@@ -19,6 +19,8 @@ namespace osu.Game.Rulesets.Osu.Edit
 {
     public partial class OsuSelectionRotationHandler : SelectionRotationHandler
     {
+        public BindableBool CanRotatePlayfieldOrigin { get; private set; } = new BindableBool();
+
         [Resolved]
         private IEditorChangeHandler? changeHandler { get; set; }
 
@@ -41,7 +43,8 @@ namespace osu.Game.Rulesets.Osu.Edit
         private void updateState()
         {
             var quad = GeometryUtils.GetSurroundingQuad(selectedMovableObjects);
-            CanRotate.Value = quad.Width > 0 || quad.Height > 0;
+            CanRotateSelectionOrigin.Value = quad.Width > 0 || quad.Height > 0;
+            CanRotatePlayfieldOrigin.Value = selectedItems.Any();
         }
 
         private OsuHitObject[]? objectsInRotation;
