@@ -21,8 +21,7 @@ namespace osu.Game.Storyboards
             LoopType = loopType;
         }
 
-        public override Drawable CreateDrawable()
-            => new DrawableStoryboardAnimation(this);
+        public override Drawable CreateDrawable() => new DrawableStoryboardAnimation(this);
     }
 
     public enum AnimationLoopType
