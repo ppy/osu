@@ -45,7 +45,7 @@ namespace osu.Game.Overlays
             {
                 new OsuContextMenuContainer
                 {
-                    Width = 360,
+                    Width = 400,
                     AutoSizeAxes = Axes.Y,
                     Children = new Drawable[]
                     {
