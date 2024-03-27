@@ -21,10 +21,6 @@ namespace osu.Game.Rulesets.Mania.Mods
         {
             var mbc = (ManiaBeatmapConverter)beatmapConverter;
 
-            // Although this can work, for now let's not allow keymods for mania-specific beatmaps
-            if (mbc.IsForCurrentRuleset)
-                return;
-
             mbc.TargetColumns = KeyCount;
         }
 

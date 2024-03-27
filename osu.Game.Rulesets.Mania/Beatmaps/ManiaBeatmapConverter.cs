@@ -32,7 +32,8 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
         public readonly bool IsForCurrentRuleset;
 
         private readonly int originalTargetColumns;
-
+        private double shortestJack;
+        private const double jack_mult = 1.5;
         // Internal for testing purposes
         internal LegacyRandom Random { get; private set; }
 
@@ -51,7 +52,6 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
                 TargetColumns /= 2;
                 Dual = true;
             }
-
             originalTargetColumns = TargetColumns;
         }
 
@@ -92,7 +92,22 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
             int seed = (int)MathF.Round(difficulty.DrainRate + difficulty.CircleSize) * 20 + (int)(difficulty.OverallDifficulty * 41.2) + (int)MathF.Round(difficulty.ApproachRate);
             Random = new LegacyRandom(seed);
 
-            return base.ConvertBeatmap(original, cancellationToken);
+            if (IsForCurrentRuleset)
+            {
+                int KeyModColumns = TargetColumns;
+                TargetColumns = originalTargetColumns;
+
+                var beatmap = (ManiaBeatmap)base.ConvertBeatmap(original, cancellationToken);
+
+                TargetColumns = KeyModColumns;
+                convertSpecific(beatmap);
+
+                return beatmap;
+            }
+            else
+            {
+                return (ManiaBeatmap)base.ConvertBeatmap(original, cancellationToken);
+            }
         }
 
         protected override Beatmap<ManiaHitObject> CreateBeatmap()
@@ -224,6 +239,309 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
                 foreach (var obj in newPattern.HitObjects)
                     yield return obj;
             }
+        }
+
+        /// <summary>
+        /// Conversion of osu!mania-specific beatmaps if KeyMod is active.
+        /// </summary>
+        private void convertSpecific(ManiaBeatmap beatmap)
+        {
+            while (TargetColumns - beatmap.TotalColumns > 0)
+            {
+                insertColumn(beatmap);
+
+                int columns = beatmap.TotalColumns;
+                beatmap.Stages.Clear();
+                beatmap.Stages.Add(new StageDefinition(columns + 1));
+            }
+
+            if (TargetColumns - beatmap.TotalColumns < 0)
+            {
+                var jackMap = getInfo(beatmap);
+                while (TargetColumns - beatmap.TotalColumns < 0)
+                {
+                    reduceColumn(beatmap);
+
+                    int columns = beatmap.TotalColumns;
+                    beatmap.Stages.Clear();
+                    beatmap.Stages.Add(new StageDefinition(columns - 1));
+                }
+                reduceHitObjects(beatmap);
+                fixHitObjects(beatmap);
+                spaceHitObjects(beatmap, jackMap);
+            }
+        }
+
+        private void insertColumn(ManiaBeatmap beatmap)
+        {
+            double turnTiming = -1;
+
+            int patternOffset = 1;
+            int patternOldOffset = 1;
+
+            int patternMoveDirection = 1;
+
+            foreach (var hitObject in beatmap.HitObjects)
+            {
+                var edgeHitObject = hitObject;
+                if (hitObject.StartTime > turnTiming)
+                {
+                    int patternToColumn = patternOffset + (patternMoveDirection == 1 ? 0 : -1);
+
+                    var bm = beatmap.HitObjects.Where(x => x.StartTime >= hitObject.StartTime
+                                                      && x.Column == patternToColumn)
+                                               .ToList();
+                    if (bm.Count != 0)
+                    {
+                        edgeHitObject = bm.First();
+                    }
+
+                    //for even distribution of free space
+                    if (bm.Count >= 2 &&
+                        (patternOffset == beatmap.TotalColumns || patternOffset == 0))
+                        edgeHitObject = bm[1];
+
+                    patternOldOffset = patternOffset;
+                    patternOffset += patternMoveDirection;
+                    if (patternOffset >= beatmap.TotalColumns || patternOffset <= 0)
+                        patternMoveDirection *= -1;
+
+                    //any next note that not on the same chord
+                    turnTiming = edgeHitObject.GetEndTime();
+                }
+
+                if (hitObject.Column >= patternOldOffset)
+                {
+                    hitObject.Column += 1;
+                }
+            }
+        }
+
+        private List<double> getInfo(ManiaBeatmap beatmap)
+        {
+            //maximum one beat for easy maps
+            double minJack = 60000 / beatmap.BeatmapInfo.BPM;
+
+            if (beatmap.BeatmapInfo.BPM > 300)
+                minJack = 1000;
+            var grouped = beatmap.HitObjects.GroupBy(x => x.Column);
+
+            foreach (var group in grouped)
+            {
+                double endPoint = -10000;
+                foreach (var hitObject in group)
+                {
+                    double jack = hitObject.StartTime - endPoint;
+
+                    if (jack < 1) jack = 1;
+
+                    if (jack < minJack)
+                        minJack = jack;
+
+                    endPoint = hitObject.GetEndTime();
+                }
+            }
+            shortestJack = minJack;
+
+            double jackToAvoid = minJack * jack_mult;
+            var jackMap = new List<double>();
+            foreach (var group in grouped)
+            {
+                double endPoint = -10000;
+                foreach (var hitObject in group)
+                {
+                    double jack = hitObject.StartTime - endPoint;
+                    if (jack < jackToAvoid)
+                        jackMap.Add(hitObject.StartTime);
+
+                    endPoint = hitObject.GetEndTime();
+                }
+                shortestJack = minJack;
+            }
+            return jackMap;
+        }
+
+        private void reduceColumn(ManiaBeatmap beatmap)
+        {
+            int currentColumn = beatmap.TotalColumns - 1;
+            int MoveDirection = -1;
+
+            foreach (var hitObject in beatmap.HitObjects)
+            {
+                if (hitObject.Column == currentColumn)
+                {
+                    currentColumn += MoveDirection;
+
+                    if (currentColumn >= beatmap.TotalColumns - 1 || currentColumn <= 0)
+                        MoveDirection *= -1;
+                }
+                if (hitObject.Column > currentColumn)
+                    hitObject.Column -= 1;
+            }
+        }
+
+        private void reduceHitObjects(ManiaBeatmap beatmap)
+        {
+            //hold notes treated as a separate chord to prevent their reduction
+            foreach (var group in beatmap.HitObjects.GroupBy(x => new { x.StartTime, x.GetType().Name })
+                                                    .ToList())
+            {
+                if (group.Count() == 1) continue;
+                int newChordScale = (int)Math.Round(group.Count() / (double)beatmap.OriginalTotalColumns * TargetColumns);
+
+                if (newChordScale == 0) newChordScale = 1;
+                int noteToDel = group.Count() - newChordScale;
+
+                //remove some notes at the same column
+                for (int i = 0; noteToDel > 0 && i < group.Count(); i++)
+                {
+                    if (group.Where(x => x.Column == group.ElementAt(i).Column)
+                             .Count() > 1)
+                    {
+                        beatmap.HitObjects.Remove(group.ElementAt(i));
+                        noteToDel--;
+                    }
+                }
+
+                Random rnd = new Random((int)group.Key.StartTime);
+                var newGr = group.OrderBy(x => rnd.Next()).ToList();
+
+                for (int i = 0; i < noteToDel; i++)
+                {
+                    beatmap.HitObjects.Remove(newGr.ElementAt(i));
+                }
+            }
+        }
+
+        private void fixHitObjects(ManiaBeatmap beatmap)
+        {
+            for (int i = 0; i < beatmap.HitObjects.Count(); i++)
+            {
+                var obstructions = beatmap.HitObjects.FindAll(x => x.Column == beatmap.HitObjects[i].Column
+                                                              && x.GetEndTime() > beatmap.HitObjects[i].StartTime - shortestJack
+                                                              && x.StartTime <= beatmap.HitObjects[i].StartTime);
+                //no obstruction
+                if (obstructions.Count() == 1)
+                    continue;
+
+                int newColumn = findFreePosition(beatmap, beatmap.HitObjects[i], shortestJack, out var bestHNToShorten);
+
+                //obstruction, possible move to closest space
+                if (newColumn != -1)
+                {
+                    beatmap.HitObjects[i].Column = newColumn;
+                    continue;
+                }
+                //only obstruction is HoldNote, all space is obstructed,
+                //possible to shorten HoldNote on current column to fit
+                if (obstructions.Count() == 2
+                    && obstructions.First().StartTime <= beatmap.HitObjects[i].StartTime - shortestJack
+                    && obstructions.First() is HoldNote hn)
+                {
+                    shortenHoldNote(beatmap, beatmap.HitObjects[i], hn);
+                    continue;
+                }
+                //obstruction, all space is obstructed,
+                //possible to shorten HoldNote on any other column to fit
+                if (bestHNToShorten != null)
+                {
+                    beatmap.HitObjects[i].Column = bestHNToShorten.Column;
+                    shortenHoldNote(beatmap, beatmap.HitObjects[i], bestHNToShorten);
+                    continue;
+                }
+
+                beatmap.HitObjects.Remove(beatmap.HitObjects[i]);
+                i--;
+            }
+        }
+
+        /// <summary>
+        /// try to space out all jacks shorter than shortestJacks * jack_mult if they weren't presented in original map
+        /// </summary>
+        private void spaceHitObjects(ManiaBeatmap beatmap, List<double> jackMap)
+        {
+            double jackToAvoid = shortestJack * jack_mult;
+            for (int i = 0; i < beatmap.HitObjects.Count(); i++)
+            {
+                var hitObject = beatmap.HitObjects[i];
+                if (jackMap.FirstOrDefault(x => x == beatmap.HitObjects[i].StartTime) != default)
+                    continue;
+
+                var jack = beatmap.HitObjects.FirstOrDefault(x => x.Column == beatmap.HitObjects[i].Column
+                                                              && x.StartTime > beatmap.HitObjects[i].StartTime - jackToAvoid
+                                                              && x.StartTime < beatmap.HitObjects[i].StartTime);
+                //no obstruction
+                if (jack != null)
+                {
+                    int newColumn = findFreePosition(beatmap, beatmap.HitObjects[i], jackToAvoid, out var bestHNToShorten);
+
+                    if (newColumn != -1)
+                    {
+                        beatmap.HitObjects[i].Column = newColumn;
+                    }
+                }
+            }
+        }
+
+        private int findFreePosition(ManiaBeatmap beatmap, ManiaHitObject hitObject, double jackTime, out HoldNote bestHNToShorten)
+        {
+            bool HNFound = false;
+            bestHNToShorten = null;
+            for (int i = 0; ; i *= -1)
+            {
+                //i = -1, 1, -2, 2, -3...
+                if (i <= 0) i--;
+
+                int newColumn = hitObject.Column + i;
+
+                if (newColumn < 0 || newColumn >= beatmap.TotalColumns)
+                {
+                    int nextNewColumn = hitObject.Column + i * -1;
+
+                    if (nextNewColumn < 0 || nextNewColumn >= beatmap.TotalColumns)
+                    {
+                        return -1;
+                    }
+                    continue;
+                }
+
+                var obstructions = beatmap.HitObjects.FindAll(x => x.Column == newColumn
+                                                              && x.GetEndTime() > hitObject.StartTime - jackTime
+                                                              && x.StartTime < hitObject.StartTime + jackTime);
+                if (obstructions.Count() == 0)
+                    return newColumn;
+
+                if (!HNFound && obstructions.Count() == 1
+                    && obstructions.First().StartTime <= hitObject.StartTime - jackTime)
+                {
+                    switch (obstructions[0])
+                    {
+                        case HoldNote hold:
+
+                            HNFound = true;
+                            bestHNToShorten = hold;
+                            break;
+                    }
+                }
+            }
+        }
+
+        private void shortenHoldNote(ManiaBeatmap beatmap, ManiaHitObject hitObject, HoldNote holdNote)
+        {
+            double shorterEnd = hitObject.StartTime - shortestJack;
+            if (shorterEnd - holdNote.StartTime >= shortestJack)
+            {
+                holdNote.EndTime = shorterEnd;
+            }
+            else
+            {
+                beatmap.HitObjects[beatmap.HitObjects.IndexOf(holdNote)] = new Note()
+                {
+                    StartTime = holdNote.StartTime,
+                    Column = holdNote.Column
+                };
+            }
+            return;
         }
 
         /// <summary>
