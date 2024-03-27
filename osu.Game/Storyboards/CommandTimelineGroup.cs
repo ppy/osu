@@ -2,11 +2,11 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osuTK;
-using osuTK.Graphics;
 using osu.Framework.Graphics;
 using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
+using osu.Framework.Graphics.Colour;
 
 namespace osu.Game.Storyboards
 {
@@ -14,16 +14,16 @@ namespace osu.Game.Storyboards
 
     public class CommandTimelineGroup
     {
-        public CommandTimeline<float> X = new CommandTimeline<float>();
-        public CommandTimeline<float> Y = new CommandTimeline<float>();
-        public CommandTimeline<float> Scale = new CommandTimeline<float>();
-        public CommandTimeline<Vector2> VectorScale = new CommandTimeline<Vector2>();
-        public CommandTimeline<float> Rotation = new CommandTimeline<float>();
-        public CommandTimeline<Color4> Colour = new CommandTimeline<Color4>();
-        public CommandTimeline<float> Alpha = new CommandTimeline<float>();
-        public CommandTimeline<BlendingParameters> BlendingParameters = new CommandTimeline<BlendingParameters>();
-        public CommandTimeline<bool> FlipH = new CommandTimeline<bool>();
-        public CommandTimeline<bool> FlipV = new CommandTimeline<bool>();
+        public CommandTimeline<float> X = new CommandTimeline<float>("X");
+        public CommandTimeline<float> Y = new CommandTimeline<float>("Y");
+        public CommandTimeline<Vector2> Scale = new CommandTimeline<Vector2>("Scale");
+        public CommandTimeline<Vector2> VectorScale = new CommandTimeline<Vector2>("VectorScale");
+        public CommandTimeline<float> Rotation = new CommandTimeline<float>("Rotation");
+        public CommandTimeline<ColourInfo> Colour = new CommandTimeline<ColourInfo>("Colour");
+        public CommandTimeline<float> Alpha = new CommandTimeline<float>("Alpha");
+        public CommandTimeline<BlendingParameters> BlendingParameters = new CommandTimeline<BlendingParameters>("Blending") { IsParameterTimeline = true };
+        public CommandTimeline<bool> FlipH = new CommandTimeline<bool>("FlipH") { IsParameterTimeline = true };
+        public CommandTimeline<bool> FlipV = new CommandTimeline<bool>("FlipV") { IsParameterTimeline = true };
 
         private readonly ICommandTimeline[] timelines;
 
@@ -74,6 +74,8 @@ namespace osu.Game.Storyboards
                         EndTime = offset + command.EndTime,
                         StartValue = command.StartValue,
                         EndValue = command.EndValue,
+                        PropertyName = command.PropertyName,
+                        IsParameterCommand = command.IsParameterCommand
                     });
             }
 

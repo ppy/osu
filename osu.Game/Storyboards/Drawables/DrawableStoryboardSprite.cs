@@ -13,7 +13,7 @@ using osuTK;
 
 namespace osu.Game.Storyboards.Drawables
 {
-    public partial class DrawableStoryboardSprite : Sprite, IFlippable, IVectorScalable
+    public partial class DrawableStoryboardSprite : Sprite, IDrawableStoryboardElement
     {
         public StoryboardSprite Sprite { get; }
 
