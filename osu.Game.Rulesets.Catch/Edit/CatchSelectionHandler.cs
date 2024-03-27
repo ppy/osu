@@ -76,21 +76,39 @@ namespace osu.Game.Rulesets.Catch.Edit
 
         public override bool HandleReverse()
         {
+            var hitObjects = EditorBeatmap.SelectedHitObjects
+                .OfType<CatchHitObject>()
+                .OrderBy(obj => obj.StartTime)
+                .ToList();
+
             double selectionStartTime = SelectedItems.Min(h => h.StartTime);
             double selectionEndTime = SelectedItems.Max(h => h.GetEndTime());
 
-            EditorBeatmap.PerformOnSelection(hitObject =>
-            {
-                hitObject.StartTime = selectionEndTime - (hitObject.GetEndTime() - selectionStartTime);
+            var newComboOrder = hitObjects.Select(obj => obj.NewCombo).ToList();
 
-                if (hitObject is JuiceStream juiceStream)
+            foreach (var h in hitObjects)
+            {
+                h.StartTime = selectionEndTime - (h.GetEndTime() - selectionStartTime);
+
+                if (h is JuiceStream juiceStream)
                 {
                     juiceStream.Path.Reverse(out Vector2 positionalOffset);
                     juiceStream.OriginalX += positionalOffset.X;
                     juiceStream.LegacyConvertedY += positionalOffset.Y;
                     EditorBeatmap.Update(juiceStream);
                 }
-            });
+            }
+
+            // re-order objects again after flipping their times
+            hitObjects = [.. hitObjects.OrderBy(obj => obj.StartTime)];
+
+            int i = 0;
+            foreach (bool newCombo in newComboOrder)
+            {
+                hitObjects[i].NewCombo = newCombo;
+                i++;
+            }
+
             return true;
         }
 
