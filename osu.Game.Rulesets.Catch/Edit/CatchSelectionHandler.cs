@@ -77,13 +77,16 @@ namespace osu.Game.Rulesets.Catch.Edit
         public override bool HandleReverse()
         {
             var hitObjects = EditorBeatmap.SelectedHitObjects
-                .OfType<CatchHitObject>()
-                .OrderBy(obj => obj.StartTime)
-                .ToList();
+                                          .OfType<CatchHitObject>()
+                                          .OrderBy(obj => obj.StartTime)
+                                          .ToList();
 
             double selectionStartTime = SelectedItems.Min(h => h.StartTime);
             double selectionEndTime = SelectedItems.Max(h => h.GetEndTime());
 
+            // the expectation is that even if the objects themselves are reversed temporally,
+            // the position of new combos in the selection should remain the same.
+            // preserve it for later before doing the reversal.
             var newComboOrder = hitObjects.Select(obj => obj.NewCombo).ToList();
 
             foreach (var h in hitObjects)
@@ -99,15 +102,11 @@ namespace osu.Game.Rulesets.Catch.Edit
                 }
             }
 
-            // re-order objects again after flipping their times
-            hitObjects = [.. hitObjects.OrderBy(obj => obj.StartTime)];
+            // re-order objects by start time again after reversing, and restore new combo flag positioning
+            hitObjects = hitObjects.OrderBy(obj => obj.StartTime).ToList();
 
-            int i = 0;
-            foreach (bool newCombo in newComboOrder)
-            {
-                hitObjects[i].NewCombo = newCombo;
-                i++;
-            }
+            for (int i = 0; i < hitObjects.Count; ++i)
+                hitObjects[i].NewCombo = newComboOrder[i];
 
             return true;
         }
