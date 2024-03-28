@@ -6,6 +6,7 @@
 using osu.Framework.Graphics;
 using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Rulesets.UI.Scrolling;
 
 namespace osu.Game.Rulesets.Mania.Objects.Drawables
 {
@@ -30,6 +31,15 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             Origin = Anchor.TopCentre;
         }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            Direction.BindValueChanged(_ => updateTailOrigin());
+            HoldNote.TailOrigin.BindValueChanged(_ => updateTailOrigin());
+            updateTailOrigin();
+        }
+
         public void UpdateResult() => base.UpdateResult(true);
 
         protected override void CheckForResult(bool userTriggered, double timeOffset) =>
@@ -51,6 +61,14 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
         public override void OnReleased(KeyBindingReleaseEvent<ManiaAction> e)
         {
+        }
+
+        private void updateTailOrigin()
+        {
+            if (Direction.Value == ScrollingDirection.Up)
+                Origin = HoldNote.TailOrigin.Value == Anchor.TopCentre ? Anchor.BottomCentre : Anchor.TopCentre;
+            else
+                Origin = HoldNote.TailOrigin.Value;
         }
     }
 }

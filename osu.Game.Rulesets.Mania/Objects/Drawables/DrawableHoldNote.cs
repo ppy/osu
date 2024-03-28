@@ -32,8 +32,11 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
         public IBindable<bool> IsHitting => isHitting;
 
-        private IBindable<Anchor> tailOrigin;
         private readonly Bindable<bool> isHitting = new Bindable<bool>();
+
+        public IBindable<Anchor> TailOrigin => tailOrigin;
+
+        private readonly Bindable<Anchor> tailOrigin = new Bindable<Anchor>(Anchor.BottomCentre);
 
         public DrawableHoldNoteHead Head => headContainer.Child;
         public DrawableHoldNoteTail Tail => tailContainer.Child;
@@ -242,16 +245,11 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             // The rationale for this is account for heads/tails with corner radius.
             bodyPiece.Y = (Direction.Value == ScrollingDirection.Up ? 1 : -1) * Head.Height / 2;
             bodyPiece.Height = DrawHeight - Head.Height / 2;
+
             if (tailOrigin.Value == Anchor.TopCentre)
                 bodyPiece.Height -= Tail.Height / 2;
             else
                 bodyPiece.Height += Tail.Height / 2;
-
-            // Update the origin of the tail piece, taking into account the scrolling direction
-            if (Direction.Value == ScrollingDirection.Up)
-                Tail.Origin = tailOrigin.Value == Anchor.TopCentre ? Anchor.BottomCentre : Anchor.TopCentre;
-            else
-                Tail.Origin = tailOrigin.Value;
 
             if (Time.Current >= HitObject.StartTime)
             {
@@ -275,10 +273,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         protected override void ApplySkin(ISkinSource skin, bool allowFallback)
         {
             base.ApplySkin(skin, allowFallback);
-            var skinTailOrigin = skin.GetConfig<ManiaSkinConfigurationLookup, Anchor>(
-                new ManiaSkinConfigurationLookup(LegacyManiaSkinConfigurationLookups.HoldNoteTailOrigin)
-            );
-            tailOrigin = skinTailOrigin ?? new Bindable<Anchor>(Anchor.BottomCentre);
+            tailOrigin.Value = skin.GetConfig<ManiaSkinConfigurationLookup, Anchor>(new ManiaSkinConfigurationLookup(LegacyManiaSkinConfigurationLookups.HoldNoteTailOrigin))?.Value ?? Anchor.BottomCentre;
         }
 
         protected override void CheckForResult(bool userTriggered, double timeOffset)
