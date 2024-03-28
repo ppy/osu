@@ -4,6 +4,7 @@
 #nullable disable
 
 using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -22,6 +23,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation;
 using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Select.Filter;
 using osuTK;
 using osuTK.Graphics;
@@ -65,6 +67,7 @@ namespace osu.Game.Screens.Select
                 Sort = sortMode.Value,
                 AllowConvertedBeatmaps = showConverted.Value,
                 Ruleset = ruleset.Value,
+                Mods = mods.Value,
                 CollectionBeatmapMD5Hashes = collectionDropdown.Current.Value?.Collection?.PerformRead(c => c.BeatmapMD5Hashes).ToImmutableHashSet()
             };
 
@@ -84,7 +87,7 @@ namespace osu.Game.Screens.Select
             base.ReceivePositionalInputAt(screenSpacePos) || sortTabs.ReceivePositionalInputAt(screenSpacePos);
 
         [BackgroundDependencyLoader(permitNulls: true)]
-        private void load(OsuColour colours, IBindable<RulesetInfo> parentRuleset, OsuConfigManager config)
+        private void load(OsuColour colours, OsuConfigManager config)
         {
             sortMode = config.GetBindable<SortMode>(OsuSetting.SongSelectSortingMode);
             groupMode = config.GetBindable<GroupMode>(OsuSetting.SongSelectGroupingMode);
@@ -214,8 +217,8 @@ namespace osu.Game.Screens.Select
             config.BindWith(OsuSetting.DisplayStarsMaximum, maximumStars);
             maximumStars.ValueChanged += _ => updateCriteria();
 
-            ruleset.BindTo(parentRuleset);
             ruleset.BindValueChanged(_ => updateCriteria());
+            mods.BindValueChanged(_ => updateCriteria());
 
             groupMode.BindValueChanged(_ => updateCriteria());
             sortMode.BindValueChanged(_ => updateCriteria());
@@ -239,7 +242,11 @@ namespace osu.Game.Screens.Select
             searchTextBox.HoldFocus = true;
         }
 
-        private readonly IBindable<RulesetInfo> ruleset = new Bindable<RulesetInfo>();
+        [Resolved]
+        private IBindable<RulesetInfo> ruleset { get; set; } = null!;
+
+        [Resolved]
+        private IBindable<IReadOnlyList<Mod>> mods { get; set; } = null!;
 
         private readonly Bindable<bool> showConverted = new Bindable<bool>();
         private readonly Bindable<double> minimumStars = new BindableDouble();
