@@ -209,38 +209,61 @@ namespace osu.Game.Storyboards
         {
             // Here we are starting from maximum value and trying to minimise the end time on each step.
             // There are few solid guesses we can make using which sprite's end time can be minimised: alpha = 0, scale = 0, colour.a = 0.
+            // If one of these conditions is met, there's no point of keeping the sprite alive since it will be invisible regardless.
             double[] deathTimes =
             {
                 double.MaxValue, // alpha
                 double.MaxValue, // colour alpha
-                double.MaxValue, // scale
+                double.MaxValue, // vector scale
                 double.MaxValue, // scale x
                 double.MaxValue, // scale y
             };
 
-            // The loops below are following the same pattern.
-            // We could be using TimelineGroup.EndValue here, however it's possible to have multiple commands with 0 value in a row
-            // so we are saving the earliest of them.
+            // Loops below are following the same pattern.
             foreach (var alphaCommand in timelineGroup.Alpha.Commands)
             {
+                // sprite is invisible by the end of the command - check the start value
                 if (alphaCommand.EndValue == 0)
-                    // commands are ordered by the start time, however end time may vary. Save the earliest.
-                    deathTimes[0] = Math.Min(alphaCommand.EndTime, deathTimes[0]);
+                {
+                    if (alphaCommand.StartValue > 0)
+                    {
+                        // sprite is visible at the start and hidden at the end - should not die earlier than the end of this command
+                        deathTimes[0] = alphaCommand.EndTime;
+                    }
+                    else
+                    {
+                        // unless new command with 0 value starts earlier than the end of the current one.
+                        deathTimes[0] = Math.Min(deathTimes[0], alphaCommand.StartTime);
+                    }
+                }
                 else
-                    // If value isn't 0 (sprite becomes visible again), revert the saved state.
+                    // sprite is visible by the end of the command, revert the saved time.
                     deathTimes[0] = double.MaxValue;
             }
 
             foreach (var colourCommand in timelineGroup.Colour.Commands)
-                deathTimes[1] = colourCommand.EndValue.A == 0 ? Math.Min(colourCommand.EndTime, deathTimes[1]) : double.MaxValue;
+            {
+                deathTimes[1] = colourCommand.EndValue.A == 0
+                    ? colourCommand.StartValue.A > 0 ? colourCommand.EndTime : Math.Min(deathTimes[1], colourCommand.StartTime)
+                    : double.MaxValue;
+            }
 
             foreach (var scaleCommand in timelineGroup.Scale.Commands)
-                deathTimes[2] = scaleCommand.EndValue == 0 ? Math.Min(scaleCommand.EndTime, deathTimes[2]) : double.MaxValue;
+            {
+                deathTimes[2] = scaleCommand.EndValue == 0
+                    ? scaleCommand.StartValue > 0 ? scaleCommand.EndTime : Math.Min(deathTimes[2], scaleCommand.StartTime)
+                    : double.MaxValue;
+            }
 
             foreach (var scaleCommand in timelineGroup.VectorScale.Commands)
             {
-                deathTimes[3] = scaleCommand.EndValue.X == 0 ? Math.Min(scaleCommand.EndTime, deathTimes[3]) : double.MaxValue;
-                deathTimes[4] = scaleCommand.EndValue.Y == 0 ? Math.Min(scaleCommand.EndTime, deathTimes[4]) : double.MaxValue;
+                deathTimes[3] = scaleCommand.EndValue.X == 0
+                    ? scaleCommand.StartValue.X > 0 ? scaleCommand.EndTime : Math.Min(deathTimes[3], scaleCommand.StartTime)
+                    : double.MaxValue;
+
+                deathTimes[4] = scaleCommand.EndValue.Y == 0
+                    ? scaleCommand.StartValue.Y > 0 ? scaleCommand.EndTime : Math.Min(deathTimes[4], scaleCommand.StartTime)
+                    : double.MaxValue;
             }
 
             return deathTimes.Min();
