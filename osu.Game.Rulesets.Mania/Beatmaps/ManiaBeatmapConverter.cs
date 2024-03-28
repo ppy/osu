@@ -27,8 +27,24 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
         /// </summary>
         private const int max_notes_for_density = 7;
 
+        /// <summary>
+        /// The total number of columns.
+        /// </summary>
+        public int TotalColumns => TargetColumns * (Dual ? 2 : 1);
+
+        /// <summary>
+        /// The number of columns per-stage.
+        /// </summary>
         public int TargetColumns;
+
+        /// <summary>
+        /// Whether to double the number of stages.
+        /// </summary>
         public bool Dual;
+
+        /// <summary>
+        /// Whether the beatmap instantiated with is for the mania ruleset.
+        /// </summary>
         public readonly bool IsForCurrentRuleset;
 
         private readonly int originalTargetColumns;
@@ -152,7 +168,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
         /// <returns>The hit objects generated.</returns>
         private IEnumerable<ManiaHitObject> generateSpecific(HitObject original, IBeatmap originalBeatmap)
         {
-            var generator = new SpecificBeatmapPatternGenerator(Random, original, beatmap, lastPattern, originalBeatmap);
+            var generator = new SpecificBeatmapPatternGenerator(Random, original, originalBeatmap, TotalColumns, lastPattern);
 
             foreach (var newPattern in generator.Generate())
             {
@@ -171,13 +187,13 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
         /// <returns>The hit objects generated.</returns>
         private IEnumerable<ManiaHitObject> generateConverted(HitObject original, IBeatmap originalBeatmap)
         {
-            Patterns.PatternGenerator conversion = null;
+            Patterns.PatternGenerator? conversion = null;
 
             switch (original)
             {
                 case IHasPath:
                 {
-                    var generator = new PathObjectPatternGenerator(Random, original, beatmap, lastPattern, originalBeatmap);
+                    var generator = new PathObjectPatternGenerator(Random, original, originalBeatmap, TotalColumns, lastPattern);
                     conversion = generator;
 
                     var positionData = original as IHasPosition;
@@ -195,7 +211,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
 
                 case IHasDuration endTimeData:
                 {
-                    conversion = new EndTimeObjectPatternGenerator(Random, original, beatmap, lastPattern, originalBeatmap);
+                    conversion = new EndTimeObjectPatternGenerator(Random, original, originalBeatmap, TotalColumns, lastPattern);
 
                     recordNote(endTimeData.EndTime, new Vector2(256, 192));
                     computeDensity(endTimeData.EndTime);
@@ -206,7 +222,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
                 {
                     computeDensity(original.StartTime);
 
-                    conversion = new HitObjectPatternGenerator(Random, original, beatmap, lastPattern, lastTime, lastPosition, density, lastStair, originalBeatmap);
+                    conversion = new HitObjectPatternGenerator(Random, original, originalBeatmap, TotalColumns, lastPattern, lastTime, lastPosition, density, lastStair);
 
                     recordNote(original.StartTime, positionData.Position);
                     break;
@@ -231,8 +247,8 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
         /// </summary>
         private class SpecificBeatmapPatternGenerator : Patterns.Legacy.PatternGenerator
         {
-            public SpecificBeatmapPatternGenerator(LegacyRandom random, HitObject hitObject, ManiaBeatmap beatmap, Pattern previousPattern, IBeatmap originalBeatmap)
-                : base(random, hitObject, beatmap, previousPattern, originalBeatmap)
+            public SpecificBeatmapPatternGenerator(LegacyRandom random, HitObject hitObject, IBeatmap beatmap, int totalColumns, Pattern previousPattern)
+                : base(random, hitObject, beatmap, previousPattern, totalColumns)
             {
             }
 
