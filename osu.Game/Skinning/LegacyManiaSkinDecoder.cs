@@ -131,9 +131,12 @@ namespace osu.Game.Skinning
 
                     case "HoldNoteTailOrigin":
                         if (Enum.TryParse<HoldNoteTailOrigin>(pair.Value, out var tailOrigin))
+                        {
                             currentConfig.HoldNoteTailOrigin = tailOrigin == HoldNoteTailOrigin.Top
                                 ? Anchor.TopCentre
                                 : Anchor.BottomCentre;
+                        }
+
                         break;
 
                     case string when pair.Key.StartsWith("Colour", StringComparison.Ordinal):
