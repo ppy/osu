@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Game.Beatmaps;
@@ -20,93 +21,78 @@ namespace osu.Game.Rulesets.Catch.Tests.Editor
         [Test]
         public void TestReverseSelectionTwoFruits()
         {
-            float fruit1OldX = default;
-            float fruit2OldX = default;
+            CatchHitObject[] objects = null!;
+            bool[] newCombos = null!;
 
             addObjects([
                 new Fruit
                 {
                     StartTime = 200,
-                    X = fruit1OldX = 0,
+                    X = 0,
                 },
                 new Fruit
                 {
                     StartTime = 400,
-                    X = fruit2OldX = 20,
+                    X = 20,
                 }
             ]);
+
+            AddStep("store objects & new combo data", () =>
+            {
+                objects = getObjects().ToArray();
+                newCombos = getObjectNewCombos().ToArray();
+            });
 
             selectEverything();
             reverseSelection();
 
-            AddAssert("fruit1 is at fruit2's X",
-                () => EditorBeatmap.HitObjects.OfType<Fruit>().ElementAt(0).EffectiveX,
-                () => Is.EqualTo(fruit2OldX)
-            );
-
-            AddAssert("fruit2 is at fruit1's X",
-                () => EditorBeatmap.HitObjects.OfType<Fruit>().ElementAt(1).EffectiveX,
-                () => Is.EqualTo(fruit1OldX)
-            );
-
-            AddAssert("fruit2 is not a new combo",
-                () => EditorBeatmap.HitObjects.OfType<Fruit>().ElementAt(1).NewCombo,
-                () => Is.EqualTo(false)
-            );
+            AddAssert("objects reversed", getObjects, () => Is.EqualTo(objects.Reverse()));
+            AddAssert("new combo positions preserved", getObjectNewCombos, () => Is.EqualTo(newCombos));
         }
 
         [Test]
         public void TestReverseSelectionThreeFruits()
         {
-            float fruit1OldX = default;
-            float fruit2OldX = default;
-            float fruit3OldX = default;
+            CatchHitObject[] objects = null!;
+            bool[] newCombos = null!;
 
             addObjects([
                 new Fruit
                 {
                     StartTime = 200,
-                    X = fruit1OldX = 0,
+                    X = 0,
                 },
                 new Fruit
                 {
                     StartTime = 400,
-                    X = fruit2OldX = 20,
+                    X = 20,
                 },
                 new Fruit
                 {
                     StartTime = 600,
-                    X = fruit3OldX = 40,
+                    X = 40,
                 }
             ]);
+
+            AddStep("store objects & new combo data", () =>
+            {
+                objects = getObjects().ToArray();
+                newCombos = getObjectNewCombos().ToArray();
+            });
 
             selectEverything();
             reverseSelection();
 
-            AddAssert("fruit1 is at fruit3's X",
-                () => EditorBeatmap.HitObjects.OfType<Fruit>().ElementAt(0).EffectiveX,
-                () => Is.EqualTo(fruit3OldX)
-            );
-
-            AddAssert("fruit2's X is unchanged",
-                () => EditorBeatmap.HitObjects.OfType<Fruit>().ElementAt(1).EffectiveX,
-                () => Is.EqualTo(fruit2OldX)
-            );
-
-            AddAssert("fruit3's is at fruit1's X",
-                () => EditorBeatmap.HitObjects.OfType<Fruit>().ElementAt(2).EffectiveX,
-                () => Is.EqualTo(fruit1OldX)
-            );
-
-            AddAssert("fruit3 is not a new combo",
-                () => EditorBeatmap.HitObjects.OfType<Fruit>().ElementAt(2).NewCombo,
-                () => Is.EqualTo(false)
-            );
+            AddAssert("objects reversed", getObjects, () => Is.EqualTo(objects.Reverse()));
+            AddAssert("new combo positions preserved", getObjectNewCombos, () => Is.EqualTo(newCombos));
         }
 
         [Test]
         public void TestReverseSelectionFruitAndJuiceStream()
         {
+            CatchHitObject[] objects = null!;
+            bool[] newCombos = null!;
+
             addObjects([
                 new Fruit
                 {
@@ -128,28 +114,25 @@ namespace osu.Game.Rulesets.Catch.Tests.Editor
                 }
             ]);
 
+            AddStep("store objects & new combo data", () =>
+            {
+                objects = getObjects().ToArray();
+                newCombos = getObjectNewCombos().ToArray();
+            });
+
             selectEverything();
             reverseSelection();
 
-            AddAssert("First element is juice stream",
-                () => EditorBeatmap.HitObjects.First().GetType(),
-                () => Is.EqualTo(typeof(JuiceStream))
-            );
-
-            AddAssert("Last element is fruit",
-                () => EditorBeatmap.HitObjects.Last().GetType(),
-                () => Is.EqualTo(typeof(Fruit))
-            );
-
-            AddAssert("Fruit is not new combo",
-                () => EditorBeatmap.HitObjects.OfType<Fruit>().ElementAt(0).NewCombo,
-                () => Is.EqualTo(false)
-            );
+            AddAssert("objects reversed", getObjects, () => Is.EqualTo(objects.Reverse()));
+            AddAssert("new combo positions preserved", getObjectNewCombos, () => Is.EqualTo(newCombos));
         }
 
         [Test]
         public void TestReverseSelectionTwoFruitsAndJuiceStream()
         {
+            CatchHitObject[] objects = null!;
+            bool[] newCombos = null!;
+
             addObjects([
                 new Fruit
                 {
@@ -176,121 +159,78 @@ namespace osu.Game.Rulesets.Catch.Tests.Editor
                 }
             ]);
 
+            AddStep("store objects & new combo data", () =>
+            {
+                objects = getObjects().ToArray();
+                newCombos = getObjectNewCombos().ToArray();
+            });
+
             selectEverything();
             reverseSelection();
 
-            AddAssert("First element is juice stream",
-                () => EditorBeatmap.HitObjects.First().GetType(),
-                () => Is.EqualTo(typeof(JuiceStream))
-            );
-
-            AddAssert("Middle element is Fruit",
-                () => EditorBeatmap.HitObjects.ElementAt(1).GetType(),
-                () => Is.EqualTo(typeof(Fruit))
-            );
-
-            AddAssert("Last element is Fruit",
-                () => EditorBeatmap.HitObjects.Last().GetType(),
-                () => Is.EqualTo(typeof(Fruit))
-            );
-
-            AddAssert("Last fruit is not new combo",
-                () => EditorBeatmap.HitObjects.OfType<Fruit>().Last().NewCombo,
-                () => Is.EqualTo(false)
-            );
+            AddAssert("objects reversed", getObjects, () => Is.EqualTo(objects.Reverse()));
+            AddAssert("new combo positions preserved", getObjectNewCombos, () => Is.EqualTo(newCombos));
         }
 
         [Test]
         public void TestReverseSelectionTwoCombos()
         {
-            float fruit1OldX = default;
-            float fruit2OldX = default;
-            float fruit3OldX = default;
-
-            float fruit4OldX = default;
-            float fruit5OldX = default;
-            float fruit6OldX = default;
+            CatchHitObject[] objects = null!;
+            bool[] newCombos = null!;
 
             addObjects([
                 new Fruit
                 {
                     StartTime = 200,
-                    X = fruit1OldX = 0,
+                    X = 0,
                 },
                 new Fruit
                 {
                     StartTime = 400,
-                    X = fruit2OldX = 20,
+                    X = 20,
                 },
                 new Fruit
                 {
                     StartTime = 600,
-                    X = fruit3OldX = 40,
+                    X = 40,
                 },
 
                 new Fruit
                 {
                     StartTime = 800,
                     NewCombo = true,
-                    X = fruit4OldX = 60,
+                    X = 60,
                 },
                 new Fruit
                 {
                     StartTime = 1000,
-                    X = fruit5OldX = 80,
+                    X = 80,
                 },
                 new Fruit
                 {
                     StartTime = 1200,
-                    X = fruit6OldX = 100,
+                    X = 100,
                 }
             ]);
+
+            AddStep("store objects & new combo data", () =>
+            {
+                objects = getObjects().ToArray();
+                newCombos = getObjectNewCombos().ToArray();
+            });
 
             selectEverything();
             reverseSelection();
 
-            AddAssert("fruit1 is at fruit6 position",
-                () => EditorBeatmap.HitObjects.OfType<Fruit>().ElementAt(0).EffectiveX,
-                () => Is.EqualTo(fruit6OldX)
-            );
-
-            AddAssert("fruit2 is at fruit5 position",
-                () => EditorBeatmap.HitObjects.OfType<Fruit>().ElementAt(1).EffectiveX,
-                () => Is.EqualTo(fruit5OldX)
-            );
-
-            AddAssert("fruit3 is at fruit4 position",
-                () => EditorBeatmap.HitObjects.OfType<Fruit>().ElementAt(2).EffectiveX,
-                () => Is.EqualTo(fruit4OldX)
-            );
-
-            AddAssert("fruit4 is at fruit3 position",
-                () => EditorBeatmap.HitObjects.OfType<Fruit>().ElementAt(3).EffectiveX,
-                () => Is.EqualTo(fruit3OldX)
-            );
-
-            AddAssert("fruit5 is at fruit2 position",
-                () => EditorBeatmap.HitObjects.OfType<Fruit>().ElementAt(4).EffectiveX,
-                () => Is.EqualTo(fruit2OldX)
-            );
-
-            AddAssert("fruit6 is at fruit1 position",
-                () => EditorBeatmap.HitObjects.OfType<Fruit>().ElementAt(5).EffectiveX,
-                () => Is.EqualTo(fruit1OldX)
-            );
-
-            AddAssert("fruit1 is new combo",
-                () => EditorBeatmap.HitObjects.OfType<Fruit>().ElementAt(0).NewCombo,
-                () => Is.EqualTo(true)
-            );
-
-            AddAssert("fruit4 is new combo",
-                () => EditorBeatmap.HitObjects.OfType<Fruit>().ElementAt(3).NewCombo,
-                () => Is.EqualTo(true)
-            );
+            AddAssert("objects reversed", getObjects, () => Is.EqualTo(objects.Reverse()));
+            AddAssert("new combo positions preserved", getObjectNewCombos, () => Is.EqualTo(newCombos));
         }
 
         private void addObjects(CatchHitObject[] hitObjects) => AddStep("Add objects", () => EditorBeatmap.AddRange(hitObjects));
+
+        private IEnumerable<CatchHitObject> getObjects() => EditorBeatmap.HitObjects.OfType<CatchHitObject>();
+
+        private IEnumerable<bool> getObjectNewCombos() => getObjects().Select(ho => ho.NewCombo);
 
         private void selectEverything()
         {

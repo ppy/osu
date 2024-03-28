@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Game.Beatmaps;
@@ -20,29 +21,32 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
         [Test]
         public void TestReverseSelectionTwoCircles()
         {
-            Vector2 circle1OldPosition = default;
-            Vector2 circle2OldPosition = default;
+            OsuHitObject[] objects = null!;
+            bool[] newCombos = null!;
 
             AddStep("Add circles", () =>
             {
                 var circle1 = new HitCircle
                 {
                     StartTime = 0,
-                    Position = circle1OldPosition = new Vector2(208, 240)
+                    Position = new Vector2(208, 240)
                 };
                 var circle2 = new HitCircle
                 {
                     StartTime = 200,
-                    Position = circle2OldPosition = new Vector2(256, 144)
+                    Position = new Vector2(256, 144)
                 };
 
                 EditorBeatmap.AddRange([circle1, circle2]);
             });
 
-            AddStep("Select circles", () =>
+            AddStep("store objects & new combo data", () =>
             {
-                EditorBeatmap.SelectedHitObjects.AddRange(EditorBeatmap.HitObjects);
+                objects = getObjects().ToArray();
+                newCombos = getObjectNewCombos().ToArray();
             });
+
+            AddStep("Select circles", () => EditorBeatmap.SelectedHitObjects.AddRange(EditorBeatmap.HitObjects));
 
             AddStep("Reverse selection", () =>
             {
@@ -51,54 +55,44 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
                 InputManager.ReleaseKey(Key.LControl);
             });
 
-            AddAssert("circle1 is at circle2 position",
-                () => EditorBeatmap.HitObjects.OfType<HitCircle>().ElementAt(0).Position,
-                () => Is.EqualTo(circle2OldPosition)
-            );
-
-            AddAssert("circle2 is at circle1 position",
-                () => EditorBeatmap.HitObjects.OfType<HitCircle>().ElementAt(1).Position,
-                () => Is.EqualTo(circle1OldPosition)
-            );
-
-            AddAssert("circle2 is not a new combo",
-                () => EditorBeatmap.HitObjects.OfType<HitCircle>().ElementAt(1).NewCombo,
-                () => Is.EqualTo(false)
-            );
+            AddAssert("objects reversed", getObjects, () => Is.EqualTo(objects.Reverse()));
+            AddAssert("new combo positions preserved", getObjectNewCombos, () => Is.EqualTo(newCombos));
         }
 
         [Test]
         public void TestReverseSelectionThreeCircles()
         {
-            Vector2 circle1OldPosition = default;
-            Vector2 circle2OldPosition = default;
-            Vector2 circle3OldPosition = default;
+            OsuHitObject[] objects = null!;
+            bool[] newCombos = null!;
 
             AddStep("Add circles", () =>
             {
                 var circle1 = new HitCircle
                 {
                     StartTime = 0,
-                    Position = circle1OldPosition = new Vector2(208, 240)
+                    Position = new Vector2(208, 240)
                 };
                 var circle2 = new HitCircle
                 {
                     StartTime = 200,
-                    Position = circle2OldPosition = new Vector2(256, 144)
+                    Position = new Vector2(256, 144)
                 };
                 var circle3 = new HitCircle
                 {
                     StartTime = 400,
-                    Position = circle3OldPosition = new Vector2(304, 240)
+                    Position = new Vector2(304, 240)
                 };
 
                 EditorBeatmap.AddRange([circle1, circle2, circle3]);
             });
 
-            AddStep("Select circles", () =>
+            AddStep("store objects & new combo data", () =>
             {
-                EditorBeatmap.SelectedHitObjects.AddRange(EditorBeatmap.HitObjects);
+                objects = getObjects().ToArray();
+                newCombos = getObjectNewCombos().ToArray();
             });
+
+            AddStep("Select circles", () => EditorBeatmap.SelectedHitObjects.AddRange(EditorBeatmap.HitObjects));
 
             AddStep("Reverse selection", () =>
             {
@@ -107,26 +101,16 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
                 InputManager.ReleaseKey(Key.LControl);
             });
 
-            AddAssert("circle1 is at circle3 position",
-                () => EditorBeatmap.HitObjects.OfType<HitCircle>().ElementAt(0).Position,
-                () => Is.EqualTo(circle3OldPosition)
-            );
-
-            AddAssert("circle3 is at circle1 position",
-                () => EditorBeatmap.HitObjects.OfType<HitCircle>().ElementAt(2).Position,
-                () => Is.EqualTo(circle1OldPosition)
-            );
-
-            AddAssert("circle3 is not a new combo",
-                () => EditorBeatmap.HitObjects.OfType<HitCircle>().ElementAt(2).NewCombo,
-                () => Is.EqualTo(false)
-            );
+            AddAssert("objects reversed", getObjects, () => Is.EqualTo(objects.Reverse()));
+            AddAssert("new combo positions preserved", getObjectNewCombos, () => Is.EqualTo(newCombos));
         }
 
         [Test]
         public void TestReverseSelectionCircleAndSlider()
         {
-            Vector2 circleOldPosition = default;
+            OsuHitObject[] objects = null!;
+            bool[] newCombos = null!;
+
             Vector2 sliderHeadOldPosition = default;
             Vector2 sliderTailOldPosition = default;
 
@@ -135,7 +119,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
                 var circle = new HitCircle
                 {
                     StartTime = 0,
-                    Position = circleOldPosition = new Vector2(208, 240)
+                    Position = new Vector2(208, 240)
                 };
                 var slider = new Slider
                 {
@@ -156,13 +140,13 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
                 EditorBeatmap.AddRange([circle, slider]);
             });
 
-            AddStep("Select objects", () =>
+            AddStep("store objects & new combo data", () =>
             {
-                var circle = (HitCircle)EditorBeatmap.HitObjects[0];
-                var slider = (Slider)EditorBeatmap.HitObjects[1];
-
-                EditorBeatmap.SelectedHitObjects.AddRange(EditorBeatmap.HitObjects);
+                objects = getObjects().ToArray();
+                newCombos = getObjectNewCombos().ToArray();
             });
+
+            AddStep("Select objects", () => EditorBeatmap.SelectedHitObjects.AddRange(EditorBeatmap.HitObjects));
 
             AddStep("Reverse selection", () =>
             {
@@ -171,10 +155,8 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
                 InputManager.ReleaseKey(Key.LControl);
             });
 
-            AddAssert("circle is at the same position",
-                () => EditorBeatmap.HitObjects.OfType<HitCircle>().ElementAt(0).Position,
-                () => Is.EqualTo(circleOldPosition)
-            );
+            AddAssert("objects reversed", getObjects, () => Is.EqualTo(objects.Reverse()));
+            AddAssert("new combo positions preserved", getObjectNewCombos, () => Is.EqualTo(newCombos));
 
             AddAssert("Slider head is at slider tail", () =>
                 Vector2.Distance(EditorBeatmap.HitObjects.OfType<Slider>().ElementAt(0).Position, sliderTailOldPosition) < 1);
@@ -186,8 +168,8 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
         [Test]
         public void TestReverseSelectionTwoCirclesAndSlider()
         {
-            Vector2 circle1OldPosition = default;
-            Vector2 circle2OldPosition = default;
+            OsuHitObject[] objects = null!;
+            bool[] newCombos = null!;
 
             Vector2 sliderHeadOldPosition = default;
             Vector2 sliderTailOldPosition = default;
@@ -197,12 +179,12 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
                 var circle1 = new HitCircle
                 {
                     StartTime = 0,
-                    Position = circle1OldPosition = new Vector2(208, 240)
+                    Position = new Vector2(208, 240)
                 };
                 var circle2 = new HitCircle
                 {
                     StartTime = 200,
-                    Position = circle2OldPosition = new Vector2(256, 144)
+                    Position = new Vector2(256, 144)
                 };
                 var slider = new Slider
                 {
@@ -223,10 +205,13 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
                 EditorBeatmap.AddRange([circle1, circle2, slider]);
             });
 
-            AddStep("Select objects", () =>
+            AddStep("store objects & new combo data", () =>
             {
-                EditorBeatmap.SelectedHitObjects.AddRange(EditorBeatmap.HitObjects);
+                objects = getObjects().ToArray();
+                newCombos = getObjectNewCombos().ToArray();
             });
+
+            AddStep("Select objects", () => EditorBeatmap.SelectedHitObjects.AddRange(EditorBeatmap.HitObjects));
 
             AddStep("Reverse selection", () =>
             {
@@ -235,15 +220,8 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
                 InputManager.ReleaseKey(Key.LControl);
             });
 
-            AddAssert("circle1 is at circle2 position",
-                () => EditorBeatmap.HitObjects.OfType<HitCircle>().ElementAt(0).Position,
-                () => Is.EqualTo(circle2OldPosition)
-            );
-
-            AddAssert("circle2 is at circle1 position",
-                () => EditorBeatmap.HitObjects.OfType<HitCircle>().ElementAt(1).Position,
-                () => Is.EqualTo(circle1OldPosition)
-            );
+            AddAssert("objects reversed", getObjects, () => Is.EqualTo(objects.Reverse()));
+            AddAssert("new combo positions preserved", getObjectNewCombos, () => Is.EqualTo(newCombos));
 
             AddAssert("Slider head is at slider tail", () =>
                 Vector2.Distance(EditorBeatmap.HitObjects.OfType<Slider>().ElementAt(0).Position, sliderTailOldPosition) < 1);
@@ -255,56 +233,54 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
         [Test]
         public void TestReverseSelectionTwoCombos()
         {
-            Vector2 circle1OldPosition = default;
-            Vector2 circle2OldPosition = default;
-            Vector2 circle3OldPosition = default;
-
-            Vector2 circle4OldPosition = default;
-            Vector2 circle5OldPosition = default;
-            Vector2 circle6OldPosition = default;
+            OsuHitObject[] objects = null!;
+            bool[] newCombos = null!;
 
             AddStep("Add circles", () =>
             {
                 var circle1 = new HitCircle
                 {
                     StartTime = 0,
-                    Position = circle1OldPosition = new Vector2(216, 240)
+                    Position = new Vector2(216, 240)
                 };
                 var circle2 = new HitCircle
                 {
                     StartTime = 200,
-                    Position = circle2OldPosition = new Vector2(120, 192)
+                    Position = new Vector2(120, 192)
                 };
                 var circle3 = new HitCircle
                 {
                     StartTime = 400,
-                    Position = circle3OldPosition = new Vector2(216, 144)
+                    Position = new Vector2(216, 144)
                 };
 
                 var circle4 = new HitCircle
                 {
                     StartTime = 646,
                     NewCombo = true,
-                    Position = circle4OldPosition = new Vector2(296, 240)
+                    Position = new Vector2(296, 240)
                 };
                 var circle5 = new HitCircle
                 {
                     StartTime = 846,
-                    Position = circle5OldPosition = new Vector2(392, 162)
+                    Position = new Vector2(392, 162)
                 };
                 var circle6 = new HitCircle
                 {
                     StartTime = 1046,
-                    Position = circle6OldPosition = new Vector2(296, 144)
+                    Position = new Vector2(296, 144)
                 };
 
                 EditorBeatmap.AddRange([circle1, circle2, circle3, circle4, circle5, circle6]);
             });
 
-            AddStep("Select circles", () =>
+            AddStep("store objects & new combo data", () =>
             {
-                EditorBeatmap.SelectedHitObjects.AddRange(EditorBeatmap.HitObjects);
+                objects = getObjects().ToArray();
+                newCombos = getObjectNewCombos().ToArray();
             });
+
+            AddStep("Select circles", () => EditorBeatmap.SelectedHitObjects.AddRange(EditorBeatmap.HitObjects));
 
             AddStep("Reverse selection", () =>
             {
@@ -313,35 +289,12 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
                 InputManager.ReleaseKey(Key.LControl);
             });
 
-            AddAssert("circle1 is at circle6 position",
-                () => EditorBeatmap.HitObjects.OfType<HitCircle>().ElementAt(0).Position,
-                () => Is.EqualTo(circle6OldPosition)
-            );
-
-            AddAssert("circle2 is at circle5 position",
-                () => EditorBeatmap.HitObjects.OfType<HitCircle>().ElementAt(1).Position,
-                () => Is.EqualTo(circle5OldPosition)
-            );
-
-            AddAssert("circle3 is at circle4 position",
-                () => EditorBeatmap.HitObjects.OfType<HitCircle>().ElementAt(2).Position,
-                () => Is.EqualTo(circle4OldPosition)
-            );
-
-            AddAssert("circle4 is at circle3 position",
-                () => EditorBeatmap.HitObjects.OfType<HitCircle>().ElementAt(3).Position,
-                () => Is.EqualTo(circle3OldPosition)
-            );
-
-            AddAssert("circle5 is at circle2 position",
-                () => EditorBeatmap.HitObjects.OfType<HitCircle>().ElementAt(4).Position,
-                () => Is.EqualTo(circle2OldPosition)
-            );
-
-            AddAssert("circle6 is at circle1 position",
-                () => EditorBeatmap.HitObjects.OfType<HitCircle>().ElementAt(5).Position,
-                () => Is.EqualTo(circle1OldPosition)
-            );
+            AddAssert("objects reversed", getObjects, () => Is.EqualTo(objects.Reverse()));
+            AddAssert("new combo positions preserved", getObjectNewCombos, () => Is.EqualTo(newCombos));
         }
+
+        private IEnumerable<OsuHitObject> getObjects() => EditorBeatmap.HitObjects.OfType<OsuHitObject>();
+
+        private IEnumerable<bool> getObjectNewCombos() => getObjects().Select(ho => ho.NewCombo);
     }
 }
