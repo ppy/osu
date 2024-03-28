@@ -46,8 +46,6 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
         /// </summary>
         public readonly bool IsForCurrentRuleset;
 
-        private readonly int originalTargetColumns;
-
         // Internal for testing purposes
         internal readonly LegacyRandom Random;
 
@@ -70,8 +68,6 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
                 TargetColumns /= 2;
                 Dual = true;
             }
-
-            originalTargetColumns = TargetColumns;
 
             static int getColumnCount(LegacyBeatmapConversionDifficultyInfo difficulty)
             {
@@ -122,7 +118,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
 
         protected override Beatmap<ManiaHitObject> CreateBeatmap()
         {
-            ManiaBeatmap beatmap = new ManiaBeatmap(new StageDefinition(TargetColumns), originalTargetColumns);
+            ManiaBeatmap beatmap = new ManiaBeatmap(new StageDefinition(TargetColumns));
 
             if (Dual)
                 beatmap.Stages.Add(new StageDefinition(TargetColumns));
