@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Game.Rulesets.Mania.Objects;
 using System;
 using System.Linq;
@@ -14,6 +12,7 @@ using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Mania.Beatmaps.Patterns;
 using osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring.Legacy;
 using osu.Game.Utils;
 using osuTK;
@@ -50,17 +49,21 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
         private readonly int originalTargetColumns;
 
         // Internal for testing purposes
-        internal LegacyRandom Random { get; private set; }
+        internal readonly LegacyRandom Random;
 
         private Pattern lastPattern = new Pattern();
 
-        private ManiaBeatmap beatmap;
-
         public ManiaBeatmapConverter(IBeatmap beatmap, Ruleset ruleset)
-            : base(beatmap, ruleset)
+            : this(beatmap, LegacyBeatmapConversionDifficultyInfo.FromBeatmap(beatmap), ruleset)
         {
-            IsForCurrentRuleset = beatmap.BeatmapInfo.Ruleset.Equals(ruleset.RulesetInfo);
-            TargetColumns = GetColumnCount(LegacyBeatmapConversionDifficultyInfo.FromBeatmap(beatmap));
+        }
+
+        private ManiaBeatmapConverter(IBeatmap? beatmap, LegacyBeatmapConversionDifficultyInfo difficulty, Ruleset ruleset)
+            : base(beatmap!, ruleset)
+        {
+            IsForCurrentRuleset = difficulty.SourceRuleset.Equals(ruleset.RulesetInfo);
+            Random = new LegacyRandom((int)MathF.Round(difficulty.DrainRate + difficulty.CircleSize) * 20 + (int)(difficulty.OverallDifficulty * 41.2) + (int)MathF.Round(difficulty.ApproachRate));
+            TargetColumns = getColumnCount(difficulty);
 
             if (IsForCurrentRuleset && TargetColumns > ManiaRuleset.MAX_STAGE_KEYS)
             {
@@ -69,51 +72,57 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
             }
 
             originalTargetColumns = TargetColumns;
+
+            static int getColumnCount(LegacyBeatmapConversionDifficultyInfo difficulty)
+            {
+                double roundedCircleSize = Math.Round(difficulty.CircleSize);
+
+                if (difficulty.SourceRuleset.ShortName == ManiaRuleset.SHORT_NAME)
+                    return (int)Math.Max(1, roundedCircleSize);
+
+                double roundedOverallDifficulty = Math.Round(difficulty.OverallDifficulty);
+
+                if (difficulty.TotalObjectCount > 0 && difficulty.EndTimeObjectCount >= 0)
+                {
+                    int countSliderOrSpinner = difficulty.EndTimeObjectCount;
+
+                    // In osu!stable, this division appears as if it happens on floats, but due to release-mode
+                    // optimisations, it actually ends up happening on doubles.
+                    double percentSpecialObjects = (double)countSliderOrSpinner / difficulty.TotalObjectCount;
+
+                    if (percentSpecialObjects < 0.2)
+                        return 7;
+                    if (percentSpecialObjects < 0.3 || roundedCircleSize >= 5)
+                        return roundedOverallDifficulty > 5 ? 7 : 6;
+                    if (percentSpecialObjects > 0.6)
+                        return roundedOverallDifficulty > 4 ? 5 : 4;
+                }
+
+                return Math.Max(4, Math.Min((int)roundedOverallDifficulty + 1, 7));
+            }
         }
 
-        public static int GetColumnCount(LegacyBeatmapConversionDifficultyInfo difficulty)
+        public static int GetColumnCount(IBeatmapInfo beatmapInfo, IReadOnlyList<Mod>? mods = null)
+            => GetColumnCount(LegacyBeatmapConversionDifficultyInfo.FromBeatmapInfo(beatmapInfo), mods);
+
+        public static int GetColumnCount(LegacyBeatmapConversionDifficultyInfo difficulty, IReadOnlyList<Mod>? mods = null)
         {
-            double roundedCircleSize = Math.Round(difficulty.CircleSize);
+            var converter = new ManiaBeatmapConverter(null, difficulty, new ManiaRuleset());
 
-            if (difficulty.SourceRuleset.ShortName == ManiaRuleset.SHORT_NAME)
-                return (int)Math.Max(1, roundedCircleSize);
-
-            double roundedOverallDifficulty = Math.Round(difficulty.OverallDifficulty);
-
-            if (difficulty.TotalObjectCount > 0 && difficulty.EndTimeObjectCount >= 0)
+            if (mods != null)
             {
-                int countSliderOrSpinner = difficulty.EndTimeObjectCount;
-
-                // In osu!stable, this division appears as if it happens on floats, but due to release-mode
-                // optimisations, it actually ends up happening on doubles.
-                double percentSpecialObjects = (double)countSliderOrSpinner / difficulty.TotalObjectCount;
-
-                if (percentSpecialObjects < 0.2)
-                    return 7;
-                if (percentSpecialObjects < 0.3 || roundedCircleSize >= 5)
-                    return roundedOverallDifficulty > 5 ? 7 : 6;
-                if (percentSpecialObjects > 0.6)
-                    return roundedOverallDifficulty > 4 ? 5 : 4;
+                foreach (var m in mods.OfType<IApplicableToBeatmapConverter>())
+                    m.ApplyToBeatmapConverter(converter);
             }
 
-            return Math.Max(4, Math.Min((int)roundedOverallDifficulty + 1, 7));
+            return converter.TotalColumns;
         }
 
         public override bool CanConvert() => Beatmap.HitObjects.All(h => h is IHasXPosition);
 
-        protected override Beatmap<ManiaHitObject> ConvertBeatmap(IBeatmap original, CancellationToken cancellationToken)
-        {
-            IBeatmapDifficultyInfo difficulty = original.Difficulty;
-
-            int seed = (int)MathF.Round(difficulty.DrainRate + difficulty.CircleSize) * 20 + (int)(difficulty.OverallDifficulty * 41.2) + (int)MathF.Round(difficulty.ApproachRate);
-            Random = new LegacyRandom(seed);
-
-            return base.ConvertBeatmap(original, cancellationToken);
-        }
-
         protected override Beatmap<ManiaHitObject> CreateBeatmap()
         {
-            beatmap = new ManiaBeatmap(new StageDefinition(TargetColumns), originalTargetColumns);
+            ManiaBeatmap beatmap = new ManiaBeatmap(new StageDefinition(TargetColumns), originalTargetColumns);
 
             if (Dual)
                 beatmap.Stages.Add(new StageDefinition(TargetColumns));
@@ -131,10 +140,6 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
             }
 
             var objects = IsForCurrentRuleset ? generateSpecific(original, beatmap) : generateConverted(original, beatmap);
-
-            if (objects == null)
-                yield break;
-
             foreach (ManiaHitObject obj in objects)
                 yield return obj;
         }
