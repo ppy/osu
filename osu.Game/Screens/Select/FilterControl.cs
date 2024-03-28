@@ -218,7 +218,13 @@ namespace osu.Game.Screens.Select
             maximumStars.ValueChanged += _ => updateCriteria();
 
             ruleset.BindValueChanged(_ => updateCriteria());
-            mods.BindValueChanged(_ => updateCriteria());
+            mods.BindValueChanged(_ =>
+            {
+                // Mods are updated once by the mod select overlay when song select is entered, regardless of if there are any mods.
+                // Updating the criteria here so early triggers a re-ordering of panels on song select, via... some mechanism.
+                // Todo: Investigate/fix the above and remove this schedule.
+                Scheduler.AddOnce(updateCriteria);
+            });
 
             groupMode.BindValueChanged(_ => updateCriteria());
             sortMode.BindValueChanged(_ => updateCriteria());
