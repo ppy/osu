@@ -77,7 +77,7 @@ namespace osu.Game.Screens.Select.Carousel
         private IBindable<RulesetInfo> ruleset { get; set; } = null!;
 
         [Resolved]
-        private IBindable<IReadOnlyList<Mod>>? mods { get; set; } = null!;
+        private IBindable<IReadOnlyList<Mod>> mods { get; set; } = null!;
 
         private IBindable<StarDifficulty?> starDifficultyBindable = null!;
         private CancellationTokenSource? starDifficultyCancellationSource;
@@ -189,7 +189,7 @@ namespace osu.Game.Screens.Select.Carousel
             base.LoadComplete();
 
             ruleset.BindValueChanged(_ => updateKeyCount());
-            mods?.BindValueChanged(_ => updateKeyCount());
+            mods.BindValueChanged(_ => updateKeyCount());
         }
 
         protected override void Selected()
@@ -260,7 +260,7 @@ namespace osu.Game.Screens.Select.Carousel
                 ILegacyRuleset legacyRuleset = (ILegacyRuleset)ruleset.Value.CreateInstance();
 
                 keyCountText.Alpha = 1;
-                keyCountText.Text = $"[{legacyRuleset.GetKeyCount(beatmapInfo, mods?.Value)}K]";
+                keyCountText.Text = $"[{legacyRuleset.GetKeyCount(beatmapInfo, mods.Value)}K]";
             }
             else
                 keyCountText.Alpha = 0;
