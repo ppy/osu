@@ -10,6 +10,8 @@ using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
+using osu.Game.Rulesets.UI.Scrolling;
+using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Mania.Tests.Skinning
 {
@@ -35,6 +37,25 @@ namespace osu.Game.Rulesets.Mania.Tests.Skinning
                 foreach (var holdNote in holdNotes)
                     holdNote.ChildrenOfType<DrawableHoldNoteHead>().First().MissForcefully();
             });
+        }
+
+        [Test]
+        public void TestTailOrigin()
+        {
+            AddStep("set tail origin to bottom", () =>
+            {
+                foreach (var holdNote in CreatedDrawables.SelectMany(d => d.ChildrenOfType<DrawableHoldNote>()))
+                    ((Bindable<HoldNoteTailOrigin>)holdNote.Tail.TailOrigin).Value = HoldNoteTailOrigin.Bottom;
+            });
+            AddStep("change direction to down", () => ScrollingInfo.Direction.Value = ScrollingDirection.Down);
+            AddStep("change direction to up", () => ScrollingInfo.Direction.Value = ScrollingDirection.Up);
+            AddStep("set tail origin to top", () =>
+            {
+                foreach (var holdNote in CreatedDrawables.SelectMany(d => d.ChildrenOfType<DrawableHoldNote>()))
+                    ((Bindable<HoldNoteTailOrigin>)holdNote.Tail.TailOrigin).Value = HoldNoteTailOrigin.Top;
+            });
+            AddStep("change direction to down", () => ScrollingInfo.Direction.Value = ScrollingDirection.Down);
+            AddStep("change direction to up", () => ScrollingInfo.Direction.Value = ScrollingDirection.Up);
         }
 
         private IEnumerable<DrawableHoldNote> holdNotes => CreatedDrawables.SelectMany(d => d.ChildrenOfType<DrawableHoldNote>());
