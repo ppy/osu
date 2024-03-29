@@ -754,6 +754,9 @@ namespace osu.Game.Screens.Select
 
             endLooping();
 
+            // Reset any dim SongSelect previously applied to the background
+            ApplyToBackground(b => b.DimWhenUserSettingsIgnored.Value = 0);
+
             FilterControl.MoveToY(-120, 500, Easing.OutQuint);
             FilterControl.FadeOut(200, Easing.OutQuint);
 

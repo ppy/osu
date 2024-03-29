@@ -98,11 +98,7 @@ namespace osu.Game.Screens.Play
 
                 backgroundBrightnessReduction = value;
 
-                ApplyToBackground(b =>
-                {
-                    b.DimWhenUserSettingsIgnored.Value = 0;
-                    b.FadeColour(OsuColour.Gray(backgroundBrightnessReduction ? 0.8f : 1), 200);
-                });
+                ApplyToBackground(b => b.FadeColour(OsuColour.Gray(backgroundBrightnessReduction ? 0.8f : 1), 200));
             }
         }
 
