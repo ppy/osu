@@ -3,6 +3,8 @@
 
 #nullable disable
 
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -14,8 +16,12 @@ using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Extensions;
 using osu.Game.IO.Serialization;
+using osu.Game.Localisation;
+using osu.Game.Overlays;
+using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Edit;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Screens.Edit.Compose.Components.Timeline;
 
 namespace osu.Game.Screens.Edit.Compose
@@ -30,6 +36,9 @@ namespace osu.Game.Screens.Edit.Compose
 
         [Resolved]
         private IGameplaySettings globalGameplaySettings { get; set; }
+
+        [Resolved(CanBeNull = true)]
+        private INotificationOverlay notifications { get; set; }
 
         private HitObjectComposer composer;
 
@@ -126,7 +135,20 @@ namespace osu.Game.Screens.Edit.Compose
         {
             string clipboardContent = hostClipboard.GetCustom(ClipboardContent.CLIPBOARD_FORMAT);
 
-            var objects = clipboardContent?.Deserialize<ClipboardContent>().HitObjects;
+            IList<HitObject> objects;
+
+            try
+            {
+                objects = clipboardContent?.Deserialize<ClipboardContent>().HitObjects;
+            }
+            catch (Exception)
+            {
+                notifications?.Post(new SimpleErrorNotification
+                {
+                    Text = NotificationsStrings.InvalidHitObjectClipboardContent
+                });
+                return;
+            }
 
             if (objects == null || objects.Count == 0)
                 return;
