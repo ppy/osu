@@ -18,6 +18,7 @@ using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Beatmaps.Legacy;
 using osu.Game.Skinning;
 using osu.Game.Utils;
+using System.Buffers;
 
 namespace osu.Game.Rulesets.Objects.Legacy
 {
@@ -264,70 +265,93 @@ namespace osu.Game.Rulesets.Objects.Legacy
         private PathControlPoint[] convertPathString(string pointString, Vector2 offset)
         {
             // This code takes on the responsibility of handling explicit segments of the path ("X" & "Y" from above). Implicit segments are handled by calls to convertPoints().
-            string[] pointSplit = pointString.Split('|');
+            string[] pointStringSplit = pointString.Split('|');
 
-            var controlPoints = new List<Memory<PathControlPoint>>();
-            int startIndex = 0;
-            int endIndex = 0;
-            bool first = true;
+            var pointsBuffer = ArrayPool<Vector2>.Shared.Rent(pointStringSplit.Length);
+            var segmentsBuffer = ArrayPool<(PathType Type, int StartIndex)>.Shared.Rent(pointStringSplit.Length);
+            int currentPointsIndex = 0;
+            int currentSegmentsIndex = 0;
 
-            while (++endIndex < pointSplit.Length)
+            try
             {
-                // Keep incrementing endIndex while it's not the start of a new segment (indicated by having an alpha character at position 0).
-                if (!char.IsLetter(pointSplit[endIndex][0]))
-                    continue;
+                foreach (string s in pointStringSplit)
+                {
+                    if (char.IsLetter(s[0]))
+                    {
+                        // The start of a new segment(indicated by having an alpha character at position 0).
+                        var pathType = convertPathType(s);
+                        segmentsBuffer[currentSegmentsIndex++] = (pathType, currentPointsIndex);
 
-                // Multi-segmented sliders DON'T contain the end point as part of the current segment as it's assumed to be the start of the next segment.
-                // The start of the next segment is the index after the type descriptor.
-                string endPoint = endIndex < pointSplit.Length - 1 ? pointSplit[endIndex + 1] : null;
+                        // First segment is prepended by an extra zero point
+                        if (currentPointsIndex == 0)
+                            pointsBuffer[currentPointsIndex++] = Vector2.Zero;
+                    }
+                    else
+                    {
+                        pointsBuffer[currentPointsIndex++] = readPoint(s, offset);
+                    }
+                }
 
-                controlPoints.AddRange(convertPoints(pointSplit.AsMemory().Slice(startIndex, endIndex - startIndex), endPoint, first, offset));
-                startIndex = endIndex;
-                first = false;
+                int pointsCount = currentPointsIndex;
+                int segmentsCount = currentSegmentsIndex;
+                var controlPoints = new List<ArraySegment<PathControlPoint>>(pointsCount);
+                var allPoints = new ArraySegment<Vector2>(pointsBuffer, 0, pointsCount);
+
+                for (int i = 0; i < segmentsCount; i++)
+                {
+                    if (i < segmentsCount - 1)
+                    {
+                        int startIndex = segmentsBuffer[i].StartIndex;
+                        int endIndex = segmentsBuffer[i + 1].StartIndex;
+                        controlPoints.AddRange(convertPoints(segmentsBuffer[i].Type, allPoints.Slice(startIndex, endIndex - startIndex), pointsBuffer[endIndex]));
+                    }
+                    else
+                    {
+                        int startIndex = segmentsBuffer[i].StartIndex;
+                        controlPoints.AddRange(convertPoints(segmentsBuffer[i].Type, allPoints.Slice(startIndex), null));
+                    }
+                }
+
+                return mergeControlPointsLists(controlPoints);
+            }
+            finally
+            {
+                ArrayPool<Vector2>.Shared.Return(pointsBuffer);
+                ArrayPool<(PathType, int)>.Shared.Return(segmentsBuffer);
             }
 
-            if (endIndex > startIndex)
-                controlPoints.AddRange(convertPoints(pointSplit.AsMemory().Slice(startIndex, endIndex - startIndex), null, first, offset));
+            static Vector2 readPoint(string value, Vector2 startPos)
+            {
+                string[] vertexSplit = value.Split(':');
 
-            return mergePointsLists(controlPoints);
+                Vector2 pos = new Vector2((int)Parsing.ParseDouble(vertexSplit[0], Parsing.MAX_COORDINATE_VALUE), (int)Parsing.ParseDouble(vertexSplit[1], Parsing.MAX_COORDINATE_VALUE)) - startPos;
+                return pos;
+            }
         }
 
         /// <summary>
         /// Converts a given point list into a set of path segments.
         /// </summary>
+        /// <param name="type">The path type of the point list.</param>
         /// <param name="points">The point list.</param>
         /// <param name="endPoint">Any extra endpoint to consider as part of the points. This will NOT be returned.</param>
-        /// <param name="first">Whether this is the first segment in the set. If <c>true</c> the first of the returned segments will contain a zero point.</param>
-        /// <param name="offset">The positional offset to apply to the control points.</param>
-        /// <returns>The set of points contained by <paramref name="points"/> as one or more segments of the path, prepended by an extra zero point if <paramref name="first"/> is <c>true</c>.</returns>
-        private IEnumerable<Memory<PathControlPoint>> convertPoints(ReadOnlyMemory<string> points, string endPoint, bool first, Vector2 offset)
+        /// <returns>The set of points contained by <paramref name="points"/> as one or more segments of the path.</returns>
+        private IEnumerable<ArraySegment<PathControlPoint>> convertPoints(PathType type, ArraySegment<Vector2> points, Vector2? endPoint)
         {
-            PathType type = convertPathType(points.Span[0]);
-
-            int readOffset = first ? 1 : 0; // First control point is zero for the first segment.
-            int readablePoints = points.Length - 1; // Total points readable from the base point span.
-            int endPointLength = endPoint != null ? 1 : 0; // Extra length if an endpoint is given that lies outside the base point span.
-
-            var vertices = new PathControlPoint[readOffset + readablePoints + endPointLength];
-
-            // Fill any non-read points.
-            for (int i = 0; i < readOffset; i++)
-                vertices[i] = new PathControlPoint();
+            var vertices = new PathControlPoint[points.Count];
 
             // Parse into control points.
-            for (int i = 1; i < points.Length; i++)
-                readPoint(points.Span[i], offset, out vertices[readOffset + i - 1]);
-
-            // If an endpoint is given, add it to the end.
-            if (endPoint != null)
-                readPoint(endPoint, offset, out vertices[^1]);
+            for (int i = 0; i < points.Count; i++)
+                vertices[i] = new PathControlPoint { Position = points[i] };
 
             // Edge-case rules (to match stable).
             if (type == PathType.PERFECT_CURVE)
             {
-                if (vertices.Length != 3)
+                int endPointLength = endPoint is null ? 0 : 1;
+
+                if (vertices.Length + endPointLength != 3)
                     type = PathType.BEZIER;
-                else if (isLinear(vertices))
+                else if (isLinear(points[0], points[1], endPoint ?? points[2]))
                 {
                     // osu-stable special-cased colinear perfect curves to a linear path
                     type = PathType.LINEAR;
@@ -346,7 +370,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
             int startIndex = 0;
             int endIndex = 0;
 
-            while (++endIndex < vertices.Length - endPointLength)
+            while (++endIndex < vertices.Length)
             {
                 // Keep incrementing while an implicit segment doesn't need to be started.
                 if (vertices[endIndex].Position != vertices[endIndex - 1].Position)
@@ -359,47 +383,39 @@ namespace osu.Game.Rulesets.Objects.Legacy
                     continue;
 
                 // The last control point of each segment is not allowed to start a new implicit segment.
-                if (endIndex == vertices.Length - endPointLength - 1)
+                if (endIndex == vertices.Length - 1)
                     continue;
 
                 // Force a type on the last point, and return the current control point set as a segment.
                 vertices[endIndex - 1].Type = type;
-                yield return vertices.AsMemory().Slice(startIndex, endIndex - startIndex);
+                yield return new ArraySegment<PathControlPoint>(vertices, startIndex, endIndex - startIndex);
 
                 // Skip the current control point - as it's the same as the one that's just been returned.
                 startIndex = endIndex + 1;
             }
 
-            if (endIndex > startIndex)
-                yield return vertices.AsMemory().Slice(startIndex, endIndex - startIndex);
+            if (startIndex < endIndex)
+                yield return new ArraySegment<PathControlPoint>(vertices, startIndex, endIndex - startIndex);
 
-            static void readPoint(string value, Vector2 startPos, out PathControlPoint point)
-            {
-                string[] vertexSplit = value.Split(':');
-
-                Vector2 pos = new Vector2((int)Parsing.ParseDouble(vertexSplit[0], Parsing.MAX_COORDINATE_VALUE), (int)Parsing.ParseDouble(vertexSplit[1], Parsing.MAX_COORDINATE_VALUE)) - startPos;
-                point = new PathControlPoint { Position = pos };
-            }
-
-            static bool isLinear(PathControlPoint[] p) => Precision.AlmostEquals(0, (p[1].Position.Y - p[0].Position.Y) * (p[2].Position.X - p[0].Position.X)
-                                                                                    - (p[1].Position.X - p[0].Position.X) * (p[2].Position.Y - p[0].Position.Y));
+            static bool isLinear(Vector2 p0, Vector2 p1, Vector2 p2)
+                => Precision.AlmostEquals(0, (p1.Y - p0.Y) * (p2.X - p0.X)
+                                             - (p1.X - p0.X) * (p2.Y - p0.Y));
         }
 
-        private PathControlPoint[] mergePointsLists(List<Memory<PathControlPoint>> controlPointList)
+        private PathControlPoint[] mergeControlPointsLists(List<ArraySegment<PathControlPoint>> controlPointList)
         {
             int totalCount = 0;
 
             foreach (var arr in controlPointList)
-                totalCount += arr.Length;
+                totalCount += arr.Count;
 
             var mergedArray = new PathControlPoint[totalCount];
-            var mergedArrayMemory = mergedArray.AsMemory();
             int copyIndex = 0;
 
             foreach (var arr in controlPointList)
             {
-                arr.CopyTo(mergedArrayMemory.Slice(copyIndex));
-                copyIndex += arr.Length;
+                arr.AsSpan().CopyTo(mergedArray.AsSpan(copyIndex));
+                copyIndex += arr.Count;
             }
 
             return mergedArray;
