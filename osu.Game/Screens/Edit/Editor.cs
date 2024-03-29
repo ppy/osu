@@ -155,6 +155,7 @@ namespace osu.Game.Screens.Edit
         private readonly EditorLoader loader;
 
         private EditorScreen currentScreen;
+        private EditorScreenSwitcherControl screenSwitcher;
 
         private readonly BindableBeatDivisor beatDivisor = new BindableBeatDivisor();
         private EditorClock clock;
@@ -372,7 +373,7 @@ namespace osu.Game.Screens.Edit
                                     }
                                 }
                             },
-                            switcherControl = new EditorScreenSwitcherControl
+                            screenSwitcher = new EditorScreenSwitcherControl
                             {
                                 Anchor = Anchor.BottomRight,
                                 Origin = Anchor.BottomRight,
@@ -662,23 +663,23 @@ namespace osu.Game.Screens.Edit
                     return true;
 
                 case GlobalAction.EditorComposeMode:
-                    switcherControl.SelectItem(EditorScreenMode.Compose);
+                    screenSwitcher.SelectItem(EditorScreenMode.Compose);
                     return true;
 
                 case GlobalAction.EditorDesignMode:
-                    switcherControl.SelectItem(EditorScreenMode.Design);
+                    screenSwitcher.SelectItem(EditorScreenMode.Design);
                     return true;
 
                 case GlobalAction.EditorTimingMode:
-                    switcherControl.SelectItem(EditorScreenMode.Timing);
+                    screenSwitcher.SelectItem(EditorScreenMode.Timing);
                     return true;
 
                 case GlobalAction.EditorSetupMode:
-                    switcherControl.SelectItem(EditorScreenMode.SongSetup);
+                    screenSwitcher.SelectItem(EditorScreenMode.SongSetup);
                     return true;
 
                 case GlobalAction.EditorVerifyMode:
-                    switcherControl.SelectItem(EditorScreenMode.Verify);
+                    screenSwitcher.SelectItem(EditorScreenMode.Verify);
                     return true;
 
                 case GlobalAction.EditorTestGameplay:
@@ -958,8 +959,6 @@ namespace osu.Game.Screens.Edit
 
         [CanBeNull]
         private ScheduledDelegate playbackDisabledDebounce;
-
-        private EditorScreenSwitcherControl switcherControl;
 
         private void updateSampleDisabledState()
         {
