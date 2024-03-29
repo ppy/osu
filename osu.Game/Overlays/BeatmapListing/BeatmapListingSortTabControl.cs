@@ -1,6 +1,9 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
@@ -8,6 +11,7 @@ using osu.Framework.Graphics;
 using osuTK.Graphics;
 using osuTK;
 using osu.Framework.Input.Events;
+using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Overlays.BeatmapListing
 {
@@ -117,6 +121,8 @@ namespace osu.Game.Overlays.BeatmapListing
 
             private readonly SpriteIcon icon;
 
+            private Sample sampleTabSelect = null!;
+
             public BeatmapTabButton(SortCriteria value)
                 : base(value)
             {
@@ -128,6 +134,12 @@ namespace osu.Game.Overlays.BeatmapListing
                     Alpha = 0,
                     Size = new Vector2(6)
                 });
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(AudioManager audio)
+            {
+                sampleTabSelect = audio.Samples.Get(@"UI/tabselect-select");
             }
 
             protected override void LoadComplete()
@@ -149,7 +161,10 @@ namespace osu.Game.Overlays.BeatmapListing
             protected override bool OnClick(ClickEvent e)
             {
                 if (Active.Value)
+                {
                     SortDirection.Value = SortDirection.Value == Overlays.SortDirection.Ascending ? Overlays.SortDirection.Descending : Overlays.SortDirection.Ascending;
+                    HoverClickSounds.PlayAsClick(sampleTabSelect);
+                }
 
                 return base.OnClick(e);
             }
