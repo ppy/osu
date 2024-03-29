@@ -13,6 +13,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
+using osu.Framework.Logging;
 using osu.Game.Rulesets;
 using osuTK;
 using osuTK.Graphics;
@@ -20,7 +21,7 @@ using osuTK.Input;
 
 namespace osu.Game.Overlays.Toolbar
 {
-    public partial class ToolbarRulesetSelector : RulesetSelector
+    public partial class ToolbarRulesetSelector : TabControl<RulesetInfo>
     {
         protected Drawable ModeButtonLine { get; private set; }
 
@@ -31,6 +32,9 @@ namespace osu.Game.Overlays.Toolbar
             RelativeSizeAxes = Axes.Y;
             AutoSizeAxes = Axes.X;
         }
+
+        [Resolved]
+        private RulesetStore rulesets { get; set; }
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
@@ -60,8 +64,19 @@ namespace osu.Game.Overlays.Toolbar
                 },
             });
 
-            foreach (var ruleset in Rulesets.AvailableRulesets)
+            foreach (var ruleset in rulesets.AvailableRulesets)
+            {
+                try
+                {
+                    AddItem(ruleset);
+                }
+                catch
+                {
+                    Logger.Log($"Could not create ruleset icon for {ruleset.Name}. Please check for an update from the developer.", level: LogLevel.Error);
+                }
+
                 selectionSamples[ruleset.ShortName] = audio.Samples.Get($"UI/ruleset-select-{ruleset.ShortName}");
+            }
         }
 
         protected override void LoadComplete()
@@ -111,6 +126,8 @@ namespace osu.Game.Overlays.Toolbar
             Direction = FillDirection.Horizontal,
         };
 
+        protected override Dropdown<RulesetInfo> CreateDropdown() => null;
+
         protected override bool OnKeyDown(KeyDownEvent e)
         {
             base.OnKeyDown(e);
@@ -119,7 +136,7 @@ namespace osu.Game.Overlays.Toolbar
             {
                 int requested = e.Key - Key.Number1;
 
-                RulesetInfo found = Rulesets.AvailableRulesets.ElementAtOrDefault(requested);
+                RulesetInfo found = rulesets.AvailableRulesets.ElementAtOrDefault(requested);
                 if (found != null)
                     Current.Value = found;
                 return true;
