@@ -15,6 +15,7 @@ using osu.Game.Online.API.Requests;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Login;
 using osu.Game.Overlays.Settings;
+using osu.Game.Users;
 using osu.Game.Users.Drawables;
 using osuTK.Input;
 
@@ -72,13 +73,24 @@ namespace osu.Game.Tests.Visual.Menus
 
                 return false;
             });
+
             AddStep("enter code", () => loginOverlay.ChildrenOfType<OsuTextBox>().First().Text = "88800088");
             assertAPIState(APIState.Online);
+            assertDropdownState(UserAction.Online);
 
             AddStep("set failing", () => { dummyAPI.SetState(APIState.Failing); });
             AddStep("return to online", () => { dummyAPI.SetState(APIState.Online); });
 
             AddStep("clear handler", () => dummyAPI.HandleRequest = null);
+
+            assertDropdownState(UserAction.Online);
+            AddStep("change user state", () => dummyAPI.LocalUser.Value.Status.Value = UserStatus.DoNotDisturb);
+            assertDropdownState(UserAction.DoNotDisturb);
+        }
+
+        private void assertDropdownState(UserAction state)
+        {
+            AddAssert($"dropdown state is {state}", () => loginOverlay.ChildrenOfType<UserDropdown>().First().Current.Value, () => Is.EqualTo(state));
         }
 
         private void assertAPIState(APIState expected) =>
