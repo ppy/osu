@@ -3,10 +3,13 @@
 
 #nullable disable
 
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Events;
+using osu.Game.Rulesets.Mania.Skinning;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI.Scrolling;
+using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Mania.Objects.Drawables
 {
@@ -18,6 +21,10 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         protected override ManiaSkinComponents Component => ManiaSkinComponents.HoldNoteTail;
 
         protected internal DrawableHoldNote HoldNote => (DrawableHoldNote)ParentHitObject;
+
+        private readonly Bindable<HoldNoteTailOrigin> tailOrigin = new Bindable<HoldNoteTailOrigin>();
+
+        public IBindable<HoldNoteTailOrigin> TailOrigin => tailOrigin;
 
         public DrawableHoldNoteTail()
             : this(null)
@@ -34,10 +41,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         protected override void LoadComplete()
         {
             base.LoadComplete();
-
-            Direction.BindValueChanged(_ => updateTailOrigin());
-            HoldNote.TailOrigin.BindValueChanged(_ => updateTailOrigin());
-            updateTailOrigin();
+            tailOrigin.BindValueChanged(_ => updateTailOrigin(), true);
         }
 
         public void UpdateResult() => base.UpdateResult(true);
@@ -63,12 +67,24 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         {
         }
 
+        protected override void ApplySkin(ISkinSource skin, bool allowFallback)
+        {
+            base.ApplySkin(skin, allowFallback);
+            tailOrigin.Value = skin.GetConfig<ManiaSkinConfigurationLookup, HoldNoteTailOrigin>(new ManiaSkinConfigurationLookup(LegacyManiaSkinConfigurationLookups.HoldNoteTailOrigin))?.Value ?? HoldNoteTailOrigin.Bottom;
+        }
+
+        protected override void OnDirectionChanged(ValueChangedEvent<ScrollingDirection> e)
+        {
+            base.OnDirectionChanged(e);
+            updateTailOrigin();
+        }
+
         private void updateTailOrigin()
         {
             if (Direction.Value == ScrollingDirection.Up)
-                Origin = HoldNote.TailOrigin.Value == Anchor.TopCentre ? Anchor.BottomCentre : Anchor.TopCentre;
+                Origin = tailOrigin.Value == HoldNoteTailOrigin.Top ? Anchor.BottomCentre : Anchor.TopCentre;
             else
-                Origin = HoldNote.TailOrigin.Value;
+                Origin = tailOrigin.Value == HoldNoteTailOrigin.Top ? Anchor.TopCentre : Anchor.BottomCentre;
         }
     }
 }

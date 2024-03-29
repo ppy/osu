@@ -8,7 +8,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
-using osu.Framework.Graphics;
 using osu.Game.Beatmaps.Formats;
 
 namespace osu.Game.Skinning
@@ -131,12 +130,7 @@ namespace osu.Game.Skinning
 
                     case "HoldNoteTailOrigin":
                         if (Enum.TryParse<HoldNoteTailOrigin>(pair.Value, out var tailOrigin))
-                        {
-                            currentConfig.HoldNoteTailOrigin = tailOrigin == HoldNoteTailOrigin.Top
-                                ? Anchor.TopCentre
-                                : Anchor.BottomCentre;
-                        }
-
+                            currentConfig.HoldNoteTailOrigin = tailOrigin;
                         break;
 
                     case string when pair.Key.StartsWith("Colour", StringComparison.Ordinal):

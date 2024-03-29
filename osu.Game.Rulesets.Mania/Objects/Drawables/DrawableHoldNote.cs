@@ -11,7 +11,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Game.Audio;
-using osu.Game.Rulesets.Mania.Skinning;
 using osu.Game.Rulesets.Mania.Skinning.Default;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -33,10 +32,6 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         public IBindable<bool> IsHitting => isHitting;
 
         private readonly Bindable<bool> isHitting = new Bindable<bool>();
-
-        public IBindable<Anchor> TailOrigin => tailOrigin;
-
-        private readonly Bindable<Anchor> tailOrigin = new Bindable<Anchor>(Anchor.BottomCentre);
 
         public DrawableHoldNoteHead Head => headContainer.Child;
         public DrawableHoldNoteTail Tail => tailContainer.Child;
@@ -246,7 +241,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             bodyPiece.Y = (Direction.Value == ScrollingDirection.Up ? 1 : -1) * Head.Height / 2;
             bodyPiece.Height = DrawHeight - Head.Height / 2;
 
-            if (tailOrigin.Value == Anchor.TopCentre)
+            if (Tail.TailOrigin.Value == HoldNoteTailOrigin.Top)
                 bodyPiece.Height -= Tail.Height / 2;
             else
                 bodyPiece.Height += Tail.Height / 2;
@@ -268,12 +263,6 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             }
             else
                 sizingContainer.Height = 1;
-        }
-
-        protected override void ApplySkin(ISkinSource skin, bool allowFallback)
-        {
-            base.ApplySkin(skin, allowFallback);
-            tailOrigin.Value = skin.GetConfig<ManiaSkinConfigurationLookup, Anchor>(new ManiaSkinConfigurationLookup(LegacyManiaSkinConfigurationLookups.HoldNoteTailOrigin))?.Value ?? Anchor.BottomCentre;
         }
 
         protected override void CheckForResult(bool userTriggered, double timeOffset)

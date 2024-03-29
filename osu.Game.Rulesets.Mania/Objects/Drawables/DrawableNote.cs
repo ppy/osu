@@ -78,7 +78,6 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         protected override void OnDirectionChanged(ValueChangedEvent<ScrollingDirection> e)
         {
             base.OnDirectionChanged(e);
-
             headPiece.Anchor = headPiece.Origin = e.NewValue == ScrollingDirection.Up ? Anchor.TopCentre : Anchor.BottomCentre;
         }
 

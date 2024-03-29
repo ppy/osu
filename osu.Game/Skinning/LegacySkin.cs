@@ -236,7 +236,7 @@ namespace osu.Game.Skinning
                     return SkinUtils.As<TValue>(new Bindable<float>(existing.ColumnWidth[maniaLookup.ColumnIndex.Value] / LegacyManiaSkinConfiguration.DEFAULT_COLUMN_SIZE));
 
                 case LegacyManiaSkinConfigurationLookups.HoldNoteTailOrigin:
-                    return SkinUtils.As<TValue>(new Bindable<Anchor>(existing.HoldNoteTailOrigin));
+                    return SkinUtils.As<TValue>(new Bindable<HoldNoteTailOrigin>(existing.HoldNoteTailOrigin));
 
                 case LegacyManiaSkinConfigurationLookups.KeyImage:
                     Debug.Assert(maniaLookup.ColumnIndex != null);
