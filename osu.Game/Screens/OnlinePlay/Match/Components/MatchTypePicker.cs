@@ -26,6 +26,8 @@ namespace osu.Game.Screens.OnlinePlay.Match.Components
 
         protected override Dropdown<MatchType> CreateDropdown() => null;
 
+        protected override bool AddEnumEntriesAutomatically => false;
+
         public MatchTypePicker()
         {
             Height = height + selection_width * 2;

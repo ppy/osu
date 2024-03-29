@@ -31,10 +31,6 @@ namespace osu.Game.Screens.OnlinePlay.Match.Components
             Height = 35;
 
             TabContainer.Spacing = new Vector2(10);
-
-            AddItem(RoomAvailability.Public);
-            AddItem(RoomAvailability.FriendsOnly);
-            AddItem(RoomAvailability.InviteOnly);
         }
 
         private partial class RoomAvailabilityPickerItem : DisableableTabItem
