@@ -34,6 +34,14 @@ namespace osu.Game.Tests.Visual.Editing
         [Resolved]
         private Clipboard hostClipboard { get; set; } = null!;
 
+        public override void SetUpSteps()
+        {
+            base.SetUpSteps();
+
+            // writing arbitrary value to the clipboard to make sure the clipboard contains no hitobects before each test
+            AddStep("clear clipboard", () => hostClipboard.SetText("dummy text"));
+        }
+
         [Test]
         public void TestCutRemovesObjects()
         {
