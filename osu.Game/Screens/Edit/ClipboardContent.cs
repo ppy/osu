@@ -26,5 +26,10 @@ namespace osu.Game.Screens.Edit
         {
             HitObjects = editorBeatmap.SelectedHitObjects.ToList();
         }
+
+        public ClipboardContent(IList<HitObject> hitObjects)
+        {
+            HitObjects = hitObjects;
+        }
     }
 }
