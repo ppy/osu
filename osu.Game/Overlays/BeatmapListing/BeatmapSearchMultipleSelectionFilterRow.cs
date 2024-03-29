@@ -15,6 +15,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
+using osu.Game.Graphics.UserInterface;
 using osuTK;
 
 namespace osu.Game.Overlays.BeatmapListing
@@ -117,6 +118,8 @@ namespace osu.Game.Overlays.BeatmapListing
                     Origin = Anchor.CentreLeft,
                 });
             }
+
+            protected override HoverSounds CreateHoverSounds() => new HoverClickSounds(HoverSampleSet.TabSelect);
 
             protected override void UpdateState()
             {
