@@ -32,7 +32,13 @@ namespace osu.Game.Overlays.Profile.Header.Components
 
         private void updateState(UserProfileData? user)
         {
-            Current.Value = Items.SingleOrDefault(ruleset => user?.Ruleset.MatchesOnlineID(ruleset) == true);
+            var ruleset = Items.SingleOrDefault(ruleset => user?.Ruleset.MatchesOnlineID(ruleset) == true);
+
+            if (ruleset != null)
+                Current.Value = ruleset;
+            else
+                Current.SetDefault();
+
             SetDefaultRuleset(Rulesets.GetRuleset(user?.User.PlayMode ?? @"osu").AsNonNull());
         }
 
