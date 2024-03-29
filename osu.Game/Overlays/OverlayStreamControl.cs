@@ -10,6 +10,7 @@ using System.Linq;
 using osu.Framework.Graphics.UserInterface;
 using JetBrains.Annotations;
 using osu.Game.Graphics.UserInterface;
+using osuTK;
 
 namespace osu.Game.Overlays
 {
@@ -19,6 +20,7 @@ namespace osu.Game.Overlays
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
+            TabContainer.Spacing = Vector2.Zero;
         }
 
         public void Populate(List<T> streams) => streams.ForEach(AddItem);
