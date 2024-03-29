@@ -70,7 +70,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         protected override void ApplySkin(ISkinSource skin, bool allowFallback)
         {
             base.ApplySkin(skin, allowFallback);
-            tailOrigin.Value = skin.GetConfig<ManiaSkinConfigurationLookup, HoldNoteTailOrigin>(new ManiaSkinConfigurationLookup(LegacyManiaSkinConfigurationLookups.HoldNoteTailOrigin))?.Value ?? HoldNoteTailOrigin.Bottom;
+            tailOrigin.Value = skin.GetConfig<ManiaSkinConfigurationLookup, HoldNoteTailOrigin>(new ManiaSkinConfigurationLookup(LegacyManiaSkinConfigurationLookups.HoldNoteTailOrigin))?.Value ?? HoldNoteTailOrigin.Regular;
         }
 
         protected override void OnDirectionChanged(ValueChangedEvent<ScrollingDirection> e)
@@ -82,9 +82,9 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         private void updateTailOrigin()
         {
             if (Direction.Value == ScrollingDirection.Up)
-                Origin = tailOrigin.Value == HoldNoteTailOrigin.Top ? Anchor.BottomCentre : Anchor.TopCentre;
+                Origin = tailOrigin.Value == HoldNoteTailOrigin.Inverted ? Anchor.BottomCentre : Anchor.TopCentre;
             else
-                Origin = tailOrigin.Value == HoldNoteTailOrigin.Top ? Anchor.TopCentre : Anchor.BottomCentre;
+                Origin = tailOrigin.Value == HoldNoteTailOrigin.Inverted ? Anchor.TopCentre : Anchor.BottomCentre;
         }
     }
 }

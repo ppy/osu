@@ -241,7 +241,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             bodyPiece.Y = (Direction.Value == ScrollingDirection.Up ? 1 : -1) * Head.Height / 2;
             bodyPiece.Height = DrawHeight - Head.Height / 2;
 
-            if (Tail.TailOrigin.Value == HoldNoteTailOrigin.Top)
+            if (Tail.TailOrigin.Value == HoldNoteTailOrigin.Inverted)
                 bodyPiece.Height -= Tail.Height / 2;
             else
                 bodyPiece.Height += Tail.Height / 2;

@@ -42,17 +42,17 @@ namespace osu.Game.Rulesets.Mania.Tests.Skinning
         [Test]
         public void TestTailOrigin()
         {
-            AddStep("set tail origin to bottom", () =>
+            AddStep("set tail origin to regular", () =>
             {
                 foreach (var holdNote in CreatedDrawables.SelectMany(d => d.ChildrenOfType<DrawableHoldNote>()))
-                    ((Bindable<HoldNoteTailOrigin>)holdNote.Tail.TailOrigin).Value = HoldNoteTailOrigin.Bottom;
+                    ((Bindable<HoldNoteTailOrigin>)holdNote.Tail.TailOrigin).Value = HoldNoteTailOrigin.Regular;
             });
             AddStep("change direction to down", () => ScrollingInfo.Direction.Value = ScrollingDirection.Down);
             AddStep("change direction to up", () => ScrollingInfo.Direction.Value = ScrollingDirection.Up);
-            AddStep("set tail origin to top", () =>
+            AddStep("set tail origin to inverted", () =>
             {
                 foreach (var holdNote in CreatedDrawables.SelectMany(d => d.ChildrenOfType<DrawableHoldNote>()))
-                    ((Bindable<HoldNoteTailOrigin>)holdNote.Tail.TailOrigin).Value = HoldNoteTailOrigin.Top;
+                    ((Bindable<HoldNoteTailOrigin>)holdNote.Tail.TailOrigin).Value = HoldNoteTailOrigin.Inverted;
             });
             AddStep("change direction to down", () => ScrollingInfo.Direction.Value = ScrollingDirection.Down);
             AddStep("change direction to up", () => ScrollingInfo.Direction.Value = ScrollingDirection.Up);

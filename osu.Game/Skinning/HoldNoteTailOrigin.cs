@@ -5,7 +5,7 @@ namespace osu.Game.Skinning
 {
     public enum HoldNoteTailOrigin
     {
-        Bottom = 0,
-        Top = 1,
+        Regular = 0,
+        Inverted = 1
     }
 }
