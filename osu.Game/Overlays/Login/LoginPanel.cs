@@ -30,7 +30,7 @@ namespace osu.Game.Overlays.Login
         [Resolved]
         private OsuColour colours { get; set; } = null!;
 
-        private UserDropdown dropdown = null!;
+        private UserDropdown? dropdown;
 
         /// <summary>
         /// Called to request a hide of a parent displaying this container.
@@ -66,6 +66,14 @@ namespace osu.Game.Overlays.Login
         {
             apiState.BindTo(api.State);
             apiState.BindValueChanged(onlineStateChanged, true);
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            userStatus.BindTo(api.LocalUser.Value.Status);
+            userStatus.BindValueChanged(e => updateDropdownCurrent(e.NewValue), true);
         }
 
         private void onlineStateChanged(ValueChangedEvent<APIState> state) => Schedule(() =>
@@ -144,9 +152,6 @@ namespace osu.Game.Overlays.Login
                         },
                     };
 
-                    userStatus.BindTo(api.LocalUser.Value.Status);
-                    userStatus.BindValueChanged(e => updateDropdownCurrent(e.NewValue), true);
-
                     dropdown.Current.BindValueChanged(action =>
                     {
                         switch (action.NewValue)
@@ -171,6 +176,7 @@ namespace osu.Game.Overlays.Login
                                 break;
                         }
                     }, true);
+
                     break;
             }
 
@@ -180,6 +186,9 @@ namespace osu.Game.Overlays.Login
 
         private void updateDropdownCurrent(UserStatus? status)
         {
+            if (dropdown == null)
+                return;
+
             switch (status)
             {
                 case UserStatus.Online:
