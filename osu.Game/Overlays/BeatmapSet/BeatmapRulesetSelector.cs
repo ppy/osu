@@ -21,7 +21,12 @@ namespace osu.Game.Overlays.BeatmapSet
                 // propagate value to tab items first to enable only available rulesets.
                 beatmapSet.Value = value;
 
-                SelectTab(TabContainer.TabItems.FirstOrDefault(t => t.Enabled.Value));
+                var ruleset = TabContainer.TabItems.FirstOrDefault(t => t.Enabled.Value)?.Value;
+
+                if (ruleset != null)
+                    Current.Value = ruleset;
+                else
+                    Current.SetDefault();
             }
         }
 
