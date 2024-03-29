@@ -74,6 +74,10 @@ namespace osu.Game.Tests.Visual.Menus
             });
             AddStep("enter code", () => loginOverlay.ChildrenOfType<OsuTextBox>().First().Text = "88800088");
             assertAPIState(APIState.Online);
+
+            AddStep("set failing", () => { dummyAPI.SetState(APIState.Failing); });
+            AddStep("return to online", () => { dummyAPI.SetState(APIState.Online); });
+
             AddStep("clear handler", () => dummyAPI.HandleRequest = null);
         }
 
