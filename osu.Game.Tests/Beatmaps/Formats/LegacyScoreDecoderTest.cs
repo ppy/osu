@@ -432,7 +432,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
             CultureInfo.CurrentCulture = originalCulture;
         }
 
-        private class TestLegacyScoreDecoder : LegacyScoreDecoder
+        public class TestLegacyScoreDecoder : LegacyScoreDecoder
         {
             private readonly int beatmapVersion;
 

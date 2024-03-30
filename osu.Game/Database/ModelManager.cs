@@ -105,7 +105,12 @@ namespace osu.Game.Database
         /// </summary>
         public void Delete(List<TModel> items, bool silent = false)
         {
-            if (items.Count == 0) return;
+            if (items.Count == 0)
+            {
+                if (!silent)
+                    PostNotification?.Invoke(new ProgressCompletionNotification { Text = $"No {HumanisedModelName}s found to delete!" });
+                return;
+            }
 
             var notification = new ProgressNotification
             {
@@ -142,7 +147,12 @@ namespace osu.Game.Database
         /// </summary>
         public void Undelete(List<TModel> items, bool silent = false)
         {
-            if (!items.Any()) return;
+            if (!items.Any())
+            {
+                if (!silent)
+                    PostNotification?.Invoke(new ProgressCompletionNotification { Text = $"No {HumanisedModelName}s found to restore!" });
+                return;
+            }
 
             var notification = new ProgressNotification
             {

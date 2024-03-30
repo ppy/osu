@@ -5,6 +5,7 @@ using System;
 using System.IO;
 using System.Runtime.Versioning;
 using osu.Desktop.LegacyIpc;
+using osu.Desktop.Windows;
 using osu.Framework;
 using osu.Framework.Development;
 using osu.Framework.Logging;
@@ -47,8 +48,8 @@ namespace osu.Desktop
             {
                 var windowsVersion = Environment.OSVersion.Version;
 
-                // While .NET 6 still supports Windows 7 and above, we are limited by realm currently, as they choose to only support 8.1 and higher.
-                // See https://www.mongodb.com/docs/realm/sdk/dotnet/#supported-platforms
+                // While .NET 8 only supports Windows 10 and above, running on Windows 7/8.1 may still work. We are limited by realm currently, as they choose to only support 8.1 and higher.
+                // See https://www.mongodb.com/docs/realm/sdk/dotnet/compatibility/
                 if (windowsVersion.Major < 6 || (windowsVersion.Major == 6 && windowsVersion.Minor <= 2))
                 {
                     // If users running in compatibility mode becomes more of a common thing, we may want to provide better guidance or even consider
@@ -69,7 +70,8 @@ namespace osu.Desktop
             // NVIDIA profiles are based on the executable name of a process.
             // Lazer and stable share the same executable name.
             // Stable sets this setting to "Off", which may not be what we want, so let's force it back to the default "Auto" on startup.
-            NVAPI.ThreadedOptimisations = NvThreadControlSetting.OGL_THREAD_CONTROL_DEFAULT;
+            if (OperatingSystem.IsWindows())
+                NVAPI.ThreadedOptimisations = NvThreadControlSetting.OGL_THREAD_CONTROL_DEFAULT;
 
             // Back up the cwd before DesktopGameHost changes it
             string cwd = Environment.CurrentDirectory;
@@ -173,13 +175,16 @@ namespace osu.Desktop
             {
                 tools.CreateShortcutForThisExe();
                 tools.CreateUninstallerRegistryEntry();
+                WindowsAssociationManager.InstallAssociations();
             }, onAppUpdate: (_, tools) =>
             {
                 tools.CreateUninstallerRegistryEntry();
+                WindowsAssociationManager.UpdateAssociations();
             }, onAppUninstall: (_, tools) =>
             {
                 tools.RemoveShortcutForThisExe();
                 tools.RemoveUninstallerRegistryEntry();
+                WindowsAssociationManager.UninstallAssociations();
             }, onEveryRun: (_, _, _) =>
             {
                 // While setting the `ProcessAppUserModelId` fixes duplicate icons/shortcuts on the taskbar, it currently

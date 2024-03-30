@@ -14,13 +14,16 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Localisation;
 using osu.Game.Models;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
+using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Scoring;
 using osu.Game.Screens.Ranking;
 using osu.Game.Screens.Ranking.Expanded;
+using osu.Game.Screens.Ranking.Expanded.Statistics;
 using osu.Game.Tests.Beatmaps;
 using osu.Game.Tests.Resources;
 using osuTK;
@@ -68,6 +71,40 @@ namespace osu.Game.Tests.Visual.Ranking
         }
 
         [Test]
+        public void TestPPShownAsProvisionalWhenBeatmapHasNoLeaderboard()
+        {
+            AddStep("show example score", () =>
+            {
+                var beatmap = createTestBeatmap(new RealmUser());
+                beatmap.Status = BeatmapOnlineStatus.Graveyard;
+                showPanel(TestResources.CreateTestScoreInfo(beatmap));
+            });
+
+            AddAssert("pp display faded out", () =>
+            {
+                var ppDisplay = this.ChildrenOfType<PerformanceStatistic>().Single();
+                return ppDisplay.Alpha == 0.5 && ppDisplay.TooltipText == ResultsScreenStrings.NoPPForUnrankedBeatmaps;
+            });
+        }
+
+        [Test]
+        public void TestPPShownAsProvisionalWhenUnrankedModsArePresent()
+        {
+            AddStep("show example score", () =>
+            {
+                var score = TestResources.CreateTestScoreInfo(createTestBeatmap(new RealmUser()));
+                score.Mods = score.Mods.Append(new OsuModDifficultyAdjust()).ToArray();
+                showPanel(score);
+            });
+
+            AddAssert("pp display faded out", () =>
+            {
+                var ppDisplay = this.ChildrenOfType<PerformanceStatistic>().Single();
+                return ppDisplay.Alpha == 0.5 && ppDisplay.TooltipText == ResultsScreenStrings.NoPPForUnrankedMods;
+            });
+        }
+
+        [Test]
         public void TestWithDefaultDate()
         {
             AddStep("show autoplay score", () =>
@@ -88,8 +125,20 @@ namespace osu.Game.Tests.Visual.Ranking
             AddAssert("play time not displayed", () => !this.ChildrenOfType<ExpandedPanelMiddleContent.PlayedOnText>().Any());
         }
 
-        private void showPanel(ScoreInfo score) =>
-            Child = new ExpandedPanelMiddleContentContainer(score);
+        [Test]
+        public void TestFailedSDisplay([Values] bool withFlair)
+        {
+            AddStep("show failed S score", () =>
+            {
+                var score = TestResources.CreateTestScoreInfo(createTestBeatmap(new RealmUser()));
+                score.Rank = ScoreRank.A;
+                score.Accuracy = 0.975;
+                showPanel(score, withFlair);
+            });
+        }
+
+        private void showPanel(ScoreInfo score, bool withFlair = false) =>
+            Child = new ExpandedPanelMiddleContentContainer(score, withFlair);
 
         private BeatmapInfo createTestBeatmap([NotNull] RealmUser author)
         {
@@ -107,7 +156,7 @@ namespace osu.Game.Tests.Visual.Ranking
 
         private partial class ExpandedPanelMiddleContentContainer : Container
         {
-            public ExpandedPanelMiddleContentContainer(ScoreInfo score)
+            public ExpandedPanelMiddleContentContainer(ScoreInfo score, bool withFlair)
             {
                 Anchor = Anchor.Centre;
                 Origin = Anchor.Centre;
@@ -119,7 +168,7 @@ namespace osu.Game.Tests.Visual.Ranking
                         RelativeSizeAxes = Axes.Both,
                         Colour = Color4Extensions.FromHex("#444"),
                     },
-                    new ExpandedPanelMiddleContent(score)
+                    new ExpandedPanelMiddleContent(score, withFlair)
                 };
             }
         }

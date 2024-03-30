@@ -3,7 +3,7 @@
 
 using NUnit.Framework;
 using osu.Framework.Graphics;
-using osu.Game.Online.Solo;
+using osu.Game.Online;
 using osu.Game.Scoring;
 using osu.Game.Screens.Ranking.Statistics.User;
 using osu.Game.Users;
@@ -112,6 +112,6 @@ namespace osu.Game.Tests.Visual.Ranking
         });
 
         private void displayUpdate(UserStatistics before, UserStatistics after) =>
-            AddStep("display update", () => overallRanking.StatisticsUpdate.Value = new SoloStatisticsUpdate(new ScoreInfo(), before, after));
+            AddStep("display update", () => overallRanking.StatisticsUpdate.Value = new UserStatisticsUpdate(new ScoreInfo(), before, after));
     }
 }

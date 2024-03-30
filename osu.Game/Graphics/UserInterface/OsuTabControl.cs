@@ -116,18 +116,18 @@ namespace osu.Game.Graphics.UserInterface
                 }
             }
 
-            private const float transition_length = 500;
+            protected const float TRANSITION_LENGTH = 500;
 
-            protected void FadeHovered()
+            protected virtual void FadeHovered()
             {
-                Bar.FadeIn(transition_length, Easing.OutQuint);
-                Text.FadeColour(Color4.White, transition_length, Easing.OutQuint);
+                Bar.FadeIn(TRANSITION_LENGTH, Easing.OutQuint);
+                Text.FadeColour(Color4.White, TRANSITION_LENGTH, Easing.OutQuint);
             }
 
-            protected void FadeUnhovered()
+            protected virtual void FadeUnhovered()
             {
-                Bar.FadeTo(IsHovered ? 1 : 0, transition_length, Easing.OutQuint);
-                Text.FadeColour(IsHovered ? Color4.White : AccentColour, transition_length, Easing.OutQuint);
+                Bar.FadeTo(IsHovered ? 1 : 0, TRANSITION_LENGTH, Easing.OutQuint);
+                Text.FadeColour(IsHovered ? Color4.White : AccentColour, TRANSITION_LENGTH, Easing.OutQuint);
             }
 
             protected override bool OnHover(HoverEvent e)
