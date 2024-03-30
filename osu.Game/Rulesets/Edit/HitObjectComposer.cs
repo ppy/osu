@@ -214,12 +214,9 @@ namespace osu.Game.Rulesets.Edit
 
             foreach (var item in toolboxCollection.Items)
             {
-                item.Selected.DisabledChanged += (isDisabled) =>
+                item.Selected.DisabledChanged += isDisabled =>
                 {
-                    if (isDisabled)
-                        item.TooltipText = "Add at least one timing point first!";
-                    else
-                        item.TooltipText = string.Empty;
+                    item.TooltipText = isDisabled ? "Add at least one timing point first!" : string.Empty;
                 };
             }
 
