@@ -25,7 +25,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             hasHiddenMod = mods.Any(m => m is OsuModHidden);
         }
 
-        private double skillMultiplier => 0.054;
+        private double skillMultiplier => 0.05;
         private double strainDecayBase => 0.15;
 
         private double currentStrain;

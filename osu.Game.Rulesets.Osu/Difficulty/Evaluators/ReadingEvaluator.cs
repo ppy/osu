@@ -16,7 +16,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
     {
         private const double reading_window_size = 3000;
 
-        private const double overlap_multiplier = 3.5;
+        private const double overlap_multiplier = 1.8; //3.5
 
         public static double EvaluateDensityOf(DifficultyHitObject current, bool applyDistanceNerf = true)
         {
@@ -171,21 +171,34 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             var currObj = (OsuDifficultyHitObject)current;
             double screenOverlapDifficulty = 0;
 
+            List<double> overlapDifficulties = new List<double>();
+
             foreach (var loopObj in retrievePastVisibleObjects(currObj))
             {
                 double lastOverlapness = 0;
                 foreach (var overlapObj in loopObj.OverlapObjects)
                 {
-                    if (overlapObj.HitObject.StartTime + overlapObj.HitObject.Preempt >= currObj.StartTime) break;
+                    if (overlapObj.HitObject.StartTime + overlapObj.HitObject.Preempt <= currObj.StartTime) break;
                     lastOverlapness = overlapObj.Overlapness;
                 }
-                screenOverlapDifficulty += lastOverlapness;
+
+                overlapDifficulties.Add(lastOverlapness);
+                //screenOverlapDifficulty += lastOverlapness;
 
                 // This is a correct way to do this (paired with changing >= to <=), but somehow it get's more broken
                 // screenOverlapDifficulty = Math.Max(screenOverlapDifficulty, lastOverlapness);
             }
 
-            return overlap_multiplier * Math.Max(0, screenOverlapDifficulty - 0.7);
+            const double decay_weight = 0.5;
+            double weight = 1.0;
+
+            foreach (double difficulty in overlapDifficulties.OrderDescending())
+            {
+                screenOverlapDifficulty += difficulty * weight;
+                weight *= decay_weight;
+            }
+
+            return overlap_multiplier * Math.Max(0, screenOverlapDifficulty - 1.2);
         }
         public static double EvaluateDifficultyOf(DifficultyHitObject current)
         {
