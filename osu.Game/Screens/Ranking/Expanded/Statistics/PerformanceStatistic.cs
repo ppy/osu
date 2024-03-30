@@ -4,19 +4,26 @@
 #nullable disable
 
 using System;
+using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Cursor;
+using osu.Framework.Localisation;
+using osu.Game.Beatmaps;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Resources.Localisation.Web;
 using osu.Game.Scoring;
+using osu.Game.Localisation;
 
 namespace osu.Game.Screens.Ranking.Expanded.Statistics
 {
-    public partial class PerformanceStatistic : StatisticDisplay
+    public partial class PerformanceStatistic : StatisticDisplay, IHasTooltip
     {
+        public LocalisableString TooltipText { get; private set; }
+
         private readonly ScoreInfo score;
 
         private readonly Bindable<int> performance = new Bindable<int>();
@@ -32,23 +39,52 @@ namespace osu.Game.Screens.Ranking.Expanded.Statistics
         }
 
         [BackgroundDependencyLoader]
-        private void load(ScorePerformanceCache performanceCache)
+        private void load(BeatmapDifficultyCache difficultyCache, CancellationToken? cancellationToken)
         {
             if (score.PP.HasValue)
             {
-                setPerformanceValue(score.PP.Value);
+                setPerformanceValue(score, score.PP.Value);
             }
             else
             {
-                performanceCache.CalculatePerformanceAsync(score, cancellationTokenSource.Token)
-                                .ContinueWith(t => Schedule(() => setPerformanceValue(t.GetResultSafely()?.Total)), cancellationTokenSource.Token);
+                Task.Run(async () =>
+                {
+                    var attributes = await difficultyCache.GetDifficultyAsync(score.BeatmapInfo!, score.Ruleset, score.Mods, cancellationToken ?? default).ConfigureAwait(false);
+                    var performanceCalculator = score.Ruleset.CreateInstance().CreatePerformanceCalculator();
+
+                    // Performance calculation requires the beatmap and ruleset to be locally available. If not, return a default value.
+                    if (attributes?.Attributes == null || performanceCalculator == null)
+                        return;
+
+                    var result = await performanceCalculator.CalculateAsync(score, attributes.Value.Attributes, cancellationToken ?? default).ConfigureAwait(false);
+
+                    Schedule(() => setPerformanceValue(score, result.Total));
+                }, cancellationToken ?? default);
             }
         }
 
-        private void setPerformanceValue(double? pp)
+        private void setPerformanceValue(ScoreInfo scoreInfo, double? pp)
         {
             if (pp.HasValue)
+            {
                 performance.Value = (int)Math.Round(pp.Value, MidpointRounding.AwayFromZero);
+
+                if (!scoreInfo.BeatmapInfo!.Status.GrantsPerformancePoints())
+                {
+                    Alpha = 0.5f;
+                    TooltipText = ResultsScreenStrings.NoPPForUnrankedBeatmaps;
+                }
+                else if (scoreInfo.Mods.Any(m => !m.Ranked))
+                {
+                    Alpha = 0.5f;
+                    TooltipText = ResultsScreenStrings.NoPPForUnrankedMods;
+                }
+                else
+                {
+                    Alpha = 1f;
+                    TooltipText = default;
+                }
+            }
         }
 
         public override void Appear()

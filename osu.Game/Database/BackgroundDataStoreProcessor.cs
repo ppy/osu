@@ -382,7 +382,7 @@ namespace osu.Game.Database
 
             HashSet<Guid> scoreIds = realmAccess.Run(r => new HashSet<Guid>(
                 r.All<ScoreInfo>()
-                 .Where(s => s.TotalScoreVersion < LegacyScoreEncoder.LATEST_VERSION)
+                 .Where(s => s.TotalScoreVersion < 30000013) // last total score version with a significant change to ranks
                  .AsEnumerable()
                  // must be done after materialisation, as realm doesn't support
                  // filtering on nested property predicates or projection via `.Select()`

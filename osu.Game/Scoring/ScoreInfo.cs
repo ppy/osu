@@ -108,6 +108,12 @@ namespace osu.Game.Scoring
         public double? PP { get; set; }
 
         /// <summary>
+        /// Whether the performance points in this score is awarded to the player. This is used for online display purposes (see <see cref="SoloScoreInfo.Ranked"/>).
+        /// </summary>
+        [Ignored]
+        public bool Ranked { get; set; }
+
+        /// <summary>
         /// The online ID of this score.
         /// </summary>
         /// <remarks>

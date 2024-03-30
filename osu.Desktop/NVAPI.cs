@@ -8,11 +8,13 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
+using System.Runtime.Versioning;
 using osu.Framework.Logging;
 
 namespace osu.Desktop
 {
     [SuppressMessage("ReSharper", "InconsistentNaming")]
+    [SupportedOSPlatform("windows")]
     internal static class NVAPI
     {
         private const string osu_filename = "osu!.exe";
@@ -138,7 +140,7 @@ namespace osu.Desktop
                     return false;
 
                 // Make sure that this is a laptop.
-                var gpus = new IntPtr[64];
+                IntPtr[] gpus = new IntPtr[64];
                 if (checkError(EnumPhysicalGPUs(gpus, out int gpuCount)))
                     return false;
 
@@ -456,7 +458,7 @@ namespace osu.Desktop
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst = NVAPI.UNICODE_STRING_MAX)]
         public string ProfileName;
 
-        [MarshalAs(UnmanagedType.ByValArray)]
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 32)]
         public uint[] GPUSupport;
 
         public uint IsPredefined;

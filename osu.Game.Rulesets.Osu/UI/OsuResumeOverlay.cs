@@ -39,6 +39,13 @@ namespace osu.Game.Rulesets.Osu.UI
 
         protected override void PopIn()
         {
+            // Can't display if the cursor is outside the window.
+            if (GameplayCursor.LastFrameState == Visibility.Hidden || !Contains(GameplayCursor.ActiveCursor.ScreenSpaceDrawQuad.Centre))
+            {
+                Resume();
+                return;
+            }
+
             base.PopIn();
 
             GameplayCursor.ActiveCursor.Hide();
