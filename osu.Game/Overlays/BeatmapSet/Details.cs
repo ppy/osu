@@ -10,6 +10,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.BeatmapSet.Buttons;
+using osu.Game.Rulesets;
 using osu.Game.Screens.Select.Details;
 using osuTK;
 
@@ -33,10 +34,10 @@ namespace osu.Game.Overlays.BeatmapSet
             {
                 if (value == beatmapSet) return;
 
-                beatmapSet = value;
+                basic.BeatmapSet = preview.BeatmapSet = beatmapSet = value;
 
-                basic.BeatmapSet = preview.BeatmapSet = BeatmapSet;
-                updateDisplay();
+                if (IsLoaded)
+                    updateDisplay();
             }
         }
 
@@ -50,13 +51,10 @@ namespace osu.Game.Overlays.BeatmapSet
                 if (value == beatmapInfo) return;
 
                 basic.BeatmapInfo = advanced.BeatmapInfo = beatmapInfo = value;
-            }
-        }
 
-        private void updateDisplay()
-        {
-            Ratings.Ratings = BeatmapSet?.Ratings;
-            ratingBox.Alpha = BeatmapSet?.Status > 0 ? 1 : 0;
+                if (IsLoaded)
+                    updateDisplay();
+            }
         }
 
         public Details()
@@ -101,10 +99,20 @@ namespace osu.Game.Overlays.BeatmapSet
             };
         }
 
-        [BackgroundDependencyLoader]
-        private void load()
+        [Resolved]
+        private RulesetStore rulesets { get; set; }
+
+        protected override void LoadComplete()
         {
+            base.LoadComplete();
             updateDisplay();
+        }
+
+        private void updateDisplay()
+        {
+            Ratings.Ratings = BeatmapSet?.Ratings;
+            ratingBox.Alpha = BeatmapSet?.Status > 0 ? 1 : 0;
+            advanced.Ruleset.Value = rulesets.GetRuleset(beatmapInfo?.Ruleset.OnlineID ?? 0);
         }
 
         private partial class DetailBox : Container

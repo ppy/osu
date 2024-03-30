@@ -13,7 +13,6 @@ using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Framework.Input.Handlers.Tablet;
-using osu.Framework.Utils;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osuTK;
@@ -196,7 +195,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             var matrix = Matrix3.Identity;
 
             MatrixExtensions.TranslateFromLeft(ref matrix, offset);
-            MatrixExtensions.RotateFromLeft(ref matrix, MathUtils.DegreesToRadians(rotation.Value));
+            MatrixExtensions.RotateFromLeft(ref matrix, float.DegreesToRadians(rotation.Value));
 
             usableAreaQuad *= matrix;
 

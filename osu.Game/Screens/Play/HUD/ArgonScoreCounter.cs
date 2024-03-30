@@ -20,7 +20,7 @@ namespace osu.Game.Screens.Play.HUD
 
         protected override double RollingDuration => 250;
 
-        [SettingSource("Wireframe opacity", "Controls the opacity of the wire frames behind the digits.")]
+        [SettingSource("Wireframe opacity", "Controls the opacity of the wireframes behind the digits.")]
         public BindableFloat WireframeOpacity { get; } = new BindableFloat(0.25f)
         {
             Precision = 0.01f,
@@ -33,7 +33,7 @@ namespace osu.Game.Screens.Play.HUD
 
         public bool UsesFixedAnchor { get; set; }
 
-        protected override LocalisableString FormatCount(long count) => count.ToLocalisableString();
+        protected override LocalisableString FormatCount(long count) => count.ToString();
 
         protected override IHasText CreateText() => scoreText = new ArgonScoreTextComponent(Anchor.TopRight, BeatmapsetsStrings.ShowScoreboardHeadersScore.ToUpper())
         {
@@ -58,8 +58,10 @@ namespace osu.Game.Screens.Play.HUD
 
         private void updateWireframe()
         {
-            scoreText.RequiredDisplayDigits.Value =
-                Math.Max(RequiredDisplayDigits.Value, getDigitsRequiredForDisplayCount());
+            int digitsRequiredForDisplayCount = Math.Max(RequiredDisplayDigits.Value, getDigitsRequiredForDisplayCount());
+
+            if (digitsRequiredForDisplayCount != scoreText.WireframeTemplate.Length)
+                scoreText.WireframeTemplate = new string('#', digitsRequiredForDisplayCount);
         }
 
         private int getDigitsRequiredForDisplayCount()

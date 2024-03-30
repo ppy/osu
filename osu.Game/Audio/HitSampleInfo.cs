@@ -80,6 +80,8 @@ namespace osu.Game.Audio
                     yield return $"Gameplay/{Bank}-{Name}{Suffix}";
 
                 yield return $"Gameplay/{Bank}-{Name}";
+
+                yield return $"Gameplay/{Name}";
             }
         }
 

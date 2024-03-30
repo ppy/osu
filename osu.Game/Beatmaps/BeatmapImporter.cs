@@ -266,8 +266,8 @@ namespace osu.Game.Beatmaps
             if (!base.CanReuseExisting(existing, import))
                 return false;
 
-            var existingIds = existing.Beatmaps.Select(b => b.OnlineID).OrderBy(i => i);
-            var importIds = import.Beatmaps.Select(b => b.OnlineID).OrderBy(i => i);
+            var existingIds = existing.Beatmaps.Select(b => b.OnlineID).Order();
+            var importIds = import.Beatmaps.Select(b => b.OnlineID).Order();
 
             // force re-import if we are not in a sane state.
             return existing.OnlineID == import.OnlineID && existingIds.SequenceEqual(importIds);
@@ -433,6 +433,9 @@ namespace osu.Game.Beatmaps
                     beatmaps.Add(beatmap);
                 }
             }
+
+            if (!beatmaps.Any())
+                throw new ArgumentException("No valid beatmap files found in the beatmap archive.");
 
             return beatmaps;
         }
