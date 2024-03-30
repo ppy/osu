@@ -51,9 +51,17 @@ namespace osu.Game.Rulesets.Osu.Edit
         {
             base.LoadComplete();
 
+            // aggregate two values into canRotate
+            RotationHandler.CanRotatePlayfieldOrigin.BindValueChanged(_ => updateCanRotateAggregate());
+            RotationHandler.CanRotateSelectionOrigin.BindValueChanged(_ => updateCanRotateAggregate());
+
+            void updateCanRotateAggregate()
+            {
+                canRotate.Value = RotationHandler.CanRotatePlayfieldOrigin.Value || RotationHandler.CanRotateSelectionOrigin.Value;
+            }
+
             // bindings to `Enabled` on the buttons are decoupled on purpose
             // due to the weird `OsuButton` behaviour of resetting `Enabled` to `false` when `Action` is set.
-            canRotate.BindTo(RotationHandler.CanRotatePlayfieldOrigin);
             canRotate.BindValueChanged(_ => rotateButton.Enabled.Value = canRotate.Value, true);
         }
 
