@@ -214,7 +214,13 @@ namespace osu.Game.Rulesets.Edit
 
             foreach (var item in toolboxCollection.Items)
             {
-                item.TooltipTextWhenDisabled = "Add at least one timing point first!";
+                item.Selected.DisabledChanged += (isDisabled) =>
+                {
+                    if (isDisabled)
+                        item.TooltipText = "Add at least one timing point first!";
+                    else
+                        item.TooltipText = string.Empty;
+                };
             }
 
             TernaryStates = CreateTernaryButtons().ToArray();
