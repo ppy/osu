@@ -17,16 +17,6 @@ namespace osu.Game.Screens.Edit.Components.RadioButtons
         public readonly BindableBool Selected;
 
         /// <summary>
-        /// Tooltip text that will be shown on hover if button is enabled.
-        /// </summary>
-        public LocalisableString TooltipTextWhenEnabled { get; set; } = string.Empty;
-
-        /// <summary>
-        /// Tooltip text that will be shown on hover if button is disabled.
-        /// </summary>
-        public LocalisableString TooltipTextWhenDisabled { get; set; } = string.Empty;
-
-        /// <summary>
         /// The item related to this button.
         /// </summary>
         public string Label;
@@ -62,5 +52,8 @@ namespace osu.Game.Screens.Edit.Components.RadioButtons
         /// Deselects this <see cref="RadioButton"/>.
         /// </summary>
         public void Deselect() => Selected.Value = false;
+
+        // Tooltip text that will be shown when hovered over
+        public LocalisableString TooltipText { get; set; } = string.Empty;
     }
 }

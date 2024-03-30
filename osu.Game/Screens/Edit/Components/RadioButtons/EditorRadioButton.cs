@@ -94,6 +94,6 @@ namespace osu.Game.Screens.Edit.Components.RadioButtons
             X = 40f
         };
 
-        public LocalisableString TooltipText => Enabled.Value ? Button.TooltipTextWhenEnabled : Button.TooltipTextWhenDisabled;
+        public LocalisableString TooltipText => Button.TooltipText;
     }
 }
