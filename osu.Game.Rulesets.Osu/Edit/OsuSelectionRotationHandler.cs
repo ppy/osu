@@ -42,7 +42,7 @@ namespace osu.Game.Rulesets.Osu.Edit
         {
             var quad = GeometryUtils.GetSurroundingQuad(selectedMovableObjects);
             CanRotateSelectionOrigin.Value = quad.Width > 0 || quad.Height > 0;
-            CanRotatePlayfieldOrigin.Value = selectedItems.Any();
+            CanRotatePlayfieldOrigin.Value = selectedMovableObjects.Any();
         }
 
         private OsuHitObject[]? objectsInRotation;
