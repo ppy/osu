@@ -68,12 +68,9 @@ namespace osu.Game.Rulesets.Osu.Edit
                     }
                 }
             };
-            selectionCentreButton.Selected.DisabledChanged += (isDisabled) =>
+            selectionCentreButton.Selected.DisabledChanged += isDisabled =>
             {
-                if (isDisabled)
-                    selectionCentreButton.TooltipText = "We can't rotate a circle around itself! Can we?";
-                else
-                    selectionCentreButton.TooltipText = string.Empty;
+                selectionCentreButton.TooltipText = isDisabled ? "We can't rotate a circle around itself! Can we?" : string.Empty;
             };
         }
 
