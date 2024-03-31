@@ -177,7 +177,8 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
         {
             createVisualiser(true);
 
-            Vector2[] points = [
+            Vector2[] points =
+            [
                 new Vector2(200),
                 new Vector2(300),
                 new Vector2(500, 300),
