@@ -105,6 +105,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             hitObjectScale = hitObject.ScaleBindable.GetBoundCopy();
             hitObjectScale.BindValueChanged(_ => updateMarkerDisplay());
 
+            hitObject.StackHeightBindable.BindValueChanged(_ => updateMarkerDisplay());
+
             IsSelected.BindValueChanged(_ => updateMarkerDisplay());
 
             updateMarkerDisplay();
