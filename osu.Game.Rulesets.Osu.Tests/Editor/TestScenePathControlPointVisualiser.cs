@@ -199,8 +199,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
         {
             createVisualiser(true);
 
-            Vector2 connectionPosition = default!;
-
+            Vector2 connectionPosition;
             addControlPointStep(connectionPosition = new Vector2(300));
             addControlPointStep(new Vector2(600));
 
