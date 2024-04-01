@@ -6,6 +6,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -218,12 +219,16 @@ namespace osu.Game.Screens.Select
             maximumStars.ValueChanged += _ => updateCriteria();
 
             ruleset.BindValueChanged(_ => updateCriteria());
-            mods.BindValueChanged(_ =>
+            mods.BindValueChanged(m =>
             {
-                // Mods are updated once by the mod select overlay when song select is entered, regardless of if there are any mods.
+                // Mods are updated once by the mod select overlay when song select is entered,
+                // regardless of if there are any mods or any changes have taken place.
                 // Updating the criteria here so early triggers a re-ordering of panels on song select, via... some mechanism.
-                // Todo: Investigate/fix the above and remove this schedule.
-                Scheduler.AddOnce(updateCriteria);
+                // Todo: Investigate/fix and potentially remove this.
+                if (m.NewValue.SequenceEqual(m.OldValue))
+                    return;
+
+                updateCriteria();
             });
 
             groupMode.BindValueChanged(_ => updateCriteria());
