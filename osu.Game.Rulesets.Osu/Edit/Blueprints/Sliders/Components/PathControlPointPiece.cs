@@ -48,6 +48,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
         private IBindable<Vector2> hitObjectPosition;
         private IBindable<float> hitObjectScale;
+        private IBindable<int> stackHeight;
 
         public PathControlPointPiece(T hitObject, PathControlPoint controlPoint)
         {
@@ -105,7 +106,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             hitObjectScale = hitObject.ScaleBindable.GetBoundCopy();
             hitObjectScale.BindValueChanged(_ => updateMarkerDisplay());
 
-            hitObject.StackHeightBindable.BindValueChanged(_ => updateMarkerDisplay());
+            stackHeight = hitObject.StackHeightBindable.GetBoundCopy();
+            stackHeight.BindValueChanged(_ => updateMarkerDisplay());
 
             IsSelected.BindValueChanged(_ => updateMarkerDisplay());
 
