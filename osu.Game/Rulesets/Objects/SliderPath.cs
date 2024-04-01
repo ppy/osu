@@ -134,6 +134,24 @@ namespace osu.Game.Rulesets.Objects
             }
         }
 
+        private bool optimiseCatmull;
+
+        /// <summary>
+        /// Whether to optimise Catmull path segments, usually resulting in removing bulbs around stacked knots.
+        /// </summary>
+        /// <remarks>
+        /// This changes the path shape and should therefore not be used.
+        /// </remarks>
+        public bool OptimiseCatmull
+        {
+            get => optimiseCatmull;
+            set
+            {
+                optimiseCatmull = value;
+                invalidate();
+            }
+        }
+
         /// <summary>
         /// Computes the slider path until a given progress that ranges from 0 (beginning of the slider)
         /// to 1 (end of the slider) and stores the generated path in the given list.
@@ -280,7 +298,7 @@ namespace osu.Game.Rulesets.Objects
                     calculatedPath.Add(segmentVertices[0]);
                 else if (segmentVertices.Length > 1)
                 {
-                    List<Vector2> subPath = calculateSubPath(segmentVertices, segmentType, ref optimisedLength);
+                    List<Vector2> subPath = calculateSubPath(segmentVertices, segmentType);
 
                     // Skip the first vertex if it is the same as the last vertex from the previous segment
                     bool skipFirst = calculatedPath.Count > 0 && subPath.Count > 0 && calculatedPath.Last() == subPath[0];
@@ -300,7 +318,7 @@ namespace osu.Game.Rulesets.Objects
             }
         }
 
-        private static List<Vector2> calculateSubPath(ReadOnlySpan<Vector2> subControlPoints, PathType type, ref double optimisedLength)
+        private List<Vector2> calculateSubPath(ReadOnlySpan<Vector2> subControlPoints, PathType type)
         {
             switch (type.Type)
             {
@@ -324,6 +342,9 @@ namespace osu.Game.Rulesets.Objects
                 case SplineType.Catmull:
                 {
                     List<Vector2> subPath = PathApproximator.CatmullToPiecewiseLinear(subControlPoints);
+
+                    if (!OptimiseCatmull)
+                        return subPath;
 
                     // At draw time, osu!stable optimises paths by only keeping piecewise segments that are 6px apart.
                     // For the most part we don't care about this optimisation, and its additional heuristics are hard to reproduce in every implementation.
