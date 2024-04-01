@@ -28,6 +28,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
         private IBindable<Vector2> hitObjectPosition;
         private IBindable<int> pathVersion;
+        private IBindable<int> stackHeight;
 
         public PathControlPointConnectionPiece(T hitObject, int controlPointIndex)
         {
@@ -56,7 +57,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             pathVersion = hitObject.Path.Version.GetBoundCopy();
             pathVersion.BindValueChanged(_ => Scheduler.AddOnce(updateConnectingPath));
 
-            hitObject.StackHeightBindable.BindValueChanged(_ => updateConnectingPath());
+            stackHeight = hitObject.StackHeightBindable.GetBoundCopy();
+            stackHeight.BindValueChanged(_ => updateConnectingPath());
 
             updateConnectingPath();
         }
