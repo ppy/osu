@@ -98,9 +98,6 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
             }
         }
 
-        public static int GetColumnCount(IBeatmapInfo beatmapInfo, IReadOnlyList<Mod>? mods = null)
-            => GetColumnCount(LegacyBeatmapConversionDifficultyInfo.FromBeatmapInfo(beatmapInfo), mods);
-
         public static int GetColumnCount(LegacyBeatmapConversionDifficultyInfo difficulty, IReadOnlyList<Mod>? mods = null)
         {
             var converter = new ManiaBeatmapConverter(null, difficulty, new ManiaRuleset());
