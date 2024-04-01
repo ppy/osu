@@ -420,7 +420,7 @@ namespace osu.Game.Overlays.Mods
                 yield return new ColumnDimContainer(new ModPresetColumn
                 {
                     Margin = new MarginPadding { Right = 10 }
-                });
+                }, this);
             }
 
             yield return createModColumnContent(ModType.DifficultyReduction);
@@ -438,7 +438,7 @@ namespace osu.Game.Overlays.Mods
                 column.Margin = new MarginPadding { Right = 10 };
             });
 
-            return new ColumnDimContainer(column);
+            return new ColumnDimContainer(column, this);
         }
 
         private void createLocalMods()
@@ -899,13 +899,17 @@ namespace osu.Game.Overlays.Mods
             [Resolved]
             private OsuColour colours { get; set; } = null!;
 
-            public ColumnDimContainer(ModSelectColumn column)
+            private ModSelectOverlay modSelectOverlayInstance;
+
+            public ColumnDimContainer(ModSelectColumn column, ModSelectOverlay modSelectOverlay)
             {
                 AutoSizeAxes = Axes.X;
                 RelativeSizeAxes = Axes.Y;
 
                 Child = Column = column;
                 column.Active.BindTo(Active);
+
+                this.modSelectOverlayInstance = modSelectOverlay;
             }
 
             [BackgroundDependencyLoader]
@@ -953,7 +957,7 @@ namespace osu.Game.Overlays.Mods
                     RequestScroll?.Invoke(this);
 
                 // Killing focus is done here because it's the only feasible place on ModSelectOverlay you can click on without triggering any action.
-                Scheduler.Add(() => GetContainingInputManager().ChangeFocus(null));
+                modSelectOverlayInstance.setTextBoxFocus(false);
 
                 return true;
             }
