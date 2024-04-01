@@ -55,7 +55,15 @@ namespace osu.Game.Graphics.UserInterface
         protected override bool OnClick(ClickEvent e)
         {
             if (buttons.Contains(e.Button))
-                PlayAsClick(Enabled.Value ? sampleClick : sampleClickDisabled);
+            {
+                var channel = (Enabled.Value ? sampleClick : sampleClickDisabled)?.GetChannel();
+
+                if (channel != null)
+                {
+                    channel.Frequency.Value = 0.99 + RNG.NextDouble(0.02);
+                    channel.Play();
+                }
+            }
 
             return base.OnClick(e);
         }
@@ -66,17 +74,6 @@ namespace osu.Game.Graphics.UserInterface
                 return;
 
             base.PlayHoverSample();
-        }
-
-        public static void PlayAsClick(Sample sample)
-        {
-            var channel = sample?.GetChannel();
-
-            if (channel != null)
-            {
-                channel.Frequency.Value = 0.99 + RNG.NextDouble(0.02);
-                channel.Play();
-            }
         }
     }
 }

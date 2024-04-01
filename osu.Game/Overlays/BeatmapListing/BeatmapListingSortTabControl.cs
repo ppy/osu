@@ -5,13 +5,12 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
+using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
-using osu.Framework.Graphics;
-using osuTK.Graphics;
-using osuTK;
 using osu.Framework.Input.Events;
-using osu.Game.Graphics.UserInterface;
+using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Overlays.BeatmapListing
 {
@@ -163,7 +162,8 @@ namespace osu.Game.Overlays.BeatmapListing
                 if (Active.Value)
                 {
                     SortDirection.Value = SortDirection.Value == Overlays.SortDirection.Ascending ? Overlays.SortDirection.Descending : Overlays.SortDirection.Ascending;
-                    HoverClickSounds.PlayAsClick(sampleTabSelect);
+
+                    sampleTabSelect?.GetChannel()?.Play();
                 }
 
                 return base.OnClick(e);

@@ -107,7 +107,8 @@ namespace osu.Game.Graphics.UserInterface
         protected override void OnUserTabSelectionChanged(TabItem<T> item)
         {
             base.OnUserTabSelectionChanged(item);
-            HoverClickSounds.PlayAsClick(sampleTabSelect);
+
+            sampleTabSelect?.GetChannel()?.Play();
         }
 
         public partial class OsuTabItem : TabItem<T>, IHasAccentColour
