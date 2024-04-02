@@ -92,6 +92,8 @@ namespace osu.Game.Skinning
                 {
                     if (isDefault && !ApplySizeRestrictionsToDefault) return;
 
+                    if (Drawable is ISerialisableDrawable) return;
+
                     switch (confineMode)
                     {
                         case ConfineMode.ScaleToFit:
@@ -113,6 +115,8 @@ namespace osu.Game.Skinning
 
         private void reload(Drawable? newComponent)
         {
+            components.Clear();
+
             if (newComponent == null)
             {
                 Drawable = CreateDefault(Lookup);
@@ -126,18 +130,18 @@ namespace osu.Game.Skinning
 
             scaling.Invalidate();
 
-            if (CentreComponent)
-            {
-                Drawable.Origin = Anchor.Centre;
-                Drawable.Anchor = Anchor.Centre;
-            }
-
-            components.Clear();
             if (Drawable is ISerialisableDrawable serialisable)
                 components.Add(serialisable);
+            else
+            {
+                if (CentreComponent)
+                {
+                    Drawable.Origin = Anchor.Centre;
+                    Drawable.Anchor = Anchor.Centre;
+                }
+            }
 
             InternalChild = Drawable;
-
             ComponentsLoaded = true;
         }
 
