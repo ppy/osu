@@ -337,19 +337,19 @@ namespace osu.Game.Overlays.SkinEditor
 
             Debug.Assert(content != null);
 
-            var skinComponentsContainer = getTarget(target.NewValue);
+            var container = getTarget(target.NewValue);
 
-            if (target.NewValue == null || skinComponentsContainer == null)
+            if (target.NewValue == null || container == null)
             {
                 content.Child = new NonSkinnableScreenPlaceholder();
                 return;
             }
 
-            changeHandler = new SkinEditorChangeHandler((Drawable)skinComponentsContainer);
+            changeHandler = new SkinEditorChangeHandler((Drawable)container);
             changeHandler.CanUndo.BindValueChanged(v => undoMenuItem.Action.Disabled = !v.NewValue, true);
             changeHandler.CanRedo.BindValueChanged(v => redoMenuItem.Action.Disabled = !v.NewValue, true);
 
-            content.Child = new SkinBlueprintContainer(skinComponentsContainer);
+            content.Child = new SkinBlueprintContainer(container);
 
             componentsSidebar.Children = new[]
             {
@@ -366,28 +366,31 @@ namespace osu.Game.Overlays.SkinEditor
                 },
             };
 
-            // If the new target has a ruleset, let's show ruleset-specific items at the top, and the rest below.
-            if (target.NewValue.Ruleset != null)
+            if (!container.IsStatic)
             {
-                componentsSidebar.Add(new SkinComponentToolbox(skinComponentsContainer, target.NewValue.Ruleset)
+                // If the new target has a ruleset, let's show ruleset-specific items at the top, and the rest below.
+                if (target.NewValue.Ruleset != null)
+                {
+                    componentsSidebar.Add(new SkinComponentToolbox(container, target.NewValue.Ruleset)
+                    {
+                        RequestPlacement = requestPlacement
+                    });
+                }
+
+                // Remove the ruleset from the lookup to get base components.
+                componentsSidebar.Add(new SkinComponentToolbox(container, null)
                 {
                     RequestPlacement = requestPlacement
                 });
-            }
 
-            // Remove the ruleset from the lookup to get base components.
-            componentsSidebar.Add(new SkinComponentToolbox(skinComponentsContainer, null)
-            {
-                RequestPlacement = requestPlacement
-            });
+                void requestPlacement(Type type)
+                {
+                    if (!(Activator.CreateInstance(type) is ISerialisableDrawable component))
+                        throw new InvalidOperationException($"Attempted to instantiate a component for placement which was not an {typeof(ISerialisableDrawable)}.");
 
-            void requestPlacement(Type type)
-            {
-                if (!(Activator.CreateInstance(type) is ISerialisableDrawable component))
-                    throw new InvalidOperationException($"Attempted to instantiate a component for placement which was not an {typeof(ISerialisableDrawable)}.");
-
-                SelectedComponents.Clear();
-                placeComponent(component);
+                    SelectedComponents.Clear();
+                    placeComponent(component);
+                }
             }
         }
 

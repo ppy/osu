@@ -168,6 +168,7 @@ namespace osu.Game.Skinning
         }
 
         public bool IsEditable => (Drawable as ISerialisableDrawable)?.IsEditable == true;
+        public bool IsStatic => true;
     }
 
     public enum ConfineMode
