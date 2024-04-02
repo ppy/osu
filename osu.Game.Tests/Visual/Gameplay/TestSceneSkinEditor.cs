@@ -8,8 +8,8 @@ using System.Text;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.IEnumerableExtensions;
-using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input;
 using osu.Framework.Testing;
@@ -46,12 +46,12 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             base.SetUpSteps();
 
+            AddStep("clear", () => Clear(true));
+
             AddUntilStep("wait for hud load", () => targetContainer.ComponentsLoaded);
 
             AddStep("reload skin editor", () =>
             {
-                if (skinEditor.IsNotNull())
-                    skinEditor.Expire();
                 Player.ScaleTo(0.4f);
                 LoadComponentAsync(skinEditor = new SkinEditor(Player), Add);
             });
@@ -369,7 +369,45 @@ namespace osu.Game.Tests.Visual.Gameplay
                 () => Is.EqualTo(3));
         }
 
+        [Test]
+        public void TestStaticContainer()
+        {
+            Container localScreen = null!;
+
+            AddStep("add local target", () => Add(localScreen = new Container
+            {
+                RelativeSizeAxes = Axes.Both,
+                Children = new Drawable[]
+                {
+                    new SkinnableDrawable(new TestSkinComponentLookup(), _ => new BigBlackBox
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                    })
+                }
+            }));
+
+            AddStep("switch screen", () => skinEditor.UpdateTargetScreen(localScreen));
+            AddUntilStep("toolbox is hidden", () => skinEditor.ChildrenOfType<SkinComponentToolbox>(), () => Is.Empty);
+
+            AddStep("select skinnable drawable", () =>
+            {
+                InputManager.MoveMouseTo(localScreen.ChildrenOfType<BigBlackBox>().Single());
+                InputManager.Click(MouseButton.Left);
+            });
+
+            AddUntilStep("skinnable drawable selected", () => skinEditor.SelectedComponents.Single(), () => Is.EqualTo(localScreen.ChildrenOfType<BigBlackBox>().Single()));
+        }
+
         protected override Ruleset CreatePlayerRuleset() => new OsuRuleset();
+
+        private class TestSkinComponentLookup : ISkinComponentLookup
+        {
+            public override string ToString() => nameof(TestSkinComponentLookup);
+            public bool Equals(ISkinComponentLookup? other) => other is TestSkinComponentLookup;
+            public object Target => nameof(TestSkinComponentLookup);
+            public RulesetInfo? Ruleset => null;
+        }
 
         private partial class TestSkinEditorChangeHandler : SkinEditorChangeHandler
         {
