@@ -74,6 +74,8 @@ namespace osu.Game.Skinning
 
         public bool IsEditable => false;
 
+        public bool IsToolboxVisible => false;
+
         internal class SpriteComponentLookup : ISkinComponentLookup
         {
             public string LookupName { get; set; }

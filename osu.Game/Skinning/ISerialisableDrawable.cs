@@ -28,6 +28,11 @@ namespace osu.Game.Skinning
         bool IsEditable => true;
 
         /// <summary>
+        /// Whether this component is visible in the toolbox and can be placed.
+        /// </summary>
+        bool IsToolboxVisible => true;
+
+        /// <summary>
         /// In the context of the skin layout editor, whether this <see cref="ISerialisableDrawable"/> has a permanent anchor defined.
         /// If <see langword="false"/>, this <see cref="ISerialisableDrawable"/>'s <see cref="Drawable.Anchor"/> is automatically determined by proximity,
         /// If <see langword="true"/>, a fixed anchor point has been defined.

@@ -23,5 +23,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
         {
             playfield.StageContainer.X = (skin.GetManiaSkinConfig<float>(LegacyManiaSkinConfigurationLookups.ColumnStart)?.Value ?? 0) / 1024;
         }
+
+        public bool IsToolboxVisible => false;
     }
 }
