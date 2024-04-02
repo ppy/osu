@@ -187,11 +187,7 @@ namespace osu.Game.Skinning
             if (LayoutInfos.TryGetValue(key, out var existing))
                 return existing;
 
-            string filename = key.Ruleset == null
-                ? $"{key.Target}.json"
-                : $"{key.Ruleset}-{key.Target}.json";
-
-            byte[]? bytes = store.Get(filename);
+            byte[]? bytes = store.Get(key.Filename);
 
             if (bytes == null)
                 return null;
@@ -327,6 +323,8 @@ namespace osu.Game.Skinning
                 : this(lookup.Target, lookup.Ruleset)
             {
             }
+
+            public string Filename => Ruleset == null ? $"{Target}.json" : $"{Ruleset.ShortName}-{Target}.json";
         }
     }
 }

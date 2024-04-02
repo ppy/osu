@@ -212,14 +212,12 @@ namespace osu.Game.Skinning
 
                     using (var streamContent = new MemoryStream(Encoding.UTF8.GetBytes(json)))
                     {
-                        string filename = @$"{drawableInfo.Key}.json";
-
-                        var oldFile = s.GetFile(filename);
+                        var oldFile = s.GetFile(drawableInfo.Key.Filename);
 
                         if (oldFile != null)
                             modelManager.ReplaceFile(oldFile, streamContent, s.Realm!);
                         else
-                            modelManager.AddFile(s, streamContent, filename, s.Realm!);
+                            modelManager.AddFile(s, streamContent, drawableInfo.Key.Filename, s.Realm!);
                     }
                 }
 
