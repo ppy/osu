@@ -77,7 +77,7 @@ namespace osu.Game.Rulesets.Objects
 
         public bool Equals(PathControlPoint other) => Position == other?.Position && Type == other.Type;
 
-        public override string ToString() => type is null
+        public override string ToString() => type == null
             ? $"Position={Position}"
             : $"Position={Position}, Type={type}";
     }
