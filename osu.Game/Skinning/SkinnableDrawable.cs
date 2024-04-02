@@ -147,9 +147,26 @@ namespace osu.Game.Skinning
 
         public void Reload(SerialisedDrawableInfo[] skinnableInfo) => reload(skinnableInfo.FirstOrDefault()?.CreateInstance());
 
-        public void Add(ISerialisableDrawable drawable) => throw new NotSupportedException();
+        // Only to be used during skin editor undo-redo.
+        public void Add(ISerialisableDrawable component)
+        {
+            if (!(component is Drawable drawable))
+                throw new ArgumentException($"Provided argument must be of type {nameof(Drawable)}.", nameof(component));
 
-        public void Remove(ISerialisableDrawable component, bool disposeImmediately) => throw new NotSupportedException();
+            AddInternal(drawable);
+            components.Add(component);
+        }
+
+        // Only to be used during skin editor undo-redo.
+        public void Remove(ISerialisableDrawable component, bool disposeImmediately)
+        {
+            if (!(component is Drawable drawable))
+                throw new ArgumentException($"Provided argument must be of type {nameof(Drawable)}.", nameof(component));
+
+            RemoveInternal(drawable, disposeImmediately);
+            components.Remove(component);
+        }
+
         public bool IsEditable => (Drawable as ISerialisableDrawable)?.IsEditable == true;
     }
 
