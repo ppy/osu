@@ -171,7 +171,7 @@ namespace osu.Game.Skinning
             components.Remove(component);
         }
 
-        public bool IsEditable => (Drawable as ISerialisableDrawable)?.IsEditable == true;
+        public virtual bool IsEditable => (Drawable as ISerialisableDrawable)?.IsEditable == true;
         public bool IsStatic => true;
     }
 
