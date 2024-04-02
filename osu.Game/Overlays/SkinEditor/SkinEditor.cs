@@ -231,19 +231,18 @@ namespace osu.Game.Overlays.SkinEditor
             base.LoadComplete();
 
             canCut.Current.BindValueChanged(cut => cutMenuItem.Action.Disabled = !cut.NewValue, true);
+
             canCopy.Current.BindValueChanged(copy =>
             {
                 copyMenuItem.Action.Disabled = !copy.NewValue;
                 cloneMenuItem.Action.Disabled = !copy.NewValue;
             }, true);
+
             canPaste.Current.BindValueChanged(paste => pasteMenuItem.Action.Disabled = !paste.NewValue, true);
 
-            SelectedComponents.BindCollectionChanged((_, _) =>
-            {
-                canCopy.Value = canCut.Value = SelectedComponents.Any();
-            }, true);
-
-            clipboard.Content.BindValueChanged(content => canPaste.Value = !string.IsNullOrEmpty(content.NewValue), true);
+            SelectedComponents.BindCollectionChanged((_, _) => updateActions());
+            clipboard.Content.BindValueChanged(_ => updateActions());
+            selectedTarget.BindValueChanged(_ => updateActions(), true);
 
             Show();
 
@@ -460,6 +459,20 @@ namespace osu.Game.Overlays.SkinEditor
             return true;
         }
 
+        private void updateActions()
+        {
+            if (getTarget(selectedTarget.Value)?.IsStatic == true)
+            {
+                canCopy.Value = false;
+                canCut.Value = false;
+                canPaste.Value = false;
+                return;
+            }
+
+            canCopy.Value = canCut.Value = SelectedComponents.Any();
+            canPaste.Value = !string.IsNullOrEmpty(clipboard.Content.Value);
+        }
+
         private void populateSettings()
         {
             settingsSidebar.Clear();
@@ -496,12 +509,18 @@ namespace osu.Game.Overlays.SkinEditor
 
         protected void Cut()
         {
+            if (!canCut.Value)
+                return;
+
             Copy();
             DeleteItems(SelectedComponents.ToArray());
         }
 
         protected void Copy()
         {
+            if (!canCopy.Value)
+                return;
+
             clipboard.Content.Value = JsonConvert.SerializeObject(SelectedComponents.Cast<Drawable>().Select(s => s.CreateSerialisedInfo()).ToArray());
         }
 
