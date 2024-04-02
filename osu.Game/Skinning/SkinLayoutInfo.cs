@@ -25,13 +25,13 @@ namespace osu.Game.Skinning
         [JsonProperty]
         public Dictionary<string, SerialisedDrawableInfo[]> DrawableInfo { get; set; } = new Dictionary<string, SerialisedDrawableInfo[]>();
 
-        public bool TryGetDrawableInfo(RulesetInfo? ruleset, [NotNullWhen(true)] out SerialisedDrawableInfo[]? components) =>
+        public bool TryGetDrawableInfo(IRulesetInfo? ruleset, [NotNullWhen(true)] out SerialisedDrawableInfo[]? components) =>
             DrawableInfo.TryGetValue(ruleset?.ShortName ?? global_identifier, out components);
 
-        public void Reset(RulesetInfo? ruleset) =>
+        public void Reset(IRulesetInfo? ruleset) =>
             DrawableInfo.Remove(ruleset?.ShortName ?? global_identifier);
 
-        public void Update(RulesetInfo? ruleset, SerialisedDrawableInfo[] components) =>
+        public void Update(IRulesetInfo? ruleset, SerialisedDrawableInfo[] components) =>
             DrawableInfo[ruleset?.ShortName ?? global_identifier] = components;
     }
 }

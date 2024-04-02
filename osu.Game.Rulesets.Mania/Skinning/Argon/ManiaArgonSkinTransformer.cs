@@ -34,6 +34,9 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
                     return new ArgonJudgementPiece(resultComponent.Component);
 
                 case ManiaSkinComponentLookup maniaComponent:
+                    if (base.GetDrawableComponent(lookup) is Drawable c)
+                        return c;
+
                     // TODO: Once everything is finalised, consider throwing UnsupportedSkinComponentException on missing entries.
                     switch (maniaComponent.Component)
                     {
