@@ -68,7 +68,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
 
             AddAssert("slider created", () =>
             {
-                if (circle1 is null || circle2 is null || slider is null)
+                if (circle1 == null || circle2 == null || slider == null)
                     return false;
 
                 var controlPoints = slider.Path.ControlPoints;
@@ -111,7 +111,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
 
             AddAssert("slider created", () =>
             {
-                if (slider1 is null || slider2 is null || slider1Path is null)
+                if (slider1 == null || slider2 == null || slider1Path == null)
                     return false;
 
                 var controlPoints1 = slider1Path.ControlPoints;
@@ -143,7 +143,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
 
             AddAssert("slider end is at same completion for last slider", () =>
             {
-                if (slider1Path is null || slider2 is null)
+                if (slider1Path == null || slider2 == null)
                     return false;
 
                 var mergedSlider = (Slider)EditorBeatmap.SelectedHitObjects.First();
@@ -256,7 +256,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
 
             AddAssert("slider created", () =>
             {
-                if (slider1 is null || slider2 is null || slider1Path is null)
+                if (slider1 == null || slider2 == null || slider1Path == null)
                     return false;
 
                 var controlPoints1 = slider1Path.ControlPoints;
@@ -288,7 +288,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
 
             AddAssert("slider end is at same completion for last slider", () =>
             {
-                if (slider1Path is null || slider2 is null)
+                if (slider1Path == null || slider2 == null)
                     return false;
 
                 var mergedSlider = (Slider)EditorBeatmap.SelectedHitObjects.First();
@@ -322,7 +322,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
 
             AddAssert("slider created", () =>
             {
-                if (slider1 is null || slider2 is null || slider1Path is null)
+                if (slider1 == null || slider2 == null || slider1Path == null)
                     return false;
 
                 var controlPoints1 = slider1Path.ControlPoints;
@@ -354,7 +354,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
 
             AddAssert("slider end is at same completion for last slider", () =>
             {
-                if (slider1Path is null || slider2 is null)
+                if (slider1Path == null || slider2 == null)
                     return false;
 
                 var mergedSlider = (Slider)EditorBeatmap.SelectedHitObjects.First();
