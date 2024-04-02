@@ -15,8 +15,8 @@ namespace osu.Game.Rulesets.Mania.Skinning.Default
 
         public DefaultStageConfiguration()
         {
-            Anchor = Anchor.TopCentre;
-            Origin = Anchor.TopCentre;
+            Anchor = Anchor.Centre;
+            Origin = Anchor.Centre;
             RelativeSizeAxes = Axes.Y;
         }
 
