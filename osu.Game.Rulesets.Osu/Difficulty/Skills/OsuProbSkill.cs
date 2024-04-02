@@ -38,22 +38,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         protected abstract double HitProbability(double skill, double difficulty);
 
-        private double fcProbabilityAtSkillBinned(double skill, IEnumerable<Bin> bins)
-        {
-            if (skill <= 0) return 0;
-
-            double totalHitProbability(Bin bin) => Math.Pow(HitProbability(skill, bin.Difficulty), bin.Count);
-
-            return bins.Aggregate(1.0, (current, bin) => current * totalHitProbability(bin));
-        }
-
-        private double fcProbabilityAtSkillExact(double skill)
-        {
-            if (skill <= 0) return 0;
-
-            return difficulties.Aggregate<double, double>(1, (current, d) => current * HitProbability(skill, d));
-        }
-
         private double difficultyValueBinned()
         {
             double maxDiff = difficulties.Max();
@@ -64,13 +48,20 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             const double lower_bound = 0;
             double upperBoundEstimate = 3.0 * maxDiff;
 
-            double skill = Chandrupatla.FindRootExpand(
-                skill => fcProbabilityAtSkillBinned(skill, bins) - FcProbability,
+            double skill = RootFinding.FindRootExpand(
+                skill => fcProbability(skill) - FcProbability,
                 lower_bound,
                 upperBoundEstimate,
                 accuracy: 1e-4);
 
             return skill;
+
+            double fcProbability(double s)
+            {
+                if (s <= 0) return 0;
+
+                return bins.Aggregate(1.0, (current, bin) => current * Math.Pow(HitProbability(s, bin.Difficulty), bin.Count));
+            }
         }
 
         private double difficultyValueExact()
@@ -81,13 +72,20 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             const double lower_bound = 0;
             double upperBoundEstimate = 3.0 * maxDiff;
 
-            double skill = Chandrupatla.FindRootExpand(
-                skill => fcProbabilityAtSkillExact(skill) - FcProbability,
+            double skill = RootFinding.FindRootExpand(
+                skill => fcProbability(skill) - FcProbability,
                 lower_bound,
                 upperBoundEstimate,
                 accuracy: 1e-4);
 
             return skill;
+
+            double fcProbability(double s)
+            {
+                if (s <= 0) return 0;
+
+                return difficulties.Aggregate<double, double>(1, (current, d) => current * HitProbability(s, d));
+            }
         }
 
         public override double DifficultyValue()

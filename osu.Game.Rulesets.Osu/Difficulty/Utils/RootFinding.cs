@@ -5,10 +5,10 @@ using System;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Utils
 {
-    public static class Chandrupatla
+    public static class RootFinding
     {
         /// <summary>
-        /// Finds the root of a <paramref name="function"/>, expanding the bounds if the root is not located within.
+        /// Finds the root of a <paramref name="function"/> using the Chandrupatla method, expanding the bounds if the root is not located within.
         /// Expansion only occurs for the upward bound, as this function is optimized for functions of range [0, x),
         /// which is useful for finding skill level (skill can never be below 0).
         /// </summary>
@@ -18,7 +18,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Utils
         /// <param name="maxIterations">The maximum number of iterations before the function throws an error.</param>
         /// <param name="accuracy">The desired precision in which the root is returned.</param>
         /// <param name="expansionFactor">The multiplier on the upper bound when no root is found within the provided bounds.</param>
-        /// <returns></returns>
         public static double FindRootExpand(Func<double, double> function, double guessLowerBound, double guessUpperBound, int maxIterations = 25, double accuracy = 1e-6D, double expansionFactor = 2)
         {
             double a = guessLowerBound;
