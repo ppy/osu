@@ -25,10 +25,10 @@ namespace osu.Game.Rulesets.Mania.UI
     public partial class ManiaPlayfield : ScrollingPlayfield
     {
         public IReadOnlyList<Stage> Stages => stages;
-
         private readonly List<Stage> stages = new List<Stage>();
 
-        public Drawable StageContainer { get; private set; }
+        private readonly Drawable stageContainer;
+        private readonly SkinnableDrawable skinnableConfiguration;
 
         public override Quad SkinnableComponentScreenSpaceDrawQuad
         {
@@ -68,7 +68,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
             AddRangeInternal(new[]
             {
-                StageContainer = new Container
+                stageContainer = new Container
                 {
                     RelativeSizeAxes = Axes.Y,
                     AutoSizeAxes = Axes.X,
@@ -83,8 +83,9 @@ namespace osu.Game.Rulesets.Mania.UI
                         }
                     }
                 },
-                new SkinnableDrawable(new ManiaSkinComponentLookup(ManiaSkinComponents.Stage), _ => new DefaultStageConfiguration())
+                skinnableConfiguration = new SkinnableDrawable(new ManiaSkinComponentLookup(ManiaSkinComponents.Stage), _ => new DefaultStageConfiguration())
                 {
+                    CentreComponent = false,
                     RelativeSizeAxes = Axes.Both
                 }
             });
@@ -104,6 +105,20 @@ namespace osu.Game.Rulesets.Mania.UI
 
                 firstColumnIndex += newStage.Columns.Length;
             }
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            Drawable config = skinnableConfiguration.Drawable;
+            config.Size = stageContainer.Size;
+            stageContainer.Anchor = config.Anchor;
+            stageContainer.Origin = config.Origin;
+            stageContainer.RelativePositionAxes = config.RelativePositionAxes;
+            stageContainer.Position = config.Position;
+            stageContainer.Scale = config.Scale;
+            stageContainer.Rotation = config.Rotation;
         }
 
         public override void Add(HitObject hitObject) => getStageByColumn(((ManiaHitObject)hitObject).Column).Add(hitObject);
