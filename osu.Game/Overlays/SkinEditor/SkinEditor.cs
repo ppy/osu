@@ -589,7 +589,12 @@ namespace osu.Game.Overlays.SkinEditor
             changeHandler?.BeginChange();
 
             foreach (var item in items)
-                availableTargets.FirstOrDefault(t => t.Components.Contains(item))?.Remove(item, true);
+            {
+                ISerialisableDrawableContainer? target = availableTargets.FirstOrDefault(t => t.Components.Contains(item));
+
+                if (target != null && !target.IsStatic)
+                    target.Remove(item, true);
+            }
 
             changeHandler?.EndChange();
         }
