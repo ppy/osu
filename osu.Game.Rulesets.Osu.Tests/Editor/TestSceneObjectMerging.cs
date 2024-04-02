@@ -231,6 +231,137 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
                 (pos: circle2.Position, pathType: null)));
         }
 
+        [Test]
+        public void TestMergeSliderSliderSameStartTime()
+        {
+            Slider? slider1 = null;
+            SliderPath? slider1Path = null;
+            Slider? slider2 = null;
+
+            AddStep("select two sliders", () =>
+            {
+                slider1 = (Slider)EditorBeatmap.HitObjects.First(h => h is Slider);
+                slider1Path = new SliderPath(slider1.Path.ControlPoints.Select(p => new PathControlPoint(p.Position, p.Type)).ToArray(), slider1.Path.ExpectedDistance.Value);
+                slider2 = (Slider)EditorBeatmap.HitObjects.First(h => h is Slider && h.StartTime > slider1.StartTime);
+                EditorClock.Seek(slider1.StartTime);
+                EditorBeatmap.SelectedHitObjects.AddRange([slider1, slider2]);
+            });
+
+            AddStep("move sliders to the same start time", () =>
+            {
+                slider2!.StartTime = slider1!.StartTime;
+            });
+
+            mergeSelection();
+
+            AddAssert("slider created", () =>
+            {
+                if (slider1 is null || slider2 is null || slider1Path is null)
+                    return false;
+
+                var controlPoints1 = slider1Path.ControlPoints;
+                var controlPoints2 = slider2.Path.ControlPoints;
+                (Vector2, PathType?)[] args = new (Vector2, PathType?)[controlPoints1.Count + controlPoints2.Count - 1];
+
+                for (int i = 0; i < controlPoints1.Count - 1; i++)
+                {
+                    args[i] = (controlPoints1[i].Position + slider1.Position, controlPoints1[i].Type);
+                }
+
+                for (int i = 0; i < controlPoints2.Count; i++)
+                {
+                    args[i + controlPoints1.Count - 1] = (controlPoints2[i].Position + controlPoints1[^1].Position + slider1.Position, controlPoints2[i].Type);
+                }
+
+                return sliderCreatedFor(args);
+            });
+
+            AddAssert("samples exist", sliderSampleExist);
+
+            AddAssert("merged slider matches first slider", () =>
+            {
+                var mergedSlider = (Slider)EditorBeatmap.SelectedHitObjects.First();
+                return slider1 is not null && mergedSlider.HeadCircle.Samples.SequenceEqual(slider1.HeadCircle.Samples)
+                                           && mergedSlider.TailCircle.Samples.SequenceEqual(slider1.TailCircle.Samples)
+                                           && mergedSlider.Samples.SequenceEqual(slider1.Samples);
+            });
+
+            AddAssert("slider end is at same completion for last slider", () =>
+            {
+                if (slider1Path is null || slider2 is null)
+                    return false;
+
+                var mergedSlider = (Slider)EditorBeatmap.SelectedHitObjects.First();
+                return Precision.AlmostEquals(mergedSlider.Path.Distance, slider1Path.CalculatedDistance + slider2.Path.Distance);
+            });
+        }
+
+        [Test]
+        public void TestMergeSliderSliderSameStartAndEndTime()
+        {
+            Slider? slider1 = null;
+            SliderPath? slider1Path = null;
+            Slider? slider2 = null;
+
+            AddStep("select two sliders", () =>
+            {
+                slider1 = (Slider)EditorBeatmap.HitObjects.First(h => h is Slider);
+                slider1Path = new SliderPath(slider1.Path.ControlPoints.Select(p => new PathControlPoint(p.Position, p.Type)).ToArray(), slider1.Path.ExpectedDistance.Value);
+                slider2 = (Slider)EditorBeatmap.HitObjects.First(h => h is Slider && h.StartTime > slider1.StartTime);
+                EditorClock.Seek(slider1.StartTime);
+                EditorBeatmap.SelectedHitObjects.AddRange([slider1, slider2]);
+            });
+
+            AddStep("move sliders to the same start & end time", () =>
+            {
+                slider2!.StartTime = slider1!.StartTime;
+                slider2.Path = slider1.Path;
+            });
+
+            mergeSelection();
+
+            AddAssert("slider created", () =>
+            {
+                if (slider1 is null || slider2 is null || slider1Path is null)
+                    return false;
+
+                var controlPoints1 = slider1Path.ControlPoints;
+                var controlPoints2 = slider2.Path.ControlPoints;
+                (Vector2, PathType?)[] args = new (Vector2, PathType?)[controlPoints1.Count + controlPoints2.Count - 1];
+
+                for (int i = 0; i < controlPoints1.Count - 1; i++)
+                {
+                    args[i] = (controlPoints1[i].Position + slider1.Position, controlPoints1[i].Type);
+                }
+
+                for (int i = 0; i < controlPoints2.Count; i++)
+                {
+                    args[i + controlPoints1.Count - 1] = (controlPoints2[i].Position + controlPoints1[^1].Position + slider1.Position, controlPoints2[i].Type);
+                }
+
+                return sliderCreatedFor(args);
+            });
+
+            AddAssert("samples exist", sliderSampleExist);
+
+            AddAssert("merged slider matches first slider", () =>
+            {
+                var mergedSlider = (Slider)EditorBeatmap.SelectedHitObjects.First();
+                return slider1 is not null && mergedSlider.HeadCircle.Samples.SequenceEqual(slider1.HeadCircle.Samples)
+                                           && mergedSlider.TailCircle.Samples.SequenceEqual(slider1.TailCircle.Samples)
+                                           && mergedSlider.Samples.SequenceEqual(slider1.Samples);
+            });
+
+            AddAssert("slider end is at same completion for last slider", () =>
+            {
+                if (slider1Path is null || slider2 is null)
+                    return false;
+
+                var mergedSlider = (Slider)EditorBeatmap.SelectedHitObjects.First();
+                return Precision.AlmostEquals(mergedSlider.Path.Distance, slider1Path.CalculatedDistance + slider2.Path.Distance);
+            });
+        }
+
         private void mergeSelection()
         {
             AddStep("merge selection", () =>
