@@ -13,14 +13,18 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
         [Resolved]
         private ManiaPlayfield playfield { get; set; } = null!;
 
+        [Resolved]
+        private ISkinSource skin { get; set; } = null!;
+
         public LegacyStageConfiguration()
         {
             RelativeSizeAxes = Axes.Both;
         }
 
-        [BackgroundDependencyLoader]
-        private void load(ISkinSource skin)
+        protected override void LoadComplete()
         {
+            base.LoadComplete();
+
             playfield.StageContainer.X = (skin.GetManiaSkinConfig<float>(LegacyManiaSkinConfigurationLookups.ColumnStart)?.Value ?? 0) / 1024;
         }
     }

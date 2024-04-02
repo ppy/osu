@@ -28,7 +28,7 @@ namespace osu.Game.Skinning
         bool IsEditable => true;
 
         /// <summary>
-        /// Whether this component is visible in the toolbox and can be placed.
+        /// Whether this component should be visible in the toolbox and placeable by an end user.
         /// </summary>
         bool IsToolboxVisible => true;
 

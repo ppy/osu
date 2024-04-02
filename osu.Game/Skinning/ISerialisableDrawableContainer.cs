@@ -24,15 +24,19 @@ namespace osu.Game.Skinning
         /// </summary>
         IBindableList<ISerialisableDrawable> Components { get; }
 
+        /// <summary>
+        /// Whether all components in this container have been loaded.
+        /// </summary>
         bool ComponentsLoaded { get; }
 
         /// <summary>
-        /// Whether the components in this container can be edited, added, or removed by an end user.
+        /// Whether the components in this container can be edited by an end user.
         /// </summary>
         bool IsEditable => true;
 
         /// <summary>
-        /// Whether the contents of this container are static. If <c>true</c>, components may not be added or removed from this container.
+        /// Whether the components in this container are static.
+        /// If <c>true</c>, components may not be added or removed from this container.
         /// </summary>
         bool IsStatic => false;
 

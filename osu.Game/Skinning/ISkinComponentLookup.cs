@@ -20,8 +20,15 @@ namespace osu.Game.Skinning
     /// </remarks>
     public interface ISkinComponentLookup : IEquatable<ISkinComponentLookup>
     {
+        /// <summary>
+        /// An anonymous object describing the target area for which components should be returned. Usually an <c>enum</c> or <c>string</c>.
+        /// </summary>
         object Target { get; }
 
+        /// <summary>
+        /// The ruleset for which skin components should be returned.
+        /// A <see langword="null"/> value means that returned components are global and should be applied for all rulesets.
+        /// </summary>
         RulesetInfo? Ruleset { get; }
     }
 }

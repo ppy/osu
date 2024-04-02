@@ -92,6 +92,7 @@ namespace osu.Game.Skinning
                 {
                     if (isDefault && !ApplySizeRestrictionsToDefault) return;
 
+                    // Sizing controlled by the skin/component.
                     if (Drawable is ISerialisableDrawable) return;
 
                     switch (confineMode)
@@ -131,7 +132,10 @@ namespace osu.Game.Skinning
             scaling.Invalidate();
 
             if (Drawable is ISerialisableDrawable serialisable)
+            {
+                // Anchoring controlled by the skin/component.
                 components.Add(serialisable);
+            }
             else
             {
                 if (CentreComponent)

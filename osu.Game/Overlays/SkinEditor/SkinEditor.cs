@@ -321,7 +321,7 @@ namespace osu.Game.Overlays.SkinEditor
             {
                 selectedTarget.Default = getFirstTarget()?.Lookup;
 
-                if (!availableTargets.Any(t => EqualityComparer<object>.Default.Equals(t.Lookup, selectedTarget.Value)))
+                if (!availableTargets.Any(t => t.Lookup.Equals(selectedTarget.Value)))
                     selectedTarget.SetDefault();
             }
         }
@@ -486,13 +486,7 @@ namespace osu.Game.Overlays.SkinEditor
 
         private ISerialisableDrawableContainer? getFirstTarget() => availableTargets.FirstOrDefault();
 
-        private ISerialisableDrawableContainer? getTarget(ISkinComponentLookup? target)
-        {
-            if (target is not ISkinComponentLookup lookup)
-                return null;
-
-            return availableTargets.FirstOrDefault(c => c.Lookup.Equals(lookup));
-        }
+        private ISerialisableDrawableContainer? getTarget(ISkinComponentLookup? target) => availableTargets.FirstOrDefault(c => c.Lookup.Equals(target));
 
         private void revert()
         {
