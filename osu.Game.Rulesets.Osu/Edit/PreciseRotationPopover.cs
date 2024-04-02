@@ -70,7 +70,7 @@ namespace osu.Game.Rulesets.Osu.Edit
             };
             selectionCentreButton.Selected.DisabledChanged += isDisabled =>
             {
-                selectionCentreButton.TooltipText = isDisabled ? "Select more than one objects to perform selection-based rotation." : string.Empty;
+                selectionCentreButton.TooltipText = isDisabled ? "Select more than one object to perform selection-based rotation." : string.Empty;
             };
         }
 
