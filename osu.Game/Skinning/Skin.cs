@@ -324,7 +324,7 @@ namespace osu.Game.Skinning
             {
             }
 
-            public string Filename => Ruleset == null ? $"{Target}.json" : $"{Ruleset.ShortName}-{Target}.json";
+            public string Filename => $"{Target}.json";
         }
     }
 }
