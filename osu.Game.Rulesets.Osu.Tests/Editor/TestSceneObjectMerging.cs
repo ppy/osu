@@ -362,7 +362,6 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             });
         }
 
-
         private void mergeSelection()
         {
             AddStep("merge selection", () =>
