@@ -22,6 +22,9 @@ namespace osu.Game.Rulesets.Osu.Edit
 
         private EditorToolButton rotateButton = null!;
 
+        private Bindable<bool> canRotatePlayfieldOrigin = null!;
+        private Bindable<bool> canRotateSelectionOrigin = null!;
+
         public SelectionRotationHandler RotationHandler { get; init; } = null!;
 
         public TransformToolboxGroup()
@@ -52,8 +55,11 @@ namespace osu.Game.Rulesets.Osu.Edit
             base.LoadComplete();
 
             // aggregate two values into canRotate
-            RotationHandler.CanRotatePlayfieldOrigin.BindValueChanged(_ => updateCanRotateAggregate());
-            RotationHandler.CanRotateSelectionOrigin.BindValueChanged(_ => updateCanRotateAggregate());
+            canRotatePlayfieldOrigin = RotationHandler.CanRotatePlayfieldOrigin.GetBoundCopy();
+            canRotatePlayfieldOrigin.BindValueChanged(_ => updateCanRotateAggregate());
+
+            canRotateSelectionOrigin = RotationHandler.CanRotateSelectionOrigin.GetBoundCopy();
+            canRotateSelectionOrigin.BindValueChanged(_ => updateCanRotateAggregate());
 
             void updateCanRotateAggregate()
             {
