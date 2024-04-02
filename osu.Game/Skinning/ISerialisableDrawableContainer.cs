@@ -27,6 +27,11 @@ namespace osu.Game.Skinning
         bool ComponentsLoaded { get; }
 
         /// <summary>
+        /// Whether the components in this container can be edited, added, or removed by an end user.
+        /// </summary>
+        bool IsEditable => true;
+
+        /// <summary>
         /// Serialise all children as <see cref="SerialisedDrawableInfo"/>.
         /// </summary>
         /// <returns>The serialised content.</returns>

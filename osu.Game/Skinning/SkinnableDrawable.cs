@@ -150,6 +150,7 @@ namespace osu.Game.Skinning
         public void Add(ISerialisableDrawable drawable) => throw new NotSupportedException();
 
         public void Remove(ISerialisableDrawable component, bool disposeImmediately) => throw new NotSupportedException();
+        public bool IsEditable => (Drawable as ISerialisableDrawable)?.IsEditable == true;
     }
 
     public enum ConfineMode

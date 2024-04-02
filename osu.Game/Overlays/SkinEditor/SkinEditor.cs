@@ -466,7 +466,7 @@ namespace osu.Game.Overlays.SkinEditor
         }
 
         private IEnumerable<ISerialisableDrawableContainer> availableTargets => targetScreen.ChildrenOfType<ISerialisableDrawableContainer>()
-                                                                                            .Where(c => (c as ISerialisableDrawable)?.IsEditable ?? true);
+                                                                                            .Where(c => c.IsEditable);
 
         private ISerialisableDrawableContainer? getFirstTarget() => availableTargets.FirstOrDefault();
 

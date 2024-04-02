@@ -72,8 +72,6 @@ namespace osu.Game.Skinning
 
         public bool UsesFixedAnchor { get; set; }
 
-        public bool IsEditable => false;
-
         public bool IsToolboxVisible => false;
 
         internal class SpriteComponentLookup : ISkinComponentLookup
