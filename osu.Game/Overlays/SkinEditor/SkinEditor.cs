@@ -681,10 +681,8 @@ namespace osu.Game.Overlays.SkinEditor
                 // This is the best we can do for now.
                 realm.Run(r => r.Refresh());
 
-                var skinnableTarget = getFirstTarget();
-
                 // Import still should happen for now, even if not placeable (as it allows a user to import skin resources that would apply to legacy gameplay skins).
-                if (skinnableTarget == null)
+                if (getTarget(selectedTarget.Value) is not SkinComponentsContainer target)
                     return;
 
                 // place component
@@ -692,7 +690,7 @@ namespace osu.Game.Overlays.SkinEditor
                 {
                     SpriteName = { Value = file.Name },
                     Origin = Anchor.Centre,
-                    Position = skinnableTarget.ToLocalSpace(GetContainingInputManager().CurrentState.Mouse.Position),
+                    Position = target.ToLocalSpace(GetContainingInputManager().CurrentState.Mouse.Position),
                 };
 
                 SelectedComponents.Clear();
