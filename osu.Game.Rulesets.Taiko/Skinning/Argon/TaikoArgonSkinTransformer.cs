@@ -14,9 +14,9 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Argon
         {
         }
 
-        public override Drawable? GetDrawableComponent(ISkinComponentLookup component)
+        public override Drawable? GetDrawableComponent(ISkinComponentLookup lookup)
         {
-            switch (component)
+            switch (lookup)
             {
                 case GameplaySkinComponentLookup<HitResult> resultComponent:
                     // This should eventually be moved to a skin setting, when supported.
@@ -26,6 +26,9 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Argon
                     return new ArgonJudgementPiece(resultComponent.Component);
 
                 case TaikoSkinComponentLookup taikoComponent:
+                    if (base.GetDrawableComponent(lookup) is Drawable c)
+                        return c;
+
                     // TODO: Once everything is finalised, consider throwing UnsupportedSkinComponentException on missing entries.
                     switch (taikoComponent.Component)
                     {
@@ -75,7 +78,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Argon
                     break;
             }
 
-            return base.GetDrawableComponent(component);
+            return base.GetDrawableComponent(lookup);
         }
     }
 }
