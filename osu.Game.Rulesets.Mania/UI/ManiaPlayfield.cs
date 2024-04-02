@@ -66,24 +66,26 @@ namespace osu.Game.Rulesets.Mania.UI
 
             GridContainer playfieldGrid;
 
-            AddInternal(StageContainer = new Container
+            AddRangeInternal(new[]
             {
-                RelativeSizeAxes = Axes.Y,
-                AutoSizeAxes = Axes.X,
-                RelativePositionAxes = Axes.X,
-                Children = new Drawable[]
+                StageContainer = new Container
                 {
-                    playfieldGrid = new GridContainer
+                    RelativeSizeAxes = Axes.Y,
+                    AutoSizeAxes = Axes.X,
+                    Children = new Drawable[]
                     {
-                        RelativeSizeAxes = Axes.Y,
-                        AutoSizeAxes = Axes.X,
-                        Content = new[] { new Drawable[stageDefinitions.Count] },
-                        ColumnDimensions = Enumerable.Range(0, stageDefinitions.Count).Select(_ => new Dimension(GridSizeMode.AutoSize)).ToArray()
-                    },
-                    new SkinnableDrawable(new ManiaSkinComponentLookup(ManiaSkinComponents.Stage), _ => new DefaultStageConfiguration())
-                    {
-                        RelativeSizeAxes = Axes.Both
+                        playfieldGrid = new GridContainer
+                        {
+                            RelativeSizeAxes = Axes.Y,
+                            AutoSizeAxes = Axes.X,
+                            Content = new[] { new Drawable[stageDefinitions.Count] },
+                            ColumnDimensions = Enumerable.Range(0, stageDefinitions.Count).Select(_ => new Dimension(GridSizeMode.AutoSize)).ToArray()
+                        }
                     }
+                },
+                new SkinnableDrawable(new ManiaSkinComponentLookup(ManiaSkinComponents.Stage), _ => new DefaultStageConfiguration())
+                {
+                    RelativeSizeAxes = Axes.Both
                 }
             });
 

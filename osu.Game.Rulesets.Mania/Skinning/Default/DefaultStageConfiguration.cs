@@ -2,9 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Game.Configuration;
 using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Skinning;
 
@@ -12,32 +10,27 @@ namespace osu.Game.Rulesets.Mania.Skinning.Default
 {
     public partial class DefaultStageConfiguration : Drawable, ISerialisableDrawable
     {
-        [SettingSource("Position", "The position of the playfield.")]
-        public BindableFloat PlayfieldPosition { get; } = new BindableFloat(0.5f)
-        {
-            MinValue = 0,
-            MaxValue = 1
-        };
-
         [Resolved]
         private ManiaPlayfield playfield { get; set; } = null!;
 
         public DefaultStageConfiguration()
         {
-            RelativeSizeAxes = Axes.Both;
+            Anchor = Anchor.TopCentre;
+            Origin = Anchor.TopCentre;
+            RelativeSizeAxes = Axes.Y;
         }
 
-        protected override void LoadComplete()
+        protected override void Update()
         {
-            base.LoadComplete();
+            base.Update();
 
-            PlayfieldPosition.BindValueChanged(updatePosition, true);
-        }
+            playfield.StageContainer.Anchor = Anchor;
+            playfield.StageContainer.Origin = Origin;
+            playfield.StageContainer.Position = Position;
+            playfield.StageContainer.Scale = Scale;
+            playfield.StageContainer.Rotation = Rotation;
 
-        private void updatePosition(ValueChangedEvent<float> pos)
-        {
-            playfield.StageContainer.Origin = Anchor.TopCentre;
-            playfield.StageContainer.X = pos.NewValue;
+            Size = playfield.StageContainer.Size;
         }
 
         public bool UsesFixedAnchor { get; set; }
