@@ -96,7 +96,7 @@ namespace osu.Game
         /// <summary>
         /// The maximum volume at which audio tracks should playback. This can be set lower than 1 to create some head-room for sound effects.
         /// </summary>
-        private const double global_track_volume_adjust = 0.8;
+        private const double global_track_volume_adjust = 1;
 
         public virtual bool UseDevelopmentServer => DebugUtils.IsDebugBuild;
 
