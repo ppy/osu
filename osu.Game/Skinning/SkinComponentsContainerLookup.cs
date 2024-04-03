@@ -3,7 +3,6 @@
 
 using System;
 using System.ComponentModel;
-using osu.Framework.Extensions;
 using osu.Game.Rulesets;
 
 namespace osu.Game.Skinning
@@ -28,13 +27,6 @@ namespace osu.Game.Skinning
         {
             Target = target;
             Ruleset = ruleset;
-        }
-
-        public override string ToString()
-        {
-            if (Ruleset == null) return Target.GetDescription();
-
-            return $"{Target.GetDescription()} (\"{Ruleset.Name}\" only)";
         }
 
         public bool Equals(SkinComponentsContainerLookup? other)

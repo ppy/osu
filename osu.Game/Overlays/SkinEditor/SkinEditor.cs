@@ -11,6 +11,7 @@ using Newtonsoft.Json;
 using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
@@ -356,7 +357,7 @@ namespace osu.Game.Overlays.SkinEditor
                 {
                     Children = new Drawable[]
                     {
-                        new SettingsDropdown<ISkinComponentLookup?>
+                        new TargetDropdown
                         {
                             Items = availableTargets.Select(t => t.Lookup).Distinct(),
                             Current = selectedTarget,
@@ -748,5 +749,24 @@ namespace osu.Game.Overlays.SkinEditor
         public void SaveState() => changeHandler?.SaveState();
 
         #endregion
+
+        private partial class TargetDropdown : SettingsDropdown<ISkinComponentLookup?>
+        {
+            protected override OsuDropdown<ISkinComponentLookup?> CreateDropdown() => new TargetDropdownControl();
+
+            private partial class TargetDropdownControl : DropdownControl
+            {
+                protected override LocalisableString GenerateItemText(ISkinComponentLookup? item)
+                {
+                    if (item == null)
+                        return base.GenerateItemText(item);
+
+                    if (item.Ruleset == null)
+                        return item.Target.GetDescription();
+
+                    return $"{item.Target.GetDescription()} (\"{item.Ruleset.Name}\" only)";
+                }
+            }
+        }
     }
 }
