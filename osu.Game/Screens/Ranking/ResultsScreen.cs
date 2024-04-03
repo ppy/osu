@@ -52,7 +52,7 @@ namespace osu.Game.Screens.Ranking
 
         protected ScorePanelList ScorePanelList { get; private set; }
 
-        protected VerticalScrollContainer VerticalScrollContent { get; private set; }
+        protected Container ResultsContent { get; private set; }
 
         [Resolved(CanBeNull = true)]
         private Player player { get; set; }
@@ -107,10 +107,9 @@ namespace osu.Game.Screens.Ranking
                 {
                     new Drawable[]
                     {
-                        VerticalScrollContent = new VerticalScrollContainer
+                        ResultsContent = new Container
                         {
                             RelativeSizeAxes = Axes.Both,
-                            ScrollbarVisible = false,
                             Child = new Container
                             {
                                 RelativeSizeAxes = Axes.Both,
@@ -275,7 +274,7 @@ namespace osu.Game.Screens.Ranking
             if (ScorePanelList.IsEmpty)
             {
                 // This can happen if for example a beatmap that is part of a playlist hasn't been played yet.
-                VerticalScrollContent.Add(new MessagePlaceholder(LeaderboardStrings.NoRecordsYet));
+                ResultsContent.Add(new MessagePlaceholder(LeaderboardStrings.NoRecordsYet));
             }
         });
 
@@ -402,24 +401,14 @@ namespace osu.Game.Screens.Ranking
         {
         }
 
-        protected partial class VerticalScrollContainer : OsuScrollContainer
+        protected override bool OnScroll(ScrollEvent e)
         {
-            protected override Container<Drawable> Content => content;
+            // Match stable behaviour of only alt-scroll adjusting volume.
+            // Supporting scroll adjust without a modifier key just feels bad, since there are so many scrollable elements on the screen.
+            if (!e.CurrentState.Keyboard.AltPressed)
+                return true;
 
-            private readonly Container content;
-
-            public VerticalScrollContainer()
-            {
-                Masking = false;
-
-                base.Content.Add(content = new Container { RelativeSizeAxes = Axes.X });
-            }
-
-            protected override void Update()
-            {
-                base.Update();
-                content.Height = Math.Max(screen_height, DrawHeight);
-            }
+            return base.OnScroll(e);
         }
     }
 }
