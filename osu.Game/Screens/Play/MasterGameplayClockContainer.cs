@@ -124,7 +124,7 @@ namespace osu.Game.Screens.Play
 
             double skipTarget = skipTargetTime - MINIMUM_SKIP_TIME;
 
-            if (GameplayClock.CurrentTime < 0 && skipTarget > 6000)
+            if (StartTime < -10000 && GameplayClock.CurrentTime < 0 && skipTarget > 6000)
                 // double skip exception for storyboards with very long intros
                 skipTarget = 0;
 
