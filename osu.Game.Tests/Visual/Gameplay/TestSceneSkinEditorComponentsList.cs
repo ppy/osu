@@ -40,13 +40,13 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         [Test]
-        public void TestInvisibleComponent()
+        public void TestNonPlaceableComponent()
         {
-            // Lift TestRuleset and ToolboxInvisibleComponent into an isolated assembly containing both types at a top level.
+            // Lift TestRuleset and NonPlaceableComponent into an isolated assembly containing both types at a top level.
             AssemblyBuilder asmBuilder = AssemblyBuilder.DefineDynamicAssembly(new AssemblyName(Guid.NewGuid().ToString()), AssemblyBuilderAccess.Run);
             ModuleBuilder moduleBuilder = asmBuilder.DefineDynamicModule(asmBuilder.GetName().Name!);
 
-            moduleBuilder.DefineType($"{nameof(ToolboxInvisibleComponent)}", TypeAttributes.Public | TypeAttributes.Class, typeof(ToolboxInvisibleComponent)).CreateType();
+            moduleBuilder.DefineType($"{nameof(NonPlaceableComponent)}", TypeAttributes.Public | TypeAttributes.Class, typeof(NonPlaceableComponent)).CreateType();
             TypeBuilder rulesetType = moduleBuilder.DefineType("MockRuleset", TypeAttributes.Public | TypeAttributes.Class, typeof(TestRuleset));
             Ruleset ruleset = (Ruleset)Activator.CreateInstance(rulesetType.CreateType())!;
 
@@ -75,10 +75,10 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         // Must be public to be lifted into a secondary assembly.
-        public partial class ToolboxInvisibleComponent : Drawable, ISerialisableDrawable
+        public partial class NonPlaceableComponent : Drawable, ISerialisableDrawable
         {
             public bool UsesFixedAnchor { get; set; }
-            public bool IsToolboxVisible => false;
+            public bool IsPlaceable => false;
         }
     }
 }

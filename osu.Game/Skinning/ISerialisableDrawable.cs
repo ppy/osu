@@ -30,7 +30,7 @@ namespace osu.Game.Skinning
         /// <summary>
         /// Whether this component should be visible in the toolbox and placeable by an end user.
         /// </summary>
-        bool IsToolboxVisible => true;
+        bool IsPlaceable => true;
 
         /// <summary>
         /// In the context of the skin layout editor, whether this <see cref="ISerialisableDrawable"/> has a permanent anchor defined.

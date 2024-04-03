@@ -17,6 +17,6 @@ namespace osu.Game.Rulesets.Mania.Skinning.Default
 
         public bool UsesFixedAnchor { get; set; }
 
-        public bool IsToolboxVisible => false;
+        public bool IsPlaceable => false;
     }
 }
