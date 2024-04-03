@@ -50,7 +50,7 @@ namespace osu.Game.Audio
                 throw new InvalidOperationException("Failed to start loudness measurement!\nError Code: " + Bass.LastError);
             }
 
-            byte[] buffer = new byte[65536];
+            byte[] buffer = new byte[10000];
 
             while (Bass.ChannelIsActive(decodeStream) == PlaybackState.Playing)
             {
@@ -67,6 +67,8 @@ namespace osu.Game.Audio
 
             IntegratedLoudness = integratedLoudness;
             VolumeOffset = (float)Math.Pow(10, (target_level - integratedLoudness) / 20);
+
+            Bass.SampleFree(decodeStream);
         }
     }
 }
