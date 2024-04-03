@@ -8,11 +8,13 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
+using System.Runtime.Versioning;
 using osu.Framework.Logging;
 
 namespace osu.Desktop
 {
     [SuppressMessage("ReSharper", "InconsistentNaming")]
+    [SupportedOSPlatform("windows")]
     internal static class NVAPI
     {
         private const string osu_filename = "osu!.exe";

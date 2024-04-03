@@ -53,6 +53,7 @@ namespace osu.Game.Overlays.SkinEditor
         private OsuTextFlowContainer headerText = null!;
 
         private Bindable<Skin> currentSkin = null!;
+        private Bindable<string> clipboardContent = null!;
 
         [Resolved]
         private OsuGame? game { get; set; }
@@ -65,9 +66,6 @@ namespace osu.Game.Overlays.SkinEditor
 
         [Resolved]
         private RealmAccess realm { get; set; } = null!;
-
-        [Resolved]
-        private EditorClipboard clipboard { get; set; } = null!;
 
         [Resolved]
         private SkinEditorOverlay? skinEditorOverlay { get; set; }
@@ -114,7 +112,7 @@ namespace osu.Game.Overlays.SkinEditor
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(EditorClipboard clipboard)
         {
             RelativeSizeAxes = Axes.Both;
 
@@ -225,6 +223,8 @@ namespace osu.Game.Overlays.SkinEditor
                     }
                 }
             };
+
+            clipboardContent = clipboard.Content.GetBoundCopy();
         }
 
         protected override void LoadComplete()
@@ -242,7 +242,7 @@ namespace osu.Game.Overlays.SkinEditor
             canPaste.Current.BindValueChanged(paste => pasteMenuItem.Action.Disabled = !paste.NewValue, true);
 
             SelectedComponents.BindCollectionChanged((_, _) => updateActions());
-            clipboard.Content.BindValueChanged(_ => updateActions());
+            clipboardContent.BindValueChanged(_ => updateActions());
             selectedTarget.BindValueChanged(_ => updateActions(), true);
 
             Show();
@@ -471,7 +471,7 @@ namespace osu.Game.Overlays.SkinEditor
             }
 
             canCopy.Value = canCut.Value = SelectedComponents.Any();
-            canPaste.Value = !string.IsNullOrEmpty(clipboard.Content.Value);
+            canPaste.Value = !string.IsNullOrEmpty(clipboardContent.Value);
         }
 
         private void populateSettings()
@@ -516,7 +516,7 @@ namespace osu.Game.Overlays.SkinEditor
             if (!canCopy.Value)
                 return;
 
-            clipboard.Content.Value = JsonConvert.SerializeObject(SelectedComponents.Cast<Drawable>().Select(s => s.CreateSerialisedInfo()).ToArray());
+            clipboardContent.Value = JsonConvert.SerializeObject(SelectedComponents.Cast<Drawable>().Select(s => s.CreateSerialisedInfo()).ToArray());
         }
 
         protected void Clone()
@@ -536,7 +536,7 @@ namespace osu.Game.Overlays.SkinEditor
 
             changeHandler?.BeginChange();
 
-            var drawableInfo = JsonConvert.DeserializeObject<SerialisedDrawableInfo[]>(clipboard.Content.Value);
+            var drawableInfo = JsonConvert.DeserializeObject<SerialisedDrawableInfo[]>(clipboardContent.Value);
 
             if (drawableInfo == null)
                 return;

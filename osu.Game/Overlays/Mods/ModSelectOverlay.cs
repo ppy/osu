@@ -781,7 +781,7 @@ namespace osu.Game.Overlays.Mods
         /// </remarks>>
         public bool OnPressed(KeyBindingPressEvent<PlatformAction> e)
         {
-            if (e.Repeat || e.Action != PlatformAction.SelectAll || SelectAllModsButton is null)
+            if (e.Repeat || e.Action != PlatformAction.SelectAll || SelectAllModsButton == null)
                 return false;
 
             SelectAllModsButton.TriggerClick();

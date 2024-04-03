@@ -18,11 +18,12 @@ namespace osu.Game.Rulesets.Filter
         /// in addition to the ones mandated by song select.
         /// </summary>
         /// <param name="beatmapInfo">The beatmap to test the criteria against.</param>
+        /// <param name="criteria">The filter criteria.</param>
         /// <returns>
         /// <c>true</c> if the beatmap matches the ruleset-specific custom filtering criteria,
         /// <c>false</c> otherwise.
         /// </returns>
-        bool Matches(BeatmapInfo beatmapInfo);
+        bool Matches(BeatmapInfo beatmapInfo, FilterCriteria criteria);
 
         /// <summary>
         /// Attempts to parse a single custom keyword criterion, given by the user via the song select search box.
