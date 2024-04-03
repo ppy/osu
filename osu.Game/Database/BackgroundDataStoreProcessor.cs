@@ -11,6 +11,8 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Logging;
+using osu.Framework.Platform;
+using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Extensions;
 using osu.Game.Online.API;
@@ -55,6 +57,9 @@ namespace osu.Game.Database
         private INotificationOverlay? notificationOverlay { get; set; }
 
         [Resolved]
+        private Storage? storage { get; set; }
+
+        [Resolved]
         private IAPIProvider api { get; set; } = null!;
 
         protected virtual int TimeToSleepDuringGameplay => 30000;
@@ -68,6 +73,7 @@ namespace osu.Game.Database
                 Logger.Log("Beginning background data store processing..");
 
                 checkForOutdatedStarRatings();
+                processAudioNormalization();
                 processBeatmapSetsWithMissingMetrics();
                 // Note that the previous method will also update these on a fresh run.
                 processBeatmapsWithMissingObjectCounts();
@@ -84,6 +90,29 @@ namespace osu.Game.Database
 
                 Logger.Log("Finished background data store processing!");
             });
+        }
+
+        private void processAudioNormalization()
+        {
+            realmAccess.Write(r =>
+            {
+                foreach (BeatmapSetInfo beatmapSetInfo in r.All<BeatmapSetInfo>())
+                {
+                    foreach (BeatmapInfo beatmapInfo in beatmapSetInfo.Beatmaps)
+                    {
+                        if (beatmapInfo.AudioNormalization != null && !beatmapInfo.AudioNormalization.isDefault()) continue;
+
+                        AudioNormalization audioNormalization = new AudioNormalization(beatmapInfo, beatmapSetInfo, new RealmFileStore(realmAccess, storage!));
+                        beatmapInfo.AudioNormalization = audioNormalization;
+                        var newbeatmapSetInfo = audioNormalization.PopulateSet(beatmapInfo, beatmapSetInfo);
+                        r.Add(newbeatmapSetInfo);
+                    }
+
+                    Logger.Log($"Processed audio normalization for {beatmapSetInfo.Metadata.Title}");
+                }
+            });
+
+            Logger.Log("Finished populating audio normalization readings.");
         }
 
         /// <summary>
