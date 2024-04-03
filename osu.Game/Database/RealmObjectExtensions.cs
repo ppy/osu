@@ -9,6 +9,7 @@ using System.Runtime.Serialization;
 using AutoMapper;
 using AutoMapper.Internal;
 using osu.Framework.Logging;
+using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Input.Bindings;
 using osu.Game.Models;
@@ -32,6 +33,7 @@ namespace osu.Game.Database
                  copyChangesToRealm(s.Author, d.Author);
              });
             c.CreateMap<BeatmapDifficulty, BeatmapDifficulty>();
+            c.CreateMap<AudioNormalization, AudioNormalization>();
             c.CreateMap<RealmUser, RealmUser>();
             c.CreateMap<RealmFile, RealmFile>();
             c.CreateMap<RealmNamedFileUsage, RealmNamedFileUsage>();
@@ -41,6 +43,7 @@ namespace osu.Game.Database
              .ForMember(s => s.UserSettings, cc => cc.Ignore())
              .ForMember(s => s.Difficulty, cc => cc.Ignore())
              .ForMember(s => s.BeatmapSet, cc => cc.Ignore())
+             .ForMember(s => s.AudioNormalization, cc => cc.Ignore())
              .AfterMap((s, d) =>
              {
                  d.Ruleset = d.Realm!.Find<RulesetInfo>(s.Ruleset.ShortName)!;
@@ -172,6 +175,7 @@ namespace osu.Game.Database
             c.CreateMap<BeatmapUserSettings, BeatmapUserSettings>();
             c.CreateMap<BeatmapDifficulty, BeatmapDifficulty>();
             c.CreateMap<RulesetInfo, RulesetInfo>();
+            c.CreateMap<AudioNormalization, AudioNormalization>();
             c.CreateMap<ScoreInfo, ScoreInfo>();
             c.CreateMap<RealmUser, RealmUser>();
             c.CreateMap<RealmFile, RealmFile>();

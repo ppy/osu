@@ -11,11 +11,16 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
+using ManagedBass;
+using ManagedBass.Fx;
 using osu.Framework.Audio;
+using osu.Framework.Audio.Mixing;
 using osu.Framework.Audio.Track;
 using osu.Framework.Extensions;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Logging;
+using osu.Game.Audio;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.UI;
@@ -57,6 +62,9 @@ namespace osu.Game.Beatmaps
 
             storyboard = new Lazy<Storyboard>(GetStoryboard);
             skin = new Lazy<ISkin>(GetSkin);
+
+            AddAudioNormalization();
+            Logger.Log("Added normalization");
         }
 
         #region Resource getters
@@ -337,6 +345,47 @@ namespace osu.Game.Beatmaps
         /// <returns>The applicable <see cref="IBeatmapConverter"/>.</returns>
         protected virtual IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap, Ruleset ruleset) => ruleset.CreateBeatmapConverter(beatmap);
 
+        #endregion
+
+        #region Audio Normalization
+
+        public void AddAudioNormalization()
+        {
+            AudioNormalization AudioNormalizationModule = BeatmapInfo.AudioNormalization;
+
+            Logger.Log("Audio Normalization Manager Null status: " + AudioNormalizationModule.IsNull());
+
+            if (AudioNormalizationModule.IsNull()) return;
+
+            Logger.Log("Volume offset: " + AudioNormalizationModule.VolumeOffset);
+            VolumeParameters volumeParameters = new VolumeParameters
+            {
+                fTarget = AudioNormalizationModule.VolumeOffset.IsNotNull() ? AudioNormalizationModule.VolumeOffset : 0.8f,
+                fCurrent = 1.0f,
+                fTime = 0,
+                lCurve = 0,
+                lChannel = FXChannelFlags.All
+            };
+
+            addFx(volumeParameters);
+        }
+
+        private void addFx(IEffectParameter effectParameter)
+        {
+            AudioMixer audioMixer = audioManager.TrackMixer;
+
+            IEffectParameter effect = audioMixer.Effects.SingleOrDefault(e => e.FXType == effectParameter.FXType);
+
+            if (effect.IsNull())
+            {
+                int i = audioMixer.Effects.IndexOf(effect);
+                audioMixer.Effects[i] = effectParameter;
+            }
+            else
+            {
+                audioMixer.Effects.Add(effectParameter);
+            }
+        }
         #endregion
 
         public override string ToString() => BeatmapInfo.ToString();
