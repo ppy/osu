@@ -52,6 +52,7 @@ namespace osu.Game.Overlays.SkinEditor
         private OsuTextFlowContainer headerText = null!;
 
         private Bindable<Skin> currentSkin = null!;
+        private Bindable<string> clipboardContent = null!;
 
         [Resolved]
         private OsuGame? game { get; set; }
@@ -243,7 +244,8 @@ namespace osu.Game.Overlays.SkinEditor
                 canCopy.Value = canCut.Value = SelectedComponents.Any();
             }, true);
 
-            clipboard.Content.BindValueChanged(content => canPaste.Value = !string.IsNullOrEmpty(content.NewValue), true);
+            clipboardContent = clipboard.Content.GetBoundCopy();
+            clipboardContent.BindValueChanged(content => canPaste.Value = !string.IsNullOrEmpty(content.NewValue), true);
 
             Show();
 
