@@ -9,6 +9,10 @@ namespace osu.Game.Audio
 {
     public class BassAudioNormalization
     {
+        /// <summary>
+        /// The target level for audio normalization
+        /// https://en.wikipedia.org/wiki/EBU_R_128
+        /// </summary>
         private const int target_level = -23;
 
         public float VolumeOffset { get; set; }
