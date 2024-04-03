@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
@@ -55,18 +54,18 @@ namespace osu.Game.Audio
             Logger.Log("Volume offset: " + VolumeOffset + "\nIntegrated loudness: " + IntegratedLoudness);
         }
 
-        public bool isDefault()
+        public bool IsDefault()
         {
             return VolumeOffset == 0 && IntegratedLoudness == 0;
         }
 
-        internal BeatmapSetInfo PopulateSet(BeatmapInfo beatmapInfo, BeatmapSetInfo beatmapSetInfo)
+        internal BeatmapSetInfo PopulateSet(BeatmapInfo beatmapInfo, BeatmapSetInfo? beatmapSetInfo)
         {
-            if (!beatmapSetInfo.IsNotNull()) return beatmapSetInfo;
+            if (beatmapSetInfo == null) return beatmapSetInfo!;
 
             foreach (BeatmapInfo beatmap in beatmapSetInfo.Beatmaps)
             {
-                if ((beatmap.AudioNormalization.IsNull() || beatmap.AudioNormalization.isDefault()) && beatmap.AudioEquals(beatmapInfo))
+                if ((beatmap.AudioNormalization == null || beatmap.AudioNormalization.IsDefault()) && beatmap.AudioEquals(beatmapInfo))
                 {
                     beatmap.AudioNormalization = new AudioNormalization
                     {
