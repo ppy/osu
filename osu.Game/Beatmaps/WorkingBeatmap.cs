@@ -117,7 +117,6 @@ namespace osu.Game.Beatmaps
             waveform = null;
 
             addAudioNormalization();
-            Logger.Log("Added normalization");
 
             return track;
         }
