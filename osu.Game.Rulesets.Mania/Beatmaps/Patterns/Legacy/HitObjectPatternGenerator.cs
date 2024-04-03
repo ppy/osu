@@ -23,9 +23,9 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
 
         private readonly PatternType convertType;
 
-        public HitObjectPatternGenerator(LegacyRandom random, HitObject hitObject, ManiaBeatmap beatmap, Pattern previousPattern, double previousTime, Vector2 previousPosition, double density,
-                                         PatternType lastStair, IBeatmap originalBeatmap)
-            : base(random, hitObject, beatmap, previousPattern, originalBeatmap)
+        public HitObjectPatternGenerator(LegacyRandom random, HitObject hitObject, IBeatmap beatmap, int totalColumns, Pattern previousPattern, double previousTime, Vector2 previousPosition,
+                                         double density, PatternType lastStair)
+            : base(random, hitObject, beatmap, previousPattern, totalColumns)
         {
             StairType = lastStair;
 

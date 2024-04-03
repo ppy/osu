@@ -14,9 +14,9 @@ namespace osu.Game.Rulesets.Mania
     {
         private FilterCriteria.OptionalRange<float> keys;
 
-        public bool Matches(BeatmapInfo beatmapInfo)
+        public bool Matches(BeatmapInfo beatmapInfo, FilterCriteria criteria)
         {
-            return !keys.HasFilter || keys.IsInRange(ManiaBeatmapConverter.GetColumnCount(LegacyBeatmapConversionDifficultyInfo.FromBeatmapInfo(beatmapInfo)));
+            return !keys.HasFilter || keys.IsInRange(ManiaBeatmapConverter.GetColumnCount(LegacyBeatmapConversionDifficultyInfo.FromBeatmapInfo(beatmapInfo), criteria.Mods));
         }
 
         public bool TryParseCustomKeywordCriteria(string key, Operator op, string value)
