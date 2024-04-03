@@ -38,6 +38,7 @@ using osu.Game.Skinning;
 using osuTK.Input;
 using Realms;
 using Realms.Exceptions;
+using BeatmapSetInfo = osu.Game.Beatmaps.BeatmapSetInfo;
 
 namespace osu.Game.Database
 {
@@ -92,7 +93,7 @@ namespace osu.Game.Database
         /// 39   2023-12-19    Migrate any EndTimeObjectCount and TotalObjectCount values of 0 to -1 to better identify non-calculated values.
         /// 40   2023-12-21    Add ScoreInfo.Version to keep track of which build scores were set on.
         /// </summary>
-        private const int schema_version = 40;
+        private const int schema_version = 41;
 
         /// <summary>
         /// Lock object which is held during <see cref="BlockAllOperations"/> sections, blocking realm retrieval during blocking periods.
