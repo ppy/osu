@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 using JetBrains.Annotations;
 using ManagedBass;
 using ManagedBass.Fx;
+using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Mixing;
 using osu.Framework.Audio.Track;
@@ -21,6 +22,7 @@ using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Logging;
 using osu.Game.Audio;
+using osu.Game.Configuration;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.UI;
@@ -116,7 +118,7 @@ namespace osu.Game.Beatmaps
             waveform?.Dispose();
             waveform = null;
 
-            AddAudioNormalization();
+            addAudioNormalization();
             Logger.Log("Added normalization");
 
             return track;
@@ -349,13 +351,12 @@ namespace osu.Game.Beatmaps
 
         #region Audio Normalization
 
-        public void AddAudioNormalization()
+        private void addAudioNormalization()
         {
             AudioNormalization audioNormalizationModule = BeatmapInfo.AudioNormalization;
 
-            Logger.Log("Audio Normalization Manager Null status: " + audioNormalizationModule.IsNull());
+            Logger.Log("Audio Normalization Manager Null Status: " + audioNormalizationModule.IsNull());
 
-            Logger.Log("Volume offset: " + audioNormalizationModule?.VolumeOffset);
             VolumeParameters volumeParameters = new VolumeParameters
             {
                 fTarget = audioNormalizationModule?.VolumeOffset ?? 0.8f,
@@ -384,6 +385,7 @@ namespace osu.Game.Beatmaps
                 audioMixer.Effects.Add(effectParameter);
             }
         }
+
         #endregion
 
         public override string ToString() => BeatmapInfo.ToString();

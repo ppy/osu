@@ -73,13 +73,13 @@ namespace osu.Game.Database
                 Logger.Log("Beginning background data store processing..");
 
                 checkForOutdatedStarRatings();
-                processAudioNormalization();
                 processBeatmapSetsWithMissingMetrics();
                 // Note that the previous method will also update these on a fresh run.
                 processBeatmapsWithMissingObjectCounts();
                 processScoresWithMissingStatistics();
                 convertLegacyTotalScoreToStandardised();
                 upgradeScoreRanks();
+                processAudioNormalization();
             }, TaskCreationOptions.LongRunning).ContinueWith(t =>
             {
                 if (t.Exception?.InnerException is ObjectDisposedException)
@@ -92,6 +92,9 @@ namespace osu.Game.Database
             });
         }
 
+        /// <summary>
+        /// Go through every beatmap and calculate the audio normalization values if they are missing.
+        /// </summary>
         private void processAudioNormalization()
         {
             realmAccess.Write(r =>
@@ -112,7 +115,7 @@ namespace osu.Game.Database
                 }
             });
 
-            Logger.Log("Finished populating audio normalization readings.");
+            Logger.Log("Finished processing audio normalization readings.");
         }
 
         /// <summary>
