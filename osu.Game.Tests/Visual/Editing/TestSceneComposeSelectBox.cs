@@ -89,7 +89,7 @@ namespace osu.Game.Tests.Visual.Editing
             {
                 this.getTargetContainer = getTargetContainer;
 
-                CanRotate.Value = true;
+                CanRotateSelectionOrigin.Value = true;
             }
 
             [CanBeNull]
