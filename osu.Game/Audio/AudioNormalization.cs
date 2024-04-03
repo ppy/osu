@@ -51,7 +51,6 @@ namespace osu.Game.Audio
             BassAudioNormalization loudnessDetection = new BassAudioNormalization(filepath);
             VolumeOffset = loudnessDetection.VolumeOffset;
             IntegratedLoudness = loudnessDetection.IntegratedLoudness;
-            Logger.Log("Volume offset: " + VolumeOffset + "\nIntegrated loudness: " + IntegratedLoudness);
         }
 
         public bool IsDefault()
