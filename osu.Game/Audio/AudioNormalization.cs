@@ -3,6 +3,7 @@
 
 using System;
 using osu.Framework.Extensions.ObjectExtensions;
+using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using Realms;
@@ -22,8 +23,14 @@ namespace osu.Game.Audio
         /// </summary>
         public float IntegratedLoudness { get; set; }
 
-        private AudioNormalization()
+        public AudioNormalization()
         {
+        }
+
+        public AudioNormalization(float volumeOffset, float integratedLoudness)
+        {
+            VolumeOffset = volumeOffset;
+            IntegratedLoudness = integratedLoudness;
         }
 
         public AudioNormalization(BeatmapInfo beatmapInfo, BeatmapSetInfo beatmapSetInfo, RealmFileStore realmFileStore)
@@ -45,6 +52,7 @@ namespace osu.Game.Audio
             BassAudioNormalization loudnessDetection = new BassAudioNormalization(filepath);
             VolumeOffset = loudnessDetection.VolumeOffset;
             IntegratedLoudness = loudnessDetection.IntegratedLoudness;
+            Logger.Log("Volume offset: " + VolumeOffset + "\nIntegrated loudness: " + IntegratedLoudness);
         }
 
         public bool isDefault()
@@ -71,14 +79,11 @@ namespace osu.Game.Audio
             return beatmapSetInfo;
         }
 
-        public bool Equals(IAudioNormalization? other)
-        {
-            throw new NotImplementedException();
-        }
+        public bool Equals(IAudioNormalization? other) => other is AudioNormalization audioNormalization && Equals(audioNormalization);
 
         public bool Equals(AudioNormalization? other)
         {
-            throw new NotImplementedException();
+            return VolumeOffset == other?.VolumeOffset && IntegratedLoudness == other.IntegratedLoudness;
         }
     }
 }

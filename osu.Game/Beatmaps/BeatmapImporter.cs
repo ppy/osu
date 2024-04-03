@@ -168,7 +168,7 @@ namespace osu.Game.Beatmaps
 
             foreach (BeatmapInfo beatmapInfo in beatmapSet.Beatmaps)
             {
-                if (beatmapInfo.AudioNormalization == null || !beatmapInfo.AudioNormalization.isDefault()) continue;
+                if (beatmapInfo.AudioNormalization != null && !beatmapInfo.AudioNormalization.isDefault()) continue;
                 AudioNormalization audioNormalization = new AudioNormalization(beatmapInfo, beatmapSet, Files);
                 beatmapInfo.AudioNormalization = audioNormalization;
                 beatmapSet = beatmapInfo.AudioNormalization.PopulateSet(beatmapInfo, beatmapSet);

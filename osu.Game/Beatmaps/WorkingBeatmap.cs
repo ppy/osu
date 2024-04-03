@@ -62,9 +62,6 @@ namespace osu.Game.Beatmaps
 
             storyboard = new Lazy<Storyboard>(GetStoryboard);
             skin = new Lazy<ISkin>(GetSkin);
-
-            AddAudioNormalization();
-            Logger.Log("Added normalization");
         }
 
         #region Resource getters
@@ -118,6 +115,9 @@ namespace osu.Game.Beatmaps
             // the track may have changed, recycle the current waveform.
             waveform?.Dispose();
             waveform = null;
+
+            AddAudioNormalization();
+            Logger.Log("Added normalization");
 
             return track;
         }
@@ -351,16 +351,14 @@ namespace osu.Game.Beatmaps
 
         public void AddAudioNormalization()
         {
-            AudioNormalization AudioNormalizationModule = BeatmapInfo.AudioNormalization;
+            AudioNormalization audioNormalizationModule = BeatmapInfo.AudioNormalization;
 
-            Logger.Log("Audio Normalization Manager Null status: " + AudioNormalizationModule.IsNull());
+            Logger.Log("Audio Normalization Manager Null status: " + audioNormalizationModule.IsNull());
 
-            if (AudioNormalizationModule.IsNull()) return;
-
-            Logger.Log("Volume offset: " + AudioNormalizationModule.VolumeOffset);
+            Logger.Log("Volume offset: " + audioNormalizationModule?.VolumeOffset);
             VolumeParameters volumeParameters = new VolumeParameters
             {
-                fTarget = AudioNormalizationModule.VolumeOffset.IsNotNull() ? AudioNormalizationModule.VolumeOffset : 0.8f,
+                fTarget = audioNormalizationModule?.VolumeOffset ?? 0.8f,
                 fCurrent = 1.0f,
                 fTime = 0,
                 lCurve = 0,
@@ -374,9 +372,9 @@ namespace osu.Game.Beatmaps
         {
             AudioMixer audioMixer = audioManager.TrackMixer;
 
-            IEffectParameter effect = audioMixer.Effects.SingleOrDefault(e => e.FXType == effectParameter.FXType);
+            IEffectParameter effect = audioMixer.Effects.SingleOrDefault(e => e.FXType == effectParameter.FXType)!;
 
-            if (effect.IsNull())
+            if (effect != null)
             {
                 int i = audioMixer.Effects.IndexOf(effect);
                 audioMixer.Effects[i] = effectParameter;
