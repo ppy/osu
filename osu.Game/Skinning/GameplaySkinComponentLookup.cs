@@ -37,20 +37,6 @@ namespace osu.Game.Skinning
             return EqualityComparer<T>.Default.Equals(Component, other.Component);
         }
 
-        public override bool Equals(object? obj)
-        {
-            if (ReferenceEquals(null, obj)) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != GetType()) return false;
-
-            return Equals((GameplaySkinComponentLookup<T>)obj);
-        }
-
-        public override int GetHashCode()
-        {
-            return EqualityComparer<T>.Default.GetHashCode(Component);
-        }
-
         bool IEquatable<ISkinComponentLookup>.Equals(ISkinComponentLookup? other)
             => other is GameplaySkinComponentLookup<T> lookup && Equals(lookup);
 
