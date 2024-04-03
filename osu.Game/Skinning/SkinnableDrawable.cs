@@ -149,10 +149,10 @@ namespace osu.Game.Skinning
             ComponentsLoaded = true;
         }
 
-        public void Reload(SerialisedDrawableInfo[] skinnableInfo) => reload(skinnableInfo.FirstOrDefault()?.CreateInstance());
+        void ISerialisableDrawableContainer.Reload(SerialisedDrawableInfo[] skinnableInfo) => reload(skinnableInfo.FirstOrDefault()?.CreateInstance());
 
         // Only to be used during skin editor undo-redo.
-        public void Add(ISerialisableDrawable component)
+        void ISerialisableDrawableContainer.Add(ISerialisableDrawable component)
         {
             if (!(component is Drawable drawable))
                 throw new ArgumentException($"Provided argument must be of type {nameof(Drawable)}.", nameof(component));
@@ -162,7 +162,7 @@ namespace osu.Game.Skinning
         }
 
         // Only to be used during skin editor undo-redo.
-        public void Remove(ISerialisableDrawable component, bool disposeImmediately)
+        void ISerialisableDrawableContainer.Remove(ISerialisableDrawable component, bool disposeImmediately)
         {
             if (!(component is Drawable drawable))
                 throw new ArgumentException($"Provided argument must be of type {nameof(Drawable)}.", nameof(component));
