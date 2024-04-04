@@ -33,6 +33,7 @@ namespace osu.Game.Rulesets.Mania
         StageForeground,
         BarLine,
 
-        Stage
+        Stage,
+        TouchOverlay
     }
 }

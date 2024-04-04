@@ -125,6 +125,9 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
                         case ManiaSkinComponents.Stage:
                             return new LegacyStageConfiguration();
 
+                        case ManiaSkinComponents.TouchOverlay:
+                            return null;
+
                         default:
                             throw new UnsupportedSkinComponentException(lookup);
                     }

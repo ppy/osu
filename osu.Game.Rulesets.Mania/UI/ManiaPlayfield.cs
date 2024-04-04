@@ -87,6 +87,10 @@ namespace osu.Game.Rulesets.Mania.UI
                 {
                     CentreComponent = false,
                     RelativeSizeAxes = Axes.Both
+                },
+                new SkinnableDrawable(new ManiaSkinComponentLookup(ManiaSkinComponents.TouchOverlay), _ => new ManiaTouchInputOverlay())
+                {
+                    RelativeSizeAxes = Axes.Both
                 }
             });
 
