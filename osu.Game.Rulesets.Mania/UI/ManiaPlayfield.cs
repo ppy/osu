@@ -13,6 +13,7 @@ using osu.Framework.Graphics.Primitives;
 using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Skinning.Default;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI.Scrolling;
@@ -29,6 +30,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
         private readonly Drawable stageContainer;
         private readonly SkinnableDrawable skinnableConfiguration;
+        private readonly Drawable touchOverlay;
 
         public override Quad SkinnableComponentScreenSpaceDrawQuad
         {
@@ -88,7 +90,7 @@ namespace osu.Game.Rulesets.Mania.UI
                     CentreComponent = false,
                     RelativeSizeAxes = Axes.Both
                 },
-                new SkinnableDrawable(new ManiaSkinComponentLookup(ManiaSkinComponents.TouchOverlay), _ => new ManiaTouchInputOverlay())
+                touchOverlay = new SkinnableDrawable(new ManiaSkinComponentLookup(ManiaSkinComponents.TouchOverlay), _ => new ManiaTouchInputOverlay())
                 {
                     RelativeSizeAxes = Axes.Both
                 }
@@ -109,6 +111,13 @@ namespace osu.Game.Rulesets.Mania.UI
 
                 firstColumnIndex += newStage.Columns.Length;
             }
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            touchOverlay.Alpha = Mods?.Any(m => m is ModTouchDevice) == true ? 1 : 0;
         }
 
         protected override void Update()

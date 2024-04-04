@@ -86,7 +86,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
         public bool IsPlaceable => false;
 
-        private partial class InputReceptor : CompositeDrawable
+        public partial class InputReceptor : CompositeDrawable
         {
             public readonly IBindable<ManiaAction> Action = new Bindable<ManiaAction>();
 
