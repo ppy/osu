@@ -97,35 +97,39 @@ namespace osu.Game.Database
         /// </summary>
         private void processAudioNormalization()
         {
-            int totalcount = 0;
+            int beatmapsCount = 0;
+            int beatmapsToProcess = 0;
 
             realmAccess.Run(r =>
             {
-                foreach (BeatmapSetInfo beatmapSetInfo in r.All<BeatmapSetInfo>())
+                foreach (BeatmapSetInfo beatmapSetInfo in r.All<BeatmapSetInfo>().Where(b => !b.DeletePending))
                 {
-                    totalcount += beatmapSetInfo.Beatmaps.Count;
+                    beatmapsCount += beatmapSetInfo.Beatmaps.Count;
+                    beatmapsToProcess += beatmapSetInfo.Beatmaps.Count(b => b.AudioNormalization == null || b.AudioNormalization.IsDefault());
                 }
             });
 
-            if (totalcount == 0)
+            if (beatmapsToProcess == 0)
             {
                 Logger.Log("No audio normalization processing required.");
                 return;
             }
 
-            var notification = showProgressNotification(totalcount, "Verifying loudness level for beatmaps", "all loudness levels have been verified");
+            var notification = showProgressNotification(beatmapsCount, "Verifying loudness level for beatmaps", "all loudness levels have been verified");
             int processedCount = 0;
 
             realmAccess.Run(r =>
             {
-                foreach (BeatmapSetInfo beatmapSetInfo in r.All<BeatmapSetInfo>())
+                r.Refresh();
+
+                foreach (BeatmapSetInfo beatmapSetInfo in r.All<BeatmapSetInfo>().Where(b => !b.DeletePending))
                 {
                     foreach (BeatmapInfo beatmapInfo in beatmapSetInfo.Beatmaps)
                     {
                         if (notification?.State == ProgressNotificationState.Cancelled)
                             break;
 
-                        updateNotificationProgress(notification, processedCount, totalcount);
+                        updateNotificationProgress(notification, processedCount, beatmapsCount);
                         processedCount++;
 
                         sleepIfRequired();
@@ -141,10 +145,13 @@ namespace osu.Game.Database
 
                     Logger.Log($"Processed audio normalization for {beatmapSetInfo.Metadata.Title}");
                 }
+
+                r.Refresh();
+                GC.Collect();
             });
 
             Logger.Log("Finished processing audio normalization readings");
-            completeNotification(notification, processedCount, totalcount);
+            completeNotification(notification, processedCount, beatmapsCount);
         }
 
         /// <summary>
