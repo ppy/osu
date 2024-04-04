@@ -78,4 +78,10 @@ namespace osu.Game.Skinning
         NoteBodyStyle,
         LightFramePerSecond
     }
+
+    public enum HoldNoteTailOrigin
+    {
+        Regular = 0,
+        Inverted = 1
+    }
 }
