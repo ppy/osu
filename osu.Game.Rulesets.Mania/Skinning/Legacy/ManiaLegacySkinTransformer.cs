@@ -82,6 +82,9 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
                     return getResult(resultComponent.Component);
 
                 case ManiaSkinComponentLookup maniaComponent:
+                    if (base.GetDrawableComponent(lookup) is Drawable c)
+                        return c;
+
                     if (!isLegacySkin.Value || !hasKeyTexture.Value)
                         return null;
 

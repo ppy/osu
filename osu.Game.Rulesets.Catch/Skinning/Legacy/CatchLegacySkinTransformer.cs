@@ -28,76 +28,80 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
 
         public override Drawable? GetDrawableComponent(ISkinComponentLookup lookup)
         {
-            if (lookup is SkinComponentsContainerLookup containerLookup)
+            switch (lookup)
             {
-                switch (containerLookup.Target)
-                {
-                    case SkinComponentsContainerLookup.TargetArea.MainHUDComponents:
-                        var components = base.GetDrawableComponent(lookup) as Container;
+                case SkinComponentsContainerLookup containerLookup:
+                    switch (containerLookup.Target)
+                    {
+                        case SkinComponentsContainerLookup.TargetArea.MainHUDComponents:
+                            var components = base.GetDrawableComponent(lookup) as Container;
 
-                        if (providesComboCounter && components != null)
-                        {
-                            // catch may provide its own combo counter; hide the default.
-                            // todo: this should be done in an elegant way per ruleset, defining which HUD skin components should be displayed.
-                            foreach (var legacyComboCounter in components.OfType<LegacyComboCounter>())
-                                legacyComboCounter.HiddenByRulesetImplementation = false;
-                        }
+                            if (providesComboCounter && components != null)
+                            {
+                                // catch may provide its own combo counter; hide the default.
+                                // todo: this should be done in an elegant way per ruleset, defining which HUD skin components should be displayed.
+                                foreach (var legacyComboCounter in components.OfType<LegacyComboCounter>())
+                                    legacyComboCounter.HiddenByRulesetImplementation = false;
+                            }
 
-                        return components;
-                }
-            }
+                            return components;
+                    }
 
-            if (lookup is CatchSkinComponentLookup catchSkinComponent)
-            {
-                switch (catchSkinComponent.Component)
-                {
-                    case CatchSkinComponents.Fruit:
-                        if (hasPear)
-                            return new LegacyFruitPiece();
+                    break;
 
-                        return null;
+                case CatchSkinComponentLookup catchSkinComponent:
+                    if (base.GetDrawableComponent(lookup) is Drawable c)
+                        return c;
 
-                    case CatchSkinComponents.Banana:
-                        if (GetTexture("fruit-bananas") != null)
-                            return new LegacyBananaPiece();
+                    switch (catchSkinComponent.Component)
+                    {
+                        case CatchSkinComponents.Fruit:
+                            if (hasPear)
+                                return new LegacyFruitPiece();
 
-                        return null;
+                            return null;
 
-                    case CatchSkinComponents.Droplet:
-                        if (GetTexture("fruit-drop") != null)
-                            return new LegacyDropletPiece();
+                        case CatchSkinComponents.Banana:
+                            if (GetTexture("fruit-bananas") != null)
+                                return new LegacyBananaPiece();
 
-                        return null;
+                            return null;
 
-                    case CatchSkinComponents.Catcher:
-                        decimal version = GetConfig<SkinConfiguration.LegacySetting, decimal>(SkinConfiguration.LegacySetting.Version)?.Value ?? 1;
+                        case CatchSkinComponents.Droplet:
+                            if (GetTexture("fruit-drop") != null)
+                                return new LegacyDropletPiece();
 
-                        if (version < 2.3m)
-                        {
-                            if (hasOldStyleCatcherSprite())
-                                return new LegacyCatcherOld();
-                        }
+                            return null;
 
-                        if (hasNewStyleCatcherSprite())
-                            return new LegacyCatcherNew();
+                        case CatchSkinComponents.Catcher:
+                            decimal version = GetConfig<SkinConfiguration.LegacySetting, decimal>(SkinConfiguration.LegacySetting.Version)?.Value ?? 1;
 
-                        return null;
+                            if (version < 2.3m)
+                            {
+                                if (hasOldStyleCatcherSprite())
+                                    return new LegacyCatcherOld();
+                            }
 
-                    case CatchSkinComponents.CatchComboCounter:
-                        if (providesComboCounter)
-                            return new LegacyCatchComboCounter();
+                            if (hasNewStyleCatcherSprite())
+                                return new LegacyCatcherNew();
 
-                        return null;
+                            return null;
 
-                    case CatchSkinComponents.HitExplosion:
-                        if (hasOldStyleCatcherSprite() || hasNewStyleCatcherSprite())
-                            return new LegacyHitExplosion();
+                        case CatchSkinComponents.CatchComboCounter:
+                            if (providesComboCounter)
+                                return new LegacyCatchComboCounter();
 
-                        return null;
+                            return null;
 
-                    default:
-                        throw new UnsupportedSkinComponentException(lookup);
-                }
+                        case CatchSkinComponents.HitExplosion:
+                            if (hasOldStyleCatcherSprite() || hasNewStyleCatcherSprite())
+                                return new LegacyHitExplosion();
+
+                            return null;
+
+                        default:
+                            throw new UnsupportedSkinComponentException(lookup);
+                    }
             }
 
             return base.GetDrawableComponent(lookup);
