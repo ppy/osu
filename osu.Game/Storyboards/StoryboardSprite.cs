@@ -228,6 +228,8 @@ namespace osu.Game.Storyboards
                     if (alphaCommand.StartValue > 0)
                     {
                         // sprite is visible at the start and hidden at the end - should not die earlier than the end of this command
+                        // TODO: due to concurrent transforms handling differences between lazer and stable this should be revisited after https://github.com/ppy/osu/issues/7257.
+                        // Check https://github.com/ppy/osu/pull/27753#discussion_r1549515565 for more info.
                         deathTimes[0] = alphaCommand.EndTime;
                     }
                     else
