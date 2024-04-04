@@ -13,7 +13,7 @@ namespace osu.Game.Audio
         /// The target level for audio normalization
         /// https://en.wikipedia.org/wiki/EBU_R_128
         /// </summary>
-        private const int target_level = -23;
+        private const int target_level = -14;
 
         public float VolumeOffset { get; set; }
 
