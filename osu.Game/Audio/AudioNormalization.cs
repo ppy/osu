@@ -8,7 +8,7 @@ using Realms;
 
 namespace osu.Game.Audio
 {
-    public class AudioNormalization : EmbeddedObject, IAudioNormalization, IEquatable<IAudioNormalization>, IEquatable<AudioNormalization>
+    public class AudioNormalization : EmbeddedObject, IAudioNormalization, IEquatable<AudioNormalization>
     {
         /// <summary>
         /// The adjustment needed to the volume to reach the target level (in bass volume language).
