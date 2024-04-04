@@ -91,6 +91,7 @@ namespace osu.Game.Database
         /// 38   2023-12-10    Add EndTimeObjectCount and TotalObjectCount to BeatmapInfo.
         /// 39   2023-12-19    Migrate any EndTimeObjectCount and TotalObjectCount values of 0 to -1 to better identify non-calculated values.
         /// 40   2023-12-21    Add ScoreInfo.Version to keep track of which build scores were set on.
+        /// 41   2024-04-04    Add AudioNormalization to BeatmapInfo.
         /// </summary>
         private const int schema_version = 41;
 
