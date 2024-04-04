@@ -97,24 +97,27 @@ namespace osu.Game.Database
         /// </summary>
         private void processAudioNormalization()
         {
-            realmAccess.Write(r =>
-            {
-                int totalcount = 0;
+            int totalcount = 0;
 
+            realmAccess.Run(r =>
+            {
                 foreach (BeatmapSetInfo beatmapSetInfo in r.All<BeatmapSetInfo>())
                 {
                     totalcount += beatmapSetInfo.Beatmaps.Count;
                 }
+            });
 
-                if (totalcount == 0)
-                {
-                    Logger.Log("No audio normalization processing required.");
-                    return;
-                }
+            if (totalcount == 0)
+            {
+                Logger.Log("No audio normalization processing required.");
+                return;
+            }
 
-                var notification = showProgressNotification(totalcount, "Verifying loudness level for beatmaps", "all loudness levels have been verified");
-                int processedCount = 0;
+            var notification = showProgressNotification(totalcount, "Verifying loudness level for beatmaps", "all loudness levels have been verified");
+            int processedCount = 0;
 
+            realmAccess.Run(r =>
+            {
                 foreach (BeatmapSetInfo beatmapSetInfo in r.All<BeatmapSetInfo>())
                 {
                     foreach (BeatmapInfo beatmapInfo in beatmapSetInfo.Beatmaps)
@@ -123,22 +126,25 @@ namespace osu.Game.Database
                             break;
 
                         updateNotificationProgress(notification, processedCount, totalcount);
-                        sleepIfRequired();
-
                         processedCount++;
+
+                        sleepIfRequired();
                         if (beatmapInfo.AudioNormalization != null && !beatmapInfo.AudioNormalization.IsDefault()) continue;
 
-                        AudioNormalization audioNormalization = new AudioNormalization(beatmapInfo, beatmapSetInfo, new RealmFileStore(realmAccess, storage!));
-                        beatmapInfo.AudioNormalization = audioNormalization;
-                        r.Add(audioNormalization.PopulateSet(beatmapInfo, beatmapSetInfo), true);
+                        realmAccess.Write(realm =>
+                        {
+                            AudioNormalization audioNormalization = new AudioNormalization(beatmapInfo, beatmapSetInfo, new RealmFileStore(realmAccess, storage!));
+                            beatmapInfo.AudioNormalization = audioNormalization;
+                            realm.Add(audioNormalization.PopulateSet(beatmapInfo, beatmapSetInfo), true);
+                        });
                     }
 
                     Logger.Log($"Processed audio normalization for {beatmapSetInfo.Metadata.Title}");
                 }
-
-                Logger.Log("Finished processing audio normalization readings");
-                completeNotification(notification, processedCount, totalcount);
             });
+
+            Logger.Log("Finished processing audio normalization readings");
+            completeNotification(notification, processedCount, totalcount);
         }
 
         /// <summary>
