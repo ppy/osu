@@ -90,6 +90,26 @@ namespace osu.Game.Tests.Database
             }
         }
 
+        [Test]
+        public void ExportFileRetryWhenInterruptedByCollectionChange()
+        {
+            var item = new TestModel("hi mom");
+
+            Assert.That(item.Filename.Length, Is.LessThan(TestLegacyModelExporter.MAX_FILENAME_LENGTH));
+
+            var live = new RealmLiveUnmanaged<TestModel>(item);
+
+            Assert.DoesNotThrow(() =>
+            {
+                var export = Task.Run(() => legacyExporter.ExportAsync(live));
+                var exportInterruptor = Task.Run(() => live.Value.Files = []);
+
+                Task.WhenAll([export, exportInterruptor]).WaitSafely();
+            });
+
+            Assert.That(storage.Exists($"exports/{item.Filename}{legacyExporter.GetExtension()}"), Is.True);
+        }
+
         private void exportItemAndAssert(TestModel item, string expectedName)
         {
             Assert.DoesNotThrow(() =>
@@ -128,7 +148,7 @@ namespace osu.Game.Tests.Database
 
             public string Filename { get; }
 
-            public IEnumerable<INamedFileUsage> Files { get; } = new List<INamedFileUsage>();
+            public IEnumerable<INamedFileUsage> Files { get; set; } = new List<INamedFileUsage>();
 
             public TestModel(string filename)
             {

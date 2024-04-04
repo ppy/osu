@@ -95,6 +95,21 @@ namespace osu.Game.Database
                 {
                     await ExportToStreamAsync(model, stream, notification, linkedSource.Token).ConfigureAwait(false);
                 }
+
+                notification.CompletionText = $"Exported {itemFilename}! Click to view.";
+                notification.CompletionClickAction = () => exportStorage.PresentFileExternally(filename);
+                notification.State = ProgressNotificationState.Completed;
+            }
+            catch (InvalidOperationException e)
+            {
+                notification.State = ProgressNotificationState.Cancelled;
+                exportStorage.Delete(filename);
+
+                if (e.Message.StartsWith("Collection was modified"))
+                {
+                    await ExportAsync(model, cancellationToken).ConfigureAwait(false);
+                }
+                else throw;
             }
             catch
             {
@@ -104,10 +119,6 @@ namespace osu.Game.Database
                 exportStorage.Delete(filename);
                 throw;
             }
-
-            notification.CompletionText = $"Exported {itemFilename}! Click to view.";
-            notification.CompletionClickAction = () => exportStorage.PresentFileExternally(filename);
-            notification.State = ProgressNotificationState.Completed;
         }
 
         /// <summary>
