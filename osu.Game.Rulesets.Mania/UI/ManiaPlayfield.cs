@@ -7,6 +7,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Primitives;
 using osu.Game.Rulesets.Mania.Beatmaps;
@@ -60,10 +61,23 @@ namespace osu.Game.Rulesets.Mania.UI
                 throw new ArgumentException("Can't have zero or fewer stages.");
 
             GridContainer playfieldGrid;
-            AddInternal(playfieldGrid = new GridContainer
+
+            RelativeSizeAxes = Axes.Y;
+            AutoSizeAxes = Axes.X;
+
+            AddRangeInternal(new Drawable[]
             {
-                RelativeSizeAxes = Axes.Both,
-                Content = new[] { new Drawable[stageDefinitions.Count] }
+                playfieldGrid = new GridContainer
+                {
+                    RelativeSizeAxes = Axes.Y,
+                    AutoSizeAxes = Axes.X,
+                    Content = new[] { new Drawable[stageDefinitions.Count] },
+                    ColumnDimensions = Enumerable.Range(0, stageDefinitions.Count).Select(_ => new Dimension(GridSizeMode.AutoSize)).ToArray()
+                },
+                new ManiaTouchInputOverlay
+                {
+                    RelativeSizeAxes = Axes.Both,
+                }
             });
 
             var normalColumnAction = ManiaAction.Key1;
