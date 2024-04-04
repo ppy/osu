@@ -29,6 +29,8 @@ namespace osu.Game.Rulesets.Mania.UI
 
         public ManiaTouchInputOverlay()
         {
+            Anchor = Anchor.BottomCentre;
+            Origin = Anchor.BottomCentre;
             RelativeSizeAxes = Axes.Both;
             Height = 0.5f;
         }
