@@ -44,18 +44,13 @@ namespace osu.Game.Audio
             IntegratedLoudness = loudnessDetection.IntegratedLoudness;
         }
 
-        public bool IsDefault()
-        {
-            return IntegratedLoudness == 0;
-        }
-
         public BeatmapSetInfo PopulateSet(BeatmapInfo beatmapInfo, BeatmapSetInfo? beatmapSetInfo)
         {
             if (beatmapSetInfo == null) return beatmapSetInfo!;
 
             foreach (BeatmapInfo beatmap in beatmapSetInfo.Beatmaps)
             {
-                if ((beatmap.AudioNormalization == null || beatmap.AudioNormalization.IsDefault()) && beatmap.AudioEquals(beatmapInfo))
+                if (beatmap.AudioNormalization == null && beatmap.AudioEquals(beatmapInfo))
                 {
                     beatmap.AudioNormalization = new AudioNormalization
                     {

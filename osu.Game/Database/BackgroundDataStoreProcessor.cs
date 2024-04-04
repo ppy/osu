@@ -105,10 +105,11 @@ namespace osu.Game.Database
                 foreach (BeatmapSetInfo beatmapSetInfo in r.All<BeatmapSetInfo>().Where(b => !b.DeletePending))
                 {
                     beatmapsCount += beatmapSetInfo.Beatmaps.Count;
-                    beatmapsToProcess += beatmapSetInfo.Beatmaps.Count(b => b.AudioNormalization == null || b.AudioNormalization.IsDefault());
+                    beatmapsToProcess += beatmapSetInfo.Beatmaps.Count(b => b.AudioNormalization == null);
                 }
             });
 
+            Logger.Log("beatmaps to process: " + beatmapsToProcess);
             if (beatmapsToProcess == 0)
             {
                 Logger.Log("No audio normalization processing required.");
@@ -120,8 +121,6 @@ namespace osu.Game.Database
 
             realmAccess.Run(r =>
             {
-                r.Refresh();
-
                 foreach (BeatmapSetInfo beatmapSetInfo in r.All<BeatmapSetInfo>().Where(b => !b.DeletePending))
                 {
                     foreach (BeatmapInfo beatmapInfo in beatmapSetInfo.Beatmaps)
@@ -133,7 +132,7 @@ namespace osu.Game.Database
                         processedCount++;
 
                         sleepIfRequired();
-                        if (beatmapInfo.AudioNormalization != null && !beatmapInfo.AudioNormalization.IsDefault()) continue;
+                        if (beatmapInfo.AudioNormalization != null) continue;
 
                         realmAccess.Write(realm =>
                         {
@@ -147,7 +146,6 @@ namespace osu.Game.Database
                 }
 
                 r.Refresh();
-                GC.Collect();
             });
 
             Logger.Log("Finished processing audio normalization readings");
