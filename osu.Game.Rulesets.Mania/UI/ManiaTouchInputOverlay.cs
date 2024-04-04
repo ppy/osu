@@ -16,12 +16,20 @@ namespace osu.Game.Rulesets.Mania.UI
 {
     public partial class ManiaTouchInputOverlay : CompositeDrawable, ISerialisableDrawable
     {
-        [SettingSource("Spacing", "The spacing between input receptors.")]
+        [SettingSource("Spacing", "The spacing between receptors.")]
         public BindableFloat Spacing { get; } = new BindableFloat(10)
         {
             Precision = 1,
             MinValue = 0,
             MaxValue = 100,
+        };
+
+        [SettingSource("Opacity", "The receptor opacity.")]
+        public BindableFloat Opacity { get; } = new BindableFloat(1)
+        {
+            Precision = 0.1f,
+            MinValue = 0,
+            MaxValue = 1
         };
 
         [Resolved]
@@ -66,6 +74,12 @@ namespace osu.Game.Rulesets.Mania.UI
                 Content = new[] { receptorGridContent.ToArray() },
                 ColumnDimensions = receptorGridDimensions.ToArray()
             };
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            Opacity.BindValueChanged(o => Alpha = o.NewValue, true);
         }
 
         public bool UsesFixedAnchor { get; set; }
