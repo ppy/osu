@@ -51,7 +51,7 @@ namespace osu.Game.Rulesets.Mania.UI
                         receptorGridDimensions.Add(new Dimension(GridSizeMode.AutoSize));
                     }
 
-                    receptorGridContent.Add(new InputReceptor());
+                    receptorGridContent.Add(new InputReceptor { Action = { BindTarget = column.Action } });
                     receptorGridDimensions.Add(new Dimension());
 
                     first = false;
@@ -72,7 +72,14 @@ namespace osu.Game.Rulesets.Mania.UI
 
         private partial class InputReceptor : CompositeDrawable
         {
+            public readonly IBindable<ManiaAction> Action = new Bindable<ManiaAction>();
+
             private readonly Box highlightOverlay;
+
+            [Resolved]
+            private ManiaInputManager? inputManager { get; set; }
+
+            private bool isPressed;
 
             public InputReceptor()
             {
@@ -105,29 +112,43 @@ namespace osu.Game.Rulesets.Mania.UI
 
             protected override bool OnTouchDown(TouchDownEvent e)
             {
-                updateHighlight(true);
+                updateButton(true);
                 return true;
             }
 
             protected override void OnTouchUp(TouchUpEvent e)
             {
-                updateHighlight(false);
+                updateButton(false);
             }
 
             protected override bool OnMouseDown(MouseDownEvent e)
             {
-                updateHighlight(true);
+                updateButton(true);
                 return true;
             }
 
             protected override void OnMouseUp(MouseUpEvent e)
             {
-                updateHighlight(false);
+                updateButton(false);
             }
 
-            private void updateHighlight(bool enabled)
+            private void updateButton(bool press)
             {
-                highlightOverlay.FadeTo(enabled ? 0.1f : 0, enabled ? 80 : 400, Easing.OutQuint);
+                if (press == isPressed)
+                    return;
+
+                isPressed = press;
+
+                if (press)
+                {
+                    inputManager?.KeyBindingContainer?.TriggerPressed(Action.Value);
+                    highlightOverlay.FadeTo(0.1f, 80, Easing.OutQuint);
+                }
+                else
+                {
+                    inputManager?.KeyBindingContainer?.TriggerReleased(Action.Value);
+                    highlightOverlay.FadeTo(0, 400, Easing.OutQuint);
+                }
             }
         }
 
