@@ -121,6 +121,8 @@ namespace osu.Game.Database
 
             realmAccess.Run(r =>
             {
+                r.Refresh();
+
                 foreach (BeatmapSetInfo beatmapSetInfo in r.All<BeatmapSetInfo>().Where(b => !b.DeletePending))
                 {
                     foreach (BeatmapInfo beatmapInfo in beatmapSetInfo.Beatmaps)
@@ -140,6 +142,7 @@ namespace osu.Game.Database
                             beatmapInfo.AudioNormalization = audioNormalization;
                             realm.Add(audioNormalization.PopulateSet(beatmapInfo, beatmapSetInfo), true);
                         });
+                        beatmapManager.GetWorkingBeatmap(beatmapInfo, true);
                     }
 
                     Logger.Log($"Processed audio normalization for {beatmapSetInfo.Metadata.Title}");
