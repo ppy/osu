@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using Realms;

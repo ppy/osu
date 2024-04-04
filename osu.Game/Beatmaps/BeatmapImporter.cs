@@ -173,7 +173,7 @@ namespace osu.Game.Beatmaps
                 AudioNormalization audioNormalization = new AudioNormalization(beatmapInfo, beatmapSet, Files);
                 beatmapInfo.AudioNormalization = audioNormalization;
                 beatmapSet = beatmapInfo.AudioNormalization.PopulateSet(beatmapInfo, beatmapSet);
-                Logger.Log("Processed audionormalization for beatmaps");
+                Logger.Log("Processed audionormalization for " + beatmapInfo.Metadata.Title);
             }
 
             validateOnlineIds(beatmapSet, realm);

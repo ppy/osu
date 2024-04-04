@@ -103,6 +103,7 @@ namespace osu.Game.Database
 
                 foreach (BeatmapSetInfo beatmapSetInfo in r.All<BeatmapSetInfo>())
                 {
+                    // TODO: Fix bug where this includes maps with the same audio files even though the actual loop below doesn't
                     totalcount += beatmapSetInfo.Beatmaps.Count(beatmapInfo => beatmapInfo.AudioNormalization == null || beatmapInfo.AudioNormalization.IsDefault());
                 }
 
