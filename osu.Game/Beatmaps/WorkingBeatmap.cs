@@ -357,11 +357,11 @@ namespace osu.Game.Beatmaps
         {
             AudioNormalization audioNormalizationModule = BeatmapInfo.AudioNormalization;
 
-            Logger.Log("Normalization status: " + (audioNormalizationModule == null));
+            Logger.Log("Normalization status: " + (audioNormalizationModule != null ? "on" : "off"));
 
             VolumeParameters volumeParameters = new VolumeParameters
             {
-                fTarget = audioNormalizationModule?.VolumeOffset ?? 0.8f,
+                fTarget = audioNormalizationModule?.IntegratedLoudness != null ? (float)Math.Pow(10, (-14 - audioNormalizationModule.IntegratedLoudness) / 20) : 0.8f,
                 fCurrent = 1.0f,
                 fTime = 0,
                 lCurve = 0,

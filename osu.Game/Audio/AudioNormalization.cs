@@ -13,6 +13,7 @@ namespace osu.Game.Audio
         /// <summary>
         /// The adjustment needed to the volume to reach the target level (in bass volume language).
         /// https://www.un4seen.com/doc/#bass/BASS_FX_VOLUME_PARAM.html
+        /// TODO: Remove this in favor of using IntegratedLoudness and doing the math in the audio engine rather than here.
         /// </summary>
         public float VolumeOffset { get; set; }
 
