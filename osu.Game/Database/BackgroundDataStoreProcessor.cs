@@ -103,8 +103,7 @@ namespace osu.Game.Database
 
                 foreach (BeatmapSetInfo beatmapSetInfo in r.All<BeatmapSetInfo>())
                 {
-                    // TODO: Fix bug where this includes maps with the same audio files even though the actual loop below doesn't
-                    totalcount += beatmapSetInfo.Beatmaps.Count(beatmapInfo => beatmapInfo.AudioNormalization == null || beatmapInfo.AudioNormalization.IsDefault());
+                    totalcount += beatmapSetInfo.Beatmaps.Count();
                 }
 
                 if (totalcount == 0)
@@ -113,7 +112,7 @@ namespace osu.Game.Database
                     return;
                 }
 
-                var notification = showProgressNotification(totalcount, "Calculating loudness level for beatmaps", "all loudness levels have been calculated");
+                var notification = showProgressNotification(totalcount, "Verifying loudness level for beatmaps", "all loudness levels have been verified");
                 int processedCount = 0;
 
                 foreach (BeatmapSetInfo beatmapSetInfo in r.All<BeatmapSetInfo>())
@@ -126,14 +125,13 @@ namespace osu.Game.Database
                         updateNotificationProgress(notification, processedCount, totalcount);
                         sleepIfRequired();
 
+                        processedCount++;
                         if (beatmapInfo.AudioNormalization != null && !beatmapInfo.AudioNormalization.IsDefault()) continue;
 
                         AudioNormalization audioNormalization = new AudioNormalization(beatmapInfo, beatmapSetInfo, new RealmFileStore(realmAccess, storage!));
                         beatmapInfo.AudioNormalization = audioNormalization;
                         var newbeatmapSetInfo = audioNormalization.PopulateSet(beatmapInfo, beatmapSetInfo);
                         r.Add(newbeatmapSetInfo, true);
-
-                        processedCount++;
                     }
 
                     Logger.Log($"Processed audio normalization for {beatmapSetInfo.Metadata.Title}");
