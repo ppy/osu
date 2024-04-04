@@ -9,38 +9,15 @@ namespace osu.Game.Audio
 {
     public class BassAudioNormalization
     {
-        /// <summary>
-        /// The target level for audio normalization
-        /// https://en.wikipedia.org/wiki/EBU_R_128
-        /// </summary>
-        private const int target_level = -14;
+        public float IntegratedLoudness { get; }
 
-        public float VolumeOffset { get; set; }
-
-        public float IntegratedLoudness { get; set; }
-
-        public BassAudioNormalization(string? filePath)
-        {
-            if (filePath != null)
-            {
-                calculateLoudness(filePath);
-            }
-            else
-            {
-                VolumeOffset = 0;
-                IntegratedLoudness = 0;
-            }
-        }
-
-        private void calculateLoudness(string? filePath)
+        public BassAudioNormalization(string filePath)
         {
             int decodeStream = Bass.CreateStream(filePath, 0, 0, BassFlags.Decode | BassFlags.Float);
 
             if (decodeStream == 0)
             {
-                VolumeOffset = 0;
-                IntegratedLoudness = 0;
-                return;
+                throw new InvalidOperationException("Failed to create stream!\nError Code: " + Bass.LastError);
             }
 
             int loudness = BassLoud.BASS_Loudness_Start(decodeStream, BassFlags.BassLoudnessIntegrated | BassFlags.BassLoudnessAutofree, 0);
@@ -66,7 +43,6 @@ namespace osu.Game.Audio
             }
 
             IntegratedLoudness = integratedLoudness;
-            VolumeOffset = (float)Math.Pow(10, (target_level - integratedLoudness) / 20);
 
             Bass.SampleFree(decodeStream);
         }

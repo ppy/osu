@@ -11,31 +11,23 @@ namespace osu.Game.Audio
     public class AudioNormalization : EmbeddedObject, IAudioNormalization, IEquatable<AudioNormalization>
     {
         /// <summary>
-        /// The adjustment needed to the volume to reach the target level (in bass volume language).
-        /// https://www.un4seen.com/doc/#bass/BASS_FX_VOLUME_PARAM.html
-        /// TODO: Remove this in favor of using IntegratedLoudness and doing the math in the audio engine rather than here.
+        /// The target level for audio normalization
+        /// https://en.wikipedia.org/wiki/EBU_R_128
         /// </summary>
-        public float VolumeOffset { get; set; }
+        public const int TARGET_LEVEL = -14;
 
         /// <summary>
         /// The integrated (average) loudness of the audio
         /// </summary>
-        public float IntegratedLoudness { get; set; }
+        public float IntegratedLoudness { get; init; }
 
         public AudioNormalization()
         {
         }
 
-        public AudioNormalization(float volumeOffset, float integratedLoudness)
-        {
-            VolumeOffset = volumeOffset;
-            IntegratedLoudness = integratedLoudness;
-        }
-
         public AudioNormalization(BeatmapInfo beatmapInfo, BeatmapSetInfo beatmapSetInfo, RealmFileStore realmFileStore)
         {
             // Set default values
-            VolumeOffset = 0;
             IntegratedLoudness = 0;
 
             string audiofile = beatmapInfo.Metadata.AudioFile;
@@ -49,13 +41,12 @@ namespace osu.Game.Audio
             filepath = realmFileStore.Storage.GetFullPath(filepath);
 
             BassAudioNormalization loudnessDetection = new BassAudioNormalization(filepath);
-            VolumeOffset = loudnessDetection.VolumeOffset;
             IntegratedLoudness = loudnessDetection.IntegratedLoudness;
         }
 
         public bool IsDefault()
         {
-            return VolumeOffset == 0 && IntegratedLoudness == 0;
+            return IntegratedLoudness == 0;
         }
 
         internal BeatmapSetInfo PopulateSet(BeatmapInfo beatmapInfo, BeatmapSetInfo? beatmapSetInfo)
@@ -68,7 +59,6 @@ namespace osu.Game.Audio
                 {
                     beatmap.AudioNormalization = new AudioNormalization
                     {
-                        VolumeOffset = VolumeOffset,
                         IntegratedLoudness = IntegratedLoudness
                     };
                 }
@@ -77,11 +67,15 @@ namespace osu.Game.Audio
             return beatmapSetInfo;
         }
 
+        /// <summary>
+        /// Convert integrated loudness to a volume offset
+        /// </summary>
+        /// <param name="integratedLoudness"></param>
+        /// <returns></returns>
+        public static float IntegratedLoudnessToVolumeOffset(float integratedLoudness) => (float)Math.Pow(10, (TARGET_LEVEL - integratedLoudness) / 20);
+
         public bool Equals(IAudioNormalization? other) => other is AudioNormalization audioNormalization && Equals(audioNormalization);
 
-        public bool Equals(AudioNormalization? other)
-        {
-            return VolumeOffset == other?.VolumeOffset && IntegratedLoudness == other.IntegratedLoudness;
-        }
+        public bool Equals(AudioNormalization? other) => other != null && Math.Abs(IntegratedLoudness - other.IntegratedLoudness) < 0.0000001;
     }
 }

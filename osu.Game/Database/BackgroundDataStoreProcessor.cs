@@ -130,8 +130,7 @@ namespace osu.Game.Database
 
                         AudioNormalization audioNormalization = new AudioNormalization(beatmapInfo, beatmapSetInfo, new RealmFileStore(realmAccess, storage!));
                         beatmapInfo.AudioNormalization = audioNormalization;
-                        var newbeatmapSetInfo = audioNormalization.PopulateSet(beatmapInfo, beatmapSetInfo);
-                        r.Add(newbeatmapSetInfo, true);
+                        r.Add(audioNormalization.PopulateSet(beatmapInfo, beatmapSetInfo), true);
                     }
 
                     Logger.Log($"Processed audio normalization for {beatmapSetInfo.Metadata.Title}");

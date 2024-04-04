@@ -7,7 +7,6 @@ namespace osu.Game.Audio
 {
     public interface IAudioNormalization : IEquatable<IAudioNormalization>
     {
-        public float VolumeOffset { get; }
         public float IntegratedLoudness { get; }
     }
 }
