@@ -17,7 +17,6 @@ using osu.Framework.Audio;
 using osu.Framework.Audio.Mixing;
 using osu.Framework.Audio.Track;
 using osu.Framework.Extensions;
-using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Logging;
 using osu.Game.Audio;
@@ -358,7 +357,7 @@ namespace osu.Game.Beatmaps
         {
             AudioNormalization audioNormalizationModule = BeatmapInfo.AudioNormalization;
 
-            Logger.Log("Audio Normalization Manager Null Status: " + audioNormalizationModule.IsNull());
+            Logger.Log("Normalization status: " + (audioNormalizationModule == null));
 
             VolumeParameters volumeParameters = new VolumeParameters
             {
