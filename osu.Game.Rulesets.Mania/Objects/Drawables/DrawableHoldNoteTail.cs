@@ -22,9 +22,9 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
         protected internal DrawableHoldNote HoldNote => (DrawableHoldNote)ParentHitObject;
 
-        private readonly Bindable<HoldNoteTailOrigin> tailOrigin = new Bindable<HoldNoteTailOrigin>();
+        private HoldNoteTailOrigin tailOrigin = HoldNoteTailOrigin.Regular;
 
-        public IBindable<HoldNoteTailOrigin> TailOrigin => tailOrigin;
+        public HoldNoteTailOrigin TailOrigin => tailOrigin;
 
         public DrawableHoldNoteTail()
             : this(null)
@@ -41,7 +41,6 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            tailOrigin.BindValueChanged(_ => updateTailOrigin(), true);
         }
 
         public void UpdateResult() => base.UpdateResult(true);
@@ -70,7 +69,8 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         protected override void ApplySkin(ISkinSource skin, bool allowFallback)
         {
             base.ApplySkin(skin, allowFallback);
-            tailOrigin.Value = skin.GetConfig<ManiaSkinConfigurationLookup, HoldNoteTailOrigin>(new ManiaSkinConfigurationLookup(LegacyManiaSkinConfigurationLookups.HoldNoteTailOrigin))?.Value ?? HoldNoteTailOrigin.Regular;
+            tailOrigin = skin.GetConfig<ManiaSkinConfigurationLookup, HoldNoteTailOrigin>(new ManiaSkinConfigurationLookup(LegacyManiaSkinConfigurationLookups.HoldNoteTailOrigin))?.Value ?? HoldNoteTailOrigin.Regular;
+            updateTailOrigin();
         }
 
         protected override void OnDirectionChanged(ValueChangedEvent<ScrollingDirection> e)
@@ -82,9 +82,9 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         private void updateTailOrigin()
         {
             if (Direction.Value == ScrollingDirection.Up)
-                Origin = tailOrigin.Value == HoldNoteTailOrigin.Inverted ? Anchor.BottomCentre : Anchor.TopCentre;
+                Origin = tailOrigin == HoldNoteTailOrigin.Inverted ? Anchor.BottomCentre : Anchor.TopCentre;
             else
-                Origin = tailOrigin.Value == HoldNoteTailOrigin.Inverted ? Anchor.TopCentre : Anchor.BottomCentre;
+                Origin = tailOrigin == HoldNoteTailOrigin.Inverted ? Anchor.TopCentre : Anchor.BottomCentre;
         }
     }
 }
