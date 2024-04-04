@@ -375,7 +375,7 @@ namespace osu.Game.Beatmaps
         {
             AudioMixer audioMixer = audioManager.TrackMixer;
 
-            IEffectParameter effect = audioMixer.Effects.SingleOrDefault(e => e.FXType == effectParameter.FXType)!;
+            IEffectParameter effect = audioMixer.Effects.SingleOrDefault(e => e.FXType == effectParameter.FXType);
 
             if (effect != null)
             {

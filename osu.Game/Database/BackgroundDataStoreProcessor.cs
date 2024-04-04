@@ -103,7 +103,7 @@ namespace osu.Game.Database
 
                 foreach (BeatmapSetInfo beatmapSetInfo in r.All<BeatmapSetInfo>())
                 {
-                    totalcount += beatmapSetInfo.Beatmaps.Count();
+                    totalcount += beatmapSetInfo.Beatmaps.Count;
                 }
 
                 if (totalcount == 0)
