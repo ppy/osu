@@ -82,12 +82,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 flashlightValue = 0.0;
 
             double lowARValue = computeReadingLowARValue(score, osuAttributes);
-            double readingHDValue = computeReadingHiddenValue(score, osuAttributes);
-
             double highARValue = computeReadingHighARValue(score, osuAttributes);
 
-            // Take only max to reduce pp inflation
-            double readingARValue = Math.Max(lowARValue, highARValue);
+            double arPower = OsuDifficultyCalculator.AR_SUM_POWER;
+            double readingARValue = Math.Pow(Math.Pow(lowARValue, arPower) + Math.Pow(highARValue, arPower), 1.0 / arPower);
+
+            double readingHDValue = computeReadingHiddenValue(score, osuAttributes);
 
             // Reduce AR reading bonus if FL is present
             double flPower = OsuDifficultyCalculator.FL_SUM_POWER;
@@ -390,7 +390,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             // Avoid it being broken on millions of pp, ruins it being continious, but it will never happen on normal circumstances
             if (capPerformance > 10000 || cognitionPerformance > 10000) cognitionPerformance = Math.Min(capPerformance, cognitionPerformance);
-            else cognitionPerformance = 1000 * softmin(capPerformance / 1000, cognitionPerformance / 1000, 100);
+            else cognitionPerformance = 100 * softmin(capPerformance / 100, cognitionPerformance / 100, 100);
 
             return cognitionPerformance;
         }

@@ -22,9 +22,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 {
     public class OsuDifficultyCalculator : DifficultyCalculator
     {
-        public const double DIFFICULTY_MULTIPLIER = 0.067;
+        public const double DIFFICULTY_MULTIPLIER = 0.0668;
         public const double SUM_POWER = 1.1;
-        public const double FL_SUM_POWER = 1.4;
+        public const double FL_SUM_POWER = 1.5;
+        public const double AR_SUM_POWER = 2.0;
         public override int Version => 20220902;
 
         public OsuDifficultyCalculator(IRulesetInfo ruleset, IWorkingBeatmap beatmap)
@@ -73,7 +74,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double baseReadingLowARPerformance = ReadingLowAR.DifficultyToPerformance(readingLowARRating);
             double baseReadingHighARPerformance = OsuStrainSkill.DifficultyToPerformance(readingHighARRating) * 0.5; // WARNING, this is purely visual change to reduce SR inflation on high-end
-            double baseReadingARPerformance = Math.Max(baseReadingLowARPerformance, baseReadingHighARPerformance);
+            double baseReadingARPerformance = Math.Pow(Math.Pow(baseReadingLowARPerformance, AR_SUM_POWER) + Math.Pow(baseReadingHighARPerformance, AR_SUM_POWER), 1.0 / AR_SUM_POWER);
 
             double baseFlashlightARPerformance = Math.Pow(Math.Pow(baseFlashlightPerformance, FL_SUM_POWER) + Math.Pow(baseReadingARPerformance, FL_SUM_POWER), 1.0 / FL_SUM_POWER);
 

@@ -16,8 +16,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
     public class ReadingLowAR : GraphSkill
     {
         private readonly List<double> difficulties = new List<double>();
-        private double skillMultiplier => 1.04;
-        private double aimComponentMultiplier => 0.7;
+        private double skillMultiplier => 1.25;
+        private double aimComponentMultiplier => 0.4;
 
         public ReadingLowAR(Mod[] mods)
             : base(mods)
@@ -83,7 +83,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             return difficulty;
         }
-        public static double DifficultyToPerformance(double difficulty) => difficulty < 1 ? difficulty * 6.0 : Math.Pow(difficulty, 4) * 6.0;
+        public static double DifficultyToPerformance(double difficulty) => Math.Max(
+            Math.Max(Math.Pow(difficulty, 1) * 13.0, Math.Pow(difficulty, 2) * 13.0),
+            Math.Max(Math.Pow(difficulty, 3) * 9.0, Math.Pow(difficulty, 4) * 6.0));
     }
 
     public class ReadingHidden : OsuStrainSkill
@@ -94,7 +96,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         }
 
         private double currentStrain;
-        private double skillMultiplier => 4.8;
+        private double skillMultiplier => 3.8;
 
         protected override double CalculateInitialStrain(double time, DifficultyHitObject current) => currentStrain * StrainDecay(time - current.Previous(0).StartTime);
 
@@ -112,6 +114,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             return currentStrain;
         }
 
-        public new static double DifficultyToPerformance(double difficulty) => Math.Pow(difficulty, 2) * 25.0;
+        public new static double DifficultyToPerformance(double difficulty) => Math.Pow(difficulty, 1.8) * 28.0;
     }
 }

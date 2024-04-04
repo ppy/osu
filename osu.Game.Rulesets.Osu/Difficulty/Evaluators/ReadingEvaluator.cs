@@ -16,7 +16,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
     {
         private const double reading_window_size = 3000;
 
-        private const double overlap_multiplier = 1.8; //3.5
+        private const double overlap_multiplier = 1.8;
 
         public static double EvaluateDensityOf(DifficultyHitObject current, bool applyDistanceNerf = true)
         {
@@ -38,7 +38,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 double loopDifficulty = currObj.OpacityAt(loopObj.BaseObject.StartTime, false);
 
                 // Small distances means objects may be cheesed, so it doesn't matter whether they are arranged confusingly.
-                if (applyDistanceNerf) loopDifficulty *= (logistic((loopObj.MinimumJumpDistance - 60) / 10) + 0.2) / 1.2;
+                if (applyDistanceNerf) loopDifficulty *= (logistic((loopObj.MinimumJumpDistance - 80) / 10) + 0.2) / 1.2;
 
                 // Reduce density bonus for this object if they're too apart in time
                 // Nerf starts on 1500ms and reaches maximum (*=0) on 3000ms
@@ -122,7 +122,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
                     // Bandaid to fix Rubik's Cube +EZ
                     double wideness = 0;
-                    if (loopObj.Angle.Value > Math.PI * 0.5)
+                    if (loopObj.Angle!.Value > Math.PI * 0.5)
                     {
                         // Goes from 0 to 1 as angle increasing from 90 degrees to 180
                         wideness = (loopObj.Angle.Value / Math.PI - 0.5) * 2;
@@ -183,10 +183,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 }
 
                 overlapDifficulties.Add(lastOverlapness);
-                //screenOverlapDifficulty += lastOverlapness;
-
-                // This is a correct way to do this (paired with changing >= to <=), but somehow it get's more broken
-                // screenOverlapDifficulty = Math.Max(screenOverlapDifficulty, lastOverlapness);
             }
 
             const double decay_weight = 0.5;
@@ -216,9 +212,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         public static double EvaluateAimingDensityFactorOf(DifficultyHitObject current)
         {
             double difficulty = ((OsuDifficultyHitObject)current).Density;
-
-            double overlapBonus = EvaluateOverlapDifficultyOf(current) * difficulty;
-            difficulty += overlapBonus * 0.1; // Overlaps should affect aiming part much less
 
             return Math.Max(0, Math.Pow(difficulty, 1.5) - 1);
         }
@@ -353,8 +346,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             // The closer timeSpentInvisible is to 0 -> the less difference there are between NM and HD
             // So we will reduce base according to this
-            // It will be 0.354 on AR11 value
-            double invisibilityFactor = logistic(currObj.Preempt / 160 - 4);
+            double invisibilityFactor = logistic(currObj.Preempt / 180 - 3.5);
 
             double hdDifficulty = invisibilityFactor + densityFactor;
 
