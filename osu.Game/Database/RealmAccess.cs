@@ -38,7 +38,6 @@ using osu.Game.Skinning;
 using osuTK.Input;
 using Realms;
 using Realms.Exceptions;
-using BeatmapSetInfo = osu.Game.Beatmaps.BeatmapSetInfo;
 
 namespace osu.Game.Database
 {
