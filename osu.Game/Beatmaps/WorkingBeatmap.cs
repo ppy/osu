@@ -11,15 +11,11 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
-using ManagedBass;
-using ManagedBass.Fx;
 using osu.Framework.Audio;
-using osu.Framework.Audio.Mixing;
 using osu.Framework.Audio.Track;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Logging;
-using osu.Game.Audio;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.UI;
@@ -115,8 +111,6 @@ namespace osu.Game.Beatmaps
             waveform?.Dispose();
             waveform = null;
 
-            addAudioNormalization();
-
             return track;
         }
 
@@ -169,11 +163,7 @@ namespace osu.Game.Beatmaps
                 return track;
             }
 
-            set
-            {
-                track = value;
-                addAudioNormalization();
-            }
+            set => track = value;
         }
 
         protected Track GetVirtualTrack(double emptyLength = 0)
@@ -348,45 +338,6 @@ namespace osu.Game.Beatmaps
         /// <param name="ruleset">The <see cref="Ruleset"/> for which <paramref name="beatmap"/> should be converted.</param>
         /// <returns>The applicable <see cref="IBeatmapConverter"/>.</returns>
         protected virtual IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap, Ruleset ruleset) => ruleset.CreateBeatmapConverter(beatmap);
-
-        #endregion
-
-        #region Audio Normalization
-
-        private void addAudioNormalization()
-        {
-            AudioNormalization audioNormalizationModule = BeatmapInfo.AudioNormalization;
-
-            Logger.Log("Normalization status: " + (audioNormalizationModule != null ? "on" : "off"));
-
-            VolumeParameters volumeParameters = new VolumeParameters
-            {
-                fTarget = audioNormalizationModule?.IntegratedLoudness != null ? AudioNormalization.IntegratedLoudnessToVolumeOffset(audioNormalizationModule.IntegratedLoudness) : 0.8f,
-                fCurrent = 1.0f,
-                fTime = 0,
-                lCurve = 0,
-                lChannel = FXChannelFlags.All
-            };
-
-            addFx(volumeParameters);
-        }
-
-        private void addFx(IEffectParameter effectParameter)
-        {
-            AudioMixer audioMixer = audioManager.TrackMixer;
-
-            IEffectParameter effect = audioMixer.Effects.SingleOrDefault(e => e.FXType == effectParameter.FXType);
-
-            if (effect != null)
-            {
-                int i = audioMixer.Effects.IndexOf(effect);
-                audioMixer.Effects[i] = effectParameter;
-            }
-            else
-            {
-                audioMixer.Effects.Add(effectParameter);
-            }
-        }
 
         #endregion
 

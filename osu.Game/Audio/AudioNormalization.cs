@@ -2,6 +2,11 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Linq;
+using ManagedBass;
+using ManagedBass.Fx;
+using osu.Framework.Audio.Mixing;
+using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using Realms;
@@ -68,6 +73,44 @@ namespace osu.Game.Audio
         /// <param name="integratedLoudness"></param>
         /// <returns></returns>
         public static float IntegratedLoudnessToVolumeOffset(float integratedLoudness) => (float)Math.Pow(10, (TARGET_LEVEL - integratedLoudness) / 20);
+
+        /// <summary>
+        /// Add the audio normalization effect to the mixer
+        /// </summary>
+        /// <param name="beatmapInfo">The BeatmapInfo to find the loudness of</param>
+        /// <param name="mixer">The mixer to apply the effect on</param>
+        public static void AddAudioNormalization(BeatmapInfo beatmapInfo, IAudioMixer mixer)
+        {
+            AudioNormalization? audioNormalizationModule = beatmapInfo.AudioNormalization;
+
+            Logger.Log("Normalization status: " + (audioNormalizationModule != null ? "on" : "off"));
+
+            VolumeParameters volumeParameters = new VolumeParameters
+            {
+                fTarget = audioNormalizationModule?.IntegratedLoudness != null ? IntegratedLoudnessToVolumeOffset(audioNormalizationModule.IntegratedLoudness) : 0.8f,
+                fCurrent = 1.0f,
+                fTime = 0,
+                lCurve = 0,
+                lChannel = FXChannelFlags.All
+            };
+
+            addFx(volumeParameters, mixer);
+        }
+
+        private static void addFx(IEffectParameter effectParameter, IAudioMixer mixer)
+        {
+            IEffectParameter? effect = mixer.Effects.SingleOrDefault(e => e.FXType == effectParameter.FXType);
+
+            if (effect != null)
+            {
+                int i = mixer.Effects.IndexOf(effect);
+                mixer.Effects[i] = effectParameter;
+            }
+            else
+            {
+                mixer.Effects.Add(effectParameter);
+            }
+        }
 
         public bool Equals(IAudioNormalization? other) => other is AudioNormalization audioNormalization && Equals(audioNormalization);
 
