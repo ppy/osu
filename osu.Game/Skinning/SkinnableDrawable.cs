@@ -80,7 +80,7 @@ namespace osu.Game.Skinning
         /// </summary>
         protected virtual bool ApplySizeRestrictionsToDefault => false;
 
-        protected override void SkinChanged(ISkinSource skin) => Reload();
+        protected override void SkinChanged(ISkinSource skin) => ((ISerialisableDrawableContainer)this).Reload();
 
         protected override void Update()
         {
@@ -112,7 +112,7 @@ namespace osu.Game.Skinning
             }
         }
 
-        public void Reload() => reload(CurrentSkin.GetDrawableComponent(Lookup));
+        void ISerialisableDrawableContainer.Reload() => reload(CurrentSkin.GetDrawableComponent(Lookup));
 
         private void reload(Drawable? newComponent)
         {
