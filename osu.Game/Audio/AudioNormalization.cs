@@ -93,9 +93,9 @@ namespace osu.Game.Audio
             VolumeParameters volumeParameters = new VolumeParameters
             {
                 fTarget = audioNormalizationModule?.IntegratedLoudness != null ? IntegratedLoudnessToVolumeOffset(audioNormalizationModule.IntegratedLoudness) : 0.8f,
-                fCurrent = 1.0f,
-                fTime = 0,
-                lCurve = 0,
+                fCurrent = -1.0f,
+                fTime = 0.3f,
+                lCurve = 1,
                 lChannel = FXChannelFlags.All
             };
 
