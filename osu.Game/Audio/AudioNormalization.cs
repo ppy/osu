@@ -32,9 +32,6 @@ namespace osu.Game.Audio
 
         public AudioNormalization(BeatmapInfo beatmapInfo, BeatmapSetInfo beatmapSetInfo, RealmFileStore realmFileStore)
         {
-            // Set default values
-            IntegratedLoudness = 0;
-
             string audiofile = beatmapInfo.Metadata.AudioFile;
 
             if (string.IsNullOrEmpty(audiofile)) return;
@@ -46,7 +43,15 @@ namespace osu.Game.Audio
             filepath = realmFileStore.Storage.GetFullPath(filepath);
 
             BassAudioNormalization loudnessDetection = new BassAudioNormalization(filepath);
-            IntegratedLoudness = loudnessDetection.IntegratedLoudness;
+            float integratedLoudness = loudnessDetection.IntegratedLoudness;
+
+            if (Math.Abs(integratedLoudness - 1) < 0.0000001)
+            {
+                Logger.Log("Failed to get loudness level for " + audiofile, LoggingTarget.Runtime, LogLevel.Error);
+                return;
+            }
+
+            IntegratedLoudness = integratedLoudness;
         }
 
         public BeatmapSetInfo PopulateSet(BeatmapInfo beatmapInfo, BeatmapSetInfo? beatmapSetInfo)
