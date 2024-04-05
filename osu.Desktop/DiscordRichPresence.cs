@@ -6,6 +6,7 @@ using System.Text;
 using DiscordRPC;
 using DiscordRPC.Message;
 using Newtonsoft.Json;
+using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.ObjectExtensions;
@@ -78,9 +79,13 @@ namespace osu.Desktop
             client.OnError += (_, e) => Logger.Log($"An error occurred with Discord RPC Client: {e.Message} ({e.Code})", LoggingTarget.Network, LogLevel.Error);
 
             // A URI scheme is required to support game invitations, as well as informing Discord of the game executable path to support launching the game when a user clicks on join/spectate.
-            client.RegisterUriScheme();
-            client.Subscribe(EventType.Join);
-            client.OnJoin += onJoin;
+            // The library doesn't properly support URI registration when ran from an app bundle on macOS.
+            if (!RuntimeInfo.IsApple)
+            {
+                client.RegisterUriScheme();
+                client.Subscribe(EventType.Join);
+                client.OnJoin += onJoin;
+            }
 
             config.BindWith(OsuSetting.DiscordRichPresence, privacyMode);
 
