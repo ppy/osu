@@ -35,10 +35,9 @@ namespace osu.Game.Skinning
         bool IsEditable => true;
 
         /// <summary>
-        /// Whether the components in this container are static.
-        /// If <c>true</c>, components may not be added or removed from this container.
+        /// Whether components may be added or removed from this container.
         /// </summary>
-        bool IsStatic => false;
+        bool ContentsMutable => true;
 
         /// <summary>
         /// Serialise all children as <see cref="SerialisedDrawableInfo"/>.

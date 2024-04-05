@@ -366,7 +366,7 @@ namespace osu.Game.Overlays.SkinEditor
                 },
             };
 
-            if (!container.IsStatic)
+            if (container.ContentsMutable)
             {
                 // If the new target has a ruleset, let's show ruleset-specific items at the top, and the rest below.
                 if (target.NewValue.Ruleset != null)
@@ -462,7 +462,7 @@ namespace osu.Game.Overlays.SkinEditor
 
         private void updateActions()
         {
-            if (getTarget(selectedTarget.Value)?.IsStatic == true)
+            if (getTarget(selectedTarget.Value)?.ContentsMutable != true)
             {
                 canCopy.Value = false;
                 canCut.Value = false;
@@ -606,7 +606,7 @@ namespace osu.Game.Overlays.SkinEditor
             {
                 ISerialisableDrawableContainer? target = availableTargets.FirstOrDefault(t => t.Components.Contains(item));
 
-                if (target != null && !target.IsStatic)
+                if (target?.ContentsMutable == true)
                     target.Remove(item, true);
             }
 
