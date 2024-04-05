@@ -36,9 +36,8 @@ namespace osu.Game.Audio
 
             byte[] buffer = new byte[10000];
 
-            while (Bass.ChannelIsActive(decodeStream) == PlaybackState.Playing)
+            while (Bass.ChannelGetData(decodeStream, buffer, buffer.Length) >= 0)
             {
-                Bass.ChannelGetData(decodeStream, buffer, buffer.Length);
             }
 
             float integratedLoudness = IntegratedLoudness;
