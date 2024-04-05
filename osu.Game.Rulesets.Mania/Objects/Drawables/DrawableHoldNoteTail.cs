@@ -24,7 +24,15 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
         private HoldNoteTailOrigin tailOrigin = HoldNoteTailOrigin.Regular;
 
-        public HoldNoteTailOrigin TailOrigin => tailOrigin;
+        public HoldNoteTailOrigin TailOrigin
+        {
+            get => tailOrigin;
+            set
+            {
+                tailOrigin = value;
+                updateTailOrigin();
+            }
+        }
 
         public DrawableHoldNoteTail()
             : this(null)
@@ -36,11 +44,6 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         {
             Anchor = Anchor.TopCentre;
             Origin = Anchor.TopCentre;
-        }
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
         }
 
         public void UpdateResult() => base.UpdateResult(true);
@@ -70,7 +73,6 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         {
             base.ApplySkin(skin, allowFallback);
             tailOrigin = skin.GetConfig<ManiaSkinConfigurationLookup, HoldNoteTailOrigin>(new ManiaSkinConfigurationLookup(LegacyManiaSkinConfigurationLookups.HoldNoteTailOrigin))?.Value ?? HoldNoteTailOrigin.Regular;
-            updateTailOrigin();
         }
 
         protected override void OnDirectionChanged(ValueChangedEvent<ScrollingDirection> e)
