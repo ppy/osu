@@ -109,7 +109,6 @@ namespace osu.Game.Database
                 }
             });
 
-            Logger.Log("beatmaps to process: " + beatmapsToProcess);
             if (beatmapsToProcess == 0)
             {
                 Logger.Log("No audio normalization processing required.");
@@ -121,8 +120,6 @@ namespace osu.Game.Database
 
             realmAccess.Run(r =>
             {
-                r.Refresh();
-
                 foreach (BeatmapSetInfo beatmapSetInfo in r.All<BeatmapSetInfo>().Where(b => !b.DeletePending))
                 {
                     foreach (BeatmapInfo beatmapInfo in beatmapSetInfo.Beatmaps)
