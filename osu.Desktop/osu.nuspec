@@ -20,6 +20,7 @@
       <file src="**.dll" target="lib\net45\"/>
       <file src="**.config" target="lib\net45\"/>
       <file src="**.json" target="lib\net45\"/>
+      <file src="**.ico" target="lib\net45\"/>
       <file src="icon.png" target=""/>
     </files>
 </package>

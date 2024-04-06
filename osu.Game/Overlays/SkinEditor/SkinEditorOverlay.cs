@@ -103,13 +103,14 @@ namespace osu.Game.Overlays.SkinEditor
         {
             globallyDisableBeatmapSkinSetting();
 
-            if (lastTargetScreen is MainMenu)
-                PresentGameplay();
-
             if (skinEditor != null)
             {
                 disableNestedInputManagers();
                 skinEditor.Show();
+
+                if (lastTargetScreen is MainMenu)
+                    PresentGameplay();
+
                 return;
             }
 
@@ -125,6 +126,9 @@ namespace osu.Game.Overlays.SkinEditor
                     return;
 
                 AddInternal(editor);
+
+                if (lastTargetScreen is MainMenu)
+                    PresentGameplay();
 
                 Debug.Assert(lastTargetScreen != null);
 
@@ -270,7 +274,7 @@ namespace osu.Game.Overlays.SkinEditor
 
             Debug.Assert(skinEditor != null);
 
-            if (!target.IsLoaded)
+            if (!target.IsLoaded || !skinEditor.IsLoaded)
             {
                 Scheduler.AddOnce(setTarget, target);
                 return;
@@ -350,7 +354,7 @@ namespace osu.Game.Overlays.SkinEditor
                 base.LoadComplete();
 
                 if (!LoadedBeatmapSuccessfully)
-                    Scheduler.AddDelayed(this.Exit, 3000);
+                    Scheduler.AddDelayed(this.Exit, 1000);
             }
 
             protected override void Update()
