@@ -788,7 +788,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddAssert("all columns visible", () => this.ChildrenOfType<ModColumn>().All(col => col.IsPresent));
 
             AddStep("set search", () => modSelectOverlay.SearchTerm = "HD");
-            AddAssert("one column visible", () => this.ChildrenOfType<ModColumn>().Count(col => col.IsPresent) == 1);
+            AddAssert("two columns visible", () => this.ChildrenOfType<ModColumn>().Count(col => col.IsPresent) == 2);
 
             AddStep("filter out everything", () => modSelectOverlay.SearchTerm = "Some long search term with no matches");
             AddAssert("no columns visible", () => this.ChildrenOfType<ModColumn>().All(col => !col.IsPresent));
@@ -812,7 +812,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddAssert("all columns visible", () => this.ChildrenOfType<ModColumn>().All(col => col.IsPresent));
 
             AddStep("set search", () => modSelectOverlay.SearchTerm = "fail");
-            AddAssert("one column visible", () => this.ChildrenOfType<ModColumn>().Count(col => col.IsPresent) == 2);
+            AddAssert("one column visible", () => this.ChildrenOfType<ModColumn>().Count(col => col.IsPresent) == 1);
 
             AddStep("hide", () => modSelectOverlay.Hide());
             AddStep("show", () => modSelectOverlay.Show());
@@ -857,6 +857,30 @@ namespace osu.Game.Tests.Visual.UserInterface
                                                                               .ChildrenOfType<RevertToDefaultButton<double>>().Single().TriggerClick());
             AddUntilStep("difficulty multiplier display shows correct value",
                 () => modSelectOverlay.ChildrenOfType<RankingInformationDisplay>().Single().ModMultiplier.Value, () => Is.EqualTo(0.3).Within(Precision.DOUBLE_EPSILON));
+        }
+
+        [Test]
+        public void TestModSettingsOrder()
+        {
+            createScreen();
+
+            AddStep("select DT + HD + DF", () => SelectedMods.Value = new Mod[] { new OsuModDoubleTime(), new OsuModHidden(), new OsuModDeflate() });
+            AddAssert("mod settings order: DT, HD, DF", () =>
+            {
+                var columns = this.ChildrenOfType<ModSettingsArea>().Single().ChildrenOfType<ModSettingsArea.ModSettingsColumn>();
+                return columns.ElementAt(0).Mod is OsuModDoubleTime &&
+                       columns.ElementAt(1).Mod is OsuModHidden &&
+                       columns.ElementAt(2).Mod is OsuModDeflate;
+            });
+
+            AddStep("replace DT with NC", () => SelectedMods.Value = SelectedMods.Value.Where(m => m is not ModDoubleTime).Append(new OsuModNightcore()).ToList());
+            AddAssert("mod settings order: NC, HD, DF", () =>
+            {
+                var columns = this.ChildrenOfType<ModSettingsArea>().Single().ChildrenOfType<ModSettingsArea.ModSettingsColumn>();
+                return columns.ElementAt(0).Mod is OsuModNightcore &&
+                       columns.ElementAt(1).Mod is OsuModHidden &&
+                       columns.ElementAt(2).Mod is OsuModDeflate;
+            });
         }
 
         private void waitForColumnLoad() => AddUntilStep("all column content loaded", () =>
