@@ -16,22 +16,23 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
     {
         private const double reading_window_size = 3000;
 
-        private const double overlap_multiplier = 1.8;
+        private const double overlap_multiplier = 1.0;
 
         public static double EvaluateDensityOf(DifficultyHitObject current, bool applyDistanceNerf = true)
         {
             var currObj = (OsuDifficultyHitObject)current;
+
             double density = 0;
             double densityAnglesNerf = -2.5; // we have threshold of 2.5
 
             OsuDifficultyHitObject? prevObj0 = null;
-            OsuDifficultyHitObject? prevObj1 = null;
-            OsuDifficultyHitObject? prevObj2 = null;
 
             double prevAngleNerf = 1;
 
-            foreach (var loopObj in retrievePastVisibleObjects(currObj).Reverse())
+            foreach (var readingpObj in currObj.ReadingObjects)
             {
+                var loopObj = readingpObj.HitObject;
+
                 if (loopObj.Index < 1)
                     continue; // Don't look on the first object of the map
 
@@ -47,12 +48,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
                 if (prevObj0.IsNull())
                     prevObj0 = (OsuDifficultyHitObject)loopObj.Previous(0);
-
-                if (prevObj1.IsNull())
-                    prevObj1 = (OsuDifficultyHitObject?)loopObj.Previous(1);
-
-                if (prevObj2.IsNull())
-                    prevObj2 = (OsuDifficultyHitObject?)loopObj.Previous(2);
 
                 // Only if next object is slower, representing break from many notes in a row
                 if (loopObj.StrainTime > prevObj0.StrainTime)
@@ -72,92 +67,32 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 density += loopDifficulty;
 
                 // Angles nerf
+                double currAngleNerf = (loopObj.AnglePredictability / 2) + 0.5;
 
-                if (loopObj.Angle.IsNotNull() && prevObj0.IsNotNull() && prevObj0.Angle.IsNotNull())
+                // Apply the nerf only when it's repeated
+                double angleNerf = Math.Min(currAngleNerf, prevAngleNerf);
+
+                // Reduce angles nerf if objects are too apart in time
+                // Angle nerf is starting being reduced from 200ms (150BPM jump) and it reduced to 0 on 2000ms
+                //double longIntervalFactor = Math.Clamp(1 - (loopObj.StrainTime - 200) / (2000 - 200), 0, 1);
+
+                // Bandaid to fix Rubik's Cube +EZ
+                double wideness = 0;
+                if (loopObj.Angle.IsNotNull() && loopObj.Angle.Value > Math.PI * 0.5)
                 {
-                    double angleDifference = Math.Abs(prevObj0.Angle.Value - loopObj.Angle.Value);
+                    // Goes from 0 to 1 as angle increasing from 90 degrees to 180
+                    wideness = (loopObj.Angle.Value / Math.PI - 0.5) * 2;
 
-                    // Assume that very low spacing difference means that angles don't matter
-                    if (prevObj0.LazyJumpDistance < OsuDifficultyHitObject.NORMALISED_RADIUS)
-                        angleDifference *= Math.Pow(prevObj0.LazyJumpDistance / OsuDifficultyHitObject.NORMALISED_RADIUS, 2);
-                    if (loopObj.LazyJumpDistance < OsuDifficultyHitObject.NORMALISED_RADIUS)
-                        angleDifference *= Math.Pow(loopObj.LazyJumpDistance / OsuDifficultyHitObject.NORMALISED_RADIUS, 2);
-
-                    // assume worst-case if no angles
-                    double angleDifference1 = 0;
-                    double angleDifference2 = 0;
-
-                    // Nerf alternating angles case
-                    if (prevObj1.IsNotNull() && prevObj2.IsNotNull() && prevObj1.Angle.IsNotNull() && prevObj2.Angle.IsNotNull())
-                    {
-                        // Normalized difference
-                        angleDifference1 = Math.Abs(prevObj1.Angle.Value - loopObj.Angle.Value) / Math.PI;
-                        angleDifference2 = Math.Abs(prevObj2.Angle.Value - prevObj0.Angle.Value) / Math.PI;
-                    }
-
-                    // Will be close to 1 if angleDifference1 and angleDifference2 was both close to 0
-                    double alternatingFactor = Math.Pow((1 - angleDifference1) * (1 - angleDifference2), 2);
-
-                    // Be sure to nerf only same rhythms
-                    double rhythmFactor = 1 - getRhythmDifference(loopObj.StrainTime, prevObj0.StrainTime); // 0 on different rhythm, 1 on same rhythm
-
-                    if (prevObj1.IsNotNull())
-                        rhythmFactor *= 1 - getRhythmDifference(prevObj0.StrainTime, prevObj1.StrainTime);
-                    if (prevObj1.IsNotNull() && prevObj2.IsNotNull())
-                        rhythmFactor *= 1 - getRhythmDifference(prevObj1.StrainTime, prevObj2.StrainTime);
-
-                    // double acuteAngleFactor = 1 - Math.Min(loopObj.Angle.Value, prevObj0.Angle.Value) / Math.PI;
-
-                    double prevAngleAdjust = Math.Max(angleDifference - angleDifference1, 0);
-
-                    prevAngleAdjust *= alternatingFactor; // Nerf if alternating
-                    prevAngleAdjust *= rhythmFactor; // Nerf if same rhythms
-                    // prevAngleAdjust *= acuteAngleFactor; // no longer needed?
-
-                    angleDifference -= prevAngleAdjust;
-
-                    // Reduce angles nerf if objects are too apart in time
-                    // Angle nerf is starting being reduced from 200ms (150BPM jump) and it reduced to 0 on 2000ms
-                    double longIntervalFactor = Math.Clamp(1 - (loopObj.StrainTime - 200) / (2000 - 200), 0, 1);
-
-                    // Bandaid to fix Rubik's Cube +EZ
-                    double wideness = 0;
-                    if (loopObj.Angle!.Value > Math.PI * 0.5)
-                    {
-                        // Goes from 0 to 1 as angle increasing from 90 degrees to 180
-                        wideness = (loopObj.Angle.Value / Math.PI - 0.5) * 2;
-
-                        // Transform into cubic scaling
-                        wideness = 1 - Math.Pow(1 - wideness, 3);
-                    }
-
-                    // Angle difference will be considered as 2 times lower if angle is wide
-                    angleDifference /= 1 + wideness;
-
-                    // Current angle nerf. Angle difference more than 15 degrees gets no penalty
-                    double adjustedAngleDifference = Math.Min(Math.PI / 12, angleDifference);
-
-                    // WARNING - this thing always gives at least 0.5 angle nerf, this is a bug, but removing it completely ruins everything
-                    // Theoretically - this issue is fixable by changing multipliers everywhere,
-                    // but this is not needed because this bug have no drawbacks outside of algorithm not working as intended
-                    double currAngleNerf = Math.Cos(Math.Min(Math.PI / 2, 4 * adjustedAngleDifference));
-
-                    // Apply the nerf only when it's repeated
-                    double angleNerf = Math.Min(currAngleNerf, prevAngleNerf);
-
-                    // But only for sharp angles
-                    angleNerf += wideness * (currAngleNerf - angleNerf);
-
-                    densityAnglesNerf += Math.Min(angleNerf, loopDifficulty);
-                    prevAngleNerf = currAngleNerf;
-                }
-                else // Assume worst-case if no angles
-                {
-                    densityAnglesNerf += loopDifficulty;
+                    // Transform into cubic scaling
+                    wideness = 1 - Math.Pow(1 - wideness, 3);
                 }
 
-                prevObj2 = prevObj1;
-                prevObj1 = prevObj0;
+                // But only for sharp angles
+                angleNerf += wideness * (currAngleNerf - angleNerf);
+
+                densityAnglesNerf += Math.Min(angleNerf, loopDifficulty);
+                prevAngleNerf = currAngleNerf;
+
                 prevObj0 = loopObj;
             }
 
@@ -171,30 +106,60 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             var currObj = (OsuDifficultyHitObject)current;
             double screenOverlapDifficulty = 0;
 
-            List<double> overlapDifficulties = new List<double>();
+            if (currObj.ReadingObjects.Count == 0)
+                return 0;
 
-            foreach (var loopObj in retrievePastVisibleObjects(currObj))
+            var overlapDifficulties = new List<(OsuDifficultyHitObject HitObject, double Difficulty)>();
+
+            // Find initial overlap values
+            foreach (var loopObj in currObj.ReadingObjects)
             {
                 double lastOverlapness = 0;
-                foreach (var overlapObj in loopObj.OverlapObjects)
+                foreach (var overlapObj in loopObj.HitObject.ReadingObjects)
                 {
                     if (overlapObj.HitObject.StartTime + overlapObj.HitObject.Preempt <= currObj.StartTime) break;
                     lastOverlapness = overlapObj.Overlapness;
                 }
 
-                overlapDifficulties.Add(lastOverlapness);
+                if (lastOverlapness > 0) overlapDifficulties.Add((loopObj.HitObject, lastOverlapness));
+            }
+
+            var sortedDifficulties = overlapDifficulties.OrderByDescending(d => d.Difficulty);
+
+            for (int i = 0; i < sortedDifficulties.Count(); i++)
+            {
+                var harderObject = sortedDifficulties.ElementAt(i);
+
+                // Look for all easier objects
+                for (int j = i + 1; j < sortedDifficulties.Count(); j++)
+                {
+                    var easierObject = sortedDifficulties.ElementAt(j);
+
+                    // Get the overlap value
+                    double overlapValue;
+
+                    // OverlapValues dict only contains prev objects, so be sure to use right object
+                    if (harderObject.HitObject.Index > easierObject.HitObject.Index)
+                        overlapValue = harderObject.HitObject.OverlapValues[easierObject.HitObject];
+                    else
+                        overlapValue = easierObject.HitObject.OverlapValues[harderObject.HitObject];
+
+                    // Nerf easier object if it overlaps in the same place as hard one
+                    easierObject.Difficulty *= Math.Pow(1 - overlapValue, 2);
+                }
             }
 
             const double decay_weight = 0.5;
             double weight = 1.0;
 
-            foreach (double difficulty in overlapDifficulties.OrderDescending())
+            foreach (var diffObject in sortedDifficulties.OrderByDescending(d => d.Difficulty))
             {
-                screenOverlapDifficulty += difficulty * weight;
+                // Add weighted difficulty
+                screenOverlapDifficulty += Math.Max(0, diffObject.Difficulty - 0.5) * weight;
                 weight *= decay_weight;
             }
 
-            return overlap_multiplier * Math.Max(0, screenOverlapDifficulty - 1.2);
+            return overlap_multiplier * Math.Max(0, screenOverlapDifficulty);
         }
         public static double EvaluateDifficultyOf(DifficultyHitObject current)
         {
@@ -304,23 +269,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             return velocityChangeFactor;
         }
 
-        // Returns a list of objects that are visible on screen at
-        // the point in time at which the current object becomes visible.
-        private static IEnumerable<OsuDifficultyHitObject> retrievePastVisibleObjects(OsuDifficultyHitObject current)
-        {
-            for (int i = 0; i < current.Index; i++)
-            {
-                OsuDifficultyHitObject hitObject = (OsuDifficultyHitObject)current.Previous(i);
-
-                if (hitObject.IsNull() ||
-                    current.StartTime - hitObject.StartTime > reading_window_size ||
-                    hitObject.StartTime < current.StartTime - current.Preempt)
-                    break;
-
-                yield return hitObject;
-            }
-        }
-
         private static double getTimeNerfFactor(double deltaTime)
         {
             return Math.Clamp(2 - deltaTime / (reading_window_size / 2), 0, 1);
@@ -393,7 +341,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 value = Math.Exp(9.07583 - 80.0 * preempt / 3);
 
             // EDIT: looks like AR11 getting a bit overnerfed in comparison to other ARs, so i will increase the difference
-            return Math.Pow(value, 1.4);
+            return Math.Pow(value, 1.25);
         }
     }
 }

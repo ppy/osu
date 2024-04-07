@@ -104,9 +104,19 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         public double Density { get; private set; }
 
         /// <summary>
+        /// Predictabiliy of the angle. Gives high values only in exceptionally repetitive patterns.
+        /// </summary>
+        public double AnglePredictability { get; private set; }
+
+        /// <summary>
         /// Objects that was visible after the note was hit together with cumulative overlapping difficulty. Saved for optimization to avoid O(x^4) time complexity.
         /// </summary>
-        public IList<OverlapObject> OverlapObjects { get; private set; }
+        public IList<ReadingObject> ReadingObjects { get; private set; }
+
+        /// <summary>
+        /// Objects that was visible after the note was hit together with cumulative overlapping difficulty. Saved for optimization to avoid O(x^4) time complexity.
+        /// </summary>
+        public IDictionary<OsuDifficultyHitObject, double> OverlapValues { get; private set; }
 
         /// <summary>
         /// Time in ms between appearence of this <see cref="OsuDifficultyHitObject"/> and moment to click on it.
@@ -152,15 +162,18 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
             setDistances(clockRate);
 
+            AnglePredictability = calculateAnglePredictability();
+
+            OverlapValues = new Dictionary<OsuDifficultyHitObject, double>();
+            ReadingObjects = getOverlapObjects();
+
             RhythmDifficulty = RhythmEvaluator.EvaluateDifficultyOf(this);
             Density = ReadingEvaluator.EvaluateDensityOf(this);
-
-            OverlapObjects = getOverlapObjects();
         }
 
-        private List<OverlapObject> getOverlapObjects()
+        private List<ReadingObject> getOverlapObjects()
         {
-            List<OverlapObject> overlapObjects = new List<OverlapObject>();
+            List<ReadingObject> overlapObjects = new List<ReadingObject>();
 
             double totalOverlapnessDifficulty = 0;
             double currentTime = DeltaTime;
@@ -174,6 +187,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 // Overlapness with this object
                 double currentOverlapness = calculateOverlapness(this, loopObj);
 
+                // Save it for future use
+                OverlapValues[loopObj] = currentOverlapness;
+
                 if (prevObject.Angle.IsNull())
                 {
                     currentTime += prevObject.DeltaTime;
@@ -184,7 +200,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 double angle = (double)prevObject.Angle;
 
                 // Overlapness between current and prev to make streams have 0 buff
-                double instantOverlapness = 0.5 + calculateOverlapness(prevObject, loopObj);
+                double instantOverlapness = 0.5 + prevObject.OverlapValues[loopObj];
 
                 // Nerf overlaps on wide angles
                 double angleFactor = 1;
@@ -192,7 +208,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 instantOverlapness = Math.Min(1, instantOverlapness * angleFactor); // wide angles are more predictable
 
                 currentOverlapness *= (1 - instantOverlapness) * 2; // wide angles will have close-to-zero buff
-                currentOverlapness *= OpacityAt(loopObj.BaseObject.StartTime, false);
+                currentOverlapness *= getOpacitiyMultiplier(loopObj); // Increase stability by using opacity
 
                 // Control overlap repetitivness
                 if (currentOverlapness > 0)
@@ -240,11 +256,26 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 }
 
                 totalOverlapnessDifficulty += currentOverlapness;
-                overlapObjects.Add(new OverlapObject(loopObj, totalOverlapnessDifficulty));
+                overlapObjects.Add(new ReadingObject(loopObj, totalOverlapnessDifficulty));
                 prevObject = loopObj;
             }
 
             return overlapObjects;
+        }
+
+        private double getOpacitiyMultiplier(OsuDifficultyHitObject loopObj)
+        {
+            const double threshold = 0.3;
+
+            // Get raw opacity
+            double opacity = OpacityAt(loopObj.BaseObject.StartTime, false);
+
+            opacity = Math.Min(1, opacity + threshold); // object with opacity 0.7 are still perfectly visible
+            opacity -= threshold; // return opacity 0 objects back to 0
+            opacity /= 1 - threshold; // fix scaling to be 0-1 again
+            opacity = Math.Sqrt(opacity); // change curve
+
+            return opacity;
         }
 
         private static double getSimilarity(double timeA, double timeB)
@@ -304,14 +335,86 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 OsuDifficultyHitObject hitObject = (OsuDifficultyHitObject)current.Previous(i);
 
                 if (hitObject.IsNull() ||
-                    // (hitObject.StartTime - current.StartTime) > reading_window_size ||
-                    //current.StartTime < hitObject.StartTime - hitObject.Preempt)
                     hitObject.StartTime < current.StartTime - current.Preempt)
                     break;
 
                 yield return hitObject;
             }
         }
+
+        private double calculateAnglePredictability()
+        {
+            OsuDifficultyHitObject? prevObj0 = (OsuDifficultyHitObject?)Previous(0);
+            OsuDifficultyHitObject? prevObj1 = (OsuDifficultyHitObject?)Previous(1);
+            OsuDifficultyHitObject? prevObj2 = (OsuDifficultyHitObject?)Previous(2);
+
+            if (Angle.IsNull() || prevObj0.IsNull() || prevObj0.Angle.IsNull())
+                return 1.0;
+
+            double angleDifference = Math.Abs(prevObj0.Angle.Value - Angle.Value);
+
+            // Assume that very low spacing difference means that angles don't matter
+            if (prevObj0.LazyJumpDistance < NORMALISED_RADIUS)
+                angleDifference *= Math.Pow(prevObj0.LazyJumpDistance / NORMALISED_RADIUS, 2);
+            if (LazyJumpDistance < NORMALISED_RADIUS)
+                angleDifference *= Math.Pow(LazyJumpDistance / NORMALISED_RADIUS, 2);
+
+            // assume worst-case if no angles
+            double angleDifference1 = 0;
+            double angleDifference2 = 0;
+
+            // Nerf alternating angles case
+            if (prevObj1.IsNotNull() && prevObj2.IsNotNull() && prevObj1.Angle.IsNotNull() && prevObj2.Angle.IsNotNull())
+            {
+                // Normalized difference
+                angleDifference1 = Math.Abs(prevObj1.Angle.Value - Angle.Value) / Math.PI;
+                angleDifference2 = Math.Abs(prevObj2.Angle.Value - prevObj0.Angle.Value) / Math.PI;
+            }
+
+            // Will be close to 1 if angleDifference1 and angleDifference2 was both close to 0
+            double alternatingFactor = Math.Pow((1 - angleDifference1) * (1 - angleDifference2), 2);
+
+            // Be sure to nerf only same rhythms
+            double rhythmFactor = 1 - getRhythmDifference(StrainTime, prevObj0.StrainTime); // 0 on different rhythm, 1 on same rhythm
+
+            if (prevObj1.IsNotNull())
+                rhythmFactor *= 1 - getRhythmDifference(prevObj0.StrainTime, prevObj1.StrainTime);
+            if (prevObj1.IsNotNull() && prevObj2.IsNotNull())
+                rhythmFactor *= 1 - getRhythmDifference(prevObj1.StrainTime, prevObj2.StrainTime);
+
+            double prevAngleAdjust = Math.Max(angleDifference - angleDifference1, 0);
+
+            prevAngleAdjust *= alternatingFactor; // Nerf if alternating
+            prevAngleAdjust *= rhythmFactor; // Nerf if same rhythms
+
+            angleDifference -= prevAngleAdjust;
+
+            // Bandaid to fix Rubik's Cube +EZ
+            double wideness = 0;
+            if (Angle!.Value > Math.PI * 0.5)
+            {
+                // Goes from 0 to 1 as angle increasing from 90 degrees to 180
+                wideness = (Angle.Value / Math.PI - 0.5) * 2;
+
+                // Transform into cubic scaling
+                wideness = 1 - Math.Pow(1 - wideness, 3);
+            }
+
+            // Angle difference will be considered as 2 times lower if angle is wide
+            angleDifference /= 1 + wideness;
+
+            // Current angle nerf. Angle difference more than 15 degrees gets no penalty
+            double adjustedAngleDifference = Math.Min(Math.PI / 12, angleDifference);
+
+            // WARNING - this thing always gives at least 0.5 angle nerf, this is a bug, but removing it completely ruins everything
+            // Theoretically - this issue is fixable by changing multipliers everywhere,
+            // but this is not needed because this bug have no drawbacks outside of algorithm not working as intended
+            double currAngleNerf = Math.Cos(Math.Min(Math.PI / 2, 4 * adjustedAngleDifference));
+
+            return (currAngleNerf - 0.5) * 2;
+        }
+
+        private static double getRhythmDifference(double t1, double t2) => 1 - Math.Min(t1, t2) / Math.Max(t1, t2);
 
         public double OpacityAt(double time, bool hidden)
         {
@@ -535,12 +638,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             return pos;
         }
 
-        public struct OverlapObject
+        public struct ReadingObject
         {
             public OsuDifficultyHitObject HitObject;
             public double Overlapness;
 
-            public OverlapObject(OsuDifficultyHitObject hitObject, double overlapness)
+            public ReadingObject(OsuDifficultyHitObject hitObject, double overlapness)
             {
                 HitObject = hitObject;
                 Overlapness = overlapness;

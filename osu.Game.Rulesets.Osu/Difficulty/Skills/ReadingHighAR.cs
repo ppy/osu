@@ -88,7 +88,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private bool adjustHighAR;
         private double currentStrain;
 
-        private double skillMultiplier => 8.9;
+        private double skillMultiplier => 7;
         private double defaultValueMultiplier => 25;
 
         protected override double CalculateInitialStrain(double time, DifficultyHitObject current) => currentStrain * StrainDecay(time - current.Previous(0).StartTime);
@@ -108,7 +108,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
     public class HighARSpeedComponent : OsuStrainSkill
     {
-        private double skillMultiplier => 520;
+        private double skillMultiplier => 7 * 0.017;
         protected override double StrainDecayBase => 0.3;
 
         private double currentStrain;
