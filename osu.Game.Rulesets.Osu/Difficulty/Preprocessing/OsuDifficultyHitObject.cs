@@ -227,13 +227,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                             cumulativeTimeWithoutCurrent += historicTimes[j];
 
                             // Check how similar cumulative times are
-                            double potentialMinOverlapness = currentOverlapness * getSimilarity(cumulativeTimeWithCurrent, cumulativeTimeWithoutCurrent);
-                            potentialMinOverlapness *= getAngleDifference(angle, historicAngles[j]);
+                            double potentialMinOverlapness = currentOverlapness * getTimeDifference(cumulativeTimeWithCurrent, cumulativeTimeWithoutCurrent);
+                            potentialMinOverlapness *= 1 - getAngleSimilarity(angle, historicAngles[j]) * (1 - getTimeDifference(loopObj.StrainTime, prevObject.StrainTime));
                             currentMinOverlapness = Math.Min(currentMinOverlapness, potentialMinOverlapness);
 
                             // Check how similar current time with cumulative time
-                            potentialMinOverlapness = currentOverlapness * getSimilarity(currentTime, cumulativeTimeWithoutCurrent);
-                            potentialMinOverlapness *= getAngleDifference(angle, historicAngles[j]);
+                            potentialMinOverlapness = currentOverlapness * getTimeDifference(currentTime, cumulativeTimeWithoutCurrent);
+                            potentialMinOverlapness *= 1 - getAngleSimilarity(angle, historicAngles[j]) * (1 - getTimeDifference(loopObj.StrainTime, prevObject.StrainTime));
                             currentMinOverlapness = Math.Min(currentMinOverlapness, potentialMinOverlapness);
 
                             // Starting from this point - we will never have better match, so stop searching
@@ -278,7 +278,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             return opacity;
         }
 
-        private static double getSimilarity(double timeA, double timeB)
+        private static double getTimeDifference(double timeA, double timeB)
         {
             double similarity = Math.Min(timeA, timeB) / Math.Max(timeA, timeB);
             if (Math.Max(timeA, timeB) == 0) similarity = 1;
@@ -289,13 +289,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             return (Math.Cos((similarity - 0.75) * Math.PI / 0.15) + 1) / 2; // drops from 1 to 0 as similarity increase from 0.75 to 0.9
         }
 
-        private static double getAngleDifference(double angle1, double angle2)
+        private static double getAngleSimilarity(double angle1, double angle2)
         {
             double difference = Math.Abs(angle1 - angle2);
             double threeshold = Math.PI / 12;
 
-            if (difference > threeshold) return 1;
-            return difference / threeshold;
+            if (difference > threeshold) return 0;
+            return 1 - difference / threeshold;
         }
 
         private static double calculateOverlapness(OsuDifficultyHitObject odho1, OsuDifficultyHitObject odho2)
@@ -375,12 +375,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             double alternatingFactor = Math.Pow((1 - angleDifference1) * (1 - angleDifference2), 2);
 
             // Be sure to nerf only same rhythms
-            double rhythmFactor = 1 - getRhythmDifference(StrainTime, prevObj0.StrainTime); // 0 on different rhythm, 1 on same rhythm
+            double rhythmFactor = 1 - getTimeDifference(StrainTime, prevObj0.StrainTime); // 0 on different rhythm, 1 on same rhythm
 
             if (prevObj1.IsNotNull())
-                rhythmFactor *= 1 - getRhythmDifference(prevObj0.StrainTime, prevObj1.StrainTime);
+                rhythmFactor *= 1 - getTimeDifference(prevObj0.StrainTime, prevObj1.StrainTime);
             if (prevObj1.IsNotNull() && prevObj2.IsNotNull())
-                rhythmFactor *= 1 - getRhythmDifference(prevObj1.StrainTime, prevObj2.StrainTime);
+                rhythmFactor *= 1 - getTimeDifference(prevObj1.StrainTime, prevObj2.StrainTime);
 
             double prevAngleAdjust = Math.Max(angleDifference - angleDifference1, 0);
 
@@ -413,8 +413,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
             return (currAngleNerf - 0.5) * 2;
         }
-
-        private static double getRhythmDifference(double t1, double t2) => 1 - Math.Min(t1, t2) / Math.Max(t1, t2);
 
         public double OpacityAt(double time, bool hidden)
         {
