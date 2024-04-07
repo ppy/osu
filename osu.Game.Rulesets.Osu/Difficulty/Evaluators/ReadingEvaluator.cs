@@ -155,7 +155,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             foreach (var diffObject in sortedDifficulties.OrderByDescending(d => d.Difficulty))
             {
                 // Add weighted difficulty
-                screenOverlapDifficulty += Math.Max(0, diffObject.Difficulty - 0.5) * weight;
+                screenOverlapDifficulty += Math.Max(0, diffObject.Difficulty - 0.6) * weight;
                 weight *= decay_weight;
             }
 
