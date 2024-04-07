@@ -162,8 +162,6 @@ namespace osu.Game.Beatmaps
 
                 return track;
             }
-
-            set => track = value;
         }
 
         protected Track GetVirtualTrack(double emptyLength = 0)
