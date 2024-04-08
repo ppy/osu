@@ -115,9 +115,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             foreach (var loopObj in currObj.ReadingObjects)
             {
                 double lastOverlapness = 0;
+                double targetStartTime = currObj.StartTime - currObj.Preempt;
+
                 foreach (var overlapObj in loopObj.HitObject.ReadingObjects)
                 {
-                    if (overlapObj.HitObject.StartTime + overlapObj.HitObject.Preempt <= currObj.StartTime) break;
+                    if (overlapObj.HitObject.StartTime <= targetStartTime) break;
                     lastOverlapness = overlapObj.Overlapness;
                 }
 

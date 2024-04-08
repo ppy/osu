@@ -68,7 +68,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             // Length bonus is in SR to not inflate Star Rating short AR11 maps
             double lengthBonus = OsuPerformanceCalculator.CalculateDefaultLengthBonus(objectsCount);
-            totalPerformance *= lengthBonus * lengthBonus;
+            totalPerformance *= Math.Pow(lengthBonus, 4); // make it bypass sqrt
 
             double adjustedDifficulty = OsuStrainSkill.PerformanceToDifficulty(totalPerformance);
             double difficultyValue = Math.Pow(adjustedDifficulty / OsuDifficultyCalculator.DIFFICULTY_MULTIPLIER, 2.0);
@@ -88,7 +88,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private bool adjustHighAR;
         private double currentStrain;
 
-        private double skillMultiplier => 7;
+        private double skillMultiplier => 5;
         private double defaultValueMultiplier => 25;
 
         protected override double CalculateInitialStrain(double time, DifficultyHitObject current) => currentStrain * StrainDecay(time - current.Previous(0).StartTime);
@@ -108,7 +108,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
     public class HighARSpeedComponent : OsuStrainSkill
     {
-        private double skillMultiplier => 7 * 0.017;
+        private double skillMultiplier => 5 * 58.8;
         protected override double StrainDecayBase => 0.3;
 
         private double currentStrain;
