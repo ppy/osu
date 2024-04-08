@@ -108,9 +108,18 @@ namespace osu.Game.Rulesets.Difficulty
             var skills = CreateSkills(Beatmap, playableMods, clockRate);
             var progressiveBeatmap = new ProgressiveCalculationBeatmap(Beatmap);
 
+            // There is a one-to-many relationship between the hitobjects in the beatmap and the "difficulty hitobjects".
+            // Each iteration of the loop bellow will add at most one hitobject to the progressive beatmap,
+            // representing the most-parenting hitobject - the hitobject from the original beatmap.
+            Dictionary<HitObject, HitObject> hitObjectParentLinks =
+                createHitObjectParentLinks(Beatmap)
+                    .ToDictionary(k => k.obj, k => k.mostParentingObject);
+
             foreach (var hitObject in getDifficultyHitObjects())
             {
-                progressiveBeatmap.HitObjects.Add(hitObject.BaseObject);
+                HitObject parent = hitObjectParentLinks[hitObject.BaseObject];
+                if (progressiveBeatmap.HitObjects.Count == 0 || parent != progressiveBeatmap.HitObjects[^1])
+                    progressiveBeatmap.HitObjects.Add(parent);
 
                 foreach (var skill in skills)
                 {
@@ -122,6 +131,23 @@ namespace osu.Game.Rulesets.Difficulty
             }
 
             return attribs;
+
+            static IEnumerable<(HitObject obj, HitObject mostParentingObject)> createHitObjectParentLinks(IBeatmap beatmap)
+            {
+                foreach (var link in createNestedLinks(beatmap.HitObjects, null))
+                    yield return link;
+
+                static IEnumerable<(HitObject obj, HitObject mostParentingObject)> createNestedLinks(IReadOnlyList<HitObject> objects, [CanBeNull] HitObject parent)
+                {
+                    foreach (var o in objects)
+                    {
+                        yield return (o, parent ?? o);
+
+                        foreach (var n in createNestedLinks(o.NestedHitObjects, parent ?? o))
+                            yield return n;
+                    }
+                }
+            }
         }
 
         /// <summary>
