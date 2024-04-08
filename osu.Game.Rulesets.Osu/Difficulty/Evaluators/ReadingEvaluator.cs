@@ -29,9 +29,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             double prevAngleNerf = 1;
 
-            foreach (var readingpObj in currObj.ReadingObjects)
+            var readingObjects = currObj.ReadingObjects;
+            for (int i = 0; i < readingObjects.Count; i++)
             {
-                var loopObj = readingpObj.HitObject;
+                var loopObj = readingObjects[i].HitObject;
 
                 if (loopObj.Index < 1)
                     continue; // Don't look on the first object of the map
@@ -110,41 +111,45 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 return 0;
 
             var overlapDifficulties = new List<(OsuDifficultyHitObject HitObject, double Difficulty)>();
+            var readingObjects = currObj.ReadingObjects;
 
             // Find initial overlap values
-            foreach (var loopObj in currObj.ReadingObjects)
+            for (int i = 0; i < readingObjects.Count; i++)
             {
-                double lastOverlapness = 0;
+                var loopObj = readingObjects[i].HitObject;
+                var loopReadingObjects = (List<OsuDifficultyHitObject.ReadingObject>)loopObj.ReadingObjects;
+
+                if (loopReadingObjects.Count == 0)
+                    continue;
+
                 double targetStartTime = currObj.StartTime - currObj.Preempt;
+                double overlapness = boundBinarySearch(loopReadingObjects, targetStartTime);
 
-                foreach (var overlapObj in loopObj.HitObject.ReadingObjects)
-                {
-                    if (overlapObj.HitObject.StartTime <= targetStartTime) break;
-                    lastOverlapness = overlapObj.Overlapness;
-                }
-
-                if (lastOverlapness > 0) overlapDifficulties.Add((loopObj.HitObject, lastOverlapness));
+                if (overlapness > 0) overlapDifficulties.Add((loopObj, overlapness));
             }
 
-            var sortedDifficulties = overlapDifficulties.OrderByDescending(d => d.Difficulty);
+            if (overlapDifficulties.Count == 0)
+                return 0;
 
-            for (int i = 0; i < sortedDifficulties.Count(); i++)
+            var sortedDifficulties = overlapDifficulties.OrderByDescending(d => d.Difficulty).ToList();
+
+            for (int i = 0; i < sortedDifficulties.Count; i++)
             {
-                var harderObject = sortedDifficulties.ElementAt(i);
+                var harderObject = sortedDifficulties[i];
 
                 // Look for all easier objects
-                for (int j = i + 1; j < sortedDifficulties.Count(); j++)
+                for (int j = i + 1; j < sortedDifficulties.Count; j++)
                 {
-                    var easierObject = sortedDifficulties.ElementAt(j);
+                    var easierObject = sortedDifficulties[j];
 
                     // Get the overlap value
-                    double overlapValue;
+                    double overlapValue = 0;
 
                     // OverlapValues dict only contains prev objects, so be sure to use right object
                     if (harderObject.HitObject.Index > easierObject.HitObject.Index)
-                        overlapValue = harderObject.HitObject.OverlapValues[easierObject.HitObject];
+                        harderObject.HitObject.OverlapValues.TryGetValue(easierObject.HitObject, out overlapValue);
                     else
-                        overlapValue = easierObject.HitObject.OverlapValues[harderObject.HitObject];
+                        easierObject.HitObject.OverlapValues.TryGetValue(harderObject.HitObject, out overlapValue);
 
                     // Nerf easier object if it overlaps in the same place as hard one
                     easierObject.Difficulty *= Math.Pow(1 - overlapValue, 2);
@@ -271,13 +276,34 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             return velocityChangeFactor;
         }
 
-        private static double getTimeNerfFactor(double deltaTime)
-        {
-            return Math.Clamp(2 - deltaTime / (reading_window_size / 2), 0, 1);
-        }
-
+        private static double getTimeNerfFactor(double deltaTime) => Math.Clamp(2 - deltaTime / (reading_window_size / 2), 0, 1);
         private static double getRhythmDifference(double t1, double t2) => 1 - Math.Min(t1, t2) / Math.Max(t1, t2);
         private static double logistic(double x) => 1 / (1 + Math.Exp(-x));
+
+        // Finds the overlapness of the last object for which StartTime lower than target
+        private static double boundBinarySearch(List<OsuDifficultyHitObject.ReadingObject> arr, double target)
+        {
+            int low = 0;
+            int mid;
+            int high = arr.Count;
+
+            int result = -1;
+
+            while (low < high)
+            {
+                mid = low + (high - low) / 2;
+
+                if (arr[mid].HitObject.StartTime >= target)
+                {
+                    result = mid;
+                    low = mid + 1;
+                }
+                else high = mid - 1;
+            }
+
+            if (result == -1) return 0;
+            return arr[result].Overlapness;
+        }
     }
 
     public static class ReadingHiddenEvaluator

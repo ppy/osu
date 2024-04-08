@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
@@ -114,7 +115,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         public IList<ReadingObject> ReadingObjects { get; private set; }
 
         /// <summary>
-        /// Objects that was visible after the note was hit together with cumulative overlapping difficulty. Saved for optimization to avoid O(x^4) time complexity.
+        /// NON ZERO overlap values for each visible object on the moment this object appeared. Saved for optimization.
         /// </summary>
         public IDictionary<OsuDifficultyHitObject, double> OverlapValues { get; private set; }
 
@@ -165,16 +166,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             AnglePredictability = calculateAnglePredictability();
 
             OverlapValues = new Dictionary<OsuDifficultyHitObject, double>();
-            ReadingObjects = getOverlapObjects();
+            ReadingObjects = getReadingObjects();
 
             RhythmDifficulty = RhythmEvaluator.EvaluateDifficultyOf(this);
             Density = ReadingEvaluator.EvaluateDensityOf(this);
         }
 
-        private List<ReadingObject> getOverlapObjects()
+        private List<ReadingObject> getReadingObjects()
         {
-            List<ReadingObject> overlapObjects = new List<ReadingObject>();
-
             double totalOverlapnessDifficulty = 0;
             double currentTime = DeltaTime;
             List<double> historicTimes = new List<double>();
@@ -182,13 +181,20 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
             OsuDifficultyHitObject prevObject = this;
 
-            foreach (var loopObj in retrieveCurrentVisibleObjects(this))
+            // The fastest way to do it so far, but still, not very fast
+            var visibleObjects = retrieveCurrentVisibleObjects(this).ToImmutableArray();
+            List<ReadingObject> overlapObjects = new List<ReadingObject>(visibleObjects.Length);
+
+            //foreach (var loopObj in visibleObjects)
+            for (int loopIndex = 0; loopIndex < visibleObjects.Length; loopIndex++)
             {
-                // Overlapness with this object
+                var loopObj = visibleObjects[loopIndex];
+
+                // Overlapness with this object. Very slow because of `StackedPosition` being bad
                 double currentOverlapness = calculateOverlapness(this, loopObj);
 
-                // Save it for future use
-                OverlapValues[loopObj] = currentOverlapness;
+                // Save it for future use. Saving only non-zero to make it faster (still slow tho)
+                if (currentOverlapness > 0) OverlapValues[loopObj] = currentOverlapness;
 
                 if (prevObject.Angle.IsNull())
                 {
@@ -200,19 +206,20 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 double angle = (double)prevObject.Angle;
 
                 // Overlapness between current and prev to make streams have 0 buff
-                double instantOverlapness = 0.5 + prevObject.OverlapValues[loopObj];
+                prevObject.OverlapValues.TryGetValue(loopObj, out double instantOverlapness);
 
                 // Nerf overlaps on wide angles
                 double angleFactor = 1;
                 angleFactor += (-Math.Cos(angle) + 1) / 2; // =2 for wide angles, =1 for acute angles
-                instantOverlapness = Math.Min(1, instantOverlapness * angleFactor); // wide angles are more predictable
+                instantOverlapness = Math.Min(1, (0.5 + instantOverlapness) * angleFactor); // wide angles are more predictable
 
                 currentOverlapness *= (1 - instantOverlapness) * 2; // wide angles will have close-to-zero buff
-                currentOverlapness *= getOpacitiyMultiplier(loopObj); // Increase stability by using opacity
 
                 // Control overlap repetitivness
                 if (currentOverlapness > 0)
                 {
+                    currentOverlapness *= getOpacitiyMultiplier(loopObj); // Increase stability by using opacity
+
                     double currentMinOverlapness = currentOverlapness;
                     double cumulativeTimeWithCurrent = currentTime;
 
@@ -256,7 +263,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 }
 
                 totalOverlapnessDifficulty += currentOverlapness;
-                overlapObjects.Add(new ReadingObject(loopObj, totalOverlapnessDifficulty));
+
+                ReadingObject newObj = new ReadingObject(loopObj, totalOverlapnessDifficulty);
+                overlapObjects.Add(newObj);
                 prevObject = loopObj;
             }
 
@@ -304,7 +313,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
             OsuHitObject o1 = odho1.BaseObject, o2 = odho2.BaseObject;
 
-            double distance = Vector2.Distance(o1.StackedPosition, o2.StackedPosition);
+            // This is VERY slow, make it faster somehow
+            Vector2 o1pos = o1.StackedPosition;
+            Vector2 o2pos = o2.StackedPosition;
+
+            double distance = Vector2.Distance(o1pos, o2pos); // Distance func is also pretty slow for some reason
             double radius = o1.Radius;
 
             double distance_sqr = distance * distance;
@@ -416,7 +429,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
         public double OpacityAt(double time, bool hidden)
         {
-            if (time > BaseObject.StartTime)
+            var baseObject = BaseObject; // Optimization
+
+            if (time > baseObject.StartTime)
             {
                 // Consider a hitobject as being invisible when its start time is passed.
                 // In reality the hitobject will be visible beyond its start time up until its hittable window has passed,
@@ -424,14 +439,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 return 0.0;
             }
 
-            double fadeInStartTime = BaseObject.StartTime - BaseObject.TimePreempt;
-            double fadeInDuration = BaseObject.TimeFadeInRaw;
+            double fadeInStartTime = baseObject.StartTime - baseObject.TimePreempt;
+            double fadeInDuration = baseObject.TimeFadeInRaw;
 
             if (hidden)
             {
                 // Taken from OsuModHidden.
-                double fadeOutStartTime = BaseObject.StartTime - BaseObject.TimePreempt + BaseObject.TimeFadeInRaw;
-                double fadeOutDuration = BaseObject.TimePreempt * OsuModHidden.FADE_OUT_DURATION_MULTIPLIER;
+                double fadeOutStartTime = baseObject.StartTime - baseObject.TimePreempt + baseObject.TimeFadeInRaw;
+                double fadeOutDuration = baseObject.TimePreempt * OsuModHidden.FADE_OUT_DURATION_MULTIPLIER;
 
                 return Math.Min
                 (
