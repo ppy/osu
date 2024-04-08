@@ -369,7 +369,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 value = Math.Exp(9.07583 - 80.0 * preempt / 3);
 
             // EDIT: looks like AR11 getting a bit overnerfed in comparison to other ARs, so i will increase the difference
-            return Math.Pow(value, 1.25);
+            return Math.Pow(value, 1.1);
         }
     }
 }

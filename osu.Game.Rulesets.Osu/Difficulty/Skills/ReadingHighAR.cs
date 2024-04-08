@@ -88,8 +88,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private bool adjustHighAR;
         private double currentStrain;
 
-        private double skillMultiplier => 5;
-        private double defaultValueMultiplier => 25;
+        private double skillMultiplier => 4;
+        private double defaultValueMultiplier => 60;
 
         protected override double CalculateInitialStrain(double time, DifficultyHitObject current) => currentStrain * StrainDecay(time - current.Previous(0).StartTime);
 
@@ -102,19 +102,19 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             currentStrain += aimDifficulty;
 
-            return currentStrain + defaultValueMultiplier * ReadingHighAREvaluator.EvaluateDifficultyOf(current, adjustHighAR);
+            return currentStrain + defaultValueMultiplier * Math.Pow(ReadingHighAREvaluator.EvaluateDifficultyOf(current, adjustHighAR), 1.5);
         }
     }
 
     public class HighARSpeedComponent : OsuStrainSkill
     {
-        private double skillMultiplier => 5 * 58.8;
+        private double skillMultiplier => 4 * 58.8;
         protected override double StrainDecayBase => 0.3;
 
         private double currentStrain;
         private double currentRhythm;
 
-        private double defaultValueMultiplier => 25;
+        private double defaultValueMultiplier => 60;
 
         public HighARSpeedComponent(Mod[] mods)
             : base(mods)
@@ -130,12 +130,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             currentStrain *= StrainDecay(currObj.StrainTime);
 
             double speedDifficulty = SpeedEvaluator.EvaluateDifficultyOf(current) * skillMultiplier;
-            speedDifficulty *= Math.Pow(ReadingHighAREvaluator.EvaluateDifficultyOf(current, false), 2);
+            speedDifficulty *= Math.Pow(ReadingHighAREvaluator.EvaluateDifficultyOf(current), 2);
             currentStrain += speedDifficulty;
 
             currentRhythm = currObj.RhythmDifficulty;
             double totalStrain = currentStrain * currentRhythm;
-            return totalStrain + defaultValueMultiplier * ReadingHighAREvaluator.EvaluateDifficultyOf(current);
+            return totalStrain + defaultValueMultiplier * Math.Pow(ReadingHighAREvaluator.EvaluateDifficultyOf(current), 1.5);
         }
     }
 }
