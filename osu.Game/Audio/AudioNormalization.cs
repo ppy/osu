@@ -54,9 +54,9 @@ namespace osu.Game.Audio
             IntegratedLoudness = integratedLoudness;
         }
 
-        public BeatmapSetInfo PopulateSet(BeatmapInfo beatmapInfo, BeatmapSetInfo? beatmapSetInfo)
+        public void PopulateSet(BeatmapInfo beatmapInfo, BeatmapSetInfo? beatmapSetInfo)
         {
-            if (beatmapSetInfo == null) return beatmapSetInfo!;
+            if (beatmapSetInfo == null) return;
 
             foreach (BeatmapInfo beatmap in beatmapSetInfo.Beatmaps)
             {
@@ -68,8 +68,6 @@ namespace osu.Game.Audio
                     };
                 }
             }
-
-            return beatmapSetInfo;
         }
 
         /// <summary>
