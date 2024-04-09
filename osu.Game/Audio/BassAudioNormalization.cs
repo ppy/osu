@@ -51,7 +51,9 @@ namespace osu.Game.Audio
                 IntegratedLoudness = 1;
             }
 
-            Bass.SampleFree(decodeStream);
+            var freedStream = Bass.StreamFree(decodeStream);
+            if (!freedStream)
+                Logger.Log("Failed to free stream!\nError Code: " + Bass.LastError, LoggingTarget.Runtime, LogLevel.Error);
         }
     }
 }
