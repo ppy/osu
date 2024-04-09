@@ -97,6 +97,7 @@ namespace osu.Game.Database
         /// </summary>
         private void processAudioNormalization()
         {
+            var filestorage = new RealmFileStore(realmAccess, storage!);
             int beatmapsCount = 0;
             int beatmapsToProcess = 0;
 
@@ -133,12 +134,9 @@ namespace osu.Game.Database
                         sleepIfRequired();
                         if (beatmapInfo.AudioNormalization != null) continue;
 
-                        realmAccess.Write(realm =>
-                        {
-                            AudioNormalization audioNormalization = new AudioNormalization(beatmapInfo, beatmapSetInfo, new RealmFileStore(realmAccess, storage!));
-                            beatmapInfo.AudioNormalization = audioNormalization;
-                            realm.Add(audioNormalization.PopulateSet(beatmapInfo, beatmapSetInfo), true);
-                        });
+                        AudioNormalization audioNormalization = new AudioNormalization(beatmapInfo, beatmapSetInfo, filestorage);
+                        beatmapInfo.AudioNormalization = audioNormalization;
+                        audioNormalization.PopulateSet(beatmapInfo, beatmapSetInfo);
                         beatmapManager.GetWorkingBeatmap(beatmapInfo, true);
                     }
 
