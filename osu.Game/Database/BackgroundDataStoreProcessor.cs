@@ -119,7 +119,7 @@ namespace osu.Game.Database
             var notification = showProgressNotification(beatmapsCount, "Verifying loudness level for beatmaps", "all loudness levels have been verified");
             int processedCount = 0;
 
-            realmAccess.Run(r =>
+            realmAccess.Write(r =>
             {
                 foreach (BeatmapSetInfo beatmapSetInfo in r.All<BeatmapSetInfo>().Where(b => !b.DeletePending))
                 {
