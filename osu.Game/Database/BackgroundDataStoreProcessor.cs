@@ -132,6 +132,7 @@ namespace osu.Game.Database
                         processedCount++;
 
                         if (beatmapInfo.AudioNormalization != null) continue;
+
                         sleepIfRequired();
 
                         AudioNormalization audioNormalization = new AudioNormalization(beatmapInfo, beatmapSetInfo, filestorage);
