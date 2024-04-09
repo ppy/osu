@@ -74,6 +74,7 @@ namespace osu.Game.Database
                 processScoresWithMissingStatistics();
                 convertLegacyTotalScoreToStandardised();
                 upgradeScoreRanks();
+                upgradeModMultipliers();
             }, TaskCreationOptions.LongRunning).ContinueWith(t =>
             {
                 if (t.Exception?.InnerException is ObjectDisposedException)
@@ -322,7 +323,7 @@ namespace osu.Game.Database
                  .Where(s => !s.BackgroundReprocessingFailed
                              && s.BeatmapInfo != null
                              && s.IsLegacyScore
-                             && s.TotalScoreVersion < LegacyScoreEncoder.LATEST_VERSION)
+                             && s.TotalScoreVersion < 30000016) // last total score version associated with changes to the score estimation algorithm
                  .AsEnumerable()
                  // must be done after materialisation, as realm doesn't want to support
                  // nested property predicates
@@ -434,6 +435,95 @@ namespace osu.Game.Database
             }
 
             completeNotification(notification, processedCount, scoreIds.Count, failedCount);
+        }
+
+        private record ModMultiplierChange(
+            string ModAcronym,
+            string RulesetName,
+            double OldMultiplier,
+            double NewMultiplier,
+            int ScoreVersion);
+
+        private static readonly ModMultiplierChange[] mod_multiplier_changes =
+        [
+            new ModMultiplierChange("CL", "taiko", 0.96, 1, 30000017),
+            new ModMultiplierChange("CL", "fruits", 0.96, 1, 30000017),
+            new ModMultiplierChange("CL", "mania", 0.96, 1, 30000017),
+        ];
+
+        private void upgradeModMultipliers()
+        {
+            Logger.Log("Performing mod multiplier upgrades...");
+
+            int latestMultiplierChange = mod_multiplier_changes.Max(change => change.ScoreVersion);
+
+            var scores = realmAccess
+                         .Run(r => r.All<ScoreInfo>()
+                                    .Where(score => score.TotalScoreVersion < latestMultiplierChange && !score.BackgroundReprocessingFailed)
+                                    .Detach())
+                         // must be done after materialisation, as realm doesn't support
+                         // filtering on nested property predicates or projection via `.Select()`
+                         .Where(s => s.Ruleset.IsLegacyRuleset())
+                         .ToList();
+
+            if (scores.Count == 0)
+                return;
+
+            var notification = showProgressNotification(scores.Count, "Adjusting mod multipliers for scores", "scores now use latest mod multipliers");
+
+            int processedCount = 0;
+            int failedCount = 0;
+
+            foreach (var score in scores)
+            {
+                if (notification?.State == ProgressNotificationState.Cancelled)
+                    break;
+
+                updateNotificationProgress(notification, processedCount, scores.Count);
+
+                sleepIfRequired();
+
+                double? newTotalScore = null;
+
+                try
+                {
+                    foreach (var multiplierChange in mod_multiplier_changes)
+                    {
+                        if (score.TotalScoreVersion >= multiplierChange.ScoreVersion
+                            || score.Ruleset.ShortName != multiplierChange.RulesetName
+                            || score.APIMods.All(m => m.Acronym != multiplierChange.ModAcronym))
+                        {
+                            continue;
+                        }
+
+                        newTotalScore ??= score.TotalScore;
+                        newTotalScore /= multiplierChange.OldMultiplier;
+                        newTotalScore *= multiplierChange.NewMultiplier;
+                    }
+
+                    realmAccess.Write(r =>
+                    {
+                        var refetched = r.Find<ScoreInfo>(score.ID)!;
+                        if (newTotalScore != null)
+                            refetched.TotalScore = (long)newTotalScore.Value;
+                        refetched.TotalScoreVersion = LegacyScoreEncoder.LATEST_VERSION;
+                    });
+
+                    ++processedCount;
+                }
+                catch (ObjectDisposedException)
+                {
+                    throw;
+                }
+                catch (Exception e)
+                {
+                    Logger.Log($"Failed to update rank score {score.ID}: {e}");
+                    realmAccess.Write(r => r.Find<ScoreInfo>(score.ID)!.BackgroundReprocessingFailed = true);
+                    ++failedCount;
+                }
+            }
+
+            completeNotification(notification, processedCount, scores.Count, failedCount);
         }
 
         private void updateNotificationProgress(ProgressNotification? notification, int processedCount, int totalCount)

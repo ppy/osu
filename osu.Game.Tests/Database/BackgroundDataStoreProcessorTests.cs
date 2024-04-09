@@ -10,6 +10,7 @@ using osu.Framework.Extensions;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
+using osu.Game.Online.API;
 using osu.Game.Rulesets;
 using osu.Game.Scoring;
 using osu.Game.Scoring.Legacy;
@@ -209,6 +210,35 @@ namespace osu.Game.Tests.Database
 
             AddAssert("Score not marked as failed", () => Realm.Run(r => r.Find<ScoreInfo>(scoreInfo.ID)!.BackgroundReprocessingFailed), () => Is.False);
             AddAssert("Score version not upgraded", () => Realm.Run(r => r.Find<ScoreInfo>(scoreInfo.ID)!.TotalScoreVersion), () => Is.EqualTo(30000001));
+        }
+
+        [Test]
+        public void TestClassicModMultiplierChange()
+        {
+            AddStep("Add scores", () =>
+            {
+                string[] rulesets = ["osu", "taiko", "fruits", "mania"];
+
+                foreach (string ruleset in rulesets)
+                {
+                    Realm.Write(r =>
+                    {
+                        r.Add(new ScoreInfo(ruleset: r.Find<RulesetInfo>(ruleset), beatmap: r.All<BeatmapInfo>().First())
+                        {
+                            TotalScoreVersion = 30000016,
+                            TotalScore = 960_000,
+                            APIMods = [new APIMod { Acronym = "CL" }]
+                        });
+                    });
+                }
+            });
+
+            AddStep("Run background processor", () => Add(new TestBackgroundDataStoreProcessor()));
+
+            AddUntilStep("Three scores updated", () => Realm.Run(r => r.All<ScoreInfo>().Count(score => score.TotalScore == 1_000_000)), () => Is.EqualTo(3));
+            AddUntilStep("osu! score preserved", () => Realm.Run(r => r.All<ScoreInfo>().Count(score => score.TotalScore == 960_000)), () => Is.EqualTo(1));
+            AddAssert("No fails", () => Realm.Run(r => r.All<ScoreInfo>().Count(score => score.BackgroundReprocessingFailed)), () => Is.Zero);
+            AddAssert("All score versions upgraded", () => Realm.Run(r => r.All<ScoreInfo>().Count(score => score.TotalScoreVersion >= 30000017)), () => Is.EqualTo(4));
         }
 
         public partial class TestBackgroundDataStoreProcessor : BackgroundDataStoreProcessor
