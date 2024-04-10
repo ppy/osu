@@ -311,7 +311,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
             foreach (var splitPoint in controlPointsToSplitAt)
             {
-                if (splitPoint == controlPoints[0] || splitPoint == controlPoints[^1] || splitPoint.Type is null)
+                if (splitPoint == controlPoints[0] || splitPoint == controlPoints[^1] || splitPoint.Type == null)
                     continue;
 
                 // Split off the section of slider before this control point so the remaining control points to split are in the latter part of the slider.

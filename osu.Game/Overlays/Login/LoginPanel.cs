@@ -15,6 +15,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation;
 using osu.Game.Online.API;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.Settings;
 using osu.Game.Users;
 using osuTK;
@@ -30,15 +31,17 @@ namespace osu.Game.Overlays.Login
         [Resolved]
         private OsuColour colours { get; set; } = null!;
 
-        private UserDropdown dropdown = null!;
+        private UserDropdown? dropdown;
 
         /// <summary>
         /// Called to request a hide of a parent displaying this container.
         /// </summary>
         public Action? RequestHide;
 
+        private IBindable<APIUser> user = null!;
+        private readonly Bindable<UserStatus?> status = new Bindable<UserStatus?>();
+
         private readonly IBindable<APIState> apiState = new Bindable<APIState>();
-        private readonly Bindable<UserStatus?> userStatus = new Bindable<UserStatus?>();
 
         [Resolved]
         private IAPIProvider api { get; set; } = null!;
@@ -61,11 +64,21 @@ namespace osu.Game.Overlays.Login
             AutoSizeAxes = Axes.Y;
         }
 
-        [BackgroundDependencyLoader]
-        private void load()
+        protected override void LoadComplete()
         {
+            base.LoadComplete();
+
             apiState.BindTo(api.State);
             apiState.BindValueChanged(onlineStateChanged, true);
+
+            user = api.LocalUser.GetBoundCopy();
+            user.BindValueChanged(u =>
+            {
+                status.UnbindBindings();
+                status.BindTo(u.NewValue.Status);
+            }, true);
+
+            status.BindValueChanged(e => updateDropdownCurrent(e.NewValue), true);
         }
 
         private void onlineStateChanged(ValueChangedEvent<APIState> state) => Schedule(() =>
@@ -144,9 +157,6 @@ namespace osu.Game.Overlays.Login
                         },
                     };
 
-                    userStatus.BindTo(api.LocalUser.Value.Status);
-                    userStatus.BindValueChanged(e => updateDropdownCurrent(e.NewValue), true);
-
                     dropdown.Current.BindValueChanged(action =>
                     {
                         switch (action.NewValue)
@@ -171,6 +181,7 @@ namespace osu.Game.Overlays.Login
                                 break;
                         }
                     }, true);
+
                     break;
             }
 
@@ -180,6 +191,9 @@ namespace osu.Game.Overlays.Login
 
         private void updateDropdownCurrent(UserStatus? status)
         {
+            if (dropdown == null)
+                return;
+
             switch (status)
             {
                 case UserStatus.Online:

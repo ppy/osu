@@ -502,7 +502,7 @@ namespace osu.Game.Tests.NonVisual.Filtering
         {
             public string? CustomValue { get; set; }
 
-            public bool Matches(BeatmapInfo beatmapInfo) => true;
+            public bool Matches(BeatmapInfo beatmapInfo, FilterCriteria criteria) => true;
 
             public bool TryParseCustomKeywordCriteria(string key, Operator op, string value)
             {

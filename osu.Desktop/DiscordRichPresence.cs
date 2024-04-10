@@ -6,6 +6,7 @@ using System.Text;
 using DiscordRPC;
 using DiscordRPC.Message;
 using Newtonsoft.Json;
+using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.ObjectExtensions;
@@ -35,8 +36,6 @@ namespace osu.Desktop
         [Resolved]
         private IBindable<RulesetInfo> ruleset { get; set; } = null!;
 
-        private IBindable<APIUser> user = null!;
-
         [Resolved]
         private IAPIProvider api { get; set; } = null!;
 
@@ -49,9 +48,11 @@ namespace osu.Desktop
         [Resolved]
         private MultiplayerClient multiplayerClient { get; set; } = null!;
 
+        [Resolved]
+        private OsuConfigManager config { get; set; } = null!;
+
         private readonly IBindable<UserStatus?> status = new Bindable<UserStatus?>();
         private readonly IBindable<UserActivity> activity = new Bindable<UserActivity>();
-
         private readonly Bindable<DiscordRichPresenceMode> privacyMode = new Bindable<DiscordRichPresenceMode>();
 
         private readonly RichPresence presence = new RichPresence
@@ -64,8 +65,10 @@ namespace osu.Desktop
             },
         };
 
+        private IBindable<APIUser>? user;
+
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
+        private void load()
         {
             client = new DiscordRpcClient(client_id)
             {
@@ -78,9 +81,20 @@ namespace osu.Desktop
             client.OnError += (_, e) => Logger.Log($"An error occurred with Discord RPC Client: {e.Message} ({e.Code})", LoggingTarget.Network, LogLevel.Error);
 
             // A URI scheme is required to support game invitations, as well as informing Discord of the game executable path to support launching the game when a user clicks on join/spectate.
-            client.RegisterUriScheme();
-            client.Subscribe(EventType.Join);
-            client.OnJoin += onJoin;
+            // The library doesn't properly support URI registration when ran from an app bundle on macOS.
+            if (!RuntimeInfo.IsApple)
+            {
+                client.RegisterUriScheme();
+                client.Subscribe(EventType.Join);
+                client.OnJoin += onJoin;
+            }
+
+            client.Initialize();
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
 
             config.BindWith(OsuSetting.DiscordRichPresence, privacyMode);
 
@@ -99,8 +113,6 @@ namespace osu.Desktop
             activity.BindValueChanged(_ => schedulePresenceUpdate());
             privacyMode.BindValueChanged(_ => schedulePresenceUpdate());
             multiplayerClient.RoomUpdated += onRoomUpdated;
-
-            client.Initialize();
         }
 
         private void onReady(object _, ReadyMessage __)
@@ -141,6 +153,9 @@ namespace osu.Desktop
 
         private void updatePresence(bool hideIdentifiableInformation)
         {
+            if (user == null)
+                return;
+
             // user activity
             if (activity.Value != null)
             {
