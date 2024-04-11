@@ -193,6 +193,7 @@ namespace osu.Game.Rulesets.Osu
                         new OsuModRelax(),
                         new OsuModAutopilot(),
                         new OsuModSpunOut(),
+                        new ModAutoHitsounds<OsuHitObject>(),
                     };
 
                 case ModType.Fun:
@@ -213,7 +214,7 @@ namespace osu.Game.Rulesets.Osu
                         new OsuModFreezeFrame(),
                         new OsuModBubbles(),
                         new OsuModSynesthesia(),
-                        new OsuModDepth()
+                        new OsuModDepth(),
                     };
 
                 case ModType.System:

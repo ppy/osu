@@ -200,5 +200,10 @@ namespace osu.Game.Screens.Play
         public double ElapsedFrameTime => GameplayClock.ElapsedFrameTime;
 
         public double FramesPerSecond => GameplayClock.FramesPerSecond;
+
+        public double GetUserOffset()
+        {
+            return -GameplayClock.TotalUserOffset;
+        }
     }
 }

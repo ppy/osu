@@ -127,6 +127,19 @@ namespace osu.Game.Beatmaps
             }
         }
 
+        public double TotalUserOffset
+        {
+            get
+            {
+                if (!applyOffsets)
+                    return 0;
+
+                Debug.Assert(platformOffsetClock != null);
+
+                return TotalAppliedOffset - platformOffsetClock.RateAdjustedOffset;
+            }
+        }
+
         #region Delegation of IAdjustableClock / ISourceChangeableClock to decoupled clock.
 
         public void ChangeSource(IClock? source) => decoupledTrack.ChangeSource(source);

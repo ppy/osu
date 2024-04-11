@@ -74,6 +74,8 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// </summary>
         public bool HandleUserInput { get; set; } = true;
 
+        public bool PlaySamplesOnHit { get; set; } = true;
+
         public override bool PropagatePositionalInputSubTree => HandleUserInput;
 
         public override bool PropagateNonPositionalInputSubTree => HandleUserInput;
@@ -492,7 +494,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
             // apply any custom state overrides
             ApplyCustomUpdateState?.Invoke(this, newState);
 
-            if (!force && newState == ArmedState.Hit)
+            if (PlaySamplesOnHit && !force && newState == ArmedState.Hit)
                 PlaySamples();
         }
 

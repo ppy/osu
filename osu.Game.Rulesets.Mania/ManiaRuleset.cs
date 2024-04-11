@@ -24,6 +24,7 @@ using osu.Game.Rulesets.Mania.Difficulty;
 using osu.Game.Rulesets.Mania.Edit;
 using osu.Game.Rulesets.Mania.Edit.Setup;
 using osu.Game.Rulesets.Mania.Mods;
+using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Replays;
 using osu.Game.Rulesets.Mania.Scoring;
 using osu.Game.Rulesets.Mania.Skinning.Argon;
@@ -283,6 +284,7 @@ namespace osu.Game.Rulesets.Mania
                     return new Mod[]
                     {
                         new MultiMod(new ManiaModAutoplay(), new ManiaModCinema()),
+                        new ModAutoHitsounds<ManiaHitObject>(),
                     };
 
                 case ModType.Fun:
