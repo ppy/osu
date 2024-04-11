@@ -117,9 +117,11 @@ namespace osu.Game.Rulesets.Difficulty
 
             foreach (var hitObject in getDifficultyHitObjects())
             {
+                // Add hitobjects between the original and progressive beatmap until the current hitobject's parent appears in the progressive beatmap.
+                // This covers cases where hitobjects aren't assigned "difficulty" representations because they don't meaningfully contribute to the calculations.
                 HitObject parent = hitObjectParentLinks[hitObject.BaseObject];
-                if (progressiveBeatmap.HitObjects.Count == 0 || parent != progressiveBeatmap.HitObjects[^1])
-                    progressiveBeatmap.HitObjects.Add(parent);
+                while (progressiveBeatmap.HitObjects.LastOrDefault() != parent)
+                    progressiveBeatmap.HitObjects.Add(Beatmap.HitObjects[progressiveBeatmap.HitObjects.Count]);
 
                 foreach (var skill in skills)
                 {
