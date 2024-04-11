@@ -28,9 +28,13 @@ namespace osu.Game.Tests.NonVisual
             {
                 HitObjects =
                 {
-                    new TestHitObject(),
-                    new TestHitObject { Nested = 1 },
-                    new TestHitObject(),
+                    new TestHitObject { StartTime = 1 },
+                    new TestHitObject
+                    {
+                        StartTime = 2,
+                        Nested = 1
+                    },
+                    new TestHitObject { StartTime = 3 },
                 }
             };
 
@@ -51,10 +55,18 @@ namespace osu.Game.Tests.NonVisual
                 HitObjects =
                 {
                     // The first object is usually skipped in all implementations
-                    new TestHitObject { Skip = true },
+                    new TestHitObject
+                    {
+                        StartTime = 1,
+                        Skip = true
+                    },
                     // An intermediate skipped object.
-                    new TestHitObject { Skip = true },
-                    new TestHitObject(),
+                    new TestHitObject
+                    {
+                        StartTime = 2,
+                        Skip = true
+                    },
+                    new TestHitObject { StartTime = 3 },
                 }
             };
 
@@ -71,7 +83,12 @@ namespace osu.Game.Tests.NonVisual
             {
                 HitObjects =
                 {
-                    new TestHitObject { Skip = true, Nested = 2 },
+                    new TestHitObject
+                    {
+                        StartTime = 1,
+                        Skip = true,
+                        Nested = 2
+                    },
                 }
             };
 
@@ -102,7 +119,7 @@ namespace osu.Game.Tests.NonVisual
             protected override void CreateNestedHitObjects(CancellationToken cancellationToken)
             {
                 for (int i = 0; i < Nested; i++)
-                    AddNested(new TestHitObject());
+                    AddNested(new TestHitObject { StartTime = StartTime + 0.1 * i });
             }
         }
 

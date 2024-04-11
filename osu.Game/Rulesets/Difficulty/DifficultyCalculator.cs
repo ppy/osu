@@ -108,20 +108,18 @@ namespace osu.Game.Rulesets.Difficulty
             var skills = CreateSkills(Beatmap, playableMods, clockRate);
             var progressiveBeatmap = new ProgressiveCalculationBeatmap(Beatmap);
 
-            // There is a one-to-many relationship between the hitobjects in the beatmap and the "difficulty hitobjects".
-            // Each iteration of the loop bellow will add at most one hitobject to the progressive beatmap,
-            // representing the most-parenting hitobject - the hitobject from the original beatmap.
-            Dictionary<HitObject, HitObject> hitObjectParentLinks =
-                createHitObjectParentLinks(Beatmap)
-                    .ToDictionary(k => k.obj, k => k.mostParentingObject);
-
             foreach (var hitObject in getDifficultyHitObjects())
             {
-                // Add hitobjects between the original and progressive beatmap until the current hitobject's parent appears in the progressive beatmap.
-                // This covers cases where hitobjects aren't assigned "difficulty" representations because they don't meaningfully contribute to the calculations.
-                HitObject parent = hitObjectParentLinks[hitObject.BaseObject];
-                while (progressiveBeatmap.HitObjects.LastOrDefault() != parent)
-                    progressiveBeatmap.HitObjects.Add(Beatmap.HitObjects[progressiveBeatmap.HitObjects.Count]);
+                // Implementations expect the progressive beatmap to only contain top-level objects from the original beatmap.
+                // At the same time, we also need to consider the possibility DHOs may not be generated for any given object,
+                // so we'll add all remaining objects up to the current point in time to the progressive beatmap.
+                for (int i = progressiveBeatmap.HitObjects.Count; i < Beatmap.HitObjects.Count; i++)
+                {
+                    if (Beatmap.HitObjects[i].StartTime > hitObject.BaseObject.StartTime)
+                        break;
+
+                    progressiveBeatmap.HitObjects.Add(Beatmap.HitObjects[i]);
+                }
 
                 foreach (var skill in skills)
                 {
@@ -133,23 +131,6 @@ namespace osu.Game.Rulesets.Difficulty
             }
 
             return attribs;
-
-            static IEnumerable<(HitObject obj, HitObject mostParentingObject)> createHitObjectParentLinks(IBeatmap beatmap)
-            {
-                foreach (var link in createNestedLinks(beatmap.HitObjects, null))
-                    yield return link;
-
-                static IEnumerable<(HitObject obj, HitObject mostParentingObject)> createNestedLinks(IReadOnlyList<HitObject> objects, [CanBeNull] HitObject parent)
-                {
-                    foreach (var o in objects)
-                    {
-                        yield return (o, parent ?? o);
-
-                        foreach (var n in createNestedLinks(o.NestedHitObjects, parent ?? o))
-                            yield return n;
-                    }
-                }
-            }
         }
 
         /// <summary>
