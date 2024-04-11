@@ -107,15 +107,16 @@ namespace osu.Game.Rulesets.Difficulty
 
             var skills = CreateSkills(Beatmap, playableMods, clockRate);
             var progressiveBeatmap = new ProgressiveCalculationBeatmap(Beatmap);
+            var difficultyObjects = getDifficultyHitObjects().ToArray();
 
-            foreach (var hitObject in getDifficultyHitObjects())
+            foreach (var obj in difficultyObjects)
             {
                 // Implementations expect the progressive beatmap to only contain top-level objects from the original beatmap.
                 // At the same time, we also need to consider the possibility DHOs may not be generated for any given object,
                 // so we'll add all remaining objects up to the current point in time to the progressive beatmap.
                 for (int i = progressiveBeatmap.HitObjects.Count; i < Beatmap.HitObjects.Count; i++)
                 {
-                    if (Beatmap.HitObjects[i].StartTime > hitObject.BaseObject.StartTime)
+                    if (obj != difficultyObjects[^1] && Beatmap.HitObjects[i].StartTime > obj.BaseObject.StartTime)
                         break;
 
                     progressiveBeatmap.HitObjects.Add(Beatmap.HitObjects[i]);
@@ -124,10 +125,10 @@ namespace osu.Game.Rulesets.Difficulty
                 foreach (var skill in skills)
                 {
                     cancellationToken.ThrowIfCancellationRequested();
-                    skill.Process(hitObject);
+                    skill.Process(obj);
                 }
 
-                attribs.Add(new TimedDifficultyAttributes(hitObject.EndTime * clockRate, CreateDifficultyAttributes(progressiveBeatmap, playableMods, skills, clockRate)));
+                attribs.Add(new TimedDifficultyAttributes(obj.EndTime * clockRate, CreateDifficultyAttributes(progressiveBeatmap, playableMods, skills, clockRate)));
             }
 
             return attribs;
