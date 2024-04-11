@@ -44,10 +44,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             countLargeTickMiss = score.Statistics.GetValueOrDefault(HitResult.LargeTickMiss);
             countSliderEndsDropped = score.Statistics.GetValueOrDefault(HitResult.SmallTickMiss);
             if (!score.Mods.Any(h => h is OsuModClassic cl && cl.NoSliderHeadAccuracy.Value))
-                effectiveMissCount = countMiss + countLargeTickMiss;
+                effectiveMissCount = countMiss + Math.Min(countLargeTickMiss, calculateEffectiveMissCount(osuAttributes) - countMiss); // Cap stuff like buzz-slider related drops to a sane value
             else
                 effectiveMissCount = calculateEffectiveMissCount(osuAttributes);
 
+            
             double multiplier = PERFORMANCE_BASE_MULTIPLIER;
 
             if (score.Mods.Any(m => m is OsuModNoFail))
