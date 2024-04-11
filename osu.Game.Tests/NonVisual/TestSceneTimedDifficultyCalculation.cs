@@ -99,6 +99,33 @@ namespace osu.Game.Tests.NonVisual
             assertEquals(attribs[1], beatmap.HitObjects[0]);
         }
 
+        [Test]
+        public void TestSkippedLastObjectAddedInLastIteration()
+        {
+            var beatmap = new Beatmap<TestHitObject>
+            {
+                HitObjects =
+                {
+                    new TestHitObject { StartTime = 1 },
+                    new TestHitObject
+                    {
+                        StartTime = 2,
+                        Skip = true
+                    },
+                    new TestHitObject
+                    {
+                        StartTime = 3,
+                        Skip = true
+                    },
+                }
+            };
+
+            List<TimedDifficultyAttributes> attribs = new TestDifficultyCalculator(new TestWorkingBeatmap(beatmap)).CalculateTimed();
+
+            Assert.That(attribs.Count, Is.EqualTo(1));
+            assertEquals(attribs[0], beatmap.HitObjects[0], beatmap.HitObjects[1], beatmap.HitObjects[2]);
+        }
+
         private void assertEquals(TimedDifficultyAttributes attribs, params HitObject[] expected)
         {
             Assert.That(((TestDifficultyAttributes)attribs.Attributes).Objects, Is.EquivalentTo(expected));
