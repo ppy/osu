@@ -64,7 +64,7 @@ namespace osu.Game.Utils
             localUser = user.GetBoundCopy();
             localUser.BindValueChanged(u =>
             {
-                SentrySdk.ConfigureScope(scope => scope.User = new User
+                SentrySdk.ConfigureScope(scope => scope.User = new SentryUser
                 {
                     Username = u.NewValue.Username,
                     Id = u.NewValue.Id.ToString(),
