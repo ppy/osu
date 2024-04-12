@@ -56,7 +56,7 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
         private void updateRelativeChildSize()
         {
             // If the track is not loaded, assign a default sane length otherwise relative positioning becomes meaningless.
-            var track = (LoggingTrack)beatmap.Value.Track;
+            var track = beatmap.Value.Track.GetUnderlyingTrack();
 
             double trackLength = track.IsLoaded ? track.Length : 60000;
             content.RelativeChildSize = new Vector2((float)Math.Max(1, trackLength), 1);

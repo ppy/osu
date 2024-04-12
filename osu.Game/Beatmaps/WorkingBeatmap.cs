@@ -123,7 +123,7 @@ namespace osu.Game.Beatmaps
 
             if (Track.RestartPoint == -1)
             {
-                if (!((LoggingTrack)Track).IsLoaded)
+                if (!Track.IsLoaded())
                 {
                     // force length to be populated (https://github.com/ppy/osu-framework/issues/4202)
                     Track.Seek(Track.CurrentTime);
@@ -356,6 +356,37 @@ namespace osu.Game.Beatmaps
         }
     }
 
+    /// <summary>
+    /// Temporary helper extension methods to aid in using <see cref="LoggingTrack"/> with minimal code damage.
+    /// </summary>
+    internal static class TrackExtensions
+    {
+        public static Track GetUnderlyingTrack(this ITrack track)
+        {
+            if (track is Track t)
+                return t;
+
+            if (track is LoggingTrack lt)
+                return lt.UnderlyingTrack;
+
+            return null;
+        }
+
+        public static bool IsLoaded(this ITrack track)
+        {
+            if (track is Track t)
+                return t.IsLoaded;
+
+            if (track is LoggingTrack lt)
+                return lt.UnderlyingTrack.IsLoaded;
+
+            return false;
+        }
+    }
+
+    /// <summary>
+    /// Temporary redirect class for logging purposes.
+    /// </summary>
     internal class LoggingTrack : ITrack, IDisposable
     {
         public readonly Track UnderlyingTrack;
