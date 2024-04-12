@@ -80,9 +80,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         public double CountDifficultStrains()
         {
             double consistentTopStrain = difficulty / 10; // What would the top strain be if all strain values were identical
-
-            // Apply a power to nerf diffspikes, but only apply that power if s / adjustedDifficulty is less than 1, to prevent buffing certain spiky maps
-            return objectStrains.Sum(s => s >= adjustedDifficulty ? s / adjustedDifficulty : Math.Pow(s / adjustedDifficulty, 8));
+            // Use a weighted sum of all strains. Constants are arbitrary and give nice values
+            return objectStrains.Sum(s => 1.3 / (1 + Math.Exp(-14.15 * (Math.Pow(s / consistentTopStrain, 2) - 0.945))));
         }
     }
 }
