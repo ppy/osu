@@ -192,7 +192,7 @@ namespace osu.Game.Screens.Edit.Timing
         private void regenerateDisplay(bool animated)
         {
             // Before a track is loaded, it won't have a valid length, which will break things.
-            if (beatmap.Value.Track.IsLoaded())
+            if (!beatmap.Value.Track.IsLoaded())
             {
                 Scheduler.AddOnce(regenerateDisplay, animated);
                 return;
