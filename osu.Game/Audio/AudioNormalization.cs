@@ -54,6 +54,12 @@ namespace osu.Game.Audio
             IntegratedLoudness = integratedLoudness;
         }
 
+        /// <summary>
+        /// Populate the audio normalization for all beatmaps in a set.
+        /// Essentially, this takes a beatmap and applies the same normalization to all beatmaps in the set that have the same audio file to avoid having to calculate the loudness for an audio file multiple times
+        /// </summary>
+        /// <param name="beatmapInfo">The BeatmapInfo to clone from</param>
+        /// <param name="beatmapSetInfo">The BeatmapSetInfo to populate</param>
         public void PopulateSet(BeatmapInfo beatmapInfo, BeatmapSetInfo? beatmapSetInfo)
         {
             if (beatmapSetInfo == null) return;
@@ -73,8 +79,8 @@ namespace osu.Game.Audio
         /// <summary>
         /// Convert integrated loudness to a volume offset
         /// </summary>
-        /// <param name="integratedLoudness"></param>
-        /// <returns></returns>
+        /// <param name="integratedLoudness">The integrated loudness value</param>
+        /// <returns>The volume offset needed to reach the target level</returns>
         public static float IntegratedLoudnessToVolumeOffset(float integratedLoudness) => (float)Math.Pow(10, (TARGET_LEVEL - integratedLoudness) / 20);
 
         /// <summary>
