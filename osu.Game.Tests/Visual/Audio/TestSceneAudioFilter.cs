@@ -7,13 +7,13 @@ using ManagedBass.Fx;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
-using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Testing;
 using osu.Game.Audio.Effects;
+using osu.Game.Beatmaps;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 
@@ -27,7 +27,7 @@ namespace osu.Game.Tests.Visual.Audio
         private OsuSpriteText highPassText;
         private AudioFilter highPassFilter;
 
-        private Track track;
+        private LoggingTrack track;
 
         private WaveformTestBeatmap beatmap;
 
@@ -38,7 +38,7 @@ namespace osu.Game.Tests.Visual.Audio
         private void load(AudioManager audio)
         {
             beatmap = new WaveformTestBeatmap(audio);
-            track = beatmap.LoadTrack();
+            track = (LoggingTrack)beatmap.LoadTrack();
 
             Add(new FillFlowContainer
             {

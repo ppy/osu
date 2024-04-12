@@ -13,7 +13,9 @@ using System.Threading.Tasks;
 using JetBrains.Annotations;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions;
+using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Logging;
 using osu.Game.Rulesets;
@@ -45,7 +47,7 @@ namespace osu.Game.Beatmaps
         private readonly Lazy<Storyboard> storyboard;
         private readonly Lazy<ISkin> skin;
 
-        private Track track; // track is not Lazy as we allow transferring and loading multiple times.
+        private ITrack track; // track is not Lazy as we allow transferring and loading multiple times.
         private Waveform waveform; // waveform is also not Lazy as the track may change.
 
         protected WorkingBeatmap(BeatmapInfo beatmapInfo, AudioManager audioManager)
@@ -103,9 +105,9 @@ namespace osu.Game.Beatmaps
 
         public virtual bool TrackLoaded => track != null;
 
-        public Track LoadTrack()
+        public ITrack LoadTrack()
         {
-            track = GetBeatmapTrack() ?? GetVirtualTrack(1000);
+            track = new LoggingTrack(GetBeatmapTrack() ?? GetVirtualTrack(1000));
 
             // the track may have changed, recycle the current waveform.
             waveform?.Dispose();
@@ -121,7 +123,7 @@ namespace osu.Game.Beatmaps
 
             if (Track.RestartPoint == -1)
             {
-                if (!Track.IsLoaded)
+                if (!((LoggingTrack)Track).IsLoaded)
                 {
                     // force length to be populated (https://github.com/ppy/osu-framework/issues/4202)
                     Track.Seek(Track.CurrentTime);
@@ -153,7 +155,7 @@ namespace osu.Game.Beatmaps
         /// This generally happens via MusicController when changing the global beatmap.
         /// </summary>
         [NotNull]
-        public Track Track
+        public ITrack Track
         {
             get
             {
@@ -351,6 +353,157 @@ namespace osu.Game.Beatmaps
                 : base($"Timed out while loading beatmap ({beatmapInfo}).")
             {
             }
+        }
+    }
+
+    internal class LoggingTrack : ITrack, IDisposable
+    {
+        public readonly Track UnderlyingTrack;
+
+        public LoggingTrack(Track underlyingTrack)
+        {
+            UnderlyingTrack = underlyingTrack;
+        }
+
+        public double CurrentTime => UnderlyingTrack.CurrentTime;
+
+        public void Reset()
+        {
+            UnderlyingTrack.Reset();
+        }
+
+        public void Start()
+        {
+            UnderlyingTrack.Start();
+        }
+
+        public void Stop()
+        {
+            UnderlyingTrack.Stop();
+        }
+
+        public bool Seek(double position)
+        {
+            Logger.Log($"{nameof(Seek)} on {UnderlyingTrack.GetType().ReadableName()} from {UnderlyingTrack.CurrentTime:N2} to {position:N2}");
+            return UnderlyingTrack.Seek(position);
+        }
+
+        public void ResetSpeedAdjustments()
+        {
+            UnderlyingTrack.ResetSpeedAdjustments();
+        }
+
+        public double Rate
+        {
+            get => UnderlyingTrack.Rate;
+            set => UnderlyingTrack.Rate = value;
+        }
+
+        public bool IsRunning => UnderlyingTrack.IsRunning;
+
+        public ChannelAmplitudes CurrentAmplitudes => UnderlyingTrack.CurrentAmplitudes;
+
+        public IBindable<double> AggregateVolume => UnderlyingTrack.AggregateVolume;
+
+        IBindable<double> IAggregateAudioAdjustment.AggregateVolume => UnderlyingTrack.AggregateVolume;
+
+        public IBindable<double> AggregateBalance => UnderlyingTrack.AggregateBalance;
+
+        public IBindable<double> AggregateFrequency => UnderlyingTrack.AggregateFrequency;
+
+        public IBindable<double> AggregateTempo => UnderlyingTrack.AggregateTempo;
+
+        public void BindAdjustments(IAggregateAudioAdjustment component)
+        {
+            UnderlyingTrack.BindAdjustments(component);
+        }
+
+        public void UnbindAdjustments(IAggregateAudioAdjustment component)
+        {
+            UnderlyingTrack.UnbindAdjustments(component);
+        }
+
+        void IAdjustableAudioComponent.AddAdjustment(AdjustableProperty type, IBindable<double> adjustBindable)
+        {
+            UnderlyingTrack.AddAdjustment(type, adjustBindable);
+        }
+
+        void IAdjustableAudioComponent.RemoveAdjustment(AdjustableProperty type, IBindable<double> adjustBindable)
+        {
+            UnderlyingTrack.RemoveAdjustment(type, adjustBindable);
+        }
+
+        public void AddAdjustment(AdjustableProperty type, IBindable<double> adjustBindable)
+        {
+            UnderlyingTrack.AddAdjustment(type, adjustBindable);
+        }
+
+        public void RemoveAdjustment(AdjustableProperty type, IBindable<double> adjustBindable)
+        {
+            UnderlyingTrack.RemoveAdjustment(type, adjustBindable);
+        }
+
+        public void RemoveAllAdjustments(AdjustableProperty type)
+        {
+            UnderlyingTrack.RemoveAllAdjustments(type);
+        }
+
+        public BindableNumber<double> Volume => UnderlyingTrack.Volume;
+
+        public BindableNumber<double> Balance => UnderlyingTrack.Balance;
+
+        public BindableNumber<double> Frequency => UnderlyingTrack.Frequency;
+
+        public BindableNumber<double> Tempo => UnderlyingTrack.Tempo;
+
+        public void Restart()
+        {
+            UnderlyingTrack.Restart();
+        }
+
+        public bool Looping
+        {
+            get => UnderlyingTrack.Looping;
+            set => UnderlyingTrack.Looping = value;
+        }
+
+        public bool IsDummyDevice => UnderlyingTrack.IsDummyDevice;
+
+        public double RestartPoint
+        {
+            get => UnderlyingTrack.RestartPoint;
+            set => UnderlyingTrack.RestartPoint = value;
+        }
+
+        public double Length
+        {
+            get => UnderlyingTrack.Length;
+            set => UnderlyingTrack.Length = value;
+        }
+
+        public int? Bitrate => UnderlyingTrack.Bitrate;
+
+        public bool IsReversed => UnderlyingTrack.IsReversed;
+
+        public bool HasCompleted => UnderlyingTrack.HasCompleted;
+
+        public bool IsLoaded => UnderlyingTrack.IsLoaded;
+
+        public event Action Completed
+        {
+            add => UnderlyingTrack.Completed += value;
+            remove => UnderlyingTrack.Completed -= value;
+        }
+
+        public event Action Failed
+        {
+            add => UnderlyingTrack.Failed += value;
+            remove => UnderlyingTrack.Failed -= value;
+        }
+
+        public void Dispose()
+        {
+            UnderlyingTrack.Dispose();
         }
     }
 }

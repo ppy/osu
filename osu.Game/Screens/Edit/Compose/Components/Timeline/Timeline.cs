@@ -91,7 +91,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         private double trackLengthForZoom;
 
-        private readonly IBindable<Track> track = new Bindable<Track>();
+        private readonly IBindable<ITrack> track = new Bindable<ITrack>();
 
         [BackgroundDependencyLoader]
         private void load(IBindable<WorkingBeatmap> beatmap, OsuColour colours, OsuConfigManager config)

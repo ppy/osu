@@ -99,7 +99,7 @@ namespace osu.Game.Tests.Visual.Editing
             AddUntilStep("wait for timeline load", () => Editor.ChildrenOfType<Timeline>().FirstOrDefault()?.IsLoaded == true);
 
             AddStep("enter setup mode", () => InputManager.Key(Key.F4));
-            AddAssert("track is virtual", () => Beatmap.Value.Track is TrackVirtual);
+            AddAssert("track is virtual", () => ((LoggingTrack)Beatmap.Value.Track).UnderlyingTrack is TrackVirtual);
             AddAssert("switch track to real track", () =>
             {
                 var setup = Editor.ChildrenOfType<SetupScreen>().First();

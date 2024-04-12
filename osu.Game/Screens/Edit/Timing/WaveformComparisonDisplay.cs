@@ -192,7 +192,7 @@ namespace osu.Game.Screens.Edit.Timing
         private void regenerateDisplay(bool animated)
         {
             // Before a track is loaded, it won't have a valid length, which will break things.
-            if (!beatmap.Value.Track.IsLoaded)
+            if (!((LoggingTrack)beatmap.Value.Track).IsLoaded)
             {
                 Scheduler.AddOnce(regenerateDisplay, animated);
                 return;
@@ -305,7 +305,7 @@ namespace osu.Game.Screens.Edit.Timing
             [Resolved]
             private IBindable<WorkingBeatmap> beatmap { get; set; } = null!;
 
-            private readonly IBindable<Track> track = new Bindable<Track>();
+            private readonly IBindable<ITrack> track = new Bindable<ITrack>();
 
             public WaveformRow(bool isMainRow)
             {
