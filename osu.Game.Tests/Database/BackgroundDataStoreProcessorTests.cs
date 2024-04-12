@@ -238,7 +238,36 @@ namespace osu.Game.Tests.Database
             AddUntilStep("Three scores updated", () => Realm.Run(r => r.All<ScoreInfo>().Count(score => score.TotalScore == 1_000_000)), () => Is.EqualTo(3));
             AddUntilStep("osu! score preserved", () => Realm.Run(r => r.All<ScoreInfo>().Count(score => score.TotalScore == 960_000)), () => Is.EqualTo(1));
             AddAssert("No fails", () => Realm.Run(r => r.All<ScoreInfo>().Count(score => score.BackgroundReprocessingFailed)), () => Is.Zero);
-            AddAssert("All score versions upgraded", () => Realm.Run(r => r.All<ScoreInfo>().Count(score => score.TotalScoreVersion >= 30000017)), () => Is.EqualTo(4));
+            AddUntilStep("Score versions upgraded", () => Realm.Run(r => r.All<ScoreInfo>().Count(score => score.TotalScoreVersion >= 30000017)), () => Is.EqualTo(3));
+        }
+
+        [Test]
+        public void TestMultipleMigrationsAtOnce()
+        {
+            Guid scoreId = Guid.Empty;
+
+            AddStep("Add score", () =>
+            {
+                Realm.Write(r =>
+                {
+                    var added = r.Add(new ScoreInfo(ruleset: r.Find<RulesetInfo>("taiko"), beatmap: r.All<BeatmapInfo>().First())
+                    {
+                        TotalScoreVersion = 30000010,
+                        TotalScore = 960_000,
+                        Accuracy = 0.91,
+                        Rank = ScoreRank.B,
+                        APIMods = [new APIMod { Acronym = "CL" }]
+                    });
+                    scoreId = added.ID;
+                });
+            });
+
+            AddStep("Run background processor", () => Add(new TestBackgroundDataStoreProcessor()));
+
+            AddUntilStep("Score total updated", () => Realm.Run(r => r.Find<ScoreInfo>(scoreId))!.TotalScore, () => Is.EqualTo(1_000_000));
+            AddUntilStep("Score total updated", () => Realm.Run(r => r.Find<ScoreInfo>(scoreId))!.Rank, () => Is.EqualTo(ScoreRank.A));
+            AddAssert("Upgrade did not fail", () => Realm.Run(r => r.Find<ScoreInfo>(scoreId))!.BackgroundReprocessingFailed, () => Is.False);
+            AddUntilStep("All score versions upgraded", () => Realm.Run(r => r.Find<ScoreInfo>(scoreId))!.TotalScoreVersion, () => Is.GreaterThanOrEqualTo(30000017));
         }
 
         public partial class TestBackgroundDataStoreProcessor : BackgroundDataStoreProcessor
