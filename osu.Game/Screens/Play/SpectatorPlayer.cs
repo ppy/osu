@@ -12,7 +12,6 @@ using osu.Game.Online.Spectator;
 using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.Replays.Types;
 using osu.Game.Scoring;
-using osu.Game.Screens.Ranking;
 
 namespace osu.Game.Screens.Play
 {
@@ -111,9 +110,6 @@ namespace osu.Game.Screens.Play
         }
 
         protected override Score CreateScore(IBeatmap beatmap) => score;
-
-        protected override ResultsScreen CreateResults(ScoreInfo score)
-            => new SpectatorResultsScreen(score);
 
         protected override void PrepareReplay()
         {

@@ -12,7 +12,9 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Localisation;
 using osu.Game.Online.API;
+using osu.Game.Online.Placeholders;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets;
 using osu.Game.Scoring;
@@ -24,6 +26,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
     {
         private readonly long roomId;
         private readonly PlaylistItem playlistItem;
+        private bool lastFetchCompleted;
 
         protected LoadingSpinner LeftSpinner { get; private set; }
         protected LoadingSpinner CentreSpinner { get; private set; }
@@ -77,7 +80,50 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             });
         }
 
-        protected override APIRequest FetchScores(Action<IEnumerable<ScoreInfo>> scoresCallback)
+        protected override void PopulateScorePanelList()
+        {
+            var req = FetchScores(fetchScoresCallback);
+
+            if (req != null)
+                api.Queue(req);
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            if (lastFetchCompleted)
+            {
+                APIRequest nextPageRequest = null;
+
+                if (ScorePanelList.IsScrolledToStart)
+                    nextPageRequest = FetchNextPage(-1, fetchScoresCallback);
+                else if (ScorePanelList.IsScrolledToEnd)
+                    nextPageRequest = FetchNextPage(1, fetchScoresCallback);
+
+                if (nextPageRequest != null)
+                {
+                    lastFetchCompleted = false;
+                    api.Queue(nextPageRequest);
+                }
+            }
+        }
+
+        private void fetchScoresCallback(IEnumerable<ScoreInfo> scores) => Schedule(() =>
+        {
+            foreach (var s in scores)
+                AddScore(s);
+
+            lastFetchCompleted = true;
+
+            if (ScorePanelList.IsEmpty)
+            {
+                // This can happen if for example a beatmap that is part of a playlist hasn't been played yet.
+                VerticalScrollContent.Add(new MessagePlaceholder(LeaderboardStrings.NoRecordsYet));
+            }
+        });
+
+        protected APIRequest FetchScores(Action<IEnumerable<ScoreInfo>> scoresCallback)
         {
             // This performs two requests:
             // 1. A request to show the user's score (and scores around).
@@ -123,7 +169,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             return userScoreReq;
         }
 
-        protected override APIRequest FetchNextPage(int direction, Action<IEnumerable<ScoreInfo>> scoresCallback)
+        protected APIRequest FetchNextPage(int direction, Action<IEnumerable<ScoreInfo>> scoresCallback)
         {
             Debug.Assert(direction == 1 || direction == -1);
 

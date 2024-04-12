@@ -6,7 +6,9 @@ using osu.Framework.Allocation;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Overlays;
+using osu.Game.Scoring;
 using osu.Game.Screens.Play;
+using osu.Game.Screens.Ranking;
 using osu.Game.Users;
 
 namespace osu.Game.Screens.Edit.GameplayTest
@@ -80,5 +82,11 @@ namespace osu.Game.Screens.Edit.GameplayTest
             editor.RestoreState(editorState);
             return base.OnExiting(e);
         }
+
+        protected override ResultsScreen CreateResults(ScoreInfo score) => new SoloResultsScreen(score)
+        {
+            AllowRetry = true,
+            ShowUserStatistics = true,
+        };
     }
 }

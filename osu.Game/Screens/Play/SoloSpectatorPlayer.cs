@@ -6,6 +6,7 @@ using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Screens;
 using osu.Game.Online.Spectator;
 using osu.Game.Scoring;
+using osu.Game.Screens.Ranking;
 using osu.Game.Users;
 
 namespace osu.Game.Screens.Play
@@ -52,5 +53,8 @@ namespace osu.Game.Screens.Play
             if (SpectatorClient.IsNotNull())
                 SpectatorClient.OnUserBeganPlaying -= userBeganPlaying;
         }
+
+        protected override ResultsScreen CreateResults(ScoreInfo score)
+            => new SpectatorResultsScreen(score);
     }
 }
