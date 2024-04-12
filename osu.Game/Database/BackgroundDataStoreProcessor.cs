@@ -72,9 +72,16 @@ namespace osu.Game.Database
                 // Note that the previous method will also update these on a fresh run.
                 processBeatmapsWithMissingObjectCounts();
                 processScoresWithMissingStatistics();
+
                 convertLegacyTotalScoreToStandardised();
-                upgradeScoreRanks();
-                upgradeModMultipliers();
+
+                var upgradedScoreIds = new HashSet<Guid>();
+
+                upgradedScoreIds.UnionWith(upgradeScoreRanks());
+                upgradedScoreIds.UnionWith(upgradeModMultipliers());
+
+                if (upgradedScoreIds.Any())
+                    bumpScoreVersions();
             }, TaskCreationOptions.LongRunning).ContinueWith(t =>
             {
                 if (t.Exception?.InnerException is ObjectDisposedException)
@@ -357,6 +364,9 @@ namespace osu.Game.Database
                     {
                         ScoreInfo s = r.Find<ScoreInfo>(id)!;
                         StandardisedScoreMigrationTools.UpdateFromLegacy(s, beatmapManager.GetWorkingBeatmap(s.BeatmapInfo));
+                        // this intentionally sets the latest version here, rather than go through the `bumpScoreVersion()` flow.
+                        // the reason is that `UpdateFromLegacy()` always recalculates both total score and score rank using latest lazer logic,
+                        // so those migrations would be redundant or even straight-up wrong if applied on top of this one.
                         s.TotalScoreVersion = LegacyScoreEncoder.LATEST_VERSION;
                     });
 
@@ -377,7 +387,7 @@ namespace osu.Game.Database
             completeNotification(notification, processedCount, scoreIds.Count, failedCount);
         }
 
-        private void upgradeScoreRanks()
+        private HashSet<Guid> upgradeScoreRanks()
         {
             Logger.Log("Querying for scores that need rank upgrades...");
 
@@ -393,7 +403,7 @@ namespace osu.Game.Database
             Logger.Log($"Found {scoreIds.Count} scores which require rank upgrades.");
 
             if (scoreIds.Count == 0)
-                return;
+                return scoreIds;
 
             var notification = showProgressNotification(scoreIds.Count, "Adjusting ranks of scores", "scores now have more correct ranks");
 
@@ -417,7 +427,6 @@ namespace osu.Game.Database
                     {
                         ScoreInfo s = r.Find<ScoreInfo>(id)!;
                         s.Rank = StandardisedScoreMigrationTools.ComputeRank(s);
-                        s.TotalScoreVersion = LegacyScoreEncoder.LATEST_VERSION;
                     });
 
                     ++processedCount;
@@ -435,6 +444,7 @@ namespace osu.Game.Database
             }
 
             completeNotification(notification, processedCount, scoreIds.Count, failedCount);
+            return scoreIds;
         }
 
         private record ModMultiplierChange(
@@ -451,9 +461,10 @@ namespace osu.Game.Database
             new ModMultiplierChange("CL", "mania", 0.96, 1, 30000017),
         ];
 
-        private void upgradeModMultipliers()
+        private HashSet<Guid> upgradeModMultipliers()
         {
             Logger.Log("Performing mod multiplier upgrades...");
+            var upgradedScoreIds = new HashSet<Guid>();
 
             int latestMultiplierChange = mod_multiplier_changes.Max(change => change.ScoreVersion);
 
@@ -467,7 +478,7 @@ namespace osu.Game.Database
                          .ToList();
 
             if (scores.Count == 0)
-                return;
+                return upgradedScoreIds;
 
             var notification = showProgressNotification(scores.Count, "Adjusting mod multipliers for scores", "scores now use latest mod multipliers");
 
@@ -501,13 +512,15 @@ namespace osu.Game.Database
                         newTotalScore *= multiplierChange.NewMultiplier;
                     }
 
-                    realmAccess.Write(r =>
+                    if (newTotalScore != null)
                     {
-                        var refetched = r.Find<ScoreInfo>(score.ID)!;
-                        if (newTotalScore != null)
+                        realmAccess.Write(r =>
+                        {
+                            var refetched = r.Find<ScoreInfo>(score.ID)!;
                             refetched.TotalScore = (long)newTotalScore.Value;
-                        refetched.TotalScoreVersion = LegacyScoreEncoder.LATEST_VERSION;
-                    });
+                        });
+                        upgradedScoreIds.Add(score.ID);
+                    }
 
                     ++processedCount;
                 }
@@ -524,6 +537,51 @@ namespace osu.Game.Database
             }
 
             completeNotification(notification, processedCount, scores.Count, failedCount);
+            return upgradedScoreIds;
+        }
+
+        private void bumpScoreVersions()
+        {
+            HashSet<Guid> scoreIds = realmAccess.Run(r => new HashSet<Guid>(
+                r.All<ScoreInfo>()
+                 .Where(s => s.TotalScoreVersion < LegacyScoreEncoder.LATEST_VERSION)
+                 .AsEnumerable()
+                 // must be done after materialisation, as realm doesn't support
+                 // filtering on nested property predicates or projection via `.Select()`
+                 .Where(s => s.Ruleset.IsLegacyRuleset())
+                 .Select(s => s.ID)));
+
+            if (!scoreIds.Any())
+                return;
+
+            Logger.Log($"Updating score version for {scoreIds.Count} scores...");
+
+            foreach (var id in scoreIds)
+            {
+                sleepIfRequired();
+
+                try
+                {
+                    // Can't use async overload because we're not on the update thread.
+                    // ReSharper disable once MethodHasAsyncOverload
+                    realmAccess.Write(r =>
+                    {
+                        ScoreInfo s = r.Find<ScoreInfo>(id)!;
+                        s.TotalScoreVersion = LegacyScoreEncoder.LATEST_VERSION;
+                    });
+                }
+                catch (ObjectDisposedException)
+                {
+                    throw;
+                }
+                catch (Exception e)
+                {
+                    Logger.Log($"Failed to bump score version {id}: {e}");
+                    realmAccess.Write(r => r.Find<ScoreInfo>(id)!.BackgroundReprocessingFailed = true);
+                }
+            }
+
+            Logger.Log("Finished updating score versions.");
         }
 
         private void updateNotificationProgress(ProgressNotification? notification, int processedCount, int totalCount)
