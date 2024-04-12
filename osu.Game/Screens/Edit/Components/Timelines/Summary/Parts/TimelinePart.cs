@@ -26,7 +26,7 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
         [Resolved]
         protected EditorBeatmap EditorBeatmap { get; private set; } = null!;
 
-        protected readonly IBindable<Track> Track = new Bindable<Track>();
+        protected readonly IBindable<ITrack> Track = new Bindable<ITrack>();
 
         private readonly Container<T> content;
 
@@ -56,11 +56,13 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
         private void updateRelativeChildSize()
         {
             // If the track is not loaded, assign a default sane length otherwise relative positioning becomes meaningless.
-            double trackLength = beatmap.Value.Track.IsLoaded ? beatmap.Value.Track.Length : 60000;
+            var track = beatmap.Value.Track.GetUnderlyingTrack();
+
+            double trackLength = track.IsLoaded ? track.Length : 60000;
             content.RelativeChildSize = new Vector2((float)Math.Max(1, trackLength), 1);
 
             // The track may not be loaded completely (only has a length once it is).
-            if (!beatmap.Value.Track.IsLoaded)
+            if (!track.IsLoaded)
                 Schedule(updateRelativeChildSize);
         }
 

@@ -18,7 +18,7 @@ namespace osu.Game.Screens.Edit.Components
 
         protected readonly IBindable<WorkingBeatmap> Beatmap = new Bindable<WorkingBeatmap>();
 
-        protected readonly IBindable<Track> Track = new Bindable<Track>();
+        protected readonly IBindable<ITrack> Track = new Bindable<ITrack>();
 
         protected readonly Drawable Background;
         private readonly Container content;

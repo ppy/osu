@@ -42,7 +42,7 @@ namespace osu.Game.Screens.Play
 
         private Box redFlashLayer = null!;
 
-        private Track track = null!;
+        private ITrack track = null!;
 
         private AudioFilter failLowPassFilter = null!;
         private AudioFilter failHighPassFilter = null!;

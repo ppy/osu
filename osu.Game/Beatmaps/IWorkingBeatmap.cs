@@ -72,7 +72,7 @@ namespace osu.Game.Beatmaps
         /// <summary>
         /// Retrieves the <see cref="Track"/> which this <see cref="IWorkingBeatmap"/> has loaded.
         /// </summary>
-        Track Track { get; }
+        ITrack Track { get; }
 
         /// <summary>
         /// Constructs a playable <see cref="IBeatmap"/> from <see cref="Beatmap"/> using the applicable converters for a specific <see cref="RulesetInfo"/>.
@@ -118,7 +118,7 @@ namespace osu.Game.Beatmaps
         /// outside of the game context.
         /// </remarks>
         /// <returns>A fresh track instance, which will also be available via <see cref="Track"/>.</returns>
-        Track LoadTrack();
+        ITrack LoadTrack();
 
         /// <summary>
         /// Returns the stream of the file from the given storage path.

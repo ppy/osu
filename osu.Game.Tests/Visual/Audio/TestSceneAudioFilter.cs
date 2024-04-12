@@ -14,6 +14,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Testing;
 using osu.Game.Audio.Effects;
+using osu.Game.Beatmaps;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 
@@ -38,7 +39,7 @@ namespace osu.Game.Tests.Visual.Audio
         private void load(AudioManager audio)
         {
             beatmap = new WaveformTestBeatmap(audio);
-            track = beatmap.LoadTrack();
+            track = beatmap.LoadTrack().GetUnderlyingTrack();
 
             Add(new FillFlowContainer
             {

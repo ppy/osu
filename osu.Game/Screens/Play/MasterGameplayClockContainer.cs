@@ -55,7 +55,7 @@ namespace osu.Game.Screens.Play
 
         private readonly WorkingBeatmap beatmap;
 
-        private Track track;
+        private ITrack track;
 
         private readonly double skipTargetTime;
 

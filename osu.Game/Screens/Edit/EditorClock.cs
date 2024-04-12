@@ -23,11 +23,11 @@ namespace osu.Game.Screens.Edit
     /// </summary>
     public partial class EditorClock : CompositeComponent, IFrameBasedClock, IAdjustableClock, ISourceChangeableClock
     {
-        public IBindable<Track> Track => track;
+        public IBindable<ITrack> Track => track;
 
-        private readonly Bindable<Track> track = new Bindable<Track>();
+        private readonly Bindable<ITrack> track = new Bindable<ITrack>();
 
-        public double TrackLength => track.Value?.IsLoaded == true ? track.Value.Length : 60000;
+        public double TrackLength => track.Value?.IsLoaded() == true ? track.Value.Length : 60000;
 
         public ControlPointInfo ControlPointInfo => Beatmap.ControlPointInfo;
 
@@ -231,7 +231,7 @@ namespace osu.Game.Screens.Edit
 
         public void ChangeSource(IClock source)
         {
-            track.Value = source as Track;
+            track.Value = source as ITrack;
             underlyingClock.ChangeSource(source);
         }
 

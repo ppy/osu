@@ -121,7 +121,7 @@ namespace osu.Game.Tests.Visual.Editing
             {
                 base.Update();
 
-                if (beatmap.Value.Track.IsLoaded)
+                if (beatmap.Value.Track.IsLoaded())
                     marker.X = (float)(editorClock.CurrentTime / beatmap.Value.Track.Length);
             }
         }

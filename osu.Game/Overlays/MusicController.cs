@@ -361,7 +361,7 @@ namespace osu.Game.Overlays
         {
             // Important to keep this in its own method to avoid inadvertently capturing unnecessary variables in the callback.
             // Can lead to leaks.
-            var queuedTrack = new DrawableTrack(current.LoadTrack());
+            var queuedTrack = new DrawableTrack(current.LoadTrack().GetUnderlyingTrack());
             queuedTrack.Completed += onTrackCompleted;
             return queuedTrack;
         }
