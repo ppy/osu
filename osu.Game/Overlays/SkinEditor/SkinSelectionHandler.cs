@@ -204,15 +204,20 @@ namespace osu.Game.Overlays.SkinEditor
 
                 drawable.Position += drawable.ScreenSpaceDeltaToParentSpace(moveEvent.ScreenSpaceDelta);
 
-                if (item.UsesFixedAnchor) continue;
-
-                ApplyClosestAnchor(drawable);
+                if (!item.UsesFixedAnchor)
+                    ApplyClosestAnchorOrigin(drawable);
             }
 
             return true;
         }
 
-        public static void ApplyClosestAnchor(Drawable drawable) => applyAnchor(drawable, getClosestAnchor(drawable));
+        public static void ApplyClosestAnchorOrigin(Drawable drawable)
+        {
+            var closest = getClosestAnchor(drawable);
+
+            applyAnchor(drawable, closest);
+            applyOrigin(drawable, closest);
+        }
 
         protected override void OnSelectionChanged()
         {
@@ -325,15 +330,10 @@ namespace osu.Game.Overlays.SkinEditor
             {
                 var drawable = (Drawable)item;
 
-                if (origin == drawable.Origin) continue;
+                applyOrigin(drawable, origin);
 
-                var previousOrigin = drawable.OriginPosition;
-                drawable.Origin = origin;
-                drawable.Position += drawable.OriginPosition - previousOrigin;
-
-                if (item.UsesFixedAnchor) continue;
-
-                ApplyClosestAnchor(drawable);
+                if (item.UsesFixedAnchor)
+                    ApplyClosestAnchorOrigin(drawable);
             }
 
             OnOperationEnded();
@@ -368,7 +368,7 @@ namespace osu.Game.Overlays.SkinEditor
             foreach (var item in SelectedItems)
             {
                 item.UsesFixedAnchor = false;
-                ApplyClosestAnchor((Drawable)item);
+                ApplyClosestAnchorOrigin((Drawable)item);
             }
 
             OnOperationEnded();
@@ -412,6 +412,15 @@ namespace osu.Game.Overlays.SkinEditor
             var previousAnchor = drawable.AnchorPosition;
             drawable.Anchor = anchor;
             drawable.Position -= drawable.AnchorPosition - previousAnchor;
+        }
+
+        private static void applyOrigin(Drawable drawable, Anchor origin)
+        {
+            if (origin == drawable.Origin) return;
+
+            var previousOrigin = drawable.OriginPosition;
+            drawable.Origin = origin;
+            drawable.Position += drawable.OriginPosition - previousOrigin;
         }
 
         private static void adjustScaleFromAnchor(ref Vector2 scale, Anchor reference)
