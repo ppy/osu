@@ -118,8 +118,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             }
             else if (score.Mods.Any(h => h is OsuModTraceable))
             {
-                // Default 2% increase and another is scaled by AR
-                aimValue *= 1.02 + 0.02 * (12.0 - attributes.ApproachRate);
+                // The same as HD, placeholder bonus
+                aimValue *= 1.0 + 0.04 * (12.0 - attributes.ApproachRate);
             }
 
             // We assume 15% of sliders in a map are difficult since there's no way to tell from the performance calculator.
@@ -174,8 +174,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             }
             else if (score.Mods.Any(h => h is OsuModTraceable))
             {
-                // More reward for speed because speed on Traceable is annoying
-                speedValue *= 1.04 + 0.06 * (12.0 - attributes.ApproachRate);
+                // The same as HD, placeholder bonus
+                speedValue *= 1.0 + 0.04 * (12.0 - attributes.ApproachRate);
             }
 
             // Calculate accuracy assuming the worst case scenario
@@ -225,7 +225,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             else if (score.Mods.Any(m => m is OsuModHidden))
                 accuracyValue *= 1.08;
             else if (score.Mods.Any(m => m is OsuModTraceable))
-                accuracyValue *= 1.02 + 0.01 * (12.0 - attributes.ApproachRate);
+                accuracyValue *= 1.08;
 
             if (score.Mods.Any(m => m is OsuModFlashlight))
                 accuracyValue *= 1.02;
