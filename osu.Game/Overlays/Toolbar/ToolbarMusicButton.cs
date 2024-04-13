@@ -21,7 +21,7 @@ namespace osu.Game.Overlays.Toolbar
 {
     public partial class ToolbarMusicButton : ToolbarOverlayToggleButton
     {
-        private Circle volumeBar;
+        private Box volumeBar;
 
         protected override Anchor TooltipAnchor => Anchor.TopRight;
 
@@ -45,14 +45,15 @@ namespace osu.Game.Overlays.Toolbar
                 Height = IconContainer.Height,
                 Margin = new MarginPadding { Horizontal = 2.5f },
                 Masking = true,
-                Children = new[]
+                CornerRadius = 3f,
+                Children = new Drawable[]
                 {
                     new Circle
                     {
                         RelativeSizeAxes = Axes.Both,
                         Colour = Color4.White.Opacity(0.25f),
                     },
-                    volumeBar = new Circle
+                    volumeBar = new Box
                     {
                         RelativeSizeAxes = Axes.Both,
                         Height = 0f,
