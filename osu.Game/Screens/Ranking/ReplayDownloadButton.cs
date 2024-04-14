@@ -147,7 +147,9 @@ namespace osu.Game.Screens.Ranking
         {
             if (state.NewValue != DownloadState.LocallyAvailable) return;
 
-            scoreManager.Export(Score.Value);
+            ScoreInfo? databasedScoreInfo = scoreManager.GetDatabasedScoreInfo(Score.Value);
+
+            if (databasedScoreInfo != null) scoreManager.Export(databasedScoreInfo);
 
             State.ValueChanged -= exportWhenReady;
         }

@@ -8,8 +8,8 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
-using JetBrains.Annotations;
 using osu.Framework.Bindables;
+using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
@@ -71,6 +71,34 @@ namespace osu.Game.Scoring
         }
 
         /// <summary>
+        /// Re-retrieve a given <see cref="IScoreInfo"/> from the database to ensure all the required data for presenting / exporting a replay are present.
+        /// </summary>
+        /// <param name="originalScoreInfo">The <see cref="IScoreInfo"/> to attempt querying on.</param>
+        /// <returns>The databased score info. Null if the score on the database cannot be found.</returns>
+        /// <remarks>Can be used when the <see cref="IScoreInfo"/> was retrieved from online data, as it may have missing properties.</remarks>
+        public ScoreInfo? GetDatabasedScoreInfo(IScoreInfo originalScoreInfo)
+        {
+            ScoreInfo? databasedScoreInfo = null;
+
+            if (originalScoreInfo.OnlineID > 0)
+                databasedScoreInfo = Query(s => s.OnlineID == originalScoreInfo.OnlineID);
+
+            if (originalScoreInfo.LegacyOnlineID > 0)
+                databasedScoreInfo ??= Query(s => s.LegacyOnlineID == originalScoreInfo.LegacyOnlineID);
+
+            if (originalScoreInfo is ScoreInfo scoreInfo)
+                databasedScoreInfo ??= Query(s => s.Hash == scoreInfo.Hash);
+
+            if (databasedScoreInfo == null)
+            {
+                Logger.Log("The requested score could not be found locally.", LoggingTarget.Information);
+                return null;
+            }
+
+            return databasedScoreInfo;
+        }
+
+        /// <summary>
         /// Retrieves a bindable that represents the total score of a <see cref="ScoreInfo"/>.
         /// </summary>
         /// <remarks>
@@ -78,7 +106,7 @@ namespace osu.Game.Scoring
         /// </remarks>
         /// <param name="score">The <see cref="ScoreInfo"/> to retrieve the bindable for.</param>
         /// <returns>The bindable containing the total score.</returns>
-        public Bindable<long> GetBindableTotalScore([NotNull] ScoreInfo score) => new TotalScoreBindable(score, configManager);
+        public Bindable<long> GetBindableTotalScore(ScoreInfo score) => new TotalScoreBindable(score, configManager);
 
         /// <summary>
         /// Retrieves a bindable that represents the formatted total score string of a <see cref="ScoreInfo"/>.
@@ -88,7 +116,7 @@ namespace osu.Game.Scoring
         /// </remarks>
         /// <param name="score">The <see cref="ScoreInfo"/> to retrieve the bindable for.</param>
         /// <returns>The bindable containing the formatted total score string.</returns>
-        public Bindable<string> GetBindableTotalScoreString([NotNull] ScoreInfo score) => new TotalScoreStringBindable(GetBindableTotalScore(score));
+        public Bindable<string> GetBindableTotalScoreString(ScoreInfo score) => new TotalScoreStringBindable(GetBindableTotalScore(score));
 
         /// <summary>
         /// Provides the total score of a <see cref="ScoreInfo"/>. Responds to changes in the currently-selected <see cref="ScoringMode"/>.
