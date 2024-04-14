@@ -287,14 +287,17 @@ namespace osu.Game.Database
                 {
                     var score = scoreManager.Query(s => s.ID == id);
 
-                    scoreManager.PopulateMaximumStatistics(score);
-
-                    // Can't use async overload because we're not on the update thread.
-                    // ReSharper disable once MethodHasAsyncOverload
-                    realmAccess.Write(r =>
+                    if (score != null)
                     {
-                        r.Find<ScoreInfo>(id)!.MaximumStatisticsJson = JsonConvert.SerializeObject(score.MaximumStatistics);
-                    });
+                        scoreManager.PopulateMaximumStatistics(score);
+
+                        // Can't use async overload because we're not on the update thread.
+                        // ReSharper disable once MethodHasAsyncOverload
+                        realmAccess.Write(r =>
+                        {
+                            r.Find<ScoreInfo>(id)!.MaximumStatisticsJson = JsonConvert.SerializeObject(score.MaximumStatistics);
+                        });
+                    }
 
                     ++processedCount;
                 }
