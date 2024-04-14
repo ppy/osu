@@ -21,7 +21,6 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
-using osu.Game.Online.API;
 using osu.Game.Overlays;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play;
