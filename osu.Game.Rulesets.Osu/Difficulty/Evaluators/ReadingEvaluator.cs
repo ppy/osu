@@ -347,8 +347,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             else
                 value = Math.Exp(9.07583 - 80.0 * preempt / 3);
 
+            // The power is 2 times higher to compensate sqrt in high AR skill
             // EDIT: looks like AR11 getting a bit overnerfed in comparison to other ARs, so i will increase the difference
-            return Math.Pow(value, 1.1);
+            return Math.Pow(value, 2.2);
         }
     }
 }
