@@ -361,6 +361,10 @@ namespace osu.Game.Tests.Visual.Background
 
             protected override BackgroundScreen CreateBackground() => new FadeAccessibleBackground(Beatmap.Value);
 
+            protected override void PopulateScorePanelList()
+            {
+            }
+
             public Vector2 ExpectedBackgroundBlur => new Vector2(BACKGROUND_BLUR);
         }
 
