@@ -37,7 +37,7 @@ namespace osu.Game.Overlays.Toolbar
             StateContainer = music;
 
             Flow.Padding = new MarginPadding { Horizontal = Toolbar.HEIGHT / 4 };
-            Flow.Add(volumeDisplay = new Container
+            Flow.Add(volumeDisplay = new CircularContainer
             {
                 Anchor = Anchor.CentreLeft,
                 Origin = Anchor.CentreLeft,
@@ -45,10 +45,9 @@ namespace osu.Game.Overlays.Toolbar
                 Height = IconContainer.Height,
                 Margin = new MarginPadding { Horizontal = 2.5f },
                 Masking = true,
-                CornerRadius = 3f,
-                Children = new Drawable[]
+                Children = new[]
                 {
-                    new Circle
+                    new Box
                     {
                         RelativeSizeAxes = Axes.Both,
                         Colour = Color4.White.Opacity(0.25f),
