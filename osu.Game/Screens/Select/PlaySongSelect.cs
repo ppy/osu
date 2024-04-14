@@ -20,6 +20,7 @@ using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play;
+using osu.Game.Screens.Play.Break;
 using osu.Game.Screens.Ranking;
 using osu.Game.Users;
 using osu.Game.Utils;
@@ -56,12 +57,17 @@ namespace osu.Game.Screens.Select
 
         protected IBindableList<ScoreInfo> Scores => playBeatmapDetailArea.Leaderboard.Scores;
 
-        protected void PresentScore(ScoreInfo score) =>
-            FinaliseSelection(score.BeatmapInfo, score.Ruleset, () => this.Push(new SoloResultsScreen(score)
+        protected void PresentScore(ScoreInfo score) => FinaliseSelection(score.BeatmapInfo, score.Ruleset, () => pushResultsScreen(score));
+
+        private void pushResultsScreen(ScoreInfo score)
+        {
+            var resultsScreen = new SoloResultsScreen(score)
             {
                 Scores = { BindTarget = Scores }
-            })
-            );
+            };
+
+            this.Push(resultsScreen);
+        }
 
         protected override BeatmapDetailArea CreateBeatmapDetailArea()
         {

@@ -30,7 +30,7 @@ namespace osu.Game.Screens.Ranking
 
             foreach (var s in Scores)
             {
-                if (s.ID != Score.ID)
+                if (Score == null || s.ID != Score.ID)
                     AddScore(s);
             }
 

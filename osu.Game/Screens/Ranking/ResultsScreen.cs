@@ -54,9 +54,6 @@ namespace osu.Game.Screens.Ranking
         [Resolved(CanBeNull = true)]
         private Player player { get; set; }
 
-        [Resolved]
-        private IAPIProvider api { get; set; }
-
         protected StatisticsPanel StatisticsPanel { get; private set; }
 
         private Drawable bottomPanel;
