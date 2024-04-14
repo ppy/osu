@@ -163,7 +163,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
             setDistances(clockRate);
 
-            AnglePredictability = calculateAnglePredictability();
+            AnglePredictability = CalculateAnglePredictability();
 
             OverlapValues = new Dictionary<OsuDifficultyHitObject, double>();
             ReadingObjects = getReadingObjects();
@@ -355,7 +355,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             }
         }
 
-        private double calculateAnglePredictability()
+        public double CalculateAnglePredictability()
         {
             OsuDifficultyHitObject? prevObj0 = (OsuDifficultyHitObject?)Previous(0);
             OsuDifficultyHitObject? prevObj1 = (OsuDifficultyHitObject?)Previous(1);
@@ -372,33 +372,41 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             if (LazyJumpDistance < NORMALISED_RADIUS)
                 angleDifference *= Math.Pow(LazyJumpDistance / NORMALISED_RADIUS, 2);
 
-            // assume worst-case if no angles
-            double angleDifference1 = 0;
-            double angleDifference2 = 0;
+            // Now research previous angles
+            double angleDifferencePrev = 0;
+
+            // How close the smallest angle of curr and prev is to 0
+            double zeroAngleFactor = 1.0;
 
             // Nerf alternating angles case
-            if (prevObj1.IsNotNull() && prevObj2.IsNotNull() && prevObj1.Angle.IsNotNull() && prevObj2.Angle.IsNotNull())
+            if (prevObj1.IsNotNull() && prevObj2.IsNotNull() && prevObj1.Angle.IsNotNull())
             {
-                // Normalized difference
-                angleDifference1 = Math.Abs(prevObj1.Angle.Value - Angle.Value) / Math.PI;
-                angleDifference2 = Math.Abs(prevObj2.Angle.Value - prevObj0.Angle.Value) / Math.PI;
+                angleDifferencePrev = Math.Abs(prevObj1.Angle.Value - Angle.Value);
+                zeroAngleFactor = Math.Pow(1 - Math.Min(Angle.Value, prevObj0.Angle.Value) / Math.PI, 10);
             }
 
-            // Will be close to 1 if angleDifference1 and angleDifference2 was both close to 0
-            double alternatingFactor = Math.Pow((1 - angleDifference1) * (1 - angleDifference2), 2);
+            // Will be close to 1 if angleDifferencePrev is close to 0
+            double rescaleFactor = Math.Pow(1 - angleDifferencePrev / Math.PI, 5);
 
-            // Be sure to nerf only same rhythms
-            double rhythmFactor = 1 - getTimeDifference(StrainTime, prevObj0.StrainTime); // 0 on different rhythm, 1 on same rhythm
+            // 0 on different rhythm, 1 on same rhythm
+            double rhythmFactor = 1 - getTimeDifference(StrainTime, prevObj0.StrainTime);
 
             if (prevObj1.IsNotNull())
                 rhythmFactor *= 1 - getTimeDifference(prevObj0.StrainTime, prevObj1.StrainTime);
             if (prevObj1.IsNotNull() && prevObj2.IsNotNull())
                 rhythmFactor *= 1 - getTimeDifference(prevObj1.StrainTime, prevObj2.StrainTime);
 
-            double prevAngleAdjust = Math.Max(angleDifference - angleDifference1, 0);
+            // Get the base - how much alternating difference is lower than current difference
+            double prevAngleAdjust = Math.Max(angleDifference - angleDifferencePrev, 0);
 
-            prevAngleAdjust *= alternatingFactor; // Nerf if alternating
-            prevAngleAdjust *= rhythmFactor; // Nerf if same rhythms
+            // Don't apply the nerf when angleDifferencePrev is too high
+            prevAngleAdjust *= rescaleFactor;
+
+            // Don't apply the nerf if rhythm is changing
+            prevAngleAdjust *= rhythmFactor;
+
+            // Don't apply the nerf if neither of previous angles isn't close to 0
+            prevAngleAdjust *= zeroAngleFactor;
 
             angleDifference -= prevAngleAdjust;
 
@@ -416,15 +424,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             // Angle difference will be considered as 2 times lower if angle is wide
             angleDifference /= 1 + wideness;
 
-            // Current angle nerf. Angle difference more than 15 degrees gets no penalty
+            // Angle difference more than 15 degrees gets no penalty
             double adjustedAngleDifference = Math.Min(Math.PI / 12, angleDifference);
-
-            // WARNING - this thing always gives at least 0.5 angle nerf, this is a bug, but removing it completely ruins everything
-            // Theoretically - this issue is fixable by changing multipliers everywhere,
-            // but this is not needed because this bug have no drawbacks outside of algorithm not working as intended
-            double currAngleNerf = Math.Cos(Math.Min(Math.PI / 2, 4 * adjustedAngleDifference));
-
-            return (currAngleNerf - 0.5) * 2;
+            return rhythmFactor * Math.Cos(Math.Min(Math.PI / 2, 6 * adjustedAngleDifference));
         }
 
         public double OpacityAt(double time, bool hidden)

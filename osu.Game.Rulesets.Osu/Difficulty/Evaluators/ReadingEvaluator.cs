@@ -23,11 +23,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             var currObj = (OsuDifficultyHitObject)current;
 
             double density = 0;
-            double densityAnglesNerf = -2.5; // we have threshold of 2.5
+            double densityAnglesNerf = -2; // we have threshold of 2
 
             OsuDifficultyHitObject? prevObj0 = null;
-
-            double prevAngleNerf = 1;
 
             var readingObjects = currObj.ReadingObjects;
             for (int i = 0; i < readingObjects.Count; i++)
@@ -71,28 +69,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 double currAngleNerf = (loopObj.AnglePredictability / 2) + 0.5;
 
                 // Apply the nerf only when it's repeated
-                double angleNerf = Math.Min(currAngleNerf, prevAngleNerf);
+                double angleNerf = currAngleNerf;
 
-                // Reduce angles nerf if objects are too apart in time
-                // Angle nerf is starting being reduced from 200ms (150BPM jump) and it reduced to 0 on 2000ms
-                //double longIntervalFactor = Math.Clamp(1 - (loopObj.StrainTime - 200) / (2000 - 200), 0, 1);
-
-                // Bandaid to fix Rubik's Cube +EZ
-                double wideness = 0;
-                if (loopObj.Angle.IsNotNull() && loopObj.Angle.Value > Math.PI * 0.5)
-                {
-                    // Goes from 0 to 1 as angle increasing from 90 degrees to 180
-                    wideness = (loopObj.Angle.Value / Math.PI - 0.5) * 2;
-
-                    // Transform into cubic scaling
-                    wideness = 1 - Math.Pow(1 - wideness, 3);
-                }
-
-                // But only for sharp angles
-                angleNerf += wideness * (currAngleNerf - angleNerf);
-
-                densityAnglesNerf += Math.Min(angleNerf, loopDifficulty);
-                prevAngleNerf = currAngleNerf;
+                densityAnglesNerf += angleNerf * loopDifficulty;
 
                 prevObj0 = loopObj;
             }
@@ -219,7 +198,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             if (osuCurrObj.Angle != null && osuLastObj.Angle != null && currVelocity > 0 && prevVelocity > 0)
             {
-                angleChangeBonus = Math.Pow(Math.Sin((double)((osuCurrObj.Angle - osuLastObj.Angle) / 2)), 2); // Also stealed from xexxar
+                angleChangeBonus = 1 - osuCurrObj.AnglePredictability;
                 angleChangeBonus *= Math.Min(currVelocity, prevVelocity) / Math.Max(currVelocity, prevVelocity); // Prevent cheesing
             }
 
