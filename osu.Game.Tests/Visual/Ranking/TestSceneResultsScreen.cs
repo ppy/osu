@@ -50,8 +50,6 @@ namespace osu.Game.Tests.Visual.Ranking
         [Resolved]
         private SkinManager skins { get; set; }
 
-        private TestScores scores;
-
         protected override void LoadComplete()
         {
             base.LoadComplete();
@@ -288,7 +286,7 @@ namespace osu.Game.Tests.Visual.Ranking
         [Test]
         public void TestFetchScoresAfterShowingStatistics()
         {
-            TestResultsScreen screen = null;
+            DelayedTestResultsScreen screen = null;
 
             var tcs = new TaskCompletionSource<bool>();
 
@@ -308,11 +306,11 @@ namespace osu.Game.Tests.Visual.Ranking
                 InputManager.Click(MouseButton.Left);
             });
 
-            AddAssert("no fetch yet", () => !((DelayedTestScores)scores).FetchCompleted);
+            AddAssert("no fetch yet", () => !screen.FetchCompleted);
 
             AddStep("allow fetch", () => tcs.SetResult(true));
 
-            AddUntilStep("wait for fetch", () => ((DelayedTestScores)scores).FetchCompleted);
+            AddUntilStep("wait for fetch", () => screen.FetchCompleted);
             AddAssert("expanded panel still on screen", () => this.ChildrenOfType<ScorePanel>().Single(p => p.State == PanelState.Expanded).ScreenSpaceDrawQuad.TopLeft.X > 0);
         }
 
@@ -371,20 +369,12 @@ namespace osu.Game.Tests.Visual.Ranking
 
         private TestResultsScreen createResultsScreen(ScoreInfo score = null)
         {
-            scores = new TestScores();
-            return new TestResultsScreen(score ?? TestResources.CreateTestScoreInfo())
-            {
-                Scores = { BindTarget = scores.Leaderboard }
-            };
+            return new TestResultsScreen(score ?? TestResources.CreateTestScoreInfo());
         }
 
-        private TestResultsScreen createDelayedResultsScreen(ScoreInfo score = null, Task fetchWaitTask = null)
+        private DelayedTestResultsScreen createDelayedResultsScreen(ScoreInfo score = null, Task fetchWaitTask = null)
         {
-            scores = new DelayedTestScores(fetchWaitTask);
-            return new TestResultsScreen(score ?? TestResources.CreateTestScoreInfo())
-            {
-                Scores = { BindTarget = scores.Leaderboard }
-            };
+            return new DelayedTestResultsScreen(score ?? TestResources.CreateTestScoreInfo(), fetchWaitTask);
         }
 
         private partial class TestResultsContainer : Container
@@ -409,19 +399,84 @@ namespace osu.Game.Tests.Visual.Ranking
         private partial class TestResultsScreen : SoloResultsScreen
         {
             public HotkeyRetryOverlay RetryOverlay;
+            protected BindableList<ScoreInfo> Leaderboard = new BindableList<ScoreInfo>();
 
             public TestResultsScreen(ScoreInfo score)
                 : base(score)
             {
                 AllowRetry = true;
                 ShowUserStatistics = true;
+
+                Scores.BindTo(Leaderboard);
             }
 
             protected override void LoadComplete()
             {
                 base.LoadComplete();
 
+                FetchScores();
                 RetryOverlay = InternalChildren.OfType<HotkeyRetryOverlay>().SingleOrDefault();
+            }
+
+            protected virtual APIRequest FetchScores()
+            {
+                var scores = new List<ScoreInfo>();
+
+                for (int i = 0; i < 20; i++)
+                {
+                    var score = TestResources.CreateTestScoreInfo();
+                    score.TotalScore += 10 - i;
+                    score.HasOnlineReplay = true;
+                    scores.Add(score);
+                }
+
+                Scheduler.Add(() =>
+                {
+                    Leaderboard.Clear();
+                    Leaderboard.AddRange(scores);
+                });
+
+                return null;
+            }
+        }
+
+        private partial class DelayedTestResultsScreen : TestResultsScreen
+        {
+            private readonly Task fetchWaitTask;
+
+            public bool FetchCompleted { get; private set; }
+
+            public DelayedTestResultsScreen(ScoreInfo score, Task fetchWaitTask = null)
+                : base(score)
+            {
+                this.fetchWaitTask = fetchWaitTask ?? Task.CompletedTask;
+            }
+
+            protected override APIRequest FetchScores()
+            {
+                Task.Run(async () =>
+                {
+                    await fetchWaitTask;
+
+                    var scores = new List<ScoreInfo>();
+
+                    for (int i = 0; i < 20; i++)
+                    {
+                        var score = TestResources.CreateTestScoreInfo();
+                        score.TotalScore += 10 - i;
+                        scores.Add(score);
+                    }
+
+                    Scheduler.Add(() =>
+                    {
+                        Leaderboard.Clear();
+                        Leaderboard.AddRange(scores);
+
+                        FetchCompleted = true;
+                    });
+                });
+
+                return null;
             }
         }
 
@@ -429,71 +484,5 @@ namespace osu.Game.Tests.Visual.Ranking
         {
             public override PerformanceCalculator CreatePerformanceCalculator() => null!;
         }
-    }
-}
-
-public class TestScores
-{
-    public IBindableList<ScoreInfo> Leaderboard => Scores;
-    protected BindableList<ScoreInfo> Scores = new BindableList<ScoreInfo>();
-
-    public TestScores()
-    {
-        FetchScores();
-    }
-
-    public virtual APIRequest FetchScores()
-    {
-        var scores = new List<ScoreInfo>();
-
-        for (int i = 0; i < 20; i++)
-        {
-            var score = TestResources.CreateTestScoreInfo();
-            score.TotalScore += 10 - i;
-            score.HasOnlineReplay = true;
-            scores.Add(score);
-        }
-
-        Scores.Clear();
-        Scores.AddRange(scores);
-
-        return null;
-    }
-}
-
-public class DelayedTestScores : TestScores
-{
-    private readonly Task fetchWaitTask;
-
-    public bool FetchCompleted { get; private set; }
-
-    public DelayedTestScores(Task fetchWaitTask = null)
-    {
-        this.fetchWaitTask = fetchWaitTask ?? Task.CompletedTask;
-        FetchScores();
-    }
-
-    public override APIRequest FetchScores()
-    {
-        Task.Run(async () =>
-        {
-            await fetchWaitTask;
-
-            var scores = new List<ScoreInfo>();
-
-            for (int i = 0; i < 20; i++)
-            {
-                var score = TestResources.CreateTestScoreInfo();
-                score.TotalScore += 10 - i;
-                scores.Add(score);
-            }
-
-            Scores.Clear();
-            Scores.AddRange(scores);
-
-            FetchCompleted = true;
-        });
-
-        return null;
     }
 }
