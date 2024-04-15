@@ -399,7 +399,7 @@ namespace osu.Game.Tests.Visual.Ranking
         private partial class TestResultsScreen : SoloResultsScreen
         {
             public HotkeyRetryOverlay RetryOverlay;
-            protected BindableList<ScoreInfo> Leaderboard = new BindableList<ScoreInfo>();
+            protected readonly BindableList<ScoreInfo> Leaderboard = new BindableList<ScoreInfo>();
 
             public TestResultsScreen(ScoreInfo score)
                 : base(score)
