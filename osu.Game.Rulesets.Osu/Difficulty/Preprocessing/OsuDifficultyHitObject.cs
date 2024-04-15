@@ -83,8 +83,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         public double? Angle { get; private set; }
 
         /// <summary>
-        /// Angle the player has to take to hit this <see cref="OsuDifficultyHitObject"/>.
-        /// Calculated as the angle between the circles (current-2, current-1, current).
+        /// Signed version of the Angle.
+        /// Potentially should be used for more accurate angle bonuses
         /// Ranges from -PI to PI
         /// </summary>
         public double? AngleSigned { get; private set; }

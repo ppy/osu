@@ -37,7 +37,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             double densityAimingFactor = ReadingEvaluator.EvaluateAimingDensityFactorOf(current);
 
             currentDensityAimStrain *= strainDecay(current.DeltaTime);
-            currentDensityAimStrain += densityAimingFactor * AimEvaluator.EvaluateDifficultyOf(current, false) * aimComponentMultiplier;
+            currentDensityAimStrain += densityAimingFactor * AimEvaluator.EvaluateDifficultyOf(current, true) * aimComponentMultiplier;
 
             double totalDensityDifficulty = (currentDensityAimStrain + densityReadingDifficulty) * skillMultiplier;
 
