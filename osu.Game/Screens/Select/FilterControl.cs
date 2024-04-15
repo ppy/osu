@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -49,14 +50,13 @@ namespace osu.Game.Screens.Select
         }
 
         private OsuTabControl<SortMode> sortTabs;
-
         private Bindable<SortMode> sortMode;
-
         private Bindable<GroupMode> groupMode;
-
         private FilterControlTextBox searchTextBox;
-
         private CollectionDropdown collectionDropdown;
+
+        [CanBeNull]
+        private FilterCriteria currentCriteria;
 
         public FilterCriteria CreateCriteria()
         {
@@ -228,7 +228,8 @@ namespace osu.Game.Screens.Select
                 if (m.NewValue.SequenceEqual(m.OldValue))
                     return;
 
-                updateCriteria();
+                if (currentCriteria?.RulesetCriteria?.FilterMayChangeFromMods(m) == true)
+                    updateCriteria();
             });
 
             groupMode.BindValueChanged(_ => updateCriteria());
@@ -263,7 +264,7 @@ namespace osu.Game.Screens.Select
         private readonly Bindable<double> minimumStars = new BindableDouble();
         private readonly Bindable<double> maximumStars = new BindableDouble();
 
-        private void updateCriteria() => FilterChanged?.Invoke(CreateCriteria());
+        private void updateCriteria() => FilterChanged?.Invoke(currentCriteria = CreateCriteria());
 
         protected override bool OnClick(ClickEvent e) => true;
 
