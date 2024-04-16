@@ -28,7 +28,7 @@ namespace osu.Desktop.Performance
         {
             if (Interlocked.Increment(ref activeSessions) > 1)
             {
-                Logger.Log($"High performance session requested ({activeSessions} others already running)");
+                Logger.Log($"High performance session requested ({activeSessions} running in total)");
                 return;
             }
 
