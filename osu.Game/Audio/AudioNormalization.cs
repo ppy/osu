@@ -92,8 +92,6 @@ namespace osu.Game.Audio
         {
             AudioNormalization? audioNormalizationModule = beatmapInfo.AudioNormalization;
 
-            Logger.Log("Normalization status: " + (audioNormalizationModule != null ? "on" : "off"));
-
             VolumeParameters volumeParameters = new VolumeParameters
             {
                 fTarget = audioNormalizationModule?.IntegratedLoudness != null ? IntegratedLoudnessToVolumeOffset(audioNormalizationModule.IntegratedLoudness) : 0.8f,
@@ -104,6 +102,8 @@ namespace osu.Game.Audio
             };
 
             addFx(volumeParameters, mixer);
+
+            Logger.Log("Normalization Status: " + (audioNormalizationModule != null ? $"on ({Math.Round(IntegratedLoudnessToVolumeOffset(audioNormalizationModule.IntegratedLoudness) * 100)}%)" : "off"));
         }
 
         private static void addFx(IEffectParameter effectParameter, IAudioMixer mixer)
