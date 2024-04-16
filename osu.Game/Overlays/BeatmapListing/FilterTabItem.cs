@@ -26,7 +26,7 @@ namespace osu.Game.Overlays.BeatmapListing
 
         private OsuSpriteText text;
 
-        private Sample selectSample = null!;
+        protected Sample SelectSample { get; private set; } = null!;
 
         public FilterTabItem(T value)
             : base(value)
@@ -49,7 +49,7 @@ namespace osu.Game.Overlays.BeatmapListing
 
             Enabled.Value = true;
 
-            selectSample = audio.Samples.Get(@"UI/tabselect-select");
+            SelectSample = audio.Samples.Get(@"UI/tabselect-select");
         }
 
         protected override void LoadComplete()
@@ -77,7 +77,7 @@ namespace osu.Game.Overlays.BeatmapListing
 
         protected override void OnDeactivated() => UpdateState();
 
-        protected override void OnActivatedByUser() => selectSample.Play();
+        protected override void OnActivatedByUser() => SelectSample.Play();
 
         /// <summary>
         /// Returns the label text to be used for the supplied <paramref name="value"/>.
