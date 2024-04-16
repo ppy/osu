@@ -706,11 +706,9 @@ namespace osu.Game
         {
             Logger.Log($"Beginning {nameof(PresentScore)} with score {score}");
 
-            ScoreInfo databasedScoreInfo = ScoreManager.GetDatabasedScoreInfo(score);
+            var databasedScore = ScoreManager.GetScore(score);
 
-            if (databasedScoreInfo == null) return;
-
-            var databasedScore = ScoreManager.GetScore(databasedScoreInfo);
+            if (databasedScore == null) return;
 
             if (databasedScore.Replay == null)
             {

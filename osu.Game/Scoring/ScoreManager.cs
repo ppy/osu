@@ -58,7 +58,12 @@ namespace osu.Game.Scoring
             };
         }
 
-        public Score GetScore(ScoreInfo score) => scoreImporter.GetScore(score);
+        public Score? GetScore(IScoreInfo scoreInfo)
+        {
+            ScoreInfo? databasedScoreInfo = getDatabasedScoreInfo(scoreInfo);
+
+            return databasedScoreInfo == null ? null : scoreImporter.GetScore(databasedScoreInfo);
+        }
 
         /// <summary>
         /// Perform a lookup query on available <see cref="ScoreInfo"/>s.
@@ -76,7 +81,7 @@ namespace osu.Game.Scoring
         /// <param name="originalScoreInfo">The <see cref="IScoreInfo"/> to attempt querying on.</param>
         /// <returns>The databased score info. Null if the score on the database cannot be found.</returns>
         /// <remarks>Can be used when the <see cref="IScoreInfo"/> was retrieved from online data, as it may have missing properties.</remarks>
-        public ScoreInfo? GetDatabasedScoreInfo(IScoreInfo originalScoreInfo)
+        private ScoreInfo? getDatabasedScoreInfo(IScoreInfo originalScoreInfo)
         {
             ScoreInfo? databasedScoreInfo = null;
 
@@ -189,7 +194,12 @@ namespace osu.Game.Scoring
 
         public Task<IEnumerable<Live<ScoreInfo>>> Import(ProgressNotification notification, ImportTask[] tasks, ImportParameters parameters = default) => scoreImporter.Import(notification, tasks);
 
-        public Task Export(ScoreInfo score) => scoreExporter.ExportAsync(score.ToLive(Realm));
+        public Task? Export(ScoreInfo scoreInfo)
+        {
+            ScoreInfo? databasedScoreInfo = getDatabasedScoreInfo(scoreInfo);
+
+            return databasedScoreInfo == null ? null : scoreExporter.ExportAsync(databasedScoreInfo.ToLive(Realm));
+        }
 
         public Task<Live<ScoreInfo>?> ImportAsUpdate(ProgressNotification notification, ImportTask task, ScoreInfo original) => scoreImporter.ImportAsUpdate(notification, task, original);
 
