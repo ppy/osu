@@ -11,16 +11,24 @@ namespace osu.Desktop.Performance
 {
     public class HighPerformanceSessionManager : IHighPerformanceSessionManager
     {
+        private int activeSessions;
+
         private GCLatencyMode originalGCMode;
 
         public IDisposable BeginSession()
         {
-            enableHighPerformanceSession();
-            return new InvokeOnDisposal<HighPerformanceSessionManager>(this, static m => m.disableHighPerformanceSession());
+            enterSession();
+            return new InvokeOnDisposal<HighPerformanceSessionManager>(this, static m => m.exitSession());
         }
 
-        private void enableHighPerformanceSession()
+        private void enterSession()
         {
+            if (Interlocked.Increment(ref activeSessions) > 1)
+            {
+                Logger.Log($"High performance session requested ({activeSessions} others already running)");
+                return;
+            }
+
             Logger.Log("Starting high performance session");
 
             originalGCMode = GCSettings.LatencyMode;
@@ -30,8 +38,14 @@ namespace osu.Desktop.Performance
             GC.Collect(0);
         }
 
-        private void disableHighPerformanceSession()
+        private void exitSession()
         {
+            if (Interlocked.Decrement(ref activeSessions) > 0)
+            {
+                Logger.Log($"High performance session finished ({activeSessions} others remain)");
+                return;
+            }
+
             Logger.Log("Ending high performance session");
 
             if (GCSettings.LatencyMode == GCLatencyMode.LowLatency)
