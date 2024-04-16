@@ -88,12 +88,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         {
             double aimDifficulty = attributes.AimDifficulty;
 
-            // We assume 15% of sliders in a map are difficult since there's no way to tell from the performance calculator.
-            double estimateDifficultSliders = attributes.SliderCount * 0.15;
+            // We assume 25% of sliders in a map are difficult since there's no way to tell from the performance calculator.
+            double estimateDifficultSliders = attributes.SliderCount * 0.25;
 
             if (attributes.SliderCount > 0)
             {
-                double estimateSliderEndsDropped = Math.Clamp(Math.Min(countOk + countMeh + countMiss, attributes.MaxCombo - scoreMaxCombo), 0, estimateDifficultSliders);
+                // Meh and Miss are more severe on sliders than normal Ok, so punish them 2 times more
+                double estimateSliderEndsDropped = Math.Clamp(Math.Min(countOk + countMeh * 2 + countMiss * 2, attributes.MaxCombo - scoreMaxCombo), 0, estimateDifficultSliders);
                 double sliderNerfFactor = (1 - attributes.SliderFactor) * (1 - estimateSliderEndsDropped / estimateDifficultSliders) + attributes.SliderFactor;
                 aimDifficulty *= sliderNerfFactor;
             }
