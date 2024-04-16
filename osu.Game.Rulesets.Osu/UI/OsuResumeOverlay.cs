@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -19,12 +17,12 @@ namespace osu.Game.Rulesets.Osu.UI
 {
     public partial class OsuResumeOverlay : ResumeOverlay
     {
-        private Container cursorScaleContainer;
-        private OsuClickToResumeCursor clickToResumeCursor;
+        private Container cursorScaleContainer = null!;
+        private OsuClickToResumeCursor clickToResumeCursor = null!;
 
-        private OsuCursorContainer localCursorContainer;
+        private OsuCursorContainer? localCursorContainer;
 
-        public override CursorContainer LocalCursor => State.Value == Visibility.Visible ? localCursorContainer : null;
+        public override CursorContainer? LocalCursor => State.Value == Visibility.Visible ? localCursorContainer : null;
 
         protected override LocalisableString Message => "Click the orange cursor to resume";
 
@@ -71,8 +69,8 @@ namespace osu.Game.Rulesets.Osu.UI
         {
             public override bool HandlePositionalInput => true;
 
-            public Action ResumeRequested;
-            private Container scaleTransitionContainer;
+            public Action? ResumeRequested;
+            private Container scaleTransitionContainer = null!;
 
             public OsuClickToResumeCursor()
             {
