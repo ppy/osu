@@ -89,6 +89,18 @@ namespace osu.Game.Tests.Editing.Checks
             }
         }
 
+        [Test]
+        public void TestCorruptAudio()
+        {
+            using (var resourceStream = TestResources.OpenResource("Samples/corrupt.wav"))
+            {
+                beatmap.Metadata.AudioFile = "abc123.mp3";
+                var issues = check.Run(getContext(resourceStream)).ToList();
+                Assert.That(issues, Has.Count.EqualTo(1));
+                Assert.That(issues.Single().Template is CheckSongFormat.IssueTemplateFormatUnsupported);
+            }
+        }
+
         private BeatmapVerifierContext getContext(Stream? resourceStream)
         {
             var mockWorkingBeatmap = new Mock<TestWorkingBeatmap>(beatmap, null, null);
