@@ -41,7 +41,7 @@ namespace osu.Game.Overlays.SkinEditor
 
         private void updateState()
         {
-            CanRotate.Value = selectedItems.Count > 0;
+            CanRotateSelectionOrigin.Value = selectedItems.Count > 0;
         }
 
         private Drawable[]? objectsInRotation;

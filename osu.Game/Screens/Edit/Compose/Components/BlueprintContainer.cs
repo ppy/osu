@@ -512,7 +512,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         protected virtual void OnBlueprintDeselected(SelectionBlueprint<T> blueprint)
         {
-            SelectionBlueprints.ChangeChildDepth(blueprint, 0);
+            if (SelectionBlueprints.Contains(blueprint))
+                SelectionBlueprints.ChangeChildDepth(blueprint, 0);
+
             SelectionHandler.HandleDeselected(blueprint);
         }
 

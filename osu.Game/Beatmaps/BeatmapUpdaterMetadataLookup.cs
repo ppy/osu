@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Online.API;
 
@@ -85,10 +86,16 @@ namespace osu.Game.Beatmaps
         private bool shouldDiscardLookupResult(OnlineBeatmapMetadata result, BeatmapInfo beatmapInfo)
         {
             if (beatmapInfo.OnlineID > 0 && result.BeatmapID != beatmapInfo.OnlineID)
+            {
+                Logger.Log($"Discarding metadata lookup result due to mismatching online ID (expected: {beatmapInfo.OnlineID} actual: {result.BeatmapID})", LoggingTarget.Database);
                 return true;
+            }
 
             if (beatmapInfo.OnlineID == -1 && result.MD5Hash != beatmapInfo.MD5Hash)
+            {
+                Logger.Log($"Discarding metadata lookup result due to mismatching hash (expected: {beatmapInfo.MD5Hash} actual: {result.MD5Hash})", LoggingTarget.Database);
                 return true;
+            }
 
             return false;
         }
