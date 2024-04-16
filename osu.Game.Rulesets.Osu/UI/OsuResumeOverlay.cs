@@ -10,6 +10,7 @@ using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Game.Rulesets.Osu.UI.Cursor;
+using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Play;
 using osuTK.Graphics;
 
@@ -26,6 +27,9 @@ namespace osu.Game.Rulesets.Osu.UI
 
         protected override LocalisableString Message => "Click the orange cursor to resume";
 
+        [Resolved]
+        private DrawableRuleset? drawableRuleset { get; set; }
+
         [BackgroundDependencyLoader]
         private void load()
         {
@@ -38,7 +42,7 @@ namespace osu.Game.Rulesets.Osu.UI
         protected override void PopIn()
         {
             // Can't display if the cursor is outside the window.
-            if (GameplayCursor.LastFrameState == Visibility.Hidden || !Contains(GameplayCursor.ActiveCursor.ScreenSpaceDrawQuad.Centre))
+            if (GameplayCursor.LastFrameState == Visibility.Hidden || drawableRuleset?.Contains(GameplayCursor.ActiveCursor.ScreenSpaceDrawQuad.Centre) == false)
             {
                 Resume();
                 return;
