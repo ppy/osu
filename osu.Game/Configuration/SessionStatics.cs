@@ -83,7 +83,8 @@ namespace osu.Game.Configuration
         LastLocalUserScore,
 
         /// <summary>
-        /// Whether the game is in the process of being restarted. This should always be the result of user intention to restart.
+        /// Whether the game is in the process of being restarted. At the point this flag is set, it is assumed that confirmation
+        /// is not required from the user on exiting the game.
         /// </summary>
         RestartRequested
     }

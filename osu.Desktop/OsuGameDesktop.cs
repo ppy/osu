@@ -118,6 +118,8 @@ namespace osu.Desktop
 
         public override bool Restart()
         {
+            SessionStatics.SetValue(Static.RestartRequested, true);
+
             switch (RuntimeInfo.OS)
             {
                 case RuntimeInfo.Platform.Windows:
@@ -132,7 +134,6 @@ namespace osu.Desktop
                     return true;
             }
 
-            SessionStatics.SetValue(Static.RestartRequested, true);
             AttemptExit();
 
             return base.Restart();
