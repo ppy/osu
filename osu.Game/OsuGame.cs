@@ -718,7 +718,7 @@ namespace osu.Game
                 return;
             }
 
-            var databasedBeatmap = BeatmapManager.QueryBeatmap(b => b.ID == databasedScoreInfo.BeatmapInfo.ID);
+            var databasedBeatmap = BeatmapManager.QueryBeatmap(b => b.OnlineID == score.Beatmap.OnlineID);
 
             if (databasedBeatmap == null)
             {
