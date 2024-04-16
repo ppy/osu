@@ -3,11 +3,8 @@
 
 #nullable disable
 
-using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Audio;
-using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -24,8 +21,6 @@ namespace osu.Game.Overlays.Toolbar
     {
         protected Drawable ModeButtonLine { get; private set; }
 
-        private readonly Dictionary<string, Sample> selectionSamples = new Dictionary<string, Sample>();
-
         public ToolbarRulesetSelector()
         {
             RelativeSizeAxes = Axes.Y;
@@ -33,7 +28,7 @@ namespace osu.Game.Overlays.Toolbar
         }
 
         [BackgroundDependencyLoader]
-        private void load(AudioManager audio)
+        private void load()
         {
             AddRangeInternal(new[]
             {
@@ -59,9 +54,6 @@ namespace osu.Game.Overlays.Toolbar
                     }
                 },
             });
-
-            foreach (var ruleset in Rulesets.AvailableRulesets)
-                selectionSamples[ruleset.ShortName] = audio.Samples.Get($"UI/ruleset-select-{ruleset.ShortName}");
         }
 
         protected override void LoadComplete()
@@ -117,7 +109,7 @@ namespace osu.Game.Overlays.Toolbar
 
                 RulesetInfo found = Rulesets.AvailableRulesets.ElementAtOrDefault(requested);
                 if (found != null)
-                    Current.Value = found;
+                    SelectItem(found);
                 return true;
             }
 
