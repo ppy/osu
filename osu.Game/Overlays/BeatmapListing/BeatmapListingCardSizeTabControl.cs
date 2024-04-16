@@ -5,6 +5,8 @@
 
 using System;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -47,13 +49,15 @@ namespace osu.Game.Overlays.BeatmapListing
             [Resolved]
             private OverlayColourProvider colourProvider { get; set; }
 
+            private Sample selectSample = null!;
+
             public TabItem(BeatmapCardSize value)
                 : base(value)
             {
             }
 
             [BackgroundDependencyLoader]
-            private void load()
+            private void load(AudioManager audio)
             {
                 AutoSizeAxes = Axes.Both;
                 Masking = true;
@@ -79,8 +83,10 @@ namespace osu.Game.Overlays.BeatmapListing
                             Icon = getIconForCardSize(Value)
                         }
                     },
-                    new HoverClickSounds(HoverSampleSet.TabSelect)
+                    new HoverSounds(HoverSampleSet.TabSelect)
                 };
+
+                selectSample = audio.Samples.Get(@"UI/tabselect-select");
             }
 
             private static IconUsage getIconForCardSize(BeatmapCardSize cardSize)
@@ -110,6 +116,8 @@ namespace osu.Game.Overlays.BeatmapListing
                 if (IsLoaded)
                     updateState();
             }
+
+            protected override void OnActivatedByUser() => selectSample.Play();
 
             protected override void OnDeactivated()
             {

@@ -88,10 +88,6 @@ namespace osu.Game.Overlays.Toolbar
             if (SelectedTab != null)
             {
                 ModeButtonLine.MoveToX(SelectedTab.DrawPosition.X, !hasInitialPosition ? 0 : 500, Easing.OutElasticQuarter);
-
-                if (hasInitialPosition)
-                    selectionSamples[SelectedTab.Value.ShortName]?.Play();
-
                 hasInitialPosition = true;
             }
         }
