@@ -75,99 +75,92 @@ namespace osu.Game.Screens.Select
                     RelativeSizeAxes = Axes.Both,
                     Colour = Colour4.Black.Opacity(0.3f),
                 },
-                new Container
+                new GridContainer
                 {
                     RelativeSizeAxes = Axes.Both,
                     Padding = new MarginPadding { Horizontal = spacing },
-                    Children = new Drawable[]
+                    RowDimensions = new[]
                     {
-                        new GridContainer
+                        new Dimension(GridSizeMode.AutoSize),
+                        new Dimension()
+                    },
+                    Content = new[]
+                    {
+                        new Drawable[]
                         {
-                            RelativeSizeAxes = Axes.Both,
-                            RowDimensions = new[]
+                            new FillFlowContainer
                             {
-                                new Dimension(GridSizeMode.AutoSize),
-                                new Dimension()
-                            },
-                            Content = new[]
-                            {
-                                new Drawable[]
+                                RelativeSizeAxes = Axes.X,
+                                AutoSizeAxes = Axes.Y,
+                                Direction = FillDirection.Horizontal,
+                                Children = new Drawable[]
                                 {
                                     new FillFlowContainer
                                     {
                                         RelativeSizeAxes = Axes.X,
                                         AutoSizeAxes = Axes.Y,
-                                        Direction = FillDirection.Horizontal,
-                                        Children = new Drawable[]
+                                        Width = 0.5f,
+                                        Spacing = new Vector2(spacing),
+                                        Padding = new MarginPadding { Right = spacing / 2 },
+                                        Children = new[]
                                         {
-                                            new FillFlowContainer
+                                            new DetailBox().WithChild(new OnlineViewContainer(string.Empty)
                                             {
                                                 RelativeSizeAxes = Axes.X,
-                                                AutoSizeAxes = Axes.Y,
-                                                Width = 0.5f,
-                                                Spacing = new Vector2(spacing),
-                                                Padding = new MarginPadding { Right = spacing / 2 },
-                                                Children = new[]
+                                                Height = 134,
+                                                Padding = new MarginPadding { Horizontal = spacing, Top = spacing },
+                                                Child = ratingsDisplay = new UserRatings
                                                 {
-                                                    new DetailBox().WithChild(new OnlineViewContainer(string.Empty)
-                                                    {
-                                                        RelativeSizeAxes = Axes.X,
-                                                        Height = 134,
-                                                        Padding = new MarginPadding { Horizontal = spacing, Top = spacing },
-                                                        Child = ratingsDisplay = new UserRatings
-                                                        {
-                                                            RelativeSizeAxes = Axes.Both,
-                                                        },
-                                                    }),
+                                                    RelativeSizeAxes = Axes.Both,
                                                 },
-                                            },
-                                            new OsuScrollContainer
+                                            }),
+                                        },
+                                    },
+                                    new OsuScrollContainer
+                                    {
+                                        RelativeSizeAxes = Axes.X,
+                                        Height = 250,
+                                        Width = 0.5f,
+                                        ScrollbarVisible = false,
+                                        Padding = new MarginPadding { Left = spacing / 2 },
+                                        Child = new FillFlowContainer
+                                        {
+                                            RelativeSizeAxes = Axes.X,
+                                            AutoSizeAxes = Axes.Y,
+                                            LayoutDuration = transition_duration,
+                                            LayoutEasing = Easing.OutQuad,
+                                            Children = new[]
                                             {
-                                                RelativeSizeAxes = Axes.X,
-                                                Height = 250,
-                                                Width = 0.5f,
-                                                ScrollbarVisible = false,
-                                                Padding = new MarginPadding { Left = spacing / 2 },
-                                                Child = new FillFlowContainer
-                                                {
-                                                    RelativeSizeAxes = Axes.X,
-                                                    AutoSizeAxes = Axes.Y,
-                                                    LayoutDuration = transition_duration,
-                                                    LayoutEasing = Easing.OutQuad,
-                                                    Children = new[]
-                                                    {
-                                                        description = new MetadataSectionDescription(query => songSelect?.Search(query)),
-                                                        source = new MetadataSectionSource(query => songSelect?.Search(query)),
-                                                        tags = new MetadataSectionTags(query => songSelect?.Search(query)),
-                                                    },
-                                                },
+                                                description = new MetadataSectionDescription(query => songSelect?.Search(query)),
+                                                source = new MetadataSectionSource(query => songSelect?.Search(query)),
+                                                tags = new MetadataSectionTags(query => songSelect?.Search(query)),
                                             },
                                         },
                                     },
                                 },
-                                new Drawable[]
+                            },
+                        },
+                        new Drawable[]
+                        {
+                            failRetryContainer = new OnlineViewContainer("Sign in to view more details")
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Children = new Drawable[]
                                 {
-                                    failRetryContainer = new OnlineViewContainer("Sign in to view more details")
+                                    new OsuSpriteText
+                                    {
+                                        Text = BeatmapsetsStrings.ShowInfoPointsOfFailure,
+                                        Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 14),
+                                    },
+                                    failRetryGraph = new FailRetryGraph
                                     {
                                         RelativeSizeAxes = Axes.Both,
-                                        Children = new Drawable[]
-                                        {
-                                            new OsuSpriteText
-                                            {
-                                                Text = BeatmapsetsStrings.ShowInfoPointsOfFailure,
-                                                Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 14),
-                                            },
-                                            failRetryGraph = new FailRetryGraph
-                                            {
-                                                RelativeSizeAxes = Axes.Both,
-                                                Padding = new MarginPadding { Top = 14 + spacing / 2 },
-                                            },
-                                        },
+                                        Padding = new MarginPadding { Top = 14 + spacing / 2 },
                                     },
-                                }
-                            }
-                        },
-                    },
+                                },
+                            },
+                        }
+                    }
                 },
                 loading = new LoadingLayer(true)
             };

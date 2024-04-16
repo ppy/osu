@@ -50,7 +50,6 @@ using osu.Game.Online.API;
 using osu.Game.Online.Chat;
 using osu.Game.Online.Metadata;
 using osu.Game.Online.Multiplayer;
-using osu.Game.Online.Solo;
 using osu.Game.Online.Spectator;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Settings;
@@ -102,7 +101,7 @@ namespace osu.Game
         public virtual bool UseDevelopmentServer => DebugUtils.IsDebugBuild;
 
         public virtual EndpointConfiguration CreateEndpoints() =>
-            UseDevelopmentServer ? new DevelopmentEndpointConfiguration() : new ExperimentalEndpointConfiguration();
+            UseDevelopmentServer ? new DevelopmentEndpointConfiguration() : new ProductionEndpointConfiguration();
 
         public virtual Version AssemblyVersion => Assembly.GetEntryAssembly()?.GetName().Version ?? new Version();
 
@@ -207,7 +206,6 @@ namespace osu.Game
         protected MultiplayerClient MultiplayerClient { get; private set; }
 
         private MetadataClient metadataClient;
-        private SoloStatisticsWatcher soloStatisticsWatcher;
 
         private RealmAccess realm;
 
@@ -328,7 +326,6 @@ namespace osu.Game
             dependencies.CacheAs(SpectatorClient = new OnlineSpectatorClient(endpoints));
             dependencies.CacheAs(MultiplayerClient = new OnlineMultiplayerClient(endpoints));
             dependencies.CacheAs(metadataClient = new OnlineMetadataClient(endpoints));
-            dependencies.CacheAs(soloStatisticsWatcher = new SoloStatisticsWatcher());
 
             base.Content.Add(new BeatmapOnlineChangeIngest(beatmapUpdater, realm, metadataClient));
 
@@ -339,10 +336,6 @@ namespace osu.Game
 
             dependencies.Cache(beatmapCache = new BeatmapLookupCache());
             base.Content.Add(beatmapCache);
-
-            var scorePerformanceManager = new ScorePerformanceCache();
-            dependencies.Cache(scorePerformanceManager);
-            base.Content.Add(scorePerformanceManager);
 
             dependencies.CacheAs<IRulesetConfigCache>(rulesetConfigCache = new RulesetConfigCache(realm, RulesetStore));
 
@@ -375,7 +368,6 @@ namespace osu.Game
             base.Content.Add(SpectatorClient);
             base.Content.Add(MultiplayerClient);
             base.Content.Add(metadataClient);
-            base.Content.Add(soloStatisticsWatcher);
 
             base.Content.Add(rulesetConfigCache);
 
@@ -686,16 +678,21 @@ namespace osu.Game
         /// <summary>
         /// Allows a maximum of one unhandled exception, per second of execution.
         /// </summary>
-        private bool onExceptionThrown(Exception _)
+        /// <returns>Whether to ignore the exception and continue running.</returns>
+        private bool onExceptionThrown(Exception ex)
         {
-            bool continueExecution = Interlocked.Decrement(ref allowableExceptions) >= 0;
+            if (Interlocked.Decrement(ref allowableExceptions) < 0)
+            {
+                Logger.Log("Too many unhandled exceptions, crashing out.");
+                RulesetStore.TryDisableCustomRulesetsCausing(ex);
+                return false;
+            }
 
-            Logger.Log($"Unhandled exception has been {(continueExecution ? $"allowed with {allowableExceptions} more allowable exceptions" : "denied")} .");
-
+            Logger.Log($"Unhandled exception has been allowed with {allowableExceptions} more allowable exceptions.");
             // restore the stock of allowable exceptions after a short delay.
             Task.Delay(1000).ContinueWith(_ => Interlocked.Increment(ref allowableExceptions));
 
-            return continueExecution;
+            return true;
         }
 
         protected override void Dispose(bool isDisposing)

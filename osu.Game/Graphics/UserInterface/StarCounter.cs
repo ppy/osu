@@ -101,7 +101,7 @@ namespace osu.Game.Graphics.UserInterface
         public void StopAnimation()
         {
             animate(current);
-            foreach (var star in stars.Children)
+            foreach (var star in stars)
                 star.FinishTransforms(true);
         }
 
@@ -115,7 +115,7 @@ namespace osu.Game.Graphics.UserInterface
 
                 star.ClearTransforms(true);
 
-                double delay = (current <= newValue ? Math.Max(i - current, 0) : Math.Max(current - 1 - i, 0)) * AnimationDelay;
+                double delay = Math.Max(current <= newValue ? i - current : Math.Min(current, StarCount) - 1 - i, 0) * AnimationDelay;
 
                 using (star.BeginDelayedSequence(delay))
                     star.DisplayAt(getStarScale(i, newValue));

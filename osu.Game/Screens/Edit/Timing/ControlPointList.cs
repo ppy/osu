@@ -162,26 +162,43 @@ namespace osu.Game.Screens.Edit.Timing
 
                     // If the selected group only has one control point, update the tracking type.
                     case 1:
-                        trackedType = selectedGroup.Value?.ControlPoints.Single().GetType();
+                        trackedType = selectedGroup.Value?.ControlPoints[0].GetType();
                         break;
 
                     // If the selected group has more than one control point, choose the first as the tracking type
                     // if we don't already have a singular tracked type.
                     default:
-                        trackedType ??= selectedGroup.Value?.ControlPoints.FirstOrDefault()?.GetType();
+                        trackedType ??= selectedGroup.Value?.ControlPoints[0].GetType();
                         break;
                 }
             }
 
             if (trackedType != null)
             {
+                double accurateTime = clock.CurrentTimeAccurate;
+
                 // We don't have an efficient way of looking up groups currently, only individual point types.
                 // To improve the efficiency of this in the future, we should reconsider the overall structure of ControlPointInfo.
 
                 // Find the next group which has the same type as the selected one.
-                var found = Beatmap.ControlPointInfo.Groups
-                                   .Where(g => g.ControlPoints.Any(cp => cp.GetType() == trackedType))
-                                   .LastOrDefault(g => g.Time <= clock.CurrentTimeAccurate);
+                ControlPointGroup? found = null;
+
+                for (int i = 0; i < Beatmap.ControlPointInfo.Groups.Count; i++)
+                {
+                    var g = Beatmap.ControlPointInfo.Groups[i];
+
+                    if (g.Time > accurateTime)
+                        continue;
+
+                    for (int j = 0; j < g.ControlPoints.Count; j++)
+                    {
+                        if (g.ControlPoints[j].GetType() == trackedType)
+                        {
+                            found = g;
+                            break;
+                        }
+                    }
+                }
 
                 if (found != null)
                     selectedGroup.Value = found;

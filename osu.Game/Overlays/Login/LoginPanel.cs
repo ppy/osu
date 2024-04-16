@@ -15,6 +15,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation;
 using osu.Game.Online.API;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.Settings;
 using osu.Game.Users;
 using osuTK;
@@ -25,18 +26,20 @@ namespace osu.Game.Overlays.Login
     {
         private bool bounding = true;
 
-        private LoginForm? form;
+        private Drawable? form;
 
         [Resolved]
         private OsuColour colours { get; set; } = null!;
 
-        private UserGridPanel panel = null!;
-        private UserDropdown dropdown = null!;
+        private UserDropdown? dropdown;
 
         /// <summary>
         /// Called to request a hide of a parent displaying this container.
         /// </summary>
         public Action? RequestHide;
+
+        private IBindable<APIUser> user = null!;
+        private readonly Bindable<UserStatus?> status = new Bindable<UserStatus?>();
 
         private readonly IBindable<APIState> apiState = new Bindable<APIState>();
 
@@ -61,11 +64,21 @@ namespace osu.Game.Overlays.Login
             AutoSizeAxes = Axes.Y;
         }
 
-        [BackgroundDependencyLoader]
-        private void load()
+        protected override void LoadComplete()
         {
+            base.LoadComplete();
+
             apiState.BindTo(api.State);
             apiState.BindValueChanged(onlineStateChanged, true);
+
+            user = api.LocalUser.GetBoundCopy();
+            user.BindValueChanged(u =>
+            {
+                status.UnbindBindings();
+                status.BindTo(u.NewValue.Status);
+            }, true);
+
+            status.BindValueChanged(e => updateDropdownCurrent(e.NewValue), true);
         }
 
         private void onlineStateChanged(ValueChangedEvent<APIState> state) => Schedule(() =>
@@ -79,6 +92,10 @@ namespace osu.Game.Overlays.Login
                     {
                         RequestHide = RequestHide
                     };
+                    break;
+
+                case APIState.RequiresSecondFactorAuth:
+                    Child = form = new SecondFactorAuthForm();
                     break;
 
                 case APIState.Failing:
@@ -131,7 +148,7 @@ namespace osu.Game.Overlays.Login
                                 Text = LoginPanelStrings.SignedIn,
                                 Font = OsuFont.GetFont(size: 18, weight: FontWeight.Bold),
                             },
-                            panel = new UserGridPanel(api.LocalUser.Value)
+                            new UserRankPanel(api.LocalUser.Value)
                             {
                                 RelativeSizeAxes = Axes.X,
                                 Action = RequestHide
@@ -139,11 +156,6 @@ namespace osu.Game.Overlays.Login
                             dropdown = new UserDropdown { RelativeSizeAxes = Axes.X },
                         },
                     };
-
-                    panel.Status.BindTo(api.LocalUser.Value.Status);
-                    panel.Activity.BindTo(api.LocalUser.Value.Activity);
-
-                    panel.Status.BindValueChanged(_ => updateDropdownCurrent(), true);
 
                     dropdown.Current.BindValueChanged(action =>
                     {
@@ -169,6 +181,7 @@ namespace osu.Game.Overlays.Login
                                 break;
                         }
                     }, true);
+
                     break;
             }
 
@@ -176,9 +189,12 @@ namespace osu.Game.Overlays.Login
                 ScheduleAfterChildren(() => GetContainingInputManager()?.ChangeFocus(form));
         });
 
-        private void updateDropdownCurrent()
+        private void updateDropdownCurrent(UserStatus? status)
         {
-            switch (panel.Status.Value)
+            if (dropdown == null)
+                return;
+
+            switch (status)
             {
                 case UserStatus.Online:
                     dropdown.Current.Value = UserAction.Online;

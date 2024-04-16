@@ -50,7 +50,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         public void ApplyToDrawableHitObject(DrawableHitObject drawable)
         {
             if (drawable is DrawableSlider s)
-                s.Tracking.ValueChanged += _ => flashlight.OnSliderTrackingChange(s);
+                s.OnUpdate += _ => flashlight.OnSliderTrackingChange(s);
         }
 
         private partial class OsuFlashlight : Flashlight, IRequireHighFrequencyMousePosition

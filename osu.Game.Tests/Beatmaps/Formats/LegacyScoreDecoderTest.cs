@@ -3,14 +3,17 @@
 
 #nullable disable
 
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using NUnit.Framework;
-using osu.Framework.Utils;
+using osu.Framework.Extensions;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Formats;
+using osu.Game.Beatmaps.Legacy;
+using osu.Game.IO.Legacy;
 using osu.Game.Replays;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Catch;
@@ -19,6 +22,7 @@ using osu.Game.Rulesets.Mania.Mods;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
+using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Replays;
 using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Rulesets.Replays;
@@ -55,14 +59,14 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.AreEqual(2, score.ScoreInfo.Statistics[HitResult.Great]);
                 Assert.AreEqual(1, score.ScoreInfo.Statistics[HitResult.Good]);
 
-                Assert.AreEqual(829_931, score.ScoreInfo.TotalScore);
+                Assert.AreEqual(829_931, score.ScoreInfo.LegacyTotalScore);
                 Assert.AreEqual(3, score.ScoreInfo.MaxCombo);
 
                 Assert.IsTrue(score.ScoreInfo.Mods.Any(m => m is ManiaModClassic));
                 Assert.IsTrue(score.ScoreInfo.APIMods.Any(m => m.Acronym == "CL"));
                 Assert.IsTrue(score.ScoreInfo.ModsJson.Contains("CL"));
 
-                Assert.IsTrue(Precision.AlmostEquals(0.8889, score.ScoreInfo.Accuracy, 0.0001));
+                Assert.That((2 * 300d + 1 * 200) / (3 * 305d), Is.EqualTo(score.ScoreInfo.Accuracy).Within(0.0001));
                 Assert.AreEqual(ScoreRank.B, score.ScoreInfo.Rank);
 
                 Assert.That(score.Replay.Frames, Is.Not.Empty);
@@ -247,6 +251,167 @@ namespace osu.Game.Tests.Beatmaps.Formats
             });
         }
 
+        [Test]
+        public void AccuracyOfStableScoreRecomputed()
+        {
+            var memoryStream = new MemoryStream();
+
+            // local partial implementation of legacy score encoder
+            // this is done half for readability, half because `LegacyScoreEncoder` forces `LATEST_VERSION`
+            // and we want to emulate a stable score here
+            using (var sw = new SerializationWriter(memoryStream, true))
+            {
+                sw.Write((byte)3); // ruleset id (mania).
+                                   // mania is used intentionally as it is the only ruleset wherein default accuracy calculation is changed in lazer
+                sw.Write(20240116); // version (anything below `LegacyScoreEncoder.FIRST_LAZER_VERSION` is stable)
+                sw.Write(string.Empty.ComputeMD5Hash()); // beatmap hash, irrelevant to this test
+                sw.Write("username"); // irrelevant to this test
+                sw.Write(string.Empty.ComputeMD5Hash()); // score hash, irrelevant to this test
+                sw.Write((ushort)1); // count300
+                sw.Write((ushort)0); // count100
+                sw.Write((ushort)0); // count50
+                sw.Write((ushort)198); // countGeki (perfects / "rainbow 300s" in mania)
+                sw.Write((ushort)0); // countKatu
+                sw.Write((ushort)1); // countMiss
+                sw.Write(12345678); // total score, irrelevant to this test
+                sw.Write((ushort)1000); // max combo, irrelevant to this test
+                sw.Write(false); // full combo, irrelevant to this test
+                sw.Write((int)LegacyMods.Hidden); // mods
+                sw.Write(string.Empty); // hp graph, irrelevant
+                sw.Write(DateTime.Now); // date, irrelevant
+                sw.Write(Array.Empty<byte>()); // replay data, irrelevant
+                sw.Write((long)1234); // legacy online ID, irrelevant
+            }
+
+            memoryStream.Seek(0, SeekOrigin.Begin);
+            var decoded = new TestLegacyScoreDecoder().Parse(memoryStream);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(decoded.ScoreInfo.Accuracy, Is.EqualTo((double)(198 * 305 + 300) / (200 * 305)));
+                Assert.That(decoded.ScoreInfo.Rank, Is.EqualTo(ScoreRank.SH));
+            });
+        }
+
+        [Test]
+        public void RankOfStableScoreUsesLazerDefinitions()
+        {
+            var memoryStream = new MemoryStream();
+
+            // local partial implementation of legacy score encoder
+            // this is done half for readability, half because `LegacyScoreEncoder` forces `LATEST_VERSION`
+            // and we want to emulate a stable score here
+            using (var sw = new SerializationWriter(memoryStream, true))
+            {
+                sw.Write((byte)0); // ruleset id (osu!)
+                sw.Write(20240116); // version (anything below `LegacyScoreEncoder.FIRST_LAZER_VERSION` is stable)
+                sw.Write(string.Empty.ComputeMD5Hash()); // beatmap hash, irrelevant to this test
+                sw.Write("username"); // irrelevant to this test
+                sw.Write(string.Empty.ComputeMD5Hash()); // score hash, irrelevant to this test
+                sw.Write((ushort)195); // count300
+                sw.Write((ushort)1); // count100
+                sw.Write((ushort)4); // count50
+                sw.Write((ushort)0); // countGeki
+                sw.Write((ushort)0); // countKatu
+                sw.Write((ushort)0); // countMiss
+                sw.Write(12345678); // total score, irrelevant to this test
+                sw.Write((ushort)1000); // max combo, irrelevant to this test
+                sw.Write(false); // full combo, irrelevant to this test
+                sw.Write((int)LegacyMods.Hidden); // mods
+                sw.Write(string.Empty); // hp graph, irrelevant
+                sw.Write(DateTime.Now); // date, irrelevant
+                sw.Write(Array.Empty<byte>()); // replay data, irrelevant
+                sw.Write((long)1234); // legacy online ID, irrelevant
+            }
+
+            memoryStream.Seek(0, SeekOrigin.Begin);
+            var decoded = new TestLegacyScoreDecoder().Parse(memoryStream);
+
+            Assert.Multiple(() =>
+            {
+                // In stable this would be an A because there are over 1% 50s. But that's not a thing in lazer.
+                Assert.That(decoded.ScoreInfo.Rank, Is.EqualTo(ScoreRank.SH));
+            });
+        }
+
+        [Test]
+        public void AccuracyRankAndTotalScoreOfLazerScorePreserved()
+        {
+            var ruleset = new OsuRuleset().RulesetInfo;
+
+            var scoreInfo = TestResources.CreateTestScoreInfo(ruleset);
+            scoreInfo.Mods = new Mod[] { new OsuModFlashlight() };
+            scoreInfo.Statistics = new Dictionary<HitResult, int>
+            {
+                [HitResult.Great] = 199,
+                [HitResult.Miss] = 1,
+                [HitResult.LargeTickHit] = 1,
+            };
+            scoreInfo.MaximumStatistics = new Dictionary<HitResult, int>
+            {
+                [HitResult.Great] = 200,
+                [HitResult.LargeTickHit] = 1,
+            };
+
+            var beatmap = new TestBeatmap(ruleset);
+            var score = new Score
+            {
+                ScoreInfo = scoreInfo,
+            };
+
+            var decodedAfterEncode = encodeThenDecode(LegacyBeatmapDecoder.LATEST_VERSION, score, beatmap);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(decodedAfterEncode.ScoreInfo.TotalScore, Is.EqualTo(284_537));
+                Assert.That(decodedAfterEncode.ScoreInfo.LegacyTotalScore, Is.Null);
+                Assert.That(decodedAfterEncode.ScoreInfo.Accuracy, Is.EqualTo((double)(199 * 300 + 30) / (200 * 300 + 30)));
+                Assert.That(decodedAfterEncode.ScoreInfo.Rank, Is.EqualTo(ScoreRank.A));
+            });
+        }
+
+        [Test]
+        public void AccuracyAndRankOfLazerScoreWithoutLegacyReplaySoloScoreInfoUsesBestEffortFallbackToLegacy()
+        {
+            var memoryStream = new MemoryStream();
+
+            // local partial implementation of legacy score encoder
+            // this is done half for readability, half because we want to emulate an old lazer score here
+            // that does not have everything that `LegacyScoreEncoder` now writes to the replay
+            using (var sw = new SerializationWriter(memoryStream, true))
+            {
+                sw.Write((byte)0); // ruleset id (osu!)
+                sw.Write(LegacyScoreEncoder.FIRST_LAZER_VERSION); // version
+                sw.Write(string.Empty.ComputeMD5Hash()); // beatmap hash, irrelevant to this test
+                sw.Write("username"); // irrelevant to this test
+                sw.Write(string.Empty.ComputeMD5Hash()); // score hash, irrelevant to this test
+                sw.Write((ushort)198); // count300
+                sw.Write((ushort)0); // count100
+                sw.Write((ushort)1); // count50
+                sw.Write((ushort)0); // countGeki
+                sw.Write((ushort)0); // countKatu
+                sw.Write((ushort)1); // countMiss
+                sw.Write(12345678); // total score, irrelevant to this test
+                sw.Write((ushort)1000); // max combo, irrelevant to this test
+                sw.Write(false); // full combo, irrelevant to this test
+                sw.Write((int)LegacyMods.Hidden); // mods
+                sw.Write(string.Empty); // hp graph, irrelevant
+                sw.Write(DateTime.Now); // date, irrelevant
+                sw.Write(Array.Empty<byte>()); // replay data, irrelevant
+                sw.Write((long)1234); // legacy online ID, irrelevant
+                // importantly, no compressed `LegacyReplaySoloScoreInfo` here
+            }
+
+            memoryStream.Seek(0, SeekOrigin.Begin);
+            var decoded = new TestLegacyScoreDecoder().Parse(memoryStream);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(decoded.ScoreInfo.Accuracy, Is.EqualTo((double)(198 * 300 + 50) / (200 * 300)));
+                Assert.That(decoded.ScoreInfo.Rank, Is.EqualTo(ScoreRank.A));
+            });
+        }
+
         private static Score encodeThenDecode(int beatmapVersion, Score score, TestBeatmap beatmap)
         {
             var encodeStream = new MemoryStream();
@@ -267,7 +432,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
             CultureInfo.CurrentCulture = originalCulture;
         }
 
-        private class TestLegacyScoreDecoder : LegacyScoreDecoder
+        public class TestLegacyScoreDecoder : LegacyScoreDecoder
         {
             private readonly int beatmapVersion;
 
@@ -294,6 +459,12 @@ namespace osu.Game.Tests.Beatmaps.Formats
                     Ruleset = new OsuRuleset().RulesetInfo,
                     Difficulty = new BeatmapDifficulty(),
                     BeatmapVersion = beatmapVersion,
+                },
+                // needs to have at least one objects so that `StandardisedScoreMigrationTools` doesn't die
+                // when trying to recompute total score.
+                HitObjects =
+                {
+                    new HitCircle()
                 }
             });
         }

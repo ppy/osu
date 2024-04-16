@@ -16,6 +16,7 @@ using osu.Game.Configuration;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Play;
 using osu.Game.Skinning;
 using osuTK;
@@ -30,6 +31,9 @@ namespace osu.Game.Tests.Visual.Gameplay
         private readonly Container content;
 
         protected override Container<Drawable> Content => content;
+
+        private bool gameplayClockAlwaysGoingForward = true;
+        private double lastForwardCheckTime;
 
         public TestScenePause()
         {
@@ -68,11 +72,19 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         [Test]
+        public void TestForwardPlaybackGuarantee()
+        {
+            hookForwardPlaybackCheck();
+
+            AddUntilStep("wait for forward playback", () => Player.GameplayClockContainer.CurrentTime > 1000);
+            AddStep("seek before gameplay", () => Player.GameplayClockContainer.Seek(-5000));
+
+            checkForwardPlayback();
+        }
+
+        [Test]
         public void TestPauseWithLargeOffset()
         {
-            double lastStopTime;
-            bool alwaysGoingForward = true;
-
             AddStep("force large offset", () =>
             {
                 var offset = (BindableDouble)LocalConfig.GetBindable<double>(OsuSetting.AudioOffset);
@@ -82,28 +94,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 offset.Value = -5000;
             });
 
-            AddStep("add time forward check hook", () =>
-            {
-                lastStopTime = double.MinValue;
-                alwaysGoingForward = true;
-
-                Player.OnUpdate += _ =>
-                {
-                    var masterClock = (MasterGameplayClockContainer)Player.GameplayClockContainer;
-
-                    double currentTime = masterClock.CurrentTime;
-
-                    bool goingForward = currentTime >= (masterClock.LastStopTime ?? lastStopTime);
-
-                    alwaysGoingForward &= goingForward;
-
-                    if (!goingForward)
-                        Logger.Log($"Went too far backwards (last stop: {lastStopTime:N1} current: {currentTime:N1})");
-
-                    if (masterClock.LastStopTime != null)
-                        lastStopTime = masterClock.LastStopTime.Value;
-                };
-            });
+            hookForwardPlaybackCheck();
 
             AddStep("move cursor outside", () => InputManager.MoveMouseTo(Player.ScreenSpaceDrawQuad.TopLeft - new Vector2(10)));
 
@@ -111,9 +102,35 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             resumeAndConfirm();
 
-            AddAssert("time didn't go too far backwards", () => alwaysGoingForward);
+            checkForwardPlayback();
 
             AddStep("reset offset", () => LocalConfig.SetValue(OsuSetting.AudioOffset, 0.0));
+        }
+
+        private void checkForwardPlayback() => AddAssert("time didn't go too far backwards", () => gameplayClockAlwaysGoingForward);
+
+        private void hookForwardPlaybackCheck()
+        {
+            AddStep("add time forward check hook", () =>
+            {
+                lastForwardCheckTime = double.MinValue;
+                gameplayClockAlwaysGoingForward = true;
+
+                Player.OnUpdate += _ =>
+                {
+                    var frameStableClock = Player.ChildrenOfType<FrameStabilityContainer>().Single().Clock;
+
+                    double currentTime = frameStableClock.CurrentTime;
+
+                    bool goingForward = currentTime >= lastForwardCheckTime;
+                    lastForwardCheckTime = currentTime;
+
+                    gameplayClockAlwaysGoingForward &= goingForward;
+
+                    if (!goingForward)
+                        Logger.Log($"Went too far backwards (last stop: {lastForwardCheckTime:N1} current: {currentTime:N1})");
+                };
+            });
         }
 
         [Test]
@@ -125,7 +142,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             resumeAndConfirm();
 
-            AddAssert("Resumed without seeking forward", () => Player.LastResumeTime, () => Is.LessThanOrEqualTo(Player.LastPauseTime));
+            AddAssert("continued playing forward", () => Player.LastResumeTime, () => Is.GreaterThanOrEqualTo(Player.LastPauseTime));
 
             AddUntilStep("player playing", () => Player.LocalUserPlaying.Value);
         }

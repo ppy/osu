@@ -405,6 +405,8 @@ namespace osu.Game.Overlays
                         RelativeSizeAxes = Axes.Both,
                         Colour = OsuColour.Gray(150),
                         FillMode = FillMode.Fill,
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
                     },
                     new Box
                     {
