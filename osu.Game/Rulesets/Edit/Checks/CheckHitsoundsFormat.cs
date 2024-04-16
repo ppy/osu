@@ -73,7 +73,7 @@ namespace osu.Game.Rulesets.Edit.Checks
         public class IssueTemplateFormatUnsupported : IssueTemplate
         {
             public IssueTemplateFormatUnsupported(ICheck check)
-                : base(check, IssueType.Problem, "\"{0}\" is using a unsupported format; Use wav or ogg for hitsounds.")
+                : base(check, IssueType.Problem, "\"{0}\" may be corrupt or using a unsupported audio format; Use wav or ogg for hitsounds.")
             {
             }
 

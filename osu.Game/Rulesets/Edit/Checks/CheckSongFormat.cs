@@ -61,7 +61,7 @@ namespace osu.Game.Rulesets.Edit.Checks
         public class IssueTemplateFormatUnsupported : IssueTemplate
         {
             public IssueTemplateFormatUnsupported(ICheck check)
-                : base(check, IssueType.Problem, "\"{0}\" is using a unsupported format; Use mp3 or ogg for the song's audio.")
+                : base(check, IssueType.Problem, "\"{0}\" may be corrupt or using a unsupported audio format; Use mp3 or ogg for the song's audio.")
             {
             }
 
