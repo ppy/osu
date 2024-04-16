@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -12,6 +10,7 @@ using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Game.Rulesets.Osu.UI.Cursor;
+using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Play;
 using osuTK.Graphics;
 
@@ -19,14 +18,17 @@ namespace osu.Game.Rulesets.Osu.UI
 {
     public partial class OsuResumeOverlay : ResumeOverlay
     {
-        private Container cursorScaleContainer;
-        private OsuClickToResumeCursor clickToResumeCursor;
+        private Container cursorScaleContainer = null!;
+        private OsuClickToResumeCursor clickToResumeCursor = null!;
 
-        private OsuCursorContainer localCursorContainer;
+        private OsuCursorContainer? localCursorContainer;
 
-        public override CursorContainer LocalCursor => State.Value == Visibility.Visible ? localCursorContainer : null;
+        public override CursorContainer? LocalCursor => State.Value == Visibility.Visible ? localCursorContainer : null;
 
         protected override LocalisableString Message => "Click the orange cursor to resume";
+
+        [Resolved]
+        private DrawableRuleset? drawableRuleset { get; set; }
 
         [BackgroundDependencyLoader]
         private void load()
@@ -40,7 +42,7 @@ namespace osu.Game.Rulesets.Osu.UI
         protected override void PopIn()
         {
             // Can't display if the cursor is outside the window.
-            if (GameplayCursor.LastFrameState == Visibility.Hidden || !Contains(GameplayCursor.ActiveCursor.ScreenSpaceDrawQuad.Centre))
+            if (GameplayCursor.LastFrameState == Visibility.Hidden || drawableRuleset?.Contains(GameplayCursor.ActiveCursor.ScreenSpaceDrawQuad.Centre) == false)
             {
                 Resume();
                 return;
@@ -71,8 +73,8 @@ namespace osu.Game.Rulesets.Osu.UI
         {
             public override bool HandlePositionalInput => true;
 
-            public Action ResumeRequested;
-            private Container scaleTransitionContainer;
+            public Action? ResumeRequested;
+            private Container scaleTransitionContainer = null!;
 
             public OsuClickToResumeCursor()
             {
