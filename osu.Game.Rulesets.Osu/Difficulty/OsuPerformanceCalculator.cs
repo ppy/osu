@@ -388,11 +388,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             // Assuming that less than 25 mechanical pp is not worthy for memory
             double capPerformance = mechanicalPerformance + flaslightPerformance + 25;
 
-            // Avoid it being broken on millions of pp, ruins it being continious, but it will never happen on normal circumstances
-            if (capPerformance > 10000 || cognitionPerformance > 10000) cognitionPerformance = Math.Min(capPerformance, cognitionPerformance);
-            else cognitionPerformance = 100 * softmin(capPerformance / 100, cognitionPerformance / 100, 100);
+            // This thing is kinda unpredictable on cognitionPerformance > capPerformance, because it isn't really a soft min
+            // But it works well on cognitionPerformance < capPerformance so i will take it
+            double ratio = capPerformance / cognitionPerformance;
+            ratio = softmin(ratio, 1, 10);
 
-            return cognitionPerformance;
+            return ratio * cognitionPerformance;
         }
 
         private static double softmin(double a, double b, double power = Math.E) => a * b / Math.Log(Math.Pow(power, a) + Math.Pow(power, b), power);
