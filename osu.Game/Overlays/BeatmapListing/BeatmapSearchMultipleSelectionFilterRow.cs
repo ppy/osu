@@ -129,6 +129,7 @@ namespace osu.Game.Overlays.BeatmapListing
             {
                 base.OnClick(e);
                 Active.Toggle();
+                SelectSample.Play();
                 return true;
             }
         }
