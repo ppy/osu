@@ -77,7 +77,7 @@ namespace osu.Game.Rulesets.Osu.Objects
         /// The distance travelled by the cursor upon completion of this <see cref="Slider"/> if it was hit
         /// with as few movements as possible. This is set and used by difficulty calculation.
         /// </summary>
-        public float LazyTravelDistance;
+        internal float LazyTravelDistance;
 
         /// <summary>
         /// The time taken by the cursor upon completion of this <see cref="Slider"/> if it was hit
