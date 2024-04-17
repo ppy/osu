@@ -1110,6 +1110,19 @@ namespace osu.Game.Database
                     }
 
                     break;
+
+                case 41:
+                    foreach (var score in migration.NewRealm.All<ScoreInfo>())
+                    {
+                        double modMultiplier = 1;
+
+                        foreach (var mod in score.Mods)
+                            modMultiplier *= mod.ScoreMultiplier;
+
+                        score.TotalScoreWithoutMods = (long)Math.Round(score.TotalScore / modMultiplier);
+                    }
+
+                    break;
             }
 
             Logger.Log($"Migration completed in {stopwatch.ElapsedMilliseconds}ms");
