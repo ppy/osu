@@ -42,7 +42,7 @@ namespace osu.Game.Rulesets.Edit.Checks
                 if (data == null || data.Length <= 0) yield break;
 
                 var fileCallbacks = new FileCallbacks(new DataStreamFileProcedures(data));
-                int decodeStream = Bass.CreateStream(StreamSystem.NoBuffer, BassFlags.Decode | BassFlags.Prescan, fileCallbacks.Callbacks, fileCallbacks.Handle);
+                int decodeStream = Bass.CreateStream(StreamSystem.NoBuffer, BassFlags.Decode, fileCallbacks.Callbacks, fileCallbacks.Handle);
 
                 // If the format is not supported by BASS
                 if (decodeStream == 0)
@@ -55,6 +55,8 @@ namespace osu.Game.Rulesets.Edit.Checks
 
                 if (!allowedFormats.Contains(audioInfo.ChannelType))
                     yield return new IssueTemplateIncorrectFormat(this).Create(audioFile.Filename, audioInfo.ChannelType.ToString());
+
+                Bass.StreamFree(decodeStream);
             }
         }
 
