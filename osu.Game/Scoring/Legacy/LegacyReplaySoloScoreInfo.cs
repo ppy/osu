@@ -38,6 +38,9 @@ namespace osu.Game.Scoring.Legacy
         [JsonProperty("client_version")]
         public string ClientVersion = string.Empty;
 
+        [JsonProperty("total_score_without_mods")]
+        public long? TotalScoreWithoutMods { get; set; }
+
         public static LegacyReplaySoloScoreInfo FromScore(ScoreInfo score) => new LegacyReplaySoloScoreInfo
         {
             OnlineID = score.OnlineID,
@@ -45,6 +48,7 @@ namespace osu.Game.Scoring.Legacy
             Statistics = score.Statistics.Where(kvp => kvp.Value != 0).ToDictionary(),
             MaximumStatistics = score.MaximumStatistics.Where(kvp => kvp.Value != 0).ToDictionary(),
             ClientVersion = score.ClientVersion,
+            TotalScoreWithoutMods = score.TotalScoreWithoutMods > 0 ? score.TotalScoreWithoutMods : null,
         };
     }
 }

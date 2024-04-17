@@ -412,6 +412,80 @@ namespace osu.Game.Tests.Beatmaps.Formats
             });
         }
 
+        [Test]
+        public void TestTotalScoreWithoutModsReadIfPresent()
+        {
+            var ruleset = new OsuRuleset().RulesetInfo;
+
+            var scoreInfo = TestResources.CreateTestScoreInfo(ruleset);
+            scoreInfo.Mods = new Mod[]
+            {
+                new OsuModDoubleTime { SpeedChange = { Value = 1.1 } }
+            };
+            scoreInfo.OnlineID = 123123;
+            scoreInfo.ClientVersion = "2023.1221.0";
+            scoreInfo.TotalScoreWithoutMods = 1_000_000;
+            scoreInfo.TotalScore = 1_020_000;
+
+            var beatmap = new TestBeatmap(ruleset);
+            var score = new Score
+            {
+                ScoreInfo = scoreInfo,
+                Replay = new Replay
+                {
+                    Frames = new List<ReplayFrame>
+                    {
+                        new OsuReplayFrame(2000, OsuPlayfield.BASE_SIZE / 2, OsuAction.LeftButton)
+                    }
+                }
+            };
+
+            var decodedAfterEncode = encodeThenDecode(LegacyBeatmapDecoder.LATEST_VERSION, score, beatmap);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(decodedAfterEncode.ScoreInfo.TotalScoreWithoutMods, Is.EqualTo(1_000_000));
+                Assert.That(decodedAfterEncode.ScoreInfo.TotalScore, Is.EqualTo(1_020_000));
+            });
+        }
+
+        [Test]
+        public void TestTotalScoreWithoutModsBackwardsPopulatedIfMissing()
+        {
+            var ruleset = new OsuRuleset().RulesetInfo;
+
+            var scoreInfo = TestResources.CreateTestScoreInfo(ruleset);
+            scoreInfo.Mods = new Mod[]
+            {
+                new OsuModDoubleTime { SpeedChange = { Value = 1.1 } }
+            };
+            scoreInfo.OnlineID = 123123;
+            scoreInfo.ClientVersion = "2023.1221.0";
+            scoreInfo.TotalScoreWithoutMods = 0;
+            scoreInfo.TotalScore = 1_020_000;
+
+            var beatmap = new TestBeatmap(ruleset);
+            var score = new Score
+            {
+                ScoreInfo = scoreInfo,
+                Replay = new Replay
+                {
+                    Frames = new List<ReplayFrame>
+                    {
+                        new OsuReplayFrame(2000, OsuPlayfield.BASE_SIZE / 2, OsuAction.LeftButton)
+                    }
+                }
+            };
+
+            var decodedAfterEncode = encodeThenDecode(LegacyBeatmapDecoder.LATEST_VERSION, score, beatmap);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(decodedAfterEncode.ScoreInfo.TotalScoreWithoutMods, Is.EqualTo(1_000_000));
+                Assert.That(decodedAfterEncode.ScoreInfo.TotalScore, Is.EqualTo(1_020_000));
+            });
+        }
+
         private static Score encodeThenDecode(int beatmapVersion, Score score, TestBeatmap beatmap)
         {
             var encodeStream = new MemoryStream();
