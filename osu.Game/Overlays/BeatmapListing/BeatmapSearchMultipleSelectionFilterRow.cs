@@ -128,6 +128,9 @@ namespace osu.Game.Overlays.BeatmapListing
             protected override bool OnClick(ClickEvent e)
             {
                 base.OnClick(e);
+
+                // this tab item implementation is not managed by a TabControl,
+                // therefore we have to manually update Active state and play select sound when this tab item is clicked.
                 Active.Toggle();
                 SelectSample.Play();
                 return true;
