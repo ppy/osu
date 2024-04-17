@@ -63,7 +63,6 @@ namespace osu.Game.Rulesets.Edit.Checks
                     if (!allowedFormats.Contains(audioInfo.ChannelType))
                         yield return new IssueTemplateIncorrectFormat(this).Create(file.Filename, audioInfo.ChannelType.ToString());
 
-
                     Bass.StreamFree(decodeStream);
                 }
             }

@@ -44,7 +44,7 @@ namespace osu.Game.Tests.Editing.Checks
         }
 
         [Test]
-        public void TestMP3Audio()
+        public void TestMp3Audio()
         {
             using (var resourceStream = TestResources.OpenResource("Samples/test-sample-cut.mp3"))
             {
@@ -55,7 +55,7 @@ namespace osu.Game.Tests.Editing.Checks
         }
 
         [Test]
-        public void TestOGGAudio()
+        public void TestOggAudio()
         {
             using (var resourceStream = TestResources.OpenResource("Samples/test-sample.ogg"))
             {
@@ -65,7 +65,7 @@ namespace osu.Game.Tests.Editing.Checks
         }
 
         [Test]
-        public void TestWAVAudio()
+        public void TestWavAudio()
         {
             using (var resourceStream = TestResources.OpenResource("Samples/hitsound-delay.wav"))
             {
@@ -75,7 +75,7 @@ namespace osu.Game.Tests.Editing.Checks
         }
 
         [Test]
-        public void TestWEBMAudio()
+        public void TestWebmAudio()
         {
             using (var resourceStream = TestResources.OpenResource("Samples/test-sample.webm"))
             {
