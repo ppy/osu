@@ -129,6 +129,11 @@ namespace osu.Game.Scoring.Legacy
                         score.ScoreInfo.MaximumStatistics = readScore.MaximumStatistics;
                         score.ScoreInfo.Mods = readScore.Mods.Select(m => m.ToMod(currentRuleset)).ToArray();
                         score.ScoreInfo.ClientVersion = readScore.ClientVersion;
+
+                        if (readScore.TotalScoreWithoutMods is long totalScoreWithoutMods)
+                            score.ScoreInfo.TotalScoreWithoutMods = totalScoreWithoutMods;
+                        else
+                            PopulateTotalScoreWithoutMods(score.ScoreInfo);
                     });
                 }
             }
@@ -235,6 +240,16 @@ namespace osu.Game.Scoring.Legacy
             if (attributes.MaxCombo > maxComboFromStatistics)
                 score.MaximumStatistics[HitResult.LegacyComboIncrease] = attributes.MaxCombo - maxComboFromStatistics;
 #pragma warning restore CS0618
+        }
+
+        public static void PopulateTotalScoreWithoutMods(ScoreInfo score)
+        {
+            double modMultiplier = 1;
+
+            foreach (var mod in score.Mods)
+                modMultiplier *= mod.ScoreMultiplier;
+
+            score.TotalScoreWithoutMods = (long)Math.Round(score.TotalScore / modMultiplier);
         }
 
         private void readLegacyReplay(Replay replay, StreamReader reader)
