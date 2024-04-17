@@ -91,8 +91,9 @@ namespace osu.Game.Database
         /// 38   2023-12-10    Add EndTimeObjectCount and TotalObjectCount to BeatmapInfo.
         /// 39   2023-12-19    Migrate any EndTimeObjectCount and TotalObjectCount values of 0 to -1 to better identify non-calculated values.
         /// 40   2023-12-21    Add ScoreInfo.Version to keep track of which build scores were set on.
+        /// 41   2024-04-17    Add ScoreInfo.TotalScoreWithoutMods for future mod multiplier rebalances.
         /// </summary>
-        private const int schema_version = 40;
+        private const int schema_version = 41;
 
         /// <summary>
         /// Lock object which is held during <see cref="BlockAllOperations"/> sections, blocking realm retrieval during blocking periods.
