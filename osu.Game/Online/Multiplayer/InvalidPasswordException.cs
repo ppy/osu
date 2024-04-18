@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Runtime.Serialization;
 using Microsoft.AspNetCore.SignalR;
 
 namespace osu.Game.Online.Multiplayer
@@ -11,11 +10,6 @@ namespace osu.Game.Online.Multiplayer
     public class InvalidPasswordException : HubException
     {
         public InvalidPasswordException()
-        {
-        }
-
-        protected InvalidPasswordException(SerializationInfo info, StreamingContext context)
-            : base(info, context)
         {
         }
     }
