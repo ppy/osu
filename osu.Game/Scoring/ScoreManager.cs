@@ -58,6 +58,15 @@ namespace osu.Game.Scoring
             };
         }
 
+        /// <summary>
+        /// Retrieve a <see cref="Score"/> from a given <see cref="IScoreInfo"/>.
+        /// </summary>
+        /// <param name="scoreInfo">The <see cref="IScoreInfo"/> to convert.</param>
+        /// <returns>The <see cref="Score"/>. Null if the score on the database cannot be found.</returns>
+        /// <remarks>
+        /// The <see cref="IScoreInfo"/> is re-retrieved from the database to ensure all the required data
+        /// for retrieving a replay are present (may have missing properties if it was retrieved from online data).
+        /// </remarks>
         public Score? GetScore(IScoreInfo scoreInfo)
         {
             ScoreInfo? databasedScoreInfo = getDatabasedScoreInfo(scoreInfo);
@@ -75,12 +84,6 @@ namespace osu.Game.Scoring
             return Realm.Run(r => r.All<ScoreInfo>().FirstOrDefault(query)?.Detach());
         }
 
-        /// <summary>
-        /// Re-retrieve a given <see cref="IScoreInfo"/> from the database to ensure all the required data for presenting / exporting a replay are present.
-        /// </summary>
-        /// <param name="originalScoreInfo">The <see cref="IScoreInfo"/> to attempt querying on.</param>
-        /// <returns>The databased score info. Null if the score on the database cannot be found.</returns>
-        /// <remarks>Can be used when the <see cref="IScoreInfo"/> was retrieved from online data, as it may have missing properties.</remarks>
         private ScoreInfo? getDatabasedScoreInfo(IScoreInfo originalScoreInfo)
         {
             ScoreInfo? databasedScoreInfo = null;
@@ -194,6 +197,15 @@ namespace osu.Game.Scoring
 
         public Task<IEnumerable<Live<ScoreInfo>>> Import(ProgressNotification notification, ImportTask[] tasks, ImportParameters parameters = default) => scoreImporter.Import(notification, tasks);
 
+        /// <summary>
+        /// Export a replay from a given <see cref="IScoreInfo"/>.
+        /// </summary>
+        /// <param name="scoreInfo">The <see cref="IScoreInfo"/> to export.</param>
+        /// <returns>The <see cref="Task"/>. Null if the score on the database cannot be found.</returns>
+        /// <remarks>
+        /// The <see cref="IScoreInfo"/> is re-retrieved from the database to ensure all the required data
+        /// for exporting a replay are present (may have missing properties if it was retrieved from online data).
+        /// </remarks>
         public Task? Export(ScoreInfo scoreInfo)
         {
             ScoreInfo? databasedScoreInfo = getDatabasedScoreInfo(scoreInfo);
