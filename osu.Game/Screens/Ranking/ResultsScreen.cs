@@ -191,6 +191,16 @@ namespace osu.Game.Screens.Ranking
                 });
             }
 
+            AddInternal(new HotkeyExitOverlay
+            {
+                Action = () =>
+                {
+                    if (!this.IsCurrentScreen()) return;
+
+                    this.Exit();
+                },
+            });
+
             if (player != null && AllowRetry)
             {
                 buttons.Add(new RetryButton { Width = 300 });
