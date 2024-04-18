@@ -205,7 +205,9 @@ namespace osu.Desktop
                     Password = room.Settings.Password,
                 };
 
-                presence.Secrets.JoinSecret = JsonConvert.SerializeObject(roomSecret);
+                if (client.HasRegisteredUriScheme)
+                    presence.Secrets.JoinSecret = JsonConvert.SerializeObject(roomSecret);
+
                 // discord cannot handle both secrets and buttons at the same time, so we need to choose something.
                 // the multiplayer room seems more important.
                 presence.Buttons = null;
