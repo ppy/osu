@@ -18,26 +18,26 @@
     </None>
   </ItemGroup>
   <ItemGroup Label="Package References">
-    <PackageReference Include="AutoMapper" Version="12.0.1" />
+    <PackageReference Include="AutoMapper" Version="13.0.1" />
     <PackageReference Include="DiffPlex" Version="1.7.2" />
-    <PackageReference Include="HtmlAgilityPack" Version="1.11.59" />
+    <PackageReference Include="HtmlAgilityPack" Version="1.11.60" />
     <PackageReference Include="Humanizer" Version="2.14.1" />
     <PackageReference Include="MessagePack" Version="2.5.140" />
-    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="7.0.15" />
-    <PackageReference Include="Microsoft.AspNetCore.SignalR.Protocols.MessagePack" Version="7.0.15" />
-    <PackageReference Include="Microsoft.AspNetCore.SignalR.Protocols.NewtonsoftJson" Version="7.0.15" />
-    <PackageReference Include="Microsoft.Data.Sqlite.Core" Version="7.0.12" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="7.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="8.0.4" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Protocols.MessagePack" Version="8.0.4" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Protocols.NewtonsoftJson" Version="8.0.4" />
+    <PackageReference Include="Microsoft.Data.Sqlite.Core" Version="8.0.4" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="8.0.0" />
     <PackageReference Include="Microsoft.Toolkit.HighPerformance" Version="7.1.2" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageReference Include="ppy.LocalisationAnalyser" Version="2023.1117.0">
+    <PackageReference Include="ppy.LocalisationAnalyser" Version="2024.318.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Realm" Version="11.5.0" />
+    <PackageReference Include="Realm" Version="12.0.0" />
     <PackageReference Include="ppy.osu.Framework" Version="2024.329.0" />
     <PackageReference Include="ppy.osu.Game.Resources" Version="2024.410.0" />
-    <PackageReference Include="Sentry" Version="4.3.0" />
+    <PackageReference Include="Sentry" Version="4.4.0" />
     <!-- Held back due to 0.34.0 failing AOT compilation on ZstdSharp.dll dependency. -->
     <PackageReference Include="SharpCompress" Version="0.36.0" />
     <PackageReference Include="NUnit" Version="3.14.0" />
