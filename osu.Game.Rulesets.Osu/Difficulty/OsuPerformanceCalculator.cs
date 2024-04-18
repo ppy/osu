@@ -84,8 +84,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double lowARValue = computeReadingLowARValue(score, osuAttributes);
             double highARValue = computeReadingHighARValue(score, osuAttributes);
 
-            double arPower = OsuDifficultyCalculator.AR_SUM_POWER;
-            double readingARValue = Math.Pow(Math.Pow(lowARValue, arPower) + Math.Pow(highARValue, arPower), 1.0 / arPower);
+            double readingARValue = Math.Pow(Math.Pow(lowARValue, power) + Math.Pow(highARValue, power), 1.0 / power);
 
             double readingHDValue = computeReadingHiddenValue(score, osuAttributes);
 
@@ -348,6 +347,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double rawReading = attributes.HiddenDifficulty;
             double hiddenValue = ReadingHidden.DifficultyToPerformance(attributes.HiddenDifficulty);
 
+            double lengthBonus = CalculateDefaultLengthBonus(totalHits);
+            hiddenValue *= lengthBonus;
+
             // Penalize misses by assessing # of misses relative to the total # of objects. Default a 3% reduction for any # of misses.
             if (effectiveMissCount > 0)
                 hiddenValue *= 0.97 * Math.Pow(1 - Math.Pow(effectiveMissCount / totalHits, 0.775), Math.Pow(effectiveMissCount, .875));
@@ -388,12 +390,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             // Assuming that less than 25 mechanical pp is not worthy for memory
             double capPerformance = mechanicalPerformance + flaslightPerformance + 25;
 
-            // This thing is kinda unpredictable on cognitionPerformance > capPerformance, because it isn't really a soft min
-            // But it works well on cognitionPerformance < capPerformance so i will take it
-            double ratio = capPerformance / cognitionPerformance;
-            ratio = softmin(ratio, 1, 10);
+            double ratio = cognitionPerformance / capPerformance;
+            if (ratio > 50) return capPerformance;
 
-            return ratio * cognitionPerformance;
+            ratio = softmin(ratio * 10, 10, 5) / 10;
+            return ratio * capPerformance;
         }
 
         private static double softmin(double a, double b, double power = Math.E) => a * b / Math.Log(Math.Pow(power, a) + Math.Pow(power, b), power);

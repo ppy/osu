@@ -294,15 +294,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             double density = ReadingEvaluator.EvaluateDensityOf(current, false);
 
             // Consider that density matters only starting from 3rd note on the screen
-            double densityFactor = Math.Max(0, density - 1) / 4;
-
-            // This is kinda wrong cuz it returns value bigger than preempt
-            // double timeSpentInvisible = getDurationSpentInvisible(currObj) / 1000 / currObj.ClockRate;
-
-            // The closer timeSpentInvisible is to 0 -> the less difference there are between NM and HD
-            // So we will reduce base according to this
-            double invisibilityFactor = logistic(currObj.Preempt / 180 - 3.5);
-
+            double densityFactor = Math.Max(0, density - 1) / 5;
+            double invisibilityFactor = currObj.Preempt / 1000;
             double hdDifficulty = invisibilityFactor + densityFactor;
 
             // Scale by inpredictability slightly
@@ -310,7 +303,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             return hdDifficulty;
         }
-        private static double logistic(double x) => 1 / (1 + Math.Exp(-x));
     }
 
     public static class ReadingHighAREvaluator
