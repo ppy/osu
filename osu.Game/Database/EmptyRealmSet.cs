@@ -35,6 +35,8 @@ namespace osu.Game.Database
         }
 
         public IRealmCollection<T> Freeze() => throw new NotImplementedException();
+        public IDisposable SubscribeForNotifications(NotificationCallbackDelegate<T> callback, KeyPathsCollection? keyPathCollection = null) => throw new NotImplementedException();
+
         public IDisposable SubscribeForNotifications(NotificationCallbackDelegate<T> callback) => throw new NotImplementedException();
         public bool IsValid => throw new NotImplementedException();
         public Realm Realm => throw new NotImplementedException();
