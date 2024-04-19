@@ -143,8 +143,6 @@ namespace osu.Game.Overlays.Mods
         protected ShearedToggleButton? CustomisationButton { get; private set; }
         protected SelectAllModsButton? SelectAllModsButton { get; set; }
 
-        private bool textBoxShouldFocus;
-
         private Sample? columnAppearSample;
 
         private WorkingBeatmap? beatmap;
@@ -542,7 +540,7 @@ namespace osu.Game.Overlays.Mods
             if (customisationVisible.Value)
                 SearchTextBox.KillFocus();
             else
-                setTextBoxFocus(textBoxShouldFocus);
+                setTextBoxFocus(textSearchStartsActive.Value);
         }
 
         /// <summary>
@@ -781,7 +779,7 @@ namespace osu.Game.Overlays.Mods
         /// </remarks>>
         public bool OnPressed(KeyBindingPressEvent<PlatformAction> e)
         {
-            if (e.Repeat || e.Action != PlatformAction.SelectAll || SelectAllModsButton is null)
+            if (e.Repeat || e.Action != PlatformAction.SelectAll || SelectAllModsButton == null)
                 return false;
 
             SelectAllModsButton.TriggerClick();
@@ -798,15 +796,13 @@ namespace osu.Game.Overlays.Mods
                 return false;
 
             // TODO: should probably eventually support typical platform search shortcuts (`Ctrl-F`, `/`)
-            setTextBoxFocus(!textBoxShouldFocus);
+            setTextBoxFocus(!SearchTextBox.HasFocus);
             return true;
         }
 
-        private void setTextBoxFocus(bool keepFocus)
+        private void setTextBoxFocus(bool focus)
         {
-            textBoxShouldFocus = keepFocus;
-
-            if (textBoxShouldFocus)
+            if (focus)
                 SearchTextBox.TakeFocus();
             else
                 SearchTextBox.KillFocus();
