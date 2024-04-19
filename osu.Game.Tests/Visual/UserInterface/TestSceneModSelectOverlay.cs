@@ -613,6 +613,23 @@ namespace osu.Game.Tests.Visual.UserInterface
         }
 
         [Test]
+        public void TestSearchBoxFocusToggleRespondsToExternalChanges()
+        {
+            AddStep("text search does not start active", () => configManager.SetValue(OsuSetting.ModSelectTextSearchStartsActive, false));
+            createScreen();
+
+            AddUntilStep("search text box not focused", () => !modSelectOverlay.SearchTextBox.HasFocus);
+
+            AddStep("press tab", () => InputManager.Key(Key.Tab));
+            AddAssert("search text box focused", () => modSelectOverlay.SearchTextBox.HasFocus);
+
+            AddStep("unfocus search text box externally", () => InputManager.ChangeFocus(null));
+
+            AddStep("press tab", () => InputManager.Key(Key.Tab));
+            AddAssert("search text box focused", () => modSelectOverlay.SearchTextBox.HasFocus);
+        }
+
+        [Test]
         public void TestTextSearchDoesNotBlockCustomisationPanelKeyboardInteractions()
         {
             AddStep("text search starts active", () => configManager.SetValue(OsuSetting.ModSelectTextSearchStartsActive, true));
