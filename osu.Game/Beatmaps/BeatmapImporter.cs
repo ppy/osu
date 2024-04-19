@@ -180,7 +180,7 @@ namespace osu.Game.Beatmaps
 
                 beatmapInfo.AudioNormalization = audioNormalization;
                 beatmapInfo.AudioNormalization.PopulateSet(beatmapInfo, beatmapSet);
-                Logger.Log("Processed loudness values for " + beatmapInfo.Metadata.Title);
+                Logger.Log($"Processed loudness values for {beatmapInfo.Metadata.Title} [{beatmapInfo.DifficultyName}]");
             }
 
             validateOnlineIds(beatmapSet, realm);
