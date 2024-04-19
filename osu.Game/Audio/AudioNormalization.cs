@@ -27,7 +27,7 @@ namespace osu.Game.Audio
         /// <summary>
         /// The integrated (average) loudness of the audio
         /// </summary>
-        public float IntegratedLoudness { get; init; }
+        public float? IntegratedLoudness { get; init; }
 
         public AudioNormalization()
         {
@@ -43,18 +43,26 @@ namespace osu.Game.Audio
         {
             string audiofile = beatmapInfo.Metadata.AudioFile;
 
-            if (string.IsNullOrEmpty(audiofile)) return;
+            if (string.IsNullOrEmpty(audiofile))
+            {
+                Logger.Log("Audio file not found for " + beatmapInfo.Metadata.Title, LoggingTarget.Runtime, LogLevel.Error);
+                return;
+            }
 
             string? filepath = beatmapSetInfo.GetPathForFile(audiofile);
 
-            if (string.IsNullOrEmpty(filepath)) return;
+            if (string.IsNullOrEmpty(filepath))
+            {
+                Logger.Log("File path not found for " + audiofile, LoggingTarget.Runtime, LogLevel.Error);
+                return;
+            }
 
             filepath = realmFileStore.Storage.GetFullPath(filepath);
 
             BassAudioNormalization loudnessDetection = new BassAudioNormalization(filepath);
-            float integratedLoudness = loudnessDetection.IntegratedLoudness;
+            float? integratedLoudness = loudnessDetection.IntegratedLoudness;
 
-            if (Math.Abs(integratedLoudness - 1) < 0.0000001)
+            if (integratedLoudness == null)
             {
                 Logger.Log("Failed to get loudness level for " + audiofile, LoggingTarget.Runtime, LogLevel.Error);
                 return;
@@ -103,7 +111,7 @@ namespace osu.Game.Audio
 
             VolumeParameters volumeParameters = new VolumeParameters
             {
-                fTarget = audioNormalizationModule?.IntegratedLoudness != null ? IntegratedLoudnessToVolumeOffset(audioNormalizationModule.IntegratedLoudness) : 0.8f,
+                fTarget = audioNormalizationModule?.IntegratedLoudness != null ? IntegratedLoudnessToVolumeOffset((float)audioNormalizationModule.IntegratedLoudness) : 0.8f,
                 fCurrent = -1.0f,
                 fTime = 0.3f,
                 lCurve = 1,
@@ -112,7 +120,7 @@ namespace osu.Game.Audio
 
             addFx(volumeParameters, mixer);
 
-            Logger.Log("Normalization Status: " + (audioNormalizationModule != null ? $"on ({Math.Round(IntegratedLoudnessToVolumeOffset(audioNormalizationModule.IntegratedLoudness) * 100)}%)" : "off"));
+            Logger.Log("Normalization Status: " + (audioNormalizationModule?.IntegratedLoudness != null ? $"on ({Math.Round(IntegratedLoudnessToVolumeOffset((float)audioNormalizationModule.IntegratedLoudness) * 100)}%)" : "off"));
         }
 
         /// <summary>
@@ -139,6 +147,6 @@ namespace osu.Game.Audio
         public bool Equals(IAudioNormalization? other) => other is AudioNormalization audioNormalization && Equals(audioNormalization);
 
         /// <inheritdoc />
-        public bool Equals(AudioNormalization? other) => other != null && Math.Abs(IntegratedLoudness - other.IntegratedLoudness) < 0.0000001;
+        public bool Equals(AudioNormalization? other) => other?.IntegratedLoudness != null && IntegratedLoudness != null && Math.Abs((float)(IntegratedLoudness - other.IntegratedLoudness)) < 0.0000001;
     }
 }

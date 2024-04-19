@@ -140,6 +140,13 @@ namespace osu.Game.Database
                         sleepIfRequired();
 
                         AudioNormalization audioNormalization = new AudioNormalization(beatmapInfo, beatmapSetInfo, filestorage);
+
+                        if (audioNormalization.IntegratedLoudness == null)
+                        {
+                            Logger.Log($"Failed to get loudness level for {beatmapInfo.Metadata.AudioFile}; {beatmapSetInfo.Metadata.Title} [{beatmapInfo.DifficultyName}]", LoggingTarget.Runtime, LogLevel.Error);
+                            continue;
+                        }
+
                         beatmapInfo.AudioNormalization = audioNormalization;
                         audioNormalization.PopulateSet(beatmapInfo, beatmapSetInfo);
                         beatmapManager.GetWorkingBeatmap(beatmapInfo, true);
