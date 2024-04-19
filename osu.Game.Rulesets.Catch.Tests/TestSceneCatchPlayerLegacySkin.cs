@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.Catch.Tests
             if (withModifiedSkin)
             {
                 AddStep("change component scale", () => Player.ChildrenOfType<LegacyScoreCounter>().First().Scale = new Vector2(2f));
-                AddStep("update target", () => Player.ChildrenOfType<SkinComponentsContainer>().ForEach(LegacySkin.UpdateDrawableTarget));
+                AddStep("update target", () => Player.ChildrenOfType<SkinnableContainer>().ForEach(LegacySkin.UpdateDrawableTarget));
                 AddStep("exit player", () => Player.Exit());
                 CreateTest();
             }

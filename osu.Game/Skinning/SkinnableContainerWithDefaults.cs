@@ -11,7 +11,7 @@ namespace osu.Game.Skinning
     /// A container which can be used to specify default skin components layouts.
     /// Handles applying a default layout to the components.
     /// </summary>
-    public partial class DefaultSkinComponentsContainer : Container
+    public partial class SkinnableContainerWithDefaults : Container
     {
         private readonly Action<Container>? applyDefaults;
 
@@ -19,7 +19,7 @@ namespace osu.Game.Skinning
         /// Construct a wrapper with defaults that should be applied once.
         /// </summary>
         /// <param name="applyDefaults">A function to apply the default layout.</param>
-        public DefaultSkinComponentsContainer(Action<Container> applyDefaults)
+        public SkinnableContainerWithDefaults(Action<Container> applyDefaults)
         {
             RelativeSizeAxes = Axes.Both;
 

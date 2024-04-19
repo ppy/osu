@@ -39,7 +39,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Cached]
         public readonly EditorClipboard Clipboard = new EditorClipboard();
 
-        private SkinComponentsContainer targetContainer => Player.ChildrenOfType<SkinComponentsContainer>().First();
+        private SkinnableContainer targetContainer => Player.ChildrenOfType<SkinnableContainer>().First();
 
         [SetUpSteps]
         public override void SetUpSteps()
@@ -67,7 +67,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddStep("Add big black boxes", () =>
             {
-                var target = Player.ChildrenOfType<SkinComponentsContainer>().First();
+                var target = Player.ChildrenOfType<SkinnableContainer>().First();
                 target.Add(box1 = new BigBlackBox
                 {
                     Position = new Vector2(-90),
@@ -192,14 +192,14 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestUndoEditHistory()
         {
-            SkinComponentsContainer firstTarget = null!;
+            SkinnableContainer firstTarget = null!;
             TestSkinEditorChangeHandler changeHandler = null!;
             byte[] defaultState = null!;
             IEnumerable<ISerialisableDrawable> testComponents = null!;
 
             AddStep("Load necessary things", () =>
             {
-                firstTarget = Player.ChildrenOfType<SkinComponentsContainer>().First();
+                firstTarget = Player.ChildrenOfType<SkinnableContainer>().First();
                 changeHandler = new TestSkinEditorChangeHandler(firstTarget);
 
                 changeHandler.SaveState();

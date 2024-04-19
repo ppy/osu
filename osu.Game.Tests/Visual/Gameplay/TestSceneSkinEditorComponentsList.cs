@@ -29,7 +29,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestToggleEditor()
         {
-            var skinComponentsContainer = new SkinComponentsContainer(new SkinComponentsContainerLookup(SkinComponentsContainerLookup.TargetArea.SongSelect));
+            var skinComponentsContainer = new SkinnableContainer(new SkinnableContainerLookup(SkinnableContainerLookup.TargetArea.SongSelect));
 
             AddStep("show available components", () => SetContents(_ => new SkinComponentToolbox(skinComponentsContainer, null)
             {
@@ -51,7 +51,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             Ruleset ruleset = (Ruleset)Activator.CreateInstance(rulesetType.CreateType())!;
 
             AddStep("show available components", () => SetContents(_ =>
-                new SkinComponentToolbox(new SkinComponentsContainer(new SkinComponentsContainerLookup(SkinComponentsContainerLookup.TargetArea.SongSelect)), ruleset.RulesetInfo)
+                new SkinComponentToolbox(new SkinnableContainer(new SkinnableContainerLookup(SkinnableContainerLookup.TargetArea.SongSelect)), ruleset.RulesetInfo)
                 {
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight,

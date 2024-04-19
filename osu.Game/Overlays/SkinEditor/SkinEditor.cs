@@ -615,7 +615,7 @@ namespace osu.Game.Overlays.SkinEditor
 
         public void BringSelectionToFront()
         {
-            if (getTarget(selectedTarget.Value) is not SkinComponentsContainer target)
+            if (getTarget(selectedTarget.Value) is not SkinnableContainer target)
                 return;
 
             changeHandler?.BeginChange();
@@ -639,7 +639,7 @@ namespace osu.Game.Overlays.SkinEditor
 
         public void SendSelectionToBack()
         {
-            if (getTarget(selectedTarget.Value) is not SkinComponentsContainer target)
+            if (getTarget(selectedTarget.Value) is not SkinnableContainer target)
                 return;
 
             changeHandler?.BeginChange();
@@ -677,7 +677,7 @@ namespace osu.Game.Overlays.SkinEditor
                 realm.Run(r => r.Refresh());
 
                 // Import still should happen for now, even if not placeable (as it allows a user to import skin resources that would apply to legacy gameplay skins).
-                if (getTarget(selectedTarget.Value) is not SkinComponentsContainer target)
+                if (getTarget(selectedTarget.Value) is not SkinnableContainer target)
                     return;
 
                 // place component

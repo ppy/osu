@@ -116,7 +116,7 @@ namespace osu.Game.Skinning
                 };
             }
 
-            foreach (SkinComponentsContainerLookup.TargetArea skinnableTarget in Enum.GetValues<SkinComponentsContainerLookup.TargetArea>())
+            foreach (SkinnableContainerLookup.TargetArea skinnableTarget in Enum.GetValues<SkinnableContainerLookup.TargetArea>())
                 loadConfiguration(new LayoutLookupKey(skinnableTarget, null));
         }
 
@@ -168,7 +168,7 @@ namespace osu.Game.Skinning
                     if (!layoutInfo.TryGetDrawableInfo(lookup.Ruleset, out var drawableInfos))
                         return null;
 
-                    if (lookup is SkinComponentsContainerLookup)
+                    if (lookup is SkinnableContainerLookup)
                     {
                         return new Container
                         {
