@@ -15,8 +15,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
     {
         public const double PERFORMANCE_BASE_MULTIPLIER = 1.14; // This is being adjusted to keep the final pp value scaled around what it used to be when changing things.
 
-        private bool useSliderHead;
-
         private double accuracy;
         private int scoreMaxCombo;
         private int countGreat;
@@ -37,8 +35,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         {
             var osuAttributes = (OsuDifficultyAttributes)attributes;
 
-            useSliderHead = !score.Mods.Any(h => h is OsuModClassic cl && cl.NoSliderHeadAccuracy.Value);
-
             accuracy = score.Accuracy;
             scoreMaxCombo = score.MaxCombo;
             countGreat = score.Statistics.GetValueOrDefault(HitResult.Great);
@@ -46,12 +42,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             countMeh = score.Statistics.GetValueOrDefault(HitResult.Meh);
             countMiss = score.Statistics.GetValueOrDefault(HitResult.Miss);
             countLargeTickMiss = score.Statistics.GetValueOrDefault(HitResult.LargeTickMiss);
-
-            if (useSliderHead)
+            if (!score.Mods.Any(h => h is OsuModClassic cl && cl.NoSliderHeadAccuracy.Value))
+            {
                 countSliderEndsDropped = osuAttributes.SliderCount - score.Statistics.GetValueOrDefault(HitResult.SliderTailHit);
-
-            if (useSliderHead)
-                effectiveMissCount = countMiss;
+            }
+            if (!score.Mods.Any(h => h is OsuModClassic cl && cl.NoSliderHeadAccuracy.Value))
+                effectiveMissCount = countMiss; 
             else
                 effectiveMissCount = calculateEffectiveMissCount(osuAttributes);
 
@@ -137,7 +133,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (attributes.SliderCount > 0)
             {
                 double estimateSliderEndsDropped;
-                if (useSliderHead)
+                if (score.IsLegacyScore)
                     estimateSliderEndsDropped = Math.Clamp(Math.Min(countOk + countMeh + countMiss, attributes.MaxCombo - scoreMaxCombo), 0, estimateDifficultSliders);
                 else
                     estimateSliderEndsDropped = countSliderEndsDropped;
