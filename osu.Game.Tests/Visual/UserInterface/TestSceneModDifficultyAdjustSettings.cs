@@ -72,23 +72,23 @@ namespace osu.Game.Tests.Visual.UserInterface
         [Test]
         public void TestOutOfRangeValueStillApplied()
         {
-            AddStep("set override cs to 11", () => modDifficultyAdjust.CircleSize.Value = 11);
+            AddStep("set override cs to 12", () => modDifficultyAdjust.CircleSize.Value = 12);
 
-            checkSliderAtValue("Circle Size", 11);
-            checkBindableAtValue("Circle Size", 11);
+            checkSliderAtValue("Circle Size", 12);
+            checkBindableAtValue("Circle Size", 12);
 
             // this is a no-op, just showing that it won't reset the value during deserialisation.
             setExtendedLimits(false);
 
-            checkSliderAtValue("Circle Size", 11);
-            checkBindableAtValue("Circle Size", 11);
+            checkSliderAtValue("Circle Size", 12);
+            checkBindableAtValue("Circle Size", 12);
 
             // setting extended limits will reset the serialisation exception.
             // this should be fine as the goal is to allow, at most, the value of extended limits.
             setExtendedLimits(true);
 
-            checkSliderAtValue("Circle Size", 11);
-            checkBindableAtValue("Circle Size", 11);
+            checkSliderAtValue("Circle Size", 12);
+            checkBindableAtValue("Circle Size", 12);
         }
 
         [Test]
@@ -106,8 +106,8 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             setSliderValue("Circle Size", 99);
 
-            checkSliderAtValue("Circle Size", 11);
-            checkBindableAtValue("Circle Size", 11);
+            checkSliderAtValue("Circle Size", 12);
+            checkBindableAtValue("Circle Size", 12);
 
             setExtendedLimits(false);
 
@@ -130,15 +130,15 @@ namespace osu.Game.Tests.Visual.UserInterface
         public void TestExtendedLimitsRetainedAfterBoundCopyCreation()
         {
             setExtendedLimits(true);
-            setSliderValue("Circle Size", 11);
+            setSliderValue("Circle Size", 12);
 
-            checkSliderAtValue("Circle Size", 11);
-            checkBindableAtValue("Circle Size", 11);
+            checkSliderAtValue("Circle Size", 12);
+            checkBindableAtValue("Circle Size", 12);
 
             AddStep("create bound copy", () => _ = modDifficultyAdjust.CircleSize.GetBoundCopy());
 
-            checkSliderAtValue("Circle Size", 11);
-            checkBindableAtValue("Circle Size", 11);
+            checkSliderAtValue("Circle Size", 12);
+            checkBindableAtValue("Circle Size", 12);
         }
 
         [Test]
