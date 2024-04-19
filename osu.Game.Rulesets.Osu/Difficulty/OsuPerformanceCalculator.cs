@@ -44,10 +44,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             countMeh = score.Statistics.GetValueOrDefault(HitResult.Meh);
             countMiss = score.Statistics.GetValueOrDefault(HitResult.Miss);
             countLargeTickMiss = score.Statistics.GetValueOrDefault(HitResult.LargeTickMiss);
+
             if (useSliderHead)
-            {
                 countSliderEndsDropped = osuAttributes.SliderCount - score.Statistics.GetValueOrDefault(HitResult.SliderTailHit);
-            }
+
             if (useSliderHead)
                 effectiveMissCount = countMiss;
             else
@@ -138,7 +138,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 if (useSliderHead)
                     estimateSliderEndsDropped = Math.Clamp(Math.Min(countOk + countMeh + countMiss, attributes.MaxCombo - scoreMaxCombo), 0, estimateDifficultSliders);
                 else
-                    estimateSliderEndsDropped = Math.Min(countSliderEndsDropped + countLargeTickMiss, estimateDifficultSliders); ;
+                    estimateSliderEndsDropped = Math.Min(countSliderEndsDropped + countLargeTickMiss, estimateDifficultSliders);
 
                 double sliderNerfFactor = 0;
                 sliderNerfFactor = (1 - attributes.SliderFactor) * Math.Pow(1 - estimateSliderEndsDropped / estimateDifficultSliders, 3) + attributes.SliderFactor;
