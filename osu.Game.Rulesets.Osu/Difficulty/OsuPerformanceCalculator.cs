@@ -136,7 +136,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 if (score.IsLegacyScore)
                     estimateSliderEndsDropped = Math.Clamp(Math.Min(countOk + countMeh + countMiss, attributes.MaxCombo - scoreMaxCombo), 0, estimateDifficultSliders);
                 else
-                    estimateSliderEndsDropped = countSliderEndsDropped;
+                    estimateSliderEndsDropped = Math.Min(countSliderEndsDropped + countLargeTickMiss, estimateDifficultSliders); ;
 
                 double sliderNerfFactor = 0;
                 sliderNerfFactor = (1 - attributes.SliderFactor) * Math.Pow(1 - estimateSliderEndsDropped / estimateDifficultSliders, 3) + attributes.SliderFactor;
