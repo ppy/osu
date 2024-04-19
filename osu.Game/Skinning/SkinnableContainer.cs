@@ -36,7 +36,7 @@ namespace osu.Game.Skinning
 
         private CancellationTokenSource? cancellationSource;
 
-        public SkinnableContainer(SkinnableContainerLookup lookup)
+        public SkinnableContainer(SkinnableContainerLookup lookup) // Todo: Eventually turn into ISkinComponentLookup
         {
             Lookup = lookup;
         }
