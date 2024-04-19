@@ -35,10 +35,9 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="ppy.ManagedBass" Version="2023.0.1" />
-    <PackageReference Include="ppy.ManagedBass.Enc" Version="3.0.0" />
     <PackageReference Include="ppy.ManagedBass.Fx" Version="2023.0.0" />
     <PackageReference Include="ppy.ManagedBass.Loud" Version="3.0.5" />
-    <PackageReference Include="ppy.osu.Framework.NativeLibs" Version="2024.0.1" />
+    <PackageReference Include="ppy.osu.Framework.NativeLibs" Version="2025.0.0" />
     <PackageReference Include="Realm" Version="11.5.0" />
     <PackageReference Include="ppy.osu.Framework" Version="2024.329.0" />
     <PackageReference Include="ppy.osu.Game.Resources" Version="2024.410.0" />
