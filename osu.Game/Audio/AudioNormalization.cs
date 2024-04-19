@@ -71,10 +71,8 @@ namespace osu.Game.Audio
         /// </remarks>
         /// <param name="beatmapInfo">The <see cref="BeatmapInfo"/> to clone from</param>
         /// <param name="beatmapSetInfo">The <see cref="BeatmapSetInfo"/> to populate</param>
-        public void PopulateSet(BeatmapInfo beatmapInfo, BeatmapSetInfo? beatmapSetInfo)
+        public void PopulateSet(BeatmapInfo beatmapInfo, BeatmapSetInfo beatmapSetInfo)
         {
-            if (beatmapSetInfo == null) return;
-
             foreach (BeatmapInfo beatmap in beatmapSetInfo.Beatmaps)
             {
                 if (beatmap.AudioNormalization == null && beatmap.AudioEquals(beatmapInfo))
