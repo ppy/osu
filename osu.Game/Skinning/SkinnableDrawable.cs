@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Caching;
 using osu.Framework.Graphics;
@@ -40,7 +39,12 @@ namespace osu.Game.Skinning
         public ISkinComponentLookup Lookup { get; }
 
         private readonly BindableList<ISerialisableDrawable> components = new BindableList<ISerialisableDrawable>();
+        private readonly Func<ISkinComponentLookup, Drawable>? createDefault;
+        private readonly Cached scaling = new Cached();
         private readonly ConfineMode confineMode;
+        private readonly bool isSingleInstance;
+
+        private bool isDefault;
 
         /// <summary>
         /// Create a new skinnable drawable.
@@ -49,29 +53,30 @@ namespace osu.Game.Skinning
         /// <param name="defaultImplementation">A function to create the default skin implementation of this element.</param>
         /// <param name="confineMode">How (if at all) the <see cref="Drawable"/> should be resize to fit within our own bounds.</param>
         public SkinnableDrawable(ISkinComponentLookup lookup, Func<ISkinComponentLookup, Drawable>? defaultImplementation = null, ConfineMode confineMode = ConfineMode.NoScaling)
-            : this(lookup, confineMode)
         {
+            Lookup = lookup;
+            this.confineMode = confineMode;
             createDefault = defaultImplementation;
+
+            RelativeSizeAxes = Axes.Both;
         }
 
-        protected SkinnableDrawable(ISkinComponentLookup lookup, ConfineMode confineMode = ConfineMode.NoScaling)
+        public SkinnableDrawable(ISkinComponentLookup lookup, Drawable drawable, ConfineMode confineMode = ConfineMode.NoScaling)
         {
             Lookup = lookup;
             this.confineMode = confineMode;
 
             RelativeSizeAxes = Axes.Both;
+            setContent(drawable);
+
+            isDefault = true;
+            isSingleInstance = true;
         }
 
         /// <summary>
         /// Seeks to the 0-th frame if the content of this <see cref="SkinnableDrawable"/> is an <see cref="IFramedAnimation"/>.
         /// </summary>
         public void ResetAnimation() => (Drawable as IFramedAnimation)?.GotoFrame(0);
-
-        private readonly Func<ISkinComponentLookup, Drawable>? createDefault;
-
-        private readonly Cached scaling = new Cached();
-
-        private bool isDefault;
 
         protected virtual Drawable CreateDefault(ISkinComponentLookup lookup) => createDefault?.Invoke(lookup) ?? Empty();
 
@@ -112,63 +117,61 @@ namespace osu.Game.Skinning
             }
         }
 
-        void ISerialisableDrawableContainer.Reload() => reload(CurrentSkin.GetDrawableComponent(Lookup));
+        void ISerialisableDrawableContainer.Reload() => reload();
 
-        private void reload(Drawable? newComponent)
+        private void reload()
         {
-            components.Clear();
+            // Todo: Temporary
+            Drawable? skinComponent = CurrentSkin.GetDrawableComponent(Lookup);
 
-            if (newComponent == null)
+            if (isSingleInstance)
             {
-                Drawable = CreateDefault(Lookup);
-                isDefault = true;
+                if (skinComponent != null)
+                    Drawable.ApplySerialisedInfo(skinComponent.CreateSerialisedInfo());
+                return;
             }
-            else
+
+            if (skinComponent != null)
             {
-                Drawable = newComponent;
+                setContent(skinComponent);
                 isDefault = false;
             }
-
-            scaling.Invalidate();
-
-            if (Drawable is ISerialisableDrawable serialisable)
-            {
-                // Anchoring controlled by the skin/component.
-                components.Add(serialisable);
-            }
             else
             {
-                if (CentreComponent)
-                {
-                    Drawable.Origin = Anchor.Centre;
-                    Drawable.Anchor = Anchor.Centre;
-                }
+                setContent(CreateDefault(Lookup));
+                isDefault = true;
+            }
+        }
+
+        private void setContent(Drawable newContent)
+        {
+            components.Clear();
+            scaling.Invalidate();
+
+            if (CentreComponent)
+            {
+                newContent.Origin = Anchor.Centre;
+                newContent.Anchor = Anchor.Centre;
             }
 
-            InternalChild = Drawable;
+            InternalChild = Drawable = newContent;
+
+            if (newContent is ISerialisableDrawable serialisable)
+                components.Add(serialisable);
+
             ComponentsLoaded = true;
         }
 
-        void ISerialisableDrawableContainer.Reload(SerialisedDrawableInfo[] skinnableInfo) => reload(skinnableInfo.FirstOrDefault()?.CreateInstance());
-
-        // Only to be used during skin editor undo-redo.
-        void ISerialisableDrawableContainer.Add(ISerialisableDrawable component)
+        void ISerialisableDrawableContainer.Reload(SerialisedDrawableInfo[] skinnableInfo)
         {
-            if (!(component is Drawable drawable))
-                throw new ArgumentException($"Provided argument must be of type {nameof(Drawable)}.", nameof(component));
-
-            AddInternal(drawable);
-            components.Add(component);
         }
 
-        // Only to be used during skin editor undo-redo.
+        void ISerialisableDrawableContainer.Add(ISerialisableDrawable component)
+        {
+        }
+
         void ISerialisableDrawableContainer.Remove(ISerialisableDrawable component, bool disposeImmediately)
         {
-            if (!(component is Drawable drawable))
-                throw new ArgumentException($"Provided argument must be of type {nameof(Drawable)}.", nameof(component));
-
-            RemoveInternal(drawable, disposeImmediately);
-            components.Remove(component);
         }
 
         public virtual bool IsEditable => (Drawable as ISerialisableDrawable)?.IsEditable == true;

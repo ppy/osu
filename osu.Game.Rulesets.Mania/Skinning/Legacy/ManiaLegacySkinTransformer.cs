@@ -11,9 +11,11 @@ using osu.Framework.Graphics;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mania.Beatmaps;
+using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Rulesets.Objects.Legacy;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Skinning;
+using osuTK;
 
 namespace osu.Game.Rulesets.Mania.Skinning.Legacy
 {
@@ -85,6 +87,9 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
                     if (!isLegacySkin.Value || !hasKeyTexture.Value)
                         return null;
 
+                    if (base.GetDrawableComponent(lookup) is Drawable c)
+                        return c;
+
                     switch (maniaComponent.Component)
                     {
                         case ManiaSkinComponents.ColumnBackground:
@@ -122,8 +127,11 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
                         case ManiaSkinComponents.BarLine:
                             return null; // Not yet implemented.
 
-                        case ManiaSkinComponents.Stage:
-                            return new LegacyStageConfiguration();
+                        case ManiaSkinComponents.PlayfieldGrid:
+                            return new PlayfieldGrid
+                            {
+                                Position = new Vector2(this.GetManiaSkinConfig<float>(LegacyManiaSkinConfigurationLookups.ColumnStart)?.Value ?? 0, 0)
+                            };
 
                         default:
                             throw new UnsupportedSkinComponentException(lookup);

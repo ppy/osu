@@ -37,13 +37,13 @@ namespace osu.Game.Skinning
         private ISkinSource source { get; set; } = null!;
 
         public SkinnableSprite(string textureName, Vector2? maxSize = null, ConfineMode confineMode = ConfineMode.NoScaling)
-            : base(new SpriteComponentLookup(textureName, maxSize), confineMode)
+            : base(new SpriteComponentLookup(textureName, maxSize), _ => Empty(), confineMode)
         {
             SpriteName.Value = textureName;
         }
 
         public SkinnableSprite()
-            : base(new SpriteComponentLookup(string.Empty), ConfineMode.NoScaling)
+            : base(new SpriteComponentLookup(string.Empty), _ => Empty())
         {
             RelativeSizeAxes = Axes.None;
             AutoSizeAxes = Axes.Both;
