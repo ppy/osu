@@ -143,7 +143,7 @@ namespace osu.Game.Database
 
                         if (audioNormalization.IntegratedLoudness == null)
                         {
-                            Logger.Log($"Failed to get loudness level for {beatmapInfo.Metadata.AudioFile}; {beatmapSetInfo.Metadata.Title} [{beatmapInfo.DifficultyName}]", LoggingTarget.Runtime, LogLevel.Error);
+                            Logger.Log($"Failed to get loudness level for {beatmapSetInfo.Metadata.Title} [{beatmapInfo.DifficultyName}]", LoggingTarget.Runtime, LogLevel.Error);
                             continue;
                         }
 
