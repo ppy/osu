@@ -24,7 +24,7 @@ namespace osu.Game.Overlays.SkinEditor
     {
         public Action<Type>? RequestPlacement;
 
-        private readonly SkinComponentsContainer target;
+        private readonly SkinnableContainer target;
 
         private readonly RulesetInfo? ruleset;
 
@@ -35,7 +35,7 @@ namespace osu.Game.Overlays.SkinEditor
         /// </summary>
         /// <param name="target">The target. This is mainly used as a dependency source to find candidate components.</param>
         /// <param name="ruleset">A ruleset to filter components by. If null, only components which are not ruleset-specific will be included.</param>
-        public SkinComponentToolbox(SkinComponentsContainer target, RulesetInfo? ruleset)
+        public SkinComponentToolbox(SkinnableContainer target, RulesetInfo? ruleset)
             : base(ruleset == null ? SkinEditorStrings.Components : LocalisableString.Interpolate($"{SkinEditorStrings.Components} ({ruleset.Name})"))
         {
             this.target = target;

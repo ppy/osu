@@ -72,7 +72,7 @@ namespace osu.Game.Overlays.SkinEditor
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
 
-        private readonly Bindable<SkinComponentsContainerLookup?> selectedTarget = new Bindable<SkinComponentsContainerLookup?>();
+        private readonly Bindable<SkinnableContainerLookup?> selectedTarget = new Bindable<SkinnableContainerLookup?>();
 
         private bool hasBegunMutating;
 
@@ -327,7 +327,7 @@ namespace osu.Game.Overlays.SkinEditor
             }
         }
 
-        private void targetChanged(ValueChangedEvent<SkinComponentsContainerLookup?> target)
+        private void targetChanged(ValueChangedEvent<SkinnableContainerLookup?> target)
         {
             foreach (var toolbox in componentsSidebar.OfType<SkinComponentToolbox>())
                 toolbox.Expire();
@@ -357,7 +357,7 @@ namespace osu.Game.Overlays.SkinEditor
                 {
                     Children = new Drawable[]
                     {
-                        new SettingsDropdown<SkinComponentsContainerLookup?>
+                        new SettingsDropdown<SkinnableContainerLookup?>
                         {
                             Items = availableTargets.Select(t => t.Lookup).Distinct(),
                             Current = selectedTarget,
@@ -466,18 +466,18 @@ namespace osu.Game.Overlays.SkinEditor
                 settingsSidebar.Add(new SkinSettingsToolbox(component));
         }
 
-        private IEnumerable<SkinComponentsContainer> availableTargets => targetScreen.ChildrenOfType<SkinComponentsContainer>();
+        private IEnumerable<SkinnableContainer> availableTargets => targetScreen.ChildrenOfType<SkinnableContainer>();
 
-        private SkinComponentsContainer? getFirstTarget() => availableTargets.FirstOrDefault();
+        private SkinnableContainer? getFirstTarget() => availableTargets.FirstOrDefault();
 
-        private SkinComponentsContainer? getTarget(SkinComponentsContainerLookup? target)
+        private SkinnableContainer? getTarget(SkinnableContainerLookup? target)
         {
             return availableTargets.FirstOrDefault(c => c.Lookup.Equals(target));
         }
 
         private void revert()
         {
-            SkinComponentsContainer[] targetContainers = availableTargets.ToArray();
+            SkinnableContainer[] targetContainers = availableTargets.ToArray();
 
             foreach (var t in targetContainers)
             {
@@ -545,7 +545,7 @@ namespace osu.Game.Overlays.SkinEditor
             if (targetScreen?.IsLoaded != true)
                 return;
 
-            SkinComponentsContainer[] targetContainers = availableTargets.ToArray();
+            SkinnableContainer[] targetContainers = availableTargets.ToArray();
 
             if (!targetContainers.All(c => c.ComponentsLoaded))
                 return;
@@ -590,7 +590,7 @@ namespace osu.Game.Overlays.SkinEditor
 
         public void BringSelectionToFront()
         {
-            if (getTarget(selectedTarget.Value) is not SkinComponentsContainer target)
+            if (getTarget(selectedTarget.Value) is not SkinnableContainer target)
                 return;
 
             changeHandler?.BeginChange();
@@ -614,7 +614,7 @@ namespace osu.Game.Overlays.SkinEditor
 
         public void SendSelectionToBack()
         {
-            if (getTarget(selectedTarget.Value) is not SkinComponentsContainer target)
+            if (getTarget(selectedTarget.Value) is not SkinnableContainer target)
                 return;
 
             changeHandler?.BeginChange();

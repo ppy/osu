@@ -352,15 +352,15 @@ namespace osu.Game.Skinning
 
             switch (lookup)
             {
-                case SkinComponentsContainerLookup containerLookup:
+                case SkinnableContainerLookup containerLookup:
                     // Only handle global level defaults for now.
                     if (containerLookup.Ruleset != null)
                         return null;
 
                     switch (containerLookup.Target)
                     {
-                        case SkinComponentsContainerLookup.TargetArea.MainHUDComponents:
-                            return new DefaultSkinComponentsContainer(container =>
+                        case SkinnableContainerLookup.TargetArea.MainHUDComponents:
+                            return new SkinnableContainerWithDefaults(container =>
                             {
                                 var score = container.OfType<LegacyScoreCounter>().FirstOrDefault();
                                 var accuracy = container.OfType<GameplayAccuracyCounter>().FirstOrDefault();

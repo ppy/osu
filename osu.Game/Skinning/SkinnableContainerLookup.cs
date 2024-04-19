@@ -11,7 +11,7 @@ namespace osu.Game.Skinning
     /// <summary>
     /// Represents a lookup of a collection of elements that make up a particular skinnable <see cref="TargetArea"/> of the game.
     /// </summary>
-    public class SkinComponentsContainerLookup : ISkinComponentLookup, IEquatable<SkinComponentsContainerLookup>
+    public class SkinnableContainerLookup : ISkinComponentLookup, IEquatable<SkinnableContainerLookup>
     {
         /// <summary>
         /// The target area / layer of the game for which skin components will be returned.
@@ -24,7 +24,7 @@ namespace osu.Game.Skinning
         /// </summary>
         public readonly RulesetInfo? Ruleset;
 
-        public SkinComponentsContainerLookup(TargetArea target, RulesetInfo? ruleset = null)
+        public SkinnableContainerLookup(TargetArea target, RulesetInfo? ruleset = null)
         {
             Target = target;
             Ruleset = ruleset;
@@ -37,7 +37,7 @@ namespace osu.Game.Skinning
             return $"{Target.GetDescription()} (\"{Ruleset.Name}\" only)";
         }
 
-        public bool Equals(SkinComponentsContainerLookup? other)
+        public bool Equals(SkinnableContainerLookup? other)
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
@@ -51,7 +51,7 @@ namespace osu.Game.Skinning
             if (ReferenceEquals(this, obj)) return true;
             if (obj.GetType() != GetType()) return false;
 
-            return Equals((SkinComponentsContainerLookup)obj);
+            return Equals((SkinnableContainerLookup)obj);
         }
 
         public override int GetHashCode()

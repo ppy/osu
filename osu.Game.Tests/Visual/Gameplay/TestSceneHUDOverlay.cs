@@ -44,7 +44,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         private readonly IGameplayClock gameplayClock = new GameplayClockContainer(new TrackVirtual(60000), false, false);
 
         // best way to check without exposing.
-        private Drawable hideTarget => hudOverlay.ChildrenOfType<SkinComponentsContainer>().First();
+        private Drawable hideTarget => hudOverlay.ChildrenOfType<SkinnableContainer>().First();
         private Drawable keyCounterFlow => hudOverlay.ChildrenOfType<KeyCounterDisplay>().First().ChildrenOfType<FillFlowContainer<KeyCounter>>().Single();
 
         public TestSceneHUDOverlay()
@@ -241,8 +241,8 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             createNew();
 
-            AddUntilStep("wait for components to be hidden", () => hudOverlay.ChildrenOfType<SkinComponentsContainer>().Single().Alpha == 0);
-            AddUntilStep("wait for hud load", () => hudOverlay.ChildrenOfType<SkinComponentsContainer>().All(c => c.ComponentsLoaded));
+            AddUntilStep("wait for components to be hidden", () => hudOverlay.ChildrenOfType<SkinnableContainer>().Single().Alpha == 0);
+            AddUntilStep("wait for hud load", () => hudOverlay.ChildrenOfType<SkinnableContainer>().All(c => c.ComponentsLoaded));
 
             AddStep("bind on update", () =>
             {
@@ -259,10 +259,10 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             createNew();
 
-            AddUntilStep("wait for components to be hidden", () => hudOverlay.ChildrenOfType<SkinComponentsContainer>().Single().Alpha == 0);
+            AddUntilStep("wait for components to be hidden", () => hudOverlay.ChildrenOfType<SkinnableContainer>().Single().Alpha == 0);
 
-            AddStep("reload components", () => hudOverlay.ChildrenOfType<SkinComponentsContainer>().Single().Reload());
-            AddUntilStep("skinnable components loaded", () => hudOverlay.ChildrenOfType<SkinComponentsContainer>().Single().ComponentsLoaded);
+            AddStep("reload components", () => hudOverlay.ChildrenOfType<SkinnableContainer>().Single().Reload());
+            AddUntilStep("skinnable components loaded", () => hudOverlay.ChildrenOfType<SkinnableContainer>().Single().ComponentsLoaded);
         }
 
         private void createNew(Action<HUDOverlay>? action = null)

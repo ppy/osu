@@ -20,7 +20,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestToggleEditor()
         {
-            var skinComponentsContainer = new SkinComponentsContainer(new SkinComponentsContainerLookup(SkinComponentsContainerLookup.TargetArea.SongSelect));
+            var skinComponentsContainer = new SkinnableContainer(new SkinnableContainerLookup(SkinnableContainerLookup.TargetArea.SongSelect));
 
             AddStep("show available components", () => SetContents(_ => new SkinComponentToolbox(skinComponentsContainer, null)
             {

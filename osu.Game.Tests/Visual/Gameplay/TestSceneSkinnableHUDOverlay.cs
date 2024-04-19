@@ -44,7 +44,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         private IEnumerable<HUDOverlay> hudOverlays => CreatedDrawables.OfType<HUDOverlay>();
 
         // best way to check without exposing.
-        private Drawable hideTarget => hudOverlay.ChildrenOfType<SkinComponentsContainer>().First();
+        private Drawable hideTarget => hudOverlay.ChildrenOfType<SkinnableContainer>().First();
         private Drawable keyCounterFlow => hudOverlay.ChildrenOfType<KeyCounterDisplay>().First().ChildrenOfType<FillFlowContainer<KeyCounter>>().Single();
 
         public TestSceneSkinnableHUDOverlay()
@@ -103,7 +103,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             });
             AddUntilStep("HUD overlay loaded", () => hudOverlay.IsAlive);
             AddUntilStep("components container loaded",
-                () => hudOverlay.ChildrenOfType<SkinComponentsContainer>().Any(scc => scc.ComponentsLoaded));
+                () => hudOverlay.ChildrenOfType<SkinnableContainer>().Any(scc => scc.ComponentsLoaded));
         }
 
         protected override Ruleset CreateRulesetForSkinProvider() => new OsuRuleset();
