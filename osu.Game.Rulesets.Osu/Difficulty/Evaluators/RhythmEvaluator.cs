@@ -2,8 +2,12 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
+using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Osu.Objects;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
@@ -16,10 +20,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         /// <summary>
         /// Calculates a rhythm multiplier for the difficulty of the tap associated with historic data of the current <see cref="OsuDifficultyHitObject"/>.
         /// </summary>
-        public static double EvaluateDifficultyOf(DifficultyHitObject current)
+        public static double EvaluateDifficultyOf(DifficultyHitObject current, IEnumerable<Mod> mods)
         {
             if (current.BaseObject is Spinner)
                 return 0;
+
+            bool usingSliderAccuracy = !mods.Any(m => m is OsuModClassic cl && cl.NoSliderHeadAccuracy.Value);
 
             int previousIslandSize = 0;
 
@@ -66,10 +72,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                     }
                     else
                     {
-                        if (current.Previous(i - 1).BaseObject is Slider) // bpm change is into slider, this is easy acc window
+                        if (!usingSliderAccuracy && current.Previous(i - 1).BaseObject is Slider) // bpm change is into slider, this is easy acc window
                             effectiveRatio *= 0.125;
 
-                        if (current.Previous(i).BaseObject is Slider) // bpm change was from a slider, this is easier typically than circle -> circle
+                        if (!usingSliderAccuracy && current.Previous(i).BaseObject is Slider) // bpm change was from a slider, this is easier typically than circle -> circle
                             effectiveRatio *= 0.25;
 
                         if (previousIslandSize == islandSize) // repeated island size (ex: triplet -> triplet)
