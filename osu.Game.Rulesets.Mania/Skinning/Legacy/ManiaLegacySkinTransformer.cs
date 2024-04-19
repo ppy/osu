@@ -11,7 +11,6 @@ using osu.Framework.Graphics;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mania.Beatmaps;
-using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Rulesets.Objects.Legacy;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Skinning;
@@ -87,9 +86,6 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
                     if (!isLegacySkin.Value || !hasKeyTexture.Value)
                         return null;
 
-                    if (base.GetDrawableComponent(lookup) is Drawable c)
-                        return c;
-
                     switch (maniaComponent.Component)
                     {
                         case ManiaSkinComponents.ColumnBackground:
@@ -127,18 +123,36 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
                         case ManiaSkinComponents.BarLine:
                             return null; // Not yet implemented.
 
-                        case ManiaSkinComponents.PlayfieldGrid:
-                            return new PlayfieldGrid
-                            {
-                                Position = new Vector2(this.GetManiaSkinConfig<float>(LegacyManiaSkinConfigurationLookups.ColumnStart)?.Value ?? 0, 0)
-                            };
-
                         default:
                             throw new UnsupportedSkinComponentException(lookup);
                     }
             }
 
             return base.GetDrawableComponent(lookup);
+        }
+
+        public override SerialisedDrawableInfo GetConfiguration(ISkinComponentLookup lookup)
+        {
+            if (base.GetConfiguration(lookup) is SerialisedDrawableInfo info)
+                return info;
+
+            switch (lookup)
+            {
+                case ManiaSkinComponentLookup maniaComponent:
+                    // Todo: Does this need the same check as GetDrawableComponent()?
+                    switch (maniaComponent.Component)
+                    {
+                        case ManiaSkinComponents.PlayfieldGrid:
+                            return new SerialisedDrawableInfo
+                            {
+                                Position = new Vector2(this.GetManiaSkinConfig<float>(LegacyManiaSkinConfigurationLookups.ColumnStart)?.Value ?? 0, 0)
+                            };
+                    }
+
+                    break;
+            }
+
+            return null;
         }
 
         private Drawable getResult(HitResult result)

@@ -34,9 +34,6 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
                     return new ArgonJudgementPiece(resultComponent.Component);
 
                 case ManiaSkinComponentLookup maniaComponent:
-                    if (base.GetDrawableComponent(lookup) is Drawable c)
-                        return c;
-
                     // TODO: Once everything is finalised, consider throwing UnsupportedSkinComponentException on missing entries.
                     switch (maniaComponent.Component)
                     {
@@ -72,6 +69,30 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
             }
 
             return base.GetDrawableComponent(lookup);
+        }
+
+        public override SerialisedDrawableInfo? GetConfiguration(ISkinComponentLookup lookup)
+        {
+            if (base.GetConfiguration(lookup) is SerialisedDrawableInfo info)
+                return info;
+
+            switch (lookup)
+            {
+                case ManiaSkinComponentLookup maniaComponent:
+                    switch (maniaComponent.Component)
+                    {
+                        case ManiaSkinComponents.PlayfieldGrid:
+                            return new SerialisedDrawableInfo
+                            {
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
+                            };
+                    }
+
+                    break;
+            }
+
+            return null;
         }
 
         private static readonly Color4 colour_special_column = new Color4(169, 106, 255, 255);

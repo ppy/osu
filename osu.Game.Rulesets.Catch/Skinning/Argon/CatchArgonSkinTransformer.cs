@@ -18,9 +18,6 @@ namespace osu.Game.Rulesets.Catch.Skinning.Argon
             switch (lookup)
             {
                 case CatchSkinComponentLookup catchComponent:
-                    if (base.GetDrawableComponent(lookup) is Drawable c)
-                        return c;
-
                     // TODO: Once everything is finalised, consider throwing UnsupportedSkinComponentException on missing entries.
                     switch (catchComponent.Component)
                     {

@@ -121,26 +121,28 @@ namespace osu.Game.Skinning
 
         private void reload()
         {
-            // Todo: Temporary
-            Drawable? skinComponent = CurrentSkin.GetDrawableComponent(Lookup);
-
             if (isSingleInstance)
             {
-                if (skinComponent != null)
-                    Drawable.ApplySerialisedInfo(skinComponent.CreateSerialisedInfo());
-                return;
-            }
-
-            if (skinComponent != null)
-            {
-                setContent(skinComponent);
-                isDefault = false;
+                // Bring the drawable to a fresh slate since it's not being recreated.
+                Drawable.ApplySerialisedInfo(new SerialisedDrawableInfo());
             }
             else
             {
-                setContent(CreateDefault(Lookup));
-                isDefault = true;
+                if (CurrentSkin.GetDrawableComponent(Lookup) is Drawable skinComponent)
+                {
+                    setContent(skinComponent);
+                    isDefault = false;
+                }
+                else
+                {
+                    setContent(CreateDefault(Lookup));
+                    isDefault = true;
+                }
             }
+
+            // Apply new configuration from the skin.
+            if (CurrentSkin.GetConfiguration(Lookup) is SerialisedDrawableInfo info)
+                Drawable.ApplySerialisedInfo(info);
         }
 
         private void setContent(Drawable newContent)

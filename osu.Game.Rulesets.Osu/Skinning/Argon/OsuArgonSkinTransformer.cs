@@ -36,9 +36,6 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
                     }
 
                 case OsuSkinComponentLookup osuComponent:
-                    if (base.GetDrawableComponent(lookup) is Drawable c)
-                        return c;
-
                     // TODO: Once everything is finalised, consider throwing UnsupportedSkinComponentException on missing entries.
                     switch (osuComponent.Component)
                     {

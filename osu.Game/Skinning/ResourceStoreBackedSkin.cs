@@ -29,6 +29,8 @@ namespace osu.Game.Skinning
 
         public Drawable? GetDrawableComponent(ISkinComponentLookup lookup) => null;
 
+        public SerialisedDrawableInfo? GetConfiguration(ISkinComponentLookup lookup) => null;
+
         public Texture? GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT) => textures.Get(componentName, wrapModeS, wrapModeT);
 
         public ISample? GetSample(ISampleInfo sampleInfo)

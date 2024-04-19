@@ -158,28 +158,38 @@ namespace osu.Game.Skinning
                 case SkinnableSprite.SpriteComponentLookup sprite:
                     return this.GetAnimation(sprite.LookupName, false, false, maxSize: sprite.MaxSize);
 
-                default:
-                {
+                case SkinnableContainerLookup:
                     // It is important to return null if the user has not configured this yet.
                     // This allows skin transformers the opportunity to provide default components.
                     SkinLayoutInfo? layoutInfo = loadConfiguration(new LayoutLookupKey(lookup));
+
                     if (layoutInfo == null)
                         return null;
+
                     if (!layoutInfo.TryGetDrawableInfo(lookup.Ruleset, out var drawableInfos))
                         return null;
 
-                    if (lookup is SkinnableContainerLookup)
+                    return new Container
                     {
-                        return new Container
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            ChildrenEnumerable = drawableInfos.Select(i => i.CreateInstance())
-                        };
-                    }
-
-                    return drawableInfos.SingleOrDefault()?.CreateInstance();
-                }
+                        RelativeSizeAxes = Axes.Both,
+                        ChildrenEnumerable = drawableInfos.Select(i => i.CreateInstance())
+                    };
             }
+
+            return null;
+        }
+
+        public SerialisedDrawableInfo? GetConfiguration(ISkinComponentLookup lookup)
+        {
+            SkinLayoutInfo? layoutInfo = loadConfiguration(new LayoutLookupKey(lookup));
+
+            if (layoutInfo == null)
+                return null;
+
+            if (!layoutInfo.TryGetDrawableInfo(lookup.Ruleset, out var drawableInfos))
+                return null;
+
+            return drawableInfos.SingleOrDefault();
         }
 
         private SkinLayoutInfo? loadConfiguration(LayoutLookupKey key)

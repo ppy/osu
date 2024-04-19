@@ -128,6 +128,21 @@ namespace osu.Game.Skinning
             return ParentSource?.GetDrawableComponent(lookup);
         }
 
+        public SerialisedDrawableInfo? GetConfiguration(ISkinComponentLookup lookup)
+        {
+            foreach (var (_, lookupWrapper) in skinSources)
+            {
+                SerialisedDrawableInfo? sourceConfig;
+                if ((sourceConfig = lookupWrapper.GetConfiguration(lookup)) != null)
+                    return sourceConfig;
+            }
+
+            if (!AllowFallingBackToParent)
+                return null;
+
+            return ParentSource?.GetConfiguration(lookup);
+        }
+
         public Texture? GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT)
         {
             foreach (var (_, lookupWrapper) in skinSources)
@@ -257,6 +272,15 @@ namespace osu.Game.Skinning
             {
                 if (provider.AllowDrawableLookup(lookup))
                     return skin.GetDrawableComponent(lookup);
+
+                return null;
+            }
+
+            public SerialisedDrawableInfo? GetConfiguration(ISkinComponentLookup lookup)
+            {
+                // Todo: Maybe wrong?
+                if (provider.AllowDrawableLookup(lookup))
+                    return skin.GetConfiguration(lookup);
 
                 return null;
             }

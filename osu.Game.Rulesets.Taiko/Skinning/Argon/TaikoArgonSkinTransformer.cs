@@ -26,9 +26,6 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Argon
                     return new ArgonJudgementPiece(resultComponent.Component);
 
                 case TaikoSkinComponentLookup taikoComponent:
-                    if (base.GetDrawableComponent(lookup) is Drawable c)
-                        return c;
-
                     // TODO: Once everything is finalised, consider throwing UnsupportedSkinComponentException on missing entries.
                     switch (taikoComponent.Component)
                     {
