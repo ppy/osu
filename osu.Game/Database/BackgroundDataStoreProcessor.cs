@@ -97,7 +97,7 @@ namespace osu.Game.Database
         }
 
         /// <summary>
-        /// Go through every beatmap and calculate the audio normalization values if they are missing.
+        /// Go through every beatmap and calculate the audio normalization values if they are missing
         /// </summary>
         private void processAudioNormalization()
         {

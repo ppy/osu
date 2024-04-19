@@ -13,6 +13,9 @@ using Realms;
 
 namespace osu.Game.Audio
 {
+    /// <summary>
+    /// Audio Normalization Manager
+    /// </summary>
     public class AudioNormalization : EmbeddedObject, IAudioNormalization, IEquatable<AudioNormalization>
     {
         /// <summary>
@@ -30,6 +33,12 @@ namespace osu.Game.Audio
         {
         }
 
+        /// <summary>
+        /// Get the audio normalization for a beatmap. The loudness normalization value is stored in the object under <see cref="IntegratedLoudness"/>
+        /// </summary>
+        /// <param name="beatmapInfo">The <see cref="BeatmapInfo"/> of the beatmap</param>
+        /// <param name="beatmapSetInfo">The parent <see cref="BeatmapSetInfo"/> of the <see cref="BeatmapInfo"/> supplied</param>
+        /// <param name="realmFileStore">The <see cref="RealmFileStore"/> to use in getting the full path of the audio file</param>
         public AudioNormalization(BeatmapInfo beatmapInfo, BeatmapSetInfo beatmapSetInfo, RealmFileStore realmFileStore)
         {
             string audiofile = beatmapInfo.Metadata.AudioFile;
@@ -55,11 +64,13 @@ namespace osu.Game.Audio
         }
 
         /// <summary>
-        /// Populate the audio normalization for all beatmaps in a set.
-        /// Essentially, this takes a beatmap and applies the same normalization to all beatmaps in the set that have the same audio file to avoid having to calculate the loudness for an audio file multiple times
+        /// Populate the audio normalization for every <see cref="BeatmapInfo"/> in a <see cref="BeatmapSetInfo"/>.
         /// </summary>
-        /// <param name="beatmapInfo">The BeatmapInfo to clone from</param>
-        /// <param name="beatmapSetInfo">The BeatmapSetInfo to populate</param>
+        /// <remarks>
+        /// This takes a <see cref="BeatmapInfo"/> and applies the same normalization to every <see cref="BeatmapInfo"/> in the <see cref="BeatmapSetInfo"/> that has the same audio file as the given <see cref="BeatmapInfo"/> to avoid having to calculate the loudness for an audio file multiple times
+        /// </remarks>
+        /// <param name="beatmapInfo">The <see cref="BeatmapInfo"/> to clone from</param>
+        /// <param name="beatmapSetInfo">The <see cref="BeatmapSetInfo"/> to populate</param>
         public void PopulateSet(BeatmapInfo beatmapInfo, BeatmapSetInfo? beatmapSetInfo)
         {
             if (beatmapSetInfo == null) return;
@@ -80,14 +91,14 @@ namespace osu.Game.Audio
         /// Convert integrated loudness to a volume offset
         /// </summary>
         /// <param name="integratedLoudness">The integrated loudness value</param>
-        /// <returns>The volume offset needed to reach the target level</returns>
+        /// <returns>The volume offset needed to reach <see cref="TARGET_LEVEL"/></returns>
         public static float IntegratedLoudnessToVolumeOffset(float integratedLoudness) => (float)Math.Pow(10, (TARGET_LEVEL - integratedLoudness) / 20);
 
         /// <summary>
-        /// Add the audio normalization effect to the mixer
+        /// Get the loudness values of a <see cref="BeatmapInfo"/> and apply the audio normalization effect to an <see cref="IAudioMixer"/>
         /// </summary>
-        /// <param name="beatmapInfo">The BeatmapInfo to find the loudness of</param>
-        /// <param name="mixer">The mixer to apply the effect on</param>
+        /// <param name="beatmapInfo">The <see cref="BeatmapInfo"/> to get the loudness values of</param>
+        /// <param name="mixer">The <see cref="IAudioMixer"/> to apply the effect on</param>
         public static void AddAudioNormalization(BeatmapInfo beatmapInfo, IAudioMixer mixer)
         {
             AudioNormalization? audioNormalizationModule = beatmapInfo.AudioNormalization;
@@ -106,6 +117,11 @@ namespace osu.Game.Audio
             Logger.Log("Normalization Status: " + (audioNormalizationModule != null ? $"on ({Math.Round(IntegratedLoudnessToVolumeOffset(audioNormalizationModule.IntegratedLoudness) * 100)}%)" : "off"));
         }
 
+        /// <summary>
+        /// Add an effect to a <see cref="IAudioMixer"/>, replacing it if it already exists
+        /// </summary>
+        /// <param name="effectParameter">The <see cref="IEffectParameter"/> to add to the <paramref name="mixer"/></param>
+        /// <param name="mixer">The <see cref="IAudioMixer"/> to add the effect to</param>
         private static void addFx(IEffectParameter effectParameter, IAudioMixer mixer)
         {
             IEffectParameter? effect = mixer.Effects.SingleOrDefault(e => e.FXType == effectParameter.FXType);
@@ -121,8 +137,10 @@ namespace osu.Game.Audio
             }
         }
 
+        /// <inheritdoc />
         public bool Equals(IAudioNormalization? other) => other is AudioNormalization audioNormalization && Equals(audioNormalization);
 
+        /// <inheritdoc />
         public bool Equals(AudioNormalization? other) => other != null && Math.Abs(IntegratedLoudness - other.IntegratedLoudness) < 0.0000001;
     }
 }

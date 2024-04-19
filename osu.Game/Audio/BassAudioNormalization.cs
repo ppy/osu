@@ -7,15 +7,24 @@ using osu.Framework.Logging;
 
 namespace osu.Game.Audio
 {
+    /// <summary>
+    /// Audio Normalization Implementation using Bass
+    /// </summary>
     public class BassAudioNormalization
     {
         /// <summary>
         /// The integrated loudness of the audio
-        /// Applicable range = -70 to -1
-        /// Returns 1 if the loudness could not be measured possibly due to an error
         /// </summary>
+        /// <remarks>
+        /// Applicable range = -70 to -1<br/>A value of 1 means the loudness could not be measured, possibly due to an error
+        /// </remarks>
         public float IntegratedLoudness { get; }
 
+        /// <summary>
+        /// Calculate the integrated loudness of an audio file using Bass
+        /// </summary>
+        /// <returns>The integrated loudness or 1 in <see cref="IntegratedLoudness"/></returns>
+        /// <param name="filePath">A path to an audio file</param>
         public BassAudioNormalization(string filePath)
         {
             int decodeStream = Bass.CreateStream(filePath, 0, 0, BassFlags.Decode | BassFlags.Float);
