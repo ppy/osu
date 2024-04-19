@@ -61,7 +61,7 @@ namespace osu.Game.Rulesets.Edit.Checks
                     var audioInfo = Bass.ChannelGetInfo(decodeStream);
 
                     if (!allowedFormats.Contains(audioInfo.ChannelType))
-                        yield return new IssueTemplateIncorrectFormat(this).Create(file.Filename, audioInfo.ChannelType.ToString());
+                        yield return new IssueTemplateIncorrectFormat(this).Create(file.Filename);
 
                     Bass.StreamFree(decodeStream);
                 }
@@ -83,11 +83,11 @@ namespace osu.Game.Rulesets.Edit.Checks
         public class IssueTemplateIncorrectFormat : IssueTemplate
         {
             public IssueTemplateIncorrectFormat(ICheck check)
-                : base(check, IssueType.Problem, "\"{0}\" is using a incorrect format ({1}). Use wav or ogg for hitsounds.")
+                : base(check, IssueType.Problem, "\"{0}\" is using a incorrect format. Use wav or ogg for hitsounds.")
             {
             }
 
-            public Issue Create(string file, string format) => new Issue(this, file, format);
+            public Issue Create(string file) => new Issue(this, file);
         }
     }
 }
