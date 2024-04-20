@@ -2,10 +2,13 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Filter;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Select;
 using osu.Game.Screens.Select.Carousel;
 using osu.Game.Screens.Select.Filter;
@@ -256,8 +259,8 @@ namespace osu.Game.Tests.NonVisual.Filtering
             const string query = "status=r";
             var filterCriteria = new FilterCriteria();
             FilterQueryParser.ApplyQueries(filterCriteria, query);
-            Assert.AreEqual(BeatmapOnlineStatus.Ranked, filterCriteria.OnlineStatus.Min);
-            Assert.AreEqual(BeatmapOnlineStatus.Ranked, filterCriteria.OnlineStatus.Max);
+            Assert.IsNotEmpty(filterCriteria.OnlineStatus.Values);
+            Assert.That(filterCriteria.OnlineStatus.Values, Contains.Item(BeatmapOnlineStatus.Ranked));
         }
 
         [Test]
@@ -268,10 +271,71 @@ namespace osu.Game.Tests.NonVisual.Filtering
             FilterQueryParser.ApplyQueries(filterCriteria, query);
             Assert.AreEqual("I want the pp", filterCriteria.SearchText.Trim());
             Assert.AreEqual(4, filterCriteria.SearchTerms.Length);
-            Assert.AreEqual(BeatmapOnlineStatus.Ranked, filterCriteria.OnlineStatus.Min);
-            Assert.IsTrue(filterCriteria.OnlineStatus.IsLowerInclusive);
-            Assert.AreEqual(BeatmapOnlineStatus.Ranked, filterCriteria.OnlineStatus.Max);
-            Assert.IsTrue(filterCriteria.OnlineStatus.IsUpperInclusive);
+            Assert.IsNotEmpty(filterCriteria.OnlineStatus.Values);
+            Assert.That(filterCriteria.OnlineStatus.Values, Contains.Item(BeatmapOnlineStatus.Ranked));
+        }
+
+        [Test]
+        public void TestApplyMultipleEqualityStatusQueries()
+        {
+            const string query = "status=ranked status=loved";
+            var filterCriteria = new FilterCriteria();
+            FilterQueryParser.ApplyQueries(filterCriteria, query);
+            Assert.That(filterCriteria.OnlineStatus.Values, Is.Empty);
+        }
+
+        [Test]
+        public void TestApplyEqualStatusQueryWithMultipleValues()
+        {
+            const string query = "status=ranked,loved";
+            var filterCriteria = new FilterCriteria();
+            FilterQueryParser.ApplyQueries(filterCriteria, query);
+            Assert.That(filterCriteria.OnlineStatus.Values, Is.Not.Empty);
+            Assert.That(filterCriteria.OnlineStatus.Values, Contains.Item(BeatmapOnlineStatus.Ranked));
+            Assert.That(filterCriteria.OnlineStatus.Values, Contains.Item(BeatmapOnlineStatus.Loved));
+        }
+
+        [Test]
+        public void TestApplyRangeStatusMatches()
+        {
+            const string query = "status>=r";
+            var filterCriteria = new FilterCriteria();
+            FilterQueryParser.ApplyQueries(filterCriteria, query);
+            Assert.That(filterCriteria.OnlineStatus.Values, Has.Count.EqualTo(4));
+            Assert.That(filterCriteria.OnlineStatus.Values, Contains.Item(BeatmapOnlineStatus.Ranked));
+            Assert.That(filterCriteria.OnlineStatus.Values, Contains.Item(BeatmapOnlineStatus.Approved));
+            Assert.That(filterCriteria.OnlineStatus.Values, Contains.Item(BeatmapOnlineStatus.Qualified));
+            Assert.That(filterCriteria.OnlineStatus.Values, Contains.Item(BeatmapOnlineStatus.Loved));
+        }
+
+        [Test]
+        public void TestApplyRangeStatusWithMultipleMatchesQuery()
+        {
+            const string query = "status>=r,l";
+            var filterCriteria = new FilterCriteria();
+            FilterQueryParser.ApplyQueries(filterCriteria, query);
+            Assert.That(filterCriteria.OnlineStatus.Values, Is.EquivalentTo(Enum.GetValues<BeatmapOnlineStatus>()));
+        }
+
+        [Test]
+        public void TestApplyTwoRangeStatusQuery()
+        {
+            const string query = "status>r status<l";
+            var filterCriteria = new FilterCriteria();
+            FilterQueryParser.ApplyQueries(filterCriteria, query);
+            Assert.That(filterCriteria.OnlineStatus.Values, Has.Count.EqualTo(2));
+            Assert.That(filterCriteria.OnlineStatus.Values, Contains.Item(BeatmapOnlineStatus.Approved));
+            Assert.That(filterCriteria.OnlineStatus.Values, Contains.Item(BeatmapOnlineStatus.Qualified));
+        }
+
+        [Test]
+        public void TestApplyRangeAndEqualStatusQuery()
+        {
+            const string query = "status>r status=loved";
+            var filterCriteria = new FilterCriteria();
+            FilterQueryParser.ApplyQueries(filterCriteria, query);
+            Assert.That(filterCriteria.OnlineStatus.Values, Is.Not.Empty);
+            Assert.That(filterCriteria.OnlineStatus.Values, Contains.Item(BeatmapOnlineStatus.Loved));
         }
 
         [TestCase("creator")]
@@ -441,7 +505,7 @@ namespace osu.Game.Tests.NonVisual.Filtering
         {
             public string? CustomValue { get; set; }
 
-            public bool Matches(BeatmapInfo beatmapInfo) => true;
+            public bool Matches(BeatmapInfo beatmapInfo, FilterCriteria criteria) => true;
 
             public bool TryParseCustomKeywordCriteria(string key, Operator op, string value)
             {
@@ -453,6 +517,8 @@ namespace osu.Game.Tests.NonVisual.Filtering
 
                 return false;
             }
+
+            public bool FilterMayChangeFromMods(ValueChangedEvent<IReadOnlyList<Mod>> mods) => false;
         }
 
         private static readonly object[] correct_date_query_examples =
