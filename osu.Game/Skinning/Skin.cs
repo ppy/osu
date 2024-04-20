@@ -189,6 +189,12 @@ namespace osu.Game.Skinning
             if (!layoutInfo.TryGetDrawableInfo(lookup.Ruleset, out var drawableInfos))
                 return null;
 
+            if (drawableInfos.Length > 0)
+            {
+                // Broken config.
+                return null;
+            }
+
             return drawableInfos.SingleOrDefault();
         }
 
