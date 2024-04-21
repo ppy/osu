@@ -59,8 +59,7 @@ namespace osu.Game.Audio
 
             filepath = realmFileStore.Storage.GetFullPath(filepath);
 
-            BassAudioNormalization loudnessDetection = new BassAudioNormalization(filepath);
-            float? integratedLoudness = loudnessDetection.IntegratedLoudness;
+            float? integratedLoudness = new BassAudioNormalization(filepath).IntegratedLoudness;
 
             if (integratedLoudness == null)
             {
