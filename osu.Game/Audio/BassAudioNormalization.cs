@@ -23,7 +23,6 @@ namespace osu.Game.Audio
         /// <summary>
         /// Calculate the integrated loudness of an audio file using Bass
         /// </summary>
-        /// <returns>The integrated loudness or 1 in <see cref="IntegratedLoudness"/></returns>
         /// <param name="filePath">A path to an audio file</param>
         public BassAudioNormalization(string filePath)
         {
