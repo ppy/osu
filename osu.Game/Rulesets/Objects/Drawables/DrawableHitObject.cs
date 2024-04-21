@@ -632,7 +632,9 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
         #endregion
 
-        public override bool UpdateSubTreeMasking(Drawable source, RectangleF maskingBounds) => false;
+        protected override bool ComputeIsMaskedAway(RectangleF maskingBounds) => false;
+
+        protected override bool UpdateChildrenMasking => false;
 
         protected override void UpdateAfterChildren()
         {

@@ -119,7 +119,6 @@ namespace osu.Game.Rulesets.UI
                     break;
 
                 base.UpdateSubTree();
-                UpdateSubTreeMasking(this, ScreenSpaceDrawQuad.AABBFloat);
             } while (state == PlaybackState.RequiresCatchUp && stopwatch.ElapsedMilliseconds < max_catchup_milliseconds);
 
             return true;

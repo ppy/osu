@@ -345,12 +345,11 @@ namespace osu.Game.Rulesets.Taiko.UI
         {
             public void Add(Drawable proxy) => AddInternal(proxy);
 
-            public override bool UpdateSubTreeMasking(Drawable source, RectangleF maskingBounds)
-            {
-                // DrawableHitObject disables masking.
-                // Hitobject content is proxied and unproxied based on hit status and the IsMaskedAway value could get stuck because of this.
-                return false;
-            }
+            // DrawableHitObject disables masking.
+            // Hitobject content is proxied and unproxied based on hit status and the IsMaskedAway value could get stuck because of this.
+            protected override bool UpdateChildrenMasking => false;
+
+            protected override bool ComputeIsMaskedAway(RectangleF maskingBounds) => false;
         }
     }
 }
