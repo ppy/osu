@@ -149,7 +149,7 @@ namespace osu.Game.Database
 
                         beatmapInfo.AudioNormalization = audioNormalization;
                         audioNormalization.PopulateSet(beatmapInfo, beatmapSetInfo);
-                        ((IWorkingBeatmapCache)beatmapManager).Invalidate(beatmapInfo);
+                        ((IWorkingBeatmapCache)beatmapManager).Invalidate(beatmapSetInfo);
                         Logger.Log($"Processed audio normalization for {beatmapSetInfo.Metadata.Title} [{beatmapInfo.DifficultyName}]");
                     }
                 }
