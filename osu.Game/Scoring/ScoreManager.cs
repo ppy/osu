@@ -62,7 +62,7 @@ namespace osu.Game.Scoring
         /// Retrieve a <see cref="Score"/> from a given <see cref="IScoreInfo"/>.
         /// </summary>
         /// <param name="scoreInfo">The <see cref="IScoreInfo"/> to convert.</param>
-        /// <returns>The <see cref="Score"/>. Null if the score on the database cannot be found.</returns>
+        /// <returns>The <see cref="Score"/>. Null if the score cannot be found in the database.</returns>
         /// <remarks>
         /// The <see cref="IScoreInfo"/> is re-retrieved from the database to ensure all the required data
         /// for retrieving a replay are present (may have missing properties if it was retrieved from online data).
@@ -201,7 +201,7 @@ namespace osu.Game.Scoring
         /// Export a replay from a given <see cref="IScoreInfo"/>.
         /// </summary>
         /// <param name="scoreInfo">The <see cref="IScoreInfo"/> to export.</param>
-        /// <returns>The <see cref="Task"/>. Null if the score on the database cannot be found.</returns>
+        /// <returns>The <see cref="Task"/>. Null if the score cannot be found in the database.</returns>
         /// <remarks>
         /// The <see cref="IScoreInfo"/> is re-retrieved from the database to ensure all the required data
         /// for exporting a replay are present (may have missing properties if it was retrieved from online data).
