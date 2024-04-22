@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Edit.Checks
             new IssueTemplateIncorrectFormat(this),
         };
 
-        private IEnumerable<ChannelType> allowedFormats => new ChannelType[]
+        private IEnumerable<ChannelType> allowedFormats => new[]
         {
             ChannelType.MP3,
             ChannelType.OGG,
