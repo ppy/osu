@@ -49,7 +49,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             createTest(() =>
             {
-                var skinContainer = new LegacySkinContainer(renderer, false);
+                var skinContainer = new LegacySkinContainer(renderer, provideMiddle: false);
                 var legacyCursorTrail = new LegacyCursorTrail(skinContainer);
 
                 skinContainer.Child = legacyCursorTrail;
@@ -63,7 +63,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             createTest(() =>
             {
-                var skinContainer = new LegacySkinContainer(renderer, true);
+                var skinContainer = new LegacySkinContainer(renderer, provideMiddle: true);
                 var legacyCursorTrail = new LegacyCursorTrail(skinContainer);
 
                 skinContainer.Child = legacyCursorTrail;
@@ -77,7 +77,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             createTest(() =>
             {
-                var skinContainer = new LegacySkinContainer(renderer, false, false);
+                var skinContainer = new LegacySkinContainer(renderer, provideMiddle: false, provideCursor: false);
                 var legacyCursorTrail = new LegacyCursorTrail(skinContainer);
 
                 skinContainer.Child = legacyCursorTrail;
@@ -104,13 +104,13 @@ namespace osu.Game.Rulesets.Osu.Tests
         private partial class LegacySkinContainer : Container, ISkinSource
         {
             private readonly IRenderer renderer;
-            private readonly bool disjoint;
+            private readonly bool provideMiddle;
             private readonly bool provideCursor;
 
-            public LegacySkinContainer(IRenderer renderer, bool disjoint, bool provideCursor = true)
+            public LegacySkinContainer(IRenderer renderer, bool provideMiddle, bool provideCursor = true)
             {
                 this.renderer = renderer;
-                this.disjoint = disjoint;
+                this.provideMiddle = provideMiddle;
                 this.provideCursor = provideCursor;
 
                 RelativeSizeAxes = Axes.Both;
@@ -129,7 +129,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                         return new Texture(renderer.WhitePixel);
 
                     case "cursormiddle":
-                        return disjoint ? null : renderer.WhitePixel;
+                        return provideMiddle ? null : renderer.WhitePixel;
                 }
 
                 return null;
