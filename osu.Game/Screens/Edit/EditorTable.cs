@@ -32,7 +32,7 @@ namespace osu.Game.Screens.Edit
 
         // We can avoid potentially thousands of objects being added to the input sub-tree since item selection is being handled by the BackgroundFlow
         // and no items in the underlying table are clickable.
-        protected override bool ShouldBeConsideredForInput(Drawable child) => base.ShouldBeConsideredForInput(child) && child == BackgroundFlow;
+        protected override bool ShouldBeConsideredForInput(Drawable child) => child == BackgroundFlow && base.ShouldBeConsideredForInput(child);
 
         protected EditorTable()
         {
