@@ -16,7 +16,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
     {
         private const double reading_window_size = 3000;
 
-        private const double overlap_multiplier = 1.0;
+        private const double overlap_multiplier = 1;
 
         public static double EvaluateDensityOf(DifficultyHitObject current, bool applyDistanceNerf = true)
         {
@@ -292,10 +292,20 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             var currObj = (OsuDifficultyHitObject)current;
 
             double density = ReadingEvaluator.EvaluateDensityOf(current, false);
+            double preempt = currObj.Preempt / 1000;
 
             // Consider that density matters only starting from 3rd note on the screen
             double densityFactor = Math.Max(0, density - 1) / 5;
-            double invisibilityFactor = currObj.Preempt / 1000;
+
+            double invisibilityFactor;
+
+            // AR11+DT and faster = 0 HD pp unless density is big
+            if (preempt < 0.2) invisibilityFactor = 0;
+
+            // Else accelerating growth until around ART0, then linear, and starting from AR5 is 3 times faster again to buff AR0 +HD
+            else invisibilityFactor = Math.Min(Math.Pow(preempt * 2.4 - 0.2, 5), Math.Max(preempt, preempt * 3 - 2.4));
+
+
             double hdDifficulty = invisibilityFactor + densityFactor;
 
             // Scale by inpredictability slightly
