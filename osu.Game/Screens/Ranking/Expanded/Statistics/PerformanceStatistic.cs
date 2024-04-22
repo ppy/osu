@@ -4,6 +4,7 @@
 #nullable disable
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -17,6 +18,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Resources.Localisation.Web;
 using osu.Game.Scoring;
 using osu.Game.Localisation;
+using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Screens.Ranking.Expanded.Statistics
 {
@@ -74,7 +76,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Statistics
                     Alpha = 0.5f;
                     TooltipText = ResultsScreenStrings.NoPPForUnrankedBeatmaps;
                 }
-                else if (scoreInfo.Mods.Any(m => !m.Ranked))
+                else if (hasUnrankedMods(scoreInfo))
                 {
                     Alpha = 0.5f;
                     TooltipText = ResultsScreenStrings.NoPPForUnrankedMods;
@@ -85,6 +87,16 @@ namespace osu.Game.Screens.Ranking.Expanded.Statistics
                     TooltipText = default;
                 }
             }
+        }
+
+        private static bool hasUnrankedMods(ScoreInfo scoreInfo)
+        {
+            IEnumerable<Mod> modsToCheck = scoreInfo.Mods;
+
+            if (scoreInfo.IsLegacyScore)
+                modsToCheck = modsToCheck.Where(m => m is not ModClassic);
+
+            return modsToCheck.Any(m => !m.Ranked);
         }
 
         public override void Appear()
