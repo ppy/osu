@@ -30,7 +30,7 @@ namespace osu.Game.Rulesets.Edit.Checks
 
             foreach (var file in beatmapSet.Files)
             {
-                if (audioFile != null && file.File == audioFile.File) continue;
+                if (audioFile != null && ReferenceEquals(file.File, audioFile.File)) continue;
 
                 using (Stream data = context.WorkingBeatmap.GetStream(file.File.GetStoragePath()))
                 {
