@@ -201,16 +201,16 @@ namespace osu.Game.Scoring
         /// Export a replay from a given <see cref="IScoreInfo"/>.
         /// </summary>
         /// <param name="scoreInfo">The <see cref="IScoreInfo"/> to export.</param>
-        /// <returns>The <see cref="Task"/>. Null if the score cannot be found in the database.</returns>
+        /// <returns>The <see cref="Task"/>. Return <see cref="Task.CompletedTask"/> if the score cannot be found in the database.</returns>
         /// <remarks>
         /// The <see cref="IScoreInfo"/> is re-retrieved from the database to ensure all the required data
         /// for exporting a replay are present (may have missing properties if it was retrieved from online data).
         /// </remarks>
-        public Task? Export(ScoreInfo scoreInfo)
+        public Task Export(ScoreInfo scoreInfo)
         {
             ScoreInfo? databasedScoreInfo = getDatabasedScoreInfo(scoreInfo);
 
-            return databasedScoreInfo == null ? null : scoreExporter.ExportAsync(databasedScoreInfo.ToLive(Realm));
+            return databasedScoreInfo == null ? Task.CompletedTask : scoreExporter.ExportAsync(databasedScoreInfo.ToLive(Realm));
         }
 
         public Task<Live<ScoreInfo>?> ImportAsUpdate(ProgressNotification notification, ImportTask task, ScoreInfo original) => scoreImporter.ImportAsUpdate(notification, task, original);
