@@ -13,7 +13,6 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
-using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Rulesets.UI;
 using osuTK;
 
@@ -37,12 +36,16 @@ namespace osu.Game.Rulesets.Osu.Mods
             MaxValue = 1.0f,
         };
 
+        // Bindable Setting for Show Judgements
+        [SettingSource("Show Judgements", "Whether to show judgements or not.")]
+        public BindableBool ShowJudgements { get; } = new BindableBool(true);
+
         public void ApplyToDrawableRuleset(DrawableRuleset<OsuHitObject> drawableRuleset)
         {
             // Hide judgment displays and follow points as they won't make any sense.
             // Judgements can potentially be turned on in a future where they display at a position relative to their drawable counterpart.
-            drawableRuleset.Playfield.DisplayJudgements.Value = false;
-            (drawableRuleset.Playfield as OsuPlayfield)?.FollowPoints.Hide();
+            drawableRuleset.Playfield.DisplayJudgements.Value = ShowJudgements.Value;
+            //(drawableRuleset.Playfield as OsuPlayfield)?.FollowPoints.Hide();
         }
 
         public void Update(Playfield playfield)
@@ -77,6 +80,10 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             float x = (float)Interpolation.DampContinuously(hitObject.X, destination.X, dampLength, clock.ElapsedFrameTime);
             float y = (float)Interpolation.DampContinuously(hitObject.Y, destination.Y, dampLength, clock.ElapsedFrameTime);
+
+            // I added these two lines
+            if (hitObject is DrawableOsuHitObject h)
+                h.HitObject.Position = new Vector2(x, y);
 
             hitObject.Position = new Vector2(x, y);
         }
