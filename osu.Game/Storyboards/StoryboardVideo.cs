@@ -3,23 +3,18 @@
 
 using osu.Framework.Graphics;
 using osu.Game.Storyboards.Drawables;
+using osuTK;
 
 namespace osu.Game.Storyboards
 {
-    public class StoryboardVideo : IStoryboardElement
+    public class StoryboardVideo : StoryboardSprite
     {
-        public string Path { get; }
-
-        public bool IsDrawable => true;
-
-        public double StartTime { get; }
-
         public StoryboardVideo(string path, double offset)
+            : base(path, Anchor.Centre, Vector2.Zero)
         {
-            Path = path;
-            StartTime = offset;
+            TimelineGroup.Alpha.Add(Easing.None, offset, offset, 0, 1);
         }
 
-        public Drawable CreateDrawable() => new DrawableStoryboardVideo(this);
+        public override Drawable CreateDrawable() => new DrawableStoryboardVideo(this);
     }
 }
