@@ -390,6 +390,15 @@ namespace osu.Game.Screens.Ranking
 
             switch (e.Action)
             {
+                case GlobalAction.QuickExit:
+                    if (this.IsCurrentScreen())
+                    {
+                        this.Exit();
+                        return true;
+                    }
+
+                    break;
+
                 case GlobalAction.Select:
                     StatisticsPanel.ToggleVisibility();
                     return true;
