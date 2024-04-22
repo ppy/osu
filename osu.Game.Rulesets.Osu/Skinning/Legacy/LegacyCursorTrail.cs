@@ -18,7 +18,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
         private readonly ISkin skin;
         private const double disjoint_trail_time_separation = 1000 / 60.0;
 
-        private bool disjointTrail;
+        public bool DisjointTrail { get; private set; }
         private double lastTrailTime;
 
         private IBindable<float> cursorSize = null!;
@@ -36,9 +36,9 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
             cursorSize = config.GetBindable<float>(OsuSetting.GameplayCursorSize).GetBoundCopy();
 
             Texture = skin.GetTexture("cursortrail");
-            disjointTrail = skin.GetTexture("cursormiddle") == null;
+            DisjointTrail = skin.GetTexture("cursormiddle") == null;
 
-            if (disjointTrail)
+            if (DisjointTrail)
             {
                 bool centre = skin.GetConfig<OsuSkinConfiguration, bool>(OsuSkinConfiguration.CursorCentre)?.Value ?? true;
 
@@ -57,19 +57,19 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
             }
         }
 
-        protected override double FadeDuration => disjointTrail ? 150 : 500;
+        protected override double FadeDuration => DisjointTrail ? 150 : 500;
         protected override float FadeExponent => 1;
 
-        protected override bool InterpolateMovements => !disjointTrail;
+        protected override bool InterpolateMovements => !DisjointTrail;
 
         protected override float IntervalMultiplier => 1 / Math.Max(cursorSize.Value, 1);
-        protected override bool AvoidDrawingNearCursor => !disjointTrail;
+        protected override bool AvoidDrawingNearCursor => !DisjointTrail;
 
         protected override void Update()
         {
             base.Update();
 
-            if (!disjointTrail || !currentPosition.HasValue)
+            if (!DisjointTrail || !currentPosition.HasValue)
                 return;
 
             if (Time.Current - lastTrailTime >= disjoint_trail_time_separation)
@@ -81,7 +81,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 
         protected override bool OnMouseMove(MouseMoveEvent e)
         {
-            if (!disjointTrail)
+            if (!DisjointTrail)
                 return base.OnMouseMove(e);
 
             currentPosition = e.ScreenSpaceMousePosition;
