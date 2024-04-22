@@ -23,7 +23,17 @@ namespace osu.Game.Storyboards.Drawables
         {
             Video = video;
 
-            RelativeSizeAxes = Axes.Both;
+            // In osu-stable, a mapper can add a scale command for a storyboard.
+            // This allows scaling based on the video's absolute size.
+            //
+            // If not specified we take up the full available space.
+            bool useRelative = !video.TimelineGroup.Scale.HasCommands;
+
+            RelativeSizeAxes = useRelative ? Axes.Both : Axes.None;
+            AutoSizeAxes = useRelative ? Axes.None : Axes.Both;
+
+            Anchor = Anchor.Centre;
+            Origin = Anchor.Centre;
         }
 
         [BackgroundDependencyLoader(true)]
@@ -36,7 +46,7 @@ namespace osu.Game.Storyboards.Drawables
 
             InternalChild = drawableVideo = new Video(stream, false)
             {
-                RelativeSizeAxes = Axes.Both,
+                RelativeSizeAxes = RelativeSizeAxes,
                 FillMode = FillMode.Fill,
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
