@@ -86,6 +86,27 @@ namespace osu.Game.Tests.Editing.Checks
         }
 
         [Test]
+        public void TestNotAnAudioFile()
+        {
+            beatmap = new Beatmap<HitObject>
+            {
+                BeatmapInfo = new BeatmapInfo
+                {
+                    BeatmapSet = new BeatmapSetInfo
+                    {
+                        Files = { CheckTestHelpers.CreateMockFile("png") }
+                    }
+                }
+            };
+
+            using (var resourceStream = TestResources.OpenResource("Textures/test-image.png"))
+            {
+                var issues = check.Run(getContext(resourceStream)).ToList();
+                Assert.That(issues, Has.Count.EqualTo(0));
+            }
+        }
+
+        [Test]
         public void TestCorruptAudio()
         {
             using (var resourceStream = TestResources.OpenResource("Samples/corrupt.wav"))
