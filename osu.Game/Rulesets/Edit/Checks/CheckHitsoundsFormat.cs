@@ -37,14 +37,16 @@ namespace osu.Game.Rulesets.Edit.Checks
                     if (data == null)
                         continue;
 
+                    if (!AudioCheckUtils.HasAudioExtension(file.Filename) || !probablyHasAudioData(data))
+                        continue;
+
                     var fileCallbacks = new FileCallbacks(new DataStreamFileProcedures(data));
                     int decodeStream = Bass.CreateStream(StreamSystem.NoBuffer, BassFlags.Decode, fileCallbacks.Callbacks, fileCallbacks.Handle);
 
                     // If the format is not supported by BASS
                     if (decodeStream == 0)
                     {
-                        if (AudioCheckUtils.HasAudioExtension(file.Filename) && probablyHasAudioData(data))
-                            yield return new IssueTemplateFormatUnsupported(this).Create(file.Filename);
+                        yield return new IssueTemplateFormatUnsupported(this).Create(file.Filename);
 
                         continue;
                     }
