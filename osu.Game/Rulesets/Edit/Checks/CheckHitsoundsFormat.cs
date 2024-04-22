@@ -3,7 +3,6 @@
 
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using ManagedBass;
 using osu.Framework.Audio.Callbacks;
 using osu.Game.Beatmaps;
@@ -20,14 +19,6 @@ namespace osu.Game.Rulesets.Edit.Checks
         {
             new IssueTemplateFormatUnsupported(this),
             new IssueTemplateIncorrectFormat(this),
-        };
-
-        private IEnumerable<ChannelType> allowedFormats => new ChannelType[]
-        {
-            ChannelType.WavePCM,
-            ChannelType.WaveFloat,
-            ChannelType.OGG,
-            ChannelType.Wave | ChannelType.OGG,
         };
 
         public IEnumerable<Issue> Run(BeatmapVerifierContext context)
@@ -60,7 +51,7 @@ namespace osu.Game.Rulesets.Edit.Checks
 
                     var audioInfo = Bass.ChannelGetInfo(decodeStream);
 
-                    if (!allowedFormats.Contains(audioInfo.ChannelType))
+                    if ((audioInfo.ChannelType & ChannelType.Wave) == 0 && audioInfo.ChannelType != ChannelType.OGG)
                         yield return new IssueTemplateIncorrectFormat(this).Create(file.Filename);
 
                     Bass.StreamFree(decodeStream);
