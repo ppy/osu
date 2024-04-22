@@ -31,12 +31,14 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
+        private void load(OsuConfigManager config, ISkinSource skinSource)
         {
             cursorSize = config.GetBindable<float>(OsuSetting.GameplayCursorSize).GetBoundCopy();
 
             Texture = skin.GetTexture("cursortrail");
-            DisjointTrail = skin.GetTexture("cursormiddle") == null;
+
+            var cursorProvider = skinSource.FindProvider(s => s.GetTexture("cursor") != null);
+            DisjointTrail = cursorProvider?.GetTexture("cursormiddle") == null;
 
             if (DisjointTrail)
             {
