@@ -46,6 +46,17 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             }
         }
 
+
+        protected override void Update()
+        {
+            base.Update();
+            if (JudgedObject is DrawableOsuHitObject osuObject && Parent != null && osuObject.HitObject != null)
+            {
+                Position = osuObject.ToSpaceOfOtherDrawable(osuObject.OriginPosition, Parent!);
+                Scale = new Vector2(osuObject.HitObject.Scale);
+            }
+        }
+
         protected override void ApplyHitAnimations()
         {
             bool hitLightingEnabled = config.Get<bool>(OsuSetting.HitLighting);
