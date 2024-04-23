@@ -21,7 +21,7 @@ namespace osu.Game.Storyboards.Drawables
         {
             Video = video;
 
-            // In osu-stable, a mapper can add a scale command for a storyboard.
+            // In osu-stable, a mapper can add a scale command for a storyboard video.
             // This allows scaling based on the video's absolute size.
             //
             // If not specified we take up the full available space.
