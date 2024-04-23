@@ -50,9 +50,6 @@ namespace osu.Game.Rulesets.Osu.Mods
             // Hide follow points as they won't make any sense.
             // Judgements can potentially be turned on in a future where they display at a position relative to their drawable counterpart.
             (drawableRuleset.Playfield as OsuPlayfield)?.FollowPoints.Hide();
-            // Hide judgements as they don't move with the drawables after appearing, which does look bad.
-            // They would need to either move with them or disappear sooner.
-            drawableRuleset.Playfield.DisplayJudgements.Value = false;
         }
 
         private void applyTransform(DrawableHitObject drawable, ArmedState state)
