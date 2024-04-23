@@ -81,10 +81,6 @@ namespace osu.Game.Rulesets.Osu.Mods
             float x = (float)Interpolation.DampContinuously(hitObject.X, destination.X, dampLength, clock.ElapsedFrameTime);
             float y = (float)Interpolation.DampContinuously(hitObject.Y, destination.Y, dampLength, clock.ElapsedFrameTime);
 
-            // I added these two lines
-            /*if (hitObject is DrawableOsuHitObject h)
-                h.HitObject.Position = new Vector2(x, y);
-*/
             hitObject.Position = new Vector2(x, y);
         }
     }

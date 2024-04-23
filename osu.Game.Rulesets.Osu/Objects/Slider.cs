@@ -8,7 +8,6 @@ using osu.Game.Rulesets.Objects.Types;
 using System.Collections.Generic;
 using osu.Game.Rulesets.Objects;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Threading;
 using Newtonsoft.Json;
 using osu.Framework.Bindables;
@@ -25,7 +24,6 @@ namespace osu.Game.Rulesets.Osu.Objects
 {
     public class Slider : OsuHitObject, IHasPathWithRepeats, IHasSliderVelocity, IHasGenerateTicks
     {
-        private static readonly ConditionalWeakTable<HitObject, StrongBox<double>> SliderProgress = new ConditionalWeakTable<HitObject, StrongBox<double>>();
 
         public double EndTime => StartTime + this.SpanCount() * Path.Distance / Velocity;
 
@@ -204,7 +202,6 @@ namespace osu.Game.Rulesets.Osu.Objects
                             Position = Position + Path.PositionAt(e.PathProgress),
                             StackHeight = StackHeight,
                         });
-                        SliderProgress.AddOrUpdate(NestedHitObjects.Last(), new StrongBox<double>(e.PathProgress));
                         break;
 
                     case SliderEventType.Head:
@@ -236,7 +233,6 @@ namespace osu.Game.Rulesets.Osu.Objects
                             Position = Position + Path.PositionAt(e.PathProgress),
                             StackHeight = StackHeight,
                         });
-                        SliderProgress.Add(NestedHitObjects.Last(), new StrongBox<double>(e.PathProgress));
                         break;
                 }
             }
@@ -254,9 +250,7 @@ namespace osu.Game.Rulesets.Osu.Objects
             if (TailCircle != null)
                 TailCircle.Position = EndPosition;
 
-            foreach (var hitObject in NestedHitObjects)
-                if (hitObject is SliderTick or SliderRepeat)
-                    ((OsuHitObject)hitObject).Position = Position + Path.PositionAt(SliderProgress.TryGetValue(hitObject, out var progress) ? progress?.Value ?? 0 : 0);
+            // Positions of other nested hitobjects are not updated
         }
 
         protected void UpdateNestedSamples()
