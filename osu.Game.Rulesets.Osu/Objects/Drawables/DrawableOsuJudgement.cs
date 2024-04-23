@@ -39,10 +39,13 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             Lighting.ResetAnimation();
             Lighting.SetColourFrom(JudgedObject, Result);
 
-            if (JudgedObject?.HitObject is OsuHitObject osuObject)
+            if (JudgedObject is DrawableOsuHitObject osuObject)
             {
-                Position = osuObject.StackedEndPosition;
-                Scale = new Vector2(osuObject.Scale);
+                Position = osuObject.ToSpaceOfOtherDrawable(Vector2.Zero, Parent);
+                // Works only for normal hit circles, also with magnetised:
+                // Position = osuObject.Position;
+
+                Scale = new Vector2(osuObject.HitObject.Scale);
             }
         }
 

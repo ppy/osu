@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         public const float DEFAULT_TICK_SIZE = 16;
 
-        protected DrawableSlider DrawableSlider => (DrawableSlider)ParentHitObject;
+        public DrawableSlider DrawableSlider => (DrawableSlider)ParentHitObject;
 
         private SkinnableDrawable scaleContainer;
 
