@@ -39,7 +39,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public void ApplyToDrawableRuleset(DrawableRuleset<OsuHitObject> drawableRuleset)
         {
-            // Hide judgment displays and follow points as they won't make any sense.
+            // Hide follow points as they won't make any sense.
             // Judgements can potentially be turned on in a future where they display at a position relative to their drawable counterpart.
             (drawableRuleset.Playfield as OsuPlayfield)?.FollowPoints.Hide();
         }
