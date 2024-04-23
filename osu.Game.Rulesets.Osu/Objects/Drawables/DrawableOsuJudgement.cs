@@ -41,10 +41,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             if (JudgedObject is DrawableOsuHitObject osuObject)
             {
-                Position = osuObject.ToSpaceOfOtherDrawable(Vector2.Zero, Parent);
-                // Works only for normal hit circles, also with magnetised:
-                // Position = osuObject.Position;
-
+                Position = osuObject.ToSpaceOfOtherDrawable(osuObject.OriginPosition, Parent!);
                 Scale = new Vector2(osuObject.HitObject.Scale);
             }
         }
