@@ -104,7 +104,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                         Files = { new RealmNamedFileUsage(new RealmFile { Hash = $"{i}" }, string.Empty) }
                     };
 
-                    importedScores.Add(scoreManager.Import(score).Value);
+                    importedScores.Add(scoreManager.Import(score)!.Value);
                 }
             });
         });
