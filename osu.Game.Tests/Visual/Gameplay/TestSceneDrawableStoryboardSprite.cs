@@ -86,7 +86,10 @@ namespace osu.Game.Tests.Visual.Gameplay
                 sprite.AddLoop(Time.Current, 100).Alpha.Add(Easing.None, 0, 10000, 1, 1);
 
                 if (scaleTransformProvided)
-                    sprite.TimelineGroup.Scale.Add(Easing.None, Time.Current, Time.Current, 1, 1);
+                {
+                    sprite.TimelineGroup.Scale.Add(Easing.None, Time.Current, Time.Current + 1000, 1, 2);
+                    sprite.TimelineGroup.Scale.Add(Easing.None, Time.Current + 1000, Time.Current + 2000, 2, 1);
+                }
 
                 layer.Elements.Clear();
                 layer.Add(sprite);
