@@ -22,8 +22,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         /// A higher value rewards short, high difficulty sections, whereas a lower value rewards consistent, lower difficulty.
         protected abstract double FcProbability { get; }
 
-        private const int bin_count = 32;
-
         private readonly List<double> difficulties = new List<double>();
 
         /// <summary>
@@ -43,7 +41,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             double maxDiff = difficulties.Max();
             if (maxDiff <= 1e-10) return 0;
 
-            var bins = Bin.CreateBins(difficulties, bin_count);
+            var bins = Bin.CreateBins(difficulties);
 
             const double lower_bound = 0;
             double upperBoundEstimate = 3.0 * maxDiff;
@@ -93,7 +91,34 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             if (difficulties.Count == 0)
                 return 0;
 
-            return difficulties.Count < 2 * bin_count ? difficultyValueExact() : difficultyValueBinned();
+            return difficulties.Count < 64 ? difficultyValueExact() : difficultyValueBinned();
+        }
+
+        /// <summary>
+        /// Find the lowest misscount that a player with the provided <paramref name="skill"/> would have a 2% chance of achieving.
+        /// </summary>
+        public double GetMissCountAtSkill(double skill)
+        {
+            double maxDiff = difficulties.Max();
+
+            if (maxDiff == 0)
+                return 0;
+            if (skill <= 0)
+                return difficulties.Count;
+
+            PoissonBinomial poiBin;
+
+            if (difficulties.Count > 64)
+            {
+                var bins = Bin.CreateBins(difficulties);
+                poiBin = new PoissonBinomial(bins, skill, HitProbability);
+            }
+            else
+            {
+                poiBin = new PoissonBinomial(difficulties, skill, HitProbability);
+            }
+
+            return Math.Max(0, RootFinding.FindRootExpand(x => poiBin.CDF(x) - FcProbability, -50, 1000, accuracy: 1e-4));
         }
     }
 }

@@ -20,6 +20,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         public double AimDifficulty { get; set; }
 
         /// <summary>
+        /// The difficulty corresponding to the aim skill.
+        /// </summary>
+        [JsonProperty("aim_penalty_constants")]
+        public (double, double, double) AimPenaltyConstants { get; set; }
+
+        /// <summary>
         /// The difficulty corresponding to the speed skill.
         /// </summary>
         [JsonProperty("speed_difficulty")]

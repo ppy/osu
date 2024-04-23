@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Rulesets.Difficulty;
+using osu.Game.Rulesets.Osu.Difficulty.Utils;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
@@ -93,9 +94,16 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             // Penalize misses by assessing # of misses relative to the total # of objects. Default a 3% reduction for any # of misses.
             if (effectiveMissCount > 0)
-                aimValue *= 0.97 * Math.Pow(1 - Math.Pow(effectiveMissCount / totalHits, 0.775), effectiveMissCount);
+            {
+                double a = attributes.AimPenaltyConstants.Item1;
+                double b = attributes.AimPenaltyConstants.Item2;
+                double c = attributes.AimPenaltyConstants.Item3;
+                double d = Math.Log(totalHits + 1) - a - b - c;
 
-            aimValue *= getComboScalingFactor(attributes);
+                double penalty = Math.Pow(1 - RootFinding.FindRootExpand(x => Math.Exp(a * x * x * x * x + b * x * x * x + c * x * x + d * x) - 1 - effectiveMissCount, 0, 1), 1.5);
+
+                aimValue *= penalty;
+            }
 
             double approachRateFactor = 0.0;
             if (attributes.ApproachRate > 10.33)

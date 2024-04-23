@@ -46,5 +46,37 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             return currentStrain;
         }
+
+        /// <summary>
+        /// The coefficients of a quartic fitted to the miss counts at each skill level.
+        /// </summary>
+        /// <returns>The coefficients for ax^4+bx^3+cx^2. The 4th coefficient for dx^1 can be deduced from the first 3 in the performance calculator.</returns>
+        public (double, double, double) GetMissCountCoefficients()
+        {
+            const int count = 21;
+            const double penalty_per_misscount = 1.0 / (count - 1);
+
+            double fcSkill = DifficultyValue();
+
+            double[] misscounts = new double[count];
+
+            for (int i = 0; i < count; i++)
+            {
+                if (i == 0)
+                {
+                    misscounts[i] = 0;
+                    continue;
+                }
+
+                double penalizedSkill = fcSkill - fcSkill * penalty_per_misscount * i;
+
+                // Save misscounts as log form to give higher weight to lower values. Add 1 so that the lowest misscounts remain above 0.
+                misscounts[i] = Math.Log(GetMissCountAtSkill(penalizedSkill) + 1);
+            }
+
+            double[] constants = FitMissCountPoints.GetPolynomialCoefficients(misscounts);
+
+            return (constants[0], constants[1], constants[2]);
+        }
     }
 }
