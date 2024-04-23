@@ -50,6 +50,8 @@ namespace osu.Game.Storyboards.Drawables
                 Origin = Anchor.Centre,
                 Alpha = 0,
             };
+
+            Video.ApplyTransforms(drawableVideo);
         }
 
         protected override void LoadComplete()
