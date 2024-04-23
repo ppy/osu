@@ -12,7 +12,9 @@ namespace osu.Game.Storyboards
         public StoryboardVideo(string path, double offset)
             : base(path, Anchor.Centre, Vector2.Zero)
         {
-            TimelineGroup.Alpha.Add(Easing.None, offset, offset, 0, 1);
+            // This is just required to get a valid StartTime based on the incoming offset.
+            // Actual fades are handled inside DrawableStoryboardVideo for now.
+            TimelineGroup.Alpha.Add(Easing.None, offset, offset, 0, 0);
         }
 
         public override Drawable CreateDrawable() => new DrawableStoryboardVideo(this);
