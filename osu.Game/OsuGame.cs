@@ -706,26 +706,9 @@ namespace osu.Game
         {
             Logger.Log($"Beginning {nameof(PresentScore)} with score {score}");
 
-            // The given ScoreInfo may have missing properties if it was retrieved from online data. Re-retrieve it from the database
-            // to ensure all the required data for presenting a replay are present.
-            ScoreInfo databasedScoreInfo = null;
+            var databasedScore = ScoreManager.GetScore(score);
 
-            if (score.OnlineID > 0)
-                databasedScoreInfo = ScoreManager.Query(s => s.OnlineID == score.OnlineID);
-
-            if (score.LegacyOnlineID > 0)
-                databasedScoreInfo ??= ScoreManager.Query(s => s.LegacyOnlineID == score.LegacyOnlineID);
-
-            if (score is ScoreInfo scoreInfo)
-                databasedScoreInfo ??= ScoreManager.Query(s => s.Hash == scoreInfo.Hash);
-
-            if (databasedScoreInfo == null)
-            {
-                Logger.Log("The requested score could not be found locally.", LoggingTarget.Information);
-                return;
-            }
-
-            var databasedScore = ScoreManager.GetScore(databasedScoreInfo);
+            if (databasedScore == null) return;
 
             if (databasedScore.Replay == null)
             {
@@ -733,7 +716,7 @@ namespace osu.Game
                 return;
             }
 
-            var databasedBeatmap = BeatmapManager.QueryBeatmap(b => b.ID == databasedScoreInfo.BeatmapInfo.ID);
+            var databasedBeatmap = BeatmapManager.QueryBeatmap(b => b.ID == databasedScore.ScoreInfo.BeatmapInfo.ID);
 
             if (databasedBeatmap == null)
             {
