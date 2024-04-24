@@ -7,7 +7,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
-using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
@@ -1035,8 +1034,8 @@ namespace osu.Game.Screens.Edit
         {
             var exportItems = new List<MenuItem>
             {
-                new EditorMenuItem(EditorStrings.ExportForEditing, MenuItemType.Standard, () => exportBeatmap(false)) { Action = { Disabled = !RuntimeInfo.IsDesktop } },
-                new EditorMenuItem(EditorStrings.ExportForCompatibility, MenuItemType.Standard, () => exportBeatmap(true)) { Action = { Disabled = !RuntimeInfo.IsDesktop } },
+                new EditorMenuItem(EditorStrings.ExportForEditing, MenuItemType.Standard, () => exportBeatmap(false)),
+                new EditorMenuItem(EditorStrings.ExportForCompatibility, MenuItemType.Standard, () => exportBeatmap(true)),
             };
 
             return new EditorMenuItem(CommonStrings.Export) { Items = exportItems };

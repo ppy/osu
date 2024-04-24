@@ -8,7 +8,6 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
-using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -152,7 +151,7 @@ namespace osu.Game.Overlays.SkinEditor
                                                 Items = new OsuMenuItem[]
                                                 {
                                                     new EditorMenuItem(Web.CommonStrings.ButtonsSave, MenuItemType.Standard, () => Save()),
-                                                    new EditorMenuItem(CommonStrings.Export, MenuItemType.Standard, () => skins.ExportCurrentSkin()) { Action = { Disabled = !RuntimeInfo.IsDesktop } },
+                                                    new EditorMenuItem(CommonStrings.Export, MenuItemType.Standard, () => skins.ExportCurrentSkin()),
                                                     new OsuMenuItemSpacer(),
                                                     new EditorMenuItem(CommonStrings.RevertToDefault, MenuItemType.Destructive, () => dialogOverlay?.Push(new RevertConfirmDialog(revert))),
                                                     new OsuMenuItemSpacer(),

@@ -78,14 +78,17 @@ namespace osu.Game.Overlays.Settings.Sections.General
                     Keywords = new[] { @"logs", @"files", @"access", "directory" },
                     Action = () => storage.PresentExternally(),
                 });
+            }
 
-                Add(new SettingsButton
-                {
-                    Text = GeneralSettingsStrings.ExportLogs,
-                    Keywords = new[] { @"bug", "report", "logs", "files" },
-                    Action = () => Task.Run(exportLogs),
-                });
+            Add(new SettingsButton
+            {
+                Text = GeneralSettingsStrings.ExportLogs,
+                Keywords = new[] { @"bug", "report", "logs", "files" },
+                Action = () => Task.Run(exportLogs),
+            });
 
+            if (RuntimeInfo.IsDesktop)
+            {
                 Add(new SettingsButton
                 {
                     Text = GeneralSettingsStrings.ChangeFolderLocation,
