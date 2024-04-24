@@ -185,17 +185,6 @@ namespace osu.Game.Screens.Edit.Components.Menus
                 {
                 }
 
-                private bool hasSubmenu => Item.Items.Any();
-
-                protected override TextContainer CreateTextContainer() => base.CreateTextContainer().With(c =>
-                {
-                    c.Padding = new MarginPadding
-                    {
-                        // Add some padding for the chevron below.
-                        Right = hasSubmenu ? 5 : 0,
-                    };
-                });
-
                 [BackgroundDependencyLoader]
                 private void load(OverlayColourProvider colourProvider)
                 {
@@ -203,18 +192,6 @@ namespace osu.Game.Screens.Edit.Components.Menus
                     BackgroundColourHover = colourProvider.Background1;
 
                     Foreground.Padding = new MarginPadding { Vertical = 2 };
-
-                    if (hasSubmenu)
-                    {
-                        AddInternal(new SpriteIcon
-                        {
-                            Margin = new MarginPadding(6),
-                            Size = new Vector2(8),
-                            Icon = FontAwesome.Solid.ChevronRight,
-                            Anchor = Anchor.CentreRight,
-                            Origin = Anchor.CentreRight,
-                        });
-                    }
                 }
             }
         }
