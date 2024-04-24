@@ -46,10 +46,10 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             }
         }
 
-
         protected override void Update()
         {
             base.Update();
+
             if (JudgedObject is DrawableOsuHitObject osuObject && Parent != null && osuObject.HitObject != null)
             {
                 Position = osuObject.ToSpaceOfOtherDrawable(osuObject.OriginPosition, Parent!);
