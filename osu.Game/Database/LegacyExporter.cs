@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using osu.Framework;
 using osu.Framework.Platform;
 using osu.Game.Extensions;
 using osu.Game.Overlays.Notifications;
@@ -105,7 +106,12 @@ namespace osu.Game.Database
                 throw;
             }
 
-            notification.CompletionText = $"Exported {itemFilename}! Click to view.";
+            notification.CompletionText = $"Exported {itemFilename}!";
+
+            // mobile platforms don't support `PresentFileExternally()` yet
+            if (RuntimeInfo.IsDesktop)
+                notification.CompletionText += " Click to view.";
+
             notification.CompletionClickAction = () => exportStorage.PresentFileExternally(filename);
             notification.State = ProgressNotificationState.Completed;
         }

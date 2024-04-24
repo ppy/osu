@@ -134,7 +134,12 @@ namespace osu.Game.Overlays.Settings.Sections.General
                 throw;
             }
 
-            notification.CompletionText = "Exported logs! Click to view.";
+            notification.CompletionText = "Exported logs!";
+
+            // mobile platforms don't support `PresentFileExternally()` yet
+            if (RuntimeInfo.IsDesktop)
+                notification.CompletionText += " Click to view.";
+
             notification.CompletionClickAction = () => storage.PresentFileExternally(archive_filename);
 
             notification.State = ProgressNotificationState.Completed;
