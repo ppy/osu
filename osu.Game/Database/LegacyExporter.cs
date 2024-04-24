@@ -112,7 +112,14 @@ namespace osu.Game.Database
             if (RuntimeInfo.IsDesktop)
                 notification.CompletionText += " Click to view.";
 
-            notification.CompletionClickAction = () => exportStorage.PresentFileExternally(filename);
+            notification.CompletionClickAction = () =>
+            {
+                exportStorage.PresentFileExternally(filename);
+
+                // always return true so that mobile platforms dismiss on click
+                return true;
+            };
+
             notification.State = ProgressNotificationState.Completed;
         }
 

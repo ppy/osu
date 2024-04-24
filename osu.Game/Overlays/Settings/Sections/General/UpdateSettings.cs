@@ -140,7 +140,13 @@ namespace osu.Game.Overlays.Settings.Sections.General
             if (RuntimeInfo.IsDesktop)
                 notification.CompletionText += " Click to view.";
 
-            notification.CompletionClickAction = () => storage.PresentFileExternally(archive_filename);
+            notification.CompletionClickAction = () =>
+            {
+                storage.PresentFileExternally(archive_filename);
+
+                // always return true so that mobile platforms dismiss on click
+                return true;
+            };
 
             notification.State = ProgressNotificationState.Completed;
         }
