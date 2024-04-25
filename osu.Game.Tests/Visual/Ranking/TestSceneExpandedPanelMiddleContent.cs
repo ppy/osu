@@ -105,6 +105,21 @@ namespace osu.Game.Tests.Visual.Ranking
         }
 
         [Test]
+        public void TestPPNotShownAsProvisionalIfClassicModIsPresentDueToLegacyScore()
+        {
+            AddStep("show example score", () =>
+            {
+                var score = TestResources.CreateTestScoreInfo(createTestBeatmap(new RealmUser()));
+                score.PP = 400;
+                score.Mods = score.Mods.Append(new OsuModClassic()).ToArray();
+                score.IsLegacyScore = true;
+                showPanel(score);
+            });
+
+            AddAssert("pp display faded out", () => this.ChildrenOfType<PerformanceStatistic>().Single().Alpha == 1);
+        }
+
+        [Test]
         public void TestWithDefaultDate()
         {
             AddStep("show autoplay score", () =>
