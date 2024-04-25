@@ -14,7 +14,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         private const double hidden_bonus = 0.2;
 
         private const double min_velocity = 0.5;
-        private const double slider_multiplier = 1.3;
+        private const double max_velocity = 1.5;
+        private const double slider_multiplier = 0.3;
 
         private const double min_angle_multiplier = 0.2;
 
@@ -97,18 +98,21 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 // Invert the scaling factor to determine the true travel distance independent of circle size.
                 double pixelTravelDistance = osuSlider.LazyTravelDistance / scalingFactor;
 
-                // Reward sliders based on velocity.
-                sliderBonus = Math.Pow(Math.Max(0.0, pixelTravelDistance / osuCurrent.TravelTime - min_velocity), 0.5);
+                // Reward sliders based on cursor velocity.
+                sliderBonus = Math.Log(pixelTravelDistance / osuCurrent.TravelTime + 1);
 
-                // Longer sliders require more memorisation.
-                sliderBonus *= pixelTravelDistance;
+                // More cursor movement requires more memorisation.
+                sliderBonus *= osuSlider.LazyTravelDistance;
 
-                // Nerf sliders with repeats, as less memorisation is required.
-                if (osuSlider.RepeatCount > 0)
-                    sliderBonus /= (osuSlider.RepeatCount + 1);
+                // Nerf slow slider velocity.
+                double sliderVelocity = osuSlider.Distance / osuCurrent.TravelTime;
+                sliderBonus *= Math.Clamp((sliderVelocity - min_velocity) / (max_velocity - min_velocity), 0, 1);
+
+                // Nerf sliders the more repeats they have, as less memorisation is required.
+                sliderBonus /= 0.75 * osuSlider.RepeatCount + 1;
             }
 
-            result += sliderBonus * slider_multiplier;
+            result += Math.Pow(sliderBonus, 1.2) * slider_multiplier;
 
             return result;
         }
