@@ -226,7 +226,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             // Increasing the accuracy value by object count for Blinds isn't ideal, so the minimum buff is given.
             if (score.Mods.Any(m => m is OsuModBlinds))
                 accuracyValue *= 1.14;
-
             else if (score.Mods.Any(m => m is OsuModHidden || m is OsuModTraceable))
                 accuracyValue *= 1.08;
 
