@@ -5,6 +5,7 @@ using System;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Objects;
+using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 {
@@ -54,13 +55,20 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
                 if (!(currentObj.BaseObject is Spinner))
                 {
-                    double jumpDistance = (osuHitObject.StackedPosition - currentHitObject.StackedEndPosition).Length;
+                    double pixelJumpDistance = (osuHitObject.StackedPosition - currentHitObject.StackedEndPosition).Length;
+
+                    // Consider the jump from the lazy end position for sliders.
+                    if (currentHitObject is Slider currentSlider)
+                    {
+                        Vector2 lazyEndPosition = currentSlider.LazyEndPosition ?? currentSlider.StackedPosition;
+                        pixelJumpDistance = Math.Min(pixelJumpDistance, (osuHitObject.StackedPosition - lazyEndPosition).Length);
+                    }
 
                     cumulativeStrainTime += lastObj.StrainTime;
 
                     // We want to nerf objects that can be easily seen within the Flashlight circle radius.
                     if (i == 0)
-                        smallDistNerf = Math.Min(1.0, jumpDistance / 75.0);
+                        smallDistNerf = Math.Min(1.0, pixelJumpDistance / 75.0);
 
                     // We also want to nerf stacks so that only the first object of the stack is accounted for.
                     double stackNerf = Math.Min(1.0, (currentObj.LazyJumpDistance / scalingFactor) / 25.0);
@@ -68,7 +76,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                     // Bonus based on how visible the object is.
                     double opacityBonus = 1.0 + max_opacity_bonus * (1.0 - osuCurrent.OpacityAt(currentHitObject.StartTime, hidden));
 
-                    result += stackNerf * opacityBonus * scalingFactor * jumpDistance / cumulativeStrainTime;
+                    result += stackNerf * opacityBonus * scalingFactor * pixelJumpDistance / cumulativeStrainTime;
 
                     if (currentObj.Angle != null && osuCurrent.Angle != null)
                     {
