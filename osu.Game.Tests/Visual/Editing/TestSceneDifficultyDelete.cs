@@ -118,12 +118,12 @@ namespace osu.Game.Tests.Visual.Editing
             AddUntilStep("switched to different difficulty",
                 () => this.ChildrenOfType<EditorBeatmap>().SingleOrDefault() != null && EditorBeatmap.BeatmapInfo.ID != deletedDifficultyID);
 
-            AddAssert($"difficulty is unattached from set",
+            AddAssert("difficulty is unattached from set",
                 () => Beatmap.Value.BeatmapSetInfo.Beatmaps.Select(b => b.ID), () => Does.Not.Contain(deletedDifficultyID));
             AddAssert("beatmap set difficulty count decreased by one",
                 () => Beatmap.Value.BeatmapSetInfo.Beatmaps.Count, () => Is.EqualTo(countBeforeDeletion - 1));
             AddAssert("set hash changed", () => Beatmap.Value.BeatmapSetInfo.Hash, () => Is.Not.EqualTo(beatmapSetHashBefore));
-            AddAssert($"difficulty is deleted from realm",
+            AddAssert("difficulty is deleted from realm",
                 () => Realm.Run(r => r.Find<BeatmapInfo>(deletedDifficultyID)), () => Is.Null);
         }
 
