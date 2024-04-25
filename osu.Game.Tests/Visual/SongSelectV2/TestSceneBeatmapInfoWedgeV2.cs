@@ -41,7 +41,6 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                 Padding = new MarginPadding { Top = 20 },
                 Child = infoWedge = new TestBeatmapInfoWedgeV2
                 {
-                    Width = 0.6f,
                     RelativeSizeAxes = Axes.X,
                 },
             });
@@ -50,6 +49,11 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             {
                 foreach (var hasCurrentValue in infoWedge.ChildrenOfType<IHasCurrentValue<StarDifficulty>>())
                     hasCurrentValue.Current.Value = new StarDifficulty(v, 0);
+            });
+
+            AddSliderStep("change relative width", 0, 1f, 0.6f, v =>
+            {
+                infoWedge.Width = v;
             });
         }
 
