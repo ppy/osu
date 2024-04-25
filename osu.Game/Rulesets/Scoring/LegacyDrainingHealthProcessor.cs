@@ -108,6 +108,9 @@ namespace osu.Game.Rulesets.Scoring
                     increaseHp(h);
                 }
 
+                if (topLevelObjectCount == 0)
+                    return testDrop;
+
                 if (!fail && currentHp < lowestHpEnd)
                 {
                     fail = true;

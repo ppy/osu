@@ -40,10 +40,12 @@ namespace osu.Game.Overlays
 
         protected override void PopOut()
         {
-            base.PopOut();
-
             Waves.Hide();
-            this.FadeOut(WaveContainer.DISAPPEAR_DURATION, Easing.InQuint);
+            this.FadeOut(WaveContainer.DISAPPEAR_DURATION, Easing.InQuint)
+                // base call is responsible for stopping preview tracks.
+                // delay it until the fade has concluded to ensure that nothing inside the overlay has triggered
+                // another preview track playback in the meantime, leaving an "orphaned" preview playing.
+                .OnComplete(_ => base.PopOut());
         }
     }
 }

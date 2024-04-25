@@ -116,5 +116,7 @@ namespace osu.Game.Rulesets.Taiko.UI
         protected override ReplayInputHandler CreateReplayInputHandler(Replay replay) => new TaikoFramedReplayInputHandler(replay);
 
         protected override ReplayRecorder CreateReplayRecorder(Score score) => new TaikoReplayRecorder(score);
+
+        protected override ResumeOverlay CreateResumeOverlay() => new DelayedResumeOverlay();
     }
 }

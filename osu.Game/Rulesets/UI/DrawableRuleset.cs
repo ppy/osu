@@ -240,7 +240,7 @@ namespace osu.Game.Rulesets.UI
 
         public override void RequestResume(Action continueResume)
         {
-            if (ResumeOverlay != null && UseResumeOverlay && (Cursor == null || (Cursor.LastFrameState == Visibility.Visible && Contains(Cursor.ActiveCursor.ScreenSpaceDrawQuad.Centre))))
+            if (ResumeOverlay != null && UseResumeOverlay)
             {
                 ResumeOverlay.GameplayCursor = Cursor;
                 ResumeOverlay.ResumeAction = continueResume;

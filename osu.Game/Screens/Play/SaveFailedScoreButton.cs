@@ -137,7 +137,7 @@ namespace osu.Game.Screens.Play
         {
             if (state.NewValue != DownloadState.LocallyAvailable) return;
 
-            scoreManager.Export(importedScore);
+            if (importedScore != null) scoreManager.Export(importedScore);
 
             this.state.ValueChanged -= exportWhenReady;
         }

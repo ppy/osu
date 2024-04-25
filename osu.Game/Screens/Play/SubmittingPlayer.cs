@@ -152,6 +152,10 @@ namespace osu.Game.Screens.Play
                                 Logger.Log($"Please ensure that you are using the latest version of the official game releases.\n\n{whatWillHappen}", level: LogLevel.Important);
                                 break;
 
+                            case @"invalid beatmap_hash":
+                                Logger.Log($"This beatmap does not match the online version. Please update or redownload it.\n\n{whatWillHappen}", level: LogLevel.Important);
+                                break;
+
                             case @"expired token":
                                 Logger.Log($"Your system clock is set incorrectly. Please check your system time, date and timezone.\n\n{whatWillHappen}", level: LogLevel.Important);
                                 break;
