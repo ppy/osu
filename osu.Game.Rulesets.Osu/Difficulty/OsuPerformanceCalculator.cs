@@ -212,11 +212,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             // Increasing the accuracy value by object count for Blinds isn't ideal, so the minimum buff is given.
             if (score.Mods.Any(m => m is OsuModBlinds))
                 accuracyValue *= 1.14;
+            // Use different multiplier when adding hidden or traceable to flashlight.
+            else if (score.Mods.Any(m => m is OsuModFlashlight))
+                accuracyValue *= score.Mods.Any(m => m is OsuModHidden || m is OsuModTraceable) ? 1.12 : 1.08;
             else if (score.Mods.Any(m => m is OsuModHidden || m is OsuModTraceable))
                 accuracyValue *= 1.08;
-
-            if (score.Mods.Any(m => m is OsuModFlashlight))
-                accuracyValue *= 1.02;
 
             return accuracyValue;
         }
