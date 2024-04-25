@@ -172,6 +172,54 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             assertControlPointPathType(4, null);
         }
 
+        [Test]
+        public void TestStackingUpdatesPointsPosition()
+        {
+            createVisualiser(true);
+
+            Vector2[] points =
+            [
+                new Vector2(200),
+                new Vector2(300),
+                new Vector2(500, 300),
+                new Vector2(700, 200),
+                new Vector2(500, 100)
+            ];
+
+            foreach (var point in points) addControlPointStep(point);
+
+            AddStep("apply stacking", () => slider.StackHeightBindable.Value += 1);
+
+            for (int i = 0; i < points.Length; i++)
+                addAssertPointPositionChanged(points, i);
+        }
+
+        [Test]
+        public void TestStackingUpdatesConnectionPosition()
+        {
+            createVisualiser(true);
+
+            Vector2 connectionPosition;
+            addControlPointStep(connectionPosition = new Vector2(300));
+            addControlPointStep(new Vector2(600));
+
+            // Apply a big number in stacking so the person running the test can clearly see if it fails
+            AddStep("apply stacking", () => slider.StackHeightBindable.Value += 10);
+
+            AddAssert($"Connection at {connectionPosition} changed",
+                () => visualiser.Connections[0].Position,
+                () => !Is.EqualTo(connectionPosition)
+            );
+        }
+
+        private void addAssertPointPositionChanged(Vector2[] points, int index)
+        {
+            AddAssert($"Point at {points.ElementAt(index)} changed",
+                () => visualiser.Pieces[index].Position,
+                () => !Is.EqualTo(points.ElementAt(index))
+            );
+        }
+
         private void createVisualiser(bool allowSelection) => AddStep("create visualiser", () => Child = visualiser = new PathControlPointVisualiser<Slider>(slider, allowSelection)
         {
             Anchor = Anchor.Centre,

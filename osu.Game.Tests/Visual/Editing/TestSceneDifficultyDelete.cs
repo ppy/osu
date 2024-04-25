@@ -12,6 +12,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
+using osu.Game.Screens.Edit;
 using osu.Game.Storyboards;
 using osu.Game.Tests.Beatmaps.IO;
 using osuTK.Input;
@@ -81,6 +82,49 @@ namespace osu.Game.Tests.Visual.Editing
                         () => Realm.Run(r => r.Find<BeatmapInfo>(deletedDifficultyID)), () => Is.Null);
                 }
             }
+        }
+
+        [Test]
+        public void TestDeleteDifficultyWithPendingChanges()
+        {
+            Guid deletedDifficultyID = Guid.Empty;
+            int countBeforeDeletion = 0;
+            string beatmapSetHashBefore = string.Empty;
+
+            AddUntilStep("wait for editor to load", () => Editor?.ReadyForUse == true);
+
+            AddStep("store selected difficulty", () =>
+            {
+                deletedDifficultyID = EditorBeatmap.BeatmapInfo.ID;
+                countBeforeDeletion = Beatmap.Value.BeatmapSetInfo.Beatmaps.Count;
+                beatmapSetHashBefore = Beatmap.Value.BeatmapSetInfo.Hash;
+            });
+
+            AddStep("make change to difficulty", () =>
+            {
+                EditorBeatmap.BeginChange();
+                EditorBeatmap.BeatmapInfo.DifficultyName = "changin' things";
+                EditorBeatmap.EndChange();
+            });
+
+            AddStep("click File", () => this.ChildrenOfType<DrawableOsuMenuItem>().First().TriggerClick());
+
+            AddStep("click delete", () => getDeleteMenuItem().TriggerClick());
+            AddUntilStep("wait for dialog", () => DialogOverlay.CurrentDialog != null);
+            AddAssert("dialog is deletion confirmation dialog", () => DialogOverlay.CurrentDialog, Is.InstanceOf<DeleteDifficultyConfirmationDialog>);
+            AddStep("confirm", () => InputManager.Key(Key.Number1));
+
+            AddUntilStep("no next dialog", () => DialogOverlay.CurrentDialog == null);
+            AddUntilStep("switched to different difficulty",
+                () => this.ChildrenOfType<EditorBeatmap>().SingleOrDefault() != null && EditorBeatmap.BeatmapInfo.ID != deletedDifficultyID);
+
+            AddAssert("difficulty is unattached from set",
+                () => Beatmap.Value.BeatmapSetInfo.Beatmaps.Select(b => b.ID), () => Does.Not.Contain(deletedDifficultyID));
+            AddAssert("beatmap set difficulty count decreased by one",
+                () => Beatmap.Value.BeatmapSetInfo.Beatmaps.Count, () => Is.EqualTo(countBeforeDeletion - 1));
+            AddAssert("set hash changed", () => Beatmap.Value.BeatmapSetInfo.Hash, () => Is.Not.EqualTo(beatmapSetHashBefore));
+            AddAssert("difficulty is deleted from realm",
+                () => Realm.Run(r => r.Find<BeatmapInfo>(deletedDifficultyID)), () => Is.Null);
         }
 
         private DrawableOsuMenuItem getDeleteMenuItem() => this.ChildrenOfType<DrawableOsuMenuItem>()
