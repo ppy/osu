@@ -1088,6 +1088,13 @@ namespace osu.Game.Screens.Edit
 
                 var difficultiesBeforeDeletion = groupedOrderedBeatmaps.SelectMany(g => g).ToList();
 
+                // if the difficulty being currently deleted has unsaved changes,
+                // the editor exit flow would prompt for save *after* this method has done its thing.
+                // this is generally undesirable and also ends up leaving the user in a broken state.
+                // therefore, just update the last saved hash to make the exit flow think the deleted beatmap is not dirty,
+                // so that it will not show the save dialog on exit.
+                updateLastSavedHash();
+
                 beatmapManager.DeleteDifficultyImmediately(difficultyToDelete);
 
                 int deletedIndex = difficultiesBeforeDeletion.IndexOf(difficultyToDelete);
