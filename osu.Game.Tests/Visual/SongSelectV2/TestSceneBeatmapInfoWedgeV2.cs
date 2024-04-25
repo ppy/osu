@@ -37,28 +37,15 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         {
             base.LoadComplete();
 
-            AddRange(new Drawable[]
+            Add(new Container
             {
-                // This exists only to make the wedge more visible in the test scene
-                new Box
+                RelativeSizeAxes = Axes.Both,
+                Padding = new MarginPadding { Top = 20 },
+                Child = infoWedge = new TestBeatmapInfoWedgeV2
                 {
-                    Y = -20,
-                    Colour = Colour4.Cornsilk.Darken(0.2f),
-                    Height = BeatmapInfoWedgeV2.WEDGE_HEIGHT + 40,
-                    Width = 0.65f,
+                    Width = 0.6f,
                     RelativeSizeAxes = Axes.X,
-                    Margin = new MarginPadding { Top = 20, Left = -10 }
                 },
-                new Container
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Padding = new MarginPadding { Top = 20 },
-                    Child = infoWedge = new TestBeatmapInfoWedgeV2
-                    {
-                        Width = 0.6f,
-                        RelativeSizeAxes = Axes.X,
-                    },
-                }
             });
 
             AddSliderStep("change star difficulty", 0, 11.9, 5.55, v =>
