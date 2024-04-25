@@ -165,6 +165,11 @@ namespace osu.Game.Screens.Select
                 starCounter.Colour = s.NewValue >= 6.5 ? colours.Orange1 : Colour4.Black.Opacity(0.75f);
                 difficultyColourBar.FadeColour(colours.ForStarDifficulty(s.NewValue));
             }, true);
+
+            beatmap.BindValueChanged(b =>
+            {
+                updateDisplay();
+            }, true);
         }
 
         private const double animation_duration = 600;
@@ -181,28 +186,16 @@ namespace osu.Game.Screens.Select
             this.FadeOut(200, Easing.OutQuint);
         }
 
-        private WorkingBeatmap beatmap = null!;
-
-        public WorkingBeatmap Beatmap
-        {
-            get => beatmap;
-            set
-            {
-                if (beatmap == value) return;
-
-                beatmap = value;
-
-                updateDisplay();
-            }
-        }
+        [Resolved]
+        private IBindable<WorkingBeatmap> beatmap { get; set; } = null!;
 
         private Container? loadingInfo;
 
         private void updateDisplay()
         {
-            statusPill.Status = beatmap.BeatmapInfo.Status;
+            statusPill.Status = beatmap.Value.BeatmapInfo.Status;
 
-            starDifficulty = difficultyCache.GetBindableDifficulty(beatmap.BeatmapInfo, (cancellationSource = new CancellationTokenSource()).Token);
+            starDifficulty = difficultyCache.GetBindableDifficulty(beatmap.Value.BeatmapInfo, (cancellationSource = new CancellationTokenSource()).Token);
 
             starDifficulty.BindValueChanged(s =>
             {
@@ -227,8 +220,8 @@ namespace osu.Game.Screens.Select
                         {
                             // TODO: New wedge design uses a coloured horizontal gradient for its background, however this lacks implementation information in the figma draft.
                             // pending https://www.figma.com/file/DXKwqZhD5yyb1igc3mKo1P?node-id=2980:3361#340801912 being answered.
-                            new BeatmapInfoWedgeBackground(beatmap) { Shear = -Shear },
-                            Info = new WedgeInfoText(beatmap) { Shear = -Shear }
+                            new BeatmapInfoWedgeBackground(beatmap.Value) { Shear = -Shear },
+                            Info = new WedgeInfoText(beatmap.Value) { Shear = -Shear }
                         }
                     }
                 }, d =>

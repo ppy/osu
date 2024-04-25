@@ -7,7 +7,6 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
@@ -20,8 +19,7 @@ using osuTK;
 
 namespace osu.Game.Tests.Visual.SongSelectV2
 {
-    [TestFixture]
-    public partial class TestSceneBeatmapInfoWedgeV2 : OsuTestScene
+    public partial class TestSceneBeatmapInfoWedgeV2 : SongSelectComponentsTestScene
     {
         private RulesetStore rulesets = null!;
         private TestBeatmapInfoWedgeV2 infoWedge = null!;
@@ -94,12 +92,6 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             AddAssert("check artist", () => infoWedge.Info!.ArtistLabel.Current.Value == $"{ruleset.ShortName}Artist");
         }
 
-        [SetUpSteps]
-        public void SetUpSteps()
-        {
-            AddStep("reset mods", () => SelectedMods.SetDefault());
-        }
-
         [Test]
         public void TestTruncation()
         {
@@ -138,7 +130,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             AddStep($"select {b?.Metadata.Title ?? "null"} beatmap", () =>
             {
                 containerBefore = infoWedge.DisplayedContent;
-                infoWedge.Beatmap = Beatmap.Value = b == null ? Beatmap.Default : CreateWorkingBeatmap(b);
+                Beatmap.Value = b == null ? Beatmap.Default : CreateWorkingBeatmap(b);
                 infoWedge.Show();
             });
 
