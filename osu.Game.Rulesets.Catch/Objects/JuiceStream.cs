@@ -118,7 +118,7 @@ namespace osu.Game.Rulesets.Catch.Objects
                         AddNested(new Droplet
                         {
                             Samples = dropletSamples,
-                            StartTime = e.Time,
+                            StartTime = (int)e.Time,
                             X = EffectiveX + Path.PositionAt(e.PathProgress).X,
                         });
                         break;
@@ -129,7 +129,7 @@ namespace osu.Game.Rulesets.Catch.Objects
                         AddNested(new Fruit
                         {
                             Samples = this.GetNodeSamples(nodeIndex++),
-                            StartTime = e.Time,
+                            StartTime = (int)e.Time,
                             X = EffectiveX + Path.PositionAt(e.PathProgress).X,
                         });
                         break;
