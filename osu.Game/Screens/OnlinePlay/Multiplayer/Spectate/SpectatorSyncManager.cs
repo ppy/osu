@@ -76,6 +76,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         public void RemoveManagedClock(SpectatorPlayerClock clock)
         {
             playerClocks.Remove(clock);
+            Logger.Log($"Removing managed clock from {nameof(SpectatorSyncManager)} ({playerClocks.Count} remain)");
             clock.IsRunning = false;
         }
 
