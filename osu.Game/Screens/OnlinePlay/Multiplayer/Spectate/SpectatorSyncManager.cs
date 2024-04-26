@@ -130,7 +130,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         }
 
         /// <summary>
-        /// Updates the catchup states of all player clocks clocks.
+        /// Updates the catchup states of all player clocks.
         /// </summary>
         private void updatePlayerCatchup()
         {
