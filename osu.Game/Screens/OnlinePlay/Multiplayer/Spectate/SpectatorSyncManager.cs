@@ -177,7 +177,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         /// </summary>
         private void updateMasterState()
         {
-            MasterClockState newState = playerClocks.Any(s => !s.IsCatchingUp) ? MasterClockState.Synchronised : MasterClockState.TooFarAhead;
+            // Clocks are removed as players complete the beatmap.
+            // Once there are no clocks we want to make sure the track plays out to the end.
+            MasterClockState newState = playerClocks.Count == 0 || playerClocks.Any(s => !s.IsCatchingUp) ? MasterClockState.Synchronised : MasterClockState.TooFarAhead;
 
             if (masterState == newState)
                 return;
