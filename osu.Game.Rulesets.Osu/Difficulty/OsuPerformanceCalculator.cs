@@ -66,13 +66,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double speedValue = computeSpeedValue(score, osuAttributes);
             double accuracyValue = computeAccuracyValue(score, osuAttributes);
             double flashlightValue = computeFlashlightValue(score, osuAttributes);
-            double totalValue =
+            double totalValue = aimValue;
+            /*
                 Math.Pow(
                     Math.Pow(aimValue, 1.1) +
                     Math.Pow(speedValue, 1.1) +
                     Math.Pow(accuracyValue, 1.1) +
                     Math.Pow(flashlightValue, 1.1), 1.0 / 1.1
-                ) * multiplier;
+                ) * multiplier; */
 
             return new OsuPerformanceAttributes
             {
@@ -92,18 +93,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double lengthBonus = 0.95 + 0.4 * Math.Min(1.0, totalHits / 2000.0) +
                                  (totalHits > 2000 ? Math.Log10(totalHits / 2000.0) * 0.5 : 0.0);
 
-            // Penalize misses by assessing # of misses relative to the total # of objects. Default a 3% reduction for any # of misses.
-            if (effectiveMissCount > 0)
-            {
-                double a = attributes.AimPenaltyConstants.Item1;
-                double b = attributes.AimPenaltyConstants.Item2;
-                double c = attributes.AimPenaltyConstants.Item3;
-                double d = Math.Log(totalHits + 1) - a - b - c;
-
-                double penalty = Math.Pow(1 - RootFinding.FindRootExpand(x => Math.Exp(a * x * x * x * x + b * x * x * x + c * x * x + d * x) - 1 - effectiveMissCount, 0, 1), 1.5);
-
-                aimValue *= penalty;
-            }
+            aimValue *= calculateAimMissPenalty(effectiveMissCount, attributes);
 
             double approachRateFactor = 0.0;
             if (attributes.ApproachRate > 10.33)
@@ -251,6 +241,15 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             flashlightValue *= 0.98 + Math.Pow(attributes.OverallDifficulty, 2) / 2500;
 
             return flashlightValue;
+        }
+
+        private double calculateAimMissPenalty(double missCount, OsuDifficultyAttributes attributes)
+        {
+            double a = attributes.AimPenaltyConstants.Item1;
+            double b = attributes.AimPenaltyConstants.Item2;
+            double c = Math.Log(totalHits + 1) - a - b; // Setting the 3rd constant this way ensures that at a penalty of 100%, the number of misses = totalHits.
+
+            return Math.Pow(1 - RootFinding.FindRootExpand(x => a * x * x * x + b * x * x + c * x - Math.Log(missCount + 1), 0, 1), 1.5);
         }
 
         private double calculateEffectiveMissCount(OsuDifficultyAttributes attributes)
