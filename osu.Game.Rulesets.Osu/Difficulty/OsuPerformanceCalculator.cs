@@ -66,14 +66,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double speedValue = computeSpeedValue(score, osuAttributes);
             double accuracyValue = computeAccuracyValue(score, osuAttributes);
             double flashlightValue = computeFlashlightValue(score, osuAttributes);
-            double totalValue = aimValue;
-            /*
+            double totalValue =
                 Math.Pow(
                     Math.Pow(aimValue, 1.1) +
                     Math.Pow(speedValue, 1.1) +
                     Math.Pow(accuracyValue, 1.1) +
                     Math.Pow(flashlightValue, 1.1), 1.0 / 1.1
-                ) * multiplier; */
+                ) * multiplier;
 
             return new OsuPerformanceAttributes
             {
