@@ -95,38 +95,34 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                         new Drawable[]
                         {
                             // Playlist items column
-                            new Container
+                            new GridContainer
                             {
                                 RelativeSizeAxes = Axes.Both,
                                 Padding = new MarginPadding { Right = 5 },
-                                Child = new GridContainer
+                                Content = new[]
                                 {
-                                    RelativeSizeAxes = Axes.Both,
-                                    Content = new[]
+                                    new Drawable[] { new OverlinedPlaylistHeader(), },
+                                    new Drawable[]
                                     {
-                                        new Drawable[] { new OverlinedPlaylistHeader(), },
-                                        new Drawable[]
+                                        new DrawableRoomPlaylist
                                         {
-                                            new DrawableRoomPlaylist
+                                            RelativeSizeAxes = Axes.Both,
+                                            Items = { BindTarget = Room.Playlist },
+                                            SelectedItem = { BindTarget = SelectedItem },
+                                            AllowSelection = true,
+                                            AllowShowingResults = true,
+                                            RequestResults = item =>
                                             {
-                                                RelativeSizeAxes = Axes.Both,
-                                                Items = { BindTarget = Room.Playlist },
-                                                SelectedItem = { BindTarget = SelectedItem },
-                                                AllowSelection = true,
-                                                AllowShowingResults = true,
-                                                RequestResults = item =>
-                                                {
-                                                    Debug.Assert(RoomId.Value != null);
-                                                    ParentScreen?.Push(new PlaylistsResultsScreen(null, RoomId.Value.Value, item, false));
-                                                }
+                                                Debug.Assert(RoomId.Value != null);
+                                                ParentScreen?.Push(new PlaylistsResultsScreen(null, RoomId.Value.Value, item));
                                             }
-                                        },
+                                        }
                                     },
-                                    RowDimensions = new[]
-                                    {
-                                        new Dimension(GridSizeMode.AutoSize),
-                                        new Dimension(),
-                                    }
+                                },
+                                RowDimensions = new[]
+                                {
+                                    new Dimension(GridSizeMode.AutoSize),
+                                    new Dimension(),
                                 }
                             },
                             // Spacer

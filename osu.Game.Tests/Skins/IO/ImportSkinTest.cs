@@ -13,6 +13,7 @@ using osu.Game.Database;
 using osu.Game.Extensions;
 using osu.Game.IO;
 using osu.Game.Skinning;
+using osu.Game.Tests.Resources;
 using SharpCompress.Archives.Zip;
 
 namespace osu.Game.Tests.Skins.IO
@@ -20,6 +21,25 @@ namespace osu.Game.Tests.Skins.IO
     public class ImportSkinTest : ImportTest
     {
         #region Testing filename metadata inclusion
+
+        [TestCase("Archives/modified-classic-20220723.osk")]
+        [TestCase("Archives/modified-default-20230117.osk")]
+        [TestCase("Archives/modified-argon-20231106.osk")]
+        public Task TestImportModifiedSkinHasResources(string archive) => runSkinTest(async osu =>
+        {
+            using (var stream = TestResources.OpenResource(archive))
+            {
+                var imported = await loadSkinIntoOsu(osu, new ImportTask(stream, "skin.osk"));
+
+                // When the import filename doesn't match, it should be appended (and update the skin.ini).
+
+                var skinManager = osu.Dependencies.Get<SkinManager>();
+
+                skinManager.CurrentSkinInfo.Value = imported;
+
+                Assert.That(skinManager.CurrentSkin.Value.LayoutInfos.Count, Is.EqualTo(2));
+            }
+        });
 
         [Test]
         public Task TestSingleImportDifferentFilename() => runSkinTest(async osu =>
@@ -151,6 +171,16 @@ namespace osu.Game.Tests.Skins.IO
 
             assertImportedOnce(import1, import2);
             assertCorrectMetadata(import1, "name 1 [my custom skin 1]", "author 1", 1.0m, osu);
+        });
+
+        [Test]
+        public Task TestImportWithSubfolder() => runSkinTest(async osu =>
+        {
+            const string filename = "Archives/skin-with-subfolder-zip-entries.osk";
+            var import = await loadSkinIntoOsu(osu, new ImportTask(TestResources.OpenResource(filename), filename));
+
+            assertCorrectMetadata(import, $"Totally fully features skin [Real Skin with Real Features] [{filename[..^4]}]", "Unknown", 2.7m, osu);
+            Assert.That(import.PerformRead(r => r.Files.Count), Is.EqualTo(3));
         });
 
         #endregion

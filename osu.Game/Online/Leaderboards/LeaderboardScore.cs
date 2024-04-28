@@ -164,7 +164,8 @@ namespace osu.Game.Online.Leaderboards
                                         {
                                             Anchor = Anchor.BottomLeft,
                                             Origin = Anchor.BottomLeft,
-                                            AutoSizeAxes = Axes.Both,
+                                            AutoSizeAxes = Axes.X,
+                                            Height = 28,
                                             Direction = FillDirection.Horizontal,
                                             Spacing = new Vector2(10f, 0f),
                                             Children = new Drawable[]
@@ -357,14 +358,12 @@ namespace osu.Game.Online.Leaderboards
                                 },
                             },
                         },
-                        new GlowingSpriteText
+                        new OsuSpriteText
                         {
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
-                            TextColour = Color4.White,
-                            GlowColour = Color4Extensions.FromHex(@"83ccfa"),
                             Text = statistic.Value,
-                            Font = OsuFont.GetFont(size: 17, weight: FontWeight.Bold),
+                            Font = OsuFont.GetFont(size: 17, weight: FontWeight.Bold, fixedWidth: true)
                         },
                     },
                 };
@@ -421,7 +420,7 @@ namespace osu.Game.Online.Leaderboards
             {
                 List<MenuItem> items = new List<MenuItem>();
 
-                if (Score.Mods.Length > 0 && modsContainer.Any(s => s.IsHovered) && songSelect != null)
+                if (Score.Mods.Length > 0 && songSelect != null)
                     items.Add(new OsuMenuItem("Use these mods", MenuItemType.Highlighted, () => songSelect.Mods.Value = Score.Mods));
 
                 if (Score.Files.Count > 0)

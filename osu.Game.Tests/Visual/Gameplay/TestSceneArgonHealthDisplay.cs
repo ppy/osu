@@ -7,6 +7,7 @@ using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Testing;
+using osu.Framework.Threading;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Judgements;
@@ -23,6 +24,23 @@ namespace osu.Game.Tests.Visual.Gameplay
         private HealthProcessor healthProcessor = new DrainingHealthProcessor(0);
 
         private ArgonHealthDisplay healthDisplay = null!;
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            AddSliderStep("Height", 0, 64, 0, val =>
+            {
+                if (healthDisplay.IsNotNull())
+                    healthDisplay.BarHeight.Value = val;
+            });
+
+            AddSliderStep("Width", 0, 1f, 0.98f, val =>
+            {
+                if (healthDisplay.IsNotNull())
+                    healthDisplay.Width = val;
+            });
+        }
 
         [SetUpSteps]
         public void SetUpSteps()
@@ -46,27 +64,12 @@ namespace osu.Game.Tests.Visual.Gameplay
                     },
                 };
             });
-
-            AddSliderStep("Width", 0, 1f, 1f, val =>
-            {
-                if (healthDisplay.IsNotNull())
-                    healthDisplay.BarLength.Value = val;
-            });
-
-            AddSliderStep("Height", 0, 64, 0, val =>
-            {
-                if (healthDisplay.IsNotNull())
-                    healthDisplay.BarHeight.Value = val;
-            });
         }
 
         [Test]
         public void TestHealthDisplayIncrementing()
         {
-            AddRepeatStep("apply miss judgement", delegate
-            {
-                healthProcessor.ApplyResult(new JudgementResult(new HitObject(), new Judgement()) { Type = HitResult.Miss });
-            }, 5);
+            AddRepeatStep("apply miss judgement", applyMiss, 5);
 
             AddRepeatStep(@"decrease hp slightly", delegate
             {
@@ -81,11 +84,91 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddRepeatStep(@"increase hp with flash", delegate
             {
                 healthProcessor.Health.Value += 0.1f;
-                healthProcessor.ApplyResult(new JudgementResult(new HitCircle(), new OsuJudgement())
-                {
-                    Type = HitResult.Perfect
-                });
+                applyPerfectHit();
             }, 3);
+        }
+
+        [Test]
+        public void TestLateMissAfterConsequentMisses()
+        {
+            AddUntilStep("wait for health", () => healthDisplay.Current.Value == 1);
+            AddStep("apply sequence", () =>
+            {
+                for (int i = 0; i < 10; i++)
+                    applyMiss();
+
+                Scheduler.AddDelayed(applyMiss, 500 + 30);
+            });
+        }
+
+        [Test]
+        public void TestMissAlmostExactlyAfterLastMissAnimation()
+        {
+            AddUntilStep("wait for health", () => healthDisplay.Current.Value == 1);
+            AddStep("apply sequence", () =>
+            {
+                const double interval = 500 + 15;
+
+                for (int i = 0; i < 5; i++)
+                {
+                    if (i % 2 == 0)
+                        Scheduler.AddDelayed(applyMiss, i * interval);
+                    else
+                    {
+                        Scheduler.AddDelayed(applyMiss, i * interval);
+                        Scheduler.AddDelayed(applyMiss, i * interval);
+                    }
+                }
+            });
+        }
+
+        [Test]
+        public void TestMissThenHitAtSameUpdateFrame()
+        {
+            AddUntilStep("wait for health", () => healthDisplay.Current.Value == 1);
+            AddStep("set half health", () => healthProcessor.Health.Value = 0.5f);
+
+            AddStep("apply miss and hit", () =>
+            {
+                applyMiss();
+                applyMiss();
+                applyPerfectHit();
+                applyPerfectHit();
+            });
+
+            AddWaitStep("wait", 3);
+
+            AddStep("apply miss and cancel with hit", () =>
+            {
+                applyMiss();
+                applyPerfectHit();
+                applyPerfectHit();
+                applyPerfectHit();
+                applyPerfectHit();
+            });
+        }
+
+        private void applyMiss()
+        {
+            healthProcessor.ApplyResult(new JudgementResult(new HitObject(), new Judgement()) { Type = HitResult.Miss });
+        }
+
+        private void applyPerfectHit()
+        {
+            healthProcessor.ApplyResult(new JudgementResult(new HitCircle(), new OsuJudgement())
+            {
+                Type = HitResult.Perfect
+            });
+        }
+
+        [Test]
+        public void TestSimulateDrain()
+        {
+            ScheduledDelegate del = null!;
+
+            AddStep("simulate drain", () => del = Scheduler.AddDelayed(() => healthProcessor.Health.Value -= 0.00025f * Time.Elapsed, 0, true));
+            AddUntilStep("wait until zero", () => healthProcessor.Health.Value == 0);
+            AddStep("cancel drain", () => del.Cancel());
         }
     }
 }

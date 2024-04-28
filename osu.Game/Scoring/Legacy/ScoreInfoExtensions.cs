@@ -50,7 +50,7 @@ namespace osu.Game.Scoring.Legacy
             switch (rulesetId)
             {
                 case 0:
-                    return (long)Math.Round((objectCount * objectCount * 32.57 + 100000) * standardisedTotalScore / ScoreProcessor.MAX_SCORE);
+                    return (long)Math.Round((Math.Pow(objectCount, 2) * 32.57 + 100000) * standardisedTotalScore / ScoreProcessor.MAX_SCORE);
 
                 case 1:
                     return (long)Math.Round((objectCount * 1109 + 100000) * standardisedTotalScore / ScoreProcessor.MAX_SCORE);
@@ -198,10 +198,25 @@ namespace osu.Game.Scoring.Legacy
             }
         }
 
-        public static int? GetCountMiss(this ScoreInfo scoreInfo) =>
-            getCount(scoreInfo, HitResult.Miss);
+        public static int? GetCountMiss(this ScoreInfo scoreInfo)
+        {
+            switch (scoreInfo.Ruleset.OnlineID)
+            {
+                case 0:
+                case 1:
+                case 3:
+                    return getCount(scoreInfo, HitResult.Miss);
+
+                case 2:
+                    return (getCount(scoreInfo, HitResult.Miss) ?? 0) + (getCount(scoreInfo, HitResult.LargeTickMiss) ?? 0);
+            }
+
+            return null;
+        }
 
         public static void SetCountMiss(this ScoreInfo scoreInfo, int value) =>
+            // this does not match the implementation of `GetCountMiss()` for catch,
+            // but we physically cannot recover that data anymore at this point.
             scoreInfo.Statistics[HitResult.Miss] = value;
 
         private static int? getCount(ScoreInfo scoreInfo, HitResult result)

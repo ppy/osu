@@ -15,6 +15,7 @@ using osu.Game.Rulesets.Catch.Beatmaps;
 using osu.Game.Rulesets.Catch.Difficulty;
 using osu.Game.Rulesets.Catch.Edit;
 using osu.Game.Rulesets.Catch.Mods;
+using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.Replays;
 using osu.Game.Rulesets.Catch.Scoring;
 using osu.Game.Rulesets.Catch.Skinning.Argon;
@@ -39,6 +40,8 @@ namespace osu.Game.Rulesets.Catch
 
         public override ScoreProcessor CreateScoreProcessor() => new CatchScoreProcessor();
 
+        public override HealthProcessor CreateHealthProcessor(double drainStartTime) => new CatchHealthProcessor(drainStartTime);
+
         public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => new CatchBeatmapConverter(beatmap, this);
 
         public override IBeatmapProcessor CreateBeatmapProcessor(IBeatmap beatmap) => new CatchBeatmapProcessor(beatmap);
@@ -54,7 +57,7 @@ namespace osu.Game.Rulesets.Catch
             new KeyBinding(InputKey.X, CatchAction.MoveRight),
             new KeyBinding(InputKey.Right, CatchAction.MoveRight),
             new KeyBinding(InputKey.Shift, CatchAction.Dash),
-            new KeyBinding(InputKey.Shift, CatchAction.Dash),
+            new KeyBinding(InputKey.MouseLeft, CatchAction.Dash),
         };
 
         public override IEnumerable<Mod> ConvertFromLegacyMods(LegacyMods mods)
@@ -232,6 +235,18 @@ namespace osu.Game.Rulesets.Catch
                     AutoSizeAxes = Axes.Y
                 }),
             };
+        }
+
+        /// <seealso cref="CatchHitObject.ApplyDefaultsToSelf"/>
+        public override BeatmapDifficulty GetRateAdjustedDisplayDifficulty(IBeatmapDifficultyInfo difficulty, double rate)
+        {
+            BeatmapDifficulty adjustedDifficulty = new BeatmapDifficulty(difficulty);
+
+            double preempt = IBeatmapDifficultyInfo.DifficultyRange(adjustedDifficulty.ApproachRate, CatchHitObject.PREEMPT_MAX, CatchHitObject.PREEMPT_MID, CatchHitObject.PREEMPT_MIN);
+            preempt /= rate;
+            adjustedDifficulty.ApproachRate = (float)IBeatmapDifficultyInfo.InverseDifficultyRange(preempt, CatchHitObject.PREEMPT_MAX, CatchHitObject.PREEMPT_MID, CatchHitObject.PREEMPT_MIN);
+
+            return adjustedDifficulty;
         }
     }
 }

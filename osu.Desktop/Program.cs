@@ -5,6 +5,7 @@ using System;
 using System.IO;
 using System.Runtime.Versioning;
 using osu.Desktop.LegacyIpc;
+using osu.Desktop.Windows;
 using osu.Framework;
 using osu.Framework.Development;
 using osu.Framework.Logging;
@@ -12,7 +13,7 @@ using osu.Framework.Platform;
 using osu.Game;
 using osu.Game.IPC;
 using osu.Game.Tournament;
-using SDL2;
+using SDL;
 using Squirrel;
 
 namespace osu.Desktop
@@ -30,29 +31,50 @@ namespace osu.Desktop
         [STAThread]
         public static void Main(string[] args)
         {
-            // run Squirrel first, as the app may exit after these run
+            /*
+             * WARNING: DO NOT PLACE **ANY** CODE ABOVE THE FOLLOWING BLOCK!
+             *
+             * Logic handling Squirrel MUST run before EVERYTHING if you do not want to break it.
+             * To be more precise: Squirrel is internally using a rather... crude method to determine whether it is running under NUnit,
+             * namely by checking loaded assemblies:
+             * https://github.com/clowd/Clowd.Squirrel/blob/24427217482deeeb9f2cacac555525edfc7bd9ac/src/Squirrel/SimpleSplat/PlatformModeDetector.cs#L17-L32
+             *
+             * If it finds ANY assembly from the ones listed above - REGARDLESS of the reason why it is loaded -
+             * the app will then do completely broken things like:
+             * - not creating system shortcuts (as the logic is if'd out if "running tests")
+             * - not exiting after the install / first-update / uninstall hooks are ran (as the `Environment.Exit()` calls are if'd out if "running tests")
+             */
             if (OperatingSystem.IsWindows())
             {
                 var windowsVersion = Environment.OSVersion.Version;
 
-                // While .NET 6 still supports Windows 7 and above, we are limited by realm currently, as they choose to only support 8.1 and higher.
-                // See https://www.mongodb.com/docs/realm/sdk/dotnet/#supported-platforms
+                // While .NET 8 only supports Windows 10 and above, running on Windows 7/8.1 may still work. We are limited by realm currently, as they choose to only support 8.1 and higher.
+                // See https://www.mongodb.com/docs/realm/sdk/dotnet/compatibility/
                 if (windowsVersion.Major < 6 || (windowsVersion.Major == 6 && windowsVersion.Minor <= 2))
                 {
-                    // If users running in compatibility mode becomes more of a common thing, we may want to provide better guidance or even consider
-                    // disabling it ourselves.
-                    // We could also better detect compatibility mode if required:
-                    // https://stackoverflow.com/questions/10744651/how-i-can-detect-if-my-application-is-running-under-compatibility-mode#comment58183249_10744730
-                    SDL.SDL_ShowSimpleMessageBox(SDL.SDL_MessageBoxFlags.SDL_MESSAGEBOX_ERROR,
-                        "Your operating system is too old to run osu!",
-                        "This version of osu! requires at least Windows 8.1 to run.\n"
-                        + "Please upgrade your operating system or consider using an older version of osu!.\n\n"
-                        + "If you are running a newer version of windows, please check you don't have \"Compatibility mode\" turned on for osu!", IntPtr.Zero);
-                    return;
+                    unsafe
+                    {
+                        // If users running in compatibility mode becomes more of a common thing, we may want to provide better guidance or even consider
+                        // disabling it ourselves.
+                        // We could also better detect compatibility mode if required:
+                        // https://stackoverflow.com/questions/10744651/how-i-can-detect-if-my-application-is-running-under-compatibility-mode#comment58183249_10744730
+                        SDL3.SDL_ShowSimpleMessageBox(SDL_MessageBoxFlags.SDL_MESSAGEBOX_ERROR,
+                            "Your operating system is too old to run osu!"u8,
+                            "This version of osu! requires at least Windows 8.1 to run.\n"u8
+                            + "Please upgrade your operating system or consider using an older version of osu!.\n\n"u8
+                            + "If you are running a newer version of windows, please check you don't have \"Compatibility mode\" turned on for osu!"u8, null);
+                        return;
+                    }
                 }
 
                 setupSquirrel();
             }
+
+            // NVIDIA profiles are based on the executable name of a process.
+            // Lazer and stable share the same executable name.
+            // Stable sets this setting to "Off", which may not be what we want, so let's force it back to the default "Auto" on startup.
+            if (OperatingSystem.IsWindows())
+                NVAPI.ThreadedOptimisations = NvThreadControlSetting.OGL_THREAD_CONTROL_DEFAULT;
 
             // Back up the cwd before DesktopGameHost changes it
             string cwd = Environment.CurrentDirectory;
@@ -85,7 +107,7 @@ namespace osu.Desktop
                 }
             }
 
-            using (DesktopGameHost host = Host.GetSuitableDesktopHost(gameName, new HostOptions { BindIPC = !tournamentClient }))
+            using (DesktopGameHost host = Host.GetSuitableDesktopHost(gameName, new HostOptions { IPCPort = !tournamentClient ? OsuGame.IPC_PORT : null }))
             {
                 if (!host.IsPrimaryInstance)
                 {
@@ -156,13 +178,16 @@ namespace osu.Desktop
             {
                 tools.CreateShortcutForThisExe();
                 tools.CreateUninstallerRegistryEntry();
+                WindowsAssociationManager.InstallAssociations();
             }, onAppUpdate: (_, tools) =>
             {
                 tools.CreateUninstallerRegistryEntry();
+                WindowsAssociationManager.UpdateAssociations();
             }, onAppUninstall: (_, tools) =>
             {
                 tools.RemoveShortcutForThisExe();
                 tools.RemoveUninstallerRegistryEntry();
+                WindowsAssociationManager.UninstallAssociations();
             }, onEveryRun: (_, _, _) =>
             {
                 // While setting the `ProcessAppUserModelId` fixes duplicate icons/shortcuts on the taskbar, it currently

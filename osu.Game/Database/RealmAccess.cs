@@ -25,6 +25,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Legacy;
 using osu.Game.Configuration;
 using osu.Game.Extensions;
+using osu.Game.Input;
 using osu.Game.Input.Bindings;
 using osu.Game.Models;
 using osu.Game.Online.API;
@@ -34,6 +35,7 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osu.Game.Scoring.Legacy;
 using osu.Game.Skinning;
+using osuTK.Input;
 using Realms;
 using Realms.Exceptions;
 
@@ -84,8 +86,13 @@ namespace osu.Game.Database
         /// 32   2023-07-09    Populate legacy scores with the ScoreV2 mod (and restore TotalScore to the legacy total for such scores) using replay files.
         /// 33   2023-08-16    Reset default chat toggle key binding to avoid conflict with newly added leaderboard toggle key binding.
         /// 34   2023-08-21    Add BackgroundReprocessingFailed flag to ScoreInfo to track upgrade failures.
+        /// 35   2023-10-16    Clear key combinations of keybindings that are assigned to more than one action in a given settings section.
+        /// 36   2023-10-26    Add LegacyOnlineID to ScoreInfo. Move osu_scores_*_high IDs stored in OnlineID to LegacyOnlineID. Reset anomalous OnlineIDs.
+        /// 38   2023-12-10    Add EndTimeObjectCount and TotalObjectCount to BeatmapInfo.
+        /// 39   2023-12-19    Migrate any EndTimeObjectCount and TotalObjectCount values of 0 to -1 to better identify non-calculated values.
+        /// 40   2023-12-21    Add ScoreInfo.Version to keep track of which build scores were set on.
         /// </summary>
-        private const int schema_version = 34;
+        private const int schema_version = 40;
 
         /// <summary>
         /// Lock object which is held during <see cref="BlockAllOperations"/> sections, blocking realm retrieval during blocking periods.
@@ -482,8 +489,7 @@ namespace osu.Game.Database
         /// <param name="action">The work to run.</param>
         public Task WriteAsync(Action<Realm> action)
         {
-            if (isDisposed)
-                throw new ObjectDisposedException(nameof(RealmAccess));
+            ObjectDisposedException.ThrowIf(isDisposed, this);
 
             // Required to ensure the write is tracked and accounted for before disposal.
             // Can potentially be avoided if we have a need to do so in the future.
@@ -668,8 +674,7 @@ namespace osu.Game.Database
 
         private Realm getRealmInstance()
         {
-            if (isDisposed)
-                throw new ObjectDisposedException(nameof(RealmAccess));
+            ObjectDisposedException.ThrowIf(isDisposed, this);
 
             bool tookSemaphoreLock = false;
 
@@ -1031,6 +1036,79 @@ namespace osu.Game.Database
 
                     break;
                 }
+
+                case 35:
+                {
+                    // catch used `Shift` twice as a default key combination for dash, which generally was bothersome and causes issues elsewhere.
+                    // the duplicate binding logic below had to account for it, it could also break keybinding conflict resolution on revert-to-default.
+                    // as such, detect this situation and fix it before proceeding further.
+                    var catchDashBindings = migration.NewRealm.All<RealmKeyBinding>()
+                                                     .Where(kb => kb.RulesetName == @"fruits" && kb.ActionInt == 2)
+                                                     .ToList();
+
+                    if (catchDashBindings.All(kb => kb.KeyCombination.Equals(new KeyCombination(InputKey.Shift))))
+                    {
+                        Debug.Assert(catchDashBindings.Count == 2);
+                        catchDashBindings.Last().KeyCombination = KeyCombination.FromMouseButton(MouseButton.Left);
+                    }
+
+                    // with the catch case dealt with, de-duplicate the remaining bindings.
+                    int countCleared = 0;
+
+                    var globalBindings = migration.NewRealm.All<RealmKeyBinding>().Where(kb => kb.RulesetName == null).ToList();
+
+                    foreach (var category in Enum.GetValues<GlobalActionCategory>())
+                    {
+                        var categoryActions = GlobalActionContainer.GetGlobalActionsFor(category).Cast<int>().ToHashSet();
+                        var categoryBindings = globalBindings.Where(kb => categoryActions.Contains(kb.ActionInt));
+                        countCleared += RealmKeyBindingStore.ClearDuplicateBindings(categoryBindings);
+                    }
+
+                    var rulesetBindings = migration.NewRealm.All<RealmKeyBinding>().Where(kb => kb.RulesetName != null).ToList();
+
+                    foreach (var variantGroup in rulesetBindings.GroupBy(kb => (kb.RulesetName, kb.Variant)))
+                        countCleared += RealmKeyBindingStore.ClearDuplicateBindings(variantGroup);
+
+                    if (countCleared > 0)
+                    {
+                        Logger.Log($"{countCleared} of your keybinding(s) have been cleared due to being bound to multiple actions. "
+                                   + "Please choose new unique ones in the settings panel.", level: LogLevel.Important);
+                    }
+
+                    break;
+                }
+
+                case 36:
+                {
+                    foreach (var score in migration.NewRealm.All<ScoreInfo>())
+                    {
+                        if (score.OnlineID > 0)
+                        {
+                            score.LegacyOnlineID = score.OnlineID;
+                            score.OnlineID = -1;
+                        }
+                        else
+                        {
+                            score.LegacyOnlineID = score.OnlineID = -1;
+                        }
+                    }
+
+                    break;
+                }
+
+                case 39:
+                    foreach (var b in migration.NewRealm.All<BeatmapInfo>())
+                    {
+                        // Either actually no objects, or processing ran and failed.
+                        // Reset to -1 so the next time they become zero we know that processing was attempted.
+                        if (b.TotalObjectCount == 0 && b.EndTimeObjectCount == 0)
+                        {
+                            b.TotalObjectCount = -1;
+                            b.EndTimeObjectCount = -1;
+                        }
+                    }
+
+                    break;
             }
 
             Logger.Log($"Migration completed in {stopwatch.ElapsedMilliseconds}ms");
@@ -1109,8 +1187,7 @@ namespace osu.Game.Database
             if (!ThreadSafety.IsUpdateThread)
                 throw new InvalidOperationException(@$"{nameof(BlockAllOperations)} must be called from the update thread.");
 
-            if (isDisposed)
-                throw new ObjectDisposedException(nameof(RealmAccess));
+            ObjectDisposedException.ThrowIf(isDisposed, this);
 
             SynchronizationContext? syncContext = null;
 
