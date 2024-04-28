@@ -3,6 +3,7 @@
 
 using System;
 using System.Linq;
+using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Objects;
@@ -21,6 +22,14 @@ namespace osu.Game.Rulesets.Osu.Mods
             var osuObject = (OsuHitObject)hitObject;
 
             OsuHitObjectGenerationUtils.ReflectVerticallyAlongPlayfield(osuObject);
+        }
+
+        public override void ApplyToDifficulty(BeatmapDifficulty difficulty)
+        {
+            base.ApplyToDifficulty(difficulty);
+
+            difficulty.CircleSize = Math.Min(difficulty.CircleSize * 1.3f, 10.0f); // CS uses a custom 1.3 ratio.
+            difficulty.ApproachRate = Math.Min(difficulty.ApproachRate * ADJUST_RATIO, 10.0f);
         }
     }
 }

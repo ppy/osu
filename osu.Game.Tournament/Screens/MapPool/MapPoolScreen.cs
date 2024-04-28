@@ -136,27 +136,45 @@ namespace osu.Game.Tournament.Screens.MapPool
             pickColour = colour;
             pickType = choiceType;
 
-            static Color4 setColour(bool active) => active ? Color4.White : Color4.Gray;
-
             buttonRedBan.Colour = setColour(pickColour == TeamColour.Red && pickType == ChoiceType.Ban);
             buttonBlueBan.Colour = setColour(pickColour == TeamColour.Blue && pickType == ChoiceType.Ban);
             buttonRedPick.Colour = setColour(pickColour == TeamColour.Red && pickType == ChoiceType.Pick);
             buttonBluePick.Colour = setColour(pickColour == TeamColour.Blue && pickType == ChoiceType.Pick);
+
+            static Color4 setColour(bool active) => active ? Color4.White : Color4.Gray;
         }
 
         private void setNextMode()
         {
-            if (CurrentMatch.Value == null)
+            if (CurrentMatch.Value?.Round.Value == null)
                 return;
 
-            const TeamColour roll_winner = TeamColour.Red; //todo: draw from match
+            int totalBansRequired = CurrentMatch.Value.Round.Value.BanCount.Value * 2;
 
-            var nextColour = (CurrentMatch.Value.PicksBans.LastOrDefault()?.Team ?? roll_winner) == TeamColour.Red ? TeamColour.Blue : TeamColour.Red;
+            TeamColour lastPickColour = CurrentMatch.Value.PicksBans.LastOrDefault()?.Team ?? TeamColour.Red;
 
-            if (pickType == ChoiceType.Ban && CurrentMatch.Value.PicksBans.Count(p => p.Type == ChoiceType.Ban) >= 2)
-                setMode(pickColour, ChoiceType.Pick);
+            TeamColour nextColour;
+
+            bool hasAllBans = CurrentMatch.Value.PicksBans.Count(p => p.Type == ChoiceType.Ban) >= totalBansRequired;
+
+            if (!hasAllBans)
+            {
+                // Ban phase: switch teams every second ban.
+                nextColour = CurrentMatch.Value.PicksBans.Count % 2 == 1
+                    ? getOppositeTeamColour(lastPickColour)
+                    : lastPickColour;
+            }
             else
-                setMode(nextColour, CurrentMatch.Value.PicksBans.Count(p => p.Type == ChoiceType.Ban) >= 2 ? ChoiceType.Pick : ChoiceType.Ban);
+            {
+                // Pick phase : switch teams every pick, except for the first pick which generally goes to the team that placed the last ban.
+                nextColour = pickType == ChoiceType.Pick
+                    ? getOppositeTeamColour(lastPickColour)
+                    : lastPickColour;
+            }
+
+            setMode(nextColour, hasAllBans ? ChoiceType.Pick : ChoiceType.Ban);
+
+            TeamColour getOppositeTeamColour(TeamColour colour) => colour == TeamColour.Red ? TeamColour.Blue : TeamColour.Red;
         }
 
         protected override bool OnMouseDown(MouseDownEvent e)

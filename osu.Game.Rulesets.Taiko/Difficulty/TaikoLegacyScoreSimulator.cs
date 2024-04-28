@@ -5,19 +5,22 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Beatmaps;
-using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Legacy;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Scoring.Legacy;
 using osu.Game.Rulesets.Taiko.Mods;
 using osu.Game.Rulesets.Taiko.Objects;
+using osu.Game.Rulesets.Taiko.Scoring;
 
 namespace osu.Game.Rulesets.Taiko.Difficulty
 {
     internal class TaikoLegacyScoreSimulator : ILegacyScoreSimulator
     {
+        private readonly ScoreProcessor scoreProcessor = new TaikoScoreProcessor();
+
         private int legacyBonusScore;
         private int standardisedBonusScore;
         private int combo;
@@ -63,11 +66,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
                 drainLength = ((int)Math.Round(baseBeatmap.HitObjects[^1].StartTime) - (int)Math.Round(baseBeatmap.HitObjects[0].StartTime) - breakLength) / 1000;
             }
 
-            difficultyPeppyStars = (int)Math.Round(
-                (baseBeatmap.Difficulty.DrainRate
-                 + baseBeatmap.Difficulty.OverallDifficulty
-                 + baseBeatmap.Difficulty.CircleSize
-                 + Math.Clamp((float)objectCount / drainLength * 8, 0, 16)) / 38 * 5);
+            difficultyPeppyStars = LegacyRulesetExtensions.CalculateDifficultyPeppyStars(baseBeatmap.Difficulty, objectCount, drainLength);
 
             LegacyScoreAttributes attributes = new LegacyScoreAttributes();
 
@@ -75,6 +74,8 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
                 simulateHit(obj, ref attributes);
 
             attributes.BonusScoreRatio = legacyBonusScore == 0 ? 0 : (double)standardisedBonusScore / legacyBonusScore;
+            attributes.BonusScore = legacyBonusScore;
+            attributes.MaxCombo = combo;
 
             return attributes;
         }
@@ -94,6 +95,8 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
                 case SwellTick:
                     scoreIncrease = 300;
                     increaseCombo = false;
+                    isBonus = true;
+                    bonusResult = HitResult.IgnoreHit;
                     break;
 
                 case DrumRollTick:
@@ -189,7 +192,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             if (isBonus)
             {
                 legacyBonusScore += scoreIncrease;
-                standardisedBonusScore += Judgement.ToNumericResult(bonusResult);
+                standardisedBonusScore += scoreProcessor.GetBaseScoreForResult(bonusResult);
             }
             else
                 attributes.AccuracyScore += scoreIncrease;

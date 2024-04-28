@@ -32,6 +32,8 @@ namespace osu.Game.Overlays.Mods
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; } = null!;
 
+        public override bool AcceptsFocus => true;
+
         public ModSettingsArea()
         {
             RelativeSizeAxes = Axes.X;
@@ -84,7 +86,10 @@ namespace osu.Game.Overlays.Mods
         {
             modSettingsFlow.Clear();
 
-            foreach (var mod in SelectedMods.Value.AsOrdered())
+            // Importantly, the selected mods bindable is already ordered by the mod select overlay (following the order of mod columns and panels).
+            // Using AsOrdered produces a slightly different order (e.g. DT and NC no longer becoming adjacent),
+            // which breaks user expectations when interacting with the overlay.
+            foreach (var mod in SelectedMods.Value)
             {
                 var settings = mod.CreateSettingsControls().ToList();
 
@@ -108,10 +113,14 @@ namespace osu.Game.Overlays.Mods
         protected override bool OnMouseDown(MouseDownEvent e) => true;
         protected override bool OnHover(HoverEvent e) => true;
 
-        private partial class ModSettingsColumn : CompositeDrawable
+        public partial class ModSettingsColumn : CompositeDrawable
         {
+            public readonly Mod Mod;
+
             public ModSettingsColumn(Mod mod, IEnumerable<Drawable> settingsControls)
             {
+                Mod = mod;
+
                 Width = 250;
                 RelativeSizeAxes = Axes.Y;
                 Padding = new MarginPadding { Bottom = 7 };

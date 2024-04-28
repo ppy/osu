@@ -12,7 +12,7 @@ namespace osu.Game.Rulesets.Catch.Tests
 {
     public class CatchDifficultyCalculatorTest : DifficultyCalculatorTest
     {
-        protected override string ResourceAssembly => "osu.Game.Rulesets.Catch";
+        protected override string ResourceAssembly => "osu.Game.Rulesets.Catch.Tests";
 
         [TestCase(4.0505463516206195d, 127, "diffcalc-test")]
         public void Test(double expectedStarRating, int expectedMaxCombo, string name)

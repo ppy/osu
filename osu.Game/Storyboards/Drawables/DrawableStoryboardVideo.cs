@@ -2,12 +2,10 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Graphics.Video;
-using osu.Game.Beatmaps;
 
 namespace osu.Game.Storyboards.Drawables
 {
@@ -23,11 +21,21 @@ namespace osu.Game.Storyboards.Drawables
         {
             Video = video;
 
-            RelativeSizeAxes = Axes.Both;
+            // In osu-stable, a mapper can add a scale command for a storyboard video.
+            // This allows scaling based on the video's absolute size.
+            //
+            // If not specified we take up the full available space.
+            bool useRelative = !video.TimelineGroup.Scale.HasCommands;
+
+            RelativeSizeAxes = useRelative ? Axes.Both : Axes.None;
+            AutoSizeAxes = useRelative ? Axes.None : Axes.Both;
+
+            Anchor = Anchor.Centre;
+            Origin = Anchor.Centre;
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(IBindable<WorkingBeatmap> beatmap, TextureStore textureStore)
+        private void load(TextureStore textureStore)
         {
             var stream = textureStore.GetStream(Video.Path);
 
@@ -36,12 +44,14 @@ namespace osu.Game.Storyboards.Drawables
 
             InternalChild = drawableVideo = new Video(stream, false)
             {
-                RelativeSizeAxes = Axes.Both,
+                RelativeSizeAxes = RelativeSizeAxes,
                 FillMode = FillMode.Fill,
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 Alpha = 0,
             };
+
+            Video.ApplyTransforms(drawableVideo);
         }
 
         protected override void LoadComplete()

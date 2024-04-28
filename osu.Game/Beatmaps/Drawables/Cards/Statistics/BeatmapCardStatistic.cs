@@ -74,7 +74,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards.Statistics
 
         #region Tooltip implementation
 
-        public virtual ITooltip GetCustomTooltip() => null;
+        public virtual ITooltip GetCustomTooltip() => null!;
         public virtual object TooltipContent => null;
 
         #endregion

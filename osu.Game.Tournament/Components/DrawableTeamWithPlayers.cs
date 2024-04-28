@@ -1,7 +1,9 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Linq;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
@@ -16,6 +18,11 @@ namespace osu.Game.Tournament.Components
         public DrawableTeamWithPlayers(TournamentTeam? team, TeamColour colour)
         {
             AutoSizeAxes = Axes.Both;
+
+            var players = team?.Players ?? new BindableList<TournamentUser>();
+
+            // split the players into two even columns, favouring the first column if odd.
+            int split = (int)Math.Ceiling(players.Count / 2f);
 
             InternalChildren = new Drawable[]
             {
@@ -39,13 +46,13 @@ namespace osu.Game.Tournament.Components
                                 {
                                     Direction = FillDirection.Vertical,
                                     AutoSizeAxes = Axes.Both,
-                                    ChildrenEnumerable = team?.Players.Select(createPlayerText).Take(5) ?? Enumerable.Empty<Drawable>()
+                                    ChildrenEnumerable = players.Take(split).Select(createPlayerText),
                                 },
                                 new FillFlowContainer
                                 {
                                     Direction = FillDirection.Vertical,
                                     AutoSizeAxes = Axes.Both,
-                                    ChildrenEnumerable = team?.Players.Select(createPlayerText).Skip(5) ?? Enumerable.Empty<Drawable>()
+                                    ChildrenEnumerable = players.Skip(split).Select(createPlayerText),
                                 },
                             }
                         },

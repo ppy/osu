@@ -15,7 +15,11 @@ namespace osu.Game.Rulesets.Mania.Difficulty
     {
         public LegacyScoreAttributes Simulate(IWorkingBeatmap workingBeatmap, IBeatmap playableBeatmap)
         {
-            return new LegacyScoreAttributes { ComboScore = 1000000 };
+            return new LegacyScoreAttributes
+            {
+                ComboScore = 1000000,
+                MaxCombo = 0 // Max combo is mod-dependent, so any value here is insufficient.
+            };
         }
 
         public double GetLegacyScoreMultiplier(IReadOnlyList<Mod> mods, LegacyBeatmapConversionDifficultyInfo difficulty)
@@ -47,13 +51,8 @@ namespace osu.Game.Rulesets.Mania.Difficulty
                 return multiplier;
 
             // Apply key mod multipliers.
-
             int originalColumns = ManiaBeatmapConverter.GetColumnCount(difficulty);
-            int actualColumns = originalColumns;
-
-            actualColumns = mods.OfType<ManiaKeyMod>().SingleOrDefault()?.KeyCount ?? actualColumns;
-            if (mods.Any(m => m is ManiaModDualStages))
-                actualColumns *= 2;
+            int actualColumns = ManiaBeatmapConverter.GetColumnCount(difficulty, mods);
 
             if (actualColumns > originalColumns)
                 multiplier *= 0.9;

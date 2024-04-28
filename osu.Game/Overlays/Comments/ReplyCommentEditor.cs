@@ -60,7 +60,7 @@ namespace osu.Game.Overlays.Comments
             foreach (var comment in cb.Comments)
                 comment.ParentComment = parentComment;
 
-            var drawables = cb.Comments.Select(commentsContainer.GetDrawableComment).ToArray();
+            var drawables = cb.Comments.Select(c => commentsContainer.GetDrawableComment(c, cb.CommentableMeta)).ToArray();
             OnPost?.Invoke(drawables);
 
             OnCancel!.Invoke();

@@ -47,8 +47,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
         [Cached]
         private readonly BindableBeatDivisor beatDivisor = new BindableBeatDivisor();
 
-        [Cached(typeof(IDistanceSnapProvider))]
-        private readonly OsuHitObjectComposer snapProvider = new OsuHitObjectComposer(new OsuRuleset())
+        private readonly TestHitObjectComposer composer = new TestHitObjectComposer
         {
             // Just used for the snap implementation, so let's hide from vision.
             AlwaysPresent = true,
@@ -71,9 +70,16 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             base.Content.Children = new Drawable[]
             {
                 editorClock = new EditorClock(editorBeatmap),
-                new PopoverContainer { Child = snapProvider },
+                new PopoverContainer { Child = composer },
                 Content
             };
+        }
+
+        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
+        {
+            var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
+            dependencies.CacheAs(composer.DistanceSnapProvider);
+            return dependencies;
         }
 
         protected override Container<Drawable> Content { get; } = new PopoverContainer { RelativeSizeAxes = Axes.Both };
@@ -84,7 +90,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             editorBeatmap.Difficulty.SliderMultiplier = 1;
             editorBeatmap.ControlPointInfo.Clear();
             editorBeatmap.ControlPointInfo.Add(0, new TimingControlPoint { BeatLength = beat_length });
-            snapProvider.DistanceSpacingMultiplier.Value = 1;
+            composer.DistanceSnapProvider.DistanceSpacingMultiplier.Value = 1;
 
             Children = new Drawable[]
             {
@@ -116,7 +122,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
         [TestCase(0.5f)]
         public void TestDistanceSpacing(float multiplier)
         {
-            AddStep($"set distance spacing = {multiplier}", () => snapProvider.DistanceSpacingMultiplier.Value = multiplier);
+            AddStep($"set distance spacing = {multiplier}", () => composer.DistanceSnapProvider.DistanceSpacingMultiplier.Value = multiplier);
         }
 
         [Test]
@@ -153,7 +159,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
         [TestCase(2f, beat_length * 2)]
         public void TestDistanceSpacingAdjust(float multiplier, float expectedDistance)
         {
-            AddStep($"Set distance spacing to {multiplier}", () => snapProvider.DistanceSpacingMultiplier.Value = multiplier);
+            AddStep($"Set distance spacing to {multiplier}", () => composer.DistanceSnapProvider.DistanceSpacingMultiplier.Value = multiplier);
             AddStep("move mouse to point", () => InputManager.MoveMouseTo(grid.ToScreenSpace(grid_position + new Vector2(beat_length, 0) * 2)));
 
             assertSnappedDistance(expectedDistance);
@@ -264,6 +270,16 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             {
                 base.Update();
                 cursor.Position = LastSnappedPosition = GetSnapPosition.Invoke(inputManager.CurrentState.Mouse.Position);
+            }
+        }
+
+        private partial class TestHitObjectComposer : OsuHitObjectComposer
+        {
+            public new IDistanceSnapProvider DistanceSnapProvider => base.DistanceSnapProvider;
+
+            public TestHitObjectComposer()
+                : base(new OsuRuleset())
+            {
             }
         }
     }

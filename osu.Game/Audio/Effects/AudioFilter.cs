@@ -4,6 +4,7 @@
 using System.Diagnostics;
 using ManagedBass.Fx;
 using osu.Framework.Audio.Mixing;
+using osu.Framework.Caching;
 using osu.Framework.Graphics;
 
 namespace osu.Game.Audio.Effects
@@ -16,11 +17,16 @@ namespace osu.Game.Audio.Effects
         /// </summary>
         public const int MAX_LOWPASS_CUTOFF = 22049; // nyquist - 1hz
 
+        /// <summary>
+        /// Whether this filter is currently attached to the audio track and thus applying an adjustment.
+        /// </summary>
+        public bool IsAttached { get; private set; }
+
         private readonly AudioMixer mixer;
         private readonly BQFParameters filter;
         private readonly BQFType type;
 
-        private bool isAttached;
+        private readonly Cached filterApplication = new Cached();
 
         private int cutoff;
 
@@ -36,7 +42,7 @@ namespace osu.Game.Audio.Effects
                     return;
 
                 cutoff = value;
-                updateFilter(cutoff);
+                filterApplication.Invalidate();
             }
         }
 
@@ -59,6 +65,17 @@ namespace osu.Game.Audio.Effects
             };
 
             Cutoff = getInitialCutoff(type);
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            if (!filterApplication.IsValid)
+            {
+                updateFilter(cutoff);
+                filterApplication.Validate();
+            }
         }
 
         private int getInitialCutoff(BQFType type)
@@ -118,22 +135,22 @@ namespace osu.Game.Audio.Effects
 
         private void ensureAttached()
         {
-            if (isAttached)
+            if (IsAttached)
                 return;
 
             Debug.Assert(!mixer.Effects.Contains(filter));
             mixer.Effects.Add(filter);
-            isAttached = true;
+            IsAttached = true;
         }
 
         private void ensureDetached()
         {
-            if (!isAttached)
+            if (!IsAttached)
                 return;
 
             Debug.Assert(mixer.Effects.Contains(filter));
             mixer.Effects.Remove(filter);
-            isAttached = false;
+            IsAttached = false;
         }
 
         protected override void Dispose(bool isDisposing)

@@ -25,7 +25,6 @@ namespace osu.Game.Rulesets.Taiko.Tests
             new object[] { LegacyMods.HalfTime, new[] { typeof(TaikoModHalfTime) } },
             new object[] { LegacyMods.Flashlight, new[] { typeof(TaikoModFlashlight) } },
             new object[] { LegacyMods.Autoplay, new[] { typeof(TaikoModAutoplay) } },
-            new object[] { LegacyMods.Random, new[] { typeof(TaikoModRandom) } },
             new object[] { LegacyMods.HardRock | LegacyMods.DoubleTime, new[] { typeof(TaikoModHardRock), typeof(TaikoModDoubleTime) } },
             new object[] { LegacyMods.ScoreV2, new[] { typeof(ModScoreV2) } },
         };

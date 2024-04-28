@@ -198,7 +198,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             foreach (var legacyFrame in frames.Frames)
             {
                 var frame = new TestReplayFrame();
-                frame.FromLegacy(legacyFrame, null);
+                frame.FromLegacy(legacyFrame, null!);
                 playbackReplay.Frames.Add(frame);
             }
 
@@ -259,7 +259,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         public partial class TestInputConsumer : CompositeDrawable, IKeyBindingHandler<TestAction>
         {
-            public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => Parent.ReceivePositionalInputAt(screenSpacePos);
+            public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => Parent!.ReceivePositionalInputAt(screenSpacePos);
 
             private readonly Box box;
 

@@ -186,7 +186,7 @@ namespace osu.Game.Screens.Utility
                     .FadeOut(duration / 2)
                     .ScaleTo(1.5f, duration / 2);
 
-                HitEvent = new HitEvent(Clock.CurrentTime - HitTime, HitResult.Good, new HitObject
+                HitEvent = new HitEvent(Clock.CurrentTime - HitTime, 1.0, HitResult.Good, new HitObject
                 {
                     HitWindows = new HitWindows(),
                 }, null, null);

@@ -9,16 +9,12 @@ namespace osu.Game.Rulesets.Objects.Legacy.Catch
     /// <summary>
     /// Legacy osu!catch Slider-type, used for parsing Beatmaps.
     /// </summary>
-    internal sealed class ConvertSlider : Legacy.ConvertSlider, IHasPosition, IHasCombo
+    internal sealed class ConvertSlider : Legacy.ConvertSlider, IHasPosition
     {
         public float X => Position.X;
 
         public float Y => Position.Y;
 
         public Vector2 Position { get; set; }
-
-        public bool NewCombo { get; set; }
-
-        public int ComboOffset { get; set; }
     }
 }

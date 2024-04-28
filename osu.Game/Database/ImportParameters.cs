@@ -21,5 +21,11 @@ namespace osu.Game.Database
         /// Whether this import should use hard links rather than file copy operations if available.
         /// </summary>
         public bool PreferHardLinks { get; set; }
+
+        /// <summary>
+        /// If set to <see langword="true"/>, this import will not respect <see cref="RealmArchiveModelImporter{TModel}.PauseImports"/>.
+        /// This is useful for cases where an import <em>must</em> complete even if gameplay is in progress.
+        /// </summary>
+        public bool ImportImmediately { get; set; }
     }
 }

@@ -69,9 +69,9 @@ namespace osu.Game.Rulesets.Taiko
 
         public override IEnumerable<KeyBinding> GetDefaultKeyBindings(int variant = 0) => new[]
         {
-            new KeyBinding(InputKey.MouseLeft, TaikoAction.LeftCentre),
             new KeyBinding(InputKey.MouseRight, TaikoAction.LeftRim),
             new KeyBinding(InputKey.D, TaikoAction.LeftRim),
+            new KeyBinding(InputKey.MouseLeft, TaikoAction.LeftCentre),
             new KeyBinding(InputKey.F, TaikoAction.LeftCentre),
             new KeyBinding(InputKey.J, TaikoAction.RightCentre),
             new KeyBinding(InputKey.K, TaikoAction.RightRim),
@@ -115,21 +115,8 @@ namespace osu.Game.Rulesets.Taiko
             if (mods.HasFlagFast(LegacyMods.Relax))
                 yield return new TaikoModRelax();
 
-            if (mods.HasFlagFast(LegacyMods.Random))
-                yield return new TaikoModRandom();
-
             if (mods.HasFlagFast(LegacyMods.ScoreV2))
                 yield return new ModScoreV2();
-        }
-
-        public override LegacyMods ConvertToLegacyMods(Mod[] mods)
-        {
-            var value = base.ConvertToLegacyMods(mods);
-
-            if (mods.OfType<TaikoModRandom>().Any())
-                value |= LegacyMods.Random;
-
-            return value;
         }
 
         public override IEnumerable<Mod> GetModsFor(ModType type)
@@ -201,6 +188,8 @@ namespace osu.Game.Rulesets.Taiko
 
         public override HitObjectComposer CreateHitObjectComposer() => new TaikoHitObjectComposer(this);
 
+        public override IBeatmapVerifier CreateBeatmapVerifier() => new TaikoBeatmapVerifier();
+
         public override DifficultyCalculator CreateDifficultyCalculator(IWorkingBeatmap beatmap) => new TaikoDifficultyCalculator(RulesetInfo, beatmap);
 
         public override PerformanceCalculator CreatePerformanceCalculator() => new TaikoPerformanceCalculator();
@@ -263,6 +252,19 @@ namespace osu.Game.Rulesets.Taiko
                     new UnstableRate(timedHitEvents)
                 }), true)
             };
+        }
+
+        /// <seealso cref="TaikoHitWindows"/>
+        public override BeatmapDifficulty GetRateAdjustedDisplayDifficulty(IBeatmapDifficultyInfo difficulty, double rate)
+        {
+            BeatmapDifficulty adjustedDifficulty = new BeatmapDifficulty(difficulty);
+
+            var greatHitWindowRange = TaikoHitWindows.TAIKO_RANGES.Single(range => range.Result == HitResult.Great);
+            double greatHitWindow = IBeatmapDifficultyInfo.DifficultyRange(adjustedDifficulty.OverallDifficulty, greatHitWindowRange.Min, greatHitWindowRange.Average, greatHitWindowRange.Max);
+            greatHitWindow /= rate;
+            adjustedDifficulty.OverallDifficulty = (float)IBeatmapDifficultyInfo.InverseDifficultyRange(greatHitWindow, greatHitWindowRange.Min, greatHitWindowRange.Average, greatHitWindowRange.Max);
+
+            return adjustedDifficulty;
         }
     }
 }

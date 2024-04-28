@@ -16,6 +16,12 @@ namespace osu.Game.Screens.Play
         public bool ShowResults { get; set; } = true;
 
         /// <summary>
+        /// Whether the fail animation / screen should be triggered on failing.
+        /// If false, the score will still be marked as failed but gameplay will continue.
+        /// </summary>
+        public bool AllowFailAnimation { get; set; } = true;
+
+        /// <summary>
         /// Whether the player should be allowed to trigger a restart.
         /// </summary>
         public bool AllowRestart { get; set; } = true;

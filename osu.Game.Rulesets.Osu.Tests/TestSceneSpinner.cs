@@ -3,9 +3,11 @@
 
 #nullable disable
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Testing;
 using osu.Game.Audio;
@@ -26,6 +28,21 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         private TestDrawableSpinner drawableSpinner;
 
+        private readonly BindableDouble spinRate = new BindableDouble();
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            AddSliderStep("Spin rate", 0.5, 5, 1, val => spinRate.Value = val);
+        }
+
+        [SetUpSteps]
+        public void SetUpSteps()
+        {
+            AddStep("Reset rate", () => spinRate.Value = 1);
+        }
+
         [TestCase(true)]
         [TestCase(false)]
         public void TestVariousSpinners(bool autoplay)
@@ -34,6 +51,36 @@ namespace osu.Game.Rulesets.Osu.Tests
             AddStep($"{term} Big", () => SetContents(_ => testSingle(2, autoplay)));
             AddStep($"{term} Medium", () => SetContents(_ => testSingle(5, autoplay)));
             AddStep($"{term} Small", () => SetContents(_ => testSingle(7, autoplay)));
+        }
+
+        [Test]
+        public void TestSpinnerNoBonus()
+        {
+            AddStep("Set high spin rate", () => spinRate.Value = 5);
+
+            Spinner spinner;
+
+            AddStep("add spinner", () => SetContents(_ =>
+            {
+                spinner = new Spinner
+                {
+                    StartTime = Time.Current,
+                    EndTime = Time.Current + 750,
+                    Samples = new List<HitSampleInfo>
+                    {
+                        new HitSampleInfo(HitSampleInfo.HIT_NORMAL)
+                    }
+                };
+
+                spinner.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty { OverallDifficulty = 0 });
+
+                return drawableSpinner = new TestDrawableSpinner(spinner, true, spinRate)
+                {
+                    Anchor = Anchor.Centre,
+                    Depth = depthIndex++,
+                    Scale = new Vector2(0.75f)
+                };
+            }));
         }
 
         [Test]
@@ -86,7 +133,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
                 spinner.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty { OverallDifficulty = od });
 
-                return drawableSpinner = new TestDrawableSpinner(spinner, true)
+                return drawableSpinner = new TestDrawableSpinner(spinner, true, spinRate)
                 {
                     Anchor = Anchor.Centre,
                     Depth = depthIndex++,
@@ -114,7 +161,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             spinner.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty { CircleSize = circleSize });
 
-            drawableSpinner = new TestDrawableSpinner(spinner, auto)
+            drawableSpinner = new TestDrawableSpinner(spinner, auto, spinRate)
             {
                 Anchor = Anchor.Centre,
                 Depth = depthIndex++,
@@ -130,18 +177,20 @@ namespace osu.Game.Rulesets.Osu.Tests
         private partial class TestDrawableSpinner : DrawableSpinner
         {
             private readonly bool auto;
+            private readonly BindableDouble spinRate;
 
-            public TestDrawableSpinner(Spinner s, bool auto)
+            public TestDrawableSpinner(Spinner s, bool auto, BindableDouble spinRate)
                 : base(s)
             {
                 this.auto = auto;
+                this.spinRate = spinRate;
             }
 
             protected override void Update()
             {
                 base.Update();
                 if (auto)
-                    RotationTracker.AddRotation((float)(Clock.ElapsedFrameTime * 2));
+                    RotationTracker.AddRotation((float)Math.Min(180, Clock.ElapsedFrameTime * spinRate.Value));
             }
         }
     }

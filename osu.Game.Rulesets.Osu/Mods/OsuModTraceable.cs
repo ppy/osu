@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override LocalisableString Description => "Put your faith in the approach circles...";
         public override double ScoreMultiplier => 1;
 
-        public override Type[] IncompatibleMods => new[] { typeof(IHidesApproachCircles) };
+        public override Type[] IncompatibleMods => new[] { typeof(IHidesApproachCircles), typeof(OsuModDepth) };
 
         protected override void ApplyIncreasedVisibilityState(DrawableHitObject hitObject, ArmedState state)
         {

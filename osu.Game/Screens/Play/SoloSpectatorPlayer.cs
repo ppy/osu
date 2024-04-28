@@ -1,9 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Screens;
 using osu.Game.Online.Spectator;
 using osu.Game.Scoring;
@@ -17,8 +16,8 @@ namespace osu.Game.Screens.Play
 
         protected override UserActivity InitialActivity => new UserActivity.SpectatingUser(Score.ScoreInfo);
 
-        public SoloSpectatorPlayer(Score score, PlayerConfiguration configuration = null)
-            : base(score, configuration)
+        public SoloSpectatorPlayer(Score score)
+            : base(score, new PlayerConfiguration { AllowUserInteraction = false })
         {
             this.score = score;
         }
@@ -50,7 +49,7 @@ namespace osu.Game.Screens.Play
         {
             base.Dispose(isDisposing);
 
-            if (SpectatorClient != null)
+            if (SpectatorClient.IsNotNull())
                 SpectatorClient.OnUserBeganPlaying -= userBeganPlaying;
         }
     }

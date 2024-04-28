@@ -3,6 +3,7 @@
 
 #nullable disable
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
@@ -14,6 +15,7 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Extensions;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets;
@@ -191,6 +193,36 @@ namespace osu.Game.Tests.Visual.SongSelect
             {
                 var label = infoWedge.DisplayedContent.ChildrenOfType<BeatmapInfoWedge.WedgeInfoText.InfoLabel>().Single(l => l.Statistic.Name == BeatmapsetsStrings.ShowStatsBpm);
                 return label.Statistic.Content == target;
+            });
+        }
+
+        [TestCase]
+        public void TestLengthUpdates()
+        {
+            IBeatmap beatmap = createTestBeatmap(new OsuRuleset().RulesetInfo);
+            double drain = beatmap.CalculateDrainLength();
+            beatmap.BeatmapInfo.Length = drain;
+
+            OsuModDoubleTime doubleTime = null;
+
+            selectBeatmap(beatmap);
+            checkDisplayedLength(drain);
+
+            AddStep("select DT", () => SelectedMods.Value = new[] { doubleTime = new OsuModDoubleTime() });
+            checkDisplayedLength(Math.Round(drain / 1.5f));
+
+            AddStep("change DT rate", () => doubleTime.SpeedChange.Value = 2);
+            checkDisplayedLength(Math.Round(drain / 2));
+        }
+
+        private void checkDisplayedLength(double drain)
+        {
+            var displayedLength = drain.ToFormattedDuration();
+
+            AddUntilStep($"check map drain ({displayedLength})", () =>
+            {
+                var label = infoWedge.DisplayedContent.ChildrenOfType<BeatmapInfoWedge.WedgeInfoText.InfoLabel>().Single(l => l.Statistic.Name == BeatmapsetsStrings.ShowStatsTotalLength(displayedLength));
+                return label.Statistic.Content == displayedLength.ToString();
             });
         }
 
