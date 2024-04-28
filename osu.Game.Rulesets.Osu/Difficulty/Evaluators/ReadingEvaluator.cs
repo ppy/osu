@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using osu.Framework.Extensions.ObjectExtensions;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Objects;
@@ -25,7 +24,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             double density = 0;
             double densityAnglesNerf = -2; // we have threshold of 2
 
-            OsuDifficultyHitObject? prevObj0 = null;
+            // Despite being called prev, it's actually more late in time
+            OsuDifficultyHitObject prevObj0 = currObj;
 
             var readingObjects = currObj.ReadingObjects;
             for (int i = 0; i < readingObjects.Count; i++)
@@ -44,9 +44,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 // Nerf starts on 1500ms and reaches maximum (*=0) on 3000ms
                 double timeBetweenCurrAndLoopObj = currObj.StartTime - loopObj.StartTime;
                 loopDifficulty *= getTimeNerfFactor(timeBetweenCurrAndLoopObj);
-
-                if (prevObj0.IsNull())
-                    prevObj0 = (OsuDifficultyHitObject)loopObj.Previous(0);
 
                 // Only if next object is slower, representing break from many notes in a row
                 if (loopObj.StrainTime > prevObj0.StrainTime)
@@ -294,8 +291,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             double density = ReadingEvaluator.EvaluateDensityOf(current, false);
             double preempt = currObj.Preempt / 1000;
 
-            // Consider that density matters only starting from 3rd note on the screen
-            double densityFactor = Math.Max(0, density - 1) / 5;
+            double densityFactor = Math.Pow(density / 6.2, 1.5);
 
             double invisibilityFactor;
 

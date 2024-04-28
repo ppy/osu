@@ -231,11 +231,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 accuracyValue *= 1.02;
 
             // Visual indication bonus
-            double visualIndicationBonus = 1.0 + 0.1 * logistic(8.0 - attributes.ApproachRate);
-
-            accuracyValue *= visualIndicationBonus;
+            accuracyValue *= 1.0 + 0.2 * logistic(8.0 - attributes.ApproachRate);
             if (score.Mods.Any(h => h is OsuModHidden || h is OsuModTraceable))
-                accuracyValue *= visualIndicationBonus;
+                accuracyValue *= 1.0 + 0.1 * logistic(8.0 - attributes.ApproachRate);
 
             return accuracyValue;
         }
