@@ -300,6 +300,21 @@ namespace osu.Game.Database
 
         private Realm prepareFirstRealmAccess()
         {
+            // Before attempting to initialise realm, make sure the realm file isn't locked and has correct permissions.
+            //
+            // This is to avoid failures like:
+            // Realms.Exceptions.RealmException: SetEndOfFile() failed: unknown error (1224)
+            //
+            // which can occur due to file handles still being open by a previous instance.
+            if (storage.Exists(Filename))
+            {
+                // If this fails we allow it to block game startup.
+                // It's better than any alternative we can offer.
+                using (var _ = storage.GetStream(Filename, FileAccess.ReadWrite))
+                {
+                }
+            }
+
             string newerVersionFilename = $"{Filename.Replace(realm_extension, string.Empty)}_newer_version{realm_extension}";
 
             // Attempt to recover a newer database version if available.
@@ -321,7 +336,7 @@ namespace osu.Game.Database
                 {
                     Logger.Error(e, "Your local database is too new to work with this version of osu!. Please close osu! and install the latest release to recover your data.");
 
-                    // If a newer version database already exists, don't backup again. We can presume that the first backup is the one we care about.
+                    // If a newer version database already exists, don't create another backup. We can presume that the first backup is the one we care about.
                     if (!storage.Exists(newerVersionFilename))
                         createBackup(newerVersionFilename);
                 }
