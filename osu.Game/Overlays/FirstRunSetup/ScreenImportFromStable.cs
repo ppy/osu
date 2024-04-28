@@ -128,6 +128,7 @@ namespace osu.Game.Overlays.FirstRunSetup
             if (available)
             {
                 copyInformation.Text = FirstRunOverlayImportFromStableScreenStrings.DataMigrationNoExtraSpace;
+                copyInformation.AddText(@" "); // just to ensure correct spacing
                 copyInformation.AddLink(FirstRunOverlayImportFromStableScreenStrings.LearnAboutHardLinks, LinkAction.OpenWiki, @"Client/Release_stream/Lazer/File_storage#via-hard-links");
             }
             else if (!RuntimeInfo.IsDesktop)
