@@ -231,9 +231,17 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 accuracyValue *= 1.02;
 
             // Visual indication bonus
-            accuracyValue *= 1.0 + 0.2 * logistic(8.0 - attributes.ApproachRate);
+            double visualBonus = 0.1 * logistic(8.0 - attributes.ApproachRate);
+
+            // Buff if OD is way lower than AR
+            double ARODDelta = Math.Max(0, attributes.OverallDifficulty - attributes.ApproachRate);
+
+            // This one is goes from 0.0 on delta=0 to 1.0 somewhere around delta=3.4
+            double deltaBonus = (1 - Math.Pow(0.95, Math.Pow(ARODDelta, 4)));
+
+            accuracyValue *= 1 + visualBonus * (1 + 2 * deltaBonus);
             if (score.Mods.Any(h => h is OsuModHidden || h is OsuModTraceable))
-                accuracyValue *= 1.0 + 0.1 * logistic(8.0 - attributes.ApproachRate);
+                accuracyValue *= 1 + visualBonus * (1 + deltaBonus);
 
             return accuracyValue;
         }

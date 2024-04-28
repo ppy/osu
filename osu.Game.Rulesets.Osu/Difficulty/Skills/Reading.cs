@@ -86,8 +86,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             return difficulty;
         }
         public static double DifficultyToPerformance(double difficulty) => Math.Max(
-            Math.Max(Math.Pow(difficulty, 1.5) * 22, Math.Pow(difficulty, 2) * 22.0),
-            Math.Max(Math.Pow(difficulty, 3) * 12.0, Math.Pow(difficulty, 4) * 6.00));
+            Math.Max(Math.Pow(difficulty, 1.5) * 20, Math.Pow(difficulty, 2) * 17.0),
+            Math.Max(Math.Pow(difficulty, 3) * 10.5, Math.Pow(difficulty, 4) * 6.00));
     }
 
     public class ReadingHidden : Aim
