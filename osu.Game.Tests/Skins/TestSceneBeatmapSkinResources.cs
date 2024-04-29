@@ -22,6 +22,15 @@ namespace osu.Game.Tests.Skins
         private BeatmapManager beatmaps { get; set; } = null!;
 
         [Test]
+        public void TestRetrieveJapaneseFilename()
+        {
+            IWorkingBeatmap beatmap = null!;
+
+            AddStep("import beatmap", () => beatmap = importBeatmapFromArchives(@"japanese-filename.osz"));
+            AddAssert("sample is non-null", () => beatmap.Skin.GetSample(new SampleInfo(@"見本")) != null);
+        }
+
+        [Test]
         public void TestRetrieveOggAudio()
         {
             IWorkingBeatmap beatmap = null!;
