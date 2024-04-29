@@ -311,9 +311,12 @@ namespace osu.Game.Database
             {
                 // If this fails we allow it to block game startup.
                 // It's better than any alternative we can offer.
-                using (var _ = storage.GetStream(Filename, FileAccess.ReadWrite))
+                FileUtils.AttemptOperation(() =>
                 {
-                }
+                    using (var _ = storage.GetStream(Filename, FileAccess.ReadWrite))
+                    {
+                    }
+                });
             }
 
             string newerVersionFilename = $"{Filename.Replace(realm_extension, string.Empty)}_newer_version{realm_extension}";
