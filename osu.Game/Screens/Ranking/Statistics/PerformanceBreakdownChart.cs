@@ -219,7 +219,6 @@ namespace osu.Game.Screens.Ranking.Statistics
                         Origin = Anchor.Centre,
                         Anchor = Anchor.Centre,
                         CornerRadius = 2.5f,
-                        Masking = true,
                         Height = 5,
                         BackgroundColour = Color4.White.Opacity(0.5f),
                         AccentColour = Color4Extensions.FromHex("#66FFCC"),
