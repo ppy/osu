@@ -346,7 +346,6 @@ namespace osu.Game.Online.Leaderboards
                     RelativeSizeAxes = Axes.Both,
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight,
-                    Masking = true,
                     SpawnRatio = 2,
                     Velocity = 0.7f,
                     Colour = ColourInfo.GradientHorizontal(backgroundColour.Opacity(0), OsuColour.ForRank(score.Rank).Darken(0.2f)),
@@ -521,15 +520,9 @@ namespace osu.Game.Online.Leaderboards
                     avatar.FadeOut(transition_duration, Easing.OutQuint).MoveToX(-avatar.DrawWidth, transition_duration, Easing.OutQuint);
 
                 if (centreContent.DrawWidth >= username_min_width)
-                {
                     usernameAndFlagContainer.FadeIn(transition_duration, Easing.OutQuint).MoveToX(0, transition_duration, Easing.OutQuint);
-                    innerAvatar.ShowUsernameTooltip = false;
-                }
                 else
-                {
                     usernameAndFlagContainer.FadeOut(transition_duration, Easing.OutQuint).MoveToX(usernameAndFlagContainer.DrawWidth, transition_duration, Easing.OutQuint);
-                    innerAvatar.ShowUsernameTooltip = true;
-                }
 
                 if (centreContent.DrawWidth >= height + statisticsContainer.DrawWidth + username_min_width)
                     statisticsContainer.FadeIn(transition_duration, Easing.OutQuint).MoveToX(0, transition_duration, Easing.OutQuint);
