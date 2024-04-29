@@ -66,7 +66,6 @@ namespace osu.Game.Online.Leaderboards
 
         private Colour4 foregroundColour;
         private Colour4 backgroundColour;
-        private Colour4 shadowColour;
         private ColourInfo totalScoreBackgroundGradient;
 
         private static readonly Vector2 shear = new Vector2(0.15f, 0);
@@ -127,7 +126,6 @@ namespace osu.Game.Online.Leaderboards
 
             foregroundColour = isPersonalBest ? colourProvider.Background1 : colourProvider.Background5;
             backgroundColour = isPersonalBest ? colourProvider.Background2 : colourProvider.Background4;
-            shadowColour = isPersonalBest ? colourProvider.Background3 : colourProvider.Background6;
             totalScoreBackgroundGradient = ColourInfo.GradientHorizontal(backgroundColour.Opacity(0), backgroundColour);
 
             statisticsLabels = GetStatistics(score).Select(s => new ScoreComponentLabel(s, score)
@@ -184,128 +182,109 @@ namespace osu.Game.Online.Leaderboards
             RelativeSizeAxes = Axes.Both,
             Children = new Drawable[]
             {
-                new Box
+                foreground = new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = shadowColour,
+                    Colour = foregroundColour
                 },
-                new Container
+                new UserCoverBackground
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Padding = new MarginPadding { Right = 5 },
-                    Child = new Container
+                    User = score.User,
+                    Shear = -shear,
+                    Anchor = Anchor.BottomLeft,
+                    Origin = Anchor.BottomLeft,
+                    Colour = ColourInfo.GradientHorizontal(Colour4.White.Opacity(0.5f), Colour4.FromHex(@"222A27").Opacity(1)),
+                },
+                new GridContainer
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    ColumnDimensions = new[]
                     {
-                        Masking = true,
-                        CornerRadius = corner_radius,
-                        RelativeSizeAxes = Axes.Both,
-                        Children = new Drawable[]
+                        new Dimension(GridSizeMode.AutoSize),
+                        new Dimension(),
+                        new Dimension(GridSizeMode.AutoSize),
+                    },
+                    Content = new[]
+                    {
+                        new Drawable[]
                         {
-                            foreground = new Box
+                            new Container
                             {
-                                RelativeSizeAxes = Axes.Both,
-                                Colour = foregroundColour
-                            },
-                            new UserCoverBackground
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                User = score.User,
-                                Shear = -shear,
-                                Anchor = Anchor.BottomLeft,
-                                Origin = Anchor.BottomLeft,
-                                Colour = ColourInfo.GradientHorizontal(Colour4.White.Opacity(0.5f), Colour4.White.Opacity(0)),
-                            },
-                            new GridContainer
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                ColumnDimensions = new[]
-                                {
-                                    new Dimension(GridSizeMode.AutoSize),
-                                    new Dimension(),
-                                    new Dimension(GridSizeMode.AutoSize),
-                                },
-                                Content = new[]
-                                {
-                                    new Drawable[]
+                                AutoSizeAxes = Axes.Both,
+                                Child = avatar = new MaskedWrapper(
+                                    innerAvatar = new ClickableAvatar(user)
                                     {
-                                        new Container
+                                        Anchor = Anchor.Centre,
+                                        Origin = Anchor.Centre,
+                                        Scale = new Vector2(1.1f),
+                                        Shear = -shear,
+                                        RelativeSizeAxes = Axes.Both,
+                                    })
+                                {
+                                    RelativeSizeAxes = Axes.None,
+                                    Size = new Vector2(height)
+                                },
+                            },
+                            usernameAndFlagContainer = new FillFlowContainer
+                            {
+                                Anchor = Anchor.CentreLeft,
+                                Origin = Anchor.CentreLeft,
+                                RelativeSizeAxes = Axes.X,
+                                AutoSizeAxes = Axes.Y,
+                                Direction = FillDirection.Vertical,
+                                Padding = new MarginPadding { Horizontal = corner_radius },
+                                Children = new Drawable[]
+                                {
+                                    flagBadgeAndDateContainer = new FillFlowContainer
+                                    {
+                                        Shear = -shear,
+                                        Direction = FillDirection.Horizontal,
+                                        Spacing = new Vector2(5),
+                                        AutoSizeAxes = Axes.Both,
+                                        Masking = true,
+                                        Children = new Drawable[]
                                         {
-                                            AutoSizeAxes = Axes.Both,
-                                            Child = avatar = new MaskedWrapper(
-                                                innerAvatar = new ClickableAvatar(user)
-                                                {
-                                                    Anchor = Anchor.Centre,
-                                                    Origin = Anchor.Centre,
-                                                    Scale = new Vector2(1.1f),
-                                                    Shear = -shear,
-                                                    RelativeSizeAxes = Axes.Both,
-                                                })
+                                            new UpdateableFlag(user.CountryCode)
                                             {
-                                                RelativeSizeAxes = Axes.None,
-                                                Size = new Vector2(height)
+                                                Anchor = Anchor.CentreLeft,
+                                                Origin = Anchor.CentreLeft,
+                                                Size = new Vector2(24, 16),
                                             },
-                                        },
-                                        usernameAndFlagContainer = new FillFlowContainer
-                                        {
-                                            Anchor = Anchor.CentreLeft,
-                                            Origin = Anchor.CentreLeft,
-                                            RelativeSizeAxes = Axes.X,
-                                            AutoSizeAxes = Axes.Y,
-                                            Direction = FillDirection.Vertical,
-                                            Padding = new MarginPadding { Horizontal = corner_radius },
-                                            Children = new Drawable[]
+                                            new DateLabel(score.Date)
                                             {
-                                                flagBadgeAndDateContainer = new FillFlowContainer
-                                                {
-                                                    Shear = -shear,
-                                                    Direction = FillDirection.Horizontal,
-                                                    Spacing = new Vector2(5),
-                                                    AutoSizeAxes = Axes.Both,
-                                                    Masking = true,
-                                                    Children = new Drawable[]
-                                                    {
-                                                        new UpdateableFlag(user.CountryCode)
-                                                        {
-                                                            Anchor = Anchor.CentreLeft,
-                                                            Origin = Anchor.CentreLeft,
-                                                            Size = new Vector2(24, 16),
-                                                        },
-                                                        new DateLabel(score.Date)
-                                                        {
-                                                            Anchor = Anchor.CentreLeft,
-                                                            Origin = Anchor.CentreLeft,
-                                                            UseFullGlyphHeight = false,
-                                                        }
-                                                    }
-                                                },
-                                                nameLabel = new TruncatingSpriteText
-                                                {
-                                                    RelativeSizeAxes = Axes.X,
-                                                    Shear = -shear,
-                                                    Text = user.Username,
-                                                    Font = OsuFont.GetFont(size: 24, weight: FontWeight.SemiBold)
-                                                }
-                                            }
-                                        },
-                                        new Container
-                                        {
-                                            AutoSizeAxes = Axes.Both,
-                                            Anchor = Anchor.CentreRight,
-                                            Origin = Anchor.CentreRight,
-                                            Child = statisticsContainer = new FillFlowContainer
-                                            {
-                                                Name = @"Statistics container",
-                                                Padding = new MarginPadding { Right = 40 },
-                                                Spacing = new Vector2(25),
-                                                Shear = -shear,
-                                                Anchor = Anchor.CentreRight,
-                                                Origin = Anchor.CentreRight,
-                                                AutoSizeAxes = Axes.Both,
-                                                Direction = FillDirection.Horizontal,
-                                                Children = statisticsLabels,
-                                                Alpha = 0,
+                                                Anchor = Anchor.CentreLeft,
+                                                Origin = Anchor.CentreLeft,
+                                                UseFullGlyphHeight = false,
                                             }
                                         }
+                                    },
+                                    nameLabel = new TruncatingSpriteText
+                                    {
+                                        RelativeSizeAxes = Axes.X,
+                                        Shear = -shear,
+                                        Text = user.Username,
+                                        Font = OsuFont.GetFont(size: 24, weight: FontWeight.SemiBold)
                                     }
+                                }
+                            },
+                            new Container
+                            {
+                                AutoSizeAxes = Axes.Both,
+                                Anchor = Anchor.CentreRight,
+                                Origin = Anchor.CentreRight,
+                                Child = statisticsContainer = new FillFlowContainer
+                                {
+                                    Name = @"Statistics container",
+                                    Padding = new MarginPadding { Right = 40 },
+                                    Spacing = new Vector2(25),
+                                    Shear = -shear,
+                                    Anchor = Anchor.CentreRight,
+                                    Origin = Anchor.CentreRight,
+                                    AutoSizeAxes = Axes.Both,
+                                    Direction = FillDirection.Horizontal,
+                                    Children = statisticsLabels,
+                                    Alpha = 0,
                                 }
                             }
                         }
