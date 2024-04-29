@@ -37,6 +37,21 @@ namespace osu.Game.Tests.Beatmaps.Formats
 
         private static IEnumerable<string> allBeatmaps = beatmaps_resource_store.GetAvailableResources().Where(res => res.EndsWith(".osu", StringComparison.Ordinal));
 
+        [Test]
+        public void TestUnsupportedStoryboardEvents()
+        {
+            const string name = "Resources/storyboard_only_video.osu";
+
+            var decoded = decodeFromLegacy(beatmaps_resource_store.GetStream(name), name);
+            var decodedAfterEncode = decodeFromLegacy(encodeToLegacy(decoded), name);
+
+            Assert.That(decoded.beatmap.UnhandledEventLines.Count, Is.EqualTo(1));
+            Assert.That(decoded.beatmap.UnhandledEventLines.Single(), Is.EqualTo("Video,0,\"video.avi\""));
+
+            Assert.That(decodedAfterEncode.beatmap.UnhandledEventLines.Count, Is.EqualTo(1));
+            Assert.That(decodedAfterEncode.beatmap.UnhandledEventLines.Single(), Is.EqualTo("Video,0,\"video.avi\""));
+        }
+
         [TestCaseSource(nameof(allBeatmaps))]
         public void TestEncodeDecodeStability(string name)
         {
