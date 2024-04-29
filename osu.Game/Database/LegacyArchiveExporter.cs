@@ -7,6 +7,7 @@ using System.Threading;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Extensions;
+using osu.Game.IO.Archives;
 using osu.Game.Overlays.Notifications;
 using Realms;
 using SharpCompress.Common;
@@ -29,7 +30,10 @@ namespace osu.Game.Database
 
         public override void ExportToStream(TModel model, Stream outputStream, ProgressNotification? notification, CancellationToken cancellationToken = default)
         {
-            using (var writer = new ZipWriter(outputStream, new ZipWriterOptions(CompressionType.Deflate)))
+            using (var writer = new ZipWriter(outputStream, new ZipWriterOptions(CompressionType.Deflate)
+                   {
+                       ArchiveEncoding = ZipArchiveReader.DEFAULT_ENCODING
+                   }))
             {
                 int i = 0;
                 int fileCount = model.Files.Count();
