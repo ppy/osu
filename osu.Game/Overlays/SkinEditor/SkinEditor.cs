@@ -255,8 +255,11 @@ namespace osu.Game.Overlays.SkinEditor
             // schedule ensures this only happens when the skin editor is visible.
             // also avoid some weird endless recursion / bindable feedback loop (something to do with tracking skins across three different bindable types).
             // probably something which will be factored out in a future database refactor so not too concerning for now.
-            currentSkin.BindValueChanged(_ =>
+            currentSkin.BindValueChanged(val =>
             {
+                if (val.OldValue != null && hasBegunMutating)
+                    save(val.OldValue);
+
                 hasBegunMutating = false;
                 Scheduler.AddOnce(skinChanged);
             }, true);
@@ -537,7 +540,9 @@ namespace osu.Game.Overlays.SkinEditor
 
         protected void Redo() => changeHandler?.RestoreState(1);
 
-        public void Save(bool userTriggered = true)
+        public void Save(bool userTriggered = true) => save(currentSkin.Value);
+
+        private void save(Skin skin, bool userTriggered = true)
         {
             if (!hasBegunMutating)
                 return;
@@ -551,11 +556,11 @@ namespace osu.Game.Overlays.SkinEditor
                 return;
 
             foreach (var t in targetContainers)
-                currentSkin.Value.UpdateDrawableTarget(t);
+                skin.UpdateDrawableTarget(t);
 
             // In the case the save was user triggered, always show the save message to make them feel confident.
-            if (skins.Save(skins.CurrentSkin.Value) || userTriggered)
-                onScreenDisplay?.Display(new SkinEditorToast(ToastStrings.SkinSaved, currentSkin.Value.SkinInfo.ToString() ?? "Unknown"));
+            if (skins.Save(skin) || userTriggered)
+                onScreenDisplay?.Display(new SkinEditorToast(ToastStrings.SkinSaved, skin.SkinInfo.ToString() ?? "Unknown"));
         }
 
         protected override bool OnHover(HoverEvent e) => true;
