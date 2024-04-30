@@ -13,7 +13,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
     public abstract partial class SongSelectComponentsTestScene : OsuTestScene
     {
         [Cached]
-        private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Aquamarine);
+        protected readonly OverlayColourProvider ColourProvider = new OverlayColourProvider(OverlayColourScheme.Aquamarine);
 
         /// <summary>
         /// The local/online beatmap.
