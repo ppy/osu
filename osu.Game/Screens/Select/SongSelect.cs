@@ -48,6 +48,9 @@ namespace osu.Game.Screens.Select
     public abstract partial class SongSelect : ScreenWithBeatmapBackground, IKeyBindingHandler<GlobalAction>
     {
         public static readonly float WEDGE_HEIGHT = 200;
+        public const float WEDGE_CORNER_RADIUS = 10;
+        public const float SHEAR_X = 0.175f;
+        public static readonly Vector2 WEDGED_CONTAINER_SHEAR = new Vector2(SHEAR_X, 0);
 
         protected const float BACKGROUND_BLUR = 20;
         private const float left_area_padding = 20;
