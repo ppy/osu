@@ -167,8 +167,6 @@ namespace osu.Game.Beatmaps.Formats
             beatmapInfo.SamplesMatchPlaybackRate = false;
         }
 
-        protected override bool ShouldSkipLine(string line) => base.ShouldSkipLine(line) || line.StartsWith(' ') || line.StartsWith('_');
-
         protected override void ParseLine(Beatmap beatmap, Section section, string line)
         {
             switch (section)
