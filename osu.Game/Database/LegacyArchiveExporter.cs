@@ -36,10 +36,12 @@ namespace osu.Game.Database
 
         public override void ExportToStream(TModel model, Stream outputStream, ProgressNotification? notification, CancellationToken cancellationToken = default)
         {
-            using (var writer = new ZipWriter(outputStream, new ZipWriterOptions(CompressionType.Deflate)
-                   {
-                       ArchiveEncoding = UseFixedEncoding ? ZipArchiveReader.DEFAULT_ENCODING : new ArchiveEncoding(Encoding.UTF8, Encoding.UTF8)
-                   }))
+            var zipWriterOptions = new ZipWriterOptions(CompressionType.Deflate)
+            {
+                ArchiveEncoding = UseFixedEncoding ? ZipArchiveReader.DEFAULT_ENCODING : new ArchiveEncoding(Encoding.UTF8, Encoding.UTF8)
+            };
+
+            using (var writer = new ZipWriter(outputStream, zipWriterOptions))
             {
                 int i = 0;
                 int fileCount = model.Files.Count();
