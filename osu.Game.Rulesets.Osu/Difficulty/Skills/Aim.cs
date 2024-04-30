@@ -70,8 +70,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
                 double penalizedSkill = fcSkill - fcSkill * penalty_per_misscount * i;
 
-                // Save misscounts as log form to give higher weight to lower values. Add 1 so that the lowest misscounts remain above 0.
-                misscounts[i] = Math.Log(GetMissCountAtSkill(penalizedSkill) + 1);
+                misscounts[i] = GetMissCountAtSkill(penalizedSkill);
             }
 
             ExpPolynomial polynomial = new ExpPolynomial();

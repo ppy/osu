@@ -900,7 +900,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Utils
                 t = Math.Clamp(t, -1, 1);
                 t = Math.Acos(t);
                 b /= 3;
-                q = -2 * Math.Sqrt(2);
+                q = -2 * Math.Sqrt(q);
 
                 xVals[0] = q * Math.Cos(t / 3) - b;
                 xVals[1] = q * Math.Cos((t + m_2_pi) / 3) - b;
