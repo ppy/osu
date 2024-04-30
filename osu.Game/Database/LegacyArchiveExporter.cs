@@ -3,6 +3,7 @@
 
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
@@ -23,6 +24,11 @@ namespace osu.Game.Database
     public abstract class LegacyArchiveExporter<TModel> : LegacyExporter<TModel>
         where TModel : RealmObject, IHasNamedFiles, IHasGuidPrimaryKey
     {
+        /// <summary>
+        /// Whether to always use Shift-JIS encoding for archive filenames (like osu!stable did).
+        /// </summary>
+        protected virtual bool UseFixedEncoding => true;
+
         protected LegacyArchiveExporter(Storage storage)
             : base(storage)
         {
@@ -32,7 +38,7 @@ namespace osu.Game.Database
         {
             using (var writer = new ZipWriter(outputStream, new ZipWriterOptions(CompressionType.Deflate)
                    {
-                       ArchiveEncoding = ZipArchiveReader.DEFAULT_ENCODING
+                       ArchiveEncoding = UseFixedEncoding ? ZipArchiveReader.DEFAULT_ENCODING : new ArchiveEncoding(Encoding.UTF8, Encoding.UTF8)
                    }))
             {
                 int i = 0;
