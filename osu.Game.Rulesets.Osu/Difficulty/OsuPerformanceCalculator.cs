@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Rulesets.Difficulty;
-using osu.Game.Rulesets.Osu.Difficulty.Utils;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
@@ -244,11 +243,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         private double calculateAimMissPenalty(double missCount, OsuDifficultyAttributes attributes)
         {
-            double a = attributes.AimPenaltyConstants.Item1;
-            double b = attributes.AimPenaltyConstants.Item2;
-            double c = Math.Log(totalHits + 1) - a - b; // Setting the 3rd constant this way ensures that at a penalty of 100%, the number of misses = totalHits.
+            double penalty = attributes.AimMissCountPolynomial.SolveBetweenZeroAndOne(missCount) ?? 1;
 
-            return Math.Pow(1 - RootFinding.FindRootExpand(x => a * x * x * x + b * x * x + c * x - Math.Log(missCount + 1), 0, 1), 1.5);
+            double multiplier = Math.Pow(1 - penalty, 1.5);
+
+            return multiplier;
         }
 
         private double calculateEffectiveMissCount(OsuDifficultyAttributes attributes)

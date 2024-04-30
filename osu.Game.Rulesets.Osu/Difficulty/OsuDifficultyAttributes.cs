@@ -8,6 +8,7 @@ using Newtonsoft.Json;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Osu.Difficulty.Utils;
 
 namespace osu.Game.Rulesets.Osu.Difficulty
 {
@@ -23,7 +24,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         /// The difficulty corresponding to the aim skill.
         /// </summary>
         [JsonProperty("aim_penalty_constants")]
-        public (double, double) AimPenaltyConstants { get; set; }
+        public ExpPolynomial AimMissCountPolynomial { get; set; }
 
         /// <summary>
         /// The difficulty corresponding to the speed skill.
