@@ -56,10 +56,6 @@ namespace osu.Game.Screens.Backgrounds
             introSequence = config.GetBindable<IntroSequence>(OsuSetting.IntroSequence);
 
             AddInternal(seasonalBackgroundLoader);
-
-            // Load first background asynchronously as part of BDL load.
-            currentDisplay = RNG.Next(0, background_count);
-            Next();
         }
 
         protected override void LoadComplete()
@@ -72,6 +68,9 @@ namespace osu.Game.Screens.Backgrounds
             beatmap.ValueChanged += _ => Scheduler.AddOnce(next);
             introSequence.ValueChanged += _ => Scheduler.AddOnce(next);
             seasonalBackgroundLoader.SeasonalBackgroundChanged += () => Scheduler.AddOnce(next);
+
+            currentDisplay = RNG.Next(0, background_count);
+            Next();
 
             // helper function required for AddOnce usage.
             void next() => Next();
