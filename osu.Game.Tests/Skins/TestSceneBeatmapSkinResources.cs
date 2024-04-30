@@ -24,7 +24,7 @@ namespace osu.Game.Tests.Skins
         private BeatmapManager beatmaps { get; set; } = null!;
 
         [Test]
-        public void TestRetrieveJapaneseFilename()
+        public void TestRetrieveAndLegacyExportJapaneseFilename()
         {
             IWorkingBeatmap beatmap = null!;
             MemoryStream outStream = null!;
@@ -39,6 +39,29 @@ namespace osu.Game.Tests.Skins
                 outStream = new MemoryStream();
 
                 new LegacyBeatmapExporter(LocalStorage)
+                    .ExportToStream((BeatmapSetInfo)beatmap.BeatmapInfo.BeatmapSet!, outStream, null);
+            });
+
+            AddStep("import beatmap again", () => beatmap = importBeatmapFromStream(outStream));
+            AddAssert("sample is non-null", () => beatmap.Skin.GetSample(new SampleInfo(@"見本")) != null);
+        }
+
+        [Test]
+        public void TestRetrieveAndNonLegacyExportJapaneseFilename()
+        {
+            IWorkingBeatmap beatmap = null!;
+            MemoryStream outStream = null!;
+
+            // Ensure importer encoding is correct
+            AddStep("import beatmap", () => beatmap = importBeatmapFromArchives(@"japanese-filename.osz"));
+            AddAssert("sample is non-null", () => beatmap.Skin.GetSample(new SampleInfo(@"見本")) != null);
+
+            // Ensure exporter encoding is correct (round trip)
+            AddStep("export", () =>
+            {
+                outStream = new MemoryStream();
+
+                new BeatmapExporter(LocalStorage)
                     .ExportToStream((BeatmapSetInfo)beatmap.BeatmapInfo.BeatmapSet!, outStream, null);
             });
 
