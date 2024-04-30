@@ -301,24 +301,6 @@ namespace osu.Game.Database
 
         private Realm prepareFirstRealmAccess()
         {
-            // Before attempting to initialise realm, make sure the realm file isn't locked and has correct permissions.
-            //
-            // This is to avoid failures like:
-            // Realms.Exceptions.RealmException: SetEndOfFile() failed: unknown error (1224)
-            //
-            // which can occur due to file handles still being open by a previous instance.
-            //
-            // If this fails we allow it to block game startup. It's better than any alternative we can offer.
-            FileUtils.AttemptOperation(() =>
-            {
-                if (storage.Exists(Filename))
-                {
-                    using (var _ = storage.GetStream(Filename, FileAccess.ReadWrite))
-                    {
-                    }
-                }
-            });
-
             string newerVersionFilename = $"{Filename.Replace(realm_extension, string.Empty)}_newer_version{realm_extension}";
 
             // Attempt to recover a newer database version if available.
@@ -346,6 +328,26 @@ namespace osu.Game.Database
                 }
                 else
                 {
+                    // This error can occur due to file handles still being open by a previous instance.
+                    // If this is the case, rather than assuming the realm file is corrupt, block game startup.
+                    if (e.Message.StartsWith("SetEndOfFile() failed", StringComparison.Ordinal))
+                    {
+                        // This will throw if the realm file is not available for write access after 5 seconds.
+                        FileUtils.AttemptOperation(() =>
+                        {
+                            if (storage.Exists(Filename))
+                            {
+                                using (var _ = storage.GetStream(Filename, FileAccess.ReadWrite))
+                                {
+                                }
+                            }
+                        }, 20);
+
+                        // If the above eventually succeeds, try and continue startup as per normal.
+                        // This may throw again but let's allow it to, and block startup.
+                        return getRealmInstance();
+                    }
+
                     Logger.Error(e, "Realm startup failed with unrecoverable error; starting with a fresh database. A backup of your database has been made.");
                     createBackup($"{Filename.Replace(realm_extension, string.Empty)}_{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}_corrupt{realm_extension}");
                 }
