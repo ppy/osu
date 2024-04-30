@@ -307,17 +307,17 @@ namespace osu.Game.Database
             // Realms.Exceptions.RealmException: SetEndOfFile() failed: unknown error (1224)
             //
             // which can occur due to file handles still being open by a previous instance.
-            if (storage.Exists(Filename))
+            //
+            // If this fails we allow it to block game startup. It's better than any alternative we can offer.
+            FileUtils.AttemptOperation(() =>
             {
-                // If this fails we allow it to block game startup.
-                // It's better than any alternative we can offer.
-                FileUtils.AttemptOperation(() =>
+                if (storage.Exists(Filename))
                 {
                     using (var _ = storage.GetStream(Filename, FileAccess.ReadWrite))
                     {
                     }
-                });
-            }
+                }
+            });
 
             string newerVersionFilename = $"{Filename.Replace(realm_extension, string.Empty)}_newer_version{realm_extension}";
 
