@@ -415,7 +415,6 @@ namespace osu.Game.Beatmaps.Formats
         {
             string[] split = line.Split(',');
 
-
             // Until we have full storyboard encoder coverage, let's track any lines which aren't handled
             // and store them to a temporary location such that they aren't lost on editor save / export.
             bool lineSupportedByEncoder = false;
