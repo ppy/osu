@@ -115,7 +115,7 @@ namespace osu.Game.Beatmaps.Formats
                         if (!OsuGameBase.VIDEO_EXTENSIONS.Contains(Path.GetExtension(path).ToLowerInvariant()))
                             break;
 
-                        storyboard.GetLayer("Video").Add(new StoryboardVideo(path, offset));
+                        storyboard.GetLayer("Video").Add(storyboardSprite = new StoryboardVideo(path, offset));
                         break;
                     }
 

@@ -14,7 +14,7 @@ namespace osu.Game.Online.Notifications.WebSocket.Events
         public uint AchievementId { get; set; }
 
         [JsonProperty("achievement_mode")]
-        public ushort? AchievementMode { get; set; }
+        public string? AchievementMode { get; set; }
 
         [JsonProperty("cover_url")]
         public string CoverUrl { get; set; } = string.Empty;

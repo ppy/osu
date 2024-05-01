@@ -13,30 +13,25 @@ namespace osu.Game.Tests.Visual.Menus
 {
     public partial class TestSceneMainMenu : OsuGameTestScene
     {
-        private SystemTitle systemTitle => Game.ChildrenOfType<SystemTitle>().Single();
+        private OnlineMenuBanner onlineMenuBanner => Game.ChildrenOfType<OnlineMenuBanner>().Single();
 
         [Test]
-        public void TestSystemTitle()
+        public void TestOnlineMenuBanner()
         {
-            AddStep("set system title", () => systemTitle.Current.Value = new APISystemTitle
+            AddStep("set online content", () => onlineMenuBanner.Current.Value = new APIMenuContent
             {
-                Image = @"https://assets.ppy.sh/main-menu/project-loved-2@2x.png",
-                Url = @"https://osu.ppy.sh/home/news/2023-12-21-project-loved-december-2023",
+                Images = new[]
+                {
+                    new APIMenuImage
+                    {
+                        Image = @"https://assets.ppy.sh/main-menu/project-loved-2@2x.png",
+                        Url = @"https://osu.ppy.sh/home/news/2023-12-21-project-loved-december-2023",
+                    }
+                }
             });
-            AddAssert("system title not visible", () => systemTitle.State.Value, () => Is.EqualTo(Visibility.Hidden));
+            AddAssert("system title not visible", () => onlineMenuBanner.State.Value, () => Is.EqualTo(Visibility.Hidden));
             AddStep("enter menu", () => InputManager.Key(Key.Enter));
-            AddUntilStep("system title visible", () => systemTitle.State.Value, () => Is.EqualTo(Visibility.Visible));
-            AddStep("set another title", () => systemTitle.Current.Value = new APISystemTitle
-            {
-                Image = @"https://assets.ppy.sh/main-menu/wf2023-vote@2x.png",
-                Url = @"https://osu.ppy.sh/community/contests/189",
-            });
-            AddStep("set title with nonexistent image", () => systemTitle.Current.Value = new APISystemTitle
-            {
-                Image = @"https://test.invalid/@2x", // .invalid TLD reserved by https://datatracker.ietf.org/doc/html/rfc2606#section-2
-                Url = @"https://osu.ppy.sh/community/contests/189",
-            });
-            AddStep("unset system title", () => systemTitle.Current.Value = null);
+            AddUntilStep("system title visible", () => onlineMenuBanner.State.Value, () => Is.EqualTo(Visibility.Visible));
         }
     }
 }
