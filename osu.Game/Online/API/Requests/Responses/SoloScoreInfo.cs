@@ -27,9 +27,6 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty("build_id")]
         public int? BuildID { get; set; }
 
-        [JsonProperty("passed")]
-        public bool Passed { get; set; }
-
         [JsonProperty("total_score")]
         public long TotalScore { get; set; }
 
@@ -204,7 +201,6 @@ namespace osu.Game.Online.API.Requests.Responses
                 User = User ?? new APIUser { Id = UserID },
                 BeatmapInfo = new BeatmapInfo { OnlineID = BeatmapID },
                 Ruleset = new RulesetInfo { OnlineID = RulesetID },
-                Passed = Passed,
                 TotalScore = TotalScore,
                 LegacyTotalScore = LegacyTotalScore,
                 Accuracy = Accuracy,
@@ -243,7 +239,6 @@ namespace osu.Game.Online.API.Requests.Responses
             PP = score.PP,
             MaxCombo = score.MaxCombo,
             RulesetID = score.RulesetID,
-            Passed = score.Passed,
             Mods = score.APIMods,
             Statistics = score.Statistics.Where(kvp => kvp.Value != 0).ToDictionary(),
             MaximumStatistics = score.MaximumStatistics.Where(kvp => kvp.Value != 0).ToDictionary(),

@@ -292,7 +292,6 @@ namespace osu.Game.Tests.Visual.Playlists
             {
                 ID = highestScoreId,
                 Accuracy = userScore.Accuracy,
-                Passed = userScore.Passed,
                 Rank = userScore.Rank,
                 Position = real_user_position,
                 MaxCombo = userScore.MaxCombo,
@@ -312,7 +311,6 @@ namespace osu.Game.Tests.Visual.Playlists
                 {
                     ID = getNextLowestScoreId(),
                     Accuracy = userScore.Accuracy,
-                    Passed = true,
                     Rank = userScore.Rank,
                     MaxCombo = userScore.MaxCombo,
                     User = new APIUser
@@ -327,7 +325,6 @@ namespace osu.Game.Tests.Visual.Playlists
                 {
                     ID = getNextHighestScoreId(),
                     Accuracy = userScore.Accuracy,
-                    Passed = true,
                     Rank = userScore.Rank,
                     MaxCombo = userScore.MaxCombo,
                     User = new APIUser
@@ -361,7 +358,6 @@ namespace osu.Game.Tests.Visual.Playlists
                 {
                     ID = sort == "score_asc" ? getNextHighestScoreId() : getNextLowestScoreId(),
                     Accuracy = 1,
-                    Passed = true,
                     Rank = ScoreRank.X,
                     MaxCombo = 1000,
                     User = new APIUser

@@ -694,12 +694,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddUntilStep("wait for results", () => multiplayerComponents.CurrentScreen is ResultsScreen);
 
-            AddAssert("check is fail", () =>
-            {
-                var scoreInfo = ((ResultsScreen)multiplayerComponents.CurrentScreen).Score;
-
-                return scoreInfo?.Passed == false && scoreInfo.Rank == ScoreRank.F;
-            });
+            AddAssert("check is fail", () => ((ResultsScreen)multiplayerComponents.CurrentScreen).Score?.Rank == ScoreRank.F);
         }
 
         [Test]

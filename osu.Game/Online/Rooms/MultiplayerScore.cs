@@ -46,9 +46,6 @@ namespace osu.Game.Online.Rooms
         [JsonProperty("statistics")]
         public Dictionary<HitResult, int> Statistics = new Dictionary<HitResult, int>();
 
-        [JsonProperty("passed")]
-        public bool Passed { get; set; }
-
         [JsonProperty("ended_at")]
         public DateTimeOffset EndedAt { get; set; }
 

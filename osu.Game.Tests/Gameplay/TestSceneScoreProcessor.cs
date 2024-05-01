@@ -138,7 +138,6 @@ namespace osu.Game.Tests.Gameplay
             scoreProcessor.FailScore(score);
 
             Assert.That(score.Rank, Is.EqualTo(ScoreRank.F));
-            Assert.That(score.Passed, Is.False);
             Assert.That(score.Statistics.Sum(kvp => kvp.Value), Is.EqualTo(4));
             Assert.That(score.MaximumStatistics.Sum(kvp => kvp.Value), Is.EqualTo(8));
 
