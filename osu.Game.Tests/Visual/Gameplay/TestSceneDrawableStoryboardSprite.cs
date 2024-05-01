@@ -85,8 +85,8 @@ namespace osu.Game.Tests.Visual.Gameplay
 
                 if (scaleTransformProvided)
                 {
-                    sprite.TimelineGroup.Scale.Add(Easing.None, Time.Current, Time.Current + 1000, 1, 2);
-                    sprite.TimelineGroup.Scale.Add(Easing.None, Time.Current + 1000, Time.Current + 2000, 2, 1);
+                    sprite.Commands.AddScale(Easing.None, Time.Current, Time.Current + 1000, 1, 2);
+                    sprite.Commands.AddScale(Easing.None, Time.Current + 1000, Time.Current + 2000, 2, 1);
                 }
 
                 layer.Elements.Clear();
