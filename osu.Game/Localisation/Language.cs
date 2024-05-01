@@ -4,6 +4,8 @@
 using System.ComponentModel;
 using JetBrains.Annotations;
 
+// ReSharper disable InconsistentNaming
+
 namespace osu.Game.Localisation
 {
     [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]

@@ -6,6 +6,8 @@ using JetBrains.Annotations;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
+// ReSharper disable InconsistentNaming
+
 namespace osu.Game.Users
 {
     /// <summary>
