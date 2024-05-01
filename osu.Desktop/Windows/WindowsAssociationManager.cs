@@ -163,6 +163,8 @@ namespace osu.Desktop.Windows
         [DllImport("Shell32.dll")]
         private static extern void SHChangeNotify(EventId wEventId, Flags uFlags, IntPtr dwItem1, IntPtr dwItem2);
 
+        // ReSharper disable InconsistentNaming
+
         private enum EventId
         {
             /// <summary>
@@ -174,8 +176,11 @@ namespace osu.Desktop.Windows
 
         private enum Flags : uint
         {
+            // ReSharper disable once InconsistentNaming
             SHCNF_IDLIST = 0x0000
         }
+
+        // ReSharper restore InconsistentNaming
 
         #endregion
 
