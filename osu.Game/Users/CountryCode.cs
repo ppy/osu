@@ -2,11 +2,10 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
-
-// ReSharper disable InconsistentNaming
 
 namespace osu.Game.Users
 {
@@ -14,6 +13,7 @@ namespace osu.Game.Users
     /// Matches `osu_countries` database table.
     /// </summary>
     [JsonConverter(typeof(StringEnumConverter))]
+    [SuppressMessage("ReSharper", "InconsistentNaming")]
     [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
     public enum CountryCode
     {
