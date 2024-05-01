@@ -415,53 +415,54 @@ namespace osu.Game.Beatmaps.Formats
         {
             string[] split = line.Split(',');
 
-            if (!Enum.TryParse(split[0], out LegacyEventType type))
-                throw new InvalidDataException($@"Unknown event type: {split[0]}");
 
             // Until we have full storyboard encoder coverage, let's track any lines which aren't handled
             // and store them to a temporary location such that they aren't lost on editor save / export.
             bool lineSupportedByEncoder = false;
 
-            switch (type)
+            if (Enum.TryParse(split[0], out LegacyEventType type))
             {
-                case LegacyEventType.Sprite:
-                    // Generally, the background is the first thing defined in a beatmap file.
-                    // In some older beatmaps, it is not present and replaced by a storyboard-level background instead.
-                    // Allow the first sprite (by file order) to act as the background in such cases.
-                    if (string.IsNullOrEmpty(beatmap.BeatmapInfo.Metadata.BackgroundFile))
-                    {
-                        beatmap.BeatmapInfo.Metadata.BackgroundFile = CleanFilename(split[3]);
+                switch (type)
+                {
+                    case LegacyEventType.Sprite:
+                        // Generally, the background is the first thing defined in a beatmap file.
+                        // In some older beatmaps, it is not present and replaced by a storyboard-level background instead.
+                        // Allow the first sprite (by file order) to act as the background in such cases.
+                        if (string.IsNullOrEmpty(beatmap.BeatmapInfo.Metadata.BackgroundFile))
+                        {
+                            beatmap.BeatmapInfo.Metadata.BackgroundFile = CleanFilename(split[3]);
+                            lineSupportedByEncoder = true;
+                        }
+
+                        break;
+
+                    case LegacyEventType.Video:
+                        string filename = CleanFilename(split[2]);
+
+                        // Some very old beatmaps had incorrect type specifications for their backgrounds (ie. using 1 for VIDEO
+                        // instead of 0 for BACKGROUND). To handle this gracefully, check the file extension against known supported
+                        // video extensions and handle similar to a background if it doesn't match.
+                        if (!OsuGameBase.VIDEO_EXTENSIONS.Contains(Path.GetExtension(filename).ToLowerInvariant()))
+                        {
+                            beatmap.BeatmapInfo.Metadata.BackgroundFile = filename;
+                            lineSupportedByEncoder = true;
+                        }
+
+                        break;
+
+                    case LegacyEventType.Background:
+                        beatmap.BeatmapInfo.Metadata.BackgroundFile = CleanFilename(split[2]);
                         lineSupportedByEncoder = true;
-                    }
+                        break;
 
-                    break;
+                    case LegacyEventType.Break:
+                        double start = getOffsetTime(Parsing.ParseDouble(split[1]));
+                        double end = Math.Max(start, getOffsetTime(Parsing.ParseDouble(split[2])));
 
-                case LegacyEventType.Video:
-                    string filename = CleanFilename(split[2]);
-
-                    // Some very old beatmaps had incorrect type specifications for their backgrounds (ie. using 1 for VIDEO
-                    // instead of 0 for BACKGROUND). To handle this gracefully, check the file extension against known supported
-                    // video extensions and handle similar to a background if it doesn't match.
-                    if (!OsuGameBase.VIDEO_EXTENSIONS.Contains(Path.GetExtension(filename).ToLowerInvariant()))
-                    {
-                        beatmap.BeatmapInfo.Metadata.BackgroundFile = filename;
+                        beatmap.Breaks.Add(new BreakPeriod(start, end));
                         lineSupportedByEncoder = true;
-                    }
-
-                    break;
-
-                case LegacyEventType.Background:
-                    beatmap.BeatmapInfo.Metadata.BackgroundFile = CleanFilename(split[2]);
-                    lineSupportedByEncoder = true;
-                    break;
-
-                case LegacyEventType.Break:
-                    double start = getOffsetTime(Parsing.ParseDouble(split[1]));
-                    double end = Math.Max(start, getOffsetTime(Parsing.ParseDouble(split[2])));
-
-                    beatmap.Breaks.Add(new BreakPeriod(start, end));
-                    lineSupportedByEncoder = true;
-                    break;
+                        break;
+                }
             }
 
             if (!lineSupportedByEncoder)
