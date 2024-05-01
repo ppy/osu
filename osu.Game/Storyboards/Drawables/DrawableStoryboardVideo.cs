@@ -25,7 +25,7 @@ namespace osu.Game.Storyboards.Drawables
             // This allows scaling based on the video's absolute size.
             //
             // If not specified we take up the full available space.
-            bool useRelative = !video.TimelineGroup.Scale.HasCommands;
+            bool useRelative = !video.Commands.Scale.Any();
 
             RelativeSizeAxes = useRelative ? Axes.Both : Axes.None;
             AutoSizeAxes = useRelative ? Axes.None : Axes.Both;
