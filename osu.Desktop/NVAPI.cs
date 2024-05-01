@@ -489,6 +489,7 @@ namespace osu.Desktop
         public static uint Stride => (uint)Marshal.SizeOf(typeof(NvApplication)) | (2 << 16);
     }
 
+    // ReSharper disable InconsistentNaming
     internal enum NvStatus
     {
         OK = 0, // Success. Request is completed.
@@ -738,4 +739,6 @@ namespace osu.Desktop
         OGL_THREAD_CONTROL_NUM_VALUES = 2,
         OGL_THREAD_CONTROL_DEFAULT = 0
     }
+
+    // ReSharper restore InconsistentNaming
 }
