@@ -151,6 +151,42 @@ namespace osu.Game.Screens.Select
                                 }
                             },
                         }
+                    },
+                    new InfoWedgeBackground
+                    {
+                        Padding = new MarginPadding
+                        {
+                            Top = 10,
+                            Left = -SongSelect.WEDGE_CORNER_RADIUS,
+                            Right = shear_width + colour_bar_width
+                        },
+                        Child = new BasicBeatmapInfoContent
+                        {
+                            Padding = new MarginPadding
+                            {
+                                Left = text_margin,
+                                Right = 20,
+                                Vertical = 10
+                            }
+                        },
+                    },
+                    new InfoWedgeBackground
+                    {
+                        Padding = new MarginPadding
+                        {
+                            Top = 10,
+                            Left = -SongSelect.WEDGE_CORNER_RADIUS,
+                            Right = shear_width + colour_bar_width
+                        },
+                        Child = new ExtendedBeatmapInfoContent
+                        {
+                            Padding = new MarginPadding
+                            {
+                                Left = text_margin - BarStatisticRow.HORIZONTAL_PADDING,
+                                Right = 20 - BarStatisticRow.HORIZONTAL_PADDING,
+                                Vertical = 10
+                            },
+                        },
                     }
                 }
             };
