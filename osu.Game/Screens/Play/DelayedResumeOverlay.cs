@@ -170,6 +170,8 @@ namespace osu.Game.Screens.Play
             countdownProgress.Progress = amountTimePassed;
             countdownProgress.InnerRadius = progress_stroke_width / progress_size / countdownProgress.Scale.X;
 
+            Alpha = 0.2f + 0.8f * newCount / 3f;
+
             if (countdownCount != newCount)
             {
                 if (newCount > 0)
