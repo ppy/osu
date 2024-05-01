@@ -52,6 +52,7 @@ namespace osu.Game.Overlays.SkinEditor
         private OsuTextFlowContainer headerText = null!;
 
         private Bindable<Skin> currentSkin = null!;
+        private Bindable<string> clipboardContent = null!;
 
         [Resolved]
         private OsuGame? game { get; set; }
@@ -64,9 +65,6 @@ namespace osu.Game.Overlays.SkinEditor
 
         [Resolved]
         private RealmAccess realm { get; set; } = null!;
-
-        [Resolved]
-        private EditorClipboard clipboard { get; set; } = null!;
 
         [Resolved]
         private SkinEditorOverlay? skinEditorOverlay { get; set; }
@@ -113,7 +111,7 @@ namespace osu.Game.Overlays.SkinEditor
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(EditorClipboard clipboard)
         {
             RelativeSizeAxes = Axes.Both;
 
@@ -224,6 +222,8 @@ namespace osu.Game.Overlays.SkinEditor
                     }
                 }
             };
+
+            clipboardContent = clipboard.Content.GetBoundCopy();
         }
 
         protected override void LoadComplete()
@@ -243,7 +243,7 @@ namespace osu.Game.Overlays.SkinEditor
                 canCopy.Value = canCut.Value = SelectedComponents.Any();
             }, true);
 
-            clipboard.Content.BindValueChanged(content => canPaste.Value = !string.IsNullOrEmpty(content.NewValue), true);
+            clipboardContent.BindValueChanged(content => canPaste.Value = !string.IsNullOrEmpty(content.NewValue), true);
 
             Show();
 
@@ -255,8 +255,11 @@ namespace osu.Game.Overlays.SkinEditor
             // schedule ensures this only happens when the skin editor is visible.
             // also avoid some weird endless recursion / bindable feedback loop (something to do with tracking skins across three different bindable types).
             // probably something which will be factored out in a future database refactor so not too concerning for now.
-            currentSkin.BindValueChanged(_ =>
+            currentSkin.BindValueChanged(val =>
             {
+                if (val.OldValue != null && hasBegunMutating)
+                    save(val.OldValue);
+
                 hasBegunMutating = false;
                 Scheduler.AddOnce(skinChanged);
             }, true);
@@ -454,6 +457,7 @@ namespace osu.Game.Overlays.SkinEditor
             }
 
             SelectedComponents.Add(component);
+            SkinSelectionHandler.ApplyClosestAnchor(drawableComponent);
             return true;
         }
 
@@ -495,7 +499,7 @@ namespace osu.Game.Overlays.SkinEditor
 
         protected void Copy()
         {
-            clipboard.Content.Value = JsonConvert.SerializeObject(SelectedComponents.Cast<Drawable>().Select(s => s.CreateSerialisedInfo()).ToArray());
+            clipboardContent.Value = JsonConvert.SerializeObject(SelectedComponents.Cast<Drawable>().Select(s => s.CreateSerialisedInfo()).ToArray());
         }
 
         protected void Clone()
@@ -515,7 +519,7 @@ namespace osu.Game.Overlays.SkinEditor
 
             changeHandler?.BeginChange();
 
-            var drawableInfo = JsonConvert.DeserializeObject<SerialisedDrawableInfo[]>(clipboard.Content.Value);
+            var drawableInfo = JsonConvert.DeserializeObject<SerialisedDrawableInfo[]>(clipboardContent.Value);
 
             if (drawableInfo == null)
                 return;
@@ -536,7 +540,9 @@ namespace osu.Game.Overlays.SkinEditor
 
         protected void Redo() => changeHandler?.RestoreState(1);
 
-        public void Save(bool userTriggered = true)
+        public void Save(bool userTriggered = true) => save(currentSkin.Value);
+
+        private void save(Skin skin, bool userTriggered = true)
         {
             if (!hasBegunMutating)
                 return;
@@ -550,11 +556,11 @@ namespace osu.Game.Overlays.SkinEditor
                 return;
 
             foreach (var t in targetContainers)
-                currentSkin.Value.UpdateDrawableTarget(t);
+                skin.UpdateDrawableTarget(t);
 
             // In the case the save was user triggered, always show the save message to make them feel confident.
-            if (skins.Save(skins.CurrentSkin.Value) || userTriggered)
-                onScreenDisplay?.Display(new SkinEditorToast(ToastStrings.SkinSaved, currentSkin.Value.SkinInfo.ToString() ?? "Unknown"));
+            if (skins.Save(skin) || userTriggered)
+                onScreenDisplay?.Display(new SkinEditorToast(ToastStrings.SkinSaved, skin.SkinInfo.ToString() ?? "Unknown"));
         }
 
         protected override bool OnHover(HoverEvent e) => true;
@@ -666,8 +672,6 @@ namespace osu.Game.Overlays.SkinEditor
 
                 SelectedComponents.Clear();
                 placeComponent(sprite, false);
-
-                SkinSelectionHandler.ApplyClosestAnchor(sprite);
             });
 
             return Task.CompletedTask;

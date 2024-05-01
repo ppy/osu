@@ -108,6 +108,9 @@ namespace osu.Game.Rulesets.Scoring
                     increaseHp(h);
                 }
 
+                if (topLevelObjectCount == 0)
+                    return testDrop;
+
                 if (!fail && currentHp < lowestHpEnd)
                 {
                     fail = true;
@@ -124,6 +127,13 @@ namespace osu.Game.Rulesets.Scoring
                     testDrop *= 0.96;
                     HpMultiplierNormal *= 1.01;
                     OnIterationFail?.Invoke($"FAILED drop {testDrop}: recovery too low ({recovery} < {hpRecoveryAvailable})");
+                }
+
+                if (!fail && double.IsInfinity(HpMultiplierNormal))
+                {
+                    OnIterationSuccess?.Invoke("Drain computation algorithm diverged to infinity. PASSING with zero drop, resetting HP multiplier to 1.");
+                    HpMultiplierNormal = 1;
+                    return 0;
                 }
 
                 if (!fail)

@@ -1,7 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
+using System.Numerics;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -10,7 +10,7 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Localisation;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
-using osuTK;
+using Vector2 = osuTK.Vector2;
 
 namespace osu.Game.Graphics.UserInterface
 {
@@ -18,7 +18,7 @@ namespace osu.Game.Graphics.UserInterface
     /// An <see cref="IExpandable"/> implementation for the UI slider bar control.
     /// </summary>
     public partial class ExpandableSlider<T, TSlider> : CompositeDrawable, IExpandable, IHasCurrentValue<T>
-        where T : struct, IEquatable<T>, IComparable<T>, IConvertible
+        where T : struct, INumber<T>, IMinMaxValue<T>
         where TSlider : RoundedSliderBar<T>, new()
     {
         private readonly OsuSpriteText label;
@@ -129,7 +129,7 @@ namespace osu.Game.Graphics.UserInterface
     /// An <see cref="IExpandable"/> implementation for the UI slider bar control.
     /// </summary>
     public partial class ExpandableSlider<T> : ExpandableSlider<T, RoundedSliderBar<T>>
-        where T : struct, IEquatable<T>, IComparable<T>, IConvertible
+        where T : struct, INumber<T>, IMinMaxValue<T>
     {
     }
 }

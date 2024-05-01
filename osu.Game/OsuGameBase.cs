@@ -94,7 +94,7 @@ namespace osu.Game
         public const int SAMPLE_DEBOUNCE_TIME = 20;
 
         /// <summary>
-        /// The maximum volume at which audio tracks should playback. This can be set lower than 1 to create some head-room for sound effects.
+        /// The maximum volume at which audio tracks should play back at. This can be set lower than 1 to create some head-room for sound effects.
         /// </summary>
         private const double global_track_volume_adjust = 0.8;
 
@@ -678,16 +678,21 @@ namespace osu.Game
         /// <summary>
         /// Allows a maximum of one unhandled exception, per second of execution.
         /// </summary>
-        private bool onExceptionThrown(Exception _)
+        /// <returns>Whether to ignore the exception and continue running.</returns>
+        private bool onExceptionThrown(Exception ex)
         {
-            bool continueExecution = Interlocked.Decrement(ref allowableExceptions) >= 0;
+            if (Interlocked.Decrement(ref allowableExceptions) < 0)
+            {
+                Logger.Log("Too many unhandled exceptions, crashing out.");
+                RulesetStore.TryDisableCustomRulesetsCausing(ex);
+                return false;
+            }
 
-            Logger.Log($"Unhandled exception has been {(continueExecution ? $"allowed with {allowableExceptions} more allowable exceptions" : "denied")} .");
-
+            Logger.Log($"Unhandled exception has been allowed with {allowableExceptions} more allowable exceptions.");
             // restore the stock of allowable exceptions after a short delay.
             Task.Delay(1000).ContinueWith(_ => Interlocked.Increment(ref allowableExceptions));
 
-            return continueExecution;
+            return true;
         }
 
         protected override void Dispose(bool isDisposing)

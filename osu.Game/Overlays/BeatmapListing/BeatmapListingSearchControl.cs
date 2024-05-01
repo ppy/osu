@@ -128,6 +128,7 @@ namespace osu.Game.Overlays.BeatmapListing
                                 RelativeSizeAxes = Axes.X,
                                 Direction = FillDirection.Vertical,
                                 Padding = new MarginPadding { Horizontal = 10 },
+                                Spacing = new Vector2(5),
                                 Children = new Drawable[]
                                 {
                                     generalFilter = new BeatmapSearchGeneralFilterRow(),
