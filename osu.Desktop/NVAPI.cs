@@ -489,7 +489,7 @@ namespace osu.Desktop
         public static uint Stride => (uint)Marshal.SizeOf(typeof(NvApplication)) | (2 << 16);
     }
 
-    // ReSharper disable InconsistentNaming
+    [SuppressMessage("ReSharper", "InconsistentNaming")]
     internal enum NvStatus
     {
         OK = 0, // Success. Request is completed.
@@ -612,6 +612,7 @@ namespace osu.Desktop
         FIRMWARE_REVISION_NOT_SUPPORTED = -200, // The device's firmware is not supported.
     }
 
+    [SuppressMessage("ReSharper", "InconsistentNaming")]
     internal enum NvSystemType
     {
         UNKNOWN = 0,
@@ -619,6 +620,7 @@ namespace osu.Desktop
         DESKTOP = 2
     }
 
+    [SuppressMessage("ReSharper", "InconsistentNaming")]
     internal enum NvGpuType
     {
         UNKNOWN = 0,
@@ -626,6 +628,7 @@ namespace osu.Desktop
         DGPU = 2, // Discrete
     }
 
+    [SuppressMessage("ReSharper", "InconsistentNaming")]
     internal enum NvSettingID : uint
     {
         OGL_AA_LINE_GAMMA_ID = 0x2089BF6C,
@@ -718,6 +721,7 @@ namespace osu.Desktop
         INVALID_SETTING_ID = 0xFFFFFFFF
     }
 
+    [SuppressMessage("ReSharper", "InconsistentNaming")]
     internal enum NvShimSetting : uint
     {
         SHIM_RENDERING_MODE_INTEGRATED = 0x00000000,
@@ -732,6 +736,7 @@ namespace osu.Desktop
         SHIM_RENDERING_MODE_DEFAULT = SHIM_RENDERING_MODE_AUTO_SELECT
     }
 
+    [SuppressMessage("ReSharper", "InconsistentNaming")]
     internal enum NvThreadControlSetting : uint
     {
         OGL_THREAD_CONTROL_ENABLE = 0x00000001,
@@ -739,6 +744,4 @@ namespace osu.Desktop
         OGL_THREAD_CONTROL_NUM_VALUES = 2,
         OGL_THREAD_CONTROL_DEFAULT = 0
     }
-
-    // ReSharper restore InconsistentNaming
 }
