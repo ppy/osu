@@ -529,7 +529,7 @@ namespace osu.Game.Rulesets.UI
         public ResumeOverlay ResumeOverlay { get; protected set; }
 
         /// <summary>
-        /// Whether the <see cref="ResumeOverlay"/> should be used to return the user's cursor position to its previous location after a pause.
+        /// Whether a <see cref="ResumeOverlay"/> should be displayed on resuming after a pause.
         /// </summary>
         /// <remarks>
         /// Defaults to <c>true</c>.

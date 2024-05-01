@@ -24,8 +24,9 @@ namespace osu.Game.Screens.Play
     /// </summary>
     public partial class DelayedResumeOverlay : ResumeOverlay
     {
-        // todo: this shouldn't define its own colour provider, but nothing in Player screen does, so let's do that for now.
-        private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
+        // todo: this shouldn't define its own colour provider, but nothing in DrawableRuleset guarantees this, so let's do it locally for now.
+        // (of note, Player does cache one but any test which uses a DrawableRuleset without Player will fail without this).
+        private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Purple);
 
         private const float outer_size = 200;
         private const float inner_size = 150;
