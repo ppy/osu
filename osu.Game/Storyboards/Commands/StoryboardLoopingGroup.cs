@@ -23,7 +23,7 @@ namespace osu.Game.Storyboards.Commands
         /// <param name="repeatCount">The number of times the loop should repeat. Should be greater than zero. Zero means a single playback.</param>
         public StoryboardLoopingGroup(double startTime, int repeatCount)
         {
-            if (repeatCount < 0) throw new ArgumentException("Repeat count must be zero or above.", nameof(repeatCount));
+            ArgumentOutOfRangeException.ThrowIfNegative(repeatCount);
 
             loopStartTime = startTime;
             TotalIterations = repeatCount + 1;
