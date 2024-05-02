@@ -16,7 +16,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         protected readonly OverlayColourProvider ColourProvider = new OverlayColourProvider(OverlayColourScheme.Aquamarine);
 
         /// <summary>
-        /// The local/online beatmap.
+        /// The beatmap. Can be local/online depending on the context.
         /// </summary>
         /// <remarks>
         /// This is the same as <see cref="apiBeatmap"/> if online.
@@ -25,7 +25,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         protected readonly Bindable<IBeatmapInfo?> BeatmapInfo = new Bindable<IBeatmapInfo?>();
 
         /// <summary>
-        /// The local/online beatmap set.
+        /// The beatmap set. Can be local/online depending on the context.
         /// </summary>
         [Cached(typeof(IBindable<IBeatmapSetInfo?>))]
         private readonly Bindable<IBeatmapSetInfo?> beatmapSetInfo = new Bindable<IBeatmapSetInfo?>();
