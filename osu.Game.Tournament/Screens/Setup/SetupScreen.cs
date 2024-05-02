@@ -140,6 +140,12 @@ namespace osu.Game.Tournament.Screens.Setup
                     Description = "Screens will progress automatically from gameplay -> results -> map pool",
                     Current = LadderInfo.AutoProgressScreens,
                 },
+                new LabelledSwitchButton
+                {
+                    Label = "Display team seeds",
+                    Description = "Team seeds will display alongside each team at the top in gameplay/map pool screens.",
+                    Current = LadderInfo.DisplayTeamSeeds,
+                },
             };
         }
 

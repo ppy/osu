@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using osu.Game.Users;
 
 namespace osu.Game.Tournament
@@ -519,9 +518,6 @@ namespace osu.Game.Tournament
                 case CountryCode.KE:
                     return "KEN";
 
-                case CountryCode.SS:
-                    return "SSD";
-
                 case CountryCode.SR:
                     return "SUR";
 
@@ -763,7 +759,7 @@ namespace osu.Game.Tournament
                     return "MOZ";
 
                 default:
-                    throw new ArgumentOutOfRangeException(nameof(country));
+                    return country.ToString();
             }
         }
     }

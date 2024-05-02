@@ -6,6 +6,7 @@
 using System;
 using System.Diagnostics;
 using System.Net.Http;
+using System.Net.Sockets;
 using Newtonsoft.Json;
 using osu.Framework.Bindables;
 
@@ -99,6 +100,11 @@ namespace osu.Game.Online.API
                     return true;
                 }
             }
+            catch (SocketException)
+            {
+                // Network failure.
+                return false;
+            }
             catch (HttpRequestException)
             {
                 // Network failure.
@@ -106,7 +112,7 @@ namespace osu.Game.Online.API
             }
             catch
             {
-                // Force a full re-reauthentication.
+                // Force a full re-authentication.
                 Token.Value = null;
                 return false;
             }
@@ -122,19 +128,12 @@ namespace osu.Game.Online.API
             // if we already have a valid access token, let's use it.
             if (accessTokenValid) return true;
 
-            // we want to ensure only a single authentication update is happening at once.
-            lock (access_token_retrieval_lock)
-            {
-                // re-check if valid, in case another request completed and revalidated our access.
-                if (accessTokenValid) return true;
+            // if not, let's try using our refresh token to request a new access token.
+            if (!string.IsNullOrEmpty(Token.Value?.RefreshToken))
+                // ReSharper disable once PossibleNullReferenceException
+                AuthenticateWithRefresh(Token.Value.RefreshToken);
 
-                // if not, let's try using our refresh token to request a new access token.
-                if (!string.IsNullOrEmpty(Token.Value?.RefreshToken))
-                    // ReSharper disable once PossibleNullReferenceException
-                    AuthenticateWithRefresh(Token.Value.RefreshToken);
-
-                return accessTokenValid;
-            }
+            return accessTokenValid;
         }
 
         private bool accessTokenValid => Token.Value?.IsValid ?? false;
@@ -143,14 +142,18 @@ namespace osu.Game.Online.API
 
         internal string RequestAccessToken()
         {
-            if (!ensureAccessToken()) return null;
+            lock (access_token_retrieval_lock)
+            {
+                if (!ensureAccessToken()) return null;
 
-            return Token.Value.AccessToken;
+                return Token.Value.AccessToken;
+            }
         }
 
         internal void Clear()
         {
-            Token.Value = null;
+            lock (access_token_retrieval_lock)
+                Token.Value = null;
         }
 
         private class AccessTokenRequestRefresh : AccessTokenRequest

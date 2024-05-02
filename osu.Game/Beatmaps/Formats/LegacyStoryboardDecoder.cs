@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using osu.Framework.Graphics;
-using osu.Framework.Utils;
 using osu.Game.Beatmaps.Legacy;
 using osu.Game.IO;
 using osu.Game.Storyboards;
@@ -115,7 +114,7 @@ namespace osu.Game.Beatmaps.Formats
                         if (!OsuGameBase.VIDEO_EXTENSIONS.Contains(Path.GetExtension(path).ToLowerInvariant()))
                             break;
 
-                        storyboard.GetLayer("Video").Add(new StoryboardVideo(path, offset));
+                        storyboard.GetLayer("Video").Add(storyboardSprite = new StoryboardVideo(path, offset));
                         break;
                     }
 
@@ -230,7 +229,7 @@ namespace osu.Game.Beatmaps.Formats
                             {
                                 float startValue = Parsing.ParseFloat(split[4]);
                                 float endValue = split.Length > 5 ? Parsing.ParseFloat(split[5]) : startValue;
-                                timelineGroup?.Rotation.Add(easing, startTime, endTime, MathUtils.RadiansToDegrees(startValue), MathUtils.RadiansToDegrees(endValue));
+                                timelineGroup?.Rotation.Add(easing, startTime, endTime, float.RadiansToDegrees(startValue), float.RadiansToDegrees(endValue));
                                 break;
                             }
 

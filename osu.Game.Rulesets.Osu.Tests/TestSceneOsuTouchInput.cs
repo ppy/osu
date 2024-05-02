@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Diagnostics;
-using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -133,8 +132,11 @@ namespace osu.Game.Rulesets.Osu.Tests
         }
 
         [Test]
-        public void TestSimpleInput()
+        public void TestSimpleInput([Values] bool disableMouseButtons)
         {
+            // OsuSetting.MouseDisableButtons should not affect touch taps
+            AddStep($"{(disableMouseButtons ? "disable" : "enable")} mouse buttons", () => config.SetValue(OsuSetting.MouseDisableButtons, disableMouseButtons));
+
             beginTouch(TouchSource.Touch1);
 
             assertKeyCounter(1, 0);
@@ -468,7 +470,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         [Test]
         public void TestInputWhileMouseButtonsDisabled()
         {
-            AddStep("Disable mouse buttons", () => config.SetValue(OsuSetting.MouseDisableButtons, true));
+            AddStep("Disable gameplay taps", () => config.SetValue(OsuSetting.TouchDisableGameplayTaps, true));
 
             beginTouch(TouchSource.Touch1);
 
@@ -620,6 +622,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             AddStep("Release all touches", () =>
             {
                 config.SetValue(OsuSetting.MouseDisableButtons, false);
+                config.SetValue(OsuSetting.TouchDisableGameplayTaps, false);
                 foreach (TouchSource source in InputManager.CurrentState.Touch.ActiveSources)
                     InputManager.EndTouch(new Touch(source, osuInputManager.ScreenSpaceDrawQuad.Centre));
             });

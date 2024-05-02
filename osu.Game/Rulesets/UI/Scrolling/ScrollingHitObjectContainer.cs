@@ -184,9 +184,12 @@ namespace osu.Game.Rulesets.UI.Scrolling
 
             // We need to calculate hit object positions (including nested hit objects) as soon as possible after lifetimes
             // to prevent hit objects displayed in a wrong position for one frame.
-            // Only AliveObjects need to be considered for layout (reduces overhead in the case of scroll speed changes).
-            foreach (var obj in AliveObjects)
+            // Only AliveEntries need to be considered for layout (reduces overhead in the case of scroll speed changes).
+            // We are not using AliveObjects directly to avoid selection/sorting overhead since we don't care about the order at which positions will be updated.
+            foreach (var entry in AliveEntries)
             {
+                var obj = entry.Value;
+
                 updatePosition(obj, Time.Current);
 
                 if (layoutComputed.Contains(obj))

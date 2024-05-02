@@ -7,6 +7,7 @@ using System.IO;
 using System.Reflection;
 using System.Runtime.Versioning;
 using Microsoft.Win32;
+using osu.Desktop.Performance;
 using osu.Desktop.Security;
 using osu.Framework.Platform;
 using osu.Game;
@@ -15,11 +16,13 @@ using osu.Framework;
 using osu.Framework.Logging;
 using osu.Game.Updater;
 using osu.Desktop.Windows;
+using osu.Framework.Allocation;
 using osu.Game.IO;
 using osu.Game.IPC;
 using osu.Game.Online.Multiplayer;
+using osu.Game.Performance;
 using osu.Game.Utils;
-using SDL2;
+using SDL;
 
 namespace osu.Desktop
 {
@@ -27,6 +30,9 @@ namespace osu.Desktop
     {
         private OsuSchemeLinkIPCChannel? osuSchemeLinkIPCChannel;
         private ArchiveImportIPCChannel? archiveImportIPCChannel;
+
+        [Cached(typeof(IHighPerformanceSessionManager))]
+        private readonly HighPerformanceSessionManager highPerformanceSessionManager = new HighPerformanceSessionManager();
 
         public OsuGameDesktop(string[]? args = null)
             : base(args)
@@ -86,8 +92,8 @@ namespace osu.Desktop
         [SupportedOSPlatform("windows")]
         private string? getStableInstallPathFromRegistry()
         {
-            using (RegistryKey? key = Registry.ClassesRoot.OpenSubKey("osu"))
-                return key?.OpenSubKey(@"shell\open\command")?.GetValue(string.Empty)?.ToString()?.Split('"')[1].Replace("osu!.exe", "");
+            using (RegistryKey? key = Registry.ClassesRoot.OpenSubKey("osu!"))
+                return key?.OpenSubKey(WindowsAssociationManager.SHELL_OPEN_COMMAND)?.GetValue(string.Empty)?.ToString()?.Split('"')[1].Replace("osu!.exe", "");
         }
 
         protected override UpdateManager CreateUpdateManager()
@@ -155,7 +161,7 @@ namespace osu.Desktop
             host.Window.Title = Name;
         }
 
-        protected override BatteryInfo CreateBatteryInfo() => new SDL2BatteryInfo();
+        protected override BatteryInfo CreateBatteryInfo() => new SDL3BatteryInfo();
 
         protected override void Dispose(bool isDisposing)
         {
@@ -164,13 +170,14 @@ namespace osu.Desktop
             archiveImportIPCChannel?.Dispose();
         }
 
-        private class SDL2BatteryInfo : BatteryInfo
+        private unsafe class SDL3BatteryInfo : BatteryInfo
         {
             public override double? ChargeLevel
             {
                 get
                 {
-                    SDL.SDL_GetPowerInfo(out _, out int percentage);
+                    int percentage;
+                    SDL3.SDL_GetPowerInfo(null, &percentage);
 
                     if (percentage == -1)
                         return null;
@@ -179,7 +186,7 @@ namespace osu.Desktop
                 }
             }
 
-            public override bool OnBattery => SDL.SDL_GetPowerInfo(out _, out _) == SDL.SDL_PowerState.SDL_POWERSTATE_ON_BATTERY;
+            public override bool OnBattery => SDL3.SDL_GetPowerInfo(null, null) == SDL_PowerState.SDL_POWERSTATE_ON_BATTERY;
         }
     }
 }

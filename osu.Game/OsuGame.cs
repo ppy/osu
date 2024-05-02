@@ -46,6 +46,7 @@ using osu.Game.IO;
 using osu.Game.Localisation;
 using osu.Game.Online;
 using osu.Game.Online.Chat;
+using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
 using osu.Game.Overlays.BeatmapListing;
 using osu.Game.Overlays.Music;
@@ -53,11 +54,12 @@ using osu.Game.Overlays.Notifications;
 using osu.Game.Overlays.SkinEditor;
 using osu.Game.Overlays.Toolbar;
 using osu.Game.Overlays.Volume;
-using osu.Game.Performance;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osu.Game.Screens;
+using osu.Game.Screens.Edit;
 using osu.Game.Screens.Menu;
+using osu.Game.Screens.OnlinePlay.Multiplayer;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Ranking;
 using osu.Game.Screens.Select;
@@ -77,6 +79,13 @@ namespace osu.Game
     [Cached(typeof(OsuGame))]
     public partial class OsuGame : OsuGameBase, IKeyBindingHandler<GlobalAction>, ILocalUserPlayInfo, IPerformFromScreenRunner, IOverlayManager, ILinkHandler
     {
+#if DEBUG
+        // Different port allows runnning release and debug builds alongside each other.
+        public const int IPC_PORT = 44824;
+#else
+        public const int IPC_PORT = 44823;
+#endif
+
         /// <summary>
         /// The amount of global offset to apply when a left/right anchored overlay is displayed (ie. settings or notifications).
         /// </summary>
@@ -431,6 +440,9 @@ namespace osu.Game
                     break;
 
                 case LinkAction.OpenEditorTimestamp:
+                    HandleTimestamp(argString);
+                    break;
+
                 case LinkAction.JoinMultiplayerMatch:
                 case LinkAction.Spectate:
                     waitForReady(() => Notifications, _ => Notifications.Post(new SimpleNotification
@@ -549,6 +561,25 @@ namespace osu.Game
         public void ShowChangelogBuild(string updateStream, string version) => waitForReady(() => changelogOverlay, _ => changelogOverlay.ShowBuild(updateStream, version));
 
         /// <summary>
+        /// Seeks to the provided <paramref name="timestamp"/> if the editor is currently open.
+        /// Can also select objects as indicated by the <paramref name="timestamp"/> (depends on ruleset implementation).
+        /// </summary>
+        public void HandleTimestamp(string timestamp)
+        {
+            if (ScreenStack.CurrentScreen is not Editor editor)
+            {
+                Schedule(() => Notifications.Post(new SimpleErrorNotification
+                {
+                    Icon = FontAwesome.Solid.ExclamationTriangle,
+                    Text = EditorStrings.MustBeInEditorToHandleLinks
+                }));
+                return;
+            }
+
+            editor.HandleTimestamp(timestamp);
+        }
+
+        /// <summary>
         /// Present a skin select immediately.
         /// </summary>
         /// <param name="skin">The skin to select.</param>
@@ -598,6 +629,12 @@ namespace osu.Game
 
             var detachedSet = databasedSet.PerformRead(s => s.Detach());
 
+            if (detachedSet.DeletePending)
+            {
+                Logger.Log("The requested beatmap has since been deleted.", LoggingTarget.Information);
+                return;
+            }
+
             PerformFromScreen(screen =>
             {
                 // Find beatmaps that match our predicate.
@@ -644,6 +681,24 @@ namespace osu.Game
         }
 
         /// <summary>
+        /// Join a multiplayer match immediately.
+        /// </summary>
+        /// <param name="room">The room to join.</param>
+        /// <param name="password">The password to join the room, if any is given.</param>
+        public void PresentMultiplayerMatch(Room room, string password)
+        {
+            PerformFromScreen(screen =>
+            {
+                if (!(screen is Multiplayer multiplayer))
+                    screen.Push(multiplayer = new Multiplayer());
+
+                multiplayer.Join(room, password);
+            });
+            // TODO: We should really be able to use `validScreens: new[] { typeof(Multiplayer) }` here
+            // but `PerformFromScreen` doesn't understand nested stacks.
+        }
+
+        /// <summary>
         /// Present a score's replay immediately.
         /// The user should have already requested this interactively.
         /// </summary>
@@ -651,23 +706,9 @@ namespace osu.Game
         {
             Logger.Log($"Beginning {nameof(PresentScore)} with score {score}");
 
-            // The given ScoreInfo may have missing properties if it was retrieved from online data. Re-retrieve it from the database
-            // to ensure all the required data for presenting a replay are present.
-            ScoreInfo databasedScoreInfo = null;
+            var databasedScore = ScoreManager.GetScore(score);
 
-            if (score.OnlineID > 0)
-                databasedScoreInfo = ScoreManager.Query(s => s.OnlineID == score.OnlineID);
-
-            if (score is ScoreInfo scoreInfo)
-                databasedScoreInfo ??= ScoreManager.Query(s => s.Hash == scoreInfo.Hash);
-
-            if (databasedScoreInfo == null)
-            {
-                Logger.Log("The requested score could not be found locally.", LoggingTarget.Information);
-                return;
-            }
-
-            var databasedScore = ScoreManager.GetScore(databasedScoreInfo);
+            if (databasedScore == null) return;
 
             if (databasedScore.Replay == null)
             {
@@ -675,7 +716,7 @@ namespace osu.Game
                 return;
             }
 
-            var databasedBeatmap = BeatmapManager.QueryBeatmap(b => b.ID == databasedScoreInfo.BeatmapInfo.ID);
+            var databasedBeatmap = BeatmapManager.QueryBeatmap(b => b.ID == databasedScore.ScoreInfo.BeatmapInfo.ID);
 
             if (databasedBeatmap == null)
             {
@@ -708,7 +749,7 @@ namespace osu.Game
                         break;
 
                     case ScorePresentType.Results:
-                        screen.Push(new SoloResultsScreen(databasedScore.ScoreInfo, false));
+                        screen.Push(new SoloResultsScreen(databasedScore.ScoreInfo));
                         break;
                 }
             }, validScreens: validScreens);
@@ -731,8 +772,6 @@ namespace osu.Game
         protected virtual Loader CreateLoader() => new Loader();
 
         protected virtual UpdateManager CreateUpdateManager() => new UpdateManager();
-
-        protected virtual HighPerformanceSession CreateHighPerformanceSession() => new HighPerformanceSession();
 
         protected override Container CreateScalingContainer() => new ScalingContainer(ScalingMode.Everything);
 
@@ -802,7 +841,10 @@ namespace osu.Game
             {
                 // General expectation that osu! starts in fullscreen by default (also gives the most predictable performance).
                 // However, macOS is bound to have issues when using exclusive fullscreen as it takes full control away from OS, therefore borderless is default there.
-                { FrameworkSetting.WindowMode, RuntimeInfo.OS == RuntimeInfo.Platform.macOS ? WindowMode.Borderless : WindowMode.Fullscreen }
+                { FrameworkSetting.WindowMode, RuntimeInfo.OS == RuntimeInfo.Platform.macOS ? WindowMode.Borderless : WindowMode.Fullscreen },
+                { FrameworkSetting.VolumeUniversal, 0.6 },
+                { FrameworkSetting.VolumeMusic, 0.6 },
+                { FrameworkSetting.VolumeEffect, 0.6 },
             };
         }
 
@@ -853,6 +895,7 @@ namespace osu.Game
             ScoreManager.PresentImport = items => PresentScore(items.First().Value);
 
             MultiplayerClient.PostNotification = n => Notifications.Post(n);
+            MultiplayerClient.PresentMatch = PresentMultiplayerMatch;
 
             // make config aware of how to lookup skins for on-screen display purposes.
             // if this becomes a more common thing, tracked settings should be reconsidered to allow local DI.
@@ -947,8 +990,11 @@ namespace osu.Game
                 Margin = new MarginPadding(5),
             }, topMostOverlayContent.Add);
 
-            if (!args?.Any(a => a == @"--no-version-overlay") ?? true)
-                loadComponentSingleFile(versionManager = new VersionManager { Depth = int.MinValue }, ScreenContainer.Add);
+            if (!IsDeployedBuild)
+            {
+                dependencies.Cache(versionManager = new VersionManager { Depth = int.MinValue });
+                loadComponentSingleFile(versionManager, ScreenContainer.Add);
+            }
 
             loadComponentSingleFile(osuLogo, _ =>
             {
@@ -958,6 +1004,7 @@ namespace osu.Game
                 ScreenStack.Push(CreateLoader().With(l => l.RelativeSizeAxes = Axes.Both));
             });
 
+            loadComponentSingleFile(new UserStatisticsWatcher(), Add, true);
             loadComponentSingleFile(Toolbar = new Toolbar
             {
                 OnHome = delegate
@@ -1022,14 +1069,14 @@ namespace osu.Game
 
             loadComponentSingleFile(new AccountCreationOverlay(), topMostOverlayContent.Add, true);
             loadComponentSingleFile<IDialogOverlay>(new DialogOverlay(), topMostOverlayContent.Add, true);
-
-            loadComponentSingleFile(CreateHighPerformanceSession(), Add);
+            loadComponentSingleFile(new MedalOverlay(), topMostOverlayContent.Add);
 
             loadComponentSingleFile(new BackgroundDataStoreProcessor(), Add);
 
             Add(difficultyRecommender);
             Add(externalLinkOpener = new ExternalLinkOpener());
             Add(new MusicKeyBindingHandler());
+            Add(new OnlineStatusNotifier(() => ScreenStack.CurrentScreen));
 
             // side overlays which cancel each other.
             var singleDisplaySideOverlays = new OverlayContainer[] { Settings, Notifications, FirstRunOverlay };
@@ -1130,6 +1177,9 @@ namespace osu.Game
             {
                 if (entry.Level < LogLevel.Important || entry.Target > LoggingTarget.Database || entry.Target == null) return;
 
+                if (entry.Exception is SentryOnlyDiagnosticsException)
+                    return;
+
                 const int short_term_display_limit = 3;
 
                 if (recentLogCount < short_term_display_limit)
@@ -1142,7 +1192,7 @@ namespace osu.Game
                 }
                 else if (recentLogCount == short_term_display_limit)
                 {
-                    string logFile = $@"{entry.Target.Value.ToString().ToLowerInvariant()}.log";
+                    string logFile = Logger.GetLogger(entry.Target.Value).Filename;
 
                     Schedule(() => Notifications.Post(new SimpleNotification
                     {
@@ -1150,7 +1200,7 @@ namespace osu.Game
                         Text = NotificationsStrings.SubsequentMessagesLogged,
                         Activated = () =>
                         {
-                            Storage.GetStorageForDirectory(@"logs").PresentFileExternally(logFile);
+                            Logger.Storage.PresentFileExternally(logFile);
                             return true;
                         }
                     }));

@@ -9,17 +9,13 @@ namespace osu.Game.Rulesets.Objects.Legacy.Osu
     /// <summary>
     /// Legacy osu! Slider-type, used for parsing Beatmaps.
     /// </summary>
-    internal sealed class ConvertSlider : Legacy.ConvertSlider, IHasPosition, IHasCombo, IHasGenerateTicks
+    internal sealed class ConvertSlider : Legacy.ConvertSlider, IHasPosition, IHasGenerateTicks
     {
         public Vector2 Position { get; set; }
 
         public float X => Position.X;
 
         public float Y => Position.Y;
-
-        public bool NewCombo { get; set; }
-
-        public int ComboOffset { get; set; }
 
         public bool GenerateTicks { get; set; } = true;
     }

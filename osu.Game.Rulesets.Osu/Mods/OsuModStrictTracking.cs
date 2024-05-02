@@ -36,6 +36,9 @@ namespace osu.Game.Rulesets.Osu.Mods
                 {
                     if (e.NewValue || slider.Judged) return;
 
+                    if (slider.Time.Current < slider.HitObject.StartTime)
+                        return;
+
                     var tail = slider.NestedHitObjects.OfType<StrictTrackingDrawableSliderTail>().First();
 
                     if (!tail.Judged)
@@ -96,14 +99,13 @@ namespace osu.Game.Rulesets.Osu.Mods
                 Position = original.Position;
                 NewCombo = original.NewCombo;
                 ComboOffset = original.ComboOffset;
-                LegacyLastTickOffset = original.LegacyLastTickOffset;
                 TickDistanceMultiplier = original.TickDistanceMultiplier;
                 SliderVelocityMultiplier = original.SliderVelocityMultiplier;
             }
 
             protected override void CreateNestedHitObjects(CancellationToken cancellationToken)
             {
-                var sliderEvents = SliderEventGenerator.Generate(StartTime, SpanDuration, Velocity, TickDistance, Path.Distance, this.SpanCount(), LegacyLastTickOffset, cancellationToken);
+                var sliderEvents = SliderEventGenerator.Generate(StartTime, SpanDuration, Velocity, TickDistance, Path.Distance, this.SpanCount(), cancellationToken);
 
                 foreach (var e in sliderEvents)
                 {
@@ -130,7 +132,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                             });
                             break;
 
-                        case SliderEventType.LegacyLastTick:
+                        case SliderEventType.Tail:
                             AddNested(TailCircle = new StrictTrackingSliderTailCircle(this)
                             {
                                 RepeatIndex = e.SpanIndex,

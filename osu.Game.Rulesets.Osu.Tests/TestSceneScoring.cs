@@ -2,15 +2,19 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Beatmaps;
 using osu.Game.Rulesets.Osu.Judgements;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Scoring;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Rulesets.Scoring.Legacy;
 using osu.Game.Tests.Visual.Gameplay;
 
 namespace osu.Game.Rulesets.Osu.Tests
@@ -32,9 +36,17 @@ namespace osu.Game.Rulesets.Osu.Tests
             return beatmap;
         }
 
-        protected override IScoringAlgorithm CreateScoreV1() => new ScoreV1 { ScoreMultiplier = { BindTarget = scoreMultiplier } };
-        protected override IScoringAlgorithm CreateScoreV2(int maxCombo) => new ScoreV2(maxCombo);
-        protected override ProcessorBasedScoringAlgorithm CreateScoreAlgorithm(IBeatmap beatmap, ScoringMode mode) => new OsuProcessorBasedScoringAlgorithm(beatmap, mode);
+        protected override IScoringAlgorithm CreateScoreV1(IReadOnlyList<Mod> selectedMods)
+            => new ScoreV1(selectedMods)
+            {
+                ScoreMultiplier = { BindTarget = scoreMultiplier }
+            };
+
+        protected override IScoringAlgorithm CreateScoreV2(int maxCombo, IReadOnlyList<Mod> selectedMods)
+            => new ScoreV2(maxCombo, selectedMods);
+
+        protected override ProcessorBasedScoringAlgorithm CreateScoreAlgorithm(IBeatmap beatmap, ScoringMode mode, IReadOnlyList<Mod> mods)
+            => new OsuProcessorBasedScoringAlgorithm(beatmap, mode, mods);
 
         [Test]
         public void TestBasicScenarios()
@@ -71,9 +83,19 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         private class ScoreV1 : IScoringAlgorithm
         {
+            private readonly double modMultiplier;
+            public BindableDouble ScoreMultiplier { get; } = new BindableDouble();
+
             private int currentCombo;
 
-            public BindableDouble ScoreMultiplier { get; } = new BindableDouble();
+            public ScoreV1(IReadOnlyList<Mod> selectedMods)
+            {
+                var ruleset = new OsuRuleset();
+                modMultiplier = ruleset.CreateLegacyScoreSimulator().GetLegacyScoreMultiplier(selectedMods, new LegacyBeatmapConversionDifficultyInfo
+                {
+                    SourceRuleset = ruleset.RulesetInfo
+                });
+            }
 
             public void ApplyHit() => applyHitV1(base_great);
             public void ApplyNonPerfect() => applyHitV1(base_ok);
@@ -91,7 +113,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
                 // combo multiplier
                 // ReSharper disable once PossibleLossOfFraction
-                TotalScore += (int)(Math.Max(0, currentCombo - 1) * (baseScore / 25 * ScoreMultiplier.Value));
+                TotalScore += (int)(Math.Max(0, currentCombo - 1) * (baseScore / 25 * (ScoreMultiplier.Value * modMultiplier)));
 
                 currentCombo++;
             }
@@ -107,12 +129,22 @@ namespace osu.Game.Rulesets.Osu.Tests
             private double maxBaseScore;
             private int currentHits;
 
+            private readonly double modMultiplier;
+
             private readonly double comboPortionMax;
             private readonly int maxCombo;
 
-            public ScoreV2(int maxCombo)
+            public ScoreV2(int maxCombo, IReadOnlyList<Mod> selectedMods)
             {
                 this.maxCombo = maxCombo;
+
+                var ruleset = new OsuRuleset();
+                modMultiplier = ruleset.CreateLegacyScoreSimulator().GetLegacyScoreMultiplier(
+                    selectedMods.Append(new ModScoreV2()).ToList(),
+                    new LegacyBeatmapConversionDifficultyInfo
+                    {
+                        SourceRuleset = ruleset.RulesetInfo
+                    });
 
                 for (int i = 0; i < this.maxCombo; i++)
                     ApplyHit();
@@ -152,18 +184,18 @@ namespace osu.Game.Rulesets.Osu.Tests
                     double accuracy = currentBaseScore / maxBaseScore;
 
                     return (int)Math.Round
-                    (
+                    ((
                         700000 * comboPortion / comboPortionMax +
                         300000 * Math.Pow(accuracy, 10) * ((double)currentHits / maxCombo)
-                    );
+                    ) * modMultiplier);
                 }
             }
         }
 
         private class OsuProcessorBasedScoringAlgorithm : ProcessorBasedScoringAlgorithm
         {
-            public OsuProcessorBasedScoringAlgorithm(IBeatmap beatmap, ScoringMode mode)
-                : base(beatmap, mode)
+            public OsuProcessorBasedScoringAlgorithm(IBeatmap beatmap, ScoringMode mode, IReadOnlyList<Mod> selectedMods)
+                : base(beatmap, mode, selectedMods)
             {
             }
 

@@ -25,6 +25,7 @@ using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Rulesets.Taiko;
 using osu.Game.Rulesets.Taiko.Objects;
 using osu.Game.Screens.Edit;
+using osu.Game.Screens.Edit.Compose.Components.Timeline;
 using osu.Game.Screens.Edit.Setup;
 using osu.Game.Storyboards;
 using osu.Game.Tests.Resources;
@@ -94,8 +95,11 @@ namespace osu.Game.Tests.Visual.Editing
         [Test]
         public void TestAddAudioTrack()
         {
-            AddAssert("track is virtual", () => Beatmap.Value.Track is TrackVirtual);
+            AddStep("enter compose mode", () => InputManager.Key(Key.F1));
+            AddUntilStep("wait for timeline load", () => Editor.ChildrenOfType<Timeline>().FirstOrDefault()?.IsLoaded == true);
 
+            AddStep("enter setup mode", () => InputManager.Key(Key.F4));
+            AddAssert("track is virtual", () => Beatmap.Value.Track is TrackVirtual);
             AddAssert("switch track to real track", () =>
             {
                 var setup = Editor.ChildrenOfType<SetupScreen>().First();
@@ -125,7 +129,7 @@ namespace osu.Game.Tests.Visual.Editing
             });
 
             AddAssert("track is not virtual", () => Beatmap.Value.Track is not TrackVirtual);
-            AddAssert("track length changed", () => Beatmap.Value.Track.Length > 60000);
+            AddUntilStep("track length changed", () => Beatmap.Value.Track.Length > 60000);
 
             AddStep("test play", () => Editor.TestGameplay());
 
@@ -182,7 +186,7 @@ namespace osu.Game.Tests.Visual.Editing
             if (sameRuleset)
             {
                 AddUntilStep("wait for dialog", () => DialogOverlay.CurrentDialog is CreateNewDifficultyDialog);
-                AddStep("confirm creation with no objects", () => DialogOverlay.CurrentDialog.PerformOkAction());
+                AddStep("confirm creation with no objects", () => DialogOverlay.CurrentDialog!.PerformOkAction());
             }
 
             AddUntilStep("wait for created", () =>
@@ -269,7 +273,7 @@ namespace osu.Game.Tests.Visual.Editing
             AddStep("create new difficulty", () => Editor.CreateNewDifficulty(new OsuRuleset().RulesetInfo));
 
             AddUntilStep("wait for dialog", () => DialogOverlay.CurrentDialog is CreateNewDifficultyDialog);
-            AddStep("confirm creation as a copy", () => DialogOverlay.CurrentDialog.Buttons.ElementAt(1).TriggerClick());
+            AddStep("confirm creation as a copy", () => DialogOverlay.CurrentDialog!.Buttons.ElementAt(1).TriggerClick());
 
             AddUntilStep("wait for created", () =>
             {
@@ -342,7 +346,7 @@ namespace osu.Game.Tests.Visual.Editing
             AddStep("create new difficulty", () => Editor.CreateNewDifficulty(new OsuRuleset().RulesetInfo));
 
             AddUntilStep("wait for dialog", () => DialogOverlay.CurrentDialog is CreateNewDifficultyDialog);
-            AddStep("confirm creation as a copy", () => DialogOverlay.CurrentDialog.Buttons.ElementAt(1).TriggerClick());
+            AddStep("confirm creation as a copy", () => DialogOverlay.CurrentDialog!.Buttons.ElementAt(1).TriggerClick());
 
             AddUntilStep("wait for created", () =>
             {
@@ -380,7 +384,7 @@ namespace osu.Game.Tests.Visual.Editing
 
             AddStep("try to create new difficulty", () => Editor.CreateNewDifficulty(new OsuRuleset().RulesetInfo));
             AddUntilStep("wait for dialog", () => DialogOverlay.CurrentDialog is CreateNewDifficultyDialog);
-            AddStep("confirm creation with no objects", () => DialogOverlay.CurrentDialog.PerformOkAction());
+            AddStep("confirm creation with no objects", () => DialogOverlay.CurrentDialog!.PerformOkAction());
 
             AddUntilStep("wait for created", () =>
             {
@@ -415,7 +419,7 @@ namespace osu.Game.Tests.Visual.Editing
             if (sameRuleset)
             {
                 AddUntilStep("wait for dialog", () => DialogOverlay.CurrentDialog is CreateNewDifficultyDialog);
-                AddStep("confirm creation with no objects", () => DialogOverlay.CurrentDialog.PerformOkAction());
+                AddStep("confirm creation with no objects", () => DialogOverlay.CurrentDialog!.PerformOkAction());
             }
 
             AddUntilStep("wait for created", () =>
@@ -476,7 +480,7 @@ namespace osu.Game.Tests.Visual.Editing
 
             AddStep("exit", () => Editor.Exit());
             AddUntilStep("wait for dialog", () => DialogOverlay.CurrentDialog is PromptForSaveDialog);
-            AddStep("attempt to save", () => DialogOverlay.CurrentDialog.PerformOkAction());
+            AddStep("attempt to save", () => DialogOverlay.CurrentDialog!.PerformOkAction());
             AddAssert("editor is still current", () => Editor.IsCurrentScreen());
         }
 

@@ -18,6 +18,16 @@ namespace osu.Game.Rulesets.Osu.Objects
 {
     public class Spinner : OsuHitObject, IHasDuration
     {
+        /// <summary>
+        /// The RPM required to clear the spinner at ODs [ 0, 5, 10 ].
+        /// </summary>
+        private static readonly (int min, int mid, int max) clear_rpm_range = (90, 150, 225);
+
+        /// <summary>
+        /// The RPM required to complete the spinner and receive full score at ODs [ 0, 5, 10 ].
+        /// </summary>
+        private static readonly (int min, int mid, int max) complete_rpm_range = (250, 380, 430);
+
         public double EndTime
         {
             get => StartTime + Duration;
@@ -52,13 +62,19 @@ namespace osu.Game.Rulesets.Osu.Objects
         {
             base.ApplyDefaultsToSelf(controlPointInfo, difficulty);
 
-            const double maximum_rotations_per_second = 477f / 60f;
+            // The average RPS required over the length of the spinner to clear the spinner.
+            double minRps = IBeatmapDifficultyInfo.DifficultyRange(difficulty.OverallDifficulty, clear_rpm_range) / 60;
+
+            // The RPS required over the length of the spinner to receive full score (all normal + bonus ticks).
+            double maxRps = IBeatmapDifficultyInfo.DifficultyRange(difficulty.OverallDifficulty, complete_rpm_range) / 60;
 
             double secondsDuration = Duration / 1000;
-            double minimumRotationsPerSecond = IBeatmapDifficultyInfo.DifficultyRange(difficulty.OverallDifficulty, 1.5, 2.5, 3.75);
 
-            SpinsRequired = (int)(secondsDuration * minimumRotationsPerSecond);
-            MaximumBonusSpins = (int)((maximum_rotations_per_second - minimumRotationsPerSecond) * secondsDuration) - bonus_spins_gap;
+            // Allow a 0.1ms floating point precision error in the calculation of the duration.
+            const double duration_error = 0.0001;
+
+            SpinsRequired = (int)(minRps * secondsDuration + duration_error);
+            MaximumBonusSpins = Math.Max(0, (int)(maxRps * secondsDuration + duration_error) - SpinsRequired - bonus_spins_gap);
         }
 
         protected override void CreateNestedHitObjects(CancellationToken cancellationToken)

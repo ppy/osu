@@ -94,25 +94,19 @@ namespace osu.Game.Storyboards.Drawables
         [Resolved]
         private IBeatSyncProvider beatSyncProvider { get; set; }
 
+        [Resolved]
+        private TextureStore textureStore { get; set; }
+
         [BackgroundDependencyLoader]
-        private void load(TextureStore textureStore, Storyboard storyboard)
+        private void load(Storyboard storyboard)
         {
-            int frameIndex = 0;
-
-            Texture frameTexture = textureStore.Get(getFramePath(frameIndex));
-
-            if (frameTexture != null)
+            if (storyboard.UseSkinSprites)
             {
-                // sourcing from storyboard.
-                for (frameIndex = 0; frameIndex < Animation.FrameCount; frameIndex++)
-                    AddFrame(textureStore.Get(getFramePath(frameIndex)), Animation.FrameDelay);
-            }
-            else if (storyboard.UseSkinSprites)
-            {
-                // fallback to skin if required.
                 skin.SourceChanged += skinSourceChanged;
                 skinSourceChanged();
             }
+            else
+                addFramesFromStoryboardSource();
 
             Animation.ApplyTransforms(this);
         }
@@ -135,11 +129,28 @@ namespace osu.Game.Storyboards.Drawables
 
             // When reading from a skin, we match stables weird behaviour where `FrameCount` is ignored
             // and resources are retrieved until the end of the animation.
-            foreach (var texture in skin.GetTextures(Path.GetFileNameWithoutExtension(Animation.Path)!, default, default, true, string.Empty, out _))
-                AddFrame(texture, Animation.FrameDelay);
+            var skinTextures = skin.GetTextures(Path.ChangeExtension(Animation.Path, null), default, default, true, string.Empty, null, out _);
+
+            if (skinTextures.Length > 0)
+            {
+                foreach (var texture in skinTextures)
+                    AddFrame(texture, Animation.FrameDelay);
+            }
+            else
+            {
+                addFramesFromStoryboardSource();
+            }
         }
 
-        private string getFramePath(int i) => Animation.Path.Replace(".", $"{i}.");
+        private void addFramesFromStoryboardSource()
+        {
+            int frameIndex;
+            // sourcing from storyboard.
+            for (frameIndex = 0; frameIndex < Animation.FrameCount; frameIndex++)
+                AddFrame(textureStore.Get(getFramePath(frameIndex)), Animation.FrameDelay);
+
+            string getFramePath(int i) => Animation.Path.Replace(".", $"{i}.");
+        }
 
         protected override void Dispose(bool isDisposing)
         {

@@ -196,7 +196,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 {
                     StartTime = time_slider,
                     Position = positionSlider,
-                    Path = new SliderPath(PathType.Linear, new[]
+                    Path = new SliderPath(PathType.LINEAR, new[]
                     {
                         Vector2.Zero,
                         new Vector2(25, 0),
@@ -238,7 +238,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 {
                     StartTime = time_slider,
                     Position = positionSlider,
-                    Path = new SliderPath(PathType.Linear, new[]
+                    Path = new SliderPath(PathType.LINEAR, new[]
                     {
                         Vector2.Zero,
                         new Vector2(25, 0),
@@ -284,15 +284,16 @@ namespace osu.Game.Rulesets.Osu.Tests
                 },
             };
 
-            performTest(hitObjects, new List<ReplayFrame>
+            List<ReplayFrame> frames = new List<ReplayFrame>
             {
                 new OsuReplayFrame { Time = time_spinner - 100, Position = positionCircle, Actions = { OsuAction.LeftButton } },
-                new OsuReplayFrame { Time = time_spinner + 10, Position = new Vector2(236, 192), Actions = { OsuAction.RightButton } },
-                new OsuReplayFrame { Time = time_spinner + 20, Position = new Vector2(256, 172), Actions = { OsuAction.RightButton } },
-                new OsuReplayFrame { Time = time_spinner + 30, Position = new Vector2(276, 192), Actions = { OsuAction.RightButton } },
-                new OsuReplayFrame { Time = time_spinner + 40, Position = new Vector2(256, 212), Actions = { OsuAction.RightButton } },
-                new OsuReplayFrame { Time = time_spinner + 50, Position = new Vector2(236, 192), Actions = { OsuAction.RightButton } },
-            });
+            };
+
+            frames.AddRange(new SpinFramesGenerator(time_spinner + 10)
+                            .Spin(360, 500)
+                            .Build());
+
+            performTest(hitObjects, frames);
 
             addJudgementAssert(hitObjects[0], HitResult.Great);
             addJudgementAssert(hitObjects[1], HitResult.Great);
@@ -317,7 +318,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 {
                     StartTime = time_slider,
                     Position = positionSlider,
-                    Path = new SliderPath(PathType.Linear, new[]
+                    Path = new SliderPath(PathType.LINEAR, new[]
                     {
                         Vector2.Zero,
                         new Vector2(25, 0),
@@ -351,7 +352,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 {
                     StartTime = time_first_slider,
                     Position = positionFirstSlider,
-                    Path = new SliderPath(PathType.Linear, new[]
+                    Path = new SliderPath(PathType.LINEAR, new[]
                     {
                         Vector2.Zero,
                         new Vector2(25, 0),
@@ -361,7 +362,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 {
                     StartTime = time_second_slider,
                     Position = positionSecondSlider,
-                    Path = new SliderPath(PathType.Linear, new[]
+                    Path = new SliderPath(PathType.LINEAR, new[]
                     {
                         Vector2.Zero,
                         new Vector2(25, 0),

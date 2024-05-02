@@ -10,7 +10,6 @@ namespace osu.Game.Screens.Play.HUD
 {
     public partial class DefaultKeyCounterDisplay : KeyCounterDisplay
     {
-        private const int duration = 100;
         private const double key_fade_time = 80;
 
         protected override FillFlowContainer<KeyCounter> KeyFlow { get; }
@@ -25,25 +24,12 @@ namespace osu.Game.Screens.Play.HUD
             };
         }
 
-        protected override void Update()
-        {
-            base.Update();
-
-            // Don't use autosize as it will shrink to zero when KeyFlow is hidden.
-            // In turn this can cause the display to be masked off screen and never become visible again.
-            Size = KeyFlow.Size;
-        }
-
         protected override KeyCounter CreateCounter(InputTrigger trigger) => new DefaultKeyCounter(trigger)
         {
             FadeTime = key_fade_time,
             KeyDownTextColor = KeyDownTextColor,
             KeyUpTextColor = KeyUpTextColor,
         };
-
-        protected override void UpdateVisibility() =>
-            // Isolate changing visibility of the key counters from fading this component.
-            KeyFlow.FadeTo(AlwaysVisible.Value || ConfigVisibility.Value ? 1 : 0, duration);
 
         private Color4 keyDownTextColor = Color4.DarkGray;
 

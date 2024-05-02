@@ -4,6 +4,8 @@
 #nullable disable
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -71,21 +73,36 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             ScaleBindable.UnbindFrom(HitObject.ScaleBindable);
         }
 
+        protected virtual IEnumerable<Drawable> DimmablePieces => Enumerable.Empty<Drawable>();
+
         protected override void UpdateInitialTransforms()
         {
             base.UpdateInitialTransforms();
 
-            // Dim should only be applied at a top level, as it will be implicitly applied to nested objects.
-            if (ParentHitObject == null)
+            foreach (var piece in DimmablePieces)
             {
-                // Of note, no one noticed this was missing for years, but it definitely feels like it should still exist.
-                // For now this is applied across all skins, and matches stable.
-                // For simplicity, dim colour is applied to the DrawableHitObject itself.
-                // We may need to make a nested container setup if this even causes a usage conflict (ie. with a mod).
-                this.FadeColour(new Color4(195, 195, 195, 255));
-                using (BeginDelayedSequence(InitialLifetimeOffset - OsuHitWindows.MISS_WINDOW))
-                    this.FadeColour(Color4.White, 100);
+                // if the specified dimmable piece is a DHO, it is generally not safe to tack transforms onto it directly
+                // as they may be cleared via the `updateState()` DHO flow,
+                // so use `ApplyCustomUpdateState` instead. which does not have this pitfall.
+                if (piece is DrawableHitObject drawableObjectPiece)
+                {
+                    // this method can be called multiple times, and we don't want to subscribe to the event more than once,
+                    // so this is what it is going to have to be...
+                    drawableObjectPiece.ApplyCustomUpdateState -= applyDimToDrawableHitObject;
+                    drawableObjectPiece.ApplyCustomUpdateState += applyDimToDrawableHitObject;
+                }
+                else
+                    applyDim(piece);
             }
+
+            void applyDim(Drawable piece)
+            {
+                piece.FadeColour(new Color4(195, 195, 195, 255));
+                using (piece.BeginDelayedSequence(InitialLifetimeOffset - OsuHitWindows.MISS_WINDOW))
+                    piece.FadeColour(Color4.White, 100);
+            }
+
+            void applyDimToDrawableHitObject(DrawableHitObject dho, ArmedState _) => applyDim(dho);
         }
 
         protected sealed override double InitialLifetimeOffset => HitObject.TimePreempt;
@@ -99,11 +116,16 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         public virtual void Shake() { }
 
         /// <summary>
+        /// Causes this <see cref="DrawableOsuHitObject"/> to get hit, disregarding all conditions in implementations of <see cref="DrawableHitObject.CheckForResult"/>.
+        /// </summary>
+        public void HitForcefully() => ApplyMaxResult();
+
+        /// <summary>
         /// Causes this <see cref="DrawableOsuHitObject"/> to get missed, disregarding all conditions in implementations of <see cref="DrawableHitObject.CheckForResult"/>.
         /// </summary>
-        public void MissForcefully() => ApplyResult(r => r.Type = r.Judgement.MinResult);
+        public void MissForcefully() => ApplyMinResult();
 
-        private RectangleF parentScreenSpaceRectangle => ((DrawableOsuHitObject)ParentHitObject)?.parentScreenSpaceRectangle ?? Parent.ScreenSpaceDrawQuad.AABBFloat;
+        private RectangleF parentScreenSpaceRectangle => ((DrawableOsuHitObject)ParentHitObject)?.parentScreenSpaceRectangle ?? Parent!.ScreenSpaceDrawQuad.AABBFloat;
 
         /// <summary>
         /// Calculates the position of the given <paramref name="drawable"/> relative to the playfield area.

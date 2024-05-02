@@ -4,11 +4,16 @@
 #nullable disable
 
 using System;
+using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Linq;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Input;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Game.Collections;
@@ -20,9 +25,11 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation;
 using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Select.Filter;
 using osuTK;
 using osuTK.Graphics;
+using osuTK.Input;
 
 namespace osu.Game.Screens.Select
 {
@@ -43,14 +50,13 @@ namespace osu.Game.Screens.Select
         }
 
         private OsuTabControl<SortMode> sortTabs;
-
         private Bindable<SortMode> sortMode;
-
         private Bindable<GroupMode> groupMode;
-
         private FilterControlTextBox searchTextBox;
-
         private CollectionDropdown collectionDropdown;
+
+        [CanBeNull]
+        private FilterCriteria currentCriteria;
 
         public FilterCriteria CreateCriteria()
         {
@@ -62,7 +68,8 @@ namespace osu.Game.Screens.Select
                 Sort = sortMode.Value,
                 AllowConvertedBeatmaps = showConverted.Value,
                 Ruleset = ruleset.Value,
-                CollectionBeatmapMD5Hashes = collectionDropdown.Current.Value?.Collection?.PerformRead(c => c.BeatmapMD5Hashes)
+                Mods = mods.Value,
+                CollectionBeatmapMD5Hashes = collectionDropdown.Current.Value?.Collection?.PerformRead(c => c.BeatmapMD5Hashes).ToImmutableHashSet()
             };
 
             if (!minimumStars.IsDefault)
@@ -81,7 +88,7 @@ namespace osu.Game.Screens.Select
             base.ReceivePositionalInputAt(screenSpacePos) || sortTabs.ReceivePositionalInputAt(screenSpacePos);
 
         [BackgroundDependencyLoader(permitNulls: true)]
-        private void load(OsuColour colours, IBindable<RulesetInfo> parentRuleset, OsuConfigManager config)
+        private void load(OsuColour colours, OsuConfigManager config)
         {
             sortMode = config.GetBindable<SortMode>(OsuSetting.SongSelectSortingMode);
             groupMode = config.GetBindable<GroupMode>(OsuSetting.SongSelectGroupingMode);
@@ -211,8 +218,19 @@ namespace osu.Game.Screens.Select
             config.BindWith(OsuSetting.DisplayStarsMaximum, maximumStars);
             maximumStars.ValueChanged += _ => updateCriteria();
 
-            ruleset.BindTo(parentRuleset);
             ruleset.BindValueChanged(_ => updateCriteria());
+            mods.BindValueChanged(m =>
+            {
+                // Mods are updated once by the mod select overlay when song select is entered,
+                // regardless of if there are any mods or any changes have taken place.
+                // Updating the criteria here so early triggers a re-ordering of panels on song select, via... some mechanism.
+                // Todo: Investigate/fix and potentially remove this.
+                if (m.NewValue.SequenceEqual(m.OldValue))
+                    return;
+
+                if (currentCriteria?.RulesetCriteria?.FilterMayChangeFromMods(m) == true)
+                    updateCriteria();
+            });
 
             groupMode.BindValueChanged(_ => updateCriteria());
             sortMode.BindValueChanged(_ => updateCriteria());
@@ -236,26 +254,27 @@ namespace osu.Game.Screens.Select
             searchTextBox.HoldFocus = true;
         }
 
-        private readonly IBindable<RulesetInfo> ruleset = new Bindable<RulesetInfo>();
+        [Resolved]
+        private IBindable<RulesetInfo> ruleset { get; set; } = null!;
+
+        [Resolved]
+        private IBindable<IReadOnlyList<Mod>> mods { get; set; } = null!;
 
         private readonly Bindable<bool> showConverted = new Bindable<bool>();
         private readonly Bindable<double> minimumStars = new BindableDouble();
         private readonly Bindable<double> maximumStars = new BindableDouble();
 
-        private void updateCriteria() => FilterChanged?.Invoke(CreateCriteria());
+        private void updateCriteria() => FilterChanged?.Invoke(currentCriteria = CreateCriteria());
 
         protected override bool OnClick(ClickEvent e) => true;
 
         protected override bool OnHover(HoverEvent e) => true;
 
-        private partial class FilterControlTextBox : SeekLimitedSearchTextBox
+        internal partial class FilterControlTextBox : SeekLimitedSearchTextBox
         {
             private const float filter_text_size = 12;
 
             public OsuSpriteText FilterText { get; private set; }
-
-            // clipboard is disabled because one of the "cut" platform key bindings (shift-delete) conflicts with the beatmap deletion action.
-            protected override bool AllowClipboardExport => false;
 
             public FilterControlTextBox()
             {
@@ -276,6 +295,15 @@ namespace osu.Game.Screens.Select
                     Margin = new MarginPadding { Top = 2, Left = 2 },
                     Colour = colours.Yellow
                 });
+            }
+
+            public override bool OnPressed(KeyBindingPressEvent<PlatformAction> e)
+            {
+                // the "cut" platform key binding (shift-delete) conflicts with the beatmap deletion action.
+                if (e.Action == PlatformAction.Cut && e.ShiftPressed && e.CurrentState.Keyboard.Keys.IsPressed(Key.Delete))
+                    return false;
+
+                return base.OnPressed(e);
             }
         }
     }

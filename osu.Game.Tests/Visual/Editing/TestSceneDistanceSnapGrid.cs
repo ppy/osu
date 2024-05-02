@@ -187,11 +187,9 @@ namespace osu.Game.Tests.Visual.Editing
 
         private class SnapProvider : IDistanceSnapProvider
         {
-            public SnapResult FindSnappedPositionAndTime(Vector2 screenSpacePosition, SnapType snapType = SnapType.AllGrids) => new SnapResult(screenSpacePosition, 0);
-
             public Bindable<double> DistanceSpacingMultiplier { get; } = new BindableDouble(1);
 
-            IBindable<double> IDistanceSnapProvider.DistanceSpacingMultiplier => DistanceSpacingMultiplier;
+            Bindable<double> IDistanceSnapProvider.DistanceSpacingMultiplier => DistanceSpacingMultiplier;
 
             public float GetBeatSnapDistanceAt(HitObject referenceObject, bool useReferenceSliderVelocity = true) => beat_snap_distance;
 
