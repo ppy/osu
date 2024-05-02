@@ -4,10 +4,15 @@
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Rulesets.Catch;
+using osu.Game.Rulesets.Mania;
+using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Objects;
+using osu.Game.Rulesets.Taiko;
 using osu.Game.Screens.Select;
 
 namespace osu.Game.Tests.Visual.SongSelectV2
@@ -49,7 +54,21 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             const int slider_count = 50;
             const int spinner_count = 2;
 
-            AddStep("set beatmap", () =>
+            AddStep("set empty beatmap", () => Beatmap.Value = CreateWorkingBeatmap(new Beatmap()));
+
+            AddStep("set ruleset to taiko", () => Ruleset.Value = new TaikoRuleset().RulesetInfo);
+            AddAssert("first bar text is correct", () => objectCountContent.ChildrenOfType<SpriteText>().First().Text.ToString(), () => Is.EqualTo("Hit "));
+
+            AddStep("set ruleset to catch", () => Ruleset.Value = new CatchRuleset().RulesetInfo);
+            AddAssert("first bar text is correct", () => objectCountContent.ChildrenOfType<SpriteText>().First().Text.ToString(), () => Is.EqualTo("Fruit "));
+
+            AddStep("set ruleset to mania", () => Ruleset.Value = new ManiaRuleset().RulesetInfo);
+            AddAssert("first bar text is correct", () => objectCountContent.ChildrenOfType<SpriteText>().First().Text.ToString(), () => Is.EqualTo("Note "));
+
+            AddStep("set ruleset to osu", () => Ruleset.Value = new OsuRuleset().RulesetInfo);
+            AddAssert("first bar text is correct", () => objectCountContent.ChildrenOfType<SpriteText>().First().Text.ToString(), () => Is.EqualTo("Circle "));
+
+            AddStep("set beatmap with hit objects", () =>
             {
                 var beatmap = new Beatmap();
 
