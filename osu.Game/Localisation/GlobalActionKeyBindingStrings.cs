@@ -369,6 +369,16 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString EditorToggleRotateControl => new TranslatableString(getKey(@"editor_toggle_rotate_control"), @"Toggle rotate control");
 
+        /// <summary>
+        /// "Increase Speed"
+        /// </summary>
+        public static LocalisableString IncreaseSpeed => new TranslatableString(getKey(@"increase_speed"), @"Increase Speed");
+
+        /// <summary>
+        /// "Decrease Speed"
+        /// </summary>
+        public static LocalisableString DecreaseSpeed => new TranslatableString(getKey(@"decrease_speed"), @"Decrease Speed");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }

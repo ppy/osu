@@ -182,6 +182,8 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(new[] { InputKey.Shift, InputKey.F2 }, GlobalAction.SelectPreviousRandom),
             new KeyBinding(InputKey.F3, GlobalAction.ToggleBeatmapOptions),
             new KeyBinding(InputKey.BackSpace, GlobalAction.DeselectAllMods),
+            new KeyBinding(InputKey.PageUp, GlobalAction.IncreaseSpeed),
+            new KeyBinding(InputKey.PageDown, GlobalAction.DecreaseSpeed),
         };
 
         private static IEnumerable<KeyBinding> audioControlKeyBindings => new[]
@@ -409,6 +411,12 @@ namespace osu.Game.Input.Bindings
         [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.EditorToggleRotateControl))]
         EditorToggleRotateControl,
 
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.IncreaseSpeed))]
+        IncreaseSpeed,
+
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.DecreaseSpeed))]
+        DecreaseSpeed,
+        
         [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.IncreaseOffset))]
         IncreaseOffset,
 
