@@ -100,6 +100,8 @@ namespace osu.Game.Screens.Select
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
             Width = 1 / 3f;
+            Anchor = Anchor.CentreLeft;
+            Origin = Anchor.CentreLeft;
             Padding = new MarginPadding { Horizontal = HORIZONTAL_PADDING };
 
             ColumnDimensions = new[]
