@@ -352,6 +352,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 [HitResult.Great] = 200,
                 [HitResult.LargeTickHit] = 1,
             };
+            scoreInfo.Rank = ScoreRank.A;
 
             var beatmap = new TestBeatmap(ruleset);
             var score = new Score

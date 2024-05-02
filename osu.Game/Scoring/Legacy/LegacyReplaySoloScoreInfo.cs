@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets.Scoring;
@@ -38,6 +39,10 @@ namespace osu.Game.Scoring.Legacy
         [JsonProperty("client_version")]
         public string ClientVersion = string.Empty;
 
+        [JsonProperty("rank")]
+        [JsonConverter(typeof(StringEnumConverter))]
+        public ScoreRank? Rank;
+
         public static LegacyReplaySoloScoreInfo FromScore(ScoreInfo score) => new LegacyReplaySoloScoreInfo
         {
             OnlineID = score.OnlineID,
@@ -45,6 +50,7 @@ namespace osu.Game.Scoring.Legacy
             Statistics = score.Statistics.Where(kvp => kvp.Value != 0).ToDictionary(),
             MaximumStatistics = score.MaximumStatistics.Where(kvp => kvp.Value != 0).ToDictionary(),
             ClientVersion = score.ClientVersion,
+            Rank = score.Rank,
         };
     }
 }

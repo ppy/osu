@@ -20,7 +20,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
         [TestCase(1, 3)]
         [TestCase(1, 0)]
         [TestCase(0, 3)]
-        public void CatchMergesFruitAndDropletMisses(int missCount, int largeTickMissCount)
+        public void TestCatchMergesFruitAndDropletMisses(int missCount, int largeTickMissCount)
         {
             var ruleset = new CatchRuleset().RulesetInfo;
             var scoreInfo = TestResources.CreateTestScoreInfo(ruleset);
@@ -41,7 +41,22 @@ namespace osu.Game.Tests.Beatmaps.Formats
         }
 
         [Test]
-        public void ScoreWithMissIsNotPerfect()
+        public void TestFailPreserved()
+        {
+            var ruleset = new OsuRuleset().RulesetInfo;
+            var scoreInfo = TestResources.CreateTestScoreInfo();
+            var beatmap = new TestBeatmap(ruleset);
+
+            scoreInfo.Rank = ScoreRank.F;
+
+            var score = new Score { ScoreInfo = scoreInfo };
+            var decodedAfterEncode = encodeThenDecode(LegacyBeatmapDecoder.LATEST_VERSION, score, beatmap);
+
+            Assert.That(decodedAfterEncode.ScoreInfo.Rank, Is.EqualTo(ScoreRank.F));
+        }
+
+        [Test]
+        public void TestScoreWithMissIsNotPerfect()
         {
             var ruleset = new OsuRuleset().RulesetInfo;
             var scoreInfo = TestResources.CreateTestScoreInfo(ruleset);
