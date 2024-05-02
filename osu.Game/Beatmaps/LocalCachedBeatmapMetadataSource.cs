@@ -44,9 +44,32 @@ namespace osu.Game.Beatmaps
 
             this.storage = storage;
 
-            // avoid downloading / using cache for unit tests.
-            if (!DebugUtils.IsNUnitRunning && !storage.Exists(cache_database_name))
+            if (shouldFetchCache())
                 prepareLocalCache();
+        }
+
+        private bool shouldFetchCache()
+        {
+            // avoid downloading / using cache for unit tests.
+            if (DebugUtils.IsNUnitRunning)
+                return false;
+
+            if (!storage.Exists(cache_database_name))
+            {
+                log(@"Fetching local cache because it does not exist.");
+                return true;
+            }
+
+            // periodically update the cache to include newer beatmaps.
+            var fileInfo = new FileInfo(storage.GetFullPath(cache_database_name));
+
+            if (fileInfo.LastWriteTime < DateTime.Now.AddMonths(-1))
+            {
+                log($@"Refetching local cache because it was last written to on {fileInfo.LastWriteTime}.");
+                return true;
+            }
+
+            return false;
         }
 
         public bool Available =>
@@ -124,6 +147,8 @@ namespace osu.Game.Beatmaps
 
         private void prepareLocalCache()
         {
+            bool isRefetch = storage.Exists(cache_database_name);
+
             string cacheFilePath = storage.GetFullPath(cache_database_name);
             string compressedCacheFilePath = $@"{cacheFilePath}.bz2";
 
@@ -132,9 +157,15 @@ namespace osu.Game.Beatmaps
             cacheDownloadRequest.Failed += ex =>
             {
                 File.Delete(compressedCacheFilePath);
-                File.Delete(cacheFilePath);
 
-                Logger.Log($@"{nameof(BeatmapUpdaterMetadataLookup)}'s online cache download failed: {ex}", LoggingTarget.Database);
+                // don't clobber the cache when refetching if the download didn't succeed. seems excessive.
+                // consequently, also null the download request to allow the existing cache to be used (see `Available`).
+                if (isRefetch)
+                    cacheDownloadRequest = null;
+                else
+                    File.Delete(cacheFilePath);
+
+                log($@"Online cache download failed: {ex}");
             };
 
             cacheDownloadRequest.Finished += () =>
@@ -143,15 +174,22 @@ namespace osu.Game.Beatmaps
                 {
                     using (var stream = File.OpenRead(cacheDownloadRequest.Filename))
                     using (var outStream = File.OpenWrite(cacheFilePath))
-                    using (var bz2 = new BZip2Stream(stream, CompressionMode.Decompress, false))
-                        bz2.CopyTo(outStream);
+                    {
+                        // ensure to clobber any and all existing data to avoid accidental corruption.
+                        outStream.SetLength(0);
+
+                        using (var bz2 = new BZip2Stream(stream, CompressionMode.Decompress, false))
+                            bz2.CopyTo(outStream);
+                    }
 
                     // set to null on completion to allow lookups to begin using the new source
                     cacheDownloadRequest = null;
+                    log(@"Local cache fetch completed successfully.");
                 }
                 catch (Exception ex)
                 {
-                    Logger.Log($@"{nameof(LocalCachedBeatmapMetadataSource)}'s online cache extraction failed: {ex}", LoggingTarget.Database);
+                    log($@"Online cache extraction failed: {ex}");
+                    // at this point clobber the cache regardless of whether we're refetching, because by this point who knows what state the cache file is in.
                     File.Delete(cacheFilePath);
                 }
                 finally
@@ -172,6 +210,9 @@ namespace osu.Game.Beatmaps
                 }
             });
         }
+
+        private static void log(string message)
+            => Logger.Log($@"[{nameof(LocalCachedBeatmapMetadataSource)}] {message}", LoggingTarget.Database);
 
         private void logForModel(BeatmapSetInfo set, string message) =>
             RealmArchiveModelImporter<BeatmapSetInfo>.LogForModel(set, $@"[{nameof(LocalCachedBeatmapMetadataSource)}] {message}");
