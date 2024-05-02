@@ -123,9 +123,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
                     // OverlapValues dict only contains prev objects, so be sure to use right object
                     if (harderObject.HitObject.Index > easierObject.HitObject.Index)
-                        harderObject.HitObject.OverlapValues.TryGetValue(easierObject.HitObject, out overlapValue);
+                        harderObject.HitObject.OverlapValues.TryGetValue(easierObject.HitObject.Index, out overlapValue);
                     else
-                        easierObject.HitObject.OverlapValues.TryGetValue(harderObject.HitObject, out overlapValue);
+                        easierObject.HitObject.OverlapValues.TryGetValue(harderObject.HitObject.Index, out overlapValue);
 
                     // Nerf easier object if it overlaps in the same place as hard one
                     easierObject.Difficulty *= Math.Pow(1 - overlapValue, 2);
@@ -133,12 +133,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             }
 
             const double decay_weight = 0.5;
+            const double threshold = 0.6;
             double weight = 1.0;
 
-            foreach (var diffObject in sortedDifficulties.OrderByDescending(d => d.Difficulty))
+            foreach (var diffObject in sortedDifficulties.Where(d => d.Difficulty > threshold).OrderByDescending(d => d.Difficulty))
             {
                 // Add weighted difficulty
-                screenOverlapDifficulty += Math.Max(0, diffObject.Difficulty - 0.6) * weight;
+                screenOverlapDifficulty += Math.Max(0, diffObject.Difficulty - threshold) * weight;
                 weight *= decay_weight;
             }
 

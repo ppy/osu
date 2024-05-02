@@ -115,9 +115,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         public IList<ReadingObject> ReadingObjects { get; private set; }
 
         /// <summary>
-        /// NON ZERO overlap values for each visible object on the moment this object appeared. Saved for optimization.
+        /// NON ZERO overlap values for each visible object on the moment this object appeared. Key is <see cref="DifficultyHitObject.Index"/>. Saved for optimization.
         /// </summary>
-        public IDictionary<OsuDifficultyHitObject, double> OverlapValues { get; private set; }
+        public IDictionary<int, double> OverlapValues { get; private set; }
 
         /// <summary>
         /// Time in ms between appearence of this <see cref="OsuDifficultyHitObject"/> and moment to click on it.
@@ -165,7 +165,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
             AnglePredictability = CalculateAnglePredictability();
 
-            OverlapValues = new Dictionary<OsuDifficultyHitObject, double>();
+            OverlapValues = new Dictionary<int, double>();
             ReadingObjects = getReadingObjects();
 
             RhythmDifficulty = RhythmEvaluator.EvaluateDifficultyOf(this);
@@ -181,20 +181,20 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
             OsuDifficultyHitObject prevObject = this;
 
-            // The fastest way to do it so far, but still, not very fast
-            var visibleObjects = retrieveCurrentVisibleObjects(this).ToImmutableArray();
-            List<ReadingObject> overlapObjects = new List<ReadingObject>(visibleObjects.Length);
+            // The fastest way to do it I seen so far. Still - one of the slowest parts of the reading calc
+            var visibleObjects = retrieveCurrentVisibleObjects(this);
+            List<ReadingObject> readingObjects = new List<ReadingObject>(visibleObjects.Count);
 
             //foreach (var loopObj in visibleObjects)
-            for (int loopIndex = 0; loopIndex < visibleObjects.Length; loopIndex++)
+            for (int loopIndex = 0; loopIndex < visibleObjects.Count; loopIndex++)
             {
                 var loopObj = visibleObjects[loopIndex];
 
                 // Overlapness with this object. Very slow because of `StackedPosition` being bad
                 double currentOverlapness = calculateOverlapness(this, loopObj);
 
-                // Save it for future use. Saving only non-zero to make it faster (still slow tho)
-                if (currentOverlapness > 0) OverlapValues[loopObj] = currentOverlapness;
+                // Save it for future use. Saving only non-zero to make it faster
+                if (currentOverlapness > 0) OverlapValues[loopObj.Index] = currentOverlapness;
 
                 if (prevObject.Angle.IsNull())
                 {
@@ -206,7 +206,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 double angle = (double)prevObject.Angle;
 
                 // Overlapness between current and prev to make streams have 0 buff
-                prevObject.OverlapValues.TryGetValue(loopObj, out double instantOverlapness);
+                prevObject.OverlapValues.TryGetValue(loopObj.Index, out double instantOverlapness);
 
                 // Nerf overlaps on wide angles
                 double angleFactor = 1;
@@ -265,11 +265,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 totalOverlapnessDifficulty += currentOverlapness;
 
                 ReadingObject newObj = new ReadingObject(loopObj, totalOverlapnessDifficulty);
-                overlapObjects.Add(newObj);
+                readingObjects.Add(newObj);
                 prevObject = loopObj;
             }
 
-            return overlapObjects;
+            return readingObjects;
         }
 
         private double getOpacitiyMultiplier(OsuDifficultyHitObject loopObj)
@@ -340,8 +340,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             return overlappingAreaNormalized * area_coef + perfectStackBuff * (1 - area_coef);
         }
 
-        private static IEnumerable<OsuDifficultyHitObject> retrieveCurrentVisibleObjects(OsuDifficultyHitObject current)
+        private static List<OsuDifficultyHitObject> retrieveCurrentVisibleObjects(OsuDifficultyHitObject current)
         {
+
+            var visibleObjects = new List<OsuDifficultyHitObject>();
 
             for (int i = 0; i < current.Count; i++)
             {
@@ -351,8 +353,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                     hitObject.StartTime < current.StartTime - current.Preempt)
                     break;
 
-                yield return hitObject;
+                visibleObjects.Add(hitObject);
             }
+
+            return visibleObjects;
         }
 
         public double CalculateAnglePredictability()
