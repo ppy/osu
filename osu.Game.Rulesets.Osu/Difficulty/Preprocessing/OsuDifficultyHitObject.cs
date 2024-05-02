@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Linq;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
@@ -33,6 +32,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         /// Milliseconds elapsed since the start time of the previous <see cref="OsuDifficultyHitObject"/>, with a minimum of 25ms.
         /// </summary>
         public readonly double StrainTime;
+
+        /// <summary>
+        /// Saved version of <see cref="OsuHitObject.StackedPosition"/> to decrease overhead.
+        /// </summary>
+        public readonly Vector2 StackedPosition;
 
         /// <summary>
         /// Normalised distance from the "lazy" end position of the previous <see cref="OsuDifficultyHitObject"/> to the start position of this <see cref="OsuDifficultyHitObject"/>.
@@ -142,11 +146,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         public OsuDifficultyHitObject(HitObject hitObject, HitObject lastObject, HitObject? lastLastObject, double clockRate, List<DifficultyHitObject> objects, int index)
             : base(hitObject, lastObject, clockRate, objects, index)
         {
-            this.lastLastObject = lastLastObject as OsuHitObject;
+            OsuHitObject currObject = (OsuHitObject)hitObject;
             this.lastObject = (OsuHitObject)lastObject;
+            this.lastLastObject = lastLastObject as OsuHitObject;
+
+            StackedPosition = currObject.StackedPosition;
             Preempt = BaseObject.TimePreempt / clockRate;
             FollowLineTime = 800 / clockRate; // 800ms is follow line appear time
-            FollowLineTime *= ((OsuHitObject)hitObject).NewCombo ? 0 : 1; // no follow lines when NC
+            FollowLineTime *= (currObject.NewCombo ? 0 : 1); // no follow lines when NC
             ClockRate = clockRate;
 
             // Capped to 25ms to prevent difficulty calculation breaking from simultaneous objects.
@@ -165,32 +172,33 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
             AnglePredictability = CalculateAnglePredictability();
 
-            OverlapValues = new Dictionary<int, double>();
-            ReadingObjects = getReadingObjects();
+            (ReadingObjects, OverlapValues) = getReadingObjects();
 
             RhythmDifficulty = RhythmEvaluator.EvaluateDifficultyOf(this);
             Density = ReadingEvaluator.EvaluateDensityOf(this);
         }
 
-        private List<ReadingObject> getReadingObjects()
+        private (IList<ReadingObject>, IDictionary<int, double>) getReadingObjects()
         {
             double totalOverlapnessDifficulty = 0;
             double currentTime = DeltaTime;
-            List<double> historicTimes = new List<double>();
-            List<double> historicAngles = new List<double>();
+            List<double> historicTimes = [];
+            List<double> historicAngles = [];
 
             OsuDifficultyHitObject prevObject = this;
 
-            // The fastest way to do it I seen so far. Still - one of the slowest parts of the reading calc
+            // The fastest way to do it I've seen so far. Still - one of the slowest parts of the reading calc
             var visibleObjects = retrieveCurrentVisibleObjects(this);
-            List<ReadingObject> readingObjects = new List<ReadingObject>(visibleObjects.Count);
+
+            var readingObjects = new List<ReadingObject>(visibleObjects.Count);
+            OverlapValues = new Dictionary<int, double>();
 
             //foreach (var loopObj in visibleObjects)
             for (int loopIndex = 0; loopIndex < visibleObjects.Count; loopIndex++)
             {
                 var loopObj = visibleObjects[loopIndex];
 
-                // Overlapness with this object. Very slow because of `StackedPosition` being bad
+                // Overlapness with this object
                 double currentOverlapness = calculateOverlapness(this, loopObj);
 
                 // Save it for future use. Saving only non-zero to make it faster
@@ -206,7 +214,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 double angle = (double)prevObject.Angle;
 
                 // Overlapness between current and prev to make streams have 0 buff
-                prevObject.OverlapValues.TryGetValue(loopObj.Index, out double instantOverlapness);
+                double instantOverlapness = 0;
+                prevObject.OverlapValues?.TryGetValue(loopObj.Index, out instantOverlapness);
 
                 // Nerf overlaps on wide angles
                 double angleFactor = 1;
@@ -269,7 +278,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 prevObject = loopObj;
             }
 
-            return readingObjects;
+            return (readingObjects, OverlapValues);
         }
 
         private double getOpacitiyMultiplier(OsuDifficultyHitObject loopObj)
@@ -311,14 +320,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         {
             const double area_coef = 0.85;
 
-            OsuHitObject o1 = odho1.BaseObject, o2 = odho2.BaseObject;
-
-            // This is VERY slow, make it faster somehow
-            Vector2 o1pos = o1.StackedPosition;
-            Vector2 o2pos = o2.StackedPosition;
-
-            double distance = Vector2.Distance(o1pos, o2pos); // Distance func is also pretty slow for some reason
-            double radius = o1.Radius;
+            double distance = Vector2.Distance(odho1.StackedPosition, odho2.StackedPosition); // Distance func is kinda slow for some reason
+            double radius = odho1.BaseObject.Radius;
 
             double distance_sqr = distance * distance;
             double radius_sqr = radius * radius;
