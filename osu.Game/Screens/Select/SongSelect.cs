@@ -808,7 +808,82 @@ namespace osu.Game.Screens.Select
 
             return false;
         }
-
+        private void increaseSpeed()
+        {
+            var rateAdjustStates = ModSelect.AllAvailableMods.Where(pair => pair.Mod is ModRateAdjust);
+            var stateDoubleTime = ModSelect.AllAvailableMods.First(pair => pair.Mod is ModDoubleTime);
+            bool rateModActive = ModSelect.AllAvailableMods.Where(pair => pair.Mod is ModRateAdjust && pair.Active.Value).Count() > 0;
+            double stepSize = 0.05d;
+            double newRate = 1d + stepSize;
+            // If no mod rateAdjust mod is currently active activate DoubleTime with speed newRate
+            if (!rateModActive)
+            {
+                stateDoubleTime.Active.Value = true;
+                ((ModDoubleTime)stateDoubleTime.Mod).SpeedChange.Value = newRate;
+                return;
+            }
+            // Find current active rateAdjust mod and modify speed, enable DoubleTime if necessary
+            foreach (var state in rateAdjustStates)
+            {
+                ModRateAdjust mod = (ModRateAdjust)state.Mod;
+                if (!state.Active.Value) continue;
+                newRate = mod.SpeedChange.Value + stepSize;
+                if (mod.Acronym == "DT" || mod.Acronym == "NC")
+                    mod.SpeedChange.Value = newRate;
+                else
+                {
+                    if (newRate == 1.0d)
+                        state.Active.Value = false;
+                    if (newRate > 1d)
+                    {
+                        state.Active.Value = false;
+                        stateDoubleTime.Active.Value = true;
+                        ((ModDoubleTime)stateDoubleTime.Mod).SpeedChange.Value = newRate;
+                        break;
+                    }
+                    if (newRate < 1d)
+                        mod.SpeedChange.Value = newRate;
+                }
+            }
+        }
+        private void decreaseSpeed()
+        {
+            var rateAdjustStates = ModSelect.AllAvailableMods.Where(pair => pair.Mod is ModRateAdjust);
+            var stateHalfTime = ModSelect.AllAvailableMods.First(pair => pair.Mod is ModHalfTime);
+            bool rateModActive = ModSelect.AllAvailableMods.Where(pair => pair.Mod is ModRateAdjust && pair.Active.Value).Count() > 0;
+            double stepSize = 0.05d;
+            double newRate = 1d - stepSize;
+            // If no mod rateAdjust mod is currently active activate HalfTime with speed newRate
+            if (!rateModActive)
+            {
+                stateHalfTime.Active.Value = true;
+                ((ModHalfTime)stateHalfTime.Mod).SpeedChange.Value = newRate;
+                return;
+            }
+            // Find current active rateAdjust mod and modify speed, enable HalfTime if necessary
+            foreach (var state in rateAdjustStates)
+            {
+                ModRateAdjust mod = (ModRateAdjust)state.Mod;
+                if (!state.Active.Value) continue;
+                newRate = mod.SpeedChange.Value - stepSize;
+                if (mod.Acronym == "HT" || mod.Acronym == "DC")
+                    mod.SpeedChange.Value = newRate;
+                else
+                {
+                    if (newRate == 1.0d)
+                        state.Active.Value = false;
+                    if (newRate < 1d)
+                    {
+                        state.Active.Value = false;
+                        stateHalfTime.Active.Value = true;
+                        ((ModHalfTime)stateHalfTime.Mod).SpeedChange.Value = newRate;
+                        break;
+                    }
+                    if (newRate > 1d)
+                        mod.SpeedChange.Value = newRate;
+                }
+            }
+        }
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
@@ -1011,11 +1086,16 @@ namespace osu.Game.Screens.Select
                 return false;
 
             if (!this.IsCurrentScreen()) return false;
-
             switch (e.Action)
             {
                 case GlobalAction.Select:
                     FinaliseSelection();
+                    return true;
+                case GlobalAction.IncreaseSpeed:
+                    increaseSpeed();
+                    return true;
+                case GlobalAction.DecreaseSpeed:
+                    decreaseSpeed();
                     return true;
             }
 
