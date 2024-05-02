@@ -24,10 +24,10 @@ namespace osu.Game.Screens.Select
     public partial class BeatmapInfoWedgeV2 : VisibilityContainer
     {
         public const float WEDGE_HEIGHT = 120;
-        private const float shear_width = SongSelect.SHEAR_X * WEDGE_HEIGHT;
+        public const float SHEAR_WIDTH = SongSelect.SHEAR_X * WEDGE_HEIGHT;
 
         private const float transition_duration = 250;
-        private const float colour_bar_width = 30;
+        public const float COLOUR_BAR_WIDTH = 30;
 
         /// Todo: move this const out to song select when more new design elements are implemented for the beatmap details area, since it applies to text alignment of various elements
         private const float text_margin = 62;
@@ -96,7 +96,7 @@ namespace osu.Game.Screens.Select
                                 RelativeSizeAxes = Axes.Y,
 
                                 // By limiting the width we avoid this box showing up as an outline around the drawables that are on top of it.
-                                Width = colour_bar_width + SongSelect.WEDGE_CORNER_RADIUS,
+                                Width = COLOUR_BAR_WIDTH + SongSelect.WEDGE_CORNER_RADIUS,
                                 Child = new Box { RelativeSizeAxes = Axes.Both }
                             },
                             new Container
@@ -104,11 +104,11 @@ namespace osu.Game.Screens.Select
                                 // Applying the shear to this container and nesting the starCounter inside avoids
                                 // the deformation that occurs if the shear is applied to the starCounter whilst rotated
                                 Shear = -SongSelect.WEDGED_CONTAINER_SHEAR,
-                                X = -colour_bar_width / 2,
+                                X = -COLOUR_BAR_WIDTH / 2,
                                 Anchor = Anchor.CentreRight,
                                 Origin = Anchor.Centre,
                                 RelativeSizeAxes = Axes.Y,
-                                Width = colour_bar_width,
+                                Width = COLOUR_BAR_WIDTH,
                                 Child = starCounter = new StarCounter
                                 {
                                     Rotation = (float)(Math.Atan(SongSelect.SHEAR_X) * (180 / Math.PI)),
@@ -125,7 +125,7 @@ namespace osu.Game.Screens.Select
                                 Anchor = Anchor.TopRight,
                                 Origin = Anchor.TopRight,
                                 Direction = FillDirection.Vertical,
-                                Padding = new MarginPadding { Top = 3, Right = colour_bar_width + 8 },
+                                Padding = new MarginPadding { Top = 3, Right = COLOUR_BAR_WIDTH + 8 },
                                 AutoSizeAxes = Axes.Both,
                                 Spacing = new Vector2(0, 5),
                                 Depth = float.MinValue,
@@ -154,12 +154,6 @@ namespace osu.Game.Screens.Select
                     },
                     new InfoWedgeBackground
                     {
-                        Padding = new MarginPadding
-                        {
-                            Top = 10,
-                            Left = -SongSelect.WEDGE_CORNER_RADIUS,
-                            Right = shear_width + colour_bar_width
-                        },
                         Child = new BasicBeatmapInfoContent
                         {
                             Padding = new MarginPadding
@@ -172,12 +166,6 @@ namespace osu.Game.Screens.Select
                     },
                     new InfoWedgeBackground
                     {
-                        Padding = new MarginPadding
-                        {
-                            Top = 10,
-                            Left = -SongSelect.WEDGE_CORNER_RADIUS,
-                            Right = shear_width + colour_bar_width
-                        },
                         Child = new ExtendedBeatmapInfoContent
                         {
                             Padding = new MarginPadding
@@ -253,7 +241,7 @@ namespace osu.Game.Screens.Select
             {
                 LoadComponentAsync(loadingInfo = new Container
                 {
-                    Padding = new MarginPadding { Right = colour_bar_width },
+                    Padding = new MarginPadding { Right = COLOUR_BAR_WIDTH },
                     RelativeSizeAxes = Axes.Both,
                     Depth = DisplayedContent?.Depth + 1 ?? 0,
                     Child = new Container
@@ -359,8 +347,8 @@ namespace osu.Game.Screens.Select
 
                 // best effort to confine the auto-sized text to wedge bounds
                 // the artist label doesn't have an extra text_margin as it doesn't touch the right metadata
-                TitleLabel.MaxWidth = DrawWidth - text_margin * 2 - shear_width;
-                ArtistLabel.MaxWidth = DrawWidth - text_margin - shear_width;
+                TitleLabel.MaxWidth = DrawWidth - text_margin * 2 - SHEAR_WIDTH;
+                ArtistLabel.MaxWidth = DrawWidth - text_margin - SHEAR_WIDTH;
             }
         }
     }

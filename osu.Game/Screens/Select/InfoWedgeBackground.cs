@@ -23,6 +23,15 @@ namespace osu.Game.Screens.Select
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
+
+            Padding = new MarginPadding
+            {
+                Top = 10,
+                Left = -SongSelect.WEDGE_CORNER_RADIUS,
+
+                // TODO: should account top wedge's shear width for alignment (hard to do as this auto-sizes height right now)
+                Right = BeatmapInfoWedgeV2.SHEAR_WIDTH + BeatmapInfoWedgeV2.COLOUR_BAR_WIDTH
+            };
         }
 
         [BackgroundDependencyLoader]
