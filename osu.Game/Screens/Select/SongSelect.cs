@@ -755,7 +755,95 @@ namespace osu.Game.Screens.Select
 
             return false;
         }
-
+        public void IncreaseSpeed()
+        {
+            // find way of grabbing all types of ModSpeedAdjust
+            var rateAdjustStates = ModSelect.AllAvailableMods.Where(pair => pair.Mod.Acronym == "DT" || pair.Mod.Acronym == "NC" || pair.Mod.Acronym == "HT" || pair.Mod.Acronym == "DC");
+            var stateDoubleTime = ModSelect.AllAvailableMods.First(pair => pair.Mod.Acronym == "DT");
+            bool oneActive = false;
+            double newRate = 1.05d;
+            foreach (var state in rateAdjustStates)
+            {
+                ModRateAdjust mod = (ModRateAdjust)state.Mod;
+                if (state.Active.Value)
+                {
+                    oneActive = true;
+                    newRate = mod.SpeedChange.Value + 0.05d;
+                    if (mod.Acronym == "DT" || mod.Acronym == "NC")
+                    {
+                        mod.SpeedChange.Value = newRate;
+                        return;
+                    }
+                    else
+                    {
+                        if (newRate == 1.0d)
+                        {
+                            state.Active.Value = false;
+                        }
+                        if (newRate > 1d)
+                        {
+                            state.Active.Value = false;
+                            stateDoubleTime.Active.Value = true;
+                            ((ModDoubleTime)stateDoubleTime.Mod).SpeedChange.Value = newRate;
+                            return;
+                        }
+                        if (newRate < 1d)
+                        {
+                            mod.SpeedChange.Value = newRate;
+                        }
+                    }
+                }
+            }
+            if (!oneActive)
+            {
+                stateDoubleTime.Active.Value = true;
+                ((ModDoubleTime)stateDoubleTime.Mod).SpeedChange.Value = newRate;
+            }
+        }
+        public void DecreaseSpeed()
+        {
+            var rateAdjustStates = ModSelect.AllAvailableMods.Where(pair => pair.Mod.Acronym == "DT" || pair.Mod.Acronym == "NC" || pair.Mod.Acronym == "HT" || pair.Mod.Acronym == "DC");
+            var stateHalfTime = ModSelect.AllAvailableMods.First(pair => pair.Mod.Acronym == "HT");
+            bool oneActive = false;
+            double newRate = 0.95d;
+            foreach (var state in rateAdjustStates)
+            {
+                ModRateAdjust mod = (ModRateAdjust)state.Mod;
+                if (state.Active.Value)
+                {
+                    oneActive = true;
+                    newRate = mod.SpeedChange.Value - 0.05d;
+                    if (mod.Acronym == "HT" || mod.Acronym == "DC")
+                    {
+                        mod.SpeedChange.Value = newRate;
+                        return;
+                    }
+                    else
+                    {
+                        if (newRate == 1.0d)
+                        {
+                            state.Active.Value = false;
+                        }
+                        if (newRate < 1d)
+                        {
+                            state.Active.Value = false;
+                            stateHalfTime.Active.Value = true;
+                            ((ModHalfTime)stateHalfTime.Mod).SpeedChange.Value = newRate;
+                            return;
+                        }
+                        if (newRate > 1d)
+                        {
+                            mod.SpeedChange.Value = newRate;
+                        }
+                    }
+                }
+            }
+            if (!oneActive)
+            {
+                stateHalfTime.Active.Value = true;
+                ((ModHalfTime)stateHalfTime.Mod).SpeedChange.Value = newRate;
+            }
+        }
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
@@ -955,11 +1043,16 @@ namespace osu.Game.Screens.Select
                 return false;
 
             if (!this.IsCurrentScreen()) return false;
-
             switch (e.Action)
             {
                 case GlobalAction.Select:
                     FinaliseSelection();
+                    return true;
+                case GlobalAction.IncreaseSpeed:
+                    IncreaseSpeed();
+                    return true;
+                case GlobalAction.DecreaseSpeed:
+                    DecreaseSpeed();
                     return true;
             }
 
