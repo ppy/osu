@@ -11,7 +11,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Utils;
 using osu.Game.Rulesets.Judgements;
-using osu.Game.Rulesets.Mania.Judgements;
 using osu.Game.Rulesets.Mania.Skinning.Default;
 using osu.Game.Rulesets.UI.Scrolling;
 using osuTK;
@@ -149,9 +148,6 @@ namespace osu.Game.Rulesets.Mania.UI
         {
             // scale roughly in-line with visual appearance of notes
             Vector2 scale = new Vector2(1, 0.6f);
-
-            if (result.Judgement is HoldNoteTickJudgement)
-                scale *= 0.5f;
 
             this.ScaleTo(scale);
 

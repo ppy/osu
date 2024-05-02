@@ -97,7 +97,7 @@ namespace osu.Game.Tests.Visual.Navigation
         [Test]
         public void TestFromSongSelectWithFilter([Values] ScorePresentType type)
         {
-            AddStep("enter song select", () => Game.ChildrenOfType<ButtonSystem>().Single().OnSolo.Invoke());
+            AddStep("enter song select", () => Game.ChildrenOfType<ButtonSystem>().Single().OnSolo?.Invoke());
             AddUntilStep("song select is current", () => Game.ScreenStack.CurrentScreen is PlaySongSelect songSelect && songSelect.BeatmapSetsLoaded);
 
             AddStep("filter to nothing", () => ((PlaySongSelect)Game.ScreenStack.CurrentScreen).FilterControl.CurrentTextSearch.Value = "fdsajkl;fgewq");
@@ -110,7 +110,7 @@ namespace osu.Game.Tests.Visual.Navigation
         [Test]
         public void TestFromSongSelectWithConvertRulesetChange([Values] ScorePresentType type)
         {
-            AddStep("enter song select", () => Game.ChildrenOfType<ButtonSystem>().Single().OnSolo.Invoke());
+            AddStep("enter song select", () => Game.ChildrenOfType<ButtonSystem>().Single().OnSolo?.Invoke());
             AddUntilStep("song select is current", () => Game.ScreenStack.CurrentScreen is PlaySongSelect songSelect && songSelect.BeatmapSetsLoaded);
 
             AddStep("set convert to false", () => Game.LocalConfig.SetValue(OsuSetting.ShowConvertedBeatmaps, false));
@@ -122,7 +122,7 @@ namespace osu.Game.Tests.Visual.Navigation
         [Test]
         public void TestFromSongSelect([Values] ScorePresentType type)
         {
-            AddStep("enter song select", () => Game.ChildrenOfType<ButtonSystem>().Single().OnSolo.Invoke());
+            AddStep("enter song select", () => Game.ChildrenOfType<ButtonSystem>().Single().OnSolo?.Invoke());
             AddUntilStep("song select is current", () => Game.ScreenStack.CurrentScreen is PlaySongSelect songSelect && songSelect.BeatmapSetsLoaded);
 
             var firstImport = importScore(1);
@@ -135,7 +135,7 @@ namespace osu.Game.Tests.Visual.Navigation
         [Test]
         public void TestFromSongSelectDifferentRuleset([Values] ScorePresentType type)
         {
-            AddStep("enter song select", () => Game.ChildrenOfType<ButtonSystem>().Single().OnSolo.Invoke());
+            AddStep("enter song select", () => Game.ChildrenOfType<ButtonSystem>().Single().OnSolo?.Invoke());
             AddUntilStep("song select is current", () => Game.ScreenStack.CurrentScreen is PlaySongSelect songSelect && songSelect.BeatmapSetsLoaded);
 
             var firstImport = importScore(1);
@@ -170,7 +170,7 @@ namespace osu.Game.Tests.Visual.Navigation
                     BeatmapInfo = beatmap.Beatmaps.First(),
                     Ruleset = ruleset ?? new OsuRuleset().RulesetInfo,
                     User = new GuestUser(),
-                }).Value;
+                })!.Value;
             });
 
             AddAssert($"import {i} succeeded", () => imported != null);
@@ -193,7 +193,7 @@ namespace osu.Game.Tests.Visual.Navigation
                 case ScorePresentType.Results:
                     AddUntilStep("wait for results", () => lastWaitedScreen != Game.ScreenStack.CurrentScreen && Game.ScreenStack.CurrentScreen is ResultsScreen);
                     AddStep("store last waited screen", () => lastWaitedScreen = Game.ScreenStack.CurrentScreen);
-                    AddUntilStep("correct score displayed", () => ((ResultsScreen)Game.ScreenStack.CurrentScreen).Score.Equals(getImport()));
+                    AddUntilStep("correct score displayed", () => ((ResultsScreen)Game.ScreenStack.CurrentScreen).Score!.Equals(getImport()));
                     AddAssert("correct ruleset selected", () => Game.Ruleset.Value.Equals(getImport().Ruleset));
                     break;
 

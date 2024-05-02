@@ -33,8 +33,7 @@ namespace osu.Game.Screens.Ranking.Statistics
         /// <param name="items">The <see cref="SimpleStatisticItem"/>s to display in this row.</param>
         public SimpleStatisticTable(int columnCount, [ItemNotNull] IEnumerable<SimpleStatisticItem> items)
         {
-            if (columnCount < 1)
-                throw new ArgumentOutOfRangeException(nameof(columnCount));
+            ArgumentOutOfRangeException.ThrowIfNegativeOrZero(columnCount);
 
             this.columnCount = columnCount;
             this.items = items.ToArray();

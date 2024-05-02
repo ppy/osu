@@ -8,6 +8,8 @@ using System.Linq;
 using osuTK;
 using osuTK.Graphics;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Extensions.Color4Extensions;
@@ -37,7 +39,7 @@ namespace osu.Game.Graphics.UserInterface
 
                 if (Dropdown is IHasAccentColour dropdown)
                     dropdown.AccentColour = value;
-                foreach (var i in TabContainer.Children.OfType<IHasAccentColour>())
+                foreach (var i in TabContainer.OfType<IHasAccentColour>())
                     i.AccentColour = value;
             }
         }
@@ -48,7 +50,7 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override TabItem<T> CreateTabItem(T value) => new OsuTabItem(value);
 
-        protected virtual float StripWidth => TabContainer.Children.Sum(c => c.IsPresent ? c.DrawWidth + TabContainer.Spacing.X : 0) - TabContainer.Spacing.X;
+        protected virtual float StripWidth => TabContainer.Sum(c => c.IsPresent ? c.DrawWidth + TabContainer.Spacing.X : 0) - TabContainer.Spacing.X;
 
         /// <summary>
         /// Whether entries should be automatically populated if <typeparamref name="T"/> is an <see cref="Enum"/> type.
@@ -116,18 +118,18 @@ namespace osu.Game.Graphics.UserInterface
                 }
             }
 
-            private const float transition_length = 500;
+            protected const float TRANSITION_LENGTH = 500;
 
-            protected void FadeHovered()
+            protected virtual void FadeHovered()
             {
-                Bar.FadeIn(transition_length, Easing.OutQuint);
-                Text.FadeColour(Color4.White, transition_length, Easing.OutQuint);
+                Bar.FadeIn(TRANSITION_LENGTH, Easing.OutQuint);
+                Text.FadeColour(Color4.White, TRANSITION_LENGTH, Easing.OutQuint);
             }
 
-            protected void FadeUnhovered()
+            protected virtual void FadeUnhovered()
             {
-                Bar.FadeTo(IsHovered ? 1 : 0, transition_length, Easing.OutQuint);
-                Text.FadeColour(IsHovered ? Color4.White : AccentColour, transition_length, Easing.OutQuint);
+                Bar.FadeTo(IsHovered ? 1 : 0, TRANSITION_LENGTH, Easing.OutQuint);
+                Text.FadeColour(IsHovered ? Color4.White : AccentColour, TRANSITION_LENGTH, Easing.OutQuint);
             }
 
             protected override bool OnHover(HoverEvent e)
@@ -141,13 +143,6 @@ namespace osu.Game.Graphics.UserInterface
             {
                 if (!Active.Value)
                     FadeUnhovered();
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
-            {
-                if (accentColour == default)
-                    AccentColour = colours.Blue;
             }
 
             public OsuTabItem(T value)
@@ -196,8 +191,19 @@ namespace osu.Game.Graphics.UserInterface
                         Origin = Anchor.BottomLeft,
                         Anchor = Anchor.BottomLeft,
                     },
-                    new HoverClickSounds(HoverSampleSet.TabSelect)
+                    new HoverSounds(HoverSampleSet.TabSelect)
                 };
+            }
+
+            private Sample selectSample;
+
+            [BackgroundDependencyLoader]
+            private void load(OsuColour colours, AudioManager audio)
+            {
+                if (accentColour == default)
+                    AccentColour = colours.Blue;
+
+                selectSample = audio.Samples.Get(@"UI/tabselect-select");
             }
 
             protected override void OnActivated()
@@ -211,6 +217,8 @@ namespace osu.Game.Graphics.UserInterface
                 Text.Font = Text.Font.With(weight: FontWeight.Medium);
                 FadeUnhovered();
             }
+
+            protected override void OnActivatedByUser() => selectSample.Play();
         }
     }
 }

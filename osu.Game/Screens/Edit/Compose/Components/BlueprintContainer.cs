@@ -114,7 +114,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         protected override bool OnMouseDown(MouseDownEvent e)
         {
             bool selectionPerformed = performMouseDownActions(e);
-            bool movementPossible = prepareSelectionMovement();
+            bool movementPossible = prepareSelectionMovement(e);
 
             // check if selection has occurred
             if (selectionPerformed)
@@ -512,7 +512,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         protected virtual void OnBlueprintDeselected(SelectionBlueprint<T> blueprint)
         {
-            SelectionBlueprints.ChangeChildDepth(blueprint, 0);
+            if (SelectionBlueprints.Contains(blueprint))
+                SelectionBlueprints.ChangeChildDepth(blueprint, 0);
+
             SelectionHandler.HandleDeselected(blueprint);
         }
 
@@ -536,9 +538,13 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <summary>
         /// Attempts to begin the movement of any selected blueprints.
         /// </summary>
+        /// <param name="e">The <see cref="MouseDownEvent"/> defining the beginning of a movement.</param>
         /// <returns>Whether a movement is possible.</returns>
-        private bool prepareSelectionMovement()
+        private bool prepareSelectionMovement(MouseDownEvent e)
         {
+            if (e.Button == MouseButton.Right)
+                return false;
+
             if (!SelectionHandler.SelectedBlueprints.Any())
                 return false;
 

@@ -140,7 +140,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
                 Colour = this.baseColour = baseColour;
 
-                Current.Value = 1;
+                Progress = 1;
             }
 
             protected override void Update()

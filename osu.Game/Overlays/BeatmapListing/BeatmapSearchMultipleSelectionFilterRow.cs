@@ -52,10 +52,8 @@ namespace osu.Game.Overlays.BeatmapListing
             [BackgroundDependencyLoader]
             private void load()
             {
-                Anchor = Anchor.BottomLeft;
-                Origin = Anchor.BottomLeft;
                 RelativeSizeAxes = Axes.X;
-                Height = 15;
+                AutoSizeAxes = Axes.Y;
                 Spacing = new Vector2(10, 0);
 
                 AddRange(GetValues().Select(CreateTabItem));
@@ -130,7 +128,11 @@ namespace osu.Game.Overlays.BeatmapListing
             protected override bool OnClick(ClickEvent e)
             {
                 base.OnClick(e);
+
+                // this tab item implementation is not managed by a TabControl,
+                // therefore we have to manually update Active state and play select sound when this tab item is clicked.
                 Active.Toggle();
+                SelectSample.Play();
                 return true;
             }
         }

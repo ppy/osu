@@ -174,6 +174,8 @@ namespace osu.Game.Screens.Edit
 
         public List<BreakPeriod> Breaks => PlayableBeatmap.Breaks;
 
+        public List<string> UnhandledEventLines => PlayableBeatmap.UnhandledEventLines;
+
         public double TotalBreakTime => PlayableBeatmap.TotalBreakTime;
 
         public IReadOnlyList<HitObject> HitObjects => PlayableBeatmap.HitObjects;

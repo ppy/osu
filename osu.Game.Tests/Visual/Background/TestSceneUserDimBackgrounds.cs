@@ -89,13 +89,18 @@ namespace osu.Game.Tests.Visual.Background
             setupUserSettings();
             AddStep("Start player loader", () => songSelect.Push(playerLoader = new TestPlayerLoader(player = new LoadBlockingTestPlayer { BlockLoad = true })));
             AddUntilStep("Wait for Player Loader to load", () => playerLoader?.IsLoaded ?? false);
-            AddAssert("Background retained from song select", () => songSelect.IsBackgroundCurrent());
-            AddStep("Trigger background preview", () =>
+            AddAssert("Background retained from song select", () =>
             {
-                InputManager.MoveMouseTo(playerLoader.ScreenPos);
-                InputManager.MoveMouseTo(playerLoader.VisualSettingsPos);
+                InputManager.MoveMouseTo(playerLoader);
+                return songSelect.IsBackgroundCurrent();
             });
-            AddUntilStep("Screen is dimmed and blur applied", () => songSelect.IsBackgroundDimmed() && songSelect.IsUserBlurApplied());
+
+            AddUntilStep("Screen is dimmed and blur applied", () =>
+            {
+                InputManager.MoveMouseTo(playerLoader.VisualSettingsPos);
+                return songSelect.IsBackgroundDimmed() && songSelect.IsUserBlurApplied();
+            });
+
             AddStep("Stop background preview", () => InputManager.MoveMouseTo(playerLoader.ScreenPos));
             AddUntilStep("Screen is undimmed and user blur removed", () => songSelect.IsBackgroundUndimmed() && songSelect.CheckBackgroundBlur(playerLoader.ExpectedBackgroundBlur));
         }
@@ -349,8 +354,9 @@ namespace osu.Game.Tests.Visual.Background
         private partial class FadeAccessibleResults : ResultsScreen
         {
             public FadeAccessibleResults(ScoreInfo score)
-                : base(score, true)
+                : base(score)
             {
+                AllowRetry = true;
             }
 
             protected override BackgroundScreen CreateBackground() => new FadeAccessibleBackground(Beatmap.Value);

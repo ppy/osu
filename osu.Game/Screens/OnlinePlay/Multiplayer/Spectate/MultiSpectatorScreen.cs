@@ -228,7 +228,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         {
         }
 
-        protected override void StartGameplay(int userId, SpectatorGameplayState spectatorGameplayState)
+        protected override void StartGameplay(int userId, SpectatorGameplayState spectatorGameplayState) => Schedule(() =>
         {
             var playerArea = instances.Single(i => i.UserId == userId);
 
@@ -242,9 +242,23 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
                 return;
 
             playerArea.LoadScore(spectatorGameplayState.Score);
-        }
+        });
 
-        protected override void QuitGameplay(int userId)
+        protected override void FailGameplay(int userId) => Schedule(() =>
+        {
+            // We probably want to visualise this in the future.
+
+            var instance = instances.Single(i => i.UserId == userId);
+            syncManager.RemoveManagedClock(instance.SpectatorPlayerClock);
+        });
+
+        protected override void PassGameplay(int userId) => Schedule(() =>
+        {
+            var instance = instances.Single(i => i.UserId == userId);
+            syncManager.RemoveManagedClock(instance.SpectatorPlayerClock);
+        });
+
+        protected override void QuitGameplay(int userId) => Schedule(() =>
         {
             RemoveUser(userId);
 
@@ -252,7 +266,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
 
             instance.FadeColour(colours.Gray4, 400, Easing.OutQuint);
             syncManager.RemoveManagedClock(instance.SpectatorPlayerClock);
-        }
+        });
 
         public override bool OnBackButton()
         {

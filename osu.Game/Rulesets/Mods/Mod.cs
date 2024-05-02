@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using Newtonsoft.Json;
@@ -26,6 +27,9 @@ namespace osu.Game.Rulesets.Mods
         public abstract string Name { get; }
 
         public abstract string Acronym { get; }
+
+        [JsonIgnore]
+        public virtual string ExtendedIconInformation => string.Empty;
 
         [JsonIgnore]
         public virtual IconUsage? Icon => null;
@@ -104,20 +108,70 @@ namespace osu.Game.Rulesets.Mods
         [JsonIgnore]
         public virtual bool HasImplementation => this is IApplicableMod;
 
+        /// <summary>
+        /// Whether this mod can be played by a real human user.
+        /// Non-user-playable mods are not viable for single-player score submission.
+        /// </summary>
+        /// <example>
+        /// <list type="bullet">
+        /// <item><see cref="ModDoubleTime"/> is user-playable.</item>
+        /// <item><see cref="ModAutoplay"/> is not user-playable.</item>
+        /// </list>
+        /// </example>
         [JsonIgnore]
         public virtual bool UserPlayable => true;
 
+        /// <summary>
+        /// Whether this mod can be specified as a "required" mod in a multiplayer context.
+        /// </summary>
+        /// <example>
+        /// <list type="bullet">
+        /// <item><see cref="ModHardRock"/> is valid for multiplayer.</item>
+        /// <item>
+        /// <see cref="ModDoubleTime"/> is valid for multiplayer as long as it is a <b>required</b> mod,
+        /// as that ensures the same duration of gameplay for all users in the room.
+        /// </item>
+        /// <item>
+        /// <see cref="ModAdaptiveSpeed"/> is not valid for multiplayer, as it leads to varying
+        /// gameplay duration depending on how the users in the room play.
+        /// </item>
+        /// <item><see cref="ModAutoplay"/> is not valid for multiplayer.</item>
+        /// </list>
+        /// </example>
         [JsonIgnore]
         public virtual bool ValidForMultiplayer => true;
 
+        /// <summary>
+        /// Whether this mod can be specified as a "free" or "allowed" mod in a multiplayer context.
+        /// </summary>
+        /// <example>
+        /// <list type="bullet">
+        /// <item><see cref="ModHardRock"/> is valid for multiplayer as a free mod.</item>
+        /// <item>
+        /// <see cref="ModDoubleTime"/> is <b>not</b> valid for multiplayer as a free mod,
+        /// as it could to varying gameplay duration between users in the room depending on whether they picked it.
+        /// </item>
+        /// <item><see cref="ModAutoplay"/> is not valid for multiplayer as a free mod.</item>
+        /// </list>
+        /// </example>
         [JsonIgnore]
         public virtual bool ValidForMultiplayerAsFreeMod => true;
+
+        /// <inheritdoc/>
+        [JsonIgnore]
+        public virtual bool AlwaysValidForSubmission => false;
 
         /// <summary>
         /// Whether this mod requires configuration to apply changes to the game.
         /// </summary>
         [JsonIgnore]
         public virtual bool RequiresConfiguration => false;
+
+        /// <summary>
+        /// Whether scores with this mod active can give performance points.
+        /// </summary>
+        [JsonIgnore]
+        public virtual bool Ranked => false;
 
         /// <summary>
         /// The mods this mod cannot be enabled with.
@@ -147,7 +201,7 @@ namespace osu.Game.Rulesets.Mods
         /// <summary>
         /// Whether all settings in this mod are set to their default state.
         /// </summary>
-        protected virtual bool UsesDefaultConfiguration => SettingsBindables.All(s => s.IsDefault);
+        public virtual bool UsesDefaultConfiguration => SettingsBindables.All(s => s.IsDefault);
 
         /// <summary>
         /// Creates a copy of this <see cref="Mod"/> initialised to a default state.
@@ -237,7 +291,7 @@ namespace osu.Game.Rulesets.Mods
                 if (!(target is IParseable parseable))
                     throw new InvalidOperationException($"Bindable type {target.GetType().ReadableName()} is not {nameof(IParseable)}.");
 
-                parseable.Parse(source);
+                parseable.Parse(source, CultureInfo.InvariantCulture);
             }
         }
 

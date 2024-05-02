@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Globalization;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.Graphics;
@@ -46,7 +47,7 @@ namespace osu.Game.Skinning
                 if (!(target is IParseable parseable))
                     throw new InvalidOperationException($"Bindable type {target.GetType().ReadableName()} is not {nameof(IParseable)}.");
 
-                parseable.Parse(source);
+                parseable.Parse(source, CultureInfo.InvariantCulture);
             }
         }
     }

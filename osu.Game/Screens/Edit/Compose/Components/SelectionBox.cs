@@ -60,7 +60,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         private bool canScaleX;
 
         /// <summary>
-        /// Whether horizontal scaling support should be enabled.
+        /// Whether horizontal scaling (from the left or right edge) support should be enabled.
         /// </summary>
         public bool CanScaleX
         {
@@ -77,7 +77,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         private bool canScaleY;
 
         /// <summary>
-        /// Whether vertical scaling support should be enabled.
+        /// Whether vertical scaling (from the top or bottom edge) support should be enabled.
         /// </summary>
         public bool CanScaleY
         {
@@ -87,6 +87,27 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 if (canScaleY == value) return;
 
                 canScaleY = value;
+                recreate();
+            }
+        }
+
+        private bool canScaleDiagonally;
+
+        /// <summary>
+        /// Whether diagonal scaling (from a corner) support should be enabled.
+        /// </summary>
+        /// <remarks>
+        /// There are some cases where we only want to allow proportional resizing, and not allow
+        /// one or both explicit directions of scale.
+        /// </remarks>
+        public bool CanScaleDiagonally
+        {
+            get => canScaleDiagonally;
+            set
+            {
+                if (canScaleDiagonally == value) return;
+
+                canScaleDiagonally = value;
                 recreate();
             }
         }
@@ -153,7 +174,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         private void load()
         {
             if (rotationHandler != null)
-                canRotate.BindTo(rotationHandler.CanRotate);
+                canRotate.BindTo(rotationHandler.CanRotateSelectionOrigin);
 
             canRotate.BindValueChanged(_ => recreate(), true);
         }
@@ -245,7 +266,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             };
 
             if (CanScaleX) addXScaleComponents();
-            if (CanScaleX && CanScaleY) addFullScaleComponents();
+            if (CanScaleDiagonally) addFullScaleComponents();
             if (CanScaleY) addYScaleComponents();
             if (CanFlipX) addXFlipComponents();
             if (CanFlipY) addYFlipComponents();
@@ -383,7 +404,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
             // Shrink the parent quad to give a bit of padding so the buttons don't stick *right* on the border.
             // AABBFloat assumes no rotation. one would hope the whole editor is not being rotated.
-            var parentQuad = Parent.ScreenSpaceDrawQuad.AABBFloat.Shrink(ToLocalSpace(thisQuad.TopLeft + new Vector2(button_padding * 2)));
+            var parentQuad = Parent!.ScreenSpaceDrawQuad.AABBFloat.Shrink(ToLocalSpace(thisQuad.TopLeft + new Vector2(button_padding * 2)));
 
             float topExcess = thisQuad.TopLeft.Y - parentQuad.TopLeft.Y;
             float bottomExcess = parentQuad.BottomLeft.Y - thisQuad.BottomLeft.Y;
@@ -396,7 +417,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             {
                 buttons.Anchor = Anchor.BottomCentre;
                 buttons.Origin = Anchor.BottomCentre;
-                buttons.Y = Math.Min(0, ToLocalSpace(Parent.ScreenSpaceDrawQuad.BottomLeft).Y - DrawHeight);
+                buttons.Y = Math.Min(0, ToLocalSpace(Parent!.ScreenSpaceDrawQuad.BottomLeft).Y - DrawHeight);
             }
             else if (topExcess > bottomExcess)
             {

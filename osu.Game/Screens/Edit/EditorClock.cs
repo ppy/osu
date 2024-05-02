@@ -54,7 +54,7 @@ namespace osu.Game.Screens.Edit
 
             this.beatDivisor = beatDivisor ?? new BindableBeatDivisor();
 
-            underlyingClock = new FramedBeatmapClock(applyOffsets: true) { IsCoupled = false };
+            underlyingClock = new FramedBeatmapClock(applyOffsets: true, requireDecoupling: true);
             AddInternal(underlyingClock);
         }
 
@@ -157,8 +157,6 @@ namespace osu.Game.Screens.Edit
             Transforms.OfType<TransformSeek>().FirstOrDefault()?.EndValue ?? CurrentTime;
 
         public double CurrentTime => underlyingClock.CurrentTime;
-
-        public double TotalAppliedOffset => underlyingClock.TotalAppliedOffset;
 
         public void Reset()
         {
