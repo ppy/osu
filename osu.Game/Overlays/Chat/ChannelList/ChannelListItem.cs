@@ -49,7 +49,7 @@ namespace osu.Game.Overlays.Chat.ChannelList
         [BackgroundDependencyLoader]
         private void load()
         {
-            Height = 30;
+            Height = 25;
             RelativeSizeAxes = Axes.X;
 
             Children = new Drawable[]
@@ -87,7 +87,7 @@ namespace osu.Game.Overlays.Chat.ChannelList
                                 Anchor = Anchor.CentreLeft,
                                 Origin = Anchor.CentreLeft,
                                 Text = Channel.Name,
-                                Font = OsuFont.Torus.With(size: 17, weight: FontWeight.SemiBold),
+                                Font = OsuFont.Torus.With(size: 14, weight: FontWeight.SemiBold),
                                 Colour = colourProvider.Light3,
                                 Margin = new MarginPadding { Bottom = 2 },
                                 RelativeSizeAxes = Axes.X,
