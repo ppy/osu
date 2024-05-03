@@ -9,6 +9,7 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
@@ -533,7 +534,8 @@ namespace osu.Game.Overlays
 
                 float textOverflowWidth = mainSpriteText.Width - player_width;
 
-                if (textOverflowWidth > 0)
+                // apply half margin of tolerance on both sides before the text scrolls
+                if (textOverflowWidth > margin)
                 {
                     fillerSpriteText.Alpha = 1;
                     fillerSpriteText.Text = text;
