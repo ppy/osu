@@ -540,24 +540,8 @@ namespace osu.Game.Overlays
                     fillerSpriteText.Alpha = 1;
                     fillerSpriteText.Text = text;
 
-                    float initialX;
-                    float targetX;
-
-                    if (Anchor.HasFlagFast(Anchor.x0))
-                    {
-                        initialX = 0;
-                        targetX = -mainSpriteText.Width;
-                    }
-                    else if (Anchor.HasFlagFast(Anchor.x1))
-                    {
-                        initialX = (textOverflowWidth + mainSpriteText.Width) / 2;
-                        targetX = (textOverflowWidth - mainSpriteText.Width) / 2;
-                    }
-                    else // Anchor.x2
-                    {
-                        initialX = textOverflowWidth + mainSpriteText.Width;
-                        targetX = textOverflowWidth;
-                    }
+                    float initialX = (textOverflowWidth + mainSpriteText.Width) / 2;
+                    float targetX = (textOverflowWidth - mainSpriteText.Width) / 2;
 
                     this.MoveToX(initialX)
                         .Delay(initial_move_delay)
