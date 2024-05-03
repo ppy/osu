@@ -422,7 +422,7 @@ namespace osu.Game.Overlays
             [BackgroundDependencyLoader]
             private void load(LargeTextureStore textures)
             {
-                sprite.Texture = beatmap.GetBackground() ?? textures.Get(@"Backgrounds/bg4");
+                sprite.Texture = beatmap.GetBackground() ?? textures.Get(@"Backgrounds/bg2");
             }
         }
 
