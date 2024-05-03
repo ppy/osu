@@ -45,16 +45,28 @@ namespace osu.Game.Tests.Visual.UserInterface
         [Test]
         public void TestLongMetadata()
         {
-            AddStep(@"set beatmap", () => Beatmap.Value = CreateWorkingBeatmap(new Beatmap
+            AddStep(@"set metadata within tolerance", () => Beatmap.Value = CreateWorkingBeatmap(new Beatmap
             {
                 Metadata =
                 {
-                    Artist = "very very very very very very very very very very very long artist",
-                    ArtistUnicode = "very very very very very very very very very very very long artist",
-                    Title = "very very very very very very very very very very very long title",
-                    TitleUnicode = "very very very very very very very very very very very long title",
+                    Artist = "very very very very very very very very very very verry long artist",
+                    ArtistUnicode = "very very very very very very very very very very verry long artist",
+                    Title = "very very very very very verry long title",
+                    TitleUnicode = "very very very very very verry long title",
                 }
             }));
+
+            AddStep(@"set metadata outside bounds", () => Beatmap.Value = CreateWorkingBeatmap(new Beatmap
+            {
+                Metadata =
+                {
+                    Artist = "very very very very very very very very very very verrry long artist",
+                    ArtistUnicode = "very very very very very very very very very very verrry long artist",
+                    Title = "very very very very very verrry long title",
+                    TitleUnicode = "very very very very very verrry long title",
+                }
+            }));
+
             AddStep(@"show", () => nowPlayingOverlay.Show());
         }
     }
