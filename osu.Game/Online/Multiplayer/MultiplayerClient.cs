@@ -396,7 +396,7 @@ namespace osu.Game.Online.Multiplayer
                 switch (state)
                 {
                     case MultiplayerRoomState.Open:
-                        APIRoom.Status.Value = new RoomStatusOpen();
+                        APIRoom.Status.Value = APIRoom.HasPassword.Value ? new RoomStatusOpenPrivate() : new RoomStatusOpen();
                         break;
 
                     case MultiplayerRoomState.Playing:

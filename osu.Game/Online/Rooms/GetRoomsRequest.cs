@@ -46,6 +46,8 @@ namespace osu.Game.Online.Rooms
                 {
                     if (room.EndDate.Value != null && DateTimeOffset.Now >= room.EndDate.Value)
                         room.Status.Value = new RoomStatusEnded();
+                    else if (room.HasPassword.Value)
+                        room.Status.Value = new RoomStatusOpenPrivate();
                     else
                         room.Status.Value = new RoomStatusOpen();
                 }
