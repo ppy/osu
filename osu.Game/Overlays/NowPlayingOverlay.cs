@@ -476,9 +476,10 @@ namespace osu.Game.Overlays
             private const float initial_move_delay = 1000;
             private const float pixels_per_second = 50;
 
-            private LocalisableString text;
             private OsuSpriteText mainSpriteText = null!;
             private OsuSpriteText fillerSpriteText = null!;
+
+            private LocalisableString text;
 
             public LocalisableString Text
             {
@@ -486,19 +487,24 @@ namespace osu.Game.Overlays
                 set
                 {
                     text = value;
-                    Schedule(updateText);
+
+                    if (IsLoaded)
+                        updateText();
                 }
             }
 
+            private FontUsage font = OsuFont.Default;
+
             public FontUsage Font
             {
-                set => Schedule(() =>
+                get => font;
+                set
                 {
-                    mainSpriteText.Font = value;
-                    fillerSpriteText.Font = value;
+                    font = value;
 
-                    updateText();
-                });
+                    if (IsLoaded)
+                        updateFontAndText();
+                }
             }
 
             public ScrollingTextContainer()
@@ -519,6 +525,21 @@ namespace osu.Game.Overlays
                         fillerSpriteText = new OsuSpriteText { Padding = new MarginPadding { Horizontal = margin }, Alpha = 0 },
                     }
                 };
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+
+                updateFontAndText();
+            }
+
+            private void updateFontAndText()
+            {
+                mainSpriteText.Font = font;
+                fillerSpriteText.Font = font;
+
+                updateText();
             }
 
             private void updateText()
