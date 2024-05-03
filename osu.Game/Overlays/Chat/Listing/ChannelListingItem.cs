@@ -44,7 +44,7 @@ namespace osu.Game.Overlays.Chat.Listing
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; } = null!;
 
-        private const float text_size = 18;
+        private const float text_size = 14;
         private const float icon_size = 14;
 
         private const float vertical_margin = 1.5f;
