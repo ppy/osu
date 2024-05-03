@@ -494,14 +494,13 @@ namespace osu.Game.Overlays
 
             public FontUsage Font
             {
-                set =>
-                    Schedule(() =>
-                    {
-                        mainSpriteText.Font = value;
-                        fillerSpriteText.Font = value;
+                set => Schedule(() =>
+                {
+                    mainSpriteText.Font = value;
+                    fillerSpriteText.Font = value;
 
-                        updateText();
-                    });
+                    updateText();
+                });
             }
 
             public ScrollingTextContainer()
