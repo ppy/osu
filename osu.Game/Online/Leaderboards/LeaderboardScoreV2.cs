@@ -353,8 +353,7 @@ namespace osu.Game.Online.Leaderboards
                 new Container
                 {
                     AutoSizeAxes = Axes.X,
-                    // makeshift inner border
-                    Height = height - 4,
+                    RelativeSizeAxes = Axes.Y,
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft,
                     Padding = new MarginPadding { Right = grade_width },
