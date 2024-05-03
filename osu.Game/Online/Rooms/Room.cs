@@ -111,7 +111,6 @@ namespace osu.Game.Online.Rooms
         [JsonProperty("current_user_score")]
         public readonly Bindable<PlaylistAggregateScore> UserScore = new Bindable<PlaylistAggregateScore>();
 
-        [Cached]
         [JsonProperty("has_password")]
         public readonly Bindable<bool> HasPassword = new Bindable<bool>();
 
