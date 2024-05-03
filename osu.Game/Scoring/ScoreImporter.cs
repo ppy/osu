@@ -127,6 +127,9 @@ namespace osu.Game.Scoring
             if (model.RealmUser.OnlineID == APIUser.SYSTEM_USER_ID)
                 return;
 
+            if (model.OnlineID < 0 && model.LegacyOnlineID <= 0)
+                return;
+
             string username = model.RealmUser.Username;
 
             if (usernameLookupCache.TryGetValue(username, out var existing))
