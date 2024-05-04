@@ -149,6 +149,15 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             // touch device should be removed due to incompatible with autoplay.
             assertSelectedModsEquivalentTo(new Mod[] { new OsuModAutoplay() });
+
+            AddStep("deactivate panel", () => panel.AsNonNull().TriggerClick());
+            assertSelectedModsEquivalentTo(Array.Empty<Mod>());
+
+            // just for test purpose
+            AddStep("Add score v2 to selected mod", () => SelectedMods.Value = new Mod[] { new ModScoreV2() });
+            AddStep("activate panel", () => panel.AsNonNull().TriggerClick());
+
+            assertSelectedModsEquivalentTo(new Mod[] { new OsuModAutoplay(), new ModScoreV2() });
         }
 
         private void assertSelectedModsEquivalentTo(IEnumerable<Mod> mods)
