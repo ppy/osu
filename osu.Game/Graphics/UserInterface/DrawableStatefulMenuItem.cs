@@ -4,6 +4,8 @@
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics;
+using osu.Framework.Input.Events;
+using osuTK.Input;
 using osuTK;
 
 namespace osu.Game.Graphics.UserInterface
@@ -19,8 +21,16 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override TextContainer CreateTextContainer() => new ToggleTextContainer(Item);
 
+        protected override bool OnMouseDown(MouseDownEvent e)
         {
+            if (!IsActionable)
+                return true;
 
+            if (e.Button != MouseButton.Right)
+                return true;
+
+            Item.Action.Value?.Invoke();
+            return true;
         }
 
         private partial class ToggleTextContainer : TextContainer
