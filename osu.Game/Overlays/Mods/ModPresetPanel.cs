@@ -55,7 +55,8 @@ namespace osu.Game.Overlays.Mods
 
         protected override void Select()
         {
-            var selectedSystemMods = selectedMods.Value.Where(mod => mod.Type == ModType.System);
+            var selectedSystemMods = selectedMods.Value.Where(mod => mod.Type == ModType.System
+                                                                     && !mod.IncompatibleMods.Any(t => Preset.Value.Mods.Any(m => m.GetType() == t)));
             // will also have the side effect of activating the preset (see `updateActiveState()`).
             selectedMods.Value = Preset.Value.Mods.Concat(selectedSystemMods).ToArray();
         }
