@@ -72,12 +72,12 @@ namespace osu.Game.Rulesets.Mania.Tests
             seekTo(10000);
             AddStep("disable", () => configTimingBasedNoteColouring.Value = false);
             seekTo(0);
-            AddAssert("all notes not coloured", () => this.ChildrenOfType<DrawableNote>().All(note => note.Colour == Colour4.White));
+            AddAssert("no notes has snap divisor", () => this.ChildrenOfType<DrawableNote>().All(note => note.SnapDivisor.Value == 0));
 
             seekTo(10000);
             AddStep("enable again", () => configTimingBasedNoteColouring.Value = true);
             seekTo(0);
-            AddAssert("some notes coloured", () => this.ChildrenOfType<DrawableNote>().Any(note => note.Colour != Colour4.White));
+            AddAssert("all notes has snap divisor", () => this.ChildrenOfType<DrawableNote>().All(note => note.SnapDivisor.Value != 0));
         }
 
         private void seekTo(double time)
