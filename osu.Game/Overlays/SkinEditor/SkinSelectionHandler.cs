@@ -23,6 +23,8 @@ namespace osu.Game.Overlays.SkinEditor
 {
     public partial class SkinSelectionHandler : SelectionHandler<ISerialisableDrawable>
     {
+        private OsuMenuItem originMenu = null!;
+
         [Resolved]
         private SkinEditor skinEditor { get; set; } = null!;
 
@@ -248,10 +250,15 @@ namespace osu.Game.Overlays.SkinEditor
                         .ToArray()
             };
 
-            yield return new OsuMenuItem("Origin")
+            yield return originMenu = new OsuMenuItem("Origin");
+
+            closestItem.State.BindValueChanged(s =>
             {
-                Items = createAnchorItems((d, o) => ((Drawable)d).Origin == o, applyOrigins).ToArray()
-            };
+                // For UX simplicity, origin should only be user-editable when "closest" anchor mode is disabled.
+                originMenu.Items = s.NewValue == TernaryState.True
+                    ? Array.Empty<MenuItem>()
+                    : createAnchorItems((d, o) => ((Drawable)d).Origin == o, applyOrigins).ToArray();
+            }, true);
 
             yield return new OsuMenuItemSpacer();
 
