@@ -77,6 +77,9 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             controlPoints.BindTo(hitObject.Path.ControlPoints);
         }
 
+        // Generally all the control points are within the visible area all the time.
+        public override bool UpdateSubTreeMasking(Drawable source, RectangleF maskingBounds) => true;
+
         /// <summary>
         /// Handles correction of invalid path types.
         /// </summary>
