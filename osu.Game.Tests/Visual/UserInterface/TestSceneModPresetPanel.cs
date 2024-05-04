@@ -123,6 +123,34 @@ namespace osu.Game.Tests.Visual.UserInterface
             assertSelectedModsEquivalentTo(new Mod[] { new OsuModTouchDevice(), new OsuModHardRock(), new OsuModDoubleTime { SpeedChange = { Value = 1.5 } } });
         }
 
+        [Test]
+        public void TestActivatingPresetWithAutoplayWhenSystemModEnabled()
+        {
+            ModPresetPanel? panel = null;
+
+            AddStep("create panel", () => Child = panel = new ModPresetPanel(new ModPreset
+            {
+                Name = "Autoplay include",
+                Description = "no way",
+                Mods = new Mod[]
+                {
+                    new OsuModAutoplay()
+                },
+                Ruleset = new OsuRuleset().RulesetInfo
+            }.ToLiveUnmanaged())
+            {
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                Width = 0.5f
+            });
+
+            AddStep("Add touch device to selected mod", () => SelectedMods.Value = new Mod[] { new OsuModTouchDevice() });
+            AddStep("activate panel", () => panel.AsNonNull().TriggerClick());
+
+            // touch device should be removed due to incompatible with autoplay.
+            assertSelectedModsEquivalentTo(new Mod[] { new OsuModAutoplay() });
+        }
+
         private void assertSelectedModsEquivalentTo(IEnumerable<Mod> mods)
             => AddAssert("selected mods changed correctly", () => new HashSet<Mod>(SelectedMods.Value).SetEquals(mods));
 
