@@ -202,10 +202,10 @@ namespace osu.Game.Overlays.SkinEditor
                 var item = c.Item;
                 Drawable drawable = (Drawable)item;
 
-                drawable.Position += drawable.ScreenSpaceDeltaToParentSpace(moveEvent.ScreenSpaceDelta);
-
                 if (!item.UsesFixedAnchor)
                     ApplyClosestAnchorOrigin(drawable);
+
+                drawable.Position += drawable.ScreenSpaceDeltaToParentSpace(moveEvent.ScreenSpaceDelta);
             }
 
             return true;
@@ -332,7 +332,7 @@ namespace osu.Game.Overlays.SkinEditor
 
                 applyOrigin(drawable, origin);
 
-                if (item.UsesFixedAnchor)
+                if (!item.UsesFixedAnchor)
                     ApplyClosestAnchorOrigin(drawable);
             }
 
