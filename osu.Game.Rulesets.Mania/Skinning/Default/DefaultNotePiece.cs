@@ -8,8 +8,11 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
+using osu.Game.Graphics;
+using osu.Game.Rulesets.Mania.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI.Scrolling;
+using osu.Game.Screens.Edit;
 using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Mania.Skinning.Default
@@ -21,8 +24,12 @@ namespace osu.Game.Rulesets.Mania.Skinning.Default
     {
         public const float NOTE_HEIGHT = 12;
 
+        [Resolved]
+        private OsuColour? colours { get; set; }
+
         private readonly IBindable<ScrollingDirection> direction = new Bindable<ScrollingDirection>();
         private readonly IBindable<Color4> accentColour = new Bindable<Color4>();
+        private readonly IBindable<int> snapDivisor = new Bindable<int>();
 
         private readonly Box colouredBox;
 
@@ -59,6 +66,12 @@ namespace osu.Game.Rulesets.Mania.Skinning.Default
             {
                 accentColour.BindTo(drawableObject.AccentColour);
                 accentColour.BindValueChanged(onAccentChanged, true);
+
+                if (drawableObject is DrawableManiaHitObject maniaHitObject)
+                {
+                    snapDivisor.BindTo(maniaHitObject.SnapDivisor);
+                    snapDivisor.BindValueChanged(onSnapDivisorChanged, true);
+                }
             }
         }
 
@@ -79,6 +92,11 @@ namespace osu.Game.Rulesets.Mania.Skinning.Default
                 Colour = accent.NewValue.Lighten(1f).Opacity(0.2f),
                 Radius = 10,
             };
+        }
+
+        private void onSnapDivisorChanged(ValueChangedEvent<int> divisor)
+        {
+            Colour = BindableBeatDivisor.GetColourFor(divisor.NewValue, colours);
         }
     }
 }

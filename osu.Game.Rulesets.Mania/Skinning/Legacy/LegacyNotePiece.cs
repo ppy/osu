@@ -8,7 +8,11 @@ using osu.Framework.Graphics.Animations;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
+using osu.Game.Graphics;
+using osu.Game.Rulesets.Mania.Objects.Drawables;
+using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI.Scrolling;
+using osu.Game.Screens.Edit;
 using osu.Game.Skinning;
 using osuTK;
 
@@ -16,7 +20,11 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
 {
     public partial class LegacyNotePiece : LegacyManiaColumnElement
     {
+        [Resolved]
+        private OsuColour? colours { get; set; }
+
         private readonly IBindable<ScrollingDirection> direction = new Bindable<ScrollingDirection>();
+        private readonly IBindable<int> snapDivisor = new Bindable<int>();
 
         private Container directionContainer = null!;
 
@@ -31,7 +39,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
         }
 
         [BackgroundDependencyLoader]
-        private void load(ISkinSource skin, IScrollingInfo scrollingInfo)
+        private void load(ISkinSource skin, IScrollingInfo scrollingInfo, DrawableHitObject? drawableObject)
         {
             minimumColumnWidth = skin.GetConfig<ManiaSkinConfigurationLookup, float>(new ManiaSkinConfigurationLookup(LegacyManiaSkinConfigurationLookups.MinimumColumnWidth))?.Value;
 
@@ -45,6 +53,12 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
 
             direction.BindTo(scrollingInfo.Direction);
             direction.BindValueChanged(OnDirectionChanged, true);
+
+            if (drawableObject is DrawableManiaHitObject maniaHitObject)
+            {
+                snapDivisor.BindTo(maniaHitObject.SnapDivisor);
+                snapDivisor.BindValueChanged(onSnapDivisorChanged, true);
+            }
         }
 
         protected override void Update()
@@ -65,6 +79,9 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
                 noteAnimation.Scale = Vector2.Divide(new Vector2(DrawWidth, minimumWidth), texture.DisplayWidth);
             }
         }
+
+        private void onSnapDivisorChanged(ValueChangedEvent<int> divisor)
+            => Colour = BindableBeatDivisor.GetColourFor(divisor.NewValue, colours);
 
         protected virtual void OnDirectionChanged(ValueChangedEvent<ScrollingDirection> direction)
         {

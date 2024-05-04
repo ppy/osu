@@ -121,6 +121,9 @@ namespace osu.Game.Screens.Edit
                 case 12:
                     return colours.YellowDarker;
 
+                case 0:
+                    return Color4.White;
+
                 default:
                     return Color4.Red;
             }

@@ -23,6 +23,11 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
         protected readonly IBindable<ScrollingDirection> Direction = new Bindable<ScrollingDirection>();
 
+        /// <summary>
+        /// If timing based note colouring is used, the snap divisor of the note. 0 otherwise.
+        /// </summary>
+        public readonly Bindable<int> SnapDivisor = new();
+
         [Resolved(canBeNull: true)]
         private ManiaPlayfield playfield { get; set; }
 
