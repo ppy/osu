@@ -2,9 +2,8 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Bindables;
-using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Input;
+using osu.Framework.Graphics;
 using osuTK;
 
 namespace osu.Game.Graphics.UserInterface
@@ -20,15 +19,8 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override TextContainer CreateTextContainer() => new ToggleTextContainer(Item);
 
-        private InputManager inputManager = null!;
-
-        public override bool CloseMenuOnClick => !inputManager.CurrentState.Keyboard.ControlPressed;
-
-        protected override void LoadComplete()
         {
-            base.LoadComplete();
 
-            inputManager = GetContainingInputManager();
         }
 
         private partial class ToggleTextContainer : TextContainer
