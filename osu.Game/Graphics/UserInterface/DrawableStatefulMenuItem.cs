@@ -2,11 +2,11 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Bindables;
-using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
-using osuTK.Input;
 using osuTK;
+using osuTK.Input;
 
 namespace osu.Game.Graphics.UserInterface
 {
