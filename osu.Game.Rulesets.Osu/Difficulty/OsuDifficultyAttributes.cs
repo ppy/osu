@@ -33,18 +33,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         public double SpeedNoteCount { get; set; }
 
         /// <summary>
-        /// The difficulty corresponding to the reading skill. Low AR branch.
-        /// </summary>
-        [JsonProperty("reading_low_ar_difficulty")]
-        public double ReadingDifficultyLowAR { get; set; }
-
-        /// <summary>
-        /// The difficulty corresponding to the reading skill. High AR branch.
-        /// </summary>
-        [JsonProperty("reading_high_ar_difficulty")]
-        public double ReadingDifficultyHighAR { get; set; }
-
-        /// <summary>
         /// The difficulty corresponding to the reading skill. Hidden mod branch.
         /// </summary>
         [JsonProperty("reading_hidden_difficulty")]
