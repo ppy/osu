@@ -21,17 +21,21 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         private readonly bool withSliders;
 
-        protected double CurrentStrain;
-        protected double SkillMultiplier => 23.55;
+        private double currentStrain;
 
-        protected override double CalculateInitialStrain(double time, DifficultyHitObject current) => CurrentStrain * StrainDecay(time - current.Previous(0).StartTime);
+        private double skillMultiplier => 23.55;
+        private double strainDecayBase => 0.15;
+
+        private double strainDecay(double ms) => Math.Pow(strainDecayBase, ms / 1000);
+
+        protected override double CalculateInitialStrain(double time, DifficultyHitObject current) => currentStrain * strainDecay(time - current.Previous(0).StartTime);
 
         protected override double StrainValueAt(DifficultyHitObject current)
         {
-            CurrentStrain *= StrainDecay(current.DeltaTime);
-            CurrentStrain += AimEvaluator.EvaluateDifficultyOf(current, withSliders) * SkillMultiplier;
+            currentStrain *= strainDecay(current.DeltaTime);
+            currentStrain += AimEvaluator.EvaluateDifficultyOf(current, withSliders) * skillMultiplier;
 
-            return CurrentStrain;
+            return currentStrain;
         }
     }
 }

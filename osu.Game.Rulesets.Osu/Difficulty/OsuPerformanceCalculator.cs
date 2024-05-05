@@ -77,23 +77,18 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double potentialHiddenFlashlightValue = computeFlashlightValue(score, osuAttributes, true);
 
             double lowARValue = computeReadingLowARValue(score, osuAttributes);
-            double highARValue = computeReadingHighARValue(score, osuAttributes);
 
-            double readingARValue = Math.Pow(Math.Pow(lowARValue, power) + Math.Pow(highARValue, power), 1.0 / power);
+            double readingARValue = lowARValue;
 
             double flashlightValue = 0;
             if (score.Mods.Any(h => h is OsuModFlashlight))
                 flashlightValue = computeFlashlightValue(score, osuAttributes);
 
-            double readingHDValue = 0;
-            if (score.Mods.Any(h => h is OsuModHidden))
-                readingHDValue = computeReadingHiddenValue(score, osuAttributes);
-
             // Reduce AR reading bonus if FL is present
             double flPower = OsuDifficultyCalculator.FL_SUM_POWER;
             double flashlightARValue = Math.Pow(Math.Pow(flashlightValue, flPower) + Math.Pow(readingARValue, flPower), 1.0 / flPower);
 
-            double cognitionValue = flashlightARValue + readingHDValue;
+            double cognitionValue = flashlightARValue;
             cognitionValue = AdjustCognitionPerformance(cognitionValue, mechanicalValue, potentialHiddenFlashlightValue);
 
             double accuracyValue = computeAccuracyValue(score, osuAttributes);
@@ -129,9 +124,18 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             aimValue *= getComboScalingFactor(attributes);
 
+            double approachRateFactor = 0.0;
+            if (attributes.ApproachRate > 10.33)
+                approachRateFactor = 0.3 * (attributes.ApproachRate - 10.33);
+
+            if (score.Mods.Any(h => h is OsuModRelax))
+                approachRateFactor = 0.0;
+
+            aimValue *= 1.0 + approachRateFactor * lengthBonus; // Buff for longer maps with high AR.
+
             if (score.Mods.Any(m => m is OsuModBlinds))
                 aimValue *= 1.3 + (totalHits * (0.0016 / (1 + 2 * effectiveMissCount)) * Math.Pow(accuracy, 16)) * (1 - 0.003 * attributes.DrainRate * attributes.DrainRate);
-            else if (score.Mods.Any(m => m is OsuModTraceable))
+            else if (score.Mods.Any(m => m is OsuModHidden || m is OsuModTraceable))
             {
                 // We want to give more reward for lower AR when it comes to aim and HD. This nerfs high AR and buffs lower AR.
                 aimValue *= 1.0 + 0.04 * (12.0 - attributes.ApproachRate);
@@ -170,12 +174,18 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             speedValue *= getComboScalingFactor(attributes);
 
+            double approachRateFactor = 0.0;
+            if (attributes.ApproachRate > 10.33)
+                approachRateFactor = 0.3 * (attributes.ApproachRate - 10.33);
+
+            speedValue *= 1.0 + approachRateFactor * lengthBonus; // Buff for longer maps with high AR.
+
             if (score.Mods.Any(m => m is OsuModBlinds))
             {
                 // Increasing the speed value by object count for Blinds isn't ideal, so the minimum buff is given.
                 speedValue *= 1.12;
             }
-            else if (score.Mods.Any(m => m is OsuModTraceable))
+            else if (score.Mods.Any(m => m is OsuModHidden || m is OsuModTraceable)) 
             {
                 // We want to give more reward for lower AR when it comes to aim and HD. This nerfs high AR and buffs lower AR.
                 speedValue *= 1.0 + 0.04 * (12.0 - attributes.ApproachRate);
@@ -225,6 +235,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             // Increasing the accuracy value by object count for Blinds isn't ideal, so the minimum buff is given.
             if (score.Mods.Any(m => m is OsuModBlinds))
                 accuracyValue *= 1.14;
+            else if (score.Mods.Any(m => m is OsuModHidden || m is OsuModTraceable))
+                accuracyValue *= 1.08;
 
             if (score.Mods.Any(m => m is OsuModFlashlight))
                 accuracyValue *= 1.02;
@@ -239,8 +251,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double deltaBonus = (1 - Math.Pow(0.95, Math.Pow(ARODDelta, 4)));
 
             accuracyValue *= 1 + visualBonus * (1 + 2 * deltaBonus);
-            if (score.Mods.Any(h => h is OsuModHidden || h is OsuModTraceable))
-                accuracyValue *= 1 + visualBonus * (1 + deltaBonus);
 
             return accuracyValue;
         }
@@ -299,86 +309,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             return readingValue;
         }
-
-        private double computeReadingHighARValue(ScoreInfo score, OsuDifficultyAttributes attributes)
-        {
-            double highARValue = OsuStrainSkill.DifficultyToPerformance(attributes.ReadingDifficultyHighAR);
-
-            // Penalize misses by assessing # of misses relative to the total # of objects. Default a 3% reduction for any # of misses.
-            if (effectiveMissCount > 0)
-                highARValue *= 0.97 * Math.Pow(1 - Math.Pow(effectiveMissCount / totalHits, 0.775), effectiveMissCount);
-
-            highARValue *= getComboScalingFactor(attributes);
-
-            // Approximate how much of high AR difficulty is aim
-            double aimPerformance = OsuStrainSkill.DifficultyToPerformance(attributes.AimDifficulty);
-            double speedPerformance = OsuStrainSkill.DifficultyToPerformance(attributes.SpeedDifficulty);
-
-            double aimRatio = aimPerformance / (aimPerformance + speedPerformance);
-
-            // Aim part calculation
-            double aimPartValue = highARValue * aimRatio;
-            {
-                // We assume 15% of sliders in a map are difficult since there's no way to tell from the performance calculator.
-                double estimateDifficultSliders = attributes.SliderCount * 0.15;
-
-                if (attributes.SliderCount > 0)
-                {
-                    double estimateSliderEndsDropped = Math.Clamp(Math.Min(countOk + countMeh + countMiss, attributes.MaxCombo - scoreMaxCombo), 0, estimateDifficultSliders);
-                    double sliderNerfFactor = (1 - attributes.SliderFactor) * Math.Pow(1 - estimateSliderEndsDropped / estimateDifficultSliders, 3) + attributes.SliderFactor;
-                    aimPartValue *= sliderNerfFactor;
-                }
-
-                aimPartValue *= accuracy;
-                // It is important to consider accuracy difficulty when scaling with accuracy.
-                aimPartValue *= 0.98 + Math.Pow(attributes.OverallDifficulty, 2) / 2500;
-            }
-
-            // Speed part calculation
-            double speedPartValue = highARValue * (1 - aimRatio);
-            {
-                // Calculate accuracy assuming the worst case scenario
-                double relevantTotalDiff = totalHits - attributes.SpeedNoteCount;
-                double relevantCountGreat = Math.Max(0, countGreat - relevantTotalDiff);
-                double relevantCountOk = Math.Max(0, countOk - Math.Max(0, relevantTotalDiff - countGreat));
-                double relevantCountMeh = Math.Max(0, countMeh - Math.Max(0, relevantTotalDiff - countGreat - countOk));
-                double relevantAccuracy = attributes.SpeedNoteCount == 0 ? 0 : (relevantCountGreat * 6.0 + relevantCountOk * 2.0 + relevantCountMeh) / (attributes.SpeedNoteCount * 6.0);
-
-                // Scale the speed value with accuracy and OD.
-                speedPartValue *= (0.95 + Math.Pow(attributes.OverallDifficulty, 2) / 750) * Math.Pow((accuracy + relevantAccuracy) / 2.0, (14.5 - Math.Max(attributes.OverallDifficulty, 8)) / 2);
-
-                // Scale the speed value with # of 50s to punish doubletapping.
-                speedPartValue *= Math.Pow(0.99, countMeh < totalHits / 500.0 ? 0 : countMeh - totalHits / 500.0);
-            }
-
-            return aimPartValue + speedPartValue;
-        }
-
-        private double computeReadingHiddenValue(ScoreInfo score, OsuDifficultyAttributes attributes)
-        {
-            if (!score.Mods.Any(h => h is OsuModHidden))
-                return 0.0;
-
-            double rawReading = attributes.HiddenDifficulty;
-            double hiddenValue = ReadingHidden.DifficultyToPerformance(attributes.HiddenDifficulty);
-
-            double lengthBonus = CalculateDefaultLengthBonus(totalHits);
-            hiddenValue *= lengthBonus;
-
-            // Penalize misses by assessing # of misses relative to the total # of objects. Default a 3% reduction for any # of misses.
-            if (effectiveMissCount > 0)
-                hiddenValue *= 0.97 * Math.Pow(1 - Math.Pow(effectiveMissCount / totalHits, 0.775), Math.Pow(effectiveMissCount, .875));
-
-            hiddenValue *= getComboScalingFactor(attributes);
-
-            // Scale the reading value with accuracy _harshly_. Additional note: it would have it's own curve in Statistical Accuracy rework.
-            hiddenValue *= accuracy * accuracy;
-            // It is important to also consider accuracy difficulty when doing that.
-            hiddenValue *= 0.98 + Math.Pow(attributes.OverallDifficulty, 2) / 2500;
-
-            return hiddenValue;
-        }
-
         private double calculateEffectiveMissCount(OsuDifficultyAttributes attributes)
         {
             // Guess the number of misses + slider breaks from combo

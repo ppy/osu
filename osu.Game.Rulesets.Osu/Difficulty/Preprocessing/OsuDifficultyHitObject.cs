@@ -99,11 +99,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         public double HitWindowGreat { get; private set; }
 
         /// <summary>
-        /// Rhythm difficulty of the object. Saved for optimization, rhythm calculation is very expensive.
-        /// </summary>
-        public double RhythmDifficulty { get; private set; }
-
-        /// <summary>
         /// Density of the object for given preempt. Saved for optimization, density calculation is expensive.
         /// </summary>
         public double Density { get; private set; }
@@ -128,18 +123,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         /// </summary>
         public readonly double Preempt;
 
-        /// <summary>
-        /// Preempt of follow line for this <see cref="OsuDifficultyHitObject"/> adjusted by clockrate.
-        /// Will be equal to 0 if object is New Combo.
-        /// </summary>
-        public readonly double FollowLineTime;
-
-        /// <summary>
-        /// Playback rate of beatmap.
-        /// Will be equal 1.5 on DT and 0.75 on HT.
-        /// </summary>
-        public readonly double ClockRate;
-
         private readonly OsuHitObject? lastLastObject;
         private readonly OsuHitObject lastObject;
 
@@ -152,9 +135,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
             StackedPosition = currObject.StackedPosition;
             Preempt = BaseObject.TimePreempt / clockRate;
-            FollowLineTime = 800 / clockRate; // 800ms is follow line appear time
-            FollowLineTime *= (currObject.NewCombo ? 0 : 1); // no follow lines when NC
-            ClockRate = clockRate;
 
             // Capped to 25ms to prevent difficulty calculation breaking from simultaneous objects.
             StrainTime = Math.Max(DeltaTime, min_delta_time);
@@ -174,7 +154,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
             (ReadingObjects, OverlapValues) = getReadingObjects();
 
-            RhythmDifficulty = RhythmEvaluator.EvaluateDifficultyOf(this);
             Density = ReadingEvaluator.EvaluateDensityOf(this);
         }
 
