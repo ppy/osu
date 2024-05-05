@@ -5,6 +5,7 @@ using System;
 using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Configuration;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
@@ -479,6 +480,11 @@ namespace osu.Game.Overlays
             private OsuSpriteText mainSpriteText = null!;
             private OsuSpriteText fillerSpriteText = null!;
 
+            private Bindable<bool> showUnicode = null!;
+
+            [Resolved]
+            private FrameworkConfigManager frameworkConfig { get; set; } = null!;
+
             private LocalisableString text;
 
             public LocalisableString Text
@@ -530,6 +536,9 @@ namespace osu.Game.Overlays
             protected override void LoadComplete()
             {
                 base.LoadComplete();
+
+                showUnicode = frameworkConfig.GetBindable<bool>(FrameworkSetting.ShowUnicode);
+                showUnicode.BindValueChanged(_ => updateText());
 
                 updateFontAndText();
             }
