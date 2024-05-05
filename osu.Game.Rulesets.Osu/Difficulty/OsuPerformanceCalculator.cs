@@ -86,7 +86,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 flashlightValue = computeFlashlightValue(score, osuAttributes);
 
             double readingHDValue = 0;
-            if (score.Mods.Any(h => h is OsuModFlashlight))
+            if (score.Mods.Any(h => h is OsuModHidden))
                 readingHDValue = computeReadingHiddenValue(score, osuAttributes);
 
             // Reduce AR reading bonus if FL is present
