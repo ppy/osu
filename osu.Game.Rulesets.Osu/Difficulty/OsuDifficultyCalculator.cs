@@ -51,23 +51,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double sliderFactor = aimRating > 0 ? aimRatingNoSliders / aimRating : 1;
 
-            if (mods.Any(m => m is OsuModTouchDevice))
-            {
-                aimRating = Math.Pow(aimRating, 0.8);
-                flashlightRating = Math.Pow(flashlightRating, 0.8);
-            }
-
-            if (mods.Any(h => h is OsuModRelax))
-            {
-                aimRating *= 0.9;
-                speedRating = 0.0;
-                flashlightRating *= 0.7;
-            }
-
-            double baseAimPerformance = OsuStrainSkill.DifficultyToPerformance(aimRating);
-            double baseSpeedPerformance = OsuStrainSkill.DifficultyToPerformance(speedRating);
-
-            // Cognition
             int flIndex = 6;
 
             double baseReadingHiddenPerformance = 0;
@@ -85,6 +68,29 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 baseFlashlightPerformance = Flashlight.DifficultyToPerformance(flashlightRating);
             }
 
+            if (mods.Any(m => m is OsuModTouchDevice))
+            {
+                aimRating = Math.Pow(aimRating, 0.8);
+                readingLowARRating = Math.Pow(readingLowARRating, 0.9);
+                readingHighARRating = Math.Pow(readingHighARRating, 0.9);
+                hiddenRating = Math.Pow(hiddenRating, 0.9);
+                flashlightRating = Math.Pow(flashlightRating, 0.8);
+            }
+
+            if (mods.Any(h => h is OsuModRelax))
+            {
+                aimRating *= 0.9;
+                speedRating = 0.0;
+                readingLowARRating *= 0.95;
+                readingHighARRating *= 0.7;
+                hiddenRating *= 0.7;
+                flashlightRating *= 0.7;
+            }
+
+            double baseAimPerformance = OsuStrainSkill.DifficultyToPerformance(aimRating);
+            double baseSpeedPerformance = OsuStrainSkill.DifficultyToPerformance(speedRating);
+
+            // Cognition
             double baseReadingLowARPerformance = ReadingLowAR.DifficultyToPerformance(readingLowARRating);
             double baseReadingHighARPerformance = OsuStrainSkill.DifficultyToPerformance(readingHighARRating);
             double baseReadingARPerformance = Math.Pow(Math.Pow(baseReadingLowARPerformance, SUM_POWER) + Math.Pow(baseReadingHighARPerformance, SUM_POWER), 1.0 / SUM_POWER);
