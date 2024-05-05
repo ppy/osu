@@ -45,12 +45,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         public double ReadingDifficultyHighAR { get; set; }
 
         /// <summary>
-        /// The difficulty corresponding to the reading skill. Sliders branch.
-        /// </summary>
-        [JsonProperty("reading_sliders_difficulty")]
-        public double ReadingDifficultySliders { get; set; }
-
-        /// <summary>
         /// The difficulty corresponding to the reading skill. Hidden mod branch.
         /// </summary>
         [JsonProperty("reading_hidden_difficulty")]
