@@ -124,8 +124,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             aimValue *= getComboScalingFactor(attributes);
 
-            aimValue *= getComboScalingFactor(attributes);
-
             double approachRateFactor = 0.0;
             if (attributes.ApproachRate < 8.0)
                 approachRateFactor = 0.05 * (8.0 - attributes.ApproachRate);
