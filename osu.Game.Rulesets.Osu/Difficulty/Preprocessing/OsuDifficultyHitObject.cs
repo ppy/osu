@@ -80,18 +80,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         public double TravelTime { get; private set; }
 
         /// <summary>
-        /// Absolute angle the player has to take to hit this <see cref="OsuDifficultyHitObject"/>.
+        /// Angle the player has to take to hit this <see cref="OsuDifficultyHitObject"/>.
         /// Calculated as the angle between the circles (current-2, current-1, current).
         /// Ranges from 0 to PI
         /// </summary>
         public double? Angle { get; private set; }
-
-        /// <summary>
-        /// Signed version of the Angle.
-        /// Potentially should be used for more accurate angle bonuses
-        /// Ranges from -PI to PI
-        /// </summary>
-        public double? AngleSigned { get; private set; }
 
         /// <summary>
         /// Retrieves the full hit window for a Great <see cref="HitResult"/>.
@@ -516,8 +509,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 float dot = Vector2.Dot(v1, v2);
                 float det = v1.X * v2.Y - v1.Y * v2.X;
 
-                AngleSigned = Math.Atan2(det, dot);
-                Angle = Math.Abs((double)AngleSigned);
+                Angle = Math.Abs(Math.Atan2(det, dot));
             }
         }
 
