@@ -23,13 +23,11 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override bool OnMouseDown(MouseDownEvent e)
         {
-            if (!IsActionable)
-                return true;
+            // Right mouse button is a special case where we allow actioning without dismissing the menu.
+            // This is achieved by not calling `Clicked` (as done by the base implementation in OnClick).
+            if (IsActionable && e.Button == MouseButton.Right)
+                Item.Action.Value?.Invoke();
 
-            if (e.Button != MouseButton.Right)
-                return true;
-
-            Item.Action.Value?.Invoke();
             return true;
         }
 
