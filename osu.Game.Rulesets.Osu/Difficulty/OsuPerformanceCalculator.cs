@@ -69,24 +69,25 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             // Cognition
 
-            // Preferably this value should be used for capping low AR reading performance
-            // Because it should have lower cap (you can actually see)
-            // But it will make formula really weird and overcomplicated
-            double potentialFlashlightValue = computeFlashlightValue(score, osuAttributes);
-
             // Get HDFL value for capping reading performance
+            // In theory stuff like AR13, AR13 +HD and AR-INF +HD should use this values
+            // While AR-INF without HD shoud use normal flashlight values
+            // Because in first case you're clicking air, while in AR-INF case you're see the notes
+            // But implementing it is pretty annoying, so I left it "as is"
             double potentialHiddenFlashlightValue = computeFlashlightValue(score, osuAttributes, true);
-
-            double flashlightValue = potentialFlashlightValue;
-            if (!score.Mods.Any(h => h is OsuModFlashlight))
-                flashlightValue = 0.0;
 
             double lowARValue = computeReadingLowARValue(score, osuAttributes);
             double highARValue = computeReadingHighARValue(score, osuAttributes);
 
             double readingARValue = Math.Pow(Math.Pow(lowARValue, power) + Math.Pow(highARValue, power), 1.0 / power);
 
-            double readingHDValue = computeReadingHiddenValue(score, osuAttributes);
+            double flashlightValue = 0;
+            if (score.Mods.Any(h => h is OsuModFlashlight))
+                flashlightValue = computeFlashlightValue(score, osuAttributes);
+
+            double readingHDValue = 0;
+            if (score.Mods.Any(h => h is OsuModFlashlight))
+                readingHDValue = computeReadingHiddenValue(score, osuAttributes);
 
             // Reduce AR reading bonus if FL is present
             double flPower = OsuDifficultyCalculator.FL_SUM_POWER;
@@ -97,12 +98,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double accuracyValue = computeAccuracyValue(score, osuAttributes);
 
+            // Add cognition value without LP-sum cuz otherwise it makes balancing harder
             double totalValue =
-                Math.Pow(
-                    Math.Pow(mechanicalValue, power) +
-                    Math.Pow(accuracyValue, power), 1.0 / power
-                ) * multiplier;
-            totalValue += cognitionValue * multiplier;
+                (Math.Pow(Math.Pow(mechanicalValue, power) + Math.Pow(accuracyValue, power), 1.0 / power)
+                + cognitionValue) * multiplier;
 
             return new OsuPerformanceAttributes
             {
