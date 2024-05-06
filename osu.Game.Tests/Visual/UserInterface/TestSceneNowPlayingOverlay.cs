@@ -5,6 +5,7 @@
 
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
 using osu.Game.Overlays;
@@ -21,8 +22,10 @@ namespace osu.Game.Tests.Visual.UserInterface
         private NowPlayingOverlay nowPlayingOverlay;
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(FrameworkConfigManager frameworkConfig)
         {
+            AddToggleStep("toggle unicode", v => frameworkConfig.SetValue(FrameworkSetting.ShowUnicode, v));
+
             nowPlayingOverlay = new NowPlayingOverlay
             {
                 Origin = Anchor.Centre,
@@ -50,9 +53,9 @@ namespace osu.Game.Tests.Visual.UserInterface
                 Metadata =
                 {
                     Artist = "very very very very very very very very very very verry long artist",
-                    ArtistUnicode = "very very very very very very very very very very verry long artist",
+                    ArtistUnicode = "very very very very very very very very very very verry long artist unicode",
                     Title = "very very very very very verry long title",
-                    TitleUnicode = "very very very very very verry long title",
+                    TitleUnicode = "very very very very very verry long title unicode",
                 }
             }));
 
@@ -61,9 +64,9 @@ namespace osu.Game.Tests.Visual.UserInterface
                 Metadata =
                 {
                     Artist = "very very very very very very very very very very verrry long artist",
-                    ArtistUnicode = "very very very very very very very very very very verrry long artist",
+                    ArtistUnicode = "not very long artist unicode",
                     Title = "very very very very very verrry long title",
-                    TitleUnicode = "very very very very very verrry long title",
+                    TitleUnicode = "not very long title unicode",
                 }
             }));
 
