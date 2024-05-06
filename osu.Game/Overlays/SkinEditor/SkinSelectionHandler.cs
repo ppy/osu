@@ -139,7 +139,7 @@ namespace osu.Game.Overlays.SkinEditor
                 var drawableItem = (Drawable)b.Item;
 
                 // each drawable's relative position should be maintained in the scaled quad.
-                var screenPosition = b.ScreenSpaceSelectionPoint;
+                var screenPosition = drawableItem.ToScreenSpace(drawableItem.OriginPosition);
 
                 var relativePositionInOriginal =
                     new Vector2(
