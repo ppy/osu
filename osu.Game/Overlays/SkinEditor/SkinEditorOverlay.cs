@@ -70,7 +70,7 @@ namespace osu.Game.Overlays.SkinEditor
         private OsuScreen? lastTargetScreen;
         private InvokeOnDisposal? nestedInputManagerDisable;
 
-        private LayoutValue drawSizeLayout;
+        private readonly LayoutValue drawSizeLayout;
 
         public SkinEditorOverlay(ScalingContainer scalingContainer)
         {
