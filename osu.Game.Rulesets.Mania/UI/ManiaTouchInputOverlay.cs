@@ -33,12 +33,13 @@ namespace osu.Game.Rulesets.Mania.UI
         };
 
         [Resolved]
-        private ManiaPlayfield playfield { get; set; } = null!;
+        private DrawableManiaRuleset drawableRuleset { get; set; } = null!;
 
         public ManiaTouchInputOverlay()
         {
             Anchor = Anchor.BottomCentre;
             Origin = Anchor.BottomCentre;
+
             RelativeSizeAxes = Axes.Both;
             Height = 0.5f;
         }
@@ -51,7 +52,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
             bool first = true;
 
-            foreach (var stage in playfield.Stages)
+            foreach (var stage in drawableRuleset.Playfield.Stages)
             {
                 foreach (var column in stage.Columns)
                 {
