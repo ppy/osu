@@ -41,16 +41,16 @@ namespace osu.Game.Online.Leaderboards
     public partial class LeaderboardScoreV2 : OsuClickableContainer, IHasContextMenu, IHasCustomTooltip<ScoreInfo>
     {
         /// <summary>
-        /// The maximum number of mods when contracted until the mods display width exceeds the <see cref="right_content_min_width"/>.
+        /// The maximum number of mods when contracted until the mods display width exceeds the <see cref="right_content_width"/>.
         /// </summary>
         public const int MAX_MODS_CONTRACTED = 13;
 
         /// <summary>
-        /// The maximum number of mods when expanded until the mods display width exceeds the <see cref="right_content_min_width"/>.
+        /// The maximum number of mods when expanded until the mods display width exceeds the <see cref="right_content_width"/>.
         /// </summary>
         public const int MAX_MODS_EXPANDED = 4;
 
-        private const float right_content_min_width = 180;
+        private const float right_content_width = 180;
         private const float grade_width = 40;
         private const float username_min_width = 100;
 
@@ -153,7 +153,7 @@ namespace osu.Game.Online.Leaderboards
                         {
                             new Dimension(GridSizeMode.Absolute, 65),
                             new Dimension(),
-                            new Dimension(GridSizeMode.AutoSize, minSize: right_content_min_width), // use min size to account for classic scoring
+                            new Dimension(GridSizeMode.Absolute, right_content_width),
                         },
                         Content = new[]
                         {
