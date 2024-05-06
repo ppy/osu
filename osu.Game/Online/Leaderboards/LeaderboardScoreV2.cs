@@ -212,7 +212,9 @@ namespace osu.Game.Online.Leaderboards
                             new Container
                             {
                                 AutoSizeAxes = Axes.Both,
-                                Child = avatar = new MaskedWrapper(
+                                CornerRadius = corner_radius,
+                                Masking = true,
+                                Child = avatar = new DelayedLoadWrapper(
                                     innerAvatar = new ClickableAvatar(user)
                                     {
                                         Anchor = Anchor.Centre,
@@ -590,16 +592,6 @@ namespace osu.Game.Online.Leaderboards
             }
 
             public LocalisableString TooltipText { get; }
-        }
-
-        private partial class MaskedWrapper : DelayedLoadWrapper
-        {
-            public MaskedWrapper(Drawable content, double timeBeforeLoad = 500)
-                : base(content, timeBeforeLoad)
-            {
-                CornerRadius = corner_radius;
-                Masking = true;
-            }
         }
 
         private sealed partial class ColouredModSwitchTiny : ModSwitchTiny, IHasTooltip
