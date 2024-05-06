@@ -54,7 +54,7 @@ namespace osu.Game.Scoring.Legacy
             MaximumStatistics = score.MaximumStatistics.Where(kvp => kvp.Value != 0).ToDictionary(),
             ClientVersion = score.ClientVersion,
             Rank = score.Rank,
-            UserID = score.UserID,
+            UserID = score.User.OnlineID,
         };
     }
 }
