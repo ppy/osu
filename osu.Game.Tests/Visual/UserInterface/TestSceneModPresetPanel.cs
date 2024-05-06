@@ -124,17 +124,17 @@ namespace osu.Game.Tests.Visual.UserInterface
         }
 
         [Test]
-        public void TestActivatingPresetWithAutoplayWhenSystemModEnabled()
+        public void TestSystemModsNotPreservedIfIncompatibleWithPresetMods()
         {
             ModPresetPanel? panel = null;
 
             AddStep("create panel", () => Child = panel = new ModPresetPanel(new ModPreset
             {
-                Name = "Autoplay include",
+                Name = "Autopilot included",
                 Description = "no way",
                 Mods = new Mod[]
                 {
-                    new OsuModAutoplay()
+                    new OsuModAutopilot()
                 },
                 Ruleset = new OsuRuleset().RulesetInfo
             }.ToLiveUnmanaged())
@@ -144,20 +144,20 @@ namespace osu.Game.Tests.Visual.UserInterface
                 Width = 0.5f
             });
 
-            AddStep("Add touch device to selected mod", () => SelectedMods.Value = new Mod[] { new OsuModTouchDevice() });
+            AddStep("Add touch device to selected mods", () => SelectedMods.Value = new Mod[] { new OsuModTouchDevice() });
             AddStep("activate panel", () => panel.AsNonNull().TriggerClick());
 
-            // touch device should be removed due to incompatible with autoplay.
-            assertSelectedModsEquivalentTo(new Mod[] { new OsuModAutoplay() });
+            // touch device should be removed due to incompatibility with autopilot.
+            assertSelectedModsEquivalentTo(new Mod[] { new OsuModAutopilot() });
 
             AddStep("deactivate panel", () => panel.AsNonNull().TriggerClick());
             assertSelectedModsEquivalentTo(Array.Empty<Mod>());
 
-            // just for test purpose
+            // just for test purposes, can't/shouldn't happen in reality
             AddStep("Add score v2 to selected mod", () => SelectedMods.Value = new Mod[] { new ModScoreV2() });
             AddStep("activate panel", () => panel.AsNonNull().TriggerClick());
 
-            assertSelectedModsEquivalentTo(new Mod[] { new OsuModAutoplay(), new ModScoreV2() });
+            assertSelectedModsEquivalentTo(new Mod[] { new OsuModAutopilot(), new ModScoreV2() });
         }
 
         private void assertSelectedModsEquivalentTo(IEnumerable<Mod> mods)
