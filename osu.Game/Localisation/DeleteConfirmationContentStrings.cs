@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-
 using osu.Framework.Localisation;
 
 namespace osu.Game.Localisation
@@ -40,8 +39,6 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString ModPresets => new TranslatableString(getKey(@"mod_presets"), @"All mod presets?");
 
-
         private static string getKey(string key) => $@"{prefix}:{key}";
-
     }
 }
