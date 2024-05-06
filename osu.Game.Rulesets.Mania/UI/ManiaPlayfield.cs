@@ -7,12 +7,10 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Primitives;
 using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Objects;
-using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI.Scrolling;
@@ -26,8 +24,6 @@ namespace osu.Game.Rulesets.Mania.UI
         public IReadOnlyList<Stage> Stages => stages;
 
         private readonly List<Stage> stages = new List<Stage>();
-
-        private readonly ManiaTouchInputOverlay touchOverlay;
 
         public override Quad SkinnableComponentScreenSpaceDrawQuad
         {
@@ -64,23 +60,10 @@ namespace osu.Game.Rulesets.Mania.UI
                 throw new ArgumentException("Can't have zero or fewer stages.");
 
             GridContainer playfieldGrid;
-
-            RelativeSizeAxes = Axes.Y;
-            AutoSizeAxes = Axes.X;
-
-            AddRangeInternal(new Drawable[]
+            AddInternal(playfieldGrid = new GridContainer
             {
-                playfieldGrid = new GridContainer
-                {
-                    RelativeSizeAxes = Axes.Y,
-                    AutoSizeAxes = Axes.X,
-                    Content = new[] { new Drawable[stageDefinitions.Count] },
-                    ColumnDimensions = Enumerable.Range(0, stageDefinitions.Count).Select(_ => new Dimension(GridSizeMode.AutoSize)).ToArray()
-                },
-                touchOverlay = new ManiaTouchInputOverlay
-                {
-                    RelativeSizeAxes = Axes.Both
-                }
+                RelativeSizeAxes = Axes.Both,
+                Content = new[] { new Drawable[stageDefinitions.Count] }
             });
 
             var normalColumnAction = ManiaAction.Key1;
@@ -98,13 +81,6 @@ namespace osu.Game.Rulesets.Mania.UI
 
                 firstColumnIndex += newStage.Columns.Length;
             }
-        }
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            touchOverlay.Alpha = Mods?.Any(m => m is ModTouchDevice) == true ? 1 : 0;
         }
 
         public override void Add(HitObject hitObject) => getStageByColumn(((ManiaHitObject)hitObject).Column).Add(hitObject);
