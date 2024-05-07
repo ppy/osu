@@ -10,34 +10,34 @@ namespace osu.Game.Localisation
         private const string prefix = @"osu.Game.Resources.Localisation.DeleteConfirmationContent";
 
         /// <summary>
-        /// "All beatmaps?"
+        /// "Are you sure you want to delete all beatmaps?"
         /// </summary>
-        public static LocalisableString Beatmaps => new TranslatableString(getKey(@"beatmaps"), @"All beatmaps?");
+        public static LocalisableString Beatmaps => new TranslatableString(getKey(@"beatmaps"), @"Are you sure you want to delete all beatmaps?");
 
         /// <summary>
-        /// "All beatmaps videos? This cannot be undone!"
+        /// "Are you sure you want to delete all beatmaps videos? This cannot be undone!"
         /// </summary>
-        public static LocalisableString BeatmapVideos => new TranslatableString(getKey(@"beatmap_videos"), @"All beatmaps videos? This cannot be undone!");
+        public static LocalisableString BeatmapVideos => new TranslatableString(getKey(@"beatmap_videos"), @"Are you sure you want to delete all beatmaps videos? This cannot be undone!");
 
         /// <summary>
-        /// "All skins? This cannot be undone!"
+        /// "Are you sure you want to delete all skins? This cannot be undone!"
         /// </summary>
-        public static LocalisableString Skins => new TranslatableString(getKey(@"skins"), @"All skins? This cannot be undone!");
+        public static LocalisableString Skins => new TranslatableString(getKey(@"skins"), @"Are you sure you want to delete all skins? This cannot be undone!");
 
         /// <summary>
-        /// "All collections? This cannot be undone!"
+        /// "Are you sure you want to delete all collections? This cannot be undone!"
         /// </summary>
-        public static LocalisableString Collections => new TranslatableString(getKey(@"collections"), @"All collections? This cannot be undone!");
+        public static LocalisableString Collections => new TranslatableString(getKey(@"collections"), @"Are you sure you want to delete all collections? This cannot be undone!");
 
         /// <summary>
-        /// "All scores? This cannot be undone!"
+        /// "Are you sure you want to delete all scores? This cannot be undone!"
         /// </summary>
-        public static LocalisableString Scores => new TranslatableString(getKey(@"collections"), @"All scores? This cannot be undone!");
+        public static LocalisableString Scores => new TranslatableString(getKey(@"collections"), @"Are you sure you want to delete all scores? This cannot be undone!");
 
         /// <summary>
-        /// "All mod presets?"
+        /// "Are you sure you want to delete all mod presets?"
         /// </summary>
-        public static LocalisableString ModPresets => new TranslatableString(getKey(@"mod_presets"), @"All mod presets?");
+        public static LocalisableString ModPresets => new TranslatableString(getKey(@"mod_presets"), @"Are you sure you want to delete all mod presets?");
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
