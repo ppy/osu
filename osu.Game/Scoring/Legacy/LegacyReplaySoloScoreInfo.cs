@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets.Scoring;
@@ -38,6 +39,13 @@ namespace osu.Game.Scoring.Legacy
         [JsonProperty("client_version")]
         public string ClientVersion = string.Empty;
 
+        [JsonProperty("rank")]
+        [JsonConverter(typeof(StringEnumConverter))]
+        public ScoreRank? Rank;
+
+        [JsonProperty("user_id")]
+        public int UserID = -1;
+
         [JsonProperty("total_score_without_mods")]
         public long? TotalScoreWithoutMods { get; set; }
 
@@ -48,6 +56,8 @@ namespace osu.Game.Scoring.Legacy
             Statistics = score.Statistics.Where(kvp => kvp.Value != 0).ToDictionary(),
             MaximumStatistics = score.MaximumStatistics.Where(kvp => kvp.Value != 0).ToDictionary(),
             ClientVersion = score.ClientVersion,
+            Rank = score.Rank,
+            UserID = score.User.OnlineID,
             TotalScoreWithoutMods = score.TotalScoreWithoutMods > 0 ? score.TotalScoreWithoutMods : null,
         };
     }
