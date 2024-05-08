@@ -35,6 +35,7 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osu.Game.Scoring.Legacy;
 using osu.Game.Skinning;
+using osu.Game.Utils;
 using osuTK.Input;
 using Realms;
 using Realms.Exceptions;
@@ -322,12 +323,32 @@ namespace osu.Game.Database
                 {
                     Logger.Error(e, "Your local database is too new to work with this version of osu!. Please close osu! and install the latest release to recover your data.");
 
-                    // If a newer version database already exists, don't backup again. We can presume that the first backup is the one we care about.
+                    // If a newer version database already exists, don't create another backup. We can presume that the first backup is the one we care about.
                     if (!storage.Exists(newerVersionFilename))
                         createBackup(newerVersionFilename);
                 }
                 else
                 {
+                    // This error can occur due to file handles still being open by a previous instance.
+                    // If this is the case, rather than assuming the realm file is corrupt, block game startup.
+                    if (e.Message.StartsWith("SetEndOfFile() failed", StringComparison.Ordinal))
+                    {
+                        // This will throw if the realm file is not available for write access after 5 seconds.
+                        FileUtils.AttemptOperation(() =>
+                        {
+                            if (storage.Exists(Filename))
+                            {
+                                using (var _ = storage.GetStream(Filename, FileAccess.ReadWrite))
+                                {
+                                }
+                            }
+                        }, 20);
+
+                        // If the above eventually succeeds, try and continue startup as per normal.
+                        // This may throw again but let's allow it to, and block startup.
+                        return getRealmInstance();
+                    }
+
                     Logger.Error(e, "Realm startup failed with unrecoverable error; starting with a fresh database. A backup of your database has been made.");
                     createBackup($"{Filename.Replace(realm_extension, string.Empty)}_{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}_corrupt{realm_extension}");
                 }
@@ -1149,33 +1170,18 @@ namespace osu.Game.Database
         {
             Logger.Log($"Creating full realm database backup at {backupFilename}", LoggingTarget.Database);
 
-            int attempts = 10;
-
-            while (true)
+            FileUtils.AttemptOperation(() =>
             {
-                try
+                using (var source = storage.GetStream(Filename, mode: FileMode.Open))
                 {
-                    using (var source = storage.GetStream(Filename, mode: FileMode.Open))
-                    {
-                        // source may not exist.
-                        if (source == null)
-                            return;
+                    // source may not exist.
+                    if (source == null)
+                        return;
 
-                        using (var destination = storage.GetStream(backupFilename, FileAccess.Write, FileMode.CreateNew))
-                            source.CopyTo(destination);
-                    }
-
-                    return;
+                    using (var destination = storage.GetStream(backupFilename, FileAccess.Write, FileMode.CreateNew))
+                        source.CopyTo(destination);
                 }
-                catch (IOException)
-                {
-                    if (attempts-- <= 0)
-                        throw;
-
-                    // file may be locked during use.
-                    Thread.Sleep(500);
-                }
-            }
+            }, 20);
         }
 
         /// <summary>

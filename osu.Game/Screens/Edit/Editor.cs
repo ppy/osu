@@ -372,7 +372,7 @@ namespace osu.Game.Screens.Edit
                                     }
                                 }
                             },
-                            new EditorScreenSwitcherControl
+                            screenSwitcher = new EditorScreenSwitcherControl
                             {
                                 Anchor = Anchor.BottomRight,
                                 Origin = Anchor.BottomRight,
@@ -662,23 +662,23 @@ namespace osu.Game.Screens.Edit
                     return true;
 
                 case GlobalAction.EditorComposeMode:
-                    Mode.Value = EditorScreenMode.Compose;
+                    screenSwitcher.SelectItem(EditorScreenMode.Compose);
                     return true;
 
                 case GlobalAction.EditorDesignMode:
-                    Mode.Value = EditorScreenMode.Design;
+                    screenSwitcher.SelectItem(EditorScreenMode.Design);
                     return true;
 
                 case GlobalAction.EditorTimingMode:
-                    Mode.Value = EditorScreenMode.Timing;
+                    screenSwitcher.SelectItem(EditorScreenMode.Timing);
                     return true;
 
                 case GlobalAction.EditorSetupMode:
-                    Mode.Value = EditorScreenMode.SongSetup;
+                    screenSwitcher.SelectItem(EditorScreenMode.SongSetup);
                     return true;
 
                 case GlobalAction.EditorVerifyMode:
-                    Mode.Value = EditorScreenMode.Verify;
+                    screenSwitcher.SelectItem(EditorScreenMode.Verify);
                     return true;
 
                 case GlobalAction.EditorTestGameplay:
@@ -959,6 +959,8 @@ namespace osu.Game.Screens.Edit
         [CanBeNull]
         private ScheduledDelegate playbackDisabledDebounce;
 
+        private EditorScreenSwitcherControl screenSwitcher;
+
         private void updateSampleDisabledState()
         {
             bool shouldDisableSamples = clock.SeekingOrStopped.Value
@@ -1085,6 +1087,13 @@ namespace osu.Game.Screens.Edit
                 BeatmapInfo difficultyToDelete = playableBeatmap.BeatmapInfo;
 
                 var difficultiesBeforeDeletion = groupedOrderedBeatmaps.SelectMany(g => g).ToList();
+
+                // if the difficulty being currently deleted has unsaved changes,
+                // the editor exit flow would prompt for save *after* this method has done its thing.
+                // this is generally undesirable and also ends up leaving the user in a broken state.
+                // therefore, just update the last saved hash to make the exit flow think the deleted beatmap is not dirty,
+                // so that it will not show the save dialog on exit.
+                updateLastSavedHash();
 
                 beatmapManager.DeleteDifficultyImmediately(difficultyToDelete);
 

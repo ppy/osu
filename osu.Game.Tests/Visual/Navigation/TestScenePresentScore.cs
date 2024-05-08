@@ -170,7 +170,7 @@ namespace osu.Game.Tests.Visual.Navigation
                     BeatmapInfo = beatmap.Beatmaps.First(),
                     Ruleset = ruleset ?? new OsuRuleset().RulesetInfo,
                     User = new GuestUser(),
-                }).Value;
+                })!.Value;
             });
 
             AddAssert($"import {i} succeeded", () => imported != null);
