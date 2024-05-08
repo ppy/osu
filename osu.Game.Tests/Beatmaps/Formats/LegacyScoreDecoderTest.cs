@@ -14,7 +14,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Beatmaps.Legacy;
 using osu.Game.IO.Legacy;
-using osu.Game.Models;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Replays;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Catch;
@@ -226,10 +226,10 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 new OsuModDoubleTime { SpeedChange = { Value = 1.1 } }
             };
             scoreInfo.OnlineID = 123123;
-            scoreInfo.RealmUser = new RealmUser
+            scoreInfo.User = new APIUser
             {
                 Username = "spaceman_atlas",
-                OnlineID = 3035836,
+                Id = 3035836,
                 CountryCode = CountryCode.PL
             };
             scoreInfo.ClientVersion = "2023.1221.0";
