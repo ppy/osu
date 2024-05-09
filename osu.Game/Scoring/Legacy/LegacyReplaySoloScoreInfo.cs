@@ -43,6 +43,9 @@ namespace osu.Game.Scoring.Legacy
         [JsonConverter(typeof(StringEnumConverter))]
         public ScoreRank? Rank;
 
+        [JsonProperty("user_id")]
+        public int UserID = -1;
+
         public static LegacyReplaySoloScoreInfo FromScore(ScoreInfo score) => new LegacyReplaySoloScoreInfo
         {
             OnlineID = score.OnlineID,
@@ -51,6 +54,7 @@ namespace osu.Game.Scoring.Legacy
             MaximumStatistics = score.MaximumStatistics.Where(kvp => kvp.Value != 0).ToDictionary(),
             ClientVersion = score.ClientVersion,
             Rank = score.Rank,
+            UserID = score.User.OnlineID,
         };
     }
 }
