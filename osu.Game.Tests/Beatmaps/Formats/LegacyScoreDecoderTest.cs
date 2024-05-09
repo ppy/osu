@@ -14,6 +14,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Beatmaps.Legacy;
 using osu.Game.IO.Legacy;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Replays;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Catch;
@@ -31,6 +32,7 @@ using osu.Game.Rulesets.Taiko;
 using osu.Game.Scoring;
 using osu.Game.Scoring.Legacy;
 using osu.Game.Tests.Resources;
+using osu.Game.Users;
 
 namespace osu.Game.Tests.Beatmaps.Formats
 {
@@ -224,6 +226,12 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 new OsuModDoubleTime { SpeedChange = { Value = 1.1 } }
             };
             scoreInfo.OnlineID = 123123;
+            scoreInfo.User = new APIUser
+            {
+                Username = "spaceman_atlas",
+                Id = 3035836,
+                CountryCode = CountryCode.PL
+            };
             scoreInfo.ClientVersion = "2023.1221.0";
 
             var beatmap = new TestBeatmap(ruleset);
@@ -248,6 +256,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.That(decodedAfterEncode.ScoreInfo.MaximumStatistics, Is.EqualTo(scoreInfo.MaximumStatistics));
                 Assert.That(decodedAfterEncode.ScoreInfo.Mods, Is.EqualTo(scoreInfo.Mods));
                 Assert.That(decodedAfterEncode.ScoreInfo.ClientVersion, Is.EqualTo("2023.1221.0"));
+                Assert.That(decodedAfterEncode.ScoreInfo.RealmUser.OnlineID, Is.EqualTo(3035836));
             });
         }
 
@@ -352,6 +361,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 [HitResult.Great] = 200,
                 [HitResult.LargeTickHit] = 1,
             };
+            scoreInfo.Rank = ScoreRank.A;
 
             var beatmap = new TestBeatmap(ruleset);
             var score = new Score

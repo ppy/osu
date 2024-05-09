@@ -40,6 +40,7 @@ namespace osu.Game.Scoring.Legacy
             };
 
             WorkingBeatmap workingBeatmap;
+            ScoreRank? decodedRank = null;
 
             using (SerializationReader sr = new SerializationReader(stream))
             {
@@ -129,6 +130,9 @@ namespace osu.Game.Scoring.Legacy
                         score.ScoreInfo.MaximumStatistics = readScore.MaximumStatistics;
                         score.ScoreInfo.Mods = readScore.Mods.Select(m => m.ToMod(currentRuleset)).ToArray();
                         score.ScoreInfo.ClientVersion = readScore.ClientVersion;
+                        decodedRank = readScore.Rank;
+                        if (readScore.UserID > 1)
+                            score.ScoreInfo.RealmUser.OnlineID = readScore.UserID;
                     });
                 }
             }
@@ -139,6 +143,9 @@ namespace osu.Game.Scoring.Legacy
                 score.ScoreInfo.LegacyTotalScore = score.ScoreInfo.TotalScore;
 
             StandardisedScoreMigrationTools.UpdateFromLegacy(score.ScoreInfo, workingBeatmap);
+
+            if (decodedRank != null)
+                score.ScoreInfo.Rank = decodedRank.Value;
 
             // before returning for database import, we must restore the database-sourced BeatmapInfo.
             // if not, the clone operation in GetPlayableBeatmap will cause a dereference and subsequent database exception.

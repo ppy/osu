@@ -125,6 +125,8 @@ namespace osu.Game.Skinning.Components
         protected override void SetFont(FontUsage font) => text.Font = font.With(size: 40);
     }
 
+    // WARNING: DO NOT ADD ANY VALUES TO THIS ENUM ANYWHERE ELSE THAN AT THE END.
+    // Doing so will break existing user skins.
     public enum BeatmapAttribute
     {
         CircleSize,
@@ -134,11 +136,11 @@ namespace osu.Game.Skinning.Components
         StarRating,
         Title,
         Artist,
-        Source,
         DifficultyName,
         Creator,
         Length,
         RankedStatus,
         BPM,
+        Source,
     }
 }
