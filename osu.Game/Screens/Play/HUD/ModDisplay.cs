@@ -60,6 +60,9 @@ namespace osu.Game.Screens.Play.HUD
             Current.BindValueChanged(updateDisplay, true);
 
             iconsContainer.FadeInFromZero(fade_duration, Easing.OutQuint);
+
+            if (ExpansionMode == ExpansionMode.AlwaysExpanded || ExpansionMode == ExpansionMode.AlwaysContracted)
+                FinishTransforms(true);
         }
 
         private void updateDisplay(ValueChangedEvent<IReadOnlyList<Mod>> mods)
