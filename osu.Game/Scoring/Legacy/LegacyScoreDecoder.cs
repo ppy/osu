@@ -131,6 +131,8 @@ namespace osu.Game.Scoring.Legacy
                         score.ScoreInfo.Mods = readScore.Mods.Select(m => m.ToMod(currentRuleset)).ToArray();
                         score.ScoreInfo.ClientVersion = readScore.ClientVersion;
                         decodedRank = readScore.Rank;
+                        if (readScore.UserID > 1)
+                            score.ScoreInfo.RealmUser.OnlineID = readScore.UserID;
                     });
                 }
             }
