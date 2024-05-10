@@ -221,16 +221,13 @@ namespace osu.Game.Screens.Select.FooterV2
             }
             else
             {
+                modDisplay.Hide();
+                modCountText.Hide();
+
                 if (Current.Value.Count >= 5)
-                {
-                    modCountText.FadeIn(duration, easing);
-                    modDisplay.FadeOut(duration, easing);
-                }
+                    modCountText.Show();
                 else
-                {
-                    modDisplay.FadeIn(duration, easing);
-                    modCountText.FadeOut(duration, easing);
-                }
+                    modDisplay.Show();
 
                 if (Current.Value.Any(m => !m.Ranked))
                 {
