@@ -11,6 +11,8 @@ using osu.Framework.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Rulesets.Mania.UI;
+using osu.Game.Beatmaps;
+using osu.Game.Rulesets.Mania.Configuration;
 
 namespace osu.Game.Rulesets.Mania.Objects.Drawables
 {
@@ -22,14 +24,18 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         protected readonly IBindable<ManiaAction> Action = new Bindable<ManiaAction>();
 
         protected readonly IBindable<ScrollingDirection> Direction = new Bindable<ScrollingDirection>();
+        private readonly Bindable<bool> configTimingBasedNoteColouring = new Bindable<bool>();
 
         /// <summary>
         /// If timing based note colouring is used, the snap divisor of the note. 0 otherwise.
         /// </summary>
-        public readonly Bindable<int> SnapDivisor = new Bindable<int>();
+        public IBindable<int> SnapDivisor => snapDivisor;
+        private readonly Bindable<int> snapDivisor = new Bindable<int>();
 
         [Resolved(canBeNull: true)]
         private ManiaPlayfield playfield { get; set; }
+        [Resolved(canBeNull: true)]
+        private IBeatmap beatmap { get; set; }
 
         protected override float SamplePlaybackPosition
         {
@@ -55,8 +61,10 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load([CanBeNull] IBindable<ManiaAction> action, [NotNull] IScrollingInfo scrollingInfo)
+        private void load(ManiaRulesetConfigManager config, [CanBeNull] IBindable<ManiaAction> action, [NotNull] IScrollingInfo scrollingInfo)
         {
+            config.BindWith(ManiaRulesetSetting.TimingBasedNoteColouring, configTimingBasedNoteColouring);
+
             if (action != null)
                 Action.BindTo(action);
 
@@ -67,12 +75,29 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         {
             base.LoadComplete();
 
+            configTimingBasedNoteColouring.BindValueChanged(_ => updateSnapColour());
+            StartTimeBindable.BindValueChanged(_ => updateSnapColour(), true);
             Direction.BindValueChanged(OnDirectionChanged, true);
+        }
+
+        protected override void OnApply()
+        {
+            base.OnApply();
+            updateSnapColour();
         }
 
         protected virtual void OnDirectionChanged(ValueChangedEvent<ScrollingDirection> e)
         {
             Anchor = Origin = e.NewValue == ScrollingDirection.Up ? Anchor.TopCentre : Anchor.BottomCentre;
+        }
+
+        private void updateSnapColour()
+        {
+            if (beatmap == null || HitObject == null) return;
+
+            int divisor = beatmap.ControlPointInfo.GetClosestBeatDivisor(HitObject.StartTime);
+
+            snapDivisor.Value = configTimingBasedNoteColouring.Value ? divisor : 0;
         }
 
         protected override void UpdateHitStateTransforms(ArmedState state)

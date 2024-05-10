@@ -9,8 +9,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
-using osu.Game.Beatmaps;
-using osu.Game.Rulesets.Mania.Configuration;
 using osu.Game.Rulesets.Mania.Skinning.Default;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI.Scrolling;
@@ -23,10 +21,6 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
     /// </summary>
     public partial class DrawableNote : DrawableManiaHitObject<Note>, IKeyBindingHandler<ManiaAction>
     {
-        [Resolved(canBeNull: true)]
-        private IBeatmap beatmap { get; set; }
-
-        private readonly Bindable<bool> configTimingBasedNoteColouring = new Bindable<bool>();
 
         protected virtual ManiaSkinComponents Component => ManiaSkinComponents.Note;
 
@@ -44,29 +38,13 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(ManiaRulesetConfigManager rulesetConfig)
+        private void load()
         {
-            rulesetConfig?.BindWith(ManiaRulesetSetting.TimingBasedNoteColouring, configTimingBasedNoteColouring);
-
             AddInternal(headPiece = new SkinnableDrawable(new ManiaSkinComponentLookup(Component), _ => new DefaultNotePiece())
             {
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y
             });
-        }
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            configTimingBasedNoteColouring.BindValueChanged(_ => updateSnapColour());
-            StartTimeBindable.BindValueChanged(_ => updateSnapColour(), true);
-        }
-
-        protected override void OnApply()
-        {
-            base.OnApply();
-            updateSnapColour();
         }
 
         protected override void OnDirectionChanged(ValueChangedEvent<ScrollingDirection> e)
@@ -115,15 +93,6 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
         public virtual void OnReleased(KeyBindingReleaseEvent<ManiaAction> e)
         {
-        }
-
-        private void updateSnapColour()
-        {
-            if (beatmap == null || HitObject == null) return;
-
-            int snapDivisor = beatmap.ControlPointInfo.GetClosestBeatDivisor(HitObject.StartTime);
-
-            SnapDivisor.Value = configTimingBasedNoteColouring.Value ? snapDivisor : 0;
         }
     }
 }
