@@ -22,6 +22,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
     {
         [Resolved]
         private DrawableHitObject? drawableObject { get; set; }
+
         [Resolved]
         private OsuColour? colours { get; set; }
 
@@ -118,14 +119,9 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
 
         private void updateNoteAccent()
         {
-            if (snapDivisor.Value == 0)
-            {
-                accentColour.Value = baseAccentColour.Value;
-            }
-            else
-            {
-                accentColour.Value = SnapColourFor(snapDivisor.Value, colours);
-            }
+            accentColour.Value = snapDivisor.Value == 0
+                ? baseAccentColour.Value
+                : SnapColourFor(snapDivisor.Value, colours);
 
             foreground.Colour = accentColour.Value.Darken(0.6f); // matches body
 

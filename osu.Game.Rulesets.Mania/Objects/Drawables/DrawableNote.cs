@@ -21,7 +21,6 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
     /// </summary>
     public partial class DrawableNote : DrawableManiaHitObject<Note>, IKeyBindingHandler<ManiaAction>
     {
-
         protected virtual ManiaSkinComponents Component => ManiaSkinComponents.Note;
 
         private Drawable headPiece;

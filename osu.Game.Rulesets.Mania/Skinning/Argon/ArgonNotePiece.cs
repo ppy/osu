@@ -110,15 +110,9 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
 
         private void updateNoteAccent()
         {
-            Color4 colour;
-            if (snapDivisor.Value == 0)
-            {
-                colour = accentColour.Value;
-            }
-            else
-            {
-                colour = SnapColourFor(snapDivisor.Value, colours);
-            }
+            Color4 colour = snapDivisor.Value == 0
+                ? accentColour.Value
+                : SnapColourFor(snapDivisor.Value, colours);
 
             colouredBox.Colour = ColourInfo.GradientVertical(
                 colour.Lighten(0.1f),

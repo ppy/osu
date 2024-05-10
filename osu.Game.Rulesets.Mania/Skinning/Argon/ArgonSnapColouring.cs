@@ -16,20 +16,28 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
             {
                 case 1:
                     return colours.Gray8;
+
                 case 2:
                     return colours.Red;
+
                 case 4:
                     return colours.BlueDarker;
+
                 case 8:
                     return colours.YellowDark;
+
                 case 16:
                     return colours.PurpleDark;
+
                 case 3:
                     return colours.PinkDark;
+
                 case 6:
                     return colours.Purple;
+
                 case 12:
                     return colours.PinkDarker;
+
                 default:
                     return colours.Gray7;
             }

@@ -76,14 +76,9 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
 
         private void updateNoteAccent()
         {
-            if (snapDivisor.Value == 0)
-            {
-                accentColour.Value = baseAccentColour.Value;
-            }
-            else
-            {
-                accentColour.Value = SnapColourFor(snapDivisor.Value, colours);
-            }
+            accentColour.Value = snapDivisor.Value == 0
+                ? baseAccentColour.Value
+                : SnapColourFor(snapDivisor.Value, colours);
 
             background.Colour = accentColour.Value.Darken(0.6f);
         }

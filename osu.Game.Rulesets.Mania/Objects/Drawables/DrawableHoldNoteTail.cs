@@ -37,6 +37,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         {
             base.OnApply();
             StartSnapDivisor.UnbindBindings();
+
             if (HoldNote is not null)
             {
                 StartSnapDivisor.BindTo(HoldNote.SnapDivisor);

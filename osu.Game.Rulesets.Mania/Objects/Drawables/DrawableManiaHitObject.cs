@@ -27,10 +27,12 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         /// If timing based note colouring is used, the snap divisor of the note. 0 otherwise.
         /// </summary>
         public IBindable<int> SnapDivisor => snapDivisor;
+
         private readonly Bindable<int> snapDivisor = new Bindable<int>();
 
         [Resolved(canBeNull: true)]
         private ManiaPlayfield? playfield { get; set; }
+
         [Resolved(canBeNull: true)]
         private IBeatmap? beatmap { get; set; }
 
