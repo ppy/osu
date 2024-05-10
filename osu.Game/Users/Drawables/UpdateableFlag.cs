@@ -28,11 +28,6 @@ namespace osu.Game.Users.Drawables
         }
 
         /// <summary>
-        /// Whether to show a placeholder on unknown country.
-        /// </summary>
-        public bool ShowPlaceholderOnUnknown = true;
-
-        /// <summary>
         /// Perform an action in addition to showing the country ranking.
         /// This should be used to perform auxiliary tasks and not as a primary action for clicking a flag (to maintain a consistent UX).
         /// </summary>
@@ -57,9 +52,6 @@ namespace osu.Game.Users.Drawables
 
         protected override Drawable? CreateDrawable(CountryCode countryCode)
         {
-            if (countryCode == CountryCode.Unknown && !ShowPlaceholderOnUnknown)
-                return null;
-
             return new Container
             {
                 RelativeSizeAxes = Axes.Both,
