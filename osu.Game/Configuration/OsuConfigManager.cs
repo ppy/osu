@@ -200,6 +200,8 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.EditorLimitedDistanceSnap, false);
             SetDefault(OsuSetting.EditorShowSpeedChanges, false);
 
+            SetDefault(OsuSetting.HideCountryFlags, false);
+
             SetDefault(OsuSetting.MultiplayerRoomFilter, RoomPermissionsFilter.All);
 
             SetDefault(OsuSetting.LastProcessedMetadataId, -1);
@@ -435,6 +437,7 @@ namespace osu.Game.Configuration
         TouchDisableGameplayTaps,
         ModSelectTextSearchStartsActive,
         UserOnlineStatus,
-        MultiplayerRoomFilter
+        MultiplayerRoomFilter,
+        HideCountryFlags,
     }
 }
