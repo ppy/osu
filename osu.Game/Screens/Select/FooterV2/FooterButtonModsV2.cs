@@ -9,12 +9,14 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Localisation;
 using osu.Game.Overlays;
@@ -155,15 +157,16 @@ namespace osu.Game.Screens.Select.FooterV2
                                     Origin = Anchor.Centre,
                                     Shear = -barShear,
                                     Scale = new Vector2(0.6f),
-                                    Current = { Value = new List<Mod> { new ModCinema() } },
+                                    Current = { BindTarget = Current },
                                     ExpansionMode = ExpansionMode.AlwaysContracted,
                                 },
-                                modCountText = new OsuSpriteText
+                                modCountText = new ModCountText
                                 {
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
                                     Shear = -barShear,
                                     Font = OsuFont.Torus.With(size: 14 * torus_scale_factor, weight: FontWeight.Bold),
+                                    Mods = { BindTarget = Current },
                                 }
                             }
                         },
@@ -216,13 +219,11 @@ namespace osu.Game.Screens.Select.FooterV2
             {
                 if (Current.Value.Count >= 5)
                 {
-                    modCountText.Text = $"{Current.Value.Count} MODS";
                     modCountText.FadeIn(duration, easing);
                     modDisplay.FadeOut(duration, easing);
                 }
                 else
                 {
-                    modDisplay.Current.Value = Current.Value;
                     modDisplay.FadeIn(duration, easing);
                     modCountText.FadeOut(duration, easing);
                 }
@@ -256,6 +257,59 @@ namespace osu.Game.Screens.Select.FooterV2
                 MultiplierText.FadeColour(colours.Lime1, duration, easing);
             else
                 MultiplierText.FadeColour(Color4.White, duration, easing);
+        }
+
+        private partial class ModCountText : OsuSpriteText, IHasCustomTooltip<IReadOnlyList<Mod>>
+        {
+            public readonly Bindable<IReadOnlyList<Mod>> Mods = new Bindable<IReadOnlyList<Mod>>();
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+                Mods.BindValueChanged(v => Text = FooterButtonModsV2Strings.Mods(v.NewValue.Count).ToUpper(), true);
+            }
+
+            public ITooltip<IReadOnlyList<Mod>> GetCustomTooltip() => new ModTooltip();
+
+            public IReadOnlyList<Mod>? TooltipContent => Mods.Value;
+
+            public partial class ModTooltip : VisibilityContainer, ITooltip<IReadOnlyList<Mod>>
+            {
+                private ModDisplay extendedModDisplay = null!;
+
+                [BackgroundDependencyLoader]
+                private void load(OverlayColourProvider colourProvider)
+                {
+                    AutoSizeAxes = Axes.Both;
+                    CornerRadius = CORNER_RADIUS;
+                    Masking = true;
+
+                    InternalChildren = new Drawable[]
+                    {
+                        new Box
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Colour = colourProvider.Background5,
+                        },
+                        extendedModDisplay = new ModDisplay
+                        {
+                            Margin = new MarginPadding { Vertical = 2f, Horizontal = 10f },
+                            Scale = new Vector2(0.6f),
+                            ExpansionMode = ExpansionMode.AlwaysExpanded,
+                        },
+                    };
+                }
+
+                public void SetContent(IReadOnlyList<Mod> content)
+                {
+                    extendedModDisplay.Current.Value = content;
+                }
+
+                public void Move(Vector2 pos) => Position = pos;
+
+                protected override void PopIn() => this.FadeIn(240, Easing.OutQuint);
+                protected override void PopOut() => this.FadeOut(240, Easing.OutQuint);
+            }
         }
     }
 }
