@@ -3,9 +3,11 @@
 
 using System;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
+using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
 
@@ -13,14 +15,20 @@ namespace osu.Game.Users.Drawables
 {
     public partial class UpdateableFlag : ModelBackedDrawable<CountryCode>
     {
+        private CountryCode countryCode;
+
         public CountryCode CountryCode
         {
-            get => Model;
-            set => Model = value;
+            get => countryCode;
+            set
+            {
+                countryCode = value;
+                updateModel();
+            }
         }
 
         /// <summary>
-        /// Whether to show a place holder on unknown country.
+        /// Whether to show a placeholder on unknown country.
         /// </summary>
         public bool ShowPlaceholderOnUnknown = true;
 
@@ -30,9 +38,21 @@ namespace osu.Game.Users.Drawables
         /// </summary>
         public Action? Action;
 
+        private readonly Bindable<bool> hideFlags = new BindableBool();
+
+        [Resolved]
+        private RankingsOverlay? rankingsOverlay { get; set; }
+
         public UpdateableFlag(CountryCode countryCode = CountryCode.Unknown)
         {
             CountryCode = countryCode;
+            hideFlags.BindValueChanged(_ => updateModel());
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(OsuConfigManager config)
+        {
+            config.BindWith(OsuSetting.HideCountryFlags, hideFlags);
         }
 
         protected override Drawable? CreateDrawable(CountryCode countryCode)
@@ -54,14 +74,13 @@ namespace osu.Game.Users.Drawables
             };
         }
 
-        [Resolved]
-        private RankingsOverlay? rankingsOverlay { get; set; }
-
         protected override bool OnClick(ClickEvent e)
         {
             Action?.Invoke();
             rankingsOverlay?.ShowCountry(CountryCode);
             return true;
         }
+
+        private void updateModel() => Model = hideFlags.Value ? CountryCode.Unknown : countryCode;
     }
 }
