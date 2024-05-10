@@ -266,7 +266,7 @@ namespace osu.Game.Online.Leaderboards
                                         RelativeSizeAxes = Axes.X,
                                         Shear = -shear,
                                         Text = user.Username,
-                                        Font = OsuFont.GetFont(size: 24, weight: FontWeight.SemiBold)
+                                        Font = OsuFont.GetFont(size: 20, weight: FontWeight.SemiBold)
                                     }
                                 }
                             },
