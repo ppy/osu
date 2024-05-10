@@ -46,6 +46,9 @@ namespace osu.Game.Scoring.Legacy
         [JsonProperty("user_id")]
         public int UserID = -1;
 
+        [JsonProperty("total_score_without_mods")]
+        public long? TotalScoreWithoutMods { get; set; }
+
         public static LegacyReplaySoloScoreInfo FromScore(ScoreInfo score) => new LegacyReplaySoloScoreInfo
         {
             OnlineID = score.OnlineID,
@@ -55,6 +58,7 @@ namespace osu.Game.Scoring.Legacy
             ClientVersion = score.ClientVersion,
             Rank = score.Rank,
             UserID = score.User.OnlineID,
+            TotalScoreWithoutMods = score.TotalScoreWithoutMods > 0 ? score.TotalScoreWithoutMods : null,
         };
     }
 }
