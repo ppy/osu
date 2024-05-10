@@ -20,7 +20,6 @@ namespace osu.Game.Screens.Play.HUD
     /// </summary>
     public partial class ModDisplay : CompositeDrawable, IHasCurrentValue<IReadOnlyList<Mod>>
     {
-        private readonly bool showExtendedInformation;
         private const int fade_duration = 1000;
 
         public ExpansionMode ExpansionMode = ExpansionMode.ExpandOnHover;
@@ -38,6 +37,7 @@ namespace osu.Game.Screens.Play.HUD
             }
         }
 
+        private readonly bool showExtendedInformation;
         private readonly FillFlowContainer<ModIcon> iconsContainer;
 
         public ModDisplay(bool showExtendedInformation = true)

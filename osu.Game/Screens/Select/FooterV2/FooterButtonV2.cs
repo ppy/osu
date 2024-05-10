@@ -27,15 +27,15 @@ namespace osu.Game.Screens.Select.FooterV2
         private const int transition_length = 500;
 
         // This should be 12 by design, but an extra allowance is added due to the corner radius specification.
-        public const float SHEAR_WIDTH = 13.5f;
+        private const float shear_width = 13.5f;
 
-        public const int CORNER_RADIUS = 10;
-        public const int BUTTON_HEIGHT = 90;
-        public const int BUTTON_WIDTH = 140;
+        protected const int CORNER_RADIUS = 10;
+        protected const int BUTTON_HEIGHT = 90;
+        protected const int BUTTON_WIDTH = 140;
 
         public Bindable<Visibility> OverlayState = new Bindable<Visibility>();
 
-        protected static readonly Vector2 BUTTON_SHEAR = new Vector2(SHEAR_WIDTH / BUTTON_HEIGHT, 0);
+        protected static readonly Vector2 BUTTON_SHEAR = new Vector2(shear_width / BUTTON_HEIGHT, 0);
 
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; } = null!;
@@ -72,7 +72,6 @@ namespace osu.Game.Screens.Select.FooterV2
         public FooterButtonV2()
         {
             Size = new Vector2(BUTTON_WIDTH, BUTTON_HEIGHT);
-            Margin = new MarginPadding { Horizontal = SHEAR_WIDTH / 2f };
 
             Child = new Container
             {
