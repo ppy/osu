@@ -9,10 +9,13 @@ using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
+using osu.Game.Graphics;
+using osu.Game.Rulesets.Mania.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI.Scrolling;
 using osuTK;
 using osuTK.Graphics;
+using static osu.Game.Rulesets.Mania.Skinning.Argon.ArgonSnapColouring;
 
 namespace osu.Game.Rulesets.Mania.Skinning.Argon
 {
@@ -23,7 +26,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
         public const float CORNER_RADIUS = 3.4f;
 
         private readonly IBindable<ScrollingDirection> direction = new Bindable<ScrollingDirection>();
-        private readonly IBindable<Color4> accentColour = new Bindable<Color4>();
+        private readonly Bindable<Color4> accentColour = new Bindable<Color4>();
 
         private readonly Box colouredBox;
 
@@ -90,9 +93,44 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
             if (drawableObject != null)
             {
                 accentColour.BindTo(drawableObject.AccentColour);
-                accentColour.BindValueChanged(onAccentChanged, true);
+                accentColour.BindValueChanged(onAccentColourChanged, true);
+
+                if (drawableObject is DrawableManiaHitObject maniaHitObject)
+                {
+                    snapDivisor.BindTo(maniaHitObject.SnapDivisor);
+                    snapDivisor.BindValueChanged(onSnapDivisorChanged, true);
+                }
             }
         }
+
+        [Resolved]
+        private OsuColour? colours { get; set; }
+
+        private readonly IBindable<int> snapDivisor = new Bindable<int>();
+
+        private void updateNoteAccent()
+        {
+            Color4 colour;
+            if (snapDivisor.Value == 0)
+            {
+                colour = accentColour.Value;
+            }
+            else
+            {
+                colour = SnapColourFor(snapDivisor.Value, colours);
+            }
+
+            colouredBox.Colour = ColourInfo.GradientVertical(
+                colour.Lighten(0.1f),
+                colour
+            );
+        }
+
+        private void onAccentColourChanged(ValueChangedEvent<Color4> accent)
+            => updateNoteAccent();
+
+        private void onSnapDivisorChanged(ValueChangedEvent<int> divisor)
+            => updateNoteAccent();
 
         private void onDirectionChanged(ValueChangedEvent<ScrollingDirection> direction)
         {
@@ -101,14 +139,6 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
                 : Anchor.BottomCentre;
 
             Scale = new Vector2(1, direction.NewValue == ScrollingDirection.Up ? -1 : 1);
-        }
-
-        private void onAccentChanged(ValueChangedEvent<Color4> accent)
-        {
-            colouredBox.Colour = ColourInfo.GradientVertical(
-                accent.NewValue.Lighten(0.1f),
-                accent.NewValue
-            );
         }
     }
 }
