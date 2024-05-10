@@ -50,7 +50,7 @@ namespace osu.Game.Users.Drawables
             config.BindWith(OsuSetting.HideCountryFlags, hideFlags);
         }
 
-        protected override Drawable? CreateDrawable(CountryCode countryCode)
+        protected override Drawable CreateDrawable(CountryCode countryCode)
         {
             return new Container
             {
