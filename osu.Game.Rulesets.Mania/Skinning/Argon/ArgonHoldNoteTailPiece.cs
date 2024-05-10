@@ -8,11 +8,13 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Game.Graphics;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI.Scrolling;
 using osuTK;
 using osuTK.Graphics;
+using static osu.Game.Rulesets.Mania.Skinning.Argon.ArgonSnapColouring;
 
 namespace osu.Game.Rulesets.Mania.Skinning.Argon
 {
@@ -20,9 +22,13 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
     {
         [Resolved]
         private DrawableHitObject? drawableObject { get; set; }
+        [Resolved]
+        private OsuColour? colours { get; set; }
 
         private readonly IBindable<ScrollingDirection> direction = new Bindable<ScrollingDirection>();
-        private readonly IBindable<Color4> accentColour = new Bindable<Color4>();
+        private readonly IBindable<Color4> baseAccentColour = new Bindable<Color4>();
+        private readonly Bindable<Color4> accentColour = new Bindable<Color4>();
+        private readonly IBindable<int> snapDivisor = new Bindable<int>();
 
         private readonly Box foreground;
         private readonly ArgonHoldNoteHittingLayer hittingLayer;
@@ -86,8 +92,8 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
 
             if (drawableObject != null)
             {
-                accentColour.BindTo(drawableObject.AccentColour);
-                accentColour.BindValueChanged(onAccentChanged, true);
+                baseAccentColour.BindTo(drawableObject.AccentColour);
+                baseAccentColour.BindValueChanged(_ => updateNoteAccent(), true);
 
                 drawableObject.HitObjectApplied += hitObjectApplied;
             }
@@ -97,28 +103,41 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
         {
             var holdNoteTail = (DrawableHoldNoteTail)drawableHitObject;
 
+            snapDivisor.UnbindBindings();
+            snapDivisor.BindTo(holdNoteTail.StartSnapDivisor);
+            snapDivisor.BindValueChanged(_ => updateNoteAccent(), true);
+
             hittingLayer.Recycle();
 
             hittingLayer.AccentColour.UnbindBindings();
-            hittingLayer.AccentColour.BindTo(holdNoteTail.HoldNote.AccentColour);
+            hittingLayer.AccentColour.BindTo(accentColour);
 
             hittingLayer.IsHitting.UnbindBindings();
-            ((IBindable<bool>)hittingLayer.IsHitting).BindTo(holdNoteTail.HoldNote.IsHitting);
+            hittingLayer.IsHitting.BindTo(holdNoteTail.HoldNote.IsHitting);
+        }
+
+        private void updateNoteAccent()
+        {
+            if (snapDivisor.Value == 0)
+            {
+                accentColour.Value = baseAccentColour.Value;
+            }
+            else
+            {
+                accentColour.Value = SnapColourFor(snapDivisor.Value, colours);
+            }
+
+            foreground.Colour = accentColour.Value.Darken(0.6f); // matches body
+
+            foregroundAdditive.Colour = ColourInfo.GradientVertical(
+                accentColour.Value.Opacity(0.4f),
+                accentColour.Value.Opacity(0)
+            );
         }
 
         private void onDirectionChanged(ValueChangedEvent<ScrollingDirection> direction)
         {
             Scale = new Vector2(1, direction.NewValue == ScrollingDirection.Up ? -1 : 1);
-        }
-
-        private void onAccentChanged(ValueChangedEvent<Color4> accent)
-        {
-            foreground.Colour = accent.NewValue.Darken(0.6f); // matches body
-
-            foregroundAdditive.Colour = ColourInfo.GradientVertical(
-                accent.NewValue.Opacity(0.4f),
-                accent.NewValue.Opacity(0)
-            );
         }
 
         protected override void Dispose(bool isDisposing)

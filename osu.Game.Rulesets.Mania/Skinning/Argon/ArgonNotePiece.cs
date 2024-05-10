@@ -93,12 +93,12 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
             if (drawableObject != null)
             {
                 accentColour.BindTo(drawableObject.AccentColour);
-                accentColour.BindValueChanged(onAccentColourChanged, true);
+                accentColour.BindValueChanged(_ => updateNoteAccent(), true);
 
                 if (drawableObject is DrawableManiaHitObject maniaHitObject)
                 {
                     snapDivisor.BindTo(maniaHitObject.SnapDivisor);
-                    snapDivisor.BindValueChanged(onSnapDivisorChanged, true);
+                    snapDivisor.BindValueChanged(_ => updateNoteAccent(), true);
                 }
             }
         }
@@ -125,12 +125,6 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
                 colour
             );
         }
-
-        private void onAccentColourChanged(ValueChangedEvent<Color4> accent)
-            => updateNoteAccent();
-
-        private void onSnapDivisorChanged(ValueChangedEvent<int> divisor)
-            => updateNoteAccent();
 
         private void onDirectionChanged(ValueChangedEvent<ScrollingDirection> direction)
         {

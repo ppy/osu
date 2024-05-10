@@ -1,10 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
-using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -33,9 +30,9 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         private readonly Bindable<int> snapDivisor = new Bindable<int>();
 
         [Resolved(canBeNull: true)]
-        private ManiaPlayfield playfield { get; set; }
+        private ManiaPlayfield? playfield { get; set; }
         [Resolved(canBeNull: true)]
-        private IBeatmap beatmap { get; set; }
+        private IBeatmap? beatmap { get; set; }
 
         protected override float SamplePlaybackPosition
         {
@@ -52,7 +49,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         /// Whether this <see cref="DrawableManiaHitObject"/> can be hit, given a time value.
         /// If non-null, judgements will be ignored whilst the function returns false.
         /// </summary>
-        public Func<DrawableHitObject, double, bool> CheckHittable;
+        public Func<DrawableHitObject, double, bool>? CheckHittable;
 
         protected DrawableManiaHitObject(ManiaHitObject hitObject)
             : base(hitObject)
@@ -61,9 +58,9 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(ManiaRulesetConfigManager config, [CanBeNull] IBindable<ManiaAction> action, [NotNull] IScrollingInfo scrollingInfo)
+        private void load(ManiaRulesetConfigManager? config, IBindable<ManiaAction>? action, IScrollingInfo scrollingInfo)
         {
-            config.BindWith(ManiaRulesetSetting.TimingBasedNoteColouring, configTimingBasedNoteColouring);
+            config?.BindWith(ManiaRulesetSetting.TimingBasedNoteColouring, configTimingBasedNoteColouring);
 
             if (action != null)
                 Action.BindTo(action);

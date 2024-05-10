@@ -204,12 +204,6 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             // Samples are played by the head/tail notes.
         }
 
-        public override void OnKilled()
-        {
-            base.OnKilled();
-            (bodyPiece.Drawable as IHoldNoteBody)?.Recycle();
-        }
-
         protected override void Update()
         {
             base.Update();
@@ -292,7 +286,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                 return false;
 
             // do not run any of this logic when rewinding, as it inverts order of presses/releases.
-            if ((Clock as IGameplayClock)?.IsRewinding == true)
+            if (Clock is IGameplayClock { IsRewinding: true })
                 return false;
 
             if (CheckHittable?.Invoke(this, Time.Current) == false)
@@ -327,7 +321,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                 return;
 
             // do not run any of this logic when rewinding, as it inverts order of presses/releases.
-            if ((Clock as IGameplayClock)?.IsRewinding == true)
+            if (Clock is IGameplayClock { IsRewinding: true })
                 return;
 
             // When our action is released and we are in the middle of a hold, there's a chance that

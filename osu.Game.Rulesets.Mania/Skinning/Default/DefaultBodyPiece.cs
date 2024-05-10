@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Default
     /// <summary>
     /// Represents length-wise portion of a hold note.
     /// </summary>
-    public partial class DefaultBodyPiece : CompositeDrawable, IHoldNoteBody
+    public partial class DefaultBodyPiece : CompositeDrawable
     {
         protected readonly Bindable<Color4> AccentColour = new Bindable<Color4>();
         protected readonly IBindable<bool> IsHitting = new Bindable<bool>();

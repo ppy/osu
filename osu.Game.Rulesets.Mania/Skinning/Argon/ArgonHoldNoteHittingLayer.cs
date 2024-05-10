@@ -12,7 +12,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
     public partial class ArgonHoldNoteHittingLayer : Box
     {
         public readonly Bindable<Color4> AccentColour = new Bindable<Color4>();
-        public readonly Bindable<bool> IsHitting = new Bindable<bool>();
+        public readonly IBindable<bool> IsHitting = new Bindable<bool>();
 
         public ArgonHoldNoteHittingLayer()
         {

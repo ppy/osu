@@ -3,6 +3,7 @@
 
 #nullable disable
 
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Scoring;
@@ -18,6 +19,8 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
         protected internal DrawableHoldNote HoldNote => (DrawableHoldNote)ParentHitObject;
 
+        public readonly IBindable<int> StartSnapDivisor = new Bindable<int>();
+
         public DrawableHoldNoteTail()
             : this(null)
         {
@@ -30,7 +33,17 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             Origin = Anchor.TopCentre;
         }
 
-        public void UpdateResult() => base.UpdateResult(true);
+        protected override void OnApply()
+        {
+            base.OnApply();
+            StartSnapDivisor.UnbindBindings();
+            if (HoldNote is not null)
+            {
+                StartSnapDivisor.BindTo(HoldNote.SnapDivisor);
+            }
+        }
+
+        public void UpdateResult() => UpdateResult(true);
 
         protected override void CheckForResult(bool userTriggered, double timeOffset) =>
             // Factor in the release lenience

@@ -7,19 +7,25 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Game.Graphics;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
-using osu.Game.Rulesets.Mania.Skinning.Default;
 using osu.Game.Rulesets.Objects.Drawables;
 using osuTK.Graphics;
+using static osu.Game.Rulesets.Mania.Skinning.Argon.ArgonSnapColouring;
 
 namespace osu.Game.Rulesets.Mania.Skinning.Argon
 {
     /// <summary>
     /// Represents length-wise portion of a hold note.
     /// </summary>
-    public partial class ArgonHoldBodyPiece : CompositeDrawable, IHoldNoteBody
+    public partial class ArgonHoldBodyPiece : CompositeDrawable
     {
-        protected readonly Bindable<Color4> AccentColour = new Bindable<Color4>();
+        private readonly IBindable<Color4> baseAccentColour = new Bindable<Color4>();
+        private readonly IBindable<int> snapDivisor = new Bindable<int>();
+        private readonly Bindable<Color4> accentColour = new Bindable<Color4>();
+
+        [Resolved]
+        private OsuColour? colours { get; set; }
 
         private Drawable background = null!;
         private ArgonHoldNoteHittingLayer hittingLayer = null!;
@@ -42,24 +48,44 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
                 hittingLayer = new ArgonHoldNoteHittingLayer()
             };
 
-            if (drawableObject != null)
+            if (drawableObject is not null)
             {
-                var holdNote = (DrawableHoldNote)drawableObject;
+                baseAccentColour.BindTo(drawableObject.AccentColour);
+                baseAccentColour.BindValueChanged(_ => updateNoteAccent(), true);
 
-                AccentColour.BindTo(holdNote.AccentColour);
-                hittingLayer.AccentColour.BindTo(holdNote.AccentColour);
-                ((IBindable<bool>)hittingLayer.IsHitting).BindTo(holdNote.IsHitting);
+                drawableObject.HitObjectApplied += hitObjectApplied;
             }
-
-            AccentColour.BindValueChanged(colour =>
-            {
-                background.Colour = colour.NewValue.Darken(0.6f);
-            }, true);
         }
 
-        public void Recycle()
+        private void hitObjectApplied(DrawableHitObject hitObject)
         {
-            hittingLayer.Recycle();
+            if (hitObject is DrawableHoldNote holdNote)
+            {
+                snapDivisor.UnbindBindings();
+                snapDivisor.BindTo(holdNote.SnapDivisor);
+                snapDivisor.BindValueChanged(_ => updateNoteAccent(), true);
+
+                hittingLayer.Recycle();
+
+                hittingLayer.IsHitting.UnbindBindings();
+                hittingLayer.IsHitting.BindTo(holdNote.IsHitting);
+                hittingLayer.AccentColour.UnbindBindings();
+                hittingLayer.AccentColour.BindTo(accentColour);
+            }
+        }
+
+        private void updateNoteAccent()
+        {
+            if (snapDivisor.Value == 0)
+            {
+                accentColour.Value = baseAccentColour.Value;
+            }
+            else
+            {
+                accentColour.Value = SnapColourFor(snapDivisor.Value, colours);
+            }
+
+            background.Colour = accentColour.Value.Darken(0.6f);
         }
     }
 }
