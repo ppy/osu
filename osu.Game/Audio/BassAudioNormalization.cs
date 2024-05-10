@@ -36,7 +36,7 @@ namespace osu.Game.Audio
                 return;
             }
 
-            int loudness = BassLoud.BASS_Loudness_Start(decodeStream, BassFlags.BassLoudnessIntegrated | BassFlags.BassLoudnessAutofree, 0);
+            int loudness = BassLoud.Start(decodeStream, BassFlags.BassLoudnessIntegrated | BassFlags.BassLoudnessAutofree, 0);
 
             if (loudness == 0)
             {
@@ -53,7 +53,7 @@ namespace osu.Game.Audio
             }
 
             float integratedLoudness = 1;
-            bool gotLevel = BassLoud.BASS_Loudness_GetLevel(loudness, BassFlags.BassLoudnessIntegrated, ref integratedLoudness);
+            bool gotLevel = BassLoud.GetLevel(loudness, BassFlags.BassLoudnessIntegrated, ref integratedLoudness);
 
             if (!gotLevel || integratedLoudness > 0)
             {
