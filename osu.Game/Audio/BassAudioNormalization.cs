@@ -16,7 +16,7 @@ namespace osu.Game.Audio
         /// The integrated loudness of the audio
         /// </summary>
         /// <remarks>
-        /// Applicable range = -70 to -1<br/>Null if the loudness could not be calculated due to an error
+        /// Applicable range = -70 to 0<br/>Null if the loudness could not be calculated due to an error
         /// </remarks>
         public float? IntegratedLoudness { get; }
 
@@ -52,10 +52,10 @@ namespace osu.Game.Audio
             {
             }
 
-            float integratedLoudness = 0;
+            float integratedLoudness = 1;
             bool gotLevel = BassLoud.BASS_Loudness_GetLevel(loudness, BassFlags.BassLoudnessIntegrated, ref integratedLoudness);
 
-            if (!gotLevel || integratedLoudness == 0)
+            if (!gotLevel || integratedLoudness > 0)
             {
                 Logger.Log("Failed to get loudness level!\nError Code: " + Bass.LastError, LoggingTarget.Runtime, LogLevel.Error);
                 IntegratedLoudness = null;
