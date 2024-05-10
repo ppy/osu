@@ -86,7 +86,7 @@ namespace osu.Game.Screens.Select.FooterV2
                     {
                         new Box
                         {
-                            Colour = colours.Red2,
+                            Colour = colours.Orange2,
                             RelativeSizeAxes = Axes.Both,
                         },
                         new OsuSpriteText
