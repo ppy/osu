@@ -16,7 +16,6 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Localisation;
 using osu.Game.Overlays;
@@ -61,7 +60,7 @@ namespace osu.Game.Screens.Select.FooterV2
         {
             const float bar_shear_width = 7f;
             const float bar_height = 37f;
-            const float display_rel_width = 0.65f;
+            const float mod_display_portion = 0.65f;
 
             var barShear = new Vector2(bar_shear_width / bar_height, 0);
 
@@ -132,7 +131,7 @@ namespace osu.Game.Screens.Select.FooterV2
                             Anchor = Anchor.CentreRight,
                             Origin = Anchor.CentreRight,
                             RelativeSizeAxes = Axes.Both,
-                            Width = 1f - display_rel_width,
+                            Width = 1f - mod_display_portion,
                             Masking = true,
                             Child = MultiplierText = new OsuSpriteText
                             {
@@ -147,7 +146,7 @@ namespace osu.Game.Screens.Select.FooterV2
                         {
                             CornerRadius = CORNER_RADIUS,
                             RelativeSizeAxes = Axes.Both,
-                            Width = display_rel_width,
+                            Width = mod_display_portion,
                             Masking = true,
                             Children = new Drawable[]
                             {
