@@ -14,6 +14,7 @@ using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Localisation;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
@@ -70,7 +71,7 @@ namespace osu.Game.Screens.Select.FooterV2
 
             AddRange(new[]
             {
-                UnrankedBadge = new Container
+                UnrankedBadge = new ContainerWithTooltip
                 {
                     Position = new Vector2(BUTTON_WIDTH + 5f, -5f),
                     Depth = float.MaxValue,
@@ -82,6 +83,7 @@ namespace osu.Game.Screens.Select.FooterV2
                     Masking = true,
                     BorderColour = Color4.White,
                     BorderThickness = 2f,
+                    TooltipText = ModSelectOverlayStrings.UnrankedExplanation,
                     Children = new Drawable[]
                     {
                         new Box
@@ -311,6 +313,11 @@ namespace osu.Game.Screens.Select.FooterV2
                 protected override void PopIn() => this.FadeIn(240, Easing.OutQuint);
                 protected override void PopOut() => this.FadeOut(240, Easing.OutQuint);
             }
+        }
+
+        private partial class ContainerWithTooltip : Container, IHasTooltip
+        {
+            public LocalisableString TooltipText { get; set; }
         }
     }
 }
