@@ -78,7 +78,8 @@ namespace osu.Game.Screens.Select.FooterV2
                     Origin = Anchor.BottomLeft,
                     Shear = barShear,
                     CornerRadius = CORNER_RADIUS,
-                    AutoSizeAxes = Axes.Both,
+                    AutoSizeAxes = Axes.X,
+                    Height = bar_height,
                     Masking = true,
                     BorderColour = Color4.White,
                     BorderThickness = 2f,
@@ -91,9 +92,12 @@ namespace osu.Game.Screens.Select.FooterV2
                         },
                         new OsuSpriteText
                         {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
                             Shear = -barShear,
                             Text = ModSelectOverlayStrings.Unranked.ToUpper(),
-                            Margin = new MarginPadding { Horizontal = 15, Vertical = 5 },
+                            Margin = new MarginPadding { Horizontal = 15 },
+                            UseFullGlyphHeight = false,
                             Font = OsuFont.Torus.With(size: 14 * torus_scale_factor, weight: FontWeight.Bold),
                             Colour = Color4.Black,
                         }
@@ -135,6 +139,7 @@ namespace osu.Game.Screens.Select.FooterV2
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
                                 Shear = -barShear,
+                                UseFullGlyphHeight = false,
                                 Font = OsuFont.Torus.With(size: 14 * torus_scale_factor, weight: FontWeight.Bold)
                             }
                         },
