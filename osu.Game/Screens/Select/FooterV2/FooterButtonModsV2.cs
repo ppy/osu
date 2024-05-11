@@ -73,7 +73,8 @@ namespace osu.Game.Screens.Select.FooterV2
             {
                 UnrankedBadge = new ContainerWithTooltip
                 {
-                    Position = new Vector2(BUTTON_WIDTH + 5f, -5f),
+                    Margin = new MarginPadding { Left = BUTTON_WIDTH + 5f },
+                    Y = -5f,
                     Depth = float.MaxValue,
                     Origin = Anchor.BottomLeft,
                     Shear = barShear,
@@ -233,14 +234,14 @@ namespace osu.Game.Screens.Select.FooterV2
 
                 if (Current.Value.Any(m => !m.Ranked))
                 {
-                    UnrankedBadge.MoveToX(BUTTON_WIDTH + 5, duration, easing);
+                    UnrankedBadge.MoveToX(0, duration, easing);
                     UnrankedBadge.FadeIn(duration, easing);
 
-                    this.ResizeWidthTo(BUTTON_WIDTH + UnrankedBadge.DrawWidth + 10, duration, easing);
+                    this.ResizeWidthTo(BUTTON_WIDTH + 5 + UnrankedBadge.DrawWidth, duration, easing);
                 }
                 else
                 {
-                    UnrankedBadge.MoveToX(BUTTON_WIDTH + 5 - UnrankedBadge.DrawWidth, duration, easing);
+                    UnrankedBadge.MoveToX(-UnrankedBadge.DrawWidth, duration, easing);
                     UnrankedBadge.FadeOut(duration, easing);
 
                     this.ResizeWidthTo(BUTTON_WIDTH, duration, easing);
