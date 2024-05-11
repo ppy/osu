@@ -23,6 +23,8 @@ namespace osu.Game.Screens.SelectV2
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Aquamarine);
 
+        public override bool AllowBackButton => false;
+
         [BackgroundDependencyLoader]
         private void load()
         {

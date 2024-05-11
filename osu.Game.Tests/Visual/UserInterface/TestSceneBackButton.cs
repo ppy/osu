@@ -5,6 +5,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Screens.Footer;
 using osuTK;
 using osuTK.Graphics;
 
@@ -15,7 +16,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         public TestSceneBackButton()
         {
             BackButton button;
-            BackButton.Receptor receptor = new BackButton.Receptor();
+            FooterV2.BackReceptor receptor = new FooterV2.BackReceptor();
 
             Child = new Container
             {

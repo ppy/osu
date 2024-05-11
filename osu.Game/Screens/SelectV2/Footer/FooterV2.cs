@@ -6,7 +6,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
 using osuTK;
 
@@ -14,9 +13,8 @@ namespace osu.Game.Screens.SelectV2.Footer
 {
     public partial class FooterV2 : VisibilityContainer
     {
-        //Should be 60, setting to 50 for now for the sake of matching the current BackButton height.
-        private const int height = 50;
-        private const int padding = 80;
+        private const int height = 60;
+        private const int padding = 60;
 
         private readonly List<OverlayContainer> overlays = new List<OverlayContainer>();
 
@@ -46,6 +44,7 @@ namespace osu.Game.Screens.SelectV2.Footer
         }
 
         private Box background = null!;
+        private BackButtonV2 backButton = null!;
         private FillFlowContainer<FooterButtonV2> buttons = null!;
 
         public FooterV2()
@@ -66,9 +65,16 @@ namespace osu.Game.Screens.SelectV2.Footer
                     RelativeSizeAxes = Axes.Both,
                     Colour = colourProvider.Background5
                 },
+                backButton = new BackButtonV2
+                {
+                    Margin = new MarginPadding { Bottom = 10f, Left = 12f },
+                    Anchor = Anchor.BottomLeft,
+                    Origin = Anchor.BottomLeft,
+                    Action = () => { },
+                },
                 buttons = new FillFlowContainer<FooterButtonV2>
                 {
-                    Margin = new MarginPadding { Left = TwoLayerButton.SIZE_EXTENDED.X + padding },
+                    Margin = new MarginPadding { Left = 12f + BackButtonV2.BUTTON_WIDTH + padding },
                     Y = 10f,
                     RelativePositionAxes = Axes.X,
                     Anchor = Anchor.BottomLeft,
@@ -87,6 +93,8 @@ namespace osu.Game.Screens.SelectV2.Footer
         {
             background.MoveToY(0, 400, Easing.OutQuint);
 
+            ScheduleAfterChildren(() => backButton.MoveToY(0, 400, Easing.OutQuint));
+
             buttons.Delay(buttons_pop_delay)
                    .MoveToX(0, 400, Easing.OutQuint)
                    .FadeIn(400, Easing.OutQuint);
@@ -98,6 +106,7 @@ namespace osu.Game.Screens.SelectV2.Footer
                    .FadeOut(400, Easing.OutQuint);
 
             background.Delay(buttons_pop_delay).MoveToY(off_screen_y, 400, Easing.OutQuint);
+            backButton.Delay(buttons_pop_delay).MoveToY(off_screen_y, 400, Easing.OutQuint);
         }
     }
 }
