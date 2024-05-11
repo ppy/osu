@@ -24,6 +24,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         private bool nextRandomCalled;
         private bool previousRandomCalled;
 
+        private FooterV2 footer = null!;
         private DummyOverlay overlay = null!;
 
         [Cached]
@@ -34,8 +35,6 @@ namespace osu.Game.Tests.Visual.SongSelect
         {
             nextRandomCalled = false;
             previousRandomCalled = false;
-
-            FooterV2 footer;
 
             Children = new Drawable[]
             {
@@ -62,6 +61,14 @@ namespace osu.Game.Tests.Visual.SongSelect
         public void SetUpSteps()
         {
             AddStep("set beatmap", () => Beatmap.Value = CreateWorkingBeatmap(CreateBeatmap(new OsuRuleset().RulesetInfo)));
+            AddStep("show footer", () => footer.Show());
+        }
+
+        [Test]
+        public void TestDisplay()
+        {
+            AddStep("hide footer", () => footer.Hide());
+            AddStep("show footer", () => footer.Show());
         }
 
         [Test]

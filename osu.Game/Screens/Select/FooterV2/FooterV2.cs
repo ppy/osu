@@ -6,14 +6,13 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
 using osuTK;
 
 namespace osu.Game.Screens.Select.FooterV2
 {
-    public partial class FooterV2 : InputBlockingContainer
+    public partial class FooterV2 : VisibilityContainer
     {
         //Should be 60, setting to 50 for now for the sake of matching the current BackButton height.
         private const int height = 50;
@@ -46,6 +45,7 @@ namespace osu.Game.Screens.Select.FooterV2
             }
         }
 
+        private Box background = null!;
         private FillFlowContainer<FooterButtonV2> buttons = null!;
 
         public FooterV2()
@@ -61,21 +61,43 @@ namespace osu.Game.Screens.Select.FooterV2
         {
             InternalChildren = new Drawable[]
             {
-                new Box
+                background = new Box
                 {
                     RelativeSizeAxes = Axes.Both,
                     Colour = colourProvider.Background5
                 },
                 buttons = new FillFlowContainer<FooterButtonV2>
                 {
-                    Position = new Vector2(TwoLayerButton.SIZE_EXTENDED.X + padding, 10),
+                    Margin = new MarginPadding { Left = TwoLayerButton.SIZE_EXTENDED.X + padding },
+                    Y = 10f,
+                    RelativePositionAxes = Axes.X,
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.BottomLeft,
                     Direction = FillDirection.Horizontal,
                     Spacing = new Vector2(-FooterButtonV2.SHEAR_WIDTH + 7, 0),
                     AutoSizeAxes = Axes.Both
-                }
+                },
             };
+        }
+
+        private const float off_screen_y = 100;
+        private const float buttons_pop_delay = 30;
+
+        protected override void PopIn()
+        {
+            background.MoveToY(0, 400, Easing.OutQuint);
+
+            buttons.Delay(buttons_pop_delay)
+                   .MoveToX(0, 400, Easing.OutQuint)
+                   .FadeIn(400, Easing.OutQuint);
+        }
+
+        protected override void PopOut()
+        {
+            buttons.MoveToX(-0.5f, 400, Easing.OutQuint)
+                   .FadeOut(400, Easing.OutQuint);
+
+            background.Delay(buttons_pop_delay).MoveToY(off_screen_y, 400, Easing.OutQuint);
         }
     }
 }
