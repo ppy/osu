@@ -267,13 +267,16 @@ namespace osu.Game.Screens.Select.FooterV2
         {
             public readonly Bindable<IReadOnlyList<Mod>> Mods = new Bindable<IReadOnlyList<Mod>>();
 
+            [Resolved]
+            private OverlayColourProvider colourProvider { get; set; } = null!;
+
             protected override void LoadComplete()
             {
                 base.LoadComplete();
                 Mods.BindValueChanged(v => Text = FooterButtonModsV2Strings.Mods(v.NewValue.Count).ToUpper(), true);
             }
 
-            public ITooltip<IReadOnlyList<Mod>> GetCustomTooltip() => new ModTooltip();
+            public ITooltip<IReadOnlyList<Mod>> GetCustomTooltip() => new ModTooltip(colourProvider);
 
             public IReadOnlyList<Mod>? TooltipContent => Mods.Value;
 
@@ -281,8 +284,16 @@ namespace osu.Game.Screens.Select.FooterV2
             {
                 private ModDisplay extendedModDisplay = null!;
 
+                [Cached]
+                private OverlayColourProvider colourProvider;
+
+                public ModTooltip(OverlayColourProvider colourProvider)
+                {
+                    this.colourProvider = colourProvider;
+                }
+
                 [BackgroundDependencyLoader]
-                private void load(OverlayColourProvider colourProvider)
+                private void load()
                 {
                     AutoSizeAxes = Axes.Both;
                     CornerRadius = CORNER_RADIUS;
