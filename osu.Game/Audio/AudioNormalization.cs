@@ -2,12 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Linq;
-using ManagedBass;
-using ManagedBass.Fx;
-using osu.Framework.Audio.Mixing;
 using osu.Framework.Audio.Track;
-using osu.Framework.Extensions;
 using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
@@ -59,12 +54,9 @@ namespace osu.Game.Audio
                 return;
             }
 
-            AudioLoudness loudness = new AudioLoudness(realmFileStore.Storage.GetStream(filepath));
+            using AudioLoudness loudness = new AudioLoudness(realmFileStore.Storage.GetStream(filepath));
 
-            var loudTask = loudness.GetIntegratedLoudness();
-            loudTask.WaitSafely();
-
-            float? integratedLoudness = loudTask.GetResultSafely();
+            float? integratedLoudness = loudness.GetIntegratedLoudness();
 
             if (integratedLoudness == null)
             {
@@ -100,52 +92,8 @@ namespace osu.Game.Audio
         /// <summary>
         /// Convert integrated loudness to a volume offset
         /// </summary>
-        /// <param name="integratedLoudness">The integrated loudness value</param>
         /// <returns>The volume offset needed to reach <see cref="TARGET_LEVEL"/></returns>
-        public static float IntegratedLoudnessToVolumeOffset(float integratedLoudness) => (float)Math.Pow(10, (TARGET_LEVEL - integratedLoudness) / 20);
-
-        /// <summary>
-        /// Get the loudness values of a <see cref="BeatmapInfo"/> and apply the audio normalization effect to an <see cref="IAudioMixer"/>
-        /// </summary>
-        /// <param name="beatmapInfo">The <see cref="BeatmapInfo"/> to get the loudness values of</param>
-        /// <param name="mixer">The <see cref="IAudioMixer"/> to apply the effect on</param>
-        public static void AddAudioNormalization(BeatmapInfo beatmapInfo, IAudioMixer mixer)
-        {
-            AudioNormalization? audioNormalizationModule = beatmapInfo.AudioNormalization;
-
-            VolumeParameters volumeParameters = new VolumeParameters
-            {
-                fTarget = audioNormalizationModule?.IntegratedLoudness != null ? IntegratedLoudnessToVolumeOffset((float)audioNormalizationModule.IntegratedLoudness) : 0.8f,
-                fCurrent = -1.0f,
-                fTime = 0.3f,
-                lCurve = 1,
-                lChannel = FXChannelFlags.All
-            };
-
-            addFx(volumeParameters, mixer);
-
-            Logger.Log("Normalization Status: " + (audioNormalizationModule?.IntegratedLoudness != null ? $"on ({Math.Round(IntegratedLoudnessToVolumeOffset((float)audioNormalizationModule.IntegratedLoudness) * 100)}%)" : "off"));
-        }
-
-        /// <summary>
-        /// Add an effect to a <see cref="IAudioMixer"/>, replacing it if it already exists
-        /// </summary>
-        /// <param name="effectParameter">The <see cref="IEffectParameter"/> to add to the <paramref name="mixer"/></param>
-        /// <param name="mixer">The <see cref="IAudioMixer"/> to add the effect to</param>
-        private static void addFx(IEffectParameter effectParameter, IAudioMixer mixer)
-        {
-            IEffectParameter? effect = mixer.Effects.SingleOrDefault(e => e.FXType == effectParameter.FXType);
-
-            if (effect != null)
-            {
-                int i = mixer.Effects.IndexOf(effect);
-                mixer.Effects[i] = effectParameter;
-            }
-            else
-            {
-                mixer.Effects.Add(effectParameter);
-            }
-        }
+        public float IntegratedLoudnessInVolumeOffset => IntegratedLoudness != null ? (float)Math.Pow(10, (TARGET_LEVEL - (double)IntegratedLoudness) / 20) : 0.8f;
 
         /// <inheritdoc />
         public bool Equals(AudioNormalization? other) => other?.IntegratedLoudness != null && IntegratedLoudness != null && Math.Abs((float)(IntegratedLoudness - other.IntegratedLoudness)) < 0.0000001;
