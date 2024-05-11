@@ -83,7 +83,6 @@ namespace osu.Game.Screens.SelectV2.Footer
                     Spacing = new Vector2(-FooterButtonV2.SHEAR_WIDTH + 7, 0),
                     AutoSizeAxes = Axes.Both
                 },
-                // todo: figure out what's going on with the button not appearing from below on initial transition.
                 osuLogoButton = new OsuLogoButton(0)
                 {
                     Anchor = Anchor.BottomRight,
