@@ -32,6 +32,11 @@ namespace osu.Game.Screens.Select.FooterV2
     {
         // todo: see https://github.com/ppy/osu-framework/issues/3271
         private const float torus_scale_factor = 1.2f;
+        private const float bar_shear_width = 7f;
+        private const float bar_height = 37f;
+        private const float mod_display_portion = 0.65f;
+
+        private static readonly Vector2 bar_shear = new Vector2(bar_shear_width / bar_height, 0);
 
         private readonly BindableWithCurrent<IReadOnlyList<Mod>> current = new BindableWithCurrent<IReadOnlyList<Mod>>(Array.Empty<Mod>());
 
@@ -43,7 +48,7 @@ namespace osu.Game.Screens.Select.FooterV2
 
         private Container modDisplayBar = null!;
 
-        protected Container UnrankedBadge { get; private set; } = null!;
+        private Drawable unrankedBadge = null!;
 
         private ModDisplay modDisplay = null!;
         private OsuSpriteText modCountText = null!;
@@ -59,57 +64,19 @@ namespace osu.Game.Screens.Select.FooterV2
         [BackgroundDependencyLoader]
         private void load()
         {
-            const float bar_shear_width = 7f;
-            const float bar_height = 37f;
-            const float mod_display_portion = 0.65f;
-
-            var barShear = new Vector2(bar_shear_width / bar_height, 0);
-
             Text = "Mods";
             Icon = FontAwesome.Solid.ExchangeAlt;
             AccentColour = colours.Lime1;
 
             AddRange(new[]
             {
-                UnrankedBadge = new ContainerWithTooltip
-                {
-                    Position = new Vector2(BUTTON_WIDTH + 5f, -5f),
-                    Depth = float.MaxValue,
-                    Origin = Anchor.BottomLeft,
-                    Shear = barShear,
-                    CornerRadius = CORNER_RADIUS,
-                    AutoSizeAxes = Axes.X,
-                    Height = bar_height,
-                    Masking = true,
-                    BorderColour = Color4.White,
-                    BorderThickness = 2f,
-                    TooltipText = ModSelectOverlayStrings.UnrankedExplanation,
-                    Children = new Drawable[]
-                    {
-                        new Box
-                        {
-                            Colour = colours.Orange2,
-                            RelativeSizeAxes = Axes.Both,
-                        },
-                        new OsuSpriteText
-                        {
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                            Shear = -barShear,
-                            Text = ModSelectOverlayStrings.Unranked.ToUpper(),
-                            Margin = new MarginPadding { Horizontal = 15 },
-                            UseFullGlyphHeight = false,
-                            Font = OsuFont.Torus.With(size: 14 * torus_scale_factor, weight: FontWeight.Bold),
-                            Colour = Color4.Black,
-                        }
-                    }
-                },
+                unrankedBadge = new UnrankedBadge(),
                 modDisplayBar = new Container
                 {
                     Y = -5f,
                     Depth = float.MaxValue,
                     Origin = Anchor.BottomLeft,
-                    Shear = barShear,
+                    Shear = bar_shear,
                     CornerRadius = CORNER_RADIUS,
                     Size = new Vector2(BUTTON_WIDTH, bar_height),
                     Masking = true,
@@ -139,7 +106,7 @@ namespace osu.Game.Screens.Select.FooterV2
                             {
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
-                                Shear = -barShear,
+                                Shear = -bar_shear,
                                 UseFullGlyphHeight = false,
                                 Font = OsuFont.Torus.With(size: 14 * torus_scale_factor, weight: FontWeight.Bold)
                             }
@@ -161,7 +128,7 @@ namespace osu.Game.Screens.Select.FooterV2
                                 {
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
-                                    Shear = -barShear,
+                                    Shear = -bar_shear,
                                     Scale = new Vector2(0.6f),
                                     Current = { BindTarget = Current },
                                     ExpansionMode = ExpansionMode.AlwaysContracted,
@@ -170,7 +137,7 @@ namespace osu.Game.Screens.Select.FooterV2
                                 {
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
-                                    Shear = -barShear,
+                                    Shear = -bar_shear,
                                     Font = OsuFont.Torus.With(size: 14 * torus_scale_factor, weight: FontWeight.Bold),
                                     Mods = { BindTarget = Current },
                                 }
@@ -215,8 +182,8 @@ namespace osu.Game.Screens.Select.FooterV2
                 modDisplay.FadeOut(duration, easing);
                 modCountText.FadeOut(duration, easing);
 
-                UnrankedBadge.MoveToY(20, duration, easing);
-                UnrankedBadge.FadeOut(duration, easing);
+                unrankedBadge.MoveToY(20, duration, easing);
+                unrankedBadge.FadeOut(duration, easing);
 
                 // add delay to let unranked indicator hide first before resizing the button back to its original width.
                 this.Delay(duration).ResizeWidthTo(BUTTON_WIDTH, duration, easing);
@@ -233,21 +200,21 @@ namespace osu.Game.Screens.Select.FooterV2
 
                 if (Current.Value.Any(m => !m.Ranked))
                 {
-                    UnrankedBadge.MoveToX(BUTTON_WIDTH + 5, duration, easing);
-                    UnrankedBadge.FadeIn(duration, easing);
+                    unrankedBadge.MoveToX(0, duration, easing);
+                    unrankedBadge.FadeIn(duration, easing);
 
-                    this.ResizeWidthTo(BUTTON_WIDTH + UnrankedBadge.DrawWidth + 10, duration, easing);
+                    this.ResizeWidthTo(BUTTON_WIDTH + 5 + unrankedBadge.DrawWidth, duration, easing);
                 }
                 else
                 {
-                    UnrankedBadge.MoveToX(BUTTON_WIDTH + 5 - UnrankedBadge.DrawWidth, duration, easing);
-                    UnrankedBadge.FadeOut(duration, easing);
+                    unrankedBadge.MoveToX(-unrankedBadge.DrawWidth, duration, easing);
+                    unrankedBadge.FadeOut(duration, easing);
 
                     this.ResizeWidthTo(BUTTON_WIDTH, duration, easing);
                 }
 
                 modDisplayBar.MoveToY(-5, duration, Easing.OutQuint);
-                UnrankedBadge.MoveToY(-5, duration, easing);
+                unrankedBadge.MoveToY(-5, duration, easing);
                 modDisplayBar.FadeIn(duration, easing);
             }
 
@@ -266,13 +233,16 @@ namespace osu.Game.Screens.Select.FooterV2
         {
             public readonly Bindable<IReadOnlyList<Mod>> Mods = new Bindable<IReadOnlyList<Mod>>();
 
+            [Resolved]
+            private OverlayColourProvider colourProvider { get; set; } = null!;
+
             protected override void LoadComplete()
             {
                 base.LoadComplete();
-                Mods.BindValueChanged(v => Text = FooterButtonModsV2Strings.Mods(v.NewValue.Count).ToUpper(), true);
+                Mods.BindValueChanged(v => Text = ModSelectOverlayStrings.Mods(v.NewValue.Count).ToUpper(), true);
             }
 
-            public ITooltip<IReadOnlyList<Mod>> GetCustomTooltip() => new ModTooltip();
+            public ITooltip<IReadOnlyList<Mod>> GetCustomTooltip() => new ModTooltip(colourProvider);
 
             public IReadOnlyList<Mod>? TooltipContent => Mods.Value;
 
@@ -280,8 +250,16 @@ namespace osu.Game.Screens.Select.FooterV2
             {
                 private ModDisplay extendedModDisplay = null!;
 
+                [Cached]
+                private OverlayColourProvider colourProvider;
+
+                public ModTooltip(OverlayColourProvider colourProvider)
+                {
+                    this.colourProvider = colourProvider;
+                }
+
                 [BackgroundDependencyLoader]
-                private void load(OverlayColourProvider colourProvider)
+                private void load()
                 {
                     AutoSizeAxes = Axes.Both;
                     CornerRadius = CORNER_RADIUS;
@@ -315,9 +293,49 @@ namespace osu.Game.Screens.Select.FooterV2
             }
         }
 
-        private partial class ContainerWithTooltip : Container, IHasTooltip
+        internal partial class UnrankedBadge : CompositeDrawable, IHasTooltip
         {
-            public LocalisableString TooltipText { get; set; }
+            public LocalisableString TooltipText { get; }
+
+            public UnrankedBadge()
+            {
+                Margin = new MarginPadding { Left = BUTTON_WIDTH + 5f };
+                Y = -5f;
+                Depth = float.MaxValue;
+                Origin = Anchor.BottomLeft;
+                Shear = bar_shear;
+                CornerRadius = CORNER_RADIUS;
+                AutoSizeAxes = Axes.X;
+                Height = bar_height;
+                Masking = true;
+                BorderColour = Color4.White;
+                BorderThickness = 2f;
+                TooltipText = ModSelectOverlayStrings.UnrankedExplanation;
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(OsuColour colours)
+            {
+                InternalChildren = new Drawable[]
+                {
+                    new Box
+                    {
+                        Colour = colours.Orange2,
+                        RelativeSizeAxes = Axes.Both,
+                    },
+                    new OsuSpriteText
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Shear = -bar_shear,
+                        Text = ModSelectOverlayStrings.Unranked.ToUpper(),
+                        Margin = new MarginPadding { Horizontal = 15 },
+                        UseFullGlyphHeight = false,
+                        Font = OsuFont.Torus.With(size: 14 * torus_scale_factor, weight: FontWeight.Bold),
+                        Colour = Color4.Black,
+                    }
+                };
+            }
         }
     }
 }

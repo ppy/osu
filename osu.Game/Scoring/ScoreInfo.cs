@@ -65,7 +65,18 @@ namespace osu.Game.Scoring
 
         public bool DeletePending { get; set; }
 
+        /// <summary>
+        /// The total number of points awarded for the score.
+        /// </summary>
         public long TotalScore { get; set; }
+
+        /// <summary>
+        /// The total number of points awarded for the score without including mod multipliers.
+        /// </summary>
+        /// <remarks>
+        /// The purpose of this property is to enable future lossless rebalances of mod multipliers.
+        /// </remarks>
+        public long TotalScoreWithoutMods { get; set; }
 
         /// <summary>
         /// The version of processing applied to calculate total score as stored in the database.
