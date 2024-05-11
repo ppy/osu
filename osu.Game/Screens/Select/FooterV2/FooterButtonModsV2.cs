@@ -273,7 +273,7 @@ namespace osu.Game.Screens.Select.FooterV2
             protected override void LoadComplete()
             {
                 base.LoadComplete();
-                Mods.BindValueChanged(v => Text = FooterButtonModsV2Strings.Mods(v.NewValue.Count).ToUpper(), true);
+                Mods.BindValueChanged(v => Text = ModSelectOverlayStrings.Mods(v.NewValue.Count).ToUpper(), true);
             }
 
             public ITooltip<IReadOnlyList<Mod>> GetCustomTooltip() => new ModTooltip(colourProvider);
