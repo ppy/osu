@@ -5,7 +5,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 
-namespace osu.Game.Screens.Select.FooterV2
+namespace osu.Game.Screens.SelectV2.Footer
 {
     public partial class FooterButtonModsV2 : FooterButtonV2
     {

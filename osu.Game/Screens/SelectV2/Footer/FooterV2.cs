@@ -10,7 +10,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
 using osuTK;
 
-namespace osu.Game.Screens.Select.FooterV2
+namespace osu.Game.Screens.SelectV2.Footer
 {
     public partial class FooterV2 : VisibilityContainer
     {

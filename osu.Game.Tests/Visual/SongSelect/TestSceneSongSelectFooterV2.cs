@@ -11,7 +11,7 @@ using osu.Framework.Testing;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Mods;
 using osu.Game.Rulesets.Osu;
-using osu.Game.Screens.Select.FooterV2;
+using osu.Game.Screens.SelectV2.Footer;
 using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.SongSelect

@@ -25,7 +25,7 @@ using osuTK.Graphics;
 using osuTK.Input;
 using WebCommonStrings = osu.Game.Resources.Localisation.Web.CommonStrings;
 
-namespace osu.Game.Screens.Select.FooterV2
+namespace osu.Game.Screens.SelectV2.Footer
 {
     public partial class BeatmapOptionsPopover : OsuPopover
     {
@@ -43,7 +43,7 @@ namespace osu.Game.Screens.Select.FooterV2
         }
 
         [BackgroundDependencyLoader]
-        private void load(ManageCollectionsDialog? manageCollectionsDialog, SongSelect? songSelect, OsuColour colours, BeatmapManager? beatmapManager)
+        private void load(ManageCollectionsDialog? manageCollectionsDialog, OsuColour colours, BeatmapManager? beatmapManager)
         {
             Content.Padding = new MarginPadding(5);
 
@@ -60,15 +60,15 @@ namespace osu.Game.Screens.Select.FooterV2
             addButton(SongSelectStrings.ManageCollections, FontAwesome.Solid.Book, () => manageCollectionsDialog?.Show());
 
             addHeader(SongSelectStrings.ForAllDifficulties, beatmapWhenOpening.BeatmapSetInfo.ToString());
-            addButton(SongSelectStrings.DeleteBeatmap, FontAwesome.Solid.Trash, () => songSelect?.DeleteBeatmap(beatmapWhenOpening.BeatmapSetInfo), colours.Red1);
+            // addButton(SongSelectStrings.DeleteBeatmap, FontAwesome.Solid.Trash, () => songSelect?.DeleteBeatmap(beatmapWhenOpening.BeatmapSetInfo), colours.Red1);
 
             addHeader(SongSelectStrings.ForSelectedDifficulty, beatmapWhenOpening.BeatmapInfo.DifficultyName);
             // TODO: make work, and make show "unplayed" or "played" based on status.
             addButton(SongSelectStrings.MarkAsPlayed, FontAwesome.Regular.TimesCircle, null);
-            addButton(SongSelectStrings.ClearAllLocalScores, FontAwesome.Solid.Eraser, () => songSelect?.ClearScores(beatmapWhenOpening.BeatmapInfo), colours.Red1);
+            // addButton(SongSelectStrings.ClearAllLocalScores, FontAwesome.Solid.Eraser, () => songSelect?.ClearScores(beatmapWhenOpening.BeatmapInfo), colours.Red1);
 
-            if (songSelect != null && songSelect.AllowEditing)
-                addButton(SongSelectStrings.EditBeatmap, FontAwesome.Solid.PencilAlt, () => songSelect.Edit(beatmapWhenOpening.BeatmapInfo));
+            // if (songSelect != null && songSelect.AllowEditing)
+            //     addButton(SongSelectStrings.EditBeatmap, FontAwesome.Solid.PencilAlt, () => songSelect.Edit(beatmapWhenOpening.BeatmapInfo));
 
             addButton(WebCommonStrings.ButtonsHide.ToSentence(), FontAwesome.Solid.Magic, () => beatmapManager?.Hide(beatmapWhenOpening.BeatmapInfo));
         }

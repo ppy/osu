@@ -11,7 +11,7 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics;
 using osu.Game.Input.Bindings;
 
-namespace osu.Game.Screens.Select.FooterV2
+namespace osu.Game.Screens.SelectV2.Footer
 {
     public partial class FooterButtonOptionsV2 : FooterButtonV2, IHasPopover
     {

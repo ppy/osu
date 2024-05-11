@@ -13,7 +13,7 @@ using osu.Game.Input.Bindings;
 using osuTK;
 using osuTK.Input;
 
-namespace osu.Game.Screens.Select.FooterV2
+namespace osu.Game.Screens.SelectV2.Footer
 {
     public partial class FooterButtonRandomV2 : FooterButtonV2
     {
