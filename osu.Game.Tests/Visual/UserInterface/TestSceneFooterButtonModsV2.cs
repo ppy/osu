@@ -7,7 +7,7 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
+using osu.Framework.Testing;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays;
 using osu.Game.Rulesets.Mods;
@@ -97,15 +97,12 @@ namespace osu.Game.Tests.Visual.UserInterface
         public void TestUnrankedBadge()
         {
             AddStep(@"Add unranked mod", () => changeMods(new[] { new OsuModDeflate() }));
-            AddUntilStep("Unranked badge shown", () => footerButtonMods.UnrankedBadge.Alpha == 1);
+            AddUntilStep("Unranked badge shown", () => footerButtonMods.ChildrenOfType<FooterButtonModsV2.UnrankedBadge>().Single().Alpha == 1);
             AddStep(@"Clear selected mod", () => changeMods(Array.Empty<Mod>()));
-            AddUntilStep("Unranked badge not shown", () => footerButtonMods.UnrankedBadge.Alpha == 0);
+            AddUntilStep("Unranked badge not shown", () => footerButtonMods.ChildrenOfType<FooterButtonModsV2.UnrankedBadge>().Single().Alpha == 0);
         }
 
-        private void changeMods(IReadOnlyList<Mod> mods)
-        {
-            footerButtonMods.Current.Value = mods;
-        }
+        private void changeMods(IReadOnlyList<Mod> mods) => footerButtonMods.Current.Value = mods;
 
         private bool assertModsMultiplier(IEnumerable<Mod> mods)
         {
@@ -117,7 +114,6 @@ namespace osu.Game.Tests.Visual.UserInterface
 
         private partial class TestFooterButtonModsV2 : FooterButtonModsV2
         {
-            public new Container UnrankedBadge => base.UnrankedBadge;
             public new OsuSpriteText MultiplierText => base.MultiplierText;
         }
     }

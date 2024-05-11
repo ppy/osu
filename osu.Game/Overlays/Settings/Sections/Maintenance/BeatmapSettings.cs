@@ -31,7 +31,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                     {
                         deleteBeatmapsButton.Enabled.Value = false;
                         Task.Run(() => beatmaps.Delete()).ContinueWith(_ => Schedule(() => deleteBeatmapsButton.Enabled.Value = true));
-                    }));
+                    }, DeleteConfirmationContentStrings.Beatmaps));
                 }
             });
 
@@ -40,11 +40,11 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                 Text = MaintenanceSettingsStrings.DeleteAllBeatmapVideos,
                 Action = () =>
                 {
-                    dialogOverlay?.Push(new MassVideoDeleteConfirmationDialog(() =>
+                    dialogOverlay?.Push(new MassDeleteConfirmationDialog(() =>
                     {
                         deleteBeatmapVideosButton.Enabled.Value = false;
                         Task.Run(beatmaps.DeleteAllVideos).ContinueWith(_ => Schedule(() => deleteBeatmapVideosButton.Enabled.Value = true));
-                    }));
+                    }, DeleteConfirmationContentStrings.BeatmapVideos));
                 }
             });
             AddRange(new Drawable[]
