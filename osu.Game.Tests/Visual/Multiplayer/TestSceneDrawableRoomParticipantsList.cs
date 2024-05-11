@@ -15,7 +15,7 @@ using osu.Game.Users.Drawables;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
-    public class TestSceneDrawableRoomParticipantsList : OnlinePlayTestScene
+    public partial class TestSceneDrawableRoomParticipantsList : OnlinePlayTestScene
     {
         private DrawableRoomParticipantsList list;
 

@@ -1,24 +1,19 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using Android.App;
-using Android.OS;
+using Microsoft.Maui.Devices;
 using osu.Framework.Allocation;
-using osu.Framework.Android.Input;
-using osu.Framework.Input.Handlers;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Platform;
 using osu.Game;
-using osu.Game.Overlays.Settings;
 using osu.Game.Updater;
 using osu.Game.Utils;
-using Xamarin.Essentials;
 
 namespace osu.Android
 {
-    public class OsuGameAndroid : OsuGame
+    public partial class OsuGameAndroid : OsuGame
     {
         [Cached]
         private readonly OsuGameActivity gameActivity;
@@ -33,7 +28,7 @@ namespace osu.Android
         {
             get
             {
-                var packageInfo = Application.Context.ApplicationContext.PackageManager.GetPackageInfo(Application.Context.ApplicationContext.PackageName, 0);
+                var packageInfo = Application.Context.ApplicationContext!.PackageManager!.GetPackageInfo(Application.Context.ApplicationContext.PackageName!, 0).AsNonNull();
 
                 try
                 {
@@ -46,9 +41,9 @@ namespace osu.Android
                     // Basic conversion format (as done in Fastfile): 2020.606.0 -> 202006060
 
                     // https://stackoverflow.com/questions/52977079/android-sdk-28-versioncode-in-packageinfo-has-been-deprecated
-                    string versionName = string.Empty;
+                    string versionName;
 
-                    if (Build.VERSION.SdkInt >= BuildVersionCodes.P)
+                    if (OperatingSystem.IsAndroidVersionAtLeast(28))
                     {
                         versionName = packageInfo.LongVersionCode.ToString();
                         // ensure we only read the trailing portion of long (the part we are interested in).
@@ -69,7 +64,7 @@ namespace osu.Android
                 {
                 }
 
-                return new Version(packageInfo.VersionName);
+                return new Version(packageInfo.VersionName.AsNonNull());
             }
         }
 
@@ -88,21 +83,6 @@ namespace osu.Android
         protected override UpdateManager CreateUpdateManager() => new SimpleUpdateManager();
 
         protected override BatteryInfo CreateBatteryInfo() => new AndroidBatteryInfo();
-
-        public override SettingsSubsection CreateSettingsSubsectionFor(InputHandler handler)
-        {
-            switch (handler)
-            {
-                case AndroidMouseHandler mh:
-                    return new AndroidMouseSettings(mh);
-
-                case AndroidJoystickHandler jh:
-                    return new AndroidJoystickSettings(jh);
-
-                default:
-                    return base.CreateSettingsSubsectionFor(handler);
-            }
-        }
 
         private class AndroidBatteryInfo : BatteryInfo
         {

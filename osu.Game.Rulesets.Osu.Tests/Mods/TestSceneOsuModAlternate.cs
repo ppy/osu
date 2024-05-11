@@ -15,7 +15,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Tests.Mods
 {
-    public class TestSceneOsuModAlternate : OsuModTestScene
+    public partial class TestSceneOsuModAlternate : OsuModTestScene
     {
         [Test]
         public void TestInputAlternating() => CreateModTest(new ModTestData

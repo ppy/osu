@@ -13,14 +13,14 @@ namespace osu.Game.Tests.Visual.Multiplayer
     /// <summary>
     /// The base test scene for all multiplayer components and screens.
     /// </summary>
-    public abstract class MultiplayerTestScene : OnlinePlayTestScene, IMultiplayerTestSceneDependencies
+    public abstract partial class MultiplayerTestScene : OnlinePlayTestScene, IMultiplayerTestSceneDependencies
     {
         public const int PLAYER_1_ID = 55;
         public const int PLAYER_2_ID = 56;
 
         public TestMultiplayerClient MultiplayerClient => OnlinePlayDependencies.MultiplayerClient;
         public new TestMultiplayerRoomManager RoomManager => OnlinePlayDependencies.RoomManager;
-        public TestSpectatorClient SpectatorClient => OnlinePlayDependencies?.SpectatorClient;
+        public TestSpectatorClient SpectatorClient => OnlinePlayDependencies.SpectatorClient;
 
         protected new MultiplayerTestSceneDependencies OnlinePlayDependencies => (MultiplayerTestSceneDependencies)base.OnlinePlayDependencies;
 

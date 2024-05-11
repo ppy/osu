@@ -1,6 +1,6 @@
 clone_depth: 1
 version: '{branch}-{build}'
-image: Visual Studio 2019
+image: Visual Studio 2022
 cache:
   - '%LOCALAPPDATA%\NuGet\v3-cache -> appveyor.yml'
 
@@ -11,6 +11,8 @@ dotnet_csproj:
 
 before_build:
   - cmd: dotnet --info # Useful when version mismatch between CI and local
+  - cmd: dotnet workload install maui-android # Change to `dotnet workload restore` once there's no old projects
+  - cmd: dotnet workload install maui-ios # Change to `dotnet workload restore` once there's no old projects
   - cmd: nuget restore -verbosity quiet # Only nuget.exe knows both new (.NET Core) and old (Xamarin) projects
 
 build:

@@ -19,7 +19,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards.Statistics
     /// <summary>
     /// A single statistic shown on a beatmap card.
     /// </summary>
-    public abstract class BeatmapCardStatistic : CompositeDrawable, IHasTooltip, IHasCustomTooltip
+    public abstract partial class BeatmapCardStatistic : CompositeDrawable, IHasTooltip, IHasCustomTooltip
     {
         protected IconUsage Icon
         {
@@ -74,7 +74,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards.Statistics
 
         #region Tooltip implementation
 
-        public virtual ITooltip GetCustomTooltip() => null;
+        public virtual ITooltip GetCustomTooltip() => null!;
         public virtual object TooltipContent => null;
 
         #endregion

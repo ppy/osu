@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
@@ -13,7 +12,7 @@ using osu.Game.Screens.Edit.Components.Timelines.Summary.Visualisations;
 
 namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
 {
-    public class EffectPointVisualisation : CompositeDrawable, IControlPointVisualisation
+    public partial class EffectPointVisualisation : CompositeDrawable, IControlPointVisualisation
     {
         private readonly EffectControlPoint effect;
         private Bindable<bool> kiai = null!;
@@ -53,7 +52,18 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
             // for changes. ControlPointInfo needs a refactor to make this flow better, but it should do for now.
             Scheduler.AddDelayed(() =>
             {
-                var next = beatmap.ControlPointInfo.EffectPoints.FirstOrDefault(c => c.Time > effect.Time);
+                EffectControlPoint? next = null;
+
+                for (int i = 0; i < beatmap.ControlPointInfo.EffectPoints.Count; i++)
+                {
+                    var point = beatmap.ControlPointInfo.EffectPoints[i];
+
+                    if (point.Time > effect.Time)
+                    {
+                        next = point;
+                        break;
+                    }
+                }
 
                 if (!ReferenceEquals(nextControlPoint, next))
                 {

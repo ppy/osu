@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using NUnit.Framework;
+using osu.Framework.Audio;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mods;
@@ -18,7 +19,7 @@ using osu.Game.Scoring;
 
 namespace osu.Game.Tests.NonVisual
 {
-    public class FirstAvailableHitWindowsTest
+    public partial class FirstAvailableHitWindowsTest
     {
         private TestDrawableRuleset testDrawableRuleset;
 
@@ -76,7 +77,7 @@ namespace osu.Game.Tests.NonVisual
         }
 
         [SuppressMessage("ReSharper", "UnassignedGetOnlyAutoProperty")]
-        private class TestDrawableRuleset : DrawableRuleset
+        private partial class TestDrawableRuleset : DrawableRuleset
         {
             public List<HitObject> HitObjects;
             public override IEnumerable<HitObject> Objects => HitObjects;
@@ -93,11 +94,13 @@ namespace osu.Game.Tests.NonVisual
                 remove => throw new InvalidOperationException($"{nameof(RevertResult)} operations not supported in test context");
             }
 
+            public override IAdjustableAudioComponent Audio { get; }
             public override Playfield Playfield { get; }
             public override Container Overlays { get; }
             public override Container FrameStableComponents { get; }
             public override IFrameStableClock FrameStableClock { get; }
             internal override bool FrameStablePlayback { get; set; }
+            public override bool AllowBackwardsSeeks { get; set; }
             public override IReadOnlyList<Mod> Mods { get; }
 
             public override double GameplayStartTime { get; }

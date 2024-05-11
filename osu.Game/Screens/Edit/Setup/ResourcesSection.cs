@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.IO;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -14,27 +12,30 @@ using osu.Game.Localisation;
 
 namespace osu.Game.Screens.Edit.Setup
 {
-    internal class ResourcesSection : SetupSection
+    internal partial class ResourcesSection : SetupSection
     {
-        private LabelledFileChooser audioTrackChooser;
-        private LabelledFileChooser backgroundChooser;
+        private LabelledFileChooser audioTrackChooser = null!;
+        private LabelledFileChooser backgroundChooser = null!;
 
         public override LocalisableString Title => EditorSetupStrings.ResourcesHeader;
 
         [Resolved]
-        private MusicController music { get; set; }
+        private MusicController music { get; set; } = null!;
 
         [Resolved]
-        private BeatmapManager beatmaps { get; set; }
+        private BeatmapManager beatmaps { get; set; } = null!;
 
         [Resolved]
-        private IBindable<WorkingBeatmap> working { get; set; }
+        private IBindable<WorkingBeatmap> working { get; set; } = null!;
 
         [Resolved]
-        private EditorBeatmap editorBeatmap { get; set; }
+        private EditorBeatmap editorBeatmap { get; set; } = null!;
 
         [Resolved]
-        private SetupScreenHeader header { get; set; }
+        private Editor? editor { get; set; }
+
+        [Resolved]
+        private SetupScreenHeader header { get; set; } = null!;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -93,6 +94,8 @@ namespace osu.Game.Screens.Edit.Setup
             working.Value.Metadata.BackgroundFile = destination.Name;
             header.Background.UpdateBackground();
 
+            editor?.ApplyToBackground(bg => bg.RefreshBackground());
+
             return true;
         }
 
@@ -125,17 +128,17 @@ namespace osu.Game.Screens.Edit.Setup
             return true;
         }
 
-        private void backgroundChanged(ValueChangedEvent<FileInfo> file)
+        private void backgroundChanged(ValueChangedEvent<FileInfo?> file)
         {
-            if (!ChangeBackgroundImage(file.NewValue))
+            if (file.NewValue == null || !ChangeBackgroundImage(file.NewValue))
                 backgroundChooser.Current.Value = file.OldValue;
 
             updatePlaceholderText();
         }
 
-        private void audioTrackChanged(ValueChangedEvent<FileInfo> file)
+        private void audioTrackChanged(ValueChangedEvent<FileInfo?> file)
         {
-            if (!ChangeAudioTrack(file.NewValue))
+            if (file.NewValue == null || !ChangeAudioTrack(file.NewValue))
                 audioTrackChooser.Current.Value = file.OldValue;
 
             updatePlaceholderText();
@@ -143,13 +146,8 @@ namespace osu.Game.Screens.Edit.Setup
 
         private void updatePlaceholderText()
         {
-            audioTrackChooser.Text = audioTrackChooser.Current.Value == null
-                ? EditorSetupStrings.ClickToSelectTrack
-                : EditorSetupStrings.ClickToReplaceTrack;
-
-            backgroundChooser.Text = backgroundChooser.Current.Value == null
-                ? EditorSetupStrings.ClickToSelectBackground
-                : EditorSetupStrings.ClickToReplaceBackground;
+            audioTrackChooser.Text = audioTrackChooser.Current.Value?.Name ?? EditorSetupStrings.ClickToSelectTrack;
+            backgroundChooser.Text = backgroundChooser.Current.Value?.Name ?? EditorSetupStrings.ClickToSelectBackground;
         }
     }
 }

@@ -1,31 +1,30 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
-using System.Diagnostics;
 using System.Linq;
-using JetBrains.Annotations;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Leaderboards;
+using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.UI;
-using osu.Game.Scoring.Drawables;
 using osu.Game.Utils;
 using osuTK;
 
 namespace osu.Game.Overlays.Profile.Sections.Ranks
 {
-    public class DrawableProfileScore : CompositeDrawable
+    public partial class DrawableProfileScore : CompositeDrawable
     {
         private const int height = 40;
         private const int performance_width = 100;
@@ -35,10 +34,10 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
         protected readonly SoloScoreInfo Score;
 
         [Resolved]
-        private OsuColour colours { get; set; }
+        private OsuColour colours { get; set; } = null!;
 
         [Resolved]
-        private OverlayColourProvider colourProvider { get; set; }
+        private OverlayColourProvider colourProvider { get; set; } = null!;
 
         public DrawableProfileScore(SoloScoreInfo score)
         {
@@ -51,6 +50,8 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
         [BackgroundDependencyLoader]
         private void load(RulesetStore rulesets)
         {
+            var ruleset = rulesets.GetRuleset(Score.RulesetID)?.CreateInstance() ?? throw new InvalidOperationException($"Ruleset with ID of {Score.RulesetID} not found locally");
+
             AddInternal(new ProfileItemContainer
             {
                 Children = new Drawable[]
@@ -85,7 +86,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                                         Spacing = new Vector2(0, 2),
                                         Children = new Drawable[]
                                         {
-                                            new ScoreBeatmapMetadataContainer(Score.Beatmap),
+                                            new ScoreBeatmapMetadataContainer(Score.Beatmap.AsNonNull()),
                                             new FillFlowContainer
                                             {
                                                 AutoSizeAxes = Axes.Both,
@@ -95,7 +96,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                                                 {
                                                     new OsuSpriteText
                                                     {
-                                                        Text = $"{Score.Beatmap?.DifficultyName}",
+                                                        Text = $"{Score.Beatmap.AsNonNull().DifficultyName}",
                                                         Font = OsuFont.GetFont(size: 12, weight: FontWeight.Regular),
                                                         Colour = colours.Yellow
                                                     },
@@ -135,14 +136,9 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                                         Origin = Anchor.CentreRight,
                                         Direction = FillDirection.Horizontal,
                                         Spacing = new Vector2(2),
-                                        Children = Score.Mods.Select(mod =>
+                                        Children = Score.Mods.Select(m => m.ToMod(ruleset)).AsOrdered().Select(mod => new ModIcon(mod)
                                         {
-                                            var ruleset = rulesets.GetRuleset(Score.RulesetID) ?? throw new InvalidOperationException($"Ruleset with ID of {Score.RulesetID} not found locally");
-
-                                            return new ModIcon(mod.ToMod(ruleset.CreateInstance()))
-                                            {
-                                                Scale = new Vector2(0.35f)
-                                            };
+                                            Scale = new Vector2(0.35f)
                                         }).ToList(),
                                     }
                                 }
@@ -163,7 +159,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                                 Origin = Anchor.TopRight,
                                 RelativeSizeAxes = Axes.Both,
                                 Height = 0.5f,
-                                Colour = colourProvider.Background4,
+                                Colour = colourProvider.Background3,
                                 Shear = new Vector2(-performance_background_shear, 0),
                                 EdgeSmoothness = new Vector2(2, 0),
                             },
@@ -175,7 +171,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                                 RelativePositionAxes = Axes.Y,
                                 Height = -0.5f,
                                 Position = new Vector2(0, 1),
-                                Colour = colourProvider.Background4,
+                                Colour = colourProvider.Background3,
                                 Shear = new Vector2(performance_background_shear, 0),
                                 EdgeSmoothness = new Vector2(2, 0),
                             },
@@ -200,7 +196,6 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
             });
         }
 
-        [NotNull]
         protected virtual Drawable CreateRightContent() => CreateDrawableAccuracy();
 
         protected Drawable CreateDrawableAccuracy() => new Container
@@ -219,46 +214,79 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
 
         private Drawable createDrawablePerformance()
         {
-            if (!Score.PP.HasValue)
-            {
-                if (Score.Beatmap?.Status.GrantsPerformancePoints() == true)
-                    return new UnprocessedPerformancePointsPlaceholder { Size = new Vector2(16), Colour = colourProvider.Highlight1 };
+            var font = OsuFont.GetFont(weight: FontWeight.Bold);
 
-                return new OsuSpriteText
+            if (Score.PP.HasValue)
+            {
+                return new FillFlowContainer
                 {
-                    Font = OsuFont.GetFont(weight: FontWeight.Bold),
+                    AutoSizeAxes = Axes.Both,
+                    Direction = FillDirection.Horizontal,
+                    Children = new[]
+                    {
+                        new OsuSpriteText
+                        {
+                            Anchor = Anchor.BottomLeft,
+                            Origin = Anchor.BottomLeft,
+                            Font = font,
+                            Text = $"{Score.PP:0}",
+                            Colour = colourProvider.Highlight1
+                        },
+                        new OsuSpriteText
+                        {
+                            Anchor = Anchor.BottomLeft,
+                            Origin = Anchor.BottomLeft,
+                            Font = font.With(size: 12),
+                            Text = "pp",
+                            Colour = colourProvider.Light3
+                        }
+                    }
+                };
+            }
+
+            if (Score.Beatmap?.Status.GrantsPerformancePoints() != true)
+            {
+                if (Score.Beatmap?.Status == BeatmapOnlineStatus.Loved)
+                {
+                    return new SpriteIconWithTooltip
+                    {
+                        Icon = FontAwesome.Solid.Heart,
+                        Size = new Vector2(font.Size),
+                        TooltipText = UsersStrings.ShowExtraTopRanksNotRanked,
+                        Colour = colourProvider.Highlight1
+                    };
+                }
+
+                return new SpriteTextWithTooltip
+                {
                     Text = "-",
+                    Font = OsuFont.GetFont(weight: FontWeight.Bold),
+                    TooltipText = UsersStrings.ShowExtraTopRanksNotRanked,
                     Colour = colourProvider.Highlight1
                 };
             }
 
-            return new FillFlowContainer
+            if (!Score.Ranked)
             {
-                AutoSizeAxes = Axes.Both,
-                Direction = FillDirection.Horizontal,
-                Children = new[]
+                return new SpriteTextWithTooltip
                 {
-                    new OsuSpriteText
-                    {
-                        Anchor = Anchor.BottomLeft,
-                        Origin = Anchor.BottomLeft,
-                        Font = OsuFont.GetFont(weight: FontWeight.Bold),
-                        Text = $"{Score.PP:0}",
-                        Colour = colourProvider.Highlight1
-                    },
-                    new OsuSpriteText
-                    {
-                        Anchor = Anchor.BottomLeft,
-                        Origin = Anchor.BottomLeft,
-                        Font = OsuFont.GetFont(size: 12, weight: FontWeight.Bold),
-                        Text = "pp",
-                        Colour = colourProvider.Light3
-                    }
-                }
+                    Text = "-",
+                    Font = OsuFont.GetFont(weight: FontWeight.Bold),
+                    TooltipText = ScoresStrings.StatusNoPp,
+                    Colour = colourProvider.Highlight1
+                };
+            }
+
+            return new SpriteIconWithTooltip
+            {
+                Icon = FontAwesome.Solid.Sync,
+                Size = new Vector2(font.Size),
+                TooltipText = ScoresStrings.StatusProcessing,
+                Colour = colourProvider.Highlight1
             };
         }
 
-        private class ScoreBeatmapMetadataContainer : BeatmapMetadataContainer
+        private partial class ScoreBeatmapMetadataContainer : BeatmapMetadataContainer
         {
             public ScoreBeatmapMetadataContainer(IBeatmapInfo beatmapInfo)
                 : base(beatmapInfo)
@@ -268,8 +296,6 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
             protected override Drawable[] CreateText(IBeatmapInfo beatmapInfo)
             {
                 var metadata = beatmapInfo.Metadata;
-
-                Debug.Assert(metadata != null);
 
                 return new Drawable[]
                 {

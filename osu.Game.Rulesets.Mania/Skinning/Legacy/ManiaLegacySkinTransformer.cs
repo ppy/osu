@@ -74,14 +74,14 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
             });
         }
 
-        public override Drawable GetDrawableComponent(ISkinComponent component)
+        public override Drawable GetDrawableComponent(ISkinComponentLookup lookup)
         {
-            switch (component)
+            switch (lookup)
             {
-                case GameplaySkinComponent<HitResult> resultComponent:
+                case GameplaySkinComponentLookup<HitResult> resultComponent:
                     return getResult(resultComponent.Component);
 
-                case ManiaSkinComponent maniaComponent:
+                case ManiaSkinComponentLookup maniaComponent:
                     if (!isLegacySkin.Value || !hasKeyTexture.Value)
                         return null;
 
@@ -119,12 +119,15 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
                         case ManiaSkinComponents.StageForeground:
                             return new LegacyStageForeground();
 
+                        case ManiaSkinComponents.BarLine:
+                            return null; // Not yet implemented.
+
                         default:
-                            throw new UnsupportedSkinComponentException(component);
+                            throw new UnsupportedSkinComponentException(lookup);
                     }
             }
 
-            return base.GetDrawableComponent(component);
+            return base.GetDrawableComponent(lookup);
         }
 
         private Drawable getResult(HitResult result)
@@ -135,7 +138,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
             string filename = this.GetManiaSkinConfig<string>(hit_result_mapping[result])?.Value
                               ?? default_hit_result_skin_filenames[result];
 
-            var animation = this.GetAnimation(filename, true, true);
+            var animation = this.GetAnimation(filename, true, true, frameLength: 1000 / 20d);
             return animation == null ? null : new LegacyManiaJudgementPiece(result, animation);
         }
 

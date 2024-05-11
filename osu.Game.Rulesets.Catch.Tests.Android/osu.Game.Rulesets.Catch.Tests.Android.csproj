@@ -1,49 +1,24 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <Import Project="..\osu.Android.props" />
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>8.0.30703</ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{C5379ECB-3A94-4D2F-AC3B-2615AC23EB0D}</ProjectGuid>
-    <ProjectTypeGuids>{EFBA0AD7-5A72-4C68-AF49-83D382785DCF};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
-    <TemplateGuid>{122416d6-6b49-4ee2-a1e8-b825f31c79fe}</TemplateGuid>
+    <TargetFramework>net8.0-android</TargetFramework>
+    <OutputType>Exe</OutputType>
     <RootNamespace>osu.Game.Rulesets.Catch.Tests</RootNamespace>
     <AssemblyName>osu.Game.Rulesets.Catch.Tests.Android</AssemblyName>
-    <AndroidManifest>Properties\AndroidManifest.xml</AndroidManifest>
-    <AndroidSupportedAbis>armeabi-v7a;x86;arm64-v8a</AndroidSupportedAbis>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <AndroidLinkMode>None</AndroidLinkMode>
-    <MandroidI18n>cjk;mideast;other;rare;west</MandroidI18n>
-    <EmbedAssembliesIntoApk>true</EmbedAssembliesIntoApk>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="MainActivity.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Properties\AndroidManifest.xml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="..\osu.Game.Rulesets.Catch.Tests\*.cs">
+    <Compile Include="..\osu.Game.Rulesets.Catch.Tests\**\*.cs" Exclude="**\obj\**">
       <Link>%(RecursiveDir)%(Filename)%(Extension)</Link>
     </Compile>
+    <!-- TargetPath is relative to RootNamespace,
+         and DllResourceStore is relative to AssemblyName. -->
+    <EmbeddedResource Include="..\osu.Game.Rulesets.Catch.Tests\**\Resources\**\*">
+      <Link>%(RecursiveDir)%(Filename)%(Extension)</Link>
+      <TargetPath>Android\%(RecursiveDir)%(Filename)%(Extension)</TargetPath>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\osu.Game.Rulesets.Catch\osu.Game.Rulesets.Catch.csproj">
-      <Project>{58f6c80c-1253-4a0e-a465-b8c85ebeadf3}</Project>
-      <Name>osu.Game.Rulesets.Catch</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\osu.Game\osu.Game.csproj">
-      <Project>{2A66DD92-ADB1-4994-89E2-C94E04ACDA0D}</Project>
-      <Name>osu.Game</Name>
-    </ProjectReference>
+    <ProjectReference Include="..\osu.Game.Rulesets.Catch\osu.Game.Rulesets.Catch.csproj" />
+    <ProjectReference Include="..\osu.Game\osu.Game.csproj" />
   </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="System.Formats.Asn1">
-      <Version>5.0.0</Version>
-    </PackageReference>
-  </ItemGroup>
-  <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
 </Project>

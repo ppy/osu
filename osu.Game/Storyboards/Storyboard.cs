@@ -2,8 +2,8 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
-using osu.Framework.Graphics.Textures;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Storyboards.Drawables;
@@ -18,7 +18,7 @@ namespace osu.Game.Storyboards
         public BeatmapInfo BeatmapInfo = new BeatmapInfo();
 
         /// <summary>
-        /// Whether the storyboard can fall back to skin sprites in case no matching storyboard sprites are found.
+        /// Whether the storyboard should prefer textures from the current skin before using local storyboard textures.
         /// </summary>
         public bool UseSkinSprites { get; set; }
 
@@ -30,8 +30,12 @@ namespace osu.Game.Storyboards
         /// </summary>
         /// <remarks>
         /// This iterates all elements and as such should be used sparingly or stored locally.
+        /// Sample events use their start time as "end time" during this calculation.
+        /// Video and background events are not included to match stable.
         /// </remarks>
-        public double? EarliestEventTime => Layers.SelectMany(l => l.Elements).OrderBy(e => e.StartTime).FirstOrDefault()?.StartTime;
+        public double? EarliestEventTime => Layers.SelectMany(l => l.Elements)
+                                                  .Where(e => e is not StoryboardVideo)
+                                                  .MinBy(e => e.StartTime)?.StartTime;
 
         /// <summary>
         /// Across all layers, find the latest point in time that a storyboard element ends at.
@@ -39,9 +43,12 @@ namespace osu.Game.Storyboards
         /// </summary>
         /// <remarks>
         /// This iterates all elements and as such should be used sparingly or stored locally.
-        /// Videos and samples return StartTime as their EndTIme.
+        /// Sample events use their start time as "end time" during this calculation.
+        /// Video and background events are not included to match stable.
         /// </remarks>
-        public double? LatestEventTime => Layers.SelectMany(l => l.Elements).OrderBy(e => e.GetEndTime()).LastOrDefault()?.GetEndTime();
+        public double? LatestEventTime => Layers.SelectMany(l => l.Elements)
+                                                .Where(e => e is not StoryboardVideo)
+                                                .MaxBy(e => e.GetEndTime())?.GetEndTime();
 
         /// <summary>
         /// Depth of the currently front-most storyboard layer, excluding the overlay layer.
@@ -86,17 +93,30 @@ namespace osu.Game.Storyboards
             }
         }
 
-        public DrawableStoryboard CreateDrawable(IReadOnlyList<Mod>? mods = null) =>
+        public virtual DrawableStoryboard CreateDrawable(IReadOnlyList<Mod>? mods = null) =>
             new DrawableStoryboard(this, mods);
 
-        public Texture? GetTextureFromPath(string path, TextureStore textureStore)
+        private static readonly string[] image_extensions = { @".png", @".jpg" };
+
+        public virtual string? GetStoragePathFromStoryboardPath(string path)
         {
-            string? storyboardPath = BeatmapInfo.BeatmapSet?.GetPathForFile(path);
+            string? resolvedPath = null;
 
-            if (!string.IsNullOrEmpty(storyboardPath))
-                return textureStore.Get(storyboardPath);
+            if (Path.HasExtension(path))
+            {
+                resolvedPath = BeatmapInfo.BeatmapSet?.GetPathForFile(path);
+            }
+            else
+            {
+                // Some old storyboards don't include a file extension, so let's best guess at one.
+                foreach (string ext in image_extensions)
+                {
+                    if ((resolvedPath = BeatmapInfo.BeatmapSet?.GetPathForFile($"{path}{ext}")) != null)
+                        break;
+                }
+            }
 
-            return null;
+            return resolvedPath;
         }
     }
 }

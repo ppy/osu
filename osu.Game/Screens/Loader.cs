@@ -19,10 +19,8 @@ using IntroSequence = osu.Game.Configuration.IntroSequence;
 
 namespace osu.Game.Screens
 {
-    public class Loader : StartupScreen
+    public partial class Loader : StartupScreen
     {
-        private bool showDisclaimer;
-
         public Loader()
         {
             ValidForResume = false;
@@ -35,13 +33,7 @@ namespace osu.Game.Screens
         private LoadingSpinner spinner;
         private ScheduledDelegate spinnerShow;
 
-        protected virtual OsuScreen CreateLoadableScreen()
-        {
-            if (showDisclaimer)
-                return new Disclaimer(getIntroSequence());
-
-            return getIntroSequence();
-        }
+        protected virtual OsuScreen CreateLoadableScreen() => getIntroSequence();
 
         private IntroScreen getIntroSequence()
         {
@@ -107,16 +99,15 @@ namespace osu.Game.Screens
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuGameBase game, OsuConfigManager config)
+        private void load(OsuConfigManager config)
         {
-            showDisclaimer = game.IsDeployedBuild;
             introSequence = config.Get<IntroSequence>(OsuSetting.IntroSequence);
         }
 
         /// <summary>
         /// Compiles a set of shaders before continuing. Attempts to draw some frames between compilation by limiting to one compile per draw frame.
         /// </summary>
-        public class ShaderPrecompiler : Drawable
+        public partial class ShaderPrecompiler : Drawable
         {
             private readonly List<IShader> loadTargets = new List<IShader>();
 
@@ -125,13 +116,13 @@ namespace osu.Game.Screens
             [BackgroundDependencyLoader]
             private void load(ShaderManager manager)
             {
-                loadTargets.Add(manager.Load(VertexShaderDescriptor.TEXTURE_2, FragmentShaderDescriptor.TEXTURE_ROUNDED));
-                loadTargets.Add(manager.Load(VertexShaderDescriptor.TEXTURE_2, FragmentShaderDescriptor.BLUR));
                 loadTargets.Add(manager.Load(VertexShaderDescriptor.TEXTURE_2, FragmentShaderDescriptor.TEXTURE));
+                loadTargets.Add(manager.Load(VertexShaderDescriptor.TEXTURE_2, FragmentShaderDescriptor.BLUR));
 
                 loadTargets.Add(manager.Load(@"CursorTrail", FragmentShaderDescriptor.TEXTURE));
 
-                loadTargets.Add(manager.Load(VertexShaderDescriptor.TEXTURE_3, FragmentShaderDescriptor.TEXTURE_ROUNDED));
+                loadTargets.Add(manager.Load(VertexShaderDescriptor.TEXTURE_2, "TriangleBorder"));
+
                 loadTargets.Add(manager.Load(VertexShaderDescriptor.TEXTURE_3, FragmentShaderDescriptor.TEXTURE));
             }
 

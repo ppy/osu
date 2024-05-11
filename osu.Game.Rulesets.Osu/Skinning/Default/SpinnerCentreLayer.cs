@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -17,13 +15,13 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Default
 {
-    public class SpinnerCentreLayer : CompositeDrawable, IHasAccentColour
+    public partial class SpinnerCentreLayer : CompositeDrawable, IHasAccentColour
     {
-        private DrawableSpinner spinner;
+        private DrawableSpinner spinner = null!;
 
-        private CirclePiece circle;
-        private GlowPiece glow;
-        private SpriteIcon symbol;
+        private CirclePiece circle = null!;
+        private GlowPiece glow = null!;
+        private SpriteIcon symbol = null!;
 
         [BackgroundDependencyLoader]
         private void load(DrawableHitObject drawableHitObject)

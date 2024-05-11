@@ -49,5 +49,31 @@ namespace osu.Game.Tests.Mods
             Assert.That(mod3, Is.EqualTo(mod2));
             Assert.That(doubleConvertedMod3, Is.EqualTo(doubleConvertedMod2));
         }
+
+        [Test]
+        public void TestModWithMultipleSettings()
+        {
+            var ruleset = new OsuRuleset();
+
+            var mod1 = new OsuModDifficultyAdjust { OverallDifficulty = { Value = 10 }, CircleSize = { Value = 0 } };
+            var mod2 = new OsuModDifficultyAdjust { OverallDifficulty = { Value = 10 }, CircleSize = { Value = 6 } };
+            var mod3 = new OsuModDifficultyAdjust { OverallDifficulty = { Value = 10 }, CircleSize = { Value = 6 } };
+
+            var doubleConvertedMod1 = new APIMod(mod1).ToMod(ruleset);
+            var doubleConvertedMod2 = new APIMod(mod2).ToMod(ruleset);
+            var doubleConvertedMod3 = new APIMod(mod3).ToMod(ruleset);
+
+            Assert.That(mod1, Is.Not.EqualTo(mod2));
+            Assert.That(doubleConvertedMod1, Is.Not.EqualTo(doubleConvertedMod2));
+
+            Assert.That(mod2, Is.EqualTo(mod2));
+            Assert.That(doubleConvertedMod2, Is.EqualTo(doubleConvertedMod2));
+
+            Assert.That(mod2, Is.EqualTo(mod3));
+            Assert.That(doubleConvertedMod2, Is.EqualTo(doubleConvertedMod3));
+
+            Assert.That(mod3, Is.EqualTo(mod2));
+            Assert.That(doubleConvertedMod3, Is.EqualTo(doubleConvertedMod2));
+        }
     }
 }

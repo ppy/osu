@@ -1,7 +1,5 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -14,21 +12,22 @@ namespace osu.Game.Rulesets.Edit
     /// A snap provider which given a reference hit object and proposed distance from it, offers a more correct duration or distance value.
     /// </summary>
     [Cached]
-    public interface IDistanceSnapProvider : IPositionSnapProvider
+    public interface IDistanceSnapProvider
     {
         /// <summary>
         /// A multiplier which changes the ratio of distance travelled per time unit.
         /// Importantly, this is provided for manual usage, and not multiplied into any of the methods exposed by this interface.
         /// </summary>
         /// <seealso cref="BeatmapInfo.DistanceSpacing"/>
-        IBindable<double> DistanceSpacingMultiplier { get; }
+        Bindable<double> DistanceSpacingMultiplier { get; }
 
         /// <summary>
         /// Retrieves the distance between two points within a timing point that are one beat length apart.
         /// </summary>
         /// <param name="referenceObject">An object to be used as a reference point for this operation.</param>
+        /// <param name="useReferenceSliderVelocity">Whether the <paramref name="referenceObject"/>'s slider velocity should be factored into the returned distance.</param>
         /// <returns>The distance between two points residing in the timing point that are one beat length apart.</returns>
-        float GetBeatSnapDistanceAt(HitObject referenceObject);
+        float GetBeatSnapDistanceAt(HitObject referenceObject, bool useReferenceSliderVelocity = true);
 
         /// <summary>
         /// Converts a duration to a distance without applying any snapping.

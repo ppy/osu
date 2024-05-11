@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -12,7 +10,7 @@ using osu.Game.Overlays;
 
 namespace osu.Game.Screens.Edit.Setup
 {
-    public class SetupScreen : EditorScreen
+    public partial class SetupScreen : EditorScreen
     {
         [Cached]
         private SectionsContainer<SetupSection> sections { get; } = new SetupScreenSectionsContainer();
@@ -28,16 +26,18 @@ namespace osu.Game.Screens.Edit.Setup
         [BackgroundDependencyLoader]
         private void load(EditorBeatmap beatmap, OverlayColourProvider colourProvider)
         {
+            var ruleset = beatmap.BeatmapInfo.Ruleset.CreateInstance();
+
             var sectionsEnumerable = new List<SetupSection>
             {
                 new ResourcesSection(),
                 new MetadataSection(),
-                new DifficultySection(),
+                ruleset.CreateEditorDifficultySection() ?? new DifficultySection(),
                 new ColoursSection(),
                 new DesignSection(),
             };
 
-            var rulesetSpecificSection = beatmap.BeatmapInfo.Ruleset.CreateInstance().CreateEditorSetupSection();
+            var rulesetSpecificSection = ruleset.CreateEditorSetupSection();
             if (rulesetSpecificSection != null)
                 sectionsEnumerable.Add(rulesetSpecificSection);
 
@@ -55,7 +55,7 @@ namespace osu.Game.Screens.Edit.Setup
             }));
         }
 
-        private class SetupScreenSectionsContainer : SectionsContainer<SetupSection>
+        private partial class SetupScreenSectionsContainer : SectionsContainer<SetupSection>
         {
             protected override UserTrackingScrollContainer CreateScrollContainer()
             {

@@ -12,7 +12,7 @@ using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    public class TestSceneFrameStabilityContainer : OsuTestScene
+    public partial class TestSceneFrameStabilityContainer : OsuTestScene
     {
         private readonly ManualClock manualClock;
 
@@ -129,11 +129,13 @@ namespace osu.Game.Tests.Visual.Gameplay
             checkRate(1);
         }
 
-        private const int max_frames_catchup = 50;
-
         private void createStabilityContainer(double gameplayStartTime = double.MinValue) => AddStep("create container", () =>
-            mainContainer.Child = new FrameStabilityContainer(gameplayStartTime) { MaxCatchUpFrames = max_frames_catchup }
-                .WithChild(consumer = new ClockConsumingChild()));
+        {
+            mainContainer.Child = new FrameStabilityContainer(gameplayStartTime)
+            {
+                AllowBackwardsSeeks = true,
+            }.WithChild(consumer = new ClockConsumingChild());
+        });
 
         private void seekManualTo(double time) => AddStep($"seek manual clock to {time}", () => manualClock.CurrentTime = time);
 
@@ -145,7 +147,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         private void checkRate(double rate) =>
             AddAssert($"clock rate is {rate}", () => consumer.Clock.Rate, () => Is.EqualTo(rate));
 
-        public class ClockConsumingChild : CompositeDrawable
+        public partial class ClockConsumingChild : CompositeDrawable
         {
             private readonly OsuSpriteText text;
             private readonly OsuSpriteText text2;

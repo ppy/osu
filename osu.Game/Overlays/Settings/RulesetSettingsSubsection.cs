@@ -14,7 +14,7 @@ namespace osu.Game.Overlays.Settings
     /// A <see cref="SettingsSubsection"/> which provides subclasses with the <see cref="IRulesetConfigManager"/>
     /// from the <see cref="Ruleset"/>'s <see cref="Ruleset.CreateConfig(SettingsStore)"/>.
     /// </summary>
-    public abstract class RulesetSettingsSubsection : SettingsSubsection
+    public abstract partial class RulesetSettingsSubsection : SettingsSubsection
     {
         private readonly Ruleset ruleset;
 

@@ -11,7 +11,7 @@ using osu.Game.Overlays;
 
 namespace osu.Game.Beatmaps.Drawables.Cards
 {
-    public class BeatmapCardContentBackground : CompositeDrawable
+    public partial class BeatmapCardContentBackground : CompositeDrawable
     {
         public BindableBool Dimmed { get; } = new BindableBool();
 

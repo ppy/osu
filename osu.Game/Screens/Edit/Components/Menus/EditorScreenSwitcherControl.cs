@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
@@ -11,10 +9,11 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
 using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Screens.Edit.Components.Menus
 {
-    public class EditorScreenSwitcherControl : OsuTabControl<EditorScreenMode>
+    public partial class EditorScreenSwitcherControl : OsuTabControl<EditorScreenMode>
     {
         public EditorScreenSwitcherControl()
         {
@@ -23,7 +22,7 @@ namespace osu.Game.Screens.Edit.Components.Menus
 
             TabContainer.RelativeSizeAxes &= ~Axes.X;
             TabContainer.AutoSizeAxes = Axes.X;
-            TabContainer.Padding = new MarginPadding(10);
+            TabContainer.Spacing = Vector2.Zero;
         }
 
         [BackgroundDependencyLoader]
@@ -38,22 +37,30 @@ namespace osu.Game.Screens.Edit.Components.Menus
             });
         }
 
-        protected override Dropdown<EditorScreenMode> CreateDropdown() => null;
+        protected override Dropdown<EditorScreenMode> CreateDropdown() => null!;
 
         protected override TabItem<EditorScreenMode> CreateTabItem(EditorScreenMode value) => new TabItem(value);
 
-        private class TabItem : OsuTabItem
+        private partial class TabItem : OsuTabItem
         {
-            private const float transition_length = 250;
+            private readonly Box background;
+            private Color4 backgroundIdleColour;
+            private Color4 backgroundHoverColour;
 
             public TabItem(EditorScreenMode value)
                 : base(value)
             {
-                Text.Margin = new MarginPadding();
+                Text.Margin = new MarginPadding(10);
                 Text.Anchor = Anchor.CentreLeft;
                 Text.Origin = Anchor.CentreLeft;
 
                 Text.Font = OsuFont.TorusAlternate;
+
+                Add(background = new Box
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Depth = float.MaxValue,
+                });
 
                 Bar.Expire();
             }
@@ -61,18 +68,26 @@ namespace osu.Game.Screens.Edit.Components.Menus
             [BackgroundDependencyLoader]
             private void load(OverlayColourProvider colourProvider)
             {
+                backgroundIdleColour = colourProvider.Background2;
+                backgroundHoverColour = colourProvider.Background1;
             }
 
-            protected override void OnActivated()
+            protected override void LoadComplete()
             {
-                base.OnActivated();
-                Bar.ScaleTo(new Vector2(1, 5), transition_length, Easing.OutQuint);
+                base.LoadComplete();
+                background.Colour = backgroundIdleColour;
             }
 
-            protected override void OnDeactivated()
+            protected override void FadeHovered()
             {
-                base.OnDeactivated();
-                Bar.ScaleTo(Vector2.One, transition_length, Easing.OutQuint);
+                base.FadeHovered();
+                background.FadeColour(backgroundHoverColour, TRANSITION_LENGTH, Easing.OutQuint);
+            }
+
+            protected override void FadeUnhovered()
+            {
+                base.FadeUnhovered();
+                background.FadeColour(backgroundIdleColour, TRANSITION_LENGTH, Easing.OutQuint);
             }
         }
     }

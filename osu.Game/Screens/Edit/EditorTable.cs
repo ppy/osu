@@ -1,8 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
+using System;
+using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
@@ -18,8 +18,10 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.Edit
 {
-    public abstract class EditorTable : TableContainer
+    public abstract partial class EditorTable : TableContainer
     {
+        public event Action<Drawable>? OnRowSelected;
+
         private const float horizontal_inset = 20;
 
         protected const float ROW_HEIGHT = 25;
@@ -27,6 +29,10 @@ namespace osu.Game.Screens.Edit
         public const int TEXT_SIZE = 14;
 
         protected readonly FillFlowContainer<RowBackground> BackgroundFlow;
+
+        // We can avoid potentially thousands of objects being added to the input sub-tree since item selection is being handled by the BackgroundFlow
+        // and no items in the underlying table are clickable.
+        protected override bool ShouldBeConsideredForInput(Drawable child) => child == BackgroundFlow && base.ShouldBeConsideredForInput(child);
 
         protected EditorTable()
         {
@@ -45,9 +51,47 @@ namespace osu.Game.Screens.Edit
             });
         }
 
-        protected override Drawable CreateHeader(int index, TableColumn column) => new HeaderText(column?.Header ?? default);
+        protected int GetIndexForObject(object? item)
+        {
+            for (int i = 0; i < BackgroundFlow.Count; i++)
+            {
+                if (BackgroundFlow[i].Item == item)
+                    return i;
+            }
 
-        private class HeaderText : OsuSpriteText
+            return -1;
+        }
+
+        protected virtual bool SetSelectedRow(object? item)
+        {
+            bool foundSelection = false;
+
+            foreach (var b in BackgroundFlow)
+            {
+                b.Selected = ReferenceEquals(b.Item, item);
+
+                if (b.Selected)
+                {
+                    Debug.Assert(!foundSelection);
+                    OnRowSelected?.Invoke(b);
+                    foundSelection = true;
+                }
+            }
+
+            return foundSelection;
+        }
+
+        protected object? GetObjectAtIndex(int index)
+        {
+            if (index < 0 || index > BackgroundFlow.Count - 1)
+                return null;
+
+            return BackgroundFlow[index].Item;
+        }
+
+        protected override Drawable CreateHeader(int index, TableColumn? column) => new HeaderText(column?.Header ?? default);
+
+        private partial class HeaderText : OsuSpriteText
         {
             public HeaderText(LocalisableString text)
             {
@@ -56,7 +100,7 @@ namespace osu.Game.Screens.Edit
             }
         }
 
-        public class RowBackground : OsuClickableContainer
+        public partial class RowBackground : OsuClickableContainer
         {
             public readonly object Item;
 
@@ -83,11 +127,6 @@ namespace osu.Game.Screens.Edit
                         RelativeSizeAxes = Axes.Both,
                         Alpha = 0,
                     },
-                };
-
-                // todo delete
-                Action = () =>
-                {
                 };
             }
 

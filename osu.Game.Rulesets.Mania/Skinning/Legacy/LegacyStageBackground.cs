@@ -16,7 +16,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Mania.Skinning.Legacy
 {
-    public class LegacyStageBackground : CompositeDrawable
+    public partial class LegacyStageBackground : CompositeDrawable
     {
         private Drawable leftSprite;
         private Drawable rightSprite;
@@ -77,7 +77,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
                 rightSprite.Scale = new Vector2(1, DrawHeight / rightSprite.Height);
         }
 
-        private class ColumnBackground : CompositeDrawable
+        private partial class ColumnBackground : CompositeDrawable
         {
             private readonly int columnIndex;
             private readonly bool isLastColumn;

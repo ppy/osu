@@ -1,62 +1,32 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using osu.Framework.Allocation;
 using osu.Framework.Extensions;
-using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Sprites;
 using osuTK.Graphics;
 
 namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 {
-    public class RoomSpecialCategoryPill : OnlinePlayComposite
+    public partial class RoomSpecialCategoryPill : OnlinePlayPill
     {
-        private SpriteText text;
-        private PillContainer pill;
-
         [Resolved]
-        private OsuColour colours { get; set; }
+        private OsuColour colours { get; set; } = null!;
 
-        public RoomSpecialCategoryPill()
-        {
-            AutoSizeAxes = Axes.Both;
-        }
-
-        [BackgroundDependencyLoader]
-        private void load()
-        {
-            InternalChild = pill = new PillContainer
-            {
-                Background =
-                {
-                    Colour = colours.Pink,
-                    Alpha = 1
-                },
-                Child = text = new OsuSpriteText
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Font = OsuFont.GetFont(weight: FontWeight.SemiBold, size: 12),
-                    Colour = Color4.Black
-                }
-            };
-        }
+        protected override FontUsage Font => base.Font.With(weight: FontWeight.SemiBold);
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
+            Pill.Background.Alpha = 1;
+            TextFlow.Colour = Color4.Black;
+
             Category.BindValueChanged(c =>
             {
-                text.Text = c.NewValue.GetLocalisableDescription();
-
-                var backgroundColour = colours.ForRoomCategory(Category.Value);
-                if (backgroundColour != null)
-                    pill.Background.Colour = backgroundColour.Value;
+                TextFlow.Text = c.NewValue.GetLocalisableDescription();
+                Pill.Background.Colour = colours.ForRoomCategory(c.NewValue) ?? colours.Pink;
             }, true);
         }
     }

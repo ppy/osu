@@ -1,7 +1,7 @@
 ﻿<!-- Contains required properties for osu!framework projects. -->
 <Project>
   <PropertyGroup Label="C#">
-    <LangVersion>9.0</LangVersion>
+    <LangVersion>12.0</LangVersion>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <Nullable>enable</Nullable>
   </PropertyGroup>
@@ -17,7 +17,7 @@
     <EmbeddedResource Include="Resources\**\*.*" />
   </ItemGroup>
   <ItemGroup Label="Code Analysis">
-    <PackageReference Include="Microsoft.CodeAnalysis.BannedApiAnalyzers" Version="3.3.3" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.CodeAnalysis.BannedApiAnalyzers" Version="3.3.4" PrivateAssets="All" />
     <AdditionalFiles Include="$(MSBuildThisFileDirectory)CodeAnalysis\BannedSymbols.txt" />
   </ItemGroup>
   <PropertyGroup Label="Code Analysis">
@@ -35,7 +35,7 @@
     <RepositoryUrl>https://github.com/ppy/osu</RepositoryUrl>
     <PackageReleaseNotes>Automated release.</PackageReleaseNotes>
     <Company>ppy Pty Ltd</Company>
-    <Copyright>Copyright (c) 2022 ppy Pty Ltd</Copyright>
+    <Copyright>Copyright (c) 2024 ppy Pty Ltd</Copyright>
     <PackageTags>osu game</PackageTags>
   </PropertyGroup>
 </Project>

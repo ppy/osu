@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Edit.Checks.Components;
 
@@ -12,6 +10,6 @@ namespace osu.Game.Rulesets.Edit.Checks
     {
         protected override CheckCategory Category => CheckCategory.Audio;
         protected override string TypeOfFile => "audio";
-        protected override string GetFilename(IBeatmap beatmap) => beatmap.Metadata?.AudioFile;
+        protected override string GetFilename(IBeatmap beatmap) => beatmap.Metadata.AudioFile;
     }
 }

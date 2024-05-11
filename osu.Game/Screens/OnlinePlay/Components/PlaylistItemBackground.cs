@@ -9,7 +9,7 @@ using osu.Game.Online.Rooms;
 
 namespace osu.Game.Screens.OnlinePlay.Components
 {
-    public class PlaylistItemBackground : Background
+    public partial class PlaylistItemBackground : Background
     {
         public readonly IBeatmapInfo? Beatmap;
 
@@ -27,7 +27,7 @@ namespace osu.Game.Screens.OnlinePlay.Components
             if (Beatmap?.BeatmapSet is IBeatmapSetOnlineInfo online)
                 texture = textures.Get(online.Covers.Cover);
 
-            Sprite.Texture = texture ?? beatmaps.DefaultBeatmap.Background;
+            Sprite.Texture = texture ?? beatmaps.DefaultBeatmap.GetBackground();
         }
 
         public override bool Equals(Background? other)

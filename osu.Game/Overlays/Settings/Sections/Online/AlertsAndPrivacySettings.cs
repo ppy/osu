@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
@@ -11,7 +9,7 @@ using osu.Game.Localisation;
 
 namespace osu.Game.Overlays.Settings.Sections.Online
 {
-    public class AlertsAndPrivacySettings : SettingsSubsection
+    public partial class AlertsAndPrivacySettings : SettingsSubsection
     {
         protected override LocalisableString Header => OnlineSettingsStrings.AlertsAndPrivacyHeader;
 

@@ -4,11 +4,9 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
 using System.Threading;
 using Newtonsoft.Json;
-using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
@@ -33,18 +31,15 @@ namespace osu.Game.Skinning
             this.skinResources = skinResources;
 
             modelManager = new ModelManager<SkinInfo>(storage, realm);
-
-            // can be removed 20220420.
-            populateMissingHashes();
         }
 
         public override IEnumerable<string> HandledExtensions => new[] { ".osk" };
 
         protected override string[] HashableFileTypes => new[] { ".ini", ".json" };
 
-        protected override bool ShouldDeleteArchive(string path) => Path.GetExtension(path)?.ToLowerInvariant() == @".osk";
+        protected override bool ShouldDeleteArchive(string path) => Path.GetExtension(path).ToLowerInvariant() == @".osk";
 
-        protected override SkinInfo CreateModel(ArchiveReader archive) => new SkinInfo { Name = archive.Name ?? @"No name" };
+        protected override SkinInfo CreateModel(ArchiveReader archive, ImportParameters parameters) => new SkinInfo { Name = archive.Name ?? @"No name" };
 
         private const string unknown_creator_string = @"Unknown";
 
@@ -106,7 +101,8 @@ namespace osu.Game.Skinning
                 // In both of these cases, the expectation from the user is that the filename or folder name is displayed somewhere to identify the skin.
                 if (archiveName != item.Name
                     // lazer exports use this format
-                    && archiveName != item.GetDisplayString())
+                    // GetValidFilename accounts for skins with non-ASCII characters in the name that have been exported by lazer.
+                    && archiveName != item.GetDisplayString().GetValidFilename())
                     item.Name = @$"{item.Name} [{archiveName}]";
             }
 
@@ -122,7 +118,7 @@ namespace osu.Game.Skinning
             string nameLine = @$"Name: {item.Name}";
             string authorLine = @$"Author: {item.Creator}";
 
-            string[] newLines =
+            List<string> newLines = new List<string>
             {
                 @"// The following content was automatically added by osu! during import, based on filename / folder metadata.",
                 @"[General]",
@@ -134,6 +130,10 @@ namespace osu.Game.Skinning
 
             if (existingFile == null)
             {
+                // skins without a skin.ini are supposed to import using the "latest version" spec.
+                // see https://github.com/peppy/osu-stable-reference/blob/1531237b63392e82c003c712faa028406073aa8f/osu!/Graphics/Skinning/SkinManager.cs#L297-L298
+                newLines.Add(FormattableString.Invariant($"Version: {SkinConfiguration.LATEST_VERSION}"));
+
                 // In the case a skin doesn't have a skin.ini yet, let's create one.
                 writeNewSkinIni();
             }
@@ -158,18 +158,6 @@ namespace osu.Game.Skinning
                     }
 
                     modelManager.ReplaceFile(existingFile, stream, realm);
-
-                    // can be removed 20220502.
-                    if (!ensureIniWasUpdated(item))
-                    {
-                        Logger.Log($"Skin {item}'s skin.ini had issues and has been removed. Please report this and provide the problematic skin.", LoggingTarget.Database, LogLevel.Important);
-
-                        var existingIni = item.GetFile(@"skin.ini");
-                        if (existingIni != null)
-                            item.Files.Remove(existingIni);
-
-                        writeNewSkinIni();
-                    }
                 }
             }
 
@@ -194,42 +182,16 @@ namespace osu.Game.Skinning
             }
         }
 
-        private bool ensureIniWasUpdated(SkinInfo item)
-        {
-            // This is a final consistency check to ensure that hash computation doesn't enter an infinite loop.
-            // With other changes to the surrounding code this should never be hit, but until we are 101% sure that there
-            // are no other cases let's avoid a hard startup crash by bailing and alerting.
-
-            var instance = createInstance(item);
-
-            return instance.Configuration.SkinInfo.Name == item.Name;
-        }
-
-        private void populateMissingHashes()
-        {
-            Realm.Run(realm =>
-            {
-                var skinsWithoutHashes = realm.All<SkinInfo>().Where(i => !i.Protected && string.IsNullOrEmpty(i.Hash)).ToArray();
-
-                foreach (SkinInfo skin in skinsWithoutHashes)
-                {
-                    try
-                    {
-                        realm.Write(_ => skin.Hash = ComputeHash(skin));
-                    }
-                    catch (Exception e)
-                    {
-                        modelManager.Delete(skin);
-                        Logger.Error(e, $"Existing skin {skin} has been deleted during hash recomputation due to being invalid");
-                    }
-                }
-            });
-        }
-
         private Skin createInstance(SkinInfo item) => item.CreateInstance(skinResources);
 
-        public void Save(Skin skin)
+        /// <summary>
+        /// Save a skin, serialising any changes to skin layouts to relevant JSON structures.
+        /// </summary>
+        /// <returns>Whether any change actually occurred.</returns>
+        public bool Save(Skin skin)
         {
+            bool hadChanges = false;
+
             skin.SkinInfo.PerformWrite(s =>
             {
                 // Update for safety
@@ -240,11 +202,11 @@ namespace osu.Game.Skinning
 
                 using (var streamContent = new MemoryStream(Encoding.UTF8.GetBytes(skinInfoJson)))
                 {
-                    modelManager.AddFile(s, streamContent, skin_info_file, s.Realm);
+                    modelManager.AddFile(s, streamContent, skin_info_file, s.Realm!);
                 }
 
                 // Then serialise each of the drawable component groups into respective files.
-                foreach (var drawableInfo in skin.DrawableComponentInfo)
+                foreach (var drawableInfo in skin.LayoutInfos)
                 {
                     string json = JsonConvert.SerializeObject(drawableInfo.Value, new JsonSerializerSettings { Formatting = Formatting.Indented });
 
@@ -255,14 +217,20 @@ namespace osu.Game.Skinning
                         var oldFile = s.GetFile(filename);
 
                         if (oldFile != null)
-                            modelManager.ReplaceFile(oldFile, streamContent, s.Realm);
+                            modelManager.ReplaceFile(oldFile, streamContent, s.Realm!);
                         else
-                            modelManager.AddFile(s, streamContent, filename, s.Realm);
+                            modelManager.AddFile(s, streamContent, filename, s.Realm!);
                     }
                 }
 
-                s.Hash = ComputeHash(s);
+                string newHash = ComputeHash(s);
+
+                hadChanges = newHash != s.Hash;
+
+                s.Hash = newHash;
             });
+
+            return hadChanges;
         }
     }
 }

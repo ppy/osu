@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
 using NUnit.Framework;
@@ -25,6 +23,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
         [TestCase("slider-conversion-v6")]
         [TestCase("slider-conversion-v14")]
         [TestCase("slider-generating-drumroll-2")]
+        [TestCase("file-hitsamples")]
         public void Test(string name) => base.Test(name);
 
         protected override IEnumerable<ConvertValue> CreateConvertValue(HitObject hitObject)

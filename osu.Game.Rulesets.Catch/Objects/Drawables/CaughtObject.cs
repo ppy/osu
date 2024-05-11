@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -17,9 +15,9 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
     /// Represents a <see cref="PalpableCatchHitObject"/> caught by the catcher.
     /// </summary>
     [Cached(typeof(IHasCatchObjectState))]
-    public abstract class CaughtObject : SkinnableDrawable, IHasCatchObjectState
+    public abstract partial class CaughtObject : SkinnableDrawable, IHasCatchObjectState
     {
-        public PalpableCatchHitObject HitObject { get; private set; }
+        public PalpableCatchHitObject HitObject { get; private set; } = null!;
         public Bindable<Color4> AccentColour { get; } = new Bindable<Color4>();
         public Bindable<bool> HyperDash { get; } = new Bindable<bool>();
         public Bindable<int> IndexInBeatmap { get; } = new Bindable<int>();
@@ -28,6 +26,8 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
 
         public float DisplayRotation => Rotation;
 
+        public double DisplayStartTime => HitObject.StartTime;
+
         /// <summary>
         /// Whether this hit object should stay on the catcher plate when the object is caught by the catcher.
         /// </summary>
@@ -35,8 +35,8 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
 
         public override bool RemoveWhenNotAlive => true;
 
-        protected CaughtObject(CatchSkinComponents skinComponent, Func<ISkinComponent, Drawable> defaultImplementation)
-            : base(new CatchSkinComponent(skinComponent), defaultImplementation)
+        protected CaughtObject(CatchSkinComponents skinComponent, Func<ISkinComponentLookup, Drawable> defaultImplementation)
+            : base(new CatchSkinComponentLookup(skinComponent), defaultImplementation)
         {
             Origin = Anchor.Centre;
 

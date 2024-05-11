@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Collections.Generic;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mods;
@@ -12,7 +10,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Edit
 {
-    public class DrawableOsuEditorRuleset : DrawableOsuRuleset
+    public partial class DrawableOsuEditorRuleset : DrawableOsuRuleset
     {
         public DrawableOsuEditorRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod> mods)
             : base(ruleset, beatmap, mods)
@@ -23,9 +21,9 @@ namespace osu.Game.Rulesets.Osu.Edit
 
         public override PlayfieldAdjustmentContainer CreatePlayfieldAdjustmentContainer() => new OsuPlayfieldAdjustmentContainer { Size = Vector2.One };
 
-        private class OsuEditorPlayfield : OsuPlayfield
+        private partial class OsuEditorPlayfield : OsuPlayfield
         {
-            protected override GameplayCursorContainer CreateCursor() => null;
+            protected override GameplayCursorContainer? CreateCursor() => null;
 
             public OsuEditorPlayfield()
             {

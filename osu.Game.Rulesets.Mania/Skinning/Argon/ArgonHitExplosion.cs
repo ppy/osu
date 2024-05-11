@@ -15,7 +15,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Mania.Skinning.Argon
 {
-    public class ArgonHitExplosion : CompositeDrawable, IHitExplosion
+    public partial class ArgonHitExplosion : CompositeDrawable, IHitExplosion
     {
         public override bool RemoveWhenNotAlive => true;
 
@@ -43,9 +43,8 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
             {
                 largeFaint = new Container
                 {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
                     RelativeSizeAxes = Axes.Both,
+                    Height = ArgonNotePiece.NOTE_ACCENT_RATIO,
                     Masking = true,
                     CornerRadius = ArgonNotePiece.CORNER_RADIUS,
                     Blending = BlendingParameters.Additive,
@@ -80,11 +79,15 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
             if (direction.NewValue == ScrollingDirection.Up)
             {
                 Anchor = Anchor.TopCentre;
+                largeFaint.Anchor = Anchor.TopCentre;
+                largeFaint.Origin = Anchor.TopCentre;
                 Y = ArgonNotePiece.NOTE_HEIGHT / 2;
             }
             else
             {
                 Anchor = Anchor.BottomCentre;
+                largeFaint.Anchor = Anchor.BottomCentre;
+                largeFaint.Origin = Anchor.BottomCentre;
                 Y = -ArgonNotePiece.NOTE_HEIGHT / 2;
             }
         }

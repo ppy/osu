@@ -10,7 +10,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards.Statistics
     /// <summary>
     /// Shows the number of current nominations that a map has received, as well as the number of nominations required for qualification.
     /// </summary>
-    public class NominationsStatistic : BeatmapCardStatistic
+    public partial class NominationsStatistic : BeatmapCardStatistic
     {
         private NominationsStatistic(BeatmapSetNominationStatus nominationStatus)
         {

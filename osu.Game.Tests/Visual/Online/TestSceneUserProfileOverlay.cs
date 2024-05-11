@@ -1,34 +1,147 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Testing;
+using osu.Game.Online.API;
+using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
-using osu.Game.Overlays.Profile;
 using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual.Online
 {
     [TestFixture]
-    public class TestSceneUserProfileOverlay : OsuTestScene
+    public partial class TestSceneUserProfileOverlay : OsuTestScene
     {
-        protected override bool UseOnlineAPI => true;
+        private DummyAPIAccess dummyAPI => (DummyAPIAccess)API;
 
-        private readonly TestUserProfileOverlay profile;
+        private UserProfileOverlay profile = null!;
+
+        [SetUpSteps]
+        public void SetUp()
+        {
+            AddStep("create profile overlay", () => Child = profile = new UserProfileOverlay());
+        }
+
+        [Test]
+        public void TestBlank()
+        {
+            AddStep("show overlay", () => profile.Show());
+        }
+
+        [Test]
+        public void TestActualUser()
+        {
+            AddStep("set up request handling", () =>
+            {
+                dummyAPI.HandleRequest = req =>
+                {
+                    if (req is GetUserRequest getUserRequest)
+                    {
+                        getUserRequest.TriggerSuccess(TEST_USER);
+                        return true;
+                    }
+
+                    return false;
+                };
+            });
+            AddStep("show user", () => profile.ShowUser(new APIUser { Id = 1 }));
+            AddToggleStep("toggle visibility", visible => profile.State.Value = visible ? Visibility.Visible : Visibility.Hidden);
+            AddStep("log out", () => dummyAPI.Logout());
+            AddStep("log back in", () =>
+            {
+                dummyAPI.Login("username", "password");
+                dummyAPI.AuthenticateSecondFactor("abcdefgh");
+            });
+        }
+
+        [Test]
+        public void TestLoading()
+        {
+            GetUserRequest pendingRequest = null!;
+
+            AddStep("set up request handling", () =>
+            {
+                dummyAPI.HandleRequest = req =>
+                {
+                    if (req is GetUserRequest getUserRequest)
+                    {
+                        pendingRequest = getUserRequest;
+                        return true;
+                    }
+
+                    return false;
+                };
+            });
+            AddStep("show user", () => profile.ShowUser(new APIUser { Id = 1 }));
+            AddWaitStep("wait some", 3);
+            AddStep("complete request", () => pendingRequest.TriggerSuccess(TEST_USER));
+        }
+
+        [Test]
+        public void TestLogin()
+        {
+            GetUserRequest pendingRequest = null!;
+
+            AddStep("set up request handling", () =>
+            {
+                dummyAPI.HandleRequest = req =>
+                {
+                    if (dummyAPI.State.Value == APIState.Online && req is GetUserRequest getUserRequest)
+                    {
+                        pendingRequest = getUserRequest;
+                        return true;
+                    }
+
+                    return false;
+                };
+            });
+            AddStep("logout", () => dummyAPI.Logout());
+            AddStep("show user", () => profile.ShowUser(new APIUser { Id = 1 }));
+            AddStep("login", () =>
+            {
+                dummyAPI.Login("username", "password");
+                dummyAPI.AuthenticateSecondFactor("abcdefgh");
+            });
+            AddWaitStep("wait some", 3);
+            AddStep("complete request", () => pendingRequest.TriggerSuccess(TEST_USER));
+        }
 
         public static readonly APIUser TEST_USER = new APIUser
         {
             Username = @"Somebody",
             Id = 1,
-            CountryCode = CountryCode.Unknown,
+            CountryCode = CountryCode.JP,
             CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c1.jpg",
             JoinDate = DateTimeOffset.Now.AddDays(-1),
             LastVisit = DateTimeOffset.Now,
-            ProfileOrder = new[] { "me" },
+            Groups = new[]
+            {
+                new APIUserGroup { Colour = "#EB47D0", ShortName = "DEV", Name = "Developers" },
+                new APIUserGroup { Colour = "#A347EB", ShortName = "BN", Name = "Beatmap Nominators", Playmodes = new[] { "mania" } },
+                new APIUserGroup { Colour = "#A347EB", ShortName = "BN", Name = "Beatmap Nominators", Playmodes = new[] { "osu", "taiko" } },
+                new APIUserGroup { Colour = "#A347EB", ShortName = "BN", Name = "Beatmap Nominators", Playmodes = new[] { "osu", "taiko", "fruits", "mania" } },
+                new APIUserGroup { Colour = "#A347EB", ShortName = "BN", Name = "Beatmap Nominators (Probationary)", Playmodes = new[] { "osu", "taiko", "fruits", "mania" }, IsProbationary = true }
+            },
+            ProfileOrder = new[]
+            {
+                @"me",
+                @"recent_activity",
+                @"beatmaps",
+                @"historical",
+                @"kudosu",
+                @"top_ranks",
+                @"medals"
+            },
+            RankHighest = new APIUser.UserRankHighest
+            {
+                Rank = 1,
+                UpdatedAt = DateTimeOffset.Now,
+            },
             Statistics = new UserStatistics
             {
                 IsRanked = true,
@@ -46,73 +159,64 @@ namespace osu.Game.Tests.Visual.Online
                     Data = Enumerable.Range(2345, 45).Concat(Enumerable.Range(2109, 40)).ToArray()
                 },
             },
+            TournamentBanners = new[]
+            {
+                new TournamentBanner
+                {
+                    Id = 15588,
+                    TournamentId = 41,
+                    ImageLowRes = "https://assets.ppy.sh/tournament-banners/official/owc2023/profile/supporter_CN.jpg",
+                    Image = "https://assets.ppy.sh/tournament-banners/official/owc2023/profile/supporter_CN@2x.jpg"
+                },
+                new TournamentBanner
+                {
+                    Id = 15589,
+                    TournamentId = 41,
+                    ImageLowRes = "https://assets.ppy.sh/tournament-banners/official/owc2023/profile/supporter_PH.jpg",
+                    Image = "https://assets.ppy.sh/tournament-banners/official/owc2023/profile/supporter_PH@2x.jpg"
+                },
+                new TournamentBanner
+                {
+                    Id = 15590,
+                    TournamentId = 41,
+                    ImageLowRes = "https://assets.ppy.sh/tournament-banners/official/owc2023/profile/supporter_CL.jpg",
+                    Image = "https://assets.ppy.sh/tournament-banners/official/owc2023/profile/supporter_CL@2x.jpg"
+                }
+            },
             Badges = new[]
             {
                 new Badge
                 {
                     AwardedAt = DateTimeOffset.FromUnixTimeSeconds(1505741569),
                     Description = "Outstanding help by being a voluntary test subject.",
-                    ImageUrl = "https://assets.ppy.sh/profile-badges/contributor.jpg"
-                }
+                    ImageUrl = "https://assets.ppy.sh/profile-badges/contributor-new@2x.png",
+                    ImageUrlLowRes = "https://assets.ppy.sh/profile-badges/contributor-new.png",
+                    Url = "https://osu.ppy.sh/wiki/en/People/Community_Contributors",
+                },
+                new Badge
+                {
+                    AwardedAt = DateTimeOffset.FromUnixTimeSeconds(1505741569),
+                    Description = "Badge without a url.",
+                    ImageUrl = "https://assets.ppy.sh/profile-badges/contributor@2x.png",
+                    ImageUrlLowRes = "https://assets.ppy.sh/profile-badges/contributor.png",
+                },
             },
             Title = "osu!volunteer",
             Colour = "ff0000",
             Achievements = Array.Empty<APIUserAchievement>(),
+            PlayMode = "osu",
+            Kudosu = new APIUser.KudosuCount
+            {
+                Available = 10,
+                Total = 50
+            },
+            SupportLevel = 2,
+            Location = "Somewhere",
+            Interests = "Rhythm games",
+            Occupation = "Gamer",
+            Twitter = "test_user",
+            Discord = "test_user",
+            Website = "https://google.com",
         };
-
-        public TestSceneUserProfileOverlay()
-        {
-            Add(profile = new TestUserProfileOverlay());
-        }
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            AddStep("Show offline dummy", () => profile.ShowUser(TEST_USER));
-
-            AddStep("Show null dummy", () => profile.ShowUser(new APIUser
-            {
-                Username = @"Null",
-                Id = 1,
-            }));
-
-            AddStep("Show ppy", () => profile.ShowUser(new APIUser
-            {
-                Username = @"peppy",
-                Id = 2,
-                IsSupporter = true,
-                CountryCode = CountryCode.AU,
-                CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c3.jpg"
-            }));
-
-            AddStep("Show flyte", () => profile.ShowUser(new APIUser
-            {
-                Username = @"flyte",
-                Id = 3103765,
-                CountryCode = CountryCode.JP,
-                CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c6.jpg"
-            }));
-
-            AddStep("Show bancho", () => profile.ShowUser(new APIUser
-            {
-                Username = @"BanchoBot",
-                Id = 3,
-                IsBot = true,
-                CountryCode = CountryCode.SH,
-                CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c4.jpg"
-            }));
-
-            AddStep("Show ppy from username", () => profile.ShowUser(new APIUser { Username = @"peppy" }));
-            AddStep("Show flyte from username", () => profile.ShowUser(new APIUser { Username = @"flyte" }));
-
-            AddStep("Hide", profile.Hide);
-            AddStep("Show without reload", profile.Show);
-        }
-
-        private class TestUserProfileOverlay : UserProfileOverlay
-        {
-            public new ProfileHeader Header => base.Header;
-        }
     }
 }

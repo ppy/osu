@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -18,20 +16,21 @@ using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Scoring;
+using osu.Game.Screens.Play;
+using osuTK;
 
 namespace osu.Game.Rulesets.Catch.UI
 {
-    public class DrawableCatchRuleset : DrawableScrollingRuleset<CatchHitObject>
+    public partial class DrawableCatchRuleset : DrawableScrollingRuleset<CatchHitObject>
     {
-        protected override ScrollVisualisationMethod VisualisationMethod => ScrollVisualisationMethod.Constant;
-
         protected override bool UserScrollSpeedAdjustment => false;
 
-        public DrawableCatchRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod> mods = null)
+        public DrawableCatchRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod>? mods = null)
             : base(ruleset, beatmap, mods)
         {
             Direction.Value = ScrollingDirection.Down;
             TimeRange.Value = GetTimeRange(beatmap.Difficulty.ApproachRate);
+            VisualisationMethod = ScrollVisualisationMethod.Constant;
         }
 
         [BackgroundDependencyLoader]
@@ -54,6 +53,8 @@ namespace osu.Game.Rulesets.Catch.UI
 
         protected override PassThroughInputManager CreateInputManager() => new CatchInputManager(Ruleset.RulesetInfo);
 
-        public override DrawableHitObject<CatchHitObject> CreateDrawableRepresentation(CatchHitObject h) => null;
+        public override DrawableHitObject<CatchHitObject>? CreateDrawableRepresentation(CatchHitObject h) => null;
+
+        protected override ResumeOverlay CreateResumeOverlay() => new DelayedResumeOverlay { Scale = new Vector2(0.65f) };
     }
 }

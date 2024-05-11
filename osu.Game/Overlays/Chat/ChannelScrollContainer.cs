@@ -1,7 +1,5 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using osu.Framework.Graphics;
 using osu.Game.Graphics.Containers;
@@ -11,7 +9,7 @@ namespace osu.Game.Overlays.Chat
     /// <summary>
     /// An <see cref="OsuScrollContainer"/> with functionality to automatically scroll whenever the maximum scrollable distance increases.
     /// </summary>
-    public class ChannelScrollContainer : OsuScrollContainer
+    public partial class ChannelScrollContainer : OsuScrollContainer
     {
         /// <summary>
         /// The chat will be automatically scrolled to end if and only if

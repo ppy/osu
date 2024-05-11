@@ -11,7 +11,7 @@ using osu.Game.Beatmaps;
 
 namespace osu.Game.Screens.Select
 {
-    public abstract class BeatmapDetailArea : Container
+    public abstract partial class BeatmapDetailArea : Container
     {
         private const float details_padding = 10;
 

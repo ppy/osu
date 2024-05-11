@@ -1,11 +1,11 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
+using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
@@ -17,11 +17,20 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Default
 {
-    public class SpinnerRotationTracker : CircularContainer
+    public partial class SpinnerRotationTracker : CircularContainer
     {
         public override bool IsPresent => true; // handle input when hidden
 
         private readonly DrawableSpinner drawableSpinner;
+
+        private Vector2? mousePosition;
+        private float? lastAngle;
+
+        private float currentRotation;
+        private bool rotationTransferred;
+
+        [Resolved(canBeNull: true)]
+        private IGameplayClock? gameplayClock { get; set; }
 
         public SpinnerRotationTracker(DrawableSpinner drawableSpinner)
         {
@@ -47,35 +56,31 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
 
         protected override bool OnMouseMove(MouseMoveEvent e)
         {
-            mousePosition = Parent.ToLocalSpace(e.ScreenSpaceMousePosition);
+            mousePosition = Parent!.ToLocalSpace(e.ScreenSpaceMousePosition);
             return base.OnMouseMove(e);
         }
-
-        private Vector2 mousePosition;
-
-        private float lastAngle;
-        private float currentRotation;
-
-        private bool rotationTransferred;
-
-        [Resolved(canBeNull: true)]
-        private IGameplayClock gameplayClock { get; set; }
 
         protected override void Update()
         {
             base.Update();
-            float thisAngle = -MathUtils.RadiansToDegrees(MathF.Atan2(mousePosition.X - DrawSize.X / 2, mousePosition.Y - DrawSize.Y / 2));
 
-            float delta = thisAngle - lastAngle;
+            if (mousePosition is Vector2 pos)
+            {
+                float thisAngle = -float.RadiansToDegrees(MathF.Atan2(pos.X - DrawSize.X / 2, pos.Y - DrawSize.Y / 2));
+                float delta = lastAngle == null ? 0 : thisAngle - lastAngle.Value;
 
-            if (Tracking)
-                AddRotation(delta);
+                // Normalise the delta to -180 .. 180
+                if (delta > 180) delta -= 360;
+                if (delta < -180) delta += 360;
 
-            lastAngle = thisAngle;
+                if (Tracking)
+                    AddRotation(delta);
 
-            IsSpinning.Value = isSpinnableTime && Math.Abs(currentRotation / 2 - Rotation) > 5f;
+                lastAngle = thisAngle;
+            }
 
-            Rotation = (float)Interpolation.Damp(Rotation, currentRotation / 2, 0.99, Math.Abs(Time.Elapsed));
+            IsSpinning.Value = isSpinnableTime && Math.Abs(currentRotation - Rotation) > 10f;
+            Rotation = (float)Interpolation.Damp(Rotation, currentRotation, 0.99, Math.Abs(Time.Elapsed));
         }
 
         /// <summary>
@@ -84,41 +89,35 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
         /// <remarks>
         /// Will be a no-op if not a valid time to spin.
         /// </remarks>
-        /// <param name="angle">The delta angle.</param>
-        public void AddRotation(float angle)
+        /// <param name="delta">The delta angle.</param>
+        public void AddRotation(float delta)
         {
             if (!isSpinnableTime)
                 return;
 
             if (!rotationTransferred)
             {
-                currentRotation = Rotation * 2;
+                currentRotation = Rotation;
                 rotationTransferred = true;
             }
 
-            if (angle > 180)
-            {
-                lastAngle += 360;
-                angle -= 360;
-            }
-            else if (-angle > 180)
-            {
-                lastAngle -= 360;
-                angle += 360;
-            }
+            Debug.Assert(Math.Abs(delta) <= 180);
 
-            currentRotation += angle;
-            // rate has to be applied each frame, because it's not guaranteed to be constant throughout playback
-            // (see: ModTimeRamp)
-            drawableSpinner.Result.RateAdjustedRotation += (float)(Math.Abs(angle) * (gameplayClock?.GetTrueGameplayRate() ?? Clock.Rate));
+            double rate = gameplayClock?.GetTrueGameplayRate() ?? Clock.Rate;
+            delta = (float)(delta * Math.Abs(rate));
+
+            currentRotation += delta;
+            drawableSpinner.Result.History.ReportDelta(Time.Current, delta);
         }
 
         private void resetState(DrawableHitObject obj)
         {
             Tracking = false;
             IsSpinning.Value = false;
-            mousePosition = default;
-            lastAngle = currentRotation = Rotation = 0;
+            mousePosition = null;
+            lastAngle = null;
+            currentRotation = 0;
+            Rotation = 0;
             rotationTransferred = false;
         }
 
@@ -126,7 +125,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
         {
             base.Dispose(isDisposing);
 
-            if (drawableSpinner != null)
+            if (drawableSpinner.IsNotNull())
                 drawableSpinner.HitObjectApplied -= resetState;
         }
     }

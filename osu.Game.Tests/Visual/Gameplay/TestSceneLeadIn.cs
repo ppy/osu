@@ -15,7 +15,7 @@ using osuTK;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    public class TestSceneLeadIn : RateAdjustedBeatmapTestScene
+    public partial class TestSceneLeadIn : RateAdjustedBeatmapTestScene
     {
         private LeadInPlayer player = null!;
 
@@ -47,7 +47,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             var sprite = new StoryboardSprite("unknown", Anchor.TopLeft, Vector2.Zero);
 
-            sprite.TimelineGroup.Alpha.Add(Easing.None, firstStoryboardEvent, firstStoryboardEvent + 500, 0, 1);
+            sprite.Commands.AddAlpha(Easing.None, firstStoryboardEvent, firstStoryboardEvent + 500, 0, 1);
 
             storyboard.GetLayer("Background").Add(sprite);
 
@@ -73,17 +73,17 @@ namespace osu.Game.Tests.Visual.Gameplay
             var sprite = new StoryboardSprite("unknown", Anchor.TopLeft, Vector2.Zero);
 
             // these should be ignored as we have an alpha visibility blocker proceeding this command.
-            sprite.TimelineGroup.Scale.Add(Easing.None, loop_start_time, -18000, 0, 1);
-            var loopGroup = sprite.AddLoop(loop_start_time, 50);
-            loopGroup.Scale.Add(Easing.None, loop_start_time, -18000, 0, 1);
+            sprite.Commands.AddScale(Easing.None, loop_start_time, -18000, 0, 1);
+            var loopGroup = sprite.AddLoopingGroup(loop_start_time, 50);
+            loopGroup.AddScale(Easing.None, loop_start_time, -18000, 0, 1);
 
-            var target = addEventToLoop ? loopGroup : sprite.TimelineGroup;
+            var target = addEventToLoop ? loopGroup : sprite.Commands;
             double loopRelativeOffset = addEventToLoop ? -loop_start_time : 0;
-            target.Alpha.Add(Easing.None, loopRelativeOffset + firstStoryboardEvent, loopRelativeOffset + firstStoryboardEvent + 500, 0, 1);
+            target.AddAlpha(Easing.None, loopRelativeOffset + firstStoryboardEvent, loopRelativeOffset + firstStoryboardEvent + 500, 0, 1);
 
             // these should be ignored due to being in the future.
-            sprite.TimelineGroup.Alpha.Add(Easing.None, 18000, 20000, 0, 1);
-            loopGroup.Alpha.Add(Easing.None, 38000, 40000, 0, 1);
+            sprite.Commands.AddAlpha(Easing.None, 18000, 20000, 0, 1);
+            loopGroup.AddAlpha(Easing.None, 38000, 40000, 0, 1);
 
             storyboard.GetLayer("Background").Add(sprite);
 
@@ -106,7 +106,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddUntilStep("player loaded", () => player.IsLoaded && player.Alpha == 1);
         }
 
-        private class LeadInPlayer : TestPlayer
+        private partial class LeadInPlayer : TestPlayer
         {
             public LeadInPlayer()
                 : base(false, false)

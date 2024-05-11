@@ -1,61 +1,20 @@
 ﻿<Project>
   <PropertyGroup>
-    <LangVersion>8.0</LangVersion>
-    <OutputPath>bin\$(Configuration)</OutputPath>
-    <WarningLevel>4</WarningLevel>
-    <SchemaVersion>2.0</SchemaVersion>
-    <BundleAssemblies>false</BundleAssemblies>
-    <AotAssemblies>false</AotAssemblies>
-    <OutputType>Library</OutputType>
-    <FileAlignment>512</FileAlignment>
-    <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
-    <AndroidApplication>True</AndroidApplication>
-    <AndroidHttpClientHandlerType>Xamarin.Android.Net.AndroidClientHandler</AndroidHttpClientHandlerType>
-    <TargetFrameworkVersion>v10.0</TargetFrameworkVersion>
-    <AndroidUseLatestPlatformSdk>false</AndroidUseLatestPlatformSdk>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <AndroidSupportedAbis>armeabi-v7a;x86;arm64-v8a</AndroidSupportedAbis>
-    <AndroidEnableSGenConcurrent>true</AndroidEnableSGenConcurrent>
-    <MandroidI18n>cjk,mideast,other,rare,west</MandroidI18n>
-    <AndroidLinkMode>SdkOnly</AndroidLinkMode>
-    <ErrorReport>prompt</ErrorReport>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
-    <DebugSymbols>True</DebugSymbols>
-    <DebugType>portable</DebugType>
-    <Optimize>False</Optimize>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <AndroidManagedSymbols>false</AndroidManagedSymbols>
-    <AndroidUseSharedRuntime>true</AndroidUseSharedRuntime>
-    <EmbedAssembliesIntoApk>false</EmbedAssembliesIntoApk>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
-    <DebugSymbols>false</DebugSymbols>
-    <DebugType>None</DebugType>
-    <Optimize>True</Optimize>
-    <AndroidManagedSymbols>false</AndroidManagedSymbols>
-    <AndroidUseSharedRuntime>False</AndroidUseSharedRuntime>
+    <SupportedOSPlatformVersion>21.0</SupportedOSPlatformVersion>
+    <RuntimeIdentifiers>android-x86;android-arm;android-arm64</RuntimeIdentifiers>
+    <AndroidPackageFormat>apk</AndroidPackageFormat>
+    <MandroidI18n>CJK;Mideast;Rare;West;Other;</MandroidI18n>
+    <AndroidHttpClientHandlerType>Xamarin.Android.Net.AndroidMessageHandler</AndroidHttpClientHandlerType>
+    <!-- NullabilityInfoContextSupport is disabled by default for Android -->
+    <NullabilityInfoContextSupport>true</NullabilityInfoContextSupport>
     <EmbedAssembliesIntoApk>true</EmbedAssembliesIntoApk>
   </PropertyGroup>
   <ItemGroup>
-    <None Include="$(MSBuildThisFileDirectory)\osu.licenseheader">
-      <Link>osu.licenseheader</Link>
-    </None>
+    <PackageReference Include="ppy.osu.Framework.Android" Version="2024.509.0" />
   </ItemGroup>
-  <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="System.Net.Http" />
-    <Reference Include="System.Xml" />
-    <Reference Include="System.Core" />
-    <Reference Include="Mono.Android" />
-    <Reference Include="Java.Interop" />
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="ppy.osu.Game.Resources" Version="2022.1021.0" />
-    <PackageReference Include="ppy.osu.Framework.Android" Version="2022.1022.1" />
-  </ItemGroup>
-  <ItemGroup Label="Transitive Dependencies">
-    <!-- Realm needs to be directly referenced in all Xamarin projects, as it will not pull in its transitive dependencies otherwise. -->
-    <PackageReference Include="Realm" Version="10.17.0" />
-  </ItemGroup>
+  <PropertyGroup>
+    <!-- Fody does not handle Android build well, and warns when unchanged.
+         Since Realm objects are not declared directly in Android projects, simply disable Fody. -->
+    <DisableFody>true</DisableFody>
+  </PropertyGroup>
 </Project>

@@ -13,7 +13,7 @@ namespace osu.Game.Screens.OnlinePlay
     /// Utility class to track ongoing online operations' progress.
     /// Can be used to disable interactivity while waiting for a response from online sources.
     /// </summary>
-    public class OngoingOperationTracker : Component
+    public partial class OngoingOperationTracker : Component
     {
         /// <summary>
         /// Whether there is an online operation in progress.

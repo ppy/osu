@@ -9,7 +9,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.EmptyFreeform.Objects.Drawables
 {
-    public class DrawableEmptyFreeformHitObject : DrawableHitObject<EmptyFreeformHitObject>
+    public partial class DrawableEmptyFreeformHitObject : DrawableHitObject<EmptyFreeformHitObject>
     {
         public DrawableEmptyFreeformHitObject(EmptyFreeformHitObject hitObject)
             : base(hitObject)
@@ -26,7 +26,7 @@ namespace osu.Game.Rulesets.EmptyFreeform.Objects.Drawables
         {
             if (timeOffset >= 0)
                 // todo: implement judgement logic
-                ApplyResult(r => r.Type = HitResult.Perfect);
+                ApplyResult(HitResult.Perfect);
         }
 
         protected override void UpdateHitStateTransforms(ArmedState state)

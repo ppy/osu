@@ -18,7 +18,7 @@ namespace osu.Game.Tests.Visual
     /// A container which provides a <see cref="IScrollingInfo"/> to children.
     /// This should only be used when testing
     /// </summary>
-    public class ScrollingTestContainer : Container
+    public partial class ScrollingTestContainer : Container
     {
         public SortedList<MultiplierControlPoint> ControlPoints => scrollingInfo.Algorithm.ControlPoints;
 
@@ -58,7 +58,7 @@ namespace osu.Game.Tests.Visual
             IBindable<double> IScrollingInfo.TimeRange => TimeRange;
 
             public readonly TestScrollAlgorithm Algorithm = new TestScrollAlgorithm();
-            IScrollAlgorithm IScrollingInfo.Algorithm => Algorithm;
+            IBindable<IScrollAlgorithm> IScrollingInfo.Algorithm => new Bindable<IScrollAlgorithm>(Algorithm);
         }
 
         public class TestScrollAlgorithm : IScrollAlgorithm

@@ -11,7 +11,7 @@ using osu.Game.Graphics;
 
 namespace osu.Game.Beatmaps.Drawables
 {
-    public class UpdateableOnlineBeatmapSetCover : ModelBackedDrawable<IBeatmapSetOnlineInfo>
+    public partial class UpdateableOnlineBeatmapSetCover : ModelBackedDrawable<IBeatmapSetOnlineInfo>
     {
         private readonly BeatmapSetCoverType coverType;
 

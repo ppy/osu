@@ -13,7 +13,7 @@ using osu.Game.Tests.Visual;
 
 namespace osu.Game.Rulesets.Mania.Tests.Mods
 {
-    public class TestSceneManiaModConstantSpeed : ModTestScene
+    public partial class TestSceneManiaModConstantSpeed : ModTestScene
     {
         protected override Ruleset CreatePlayerRuleset() => new ManiaRuleset();
 
@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Mods
             PassCondition = () =>
             {
                 var hitObject = Player.ChildrenOfType<DrawableManiaHitObject>().FirstOrDefault();
-                return hitObject?.Dependencies.Get<IScrollingInfo>().Algorithm is ConstantScrollAlgorithm;
+                return hitObject?.Dependencies.Get<IScrollingInfo>().Algorithm.Value is ConstantScrollAlgorithm;
             }
         });
     }

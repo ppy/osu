@@ -1,7 +1,5 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -10,6 +8,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Localisation;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Mods;
@@ -18,7 +17,7 @@ using osuTK;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class ShearedSearchTextBox : CompositeDrawable, IHasCurrentValue<string>
+    public partial class ShearedSearchTextBox : CompositeDrawable, IHasCurrentValue<string>
     {
         private const float corner_radius = 7;
 
@@ -37,9 +36,19 @@ namespace osu.Game.Graphics.UserInterface
             set => textBox.HoldFocus = value;
         }
 
+        public LocalisableString PlaceholderText
+        {
+            get => textBox.PlaceholderText;
+            set => textBox.PlaceholderText = value;
+        }
+
+        public new bool HasFocus => textBox.HasFocus;
+
         public void TakeFocus() => textBox.TakeFocus();
 
         public void KillFocus() => textBox.KillFocus();
+
+        public bool SelectAll() => textBox.SelectAll();
 
         public ShearedSearchTextBox()
         {
@@ -95,7 +104,7 @@ namespace osu.Game.Graphics.UserInterface
 
         public override bool HandleNonPositionalInput => textBox.HandleNonPositionalInput;
 
-        private class InnerSearchTextBox : SearchTextBox
+        private partial class InnerSearchTextBox : SearchTextBox
         {
             [BackgroundDependencyLoader]
             private void load(OverlayColourProvider colourProvider)
@@ -103,7 +112,7 @@ namespace osu.Game.Graphics.UserInterface
                 BackgroundFocused = colourProvider.Background4;
                 BackgroundUnfocused = colourProvider.Background4;
 
-                Placeholder.Font = OsuFont.GetFont(size: CalculatedTextSize, weight: FontWeight.SemiBold);
+                Placeholder.Font = OsuFont.GetFont(size: FontSize, weight: FontWeight.SemiBold);
                 PlaceholderText = CommonStrings.InputSearch;
 
                 CornerRadius = corner_radius;
@@ -112,7 +121,7 @@ namespace osu.Game.Graphics.UserInterface
 
             protected override SpriteText CreatePlaceholder() => new SearchPlaceholder();
 
-            internal class SearchPlaceholder : SpriteText
+            internal partial class SearchPlaceholder : SpriteText
             {
                 public override void Show()
                 {

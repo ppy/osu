@@ -25,7 +25,7 @@ using APIUser = osu.Game.Online.API.Requests.Responses.APIUser;
 
 namespace osu.Game.Tests.Visual.Online
 {
-    public class TestSceneBeatmapListingOverlay : OsuManualInputManagerTestScene
+    public partial class TestSceneBeatmapListingOverlay : OsuManualInputManagerTestScene
     {
         private readonly List<APIBeatmapSet> setsForResponse = new List<APIBeatmapSet>();
 
@@ -78,6 +78,15 @@ namespace osu.Game.Tests.Visual.Online
             });
 
             AddStep("reset size", () => localConfig.SetValue(OsuSetting.BeatmapListingCardSize, BeatmapCardSize.Normal));
+        }
+
+        [Test]
+        public void TestFeaturedArtistFilter()
+        {
+            AddAssert("is visible", () => overlay.State.Value == Visibility.Visible);
+            AddAssert("featured artist filter is on", () => overlay.ChildrenOfType<BeatmapSearchGeneralFilterRow>().First().Current.Contains(SearchGeneral.FeaturedArtists));
+            AddStep("toggle featured artist filter", () => overlay.ChildrenOfType<FilterTabItem<SearchGeneral>>().First(i => i.Value == SearchGeneral.FeaturedArtists).TriggerClick());
+            AddAssert("featured artist filter is off", () => !overlay.ChildrenOfType<BeatmapSearchGeneralFilterRow>().First().Current.Contains(SearchGeneral.FeaturedArtists));
         }
 
         [Test]
@@ -179,7 +188,7 @@ namespace osu.Game.Tests.Visual.Online
                 AddUntilStep("placeholder shown", () =>
                 {
                     var notFoundDrawable = overlay.ChildrenOfType<BeatmapListingOverlay.NotFoundDrawable>().SingleOrDefault();
-                    return notFoundDrawable != null && notFoundDrawable.IsPresent && notFoundDrawable.Parent.DrawHeight > 0;
+                    return notFoundDrawable != null && notFoundDrawable.IsPresent && notFoundDrawable.Parent!.DrawHeight > 0;
                 });
         }
 
@@ -198,13 +207,13 @@ namespace osu.Game.Tests.Visual.Online
                 beatmapSet = CreateAPIBeatmapSet(Ruleset.Value);
                 beatmapSet.Title = "last beatmap of first page";
 
-                fetchFor(getManyBeatmaps(49).Append(beatmapSet).ToArray(), true);
+                fetchFor(getManyBeatmaps(49).Append(new APIBeatmapSet { Title = "last beatmap of first page", OnlineID = beatmapSet.OnlineID }).ToArray(), true);
             });
             AddUntilStep("wait for loaded", () => this.ChildrenOfType<BeatmapCard>().Count() == 50);
 
-            AddStep("set next page", () => setSearchResponse(getManyBeatmaps(49).Prepend(beatmapSet).ToArray(), false));
+            AddStep("set next page", () => setSearchResponse(getManyBeatmaps(49).Prepend(new APIBeatmapSet { Title = "this shouldn't show up", OnlineID = beatmapSet.OnlineID }).ToArray(), false));
             AddStep("scroll to end", () => overlay.ChildrenOfType<OverlayScrollContainer>().Single().ScrollToEnd());
-            AddUntilStep("wait for loaded", () => this.ChildrenOfType<BeatmapCard>().Count() == 99);
+            AddUntilStep("wait for loaded", () => this.ChildrenOfType<BeatmapCard>().Count() >= 99);
 
             AddAssert("beatmap not duplicated", () => overlay.ChildrenOfType<BeatmapCard>().Count(c => c.BeatmapSet.Equals(beatmapSet)) == 1);
         }
@@ -359,7 +368,7 @@ namespace osu.Game.Tests.Visual.Online
             {
                 var cardContainer = this.ChildrenOfType<ReverseChildIDFillFlowContainer<BeatmapCard>>().Single().Parent;
                 var expandedContent = this.ChildrenOfType<ExpandedContentScrollContainer>().Single();
-                return expandedContent.ScreenSpaceDrawQuad.GetVertices().ToArray().All(v => cardContainer.ScreenSpaceDrawQuad.Contains(v));
+                return expandedContent.ScreenSpaceDrawQuad.GetVertices().ToArray().All(v => cardContainer!.ScreenSpaceDrawQuad.Contains(v));
             });
         }
 

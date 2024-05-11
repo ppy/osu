@@ -34,12 +34,21 @@ namespace osu.Game.Rulesets.Mods
             set => CurrentNumber.Precision = value;
         }
 
+        private float minValue;
+
         public float MinValue
         {
-            set => CurrentNumber.MinValue = value;
+            set
+            {
+                if (value == minValue)
+                    return;
+
+                minValue = value;
+                updateExtents();
+            }
         }
 
-        private float maxValue;
+        private float maxValue = 10; // matches default max value of `CurrentNumber`
 
         public float MaxValue
         {
@@ -49,7 +58,24 @@ namespace osu.Game.Rulesets.Mods
                     return;
 
                 maxValue = value;
-                updateMaxValue();
+                updateExtents();
+            }
+        }
+
+        private float? extendedMinValue;
+
+        /// <summary>
+        /// The minimum value to be used when extended limits are applied.
+        /// </summary>
+        public float? ExtendedMinValue
+        {
+            set
+            {
+                if (value == extendedMinValue)
+                    return;
+
+                extendedMinValue = value;
+                updateExtents();
             }
         }
 
@@ -66,7 +92,7 @@ namespace osu.Game.Rulesets.Mods
                     return;
 
                 extendedMaxValue = value;
-                updateMaxValue();
+                updateExtents();
             }
         }
 
@@ -78,7 +104,7 @@ namespace osu.Game.Rulesets.Mods
         public DifficultyBindable(float? defaultValue = null)
             : base(defaultValue)
         {
-            ExtendedLimits.BindValueChanged(_ => updateMaxValue());
+            ExtendedLimits.BindValueChanged(_ => updateExtents());
         }
 
         public override float? Value
@@ -94,9 +120,24 @@ namespace osu.Game.Rulesets.Mods
             }
         }
 
-        private void updateMaxValue()
+        private void updateExtents()
         {
+            CurrentNumber.MinValue = ExtendedLimits.Value && extendedMinValue != null ? extendedMinValue.Value : minValue;
             CurrentNumber.MaxValue = ExtendedLimits.Value && extendedMaxValue != null ? extendedMaxValue.Value : maxValue;
+        }
+
+        public override void CopyTo(Bindable<float?> them)
+        {
+            if (!(them is DifficultyBindable otherDifficultyBindable))
+                throw new InvalidOperationException($"Cannot copy to a non-{nameof(DifficultyBindable)}.");
+
+            base.CopyTo(them);
+
+            otherDifficultyBindable.ReadCurrentFromDifficulty = ReadCurrentFromDifficulty;
+
+            // the following max value copies are only safe as long as these values are effectively constants.
+            otherDifficultyBindable.MaxValue = maxValue;
+            otherDifficultyBindable.ExtendedMaxValue = extendedMaxValue;
         }
 
         public override void BindTo(Bindable<float?> them)
@@ -104,16 +145,18 @@ namespace osu.Game.Rulesets.Mods
             if (!(them is DifficultyBindable otherDifficultyBindable))
                 throw new InvalidOperationException($"Cannot bind to a non-{nameof(DifficultyBindable)}.");
 
-            ReadCurrentFromDifficulty = otherDifficultyBindable.ReadCurrentFromDifficulty;
+            // ensure that MaxValue and ExtendedMaxValue are copied across first before continuing.
+            // not doing so may cause the value of CurrentNumber to be truncated to 10.
+            otherDifficultyBindable.CopyTo(this);
 
-            // the following max value copies are only safe as long as these values are effectively constants.
-            MaxValue = otherDifficultyBindable.maxValue;
-            ExtendedMaxValue = otherDifficultyBindable.extendedMaxValue;
-
+            // set up mutual binding for ExtendedLimits to correctly set the upper bound of CurrentNumber.
             ExtendedLimits.BindTarget = otherDifficultyBindable.ExtendedLimits;
 
-            // the actual values need to be copied after the max value constraints.
+            // set up mutual binding for CurrentNumber. this must happen after all of the above.
             CurrentNumber.BindTarget = otherDifficultyBindable.CurrentNumber;
+
+            // finish up the binding by setting up weak references via the base call.
+            // unfortunately this will call `.CopyTo()` again, but fixing that is problematic and messy.
             base.BindTo(them);
         }
 

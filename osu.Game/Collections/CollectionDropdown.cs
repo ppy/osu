@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
@@ -23,7 +24,7 @@ namespace osu.Game.Collections
     /// <summary>
     /// A dropdown to select the collection to be used to filter results.
     /// </summary>
-    public class CollectionDropdown : OsuDropdown<CollectionFilterMenuItem>
+    public partial class CollectionDropdown : OsuDropdown<CollectionFilterMenuItem>
     {
         /// <summary>
         /// Whether to show the "manage collections..." menu item in the dropdown.
@@ -42,11 +43,14 @@ namespace osu.Game.Collections
 
         private IDisposable? realmSubscription;
 
+        private readonly CollectionFilterMenuItem allBeatmapsItem = new AllBeatmapsCollectionFilterMenuItem();
+
         public CollectionDropdown()
         {
             ItemSource = filters;
 
-            Current.Value = new AllBeatmapsCollectionFilterMenuItem();
+            Current.Value = allBeatmapsItem;
+            AlwaysShowSearchBar = true;
         }
 
         protected override void LoadComplete()
@@ -58,39 +62,54 @@ namespace osu.Game.Collections
             Current.BindValueChanged(selectionChanged);
         }
 
-        private void collectionsChanged(IRealmCollection<BeatmapCollection> collections, ChangeSet? changes, Exception error)
+        private void collectionsChanged(IRealmCollection<BeatmapCollection> collections, ChangeSet? changes)
         {
-            var selectedItem = SelectedItem?.Value?.Collection;
-
-            var allBeatmaps = new AllBeatmapsCollectionFilterMenuItem();
-
-            filters.Clear();
-            filters.Add(allBeatmaps);
-            filters.AddRange(collections.Select(c => new CollectionFilterMenuItem(c.ToLive(realm))));
-
-            if (ShowManageCollectionsItem)
-                filters.Add(new ManageCollectionsFilterMenuItem());
-
-            // This current update and schedule is required to work around dropdown headers not updating text even when the selected item
-            // changes. It's not great but honestly the whole dropdown menu structure isn't great. This needs to be fixed, but I'll issue
-            // a warning that it's going to be a frustrating journey.
-            Current.Value = allBeatmaps;
-            Schedule(() =>
+            if (changes == null)
             {
-                // current may have changed before the scheduled call is run.
-                if (Current.Value != allBeatmaps)
-                    return;
-
-                Current.Value = filters.SingleOrDefault(f => f.Collection != null && f.Collection.ID == selectedItem?.ID) ?? filters[0];
-            });
-
-            // Trigger a re-filter if the current item was in the change set.
-            if (selectedItem != null && changes != null)
+                filters.Clear();
+                filters.Add(allBeatmapsItem);
+                filters.AddRange(collections.Select(c => new CollectionFilterMenuItem(c.ToLive(realm))));
+                if (ShowManageCollectionsItem)
+                    filters.Add(new ManageCollectionsFilterMenuItem());
+            }
+            else
             {
-                foreach (int index in changes.ModifiedIndices)
+                foreach (int i in changes.DeletedIndices.OrderDescending())
+                    filters.RemoveAt(i + 1);
+
+                foreach (int i in changes.InsertedIndices)
+                    filters.Insert(i + 1, new CollectionFilterMenuItem(collections[i].ToLive(realm)));
+
+                var selectedItem = SelectedItem?.Value;
+
+                foreach (int i in changes.NewModifiedIndices)
                 {
-                    if (collections[index].ID == selectedItem.ID)
+                    var updatedItem = collections[i];
+
+                    // This is responsible for updating the state of the +/- button and the collection's name.
+                    // TODO: we can probably make the menu items update with changes to avoid this.
+                    filters.RemoveAt(i + 1);
+                    filters.Insert(i + 1, new CollectionFilterMenuItem(updatedItem.ToLive(realm)));
+
+                    if (updatedItem.ID == selectedItem?.Collection?.ID)
+                    {
+                        // This current update and schedule is required to work around dropdown headers not updating text even when the selected item
+                        // changes. It's not great but honestly the whole dropdown menu structure isn't great. This needs to be fixed, but I'll issue
+                        // a warning that it's going to be a frustrating journey.
+                        Current.Value = allBeatmapsItem;
+                        Schedule(() =>
+                        {
+                            // current may have changed before the scheduled call is run.
+                            if (Current.Value != allBeatmapsItem)
+                                return;
+
+                            Current.Value = filters.SingleOrDefault(f => f.Collection?.ID == selectedItem.Collection?.ID) ?? filters[0];
+                        });
+
+                        // Trigger an external re-filter if the current item was in the change set.
                         RequestFilter?.Invoke();
+                        break;
+                    }
                 }
             }
         }
@@ -100,7 +119,7 @@ namespace osu.Game.Collections
         private void selectionChanged(ValueChangedEvent<CollectionFilterMenuItem> filter)
         {
             // May be null during .Clear().
-            if (filter.NewValue == null)
+            if (filter.NewValue.IsNull())
                 return;
 
             // Never select the manage collection filter - rollback to the previous filter.
@@ -112,7 +131,7 @@ namespace osu.Game.Collections
                 return;
             }
 
-            var newCollection = filter.NewValue?.Collection;
+            var newCollection = filter.NewValue.Collection;
 
             // This dropdown be weird.
             // We only care about filtering if the actual collection has changed.
@@ -139,7 +158,7 @@ namespace osu.Game.Collections
 
         protected virtual CollectionDropdownMenu CreateCollectionMenu() => new CollectionDropdownMenu();
 
-        public class CollectionDropdownHeader : OsuDropdownHeader
+        public partial class CollectionDropdownHeader : OsuDropdownHeader
         {
             public CollectionDropdownHeader()
             {
@@ -149,7 +168,7 @@ namespace osu.Game.Collections
             }
         }
 
-        protected class CollectionDropdownMenu : OsuDropdownMenu
+        protected partial class CollectionDropdownMenu : OsuDropdownMenu
         {
             public CollectionDropdownMenu()
             {
@@ -163,7 +182,7 @@ namespace osu.Game.Collections
             };
         }
 
-        protected class CollectionDropdownDrawableMenuItem : OsuDropdownMenu.DrawableOsuDropdownMenuItem
+        protected partial class CollectionDropdownDrawableMenuItem : OsuDropdownMenu.DrawableOsuDropdownMenuItem
         {
             private IconButton addOrRemoveButton = null!;
 
@@ -187,7 +206,7 @@ namespace osu.Game.Collections
                 {
                     Anchor = Anchor.CentreRight,
                     Origin = Anchor.CentreRight,
-                    X = -OsuScrollContainer.SCROLL_BAR_HEIGHT,
+                    X = -OsuScrollContainer.SCROLL_BAR_WIDTH,
                     Scale = new Vector2(0.65f),
                     Action = addOrRemove,
                 });

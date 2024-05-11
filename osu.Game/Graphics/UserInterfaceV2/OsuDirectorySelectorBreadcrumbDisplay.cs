@@ -13,7 +13,7 @@ using osuTK;
 
 namespace osu.Game.Graphics.UserInterfaceV2
 {
-    internal class OsuDirectorySelectorBreadcrumbDisplay : DirectorySelectorBreadcrumbDisplay
+    internal partial class OsuDirectorySelectorBreadcrumbDisplay : DirectorySelectorBreadcrumbDisplay
     {
         protected override Drawable CreateCaption() => new OsuSpriteText
         {
@@ -25,13 +25,12 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
         protected override DirectorySelectorDirectory CreateDirectoryItem(DirectoryInfo directory, string displayName = null) => new OsuBreadcrumbDisplayDirectory(directory, displayName);
 
-        [BackgroundDependencyLoader]
-        private void load()
+        public OsuDirectorySelectorBreadcrumbDisplay()
         {
-            Height = 50;
+            Padding = new MarginPadding(15);
         }
 
-        private class OsuBreadcrumbDisplayComputer : OsuBreadcrumbDisplayDirectory
+        private partial class OsuBreadcrumbDisplayComputer : OsuBreadcrumbDisplayDirectory
         {
             protected override IconUsage? Icon => null;
 
@@ -41,7 +40,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
             }
         }
 
-        private class OsuBreadcrumbDisplayDirectory : OsuDirectorySelectorDirectory
+        private partial class OsuBreadcrumbDisplayDirectory : OsuDirectorySelectorDirectory
         {
             public OsuBreadcrumbDisplayDirectory(DirectoryInfo directory, string displayName = null)
                 : base(directory, displayName)

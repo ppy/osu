@@ -32,7 +32,7 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public class TestSceneDeleteLocalScore : OsuManualInputManagerTestScene
+    public partial class TestSceneDeleteLocalScore : OsuManualInputManagerTestScene
     {
         private readonly ContextMenuContainer contextMenuContainer;
         private readonly BeatmapLeaderboard leaderboard;
@@ -94,6 +94,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                     {
                         OnlineID = i,
                         BeatmapInfo = beatmapInfo,
+                        BeatmapHash = beatmapInfo.Hash,
                         Accuracy = RNG.NextDouble(),
                         TotalScore = RNG.Next(1, 1000000),
                         MaxCombo = RNG.Next(1, 1000),
@@ -103,7 +104,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                         Files = { new RealmNamedFileUsage(new RealmFile { Hash = $"{i}" }, string.Empty) }
                     };
 
-                    importedScores.Add(scoreManager.Import(score).Value);
+                    importedScores.Add(scoreManager.Import(score)!.Value);
                 }
             });
         });

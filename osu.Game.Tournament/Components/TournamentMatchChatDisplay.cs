@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -15,11 +13,14 @@ using osu.Game.Tournament.Models;
 
 namespace osu.Game.Tournament.Components
 {
-    public class TournamentMatchChatDisplay : StandAloneChatDisplay
+    public partial class TournamentMatchChatDisplay : StandAloneChatDisplay
     {
         private readonly Bindable<string> chatChannel = new Bindable<string>();
 
-        private ChannelManager manager;
+        private ChannelManager? manager;
+
+        [Resolved]
+        private LadderInfo ladderInfo { get; set; } = null!;
 
         public TournamentMatchChatDisplay()
         {
@@ -31,8 +32,8 @@ namespace osu.Game.Tournament.Components
             CornerRadius = 0;
         }
 
-        [BackgroundDependencyLoader(true)]
-        private void load(MatchIPCInfo ipc, IAPIProvider api)
+        [BackgroundDependencyLoader]
+        private void load(MatchIPCInfo? ipc, IAPIProvider api)
         {
             if (ipc != null)
             {
@@ -48,7 +49,7 @@ namespace osu.Game.Tournament.Components
 
                     if (manager == null)
                     {
-                        AddInternal(manager = new ChannelManager(api) { HighPollRate = { Value = true } });
+                        AddInternal(manager = new ChannelManager(api));
                         Channel.BindTo(manager.CurrentChannel);
                     }
 
@@ -71,11 +72,11 @@ namespace osu.Game.Tournament.Components
 
         public void Contract() => this.FadeOut(200);
 
-        protected override ChatLine CreateMessage(Message message) => new MatchMessage(message);
+        protected override ChatLine CreateMessage(Message message) => new MatchMessage(message, ladderInfo);
 
         protected override StandAloneDrawableChannel CreateDrawableChannel(Channel channel) => new MatchChannel(channel);
 
-        public class MatchChannel : StandAloneDrawableChannel
+        public partial class MatchChannel : StandAloneDrawableChannel
         {
             public MatchChannel(Channel channel)
                 : base(channel)
@@ -84,21 +85,18 @@ namespace osu.Game.Tournament.Components
             }
         }
 
-        protected class MatchMessage : StandAloneMessage
+        protected partial class MatchMessage : StandAloneMessage
         {
-            public MatchMessage(Message message)
+            public MatchMessage(Message message, LadderInfo info)
                 : base(message)
             {
-            }
-
-            private void load(LadderInfo info)
-            {
-                // if (info.CurrentMatch.Value.Team1.Value.Players.Any(u => u.Id == Message.Sender.Id))
-                //     SenderText.Colour = TournamentGame.COLOUR_RED;
-                // else if (info.CurrentMatch.Value.Team2.Value.Players.Any(u => u.Id == Message.Sender.Id))
-                //     SenderText.Colour = TournamentGame.COLOUR_BLUE;
-                // else if (Message.Sender.Colour != null)
-                //     SenderText.Colour = ColourBox.Colour = Color4Extensions.FromHex(Message.Sender.Colour);
+                if (info.CurrentMatch.Value is TournamentMatch match)
+                {
+                    if (match.Team1.Value?.Players.Any(u => u.OnlineID == Message.Sender.OnlineID) == true)
+                        UsernameColour = TournamentGame.COLOUR_RED;
+                    else if (match.Team2.Value?.Players.Any(u => u.OnlineID == Message.Sender.OnlineID) == true)
+                        UsernameColour = TournamentGame.COLOUR_BLUE;
+                }
             }
         }
     }

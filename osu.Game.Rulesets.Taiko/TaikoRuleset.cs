@@ -24,12 +24,18 @@ using osu.Game.Rulesets.Taiko.Mods;
 using osu.Game.Rulesets.Taiko.Objects;
 using osu.Game.Rulesets.Taiko.Replays;
 using osu.Game.Rulesets.Taiko.Scoring;
+using osu.Game.Rulesets.Taiko.Skinning.Argon;
 using osu.Game.Rulesets.Taiko.Skinning.Legacy;
 using osu.Game.Rulesets.Taiko.UI;
 using osu.Game.Rulesets.UI;
+using osu.Game.Overlays.Settings;
 using osu.Game.Scoring;
 using osu.Game.Screens.Ranking.Statistics;
 using osu.Game.Skinning;
+using osu.Game.Rulesets.Configuration;
+using osu.Game.Configuration;
+using osu.Game.Rulesets.Scoring.Legacy;
+using osu.Game.Rulesets.Taiko.Configuration;
 
 namespace osu.Game.Rulesets.Taiko
 {
@@ -47,6 +53,9 @@ namespace osu.Game.Rulesets.Taiko
         {
             switch (skin)
             {
+                case ArgonSkin:
+                    return new TaikoArgonSkinTransformer(skin);
+
                 case LegacySkin:
                     return new TaikoLegacySkinTransformer(skin);
             }
@@ -60,9 +69,9 @@ namespace osu.Game.Rulesets.Taiko
 
         public override IEnumerable<KeyBinding> GetDefaultKeyBindings(int variant = 0) => new[]
         {
-            new KeyBinding(InputKey.MouseLeft, TaikoAction.LeftCentre),
             new KeyBinding(InputKey.MouseRight, TaikoAction.LeftRim),
             new KeyBinding(InputKey.D, TaikoAction.LeftRim),
+            new KeyBinding(InputKey.MouseLeft, TaikoAction.LeftCentre),
             new KeyBinding(InputKey.F, TaikoAction.LeftCentre),
             new KeyBinding(InputKey.J, TaikoAction.RightCentre),
             new KeyBinding(InputKey.K, TaikoAction.RightRim),
@@ -106,18 +115,8 @@ namespace osu.Game.Rulesets.Taiko
             if (mods.HasFlagFast(LegacyMods.Relax))
                 yield return new TaikoModRelax();
 
-            if (mods.HasFlagFast(LegacyMods.Random))
-                yield return new TaikoModRandom();
-        }
-
-        public override LegacyMods ConvertToLegacyMods(Mod[] mods)
-        {
-            var value = base.ConvertToLegacyMods(mods);
-
-            if (mods.OfType<TaikoModRandom>().Any())
-                value |= LegacyMods.Random;
-
-            return value;
+            if (mods.HasFlagFast(LegacyMods.ScoreV2))
+                yield return new ModScoreV2();
         }
 
         public override IEnumerable<Mod> GetModsFor(ModType type)
@@ -140,6 +139,7 @@ namespace osu.Game.Rulesets.Taiko
                         new MultiMod(new TaikoModDoubleTime(), new TaikoModNightcore()),
                         new TaikoModHidden(),
                         new TaikoModFlashlight(),
+                        new ModAccuracyChallenge(),
                     };
 
                 case ModType.Conversion:
@@ -149,6 +149,7 @@ namespace osu.Game.Rulesets.Taiko
                         new TaikoModDifficultyAdjust(),
                         new TaikoModClassic(),
                         new TaikoModSwap(),
+                        new TaikoModSingleTap(),
                     };
 
                 case ModType.Automation:
@@ -166,6 +167,12 @@ namespace osu.Game.Rulesets.Taiko
                         new ModAdaptiveSpeed()
                     };
 
+                case ModType.System:
+                    return new Mod[]
+                    {
+                        new ModScoreV2(),
+                    };
+
                 default:
                     return Array.Empty<Mod>();
             }
@@ -181,13 +188,21 @@ namespace osu.Game.Rulesets.Taiko
 
         public override HitObjectComposer CreateHitObjectComposer() => new TaikoHitObjectComposer(this);
 
+        public override IBeatmapVerifier CreateBeatmapVerifier() => new TaikoBeatmapVerifier();
+
         public override DifficultyCalculator CreateDifficultyCalculator(IWorkingBeatmap beatmap) => new TaikoDifficultyCalculator(RulesetInfo, beatmap);
 
         public override PerformanceCalculator CreatePerformanceCalculator() => new TaikoPerformanceCalculator();
 
         public int LegacyID => 1;
 
+        public ILegacyScoreSimulator CreateLegacyScoreSimulator() => new TaikoLegacyScoreSimulator();
+
         public override IConvertibleReplayFrame CreateConvertibleReplayFrame() => new TaikoReplayFrame();
+
+        public override IRulesetConfigManager CreateConfig(SettingsStore? settings) => new TaikoRulesetConfigManager(settings, RulesetInfo);
+
+        public override RulesetSettingsSubsection CreateSettings() => new TaikoSettingsSubsection(this);
 
         protected override IEnumerable<HitResult> GetValidHitResults()
         {
@@ -196,9 +211,8 @@ namespace osu.Game.Rulesets.Taiko
                 HitResult.Great,
                 HitResult.Ok,
 
-                HitResult.SmallTickHit,
-
                 HitResult.SmallBonus,
+                HitResult.LargeBonus,
             };
         }
 
@@ -207,52 +221,50 @@ namespace osu.Game.Rulesets.Taiko
             switch (result)
             {
                 case HitResult.SmallBonus:
+                    return "drum tick";
+
+                case HitResult.LargeBonus:
                     return "bonus";
             }
 
             return base.GetDisplayNameForHitResult(result);
         }
 
-        public override StatisticRow[] CreateStatisticsForScore(ScoreInfo score, IBeatmap playableBeatmap)
+        public override StatisticItem[] CreateStatisticsForScore(ScoreInfo score, IBeatmap playableBeatmap)
         {
             var timedHitEvents = score.HitEvents.Where(e => e.HitObject is Hit).ToList();
 
             return new[]
             {
-                new StatisticRow
+                new StatisticItem("Performance Breakdown", () => new PerformanceBreakdownChart(score, playableBeatmap)
                 {
-                    Columns = new[]
-                    {
-                        new StatisticItem("Performance Breakdown", () => new PerformanceBreakdownChart(score, playableBeatmap)
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y
-                        }),
-                    }
-                },
-                new StatisticRow
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y
+                }),
+                new StatisticItem("Timing Distribution", () => new HitEventTimingDistributionGraph(timedHitEvents)
                 {
-                    Columns = new[]
-                    {
-                        new StatisticItem("Timing Distribution", () => new HitEventTimingDistributionGraph(timedHitEvents)
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            Height = 250
-                        }, true),
-                    }
-                },
-                new StatisticRow
+                    RelativeSizeAxes = Axes.X,
+                    Height = 250
+                }, true),
+                new StatisticItem("Statistics", () => new SimpleStatisticTable(2, new SimpleStatisticItem[]
                 {
-                    Columns = new[]
-                    {
-                        new StatisticItem(string.Empty, () => new SimpleStatisticTable(3, new SimpleStatisticItem[]
-                        {
-                            new AverageHitError(timedHitEvents),
-                            new UnstableRate(timedHitEvents)
-                        }), true)
-                    }
-                }
+                    new AverageHitError(timedHitEvents),
+                    new UnstableRate(timedHitEvents)
+                }), true)
             };
+        }
+
+        /// <seealso cref="TaikoHitWindows"/>
+        public override BeatmapDifficulty GetRateAdjustedDisplayDifficulty(IBeatmapDifficultyInfo difficulty, double rate)
+        {
+            BeatmapDifficulty adjustedDifficulty = new BeatmapDifficulty(difficulty);
+
+            var greatHitWindowRange = TaikoHitWindows.TAIKO_RANGES.Single(range => range.Result == HitResult.Great);
+            double greatHitWindow = IBeatmapDifficultyInfo.DifficultyRange(adjustedDifficulty.OverallDifficulty, greatHitWindowRange.Min, greatHitWindowRange.Average, greatHitWindowRange.Max);
+            greatHitWindow /= rate;
+            adjustedDifficulty.OverallDifficulty = (float)IBeatmapDifficultyInfo.InverseDifficultyRange(greatHitWindow, greatHitWindowRange.Min, greatHitWindowRange.Average, greatHitWindowRange.Max);
+
+            return adjustedDifficulty;
         }
     }
 }

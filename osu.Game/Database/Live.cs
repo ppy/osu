@@ -61,6 +61,6 @@ namespace osu.Game.Database
 
         public override int GetHashCode() => HashCode.Combine(ID);
 
-        public override string ToString() => PerformRead(i => i.ToString());
+        public override string? ToString() => PerformRead(i => i.ToString());
     }
 }

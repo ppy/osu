@@ -1,15 +1,13 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Bindables;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Catch.Tests
 {
-    public class TestSceneFruitVisualChange : TestSceneFruitObjects
+    public partial class TestSceneFruitVisualChange : TestSceneFruitObjects
     {
         private readonly Bindable<int> indexInBeatmap = new Bindable<int>();
         private readonly Bindable<bool> hyperDash = new Bindable<bool>();

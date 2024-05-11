@@ -1,20 +1,21 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics.Containers;
 using osu.Game.Overlays;
 using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Beatmaps.Drawables.Cards.Buttons
 {
-    public abstract class BeatmapCardIconButton : OsuClickableContainer
+    public abstract partial class BeatmapCardIconButton : OsuClickableContainer
     {
         private Colour4 idleColour;
 
@@ -59,6 +60,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards.Buttons
         protected override Container<Drawable> Content => content;
 
         private readonly Container content;
+        private readonly Box hover;
 
         protected BeatmapCardIconButton()
         {
@@ -69,19 +71,27 @@ namespace osu.Game.Beatmaps.Drawables.Cards.Buttons
             {
                 RelativeSizeAxes = Axes.Both,
                 Masking = true,
+                CornerRadius = BeatmapCard.CORNER_RADIUS,
+                Scale = new Vector2(0.8f),
                 Origin = Anchor.Centre,
                 Anchor = Anchor.Centre,
                 Children = new Drawable[]
                 {
+                    hover = new Box
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Colour = Color4.White.Opacity(0.1f),
+                        Blending = BlendingParameters.Additive,
+                    },
                     Icon = new SpriteIcon
                     {
                         Origin = Anchor.Centre,
-                        Anchor = Anchor.Centre
-                    }
+                        Anchor = Anchor.Centre,
+                        Scale = new Vector2(1.2f),
+                    },
                 }
             });
 
-            Size = new Vector2(24);
             IconSize = 12;
         }
 
@@ -116,8 +126,9 @@ namespace osu.Game.Beatmaps.Drawables.Cards.Buttons
         {
             bool isHovered = IsHovered && Enabled.Value;
 
-            content.ScaleTo(isHovered ? 1.2f : 1, 500, Easing.OutQuint);
-            content.FadeColour(isHovered ? HoverColour : IdleColour, BeatmapCard.TRANSITION_DURATION, Easing.OutQuint);
+            hover.FadeTo(isHovered ? 1f : 0f, 500, Easing.OutQuint);
+            content.ScaleTo(isHovered ? 1 : 0.8f, 500, Easing.OutQuint);
+            Icon.FadeColour(isHovered ? HoverColour : IdleColour, BeatmapCard.TRANSITION_DURATION, Easing.OutQuint);
         }
     }
 }

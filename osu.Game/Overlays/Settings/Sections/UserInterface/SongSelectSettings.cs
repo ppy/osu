@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
@@ -12,7 +10,7 @@ using osu.Game.Overlays.Mods.Input;
 
 namespace osu.Game.Overlays.Settings.Sections.UserInterface
 {
-    public class SongSelectSettings : SettingsSubsection
+    public partial class SongSelectSettings : SettingsSubsection
     {
         protected override LocalisableString Header => UserInterfaceStrings.SongSelectHeader;
 
@@ -42,6 +40,18 @@ namespace osu.Game.Overlays.Settings.Sections.UserInterface
                     LabelText = UserInterfaceStrings.ModSelectHotkeyStyle,
                     Current = config.GetBindable<ModSelectHotkeyStyle>(OsuSetting.ModSelectHotkeyStyle),
                     ClassicDefault = ModSelectHotkeyStyle.Classic
+                },
+                new SettingsCheckbox
+                {
+                    LabelText = UserInterfaceStrings.ModSelectTextSearchStartsActive,
+                    Current = config.GetBindable<bool>(OsuSetting.ModSelectTextSearchStartsActive),
+                    ClassicDefault = false
+                },
+                new SettingsCheckbox
+                {
+                    LabelText = GameplaySettingsStrings.BackgroundBlur,
+                    Current = config.GetBindable<bool>(OsuSetting.SongSelectBackgroundBlur),
+                    ClassicDefault = false,
                 }
             };
         }

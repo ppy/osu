@@ -1,13 +1,11 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Concurrent;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
-using JetBrains.Annotations;
 using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Statistics;
@@ -18,9 +16,10 @@ namespace osu.Game.Database
     /// A component which performs lookups (or calculations) and caches the results.
     /// Currently not persisted between game sessions.
     /// </summary>
-    public abstract class MemoryCachingComponent<TLookup, TValue> : Component
+    public abstract partial class MemoryCachingComponent<TLookup, TValue> : Component
+        where TLookup : notnull
     {
-        private readonly ConcurrentDictionary<TLookup, TValue> cache = new ConcurrentDictionary<TLookup, TValue>();
+        private readonly ConcurrentDictionary<TLookup, TValue?> cache = new ConcurrentDictionary<TLookup, TValue?>();
 
         private readonly GlobalStatistic<MemoryCachingStatistics> statistics;
 
@@ -37,12 +36,12 @@ namespace osu.Game.Database
         /// </summary>
         /// <param name="lookup">The lookup to retrieve.</param>
         /// <param name="token">An optional <see cref="CancellationToken"/> to cancel the operation.</param>
-        protected async Task<TValue> GetAsync([NotNull] TLookup lookup, CancellationToken token = default)
+        protected async Task<TValue?> GetAsync(TLookup lookup, CancellationToken token = default)
         {
-            if (CheckExists(lookup, out TValue performance))
+            if (CheckExists(lookup, out TValue? existing))
             {
                 statistics.Value.HitCount++;
-                return performance;
+                return existing;
             }
 
             var computed = await ComputeValueAsync(lookup, token).ConfigureAwait(false);
@@ -73,7 +72,7 @@ namespace osu.Game.Database
             statistics.Value.Usage = cache.Count;
         }
 
-        protected bool CheckExists([NotNull] TLookup lookup, out TValue value) =>
+        protected bool CheckExists(TLookup lookup, [MaybeNullWhen(false)] out TValue value) =>
             cache.TryGetValue(lookup, out value);
 
         /// <summary>
@@ -82,7 +81,7 @@ namespace osu.Game.Database
         /// <param name="lookup">The lookup to retrieve.</param>
         /// <param name="token">An optional <see cref="CancellationToken"/> to cancel the operation.</param>
         /// <returns>The computed value.</returns>
-        protected abstract Task<TValue> ComputeValueAsync(TLookup lookup, CancellationToken token = default);
+        protected abstract Task<TValue?> ComputeValueAsync(TLookup lookup, CancellationToken token = default);
 
         private class MemoryCachingStatistics
         {

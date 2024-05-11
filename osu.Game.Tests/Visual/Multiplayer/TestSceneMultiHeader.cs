@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Screens;
@@ -12,7 +10,7 @@ using osu.Game.Screens.OnlinePlay;
 namespace osu.Game.Tests.Visual.Multiplayer
 {
     [TestFixture]
-    public class TestSceneMultiHeader : OsuTestScene
+    public partial class TestSceneMultiHeader : OsuTestScene
     {
         public TestSceneMultiHeader()
         {
@@ -31,7 +29,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddStep("push multi screen", () => screenStack.CurrentScreen.Push(new TestOnlinePlaySubScreen(++index)));
         }
 
-        private class TestOnlinePlaySubScreen : OsuScreen, IOnlinePlaySubScreen
+        private partial class TestOnlinePlaySubScreen : OsuScreen, IOnlinePlaySubScreen
         {
             private readonly int index;
 

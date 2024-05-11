@@ -1,7 +1,5 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
@@ -13,7 +11,7 @@ using osu.Game.Tests.Visual;
 
 namespace osu.Game.Rulesets.Osu.Tests.Editor
 {
-    public class TestSceneSpinnerPlacementBlueprint : PlacementBlueprintTestScene
+    public partial class TestSceneSpinnerPlacementBlueprint : PlacementBlueprintTestScene
     {
         protected override DrawableHitObject CreateHitObject(HitObject hitObject) => new DrawableSpinner((Spinner)hitObject);
 

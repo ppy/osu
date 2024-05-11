@@ -1,7 +1,5 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using System.Collections.Generic;
 using System.Linq;
@@ -17,14 +15,14 @@ using osuTK;
 
 namespace osu.Game.Overlays.Mods
 {
-    internal class IncompatibilityDisplayingTooltip : ModButtonTooltip
+    internal partial class IncompatibilityDisplayingTooltip : ModButtonTooltip
     {
         private readonly OsuSpriteText incompatibleText;
 
         private readonly Bindable<IReadOnlyList<Mod>> incompatibleMods = new Bindable<IReadOnlyList<Mod>>();
 
         [Resolved]
-        private Bindable<RulesetInfo> ruleset { get; set; }
+        private Bindable<RulesetInfo> ruleset { get; set; } = null!;
 
         public IncompatibilityDisplayingTooltip()
         {

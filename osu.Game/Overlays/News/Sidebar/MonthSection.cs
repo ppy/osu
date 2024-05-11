@@ -19,11 +19,12 @@ using osu.Framework.Graphics.Sprites;
 using System.Diagnostics;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
-using osu.Framework.Platform;
+using osu.Framework.Extensions.LocalisationExtensions;
+using osu.Game.Online.Chat;
 
 namespace osu.Game.Overlays.News.Sidebar
 {
-    public class MonthSection : CompositeDrawable
+    public partial class MonthSection : CompositeDrawable
     {
         public int Year { get; private set; }
         public int Month { get; private set; }
@@ -58,7 +59,7 @@ namespace osu.Game.Overlays.News.Sidebar
                     new PostsContainer
                     {
                         Expanded = { BindTarget = Expanded },
-                        Children = posts.Select(p => new PostButton(p)).ToArray()
+                        Children = posts.Select(p => new PostLink(p)).ToArray()
                     }
                 }
             };
@@ -79,7 +80,7 @@ namespace osu.Game.Overlays.News.Sidebar
             sampleClose = audio.Samples.Get(@"UI/dropdown-close");
         }
 
-        private class DropdownHeader : OsuClickableContainer
+        private partial class DropdownHeader : OsuClickableContainer
         {
             public readonly BindableBool Expanded = new BindableBool();
 
@@ -99,7 +100,7 @@ namespace osu.Game.Overlays.News.Sidebar
                         Anchor = Anchor.CentreLeft,
                         Origin = Anchor.CentreLeft,
                         Font = OsuFont.GetFont(size: 12, weight: FontWeight.Bold),
-                        Text = date.ToString("MMM yyyy")
+                        Text = date.ToLocalisableString(@"MMM yyyy")
                     },
                     icon = new SpriteIcon
                     {
@@ -122,39 +123,18 @@ namespace osu.Game.Overlays.News.Sidebar
             }
         }
 
-        private class PostButton : OsuHoverContainer
+        private partial class PostLink : LinkFlowContainer
         {
-            protected override IEnumerable<Drawable> EffectTargets => new[] { text };
-
-            private readonly TextFlowContainer text;
-            private readonly APINewsPost post;
-
-            public PostButton(APINewsPost post)
+            public PostLink(APINewsPost post)
+                : base(t => t.Font = OsuFont.GetFont(size: 12))
             {
-                this.post = post;
-
                 RelativeSizeAxes = Axes.X;
                 AutoSizeAxes = Axes.Y;
-                Child = text = new TextFlowContainer(t => t.Font = OsuFont.GetFont(size: 12))
-                {
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
-                    Text = post.Title
-                };
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(OverlayColourProvider overlayColours, GameHost host)
-            {
-                IdleColour = overlayColours.Light2;
-                HoverColour = overlayColours.Light1;
-
-                TooltipText = "view in browser";
-                Action = () => host.OpenUrlExternally("https://osu.ppy.sh/home/news/" + post.Slug);
+                AddLink(post.Title, LinkAction.External, @"/home/news/" + post.Slug, "view in browser");
             }
         }
 
-        private class PostsContainer : Container
+        private partial class PostsContainer : Container
         {
             public readonly BindableBool Expanded = new BindableBool();
 

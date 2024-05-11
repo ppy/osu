@@ -1,27 +1,25 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects;
-using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Default
 {
-    public class ExplodePiece : Container
+    public partial class ExplodePiece : Container
     {
         [Resolved]
-        private DrawableHitObject drawableObject { get; set; }
+        private DrawableHitObject drawableObject { get; set; } = null!;
 
-        private TrianglesPiece triangles;
+        private TrianglesPiece triangles = null!;
 
         public ExplodePiece()
         {
-            Size = new Vector2(OsuHitObject.OBJECT_RADIUS * 2);
+            Size = OsuHitObject.OBJECT_DIMENSIONS;
 
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
@@ -56,7 +54,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
         {
             base.Dispose(isDisposing);
 
-            if (drawableObject != null)
+            if (drawableObject.IsNotNull())
                 drawableObject.HitObjectApplied -= onHitObjectApplied;
         }
     }

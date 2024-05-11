@@ -16,7 +16,7 @@ namespace osu.Game.Online
     /// <summary>
     /// A component which requires a constant polling process.
     /// </summary>
-    public abstract class PollingComponent : CompositeComponent
+    public abstract partial class PollingComponent : CompositeComponent
     {
         private double? lastTimePolled;
 

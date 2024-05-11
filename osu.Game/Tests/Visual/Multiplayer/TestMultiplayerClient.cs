@@ -23,7 +23,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
     /// <summary>
     /// A <see cref="MultiplayerClient"/> for use in multiplayer test scenes. Should generally not be used by itself outside of a <see cref="MultiplayerTestScene"/>.
     /// </summary>
-    public class TestMultiplayerClient : MultiplayerClient
+    public partial class TestMultiplayerClient : MultiplayerClient
     {
         public override IBindable<bool> IsConnected => isConnected;
         private readonly Bindable<bool> isConnected = new Bindable<bool>(true);
@@ -109,8 +109,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     // the "best" team is the one with the least users on it.
                     int bestTeam = teamVersus.Teams
                                              .Select(team => (teamID: team.ID, userCount: ServerRoom.Users.Count(u => (u.MatchState as TeamVersusUserState)?.TeamID == team.ID)))
-                                             .OrderBy(pair => pair.userCount)
-                                             .First().teamID;
+                                             .MinBy(pair => pair.userCount).teamID;
 
                     user.MatchState = new TeamVersusUserState { TeamID = bestTeam };
                     ((IMultiplayerClient)this).MatchUserStateChanged(clone(user.UserID), clone(user.MatchState)).WaitSafely();
@@ -234,7 +233,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     QueueMode = ServerAPIRoom.QueueMode.Value,
                     AutoStartDuration = ServerAPIRoom.AutoStartDuration.Value
                 },
-                Playlist = ServerAPIRoom.Playlist.Select(item => new MultiplayerPlaylistItem(item)).ToList(),
+                Playlist = ServerAPIRoom.Playlist.Select(CreateMultiplayerPlaylistItem).ToList(),
                 Users = { localUser },
                 Host = localUser
             };
@@ -261,6 +260,11 @@ namespace osu.Game.Tests.Visual.Multiplayer
         protected override Task LeaveRoomInternal()
         {
             RoomJoined = false;
+            return Task.CompletedTask;
+        }
+
+        public override Task InvitePlayer(int userId)
+        {
             return Task.CompletedTask;
         }
 
@@ -390,6 +394,12 @@ namespace osu.Game.Tests.Visual.Multiplayer
             ChangeUserState(LocalUser.UserID, MultiplayerUserState.Idle);
 
             return Task.CompletedTask;
+        }
+
+        public override async Task AbortMatch()
+        {
+            ChangeUserState(api.LocalUser.Value.Id, MultiplayerUserState.Idle);
+            await ((IMultiplayerClient)this).GameplayAborted(GameplayAbortReason.HostAbortedTheMatch).ConfigureAwait(false);
         }
 
         public async Task AddUserPlaylistItem(int userId, MultiplayerPlaylistItem item)
@@ -636,8 +646,29 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         private T clone<T>(T incoming)
         {
-            byte[]? serialized = MessagePackSerializer.Serialize(typeof(T), incoming, SignalRUnionWorkaroundResolver.OPTIONS);
+            byte[] serialized = MessagePackSerializer.Serialize(typeof(T), incoming, SignalRUnionWorkaroundResolver.OPTIONS);
             return MessagePackSerializer.Deserialize<T>(serialized, SignalRUnionWorkaroundResolver.OPTIONS);
+        }
+
+        public static MultiplayerPlaylistItem CreateMultiplayerPlaylistItem(PlaylistItem item) => new MultiplayerPlaylistItem
+        {
+            ID = item.ID,
+            OwnerID = item.OwnerID,
+            BeatmapID = item.Beatmap.OnlineID,
+            BeatmapChecksum = item.Beatmap.MD5Hash,
+            RulesetID = item.RulesetID,
+            RequiredMods = item.RequiredMods.ToArray(),
+            AllowedMods = item.AllowedMods.ToArray(),
+            Expired = item.Expired,
+            PlaylistOrder = item.PlaylistOrder ?? 0,
+            PlayedAt = item.PlayedAt,
+            StarRating = item.Beatmap.StarRating,
+        };
+
+        public override Task DisconnectInternal()
+        {
+            isConnected.Value = false;
+            return Task.CompletedTask;
         }
     }
 }

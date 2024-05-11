@@ -15,8 +15,12 @@ using osuTK;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class ShearedButton : OsuClickableContainer
+    public partial class ShearedButton : OsuClickableContainer
     {
+        public const float HEIGHT = 50;
+        public const float CORNER_RADIUS = 7;
+        public const float BORDER_THICKNESS = 2;
+
         public LocalisableString Text
         {
             get => text.Text;
@@ -83,12 +87,10 @@ namespace osu.Game.Graphics.UserInterface
         /// </param>
         public ShearedButton(float? width = null)
         {
-            Height = 50;
+            Height = HEIGHT;
             Padding = new MarginPadding { Horizontal = shear * 50 };
 
-            const float corner_radius = 7;
-
-            Content.CornerRadius = corner_radius;
+            Content.CornerRadius = CORNER_RADIUS;
             Content.Shear = new Vector2(shear, 0);
             Content.Masking = true;
             Content.Anchor = Content.Origin = Anchor.Centre;
@@ -98,9 +100,9 @@ namespace osu.Game.Graphics.UserInterface
                 backgroundLayer = new Container
                 {
                     RelativeSizeAxes = Axes.Y,
-                    CornerRadius = corner_radius,
+                    CornerRadius = CORNER_RADIUS,
                     Masking = true,
-                    BorderThickness = 2,
+                    BorderThickness = BORDER_THICKNESS,
                     Children = new Drawable[]
                     {
                         background = new Box
@@ -138,7 +140,7 @@ namespace osu.Game.Graphics.UserInterface
             }
         }
 
-        protected override HoverSounds CreateHoverSounds(HoverSampleSet sampleSet) => new HoverClickSounds(sampleSet);
+        protected override HoverSounds CreateHoverSounds(HoverSampleSet sampleSet) => new HoverClickSounds(sampleSet) { Enabled = { BindTarget = Enabled } };
 
         protected override void LoadComplete()
         {

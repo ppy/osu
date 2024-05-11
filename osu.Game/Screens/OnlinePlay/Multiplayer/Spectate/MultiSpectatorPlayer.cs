@@ -7,13 +7,14 @@ using osu.Framework.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play;
+using osu.Game.Screens.Ranking;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
 {
     /// <summary>
     /// A single spectated player within a <see cref="MultiSpectatorScreen"/>.
     /// </summary>
-    public class MultiSpectatorPlayer : SpectatorPlayer
+    public partial class MultiSpectatorPlayer : SpectatorPlayer
     {
         /// <summary>
         /// All adjustments applied to the clock of this <see cref="MultiSpectatorPlayer"/> which come from mods.
@@ -48,7 +49,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         protected override void Update()
         {
             // The player clock's running state is controlled externally, but the local pausing state needs to be updated to start/stop gameplay.
-            if (GameplayClockContainer.SourceClock.IsRunning)
+            if (GameplayClockContainer.IsRunning)
                 GameplayClockContainer.Start();
             else
                 GameplayClockContainer.Stop();
@@ -66,9 +67,14 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
 
         protected override GameplayClockContainer CreateGameplayClockContainer(WorkingBeatmap beatmap, double gameplayStart)
         {
-            var gameplayClockContainer = new GameplayClockContainer(spectatorPlayerClock);
+            // Importantly, we don't want to apply decoupling because SpectatorPlayerClock updates its IsRunning directly.
+            // If we applied decoupling, this state change wouldn't actually cause the clock to stop.
+            // TODO: Can we just use Start/Stop rather than this workaround, now that DecouplingClock is more sane?
+            var gameplayClockContainer = new GameplayClockContainer(spectatorPlayerClock, applyOffsets: false, requireDecoupling: false);
             clockAdjustmentsFromMods.BindAdjustments(gameplayClockContainer.AdjustmentsFromMods);
             return gameplayClockContainer;
         }
+
+        protected override ResultsScreen CreateResults(ScoreInfo score) => new MultiSpectatorResultsScreen(score);
     }
 }

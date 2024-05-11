@@ -1,12 +1,11 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Utils;
@@ -19,9 +18,9 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Default
 {
-    public class DefaultSpinnerDisc : CompositeDrawable
+    public partial class DefaultSpinnerDisc : CompositeDrawable
     {
-        private DrawableSpinner drawableSpinner;
+        private DrawableSpinner drawableSpinner = null!;
 
         private const float initial_scale = 1.3f;
         private const float idle_alpha = 0.2f;
@@ -30,15 +29,15 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
         private Color4 normalColour;
         private Color4 completeColour;
 
-        private SpinnerTicks ticks;
+        private SpinnerTicks ticks = null!;
 
         private int wholeRotationCount;
         private readonly BindableBool complete = new BindableBool();
 
-        private SpinnerFill fill;
-        private Container mainContainer;
-        private SpinnerCentreLayer centre;
-        private SpinnerBackgroundLayer background;
+        private SpinnerFill fill = null!;
+        private Container mainContainer = null!;
+        private SpinnerCentreLayer centre = null!;
+        private SpinnerBackgroundLayer background = null!;
 
         public DefaultSpinnerDisc()
         {
@@ -201,7 +200,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
         {
             get
             {
-                int rotations = (int)(drawableSpinner.Result.RateAdjustedRotation / 360);
+                int rotations = (int)(drawableSpinner.Result.TotalRotation / 360);
 
                 if (wholeRotationCount == rotations) return false;
 
@@ -214,7 +213,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
         {
             base.Dispose(isDisposing);
 
-            if (drawableSpinner != null)
+            if (drawableSpinner.IsNotNull())
                 drawableSpinner.ApplyCustomUpdateState -= updateStateTransforms;
         }
     }

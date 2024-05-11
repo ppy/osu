@@ -12,7 +12,7 @@ using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Overlays.Chat
 {
-    public class DaySeparator : Container
+    public partial class DaySeparator : Container
     {
         protected virtual float TextSize => 15;
 
@@ -22,14 +22,14 @@ namespace osu.Game.Overlays.Chat
 
         protected virtual float Spacing => 15;
 
-        private readonly DateTimeOffset time;
+        public readonly DateTimeOffset Date;
 
         [Resolved(CanBeNull = true)]
         private OverlayColourProvider? colourProvider { get; set; }
 
-        public DaySeparator(DateTimeOffset time)
+        public DaySeparator(DateTimeOffset date)
         {
-            this.time = time;
+            Date = date;
             Height = 40;
         }
 
@@ -80,7 +80,7 @@ namespace osu.Game.Overlays.Chat
                                     {
                                         Anchor = Anchor.CentreRight,
                                         Origin = Anchor.CentreRight,
-                                        Text = time.ToLocalTime().ToLocalisableString(@"dd MMMM yyyy").ToUpper(),
+                                        Text = Date.ToLocalTime().ToLocalisableString(@"dd MMMM yyyy").ToUpper(),
                                         Font = OsuFont.Torus.With(size: TextSize, weight: FontWeight.SemiBold),
                                         Colour = colourProvider?.Content1 ?? Colour4.White,
                                     },

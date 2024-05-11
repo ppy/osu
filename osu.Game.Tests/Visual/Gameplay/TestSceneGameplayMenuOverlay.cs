@@ -1,9 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
-using System;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -19,12 +16,14 @@ using osuTK.Input;
 namespace osu.Game.Tests.Visual.Gameplay
 {
     [Description("player pause/fail screens")]
-    public class TestSceneGameplayMenuOverlay : OsuManualInputManagerTestScene
+    public partial class TestSceneGameplayMenuOverlay : OsuManualInputManagerTestScene
     {
-        private FailOverlay failOverlay;
-        private PauseOverlay pauseOverlay;
+        private FailOverlay failOverlay = null!;
+        private PauseOverlay pauseOverlay = null!;
 
-        private GlobalActionContainer globalActionContainer;
+        private GlobalActionContainer globalActionContainer = null!;
+
+        private bool triggeredRetryButton;
 
         [BackgroundDependencyLoader]
         private void load(OsuGameBase game)
@@ -35,12 +34,18 @@ namespace osu.Game.Tests.Visual.Gameplay
         [SetUp]
         public void SetUp() => Schedule(() =>
         {
+            triggeredRetryButton = false;
+
             globalActionContainer.Children = new Drawable[]
             {
                 pauseOverlay = new PauseOverlay
                 {
                     OnResume = () => Logger.Log(@"Resume"),
-                    OnRetry = () => Logger.Log(@"Retry"),
+                    OnRetry = () =>
+                    {
+                        Logger.Log(@"Retry");
+                        triggeredRetryButton = true;
+                    },
                     OnQuit = () => Logger.Log(@"Quit"),
                 },
                 failOverlay = new FailOverlay
@@ -224,17 +229,9 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             showOverlay();
 
-            bool triggered = false;
-            AddStep("Click retry button", () =>
-            {
-                var lastAction = pauseOverlay.OnRetry;
-                pauseOverlay.OnRetry = () => triggered = true;
+            AddStep("Click retry button", () => getButton(1).TriggerClick());
 
-                getButton(1).TriggerClick();
-                pauseOverlay.OnRetry = lastAction;
-            });
-
-            AddAssert("Action was triggered", () => triggered);
+            AddAssert("Retry was triggered", () => triggeredRetryButton);
             AddAssert("Overlay is closed", () => pauseOverlay.State.Value == Visibility.Hidden);
         }
 
@@ -252,25 +249,9 @@ namespace osu.Game.Tests.Visual.Gameplay
                 InputManager.Key(Key.Down);
             });
 
-            bool triggered = false;
-            Action lastAction = null;
-            AddStep("Press enter", () =>
-            {
-                lastAction = pauseOverlay.OnRetry;
-                pauseOverlay.OnRetry = () => triggered = true;
-                InputManager.Key(Key.Enter);
-            });
+            AddStep("Press enter", () => InputManager.Key(Key.Enter));
 
-            AddAssert("Action was triggered", () =>
-            {
-                if (lastAction != null)
-                {
-                    pauseOverlay.OnRetry = lastAction;
-                    lastAction = null;
-                }
-
-                return triggered;
-            });
+            AddAssert("Retry was triggered", () => triggeredRetryButton);
             AddAssert("Overlay is closed", () => pauseOverlay.State.Value == Visibility.Hidden);
         }
 

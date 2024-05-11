@@ -18,7 +18,7 @@ using osuTK.Input;
 namespace osu.Game.Tests.Visual.Settings
 {
     [TestFixture]
-    public class TestSceneSettingsPanel : OsuManualInputManagerTestScene
+    public partial class TestSceneSettingsPanel : OsuManualInputManagerTestScene
     {
         private SettingsPanel settings;
         private DialogOverlay dialogOverlay;
@@ -35,20 +35,27 @@ namespace osu.Game.Tests.Visual.Settings
                     State = { Value = Visibility.Visible }
                 });
             });
+        }
 
-            AddStep("reset mouse", () => InputManager.MoveMouseTo(settings));
+        [Test]
+        public void TestBasic()
+        {
+            AddStep("do nothing", () => { });
+            AddToggleStep("toggle visibility", visible => settings.State.Value = visible ? Visibility.Visible : Visibility.Hidden);
         }
 
         [Test]
         public void TestFiltering([Values] bool beforeLoad)
         {
+            AddStep("reset mouse", () => InputManager.MoveMouseTo(settings));
+
             if (beforeLoad)
-                AddStep("set filter", () => settings.SectionsContainer.ChildrenOfType<SearchTextBox>().First().Current.Value = "scaling");
+                AddStep("set filter", () => settings.SectionsContainer.ChildrenOfType<SettingsSearchTextBox>().First().Current.Value = "scaling");
 
             AddUntilStep("wait for items to load", () => settings.SectionsContainer.ChildrenOfType<IFilterable>().Any());
 
             if (!beforeLoad)
-                AddStep("set filter", () => settings.SectionsContainer.ChildrenOfType<SearchTextBox>().First().Current.Value = "scaling");
+                AddStep("set filter", () => settings.SectionsContainer.ChildrenOfType<SettingsSearchTextBox>().First().Current.Value = "scaling");
 
             AddAssert("ensure all items match filter", () => settings.SectionsContainer
                                                                      .ChildrenOfType<SettingsSection>().Where(f => f.IsPresent)
@@ -56,7 +63,6 @@ namespace osu.Game.Tests.Visual.Settings
                                                                          section.Children.Where(f => f.IsPresent)
                                                                                 .OfType<ISettingsItem>()
                                                                                 .OfType<IFilterable>()
-                                                                                .Where(f => !(f is IHasFilterableChildren))
                                                                                 .All(f => f.FilterTerms.Any(t => t.ToString().Contains("scaling")))
                                                                      ));
 
@@ -67,14 +73,18 @@ namespace osu.Game.Tests.Visual.Settings
         [Test]
         public void TestFilterAfterLoad()
         {
+            AddStep("reset mouse", () => InputManager.MoveMouseTo(settings));
+
             AddUntilStep("wait for items to load", () => settings.SectionsContainer.ChildrenOfType<IFilterable>().Any());
 
-            AddStep("set filter", () => settings.SectionsContainer.ChildrenOfType<SearchTextBox>().First().Current.Value = "scaling");
+            AddStep("set filter", () => settings.SectionsContainer.ChildrenOfType<SettingsSearchTextBox>().First().Current.Value = "scaling");
         }
 
         [Test]
         public void ToggleVisibility()
         {
+            AddStep("reset mouse", () => InputManager.MoveMouseTo(settings));
+
             AddWaitStep("wait some", 5);
             AddToggleStep("toggle visibility", _ => settings.ToggleVisibility());
         }
@@ -82,8 +92,10 @@ namespace osu.Game.Tests.Visual.Settings
         [Test]
         public void TestTextboxFocusAfterNestedPanelBackButton()
         {
+            AddStep("reset mouse", () => InputManager.MoveMouseTo(settings));
+
             AddUntilStep("sections loaded", () => settings.SectionsContainer.Children.Count > 0);
-            AddUntilStep("top-level textbox focused", () => settings.SectionsContainer.ChildrenOfType<FocusedTextBox>().FirstOrDefault()?.HasFocus == true);
+            AddUntilStep("top-level textbox focused", () => settings.SectionsContainer.ChildrenOfType<SettingsSearchTextBox>().FirstOrDefault()?.HasFocus == true);
 
             AddStep("open key binding subpanel", () =>
             {
@@ -95,20 +107,22 @@ namespace osu.Game.Tests.Visual.Settings
 
             AddUntilStep("binding panel textbox focused", () => settings
                                                                 .ChildrenOfType<KeyBindingPanel>().FirstOrDefault()?
-                                                                .ChildrenOfType<FocusedTextBox>().FirstOrDefault()?.HasFocus == true);
+                                                                .ChildrenOfType<SettingsSearchTextBox>().FirstOrDefault()?.HasFocus == true);
 
             AddStep("Press back", () => settings
                                         .ChildrenOfType<KeyBindingPanel>().FirstOrDefault()?
-                                        .ChildrenOfType<SettingsSubPanel.BackButton>().FirstOrDefault()?.TriggerClick());
+                                        .ChildrenOfType<SettingsSidebar.BackButton>().FirstOrDefault()?.TriggerClick());
 
-            AddUntilStep("top-level textbox focused", () => settings.SectionsContainer.ChildrenOfType<FocusedTextBox>().FirstOrDefault()?.HasFocus == true);
+            AddUntilStep("top-level textbox focused", () => settings.SectionsContainer.ChildrenOfType<SettingsSearchTextBox>().FirstOrDefault()?.HasFocus == true);
         }
 
         [Test]
         public void TestTextboxFocusAfterNestedPanelEscape()
         {
+            AddStep("reset mouse", () => InputManager.MoveMouseTo(settings));
+
             AddUntilStep("sections loaded", () => settings.SectionsContainer.Children.Count > 0);
-            AddUntilStep("top-level textbox focused", () => settings.SectionsContainer.ChildrenOfType<FocusedTextBox>().FirstOrDefault()?.HasFocus == true);
+            AddUntilStep("top-level textbox focused", () => settings.SectionsContainer.ChildrenOfType<SettingsSearchTextBox>().FirstOrDefault()?.HasFocus == true);
 
             AddStep("open key binding subpanel", () =>
             {
@@ -120,11 +134,22 @@ namespace osu.Game.Tests.Visual.Settings
 
             AddUntilStep("binding panel textbox focused", () => settings
                                                                 .ChildrenOfType<KeyBindingPanel>().FirstOrDefault()?
-                                                                .ChildrenOfType<FocusedTextBox>().FirstOrDefault()?.HasFocus == true);
+                                                                .ChildrenOfType<SettingsSearchTextBox>().FirstOrDefault()?.HasFocus == true);
 
             AddStep("Escape", () => InputManager.Key(Key.Escape));
 
-            AddUntilStep("top-level textbox focused", () => settings.SectionsContainer.ChildrenOfType<FocusedTextBox>().FirstOrDefault()?.HasFocus == true);
+            AddUntilStep("top-level textbox focused", () => settings.SectionsContainer.ChildrenOfType<SettingsSearchTextBox>().FirstOrDefault()?.HasFocus == true);
+        }
+
+        [Test]
+        public void TestSearchTextBoxSelectedOnShow()
+        {
+            SettingsSearchTextBox searchTextBox = null!;
+
+            AddStep("set text", () => (searchTextBox = settings.SectionsContainer.ChildrenOfType<SettingsSearchTextBox>().First()).Current.Value = "some text");
+            AddAssert("no text selected", () => searchTextBox.SelectedText == string.Empty);
+            AddRepeatStep("toggle visibility", () => settings.ToggleVisibility(), 2);
+            AddAssert("search text selected", () => searchTextBox.SelectedText == searchTextBox.Current.Value);
         }
 
         [BackgroundDependencyLoader]

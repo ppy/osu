@@ -17,7 +17,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
     /// <summary>
     /// Visualises connections between <see cref="DrawableOsuHitObject"/>s.
     /// </summary>
-    public class FollowPointRenderer : PooledDrawableWithLifetimeContainer<FollowPointLifetimeEntry, FollowPointConnection>
+    public partial class FollowPointRenderer : PooledDrawableWithLifetimeContainer<FollowPointLifetimeEntry, FollowPointConnection>
     {
         public new IReadOnlyList<FollowPointLifetimeEntry> Entries => lifetimeEntries;
 

@@ -1,7 +1,5 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using System;
 using osu.Framework.Graphics;
@@ -13,7 +11,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public class TestSceneDrawableDate : OsuTestScene
+    public partial class TestSceneDrawableDate : OsuTestScene
     {
         public TestSceneDrawableDate()
         {
@@ -36,7 +34,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             };
         }
 
-        private class PokeyDrawableDate : CompositeDrawable
+        private partial class PokeyDrawableDate : CompositeDrawable
         {
             public PokeyDrawableDate(DateTimeOffset date)
             {

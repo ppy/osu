@@ -1,10 +1,10 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
+using System;
 using System.Collections.Generic;
 using System.IO;
+using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.IO.FileAbstraction;
 using osu.Game.Rulesets.Edit.Checks.Components;
@@ -45,7 +45,7 @@ namespace osu.Game.Rulesets.Edit.Checks
 
             foreach (string filename in videoPaths)
             {
-                string storagePath = beatmapSet?.GetPathForFile(filename);
+                string? storagePath = beatmapSet?.GetPathForFile(filename);
 
                 if (storagePath == null)
                 {
@@ -76,6 +76,11 @@ namespace osu.Game.Rulesets.Edit.Checks
                 catch (UnsupportedFormatException)
                 {
                     issue = new IssueTemplateFileError(this).Create(filename, "Unsupported format");
+                }
+                catch (Exception ex)
+                {
+                    issue = new IssueTemplateFileError(this).Create(filename, "Internal failure - see logs for more info");
+                    Logger.Log($"Failed when running {nameof(CheckAudioInVideo)}: {ex}");
                 }
 
                 yield return issue;

@@ -11,7 +11,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Catch.Mods
 {
-    public class CatchModFlashlight : ModFlashlight<CatchHitObject>
+    public partial class CatchModFlashlight : ModFlashlight<CatchHitObject>
     {
         public override double ScoreMultiplier => UsesDefaultConfiguration ? 1.12 : 1;
 
@@ -36,7 +36,7 @@ namespace osu.Game.Rulesets.Catch.Mods
             base.ApplyToDrawableRuleset(drawableRuleset);
         }
 
-        private class CatchFlashlight : Flashlight
+        private partial class CatchFlashlight : Flashlight
         {
             private readonly CatchPlayfield playfield;
 

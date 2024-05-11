@@ -4,6 +4,7 @@
 #nullable disable
 
 using System;
+using JetBrains.Annotations;
 using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -25,8 +26,13 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.Play
 {
-    public class SkipOverlay : CompositeDrawable, IKeyBindingHandler<GlobalAction>
+    public partial class SkipOverlay : CompositeDrawable, IKeyBindingHandler<GlobalAction>
     {
+        /// <summary>
+        /// The total number of successful skips performed by this overlay.
+        /// </summary>
+        public int SkipCount { get; private set; }
+
         private readonly double startTime;
 
         public Action RequestSkip;
@@ -124,23 +130,36 @@ namespace osu.Game.Screens.Play
                 return;
             }
 
-            button.Action = () => RequestSkip?.Invoke();
+            button.Action = () =>
+            {
+                SkipCount++;
+                RequestSkip?.Invoke();
+            };
 
             fadeContainer.TriggerShow();
-
-            if (skipQueued)
-            {
-                Scheduler.AddDelayed(() => button.TriggerClick(), 200);
-                skipQueued = false;
-            }
         }
 
+        /// <summary>
+        /// Triggers an "automated" skip to happen as soon as available.
+        /// </summary>
         public void SkipWhenReady()
         {
-            if (IsLoaded)
+            if (skipQueued) return;
+
+            skipQueued = true;
+            attemptNextSkip();
+
+            void attemptNextSkip() => Scheduler.AddDelayed(() =>
+            {
+                if (!button.Enabled.Value)
+                {
+                    skipQueued = false;
+                    return;
+                }
+
                 button.TriggerClick();
-            else
-                skipQueued = true;
+                attemptNextSkip();
+            }, 200);
         }
 
         protected override void Update()
@@ -191,8 +210,9 @@ namespace osu.Game.Screens.Play
         {
         }
 
-        public class FadeContainer : Container, IStateful<Visibility>
+        public partial class FadeContainer : Container, IStateful<Visibility>
         {
+            [CanBeNull]
             public event Action<Visibility> StateChanged;
 
             private Visibility state;
@@ -269,14 +289,14 @@ namespace osu.Game.Screens.Play
             public override void Show() => State = Visibility.Visible;
         }
 
-        private class ButtonContainer : VisibilityContainer
+        private partial class ButtonContainer : VisibilityContainer
         {
             protected override void PopIn() => this.FadeIn(fade_time);
 
             protected override void PopOut() => this.FadeOut(fade_time);
         }
 
-        private class Button : OsuClickableContainer
+        private partial class Button : OsuClickableContainer
         {
             private Color4 colourNormal;
             private Color4 colourHover;

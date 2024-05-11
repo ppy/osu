@@ -12,7 +12,7 @@ using osu.Game.Online.API;
 
 namespace osu.Game.Overlays
 {
-    public abstract class TabbableOnlineOverlay<THeader, TEnum> : OnlineOverlay<THeader>
+    public abstract partial class TabbableOnlineOverlay<THeader, TEnum> : OnlineOverlay<THeader>
         where THeader : TabControlOverlayHeader<TEnum>
     {
         private readonly IBindable<APIState> apiState = new Bindable<APIState>();

@@ -4,11 +4,15 @@
 #nullable disable
 
 using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using Newtonsoft.Json;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Beatmaps.Legacy;
+using osu.Game.Database;
 using osu.Game.IO.Legacy;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Replays;
@@ -16,6 +20,7 @@ using osu.Game.Replays.Legacy;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Replays;
+using osu.Game.Rulesets.Scoring;
 using SharpCompress.Compressors.LZMA;
 
 namespace osu.Game.Scoring.Legacy
@@ -35,6 +40,7 @@ namespace osu.Game.Scoring.Legacy
             };
 
             WorkingBeatmap workingBeatmap;
+            ScoreRank? decodedRank = null;
 
             using (SerializationReader sr = new SerializationReader(stream))
             {
@@ -45,9 +51,21 @@ namespace osu.Game.Scoring.Legacy
 
                 int version = sr.ReadInt32();
 
-                workingBeatmap = GetBeatmap(sr.ReadString());
+                scoreInfo.IsLegacyScore = version < LegacyScoreEncoder.FIRST_LAZER_VERSION;
+
+                // TotalScoreVersion gets initialised to LATEST_VERSION.
+                // In the case where the incoming score has either an osu!stable or old lazer version, we need
+                // to mark it with the correct version increment to trigger reprocessing to new standardised scoring.
+                //
+                // See StandardisedScoreMigrationTools.ShouldMigrateToNewStandardised().
+                scoreInfo.TotalScoreVersion = version < 30000002 ? 30000001 : LegacyScoreEncoder.LATEST_VERSION;
+
+                string beatmapHash = sr.ReadString();
+
+                workingBeatmap = GetBeatmap(beatmapHash);
+
                 if (workingBeatmap is DummyWorkingBeatmap)
-                    throw new BeatmapNotFoundException();
+                    throw new BeatmapNotFoundException(beatmapHash);
 
                 scoreInfo.User = new APIUser { Username = sr.ReadString() };
 
@@ -87,151 +105,158 @@ namespace osu.Game.Scoring.Legacy
                 byte[] compressedReplay = sr.ReadByteArray();
 
                 if (version >= 20140721)
-                    scoreInfo.OnlineID = sr.ReadInt64();
+                    scoreInfo.LegacyOnlineID = sr.ReadInt64();
                 else if (version >= 20121008)
-                    scoreInfo.OnlineID = sr.ReadInt32();
+                    scoreInfo.LegacyOnlineID = sr.ReadInt32();
+
+                byte[] compressedScoreInfo = null;
+
+                if (version >= 30000001)
+                    compressedScoreInfo = sr.ReadByteArray();
 
                 if (compressedReplay?.Length > 0)
+                    readCompressedData(compressedReplay, reader => readLegacyReplay(score.Replay, reader));
+
+                if (compressedScoreInfo?.Length > 0)
                 {
-                    using (var replayInStream = new MemoryStream(compressedReplay))
+                    readCompressedData(compressedScoreInfo, reader =>
                     {
-                        byte[] properties = new byte[5];
-                        if (replayInStream.Read(properties, 0, 5) != 5)
-                            throw new IOException("input .lzma is too short");
+                        LegacyReplaySoloScoreInfo readScore = JsonConvert.DeserializeObject<LegacyReplaySoloScoreInfo>(reader.ReadToEnd());
 
-                        long outSize = 0;
+                        Debug.Assert(readScore != null);
 
-                        for (int i = 0; i < 8; i++)
-                        {
-                            int v = replayInStream.ReadByte();
-                            if (v < 0)
-                                throw new IOException("Can't Read 1");
+                        score.ScoreInfo.OnlineID = readScore.OnlineID;
+                        score.ScoreInfo.Statistics = readScore.Statistics;
+                        score.ScoreInfo.MaximumStatistics = readScore.MaximumStatistics;
+                        score.ScoreInfo.Mods = readScore.Mods.Select(m => m.ToMod(currentRuleset)).ToArray();
+                        score.ScoreInfo.ClientVersion = readScore.ClientVersion;
+                        decodedRank = readScore.Rank;
+                        if (readScore.UserID > 1)
+                            score.ScoreInfo.RealmUser.OnlineID = readScore.UserID;
 
-                            outSize |= (long)(byte)v << (8 * i);
-                        }
-
-                        long compressedSize = replayInStream.Length - replayInStream.Position;
-
-                        using (var lzma = new LzmaStream(properties, replayInStream, compressedSize, outSize))
-                        using (var reader = new StreamReader(lzma))
-                            readLegacyReplay(score.Replay, reader);
-                    }
+                        if (readScore.TotalScoreWithoutMods is long totalScoreWithoutMods)
+                            score.ScoreInfo.TotalScoreWithoutMods = totalScoreWithoutMods;
+                        else
+                            PopulateTotalScoreWithoutMods(score.ScoreInfo);
+                    });
                 }
             }
 
-            PopulateAccuracy(score.ScoreInfo);
+            PopulateMaximumStatistics(score.ScoreInfo, workingBeatmap);
+
+            if (score.ScoreInfo.IsLegacyScore)
+                score.ScoreInfo.LegacyTotalScore = score.ScoreInfo.TotalScore;
+
+            StandardisedScoreMigrationTools.UpdateFromLegacy(score.ScoreInfo, workingBeatmap);
+
+            if (decodedRank != null)
+                score.ScoreInfo.Rank = decodedRank.Value;
 
             // before returning for database import, we must restore the database-sourced BeatmapInfo.
             // if not, the clone operation in GetPlayableBeatmap will cause a dereference and subsequent database exception.
             score.ScoreInfo.BeatmapInfo = workingBeatmap.BeatmapInfo;
+            score.ScoreInfo.BeatmapHash = workingBeatmap.BeatmapInfo.Hash;
 
             return score;
         }
 
-        /// <summary>
-        /// Populates the accuracy of a given <see cref="ScoreInfo"/> from its contained statistics.
-        /// </summary>
-        /// <remarks>
-        /// Legacy use only.
-        /// </remarks>
-        /// <param name="score">The <see cref="ScoreInfo"/> to populate.</param>
-        public static void PopulateAccuracy(ScoreInfo score)
+        private void readCompressedData(byte[] data, Action<StreamReader> readFunc)
         {
-            int countMiss = score.GetCountMiss() ?? 0;
-            int count50 = score.GetCount50() ?? 0;
-            int count100 = score.GetCount100() ?? 0;
-            int count300 = score.GetCount300() ?? 0;
-            int countGeki = score.GetCountGeki() ?? 0;
-            int countKatu = score.GetCountKatu() ?? 0;
-
-            switch (score.Ruleset.OnlineID)
+            using (var replayInStream = new MemoryStream(data))
             {
-                case 0:
+                byte[] properties = new byte[5];
+                if (replayInStream.Read(properties, 0, 5) != 5)
+                    throw new IOException("input .lzma is too short");
+
+                long outSize = 0;
+
+                for (int i = 0; i < 8; i++)
                 {
-                    int totalHits = count50 + count100 + count300 + countMiss;
-                    score.Accuracy = totalHits > 0 ? (double)(count50 * 50 + count100 * 100 + count300 * 300) / (totalHits * 300) : 1;
+                    int v = replayInStream.ReadByte();
+                    if (v < 0)
+                        throw new IOException("Can't Read 1");
 
-                    float ratio300 = (float)count300 / totalHits;
-                    float ratio50 = (float)count50 / totalHits;
-
-                    if (ratio300 == 1)
-                        score.Rank = score.Mods.Any(m => m is ModHidden || m is ModFlashlight) ? ScoreRank.XH : ScoreRank.X;
-                    else if (ratio300 > 0.9 && ratio50 <= 0.01 && countMiss == 0)
-                        score.Rank = score.Mods.Any(m => m is ModHidden || m is ModFlashlight) ? ScoreRank.SH : ScoreRank.S;
-                    else if ((ratio300 > 0.8 && countMiss == 0) || ratio300 > 0.9)
-                        score.Rank = ScoreRank.A;
-                    else if ((ratio300 > 0.7 && countMiss == 0) || ratio300 > 0.8)
-                        score.Rank = ScoreRank.B;
-                    else if (ratio300 > 0.6)
-                        score.Rank = ScoreRank.C;
-                    else
-                        score.Rank = ScoreRank.D;
-                    break;
+                    outSize |= (long)(byte)v << (8 * i);
                 }
 
-                case 1:
+                long compressedSize = replayInStream.Length - replayInStream.Position;
+
+                using (var lzma = new LzmaStream(properties, replayInStream, compressedSize, outSize))
+                using (var reader = new StreamReader(lzma))
+                    readFunc(reader);
+            }
+        }
+
+        /// <summary>
+        /// Populates the <see cref="ScoreInfo.MaximumStatistics"/> for a given <see cref="ScoreInfo"/>.
+        /// </summary>
+        /// <param name="score">The score to populate the statistics of.</param>
+        /// <param name="workingBeatmap">The corresponding <see cref="WorkingBeatmap"/>.</param>
+        public static void PopulateMaximumStatistics(ScoreInfo score, WorkingBeatmap workingBeatmap)
+        {
+            Debug.Assert(score.BeatmapInfo != null);
+
+            if (score.MaximumStatistics.Select(kvp => kvp.Value).Sum() > 0)
+                return;
+
+            var ruleset = score.Ruleset.Detach();
+            var rulesetInstance = ruleset.CreateInstance();
+            var scoreProcessor = rulesetInstance.CreateScoreProcessor();
+
+            // Populate the maximum statistics.
+            HitResult maxBasicResult = rulesetInstance.GetHitResults()
+                                                      .Select(h => h.result)
+                                                      .Where(h => h.IsBasic()).MaxBy(scoreProcessor.GetBaseScoreForResult);
+
+            foreach ((HitResult result, int count) in score.Statistics)
+            {
+                switch (result)
                 {
-                    int totalHits = count50 + count100 + count300 + countMiss;
-                    score.Accuracy = totalHits > 0 ? (double)(count100 * 150 + count300 * 300) / (totalHits * 300) : 1;
+                    case HitResult.LargeTickHit:
+                    case HitResult.LargeTickMiss:
+                        score.MaximumStatistics[HitResult.LargeTickHit] = score.MaximumStatistics.GetValueOrDefault(HitResult.LargeTickHit) + count;
+                        break;
 
-                    float ratio300 = (float)count300 / totalHits;
-                    float ratio50 = (float)count50 / totalHits;
+                    case HitResult.SmallTickHit:
+                    case HitResult.SmallTickMiss:
+                        score.MaximumStatistics[HitResult.SmallTickHit] = score.MaximumStatistics.GetValueOrDefault(HitResult.SmallTickHit) + count;
+                        break;
 
-                    if (ratio300 == 1)
-                        score.Rank = score.Mods.Any(m => m is ModHidden || m is ModFlashlight) ? ScoreRank.XH : ScoreRank.X;
-                    else if (ratio300 > 0.9 && ratio50 <= 0.01 && countMiss == 0)
-                        score.Rank = score.Mods.Any(m => m is ModHidden || m is ModFlashlight) ? ScoreRank.SH : ScoreRank.S;
-                    else if ((ratio300 > 0.8 && countMiss == 0) || ratio300 > 0.9)
-                        score.Rank = ScoreRank.A;
-                    else if ((ratio300 > 0.7 && countMiss == 0) || ratio300 > 0.8)
-                        score.Rank = ScoreRank.B;
-                    else if (ratio300 > 0.6)
-                        score.Rank = ScoreRank.C;
-                    else
-                        score.Rank = ScoreRank.D;
-                    break;
-                }
+                    case HitResult.IgnoreHit:
+                    case HitResult.IgnoreMiss:
+                    case HitResult.SmallBonus:
+                    case HitResult.LargeBonus:
+                        break;
 
-                case 2:
-                {
-                    int totalHits = count50 + count100 + count300 + countMiss + countKatu;
-                    score.Accuracy = totalHits > 0 ? (double)(count50 + count100 + count300) / totalHits : 1;
-
-                    if (score.Accuracy == 1)
-                        score.Rank = score.Mods.Any(m => m is ModHidden || m is ModFlashlight) ? ScoreRank.XH : ScoreRank.X;
-                    else if (score.Accuracy > 0.98)
-                        score.Rank = score.Mods.Any(m => m is ModHidden || m is ModFlashlight) ? ScoreRank.SH : ScoreRank.S;
-                    else if (score.Accuracy > 0.94)
-                        score.Rank = ScoreRank.A;
-                    else if (score.Accuracy > 0.9)
-                        score.Rank = ScoreRank.B;
-                    else if (score.Accuracy > 0.85)
-                        score.Rank = ScoreRank.C;
-                    else
-                        score.Rank = ScoreRank.D;
-                    break;
-                }
-
-                case 3:
-                {
-                    int totalHits = count50 + count100 + count300 + countMiss + countGeki + countKatu;
-                    score.Accuracy = totalHits > 0 ? (double)(count50 * 50 + count100 * 100 + countKatu * 200 + (count300 + countGeki) * 300) / (totalHits * 300) : 1;
-
-                    if (score.Accuracy == 1)
-                        score.Rank = score.Mods.Any(m => m is ModHidden || m is ModFlashlight) ? ScoreRank.XH : ScoreRank.X;
-                    else if (score.Accuracy > 0.95)
-                        score.Rank = score.Mods.Any(m => m is ModHidden || m is ModFlashlight) ? ScoreRank.SH : ScoreRank.S;
-                    else if (score.Accuracy > 0.9)
-                        score.Rank = ScoreRank.A;
-                    else if (score.Accuracy > 0.8)
-                        score.Rank = ScoreRank.B;
-                    else if (score.Accuracy > 0.7)
-                        score.Rank = ScoreRank.C;
-                    else
-                        score.Rank = ScoreRank.D;
-                    break;
+                    default:
+                        score.MaximumStatistics[maxBasicResult] = score.MaximumStatistics.GetValueOrDefault(maxBasicResult) + count;
+                        break;
                 }
             }
+
+            if (!score.IsLegacyScore)
+                return;
+
+#pragma warning disable CS0618
+            // In osu! and osu!mania, some judgements affect combo but aren't stored to scores.
+            // A special hit result is used to pad out the combo value to match, based on the max combo from the difficulty attributes.
+            var calculator = rulesetInstance.CreateDifficultyCalculator(workingBeatmap);
+            var attributes = calculator.Calculate(score.Mods);
+
+            int maxComboFromStatistics = score.MaximumStatistics.Where(kvp => kvp.Key.AffectsCombo()).Select(kvp => kvp.Value).DefaultIfEmpty(0).Sum();
+            if (attributes.MaxCombo > maxComboFromStatistics)
+                score.MaximumStatistics[HitResult.LegacyComboIncrease] = attributes.MaxCombo - maxComboFromStatistics;
+#pragma warning restore CS0618
+        }
+
+        public static void PopulateTotalScoreWithoutMods(ScoreInfo score)
+        {
+            double modMultiplier = 1;
+
+            foreach (var mod in score.Mods)
+                modMultiplier *= mod.ScoreMultiplier;
+
+            score.TotalScoreWithoutMods = (long)Math.Round(score.TotalScore / modMultiplier);
         }
 
         private void readLegacyReplay(Replay replay, StreamReader reader)
@@ -310,9 +335,11 @@ namespace osu.Game.Scoring.Legacy
 
         public class BeatmapNotFoundException : Exception
         {
-            public BeatmapNotFoundException()
-                : base("No corresponding beatmap for the score could be found.")
+            public string Hash { get; }
+
+            public BeatmapNotFoundException(string hash)
             {
+                Hash = hash;
             }
         }
     }

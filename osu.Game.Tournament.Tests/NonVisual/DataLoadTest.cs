@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.IO;
 using System.Threading.Tasks;
@@ -17,7 +15,7 @@ using osu.Game.Tests;
 
 namespace osu.Game.Tournament.Tests.NonVisual
 {
-    public class DataLoadTest : TournamentHostTest
+    public partial class DataLoadTest : TournamentHostTest
     {
         [Test]
         public void TestRulesetGetsValidOnlineID()
@@ -78,14 +76,14 @@ namespace osu.Game.Tournament.Tests.NonVisual
             }
         }
 
-        public class TestTournament : TournamentGameBase
+        public partial class TestTournament : TournamentGameBase
         {
             private readonly bool resetRuleset;
-            private readonly Action runOnLoadComplete;
+            private readonly Action? runOnLoadComplete;
 
             public new Task BracketLoadTask => base.BracketLoadTask;
 
-            public TestTournament(bool resetRuleset = false, [InstantHandle] Action runOnLoadComplete = null)
+            public TestTournament(bool resetRuleset = false, [InstantHandle] Action? runOnLoadComplete = null)
             {
                 this.resetRuleset = resetRuleset;
                 this.runOnLoadComplete = runOnLoadComplete;

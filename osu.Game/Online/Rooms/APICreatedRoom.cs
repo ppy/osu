@@ -7,7 +7,7 @@ using Newtonsoft.Json;
 
 namespace osu.Game.Online.Rooms
 {
-    public class APICreatedRoom : Room
+    public partial class APICreatedRoom : Room
     {
         [JsonProperty("error")]
         public string Error { get; set; }

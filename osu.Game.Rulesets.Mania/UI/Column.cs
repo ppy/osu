@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Pooling;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Platform;
+using osu.Game.Extensions;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
@@ -26,7 +27,7 @@ using osuTK.Graphics;
 namespace osu.Game.Rulesets.Mania.UI
 {
     [Cached]
-    public class Column : ScrollingPlayfield, IKeyBindingHandler<ManiaAction>
+    public partial class Column : ScrollingPlayfield, IKeyBindingHandler<ManiaAction>
     {
         public const float COLUMN_WIDTH = 80;
         public const float SPECIAL_COLUMN_WIDTH = 70;
@@ -39,7 +40,11 @@ namespace osu.Game.Rulesets.Mania.UI
         public readonly Bindable<ManiaAction> Action = new Bindable<ManiaAction>();
 
         public readonly ColumnHitObjectArea HitObjectArea;
+
+        internal readonly Container BackgroundContainer = new Container { RelativeSizeAxes = Axes.Both };
+
         internal readonly Container TopLevelContainer = new Container { RelativeSizeAxes = Axes.Both };
+
         private DrawablePool<PoolableHitExplosion> hitExplosionPool;
         private readonly OrderedHitPolicy hitPolicy;
         public Container UnderlayElements => HitObjectArea.UnderlayElements;
@@ -76,49 +81,38 @@ namespace osu.Game.Rulesets.Mania.UI
             skin.SourceChanged += onSourceChanged;
             onSourceChanged();
 
-            Drawable background = new SkinnableDrawable(new ManiaSkinComponent(ManiaSkinComponents.ColumnBackground), _ => new DefaultColumnBackground())
-            {
-                RelativeSizeAxes = Axes.Both,
-            };
-
-            InternalChildren = new[]
+            InternalChildren = new Drawable[]
             {
                 hitExplosionPool = new DrawablePool<PoolableHitExplosion>(5),
                 sampleTriggerSource = new GameplaySampleTriggerSource(HitObjectContainer),
-                // For input purposes, the background is added at the highest depth, but is then proxied back below all other elements
-                background.CreateProxy(),
                 HitObjectArea,
-                keyArea = new SkinnableDrawable(new ManiaSkinComponent(ManiaSkinComponents.KeyArea), _ => new DefaultKeyArea())
+                keyArea = new SkinnableDrawable(new ManiaSkinComponentLookup(ManiaSkinComponents.KeyArea), _ => new DefaultKeyArea())
                 {
                     RelativeSizeAxes = Axes.Both,
                 },
-                background,
+                // For input purposes, the background is added at the highest depth, but is then proxied back below all other elements externally
+                // (see `Stage.columnBackgrounds`).
+                BackgroundContainer,
                 TopLevelContainer,
                 new ColumnTouchInputArea(this)
             };
 
-            applyGameWideClock(background);
-            applyGameWideClock(keyArea);
+            var background = new SkinnableDrawable(new ManiaSkinComponentLookup(ManiaSkinComponents.ColumnBackground), _ => new DefaultColumnBackground())
+            {
+                RelativeSizeAxes = Axes.Both,
+            };
 
+            background.ApplyGameWideClock(host);
+            keyArea.ApplyGameWideClock(host);
+
+            BackgroundContainer.Add(background);
             TopLevelContainer.Add(HitObjectArea.Explosions.CreateProxy());
 
             RegisterPool<Note, DrawableNote>(10, 50);
             RegisterPool<HoldNote, DrawableHoldNote>(10, 50);
             RegisterPool<HeadNote, DrawableHoldNoteHead>(10, 50);
             RegisterPool<TailNote, DrawableHoldNoteTail>(10, 50);
-            RegisterPool<HoldNoteTick, DrawableHoldNoteTick>(50, 250);
-
-            // Some elements don't handle rewind correctly and fixing them is non-trivial.
-            // In the future we need a better solution to this, but as a temporary work-around, give these components the game-wide
-            // clock so they don't need to worry about rewind.
-            // This only works because they handle OnPressed/OnReleased which results in a correct state while rewinding.
-            //
-            // This is kinda dodgy (and will cause weirdness when pausing gameplay) but is better than completely broken rewind.
-            void applyGameWideClock(Drawable drawable)
-            {
-                drawable.Clock = host.UpdateThread.Clock;
-                drawable.ProcessCustomClock = false;
-            }
+            RegisterPool<HoldNoteBody, DrawableHoldNoteBody>(10, 50);
         }
 
         private void onSourceChanged()
@@ -134,6 +128,9 @@ namespace osu.Game.Rulesets.Mania.UI
 
         protected override void Dispose(bool isDisposing)
         {
+            // must happen before children are disposed in base call to prevent illegal accesses to the hit explosion pool.
+            NewResult -= OnNewResult;
+
             base.Dispose(isDisposing);
 
             if (skin != null)
@@ -185,7 +182,7 @@ namespace osu.Game.Rulesets.Mania.UI
             // This probably shouldn't exist as is, but the columns in the stage are separated by a 1px border
             => DrawRectangle.Inflate(new Vector2(Stage.COLUMN_SPACING / 2, 0)).Contains(ToLocalSpace(screenSpacePos));
 
-        public class ColumnTouchInputArea : Drawable
+        public partial class ColumnTouchInputArea : Drawable
         {
             private readonly Column column;
 
@@ -204,18 +201,6 @@ namespace osu.Game.Rulesets.Mania.UI
             protected override void LoadComplete()
             {
                 keyBindingContainer = maniaInputManager?.KeyBindingContainer;
-            }
-
-            protected override bool OnMouseDown(MouseDownEvent e)
-            {
-                keyBindingContainer?.TriggerPressed(column.Action.Value);
-                return base.OnMouseDown(e);
-            }
-
-            protected override void OnMouseUp(MouseUpEvent e)
-            {
-                keyBindingContainer?.TriggerReleased(column.Action.Value);
-                base.OnMouseUp(e);
             }
 
             protected override bool OnTouchDown(TouchDownEvent e)

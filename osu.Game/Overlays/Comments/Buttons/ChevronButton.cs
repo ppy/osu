@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Framework.Bindables;
@@ -12,7 +10,7 @@ using osu.Framework.Allocation;
 
 namespace osu.Game.Overlays.Comments.Buttons
 {
-    public class ChevronButton : OsuHoverContainer
+    public partial class ChevronButton : OsuHoverContainer
     {
         public readonly BindableBool Expanded = new BindableBool(true);
 

@@ -1,9 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
@@ -18,14 +17,17 @@ using osu.Framework.Platform;
 using osu.Framework.Threading;
 using osu.Game.Configuration;
 using osu.Game.Input.Bindings;
+using osu.Game.Online.Multiplayer;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats.Jpeg;
+using SixLabors.ImageSharp.PixelFormats;
+using SixLabors.ImageSharp.Processing;
 
 namespace osu.Game.Graphics
 {
-    public class ScreenshotManager : Component, IKeyBindingHandler<GlobalAction>, IHandleGlobalKeyboardInput
+    public partial class ScreenshotManager : Component, IKeyBindingHandler<GlobalAction>, IHandleGlobalKeyboardInput
     {
         private readonly BindableBool cursorVisibility = new BindableBool(true);
 
@@ -35,27 +37,26 @@ namespace osu.Game.Graphics
         /// </summary>
         public IBindable<bool> CursorVisibility => cursorVisibility;
 
-        private Bindable<ScreenshotFormat> screenshotFormat;
-        private Bindable<bool> captureMenuCursor;
+        [Resolved]
+        private GameHost host { get; set; } = null!;
 
         [Resolved]
-        private GameHost host { get; set; }
-
-        private Storage storage;
+        private Clipboard clipboard { get; set; } = null!;
 
         [Resolved]
-        private INotificationOverlay notificationOverlay { get; set; }
+        private INotificationOverlay notificationOverlay { get; set; } = null!;
 
-        private Sample shutter;
+        [Resolved]
+        private OsuConfigManager config { get; set; } = null!;
+
+        private Storage storage = null!;
+
+        private Sample? shutter;
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config, Storage storage, AudioManager audio)
+        private void load(Storage storage, AudioManager audio)
         {
             this.storage = storage.GetStorageForDirectory(@"screenshots");
-
-            screenshotFormat = config.GetBindable<ScreenshotFormat>(OsuSetting.ScreenshotFormat);
-            captureMenuCursor = config.GetBindable<bool>(OsuSetting.ScreenshotCaptureMenuCursor);
-
             shutter = audio.Samples.Get("UI/shutter");
         }
 
@@ -67,8 +68,8 @@ namespace osu.Game.Graphics
             switch (e.Action)
             {
                 case GlobalAction.TakeScreenshot:
-                    shutter.Play();
-                    TakeScreenshotAsync();
+                    shutter?.Play();
+                    TakeScreenshotAsync().FireAndForget();
                     return true;
             }
 
@@ -85,90 +86,127 @@ namespace osu.Game.Graphics
         {
             Interlocked.Increment(ref screenShotTasks);
 
-            if (!captureMenuCursor.Value)
+            ScreenshotFormat screenshotFormat = config.Get<ScreenshotFormat>(OsuSetting.ScreenshotFormat);
+            bool captureMenuCursor = config.Get<bool>(OsuSetting.ScreenshotCaptureMenuCursor);
+
+            try
             {
-                cursorVisibility.Value = false;
-
-                // We need to wait for at most 3 draw nodes to be drawn, following which we can be assured at least one DrawNode has been generated/drawn with the set value
-                const int frames_to_wait = 3;
-
-                int framesWaited = 0;
-
-                using (var framesWaitedEvent = new ManualResetEventSlim(false))
+                if (!captureMenuCursor)
                 {
-                    ScheduledDelegate waitDelegate = host.DrawThread.Scheduler.AddDelayed(() =>
+                    cursorVisibility.Value = false;
+
+                    // We need to wait for at most 3 draw nodes to be drawn, following which we can be assured at least one DrawNode has been generated/drawn with the set value
+                    const int frames_to_wait = 3;
+
+                    int framesWaited = 0;
+
+                    using (ManualResetEventSlim framesWaitedEvent = new ManualResetEventSlim(false))
                     {
-                        if (framesWaited++ >= frames_to_wait)
-                            // ReSharper disable once AccessToDisposedClosure
-                            framesWaitedEvent.Set();
-                    }, 10, true);
+                        ScheduledDelegate waitDelegate = host.DrawThread.Scheduler.AddDelayed(() =>
+                        {
+                            if (framesWaited++ >= frames_to_wait)
+                                // ReSharper disable once AccessToDisposedClosure
+                                framesWaitedEvent.Set();
+                        }, 10, true);
 
-                    if (!framesWaitedEvent.Wait(1000))
-                        throw new TimeoutException("Screenshot data did not arrive in a timely fashion");
+                        if (!framesWaitedEvent.Wait(1000))
+                            throw new TimeoutException("Screenshot data did not arrive in a timely fashion");
 
-                    waitDelegate.Cancel();
+                        waitDelegate.Cancel();
+                    }
+                }
+
+                using (Image<Rgba32>? image = await host.TakeScreenshotAsync().ConfigureAwait(false))
+                {
+                    if (config.Get<ScalingMode>(OsuSetting.Scaling) == ScalingMode.Everything)
+                    {
+                        float posX = config.Get<float>(OsuSetting.ScalingPositionX);
+                        float posY = config.Get<float>(OsuSetting.ScalingPositionY);
+                        float sizeX = config.Get<float>(OsuSetting.ScalingSizeX);
+                        float sizeY = config.Get<float>(OsuSetting.ScalingSizeY);
+
+                        image.Mutate(m =>
+                        {
+                            Rectangle rect = new Rectangle(Point.Empty, m.GetCurrentSize());
+
+                            // Reduce size by user scale settings...
+                            int sx = (rect.Width - (int)(rect.Width * sizeX)) / 2;
+                            int sy = (rect.Height - (int)(rect.Height * sizeY)) / 2;
+                            rect.Inflate(-sx, -sy);
+
+                            // ...then adjust the region based on their positional offset.
+                            rect.X = (int)(rect.X * posX) * 2;
+                            rect.Y = (int)(rect.Y * posY) * 2;
+
+                            m.Crop(rect);
+                        });
+                    }
+
+                    clipboard.SetImage(image);
+
+                    (string? filename, Stream? stream) = getWritableStream(screenshotFormat);
+
+                    if (filename == null) return;
+
+                    using (stream)
+                    {
+                        switch (screenshotFormat)
+                        {
+                            case ScreenshotFormat.Png:
+                                await image.SaveAsPngAsync(stream).ConfigureAwait(false);
+                                break;
+
+                            case ScreenshotFormat.Jpg:
+                                const int jpeg_quality = 92;
+
+                                await image.SaveAsJpegAsync(stream, new JpegEncoder { Quality = jpeg_quality }).ConfigureAwait(false);
+                                break;
+
+                            default:
+                                throw new InvalidOperationException($"Unknown enum member {nameof(ScreenshotFormat)} {screenshotFormat}.");
+                        }
+                    }
+
+                    notificationOverlay.Post(new SimpleNotification
+                    {
+                        Text = $"Screenshot {filename} saved!",
+                        Activated = () =>
+                        {
+                            storage.PresentFileExternally(filename);
+                            return true;
+                        }
+                    });
                 }
             }
-
-            using (var image = await host.TakeScreenshotAsync().ConfigureAwait(false))
+            finally
             {
-                if (Interlocked.Decrement(ref screenShotTasks) == 0 && cursorVisibility.Value == false)
+                if (Interlocked.Decrement(ref screenShotTasks) == 0)
                     cursorVisibility.Value = true;
-
-                host.GetClipboard()?.SetImage(image);
-
-                string filename = getFilename();
-
-                if (filename == null) return;
-
-                using (var stream = storage.CreateFileSafely(filename))
-                {
-                    switch (screenshotFormat.Value)
-                    {
-                        case ScreenshotFormat.Png:
-                            await image.SaveAsPngAsync(stream).ConfigureAwait(false);
-                            break;
-
-                        case ScreenshotFormat.Jpg:
-                            const int jpeg_quality = 92;
-
-                            await image.SaveAsJpegAsync(stream, new JpegEncoder { Quality = jpeg_quality }).ConfigureAwait(false);
-                            break;
-
-                        default:
-                            throw new InvalidOperationException($"Unknown enum member {nameof(ScreenshotFormat)} {screenshotFormat.Value}.");
-                    }
-                }
-
-                notificationOverlay.Post(new SimpleNotification
-                {
-                    Text = $"{filename} saved!",
-                    Activated = () =>
-                    {
-                        storage.PresentFileExternally(filename);
-                        return true;
-                    }
-                });
             }
         });
 
-        private string getFilename()
+        private static readonly object filename_reservation_lock = new object();
+
+        private (string? filename, Stream? stream) getWritableStream(ScreenshotFormat format)
         {
-            var dt = DateTime.Now;
-            string fileExt = screenshotFormat.ToString().ToLowerInvariant();
-
-            string withoutIndex = $"osu_{dt:yyyy-MM-dd_HH-mm-ss}.{fileExt}";
-            if (!storage.Exists(withoutIndex))
-                return withoutIndex;
-
-            for (ulong i = 1; i < ulong.MaxValue; i++)
+            lock (filename_reservation_lock)
             {
-                string indexedName = $"osu_{dt:yyyy-MM-dd_HH-mm-ss}-{i}.{fileExt}";
-                if (!storage.Exists(indexedName))
-                    return indexedName;
-            }
+                DateTime dt = DateTime.Now;
+                string fileExt = format.ToString().ToLowerInvariant();
 
-            return null;
+                string withoutIndex = $"osu_{dt:yyyy-MM-dd_HH-mm-ss}.{fileExt}";
+                if (!storage.Exists(withoutIndex))
+                    return (withoutIndex, storage.GetStream(withoutIndex, FileAccess.Write, FileMode.Create));
+
+                for (ulong i = 1; i < ulong.MaxValue; i++)
+                {
+                    string indexedName = $"osu_{dt:yyyy-MM-dd_HH-mm-ss}-{i}.{fileExt}";
+                    if (!storage.Exists(indexedName))
+                        return (indexedName, storage.GetStream(indexedName, FileAccess.Write, FileMode.Create));
+                }
+
+                return (null, null);
+            }
         }
     }
 }

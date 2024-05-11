@@ -19,7 +19,7 @@ using osuTK;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    public class TestSceneCompletionCancellation : OsuPlayerTestScene
+    public partial class TestSceneCompletionCancellation : OsuPlayerTestScene
     {
         [Resolved]
         private AudioManager audio { get; set; }
@@ -28,6 +28,8 @@ namespace osu.Game.Tests.Visual.Gameplay
             (int)((Screens.Play.Player.RESULTS_DISPLAY_DELAY / TimePerAction) * 2);
 
         protected override bool AllowFail => false;
+
+        protected override bool AllowBackwardsSeeks => true;
 
         [SetUpSteps]
         public override void SetUpSteps()
@@ -122,7 +124,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         protected override TestPlayer CreatePlayer(Ruleset ruleset) => new FakeRankingPushPlayer();
 
-        public class FakeRankingPushPlayer : TestPlayer
+        public partial class FakeRankingPushPlayer : TestPlayer
         {
             public bool ResultsCreated { get; private set; }
 

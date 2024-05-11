@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -22,8 +20,8 @@ namespace osu.Game.Tests.Editing.Checks
     [TestFixture]
     public class CheckTooShortAudioFilesTest
     {
-        private CheckTooShortAudioFiles check;
-        private IBeatmap beatmap;
+        private CheckTooShortAudioFiles check = null!;
+        private IBeatmap beatmap = null!;
 
         [SetUp]
         public void Setup()
@@ -97,19 +95,7 @@ namespace osu.Game.Tests.Editing.Checks
             }
         }
 
-        [Test]
-        public void TestCorruptAudioFile()
-        {
-            using (var resourceStream = TestResources.OpenResource("Samples/corrupt.wav"))
-            {
-                var issues = check.Run(getContext(resourceStream)).ToList();
-
-                Assert.That(issues, Has.Count.EqualTo(1));
-                Assert.That(issues.Single().Template is CheckTooShortAudioFiles.IssueTemplateBadFormat);
-            }
-        }
-
-        private BeatmapVerifierContext getContext(Stream resourceStream)
+        private BeatmapVerifierContext getContext(Stream? resourceStream)
         {
             var mockWorkingBeatmap = new Mock<TestWorkingBeatmap>(beatmap, null, null);
             mockWorkingBeatmap.Setup(w => w.GetStream(It.IsAny<string>())).Returns(resourceStream);

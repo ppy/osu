@@ -28,7 +28,7 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
-    public class TestSceneMatchStartControl : OsuManualInputManagerTestScene
+    public partial class TestSceneMatchStartControl : OsuManualInputManagerTestScene
     {
         private readonly Mock<MultiplayerClient> multiplayerClient = new Mock<MultiplayerClient>();
         private readonly Mock<OnlinePlayBeatmapAvailabilityTracker> availabilityTracker = new Mock<OnlinePlayBeatmapAvailabilityTracker>();
@@ -129,7 +129,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 {
                     Playlist =
                     {
-                        new MultiplayerPlaylistItem(playlistItem),
+                        TestMultiplayerClient.CreateMultiplayerPlaylistItem(playlistItem),
                     },
                     Users = { localUser },
                     Host = localUser,
@@ -376,6 +376,41 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 if (nextUnready != null)
                     changeUserState(nextUnready.UserID, MultiplayerUserState.Ready);
             }, users);
+        }
+
+        [Test]
+        public void TestAbortMatch()
+        {
+            AddStep("setup client", () =>
+            {
+                multiplayerClient.Setup(m => m.StartMatch())
+                                 .Callback(() =>
+                                 {
+                                     multiplayerClient.Raise(m => m.LoadRequested -= null);
+                                     multiplayerClient.Object.Room!.State = MultiplayerRoomState.WaitingForLoad;
+
+                                     // The local user state doesn't really matter, so let's do the same as the base implementation for these tests.
+                                     changeUserState(localUser.UserID, MultiplayerUserState.Idle);
+                                 });
+
+                multiplayerClient.Setup(m => m.AbortMatch())
+                                 .Callback(() =>
+                                 {
+                                     multiplayerClient.Object.Room!.State = MultiplayerRoomState.Open;
+                                     raiseRoomUpdated();
+                                 });
+            });
+
+            // Ready
+            ClickButtonWhenEnabled<MultiplayerReadyButton>();
+
+            // Start match
+            ClickButtonWhenEnabled<MultiplayerReadyButton>();
+            AddUntilStep("countdown button disabled", () => !this.ChildrenOfType<MultiplayerCountdownButton>().Single().Enabled.Value);
+
+            // Abort
+            ClickButtonWhenEnabled<MultiplayerReadyButton>();
+            AddStep("check abort request received", () => multiplayerClient.Verify(m => m.AbortMatch(), Times.Once));
         }
 
         private void verifyGameplayStartFlow()

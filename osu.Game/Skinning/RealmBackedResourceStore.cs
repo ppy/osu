@@ -38,7 +38,7 @@ namespace osu.Game.Skinning
             realmSubscription?.Dispose();
         }
 
-        private void skinChanged(IRealmCollection<T> sender, ChangeSet changes, Exception error) => invalidateCache();
+        private void skinChanged(IRealmCollection<T> sender, ChangeSet? changes) => invalidateCache();
 
         protected override IEnumerable<string> GetFilenames(string name)
         {
@@ -52,7 +52,7 @@ namespace osu.Game.Skinning
 
         private string? getPathForFile(string filename)
         {
-            if (fileToStoragePathMapping.Value.TryGetValue(filename.ToLowerInvariant(), out string path))
+            if (fileToStoragePathMapping.Value.TryGetValue(filename.ToLowerInvariant(), out string? path))
                 return path;
 
             return null;

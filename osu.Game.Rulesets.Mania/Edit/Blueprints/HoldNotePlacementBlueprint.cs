@@ -1,12 +1,11 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Events;
+using osu.Framework.Utils;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Mania.Edit.Blueprints.Components;
 using osu.Game.Rulesets.Mania.Objects;
@@ -16,14 +15,16 @@ using osuTK.Input;
 
 namespace osu.Game.Rulesets.Mania.Edit.Blueprints
 {
-    public class HoldNotePlacementBlueprint : ManiaPlacementBlueprint<HoldNote>
+    public partial class HoldNotePlacementBlueprint : ManiaPlacementBlueprint<HoldNote>
     {
         private readonly EditBodyPiece bodyPiece;
         private readonly EditNotePiece headPiece;
         private readonly EditNotePiece tailPiece;
 
         [Resolved]
-        private IScrollingInfo scrollingInfo { get; set; }
+        private IScrollingInfo scrollingInfo { get; set; } = null!;
+
+        protected override bool IsValidForPlacement => Precision.DefinitelyBigger(HitObject.Duration, 0);
 
         public HoldNotePlacementBlueprint()
             : base(new HoldNote())
@@ -44,8 +45,8 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
 
             if (Column != null)
             {
-                headPiece.Y = Parent.ToLocalSpace(Column.ScreenSpacePositionAtTime(HitObject.StartTime)).Y;
-                tailPiece.Y = Parent.ToLocalSpace(Column.ScreenSpacePositionAtTime(HitObject.EndTime)).Y;
+                headPiece.Y = Parent!.ToLocalSpace(Column.ScreenSpacePositionAtTime(HitObject.StartTime)).Y;
+                tailPiece.Y = Parent!.ToLocalSpace(Column.ScreenSpacePositionAtTime(HitObject.EndTime)).Y;
 
                 switch (scrollingInfo.Direction.Value)
                 {
@@ -75,7 +76,7 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
                 return;
 
             base.OnMouseUp(e);
-            EndPlacement(HitObject.Duration > 0);
+            EndPlacement(true);
         }
 
         private double originalStartTime;

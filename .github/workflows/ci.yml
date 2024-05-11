@@ -13,28 +13,21 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
-      # FIXME: Tools won't run in .NET 6.0 unless you install 3.1.x LTS side by side.
-      # https://itnext.io/how-to-support-multiple-net-sdks-in-github-actions-workflows-b988daa884e
-      - name: Install .NET 3.1.x LTS
-        uses: actions/setup-dotnet@v1
+      - name: Install .NET 8.0.x
+        uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: "3.1.x"
-
-      - name: Install .NET 6.0.x
-        uses: actions/setup-dotnet@v1
-        with:
-          dotnet-version: "6.0.x"
+          dotnet-version: "8.0.x"
 
       - name: Restore Tools
         run: dotnet tool restore
 
       - name: Restore Packages
-        run: dotnet restore
+        run: dotnet restore osu.Desktop.slnf
 
       - name: Restore inspectcode cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ${{ github.workspace }}/inspectcode
           key: inspectcode-${{ hashFiles('.config/dotnet-tools.json', '.github/workflows/ci.yml', 'osu.sln*', 'osu*.slnf', '.editorconfig', '.globalconfig', 'CodeAnalysis/*', '**/*.csproj', '**/*.props') }}
@@ -77,12 +70,12 @@ jobs:
     timeout-minutes: 60
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
-      - name: Install .NET 6.0.x
-        uses: actions/setup-dotnet@v1
+      - name: Install .NET 8.0.x
+        uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: "6.0.x"
+          dotnet-version: "8.0.x"
 
       - name: Compile
         run: dotnet build -c Debug -warnaserror osu.Desktop.slnf
@@ -94,7 +87,7 @@ jobs:
       # Attempt to upload results even if test fails.
       # https://docs.github.com/en/actions/reference/context-and-expression-syntax-for-github-actions#always
       - name: Upload Test Results
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         if: ${{ always() }}
         with:
           name: osu-test-results-${{matrix.os.prettyname}}-${{matrix.threadingMode}}
@@ -106,34 +99,45 @@ jobs:
     timeout-minutes: 60
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
-      - name: Install .NET 6.0.x
-        uses: actions/setup-dotnet@v1
+      - name: Setup JDK 11
+        uses: actions/setup-java@v4
         with:
-          dotnet-version: "6.0.x"
+          distribution: microsoft
+          java-version: 11
 
-      - name: Setup MSBuild
-        uses: microsoft/setup-msbuild@v1
+      - name: Install .NET 8.0.x
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
 
-      - name: Build
-        run: msbuild osu.Android/osu.Android.csproj /restore /p:Configuration=Debug
+      - name: Install .NET workloads
+        run: dotnet workload install maui-android
+
+      - name: Compile
+        run: dotnet build -c Debug osu.Android.slnf
 
   build-only-ios:
     name: Build only (iOS)
-    runs-on: macos-latest
+    # `macos-13` is required, because the newest Microsoft.iOS.Sdk versions require Xcode 14.3.
+    # TODO: can be changed to `macos-latest` once `macos-13` becomes latest (currently in beta: https://github.com/actions/runner-images/tree/main#available-images)
+    runs-on: macos-13
     timeout-minutes: 60
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
-      - name: Install .NET 6.0.x
-        uses: actions/setup-dotnet@v1
+      - name: Install .NET 8.0.x
+        uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: "6.0.x"
+          dotnet-version: "8.0.x"
 
-      # Contrary to seemingly any other msbuild, msbuild running on macOS/Mono
-      # cannot accept .sln(f) files as arguments.
-      # Build just the main game for now.
+      - name: Install .NET Workloads
+        run: dotnet workload install maui-ios
+
+      - name: Select Xcode 15.2
+        run: sudo xcode-select -s /Applications/Xcode_15.2.app/Contents/Developer
+
       - name: Build
-        run: msbuild osu.iOS/osu.iOS.csproj /restore /p:Configuration=Debug
+        run: dotnet build -c Debug osu.iOS

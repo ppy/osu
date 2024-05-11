@@ -1,16 +1,16 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Input.Events;
 using osuTK;
+using osuTK.Input;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class DrawableStatefulMenuItem : DrawableOsuMenuItem
+    public partial class DrawableStatefulMenuItem : DrawableOsuMenuItem
     {
         protected new StatefulMenuItem Item => (StatefulMenuItem)base.Item;
 
@@ -21,7 +21,17 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override TextContainer CreateTextContainer() => new ToggleTextContainer(Item);
 
-        private class ToggleTextContainer : TextContainer
+        protected override bool OnMouseDown(MouseDownEvent e)
+        {
+            // Right mouse button is a special case where we allow actioning without dismissing the menu.
+            // This is achieved by not calling `Clicked` (as done by the base implementation in OnClick).
+            if (IsActionable && e.Button == MouseButton.Right)
+                Item.Action.Value?.Invoke();
+
+            return true;
+        }
+
+        private partial class ToggleTextContainer : TextContainer
         {
             private readonly StatefulMenuItem menuItem;
             private readonly Bindable<object> state;

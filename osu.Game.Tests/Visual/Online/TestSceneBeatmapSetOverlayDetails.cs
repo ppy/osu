@@ -16,7 +16,7 @@ using osu.Game.Screens.Select.Details;
 
 namespace osu.Game.Tests.Visual.Online
 {
-    public class TestSceneBeatmapSetOverlayDetails : OsuTestScene
+    public partial class TestSceneBeatmapSetOverlayDetails : OsuTestScene
     {
         private RatingsExposingDetails details;
 
@@ -63,7 +63,7 @@ namespace osu.Game.Tests.Visual.Online
             };
         }
 
-        private class RatingsExposingDetails : Details
+        private partial class RatingsExposingDetails : Details
         {
             public new UserRatings Ratings => base.Ratings;
         }

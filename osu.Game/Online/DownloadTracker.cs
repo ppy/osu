@@ -6,7 +6,7 @@ using osu.Framework.Graphics;
 
 namespace osu.Game.Online
 {
-    public abstract class DownloadTracker<T> : Component
+    public abstract partial class DownloadTracker<T> : Component
         where T : class
     {
         public readonly T TrackedItem;

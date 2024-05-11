@@ -15,7 +15,7 @@ using osuTK;
 
 namespace osu.Game.Overlays.FirstRunSetup
 {
-    public abstract class FirstRunSetupScreen : Screen
+    public abstract partial class FirstRunSetupScreen : Screen
     {
         private const float offset = 100;
 

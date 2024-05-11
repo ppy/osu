@@ -20,7 +20,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Tests
 {
-    public class TestSceneAccuracyHeatmap : OsuManualInputManagerTestScene
+    public partial class TestSceneAccuracyHeatmap : OsuManualInputManagerTestScene
     {
         private Box background;
         private Drawable object1;
@@ -54,7 +54,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Size = new Vector2(130)
+                    Size = new Vector2(300)
                 }
             };
         });
@@ -85,13 +85,37 @@ namespace osu.Game.Rulesets.Osu.Tests
             AddStep("return user input", () => InputManager.UseParentInput = true);
         }
 
+        [Test]
+        public void TestAllPoints()
+        {
+            AddStep("add points", () =>
+            {
+                float minX = object1.DrawPosition.X - object1.DrawSize.X / 2;
+                float maxX = object1.DrawPosition.X + object1.DrawSize.X / 2;
+
+                float minY = object1.DrawPosition.Y - object1.DrawSize.Y / 2;
+                float maxY = object1.DrawPosition.Y + object1.DrawSize.Y / 2;
+
+                for (int i = 0; i < 10; i++)
+                {
+                    for (float x = minX; x <= maxX; x += 0.5f)
+                    {
+                        for (float y = minY; y <= maxY; y += 0.5f)
+                        {
+                            accuracyHeatmap.AddPoint(object2.Position, object1.Position, new Vector2(x, y), RNG.NextSingle(10, 500));
+                        }
+                    }
+                }
+            });
+        }
+
         protected override bool OnMouseDown(MouseDownEvent e)
         {
             accuracyHeatmap.AddPoint(object2.Position, object1.Position, background.ToLocalSpace(e.ScreenSpaceMouseDownPosition), 50);
             return true;
         }
 
-        private class TestAccuracyHeatmap : AccuracyHeatmap
+        private partial class TestAccuracyHeatmap : AccuracyHeatmap
         {
             public TestAccuracyHeatmap(ScoreInfo score)
                 : base(score, new TestBeatmap(new OsuRuleset().RulesetInfo))
@@ -102,7 +126,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 => base.AddPoint(start, end, hitPoint, radius);
         }
 
-        private class BorderCircle : CircularContainer
+        private partial class BorderCircle : CircularContainer
         {
             public BorderCircle()
             {

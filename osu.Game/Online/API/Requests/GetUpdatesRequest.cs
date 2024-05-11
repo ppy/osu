@@ -25,6 +25,7 @@ namespace osu.Game.Online.API.Requests
             var req = base.CreateWebRequest();
             if (channel != null) req.AddParameter(@"channel", channel.Id.ToString());
             req.AddParameter(@"since", since.ToString());
+            req.AddParameter(@"includes[]", "presence");
 
             return req;
         }

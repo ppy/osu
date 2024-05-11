@@ -1,14 +1,13 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -24,32 +23,33 @@ using osuTK.Graphics;
 
 namespace osu.Game.Tournament.Screens.Drawings
 {
-    public class DrawingsScreen : TournamentScreen
+    public partial class DrawingsScreen : TournamentScreen
     {
         private const string results_filename = "drawings_results.txt";
 
-        private ScrollingTeamContainer teamsContainer;
-        private GroupContainer groupsContainer;
-        private TournamentSpriteText fullTeamNameText;
+        private ScrollingTeamContainer teamsContainer = null!;
+        private GroupContainer groupsContainer = null!;
+        private TournamentSpriteText fullTeamNameText = null!;
 
         private readonly List<TournamentTeam> allTeams = new List<TournamentTeam>();
 
-        private DrawingsConfigManager drawingsConfig;
+        private DrawingsConfigManager drawingsConfig = null!;
 
-        private Task writeOp;
+        private Task? writeOp;
 
-        private Storage storage;
+        private Storage storage = null!;
 
-        public ITeamList TeamList;
+        public ITeamList TeamList = null!;
 
         [BackgroundDependencyLoader]
         private void load(Storage storage)
         {
-            RelativeSizeAxes = Axes.Both;
-
             this.storage = storage;
 
-            TeamList ??= new StorageBackedTeamList(storage);
+            RelativeSizeAxes = Axes.Both;
+
+            if (TeamList.IsNull())
+                TeamList = new StorageBackedTeamList(storage);
 
             if (!TeamList.Teams.Any())
             {
@@ -251,7 +251,7 @@ namespace osu.Game.Tournament.Screens.Drawings
                     using (Stream stream = storage.GetStream(results_filename, FileAccess.Read, FileMode.Open))
                     using (StreamReader sr = new StreamReader(stream))
                     {
-                        string line;
+                        string? line;
 
                         while ((line = sr.ReadLine()?.Trim()) != null)
                         {
@@ -261,8 +261,7 @@ namespace osu.Game.Tournament.Screens.Drawings
                             if (line.ToUpperInvariant().StartsWith("GROUP", StringComparison.Ordinal))
                                 continue;
 
-                            // ReSharper disable once AccessToModifiedClosure
-                            TournamentTeam teamToAdd = allTeams.FirstOrDefault(t => t.FullName.Value == line);
+                            TournamentTeam? teamToAdd = allTeams.FirstOrDefault(t => t.FullName.Value == line);
 
                             if (teamToAdd == null)
                                 continue;

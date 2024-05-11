@@ -18,7 +18,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class ExternalLinkButton : CompositeDrawable, IHasTooltip, IHasContextMenu
+    public partial class ExternalLinkButton : CompositeDrawable, IHasTooltip, IHasContextMenu
     {
         public string? Link { get; set; }
 
@@ -26,6 +26,9 @@ namespace osu.Game.Graphics.UserInterface
 
         [Resolved]
         private GameHost host { get; set; } = null!;
+
+        [Resolved]
+        private Clipboard clipboard { get; set; } = null!;
 
         [Resolved]
         private OnScreenDisplay? onScreenDisplay { get; set; }
@@ -82,7 +85,7 @@ namespace osu.Game.Graphics.UserInterface
 
                 if (Link != null)
                 {
-                    items.Add(new OsuMenuItem("Open", MenuItemType.Standard, () => host.OpenUrlExternally(Link)));
+                    items.Add(new OsuMenuItem("Open", MenuItemType.Highlighted, () => host.OpenUrlExternally(Link)));
                     items.Add(new OsuMenuItem("Copy URL", MenuItemType.Standard, copyUrl));
                 }
 
@@ -92,8 +95,11 @@ namespace osu.Game.Graphics.UserInterface
 
         private void copyUrl()
         {
-            host.GetClipboard()?.SetText(Link);
-            onScreenDisplay?.Display(new CopyUrlToast());
+            if (Link != null)
+            {
+                clipboard.SetText(Link);
+                onScreenDisplay?.Display(new CopyUrlToast());
+            }
         }
     }
 }

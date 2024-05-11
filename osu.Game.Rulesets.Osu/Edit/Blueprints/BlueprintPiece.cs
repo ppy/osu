@@ -1,7 +1,5 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Osu.Objects;
@@ -12,7 +10,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints
     /// A piece of a selection or placement blueprint which visualises an <see cref="OsuHitObject"/>.
     /// </summary>
     /// <typeparam name="T">The type of <see cref="OsuHitObject"/> which this <see cref="BlueprintPiece{T}"/> visualises.</typeparam>
-    public abstract class BlueprintPiece<T> : CompositeDrawable
+    public abstract partial class BlueprintPiece<T> : CompositeDrawable
         where T : OsuHitObject
     {
         /// <summary>

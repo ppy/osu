@@ -1,88 +1,52 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <Import Project="..\osu.Android.props" />
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>8.0.30703</ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{5CC222DC-5716-4499-B897-DCBDDA4A5CF9}</ProjectGuid>
-    <ProjectTypeGuids>{EFBA0AD7-5A72-4C68-AF49-83D382785DCF};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
-    <TemplateGuid>{122416d6-6b49-4ee2-a1e8-b825f31c79fe}</TemplateGuid>
+    <TargetFramework>net8.0-android</TargetFramework>
+    <OutputType>Exe</OutputType>
     <RootNamespace>osu.Game.Tests</RootNamespace>
     <AssemblyName>osu.Game.Tests.Android</AssemblyName>
-    <AndroidManifest>Properties\AndroidManifest.xml</AndroidManifest>
-    <AndroidSupportedAbis>armeabi-v7a;x86;arm64-v8a</AndroidSupportedAbis>
   </PropertyGroup>
-  <ItemGroup>
-    <Compile Include="MainActivity.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Properties\AndroidManifest.xml" />
-  </ItemGroup>
   <PropertyGroup>
     <NoWarn>$(NoWarn);CA2007</NoWarn>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <AndroidLinkMode>None</AndroidLinkMode>
-    <MandroidI18n>cjk;mideast;other;rare;west</MandroidI18n>
-    <EmbedAssembliesIntoApk>true</EmbedAssembliesIntoApk>
-  </PropertyGroup>
   <ItemGroup>
-    <Compile Include="..\osu.Game.Tests\**\Beatmaps\**\*.cs">
+    <Compile Include="..\osu.Game.Tests\**\*.cs" Exclude="**\obj\**">
       <Link>%(RecursiveDir)%(Filename)%(Extension)</Link>
     </Compile>
-    <Compile Remove="..\osu.Game.Tests\Beatmaps\Formats\OsuJsonDecoderTest.cs" />
-    <Compile Include="..\osu.Game.Tests\**\Chat\**\*.cs">
+    <!-- TargetPath is relative to RootNamespace,
+         and DllResourceStore is relative to AssemblyName. -->
+    <EmbeddedResource Include="..\osu.Game.Tests\**\Resources\**\*">
       <Link>%(RecursiveDir)%(Filename)%(Extension)</Link>
-    </Compile>
-    <Compile Include="..\osu.Game.Tests\**\NonVisual\**\*.cs">
-      <Link>%(RecursiveDir)%(Filename)%(Extension)</Link>
-    </Compile>
-    <Compile Include="..\osu.Game.Tests\**\Scores\**\*.cs">
-      <Link>%(RecursiveDir)%(Filename)%(Extension)</Link>
-    </Compile>
-    <Compile Include="..\osu.Game.Tests\**\ScrollAlgorithms\**\*.cs">
-      <Link>%(RecursiveDir)%(Filename)%(Extension)</Link>
-    </Compile>
-    <Compile Include="..\osu.Game.Tests\**\Visual\**\*.cs">
-      <Link>%(RecursiveDir)%(Filename)%(Extension)</Link>
-    </Compile>
-    <Compile Include="..\osu.Game.Tests\**\Resources\**\*.cs">
-      <Link>%(RecursiveDir)%(Filename)%(Extension)</Link>
-    </Compile>
-    <Compile Include="..\osu.Game.Tests\*.cs">
-      <Link>%(RecursiveDir)%(Filename)%(Extension)</Link>
-    </Compile>
+      <TargetPath>Android\%(RecursiveDir)%(Filename)%(Extension)</TargetPath>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\osu.Game.Rulesets.Catch\osu.Game.Rulesets.Catch.csproj">
-      <Project>{58f6c80c-1253-4a0e-a465-b8c85ebeadf3}</Project>
-      <Name>osu.Game.Rulesets.Catch</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\osu.Game.Rulesets.Mania\osu.Game.Rulesets.Mania.csproj">
-      <Project>{48f4582b-7687-4621-9cbe-5c24197cb536}</Project>
-      <Name>osu.Game.Rulesets.Mania</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\osu.Game.Rulesets.Osu\osu.Game.Rulesets.Osu.csproj">
-      <Project>{c92a607b-1fdd-4954-9f92-03ff547d9080}</Project>
-      <Name>osu.Game.Rulesets.Osu</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\osu.Game.Rulesets.Taiko\osu.Game.Rulesets.Taiko.csproj">
-      <Project>{f167e17a-7de6-4af5-b920-a5112296c695}</Project>
-      <Name>osu.Game.Rulesets.Taiko</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\osu.Game\osu.Game.csproj">
-      <Project>{2a66dd92-adb1-4994-89e2-c94e04acda0d}</Project>
-      <Name>osu.Game</Name>
-    </ProjectReference>
+    <ProjectReference Include="..\osu.Game.Rulesets.Catch\osu.Game.Rulesets.Catch.csproj" />
+    <ProjectReference Include="..\osu.Game.Rulesets.Mania\osu.Game.Rulesets.Mania.csproj" />
+    <ProjectReference Include="..\osu.Game.Rulesets.Osu\osu.Game.Rulesets.Osu.csproj" />
+    <ProjectReference Include="..\osu.Game.Rulesets.Taiko\osu.Game.Rulesets.Taiko.csproj" />
+    <ProjectReference Include="..\osu.Game\osu.Game.csproj" />
   </ItemGroup>
   <ItemGroup Label="Package References">
     <PackageReference Include="DeepEqual" Version="2.0.0" />
     <PackageReference Include="Moq" Version="4.17.2" />
-    <PackageReference Include="System.Formats.Asn1">
-      <Version>5.0.0</Version>
-    </PackageReference>
   </ItemGroup>
-  <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
+  <!-- osu.Framework.Android depends on https://www.nuget.org/packages/Xamarin.AndroidX.Window,
+       which - via a chain of transitive dependencies - also includes https://www.nuget.org/packages/Xamarin.Jetbrains.Annotations,
+       which causes compile failures such as:
+
+         The type 'NotNullAttribute' exists in both 'JetBrains.Annotations, Version=4242.42.42.42, Culture=neutral, PublicKeyToken=1010a0d8d6380325'
+         and 'Xamarin.Jetbrains.Annotations, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null' [D:\a\osu\osu\osu.Game.Tests.Android\osu.Game.Tests.Android.csproj]
+
+       We cannot easily change the source files, because of how this project works
+       (all source files are basically symlinked from the desktop test project,
+       so changing anything there just for the sake of mobile would be strange).
+       Thus, apply the following "interesting" workaround as borrowed from https://stackoverflow.com/a/65127159 instead. -->
+  <Target Name="AddPackageAliases" BeforeTargets="FindReferenceAssembliesForReferences;ResolveReferences">
+    <ItemGroup>
+      <ReferencePath Condition="%(Filename) == 'Xamarin.Jetbrains.Annotations'">
+        <Aliases>XamarinJetbrainsAnnotations</Aliases>
+      </ReferencePath>
+    </ItemGroup>
+  </Target>
 </Project>

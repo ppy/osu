@@ -1,22 +1,20 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using osu.Framework.Graphics;
 using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Tournament.Screens.Setup
 {
-    internal class ResolutionSelector : ActionableInfo
+    internal partial class ResolutionSelector : ActionableInfo
     {
         private const int minimum_window_height = 480;
         private const int maximum_window_height = 2160;
 
-        public new Action<int> Action;
+        public new Action<int>? Action;
 
-        private OsuNumberBox numberBox;
+        private OsuNumberBox? numberBox;
 
         protected override Drawable CreateComponent()
         {

@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -17,7 +15,7 @@ using static osu.Game.Graphics.UserInterface.ShowMoreButton;
 
 namespace osu.Game.Overlays.Comments.Buttons
 {
-    public abstract class CommentRepliesButton : CompositeDrawable
+    public abstract partial class CommentRepliesButton : CompositeDrawable
     {
         protected LocalisableString Text
         {
@@ -26,7 +24,7 @@ namespace osu.Game.Overlays.Comments.Buttons
         }
 
         [Resolved]
-        private OverlayColourProvider colourProvider { get; set; }
+        private OverlayColourProvider colourProvider { get; set; } = null!;
 
         private readonly ChevronIcon icon;
         private readonly Box background;

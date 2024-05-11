@@ -3,6 +3,7 @@
 
 #nullable disable
 
+using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
 using Moq;
@@ -26,7 +27,7 @@ using osuTK.Input;
 namespace osu.Game.Tests.Visual.Menus
 {
     [TestFixture]
-    public class TestSceneToolbar : OsuManualInputManagerTestScene
+    public partial class TestSceneToolbar : OsuManualInputManagerTestScene
     {
         private TestToolbar toolbar;
 
@@ -116,6 +117,19 @@ namespace osu.Game.Tests.Visual.Menus
 
         [TestCase(OverlayActivation.All)]
         [TestCase(OverlayActivation.Disabled)]
+        public void TestButtonKeyboardInputRespectsOverlayActivation(OverlayActivation mode)
+        {
+            AddStep($"set activation mode to {mode}", () => toolbar.OverlayActivationMode.Value = mode);
+            AddStep("hide toolbar", () => toolbar.Hide());
+
+            if (mode == OverlayActivation.Disabled)
+                AddAssert("check buttons not accepting input", () => InputManager.NonPositionalInputQueue.OfType<ToolbarButton>().Count(), () => Is.Zero);
+            else
+                AddAssert("check buttons accepting input", () => InputManager.NonPositionalInputQueue.OfType<ToolbarButton>().Count(), () => Is.Not.Zero);
+        }
+
+        [TestCase(OverlayActivation.All)]
+        [TestCase(OverlayActivation.Disabled)]
         public void TestRespectsOverlayActivation(OverlayActivation mode)
         {
             AddStep($"set activation mode to {mode}", () => toolbar.OverlayActivationMode.Value = mode);
@@ -201,7 +215,24 @@ namespace osu.Game.Tests.Visual.Menus
             AddAssert("volume not changed", () => Audio.Volume.Value == 0.5);
         }
 
-        public class TestToolbar : Toolbar
+        [Test]
+        public void TestRulesetSelectorOverflow()
+        {
+            AddStep("set toolbar width", () =>
+            {
+                toolbar.RelativeSizeAxes = Axes.None;
+                toolbar.Width = 400;
+            });
+            AddStep("move mouse over news toggle button", () =>
+            {
+                var button = toolbar.ChildrenOfType<ToolbarNewsButton>().Single();
+                InputManager.MoveMouseTo(button);
+            });
+            AddAssert("no ruleset toggle buttons hovered", () => !toolbar.ChildrenOfType<ToolbarRulesetTabButton>().Any(button => button.IsHovered));
+            AddUntilStep("toolbar gradient visible", () => toolbar.ChildrenOfType<Toolbar.ToolbarBackground>().Single().Children.All(d => d.Alpha > 0));
+        }
+
+        public partial class TestToolbar : Toolbar
         {
             public new Bindable<OverlayActivation> OverlayActivationMode => base.OverlayActivationMode as Bindable<OverlayActivation>;
         }
@@ -219,7 +250,9 @@ namespace osu.Game.Tests.Visual.Menus
             {
             }
 
-            public virtual IBindable<int> UnreadCount => null;
+            public virtual IBindable<int> UnreadCount { get; } = new Bindable<int>();
+
+            public IEnumerable<Notification> AllNotifications => Enumerable.Empty<Notification>();
         }
     }
 }

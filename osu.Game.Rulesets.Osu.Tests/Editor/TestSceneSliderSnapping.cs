@@ -26,7 +26,7 @@ using osuTK.Input;
 
 namespace osu.Game.Rulesets.Osu.Tests.Editor
 {
-    public class TestSceneSliderSnapping : EditorTestScene
+    public partial class TestSceneSliderSnapping : EditorTestScene
     {
         private const double beat_length = 1000;
 
@@ -56,7 +56,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
                 {
                     ControlPoints =
                     {
-                        new PathControlPoint(Vector2.Zero, PathType.PerfectCurve),
+                        new PathControlPoint(Vector2.Zero, PathType.PERFECT_CURVE),
                         new PathControlPoint(new Vector2(136, 205)),
                         new PathControlPoint(new Vector2(-4, 226))
                     }
@@ -72,14 +72,14 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
         [Test]
         public void TestMovingUnsnappedSliderNodesSnaps()
         {
-            PathControlPointPiece sliderEnd = null;
+            PathControlPointPiece<Slider> sliderEnd = null;
 
             assertSliderSnapped(false);
 
             AddStep("select slider", () => EditorBeatmap.SelectedHitObjects.Add(slider));
             AddStep("select slider end", () =>
             {
-                sliderEnd = this.ChildrenOfType<PathControlPointPiece>().Single(piece => piece.ControlPoint == slider.Path.ControlPoints.Last());
+                sliderEnd = this.ChildrenOfType<PathControlPointPiece<Slider>>().Single(piece => piece.ControlPoint == slider.Path.ControlPoints.Last());
                 InputManager.MoveMouseTo(sliderEnd.ScreenSpaceDrawQuad.Centre);
             });
             AddStep("move slider end", () =>
@@ -99,9 +99,9 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             AddStep("select slider", () => EditorBeatmap.SelectedHitObjects.Add(slider));
             AddStep("move mouse to new point location", () =>
             {
-                var firstPiece = this.ChildrenOfType<PathControlPointPiece>().Single(piece => piece.ControlPoint == slider.Path.ControlPoints[0]);
+                var firstPiece = this.ChildrenOfType<PathControlPointPiece<Slider>>().Single(piece => piece.ControlPoint == slider.Path.ControlPoints[0]);
                 var pos = slider.Path.PositionAt(0.25d) + slider.Position;
-                InputManager.MoveMouseTo(firstPiece.Parent.ToScreenSpace(pos));
+                InputManager.MoveMouseTo(firstPiece.Parent!.ToScreenSpace(pos));
             });
             AddStep("move slider end", () =>
             {
@@ -120,7 +120,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             AddStep("select slider", () => EditorBeatmap.SelectedHitObjects.Add(slider));
             AddStep("move mouse to second control point", () =>
             {
-                var secondPiece = this.ChildrenOfType<PathControlPointPiece>().Single(piece => piece.ControlPoint == slider.Path.ControlPoints[1]);
+                var secondPiece = this.ChildrenOfType<PathControlPointPiece<Slider>>().Single(piece => piece.ControlPoint == slider.Path.ControlPoints[1]);
                 InputManager.MoveMouseTo(secondPiece);
             });
             AddStep("quick delete", () =>
@@ -181,7 +181,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
         {
             OsuSelectionHandler selectionHandler;
 
-            AddAssert("first control point perfect", () => slider.Path.ControlPoints[0].Type == PathType.PerfectCurve);
+            AddAssert("first control point perfect", () => slider.Path.ControlPoints[0].Type == PathType.PERFECT_CURVE);
 
             AddStep("select slider", () => EditorBeatmap.SelectedHitObjects.Add(slider));
             AddStep("rotate 90 degrees ccw", () =>
@@ -190,7 +190,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
                 selectionHandler.HandleRotation(-90);
             });
 
-            AddAssert("first control point still perfect", () => slider.Path.ControlPoints[0].Type == PathType.PerfectCurve);
+            AddAssert("first control point still perfect", () => slider.Path.ControlPoints[0].Type == PathType.PERFECT_CURVE);
         }
 
         [Test]
@@ -223,7 +223,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
         {
             OsuSelectionHandler selectionHandler;
 
-            AddAssert("first control point perfect", () => slider.Path.ControlPoints[0].Type == PathType.PerfectCurve);
+            AddAssert("first control point perfect", () => slider.Path.ControlPoints[0].Type == PathType.PERFECT_CURVE);
 
             AddStep("select slider", () => EditorBeatmap.SelectedHitObjects.Add(slider));
             AddStep("flip slider horizontally", () =>
@@ -232,7 +232,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
                 selectionHandler.OnPressed(new KeyBindingPressEvent<GlobalAction>(InputManager.CurrentState, GlobalAction.EditorFlipVertically));
             });
 
-            AddAssert("first control point still perfect", () => slider.Path.ControlPoints[0].Type == PathType.PerfectCurve);
+            AddAssert("first control point still perfect", () => slider.Path.ControlPoints[0].Type == PathType.PERFECT_CURVE);
         }
 
         [Test]

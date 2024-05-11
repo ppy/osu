@@ -21,7 +21,7 @@ using osu.Game.Tests.Visual;
 namespace osu.Game.Tests.Rulesets
 {
     [HeadlessTest]
-    public class TestSceneRulesetSkinProvidingContainer : OsuTestScene
+    public partial class TestSceneRulesetSkinProvidingContainer : OsuTestScene
     {
         private SkinRequester requester;
 
@@ -43,13 +43,13 @@ namespace osu.Game.Tests.Rulesets
 
             AddStep("setup provider", () =>
             {
-                var rulesetSkinProvider = new RulesetSkinProvidingContainer(Ruleset.Value.CreateInstance(), Beatmap.Value.Beatmap, Beatmap.Value.Skin);
-
-                rulesetSkinProvider.Add(requester = new SkinRequester());
-
+                requester = new SkinRequester();
                 requester.OnLoadAsync += () => textureOnLoad = requester.GetTexture("test-image");
 
-                Child = rulesetSkinProvider;
+                Child = new RulesetSkinProvidingContainer(Ruleset.Value.CreateInstance(), Beatmap.Value.Beatmap, Beatmap.Value.Skin)
+                {
+                    Child = requester
+                };
             });
 
             AddAssert("requester got correct initial texture", () => textureOnLoad != null);
@@ -64,7 +64,7 @@ namespace osu.Game.Tests.Rulesets
             });
         }
 
-        private class SkinRequester : Drawable, ISkin
+        private partial class SkinRequester : Drawable, ISkin
         {
             private ISkinSource skin;
 
@@ -78,7 +78,7 @@ namespace osu.Game.Tests.Rulesets
                 OnLoadAsync?.Invoke();
             }
 
-            public Drawable GetDrawableComponent(ISkinComponent component) => skin.GetDrawableComponent(component);
+            public Drawable GetDrawableComponent(ISkinComponentLookup lookup) => skin.GetDrawableComponent(lookup);
 
             public Texture GetTexture(string componentName, WrapMode wrapModeS = default, WrapMode wrapModeT = default) => skin.GetTexture(componentName);
 

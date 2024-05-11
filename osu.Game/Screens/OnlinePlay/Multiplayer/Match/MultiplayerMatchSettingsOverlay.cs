@@ -16,6 +16,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
@@ -25,7 +26,7 @@ using Container = osu.Framework.Graphics.Containers.Container;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 {
-    public class MultiplayerMatchSettingsOverlay : RoomSettingsOverlay
+    public partial class MultiplayerMatchSettingsOverlay : RoomSettingsOverlay
     {
         private MatchSettings settings = null!;
 
@@ -50,7 +51,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             SettingsApplied = Hide
         };
 
-        protected class MatchSettings : OnlinePlayComposite
+        protected partial class MatchSettings : OnlinePlayComposite
         {
             private const float disabled_alpha = 0.2f;
 
@@ -64,7 +65,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             public OsuEnumDropdown<QueueMode> QueueModeDropdown = null!;
             public OsuTextBox PasswordTextBox = null!;
             public OsuCheckbox AutoSkipCheckbox = null!;
-            public TriangleButton ApplyButton = null!;
+            public RoundedButton ApplyButton = null!;
 
             public OsuSpriteText ErrorText = null!;
 
@@ -72,11 +73,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             private OsuSpriteText typeLabel = null!;
             private LoadingLayer loadingLayer = null!;
 
-            public void SelectBeatmap()
-            {
-                if (matchSubScreen.IsCurrentScreen())
-                    matchSubScreen.Push(new MultiplayerMatchSongSelect(matchSubScreen.Room));
-            }
+            public void SelectBeatmap() => selectBeatmapButton.TriggerClick();
 
             [Resolved]
             private MultiplayerMatchSubScreen matchSubScreen { get; set; } = null!;
@@ -96,6 +93,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             private IDisposable? applyingSettingsOperation;
             private Drawable playlistContainer = null!;
             private DrawableRoomPlaylist drawablePlaylist = null!;
+            private RoundedButton selectBeatmapButton = null!;
 
             public MatchSettings(Room room)
             {
@@ -274,12 +272,16 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                                                             RelativeSizeAxes = Axes.X,
                                                             Height = DrawableRoomPlaylistItem.HEIGHT
                                                         },
-                                                        new PurpleTriangleButton
+                                                        selectBeatmapButton = new RoundedButton
                                                         {
                                                             RelativeSizeAxes = Axes.X,
                                                             Height = 40,
                                                             Text = "Select beatmap",
-                                                            Action = SelectBeatmap
+                                                            Action = () =>
+                                                            {
+                                                                if (matchSubScreen.IsCurrentScreen())
+                                                                    matchSubScreen.Push(new MultiplayerMatchSongSelect(matchSubScreen.Room));
+                                                            }
                                                         }
                                                     }
                                                 }
@@ -460,7 +462,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             });
         }
 
-        public class CreateOrUpdateButton : TriangleButton
+        public partial class CreateOrUpdateButton : RoundedButton
         {
             [Resolved(typeof(Room), nameof(Room.RoomID))]
             private Bindable<long?> roomId { get; set; } = null!;
@@ -474,9 +476,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)
             {
-                BackgroundColour = colours.Yellow;
-                Triangles.ColourLight = colours.YellowLight;
-                Triangles.ColourDark = colours.YellowDark;
+                BackgroundColour = colours.YellowDark;
             }
         }
 
@@ -486,16 +486,16 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             Off = 0,
 
             [Description("30 seconds")]
-            Seconds_30 = 30,
+            Seconds30 = 30,
 
             [Description("1 minute")]
-            Seconds_60 = 60,
+            Seconds60 = 60,
 
             [Description("3 minutes")]
-            Seconds_180 = 180,
+            Seconds180 = 180,
 
             [Description("5 minutes")]
-            Seconds_300 = 300
+            Seconds300 = 300
         }
     }
 }

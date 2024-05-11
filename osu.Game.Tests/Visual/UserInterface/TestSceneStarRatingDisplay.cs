@@ -14,7 +14,7 @@ using osuTK;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public class TestSceneStarRatingDisplay : OsuTestScene
+    public partial class TestSceneStarRatingDisplay : OsuTestScene
     {
         [TestCase(StarRatingDisplaySize.Regular)]
         [TestCase(StarRatingDisplaySize.Small)]

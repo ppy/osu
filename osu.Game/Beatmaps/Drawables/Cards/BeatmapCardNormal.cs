@@ -18,7 +18,7 @@ using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Beatmaps.Drawables.Cards
 {
-    public class BeatmapCardNormal : BeatmapCard
+    public partial class BeatmapCardNormal : BeatmapCard
     {
         protected override Drawable IdleContent => idleBottomContent;
         protected override Drawable DownloadInProgressContent => downloadProgressBar;
@@ -82,7 +82,6 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                             FavouriteState = { BindTarget = FavouriteState },
                             ButtonsCollapsedWidth = CORNER_RADIUS,
                             ButtonsExpandedWidth = 30,
-                            ButtonsPadding = new MarginPadding { Vertical = 17.5f },
                             Children = new Drawable[]
                             {
                                 new FillFlowContainer
@@ -108,12 +107,11 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                                             {
                                                 new Drawable[]
                                                 {
-                                                    new OsuSpriteText
+                                                    new TruncatingSpriteText
                                                     {
                                                         Text = new RomanisableString(BeatmapSet.TitleUnicode, BeatmapSet.Title),
                                                         Font = OsuFont.Default.With(size: 22.5f, weight: FontWeight.SemiBold),
                                                         RelativeSizeAxes = Axes.X,
-                                                        Truncate = true
                                                     },
                                                     titleBadgeArea = new FillFlowContainer
                                                     {
@@ -142,12 +140,11 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                                             {
                                                 new[]
                                                 {
-                                                    new OsuSpriteText
+                                                    new TruncatingSpriteText
                                                     {
                                                         Text = createArtistText(),
                                                         Font = OsuFont.Default.With(size: 17.5f, weight: FontWeight.SemiBold),
                                                         RelativeSizeAxes = Axes.X,
-                                                        Truncate = true
                                                     },
                                                     Empty()
                                                 },

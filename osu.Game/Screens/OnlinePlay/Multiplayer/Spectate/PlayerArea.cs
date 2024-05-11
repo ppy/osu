@@ -20,7 +20,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
     /// <summary>
     /// Provides an area for and manages the hierarchy of a spectated player within a <see cref="MultiSpectatorScreen"/>.
     /// </summary>
-    public class PlayerArea : CompositeDrawable
+    public partial class PlayerArea : CompositeDrawable
     {
         /// <summary>
         /// Raised after <see cref="Player.StartGameplay"/> is called on <see cref="Player"/>.
@@ -67,7 +67,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             SpectatorPlayerClock = clock;
 
             RelativeSizeAxes = Axes.Both;
-            Masking = true;
 
             AudioContainer audioContainer;
             InternalChildren = new Drawable[]
@@ -131,7 +130,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         /// <summary>
         /// Isolates each player instance from the game-wide ruleset/beatmap/mods (to allow for different players having different settings).
         /// </summary>
-        private class PlayerIsolationContainer : Container
+        private partial class PlayerIsolationContainer : Container
         {
             [Cached]
             private readonly Bindable<RulesetInfo> ruleset = new Bindable<RulesetInfo>();

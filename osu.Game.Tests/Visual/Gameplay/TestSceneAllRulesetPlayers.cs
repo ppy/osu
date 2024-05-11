@@ -20,7 +20,7 @@ namespace osu.Game.Tests.Visual.Gameplay
     /// A base class which runs <see cref="Player"/> test for all available rulesets.
     /// Steps to be run for each ruleset should be added via <see cref="AddCheckSteps"/>.
     /// </summary>
-    public abstract class TestSceneAllRulesetPlayers : RateAdjustedBeatmapTestScene
+    public abstract partial class TestSceneAllRulesetPlayers : RateAdjustedBeatmapTestScene
     {
         protected Player Player { get; private set; }
 
@@ -67,6 +67,11 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private Player loadPlayerFor(RulesetInfo rulesetInfo)
         {
+            // if a player screen is present already, we must exit that before loading another one,
+            // otherwise it'll crash on SpectatorClient.BeginPlaying being called while client is in "playing" state already.
+            if (Stack.CurrentScreen is Player)
+                Stack.Exit();
+
             Ruleset.Value = rulesetInfo;
             var ruleset = rulesetInfo.CreateInstance();
 

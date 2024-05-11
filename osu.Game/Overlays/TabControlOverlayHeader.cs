@@ -1,9 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
-using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
@@ -21,12 +18,12 @@ namespace osu.Game.Overlays
     /// An overlay header which contains a <see cref="OsuTabControl{T}"/>.
     /// </summary>
     /// <typeparam name="T">The type of item to be represented by tabs.</typeparam>
-    public abstract class TabControlOverlayHeader<T> : OverlayHeader, IHasCurrentValue<T>
+    public abstract partial class TabControlOverlayHeader<T> : OverlayHeader, IHasCurrentValue<T>
     {
-        protected OsuTabControl<T> TabControl;
+        protected OsuTabControl<T> TabControl { get; }
+        protected Container TabControlContainer { get; }
 
         private readonly Box controlBackground;
-        private readonly Container tabControlContainer;
         private readonly BindableWithCurrent<T> current = new BindableWithCurrent<T>();
 
         public Bindable<T> Current
@@ -41,7 +38,7 @@ namespace osu.Game.Overlays
             set
             {
                 base.ContentSidePadding = value;
-                tabControlContainer.Padding = new MarginPadding { Horizontal = value };
+                TabControlContainer.Padding = new MarginPadding { Horizontal = value };
             }
         }
 
@@ -57,15 +54,23 @@ namespace osu.Game.Overlays
                     {
                         RelativeSizeAxes = Axes.Both,
                     },
-                    tabControlContainer = new Container
+                    TabControlContainer = new Container
                     {
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
                         Padding = new MarginPadding { Horizontal = ContentSidePadding },
-                        Child = TabControl = CreateTabControl().With(control =>
+                        Children = new[]
                         {
-                            control.Current = Current;
-                        })
+                            TabControl = CreateTabControl().With(control =>
+                            {
+                                control.Current = Current;
+                            }),
+                            CreateTabControlContent().With(content =>
+                            {
+                                content.Anchor = Anchor.CentreRight;
+                                content.Origin = Anchor.CentreRight;
+                            }),
+                        }
                     }
                 }
             });
@@ -77,10 +82,14 @@ namespace osu.Game.Overlays
             controlBackground.Colour = colourProvider.Dark4;
         }
 
-        [NotNull]
         protected virtual OsuTabControl<T> CreateTabControl() => new OverlayHeaderTabControl();
 
-        public class OverlayHeaderTabControl : OverlayTabControl<T>
+        /// <summary>
+        /// Creates a <see cref="Drawable"/> on the opposite side of the <see cref="OsuTabControl{T}"/>. Used mostly to create <see cref="OverlayRulesetSelector"/>.
+        /// </summary>
+        protected virtual Drawable CreateTabControlContent() => Empty();
+
+        public partial class OverlayHeaderTabControl : OverlayTabControl<T>
         {
             private const float bar_height = 1;
 
@@ -103,7 +112,7 @@ namespace osu.Game.Overlays
                 Direction = FillDirection.Horizontal,
             };
 
-            private class OverlayHeaderTabItem : OverlayTabItem
+            private partial class OverlayHeaderTabItem : OverlayTabItem
             {
                 public OverlayHeaderTabItem(T value)
                     : base(value)

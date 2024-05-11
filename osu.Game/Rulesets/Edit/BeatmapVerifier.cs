@@ -1,7 +1,5 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using System.Collections.Generic;
 using System.Linq;
@@ -20,6 +18,7 @@ namespace osu.Game.Rulesets.Edit
             // Resources
             new CheckBackgroundPresence(),
             new CheckBackgroundQuality(),
+            new CheckVideoResolution(),
 
             // Audio
             new CheckAudioPresence(),
@@ -28,6 +27,9 @@ namespace osu.Game.Rulesets.Edit
             new CheckFewHitsounds(),
             new CheckTooShortAudioFiles(),
             new CheckAudioInVideo(),
+            new CheckDelayedHitsounds(),
+            new CheckSongFormat(),
+            new CheckHitsoundsFormat(),
 
             // Files
             new CheckZeroByteFiles(),
@@ -36,6 +38,14 @@ namespace osu.Game.Rulesets.Edit
             new CheckUnsnappedObjects(),
             new CheckConcurrentObjects(),
             new CheckZeroLengthObjects(),
+            new CheckDrainLength(),
+            new CheckUnusedAudioAtEnd(),
+
+            // Timing
+            new CheckPreviewTime(),
+
+            // Events
+            new CheckBreaks(),
         };
 
         public IEnumerable<Issue> Run(BeatmapVerifierContext context)

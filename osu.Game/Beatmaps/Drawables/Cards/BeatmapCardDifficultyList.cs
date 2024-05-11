@@ -1,7 +1,5 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using System.Linq;
 using osu.Framework.Allocation;
@@ -16,7 +14,7 @@ using osuTK;
 
 namespace osu.Game.Beatmaps.Drawables.Cards
 {
-    public class BeatmapCardDifficultyList : CompositeDrawable
+    public partial class BeatmapCardDifficultyList : CompositeDrawable
     {
         public BeatmapCardDifficultyList(IBeatmapSetInfo beatmapSetInfo)
         {
@@ -53,7 +51,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
             }
         }
 
-        private class BeatmapCardDifficultyRow : CompositeDrawable
+        private partial class BeatmapCardDifficultyRow : CompositeDrawable
         {
             private readonly IBeatmapInfo beatmapInfo;
 

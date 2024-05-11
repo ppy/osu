@@ -1,0 +1,33 @@
+{
+  "Mappings": [{
+    "StartTime": 1000.0,
+    "Objects": [{
+      "StartTime": 1000.0,
+      "EndTime": 2750.0,
+      "Column": 1,
+      "NodeSamples": [
+        ["Gameplay/normal-hitnormal"],
+        ["Gameplay/soft-hitnormal"],
+        ["Gameplay/drum-hitnormal"]
+      ],
+      "Samples": ["Gameplay/normal-hitnormal"]
+    }, {
+      "StartTime": 1875.0,
+      "EndTime": 2750.0,
+      "Column": 0,
+      "NodeSamples": [
+        ["Gameplay/soft-hitnormal"],
+        ["Gameplay/drum-hitnormal"]
+      ],
+      "Samples": ["Gameplay/normal-hitnormal"]
+    }]
+  }, {
+    "StartTime": 3750.0,
+    "Objects": [{
+      "StartTime": 3750.0,
+      "EndTime": 3750.0,
+      "Column": 3,
+      "Samples": ["Gameplay/normal-hitnormal"]
+    }]
+  }]
+}

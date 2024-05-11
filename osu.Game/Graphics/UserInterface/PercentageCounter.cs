@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
@@ -14,9 +12,9 @@ namespace osu.Game.Graphics.UserInterface
     /// <summary>
     /// Used as an accuracy counter. Represented visually as a percentage.
     /// </summary>
-    public class PercentageCounter : RollingCounter<double>
+    public partial class PercentageCounter : RollingCounter<double>
     {
-        protected override double RollingDuration => 750;
+        protected override double RollingDuration => 375;
 
         private float epsilon => 1e-10f;
 

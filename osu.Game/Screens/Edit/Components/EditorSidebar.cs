@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -16,9 +14,11 @@ namespace osu.Game.Screens.Edit.Components
     /// A sidebar area that can be attached to the left or right edge of the screen.
     /// Houses scrolling sectionised content.
     /// </summary>
-    internal class EditorSidebar : Container<EditorSidebarSection>
+    internal partial class EditorSidebar : Container<EditorSidebarSection>
     {
         public const float WIDTH = 250;
+
+        public const float PADDING = 3;
 
         private readonly Box background;
 
@@ -37,13 +37,13 @@ namespace osu.Game.Screens.Edit.Components
                 },
                 new OsuScrollContainer
                 {
-                    Padding = new MarginPadding { Left = 20 },
                     ScrollbarOverlapsContent = false,
                     RelativeSizeAxes = Axes.Both,
                     Child = Content = new FillFlowContainer<EditorSidebarSection>
                     {
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
+                        Padding = new MarginPadding(PADDING),
                         Direction = FillDirection.Vertical,
                     },
                 }

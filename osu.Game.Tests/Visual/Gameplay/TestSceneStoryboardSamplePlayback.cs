@@ -23,7 +23,7 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    public class TestSceneStoryboardSamplePlayback : PlayerTestScene
+    public partial class TestSceneStoryboardSamplePlayback : PlayerTestScene
     {
         private Storyboard storyboard;
 
@@ -41,6 +41,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             backgroundLayer.Add(new StoryboardSampleInfo("Intro/welcome.mp3", time: -7000, volume: 20));
             backgroundLayer.Add(new StoryboardSampleInfo("Intro/welcome.mp3", time: -5000, volume: 20));
             backgroundLayer.Add(new StoryboardSampleInfo("Intro/welcome.mp3", time: 0, volume: 20));
+            backgroundLayer.Add(new StoryboardSampleInfo("Intro/welcome.mp3", time: 2000, volume: 20));
         }
 
         [SetUp]

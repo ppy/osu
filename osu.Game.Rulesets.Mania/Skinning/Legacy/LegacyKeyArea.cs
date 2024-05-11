@@ -1,13 +1,12 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Textures;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Mania.UI;
@@ -17,16 +16,16 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Mania.Skinning.Legacy
 {
-    public class LegacyKeyArea : LegacyManiaColumnElement, IKeyBindingHandler<ManiaAction>
+    public partial class LegacyKeyArea : LegacyManiaColumnElement, IKeyBindingHandler<ManiaAction>
     {
         private readonly IBindable<ScrollingDirection> direction = new Bindable<ScrollingDirection>();
 
-        private Container directionContainer;
-        private Sprite upSprite;
-        private Sprite downSprite;
+        private Container directionContainer = null!;
+        private Sprite upSprite = null!;
+        private Sprite downSprite = null!;
 
         [Resolved]
-        private Column column { get; set; }
+        private Column column { get; set; } = null!;
 
         public LegacyKeyArea()
         {
@@ -48,17 +47,18 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
                 AutoSizeAxes = Axes.Y,
                 Children = new Drawable[]
                 {
+                    // Key images are placed side-to-side on the playfield, therefore ClampToEdge must be used to prevent any gaps between each key.
                     upSprite = new Sprite
                     {
                         Origin = Anchor.BottomCentre,
-                        Texture = skin.GetTexture(upImage),
+                        Texture = skin.GetTexture(upImage, WrapMode.ClampToEdge, default),
                         RelativeSizeAxes = Axes.X,
                         Width = 1
                     },
                     downSprite = new Sprite
                     {
                         Origin = Anchor.BottomCentre,
-                        Texture = skin.GetTexture(downImage),
+                        Texture = skin.GetTexture(downImage, WrapMode.ClampToEdge, default),
                         RelativeSizeAxes = Axes.X,
                         Width = 1,
                         Alpha = 0

@@ -3,8 +3,11 @@
 
 #nullable disable
 
+using System;
 using System.Linq;
+using JetBrains.Annotations;
 using NUnit.Framework;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
@@ -15,10 +18,18 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Editing
 {
-    public class TestSceneComposeSelectBox : OsuManualInputManagerTestScene
+    public partial class TestSceneComposeSelectBox : OsuManualInputManagerTestScene
     {
         private Container selectionArea;
         private SelectionBox selectionBox;
+
+        [Cached(typeof(SelectionRotationHandler))]
+        private TestSelectionRotationHandler rotationHandler;
+
+        public TestSceneComposeSelectBox()
+        {
+            rotationHandler = new TestSelectionRotationHandler(() => selectionArea);
+        }
 
         [SetUp]
         public void SetUp() => Schedule(() =>
@@ -34,13 +45,12 @@ namespace osu.Game.Tests.Visual.Editing
                     {
                         RelativeSizeAxes = Axes.Both,
 
-                        CanRotate = true,
                         CanScaleX = true,
                         CanScaleY = true,
+                        CanScaleDiagonally = true,
                         CanFlipX = true,
                         CanFlipY = true,
 
-                        OnRotation = handleRotation,
                         OnScale = handleScale
                     }
                 }
@@ -71,11 +81,48 @@ namespace osu.Game.Tests.Visual.Editing
             return true;
         }
 
-        private bool handleRotation(float angle)
+        private partial class TestSelectionRotationHandler : SelectionRotationHandler
         {
-            // kinda silly and wrong, but just showing that the drag handles work.
-            selectionArea.Rotation += angle;
-            return true;
+            private readonly Func<Container> getTargetContainer;
+
+            public TestSelectionRotationHandler(Func<Container> getTargetContainer)
+            {
+                this.getTargetContainer = getTargetContainer;
+
+                CanRotateSelectionOrigin.Value = true;
+            }
+
+            [CanBeNull]
+            private Container targetContainer;
+
+            private float? initialRotation;
+
+            public override void Begin()
+            {
+                if (targetContainer != null)
+                    throw new InvalidOperationException($"Cannot {nameof(Begin)} a rotate operation while another is in progress!");
+
+                targetContainer = getTargetContainer();
+                initialRotation = targetContainer!.Rotation;
+            }
+
+            public override void Update(float rotation, Vector2? origin = null)
+            {
+                if (targetContainer == null)
+                    throw new InvalidOperationException($"Cannot {nameof(Update)} a rotate operation without calling {nameof(Begin)} first!");
+
+                // kinda silly and wrong, but just showing that the drag handles work.
+                targetContainer.Rotation = initialRotation!.Value + rotation;
+            }
+
+            public override void Commit()
+            {
+                if (targetContainer == null)
+                    throw new InvalidOperationException($"Cannot {nameof(Commit)} a rotate operation without calling {nameof(Begin)} first!");
+
+                targetContainer = null;
+                initialRotation = null;
+            }
         }
 
         [Test]

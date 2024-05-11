@@ -1,7 +1,5 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -17,7 +15,7 @@ using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Overlays.Rankings.Tables
 {
-    public class CountriesTable : RankingsTable<CountryStatistics>
+    public partial class CountriesTable : RankingsTable<CountryStatistics>
     {
         public CountriesTable(int page, IReadOnlyList<CountryStatistics> rankings)
             : base(page, rankings)
@@ -66,10 +64,10 @@ namespace osu.Game.Overlays.Rankings.Tables
             }
         };
 
-        private class CountryName : LinkFlowContainer
+        private partial class CountryName : LinkFlowContainer
         {
-            [Resolved(canBeNull: true)]
-            private RankingsOverlay rankings { get; set; }
+            [Resolved]
+            private RankingsOverlay? rankings { get; set; }
 
             public CountryName(CountryCode countryCode)
                 : base(t => t.Font = OsuFont.GetFont(size: 12))

@@ -20,7 +20,7 @@ using osuTK.Input;
 
 namespace osu.Game.Rulesets.Osu.Tests.Editor
 {
-    public class TestSceneSliderSelectionBlueprint : SelectionBlueprintTestScene
+    public partial class TestSceneSliderSelectionBlueprint : SelectionBlueprintTestScene
     {
         private Slider slider;
         private DrawableSlider drawableObject;
@@ -34,7 +34,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             slider = new Slider
             {
                 Position = new Vector2(256, 192),
-                Path = new SliderPath(PathType.Bezier, new[]
+                Path = new SliderPath(PathType.BEZIER, new[]
                 {
                     Vector2.Zero,
                     new Vector2(150, 150),
@@ -187,19 +187,19 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             AddStep($"move mouse to control point {index}", () =>
             {
                 Vector2 position = slider.Position + slider.Path.ControlPoints[index].Position;
-                InputManager.MoveMouseTo(drawableObject.Parent.ToScreenSpace(position));
+                InputManager.MoveMouseTo(drawableObject.Parent!.ToScreenSpace(position));
             });
         }
 
         private void checkControlPointSelected(int index, bool selected)
             => AddAssert($"control point {index} {(selected ? "selected" : "not selected")}", () => blueprint.ControlPointVisualiser.Pieces[index].IsSelected.Value == selected);
 
-        private class TestSliderBlueprint : SliderSelectionBlueprint
+        private partial class TestSliderBlueprint : SliderSelectionBlueprint
         {
             public new SliderBodyPiece BodyPiece => base.BodyPiece;
             public new TestSliderCircleOverlay HeadOverlay => (TestSliderCircleOverlay)base.HeadOverlay;
             public new TestSliderCircleOverlay TailOverlay => (TestSliderCircleOverlay)base.TailOverlay;
-            public new PathControlPointVisualiser ControlPointVisualiser => base.ControlPointVisualiser;
+            public new PathControlPointVisualiser<Slider> ControlPointVisualiser => base.ControlPointVisualiser;
 
             public TestSliderBlueprint(Slider slider)
                 : base(slider)
@@ -209,7 +209,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             protected override SliderCircleOverlay CreateCircleOverlay(Slider slider, SliderPosition position) => new TestSliderCircleOverlay(slider, position);
         }
 
-        private class TestSliderCircleOverlay : SliderCircleOverlay
+        private partial class TestSliderCircleOverlay : SliderCircleOverlay
         {
             public new HitCirclePiece CirclePiece => base.CirclePiece;
 

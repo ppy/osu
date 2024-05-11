@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -11,23 +9,25 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Pooling;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Localisation;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Localisation.HUD;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Scoring;
 using osuTK;
 
 namespace osu.Game.Screens.Play.HUD.HitErrorMeters
 {
-    public class BarHitErrorMeter : HitErrorMeter
+    [Cached]
+    public partial class BarHitErrorMeter : HitErrorMeter
     {
-        private const int judgement_line_width = 14;
-
-        [SettingSource("Judgement line thickness", "How thick the individual lines should be.")]
+        [SettingSource(typeof(BarHitErrorMeterStrings), nameof(BarHitErrorMeterStrings.JudgementLineThickness), nameof(BarHitErrorMeterStrings.JudgementLineThicknessDescription))]
         public BindableNumber<float> JudgementLineThickness { get; } = new BindableNumber<float>(4)
         {
             MinValue = 1,
@@ -35,37 +35,45 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
             Precision = 0.1f,
         };
 
-        [SettingSource("Show moving average arrow", "Whether an arrow should move beneath the bar showing the average error.")]
+        [SettingSource(typeof(BarHitErrorMeterStrings), nameof(BarHitErrorMeterStrings.ColourBarVisibility))]
+        public Bindable<bool> ColourBarVisibility { get; } = new Bindable<bool>(true);
+
+        [SettingSource(typeof(BarHitErrorMeterStrings), nameof(BarHitErrorMeterStrings.ShowMovingAverage), nameof(BarHitErrorMeterStrings.ShowMovingAverageDescription))]
         public Bindable<bool> ShowMovingAverage { get; } = new BindableBool(true);
 
-        [SettingSource("Centre marker style", "How to signify the centre of the display")]
+        [SettingSource(typeof(BarHitErrorMeterStrings), nameof(BarHitErrorMeterStrings.CentreMarkerStyle), nameof(BarHitErrorMeterStrings.CentreMarkerStyleDescription))]
         public Bindable<CentreMarkerStyles> CentreMarkerStyle { get; } = new Bindable<CentreMarkerStyles>(CentreMarkerStyles.Circle);
 
-        [SettingSource("Label style", "How to show early/late extremities")]
+        [SettingSource(typeof(BarHitErrorMeterStrings), nameof(BarHitErrorMeterStrings.LabelStyle), nameof(BarHitErrorMeterStrings.LabelStyleDescription))]
         public Bindable<LabelStyles> LabelStyle { get; } = new Bindable<LabelStyles>(LabelStyles.Icons);
 
-        private SpriteIcon arrow;
-        private UprightAspectMaintainingContainer labelEarly;
-        private UprightAspectMaintainingContainer labelLate;
+        private const int judgement_line_width = 14;
 
-        private Container colourBarsEarly;
-        private Container colourBarsLate;
+        private const int max_concurrent_judgements = 50;
 
-        private Container judgementsContainer;
+        private const int centre_marker_size = 8;
 
         private double maxHitWindow;
 
         private double floatingAverage;
-        private Container colourBars;
-        private Container arrowContainer;
 
-        private (HitResult result, double length)[] hitWindows;
+        private readonly DrawablePool<JudgementLine> judgementLinePool = new DrawablePool<JudgementLine>(50);
 
-        private const int max_concurrent_judgements = 50;
+        private SpriteIcon arrow = null!;
+        private UprightAspectMaintainingContainer labelEarly = null!;
+        private UprightAspectMaintainingContainer labelLate = null!;
 
-        private Drawable[] centreMarkerDrawables;
+        private Container colourBarsEarly = null!;
+        private Container colourBarsLate = null!;
 
-        private const int centre_marker_size = 8;
+        private Container judgementsContainer = null!;
+
+        private Container colourBars = null!;
+        private Container arrowContainer = null!;
+
+        private (HitResult result, double length)[] hitWindows = null!;
+
+        private Drawable[]? centreMarkerDrawables;
 
         public BarHitErrorMeter()
         {
@@ -88,6 +96,7 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
                 Margin = new MarginPadding(2),
                 Children = new Drawable[]
                 {
+                    judgementLinePool,
                     colourBars = new Container
                     {
                         Name = "colour axis",
@@ -104,6 +113,7 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
                                 Origin = Anchor.TopCentre,
                                 Width = bar_width,
                                 RelativeSizeAxes = Axes.Y,
+                                Alpha = 0,
                                 Height = 0.5f,
                                 Scale = new Vector2(1, -1),
                             },
@@ -111,6 +121,7 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
                             {
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.TopCentre,
+                                Alpha = 0,
                                 Width = bar_width,
                                 RelativeSizeAxes = Axes.Y,
                                 Height = 0.5f,
@@ -174,6 +185,11 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
 
             CentreMarkerStyle.BindValueChanged(style => recreateCentreMarker(style.NewValue), true);
             LabelStyle.BindValueChanged(style => recreateLabels(style.NewValue), true);
+            ColourBarVisibility.BindValueChanged(visible =>
+            {
+                colourBarsEarly.FadeTo(visible.NewValue ? 1 : 0, 500, Easing.OutQuint);
+                colourBarsLate.FadeTo(visible.NewValue ? 1 : 0, 500, Easing.OutQuint);
+            }, true);
 
             // delay the appearance animations for only the initial appearance.
             using (arrowContainer.BeginDelayedSequence(450))
@@ -279,19 +295,21 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
             switch (style)
             {
                 case LabelStyles.None:
+                    labelEarly.Clear();
+                    labelLate.Clear();
                     break;
 
                 case LabelStyles.Icons:
                     labelEarly.Child = new SpriteIcon
                     {
                         Size = new Vector2(icon_size),
-                        Icon = FontAwesome.Solid.ShippingFast,
+                        Icon = OsuIcon.Hare
                     };
 
                     labelLate.Child = new SpriteIcon
                     {
                         Size = new Vector2(icon_size),
-                        Icon = FontAwesome.Solid.Bicycle,
+                        Icon = OsuIcon.Tortoise
                     };
 
                     break;
@@ -401,11 +419,12 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
                 }
             }
 
-            judgementsContainer.Add(new JudgementLine
+            judgementLinePool.Get(drawableJudgement =>
             {
-                JudgementLineThickness = { BindTarget = JudgementLineThickness },
-                Y = getRelativeJudgementPosition(judgement.TimeOffset),
-                Colour = GetColourForHitResult(judgement.Type),
+                drawableJudgement.Y = getRelativeJudgementPosition(judgement.TimeOffset);
+                drawableJudgement.Colour = GetColourForHitResult(judgement.Type);
+
+                judgementsContainer.Add(drawableJudgement);
             });
 
             arrow.MoveToY(
@@ -415,9 +434,12 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
 
         private float getRelativeJudgementPosition(double value) => Math.Clamp((float)((value / maxHitWindow) + 1) / 2, 0, 1);
 
-        internal class JudgementLine : CompositeDrawable
+        internal partial class JudgementLine : PoolableDrawable
         {
             public readonly BindableNumber<float> JudgementLineThickness = new BindableFloat();
+
+            [Resolved]
+            private BarHitErrorMeter barHitErrorMeter { get; set; } = null!;
 
             public JudgementLine()
             {
@@ -437,15 +459,21 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
 
             protected override void LoadComplete()
             {
+                base.LoadComplete();
+
+                JudgementLineThickness.BindTo(barHitErrorMeter.JudgementLineThickness);
+                JudgementLineThickness.BindValueChanged(thickness => Height = thickness.NewValue, true);
+            }
+
+            protected override void PrepareForUse()
+            {
+                base.PrepareForUse();
+
                 const int judgement_fade_in_duration = 100;
                 const int judgement_fade_out_duration = 5000;
 
-                base.LoadComplete();
-
                 Alpha = 0;
                 Width = 0;
-
-                JudgementLineThickness.BindValueChanged(thickness => Height = thickness.NewValue, true);
 
                 this
                     .FadeTo(0.6f, judgement_fade_in_duration, Easing.OutQuint)
@@ -457,19 +485,36 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
             }
         }
 
-        public override void Clear() => judgementsContainer.Clear();
+        public override void Clear()
+        {
+            foreach (var j in judgementsContainer)
+            {
+                j.ClearTransforms();
+                j.Expire();
+            }
+        }
 
         public enum CentreMarkerStyles
         {
+            [LocalisableDescription(typeof(BarHitErrorMeterStrings), nameof(BarHitErrorMeterStrings.CentreMarkerStylesNone))]
             None,
+
+            [LocalisableDescription(typeof(BarHitErrorMeterStrings), nameof(BarHitErrorMeterStrings.CentreMarkerStylesCircle))]
             Circle,
+
+            [LocalisableDescription(typeof(BarHitErrorMeterStrings), nameof(BarHitErrorMeterStrings.CentreMarkerStylesLine))]
             Line
         }
 
         public enum LabelStyles
         {
+            [LocalisableDescription(typeof(BarHitErrorMeterStrings), nameof(BarHitErrorMeterStrings.LabelStylesNone))]
             None,
+
+            [LocalisableDescription(typeof(BarHitErrorMeterStrings), nameof(BarHitErrorMeterStrings.LabelStylesIcons))]
             Icons,
+
+            [LocalisableDescription(typeof(BarHitErrorMeterStrings), nameof(BarHitErrorMeterStrings.LabelStylesText))]
             Text
         }
     }

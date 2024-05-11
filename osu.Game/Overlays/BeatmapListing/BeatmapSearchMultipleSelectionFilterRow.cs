@@ -5,19 +5,22 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osuTK;
 
 namespace osu.Game.Overlays.BeatmapListing
 {
-    public class BeatmapSearchMultipleSelectionFilterRow<T> : BeatmapSearchFilterRow<List<T>>
+    public partial class BeatmapSearchMultipleSelectionFilterRow<T> : BeatmapSearchFilterRow<List<T>>
+        where T : Enum
     {
         public new readonly BindableList<T> Current = new BindableList<T>();
 
@@ -31,7 +34,7 @@ namespace osu.Game.Overlays.BeatmapListing
         [BackgroundDependencyLoader]
         private void load()
         {
-            Current.BindTo(filter.Current);
+            filter.Current.BindTo(Current);
         }
 
         protected sealed override Drawable CreateFilter() => filter = CreateMultipleSelectionFilter();
@@ -42,17 +45,15 @@ namespace osu.Game.Overlays.BeatmapListing
         [NotNull]
         protected virtual MultipleSelectionFilter CreateMultipleSelectionFilter() => new MultipleSelectionFilter();
 
-        protected class MultipleSelectionFilter : FillFlowContainer<MultipleSelectionFilterTabItem>
+        protected partial class MultipleSelectionFilter : FillFlowContainer<MultipleSelectionFilterTabItem>
         {
             public readonly BindableList<T> Current = new BindableList<T>();
 
             [BackgroundDependencyLoader]
             private void load()
             {
-                Anchor = Anchor.BottomLeft;
-                Origin = Anchor.BottomLeft;
                 RelativeSizeAxes = Axes.X;
-                Height = 15;
+                AutoSizeAxes = Axes.Y;
                 Spacing = new Vector2(10, 0);
 
                 AddRange(GetValues().Select(CreateTabItem));
@@ -64,6 +65,14 @@ namespace osu.Game.Overlays.BeatmapListing
 
                 foreach (var item in Children)
                     item.Active.BindValueChanged(active => toggleItem(item.Value, active.NewValue));
+
+                Current.BindCollectionChanged(currentChanged, true);
+            }
+
+            private void currentChanged(object sender, NotifyCollectionChangedEventArgs e)
+            {
+                foreach (var c in Children)
+                    c.Active.Value = Current.Contains(c.Value);
             }
 
             /// <summary>
@@ -79,23 +88,51 @@ namespace osu.Game.Overlays.BeatmapListing
             private void toggleItem(T value, bool active)
             {
                 if (active)
-                    Current.Add(value);
+                {
+                    if (!Current.Contains(value))
+                        Current.Add(value);
+                }
                 else
                     Current.Remove(value);
             }
         }
 
-        protected class MultipleSelectionFilterTabItem : FilterTabItem<T>
+        protected partial class MultipleSelectionFilterTabItem : FilterTabItem<T>
         {
+            private readonly Box selectedUnderline;
+
+            protected override bool HighlightOnHoverWhenActive => true;
+
             public MultipleSelectionFilterTabItem(T value)
                 : base(value)
             {
+                // This doesn't match any actual design, but should make it easier for the user to understand
+                // that filters are applied until we settle on a final design.
+                AddInternal(selectedUnderline = new Box
+                {
+                    Depth = float.MaxValue,
+                    RelativeSizeAxes = Axes.X,
+                    Height = 1.5f,
+                    Anchor = Anchor.BottomLeft,
+                    Origin = Anchor.CentreLeft,
+                });
+            }
+
+            protected override void UpdateState()
+            {
+                base.UpdateState();
+                selectedUnderline.FadeTo(Active.Value ? 1 : 0, 200, Easing.OutQuint);
+                selectedUnderline.FadeColour(IsHovered ? ColourProvider.Content2 : GetStateColour(), 200, Easing.OutQuint);
             }
 
             protected override bool OnClick(ClickEvent e)
             {
                 base.OnClick(e);
+
+                // this tab item implementation is not managed by a TabControl,
+                // therefore we have to manually update Active state and play select sound when this tab item is clicked.
                 Active.Toggle();
+                SelectSample.Play();
                 return true;
             }
         }

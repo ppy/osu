@@ -1,20 +1,20 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
+using System;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
 using osu.Game.Beatmaps;
-using osu.Game.Beatmaps.Drawables;
 using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Screens.Select.Carousel
 {
-    public class SetPanelBackground : BufferedContainer
+    public partial class SetPanelBackground : BufferedContainer
     {
         public SetPanelBackground(IWorkingBeatmap working)
             : base(cachedFrameBuffer: true)
@@ -23,7 +23,7 @@ namespace osu.Game.Screens.Select.Carousel
 
             Children = new Drawable[]
             {
-                new BeatmapBackgroundSprite(working)
+                new PanelBeatmapBackground(working)
                 {
                     RelativeSizeAxes = Axes.Both,
                     Anchor = Anchor.Centre,
@@ -69,6 +69,24 @@ namespace osu.Game.Screens.Select.Carousel
                     }
                 },
             };
+        }
+
+        public partial class PanelBeatmapBackground : Sprite
+        {
+            private readonly IWorkingBeatmap working;
+
+            public PanelBeatmapBackground(IWorkingBeatmap working)
+            {
+                ArgumentNullException.ThrowIfNull(working);
+
+                this.working = working;
+            }
+
+            [BackgroundDependencyLoader]
+            private void load()
+            {
+                Texture = working.GetPanelBackground();
+            }
         }
     }
 }

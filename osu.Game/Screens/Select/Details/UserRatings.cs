@@ -15,7 +15,7 @@ using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Screens.Select.Details
 {
-    public class UserRatings : Container
+    public partial class UserRatings : Container
     {
         private readonly FillFlowContainer header;
         private readonly Bar ratingsBar;

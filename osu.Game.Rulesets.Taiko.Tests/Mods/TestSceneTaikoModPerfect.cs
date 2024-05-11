@@ -10,7 +10,7 @@ using osu.Game.Tests.Visual;
 
 namespace osu.Game.Rulesets.Taiko.Tests.Mods
 {
-    public class TestSceneTaikoModPerfect : ModPerfectTestScene
+    public partial class TestSceneTaikoModPerfect : ModFailConditionTestScene
     {
         protected override Ruleset CreatePlayerRuleset() => new TestTaikoRuleset();
 
@@ -31,11 +31,11 @@ namespace osu.Game.Rulesets.Taiko.Tests.Mods
         [TestCase(true)]
         public void TestSwell(bool shouldMiss) => CreateHitObjectTest(new HitObjectTestData(new Swell { StartTime = 1000, EndTime = 3000 }, false), shouldMiss);
 
-        private class TestTaikoRuleset : TaikoRuleset
+        private partial class TestTaikoRuleset : TaikoRuleset
         {
             public override HealthProcessor CreateHealthProcessor(double drainStartTime) => new TestTaikoHealthProcessor();
 
-            private class TestTaikoHealthProcessor : TaikoHealthProcessor
+            private partial class TestTaikoHealthProcessor : TaikoHealthProcessor
             {
                 protected override void Reset(bool storeResults)
                 {

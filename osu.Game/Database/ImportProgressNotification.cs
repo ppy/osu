@@ -5,7 +5,7 @@ using osu.Game.Overlays.Notifications;
 
 namespace osu.Game.Database
 {
-    public class ImportProgressNotification : ProgressNotification
+    public partial class ImportProgressNotification : ProgressNotification
     {
         public ImportProgressNotification()
         {

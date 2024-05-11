@@ -9,7 +9,7 @@ using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Database
 {
-    public class TooManyDownloadsNotification : SimpleNotification
+    public partial class TooManyDownloadsNotification : SimpleNotification
     {
         public TooManyDownloadsNotification()
         {

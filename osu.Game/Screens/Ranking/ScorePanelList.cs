@@ -9,7 +9,6 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using JetBrains.Annotations;
-using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -21,7 +20,7 @@ using osuTK.Input;
 
 namespace osu.Game.Screens.Ranking
 {
-    public class ScorePanelList : CompositeDrawable
+    public partial class ScorePanelList : CompositeDrawable
     {
         /// <summary>
         /// Normal spacing between all panels.
@@ -50,6 +49,8 @@ namespace osu.Game.Screens.Ranking
 
         public bool AllPanelsVisible => flow.All(p => p.IsPresent);
 
+        public bool IsEmpty => flow.Count == 0;
+
         /// <summary>
         /// The current scroll position.
         /// </summary>
@@ -66,9 +67,6 @@ namespace osu.Game.Screens.Ranking
         public Action PostExpandAction;
 
         public readonly Bindable<ScoreInfo> SelectedScore = new Bindable<ScoreInfo>();
-
-        [Resolved]
-        private ScoreManager scoreManager { get; set; }
 
         private readonly CancellationTokenSource loadCancellationSource = new CancellationTokenSource();
         private readonly Flow flow;
@@ -149,7 +147,7 @@ namespace osu.Game.Screens.Ranking
 
             var score = trackingContainer.Panel.Score;
 
-            flow.SetLayoutPosition(trackingContainer, scoreManager.GetTotalScore(score));
+            flow.SetLayoutPosition(trackingContainer, score.TotalScore);
 
             trackingContainer.Show();
 
@@ -322,7 +320,7 @@ namespace osu.Game.Screens.Ranking
             loadCancellationSource?.Cancel();
         }
 
-        private class Flow : FillFlowContainer<ScorePanelTrackingContainer>
+        private partial class Flow : FillFlowContainer<ScorePanelTrackingContainer>
         {
             public override IEnumerable<Drawable> FlowingChildren => applySorting(AliveInternalChildren);
 
@@ -339,7 +337,7 @@ namespace osu.Game.Screens.Ranking
                                                                                                                        .ThenBy(s => s.Panel.Score.OnlineID);
         }
 
-        private class Scroll : OsuScrollContainer
+        private partial class Scroll : OsuScrollContainer
         {
             public new float Target => base.Target;
 

@@ -10,7 +10,7 @@ using osu.Game.Screens.Select;
 
 namespace osu.Game.Screens.OnlinePlay.Playlists
 {
-    public class PlaylistsSongSelect : OnlinePlaySongSelect
+    public partial class PlaylistsSongSelect : OnlinePlaySongSelect
     {
         public PlaylistsSongSelect(Room room)
             : base(room)

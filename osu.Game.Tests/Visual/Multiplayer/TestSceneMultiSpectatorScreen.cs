@@ -30,7 +30,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
-    public class TestSceneMultiSpectatorScreen : MultiplayerTestScene
+    public partial class TestSceneMultiSpectatorScreen : MultiplayerTestScene
     {
         [Resolved]
         private OsuGameBase game { get; set; } = null!;
@@ -65,6 +65,47 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddStep("clear playing users", () => playingUsers.Clear());
         }
 
+        [TestCase(1)]
+        [TestCase(4)]
+        [TestCase(9)]
+        public void TestGeneral(int count)
+        {
+            int[] userIds = getPlayerIds(count);
+
+            start(userIds);
+            loadSpectateScreen();
+
+            sendFrames(userIds, 1000);
+            AddWaitStep("wait a bit", 20);
+        }
+
+        [TestCase(2)]
+        [TestCase(16)]
+        public void TestTeams(int count)
+        {
+            int[] userIds = getPlayerIds(count);
+
+            start(userIds, teams: true);
+            loadSpectateScreen();
+
+            sendFrames(userIds, 1000);
+            AddWaitStep("wait a bit", 20);
+        }
+
+        [Test]
+        public void TestMultipleStartRequests()
+        {
+            int[] userIds = getPlayerIds(2);
+
+            start(userIds);
+            loadSpectateScreen();
+
+            sendFrames(userIds, 1000);
+            AddWaitStep("wait a bit", 20);
+
+            start(userIds);
+        }
+
         [Test]
         public void TestDelayedStart()
         {
@@ -89,18 +130,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         [Test]
-        public void TestGeneral()
-        {
-            int[] userIds = getPlayerIds(4);
-
-            start(userIds);
-            loadSpectateScreen();
-
-            sendFrames(userIds, 1000);
-            AddWaitStep("wait a bit", 20);
-        }
-
-        [Test]
         public void TestSpectatorPlayerInteractiveElementsHidden()
         {
             HUDVisibilityMode originalConfigValue = default;
@@ -121,7 +150,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddUntilStep("all interactive elements removed", () => this.ChildrenOfType<Player>().All(p =>
                 !p.ChildrenOfType<PlayerSettingsOverlay>().Any() &&
                 !p.ChildrenOfType<HoldForMenuButton>().Any() &&
-                p.ChildrenOfType<SongProgressBar>().SingleOrDefault()?.ShowHandle == false));
+                p.ChildrenOfType<ArgonSongProgressBar>().SingleOrDefault()?.Interactive == false));
 
             AddStep("restore config hud visibility", () => config.SetValue(OsuSetting.HUDVisibilityMode, originalConfigValue));
         }
@@ -395,7 +424,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         public void TestIntroStoryboardElement() => testLeadIn(b =>
         {
             var sprite = new StoryboardSprite("unknown", Anchor.TopLeft, Vector2.Zero);
-            sprite.TimelineGroup.Alpha.Add(Easing.None, -2000, 0, 0, 1);
+            sprite.Commands.AddAlpha(Easing.None, -2000, 0, 0, 1);
             b.Storyboard.GetLayer("Background").Add(sprite);
         });
 
@@ -434,16 +463,18 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         private void start(int userId, int? beatmapId = null) => start(new[] { userId }, beatmapId);
 
-        private void start(int[] userIds, int? beatmapId = null, APIMod[]? mods = null)
+        private void start(int[] userIds, int? beatmapId = null, APIMod[]? mods = null, bool teams = false)
         {
             AddStep("start play", () =>
             {
-                foreach (int id in userIds)
+                for (int i = 0; i < userIds.Length; i++)
                 {
+                    int id = userIds[i];
                     var user = new MultiplayerRoomUser(id)
                     {
                         User = new APIUser { Id = id },
                         Mods = mods ?? Array.Empty<APIMod>(),
+                        MatchState = teams ? new TeamVersusUserState { TeamID = i % 2 } : null,
                     };
 
                     OnlinePlayDependencies.MultiplayerClient.AddUser(user, true);

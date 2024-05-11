@@ -15,7 +15,7 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public class TestSceneOverlayScrollContainer : OsuManualInputManagerTestScene
+    public partial class TestSceneOverlayScrollContainer : OsuManualInputManagerTestScene
     {
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
@@ -61,6 +61,18 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddStep("scroll to 500", () => scroll.ScrollTo(500));
             AddUntilStep("scrolled to 500", () => Precision.AlmostEquals(scroll.Current, 500, 0.1f));
             AddAssert("button is visible", () => scroll.Button.State == Visibility.Visible);
+
+            AddStep("click button", () =>
+            {
+                InputManager.MoveMouseTo(scroll.Button);
+                InputManager.Click(MouseButton.Left);
+            });
+
+            AddAssert("button is visible", () => scroll.Button.State == Visibility.Visible);
+
+            AddStep("user scroll down by 1", () => InputManager.ScrollVerticalBy(-1));
+
+            AddAssert("button is hidden", () => scroll.Button.State == Visibility.Hidden);
         }
 
         [Test]
@@ -71,6 +83,10 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddStep("invoke action", () => scroll.Button.Action.Invoke());
 
             AddUntilStep("scrolled back to start", () => Precision.AlmostEquals(scroll.Current, 0, 0.1f));
+
+            AddStep("invoke action", () => scroll.Button.Action.Invoke());
+
+            AddAssert("scrolled to end", () => scroll.IsScrolledToEnd());
         }
 
         [Test]
@@ -85,6 +101,14 @@ namespace osu.Game.Tests.Visual.UserInterface
             });
 
             AddUntilStep("scrolled back to start", () => Precision.AlmostEquals(scroll.Current, 0, 0.1f));
+
+            AddStep("click button", () =>
+            {
+                InputManager.MoveMouseTo(scroll.Button);
+                InputManager.Click(MouseButton.Left);
+            });
+
+            AddAssert("scrolled to end", () => scroll.IsScrolledToEnd());
         }
 
         [Test]
@@ -97,12 +121,12 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddStep("hover button", () => InputManager.MoveMouseTo(scroll.Button));
             AddRepeatStep("click button", () => InputManager.Click(MouseButton.Left), 3);
 
-            AddAssert("invocation count is 1", () => invocationCount == 1);
+            AddAssert("invocation count is 3", () => invocationCount == 3);
         }
 
-        private class TestScrollContainer : OverlayScrollContainer
+        private partial class TestScrollContainer : OverlayScrollContainer
         {
-            public new ScrollToTopButton Button => base.Button;
+            public new ScrollBackButton Button => base.Button;
         }
     }
 }

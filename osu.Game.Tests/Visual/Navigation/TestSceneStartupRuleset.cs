@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using NUnit.Framework;
 using osu.Framework.Development;
 using osu.Game.Configuration;
@@ -10,7 +8,7 @@ using osu.Game.Configuration;
 namespace osu.Game.Tests.Visual.Navigation
 {
     [TestFixture]
-    public class TestSceneStartupRuleset : OsuGameTestScene
+    public partial class TestSceneStartupRuleset : OsuGameTestScene
     {
         protected override TestOsuGame CreateTestGame()
         {

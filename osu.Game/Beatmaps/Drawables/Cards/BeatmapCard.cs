@@ -5,18 +5,21 @@ using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Cursor;
+using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
+using osu.Game.Localisation;
 
 namespace osu.Game.Beatmaps.Drawables.Cards
 {
-    public abstract class BeatmapCard : OsuClickableContainer, IEquatable<BeatmapCard>
+    public abstract partial class BeatmapCard : OsuClickableContainer, IHasContextMenu
     {
-        public const float TRANSITION_DURATION = 400;
+        public const float TRANSITION_DURATION = 340;
         public const float CORNER_RADIUS = 10;
 
         protected const float WIDTH = 430;
@@ -86,6 +89,9 @@ namespace osu.Game.Beatmaps.Drawables.Cards
         {
             switch (size)
             {
+                case BeatmapCardSize.Nano:
+                    return new BeatmapCardNano(beatmapSet);
+
                 case BeatmapCardSize.Normal:
                     return new BeatmapCardNormal(beatmapSet, allowExpansion);
 
@@ -97,15 +103,9 @@ namespace osu.Game.Beatmaps.Drawables.Cards
             }
         }
 
-        public bool Equals(BeatmapCard? other)
+        public MenuItem[] ContextMenuItems => new MenuItem[]
         {
-            if (ReferenceEquals(null, other)) return false;
-            if (ReferenceEquals(this, other)) return true;
-
-            return BeatmapSet.Equals(other.BeatmapSet);
-        }
-
-        public override bool Equals(object obj) => obj is BeatmapCard other && Equals(other);
-        public override int GetHashCode() => BeatmapSet.GetHashCode();
+            new OsuMenuItem(ContextMenuStrings.ViewBeatmap, MenuItemType.Highlighted, Action),
+        };
     }
 }

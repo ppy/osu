@@ -7,10 +7,12 @@ using System;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
@@ -21,12 +23,11 @@ using osu.Game.Screens.Edit.GameplayTest;
 using osu.Game.Screens.Play;
 using osu.Game.Storyboards;
 using osu.Game.Tests.Beatmaps.IO;
-using osuTK.Graphics;
 using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Editing
 {
-    public class TestSceneEditorTestGameplay : EditorTestScene
+    public partial class TestSceneEditorTestGameplay : EditorTestScene
     {
         protected override bool IsolateSavingFromDatabase => false;
 
@@ -39,6 +40,14 @@ namespace osu.Game.Tests.Visual.Editing
         private BeatmapManager beatmaps { get; set; }
 
         private BeatmapSetInfo importedBeatmapSet;
+
+        private Bindable<float> editorDim;
+
+        [BackgroundDependencyLoader]
+        private void load(OsuConfigManager config)
+        {
+            editorDim = config.GetBindable<float>(OsuSetting.EditorDim);
+        }
 
         public override void SetUpSteps()
         {
@@ -77,7 +86,7 @@ namespace osu.Game.Tests.Visual.Editing
                 // this test cares about checking the background belonging to the editor specifically, so check that using reference equality
                 // (as `.Equals()` cannot discern between the two, as they technically share the same database GUID).
                 var background = this.ChildrenOfType<BackgroundScreenBeatmap>().Single(b => ReferenceEquals(b.Beatmap.BeatmapInfo, EditorBeatmap.BeatmapInfo));
-                return background.Colour == Color4.DarkGray && background.BlurAmount.Value == 0;
+                return background.DimWhenUserSettingsIgnored.Value == editorDim.Value && background.BlurAmount.Value == 0;
             });
             AddAssert("no mods selected", () => SelectedMods.Value.Count == 0);
         }
@@ -110,7 +119,7 @@ namespace osu.Game.Tests.Visual.Editing
                 // this test cares about checking the background belonging to the editor specifically, so check that using reference equality
                 // (as `.Equals()` cannot discern between the two, as they technically share the same database GUID).
                 var background = this.ChildrenOfType<BackgroundScreenBeatmap>().Single(b => ReferenceEquals(b.Beatmap.BeatmapInfo, EditorBeatmap.BeatmapInfo));
-                return background.Colour == Color4.DarkGray && background.BlurAmount.Value == 0;
+                return background.DimWhenUserSettingsIgnored.Value == editorDim.Value && background.BlurAmount.Value == 0;
             });
 
             AddStep("start track", () => EditorClock.Start());
@@ -129,11 +138,11 @@ namespace osu.Game.Tests.Visual.Editing
                 InputManager.MoveMouseTo(button);
                 InputManager.Click(MouseButton.Left);
             });
-            AddUntilStep("save prompt shown", () => DialogOverlay.CurrentDialog is SaveBeforeGameplayTestDialog);
+            AddUntilStep("save prompt shown", () => DialogOverlay.CurrentDialog is SaveRequiredPopupDialog);
 
             AddStep("dismiss prompt", () =>
             {
-                var button = DialogOverlay.CurrentDialog.Buttons.Last();
+                var button = DialogOverlay.CurrentDialog!.Buttons.Last();
                 InputManager.MoveMouseTo(button);
                 InputManager.Click(MouseButton.Left);
             });
@@ -156,9 +165,9 @@ namespace osu.Game.Tests.Visual.Editing
                 InputManager.MoveMouseTo(button);
                 InputManager.Click(MouseButton.Left);
             });
-            AddUntilStep("save prompt shown", () => DialogOverlay.CurrentDialog is SaveBeforeGameplayTestDialog);
+            AddUntilStep("save prompt shown", () => DialogOverlay.CurrentDialog is SaveRequiredPopupDialog);
 
-            AddStep("save changes", () => DialogOverlay.CurrentDialog.PerformOkAction());
+            AddStep("save changes", () => DialogOverlay.CurrentDialog!.PerformOkAction());
 
             EditorPlayer editorPlayer = null;
             AddUntilStep("player pushed", () => (editorPlayer = Stack.CurrentScreen as EditorPlayer) != null);
@@ -169,7 +178,7 @@ namespace osu.Game.Tests.Visual.Editing
         }
 
         [Test]
-        public void TestSharedClockState()
+        public void TestClockTimeTransferIsOneDirectional()
         {
             AddStep("seek to 00:01:00", () => EditorClock.Seek(60_000));
             AddStep("click test gameplay button", () =>
@@ -186,24 +195,28 @@ namespace osu.Game.Tests.Visual.Editing
             GameplayClockContainer gameplayClockContainer = null;
             AddStep("fetch gameplay clock", () => gameplayClockContainer = editorPlayer.ChildrenOfType<GameplayClockContainer>().First());
             AddUntilStep("gameplay clock running", () => gameplayClockContainer.IsRunning);
+            // when the gameplay test is entered, the clock is expected to continue from where it was in the main editor...
             AddAssert("gameplay time past 00:01:00", () => gameplayClockContainer.CurrentTime >= 60_000);
 
-            double timeAtPlayerExit = 0;
             AddWaitStep("wait some", 5);
-            AddStep("store time before exit", () => timeAtPlayerExit = gameplayClockContainer.CurrentTime);
 
             AddStep("exit player", () => editorPlayer.Exit());
             AddUntilStep("current screen is editor", () => Stack.CurrentScreen is Editor);
-            AddAssert("time is past player exit", () => EditorClock.CurrentTime >= timeAtPlayerExit);
+            // but when exiting from gameplay test back to editor, the expectation is that the editor time should revert to what it was at the point of initiating the gameplay test.
+            AddAssert("time reverted to 00:01:00", () => EditorClock.CurrentTime, () => Is.EqualTo(60_000));
         }
 
         public override void TearDownSteps()
         {
             base.TearDownSteps();
-            AddStep("delete imported", () =>
+            AddStep("delete imported", () => Realm.Write(r =>
             {
-                beatmaps.Delete(importedBeatmapSet);
-            });
+                // delete from realm directly rather than via `BeatmapManager` to avoid cross-test pollution
+                // (`BeatmapManager.Delete()` uses soft deletion, which can lead to beatmap reuse between test cases).
+                r.RemoveAll<BeatmapMetadata>();
+                r.RemoveAll<BeatmapInfo>();
+                r.RemoveAll<BeatmapSetInfo>();
+            }));
         }
     }
 }

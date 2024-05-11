@@ -7,16 +7,16 @@ using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using osu.Game.Beatmaps;
-using osu.Game.Database;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
+using osu.Game.Users;
 
 namespace osu.Game.Online.API.Requests.Responses
 {
     [Serializable]
-    public class SoloScoreInfo : IHasOnlineID<long>
+    public class SoloScoreInfo : IScoreInfo
     {
         [JsonProperty("beatmap_id")]
         public int BeatmapID { get; set; }
@@ -31,7 +31,10 @@ namespace osu.Game.Online.API.Requests.Responses
         public bool Passed { get; set; }
 
         [JsonProperty("total_score")]
-        public int TotalScore { get; set; }
+        public long TotalScore { get; set; }
+
+        [JsonProperty("total_score_without_mods")]
+        public long TotalScoreWithoutMods { get; set; }
 
         [JsonProperty("accuracy")]
         public double Accuracy { get; set; }
@@ -44,7 +47,8 @@ namespace osu.Game.Online.API.Requests.Responses
         public int MaxCombo { get; set; }
 
         [JsonConverter(typeof(StringEnumConverter))]
-        [JsonProperty("rank")]
+        // ScoreRank is aligned to make 0 equal D. We still want to serialise this (even when DefaultValueHandling.Ignore is used).
+        [JsonProperty("rank", DefaultValueHandling = DefaultValueHandling.Include)]
         public ScoreRank Rank { get; set; }
 
         [JsonProperty("started_at")]
@@ -114,6 +118,9 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty("has_replay")]
         public bool HasReplay { get; set; }
 
+        [JsonProperty("ranked")]
+        public bool Ranked { get; set; }
+
         // These properties are calculated or not relevant to any external usage.
         public bool ShouldSerializeID() => false;
         public bool ShouldSerializeUser() => false;
@@ -137,6 +144,24 @@ namespace osu.Game.Online.API.Requests.Responses
 
         #endregion
 
+        #region IScoreInfo
+
+        public long OnlineID => (long?)ID ?? -1;
+
+        IUser IScoreInfo.User => User!;
+        DateTimeOffset IScoreInfo.Date => EndedAt;
+        long IScoreInfo.LegacyOnlineID => (long?)LegacyScoreId ?? -1;
+        IBeatmapInfo IScoreInfo.Beatmap => Beatmap!;
+        IRulesetInfo IScoreInfo.Ruleset => Beatmap!.Ruleset;
+
+        #endregion
+
+        /// <summary>
+        /// Whether this <see cref="ScoreInfo"/> represents a legacy (osu!stable) score.
+        /// </summary>
+        [JsonIgnore]
+        public bool IsLegacyScore => LegacyScoreId != null;
+
         public override string ToString() => $"score_id: {ID} user_id: {UserID}";
 
         /// <summary>
@@ -153,10 +178,8 @@ namespace osu.Game.Online.API.Requests.Responses
 
             var mods = Mods.Select(apiMod => apiMod.ToMod(rulesetInstance)).ToArray();
 
-            var scoreInfo = ToScoreInfo(mods);
-
+            var scoreInfo = ToScoreInfo(mods, beatmap);
             scoreInfo.Ruleset = ruleset;
-            if (beatmap != null) scoreInfo.BeatmapInfo = beatmap;
 
             return scoreInfo;
         }
@@ -165,25 +188,52 @@ namespace osu.Game.Online.API.Requests.Responses
         /// Create a <see cref="ScoreInfo"/> from an API score instance.
         /// </summary>
         /// <param name="mods">The mod instances, resolved from a ruleset.</param>
-        /// <returns></returns>
-        public ScoreInfo ToScoreInfo(Mod[] mods) => new ScoreInfo
+        /// <param name="beatmap">The object to populate the scores' beatmap with.
+        ///<list type="bullet">
+        /// <item>If this is a <see cref="BeatmapInfo"/> type, then the score will be fully populated with the given object.</item>
+        /// <item>Otherwise, if this is an <see cref="IBeatmapInfo"/> type (e.g. <see cref="APIBeatmap"/>), then only the beatmap ruleset will be populated.</item>
+        /// <item>Otherwise, if this is <c>null</c>, then the beatmap ruleset will not be populated.</item>
+        /// <item>The online beatmap ID is populated in all cases.</item>
+        /// </list>
+        /// </param>
+        /// <returns>The populated <see cref="ScoreInfo"/>.</returns>
+        public ScoreInfo ToScoreInfo(Mod[] mods, IBeatmapInfo? beatmap = null)
         {
-            OnlineID = OnlineID,
-            User = User ?? new APIUser { Id = UserID },
-            BeatmapInfo = new BeatmapInfo { OnlineID = BeatmapID },
-            Ruleset = new RulesetInfo { OnlineID = RulesetID },
-            Passed = Passed,
-            TotalScore = TotalScore,
-            Accuracy = Accuracy,
-            MaxCombo = MaxCombo,
-            Rank = Rank,
-            Statistics = Statistics,
-            MaximumStatistics = MaximumStatistics,
-            Date = EndedAt,
-            Hash = HasReplay ? "online" : string.Empty, // TODO: temporary?
-            Mods = mods,
-            PP = PP,
-        };
+            var score = new ScoreInfo
+            {
+                OnlineID = OnlineID,
+                LegacyOnlineID = (long?)LegacyScoreId ?? -1,
+                IsLegacyScore = IsLegacyScore,
+                User = User ?? new APIUser { Id = UserID },
+                BeatmapInfo = new BeatmapInfo { OnlineID = BeatmapID },
+                Ruleset = new RulesetInfo { OnlineID = RulesetID },
+                Passed = Passed,
+                TotalScore = TotalScore,
+                TotalScoreWithoutMods = TotalScoreWithoutMods,
+                LegacyTotalScore = LegacyTotalScore,
+                Accuracy = Accuracy,
+                MaxCombo = MaxCombo,
+                Rank = Rank,
+                Statistics = Statistics,
+                MaximumStatistics = MaximumStatistics,
+                Date = EndedAt,
+                HasOnlineReplay = HasReplay,
+                Mods = mods,
+                PP = PP,
+                Ranked = Ranked,
+            };
+
+            if (beatmap is BeatmapInfo realmBeatmap)
+                score.BeatmapInfo = realmBeatmap;
+            else if (beatmap != null)
+            {
+                score.BeatmapInfo.Ruleset.OnlineID = beatmap.Ruleset.OnlineID;
+                score.BeatmapInfo.Ruleset.Name = beatmap.Ruleset.Name;
+                score.BeatmapInfo.Ruleset.ShortName = beatmap.Ruleset.ShortName;
+            }
+
+            return score;
+        }
 
         /// <summary>
         /// Creates a <see cref="SoloScoreInfo"/> from a local score for score submission.
@@ -192,17 +242,16 @@ namespace osu.Game.Online.API.Requests.Responses
         public static SoloScoreInfo ForSubmission(ScoreInfo score) => new SoloScoreInfo
         {
             Rank = score.Rank,
-            TotalScore = (int)score.TotalScore,
+            TotalScore = score.TotalScore,
+            TotalScoreWithoutMods = score.TotalScoreWithoutMods,
             Accuracy = score.Accuracy,
             PP = score.PP,
             MaxCombo = score.MaxCombo,
             RulesetID = score.RulesetID,
             Passed = score.Passed,
             Mods = score.APIMods,
-            Statistics = score.Statistics.Where(kvp => kvp.Value != 0).ToDictionary(kvp => kvp.Key, kvp => kvp.Value),
-            MaximumStatistics = score.MaximumStatistics.Where(kvp => kvp.Value != 0).ToDictionary(kvp => kvp.Key, kvp => kvp.Value),
+            Statistics = score.Statistics.Where(kvp => kvp.Value != 0).ToDictionary(),
+            MaximumStatistics = score.MaximumStatistics.Where(kvp => kvp.Value != 0).ToDictionary(),
         };
-
-        public long OnlineID => (long?)ID ?? -1;
     }
 }

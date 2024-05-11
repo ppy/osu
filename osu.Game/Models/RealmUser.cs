@@ -27,7 +27,7 @@ namespace osu.Game.Models
 
         public bool IsBot => false;
 
-        public bool Equals(RealmUser other)
+        public bool Equals(RealmUser? other)
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;

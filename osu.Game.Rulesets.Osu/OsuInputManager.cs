@@ -1,23 +1,24 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using osu.Framework.Input;
+using osu.Framework.Allocation;
+using osu.Framework.Graphics;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
-using osu.Framework.Input.StateChanges.Events;
+using osu.Framework.Lists;
 using osu.Game.Input.Bindings;
+using osu.Game.Rulesets.Osu.Objects.Drawables;
+using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Rulesets.UI;
+using osuTK;
 
 namespace osu.Game.Rulesets.Osu
 {
-    public class OsuInputManager : RulesetInputManager<OsuAction>
+    public partial class OsuInputManager : RulesetInputManager<OsuAction>
     {
-        public IEnumerable<OsuAction> PressedActions => KeyBindingContainer.PressedActions;
+        public SlimReadOnlyListWrapper<OsuAction> PressedActions => KeyBindingContainer.PressedActions;
 
         /// <summary>
         /// Whether gameplay input buttons should be allowed.
@@ -28,6 +29,7 @@ namespace osu.Game.Rulesets.Osu
         /// </remarks>
         public bool AllowGameplayInputs
         {
+            get => ((OsuKeyBindingContainer)KeyBindingContainer).AllowGameplayInputs;
             set => ((OsuKeyBindingContainer)KeyBindingContainer).AllowGameplayInputs = value;
         }
 
@@ -40,9 +42,22 @@ namespace osu.Game.Rulesets.Osu
         protected override KeyBindingContainer<OsuAction> CreateKeyBindingContainer(RulesetInfo ruleset, int variant, SimultaneousBindingMode unique)
             => new OsuKeyBindingContainer(ruleset, variant, unique);
 
+        public bool CheckScreenSpaceActionPressJudgeable(Vector2 screenSpacePosition) =>
+            // This is a very naive but simple approach.
+            //
+            // Based on user feedback of more nuanced scenarios (where touch doesn't behave as expected),
+            // this can be expanded to a more complex implementation, but I'd still want to keep it as simple as we can.
+            NonPositionalInputQueue.OfType<DrawableHitCircle.HitReceptor>().Any(c => c.ReceivePositionalInputAt(screenSpacePosition));
+
         public OsuInputManager(RulesetInfo ruleset)
             : base(ruleset, 0, SimultaneousBindingMode.Unique)
         {
+        }
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            Add(new OsuTouchInputMapper(this) { RelativeSizeAxes = Axes.Both });
         }
 
         protected override bool Handle(UIEvent e)
@@ -52,20 +67,7 @@ namespace osu.Game.Rulesets.Osu
             return base.Handle(e);
         }
 
-        protected override bool HandleMouseTouchStateChange(TouchStateChangeEvent e)
-        {
-            if (!AllowUserCursorMovement)
-            {
-                // Still allow for forwarding of the "touch" part, but replace the positional data with that of the mouse.
-                // Primarily relied upon by the "autopilot" osu! mod.
-                var touch = new Touch(e.Touch.Source, CurrentState.Mouse.Position);
-                e = new TouchStateChangeEvent(e.State, e.Input, touch, e.IsActive, null);
-            }
-
-            return base.HandleMouseTouchStateChange(e);
-        }
-
-        private class OsuKeyBindingContainer : RulesetKeyBindingContainer
+        private partial class OsuKeyBindingContainer : RulesetKeyBindingContainer
         {
             private bool allowGameplayInputs = true;
 
@@ -96,7 +98,7 @@ namespace osu.Game.Rulesets.Osu
                 base.ReloadMappings(realmKeyBindings);
 
                 if (!AllowGameplayInputs)
-                    KeyBindings = KeyBindings.Where(b => b.GetAction<OsuAction>() == OsuAction.Smoke).ToList();
+                    KeyBindings = KeyBindings.Where(static b => b.GetAction<OsuAction>() == OsuAction.Smoke).ToList();
             }
         }
     }

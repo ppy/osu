@@ -1,35 +1,19 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">iPhoneSimulator</Platform>
-    <ProjectGuid>{4004C7B7-1A62-43F1-9DF2-52450FA67E70}</ProjectGuid>
     <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0-ios</TargetFramework>
+    <SupportedOSPlatformVersion>13.4</SupportedOSPlatformVersion>
     <RootNamespace>osu.Game.Rulesets.Catch.Tests</RootNamespace>
     <AssemblyName>osu.Game.Rulesets.Catch.Tests.iOS</AssemblyName>
   </PropertyGroup>
   <Import Project="..\osu.iOS.props" />
   <ItemGroup>
-    <None Include="Info.plist" />
-    <None Include="Entitlements.plist" />
-    <LinkDescription Include="..\osu.iOS\Linker.xml">
-      <Link>Linker.xml</Link>
-    </LinkDescription>
-    <Compile Include="Application.cs" />
-    <Compile Include="AppDelegate.cs" />
     <Compile Include="..\osu.Game.Rulesets.Catch.Tests\**\*.cs" Exclude="**\obj\**">
       <Link>%(RecursiveDir)%(Filename)%(Extension)</Link>
     </Compile>
   </ItemGroup>
   <ItemGroup Label="Project References">
-    <ProjectReference Include="..\osu.Game\osu.Game.csproj">
-      <Project>{2A66DD92-ADB1-4994-89E2-C94E04ACDA0D}</Project>
-      <Name>osu.Game</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\osu.Game.Rulesets.Catch\osu.Game.Rulesets.Catch.csproj">
-      <Project>{58F6C80C-1253-4A0E-A465-B8C85EBEADF3}</Project>
-      <Name>osu.Game.Rulesets.Catch</Name>
-    </ProjectReference>
+    <ProjectReference Include="..\osu.Game\osu.Game.csproj" />
+    <ProjectReference Include="..\osu.Game.Rulesets.Catch\osu.Game.Rulesets.Catch.csproj" />
   </ItemGroup>
-  <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
 </Project>

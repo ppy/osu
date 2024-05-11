@@ -16,7 +16,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Statistics
     /// <summary>
     /// A <see cref="StatisticDisplay"/> to display general numeric values.
     /// </summary>
-    public class CounterStatistic : StatisticDisplay
+    public partial class CounterStatistic : StatisticDisplay
     {
         private readonly int count;
         private readonly int? maxCount;

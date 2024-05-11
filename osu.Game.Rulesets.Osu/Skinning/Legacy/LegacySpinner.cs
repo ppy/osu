@@ -1,12 +1,11 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Globalization;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
@@ -17,7 +16,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 {
-    public abstract class LegacySpinner : CompositeDrawable, IHasApproachCircle
+    public abstract partial class LegacySpinner : CompositeDrawable, IHasApproachCircle
     {
         public const float SPRITE_SCALE = 0.625f;
 
@@ -32,17 +31,17 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 
         private const float spm_hide_offset = 50f;
 
-        protected DrawableSpinner DrawableSpinner { get; private set; }
+        protected DrawableSpinner DrawableSpinner { get; private set; } = null!;
 
-        public Drawable ApproachCircle { get; protected set; }
+        public Drawable? ApproachCircle { get; protected set; }
 
-        private Sprite spin;
-        private Sprite clear;
+        private Sprite spin = null!;
+        private Sprite clear = null!;
 
-        private LegacySpriteText bonusCounter;
+        private LegacySpriteText bonusCounter = null!;
 
-        private Sprite spmBackground;
-        private LegacySpriteText spmCounter;
+        private Sprite spmBackground = null!;
+        private LegacySpriteText spmCounter = null!;
 
         [BackgroundDependencyLoader]
         private void load(DrawableHitObject drawableHitObject, ISkinSource source)
@@ -88,7 +87,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                         Origin = Anchor.Centre,
                         Scale = new Vector2(SPRITE_SCALE),
                         Y = SPINNER_TOP_OFFSET + 299,
-                    }.With(s => s.Font = s.Font.With(fixedWidth: false)),
+                    },
                     spmBackground = new Sprite
                     {
                         Anchor = Anchor.TopCentre,
@@ -103,13 +102,13 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                         Origin = Anchor.TopRight,
                         Scale = new Vector2(SPRITE_SCALE * 0.9f),
                         Position = new Vector2(80, 448 + spm_hide_offset),
-                    }.With(s => s.Font = s.Font.With(fixedWidth: false)),
+                    },
                 }
             });
         }
 
-        private IBindable<double> gainedBonus;
-        private IBindable<double> spinsPerMinute;
+        private IBindable<int> completedSpins = null!;
+        private IBindable<double> spinsPerMinute = null!;
 
         private readonly Bindable<bool> completed = new Bindable<bool>();
 
@@ -117,12 +116,24 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
         {
             base.LoadComplete();
 
-            gainedBonus = DrawableSpinner.GainedBonus.GetBoundCopy();
-            gainedBonus.BindValueChanged(bonus =>
+            completedSpins = DrawableSpinner.CompletedFullSpins.GetBoundCopy();
+            completedSpins.BindValueChanged(bonus =>
             {
-                bonusCounter.Text = bonus.NewValue.ToString(NumberFormatInfo.InvariantInfo);
-                bonusCounter.FadeOutFromOne(800, Easing.Out);
-                bonusCounter.ScaleTo(SPRITE_SCALE * 2f).Then().ScaleTo(SPRITE_SCALE * 1.28f, 800, Easing.Out);
+                if (DrawableSpinner.CurrentBonusScore <= 0)
+                    return;
+
+                bonusCounter.Text = DrawableSpinner.CurrentBonusScore.ToString(NumberFormatInfo.InvariantInfo);
+
+                if (DrawableSpinner.CurrentBonusScore == DrawableSpinner.MaximumBonusScore)
+                {
+                    bonusCounter.ScaleTo(1.4f).Then().ScaleTo(1.8f, 1000, Easing.Out);
+                    bonusCounter.FadeOutFromOne(500, Easing.Out);
+                }
+                else
+                {
+                    bonusCounter.FadeOutFromOne(800, Easing.Out);
+                    bonusCounter.ScaleTo(SPRITE_SCALE * 2f).Then().ScaleTo(SPRITE_SCALE * 1.28f, 800, Easing.Out);
+                }
             });
 
             spinsPerMinute = DrawableSpinner.SpinsPerMinute.GetBoundCopy();
@@ -207,7 +218,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
         {
             base.Dispose(isDisposing);
 
-            if (DrawableSpinner != null)
+            if (DrawableSpinner.IsNotNull())
                 DrawableSpinner.ApplyCustomUpdateState -= UpdateStateTransforms;
         }
     }

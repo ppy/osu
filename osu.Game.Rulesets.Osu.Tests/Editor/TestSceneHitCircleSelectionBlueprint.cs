@@ -15,7 +15,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Tests.Editor
 {
-    public class TestSceneHitCircleSelectionBlueprint : SelectionBlueprintTestScene
+    public partial class TestSceneHitCircleSelectionBlueprint : SelectionBlueprintTestScene
     {
         private HitCircle hitCircle;
         private DrawableHitCircle drawableObject;
@@ -61,7 +61,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             AddAssert("blueprint positioned over hitobject", () => blueprint.CirclePiece.Position == hitCircle.StackedPosition);
         }
 
-        private class TestBlueprint : HitCircleSelectionBlueprint
+        private partial class TestBlueprint : HitCircleSelectionBlueprint
         {
             public new HitCirclePiece CirclePiece => base.CirclePiece;
 

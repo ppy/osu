@@ -1,9 +1,11 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -11,6 +13,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
+using osu.Game.Rulesets.Taiko.Configuration;
 using osuTK;
 using osuTK.Graphics;
 
@@ -19,7 +22,7 @@ namespace osu.Game.Rulesets.Taiko.UI
     /// <summary>
     /// An overlay that captures and displays osu!taiko mouse and touch input.
     /// </summary>
-    public class DrumTouchInputArea : VisibilityContainer
+    public partial class DrumTouchInputArea : VisibilityContainer
     {
         // visibility state affects our child. we always want to handle input.
         public override bool PropagatePositionalInputSubTree => true;
@@ -31,15 +34,18 @@ namespace osu.Game.Rulesets.Taiko.UI
 
         private Container mainContent = null!;
 
-        private QuarterCircle leftCentre = null!;
-        private QuarterCircle rightCentre = null!;
-        private QuarterCircle leftRim = null!;
-        private QuarterCircle rightRim = null!;
+        private DrumSegment leftCentre = null!;
+        private DrumSegment rightCentre = null!;
+        private DrumSegment leftRim = null!;
+        private DrumSegment rightRim = null!;
+
+        private readonly Bindable<TaikoTouchControlScheme> configTouchControlScheme = new Bindable<TaikoTouchControlScheme>();
 
         [BackgroundDependencyLoader]
-        private void load(TaikoInputManager taikoInputManager, OsuColour colours)
+        private void load(TaikoInputManager taikoInputManager, TaikoRulesetConfigManager config)
         {
             Debug.Assert(taikoInputManager.KeyBindingContainer != null);
+
             keyBindingContainer = taikoInputManager.KeyBindingContainer;
 
             // Container should handle input everywhere.
@@ -65,27 +71,27 @@ namespace osu.Game.Rulesets.Taiko.UI
                             RelativeSizeAxes = Axes.Both,
                             Children = new Drawable[]
                             {
-                                leftRim = new QuarterCircle(TaikoAction.LeftRim, colours.Blue)
+                                leftRim = new DrumSegment
                                 {
                                     Anchor = Anchor.BottomCentre,
                                     Origin = Anchor.BottomRight,
                                     X = -2,
                                 },
-                                rightRim = new QuarterCircle(TaikoAction.RightRim, colours.Blue)
+                                rightRim = new DrumSegment
                                 {
                                     Anchor = Anchor.BottomCentre,
                                     Origin = Anchor.BottomRight,
                                     X = 2,
                                     Rotation = 90,
                                 },
-                                leftCentre = new QuarterCircle(TaikoAction.LeftCentre, colours.Pink)
+                                leftCentre = new DrumSegment
                                 {
                                     Anchor = Anchor.BottomCentre,
                                     Origin = Anchor.BottomRight,
                                     X = -2,
                                     Scale = new Vector2(centre_region),
                                 },
-                                rightCentre = new QuarterCircle(TaikoAction.RightCentre, colours.Pink)
+                                rightCentre = new DrumSegment
                                 {
                                     Anchor = Anchor.BottomCentre,
                                     Origin = Anchor.BottomRight,
@@ -98,6 +104,17 @@ namespace osu.Game.Rulesets.Taiko.UI
                     }
                 },
             };
+
+            config.BindWith(TaikoRulesetSetting.TouchControlScheme, configTouchControlScheme);
+            configTouchControlScheme.BindValueChanged(scheme =>
+            {
+                var actions = getOrderedActionsForScheme(scheme.NewValue);
+
+                leftRim.Action = actions[0];
+                leftCentre.Action = actions[1];
+                rightCentre.Action = actions[2];
+                rightRim.Action = actions[3];
+            }, true);
         }
 
         protected override bool OnKeyDown(KeyDownEvent e)
@@ -105,24 +122,6 @@ namespace osu.Game.Rulesets.Taiko.UI
             // Hide whenever the keyboard is used.
             Hide();
             return false;
-        }
-
-        protected override bool OnMouseDown(MouseDownEvent e)
-        {
-            if (!validMouse(e))
-                return false;
-
-            handleDown(e.Button, e.ScreenSpaceMousePosition);
-            return true;
-        }
-
-        protected override void OnMouseUp(MouseUpEvent e)
-        {
-            if (!validMouse(e))
-                return;
-
-            handleUp(e.Button);
-            base.OnMouseUp(e);
         }
 
         protected override bool OnTouchDown(TouchDownEvent e)
@@ -137,17 +136,52 @@ namespace osu.Game.Rulesets.Taiko.UI
             base.OnTouchUp(e);
         }
 
+        private static TaikoAction[] getOrderedActionsForScheme(TaikoTouchControlScheme scheme)
+        {
+            switch (scheme)
+            {
+                case TaikoTouchControlScheme.KDDK:
+                    return new[]
+                    {
+                        TaikoAction.LeftRim,
+                        TaikoAction.LeftCentre,
+                        TaikoAction.RightCentre,
+                        TaikoAction.RightRim
+                    };
+
+                case TaikoTouchControlScheme.DDKK:
+                    return new[]
+                    {
+                        TaikoAction.LeftCentre,
+                        TaikoAction.RightCentre,
+                        TaikoAction.LeftRim,
+                        TaikoAction.RightRim
+                    };
+
+                case TaikoTouchControlScheme.KKDD:
+                    return new[]
+                    {
+                        TaikoAction.LeftRim,
+                        TaikoAction.RightRim,
+                        TaikoAction.LeftCentre,
+                        TaikoAction.RightCentre
+                    };
+
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(scheme), scheme, null);
+            }
+        }
+
         private void handleDown(object source, Vector2 position)
         {
             Show();
 
-            TaikoAction taikoAction = getTaikoActionFromInput(position);
+            TaikoAction taikoAction = getTaikoActionFromPosition(position);
 
             // Not too sure how this can happen, but let's avoid throwing.
-            if (trackedActions.ContainsKey(source))
+            if (!trackedActions.TryAdd(source, taikoAction))
                 return;
 
-            trackedActions.Add(source, taikoAction);
             keyBindingContainer.TriggerPressed(taikoAction);
         }
 
@@ -157,18 +191,15 @@ namespace osu.Game.Rulesets.Taiko.UI
             trackedActions.Remove(source);
         }
 
-        private bool validMouse(MouseButtonEvent e) =>
-            leftRim.Contains(e.ScreenSpaceMouseDownPosition) || rightRim.Contains(e.ScreenSpaceMouseDownPosition);
-
-        private TaikoAction getTaikoActionFromInput(Vector2 inputPosition)
+        private TaikoAction getTaikoActionFromPosition(Vector2 inputPosition)
         {
             bool centreHit = leftCentre.Contains(inputPosition) || rightCentre.Contains(inputPosition);
             bool leftSide = ToLocalSpace(inputPosition).X < DrawWidth / 2;
 
             if (leftSide)
-                return centreHit ? TaikoAction.LeftCentre : TaikoAction.LeftRim;
+                return centreHit ? leftCentre.Action : leftRim.Action;
 
-            return centreHit ? TaikoAction.RightCentre : TaikoAction.RightRim;
+            return centreHit ? rightCentre.Action : rightRim.Action;
         }
 
         protected override void PopIn()
@@ -181,23 +212,42 @@ namespace osu.Game.Rulesets.Taiko.UI
             mainContent.FadeOut(300);
         }
 
-        private class QuarterCircle : CompositeDrawable, IKeyBindingHandler<TaikoAction>
+        private partial class DrumSegment : CompositeDrawable, IKeyBindingHandler<TaikoAction>
         {
-            private readonly Circle overlay;
+            private TaikoAction action;
 
-            private readonly TaikoAction handledAction;
+            public TaikoAction Action
+            {
+                get => action;
+                set
+                {
+                    if (action == value)
+                        return;
 
-            private readonly Circle circle;
+                    action = value;
+                    updateColoursFromAction();
+                }
+            }
+
+            private Circle overlay = null!;
+
+            private Circle circle = null!;
+
+            [Resolved]
+            private OsuColour colours { get; set; } = null!;
 
             public override bool Contains(Vector2 screenSpacePos) => circle.Contains(screenSpacePos);
 
-            public QuarterCircle(TaikoAction handledAction, Color4 colour)
+            public DrumSegment()
             {
-                this.handledAction = handledAction;
                 RelativeSizeAxes = Axes.Both;
 
                 FillMode = FillMode.Fit;
+            }
 
+            [BackgroundDependencyLoader]
+            private void load()
+            {
                 InternalChildren = new Drawable[]
                 {
                     new Container
@@ -209,7 +259,6 @@ namespace osu.Game.Rulesets.Taiko.UI
                             circle = new Circle
                             {
                                 RelativeSizeAxes = Axes.Both,
-                                Colour = colour.Multiply(1.4f).Darken(2.8f),
                                 Alpha = 0.8f,
                                 Scale = new Vector2(2),
                             },
@@ -218,7 +267,6 @@ namespace osu.Game.Rulesets.Taiko.UI
                                 Alpha = 0,
                                 RelativeSizeAxes = Axes.Both,
                                 Blending = BlendingParameters.Additive,
-                                Colour = colour,
                                 Scale = new Vector2(2),
                             }
                         }
@@ -226,17 +274,51 @@ namespace osu.Game.Rulesets.Taiko.UI
                 };
             }
 
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+
+                updateColoursFromAction();
+            }
+
             public bool OnPressed(KeyBindingPressEvent<TaikoAction> e)
             {
-                if (e.Action == handledAction)
+                if (e.Action == Action)
                     overlay.FadeTo(1f, 80, Easing.OutQuint);
                 return false;
             }
 
             public void OnReleased(KeyBindingReleaseEvent<TaikoAction> e)
             {
-                if (e.Action == handledAction)
+                if (e.Action == Action)
                     overlay.FadeOut(1000, Easing.OutQuint);
+            }
+
+            private void updateColoursFromAction()
+            {
+                if (!IsLoaded)
+                    return;
+
+                var colour = getColourFromTaikoAction(Action);
+
+                circle.Colour = colour.Multiply(1.4f).Darken(2.8f);
+                overlay.Colour = colour;
+            }
+
+            private Color4 getColourFromTaikoAction(TaikoAction handledAction)
+            {
+                switch (handledAction)
+                {
+                    case TaikoAction.LeftRim:
+                    case TaikoAction.RightRim:
+                        return colours.Blue;
+
+                    case TaikoAction.LeftCentre:
+                    case TaikoAction.RightCentre:
+                        return colours.Pink;
+                }
+
+                throw new ArgumentOutOfRangeException();
             }
         }
     }

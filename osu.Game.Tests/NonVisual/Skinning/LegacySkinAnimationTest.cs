@@ -22,7 +22,7 @@ using osu.Game.Tests.Visual;
 namespace osu.Game.Tests.NonVisual.Skinning
 {
     [HeadlessTest]
-    public class LegacySkinAnimationTest : OsuTestScene
+    public partial class LegacySkinAnimationTest : OsuTestScene
     {
         private const string animation_name = "animation";
         private const int frame_count = 6;
@@ -73,7 +73,7 @@ namespace osu.Game.Tests.NonVisual.Skinning
                 return lookup_names.Contains(componentName) ? renderer.WhitePixel : null;
             }
 
-            public Drawable GetDrawableComponent(ISkinComponent component) => throw new NotSupportedException();
+            public Drawable GetDrawableComponent(ISkinComponentLookup lookup) => throw new NotSupportedException();
             public ISample GetSample(ISampleInfo sampleInfo) => throw new NotSupportedException();
             public IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup) => throw new NotSupportedException();
         }

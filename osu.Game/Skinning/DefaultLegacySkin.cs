@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Collections.Generic;
 using JetBrains.Annotations;
 using osu.Framework.IO.Stores;
@@ -33,8 +31,7 @@ namespace osu.Game.Skinning
             : base(
                 skin,
                 resources,
-                // In the case of the actual default legacy skin (ie. the fallback one, which a user hasn't applied any modifications to) we want to use the game provided resources.
-                skin.Protected ? new NamespacedResourceStore<byte[]>(resources.Resources, "Skins/Legacy") : null
+                new NamespacedResourceStore<byte[]>(resources.Resources, "Skins/Legacy")
             )
         {
             Configuration.CustomColours["SliderBall"] = new Color4(2, 170, 255, 255);

@@ -17,6 +17,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Online.Placeholders;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Scoring;
@@ -28,7 +29,7 @@ using osu.Game.Tests.Resources;
 
 namespace osu.Game.Tests.Visual.Playlists
 {
-    public class TestScenePlaylistsResultsScreen : ScreenTestScene
+    public partial class TestScenePlaylistsResultsScreen : ScreenTestScene
     {
         private const int scores_per_result = 10;
         private const int real_user_position = 200;
@@ -49,8 +50,8 @@ namespace osu.Game.Tests.Visual.Playlists
 
             // Previous test instances of the results screen may still exist at this point so wait for
             // those screens to be cleaned up by the base SetUpSteps before re-initialising test state.
-            // The the screen also holds a leased Beatmap bindable so reassigning it must happen after
-            // the screen as been exited.
+            // The screen also holds a leased Beatmap bindable so reassigning it must happen after
+            // the screen has been exited.
             AddStep("initialise user scores and beatmap", () =>
             {
                 lowestScoreId = 1;
@@ -62,8 +63,6 @@ namespace osu.Game.Tests.Visual.Playlists
                 userScore.TotalScore = 0;
                 userScore.Statistics = new Dictionary<HitResult, int>();
                 userScore.MaximumStatistics = new Dictionary<HitResult, int>();
-
-                bindHandler();
 
                 // Beatmap is required to be an actual beatmap so the scores can get their scores correctly
                 // calculated for standardised scoring, else the tests that rely on ordering will fall over.
@@ -77,6 +76,7 @@ namespace osu.Game.Tests.Visual.Playlists
             AddStep("bind user score info handler", () => bindHandler(userScore: userScore));
 
             createResults(() => userScore);
+            waitForDisplay();
 
             AddAssert("user score selected", () => this.ChildrenOfType<ScorePanel>().Single(p => p.Score.OnlineID == userScore.OnlineID).State == PanelState.Expanded);
             AddAssert($"score panel position is {real_user_position}",
@@ -86,7 +86,10 @@ namespace osu.Game.Tests.Visual.Playlists
         [Test]
         public void TestShowNullUserScore()
         {
+            AddStep("bind user score info handler", () => bindHandler());
+
             createResults();
+            waitForDisplay();
 
             AddAssert("top score selected", () => this.ChildrenOfType<ScorePanel>().OrderByDescending(p => p.Score.TotalScore).First().State == PanelState.Expanded);
         }
@@ -97,6 +100,7 @@ namespace osu.Game.Tests.Visual.Playlists
             AddStep("bind user score info handler", () => bindHandler(true, userScore));
 
             createResults(() => userScore);
+            waitForDisplay();
 
             AddAssert("more than 1 panel displayed", () => this.ChildrenOfType<ScorePanel>().Count() > 1);
             AddAssert("user score selected", () => this.ChildrenOfType<ScorePanel>().Single(p => p.Score.OnlineID == userScore.OnlineID).State == PanelState.Expanded);
@@ -108,6 +112,7 @@ namespace osu.Game.Tests.Visual.Playlists
             AddStep("bind delayed handler", () => bindHandler(true));
 
             createResults();
+            waitForDisplay();
 
             AddAssert("top score selected", () => this.ChildrenOfType<ScorePanel>().OrderByDescending(p => p.Score.TotalScore).First().State == PanelState.Expanded);
         }
@@ -115,9 +120,10 @@ namespace osu.Game.Tests.Visual.Playlists
         [Test]
         public void TestFetchWhenScrolledToTheRight()
         {
-            createResults();
-
             AddStep("bind delayed handler", () => bindHandler(true));
+
+            createResults();
+            waitForDisplay();
 
             for (int i = 0; i < 2; i++)
             {
@@ -135,11 +141,43 @@ namespace osu.Game.Tests.Visual.Playlists
         }
 
         [Test]
+        public void TestNoMoreScoresToTheRight()
+        {
+            AddStep("bind delayed handler with scores", () => bindHandler(delayed: true));
+
+            createResults();
+            waitForDisplay();
+
+            int beforePanelCount = 0;
+
+            AddStep("get panel count", () => beforePanelCount = this.ChildrenOfType<ScorePanel>().Count());
+            AddStep("scroll to right", () => resultsScreen.ScorePanelList.ChildrenOfType<OsuScrollContainer>().Single().ScrollToEnd(false));
+
+            AddAssert("right loading spinner shown", () => resultsScreen.RightSpinner.State.Value == Visibility.Visible);
+            waitForDisplay();
+
+            AddAssert($"count increased by {scores_per_result}", () => this.ChildrenOfType<ScorePanel>().Count() >= beforePanelCount + scores_per_result);
+            AddAssert("right loading spinner hidden", () => resultsScreen.RightSpinner.State.Value == Visibility.Hidden);
+
+            AddStep("get panel count", () => beforePanelCount = this.ChildrenOfType<ScorePanel>().Count());
+            AddStep("bind delayed handler with no scores", () => bindHandler(delayed: true, noScores: true));
+            AddStep("scroll to right", () => resultsScreen.ScorePanelList.ChildrenOfType<OsuScrollContainer>().Single().ScrollToEnd(false));
+
+            AddAssert("right loading spinner shown", () => resultsScreen.RightSpinner.State.Value == Visibility.Visible);
+            waitForDisplay();
+
+            AddAssert("count not increased", () => this.ChildrenOfType<ScorePanel>().Count() == beforePanelCount);
+            AddAssert("right loading spinner hidden", () => resultsScreen.RightSpinner.State.Value == Visibility.Hidden);
+            AddAssert("no placeholders shown", () => this.ChildrenOfType<MessagePlaceholder>().Count(), () => Is.Zero);
+        }
+
+        [Test]
         public void TestFetchWhenScrolledToTheLeft()
         {
             AddStep("bind user score info handler", () => bindHandler(userScore: userScore));
 
             createResults(() => userScore);
+            waitForDisplay();
 
             AddStep("bind delayed handler", () => bindHandler(true));
 
@@ -158,6 +196,15 @@ namespace osu.Game.Tests.Visual.Playlists
             }
         }
 
+        [Test]
+        public void TestShowWithNoScores()
+        {
+            AddStep("bind user score info handler", () => bindHandler(noScores: true));
+            createResults();
+            AddAssert("no scores visible", () => !resultsScreen.ScorePanelList.GetScorePanels().Any());
+            AddAssert("placeholder shown", () => this.ChildrenOfType<MessagePlaceholder>().Count(), () => Is.EqualTo(1));
+        }
+
         private void createResults(Func<ScoreInfo> getScore = null)
         {
             AddStep("load results", () =>
@@ -169,7 +216,6 @@ namespace osu.Game.Tests.Visual.Playlists
             });
 
             AddUntilStep("wait for screen to load", () => resultsScreen.IsLoaded);
-            waitForDisplay();
         }
 
         private void waitForDisplay()
@@ -183,7 +229,7 @@ namespace osu.Game.Tests.Visual.Playlists
             AddWaitStep("wait for display", 5);
         }
 
-        private void bindHandler(bool delayed = false, ScoreInfo userScore = null, bool failRequests = false) => ((DummyAPIAccess)API).HandleRequest = request =>
+        private void bindHandler(bool delayed = false, ScoreInfo userScore = null, bool failRequests = false, bool noScores = false) => ((DummyAPIAccess)API).HandleRequest = request =>
         {
             // pre-check for requests we should be handling (as they are scheduled below).
             switch (request)
@@ -219,7 +265,7 @@ namespace osu.Game.Tests.Visual.Playlists
                         break;
 
                     case IndexPlaylistScoresRequest i:
-                        triggerSuccess(i, createIndexResponse(i));
+                        triggerSuccess(i, createIndexResponse(i, noScores));
                         break;
                 }
             }, delay);
@@ -301,9 +347,11 @@ namespace osu.Game.Tests.Visual.Playlists
             return multiplayerUserScore;
         }
 
-        private IndexedMultiplayerScores createIndexResponse(IndexPlaylistScoresRequest req)
+        private IndexedMultiplayerScores createIndexResponse(IndexPlaylistScoresRequest req, bool noScores = false)
         {
             var result = new IndexedMultiplayerScores();
+
+            if (noScores) return result;
 
             string sort = req.IndexParams?.Properties["sort"].ToObject<string>() ?? "score_desc";
 
@@ -365,16 +413,17 @@ namespace osu.Game.Tests.Visual.Playlists
             };
         }
 
-        private class TestResultsScreen : PlaylistsResultsScreen
+        private partial class TestResultsScreen : PlaylistsResultsScreen
         {
             public new LoadingSpinner LeftSpinner => base.LeftSpinner;
             public new LoadingSpinner CentreSpinner => base.CentreSpinner;
             public new LoadingSpinner RightSpinner => base.RightSpinner;
             public new ScorePanelList ScorePanelList => base.ScorePanelList;
 
-            public TestResultsScreen(ScoreInfo score, int roomId, PlaylistItem playlistItem, bool allowRetry = true)
-                : base(score, roomId, playlistItem, allowRetry)
+            public TestResultsScreen([CanBeNull] ScoreInfo score, int roomId, PlaylistItem playlistItem)
+                : base(score, roomId, playlistItem)
             {
+                AllowRetry = true;
             }
         }
     }

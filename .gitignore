@@ -339,6 +339,6 @@ inspectcode
 
 # Fody (pulled in by Realm) - schema file
 FodyWeavers.xsd
-**/FodyWeavers.xml
 
 .idea/.idea.osu.Desktop/.idea/misc.xml
+.idea/.idea.osu.Android/.idea/deploymentTargetDropDown.xml

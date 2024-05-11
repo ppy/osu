@@ -15,7 +15,7 @@ using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.Components
 {
-    public class ParticipantsList : OnlinePlayComposite
+    public partial class ParticipantsList : OnlinePlayComposite
     {
         public const float TILE_SIZE = 35;
 
@@ -92,7 +92,7 @@ namespace osu.Game.Screens.OnlinePlay.Components
             });
         }
 
-        private class UserTile : CompositeDrawable
+        private partial class UserTile : CompositeDrawable
         {
             public APIUser User
             {
@@ -115,7 +115,7 @@ namespace osu.Game.Screens.OnlinePlay.Components
                         RelativeSizeAxes = Axes.Both,
                         Colour = Color4Extensions.FromHex(@"27252d"),
                     },
-                    avatar = new UpdateableAvatar(showUsernameTooltip: true) { RelativeSizeAxes = Axes.Both },
+                    avatar = new UpdateableAvatar(showUserPanelOnHover: true) { RelativeSizeAxes = Axes.Both },
                 };
             }
         }

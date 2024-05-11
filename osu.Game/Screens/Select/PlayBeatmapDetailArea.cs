@@ -14,7 +14,7 @@ using osu.Game.Screens.Select.Leaderboards;
 
 namespace osu.Game.Screens.Select
 {
-    public class PlayBeatmapDetailArea : BeatmapDetailArea
+    public partial class PlayBeatmapDetailArea : BeatmapDetailArea
     {
         public readonly BeatmapLeaderboard Leaderboard;
 
@@ -80,8 +80,8 @@ namespace osu.Game.Screens.Select
         protected override BeatmapDetailAreaTabItem[] CreateTabItems() => base.CreateTabItems().Concat(new BeatmapDetailAreaTabItem[]
         {
             new BeatmapDetailAreaLeaderboardTabItem<BeatmapLeaderboardScope>(BeatmapLeaderboardScope.Local),
-            new BeatmapDetailAreaLeaderboardTabItem<BeatmapLeaderboardScope>(BeatmapLeaderboardScope.Country),
             new BeatmapDetailAreaLeaderboardTabItem<BeatmapLeaderboardScope>(BeatmapLeaderboardScope.Global),
+            new BeatmapDetailAreaLeaderboardTabItem<BeatmapLeaderboardScope>(BeatmapLeaderboardScope.Country),
             new BeatmapDetailAreaLeaderboardTabItem<BeatmapLeaderboardScope>(BeatmapLeaderboardScope.Friend),
         }).ToArray();
 
@@ -95,11 +95,11 @@ namespace osu.Game.Screens.Select
                 case TabType.Local:
                     return new BeatmapDetailAreaLeaderboardTabItem<BeatmapLeaderboardScope>(BeatmapLeaderboardScope.Local);
 
-                case TabType.Country:
-                    return new BeatmapDetailAreaLeaderboardTabItem<BeatmapLeaderboardScope>(BeatmapLeaderboardScope.Country);
-
                 case TabType.Global:
                     return new BeatmapDetailAreaLeaderboardTabItem<BeatmapLeaderboardScope>(BeatmapLeaderboardScope.Global);
+
+                case TabType.Country:
+                    return new BeatmapDetailAreaLeaderboardTabItem<BeatmapLeaderboardScope>(BeatmapLeaderboardScope.Country);
 
                 case TabType.Friends:
                     return new BeatmapDetailAreaLeaderboardTabItem<BeatmapLeaderboardScope>(BeatmapLeaderboardScope.Friend);

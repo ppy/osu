@@ -15,7 +15,7 @@ using osu.Game.Graphics.UserInterfaceV2;
 
 namespace osu.Game.Overlays.Settings.Sections.Input
 {
-    internal class RotationPresetButtons : CompositeDrawable
+    internal partial class RotationPresetButtons : CompositeDrawable
     {
         public new MarginPadding Padding
         {
@@ -86,7 +86,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             }, true);
         }
 
-        public class RotationButton : RoundedButton
+        public partial class RotationButton : RoundedButton
         {
             [Resolved]
             private OsuColour colours { get; set; }

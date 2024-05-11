@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Catch;
 using osu.Game.Rulesets.Mania;
@@ -18,7 +16,7 @@ using osu.Framework.Allocation;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public class TestSceneOverlayRulesetSelector : OsuTestScene
+    public partial class TestSceneOverlayRulesetSelector : OsuTestScene
     {
         private readonly OverlayRulesetSelector selector;
         private readonly Bindable<RulesetInfo> ruleset = new Bindable<RulesetInfo>();
@@ -44,7 +42,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             });
         }
 
-        private class ColourProvidedContainer : Container
+        private partial class ColourProvidedContainer : Container
         {
             [Cached]
             private readonly OverlayColourProvider colourProvider;

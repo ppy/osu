@@ -3,7 +3,6 @@
 
 using System;
 using osu.Framework.Allocation;
-using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -18,11 +17,9 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Mania.Skinning.Argon
 {
-    public class ArgonJudgementPiece : CompositeDrawable, IAnimatableJudgement
+    public partial class ArgonJudgementPiece : TextJudgementPiece, IAnimatableJudgement
     {
-        protected readonly HitResult Result;
-
-        protected SpriteText JudgementText { get; private set; } = null!;
+        private const float judgement_y_position = 160;
 
         private RingExplosion? ringExplosion;
 
@@ -30,31 +27,17 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
         private OsuColour colours { get; set; } = null!;
 
         public ArgonJudgementPiece(HitResult result)
+            : base(result)
         {
-            Result = result;
+            AutoSizeAxes = Axes.Both;
+
             Origin = Anchor.Centre;
-            Y = 160;
+            Y = judgement_y_position;
         }
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            AutoSizeAxes = Axes.Both;
-
-            InternalChildren = new Drawable[]
-            {
-                JudgementText = new OsuSpriteText
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Text = Result.GetDescription().ToUpperInvariant(),
-                    Colour = colours.ForHitResult(Result),
-                    Blending = BlendingParameters.Additive,
-                    Spacing = new Vector2(10, 0),
-                    Font = OsuFont.Default.With(size: 28, weight: FontWeight.Regular),
-                },
-            };
-
             if (Result.IsHit())
             {
                 AddInternal(ringExplosion = new RingExplosion(Result)
@@ -63,6 +46,16 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
                 });
             }
         }
+
+        protected override SpriteText CreateJudgementText() =>
+            new OsuSpriteText
+            {
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                Blending = BlendingParameters.Additive,
+                Spacing = new Vector2(10, 0),
+                Font = OsuFont.Default.With(size: 28, weight: FontWeight.Regular),
+            };
 
         /// <summary>
         /// Plays the default animation for this judgement piece.
@@ -85,7 +78,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
                     this.ScaleTo(1.6f);
                     this.ScaleTo(1, 100, Easing.In);
 
-                    this.MoveTo(Vector2.Zero);
+                    this.MoveToY(judgement_y_position);
                     this.MoveToOffset(new Vector2(0, 100), 800, Easing.InQuint);
 
                     this.RotateTo(0);
@@ -100,7 +93,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
 
         public Drawable? GetAboveHitObjectsProxiedContent() => null;
 
-        private class RingExplosion : CompositeDrawable
+        private partial class RingExplosion : CompositeDrawable
         {
             private readonly float travel = 52;
 
@@ -169,7 +162,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
                 this.FadeOutFromOne(1000, Easing.OutQuint);
             }
 
-            public class RingPiece : CircularContainer
+            public partial class RingPiece : CircularContainer
             {
                 public RingPiece(float thickness = 9)
                 {

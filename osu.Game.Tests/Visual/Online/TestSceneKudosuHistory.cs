@@ -1,24 +1,25 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Game.Overlays.Profile.Sections.Kudosu;
 using System.Collections.Generic;
 using System;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Framework.Extensions.IEnumerableExtensions;
+using osu.Game.Overlays;
 
 namespace osu.Game.Tests.Visual.Online
 {
-    public class TestSceneKudosuHistory : OsuTestScene
+    public partial class TestSceneKudosuHistory : OsuTestScene
     {
         private readonly Box background;
+
+        [Cached]
+        private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Pink);
 
         public TestSceneKudosuHistory()
         {
@@ -44,9 +45,9 @@ namespace osu.Game.Tests.Visual.Online
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load()
         {
-            background.Colour = colours.GreySeaFoam;
+            background.Colour = colourProvider.Background4;
         }
 
         private readonly IEnumerable<APIKudosuHistory> items = new[]

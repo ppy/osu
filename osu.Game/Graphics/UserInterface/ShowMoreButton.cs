@@ -19,7 +19,7 @@ using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class ShowMoreButton : LoadingButton
+    public partial class ShowMoreButton : LoadingButton
     {
         private const int duration = 200;
 
@@ -115,7 +115,7 @@ namespace osu.Game.Graphics.UserInterface
             rightIcon.SetHoveredState(false);
         }
 
-        public class ChevronIcon : SpriteIcon
+        public partial class ChevronIcon : SpriteIcon
         {
             [Resolved]
             private OverlayColourProvider colourProvider { get; set; }

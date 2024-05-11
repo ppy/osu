@@ -14,7 +14,7 @@ using osuTK;
 namespace osu.Game.Tests.Visual.Editing
 {
     [TestFixture]
-    public class TestSceneEditorClock : EditorClockTestScene
+    public partial class TestSceneEditorClock : EditorClockTestScene
     {
         [Cached]
         private EditorBeatmap editorBeatmap = new EditorBeatmap(new TestBeatmap(new OsuRuleset().RulesetInfo));
@@ -63,7 +63,7 @@ namespace osu.Game.Tests.Visual.Editing
             AddStep("seek near end", () => EditorClock.Seek(EditorClock.TrackLength - 250));
             AddUntilStep("clock stops", () => !EditorClock.IsRunning);
 
-            AddUntilStep("clock stopped at end", () => EditorClock.CurrentTime - EditorClock.TotalAppliedOffset, () => Is.EqualTo(EditorClock.TrackLength));
+            AddUntilStep("clock stopped at end", () => EditorClock.CurrentTime, () => Is.EqualTo(EditorClock.TrackLength));
 
             AddStep("start clock again", () => EditorClock.Start());
             AddAssert("clock looped to start", () => EditorClock.IsRunning && EditorClock.CurrentTime < 500);

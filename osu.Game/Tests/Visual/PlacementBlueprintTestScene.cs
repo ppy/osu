@@ -16,7 +16,7 @@ using osu.Game.Screens.Edit.Compose;
 
 namespace osu.Game.Tests.Visual
 {
-    public abstract class PlacementBlueprintTestScene : OsuManualInputManagerTestScene, IPlacementHandler
+    public abstract partial class PlacementBlueprintTestScene : OsuManualInputManagerTestScene, IPlacementHandler
     {
         protected readonly Container HitObjectContainer;
         protected PlacementBlueprint CurrentBlueprint { get; private set; }

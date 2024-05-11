@@ -15,7 +15,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Mania.Edit.Blueprints
 {
-    public class HoldNoteSelectionBlueprint : ManiaSelectionBlueprint<HoldNote>
+    public partial class HoldNoteSelectionBlueprint : ManiaSelectionBlueprint<HoldNote>
     {
         [Resolved]
         private OsuColour colours { get; set; }

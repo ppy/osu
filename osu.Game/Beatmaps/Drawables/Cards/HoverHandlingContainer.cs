@@ -7,7 +7,7 @@ using osu.Framework.Input.Events;
 
 namespace osu.Game.Beatmaps.Drawables.Cards
 {
-    public class HoverHandlingContainer : Container
+    public partial class HoverHandlingContainer : Container
     {
         public Func<HoverEvent, bool>? Hovered { get; set; }
         public Action<HoverLostEvent>? Unhovered { get; set; }
