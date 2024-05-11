@@ -127,7 +127,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             else if (score.Mods.Any(h => h is OsuModHidden))
             {
                 // We want to give more reward for lower AR when it comes to aim and HD. This nerfs high AR and buffs lower AR.
-                aimValue *= 1.0 + 0.04 * (12.0 - attributes.ApproachRate) * attributes.SliderFactor;
+                aimValue *= 1.0 + 0.04 * (12.0 - attributes.ApproachRate) * (0.5 + 0.5 * Math.Pow(attributes.SliderFactor, 3));
             }
 
             aimValue *= accuracy;
