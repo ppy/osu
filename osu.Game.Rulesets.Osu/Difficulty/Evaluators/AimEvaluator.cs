@@ -129,7 +129,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                     sliderJumpBonus = slider_jump_multiplier * aimStrain * sliderJumpsAdjustingMultiplier;
 
                     // Reward more if sliders and circles are alternating (actually it's still lower than several sliders in a row)
-                    if (osuLastLastObj?.BaseObject is HitCircle)
+                    if (osuLastLastObj.BaseObject is HitCircle)
                     {
                         double alternatingBonus = 0.5 * slider_jump_multiplier * osuLastObj.JumpDistance / osuLastObj.StrainTime;
 
@@ -154,6 +154,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             // Add in additional slider velocity bonus.
             double sliderBonus = 0;
+
             if (withSliderTravelDistance && osuLastObj.BaseObject is Slider)
             {
                 // Reward sliders based on velocity.
