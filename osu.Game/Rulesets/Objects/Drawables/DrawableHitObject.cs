@@ -10,6 +10,7 @@ using System.Diagnostics;
 using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.ListExtensions;
 using osu.Framework.Extensions.ObjectExtensions;
@@ -197,7 +198,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         }
 
         [BackgroundDependencyLoader]
-        private void load(IGameplaySettings gameplaySettings, ISkinSource skinSource)
+        private void load(IGameplaySettings gameplaySettings, ISkinSource skinSource, OsuGameBase gameBase)
         {
             positionalHitsoundsLevel.BindTo(gameplaySettings.PositionalHitsoundsLevel);
             comboColourBrightness.BindTo(gameplaySettings.ComboColourNormalisationAmount);
@@ -207,6 +208,8 @@ namespace osu.Game.Rulesets.Objects.Drawables
             {
                 MinimumSampleVolume = MINIMUM_SAMPLE_VOLUME
             });
+
+            Samples.AddAdjustment(AdjustableProperty.Volume, gameBase.SampleNormalizeVolume);
 
             CurrentSkin = skinSource;
             CurrentSkin.SourceChanged += skinSourceChanged;
