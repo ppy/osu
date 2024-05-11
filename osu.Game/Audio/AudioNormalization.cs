@@ -6,6 +6,8 @@ using System.Linq;
 using ManagedBass;
 using ManagedBass.Fx;
 using osu.Framework.Audio.Mixing;
+using osu.Framework.Audio.Track;
+using osu.Framework.Extensions;
 using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
@@ -16,7 +18,7 @@ namespace osu.Game.Audio
     /// <summary>
     /// Audio Normalization Manager
     /// </summary>
-    public class AudioNormalization : EmbeddedObject, IAudioNormalization, IEquatable<AudioNormalization>
+    public class AudioNormalization : EmbeddedObject, IEquatable<AudioNormalization>
     {
         /// <summary>
         /// The target level for audio normalization
@@ -57,9 +59,12 @@ namespace osu.Game.Audio
                 return;
             }
 
-            filepath = realmFileStore.Storage.GetFullPath(filepath);
+            AudioLoudness loudness = new AudioLoudness(realmFileStore.Storage.GetStream(filepath));
 
-            float? integratedLoudness = new BassAudioNormalization(filepath).IntegratedLoudness;
+            var loudTask = loudness.GetIntegratedLoudness();
+            loudTask.WaitSafely();
+
+            float? integratedLoudness = loudTask.GetResultSafely();
 
             if (integratedLoudness == null)
             {
@@ -141,9 +146,6 @@ namespace osu.Game.Audio
                 mixer.Effects.Add(effectParameter);
             }
         }
-
-        /// <inheritdoc />
-        public bool Equals(IAudioNormalization? other) => other is AudioNormalization audioNormalization && Equals(audioNormalization);
 
         /// <inheritdoc />
         public bool Equals(AudioNormalization? other) => other?.IntegratedLoudness != null && IntegratedLoudness != null && Math.Abs((float)(IntegratedLoudness - other.IntegratedLoudness)) < 0.0000001;
