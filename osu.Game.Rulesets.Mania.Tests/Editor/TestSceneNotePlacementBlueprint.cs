@@ -21,7 +21,7 @@ using osuTK.Input;
 
 namespace osu.Game.Rulesets.Mania.Tests.Editor
 {
-    public class TestSceneNotePlacementBlueprint : ManiaPlacementBlueprintTestScene
+    public partial class TestSceneNotePlacementBlueprint : ManiaPlacementBlueprintTestScene
     {
         [SetUp]
         public void Setup() => Schedule(() =>

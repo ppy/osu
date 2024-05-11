@@ -1,7 +1,5 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -14,7 +12,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Skinning
     /// <summary>
     /// A container to be used in a <see cref="ManiaSkinnableTestScene"/> to provide a resolvable <see cref="Column"/> dependency.
     /// </summary>
-    public class ColumnTestContainer : Container
+    public partial class ColumnTestContainer : Container
     {
         protected override Container<Drawable> Content => content;
 

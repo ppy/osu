@@ -1,7 +1,5 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using System;
 using System.Diagnostics;
@@ -18,22 +16,25 @@ using osuTK;
 
 namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 {
-    public class TimelineTickDisplay : TimelinePart<PointVisualisation>
+    public partial class TimelineTickDisplay : TimelinePart<PointVisualisation>
     {
-        [Resolved]
-        private EditorBeatmap beatmap { get; set; }
+        // With current implementation every tick in the sub-tree should be visible, no need to check whether they are masked away.
+        public override bool UpdateSubTreeMasking() => false;
 
         [Resolved]
-        private Bindable<WorkingBeatmap> working { get; set; }
+        private EditorBeatmap beatmap { get; set; } = null!;
 
         [Resolved]
-        private BindableBeatDivisor beatDivisor { get; set; }
-
-        [Resolved(CanBeNull = true)]
-        private IEditorChangeHandler changeHandler { get; set; }
+        private Bindable<WorkingBeatmap> working { get; set; } = null!;
 
         [Resolved]
-        private OsuColour colours { get; set; }
+        private BindableBeatDivisor beatDivisor { get; set; } = null!;
+
+        [Resolved]
+        private IEditorChangeHandler? changeHandler { get; set; }
+
+        [Resolved]
+        private OsuColour colours { get; set; } = null!;
 
         public TimelineTickDisplay()
         {
@@ -72,8 +73,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         /// </summary>
         private float? nextMaxTick;
 
-        [Resolved(canBeNull: true)]
-        private Timeline timeline { get; set; }
+        [Resolved]
+        private Timeline? timeline { get; set; }
 
         protected override void Update()
         {
@@ -167,7 +168,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
             // save a few drawables beyond the currently used for edge cases.
             while (drawableIndex < Math.Min(usedDrawables + 16, Count))
-                Children[drawableIndex++].Hide();
+                Children[drawableIndex++].Alpha = 0;
 
             // expire any excess
             while (drawableIndex < Count)
@@ -184,7 +185,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                     point = Children[drawableIndex];
 
                 drawableIndex++;
-                point.Show();
+                point.Alpha = 1;
 
                 return point;
             }

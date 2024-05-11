@@ -20,8 +20,9 @@ namespace osu.Game.Database
         /// </summary>
         /// <param name="notification">The notification to update.</param>
         /// <param name="tasks">The import tasks.</param>
+        /// <param name="parameters">Parameters to further configure the import process.</param>
         /// <returns>The imported models.</returns>
-        Task<IEnumerable<Live<TModel>>> Import(ProgressNotification notification, params ImportTask[] tasks);
+        Task<IEnumerable<Live<TModel>>> Import(ProgressNotification notification, ImportTask[] tasks, ImportParameters parameters = default);
 
         /// <summary>
         /// Process a single import as an update for an existing model.

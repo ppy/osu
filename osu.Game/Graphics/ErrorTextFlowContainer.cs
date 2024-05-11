@@ -1,7 +1,5 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using System.Collections.Generic;
 using osu.Framework.Graphics.Containers;
@@ -10,7 +8,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Graphics
 {
-    public class ErrorTextFlowContainer : OsuTextFlowContainer
+    public partial class ErrorTextFlowContainer : OsuTextFlowContainer
     {
         private readonly List<ITextPart> errorTextParts = new List<ITextPart>();
 
@@ -25,7 +23,7 @@ namespace osu.Game.Graphics
                 RemovePart(textPart);
         }
 
-        public void AddErrors(string[] errors)
+        public void AddErrors(string[]? errors)
         {
             ClearErrors();
 

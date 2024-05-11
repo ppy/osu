@@ -15,7 +15,7 @@ namespace osu.Game.Screens.OnlinePlay.Components
     /// <summary>
     /// A <see cref="RoomPollingComponent"/> that polls for the lounge listing.
     /// </summary>
-    public class ListingPollingComponent : RoomPollingComponent
+    public partial class ListingPollingComponent : RoomPollingComponent
     {
         public IBindable<bool> InitialRoomsReceived => initialRoomsReceived;
         private readonly Bindable<bool> initialRoomsReceived = new Bindable<bool>();

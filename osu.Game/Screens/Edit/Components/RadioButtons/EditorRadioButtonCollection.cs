@@ -1,8 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
+using System;
 using System.Collections.Generic;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
@@ -11,9 +10,9 @@ using osuTK;
 
 namespace osu.Game.Screens.Edit.Components.RadioButtons
 {
-    public class EditorRadioButtonCollection : CompositeDrawable
+    public partial class EditorRadioButtonCollection : CompositeDrawable
     {
-        private IReadOnlyList<RadioButton> items;
+        private IReadOnlyList<RadioButton> items = Array.Empty<RadioButton>();
 
         public IReadOnlyList<RadioButton> Items
         {
@@ -45,7 +44,7 @@ namespace osu.Game.Screens.Edit.Components.RadioButtons
             };
         }
 
-        private RadioButton currentlySelected;
+        private RadioButton? currentlySelected;
 
         private void addButton(RadioButton button)
         {

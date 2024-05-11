@@ -15,9 +15,9 @@ namespace osu.Game.Localisation
         public static LocalisableString Header => new TranslatableString(getKey(@"header"), @"Obtaining Beatmaps");
 
         /// <summary>
-        /// "&quot;Beatmaps&quot; are what we call playable levels. osu! doesn&#39;t come with any beatmaps pre-loaded. This step will help you get started on your beatmap collection."
+        /// "&quot;Beatmaps&quot; are what we call sets of playable levels. osu! doesn&#39;t come with any beatmaps pre-loaded. This step will help you get started on your beatmap collection."
         /// </summary>
-        public static LocalisableString Description => new TranslatableString(getKey(@"description"), @"""Beatmaps"" are what we call playable levels. osu! doesn't come with any beatmaps pre-loaded. This step will help you get started on your beatmap collection.");
+        public static LocalisableString Description => new TranslatableString(getKey(@"description"), @"""Beatmaps"" are what we call sets of playable levels. osu! doesn't come with any beatmaps pre-loaded. This step will help you get started on your beatmap collection.");
 
         /// <summary>
         /// "If you are a new player, we recommend playing through the tutorial to get accustomed to the gameplay."
@@ -38,6 +38,11 @@ namespace osu.Game.Localisation
         /// "Get recommended beatmaps"
         /// </summary>
         public static LocalisableString BundledButton => new TranslatableString(getKey(@"bundled_button"), @"Get recommended beatmaps");
+
+        /// <summary>
+        /// "Beatmaps will be downloaded in the background. You can continue with setup while this happens!"
+        /// </summary>
+        public static LocalisableString DownloadingInBackground => new TranslatableString(getKey(@"downloading_in_background"), @"Beatmaps will be downloaded in the background. You can continue with setup while this happens!");
 
         /// <summary>
         /// "You can also obtain more beatmaps from the main menu &quot;browse&quot; button at any time."

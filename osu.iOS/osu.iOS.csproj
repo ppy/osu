@@ -1,124 +1,21 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">iPhoneSimulator</Platform>
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup Label="Project">
+    <TargetFramework>net8.0-ios</TargetFramework>
+    <SupportedOSPlatformVersion>13.4</SupportedOSPlatformVersion>
     <OutputType>Exe</OutputType>
-    <ProjectGuid>{3F082D0B-A964-43D7-BDF7-C256D76A50D0}</ProjectGuid>
-    <RootNamespace>osu.iOS</RootNamespace>
-    <AssemblyName>osu.iOS</AssemblyName>
-    <MtouchUseLlvm>false</MtouchUseLlvm> <!-- This currently causes random lockups during gameplay. https://github.com/mono/mono/issues/18973 -->
+    <Version>0.1.0</Version>
+    <ApplicationVersion Condition=" '$(ApplicationVersion)' == '' ">$(Version)</ApplicationVersion>
+    <ApplicationDisplayVersion Condition=" '$(ApplicationDisplayVersion)' == '' ">$(Version)</ApplicationDisplayVersion>
   </PropertyGroup>
   <Import Project="..\osu.iOS.props" />
   <ItemGroup>
-    <Folder Include="Resources\" />
+    <ProjectReference Include="..\osu.Game\osu.Game.csproj" />
+    <ProjectReference Include="..\osu.Game.Rulesets.Catch\osu.Game.Rulesets.Catch.csproj" />
+    <ProjectReference Include="..\osu.Game.Rulesets.Mania\osu.Game.Rulesets.Mania.csproj" />
+    <ProjectReference Include="..\osu.Game.Rulesets.Osu\osu.Game.Rulesets.Osu.csproj" />
+    <ProjectReference Include="..\osu.Game.Rulesets.Taiko\osu.Game.Rulesets.Taiko.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <InterfaceDefinition Include="LaunchScreen.storyboard" />
+    <PackageReference Include="Microsoft.Maui.Essentials" Version="8.0.3" />
   </ItemGroup>
-  <ItemGroup>
-    <None Include="Info.plist" />
-    <None Include="Entitlements.plist" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Application.cs" />
-    <Compile Include="AppDelegate.cs" />
-    <Compile Include="IOSMouseSettings.cs" />
-    <Compile Include="OsuGameIOS.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <LinkDescription Include="Linker.xml" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\osu.Game\osu.Game.csproj">
-      <Project>{2A66DD92-ADB1-4994-89E2-C94E04ACDA0D}</Project>
-      <Name>osu.Game</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\osu.Game.Rulesets.Catch\osu.Game.Rulesets.Catch.csproj">
-      <Project>{58F6C80C-1253-4A0E-A465-B8C85EBEADF3}</Project>
-      <Name>osu.Game.Rulesets.Catch</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\osu.Game.Rulesets.Mania\osu.Game.Rulesets.Mania.csproj">
-      <Project>{48F4582B-7687-4621-9CBE-5C24197CB536}</Project>
-      <Name>osu.Game.Rulesets.Mania</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\osu.Game.Rulesets.Osu\osu.Game.Rulesets.Osu.csproj">
-      <Project>{C92A607B-1FDD-4954-9F92-03FF547D9080}</Project>
-      <Name>osu.Game.Rulesets.Osu</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\osu.Game.Rulesets.Taiko\osu.Game.Rulesets.Taiko.csproj">
-      <Project>{F167E17A-7DE6-4AF5-B920-A5112296C695}</Project>
-      <Name>osu.Game.Rulesets.Taiko</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <ITunesArtwork Include="iTunesArtwork" />
-    <ITunesArtwork Include="iTunesArtwork%402x" />
-  </ItemGroup>
-  <ItemGroup>
-    <ImageAsset Include="Assets.xcassets\Contents.json">
-      <Visible>false</Visible>
-    </ImageAsset>
-    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Contents.json">
-      <Visible>false</Visible>
-    </ImageAsset>
-    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\iOSAppStore.png">
-      <Visible>false</Visible>
-    </ImageAsset>
-    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\iPadApp1x.png">
-      <Visible>false</Visible>
-    </ImageAsset>
-    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\iPadApp2x.png">
-      <Visible>false</Visible>
-    </ImageAsset>
-    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\iPadNotification1x.png">
-      <Visible>false</Visible>
-    </ImageAsset>
-    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\iPadNotification2x.png">
-      <Visible>false</Visible>
-    </ImageAsset>
-    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\iPadProApp2x.png">
-      <Visible>false</Visible>
-    </ImageAsset>
-    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\iPadSettings1x.png">
-      <Visible>false</Visible>
-    </ImageAsset>
-    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\iPadSettings2x.png">
-      <Visible>false</Visible>
-    </ImageAsset>
-    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\iPadSpotlight1x.png">
-      <Visible>false</Visible>
-    </ImageAsset>
-    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\iPadSpotlight2x.png">
-      <Visible>false</Visible>
-    </ImageAsset>
-    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\iPhoneApp2x.png">
-      <Visible>false</Visible>
-    </ImageAsset>
-    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\iPhoneApp3x.png">
-      <Visible>false</Visible>
-    </ImageAsset>
-    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\iPhoneNotification2x.png">
-      <Visible>false</Visible>
-    </ImageAsset>
-    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\iPhoneNotification3x.png">
-      <Visible>false</Visible>
-    </ImageAsset>
-    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\iPhoneSettings2x.png">
-      <Visible>false</Visible>
-    </ImageAsset>
-    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\iPhoneSettings3x.png">
-      <Visible>false</Visible>
-    </ImageAsset>
-    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\iPhoneSpotlight2x.png">
-      <Visible>false</Visible>
-    </ImageAsset>
-    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\iPhoneSpotlight3x.png">
-      <Visible>false</Visible>
-    </ImageAsset>
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="Xamarin.Essentials" Version="1.7.0" />
-  </ItemGroup>
-  <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
 </Project>

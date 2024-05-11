@@ -1,12 +1,11 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
+using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Osu.Edit;
 using osu.Game.Rulesets.Osu.Edit.Blueprints.HitCircles;
 using osu.Game.Tests.Visual;
@@ -15,25 +14,113 @@ using osuTK.Input;
 
 namespace osu.Game.Rulesets.Osu.Tests.Editor
 {
-    public class TestSceneOsuEditorGrids : EditorTestScene
+    public partial class TestSceneOsuEditorGrids : EditorTestScene
     {
         protected override Ruleset CreateEditorRuleset() => new OsuRuleset();
 
         [Test]
-        public void TestGridExclusivity()
+        public void TestGridToggles()
         {
             AddStep("enable distance snap grid", () => InputManager.Key(Key.T));
             AddStep("select second object", () => EditorBeatmap.SelectedHitObjects.Add(EditorBeatmap.HitObjects.ElementAt(1)));
+
             AddUntilStep("distance snap grid visible", () => this.ChildrenOfType<OsuDistanceSnapGrid>().Any());
             rectangularGridActive(false);
 
             AddStep("enable rectangular grid", () => InputManager.Key(Key.Y));
-            AddUntilStep("distance snap grid hidden", () => !this.ChildrenOfType<OsuDistanceSnapGrid>().Any());
+
+            AddStep("select second object", () => EditorBeatmap.SelectedHitObjects.Add(EditorBeatmap.HitObjects.ElementAt(1)));
+            AddUntilStep("distance snap grid still visible", () => this.ChildrenOfType<OsuDistanceSnapGrid>().Any());
             rectangularGridActive(true);
 
+            AddStep("disable distance snap grid", () => InputManager.Key(Key.T));
+            AddUntilStep("distance snap grid hidden", () => !this.ChildrenOfType<OsuDistanceSnapGrid>().Any());
+            AddStep("select second object", () => EditorBeatmap.SelectedHitObjects.Add(EditorBeatmap.HitObjects.ElementAt(1)));
+            rectangularGridActive(true);
+
+            AddStep("disable rectangular grid", () => InputManager.Key(Key.Y));
+            AddUntilStep("distance snap grid still hidden", () => !this.ChildrenOfType<OsuDistanceSnapGrid>().Any());
+            rectangularGridActive(false);
+        }
+
+        [Test]
+        public void TestDistanceSnapMomentaryToggle()
+        {
+            AddStep("select second object", () => EditorBeatmap.SelectedHitObjects.Add(EditorBeatmap.HitObjects.ElementAt(1)));
+
+            AddUntilStep("distance snap grid hidden", () => !this.ChildrenOfType<OsuDistanceSnapGrid>().Any());
+            AddStep("hold alt", () => InputManager.PressKey(Key.AltLeft));
+            AddUntilStep("distance snap grid visible", () => this.ChildrenOfType<OsuDistanceSnapGrid>().Any());
+            AddStep("release alt", () => InputManager.ReleaseKey(Key.AltLeft));
+            AddUntilStep("distance snap grid hidden", () => !this.ChildrenOfType<OsuDistanceSnapGrid>().Any());
+
             AddStep("enable distance snap grid", () => InputManager.Key(Key.T));
+            AddUntilStep("distance snap grid visible", () => this.ChildrenOfType<OsuDistanceSnapGrid>().Any());
+            AddStep("hold alt", () => InputManager.PressKey(Key.AltLeft));
+            AddUntilStep("distance snap grid hidden", () => !this.ChildrenOfType<OsuDistanceSnapGrid>().Any());
+            AddStep("release alt", () => InputManager.ReleaseKey(Key.AltLeft));
+            AddUntilStep("distance snap grid visible", () => this.ChildrenOfType<OsuDistanceSnapGrid>().Any());
+        }
+
+        [Test]
+        public void TestDistanceSnapAdjustDoesNotHideTheGridIfStartingEnabled()
+        {
+            double distanceSnap = double.PositiveInfinity;
+
+            AddStep("enable distance snap grid", () => InputManager.Key(Key.T));
+
             AddStep("select second object", () => EditorBeatmap.SelectedHitObjects.Add(EditorBeatmap.HitObjects.ElementAt(1)));
             AddUntilStep("distance snap grid visible", () => this.ChildrenOfType<OsuDistanceSnapGrid>().Any());
+            AddStep("store distance snap", () => distanceSnap = this.ChildrenOfType<IDistanceSnapProvider>().First().DistanceSpacingMultiplier.Value);
+
+            AddStep("increase distance", () =>
+            {
+                InputManager.PressKey(Key.AltLeft);
+                InputManager.PressKey(Key.ControlLeft);
+                InputManager.ScrollVerticalBy(1);
+                InputManager.ReleaseKey(Key.ControlLeft);
+                InputManager.ReleaseKey(Key.AltLeft);
+            });
+
+            AddUntilStep("distance snap increased", () => this.ChildrenOfType<IDistanceSnapProvider>().First().DistanceSpacingMultiplier.Value, () => Is.GreaterThan(distanceSnap));
+            AddUntilStep("distance snap grid still visible", () => this.ChildrenOfType<OsuDistanceSnapGrid>().Any());
+        }
+
+        [Test]
+        public void TestDistanceSnapAdjustShowsGridMomentarilyIfStartingDisabled()
+        {
+            double distanceSnap = double.PositiveInfinity;
+
+            AddStep("select second object", () => EditorBeatmap.SelectedHitObjects.Add(EditorBeatmap.HitObjects.ElementAt(1)));
+            AddUntilStep("distance snap grid hidden", () => !this.ChildrenOfType<OsuDistanceSnapGrid>().Any());
+            AddStep("store distance snap", () => distanceSnap = this.ChildrenOfType<IDistanceSnapProvider>().First().DistanceSpacingMultiplier.Value);
+
+            AddStep("start increasing distance", () =>
+            {
+                InputManager.PressKey(Key.AltLeft);
+                InputManager.PressKey(Key.ControlLeft);
+            });
+
+            AddUntilStep("distance snap grid visible", () => this.ChildrenOfType<OsuDistanceSnapGrid>().Any());
+
+            AddStep("finish increasing distance", () =>
+            {
+                InputManager.ScrollVerticalBy(1);
+                InputManager.ReleaseKey(Key.ControlLeft);
+                InputManager.ReleaseKey(Key.AltLeft);
+            });
+
+            AddUntilStep("distance snap increased", () => this.ChildrenOfType<IDistanceSnapProvider>().First().DistanceSpacingMultiplier.Value, () => Is.GreaterThan(distanceSnap));
+            AddUntilStep("distance snap hidden in the end", () => !this.ChildrenOfType<OsuDistanceSnapGrid>().Any());
+        }
+
+        [Test]
+        public void TestGridSnapMomentaryToggle()
+        {
+            rectangularGridActive(false);
+            AddStep("hold shift", () => InputManager.PressKey(Key.ShiftLeft));
+            rectangularGridActive(true);
+            AddStep("release shift", () => InputManager.ReleaseKey(Key.ShiftLeft));
             rectangularGridActive(false);
         }
 
@@ -50,8 +137,6 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
                 AddAssert("placement blueprint at (0, 0)", () => Precision.AlmostEquals(Editor.ChildrenOfType<HitCirclePlacementBlueprint>().Single().HitObject.Position, new Vector2(0, 0)));
             else
                 AddAssert("placement blueprint at (1, 1)", () => Precision.AlmostEquals(Editor.ChildrenOfType<HitCirclePlacementBlueprint>().Single().HitObject.Position, new Vector2(1, 1)));
-
-            AddStep("choose selection tool", () => InputManager.Key(Key.Number1));
         }
 
         [Test]

@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -16,54 +14,50 @@ using osu.Game.Utils;
 
 namespace osu.Game.Screens.Play.Break
 {
-    public class BreakInfoLine<T> : Container
+    public partial class BreakInfoLine<T> : Container
         where T : struct
     {
         private const int margin = 2;
 
         public Bindable<T> Current = new Bindable<T>();
 
-        private readonly OsuSpriteText text;
-        private readonly OsuSpriteText valueText;
+        private readonly LocalisableString name;
 
-        private readonly string prefix;
+        private OsuSpriteText valueText = null!;
 
-        public BreakInfoLine(LocalisableString name, string prefix = @"")
+        public BreakInfoLine(LocalisableString name)
         {
-            this.prefix = prefix;
+            this.name = name;
 
             AutoSizeAxes = Axes.Y;
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
+        {
             Children = new Drawable[]
             {
-                text = new OsuSpriteText
+                new OsuSpriteText
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.CentreRight,
                     Text = name,
                     Font = OsuFont.GetFont(size: 17),
-                    Margin = new MarginPadding { Right = margin }
+                    Margin = new MarginPadding { Right = margin },
+                    Colour = colours.Yellow,
                 },
                 valueText = new OsuSpriteText
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.CentreLeft,
-                    Text = prefix + @"-",
+                    Text = @"-",
                     Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 17),
-                    Margin = new MarginPadding { Left = margin }
+                    Margin = new MarginPadding { Left = margin },
+                    Colour = colours.YellowLight,
                 }
             };
 
-            Current.ValueChanged += currentValueChanged;
-        }
-
-        private void currentValueChanged(ValueChangedEvent<T> e)
-        {
-            string newText = prefix + Format(e.NewValue);
-
-            if (valueText.Text == newText)
-                return;
-
-            valueText.Text = newText;
+            Current.BindValueChanged(text => valueText.Text = Format(text.NewValue));
         }
 
         protected virtual LocalisableString Format(T count)
@@ -71,21 +65,14 @@ namespace osu.Game.Screens.Play.Break
             if (count is Enum countEnum)
                 return countEnum.GetDescription();
 
-            return count.ToString();
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
-        {
-            text.Colour = colours.Yellow;
-            valueText.Colour = colours.YellowLight;
+            return count.ToString() ?? string.Empty;
         }
     }
 
-    public class PercentageBreakInfoLine : BreakInfoLine<double>
+    public partial class PercentageBreakInfoLine : BreakInfoLine<double>
     {
-        public PercentageBreakInfoLine(LocalisableString name, string prefix = "")
-            : base(name, prefix)
+        public PercentageBreakInfoLine(LocalisableString name)
+            : base(name)
         {
         }
 

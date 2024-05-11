@@ -24,7 +24,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
     /// <summary>
     /// A component which displays a colour along with related description text.
     /// </summary>
-    public class ColourDisplay : CompositeDrawable, IHasCurrentValue<Colour4>
+    public partial class ColourDisplay : CompositeDrawable, IHasCurrentValue<Colour4>
     {
         /// <summary>
         /// Invoked when the user has requested the colour corresponding to this <see cref="ColourDisplay"/>
@@ -86,7 +86,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
             };
         }
 
-        private class ColourCircle : OsuClickableContainer, IHasPopover, IHasContextMenu
+        private partial class ColourCircle : OsuClickableContainer, IHasPopover, IHasContextMenu
         {
             public Bindable<Colour4> Current { get; } = new Bindable<Colour4>();
 

@@ -1,13 +1,10 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using JetBrains.Annotations;
 using osu.Game.IO;
 using osu.Game.Rulesets;
 
@@ -45,7 +42,7 @@ namespace osu.Game.Beatmaps.Formats
         /// Register dependencies for use with static decoder classes.
         /// </summary>
         /// <param name="rulesets">A store containing all available rulesets (used by <see cref="LegacyBeatmapDecoder"/>).</param>
-        public static void RegisterDependencies([NotNull] RulesetStore rulesets)
+        public static void RegisterDependencies(RulesetStore rulesets)
         {
             LegacyBeatmapDecoder.RulesetStore = rulesets ?? throw new ArgumentNullException(nameof(rulesets));
         }
@@ -57,14 +54,13 @@ namespace osu.Game.Beatmaps.Formats
         public static Decoder<T> GetDecoder<T>(LineBufferedReader stream)
             where T : new()
         {
-            if (stream == null)
-                throw new ArgumentNullException(nameof(stream));
+            ArgumentNullException.ThrowIfNull(stream);
 
             if (!decoders.TryGetValue(typeof(T), out var typedDecoders))
                 throw new IOException(@"Unknown decoder type");
 
             // start off with the first line of the file
-            string line = stream.PeekLine()?.Trim();
+            string? line = stream.PeekLine()?.Trim();
 
             while (line != null && line.Length == 0)
             {

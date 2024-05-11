@@ -18,7 +18,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Statistics
     /// <summary>
     /// A <see cref="StatisticDisplay"/> to display the player's combo.
     /// </summary>
-    public class ComboStatistic : CounterStatistic
+    public partial class ComboStatistic : CounterStatistic
     {
         private readonly bool isPerfect;
 

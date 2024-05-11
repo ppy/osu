@@ -10,7 +10,7 @@ using osu.Game.Screens.Edit.Compose.Components;
 
 namespace osu.Game.Rulesets.Osu.Edit
 {
-    public class OsuDistanceSnapGrid : CircularDistanceSnapGrid
+    public partial class OsuDistanceSnapGrid : CircularDistanceSnapGrid
     {
         public OsuDistanceSnapGrid(OsuHitObject hitObject, [CanBeNull] OsuHitObject nextHitObject = null)
             : base(hitObject, hitObject.StackedEndPosition, hitObject.GetEndTime(), nextHitObject?.StartTime - 1)

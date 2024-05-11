@@ -17,7 +17,7 @@ using osu.Game.Tests.Visual;
 namespace osu.Game.Tests.NonVisual
 {
     [HeadlessTest]
-    public class OngoingOperationTrackerTest : OsuTestScene
+    public partial class OngoingOperationTrackerTest : OsuTestScene
     {
         private OngoingOperationTracker tracker;
         private IBindable<bool> operationInProgress;
@@ -94,7 +94,7 @@ namespace osu.Game.Tests.NonVisual
             AddAssert("operation ended", () => !screen.OngoingOperationTracker.InProgress.Value);
         }
 
-        private class TestScreenWithTracker : OsuScreen
+        private partial class TestScreenWithTracker : OsuScreen
         {
             public OngoingOperationTracker OngoingOperationTracker { get; private set; }
 

@@ -19,7 +19,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.OnlinePlay.Match.Components
 {
-    public class RoomAvailabilityPicker : DisableableTabControl<RoomAvailability>
+    public partial class RoomAvailabilityPicker : DisableableTabControl<RoomAvailability>
     {
         protected override TabItem<RoomAvailability> CreateTabItem(RoomAvailability value) => new RoomAvailabilityPickerItem(value);
         protected override Dropdown<RoomAvailability> CreateDropdown() => null;
@@ -36,7 +36,7 @@ namespace osu.Game.Screens.OnlinePlay.Match.Components
             AddItem(RoomAvailability.InviteOnly);
         }
 
-        private class RoomAvailabilityPickerItem : DisableableTabItem
+        private partial class RoomAvailabilityPickerItem : DisableableTabItem
         {
             private const float transition_duration = 200;
 

@@ -12,7 +12,7 @@ using osuTK;
 
 namespace osu.Game.Online.Leaderboards
 {
-    public class UserTopScoreContainer<TScoreInfo> : VisibilityContainer
+    public partial class UserTopScoreContainer<TScoreInfo> : VisibilityContainer
     {
         private const int duration = 500;
 

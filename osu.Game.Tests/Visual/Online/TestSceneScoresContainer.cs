@@ -26,7 +26,7 @@ using APIUser = osu.Game.Online.API.Requests.Responses.APIUser;
 
 namespace osu.Game.Tests.Visual.Online
 {
-    public class TestSceneScoresContainer : OsuTestScene
+    public partial class TestSceneScoresContainer : OsuTestScene
     {
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
@@ -154,6 +154,19 @@ namespace osu.Game.Tests.Visual.Online
             });
         }
 
+        [Test]
+        public void TestUnrankedPP()
+        {
+            AddStep("Load scores with unranked PP", () =>
+            {
+                var allScores = createScores();
+                allScores.Scores[0].Ranked = false;
+                allScores.UserScore = createUserBest();
+                allScores.UserScore.Score.Ranked = false;
+                scoresContainer.Scores = allScores;
+            });
+        }
+
         private ulong onlineID = 1;
 
         private APIScoresCollection createScores()
@@ -184,6 +197,7 @@ namespace osu.Game.Tests.Visual.Online
                         MaxCombo = 1234,
                         TotalScore = 1234567890,
                         Accuracy = 1,
+                        Ranked = true,
                     },
                     new SoloScoreInfo
                     {
@@ -206,6 +220,7 @@ namespace osu.Game.Tests.Visual.Online
                         MaxCombo = 1234,
                         TotalScore = 1234789,
                         Accuracy = 0.9997,
+                        Ranked = true,
                     },
                     new SoloScoreInfo
                     {
@@ -227,6 +242,7 @@ namespace osu.Game.Tests.Visual.Online
                         MaxCombo = 1234,
                         TotalScore = 12345678,
                         Accuracy = 0.9854,
+                        Ranked = true,
                     },
                     new SoloScoreInfo
                     {
@@ -247,6 +263,7 @@ namespace osu.Game.Tests.Visual.Online
                         MaxCombo = 1234,
                         TotalScore = 1234567,
                         Accuracy = 0.8765,
+                        Ranked = true,
                     },
                     new SoloScoreInfo
                     {
@@ -263,6 +280,7 @@ namespace osu.Game.Tests.Visual.Online
                         MaxCombo = 1234,
                         TotalScore = 123456,
                         Accuracy = 0.6543,
+                        Ranked = true,
                     },
                 }
             };
@@ -309,11 +327,12 @@ namespace osu.Game.Tests.Visual.Online
                 MaxCombo = 1234,
                 TotalScore = 123456,
                 Accuracy = 0.6543,
+                Ranked = true,
             },
             Position = 1337,
         };
 
-        private class TestScoresContainer : ScoresContainer
+        private partial class TestScoresContainer : ScoresContainer
         {
             public new APIScoresCollection Scores
             {

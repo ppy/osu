@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using Newtonsoft.Json;
 using osu.Framework.Bindables;
 using osu.Game.Rulesets.Objects;
@@ -34,13 +32,13 @@ namespace osu.Game.Rulesets.Catch.Objects
         /// </summary>
         public bool HyperDash => hyperDash.Value;
 
-        private CatchHitObject hyperDashTarget;
+        private CatchHitObject? hyperDashTarget;
 
         /// <summary>
         /// The target fruit if we are to initiate a hyperdash.
         /// </summary>
         [JsonIgnore]
-        public CatchHitObject HyperDashTarget
+        public CatchHitObject? HyperDashTarget
         {
             get => hyperDashTarget;
             set

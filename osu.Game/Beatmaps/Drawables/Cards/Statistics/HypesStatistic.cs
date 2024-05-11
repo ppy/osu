@@ -10,7 +10,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards.Statistics
     /// <summary>
     /// Shows the number of current hypes that a map has received, as well as the number of hypes required for nomination.
     /// </summary>
-    public class HypesStatistic : BeatmapCardStatistic
+    public partial class HypesStatistic : BeatmapCardStatistic
     {
         private HypesStatistic(BeatmapSetHypeStatus hypeStatus)
         {

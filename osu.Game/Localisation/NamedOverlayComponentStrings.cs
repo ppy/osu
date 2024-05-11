@@ -20,12 +20,12 @@ namespace osu.Game.Localisation
         public static LocalisableString ChangelogDescription => new TranslatableString(getKey(@"changelog_description"), @"track recent dev updates in the osu! ecosystem");
 
         /// <summary>
-        /// "view your friends and other information"
+        /// "view your friends and spectate other players"
         /// </summary>
-        public static LocalisableString DashboardDescription => new TranslatableString(getKey(@"dashboard_description"), @"view your friends and other information");
+        public static LocalisableString DashboardDescription => new TranslatableString(getKey(@"dashboard_description"), @"view your friends and spectate other players");
 
         /// <summary>
-        /// "find out who's the best right now"
+        /// "find out who&#39;s the best right now"
         /// </summary>
         public static LocalisableString RankingsDescription => new TranslatableString(getKey(@"rankings_description"), @"find out who's the best right now");
 
@@ -39,6 +39,6 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString WikiDescription => new TranslatableString(getKey(@"wiki_description"), @"knowledge base");
 
-        private static string getKey(string key) => $"{prefix}:{key}";
+        private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }

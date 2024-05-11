@@ -1,7 +1,5 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using System.Linq;
 using NUnit.Framework;
@@ -16,7 +14,7 @@ using osuTK;
 namespace osu.Game.Rulesets.Catch.Tests
 {
     [TestFixture]
-    public class TestSceneCatchPlayerLegacySkin : LegacySkinPlayerTestScene
+    public partial class TestSceneCatchPlayerLegacySkin : LegacySkinPlayerTestScene
     {
         protected override Ruleset CreatePlayerRuleset() => new CatchRuleset();
 
@@ -26,7 +24,7 @@ namespace osu.Game.Rulesets.Catch.Tests
             if (withModifiedSkin)
             {
                 AddStep("change component scale", () => Player.ChildrenOfType<LegacyScoreCounter>().First().Scale = new Vector2(2f));
-                AddStep("update target", () => Player.ChildrenOfType<SkinnableTargetContainer>().ForEach(LegacySkin.UpdateDrawableTarget));
+                AddStep("update target", () => Player.ChildrenOfType<SkinComponentsContainer>().ForEach(LegacySkin.UpdateDrawableTarget));
                 AddStep("exit player", () => Player.Exit());
                 CreateTest();
             }

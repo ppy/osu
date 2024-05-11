@@ -15,7 +15,6 @@ using osu.Game.Rulesets.Catch;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
-using osu.Game.Screens.OnlinePlay;
 using osu.Game.Screens.OnlinePlay.Multiplayer;
 using osu.Game.Screens.OnlinePlay.Multiplayer.Match;
 using osu.Game.Screens.Play;
@@ -23,7 +22,7 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
-    public class TestSceneAllPlayersQueueMode : QueueModeTestScene
+    public partial class TestSceneAllPlayersQueueMode : QueueModeTestScene
     {
         protected override QueueMode Mode => QueueMode.AllPlayers;
 
@@ -31,6 +30,16 @@ namespace osu.Game.Tests.Visual.Multiplayer
         public void TestFirstItemSelectedByDefault()
         {
             AddUntilStep("first item selected", () => MultiplayerClient.ClientRoom?.Settings.PlaylistItemId == MultiplayerClient.ClientAPIRoom?.Playlist[0].ID);
+        }
+
+        [Test]
+        public void TestSingleItemExpiredAfterGameplay()
+        {
+            RunGameplay();
+
+            AddUntilStep("playlist has only one item", () => MultiplayerClient.ClientAPIRoom?.Playlist.Count == 1);
+            AddUntilStep("playlist item is expired", () => MultiplayerClient.ClientAPIRoom?.Playlist[0].Expired == true);
+            AddUntilStep("last item selected", () => MultiplayerClient.ClientRoom?.Settings.PlaylistItemId == MultiplayerClient.ClientAPIRoom?.Playlist[0].ID);
         }
 
         [Test]
@@ -43,16 +52,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddUntilStep("playlist has 3 items", () => MultiplayerClient.ClientAPIRoom?.Playlist.Count == 3);
 
             AddUntilStep("first item still selected", () => MultiplayerClient.ClientRoom?.Settings.PlaylistItemId == MultiplayerClient.ClientAPIRoom?.Playlist[0].ID);
-        }
-
-        [Test]
-        public void TestSingleItemExpiredAfterGameplay()
-        {
-            RunGameplay();
-
-            AddUntilStep("playlist has only one item", () => MultiplayerClient.ClientAPIRoom?.Playlist.Count == 1);
-            AddUntilStep("playlist item is expired", () => MultiplayerClient.ClientAPIRoom?.Playlist[0].Expired == true);
-            AddUntilStep("last item selected", () => MultiplayerClient.ClientRoom?.Settings.PlaylistItemId == MultiplayerClient.ClientAPIRoom?.Playlist[0].ID);
         }
 
         [Test]
@@ -140,7 +139,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddUntilStep("wait for song select", () => (songSelect = CurrentSubScreen as Screens.Select.SongSelect) != null);
             AddUntilStep("wait for loaded", () => songSelect.AsNonNull().BeatmapSetsLoaded);
-            AddUntilStep("wait for ongoing operation to complete", () => !(CurrentScreen as OnlinePlayScreen).ChildrenOfType<OngoingOperationTracker>().Single().InProgress.Value);
 
             if (ruleset != null)
                 AddStep($"set {ruleset.Name} ruleset", () => songSelect.AsNonNull().Ruleset.Value = ruleset);

@@ -1,7 +1,5 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using System;
 using System.Collections.Generic;
@@ -22,7 +20,7 @@ using osuTK;
 
 namespace osu.Game.Overlays.Mods
 {
-    public class ModSettingsArea : CompositeDrawable
+    public partial class ModSettingsArea : CompositeDrawable
     {
         public Bindable<IReadOnlyList<Mod>> SelectedMods { get; } = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
 
@@ -32,7 +30,9 @@ namespace osu.Game.Overlays.Mods
         private readonly FillFlowContainer modSettingsFlow;
 
         [Resolved]
-        private OverlayColourProvider colourProvider { get; set; }
+        private OverlayColourProvider colourProvider { get; set; } = null!;
+
+        public override bool AcceptsFocus => true;
 
         public ModSettingsArea()
         {
@@ -86,7 +86,10 @@ namespace osu.Game.Overlays.Mods
         {
             modSettingsFlow.Clear();
 
-            foreach (var mod in SelectedMods.Value.OrderBy(mod => mod.Type).ThenBy(mod => mod.Acronym))
+            // Importantly, the selected mods bindable is already ordered by the mod select overlay (following the order of mod columns and panels).
+            // Using AsOrdered produces a slightly different order (e.g. DT and NC no longer becoming adjacent),
+            // which breaks user expectations when interacting with the overlay.
+            foreach (var mod in SelectedMods.Value)
             {
                 var settings = mod.CreateSettingsControls().ToList();
 
@@ -110,10 +113,14 @@ namespace osu.Game.Overlays.Mods
         protected override bool OnMouseDown(MouseDownEvent e) => true;
         protected override bool OnHover(HoverEvent e) => true;
 
-        private class ModSettingsColumn : CompositeDrawable
+        public partial class ModSettingsColumn : CompositeDrawable
         {
+            public readonly Mod Mod;
+
             public ModSettingsColumn(Mod mod, IEnumerable<Drawable> settingsControls)
             {
+                Mod = mod;
+
                 Width = 250;
                 RelativeSizeAxes = Axes.Y;
                 Padding = new MarginPadding { Bottom = 7 };

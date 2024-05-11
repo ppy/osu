@@ -11,7 +11,7 @@ using osuTK;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public class TestSceneOsuAnimatedButton : OsuTestScene
+    public partial class TestSceneOsuAnimatedButton : OsuTestScene
     {
         [Test]
         public void TestRelativeSized()
@@ -104,7 +104,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             });
         }
 
-        public class BaseContainer : OsuAnimatedButton
+        public partial class BaseContainer : OsuAnimatedButton
         {
             public BaseContainer(string text)
             {

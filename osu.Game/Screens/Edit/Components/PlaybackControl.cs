@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Linq;
 using osuTK;
 using osuTK.Graphics;
@@ -18,17 +16,18 @@ using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Localisation;
 using osu.Game.Overlays;
 using osuTK.Input;
 
 namespace osu.Game.Screens.Edit.Components
 {
-    public class PlaybackControl : BottomBarContainer
+    public partial class PlaybackControl : BottomBarContainer
     {
-        private IconButton playButton;
+        private IconButton playButton = null!;
 
         [Resolved]
-        private EditorClock editorClock { get; set; }
+        private EditorClock editorClock { get; set; } = null!;
 
         private readonly BindableNumber<double> freqAdjust = new BindableDouble(1);
 
@@ -49,7 +48,7 @@ namespace osu.Game.Screens.Edit.Components
                 new OsuSpriteText
                 {
                     Origin = Anchor.BottomLeft,
-                    Text = "Playback speed",
+                    Text = EditorStrings.PlaybackSpeed,
                     RelativePositionAxes = Axes.Y,
                     Y = 0.5f,
                     Padding = new MarginPadding { Left = 45 }
@@ -77,6 +76,9 @@ namespace osu.Game.Screens.Edit.Components
 
         protected override bool OnKeyDown(KeyDownEvent e)
         {
+            if (e.Repeat)
+                return false;
+
             switch (e.Key)
             {
                 case Key.Space:
@@ -95,20 +97,23 @@ namespace osu.Game.Screens.Edit.Components
                 editorClock.Start();
         }
 
+        private static readonly IconUsage play_icon = FontAwesome.Regular.PlayCircle;
+        private static readonly IconUsage pause_icon = FontAwesome.Regular.PauseCircle;
+
         protected override void Update()
         {
             base.Update();
 
-            playButton.Icon = editorClock.IsRunning ? FontAwesome.Regular.PauseCircle : FontAwesome.Regular.PlayCircle;
+            playButton.Icon = editorClock.IsRunning ? pause_icon : play_icon;
         }
 
-        private class PlaybackTabControl : OsuTabControl<double>
+        private partial class PlaybackTabControl : OsuTabControl<double>
         {
             private static readonly double[] tempo_values = { 0.25, 0.5, 0.75, 1 };
 
             protected override TabItem<double> CreateTabItem(double value) => new PlaybackTabItem(value);
 
-            protected override Dropdown<double> CreateDropdown() => null;
+            protected override Dropdown<double> CreateDropdown() => null!;
 
             public PlaybackTabControl()
             {
@@ -120,7 +125,7 @@ namespace osu.Game.Screens.Edit.Components
                 Current.Value = tempo_values.Last();
             }
 
-            public class PlaybackTabItem : TabItem<double>
+            public partial class PlaybackTabItem : TabItem<double>
             {
                 private const float fade_duration = 200;
 

@@ -14,15 +14,11 @@ using osu.Framework.Graphics.Containers;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
-    public class DrawableSliderTick : DrawableOsuHitObject, IRequireTracking
+    public partial class DrawableSliderTick : DrawableOsuHitObject
     {
         public const double ANIM_DURATION = 150;
 
-        private const float default_tick_size = 16;
-
-        public bool Tracking { get; set; }
-
-        public override bool DisplayResult => false;
+        public const float DEFAULT_TICK_SIZE = 16;
 
         protected DrawableSlider DrawableSlider => (DrawableSlider)ParentHitObject;
 
@@ -41,15 +37,15 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         [BackgroundDependencyLoader]
         private void load()
         {
-            Size = new Vector2(OsuHitObject.OBJECT_RADIUS * 2);
+            Size = OsuHitObject.OBJECT_DIMENSIONS;
             Origin = Anchor.Centre;
 
-            AddInternal(scaleContainer = new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.SliderScorePoint), _ => new CircularContainer
+            AddInternal(scaleContainer = new SkinnableDrawable(new OsuSkinComponentLookup(OsuSkinComponents.SliderScorePoint), _ => new CircularContainer
             {
                 Masking = true,
                 Origin = Anchor.Centre,
-                Size = new Vector2(default_tick_size),
-                BorderThickness = default_tick_size / 4,
+                Size = new Vector2(DEFAULT_TICK_SIZE),
+                BorderThickness = DEFAULT_TICK_SIZE / 4,
                 BorderColour = Color4.White,
                 Child = new Box
                 {
@@ -73,11 +69,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             Position = HitObject.Position - DrawableSlider.HitObject.Position;
         }
 
-        protected override void CheckForResult(bool userTriggered, double timeOffset)
-        {
-            if (timeOffset >= 0)
-                ApplyResult(r => r.Type = Tracking ? r.Judgement.MaxResult : r.Judgement.MinResult);
-        }
+        protected override void CheckForResult(bool userTriggered, double timeOffset) => DrawableSlider.SliderInputManager.TryJudgeNestedObject(this, timeOffset);
 
         protected override void UpdateInitialTransforms()
         {
@@ -96,8 +88,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     break;
 
                 case ArmedState.Miss:
-                    this.FadeOut(ANIM_DURATION);
-                    this.FadeColour(Color4.Red, ANIM_DURATION / 2);
+                    this.FadeOut(ANIM_DURATION, Easing.OutQuint);
                     break;
 
                 case ArmedState.Hit:

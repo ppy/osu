@@ -1,10 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
-using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
@@ -22,13 +19,13 @@ namespace osu.Game.Rulesets.Mania.Skinning.Default
     /// <summary>
     /// Represents length-wise portion of a hold note.
     /// </summary>
-    public class DefaultBodyPiece : CompositeDrawable, IHoldNoteBody
+    public partial class DefaultBodyPiece : CompositeDrawable, IHoldNoteBody
     {
         protected readonly Bindable<Color4> AccentColour = new Bindable<Color4>();
         protected readonly IBindable<bool> IsHitting = new Bindable<bool>();
 
-        protected Drawable Background { get; private set; }
-        private Container foregroundContainer;
+        protected Drawable Background { get; private set; } = null!;
+        private Container foregroundContainer = null!;
 
         public DefaultBodyPiece()
         {
@@ -36,7 +33,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Default
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load([CanBeNull] DrawableHitObject drawableObject)
+        private void load(DrawableHitObject? drawableObject)
         {
             InternalChildren = new[]
             {
@@ -67,16 +64,16 @@ namespace osu.Game.Rulesets.Mania.Skinning.Default
 
         private void onAccentChanged(ValueChangedEvent<Color4> accent) => Background.Colour = accent.NewValue.Opacity(0.7f);
 
-        private class ForegroundPiece : CompositeDrawable
+        private partial class ForegroundPiece : CompositeDrawable
         {
             public readonly Bindable<Color4> AccentColour = new Bindable<Color4>();
             public readonly IBindable<bool> IsHitting = new Bindable<bool>();
 
             private readonly LayoutValue subtractionCache = new LayoutValue(Invalidation.DrawSize);
 
-            private BufferedContainer foregroundBuffer;
-            private BufferedContainer subtractionBuffer;
-            private Container subtractionLayer;
+            private BufferedContainer foregroundBuffer = null!;
+            private BufferedContainer subtractionBuffer = null!;
+            private Container subtractionLayer = null!;
 
             public ForegroundPiece()
             {

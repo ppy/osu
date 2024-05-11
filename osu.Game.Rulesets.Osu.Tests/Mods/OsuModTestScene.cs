@@ -5,7 +5,7 @@ using osu.Game.Tests.Visual;
 
 namespace osu.Game.Rulesets.Osu.Tests.Mods
 {
-    public abstract class OsuModTestScene : ModTestScene
+    public abstract partial class OsuModTestScene : ModTestScene
     {
         protected override Ruleset CreatePlayerRuleset() => new OsuRuleset();
     }

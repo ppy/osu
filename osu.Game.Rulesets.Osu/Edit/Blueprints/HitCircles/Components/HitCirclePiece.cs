@@ -1,7 +1,5 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -12,13 +10,13 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Edit.Blueprints.HitCircles.Components
 {
-    public class HitCirclePiece : BlueprintPiece<HitCircle>
+    public partial class HitCirclePiece : BlueprintPiece<HitCircle>
     {
         public HitCirclePiece()
         {
             Origin = Anchor.Centre;
 
-            Size = new Vector2(OsuHitObject.OBJECT_RADIUS * 2);
+            Size = OsuHitObject.OBJECT_DIMENSIONS;
 
             CornerRadius = Size.X / 2;
             CornerExponent = 2;

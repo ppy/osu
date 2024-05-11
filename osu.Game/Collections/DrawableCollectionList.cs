@@ -18,7 +18,7 @@ namespace osu.Game.Collections
     /// <summary>
     /// Visualises a list of <see cref="BeatmapCollection"/>s.
     /// </summary>
-    public class DrawableCollectionList : OsuRearrangeableListContainer<Live<BeatmapCollection>>
+    public partial class DrawableCollectionList : OsuRearrangeableListContainer<Live<BeatmapCollection>>
     {
         protected override ScrollContainer<Drawable> CreateScrollContainer() => scroll = new Scroll();
 
@@ -41,7 +41,7 @@ namespace osu.Game.Collections
             realmSubscription = realm.RegisterForNotifications(r => r.All<BeatmapCollection>().OrderBy(c => c.Name), collectionsChanged);
         }
 
-        private void collectionsChanged(IRealmCollection<BeatmapCollection> collections, ChangeSet? changes, Exception error)
+        private void collectionsChanged(IRealmCollection<BeatmapCollection> collections, ChangeSet? changes)
         {
             Items.Clear();
             Items.AddRange(collections.AsEnumerable().Select(c => c.ToLive(realm)));
@@ -68,7 +68,7 @@ namespace osu.Game.Collections
         /// <remarks>
         /// Use <see cref="ReplacePlaceholder"/> to transfer the placeholder into the main list.
         /// </remarks>
-        private class Scroll : OsuScrollContainer
+        private partial class Scroll : OsuScrollContainer
         {
             /// <summary>
             /// The currently-displayed placeholder item.
@@ -132,7 +132,7 @@ namespace osu.Game.Collections
         /// <summary>
         /// The flow of <see cref="DrawableCollectionListItem"/>. Disables layout easing unless a drag is in progress.
         /// </summary>
-        private class Flow : FillFlowContainer<RearrangeableListItem<Live<BeatmapCollection>>>
+        private partial class Flow : FillFlowContainer<RearrangeableListItem<Live<BeatmapCollection>>>
         {
             public readonly IBindable<bool> DragActive = new Bindable<bool>();
 

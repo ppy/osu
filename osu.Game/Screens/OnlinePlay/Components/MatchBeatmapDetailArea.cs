@@ -9,7 +9,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Graphics.UserInterface;
+using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Online.Rooms;
 using osu.Game.Screens.OnlinePlay.Playlists;
 using osu.Game.Screens.Select;
@@ -17,7 +17,7 @@ using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.Components
 {
-    public class MatchBeatmapDetailArea : BeatmapDetailArea
+    public partial class MatchBeatmapDetailArea : BeatmapDetailArea
     {
         public Action CreateNewItem;
 
@@ -26,48 +26,44 @@ namespace osu.Game.Screens.OnlinePlay.Components
         [Resolved(typeof(Room))]
         protected BindableList<PlaylistItem> Playlist { get; private set; }
 
-        private readonly Drawable playlistArea;
+        private readonly GridContainer playlistArea;
         private readonly DrawableRoomPlaylist playlist;
 
         public MatchBeatmapDetailArea()
         {
-            Add(playlistArea = new Container
+            Add(playlistArea = new GridContainer
             {
                 RelativeSizeAxes = Axes.Both,
                 Padding = new MarginPadding { Vertical = 10 },
-                Child = new GridContainer
+                Content = new[]
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    Content = new[]
+                    new Drawable[]
                     {
-                        new Drawable[]
+                        new Container
                         {
-                            new Container
+                            RelativeSizeAxes = Axes.Both,
+                            Padding = new MarginPadding { Bottom = 10 },
+                            Child = playlist = new PlaylistsRoomSettingsPlaylist
                             {
-                                RelativeSizeAxes = Axes.Both,
-                                Padding = new MarginPadding { Bottom = 10 },
-                                Child = playlist = new PlaylistsRoomSettingsPlaylist
-                                {
-                                    RelativeSizeAxes = Axes.Both
-                                }
+                                RelativeSizeAxes = Axes.Both
                             }
-                        },
-                        new Drawable[]
-                        {
-                            new TriangleButton
-                            {
-                                Text = "Add new playlist entry",
-                                RelativeSizeAxes = Axes.Both,
-                                Size = Vector2.One,
-                                Action = () => CreateNewItem?.Invoke()
-                            }
-                        },
+                        }
                     },
-                    RowDimensions = new[]
+                    new Drawable[]
                     {
-                        new Dimension(),
-                        new Dimension(GridSizeMode.Absolute, 50),
-                    }
+                        new RoundedButton
+                        {
+                            Text = "Add new playlist entry",
+                            RelativeSizeAxes = Axes.Both,
+                            Size = Vector2.One,
+                            Action = () => CreateNewItem?.Invoke()
+                        }
+                    },
+                },
+                RowDimensions = new[]
+                {
+                    new Dimension(),
+                    new Dimension(GridSizeMode.Absolute, 50),
                 }
             });
         }

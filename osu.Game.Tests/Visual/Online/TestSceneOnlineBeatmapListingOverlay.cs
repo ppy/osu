@@ -1,15 +1,13 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Game.Overlays;
 using NUnit.Framework;
 
 namespace osu.Game.Tests.Visual.Online
 {
     [Description("uses online API")]
-    public class TestSceneOnlineBeatmapListingOverlay : OsuTestScene
+    public partial class TestSceneOnlineBeatmapListingOverlay : OsuTestScene
     {
         protected override bool UseOnlineAPI => true;
 

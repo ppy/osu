@@ -16,7 +16,7 @@ using osu.Game.Screens.Select;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer
 {
-    public class MultiplayerMatchSongSelect : OnlinePlaySongSelect
+    public partial class MultiplayerMatchSongSelect : OnlinePlaySongSelect
     {
         [Resolved]
         private MultiplayerClient client { get; set; } = null!;

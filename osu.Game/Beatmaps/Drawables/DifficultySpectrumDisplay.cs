@@ -1,7 +1,5 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using System.Collections.Generic;
 using System.Linq;
@@ -18,7 +16,7 @@ using osuTK;
 
 namespace osu.Game.Beatmaps.Drawables
 {
-    public class DifficultySpectrumDisplay : CompositeDrawable
+    public partial class DifficultySpectrumDisplay : CompositeDrawable
     {
         private Vector2 dotSize = new Vector2(4, 8);
 
@@ -83,7 +81,7 @@ namespace osu.Game.Beatmaps.Drawables
             }
         }
 
-        private class RulesetDifficultyGroup : FillFlowContainer
+        private partial class RulesetDifficultyGroup : FillFlowContainer
         {
             private readonly int rulesetId;
             private readonly IEnumerable<IBeatmapInfo> beatmapInfos;
@@ -143,7 +141,7 @@ namespace osu.Game.Beatmaps.Drawables
             }
         }
 
-        private class DifficultyDot : CircularContainer
+        private partial class DifficultyDot : CircularContainer
         {
             private readonly double starDifficulty;
 

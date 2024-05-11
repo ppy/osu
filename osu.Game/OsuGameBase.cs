@@ -14,6 +14,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
+using osu.Framework.Configuration;
 using osu.Framework.Development;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
@@ -21,8 +22,13 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Input;
 using osu.Framework.Input.Handlers;
+using osu.Framework.Input.Handlers.Joystick;
 using osu.Framework.Input.Handlers.Midi;
+using osu.Framework.Input.Handlers.Mouse;
+using osu.Framework.Input.Handlers.Tablet;
+using osu.Framework.Input.Handlers.Touch;
 using osu.Framework.IO.Stores;
+using osu.Framework.Localisation;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Framework.Timing;
@@ -32,11 +38,13 @@ using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Configuration;
 using osu.Game.Database;
+using osu.Game.Extensions;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Input;
 using osu.Game.Input.Bindings;
 using osu.Game.IO;
+using osu.Game.Localisation;
 using osu.Game.Online;
 using osu.Game.Online.API;
 using osu.Game.Online.Chat;
@@ -46,13 +54,13 @@ using osu.Game.Online.Spectator;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Settings;
 using osu.Game.Overlays.Settings.Sections;
+using osu.Game.Overlays.Settings.Sections.Input;
 using osu.Game.Resources;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osu.Game.Skinning;
 using osu.Game.Utils;
-using File = System.IO.File;
 using RuntimeInfo = osu.Framework.RuntimeInfo;
 
 namespace osu.Game
@@ -65,7 +73,13 @@ namespace osu.Game
     [Cached(typeof(OsuGameBase))]
     public partial class OsuGameBase : Framework.Game, ICanAcceptFiles, IBeatSyncProvider
     {
-        public static readonly string[] VIDEO_EXTENSIONS = { ".mp4", ".mov", ".avi", ".flv" };
+        public static readonly string[] VIDEO_EXTENSIONS = { ".mp4", ".mov", ".avi", ".flv", ".mpg", ".wmv", ".m4v" };
+
+#if DEBUG
+        public const string GAME_NAME = "osu! (development)";
+#else
+        public const string GAME_NAME = "osu!";
+#endif
 
         public const string OSU_PROTOCOL = "osu://";
 
@@ -78,19 +92,21 @@ namespace osu.Game
 
         public const int SAMPLE_CONCURRENCY = 6;
 
+        public const double SFX_STEREO_STRENGTH = 0.75;
+
         /// <summary>
         /// Length of debounce (in milliseconds) for commonly occuring sample playbacks that could stack.
         /// </summary>
         public const int SAMPLE_DEBOUNCE_TIME = 20;
 
         /// <summary>
-        /// The maximum volume at which audio tracks should playback. This can be set lower than 1 to create some head-room for sound effects.
+        /// The maximum volume at which audio tracks should play back at. This can be set lower than 1 to create some head-room for sound effects.
         /// </summary>
         private const double global_track_volume_adjust = 0.8;
 
         public virtual bool UseDevelopmentServer => DebugUtils.IsDebugBuild;
 
-        internal EndpointConfiguration CreateEndpoints() =>
+        public virtual EndpointConfiguration CreateEndpoints() =>
             UseDevelopmentServer ? new DevelopmentEndpointConfiguration() : new ProductionEndpointConfiguration();
 
         public virtual Version AssemblyVersion => Assembly.GetEntryAssembly()?.GetName().Version ?? new Version();
@@ -150,11 +166,19 @@ namespace osu.Game
 
         protected Storage Storage { get; set; }
 
+        /// <summary>
+        /// The language in which the game is currently displayed in.
+        /// </summary>
+        public Bindable<Language> CurrentLanguage { get; } = new Bindable<Language>();
+
         protected Bindable<WorkingBeatmap> Beatmap { get; private set; } // cached via load() method
 
+        /// <summary>
+        /// The current ruleset selection for the local user.
+        /// </summary>
         [Cached]
         [Cached(typeof(IBindable<RulesetInfo>))]
-        protected readonly Bindable<RulesetInfo> Ruleset = new Bindable<RulesetInfo>();
+        protected internal readonly Bindable<RulesetInfo> Ruleset = new Bindable<RulesetInfo>();
 
         /// <summary>
         /// The current mod selection for the local user.
@@ -181,7 +205,9 @@ namespace osu.Game
 
         private RulesetConfigCache rulesetConfigCache;
 
-        private SpectatorClient spectatorClient;
+        private SessionAverageHitErrorTracker hitErrorTracker;
+
+        protected SpectatorClient SpectatorClient { get; private set; }
 
         protected MultiplayerClient MultiplayerClient { get; private set; }
 
@@ -189,11 +215,13 @@ namespace osu.Game
 
         private RealmAccess realm;
 
+        protected SafeAreaContainer SafeAreaContainer { get; private set; }
+
         /// <summary>
         /// For now, this is used as a source specifically for beat synced components.
         /// Going forward, it could potentially be used as the single source-of-truth for beatmap timing.
         /// </summary>
-        private readonly FramedBeatmapClock beatmapClock = new FramedBeatmapClock(true);
+        private readonly FramedBeatmapClock beatmapClock = new FramedBeatmapClock(applyOffsets: true, requireDecoupling: false);
 
         protected override Container<Drawable> Content => content;
 
@@ -202,6 +230,10 @@ namespace osu.Game
         private DependencyContainer dependencies;
 
         private readonly BindableNumber<double> globalTrackVolumeAdjust = new BindableNumber<double>(global_track_volume_adjust);
+
+        private Bindable<string> frameworkLocale = null!;
+
+        private IBindable<LocalisationParameters> localisationParameters = null!;
 
         /// <summary>
         /// Number of unhandled exceptions to allow before aborting execution.
@@ -215,17 +247,13 @@ namespace osu.Game
 
         public OsuGameBase()
         {
-            Name = @"osu!";
-
-#if DEBUG
-            Name += " (development)";
-#endif
+            Name = GAME_NAME;
 
             allowableExceptions = UnhandledExceptionsBeforeCrash;
         }
 
         [BackgroundDependencyLoader]
-        private void load(ReadableKeyCombinationProvider keyCombinationProvider)
+        private void load(ReadableKeyCombinationProvider keyCombinationProvider, FrameworkConfigManager frameworkConfig)
         {
             try
             {
@@ -255,6 +283,7 @@ namespace osu.Game
             dependencies.Cache(largeStore);
 
             dependencies.CacheAs(LocalConfig);
+            dependencies.CacheAs<IGameplaySettings>(LocalConfig);
 
             InitialiseFonts();
 
@@ -269,7 +298,15 @@ namespace osu.Game
 
             MessageFormatter.WebsiteRootUrl = endpoints.WebsiteRootUrl;
 
-            dependencies.CacheAs(API ??= new APIAccess(LocalConfig, endpoints, VersionHash));
+            frameworkLocale = frameworkConfig.GetBindable<string>(FrameworkSetting.Locale);
+            frameworkLocale.BindValueChanged(_ => updateLanguage());
+
+            localisationParameters = Localisation.CurrentParameters.GetBoundCopy();
+            localisationParameters.BindValueChanged(_ => updateLanguage(), true);
+
+            CurrentLanguage.BindValueChanged(val => frameworkLocale.Value = val.NewValue.ToCultureCode());
+
+            dependencies.CacheAs(API ??= new APIAccess(this, LocalConfig, endpoints, VersionHash));
 
             var defaultBeatmap = new DummyWorkingBeatmap(Audio, Textures);
 
@@ -284,27 +321,23 @@ namespace osu.Game
             dependencies.Cache(ScoreDownloader = new ScoreModelDownloader(ScoreManager, API));
 
             // Add after all the above cache operations as it depends on them.
-            AddInternal(difficultyCache);
+            base.Content.Add(difficultyCache);
 
             // TODO: OsuGame or OsuGameBase?
             dependencies.CacheAs(beatmapUpdater = new BeatmapUpdater(BeatmapManager, difficultyCache, API, Storage));
-            dependencies.CacheAs(spectatorClient = new OnlineSpectatorClient(endpoints));
+            dependencies.CacheAs(SpectatorClient = new OnlineSpectatorClient(endpoints));
             dependencies.CacheAs(MultiplayerClient = new OnlineMultiplayerClient(endpoints));
             dependencies.CacheAs(metadataClient = new OnlineMetadataClient(endpoints));
 
-            AddInternal(new BeatmapOnlineChangeIngest(beatmapUpdater, realm, metadataClient));
+            base.Content.Add(new BeatmapOnlineChangeIngest(beatmapUpdater, realm, metadataClient));
 
-            BeatmapManager.ProcessBeatmap = args => beatmapUpdater.Process(args.beatmapSet, !args.isBatch);
+            BeatmapManager.ProcessBeatmap = (beatmapSet, scope) => beatmapUpdater.Process(beatmapSet, scope);
 
             dependencies.Cache(userCache = new UserLookupCache());
-            AddInternal(userCache);
+            base.Content.Add(userCache);
 
             dependencies.Cache(beatmapCache = new BeatmapLookupCache());
-            AddInternal(beatmapCache);
-
-            var scorePerformanceManager = new ScorePerformanceCache();
-            dependencies.Cache(scorePerformanceManager);
-            AddInternal(scorePerformanceManager);
+            base.Content.Add(beatmapCache);
 
             dependencies.CacheAs<IRulesetConfigCache>(rulesetConfigCache = new RulesetConfigCache(realm, RulesetStore));
 
@@ -313,6 +346,7 @@ namespace osu.Game
                 dependencies.CacheAs(powerStatus);
 
             dependencies.Cache(SessionStatics = new SessionStatics());
+            dependencies.Cache(hitErrorTracker = new SessionAverageHitErrorTracker());
             dependencies.Cache(Colours = new OsuColour());
 
             RegisterImportHandler(BeatmapManager);
@@ -331,52 +365,58 @@ namespace osu.Game
 
             // add api components to hierarchy.
             if (API is APIAccess apiAccess)
-                AddInternal(apiAccess);
+                base.Content.Add(apiAccess);
 
-            AddInternal(spectatorClient);
-            AddInternal(MultiplayerClient);
-            AddInternal(metadataClient);
+            base.Content.Add(SpectatorClient);
+            base.Content.Add(MultiplayerClient);
+            base.Content.Add(metadataClient);
 
-            AddInternal(rulesetConfigCache);
+            base.Content.Add(rulesetConfigCache);
+
+            PreviewTrackManager previewTrackManager;
+            dependencies.Cache(previewTrackManager = new PreviewTrackManager(BeatmapManager.BeatmapTrackStore));
+            base.Content.Add(previewTrackManager);
+
+            base.Content.Add(MusicController = new MusicController());
+            dependencies.CacheAs(MusicController);
+
+            MusicController.TrackChanged += onTrackChanged;
+            base.Content.Add(beatmapClock);
 
             GlobalActionContainer globalBindings;
 
-            base.Content.Add(new SafeAreaContainer
+            base.Content.Add(SafeAreaContainer = new SafeAreaContainer
             {
                 SafeAreaOverrideEdges = SafeAreaOverrideEdges,
                 RelativeSizeAxes = Axes.Both,
-                Child = CreateScalingContainer().WithChildren(new Drawable[]
+                Child = CreateScalingContainer().WithChild(globalBindings = new GlobalActionContainer(this)
                 {
-                    (GlobalCursorDisplay = new GlobalCursorDisplay
+                    Children = new Drawable[]
                     {
-                        RelativeSizeAxes = Axes.Both
-                    }).WithChild(content = new OsuTooltipContainer(GlobalCursorDisplay.MenuCursor)
-                    {
-                        RelativeSizeAxes = Axes.Both
-                    }),
-                    // to avoid positional input being blocked by children, ensure the GlobalActionContainer is above everything.
-                    globalBindings = new GlobalActionContainer(this)
+                        (GlobalCursorDisplay = new GlobalCursorDisplay
+                        {
+                            RelativeSizeAxes = Axes.Both
+                        }).WithChild(content = new OsuTooltipContainer(GlobalCursorDisplay.MenuCursor)
+                        {
+                            RelativeSizeAxes = Axes.Both
+                        }),
+                    }
                 })
             });
+
+            base.Content.Add(new TouchInputInterceptor());
+            base.Content.Add(hitErrorTracker);
 
             KeyBindingStore = new RealmKeyBindingStore(realm, keyCombinationProvider);
             KeyBindingStore.Register(globalBindings, RulesetStore.AvailableRulesets);
 
             dependencies.Cache(globalBindings);
 
-            PreviewTrackManager previewTrackManager;
-            dependencies.Cache(previewTrackManager = new PreviewTrackManager(BeatmapManager.BeatmapTrackStore));
-            Add(previewTrackManager);
-
-            AddInternal(MusicController = new MusicController());
-            dependencies.CacheAs(MusicController);
-
-            MusicController.TrackChanged += onTrackChanged;
-            AddInternal(beatmapClock);
-
             Ruleset.BindValueChanged(onRulesetChanged);
             Beatmap.BindValueChanged(onBeatmapChanged);
         }
+
+        private void updateLanguage() => CurrentLanguage.Value = LanguageExtensions.GetLanguageFor(frameworkLocale.Value, localisationParameters.Value);
 
         private void addFilesWarning()
         {
@@ -401,16 +441,7 @@ namespace osu.Game
             }
         }
 
-        private void onTrackChanged(WorkingBeatmap beatmap, TrackChangeDirection direction)
-        {
-            // FramedBeatmapClock uses a decoupled clock internally which will mutate the source if it is an `IAdjustableClock`.
-            // We don't want this for now, as the intention of beatmapClock is to be a read-only source for beat sync components.
-            //
-            // Encapsulating in a FramedClock will avoid any mutations.
-            var framedClock = new FramedClock(beatmap.Track);
-
-            beatmapClock.ChangeSource(framedClock);
-        }
+        private void onTrackChanged(WorkingBeatmap beatmap, TrackChangeDirection direction) => beatmapClock.ChangeSource(beatmap.Track);
 
         protected virtual void InitialiseFonts()
         {
@@ -444,6 +475,8 @@ namespace osu.Game
             AddFont(Resources, @"Fonts/Venera/Venera-Light");
             AddFont(Resources, @"Fonts/Venera/Venera-Bold");
             AddFont(Resources, @"Fonts/Venera/Venera-Black");
+
+            Fonts.AddStore(new OsuIcon.OsuIconStore(Textures));
         }
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent) =>
@@ -476,6 +509,12 @@ namespace osu.Game
                 Scheduler.AddDelayed(AttemptExit, 2000);
         }
 
+        /// <summary>
+        /// If supported by the platform, the game will automatically restart after the next exit.
+        /// </summary>
+        /// <returns>Whether a restart operation was queued.</returns>
+        public virtual bool RestartAppWhenExited() => false;
+
         public bool Migrate(string path)
         {
             Logger.Log($@"Migrating osu! data from ""{Storage.GetFullPath(string.Empty)}"" to ""{path}""...");
@@ -486,14 +525,21 @@ namespace osu.Game
             {
                 ManualResetEventSlim readyToRun = new ManualResetEventSlim();
 
+                bool success = false;
+
                 Scheduler.Add(() =>
                 {
-                    realmBlocker = realm.BlockAllOperations("migration");
+                    try
+                    {
+                        realmBlocker = realm.BlockAllOperations("migration");
+                        success = true;
+                    }
+                    catch { }
 
                     readyToRun.Set();
                 }, false);
 
-                if (!readyToRun.Wait(30000))
+                if (!readyToRun.Wait(30000) || !success)
                     throw new TimeoutException("Attempting to block for migration took too long.");
 
                 bool? cleanupSucceded = (Storage as OsuStorage)?.Migrate(Host.GetStorage(path));
@@ -521,8 +567,31 @@ namespace osu.Game
         /// <remarks>Should be overriden per-platform to provide settings for platform-specific handlers.</remarks>
         public virtual SettingsSubsection CreateSettingsSubsectionFor(InputHandler handler)
         {
+            // One would think that this could be moved to the `OsuGameDesktop` class, but doing so means that
+            // OsuGameTestScenes will not show any input options (as they are based on OsuGame not OsuGameDesktop).
+            //
+            // This in turn makes it hard for ruleset creators to adjust input settings while testing their ruleset
+            // within the test browser interface.
+            if (RuntimeInfo.IsDesktop)
+            {
+                switch (handler)
+                {
+                    case ITabletHandler th:
+                        return new TabletSettings(th);
+
+                    case MouseHandler mh:
+                        return new MouseSettings(mh);
+
+                    case JoystickHandler jh:
+                        return new JoystickSettings(jh);
+                }
+            }
+
             switch (handler)
             {
+                case TouchHandler th:
+                    return new TouchSettings(th);
+
                 case MidiHandler:
                     return new InputSection.HandlerSection(handler);
 
@@ -570,7 +639,7 @@ namespace osu.Game
 
             try
             {
-                foreach (ModType type in Enum.GetValues(typeof(ModType)))
+                foreach (ModType type in Enum.GetValues<ModType>())
                 {
                     dict[type] = instance.GetModsFor(type)
                                          // Rulesets should never return null mods, but let's be defensive just in case.
@@ -586,10 +655,22 @@ namespace osu.Game
                 return;
             }
 
-            if (!SelectedMods.Disabled)
-                SelectedMods.Value = Array.Empty<Mod>();
-
             AvailableMods.Value = dict;
+
+            if (SelectedMods.Disabled)
+                return;
+
+            var convertedMods = SelectedMods.Value.Select(mod =>
+            {
+                var newMod = instance.CreateModFromAcronym(mod.Acronym);
+                newMod?.CopyCommonSettingsFrom(mod);
+                return newMod;
+            }).Where(newMod => newMod != null).ToList();
+
+            if (!ModUtils.CheckValidForGameplay(convertedMods, out var invalid))
+                invalid.ForEach(newMod => convertedMods.Remove(newMod));
+
+            SelectedMods.Value = convertedMods;
 
             void revertRulesetChange() => Ruleset.Value = r.OldValue?.Available == true ? r.OldValue : RulesetStore.AvailableRulesets.First();
         }
@@ -599,16 +680,21 @@ namespace osu.Game
         /// <summary>
         /// Allows a maximum of one unhandled exception, per second of execution.
         /// </summary>
-        private bool onExceptionThrown(Exception _)
+        /// <returns>Whether to ignore the exception and continue running.</returns>
+        private bool onExceptionThrown(Exception ex)
         {
-            bool continueExecution = Interlocked.Decrement(ref allowableExceptions) >= 0;
+            if (Interlocked.Decrement(ref allowableExceptions) < 0)
+            {
+                Logger.Log("Too many unhandled exceptions, crashing out.");
+                RulesetStore.TryDisableCustomRulesetsCausing(ex);
+                return false;
+            }
 
-            Logger.Log($"Unhandled exception has been {(continueExecution ? $"allowed with {allowableExceptions} more allowable exceptions" : "denied")} .");
-
+            Logger.Log($"Unhandled exception has been allowed with {allowableExceptions} more allowable exceptions.");
             // restore the stock of allowable exceptions after a short delay.
             Task.Delay(1000).ContinueWith(_ => Interlocked.Increment(ref allowableExceptions));
 
-            return continueExecution;
+            return true;
         }
 
         protected override void Dispose(bool isDisposing)

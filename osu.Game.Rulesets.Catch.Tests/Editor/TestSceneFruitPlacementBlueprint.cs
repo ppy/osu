@@ -1,7 +1,5 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using System.Linq;
 using NUnit.Framework;
@@ -17,7 +15,7 @@ using osuTK.Input;
 
 namespace osu.Game.Rulesets.Catch.Tests.Editor
 {
-    public class TestSceneFruitPlacementBlueprint : CatchPlacementBlueprintTestScene
+    public partial class TestSceneFruitPlacementBlueprint : CatchPlacementBlueprintTestScene
     {
         protected override DrawableHitObject CreateHitObject(HitObject hitObject) => new DrawableFruit((Fruit)hitObject);
 

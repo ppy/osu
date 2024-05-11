@@ -19,7 +19,7 @@ using APIUser = osu.Game.Online.API.Requests.Responses.APIUser;
 
 namespace osu.Game.Tests.Visual.Online
 {
-    public class TestSceneOfflineCommentsContainer : OsuTestScene
+    public partial class TestSceneOfflineCommentsContainer : OsuTestScene
     {
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
@@ -184,7 +184,7 @@ namespace osu.Game.Tests.Visual.Online
             PinnedComments = new List<Comment>(),
         };
 
-        private class TestCommentsContainer : CommentsContainer
+        private partial class TestCommentsContainer : CommentsContainer
         {
             public new void AppendComments([NotNull] CommentBundle bundle) => base.AppendComments(bundle);
 

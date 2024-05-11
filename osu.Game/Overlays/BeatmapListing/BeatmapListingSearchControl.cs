@@ -24,7 +24,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.BeatmapListing
 {
-    public class BeatmapListingSearchControl : CompositeDrawable
+    public partial class BeatmapListingSearchControl : CompositeDrawable
     {
         /// <summary>
         /// Any time the text box receives key events (even while masked).
@@ -107,7 +107,7 @@ namespace osu.Game.Overlays.BeatmapListing
                     Padding = new MarginPadding
                     {
                         Vertical = 20,
-                        Horizontal = 40,
+                        Horizontal = WaveOverlayContainer.HORIZONTAL_PADDING,
                     },
                     Child = new FillFlowContainer
                     {
@@ -128,6 +128,7 @@ namespace osu.Game.Overlays.BeatmapListing
                                 RelativeSizeAxes = Axes.X,
                                 Direction = FillDirection.Vertical,
                                 Padding = new MarginPadding { Horizontal = 10 },
+                                Spacing = new Vector2(5),
                                 Children = new Drawable[]
                                 {
                                     generalFilter = new BeatmapSearchGeneralFilterRow(),
@@ -146,6 +147,7 @@ namespace osu.Game.Overlays.BeatmapListing
                 }
             });
 
+            generalFilter.Current.Add(SearchGeneral.FeaturedArtists);
             categoryFilter.Current.Value = SearchCategory.Leaderboard;
         }
 
@@ -165,7 +167,7 @@ namespace osu.Game.Overlays.BeatmapListing
 
         public void TakeFocus() => textBox.TakeFocus();
 
-        private class BeatmapSearchTextBox : BasicSearchTextBox
+        private partial class BeatmapSearchTextBox : BasicSearchTextBox
         {
             /// <summary>
             /// Any time the text box receives key events (even while masked).
@@ -198,7 +200,7 @@ namespace osu.Game.Overlays.BeatmapListing
             }
         }
 
-        private class TopSearchBeatmapSetCover : UpdateableOnlineBeatmapSetCover
+        private partial class TopSearchBeatmapSetCover : UpdateableOnlineBeatmapSetCover
         {
             protected override bool TransformImmediately => true;
         }

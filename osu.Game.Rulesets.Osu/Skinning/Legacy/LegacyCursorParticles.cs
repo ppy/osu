@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -25,21 +23,21 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 {
-    public class LegacyCursorParticles : CompositeDrawable, IKeyBindingHandler<OsuAction>
+    public partial class LegacyCursorParticles : CompositeDrawable, IKeyBindingHandler<OsuAction>
     {
-        public bool Active => breakSpewer?.Active.Value == true || kiaiSpewer?.Active.Value == true;
+        public bool Active => breakSpewer.Active.Value || kiaiSpewer.Active.Value;
 
-        private LegacyCursorParticleSpewer breakSpewer;
-        private LegacyCursorParticleSpewer kiaiSpewer;
-
-        [Resolved(canBeNull: true)]
-        private Player player { get; set; }
+        private LegacyCursorParticleSpewer breakSpewer = null!;
+        private LegacyCursorParticleSpewer kiaiSpewer = null!;
 
         [Resolved(canBeNull: true)]
-        private OsuPlayfield playfield { get; set; }
+        private Player? player { get; set; }
 
         [Resolved(canBeNull: true)]
-        private GameplayState gameplayState { get; set; }
+        private OsuPlayfield? playfield { get; set; }
+
+        [Resolved(canBeNull: true)]
+        private GameplayState? gameplayState { get; set; }
 
         [BackgroundDependencyLoader]
         private void load(ISkinSource skin)
@@ -79,7 +77,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
         {
             if (playfield == null || gameplayState == null) return;
 
-            DrawableHitObject kiaiHitObject = null;
+            DrawableHitObject? kiaiHitObject = null;
 
             // Check whether currently in a kiai section first. This is only done as an optimisation to avoid enumerating AliveObjects when not necessary.
             if (gameplayState.Beatmap.ControlPointInfo.EffectPointAt(Time.Current).KiaiMode)
@@ -142,7 +140,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                 breakSpewer.Direction = SpewDirection.None;
         }
 
-        private class LegacyCursorParticleSpewer : ParticleSpewer, IRequireHighFrequencyMousePosition
+        private partial class LegacyCursorParticleSpewer : ParticleSpewer, IRequireHighFrequencyMousePosition
         {
             private const int particle_duration_min = 300;
             private const int particle_duration_max = 1000;
@@ -152,7 +150,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
             protected override bool CanSpawnParticles => base.CanSpawnParticles && cursorScreenPosition.HasValue;
             protected override float ParticleGravity => 240;
 
-            public LegacyCursorParticleSpewer(Texture texture, int perSecond)
+            public LegacyCursorParticleSpewer(Texture? texture, int perSecond)
                 : base(texture, perSecond, particle_duration_max)
             {
                 Active.BindValueChanged(_ => resetVelocityCalculation());

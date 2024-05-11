@@ -19,7 +19,7 @@ using osuTK.Input;
 
 namespace osu.Game.Rulesets.Catch.Tests.Editor
 {
-    public class TestSceneJuiceStreamSelectionBlueprint : CatchSelectionBlueprintTestScene
+    public partial class TestSceneJuiceStreamSelectionBlueprint : CatchSelectionBlueprintTestScene
     {
         private JuiceStream hitObject;
 
@@ -108,11 +108,11 @@ namespace osu.Game.Rulesets.Catch.Tests.Editor
             double[] times = { 100, 300 };
             float[] positions = { 200, 300 };
             addBlueprintStep(times, positions);
-            AddAssert("default slider velocity", () => hitObject.DifficultyControlPoint.SliderVelocityBindable.IsDefault);
+            AddAssert("default slider velocity", () => hitObject.SliderVelocityMultiplierBindable.IsDefault);
 
             addDragStartStep(times[1], positions[1]);
             AddMouseMoveStep(times[1], 400);
-            AddAssert("slider velocity changed", () => !hitObject.DifficultyControlPoint.SliderVelocityBindable.IsDefault);
+            AddAssert("slider velocity changed", () => !hitObject.SliderVelocityMultiplierBindable.IsDefault);
         }
 
         [Test]
@@ -140,7 +140,7 @@ namespace osu.Game.Rulesets.Catch.Tests.Editor
 
             AddStep("update hit object path", () =>
             {
-                hitObject.Path = new SliderPath(PathType.PerfectCurve, new[]
+                hitObject.Path = new SliderPath(PathType.PERFECT_CURVE, new[]
                 {
                     Vector2.Zero,
                     new Vector2(100, 100),
@@ -190,16 +190,16 @@ namespace osu.Game.Rulesets.Catch.Tests.Editor
         [Test]
         public void TestVertexResampling()
         {
-            addBlueprintStep(100, 100, new SliderPath(PathType.PerfectCurve, new[]
+            addBlueprintStep(100, 100, new SliderPath(PathType.PERFECT_CURVE, new[]
             {
                 Vector2.Zero,
                 new Vector2(100, 100),
                 new Vector2(50, 200),
             }), 0.5);
             AddAssert("1 vertex per 1 nested HO", () => getVertices().Count == hitObject.NestedHitObjects.Count);
-            AddAssert("slider path not yet changed", () => hitObject.Path.ControlPoints[0].Type == PathType.PerfectCurve);
+            AddAssert("slider path not yet changed", () => hitObject.Path.ControlPoints[0].Type == PathType.PERFECT_CURVE);
             addAddVertexSteps(150, 150);
-            AddAssert("slider path change to linear", () => hitObject.Path.ControlPoints[0].Type == PathType.Linear);
+            AddAssert("slider path change to linear", () => hitObject.Path.ControlPoints[0].Type == PathType.LINEAR);
         }
 
         private void addBlueprintStep(double time, float x, SliderPath sliderPath, double velocity) => AddStep("add selection blueprint", () =>

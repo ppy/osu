@@ -1,8 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Linq;
 using osu.Framework.Localisation;
+using osu.Game.Screens.Select;
 
 namespace osu.Game.Beatmaps
 {
@@ -29,10 +29,23 @@ namespace osu.Game.Beatmaps
             return new RomanisableString($"{metadata.GetPreferred(true)}".Trim(), $"{metadata.GetPreferred(false)}".Trim());
         }
 
-        public static string[] GetSearchableTerms(this IBeatmapInfo beatmapInfo) => new[]
+        public static bool Match(this IBeatmapInfo beatmapInfo, params FilterCriteria.OptionalTextFilter[] filters)
         {
-            beatmapInfo.DifficultyName
-        }.Concat(beatmapInfo.Metadata.GetSearchableTerms()).Where(s => !string.IsNullOrEmpty(s)).ToArray();
+            foreach (var filter in filters)
+            {
+                if (filter.Matches(beatmapInfo.DifficultyName))
+                    continue;
+
+                if (BeatmapMetadataInfoExtensions.Match(beatmapInfo.Metadata, filter))
+                    continue;
+
+                // failed to match a single filter at all - fail the whole match.
+                return false;
+            }
+
+            // got through all filters without failing any - pass the whole match.
+            return true;
+        }
 
         private static string getVersionString(IBeatmapInfo beatmapInfo) => string.IsNullOrEmpty(beatmapInfo.DifficultyName) ? string.Empty : $"[{beatmapInfo.DifficultyName}]";
     }

@@ -19,7 +19,7 @@ using osuTK.Input;
 namespace osu.Game.Rulesets.Osu.Tests.Editor
 {
     [TestFixture]
-    public class TestSliderScaling : TestSceneOsuEditor
+    public partial class TestSliderScaling : TestSceneOsuEditor
     {
         private OsuPlayfield playfield;
 
@@ -43,7 +43,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
 
                 PathControlPoint[] points =
                 {
-                    new PathControlPoint(new Vector2(0), PathType.Linear),
+                    new PathControlPoint(new Vector2(0), PathType.LINEAR),
                     new PathControlPoint(new Vector2(100, 0)),
                 };
 

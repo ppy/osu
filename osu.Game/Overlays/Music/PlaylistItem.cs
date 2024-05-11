@@ -20,7 +20,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Music
 {
-    public class PlaylistItem : OsuRearrangeableListItem<Live<BeatmapSetInfo>>, IFilterable
+    public partial class PlaylistItem : OsuRearrangeableListItem<Live<BeatmapSetInfo>>, IFilterable
     {
         public readonly Bindable<Live<BeatmapSetInfo>> SelectedSet = new Bindable<Live<BeatmapSetInfo>>();
 
@@ -56,7 +56,7 @@ namespace osu.Game.Overlays.Music
                 var artist = new RomanisableString(metadata.ArtistUnicode, metadata.Artist);
 
                 titlePart = text.AddText(title, sprite => sprite.Font = OsuFont.GetFont(weight: FontWeight.Regular));
-                titlePart.DrawablePartsRecreated += _ => updateSelectionState(true);
+                titlePart.DrawablePartsRecreated += _ => updateSelectionState(SelectedSet.Value, applyImmediately: true);
 
                 text.AddText(@"  "); // to separate the title from the artist.
                 text.AddText(artist, sprite =>
@@ -66,27 +66,25 @@ namespace osu.Game.Overlays.Music
                     sprite.Padding = new MarginPadding { Top = 1 };
                 });
 
-                SelectedSet.BindValueChanged(set =>
-                {
-                    bool newSelected = set.NewValue?.Equals(Model) == true;
-
-                    if (newSelected == selected)
-                        return;
-
-                    selected = newSelected;
-                    updateSelectionState(false);
-                });
-
-                updateSelectionState(true);
+                SelectedSet.BindValueChanged(set => updateSelectionState(set.NewValue));
+                updateSelectionState(SelectedSet.Value, applyImmediately: true);
             });
         }
 
         private bool selected;
 
-        private void updateSelectionState(bool instant)
+        private void updateSelectionState(Live<BeatmapSetInfo> selectedSet, bool applyImmediately = false)
         {
+            bool wasSelected = selected;
+            selected = selectedSet?.Equals(Model) == true;
+
+            // Immediate updates should forcibly set correct state regardless of previous state.
+            // This ensures that the initial state is correctly applied.
+            if (wasSelected == selected && !applyImmediately)
+                return;
+
             foreach (Drawable s in titlePart.Drawables)
-                s.FadeColour(selected ? colours.Yellow : Color4.White, instant ? 0 : FADE_DURATION);
+                s.FadeColour(selected ? colours.Yellow : Color4.White, applyImmediately ? 0 : FADE_DURATION);
         }
 
         protected override Drawable CreateContent() => new DelayedLoadWrapper(text = new OsuTextFlowContainer

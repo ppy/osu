@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -16,24 +14,22 @@ namespace osu.Game.Graphics.Containers
     /// <summary>
     /// A container that applies user-configured visual settings to its contents.
     /// </summary>
-    public abstract class UserDimContainer : Container
+    public abstract partial class UserDimContainer : Container
     {
         /// <summary>
         /// Amount of lightening to apply to current dim level during break times.
         /// </summary>
         public const float BREAK_LIGHTEN_AMOUNT = 0.3f;
 
-        protected const double BACKGROUND_FADE_DURATION = 800;
+        public const double BACKGROUND_FADE_DURATION = 800;
 
         /// <summary>
-        /// Whether or not user-configured settings relating to brightness of elements should be ignored
+        /// Whether or not user-configured settings relating to brightness of elements should be ignored.
         /// </summary>
+        /// <remarks>
+        /// For best or worst, this also bypasses storyboard disable. Not sure this is correct but leaving it as to not break anything.
+        /// </remarks>
         public readonly Bindable<bool> IgnoreUserSettings = new Bindable<bool>();
-
-        /// <summary>
-        /// Whether or not the storyboard loaded should completely hide the background behind it.
-        /// </summary>
-        public readonly Bindable<bool> StoryboardReplacesBackground = new Bindable<bool>();
 
         /// <summary>
         /// Whether player is in break time.
@@ -46,15 +42,20 @@ namespace osu.Game.Graphics.Containers
         /// </summary>
         public bool ContentDisplayed { get; private set; }
 
-        protected Bindable<double> UserDimLevel { get; private set; }
+        protected Bindable<double> UserDimLevel { get; private set; } = null!;
 
-        protected Bindable<bool> LightenDuringBreaks { get; private set; }
+        /// <summary>
+        /// The amount of dim to be used when <see cref="IgnoreUserSettings"/> is <c>true</c>.
+        /// </summary>
+        public Bindable<float> DimWhenUserSettingsIgnored { get; } = new Bindable<float>();
 
-        protected Bindable<bool> ShowStoryboard { get; private set; }
+        protected Bindable<bool> LightenDuringBreaks { get; private set; } = null!;
+
+        protected Bindable<bool> ShowStoryboard { get; private set; } = null!;
 
         private float breakLightening => LightenDuringBreaks.Value && IsBreakTime.Value ? BREAK_LIGHTEN_AMOUNT : 0;
 
-        protected float DimLevel => Math.Max(!IgnoreUserSettings.Value ? (float)UserDimLevel.Value - breakLightening : 0, 0);
+        protected virtual float DimLevel => Math.Max(!IgnoreUserSettings.Value ? (float)UserDimLevel.Value - breakLightening : DimWhenUserSettingsIgnored.Value, 0);
 
         protected override Container<Drawable> Content => dimContent;
 
@@ -76,10 +77,10 @@ namespace osu.Game.Graphics.Containers
             ShowStoryboard = config.GetBindable<bool>(OsuSetting.ShowStoryboard);
 
             UserDimLevel.ValueChanged += _ => UpdateVisuals();
+            DimWhenUserSettingsIgnored.ValueChanged += _ => UpdateVisuals();
             LightenDuringBreaks.ValueChanged += _ => UpdateVisuals();
             IsBreakTime.ValueChanged += _ => UpdateVisuals();
             ShowStoryboard.ValueChanged += _ => UpdateVisuals();
-            StoryboardReplacesBackground.ValueChanged += _ => UpdateVisuals();
             IgnoreUserSettings.ValueChanged += _ => UpdateVisuals();
         }
 

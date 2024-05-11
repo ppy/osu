@@ -10,6 +10,7 @@ using osu.Framework.Audio.Sample;
 using osu.Framework.Audio.Track;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
@@ -29,11 +30,15 @@ namespace osu.Game.Screens.Menu
     /// <summary>
     /// osu! logo and its attachments (pulsing, visualiser etc.)
     /// </summary>
-    public class OsuLogo : BeatSyncedContainer
+    public partial class OsuLogo : BeatSyncedContainer
     {
-        public readonly Color4 OsuPink = Color4Extensions.FromHex(@"e967a1");
-
         private const double transition_length = 300;
+
+        /// <summary>
+        /// The osu! logo sprite has a shadow included in its texture.
+        /// This adjustment vector is used to match the precise edge of the border of the logo.
+        /// </summary>
+        public static readonly Vector2 SCALE_ADJUST = new Vector2(0.94f);
 
         private readonly Sprite logo;
         private readonly CircularContainer logoContainer;
@@ -46,11 +51,13 @@ namespace osu.Game.Screens.Menu
         private readonly IntroSequence intro;
 
         private Sample sampleClick;
+        private SampleChannel sampleClickChannel;
+
         private Sample sampleBeat;
         private Sample sampleDownbeat;
 
         private readonly Container colourAndTriangles;
-        private readonly Triangles triangles;
+        private readonly TrianglesV2 triangles;
 
         /// <summary>
         /// Return value decides whether the logo should play its own sample for the click action.
@@ -113,7 +120,7 @@ namespace osu.Game.Screens.Menu
                     AutoSizeAxes = Axes.Both,
                     Children = new Drawable[]
                     {
-                        logoBounceContainer = new DragContainer
+                        logoBounceContainer = new Container
                         {
                             AutoSizeAxes = Axes.Both,
                             Children = new Drawable[]
@@ -150,7 +157,7 @@ namespace osu.Game.Screens.Menu
                                                     Origin = Anchor.Centre,
                                                     Anchor = Anchor.Centre,
                                                     Alpha = visualizer_default_alpha,
-                                                    Size = new Vector2(0.96f)
+                                                    Size = SCALE_ADJUST
                                                 },
                                                 new Container
                                                 {
@@ -162,7 +169,7 @@ namespace osu.Game.Screens.Menu
                                                             Anchor = Anchor.Centre,
                                                             Origin = Anchor.Centre,
                                                             RelativeSizeAxes = Axes.Both,
-                                                            Scale = new Vector2(0.88f),
+                                                            Scale = SCALE_ADJUST,
                                                             Masking = true,
                                                             Children = new Drawable[]
                                                             {
@@ -176,13 +183,16 @@ namespace osu.Game.Screens.Menu
                                                                         new Box
                                                                         {
                                                                             RelativeSizeAxes = Axes.Both,
-                                                                            Colour = OsuPink,
+                                                                            Colour = ColourInfo.GradientVertical(Color4Extensions.FromHex(@"ff66ab"), Color4Extensions.FromHex(@"cc5289")),
                                                                         },
-                                                                        triangles = new Triangles
+                                                                        triangles = new TrianglesV2
                                                                         {
-                                                                            TriangleScale = 4,
-                                                                            ColourLight = Color4Extensions.FromHex(@"ff7db7"),
-                                                                            ColourDark = Color4Extensions.FromHex(@"de5b95"),
+                                                                            Anchor = Anchor.Centre,
+                                                                            Origin = Anchor.Centre,
+                                                                            Thickness = 0.009f,
+                                                                            ScaleAdjust = 3,
+                                                                            SpawnRatio = 1.4f,
+                                                                            Colour = ColourInfo.GradientVertical(Color4Extensions.FromHex(@"ff66ab"), Color4Extensions.FromHex(@"b6346f")),
                                                                             RelativeSizeAxes = Axes.Both,
                                                                         },
                                                                     }
@@ -282,7 +292,7 @@ namespace osu.Game.Screens.Menu
 
             if (beatIndex < 0) return;
 
-            if (IsHovered)
+            if (Action != null && IsHovered)
             {
                 this.Delay(early_activation).Schedule(() =>
                 {
@@ -361,11 +371,11 @@ namespace osu.Game.Screens.Menu
             }
         }
 
-        public override bool HandlePositionalInput => base.HandlePositionalInput && Action != null && Alpha > 0.2f;
+        public override bool HandlePositionalInput => base.HandlePositionalInput && Alpha > 0.2f;
 
         protected override bool OnMouseDown(MouseDownEvent e)
         {
-            if (e.Button != MouseButton.Left) return false;
+            if (e.Button != MouseButton.Left) return true;
 
             logoBounceContainer.ScaleTo(0.9f, 1000, Easing.Out);
             return true;
@@ -380,18 +390,25 @@ namespace osu.Game.Screens.Menu
 
         protected override bool OnClick(ClickEvent e)
         {
-            if (Action?.Invoke() ?? true)
-                sampleClick.Play();
-
             flashLayer.ClearTransforms();
             flashLayer.Alpha = 0.4f;
             flashLayer.FadeOut(1500, Easing.OutExpo);
+
+            if (Action?.Invoke() == true)
+            {
+                StopSamplePlayback();
+                sampleClickChannel = sampleClick.GetChannel();
+                sampleClickChannel.Play();
+            }
+
             return true;
         }
 
         protected override bool OnHover(HoverEvent e)
         {
-            logoHoverContainer.ScaleTo(1.1f, 500, Easing.OutElastic);
+            if (Action != null)
+                logoHoverContainer.ScaleTo(1.1f, 500, Easing.OutElastic);
+
             return true;
         }
 
@@ -403,31 +420,78 @@ namespace osu.Game.Screens.Menu
         public void Impact()
         {
             impactContainer.FadeOutFromOne(250, Easing.In);
-            impactContainer.ScaleTo(0.96f);
+            impactContainer.ScaleTo(SCALE_ADJUST);
             impactContainer.ScaleTo(1.12f, 250);
         }
 
-        private class DragContainer : Container
+        public override bool DragBlocksClick => false;
+
+        protected override bool OnDragStart(DragStartEvent e) => true;
+
+        protected override void OnDrag(DragEvent e)
         {
-            public override bool DragBlocksClick => false;
+            Vector2 change = e.MousePosition - e.MouseDownPosition;
 
-            protected override bool OnDragStart(DragStartEvent e) => true;
+            // Diminish the drag distance as we go further to simulate "rubber band" feeling.
+            change *= change.Length <= 0 ? 0 : MathF.Pow(change.Length, 0.6f) / change.Length;
 
-            protected override void OnDrag(DragEvent e)
-            {
-                Vector2 change = e.MousePosition - e.MouseDownPosition;
+            logoBounceContainer.MoveTo(change);
+        }
 
-                // Diminish the drag distance as we go further to simulate "rubber band" feeling.
-                change *= change.Length <= 0 ? 0 : MathF.Pow(change.Length, 0.6f) / change.Length;
+        protected override void OnDragEnd(DragEndEvent e)
+        {
+            logoBounceContainer.MoveTo(Vector2.Zero, 800, Easing.OutElastic);
+            base.OnDragEnd(e);
+        }
 
-                this.MoveTo(change);
-            }
+        private Container defaultProxyTarget;
+        private Container currentProxyTarget;
+        private Drawable proxy;
 
-            protected override void OnDragEnd(DragEndEvent e)
-            {
-                this.MoveTo(Vector2.Zero, 800, Easing.OutElastic);
-                base.OnDragEnd(e);
-            }
+        public void StopSamplePlayback() => sampleClickChannel?.Stop();
+
+        public Drawable ProxyToContainer(Container c)
+        {
+            if (currentProxyTarget != null)
+                throw new InvalidOperationException("Previous proxy usage was not returned");
+
+            if (defaultProxyTarget == null)
+                throw new InvalidOperationException($"{nameof(SetupDefaultContainer)} must be called first");
+
+            currentProxyTarget = c;
+
+            defaultProxyTarget.Remove(proxy, false);
+            currentProxyTarget.Add(proxy);
+            return proxy;
+        }
+
+        public void ReturnProxy()
+        {
+            if (currentProxyTarget == null)
+                throw new InvalidOperationException("No usage to return");
+
+            if (defaultProxyTarget == null)
+                throw new InvalidOperationException($"{nameof(SetupDefaultContainer)} must be called first");
+
+            currentProxyTarget.Remove(proxy, false);
+            currentProxyTarget = null;
+
+            defaultProxyTarget.Add(proxy);
+        }
+
+        public void SetupDefaultContainer(Container container)
+        {
+            defaultProxyTarget = container;
+
+            defaultProxyTarget.Add(this);
+            defaultProxyTarget.Add(proxy = CreateProxy());
+        }
+
+        public void ChangeAnchor(Anchor anchor)
+        {
+            var previousAnchor = AnchorPosition;
+            Anchor = anchor;
+            Position -= AnchorPosition - previousAnchor;
         }
     }
 }

@@ -1,0 +1,27 @@
+osu file format v14
+
+[TimingPoints]
+
+// Uninherited: none, inherited: none
+0,500,4,2,0,100,1,0
+0,-50,4,3,0,100,0,0
+
+// Uninherited: omit, inherited: none
+1000,500,4,2,0,100,1,8
+1000,-50,4,3,0,100,0,0
+
+// Uninherited: none, inherited: omit (should be ignored, inheriting cannot omit)
+2000,500,4,2,0,100,1,0
+2000,-50,4,3,0,100,0,8
+
+// Inherited: none, uninherited: none
+3000,-50,4,3,0,100,0,0
+3000,500,4,2,0,100,1,0
+
+// Inherited: omit, uninherited: none (should be ignored, inheriting cannot omit)
+4000,-50,4,3,0,100,0,8
+4000,500,4,2,0,100,1,0
+
+// Inherited: none, uninherited: omit
+5000,-50,4,3,0,100,0,0
+5000,500,4,2,0,100,1,8

@@ -35,7 +35,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    public class TestSceneSpectatorPlayback : OsuManualInputManagerTestScene
+    public partial class TestSceneSpectatorPlayback : OsuManualInputManagerTestScene
     {
         private TestRulesetInputManager playbackManager;
         private TestRulesetInputManager recordingManager;
@@ -147,7 +147,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                     }
                 };
 
-                spectatorClient.BeginPlaying(TestGameplayState.Create(new OsuRuleset()), recordingScore);
+                spectatorClient.BeginPlaying(0, TestGameplayState.Create(new OsuRuleset()), recordingScore);
                 spectatorClient.OnNewFrames += onNewFrames;
             });
         }
@@ -198,7 +198,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             foreach (var legacyFrame in frames.Frames)
             {
                 var frame = new TestReplayFrame();
-                frame.FromLegacy(legacyFrame, null);
+                frame.FromLegacy(legacyFrame, null!);
                 playbackReplay.Frames.Add(frame);
             }
 
@@ -257,9 +257,9 @@ namespace osu.Game.Tests.Visual.Gameplay
             }
         }
 
-        public class TestInputConsumer : CompositeDrawable, IKeyBindingHandler<TestAction>
+        public partial class TestInputConsumer : CompositeDrawable, IKeyBindingHandler<TestAction>
         {
-            public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => Parent.ReceivePositionalInputAt(screenSpacePos);
+            public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => Parent!.ReceivePositionalInputAt(screenSpacePos);
 
             private readonly Box box;
 
@@ -300,7 +300,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             }
         }
 
-        public class TestRulesetInputManager : RulesetInputManager<TestAction>
+        public partial class TestRulesetInputManager : RulesetInputManager<TestAction>
         {
             public TestRulesetInputManager(RulesetInfo ruleset, int variant, SimultaneousBindingMode unique)
                 : base(ruleset, variant, unique)
@@ -310,7 +310,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             protected override KeyBindingContainer<TestAction> CreateKeyBindingContainer(RulesetInfo ruleset, int variant, SimultaneousBindingMode unique)
                 => new TestKeyBindingContainer();
 
-            internal class TestKeyBindingContainer : KeyBindingContainer<TestAction>
+            internal partial class TestKeyBindingContainer : KeyBindingContainer<TestAction>
             {
                 public override IEnumerable<IKeyBinding> DefaultKeyBindings => new[]
                 {
@@ -360,7 +360,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             Down,
         }
 
-        internal class TestReplayRecorder : ReplayRecorder<TestAction>
+        internal partial class TestReplayRecorder : ReplayRecorder<TestAction>
         {
             public List<ReplayFrame> SentFrames = new List<ReplayFrame>();
 

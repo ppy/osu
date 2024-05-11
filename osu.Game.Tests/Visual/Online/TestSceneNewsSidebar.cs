@@ -16,7 +16,7 @@ using static osu.Game.Overlays.News.Sidebar.YearsPanel;
 
 namespace osu.Game.Tests.Visual.Online
 {
-    public class TestSceneNewsSidebar : OsuTestScene
+    public partial class TestSceneNewsSidebar : OsuTestScene
     {
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Purple);
@@ -211,7 +211,7 @@ namespace osu.Game.Tests.Visual.Online
             }
         };
 
-        private class TestNewsSidebar : NewsSidebar
+        private partial class TestNewsSidebar : NewsSidebar
         {
             public Action<int> YearChanged;
 

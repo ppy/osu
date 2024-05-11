@@ -1,12 +1,11 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
 using osu.Framework.Logging;
@@ -16,7 +15,7 @@ using osu.Game.Localisation;
 
 namespace osu.Game.Overlays.Settings.Sections.DebugSettings
 {
-    public class MemorySettings : SettingsSubsection
+    public partial class MemorySettings : SettingsSubsection
     {
         protected override LocalisableString Header => DebugSettingsStrings.MemoryHeader;
 
@@ -58,7 +57,7 @@ namespace osu.Game.Overlays.Settings.Sections.DebugSettings
             {
                 try
                 {
-                    var token = realm.BlockAllOperations("maintenance");
+                    IDisposable? token = realm.BlockAllOperations("maintenance");
 
                     blockAction.Enabled.Value = false;
 
@@ -75,10 +74,10 @@ namespace osu.Game.Overlays.Settings.Sections.DebugSettings
 
                     void unblock()
                     {
-                        if (token == null)
+                        if (token.IsNull())
                             return;
 
-                        token?.Dispose();
+                        token.Dispose();
                         token = null;
 
                         Scheduler.Add(() =>

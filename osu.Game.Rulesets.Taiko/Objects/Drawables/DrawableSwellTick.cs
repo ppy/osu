@@ -11,7 +11,7 @@ using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 {
-    public class DrawableSwellTick : DrawableTaikoHitObject<SwellTick>
+    public partial class DrawableSwellTick : DrawableTaikoHitObject<SwellTick>
     {
         public override bool DisplayResult => false;
 
@@ -30,7 +30,11 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         public void TriggerResult(bool hit)
         {
             HitObject.StartTime = Time.Current;
-            ApplyResult(r => r.Type = hit ? r.Judgement.MaxResult : r.Judgement.MinResult);
+
+            if (hit)
+                ApplyMaxResult();
+            else
+                ApplyMinResult();
         }
 
         protected override void CheckForResult(bool userTriggered, double timeOffset)
@@ -39,7 +43,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
         public override bool OnPressed(KeyBindingPressEvent<TaikoAction> e) => false;
 
-        protected override SkinnableDrawable CreateMainPiece() => new SkinnableDrawable(new TaikoSkinComponent(TaikoSkinComponents.DrumRollTick),
+        protected override SkinnableDrawable CreateMainPiece() => new SkinnableDrawable(new TaikoSkinComponentLookup(TaikoSkinComponents.DrumRollTick),
             _ => new TickPiece());
     }
 }

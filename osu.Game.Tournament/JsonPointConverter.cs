@@ -1,11 +1,10 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Diagnostics;
 using System.Drawing;
+using System.Globalization;
 using Newtonsoft.Json;
 
 namespace osu.Game.Tournament
@@ -27,11 +26,13 @@ namespace osu.Game.Tournament
             if (reader.TokenType != JsonToken.StartObject)
             {
                 // if there's no object present then this is using string representation (System.Drawing.Point serializes to "x,y")
-                string str = (string)reader.Value;
+                string? str = (string?)reader.Value;
 
                 Debug.Assert(str != null);
 
-                return new PointConverter().ConvertFromString(str) as Point? ?? new Point();
+                // Null check suppression is required due to .NET standard expecting a non-null context.
+                // Seems to work fine at a runtime level (and the parameter is nullable in .NET 6+).
+                return new PointConverter().ConvertFromString(null!, CultureInfo.InvariantCulture, str) as Point? ?? new Point();
             }
 
             var point = new Point();
@@ -42,8 +43,11 @@ namespace osu.Game.Tournament
 
                 if (reader.TokenType == JsonToken.PropertyName)
                 {
-                    string name = reader.Value?.ToString();
+                    string? name = reader.Value?.ToString();
                     int? val = reader.ReadAsInt32();
+
+                    if (name == null)
+                        continue;
 
                     if (val == null)
                         continue;

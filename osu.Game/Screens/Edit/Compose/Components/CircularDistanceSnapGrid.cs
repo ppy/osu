@@ -1,7 +1,5 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using System;
 using osu.Framework.Allocation;
@@ -16,8 +14,11 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.Edit.Compose.Components
 {
-    public abstract class CircularDistanceSnapGrid : DistanceSnapGrid
+    public abstract partial class CircularDistanceSnapGrid : DistanceSnapGrid
     {
+        [Resolved]
+        private EditorClock editorClock { get; set; } = null!;
+
         protected CircularDistanceSnapGrid(HitObject referenceObject, Vector2 startPosition, double startTime, double? endTime = null)
             : base(referenceObject, startPosition, startTime, endTime)
         {
@@ -53,16 +54,24 @@ namespace osu.Game.Screens.Edit.Compose.Components
             float maxDistance = new Vector2(dx, dy).Length;
             int requiredCircles = Math.Min(MaxIntervals, (int)(maxDistance / DistanceBetweenTicks));
 
+            // We need to offset the drawn lines to the next valid snap for the currently selected divisor.
+            //
+            // Picture the scenario where the user has just placed an object on a 1/2 snap, then changes to
+            // 1/3 snap and expects to be able to place the next object on a valid 1/3 snap, regardless of the
+            // fact that the 1/2 snap reference object is not valid for 1/3 snapping.
+            float offset = SnapProvider.FindSnappedDistance(ReferenceObject, 0);
+
             for (int i = 0; i < requiredCircles; i++)
             {
-                float diameter = (i + 1) * DistanceBetweenTicks * 2;
+                const float thickness = 4;
+                float diameter = (offset + (i + 1) * DistanceBetweenTicks + thickness / 2) * 2;
 
                 AddInternal(new Ring(ReferenceObject, GetColourForIndexFromPlacement(i))
                 {
                     Position = StartPosition,
                     Origin = Anchor.Centre,
                     Size = new Vector2(diameter),
-                    InnerRadius = 4 * 1f / diameter,
+                    InnerRadius = thickness * 1f / diameter,
                 });
             }
         }
@@ -91,9 +100,12 @@ namespace osu.Game.Screens.Edit.Compose.Components
             if (travelLength < DistanceBetweenTicks)
                 travelLength = DistanceBetweenTicks;
 
-            // When interacting with the resolved snap provider, the distance spacing multiplier should first be removed
-            // to allow for snapping at a non-multiplied ratio.
-            float snappedDistance = SnapProvider.FindSnappedDistance(ReferenceObject, travelLength / distanceSpacingMultiplier);
+            float snappedDistance = LimitedDistanceSnap.Value
+                ? SnapProvider.DurationToDistance(ReferenceObject, editorClock.CurrentTime - ReferenceObject.GetEndTime())
+                // When interacting with the resolved snap provider, the distance spacing multiplier should first be removed
+                // to allow for snapping at a non-multiplied ratio.
+                : SnapProvider.FindSnappedDistance(ReferenceObject, travelLength / distanceSpacingMultiplier);
+
             double snappedTime = StartTime + SnapProvider.DistanceToDuration(ReferenceObject, snappedDistance);
 
             if (snappedTime > LatestEndTime)
@@ -110,13 +122,13 @@ namespace osu.Game.Screens.Edit.Compose.Components
             return (snappedPosition, snappedTime);
         }
 
-        private class Ring : CircularProgress
+        private partial class Ring : CircularProgress
         {
             [Resolved]
-            private IDistanceSnapProvider snapProvider { get; set; }
+            private IDistanceSnapProvider snapProvider { get; set; } = null!;
 
-            [Resolved(canBeNull: true)]
-            private EditorClock editorClock { get; set; }
+            [Resolved]
+            private EditorClock? editorClock { get; set; }
 
             private readonly HitObject referenceObject;
 
@@ -128,7 +140,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
                 Colour = this.baseColour = baseColour;
 
-                Current.Value = 1;
+                Progress = 1;
             }
 
             protected override void Update()

@@ -16,7 +16,7 @@ using osu.Game.Overlays.Wiki;
 
 namespace osu.Game.Tests.Visual.Online
 {
-    public class TestSceneWikiHeader : OsuTestScene
+    public partial class TestSceneWikiHeader : OsuTestScene
     {
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Orange);
@@ -24,8 +24,8 @@ namespace osu.Game.Tests.Visual.Online
         [Cached]
         private readonly Bindable<APIWikiPage> wikiPageData = new Bindable<APIWikiPage>(new APIWikiPage
         {
-            Title = "Main Page",
-            Path = "Main_Page",
+            Title = "Main page",
+            Path = WikiOverlay.INDEX_PATH,
         });
 
         private TestHeader header;
@@ -97,7 +97,7 @@ namespace osu.Game.Tests.Visual.Online
             };
         }
 
-        private class TestHeader : WikiHeader
+        private partial class TestHeader : WikiHeader
         {
             public IReadOnlyList<LocalisableString?> TabControlItems => TabControl.Items;
         }

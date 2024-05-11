@@ -10,7 +10,7 @@ using osu.Game.Utils;
 
 namespace osu.Game.Online.Multiplayer
 {
-    public class ServerShutdownNotification : SimpleNotification
+    public partial class ServerShutdownNotification : SimpleNotification
     {
         private readonly DateTimeOffset endDate;
         private ScheduledDelegate? updateDelegate;

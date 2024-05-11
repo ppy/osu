@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using NUnit.Framework;
 using osu.Game.Beatmaps;
 using osu.Game.Online.API.Requests.Responses;
@@ -11,7 +9,7 @@ using osu.Game.Overlays.BeatmapSet;
 namespace osu.Game.Tests.Visual.Online
 {
     [TestFixture]
-    public class TestSceneBeatmapAvailability : OsuTestScene
+    public partial class TestSceneBeatmapAvailability : OsuTestScene
     {
         private readonly BeatmapAvailability container;
 

@@ -18,6 +18,7 @@ using osu.Game.Extensions;
 using osu.Game.Models;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets;
+using osu.Game.Scoring;
 using osu.Game.Tests.Resources;
 using Realms;
 using SharpCompress.Archives;
@@ -417,6 +418,108 @@ namespace osu.Game.Tests.Database
         }
 
         [Test]
+        public void TestImport_Modify_Revert()
+        {
+            RunTestWithRealmAsync(async (realm, storage) =>
+            {
+                var importer = new BeatmapImporter(storage, realm);
+                using var store = new RealmRulesetStore(realm, storage);
+
+                var imported = await LoadOszIntoStore(importer, realm.Realm);
+
+                await createScoreForBeatmap(realm.Realm, imported.Beatmaps.First());
+
+                var score = realm.Run(r => r.All<ScoreInfo>().Single());
+
+                string originalHash = imported.Beatmaps.First().Hash;
+                const string modified_hash = "new_hash";
+
+                Assert.That(imported.Beatmaps.First().Scores.Single(), Is.EqualTo(score));
+
+                Assert.That(score.BeatmapHash, Is.EqualTo(originalHash));
+                Assert.That(score.BeatmapInfo, Is.EqualTo(imported.Beatmaps.First()));
+
+                // imitate making local changes via editor
+                // ReSharper disable once MethodHasAsyncOverload
+                realm.Write(r =>
+                {
+                    BeatmapInfo beatmap = imported.Beatmaps.First();
+                    beatmap.Hash = modified_hash;
+                    beatmap.ResetOnlineInfo();
+                    beatmap.UpdateLocalScores(r);
+                });
+
+                Assert.That(!imported.Beatmaps.First().Scores.Any());
+
+                Assert.That(score.BeatmapInfo, Is.Null);
+                Assert.That(score.BeatmapHash, Is.EqualTo(originalHash));
+
+                // imitate reverting the local changes made above
+                // ReSharper disable once MethodHasAsyncOverload
+                realm.Write(r =>
+                {
+                    BeatmapInfo beatmap = imported.Beatmaps.First();
+                    beatmap.Hash = originalHash;
+                    beatmap.ResetOnlineInfo();
+                    beatmap.UpdateLocalScores(r);
+                });
+
+                Assert.That(imported.Beatmaps.First().Scores.Single(), Is.EqualTo(score));
+
+                Assert.That(score.BeatmapHash, Is.EqualTo(originalHash));
+                Assert.That(score.BeatmapInfo, Is.EqualTo(imported.Beatmaps.First()));
+            });
+        }
+
+        [Test]
+        public void TestImport_ThenModifyMapWithScore_ThenImport()
+        {
+            RunTestWithRealmAsync(async (realm, storage) =>
+            {
+                var importer = new BeatmapImporter(storage, realm);
+                using var store = new RealmRulesetStore(realm, storage);
+
+                string? temp = TestResources.GetTestBeatmapForImport();
+
+                var imported = await LoadOszIntoStore(importer, realm.Realm);
+
+                await createScoreForBeatmap(realm.Realm, imported.Beatmaps.First());
+
+                Assert.That(imported.Beatmaps.First().Scores.Any());
+
+                // imitate making local changes via editor
+                // ReSharper disable once MethodHasAsyncOverload
+                realm.Write(r =>
+                {
+                    BeatmapInfo beatmap = imported.Beatmaps.First();
+                    beatmap.Hash = "new_hash";
+                    beatmap.ResetOnlineInfo();
+                    beatmap.UpdateLocalScores(r);
+                });
+
+                Assert.That(!imported.Beatmaps.First().Scores.Any());
+
+                var importedSecondTime = await importer.Import(new ImportTask(temp));
+
+                EnsureLoaded(realm.Realm);
+
+                // check the newly "imported" beatmap is not the original.
+                Assert.NotNull(importedSecondTime);
+                Debug.Assert(importedSecondTime != null);
+                Assert.That(imported.ID != importedSecondTime.ID);
+
+                var importedFirstTimeBeatmap = imported.Beatmaps.First();
+                var importedSecondTimeBeatmap = importedSecondTime.PerformRead(s => s.Beatmaps.First());
+
+                Assert.That(importedFirstTimeBeatmap.ID != importedSecondTimeBeatmap.ID);
+                Assert.That(importedFirstTimeBeatmap.Hash != importedSecondTimeBeatmap.Hash);
+                Assert.That(!importedFirstTimeBeatmap.Scores.Any());
+                Assert.That(importedSecondTimeBeatmap.Scores.Count() == 1);
+                Assert.That(importedSecondTimeBeatmap.Scores.Single().BeatmapInfo, Is.EqualTo(importedSecondTimeBeatmap));
+            });
+        }
+
+        [Test]
         public void TestImportThenImportWithChangedFile()
         {
             RunTestWithRealmAsync(async (realm, storage) =>
@@ -564,7 +667,7 @@ namespace osu.Game.Tests.Database
 
                 var imported = await importer.Import(
                     progressNotification,
-                    new ImportTask(zipStream, string.Empty)
+                    new[] { new ImportTask(zipStream, string.Empty) }
                 );
 
                 realm.Run(r => r.Refresh());
@@ -1052,7 +1155,7 @@ namespace osu.Game.Tests.Database
         {
             string? temp = path ?? TestResources.GetTestBeatmapForImport(virtualTrack);
 
-            var importedSet = await importer.Import(new ImportTask(temp), batchImport);
+            var importedSet = await importer.Import(new ImportTask(temp), new ImportParameters { Batch = batchImport });
 
             Assert.NotNull(importedSet);
             Debug.Assert(importedSet != null);
@@ -1074,18 +1177,16 @@ namespace osu.Game.Tests.Database
             Assert.IsTrue(realm.All<BeatmapSetInfo>().First(_ => true).DeletePending);
         }
 
-        private static Task createScoreForBeatmap(Realm realm, BeatmapInfo beatmap)
-        {
-            // TODO: reimplement when we have score support in realm.
-            // return ImportScoreTest.LoadScoreIntoOsu(osu, new ScoreInfo
-            // {
-            //     OnlineID = 2,
-            //     Beatmap = beatmap,
-            //     BeatmapInfoID = beatmap.ID
-            // }, new ImportScoreTest.TestArchiveReader());
-
-            return Task.CompletedTask;
-        }
+        private static Task createScoreForBeatmap(Realm realm, BeatmapInfo beatmap) =>
+            realm.WriteAsync(() =>
+            {
+                realm.Add(new ScoreInfo
+                {
+                    OnlineID = 2,
+                    BeatmapInfo = beatmap,
+                    BeatmapHash = beatmap.Hash
+                });
+            });
 
         private static void checkBeatmapSetCount(Realm realm, int expected, bool includeDeletePending = false)
         {

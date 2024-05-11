@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Mods;
@@ -13,9 +11,6 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
     /// <summary>
     /// Calculates the stamina coefficient of taiko difficulty.
     /// </summary>
-    /// <remarks>
-    /// The reference play style chosen uses two hands, with full alternating (the hand changes after every hit).
-    /// </remarks>
     public class Stamina : StrainDecaySkill
     {
         protected override double SkillMultiplier => 1.1;

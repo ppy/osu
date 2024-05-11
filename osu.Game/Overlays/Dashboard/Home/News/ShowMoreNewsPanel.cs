@@ -13,7 +13,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Dashboard.Home.News
 {
-    public class ShowMoreNewsPanel : OsuHoverContainer
+    public partial class ShowMoreNewsPanel : OsuHoverContainer
     {
         protected override IEnumerable<Drawable> EffectTargets => new[] { text };
 

@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Graphics.Pooling;
 using osu.Game.Rulesets.Scoring;
 
@@ -11,7 +9,7 @@ namespace osu.Game.Rulesets.Taiko.UI
     /// <summary>
     /// Pool for hit explosions of a specific type.
     /// </summary>
-    internal class HitExplosionPool : DrawablePool<HitExplosion>
+    internal partial class HitExplosionPool : DrawablePool<HitExplosion>
     {
         private readonly HitResult hitResult;
 

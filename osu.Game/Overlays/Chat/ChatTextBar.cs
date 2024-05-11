@@ -17,8 +17,10 @@ using osuTK;
 
 namespace osu.Game.Overlays.Chat
 {
-    public class ChatTextBar : Container
+    public partial class ChatTextBar : Container
     {
+        public const float HEIGHT = 40;
+
         public readonly BindableBool ShowSearch = new BindableBool();
 
         public event Action<string>? OnChatMessageCommitted;
@@ -39,12 +41,13 @@ namespace osu.Game.Overlays.Chat
 
         private const float chatting_text_width = 220;
         private const float search_icon_width = 40;
+        private const float padding = 5;
 
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider)
         {
             RelativeSizeAxes = Axes.X;
-            Height = 60;
+            Height = HEIGHT;
 
             Children = new Drawable[]
             {
@@ -71,14 +74,14 @@ namespace osu.Game.Overlays.Chat
                                 RelativeSizeAxes = Axes.Y,
                                 Width = chatting_text_width,
                                 Masking = true,
-                                Padding = new MarginPadding { Right = 5 },
-                                Child = chattingText = new OsuSpriteText
+                                Padding = new MarginPadding { Horizontal = padding },
+                                Child = chattingText = new TruncatingSpriteText
                                 {
-                                    Font = OsuFont.Torus.With(size: 20),
+                                    MaxWidth = chatting_text_width - padding * 2,
+                                    Font = OsuFont.Torus,
                                     Colour = colourProvider.Background1,
                                     Anchor = Anchor.CentreRight,
                                     Origin = Anchor.CentreRight,
-                                    Truncate = true,
                                 },
                             },
                             searchIconContainer = new Container
@@ -90,16 +93,17 @@ namespace osu.Game.Overlays.Chat
                                     Icon = FontAwesome.Solid.Search,
                                     Origin = Anchor.CentreRight,
                                     Anchor = Anchor.CentreRight,
-                                    Size = new Vector2(20),
+                                    Size = new Vector2(OsuFont.DEFAULT_FONT_SIZE),
                                     Margin = new MarginPadding { Right = 2 },
                                 },
                             },
                             new Container
                             {
                                 RelativeSizeAxes = Axes.Both,
-                                Padding = new MarginPadding { Right = 5 },
+                                Padding = new MarginPadding { Right = padding },
                                 Child = chatTextBox = new ChatTextBox
                                 {
+                                    FontSize = OsuFont.DEFAULT_FONT_SIZE,
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.CentreLeft,
                                     RelativeSizeAxes = Axes.X,
@@ -128,9 +132,8 @@ namespace osu.Game.Overlays.Chat
                 chattingTextContainer.FadeTo(showSearch ? 0 : 1);
                 searchIconContainer.FadeTo(showSearch ? 1 : 0);
 
-                // Clear search terms if any exist when switching back to chat mode
-                if (!showSearch)
-                    OnSearchTermsChanged?.Invoke(string.Empty);
+                if (showSearch)
+                    OnSearchTermsChanged?.Invoke(chatTextBox.Current.Value);
             }, true);
 
             currentChannel.BindValueChanged(change =>
@@ -150,6 +153,16 @@ namespace osu.Game.Overlays.Chat
                     default:
                         chattingText.Text = ChatStrings.TalkingIn(newChannel.Name);
                         break;
+                }
+
+                if (change.OldValue != null)
+                    chatTextBox.Current.UnbindFrom(change.OldValue.TextBoxMessage);
+
+                if (newChannel != null)
+                {
+                    // change length limit first before binding to avoid accidentally truncating pending message from new channel.
+                    chatTextBox.LengthLimit = newChannel.MessageLengthLimit;
+                    chatTextBox.Current.BindTo(newChannel.TextBoxMessage);
                 }
             }, true);
         }

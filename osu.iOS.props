@@ -1,92 +1,28 @@
 ﻿<Project>
   <PropertyGroup>
-    <LangVersion>8.0</LangVersion>
-    <ProjectTypeGuids>{FEACFBD2-3405-455C-9665-78FE426C6842};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
-    <IPhoneResourcePrefix>Resources</IPhoneResourcePrefix>
-    <RestoreProjectStyle>PackageReference</RestoreProjectStyle>
-    <OutputPath>bin\$(Platform)\$(Configuration)</OutputPath>
-    <MtouchI18n>cjk,mideast,other,rare,west</MtouchI18n>
-    <OptimizePNGs>false</OptimizePNGs>
-    <MtouchHttpClientHandler>NSUrlSessionHandler</MtouchHttpClientHandler>
-    <MtouchVerbosity></MtouchVerbosity>
     <CodesignKey>iPhone Developer</CodesignKey>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-  </PropertyGroup>
-  <PropertyGroup>
-    <!-- Generated via osu.Framework.iOS/generate-symbol-strip-flags.sh -->
-    <GeneratedMtouchSymbolStripFlags>--nosymbolstrip=BASS_FX_BPM_BeatCallbackReset --nosymbolstrip=BASS_FX_BPM_BeatCallbackSet --nosymbolstrip=BASS_FX_BPM_BeatDecodeGet --nosymbolstrip=BASS_FX_BPM_BeatFree --nosymbolstrip=BASS_FX_BPM_BeatGetParameters --nosymbolstrip=BASS_FX_BPM_BeatSetParameters --nosymbolstrip=BASS_FX_BPM_CallbackReset --nosymbolstrip=BASS_FX_BPM_CallbackSet --nosymbolstrip=BASS_FX_BPM_DecodeGet --nosymbolstrip=BASS_FX_BPM_Free --nosymbolstrip=BASS_FX_BPM_Translate --nosymbolstrip=BASS_FX_GetVersion --nosymbolstrip=BASS_FX_ReverseCreate --nosymbolstrip=BASS_FX_ReverseGetSource --nosymbolstrip=BASS_FX_TempoCreate --nosymbolstrip=BASS_FX_TempoGetRateRatio --nosymbolstrip=BASS_FX_TempoGetSource --nosymbolstrip=BASS_Mixer_ChannelFlags --nosymbolstrip=BASS_Mixer_ChannelGetData --nosymbolstrip=BASS_Mixer_ChannelGetEnvelopePos --nosymbolstrip=BASS_Mixer_ChannelGetLevel --nosymbolstrip=BASS_Mixer_ChannelGetLevelEx --nosymbolstrip=BASS_Mixer_ChannelGetMatrix --nosymbolstrip=BASS_Mixer_ChannelGetMixer --nosymbolstrip=BASS_Mixer_ChannelGetPosition --nosymbolstrip=BASS_Mixer_ChannelGetPositionEx --nosymbolstrip=BASS_Mixer_ChannelIsActive --nosymbolstrip=BASS_Mixer_ChannelRemove --nosymbolstrip=BASS_Mixer_ChannelRemoveSync --nosymbolstrip=BASS_Mixer_ChannelSetEnvelope --nosymbolstrip=BASS_Mixer_ChannelSetEnvelopePos --nosymbolstrip=BASS_Mixer_ChannelSetMatrix --nosymbolstrip=BASS_Mixer_ChannelSetMatrixEx --nosymbolstrip=BASS_Mixer_ChannelSetPosition --nosymbolstrip=BASS_Mixer_ChannelSetSync --nosymbolstrip=BASS_Mixer_GetVersion --nosymbolstrip=BASS_Mixer_StreamAddChannel --nosymbolstrip=BASS_Mixer_StreamAddChannelEx --nosymbolstrip=BASS_Mixer_StreamCreate --nosymbolstrip=BASS_Mixer_StreamGetChannels --nosymbolstrip=BASS_Split_StreamCreate --nosymbolstrip=BASS_Split_StreamGetAvailable --nosymbolstrip=BASS_Split_StreamGetSource --nosymbolstrip=BASS_Split_StreamGetSplits --nosymbolstrip=BASS_Split_StreamReset --nosymbolstrip=BASS_Split_StreamResetEx</GeneratedMtouchSymbolStripFlags>
-    <!-- Disable mono-cil-strip (nostrip) to avoid random attributes potentially stripped out from certain members. -->
-    <MtouchExtraArgs>--nolinkaway --nostrip $(GeneratedMtouchSymbolStripFlags)</MtouchExtraArgs>
+    <NullabilityInfoContextSupport>true</NullabilityInfoContextSupport>
+    <!-- MT7091 occurs when referencing a .framework bundle that consists of a static library.
+         It only warns about not copying the library to the app bundle to save space,
+         so there's nothing to be worried about. -->
+    <NoWarn>$(NoWarn);MT7091</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <DefineConstants>DEBUG;ENABLE_TEST_CLOUD;</DefineConstants>
-    <MtouchDebug>true</MtouchDebug>
-    <MtouchNoSymbolStrip>true</MtouchNoSymbolStrip>
+    <!-- On debug configurations, we use Mono interpreter for faster compilation. -->
+    <UseInterpreter>true</UseInterpreter>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)' == 'Release'">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Platform)' == 'iPhoneSimulator'">
-    <MtouchArch>x86_64</MtouchArch>
-    <MtouchLink>None</MtouchLink>
+    <!-- On release configurations, we use AOT compiler for optimal performance, along with Mono Interpreter as a fallback for libraries such as AutoMapper. -->
+    <UseInterpreter>false</UseInterpreter>
+    <MtouchInterpreter>-all</MtouchInterpreter>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Platform)' == 'iPhone'">
-    <MtouchFloat32>true</MtouchFloat32>
-    <MtouchLink>SdkOnly</MtouchLink>
-    <MtouchArch>ARM64</MtouchArch>
-    <CodesignEntitlements>Entitlements.plist</CodesignEntitlements>
+    <RuntimeIdentifier>ios-arm64</RuntimeIdentifier>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|iPhoneSimulator' ">
-    <MtouchFastDev>true</MtouchFastDev>
-    <IOSDebuggerPort>25823</IOSDebuggerPort>
-    <DeviceSpecificBuild>false</DeviceSpecificBuild>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhoneSimulator' ">
-    <MtouchNoSymbolStrip>true</MtouchNoSymbolStrip>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|iPhone' ">
-    <DeviceSpecificBuild>true</DeviceSpecificBuild>
-    <IOSDebuggerPort>28126</IOSDebuggerPort>
+  <PropertyGroup Condition="'$(Platform)' == 'iPhoneSimulator'">
+    <RuntimeIdentifier>iossimulator-x64</RuntimeIdentifier>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="System.Xml" />
-    <Reference Include="System.Core" />
-    <Reference Include="Xamarin.iOS" />
-    <Reference Include="mscorlib" />
-    <Reference Include="System.Net.Http" />
-  </ItemGroup>
-  <ItemGroup Label="Package References">
-    <PackageReference Include="ppy.osu.Game.Resources" Version="2022.1021.0" />
-    <PackageReference Include="ppy.osu.Framework.iOS" Version="2022.1022.1" />
-  </ItemGroup>
-  <!-- See https://github.com/dotnet/runtime/issues/35988 (can be removed after Xamarin uses net6.0) -->
-  <PropertyGroup>
-    <NoWarn>$(NoWarn);NU1605</NoWarn>
-  </PropertyGroup>
-  <!-- Workaround to make SignalR 5.x work properly, avoiding a runtime error (https://github.com/mono/mono/issues/20805#issuecomment-791440473) -->
-  <ItemGroup>
-    <PackageReference Include="System.Memory" Version="4.5.4">
-      <IncludeAssets>none</IncludeAssets>
-    </PackageReference>
-    <PackageReference Include="System.Buffers" Version="4.5.1">
-      <IncludeAssets>none</IncludeAssets>
-    </PackageReference>
-  </ItemGroup>
-  <!-- Xamarin.iOS does not automatically handle transitive dependencies from NuGet packages. -->
-  <ItemGroup Label="Transitive Dependencies">
-    <PackageReference Include="DiffPlex" Version="1.7.1" />
-    <PackageReference Include="Humanizer" Version="2.14.1" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-    <PackageReference Include="ppy.osu.Framework" Version="2022.1022.1" />
-    <PackageReference Include="SharpCompress" Version="0.32.2" />
-    <PackageReference Include="NUnit" Version="3.13.3" />
-    <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
-    <PackageReference Include="ppy.osu.Framework.NativeLibs" Version="2022.429.0" ExcludeAssets="all" />
-    <PackageReference Include="Realm" Version="10.17.0" />
+    <PackageReference Include="ppy.osu.Framework.iOS" Version="2024.509.0" />
   </ItemGroup>
 </Project>

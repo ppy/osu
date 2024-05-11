@@ -1,9 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
-using System;
+using System.Numerics;
 using System.Globalization;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -14,7 +12,7 @@ using osu.Framework.Localisation;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Overlays.Settings;
 using osu.Game.Utils;
-using osuTK;
+using Vector2 = osuTK.Vector2;
 
 namespace osu.Game.Screens.Edit.Timing
 {
@@ -23,8 +21,8 @@ namespace osu.Game.Screens.Edit.Timing
     /// where multiple objects with multiple different property values are selected
     /// by providing an "indeterminate state".
     /// </summary>
-    public class IndeterminateSliderWithTextBoxInput<T> : CompositeDrawable, IHasCurrentValue<T?>
-        where T : struct, IEquatable<T>, IComparable<T>, IConvertible
+    public partial class IndeterminateSliderWithTextBoxInput<T> : CompositeDrawable, IHasCurrentValue<T?>
+        where T : struct, INumber<T>, IMinMaxValue<T>
     {
         /// <summary>
         /// A custom step value for each key press which actuates a change on this control.
@@ -94,7 +92,20 @@ namespace osu.Game.Screens.Edit.Timing
 
                 try
                 {
-                    slider.Current.Parse(t.Text);
+                    switch (slider.Current)
+                    {
+                        case Bindable<int> bindableInt:
+                            bindableInt.Value = int.Parse(t.Text);
+                            break;
+
+                        case Bindable<double> bindableDouble:
+                            bindableDouble.Value = double.Parse(t.Text);
+                            break;
+
+                        default:
+                            slider.Current.Parse(t.Text, CultureInfo.CurrentCulture);
+                            break;
+                    }
                 }
                 catch
                 {
@@ -125,7 +136,7 @@ namespace osu.Game.Screens.Edit.Timing
                 slider.Current.Value = nonNullValue;
 
                 // use the value from the slider to ensure that any precision/min/max set on it via the initial indeterminate value have been applied correctly.
-                decimal decimalValue = slider.Current.Value.ToDecimal(NumberFormatInfo.InvariantInfo);
+                decimal decimalValue = decimal.CreateTruncating(slider.Current.Value);
                 textBox.Text = decimalValue.ToString($@"N{FormatUtils.FindPrecision(decimalValue)}");
                 textBox.PlaceholderText = string.Empty;
             }

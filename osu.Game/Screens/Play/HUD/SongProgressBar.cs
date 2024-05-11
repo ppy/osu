@@ -1,157 +1,97 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
-using osuTK;
-using osuTK.Graphics;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics;
-using osu.Framework.Graphics.Shapes;
-using osu.Framework.Graphics.UserInterface;
-using osu.Framework.Utils;
+using osu.Framework.Input.Events;
 using osu.Framework.Threading;
+using osuTK;
 
 namespace osu.Game.Screens.Play.HUD
 {
-    public class SongProgressBar : SliderBar<double>
+    public abstract partial class SongProgressBar : CompositeDrawable
     {
-        public Action<double> OnSeek;
+        /// <summary>
+        /// The current seek position of the audio, on a (0..1) range.
+        /// This is generally the seek target, which will eventually match the gameplay clock when it catches up.
+        /// </summary>
+        protected double AudioProgress => length == 0 ? 1 : AudioTime / length;
 
-        private readonly Box fill;
-        private readonly Container handleBase;
-        private readonly Container handleContainer;
+        /// <summary>
+        /// The current (non-frame-stable) audio time.
+        /// </summary>
+        protected double AudioTime => Math.Clamp(GameplayClock.CurrentTime - StartTime, 0.0, length);
 
-        private bool showHandle;
+        [Resolved]
+        protected IGameplayClock GameplayClock { get; private set; } = null!;
 
-        public bool ShowHandle
+        /// <summary>
+        /// Action which is invoked when a seek is requested, with the proposed millisecond value for the seek operation.
+        /// </summary>
+        public Action<double>? OnSeek { get; set; }
+
+        /// <summary>
+        /// Whether the progress bar should allow interaction, ie. to perform seek operations.
+        /// </summary>
+        public virtual bool Interactive { get; set; }
+
+        public double StartTime { get; set; }
+
+        public double EndTime { get; set; } = 1.0;
+
+        private double length => EndTime - StartTime;
+
+        private bool handleClick;
+
+        protected override bool OnMouseDown(MouseDownEvent e)
         {
-            get => showHandle;
-            set
+            handleClick = true;
+            return base.OnMouseDown(e);
+        }
+
+        protected override bool OnClick(ClickEvent e)
+        {
+            if (handleClick)
+                handleMouseInput(e);
+
+            return true;
+        }
+
+        protected override void OnDrag(DragEvent e)
+        {
+            handleMouseInput(e);
+        }
+
+        protected override bool OnDragStart(DragStartEvent e)
+        {
+            Vector2 posDiff = e.MouseDownPosition - e.MousePosition;
+
+            if (Math.Abs(posDiff.X) < Math.Abs(posDiff.Y))
             {
-                if (value == showHandle)
-                    return;
-
-                showHandle = value;
-
-                handleBase.FadeTo(showHandle ? 1 : 0, 200);
+                handleClick = false;
+                return false;
             }
+
+            handleMouseInput(e);
+            return true;
         }
 
-        public Color4 FillColour
+        private void handleMouseInput(UIEvent e)
         {
-            set => fill.Colour = value;
+            if (!Interactive)
+                return;
+
+            double relativeX = Math.Clamp(ToLocalSpace(e.ScreenSpaceMousePosition).X / DrawWidth, 0, 1);
+            onUserChange(StartTime + (EndTime - StartTime) * relativeX);
         }
 
-        public double StartTime
-        {
-            set => CurrentNumber.MinValue = value;
-        }
+        private ScheduledDelegate? scheduledSeek;
 
-        public double EndTime
-        {
-            set => CurrentNumber.MaxValue = value;
-        }
-
-        public double CurrentTime
-        {
-            set => CurrentNumber.Value = value;
-        }
-
-        public SongProgressBar(float barHeight, float handleBarHeight, Vector2 handleSize)
-        {
-            CurrentNumber.MinValue = 0;
-            CurrentNumber.MaxValue = 1;
-
-            RelativeSizeAxes = Axes.X;
-            Height = barHeight + handleBarHeight + handleSize.Y;
-
-            Children = new Drawable[]
-            {
-                new Box
-                {
-                    Name = "Background",
-                    Anchor = Anchor.BottomLeft,
-                    Origin = Anchor.BottomLeft,
-                    RelativeSizeAxes = Axes.X,
-                    Height = barHeight,
-                    Colour = Color4.Black,
-                    Alpha = 0.5f,
-                    Depth = 1,
-                },
-                fill = new Box
-                {
-                    Name = "Fill",
-                    Anchor = Anchor.BottomLeft,
-                    Origin = Anchor.BottomLeft,
-                    Height = barHeight,
-                },
-                handleBase = new Container
-                {
-                    Name = "HandleBar container",
-                    Origin = Anchor.BottomLeft,
-                    Anchor = Anchor.BottomLeft,
-                    Width = 2,
-                    Alpha = 0,
-                    Colour = Color4.White,
-                    Position = new Vector2(2, 0),
-                    Children = new Drawable[]
-                    {
-                        new Box
-                        {
-                            Name = "HandleBar box",
-                            RelativeSizeAxes = Axes.Both,
-                        },
-                        handleContainer = new Container
-                        {
-                            Name = "Handle container",
-                            Origin = Anchor.BottomCentre,
-                            Anchor = Anchor.TopCentre,
-                            Size = handleSize,
-                            CornerRadius = 5,
-                            Masking = true,
-                            Children = new Drawable[]
-                            {
-                                new Box
-                                {
-                                    Name = "Handle box",
-                                    RelativeSizeAxes = Axes.Both,
-                                    Colour = Color4.White
-                                }
-                            }
-                        }
-                    }
-                }
-            };
-        }
-
-        protected override void UpdateValue(float value)
-        {
-            // handled in update
-        }
-
-        protected override void Update()
-        {
-            base.Update();
-
-            handleBase.Height = Height - handleContainer.Height;
-            float newX = (float)Interpolation.Lerp(handleBase.X, NormalizedValue * UsableWidth, Math.Clamp(Time.Elapsed / 40, 0, 1));
-
-            fill.Width = newX;
-            handleBase.X = newX;
-        }
-
-        private ScheduledDelegate scheduledSeek;
-
-        protected override void OnUserChange(double value)
+        private void onUserChange(double value)
         {
             scheduledSeek?.Cancel();
-            scheduledSeek = Schedule(() =>
-            {
-                if (showHandle)
-                    OnSeek?.Invoke(value);
-            });
+            scheduledSeek = Schedule(() => OnSeek?.Invoke(value));
         }
     }
 }

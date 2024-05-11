@@ -130,18 +130,22 @@ namespace osu.Game.Beatmaps.Formats
             }
         }
 
-        protected KeyValuePair<string, string> SplitKeyVal(string line, char separator = ':')
+        protected KeyValuePair<string, string> SplitKeyVal(string line, char separator = ':', bool shouldTrim = true)
         {
-            string[] split = line.Split(separator, 2);
+            string[] split = line.Split(separator, 2, shouldTrim ? StringSplitOptions.TrimEntries : StringSplitOptions.None);
 
             return new KeyValuePair<string, string>
             (
-                split[0].Trim(),
-                split.Length > 1 ? split[1].Trim() : string.Empty
+                split[0],
+                split.Length > 1 ? split[1] : string.Empty
             );
         }
 
-        protected string CleanFilename(string path) => path.Trim('"').ToStandardisedPath();
+        protected string CleanFilename(string path) => path
+                                                       // User error which is supported by stable (https://github.com/ppy/osu/issues/21204)
+                                                       .Replace(@"\\", @"\")
+                                                       .Trim('"')
+                                                       .ToStandardisedPath();
 
         public enum Section
         {
@@ -159,71 +163,22 @@ namespace osu.Game.Beatmaps.Formats
             Mania,
         }
 
-        [Obsolete("Do not use unless you're a legacy ruleset and 100% sure.")]
-        public class LegacyDifficultyControlPoint : DifficultyControlPoint, IEquatable<LegacyDifficultyControlPoint>
-        {
-            /// <summary>
-            /// Legacy BPM multiplier that introduces floating-point errors for rulesets that depend on it.
-            /// DO NOT USE THIS UNLESS 100% SURE.
-            /// </summary>
-            public double BpmMultiplier { get; private set; }
-
-            /// <summary>
-            /// Whether or not slider ticks should be generated at this control point.
-            /// This exists for backwards compatibility with maps that abuse NaN slider velocity behavior on osu!stable (e.g. /b/2628991).
-            /// </summary>
-            public bool GenerateTicks { get; private set; } = true;
-
-            public LegacyDifficultyControlPoint(double beatLength)
-                : this()
-            {
-                // Note: In stable, the division occurs on floats, but with compiler optimisations turned on actually seems to occur on doubles via some .NET black magic (possibly inlining?).
-                BpmMultiplier = beatLength < 0 ? Math.Clamp((float)-beatLength, 10, 10000) / 100.0 : 1;
-                GenerateTicks = !double.IsNaN(beatLength);
-            }
-
-            public LegacyDifficultyControlPoint()
-            {
-                SliderVelocityBindable.Precision = double.Epsilon;
-            }
-
-            public override bool IsRedundant(ControlPoint? existing)
-                => base.IsRedundant(existing)
-                   && GenerateTicks == ((existing as LegacyDifficultyControlPoint)?.GenerateTicks ?? true);
-
-            public override void CopyFrom(ControlPoint other)
-            {
-                base.CopyFrom(other);
-
-                BpmMultiplier = ((LegacyDifficultyControlPoint)other).BpmMultiplier;
-                GenerateTicks = ((LegacyDifficultyControlPoint)other).GenerateTicks;
-            }
-
-            public override bool Equals(ControlPoint? other)
-                => other is LegacyDifficultyControlPoint otherLegacyDifficultyControlPoint
-                   && Equals(otherLegacyDifficultyControlPoint);
-
-            public bool Equals(LegacyDifficultyControlPoint? other)
-                => base.Equals(other)
-                   && BpmMultiplier == other.BpmMultiplier
-                   && GenerateTicks == other.GenerateTicks;
-
-            // ReSharper disable twice NonReadonlyMemberInGetHashCode
-            public override int GetHashCode() => HashCode.Combine(base.GetHashCode(), BpmMultiplier, GenerateTicks);
-        }
-
         internal class LegacySampleControlPoint : SampleControlPoint, IEquatable<LegacySampleControlPoint>
         {
             public int CustomSampleBank;
 
             public override HitSampleInfo ApplyTo(HitSampleInfo hitSampleInfo)
             {
-                var baseInfo = base.ApplyTo(hitSampleInfo);
+                if (hitSampleInfo is ConvertHitObjectParser.LegacyHitSampleInfo legacy)
+                {
+                    return legacy.With(
+                        newCustomSampleBank: legacy.CustomSampleBank > 0 ? legacy.CustomSampleBank : CustomSampleBank,
+                        newVolume: hitSampleInfo.Volume > 0 ? hitSampleInfo.Volume : SampleVolume,
+                        newBank: legacy.BankSpecified ? legacy.Bank : SampleBank
+                    );
+                }
 
-                if (baseInfo is ConvertHitObjectParser.LegacyHitSampleInfo legacy && legacy.CustomSampleBank == 0)
-                    return legacy.With(newCustomSampleBank: CustomSampleBank);
-
-                return baseInfo;
+                return base.ApplyTo(hitSampleInfo);
             }
 
             public override bool IsRedundant(ControlPoint? existing)

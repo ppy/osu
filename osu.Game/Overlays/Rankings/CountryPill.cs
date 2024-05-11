@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -22,7 +20,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Rankings
 {
-    public class CountryPill : CompositeDrawable, IHasCurrentValue<CountryCode>
+    public partial class CountryPill : CompositeDrawable, IHasCurrentValue<CountryCode>
     {
         private const int duration = 200;
 
@@ -140,7 +138,7 @@ namespace osu.Game.Overlays.Rankings
             countryName.Text = country.NewValue.GetDescription();
         }
 
-        private class CloseButton : OsuHoverContainer
+        private partial class CloseButton : OsuHoverContainer
         {
             private readonly SpriteIcon icon;
 

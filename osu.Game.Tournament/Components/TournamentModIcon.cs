@@ -1,7 +1,5 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -18,12 +16,12 @@ namespace osu.Game.Tournament.Components
     /// <summary>
     /// Mod icon displayed in tournament usages, allowing user overridden graphics.
     /// </summary>
-    public class TournamentModIcon : CompositeDrawable
+    public partial class TournamentModIcon : CompositeDrawable
     {
         private readonly string modAcronym;
 
         [Resolved]
-        private IRulesetStore rulesets { get; set; }
+        private IRulesetStore rulesets { get; set; } = null!;
 
         public TournamentModIcon(string modAcronym)
         {

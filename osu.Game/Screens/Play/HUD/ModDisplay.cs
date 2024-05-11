@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
 using osu.Framework.Bindables;
@@ -20,21 +18,20 @@ namespace osu.Game.Screens.Play.HUD
     /// <summary>
     /// Displays a single-line horizontal auto-sized flow of mods. For cases where wrapping is required, use <see cref="ModFlowDisplay"/> instead.
     /// </summary>
-    public class ModDisplay : CompositeDrawable, IHasCurrentValue<IReadOnlyList<Mod>>
+    public partial class ModDisplay : CompositeDrawable, IHasCurrentValue<IReadOnlyList<Mod>>
     {
         private const int fade_duration = 1000;
 
         public ExpansionMode ExpansionMode = ExpansionMode.ExpandOnHover;
 
-        private readonly BindableWithCurrent<IReadOnlyList<Mod>> current = new BindableWithCurrent<IReadOnlyList<Mod>>();
+        private readonly BindableWithCurrent<IReadOnlyList<Mod>> current = new BindableWithCurrent<IReadOnlyList<Mod>>(Array.Empty<Mod>());
 
         public Bindable<IReadOnlyList<Mod>> Current
         {
             get => current.Current;
             set
             {
-                if (value == null)
-                    throw new ArgumentNullException(nameof(value));
+                ArgumentNullException.ThrowIfNull(value);
 
                 current.Current = value;
             }
@@ -66,9 +63,7 @@ namespace osu.Game.Screens.Play.HUD
         {
             iconsContainer.Clear();
 
-            if (mods.NewValue == null) return;
-
-            foreach (Mod mod in mods.NewValue)
+            foreach (Mod mod in mods.NewValue.AsOrdered())
                 iconsContainer.Add(new ModIcon(mod) { Scale = new Vector2(0.6f) });
 
             appearTransform();

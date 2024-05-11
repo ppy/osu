@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Mania.Mods
 
         public override string Acronym => "HO";
 
-        public override double ScoreMultiplier => 1;
+        public override double ScoreMultiplier => 0.9;
 
         public override LocalisableString Description => @"Replaces all hold notes with normal notes.";
 
@@ -28,8 +28,6 @@ namespace osu.Game.Rulesets.Mania.Mods
         public override ModType Type => ModType.Conversion;
 
         public override Type[] IncompatibleMods => new[] { typeof(ManiaModInvert) };
-
-        public const double END_NOTE_ALLOW_THRESHOLD = 0.5;
 
         public void ApplyToBeatmap(IBeatmap beatmap)
         {
@@ -46,28 +44,9 @@ namespace osu.Game.Rulesets.Mania.Mods
                     StartTime = h.StartTime,
                     Samples = h.GetNodeSamples(0)
                 });
-
-                // Don't add an end note if the duration is shorter than the threshold
-                double noteValue = GetNoteDurationInBeatLength(h, maniaBeatmap); // 1/1, 1/2, 1/4, etc.
-
-                if (noteValue >= END_NOTE_ALLOW_THRESHOLD)
-                {
-                    newObjects.Add(new Note
-                    {
-                        Column = h.Column,
-                        StartTime = h.EndTime,
-                        Samples = h.GetNodeSamples((h.NodeSamples?.Count - 1) ?? 1)
-                    });
-                }
             }
 
             maniaBeatmap.HitObjects = maniaBeatmap.HitObjects.OfType<Note>().Concat(newObjects).OrderBy(h => h.StartTime).ToList();
-        }
-
-        public static double GetNoteDurationInBeatLength(HoldNote holdNote, ManiaBeatmap beatmap)
-        {
-            double beatLength = beatmap.ControlPointInfo.TimingPointAt(holdNote.StartTime).BeatLength;
-            return holdNote.Duration / beatLength;
         }
     }
 }

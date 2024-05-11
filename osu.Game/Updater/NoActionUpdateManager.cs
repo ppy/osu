@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 #nullable disable
@@ -16,7 +16,7 @@ namespace osu.Game.Updater
     /// An update manager that shows notifications if a newer release is detected.
     /// This is a case where updates are handled externally by a package manager or other means, so no action is performed on clicking the notification.
     /// </summary>
-    public class NoActionUpdateManager : UpdateManager
+    public partial class NoActionUpdateManager : UpdateManager
     {
         private string version;
 
@@ -47,7 +47,7 @@ namespace osu.Game.Updater
                     {
                         Text = $"A newer release of osu! has been found ({version} → {latestTagName}).\n\n"
                                + "Check with your package manager / provider to bring osu! up-to-date!",
-                        Icon = FontAwesome.Solid.Upload,
+                        Icon = FontAwesome.Solid.Download,
                     });
 
                     return true;

@@ -12,13 +12,15 @@ using System.Collections.Generic;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Localisation;
+using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Online;
 using osu.Game.Users;
+using osu.Game.Localisation;
 
 namespace osu.Game.Graphics.Containers
 {
-    public class LinkFlowContainer : OsuTextFlowContainer
+    public partial class LinkFlowContainer : OsuTextFlowContainer
     {
         public LinkFlowContainer(Action<SpriteText> defaultCreationParameters = null)
             : base(defaultCreationParameters)
@@ -46,9 +48,16 @@ namespace osu.Game.Graphics.Containers
 
             foreach (var link in links)
             {
+                string displayText = text.Substring(link.Index, link.Length);
+
+                if (previousLinkEnd > link.Index)
+                {
+                    Logger.Log($@"Link ""{link.Url}"" with text ""{displayText}"" overlaps previous link, ignoring.");
+                    continue;
+                }
+
                 AddText(text[previousLinkEnd..link.Index]);
 
-                string displayText = text.Substring(link.Index, link.Length);
                 object linkArgument = link.Argument;
                 string tooltip = displayText == link.Url ? null : link.Url;
 
@@ -74,7 +83,7 @@ namespace osu.Game.Graphics.Containers
         }
 
         public void AddUserLink(IUser user, Action<SpriteText> creationParameters = null)
-            => createLink(CreateChunkFor(user.Username, true, CreateSpriteText, creationParameters), new LinkDetails(LinkAction.OpenUserProfile, user), "view profile");
+            => createLink(CreateChunkFor(user.Username, true, CreateSpriteText, creationParameters), new LinkDetails(LinkAction.OpenUserProfile, user), ContextMenuStrings.ViewProfile);
 
         private void createLink(ITextPart textPart, LinkDetails link, LocalisableString tooltipText, Action action = null)
         {

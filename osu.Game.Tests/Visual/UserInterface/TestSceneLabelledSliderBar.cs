@@ -1,7 +1,5 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using System;
 using System.Linq;
@@ -17,7 +15,7 @@ using osu.Game.Overlays;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public class TestSceneLabelledSliderBar : OsuTestScene
+    public partial class TestSceneLabelledSliderBar : OsuTestScene
     {
         [Test]
         public void TestBasic() => createSliderBar();
@@ -36,6 +34,14 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddStep("set zero width", () => this.ChildrenOfType<LabelledSliderBar<double>>().ForEach(l => l.ResizeWidthTo(0, 200, Easing.OutQuint)));
             AddStep("set negative width", () => this.ChildrenOfType<LabelledSliderBar<double>>().ForEach(l => l.ResizeWidthTo(-1, 200, Easing.OutQuint)));
             AddStep("revert back", () => this.ChildrenOfType<LabelledSliderBar<double>>().ForEach(l => l.ResizeWidthTo(1, 200, Easing.OutQuint)));
+        }
+
+        [Test]
+        public void TestDisable()
+        {
+            createSliderBar();
+            AddStep("set disabled", () => this.ChildrenOfType<LabelledSliderBar<double>>().ForEach(l => l.Current.Disabled = true));
+            AddStep("unset disabled", () => this.ChildrenOfType<LabelledSliderBar<double>>().ForEach(l => l.Current.Disabled = false));
         }
 
         private void createSliderBar()
@@ -93,7 +99,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             });
         }
 
-        private class OverlayColourContainer : Container
+        private partial class OverlayColourContainer : Container
         {
             [Cached]
             private OverlayColourProvider colourProvider;

@@ -1,68 +1,47 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Sprites;
 using osuTK;
 
 namespace osu.Game.Screens.Play.Break
 {
-    public class GlowIcon : Container
+    public partial class GlowIcon : GlowingDrawable
     {
-        private readonly SpriteIcon spriteIcon;
-        private readonly BlurredIcon blurredIcon;
-
-        public override Vector2 Size
-        {
-            get => base.Size;
-            set
-            {
-                blurredIcon.Size = spriteIcon.Size = value;
-                blurredIcon.ForceRedraw();
-            }
-        }
-
-        public Vector2 BlurSigma
-        {
-            get => blurredIcon.BlurSigma;
-            set => blurredIcon.BlurSigma = value;
-        }
+        private SpriteIcon icon = null!;
 
         public IconUsage Icon
         {
-            get => spriteIcon.Icon;
-            set => spriteIcon.Icon = blurredIcon.Icon = value;
+            set => icon.Icon = value;
+            get => icon.Icon;
+        }
+
+        public new Vector2 Size
+        {
+            set => icon.Size = value;
+            get => icon.Size;
         }
 
         public GlowIcon()
         {
             RelativePositionAxes = Axes.X;
-            AutoSizeAxes = Axes.Both;
-            Children = new Drawable[]
-            {
-                blurredIcon = new BlurredIcon
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                },
-                spriteIcon = new SpriteIcon
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Shadow = false,
-                }
-            };
         }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            blurredIcon.Colour = colours.Blue;
+            GlowColour = colours.BlueLighter;
         }
+
+        protected override Drawable CreateDrawable() => icon = new SpriteIcon
+        {
+            Origin = Anchor.Centre,
+            Anchor = Anchor.Centre,
+            Shadow = false,
+        };
     }
 }

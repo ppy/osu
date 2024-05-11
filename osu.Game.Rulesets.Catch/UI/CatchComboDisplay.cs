@@ -16,7 +16,7 @@ namespace osu.Game.Rulesets.Catch.UI
     /// <summary>
     /// Represents a component that displays a skinned <see cref="ICatchComboCounter"/> and handles combo judgement results for updating it accordingly.
     /// </summary>
-    public class CatchComboDisplay : SkinnableDrawable
+    public partial class CatchComboDisplay : SkinnableDrawable
     {
         private int currentCombo;
 
@@ -25,11 +25,11 @@ namespace osu.Game.Rulesets.Catch.UI
         private readonly IBindable<bool> showCombo = new BindableBool(true);
 
         public CatchComboDisplay()
-            : base(new CatchSkinComponent(CatchSkinComponents.CatchComboCounter), _ => Empty())
+            : base(new CatchSkinComponentLookup(CatchSkinComponents.CatchComboCounter), _ => Empty())
         {
         }
 
-        [Resolved(canBeNull: true)]
+        [Resolved]
         private Player? player { get; set; }
 
         protected override void LoadComplete()
@@ -63,12 +63,12 @@ namespace osu.Game.Rulesets.Catch.UI
             updateCombo(result.ComboAtJudgement + 1, judgedObject.AccentColour.Value);
         }
 
-        public void OnRevertResult(DrawableCatchHitObject judgedObject, JudgementResult result)
+        public void OnRevertResult(JudgementResult result)
         {
             if (!result.Type.AffectsCombo() || !result.HasResult)
                 return;
 
-            updateCombo(result.ComboAtJudgement, judgedObject.AccentColour.Value);
+            updateCombo(result.ComboAtJudgement, null);
         }
 
         private void updateCombo(int newCombo, Color4? hitObjectColour)

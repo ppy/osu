@@ -6,6 +6,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using JetBrains.Annotations;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -29,7 +30,7 @@ using osu.Game.Tests.Visual;
 namespace osu.Game.Rulesets.Osu.Tests
 {
     [TestFixture]
-    public class TestSceneSkinFallbacks : TestSceneOsuPlayer
+    public partial class TestSceneSkinFallbacks : TestSceneOsuPlayer
     {
         private readonly TestSource testUserSkin;
         private readonly TestSource testBeatmapSkin;
@@ -90,11 +91,11 @@ namespace osu.Game.Rulesets.Osu.Tests
 
                 var skinnable = firstObject.ApproachCircle;
 
-                if (skin == null && skinnable?.Drawable is DefaultApproachCircle)
+                if (skin == null && skinnable.Drawable is DefaultApproachCircle)
                     // check for default skin provider
                     return true;
 
-                var text = skinnable?.Drawable as SpriteText;
+                var text = skinnable.Drawable as SpriteText;
 
                 return text?.Text == skin;
             });
@@ -119,7 +120,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             protected override ISkin GetSkin() => skin;
         }
 
-        public class SkinProvidingPlayer : TestPlayer
+        public partial class SkinProvidingPlayer : TestPlayer
         {
             private readonly TestSource userSkin;
 
@@ -149,11 +150,11 @@ namespace osu.Game.Rulesets.Osu.Tests
                 this.identifier = identifier;
             }
 
-            public Drawable GetDrawableComponent(ISkinComponent component)
+            public Drawable GetDrawableComponent(ISkinComponentLookup lookup)
             {
                 if (!enabled) return null;
 
-                if (component is OsuSkinComponent osuComponent && osuComponent.Component == OsuSkinComponents.SliderBody)
+                if (lookup is OsuSkinComponentLookup osuComponent && osuComponent.Component == OsuSkinComponents.SliderBody)
                     return null;
 
                 return new OsuSpriteText
@@ -173,6 +174,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             public IEnumerable<ISkin> AllSources => new[] { this };
 
+            [CanBeNull]
             public event Action SourceChanged;
 
             private bool enabled = true;

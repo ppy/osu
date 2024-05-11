@@ -1,7 +1,5 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Mania.Edit.Blueprints;
@@ -11,14 +9,14 @@ using osu.Game.Screens.Edit.Compose.Components;
 
 namespace osu.Game.Rulesets.Mania.Edit
 {
-    public class ManiaBlueprintContainer : ComposeBlueprintContainer
+    public partial class ManiaBlueprintContainer : ComposeBlueprintContainer
     {
         public ManiaBlueprintContainer(HitObjectComposer composer)
             : base(composer)
         {
         }
 
-        public override HitObjectSelectionBlueprint CreateHitObjectBlueprintFor(HitObject hitObject)
+        public override HitObjectSelectionBlueprint? CreateHitObjectBlueprintFor(HitObject hitObject)
         {
             switch (hitObject)
             {

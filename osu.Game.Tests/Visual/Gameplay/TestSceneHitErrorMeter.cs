@@ -9,6 +9,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -31,7 +32,7 @@ using osu.Game.Screens.Play.HUD.HitErrorMeters;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    public class TestSceneHitErrorMeter : OsuTestScene
+    public partial class TestSceneHitErrorMeter : OsuTestScene
     {
         [Cached(typeof(ScoreProcessor))]
         private TestScoreProcessor scoreProcessor = new TestScoreProcessor();
@@ -163,10 +164,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddUntilStep("wait for bars to disappear", () => !this.ChildrenOfType<BarHitErrorMeter.JudgementLine>().Any());
             AddUntilStep("ensure max circles not exceeded", () =>
-            {
-                return this.ChildrenOfType<ColourHitErrorMeter>()
-                           .All(m => m.ChildrenOfType<ColourHitErrorMeter.HitErrorShape>().Count() <= max_displayed_judgements);
-            });
+                this.ChildrenOfType<ColourHitErrorMeter>().First().ChildrenOfType<ColourHitErrorMeter.HitErrorShape>().Count(), () => Is.LessThanOrEqualTo(max_displayed_judgements));
 
             AddStep("show displays", () =>
             {
@@ -266,7 +264,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         [SuppressMessage("ReSharper", "UnassignedGetOnlyAutoProperty")]
-        private class TestDrawableRuleset : DrawableRuleset
+        private partial class TestDrawableRuleset : DrawableRuleset
         {
             public HitWindows HitWindows;
 
@@ -284,11 +282,13 @@ namespace osu.Game.Tests.Visual.Gameplay
                 remove => throw new InvalidOperationException($"{nameof(RevertResult)} operations not supported in test context");
             }
 
+            public override IAdjustableAudioComponent Audio { get; }
             public override Playfield Playfield { get; }
             public override Container Overlays { get; }
             public override Container FrameStableComponents { get; }
             public override IFrameStableClock FrameStableClock { get; }
             internal override bool FrameStablePlayback { get; set; }
+            public override bool AllowBackwardsSeeks { get; set; }
             public override IReadOnlyList<Mod> Mods { get; }
 
             public override double GameplayStartTime { get; }
@@ -308,7 +308,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             public override void CancelResume() => throw new NotImplementedException();
         }
 
-        private class TestScoreProcessor : ScoreProcessor
+        private partial class TestScoreProcessor : ScoreProcessor
         {
             public TestScoreProcessor()
                 : base(new OsuRuleset())

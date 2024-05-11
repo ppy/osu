@@ -12,7 +12,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Tests.Mods
 {
-    public class TestSceneOsuModRandom : OsuModTestScene
+    public partial class TestSceneOsuModRandom : OsuModTestScene
     {
         [TestCase(1)]
         [TestCase(7)]

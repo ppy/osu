@@ -1,10 +1,9 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
@@ -20,7 +19,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Dashboard.Home.News
 {
-    public class FeaturedNewsItemPanel : HomePanel
+    public partial class FeaturedNewsItemPanel : HomePanel
     {
         private readonly APINewsPost post;
 
@@ -104,7 +103,7 @@ namespace osu.Game.Overlays.Dashboard.Home.News
             };
         }
 
-        private class ClickableNewsBackground : OsuHoverContainer
+        private partial class ClickableNewsBackground : OsuHoverContainer
         {
             private readonly APINewsPost post;
 
@@ -119,21 +118,16 @@ namespace osu.Game.Overlays.Dashboard.Home.News
             [BackgroundDependencyLoader]
             private void load(GameHost host)
             {
-                NewsPostBackground bg;
-
-                Child = new DelayedLoadWrapper(bg = new NewsPostBackground(post.FirstImage)
+                Child = new DelayedLoadUnloadWrapper(() => new NewsPostBackground(post.FirstImage)
                 {
                     RelativeSizeAxes = Axes.Both,
                     FillMode = FillMode.Fill,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Alpha = 0
                 })
                 {
                     RelativeSizeAxes = Axes.Both
                 };
-
-                bg.OnLoadComplete += d => d.FadeIn(250, Easing.In);
 
                 TooltipText = "view in browser";
                 Action = () => host.OpenUrlExternally("https://osu.ppy.sh/home/news/" + post.Slug);
@@ -142,7 +136,7 @@ namespace osu.Game.Overlays.Dashboard.Home.News
             }
         }
 
-        private class Date : CompositeDrawable, IHasCustomTooltip<DateTimeOffset>
+        private partial class Date : CompositeDrawable, IHasCustomTooltip<DateTimeOffset>
         {
             private readonly DateTimeOffset date;
 
@@ -172,7 +166,7 @@ namespace osu.Game.Overlays.Dashboard.Home.News
                             Origin = Anchor.TopRight,
                             Font = OsuFont.GetFont(weight: FontWeight.Bold), // using Bold since there is no 800 weight alternative
                             Colour = colourProvider.Light1,
-                            Text = $"{date:dd}"
+                            Text = date.ToLocalisableString(@"dd")
                         },
                         new TextFlowContainer(f =>
                         {
@@ -183,7 +177,7 @@ namespace osu.Game.Overlays.Dashboard.Home.News
                             Anchor = Anchor.TopRight,
                             Origin = Anchor.TopRight,
                             AutoSizeAxes = Axes.Both,
-                            Text = $"{date:MMM yyyy}"
+                            Text = date.ToLocalisableString(@"MMM yyyy")
                         }
                     }
                 };

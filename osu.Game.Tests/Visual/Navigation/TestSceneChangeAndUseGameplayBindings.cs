@@ -14,13 +14,14 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
 using osu.Game.Overlays.Settings.Sections.Input;
 using osu.Game.Screens.Play;
+using osu.Game.Screens.Play.HUD;
 using osu.Game.Screens.Select;
 using osu.Game.Tests.Beatmaps.IO;
 using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Navigation
 {
-    public class TestSceneChangeAndUseGameplayBindings : OsuGameTestScene
+    public partial class TestSceneChangeAndUseGameplayBindings : OsuGameTestScene
     {
         [Test]
         public void TestGameplayKeyBindings()
@@ -56,6 +57,7 @@ namespace osu.Game.Tests.Visual.Navigation
             PushAndConfirm(() => new PlaySongSelect());
 
             AddUntilStep("wait for selection", () => !Game.Beatmap.IsDefault);
+            AddUntilStep("wait for carousel load", () => songSelect.BeatmapSetsLoaded);
 
             AddStep("enter gameplay", () => InputManager.Key(Key.Enter));
 
@@ -68,19 +70,19 @@ namespace osu.Game.Tests.Visual.Navigation
             AddUntilStep("wait for gameplay", () => player?.IsBreakTime.Value == false);
 
             AddStep("press 'z'", () => InputManager.Key(Key.Z));
-            AddAssert("key counter didn't increase", () => keyCounter.CountPresses == 0);
+            AddAssert("key counter didn't increase", () => keyCounter.CountPresses.Value == 0);
 
             AddStep("press 's'", () => InputManager.Key(Key.S));
-            AddAssert("key counter did increase", () => keyCounter.CountPresses == 1);
+            AddAssert("key counter did increase", () => keyCounter.CountPresses.Value == 1);
         }
 
         private KeyBindingsSubsection osuBindingSubsection => keyBindingPanel
                                                               .ChildrenOfType<VariantBindingsSubsection>()
-                                                              .FirstOrDefault(s => s.Ruleset.ShortName == "osu");
+                                                              .FirstOrDefault(s => s.Ruleset!.ShortName == "osu");
 
         private OsuButton configureBindingsButton => Game.Settings
                                                          .ChildrenOfType<BindingSettings>().SingleOrDefault()?
-                                                         .ChildrenOfType<OsuButton>()?
+                                                         .ChildrenOfType<OsuButton>()
                                                          .First(b => b.Text.ToString() == "Configure");
 
         private KeyBindingPanel keyBindingPanel => Game.Settings
@@ -91,6 +93,8 @@ namespace osu.Game.Tests.Visual.Navigation
                                                                   .All<RealmKeyBinding>()
                                                                   .AsEnumerable()
                                                                   .First(k => k.RulesetName == "osu" && k.ActionInt == 0);
+
+        private Screens.Select.SongSelect songSelect => Game.ScreenStack.CurrentScreen as Screens.Select.SongSelect;
 
         private Player player => Game.ScreenStack.CurrentScreen as Player;
 

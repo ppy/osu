@@ -1,24 +1,21 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Bindables;
-using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
 
 namespace osu.Game.Overlays.Settings
 {
-    public class SettingsNumberBox : SettingsItem<int?>
+    public partial class SettingsNumberBox : SettingsItem<int?>
     {
         protected override Drawable CreateControl() => new NumberControl
         {
             RelativeSizeAxes = Axes.X,
         };
 
-        private sealed class NumberControl : CompositeDrawable, IHasCurrentValue<int?>
+        private sealed partial class NumberControl : CompositeDrawable, IHasCurrentValue<int?>
         {
             private readonly BindableWithCurrent<int?> current = new BindableWithCurrent<int?>();
 
@@ -38,7 +35,6 @@ namespace osu.Game.Overlays.Settings
                 {
                     numberBox = new OutlinedNumberBox
                     {
-                        Margin = new MarginPadding { Top = 5 },
                         RelativeSizeAxes = Axes.X,
                         CommitOnFocusLost = true
                     }
@@ -68,11 +64,11 @@ namespace osu.Game.Overlays.Settings
             }
         }
 
-        private class OutlinedNumberBox : OutlinedTextBox
+        private partial class OutlinedNumberBox : OutlinedTextBox
         {
             protected override bool AllowIme => false;
 
-            protected override bool CanAddCharacter(char character) => character.IsAsciiDigit();
+            protected override bool CanAddCharacter(char character) => char.IsAsciiDigit(character);
 
             public new void NotifyInputError() => base.NotifyInputError();
         }

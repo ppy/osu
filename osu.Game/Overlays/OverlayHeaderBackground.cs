@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -11,17 +9,17 @@ using osu.Framework.Graphics.Textures;
 
 namespace osu.Game.Overlays
 {
-    public class OverlayHeaderBackground : CompositeDrawable
+    public partial class OverlayHeaderBackground : CompositeDrawable
     {
         public OverlayHeaderBackground(string textureName)
         {
             Height = 80;
             RelativeSizeAxes = Axes.X;
             Masking = true;
-            InternalChild = new Background(textureName);
+            InternalChild = new DelayedLoadWrapper(() => new Background(textureName));
         }
 
-        private class Background : Sprite
+        private partial class Background : Sprite
         {
             private readonly string textureName;
 
@@ -36,9 +34,15 @@ namespace osu.Game.Overlays
             }
 
             [BackgroundDependencyLoader]
-            private void load(TextureStore textures)
+            private void load(LargeTextureStore textures)
             {
                 Texture = textures.Get(textureName);
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+                this.FadeInFromZero(500, Easing.OutQuint);
             }
         }
     }

@@ -9,8 +9,8 @@ using osu.Framework.Allocation;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Testing;
 using osu.Framework.Graphics.Cursor;
+using osu.Framework.Testing;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
@@ -25,7 +25,7 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public class TestSceneModPresetColumn : OsuManualInputManagerTestScene
+    public partial class TestSceneModPresetColumn : OsuManualInputManagerTestScene
     {
         protected override bool UseFreshStoragePerRun => true;
 
@@ -73,7 +73,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
                     var testPresets = createTestPresets();
                     foreach (var preset in testPresets)
-                        preset.Ruleset = realm.Find<RulesetInfo>(preset.Ruleset.ShortName);
+                        preset.Ruleset = realm.Find<RulesetInfo>(preset.Ruleset.ShortName)!;
 
                     realm.Add(testPresets);
                 });
@@ -103,7 +103,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                     new ManiaModNightcore(),
                     new ManiaModHardRock()
                 },
-                Ruleset = r.Find<RulesetInfo>("mania")
+                Ruleset = r.Find<RulesetInfo>("mania")!
             })));
             AddUntilStep("2 panels visible", () => this.ChildrenOfType<ModPresetPanel>().Count() == 2);
 
@@ -115,7 +115,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                     new OsuModHidden(),
                     new OsuModHardRock()
                 },
-                Ruleset = r.Find<RulesetInfo>("osu")
+                Ruleset = r.Find<RulesetInfo>("osu")!
             })));
             AddUntilStep("2 panels visible", () => this.ChildrenOfType<ModPresetPanel>().Count() == 2);
 
@@ -167,7 +167,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         }
 
         [Test]
-        public void TestAddingFlow()
+        public void TestAddingFlow([Values] bool withSystemModActive)
         {
             ModPresetColumn modPresetColumn = null!;
 
@@ -181,7 +181,13 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddUntilStep("items loaded", () => modPresetColumn.IsLoaded && modPresetColumn.ItemsLoaded);
             AddAssert("add preset button disabled", () => !this.ChildrenOfType<AddPresetButton>().Single().Enabled.Value);
 
-            AddStep("set mods", () => SelectedMods.Value = new Mod[] { new OsuModDaycore(), new OsuModClassic() });
+            AddStep("set mods", () =>
+            {
+                var newMods = new Mod[] { new OsuModDaycore(), new OsuModClassic() };
+                if (withSystemModActive)
+                    newMods = newMods.Append(new OsuModTouchDevice()).ToArray();
+                SelectedMods.Value = newMods;
+            });
             AddAssert("add preset button enabled", () => this.ChildrenOfType<AddPresetButton>().Single().Enabled.Value);
 
             AddStep("click add preset button", () =>
@@ -209,6 +215,9 @@ namespace osu.Game.Tests.Visual.UserInterface
             });
             AddUntilStep("popover closed", () => !this.ChildrenOfType<OsuPopover>().Any());
             AddUntilStep("preset creation occurred", () => this.ChildrenOfType<ModPresetPanel>().Count() == 4);
+            AddAssert("preset has correct mods",
+                () => this.ChildrenOfType<ModPresetPanel>().Single(panel => panel.Preset.Value.Name == "new preset").Preset.Value.Mods,
+                () => Has.Count.EqualTo(2));
 
             AddStep("click add preset button", () =>
             {
@@ -243,7 +252,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddUntilStep("wait for context menu", () => this.ChildrenOfType<OsuContextMenu>().Any());
             AddStep("click delete", () =>
             {
-                var deleteItem = this.ChildrenOfType<DrawableOsuMenuItem>().Single();
+                var deleteItem = this.ChildrenOfType<DrawableOsuMenuItem>().ElementAt(1);
                 InputManager.MoveMouseTo(deleteItem);
                 InputManager.Click(MouseButton.Left);
             });
@@ -259,6 +268,156 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddStep("release mouse", () => InputManager.ReleaseButton(MouseButton.Left));
             AddUntilStep("preset deletion occurred", () => this.ChildrenOfType<ModPresetPanel>().Count() == 2);
             AddAssert("preset soft-deleted", () => Realm.Run(r => r.All<ModPreset>().Count(preset => preset.DeletePending) == 1));
+        }
+
+        [Test]
+        public void TestEditPresetName()
+        {
+            ModPresetColumn modPresetColumn = null!;
+            string presetName = null!;
+            ModPresetPanel panel = null!;
+
+            AddStep("clear mods", () => SelectedMods.Value = Array.Empty<Mod>());
+            AddStep("create content", () => Child = modPresetColumn = new ModPresetColumn
+            {
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+            });
+
+            AddUntilStep("items loaded", () => modPresetColumn.IsLoaded && modPresetColumn.ItemsLoaded);
+            AddStep("right click first panel", () =>
+            {
+                panel = this.ChildrenOfType<ModPresetPanel>().First();
+                presetName = panel.Preset.Value.Name;
+                InputManager.MoveMouseTo(panel);
+                InputManager.Click(MouseButton.Right);
+            });
+
+            AddUntilStep("wait for context menu", () => this.ChildrenOfType<OsuContextMenu>().Any());
+            AddStep("click edit", () =>
+            {
+                var editItem = this.ChildrenOfType<DrawableOsuMenuItem>().ElementAt(0);
+                InputManager.MoveMouseTo(editItem);
+                InputManager.Click(MouseButton.Left);
+            });
+
+            OsuPopover? popover = null;
+            AddUntilStep("wait for popover", () => (popover = this.ChildrenOfType<OsuPopover>().FirstOrDefault()) != null);
+            AddStep("clear preset name", () => popover.ChildrenOfType<LabelledTextBox>().First().Current.Value = "");
+            AddStep("attempt preset edit", () =>
+            {
+                InputManager.MoveMouseTo(popover.ChildrenOfType<ShearedButton>().ElementAt(1));
+                InputManager.Click(MouseButton.Left);
+            });
+
+            AddAssert("preset is not changed", () => panel.Preset.Value.Name == presetName);
+            AddUntilStep("popover is unchanged", () => this.ChildrenOfType<OsuPopover>().FirstOrDefault() == popover);
+            AddStep("edit preset name", () => popover.ChildrenOfType<LabelledTextBox>().First().Current.Value = "something new");
+            AddStep("commit changes to textbox", () => InputManager.Key(Key.Enter));
+            AddStep("attempt preset edit via select binding", () => InputManager.Key(Key.Enter));
+            AddUntilStep("popover closed", () => !this.ChildrenOfType<OsuPopover>().Any());
+            AddAssert("preset is changed", () => panel.Preset.Value.Name != presetName);
+        }
+
+        [Test]
+        public void TestEditPresetMod()
+        {
+            ModPresetColumn modPresetColumn = null!;
+            var mods = new Mod[] { new OsuModHidden(), new OsuModHardRock() };
+            List<Mod> previousMod = null!;
+
+            AddStep("clear mods", () => SelectedMods.Value = Array.Empty<Mod>());
+            AddStep("create content", () => Child = modPresetColumn = new ModPresetColumn
+            {
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+            });
+
+            AddUntilStep("items loaded", () => modPresetColumn.IsLoaded && modPresetColumn.ItemsLoaded);
+
+            AddStep("right click first panel", () =>
+            {
+                var panel = this.ChildrenOfType<ModPresetPanel>().First();
+                previousMod = panel.Preset.Value.Mods.ToList();
+                InputManager.MoveMouseTo(panel);
+                InputManager.Click(MouseButton.Right);
+            });
+            AddUntilStep("wait for context menu", () => this.ChildrenOfType<OsuContextMenu>().Any());
+            AddStep("click edit", () =>
+            {
+                var editItem = this.ChildrenOfType<DrawableOsuMenuItem>().ElementAt(0);
+                InputManager.MoveMouseTo(editItem);
+                InputManager.Click(MouseButton.Left);
+            });
+
+            OsuPopover? popover = null;
+            AddUntilStep("wait for popover", () => (popover = this.ChildrenOfType<OsuPopover>().FirstOrDefault()) != null);
+            AddStep("click use current mods", () =>
+            {
+                InputManager.MoveMouseTo(popover.ChildrenOfType<ShearedButton>().ElementAt(0));
+                InputManager.Click(MouseButton.Left);
+            });
+            AddStep("attempt preset edit", () =>
+            {
+                InputManager.MoveMouseTo(popover.ChildrenOfType<ShearedButton>().ElementAt(1));
+                InputManager.Click(MouseButton.Left);
+            });
+
+            AddUntilStep("preset mod not changed", () =>
+                new HashSet<Mod>(this.ChildrenOfType<ModPresetPanel>().First().Preset.Value.Mods).SetEquals(previousMod));
+
+            AddStep("select mods", () => SelectedMods.Value = mods);
+            AddStep("right click first panel", () =>
+            {
+                var panel = this.ChildrenOfType<ModPresetPanel>().First();
+                InputManager.MoveMouseTo(panel);
+                InputManager.Click(MouseButton.Right);
+            });
+
+            AddUntilStep("wait for context menu", () => this.ChildrenOfType<OsuContextMenu>().Any());
+            AddStep("click edit", () =>
+            {
+                var editItem = this.ChildrenOfType<DrawableOsuMenuItem>().ElementAt(0);
+                InputManager.MoveMouseTo(editItem);
+                InputManager.Click(MouseButton.Left);
+            });
+
+            AddUntilStep("wait for popover", () => (popover = this.ChildrenOfType<OsuPopover>().FirstOrDefault()) != null);
+            AddStep("click use current mods", () =>
+            {
+                InputManager.MoveMouseTo(popover.ChildrenOfType<ShearedButton>().ElementAt(0));
+                InputManager.Click(MouseButton.Left);
+            });
+            AddStep("attempt preset edit", () =>
+            {
+                InputManager.MoveMouseTo(popover.ChildrenOfType<ShearedButton>().ElementAt(1));
+                InputManager.Click(MouseButton.Left);
+            });
+
+            AddUntilStep("preset mod is changed", () =>
+                new HashSet<Mod>(this.ChildrenOfType<ModPresetPanel>().First().Preset.Value.Mods).SetEquals(mods));
+        }
+
+        [Test]
+        public void TestTextFiltering()
+        {
+            ModPresetColumn modPresetColumn = null!;
+
+            AddStep("clear mods", () => SelectedMods.Value = Array.Empty<Mod>());
+            AddStep("create content", () => Child = modPresetColumn = new ModPresetColumn
+            {
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+            });
+
+            AddUntilStep("items loaded", () => modPresetColumn.IsLoaded && modPresetColumn.ItemsLoaded);
+
+            AddStep("set osu! ruleset", () => Ruleset.Value = rulesets.GetRuleset(0));
+            AddStep("set text filter", () => modPresetColumn.SearchTerm = "First");
+            AddUntilStep("one panel visible", () => modPresetColumn.ChildrenOfType<ModPresetPanel>().Count(panel => panel.IsPresent), () => Is.EqualTo(1));
+
+            AddStep("set mania ruleset", () => Ruleset.Value = rulesets.GetRuleset(3));
+            AddUntilStep("no panels visible", () => modPresetColumn.ChildrenOfType<ModPresetPanel>().Count(panel => panel.IsPresent), () => Is.EqualTo(0));
         }
 
         private ICollection<ModPreset> createTestPresets() => new[]

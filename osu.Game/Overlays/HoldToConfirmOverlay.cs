@@ -17,7 +17,7 @@ namespace osu.Game.Overlays
     /// An overlay which will display a black screen that dims over a period before confirming an exit action.
     /// Action is BYO (derived class will need to call <see cref="HoldToConfirmContainer.BeginConfirm"/> and <see cref="HoldToConfirmContainer.AbortConfirm"/> from a user event).
     /// </summary>
-    public abstract class HoldToConfirmOverlay : HoldToConfirmContainer
+    public abstract partial class HoldToConfirmOverlay : HoldToConfirmContainer
     {
         private Box overlay;
 

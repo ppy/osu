@@ -12,7 +12,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Chat.ChannelList
 {
-    public class ChannelListItemCloseButton : OsuClickableContainer
+    public partial class ChannelListItemCloseButton : OsuClickableContainer
     {
         private SpriteIcon icon = null!;
 

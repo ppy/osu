@@ -4,6 +4,7 @@
 #nullable disable
 
 using System;
+using JetBrains.Annotations;
 using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -25,7 +26,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.Ranking
 {
-    public class ScorePanel : CompositeDrawable, IStateful<PanelState>
+    public partial class ScorePanel : CompositeDrawable, IStateful<PanelState>
     {
         /// <summary>
         /// Width of the panel when contracted.
@@ -82,6 +83,7 @@ namespace osu.Game.Screens.Ranking
         private static readonly Color4 contracted_top_layer_colour = Color4Extensions.FromHex("#353535");
         private static readonly Color4 contracted_middle_layer_colour = Color4Extensions.FromHex("#353535");
 
+        [CanBeNull]
         public event Action<PanelState> StateChanged;
 
         /// <summary>
@@ -225,7 +227,7 @@ namespace osu.Game.Screens.Ranking
         protected override void Update()
         {
             base.Update();
-            audioContent.Balance.Value = (ScreenSpaceDrawQuad.Centre.X / game.ScreenSpaceDrawQuad.Width) * 2 - 1;
+            audioContent.Balance.Value = ((ScreenSpaceDrawQuad.Centre.X / game.ScreenSpaceDrawQuad.Width) * 2 - 1) * OsuGameBase.SFX_STEREO_STRENGTH;
         }
 
         private void playAppearSample()

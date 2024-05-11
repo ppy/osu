@@ -1,13 +1,10 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -20,7 +17,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Catch.Edit.Blueprints.Components
 {
-    public abstract class EditablePath : CompositeDrawable
+    public abstract partial class EditablePath : CompositeDrawable
     {
         public int PathId => path.InvalidationID;
 
@@ -42,9 +39,8 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints.Components
 
         private readonly List<VertexState> previousVertexStates = new List<VertexState>();
 
-        [Resolved(CanBeNull = true)]
-        [CanBeNull]
-        private IBeatSnapProvider beatSnapProvider { get; set; }
+        [Resolved]
+        private IBeatSnapProvider? beatSnapProvider { get; set; }
 
         protected EditablePath(Func<float, double> positionToTime)
         {
@@ -78,7 +74,7 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints.Components
             path.ConvertFromSliderPath(sliderPath, hitObject.Velocity);
 
             // If the original slider path has non-linear type segments, resample the vertices at nested hit object times to reduce the number of vertices.
-            if (sliderPath.ControlPoints.Any(p => p.Type != null && p.Type != PathType.Linear))
+            if (sliderPath.ControlPoints.Any(p => p.Type != null && p.Type != PathType.LINEAR))
             {
                 path.ResampleVertices(hitObject.NestedHitObjects
                                                .Skip(1).TakeWhile(h => !(h is Fruit)) // Only droplets in the first span are used.
@@ -95,7 +91,7 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints.Components
         public void UpdateHitObjectFromPath(JuiceStream hitObject)
         {
             // The SV setting may need to be changed for the current path.
-            var svBindable = hitObject.DifficultyControlPoint.SliderVelocityBindable;
+            var svBindable = hitObject.SliderVelocityMultiplierBindable;
             double svToVelocityFactor = hitObject.Velocity / svBindable.Value;
             double requiredVelocity = path.ComputeRequiredVelocity();
 

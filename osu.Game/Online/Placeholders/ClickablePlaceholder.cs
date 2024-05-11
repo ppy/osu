@@ -11,7 +11,7 @@ using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Online.Placeholders
 {
-    public class ClickablePlaceholder : Placeholder
+    public partial class ClickablePlaceholder : Placeholder
     {
         public Action Action;
 

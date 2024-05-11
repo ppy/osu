@@ -15,7 +15,7 @@ using osu.Game.Overlays.Rankings;
 
 namespace osu.Game.Tests.Visual.Online
 {
-    public class TestSceneRankingsSpotlightSelector : OsuTestScene
+    public partial class TestSceneRankingsSpotlightSelector : OsuTestScene
     {
         protected override bool UseOnlineAPI => true;
 

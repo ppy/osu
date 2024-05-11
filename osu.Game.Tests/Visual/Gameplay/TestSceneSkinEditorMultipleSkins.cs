@@ -4,24 +4,26 @@
 #nullable disable
 
 using osu.Framework.Allocation;
+using osu.Framework.Audio.Track;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
-using osu.Framework.Timing;
+using osu.Game.Overlays.SkinEditor;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Screens.Edit;
 using osu.Game.Screens.Play;
-using osu.Game.Skinning.Editor;
+using osu.Game.Screens.Play.HUD;
 using osu.Game.Tests.Gameplay;
 using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    public class TestSceneSkinEditorMultipleSkins : SkinnableTestScene
+    public partial class TestSceneSkinEditorMultipleSkins : SkinnableTestScene
     {
-        [Cached]
-        private readonly ScoreProcessor scoreProcessor = new ScoreProcessor(new OsuRuleset());
+        [Cached(typeof(ScoreProcessor))]
+        private ScoreProcessor scoreProcessor { get; set; }
 
         [Cached(typeof(HealthProcessor))]
         private HealthProcessor healthProcessor = new DrainingHealthProcessor(0);
@@ -30,7 +32,15 @@ namespace osu.Game.Tests.Visual.Gameplay
         private GameplayState gameplayState = TestGameplayState.Create(new OsuRuleset());
 
         [Cached(typeof(IGameplayClock))]
-        private readonly IGameplayClock gameplayClock = new GameplayClockContainer(new FramedClock());
+        private readonly IGameplayClock gameplayClock = new GameplayClockContainer(new TrackVirtual(60000), false, false);
+
+        [Cached]
+        public readonly EditorClipboard Clipboard = new EditorClipboard();
+
+        public TestSceneSkinEditorMultipleSkins()
+        {
+            scoreProcessor = gameplayState.ScoreProcessor;
+        }
 
         [SetUpSteps]
         public void SetUpSteps()
@@ -53,7 +63,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                     };
 
                     // Add any key just to display the key counter visually.
-                    hudOverlay.KeyCounter.Add(new KeyCounterKeyboard(Key.Space));
+                    hudOverlay.InputCountController.Add(new KeyCounterKeyboardTrigger(Key.Space));
                     scoreProcessor.Combo.Value = 1;
 
                     return new Container

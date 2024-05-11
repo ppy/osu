@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup Label="Project">
-    <TargetFramework>netstandard2.1</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <AssemblyTitle>osu.Game.Rulesets.Pippidon</AssemblyTitle>
     <OutputType>Library</OutputType>
     <PlatformTarget>AnyCPU</PlatformTarget>

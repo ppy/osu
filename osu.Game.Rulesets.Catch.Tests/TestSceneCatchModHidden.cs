@@ -1,7 +1,5 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using System.Collections.Generic;
 using System.Linq;
@@ -19,7 +17,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Catch.Tests
 {
-    public class TestSceneCatchModHidden : ModTestScene
+    public partial class TestSceneCatchModHidden : ModTestScene
     {
         [Test]
         public void TestJuiceStream()
@@ -33,7 +31,7 @@ namespace osu.Game.Rulesets.Catch.Tests
                         new JuiceStream
                         {
                             StartTime = 1000,
-                            Path = new SliderPath(PathType.Linear, new[] { Vector2.Zero, new Vector2(0, -192) }),
+                            Path = new SliderPath(PathType.LINEAR, new[] { Vector2.Zero, new Vector2(0, -192) }),
                             X = CatchPlayfield.WIDTH / 2
                         }
                     }
@@ -41,7 +39,7 @@ namespace osu.Game.Rulesets.Catch.Tests
                 Mod = new CatchModHidden(),
                 PassCondition = () => Player.Results.Count > 0
                                       && Player.ChildrenOfType<DrawableJuiceStream>().Single().Alpha > 0
-                                      && Player.ChildrenOfType<DrawableFruit>().Last().Alpha > 0
+                                      && Player.ChildrenOfType<DrawableFruit>().First().Alpha > 0
             });
         }
 

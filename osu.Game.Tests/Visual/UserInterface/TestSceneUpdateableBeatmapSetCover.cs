@@ -20,7 +20,7 @@ using osuTK;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public class TestSceneUpdateableBeatmapSetCover : OsuTestScene
+    public partial class TestSceneUpdateableBeatmapSetCover : OsuTestScene
     {
         [Test]
         public void TestLocal([Values] BeatmapSetCoverType coverType)
@@ -99,16 +99,18 @@ namespace osu.Game.Tests.Visual.UserInterface
         {
             TestUpdateableOnlineBeatmapSetCover updateableCover = null;
 
-            AddStep("setup cover", () => Child = updateableCover = new TestUpdateableOnlineBeatmapSetCover
+            AddStep("setup cover", () => Child = updateableCover = new TestUpdateableOnlineBeatmapSetCover(400)
             {
                 OnlineInfo = CreateAPIBeatmapSet(),
                 RelativeSizeAxes = Axes.Both,
                 Masking = true,
             });
 
-            AddStep("change model", () => updateableCover.OnlineInfo = null);
-            AddWaitStep("wait some", 5);
-            AddAssert("no cover added", () => !updateableCover.ChildrenOfType<DelayedLoadUnloadWrapper>().Any());
+            AddStep("change model to null", () => updateableCover.OnlineInfo = null);
+
+            AddUntilStep("wait for load", () => updateableCover.DelayedLoadFinished);
+
+            AddAssert("no cover added", () => !updateableCover.ChildrenOfType<TestOnlineBeatmapSetCover>().Any());
         }
 
         [Test]
@@ -139,13 +141,21 @@ namespace osu.Game.Tests.Visual.UserInterface
             Covers = new BeatmapSetOnlineCovers { Cover = coverUrl }
         };
 
-        private class TestUpdateableOnlineBeatmapSetCover : UpdateableOnlineBeatmapSetCover
+        private partial class TestUpdateableOnlineBeatmapSetCover : UpdateableOnlineBeatmapSetCover
         {
             private readonly int loadDelay;
+
+            public bool DelayedLoadFinished;
 
             public TestUpdateableOnlineBeatmapSetCover(int loadDelay = 10000)
             {
                 this.loadDelay = loadDelay;
+            }
+
+            protected override void OnLoadFinished()
+            {
+                base.OnLoadFinished();
+                DelayedLoadFinished = true;
             }
 
             protected override Drawable CreateDrawable(IBeatmapSetOnlineInfo model)
@@ -163,7 +173,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             }
         }
 
-        private class TestOnlineBeatmapSetCover : OnlineBeatmapSetCover
+        private partial class TestOnlineBeatmapSetCover : OnlineBeatmapSetCover
         {
             private readonly int loadDelay;
 

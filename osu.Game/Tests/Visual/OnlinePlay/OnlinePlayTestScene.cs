@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -20,25 +18,25 @@ namespace osu.Game.Tests.Visual.OnlinePlay
     /// <summary>
     /// A base test scene for all online play components and screens.
     /// </summary>
-    public abstract class OnlinePlayTestScene : ScreenTestScene, IOnlinePlayTestSceneDependencies
+    public abstract partial class OnlinePlayTestScene : ScreenTestScene, IOnlinePlayTestSceneDependencies
     {
-        public Bindable<Room> SelectedRoom => OnlinePlayDependencies?.SelectedRoom;
-        public IRoomManager RoomManager => OnlinePlayDependencies?.RoomManager;
-        public OngoingOperationTracker OngoingOperationTracker => OnlinePlayDependencies?.OngoingOperationTracker;
-        public OnlinePlayBeatmapAvailabilityTracker AvailabilityTracker => OnlinePlayDependencies?.AvailabilityTracker;
-        public TestUserLookupCache UserLookupCache => OnlinePlayDependencies?.UserLookupCache;
-        public BeatmapLookupCache BeatmapLookupCache => OnlinePlayDependencies?.BeatmapLookupCache;
+        public Bindable<Room> SelectedRoom => OnlinePlayDependencies.SelectedRoom;
+        public IRoomManager RoomManager => OnlinePlayDependencies.RoomManager;
+        public OngoingOperationTracker OngoingOperationTracker => OnlinePlayDependencies.OngoingOperationTracker;
+        public OnlinePlayBeatmapAvailabilityTracker AvailabilityTracker => OnlinePlayDependencies.AvailabilityTracker;
+        public TestUserLookupCache UserLookupCache => OnlinePlayDependencies.UserLookupCache;
+        public BeatmapLookupCache BeatmapLookupCache => OnlinePlayDependencies.BeatmapLookupCache;
 
         /// <summary>
         /// All dependencies required for online play components and screens.
         /// </summary>
-        protected OnlinePlayTestSceneDependencies OnlinePlayDependencies => dependencies?.OnlinePlayDependencies;
+        protected OnlinePlayTestSceneDependencies OnlinePlayDependencies => dependencies.OnlinePlayDependencies!;
 
         protected override Container<Drawable> Content => content;
 
         private readonly Container content;
         private readonly Container drawableDependenciesContainer;
-        private DelegatedDependencyContainer dependencies;
+        private DelegatedDependencyContainer dependencies = null!;
 
         protected OnlinePlayTestScene()
         {
@@ -50,10 +48,7 @@ namespace osu.Game.Tests.Visual.OnlinePlay
         }
 
         protected sealed override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
-        {
-            dependencies = new DelegatedDependencyContainer(base.CreateChildDependencies(parent));
-            return dependencies;
-        }
+            => dependencies = new DelegatedDependencyContainer(base.CreateChildDependencies(parent));
 
         public override void SetUpSteps()
         {
@@ -62,9 +57,9 @@ namespace osu.Game.Tests.Visual.OnlinePlay
             AddStep("setup dependencies", () =>
             {
                 // Reset the room dependencies to a fresh state.
-                drawableDependenciesContainer.Clear();
                 dependencies.OnlinePlayDependencies = CreateOnlinePlayDependencies();
-                drawableDependenciesContainer.AddRange(OnlinePlayDependencies.DrawableComponents);
+                drawableDependenciesContainer.Clear();
+                drawableDependenciesContainer.AddRange(dependencies.OnlinePlayDependencies.DrawableComponents);
 
                 var handler = OnlinePlayDependencies.RequestsHandler;
 
@@ -106,7 +101,7 @@ namespace osu.Game.Tests.Visual.OnlinePlay
             /// <summary>
             /// The online play dependencies.
             /// </summary>
-            public OnlinePlayTestSceneDependencies OnlinePlayDependencies { get; set; }
+            public OnlinePlayTestSceneDependencies? OnlinePlayDependencies { get; set; }
 
             private readonly IReadOnlyDependencyContainer parent;
             private readonly DependencyContainer injectableDependencies;
@@ -128,7 +123,7 @@ namespace osu.Game.Tests.Visual.OnlinePlay
                 => OnlinePlayDependencies?.Get(type, info) ?? parent.Get(type, info);
 
             public void Inject<T>(T instance)
-                where T : class
+                where T : class, IDependencyInjectionCandidate
                 => injectableDependencies.Inject(instance);
         }
     }

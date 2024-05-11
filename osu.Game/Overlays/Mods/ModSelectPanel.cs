@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
@@ -14,6 +15,7 @@ using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Framework.Utils;
 using osu.Game.Audio;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -24,7 +26,7 @@ using osuTK.Input;
 
 namespace osu.Game.Overlays.Mods
 {
-    public abstract class ModSelectPanel : OsuClickableContainer, IHasAccentColour
+    public abstract partial class ModSelectPanel : OsuClickableContainer, IHasAccentColour, IFilterable
     {
         public abstract BindableBool Active { get; }
 
@@ -44,6 +46,8 @@ namespace osu.Game.Overlays.Mods
 
         public const float CORNER_RADIUS = 7;
         public const float HEIGHT = 42;
+
+        public const double SAMPLE_PLAYBACK_DELAY = 30;
 
         protected virtual float IdleSwitchWidth => 14;
         protected virtual float ExpandedSwitchWidth => 30;
@@ -68,6 +72,8 @@ namespace osu.Game.Overlays.Mods
         private readonly Bindable<bool> samplePlaybackDisabled = new BindableBool();
         private Sample? sampleOff;
         private Sample? sampleOn;
+
+        private Bindable<double?> lastPlaybackTime = null!;
 
         protected ModSelectPanel()
         {
@@ -118,23 +124,23 @@ namespace osu.Game.Overlays.Mods
                                 Direction = FillDirection.Vertical,
                                 Children = new[]
                                 {
-                                    titleText = new OsuSpriteText
+                                    titleText = new TruncatingSpriteText
                                     {
                                         Font = OsuFont.TorusAlternate.With(size: 18, weight: FontWeight.SemiBold),
                                         RelativeSizeAxes = Axes.X,
-                                        Truncate = true,
                                         Shear = new Vector2(-ShearedOverlayContainer.SHEAR, 0),
                                         Margin = new MarginPadding
                                         {
                                             Left = -18 * ShearedOverlayContainer.SHEAR
-                                        }
+                                        },
+                                        ShowTooltip = false, // Tooltip is handled by `IncompatibilityDisplayingModPanel`.
                                     },
-                                    descriptionText = new OsuSpriteText
+                                    descriptionText = new TruncatingSpriteText
                                     {
                                         Font = OsuFont.Default.With(size: 12),
                                         RelativeSizeAxes = Axes.X,
-                                        Truncate = true,
-                                        Shear = new Vector2(-ShearedOverlayContainer.SHEAR, 0)
+                                        Shear = new Vector2(-ShearedOverlayContainer.SHEAR, 0),
+                                        ShowTooltip = false, // Tooltip is handled by `IncompatibilityDisplayingModPanel`.
                                     }
                                 }
                             }
@@ -163,13 +169,15 @@ namespace osu.Game.Overlays.Mods
         protected abstract void Deselect();
 
         [BackgroundDependencyLoader]
-        private void load(AudioManager audio, ISamplePlaybackDisabler? samplePlaybackDisabler)
+        private void load(AudioManager audio, SessionStatics statics, ISamplePlaybackDisabler? samplePlaybackDisabler)
         {
             sampleOn = audio.Samples.Get(@"UI/check-on");
             sampleOff = audio.Samples.Get(@"UI/check-off");
 
             if (samplePlaybackDisabler != null)
                 ((IBindable<bool>)samplePlaybackDisabled).BindTo(samplePlaybackDisabler.SamplePlaybackDisabled);
+
+            lastPlaybackTime = statics.GetBindable<double?>(Static.LastHoverSoundPlaybackTime);
         }
 
         protected sealed override HoverSounds CreateHoverSounds(HoverSampleSet sampleSet) => new HoverSounds(sampleSet);
@@ -192,10 +200,20 @@ namespace osu.Game.Overlays.Mods
             if (samplePlaybackDisabled.Value)
                 return;
 
-            if (Active.Value)
-                sampleOn?.Play();
-            else
-                sampleOff?.Play();
+            if (!IsPresent)
+                return;
+
+            bool enoughTimePassedSinceLastPlayback = !lastPlaybackTime.Value.HasValue || Time.Current - lastPlaybackTime.Value >= SAMPLE_PLAYBACK_DELAY;
+
+            if (enoughTimePassedSinceLastPlayback)
+            {
+                if (Active.Value)
+                    sampleOn?.Play();
+                else
+                    sampleOff?.Play();
+
+                lastPlaybackTime.Value = Time.Current;
+            }
         }
 
         protected override bool OnHover(HoverEvent e)
@@ -263,5 +281,28 @@ namespace osu.Game.Overlays.Mods
             TextBackground.FadeColour(foregroundColour, transitionDuration, Easing.OutQuint);
             TextFlow.FadeColour(textColour, transitionDuration, Easing.OutQuint);
         }
+
+        #region IFilterable
+
+        public abstract IEnumerable<LocalisableString> FilterTerms { get; }
+
+        private bool matchingFilter = true;
+
+        public virtual bool MatchingFilter
+        {
+            get => matchingFilter;
+            set
+            {
+                if (matchingFilter == value)
+                    return;
+
+                matchingFilter = value;
+                this.FadeTo(value ? 1 : 0);
+            }
+        }
+
+        public bool FilteringActive { set { } }
+
+        #endregion
     }
 }

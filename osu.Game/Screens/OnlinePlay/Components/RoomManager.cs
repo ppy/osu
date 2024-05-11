@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Development;
@@ -17,8 +18,9 @@ using osu.Game.Online.Rooms;
 
 namespace osu.Game.Screens.OnlinePlay.Components
 {
-    public class RoomManager : Component, IRoomManager
+    public partial class RoomManager : Component, IRoomManager
     {
+        [CanBeNull]
         public event Action RoomsUpdated;
 
         private readonly BindableList<Room> rooms = new BindableList<Room>();
@@ -98,7 +100,9 @@ namespace osu.Game.Screens.OnlinePlay.Components
             if (JoinedRoom.Value == null)
                 return;
 
-            api.Queue(new PartRoomRequest(joinedRoom.Value));
+            if (api.State.Value == APIState.Online)
+                api.Queue(new PartRoomRequest(joinedRoom.Value));
+
             joinedRoom.Value = null;
         }
 

@@ -1,7 +1,5 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -11,7 +9,7 @@ using osu.Game.Tournament.Screens.Gameplay.Components;
 
 namespace osu.Game.Tournament.Tests.Components
 {
-    public class TestSceneMatchScoreDisplay : TournamentTestScene
+    public partial class TestSceneMatchScoreDisplay : TournamentTestScene
     {
         [Cached(Type = typeof(MatchIPCInfo))]
         private MatchIPCInfo matchInfo = new MatchIPCInfo();

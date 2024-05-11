@@ -3,6 +3,7 @@
 
 #nullable disable
 
+using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -12,9 +13,9 @@ using osu.Game.Graphics;
 
 namespace osu.Game.Overlays.Toolbar
 {
-    public class ToolbarOverlayToggleButton : ToolbarButton
+    public partial class ToolbarOverlayToggleButton : ToolbarButton
     {
-        private readonly Box stateBackground;
+        private Box stateBackground;
 
         private OverlayContainer stateContainer;
 
@@ -39,19 +40,20 @@ namespace osu.Game.Overlays.Toolbar
                 {
                     TooltipMain = named.Title;
                     TooltipSub = named.Description;
-                    SetIcon(named.IconTexture);
+                    SetIcon(named.Icon);
                 }
             }
         }
 
-        public ToolbarOverlayToggleButton()
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
         {
-            Add(stateBackground = new Box
+            BackgroundContent.Add(stateBackground = new Box
             {
                 RelativeSizeAxes = Axes.Both,
-                Colour = OsuColour.Gray(150).Opacity(180),
+                Colour = colours.Carmine.Opacity(180),
                 Blending = BlendingParameters.Additive,
-                Depth = 2,
+                Depth = float.MaxValue,
                 Alpha = 0,
             });
 
@@ -63,11 +65,11 @@ namespace osu.Game.Overlays.Toolbar
             switch (state.NewValue)
             {
                 case Visibility.Hidden:
-                    stateBackground.FadeOut(200);
+                    stateBackground.FadeOut(200, Easing.OutQuint);
                     break;
 
                 case Visibility.Visible:
-                    stateBackground.FadeIn(200);
+                    stateBackground.FadeIn(200, Easing.OutQuint);
                     break;
             }
         }

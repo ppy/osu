@@ -15,7 +15,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.BeatmapSet.Scores
 {
-    public class DrawableTopScore : CompositeDrawable
+    public partial class DrawableTopScore : CompositeDrawable
     {
         private readonly Box background;
 
@@ -89,7 +89,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             background.Colour = colourProvider.Background4;
         }
 
-        private class AutoSizingGrid : GridContainer
+        private partial class AutoSizingGrid : GridContainer
         {
             public AutoSizingGrid()
             {

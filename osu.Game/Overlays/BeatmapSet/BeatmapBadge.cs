@@ -12,7 +12,7 @@ using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Overlays.BeatmapSet
 {
-    public abstract class BeatmapBadge : CompositeDrawable
+    public abstract partial class BeatmapBadge : CompositeDrawable
     {
         /// <summary>
         /// The text displayed on the badge's label.

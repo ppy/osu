@@ -1,4 +1,4 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 #nullable disable
@@ -9,7 +9,7 @@ using osu.Game.Beatmaps;
 
 namespace osu.Game.Graphics.Backgrounds
 {
-    public class BeatmapBackground : Background
+    public partial class BeatmapBackground : Background
     {
         public readonly WorkingBeatmap Beatmap;
 
@@ -24,7 +24,7 @@ namespace osu.Game.Graphics.Backgrounds
         [BackgroundDependencyLoader]
         private void load(LargeTextureStore textures)
         {
-            Sprite.Texture = Beatmap?.Background ?? textures.Get(fallbackTextureName);
+            Sprite.Texture = Beatmap?.GetBackground() ?? textures.Get(fallbackTextureName);
         }
 
         public override bool Equals(Background other)

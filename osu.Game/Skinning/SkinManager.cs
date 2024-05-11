@@ -18,7 +18,6 @@ using osu.Framework.Graphics.Rendering;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
 using osu.Framework.Platform;
-using osu.Framework.Testing;
 using osu.Framework.Threading;
 using osu.Framework.Utils;
 using osu.Game.Audio;
@@ -36,7 +35,6 @@ namespace osu.Game.Skinning
     /// This is also exposed and cached as <see cref="ISkinSource"/> to allow for any component to potentially have skinning support.
     /// For gameplay components, see <see cref="RulesetSkinProvidingContainer"/> which adds extra legacy and toggle logic that may affect the lookup process.
     /// </remarks>
-    [ExcludeFromDynamicCompile]
     public class SkinManager : ModelManager<SkinInfo>, ISkinSource, IStorageResourceProvider, IModelImporter<SkinInfo>
     {
         /// <summary>
@@ -58,11 +56,23 @@ namespace osu.Game.Skinning
 
         private readonly SkinImporter skinImporter;
 
+        private readonly LegacySkinExporter skinExporter;
+
         private readonly IResourceStore<byte[]> userFiles;
 
         private Skin argonSkin { get; }
 
         private Skin trianglesSkin { get; }
+
+        public override bool PauseImports
+        {
+            get => base.PauseImports;
+            set
+            {
+                base.PauseImports = value;
+                skinImporter.PauseImports = value;
+            }
+        }
 
         public SkinManager(Storage storage, RealmAccess realm, GameHost host, IResourceStore<byte[]> resources, AudioManager audio, Scheduler scheduler)
             : base(storage, realm)
@@ -84,6 +94,7 @@ namespace osu.Game.Skinning
                 DefaultClassicSkin = new DefaultLegacySkin(this),
                 trianglesSkin = new TrianglesSkin(this),
                 argonSkin = new ArgonSkin(this),
+                new ArgonProSkin(this),
             };
 
             // Ensure the default entries are present.
@@ -108,6 +119,11 @@ namespace osu.Game.Skinning
                     throw new InvalidOperationException($"Setting {nameof(CurrentSkin)}'s value directly is not supported. Use {nameof(CurrentSkinInfo)} instead.");
 
                 SourceChanged?.Invoke();
+            };
+
+            skinExporter = new LegacySkinExporter(storage)
+            {
+                PostNotification = obj => PostNotification?.Invoke(obj)
             };
         }
 
@@ -166,7 +182,10 @@ namespace osu.Game.Skinning
                     Name = NamingUtils.GetNextBestName(existingSkinNames, $@"{s.Name} (modified)")
                 };
 
-                var result = skinImporter.ImportModel(skinInfo);
+                var result = skinImporter.ImportModel(skinInfo, parameters: new ImportParameters
+                {
+                    ImportImmediately = true // to avoid possible deadlocks when editing skin during gameplay.
+                });
 
                 if (result != null)
                 {
@@ -181,12 +200,16 @@ namespace osu.Game.Skinning
             });
         }
 
-        public void Save(Skin skin)
+        /// <summary>
+        /// Save a skin, serialising any changes to skin layouts to relevant JSON structures.
+        /// </summary>
+        /// <returns>Whether any change actually occurred.</returns>
+        public bool Save(Skin skin)
         {
             if (!skin.SkinInfo.IsManaged)
                 throw new InvalidOperationException($"Attempting to save a skin which is not yet tracked. Call {nameof(EnsureMutableSkin)} first.");
 
-            skinImporter.Save(skin);
+            return skinImporter.Save(skin);
         }
 
         /// <summary>
@@ -201,7 +224,7 @@ namespace osu.Game.Skinning
 
         public event Action SourceChanged;
 
-        public Drawable GetDrawableComponent(ISkinComponent component) => lookupWithFallback(s => s.GetDrawableComponent(component));
+        public Drawable GetDrawableComponent(ISkinComponentLookup lookup) => lookupWithFallback(s => s.GetDrawableComponent(lookup));
 
         public Texture GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT) => lookupWithFallback(s => s.GetTexture(componentName, wrapModeS, wrapModeT));
 
@@ -241,13 +264,22 @@ namespace osu.Game.Skinning
         private T lookupWithFallback<T>(Func<ISkin, T> lookupFunction)
             where T : class
         {
-            foreach (var source in AllSources)
+            try
             {
-                if (lookupFunction(source) is T skinSourced)
-                    return skinSourced;
-            }
+                Skin.LogLookupDebug(this, lookupFunction, Skin.LookupDebugType.Enter);
 
-            return null;
+                foreach (var source in AllSources)
+                {
+                    if (lookupFunction(source) is T skinSourced)
+                        return skinSourced;
+                }
+
+                return null;
+            }
+            finally
+            {
+                Skin.LogLookupDebug(this, lookupFunction, Skin.LookupDebugType.Exit);
+            }
         }
 
         #region IResourceStorageProvider
@@ -270,15 +302,22 @@ namespace osu.Game.Skinning
 
         public Task Import(params string[] paths) => skinImporter.Import(paths);
 
-        public Task Import(params ImportTask[] tasks) => skinImporter.Import(tasks);
+        public Task Import(ImportTask[] imports, ImportParameters parameters = default) => skinImporter.Import(imports, parameters);
 
         public IEnumerable<string> HandledExtensions => skinImporter.HandledExtensions;
 
-        public Task<IEnumerable<Live<SkinInfo>>> Import(ProgressNotification notification, params ImportTask[] tasks) => skinImporter.Import(notification, tasks);
+        public Task<IEnumerable<Live<SkinInfo>>> Import(ProgressNotification notification, ImportTask[] tasks, ImportParameters parameters = default) =>
+            skinImporter.Import(notification, tasks, parameters);
 
-        public Task<Live<SkinInfo>> ImportAsUpdate(ProgressNotification notification, ImportTask task, SkinInfo original) => skinImporter.ImportAsUpdate(notification, task, original);
+        public Task<Live<SkinInfo>> ImportAsUpdate(ProgressNotification notification, ImportTask task, SkinInfo original) =>
+            skinImporter.ImportAsUpdate(notification, task, original);
 
-        public Task<Live<SkinInfo>> Import(ImportTask task, bool batchImport = false, CancellationToken cancellationToken = default) => skinImporter.Import(task, batchImport, cancellationToken);
+        public Task<Live<SkinInfo>> Import(ImportTask task, ImportParameters parameters = default, CancellationToken cancellationToken = default) =>
+            skinImporter.Import(task, parameters, cancellationToken);
+
+        public Task ExportCurrentSkin() => ExportSkin(CurrentSkinInfo.Value);
+
+        public Task ExportSkin(Live<SkinInfo> skin) => skinExporter.ExportAsync(skin);
 
         #endregion
 

@@ -1,12 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
-using osu.Game.Configuration;
-using osu.Game.Screens.Play.HUD;
-using osu.Game.Skinning;
+using osu.Framework.Platform;
 using osuTK;
 
 namespace osu.Game.Extensions
@@ -47,37 +43,21 @@ namespace osu.Game.Extensions
         /// <param name="delta">A delta in screen-space coordinates.</param>
         /// <returns>The delta vector in Parent's coordinates.</returns>
         public static Vector2 ScreenSpaceDeltaToParentSpace(this Drawable drawable, Vector2 delta) =>
-            drawable.Parent.ToLocalSpace(drawable.Parent.ToScreenSpace(Vector2.Zero) + delta);
+            drawable.Parent!.ToLocalSpace(drawable.Parent!.ToScreenSpace(Vector2.Zero) + delta);
 
-        public static SkinnableInfo CreateSkinnableInfo(this Drawable component) => new SkinnableInfo(component);
-
-        public static void ApplySkinnableInfo(this Drawable component, SkinnableInfo info)
+        /// <summary>
+        /// Some elements don't handle rewind correctly and fixing them is non-trivial.
+        /// In the future we need a better solution to this, but as a temporary work-around, give these components the game-wide
+        /// clock so they don't need to worry about rewind.
+        ///
+        /// This only works if input handling components handle OnPressed/OnReleased which results in a correct state while rewinding.
+        ///
+        /// This is kinda dodgy (and will cause weirdness when pausing gameplay) but is better than completely broken rewind.
+        /// </summary>
+        public static void ApplyGameWideClock(this Drawable drawable, GameHost host)
         {
-            // todo: can probably make this better via deserialisation directly using a common interface.
-            component.Position = info.Position;
-            component.Rotation = info.Rotation;
-            component.Scale = info.Scale;
-            component.Anchor = info.Anchor;
-            component.Origin = info.Origin;
-
-            if (component is ISkinnableDrawable skinnable)
-            {
-                skinnable.UsesFixedAnchor = info.UsesFixedAnchor;
-
-                foreach (var (_, property) in component.GetSettingsSourceProperties())
-                {
-                    if (!info.Settings.TryGetValue(property.Name.ToSnakeCase(), out object settingValue))
-                        continue;
-
-                    skinnable.CopyAdjustedSetting((IBindable)property.GetValue(component), settingValue);
-                }
-            }
-
-            if (component is Container container)
-            {
-                foreach (var child in info.Children)
-                    container.Add(child.CreateInstance());
-            }
+            drawable.Clock = host.UpdateThread.Clock;
+            drawable.ProcessCustomClock = false;
         }
     }
 }

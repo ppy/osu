@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -14,7 +12,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Default
 {
-    public class NumberPiece : Container
+    public partial class NumberPiece : Container
     {
         private readonly SkinnableSpriteText number;
 
@@ -41,7 +39,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
                         Colour = Color4.White.Opacity(0.5f),
                     },
                 },
-                number = new SkinnableSpriteText(new OsuSkinComponent(OsuSkinComponents.HitCircleText), _ => new OsuSpriteText
+                number = new SkinnableSpriteText(new OsuSkinComponentLookup(OsuSkinComponents.HitCircleText), _ => new OsuSpriteText
                 {
                     Font = OsuFont.Numeric.With(size: 40),
                     UseFullGlyphHeight = false,

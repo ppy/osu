@@ -1,35 +1,19 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">iPhoneSimulator</Platform>
-    <ProjectGuid>{7E408809-66AC-49D1-AF4D-98834F9B979A}</ProjectGuid>
     <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0-ios</TargetFramework>
+    <SupportedOSPlatformVersion>13.4</SupportedOSPlatformVersion>
     <RootNamespace>osu.Game.Rulesets.Taiko.Tests</RootNamespace>
     <AssemblyName>osu.Game.Rulesets.Taiko.Tests.iOS</AssemblyName>
   </PropertyGroup>
   <Import Project="..\osu.iOS.props" />
   <ItemGroup>
-    <None Include="Info.plist" />
-    <None Include="Entitlements.plist" />
-    <LinkDescription Include="..\osu.iOS\Linker.xml">
-      <Link>Linker.xml</Link>
-    </LinkDescription>
-    <Compile Include="Application.cs" />
-    <Compile Include="AppDelegate.cs" />
     <Compile Include="..\osu.Game.Rulesets.Taiko.Tests\**\*.cs" Exclude="**\obj\**">
       <Link>%(RecursiveDir)%(Filename)%(Extension)</Link>
     </Compile>
   </ItemGroup>
   <ItemGroup Label="Project References">
-    <ProjectReference Include="..\osu.Game\osu.Game.csproj">
-      <Project>{2A66DD92-ADB1-4994-89E2-C94E04ACDA0D}</Project>
-      <Name>osu.Game</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\osu.Game.Rulesets.Taiko\osu.Game.Rulesets.Taiko.csproj">
-      <Project>{F167E17A-7DE6-4AF5-B920-A5112296C695}</Project>
-      <Name>osu.Game.Rulesets.Taiko</Name>
-    </ProjectReference>
+    <ProjectReference Include="..\osu.Game\osu.Game.csproj" />
+    <ProjectReference Include="..\osu.Game.Rulesets.Taiko\osu.Game.Rulesets.Taiko.csproj" />
   </ItemGroup>
-  <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
 </Project>

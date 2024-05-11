@@ -15,7 +15,7 @@ using osu.Game.Screens.Play;
 namespace osu.Game.Tests.Visual.Gameplay
 {
     [Description("Player instantiated with a replay.")]
-    public class TestSceneReplay : TestSceneAllRulesetPlayers
+    public partial class TestSceneReplay : TestSceneAllRulesetPlayers
     {
         protected override Player CreatePlayer(Ruleset ruleset)
         {
@@ -27,11 +27,11 @@ namespace osu.Game.Tests.Visual.Gameplay
         protected override void AddCheckSteps()
         {
             AddUntilStep("score above zero", () => ((ScoreAccessibleReplayPlayer)Player).ScoreProcessor.TotalScore.Value > 0);
-            AddUntilStep("key counter counted keys", () => ((ScoreAccessibleReplayPlayer)Player).HUDOverlay.KeyCounter.Children.Any(kc => kc.CountPresses > 0));
+            AddUntilStep("key counter counted keys", () => ((ScoreAccessibleReplayPlayer)Player).HUDOverlay.InputCountController.Triggers.Any(kc => kc.ActivationCount.Value > 0));
             AddAssert("cannot fail", () => !((ScoreAccessibleReplayPlayer)Player).AllowFail);
         }
 
-        private class ScoreAccessibleReplayPlayer : ReplayPlayer
+        private partial class ScoreAccessibleReplayPlayer : ReplayPlayer
         {
             public new ScoreProcessor ScoreProcessor => base.ScoreProcessor;
             public new HUDOverlay HUDOverlay => base.HUDOverlay;

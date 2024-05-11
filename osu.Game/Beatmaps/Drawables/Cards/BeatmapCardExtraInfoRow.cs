@@ -10,7 +10,7 @@ using osuTK;
 
 namespace osu.Game.Beatmaps.Drawables.Cards
 {
-    public class BeatmapCardExtraInfoRow : CompositeDrawable
+    public partial class BeatmapCardExtraInfoRow : CompositeDrawable
     {
         [Resolved(CanBeNull = true)]
         private BeatmapCardContent? content { get; set; }

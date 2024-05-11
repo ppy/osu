@@ -29,26 +29,34 @@ namespace osu.Game.Online.API.Requests.Responses
         public DateTimeOffset JoinDate;
 
         [JsonProperty(@"username")]
-        public string Username { get; set; }
+        public string Username { get; set; } = string.Empty;
 
         [JsonProperty(@"previous_usernames")]
         public string[] PreviousUsernames;
 
-        private CountryCode? countryCode;
+        [JsonProperty(@"rank_highest")]
+        [CanBeNull]
+        public UserRankHighest RankHighest;
+
+        public class UserRankHighest
+        {
+            [JsonProperty(@"rank")]
+            public int Rank;
+
+            [JsonProperty(@"updated_at")]
+            public DateTimeOffset UpdatedAt;
+        }
+
+        [JsonProperty(@"country_code")]
+        private string countryCodeString;
 
         public CountryCode CountryCode
         {
-            get => countryCode ??= (Enum.TryParse(country?.Code, out CountryCode result) ? result : default);
-            set => countryCode = value;
+            get => Enum.TryParse(countryCodeString, out CountryCode result) ? result : CountryCode.Unknown;
+            set => countryCodeString = value.ToString();
         }
 
-#pragma warning disable 649
-        [CanBeNull]
-        [JsonProperty(@"country")]
-        private Country country;
-#pragma warning restore 649
-
-        public readonly Bindable<UserStatus> Status = new Bindable<UserStatus>();
+        public readonly Bindable<UserStatus?> Status = new Bindable<UserStatus?>();
 
         public readonly Bindable<UserActivity> Activity = new Bindable<UserActivity>();
 
@@ -164,6 +172,9 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty(@"guest_beatmapset_count")]
         public int GuestBeatmapsetCount;
 
+        [JsonProperty(@"nominated_beatmapset_count")]
+        public int NominatedBeatmapsetCount;
+
         [JsonProperty(@"scores_best_count")]
         public int ScoresBestCount;
 
@@ -182,7 +193,7 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty(@"playstyle")]
         private string[] playStyle
         {
-            set => PlayStyles = value?.Select(str => Enum.Parse(typeof(APIPlayStyle), str, true)).Cast<APIPlayStyle>().ToArray();
+            set => PlayStyles = value?.Select(str => Enum.Parse<APIPlayStyle>(str, true)).ToArray();
         }
 
         public APIPlayStyle[] PlayStyles;
@@ -231,6 +242,9 @@ namespace osu.Game.Online.API.Requests.Responses
             set => Statistics.RankHistory = value;
         }
 
+        [JsonProperty(@"active_tournament_banners")]
+        public TournamentBanner[] TournamentBanners;
+
         [JsonProperty("badges")]
         public Badge[] Badges;
 
@@ -251,6 +265,9 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty("statistics_rulesets")]
         [CanBeNull]
         public Dictionary<string, UserStatistics> RulesetsStatistics { get; set; }
+
+        [JsonProperty("groups")]
+        public APIUserGroup[] Groups;
 
         public override string ToString() => Username;
 

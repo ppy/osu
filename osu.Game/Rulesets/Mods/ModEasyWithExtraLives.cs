@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
+using System.Linq;
 using Humanizer;
 using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
@@ -19,6 +21,7 @@ namespace osu.Game.Rulesets.Mods
         };
 
         public override string SettingDescription => Retries.IsDefault ? string.Empty : $"{"lives".ToQuantity(Retries.Value)}";
+        public override Type[] IncompatibleMods => base.IncompatibleMods.Append(typeof(ModAccuracyChallenge)).ToArray();
 
         private int retries;
 

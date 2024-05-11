@@ -1,17 +1,19 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
+using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.Taiko.Objects.Drawables;
 using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Taiko.Skinning.Default
 {
-    public class TickPiece : CompositeDrawable
+    public partial class TickPiece : CompositeDrawable
     {
         /// <summary>
         /// Any tick that is not the first for a drumroll is not filled, but is instead displayed
@@ -24,19 +26,9 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Default
         /// </summary>
         private const float tick_size = 0.35f;
 
-        private bool filled;
-
-        public bool Filled
-        {
-            get => filled;
-            set
-            {
-                filled = value;
-                fillBox.Alpha = filled ? 1 : 0;
-            }
-        }
-
         private readonly Box fillBox;
+
+        private Bindable<bool> isFirstTick = null!;
 
         public TickPiece()
         {
@@ -63,6 +55,20 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Default
                     }
                 }
             };
+        }
+
+        [Resolved]
+        private DrawableHitObject drawableHitObject { get; set; } = null!;
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            if (drawableHitObject is DrawableDrumRollTick drumRollTick)
+            {
+                isFirstTick = drumRollTick.IsFirstTick.GetBoundCopy();
+                isFirstTick.BindValueChanged(first => fillBox.Alpha = first.NewValue ? 1 : 0, true);
+            }
         }
     }
 }

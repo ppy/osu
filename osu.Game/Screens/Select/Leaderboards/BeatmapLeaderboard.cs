@@ -21,7 +21,7 @@ using Realms;
 
 namespace osu.Game.Screens.Select.Leaderboards
 {
-    public class BeatmapLeaderboard : Leaderboard<BeatmapLeaderboardScope, ScoreInfo>
+    public partial class BeatmapLeaderboard : Leaderboard<BeatmapLeaderboardScope, ScoreInfo>
     {
         public Action<ScoreInfo>? ScoreSelected;
 
@@ -68,9 +68,6 @@ namespace osu.Game.Screens.Select.Leaderboards
         }
 
         [Resolved]
-        private ScoreManager scoreManager { get; set; } = null!;
-
-        [Resolved]
         private IBindable<RulesetInfo> ruleset { get; set; } = null!;
 
         [Resolved]
@@ -104,6 +101,9 @@ namespace osu.Game.Screens.Select.Leaderboards
 
         protected override APIRequest? FetchScores(CancellationToken cancellationToken)
         {
+            scoreRetrievalRequest?.Cancel();
+            scoreRetrievalRequest = null;
+
             var fetchBeatmapInfo = BeatmapInfo;
 
             if (fetchBeatmapInfo == null)
@@ -152,14 +152,21 @@ namespace osu.Game.Screens.Select.Leaderboards
             else if (filterMods)
                 requestMods = mods.Value;
 
-            scoreRetrievalRequest = new GetScoresRequest(fetchBeatmapInfo, fetchRuleset, Scope, requestMods);
+            var newRequest = new GetScoresRequest(fetchBeatmapInfo, fetchRuleset, Scope, requestMods);
+            newRequest.Success += response => Schedule(() =>
+            {
+                // Request may have changed since fetch request.
+                // Can't rely on request cancellation due to Schedule inside SetScores so let's play it safe.
+                if (!newRequest.Equals(scoreRetrievalRequest))
+                    return;
 
-            scoreRetrievalRequest.Success += response => SetScores(
-                scoreManager.OrderByTotalScore(response.Scores.Select(s => s.ToScoreInfo(rulesets, fetchBeatmapInfo))),
-                response.UserScore?.CreateScoreInfo(rulesets, fetchBeatmapInfo)
-            );
+                SetScores(
+                    response.Scores.Select(s => s.ToScoreInfo(rulesets, fetchBeatmapInfo)).OrderByTotalScore(),
+                    response.UserScore?.CreateScoreInfo(rulesets, fetchBeatmapInfo)
+                );
+            });
 
-            return scoreRetrievalRequest;
+            return scoreRetrievalRequest = newRequest;
         }
 
         protected override LeaderboardScore CreateDrawableScore(ScoreInfo model, int index) => new LeaderboardScore(model, index, IsOnlineScope)
@@ -181,11 +188,12 @@ namespace osu.Game.Screens.Select.Leaderboards
 
             scoreSubscription = realm.RegisterForNotifications(r =>
                 r.All<ScoreInfo>().Filter($"{nameof(ScoreInfo.BeatmapInfo)}.{nameof(BeatmapInfo.ID)} == $0"
+                                          + $" AND {nameof(ScoreInfo.BeatmapInfo)}.{nameof(BeatmapInfo.Hash)} == {nameof(ScoreInfo.BeatmapHash)}"
                                           + $" AND {nameof(ScoreInfo.Ruleset)}.{nameof(RulesetInfo.ShortName)} == $1"
                                           + $" AND {nameof(ScoreInfo.DeletePending)} == false"
                     , beatmapInfo.ID, ruleset.Value.ShortName), localScoresChanged);
 
-            void localScoresChanged(IRealmCollection<ScoreInfo> sender, ChangeSet? changes, Exception exception)
+            void localScoresChanged(IRealmCollection<ScoreInfo> sender, ChangeSet? changes)
             {
                 if (cancellationToken.IsCancellationRequested)
                     return;
@@ -204,13 +212,14 @@ namespace osu.Game.Screens.Select.Leaderboards
                 }
                 else if (filterMods)
                 {
-                    // otherwise find all the scores that have *any* of the currently selected mods (similar to how web applies mod filters)
-                    // we're creating and using a string list representation of selected mods so that it can be translated into the DB query itself
-                    var selectedMods = mods.Value.Select(m => m.Acronym);
-                    scores = scores.Where(s => s.Mods.Any(m => selectedMods.Contains(m.Acronym)));
+                    // otherwise find all the scores that have all of the currently selected mods (similar to how web applies mod filters)
+                    // we're creating and using a string HashSet representation of selected mods so that it can be translated into the DB query itself
+                    var selectedMods = mods.Value.Select(m => m.Acronym).ToHashSet();
+
+                    scores = scores.Where(s => selectedMods.SetEquals(s.Mods.Select(m => m.Acronym)));
                 }
 
-                scores = scoreManager.OrderByTotalScore(scores.Detach());
+                scores = scores.Detach().OrderByTotalScore();
 
                 SetScores(scores);
             }

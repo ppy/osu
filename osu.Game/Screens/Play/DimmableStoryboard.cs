@@ -17,7 +17,7 @@ namespace osu.Game.Screens.Play
     /// <summary>
     /// A container that handles <see cref="Storyboard"/> loading, as well as applies user-specified visual settings to it.
     /// </summary>
-    public class DimmableStoryboard : UserDimContainer
+    public partial class DimmableStoryboard : UserDimContainer
     {
         public Container OverlayLayerContainer { get; private set; }
 

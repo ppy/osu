@@ -1,15 +1,12 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Animations;
 using osu.Game.Rulesets.Judgements;
-using osu.Game.Rulesets.Mania.Judgements;
 using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Skinning;
@@ -17,13 +14,13 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Mania.Skinning.Legacy
 {
-    public class LegacyHitExplosion : LegacyManiaColumnElement, IHitExplosion
+    public partial class LegacyHitExplosion : LegacyManiaColumnElement, IHitExplosion
     {
         public const double FADE_IN_DURATION = 80;
 
         private readonly IBindable<ScrollingDirection> direction = new Bindable<ScrollingDirection>();
 
-        private Drawable explosion;
+        private Drawable? explosion;
 
         public LegacyHitExplosion()
         {
@@ -71,9 +68,6 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
 
         public void Animate(JudgementResult result)
         {
-            if (result.Judgement is HoldNoteTickJudgement)
-                return;
-
             (explosion as IFramedAnimation)?.GotoFrame(0);
 
             explosion?.FadeInFromZero(FADE_IN_DURATION)

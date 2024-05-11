@@ -20,7 +20,7 @@ using osu.Game.Tests.Beatmaps.IO;
 
 namespace osu.Game.Tests.Visual.Editing
 {
-    public class TestSceneDifficultySwitching : EditorTestScene
+    public partial class TestSceneDifficultySwitching : EditorTestScene
     {
         protected override Ruleset CreateEditorRuleset() => new OsuRuleset();
 
@@ -104,7 +104,7 @@ namespace osu.Game.Tests.Visual.Editing
             if (sameRuleset)
             {
                 AddUntilStep("prompt for save dialog shown", () => DialogOverlay.CurrentDialog is PromptForSaveDialog);
-                AddStep("discard changes", () => ((PromptForSaveDialog)DialogOverlay.CurrentDialog).PerformOkAction());
+                AddStep("discard changes", () => ((PromptForSaveDialog)DialogOverlay.CurrentDialog)?.PerformOkAction());
             }
 
             // ensure editor loader didn't resume.

@@ -26,7 +26,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.Ranking.Statistics
 {
-    public class PerformanceBreakdownChart : Container
+    public partial class PerformanceBreakdownChart : Container
     {
         private readonly ScoreInfo score;
         private readonly IBeatmap playableBeatmap;
@@ -38,9 +38,6 @@ namespace osu.Game.Screens.Ranking.Statistics
         private OsuSpriteText maximumPerformance;
 
         private readonly CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
-
-        [Resolved]
-        private ScorePerformanceCache performanceCache { get; set; }
 
         [Resolved]
         private BeatmapDifficultyCache difficultyCache { get; set; }
@@ -97,7 +94,7 @@ namespace osu.Game.Screens.Ranking.Statistics
                                     {
                                         Origin = Anchor.CentreLeft,
                                         Anchor = Anchor.CentreLeft,
-                                        Font = OsuFont.GetFont(weight: FontWeight.Regular, size: 18),
+                                        Font = OsuFont.GetFont(weight: FontWeight.Regular, size: StatisticItem.FONT_SIZE),
                                         Text = "Achieved PP",
                                         Colour = Color4Extensions.FromHex("#66FFCC")
                                     },
@@ -105,7 +102,7 @@ namespace osu.Game.Screens.Ranking.Statistics
                                     {
                                         Origin = Anchor.CentreRight,
                                         Anchor = Anchor.CentreRight,
-                                        Font = OsuFont.GetFont(weight: FontWeight.SemiBold, size: 18),
+                                        Font = OsuFont.GetFont(weight: FontWeight.SemiBold, size: StatisticItem.FONT_SIZE),
                                         Colour = Color4Extensions.FromHex("#66FFCC")
                                     }
                                 },
@@ -115,7 +112,7 @@ namespace osu.Game.Screens.Ranking.Statistics
                                     {
                                         Origin = Anchor.CentreLeft,
                                         Anchor = Anchor.CentreLeft,
-                                        Font = OsuFont.GetFont(weight: FontWeight.Regular, size: 18),
+                                        Font = OsuFont.GetFont(weight: FontWeight.Regular, size: StatisticItem.FONT_SIZE),
                                         Text = "Maximum",
                                         Colour = OsuColour.Gray(0.7f)
                                     },
@@ -123,7 +120,7 @@ namespace osu.Game.Screens.Ranking.Statistics
                                     {
                                         Origin = Anchor.CentreLeft,
                                         Anchor = Anchor.CentreLeft,
-                                        Font = OsuFont.GetFont(weight: FontWeight.Regular, size: 18),
+                                        Font = OsuFont.GetFont(weight: FontWeight.Regular, size: StatisticItem.FONT_SIZE),
                                         Colour = OsuColour.Gray(0.7f)
                                     }
                                 }
@@ -148,7 +145,7 @@ namespace osu.Game.Screens.Ranking.Statistics
 
             spinner.Show();
 
-            new PerformanceBreakdownCalculator(playableBeatmap, difficultyCache, performanceCache)
+            new PerformanceBreakdownCalculator(playableBeatmap, difficultyCache)
                 .CalculateAsync(score, cancellationTokenSource.Token)
                 .ContinueWith(t => Schedule(() => setPerformanceValue(t.GetResultSafely())));
         }
@@ -208,7 +205,7 @@ namespace osu.Game.Screens.Ranking.Statistics
                 {
                     Origin = Anchor.CentreLeft,
                     Anchor = Anchor.CentreLeft,
-                    Font = OsuFont.GetFont(weight: FontWeight.Regular),
+                    Font = OsuFont.GetFont(weight: FontWeight.Regular, size: StatisticItem.FONT_SIZE),
                     Text = attribute.DisplayName,
                     Colour = Colour4.White
                 },
@@ -233,7 +230,7 @@ namespace osu.Game.Screens.Ranking.Statistics
                 {
                     Origin = Anchor.CentreRight,
                     Anchor = Anchor.CentreRight,
-                    Font = OsuFont.GetFont(weight: FontWeight.SemiBold),
+                    Font = OsuFont.GetFont(weight: FontWeight.SemiBold, size: StatisticItem.FONT_SIZE),
                     Text = percentage.ToLocalisableString("0%"),
                     Colour = Colour4.White
                 }

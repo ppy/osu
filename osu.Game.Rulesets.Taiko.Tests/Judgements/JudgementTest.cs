@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
@@ -10,6 +11,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Replays;
 using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko.Objects;
@@ -19,7 +21,7 @@ using osu.Game.Tests.Visual;
 
 namespace osu.Game.Rulesets.Taiko.Tests.Judgements
 {
-    public class JudgementTest : RateAdjustedBeatmapTestScene
+    public partial class JudgementTest : RateAdjustedBeatmapTestScene
     {
         private ScoreAccessibleReplayPlayer currentPlayer = null!;
         protected List<JudgementResult> JudgementResults { get; private set; } = null!;
@@ -36,11 +38,12 @@ namespace osu.Game.Rulesets.Taiko.Tests.Judgements
                 () => Is.EqualTo(expectedResult));
         }
 
-        protected void PerformTest(List<ReplayFrame> frames, Beatmap<TaikoHitObject>? beatmap = null)
+        protected void PerformTest(List<ReplayFrame> frames, Beatmap<TaikoHitObject>? beatmap = null, Mod[]? mods = null)
         {
             AddStep("load player", () =>
             {
                 Beatmap.Value = CreateWorkingBeatmap(beatmap);
+                SelectedMods.Value = mods ?? Array.Empty<Mod>();
 
                 var p = new ScoreAccessibleReplayPlayer(new Score { Replay = new Replay { Frames = frames } });
 
@@ -77,7 +80,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Judgements
             return beatmap;
         }
 
-        private class ScoreAccessibleReplayPlayer : ReplayPlayer
+        private partial class ScoreAccessibleReplayPlayer : ReplayPlayer
         {
             public new ScoreProcessor ScoreProcessor => base.ScoreProcessor;
 

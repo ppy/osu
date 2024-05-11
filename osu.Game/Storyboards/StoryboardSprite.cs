@@ -1,13 +1,11 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using JetBrains.Annotations;
 using osu.Framework.Graphics;
+using osu.Game.Storyboards.Commands;
 using osu.Game.Storyboards.Drawables;
 using osuTK;
 
@@ -15,8 +13,8 @@ namespace osu.Game.Storyboards
 {
     public class StoryboardSprite : IStoryboardElementWithDuration
     {
-        private readonly List<CommandLoop> loops = new List<CommandLoop>();
-        private readonly List<CommandTrigger> triggers = new List<CommandTrigger>();
+        private readonly List<StoryboardLoopingGroup> loopingGroups = new List<StoryboardLoopingGroup>();
+        private readonly List<StoryboardTriggerGroup> triggerGroups = new List<StoryboardTriggerGroup>();
 
         public string Path { get; }
         public bool IsDrawable => HasCommands;
@@ -24,7 +22,7 @@ namespace osu.Game.Storyboards
         public Anchor Origin;
         public Vector2 InitialPosition;
 
-        public readonly CommandTimelineGroup TimelineGroup = new CommandTimelineGroup();
+        public readonly StoryboardCommandGroup Commands = new StoryboardCommandGroup();
 
         public double StartTime
         {
@@ -37,18 +35,18 @@ namespace osu.Game.Storyboards
                 // anything before that point can be ignored (the sprite is not visible after all).
                 var alphaCommands = new List<(double startTime, bool isZeroStartValue)>();
 
-                var command = TimelineGroup.Alpha.Commands.FirstOrDefault();
+                var command = Commands.Alpha.FirstOrDefault();
                 if (command != null) alphaCommands.Add((command.StartTime, command.StartValue == 0));
 
-                foreach (var loop in loops)
+                foreach (var loop in loopingGroups)
                 {
-                    command = loop.Alpha.Commands.FirstOrDefault();
-                    if (command != null) alphaCommands.Add((command.StartTime + loop.LoopStartTime, command.StartValue == 0));
+                    command = loop.Alpha.FirstOrDefault();
+                    if (command != null) alphaCommands.Add((command.StartTime, command.StartValue == 0));
                 }
 
                 if (alphaCommands.Count > 0)
                 {
-                    var firstAlpha = alphaCommands.OrderBy(t => t.startTime).First();
+                    var firstAlpha = alphaCommands.MinBy(t => t.startTime);
 
                     if (firstAlpha.isZeroStartValue)
                         return firstAlpha.startTime;
@@ -64,8 +62,8 @@ namespace osu.Game.Storyboards
             {
                 // If we got to this point, either no alpha commands were present, or the earliest had a non-zero start value.
                 // The sprite's StartTime will be determined by the earliest command, regardless of type.
-                double earliestStartTime = TimelineGroup.StartTime;
-                foreach (var l in loops)
+                double earliestStartTime = Commands.StartTime;
+                foreach (var l in loopingGroups)
                     earliestStartTime = Math.Min(earliestStartTime, l.StartTime);
                 return earliestStartTime;
             }
@@ -75,20 +73,29 @@ namespace osu.Game.Storyboards
         {
             get
             {
-                double latestEndTime = TimelineGroup.EndTime;
+                double latestEndTime = Commands.EndTime;
 
-                foreach (var l in loops)
+                foreach (var l in loopingGroups)
                     latestEndTime = Math.Max(latestEndTime, l.EndTime);
 
                 return latestEndTime;
             }
         }
 
-        public bool HasCommands => TimelineGroup.HasCommands || loops.Any(l => l.HasCommands);
+        public double EndTimeForDisplay
+        {
+            get
+            {
+                double latestEndTime = Commands.EndTime;
 
-        private delegate void DrawablePropertyInitializer<in T>(Drawable drawable, T value);
+                foreach (var l in loopingGroups)
+                    latestEndTime = Math.Max(latestEndTime, l.StartTime + l.Duration * l.TotalIterations);
 
-        private delegate void DrawableTransformer<in T>(Drawable drawable, T value, double duration, Easing easing);
+                return latestEndTime;
+            }
+        }
+
+        public bool HasCommands => Commands.HasCommands || loopingGroups.Any(l => l.HasCommands);
 
         public StoryboardSprite(string path, Anchor origin, Vector2 initialPosition)
         {
@@ -97,127 +104,39 @@ namespace osu.Game.Storyboards
             InitialPosition = initialPosition;
         }
 
-        public CommandLoop AddLoop(double startTime, int repeatCount)
+        public virtual Drawable CreateDrawable() => new DrawableStoryboardSprite(this);
+
+        public StoryboardLoopingGroup AddLoopingGroup(double loopStartTime, int repeatCount)
         {
-            var loop = new CommandLoop(startTime, repeatCount);
-            loops.Add(loop);
+            var loop = new StoryboardLoopingGroup(loopStartTime, repeatCount);
+            loopingGroups.Add(loop);
             return loop;
         }
 
-        public CommandTrigger AddTrigger(string triggerName, double startTime, double endTime, int groupNumber)
+        public StoryboardTriggerGroup AddTriggerGroup(string triggerName, double startTime, double endTime, int groupNumber)
         {
-            var trigger = new CommandTrigger(triggerName, startTime, endTime, groupNumber);
-            triggers.Add(trigger);
+            var trigger = new StoryboardTriggerGroup(triggerName, startTime, endTime, groupNumber);
+            triggerGroups.Add(trigger);
             return trigger;
         }
 
-        public virtual Drawable CreateDrawable()
-            => new DrawableStoryboardSprite(this);
-
-        public void ApplyTransforms(Drawable drawable, IEnumerable<Tuple<CommandTimelineGroup, double>> triggeredGroups = null)
+        public void ApplyTransforms<TDrawable>(TDrawable drawable)
+            where TDrawable : Drawable, IFlippable, IVectorScalable
         {
-            // For performance reasons, we need to apply the commands in order by start time. Not doing so will cause many functions to be interleaved, resulting in O(n^2) complexity.
-            // To achieve this, commands are "generated" as pairs of (command, initFunc, transformFunc) and batched into a contiguous list
-            // The list is then stably-sorted (to preserve command order), and applied to the drawable sequentially.
+            HashSet<string> appliedProperties = new HashSet<string>();
 
-            List<IGeneratedCommand> generated = new List<IGeneratedCommand>();
+            // For performance reasons, we need to apply the commands in chronological order.
+            // Not doing so will cause many functions to be interleaved, resulting in O(n^2) complexity.
+            IEnumerable<IStoryboardCommand> commands = Commands.AllCommands;
+            commands = commands.Concat(loopingGroups.SelectMany(l => l.AllCommands));
 
-            generateCommands(generated, getCommands(g => g.X, triggeredGroups), (d, value) => d.X = value, (d, value, duration, easing) => d.MoveToX(value, duration, easing));
-            generateCommands(generated, getCommands(g => g.Y, triggeredGroups), (d, value) => d.Y = value, (d, value, duration, easing) => d.MoveToY(value, duration, easing));
-            generateCommands(generated, getCommands(g => g.Scale, triggeredGroups), (d, value) => d.Scale = new Vector2(value), (d, value, duration, easing) => d.ScaleTo(value, duration, easing));
-            generateCommands(generated, getCommands(g => g.Rotation, triggeredGroups), (d, value) => d.Rotation = value, (d, value, duration, easing) => d.RotateTo(value, duration, easing));
-            generateCommands(generated, getCommands(g => g.Colour, triggeredGroups), (d, value) => d.Colour = value, (d, value, duration, easing) => d.FadeColour(value, duration, easing));
-            generateCommands(generated, getCommands(g => g.Alpha, triggeredGroups), (d, value) => d.Alpha = value, (d, value, duration, easing) => d.FadeTo(value, duration, easing));
-            generateCommands(generated, getCommands(g => g.BlendingParameters, triggeredGroups), (d, value) => d.Blending = value, (d, value, duration, _) => d.TransformBlendingMode(value, duration),
-                false);
-
-            if (drawable is IVectorScalable vectorScalable)
+            foreach (var command in commands.OrderBy(c => c.StartTime))
             {
-                generateCommands(generated, getCommands(g => g.VectorScale, triggeredGroups), (_, value) => vectorScalable.VectorScale = value,
-                    (_, value, duration, easing) => vectorScalable.VectorScaleTo(value, duration, easing));
-            }
-
-            if (drawable is IFlippable flippable)
-            {
-                generateCommands(generated, getCommands(g => g.FlipH, triggeredGroups), (_, value) => flippable.FlipH = value, (_, value, duration, _) => flippable.TransformFlipH(value, duration),
-                    false);
-                generateCommands(generated, getCommands(g => g.FlipV, triggeredGroups), (_, value) => flippable.FlipV = value, (_, value, duration, _) => flippable.TransformFlipV(value, duration),
-                    false);
-            }
-
-            foreach (var command in generated.OrderBy(g => g.StartTime))
-                command.ApplyTo(drawable);
-        }
-
-        private void generateCommands<T>(List<IGeneratedCommand> resultList, IEnumerable<CommandTimeline<T>.TypedCommand> commands,
-                                         DrawablePropertyInitializer<T> initializeProperty, DrawableTransformer<T> transform, bool alwaysInitialize = true)
-        {
-            bool initialized = false;
-
-            foreach (var command in commands)
-            {
-                DrawablePropertyInitializer<T> initFunc = null;
-
-                if (!initialized)
-                {
-                    if (alwaysInitialize || command.StartTime == command.EndTime)
-                        initFunc = initializeProperty;
-                    initialized = true;
-                }
-
-                resultList.Add(new GeneratedCommand<T>(command, initFunc, transform));
-            }
-        }
-
-        private IEnumerable<CommandTimeline<T>.TypedCommand> getCommands<T>(CommandTimelineSelector<T> timelineSelector, IEnumerable<Tuple<CommandTimelineGroup, double>> triggeredGroups)
-        {
-            var commands = TimelineGroup.GetCommands(timelineSelector);
-            foreach (var loop in loops)
-                commands = commands.Concat(loop.GetCommands(timelineSelector));
-
-            if (triggeredGroups != null)
-            {
-                foreach (var pair in triggeredGroups)
-                    commands = commands.Concat(pair.Item1.GetCommands(timelineSelector, pair.Item2));
-            }
-
-            return commands;
-        }
-
-        public override string ToString()
-            => $"{Path}, {Origin}, {InitialPosition}";
-
-        private interface IGeneratedCommand
-        {
-            double StartTime { get; }
-
-            void ApplyTo(Drawable drawable);
-        }
-
-        private readonly struct GeneratedCommand<T> : IGeneratedCommand
-        {
-            public double StartTime => command.StartTime;
-
-            private readonly DrawablePropertyInitializer<T> initializeProperty;
-            private readonly DrawableTransformer<T> transform;
-            private readonly CommandTimeline<T>.TypedCommand command;
-
-            public GeneratedCommand([NotNull] CommandTimeline<T>.TypedCommand command, [CanBeNull] DrawablePropertyInitializer<T> initializeProperty, [NotNull] DrawableTransformer<T> transform)
-            {
-                this.command = command;
-                this.initializeProperty = initializeProperty;
-                this.transform = transform;
-            }
-
-            public void ApplyTo(Drawable drawable)
-            {
-                initializeProperty?.Invoke(drawable, command.StartValue);
+                if (appliedProperties.Add(command.PropertyName))
+                    command.ApplyInitialValue(drawable);
 
                 using (drawable.BeginAbsoluteSequence(command.StartTime))
-                {
-                    transform(drawable, command.StartValue, 0, Easing.None);
-                    transform(drawable, command.EndValue, command.Duration, command.Easing);
-                }
+                    command.ApplyTransforms(drawable);
             }
         }
     }

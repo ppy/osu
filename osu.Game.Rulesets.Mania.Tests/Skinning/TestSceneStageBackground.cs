@@ -1,7 +1,5 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -10,12 +8,12 @@ using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Mania.Tests.Skinning
 {
-    public class TestSceneStageBackground : ManiaSkinnableTestScene
+    public partial class TestSceneStageBackground : ManiaSkinnableTestScene
     {
         [BackgroundDependencyLoader]
         private void load()
         {
-            SetContents(_ => new SkinnableDrawable(new ManiaSkinComponent(ManiaSkinComponents.StageBackground),
+            SetContents(_ => new SkinnableDrawable(new ManiaSkinComponentLookup(ManiaSkinComponents.StageBackground),
                 _ => new DefaultStageBackground())
             {
                 Anchor = Anchor.Centre,

@@ -16,7 +16,13 @@ namespace osu.Game.Users
         [JsonProperty("description")]
         public string Description;
 
-        [JsonProperty("image_url")]
+        [JsonProperty("image@2x_url")]
         public string ImageUrl;
+
+        [JsonProperty("image_url")]
+        public string ImageUrlLowRes;
+
+        [JsonProperty("url")]
+        public string Url;
     }
 }

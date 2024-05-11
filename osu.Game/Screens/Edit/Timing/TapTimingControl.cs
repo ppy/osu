@@ -18,7 +18,7 @@ using osuTK;
 
 namespace osu.Game.Screens.Edit.Timing
 {
-    public class TapTimingControl : CompositeDrawable
+    public partial class TapTimingControl : CompositeDrawable
     {
         [Resolved]
         private EditorClock editorClock { get; set; } = null!;
@@ -65,35 +65,28 @@ namespace osu.Game.Screens.Edit.Timing
                     {
                         new Drawable[]
                         {
-                            new Container
+                            new GridContainer
                             {
                                 RelativeSizeAxes = Axes.Both,
                                 Padding = new MarginPadding(padding),
-                                Children = new Drawable[]
+                                ColumnDimensions = new[]
                                 {
-                                    new GridContainer
+                                    new Dimension(GridSizeMode.AutoSize),
+                                    new Dimension()
+                                },
+                                Content = new[]
+                                {
+                                    new Drawable[]
                                     {
-                                        RelativeSizeAxes = Axes.Both,
-                                        ColumnDimensions = new[]
+                                        metronome = new MetronomeDisplay
                                         {
-                                            new Dimension(GridSizeMode.AutoSize),
-                                            new Dimension()
+                                            Anchor = Anchor.CentreLeft,
+                                            Origin = Anchor.CentreLeft,
                                         },
-                                        Content = new[]
-                                        {
-                                            new Drawable[]
-                                            {
-                                                metronome = new MetronomeDisplay
-                                                {
-                                                    Anchor = Anchor.CentreLeft,
-                                                    Origin = Anchor.CentreLeft,
-                                                },
-                                                new WaveformComparisonDisplay(),
-                                            }
-                                        },
+                                        new WaveformComparisonDisplay()
                                     }
-                                }
-                            },
+                                },
+                            }
                         },
                         new Drawable[]
                         {
@@ -183,18 +176,27 @@ namespace osu.Game.Screens.Edit.Timing
 
         private void start()
         {
+            if (selectedGroup.Value == null)
+                return;
+
             editorClock.Seek(selectedGroup.Value.Time);
             editorClock.Start();
         }
 
         private void reset()
         {
+            if (selectedGroup.Value == null)
+                return;
+
             editorClock.Stop();
             editorClock.Seek(selectedGroup.Value.Time);
         }
 
         private void adjustOffset(double adjust)
         {
+            if (selectedGroup.Value == null)
+                return;
+
             bool wasAtStart = editorClock.CurrentTimeAccurate == selectedGroup.Value.Time;
 
             // VERY TEMPORARY
@@ -216,7 +218,7 @@ namespace osu.Game.Screens.Edit.Timing
 
         private void adjustBpm(double adjust)
         {
-            var timing = selectedGroup.Value.ControlPoints.OfType<TimingControlPoint>().FirstOrDefault();
+            var timing = selectedGroup.Value?.ControlPoints.OfType<TimingControlPoint>().FirstOrDefault();
 
             if (timing == null)
                 return;
@@ -224,7 +226,7 @@ namespace osu.Game.Screens.Edit.Timing
             timing.BeatLength = 60000 / (timing.BPM + adjust);
         }
 
-        private class InlineButton : OsuButton
+        private partial class InlineButton : OsuButton
         {
             private readonly IconUsage icon;
             private readonly Anchor anchor;

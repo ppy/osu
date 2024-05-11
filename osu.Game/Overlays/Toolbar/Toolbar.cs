@@ -21,7 +21,7 @@ using osu.Game.Input.Bindings;
 
 namespace osu.Game.Overlays.Toolbar
 {
-    public class Toolbar : OverlayContainer, IKeyBindingHandler<GlobalAction>
+    public partial class Toolbar : OverlayContainer, IKeyBindingHandler<GlobalAction>
     {
         public const float HEIGHT = 40;
         public const float TOOLTIP_HEIGHT = 30;
@@ -42,7 +42,7 @@ namespace osu.Game.Overlays.Toolbar
         protected readonly IBindable<OverlayActivation> OverlayActivationMode = new Bindable<OverlayActivation>(OverlayActivation.All);
 
         // Toolbar and its components need keyboard input even when hidden.
-        public override bool PropagateNonPositionalInputSubTree => true;
+        public override bool PropagateNonPositionalInputSubTree => OverlayActivationMode.Value != OverlayActivation.Disabled;
 
         public Toolbar()
         {
@@ -65,9 +65,12 @@ namespace osu.Game.Overlays.Toolbar
         [BackgroundDependencyLoader(true)]
         private void load(OsuGame osuGame)
         {
+            ToolbarBackground background;
+            HoverInterceptor interceptor;
+
             Children = new Drawable[]
             {
-                new ToolbarBackground(),
+                background = new ToolbarBackground(),
                 new GridContainer
                 {
                     RelativeSizeAxes = Axes.Both,
@@ -141,6 +144,8 @@ namespace osu.Game.Overlays.Toolbar
                                 Name = "Right buttons",
                                 RelativeSizeAxes = Axes.Y,
                                 AutoSizeAxes = Axes.X,
+                                Anchor = Anchor.TopRight,
+                                Origin = Anchor.TopRight,
                                 Children = new Drawable[]
                                 {
                                     new Box
@@ -159,11 +164,11 @@ namespace osu.Game.Overlays.Toolbar
                                         {
                                             new ToolbarNewsButton(),
                                             new ToolbarChangelogButton(),
+                                            new ToolbarWikiButton(),
                                             new ToolbarRankingsButton(),
                                             new ToolbarBeatmapListingButton(),
                                             new ToolbarChatButton(),
                                             new ToolbarSocialButton(),
-                                            new ToolbarWikiButton(),
                                             new ToolbarMusicButton(),
                                             //new ToolbarButton
                                             //{
@@ -178,8 +183,14 @@ namespace osu.Game.Overlays.Toolbar
                             },
                         },
                     }
+                },
+                interceptor = new HoverInterceptor
+                {
+                    RelativeSizeAxes = Axes.Both
                 }
             };
+
+            ((IBindable<bool>)background.ShowGradient).BindTo(interceptor.ReceivedHover);
 
             if (osuGame != null)
                 OverlayActivationMode.BindTo(osuGame.OverlayActivationMode);
@@ -192,8 +203,10 @@ namespace osu.Game.Overlays.Toolbar
             rulesetSelector.Current.BindTo(ruleset);
         }
 
-        public class ToolbarBackground : Container
+        public partial class ToolbarBackground : Container
         {
+            public Bindable<bool> ShowGradient { get; } = new BindableBool();
+
             private readonly Box gradientBackground;
 
             public ToolbarBackground()
@@ -211,22 +224,50 @@ namespace osu.Game.Overlays.Toolbar
                         RelativeSizeAxes = Axes.X,
                         Anchor = Anchor.BottomLeft,
                         Alpha = 0,
-                        Height = 100,
+                        Height = 80,
                         Colour = ColourInfo.GradientVertical(
-                            OsuColour.Gray(0).Opacity(0.9f), OsuColour.Gray(0).Opacity(0)),
+                            OsuColour.Gray(0f).Opacity(0.7f), OsuColour.Gray(0).Opacity(0)),
                     },
                 };
             }
 
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+
+                ShowGradient.BindValueChanged(_ => updateState(), true);
+            }
+
+            private void updateState()
+            {
+                if (ShowGradient.Value)
+                    gradientBackground.FadeIn(2500, Easing.OutQuint);
+                else
+                    gradientBackground.FadeOut(200, Easing.OutQuint);
+            }
+        }
+
+        /// <summary>
+        /// Whenever the mouse cursor is within the bounds of the toolbar, we want the background gradient to show, for toolbar button descriptions to be legible.
+        /// Unfortunately we also need to ensure that the toolbar buttons handle hover, to prevent the possibility of multiple descriptions being shown
+        /// due to hover events passing through multiple buttons.
+        /// This drawable is a workaround, that when placed front-most in the toolbar, allows to see whether hover events have been propagated through it without handling them.
+        /// </summary>
+        private partial class HoverInterceptor : Drawable
+        {
+            public IBindable<bool> ReceivedHover => receivedHover;
+            private readonly Bindable<bool> receivedHover = new BindableBool();
+
             protected override bool OnHover(HoverEvent e)
             {
-                gradientBackground.FadeIn(transition_time, Easing.OutQuint);
-                return true;
+                receivedHover.Value = true;
+                return base.OnHover(e);
             }
 
             protected override void OnHoverLost(HoverLostEvent e)
             {
-                gradientBackground.FadeOut(transition_time, Easing.OutQuint);
+                receivedHover.Value = false;
+                base.OnHoverLost(e);
             }
         }
 

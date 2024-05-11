@@ -41,6 +41,10 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty(@"difficulty_rating")]
         public double StarRating { get; set; }
 
+        public int EndTimeObjectCount => SliderCount + SpinnerCount;
+
+        public int TotalObjectCount => CircleCount + SliderCount + SpinnerCount;
+
         [JsonProperty(@"drain")]
         public float DrainRate { get; set; }
 
@@ -62,6 +66,19 @@ namespace osu.Game.Online.API.Requests.Responses
             get => TimeSpan.FromMilliseconds(Length).TotalSeconds;
             set => Length = TimeSpan.FromSeconds(value).TotalMilliseconds;
         }
+
+        [JsonIgnore]
+        public double HitLength { get; set; }
+
+        [JsonProperty(@"hit_length")]
+        private double hitLengthInSeconds
+        {
+            get => TimeSpan.FromMilliseconds(HitLength).TotalSeconds;
+            set => HitLength = TimeSpan.FromSeconds(value).TotalMilliseconds;
+        }
+
+        [JsonProperty(@"convert")]
+        public bool Convert { get; set; }
 
         [JsonProperty(@"count_circles")]
         public int CircleCount { get; set; }
@@ -95,7 +112,7 @@ namespace osu.Game.Online.API.Requests.Responses
             DrainRate = DrainRate,
             CircleSize = CircleSize,
             ApproachRate = ApproachRate,
-            OverallDifficulty = OverallDifficulty,
+            OverallDifficulty = OverallDifficulty
         };
 
         IBeatmapSetInfo? IBeatmapInfo.BeatmapSet => BeatmapSet;
@@ -143,7 +160,7 @@ namespace osu.Game.Online.API.Requests.Responses
 
             public bool Equals(IRulesetInfo? other) => other is APIRuleset r && this.MatchesOnlineID(r);
 
-            public int CompareTo(IRulesetInfo other)
+            public int CompareTo(IRulesetInfo? other)
             {
                 if (!(other is APIRuleset ruleset))
                     throw new ArgumentException($@"Object is not of type {nameof(APIRuleset)}.", nameof(other));

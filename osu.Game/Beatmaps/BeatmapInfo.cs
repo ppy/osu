@@ -6,7 +6,6 @@ using System.Diagnostics;
 using System.Linq;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
-using osu.Framework.Testing;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Collections;
 using osu.Game.Database;
@@ -27,7 +26,6 @@ namespace osu.Game.Beatmaps
     /// <remarks>
     /// There are some legacy fields in this model which are not persisted to realm. These are isolated in a code region within the class and should eventually be migrated to `Beatmap`.
     /// </remarks>
-    [ExcludeFromDynamicCompile]
     [Serializable]
     [MapTo("Beatmap")]
     public class BeatmapInfo : RealmObject, IHasGuidPrimaryKey, IBeatmapInfo, IEquatable<BeatmapInfo>
@@ -122,6 +120,10 @@ namespace osu.Game.Beatmaps
         [JsonIgnore]
         public bool Hidden { get; set; }
 
+        public int EndTimeObjectCount { get; set; } = -1;
+
+        public int TotalObjectCount { get; set; } = -1;
+
         /// <summary>
         /// Reset any fetched online linking information (and history).
         /// </summary>
@@ -167,11 +169,16 @@ namespace osu.Game.Beatmaps
         /// </remarks>
         public double DistanceSpacing { get; set; } = 1.0;
 
-        public int BeatDivisor { get; set; }
+        public int BeatDivisor { get; set; } = 4;
 
         public int GridSize { get; set; }
 
         public double TimelineZoom { get; set; } = 1.0;
+
+        /// <summary>
+        /// The time in milliseconds when last exiting the editor with this beatmap loaded.
+        /// </summary>
+        public double? EditorTimestamp { get; set; }
 
         [Ignored]
         public CountdownType Countdown { get; set; } = CountdownType.Normal;
@@ -231,20 +238,28 @@ namespace osu.Game.Beatmaps
             }
         }
 
+        /// <summary>
+        /// Local scores are retained separate from a beatmap's lifetime, matched via <see cref="ScoreInfo.BeatmapHash"/>.
+        /// Therefore we need to detach / reattach scores when a beatmap is edited or imported.
+        /// </summary>
+        /// <param name="realm">A realm instance in an active write transaction.</param>
+        public void UpdateLocalScores(Realm realm)
+        {
+            // first disassociate any scores which are already attached and no longer valid.
+            foreach (var score in Scores)
+                score.BeatmapInfo = null;
+
+            // then attach any scores which match the new hash.
+            foreach (var score in realm.All<ScoreInfo>().Where(s => s.BeatmapHash == Hash))
+                score.BeatmapInfo = this;
+        }
+
         IBeatmapMetadataInfo IBeatmapInfo.Metadata => Metadata;
         IBeatmapSetInfo? IBeatmapInfo.BeatmapSet => BeatmapSet;
         IRulesetInfo IBeatmapInfo.Ruleset => Ruleset;
         IBeatmapDifficultyInfo IBeatmapInfo.Difficulty => Difficulty;
 
         #region Compatibility properties
-
-        [Ignored]
-        [Obsolete("Use BeatmapInfo.Difficulty instead.")] // can be removed 20220719
-        public BeatmapDifficulty BaseDifficulty
-        {
-            get => Difficulty;
-            set => Difficulty = value;
-        }
 
         [Ignored]
         public string? Path => File?.Filename;

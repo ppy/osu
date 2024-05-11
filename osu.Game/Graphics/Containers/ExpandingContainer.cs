@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -14,7 +12,7 @@ namespace osu.Game.Graphics.Containers
     /// <summary>
     /// Represents a <see cref="Container"/> with the ability to expand/contract on hover.
     /// </summary>
-    public class ExpandingContainer : Container, IExpandingContainer
+    public partial class ExpandingContainer : Container, IExpandingContainer
     {
         private readonly float contractedWidth;
         private readonly float expandedWidth;
@@ -25,6 +23,8 @@ namespace osu.Game.Graphics.Containers
         /// Delay before the container switches to expanded state from hover.
         /// </summary>
         protected virtual double HoverExpansionDelay => 0;
+
+        protected virtual bool ExpandOnHover => true;
 
         protected override Container<Drawable> Content => FillFlow;
 
@@ -53,7 +53,7 @@ namespace osu.Game.Graphics.Containers
             };
         }
 
-        private ScheduledDelegate hoverExpandEvent;
+        private ScheduledDelegate? hoverExpandEvent;
 
         protected override void LoadComplete()
         {
@@ -93,6 +93,9 @@ namespace osu.Game.Graphics.Containers
 
         private void updateHoverExpansion()
         {
+            if (!ExpandOnHover)
+                return;
+
             hoverExpandEvent?.Cancel();
 
             if (IsHovered && !Expanded.Value)

@@ -1,22 +1,23 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
-using System;
+using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.IEnumerableExtensions;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Taiko.Beatmaps;
 using osu.Game.Rulesets.Taiko.UI;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Tests.Visual;
+using osuTK;
 
 namespace osu.Game.Rulesets.Taiko.Tests.Skinning
 {
-    public class TestSceneTaikoPlayfield : TaikoSkinnableTestScene
+    public partial class TestSceneTaikoPlayfield : TaikoSkinnableTestScene
     {
         [Cached(typeof(IScrollingInfo))]
         private ScrollingTestContainer.TestScrollingInfo info = new ScrollingTestContainer.TestScrollingInfo
@@ -25,11 +26,10 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
             TimeRange = { Value = 5000 },
         };
 
-        public TestSceneTaikoPlayfield()
+        [SetUpSteps]
+        public void SetUpSteps()
         {
             TaikoBeatmap beatmap;
-            bool kiai = false;
-
             AddStep("set beatmap", () =>
             {
                 Beatmap.Value = CreateWorkingBeatmap(beatmap = new TaikoBeatmap());
@@ -39,14 +39,46 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
                 Beatmap.Value.Track.Start();
             });
 
-            AddStep("Load playfield", () => SetContents(_ => new TaikoPlayfield
+            AddStep("Load playfield", () => SetContents(_ => new Container
             {
                 Anchor = Anchor.CentreLeft,
                 Origin = Anchor.CentreLeft,
-                Height = 0.6f,
+                RelativeSizeAxes = Axes.Both,
+                Size = new Vector2(2f, 1f),
+                Scale = new Vector2(0.5f),
+                Child = new TaikoPlayfieldAdjustmentContainer { Child = new TaikoPlayfield() },
             }));
+        }
 
-            AddRepeatStep("change height", () => this.ChildrenOfType<TaikoPlayfield>().ForEach(p => p.Height = Math.Max(0.2f, (p.Height + 0.2f) % 1f)), 50);
+        [Test]
+        public void TestBasic()
+        {
+            AddStep("do nothing", () => { });
+        }
+
+        [Test]
+        public void TestHeightChanges()
+        {
+            int value = 0;
+
+            AddRepeatStep("change height", () =>
+            {
+                value = (value + 1) % 5;
+
+                this.ChildrenOfType<TaikoPlayfieldAdjustmentContainer>().ForEach(p =>
+                {
+                    var parent = (Container)p.Parent.AsNonNull();
+                    parent.Scale = new Vector2(0.5f + 0.1f * value);
+                    parent.Width = 1f / parent.Scale.X;
+                    parent.Height = 0.5f / parent.Scale.Y;
+                });
+            }, 50);
+        }
+
+        [Test]
+        public void TestKiai()
+        {
+            bool kiai = false;
 
             AddStep("Toggle kiai", () =>
             {

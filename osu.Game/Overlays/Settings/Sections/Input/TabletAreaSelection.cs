@@ -11,8 +11,8 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Input.Events;
 using osu.Framework.Input.Handlers.Tablet;
-using osu.Framework.Utils;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osuTK;
@@ -20,7 +20,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Settings.Sections.Input
 {
-    public class TabletAreaSelection : CompositeDrawable
+    public partial class TabletAreaSelection : CompositeDrawable
     {
         public bool IsWithinBounds { get; private set; }
 
@@ -66,7 +66,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                         RelativeSizeAxes = Axes.Both,
                         Colour = colour.Gray1,
                     },
-                    usableAreaContainer = new Container
+                    usableAreaContainer = new UsableAreaContainer(handler)
                     {
                         Origin = Anchor.Centre,
                         Children = new Drawable[]
@@ -125,11 +125,11 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             {
                 usableAreaContainer.ResizeTo(val.NewValue, 100, Easing.OutQuint);
 
-                int x = (int)val.NewValue.X;
-                int y = (int)val.NewValue.Y;
+                int x = (int)Math.Round(val.NewValue.X);
+                int y = (int)Math.Round(val.NewValue.Y);
                 int commonDivider = greatestCommonDivider(x, y);
 
-                usableAreaText.Text = $"{(float)x / commonDivider}:{(float)y / commonDivider}";
+                usableAreaText.Text = $"{x / commonDivider}:{y / commonDivider}";
                 checkBounds();
             }, true);
 
@@ -195,7 +195,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             var matrix = Matrix3.Identity;
 
             MatrixExtensions.TranslateFromLeft(ref matrix, offset);
-            MatrixExtensions.RotateFromLeft(ref matrix, MathUtils.DegreesToRadians(rotation.Value));
+            MatrixExtensions.RotateFromLeft(ref matrix, float.DegreesToRadians(rotation.Value));
 
             usableAreaQuad *= matrix;
 
@@ -223,6 +223,30 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             float adjust = MathF.Max(fitX, fitY);
 
             tabletContainer.Scale = new Vector2(1 / adjust);
+        }
+    }
+
+    public partial class UsableAreaContainer : Container
+    {
+        private readonly Bindable<Vector2> areaOffset;
+
+        public UsableAreaContainer(ITabletHandler tabletHandler)
+        {
+            areaOffset = tabletHandler.AreaOffset.GetBoundCopy();
+        }
+
+        protected override bool OnDragStart(DragStartEvent e) => true;
+
+        protected override void OnDrag(DragEvent e)
+        {
+            var newPos = Position + e.Delta;
+            this.MoveTo(Vector2.Clamp(newPos, Vector2.Zero, Parent!.Size));
+        }
+
+        protected override void OnDragEnd(DragEndEvent e)
+        {
+            areaOffset.Value = Position;
+            base.OnDragEnd(e);
         }
     }
 }

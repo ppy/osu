@@ -1,12 +1,12 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Textures;
 using osu.Framework.Graphics.UserInterface;
-using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
@@ -14,28 +14,68 @@ using osuTK;
 
 namespace osu.Game.Screens.Edit.Components.Menus
 {
-    public class EditorMenuBar : OsuMenu
+    public partial class EditorMenuBar : OsuMenu
     {
+        private const float heading_area = 114;
+
         public EditorMenuBar()
             : base(Direction.Horizontal, true)
         {
             RelativeSizeAxes = Axes.X;
 
             MaskingContainer.CornerRadius = 0;
-            ItemsContainer.Padding = new MarginPadding { Left = 100 };
+            ItemsContainer.Padding = new MarginPadding();
+
+            ContentContainer.Margin = new MarginPadding { Left = heading_area };
+            ContentContainer.Masking = true;
         }
 
         [BackgroundDependencyLoader]
-        private void load(OverlayColourProvider colourProvider)
+        private void load(OverlayColourProvider colourProvider, TextureStore textures)
         {
             BackgroundColour = colourProvider.Background3;
+
+            TextFlowContainer text;
+
+            AddRangeInternal(new[]
+            {
+                new Container
+                {
+                    RelativeSizeAxes = Axes.Y,
+                    Width = heading_area,
+                    Padding = new MarginPadding(8),
+                    Children = new Drawable[]
+                    {
+                        new SpriteIcon
+                        {
+                            Size = new Vector2(26),
+                            Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.CentreLeft,
+                            Icon = OsuIcon.EditCircle,
+                        },
+                        text = new TextFlowContainer
+                        {
+                            Anchor = Anchor.CentreRight,
+                            Origin = Anchor.CentreRight,
+                            AutoSizeAxes = Axes.Both,
+                        }
+                    }
+                },
+            });
+
+            text.AddText(@"osu!", t => t.Font = OsuFont.TorusAlternate);
+            text.AddText(@"editor", t =>
+            {
+                t.Font = OsuFont.TorusAlternate;
+                t.Colour = colourProvider.Highlight1;
+            });
         }
 
         protected override Framework.Graphics.UserInterface.Menu CreateSubMenu() => new SubMenu();
 
         protected override DrawableMenuItem CreateDrawableMenuItem(MenuItem item) => new DrawableEditorBarMenuItem(item);
 
-        private class DrawableEditorBarMenuItem : DrawableOsuMenuItem
+        private partial class DrawableEditorBarMenuItem : DrawableOsuMenuItem
         {
             public DrawableEditorBarMenuItem(MenuItem item)
                 : base(item)
@@ -77,7 +117,7 @@ namespace osu.Game.Screens.Edit.Components.Menus
 
             protected override DrawableOsuMenuItem.TextContainer CreateTextContainer() => new TextContainer();
 
-            private new class TextContainer : DrawableOsuMenuItem.TextContainer
+            private new partial class TextContainer : DrawableOsuMenuItem.TextContainer
             {
                 public TextContainer()
                 {
@@ -87,7 +127,7 @@ namespace osu.Game.Screens.Edit.Components.Menus
             }
         }
 
-        private class SubMenu : OsuMenu
+        private partial class SubMenu : OsuMenu
         {
             public SubMenu()
                 : base(Direction.Vertical)
@@ -109,7 +149,7 @@ namespace osu.Game.Screens.Edit.Components.Menus
             {
                 switch (item)
                 {
-                    case EditorMenuItemSpacer spacer:
+                    case OsuMenuItemSpacer spacer:
                         return new DrawableSpacer(spacer);
 
                     case StatefulMenuItem stateful:
@@ -120,7 +160,7 @@ namespace osu.Game.Screens.Edit.Components.Menus
                 }
             }
 
-            private class EditorStatefulMenuItem : DrawableStatefulMenuItem
+            private partial class EditorStatefulMenuItem : DrawableStatefulMenuItem
             {
                 public EditorStatefulMenuItem(StatefulMenuItem item)
                     : base(item)
@@ -137,7 +177,7 @@ namespace osu.Game.Screens.Edit.Components.Menus
                 }
             }
 
-            private class EditorMenuItem : DrawableOsuMenuItem
+            private partial class EditorMenuItem : DrawableOsuMenuItem
             {
                 public EditorMenuItem(MenuItem item)
                     : base(item)
@@ -152,19 +192,6 @@ namespace osu.Game.Screens.Edit.Components.Menus
 
                     Foreground.Padding = new MarginPadding { Vertical = 2 };
                 }
-            }
-
-            private class DrawableSpacer : DrawableOsuMenuItem
-            {
-                public DrawableSpacer(MenuItem item)
-                    : base(item)
-                {
-                    Scale = new Vector2(1, 0.3f);
-                }
-
-                protected override bool OnHover(HoverEvent e) => true;
-
-                protected override bool OnClick(ClickEvent e) => true;
             }
         }
     }

@@ -4,9 +4,12 @@
 #nullable disable
 
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Utils;
+using osu.Game.Configuration;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Skinning.Default;
@@ -17,7 +20,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Edit.Blueprints.HitCircles.Components
 {
-    public class HitCircleOverlapMarker : BlueprintPiece<HitCircle>
+    public partial class HitCircleOverlapMarker : BlueprintPiece<HitCircle>
     {
         /// <summary>
         /// Hit objects are intentionally made to fade out at a constant slower rate than in gameplay.
@@ -27,29 +30,43 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.HitCircles.Components
 
         private readonly RingPiece ring;
 
+        private readonly Container content;
+
         [Resolved]
         private EditorClock editorClock { get; set; }
+
+        private Bindable<bool> showHitMarkers;
 
         public HitCircleOverlapMarker()
         {
             Origin = Anchor.Centre;
 
-            Size = new Vector2(OsuHitObject.OBJECT_RADIUS * 2);
+            Size = OsuHitObject.OBJECT_DIMENSIONS;
 
-            InternalChildren = new Drawable[]
+            InternalChild = content = new Container
             {
-                new Circle
+                RelativeSizeAxes = Axes.Both,
+                Children = new Drawable[]
                 {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = Color4.White,
-                },
-                ring = new RingPiece
-                {
-                    BorderThickness = 4,
+                    new Circle
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        RelativeSizeAxes = Axes.Both,
+                        Colour = Color4.White,
+                    },
+                    ring = new RingPiece
+                    {
+                        BorderThickness = 4,
+                    }
                 }
             };
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(OsuConfigManager config)
+        {
+            showHitMarkers = config.GetBindable<bool>(OsuSetting.EditorShowHitMarkers);
         }
 
         [Resolved]
@@ -61,28 +78,34 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.HitCircles.Components
 
             Scale = new Vector2(hitObject.Scale);
 
-            if (hitObject is IHasComboInformation combo)
-                ring.BorderColour = combo.GetComboColour(skin);
-
             double editorTime = editorClock.CurrentTime;
             double hitObjectTime = hitObject.StartTime;
             bool hasReachedObject = editorTime >= hitObjectTime;
 
-            if (hasReachedObject)
+            if (hasReachedObject && showHitMarkers.Value)
             {
                 float alpha = Interpolation.ValueAt(editorTime, 0, 1f, hitObjectTime, hitObjectTime + FADE_OUT_EXTENSION, Easing.In);
                 float ringScale = MathHelper.Clamp(Interpolation.ValueAt(editorTime, 0, 1f, hitObjectTime, hitObjectTime + FADE_OUT_EXTENSION / 2, Easing.OutQuint), 0, 1);
 
                 ring.Scale = new Vector2(1 + 0.1f * ringScale);
-                Alpha = 0.9f * (1 - alpha);
+                content.Alpha = 0.9f * (1 - alpha);
+
+                // TODO: should only update colour on skin/combo/object change.
+                if (hitObject is IHasComboInformation combo && content.Alpha > 0)
+                    ring.BorderColour = combo.GetComboColour(skin);
             }
             else
-                Alpha = 0;
+                content.Alpha = 0;
+        }
+
+        public override void Show()
+        {
+            // intentional no op so SelectionBlueprint Selection/Deselection logic doesn't touch us.
         }
 
         public override void Hide()
         {
-            // intentional no op so we are not hidden when not selected.
+            // intentional no op so SelectionBlueprint Selection/Deselection logic doesn't touch us.
         }
     }
 }

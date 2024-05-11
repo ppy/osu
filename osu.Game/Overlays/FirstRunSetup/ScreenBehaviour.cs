@@ -19,7 +19,7 @@ using osu.Game.Overlays.Settings.Sections;
 namespace osu.Game.Overlays.FirstRunSetup
 {
     [LocalisableDescription(typeof(FirstRunSetupOverlayStrings), nameof(FirstRunSetupOverlayStrings.Behaviour))]
-    public class ScreenBehaviour : FirstRunSetupScreen
+    public partial class ScreenBehaviour : FirstRunSetupScreen
     {
         private SearchContainer<SettingsSection> searchContainer;
 
@@ -65,7 +65,7 @@ namespace osu.Game.Overlays.FirstRunSetup
                             {
                                 Anchor = Anchor.TopRight,
                                 Origin = Anchor.TopRight,
-                                BackgroundColour = colours.Pink3,
+                                BackgroundColour = colours.DangerousButtonColour,
                                 Text = FirstRunSetupOverlayStrings.ClassicDefaults,
                                 RelativeSizeAxes = Axes.X,
                                 Action = applyClassic

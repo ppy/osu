@@ -20,7 +20,7 @@ using osuTK.Graphics;
 namespace osu.Game.Tests.Visual.Editing
 {
     [TestFixture]
-    public class TestSceneWaveform : OsuTestScene
+    public partial class TestSceneWaveform : OsuTestScene
     {
         private IWorkingBeatmap waveformBeatmap;
 
@@ -104,7 +104,7 @@ namespace osu.Game.Tests.Visual.Editing
             AddUntilStep("wait for load", () => graph.Loaded.IsSet);
         }
 
-        public class TestWaveformGraph : WaveformGraph
+        public partial class TestWaveformGraph : WaveformGraph
         {
             public readonly ManualResetEventSlim Loaded = new ManualResetEventSlim();
 

@@ -5,7 +5,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Audio.Track;
@@ -26,7 +25,7 @@ using osuTK.Graphics;
 namespace osu.Game.Tests.Visual.UserInterface
 {
     [TestFixture]
-    public class TestSceneBeatSyncedContainer : OsuTestScene
+    public partial class TestSceneBeatSyncedContainer : OsuTestScene
     {
         private TestBeatSyncedContainer beatContainer;
 
@@ -171,7 +170,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddAssert("effect has kiai", () => actualEffectPoint != null && ((EffectControlPoint)actualEffectPoint).KiaiMode);
         }
 
-        private class TestBeatSyncedContainer : BeatSyncedContainer
+        private partial class TestBeatSyncedContainer : BeatSyncedContainer
         {
             private const int flash_layer_height = 150;
 
@@ -283,8 +282,6 @@ namespace osu.Game.Tests.Visual.UserInterface
 
                 if (ReferenceEquals(timingPoints[^1], current))
                 {
-                    Debug.Assert(BeatSyncSource.Clock != null);
-
                     return (int)Math.Ceiling((BeatSyncSource.Clock.CurrentTime - current.Time) / current.BeatLength);
                 }
 
@@ -294,8 +291,6 @@ namespace osu.Game.Tests.Visual.UserInterface
             protected override void Update()
             {
                 base.Update();
-
-                Debug.Assert(BeatSyncSource.Clock != null);
 
                 timeUntilNextBeat.Value = TimeUntilNextBeat;
                 timeSinceLastBeat.Value = TimeSinceLastBeat;
@@ -321,7 +316,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             }
         }
 
-        private class InfoString : FillFlowContainer
+        private partial class InfoString : FillFlowContainer
         {
             private const int text_size = 20;
             private const int margin = 7;

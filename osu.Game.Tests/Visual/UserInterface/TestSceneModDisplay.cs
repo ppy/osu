@@ -1,7 +1,5 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using NUnit.Framework;
 using osu.Framework.Graphics;
@@ -11,7 +9,7 @@ using osu.Game.Screens.Play.HUD;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public class TestSceneModDisplay : OsuTestScene
+    public partial class TestSceneModDisplay : OsuTestScene
     {
         [Test]
         public void TestMode([Values] ExpansionMode mode)

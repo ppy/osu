@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics;
@@ -11,7 +9,7 @@ using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Graphics.UserInterface.PageSelector
 {
-    public class PageSelector : CompositeDrawable
+    public partial class PageSelector : CompositeDrawable
     {
         public readonly BindableInt CurrentPage = new BindableInt { MinValue = 0, };
 

@@ -7,12 +7,13 @@ using System;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
+using osu.Game.Graphics;
 using osu.Game.Localisation;
 using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Overlays.News
 {
-    public class NewsHeader : BreadcrumbControlOverlayHeader
+    public partial class NewsHeader : BreadcrumbControlOverlayHeader
     {
         public static LocalisableString FrontPageString => NewsStrings.IndexTitleInfo;
 
@@ -62,13 +63,13 @@ namespace osu.Game.Overlays.News
 
         protected override OverlayTitle CreateTitle() => new NewsHeaderTitle();
 
-        private class NewsHeaderTitle : OverlayTitle
+        private partial class NewsHeaderTitle : OverlayTitle
         {
             public NewsHeaderTitle()
             {
                 Title = PageTitleStrings.MainNewsControllerDefault;
                 Description = NamedOverlayComponentStrings.NewsDescription;
-                IconTexture = "Icons/Hexacons/news";
+                Icon = OsuIcon.News;
             }
         }
     }

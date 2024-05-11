@@ -8,11 +8,17 @@ using osu.Framework.Bindables;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class ShearedToggleButton : ShearedButton
+    public partial class ShearedToggleButton : ShearedButton
     {
         private Sample? sampleClick;
         private Sample? sampleOff;
         private Sample? sampleOn;
+
+        /// <summary>
+        /// Sheared toggle buttons by default play two samples when toggled: a click and a toggle (on/off).
+        /// Sometimes this might be too much. Setting this to <c>false</c> will silence the toggle sound.
+        /// </summary>
+        protected virtual bool PlayToggleSamples => true;
 
         /// <summary>
         /// Whether this button is currently toggled to an active state.
@@ -68,10 +74,13 @@ namespace osu.Game.Graphics.UserInterface
         {
             sampleClick?.Play();
 
-            if (Active.Value)
-                sampleOn?.Play();
-            else
-                sampleOff?.Play();
+            if (PlayToggleSamples)
+            {
+                if (Active.Value)
+                    sampleOn?.Play();
+                else
+                    sampleOff?.Play();
+            }
         }
     }
 }

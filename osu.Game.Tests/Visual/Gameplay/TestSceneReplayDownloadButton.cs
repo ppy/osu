@@ -24,7 +24,7 @@ using APIUser = osu.Game.Online.API.Requests.Responses.APIUser;
 namespace osu.Game.Tests.Visual.Gameplay
 {
     [TestFixture]
-    public class TestSceneReplayDownloadButton : OsuManualInputManagerTestScene
+    public partial class TestSceneReplayDownloadButton : OsuManualInputManagerTestScene
     {
         private const long online_score_id = 2553163309;
 
@@ -107,7 +107,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddUntilStep("wait for load", () => downloadButton.IsLoaded);
 
-            AddAssert("state is available", () => downloadButton.State.Value == DownloadState.NotDownloaded);
+            checkState(DownloadState.NotDownloaded);
 
             AddStep("click button", () =>
             {
@@ -133,7 +133,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddUntilStep("wait for load", () => downloadButton.IsLoaded);
 
-            AddAssert("state is not downloaded", () => downloadButton.State.Value == DownloadState.NotDownloaded);
+            checkState(DownloadState.NotDownloaded);
             AddAssert("button is not enabled", () => !downloadButton.ChildrenOfType<DownloadButton>().First().Enabled.Value);
         }
 
@@ -155,7 +155,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddUntilStep("wait for load", () => downloadButton.IsLoaded);
 
-            AddUntilStep("state is not downloaded", () => downloadButton.State.Value == DownloadState.NotDownloaded);
+            checkState(DownloadState.NotDownloaded);
             AddAssert("button is not enabled", () => !downloadButton.ChildrenOfType<DownloadButton>().First().Enabled.Value);
         }
 
@@ -174,17 +174,16 @@ namespace osu.Game.Tests.Visual.Gameplay
             });
 
             AddUntilStep("wait for load", () => downloadButton.IsLoaded);
-
-            AddUntilStep("state is not downloaded", () => downloadButton.State.Value == DownloadState.NotDownloaded);
+            checkState(DownloadState.NotDownloaded);
 
             AddStep("import score", () => imported = scoreManager.Import(getScoreInfo(true)));
 
-            AddUntilStep("state is available", () => downloadButton.State.Value == DownloadState.LocallyAvailable);
+            checkState(DownloadState.LocallyAvailable);
             AddAssert("button is enabled", () => downloadButton.ChildrenOfType<DownloadButton>().First().Enabled.Value);
 
             AddStep("delete score", () => scoreManager.Delete(imported.Value));
 
-            AddUntilStep("state is not downloaded", () => downloadButton.State.Value == DownloadState.NotDownloaded);
+            checkState(DownloadState.NotDownloaded);
             AddAssert("button is not enabled", () => !downloadButton.ChildrenOfType<DownloadButton>().First().Enabled.Value);
         }
 
@@ -202,16 +201,19 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddUntilStep("wait for load", () => downloadButton.IsLoaded);
 
-            AddAssert("state is unknown", () => downloadButton.State.Value == DownloadState.Unknown);
+            checkState(DownloadState.Unknown);
             AddAssert("button is not enabled", () => !downloadButton.ChildrenOfType<DownloadButton>().First().Enabled.Value);
         }
+
+        private void checkState(DownloadState expectedState) =>
+            AddUntilStep($"state is {expectedState}", () => downloadButton.State.Value, () => Is.EqualTo(expectedState));
 
         private ScoreInfo getScoreInfo(bool replayAvailable, bool hasOnlineId = true) => new ScoreInfo
         {
             OnlineID = hasOnlineId ? online_score_id : 0,
             Ruleset = new OsuRuleset().RulesetInfo,
             BeatmapInfo = beatmapManager.GetAllUsableBeatmapSets().First().Beatmaps.First(),
-            Hash = replayAvailable ? "online" : string.Empty,
+            HasOnlineReplay = replayAvailable,
             User = new APIUser
             {
                 Id = 39828,
@@ -219,7 +221,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             }
         };
 
-        private class TestReplayDownloadButton : ReplayDownloadButton
+        private partial class TestReplayDownloadButton : ReplayDownloadButton
         {
             public void SetDownloadState(DownloadState state) => State.Value = state;
 

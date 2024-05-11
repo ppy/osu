@@ -27,7 +27,7 @@ namespace osu.Game.Online.Rooms
     /// This differs from a regular download tracking composite as this accounts for the
     /// databased beatmap set's checksum, to disallow from playing with an altered version of the beatmap.
     /// </summary>
-    public class OnlinePlayBeatmapAvailabilityTracker : CompositeComponent
+    public partial class OnlinePlayBeatmapAvailabilityTracker : CompositeComponent
     {
         public readonly IBindable<PlaylistItem> SelectedItem = new Bindable<PlaylistItem>();
 
@@ -60,6 +60,15 @@ namespace osu.Game.Online.Rooms
                 if (item.NewValue == null)
                     return;
 
+                // Initially set to unknown until we have attained a good state.
+                // This has the wanted side effect of forcing a state change when the current playlist
+                // item changes at the server but our local availability doesn't necessarily change
+                // (ie. we have both the previous and next item LocallyAvailable).
+                //
+                // Note that even without this, the server will trigger a state change and things will work.
+                // This is just for safety.
+                availability.Value = BeatmapAvailability.Unknown();
+
                 downloadTracker?.RemoveAndDisposeImmediately();
                 selectedBeatmap = null;
 
@@ -67,7 +76,7 @@ namespace osu.Game.Online.Rooms
                 {
                     var beatmap = task.GetResultSafely();
 
-                    if (SelectedItem.Value?.Beatmap.OnlineID == beatmap.OnlineID)
+                    if (beatmap != null && SelectedItem.Value?.Beatmap.OnlineID == beatmap.OnlineID)
                     {
                         selectedBeatmap = beatmap;
                         beginTracking();
@@ -98,7 +107,7 @@ namespace osu.Game.Online.Rooms
 
             // handles changes to hash that didn't occur from the import process (ie. a user editing the beatmap in the editor, somehow).
             realmSubscription?.Dispose();
-            realmSubscription = realm.RegisterForNotifications(_ => filteredBeatmaps(), (_, changes, _) =>
+            realmSubscription = realm.RegisterForNotifications(_ => filteredBeatmaps(), (_, changes) =>
             {
                 if (changes == null)
                     return;
@@ -115,6 +124,9 @@ namespace osu.Game.Online.Rooms
             switch (downloadTracker.State.Value)
             {
                 case DownloadState.Unknown:
+                    availability.Value = BeatmapAvailability.Unknown();
+                    break;
+
                 case DownloadState.NotDownloaded:
                     availability.Value = BeatmapAvailability.NotDownloaded();
                     break;

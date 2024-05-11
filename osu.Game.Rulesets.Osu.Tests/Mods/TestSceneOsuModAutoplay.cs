@@ -1,22 +1,41 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Skinning.Default;
 using osu.Game.Rulesets.Osu.UI;
+using osu.Game.Rulesets.Scoring;
+using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Tests.Mods
 {
-    public class TestSceneOsuModAutoplay : OsuModTestScene
+    public partial class TestSceneOsuModAutoplay : OsuModTestScene
     {
+        protected override bool AllowFail => true;
+
+        [Test]
+        public void TestCursorPositionStoredToJudgement()
+        {
+            CreateModTest(new ModTestData
+            {
+                Autoplay = true,
+                PassCondition = () =>
+                    Player.ScoreProcessor.JudgedHits >= 1
+                    && Player.ScoreProcessor.HitEvents.Any(e => e.Position != null)
+            });
+        }
+
         [Test]
         public void TestSpmUnaffectedByRateAdjust()
             => runSpmTest(new OsuModDaycore
@@ -31,6 +50,37 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
                 InitialRate = { Value = 0.7 },
                 FinalRate = { Value = 1.3 }
             });
+
+        [TestCase(6.25f)]
+        [TestCase(20)]
+        public void TestPerfectScoreOnShortSliderWithRepeat(float pathLength)
+        {
+            AddStep("set score to standardised", () => LocalConfig.SetValue(OsuSetting.ScoreDisplayMode, ScoringMode.Standardised));
+
+            CreateModTest(new ModTestData
+            {
+                Autoplay = true,
+                Beatmap = new Beatmap
+                {
+                    HitObjects = new List<HitObject>
+                    {
+                        new Slider
+                        {
+                            StartTime = 500,
+                            Position = new Vector2(256, 192),
+                            Path = new SliderPath(new[]
+                            {
+                                new PathControlPoint(),
+                                new PathControlPoint(new Vector2(0, pathLength))
+                            }),
+                            RepeatCount = 1,
+                            SliderVelocityMultiplier = 10
+                        }
+                    }
+                },
+                PassCondition = () => Player.ScoreProcessor.TotalScore.Value == 1_000_000
+            });
+        }
 
         private void runSpmTest(Mod mod)
         {

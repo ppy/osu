@@ -18,7 +18,7 @@ using osu.Game.Overlays.Changelog;
 namespace osu.Game.Tests.Visual.Online
 {
     [TestFixture]
-    public class TestSceneChangelogOverlay : OsuTestScene
+    public partial class TestSceneChangelogOverlay : OsuTestScene
     {
         private DummyAPIAccess dummyAPI => (DummyAPIAccess)API;
 
@@ -154,7 +154,14 @@ namespace osu.Game.Tests.Visual.Online
                         Type = ChangelogEntryType.Misc,
                         Category = "Code quality",
                         Title = "Clean up another thing"
-                    }
+                    },
+                    new APIChangelogEntry
+                    {
+                        Type = ChangelogEntryType.Add,
+                        Category = "osu!",
+                        Title = "Add entry with news url",
+                        Url = "https://osu.ppy.sh/home/news/2023-07-27-summer-splash"
+                    },
                 }
             });
 
@@ -201,7 +208,7 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("show build", () => changelog.ShowBuild(requestedBuild));
         }
 
-        private class TestChangelogOverlay : ChangelogOverlay
+        private partial class TestChangelogOverlay : ChangelogOverlay
         {
             public new List<APIUpdateStream> Streams => base.Streams;
 

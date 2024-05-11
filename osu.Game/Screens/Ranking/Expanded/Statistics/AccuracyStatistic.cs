@@ -18,7 +18,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Statistics
     /// <summary>
     /// A <see cref="StatisticDisplay"/> to display the player's accuracy.
     /// </summary>
-    public class AccuracyStatistic : StatisticDisplay
+    public partial class AccuracyStatistic : StatisticDisplay
     {
         private readonly double accuracy;
 
@@ -42,11 +42,12 @@ namespace osu.Game.Screens.Ranking.Expanded.Statistics
 
         protected override Drawable CreateContent() => counter = new Counter();
 
-        private class Counter : RollingCounter<double>
+        private partial class Counter : RollingCounter<double>
         {
-            protected override double RollingDuration => AccuracyCircle.ACCURACY_TRANSFORM_DURATION;
-
-            protected override Easing RollingEasing => AccuracyCircle.ACCURACY_TRANSFORM_EASING;
+            // FormatAccuracy doesn't round, which means if we use the OutPow10 easing the number will stick 0.01% short for some time.
+            // To avoid that let's use a shorter easing which looks roughly the same.
+            protected override double RollingDuration => AccuracyCircle.ACCURACY_TRANSFORM_DURATION / 2;
+            protected override Easing RollingEasing => Easing.OutQuad;
 
             protected override LocalisableString FormatCount(double count) => count.FormatAccuracy();
 

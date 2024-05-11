@@ -22,7 +22,7 @@ using osuTK;
 
 namespace osu.Game.Overlays.Settings
 {
-    public abstract class SettingsItem<T> : Container, IFilterable, ISettingsItem, IHasCurrentValue<T>, IHasTooltip
+    public abstract partial class SettingsItem<T> : Container, IConditionalFilterable, ISettingsItem, IHasCurrentValue<T>, IHasTooltip
     {
         protected abstract Drawable CreateControl();
 
@@ -144,6 +144,9 @@ namespace osu.Game.Overlays.Settings
 
         public bool FilteringActive { get; set; }
 
+        public BindableBool CanBeShown { get; } = new BindableBool(true);
+        IBindable<bool> IConditionalFilterable.CanBeShown => CanBeShown;
+
         public event Action SettingChanged;
 
         private T classicDefault;
@@ -193,7 +196,7 @@ namespace osu.Game.Overlays.Settings
                     {
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
-                        Spacing = new Vector2(0, 10),
+                        Spacing = new Vector2(0, 5),
                         Child = Control = CreateControl(),
                     }
                 }
@@ -214,7 +217,7 @@ namespace osu.Game.Overlays.Settings
             // intentionally done before LoadComplete to avoid overhead.
             if (ShowsDefaultIndicator)
             {
-                defaultValueIndicatorContainer.Add(new RestoreDefaultValueButton<T>
+                defaultValueIndicatorContainer.Add(new RevertToDefaultButton<T>
                 {
                     Current = controlWithCurrent.Current,
                     Anchor = Anchor.Centre,

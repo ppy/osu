@@ -1,17 +1,18 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
+using System.Diagnostics;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Audio.Track;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
-using osu.Framework.Timing;
 using osu.Game.Configuration;
+using osu.Game.Graphics.Containers;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Scoring;
@@ -24,14 +25,14 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    public class TestSceneHUDOverlay : OsuManualInputManagerTestScene
+    public partial class TestSceneHUDOverlay : OsuManualInputManagerTestScene
     {
-        private OsuConfigManager localConfig;
+        private OsuConfigManager localConfig = null!;
 
-        private HUDOverlay hudOverlay;
+        private HUDOverlay hudOverlay = null!;
 
-        [Cached]
-        private ScoreProcessor scoreProcessor = new ScoreProcessor(new OsuRuleset());
+        [Cached(typeof(ScoreProcessor))]
+        private ScoreProcessor scoreProcessor { get; set; }
 
         [Cached(typeof(HealthProcessor))]
         private HealthProcessor healthProcessor = new DrainingHealthProcessor(0);
@@ -40,11 +41,16 @@ namespace osu.Game.Tests.Visual.Gameplay
         private GameplayState gameplayState = TestGameplayState.Create(new OsuRuleset());
 
         [Cached(typeof(IGameplayClock))]
-        private readonly IGameplayClock gameplayClock = new GameplayClockContainer(new FramedClock());
+        private readonly IGameplayClock gameplayClock = new GameplayClockContainer(new TrackVirtual(60000), false, false);
 
         // best way to check without exposing.
-        private Drawable hideTarget => hudOverlay.KeyCounter;
-        private FillFlowContainer<KeyCounter> keyCounterFlow => hudOverlay.KeyCounter.ChildrenOfType<FillFlowContainer<KeyCounter>>().First();
+        private Drawable hideTarget => hudOverlay.ChildrenOfType<SkinComponentsContainer>().First();
+        private Drawable keyCounterFlow => hudOverlay.ChildrenOfType<KeyCounterDisplay>().First().ChildrenOfType<FillFlowContainer<KeyCounter>>().Single();
+
+        public TestSceneHUDOverlay()
+        {
+            scoreProcessor = gameplayState.ScoreProcessor;
+        }
 
         [BackgroundDependencyLoader]
         private void load()
@@ -72,7 +78,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddAssert("showhud is set", () => hudOverlay.ShowHud.Value);
 
-            AddAssert("hidetarget is visible", () => hideTarget.IsPresent);
+            AddAssert("hidetarget is visible", () => hideTarget.Alpha, () => Is.GreaterThan(0));
             AddAssert("key counter flow is visible", () => keyCounterFlow.IsPresent);
             AddAssert("pause button is visible", () => hudOverlay.HoldToQuit.IsPresent);
         }
@@ -94,7 +100,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddStep("set showhud false", () => hudOverlay.ShowHud.Value = false);
 
-            AddUntilStep("hidetarget is hidden", () => !hideTarget.IsPresent);
+            AddUntilStep("hidetarget is hidden", () => hideTarget.Alpha, () => Is.LessThanOrEqualTo(0));
             AddAssert("pause button is still visible", () => hudOverlay.HoldToQuit.IsPresent);
 
             // Key counter flow container should not be affected by this, only the key counter display will be hidden as checked above.
@@ -108,13 +114,13 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddStep("set hud to never show", () => localConfig.SetValue(OsuSetting.HUDVisibilityMode, HUDVisibilityMode.Never));
 
-            AddUntilStep("wait for fade", () => !hideTarget.IsPresent);
+            AddUntilStep("wait for fade", () => hideTarget.Alpha, () => Is.LessThanOrEqualTo(0));
 
             AddStep("trigger momentary show", () => InputManager.PressKey(Key.ControlLeft));
-            AddUntilStep("wait for visible", () => hideTarget.IsPresent);
+            AddUntilStep("wait for visible", () => hideTarget.Alpha, () => Is.GreaterThan(0));
 
             AddStep("stop trigering", () => InputManager.ReleaseKey(Key.ControlLeft));
-            AddUntilStep("wait for fade", () => !hideTarget.IsPresent);
+            AddUntilStep("wait for fade", () => hideTarget.Alpha, () => Is.LessThanOrEqualTo(0));
         }
 
         [Test]
@@ -137,26 +143,65 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("hide key overlay", () =>
             {
                 localConfig.SetValue(OsuSetting.KeyOverlay, false);
-                hudOverlay.KeyCounter.AlwaysVisible.Value = false;
+                var kcd = hudOverlay.ChildrenOfType<KeyCounterDisplay>().FirstOrDefault();
+                if (kcd != null)
+                    kcd.AlwaysVisible.Value = false;
             });
 
             AddStep("set showhud false", () => hudOverlay.ShowHud.Value = false);
-            AddUntilStep("hidetarget is hidden", () => !hideTarget.IsPresent);
-            AddAssert("key counters hidden", () => !keyCounterFlow.IsPresent);
+            AddUntilStep("hidetarget is hidden", () => hideTarget.Alpha, () => Is.LessThanOrEqualTo(0));
+            AddUntilStep("key counters hidden", () => !keyCounterFlow.IsPresent);
 
             AddStep("set showhud true", () => hudOverlay.ShowHud.Value = true);
-            AddUntilStep("hidetarget is visible", () => hideTarget.IsPresent);
-            AddAssert("key counters still hidden", () => !keyCounterFlow.IsPresent);
+            AddUntilStep("hidetarget is visible", () => hideTarget.Alpha, () => Is.GreaterThan(0));
+            AddUntilStep("key counters still hidden", () => !keyCounterFlow.IsPresent);
+        }
+
+        [Test]
+        public void TestHoldForMenuDoesWorkWhenHidden()
+        {
+            bool activated = false;
+
+            HoldForMenuButton getHoldForMenu() => hudOverlay.ChildrenOfType<HoldForMenuButton>().Single();
+
+            createNew();
+
+            AddStep("bind action", () =>
+            {
+                activated = false;
+
+                var holdForMenu = getHoldForMenu();
+
+                holdForMenu.Action += () => activated = true;
+            });
+
+            AddStep("set showhud false", () => hudOverlay.ShowHud.Value = false);
+            AddUntilStep("hidetarget is hidden", () => hideTarget.Alpha, () => Is.LessThanOrEqualTo(0));
+
+            AddStep("attempt activate", () =>
+            {
+                InputManager.MoveMouseTo(getHoldForMenu().OfType<HoldToConfirmContainer>().Single());
+                InputManager.PressButton(MouseButton.Left);
+            });
+
+            AddUntilStep("activated", () => activated);
+
+            AddStep("release mouse button", () =>
+            {
+                InputManager.ReleaseButton(MouseButton.Left);
+            });
         }
 
         [Test]
         public void TestInputDoesntWorkWhenHUDHidden()
         {
-            SongProgressBar getSongProgress() => hudOverlay.ChildrenOfType<SongProgressBar>().Single();
+            ArgonSongProgress? getSongProgress() => hudOverlay.ChildrenOfType<ArgonSongProgress>().SingleOrDefault();
 
             bool seeked = false;
 
             createNew();
+
+            AddUntilStep("wait for song progress", () => getSongProgress() != null);
 
             AddStep("bind seek", () =>
             {
@@ -164,16 +209,18 @@ namespace osu.Game.Tests.Visual.Gameplay
 
                 var progress = getSongProgress();
 
-                progress.ShowHandle = true;
-                progress.OnSeek += _ => seeked = true;
+                Debug.Assert(progress != null);
+
+                progress.Interactive.Value = true;
+                progress.ChildrenOfType<ArgonSongProgressBar>().Single().OnSeek += _ => seeked = true;
             });
 
             AddStep("set showhud false", () => hudOverlay.ShowHud.Value = false);
-            AddUntilStep("hidetarget is hidden", () => !hideTarget.IsPresent);
+            AddUntilStep("hidetarget is hidden", () => hideTarget.Alpha, () => Is.LessThanOrEqualTo(0));
 
             AddStep("attempt seek", () =>
             {
-                InputManager.MoveMouseTo(getSongProgress());
+                InputManager.MoveMouseTo(getSongProgress().AsNonNull());
                 InputManager.Click(MouseButton.Left);
             });
 
@@ -194,9 +241,8 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             createNew();
 
-            AddUntilStep("wait for hud load", () => hudOverlay.IsLoaded);
-            AddUntilStep("wait for components to be hidden", () => hudOverlay.ChildrenOfType<SkinnableTargetContainer>().Single().Alpha == 0);
-            AddUntilStep("wait for hud load", () => hudOverlay.ChildrenOfType<SkinnableTargetContainer>().All(c => c.ComponentsLoaded));
+            AddUntilStep("wait for components to be hidden", () => hudOverlay.ChildrenOfType<SkinComponentsContainer>().Single().Alpha == 0);
+            AddUntilStep("wait for hud load", () => hudOverlay.ChildrenOfType<SkinComponentsContainer>().All(c => c.ComponentsLoaded));
 
             AddStep("bind on update", () =>
             {
@@ -213,21 +259,20 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             createNew();
 
-            AddUntilStep("wait for hud load", () => hudOverlay.IsLoaded);
-            AddUntilStep("wait for components to be hidden", () => hudOverlay.ChildrenOfType<SkinnableTargetContainer>().Single().Alpha == 0);
+            AddUntilStep("wait for components to be hidden", () => hudOverlay.ChildrenOfType<SkinComponentsContainer>().Single().Alpha == 0);
 
-            AddStep("reload components", () => hudOverlay.ChildrenOfType<SkinnableTargetContainer>().Single().Reload());
-            AddUntilStep("skinnable components loaded", () => hudOverlay.ChildrenOfType<SkinnableTargetContainer>().Single().ComponentsLoaded);
+            AddStep("reload components", () => hudOverlay.ChildrenOfType<SkinComponentsContainer>().Single().Reload());
+            AddUntilStep("skinnable components loaded", () => hudOverlay.ChildrenOfType<SkinComponentsContainer>().Single().ComponentsLoaded);
         }
 
-        private void createNew(Action<HUDOverlay> action = null)
+        private void createNew(Action<HUDOverlay>? action = null)
         {
             AddStep("create overlay", () =>
             {
                 hudOverlay = new HUDOverlay(null, Array.Empty<Mod>());
 
                 // Add any key just to display the key counter visually.
-                hudOverlay.KeyCounter.Add(new KeyCounterKeyboard(Key.Space));
+                hudOverlay.InputCountController.Add(new KeyCounterKeyboardTrigger(Key.Space));
 
                 scoreProcessor.Combo.Value = 1;
 
@@ -235,11 +280,16 @@ namespace osu.Game.Tests.Visual.Gameplay
 
                 Child = hudOverlay;
             });
+
+            AddUntilStep("wait for hud load", () => hudOverlay.IsLoaded);
+            AddUntilStep("wait for components present", () => hudOverlay.ChildrenOfType<KeyCounterDisplay>().FirstOrDefault() != null);
         }
 
         protected override void Dispose(bool isDisposing)
         {
-            localConfig?.Dispose();
+            if (localConfig.IsNotNull())
+                localConfig.Dispose();
+
             base.Dispose(isDisposing);
         }
     }

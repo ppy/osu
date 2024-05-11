@@ -18,7 +18,7 @@ using osuTK;
 
 namespace osu.Game.Screens.Utility
 {
-    public class CircleGameplay : LatencySampleComponent
+    public partial class CircleGameplay : LatencySampleComponent
     {
         private int nextLocation;
 
@@ -111,7 +111,7 @@ namespace osu.Game.Screens.Utility
             hitEvents.Add(h);
         }
 
-        public class SampleHitCircle : LatencySampleComponent
+        public partial class SampleHitCircle : LatencySampleComponent
         {
             public HitEvent? HitEvent;
 
@@ -224,7 +224,7 @@ namespace osu.Game.Screens.Utility
                     .FadeOut(duration)
                     .ScaleTo(1.5f, duration);
 
-                HitEvent = new HitEvent(Clock.CurrentTime - HitTime, HitResult.Good, new HitObject
+                HitEvent = new HitEvent(Clock.CurrentTime - HitTime, 1.0, HitResult.Good, new HitObject
                 {
                     HitWindows = new HitWindows(),
                 }, null, null);

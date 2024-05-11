@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Collections.Generic;
 using osu.Game.Rulesets.Edit.Checks.Components;
 
@@ -29,7 +27,7 @@ namespace osu.Game.Rulesets.Edit.Checks
 
         public IEnumerable<Issue> Run(BeatmapVerifierContext context)
         {
-            string audioFile = context.Beatmap.Metadata?.AudioFile;
+            string audioFile = context.Beatmap.Metadata.AudioFile;
             if (string.IsNullOrEmpty(audioFile))
                 yield break;
 

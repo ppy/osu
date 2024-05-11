@@ -25,7 +25,7 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public class TestSceneFirstRunSetupOverlay : OsuManualInputManagerTestScene
+    public partial class TestSceneFirstRunSetupOverlay : OsuManualInputManagerTestScene
     {
         private FirstRunSetupOverlay overlay;
 
@@ -213,7 +213,9 @@ namespace osu.Game.Tests.Visual.UserInterface
             {
             }
 
-            public virtual IBindable<int> UnreadCount => null;
+            public virtual IBindable<int> UnreadCount { get; } = new Bindable<int>();
+
+            public IEnumerable<Notification> AllNotifications => Enumerable.Empty<Notification>();
         }
 
         // interface mocks break hot reload, mocking this stub implementation instead works around it.

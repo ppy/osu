@@ -6,6 +6,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -21,7 +22,7 @@ using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 {
-    public class RoomsContainer : CompositeDrawable, IKeyBindingHandler<GlobalAction>
+    public partial class RoomsContainer : CompositeDrawable, IKeyBindingHandler<GlobalAction>
     {
         public readonly Bindable<Room> SelectedRoom = new Bindable<Room>();
         public readonly Bindable<FilterCriteria> Filter = new Bindable<FilterCriteria>();
@@ -117,11 +118,21 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
             switch (args.Action)
             {
                 case NotifyCollectionChangedAction.Add:
+                    Debug.Assert(args.NewItems != null);
+
                     addRooms(args.NewItems.Cast<Room>());
                     break;
 
                 case NotifyCollectionChangedAction.Remove:
-                    removeRooms(args.OldItems.Cast<Room>());
+                    Debug.Assert(args.OldItems != null);
+
+                    // clear operations have a separate path that benefits from async disposal,
+                    // since disposing is quite expensive when performed on a high number of drawables synchronously.
+                    if (args.OldItems.Count == roomFlow.Count)
+                        clearRooms();
+                    else
+                        removeRooms(args.OldItems.Cast<Room>());
+
                     break;
             }
         }
@@ -141,9 +152,18 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                 roomFlow.RemoveAll(d => d.Room == r, true);
 
                 // selection may have a lease due to being in a sub screen.
-                if (!SelectedRoom.Disabled)
+                if (SelectedRoom.Value == r && !SelectedRoom.Disabled)
                     SelectedRoom.Value = null;
             }
+        }
+
+        private void clearRooms()
+        {
+            roomFlow.Clear();
+
+            // selection may have a lease due to being in a sub screen.
+            if (!SelectedRoom.Disabled)
+                SelectedRoom.Value = null;
         }
 
         private void updateSorting()

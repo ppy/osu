@@ -15,8 +15,11 @@ using osu.Game.Tests.Visual;
 
 namespace osu.Game.Tests.OnlinePlay
 {
+    // NOTE: This test scene never calls ProcessFrame on clocks.
+    // The current tests are fine without this as they are testing very static scenarios, but it's worth knowing
+    // if adding further tests to this class.
     [HeadlessTest]
-    public class TestSceneCatchUpSyncManager : OsuTestScene
+    public partial class TestSceneCatchUpSyncManager : OsuTestScene
     {
         private GameplayClockContainer master;
         private SpectatorSyncManager syncManager;
@@ -28,7 +31,7 @@ namespace osu.Game.Tests.OnlinePlay
         [SetUp]
         public void Setup()
         {
-            syncManager = new SpectatorSyncManager(master = new GameplayClockContainer(new TestManualClock()));
+            syncManager = new SpectatorSyncManager(master = new GameplayClockContainer(new TestManualClock(), false, false));
             player1 = syncManager.CreateManagedClock();
             player2 = syncManager.CreateManagedClock();
 
@@ -188,6 +191,8 @@ namespace osu.Game.Tests.OnlinePlay
 
             public void Reset()
             {
+                IsRunning = false;
+                CurrentTime = 0;
             }
 
             public void ResetSpeedAdjustments()

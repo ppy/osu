@@ -18,7 +18,7 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public class TestSceneLabelledColourPalette : OsuManualInputManagerTestScene
+    public partial class TestSceneLabelledColourPalette : OsuManualInputManagerTestScene
     {
         private LabelledColourPalette component;
 

@@ -6,6 +6,7 @@
 using System;
 using System.Linq;
 using Markdig.Extensions.CustomContainers;
+using Markdig.Extensions.Footnotes;
 using Markdig.Syntax.Inlines;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -13,6 +14,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Containers.Markdown;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
+using osu.Game.Graphics.Containers.Markdown.Footnotes;
 using osu.Game.Overlays;
 using osu.Game.Users;
 using osu.Game.Users.Drawables;
@@ -20,7 +22,7 @@ using osuTK;
 
 namespace osu.Game.Graphics.Containers.Markdown
 {
-    public class OsuMarkdownTextFlowContainer : MarkdownTextFlowContainer
+    public partial class OsuMarkdownTextFlowContainer : MarkdownTextFlowContainer
     {
         protected override void AddLinkText(string text, LinkInline linkInline)
             => AddDrawable(new OsuMarkdownLinkText(text, linkInline));
@@ -36,8 +38,16 @@ namespace osu.Game.Graphics.Containers.Markdown
             Text = codeInline.Content
         });
 
-        protected override SpriteText CreateEmphasisedSpriteText(bool bold, bool italic)
-            => CreateSpriteText().With(t => t.Font = t.Font.With(weight: bold ? FontWeight.Bold : FontWeight.Regular, italics: italic));
+        protected override void AddFootnoteLink(FootnoteLink footnoteLink) => AddDrawable(new OsuMarkdownFootnoteLink(footnoteLink));
+
+        protected override void AddFootnoteBacklink(FootnoteLink footnoteBacklink) => AddDrawable(new OsuMarkdownFootnoteBacklink(footnoteBacklink));
+
+        protected override void ApplyEmphasisedCreationParameters(SpriteText spriteText, bool bold, bool italic)
+        {
+            base.ApplyEmphasisedCreationParameters(spriteText, bold, italic);
+
+            spriteText.Font = spriteText.Font.With(weight: bold ? FontWeight.Bold : FontWeight.Regular, italics: italic);
+        }
 
         protected override void AddCustomComponent(CustomContainerInline inline)
         {
@@ -64,7 +74,7 @@ namespace osu.Game.Graphics.Containers.Markdown
             AddDrawable(new DrawableFlag(countryCode) { Size = new Vector2(20, 15) });
         }
 
-        private class OsuMarkdownInlineCode : Container
+        private partial class OsuMarkdownInlineCode : Container
         {
             [Resolved]
             private IMarkdownTextComponent parentTextComponent { get; set; }

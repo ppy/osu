@@ -16,7 +16,7 @@ using osuTK.Input;
 
 namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 {
-    internal class TimelineSelectionHandler : EditorSelectionHandler
+    internal partial class TimelineSelectionHandler : EditorSelectionHandler
     {
         // for now we always allow movement. snapping is provided by the Timeline's "distance" snap implementation
         public override bool HandleMovement(MoveSelectionEvent<HitObject> moveEvent) => true;

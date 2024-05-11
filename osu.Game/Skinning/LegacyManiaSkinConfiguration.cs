@@ -1,7 +1,5 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using System;
 using System.Collections.Generic;
@@ -23,11 +21,15 @@ namespace osu.Game.Skinning
         /// </summary>
         public const float DEFAULT_COLUMN_SIZE = 30 * POSITION_SCALE_FACTOR;
 
+        public const float DEFAULT_HIT_POSITION = (480 - 402) * POSITION_SCALE_FACTOR;
+
         public readonly int Keys;
 
         public Dictionary<string, Color4> CustomColours { get; } = new Dictionary<string, Color4>();
 
         public Dictionary<string, string> ImageLookups = new Dictionary<string, string>();
+
+        public float WidthForNoteHeightScale;
 
         public readonly float[] ColumnLineWidth;
         public readonly float[] ColumnSpacing;
@@ -35,11 +37,14 @@ namespace osu.Game.Skinning
         public readonly float[] ExplosionWidth;
         public readonly float[] HoldNoteLightWidth;
 
-        public float HitPosition = (480 - 402) * POSITION_SCALE_FACTOR;
+        public float HitPosition = DEFAULT_HIT_POSITION;
         public float LightPosition = (480 - 413) * POSITION_SCALE_FACTOR;
         public float ScorePosition = 300 * POSITION_SCALE_FACTOR;
         public bool ShowJudgementLine = true;
         public bool KeysUnderNotes;
+        public int LightFramePerSecond = 60;
+
+        public LegacyNoteBodyStyle? NoteBodyStyle;
 
         public LegacyManiaSkinConfiguration(int keys)
         {
@@ -55,12 +60,6 @@ namespace osu.Game.Skinning
             ColumnWidth.AsSpan().Fill(DEFAULT_COLUMN_SIZE);
         }
 
-        private float? minimumColumnWidth;
-
-        public float MinimumColumnWidth
-        {
-            get => minimumColumnWidth ?? ColumnWidth.Min();
-            set => minimumColumnWidth = value;
-        }
+        public float MinimumColumnWidth => ColumnWidth.Min();
     }
 }

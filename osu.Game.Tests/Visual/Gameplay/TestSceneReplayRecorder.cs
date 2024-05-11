@@ -31,7 +31,7 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    public class TestSceneReplayRecorder : OsuManualInputManagerTestScene
+    public partial class TestSceneReplayRecorder : OsuManualInputManagerTestScene
     {
         private TestRulesetInputManager playbackManager;
         private TestRulesetInputManager recordingManager;
@@ -120,7 +120,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         protected override void Update()
         {
             base.Update();
-            playbackManager?.ReplayInputHandler.SetFrameFromTime(Time.Current - 100);
+            playbackManager?.ReplayInputHandler?.SetFrameFromTime(Time.Current - 100);
         }
 
         [TearDownSteps]
@@ -218,9 +218,9 @@ namespace osu.Game.Tests.Visual.Gameplay
             }
         }
 
-        public class TestInputConsumer : CompositeDrawable, IKeyBindingHandler<TestAction>
+        public partial class TestInputConsumer : CompositeDrawable, IKeyBindingHandler<TestAction>
         {
-            public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => Parent.ReceivePositionalInputAt(screenSpacePos);
+            public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => Parent!.ReceivePositionalInputAt(screenSpacePos);
 
             private readonly Box box;
 
@@ -261,7 +261,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             }
         }
 
-        public class TestRulesetInputManager : RulesetInputManager<TestAction>
+        public partial class TestRulesetInputManager : RulesetInputManager<TestAction>
         {
             public TestRulesetInputManager(RulesetInfo ruleset, int variant, SimultaneousBindingMode unique)
                 : base(ruleset, variant, unique)
@@ -271,7 +271,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             protected override KeyBindingContainer<TestAction> CreateKeyBindingContainer(RulesetInfo ruleset, int variant, SimultaneousBindingMode unique)
                 => new TestKeyBindingContainer();
 
-            internal class TestKeyBindingContainer : KeyBindingContainer<TestAction>
+            internal partial class TestKeyBindingContainer : KeyBindingContainer<TestAction>
             {
                 public override IEnumerable<IKeyBinding> DefaultKeyBindings => new[]
                 {
@@ -299,7 +299,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             Down,
         }
 
-        internal class TestReplayRecorder : ReplayRecorder<TestAction>
+        internal partial class TestReplayRecorder : ReplayRecorder<TestAction>
         {
             public TestReplayRecorder(Score target)
                 : base(target)

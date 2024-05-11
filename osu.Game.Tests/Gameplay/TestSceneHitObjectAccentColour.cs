@@ -6,6 +6,7 @@
 using System;
 using System.Collections.Generic;
 using NUnit.Framework;
+using osu.Framework.Allocation;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -13,6 +14,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Testing;
 using osu.Game.Audio;
+using osu.Game.Configuration;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Legacy;
 using osu.Game.Rulesets.Objects.Types;
@@ -23,12 +25,22 @@ using osuTK.Graphics;
 namespace osu.Game.Tests.Gameplay
 {
     [HeadlessTest]
-    public class TestSceneHitObjectAccentColour : OsuTestScene
+    public partial class TestSceneHitObjectAccentColour : OsuTestScene
     {
+        [Resolved]
+        private OsuConfigManager config { get; set; }
+
         private Container skinContainer;
 
         [SetUp]
-        public void Setup() => Schedule(() => Child = skinContainer = new SkinProvidingContainer(new TestSkin()));
+        public void Setup()
+        {
+            Schedule(() =>
+            {
+                config.SetValue(OsuSetting.ComboColourNormalisationAmount, 0f);
+                Child = skinContainer = new SkinProvidingContainer(new TestSkin());
+            });
+        }
 
         [Test]
         public void TestChangeComboIndexBeforeLoad()
@@ -72,7 +84,7 @@ namespace osu.Game.Tests.Gameplay
             AddAssert("combo colour is green", () => hitObject.AccentColour.Value == Color4.Green);
         }
 
-        private class TestDrawableHitObject : DrawableHitObject<TestHitObjectWithCombo>
+        private partial class TestDrawableHitObject : DrawableHitObject<TestHitObjectWithCombo>
         {
             public TestDrawableHitObject()
                 : base(new TestHitObjectWithCombo())
@@ -82,9 +94,6 @@ namespace osu.Game.Tests.Gameplay
 
         private class TestHitObjectWithCombo : ConvertHitObject, IHasComboInformation
         {
-            public bool NewCombo { get; set; }
-            public int ComboOffset => 0;
-
             public Bindable<int> IndexInCurrentComboBindable { get; } = new Bindable<int>();
 
             public int IndexInCurrentCombo
@@ -126,7 +135,7 @@ namespace osu.Game.Tests.Gameplay
                 Color4.Green
             };
 
-            public Drawable GetDrawableComponent(ISkinComponent component) => throw new NotImplementedException();
+            public Drawable GetDrawableComponent(ISkinComponentLookup lookup) => throw new NotImplementedException();
 
             public Texture GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT) => throw new NotImplementedException();
 

@@ -34,7 +34,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
     /// <summary>
     /// A <see cref="DrawableRoom"/> with lounge-specific interactions such as selection and hover sounds.
     /// </summary>
-    public class DrawableLoungeRoom : DrawableRoom, IFilterable, IHasContextMenu, IHasPopover, IKeyBindingHandler<GlobalAction>
+    public partial class DrawableLoungeRoom : DrawableRoom, IFilterable, IHasContextMenu, IHasPopover, IKeyBindingHandler<GlobalAction>
     {
         private const float transition_duration = 60;
         private const float selection_border_width = 4;
@@ -170,7 +170,6 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
 
             if (Room.HasPassword.Value)
             {
-                sampleJoin?.Play();
                 this.ShowPopover();
                 return true;
             }
@@ -180,7 +179,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
             return true;
         }
 
-        public class PasswordEntryPopover : OsuPopover
+        public partial class PasswordEntryPopover : OsuPopover
         {
             private readonly Room room;
 
@@ -197,7 +196,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
             }
 
             private OsuPasswordTextBox passwordTextBox;
-            private TriangleButton joinButton;
+            private RoundedButton joinButton;
             private OsuSpriteText errorText;
             private Sample sampleJoinFail;
 
@@ -226,7 +225,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
                                     Width = 200,
                                     PlaceholderText = "password",
                                 },
-                                joinButton = new TriangleButton
+                                joinButton = new RoundedButton
                                 {
                                     Width = 80,
                                     Text = "Join Room",
@@ -240,7 +239,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
                     }
                 };
 
-                sampleJoinFail = audio.Samples.Get(@"UI/password-fail");
+                sampleJoinFail = audio.Samples.Get(@"UI/generic-error");
 
                 joinButton.Action = performJoin;
             }

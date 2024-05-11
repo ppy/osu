@@ -27,7 +27,7 @@ using osuTK;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
-    public class TestSceneMultiplayerPlaylist : MultiplayerTestScene
+    public partial class TestSceneMultiplayerPlaylist : MultiplayerTestScene
     {
         private MultiplayerPlaylist list;
         private BeatmapManager beatmaps;
@@ -215,7 +215,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         /// </summary>
         private void addItemStep(bool expired = false, int? userId = null) => AddStep("add item", () =>
         {
-            MultiplayerClient.AddUserPlaylistItem(userId ?? API.LocalUser.Value.OnlineID, new MultiplayerPlaylistItem(new PlaylistItem(importedBeatmap)
+            MultiplayerClient.AddUserPlaylistItem(userId ?? API.LocalUser.Value.OnlineID, TestMultiplayerClient.CreateMultiplayerPlaylistItem(new PlaylistItem(importedBeatmap)
             {
                 Expired = expired,
                 PlayedAt = DateTimeOffset.Now

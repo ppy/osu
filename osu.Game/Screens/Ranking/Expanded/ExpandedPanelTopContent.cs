@@ -19,7 +19,7 @@ namespace osu.Game.Screens.Ranking.Expanded
     /// <summary>
     /// The content that appears in the middle section of the <see cref="ScorePanel"/>.
     /// </summary>
-    public class ExpandedPanelTopContent : CompositeDrawable
+    public partial class ExpandedPanelTopContent : CompositeDrawable
     {
         private readonly APIUser user;
 

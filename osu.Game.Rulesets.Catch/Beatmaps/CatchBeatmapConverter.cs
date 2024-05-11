@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Catch.Objects;
 using System.Collections.Generic;
@@ -11,6 +9,7 @@ using System.Threading;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Objects;
 using osu.Framework.Extensions.IEnumerableExtensions;
+using osu.Game.Beatmaps.Legacy;
 
 namespace osu.Game.Rulesets.Catch.Beatmaps
 {
@@ -28,6 +27,7 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
             var xPositionData = obj as IHasXPosition;
             var yPositionData = obj as IHasYPosition;
             var comboData = obj as IHasCombo;
+            var sliderVelocityData = obj as IHasSliderVelocity;
 
             switch (obj)
             {
@@ -42,8 +42,11 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
                         X = xPositionData?.X ?? 0,
                         NewCombo = comboData?.NewCombo ?? false,
                         ComboOffset = comboData?.ComboOffset ?? 0,
-                        LegacyLastTickOffset = (obj as IHasLegacyLastTickOffset)?.LegacyLastTickOffset ?? 0,
-                        LegacyConvertedY = yPositionData?.Y ?? CatchHitObject.DEFAULT_LEGACY_CONVERT_Y
+                        LegacyConvertedY = yPositionData?.Y ?? CatchHitObject.DEFAULT_LEGACY_CONVERT_Y,
+                        // prior to v8, speed multipliers don't adjust for how many ticks are generated over the same distance.
+                        // this results in more (or less) ticks being generated in <v8 maps for the same time duration.
+                        TickDistanceMultiplier = beatmap.BeatmapInfo.BeatmapVersion < 8 ? 1 : ((LegacyControlPointInfo)beatmap.ControlPointInfo).DifficultyPointAt(obj.StartTime).SliderVelocity,
+                        SliderVelocityMultiplier = sliderVelocityData?.SliderVelocityMultiplier ?? 1
                     }.Yield();
 
                 case IHasDuration endTime:
