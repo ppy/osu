@@ -56,21 +56,24 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             if (strainTime < min_speed_bonus)
                 speedBonus = 1 + 0.75 * Math.Pow((min_speed_bonus - strainTime) / speed_balancing_factor, 2);
 
-            double travelDistance = osuPrevObj?.TravelDistance ?? 0;
-            double distance = Math.Min(single_spacing_threshold, travelDistance + osuCurrObj.MinimumJumpDistance);
+            double distance = Math.Min(single_spacing_threshold, osuCurrObj.JumpDistance);
 
             double sliderStreamMultiplier = 1;
-            if (osuPrevObj?.BaseObject is Slider slider)
+            if (osuCurrObj.BaseObject is Slider slider && osuPrevObj?.BaseObject is Slider)
             {
                 // Take just slider heads into account because we're computing sliderjumps, not slideraim
-                double sliderStreamDifficulty = 0.08 * Math.Max(1, Math.Sqrt(osuCurrObj.JumpDistance / slider.Radius));
+                double sliderStreamBonus = 0.25;
+
+                // If slider was slower than notes before - punish it
+                if (osuCurrObj.StrainTime > osuPrevObj.StrainTime)
+                    sliderStreamBonus *= Math.Pow(Math.Min(osuCurrObj.StrainTime, osuPrevObj.StrainTime) / Math.Max(osuCurrObj.StrainTime, osuPrevObj.StrainTime), 2);
 
                 // Punish too short sliders to prevent cheesing (cheesing is still possible, but it's very rare)
                 double sliderLength = 2 * slider.Velocity * slider.SpanDuration;
                 if (sliderLength < slider.Radius)
-                    sliderStreamDifficulty *= sliderLength / slider.Radius;
+                    sliderStreamBonus *= sliderLength / slider.Radius;
 
-                sliderStreamMultiplier += sliderStreamDifficulty;
+                sliderStreamMultiplier += sliderStreamBonus;
             }
 
             return (speedBonus + speedBonus * Math.Pow(distance / single_spacing_threshold, 3.5)) * doubletapness * sliderStreamMultiplier / strainTime;

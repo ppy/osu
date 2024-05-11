@@ -15,7 +15,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         private const double velocity_change_multiplier = 0.75;
 
         private const double slider_aim_multiplier = 1.35;
-        private const double slider_jump_multiplier = 0.1;
+        private const double slider_jump_multiplier = 0.08;
 
         /// <summary>
         /// Evaluates the difficulty of aiming the current object, based on:
