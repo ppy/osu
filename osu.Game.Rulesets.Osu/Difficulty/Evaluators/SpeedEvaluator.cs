@@ -59,9 +59,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             double distance = Math.Min(single_spacing_threshold, osuCurrObj.JumpDistance);
 
             double sliderStreamMultiplier = 1;
+
             if (osuCurrObj.BaseObject is Slider slider && osuPrevObj?.BaseObject is Slider)
             {
-                // Take just slider heads into account because we're computing sliderjumps, not slideraim
+                // Bonus base
                 double sliderStreamBonus = 0.25;
 
                 // If slider was slower than notes before - punish it
