@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -8,6 +9,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
+using osu.Game.Screens.Menu;
 using osuTK;
 
 namespace osu.Game.Screens.SelectV2.Footer
@@ -19,6 +21,10 @@ namespace osu.Game.Screens.SelectV2.Footer
         private const int padding = 80;
 
         private readonly List<OverlayContainer> overlays = new List<OverlayContainer>();
+
+        private OsuLogoButton osuLogoButton = null!;
+
+        public Action? OnOsu;
 
         /// <param name="button">The button to be added.</param>
         /// <param name="overlay">The <see cref="OverlayContainer"/> to be toggled by this button.</param>
@@ -77,6 +83,16 @@ namespace osu.Game.Screens.SelectV2.Footer
                     Spacing = new Vector2(-FooterButtonV2.SHEAR_WIDTH + 7, 0),
                     AutoSizeAxes = Axes.Both
                 },
+                // todo: figure out what's going on with the button not appearing from below on initial transition.
+                osuLogoButton = new OsuLogoButton(0)
+                {
+                    Anchor = Anchor.BottomRight,
+                    Origin = Anchor.BottomRight,
+                    RelativeSizeAxes = Axes.X,
+                    Width = 0.3f,
+                    Margin = new MarginPadding { Right = 17, Bottom = 5 },
+                    Action = () => OnOsu?.Invoke(),
+                }
             };
         }
 
@@ -86,7 +102,6 @@ namespace osu.Game.Screens.SelectV2.Footer
         protected override void PopIn()
         {
             background.MoveToY(0, 400, Easing.OutQuint);
-
             buttons.Delay(buttons_pop_delay)
                    .MoveToX(0, 400, Easing.OutQuint)
                    .FadeIn(400, Easing.OutQuint);
@@ -98,6 +113,36 @@ namespace osu.Game.Screens.SelectV2.Footer
                    .FadeOut(400, Easing.OutQuint);
 
             background.Delay(buttons_pop_delay).MoveToY(off_screen_y, 400, Easing.OutQuint);
+            osuLogoButton.Delay(buttons_pop_delay).MoveToY(off_screen_y, 400, Easing.OutQuint);
+        }
+
+        private OsuLogo? logo;
+
+        public void AttachLogo(OsuLogo logo, bool resuming)
+        {
+            this.logo = logo;
+
+            osuLogoButton.AttachLogo(logo, resuming ? 240 : 0, Easing.OutQuint);
+            osuLogoButton.MoveToY(0, 240, Easing.OutQuint);
+
+            if (resuming)
+                logo.FadeOut(180, Easing.InQuint);
+        }
+
+        public void DetachLogo(bool pushLogoUpwards)
+        {
+            if (logo == null)
+                return;
+
+            osuLogoButton.DetachLogo(60, Easing.OutQuint, pushLogoUpwards);
+
+            if (pushLogoUpwards)
+            {
+                logo.MoveToOffset(new Vector2(0, -0.15f), 240, Easing.OutQuint);
+                logo.FadeIn(240, Easing.OutQuint);
+            }
+
+            logo = null;
         }
     }
 }

@@ -7,6 +7,8 @@ using osu.Framework.Graphics.Cursor;
 using osu.Framework.Screens;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Mods;
+using osu.Game.Screens.Menu;
+using osu.Game.Screens.Play;
 using osu.Game.Screens.SelectV2.Footer;
 
 namespace osu.Game.Screens.SelectV2
@@ -28,7 +30,10 @@ namespace osu.Game.Screens.SelectV2
                 new PopoverContainer
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Child = footer = new FooterV2(),
+                    Child = footer = new FooterV2
+                    {
+                        OnOsu = () => this.Push(new PlayerLoader(() => new SoloPlayer()))
+                    },
                 },
                 overlay = new SoloModSelectOverlay()
             });
@@ -56,8 +61,8 @@ namespace osu.Game.Screens.SelectV2
 
         public override void OnSuspending(ScreenTransitionEvent e)
         {
-            footer.Hide();
-            this.Delay(400).FadeOut();
+            this.Delay(200).Schedule(footer.Hide)
+                .Delay(400).FadeOut();
             base.OnSuspending(e);
         }
 
@@ -66,6 +71,24 @@ namespace osu.Game.Screens.SelectV2
             footer.Hide();
             this.Delay(400).FadeOut();
             return base.OnExiting(e);
+        }
+
+        protected override void LogoArriving(OsuLogo logo, bool resuming)
+        {
+            base.LogoArriving(logo, resuming);
+            footer.AttachLogo(logo, resuming);
+        }
+
+        protected override void LogoSuspending(OsuLogo logo)
+        {
+            base.LogoSuspending(logo);
+            footer.DetachLogo(true);
+        }
+
+        protected override void LogoExiting(OsuLogo logo)
+        {
+            base.LogoExiting(logo);
+            footer.DetachLogo(false);
         }
 
         private partial class SoloModSelectOverlay : ModSelectOverlay

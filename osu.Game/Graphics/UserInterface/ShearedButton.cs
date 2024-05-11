@@ -73,6 +73,9 @@ namespace osu.Game.Graphics.UserInterface
         private Colour4? textColour;
 
         private readonly Container backgroundLayer;
+
+        protected Container ButtonContent { get; }
+
         private readonly Box flashLayer;
 
         /// <summary>
@@ -109,12 +112,17 @@ namespace osu.Game.Graphics.UserInterface
                         {
                             RelativeSizeAxes = Axes.Both
                         },
-                        text = new OsuSpriteText
+                        ButtonContent = new Container
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
-                            Font = OsuFont.TorusAlternate.With(size: 17),
-                            Shear = new Vector2(-shear, 0)
+                            Shear = new Vector2(-shear, 0),
+                            Child = text = new OsuSpriteText
+                            {
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
+                                Font = OsuFont.TorusAlternate.With(size: 17),
+                            }
                         },
                     }
                 },
