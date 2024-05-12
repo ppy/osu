@@ -188,9 +188,7 @@ namespace osu.Game.Screens.Select.FooterV2
         protected override void UpdateState(ValueChangedEvent<Visibility> state)
         {
             base.UpdateState(state);
-            // intentionally scheduling to let the button have a chance whether the popover will hide from clicking the button or clicking outside
-            // see the "hidingFromClick" field in FooterButtonOptionsV2.
-            Schedule(() => footerButton.OverlayState.Value = state.NewValue);
+            footerButton.OverlayState.Value = state.NewValue;
         }
     }
 }
