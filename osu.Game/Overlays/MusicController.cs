@@ -65,9 +65,6 @@ namespace osu.Game.Overlays
         private RealmAccess realm { get; set; }
 
         [Resolved]
-        private AudioManager audioManager { get; set; }
-
-        [Resolved]
         private AudioNormalizationManager audioNormalizationManager { get; set; }
 
         protected override void LoadComplete()
