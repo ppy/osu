@@ -42,8 +42,6 @@ namespace osu.Game.Audio
 
             normalizeSampleIfTrue(beatmapHitsoundBind.Value);
             beatmapHitsoundBind.BindValueChanged(change => normalizeSampleIfTrue(change.NewValue));
-
-            TrackNormalizeVolume.BindValueChanged(va => Logger.Log($"New track loudness normalization value is {va.NewValue}", level: LogLevel.Debug));
         }
 
         private void normalizeSampleIfTrue(bool value)

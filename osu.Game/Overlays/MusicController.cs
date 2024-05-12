@@ -354,7 +354,9 @@ namespace osu.Game.Overlays
                 {
                     AddInternal(queuedTrack);
 
-                    audioNormalizationManager.TrackNormalizeVolume.Value = current.BeatmapInfo.AudioNormalization?.IntegratedLoudnessInVolumeOffset ?? 0.8;
+                    double normalizedVol = current.BeatmapInfo.AudioNormalization?.IntegratedLoudnessInVolumeOffset ?? 0.8;
+                    this.TransformBindableTo(audioNormalizationManager.TrackNormalizeVolume, normalizedVol, 300, Easing.Out);
+
                     queuedTrack.VolumeTo(0).Then().VolumeTo(1, 300, Easing.Out);
                 }
                 else
