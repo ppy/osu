@@ -16,6 +16,7 @@ using osu.Framework.Graphics.Audio;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Logging;
 using osu.Framework.Threading;
+using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Rulesets.Mods;
@@ -67,7 +68,7 @@ namespace osu.Game.Overlays
         private AudioManager audioManager { get; set; }
 
         [Resolved]
-        private OsuGameBase gameBase { get; set; }
+        private AudioNormalizationManager audioNormalizationManager { get; set; }
 
         protected override void LoadComplete()
         {
@@ -342,8 +343,6 @@ namespace osu.Game.Overlays
 
             CurrentTrack = queuedTrack;
 
-            gameBase.TrackNormalizeVolume.Value = current.BeatmapInfo.AudioNormalization?.IntegratedLoudnessInVolumeOffset ?? 0.8;
-
             // At this point we may potentially be in an async context from tests. This is extremely dangerous but we have to make do for now.
             // CurrentTrack is immediately updated above for situations where a immediate knowledge about the new track is required,
             // but the mutation of the hierarchy is scheduled to avoid exceptions.
@@ -354,6 +353,8 @@ namespace osu.Game.Overlays
                 if (queuedTrack == CurrentTrack)
                 {
                     AddInternal(queuedTrack);
+
+                    audioNormalizationManager.TrackNormalizeVolume.Value = current.BeatmapInfo.AudioNormalization?.IntegratedLoudnessInVolumeOffset ?? 0.8;
                     queuedTrack.VolumeTo(0).Then().VolumeTo(1, 300, Easing.Out);
                 }
                 else

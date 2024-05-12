@@ -198,7 +198,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         }
 
         [BackgroundDependencyLoader]
-        private void load(IGameplaySettings gameplaySettings, ISkinSource skinSource, OsuGameBase gameBase)
+        private void load(IGameplaySettings gameplaySettings, ISkinSource skinSource, AudioNormalizationManager audioNormalizationManager)
         {
             positionalHitsoundsLevel.BindTo(gameplaySettings.PositionalHitsoundsLevel);
             comboColourBrightness.BindTo(gameplaySettings.ComboColourNormalisationAmount);
@@ -209,7 +209,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
                 MinimumSampleVolume = MINIMUM_SAMPLE_VOLUME
             });
 
-            Samples.AddAdjustment(AdjustableProperty.Volume, gameBase.SampleNormalizeVolume);
+            Samples.AddAdjustment(AdjustableProperty.Volume, audioNormalizationManager.SampleNormalizeVolume);
 
             CurrentSkin = skinSource;
             CurrentSkin.SourceChanged += skinSourceChanged;

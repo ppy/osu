@@ -212,6 +212,8 @@ namespace osu.Game
 
         protected SafeAreaContainer SafeAreaContainer { get; private set; }
 
+        protected AudioNormalizationManager AudioNormalizationManager { get; private set; }
+
         /// <summary>
         /// For now, this is used as a source specifically for beat synced components.
         /// Going forward, it could potentially be used as the single source-of-truth for beatmap timing.
@@ -223,13 +225,6 @@ namespace osu.Game
         private Container content;
 
         private DependencyContainer dependencies;
-
-        private Bindable<bool> beatmapHitsoundBind = null!;
-
-        // drop track volume game-wide to leave some head-room for UI effects / samples.
-        public readonly BindableDouble TrackNormalizeVolume = new BindableDouble(0.8);
-
-        public readonly BindableDouble SampleNormalizeVolume = new BindableDouble(1.0);
 
         private Bindable<string> frameworkLocale = null!;
 
@@ -353,26 +348,7 @@ namespace osu.Game
             RegisterImportHandler(ScoreManager);
             RegisterImportHandler(SkinManager);
 
-            // Apply normalization to tracks and samples.
-            // Samples will get normalized in line with tracks only if BeatmapHitsounds is enabled.
-            Audio.Tracks.AddAdjustment(AdjustableProperty.Volume, TrackNormalizeVolume);
-            beatmapHitsoundBind = LocalConfig.GetBindable<bool>(OsuSetting.BeatmapHitsounds);
-
-            void normalizeSampleIfTrue(bool value)
-            {
-                if (value)
-                {
-                    SampleNormalizeVolume.BindTo(TrackNormalizeVolume);
-                }
-                else
-                {
-                    SampleNormalizeVolume.UnbindFrom(TrackNormalizeVolume);
-                    SampleNormalizeVolume.Value = 1.0;
-                }
-            }
-
-            normalizeSampleIfTrue(beatmapHitsoundBind.Value);
-            beatmapHitsoundBind.BindValueChanged(change => normalizeSampleIfTrue(change.NewValue));
+            dependencies.Cache(AudioNormalizationManager = new AudioNormalizationManager(Audio, LocalConfig));
 
             Beatmap = new NonNullableBindable<WorkingBeatmap>(defaultBeatmap);
 
