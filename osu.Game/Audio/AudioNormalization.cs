@@ -90,9 +90,8 @@ namespace osu.Game.Audio
         }
 
         /// <summary>
-        /// Convert integrated loudness to a volume offset
+        /// A volume offset that can be applied upon audio to reach <see cref="TARGET_LEVEL"/> (converted from integrated loudness).
         /// </summary>
-        /// <returns>The volume offset needed to reach <see cref="TARGET_LEVEL"/></returns>
         public float IntegratedLoudnessInVolumeOffset => IntegratedLoudness != null ? (float)Math.Pow(10, (TARGET_LEVEL - (double)IntegratedLoudness) / 20) : 0.8f;
 
         /// <inheritdoc />
