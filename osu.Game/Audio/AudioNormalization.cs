@@ -54,7 +54,7 @@ namespace osu.Game.Audio
                 return;
             }
 
-            using AudioLoudness loudness = new AudioLoudness(realmFileStore.Storage.GetStream(filepath));
+            using TrackLoudness loudness = new TrackLoudness(realmFileStore.Storage.GetStream(filepath));
 
             float? integratedLoudness = loudness.GetIntegratedLoudness();
 
