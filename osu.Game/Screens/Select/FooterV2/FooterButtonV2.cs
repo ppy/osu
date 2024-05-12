@@ -5,6 +5,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
@@ -66,6 +67,7 @@ namespace osu.Game.Screens.Select.FooterV2
         protected Container TextContainer;
         private readonly Box bar;
         private readonly Box backgroundBox;
+        private readonly Box glowBox;
         private readonly Box flashLayer;
 
         public FooterButtonV2()
@@ -89,6 +91,10 @@ namespace osu.Game.Screens.Select.FooterV2
                 Children = new Drawable[]
                 {
                     backgroundBox = new Box
+                    {
+                        RelativeSizeAxes = Axes.Both
+                    },
+                    glowBox = new Box
                     {
                         RelativeSizeAxes = Axes.Both
                     },
@@ -207,6 +213,8 @@ namespace osu.Game.Screens.Select.FooterV2
             text.FadeColour(textColour, 150, Easing.OutQuint);
             icon.FadeColour(accentColour, 150, Easing.OutQuint);
             bar.FadeColour(accentColour, 150, Easing.OutQuint);
+
+            glowBox.FadeColour(ColourInfo.GradientVertical(buttonAccentColour.Opacity(0f), buttonAccentColour.Opacity(0.2f)), 150, Easing.OutQuint);
         }
     }
 }
