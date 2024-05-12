@@ -40,6 +40,7 @@ namespace osu.Game.Scoring.Legacy
             };
 
             WorkingBeatmap workingBeatmap;
+            ScoreRank? decodedRank = null;
 
             using (SerializationReader sr = new SerializationReader(stream))
             {
@@ -129,6 +130,14 @@ namespace osu.Game.Scoring.Legacy
                         score.ScoreInfo.MaximumStatistics = readScore.MaximumStatistics;
                         score.ScoreInfo.Mods = readScore.Mods.Select(m => m.ToMod(currentRuleset)).ToArray();
                         score.ScoreInfo.ClientVersion = readScore.ClientVersion;
+                        decodedRank = readScore.Rank;
+                        if (readScore.UserID > 1)
+                            score.ScoreInfo.RealmUser.OnlineID = readScore.UserID;
+
+                        if (readScore.TotalScoreWithoutMods is long totalScoreWithoutMods)
+                            score.ScoreInfo.TotalScoreWithoutMods = totalScoreWithoutMods;
+                        else
+                            PopulateTotalScoreWithoutMods(score.ScoreInfo);
                     });
                 }
             }
@@ -139,6 +148,9 @@ namespace osu.Game.Scoring.Legacy
                 score.ScoreInfo.LegacyTotalScore = score.ScoreInfo.TotalScore;
 
             StandardisedScoreMigrationTools.UpdateFromLegacy(score.ScoreInfo, workingBeatmap);
+
+            if (decodedRank != null)
+                score.ScoreInfo.Rank = decodedRank.Value;
 
             // before returning for database import, we must restore the database-sourced BeatmapInfo.
             // if not, the clone operation in GetPlayableBeatmap will cause a dereference and subsequent database exception.
@@ -235,6 +247,16 @@ namespace osu.Game.Scoring.Legacy
             if (attributes.MaxCombo > maxComboFromStatistics)
                 score.MaximumStatistics[HitResult.LegacyComboIncrease] = attributes.MaxCombo - maxComboFromStatistics;
 #pragma warning restore CS0618
+        }
+
+        public static void PopulateTotalScoreWithoutMods(ScoreInfo score)
+        {
+            double modMultiplier = 1;
+
+            foreach (var mod in score.Mods)
+                modMultiplier *= mod.ScoreMultiplier;
+
+            score.TotalScoreWithoutMods = (long)Math.Round(score.TotalScore / modMultiplier);
         }
 
         private void readLegacyReplay(Replay replay, StreamReader reader)

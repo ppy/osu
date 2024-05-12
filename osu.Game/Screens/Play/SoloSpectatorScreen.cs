@@ -16,6 +16,7 @@ using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterfaceV2;
+using osu.Game.Localisation;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
@@ -138,7 +139,7 @@ namespace osu.Game.Screens.Play
                             },
                             automaticDownload = new SettingsCheckbox
                             {
-                                LabelText = "Automatically download beatmaps",
+                                LabelText = OnlineSettingsStrings.AutomaticallyDownloadMissingBeatmaps,
                                 Current = config.GetBindable<bool>(OsuSetting.AutomaticallyDownloadMissingBeatmaps),
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,

@@ -27,6 +27,7 @@ namespace osu.Game.Tests.Beatmaps
             BeatmapInfo = baseBeatmap.BeatmapInfo;
             ControlPointInfo = baseBeatmap.ControlPointInfo;
             Breaks = baseBeatmap.Breaks;
+            UnhandledEventLines = baseBeatmap.UnhandledEventLines;
 
             if (withHitObjects)
                 HitObjects = baseBeatmap.HitObjects;
