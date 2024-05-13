@@ -580,7 +580,6 @@ namespace osu.Game.Rulesets.Osu.Tests
         }
 
         [Test]
-        [Solo]
         public void TestTouchJudgedCircle()
         {
             addHitCircleAt(TouchSource.Touch1);
