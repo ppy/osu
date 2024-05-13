@@ -4,6 +4,8 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
+using osu.Game.Overlays;
 using osuTK;
 
 namespace osu.Game.Screens.Select
@@ -29,10 +31,15 @@ namespace osu.Game.Screens.Select
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
                     Direction = FillDirection.Vertical,
-                    Spacing = new Vector2(10),
+                    Spacing = new Vector2(5),
                     Children = new Drawable[]
                     {
                         new ObjectCountContent
+                        {
+                            Anchor = Anchor.TopCentre,
+                            Origin = Anchor.TopCentre,
+                        },
+                        new RowDivider
                         {
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
@@ -46,6 +53,31 @@ namespace osu.Game.Screens.Select
                 },
                 // TODO: add online stats column
             };
+        }
+
+        private partial class RowDivider : CompositeDrawable
+        {
+            public RowDivider()
+            {
+                Height = 2;
+                RelativeSizeAxes = Axes.X;
+                Padding = new MarginPadding { Horizontal = BarStatisticRow.HORIZONTAL_PADDING };
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(OverlayColourProvider colourProvider)
+            {
+                InternalChild = new CircularContainer
+                {
+                    Masking = true,
+                    RelativeSizeAxes = Axes.Both,
+                    Child = new Box
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Colour = colourProvider.Background3,
+                    }
+                };
+            }
         }
     }
 }
