@@ -11,7 +11,7 @@ using Realms;
 namespace osu.Game.Audio
 {
     /// <summary>
-    /// Audio Normalization Manager
+    /// Audio Normalization Data
     /// </summary>
     public class AudioNormalization : EmbeddedObject, IEquatable<AudioNormalization>
     {
@@ -92,7 +92,7 @@ namespace osu.Game.Audio
         /// <summary>
         /// A volume offset that can be applied upon audio to reach <see cref="TARGET_LEVEL"/> (converted from integrated loudness).
         /// </summary>
-        public float IntegratedLoudnessInVolumeOffset => IntegratedLoudness != null ? (float)Math.Pow(10, (TARGET_LEVEL - (double)IntegratedLoudness) / 20) : 0.8f;
+        public double? IntegratedLoudnessInVolumeOffset => IntegratedLoudness != null ? TrackLoudness.ConvertToVolumeOffset(TARGET_LEVEL, (float)IntegratedLoudness) : null;
 
         /// <inheritdoc />
         public bool Equals(AudioNormalization? other) => other?.IntegratedLoudness != null && IntegratedLoudness != null && Math.Abs((float)(IntegratedLoudness - other.IntegratedLoudness)) < 0.0000001;
