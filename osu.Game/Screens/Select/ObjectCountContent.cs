@@ -38,7 +38,7 @@ namespace osu.Game.Screens.Select
         {
             base.LoadComplete();
 
-            ruleset.BindValueChanged(r => updateObjectCounts());
+            ruleset.BindValueChanged(_ => updateObjectCounts());
 
             beatmapInfo.BindValueChanged(_ => updateObjectCounts(), true);
         }

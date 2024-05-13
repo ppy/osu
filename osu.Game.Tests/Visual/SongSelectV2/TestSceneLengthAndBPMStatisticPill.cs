@@ -4,12 +4,10 @@
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Online.API.Requests.Responses;
-using osu.Game.Overlays;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Screens.Select;
@@ -18,24 +16,8 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 {
     public partial class TestSceneLengthAndBPMStatisticPill : SongSelectComponentsTestScene
     {
-        [Cached]
-        private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Aquamarine);
-
-        [Cached(typeof(IBindable<IBeatmapInfo?>))]
-        private readonly Bindable<IBeatmapInfo?> beatmapInfo = new Bindable<IBeatmapInfo?>();
-
         [Resolved]
         private OsuColour colours { get; set; } = null!;
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            Beatmap.BindValueChanged(b =>
-            {
-                beatmapInfo.Value = b.NewValue.BeatmapInfo;
-            }, true);
-        }
 
         [SetUpSteps]
         public override void SetUpSteps()
@@ -77,7 +59,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         [Test]
         public void TestAPIBeatmap()
         {
-            AddStep("set beatmap", () => beatmapInfo.Value = new APIBeatmap
+            AddStep("set beatmap", () => BeatmapInfo.Value = new APIBeatmap
             {
                 Length = 83000,
                 HitLength = 62000,
@@ -88,16 +70,16 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             AddStep("set double time", () => SelectedMods.Value = new[] { new OsuModDoubleTime() });
 
             AddAssert("length value color not changed", () => this.ChildrenOfType<LengthAndBPMStatisticPill.PillStatistic>().ElementAt(0).ValueColour,
-                () => Is.EqualTo(colourProvider.Content2));
+                () => Is.EqualTo(ColourProvider.Content2));
             AddAssert("bpm value color not changed", () => this.ChildrenOfType<LengthAndBPMStatisticPill.PillStatistic>().ElementAt(1).ValueColour,
-                () => Is.EqualTo(colourProvider.Content2));
+                () => Is.EqualTo(ColourProvider.Content2));
 
             AddStep("set half time", () => SelectedMods.Value = new[] { new OsuModHalfTime() });
 
             AddAssert("length value color not changed", () => this.ChildrenOfType<LengthAndBPMStatisticPill.PillStatistic>().ElementAt(0).ValueColour,
-                () => Is.EqualTo(colourProvider.Content2));
+                () => Is.EqualTo(ColourProvider.Content2));
             AddAssert("bpm value color not changed", () => this.ChildrenOfType<LengthAndBPMStatisticPill.PillStatistic>().ElementAt(1).ValueColour,
-                () => Is.EqualTo(colourProvider.Content2));
+                () => Is.EqualTo(ColourProvider.Content2));
         }
     }
 }

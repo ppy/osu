@@ -45,13 +45,10 @@ namespace osu.Game.Screens.Select
                     Masking = true,
                     CornerRadius = SongSelect.WEDGE_CORNER_RADIUS,
                     Shear = SongSelect.WEDGED_CONTAINER_SHEAR,
-                    Children = new Drawable[]
+                    Child = new Box
                     {
-                        new Box
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Colour = colourProvider.Background5,
-                        },
+                        RelativeSizeAxes = Axes.Both,
+                        Colour = colourProvider.Background5,
                     },
                 },
                 content

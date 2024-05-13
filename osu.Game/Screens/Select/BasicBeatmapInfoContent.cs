@@ -19,50 +19,47 @@ namespace osu.Game.Screens.Select
         [BackgroundDependencyLoader]
         private void load()
         {
-            InternalChildren = new Drawable[]
+            InternalChild = new FillFlowContainer
             {
-                new FillFlowContainer
+                RelativeSizeAxes = Axes.X,
+                AutoSizeAxes = Axes.Y,
+                Direction = FillDirection.Vertical,
+                Spacing = new Vector2(10),
+                Children = new Drawable[]
                 {
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
-                    Direction = FillDirection.Vertical,
-                    Spacing = new Vector2(10),
-                    Children = new Drawable[]
+                    new GridContainer
                     {
-                        new GridContainer
+                        RelativeSizeAxes = Axes.X,
+                        AutoSizeAxes = Axes.Y,
+                        RowDimensions = new[]
                         {
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
-                            RowDimensions = new[]
+                            new Dimension(GridSizeMode.AutoSize)
+                        },
+                        ColumnDimensions = new[]
+                        {
+                            new Dimension(),
+                            new Dimension(GridSizeMode.Absolute, 10), // padding
+                            new Dimension(GridSizeMode.AutoSize),
+                        },
+                        Content = new[]
+                        {
+                            new[]
                             {
-                                new Dimension(GridSizeMode.AutoSize)
-                            },
-                            ColumnDimensions = new[]
-                            {
-                                new Dimension(),
-                                new Dimension(GridSizeMode.Absolute, 10), // padding
-                                new Dimension(GridSizeMode.AutoSize),
-                            },
-                            Content = new[]
-                            {
-                                new[]
+                                new DifficultyNameContent
                                 {
-                                    new DifficultyNameContent
-                                    {
-                                        Anchor = Anchor.CentreLeft,
-                                        Origin = Anchor.CentreLeft,
-                                    },
-                                    Empty(),
-                                    new LengthAndBPMStatisticPill
-                                    {
-                                        Anchor = Anchor.CentreRight,
-                                        Origin = Anchor.CentreRight,
-                                    }
+                                    Anchor = Anchor.CentreLeft,
+                                    Origin = Anchor.CentreLeft,
+                                },
+                                Empty(),
+                                new LengthAndBPMStatisticPill
+                                {
+                                    Anchor = Anchor.CentreRight,
+                                    Origin = Anchor.CentreRight,
                                 }
                             }
-                        },
-                        // TODO: add density and fail graph content
+                        }
                     },
+                    // TODO: add density and fail graph content
                 },
             };
         }

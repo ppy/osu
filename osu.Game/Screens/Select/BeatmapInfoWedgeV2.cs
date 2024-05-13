@@ -199,10 +199,7 @@ namespace osu.Game.Screens.Select
                 difficultyColourBar.FadeColour(colours.ForStarDifficulty(s.NewValue));
             }, true);
 
-            beatmap.BindValueChanged(b =>
-            {
-                updateDisplay();
-            }, true);
+            beatmap.BindValueChanged(_ => updateDisplay(), true);
         }
 
         private const double animation_duration = 600;

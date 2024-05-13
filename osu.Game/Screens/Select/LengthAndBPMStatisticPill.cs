@@ -32,7 +32,7 @@ namespace osu.Game.Screens.Select
         private PillStatistic lengthStatistic = null!;
         private PillStatistic bpmStatistic = null!;
 
-        private ModSettingChangeTracker? settingChangeTracker;
+        private ModSettingChangeTracker? modSettingChangeTracker;
 
         [Resolved]
         private IBindable<IBeatmapInfo?> beatmapInfo { get; set; } = null!;
@@ -93,19 +93,19 @@ namespace osu.Game.Screens.Select
         {
             base.LoadComplete();
 
-            beatmapInfo.BindValueChanged(b => updateStatistics());
+            beatmapInfo.BindValueChanged(_ => updateStatistics());
 
             mods.BindValueChanged(m =>
             {
                 // only valid in song select context
                 if (beatmapInfo.Value is not BeatmapInfo) return;
 
-                settingChangeTracker?.Dispose();
+                modSettingChangeTracker?.Dispose();
 
                 updateStatistics();
 
-                settingChangeTracker = new ModSettingChangeTracker(m.NewValue);
-                settingChangeTracker.SettingChanged += _ => updateStatistics();
+                modSettingChangeTracker = new ModSettingChangeTracker(m.NewValue);
+                modSettingChangeTracker.SettingChanged += _ => updateStatistics();
             }, true);
         }
 
@@ -216,7 +216,7 @@ namespace osu.Game.Screens.Select
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
-            settingChangeTracker?.Dispose();
+            modSettingChangeTracker?.Dispose();
         }
     }
 }
