@@ -52,7 +52,11 @@ namespace osu.Game.Online.Leaderboards
 
         private const float right_content_width = 180;
         private const float grade_width = 40;
-        private const float username_min_width = 100;
+        private const float username_min_width = 125;
+        private const float statistics_regular_min_width = 175;
+        private const float statistics_compact_min_width = 100;
+        private const float rank_label_width = 65;
+        private const float rank_label_visibility_width_cutoff = rank_label_width + height + username_min_width + statistics_regular_min_width + right_content_width;
 
         private readonly ScoreInfo score;
 
@@ -101,9 +105,9 @@ namespace osu.Game.Online.Leaderboards
         private Drawable scoreRank = null!;
         private Box totalScoreBackground = null!;
 
-        private Container centreContent = null!;
-        private FillFlowContainer usernameAndFlagContainer = null!;
         private FillFlowContainer statisticsContainer = null!;
+        private RankLabel rankLabel = null!;
+        private Container rankLabelOverlay = null!;
 
         public ITooltip<ScoreInfo> GetCustomTooltip() => new LeaderboardScoreTooltip();
         public virtual ScoreInfo TooltipContent => score;
@@ -151,7 +155,7 @@ namespace osu.Game.Online.Leaderboards
                         RelativeSizeAxes = Axes.Both,
                         ColumnDimensions = new[]
                         {
-                            new Dimension(GridSizeMode.Absolute, 65),
+                            new Dimension(GridSizeMode.AutoSize),
                             new Dimension(),
                             new Dimension(GridSizeMode.Absolute, right_content_width),
                         },
@@ -159,8 +163,17 @@ namespace osu.Game.Online.Leaderboards
                         {
                             new Drawable[]
                             {
-                                new RankLabel(rank) { Shear = -shear },
-                                centreContent = createCentreContent(user),
+                                new Container
+                                {
+                                    AutoSizeAxes = Axes.X,
+                                    RelativeSizeAxes = Axes.Y,
+                                    Child = rankLabel = new RankLabel(rank)
+                                    {
+                                        Width = rank_label_width,
+                                        RelativeSizeAxes = Axes.Y,
+                                    },
+                                },
+                                createCentreContent(user),
                                 createRightContent()
                             }
                         }
@@ -214,21 +227,43 @@ namespace osu.Game.Online.Leaderboards
                                 AutoSizeAxes = Axes.Both,
                                 CornerRadius = corner_radius,
                                 Masking = true,
-                                Child = avatar = new DelayedLoadWrapper(
-                                    innerAvatar = new ClickableAvatar(user)
-                                    {
-                                        Anchor = Anchor.Centre,
-                                        Origin = Anchor.Centre,
-                                        Scale = new Vector2(1.1f),
-                                        Shear = -shear,
-                                        RelativeSizeAxes = Axes.Both,
-                                    })
+                                Children = new[]
                                 {
-                                    RelativeSizeAxes = Axes.None,
-                                    Size = new Vector2(height)
+                                    avatar = new DelayedLoadWrapper(
+                                        innerAvatar = new ClickableAvatar(user)
+                                        {
+                                            Anchor = Anchor.Centre,
+                                            Origin = Anchor.Centre,
+                                            Scale = new Vector2(1.1f),
+                                            Shear = -shear,
+                                            RelativeSizeAxes = Axes.Both,
+                                        })
+                                    {
+                                        RelativeSizeAxes = Axes.None,
+                                        Size = new Vector2(height)
+                                    },
+                                    rankLabelOverlay = new Container
+                                    {
+                                        RelativeSizeAxes = Axes.Both,
+                                        Alpha = 0,
+                                        Children = new Drawable[]
+                                        {
+                                            new Box
+                                            {
+                                                RelativeSizeAxes = Axes.Both,
+                                                Colour = Colour4.Black.Opacity(0.5f),
+                                            },
+                                            new RankLabel(rank)
+                                            {
+                                                AutoSizeAxes = Axes.Both,
+                                                Anchor = Anchor.Centre,
+                                                Origin = Anchor.Centre,
+                                            },
+                                        }
+                                    }
                                 },
                             },
-                            usernameAndFlagContainer = new FillFlowContainer
+                            new FillFlowContainer
                             {
                                 Anchor = Anchor.CentreLeft,
                                 Origin = Anchor.CentreLeft,
@@ -279,7 +314,7 @@ namespace osu.Game.Online.Leaderboards
                                 {
                                     Name = @"Statistics container",
                                     Padding = new MarginPadding { Right = 40 },
-                                    Spacing = new Vector2(25),
+                                    Spacing = new Vector2(25, 0),
                                     Shear = -shear,
                                     Anchor = Anchor.CentreRight,
                                     Origin = Anchor.CentreRight,
@@ -287,6 +322,8 @@ namespace osu.Game.Online.Leaderboards
                                     Direction = FillDirection.Horizontal,
                                     Children = statisticsLabels,
                                     Alpha = 0,
+                                    LayoutEasing = Easing.OutQuint,
+                                    LayoutDuration = transition_duration,
                                 }
                             }
                         }
@@ -483,6 +520,11 @@ namespace osu.Game.Online.Leaderboards
             foreground.FadeColour(IsHovered ? foregroundColour.Lighten(0.2f) : foregroundColour, transition_duration, Easing.OutQuint);
             background.FadeColour(IsHovered ? backgroundColour.Lighten(0.2f) : backgroundColour, transition_duration, Easing.OutQuint);
             totalScoreBackground.FadeColour(IsHovered ? lightenedGradient : totalScoreBackgroundGradient, transition_duration, Easing.OutQuint);
+
+            if (DrawWidth < rank_label_visibility_width_cutoff && IsHovered)
+                rankLabelOverlay.FadeIn(transition_duration, Easing.OutQuint);
+            else
+                rankLabelOverlay.FadeOut(transition_duration, Easing.OutQuint);
         }
 
         protected override bool OnInvalidate(Invalidation invalidation, InvalidationSource source)
@@ -490,22 +532,27 @@ namespace osu.Game.Online.Leaderboards
             Scheduler.AddOnce(() =>
             {
                 // when width decreases
-                // - hide statistics, then
-                // - hide avatar, then
-                // - hide user and flag and show avatar again
+                // - hide rank and show rank overlay on avatar when hovered, then
+                // - compact statistics, then
+                // - hide statistics
 
-                if (centreContent.DrawWidth >= height + username_min_width || centreContent.DrawWidth < username_min_width)
-                    avatar.FadeIn(transition_duration, Easing.OutQuint).MoveToX(0, transition_duration, Easing.OutQuint);
+                if (DrawWidth >= rank_label_visibility_width_cutoff)
+                    rankLabel.FadeIn(transition_duration, Easing.OutQuint).MoveToX(0, transition_duration, Easing.OutQuint);
                 else
-                    avatar.FadeOut(transition_duration, Easing.OutQuint).MoveToX(-avatar.DrawWidth, transition_duration, Easing.OutQuint);
+                    rankLabel.FadeOut(transition_duration, Easing.OutQuint).MoveToX(-rankLabel.DrawWidth, transition_duration, Easing.OutQuint);
 
-                if (centreContent.DrawWidth >= username_min_width)
-                    usernameAndFlagContainer.FadeIn(transition_duration, Easing.OutQuint).MoveToX(0, transition_duration, Easing.OutQuint);
-                else
-                    usernameAndFlagContainer.FadeOut(transition_duration, Easing.OutQuint).MoveToX(usernameAndFlagContainer.DrawWidth, transition_duration, Easing.OutQuint);
-
-                if (centreContent.DrawWidth >= height + statisticsContainer.DrawWidth + username_min_width)
+                if (DrawWidth >= height + username_min_width + statistics_regular_min_width + right_content_width)
+                {
                     statisticsContainer.FadeIn(transition_duration, Easing.OutQuint).MoveToX(0, transition_duration, Easing.OutQuint);
+                    statisticsContainer.Direction = FillDirection.Horizontal;
+                    statisticsContainer.ScaleTo(1, transition_duration, Easing.OutQuint);
+                }
+                else if (DrawWidth >= height + username_min_width + statistics_compact_min_width + right_content_width)
+                {
+                    statisticsContainer.FadeIn(transition_duration, Easing.OutQuint).MoveToX(0, transition_duration, Easing.OutQuint);
+                    statisticsContainer.Direction = FillDirection.Vertical;
+                    statisticsContainer.ScaleTo(0.8f, transition_duration, Easing.OutQuint);
+                }
                 else
                     statisticsContainer.FadeOut(transition_duration, Easing.OutQuint).MoveToX(statisticsContainer.DrawWidth, transition_duration, Easing.OutQuint);
             });
@@ -577,15 +624,14 @@ namespace osu.Game.Online.Leaderboards
         {
             public RankLabel(int? rank)
             {
-                AutoSizeAxes = Axes.Both;
-                Anchor = Anchor.Centre;
-                Origin = Anchor.Centre;
-
                 if (rank >= 1000)
                     TooltipText = $"#{rank:N0}";
 
                 Child = new OsuSpriteText
                 {
+                    Shear = -shear,
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
                     Font = OsuFont.GetFont(size: 20, weight: FontWeight.SemiBold, italics: true),
                     Text = rank == null ? "-" : rank.Value.FormatRank().Insert(0, "#")
                 };
