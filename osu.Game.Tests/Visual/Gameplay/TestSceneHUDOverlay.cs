@@ -6,11 +6,11 @@ using System.Diagnostics;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Audio.Track;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
-using osu.Framework.Timing;
 using osu.Game.Configuration;
 using osu.Game.Graphics.Containers;
 using osu.Game.Rulesets.Mods;
@@ -41,7 +41,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         private GameplayState gameplayState = TestGameplayState.Create(new OsuRuleset());
 
         [Cached(typeof(IGameplayClock))]
-        private readonly IGameplayClock gameplayClock = new GameplayClockContainer(new FramedClock());
+        private readonly IGameplayClock gameplayClock = new GameplayClockContainer(new TrackVirtual(60000), false, false);
 
         // best way to check without exposing.
         private Drawable hideTarget => hudOverlay.ChildrenOfType<SkinComponentsContainer>().First();

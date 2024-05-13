@@ -34,9 +34,9 @@
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
 	<key>NSCameraUsageDescription</key>
-	<string>We don&apos;t really use the camera.</string>
+	<string>We don't really use the camera.</string>
 	<key>NSMicrophoneUsageDescription</key>
-	<string>We don&apos;t really use the microphone.</string>
+	<string>We don't really use the microphone.</string>
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationLandscapeRight</string>
@@ -102,6 +102,19 @@
 				<string>osz</string>
 			</dict>
 		</dict>
+		<dict>
+			<key>UTTypeConformsTo</key>
+			<array>
+				<string>sh.ppy.osu.items</string>
+			</array>
+			<key>UTTypeIdentifier</key>
+			<string>sh.ppy.osu.olz</string>
+			<key>UTTypeTagSpecification</key>
+			<dict>
+				<key>public.filename-extension</key>
+				<string>olz</string>
+			</dict>
+		</dict>
 	</array>
 	<key>CFBundleDocumentTypes</key>
 	<array>
@@ -130,5 +143,7 @@
 			<string>Editor</string>
 		</dict>
 	</array>
+	<key>LSApplicationCategoryType</key>
+	<string>public.app-category.music-games</string>
 </dict>
 </plist>

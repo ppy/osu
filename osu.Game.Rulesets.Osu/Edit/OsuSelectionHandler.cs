@@ -42,6 +42,7 @@ namespace osu.Game.Rulesets.Osu.Edit
 
             SelectionBox.CanFlipX = SelectionBox.CanScaleX = quad.Width > 0;
             SelectionBox.CanFlipY = SelectionBox.CanScaleY = quad.Height > 0;
+            SelectionBox.CanScaleDiagonally = SelectionBox.CanScaleX && SelectionBox.CanScaleY;
             SelectionBox.CanReverse = EditorBeatmap.SelectedHitObjects.Count > 1 || EditorBeatmap.SelectedHitObjects.Any(s => s is Slider);
         }
 
@@ -77,12 +78,20 @@ namespace osu.Game.Rulesets.Osu.Edit
 
         public override bool HandleReverse()
         {
-            var hitObjects = EditorBeatmap.SelectedHitObjects;
+            var hitObjects = EditorBeatmap.SelectedHitObjects
+                                          .OfType<OsuHitObject>()
+                                          .OrderBy(obj => obj.StartTime)
+                                          .ToList();
 
             double endTime = hitObjects.Max(h => h.GetEndTime());
             double startTime = hitObjects.Min(h => h.StartTime);
 
             bool moreThanOneObject = hitObjects.Count > 1;
+
+            // the expectation is that even if the objects themselves are reversed temporally,
+            // the position of new combos in the selection should remain the same.
+            // preserve it for later before doing the reversal.
+            var newComboOrder = hitObjects.Select(obj => obj.NewCombo).ToList();
 
             foreach (var h in hitObjects)
             {
@@ -95,6 +104,12 @@ namespace osu.Game.Rulesets.Osu.Edit
                     slider.Position += offset;
                 }
             }
+
+            // re-order objects by start time again after reversing, and restore new combo flag positioning
+            hitObjects = hitObjects.OrderBy(obj => obj.StartTime).ToList();
+
+            for (int i = 0; i < hitObjects.Count; ++i)
+                hitObjects[i].NewCombo = newComboOrder[i];
 
             return true;
         }
@@ -320,7 +335,7 @@ namespace osu.Game.Rulesets.Osu.Edit
 
             if (mergedHitObject.Path.ControlPoints.Count == 0)
             {
-                mergedHitObject.Path.ControlPoints.Add(new PathControlPoint(Vector2.Zero, PathType.Linear));
+                mergedHitObject.Path.ControlPoints.Add(new PathControlPoint(Vector2.Zero, PathType.LINEAR));
             }
 
             // Merge all the selected hit objects into one slider path.
@@ -350,7 +365,7 @@ namespace osu.Game.Rulesets.Osu.Edit
                     // Turn the last control point into a linear type if this is the first merging circle in a sequence, so the subsequent control points can be inherited path type.
                     if (!lastCircle)
                     {
-                        mergedHitObject.Path.ControlPoints.Last().Type = PathType.Linear;
+                        mergedHitObject.Path.ControlPoints.Last().Type = PathType.LINEAR;
                     }
 
                     mergedHitObject.Path.ControlPoints.Add(new PathControlPoint(selectedMergeableObject.Position - mergedHitObject.Position));

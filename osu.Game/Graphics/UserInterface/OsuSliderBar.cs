@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Numerics;
 using System.Globalization;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -15,7 +16,7 @@ using osu.Game.Utils;
 namespace osu.Game.Graphics.UserInterface
 {
     public abstract partial class OsuSliderBar<T> : SliderBar<T>, IHasTooltip
-        where T : struct, IEquatable<T>, IComparable<T>, IConvertible
+        where T : struct, INumber<T>, IMinMaxValue<T>
     {
         public bool PlaySamplesOnAdjust { get; set; } = true;
 
@@ -62,7 +63,7 @@ namespace osu.Game.Graphics.UserInterface
             if (!PlaySamplesOnAdjust)
                 return;
 
-            if (Clock == null || Clock.CurrentTime - lastSampleTime <= 30)
+            if (Clock.CurrentTime - lastSampleTime <= 30)
                 return;
 
             if (value.Equals(lastSampleValue))
@@ -85,11 +86,11 @@ namespace osu.Game.Graphics.UserInterface
         private LocalisableString getTooltipText(T value)
         {
             if (CurrentNumber.IsInteger)
-                return value.ToInt32(NumberFormatInfo.InvariantInfo).ToString("N0");
+                return int.CreateTruncating(value).ToString("N0");
 
-            double floatValue = value.ToDouble(NumberFormatInfo.InvariantInfo);
+            double floatValue = double.CreateTruncating(value);
 
-            decimal decimalPrecision = normalise(CurrentNumber.Precision.ToDecimal(NumberFormatInfo.InvariantInfo), max_decimal_digits);
+            decimal decimalPrecision = normalise(decimal.CreateTruncating(CurrentNumber.Precision), max_decimal_digits);
 
             // Find the number of significant digits (we could have less than 5 after normalize())
             int significantDigits = FormatUtils.FindPrecision(decimalPrecision);

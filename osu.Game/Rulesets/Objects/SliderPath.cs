@@ -31,7 +31,7 @@ namespace osu.Game.Rulesets.Objects
         /// </summary>
         public readonly Bindable<double?> ExpectedDistance = new Bindable<double?>();
 
-        public bool HasValidLength => Distance > 0;
+        public bool HasValidLength => Precision.DefinitelyBigger(Distance, 0);
 
         /// <summary>
         /// The control points of the path.
@@ -42,6 +42,17 @@ namespace osu.Game.Rulesets.Objects
         private readonly List<double> cumulativeLength = new List<double>();
         private readonly Cached pathCache = new Cached();
 
+        /// <summary>
+        /// Any additional length of the path which was optimised out during piecewise approximation, but should still be considered as part of <see cref="calculatedLength"/>.
+        /// </summary>
+        /// <remarks>
+        /// This is a hack for Catmull paths.
+        /// </remarks>
+        private double optimisedLength;
+
+        /// <summary>
+        /// The final calculated length of the path.
+        /// </summary>
         private double calculatedLength;
 
         private readonly List<int> segmentEnds = new List<int>();
@@ -61,16 +72,17 @@ namespace osu.Game.Rulesets.Objects
                     case NotifyCollectionChangedAction.Add:
                         Debug.Assert(args.NewItems != null);
 
-                        foreach (var c in args.NewItems.Cast<PathControlPoint>())
-                            c.Changed += invalidate;
+                        foreach (object? newItem in args.NewItems)
+                            ((PathControlPoint)newItem).Changed += invalidate;
+
                         break;
 
                     case NotifyCollectionChangedAction.Reset:
                     case NotifyCollectionChangedAction.Remove:
                         Debug.Assert(args.OldItems != null);
 
-                        foreach (var c in args.OldItems.Cast<PathControlPoint>())
-                            c.Changed -= invalidate;
+                        foreach (object? oldItem in args.OldItems)
+                            ((PathControlPoint)oldItem).Changed -= invalidate;
                         break;
                 }
 
@@ -119,6 +131,24 @@ namespace osu.Game.Rulesets.Objects
             {
                 ensureValid();
                 return calculatedLength;
+            }
+        }
+
+        private bool optimiseCatmull;
+
+        /// <summary>
+        /// Whether to optimise Catmull path segments, usually resulting in removing bulbs around stacked knots.
+        /// </summary>
+        /// <remarks>
+        /// This changes the path shape and should therefore not be used.
+        /// </remarks>
+        public bool OptimiseCatmull
+        {
+            get => optimiseCatmull;
+            set
+            {
+                optimiseCatmull = value;
+                invalidate();
             }
         }
 
@@ -243,6 +273,7 @@ namespace osu.Game.Rulesets.Objects
         {
             calculatedPath.Clear();
             segmentEnds.Clear();
+            optimisedLength = 0;
 
             if (ControlPoints.Count == 0)
                 return;
@@ -260,12 +291,20 @@ namespace osu.Game.Rulesets.Objects
 
                 // The current vertex ends the segment
                 var segmentVertices = vertices.AsSpan().Slice(start, i - start + 1);
-                var segmentType = ControlPoints[start].Type ?? PathType.Linear;
+                var segmentType = ControlPoints[start].Type ?? PathType.LINEAR;
 
-                foreach (Vector2 t in calculateSubPath(segmentVertices, segmentType))
+                // No need to calculate path when there is only 1 vertex
+                if (segmentVertices.Length == 1)
+                    calculatedPath.Add(segmentVertices[0]);
+                else if (segmentVertices.Length > 1)
                 {
-                    if (calculatedPath.Count == 0 || calculatedPath.Last() != t)
-                        calculatedPath.Add(t);
+                    List<Vector2> subPath = calculateSubPath(segmentVertices, segmentType);
+
+                    // Skip the first vertex if it is the same as the last vertex from the previous segment
+                    bool skipFirst = calculatedPath.Count > 0 && subPath.Count > 0 && calculatedPath.Last() == subPath[0];
+
+                    for (int j = skipFirst ? 1 : 0; j < subPath.Count; j++)
+                        calculatedPath.Add(subPath[j]);
                 }
 
                 if (i > 0)
@@ -281,33 +320,83 @@ namespace osu.Game.Rulesets.Objects
 
         private List<Vector2> calculateSubPath(ReadOnlySpan<Vector2> subControlPoints, PathType type)
         {
-            switch (type)
+            switch (type.Type)
             {
-                case PathType.Linear:
-                    return PathApproximator.ApproximateLinear(subControlPoints);
+                case SplineType.Linear:
+                    return PathApproximator.LinearToPiecewiseLinear(subControlPoints);
 
-                case PathType.PerfectCurve:
+                case SplineType.PerfectCurve:
+                {
                     if (subControlPoints.Length != 3)
                         break;
 
-                    List<Vector2> subPath = PathApproximator.ApproximateCircularArc(subControlPoints);
+                    List<Vector2> subPath = PathApproximator.CircularArcToPiecewiseLinear(subControlPoints);
 
                     // If for some reason a circular arc could not be fit to the 3 given points, fall back to a numerically stable bezier approximation.
                     if (subPath.Count == 0)
                         break;
 
                     return subPath;
+                }
 
-                case PathType.Catmull:
-                    return PathApproximator.ApproximateCatmull(subControlPoints);
+                case SplineType.Catmull:
+                {
+                    List<Vector2> subPath = PathApproximator.CatmullToPiecewiseLinear(subControlPoints);
+
+                    if (!OptimiseCatmull)
+                        return subPath;
+
+                    // At draw time, osu!stable optimises paths by only keeping piecewise segments that are 6px apart.
+                    // For the most part we don't care about this optimisation, and its additional heuristics are hard to reproduce in every implementation.
+                    //
+                    // However, it matters for Catmull paths which form "bulbs" around sequential knots with identical positions,
+                    // so we'll apply a very basic form of the optimisation here and return a length representing the optimised portion.
+                    // The returned length is important so that the optimisation doesn't cause the path to get extended to match the value of ExpectedDistance.
+
+                    List<Vector2> optimisedPath = new List<Vector2>(subPath.Count);
+
+                    Vector2? lastStart = null;
+                    double lengthRemovedSinceStart = 0;
+
+                    for (int i = 0; i < subPath.Count; i++)
+                    {
+                        if (lastStart == null)
+                        {
+                            optimisedPath.Add(subPath[i]);
+                            lastStart = subPath[i];
+                            continue;
+                        }
+
+                        Debug.Assert(i > 0);
+
+                        double distFromStart = Vector2.Distance(lastStart.Value, subPath[i]);
+                        lengthRemovedSinceStart += Vector2.Distance(subPath[i - 1], subPath[i]);
+
+                        // See PathApproximator.catmull_detail.
+                        const int catmull_detail = 50;
+                        const int catmull_segment_length = catmull_detail * 2;
+
+                        // Either 6px from the start, the last vertex at every knot, or the end of the path.
+                        if (distFromStart > 6 || (i + 1) % catmull_segment_length == 0 || i == subPath.Count - 1)
+                        {
+                            optimisedPath.Add(subPath[i]);
+                            optimisedLength += lengthRemovedSinceStart - distFromStart;
+
+                            lastStart = null;
+                            lengthRemovedSinceStart = 0;
+                        }
+                    }
+
+                    return optimisedPath;
+                }
             }
 
-            return PathApproximator.ApproximateBezier(subControlPoints);
+            return PathApproximator.BSplineToPiecewiseLinear(subControlPoints, type.Degree ?? subControlPoints.Length);
         }
 
         private void calculateLength()
         {
-            calculatedLength = 0;
+            calculatedLength = optimisedLength;
             cumulativeLength.Clear();
             cumulativeLength.Add(0);
 
@@ -328,8 +417,8 @@ namespace osu.Game.Rulesets.Objects
 
             if (ExpectedDistance.Value is double expectedDistance && calculatedLength != expectedDistance)
             {
-                // In osu-stable, if the last two control points of a slider are equal, extension is not performed.
-                if (ControlPoints.Count >= 2 && ControlPoints[^1].Position == ControlPoints[^2].Position && expectedDistance > calculatedLength)
+                // In osu-stable, if the last two path points of a slider are equal, extension is not performed.
+                if (calculatedPath.Count >= 2 && calculatedPath[^1] == calculatedPath[^2] && expectedDistance > calculatedLength)
                 {
                     cumulativeLength.Add(calculatedLength);
                     return;

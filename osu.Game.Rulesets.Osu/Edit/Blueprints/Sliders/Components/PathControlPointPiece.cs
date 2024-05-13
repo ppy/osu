@@ -4,20 +4,15 @@
 #nullable disable
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
-using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
-using osu.Framework.Utils;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
@@ -41,8 +36,6 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         public Action<DragEvent> DragInProgress;
         public Action DragEnded;
 
-        public List<PathControlPoint> PointsInSegment;
-
         public readonly BindableBool IsSelected = new BindableBool();
         public readonly PathControlPoint ControlPoint;
 
@@ -55,27 +48,12 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
         private IBindable<Vector2> hitObjectPosition;
         private IBindable<float> hitObjectScale;
-
-        [UsedImplicitly]
-        private readonly IBindable<int> hitObjectVersion;
+        private IBindable<int> stackHeight;
 
         public PathControlPointPiece(T hitObject, PathControlPoint controlPoint)
         {
             this.hitObject = hitObject;
             ControlPoint = controlPoint;
-
-            // we don't want to run the path type update on construction as it may inadvertently change the hit object.
-            cachePoints(hitObject);
-
-            hitObjectVersion = hitObject.Path.Version.GetBoundCopy();
-
-            // schedule ensure that updates are only applied after all operations from a single frame are applied.
-            // this avoids inadvertently changing the hit object path type for batch operations.
-            hitObjectVersion.BindValueChanged(_ => Scheduler.AddOnce(() =>
-            {
-                cachePoints(hitObject);
-                updatePathType();
-            }));
 
             controlPoint.Changed += updateMarkerDisplay;
 
@@ -127,6 +105,9 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
             hitObjectScale = hitObject.ScaleBindable.GetBoundCopy();
             hitObjectScale.BindValueChanged(_ => updateMarkerDisplay());
+
+            stackHeight = hitObject.StackHeightBindable.GetBoundCopy();
+            stackHeight.BindValueChanged(_ => updateMarkerDisplay());
 
             IsSelected.BindValueChanged(_ => updateMarkerDisplay());
 
@@ -214,28 +195,6 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
         protected override void OnDragEnd(DragEndEvent e) => DragEnded?.Invoke();
 
-        private void cachePoints(T hitObject) => PointsInSegment = hitObject.Path.PointsInSegment(ControlPoint);
-
-        /// <summary>
-        /// Handles correction of invalid path types.
-        /// </summary>
-        private void updatePathType()
-        {
-            if (ControlPoint.Type != PathType.PerfectCurve)
-                return;
-
-            if (PointsInSegment.Count > 3)
-                ControlPoint.Type = PathType.Bezier;
-
-            if (PointsInSegment.Count != 3)
-                return;
-
-            ReadOnlySpan<Vector2> points = PointsInSegment.Select(p => p.Position).ToArray();
-            RectangleF boundingBox = PathApproximator.CircularArcBoundingBox(points);
-            if (boundingBox.Width >= 640 || boundingBox.Height >= 480)
-                ControlPoint.Type = PathType.Bezier;
-        }
-
         /// <summary>
         /// Updates the state of the circular control point marker.
         /// </summary>
@@ -256,18 +215,22 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
         private Color4 getColourFromNodeType()
         {
-            if (!(ControlPoint.Type is PathType pathType))
+            if (ControlPoint.Type is not PathType pathType)
                 return colours.Yellow;
 
-            switch (pathType)
+            switch (pathType.Type)
             {
-                case PathType.Catmull:
+                case SplineType.Catmull:
                     return colours.SeaFoam;
 
-                case PathType.Bezier:
-                    return colours.Pink;
+                case SplineType.BSpline:
+                    if (!pathType.Degree.HasValue)
+                        return colours.PinkLighter;
 
-                case PathType.PerfectCurve:
+                    int idx = Math.Clamp(pathType.Degree.Value, 0, 3);
+                    return new[] { colours.PinkDarker, colours.PinkDark, colours.Pink, colours.PinkLight }[idx];
+
+                case SplineType.PerfectCurve:
                     return colours.PurpleDark;
 
                 default:
@@ -275,6 +238,6 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             }
         }
 
-        public LocalisableString TooltipText => ControlPoint.Type.ToString() ?? string.Empty;
+        public LocalisableString TooltipText => ControlPoint.Type?.Description ?? string.Empty;
     }
 }

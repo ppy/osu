@@ -11,11 +11,13 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Game.Configuration;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation;
@@ -29,7 +31,7 @@ namespace osu.Game.Overlays
 {
     public partial class ChatOverlay : OsuFocusedOverlayContainer, INamedOverlayComponent, IKeyBindingHandler<PlatformAction>
     {
-        public string IconTexture => "Icons/Hexacons/messaging";
+        public IconUsage Icon => OsuIcon.Chat;
         public LocalisableString Title => ChatStrings.HeaderTitle;
         public LocalisableString Description => ChatStrings.HeaderDescription;
 
@@ -53,7 +55,6 @@ namespace osu.Game.Overlays
         private const int transition_length = 500;
         private const float top_bar_height = 40;
         private const float side_bar_width = 190;
-        private const float chat_bar_height = 60;
 
         protected override string PopInSampleName => @"UI/overlay-big-pop-in";
         protected override string PopOutSampleName => @"UI/overlay-big-pop-out";
@@ -134,7 +135,7 @@ namespace osu.Game.Overlays
                                     Padding = new MarginPadding
                                     {
                                         Left = side_bar_width,
-                                        Bottom = chat_bar_height,
+                                        Bottom = ChatTextBar.HEIGHT,
                                     },
                                     Children = new Drawable[]
                                     {
@@ -251,10 +252,14 @@ namespace osu.Game.Overlays
         {
         }
 
+        protected override bool OnMouseDown(MouseDownEvent e)
+        {
+            isDraggingTopBar = topBar.DragBar.IsHovered;
+            return base.OnMouseDown(e);
+        }
+
         protected override bool OnDragStart(DragStartEvent e)
         {
-            isDraggingTopBar = topBar.IsHovered;
-
             if (!isDraggingTopBar)
                 return base.OnDragStart(e);
 
@@ -267,7 +272,7 @@ namespace osu.Game.Overlays
             if (!isDraggingTopBar)
                 return;
 
-            float targetChatHeight = dragStartChatHeight - (e.MousePosition.Y - e.MouseDownPosition.Y) / Parent.DrawSize.Y;
+            float targetChatHeight = dragStartChatHeight - (e.MousePosition.Y - e.MouseDownPosition.Y) / Parent!.DrawSize.Y;
             chatHeight.Value = targetChatHeight;
         }
 

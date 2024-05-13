@@ -14,10 +14,12 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
+using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Framework.Utils;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
@@ -35,7 +37,6 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true; // allow context menu to appear outside of the playfield.
 
         internal readonly Container<PathControlPointPiece<T>> Pieces;
-        internal readonly Container<PathControlPointConnectionPiece<T>> Connections;
 
         private readonly IBindableList<PathControlPoint> controlPoints = new BindableList<PathControlPoint>();
         private readonly T hitObject;
@@ -47,7 +48,10 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         public Action<List<PathControlPoint>> SplitControlPointsRequested;
 
         [Resolved(CanBeNull = true)]
-        private IDistanceSnapProvider snapProvider { get; set; }
+        private IPositionSnapProvider positionSnapProvider { get; set; }
+
+        [Resolved(CanBeNull = true)]
+        private IDistanceSnapProvider distanceSnapProvider { get; set; }
 
         public PathControlPointVisualiser(T hitObject, bool allowSelection)
         {
@@ -58,7 +62,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
             InternalChildren = new Drawable[]
             {
-                Connections = new Container<PathControlPointConnectionPiece<T>> { RelativeSizeAxes = Axes.Both },
+                new PathControlPointConnection<T>(hitObject),
                 Pieces = new Container<PathControlPointPiece<T>> { RelativeSizeAxes = Axes.Both }
             };
         }
@@ -71,6 +75,53 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
             controlPoints.CollectionChanged += onControlPointsChanged;
             controlPoints.BindTo(hitObject.Path.ControlPoints);
+        }
+
+        // Generally all the control points are within the visible area all the time.
+        public override bool UpdateSubTreeMasking() => true;
+
+        /// <summary>
+        /// Handles correction of invalid path types.
+        /// </summary>
+        public void EnsureValidPathTypes()
+        {
+            List<PathControlPoint> pointsInCurrentSegment = new List<PathControlPoint>();
+
+            foreach (var controlPoint in controlPoints)
+            {
+                if (controlPoint.Type != null)
+                {
+                    pointsInCurrentSegment.Add(controlPoint);
+                    ensureValidPathType(pointsInCurrentSegment);
+                    pointsInCurrentSegment.Clear();
+                }
+
+                pointsInCurrentSegment.Add(controlPoint);
+            }
+
+            ensureValidPathType(pointsInCurrentSegment);
+        }
+
+        private void ensureValidPathType(IReadOnlyList<PathControlPoint> segment)
+        {
+            if (segment.Count == 0)
+                return;
+
+            var first = segment[0];
+
+            if (first.Type != PathType.PERFECT_CURVE)
+                return;
+
+            if (segment.Count > 3)
+                first.Type = PathType.BEZIER;
+
+            if (segment.Count != 3)
+                return;
+
+            ReadOnlySpan<Vector2> points = segment.Select(p => p.Position).ToArray();
+            RectangleF boundingBox = PathApproximator.CircularArcBoundingBox(points);
+            if (boundingBox.Width >= 640 || boundingBox.Height >= 480)
+                first.Type = PathType.BEZIER;
         }
 
         /// <summary>
@@ -136,17 +187,6 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
                 case NotifyCollectionChangedAction.Add:
                     Debug.Assert(e.NewItems != null);
 
-                    // If inserting in the path (not appending),
-                    // update indices of existing connections after insert location
-                    if (e.NewStartingIndex < Pieces.Count)
-                    {
-                        foreach (var connection in Connections)
-                        {
-                            if (connection.ControlPointIndex >= e.NewStartingIndex)
-                                connection.ControlPointIndex += e.NewItems.Count;
-                        }
-                    }
-
                     for (int i = 0; i < e.NewItems.Count; i++)
                     {
                         var point = (PathControlPoint)e.NewItems[i];
@@ -156,12 +196,10 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
                             if (allowSelection)
                                 d.RequestSelection = selectionRequested;
 
-                            d.DragStarted = dragStarted;
-                            d.DragInProgress = dragInProgress;
-                            d.DragEnded = dragEnded;
+                            d.DragStarted = DragStarted;
+                            d.DragInProgress = DragInProgress;
+                            d.DragEnded = DragEnded;
                         }));
-
-                        Connections.Add(new PathControlPointConnectionPiece<T>(hitObject, e.NewStartingIndex + i));
                     }
 
                     break;
@@ -173,19 +211,6 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
                     {
                         foreach (var piece in Pieces.Where(p => p.ControlPoint == point).ToArray())
                             piece.RemoveAndDisposeImmediately();
-                        foreach (var connection in Connections.Where(c => c.ControlPoint == point).ToArray())
-                            connection.RemoveAndDisposeImmediately();
-                    }
-
-                    // If removing before the end of the path,
-                    // update indices of connections after remove location
-                    if (e.OldStartingIndex < Pieces.Count)
-                    {
-                        foreach (var connection in Connections)
-                        {
-                            if (connection.ControlPointIndex >= e.OldStartingIndex)
-                                connection.ControlPointIndex -= e.OldItems.Count;
-                        }
                     }
 
                     break;
@@ -237,20 +262,18 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         /// <param name="type">The path type we want to assign to the given control point piece.</param>
         private void updatePathType(PathControlPointPiece<T> piece, PathType? type)
         {
-            int indexInSegment = piece.PointsInSegment.IndexOf(piece.ControlPoint);
+            var pointsInSegment = hitObject.Path.PointsInSegment(piece.ControlPoint);
+            int indexInSegment = pointsInSegment.IndexOf(piece.ControlPoint);
 
-            switch (type)
+            if (type?.Type == SplineType.PerfectCurve)
             {
-                case PathType.PerfectCurve:
-                    // Can't always create a circular arc out of 4 or more points,
-                    // so we split the segment into one 3-point circular arc segment
-                    // and one segment of the previous type.
-                    int thirdPointIndex = indexInSegment + 2;
+                // Can't always create a circular arc out of 4 or more points,
+                // so we split the segment into one 3-point circular arc segment
+                // and one segment of the previous type.
+                int thirdPointIndex = indexInSegment + 2;
 
-                    if (piece.PointsInSegment.Count > thirdPointIndex + 1)
-                        piece.PointsInSegment[thirdPointIndex].Type = piece.PointsInSegment[0].Type;
-
-                    break;
+                if (pointsInSegment.Count > thirdPointIndex + 1)
+                    pointsInSegment[thirdPointIndex].Type = pointsInSegment[0].Type;
             }
 
             hitObject.Path.ExpectedDistance.Value = null;
@@ -267,7 +290,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         private int draggedControlPointIndex;
         private HashSet<PathControlPoint> selectedControlPoints;
 
-        private void dragStarted(PathControlPoint controlPoint)
+        public void DragStarted(PathControlPoint controlPoint)
         {
             dragStartPositions = hitObject.Path.ControlPoints.Select(point => point.Position).ToArray();
             dragPathTypes = hitObject.Path.ControlPoints.Select(point => point.Type).ToArray();
@@ -279,7 +302,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             changeHandler?.BeginChange();
         }
 
-        private void dragInProgress(DragEvent e)
+        public void DragInProgress(DragEvent e)
         {
             Vector2[] oldControlPoints = hitObject.Path.ControlPoints.Select(cp => cp.Position).ToArray();
             var oldPosition = hitObject.Position;
@@ -288,10 +311,10 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             if (selectedControlPoints.Contains(hitObject.Path.ControlPoints[0]))
             {
                 // Special handling for selections containing head control point - the position of the hit object changes which means the snapped position and time have to be taken into account
-                Vector2 newHeadPosition = Parent.ToScreenSpace(e.MousePosition + (dragStartPositions[0] - dragStartPositions[draggedControlPointIndex]));
-                var result = snapProvider?.FindSnappedPositionAndTime(newHeadPosition);
+                Vector2 newHeadPosition = Parent!.ToScreenSpace(e.MousePosition + (dragStartPositions[0] - dragStartPositions[draggedControlPointIndex]));
+                var result = positionSnapProvider?.FindSnappedPositionAndTime(newHeadPosition);
 
-                Vector2 movementDelta = Parent.ToLocalSpace(result?.ScreenSpacePosition ?? newHeadPosition) - hitObject.Position;
+                Vector2 movementDelta = Parent!.ToLocalSpace(result?.ScreenSpacePosition ?? newHeadPosition) - hitObject.Position;
 
                 hitObject.Position += movementDelta;
                 hitObject.StartTime = result?.Time ?? hitObject.StartTime;
@@ -309,9 +332,9 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             }
             else
             {
-                var result = snapProvider?.FindSnappedPositionAndTime(Parent.ToScreenSpace(e.MousePosition), SnapType.GlobalGrids);
+                var result = positionSnapProvider?.FindSnappedPositionAndTime(Parent!.ToScreenSpace(e.MousePosition), SnapType.GlobalGrids);
 
-                Vector2 movementDelta = Parent.ToLocalSpace(result?.ScreenSpacePosition ?? Parent.ToScreenSpace(e.MousePosition)) - dragStartPositions[draggedControlPointIndex] - hitObject.Position;
+                Vector2 movementDelta = Parent!.ToLocalSpace(result?.ScreenSpacePosition ?? Parent!.ToScreenSpace(e.MousePosition)) - dragStartPositions[draggedControlPointIndex] - hitObject.Position;
 
                 for (int i = 0; i < controlPoints.Count; ++i)
                 {
@@ -322,7 +345,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             }
 
             // Snap the path to the current beat divisor before checking length validity.
-            hitObject.SnapTo(snapProvider);
+            hitObject.SnapTo(distanceSnapProvider);
 
             if (!hitObject.Path.HasValidLength)
             {
@@ -332,16 +355,18 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
                 hitObject.Position = oldPosition;
                 hitObject.StartTime = oldStartTime;
                 // Snap the path length again to undo the invalid length.
-                hitObject.SnapTo(snapProvider);
+                hitObject.SnapTo(distanceSnapProvider);
                 return;
             }
 
             // Maintain the path types in case they got defaulted to bezier at some point during the drag.
             for (int i = 0; i < hitObject.Path.ControlPoints.Count; i++)
                 hitObject.Path.ControlPoints[i].Type = dragPathTypes[i];
+
+            EnsureValidPathTypes();
         }
 
-        private void dragEnded() => changeHandler?.EndChange();
+        public void DragEnded() => changeHandler?.EndChange();
 
         #endregion
 
@@ -364,13 +389,19 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
                 List<MenuItem> curveTypeItems = new List<MenuItem>();
 
                 if (!selectedPieces.Contains(Pieces[0]))
+                {
                     curveTypeItems.Add(createMenuItemForPathType(null));
+                    curveTypeItems.Add(new OsuMenuItemSpacer());
+                }
 
                 // todo: hide/disable items which aren't valid for selected points
-                curveTypeItems.Add(createMenuItemForPathType(PathType.Linear));
-                curveTypeItems.Add(createMenuItemForPathType(PathType.PerfectCurve));
-                curveTypeItems.Add(createMenuItemForPathType(PathType.Bezier));
-                curveTypeItems.Add(createMenuItemForPathType(PathType.Catmull));
+                curveTypeItems.Add(createMenuItemForPathType(PathType.LINEAR));
+                curveTypeItems.Add(createMenuItemForPathType(PathType.PERFECT_CURVE));
+                curveTypeItems.Add(createMenuItemForPathType(PathType.BEZIER));
+                curveTypeItems.Add(createMenuItemForPathType(PathType.BSpline(4)));
+
+                if (selectedPieces.Any(piece => piece.ControlPoint.Type?.Type == SplineType.Catmull))
+                    curveTypeItems.Add(createMenuItemForPathType(PathType.CATMULL));
 
                 var menuItems = new List<MenuItem>
                 {
@@ -402,10 +433,12 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             int totalCount = Pieces.Count(p => p.IsSelected.Value);
             int countOfState = Pieces.Where(p => p.IsSelected.Value).Count(p => p.ControlPoint.Type == type);
 
-            var item = new TernaryStateRadioMenuItem(type == null ? "Inherit" : type.ToString().Humanize(), MenuItemType.Standard, _ =>
+            var item = new TernaryStateRadioMenuItem(type?.Description ?? "Inherit", MenuItemType.Standard, _ =>
             {
                 foreach (var p in Pieces.Where(p => p.IsSelected.Value))
                     updatePathType(p, type);
+
+                EnsureValidPathTypes();
             });
 
             if (countOfState == totalCount)

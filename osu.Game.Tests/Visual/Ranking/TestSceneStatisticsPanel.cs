@@ -13,7 +13,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Online.Solo;
+using osu.Game.Online;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Mods;
@@ -82,14 +82,14 @@ namespace osu.Game.Tests.Visual.Ranking
 
         private void loadPanel(ScoreInfo score) => AddStep("load panel", () =>
         {
-            Child = new SoloStatisticsPanel(score)
+            Child = new UserStatisticsPanel(score)
             {
                 RelativeSizeAxes = Axes.Both,
                 State = { Value = Visibility.Visible },
                 Score = { Value = score },
-                StatisticsUpdate =
+                DisplayedUserStatisticsUpdate =
                 {
-                    Value = new SoloStatisticsUpdate(score, new UserStatistics
+                    Value = new UserStatisticsUpdate(score, new UserStatistics
                     {
                         Level = new UserStatistics.LevelInfo
                         {
@@ -203,6 +203,7 @@ namespace osu.Game.Tests.Visual.Ranking
 
                 public IBeatmap Beatmap { get; }
 
+                // ReSharper disable once NotNullOrRequiredMemberIsNotInitialized
                 public TestBeatmapConverter(IBeatmap beatmap)
                 {
                     Beatmap = beatmap;

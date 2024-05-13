@@ -18,15 +18,12 @@ using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
-    public class OsuModClassic : ModClassic, IApplicableToHitObject, IApplicableToDrawableHitObject, IApplicableToDrawableRuleset<OsuHitObject>
+    public class OsuModClassic : ModClassic, IApplicableToHitObject, IApplicableToDrawableHitObject, IApplicableToDrawableRuleset<OsuHitObject>, IApplicableHealthProcessor
     {
         public override Type[] IncompatibleMods => base.IncompatibleMods.Append(typeof(OsuModStrictTracking)).ToArray();
 
         [SettingSource("No slider head accuracy requirement", "Scores sliders proportionally to the number of ticks hit.")]
         public Bindable<bool> NoSliderHeadAccuracy { get; } = new BindableBool(true);
-
-        [SettingSource("No slider head movement", "Pins slider heads at their starting position, regardless of time.")]
-        public Bindable<bool> NoSliderHeadMovement { get; } = new BindableBool(true);
 
         [SettingSource("Apply classic note lock", "Applies note lock to the full hit window.")]
         public Bindable<bool> ClassicNoteLock { get; } = new BindableBool(true);
@@ -37,6 +34,9 @@ namespace osu.Game.Rulesets.Osu.Mods
         [SettingSource("Fade out hit circles earlier", "Make hit circles fade out into a miss, rather than after it.")]
         public Bindable<bool> FadeHitCircleEarly { get; } = new Bindable<bool>(true);
 
+        [SettingSource("Classic health", "More closely resembles the original HP drain mechanics.")]
+        public Bindable<bool> ClassicHealth { get; } = new Bindable<bool>(true);
+
         private bool usingHiddenFading;
 
         public void ApplyToHitObject(HitObject hitObject)
@@ -44,11 +44,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             switch (hitObject)
             {
                 case Slider slider:
-                    slider.OnlyJudgeNestedObjects = !NoSliderHeadAccuracy.Value;
-
-                    foreach (var head in slider.NestedHitObjects.OfType<SliderHeadCircle>())
-                        head.JudgeAsNormalHitCircle = !NoSliderHeadAccuracy.Value;
-
+                    slider.ClassicSliderBehaviour = NoSliderHeadAccuracy.Value;
                     break;
             }
         }
@@ -71,9 +67,12 @@ namespace osu.Game.Rulesets.Osu.Mods
             switch (obj)
             {
                 case DrawableSliderHead head:
-                    head.TrackFollowCircle = !NoSliderHeadMovement.Value;
                     if (FadeHitCircleEarly.Value && !usingHiddenFading)
                         applyEarlyFading(head);
+
+                    if (ClassicNoteLock.Value)
+                        blockInputToObjectsUnderSliderHead(head);
+
                     break;
 
                 case DrawableSliderTail tail:
@@ -83,8 +82,20 @@ namespace osu.Game.Rulesets.Osu.Mods
                 case DrawableHitCircle circle:
                     if (FadeHitCircleEarly.Value && !usingHiddenFading)
                         applyEarlyFading(circle);
+
                     break;
             }
+        }
+
+        /// <summary>
+        /// On stable, slider heads that have already been hit block input from reaching objects that may be underneath them
+        /// until the sliders they're part of have been fully judged.
+        /// The purpose of this method is to restore that behaviour.
+        /// In order to avoid introducing yet another confusing config option, this behaviour is roped into the general notion of "note lock".
+        /// </summary>
+        private static void blockInputToObjectsUnderSliderHead(DrawableSliderHead slider)
+        {
+            slider.HitArea.CanBeHit = () => !slider.DrawableSlider.AllJudged;
         }
 
         private void applyEarlyFading(DrawableHitCircle circle)
@@ -102,5 +113,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                 }
             };
         }
+
+        public HealthProcessor? CreateHealthProcessor(double drainStartTime) => ClassicHealth.Value ? new OsuLegacyHealthProcessor(drainStartTime) : null;
     }
 }

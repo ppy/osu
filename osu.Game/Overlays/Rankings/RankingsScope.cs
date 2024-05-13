@@ -11,13 +11,16 @@ namespace osu.Game.Overlays.Rankings
         [LocalisableDescription(typeof(RankingsStrings), nameof(RankingsStrings.TypePerformance))]
         Performance,
 
-        [LocalisableDescription(typeof(RankingsStrings), nameof(RankingsStrings.TypeCharts))]
-        Spotlights,
-
         [LocalisableDescription(typeof(RankingsStrings), nameof(RankingsStrings.TypeScore))]
         Score,
 
         [LocalisableDescription(typeof(RankingsStrings), nameof(RankingsStrings.TypeCountry))]
-        Country
+        Country,
+
+        [LocalisableDescription(typeof(RankingsStrings), nameof(RankingsStrings.TypeCharts))]
+        Spotlights,
+
+        [LocalisableDescription(typeof(RankingsStrings), nameof(RankingsStrings.TypeKudosu))]
+        Kudosu,
     }
 }

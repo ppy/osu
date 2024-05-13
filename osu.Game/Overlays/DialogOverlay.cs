@@ -27,18 +27,26 @@ namespace osu.Game.Overlays
 
         public PopupDialog CurrentDialog { get; private set; }
 
+        public override bool IsPresent => Scheduler.HasPendingTasks
+                                          || dialogContainer.Children.Count > 0
+                                          // Safety for low pass filter potentially getting stuck in applied state due to
+                                          // transforms on `this` causing children to no longer be updated.
+                                          || lowPassFilter.IsAttached;
+
         public DialogOverlay()
         {
-            RelativeSizeAxes = Axes.Both;
+            AutoSizeAxes = Axes.Y;
 
             Child = dialogContainer = new Container
             {
-                RelativeSizeAxes = Axes.Both,
+                RelativeSizeAxes = Axes.X,
+                AutoSizeAxes = Axes.Y,
             };
 
-            Width = 0.4f;
-            Anchor = Anchor.BottomCentre;
-            Origin = Anchor.BottomCentre;
+            Width = 500;
+
+            Anchor = Anchor.Centre;
+            Origin = Anchor.Centre;
         }
 
         [BackgroundDependencyLoader]
@@ -92,8 +100,6 @@ namespace osu.Game.Overlays
                 CurrentDialog = null;
             }
         }
-
-        public override bool IsPresent => Scheduler.HasPendingTasks || dialogContainer.Children.Count > 0;
 
         protected override bool BlockNonPositionalInput => true;
 

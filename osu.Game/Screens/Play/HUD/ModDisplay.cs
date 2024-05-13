@@ -37,10 +37,13 @@ namespace osu.Game.Screens.Play.HUD
             }
         }
 
+        private readonly bool showExtendedInformation;
         private readonly FillFlowContainer<ModIcon> iconsContainer;
 
-        public ModDisplay()
+        public ModDisplay(bool showExtendedInformation = true)
         {
+            this.showExtendedInformation = showExtendedInformation;
+
             AutoSizeAxes = Axes.Both;
 
             InternalChild = iconsContainer = new ReverseChildIDFillFlowContainer<ModIcon>
@@ -57,14 +60,17 @@ namespace osu.Game.Screens.Play.HUD
             Current.BindValueChanged(updateDisplay, true);
 
             iconsContainer.FadeInFromZero(fade_duration, Easing.OutQuint);
+
+            if (ExpansionMode == ExpansionMode.AlwaysExpanded || ExpansionMode == ExpansionMode.AlwaysContracted)
+                FinishTransforms(true);
         }
 
         private void updateDisplay(ValueChangedEvent<IReadOnlyList<Mod>> mods)
         {
             iconsContainer.Clear();
 
-            foreach (Mod mod in mods.NewValue)
-                iconsContainer.Add(new ModIcon(mod) { Scale = new Vector2(0.6f) });
+            foreach (Mod mod in mods.NewValue.AsOrdered())
+                iconsContainer.Add(new ModIcon(mod, showExtendedInformation: showExtendedInformation) { Scale = new Vector2(0.6f) });
 
             appearTransform();
         }

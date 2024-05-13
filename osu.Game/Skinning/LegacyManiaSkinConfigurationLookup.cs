@@ -67,13 +67,17 @@ namespace osu.Game.Skinning
         LeftStageImage,
         RightStageImage,
         BottomStageImage,
+
+        // ReSharper disable once InconsistentNaming
         Hit300g,
+
         Hit300,
         Hit200,
         Hit100,
         Hit50,
         Hit0,
         KeysUnderNotes,
-        NoteBodyStyle
+        NoteBodyStyle,
+        LightFramePerSecond
     }
 }

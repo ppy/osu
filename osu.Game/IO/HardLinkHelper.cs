@@ -153,12 +153,12 @@ namespace osu.Game.IO
         public static extern int link(string oldpath, string newpath);
 
         [DllImport("libc", SetLastError = true)]
-        private static extern int stat(string pathname, out struct_stat statbuf);
+        private static extern int stat(string pathname, out Stat statbuf);
 
         // ReSharper disable once InconsistentNaming
         // Struct layout is likely non-portable across unices. Tread with caution.
         [StructLayout(LayoutKind.Sequential)]
-        private struct struct_stat
+        private struct Stat
         {
             public readonly long st_dev;
             public readonly long st_ino;
@@ -170,14 +170,14 @@ namespace osu.Game.IO
             public readonly long st_size;
             public readonly long st_blksize;
             public readonly long st_blocks;
-            public readonly timespec st_atim;
-            public readonly timespec st_mtim;
-            public readonly timespec st_ctim;
+            public readonly Timespec st_atim;
+            public readonly Timespec st_mtim;
+            public readonly Timespec st_ctim;
         }
 
         // ReSharper disable once InconsistentNaming
         [StructLayout(LayoutKind.Sequential)]
-        private struct timespec
+        private struct Timespec
         {
             public readonly long tv_sec;
             public readonly long tv_nsec;

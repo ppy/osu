@@ -10,6 +10,7 @@ using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
+using osu.Game.Storyboards;
 
 namespace osu.Game.Screens.Play
 {
@@ -41,12 +42,17 @@ namespace osu.Game.Screens.Play
         public readonly ScoreProcessor ScoreProcessor;
 
         /// <summary>
+        /// The storyboard associated with the beatmap.
+        /// </summary>
+        public readonly Storyboard Storyboard;
+
+        /// <summary>
         /// Whether gameplay completed without the user failing.
         /// </summary>
         public bool HasPassed { get; set; }
 
         /// <summary>
-        /// Whether the user failed during gameplay.
+        /// Whether the user failed during gameplay. This is only set when the gameplay session has completed due to the fail.
         /// </summary>
         public bool HasFailed { get; set; }
 
@@ -62,7 +68,7 @@ namespace osu.Game.Screens.Play
 
         private readonly Bindable<JudgementResult> lastJudgementResult = new Bindable<JudgementResult>();
 
-        public GameplayState(IBeatmap beatmap, Ruleset ruleset, IReadOnlyList<Mod>? mods = null, Score? score = null, ScoreProcessor? scoreProcessor = null)
+        public GameplayState(IBeatmap beatmap, Ruleset ruleset, IReadOnlyList<Mod>? mods = null, Score? score = null, ScoreProcessor? scoreProcessor = null, Storyboard? storyboard = null)
         {
             Beatmap = beatmap;
             Ruleset = ruleset;
@@ -76,6 +82,7 @@ namespace osu.Game.Screens.Play
             };
             Mods = mods ?? Array.Empty<Mod>();
             ScoreProcessor = scoreProcessor ?? ruleset.CreateScoreProcessor();
+            Storyboard = storyboard ?? new Storyboard();
         }
 
         /// <summary>

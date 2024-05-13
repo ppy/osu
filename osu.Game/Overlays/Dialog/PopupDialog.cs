@@ -3,6 +3,9 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -11,6 +14,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Containers;
 using osuTK;
@@ -22,11 +26,13 @@ namespace osu.Game.Overlays.Dialog
     public abstract partial class PopupDialog : VisibilityContainer
     {
         public const float ENTER_DURATION = 500;
-        public const float EXIT_DURATION = 200;
+        public const float EXIT_DURATION = 500;
 
         private readonly Vector2 ringSize = new Vector2(100f);
         private readonly Vector2 ringMinifiedSize = new Vector2(20f);
-        private readonly Vector2 buttonsEnterSpacing = new Vector2(0f, 50f);
+
+        private readonly Box flashLayer;
+        private Sample? flashSample;
 
         private readonly Container content;
         private readonly Container ring;
@@ -102,13 +108,20 @@ namespace osu.Game.Overlays.Dialog
 
         protected PopupDialog()
         {
-            RelativeSizeAxes = Axes.Both;
+            RelativeSizeAxes = Axes.X;
+            AutoSizeAxes = Axes.Y;
+
+            Anchor = Anchor.Centre;
+            Origin = Anchor.Centre;
 
             Children = new Drawable[]
             {
                 content = new Container
                 {
-                    RelativeSizeAxes = Axes.Both,
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
                     Alpha = 0f,
                     Children = new Drawable[]
                     {
@@ -116,11 +129,13 @@ namespace osu.Game.Overlays.Dialog
                         {
                             RelativeSizeAxes = Axes.Both,
                             Masking = true,
+                            CornerRadius = 20,
+                            CornerExponent = 2.5f,
                             EdgeEffect = new EdgeEffectParameters
                             {
                                 Type = EdgeEffectType.Shadow,
-                                Colour = Color4.Black.Opacity(0.5f),
-                                Radius = 8,
+                                Colour = Color4.Black.Opacity(0.2f),
+                                Radius = 14,
                             },
                             Children = new Drawable[]
                             {
@@ -136,23 +151,29 @@ namespace osu.Game.Overlays.Dialog
                                     ColourDark = Color4Extensions.FromHex(@"1e171e"),
                                     TriangleScale = 4,
                                 },
+                                flashLayer = new Box
+                                {
+                                    Alpha = 0,
+                                    RelativeSizeAxes = Axes.Both,
+                                    Blending = BlendingParameters.Additive,
+                                    Colour = Color4Extensions.FromHex(@"221a21"),
+                                },
                             },
                         },
                         new FillFlowContainer
                         {
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.BottomCentre,
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
                             Direction = FillDirection.Vertical,
                             Spacing = new Vector2(0f, 10f),
-                            Padding = new MarginPadding { Bottom = 10 },
+                            Padding = new MarginPadding { Vertical = 60 },
                             Children = new Drawable[]
                             {
                                 new Container
                                 {
                                     Origin = Anchor.TopCentre,
                                     Anchor = Anchor.TopCentre,
+                                    Padding = new MarginPadding { Bottom = 30 },
                                     Size = ringSize,
                                     Children = new Drawable[]
                                     {
@@ -175,6 +196,7 @@ namespace osu.Game.Overlays.Dialog
                                                     Origin = Anchor.Centre,
                                                     Anchor = Anchor.Centre,
                                                     Icon = FontAwesome.Solid.TimesCircle,
+                                                    Y = -2,
                                                     Size = new Vector2(50),
                                                 },
                                             },
@@ -188,6 +210,7 @@ namespace osu.Game.Overlays.Dialog
                                     RelativeSizeAxes = Axes.X,
                                     AutoSizeAxes = Axes.Y,
                                     TextAnchor = Anchor.TopCentre,
+                                    Padding = new MarginPadding { Horizontal = 15 },
                                 },
                                 body = new OsuTextFlowContainer(t => t.Font = t.Font.With(size: 18))
                                 {
@@ -196,17 +219,18 @@ namespace osu.Game.Overlays.Dialog
                                     TextAnchor = Anchor.TopCentre,
                                     RelativeSizeAxes = Axes.X,
                                     AutoSizeAxes = Axes.Y,
-                                    Padding = new MarginPadding(5),
+                                    Padding = new MarginPadding { Horizontal = 15 },
+                                },
+                                buttonsContainer = new FillFlowContainer<PopupDialogButton>
+                                {
+                                    Anchor = Anchor.TopCentre,
+                                    Origin = Anchor.TopCentre,
+                                    RelativeSizeAxes = Axes.X,
+                                    AutoSizeAxes = Axes.Y,
+                                    Direction = FillDirection.Vertical,
+                                    Padding = new MarginPadding { Top = 30 },
                                 },
                             },
-                        },
-                        buttonsContainer = new FillFlowContainer<PopupDialogButton>
-                        {
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.TopCentre,
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
-                            Direction = FillDirection.Vertical,
                         },
                     },
                 },
@@ -215,6 +239,12 @@ namespace osu.Game.Overlays.Dialog
             // It's important we start in a visible state so our state fires on hide, even before load.
             // This is used by the dialog overlay to know when the dialog was dismissed.
             Show();
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(AudioManager audio, OsuColour colours)
+        {
+            flashSample = audio.Samples.Get(@"UI/default-select-disabled");
         }
 
         /// <summary>
@@ -230,6 +260,14 @@ namespace osu.Game.Overlays.Dialog
             // Buttons are regularly added in BDL or LoadComplete, so let's schedule to ensure
             // they are ready to be pressed.
             Scheduler.AddOnce(() => Buttons.OfType<T>().FirstOrDefault()?.TriggerClick());
+        }
+
+        public void Flash()
+        {
+            flashLayer.FadeInFromZero(80, Easing.OutQuint)
+                      .Then()
+                      .FadeOutFromOne(1500, Easing.OutQuint);
+            flashSample?.Play();
         }
 
         protected override bool OnKeyDown(KeyDownEvent e)
@@ -261,15 +299,15 @@ namespace osu.Game.Overlays.Dialog
             // Reset various animations but only if the dialog animation fully completed
             if (content.Alpha == 0)
             {
-                buttonsContainer.TransformSpacingTo(buttonsEnterSpacing);
-                buttonsContainer.MoveToY(buttonsEnterSpacing.Y);
+                content.ScaleTo(0.7f);
                 ring.ResizeTo(ringMinifiedSize);
             }
 
-            content.FadeIn(ENTER_DURATION, Easing.OutQuint);
-            ring.ResizeTo(ringSize, ENTER_DURATION, Easing.OutQuint);
-            buttonsContainer.TransformSpacingTo(Vector2.Zero, ENTER_DURATION, Easing.OutQuint);
-            buttonsContainer.MoveToY(0, ENTER_DURATION, Easing.OutQuint);
+            content
+                .ScaleTo(1, 750, Easing.OutElasticHalf)
+                .FadeIn(ENTER_DURATION, Easing.OutQuint);
+
+            ring.ResizeTo(ringSize, ENTER_DURATION * 1.5f, Easing.OutQuint);
         }
 
         protected override void PopOut()
@@ -279,7 +317,9 @@ namespace osu.Game.Overlays.Dialog
                 // This is presumed to always be a sane default "cancel" action.
                 buttonsContainer.Last().TriggerClick();
 
-            content.FadeOut(EXIT_DURATION, Easing.InSine);
+            content
+                .ScaleTo(0.7f, EXIT_DURATION, Easing.Out)
+                .FadeOut(EXIT_DURATION, Easing.OutQuint);
         }
 
         private void pressButtonAtIndex(int index)
