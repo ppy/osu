@@ -127,7 +127,7 @@ namespace osu.Game.Screens.Select
 
                     string labelText = bpmMin == bpmMax
                         ? $"{bpmMin}"
-                        : $"{bpmMin}-{bpmMax} (mostly {mostCommonBPM})";
+                        : $"{bpmMin}-{bpmMax} ({mostCommonBPM})";
 
                     bpmStatistic.Value = labelText;
 
