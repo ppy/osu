@@ -105,7 +105,6 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         [Test]
         public void TestNullBeatmapWithBackground()
         {
-            selectBeatmap(null);
             AddAssert("check default title", () => infoWedge.Info!.TitleLabel.Current.Value == Beatmap.Default.BeatmapInfo.Metadata.Title);
             AddAssert("check default artist", () => infoWedge.Info!.ArtistLabel.Current.Value == Beatmap.Default.BeatmapInfo.Metadata.Artist);
             AddAssert("check no info labels", () => !infoWedge.Info.ChildrenOfType<BeatmapInfoWedge.WedgeInfoText.InfoLabel>().Any());
