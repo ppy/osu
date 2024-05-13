@@ -439,7 +439,7 @@ namespace osu.Game.Online.Leaderboards
                                         Shear = -shear,
                                         AutoSizeAxes = Axes.Both,
                                         Direction = FillDirection.Horizontal,
-                                        ChildrenEnumerable = score.Mods.Select(mod => new ColouredModSwitchTiny(mod) { Scale = new Vector2(0.375f) })
+                                        ChildrenEnumerable = score.Mods.AsOrdered().Select(mod => new ColouredModSwitchTiny(mod) { Scale = new Vector2(0.375f) })
                                     },
                                     modsCounter = new OsuSpriteText
                                     {
@@ -671,12 +671,12 @@ namespace osu.Game.Online.Leaderboards
             {
                 List<MenuItem> items = new List<MenuItem>();
 
-                if (score.Mods.Length > 0 && modsContainer.Any(s => s.IsHovered) && songSelect != null)
+                if (score.Mods.Length > 0 && songSelect != null)
                     items.Add(new OsuMenuItem("Use these mods", MenuItemType.Highlighted, () => songSelect.Mods.Value = score.Mods));
 
                 if (score.Files.Count <= 0) return items.ToArray();
 
-                items.Add(new OsuMenuItem("Export", MenuItemType.Standard, () => scoreManager.Export(score)));
+                items.Add(new OsuMenuItem(Localisation.CommonStrings.Export, MenuItemType.Standard, () => scoreManager.Export(score)));
                 items.Add(new OsuMenuItem(CommonStrings.ButtonsDelete, MenuItemType.Destructive, () => dialogOverlay?.Push(new LocalScoreDeleteDialog(score))));
 
                 return items.ToArray();
