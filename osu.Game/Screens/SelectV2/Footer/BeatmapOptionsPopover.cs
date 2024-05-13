@@ -188,9 +188,7 @@ namespace osu.Game.Screens.SelectV2.Footer
         protected override void UpdateState(ValueChangedEvent<Visibility> state)
         {
             base.UpdateState(state);
-
-            if (state.NewValue == Visibility.Hidden)
-                footerButton.IsActive.Value = false;
+            footerButton.OverlayState.Value = state.NewValue;
         }
     }
 }

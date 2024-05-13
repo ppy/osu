@@ -5,6 +5,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
@@ -24,8 +25,6 @@ namespace osu.Game.Screens.SelectV2.Footer
 {
     public partial class FooterButtonV2 : OsuClickableContainer, IKeyBindingHandler<GlobalAction>
     {
-        private const int transition_length = 500;
-
         // This should be 12 by design, but an extra allowance is added due to the corner radius specification.
         private const float shear_width = 13.5f;
 
@@ -68,6 +67,8 @@ namespace osu.Game.Screens.SelectV2.Footer
         protected Container TextContainer;
         private readonly Box bar;
         private readonly Box backgroundBox;
+        private readonly Box glowBox;
+        private readonly Box flashLayer;
 
         public FooterButtonV2()
         {
@@ -90,6 +91,10 @@ namespace osu.Game.Screens.SelectV2.Footer
                 Children = new Drawable[]
                 {
                     backgroundBox = new Box
+                    {
+                        RelativeSizeAxes = Axes.Both
+                    },
+                    glowBox = new Box
                     {
                         RelativeSizeAxes = Axes.Both
                     },
@@ -137,8 +142,15 @@ namespace osu.Game.Screens.SelectV2.Footer
                         {
                             RelativeSizeAxes = Axes.Both,
                         }
-                    }
-                }
+                    },
+                    flashLayer = new Box
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Colour = Colour4.White.Opacity(0.9f),
+                        Blending = BlendingParameters.Additive,
+                        Alpha = 0,
+                    },
+                },
             };
         }
 
@@ -154,26 +166,20 @@ namespace osu.Game.Screens.SelectV2.Footer
 
         public GlobalAction? Hotkey;
 
-        private bool handlingMouse;
+        protected override bool OnClick(ClickEvent e)
+        {
+            if (Enabled.Value)
+                Flash();
+
+            return base.OnClick(e);
+        }
+
+        protected virtual void Flash() => flashLayer.FadeOutFromOne(800, Easing.OutQuint);
 
         protected override bool OnHover(HoverEvent e)
         {
             updateDisplay();
             return true;
-        }
-
-        protected override bool OnMouseDown(MouseDownEvent e)
-        {
-            handlingMouse = true;
-            updateDisplay();
-            return base.OnMouseDown(e);
-        }
-
-        protected override void OnMouseUp(MouseUpEvent e)
-        {
-            handlingMouse = false;
-            updateDisplay();
-            base.OnMouseUp(e);
         }
 
         protected override void OnHoverLost(HoverLostEvent e) => updateDisplay();
@@ -190,27 +196,25 @@ namespace osu.Game.Screens.SelectV2.Footer
 
         private void updateDisplay()
         {
-            Color4 backgroundColour = colourProvider.Background3;
+            Color4 backgroundColour = OverlayState.Value == Visibility.Visible ? buttonAccentColour : colourProvider.Background3;
+            Color4 textColour = OverlayState.Value == Visibility.Visible ? colourProvider.Background6 : colourProvider.Content1;
+            Color4 accentColour = OverlayState.Value == Visibility.Visible ? colourProvider.Background6 : buttonAccentColour;
 
             if (!Enabled.Value)
-            {
-                backgroundColour = colourProvider.Background3.Darken(0.4f);
-            }
-            else
-            {
-                if (OverlayState.Value == Visibility.Visible)
-                    backgroundColour = buttonAccentColour.Darken(0.5f);
+                backgroundColour = backgroundColour.Darken(1f);
+            else if (IsHovered)
+                backgroundColour = backgroundColour.Lighten(0.2f);
 
-                if (IsHovered)
-                {
-                    backgroundColour = backgroundColour.Lighten(0.3f);
+            backgroundBox.FadeColour(backgroundColour, 150, Easing.OutQuint);
 
-                    if (handlingMouse)
-                        backgroundColour = backgroundColour.Lighten(0.3f);
-                }
-            }
+            if (!Enabled.Value)
+                textColour = textColour.Opacity(0.6f);
 
-            backgroundBox.FadeColour(backgroundColour, transition_length, Easing.OutQuint);
+            text.FadeColour(textColour, 150, Easing.OutQuint);
+            icon.FadeColour(accentColour, 150, Easing.OutQuint);
+            bar.FadeColour(accentColour, 150, Easing.OutQuint);
+
+            glowBox.FadeColour(ColourInfo.GradientVertical(buttonAccentColour.Opacity(0f), buttonAccentColour.Opacity(0.2f)), 150, Easing.OutQuint);
         }
     }
 }
