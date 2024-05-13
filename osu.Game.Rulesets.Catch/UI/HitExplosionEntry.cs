@@ -9,7 +9,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Catch.UI
 {
-    public class HitExplosionEntry : LifetimeEntry<HitExplosionEntry>
+    public class HitExplosionEntry : LifetimeEntryBase<HitExplosionEntry>
     {
         /// <summary>
         /// The judgement result that triggered this explosion.

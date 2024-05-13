@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Objects.Pooling
     /// <typeparam name="TEntry">The type of entries managed by this container.</typeparam>
     /// <typeparam name="TDrawable">The type of drawables corresponding to the entries.</typeparam>
     public abstract partial class PooledDrawableWithLifetimeContainer<TEntry, TDrawable> : CompositeDrawable
-        where TEntry : LifetimeEntry<TEntry>
+        where TEntry : LifetimeEntryBase<TEntry>
         where TDrawable : Drawable
     {
         /// <summary>
@@ -41,8 +41,8 @@ namespace osu.Game.Rulesets.Objects.Pooling
         public readonly SlimReadOnlyDictionaryWrapper<TEntry, TDrawable> AliveEntries;
 
         /// <summary>
-        /// Whether to remove an entry when clock goes backward and crossed its <see cref="LifetimeEntry{T}.LifetimeStart"/>.
-        /// Used when entries are dynamically added at its <see cref="LifetimeEntry{T}.LifetimeStart"/> to prevent duplicated entries.
+        /// Whether to remove an entry when clock goes backward and crossed its <see cref="LifetimeEntryBase{T}.LifetimeStart"/>.
+        /// Used when entries are dynamically added at its <see cref="LifetimeEntryBase{T}.LifetimeStart"/> to prevent duplicated entries.
         /// </summary>
         protected virtual bool RemoveRewoundEntry => false;
 

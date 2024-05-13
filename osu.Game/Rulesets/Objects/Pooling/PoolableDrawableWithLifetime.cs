@@ -13,8 +13,8 @@ namespace osu.Game.Rulesets.Objects.Pooling
     /// <summary>
     /// A <see cref="PoolableDrawable"/> that is controlled by <see cref="Entry"/> to implement drawable pooling and replay rewinding.
     /// </summary>
-    /// <typeparam name="TEntry">The <see cref="LifetimeEntry{T}"/> type storing state and controlling this drawable.</typeparam>
-    public abstract partial class PoolableDrawableWithLifetime<TEntry> : PoolableDrawable where TEntry : LifetimeEntry<TEntry>
+    /// <typeparam name="TEntry">The <see cref="LifetimeEntryBase{T}"/> type storing state and controlling this drawable.</typeparam>
+    public abstract partial class PoolableDrawableWithLifetime<TEntry> : PoolableDrawable where TEntry : LifetimeEntryBase<TEntry>
     {
         private TEntry? entry;
 
