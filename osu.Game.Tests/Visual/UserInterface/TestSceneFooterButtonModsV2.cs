@@ -12,7 +12,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Mods;
-using osu.Game.Screens.Select.FooterV2;
+using osu.Game.Screens.SelectV2.Footer;
 using osu.Game.Utils;
 
 namespace osu.Game.Tests.Visual.UserInterface
