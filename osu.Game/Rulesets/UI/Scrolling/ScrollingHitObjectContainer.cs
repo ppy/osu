@@ -136,7 +136,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
             // Scroll info is not available until loaded.
             // The lifetime of all entries will be updated in the first Update.
             if (IsLoaded)
-                setComputedLifetimeStart(entry);
+                setComputedLifetime(entry);
 
             base.Add(entry);
         }
@@ -171,7 +171,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
             layoutComputed.Clear();
 
             foreach (var entry in Entries)
-                setComputedLifetimeStart(entry);
+                setComputedLifetime(entry);
 
             algorithm.Value.Reset();
 
@@ -234,12 +234,13 @@ namespace osu.Game.Rulesets.UI.Scrolling
             return algorithm.Value.GetDisplayStartTime(entry.HitObject.StartTime, startOffset, timeRange.Value, scrollLength);
         }
 
-        private void setComputedLifetimeStart(HitObjectLifetimeEntry entry)
+        private void setComputedLifetime(HitObjectLifetimeEntry entry)
         {
             double computedStartTime = computeDisplayStartTime(entry);
 
             // always load the hitobject before its first judgement offset
             entry.LifetimeStart = Math.Min(entry.HitObject.StartTime - entry.HitObject.MaximumJudgementOffset, computedStartTime);
+            entry.LifetimeEnd = entry.HitObject.GetEndTime() + timeRange.Value;
         }
 
         private void updateLayoutRecursive(DrawableHitObject hitObject, double? parentHitObjectStartTime = null)
@@ -261,7 +262,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
 
                 // Nested hitobjects don't need to scroll, but they do need accurate positions and start lifetime
                 updatePosition(obj, hitObject.HitObject.StartTime, parentHitObjectStartTime);
-                setComputedLifetimeStart(obj.Entry);
+                setComputedLifetime(obj.Entry);
             }
         }
 
