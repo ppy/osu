@@ -8,10 +8,12 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Primitives;
@@ -165,13 +167,25 @@ namespace osu.Game.Screens.Select.Carousel
 
             var state = Item?.State.Value;
 
+            backgroundContainer.Height = state == CarouselItemState.Selected ? HEIGHT - 4 : HEIGHT;
+
             // TODO: implement colour sampling of beatmap background for colour box and offset this by 10, hide for now
             backgroundContainer.MoveToX(state == CarouselItemState.Selected ? colour_box_width_expanded : 0, duration, Easing.OutQuint);
             mainFlow.MoveToX(state == CarouselItemState.Selected ? colour_box_width_expanded : 0, duration, Easing.OutQuint);
 
+            colourBox.RelativeSizeAxes = state == CarouselItemState.Selected ? Axes.Both : Axes.Y;
+            colourBox.Width = state == CarouselItemState.Selected ? 1 : colour_box_width_expanded + corner_radius;
             colourBox.FadeTo(state == CarouselItemState.Selected ? 1 : 0, duration, Easing.OutQuint);
+
             rightArrow.FadeTo(state == CarouselItemState.Selected ? 1 : 0, duration, Easing.OutQuint);
             backgroundPlaceholder.FadeTo(state == CarouselItemState.Selected ? 1 : 0, duration, Easing.OutQuint);
+
+            Header.EffectContainer.EdgeEffect = new EdgeEffectParameters
+            {
+                Type = EdgeEffectType.Shadow,
+                Colour = state == CarouselItemState.Selected ? Color4Extensions.FromHex(@"4EBFFF").Opacity(0.5f) : Colour4.Black.Opacity(100),
+                Radius = state == CarouselItemState.Selected ? 15 : 10,
+            };
         }
 
         private void updateBeatmapDifficulties()
@@ -253,7 +267,6 @@ namespace osu.Game.Screens.Select.Carousel
                     {
                         colourBox = new Box
                         {
-                            Width = colour_box_width_expanded + corner_radius,
                             RelativeSizeAxes = Axes.Y,
                             Alpha = 0,
                             EdgeSmoothness = new Vector2(2, 0),
@@ -262,8 +275,10 @@ namespace osu.Game.Screens.Select.Carousel
                         {
                             Masking = true,
                             CornerRadius = corner_radius,
-                            RelativeSizeAxes = Axes.Both,
+                            RelativeSizeAxes = Axes.X,
                             MaskingSmoothness = 2,
+                            Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.CentreLeft,
                             Children = new Drawable[]
                             {
                                 backgroundPlaceholder = new Box

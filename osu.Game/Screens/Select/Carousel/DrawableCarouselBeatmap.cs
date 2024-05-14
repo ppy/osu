@@ -101,8 +101,6 @@ namespace osu.Game.Screens.Select.Carousel
         private void load(BeatmapManager? manager, SongSelect? songSelect)
         {
             Header.Height = height;
-            Header.HasCustomBorder = true;
-            Header.BorderContainer.EdgeEffect = new EdgeEffectParameters();
 
             if (songSelect != null)
             {
@@ -262,8 +260,6 @@ namespace osu.Game.Screens.Select.Carousel
                 Colour = Colour4.Black.Opacity(100),
             };
 
-            Header.BorderContainer.EdgeEffect = new EdgeEffectParameters();
-
             colourBox.RelativeSizeAxes = Axes.Y;
             colourBox.Width = colour_box_width + corner_radius;
         }
@@ -313,15 +309,7 @@ namespace osu.Game.Screens.Select.Carousel
                     {
                         Type = EdgeEffectType.Shadow,
                         Colour = starCounter.Colour.MultiplyAlpha(0.5f),
-                        Radius = 50
-                    };
-
-                    Header.BorderContainer.EdgeEffect = new EdgeEffectParameters
-                    {
-                        Type = EdgeEffectType.Shadow,
-                        Colour = starCounter.Colour.MultiplyAlpha(0.5f),
                         Radius = 10,
-                        Hollow = true,
                     };
                 });
 
