@@ -12,6 +12,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
     {
         private const double max_opacity_bonus = 0.4;
         private const double hidden_bonus = 0.2;
+        private const double flashlight_padding = 80;
 
         private const double min_velocity = 0.5;
         private const double slider_multiplier = 1.3;
@@ -60,7 +61,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
                     // We want to nerf objects that can be easily seen within the Flashlight circle radius.
                     if (i == 0)
-                        smallDistNerf = Math.Min(1.0, jumpDistance / 75.0);
+                    {
+                        float flashlightRadius = 200 * getComboScaleFor(osuCurrent.PreviousMaxCombo);
+                        smallDistNerf = Math.Min(1.0, jumpDistance / (flashlightRadius + osuHitObject.Radius - flashlight_padding));
+                    }
 
                     // We also want to nerf stacks so that only the first object of the stack is accounted for.
                     double stackNerf = Math.Min(1.0, (currentObj.LazyJumpDistance / scalingFactor) / 25.0);
@@ -111,6 +115,17 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             result += sliderBonus * slider_multiplier;
 
             return result;
+        }
+
+        private static float getComboScaleFor(int combo)
+        {
+            // Taken from ModFlashlight.
+            if (combo >= 200)
+                return 0.625f;
+            if (combo >= 100)
+                return 0.8125f;
+
+            return 1.0f;
         }
     }
 }
