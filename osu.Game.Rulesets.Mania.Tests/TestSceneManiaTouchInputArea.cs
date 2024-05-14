@@ -3,42 +3,28 @@
 
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
 using osu.Framework.Testing;
 using osu.Game.Rulesets.Mania.UI;
-using osu.Game.Rulesets.Mods;
 using osu.Game.Tests.Visual;
 
-namespace osu.Game.Rulesets.Mania.Tests.Mods
+namespace osu.Game.Rulesets.Mania.Tests
 {
-    public partial class TestSceneModTouchDevice : ModTestScene
+    public partial class TestSceneManiaTouchInputArea : PlayerTestScene
     {
         protected override Ruleset CreatePlayerRuleset() => new ManiaRuleset();
 
         [Test]
-        public void TestOverlayVisibleWithMod() => CreateModTest(new ModTestData
+        public void TestTouchAreaNotInitiallyVisible()
         {
-            Mod = new ModTouchDevice(),
-            Autoplay = false,
-            PassCondition = () => getTouchOverlay()?.IsPresent == true
-        });
-
-        [Test]
-        public void TestOverlayNotVisibleWithoutMod() => CreateModTest(new ModTestData
-        {
-            Autoplay = false,
-            PassCondition = () => getTouchOverlay()?.IsPresent == false
-        });
+            AddAssert("touch area not visible", () => getTouchOverlay()?.State.Value == Visibility.Hidden);
+        }
 
         [Test]
         public void TestPressReceptors()
         {
-            CreateModTest(new ModTestData
-            {
-                Mod = new ModTouchDevice(),
-                Autoplay = false,
-                PassCondition = () => true
-            });
+            AddAssert("touch area not visible", () => getTouchOverlay()?.State.Value == Visibility.Hidden);
 
             for (int i = 0; i < 4; i++)
             {
@@ -51,6 +37,8 @@ namespace osu.Game.Rulesets.Mania.Tests.Mods
                     () => Does.Contain(getReceptor(index).Action.Value));
 
                 AddStep($"release receptor {index}", () => InputManager.EndTouch(new Touch(TouchSource.Touch1, getReceptor(index).ScreenSpaceDrawQuad.Centre)));
+
+                AddAssert("touch area visible", () => getTouchOverlay()?.State.Value == Visibility.Visible);
             }
         }
 
