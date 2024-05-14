@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -23,9 +21,9 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
     {
         private readonly ScoreRank rank;
 
-        private BufferedContainer flash;
-        private BufferedContainer superFlash;
-        private GlowingSpriteText rankText;
+        private BufferedContainer flash = null!;
+        private BufferedContainer superFlash = null!;
+        private GlowingSpriteText rankText = null!;
 
         public RankText(ScoreRank rank)
         {
