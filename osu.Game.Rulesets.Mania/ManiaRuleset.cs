@@ -163,9 +163,6 @@ namespace osu.Game.Rulesets.Mania
 
             if (mods.HasFlagFast(LegacyMods.ScoreV2))
                 yield return new ModScoreV2();
-
-            if (mods.HasFlagFast(LegacyMods.TouchDevice))
-                yield return new ModTouchDevice();
         }
 
         public override LegacyMods ConvertToLegacyMods(Mod[] mods)
@@ -227,10 +224,6 @@ namespace osu.Game.Rulesets.Mania
 
                     case ManiaModRandom:
                         value |= LegacyMods.Random;
-                        break;
-
-                    case ModTouchDevice:
-                        value |= LegacyMods.TouchDevice;
                         break;
                 }
             }
@@ -303,7 +296,6 @@ namespace osu.Game.Rulesets.Mania
                 case ModType.System:
                     return new Mod[]
                     {
-                        new ModTouchDevice(),
                         new ModScoreV2(),
                     };
 
