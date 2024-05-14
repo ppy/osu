@@ -8,20 +8,24 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Effects;
+using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Input.Events;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Collections;
 using osu.Game.Database;
+using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
 using osuTK;
@@ -31,11 +35,13 @@ namespace osu.Game.Screens.Select.Carousel
     public partial class DrawableCarouselBeatmapSet : DrawableCarouselItem, IHasContextMenu
     {
         public const float HEIGHT = MAX_HEIGHT;
-        private const float colour_box_width_expanded = 20;
+        private const float arrow_container_width = 20;
+        private const float difficulty_icon_container_width = 30;
         private const float corner_radius = 10;
 
         private Action<BeatmapSetInfo> restoreHiddenRequested = null!;
         private Action<int>? viewDetails;
+        private Action<BeatmapInfo>? selectRequested;
 
         [Resolved]
         private IDialogOverlay? dialogOverlay { get; set; }
@@ -49,6 +55,14 @@ namespace osu.Game.Screens.Select.Carousel
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; } = null!;
 
+        [Resolved]
+        private OsuColour colours { get; set; } = null!;
+
+        private IBindable<StarDifficulty?> starDifficultyBindable = null!;
+
+        [Resolved]
+        private BeatmapDifficultyCache difficultyCache { get; set; } = null!;
+
         public IEnumerable<DrawableCarouselItem> DrawableBeatmaps => beatmapContainer?.IsLoaded != true ? Enumerable.Empty<DrawableCarouselItem>() : beatmapContainer.AliveChildren;
 
         private Container<DrawableCarouselItem>? beatmapContainer;
@@ -58,7 +72,6 @@ namespace osu.Game.Screens.Select.Carousel
         private Task? beatmapsLoadTask;
         private Box colourBox = null!;
         private Container backgroundContainer = null!;
-        private SpriteIcon rightArrow = null!;
         private SetPanelContent mainFlow = null!;
         private Box backgroundPlaceholder = null!;
 
@@ -93,6 +106,9 @@ namespace osu.Game.Screens.Select.Carousel
 
             if (beatmapOverlay != null)
                 viewDetails = beatmapOverlay.FetchAndShowBeatmapSet;
+
+            if (songSelect != null)
+                selectRequested = b => songSelect.FinaliseSelection(b);
         }
 
         protected override void Update()
@@ -165,27 +181,53 @@ namespace osu.Game.Screens.Select.Carousel
             // Header children may not be loaded yet.
             if (Header.Count == 0) return;
 
+            float colourBoxWidth = beatmapSet.Beatmaps.Count == 1 ? difficulty_icon_container_width : arrow_container_width;
+
             var state = Item?.State.Value;
 
             backgroundContainer.Height = state == CarouselItemState.Selected ? HEIGHT - 4 : HEIGHT;
 
             // TODO: implement colour sampling of beatmap background for colour box and offset this by 10, hide for now
-            backgroundContainer.MoveToX(state == CarouselItemState.Selected ? colour_box_width_expanded : 0, duration, Easing.OutQuint);
-            mainFlow.MoveToX(state == CarouselItemState.Selected ? colour_box_width_expanded : 0, duration, Easing.OutQuint);
+            backgroundContainer.MoveToX(state == CarouselItemState.Selected ? colourBoxWidth : 0, duration, Easing.OutQuint);
+            mainFlow.MoveToX(state == CarouselItemState.Selected ? colourBoxWidth : 0, duration, Easing.OutQuint);
 
             colourBox.RelativeSizeAxes = state == CarouselItemState.Selected ? Axes.Both : Axes.Y;
-            colourBox.Width = state == CarouselItemState.Selected ? 1 : colour_box_width_expanded + corner_radius;
+            colourBox.Width = state == CarouselItemState.Selected ? 1 : colourBoxWidth + corner_radius;
             colourBox.FadeTo(state == CarouselItemState.Selected ? 1 : 0, duration, Easing.OutQuint);
-
-            rightArrow.FadeTo(state == CarouselItemState.Selected ? 1 : 0, duration, Easing.OutQuint);
+            iconContainer.FadeTo(state == CarouselItemState.Selected ? 1 : 0, duration, Easing.OutQuint);
             backgroundPlaceholder.FadeTo(state == CarouselItemState.Selected ? 1 : 0, duration, Easing.OutQuint);
 
-            Header.EffectContainer.EdgeEffect = new EdgeEffectParameters
+            starDifficultyCancellationSource?.Cancel();
+
+            if (beatmapSet.Beatmaps.Count == 1)
             {
-                Type = EdgeEffectType.Shadow,
-                Colour = state == CarouselItemState.Selected ? Color4Extensions.FromHex(@"4EBFFF").Opacity(0.5f) : Colour4.Black.Opacity(100),
-                Radius = state == CarouselItemState.Selected ? 15 : 10,
-            };
+                starDifficultyBindable = difficultyCache.GetBindableDifficulty(beatmapSet.Beatmaps.Single(), (starDifficultyCancellationSource = new CancellationTokenSource()).Token);
+                starDifficultyBindable.BindValueChanged(d =>
+                {
+                    // We want to update the EdgeEffect here instead of in selected() to make sure the colours are correct
+                    if (d.NewValue != null)
+                    {
+                        colourBox.Colour = colours.ForStarDifficulty(d.NewValue.Value.Stars);
+                        iconContainer.Colour = d.NewValue.Value.Stars > 6.5f ? Colour4.White : colourProvider.Background5;
+
+                        Header.EffectContainer.EdgeEffect = new EdgeEffectParameters
+                        {
+                            Type = EdgeEffectType.Shadow,
+                            Colour = state == CarouselItemState.Selected ? colours.ForStarDifficulty(d.NewValue.Value.Stars).Opacity(0.5f) : Colour4.Black.Opacity(100),
+                            Radius = state == CarouselItemState.Selected ? 15 : 10,
+                        };
+                    }
+                }, true);
+            }
+            else
+            {
+                Header.EffectContainer.EdgeEffect = new EdgeEffectParameters
+                {
+                    Type = EdgeEffectType.Shadow,
+                    Colour = state == CarouselItemState.Selected ? Color4Extensions.FromHex(@"4EBFFF").Opacity(0.5f) : Colour4.Black.Opacity(100),
+                    Radius = state == CarouselItemState.Selected ? 15 : 10,
+                };
+            }
         }
 
         private void updateBeatmapDifficulties()
@@ -205,6 +247,9 @@ namespace osu.Game.Screens.Select.Carousel
             }
             else
             {
+                if (beatmapSet.Beatmaps.Count == 1)
+                    return;
+
                 // on selection we show our child beatmaps.
                 // for now this is a simple drawable construction each selection.
                 // can be improved in the future.
@@ -299,17 +344,13 @@ namespace osu.Game.Screens.Select.Carousel
                         },
                     }
                 },
-                rightArrow = new SpriteIcon
+                iconContainer = new Container
                 {
-                    X = colour_box_width_expanded / 2,
-                    Origin = Anchor.Centre,
-                    Anchor = Anchor.CentreLeft,
-                    Icon = FontAwesome.Solid.ChevronRight,
-                    Size = new Vector2(12),
-                    // TODO: implement colour sampling of beatmap background
-                    Colour = colourProvider.Background5,
+                    AutoSizeAxes = Axes.Both,
                     Shear = -CarouselHeader.SHEAR,
                     Alpha = 0,
+                    Origin = Anchor.Centre,
+                    Anchor = Anchor.CentreLeft,
                 },
                 mainFlow = new SetPanelContent((CarouselBeatmapSet)Item)
                 {
@@ -320,8 +361,36 @@ namespace osu.Game.Screens.Select.Carousel
                 Header.AddRange(drawables);
                 drawables.ForEach(d => d.FadeInFromZero(150));
                 updateSelectionState();
+
+                if (beatmapSet.Beatmaps.Count == 1)
+                {
+                    iconContainer.Add(new ConstrainedIconContainer
+                    {
+                        X = difficulty_icon_container_width / 2,
+                        Origin = Anchor.Centre,
+                        Anchor = Anchor.Centre,
+                        Icon = beatmapSet.Beatmaps.Single().Ruleset.CreateInstance().CreateIcon(),
+                        Size = new Vector2(20),
+                    });
+                }
+                else
+                {
+                    iconContainer.Add(new SpriteIcon
+                    {
+                        X = arrow_container_width / 2,
+                        Origin = Anchor.Centre,
+                        Anchor = Anchor.Centre,
+                        Icon = FontAwesome.Solid.ChevronRight,
+                        Size = new Vector2(12),
+                        // TODO: implement colour sampling of beatmap background
+                        Colour = colourProvider.Background5,
+                    });
+                }
             }, loadCancellation.Token);
         }
+
+        private CancellationTokenSource? starDifficultyCancellationSource;
+        private Container iconContainer = null!;
 
         private void updateBeatmapYPositions()
         {
@@ -428,6 +497,14 @@ namespace osu.Game.Screens.Select.Carousel
             {
                 State = { Value = state }
             };
+        }
+
+        protected override bool OnClick(ClickEvent e)
+        {
+            if (Item?.State.Value == CarouselItemState.Selected && beatmapSet.Beatmaps.Count == 1)
+                selectRequested?.Invoke(beatmapSet.Beatmaps.Single());
+
+            return base.OnClick(e);
         }
     }
 }

@@ -1031,7 +1031,7 @@ namespace osu.Game.Screens.Select
                             // scroll position at currentY makes the set panel appear at the very top of the carousel's screen space
                             // move down by half of visible height (height of the carousel's visible extent, including semi-transparent areas)
                             // then reapply the top semi-transparent area (because carousel's screen space starts below it)
-                            scrollTarget = currentY + DrawableCarouselBeatmapSet.HEIGHT - visibleHalfHeight + BleedTop;
+                            scrollTarget = currentY + (set.Beatmaps.Count() == 1 ? 0 : DrawableCarouselBeatmapSet.HEIGHT) - visibleHalfHeight + BleedTop;
 
                             foreach (var b in set.Beatmaps)
                             {
