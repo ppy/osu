@@ -1,12 +1,9 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -24,14 +21,14 @@ namespace osu.Game.Screens.Ranking.Statistics
         private readonly SimpleStatisticItem[] items;
         private readonly int columnCount;
 
-        private FillFlowContainer[] columns;
+        private FillFlowContainer[] columns = null!;
 
         /// <summary>
         /// Creates a statistic row for the supplied <see cref="SimpleStatisticItem"/>s.
         /// </summary>
         /// <param name="columnCount">The number of columns to layout the <paramref name="items"/> into.</param>
         /// <param name="items">The <see cref="SimpleStatisticItem"/>s to display in this row.</param>
-        public SimpleStatisticTable(int columnCount, [ItemNotNull] IEnumerable<SimpleStatisticItem> items)
+        public SimpleStatisticTable(int columnCount, IEnumerable<SimpleStatisticItem> items)
         {
             ArgumentOutOfRangeException.ThrowIfNegativeOrZero(columnCount);
 
