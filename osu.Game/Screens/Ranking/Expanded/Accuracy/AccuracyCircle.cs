@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -93,17 +91,17 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
 
         private readonly ScoreInfo score;
 
-        private CircularProgress accuracyCircle;
-        private GradedCircles gradedCircles;
-        private Container<RankBadge> badges;
-        private RankText rankText;
+        private CircularProgress accuracyCircle = null!;
+        private GradedCircles gradedCircles = null!;
+        private Container<RankBadge> badges = null!;
+        private RankText rankText = null!;
 
-        private PoolableSkinnableSample scoreTickSound;
-        private PoolableSkinnableSample badgeTickSound;
-        private PoolableSkinnableSample badgeMaxSound;
-        private PoolableSkinnableSample swooshUpSound;
-        private PoolableSkinnableSample rankImpactSound;
-        private PoolableSkinnableSample rankApplauseSound;
+        private PoolableSkinnableSample? scoreTickSound;
+        private PoolableSkinnableSample? badgeTickSound;
+        private PoolableSkinnableSample? badgeMaxSound;
+        private PoolableSkinnableSample? swooshUpSound;
+        private PoolableSkinnableSample? rankImpactSound;
+        private PoolableSkinnableSample? rankApplauseSound;
 
         private readonly Bindable<double> tickPlaybackRate = new Bindable<double>();
 
@@ -119,7 +117,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
         private readonly bool withFlair;
 
         private readonly bool isFailedSDueToMisses;
-        private RankText failedSRankText;
+        private RankText failedSRankText = null!;
 
         public AccuracyCircle(ScoreInfo score, bool withFlair = false)
         {
@@ -229,8 +227,8 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
 
                 this.Delay(swoosh_pre_delay).Schedule(() =>
                 {
-                    swooshUpSound.VolumeTo(swoosh_volume);
-                    swooshUpSound.Play();
+                    swooshUpSound!.VolumeTo(swoosh_volume);
+                    swooshUpSound!.Play();
                 });
             }
 
@@ -287,8 +285,8 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
                         this.TransformBindableTo(tickPlaybackRate, score_tick_debounce_rate_start);
                         this.TransformBindableTo(tickPlaybackRate, score_tick_debounce_rate_end, ACCURACY_TRANSFORM_DURATION, Easing.OutSine);
 
-                        scoreTickSound.FrequencyTo(1 + targetAccuracy, ACCURACY_TRANSFORM_DURATION, Easing.OutSine);
-                        scoreTickSound.VolumeTo(score_tick_volume_start).Then().VolumeTo(score_tick_volume_end, ACCURACY_TRANSFORM_DURATION, Easing.OutSine);
+                        scoreTickSound!.FrequencyTo(1 + targetAccuracy, ACCURACY_TRANSFORM_DURATION, Easing.OutSine);
+                        scoreTickSound!.VolumeTo(score_tick_volume_start).Then().VolumeTo(score_tick_volume_end, ACCURACY_TRANSFORM_DURATION, Easing.OutSine);
 
                         isTicking = true;
                     });
@@ -314,8 +312,8 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
                                 {
                                     var dink = badgeNum < badges.Count - 1 ? badgeTickSound : badgeMaxSound;
 
-                                    dink.FrequencyTo(1 + badgeNum++ * 0.05);
-                                    dink.Play();
+                                    dink!.FrequencyTo(1 + badgeNum++ * 0.05);
+                                    dink!.Play();
                                 });
                             }
                         }
@@ -331,7 +329,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
                         Schedule(() =>
                         {
                             isTicking = false;
-                            rankImpactSound.Play();
+                            rankImpactSound!.Play();
                         });
 
                         const double applause_pre_delay = 545f;
@@ -341,8 +339,8 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
                         {
                             Schedule(() =>
                             {
-                                rankApplauseSound.VolumeTo(applause_volume);
-                                rankApplauseSound.Play();
+                                rankApplauseSound!.VolumeTo(applause_volume);
+                                rankApplauseSound!.Play();
                             });
                         }
                     }
