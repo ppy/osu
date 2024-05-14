@@ -3,12 +3,10 @@
 
 using System.Linq;
 using NUnit.Framework;
-using osu.Framework.Graphics;
 using osu.Framework.Input;
 using osu.Framework.Testing;
 using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Skinning;
 using osu.Game.Tests.Visual;
 
 namespace osu.Game.Rulesets.Mania.Tests.Mods
@@ -22,14 +20,14 @@ namespace osu.Game.Rulesets.Mania.Tests.Mods
         {
             Mod = new ModTouchDevice(),
             Autoplay = false,
-            PassCondition = () => getSkinnableOverlay()?.IsPresent == true
+            PassCondition = () => getTouchOverlay()?.IsPresent == true
         });
 
         [Test]
         public void TestOverlayNotVisibleWithoutMod() => CreateModTest(new ModTestData
         {
             Autoplay = false,
-            PassCondition = () => getSkinnableOverlay()?.IsPresent == false
+            PassCondition = () => getTouchOverlay()?.IsPresent == false
         });
 
         [Test]
@@ -56,9 +54,8 @@ namespace osu.Game.Rulesets.Mania.Tests.Mods
             }
         }
 
-        private Drawable? getSkinnableOverlay() => this.ChildrenOfType<SkinnableDrawable>()
-                                                       .SingleOrDefault(d => d.Lookup.Equals(new ManiaSkinComponentLookup(ManiaSkinComponents.TouchOverlay)));
+        private ManiaTouchInputArea? getTouchOverlay() => this.ChildrenOfType<ManiaTouchInputArea>().SingleOrDefault();
 
-        private ManiaTouchInputArea.InputReceptor getReceptor(int index) => this.ChildrenOfType<ManiaTouchInputArea.InputReceptor>().ElementAt(index);
+        private ManiaTouchInputArea.ColumnInputReceptor getReceptor(int index) => this.ChildrenOfType<ManiaTouchInputArea.ColumnInputReceptor>().ElementAt(index);
     }
 }

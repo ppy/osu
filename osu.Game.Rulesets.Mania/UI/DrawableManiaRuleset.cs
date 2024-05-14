@@ -105,10 +105,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
             TimeRange.Value = smoothTimeRange = ComputeScrollTime(configScrollSpeed.Value);
 
-            KeyBindingInputManager.Add(touchArea = new ManiaTouchInputArea
-            {
-                RelativeSizeAxes = Axes.Both
-            });
+            KeyBindingInputManager.Add(new ManiaTouchInputArea());
         }
 
         protected override void AdjustScrollSpeed(int amount) => configScrollSpeed.Value += amount;
@@ -121,8 +118,6 @@ namespace osu.Game.Rulesets.Mania.UI
 
         private ScheduledDelegate? pendingSkinChange;
         private float hitPosition;
-
-        private ManiaTouchInputArea touchArea = null!;
 
         private void onSkinChange()
         {

@@ -9,13 +9,19 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Game.Configuration;
-using osu.Game.Skinning;
 using osuTK;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
-    public partial class ManiaTouchInputArea : CompositeDrawable, ISerialisableDrawable
+    /// <summary>
+    /// An overlay that captures and displays osu!mania mouse and touch input.
+    /// </summary>
+    public partial class ManiaTouchInputArea : VisibilityContainer
     {
+        // visibility state affects our child. we always want to handle input.
+        public override bool PropagatePositionalInputSubTree => true;
+        public override bool PropagateNonPositionalInputSubTree => true;
+
         [SettingSource("Spacing", "The spacing between receptors.")]
         public BindableFloat Spacing { get; } = new BindableFloat(10)
         {
@@ -34,6 +40,8 @@ namespace osu.Game.Rulesets.Mania.UI
 
         [Resolved]
         private DrawableManiaRuleset drawableRuleset { get; set; } = null!;
+
+        private GridContainer gridContainer = null!;
 
         public ManiaTouchInputArea()
         {
@@ -62,16 +70,17 @@ namespace osu.Game.Rulesets.Mania.UI
                         receptorGridDimensions.Add(new Dimension(GridSizeMode.AutoSize));
                     }
 
-                    receptorGridContent.Add(new InputReceptor { Action = { BindTarget = column.Action } });
+                    receptorGridContent.Add(new ColumnInputReceptor { Action = { BindTarget = column.Action } });
                     receptorGridDimensions.Add(new Dimension());
 
                     first = false;
                 }
             }
 
-            InternalChild = new GridContainer
+            InternalChild = gridContainer = new GridContainer
             {
                 RelativeSizeAxes = Axes.Both,
+                AlwaysPresent = true,
                 Content = new[] { receptorGridContent.ToArray() },
                 ColumnDimensions = receptorGridDimensions.ToArray()
             };
@@ -83,9 +92,36 @@ namespace osu.Game.Rulesets.Mania.UI
             Opacity.BindValueChanged(o => Alpha = o.NewValue, true);
         }
 
-        public bool UsesFixedAnchor { get; set; }
+        protected override bool OnKeyDown(KeyDownEvent e)
+        {
+            // Hide whenever the keyboard is used.
+            Hide();
+            return false;
+        }
 
-        public partial class InputReceptor : CompositeDrawable
+        protected override bool OnMouseDown(MouseDownEvent e)
+        {
+            Show();
+            return true;
+        }
+
+        protected override bool OnTouchDown(TouchDownEvent e)
+        {
+            Show();
+            return true;
+        }
+
+        protected override void PopIn()
+        {
+            gridContainer.FadeIn(500, Easing.OutQuint);
+        }
+
+        protected override void PopOut()
+        {
+            gridContainer.FadeOut(300);
+        }
+
+        public partial class ColumnInputReceptor : CompositeDrawable
         {
             public readonly IBindable<ManiaAction> Action = new Bindable<ManiaAction>();
 
@@ -96,7 +132,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
             private bool isPressed;
 
-            public InputReceptor()
+            public ColumnInputReceptor()
             {
                 RelativeSizeAxes = Axes.Both;
 
@@ -128,7 +164,7 @@ namespace osu.Game.Rulesets.Mania.UI
             protected override bool OnTouchDown(TouchDownEvent e)
             {
                 updateButton(true);
-                return true;
+                return false; // handled by parent container to show overlay.
             }
 
             protected override void OnTouchUp(TouchUpEvent e)
@@ -139,7 +175,7 @@ namespace osu.Game.Rulesets.Mania.UI
             protected override bool OnMouseDown(MouseDownEvent e)
             {
                 updateButton(true);
-                return true;
+                return false; // handled by parent container to show overlay.
             }
 
             protected override void OnMouseUp(MouseUpEvent e)
