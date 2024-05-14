@@ -88,14 +88,14 @@ namespace osu.Game.Scoring
         {
             ScoreInfo? databasedScoreInfo = null;
 
+            if (originalScoreInfo is ScoreInfo scoreInfo)
+                databasedScoreInfo = Query(s => s.Hash == scoreInfo.Hash);
+
             if (originalScoreInfo.OnlineID > 0)
-                databasedScoreInfo = Query(s => s.OnlineID == originalScoreInfo.OnlineID);
+                databasedScoreInfo ??= Query(s => s.OnlineID == originalScoreInfo.OnlineID);
 
             if (originalScoreInfo.LegacyOnlineID > 0)
                 databasedScoreInfo ??= Query(s => s.LegacyOnlineID == originalScoreInfo.LegacyOnlineID);
-
-            if (originalScoreInfo is ScoreInfo scoreInfo)
-                databasedScoreInfo ??= Query(s => s.Hash == scoreInfo.Hash);
 
             if (databasedScoreInfo == null)
             {

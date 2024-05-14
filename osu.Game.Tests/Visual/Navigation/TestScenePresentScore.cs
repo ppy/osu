@@ -145,6 +145,19 @@ namespace osu.Game.Tests.Visual.Navigation
             presentAndConfirm(secondImport, type);
         }
 
+        [Test]
+        public void TestPresentTwoImportsWithSameOnlineIDButDifferentHashes([Values] ScorePresentType type)
+        {
+            AddStep("enter song select", () => Game.ChildrenOfType<ButtonSystem>().Single().OnSolo?.Invoke());
+            AddUntilStep("song select is current", () => Game.ScreenStack.CurrentScreen is PlaySongSelect songSelect && songSelect.BeatmapSetsLoaded);
+
+            var firstImport = importScore(1);
+            presentAndConfirm(firstImport, type);
+
+            var secondImport = importScore(1);
+            presentAndConfirm(secondImport, type);
+        }
+
         private void returnToMenu()
         {
             // if we don't pause, there's a chance the track may change at the main menu out of our control (due to reaching the end of the track).
