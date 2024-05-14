@@ -14,7 +14,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
-    public partial class ManiaTouchInputOverlay : CompositeDrawable, ISerialisableDrawable
+    public partial class ManiaTouchInputArea : CompositeDrawable, ISerialisableDrawable
     {
         [SettingSource("Spacing", "The spacing between receptors.")]
         public BindableFloat Spacing { get; } = new BindableFloat(10)
@@ -35,7 +35,7 @@ namespace osu.Game.Rulesets.Mania.UI
         [Resolved]
         private DrawableManiaRuleset drawableRuleset { get; set; } = null!;
 
-        public ManiaTouchInputOverlay()
+        public ManiaTouchInputArea()
         {
             Anchor = Anchor.BottomCentre;
             Origin = Anchor.BottomCentre;

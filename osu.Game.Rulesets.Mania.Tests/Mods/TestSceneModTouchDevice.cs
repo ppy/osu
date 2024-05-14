@@ -59,6 +59,6 @@ namespace osu.Game.Rulesets.Mania.Tests.Mods
         private Drawable? getSkinnableOverlay() => this.ChildrenOfType<SkinnableDrawable>()
                                                        .SingleOrDefault(d => d.Lookup.Equals(new ManiaSkinComponentLookup(ManiaSkinComponents.TouchOverlay)));
 
-        private ManiaTouchInputOverlay.InputReceptor getReceptor(int index) => this.ChildrenOfType<ManiaTouchInputOverlay.InputReceptor>().ElementAt(index);
+        private ManiaTouchInputArea.InputReceptor getReceptor(int index) => this.ChildrenOfType<ManiaTouchInputArea.InputReceptor>().ElementAt(index);
     }
 }
