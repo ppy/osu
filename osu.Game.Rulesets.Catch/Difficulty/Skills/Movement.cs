@@ -11,14 +11,15 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Skills
 {
     public class Movement : StrainDecaySkill
     {
+        private const double skill_multiplier = 900;
+
         private const float absolute_player_positioning_error = 16f;
         private const float normalized_hitobject_radius = 41.0f;
         private const double direction_change_bonus = 21.0;
 
-        protected override double SkillMultiplier => 900;
         protected override double StrainDecayBase => 0.2;
 
-        protected override double DecayWeight => 0.94;
+        protected override double SumDecay => 0.94;
 
         protected override int SectionLength => 750;
 
@@ -99,7 +100,12 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Skills
             lastDistanceMoved = distanceMoved;
             lastStrainTime = catchCurrent.StrainTime;
 
-            return distanceAddition / weightedStrainTime;
+            return skill_multiplier * distanceAddition / weightedStrainTime;
+        }
+
+        public override double DifficultyValue()
+        {
+            return Math.Sqrt(base.DifficultyValue()) * CatchDifficultyCalculator.DIFFICULTY_MULTIPLIER;
         }
     }
 }

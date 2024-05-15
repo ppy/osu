@@ -11,6 +11,8 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
 {
     public class ColourEvaluator
     {
+        private const double skill_multiplier = 0.12;
+
         /// <summary>
         /// A sigmoid function. It gives a value between (middle - height/2) and (middle + height/2).
         /// </summary>
@@ -61,7 +63,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
             if (colour.RepeatingHitPattern?.FirstHitObject == hitObject) // Difficulty for RepeatingHitPattern
                 difficulty += EvaluateDifficultyOf(colour.RepeatingHitPattern);
 
-            return difficulty;
+            return skill_multiplier * difficulty;
         }
     }
 }

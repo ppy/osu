@@ -24,23 +24,16 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             hasHiddenMod = mods.Any(m => m is OsuModHidden);
         }
 
-        private double skillMultiplier => 0.052;
-        private double strainDecayBase => 0.15;
-
-        private double currentStrain;
-
-        private double strainDecay(double ms) => Math.Pow(strainDecayBase, ms / 1000);
-
-        protected override double CalculateInitialStrain(double time, DifficultyHitObject current) => currentStrain * strainDecay(time - current.Previous(0).StartTime);
-
         protected override double StrainValueAt(DifficultyHitObject current)
         {
-            currentStrain *= strainDecay(current.DeltaTime);
-            currentStrain += FlashlightEvaluator.EvaluateDifficultyOf(current, hasHiddenMod) * skillMultiplier;
+            CurrentStrain *= StrainDecay(current.DeltaTime);
+            CurrentStrain += FlashlightEvaluator.EvaluateDifficultyOf(current, hasHiddenMod);
 
-            return currentStrain;
+            return CurrentStrain;
         }
 
-        public override double DifficultyValue() => GetCurrentStrainPeaks().Sum() * OsuStrainSkill.DEFAULT_DIFFICULTY_MULTIPLIER;
+        public override double DifficultyValue() => Math.Sqrt(GetCurrentStrainPeaks().Sum()) * OsuDifficultyCalculator.DIFFICULTY_MULTIPLIER;
+
+        public static double DifficultyToPerformance(double difficulty) => 28.5 * Math.Pow(difficulty, 2);
     }
 }

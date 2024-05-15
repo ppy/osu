@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
 {
     public class TaikoDifficultyCalculator : DifficultyCalculator
     {
-        private const double difficulty_multiplier = 1.35;
+        public const double DIFFICULTY_MULTIPLIER = 0.084375;
 
         public override int Version => 20221107;
 
@@ -74,11 +74,11 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
 
             var combined = (Peaks)skills[0];
 
-            double colourRating = combined.ColourDifficultyValue * difficulty_multiplier;
-            double rhythmRating = combined.RhythmDifficultyValue * difficulty_multiplier;
-            double staminaRating = combined.StaminaDifficultyValue * difficulty_multiplier;
+            double colourRating = combined.ColourDifficultyValue;
+            double rhythmRating = combined.RhythmDifficultyValue;
+            double staminaRating = combined.StaminaDifficultyValue;
 
-            double combinedRating = combined.DifficultyValue() * difficulty_multiplier;
+            double combinedRating = combined.DifficultyValue();
             double starRating = rescale(combinedRating * 1.4);
 
             HitWindows hitWindows = new TaikoHitWindows();
