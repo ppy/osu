@@ -9,6 +9,7 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics;
 using osu.Game.Input.Bindings;
 using osu.Game.Overlays;
+using osu.Game.Screens.Footer;
 
 namespace osu.Game.Screens.SelectV2.Footer
 {

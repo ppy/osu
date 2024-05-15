@@ -65,7 +65,6 @@ using osu.Game.Screens.OnlinePlay.Multiplayer;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Ranking;
 using osu.Game.Screens.Select;
-using osu.Game.Screens.SelectV2.Footer;
 using osu.Game.Skinning;
 using osu.Game.Updater;
 using osu.Game.Users;

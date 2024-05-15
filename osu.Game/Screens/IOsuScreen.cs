@@ -7,7 +7,7 @@ using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Overlays;
 using osu.Game.Rulesets;
-using osu.Game.Screens.SelectV2.Footer;
+using osu.Game.Screens.Footer;
 using osu.Game.Users;
 
 namespace osu.Game.Screens

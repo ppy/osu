@@ -15,7 +15,6 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Input.Bindings;
 using osu.Game.Overlays;
 using osu.Game.Screens.Menu;
-using osu.Game.Screens.SelectV2.Footer;
 using osuTK;
 
 namespace osu.Game.Screens.Footer

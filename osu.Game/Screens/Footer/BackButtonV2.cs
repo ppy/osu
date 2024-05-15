@@ -13,7 +13,7 @@ using osu.Game.Localisation;
 using osuTK;
 using osuTK.Graphics;
 
-namespace osu.Game.Screens.SelectV2.Footer
+namespace osu.Game.Screens.Footer
 {
     public partial class BackButtonV2 : ShearedButton
     {

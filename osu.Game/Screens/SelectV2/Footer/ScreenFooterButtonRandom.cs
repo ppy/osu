@@ -10,6 +10,7 @@ using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Input.Bindings;
+using osu.Game.Screens.Footer;
 using osuTK;
 using osuTK.Input;
 
