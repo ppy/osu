@@ -66,7 +66,7 @@ namespace osu.Game.Graphics.UserInterface
         private readonly Box background;
         private readonly OsuSpriteText text;
 
-        private const float shear = 0.2f;
+        private const float shear_width = 10;
 
         private Colour4? darkerColour;
         private Colour4? lighterColour;
@@ -90,8 +90,10 @@ namespace osu.Game.Graphics.UserInterface
         /// <param name="height">The height of the button.</param>
         public ShearedButton(float? width = null, float height = DEFAULT_HEIGHT)
         {
+            float shear = shear_width / height;
+
             Height = height;
-            Padding = new MarginPadding { Horizontal = shear * height };
+            Padding = new MarginPadding { Horizontal = shear_width };
 
             Content.CornerRadius = CORNER_RADIUS;
             Content.Shear = new Vector2(shear, 0);
@@ -116,7 +118,7 @@ namespace osu.Game.Graphics.UserInterface
                         {
                             RelativeSizeAxes = Axes.Both,
                             Shear = new Vector2(-shear, 0),
-                            X = -shear * height,
+                            X = -shear_width,
                             Child = text = new OsuSpriteText
                             {
                                 Anchor = Anchor.Centre,
