@@ -23,9 +23,8 @@ namespace osu.Game.Screens.Footer
         public const float BUTTON_WIDTH = 240;
 
         public BackButtonV2()
-            : base(BUTTON_WIDTH)
+            : base(BUTTON_WIDTH, 70)
         {
-            Height = 70f;
         }
 
         [BackgroundDependencyLoader]
