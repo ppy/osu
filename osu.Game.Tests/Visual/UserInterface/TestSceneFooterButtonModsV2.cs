@@ -10,6 +10,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Testing;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays;
+using osu.Game.Overlays.Mods;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Screens.SelectV2.Footer;
@@ -26,12 +27,11 @@ namespace osu.Game.Tests.Visual.UserInterface
 
         public TestSceneFooterButtonModsV2()
         {
-            Add(footerButtonMods = new TestFooterButtonModsV2
+            Add(footerButtonMods = new TestFooterButtonModsV2(new TestModSelectOverlay())
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.CentreLeft,
                 X = -100,
-                Action = () => { },
             });
         }
 
@@ -112,9 +112,19 @@ namespace osu.Game.Tests.Visual.UserInterface
             return expectedValue == footerButtonMods.MultiplierText.Current.Value;
         }
 
+        private partial class TestModSelectOverlay : UserModSelectOverlay
+        {
+            protected override bool ShowPresets => true;
+        }
+
         private partial class TestFooterButtonModsV2 : FooterButtonModsV2
         {
             public new OsuSpriteText MultiplierText => base.MultiplierText;
+
+            public TestFooterButtonModsV2(ModSelectOverlay overlay)
+                : base(overlay)
+            {
+            }
         }
     }
 }
