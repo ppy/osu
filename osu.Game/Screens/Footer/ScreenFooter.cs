@@ -22,11 +22,10 @@ namespace osu.Game.Screens.Footer
 {
     public partial class ScreenFooter : VisibilityContainer
     {
-        private const int height = 60;
         private const int padding = 60;
-
         private const float delay_per_button = 30;
-        private const float back_button_delay = 120;
+
+        public const int HEIGHT = 60;
 
         private readonly List<OverlayContainer> overlays = new List<OverlayContainer>();
 
@@ -38,6 +37,8 @@ namespace osu.Game.Screens.Footer
 
         public void SetButtons(IReadOnlyList<ScreenFooterButton> buttons)
         {
+            overlays.Clear();
+
             var oldButtons = buttonsFlow.ToArray();
 
             for (int i = 0; i < oldButtons.Length; i++)
@@ -55,18 +56,14 @@ namespace osu.Game.Screens.Footer
                 Scheduler.AddDelayed(() => oldButton.Expire(), oldButton.TopLevelContent.LatestTransformEndTime - Time.Current);
             }
 
-            overlays.Clear();
-
             for (int i = 0; i < buttons.Count; i++)
             {
                 var newButton = buttons[i];
 
                 if (newButton.Overlay != null)
                 {
-                    // todo: this code is very stupid.
-                    overlays.Add(newButton.Overlay);
                     newButton.Action = () => showOverlay(newButton.Overlay);
-                    newButton.OverlayState.BindTo(newButton.Overlay.State);
+                    overlays.Add(newButton.Overlay);
                 }
 
                 Debug.Assert(!newButton.IsLoaded);
@@ -87,53 +84,44 @@ namespace osu.Game.Screens.Footer
 
         private void fadeButtonFromRight(ScreenFooterButton button, int index, int count, float startDelay)
         {
-            const float delay = 30;
-
             button.TopLevelContent
                   .MoveToX(-300f)
                   .FadeOut();
 
             button.TopLevelContent
-                  .Delay(startDelay + (count - index) * delay)
+                  .Delay(startDelay + (count - index) * delay_per_button)
                   .MoveToX(0f, 240, Easing.OutCubic)
                   .FadeIn(240, Easing.OutCubic);
         }
 
         private void fadeButtonFromBottom(ScreenFooterButton button, int index)
         {
-            const float delay = 30;
-
             button.TopLevelContent
                   .MoveToY(100f)
                   .FadeOut();
 
             button.TopLevelContent
-                  .Delay(index * delay)
+                  .Delay(index * delay_per_button)
                   .MoveToY(0f, 240, Easing.OutCubic)
                   .FadeIn(240, Easing.OutCubic);
         }
 
         private void fadeButtonToLeft(ScreenFooterButton button, int index, int count)
         {
-            const float delay = 30;
-
             button.TopLevelContent
-                  .Delay((count - index) * delay)
+                  .Delay((count - index) * delay_per_button)
                   .FadeOut(240, Easing.InOutCubic)
                   .MoveToX(300f, 360, Easing.InOutCubic);
         }
 
         private void fadeButtonToBottom(ScreenFooterButton button, int index, int count)
         {
-            const float delay = 30;
-
             button.TopLevelContent
-                  .Delay((count - index) * delay)
+                  .Delay((count - index) * delay_per_button)
                   .FadeOut(240, Easing.InOutCubic)
                   .MoveToY(100f, 240, Easing.InOutCubic);
         }
 
-        // todo: does this even need to exist.
         private void showOverlay(OverlayContainer overlay)
         {
             foreach (var o in overlays)
@@ -153,7 +141,7 @@ namespace osu.Game.Screens.Footer
         public ScreenFooter(BackReceptor? receptor = null)
         {
             RelativeSizeAxes = Axes.X;
-            Height = height;
+            Height = HEIGHT;
             Anchor = Anchor.BottomLeft;
             Origin = Anchor.BottomLeft;
 
@@ -221,7 +209,7 @@ namespace osu.Game.Screens.Footer
 
         protected override void PopOut()
         {
-            this.MoveToY(height, 400, Easing.OutQuint)
+            this.MoveToY(HEIGHT, 400, Easing.OutQuint)
                 .FadeOut(400, Easing.OutQuint);
         }
 

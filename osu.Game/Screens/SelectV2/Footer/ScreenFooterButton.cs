@@ -167,7 +167,12 @@ namespace osu.Game.Screens.SelectV2.Footer
         {
             base.LoadComplete();
 
-            OverlayState.BindValueChanged(_ => updateDisplay());
+            if (Overlay != null)
+            {
+                OverlayState.BindTo(Overlay.State);
+                OverlayState.BindValueChanged(_ => updateDisplay());
+            }
+
             Enabled.BindValueChanged(_ => updateDisplay(), true);
 
             FinishTransforms(true);
