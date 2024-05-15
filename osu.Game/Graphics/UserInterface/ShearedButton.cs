@@ -116,13 +116,12 @@ namespace osu.Game.Graphics.UserInterface
                         },
                         ButtonContent = new Container
                         {
-                            RelativeSizeAxes = Axes.Both,
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            AutoSizeAxes = Axes.Both,
                             Shear = new Vector2(-shear, 0),
-                            X = -shear_width,
                             Child = text = new OsuSpriteText
                             {
-                                Anchor = Anchor.Centre,
-                                Origin = Anchor.Centre,
                                 Font = OsuFont.TorusAlternate.With(size: 17),
                             }
                         },
