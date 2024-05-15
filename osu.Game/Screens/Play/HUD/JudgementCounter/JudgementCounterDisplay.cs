@@ -64,7 +64,7 @@ namespace osu.Game.Screens.Play.HUD.JudgementCounter
 
                 CounterFlow.Direction = convertedDirection;
 
-                foreach (var counter in CounterFlow.Children)
+                foreach (var counter in CounterFlow)
                     counter.Direction.Value = convertedDirection;
             }, true);
 

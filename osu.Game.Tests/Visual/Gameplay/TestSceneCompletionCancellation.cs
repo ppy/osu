@@ -29,6 +29,8 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         protected override bool AllowFail => false;
 
+        protected override bool AllowBackwardsSeeks => true;
+
         [SetUpSteps]
         public override void SetUpSteps()
         {

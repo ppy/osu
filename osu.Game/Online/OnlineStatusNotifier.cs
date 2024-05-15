@@ -11,6 +11,7 @@ using osu.Framework.Screens;
 using osu.Game.Online.API;
 using osu.Game.Online.Metadata;
 using osu.Game.Online.Multiplayer;
+using osu.Game.Online.Notifications.WebSocket;
 using osu.Game.Online.Spectator;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
@@ -24,6 +25,8 @@ namespace osu.Game.Online
     public partial class OnlineStatusNotifier : Component
     {
         private readonly Func<IScreen> getCurrentScreen;
+
+        private INotificationsClient notificationsClient = null!;
 
         [Resolved]
         private MultiplayerClient multiplayerClient { get; set; } = null!;
@@ -55,9 +58,11 @@ namespace osu.Game.Online
         private void load(IAPIProvider api)
         {
             apiState = api.State.GetBoundCopy();
+            notificationsClient = api.NotificationsClient;
             multiplayerState = multiplayerClient.IsConnected.GetBoundCopy();
             spectatorState = spectatorClient.IsConnected.GetBoundCopy();
 
+            notificationsClient.MessageReceived += notifyAboutForcedDisconnection;
             multiplayerClient.Disconnecting += notifyAboutForcedDisconnection;
             spectatorClient.Disconnecting += notifyAboutForcedDisconnection;
             metadataClient.Disconnecting += notifyAboutForcedDisconnection;
@@ -127,9 +132,26 @@ namespace osu.Game.Online
             });
         }
 
+        private void notifyAboutForcedDisconnection(SocketMessage obj)
+        {
+            if (obj.Event != @"logout") return;
+
+            if (userNotified) return;
+
+            userNotified = true;
+            notificationOverlay?.Post(new SimpleErrorNotification
+            {
+                Icon = FontAwesome.Solid.ExclamationCircle,
+                Text = "You have been logged out due to a change to your account. Please log in again."
+            });
+        }
+
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
+
+            if (notificationsClient.IsNotNull())
+                notificationsClient.MessageReceived += notifyAboutForcedDisconnection;
 
             if (spectatorClient.IsNotNull())
                 spectatorClient.Disconnecting -= notifyAboutForcedDisconnection;

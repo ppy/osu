@@ -75,14 +75,21 @@ namespace osu.Game.Configuration
 #pragma warning restore CS0618 // Type or member is obsolete
             SetDefault(OsuSetting.AutomaticallyDownloadMissingBeatmaps, false);
 
-            SetDefault(OsuSetting.SavePassword, false).ValueChanged += enabled =>
+            SetDefault(OsuSetting.SavePassword, true).ValueChanged += enabled =>
             {
-                if (enabled.NewValue) SetValue(OsuSetting.SaveUsername, true);
+                if (enabled.NewValue)
+                    SetValue(OsuSetting.SaveUsername, true);
+                else
+                    GetBindable<string>(OsuSetting.Token).SetDefault();
             };
 
             SetDefault(OsuSetting.SaveUsername, true).ValueChanged += enabled =>
             {
-                if (!enabled.NewValue) SetValue(OsuSetting.SavePassword, false);
+                if (!enabled.NewValue)
+                {
+                    GetBindable<string>(OsuSetting.Username).SetDefault();
+                    SetValue(OsuSetting.SavePassword, false);
+                }
             };
 
             SetDefault(OsuSetting.ExternalLinkWarning, true);
@@ -142,6 +149,7 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.FadePlayfieldWhenHealthLow, true);
             SetDefault(OsuSetting.KeyOverlay, false);
             SetDefault(OsuSetting.ReplaySettingsOverlay, true);
+            SetDefault(OsuSetting.ReplayPlaybackControlsExpanded, true);
             SetDefault(OsuSetting.GameplayLeaderboard, true);
             SetDefault(OsuSetting.AlwaysPlayFirstComboBreak, true);
 
@@ -191,6 +199,8 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.EditorAutoSeekOnPlacement, true);
             SetDefault(OsuSetting.EditorLimitedDistanceSnap, false);
             SetDefault(OsuSetting.EditorShowSpeedChanges, false);
+
+            SetDefault(OsuSetting.HideCountryFlags, false);
 
             SetDefault(OsuSetting.MultiplayerRoomFilter, RoomPermissionsFilter.All);
 
@@ -421,11 +431,13 @@ namespace osu.Game.Configuration
         ProfileCoverExpanded,
         EditorLimitedDistanceSnap,
         ReplaySettingsOverlay,
+        ReplayPlaybackControlsExpanded,
         AutomaticallyDownloadMissingBeatmaps,
         EditorShowSpeedChanges,
         TouchDisableGameplayTaps,
         ModSelectTextSearchStartsActive,
         UserOnlineStatus,
-        MultiplayerRoomFilter
+        MultiplayerRoomFilter,
+        HideCountryFlags,
     }
 }

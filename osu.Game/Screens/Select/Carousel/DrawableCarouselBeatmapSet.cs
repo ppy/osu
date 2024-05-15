@@ -242,7 +242,7 @@ namespace osu.Game.Screens.Select.Carousel
 
             bool isSelected = Item?.State.Value == CarouselItemState.Selected;
 
-            foreach (var panel in beatmapContainer.Children)
+            foreach (var panel in beatmapContainer)
             {
                 Debug.Assert(panel.Item != null);
 
