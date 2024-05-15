@@ -64,7 +64,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             base.SetUpSteps();
 
             AddStep("load screen", () => Stack.Push(new SongSelectV2()));
-            AddWaitStep("wait for transition", 3);
+            AddUntilStep("wait for load", () => Stack.CurrentScreen is SongSelectV2 songSelect && songSelect.IsLoaded);
         }
 
         #region Footer

@@ -17,8 +17,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             base.SetUpSteps();
             AddStep("press enter", () => InputManager.Key(Key.Enter));
             AddWaitStep("wait", 5);
-            AddStep("load screen", () => Game.ScreenStack.Push(new SongSelectV2()));
-            AddWaitStep("wait for transition", 3);
+            PushAndConfirm(() => new SongSelectV2());
         }
 
         [Test]

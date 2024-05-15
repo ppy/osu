@@ -16,16 +16,16 @@ using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Screens.SelectV2.Footer;
 using osu.Game.Utils;
 
-namespace osu.Game.Tests.Visual.UserInterface
+namespace osu.Game.Tests.Visual.SongSelect
 {
-    public partial class TestSceneFooterButtonModsV2 : OsuTestScene
+    public partial class TestSceneScreenFooterButtonMods : OsuTestScene
     {
         private readonly TestScreenFooterButtonMods screenFooterButtonMods;
 
         [Cached]
         private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Aquamarine);
 
-        public TestSceneFooterButtonModsV2()
+        public TestSceneScreenFooterButtonMods()
         {
             Add(screenFooterButtonMods = new TestScreenFooterButtonMods(new TestModSelectOverlay())
             {
