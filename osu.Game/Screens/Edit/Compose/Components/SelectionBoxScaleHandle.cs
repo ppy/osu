@@ -13,9 +13,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
     public partial class SelectionBoxScaleHandle : SelectionBoxDragHandle
     {
         [Resolved]
-        private SelectionBox selectionBox { get; set; } = null!;
-
-        [Resolved]
         private SelectionScaleHandler? scaleHandler { get; set; }
 
         [BackgroundDependencyLoader]
