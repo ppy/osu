@@ -31,6 +31,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.CentreLeft,
+                Action = () => { },
                 X = -100,
             });
         }
