@@ -168,11 +168,9 @@ namespace osu.Game.Screens.Footer
             base.LoadComplete();
 
             if (Overlay != null)
-            {
                 OverlayState.BindTo(Overlay.State);
-                OverlayState.BindValueChanged(_ => updateDisplay());
-            }
 
+            OverlayState.BindValueChanged(_ => updateDisplay());
             Enabled.BindValueChanged(_ => updateDisplay(), true);
 
             FinishTransforms(true);

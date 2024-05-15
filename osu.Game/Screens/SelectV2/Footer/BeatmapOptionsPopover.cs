@@ -64,15 +64,15 @@ namespace osu.Game.Screens.SelectV2.Footer
             addButton(SongSelectStrings.ManageCollections, FontAwesome.Solid.Book, () => manageCollectionsDialog?.Show());
 
             addHeader(SongSelectStrings.ForAllDifficulties, beatmapWhenOpening.BeatmapSetInfo.ToString());
-            // addButton(SongSelectStrings.DeleteBeatmap, FontAwesome.Solid.Trash, () => songSelect?.DeleteBeatmap(beatmapWhenOpening.BeatmapSetInfo), colours.Red1);
+            addButton(SongSelectStrings.DeleteBeatmap, FontAwesome.Solid.Trash, () => { }, colours.Red1); // songSelect?.DeleteBeatmap(beatmapWhenOpening.BeatmapSetInfo);
 
             addHeader(SongSelectStrings.ForSelectedDifficulty, beatmapWhenOpening.BeatmapInfo.DifficultyName);
             // TODO: make work, and make show "unplayed" or "played" based on status.
             addButton(SongSelectStrings.MarkAsPlayed, FontAwesome.Regular.TimesCircle, null);
-            // addButton(SongSelectStrings.ClearAllLocalScores, FontAwesome.Solid.Eraser, () => songSelect?.ClearScores(beatmapWhenOpening.BeatmapInfo), colours.Red1);
+            addButton(SongSelectStrings.ClearAllLocalScores, FontAwesome.Solid.Eraser, () => { }, colours.Red1); // songSelect?.ClearScores(beatmapWhenOpening.BeatmapInfo);
 
             // if (songSelect != null && songSelect.AllowEditing)
-            //     addButton(SongSelectStrings.EditBeatmap, FontAwesome.Solid.PencilAlt, () => songSelect.Edit(beatmapWhenOpening.BeatmapInfo));
+            addButton(SongSelectStrings.EditBeatmap, FontAwesome.Solid.PencilAlt, () => { }); // songSelect.Edit(beatmapWhenOpening.BeatmapInfo);
 
             addButton(WebCommonStrings.ButtonsHide.ToSentence(), FontAwesome.Solid.Magic, () => beatmapManager?.Hide(beatmapWhenOpening.BeatmapInfo));
         }
