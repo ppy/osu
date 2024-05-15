@@ -12,7 +12,7 @@ using osu.Game.Overlays;
 
 namespace osu.Game.Screens.SelectV2.Footer
 {
-    public partial class FooterButtonOptionsV2 : FooterButtonV2, IHasPopover
+    public partial class ScreenFooterButtonOptions : ScreenFooterButton, IHasPopover
     {
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; } = null!;

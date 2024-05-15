@@ -17,7 +17,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 {
     public partial class TestSceneScreenFooter : OsuManualInputManagerTestScene
     {
-        private FooterV2 footer = null!;
+        private ScreenFooter screenFooter = null!;
         private TestModSelectOverlay overlay = null!;
 
         [Cached]
@@ -38,22 +38,22 @@ namespace osu.Game.Tests.Visual.UserInterface
                 new PopoverContainer
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Child = footer = new FooterV2(),
+                    Child = screenFooter = new ScreenFooter(),
                 },
             };
 
-            footer.SetButtons(new FooterButtonV2[]
+            screenFooter.SetButtons(new ScreenFooterButton[]
             {
-                new FooterButtonModsV2(overlay) { Current = SelectedMods },
-                new FooterButtonRandomV2(),
-                new FooterButtonOptionsV2(),
+                new ScreenFooterButtonMods(overlay) { Current = SelectedMods },
+                new ScreenFooterButtonRandom(),
+                new ScreenFooterButtonOptions(),
             });
         });
 
         [SetUpSteps]
         public void SetUpSteps()
         {
-            AddStep("show footer", () => footer.Show());
+            AddStep("show footer", () => screenFooter.Show());
         }
 
         /// <summary>
@@ -70,7 +70,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         [Test]
         public void TestButtonsOut()
         {
-            AddStep("clear buttons", () => footer.SetButtons(Array.Empty<FooterButtonV2>()));
+            AddStep("clear buttons", () => screenFooter.SetButtons(Array.Empty<ScreenFooterButton>()));
         }
 
         /// <summary>
@@ -79,11 +79,11 @@ namespace osu.Game.Tests.Visual.UserInterface
         [Test]
         public void TestReplaceButtons()
         {
-            AddStep("replace buttons", () => footer.SetButtons(new[]
+            AddStep("replace buttons", () => screenFooter.SetButtons(new[]
             {
-                new FooterButtonV2 { Text = "One", Icon = FontAwesome.Solid.ArrowUp, Action = () => { } },
-                new FooterButtonV2 { Text = "Two", Icon = FontAwesome.Solid.ArrowLeft, Action = () => { } },
-                new FooterButtonV2 { Text = "Three", Icon = FontAwesome.Solid.ArrowDown, Action = () => { } },
+                new ScreenFooterButton { Text = "One", Icon = FontAwesome.Solid.ArrowUp, Action = () => { } },
+                new ScreenFooterButton { Text = "Two", Icon = FontAwesome.Solid.ArrowLeft, Action = () => { } },
+                new ScreenFooterButton { Text = "Three", Icon = FontAwesome.Solid.ArrowDown, Action = () => { } },
             }));
         }
 

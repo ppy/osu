@@ -163,7 +163,7 @@ namespace osu.Game.Screens.Select
                 Origin = Anchor.CentreRight,
                 RelativeSizeAxes = Axes.Both,
                 BleedTop = FilterControl.HEIGHT,
-                BleedBottom = Select.Footer.HEIGHT,
+                BleedBottom = Footer.HEIGHT,
                 SelectionChanged = updateSelectedBeatmap,
                 BeatmapSetsChanged = carouselBeatmapsLoaded,
                 FilterApplied = () => Scheduler.AddOnce(updateVisibleBeatmapCount),
@@ -210,7 +210,7 @@ namespace osu.Game.Screens.Select
                                         Padding = new MarginPadding
                                         {
                                             Top = FilterControl.HEIGHT,
-                                            Bottom = Select.Footer.HEIGHT
+                                            Bottom = Footer.HEIGHT
                                         },
                                         Child = new LoadingSpinner(true) { State = { Value = Visibility.Visible } }
                                     }
@@ -297,7 +297,7 @@ namespace osu.Game.Screens.Select
                                                 RelativeSizeAxes = Axes.Both,
                                                 Padding = new MarginPadding
                                                 {
-                                                    Bottom = Select.Footer.HEIGHT,
+                                                    Bottom = Footer.HEIGHT,
                                                     Top = WEDGE_HEIGHT + 70,
                                                     Left = left_area_padding,
                                                     Right = left_area_padding * 2,
@@ -330,7 +330,7 @@ namespace osu.Game.Screens.Select
                         Anchor = Anchor.BottomLeft,
                         Origin = Anchor.BottomLeft,
                         RelativeSizeAxes = Axes.Both,
-                        Padding = new MarginPadding { Bottom = Select.Footer.HEIGHT },
+                        Padding = new MarginPadding { Bottom = Footer.HEIGHT },
                         Children = new Drawable[]
                         {
                             BeatmapOptions = new BeatmapOptionsOverlay(),

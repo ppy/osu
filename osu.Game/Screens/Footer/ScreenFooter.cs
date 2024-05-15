@@ -20,7 +20,7 @@ using osuTK;
 
 namespace osu.Game.Screens.Footer
 {
-    public partial class FooterV2 : VisibilityContainer
+    public partial class ScreenFooter : VisibilityContainer
     {
         private const int height = 60;
         private const int padding = 60;
@@ -32,12 +32,11 @@ namespace osu.Game.Screens.Footer
 
         public Action? OnBack;
 
-        // todo: maybe make this based on the current screen, if we don't want all screens to use aquamarine colour.
+        // todo: this assumes all screens with a footer will use aquamarine colour scheme. this might not be the case when we show the footer in other screens than song select.
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Aquamarine);
 
-        // todo: the transitions here are completely temporary and are made just to confirm that there are no issues with adding transitions.
-        public void SetButtons(IReadOnlyList<FooterButtonV2> buttons)
+        public void SetButtons(IReadOnlyList<ScreenFooterButton> buttons)
         {
             var oldButtons = buttonsFlow.ToArray();
 
@@ -86,7 +85,7 @@ namespace osu.Game.Screens.Footer
             }
         }
 
-        private void fadeButtonFromRight(FooterButtonV2 button, int index, int count, float startDelay)
+        private void fadeButtonFromRight(ScreenFooterButton button, int index, int count, float startDelay)
         {
             const float delay = 30;
 
@@ -100,7 +99,7 @@ namespace osu.Game.Screens.Footer
                   .FadeIn(240, Easing.OutCubic);
         }
 
-        private void fadeButtonFromBottom(FooterButtonV2 button, int index)
+        private void fadeButtonFromBottom(ScreenFooterButton button, int index)
         {
             const float delay = 30;
 
@@ -114,7 +113,7 @@ namespace osu.Game.Screens.Footer
                   .FadeIn(240, Easing.OutCubic);
         }
 
-        private void fadeButtonToLeft(FooterButtonV2 button, int index, int count)
+        private void fadeButtonToLeft(ScreenFooterButton button, int index, int count)
         {
             const float delay = 30;
 
@@ -124,7 +123,7 @@ namespace osu.Game.Screens.Footer
                   .MoveToX(300f, 360, Easing.InOutCubic);
         }
 
-        private void fadeButtonToBottom(FooterButtonV2 button, int index, int count)
+        private void fadeButtonToBottom(ScreenFooterButton button, int index, int count)
         {
             const float delay = 30;
 
@@ -146,13 +145,12 @@ namespace osu.Game.Screens.Footer
             }
         }
 
-        // private Box background = null!;
         private BackButtonV2 backButton = null!;
-        private FillFlowContainer<FooterButtonV2> buttonsFlow = null!;
-        private Container<FooterButtonV2> removedButtonsContainer = null!;
+        private FillFlowContainer<ScreenFooterButton> buttonsFlow = null!;
+        private Container<ScreenFooterButton> removedButtonsContainer = null!;
         private LogoTrackingContainer logoTrackingContainer = null!;
 
-        public FooterV2(BackReceptor? receptor = null)
+        public ScreenFooter(BackReceptor? receptor = null)
         {
             RelativeSizeAxes = Axes.X;
             Height = height;
@@ -175,7 +173,7 @@ namespace osu.Game.Screens.Footer
                     RelativeSizeAxes = Axes.Both,
                     Colour = colourProvider.Background5
                 },
-                buttonsFlow = new FillFlowContainer<FooterButtonV2>
+                buttonsFlow = new FillFlowContainer<ScreenFooterButton>
                 {
                     Margin = new MarginPadding { Left = 12f + BackButtonV2.BUTTON_WIDTH + padding },
                     Y = 10f,
@@ -192,7 +190,7 @@ namespace osu.Game.Screens.Footer
                     Origin = Anchor.BottomLeft,
                     Action = () => OnBack?.Invoke(),
                 },
-                removedButtonsContainer = new Container<FooterButtonV2>
+                removedButtonsContainer = new Container<ScreenFooterButton>
                 {
                     Margin = new MarginPadding { Left = 12f + BackButtonV2.BUTTON_WIDTH + padding },
                     Y = 10f,

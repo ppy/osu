@@ -147,7 +147,7 @@ namespace osu.Game.Screens
 
         [Resolved(canBeNull: true)]
         [CanBeNull]
-        protected FooterV2 Footer { get; private set; }
+        protected ScreenFooter ScreenFooter { get; private set; }
 
         protected OsuScreen()
         {
@@ -306,7 +306,7 @@ namespace osu.Game.Screens
         /// </summary>
         protected virtual BackgroundScreen CreateBackground() => null;
 
-        public virtual IReadOnlyList<FooterButtonV2> CreateFooterButtons() => Array.Empty<FooterButtonV2>();
+        public virtual IReadOnlyList<ScreenFooterButton> CreateFooterButtons() => Array.Empty<ScreenFooterButton>();
 
         public virtual bool OnBackButton() => false;
     }

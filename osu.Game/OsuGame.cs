@@ -177,7 +177,7 @@ namespace osu.Game
         protected OsuScreenStack ScreenStack;
 
         protected BackButton BackButton;
-        protected FooterV2 ScreenFooter;
+        protected ScreenFooter ScreenFooter;
 
         protected SettingsOverlay Settings;
 
@@ -918,7 +918,7 @@ namespace osu.Game
             };
 
             Container logoContainer;
-            FooterV2.BackReceptor backReceptor;
+            ScreenFooter.BackReceptor backReceptor;
 
             dependencies.CacheAs(idleTracker = new GameIdleTracker(6000));
 
@@ -951,7 +951,7 @@ namespace osu.Game
                             Origin = Anchor.Centre,
                             Children = new Drawable[]
                             {
-                                backReceptor = new FooterV2.BackReceptor(),
+                                backReceptor = new ScreenFooter.BackReceptor(),
                                 ScreenStack = new OsuScreenStack { RelativeSizeAxes = Axes.Both },
                                 BackButton = new BackButton(backReceptor)
                                 {
@@ -962,7 +962,7 @@ namespace osu.Game
                                 new PopoverContainer
                                 {
                                     RelativeSizeAxes = Axes.Both,
-                                    Child = ScreenFooter = new FooterV2(backReceptor)
+                                    Child = ScreenFooter = new ScreenFooter(backReceptor)
                                     {
                                         OnBack = () =>
                                         {
@@ -1550,7 +1550,7 @@ namespace osu.Game
                 }
                 else
                 {
-                    ScreenFooter.SetButtons(Array.Empty<FooterButtonV2>());
+                    ScreenFooter.SetButtons(Array.Empty<ScreenFooterButton>());
                     ScreenFooter.Hide();
                 }
             }

@@ -30,7 +30,7 @@ namespace osu.Game.Screens.SelectV2.Footer
     public partial class BeatmapOptionsPopover : OsuPopover
     {
         private FillFlowContainer buttonFlow = null!;
-        private readonly FooterButtonOptionsV2 footerButton;
+        private readonly ScreenFooterButtonOptions screenFooterButton;
 
         [Cached]
         private readonly OverlayColourProvider colourProvider;
@@ -40,9 +40,9 @@ namespace osu.Game.Screens.SelectV2.Footer
         [Resolved]
         private IBindable<WorkingBeatmap> beatmap { get; set; } = null!;
 
-        public BeatmapOptionsPopover(FooterButtonOptionsV2 footerButton, OverlayColourProvider colourProvider)
+        public BeatmapOptionsPopover(ScreenFooterButtonOptions screenFooterButton, OverlayColourProvider colourProvider)
         {
-            this.footerButton = footerButton;
+            this.screenFooterButton = screenFooterButton;
             this.colourProvider = colourProvider;
         }
 
@@ -189,7 +189,7 @@ namespace osu.Game.Screens.SelectV2.Footer
         protected override void UpdateState(ValueChangedEvent<Visibility> state)
         {
             base.UpdateState(state);
-            footerButton.OverlayState.Value = state.NewValue;
+            screenFooterButton.OverlayState.Value = state.NewValue;
         }
     }
 }

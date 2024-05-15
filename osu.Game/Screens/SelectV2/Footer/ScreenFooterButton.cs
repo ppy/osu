@@ -23,7 +23,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.SelectV2.Footer
 {
-    public partial class FooterButtonV2 : OsuClickableContainer, IKeyBindingHandler<GlobalAction>
+    public partial class ScreenFooterButton : OsuClickableContainer, IKeyBindingHandler<GlobalAction>
     {
         // This should be 12 by design, but an extra allowance is added due to the corner radius specification.
         private const float shear_width = 13.5f;
@@ -73,7 +73,7 @@ namespace osu.Game.Screens.SelectV2.Footer
         public readonly Container TopLevelContent;
         public readonly OverlayContainer? Overlay;
 
-        public FooterButtonV2(OverlayContainer? overlay = null)
+        public ScreenFooterButton(OverlayContainer? overlay = null)
         {
             Overlay = overlay;
 

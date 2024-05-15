@@ -76,7 +76,7 @@ namespace osu.Game.Screens
         /// <summary>
         /// A list of footer buttons to be added to the game footer, or empty to display no buttons.
         /// </summary>
-        IReadOnlyList<FooterButtonV2> CreateFooterButtons();
+        IReadOnlyList<ScreenFooterButton> CreateFooterButtons();
 
         /// <summary>
         /// Whether mod track adjustments should be applied on entering this screen.

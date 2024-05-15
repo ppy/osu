@@ -26,7 +26,7 @@ namespace osu.Game.Tests.Visual.SongSelect
     public partial class TestSceneSongSelectV2 : ScreenTestScene
     {
         [Cached]
-        private readonly FooterV2 screenFooter;
+        private readonly ScreenFooter screenScreenFooter;
 
         [Cached]
         private readonly OsuLogo logo;
@@ -38,7 +38,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 new PopoverContainer
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Child = screenFooter = new FooterV2
+                    Child = screenScreenFooter = new ScreenFooter
                     {
                         OnBack = () => Stack.CurrentScreen.Exit(),
                     },
@@ -98,7 +98,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         {
             AddStep("enable options", () =>
             {
-                var optionsButton = this.ChildrenOfType<FooterButtonV2>().Last();
+                var optionsButton = this.ChildrenOfType<ScreenFooterButton>().Last();
 
                 optionsButton.Enabled.Value = true;
                 optionsButton.TriggerClick();
@@ -108,7 +108,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         [Test]
         public void TestState()
         {
-            AddToggleStep("set options enabled state", state => this.ChildrenOfType<FooterButtonV2>().Last().Enabled.Value = state);
+            AddToggleStep("set options enabled state", state => this.ChildrenOfType<ScreenFooterButton>().Last().Enabled.Value = state);
         }
 
         // add these test cases when functionality is implemented.
@@ -172,7 +172,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         {
             AddStep("Press F1", () =>
             {
-                InputManager.MoveMouseTo(this.ChildrenOfType<FooterButtonModsV2>().Single());
+                InputManager.MoveMouseTo(this.ChildrenOfType<ScreenFooterButtonMods>().Single());
                 InputManager.Click(MouseButton.Left);
             });
             AddAssert("Overlay visible", () => this.ChildrenOfType<ModSelectOverlay>().Single().State.Value == Visibility.Visible);
@@ -184,20 +184,20 @@ namespace osu.Game.Tests.Visual.SongSelect
         protected override void Update()
         {
             base.Update();
-            Stack.Padding = new MarginPadding { Bottom = screenFooter.DrawHeight - screenFooter.Y };
+            Stack.Padding = new MarginPadding { Bottom = screenScreenFooter.DrawHeight - screenScreenFooter.Y };
         }
 
         private void updateFooter(IScreen? _, IScreen? newScreen)
         {
             if (newScreen is IOsuScreen osuScreen && osuScreen.AllowNewFooter)
             {
-                screenFooter.Show();
-                screenFooter.SetButtons(osuScreen.CreateFooterButtons());
+                screenScreenFooter.Show();
+                screenScreenFooter.SetButtons(osuScreen.CreateFooterButtons());
             }
             else
             {
-                screenFooter.Hide();
-                screenFooter.SetButtons(Array.Empty<FooterButtonV2>());
+                screenScreenFooter.Hide();
+                screenScreenFooter.SetButtons(Array.Empty<ScreenFooterButton>());
             }
         }
     }

@@ -18,7 +18,7 @@ namespace osu.Game.Graphics.UserInterface
 
         private readonly TwoLayerButton button;
 
-        public BackButton(FooterV2.BackReceptor receptor = null)
+        public BackButton(ScreenFooter.BackReceptor receptor = null)
         {
             Size = TwoLayerButton.SIZE_EXTENDED;
 
@@ -34,7 +34,7 @@ namespace osu.Game.Graphics.UserInterface
             if (receptor == null)
             {
                 // if a receptor wasn't provided, create our own locally.
-                Add(receptor = new FooterV2.BackReceptor());
+                Add(receptor = new ScreenFooter.BackReceptor());
             }
 
             receptor.OnBackPressed = () => button.TriggerClick();

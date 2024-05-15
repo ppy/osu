@@ -29,7 +29,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.SelectV2.Footer
 {
-    public partial class FooterButtonModsV2 : FooterButtonV2, IHasCurrentValue<IReadOnlyList<Mod>>
+    public partial class ScreenFooterButtonMods : ScreenFooterButton, IHasCurrentValue<IReadOnlyList<Mod>>
     {
         // todo: see https://github.com/ppy/osu-framework/issues/3271
         private const float torus_scale_factor = 1.2f;
@@ -62,7 +62,7 @@ namespace osu.Game.Screens.SelectV2.Footer
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; } = null!;
 
-        public FooterButtonModsV2(ModSelectOverlay overlay)
+        public ScreenFooterButtonMods(ModSelectOverlay overlay)
             : base(overlay)
         {
         }

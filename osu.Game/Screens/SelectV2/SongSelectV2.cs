@@ -38,11 +38,11 @@ namespace osu.Game.Screens.SelectV2
             });
         }
 
-        public override IReadOnlyList<FooterButtonV2> CreateFooterButtons() => new FooterButtonV2[]
+        public override IReadOnlyList<ScreenFooterButton> CreateFooterButtons() => new ScreenFooterButton[]
         {
-            new FooterButtonModsV2(modSelectOverlay) { Current = Mods },
-            new FooterButtonRandomV2(),
-            new FooterButtonOptionsV2(),
+            new ScreenFooterButtonMods(modSelectOverlay) { Current = Mods },
+            new ScreenFooterButtonRandom(),
+            new ScreenFooterButtonOptions(),
         };
 
         public override void OnEntering(ScreenTransitionEvent e)
@@ -85,12 +85,12 @@ namespace osu.Game.Screens.SelectV2
             base.LogoArriving(logo, resuming);
 
             if (logo.Alpha > 0.8f)
-                Footer?.StartTrackingLogo(logo, 400, Easing.OutQuint);
+                ScreenFooter?.StartTrackingLogo(logo, 400, Easing.OutQuint);
             else
             {
                 logo.Hide();
                 logo.ScaleTo(0.2f);
-                Footer?.StartTrackingLogo(logo);
+                ScreenFooter?.StartTrackingLogo(logo);
             }
 
             logo.FadeIn(240, Easing.OutQuint);
@@ -106,13 +106,13 @@ namespace osu.Game.Screens.SelectV2
         protected override void LogoSuspending(OsuLogo logo)
         {
             base.LogoSuspending(logo);
-            Footer?.StopTrackingLogo();
+            ScreenFooter?.StopTrackingLogo();
         }
 
         protected override void LogoExiting(OsuLogo logo)
         {
             base.LogoExiting(logo);
-            Scheduler.AddDelayed(() => Footer?.StopTrackingLogo(), 120);
+            Scheduler.AddDelayed(() => ScreenFooter?.StopTrackingLogo(), 120);
             logo.ScaleTo(0.2f, 120, Easing.Out);
             logo.FadeOut(120, Easing.Out);
         }

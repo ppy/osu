@@ -16,7 +16,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         public TestSceneBackButton()
         {
             BackButton button;
-            FooterV2.BackReceptor receptor = new FooterV2.BackReceptor();
+            ScreenFooter.BackReceptor receptor = new ScreenFooter.BackReceptor();
 
             Child = new Container
             {
