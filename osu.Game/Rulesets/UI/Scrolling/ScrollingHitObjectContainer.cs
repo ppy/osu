@@ -240,6 +240,13 @@ namespace osu.Game.Rulesets.UI.Scrolling
 
             // always load the hitobject before its first judgement offset
             entry.LifetimeStart = Math.Min(entry.HitObject.StartTime - entry.HitObject.MaximumJudgementOffset, computedStartTime);
+
+            // This is likely not entirely correct, but sets a sane expectation of the ending lifetime.
+            // A more correct lifetime will be overwritten after a DrawableHitObject is assigned via DrawableHitObject.updateState.
+            //
+            // It is required that we set a lifetime end here to ensure that in scenarios like loading a Player instance to a seeked
+            // location in a beatmap doesn't churn every hit object into a DrawableHitObject. Even in a pooled scenario, the overhead
+            // of this can be quite crippling.
             entry.LifetimeEnd = entry.HitObject.GetEndTime() + timeRange.Value;
         }
 
