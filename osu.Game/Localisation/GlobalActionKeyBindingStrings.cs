@@ -325,6 +325,16 @@ namespace osu.Game.Localisation
         public static LocalisableString SeekReplayBackward => new TranslatableString(getKey(@"seek_replay_backward"), @"Seek replay backward");
 
         /// <summary>
+        /// "Seek replay forward one frame"
+        /// </summary>
+        public static LocalisableString StepReplayForward => new TranslatableString(getKey(@"step_replay_forward"), @"Seek replay forward one frame");
+
+        /// <summary>
+        /// "Step replay backward one frame"
+        /// </summary>
+        public static LocalisableString StepReplayBackward => new TranslatableString(getKey(@"step_replay_backward"), @"Step replay backward one frame");
+
+        /// <summary>
         /// "Toggle chat focus"
         /// </summary>
         public static LocalisableString ToggleChatFocus => new TranslatableString(getKey(@"toggle_chat_focus"), @"Toggle chat focus");

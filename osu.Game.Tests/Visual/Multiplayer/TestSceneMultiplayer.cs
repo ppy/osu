@@ -698,7 +698,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             {
                 var scoreInfo = ((ResultsScreen)multiplayerComponents.CurrentScreen).Score;
 
-                return !scoreInfo.Passed && scoreInfo.Rank == ScoreRank.F;
+                return scoreInfo?.Passed == false && scoreInfo.Rank == ScoreRank.F;
             });
         }
 

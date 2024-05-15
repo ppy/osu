@@ -215,6 +215,12 @@ namespace osu.Game.Screens.Select
             InternalChild = new OsuContextMenuContainer
             {
                 RelativeSizeAxes = Axes.Both,
+                Padding = new MarginPadding
+                {
+                    // Avoid clash between scrollbar and osu! logo.
+                    Top = 10,
+                    Bottom = 100,
+                },
                 Children = new Drawable[]
                 {
                     setPool,
@@ -868,7 +874,7 @@ namespace osu.Game.Screens.Select
                 {
                     var toDisplay = visibleItems.GetRange(displayedRange.first, displayedRange.last - displayedRange.first + 1);
 
-                    foreach (var panel in Scroll.Children)
+                    foreach (var panel in Scroll)
                     {
                         Debug.Assert(panel.Item != null);
 
@@ -899,7 +905,7 @@ namespace osu.Game.Screens.Select
 
             // Update externally controlled state of currently visible items (e.g. x-offset and opacity).
             // This is a per-frame update on all drawable panels.
-            foreach (DrawableCarouselItem item in Scroll.Children)
+            foreach (DrawableCarouselItem item in Scroll)
             {
                 updateItem(item);
 
@@ -1094,7 +1100,7 @@ namespace osu.Game.Screens.Select
                         // to enter clamp-special-case mode where it animates completely differently to normal.
                         float scrollChange = scrollTarget.Value - Scroll.Current;
                         Scroll.ScrollTo(scrollTarget.Value, false);
-                        foreach (var i in Scroll.Children)
+                        foreach (var i in Scroll)
                             i.Y += scrollChange;
                         break;
                 }

@@ -25,7 +25,6 @@ namespace osu.Game.Screens.Play.HUD
         private readonly OsuSpriteText labelText;
 
         public IBindable<float> WireframeOpacity { get; } = new BindableFloat();
-        public Bindable<int> RequiredDisplayDigits { get; } = new BindableInt();
         public Bindable<bool> ShowLabel { get; } = new BindableBool();
 
         public Container NumberContainer { get; private set; }
@@ -36,46 +35,51 @@ namespace osu.Game.Screens.Play.HUD
             set => textPart.Text = value;
         }
 
+        /// <summary>
+        /// The template for the wireframe displayed behind the <see cref="Text"/>.
+        /// Any character other than a dot is interpreted to mean a full segmented display "wireframe".
+        /// </summary>
+        public string WireframeTemplate
+        {
+            get => wireframeTemplate;
+            set => wireframesPart.Text = wireframeTemplate = value;
+        }
+
+        private string wireframeTemplate = string.Empty;
+
         public ArgonCounterTextComponent(Anchor anchor, LocalisableString? label = null)
         {
             Anchor = anchor;
             Origin = anchor;
             AutoSizeAxes = Axes.Both;
 
-            InternalChild = new FillFlowContainer
+            InternalChildren = new Drawable[]
             {
-                AutoSizeAxes = Axes.Both,
-                Direction = FillDirection.Vertical,
-                Children = new Drawable[]
+                labelText = new OsuSpriteText
                 {
-                    labelText = new OsuSpriteText
+                    Alpha = 0,
+                    Text = label.GetValueOrDefault(),
+                    Font = OsuFont.Torus.With(size: 12, weight: FontWeight.Bold),
+                    Margin = new MarginPadding { Left = 2.5f },
+                },
+                NumberContainer = new Container
+                {
+                    AutoSizeAxes = Axes.Both,
+                    Children = new[]
                     {
-                        Alpha = 0,
-                        Text = label.GetValueOrDefault(),
-                        Font = OsuFont.Torus.With(size: 12, weight: FontWeight.Bold),
-                        Margin = new MarginPadding { Left = 2.5f },
-                    },
-                    NumberContainer = new Container
-                    {
-                        AutoSizeAxes = Axes.Both,
-                        Children = new[]
+                        wireframesPart = new ArgonCounterSpriteText(wireframesLookup)
                         {
-                            wireframesPart = new ArgonCounterSpriteText(wireframesLookup)
-                            {
-                                Anchor = anchor,
-                                Origin = anchor,
-                            },
-                            textPart = new ArgonCounterSpriteText(textLookup)
-                            {
-                                Anchor = anchor,
-                                Origin = anchor,
-                            },
-                        }
+                            Anchor = anchor,
+                            Origin = anchor,
+                        },
+                        textPart = new ArgonCounterSpriteText(textLookup)
+                        {
+                            Anchor = anchor,
+                            Origin = anchor,
+                        },
                     }
                 }
             };
-
-            RequiredDisplayDigits.BindValueChanged(digits => wireframesPart.Text = new string('#', digits.NewValue));
         }
 
         private string textLookup(char c)
@@ -110,7 +114,11 @@ namespace osu.Game.Screens.Play.HUD
         {
             base.LoadComplete();
             WireframeOpacity.BindValueChanged(v => wireframesPart.Alpha = v.NewValue, true);
-            ShowLabel.BindValueChanged(s => labelText.Alpha = s.NewValue ? 1 : 0, true);
+            ShowLabel.BindValueChanged(s =>
+            {
+                labelText.Alpha = s.NewValue ? 1 : 0;
+                NumberContainer.Y = s.NewValue ? 12 : 0;
+            }, true);
         }
 
         private partial class ArgonCounterSpriteText : OsuSpriteText

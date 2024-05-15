@@ -86,7 +86,6 @@ namespace osu.Game.Rulesets.Scoring
         /// Indicates a large tick miss.
         /// </summary>
         [EnumMember(Value = "large_tick_miss")]
-        [Description("-")]
         [Order(11)]
         LargeTickMiss,
 
@@ -118,7 +117,6 @@ namespace osu.Game.Rulesets.Scoring
         /// Indicates a miss that should be ignored for scoring purposes.
         /// </summary>
         [EnumMember(Value = "ignore_miss")]
-        [Description("-")]
         [Order(14)]
         IgnoreMiss,
 
@@ -140,7 +138,8 @@ namespace osu.Game.Rulesets.Scoring
         ComboBreak,
 
         /// <summary>
-        /// A special judgement similar to <see cref="LargeTickHit"/> that's used to increase the valuation of the final tick of a slider.
+        /// A special tick judgement to increase the valuation of the final tick of a slider.
+        /// The default minimum result is <see cref="IgnoreMiss"/>, but may be overridden to <see cref="LargeTickMiss"/>.
         /// </summary>
         [EnumMember(Value = "slider_tail_hit")]
         [Order(8)]

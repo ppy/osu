@@ -1,8 +1,8 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="OsuRuleset (Tests)" type="DotNetProject" factoryName=".NET Project" folderName="Ruleset" activateToolWindowBeforeRun="false">
-    <option name="EXE_PATH" value="$PROJECT_DIR$/osu.Game.Rulesets.Osu.Tests/bin/Debug/net6.0/osu.Game.Rulesets.Osu.Tests.dll" />
+    <option name="EXE_PATH" value="$PROJECT_DIR$/osu.Game.Rulesets.Osu.Tests/bin/Debug/net8.0/osu.Game.Rulesets.Osu.Tests.dll" />
     <option name="PROGRAM_PARAMETERS" value="" />
-    <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/osu.Game.Rulesets.Osu.Tests/bin/Debug/net6.0" />
+    <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/osu.Game.Rulesets.Osu.Tests/bin/Debug/net8.0" />
     <option name="PASS_PARENT_ENVS" value="1" />
     <option name="USE_EXTERNAL_CONSOLE" value="0" />
     <option name="USE_MONO" value="0" />
@@ -12,7 +12,7 @@
     <option name="PROJECT_ARGUMENTS_TRACKING" value="1" />
     <option name="PROJECT_WORKING_DIRECTORY_TRACKING" value="1" />
     <option name="PROJECT_KIND" value="DotNetCore" />
-    <option name="PROJECT_TFM" value="net6.0" />
+    <option name="PROJECT_TFM" value="net8.0" />
     <browser url="http://localhost:5000" />
     <method v="2">
       <option name="Build" />

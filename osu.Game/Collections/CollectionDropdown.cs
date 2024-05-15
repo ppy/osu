@@ -74,7 +74,7 @@ namespace osu.Game.Collections
             }
             else
             {
-                foreach (int i in changes.DeletedIndices.OrderByDescending(i => i))
+                foreach (int i in changes.DeletedIndices.OrderDescending())
                     filters.RemoveAt(i + 1);
 
                 foreach (int i in changes.InsertedIndices)

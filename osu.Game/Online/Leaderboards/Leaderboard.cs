@@ -287,7 +287,7 @@ namespace osu.Game.Online.Leaderboards
 
                 double delay = 0;
 
-                foreach (var s in scoreFlowContainer.Children)
+                foreach (var s in scoreFlowContainer)
                 {
                     using (s.BeginDelayedSequence(delay))
                         s.Show();
@@ -384,7 +384,7 @@ namespace osu.Game.Online.Leaderboards
             if (scoreFlowContainer == null)
                 return;
 
-            foreach (var c in scoreFlowContainer.Children)
+            foreach (var c in scoreFlowContainer)
             {
                 float topY = c.ToSpaceOfOtherDrawable(Vector2.Zero, scoreFlowContainer).Y;
                 float bottomY = topY + LeaderboardScore.HEIGHT;

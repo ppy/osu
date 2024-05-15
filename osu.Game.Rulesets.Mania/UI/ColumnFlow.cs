@@ -4,8 +4,6 @@
 #nullable disable
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -28,20 +26,21 @@ namespace osu.Game.Rulesets.Mania.UI
         /// <summary>
         /// All contents added to this <see cref="ColumnFlow{TContent}"/>.
         /// </summary>
-        public IReadOnlyList<TContent> Content => columns.Children.Select(c => c.Count == 0 ? null : (TContent)c.Child).ToList();
+        public TContent[] Content { get; }
 
-        private readonly FillFlowContainer<Container> columns;
+        private readonly FillFlowContainer<Container<TContent>> columns;
         private readonly StageDefinition stageDefinition;
 
         public ColumnFlow(StageDefinition stageDefinition)
         {
             this.stageDefinition = stageDefinition;
+            Content = new TContent[stageDefinition.Columns];
 
             AutoSizeAxes = Axes.X;
 
             Masking = true;
 
-            InternalChild = columns = new FillFlowContainer<Container>
+            InternalChild = columns = new FillFlowContainer<Container<TContent>>
             {
                 RelativeSizeAxes = Axes.Y,
                 AutoSizeAxes = Axes.X,
@@ -49,7 +48,7 @@ namespace osu.Game.Rulesets.Mania.UI
             };
 
             for (int i = 0; i < stageDefinition.Columns; i++)
-                columns.Add(new Container { RelativeSizeAxes = Axes.Y });
+                columns.Add(new Container<TContent> { RelativeSizeAxes = Axes.Y });
         }
 
         private ISkinSource currentSkin;
@@ -102,7 +101,10 @@ namespace osu.Game.Rulesets.Mania.UI
         /// </summary>
         /// <param name="column">The index of the column to set the content of.</param>
         /// <param name="content">The content.</param>
-        public void SetContentForColumn(int column, TContent content) => columns[column].Child = content;
+        public void SetContentForColumn(int column, TContent content)
+        {
+            Content[column] = columns[column].Child = content;
+        }
 
         private void updateMobileSizing()
         {
