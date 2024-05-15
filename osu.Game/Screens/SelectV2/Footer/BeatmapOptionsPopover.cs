@@ -32,14 +32,18 @@ namespace osu.Game.Screens.SelectV2.Footer
         private FillFlowContainer buttonFlow = null!;
         private readonly FooterButtonOptionsV2 footerButton;
 
+        [Cached]
+        private readonly OverlayColourProvider colourProvider;
+
         private WorkingBeatmap beatmapWhenOpening = null!;
 
         [Resolved]
         private IBindable<WorkingBeatmap> beatmap { get; set; } = null!;
 
-        public BeatmapOptionsPopover(FooterButtonOptionsV2 footerButton)
+        public BeatmapOptionsPopover(FooterButtonOptionsV2 footerButton, OverlayColourProvider colourProvider)
         {
             this.footerButton = footerButton;
+            this.colourProvider = colourProvider;
         }
 
         [BackgroundDependencyLoader]
@@ -82,9 +86,6 @@ namespace osu.Game.Screens.SelectV2.Footer
             beatmap.BindValueChanged(_ => Hide());
         }
 
-        [Resolved]
-        private OverlayColourProvider overlayColourProvider { get; set; } = null!;
-
         private void addHeader(LocalisableString text, string? context = null)
         {
             var textFlow = new OsuTextFlowContainer
@@ -101,7 +102,7 @@ namespace osu.Game.Screens.SelectV2.Footer
                 textFlow.NewLine();
                 textFlow.AddText(context, t =>
                 {
-                    t.Colour = overlayColourProvider.Content2;
+                    t.Colour = colourProvider.Content2;
                     t.Font = t.Font.With(size: 13);
                 });
             }
