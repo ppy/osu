@@ -16,7 +16,9 @@ using osu.Game.Beatmaps;
 using osu.Game.Overlays;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Screens.Footer;
 using osu.Game.Screens.Menu;
+using osu.Game.Screens.SelectV2.Footer;
 using osu.Game.Users;
 
 namespace osu.Game.Screens
@@ -37,6 +39,8 @@ namespace osu.Game.Screens
         public string Description => Title;
 
         public virtual bool AllowBackButton => true;
+
+        public virtual bool AllowNewFooter => false;
 
         public virtual bool AllowExternalScreenChange => false;
 
@@ -140,6 +144,10 @@ namespace osu.Game.Screens
 
         [Resolved(canBeNull: true)]
         private OsuLogo logo { get; set; }
+
+        [Resolved(canBeNull: true)]
+        [CanBeNull]
+        protected FooterV2 Footer { get; private set; }
 
         protected OsuScreen()
         {
@@ -297,6 +305,8 @@ namespace osu.Game.Screens
         /// Note that the instance created may not be the used instance if it matches the BackgroundMode equality clause.
         /// </summary>
         protected virtual BackgroundScreen CreateBackground() => null;
+
+        public virtual IReadOnlyList<FooterButtonV2> CreateFooterButtons() => Array.Empty<FooterButtonV2>();
 
         public virtual bool OnBackButton() => false;
     }

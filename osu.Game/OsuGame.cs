@@ -22,6 +22,7 @@ using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
@@ -58,11 +59,13 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osu.Game.Screens;
 using osu.Game.Screens.Edit;
+using osu.Game.Screens.Footer;
 using osu.Game.Screens.Menu;
 using osu.Game.Screens.OnlinePlay.Multiplayer;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Ranking;
 using osu.Game.Screens.Select;
+using osu.Game.Screens.SelectV2.Footer;
 using osu.Game.Skinning;
 using osu.Game.Updater;
 using osu.Game.Users;
@@ -148,6 +151,8 @@ namespace osu.Game
 
         private float toolbarOffset => (Toolbar?.Position.Y ?? 0) + (Toolbar?.DrawHeight ?? 0);
 
+        private float screenFooterOffset => (ScreenFooter?.DrawHeight ?? 0) - (ScreenFooter?.Position.Y ?? 0);
+
         private IdleTracker idleTracker;
 
         /// <summary>
@@ -172,6 +177,7 @@ namespace osu.Game
         protected OsuScreenStack ScreenStack;
 
         protected BackButton BackButton;
+        protected FooterV2 ScreenFooter;
 
         protected SettingsOverlay Settings;
 
@@ -912,7 +918,7 @@ namespace osu.Game
             };
 
             Container logoContainer;
-            BackButton.Receptor receptor;
+            FooterV2.BackReceptor backReceptor;
 
             dependencies.CacheAs(idleTracker = new GameIdleTracker(6000));
 
@@ -945,20 +951,28 @@ namespace osu.Game
                             Origin = Anchor.Centre,
                             Children = new Drawable[]
                             {
-                                receptor = new BackButton.Receptor(),
+                                backReceptor = new FooterV2.BackReceptor(),
                                 ScreenStack = new OsuScreenStack { RelativeSizeAxes = Axes.Both },
-                                BackButton = new BackButton(receptor)
+                                BackButton = new BackButton(backReceptor)
                                 {
                                     Anchor = Anchor.BottomLeft,
                                     Origin = Anchor.BottomLeft,
-                                    Action = () =>
+                                    Action = () => ScreenFooter.OnBack?.Invoke(),
+                                },
+                                new PopoverContainer
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    Child = ScreenFooter = new FooterV2(backReceptor)
                                     {
-                                        if (!(ScreenStack.CurrentScreen is IOsuScreen currentScreen))
-                                            return;
+                                        OnBack = () =>
+                                        {
+                                            if (!(ScreenStack.CurrentScreen is IOsuScreen currentScreen))
+                                                return;
 
-                                        if (!((Drawable)currentScreen).IsLoaded || (currentScreen.AllowBackButton && !currentScreen.OnBackButton()))
-                                            ScreenStack.Exit();
-                                    }
+                                            if (!((Drawable)currentScreen).IsLoaded || (currentScreen.AllowBackButton && !currentScreen.OnBackButton()))
+                                                ScreenStack.Exit();
+                                        }
+                                    },
                                 },
                                 logoContainer = new Container { RelativeSizeAxes = Axes.Both },
                             }
@@ -979,6 +993,8 @@ namespace osu.Game
                 idleTracker,
                 new ConfineMouseTracker()
             });
+
+            dependencies.Cache(ScreenFooter);
 
             ScreenStack.ScreenPushed += screenPushed;
             ScreenStack.ScreenExited += screenExited;
@@ -1452,6 +1468,7 @@ namespace osu.Game
 
             ScreenOffsetContainer.Padding = new MarginPadding { Top = toolbarOffset };
             overlayOffsetContainer.Padding = new MarginPadding { Top = toolbarOffset };
+            ScreenStack.Padding = new MarginPadding { Bottom = screenFooterOffset };
 
             float horizontalOffset = 0f;
 
@@ -1524,6 +1541,18 @@ namespace osu.Game
                     BackButton.Show();
                 else
                     BackButton.Hide();
+
+                if (newOsuScreen.AllowNewFooter)
+                {
+                    BackButton.Hide();
+                    ScreenFooter.SetButtons(newOsuScreen.CreateFooterButtons());
+                    ScreenFooter.Show();
+                }
+                else
+                {
+                    ScreenFooter.SetButtons(Array.Empty<FooterButtonV2>());
+                    ScreenFooter.Hide();
+                }
             }
 
             skinEditor.SetTarget((OsuScreen)newScreen);

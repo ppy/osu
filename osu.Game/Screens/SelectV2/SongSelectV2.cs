@@ -1,8 +1,11 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
+using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Screens;
 using osu.Game.Overlays;
@@ -10,20 +13,17 @@ using osu.Game.Overlays.Mods;
 using osu.Game.Screens.Menu;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.SelectV2.Footer;
-using osuTK;
 
 namespace osu.Game.Screens.SelectV2
 {
     public partial class SongSelectV2 : OsuScreen
     {
-        private FooterV2 footer = null!;
-
-        private ModSelectOverlay overlay = null!;
+        private readonly ModSelectOverlay modSelectOverlay = new SoloModSelectOverlay();
 
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Aquamarine);
 
-        public override bool AllowBackButton => false;
+        public override bool AllowNewFooter => true;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -33,64 +33,64 @@ namespace osu.Game.Screens.SelectV2
                 new PopoverContainer
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Child = footer = new FooterV2(),
                 },
-                overlay = new SoloModSelectOverlay()
+                modSelectOverlay,
             });
-
-            footer.AddButton(new FooterButtonModsV2(), overlay);
-            footer.AddButton(new FooterButtonRandomV2());
-            footer.AddButton(new FooterButtonOptionsV2());
-
-            overlay.Hide();
         }
+
+        public override IReadOnlyList<FooterButtonV2> CreateFooterButtons() => new FooterButtonV2[]
+        {
+            new FooterButtonModsV2(modSelectOverlay) { Current = Mods },
+            new FooterButtonRandomV2(),
+            new FooterButtonOptionsV2(),
+        };
 
         public override void OnEntering(ScreenTransitionEvent e)
         {
-            footer.Show();
             this.FadeIn();
             base.OnEntering(e);
         }
 
         public override void OnResuming(ScreenTransitionEvent e)
         {
-            footer.Show();
             this.FadeIn();
             base.OnResuming(e);
         }
 
         public override void OnSuspending(ScreenTransitionEvent e)
         {
-            footer.Hide();
             this.Delay(400).FadeOut();
             base.OnSuspending(e);
         }
 
         public override bool OnExiting(ScreenExitEvent e)
         {
-            footer.Hide();
             this.Delay(400).FadeOut();
             return base.OnExiting(e);
+        }
+
+        public override bool OnBackButton()
+        {
+            if (modSelectOverlay.State.Value == Visibility.Visible)
+            {
+                modSelectOverlay.Hide();
+                return true;
+            }
+
+            return false;
         }
 
         protected override void LogoArriving(OsuLogo logo, bool resuming)
         {
             base.LogoArriving(logo, resuming);
 
-            logo.RelativePositionAxes = Axes.None;
-            logo.ChangeAnchor(Anchor.BottomRight);
-
-            Vector2 position = new Vector2(-76, -36);
-
             if (logo.Alpha > 0.8f)
-            {
-                logo.MoveTo(position, 400, Easing.OutQuint);
-            }
+                Footer?.StartTrackingLogo(logo, 400, Easing.OutQuint);
             else
             {
                 logo.Hide();
                 logo.ScaleTo(0.2f);
-                logo.MoveTo(position);
+                Footer?.StartTrackingLogo(logo);
             }
 
             logo.FadeIn(240, Easing.OutQuint);
@@ -98,14 +98,21 @@ namespace osu.Game.Screens.SelectV2
 
             logo.Action = () =>
             {
-                this.Push(new PlayerLoader(() => new SoloPlayer()));
+                this.Push(new PlayerLoaderV2(() => new SoloPlayer()));
                 return false;
             };
+        }
+
+        protected override void LogoSuspending(OsuLogo logo)
+        {
+            base.LogoSuspending(logo);
+            Footer?.StopTrackingLogo();
         }
 
         protected override void LogoExiting(OsuLogo logo)
         {
             base.LogoExiting(logo);
+            Scheduler.AddDelayed(() => Footer?.StopTrackingLogo(), 120);
             logo.ScaleTo(0.2f, 120, Easing.Out);
             logo.FadeOut(120, Easing.Out);
         }
@@ -113,6 +120,21 @@ namespace osu.Game.Screens.SelectV2
         private partial class SoloModSelectOverlay : ModSelectOverlay
         {
             protected override bool ShowPresets => true;
+
+            public SoloModSelectOverlay()
+                : base(OverlayColourScheme.Aquamarine)
+            {
+            }
+        }
+
+        private partial class PlayerLoaderV2 : PlayerLoader
+        {
+            public override bool AllowNewFooter => true;
+
+            public PlayerLoaderV2(Func<Player> createPlayer)
+                : base(createPlayer)
+            {
+            }
         }
     }
 }
