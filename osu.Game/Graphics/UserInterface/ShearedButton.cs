@@ -11,6 +11,7 @@ using osu.Framework.Localisation;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays;
+using osu.Game.Overlays.Mods;
 using osuTK;
 
 namespace osu.Game.Graphics.UserInterface
@@ -66,7 +67,7 @@ namespace osu.Game.Graphics.UserInterface
         private readonly Box background;
         private readonly OsuSpriteText text;
 
-        private const float shear = 0.2f;
+        private const float shear = ShearedOverlayContainer.SHEAR;
 
         private Colour4? darkerColour;
         private Colour4? lighterColour;
