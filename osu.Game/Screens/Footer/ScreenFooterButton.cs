@@ -21,9 +21,9 @@ using osu.Game.Overlays;
 using osuTK;
 using osuTK.Graphics;
 
-namespace osu.Game.Screens.Select.FooterV2
+namespace osu.Game.Screens.Footer
 {
-    public partial class FooterButtonV2 : OsuClickableContainer, IKeyBindingHandler<GlobalAction>
+    public partial class ScreenFooterButton : OsuClickableContainer, IKeyBindingHandler<GlobalAction>
     {
         // This should be 12 by design, but an extra allowance is added due to the corner radius specification.
         private const float shear_width = 13.5f;
@@ -70,7 +70,7 @@ namespace osu.Game.Screens.Select.FooterV2
         private readonly Box glowBox;
         private readonly Box flashLayer;
 
-        public FooterButtonV2()
+        public ScreenFooterButton()
         {
             Size = new Vector2(BUTTON_WIDTH, BUTTON_HEIGHT);
 
