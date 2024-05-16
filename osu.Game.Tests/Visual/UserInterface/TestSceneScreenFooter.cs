@@ -2,34 +2,22 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Testing;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Mods;
-using osu.Game.Rulesets.Mods;
-using osu.Game.Rulesets.Osu;
-using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Screens.Footer;
 using osu.Game.Screens.SelectV2.Footer;
-using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
     public partial class TestSceneScreenFooter : OsuManualInputManagerTestScene
     {
-        private ScreenFooterButtonRandom randomButton = null!;
-        private ScreenFooterButtonMods modsButton = null!;
-
-        private bool nextRandomCalled;
-        private bool previousRandomCalled;
-
-        private DummyOverlay overlay = null!;
+        private ScreenFooter screenFooter = null!;
+        private TestModSelectOverlay overlay = null!;
 
         [Cached]
         private OverlayColourProvider colourProvider { get; set; } = new OverlayColourProvider(OverlayColourScheme.Aquamarine);
@@ -37,160 +25,70 @@ namespace osu.Game.Tests.Visual.UserInterface
         [SetUp]
         public void SetUp() => Schedule(() =>
         {
-            nextRandomCalled = false;
-            previousRandomCalled = false;
-
-            ScreenFooter footer;
-
             Children = new Drawable[]
             {
+                overlay = new TestModSelectOverlay
+                {
+                    Padding = new MarginPadding
+                    {
+                        Bottom = ScreenFooter.HEIGHT
+                    }
+                },
                 new PopoverContainer
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Child = footer = new ScreenFooter(),
+                    Child = screenFooter = new ScreenFooter(),
                 },
-                overlay = new DummyOverlay()
             };
 
-            footer.AddButton(modsButton = new ScreenFooterButtonMods { Current = SelectedMods }, overlay);
-            footer.AddButton(randomButton = new ScreenFooterButtonRandom
+            screenFooter.SetButtons(new ScreenFooterButton[]
             {
-                NextRandom = () => nextRandomCalled = true,
-                PreviousRandom = () => previousRandomCalled = true
+                new ScreenFooterButtonMods(overlay) { Current = SelectedMods },
+                new ScreenFooterButtonRandom(),
+                new ScreenFooterButtonOptions(),
             });
-            footer.AddButton(new ScreenFooterButtonOptions());
-
-            overlay.Hide();
         });
 
         [SetUpSteps]
         public void SetUpSteps()
         {
-            AddStep("clear mods", () => SelectedMods.Value = Array.Empty<Mod>());
-            AddStep("set beatmap", () => Beatmap.Value = CreateWorkingBeatmap(CreateBeatmap(new OsuRuleset().RulesetInfo)));
+            AddStep("show footer", () => screenFooter.Show());
         }
 
+        /// <summary>
+        /// Transition when moving from a screen with no buttons to a screen with buttons.
+        /// </summary>
         [Test]
-        public void TestMods()
+        public void TestButtonsIn()
         {
-            AddStep("one mod", () => SelectedMods.Value = new List<Mod> { new OsuModHidden() });
-            AddStep("two mods", () => SelectedMods.Value = new List<Mod> { new OsuModHidden(), new OsuModHardRock() });
-            AddStep("three mods", () => SelectedMods.Value = new List<Mod> { new OsuModHidden(), new OsuModHardRock(), new OsuModDoubleTime() });
-            AddStep("four mods", () => SelectedMods.Value = new List<Mod> { new OsuModHidden(), new OsuModHardRock(), new OsuModDoubleTime(), new OsuModClassic() });
-            AddStep("five mods", () => SelectedMods.Value = new List<Mod> { new OsuModHidden(), new OsuModHardRock(), new OsuModDoubleTime(), new OsuModClassic(), new OsuModDifficultyAdjust() });
-
-            AddStep("modified", () => SelectedMods.Value = new List<Mod> { new OsuModDoubleTime { SpeedChange = { Value = 1.2 } } });
-            AddStep("modified + one", () => SelectedMods.Value = new List<Mod> { new OsuModHidden(), new OsuModDoubleTime { SpeedChange = { Value = 1.2 } } });
-            AddStep("modified + two", () => SelectedMods.Value = new List<Mod> { new OsuModHidden(), new OsuModHardRock(), new OsuModDoubleTime { SpeedChange = { Value = 1.2 } } });
-            AddStep("modified + three", () => SelectedMods.Value = new List<Mod> { new OsuModHidden(), new OsuModHardRock(), new OsuModClassic(), new OsuModDoubleTime { SpeedChange = { Value = 1.2 } } });
-            AddStep("modified + four", () => SelectedMods.Value = new List<Mod> { new OsuModHidden(), new OsuModHardRock(), new OsuModClassic(), new OsuModDifficultyAdjust(), new OsuModDoubleTime { SpeedChange = { Value = 1.2 } } });
-
-            AddStep("clear mods", () => SelectedMods.Value = Array.Empty<Mod>());
-            AddWaitStep("wait", 3);
-            AddStep("one mod", () => SelectedMods.Value = new List<Mod> { new OsuModHidden() });
-
-            AddStep("clear mods", () => SelectedMods.Value = Array.Empty<Mod>());
-            AddWaitStep("wait", 3);
-            AddStep("five mods", () => SelectedMods.Value = new List<Mod> { new OsuModHidden(), new OsuModHardRock(), new OsuModDoubleTime(), new OsuModClassic(), new OsuModDifficultyAdjust() });
         }
 
+        /// <summary>
+        /// Transition when moving from a screen with buttons to a screen with no buttons.
+        /// </summary>
         [Test]
-        public void TestShowOptions()
+        public void TestButtonsOut()
         {
-            AddStep("enable options", () =>
+            AddStep("clear buttons", () => screenFooter.SetButtons(Array.Empty<ScreenFooterButton>()));
+        }
+
+        /// <summary>
+        /// Transition when moving from a screen with buttons to a screen with buttons.
+        /// </summary>
+        [Test]
+        public void TestReplaceButtons()
+        {
+            AddStep("replace buttons", () => screenFooter.SetButtons(new[]
             {
-                var optionsButton = this.ChildrenOfType<ScreenFooterButton>().Last();
-
-                optionsButton.Enabled.Value = true;
-                optionsButton.TriggerClick();
-            });
+                new ScreenFooterButton { Text = "One", Action = () => { } },
+                new ScreenFooterButton { Text = "Two", Action = () => { } },
+                new ScreenFooterButton { Text = "Three", Action = () => { } },
+            }));
         }
 
-        [Test]
-        public void TestState()
+        private partial class TestModSelectOverlay : UserModSelectOverlay
         {
-            AddToggleStep("set options enabled state", state => this.ChildrenOfType<ScreenFooterButton>().Last().Enabled.Value = state);
-        }
-
-        [Test]
-        public void TestFooterRandom()
-        {
-            AddStep("press F2", () => InputManager.Key(Key.F2));
-            AddAssert("next random invoked", () => nextRandomCalled && !previousRandomCalled);
-        }
-
-        [Test]
-        public void TestFooterRandomViaMouse()
-        {
-            AddStep("click button", () =>
-            {
-                InputManager.MoveMouseTo(randomButton);
-                InputManager.Click(MouseButton.Left);
-            });
-            AddAssert("next random invoked", () => nextRandomCalled && !previousRandomCalled);
-        }
-
-        [Test]
-        public void TestFooterRewind()
-        {
-            AddStep("press Shift+F2", () =>
-            {
-                InputManager.PressKey(Key.LShift);
-                InputManager.PressKey(Key.F2);
-                InputManager.ReleaseKey(Key.F2);
-                InputManager.ReleaseKey(Key.LShift);
-            });
-            AddAssert("previous random invoked", () => previousRandomCalled && !nextRandomCalled);
-        }
-
-        [Test]
-        public void TestFooterRewindViaShiftMouseLeft()
-        {
-            AddStep("shift + click button", () =>
-            {
-                InputManager.PressKey(Key.LShift);
-                InputManager.MoveMouseTo(randomButton);
-                InputManager.Click(MouseButton.Left);
-                InputManager.ReleaseKey(Key.LShift);
-            });
-            AddAssert("previous random invoked", () => previousRandomCalled && !nextRandomCalled);
-        }
-
-        [Test]
-        public void TestFooterRewindViaMouseRight()
-        {
-            AddStep("right click button", () =>
-            {
-                InputManager.MoveMouseTo(randomButton);
-                InputManager.Click(MouseButton.Right);
-            });
-            AddAssert("previous random invoked", () => previousRandomCalled && !nextRandomCalled);
-        }
-
-        [Test]
-        public void TestOverlayPresent()
-        {
-            AddStep("Press F1", () =>
-            {
-                InputManager.MoveMouseTo(modsButton);
-                InputManager.Click(MouseButton.Left);
-            });
-            AddAssert("Overlay visible", () => overlay.State.Value == Visibility.Visible);
-            AddStep("Hide", () => overlay.Hide());
-        }
-
-        private partial class DummyOverlay : ShearedOverlayContainer
-        {
-            public DummyOverlay()
-                : base(OverlayColourScheme.Green)
-            {
-            }
-
-            [BackgroundDependencyLoader]
-            private void load()
-            {
-                Header.Title = "An overlay";
-            }
+            protected override bool ShowPresets => true;
         }
     }
 }
