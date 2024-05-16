@@ -18,6 +18,7 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Input.Bindings;
 using osu.Game.Overlays;
+using osu.Game.Overlays.Mods;
 using osuTK;
 using osuTK.Graphics;
 
@@ -25,9 +26,7 @@ namespace osu.Game.Screens.Footer
 {
     public partial class ScreenFooterButton : OsuClickableContainer, IKeyBindingHandler<GlobalAction>
     {
-        // if we go by design, both this and ShearedButton should have shear factor as 1/7,
-        // but ShearedButton uses 1/5 so we must follow suit for the design to stay consistent.
-        private const float shear = 1f / 5f;
+        private const float shear = ShearedOverlayContainer.SHEAR;
 
         protected const int CORNER_RADIUS = 10;
         protected const int BUTTON_HEIGHT = 90;
