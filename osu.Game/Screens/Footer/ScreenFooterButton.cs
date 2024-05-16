@@ -18,7 +18,6 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Input.Bindings;
 using osu.Game.Overlays;
-using osu.Game.Overlays.Mods;
 using osuTK;
 using osuTK.Graphics;
 

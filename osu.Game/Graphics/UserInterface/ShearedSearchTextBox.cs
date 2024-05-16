@@ -11,7 +11,6 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Localisation;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays;
-using osu.Game.Overlays.Mods;
 using osu.Game.Resources.Localisation.Web;
 using osuTK;
 
