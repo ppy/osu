@@ -17,7 +17,7 @@ namespace osu.Game.Graphics.UserInterface
 {
     public partial class ShearedButton : OsuClickableContainer
     {
-        public const float HEIGHT = 50;
+        public const float DEFAULT_HEIGHT = 50;
         public const float CORNER_RADIUS = 7;
         public const float BORDER_THICKNESS = 2;
 
@@ -85,10 +85,11 @@ namespace osu.Game.Graphics.UserInterface
         /// <item>If a <see langword="null"/> value is provided (or the argument is omitted entirely), the button will autosize in width to fit the text.</item>
         /// </list>
         /// </param>
-        public ShearedButton(float? width = null)
+        /// <param name="height">The height of the button.</param>
+        public ShearedButton(float? width = null, float height = DEFAULT_HEIGHT)
         {
-            Height = HEIGHT;
-            Padding = new MarginPadding { Horizontal = shear * 50 };
+            Height = height;
+            Padding = new MarginPadding { Horizontal = shear * height };
 
             Content.CornerRadius = CORNER_RADIUS;
             Content.Shear = new Vector2(shear, 0);
