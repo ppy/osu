@@ -26,7 +26,7 @@ namespace osu.Game.Screens.Footer
 {
     public partial class ScreenFooterButton : OsuClickableContainer, IKeyBindingHandler<GlobalAction>
     {
-        private const float shear = ShearedOverlayContainer.SHEAR;
+        private const float shear = OsuGame.SHEAR;
 
         protected const int CORNER_RADIUS = 10;
         protected const int BUTTON_HEIGHT = 90;

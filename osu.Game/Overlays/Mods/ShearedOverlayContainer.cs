@@ -22,9 +22,6 @@ namespace osu.Game.Overlays.Mods
     {
         protected const float PADDING = 14;
 
-        // todo: maybe move this to a higher place since it's used for screen footer buttons etc.
-        public const float SHEAR = 0.15f;
-
         [Cached]
         protected readonly OverlayColourProvider ColourProvider;
 
