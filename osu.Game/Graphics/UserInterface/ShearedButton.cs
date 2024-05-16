@@ -75,6 +75,8 @@ namespace osu.Game.Graphics.UserInterface
         private readonly Container backgroundLayer;
         private readonly Box flashLayer;
 
+        protected readonly Container ButtonContent;
+
         /// <summary>
         /// Creates a new <see cref="ShearedToggleButton"/>
         /// </summary>
@@ -110,12 +112,16 @@ namespace osu.Game.Graphics.UserInterface
                         {
                             RelativeSizeAxes = Axes.Both
                         },
-                        text = new OsuSpriteText
+                        ButtonContent = new Container
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
-                            Font = OsuFont.TorusAlternate.With(size: 17),
-                            Shear = new Vector2(-shear, 0)
+                            AutoSizeAxes = Axes.Both,
+                            Shear = new Vector2(-shear, 0),
+                            Child = text = new OsuSpriteText
+                            {
+                                Font = OsuFont.TorusAlternate.With(size: 17),
+                            }
                         },
                     }
                 },
@@ -189,7 +195,7 @@ namespace osu.Game.Graphics.UserInterface
         {
             var colourDark = darkerColour ?? ColourProvider.Background3;
             var colourLight = lighterColour ?? ColourProvider.Background1;
-            var colourText = textColour ?? ColourProvider.Content1;
+            var colourContent = textColour ?? ColourProvider.Content1;
 
             if (!Enabled.Value)
             {
@@ -206,9 +212,9 @@ namespace osu.Game.Graphics.UserInterface
             backgroundLayer.TransformTo(nameof(BorderColour), ColourInfo.GradientVertical(colourDark, colourLight), 150, Easing.OutQuint);
 
             if (!Enabled.Value)
-                colourText = colourText.Opacity(0.6f);
+                colourContent = colourContent.Opacity(0.6f);
 
-            text.FadeColour(colourText, 150, Easing.OutQuint);
+            ButtonContent.FadeColour(colourContent, 150, Easing.OutQuint);
         }
     }
 }
