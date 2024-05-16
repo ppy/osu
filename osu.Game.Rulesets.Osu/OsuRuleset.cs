@@ -28,6 +28,7 @@ using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Replays;
 using osu.Game.Rulesets.Osu.Scoring;
 using osu.Game.Rulesets.Osu.Skinning.Argon;
+using osu.Game.Rulesets.Osu.Skinning.Default;
 using osu.Game.Rulesets.Osu.Skinning.Legacy;
 using osu.Game.Rulesets.Osu.Statistics;
 using osu.Game.Rulesets.Osu.UI;
@@ -211,7 +212,8 @@ namespace osu.Game.Rulesets.Osu
                         new ModAdaptiveSpeed(),
                         new OsuModFreezeFrame(),
                         new OsuModBubbles(),
-                        new OsuModSynesthesia()
+                        new OsuModSynesthesia(),
+                        new OsuModDepth()
                     };
 
                 case ModType.System:
@@ -253,6 +255,9 @@ namespace osu.Game.Rulesets.Osu
 
                 case ArgonSkin:
                     return new OsuArgonSkinTransformer(skin);
+
+                case TrianglesSkin:
+                    return new OsuTrianglesSkinTransformer(skin);
             }
 
             return null;
@@ -276,6 +281,7 @@ namespace osu.Game.Rulesets.Osu
 
                 HitResult.LargeTickHit,
                 HitResult.SmallTickHit,
+                HitResult.SliderTailHit,
                 HitResult.SmallBonus,
                 HitResult.LargeBonus,
             };
@@ -288,6 +294,7 @@ namespace osu.Game.Rulesets.Osu
                 case HitResult.LargeTickHit:
                     return "slider tick";
 
+                case HitResult.SliderTailHit:
                 case HitResult.SmallTickHit:
                     return "slider end";
 
@@ -332,23 +339,20 @@ namespace osu.Game.Rulesets.Osu
 
         public override RulesetSetupSection CreateEditorSetupSection() => new OsuSetupSection();
 
+        /// <seealso cref="OsuHitObject.ApplyDefaultsToSelf"/>
+        /// <seealso cref="OsuHitWindows"/>
         public override BeatmapDifficulty GetRateAdjustedDisplayDifficulty(IBeatmapDifficultyInfo difficulty, double rate)
         {
             BeatmapDifficulty adjustedDifficulty = new BeatmapDifficulty(difficulty);
 
-            double preempt = adjustedDifficulty.ApproachRate < 5
-                ? 1200.0 + 600.0 * (5 - adjustedDifficulty.ApproachRate) / 5
-                : 1200.0 - 750.0 * (adjustedDifficulty.ApproachRate - 5) / 5;
-
+            double preempt = IBeatmapDifficultyInfo.DifficultyRange(adjustedDifficulty.ApproachRate, OsuHitObject.PREEMPT_MAX, OsuHitObject.PREEMPT_MID, OsuHitObject.PREEMPT_MIN);
             preempt /= rate;
+            adjustedDifficulty.ApproachRate = (float)IBeatmapDifficultyInfo.InverseDifficultyRange(preempt, OsuHitObject.PREEMPT_MAX, OsuHitObject.PREEMPT_MID, OsuHitObject.PREEMPT_MIN);
 
-            adjustedDifficulty.ApproachRate = (float)(preempt > 1200 ? (1800 - preempt) / 120 : (1200 - preempt) / 150 + 5);
-
-            double hitwindow = 80.0 - 6 * adjustedDifficulty.OverallDifficulty;
-
-            hitwindow /= rate;
-
-            adjustedDifficulty.OverallDifficulty = (float)(80.0 - hitwindow) / 6;
+            var greatHitWindowRange = OsuHitWindows.OSU_RANGES.Single(range => range.Result == HitResult.Great);
+            double greatHitWindow = IBeatmapDifficultyInfo.DifficultyRange(adjustedDifficulty.OverallDifficulty, greatHitWindowRange.Min, greatHitWindowRange.Average, greatHitWindowRange.Max);
+            greatHitWindow /= rate;
+            adjustedDifficulty.OverallDifficulty = (float)IBeatmapDifficultyInfo.InverseDifficultyRange(greatHitWindow, greatHitWindowRange.Min, greatHitWindowRange.Average, greatHitWindowRange.Max);
 
             return adjustedDifficulty;
         }

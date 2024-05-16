@@ -10,5 +10,10 @@ namespace osu.Game.Rulesets.Mania.Mods
     public class ManiaModDoubleTime : ModDoubleTime, IManiaRateAdjustmentMod
     {
         public HitWindows HitWindows { get; set; } = new ManiaHitWindows();
+
+        // For now, all rate-increasing mods should be given a 1x multiplier in mania because it doesn't always
+        // make the map harder and is more of a personal preference.
+        // In the future, we can consider adjusting this by experimenting with not applying the hitwindow leniency.
+        public override double ScoreMultiplier => 1;
     }
 }

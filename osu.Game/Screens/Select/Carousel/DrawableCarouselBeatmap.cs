@@ -28,6 +28,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
 using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Mods;
 using osuTK;
 using osuTK.Graphics;
 
@@ -75,6 +76,9 @@ namespace osu.Game.Screens.Select.Carousel
         [Resolved]
         private IBindable<RulesetInfo> ruleset { get; set; } = null!;
 
+        [Resolved]
+        private IBindable<IReadOnlyList<Mod>> mods { get; set; } = null!;
+
         private IBindable<StarDifficulty?> starDifficultyBindable = null!;
         private CancellationTokenSource? starDifficultyCancellationSource;
 
@@ -91,7 +95,7 @@ namespace osu.Game.Screens.Select.Carousel
 
             if (songSelect != null)
             {
-                mainMenuItems = songSelect.CreateForwardNavigationMenuItemsForBeatmap(beatmapInfo);
+                mainMenuItems = songSelect.CreateForwardNavigationMenuItemsForBeatmap(() => beatmapInfo);
                 selectRequested = b => songSelect.FinaliseSelection(b);
             }
 
@@ -122,7 +126,7 @@ namespace osu.Game.Screens.Select.Carousel
                     {
                         difficultyIcon = new DifficultyIcon(beatmapInfo)
                         {
-                            ShowTooltip = false,
+                            TooltipType = DifficultyIconTooltipType.None,
                             Scale = new Vector2(1.8f),
                         },
                         new FillFlowContainer
@@ -185,6 +189,7 @@ namespace osu.Game.Screens.Select.Carousel
             base.LoadComplete();
 
             ruleset.BindValueChanged(_ => updateKeyCount());
+            mods.BindValueChanged(_ => updateKeyCount());
         }
 
         protected override void Selected()
@@ -245,6 +250,9 @@ namespace osu.Game.Screens.Select.Carousel
 
         private void updateKeyCount()
         {
+            if (Item?.State.Value == CarouselItemState.Collapsed)
+                return;
+
             if (ruleset.Value.OnlineID == 3)
             {
                 // Account for mania differences locally for now.
@@ -252,7 +260,7 @@ namespace osu.Game.Screens.Select.Carousel
                 ILegacyRuleset legacyRuleset = (ILegacyRuleset)ruleset.Value.CreateInstance();
 
                 keyCountText.Alpha = 1;
-                keyCountText.Text = $"[{legacyRuleset.GetKeyCount(beatmapInfo)}K]";
+                keyCountText.Text = $"[{legacyRuleset.GetKeyCount(beatmapInfo, mods.Value)}K]";
             }
             else
                 keyCountText.Alpha = 0;

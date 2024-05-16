@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
@@ -29,6 +30,10 @@ namespace osu.Game.Screens.Edit
 
         protected readonly FillFlowContainer<RowBackground> BackgroundFlow;
 
+        // We can avoid potentially thousands of objects being added to the input sub-tree since item selection is being handled by the BackgroundFlow
+        // and no items in the underlying table are clickable.
+        protected override bool ShouldBeConsideredForInput(Drawable child) => child == BackgroundFlow && base.ShouldBeConsideredForInput(child);
+
         protected EditorTable()
         {
             RelativeSizeAxes = Axes.X;
@@ -46,15 +51,42 @@ namespace osu.Game.Screens.Edit
             });
         }
 
-        protected void SetSelectedRow(object? item)
+        protected int GetIndexForObject(object? item)
         {
+            for (int i = 0; i < BackgroundFlow.Count; i++)
+            {
+                if (BackgroundFlow[i].Item == item)
+                    return i;
+            }
+
+            return -1;
+        }
+
+        protected virtual bool SetSelectedRow(object? item)
+        {
+            bool foundSelection = false;
+
             foreach (var b in BackgroundFlow)
             {
                 b.Selected = ReferenceEquals(b.Item, item);
 
                 if (b.Selected)
+                {
+                    Debug.Assert(!foundSelection);
                     OnRowSelected?.Invoke(b);
+                    foundSelection = true;
+                }
             }
+
+            return foundSelection;
+        }
+
+        protected object? GetObjectAtIndex(int index)
+        {
+            if (index < 0 || index > BackgroundFlow.Count - 1)
+                return null;
+
+            return BackgroundFlow[index].Item;
         }
 
         protected override Drawable CreateHeader(int index, TableColumn? column) => new HeaderText(column?.Header ?? default);

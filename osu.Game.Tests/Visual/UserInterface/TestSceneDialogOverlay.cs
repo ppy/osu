@@ -9,6 +9,7 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Testing;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Dialog;
 
@@ -19,11 +20,15 @@ namespace osu.Game.Tests.Visual.UserInterface
     {
         private DialogOverlay overlay;
 
+        [SetUpSteps]
+        public void SetUpSteps()
+        {
+            AddStep("create dialog overlay", () => Child = overlay = new DialogOverlay());
+        }
+
         [Test]
         public void TestBasic()
         {
-            AddStep("create dialog overlay", () => Child = overlay = new DialogOverlay());
-
             TestPopupDialog firstDialog = null;
             TestPopupDialog secondDialog = null;
 
@@ -84,7 +89,31 @@ namespace osu.Game.Tests.Visual.UserInterface
             }));
 
             AddAssert("second dialog displayed", () => overlay.CurrentDialog == secondDialog);
-            AddAssert("first dialog is not part of hierarchy", () => firstDialog.Parent == null);
+            AddUntilStep("first dialog is not part of hierarchy", () => firstDialog.Parent == null);
+        }
+
+        [Test]
+        public void TestTooMuchText()
+        {
+            AddStep("dialog #1", () => overlay.Push(new TestPopupDialog
+            {
+                Icon = FontAwesome.Regular.TrashAlt,
+                HeaderText = @"Confirm deletion ofConfirm deletion ofConfirm deletion ofConfirm deletion ofConfirm deletion ofConfirm deletion of",
+                BodyText = @"Ayase Rie - Yuima-ru*World TVver.Ayase Rie - Yuima-ru*World TVver.Ayase Rie - Yuima-ru*World TVver.Ayase Rie - Yuima-ru*World TVver.Ayase Rie - Yuima-ru*World TVver.Ayase Rie - Yuima-ru*World TVver.Ayase Rie - Yuima-ru*World TVver.Ayase Rie - Yuima-ru*World TVver.Ayase Rie - Yuima-ru*World TVver. ",
+                Buttons = new PopupDialogButton[]
+                {
+                    new PopupDialogOkButton
+                    {
+                        Text = @"I never want to see this again.",
+                        Action = () => Console.WriteLine(@"OK"),
+                    },
+                    new PopupDialogCancelButton
+                    {
+                        Text = @"Firetruck, I still want quick ranks!",
+                        Action = () => Console.WriteLine(@"Cancel"),
+                    },
+                },
+            }));
         }
 
         [Test]
@@ -92,7 +121,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         {
             PopupDialog dialog = null;
 
-            AddStep("create dialog overlay", () => overlay = new SlowLoadingDialogOverlay());
+            AddStep("create slow loading dialog overlay", () => overlay = new SlowLoadingDialogOverlay());
 
             AddStep("start loading overlay", () => LoadComponentAsync(overlay, Add));
 
@@ -128,8 +157,6 @@ namespace osu.Game.Tests.Visual.UserInterface
         [Test]
         public void TestDismissBeforePush()
         {
-            AddStep("create dialog overlay", () => Child = overlay = new DialogOverlay());
-
             TestPopupDialog testDialog = null;
             AddStep("dismissed dialog push", () =>
             {
@@ -146,8 +173,6 @@ namespace osu.Game.Tests.Visual.UserInterface
         [Test]
         public void TestDismissBeforePushViaButtonPress()
         {
-            AddStep("create dialog overlay", () => Child = overlay = new DialogOverlay());
-
             TestPopupDialog testDialog = null;
             AddStep("dismissed dialog push", () =>
             {
@@ -163,7 +188,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             });
 
             AddAssert("no dialog pushed", () => overlay.CurrentDialog == null);
-            AddAssert("dialog is not part of hierarchy", () => testDialog.Parent == null);
+            AddUntilStep("dialog is not part of hierarchy", () => testDialog.Parent == null);
         }
 
         private partial class TestPopupDialog : PopupDialog

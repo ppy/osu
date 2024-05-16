@@ -82,7 +82,8 @@ namespace osu.Game.Overlays.Mods
             {
                 Origin = Anchor.CentreLeft,
                 Anchor = Anchor.CentreLeft,
-                AutoSizeAxes = Axes.Both,
+                AutoSizeAxes = Axes.Y,
+                Width = 50,
                 Direction = FillDirection.Vertical,
                 Children = new Drawable[]
                 {
@@ -123,7 +124,7 @@ namespace osu.Game.Overlays.Mods
 
         private partial class EffectCounter : RollingCounter<double>
         {
-            protected override double RollingDuration => 500;
+            protected override double RollingDuration => 250;
 
             protected override LocalisableString FormatCount(double count) => count.ToLocalisableString("0.0#");
 

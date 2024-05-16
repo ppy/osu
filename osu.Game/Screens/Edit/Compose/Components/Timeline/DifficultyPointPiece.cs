@@ -169,7 +169,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
             InspectorText.Clear();
 
-            double[] sliderVelocities = EditorBeatmap.HitObjects.OfType<IHasSliderVelocity>().Select(sv => sv.SliderVelocityMultiplier).OrderBy(v => v).ToArray();
+            double[] sliderVelocities = EditorBeatmap.HitObjects.OfType<IHasSliderVelocity>().Select(sv => sv.SliderVelocityMultiplier).Order().ToArray();
 
             AddHeader("Base velocity (from beatmap setup)");
             AddValue($"{beatmapVelocity:#,0.00}x");

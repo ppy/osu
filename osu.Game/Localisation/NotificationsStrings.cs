@@ -113,6 +113,33 @@ Please try changing your audio device to a working setting.");
         /// </summary>
         public static LocalisableString MismatchingBeatmapForReplay => new TranslatableString(getKey(@"mismatching_beatmap_for_replay"), @"Your local copy of the beatmap for this replay appears to be different than expected. You may need to update or re-download it.");
 
+        /// <summary>
+        /// "You are now running osu! {version}.
+        /// Click to see what's new!"
+        /// </summary>
+        public static LocalisableString GameVersionAfterUpdate(string version) => new TranslatableString(getKey(@"game_version_after_update"), @"You are now running osu! {0}.
+Click to see what's new!", version);
+
+        /// <summary>
+        /// "Update ready to install. Click to restart!"
+        /// </summary>
+        public static LocalisableString UpdateReadyToInstall => new TranslatableString(getKey(@"update_ready_to_install"), @"Update ready to install. Click to restart!");
+
+        /// <summary>
+        /// "This is not an official build of the game. Scores will not be submitted and other online systems may not work as intended."
+        /// </summary>
+        public static LocalisableString NotOfficialBuild => new TranslatableString(getKey(@"not_official_build"), @"This is not an official build of the game. Scores will not be submitted and other online systems may not work as intended.");
+
+        /// <summary>
+        /// "Downloading update..."
+        /// </summary>
+        public static LocalisableString DownloadingUpdate => new TranslatableString(getKey(@"downloading_update"), @"Downloading update...");
+
+        /// <summary>
+        /// "Installing update..."
+        /// </summary>
+        public static LocalisableString InstallingUpdate => new TranslatableString(getKey(@"installing_update"), @"Installing update...");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }

@@ -35,6 +35,7 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osu.Game.Scoring.Legacy;
 using osu.Game.Skinning;
+using osu.Game.Utils;
 using osuTK.Input;
 using Realms;
 using Realms.Exceptions;
@@ -89,8 +90,11 @@ namespace osu.Game.Database
         /// 35   2023-10-16    Clear key combinations of keybindings that are assigned to more than one action in a given settings section.
         /// 36   2023-10-26    Add LegacyOnlineID to ScoreInfo. Move osu_scores_*_high IDs stored in OnlineID to LegacyOnlineID. Reset anomalous OnlineIDs.
         /// 38   2023-12-10    Add EndTimeObjectCount and TotalObjectCount to BeatmapInfo.
+        /// 39   2023-12-19    Migrate any EndTimeObjectCount and TotalObjectCount values of 0 to -1 to better identify non-calculated values.
+        /// 40   2023-12-21    Add ScoreInfo.Version to keep track of which build scores were set on.
+        /// 41   2024-04-17    Add ScoreInfo.TotalScoreWithoutMods for future mod multiplier rebalances.
         /// </summary>
-        private const int schema_version = 38;
+        private const int schema_version = 41;
 
         /// <summary>
         /// Lock object which is held during <see cref="BlockAllOperations"/> sections, blocking realm retrieval during blocking periods.
@@ -319,12 +323,32 @@ namespace osu.Game.Database
                 {
                     Logger.Error(e, "Your local database is too new to work with this version of osu!. Please close osu! and install the latest release to recover your data.");
 
-                    // If a newer version database already exists, don't backup again. We can presume that the first backup is the one we care about.
+                    // If a newer version database already exists, don't create another backup. We can presume that the first backup is the one we care about.
                     if (!storage.Exists(newerVersionFilename))
                         createBackup(newerVersionFilename);
                 }
                 else
                 {
+                    // This error can occur due to file handles still being open by a previous instance.
+                    // If this is the case, rather than assuming the realm file is corrupt, block game startup.
+                    if (e.Message.StartsWith("SetEndOfFile() failed", StringComparison.Ordinal))
+                    {
+                        // This will throw if the realm file is not available for write access after 5 seconds.
+                        FileUtils.AttemptOperation(() =>
+                        {
+                            if (storage.Exists(Filename))
+                            {
+                                using (var _ = storage.GetStream(Filename, FileAccess.ReadWrite))
+                                {
+                                }
+                            }
+                        }, 20);
+
+                        // If the above eventually succeeds, try and continue startup as per normal.
+                        // This may throw again but let's allow it to, and block startup.
+                        return getRealmInstance();
+                    }
+
                     Logger.Error(e, "Realm startup failed with unrecoverable error; starting with a fresh database. A backup of your database has been made.");
                     createBackup($"{Filename.Replace(realm_extension, string.Empty)}_{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}_corrupt{realm_extension}");
                 }
@@ -487,8 +511,7 @@ namespace osu.Game.Database
         /// <param name="action">The work to run.</param>
         public Task WriteAsync(Action<Realm> action)
         {
-            if (isDisposed)
-                throw new ObjectDisposedException(nameof(RealmAccess));
+            ObjectDisposedException.ThrowIf(isDisposed, this);
 
             // Required to ensure the write is tracked and accounted for before disposal.
             // Can potentially be avoided if we have a need to do so in the future.
@@ -673,8 +696,7 @@ namespace osu.Game.Database
 
         private Realm getRealmInstance()
         {
-            if (isDisposed)
-                throw new ObjectDisposedException(nameof(RealmAccess));
+            ObjectDisposedException.ThrowIf(isDisposed, this);
 
             bool tookSemaphoreLock = false;
 
@@ -1095,6 +1117,26 @@ namespace osu.Game.Database
 
                     break;
                 }
+
+                case 39:
+                    foreach (var b in migration.NewRealm.All<BeatmapInfo>())
+                    {
+                        // Either actually no objects, or processing ran and failed.
+                        // Reset to -1 so the next time they become zero we know that processing was attempted.
+                        if (b.TotalObjectCount == 0 && b.EndTimeObjectCount == 0)
+                        {
+                            b.TotalObjectCount = -1;
+                            b.EndTimeObjectCount = -1;
+                        }
+                    }
+
+                    break;
+
+                case 41:
+                    foreach (var score in migration.NewRealm.All<ScoreInfo>())
+                        LegacyScoreDecoder.PopulateTotalScoreWithoutMods(score);
+
+                    break;
             }
 
             Logger.Log($"Migration completed in {stopwatch.ElapsedMilliseconds}ms");
@@ -1128,33 +1170,18 @@ namespace osu.Game.Database
         {
             Logger.Log($"Creating full realm database backup at {backupFilename}", LoggingTarget.Database);
 
-            int attempts = 10;
-
-            while (true)
+            FileUtils.AttemptOperation(() =>
             {
-                try
+                using (var source = storage.GetStream(Filename, mode: FileMode.Open))
                 {
-                    using (var source = storage.GetStream(Filename, mode: FileMode.Open))
-                    {
-                        // source may not exist.
-                        if (source == null)
-                            return;
+                    // source may not exist.
+                    if (source == null)
+                        return;
 
-                        using (var destination = storage.GetStream(backupFilename, FileAccess.Write, FileMode.CreateNew))
-                            source.CopyTo(destination);
-                    }
-
-                    return;
+                    using (var destination = storage.GetStream(backupFilename, FileAccess.Write, FileMode.CreateNew))
+                        source.CopyTo(destination);
                 }
-                catch (IOException)
-                {
-                    if (attempts-- <= 0)
-                        throw;
-
-                    // file may be locked during use.
-                    Thread.Sleep(500);
-                }
-            }
+            }, 20);
         }
 
         /// <summary>
@@ -1173,8 +1200,7 @@ namespace osu.Game.Database
             if (!ThreadSafety.IsUpdateThread)
                 throw new InvalidOperationException(@$"{nameof(BlockAllOperations)} must be called from the update thread.");
 
-            if (isDisposed)
-                throw new ObjectDisposedException(nameof(RealmAccess));
+            ObjectDisposedException.ThrowIf(isDisposed, this);
 
             SynchronizationContext? syncContext = null;
 

@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using NUnit.Framework;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -46,6 +47,16 @@ namespace osu.Game.Tests.Visual.Ranking
         }
 
         [Test]
+        public void TestOsuRankHidden()
+        {
+            addCircleStep(createScore(0, new OsuRuleset(), 20, true));
+            addCircleStep(createScore(0.8, new OsuRuleset(), 5, true));
+            addCircleStep(createScore(0.95, new OsuRuleset(), 0, true));
+            addCircleStep(createScore(0.97, new OsuRuleset(), 1, true));
+            addCircleStep(createScore(1, new OsuRuleset(), 0, true));
+        }
+
+        [Test]
         public void TestCatchRank()
         {
             addCircleStep(createScore(0, new CatchRuleset()));
@@ -65,7 +76,7 @@ namespace osu.Game.Tests.Visual.Ranking
             addCircleStep(createScore(1, new CatchRuleset()));
         }
 
-        private void addCircleStep(ScoreInfo score) => AddStep($"add panel ({score.DisplayAccuracy})", () =>
+        private void addCircleStep(ScoreInfo score) => AddStep($"add panel ({score.DisplayAccuracy}, {score.Statistics.GetValueOrDefault(HitResult.Miss)} miss)", () =>
         {
             Children = new Drawable[]
             {
@@ -92,9 +103,21 @@ namespace osu.Game.Tests.Visual.Ranking
             };
         });
 
-        private ScoreInfo createScore(double accuracy, Ruleset ruleset)
+        private ScoreInfo createScore(double accuracy, Ruleset ruleset, int missCount = 0, bool hidden = false)
         {
             var scoreProcessor = ruleset.CreateScoreProcessor();
+
+            var statistics = new Dictionary<HitResult, int>
+            {
+                { HitResult.Miss, missCount },
+                { HitResult.Meh, 50 },
+                { HitResult.Good, 100 },
+                { HitResult.Great, 300 },
+            };
+
+            var mods = hidden
+                ? new[] { new OsuModHidden() }
+                : new Mod[] { new OsuModHardRock(), new OsuModDoubleTime() };
 
             return new ScoreInfo
             {
@@ -105,19 +128,13 @@ namespace osu.Game.Tests.Visual.Ranking
                 },
                 BeatmapInfo = new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo,
                 Ruleset = ruleset.RulesetInfo,
-                Mods = new Mod[] { new OsuModHardRock(), new OsuModDoubleTime() },
+                Mods = mods,
                 TotalScore = 2845370,
                 Accuracy = accuracy,
                 MaxCombo = 999,
-                Rank = scoreProcessor.RankFromAccuracy(accuracy),
+                Rank = scoreProcessor.RankFromScore(accuracy, statistics),
                 Date = DateTimeOffset.Now,
-                Statistics =
-                {
-                    { HitResult.Miss, 1 },
-                    { HitResult.Meh, 50 },
-                    { HitResult.Good, 100 },
-                    { HitResult.Great, 300 },
-                }
+                Statistics = statistics,
             };
         }
     }

@@ -243,7 +243,9 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
 
                         bodySprite.FillMode = FillMode.Stretch;
                         // i dunno this looks about right??
-                        bodySprite.Scale = new Vector2(1, scaleDirection * 32800 / sprite.DrawHeight);
+                        // the guard against zero draw height is intended for zero-length hold notes. yes, such cases have been spotted in the wild.
+                        if (sprite.DrawHeight > 0)
+                            bodySprite.Scale = new Vector2(1, scaleDirection * 32800 / sprite.DrawHeight);
                     }
 
                     break;

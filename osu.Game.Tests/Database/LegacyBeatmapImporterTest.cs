@@ -12,6 +12,7 @@ using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.IO;
+using osu.Game.Rulesets;
 using osu.Game.Tests.Resources;
 
 namespace osu.Game.Tests.Database
@@ -77,6 +78,7 @@ namespace osu.Game.Tests.Database
             {
                 using (HeadlessGameHost host = new CleanRunHeadlessGameHost())
                 using (var tmpStorage = new TemporaryNativeStorage("stable-songs-folder"))
+                using (new RealmRulesetStore(realm, storage))
                 {
                     var stableStorage = new StableStorage(tmpStorage.GetFullPath(""), host);
                     var songsStorage = stableStorage.GetStorageForDirectory(StableStorage.STABLE_DEFAULT_SONGS_PATH);

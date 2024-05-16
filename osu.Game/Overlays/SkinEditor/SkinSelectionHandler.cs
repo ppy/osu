@@ -23,6 +23,8 @@ namespace osu.Game.Overlays.SkinEditor
 {
     public partial class SkinSelectionHandler : SelectionHandler<ISerialisableDrawable>
     {
+        private OsuMenuItem originMenu = null!;
+
         [Resolved]
         private SkinEditor skinEditor { get; set; } = null!;
 
@@ -137,7 +139,7 @@ namespace osu.Game.Overlays.SkinEditor
                 var drawableItem = (Drawable)b.Item;
 
                 // each drawable's relative position should be maintained in the scaled quad.
-                var screenPosition = b.ScreenSpaceSelectionPoint;
+                var screenPosition = drawableItem.ToScreenSpace(drawableItem.OriginPosition);
 
                 var relativePositionInOriginal =
                     new Vector2(
@@ -202,17 +204,22 @@ namespace osu.Game.Overlays.SkinEditor
                 var item = c.Item;
                 Drawable drawable = (Drawable)item;
 
+                if (!item.UsesFixedAnchor)
+                    ApplyClosestAnchorOrigin(drawable);
+
                 drawable.Position += drawable.ScreenSpaceDeltaToParentSpace(moveEvent.ScreenSpaceDelta);
-
-                if (item.UsesFixedAnchor) continue;
-
-                ApplyClosestAnchor(drawable);
             }
 
             return true;
         }
 
-        public static void ApplyClosestAnchor(Drawable drawable) => applyAnchor(drawable, getClosestAnchor(drawable));
+        public static void ApplyClosestAnchorOrigin(Drawable drawable)
+        {
+            var closest = getClosestAnchor(drawable);
+
+            applyAnchor(drawable, closest);
+            applyOrigin(drawable, closest);
+        }
 
         protected override void OnSelectionChanged()
         {
@@ -243,10 +250,15 @@ namespace osu.Game.Overlays.SkinEditor
                         .ToArray()
             };
 
-            yield return new OsuMenuItem("Origin")
+            yield return originMenu = new OsuMenuItem("Origin");
+
+            closestItem.State.BindValueChanged(s =>
             {
-                Items = createAnchorItems((d, o) => ((Drawable)d).Origin == o, applyOrigins).ToArray()
-            };
+                // For UX simplicity, origin should only be user-editable when "closest" anchor mode is disabled.
+                originMenu.Items = s.NewValue == TernaryState.True
+                    ? Array.Empty<MenuItem>()
+                    : createAnchorItems((d, o) => ((Drawable)d).Origin == o, applyOrigins).ToArray();
+            }, true);
 
             yield return new OsuMenuItemSpacer();
 
@@ -325,15 +337,10 @@ namespace osu.Game.Overlays.SkinEditor
             {
                 var drawable = (Drawable)item;
 
-                if (origin == drawable.Origin) continue;
+                applyOrigin(drawable, origin);
 
-                var previousOrigin = drawable.OriginPosition;
-                drawable.Origin = origin;
-                drawable.Position += drawable.OriginPosition - previousOrigin;
-
-                if (item.UsesFixedAnchor) continue;
-
-                ApplyClosestAnchor(drawable);
+                if (!item.UsesFixedAnchor)
+                    ApplyClosestAnchorOrigin(drawable);
             }
 
             OnOperationEnded();
@@ -368,7 +375,7 @@ namespace osu.Game.Overlays.SkinEditor
             foreach (var item in SelectedItems)
             {
                 item.UsesFixedAnchor = false;
-                ApplyClosestAnchor((Drawable)item);
+                ApplyClosestAnchorOrigin((Drawable)item);
             }
 
             OnOperationEnded();
@@ -412,6 +419,15 @@ namespace osu.Game.Overlays.SkinEditor
             var previousAnchor = drawable.AnchorPosition;
             drawable.Anchor = anchor;
             drawable.Position -= drawable.AnchorPosition - previousAnchor;
+        }
+
+        private static void applyOrigin(Drawable drawable, Anchor origin)
+        {
+            if (origin == drawable.Origin) return;
+
+            var previousOrigin = drawable.OriginPosition;
+            drawable.Origin = origin;
+            drawable.Position += drawable.OriginPosition - previousOrigin;
         }
 
         private static void adjustScaleFromAnchor(ref Vector2 scale, Anchor reference)

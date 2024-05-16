@@ -124,7 +124,7 @@ namespace osu.Game.Overlays.Changelog
             {
                 Title = PageTitleStrings.MainChangelogControllerDefault;
                 Description = NamedOverlayComponentStrings.ChangelogDescription;
-                Icon = HexaconsIcons.Devtools;
+                Icon = OsuIcon.ChangelogB;
             }
         }
     }
