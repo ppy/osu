@@ -37,7 +37,7 @@ namespace osu.Game.Overlays.Mods
                 Anchor = Anchor.BottomRight,
                 AutoSizeAxes = Axes.X,
                 Height = ShearedButton.DEFAULT_HEIGHT,
-                Shear = new Vector2(ShearedOverlayContainer.SHEAR, 0),
+                Shear = new Vector2(OsuGame.SHEAR, 0),
                 CornerRadius = ShearedButton.CORNER_RADIUS,
                 BorderThickness = ShearedButton.BORDER_THICKNESS,
                 Masking = true,

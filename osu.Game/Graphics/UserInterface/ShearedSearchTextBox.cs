@@ -53,7 +53,7 @@ namespace osu.Game.Graphics.UserInterface
         public ShearedSearchTextBox()
         {
             Height = 42;
-            Shear = new Vector2(ShearedOverlayContainer.SHEAR, 0);
+            Shear = new Vector2(OsuGame.SHEAR, 0);
             Masking = true;
             CornerRadius = corner_radius;
 
@@ -116,7 +116,7 @@ namespace osu.Game.Graphics.UserInterface
                 PlaceholderText = CommonStrings.InputSearch;
 
                 CornerRadius = corner_radius;
-                TextContainer.Shear = new Vector2(-ShearedOverlayContainer.SHEAR, 0);
+                TextContainer.Shear = new Vector2(-OsuGame.SHEAR, 0);
             }
 
             protected override SpriteText CreatePlaceholder() => new SearchPlaceholder();

@@ -67,7 +67,7 @@ namespace osu.Game.Graphics.UserInterface
         private readonly Box background;
         private readonly OsuSpriteText text;
 
-        private const float shear = ShearedOverlayContainer.SHEAR;
+        private const float shear = OsuGame.SHEAR;
 
         private Colour4? darkerColour;
         private Colour4? lighterColour;
