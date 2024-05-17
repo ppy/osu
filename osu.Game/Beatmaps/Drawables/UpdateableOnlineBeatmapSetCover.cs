@@ -43,7 +43,11 @@ namespace osu.Game.Beatmaps.Drawables
         protected override double TransformDuration => 400;
 
         protected override DelayedLoadWrapper CreateDelayedLoadWrapper(Func<Drawable> createContentFunc, double timeBeforeLoad)
-            => new DelayedLoadUnloadWrapper(createContentFunc, timeBeforeLoad);
+            => new DelayedLoadUnloadWrapper(createContentFunc, timeBeforeLoad)
+            {
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+            };
 
         protected override Drawable CreateDrawable(IBeatmapSetOnlineInfo model)
         {
