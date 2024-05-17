@@ -70,9 +70,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                     sliderStreamBonus *= Math.Pow(Math.Min(osuCurrObj.StrainTime, osuPrevObj.StrainTime) / Math.Max(osuCurrObj.StrainTime, osuPrevObj.StrainTime), 2);
 
                 // Punish too short sliders to prevent cheesing (cheesing is still possible, but it's very rare)
-                double sliderLength = 2 * slider.Velocity * slider.SpanDuration;
-                if (sliderLength < slider.Radius)
-                    sliderStreamBonus *= sliderLength / slider.Radius;
+                double sliderLength = slider.Velocity * slider.SpanDuration;
+                if (sliderLength < slider.Radius / 2)
+                    sliderStreamBonus *= sliderLength / (slider.Radius / 2);
 
                 sliderStreamMultiplier += sliderStreamBonus;
             }
