@@ -133,7 +133,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 // Reward more if sliders and circles are alternating (actually it's still lower than several sliders in a row)
                 if (osuLastLastObj.BaseObject is HitCircle)
                 {
-                    double alternatingBonus = 0.5 * slider_jump_multiplier * osuLastObj.JumpDistance / osuLastObj.StrainTime;
+                    double alternatingBonus = slider_jump_multiplier * osuLastObj.JumpDistance / osuLastObj.StrainTime;
 
                     if (osuLastObj.StrainTime > osuLastLastObj.StrainTime)
                         alternatingBonus *= Math.Pow(Math.Min(osuCurrObj.StrainTime, osuLastObj.StrainTime) / Math.Max(osuCurrObj.StrainTime, osuLastObj.StrainTime), 2);
