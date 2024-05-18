@@ -88,6 +88,84 @@ namespace osu.Game.Tests.Visual.SongSelect
         }
 
         [Test]
+        public void TestSpeedChange()
+        {
+            createSongSelect();
+            changeMods();
+
+            AddStep("decreasing speed without mods", () => songSelect?.ChangeSpeed(-0.05));
+            AddAssert("halftime at 0.95", () => songSelect!.Mods.Value.Single() is ModHalfTime mod && mod.SpeedChange.Value == 0.95);
+
+            AddStep("decreasing speed with halftime", () => songSelect?.ChangeSpeed(-0.05));
+            AddAssert("halftime at 0.9", () => songSelect!.Mods.Value.Single() is ModHalfTime mod && mod.SpeedChange.Value == 0.9);
+
+            AddStep("increasing speed with halftime", () => songSelect?.ChangeSpeed(+0.05));
+            AddAssert("halftime at 0.95", () => songSelect!.Mods.Value.Single() is ModHalfTime mod && mod.SpeedChange.Value == 0.95);
+
+            AddStep("increasing speed with halftime to nomod", () => songSelect?.ChangeSpeed(+0.05));
+            AddAssert("no mods selected", () => songSelect!.Mods.Value.Count == 0);
+
+            AddStep("increasing speed without mods", () => songSelect?.ChangeSpeed(+0.05));
+            AddAssert("doubletime at 1.05", () => songSelect!.Mods.Value.Single() is ModDoubleTime mod && mod.SpeedChange.Value == 1.05);
+
+            AddStep("increasing speed with doubletime", () => songSelect?.ChangeSpeed(+0.05));
+            AddAssert("doubletime at 1.1", () => songSelect!.Mods.Value.Single() is ModDoubleTime mod && mod.SpeedChange.Value == 1.1);
+
+            AddStep("decreasing speed with doubletime", () => songSelect?.ChangeSpeed(-0.05));
+            AddAssert("doubletime at 1.05", () => songSelect!.Mods.Value.Single() is ModDoubleTime mod && mod.SpeedChange.Value == 1.05);
+
+            OsuModNightcore nc = new OsuModNightcore
+            {
+                SpeedChange = { Value = 1.05 }
+            };
+            changeMods(nc);
+            AddStep("increasing speed with nightcore", () => songSelect?.ChangeSpeed(+0.05));
+            AddAssert("nightcore at 1.1", () => songSelect!.Mods.Value.Single() is ModNightcore mod && mod.SpeedChange.Value == 1.1);
+
+            AddStep("decreasing speed with nightcore", () => songSelect?.ChangeSpeed(-0.05));
+            AddAssert("doubletime at 1.05", () => songSelect!.Mods.Value.Single() is ModNightcore mod && mod.SpeedChange.Value == 1.05);
+
+            AddStep("decreasing speed with nightcore to nomod", () => songSelect?.ChangeSpeed(-0.05));
+            AddAssert("no mods selected", () => songSelect!.Mods.Value.Count == 0);
+
+            AddStep("decreasing speed nomod, nightcore was selected", () => songSelect?.ChangeSpeed(-0.05));
+            AddAssert("daycore at 0.95", () => songSelect!.Mods.Value.Single() is ModDaycore mod && mod.SpeedChange.Value == 0.95);
+
+            AddStep("decreasing speed with daycore", () => songSelect?.ChangeSpeed(-0.05));
+            AddAssert("daycore at 0.9", () => songSelect!.Mods.Value.Single() is ModDaycore mod && mod.SpeedChange.Value == 0.9);
+
+            AddStep("increasing speed with daycore", () => songSelect?.ChangeSpeed(0.05));
+            AddAssert("daycore at 0.95", () => songSelect!.Mods.Value.Single() is ModDaycore mod && mod.SpeedChange.Value == 0.95);
+
+            OsuModDoubleTime dt = new OsuModDoubleTime
+            {
+                SpeedChange = { Value = 1.02 },
+                AdjustPitch = { Value = true },
+            };
+            changeMods(dt);
+            AddStep("decreasing speed from doubletime 1.02 with adjustpitch enabled", () => songSelect?.ChangeSpeed(-0.05));
+            AddAssert("halftime at 0.97 with adjustpitch enabled", () => songSelect!.Mods.Value.Single() is ModHalfTime mod && mod.SpeedChange.Value == 0.97 && mod.AdjustPitch.Value);
+
+            OsuModHalfTime ht = new OsuModHalfTime
+            {
+                SpeedChange = { Value = 0.97 },
+                AdjustPitch = { Value = true },
+            };
+            Mod[] modlist = { ht, new OsuModHardRock(), new OsuModHidden() };
+            changeMods(modlist);
+            AddStep("decreasing speed from halftime 0.97 with adjustpitch enabled, HDHR enabled", () => songSelect?.ChangeSpeed(0.05));
+            AddAssert("doubletime at 1.02 with adjustpitch enabled, HDHR still enabled", () => songSelect!.Mods.Value.Count(mod => (mod is ModDoubleTime modDt && modDt.AdjustPitch.Value && modDt.SpeedChange.Value == 1.02) || mod is ModHardRock || mod is ModHidden) == 3);
+
+            changeMods(new ModWindUp());
+            AddStep("windup active, trying to change speed", () => songSelect?.ChangeSpeed(0.05));
+            AddAssert("windup still active", () => songSelect!.Mods.Value.First() is ModWindUp);
+
+            changeMods(new ModAdaptiveSpeed());
+            AddStep("adaptivespeed active, trying to change speed", () => songSelect?.ChangeSpeed(0.05));
+            AddAssert("adaptivespeed still active", () => songSelect!.Mods.Value.First() is ModAdaptiveSpeed);
+        }
+
+        [Test]
         public void TestPlaceholderBeatmapPresence()
         {
             createSongSelect();
