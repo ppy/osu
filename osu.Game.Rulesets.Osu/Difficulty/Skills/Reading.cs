@@ -119,8 +119,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
     public class ReadingHighAR : GraphSkill
     {
 
-        private const double component_multiplier = 0.135;
-        private const double component_default_value_multiplier = 60;
+        private const double skill_multiplier = 0.13727;
+        private const double component_default_value_multiplier = 445;
         public ReadingHighAR(Mod[] mods)
             : base(mods)
         {
@@ -132,7 +132,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private HighARSpeedComponent speedComponent;
 
         private readonly List<double> difficulties = new List<double>();
+
         private int objectsCount = 0;
+        private double objectsPreemptSum = 0;
 
         public override void Process(DifficultyHitObject current)
         {
@@ -140,7 +142,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             speedComponent.Process(current);
 
             if (current.BaseObject is not Spinner)
+            {
                 objectsCount++;
+                objectsPreemptSum += ((OsuDifficultyHitObject)current).Preempt;
+            }
 
             double power = OsuDifficultyCalculator.SUM_POWER;
             double mergedDifficulty = Math.Pow(
@@ -164,8 +169,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         public override double DifficultyValue()
         {
             // Simulating summing to get the most correct value possible
-            double aimValue = Math.Sqrt(aimComponent.DifficultyValue()) * OsuDifficultyCalculator.DIFFICULTY_MULTIPLIER;
-            double speedValue = Math.Sqrt(speedComponent.DifficultyValue()) * OsuDifficultyCalculator.DIFFICULTY_MULTIPLIER;
+            double aimValue = Math.Sqrt(aimComponent.DifficultyValue() * skill_multiplier) * OsuDifficultyCalculator.DIFFICULTY_MULTIPLIER;
+            double speedValue = Math.Sqrt(speedComponent.DifficultyValue() * skill_multiplier) * OsuDifficultyCalculator.DIFFICULTY_MULTIPLIER;
 
             double aimPerformance = OsuStrainSkill.DifficultyToPerformance(aimValue);
             double speedPerformance = OsuStrainSkill.DifficultyToPerformance(speedValue);
@@ -173,13 +178,25 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             double power = OsuDifficultyCalculator.SUM_POWER;
             double totalPerformance = Math.Pow(Math.Pow(aimPerformance, power) + Math.Pow(speedPerformance, power), 1.0 / power);
 
-            // Length bonus is in SR to not inflate Star Rating short AR11 maps
+            // Length bonus is in SR to not inflate Star Rating of short AR11 maps
             double lengthBonus = OsuPerformanceCalculator.CalculateDefaultLengthBonus(objectsCount);
-            totalPerformance *= Math.Pow(lengthBonus, 4); // make it bypass sqrt
+
+            // Get average preempt of objects
+            double averagePreempt = objectsPreemptSum / objectsCount / 1000;
+
+            // Increase length bonus for long maps with very high AR
+            // https://www.desmos.com/calculator/wz9wckqgzu
+            double lengthBonusPower = 2 + 2 * Math.Pow(0.1, Math.Pow(2.3 * averagePreempt, 8));
+
+            // Be sure that increasing AR won't decrease pp
+            if (lengthBonus < 1) lengthBonusPower = 2;
+
+            totalPerformance *= Math.Pow(lengthBonus, lengthBonusPower);
 
             double adjustedDifficulty = OsuStrainSkill.PerformanceToDifficulty(totalPerformance);
             double difficultyValue = Math.Pow(adjustedDifficulty / OsuDifficultyCalculator.DIFFICULTY_MULTIPLIER, 2.0);
 
+            // Sqrt value to make difficulty depend less on mechanical difficulty
             return 53.2 * Math.Sqrt(difficultyValue);
         }
 
@@ -190,7 +207,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             {
             }
 
-            protected new double SkillMultiplier => base.SkillMultiplier * component_multiplier;
+            protected new double SkillMultiplier => base.SkillMultiplier;
 
             protected override double StrainValueAt(DifficultyHitObject current)
             {
@@ -212,7 +229,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             {
             }
 
-            protected new double SkillMultiplier => base.SkillMultiplier * component_multiplier;
+            protected new double SkillMultiplier => base.SkillMultiplier;
 
             protected override double StrainValueAt(DifficultyHitObject current)
             {

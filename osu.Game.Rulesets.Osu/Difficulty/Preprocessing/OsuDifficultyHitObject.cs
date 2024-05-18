@@ -193,7 +193,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             var readingObjects = new List<ReadingObject>(visibleObjects.Count);
             OverlapValues = new Dictionary<int, double>();
 
-            //foreach (var loopObj in visibleObjects)
             for (int loopIndex = 0; loopIndex < visibleObjects.Count; loopIndex++)
             {
                 var loopObj = visibleObjects[loopIndex];
@@ -438,7 +437,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
         public double OpacityAt(double time, bool hidden)
         {
-            var baseObject = BaseObject; // Optimization
+            var baseObject = BaseObject;
 
             if (time > baseObject.StartTime)
             {
