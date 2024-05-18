@@ -27,6 +27,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
 using osu.Game.Localisation;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Screens.Select;
 using osu.Game.Utils;
 using osuTK;
 using osuTK.Input;
@@ -62,6 +63,9 @@ namespace osu.Game.Overlays.Mods
             new Bindable<Dictionary<ModType, IReadOnlyList<ModState>>>(new Dictionary<ModType, IReadOnlyList<ModState>>());
 
         private Func<Mod, bool> isValidMod = _ => true;
+
+        [Resolved]
+        private SongSelect? songSelect { get; set; }
 
         /// <summary>
         /// A function determining whether each mod in the column should be displayed.
@@ -752,6 +756,14 @@ namespace osu.Game.Overlays.Mods
 
                     return true;
                 }
+
+                case GlobalAction.IncreaseSpeed:
+                    songSelect!.ChangeSpeed(0.05);
+                    return true;
+
+                case GlobalAction.DecreaseSpeed:
+                    songSelect!.ChangeSpeed(-0.05);
+                    return true;
             }
 
             return base.OnPressed(e);
