@@ -15,15 +15,16 @@ using osu.Game.Overlays.Mods;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
-using osu.Game.Screens.Select.FooterV2;
+using osu.Game.Screens.Footer;
+using osu.Game.Screens.SelectV2.Footer;
 using osuTK.Input;
 
-namespace osu.Game.Tests.Visual.SongSelect
+namespace osu.Game.Tests.Visual.UserInterface
 {
-    public partial class TestSceneSongSelectFooterV2 : OsuManualInputManagerTestScene
+    public partial class TestSceneScreenFooter : OsuManualInputManagerTestScene
     {
-        private FooterButtonRandomV2 randomButton = null!;
-        private FooterButtonModsV2 modsButton = null!;
+        private ScreenFooterButtonRandom randomButton = null!;
+        private ScreenFooterButtonMods modsButton = null!;
 
         private bool nextRandomCalled;
         private bool previousRandomCalled;
@@ -39,25 +40,25 @@ namespace osu.Game.Tests.Visual.SongSelect
             nextRandomCalled = false;
             previousRandomCalled = false;
 
-            FooterV2 footer;
+            ScreenFooter footer;
 
             Children = new Drawable[]
             {
                 new PopoverContainer
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Child = footer = new FooterV2(),
+                    Child = footer = new ScreenFooter(),
                 },
                 overlay = new DummyOverlay()
             };
 
-            footer.AddButton(modsButton = new FooterButtonModsV2 { Current = SelectedMods }, overlay);
-            footer.AddButton(randomButton = new FooterButtonRandomV2
+            footer.AddButton(modsButton = new ScreenFooterButtonMods { Current = SelectedMods }, overlay);
+            footer.AddButton(randomButton = new ScreenFooterButtonRandom
             {
                 NextRandom = () => nextRandomCalled = true,
                 PreviousRandom = () => previousRandomCalled = true
             });
-            footer.AddButton(new FooterButtonOptionsV2());
+            footer.AddButton(new ScreenFooterButtonOptions());
 
             overlay.Hide();
         });
@@ -98,7 +99,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         {
             AddStep("enable options", () =>
             {
-                var optionsButton = this.ChildrenOfType<FooterButtonV2>().Last();
+                var optionsButton = this.ChildrenOfType<ScreenFooterButton>().Last();
 
                 optionsButton.Enabled.Value = true;
                 optionsButton.TriggerClick();
@@ -108,7 +109,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         [Test]
         public void TestState()
         {
-            AddToggleStep("set options enabled state", state => this.ChildrenOfType<FooterButtonV2>().Last().Enabled.Value = state);
+            AddToggleStep("set options enabled state", state => this.ChildrenOfType<ScreenFooterButton>().Last().Enabled.Value = state);
         }
 
         [Test]
