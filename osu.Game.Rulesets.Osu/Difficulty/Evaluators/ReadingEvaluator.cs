@@ -122,8 +122,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             return result;
         }
 
-        // High AR curve
-        // https://www.desmos.com/calculator/srzbeumngi
+        // High AR curve (this curve is without Math.Pow(value, 2))
+        // https://www.desmos.com/calculator/xuuwd77cbq
         public static double GetDifficulty(double preempt)
         {
             // Get preempt in seconds
@@ -136,8 +136,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 value = Math.Exp(9.07583 - 80.0 * preempt / 3);
 
             // The power is 2 times higher to compensate sqrt in high AR skill
-            // EDIT: looks like AR11 getting a bit overnerfed in comparison to other ARs, so i will increase the difference
-            return Math.Pow(value, 2.2);
+            return Math.Pow(value, 2);
         }
     }
 }

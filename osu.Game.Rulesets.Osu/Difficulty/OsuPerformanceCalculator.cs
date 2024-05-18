@@ -70,10 +70,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             // Cognition
 
             // Get HDFL value for capping reading performance
-            // In theory stuff like AR13, AR13 +HD and AR-INF +HD should use this values
-            // While AR-INF without HD shoud use normal flashlight values
-            // Because in first case you're clicking air, while in AR-INF case you're see the notes
-            // But implementing it is pretty annoying, so I left it "as is"
+            // In the future consider separating "all notes all invisible" and "full-memory but notes are visible" case
             double potentialHiddenFlashlightValue = computeFlashlightValue(score, osuAttributes, true);
 
             double highARValue = computeReadingHighARValue(score, osuAttributes);
@@ -240,7 +237,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         private double computeFlashlightValue(ScoreInfo score, OsuDifficultyAttributes attributes, bool alwaysUseHD = false)
         {
-            double flashlightValue = Math.Pow(alwaysUseHD ? attributes.HiddenFlashlightDifficulty : attributes.FlashlightDifficulty, 2.0) * 25.0;
+            double flashlightValue = Flashlight.DifficultyToPerformance(alwaysUseHD ? attributes.HiddenFlashlightDifficulty : attributes.FlashlightDifficulty);
 
             // Penalize misses by assessing # of misses relative to the total # of objects. Default a 3% reduction for any # of misses.
             if (effectiveMissCount > 0)
@@ -344,11 +341,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         private double getComboScalingFactor(OsuDifficultyAttributes attributes) => attributes.MaxCombo <= 0 ? 1.0 : Math.Min(Math.Pow(scoreMaxCombo, 0.8) / Math.Pow(attributes.MaxCombo, 0.8), 1.0);
         private int totalHits => countGreat + countOk + countMeh + countMiss;
 
-        // Adjusts cognition performance accounting for full-memory
-        public static double AdjustCognitionPerformance(double cognitionPerformance, double mechanicalPerformance, double flaslightPerformance)
+        // Limits reading difficulty by the difficulty of full-memorisation (assumed to be mechanicalPerformance + flashlightPerformance + 25)
+        // Desmos graph assuming that x = cognitionPerformance, while y = mechanicalPerformance + flaslightPerformance
+        // https://www.desmos.com/3d/vjygrxtkqs
+        public static double AdjustCognitionPerformance(double cognitionPerformance, double mechanicalPerformance, double flashlightPerformance)
         {
             // Assuming that less than 25 mechanical pp is not worthy for memory
-            double capPerformance = mechanicalPerformance + flaslightPerformance + 25;
+            double capPerformance = mechanicalPerformance + flashlightPerformance + 25;
 
             double ratio = cognitionPerformance / capPerformance;
             if (ratio > 50) return capPerformance;
