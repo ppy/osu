@@ -99,6 +99,9 @@ namespace osu.Game.Screens.Select
         };
 
         [Resolved]
+        private OsuGameBase? game { get; set; }
+
+        [Resolved]
         private Bindable<IReadOnlyList<Mod>> selectedMods { get; set; } = null!;
 
         protected BeatmapCarousel Carousel { get; private set; } = null!;
@@ -143,6 +146,10 @@ namespace osu.Game.Screens.Select
         internal IOverlayManager? OverlayManager { get; private set; }
 
         private Bindable<bool> configBackgroundBlur = null!;
+
+        private bool lastPitchState;
+
+        private bool usedPitchMods;
 
         [BackgroundDependencyLoader(true)]
         private void load(AudioManager audio, OsuColour colours, ManageCollectionsDialog? manageCollectionsDialog, DifficultyRecommender? recommender, OsuConfigManager config)
@@ -809,94 +816,123 @@ namespace osu.Game.Screens.Select
             return false;
         }
 
-        private void increaseSpeed()
+        public void ChangeSpeed(double delta)
         {
-            var rateAdjustStates = ModSelect.AllAvailableMods.Where(pair => pair.Mod is ModRateAdjust);
-            var stateDoubleTime = ModSelect.AllAvailableMods.First(pair => pair.Mod is ModDoubleTime);
-            bool rateModActive = ModSelect.AllAvailableMods.Count(pair => pair.Mod is ModRateAdjust && pair.Active.Value) > 0;
-            const double stepsize = 0.05d;
-            double newRate = 1d + stepsize;
+            // Mod Change from 0.95 DC to 1.0 none to 1.05 DT/NC ?
 
-            // If no mod rateAdjust mod is currently active activate DoubleTime with speed newRate
-            if (!rateModActive)
-            {
-                stateDoubleTime.Active.Value = true;
-                ((ModDoubleTime)stateDoubleTime.Mod).SpeedChange.Value = newRate;
+            if (game == null) return;
+
+            ModNightcore modNc = (ModNightcore)((MultiMod)game.AvailableMods.Value[ModType.DifficultyIncrease].First(mod => mod is MultiMod multiMod && multiMod.Mods.Count(modType => modType is ModNightcore) > 0)).Mods.First(mod => mod is ModNightcore);
+            ModDoubleTime modDt = (ModDoubleTime)((MultiMod)game.AvailableMods.Value[ModType.DifficultyIncrease].First(mod => mod is MultiMod multiMod && multiMod.Mods.Count(modType => modType is ModDoubleTime) > 0)).Mods.First(mod => mod is ModDoubleTime);
+            ModDaycore modDc = (ModDaycore)((MultiMod)game.AvailableMods.Value[ModType.DifficultyReduction].First(mod => mod is MultiMod multiMod && multiMod.Mods.Count(modType => modType is ModDaycore) > 0)).Mods.First(mod => mod is ModDaycore);
+            ModHalfTime modHt = (ModHalfTime)((MultiMod)game.AvailableMods.Value[ModType.DifficultyReduction].First(mod => mod is MultiMod multiMod && multiMod.Mods.Count(modType => modType is ModHalfTime) > 0)).Mods.First(mod => mod is ModHalfTime);
+            bool rateModActive = selectedMods.Value.Count(mod => mod is ModRateAdjust) > 0;
+            bool incompatiableModActive = selectedMods.Value.Count(mod => modDt.IncompatibleMods.Count(incompatibleMod => (mod.GetType().IsSubclassOf(incompatibleMod) || mod.GetType() == incompatibleMod) && incompatibleMod != typeof(ModRateAdjust)) > 0) > 0;
+            double newRate = 1d + delta;
+            bool isPositive = delta > 0;
+
+            if (incompatiableModActive)
                 return;
-            }
 
-            // Find current active rateAdjust mod and modify speed, enable DoubleTime if necessary
-            foreach (var state in rateAdjustStates)
+            if (rateModActive)
             {
-                ModRateAdjust mod = (ModRateAdjust)state.Mod;
+                ModRateAdjust mod = (ModRateAdjust)selectedMods.Value.First(mod => mod is ModRateAdjust);
 
-                if (!state.Active.Value) continue;
+                // Find current active rateAdjust mod and modify speed, enable HalfTime if necessary
+                newRate = mod.SpeedChange.Value + delta;
 
-                newRate = mod.SpeedChange.Value + stepsize;
-
-                if (mod.Acronym == "DT" || mod.Acronym == "NC")
-                    mod.SpeedChange.Value = newRate;
-                else
+                if (newRate == 1.0)
                 {
-                    if (newRate == 1.0d)
-                        state.Active.Value = false;
+                    lastPitchState = false;
+                    usedPitchMods = false;
 
-                    if (newRate > 1d)
-                    {
-                        state.Active.Value = false;
-                        stateDoubleTime.Active.Value = true;
-                        ((ModDoubleTime)stateDoubleTime.Mod).SpeedChange.Value = newRate;
-                        break;
-                    }
+                    if (mod is ModDoubleTime dtmod && dtmod.AdjustPitch.Value) lastPitchState = true;
 
-                    if (newRate < 1d)
-                        mod.SpeedChange.Value = newRate;
+                    if (mod is ModHalfTime htmod && htmod.AdjustPitch.Value) lastPitchState = true;
+
+                    if (mod is ModNightcore || mod is ModDaycore) usedPitchMods = true;
+
+                    //Disable RateAdjustMods
+                    selectedMods.Value = selectedMods.Value.Where(search => search is not ModRateAdjust).ToList();
+                    return;
                 }
-            }
-        }
 
-        private void decreaseSpeed()
-        {
-            var rateAdjustStates = ModSelect.AllAvailableMods.Where(pair => pair.Mod is ModRateAdjust);
-            var stateHalfTime = ModSelect.AllAvailableMods.First(pair => pair.Mod is ModHalfTime);
-            bool rateModActive = ModSelect.AllAvailableMods.Count(pair => pair.Mod is ModRateAdjust && pair.Active.Value) > 0;
-            const double stepsize = 0.05d;
-            double newRate = 1d - stepsize;
-
-            // If no mod rateAdjust mod is currently active activate HalfTime with speed newRate
-            if (!rateModActive)
-            {
-                stateHalfTime.Active.Value = true;
-                ((ModHalfTime)stateHalfTime.Mod).SpeedChange.Value = newRate;
-                return;
-            }
-
-            // Find current active rateAdjust mod and modify speed, enable HalfTime if necessary
-            foreach (var state in rateAdjustStates)
-            {
-                ModRateAdjust mod = (ModRateAdjust)state.Mod;
-
-                if (!state.Active.Value) continue;
-
-                newRate = mod.SpeedChange.Value - stepsize;
-
-                if (mod.Acronym == "HT" || mod.Acronym == "DC")
-                    mod.SpeedChange.Value = newRate;
-                else
+                if (((mod is ModDoubleTime || mod is ModNightcore) && newRate < mod.SpeedChange.MinValue)
+                    || ((mod is ModHalfTime || mod is ModDaycore) && newRate > mod.SpeedChange.MaxValue))
                 {
-                    if (newRate == 1.0d)
-                        state.Active.Value = false;
+                    bool adjustPitch = (mod is ModDoubleTime dtmod && dtmod.AdjustPitch.Value) || (mod is ModHalfTime htmod && htmod.AdjustPitch.Value);
 
-                    if (newRate < 1d)
+                    //Disable RateAdjustMods
+                    selectedMods.Value = selectedMods.Value.Where(search => search is not ModRateAdjust).ToList();
+
+                    ModRateAdjust? oppositeMod = null;
+
+                    switch (mod)
                     {
-                        state.Active.Value = false;
-                        stateHalfTime.Active.Value = true;
-                        ((ModHalfTime)stateHalfTime.Mod).SpeedChange.Value = newRate;
-                        break;
+                        case ModDoubleTime:
+                            modHt.AdjustPitch.Value = adjustPitch;
+                            oppositeMod = modHt;
+                            break;
+
+                        case ModHalfTime:
+                            modDt.AdjustPitch.Value = adjustPitch;
+                            oppositeMod = modDt;
+                            break;
+
+                        case ModNightcore:
+                            oppositeMod = modDc;
+                            break;
+
+                        case ModDaycore:
+                            oppositeMod = modNc;
+                            break;
                     }
 
-                    if (newRate > 1d)
-                        mod.SpeedChange.Value = newRate;
+                    if (oppositeMod == null) return;
+
+                    oppositeMod.SpeedChange.Value = newRate;
+                    selectedMods.Value = selectedMods.Value.Append(oppositeMod).ToList();
+                    return;
+                }
+
+                if (newRate > mod.SpeedChange.MaxValue && (mod is ModDoubleTime || mod is ModNightcore))
+                    newRate = mod.SpeedChange.MaxValue;
+
+                if (newRate < mod.SpeedChange.MinValue && (mod is ModHalfTime || mod is ModDaycore))
+                    newRate = mod.SpeedChange.MinValue;
+
+                mod.SpeedChange.Value = newRate;
+            }
+            else
+            {
+                // If no ModRateAdjust is actived activate one
+                if (isPositive)
+                {
+                    if (!usedPitchMods)
+                    {
+                        modDt.SpeedChange.Value = newRate;
+                        modDt.AdjustPitch.Value = lastPitchState;
+                        selectedMods.Value = selectedMods.Value.Append(modDt).ToList();
+                    }
+                    else
+                    {
+                        modNc.SpeedChange.Value = newRate;
+                        selectedMods.Value = selectedMods.Value.Append(modNc).ToList();
+                    }
+                }
+                else
+                {
+                    if (!usedPitchMods)
+                    {
+                        modHt.SpeedChange.Value = newRate;
+                        modHt.AdjustPitch.Value = lastPitchState;
+                        selectedMods.Value = selectedMods.Value.Append(modHt).ToList();
+                    }
+                    else
+                    {
+                        modDc.SpeedChange.Value = newRate;
+                        selectedMods.Value = selectedMods.Value.Append(modDc).ToList();
+                    }
                 }
             }
         }
@@ -1111,11 +1147,11 @@ namespace osu.Game.Screens.Select
                     return true;
 
                 case GlobalAction.IncreaseSpeed:
-                    increaseSpeed();
+                    ChangeSpeed(0.05);
                     return true;
 
                 case GlobalAction.DecreaseSpeed:
-                    decreaseSpeed();
+                    ChangeSpeed(-0.05);
                     return true;
             }
 
