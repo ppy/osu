@@ -28,7 +28,7 @@ namespace osu.Game.Screens.Footer
 
         private readonly List<OverlayContainer> overlays = new List<OverlayContainer>();
 
-        private BackButtonV2 backButton = null!;
+        private ScreenBackButton backButton = null!;
         private FillFlowContainer<ScreenFooterButton> buttonsFlow = null!;
         private Container<ScreenFooterButton> removedButtonsContainer = null!;
         private LogoTrackingContainer logoTrackingContainer = null!;
@@ -71,7 +71,7 @@ namespace osu.Game.Screens.Footer
                     Spacing = new Vector2(7, 0),
                     AutoSizeAxes = Axes.Both
                 },
-                backButton = new BackButtonV2
+                backButton = new ScreenBackButton
                 {
                     Margin = new MarginPadding { Bottom = 10f, Left = 12f },
                     Anchor = Anchor.BottomLeft,
