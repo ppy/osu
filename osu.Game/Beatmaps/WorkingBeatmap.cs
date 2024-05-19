@@ -13,9 +13,11 @@ using System.Threading.Tasks;
 using JetBrains.Annotations;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Logging;
+using osu.Game.Audio;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.UI;
@@ -111,8 +113,19 @@ namespace osu.Game.Beatmaps
             waveform?.Dispose();
             waveform = null;
 
+            track.AddAdjustment(AdjustableProperty.Volume, TrackNormalizeVolume);
+
             return track;
         }
+
+        // Normalization is here because it's not so good to apply normalization in global state through MusicController or TrackStore.
+        // Each beatmap has its own track and its own track loudness value.
+        public readonly BindableDouble TrackNormalizeVolume = new BindableDouble(AudioNormalizationManager.FALLBACK_VOLUME);
+
+        public void EnableTrackNormlization()
+            => TrackNormalizeVolume.Value = BeatmapInfo.AudioNormalization?.IntegratedLoudnessInVolumeOffset ?? AudioNormalizationManager.FALLBACK_VOLUME;
+
+        public void DisableTrackNormalization() => TrackNormalizeVolume.Value = AudioNormalizationManager.FALLBACK_VOLUME;
 
         public void PrepareTrackForPreview(bool looping, double offsetFromPreviewPoint = 0)
         {

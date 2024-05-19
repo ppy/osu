@@ -348,8 +348,6 @@ namespace osu.Game
             RegisterImportHandler(ScoreManager);
             RegisterImportHandler(SkinManager);
 
-            dependencies.Cache(AudioNormalizationManager = new AudioNormalizationManager(Audio, LocalConfig));
-
             Beatmap = new NonNullableBindable<WorkingBeatmap>(defaultBeatmap);
 
             dependencies.CacheAs<IBindable<WorkingBeatmap>>(Beatmap);
@@ -368,6 +366,8 @@ namespace osu.Game
             PreviewTrackManager previewTrackManager;
             dependencies.Cache(previewTrackManager = new PreviewTrackManager(BeatmapManager.BeatmapTrackStore));
             base.Content.Add(previewTrackManager);
+
+            dependencies.Cache(AudioNormalizationManager = new AudioNormalizationManager(LocalConfig, Beatmap));
 
             base.Content.Add(MusicController = new MusicController());
             dependencies.CacheAs(MusicController);

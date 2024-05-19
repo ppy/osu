@@ -16,7 +16,6 @@ using osu.Framework.Graphics.Audio;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Logging;
 using osu.Framework.Threading;
-using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Rulesets.Mods;
@@ -63,9 +62,6 @@ namespace osu.Game.Overlays
 
         [Resolved]
         private RealmAccess realm { get; set; }
-
-        [Resolved]
-        private AudioNormalizationManager audioNormalizationManager { get; set; }
 
         protected override void LoadComplete()
         {
@@ -350,8 +346,6 @@ namespace osu.Game.Overlays
                 if (queuedTrack == CurrentTrack)
                 {
                     AddInternal(queuedTrack);
-
-                    audioNormalizationManager.SetTrackNormalizationVolume(current.BeatmapInfo.AudioNormalization, (bindable, vol) => this.TransformBindableTo(bindable, vol, 300, Easing.Out));
                     queuedTrack.VolumeTo(0).Then().VolumeTo(1, 300, Easing.Out);
                 }
                 else
