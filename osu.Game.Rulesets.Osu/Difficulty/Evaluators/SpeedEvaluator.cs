@@ -62,17 +62,16 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             if (osuCurrObj.BaseObject is Slider slider && osuPrevObj?.BaseObject is Slider)
             {
-                // Bonus base
                 double sliderStreamBonus = 0.25;
 
                 // If slider was slower than notes before - punish it
                 if (osuCurrObj.StrainTime > osuPrevObj.StrainTime)
-                    sliderStreamBonus *= Math.Pow(Math.Min(osuCurrObj.StrainTime, osuPrevObj.StrainTime) / Math.Max(osuCurrObj.StrainTime, osuPrevObj.StrainTime), 2);
+                    sliderStreamBonus *= AimEvaluator.CalcRhythmDifferenceMultiplier(osuCurrObj.StrainTime, osuPrevObj.StrainTime);
 
                 // Punish too short sliders to prevent cheesing (cheesing is still possible, but it's very rare)
                 double sliderLength = slider.Velocity * slider.SpanDuration;
-                if (sliderLength < slider.Radius / 2)
-                    sliderStreamBonus *= sliderLength / (slider.Radius / 2);
+                if (sliderLength < slider.Radius)
+                    sliderStreamBonus *= sliderLength / slider.Radius;
 
                 sliderStreamMultiplier += sliderStreamBonus;
             }
