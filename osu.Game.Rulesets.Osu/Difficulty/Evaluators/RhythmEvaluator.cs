@@ -71,10 +71,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                     }
                     else
                     {
-                        if (currObj.BaseObject is Slider && mods.Any(m => m is OsuModClassic cl && cl.NoSliderHeadAccuracy.Value)) // bpm change is into slider, this is easy acc window without slider head accuracy
+                        bool noSliderHeadAccuracy =
+                            mods.Any(m => m is OsuModClassic cl && cl.NoSliderHeadAccuracy.Value);
+
+                        if (noSliderHeadAccuracy && currObj.BaseObject is Slider) // bpm change is into slider, this is easy acc window without slider head accuracy
                             effectiveRatio *= 0.125;
 
-                        if (prevObj.BaseObject is Slider && mods.Any(m => m is OsuModClassic cl && cl.NoSliderHeadAccuracy.Value)) // bpm change was from a slider, this is easier typically than circle -> circle without slider head accuracy
+                        if (noSliderHeadAccuracy && prevObj.BaseObject is Slider) // bpm change was from a slider, this is easier typically than circle -> circle without slider head accuracy
                             effectiveRatio *= 0.25;
 
                         if (previousIslandSize == islandSize) // repeated island size (ex: triplet -> triplet)
