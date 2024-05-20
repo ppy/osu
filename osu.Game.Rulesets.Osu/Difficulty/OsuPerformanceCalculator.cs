@@ -240,7 +240,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             // Account for scores where the flashlight radius is increased due to misses.
             int missingCombo = attributes.MaxCombo - scoreMaxCombo;
             double missingComboPercentage = (double)missingCombo / attributes.MaxCombo;
-            double averageMissingComboLength = Math.Max(missingCombo, 1) / Math.Max(effectiveMissCount, 1);
+
+            // For balancing purposes, assume the player made 3 misses for every memorisation mistake.
+            double averageMissingComboLength = Math.Max(missingCombo, 1) / Math.Max(effectiveMissCount / 3, 1);
 
             double maximumSizePercentage = Math.Clamp(averageMissingComboLength, 0, 100) / averageMissingComboLength * missingComboPercentage;
             double mediumSizePercentage = Math.Clamp(averageMissingComboLength - 100, 0, 100) / averageMissingComboLength * missingComboPercentage;
