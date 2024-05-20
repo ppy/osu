@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Linq;
 using NUnit.Framework;
@@ -26,7 +24,7 @@ namespace osu.Game.Tests.Visual.Navigation
 {
     public partial class TestScenePresentScore : OsuGameTestScene
     {
-        private BeatmapSetInfo beatmap;
+        private BeatmapSetInfo beatmap = null!;
 
         [SetUpSteps]
         public new void SetUpSteps()
@@ -64,7 +62,7 @@ namespace osu.Game.Tests.Visual.Navigation
                             Ruleset = new OsuRuleset().RulesetInfo
                         },
                     }
-                })?.Value;
+                })!.Value;
             });
         }
 
@@ -171,9 +169,9 @@ namespace osu.Game.Tests.Visual.Navigation
             AddUntilStep("wait for menu", () => Game.ScreenStack.CurrentScreen is MainMenu);
         }
 
-        private Func<ScoreInfo> importScore(int i, RulesetInfo ruleset = null)
+        private Func<ScoreInfo> importScore(int i, RulesetInfo? ruleset = null)
         {
-            ScoreInfo imported = null;
+            ScoreInfo? imported = null;
             AddStep($"import score {i}", () =>
             {
                 imported = Game.ScoreManager.Import(new ScoreInfo
@@ -188,14 +186,14 @@ namespace osu.Game.Tests.Visual.Navigation
 
             AddAssert($"import {i} succeeded", () => imported != null);
 
-            return () => imported;
+            return () => imported!;
         }
 
         /// <summary>
         /// Some tests test waiting for a particular screen twice in a row, but expect a new instance each time.
         /// There's a case where they may succeed incorrectly if we don't compare against the previous instance.
         /// </summary>
-        private IScreen lastWaitedScreen;
+        private IScreen lastWaitedScreen = null!;
 
         private void presentAndConfirm(Func<ScoreInfo> getImport, ScorePresentType type)
         {
