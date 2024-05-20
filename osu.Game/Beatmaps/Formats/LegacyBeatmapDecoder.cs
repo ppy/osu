@@ -383,21 +383,24 @@ namespace osu.Game.Beatmaps.Formats
             switch (pair.Key)
             {
                 case @"HPDrainRate":
-                    difficulty.DrainRate = Parsing.ParseFloat(pair.Value);
+                    difficulty.DrainRate = Math.Clamp(Parsing.ParseFloat(pair.Value), 0, 10);
                     break;
 
                 case @"CircleSize":
                     difficulty.CircleSize = Parsing.ParseFloat(pair.Value);
+                    //If the mode is not Mania, clamp circle size to [0,10]
+                    if (!beatmap.BeatmapInfo.Ruleset.OnlineID.Equals(3))
+                        difficulty.CircleSize = Math.Clamp(difficulty.CircleSize, 0, 10);
                     break;
 
                 case @"OverallDifficulty":
-                    difficulty.OverallDifficulty = Parsing.ParseFloat(pair.Value);
+                    difficulty.OverallDifficulty = Math.Clamp(Parsing.ParseFloat(pair.Value), 0, 10);
                     if (!hasApproachRate)
                         difficulty.ApproachRate = difficulty.OverallDifficulty;
                     break;
 
                 case @"ApproachRate":
-                    difficulty.ApproachRate = Parsing.ParseFloat(pair.Value);
+                    difficulty.ApproachRate = Math.Clamp(Parsing.ParseFloat(pair.Value), 0, 10);
                     hasApproachRate = true;
                     break;
 
