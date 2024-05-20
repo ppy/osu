@@ -121,6 +121,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             });
 
             PositionBindable.BindValueChanged(pos => Position = pos.NewValue);
+
+            spinningSample.BindAdjustments(Samples);
+            maxBonusSample.BindAdjustments(Samples);
         }
 
         protected override void LoadComplete()

@@ -16,7 +16,6 @@ using osu.Framework.Graphics.Audio;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Logging;
 using osu.Framework.Threading;
-using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Rulesets.Mods;
@@ -64,18 +63,11 @@ namespace osu.Game.Overlays
         [Resolved]
         private RealmAccess realm { get; set; }
 
-        [Resolved]
-        private AudioManager audioManager { get; set; }
-
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            beatmap.BindValueChanged(b =>
-            {
-                changeBeatmap(b.NewValue);
-                AudioNormalization.AddAudioNormalization(b.NewValue.BeatmapInfo, audioManager.TrackMixer);
-            }, true);
+            beatmap.BindValueChanged(b => changeBeatmap(b.NewValue), true);
             mods.BindValueChanged(_ => ResetTrackAdjustments(), true);
         }
 

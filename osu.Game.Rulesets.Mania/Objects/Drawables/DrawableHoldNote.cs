@@ -120,6 +120,8 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                 bodyPiece.CreateProxy(),
                 tailContainer.CreateProxy(),
             });
+
+            slidingSample.BindAdjustments(Samples);
         }
 
         protected override void LoadComplete()

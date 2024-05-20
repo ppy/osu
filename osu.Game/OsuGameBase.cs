@@ -212,6 +212,8 @@ namespace osu.Game
 
         protected SafeAreaContainer SafeAreaContainer { get; private set; }
 
+        protected AudioNormalizationManager AudioNormalizationManager { get; private set; }
+
         /// <summary>
         /// For now, this is used as a source specifically for beat synced components.
         /// Going forward, it could potentially be used as the single source-of-truth for beatmap timing.
@@ -364,6 +366,8 @@ namespace osu.Game
             PreviewTrackManager previewTrackManager;
             dependencies.Cache(previewTrackManager = new PreviewTrackManager(BeatmapManager.BeatmapTrackStore));
             base.Content.Add(previewTrackManager);
+
+            dependencies.Cache(AudioNormalizationManager = new AudioNormalizationManager(LocalConfig, Beatmap));
 
             base.Content.Add(MusicController = new MusicController());
             dependencies.CacheAs(MusicController);
