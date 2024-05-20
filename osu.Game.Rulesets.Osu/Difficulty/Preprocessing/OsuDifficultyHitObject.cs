@@ -116,11 +116,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
             setDistances(clockRate);
 
-            if (index > 0)
-                PreviousMaxCombo = ((OsuDifficultyHitObject)Previous(0)).CurrentMaxCombo;
-            else
-                PreviousMaxCombo = getObjectCombo(lastObject);
-
+            PreviousMaxCombo = index > 0 ? ((OsuDifficultyHitObject)Previous(0)).CurrentMaxCombo : getObjectCombo(lastObject);
             CurrentMaxCombo = PreviousMaxCombo + getObjectCombo(hitObject);
         }
 
