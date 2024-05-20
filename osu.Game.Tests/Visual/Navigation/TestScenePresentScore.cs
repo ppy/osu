@@ -156,6 +156,27 @@ namespace osu.Game.Tests.Visual.Navigation
             presentAndConfirm(secondImport, type);
         }
 
+        [Test]
+        public void TestScoreRefetchIgnoresEmptyHash()
+        {
+            AddStep("enter song select", () => Game.ChildrenOfType<ButtonSystem>().Single().OnSolo?.Invoke());
+            AddUntilStep("song select is current", () => Game.ScreenStack.CurrentScreen is PlaySongSelect songSelect && songSelect.BeatmapSetsLoaded);
+
+            importScore(-1, hash: string.Empty);
+            importScore(3, hash: @"deadbeef");
+
+            // oftentimes a `PresentScore()` call will be given a `ScoreInfo` which is converted from an online score,
+            // in which cases the hash will generally not be available.
+            AddStep("present score", () => Game.PresentScore(new ScoreInfo { OnlineID = 3, Hash = string.Empty }));
+
+            AddUntilStep("wait for results", () => lastWaitedScreen != Game.ScreenStack.CurrentScreen && Game.ScreenStack.CurrentScreen is ResultsScreen);
+            AddUntilStep("correct score displayed", () =>
+            {
+                var score = ((ResultsScreen)Game.ScreenStack.CurrentScreen).Score!;
+                return score.OnlineID == 3 && score.Hash == "deadbeef";
+            });
+        }
+
         private void returnToMenu()
         {
             // if we don't pause, there's a chance the track may change at the main menu out of our control (due to reaching the end of the track).
@@ -169,14 +190,14 @@ namespace osu.Game.Tests.Visual.Navigation
             AddUntilStep("wait for menu", () => Game.ScreenStack.CurrentScreen is MainMenu);
         }
 
-        private Func<ScoreInfo> importScore(int i, RulesetInfo? ruleset = null)
+        private Func<ScoreInfo> importScore(int i, RulesetInfo? ruleset = null, string? hash = null)
         {
             ScoreInfo? imported = null;
             AddStep($"import score {i}", () =>
             {
                 imported = Game.ScoreManager.Import(new ScoreInfo
                 {
-                    Hash = Guid.NewGuid().ToString(),
+                    Hash = hash ?? Guid.NewGuid().ToString(),
                     OnlineID = i,
                     BeatmapInfo = beatmap.Beatmaps.First(),
                     Ruleset = ruleset ?? new OsuRuleset().RulesetInfo,
