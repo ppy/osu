@@ -234,9 +234,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             flashlightValue *= getComboScalingFactor(attributes);
 
-            // Account for shorter maps having a higher ratio of 0 combo/100 combo flashlight radius.
-            flashlightValue *= 0.7 + 0.1 * Math.Min(1.0, totalHits / 200.0) +
-                               (totalHits > 200 ? 0.2 * Math.Min(1.0, (totalHits - 200) / 200.0) : 0.0);
+            // Account for shorter maps having more time played at a larger flashlight radius.
+            flashlightValue *= Math.Min(1, 0.7 + 0.1 * Math.Max(0, Math.Log(attributes.MaxCombo / 100.0)) + 0.1 * Math.Max(0, Math.Log(attributes.MaxCombo / 200.0)));
 
             // Account for scores where the flashlight radius is increased due to misses.
             int missingCombo = attributes.MaxCombo - scoreMaxCombo;
