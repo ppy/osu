@@ -825,8 +825,6 @@ namespace osu.Game.Screens.Select
 
         public void ChangeSpeed(double delta)
         {
-            // Mod Change from 0.95 DC to 1.0 none to 1.05 DT/NC ?
-            onScreenDisplay?.Display(new SpeedChangeToast(config!, delta));
             if (game == null) return;
 
             ModNightcore modNc = (ModNightcore)((MultiMod)game.AvailableMods.Value[ModType.DifficultyIncrease].First(mod => mod is MultiMod multiMod && multiMod.Mods.Count(modType => modType is ModNightcore) > 0)).Mods.First(mod => mod is ModNightcore);
@@ -840,6 +838,8 @@ namespace osu.Game.Screens.Select
 
             if (incompatiableModActive)
                 return;
+
+            onScreenDisplay?.Display(new SpeedChangeToast(config!, delta));
 
             if (rateModActive)
             {
