@@ -455,9 +455,10 @@ namespace osu.Game.Overlays.SkinEditor
             checkOrigin(Anchor.BottomCentre);
             checkOrigin(Anchor.BottomRight);
 
-            var previousOrigin = drawable.ToParentSpace(drawable.OriginPosition);
+            Vector2 offset = drawable.ToParentSpace(localOrigin.PositionOnQuad(drawable.DrawRectangle)) - drawable.ToParentSpace(drawable.Origin.PositionOnQuad(drawable.DrawRectangle));
+
             drawable.Origin = localOrigin;
-            drawable.Position += drawable.ToParentSpace(drawable.OriginPosition) - previousOrigin;
+            drawable.Position += offset;
         }
 
         private static void adjustScaleFromAnchor(ref Vector2 scale, Anchor reference)
