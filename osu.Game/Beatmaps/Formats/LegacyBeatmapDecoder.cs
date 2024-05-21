@@ -85,6 +85,8 @@ namespace osu.Game.Beatmaps.Formats
 
             base.ParseStreamInto(stream, beatmap);
 
+            applyDifficultyRestrictions(beatmap.Difficulty);
+
             flushPendingPoints();
 
             // Objects may be out of order *only* if a user has manually edited an .osu file.
@@ -100,6 +102,26 @@ namespace osu.Game.Beatmaps.Formats
                 applyDefaults(hitObject);
                 applySamples(hitObject);
             }
+        }
+
+        /// <summary>
+        /// Clamp Difficulty settings to be within the normal range.
+        /// </summary>
+        private void applyDifficultyRestrictions(BeatmapDifficulty difficulty)
+        {
+            difficulty.DrainRate = Math.Clamp(difficulty.DrainRate, 0, 10);
+            //If the mode is not Mania, clamp circle size to [0,10]
+            if (!beatmap.BeatmapInfo.Ruleset.OnlineID.Equals(3))
+                difficulty.CircleSize = Math.Clamp(difficulty.CircleSize, 0, 10);
+            //If it is Mania, it must be within [1,20] - dual stages with 10 keys each.
+            //The lower bound should be 4, but there are ranked maps that are lower than this.
+            else
+                difficulty.CircleSize = Math.Clamp(difficulty.CircleSize, 1, 20);
+            difficulty.OverallDifficulty = Math.Clamp(difficulty.OverallDifficulty, 0, 10);
+            difficulty.ApproachRate = Math.Clamp(difficulty.ApproachRate, 0, 10);
+
+            difficulty.SliderMultiplier = Math.Clamp(difficulty.SliderMultiplier, 0.4, 3.6);
+            difficulty.SliderTickRate = Math.Clamp(difficulty.SliderTickRate, 0.5, 8);
         }
 
         /// <summary>
@@ -383,33 +405,30 @@ namespace osu.Game.Beatmaps.Formats
             switch (pair.Key)
             {
                 case @"HPDrainRate":
-                    difficulty.DrainRate = Math.Clamp(Parsing.ParseFloat(pair.Value), 0, 10);
+                    difficulty.DrainRate = Parsing.ParseFloat(pair.Value);
                     break;
 
                 case @"CircleSize":
                     difficulty.CircleSize = Parsing.ParseFloat(pair.Value);
-                    //If the mode is not Mania, clamp circle size to [0,10]
-                    if (!beatmap.BeatmapInfo.Ruleset.OnlineID.Equals(3))
-                        difficulty.CircleSize = Math.Clamp(difficulty.CircleSize, 0, 10);
                     break;
 
                 case @"OverallDifficulty":
-                    difficulty.OverallDifficulty = Math.Clamp(Parsing.ParseFloat(pair.Value), 0, 10);
+                    difficulty.OverallDifficulty = Parsing.ParseFloat(pair.Value);
                     if (!hasApproachRate)
                         difficulty.ApproachRate = difficulty.OverallDifficulty;
                     break;
 
                 case @"ApproachRate":
-                    difficulty.ApproachRate = Math.Clamp(Parsing.ParseFloat(pair.Value), 0, 10);
+                    difficulty.ApproachRate = Parsing.ParseFloat(pair.Value);
                     hasApproachRate = true;
                     break;
 
                 case @"SliderMultiplier":
-                    difficulty.SliderMultiplier = Math.Clamp(Parsing.ParseDouble(pair.Value), 0.4, 3.6);
+                    difficulty.SliderMultiplier = Parsing.ParseDouble(pair.Value);
                     break;
 
                 case @"SliderTickRate":
-                    difficulty.SliderTickRate = Math.Clamp(Parsing.ParseDouble(pair.Value), 0.5, 8);
+                    difficulty.SliderTickRate = Parsing.ParseDouble(pair.Value);
                     break;
             }
         }
