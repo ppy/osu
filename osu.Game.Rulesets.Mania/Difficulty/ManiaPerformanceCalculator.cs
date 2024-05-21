@@ -42,6 +42,8 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             // The specific number has no intrinsic meaning and can be adjusted as needed.
             double multiplier = 8.0;
 
+            if (score.Mods.Any(m => m is ModNoFail))
+                multiplier *= Math.Max(0.75, 1.0 - 0.02 * countMiss);
             if (score.Mods.Any(m => m is ModEasy))
                 multiplier *= 0.5;
 
