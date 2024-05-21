@@ -49,6 +49,11 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString UrlCopied => new TranslatableString(getKey(@"url_copied"), @"URL copied");
 
+        /// <summary>
+        /// "Speed Changed"
+        /// </summary>
+        public static LocalisableString SpeedChanged => new TranslatableString(getKey(@"speed_changed"), @"Speed Changed");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }

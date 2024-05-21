@@ -30,6 +30,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Mods;
+using osu.Game.Overlays.OSD;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Backgrounds;
@@ -150,6 +151,12 @@ namespace osu.Game.Screens.Select
         private bool lastPitchState;
 
         private bool usedPitchMods;
+
+        [Resolved]
+        private OnScreenDisplay? onScreenDisplay { get; set; }
+
+        [Resolved]
+        private OsuConfigManager? config { get; set; }
 
         [BackgroundDependencyLoader(true)]
         private void load(AudioManager audio, OsuColour colours, ManageCollectionsDialog? manageCollectionsDialog, DifficultyRecommender? recommender, OsuConfigManager config)
@@ -819,7 +826,7 @@ namespace osu.Game.Screens.Select
         public void ChangeSpeed(double delta)
         {
             // Mod Change from 0.95 DC to 1.0 none to 1.05 DT/NC ?
-
+            onScreenDisplay?.Display(new SpeedChangeToast(config!, delta));
             if (game == null) return;
 
             ModNightcore modNc = (ModNightcore)((MultiMod)game.AvailableMods.Value[ModType.DifficultyIncrease].First(mod => mod is MultiMod multiMod && multiMod.Mods.Count(modType => modType is ModNightcore) > 0)).Mods.First(mod => mod is ModNightcore);
@@ -1135,23 +1142,26 @@ namespace osu.Game.Screens.Select
 
         public virtual bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
-            if (e.Repeat)
-                return false;
-
             if (!this.IsCurrentScreen()) return false;
 
             switch (e.Action)
             {
-                case GlobalAction.Select:
-                    FinaliseSelection();
-                    return true;
-
                 case GlobalAction.IncreaseSpeed:
                     ChangeSpeed(0.05);
                     return true;
 
                 case GlobalAction.DecreaseSpeed:
                     ChangeSpeed(-0.05);
+                    return true;
+            }
+
+            if (e.Repeat)
+                return false;
+
+            switch (e.Action)
+            {
+                case GlobalAction.Select:
+                    FinaliseSelection();
                     return true;
             }
 
