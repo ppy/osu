@@ -75,7 +75,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
                     // Jumps within the visible Flashlight radius should be nerfed.
                     if (i == 0)
-                        smallDistNerf = Math.Min(1.0, pixelJumpDistance / (flashlightRadius - 50));
+                        smallDistNerf = Math.Min(1.0, pixelJumpDistance / (flashlightRadius - 45));
 
                     // Nerf stacks so that only the first object of the stack is accounted for.
                     double stackNerf = Math.Min(1.0, (currentObj.LazyJumpDistance / scalingFactor) / 25.0);
