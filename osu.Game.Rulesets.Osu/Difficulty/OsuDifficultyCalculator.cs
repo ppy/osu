@@ -66,7 +66,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double baseFlashlightPerformance = 0.0;
 
             if (mods.Any(h => h is OsuModFlashlight))
-                baseFlashlightPerformance = Math.Pow(flashlightRating, 2.0) * 25.0;
+                baseFlashlightPerformance = Math.Pow(flashlightRating, 2.0) * 28.0;
 
             double basePerformance =
                 Math.Pow(
