@@ -1,7 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Numerics;
+using System;
 using System.Globalization;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -10,12 +10,12 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Localisation;
 using osu.Game.Overlays.Settings;
 using osu.Game.Utils;
-using Vector2 = osuTK.Vector2;
+using osuTK;
 
 namespace osu.Game.Graphics.UserInterfaceV2
 {
     public partial class SliderWithTextBoxInput<T> : CompositeDrawable, IHasCurrentValue<T>
-        where T : struct, INumber<T>, IMinMaxValue<T>
+        where T : struct, IEquatable<T>, IComparable<T>, IConvertible
     {
         /// <summary>
         /// A custom step value for each key press which actuates a change on this control.
@@ -138,7 +138,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
         {
             if (updatingFromTextBox) return;
 
-            decimal decimalValue = decimal.CreateTruncating(slider.Current.Value);
+            decimal decimalValue = slider.Current.Value.ToDecimal(NumberFormatInfo.InvariantInfo);
             textBox.Text = decimalValue.ToString($@"N{FormatUtils.FindPrecision(decimalValue)}");
         }
     }

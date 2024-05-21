@@ -11,8 +11,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Allocation;
-using osu.Framework.Audio;
-using osu.Framework.Audio.Sample;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics;
 using osuTK.Graphics;
@@ -51,10 +49,8 @@ namespace osu.Game.Overlays
             Margin = new MarginPadding(PADDING);
         }
 
-        private Sample selectSample;
-
         [BackgroundDependencyLoader]
-        private void load(OverlayColourProvider colourProvider, OsuColour colours, AudioManager audio)
+        private void load(OverlayColourProvider colourProvider, OsuColour colours)
         {
             AddRange(new Drawable[]
             {
@@ -91,10 +87,8 @@ namespace osu.Game.Overlays
                     CollapsedSize = 2,
                     Expanded = true
                 },
-                new HoverSounds(HoverSampleSet.TabSelect)
+                new HoverClickSounds()
             });
-
-            selectSample = audio.Samples.Get(@"UI/tabselect-select");
 
             SelectedItem.BindValueChanged(_ => updateState(), true);
         }
@@ -110,8 +104,6 @@ namespace osu.Game.Overlays
         protected override void OnActivated() => updateState();
 
         protected override void OnDeactivated() => updateState();
-
-        protected override void OnActivatedByUser() => selectSample.Play();
 
         protected override bool OnHover(HoverEvent e)
         {

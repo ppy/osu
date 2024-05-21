@@ -6,7 +6,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
-using JetBrains.Annotations;
 using Realms;
 using Realms.Schema;
 
@@ -16,12 +15,8 @@ namespace osu.Game.Database
     {
         private IList<T> emptySet => Array.Empty<T>();
 
-        [MustDisposeResource]
         public IEnumerator<T> GetEnumerator() => emptySet.GetEnumerator();
-
-        [MustDisposeResource]
         IEnumerator IEnumerable.GetEnumerator() => emptySet.GetEnumerator();
-
         public int Count => emptySet.Count;
         public T this[int index] => emptySet[index];
         public int IndexOf(object? item) => item == null ? -1 : emptySet.IndexOf((T)item);
