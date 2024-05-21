@@ -56,23 +56,26 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 if (!(currentObj.BaseObject is Spinner))
                 {
                     double jumpDistance = (osuHitObject.StackedPosition - currentHitObject.StackedEndPosition).Length;
+                    float flashlightRadius = 200 * getComboScaleFor(currentObj.CurrentMaxCombo);
+                    double objectOpacity = osuCurrent.OpacityAt(currentHitObject.StartTime, hidden);
 
                     cumulativeStrainTime += lastObj.StrainTime;
 
-                    // We want to nerf objects that can be easily seen within the Flashlight circle radius.
-                    if (i == 0)
-                    {
-                        float flashlightRadius = 200 * getComboScaleFor(osuCurrent.PreviousMaxCombo);
-                        smallDistNerf = Math.Min(1.0, jumpDistance / (flashlightRadius + osuHitObject.Radius - flashlight_padding));
-                    }
+                    // Apply a nerf based on the visibility from the current object.
+                    double distanceNerf = Math.Min(1.0, jumpDistance / (flashlightRadius + osuHitObject.Radius - flashlight_padding));
+                    double visibilityNerf = 1.0 - objectOpacity * (1.0 - distanceNerf);
 
-                    // We also want to nerf stacks so that only the first object of the stack is accounted for.
+                    // Jumps within the visible Flashlight radius should be nerfed.
+                    if (i == 0)
+                        smallDistNerf = Math.Min(1.0, jumpDistance / (flashlightRadius - 50));
+
+                    // Nerf stacks so that only the first object of the stack is accounted for.
                     double stackNerf = Math.Min(1.0, (currentObj.LazyJumpDistance / scalingFactor) / 25.0);
 
-                    // Bonus based on how visible the object is.
-                    double opacityBonus = 1.0 + max_opacity_bonus * (1.0 - osuCurrent.OpacityAt(currentHitObject.StartTime, hidden));
+                    // Bonus based on object opacity.
+                    double opacityBonus = 1.0 + max_opacity_bonus * (1.0 - objectOpacity);
 
-                    result += stackNerf * opacityBonus * scalingFactor * jumpDistance / cumulativeStrainTime;
+                    result += visibilityNerf * stackNerf * opacityBonus * scalingFactor * jumpDistance / cumulativeStrainTime;
 
                     if (currentObj.Angle != null && osuCurrent.Angle != null)
                     {
