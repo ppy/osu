@@ -8,6 +8,7 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Primitives;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
@@ -36,7 +37,7 @@ namespace osu.Game.Rulesets.Osu.UI
 
         // For osu! gameplay, everything is always on screen.
         // Skipping masking calculations improves performance in intense beatmaps (ie. https://osu.ppy.sh/beatmapsets/150945#osu/372245)
-        public override bool UpdateSubTreeMasking() => false;
+        public override bool UpdateSubTreeMasking(Drawable source, RectangleF maskingBounds) => false;
 
         public SmokeContainer Smoke { get; }
         public FollowPointRenderer FollowPoints { get; }

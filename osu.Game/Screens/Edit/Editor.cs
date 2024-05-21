@@ -372,7 +372,7 @@ namespace osu.Game.Screens.Edit
                                     }
                                 }
                             },
-                            screenSwitcher = new EditorScreenSwitcherControl
+                            new EditorScreenSwitcherControl
                             {
                                 Anchor = Anchor.BottomRight,
                                 Origin = Anchor.BottomRight,
@@ -662,23 +662,23 @@ namespace osu.Game.Screens.Edit
                     return true;
 
                 case GlobalAction.EditorComposeMode:
-                    screenSwitcher.SelectItem(EditorScreenMode.Compose);
+                    Mode.Value = EditorScreenMode.Compose;
                     return true;
 
                 case GlobalAction.EditorDesignMode:
-                    screenSwitcher.SelectItem(EditorScreenMode.Design);
+                    Mode.Value = EditorScreenMode.Design;
                     return true;
 
                 case GlobalAction.EditorTimingMode:
-                    screenSwitcher.SelectItem(EditorScreenMode.Timing);
+                    Mode.Value = EditorScreenMode.Timing;
                     return true;
 
                 case GlobalAction.EditorSetupMode:
-                    screenSwitcher.SelectItem(EditorScreenMode.SongSetup);
+                    Mode.Value = EditorScreenMode.SongSetup;
                     return true;
 
                 case GlobalAction.EditorVerifyMode:
-                    screenSwitcher.SelectItem(EditorScreenMode.Verify);
+                    Mode.Value = EditorScreenMode.Verify;
                     return true;
 
                 case GlobalAction.EditorTestGameplay:
@@ -958,8 +958,6 @@ namespace osu.Game.Screens.Edit
 
         [CanBeNull]
         private ScheduledDelegate playbackDisabledDebounce;
-
-        private EditorScreenSwitcherControl screenSwitcher;
 
         private void updateSampleDisabledState()
         {

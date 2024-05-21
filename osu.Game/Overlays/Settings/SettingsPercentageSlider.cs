@@ -1,7 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Numerics;
+using System;
 using osu.Framework.Graphics;
 using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
@@ -13,7 +13,7 @@ namespace osu.Game.Overlays.Settings
     /// Mostly provided for convenience of use with <see cref="SettingSourceAttribute"/>.
     /// </summary>
     public partial class SettingsPercentageSlider<TValue> : SettingsSlider<TValue>
-        where TValue : struct, INumber<TValue>, IMinMaxValue<TValue>
+        where TValue : struct, IEquatable<TValue>, IComparable<TValue>, IConvertible
     {
         protected override Drawable CreateControl() => ((RoundedSliderBar<TValue>)base.CreateControl()).With(sliderBar => sliderBar.DisplayAsPercentage = true);
     }

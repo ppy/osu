@@ -75,12 +75,6 @@ namespace osu.Game
     {
         public static readonly string[] VIDEO_EXTENSIONS = { ".mp4", ".mov", ".avi", ".flv", ".mpg", ".wmv", ".m4v" };
 
-#if DEBUG
-        public const string GAME_NAME = "osu! (development)";
-#else
-        public const string GAME_NAME = "osu!";
-#endif
-
         public const string OSU_PROTOCOL = "osu://";
 
         public const string CLIENT_STREAM_NAME = @"lazer";
@@ -247,7 +241,11 @@ namespace osu.Game
 
         public OsuGameBase()
         {
-            Name = GAME_NAME;
+            Name = @"osu!";
+
+#if DEBUG
+            Name += " (development)";
+#endif
 
             allowableExceptions = UnhandledExceptionsBeforeCrash;
         }

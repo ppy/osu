@@ -11,8 +11,6 @@ using osuTK;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics.UserInterface;
 using osu.Framework.Allocation;
-using osu.Framework.Audio;
-using osu.Framework.Audio.Sample;
 using osuTK.Graphics;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Localisation;
@@ -67,8 +65,6 @@ namespace osu.Game.Overlays
 
             private readonly SpriteIcon icon;
 
-            private Sample selectSample = null!;
-
             public PanelDisplayTabItem(OverlayPanelDisplayStyle value)
                 : base(value)
             {
@@ -82,21 +78,13 @@ namespace osu.Game.Overlays
                         RelativeSizeAxes = Axes.Both,
                         FillMode = FillMode.Fit
                     },
-                    new HoverSounds(HoverSampleSet.TabSelect)
+                    new HoverClickSounds()
                 });
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(AudioManager audio)
-            {
-                selectSample = audio.Samples.Get(@"UI/tabselect-select");
             }
 
             protected override void OnActivated() => updateState();
 
             protected override void OnDeactivated() => updateState();
-
-            protected override void OnActivatedByUser() => selectSample.Play();
 
             protected override bool OnHover(HoverEvent e)
             {
