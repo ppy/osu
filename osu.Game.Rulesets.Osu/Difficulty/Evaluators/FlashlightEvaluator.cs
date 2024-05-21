@@ -12,7 +12,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
     {
         private const double max_opacity_bonus = 0.4;
         private const double hidden_bonus = 0.2;
-        private const double flashlight_padding = 80;
 
         private const double min_velocity = 0.5;
         private const double slider_multiplier = 1.3;
@@ -56,13 +55,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 if (!(currentObj.BaseObject is Spinner))
                 {
                     double jumpDistance = (osuHitObject.StackedPosition - currentHitObject.StackedEndPosition).Length;
-                    float flashlightRadius = 200 * getComboScaleFor(currentObj.CurrentMaxCombo);
+                    double flashlightRadius = getComboScaleFor(currentObj.CurrentMaxCombo);
                     double objectOpacity = osuCurrent.OpacityAt(currentHitObject.StartTime, hidden);
 
                     cumulativeStrainTime += lastObj.StrainTime;
 
                     // Apply a nerf based on the visibility from the current object.
-                    double distanceNerf = Math.Min(1.0, jumpDistance / (flashlightRadius + osuHitObject.Radius - flashlight_padding));
+                    double distanceNerf = Math.Min(1.0, jumpDistance / (flashlightRadius + osuHitObject.Radius - 80));
                     double visibilityNerf = 1.0 - objectOpacity * (1.0 - distanceNerf);
 
                     // Jumps within the visible Flashlight radius should be nerfed.
@@ -120,15 +119,15 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             return result;
         }
 
-        private static float getComboScaleFor(int combo)
+        private static double getComboScaleFor(int combo)
         {
             // Taken from ModFlashlight.
             if (combo >= 200)
-                return 0.625f;
+                return 125.0;
             if (combo >= 100)
-                return 0.8125f;
+                return 162.5;
 
-            return 1.0f;
+            return 200.0;
         }
     }
 }
