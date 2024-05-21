@@ -43,9 +43,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double multiplier = PERFORMANCE_BASE_MULTIPLIER;
 
-            if (score.Mods.Any(m => m is OsuModNoFail))
-                multiplier *= Math.Max(0.90, 1.0 - 0.02 * effectiveMissCount);
-
             if (score.Mods.Any(m => m is OsuModSpunOut) && totalHits > 0)
                 multiplier *= 1.0 - Math.Pow((double)osuAttributes.SpinnerCount / totalHits, 0.85);
 
