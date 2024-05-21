@@ -43,6 +43,24 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double multiplier = PERFORMANCE_BASE_MULTIPLIER;
 
+            if (score.Mods.Any(m => m is OsuModNoFail))
+            {
+                // Multiply 50s by 4 because they're much more penalized in HP. Add misses to the 50s amount to increase stability
+                double effectiveMistakesValue = (double)(countOk + (countMeh + countMiss) * 4) / totalHits;
+
+                // Increase amount of misses if accuracy is low because it's more likely to fail
+                double effectiveFailMisscount = countMiss * (1 + 10 * effectiveMistakesValue);
+
+                // The higher HP is - the lower misscount you need to fail
+                double expectedMinimalMisscountToFail = 2 * (11 - osuAttributes.DrainRate) + 1;
+
+                // Scale penalty according to ratio between fail misscount and expected
+                double noFailPenalty = Math.Max(0, effectiveFailMisscount / expectedMinimalMisscountToFail - 1) * 0.02;
+
+                // The maximum penalty is 0.9
+                multiplier *= Math.Max(0.9, 1.0 - noFailPenalty);
+            }
+
             if (score.Mods.Any(m => m is OsuModSpunOut) && totalHits > 0)
                 multiplier *= 1.0 - Math.Pow((double)osuAttributes.SpinnerCount / totalHits, 0.85);
 
