@@ -1206,6 +1206,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.That(decoded.SliderTickRate, Is.EqualTo(8));
             }
         }
+
         [Test]
         public void TestManiaBeatmapDifficultyCircleSizeClamp()
         {
