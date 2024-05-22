@@ -113,6 +113,7 @@ namespace osu.Game.Beatmaps
             waveform?.Dispose();
             waveform = null;
 
+            TrackNormalizeVolume = new BindableDouble(AudioNormalizationManager.FALLBACK_VOLUME);
             track.AddAdjustment(AdjustableProperty.Volume, TrackNormalizeVolume);
 
             return track;
@@ -120,12 +121,23 @@ namespace osu.Game.Beatmaps
 
         // Normalization is here because it's not so good to apply normalization in global state through MusicController or TrackStore.
         // Each beatmap has its own track and its own track loudness value.
-        public readonly BindableDouble TrackNormalizeVolume = new BindableDouble(AudioNormalizationManager.FALLBACK_VOLUME);
+        public BindableDouble TrackNormalizeVolume { get; private set; }
 
         public void EnableTrackNormlization()
-            => TrackNormalizeVolume.Value = BeatmapInfo.AudioNormalization?.IntegratedLoudnessInVolumeOffset ?? AudioNormalizationManager.FALLBACK_VOLUME;
+        {
+            if (TrackNormalizeVolume == null)
+                throw new InvalidOperationException($"{nameof(TrackNormalizeVolume)} is not available. You must call {nameof(LoadTrack)} before calling this.");
 
-        public void DisableTrackNormalization() => TrackNormalizeVolume.Value = AudioNormalizationManager.FALLBACK_VOLUME;
+            TrackNormalizeVolume.Value = BeatmapInfo.AudioNormalization?.IntegratedLoudnessInVolumeOffset ?? AudioNormalizationManager.FALLBACK_VOLUME;
+        }
+
+        public void DisableTrackNormalization()
+        {
+            if (TrackNormalizeVolume == null)
+                throw new InvalidOperationException($"{nameof(TrackNormalizeVolume)} is not available. You must call {nameof(LoadTrack)} before calling this.");
+
+            TrackNormalizeVolume.Value = AudioNormalizationManager.FALLBACK_VOLUME;
+        }
 
         public void PrepareTrackForPreview(bool looping, double offsetFromPreviewPoint = 0)
         {
@@ -157,6 +169,7 @@ namespace osu.Game.Beatmaps
             if (BeatmapInfo?.AudioEquals(target.BeatmapInfo) != true || Track.IsDummyDevice)
                 return false;
 
+            target.TrackNormalizeVolume = TrackNormalizeVolume;
             target.track = Track;
             return true;
         }
