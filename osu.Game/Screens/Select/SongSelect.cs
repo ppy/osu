@@ -100,7 +100,7 @@ namespace osu.Game.Screens.Select
         };
 
         [Resolved]
-        private OsuGameBase? game { get; set; }
+        private OsuGameBase game { get; set; } = null!;
 
         [Resolved]
         private Bindable<IReadOnlyList<Mod>> selectedMods { get; set; } = null!;
@@ -156,7 +156,7 @@ namespace osu.Game.Screens.Select
         private OnScreenDisplay? onScreenDisplay { get; set; }
 
         [Resolved]
-        private OsuConfigManager? config { get; set; }
+        private OsuConfigManager config { get; set; } = null!;
 
         [BackgroundDependencyLoader(true)]
         private void load(AudioManager audio, OsuColour colours, ManageCollectionsDialog? manageCollectionsDialog, DifficultyRecommender? recommender, OsuConfigManager config)
@@ -825,21 +825,19 @@ namespace osu.Game.Screens.Select
 
         public void ChangeSpeed(double delta)
         {
-            if (game == null) return;
-
             ModNightcore modNc = (ModNightcore)((MultiMod)game.AvailableMods.Value[ModType.DifficultyIncrease].First(mod => mod is MultiMod multiMod && multiMod.Mods.Count(modType => modType is ModNightcore) > 0)).Mods.First(mod => mod is ModNightcore);
             ModDoubleTime modDt = (ModDoubleTime)((MultiMod)game.AvailableMods.Value[ModType.DifficultyIncrease].First(mod => mod is MultiMod multiMod && multiMod.Mods.Count(modType => modType is ModDoubleTime) > 0)).Mods.First(mod => mod is ModDoubleTime);
             ModDaycore modDc = (ModDaycore)((MultiMod)game.AvailableMods.Value[ModType.DifficultyReduction].First(mod => mod is MultiMod multiMod && multiMod.Mods.Count(modType => modType is ModDaycore) > 0)).Mods.First(mod => mod is ModDaycore);
             ModHalfTime modHt = (ModHalfTime)((MultiMod)game.AvailableMods.Value[ModType.DifficultyReduction].First(mod => mod is MultiMod multiMod && multiMod.Mods.Count(modType => modType is ModHalfTime) > 0)).Mods.First(mod => mod is ModHalfTime);
             bool rateModActive = selectedMods.Value.Count(mod => mod is ModRateAdjust) > 0;
-            bool incompatiableModActive = selectedMods.Value.Count(mod => modDt.IncompatibleMods.Count(incompatibleMod => (mod.GetType().IsSubclassOf(incompatibleMod) || mod.GetType() == incompatibleMod) && incompatibleMod != typeof(ModRateAdjust)) > 0) > 0;
+            bool incompatibleModActive = selectedMods.Value.Count(mod => modDt.IncompatibleMods.Count(incompatibleMod => (mod.GetType().IsSubclassOf(incompatibleMod) || mod.GetType() == incompatibleMod) && incompatibleMod != typeof(ModRateAdjust)) > 0) > 0;
             double newRate = 1d + delta;
             bool isPositive = delta > 0;
 
-            if (incompatiableModActive)
+            if (incompatibleModActive)
                 return;
 
-            onScreenDisplay?.Display(new SpeedChangeToast(config!, delta));
+            onScreenDisplay?.Display(new SpeedChangeToast(config, delta));
 
             if (rateModActive)
             {
@@ -912,7 +910,7 @@ namespace osu.Game.Screens.Select
             }
             else
             {
-                // If no ModRateAdjust is actived activate one
+                // If no ModRateAdjust is active, activate one
                 if (isPositive)
                 {
                     if (!usedPitchMods)
