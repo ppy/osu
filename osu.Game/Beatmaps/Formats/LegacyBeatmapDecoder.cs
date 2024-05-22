@@ -105,18 +105,18 @@ namespace osu.Game.Beatmaps.Formats
         }
 
         /// <summary>
-        /// Clamp Difficulty settings to be within the normal range.
+        /// Ensures that all <see cref="BeatmapDifficulty"/> settings are within the allowed ranges.
+        /// See also: https://github.com/peppy/osu-stable-reference/blob/0e425c0d525ef21353c8293c235cc0621d28338b/osu!/GameplayElements/Beatmaps/Beatmap.cs#L567-L614
         /// </summary>
         private void applyDifficultyRestrictions(BeatmapDifficulty difficulty)
         {
             difficulty.DrainRate = Math.Clamp(difficulty.DrainRate, 0, 10);
-            //If the mode is not Mania, clamp circle size to [0,10]
-            if (beatmap.BeatmapInfo.Ruleset.OnlineID != 3)
-                difficulty.CircleSize = Math.Clamp(difficulty.CircleSize, 0, 10);
-            //If it is Mania, it must be within [1,18] - copying what stable does https://github.com/ppy/osu/pull/28200#discussion_r1609522988
-            //The lower bound should be 4, but there are ranked maps that are lower than this.
-            else
-                difficulty.CircleSize = Math.Clamp(difficulty.CircleSize, 1, 18);
+
+            // mania uses "circle size" for key count, thus different allowable range
+            difficulty.CircleSize = beatmap.BeatmapInfo.Ruleset.OnlineID != 3
+                ? Math.Clamp(difficulty.CircleSize, 0, 10)
+                : Math.Clamp(difficulty.CircleSize, 1, 18);
+
             difficulty.OverallDifficulty = Math.Clamp(difficulty.OverallDifficulty, 0, 10);
             difficulty.ApproachRate = Math.Clamp(difficulty.ApproachRate, 0, 10);
 
