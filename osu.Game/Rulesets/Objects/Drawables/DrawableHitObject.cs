@@ -15,7 +15,6 @@ using osu.Framework.Extensions.ListExtensions;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Primitives;
 using osu.Framework.Lists;
 using osu.Framework.Threading;
 using osu.Framework.Utils;
@@ -632,7 +631,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
         #endregion
 
-        public override bool UpdateSubTreeMasking(Drawable source, RectangleF maskingBounds) => false;
+        public override bool UpdateSubTreeMasking() => false;
 
         protected override void UpdateAfterChildren()
         {
