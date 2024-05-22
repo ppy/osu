@@ -20,24 +20,25 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Localisation;
 using osu.Game.Overlays;
+using osu.Game.Screens.Select;
 using osuTK;
 using osuTK.Graphics;
 using osuTK.Input;
 using WebCommonStrings = osu.Game.Resources.Localisation.Web.CommonStrings;
 
-namespace osu.Game.Screens.Select.FooterV2
+namespace osu.Game.Screens.SelectV2.Footer
 {
     public partial class BeatmapOptionsPopover : OsuPopover
     {
         private FillFlowContainer buttonFlow = null!;
-        private readonly FooterButtonOptionsV2 footerButton;
+        private readonly ScreenFooterButtonOptions footerButton;
 
         private WorkingBeatmap beatmapWhenOpening = null!;
 
         [Resolved]
         private IBindable<WorkingBeatmap> beatmap { get; set; } = null!;
 
-        public BeatmapOptionsPopover(FooterButtonOptionsV2 footerButton)
+        public BeatmapOptionsPopover(ScreenFooterButtonOptions footerButton)
         {
             this.footerButton = footerButton;
         }
@@ -188,9 +189,7 @@ namespace osu.Game.Screens.Select.FooterV2
         protected override void UpdateState(ValueChangedEvent<Visibility> state)
         {
             base.UpdateState(state);
-
-            if (state.NewValue == Visibility.Hidden)
-                footerButton.IsActive.Value = false;
+            footerButton.OverlayState.Value = state.NewValue;
         }
     }
 }

@@ -457,7 +457,7 @@ namespace osu.Game.Overlays.SkinEditor
             }
 
             SelectedComponents.Add(component);
-            SkinSelectionHandler.ApplyClosestAnchor(drawableComponent);
+            SkinSelectionHandler.ApplyClosestAnchorOrigin(drawableComponent);
             return true;
         }
 
@@ -540,7 +540,7 @@ namespace osu.Game.Overlays.SkinEditor
 
         protected void Redo() => changeHandler?.RestoreState(1);
 
-        public void Save(bool userTriggered = true) => save(currentSkin.Value);
+        public void Save(bool userTriggered = true) => save(currentSkin.Value, userTriggered);
 
         private void save(Skin skin, bool userTriggered = true)
         {

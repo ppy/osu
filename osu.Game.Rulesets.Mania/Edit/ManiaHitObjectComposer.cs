@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.Mania.Edit
         {
         }
 
-        public new ManiaPlayfield Playfield => ((ManiaPlayfield)drawableRuleset.Playfield);
+        public new ManiaPlayfield Playfield => drawableRuleset.Playfield;
 
         public IScrollingInfo ScrollingInfo => drawableRuleset.ScrollingInfo;
 
