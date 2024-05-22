@@ -137,7 +137,7 @@ namespace osu.Game.Collections
             this.ScaleTo(0.9f, exit_duration);
 
             // Ensure that textboxes commit
-            GetContainingInputManager()?.TriggerFocusContention(this);
+            GetContainingFocusManager()?.TriggerFocusContention(this);
         }
     }
 }
