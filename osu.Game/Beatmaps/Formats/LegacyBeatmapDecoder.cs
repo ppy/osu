@@ -111,12 +111,12 @@ namespace osu.Game.Beatmaps.Formats
         {
             difficulty.DrainRate = Math.Clamp(difficulty.DrainRate, 0, 10);
             //If the mode is not Mania, clamp circle size to [0,10]
-            if (!beatmap.BeatmapInfo.Ruleset.OnlineID.Equals(3))
+            if (beatmap.BeatmapInfo.Ruleset.OnlineID != 3)
                 difficulty.CircleSize = Math.Clamp(difficulty.CircleSize, 0, 10);
-            //If it is Mania, it must be within [1,20] - dual stages with 10 keys each.
+            //If it is Mania, it must be within [1,18] - copying what stable does https://github.com/ppy/osu/pull/28200#discussion_r1609522988
             //The lower bound should be 4, but there are ranked maps that are lower than this.
             else
-                difficulty.CircleSize = Math.Clamp(difficulty.CircleSize, 1, 20);
+                difficulty.CircleSize = Math.Clamp(difficulty.CircleSize, 1, 18);
             difficulty.OverallDifficulty = Math.Clamp(difficulty.OverallDifficulty, 0, 10);
             difficulty.ApproachRate = Math.Clamp(difficulty.ApproachRate, 0, 10);
 
