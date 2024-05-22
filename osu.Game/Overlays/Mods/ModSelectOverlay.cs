@@ -757,11 +757,11 @@ namespace osu.Game.Overlays.Mods
                     return true;
                 }
 
-                case GlobalAction.IncreaseSpeed:
+                case GlobalAction.IncreaseModSpeed:
                     songSelect!.ChangeSpeed(0.05);
                     return true;
 
-                case GlobalAction.DecreaseSpeed:
+                case GlobalAction.DecreaseModSpeed:
                     songSelect!.ChangeSpeed(-0.05);
                     return true;
             }
