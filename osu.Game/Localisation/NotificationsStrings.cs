@@ -114,7 +114,7 @@ Please try changing your audio device to a working setting.");
         public static LocalisableString MismatchingBeatmapForReplay => new TranslatableString(getKey(@"mismatching_beatmap_for_replay"), @"Your local copy of the beatmap for this replay appears to be different than expected. You may need to update or re-download it.");
 
         /// <summary>
-        /// "You are now running osu! {version}.
+        /// "You are now running osu! {0}.
         /// Click to see what's new!"
         /// </summary>
         public static LocalisableString GameVersionAfterUpdate(string version) => new TranslatableString(getKey(@"game_version_after_update"), @"You are now running osu! {0}.

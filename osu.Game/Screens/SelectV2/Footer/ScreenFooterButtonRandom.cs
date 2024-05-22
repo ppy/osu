@@ -10,12 +10,13 @@ using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Input.Bindings;
+using osu.Game.Screens.Footer;
 using osuTK;
 using osuTK.Input;
 
-namespace osu.Game.Screens.Select.FooterV2
+namespace osu.Game.Screens.SelectV2.Footer
 {
-    public partial class FooterButtonRandomV2 : FooterButtonV2
+    public partial class ScreenFooterButtonRandom : ScreenFooterButton
     {
         public Action? NextRandom { get; set; }
         public Action? PreviousRandom { get; set; }

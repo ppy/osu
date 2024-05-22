@@ -48,7 +48,7 @@ namespace osu.Game.Rulesets.Mods
             }
         }
 
-        private float maxValue = 10; // matches default max value of `CurrentNumber`
+        private float maxValue;
 
         public float MaxValue
         {

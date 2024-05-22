@@ -37,7 +37,6 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true; // allow context menu to appear outside of the playfield.
 
         internal readonly Container<PathControlPointPiece<T>> Pieces;
-        internal readonly Container<PathControlPointConnectionPiece<T>> Connections;
 
         private readonly IBindableList<PathControlPoint> controlPoints = new BindableList<PathControlPoint>();
         private readonly T hitObject;
@@ -63,7 +62,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
             InternalChildren = new Drawable[]
             {
-                Connections = new Container<PathControlPointConnectionPiece<T>> { RelativeSizeAxes = Axes.Both },
+                new PathControlPointConnection<T>(hitObject),
                 Pieces = new Container<PathControlPointPiece<T>> { RelativeSizeAxes = Axes.Both }
             };
         }
@@ -77,6 +76,9 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             controlPoints.CollectionChanged += onControlPointsChanged;
             controlPoints.BindTo(hitObject.Path.ControlPoints);
         }
+
+        // Generally all the control points are within the visible area all the time.
+        public override bool UpdateSubTreeMasking(Drawable source, RectangleF maskingBounds) => true;
 
         /// <summary>
         /// Handles correction of invalid path types.
@@ -185,17 +187,6 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
                 case NotifyCollectionChangedAction.Add:
                     Debug.Assert(e.NewItems != null);
 
-                    // If inserting in the path (not appending),
-                    // update indices of existing connections after insert location
-                    if (e.NewStartingIndex < Pieces.Count)
-                    {
-                        foreach (var connection in Connections)
-                        {
-                            if (connection.ControlPointIndex >= e.NewStartingIndex)
-                                connection.ControlPointIndex += e.NewItems.Count;
-                        }
-                    }
-
                     for (int i = 0; i < e.NewItems.Count; i++)
                     {
                         var point = (PathControlPoint)e.NewItems[i];
@@ -209,8 +200,6 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
                             d.DragInProgress = DragInProgress;
                             d.DragEnded = DragEnded;
                         }));
-
-                        Connections.Add(new PathControlPointConnectionPiece<T>(hitObject, e.NewStartingIndex + i));
                     }
 
                     break;
@@ -222,19 +211,6 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
                     {
                         foreach (var piece in Pieces.Where(p => p.ControlPoint == point).ToArray())
                             piece.RemoveAndDisposeImmediately();
-                        foreach (var connection in Connections.Where(c => c.ControlPoint == point).ToArray())
-                            connection.RemoveAndDisposeImmediately();
-                    }
-
-                    // If removing before the end of the path,
-                    // update indices of connections after remove location
-                    if (e.OldStartingIndex < Pieces.Count)
-                    {
-                        foreach (var connection in Connections)
-                        {
-                            if (connection.ControlPointIndex >= e.OldStartingIndex)
-                                connection.ControlPointIndex -= e.OldItems.Count;
-                        }
                     }
 
                     break;
