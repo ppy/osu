@@ -85,7 +85,7 @@ namespace osu.Game.Beatmaps.Formats
 
             base.ParseStreamInto(stream, beatmap);
 
-            applyDifficultyRestrictions(beatmap.Difficulty);
+            applyDifficultyRestrictions(beatmap.Difficulty, beatmap);
 
             flushPendingPoints();
 
@@ -108,7 +108,7 @@ namespace osu.Game.Beatmaps.Formats
         /// Ensures that all <see cref="BeatmapDifficulty"/> settings are within the allowed ranges.
         /// See also: https://github.com/peppy/osu-stable-reference/blob/0e425c0d525ef21353c8293c235cc0621d28338b/osu!/GameplayElements/Beatmaps/Beatmap.cs#L567-L614
         /// </summary>
-        private void applyDifficultyRestrictions(BeatmapDifficulty difficulty)
+        private static void applyDifficultyRestrictions(BeatmapDifficulty difficulty, Beatmap beatmap)
         {
             difficulty.DrainRate = Math.Clamp(difficulty.DrainRate, 0, 10);
 
@@ -127,7 +127,7 @@ namespace osu.Game.Beatmaps.Formats
         /// <summary>
         /// Processes the beatmap such that a new combo is started the first hitobject following each break.
         /// </summary>
-        private void postProcessBreaks(Beatmap beatmap)
+        private static void postProcessBreaks(Beatmap beatmap)
         {
             int currentBreak = 0;
             bool forceNewCombo = false;
@@ -183,7 +183,7 @@ namespace osu.Game.Beatmaps.Formats
         /// This method's intention is to restore those legacy defaults.
         /// See also: https://osu.ppy.sh/wiki/en/Client/File_formats/Osu_%28file_format%29
         /// </summary>
-        private void applyLegacyDefaults(BeatmapInfo beatmapInfo)
+        private static void applyLegacyDefaults(BeatmapInfo beatmapInfo)
         {
             beatmapInfo.WidescreenStoryboard = false;
             beatmapInfo.SamplesMatchPlaybackRate = false;
