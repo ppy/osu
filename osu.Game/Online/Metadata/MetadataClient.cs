@@ -59,6 +59,15 @@ namespace osu.Game.Online.Metadata
 
         #endregion
 
+        #region Daily Challenge
+
+        public abstract IBindable<DailyChallengeInfo?> DailyChallengeInfo { get; }
+
+        /// <inheritdoc/>
+        public abstract Task DailyChallengeUpdated(DailyChallengeInfo? info);
+
+        #endregion
+
         #region Disconnection handling
 
         public event Action? Disconnecting;
