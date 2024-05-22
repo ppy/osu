@@ -50,9 +50,9 @@ namespace osu.Game.Localisation
         public static LocalisableString UrlCopied => new TranslatableString(getKey(@"url_copied"), @"URL copied");
 
         /// <summary>
-        /// "Speed Changed"
+        /// "Speed changed to"
         /// </summary>
-        public static LocalisableString SpeedChanged => new TranslatableString(getKey(@"speed_changed"), @"Speed Changed");
+        public static LocalisableString SpeedChangedTo => new TranslatableString(getKey(@"speed_changed"), @"Speed changed to");
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
