@@ -1144,11 +1144,11 @@ namespace osu.Game.Screens.Select
 
             switch (e.Action)
             {
-                case GlobalAction.IncreaseSpeed:
+                case GlobalAction.IncreaseModSpeed:
                     ChangeSpeed(0.05);
                     return true;
 
-                case GlobalAction.DecreaseSpeed:
+                case GlobalAction.DecreaseModSpeed:
                     ChangeSpeed(-0.05);
                     return true;
             }

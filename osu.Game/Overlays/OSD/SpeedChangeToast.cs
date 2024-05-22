@@ -10,7 +10,7 @@ namespace osu.Game.Overlays.OSD
     public partial class SpeedChangeToast : Toast
     {
         public SpeedChangeToast(OsuConfigManager config, double delta)
-            : base(CommonStrings.Beatmaps, ToastStrings.SpeedChanged, config.LookupKeyBindings(GlobalAction.IncreaseSpeed) + " / " + config.LookupKeyBindings(GlobalAction.DecreaseSpeed))
+            : base(CommonStrings.Beatmaps, ToastStrings.SpeedChanged, config.LookupKeyBindings(GlobalAction.IncreaseModSpeed) + " / " + config.LookupKeyBindings(GlobalAction.DecreaseModSpeed))
         {
         }
     }

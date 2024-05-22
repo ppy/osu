@@ -370,14 +370,14 @@ namespace osu.Game.Localisation
         public static LocalisableString EditorToggleRotateControl => new TranslatableString(getKey(@"editor_toggle_rotate_control"), @"Toggle rotate control");
 
         /// <summary>
-        /// "Increase Speed"
+        /// "Increase mod speed"
         /// </summary>
-        public static LocalisableString IncreaseSpeed => new TranslatableString(getKey(@"increase_speed"), @"Increase Speed");
+        public static LocalisableString IncreaseModSpeed => new TranslatableString(getKey(@"increase_mod_speed"), @"Increase mod speed");
 
         /// <summary>
-        /// "Decrease Speed"
+        /// "Decrease mod speed"
         /// </summary>
-        public static LocalisableString DecreaseSpeed => new TranslatableString(getKey(@"decrease_speed"), @"Decrease Speed");
+        public static LocalisableString DecreaseModSpeed => new TranslatableString(getKey(@"decrease_mod_speed"), @"Decrease mod speed");
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
