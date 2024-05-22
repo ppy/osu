@@ -61,8 +61,18 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
                 body.SetVertices(vertices);
             }
 
-            Size = body.Size;
             OriginPosition = body.PathOffset;
+        }
+
+        public override Vector2 Size
+        {
+            get
+            {
+                if (base.Size != body.Size)
+                    Size = body.Size;
+                return base.Size;
+            }
+            set => base.Size = value;
         }
 
         public void RecyclePath() => body.RecyclePath();

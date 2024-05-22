@@ -11,10 +11,17 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
     /// </summary>
     public partial class ManualSliderBody : SliderBody
     {
-        public new void SetVertices(IReadOnlyList<Vector2> vertices)
+        public new void SetVertices(IReadOnlyList<Vector2> vertices) => base.SetVertices(vertices);
+
+        public override Vector2 Size
         {
-            base.SetVertices(vertices);
-            Size = Path.Size;
+            get
+            {
+                if (base.Size != Path.Size)
+                    Size = Path.Size;
+                return base.Size;
+            }
+            set => base.Size = value;
         }
     }
 }
