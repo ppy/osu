@@ -578,17 +578,17 @@ namespace osu.Game
                 {
                     case ITabletHandler th:
                         return new TabletSettings(th);
-
-                    case MouseHandler mh:
-                        return new MouseSettings(mh);
-
-                    case JoystickHandler jh:
-                        return new JoystickSettings(jh);
                 }
             }
 
             switch (handler)
             {
+                case MouseHandler mh:
+                    return new MouseSettings(mh);
+
+                case JoystickHandler jh:
+                    return new JoystickSettings(jh);
+
                 case TouchHandler th:
                     return new TouchSettings(th);
 
