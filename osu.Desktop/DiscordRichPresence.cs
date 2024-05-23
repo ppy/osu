@@ -273,7 +273,11 @@ namespace osu.Desktop
 
         private static string clampLength(string str)
         {
-            // For whatever reason, discord decides that strings shorter than 2 characters cannot possibly be valid input, because... reasons?
+            // Empty strings are fine to discord even though single-character strings are not. Make it make sense.
+            if (string.IsNullOrEmpty(str))
+                return str;
+
+            // As above, discord decides that *non-empty* strings shorter than 2 characters cannot possibly be valid input, because... reasons?
             // And yes, that is two *characters*, or *codepoints*, not *bytes* as further down below (as determined by empirical testing).
             // That seems very questionable, and isn't even documented anywhere. So to *make it* accept such valid input,
             // just tack on enough of U+200B ZERO WIDTH SPACEs at the end.

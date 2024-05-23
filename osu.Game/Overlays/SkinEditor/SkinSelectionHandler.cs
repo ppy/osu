@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions;
 using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -421,13 +422,43 @@ namespace osu.Game.Overlays.SkinEditor
             drawable.Position -= drawable.AnchorPosition - previousAnchor;
         }
 
-        private static void applyOrigin(Drawable drawable, Anchor origin)
+        private static void applyOrigin(Drawable drawable, Anchor screenSpaceOrigin)
         {
-            if (origin == drawable.Origin) return;
+            var boundingBox = drawable.ScreenSpaceDrawQuad.AABBFloat;
 
-            var previousOrigin = drawable.OriginPosition;
-            drawable.Origin = origin;
-            drawable.Position += drawable.OriginPosition - previousOrigin;
+            var targetScreenSpacePosition = screenSpaceOrigin.PositionOnQuad(boundingBox);
+
+            Anchor localOrigin = Anchor.TopLeft;
+            float smallestDistanceFromTargetPosition = float.PositiveInfinity;
+
+            void checkOrigin(Anchor originToTest)
+            {
+                Vector2 positionToTest = drawable.ToScreenSpace(originToTest.PositionOnQuad(drawable.DrawRectangle));
+                float testedDistance = Vector2.Distance(targetScreenSpacePosition, positionToTest);
+
+                if (testedDistance < smallestDistanceFromTargetPosition)
+                {
+                    localOrigin = originToTest;
+                    smallestDistanceFromTargetPosition = testedDistance;
+                }
+            }
+
+            checkOrigin(Anchor.TopLeft);
+            checkOrigin(Anchor.TopCentre);
+            checkOrigin(Anchor.TopRight);
+
+            checkOrigin(Anchor.CentreLeft);
+            checkOrigin(Anchor.Centre);
+            checkOrigin(Anchor.CentreRight);
+
+            checkOrigin(Anchor.BottomLeft);
+            checkOrigin(Anchor.BottomCentre);
+            checkOrigin(Anchor.BottomRight);
+
+            Vector2 offset = drawable.ToParentSpace(localOrigin.PositionOnQuad(drawable.DrawRectangle)) - drawable.ToParentSpace(drawable.Origin.PositionOnQuad(drawable.DrawRectangle));
+
+            drawable.Origin = localOrigin;
+            drawable.Position += offset;
         }
 
         private static void adjustScaleFromAnchor(ref Vector2 scale, Anchor reference)

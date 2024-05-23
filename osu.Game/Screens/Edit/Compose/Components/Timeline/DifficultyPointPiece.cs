@@ -138,7 +138,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             protected override void LoadComplete()
             {
                 base.LoadComplete();
-                ScheduleAfterChildren(() => GetContainingInputManager().ChangeFocus(sliderVelocitySlider));
+                ScheduleAfterChildren(() => GetContainingFocusManager().ChangeFocus(sliderVelocitySlider));
             }
         }
     }
