@@ -53,13 +53,8 @@ namespace osu.Game.Overlays.SkinEditor
 
         private bool allSelectedSupportManualSizing(Axes axis) => selectedItems.All(b => (b as CompositeDrawable)?.AutoSizeAxes.HasFlagFast(axis) == false);
 
-        private Drawable[]? objectsInScale;
-
+        private Dictionary<Drawable, OriginalDrawableState>? objectsInScale;
         private Vector2? defaultOrigin;
-        private Dictionary<Drawable, float>? originalWidths;
-        private Dictionary<Drawable, float>? originalHeights;
-        private Dictionary<Drawable, Vector2>? originalScales;
-        private Dictionary<Drawable, Vector2>? originalPositions;
 
         private bool isFlippedX;
         private bool isFlippedY;
@@ -71,12 +66,8 @@ namespace osu.Game.Overlays.SkinEditor
 
             changeHandler?.BeginChange();
 
-            objectsInScale = selectedItems.Cast<Drawable>().ToArray();
-            originalWidths = objectsInScale.ToDictionary(d => d, d => d.Width);
-            originalHeights = objectsInScale.ToDictionary(d => d, d => d.Height);
-            originalScales = objectsInScale.ToDictionary(d => d, d => d.Scale);
-            originalPositions = objectsInScale.ToDictionary(d => d, d => d.ToScreenSpace(d.OriginPosition));
-            OriginalSurroundingQuad = ToLocalSpace(GeometryUtils.GetSurroundingQuad(objectsInScale.SelectMany(d => d.ScreenSpaceDrawQuad.GetVertices().ToArray())));
+            objectsInScale = selectedItems.Cast<Drawable>().ToDictionary(d => d, d => new OriginalDrawableState(d));
+            OriginalSurroundingQuad = ToLocalSpace(GeometryUtils.GetSurroundingQuad(objectsInScale.SelectMany(d => d.Key.ScreenSpaceDrawQuad.GetVertices().ToArray())));
             defaultOrigin = OriginalSurroundingQuad.Value.Centre;
 
             isFlippedX = false;
@@ -88,7 +79,7 @@ namespace osu.Game.Overlays.SkinEditor
             if (objectsInScale == null)
                 throw new InvalidOperationException($"Cannot {nameof(Update)} a scale operation without calling {nameof(Begin)} first!");
 
-            Debug.Assert(originalWidths != null && originalHeights != null && originalScales != null && originalPositions != null && defaultOrigin != null && OriginalSurroundingQuad != null);
+            Debug.Assert(defaultOrigin != null && OriginalSurroundingQuad != null);
 
             var actualOrigin = ToScreenSpace(origin ?? defaultOrigin.Value);
 
@@ -132,9 +123,9 @@ namespace osu.Game.Overlays.SkinEditor
                 return;
             }
 
-            foreach (var b in objectsInScale)
+            foreach (var (b, originalState) in objectsInScale)
             {
-                UpdatePosition(b, GeometryUtils.GetScaledPosition(scale, actualOrigin, originalPositions[b]));
+                UpdatePosition(b, GeometryUtils.GetScaledPosition(scale, actualOrigin, originalState.ScreenSpaceOriginPosition));
 
                 var currentScale = scale;
                 if (Precision.AlmostEquals(MathF.Abs(b.Rotation) % 180, 90))
@@ -143,15 +134,15 @@ namespace osu.Game.Overlays.SkinEditor
                 switch (adjustAxis)
                 {
                     case Axes.X:
-                        b.Width = MathF.Abs(originalWidths[b] * currentScale.X);
+                        b.Width = MathF.Abs(originalState.Width * currentScale.X);
                         break;
 
                     case Axes.Y:
-                        b.Height = MathF.Abs(originalHeights[b] * currentScale.Y);
+                        b.Height = MathF.Abs(originalState.Height * currentScale.Y);
                         break;
 
                     case Axes.Both:
-                        b.Scale = originalScales[b] * currentScale;
+                        b.Scale = originalState.Scale * currentScale;
                         break;
                 }
             }
@@ -165,11 +156,23 @@ namespace osu.Game.Overlays.SkinEditor
             changeHandler?.EndChange();
 
             objectsInScale = null;
-            originalPositions = null;
-            originalWidths = null;
-            originalHeights = null;
-            originalScales = null;
             defaultOrigin = null;
+        }
+
+        private struct OriginalDrawableState
+        {
+            public float Width { get; }
+            public float Height { get; }
+            public Vector2 Scale { get; }
+            public Vector2 ScreenSpaceOriginPosition { get; }
+
+            public OriginalDrawableState(Drawable drawable)
+            {
+                Width = drawable.Width;
+                Height = drawable.Height;
+                Scale = drawable.Scale;
+                ScreenSpaceOriginPosition = drawable.ToScreenSpace(drawable.OriginPosition);
+            }
         }
     }
 }
