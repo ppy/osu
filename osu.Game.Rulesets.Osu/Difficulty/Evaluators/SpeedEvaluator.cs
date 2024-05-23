@@ -60,12 +60,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             double distance = Math.Min(single_spacing_threshold, travelDistance + osuCurrObj.MinimumJumpDistance);
 
             // double wideNess = osuCurrObj.Angle is null ? 0 : Math.Sin(osuCurrObj.Angle.Value);
-            double angleBonus = 0.5 + 0.5 * CalculateAngleBonus(osuCurrObj.Angle?? Math.PI);
+            double angleBonus = 0.75 + 0.25 * CalculateAngleBonus(osuCurrObj.Angle?? Math.PI);
 
-            double speedDifficulty = (speedBonus + speedBonus * Math.Pow(distance * angleBonus / single_spacing_threshold, 3.5)) * doubletapness / Math.Pow(strainTime, 1.01);
-
-            if (double.IsNaN(speedDifficulty))
-                Console.WriteLine(angleBonus);
+            double speedDifficulty = (speedBonus + speedBonus * Math.Pow(distance * angleBonus  / Math.Pow(((OsuHitObject)osuCurrObj.BaseObject).Radius / 25, 0.75) / single_spacing_threshold, 3.5)) * doubletapness / Math.Pow(strainTime, 1.01);
 
             return speedDifficulty;
         }
