@@ -39,12 +39,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         [Test]
         public void TestDailyChallengeButton()
         {
-            AddStep("add button", () => Child = new DailyChallengeButton(@"button-default-select", new Color4(102, 68, 204, 255), _ => { }, 0, Key.D)
-            {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                ButtonSystemState = ButtonSystemState.TopLevel,
-            });
+            AddStep("beatmap of the day not active", () => metadataClient.DailyChallengeUpdated(null));
 
             AddStep("set up API", () => dummyAPI.HandleRequest = req =>
             {
@@ -72,12 +67,17 @@ namespace osu.Game.Tests.Visual.UserInterface
                 }
             });
 
+            AddStep("add button", () => Child = new DailyChallengeButton(@"button-default-select", new Color4(102, 68, 204, 255), _ => { }, 0, Key.D)
+            {
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                ButtonSystemState = ButtonSystemState.TopLevel,
+            });
+
             AddStep("beatmap of the day active", () => metadataClient.DailyChallengeUpdated(new DailyChallengeInfo
             {
                 RoomID = 1234,
             }));
-
-            AddStep("beatmap of the day not active", () => metadataClient.DailyChallengeUpdated(null));
         }
     }
 }
