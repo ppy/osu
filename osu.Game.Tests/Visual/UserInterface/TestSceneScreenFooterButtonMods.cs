@@ -12,21 +12,21 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Mods;
-using osu.Game.Screens.Select.FooterV2;
+using osu.Game.Screens.SelectV2.Footer;
 using osu.Game.Utils;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public partial class TestSceneFooterButtonModsV2 : OsuTestScene
+    public partial class TestSceneScreenFooterButtonMods : OsuTestScene
     {
-        private readonly TestFooterButtonModsV2 footerButtonMods;
+        private readonly TestScreenFooterButtonMods footerButtonMods;
 
         [Cached]
         private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Aquamarine);
 
-        public TestSceneFooterButtonModsV2()
+        public TestSceneScreenFooterButtonMods()
         {
-            Add(footerButtonMods = new TestFooterButtonModsV2
+            Add(footerButtonMods = new TestScreenFooterButtonMods
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.CentreLeft,
@@ -97,9 +97,9 @@ namespace osu.Game.Tests.Visual.UserInterface
         public void TestUnrankedBadge()
         {
             AddStep(@"Add unranked mod", () => changeMods(new[] { new OsuModDeflate() }));
-            AddUntilStep("Unranked badge shown", () => footerButtonMods.ChildrenOfType<FooterButtonModsV2.UnrankedBadge>().Single().Alpha == 1);
+            AddUntilStep("Unranked badge shown", () => footerButtonMods.ChildrenOfType<ScreenFooterButtonMods.UnrankedBadge>().Single().Alpha == 1);
             AddStep(@"Clear selected mod", () => changeMods(Array.Empty<Mod>()));
-            AddUntilStep("Unranked badge not shown", () => footerButtonMods.ChildrenOfType<FooterButtonModsV2.UnrankedBadge>().Single().Alpha == 0);
+            AddUntilStep("Unranked badge not shown", () => footerButtonMods.ChildrenOfType<ScreenFooterButtonMods.UnrankedBadge>().Single().Alpha == 0);
         }
 
         private void changeMods(IReadOnlyList<Mod> mods) => footerButtonMods.Current.Value = mods;
@@ -112,7 +112,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             return expectedValue == footerButtonMods.MultiplierText.Current.Value;
         }
 
-        private partial class TestFooterButtonModsV2 : FooterButtonModsV2
+        private partial class TestScreenFooterButtonMods : ScreenFooterButtonMods
         {
             public new OsuSpriteText MultiplierText => base.MultiplierText;
         }
