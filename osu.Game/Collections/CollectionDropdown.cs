@@ -202,7 +202,7 @@ namespace osu.Game.Collections
             [BackgroundDependencyLoader]
             private void load()
             {
-                AddInternal(addOrRemoveButton = new IconButton
+                AddInternal(addOrRemoveButton = new NoFocusChangeIconButton
                 {
                     Anchor = Anchor.CentreRight,
                     Origin = Anchor.CentreRight,
@@ -271,6 +271,11 @@ namespace osu.Game.Collections
             }
 
             protected override Drawable CreateContent() => (Content)base.CreateContent();
+
+            private partial class NoFocusChangeIconButton : IconButton
+            {
+                public override bool ChangeFocusOnClick => false;
+            }
         }
     }
 }
