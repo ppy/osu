@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
-using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osuTK;
 
@@ -13,12 +12,11 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
     /// </summary>
     public partial class ManualSliderBody : SliderBody
     {
-        public new void SetVertices(IReadOnlyList<Vector2> vertices) => base.SetVertices(vertices);
-
-        [BackgroundDependencyLoader]
-        private void load()
+        public ManualSliderBody()
         {
             AutoSizeAxes = Axes.Both;
         }
+
+        public new void SetVertices(IReadOnlyList<Vector2> vertices) => base.SetVertices(vertices);
     }
 }
