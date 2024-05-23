@@ -12,6 +12,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Threading;
+using osu.Framework.Utils;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Beatmaps.Drawables.Cards;
 using osu.Game.Graphics;
@@ -72,8 +73,7 @@ namespace osu.Game.Screens.Menu
                     RelativeSizeAxes = Axes.Y,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    RelativePositionAxes = Axes.X,
-                    X = -0.5f,
+                    RelativePositionAxes = Axes.Both,
                 },
                 new Box
                 {
@@ -100,18 +100,25 @@ namespace osu.Game.Screens.Menu
             base.LoadComplete();
 
             info.BindValueChanged(updateDisplay, true);
-            FinishTransforms(true);
-
-            cover.MoveToX(-0.5f, 10000, Easing.InOutSine)
-                 .Then().MoveToX(0.5f, 10000, Easing.InOutSine)
-                 .Loop();
         }
 
         protected override void Update()
         {
             base.Update();
 
-            cover.Width = 2 * background.DrawWidth;
+            if (cover.LatestTransformEndTime == Time.Current)
+            {
+                const double duration = 3000;
+
+                float scale = 1 + RNG.NextSingle();
+
+                cover.ScaleTo(scale, duration, Easing.InOutSine)
+                     .RotateTo(RNG.NextSingle(-4, 4) * (scale - 1), duration, Easing.InOutSine)
+                     .MoveTo(new Vector2(
+                         RNG.NextSingle(-0.5f, 0.5f) * (scale - 1),
+                         RNG.NextSingle(-0.5f, 0.5f) * (scale - 1)
+                     ), duration, Easing.InOutSine);
+            }
         }
 
         private void updateDisplay(ValueChangedEvent<DailyChallengeInfo?> info)
