@@ -9,6 +9,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Primitives;
+using osu.Framework.Logging;
 using osu.Framework.Utils;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
@@ -120,6 +121,8 @@ namespace osu.Game.Rulesets.Osu.Edit
 
         private void scaleSlider(Slider slider, Vector2 scale, Vector2[] originalPathPositions, PathType?[] originalPathTypes)
         {
+            scale = Vector2.ComponentMax(scale, new Vector2(Precision.FLOAT_EPSILON));
+
             // Maintain the path types in case they were defaulted to bezier at some point during scaling
             for (int i = 0; i < slider.Path.ControlPoints.Count; i++)
             {
@@ -178,7 +181,8 @@ namespace osu.Game.Rulesets.Osu.Edit
             if (!Precision.AlmostEquals(selectionQuad.BottomRight.Y - origin.Y, 0))
                 scale.Y = selectionQuad.BottomRight.Y - origin.Y < 0 ? MathHelper.Clamp(scale.Y, br2.Y, br1.Y) : MathHelper.Clamp(scale.Y, br1.Y, br2.Y);
 
-            return scale;
+            Logger.Log($"scale = {scale}");
+            return Vector2.ComponentMax(scale, new Vector2(Precision.FLOAT_EPSILON));
         }
 
         private void moveSelectionInBounds()
