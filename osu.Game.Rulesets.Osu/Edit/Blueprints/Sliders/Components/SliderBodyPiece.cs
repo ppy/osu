@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using osu.Framework.Allocation;
+using osu.Framework.Graphics;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Skinning.Default;
@@ -41,6 +42,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         private void load(OsuColour colours)
         {
             body.BorderColour = colours.Yellow;
+            AutoSizeAxes = Axes.Both;
         }
 
         private int? lastVersion;
@@ -62,17 +64,6 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             }
 
             OriginPosition = body.PathOffset;
-        }
-
-        public override Vector2 Size
-        {
-            get
-            {
-                if (base.Size != body.Size)
-                    Size = body.Size;
-                return base.Size;
-            }
-            set => base.Size = value;
         }
 
         public void RecyclePath() => body.RecyclePath();
