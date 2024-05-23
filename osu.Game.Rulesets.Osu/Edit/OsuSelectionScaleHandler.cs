@@ -55,12 +55,8 @@ namespace osu.Game.Rulesets.Osu.Edit
             CanScaleDiagonally.Value = CanScaleX.Value && CanScaleY.Value;
         }
 
-        private OsuHitObject[]? objectsInScale;
-
+        private Dictionary<OsuHitObject, OriginalHitObjectState>? objectsInScale;
         private Vector2? defaultOrigin;
-        private Dictionary<OsuHitObject, Vector2>? originalPositions;
-        private Dictionary<IHasPath, Vector2[]>? originalPathControlPointPositions;
-        private Dictionary<IHasPath, PathType?[]>? originalPathControlPointTypes;
 
         public override void Begin()
         {
@@ -69,18 +65,11 @@ namespace osu.Game.Rulesets.Osu.Edit
 
             changeHandler?.BeginChange();
 
-            objectsInScale = selectedMovableObjects.ToArray();
-            OriginalSurroundingQuad = objectsInScale.Length == 1 && objectsInScale.First() is Slider slider
+            objectsInScale = selectedMovableObjects.ToDictionary(ho => ho, ho => new OriginalHitObjectState(ho));
+            OriginalSurroundingQuad = objectsInScale.Count == 1 && objectsInScale.First().Key is Slider slider
                 ? GeometryUtils.GetSurroundingQuad(slider.Path.ControlPoints.Select(p => p.Position))
-                : GeometryUtils.GetSurroundingQuad(objectsInScale);
+                : GeometryUtils.GetSurroundingQuad(objectsInScale.Keys);
             defaultOrigin = OriginalSurroundingQuad.Value.Centre;
-            originalPositions = objectsInScale.ToDictionary(obj => obj, obj => obj.Position);
-            originalPathControlPointPositions = objectsInScale.OfType<IHasPath>().ToDictionary(
-                obj => obj,
-                obj => obj.Path.ControlPoints.Select(point => point.Position).ToArray());
-            originalPathControlPointTypes = objectsInScale.OfType<IHasPath>().ToDictionary(
-                obj => obj,
-                obj => obj.Path.ControlPoints.Select(p => p.Type).ToArray());
         }
 
         public override void Update(Vector2 scale, Vector2? origin = null, Axes adjustAxis = Axes.Both)
@@ -88,22 +77,26 @@ namespace osu.Game.Rulesets.Osu.Edit
             if (objectsInScale == null)
                 throw new InvalidOperationException($"Cannot {nameof(Update)} a scale operation without calling {nameof(Begin)} first!");
 
-            Debug.Assert(originalPositions != null && originalPathControlPointPositions != null && defaultOrigin != null && originalPathControlPointTypes != null && OriginalSurroundingQuad != null);
+            Debug.Assert(defaultOrigin != null && OriginalSurroundingQuad != null);
 
             Vector2 actualOrigin = origin ?? defaultOrigin.Value;
 
             // for the time being, allow resizing of slider paths only if the slider is
             // the only hit object selected. with a group selection, it's likely the user
             // is not looking to change the duration of the slider but expand the whole pattern.
-            if (objectsInScale.Length == 1 && objectsInScale.First() is Slider slider)
-                scaleSlider(slider, scale, originalPathControlPointPositions[slider], originalPathControlPointTypes[slider]);
+            if (objectsInScale.Count == 1 && objectsInScale.First().Key is Slider slider)
+            {
+                var originalInfo = objectsInScale[slider];
+                Debug.Assert(originalInfo.PathControlPointPositions != null && originalInfo.PathControlPointTypes != null);
+                scaleSlider(slider, scale, originalInfo.PathControlPointPositions, originalInfo.PathControlPointTypes);
+            }
             else
             {
                 scale = getClampedScale(OriginalSurroundingQuad.Value, actualOrigin, scale);
 
-                foreach (var ho in objectsInScale)
+                foreach (var (ho, originalState) in objectsInScale)
                 {
-                    ho.Position = GeometryUtils.GetScaledPosition(scale, actualOrigin, originalPositions[ho]);
+                    ho.Position = GeometryUtils.GetScaledPosition(scale, actualOrigin, originalState.Position);
                 }
             }
 
@@ -119,9 +112,6 @@ namespace osu.Game.Rulesets.Osu.Edit
 
             objectsInScale = null;
             OriginalSurroundingQuad = null;
-            originalPositions = null;
-            originalPathControlPointPositions = null;
-            originalPathControlPointTypes = null;
             defaultOrigin = null;
         }
 
@@ -193,7 +183,7 @@ namespace osu.Game.Rulesets.Osu.Edit
 
         private void moveSelectionInBounds()
         {
-            Quad quad = GeometryUtils.GetSurroundingQuad(objectsInScale!);
+            Quad quad = GeometryUtils.GetSurroundingQuad(objectsInScale!.Keys);
 
             Vector2 delta = Vector2.Zero;
 
@@ -207,8 +197,22 @@ namespace osu.Game.Rulesets.Osu.Edit
             if (quad.BottomRight.Y > OsuPlayfield.BASE_SIZE.Y)
                 delta.Y -= quad.BottomRight.Y - OsuPlayfield.BASE_SIZE.Y;
 
-            foreach (var h in objectsInScale!)
+            foreach (var (h, _) in objectsInScale!)
                 h.Position += delta;
+        }
+
+        private struct OriginalHitObjectState
+        {
+            public Vector2 Position { get; }
+            public Vector2[]? PathControlPointPositions { get; }
+            public PathType?[]? PathControlPointTypes { get; }
+
+            public OriginalHitObjectState(OsuHitObject hitObject)
+            {
+                Position = hitObject.Position;
+                PathControlPointPositions = (hitObject as IHasPath)?.Path.ControlPoints.Select(p => p.Position).ToArray();
+                PathControlPointTypes = (hitObject as IHasPath)?.Path.ControlPoints.Select(p => p.Type).ToArray();
+            }
         }
     }
 }
