@@ -59,9 +59,21 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             double travelDistance = osuPrevObj?.TravelDistance ?? 0;
             double distance = Math.Min(single_spacing_threshold, travelDistance + osuCurrObj.MinimumJumpDistance);
 
-            double wideNess = osuCurrObj.Angle is null ? 0 : Math.Sin(osuCurrObj.Angle.Value);
+            // double wideNess = osuCurrObj.Angle is null ? 0 : Math.Sin(osuCurrObj.Angle.Value);
+            double angleBonus = 0.5 + 0.5 * CalculateAngleBonus(osuCurrObj.Angle?? Math.PI);
 
-            return (speedBonus + speedBonus * Math.Pow(distance * wideNess / single_spacing_threshold, 3.5)) * doubletapness / Math.Pow(strainTime, 1.01);
-        } 
+            double speedDifficulty = (speedBonus + speedBonus * Math.Pow(distance * angleBonus / single_spacing_threshold, 3.5)) * doubletapness / Math.Pow(strainTime, 1.01);
+
+            if (double.IsNaN(speedDifficulty))
+                Console.WriteLine(angleBonus);
+
+            return speedDifficulty;
+        }
+        private static double CalculateAngleBonus(double angle)
+        {
+            if (angle == Math.PI) return 0;
+            // Max is used to prevent FP
+            return Math.Max(0, (Math.PI - angle) / Math.Sqrt(2 * (1 - Math.Cos(Math.PI - angle))) - 1);
+        }
     }
 }
