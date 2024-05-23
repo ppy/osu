@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Events;
 using osu.Framework.Utils;
@@ -102,21 +103,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 ? new Vector2((rawScale.X + rawScale.Y) * 0.5f)
                 : rawScale;
 
-            scaleHandler!.Update(newScale, getOriginPosition(), getAdjustAxis());
-        }
-
-        private Vector2 getOriginPosition()
-        {
-            var quad = scaleHandler!.OriginalSurroundingQuad!.Value;
-            Vector2 origin = quad.TopLeft;
-
-            if ((originalAnchor & Anchor.x0) > 0)
-                origin.X += quad.Width;
-
-            if ((originalAnchor & Anchor.y0) > 0)
-                origin.Y += quad.Height;
-
-            return origin;
+            var scaleOrigin = originalAnchor.Opposite().PositionOnQuad(scaleHandler!.OriginalSurroundingQuad!.Value);
+            scaleHandler!.Update(newScale, scaleOrigin, getAdjustAxis());
         }
 
         private Axes getAdjustAxis()
