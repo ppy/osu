@@ -3,6 +3,7 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Extensions;
+using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Events;
 using osu.Framework.Utils;
@@ -47,14 +48,14 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
             rawScale = convertDragEventToScaleMultiplier(e);
 
-            applyScale(shouldLockAspectRatio: e.ShiftPressed);
+            applyScale(shouldLockAspectRatio: isCornerAnchor(originalAnchor) && e.ShiftPressed);
         }
 
         protected override bool OnKeyDown(KeyDownEvent e)
         {
             if (IsDragged)
             {
-                applyScale(shouldLockAspectRatio: e.ShiftPressed);
+                applyScale(shouldLockAspectRatio: isCornerAnchor(originalAnchor) && e.ShiftPressed);
                 return true;
             }
 
@@ -66,7 +67,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             base.OnKeyUp(e);
 
             if (IsDragged)
-                applyScale(shouldLockAspectRatio: e.ShiftPressed);
+                applyScale(shouldLockAspectRatio: isCornerAnchor(originalAnchor) && e.ShiftPressed);
         }
 
         protected override void OnDragEnd(DragEndEvent e)
@@ -123,5 +124,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                     return Axes.Both;
             }
         }
+
+        private bool isCornerAnchor(Anchor anchor) => !anchor.HasFlagFast(Anchor.x1) && !anchor.HasFlagFast(Anchor.y1);
     }
 }
