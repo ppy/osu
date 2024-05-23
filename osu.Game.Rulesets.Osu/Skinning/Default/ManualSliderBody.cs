@@ -2,6 +2,8 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using osu.Framework.Allocation;
+using osu.Framework.Graphics;
 using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Default
@@ -13,15 +15,10 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
     {
         public new void SetVertices(IReadOnlyList<Vector2> vertices) => base.SetVertices(vertices);
 
-        public override Vector2 Size
+        [BackgroundDependencyLoader]
+        private void load()
         {
-            get
-            {
-                if (base.Size != Path.Size)
-                    Size = Path.Size;
-                return base.Size;
-            }
-            set => base.Size = value;
+            AutoSizeAxes = Axes.Both;
         }
     }
 }
