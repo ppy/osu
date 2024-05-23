@@ -51,9 +51,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         protected override bool OnKeyDown(KeyDownEvent e)
         {
-            if (IsDragged && (e.Key == Key.ShiftLeft || e.Key == Key.ShiftRight))
+            if (IsDragged)
             {
-                applyScale(shouldLockAspectRatio: true);
+                applyScale(shouldLockAspectRatio: e.ShiftPressed);
                 return true;
             }
 
@@ -64,8 +64,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
         {
             base.OnKeyUp(e);
 
-            if (IsDragged && (e.Key == Key.ShiftLeft || e.Key == Key.ShiftRight))
-                applyScale(shouldLockAspectRatio: false);
+            if (IsDragged)
+                applyScale(shouldLockAspectRatio: e.ShiftPressed);
         }
 
         protected override void OnDragEnd(DragEndEvent e)
