@@ -34,8 +34,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         /// </summary>
         protected virtual double DifficultyMultiplier => DEFAULT_DIFFICULTY_MULTIPLIER;
 
-        protected List<double> objectStrains = new List<double>();
-        protected double difficulty;
+        protected List<double> ObjectStrains = new List<double>();
+        protected double Difficulty;
 
         protected OsuStrainSkill(Mod[] mods)
             : base(mods)
@@ -44,7 +44,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         public override double DifficultyValue()
         {
-            difficulty = 0;
+            Difficulty = 0;
             double weight = 1;
 
             // Sections with 0 strain are excluded to avoid worst-case time complexity of the following sort (e.g. /b/2351871).
@@ -64,11 +64,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             // We're sorting from highest to lowest strain.
             foreach (double strain in strains.OrderDescending())
             {
-                difficulty += strain * weight;
+                Difficulty += strain * weight;
                 weight *= DecayWeight;
             }
 
-            return difficulty * DifficultyMultiplier;
+            return Difficulty * DifficultyMultiplier;
         }
 
         /// <summary>
@@ -77,9 +77,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         /// </summary>
         public double CountDifficultStrains()
         {
-            double consistentTopStrain = difficulty / 10; // What would the top strain be if all strain values were identical
+            double consistentTopStrain = Difficulty / 10; // What would the top strain be if all strain values were identical
             // Use a weighted sum of all strains. Constants are arbitrary and give nice values
-            return objectStrains.Sum(s => 1.1 / (1 + Math.Exp(-10 * (s / consistentTopStrain - 0.88))));
+            return ObjectStrains.Sum(s => 1.1 / (1 + Math.Exp(-10 * (s / consistentTopStrain - 0.88))));
         }
     }
 }
