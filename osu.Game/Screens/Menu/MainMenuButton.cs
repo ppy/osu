@@ -179,7 +179,6 @@ namespace osu.Game.Screens.Menu
         {
             base.LoadComplete();
 
-            background.Size = initialSize;
             background.Shear = new Vector2(ButtonSystem.WEDGE_WIDTH / initialSize.Y, 0);
 
             // for whatever reason, attempting to size the background "just in time" to cover the visible width
@@ -189,6 +188,9 @@ namespace osu.Game.Screens.Menu
             // (which can exceed the [0;1] range during interpolation).
             backgroundContent.Width = 2 * initialSize.X;
             backgroundContent.Shear = -background.Shear;
+
+            animateState();
+            FinishTransforms(true);
         }
 
         private bool rightward;
@@ -318,38 +320,43 @@ namespace osu.Game.Screens.Menu
 
                 state = value;
 
-                switch (state)
-                {
-                    case ButtonState.Contracted:
-                        switch (ContractStyle)
-                        {
-                            default:
-                                background.ResizeTo(Vector2.Multiply(initialSize, new Vector2(0, 1)), 500, Easing.OutExpo);
-                                this.FadeOut(500);
-                                break;
-
-                            case 1:
-                                background.ResizeTo(Vector2.Multiply(initialSize, new Vector2(0, 1)), 400, Easing.InSine);
-                                this.FadeOut(800);
-                                break;
-                        }
-
-                        break;
-
-                    case ButtonState.Expanded:
-                        const int expand_duration = 500;
-                        background.ResizeTo(initialSize, expand_duration, Easing.OutExpo);
-                        this.FadeIn(expand_duration / 6f);
-                        break;
-
-                    case ButtonState.Exploded:
-                        const int explode_duration = 200;
-                        background.ResizeTo(Vector2.Multiply(initialSize, new Vector2(2, 1)), explode_duration, Easing.OutExpo);
-                        this.FadeOut(explode_duration / 4f * 3);
-                        break;
-                }
+                animateState();
 
                 StateChanged?.Invoke(State);
+            }
+        }
+
+        private void animateState()
+        {
+            switch (state)
+            {
+                case ButtonState.Contracted:
+                    switch (ContractStyle)
+                    {
+                        default:
+                            background.ResizeTo(Vector2.Multiply(initialSize, new Vector2(0, 1)), 500, Easing.OutExpo);
+                            this.FadeOut(500);
+                            break;
+
+                        case 1:
+                            background.ResizeTo(Vector2.Multiply(initialSize, new Vector2(0, 1)), 400, Easing.InSine);
+                            this.FadeOut(800);
+                            break;
+                    }
+
+                    break;
+
+                case ButtonState.Expanded:
+                    const int expand_duration = 500;
+                    background.ResizeTo(initialSize, expand_duration, Easing.OutExpo);
+                    this.FadeIn(expand_duration / 6f);
+                    break;
+
+                case ButtonState.Exploded:
+                    const int explode_duration = 200;
+                    background.ResizeTo(Vector2.Multiply(initialSize, new Vector2(2, 1)), explode_duration, Easing.OutExpo);
+                    this.FadeOut(explode_duration / 4f * 3);
+                    break;
             }
         }
 
