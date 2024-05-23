@@ -38,7 +38,6 @@ namespace osu.Game.Screens.Menu
 
         private UpdateableOnlineBeatmapSetCover cover = null!;
         private IBindable<DailyChallengeInfo?> info = null!;
-        private BufferedContainer background = null!;
 
         [Resolved]
         private IAPIProvider api { get; set; } = null!;
@@ -64,7 +63,7 @@ namespace osu.Game.Screens.Menu
             });
         }
 
-        protected override Drawable CreateBackground(Colour4 accentColour) => background = new BufferedContainer
+        protected override Drawable CreateBackground(Colour4 accentColour) => new BufferedContainer
         {
             Children = new Drawable[]
             {
