@@ -39,6 +39,8 @@ namespace osu.Game.Screens.Menu
         private UpdateableOnlineBeatmapSetCover cover = null!;
         private IBindable<DailyChallengeInfo?> info = null!;
 
+        private Box gradientLayer = null!;
+
         [Resolved]
         private IAPIProvider api { get; set; } = null!;
 
@@ -74,10 +76,10 @@ namespace osu.Game.Screens.Menu
                     Origin = Anchor.Centre,
                     RelativePositionAxes = Axes.Both,
                 },
-                new Box
+                gradientLayer = new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = ColourInfo.GradientVertical(accentColour.Opacity(0), accentColour),
+                    Colour = ColourInfo.GradientVertical(accentColour.Opacity(0.2f), accentColour),
                     Blending = BlendingParameters.Additive,
                 },
                 new Box
@@ -117,6 +119,10 @@ namespace osu.Game.Screens.Menu
                          RNG.NextSingle(-0.5f, 0.5f) * (scale - 1),
                          RNG.NextSingle(-0.5f, 0.5f) * (scale - 1)
                      ), duration, Easing.InOutSine);
+
+                gradientLayer.FadeIn(duration / 2)
+                             .Then()
+                             .FadeOut(duration / 2);
             }
         }
 
