@@ -67,7 +67,7 @@ namespace osu.Game.Screens.Menu
         {
             Children = new Drawable[]
             {
-                cover = new UpdateableOnlineBeatmapSetCover
+                cover = new UpdateableOnlineBeatmapSetCover(timeBeforeLoad: 0, timeBeforeUnload: 600_000)
                 {
                     RelativeSizeAxes = Axes.Y,
                     Anchor = Anchor.Centre,
