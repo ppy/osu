@@ -30,7 +30,6 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Mods;
-using osu.Game.Overlays.OSD;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Backgrounds;
@@ -40,6 +39,7 @@ using osu.Game.Screens.Play;
 using osu.Game.Screens.Select.Details;
 using osu.Game.Screens.Select.Options;
 using osu.Game.Skinning;
+using osu.Game.Utils;
 using osuTK;
 using osuTK.Graphics;
 using osuTK.Input;
@@ -137,6 +137,7 @@ namespace osu.Game.Screens.Select
         private double audioFeedbackLastPlaybackTime;
 
         private IDisposable? modSelectOverlayRegistration;
+        private ModSpeedHotkeyHandler modSpeedHotkeyHandler = null!;
 
         private AdvancedStats advancedStats = null!;
 
@@ -147,16 +148,6 @@ namespace osu.Game.Screens.Select
         internal IOverlayManager? OverlayManager { get; private set; }
 
         private Bindable<bool> configBackgroundBlur = null!;
-
-        private bool lastPitchState;
-
-        private bool usedPitchMods;
-
-        [Resolved]
-        private OnScreenDisplay? onScreenDisplay { get; set; }
-
-        [Resolved]
-        private OsuConfigManager config { get; set; } = null!;
 
         [BackgroundDependencyLoader(true)]
         private void load(AudioManager audio, OsuColour colours, ManageCollectionsDialog? manageCollectionsDialog, DifficultyRecommender? recommender, OsuConfigManager config)
@@ -333,6 +324,7 @@ namespace osu.Game.Screens.Select
                 {
                     RelativeSizeAxes = Axes.Both,
                 },
+                modSpeedHotkeyHandler = new ModSpeedHotkeyHandler(),
             });
 
             if (ShowFooter)
@@ -823,140 +815,6 @@ namespace osu.Game.Screens.Select
             return false;
         }
 
-        private Mod getRateMod(ModType modType, Type type)
-        {
-            var modList = game.AvailableMods.Value[modType];
-            var multiMod = (MultiMod)modList.First(mod => mod is MultiMod multiMod && multiMod.Mods.Count(mod2 => mod2.GetType().IsSubclassOf(type)) > 0);
-            var mod = multiMod.Mods.First(mod => mod.GetType().IsSubclassOf(type));
-            return mod;
-        }
-
-        public void ChangeSpeed(double delta)
-        {
-            ModNightcore modNc = (ModNightcore)getRateMod(ModType.DifficultyIncrease, typeof(ModNightcore));
-            ModDoubleTime modDt = (ModDoubleTime)getRateMod(ModType.DifficultyIncrease, typeof(ModDoubleTime));
-            ModDaycore modDc = (ModDaycore)getRateMod(ModType.DifficultyReduction, typeof(ModDaycore));
-            ModHalfTime modHt = (ModHalfTime)getRateMod(ModType.DifficultyReduction, typeof(ModHalfTime));
-            bool rateModActive = selectedMods.Value.Count(mod => mod is ModRateAdjust) > 0;
-            bool incompatibleModActive = selectedMods.Value.Count(mod => modDt.IncompatibleMods.Count(incompatibleMod => (mod.GetType().IsSubclassOf(incompatibleMod) || mod.GetType() == incompatibleMod) && incompatibleMod != typeof(ModRateAdjust)) > 0) > 0;
-            double newRate = Math.Round(1d + delta, 2);
-            bool isPositive = delta > 0;
-
-            if (incompatibleModActive)
-                return;
-
-            if (!rateModActive)
-            {
-                onScreenDisplay?.Display(new SpeedChangeToast(config, newRate));
-
-                // If no ModRateAdjust is active, activate one
-                ModRateAdjust? newMod = null;
-
-                if (isPositive && !usedPitchMods)
-                    newMod = modDt;
-
-                if (isPositive && usedPitchMods)
-                    newMod = modNc;
-
-                if (!isPositive && !usedPitchMods)
-                    newMod = modHt;
-
-                if (!isPositive && usedPitchMods)
-                    newMod = modDc;
-
-                if (!usedPitchMods && newMod is ModDoubleTime newModDt)
-                    newModDt.AdjustPitch.Value = lastPitchState;
-
-                if (!usedPitchMods && newMod is ModHalfTime newModHt)
-                    newModHt.AdjustPitch.Value = lastPitchState;
-
-                newMod!.SpeedChange.Value = newRate;
-                selectedMods.Value = selectedMods.Value.Append(newMod).ToList();
-                return;
-            }
-
-            ModRateAdjust mod = (ModRateAdjust)selectedMods.Value.First(mod => mod is ModRateAdjust);
-            newRate = Math.Round(mod.SpeedChange.Value + delta, 2);
-
-            // Disable RateAdjustMods if newRate is 1
-            if (newRate == 1.0)
-            {
-                lastPitchState = false;
-                usedPitchMods = false;
-
-                if (mod is ModDoubleTime dtmod && dtmod.AdjustPitch.Value)
-                    lastPitchState = true;
-
-                if (mod is ModHalfTime htmod && htmod.AdjustPitch.Value)
-                    lastPitchState = true;
-
-                if (mod is ModNightcore || mod is ModDaycore)
-                    usedPitchMods = true;
-
-                //Disable RateAdjustMods
-                selectedMods.Value = selectedMods.Value.Where(search => search is not ModRateAdjust).ToList();
-
-                onScreenDisplay?.Display(new SpeedChangeToast(config, newRate));
-
-                return;
-            }
-
-            bool overMaxRateLimit = (mod is ModHalfTime || mod is ModDaycore) && newRate > mod.SpeedChange.MaxValue;
-            bool underMinRateLimit = (mod is ModDoubleTime || mod is ModNightcore) && newRate < mod.SpeedChange.MinValue;
-
-            // Swap mod to opposite mod if newRate exceeds max/min speed values
-            if (overMaxRateLimit || underMinRateLimit)
-            {
-                bool adjustPitch = (mod is ModDoubleTime dtmod && dtmod.AdjustPitch.Value) || (mod is ModHalfTime htmod && htmod.AdjustPitch.Value);
-
-                //Disable RateAdjustMods
-                selectedMods.Value = selectedMods.Value.Where(search => search is not ModRateAdjust).ToList();
-
-                ModRateAdjust? oppositeMod = null;
-
-                switch (mod)
-                {
-                    case ModDoubleTime:
-                        modHt.AdjustPitch.Value = adjustPitch;
-                        oppositeMod = modHt;
-                        break;
-
-                    case ModHalfTime:
-                        modDt.AdjustPitch.Value = adjustPitch;
-                        oppositeMod = modDt;
-                        break;
-
-                    case ModNightcore:
-                        oppositeMod = modDc;
-                        break;
-
-                    case ModDaycore:
-                        oppositeMod = modNc;
-                        break;
-                }
-
-                if (oppositeMod == null) return;
-
-                oppositeMod.SpeedChange.Value = newRate;
-                selectedMods.Value = selectedMods.Value.Append(oppositeMod).ToList();
-
-                onScreenDisplay?.Display(new SpeedChangeToast(config, newRate));
-
-                return;
-            }
-
-            // Cap newRate to max/min values and change rate of current active mod
-            if (newRate > mod.SpeedChange.MaxValue && (mod is ModDoubleTime || mod is ModNightcore))
-                newRate = mod.SpeedChange.MaxValue;
-
-            if (newRate < mod.SpeedChange.MinValue && (mod is ModHalfTime || mod is ModDaycore))
-                newRate = mod.SpeedChange.MinValue;
-
-            mod.SpeedChange.Value = newRate;
-
-            onScreenDisplay?.Display(new SpeedChangeToast(config, newRate));
-        }
-
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
@@ -1160,11 +1018,11 @@ namespace osu.Game.Screens.Select
             switch (e.Action)
             {
                 case GlobalAction.IncreaseModSpeed:
-                    ChangeSpeed(0.05);
+                    modSpeedHotkeyHandler.ChangeSpeed(0.05, ModUtils.FlattenMods(game.AvailableMods.Value.SelectMany(kv => kv.Value)));
                     return true;
 
                 case GlobalAction.DecreaseModSpeed:
-                    ChangeSpeed(-0.05);
+                    modSpeedHotkeyHandler.ChangeSpeed(-0.05, ModUtils.FlattenMods(game.AvailableMods.Value.SelectMany(kv => kv.Value)));
                     return true;
             }
 
