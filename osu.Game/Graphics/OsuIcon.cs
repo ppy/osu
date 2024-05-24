@@ -120,6 +120,7 @@ namespace osu.Game.Graphics
         public static IconUsage Cross => get(OsuIconMapping.Cross);
         public static IconUsage CrossCircle => get(OsuIconMapping.CrossCircle);
         public static IconUsage Crown => get(OsuIconMapping.Crown);
+        public static IconUsage DailyChallenge => get(OsuIconMapping.DailyChallenge);
         public static IconUsage Debug => get(OsuIconMapping.Debug);
         public static IconUsage Delete => get(OsuIconMapping.Delete);
         public static IconUsage Details => get(OsuIconMapping.Details);
@@ -217,6 +218,9 @@ namespace osu.Game.Graphics
 
             [Description(@"crown")]
             Crown,
+
+            [Description(@"daily-challenge")]
+            DailyChallenge,
 
             [Description(@"debug")]
             Debug,

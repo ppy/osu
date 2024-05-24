@@ -949,7 +949,7 @@ namespace osu.Game.Overlays.Mods
                     RequestScroll?.Invoke(this);
 
                 // Killing focus is done here because it's the only feasible place on ModSelectOverlay you can click on without triggering any action.
-                Scheduler.Add(() => GetContainingInputManager().ChangeFocus(null));
+                Scheduler.Add(() => GetContainingFocusManager().ChangeFocus(null));
 
                 return true;
             }

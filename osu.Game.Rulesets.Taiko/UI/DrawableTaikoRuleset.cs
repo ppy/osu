@@ -82,7 +82,12 @@ namespace osu.Game.Rulesets.Taiko.UI
             TimeRange.Value = ComputeTimeRange();
         }
 
-        protected virtual double ComputeTimeRange() => PlayfieldAdjustmentContainer.ComputeTimeRange();
+        protected virtual double ComputeTimeRange()
+        {
+            // Adjust when we're using constant algorithm to not be sluggish.
+            double multiplier = VisualisationMethod == ScrollVisualisationMethod.Constant ? 4 * Beatmap.Difficulty.SliderMultiplier : 1;
+            return PlayfieldAdjustmentContainer.ComputeTimeRange() / multiplier;
+        }
 
         protected override void UpdateAfterChildren()
         {

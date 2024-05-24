@@ -27,7 +27,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
         [Resolved]
         private SelectionRotationHandler? rotationHandler { get; set; }
 
-        public Func<Vector2, Anchor, bool>? OnScale;
+        [Resolved]
+        private SelectionScaleHandler? scaleHandler { get; set; }
+
         public Func<Direction, bool, bool>? OnFlip;
         public Func<bool>? OnReverse;
 
@@ -57,60 +59,11 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         private readonly IBindable<bool> canRotate = new BindableBool();
 
-        private bool canScaleX;
+        private readonly IBindable<bool> canScaleX = new BindableBool();
 
-        /// <summary>
-        /// Whether horizontal scaling (from the left or right edge) support should be enabled.
-        /// </summary>
-        public bool CanScaleX
-        {
-            get => canScaleX;
-            set
-            {
-                if (canScaleX == value) return;
+        private readonly IBindable<bool> canScaleY = new BindableBool();
 
-                canScaleX = value;
-                recreate();
-            }
-        }
-
-        private bool canScaleY;
-
-        /// <summary>
-        /// Whether vertical scaling (from the top or bottom edge) support should be enabled.
-        /// </summary>
-        public bool CanScaleY
-        {
-            get => canScaleY;
-            set
-            {
-                if (canScaleY == value) return;
-
-                canScaleY = value;
-                recreate();
-            }
-        }
-
-        private bool canScaleDiagonally;
-
-        /// <summary>
-        /// Whether diagonal scaling (from a corner) support should be enabled.
-        /// </summary>
-        /// <remarks>
-        /// There are some cases where we only want to allow proportional resizing, and not allow
-        /// one or both explicit directions of scale.
-        /// </remarks>
-        public bool CanScaleDiagonally
-        {
-            get => canScaleDiagonally;
-            set
-            {
-                if (canScaleDiagonally == value) return;
-
-                canScaleDiagonally = value;
-                recreate();
-            }
-        }
+        private readonly IBindable<bool> canScaleDiagonally = new BindableBool();
 
         private bool canFlipX;
 
@@ -176,7 +129,17 @@ namespace osu.Game.Screens.Edit.Compose.Components
             if (rotationHandler != null)
                 canRotate.BindTo(rotationHandler.CanRotateSelectionOrigin);
 
-            canRotate.BindValueChanged(_ => recreate(), true);
+            if (scaleHandler != null)
+            {
+                canScaleX.BindTo(scaleHandler.CanScaleX);
+                canScaleY.BindTo(scaleHandler.CanScaleY);
+                canScaleDiagonally.BindTo(scaleHandler.CanScaleDiagonally);
+            }
+
+            canRotate.BindValueChanged(_ => recreate());
+            canScaleX.BindValueChanged(_ => recreate());
+            canScaleY.BindValueChanged(_ => recreate());
+            canScaleDiagonally.BindValueChanged(_ => recreate(), true);
         }
 
         protected override bool OnKeyDown(KeyDownEvent e)
@@ -265,9 +228,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 }
             };
 
-            if (CanScaleX) addXScaleComponents();
-            if (CanScaleDiagonally) addFullScaleComponents();
-            if (CanScaleY) addYScaleComponents();
+            if (canScaleX.Value) addXScaleComponents();
+            if (canScaleDiagonally.Value) addFullScaleComponents();
+            if (canScaleY.Value) addYScaleComponents();
             if (CanFlipX) addXFlipComponents();
             if (CanFlipY) addYFlipComponents();
             if (canRotate.Value) addRotationComponents();
@@ -353,7 +316,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
             var handle = new SelectionBoxScaleHandle
             {
                 Anchor = anchor,
-                HandleScale = (delta, a) => OnScale?.Invoke(delta, a)
             };
 
             handle.OperationStarted += operationStarted;
