@@ -719,11 +719,7 @@ namespace osu.Game.Screens.Edit
 
         public override bool OnExiting(ScreenExitEvent e)
         {
-            // Before exiting, trigger a focus loss.
-            //
-            // This is important to ensure that if the user is still editing a textbox, it will commit
-            // (and potentially block the exit procedure for save).
-            GetContainingFocusManager().TriggerFocusContention(this);
+            currentScreen?.OnExiting(e);
 
             if (!ExitConfirmed)
             {
