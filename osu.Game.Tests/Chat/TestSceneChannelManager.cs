@@ -75,8 +75,6 @@ namespace osu.Game.Tests.Chat
                     return false;
                 };
             });
-
-            AddUntilStep("wait for notifications client", () => channelManager.NotificationsConnected);
         }
 
         [Test]

@@ -1,17 +1,17 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Utils;
-using osuTK;
 using System;
-using osu.Framework.Graphics.Shaders;
-using osu.Framework.Graphics.Textures;
-using osu.Framework.Graphics.Primitives;
-using osu.Framework.Allocation;
 using System.Collections.Generic;
-using osu.Framework.Graphics.Rendering;
+using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Primitives;
+using osu.Framework.Graphics.Rendering;
+using osu.Framework.Graphics.Shaders;
+using osu.Framework.Graphics.Textures;
+using osu.Framework.Utils;
+using osuTK;
 
 namespace osu.Game.Graphics.Backgrounds
 {
@@ -26,6 +26,8 @@ namespace osu.Game.Graphics.Backgrounds
         private const float equilateral_triangle_ratio = 0.866f;
 
         public float Thickness { get; set; } = 0.02f; // No need for invalidation since it's happening in Update()
+
+        public float ScaleAdjust { get; set; } = 1;
 
         /// <summary>
         /// Whether we should create new triangles as others expire.
@@ -106,7 +108,7 @@ namespace osu.Game.Graphics.Backgrounds
 
                 parts[i] = newParticle;
 
-                float bottomPos = parts[i].Position.Y + triangle_size * equilateral_triangle_ratio / DrawHeight;
+                float bottomPos = parts[i].Position.Y + triangle_size * ScaleAdjust * equilateral_triangle_ratio / DrawHeight;
                 if (bottomPos < 0)
                     parts.RemoveAt(i);
             }
@@ -149,7 +151,7 @@ namespace osu.Game.Graphics.Backgrounds
             if (randomY)
             {
                 // since triangles are drawn from the top - allow them to be positioned a bit above the screen
-                float maxOffset = triangle_size * equilateral_triangle_ratio / DrawHeight;
+                float maxOffset = triangle_size * ScaleAdjust * equilateral_triangle_ratio / DrawHeight;
                 y = Interpolation.ValueAt(nextRandom(), -maxOffset, 1f, 0f, 1f);
             }
 
@@ -188,7 +190,7 @@ namespace osu.Game.Graphics.Backgrounds
 
             private readonly List<TriangleParticle> parts = new List<TriangleParticle>();
 
-            private readonly Vector2 triangleSize = new Vector2(1f, equilateral_triangle_ratio) * triangle_size;
+            private Vector2 triangleSize;
 
             private Vector2 size;
             private float thickness;
@@ -209,6 +211,7 @@ namespace osu.Game.Graphics.Backgrounds
                 size = Source.DrawSize;
                 thickness = Source.Thickness;
                 clampAxes = Source.ClampAxes;
+                triangleSize = new Vector2(1f, equilateral_triangle_ratio) * triangle_size * Source.ScaleAdjust;
 
                 Quad triangleQuad = new Quad(
                     Vector2Extensions.Transform(Vector2.Zero, DrawInfo.Matrix),

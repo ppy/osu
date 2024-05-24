@@ -31,6 +31,8 @@ namespace osu.Game.Rulesets.Mods
 
         public override bool RequiresConfiguration => false;
 
+        public override bool Ranked => true;
+
         public override string SettingDescription => base.SettingDescription.Replace(MinimumAccuracy.ToString(), MinimumAccuracy.Value.ToString("##%", NumberFormatInfo.InvariantInfo));
 
         [SettingSource("Minimum accuracy", "Trigger a failure if your accuracy goes below this value.", SettingControlType = typeof(SettingsPercentageSlider<double>))]

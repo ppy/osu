@@ -6,6 +6,7 @@ using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
@@ -265,6 +266,14 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             return !Precision.AlmostIntersects(maskingBounds, rect);
         }
 
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (skin.IsNotNull())
+                skin.SourceChanged -= updateColour;
+        }
+
         private partial class Tick : Circle
         {
             public Tick()
@@ -462,6 +471,12 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         /// </summary>
         public partial class ExtendableCircle : CompositeDrawable
         {
+            public new ColourInfo Colour
+            {
+                get => Content.Colour;
+                set => Content.Colour = value;
+            }
+
             protected readonly Circle Content;
 
             public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => Content.ReceivePositionalInputAt(screenSpacePos);

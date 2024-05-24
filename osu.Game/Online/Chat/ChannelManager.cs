@@ -16,7 +16,6 @@ using osu.Game.Database;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
-using osu.Game.Online.Notifications;
 using osu.Game.Overlays.Chat.Listing;
 
 namespace osu.Game.Online.Chat
@@ -64,13 +63,8 @@ namespace osu.Game.Online.Chat
         /// </summary>
         public IBindableList<Channel> AvailableChannels => availableChannels;
 
-        /// <summary>
-        /// Whether the client responsible for channel notifications is connected.
-        /// </summary>
-        public bool NotificationsConnected => connector.IsConnected.Value;
-
         private readonly IAPIProvider api;
-        private readonly NotificationsClientConnector connector;
+        private readonly IChatClient chatClient;
 
         [Resolved]
         private UserLookupCache users { get; set; }
@@ -85,7 +79,7 @@ namespace osu.Game.Online.Chat
         {
             this.api = api;
 
-            connector = api.GetNotificationsConnector();
+            chatClient = api.GetChatClient();
 
             CurrentChannel.ValueChanged += currentChannelChanged;
         }
@@ -93,15 +87,11 @@ namespace osu.Game.Online.Chat
         [BackgroundDependencyLoader]
         private void load()
         {
-            connector.ChannelJoined += ch => Schedule(() => joinChannel(ch));
-
-            connector.ChannelParted += ch => Schedule(() => leaveChannel(getChannel(ch), false));
-
-            connector.NewMessages += msgs => Schedule(() => addMessages(msgs));
-
-            connector.PresenceReceived += () => Schedule(initializeChannels);
-
-            connector.Start();
+            chatClient.ChannelJoined += ch => Schedule(() => joinChannel(ch));
+            chatClient.ChannelParted += ch => Schedule(() => leaveChannel(getChannel(ch), false));
+            chatClient.NewMessages += msgs => Schedule(() => addMessages(msgs));
+            chatClient.PresenceReceived += () => Schedule(initializeChannels);
+            chatClient.RequestPresence();
 
             apiState.BindTo(api.State);
             apiState.BindValueChanged(_ => SendAck(), true);
@@ -655,7 +645,7 @@ namespace osu.Game.Online.Chat
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
-            connector?.Dispose();
+            chatClient?.Dispose();
         }
     }
 

@@ -279,7 +279,7 @@ namespace osu.Game.Database
                     // note that this should really be checking filesizes on disk (of existing files) for some degree of sanity.
                     // or alternatively doing a faster hash check. either of these require database changes and reprocessing of existing files.
                     if (CanSkipImport(existing, item) &&
-                        getFilenames(existing.Files).SequenceEqual(getShortenedFilenames(archive).Select(p => p.shortened).OrderBy(f => f)) &&
+                        getFilenames(existing.Files).SequenceEqual(getShortenedFilenames(archive).Select(p => p.shortened).Order()) &&
                         checkAllFilesExist(existing))
                     {
                         LogForModel(item, @$"Found existing (optimised) {HumanisedModelName} for {item} (ID {existing.ID}) – skipping import.");
@@ -437,7 +437,7 @@ namespace osu.Game.Database
         {
             MemoryStream hashable = new MemoryStream();
 
-            foreach (string? file in reader.Filenames.Where(f => HashableFileTypes.Any(ext => f.EndsWith(ext, StringComparison.OrdinalIgnoreCase))).OrderBy(f => f))
+            foreach (string? file in reader.Filenames.Where(f => HashableFileTypes.Any(ext => f.EndsWith(ext, StringComparison.OrdinalIgnoreCase))).Order())
             {
                 using (Stream s = reader.GetStream(file))
                     s.CopyTo(hashable);
@@ -447,16 +447,6 @@ namespace osu.Game.Database
                 return hashable.ComputeSHA2Hash();
 
             return reader.Name.ComputeSHA2Hash();
-        }
-
-        /// <summary>
-        /// Create all required <see cref="File"/>s for the provided archive, adding them to the global file store.
-        /// </summary>
-        private List<RealmNamedFileUsage> createFileInfos(ArchiveReader reader, RealmFileStore files, Realm realm)
-        {
-            var fileInfos = new List<RealmNamedFileUsage>();
-
-            return fileInfos;
         }
 
         private IEnumerable<(string original, string shortened)> getShortenedFilenames(ArchiveReader reader)

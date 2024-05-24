@@ -92,7 +92,7 @@ namespace osu.Game.Screens.Play
                 Scores = { BindTarget = LeaderboardScores }
             };
 
-        protected override ResultsScreen CreateResults(ScoreInfo score) => new SoloResultsScreen(score, false);
+        protected override ResultsScreen CreateResults(ScoreInfo score) => new SoloResultsScreen(score);
 
         public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {

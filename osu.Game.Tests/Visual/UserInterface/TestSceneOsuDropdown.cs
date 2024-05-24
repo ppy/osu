@@ -9,7 +9,6 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Framework.Input.States;
 using osu.Framework.Testing;
-using osu.Game.Beatmaps;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
 
@@ -18,12 +17,21 @@ namespace osu.Game.Tests.Visual.UserInterface
     public partial class TestSceneOsuDropdown : ThemeComparisonTestScene
     {
         protected override Drawable CreateContent() =>
-            new OsuEnumDropdown<BeatmapOnlineStatus>
+            new OsuEnumDropdown<TestEnum>
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.TopCentre,
                 Width = 150
             };
+
+        private enum TestEnum
+        {
+            [System.ComponentModel.Description("Option")]
+            Option,
+
+            [System.ComponentModel.Description("Really lonnnnnnng option")]
+            ReallyLongOption,
+        }
 
         [Test]
         // todo: this can be written much better if ThemeComparisonTestScene has a manual input manager
@@ -43,7 +51,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddStep("press back", () => dropdown().OnPressed(new KeyBindingPressEvent<GlobalAction>(new InputState(), GlobalAction.Back)));
             AddAssert("closed", () => dropdown().ChildrenOfType<Menu>().Single().State == MenuState.Closed);
 
-            OsuEnumDropdown<BeatmapOnlineStatus> dropdown() => this.ChildrenOfType<OsuEnumDropdown<BeatmapOnlineStatus>>().First();
+            OsuEnumDropdown<TestEnum> dropdown() => this.ChildrenOfType<OsuEnumDropdown<TestEnum>>().First();
         }
     }
 }

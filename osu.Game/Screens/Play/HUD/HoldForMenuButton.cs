@@ -109,7 +109,7 @@ namespace osu.Game.Screens.Play.HUD
 
         protected override bool OnMouseMove(MouseMoveEvent e)
         {
-            positionalAdjust = Vector2.Distance(e.MousePosition, button.ToSpaceOfOtherDrawable(button.DrawRectangle.Centre, Parent)) / 100;
+            positionalAdjust = Vector2.Distance(e.MousePosition, button.ToSpaceOfOtherDrawable(button.DrawRectangle.Centre, Parent!)) / 100;
             return base.OnMouseMove(e);
         }
 
@@ -198,9 +198,14 @@ namespace osu.Game.Screens.Play.HUD
                 bind();
             }
 
+            protected override void Update()
+            {
+                base.Update();
+                circularProgress.Progress = Progress.Value;
+            }
+
             private void bind()
             {
-                ((IBindable<double>)circularProgress.Current).BindTo(Progress);
                 Progress.ValueChanged += progress =>
                 {
                     icon.Scale = new Vector2(1 + (float)progress.NewValue * 0.2f);

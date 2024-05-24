@@ -54,7 +54,7 @@ namespace osu.Game.Screens.Select
         }
 
         protected void PresentScore(ScoreInfo score) =>
-            FinaliseSelection(score.BeatmapInfo, score.Ruleset, () => this.Push(new SoloResultsScreen(score, false)));
+            FinaliseSelection(score.BeatmapInfo, score.Ruleset, () => this.Push(new SoloResultsScreen(score)));
 
         protected override BeatmapDetailArea CreateBeatmapDetailArea()
         {

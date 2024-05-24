@@ -45,6 +45,6 @@ namespace osu.Game.Tournament.IO
             Logger.Log("Changing tournament storage: " + GetFullPath(string.Empty));
         }
 
-        public IEnumerable<string> ListTournaments() => AllTournaments.GetDirectories(string.Empty).OrderBy(directory => directory, StringComparer.CurrentCultureIgnoreCase);
+        public IEnumerable<string> ListTournaments() => AllTournaments.GetDirectories(string.Empty).Order(StringComparer.CurrentCultureIgnoreCase);
     }
 }

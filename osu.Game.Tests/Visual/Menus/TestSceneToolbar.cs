@@ -250,7 +250,7 @@ namespace osu.Game.Tests.Visual.Menus
             {
             }
 
-            public virtual IBindable<int> UnreadCount => null;
+            public virtual IBindable<int> UnreadCount { get; } = new Bindable<int>();
 
             public IEnumerable<Notification> AllNotifications => Enumerable.Empty<Notification>();
         }
