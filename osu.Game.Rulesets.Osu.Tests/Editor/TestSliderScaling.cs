@@ -6,6 +6,7 @@
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Testing;
+using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
@@ -68,108 +69,52 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             AddAssert("slider length shrunk", () => slider.Path.Distance < distanceBefore);
         }
 
-        [Test]
-        [Timeout(4000)] //Catches crashes in other threads, but not ideal. Hopefully there is a improvement to this.
-        public void TestScalingSliderFlat(
-            [Values(0, 1, 2, 3)] int typeInt
-        )
-        {
-            Slider slider = null!;
-
-            switch (typeInt)
-            {
-                case 0:
-                    AddStep("Add linear slider", () =>
-                    {
-                        slider = new Slider { StartTime = EditorClock.CurrentTime, Position = new Vector2(300) };
-
-                        PathControlPoint[] points =
-                        {
-                            new PathControlPoint(new Vector2(0), PathType.LINEAR),
-                            new PathControlPoint(new Vector2(50, 100)),
-                        };
-
-                        slider.Path = new SliderPath(points);
-                        EditorBeatmap.Add(slider);
-                    });
-                    break;
-
-                case 1:
-                    AddStep("Add perfect curve slider", () =>
-                    {
-                        slider = new Slider { StartTime = EditorClock.CurrentTime, Position = new Vector2(300) };
-
-                        PathControlPoint[] points =
-                        {
-                            new PathControlPoint(new Vector2(0), PathType.PERFECT_CURVE),
-                            new PathControlPoint(new Vector2(50, 25)),
-                            new PathControlPoint(new Vector2(25, 100)),
-                        };
-
-                        slider.Path = new SliderPath(points);
-                        EditorBeatmap.Add(slider);
-                    });
-                    break;
-
-                case 3:
-                    AddStep("Add catmull slider", () =>
-                    {
-                        slider = new Slider { StartTime = EditorClock.CurrentTime, Position = new Vector2(300) };
-
-                        PathControlPoint[] points =
-                        {
-                            new PathControlPoint(new Vector2(0), PathType.CATMULL),
-                            new PathControlPoint(new Vector2(50, 25)),
-                            new PathControlPoint(new Vector2(25, 80)),
-                            new PathControlPoint(new Vector2(40, 100)),
-                        };
-
-                        slider.Path = new SliderPath(points);
-                        EditorBeatmap.Add(slider);
-                    });
-                    break;
-
-                default:
-                    AddStep("Add bezier slider", () =>
-                    {
-                        slider = new Slider { StartTime = EditorClock.CurrentTime, Position = new Vector2(300) };
-
-                        PathControlPoint[] points =
-                        {
-                            new PathControlPoint(new Vector2(0), PathType.BEZIER),
-                            new PathControlPoint(new Vector2(50, 25)),
-                            new PathControlPoint(new Vector2(25, 80)),
-                            new PathControlPoint(new Vector2(40, 100)),
-                        };
-
-                        slider.Path = new SliderPath(points);
-                        EditorBeatmap.Add(slider);
-                    });
-                    break;
-            }
-
-            AddAssert("ensure object placed", () => EditorBeatmap.HitObjects.Count == 1);
-
-            moveMouse(new Vector2(300));
-            AddStep("select slider", () => InputManager.Click(MouseButton.Left));
-            AddStep("slider is valid", () => slider.Path.GetSegmentEnds()); //To run ensureValid();
-
-            SelectionBoxDragHandle dragHandle = null!;
-            AddStep("store drag handle", () => dragHandle = Editor.ChildrenOfType<SelectionBoxDragHandle>().Skip(1).First());
-            AddAssert("is dragHandle not null", () => dragHandle != null);
-
-            AddStep("move mouse to handle", () => InputManager.MoveMouseTo(dragHandle));
-            AddStep("begin drag", () => InputManager.PressButton(MouseButton.Left));
-            moveMouse(new Vector2(0, 300));
-            AddStep("end drag", () => InputManager.ReleaseButton(MouseButton.Left));
-
-            AddStep("move mouse to handle", () => InputManager.MoveMouseTo(dragHandle));
-            AddStep("begin drag", () => InputManager.PressButton(MouseButton.Left));
-            moveMouse(new Vector2(0, 300)); //Should crash here if broken, although doesn't count as failed...
-            AddStep("end drag", () => InputManager.ReleaseButton(MouseButton.Left));
-        }
-
         private void moveMouse(Vector2 pos) =>
             AddStep($"move mouse to {pos}", () => InputManager.MoveMouseTo(playfield.ToScreenSpace(pos)));
+    }
+    [TestFixture]
+    public class TestSliderNearLinearScaling
+    {
+        [Test]
+        public void TestScalingSliderFlat()
+        {
+            Slider sliderPerfect = new Slider
+            {
+                Position = new Vector2(300),
+                Path = new SliderPath(
+                    [
+                        new PathControlPoint(new Vector2(0), PathType.PERFECT_CURVE),
+                        new PathControlPoint(new Vector2(50, 25)),
+                        new PathControlPoint(new Vector2(25, 100)),
+                    ])
+            };
+
+            Slider sliderBezier = new Slider
+            {
+                Position = new Vector2(300),
+                Path = new SliderPath(
+                    [
+                        new PathControlPoint(new Vector2(0), PathType.BEZIER),
+                        new PathControlPoint(new Vector2(50, 25)),
+                        new PathControlPoint(new Vector2(25, 100)),
+                    ])
+            };
+
+            scaleSlider(sliderPerfect, new Vector2(0.000001f, 1));
+            scaleSlider(sliderBezier, new Vector2(0.000001f, 1));
+
+            for (int i = 0; i < 100; i++)
+            {
+                Assert.True(Precision.AlmostEquals(sliderPerfect.Path.PositionAt(i / 100.0f), sliderBezier.Path.PositionAt(i / 100.0f)));
+            }
+        }
+
+        private void scaleSlider(Slider slider, Vector2 scale)
+        {
+            for (int i = 0; i < slider.Path.ControlPoints.Count; i++)
+            {
+                slider.Path.ControlPoints[i].Position *= scale;
+            }
+        }
     }
 }
