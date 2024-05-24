@@ -46,6 +46,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             countMiss = score.Statistics.GetValueOrDefault(HitResult.Miss);
             countLargeTickMiss = score.Statistics.GetValueOrDefault(HitResult.LargeTickMiss);
 
+            if (totalHits > 0) accuracy = calculateEffectiveAccuracy(countGreat, countOk, countMeh, countMiss, osuAttributes);
+
             if (!useClassicSlider)
                 countSliderEndsDropped = osuAttributes.SliderCount - score.Statistics.GetValueOrDefault(HitResult.SliderTailHit);
 
@@ -192,7 +194,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double relevantCountGreat = Math.Max(0, countGreat - relevantTotalDiff);
             double relevantCountOk = Math.Max(0, countOk - Math.Max(0, relevantTotalDiff - countGreat));
             double relevantCountMeh = Math.Max(0, countMeh - Math.Max(0, relevantTotalDiff - countGreat - countOk));
-            double relevantAccuracy = attributes.SpeedNoteCount == 0 ? 0 : (relevantCountGreat * 6.0 + relevantCountOk * 2.0 + relevantCountMeh) / (attributes.SpeedNoteCount * 6.0);
+            double relevantCountMiss = Math.Max(0, countMiss - Math.Max(0, relevantTotalDiff - countGreat - countOk - countMeh));
+            double relevantAccuracy = attributes.SpeedNoteCount == 0 ? 0 : calculateEffectiveAccuracy(relevantCountGreat, relevantCountOk, relevantCountMeh, relevantCountMiss, attributes);
 
             // Scale the speed value with accuracy and OD.
             speedValue *= (0.95 + Math.Pow(attributes.OverallDifficulty, 2) / 750) * Math.Pow((accuracy + relevantAccuracy) / 2.0, (14.5 - Math.Max(attributes.OverallDifficulty, 8)) / 2);
@@ -281,6 +284,25 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             comboBasedMissCount = Math.Min(comboBasedMissCount, countOk + countMeh + countMiss);
 
             return Math.Max(countMiss, comboBasedMissCount);
+        }
+
+        // This function is calculating accuracy trying to remove sliders from mistap if slideracc is present
+        // This is wrong way to do this, but doing it right way overnerfs already set scores
+        // This is used to no until the better way (statistical accuracy) to do this is present
+        private double calculateEffectiveAccuracy(double c300, double c100, double c50, double cMiss, OsuDifficultyAttributes attributes)
+        {
+            double accuracy = (c300 * 6 + c100 * 2 + c50) / (c300 + c100 + c50 + cMiss) / 6;
+            if (useClassicSlider) return accuracy;
+
+            // Try to remove sliders from mistakes
+            double mistakesPortion = 1 - accuracy;
+
+            double hitcircleRatio = (double)attributes.HitCircleCount / (attributes.HitCircleCount + attributes.SliderCount);
+            mistakesPortion *= hitcircleRatio;
+
+            accuracy = Math.Max(accuracy, 1 - mistakesPortion);
+
+            return accuracy;
         }
 
         private double getComboScalingFactor(OsuDifficultyAttributes attributes) => attributes.MaxCombo <= 0 ? 1.0 : Math.Min(Math.Pow(scoreMaxCombo, 0.8) / Math.Pow(attributes.MaxCombo, 0.8), 1.0);
