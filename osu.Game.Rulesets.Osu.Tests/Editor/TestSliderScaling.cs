@@ -71,12 +71,12 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
         [Test]
         [Timeout(4000)] //Catches crashes in other threads, but not ideal. Hopefully there is a improvement to this.
         public void TestScalingSliderFlat(
-            [Values(0, 1, 2, 3)] int type_int
+            [Values(0, 1, 2, 3)] int typeInt
         )
         {
-            Slider slider = null;
+            Slider slider = null!;
 
-            switch (type_int)
+            switch (typeInt)
             {
                 case 0:
                     AddStep("Add linear slider", () =>
@@ -93,6 +93,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
                         EditorBeatmap.Add(slider);
                     });
                     break;
+
                 case 1:
                     AddStep("Add perfect curve slider", () =>
                     {
@@ -109,14 +110,15 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
                         EditorBeatmap.Add(slider);
                     });
                     break;
-                case 2:
-                    AddStep("Add bezier slider", () =>
+
+                case 3:
+                    AddStep("Add catmull slider", () =>
                     {
                         slider = new Slider { StartTime = EditorClock.CurrentTime, Position = new Vector2(300) };
 
                         PathControlPoint[] points =
                         {
-                            new PathControlPoint(new Vector2(0), PathType.BEZIER),
+                            new PathControlPoint(new Vector2(0), PathType.CATMULL),
                             new PathControlPoint(new Vector2(50, 25)),
                             new PathControlPoint(new Vector2(25, 80)),
                             new PathControlPoint(new Vector2(40, 100)),
@@ -126,14 +128,15 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
                         EditorBeatmap.Add(slider);
                     });
                     break;
-                case 3:
-                    AddStep("Add catmull slider", () =>
+
+                default:
+                    AddStep("Add bezier slider", () =>
                     {
                         slider = new Slider { StartTime = EditorClock.CurrentTime, Position = new Vector2(300) };
 
                         PathControlPoint[] points =
                         {
-                            new PathControlPoint(new Vector2(0), PathType.CATMULL),
+                            new PathControlPoint(new Vector2(0), PathType.BEZIER),
                             new PathControlPoint(new Vector2(50, 25)),
                             new PathControlPoint(new Vector2(25, 80)),
                             new PathControlPoint(new Vector2(40, 100)),
