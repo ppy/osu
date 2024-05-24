@@ -186,7 +186,7 @@ namespace osu.Game.Overlays.Mods
                     Anchor = Anchor.BottomCentre,
                     Origin = Anchor.BottomCentre,
                     Height = 0
-                }
+                },
             });
 
             MainAreaContent.AddRange(new Drawable[]
