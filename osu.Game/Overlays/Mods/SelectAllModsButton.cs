@@ -41,8 +41,8 @@ namespace osu.Game.Overlays.Mods
         private void updateEnabledState()
         {
             Enabled.Value = availableMods.Value
-                                         .Where(pair => pair.Key != ModType.System)
                                          .SelectMany(pair => pair.Value)
+                                         .Where(modState => modState.ValidForSelection.Value)
                                          .Any(modState => !modState.Active.Value && modState.Visible);
         }
     }

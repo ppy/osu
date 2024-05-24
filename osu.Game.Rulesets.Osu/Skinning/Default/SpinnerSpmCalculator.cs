@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
-using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.ObjectExtensions;
@@ -33,14 +32,16 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
             drawableSpinner.HitObjectApplied += resetState;
         }
 
+        private RotationRecord lastRecord;
+
         public void SetRotation(float currentRotation)
         {
             // If we've gone back in time, it's fine to work with a fresh set of records for now
-            if (records.Count > 0 && Time.Current < records.Last().Time)
+            if (records.Count > 0 && Time.Current < lastRecord.Time)
                 records.Clear();
 
             // Never calculate SPM by same time of record to avoid 0 / 0 = NaN or X / 0 = Infinity result.
-            if (records.Count > 0 && Precision.AlmostEquals(Time.Current, records.Last().Time))
+            if (records.Count > 0 && Precision.AlmostEquals(Time.Current, lastRecord.Time))
                 return;
 
             if (records.Count > 0)
@@ -52,11 +53,12 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
                 result.Value = (currentRotation - record.Rotation) / (Time.Current - record.Time) * 1000 * 60 / 360;
             }
 
-            records.Enqueue(new RotationRecord { Rotation = currentRotation, Time = Time.Current });
+            records.Enqueue(lastRecord = new RotationRecord { Rotation = currentRotation, Time = Time.Current });
         }
 
         private void resetState(DrawableHitObject hitObject)
         {
+            lastRecord = default;
             result.Value = 0;
             records.Clear();
         }

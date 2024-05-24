@@ -39,7 +39,7 @@ namespace osu.Game.Rulesets.Catch.Tests
                 Mod = new CatchModHidden(),
                 PassCondition = () => Player.Results.Count > 0
                                       && Player.ChildrenOfType<DrawableJuiceStream>().Single().Alpha > 0
-                                      && Player.ChildrenOfType<DrawableFruit>().Last().Alpha > 0
+                                      && Player.ChildrenOfType<DrawableFruit>().First().Alpha > 0
             });
         }
 
