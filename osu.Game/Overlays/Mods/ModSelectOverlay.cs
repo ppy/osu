@@ -707,12 +707,10 @@ namespace osu.Game.Overlays.Mods
             switch (e.Action)
             {
                 case GlobalAction.IncreaseModSpeed:
-                    modSpeedHotkeyHandler.ChangeSpeed(0.05, AllAvailableMods.Where(state => state.ValidForSelection.Value).Select(state => state.Mod));
-                    return true;
+                    return modSpeedHotkeyHandler.ChangeSpeed(0.05, AllAvailableMods.Where(state => state.ValidForSelection.Value).Select(state => state.Mod));
 
                 case GlobalAction.DecreaseModSpeed:
-                    modSpeedHotkeyHandler.ChangeSpeed(-0.05, AllAvailableMods.Where(state => state.ValidForSelection.Value).Select(state => state.Mod));
-                    return true;
+                    return modSpeedHotkeyHandler.ChangeSpeed(-0.05, AllAvailableMods.Where(state => state.ValidForSelection.Value).Select(state => state.Mod));
             }
 
             if (e.Repeat)
