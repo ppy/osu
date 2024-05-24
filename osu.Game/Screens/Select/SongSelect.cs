@@ -1018,12 +1018,10 @@ namespace osu.Game.Screens.Select
             switch (e.Action)
             {
                 case GlobalAction.IncreaseModSpeed:
-                    modSpeedHotkeyHandler.ChangeSpeed(0.05, ModUtils.FlattenMods(game.AvailableMods.Value.SelectMany(kv => kv.Value)));
-                    return true;
+                    return modSpeedHotkeyHandler.ChangeSpeed(0.05, ModUtils.FlattenMods(game.AvailableMods.Value.SelectMany(kv => kv.Value)));
 
                 case GlobalAction.DecreaseModSpeed:
-                    modSpeedHotkeyHandler.ChangeSpeed(-0.05, ModUtils.FlattenMods(game.AvailableMods.Value.SelectMany(kv => kv.Value)));
-                    return true;
+                    return modSpeedHotkeyHandler.ChangeSpeed(-0.05, ModUtils.FlattenMods(game.AvailableMods.Value.SelectMany(kv => kv.Value)));
             }
 
             if (e.Repeat)
