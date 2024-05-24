@@ -723,7 +723,7 @@ namespace osu.Game.Screens.Edit
             //
             // This is important to ensure that if the user is still editing a textbox, it will commit
             // (and potentially block the exit procedure for save).
-            GetContainingInputManager().TriggerFocusContention(this);
+            GetContainingFocusManager().TriggerFocusContention(this);
 
             if (!ExitConfirmed)
             {

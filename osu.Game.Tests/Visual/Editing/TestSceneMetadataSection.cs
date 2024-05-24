@@ -65,7 +65,7 @@ namespace osu.Game.Tests.Visual.Editing
             // It's important values are committed immediately on focus loss so the editor exit sequence detects them.
             AddAssert("value immediately changed on focus loss", () =>
             {
-                InputManager.TriggerFocusContention(metadataSection);
+                ((IFocusManager)InputManager).TriggerFocusContention(metadataSection);
                 return editorBeatmap.Metadata.Artist;
             }, () => Is.EqualTo("Example ArtistExample Artist"));
         }
