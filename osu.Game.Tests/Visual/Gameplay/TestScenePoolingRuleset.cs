@@ -269,6 +269,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
                 drawableRuleset = (TestDrawablePoolingRuleset)ruleset.CreateDrawableRulesetWith(CreateWorkingBeatmap(beatmap).GetPlayableBeatmap(ruleset.RulesetInfo));
                 drawableRuleset.FrameStablePlayback = true;
+                drawableRuleset.AllowBackwardsSeeks = true;
                 drawableRuleset.PoolSize = poolSize;
 
                 Child = new Container
@@ -431,7 +432,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             protected override void CheckForResult(bool userTriggered, double timeOffset)
             {
                 if (timeOffset > HitObject.Duration)
-                    ApplyResult(r => r.Type = r.Judgement.MaxResult);
+                    ApplyMaxResult();
             }
 
             protected override void UpdateHitStateTransforms(ArmedState state)
@@ -468,7 +469,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             public override void OnKilled()
             {
                 base.OnKilled();
-                ApplyResult(r => r.Type = r.Judgement.MinResult);
+                ApplyMinResult();
             }
         }
 
@@ -547,7 +548,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             {
                 base.CheckForResult(userTriggered, timeOffset);
                 if (timeOffset >= 0)
-                    ApplyResult(r => r.Type = r.Judgement.MaxResult);
+                    ApplyMaxResult();
             }
         }
 
@@ -596,7 +597,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             {
                 base.CheckForResult(userTriggered, timeOffset);
                 if (timeOffset >= 0)
-                    ApplyResult(r => r.Type = r.Judgement.MaxResult);
+                    ApplyMaxResult();
             }
         }
 

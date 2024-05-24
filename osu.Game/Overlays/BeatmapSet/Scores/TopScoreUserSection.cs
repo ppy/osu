@@ -118,7 +118,6 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                                 Origin = Anchor.CentreLeft,
                                 Size = new Vector2(19, 14),
                                 Margin = new MarginPadding { Top = 3 }, // makes spacing look more even
-                                ShowPlaceholderOnUnknown = false,
                             },
                         }
                     }

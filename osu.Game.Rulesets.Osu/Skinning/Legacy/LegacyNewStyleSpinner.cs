@@ -135,7 +135,11 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
         protected override void Update()
         {
             base.Update();
-            spinningMiddle.Rotation = discTop.Rotation = DrawableSpinner.RotationTracker.Rotation;
+
+            float turnRatio = spinningMiddle.Texture != null ? 0.5f : 1;
+            discTop.Rotation = DrawableSpinner.RotationTracker.Rotation * turnRatio;
+            spinningMiddle.Rotation = DrawableSpinner.RotationTracker.Rotation;
+
             discBottom.Rotation = discTop.Rotation / 3;
 
             glow.Alpha = DrawableSpinner.Progress;

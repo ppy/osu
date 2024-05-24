@@ -179,7 +179,7 @@ namespace osu.Game.Tests.Visual.Playlists
 
             public IBindable<bool> InitialRoomsReceived { get; } = new Bindable<bool>(true);
 
-            public IBindableList<Room> Rooms => null;
+            public IBindableList<Room> Rooms => null!;
 
             public void AddOrUpdateRoom(Room room) => throw new NotImplementedException();
 

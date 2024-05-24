@@ -58,6 +58,9 @@ namespace osu.Game.Skinning
         {
         }
 
+        protected override IResourceStore<TextureUpload> CreateTextureLoaderStore(IStorageResourceProvider resources, IResourceStore<byte[]> storage)
+            => new LegacyTextureLoaderStore(base.CreateTextureLoaderStore(resources, storage));
+
         protected override void ParseConfigurationStream(Stream stream)
         {
             base.ParseConfigurationStream(stream);
@@ -477,6 +480,11 @@ namespace osu.Game.Skinning
             return null;
         }
 
+        /// <summary>
+        /// Whether high-resolution textures ("@2x"-suffixed) are allowed to be used by <see cref="GetTexture"/> when available.
+        /// </summary>
+        protected virtual bool AllowHighResolutionSprites => true;
+
         public override Texture? GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT)
         {
             switch (componentName)
@@ -486,32 +494,30 @@ namespace osu.Game.Skinning
                     break;
             }
 
-            foreach (string name in getFallbackNames(componentName))
+            Texture? texture = null;
+            float ratio = 1;
+
+            if (AllowHighResolutionSprites)
             {
                 // some component names (especially user-controlled ones, like `HitX` in mania)
                 // may contain `@2x` scale specifications.
                 // stable happens to check for that and strip them, so do the same to match stable behaviour.
-                string lookupName = name.Replace(@"@2x", string.Empty);
+                componentName = componentName.Replace(@"@2x", string.Empty);
 
-                float ratio = 2;
-                string twoTimesFilename = $"{Path.ChangeExtension(lookupName, null)}@2x{Path.GetExtension(lookupName)}";
+                string twoTimesFilename = $"{Path.ChangeExtension(componentName, null)}@2x{Path.GetExtension(componentName)}";
 
-                var texture = Textures?.Get(twoTimesFilename, wrapModeS, wrapModeT);
+                texture = Textures?.Get(twoTimesFilename, wrapModeS, wrapModeT);
 
-                if (texture == null)
-                {
-                    ratio = 1;
-                    texture = Textures?.Get(lookupName, wrapModeS, wrapModeT);
-                }
-
-                if (texture == null)
-                    continue;
-
-                texture.ScaleAdjust = ratio;
-                return texture;
+                if (texture != null)
+                    ratio = 2;
             }
 
-            return null;
+            texture ??= Textures?.Get(componentName, wrapModeS, wrapModeT);
+
+            if (texture != null)
+                texture.ScaleAdjust = ratio;
+
+            return texture;
         }
 
         public override ISample? GetSample(ISampleInfo sampleInfo)
@@ -522,7 +528,7 @@ namespace osu.Game.Skinning
                 lookupNames = getLegacyLookupNames(hitSample);
             else
             {
-                lookupNames = sampleInfo.LookupNames.SelectMany(getFallbackNames);
+                lookupNames = sampleInfo.LookupNames.SelectMany(getFallbackSampleNames);
             }
 
             foreach (string lookup in lookupNames)
@@ -540,7 +546,7 @@ namespace osu.Game.Skinning
 
         private IEnumerable<string> getLegacyLookupNames(HitSampleInfo hitSample)
         {
-            var lookupNames = hitSample.LookupNames.SelectMany(getFallbackNames);
+            var lookupNames = hitSample.LookupNames.SelectMany(getFallbackSampleNames);
 
             if (!UseCustomSampleBanks && !string.IsNullOrEmpty(hitSample.Suffix))
             {
@@ -559,13 +565,13 @@ namespace osu.Game.Skinning
             yield return hitSample.Name;
         }
 
-        private IEnumerable<string> getFallbackNames(string componentName)
+        private IEnumerable<string> getFallbackSampleNames(string name)
         {
-            // May be something like "Gameplay/osu/approachcircle" from lazer, or "Arrows/note1" from a user skin.
-            yield return componentName;
+            // May be something like "Gameplay/normal-hitnormal" from lazer.
+            yield return name;
 
-            // Fall back to using the last piece for components coming from lazer (e.g. "Gameplay/osu/approachcircle" -> "approachcircle").
-            yield return componentName.Split('/').Last();
+            // Fall back to using the last piece for components coming from lazer (e.g. "Gameplay/normal-hitnormal" -> "normal-hitnormal").
+            yield return name.Split('/').Last();
         }
     }
 }

@@ -1,10 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
-using JetBrains.Annotations;
 using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -83,8 +80,7 @@ namespace osu.Game.Screens.Ranking
         private static readonly Color4 contracted_top_layer_colour = Color4Extensions.FromHex("#353535");
         private static readonly Color4 contracted_middle_layer_colour = Color4Extensions.FromHex("#353535");
 
-        [CanBeNull]
-        public event Action<PanelState> StateChanged;
+        public event Action<PanelState>? StateChanged;
 
         /// <summary>
         /// The position of the score in the rankings.
@@ -94,28 +90,30 @@ namespace osu.Game.Screens.Ranking
         /// <summary>
         /// An action to be invoked if this <see cref="ScorePanel"/> is clicked while in an expanded state.
         /// </summary>
-        public Action PostExpandAction;
+        public Action? PostExpandAction;
 
         public readonly ScoreInfo Score;
 
         [Resolved]
-        private OsuGameBase game { get; set; }
+        private OsuGameBase game { get; set; } = null!;
 
-        private AudioContainer audioContent;
+        private AudioContainer audioContent = null!;
 
         private bool displayWithFlair;
 
-        private Container topLayerContainer;
-        private Drawable topLayerBackground;
-        private Container topLayerContentContainer;
-        private Drawable topLayerContent;
+        private Container topLayerContainer = null!;
+        private Drawable topLayerBackground = null!;
+        private Container topLayerContentContainer = null!;
+        private Drawable? topLayerContent;
 
-        private Container middleLayerContainer;
-        private Drawable middleLayerBackground;
-        private Container middleLayerContentContainer;
-        private Drawable middleLayerContent;
+        private Container middleLayerContainer = null!;
+        private Drawable middleLayerBackground = null!;
+        private Container middleLayerContentContainer = null!;
+        private Drawable? middleLayerContent;
 
-        private DrawableSample samplePanelFocus;
+        private ScorePanelTrackingContainer? trackingContainer;
+
+        private DrawableSample? samplePanelFocus;
 
         public ScorePanel(ScoreInfo score, bool isNewLocalScore = false)
         {
@@ -333,8 +331,6 @@ namespace osu.Game.Screens.Ranking
             => base.ReceivePositionalInputAt(screenSpacePos)
                || topLayerContainer.ReceivePositionalInputAt(screenSpacePos)
                || middleLayerContainer.ReceivePositionalInputAt(screenSpacePos);
-
-        private ScorePanelTrackingContainer trackingContainer;
 
         /// <summary>
         /// Creates a <see cref="ScorePanelTrackingContainer"/> which this <see cref="ScorePanel"/> can reside inside.
