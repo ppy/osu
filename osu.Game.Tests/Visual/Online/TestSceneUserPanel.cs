@@ -14,7 +14,6 @@ using osu.Game.Beatmaps;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
 using osu.Game.Rulesets;
-using osu.Game.Rulesets.Osu;
 using osu.Game.Scoring;
 using osu.Game.Tests.Beatmaps;
 using osu.Game.Users;
@@ -142,7 +141,7 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("choosing", () => activity.Value = new UserActivity.ChoosingBeatmap());
             AddStep("editing beatmap", () => activity.Value = new UserActivity.EditingBeatmap(new BeatmapInfo()));
             AddStep("modding beatmap", () => activity.Value = new UserActivity.ModdingBeatmap(new BeatmapInfo()));
-            AddStep("testing beatmap", () => activity.Value = new UserActivity.TestingBeatmap(new BeatmapInfo(), new OsuRuleset().RulesetInfo));
+            AddStep("testing beatmap", () => activity.Value = new UserActivity.TestingBeatmap(new BeatmapInfo()));
         }
 
         [Test]

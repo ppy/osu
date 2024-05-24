@@ -210,7 +210,7 @@ namespace osu.Game.Overlays.Dialog
                                     RelativeSizeAxes = Axes.X,
                                     AutoSizeAxes = Axes.Y,
                                     TextAnchor = Anchor.TopCentre,
-                                    Padding = new MarginPadding { Horizontal = 5 },
+                                    Padding = new MarginPadding { Horizontal = 15 },
                                 },
                                 body = new OsuTextFlowContainer(t => t.Font = t.Font.With(size: 18))
                                 {
@@ -219,7 +219,7 @@ namespace osu.Game.Overlays.Dialog
                                     TextAnchor = Anchor.TopCentre,
                                     RelativeSizeAxes = Axes.X,
                                     AutoSizeAxes = Axes.Y,
-                                    Padding = new MarginPadding { Horizontal = 5 },
+                                    Padding = new MarginPadding { Horizontal = 15 },
                                 },
                                 buttonsContainer = new FillFlowContainer<PopupDialogButton>
                                 {

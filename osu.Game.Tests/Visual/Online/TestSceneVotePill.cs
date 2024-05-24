@@ -11,6 +11,7 @@ using osu.Framework.Allocation;
 using osu.Game.Overlays;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Online.API;
 
 namespace osu.Game.Tests.Visual.Online
 {
@@ -72,7 +73,11 @@ namespace osu.Game.Tests.Visual.Online
             AddAssert("Login overlay is visible", () => login.State.Value == Visibility.Visible);
         }
 
-        private void logIn() => API.Login("localUser", "password");
+        private void logIn()
+        {
+            API.Login("localUser", "password");
+            ((DummyAPIAccess)API).AuthenticateSecondFactor("abcdefgh");
+        }
 
         private Comment getUserComment() => new Comment
         {
