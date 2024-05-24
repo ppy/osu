@@ -704,6 +704,17 @@ namespace osu.Game.Overlays.Mods
 
         public override bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
+            switch (e.Action)
+            {
+                case GlobalAction.IncreaseModSpeed:
+                    modSpeedHotkeyHandler.ChangeSpeed(0.05, AllAvailableMods.Where(state => state.ValidForSelection.Value).Select(state => state.Mod));
+                    return true;
+
+                case GlobalAction.DecreaseModSpeed:
+                    modSpeedHotkeyHandler.ChangeSpeed(-0.05, AllAvailableMods.Where(state => state.ValidForSelection.Value).Select(state => state.Mod));
+                    return true;
+            }
+
             if (e.Repeat)
                 return false;
 
@@ -755,14 +766,6 @@ namespace osu.Game.Overlays.Mods
 
                     return true;
                 }
-
-                case GlobalAction.IncreaseModSpeed:
-                    modSpeedHotkeyHandler.ChangeSpeed(0.05, AllAvailableMods.Where(state => state.ValidForSelection.Value).Select(state => state.Mod));
-                    return true;
-
-                case GlobalAction.DecreaseModSpeed:
-                    modSpeedHotkeyHandler.ChangeSpeed(-0.05, AllAvailableMods.Where(state => state.ValidForSelection.Value).Select(state => state.Mod));
-                    return true;
             }
 
             return base.OnPressed(e);
