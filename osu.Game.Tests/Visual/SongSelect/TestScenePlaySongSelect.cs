@@ -93,25 +93,25 @@ namespace osu.Game.Tests.Visual.SongSelect
             createSongSelect();
             changeMods();
 
-            AddStep("decrease speed", () => songSelect?.ChangeSpeed(-0.05));
+            decreaseModSpeed();
             AddAssert("half time activated at 0.95x", () => songSelect!.Mods.Value.OfType<ModHalfTime>().Single().SpeedChange.Value, () => Is.EqualTo(0.95).Within(0.005));
 
-            AddStep("decrease speed", () => songSelect?.ChangeSpeed(-0.05));
+            decreaseModSpeed();
             AddAssert("half time speed changed to 0.9x", () => songSelect!.Mods.Value.OfType<ModHalfTime>().Single().SpeedChange.Value, () => Is.EqualTo(0.9).Within(0.005));
 
-            AddStep("increase speed", () => songSelect?.ChangeSpeed(0.05));
+            increaseModSpeed();
             AddAssert("half time speed changed to 0.95x", () => songSelect!.Mods.Value.OfType<ModHalfTime>().Single().SpeedChange.Value, () => Is.EqualTo(0.95).Within(0.005));
 
-            AddStep("increase speed", () => songSelect?.ChangeSpeed(0.05));
+            increaseModSpeed();
             AddAssert("no mods selected", () => songSelect!.Mods.Value.Count == 0);
 
-            AddStep("increase speed", () => songSelect?.ChangeSpeed(0.05));
+            increaseModSpeed();
             AddAssert("double time activated at 1.05x", () => songSelect!.Mods.Value.OfType<ModDoubleTime>().Single().SpeedChange.Value, () => Is.EqualTo(1.05).Within(0.005));
 
-            AddStep("increase speed", () => songSelect?.ChangeSpeed(0.05));
+            increaseModSpeed();
             AddAssert("double time speed changed to 1.1x", () => songSelect!.Mods.Value.OfType<ModDoubleTime>().Single().SpeedChange.Value, () => Is.EqualTo(1.1).Within(0.005));
 
-            AddStep("decrease speed", () => songSelect?.ChangeSpeed(-0.05));
+            decreaseModSpeed();
             AddAssert("double time speed changed to 1.05x", () => songSelect!.Mods.Value.OfType<ModDoubleTime>().Single().SpeedChange.Value, () => Is.EqualTo(1.05).Within(0.005));
 
             OsuModNightcore nc = new OsuModNightcore
@@ -119,22 +119,23 @@ namespace osu.Game.Tests.Visual.SongSelect
                 SpeedChange = { Value = 1.05 }
             };
             changeMods(nc);
-            AddStep("increase speed", () => songSelect?.ChangeSpeed(0.05));
+
+            increaseModSpeed();
             AddAssert("nightcore speed changed to 1.1x", () => songSelect!.Mods.Value.OfType<ModNightcore>().Single().SpeedChange.Value, () => Is.EqualTo(1.1).Within(0.005));
 
-            AddStep("decrease speed", () => songSelect?.ChangeSpeed(-0.05));
+            decreaseModSpeed();
             AddAssert("nightcore speed changed to 1.05x", () => songSelect!.Mods.Value.OfType<ModNightcore>().Single().SpeedChange.Value, () => Is.EqualTo(1.05).Within(0.005));
 
-            AddStep("decrease speed", () => songSelect?.ChangeSpeed(-0.05));
+            decreaseModSpeed();
             AddAssert("no mods selected", () => songSelect!.Mods.Value.Count == 0);
 
-            AddStep("decrease speed", () => songSelect?.ChangeSpeed(-0.05));
+            decreaseModSpeed();
             AddAssert("daycore activated at 0.95x", () => songSelect!.Mods.Value.OfType<ModDaycore>().Single().SpeedChange.Value, () => Is.EqualTo(0.95).Within(0.005));
 
-            AddStep("decrease speed", () => songSelect?.ChangeSpeed(-0.05));
+            decreaseModSpeed();
             AddAssert("daycore activated at 0.95x", () => songSelect!.Mods.Value.OfType<ModDaycore>().Single().SpeedChange.Value, () => Is.EqualTo(0.9).Within(0.005));
 
-            AddStep("increase speed", () => songSelect?.ChangeSpeed(0.05));
+            increaseModSpeed();
             AddAssert("daycore activated at 0.95x", () => songSelect!.Mods.Value.OfType<ModDaycore>().Single().SpeedChange.Value, () => Is.EqualTo(0.95).Within(0.005));
 
             OsuModDoubleTime dt = new OsuModDoubleTime
@@ -143,7 +144,8 @@ namespace osu.Game.Tests.Visual.SongSelect
                 AdjustPitch = { Value = true },
             };
             changeMods(dt);
-            AddStep("decrease speed", () => songSelect?.ChangeSpeed(-0.05));
+
+            decreaseModSpeed();
             AddAssert("half time activated at 0.97x", () => songSelect!.Mods.Value.OfType<ModHalfTime>().Single().SpeedChange.Value, () => Is.EqualTo(0.97).Within(0.005));
             AddAssert("adjust pitch preserved", () => songSelect!.Mods.Value.OfType<ModHalfTime>().Single().AdjustPitch.Value, () => Is.True);
 
@@ -154,19 +156,34 @@ namespace osu.Game.Tests.Visual.SongSelect
             };
             Mod[] modlist = { ht, new OsuModHardRock(), new OsuModHidden() };
             changeMods(modlist);
-            AddStep("decrease speed", () => songSelect?.ChangeSpeed(0.05));
+
+            increaseModSpeed();
             AddAssert("double time activated at 1.02x", () => songSelect!.Mods.Value.OfType<ModDoubleTime>().Single().SpeedChange.Value, () => Is.EqualTo(1.02).Within(0.005));
             AddAssert("double time activated at 1.02x", () => songSelect!.Mods.Value.OfType<ModDoubleTime>().Single().AdjustPitch.Value, () => Is.True);
             AddAssert("HD still enabled", () => songSelect!.Mods.Value.OfType<ModHidden>().SingleOrDefault(), () => Is.Not.Null);
             AddAssert("HR still enabled", () => songSelect!.Mods.Value.OfType<ModHardRock>().SingleOrDefault(), () => Is.Not.Null);
 
             changeMods(new ModWindUp());
-            AddStep("windup active, trying to change speed", () => songSelect?.ChangeSpeed(0.05));
+            increaseModSpeed();
             AddAssert("windup still active", () => songSelect!.Mods.Value.First() is ModWindUp);
 
             changeMods(new ModAdaptiveSpeed());
-            AddStep("adaptive speed active, trying to change speed", () => songSelect?.ChangeSpeed(0.05));
+            increaseModSpeed();
             AddAssert("adaptive speed still active", () => songSelect!.Mods.Value.First() is ModAdaptiveSpeed);
+
+            void increaseModSpeed() => AddStep("increase mod speed", () =>
+            {
+                InputManager.PressKey(Key.ControlLeft);
+                InputManager.Key(Key.Up);
+                InputManager.ReleaseKey(Key.ControlLeft);
+            });
+
+            void decreaseModSpeed() => AddStep("decrease mod speed", () =>
+            {
+                InputManager.PressKey(Key.ControlLeft);
+                InputManager.Key(Key.Down);
+                InputManager.ReleaseKey(Key.ControlLeft);
+            });
         }
 
         [Test]

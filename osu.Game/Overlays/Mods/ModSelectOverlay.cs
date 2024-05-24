@@ -64,9 +64,6 @@ namespace osu.Game.Overlays.Mods
 
         private Func<Mod, bool> isValidMod = _ => true;
 
-        [Resolved]
-        private SongSelect? songSelect { get; set; }
-
         /// <summary>
         /// A function determining whether each mod in the column should be displayed.
         /// A return value of <see langword="true"/> means that the mod is not filtered and therefore its corresponding panel should be displayed.
@@ -138,6 +135,7 @@ namespace osu.Game.Overlays.Mods
         private FillFlowContainer<ShearedButton> footerButtonFlow = null!;
         private FillFlowContainer footerContentFlow = null!;
         private DeselectAllModsButton deselectAllModsButton = null!;
+        private ModSpeedHotkeyHandler modSpeedHotkeyHandler = null!;
 
         private Container aboveColumnsContent = null!;
         private RankingInformationDisplay? rankingInformationDisplay;
@@ -190,7 +188,8 @@ namespace osu.Game.Overlays.Mods
                     Anchor = Anchor.BottomCentre,
                     Origin = Anchor.BottomCentre,
                     Height = 0
-                }
+                },
+                modSpeedHotkeyHandler = new ModSpeedHotkeyHandler(),
             });
 
             MainAreaContent.AddRange(new Drawable[]
@@ -758,11 +757,11 @@ namespace osu.Game.Overlays.Mods
                 }
 
                 case GlobalAction.IncreaseModSpeed:
-                    songSelect?.ChangeSpeed(0.05);
+                    modSpeedHotkeyHandler.ChangeSpeed(0.05, AllAvailableMods.Where(state => state.ValidForSelection.Value).Select(state => state.Mod));
                     return true;
 
                 case GlobalAction.DecreaseModSpeed:
-                    songSelect?.ChangeSpeed(-0.05);
+                    modSpeedHotkeyHandler.ChangeSpeed(-0.05, AllAvailableMods.Where(state => state.ValidForSelection.Value).Select(state => state.Mod));
                     return true;
             }
 
