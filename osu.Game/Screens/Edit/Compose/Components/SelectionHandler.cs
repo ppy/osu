@@ -57,6 +57,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         public SelectionRotationHandler RotationHandler { get; private set; }
 
+        public SelectionScaleHandler ScaleHandler { get; private set; }
+
         protected SelectionHandler()
         {
             selectedBlueprints = new List<SelectionBlueprint<T>>();
@@ -69,6 +71,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         {
             var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
             dependencies.CacheAs(RotationHandler = CreateRotationHandler());
+            dependencies.CacheAs(ScaleHandler = CreateScaleHandler());
             return dependencies;
         }
 
@@ -78,6 +81,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             AddRangeInternal(new Drawable[]
             {
                 RotationHandler,
+                ScaleHandler,
                 SelectionBox = CreateSelectionBox(),
             });
 
@@ -93,7 +97,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 OperationStarted = OnOperationBegan,
                 OperationEnded = OnOperationEnded,
 
-                OnScale = HandleScale,
                 OnFlip = HandleFlip,
                 OnReverse = HandleReverse,
             };
@@ -156,6 +159,11 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <param name="anchor">The point of reference where the scale is originating from.</param>
         /// <returns>Whether any items could be scaled.</returns>
         public virtual bool HandleScale(Vector2 scale, Anchor anchor) => false;
+
+        /// <summary>
+        /// Creates the handler to use for scale operations.
+        /// </summary>
+        public virtual SelectionScaleHandler CreateScaleHandler() => new SelectionScaleHandler();
 
         /// <summary>
         /// Handles the selected items being flipped.
