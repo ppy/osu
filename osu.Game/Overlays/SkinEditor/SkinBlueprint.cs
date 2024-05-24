@@ -40,7 +40,9 @@ namespace osu.Game.Overlays.SkinEditor
 
         public override bool Contains(Vector2 screenSpacePos) => drawableQuad.Contains(screenSpacePos);
 
-        public override Vector2 ScreenSpaceSelectionPoint => drawable.ToScreenSpace(drawable.OriginPosition);
+        public override Vector2 ScreenSpaceSelectionPoint =>
+            // Important to use a stable position (not based on origin) as origin may be automatically updated during drag operations.
+            drawable.ScreenSpaceDrawQuad.Centre;
 
         protected override bool ReceivePositionalInputAtSubTree(Vector2 screenSpacePos) =>
             drawableQuad.Contains(screenSpacePos);

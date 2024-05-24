@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
@@ -64,6 +63,7 @@ namespace osu.Game.Rulesets.Edit
         public readonly Bindable<TernaryState> DistanceSnapToggle = new Bindable<TernaryState>();
 
         private bool distanceSnapMomentary;
+        private TernaryState? distanceSnapStateBeforeMomentaryToggle;
 
         private EditorToolboxGroup? toolboxGroup;
 
@@ -124,12 +124,34 @@ namespace osu.Game.Rulesets.Edit
 
         private (HitObject before, HitObject after)? getObjectsOnEitherSideOfCurrentTime()
         {
-            HitObject? lastBefore = playfield.HitObjectContainer.AliveObjects.LastOrDefault(h => h.HitObject.StartTime < editorClock.CurrentTime)?.HitObject;
+            HitObject? lastBefore = null;
+
+            foreach (var entry in playfield.HitObjectContainer.AliveEntries)
+            {
+                double objTime = entry.Value.HitObject.StartTime;
+
+                if (objTime >= editorClock.CurrentTime)
+                    continue;
+
+                if (lastBefore == null || objTime > lastBefore.StartTime)
+                    lastBefore = entry.Value.HitObject;
+            }
 
             if (lastBefore == null)
                 return null;
 
-            HitObject? firstAfter = playfield.HitObjectContainer.AliveObjects.FirstOrDefault(h => h.HitObject.StartTime >= editorClock.CurrentTime)?.HitObject;
+            HitObject? firstAfter = null;
+
+            foreach (var entry in playfield.HitObjectContainer.AliveEntries)
+            {
+                double objTime = entry.Value.HitObject.StartTime;
+
+                if (objTime < editorClock.CurrentTime)
+                    continue;
+
+                if (firstAfter == null || objTime < firstAfter.StartTime)
+                    firstAfter = entry.Value.HitObject;
+            }
 
             if (firstAfter == null)
                 return null;
@@ -192,10 +214,19 @@ namespace osu.Game.Rulesets.Edit
         {
             bool altPressed = key.AltPressed;
 
-            if (altPressed != distanceSnapMomentary)
+            if (altPressed && !distanceSnapMomentary)
             {
-                distanceSnapMomentary = altPressed;
+                distanceSnapStateBeforeMomentaryToggle = DistanceSnapToggle.Value;
                 DistanceSnapToggle.Value = DistanceSnapToggle.Value == TernaryState.False ? TernaryState.True : TernaryState.False;
+                distanceSnapMomentary = true;
+            }
+
+            if (!altPressed && distanceSnapMomentary)
+            {
+                Debug.Assert(distanceSnapStateBeforeMomentaryToggle != null);
+                DistanceSnapToggle.Value = distanceSnapStateBeforeMomentaryToggle.Value;
+                distanceSnapStateBeforeMomentaryToggle = null;
+                distanceSnapMomentary = false;
             }
         }
 

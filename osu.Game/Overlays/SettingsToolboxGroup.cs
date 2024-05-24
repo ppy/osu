@@ -151,9 +151,12 @@ namespace osu.Game.Overlays
             base.Update();
 
             if (!headerTextVisibilityCache.IsValid)
+            {
                 // These toolbox grouped may be contracted to only show icons.
                 // For now, let's hide the header to avoid text truncation weirdness in such cases.
                 headerText.FadeTo(headerText.DrawWidth < DrawWidth ? 1 : 0, 150, Easing.OutQuint);
+                headerTextVisibilityCache.Validate();
+            }
         }
 
         protected override bool OnInvalidate(Invalidation invalidation, InvalidationSource source)

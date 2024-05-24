@@ -122,7 +122,7 @@ namespace osu.Game.Overlays.Music
             foreach (int i in changes.InsertedIndices)
                 beatmapSets.Insert(i, sender[i].ToLive(realm));
 
-            foreach (int i in changes.DeletedIndices.OrderByDescending(i => i))
+            foreach (int i in changes.DeletedIndices.OrderDescending())
                 beatmapSets.RemoveAt(i);
         }
 

@@ -47,8 +47,8 @@ namespace osu.Game.Tests.Visual.Gameplay
             seekTo(referenceBeatmap.HitObjects[^1].GetEndTime());
             AddUntilStep("results displayed", () => getResultsScreen()?.IsLoaded == true);
 
-            AddAssert("score has combo", () => getResultsScreen().Score.Combo > 100);
-            AddAssert("score has no misses", () => getResultsScreen().Score.Statistics[HitResult.Miss] == 0);
+            AddAssert("score has combo", () => getResultsScreen().Score!.Combo > 100);
+            AddAssert("score has no misses", () => getResultsScreen().Score!.Statistics[HitResult.Miss] == 0);
 
             AddUntilStep("avatar displayed", () => getAvatar() != null);
             AddAssert("avatar not clickable", () => getAvatar().ChildrenOfType<OsuClickableContainer>().First().Action == null);

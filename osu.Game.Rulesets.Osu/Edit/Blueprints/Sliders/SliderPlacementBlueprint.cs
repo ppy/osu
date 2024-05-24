@@ -267,6 +267,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                     segmentStart.Type = PathType.BEZIER;
                     break;
             }
+
+            controlPointVisualiser.EnsureValidPathTypes();
         }
 
         private void updateCursor()

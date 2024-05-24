@@ -5,6 +5,7 @@
 
 using System;
 using System.Diagnostics;
+using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -25,6 +26,7 @@ using osu.Game.Input.Bindings;
 using osu.Game.IO;
 using osu.Game.Online.API;
 using osu.Game.Overlays;
+using osu.Game.Overlays.Dialog;
 using osu.Game.Overlays.SkinEditor;
 using osu.Game.Rulesets;
 using osu.Game.Screens.Backgrounds;
@@ -48,6 +50,8 @@ namespace osu.Game.Screens.Menu
         public override bool AllowBackButton => false;
 
         public override bool AllowExternalScreenChange => true;
+
+        public override bool? AllowGlobalTrackControl => true;
 
         private Screen songSelect;
 
@@ -94,7 +98,7 @@ namespace osu.Game.Screens.Menu
         private ParallaxContainer buttonsContainer;
         private SongTicker songTicker;
         private Container logoTarget;
-        private SystemTitle systemTitle;
+        private OnlineMenuBanner onlineMenuBanner;
         private MenuTip menuTip;
         private FillFlowContainer bottomElementsFlow;
         private SupporterDisplay supporterDisplay;
@@ -143,6 +147,12 @@ namespace osu.Game.Screens.Menu
                             OnSolo = loadSoloSongSelect,
                             OnMultiplayer = () => this.Push(new Multiplayer()),
                             OnPlaylists = () => this.Push(new Playlists()),
+                            OnDailyChallenge = room =>
+                            {
+                                Playlists playlistsScreen;
+                                this.Push(playlistsScreen = new Playlists());
+                                playlistsScreen.Join(room);
+                            },
                             OnExit = () =>
                             {
                                 exitConfirmedViaHoldOrClick = true;
@@ -174,7 +184,7 @@ namespace osu.Game.Screens.Menu
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
                         },
-                        systemTitle = new SystemTitle
+                        onlineMenuBanner = new OnlineMenuBanner
                         {
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
@@ -197,12 +207,12 @@ namespace osu.Game.Screens.Menu
                     case ButtonSystemState.Initial:
                     case ButtonSystemState.Exit:
                         ApplyToBackground(b => b.FadeColour(Color4.White, 500, Easing.OutSine));
-                        systemTitle.State.Value = Visibility.Hidden;
+                        onlineMenuBanner.State.Value = Visibility.Hidden;
                         break;
 
                     default:
                         ApplyToBackground(b => b.FadeColour(OsuColour.Gray(0.8f), 500, Easing.OutSine));
-                        systemTitle.State.Value = Visibility.Visible;
+                        onlineMenuBanner.State.Value = Visibility.Visible;
                         break;
                 }
             };
@@ -276,7 +286,7 @@ namespace osu.Game.Screens.Menu
 
                 sideFlashes.Delay(FADE_IN_DURATION).FadeIn(64, Easing.InQuint);
             }
-            else if (!api.IsLoggedIn)
+            else if (!api.IsLoggedIn || api.State.Value == APIState.RequiresSecondFactorAuth)
             {
                 // copy out old action to avoid accidentally capturing logo.Action in closure, causing a self-reference loop.
                 var previousAction = logo.Action;
@@ -390,7 +400,12 @@ namespace osu.Game.Screens.Menu
             if (requiresConfirmation)
             {
                 if (dialogOverlay.CurrentDialog is ConfirmExitDialog exitDialog)
-                    exitDialog.PerformOkAction();
+                {
+                    if (exitDialog.Buttons.OfType<PopupDialogOkButton>().FirstOrDefault() != null)
+                        exitDialog.PerformOkAction();
+                    else
+                        exitDialog.Flash();
+                }
                 else
                 {
                     dialogOverlay.Push(new ConfirmExitDialog(() =>

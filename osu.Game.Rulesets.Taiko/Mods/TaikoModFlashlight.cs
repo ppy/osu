@@ -63,7 +63,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
             /// </param>
             private Vector2 adjustSizeForPlayfieldAspectRatio(float size)
             {
-                return new Vector2(0, size * taikoPlayfield.DrawHeight / TaikoPlayfield.DEFAULT_HEIGHT);
+                return new Vector2(0, size * taikoPlayfield.Parent!.Scale.Y);
             }
 
             protected override void UpdateFlashlightSize(float size)
