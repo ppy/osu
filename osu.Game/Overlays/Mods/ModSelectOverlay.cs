@@ -27,7 +27,6 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
 using osu.Game.Localisation;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Screens.Select;
 using osu.Game.Utils;
 using osuTK;
 using osuTK.Input;
@@ -135,7 +134,6 @@ namespace osu.Game.Overlays.Mods
         private FillFlowContainer<ShearedButton> footerButtonFlow = null!;
         private FillFlowContainer footerContentFlow = null!;
         private DeselectAllModsButton deselectAllModsButton = null!;
-        private ModSpeedHotkeyHandler modSpeedHotkeyHandler = null!;
 
         private Container aboveColumnsContent = null!;
         private RankingInformationDisplay? rankingInformationDisplay;
@@ -189,7 +187,6 @@ namespace osu.Game.Overlays.Mods
                     Origin = Anchor.BottomCentre,
                     Height = 0
                 },
-                modSpeedHotkeyHandler = new ModSpeedHotkeyHandler(),
             });
 
             MainAreaContent.AddRange(new Drawable[]
@@ -704,15 +701,6 @@ namespace osu.Game.Overlays.Mods
 
         public override bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
-            switch (e.Action)
-            {
-                case GlobalAction.IncreaseModSpeed:
-                    return modSpeedHotkeyHandler.ChangeSpeed(0.05, AllAvailableMods.Where(state => state.ValidForSelection.Value).Select(state => state.Mod));
-
-                case GlobalAction.DecreaseModSpeed:
-                    return modSpeedHotkeyHandler.ChangeSpeed(-0.05, AllAvailableMods.Where(state => state.ValidForSelection.Value).Select(state => state.Mod));
-            }
-
             if (e.Repeat)
                 return false;
 
