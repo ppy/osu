@@ -126,21 +126,6 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
                         EditorBeatmap.Add(slider);
                     });
                     break;
-                    AddStep("Add perfect curve slider", () =>
-                    {
-                        slider = new Slider { StartTime = EditorClock.CurrentTime, Position = new Vector2(300) };
-
-                        PathControlPoint[] points =
-                        {
-                            new PathControlPoint(new Vector2(0), PathType.PERFECT_CURVE),
-                            new PathControlPoint(new Vector2(50, 25)),
-                            new PathControlPoint(new Vector2(25, 100)),
-                        };
-
-                        slider.Path = new SliderPath(points);
-                        EditorBeatmap.Add(slider);
-                    });
-                    break;
                 case 3:
                     AddStep("Add catmull slider", () =>
                     {
