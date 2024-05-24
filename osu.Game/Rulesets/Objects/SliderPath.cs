@@ -269,6 +269,37 @@ namespace osu.Game.Rulesets.Objects
             pathCache.Validate();
         }
 
+        /// <summary>
+        /// Checks if the array of vectors is almost straight.
+        /// </summary>
+        /// <para>
+        /// The angle is first obtained based on the farthest vector from the first,
+        /// then we find the angle of each vector from the first, 
+        /// and calculate the distance between the two angle vectors.
+        /// We than scale this distance to the distance from the first vector 
+        /// (or by 10 if the distance is smaller),
+        /// and if it is greater than acceptableDifference, we return false.
+        /// </para>
+        private static bool isAlmostStraight(Vector2[] vectors, float acceptableDifference = 0.1f)
+        {
+            if (vectors.Length <= 2 || vectors.All(x => x == vectors.First())) return true;
+
+            Vector2 first = vectors.First();
+            Vector2 farthest = vectors.MaxBy(x => Vector2.Distance(first, x));
+
+            Vector2 angle = Vector2.Normalize(farthest - first);
+            foreach (Vector2 vector in vectors)
+            {
+                if (vector == first)
+                    continue;
+
+                if (Math.Max(10.0f, Vector2.Distance(vector, first)) * Vector2.Distance(Vector2.Normalize(vector - first), angle) > acceptableDifference)
+                    return false;
+            }
+
+            return true;
+        }
+
         private void calculatePath()
         {
             calculatedPath.Clear();
@@ -292,6 +323,10 @@ namespace osu.Game.Rulesets.Objects
                 // The current vertex ends the segment
                 var segmentVertices = vertices.AsSpan().Slice(start, i - start + 1);
                 var segmentType = ControlPoints[start].Type ?? PathType.LINEAR;
+
+                //If a segment is almost straight, treat it as linear.
+                if (segmentType != PathType.LINEAR && isAlmostStraight(segmentVertices.ToArray()))
+                    segmentType = PathType.LINEAR;
 
                 // No need to calculate path when there is only 1 vertex
                 if (segmentVertices.Length == 1)
