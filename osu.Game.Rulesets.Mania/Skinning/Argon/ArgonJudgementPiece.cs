@@ -17,7 +17,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Mania.Skinning.Argon
 {
-    public partial class ArgonJudgementPiece : JudgementPiece, IAnimatableJudgement
+    public partial class ArgonJudgementPiece : TextJudgementPiece, IAnimatableJudgement
     {
         private const float judgement_y_position = 160;
 

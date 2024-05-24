@@ -194,7 +194,7 @@ namespace osu.Game.Tournament.Components
 
             // Use DelayedLoadWrapper to avoid content unloading when switching away to another screen.
             protected override DelayedLoadWrapper CreateDelayedLoadWrapper(Func<Drawable> createContentFunc, double timeBeforeLoad)
-                => new DelayedLoadWrapper(createContentFunc, timeBeforeLoad);
+                => new DelayedLoadWrapper(createContentFunc(), timeBeforeLoad);
         }
     }
 }

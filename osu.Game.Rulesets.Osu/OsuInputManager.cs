@@ -1,13 +1,13 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Framework.Lists;
 using osu.Game.Input.Bindings;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Rulesets.Osu.UI;
@@ -18,7 +18,7 @@ namespace osu.Game.Rulesets.Osu
 {
     public partial class OsuInputManager : RulesetInputManager<OsuAction>
     {
-        public IEnumerable<OsuAction> PressedActions => KeyBindingContainer.PressedActions;
+        public SlimReadOnlyListWrapper<OsuAction> PressedActions => KeyBindingContainer.PressedActions;
 
         /// <summary>
         /// Whether gameplay input buttons should be allowed.
@@ -47,7 +47,7 @@ namespace osu.Game.Rulesets.Osu
             //
             // Based on user feedback of more nuanced scenarios (where touch doesn't behave as expected),
             // this can be expanded to a more complex implementation, but I'd still want to keep it as simple as we can.
-            NonPositionalInputQueue.OfType<DrawableHitCircle.HitReceptor>().Any(c => c.ReceivePositionalInputAt(screenSpacePosition));
+            NonPositionalInputQueue.OfType<DrawableHitCircle.HitReceptor>().Any(c => c.CanBeHit() && c.ReceivePositionalInputAt(screenSpacePosition));
 
         public OsuInputManager(RulesetInfo ruleset)
             : base(ruleset, 0, SimultaneousBindingMode.Unique)
@@ -98,7 +98,7 @@ namespace osu.Game.Rulesets.Osu
                 base.ReloadMappings(realmKeyBindings);
 
                 if (!AllowGameplayInputs)
-                    KeyBindings = KeyBindings.Where(b => b.GetAction<OsuAction>() == OsuAction.Smoke).ToList();
+                    KeyBindings = KeyBindings.Where(static b => b.GetAction<OsuAction>() == OsuAction.Smoke).ToList();
             }
         }
     }

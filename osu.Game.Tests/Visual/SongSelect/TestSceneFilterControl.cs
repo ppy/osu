@@ -77,6 +77,20 @@ namespace osu.Game.Tests.Visual.SongSelect
         }
 
         [Test]
+        public void TestCollectionsCleared()
+        {
+            AddStep("add collection", () => writeAndRefresh(r => r.Add(new BeatmapCollection(name: "1"))));
+            AddStep("add collection", () => writeAndRefresh(r => r.Add(new BeatmapCollection(name: "2"))));
+            AddStep("add collection", () => writeAndRefresh(r => r.Add(new BeatmapCollection(name: "3"))));
+
+            AddAssert("check count 5", () => control.ChildrenOfType<CollectionDropdown>().Single().ChildrenOfType<Menu.DrawableMenuItem>().Count(), () => Is.EqualTo(5));
+
+            AddStep("delete all collections", () => writeAndRefresh(r => r.RemoveAll<BeatmapCollection>()));
+
+            AddAssert("check count 2", () => control.ChildrenOfType<CollectionDropdown>().Single().ChildrenOfType<Menu.DrawableMenuItem>().Count(), () => Is.EqualTo(2));
+        }
+
+        [Test]
         public void TestCollectionRemovedFromDropdown()
         {
             BeatmapCollection first = null!;

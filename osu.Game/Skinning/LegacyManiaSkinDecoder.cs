@@ -155,7 +155,15 @@ namespace osu.Game.Skinning
                 if (i >= output.Length)
                     break;
 
-                output[i] = float.Parse(values[i], CultureInfo.InvariantCulture) * (applyScaleFactor ? LegacyManiaSkinConfiguration.POSITION_SCALE_FACTOR : 1);
+                if (!float.TryParse(values[i], NumberStyles.Float, CultureInfo.InvariantCulture, out float parsedValue))
+                    // some skins may provide incorrect entries in array values. to match stable behaviour, read such entries as zero.
+                    // see: https://github.com/ppy/osu/issues/26464, stable code: https://github.com/peppy/osu-stable-reference/blob/3ea48705eb67172c430371dcfc8a16a002ed0d3d/osu!/Graphics/Skinning/Components/Section.cs#L134-L137
+                    parsedValue = 0;
+
+                if (applyScaleFactor)
+                    parsedValue *= LegacyManiaSkinConfiguration.POSITION_SCALE_FACTOR;
+
+                output[i] = parsedValue;
             }
         }
     }

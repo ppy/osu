@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Primitives;
-using osu.Framework.Utils;
 using osu.Game.Rulesets.Objects.Types;
 using osuTK;
 
@@ -43,8 +42,8 @@ namespace osu.Game.Utils
         public static Vector2 RotateVector(Vector2 vector, float angle)
         {
             return new Vector2(
-                vector.X * MathF.Cos(MathUtils.DegreesToRadians(angle)) + vector.Y * MathF.Sin(MathUtils.DegreesToRadians(angle)),
-                vector.X * -MathF.Sin(MathUtils.DegreesToRadians(angle)) + vector.Y * MathF.Cos(MathUtils.DegreesToRadians(angle))
+                vector.X * MathF.Cos(float.DegreesToRadians(angle)) + vector.Y * MathF.Sin(float.DegreesToRadians(angle)),
+                vector.X * -MathF.Sin(float.DegreesToRadians(angle)) + vector.Y * MathF.Cos(float.DegreesToRadians(angle))
             );
         }
 
@@ -88,6 +87,15 @@ namespace osu.Game.Utils
                 position.Y = selectionQuad.TopLeft.Y + yOffset + (position.Y - selectionQuad.TopLeft.Y) / selectionQuad.Height * (selectionQuad.Height + scale.Y);
 
             return position;
+        }
+
+        /// <summary>
+        /// Given a scale multiplier, an origin, and a position,
+        /// will return the scaled position in screen space coordinates.
+        /// </summary>
+        public static Vector2 GetScaledPosition(Vector2 scale, Vector2 origin, Vector2 position)
+        {
+            return origin + (position - origin) * scale;
         }
 
         /// <summary>

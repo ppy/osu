@@ -163,7 +163,10 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                         return null;
 
                     case OsuSkinComponents.ApproachCircle:
-                        return new LegacyApproachCircle();
+                        if (GetTexture(@"approachcircle") != null)
+                            return new LegacyApproachCircle();
+
+                        return null;
 
                     default:
                         throw new UnsupportedSkinComponentException(lookup);

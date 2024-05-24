@@ -178,7 +178,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
 
             AddStep("add hitsounds", () =>
             {
-                if (slider is null) return;
+                if (slider == null) return;
 
                 sample = new HitSampleInfo("hitwhistle", HitSampleInfo.BANK_SOFT, volume: 70);
                 slider.Samples.Add(sample.With());
@@ -228,7 +228,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
         {
             AddStep($"move mouse to control point {index}", () =>
             {
-                if (slider is null || visualiser is null) return;
+                if (slider == null || visualiser == null) return;
 
                 Vector2 position = slider.Path.ControlPoints[index].Position + slider.Position;
                 InputManager.MoveMouseTo(visualiser.Pieces[0].Parent!.ToScreenSpace(position));
@@ -239,7 +239,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
         {
             AddStep($"click context menu item \"{contextMenuText}\"", () =>
             {
-                if (visualiser is null) return;
+                if (visualiser == null) return;
 
                 MenuItem? item = visualiser.ContextMenuItems?.FirstOrDefault(menuItem => menuItem.Text.Value == contextMenuText);
 
