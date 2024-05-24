@@ -64,7 +64,7 @@ namespace osu.Game.Screens.Edit.Setup
             //
             // This is important to ensure that if the user is still editing a textbox, it will commit
             // (and potentially block the exit procedure for save).
-            GetContainingFocusManager().TriggerFocusContention(this);
+            GetContainingFocusManager()?.TriggerFocusContention(this);
         }
 
         private partial class SetupScreenSectionsContainer : SectionsContainer<SetupSection>
