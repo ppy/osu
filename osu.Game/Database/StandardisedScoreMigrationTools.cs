@@ -16,6 +16,7 @@ using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Scoring.Legacy;
 using osu.Game.Scoring;
+using osu.Game.Scoring.Legacy;
 
 namespace osu.Game.Database
 {
@@ -248,6 +249,7 @@ namespace osu.Game.Database
             score.Accuracy = computeAccuracy(score, scoreProcessor);
             score.Rank = computeRank(score, scoreProcessor);
             score.TotalScore = convertFromLegacyTotalScore(score, ruleset, beatmap);
+            LegacyScoreDecoder.PopulateTotalScoreWithoutMods(score);
         }
 
         /// <summary>

@@ -10,6 +10,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Input;
 using osu.Framework.Localisation;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
@@ -610,6 +611,23 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             AddStep("press tab", () => InputManager.Key(Key.Tab));
             AddAssert("search text box unfocused", () => !modSelectOverlay.SearchTextBox.HasFocus);
+        }
+
+        [Test]
+        public void TestSearchBoxFocusToggleRespondsToExternalChanges()
+        {
+            AddStep("text search does not start active", () => configManager.SetValue(OsuSetting.ModSelectTextSearchStartsActive, false));
+            createScreen();
+
+            AddUntilStep("search text box not focused", () => !modSelectOverlay.SearchTextBox.HasFocus);
+
+            AddStep("press tab", () => InputManager.Key(Key.Tab));
+            AddAssert("search text box focused", () => modSelectOverlay.SearchTextBox.HasFocus);
+
+            AddStep("unfocus search text box externally", () => ((IFocusManager)InputManager).ChangeFocus(null));
+
+            AddStep("press tab", () => InputManager.Key(Key.Tab));
+            AddAssert("search text box focused", () => modSelectOverlay.SearchTextBox.HasFocus);
         }
 
         [Test]

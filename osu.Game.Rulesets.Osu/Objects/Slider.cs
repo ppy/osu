@@ -41,7 +41,7 @@ namespace osu.Game.Rulesets.Osu.Objects
 
         public Vector2 StackedPositionAt(double t) => StackedPosition + this.CurvePositionAt(t);
 
-        private readonly SliderPath path = new SliderPath();
+        private readonly SliderPath path = new SliderPath { OptimiseCatmull = true };
 
         public SliderPath Path
         {

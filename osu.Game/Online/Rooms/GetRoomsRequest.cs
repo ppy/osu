@@ -1,10 +1,12 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using osu.Framework.IO.Network;
 using osu.Game.Extensions;
 using osu.Game.Online.API;
+using osu.Game.Online.Rooms.RoomStatuses;
 using osu.Game.Screens.OnlinePlay.Lounge.Components;
 
 namespace osu.Game.Online.Rooms
@@ -31,6 +33,25 @@ namespace osu.Game.Online.Rooms
                 req.AddParameter("category", category);
 
             return req;
+        }
+
+        protected override void PostProcess()
+        {
+            base.PostProcess();
+
+            if (Response != null)
+            {
+                // API doesn't populate status so let's do it here.
+                foreach (var room in Response)
+                {
+                    if (room.EndDate.Value != null && DateTimeOffset.Now >= room.EndDate.Value)
+                        room.Status.Value = new RoomStatusEnded();
+                    else if (room.HasPassword.Value)
+                        room.Status.Value = new RoomStatusOpenPrivate();
+                    else
+                        room.Status.Value = new RoomStatusOpen();
+                }
+            }
         }
 
         protected override string Target => "rooms";

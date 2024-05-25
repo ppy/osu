@@ -69,6 +69,7 @@ namespace osu.Game.Overlays.Mods
         private Task? latestLoadTask;
         private ModPanel[]? latestLoadedPanels;
         internal bool ItemsLoaded => latestLoadTask?.IsCompleted == true && allPanelsLoaded;
+        private bool? wasPresent;
 
         private bool allPanelsLoaded
         {
@@ -191,6 +192,15 @@ namespace osu.Game.Overlays.Mods
         protected override void Update()
         {
             base.Update();
+
+            // we override `IsPresent` to include the scheduler's pending task state to make async loads work correctly when columns are masked away
+            // (see description of https://github.com/ppy/osu/pull/19783).
+            // however, because of that we must also ensure that we signal correct invalidations (https://github.com/ppy/osu-framework/issues/5129).
+            // failing to do so causes columns to be stuck in "present" mode despite actually not being present themselves.
+            // this works because `Update()` will always run after a scheduler update, which is what causes the presence state change responsible for the failure.
+            if (wasPresent != null && wasPresent != IsPresent)
+                Invalidate(Invalidation.Presence);
+            wasPresent = IsPresent;
 
             if (selectionDelay == initial_multiple_selection_delay || Time.Current - lastSelection >= selectionDelay)
             {

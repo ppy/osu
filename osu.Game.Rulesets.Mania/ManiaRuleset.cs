@@ -65,6 +65,8 @@ namespace osu.Game.Rulesets.Mania
 
         public override HitObjectComposer CreateHitObjectComposer() => new ManiaHitObjectComposer(this);
 
+        public override IBeatmapVerifier CreateBeatmapVerifier() => new ManiaBeatmapVerifier();
+
         public override ISkin? CreateSkinTransformer(ISkin skin, IBeatmap beatmap)
         {
             switch (skin)
@@ -421,8 +423,8 @@ namespace osu.Game.Rulesets.Mania
 
         public override DifficultySection CreateEditorDifficultySection() => new ManiaDifficultySection();
 
-        public int GetKeyCount(IBeatmapInfo beatmapInfo)
-            => ManiaBeatmapConverter.GetColumnCount(LegacyBeatmapConversionDifficultyInfo.FromBeatmapInfo(beatmapInfo));
+        public int GetKeyCount(IBeatmapInfo beatmapInfo, IReadOnlyList<Mod>? mods = null)
+            => ManiaBeatmapConverter.GetColumnCount(LegacyBeatmapConversionDifficultyInfo.FromBeatmapInfo(beatmapInfo), mods);
     }
 
     public enum PlayfieldType

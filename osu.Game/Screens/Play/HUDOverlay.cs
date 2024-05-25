@@ -171,7 +171,7 @@ namespace osu.Game.Screens.Play
                 },
             };
 
-            hideTargets = new List<Drawable> { mainComponents, playfieldComponents, topRightElements };
+            hideTargets = new List<Drawable> { mainComponents, topRightElements };
 
             if (rulesetComponents != null)
                 hideTargets.Add(rulesetComponents);

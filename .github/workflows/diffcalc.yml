@@ -110,10 +110,14 @@ jobs:
     if: ${{ github.event_name == 'workflow_dispatch' || contains(github.event.comment.body, '!diffcalc') }}
     steps:
       - name: Check permissions
-        if: ${{ github.event_name != 'workflow_dispatch' }}
-        uses: actions-cool/check-user-permission@a0668c9aec87f3875fc56170b6452a453e9dd819 # v2.2.0
-        with:
-          require: 'write'
+        run: |
+          ALLOWED_USERS=(smoogipoo peppy bdach)
+          for i in "${ALLOWED_USERS[@]}"; do
+              if [[ "${{ github.actor }}" == "$i" ]]; then
+                  exit 0
+              fi
+          done
+          exit 1
 
   create-comment:
     name: Create PR comment
@@ -122,7 +126,7 @@ jobs:
     if: ${{ github.event_name == 'issue_comment' && github.event.issue.pull_request }}
     steps:
       - name: Create comment
-        uses: thollander/actions-comment-pull-request@363c6f6eae92cc5c3a66e95ba016fc771bb38943 # v2.4.2
+        uses: thollander/actions-comment-pull-request@fabd468d3a1a0b97feee5f6b9e499eab0dd903f6 # v2.5.0
         with:
           comment_tag: ${{ env.EXECUTION_ID }}
           message: |
@@ -249,7 +253,7 @@ jobs:
 
       - name: Restore cache
         id: restore-cache
-        uses: maxnowack/local-cache@038cc090b52e4f205fbc468bf5b0756df6f68775 # v1
+        uses: maxnowack/local-cache@720e69c948191660a90aa1cf6a42fc4d2dacdf30 # v2
         with:
           path: ${{ steps.query.outputs.DATA_NAME }}.tar.bz2
           key: ${{ steps.query.outputs.DATA_NAME }}
@@ -280,7 +284,7 @@ jobs:
 
       - name: Restore cache
         id: restore-cache
-        uses: maxnowack/local-cache@038cc090b52e4f205fbc468bf5b0756df6f68775 # v1
+        uses: maxnowack/local-cache@720e69c948191660a90aa1cf6a42fc4d2dacdf30 # v2
         with:
           path: ${{ steps.query.outputs.DATA_NAME }}.tar.bz2
           key: ${{ steps.query.outputs.DATA_NAME }}
@@ -354,7 +358,7 @@ jobs:
     steps:
       - name: Update comment on success
         if: ${{ needs.generator.result == 'success' }}
-        uses: thollander/actions-comment-pull-request@363c6f6eae92cc5c3a66e95ba016fc771bb38943 # v2.4.2
+        uses: thollander/actions-comment-pull-request@fabd468d3a1a0b97feee5f6b9e499eab0dd903f6 # v2.5.0
         with:
           comment_tag: ${{ env.EXECUTION_ID }}
           mode: upsert
@@ -365,7 +369,7 @@ jobs:
 
       - name: Update comment on failure
         if: ${{ needs.generator.result == 'failure' }}
-        uses: thollander/actions-comment-pull-request@363c6f6eae92cc5c3a66e95ba016fc771bb38943 # v2.4.2
+        uses: thollander/actions-comment-pull-request@fabd468d3a1a0b97feee5f6b9e499eab0dd903f6 # v2.5.0
         with:
           comment_tag: ${{ env.EXECUTION_ID }}
           mode: upsert
@@ -375,7 +379,7 @@ jobs:
 
       - name: Update comment on cancellation
         if: ${{ needs.generator.result == 'cancelled' }}
-        uses: thollander/actions-comment-pull-request@363c6f6eae92cc5c3a66e95ba016fc771bb38943 # v2.4.2
+        uses: thollander/actions-comment-pull-request@fabd468d3a1a0b97feee5f6b9e499eab0dd903f6 # v2.5.0
         with:
           comment_tag: ${{ env.EXECUTION_ID }}
           mode: delete
