@@ -35,6 +35,14 @@ namespace osu.Game.Screens.Edit.Compose.Components
         public Quad? OriginalSurroundingQuad { get; protected set; }
 
         /// <summary>
+        /// Clamp scale where selection does not exceed playfield bounds or flip.
+        /// </summary>
+        /// <param name="origin">The origin from which the scale operation is performed</param>
+        /// <param name="scale">The scale to be clamped</param>
+        /// <returns>The clamped scale vector</returns>
+        public virtual Vector2 GetClampedScale(Vector2 scale, Vector2? origin = null) => scale;
+
+        /// <summary>
         /// Performs a single, instant, atomic scale operation.
         /// </summary>
         /// <remarks>
