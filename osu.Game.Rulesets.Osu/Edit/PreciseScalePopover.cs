@@ -90,7 +90,7 @@ namespace osu.Game.Rulesets.Osu.Edit
             scaleInput.Current.BindValueChanged(scale => scaleInfo.Value = scaleInfo.Value with { Scale = scale.NewValue });
             scaleOrigin.Items.First().Select();
 
-            scaleHandler.CanScaleX.BindValueChanged(e =>
+            scaleHandler.CanScaleSelectionOrigin.BindValueChanged(e =>
             {
                 selectionCentreButton.Selected.Disabled = !e.NewValue;
             }, true);
