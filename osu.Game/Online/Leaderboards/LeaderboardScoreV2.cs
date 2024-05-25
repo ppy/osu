@@ -17,6 +17,7 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Framework.Layout;
 using osu.Framework.Localisation;
+using osu.Framework.Utils;
 using osu.Game.Extensions;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
@@ -93,8 +94,7 @@ namespace osu.Game.Online.Leaderboards
 
         protected Container RankContainer { get; private set; } = null!;
         private FillFlowContainer flagBadgeAndDateContainer = null!;
-        private FillFlowContainer<ColouredModSwitchTiny> modsContainer = null!;
-        private OsuSpriteText modsCounter = null!;
+        private FillFlowContainer modsContainer = null!;
 
         private OsuSpriteText scoreText = null!;
         private Drawable scoreRank = null!;
@@ -178,17 +178,23 @@ namespace osu.Game.Online.Leaderboards
 
             innerAvatar.OnLoadComplete += d => d.FadeInFromZero(200);
 
-            if (score.Mods.Length > MAX_MODS)
-                modsCounter.Text = $"{score.Mods.Length} mods";
-            else if (score.Mods.Length > 0)
+            if (score.Mods.Length > 0)
             {
-                modsContainer.ChildrenEnumerable = score.Mods.AsOrdered().Select(mod => new ColouredModSwitchTiny(mod)
+                modsContainer.Padding = new MarginPadding { Top = 4f };
+                modsContainer.ChildrenEnumerable = score.Mods.AsOrdered().Take(Math.Min(MAX_MODS, score.Mods.Length)).Select(mod => new ColouredModSwitchTiny(mod)
                 {
                     Scale = new Vector2(0.375f)
                 });
-            }
 
-            modsContainer.Padding = new MarginPadding { Top = score.Mods.Length > 0 ? 4 : 0 };
+                if (score.Mods.Length > MAX_MODS)
+                {
+                    modsContainer.Remove(modsContainer[^1], true);
+                    modsContainer.Add(new MoreModSwitchTiny(score.Mods.Length - MAX_MODS + 1)
+                    {
+                        Scale = new Vector2(0.375f),
+                    });
+                }
+            }
         }
 
         private Container createCentreContent(APIUser user) => new Container
@@ -436,7 +442,7 @@ namespace osu.Game.Online.Leaderboards
                                         Current = scoreManager.GetBindableTotalScoreString(score),
                                         Font = OsuFont.GetFont(size: 30, weight: FontWeight.Light),
                                     },
-                                    modsContainer = new FillFlowContainer<ColouredModSwitchTiny>
+                                    modsContainer = new FillFlowContainer
                                     {
                                         Anchor = Anchor.TopRight,
                                         Origin = Anchor.TopRight,
@@ -445,13 +451,6 @@ namespace osu.Game.Online.Leaderboards
                                         Direction = FillDirection.Horizontal,
                                         Spacing = new Vector2(2f, 0f),
                                     },
-                                    modsCounter = new OsuSpriteText
-                                    {
-                                        Anchor = Anchor.TopRight,
-                                        Origin = Anchor.TopRight,
-                                        Shear = -shear,
-                                        Alpha = 0,
-                                    }
                                 }
                             }
                         }
@@ -495,8 +494,7 @@ namespace osu.Game.Online.Leaderboards
 
                     using (BeginDelayedSequence(50))
                     {
-                        Drawable modsDrawable = score.Mods.Length > MAX_MODS ? modsCounter : modsContainer;
-                        var drawables = new[] { flagBadgeAndDateContainer, modsDrawable }.Concat(statisticsLabels).ToArray();
+                        var drawables = new Drawable[] { flagBadgeAndDateContainer, modsContainer }.Concat(statisticsLabels).ToArray();
                         for (int i = 0; i < drawables.Length; i++)
                             drawables[i].FadeIn(100 + i * 50);
                     }
@@ -652,18 +650,52 @@ namespace osu.Game.Online.Leaderboards
             {
                 this.mod = mod;
                 Active.Value = true;
-                Masking = true;
-                EdgeEffect = new EdgeEffectParameters
-                {
-                    Roundness = 15,
-                    Type = EdgeEffectType.Shadow,
-                    Colour = Colour4.Black.Opacity(0.15f),
-                    Radius = 3,
-                    Offset = new Vector2(-2, 0)
-                };
             }
 
             public LocalisableString TooltipText => (mod as Mod)?.IconTooltip ?? mod.Name;
+        }
+
+        private sealed partial class MoreModSwitchTiny : CompositeDrawable
+        {
+            private readonly int count;
+
+            public MoreModSwitchTiny(int count)
+            {
+                this.count = count;
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(OsuColour colours)
+            {
+                Size = new Vector2(ModSwitchTiny.WIDTH, ModSwitchTiny.DEFAULT_HEIGHT);
+
+                InternalChild = new CircularContainer
+                {
+                    Masking = true,
+                    RelativeSizeAxes = Axes.Both,
+                    Children = new Drawable[]
+                    {
+                        new Box
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Colour = OsuColour.Gray(0.2f),
+                        },
+                        new OsuSpriteText
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            Shadow = false,
+                            Font = OsuFont.Numeric.With(size: 24, weight: FontWeight.Black),
+                            Text = $"+{count}",
+                            Colour = colours.Yellow,
+                            Margin = new MarginPadding
+                            {
+                                Top = 4
+                            }
+                        }
+                    }
+                };
+            }
         }
 
         #endregion
