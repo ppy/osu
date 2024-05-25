@@ -161,16 +161,13 @@ namespace osu.Game.Tests.Visual.SongSelect
                 }
             };
 
-            for (int i = 0; i < LeaderboardScoreV2.MAX_MODS_EXPANDED; i++)
-                scores[0].Mods = scores[0].Mods.Concat(new Mod[] { i % 2 == 0 ? new OsuModHidden() : halfTime }).ToArray();
-
-            for (int i = 0; i < LeaderboardScoreV2.MAX_MODS_EXPANDED + 1; i++)
+            for (int i = 0; i < LeaderboardScoreV2.MAX_MODS - 1; i++)
                 scores[1].Mods = scores[1].Mods.Concat(new Mod[] { i % 2 == 0 ? new OsuModHidden() : new OsuModHalfTime() }).ToArray();
 
-            for (int i = 0; i < LeaderboardScoreV2.MAX_MODS_CONTRACTED; i++)
+            for (int i = 0; i < LeaderboardScoreV2.MAX_MODS; i++)
                 scores[2].Mods = scores[2].Mods.Concat(new Mod[] { i % 2 == 0 ? new OsuModHidden() : halfTime }).ToArray();
 
-            for (int i = 0; i < LeaderboardScoreV2.MAX_MODS_CONTRACTED + 1; i++)
+            for (int i = 0; i < LeaderboardScoreV2.MAX_MODS + 1; i++)
                 scores[3].Mods = scores[3].Mods.Concat(new Mod[] { i % 2 == 0 ? new OsuModHidden() : new OsuModHalfTime() }).ToArray();
 
             scores[4].Mods = scores[4].BeatmapInfo!.Ruleset.CreateInstance().CreateAllMods().ToArray();
