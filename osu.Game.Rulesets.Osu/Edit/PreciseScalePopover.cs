@@ -8,6 +8,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Screens.Edit.Components.RadioButtons;
@@ -27,6 +28,9 @@ namespace osu.Game.Rulesets.Osu.Edit
         private EditorRadioButtonCollection scaleOrigin = null!;
 
         private RadioButton selectionCentreButton = null!;
+
+        private OsuCheckbox xCheckBox = null!;
+        private OsuCheckbox yCheckBox = null!;
 
         public PreciseScalePopover(SelectionScaleHandler scaleHandler)
         {
@@ -69,7 +73,28 @@ namespace osu.Game.Rulesets.Osu.Edit
                                 () => setOrigin(ScaleOrigin.SelectionCentre),
                                 () => new SpriteIcon { Icon = FontAwesome.Solid.VectorSquare })
                         }
-                    }
+                    },
+                    new FillFlowContainer
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        AutoSizeAxes = Axes.Y,
+                        Spacing = new Vector2(4),
+                        Children = new Drawable[]
+                        {
+                            xCheckBox = new OsuCheckbox(false)
+                            {
+                                RelativeSizeAxes = Axes.X,
+                                LabelText = "X-axis",
+                                Current = { Value = true },
+                            },
+                            yCheckBox = new OsuCheckbox(false)
+                            {
+                                RelativeSizeAxes = Axes.X,
+                                LabelText = "Y-axis",
+                                Current = { Value = true },
+                            },
+                        }
+                    },
                 }
             };
             selectionCentreButton.Selected.DisabledChanged += isDisabled =>
@@ -89,6 +114,9 @@ namespace osu.Game.Rulesets.Osu.Edit
             });
             scaleInput.Current.BindValueChanged(scale => scaleInfo.Value = scaleInfo.Value with { Scale = scale.NewValue });
             scaleOrigin.Items.First().Select();
+
+            xCheckBox.Current.BindValueChanged(x => setAxis(x.NewValue, yCheckBox.Current.Value));
+            yCheckBox.Current.BindValueChanged(y => setAxis(xCheckBox.Current.Value, y.NewValue));
 
             scaleHandler.CanScaleSelectionOrigin.BindValueChanged(e =>
             {
@@ -125,6 +153,12 @@ namespace osu.Game.Rulesets.Osu.Edit
         }
 
         private Vector2? getOriginPosition(PreciseScaleInfo scale) => scale.Origin == ScaleOrigin.PlayfieldCentre ? OsuPlayfield.BASE_SIZE / 2 : null;
+
+        private void setAxis(bool x, bool y)
+        {
+            scaleInfo.Value = scaleInfo.Value with { XAxis = x, YAxis = y };
+            updateMaxScale();
+        }
 
         protected override void PopIn()
         {
