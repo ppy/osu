@@ -29,7 +29,7 @@ namespace osu.Game.Rulesets.Osu.Edit
 
         private Bindable<bool> canScaleX = null!;
         private Bindable<bool> canScaleY = null!;
-        private Bindable<bool> canScaleDiagonally = null!;
+        private Bindable<bool> canScalePlayfieldOrigin = null!;
 
         public SelectionRotationHandler RotationHandler { get; init; } = null!;
         public SelectionScaleHandler ScaleHandler { get; init; } = null!;
@@ -82,12 +82,12 @@ namespace osu.Game.Rulesets.Osu.Edit
             canScaleY = ScaleHandler.CanScaleY.GetBoundCopy();
             canScaleY.BindValueChanged(_ => updateCanScaleAggregate());
 
-            canScaleDiagonally = ScaleHandler.CanScaleDiagonally.GetBoundCopy();
-            canScaleDiagonally.BindValueChanged(_ => updateCanScaleAggregate());
+            canScalePlayfieldOrigin = ScaleHandler.CanScalePlayfieldOrigin.GetBoundCopy();
+            canScalePlayfieldOrigin.BindValueChanged(_ => updateCanScaleAggregate());
 
             void updateCanScaleAggregate()
             {
-                canScale.Value = ScaleHandler.CanScaleX.Value || ScaleHandler.CanScaleY.Value || ScaleHandler.CanScaleDiagonally.Value;
+                canScale.Value = ScaleHandler.CanScaleX.Value || ScaleHandler.CanScaleY.Value || ScaleHandler.CanScalePlayfieldOrigin.Value;
             }
 
             // bindings to `Enabled` on the buttons are decoupled on purpose

@@ -53,6 +53,8 @@ namespace osu.Game.Rulesets.Osu.Edit
             CanScaleX.Value = quad.Width > 0;
             CanScaleY.Value = quad.Height > 0;
             CanScaleDiagonally.Value = CanScaleX.Value && CanScaleY.Value;
+            CanScaleSelectionOrigin.Value = CanScaleX.Value || CanScaleY.Value;
+            CanScalePlayfieldOrigin.Value = selectedMovableObjects.Any();
         }
 
         private Dictionary<OsuHitObject, OriginalHitObjectState>? objectsInScale;
