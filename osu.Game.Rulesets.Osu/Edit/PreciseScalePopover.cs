@@ -80,7 +80,11 @@ namespace osu.Game.Rulesets.Osu.Edit
         {
             base.LoadComplete();
 
-            ScheduleAfterChildren(() => scaleInput.TakeFocus());
+            ScheduleAfterChildren(() =>
+            {
+                scaleInput.TakeFocus();
+                scaleInput.SelectAll();
+            });
             scaleInput.Current.BindValueChanged(scale => scaleInfo.Value = scaleInfo.Value with { Scale = scale.NewValue });
             scaleOrigin.Items.First().Select();
 
