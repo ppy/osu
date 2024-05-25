@@ -87,6 +87,8 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
         public bool TakeFocus() => GetContainingFocusManager().ChangeFocus(textBox);
 
+        public bool SelectAll() => textBox.SelectAll();
+
         private bool updatingFromTextBox;
 
         private void textChanged(ValueChangedEvent<string> change)
