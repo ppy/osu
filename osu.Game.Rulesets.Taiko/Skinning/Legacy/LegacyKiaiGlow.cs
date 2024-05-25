@@ -21,6 +21,8 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
 
         private Sprite sprite = null!;
 
+        private const float base_scale = 0.8f;
+
         [BackgroundDependencyLoader(true)]
         private void load(ISkinSource skin, HealthProcessor? healthProcessor)
         {
@@ -30,7 +32,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
                 Origin = Anchor.Centre,
                 Anchor = Anchor.Centre,
                 Alpha = 0,
-                Scale = new Vector2(0.7f),
+                Scale = new Vector2(base_scale),
                 Colour = new Colour4(255, 228, 0, 255),
             };
 
@@ -58,8 +60,8 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
             if (!result.IsHit || !isKiaiActive)
                 return;
 
-            sprite.ScaleTo(0.85f).Then()
-                  .ScaleTo(0.7f, 80, Easing.OutQuad);
+            sprite.ScaleTo(base_scale + 0.15f).Then()
+                  .ScaleTo(base_scale, 80, Easing.OutQuad);
         }
     }
 }
