@@ -7,6 +7,7 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Configuration;
 using osu.Game.Graphics.Sprites;
@@ -47,7 +48,6 @@ namespace osu.Game.Tests.Visual.SongSelect
                 relativeWidth = v;
                 if (fillFlow != null) fillFlow.Width = v;
             });
-            AddToggleStep("toggle scoring mode", v => config.SetValue(OsuSetting.ScoreDisplayMode, v ? ScoringMode.Classic : ScoringMode.Standardised));
         }
 
         [SetUp]
@@ -80,6 +80,12 @@ namespace osu.Game.Tests.Visual.SongSelect
             foreach (var score in fillFlow.Children)
                 score.Show();
         });
+
+        [SetUpSteps]
+        public void SetUpSteps()
+        {
+            AddToggleStep("toggle scoring mode", v => config.SetValue(OsuSetting.ScoreDisplayMode, v ? ScoringMode.Classic : ScoringMode.Standardised));
+        }
 
         protected override void UpdateAfterChildren()
         {
