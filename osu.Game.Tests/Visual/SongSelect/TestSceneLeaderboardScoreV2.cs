@@ -53,15 +53,22 @@ namespace osu.Game.Tests.Visual.SongSelect
                     Width = relativeWidth,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Spacing = new Vector2(0, 10),
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
+                    Spacing = new Vector2(0f, 2f),
                 },
                 drawWidthText = new OsuSpriteText(),
             };
 
+            int i = 0;
+
             foreach (var scoreInfo in getTestScores())
-                fillFlow.Add(new LeaderboardScoreV2(scoreInfo, scoreInfo.Position, scoreInfo.User.Id == 2));
+            {
+                fillFlow.Add(new LeaderboardScoreV2(scoreInfo, scoreInfo.Position, scoreInfo.User.Id == 2)
+                {
+                    Margin = new MarginPadding { Right = 10f * i, Left = -10f * i++ },
+                });
+            }
 
             foreach (var score in fillFlow.Children)
                 score.Show();
