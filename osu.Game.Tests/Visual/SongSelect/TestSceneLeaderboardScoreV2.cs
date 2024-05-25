@@ -7,6 +7,8 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Utils;
+using osu.Game.Configuration;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Leaderboards;
@@ -15,6 +17,7 @@ using osu.Game.Rulesets.Mania;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Tests.Resources;
 using osu.Game.Users;
@@ -26,6 +29,9 @@ namespace osu.Game.Tests.Visual.SongSelect
     {
         [Cached]
         private OverlayColourProvider colourProvider { get; set; } = new OverlayColourProvider(OverlayColourScheme.Aquamarine);
+
+        [Resolved]
+        private OsuConfigManager config { get; set; } = null!;
 
         private FillFlowContainer? fillFlow;
         private OsuSpriteText? drawWidthText;
@@ -41,6 +47,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 relativeWidth = v;
                 if (fillFlow != null) fillFlow.Width = v;
             });
+            AddToggleStep("toggle scoring mode", v => config.SetValue(OsuSetting.ScoreDisplayMode, v ? ScoringMode.Classic : ScoringMode.Standardised));
         }
 
         [SetUp]
@@ -91,7 +98,8 @@ namespace osu.Game.Tests.Visual.SongSelect
                     Rank = ScoreRank.X,
                     Accuracy = 1,
                     MaxCombo = 244,
-                    TotalScore = 1707827,
+                    TotalScore = RNG.Next(1_800_000, 2_000_000),
+                    MaximumStatistics = { { HitResult.Great, 3000 } },
                     Ruleset = new OsuRuleset().RulesetInfo,
                     User = new APIUser
                     {
@@ -108,7 +116,8 @@ namespace osu.Game.Tests.Visual.SongSelect
                     Rank = ScoreRank.S,
                     Accuracy = 0.1f,
                     MaxCombo = 32040,
-                    TotalScore = 1707827,
+                    TotalScore = RNG.Next(1_200_000, 1_500_000),
+                    MaximumStatistics = { { HitResult.Great, 3000 } },
                     Ruleset = new OsuRuleset().RulesetInfo,
                     User = new APIUser
                     {
@@ -119,13 +128,15 @@ namespace osu.Game.Tests.Visual.SongSelect
                     },
                     Date = DateTimeOffset.Now.AddMonths(-6),
                 },
+                TestResources.CreateTestScoreInfo(),
                 new ScoreInfo
                 {
                     Position = 110000,
-                    Rank = ScoreRank.A,
+                    Rank = ScoreRank.B,
                     Accuracy = 1,
                     MaxCombo = 244,
-                    TotalScore = 17078279,
+                    TotalScore = RNG.Next(1_000_000, 1_200_000),
+                    MaximumStatistics = { { HitResult.Great, 3000 } },
                     Ruleset = new ManiaRuleset().RulesetInfo,
                     User = new APIUser
                     {
@@ -137,10 +148,11 @@ namespace osu.Game.Tests.Visual.SongSelect
                 new ScoreInfo
                 {
                     Position = 110000,
-                    Rank = ScoreRank.A,
+                    Rank = ScoreRank.D,
                     Accuracy = 1,
                     MaxCombo = 244,
-                    TotalScore = 1234567890,
+                    TotalScore = RNG.Next(500_000, 1_000_000),
+                    MaximumStatistics = { { HitResult.Great, 3000 } },
                     Ruleset = new ManiaRuleset().RulesetInfo,
                     User = new APIUser
                     {
@@ -150,21 +162,16 @@ namespace osu.Game.Tests.Visual.SongSelect
                     },
                     Date = DateTimeOffset.Now,
                 },
-                TestResources.CreateTestScoreInfo(),
             };
 
-            var halfTime = new OsuModHalfTime
-            {
-                SpeedChange =
-                {
-                    Value = 0.99
-                }
-            };
+            scores[2].Rank = ScoreRank.A;
+            scores[2].TotalScore = RNG.Next(120_000, 400_000);
+            scores[2].MaximumStatistics[HitResult.Great] = 3000;
 
             scores[1].Mods = new Mod[] { new OsuModHidden(), new OsuModDoubleTime(), new OsuModHardRock(), new OsuModFlashlight() };
             scores[2].Mods = new Mod[] { new OsuModHidden(), new OsuModDoubleTime(), new OsuModHardRock(), new OsuModFlashlight(), new OsuModClassic() };
             scores[3].Mods = new Mod[] { new OsuModHidden(), new OsuModDoubleTime(), new OsuModHardRock(), new OsuModFlashlight(), new OsuModClassic(), new OsuModDifficultyAdjust() };
-            scores[4].Mods = scores[4].BeatmapInfo!.Ruleset.CreateInstance().CreateAllMods().ToArray();
+            scores[4].Mods = new ManiaRuleset().CreateAllMods().ToArray();
 
             return scores;
         }
