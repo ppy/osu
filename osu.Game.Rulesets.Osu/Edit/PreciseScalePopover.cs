@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -22,6 +23,7 @@ namespace osu.Game.Rulesets.Osu.Edit
         private readonly Bindable<PreciseScaleInfo> scaleInfo = new Bindable<PreciseScaleInfo>(new PreciseScaleInfo(1, ScaleOrigin.PlayfieldCentre, true, true));
 
         private SliderWithTextBoxInput<float> scaleInput = null!;
+        private BindableNumber<float> scaleInputBindable = null!;
         private EditorRadioButtonCollection scaleOrigin = null!;
 
         private RadioButton selectionCentreButton = null!;
@@ -45,7 +47,7 @@ namespace osu.Game.Rulesets.Osu.Edit
                 {
                     scaleInput = new SliderWithTextBoxInput<float>("Scale:")
                     {
-                        Current = new BindableNumber<float>
+                        Current = scaleInputBindable = new BindableNumber<float>
                         {
                             MinValue = 0.5f,
                             MaxValue = 2,
@@ -61,10 +63,10 @@ namespace osu.Game.Rulesets.Osu.Edit
                         Items = new[]
                         {
                             new RadioButton("Playfield centre",
-                                () => scaleInfo.Value = scaleInfo.Value with { Origin = ScaleOrigin.PlayfieldCentre },
+                                () => setOrigin(ScaleOrigin.PlayfieldCentre),
                                 () => new SpriteIcon { Icon = FontAwesome.Regular.Square }),
                             selectionCentreButton = new RadioButton("Selection centre",
-                                () => scaleInfo.Value = scaleInfo.Value with { Origin = ScaleOrigin.SelectionCentre },
+                                () => setOrigin(ScaleOrigin.SelectionCentre),
                                 () => new SpriteIcon { Icon = FontAwesome.Solid.VectorSquare })
                         }
                     }
@@ -96,14 +98,39 @@ namespace osu.Game.Rulesets.Osu.Edit
             scaleInfo.BindValueChanged(scale =>
             {
                 var newScale = new Vector2(scale.NewValue.XAxis ? scale.NewValue.Scale : 1, scale.NewValue.YAxis ? scale.NewValue.Scale : 1);
-                scaleHandler.Update(newScale, scale.NewValue.Origin == ScaleOrigin.PlayfieldCentre ? OsuPlayfield.BASE_SIZE / 2 : null);
+                scaleHandler.Update(newScale, getOriginPosition(scale.NewValue));
             });
         }
+
+        private void updateMaxScale()
+        {
+            if (!scaleHandler.OriginalSurroundingQuad.HasValue)
+                return;
+
+            const float max_scale = 10;
+            var scale = scaleHandler.GetClampedScale(new Vector2(max_scale), getOriginPosition(scaleInfo.Value));
+
+            if (!scaleInfo.Value.XAxis)
+                scale.X = max_scale;
+            if (!scaleInfo.Value.YAxis)
+                scale.Y = max_scale;
+
+            scaleInputBindable.MaxValue = MathF.Max(1, MathF.Min(scale.X, scale.Y));
+        }
+
+        private void setOrigin(ScaleOrigin origin)
+        {
+            scaleInfo.Value = scaleInfo.Value with { Origin = origin };
+            updateMaxScale();
+        }
+
+        private Vector2? getOriginPosition(PreciseScaleInfo scale) => scale.Origin == ScaleOrigin.PlayfieldCentre ? OsuPlayfield.BASE_SIZE / 2 : null;
 
         protected override void PopIn()
         {
             base.PopIn();
             scaleHandler.Begin();
+            updateMaxScale();
         }
 
         protected override void PopOut()
