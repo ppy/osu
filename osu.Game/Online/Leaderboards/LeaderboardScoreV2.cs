@@ -43,14 +43,9 @@ namespace osu.Game.Online.Leaderboards
         /// <summary>
         /// The maximum number of mods when contracted until the mods display width exceeds the <see cref="right_content_width"/>.
         /// </summary>
-        public const int MAX_MODS_CONTRACTED = 13;
+        public const int MAX_MODS = 5;
 
-        /// <summary>
-        /// The maximum number of mods when expanded until the mods display width exceeds the <see cref="right_content_width"/>.
-        /// </summary>
-        public const int MAX_MODS_EXPANDED = 4;
-
-        private const float right_content_width = 180;
+        private const float right_content_width = 210;
         private const float grade_width = 40;
         private const float username_min_width = 125;
         private const float statistics_regular_min_width = 175;
@@ -183,8 +178,17 @@ namespace osu.Game.Online.Leaderboards
 
             innerAvatar.OnLoadComplete += d => d.FadeInFromZero(200);
 
-            modsContainer.Spacing = new Vector2(modsContainer.Children.Count > MAX_MODS_EXPANDED ? -20 : 2, 0);
-            modsContainer.Padding = new MarginPadding { Top = modsContainer.Children.Count > 0 ? 4 : 0 };
+            if (score.Mods.Length > MAX_MODS)
+                modsCounter.Text = $"{score.Mods.Length} mods";
+            else if (score.Mods.Length > 0)
+            {
+                modsContainer.ChildrenEnumerable = score.Mods.AsOrdered().Select(mod => new ColouredModSwitchTiny(mod)
+                {
+                    Scale = new Vector2(0.375f)
+                });
+            }
+
+            modsContainer.Padding = new MarginPadding { Top = score.Mods.Length > 0 ? 4 : 0 };
         }
 
         private Container createCentreContent(APIUser user) => new Container
@@ -439,14 +443,13 @@ namespace osu.Game.Online.Leaderboards
                                         Shear = -shear,
                                         AutoSizeAxes = Axes.Both,
                                         Direction = FillDirection.Horizontal,
-                                        ChildrenEnumerable = score.Mods.AsOrdered().Select(mod => new ColouredModSwitchTiny(mod) { Scale = new Vector2(0.375f) })
+                                        Spacing = new Vector2(2f, 0f),
                                     },
                                     modsCounter = new OsuSpriteText
                                     {
                                         Anchor = Anchor.TopRight,
                                         Origin = Anchor.TopRight,
                                         Shear = -shear,
-                                        Text = $"{score.Mods.Length} mods",
                                         Alpha = 0,
                                     }
                                 }
@@ -492,7 +495,7 @@ namespace osu.Game.Online.Leaderboards
 
                     using (BeginDelayedSequence(50))
                     {
-                        Drawable modsDrawable = score.Mods.Length > MAX_MODS_CONTRACTED ? modsCounter : modsContainer;
+                        Drawable modsDrawable = score.Mods.Length > MAX_MODS ? modsCounter : modsContainer;
                         var drawables = new[] { flagBadgeAndDateContainer, modsDrawable }.Concat(statisticsLabels).ToArray();
                         for (int i = 0; i < drawables.Length; i++)
                             drawables[i].FadeIn(100 + i * 50);
