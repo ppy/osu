@@ -77,7 +77,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         /// </summary>
         public double CountDifficultStrains()
         {
-            if (double.IsNaN(Difficulty))
+            if (Difficulty == 0)
                 return 0.0;
 
             double consistentTopStrain = Difficulty / 10; // What would the top strain be if all strain values were identical
