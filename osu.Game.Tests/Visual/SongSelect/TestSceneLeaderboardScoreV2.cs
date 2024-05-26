@@ -63,17 +63,16 @@ namespace osu.Game.Tests.Visual.SongSelect
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
                     Spacing = new Vector2(0f, 2f),
+                    Shear = LeaderboardScoreV2.SHEAR
                 },
                 drawWidthText = new OsuSpriteText(),
             };
-
-            int i = 0;
 
             foreach (var scoreInfo in getTestScores())
             {
                 fillFlow.Add(new LeaderboardScoreV2(scoreInfo, scoreInfo.Position, scoreInfo.User.Id == 2)
                 {
-                    Margin = new MarginPadding { Right = 10f * i, Left = -10f * i++ },
+                    Shear = Vector2.Zero,
                 });
             }
 
