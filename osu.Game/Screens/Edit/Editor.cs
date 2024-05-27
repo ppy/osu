@@ -372,7 +372,7 @@ namespace osu.Game.Screens.Edit
                                     }
                                 }
                             },
-                            new EditorScreenSwitcherControl
+                            screenSwitcher = new EditorScreenSwitcherControl
                             {
                                 Anchor = Anchor.BottomRight,
                                 Origin = Anchor.BottomRight,
@@ -662,23 +662,23 @@ namespace osu.Game.Screens.Edit
                     return true;
 
                 case GlobalAction.EditorComposeMode:
-                    Mode.Value = EditorScreenMode.Compose;
+                    screenSwitcher.SelectItem(EditorScreenMode.Compose);
                     return true;
 
                 case GlobalAction.EditorDesignMode:
-                    Mode.Value = EditorScreenMode.Design;
+                    screenSwitcher.SelectItem(EditorScreenMode.Design);
                     return true;
 
                 case GlobalAction.EditorTimingMode:
-                    Mode.Value = EditorScreenMode.Timing;
+                    screenSwitcher.SelectItem(EditorScreenMode.Timing);
                     return true;
 
                 case GlobalAction.EditorSetupMode:
-                    Mode.Value = EditorScreenMode.SongSetup;
+                    screenSwitcher.SelectItem(EditorScreenMode.SongSetup);
                     return true;
 
                 case GlobalAction.EditorVerifyMode:
-                    Mode.Value = EditorScreenMode.Verify;
+                    screenSwitcher.SelectItem(EditorScreenMode.Verify);
                     return true;
 
                 case GlobalAction.EditorTestGameplay:
@@ -719,6 +719,8 @@ namespace osu.Game.Screens.Edit
 
         public override bool OnExiting(ScreenExitEvent e)
         {
+            currentScreen?.OnExiting(e);
+
             if (!ExitConfirmed)
             {
                 // dialog overlay may not be available in visual tests.
@@ -958,6 +960,8 @@ namespace osu.Game.Screens.Edit
 
         [CanBeNull]
         private ScheduledDelegate playbackDisabledDebounce;
+
+        private EditorScreenSwitcherControl screenSwitcher;
 
         private void updateSampleDisabledState()
         {
