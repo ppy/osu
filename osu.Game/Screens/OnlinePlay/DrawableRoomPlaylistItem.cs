@@ -22,6 +22,7 @@ using osu.Framework.Localisation;
 using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
+using osu.Game.Beatmaps.Drawables.Cards;
 using osu.Game.Collections;
 using osu.Game.Database;
 using osu.Game.Graphics;
@@ -32,6 +33,7 @@ using osu.Game.Online.Chat;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
 using osu.Game.Overlays.BeatmapSet;
+using osu.Game.Overlays.BeatmapSet.Buttons;
 using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
@@ -81,7 +83,7 @@ namespace osu.Game.Screens.OnlinePlay
         private Mod[] requiredMods = Array.Empty<Mod>();
 
         private Container maskingContainer;
-        private Container difficultyIconContainer;
+        private FillFlowContainer difficultyIconContainer;
         private LinkFlowContainer beatmapText;
         private LinkFlowContainer authorText;
         private ExplicitContentBeatmapBadge explicitContent;
@@ -93,6 +95,7 @@ namespace osu.Game.Screens.OnlinePlay
         private Drawable removeButton;
         private PanelBackground panelBackground;
         private FillFlowContainer mainFillFlow;
+        private BeatmapCardThumbnail thumbnail;
 
         [Resolved]
         private RealmAccess realm { get; set; }
@@ -282,10 +285,23 @@ namespace osu.Game.Screens.OnlinePlay
 
             if (beatmap != null)
             {
-                difficultyIconContainer.Child = new DifficultyIcon(beatmap, ruleset, requiredMods)
+                difficultyIconContainer.Children = new Drawable[]
                 {
-                    Size = new Vector2(icon_height),
-                    TooltipType = DifficultyIconTooltipType.Extended,
+                    thumbnail = new BeatmapCardThumbnail(beatmap.BeatmapSet!)
+                    {
+                        Anchor = Anchor.CentreLeft,
+                        Origin = Anchor.CentreLeft,
+                        Width = 60,
+                        RelativeSizeAxes = Axes.Y,
+                        Dimmed = { Value = IsHovered }
+                    },
+                    new DifficultyIcon(beatmap, ruleset, requiredMods)
+                    {
+                        Size = new Vector2(icon_height),
+                        TooltipType = DifficultyIconTooltipType.Extended,
+                        Anchor = Anchor.CentreLeft,
+                        Origin = Anchor.CentreLeft,
+                    },
                 };
             }
             else
@@ -329,7 +345,7 @@ namespace osu.Game.Screens.OnlinePlay
 
         protected override Drawable CreateContent()
         {
-            Action<SpriteText> fontParameters = s => s.Font = OsuFont.Default.With(weight: FontWeight.SemiBold);
+            Action<SpriteText> fontParameters = s => s.Font = OsuFont.Default.With(size: 14, weight: FontWeight.SemiBold);
 
             return maskingContainer = new Container
             {
@@ -364,12 +380,15 @@ namespace osu.Game.Screens.OnlinePlay
                         {
                             new Drawable[]
                             {
-                                difficultyIconContainer = new Container
+                                difficultyIconContainer = new FillFlowContainer
                                 {
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.CentreLeft,
-                                    AutoSizeAxes = Axes.Both,
-                                    Margin = new MarginPadding { Left = 8, Right = 8 },
+                                    AutoSizeAxes = Axes.X,
+                                    RelativeSizeAxes = Axes.Y,
+                                    Direction = FillDirection.Horizontal,
+                                    Spacing = new Vector2(4),
+                                    Margin = new MarginPadding { Right = 8 },
                                 },
                                 mainFillFlow = new MainFlow(() => SelectedItem.Value == Model || !AllowSelection)
                                 {
@@ -483,6 +502,20 @@ namespace osu.Game.Screens.OnlinePlay
                 TooltipText = "Remove from playlist"
             },
         };
+
+        protected override bool OnHover(HoverEvent e)
+        {
+            if (thumbnail != null)
+                thumbnail.Dimmed.Value = true;
+            return base.OnHover(e);
+        }
+
+        protected override void OnHoverLost(HoverLostEvent e)
+        {
+            if (thumbnail != null)
+                thumbnail.Dimmed.Value = false;
+            base.OnHoverLost(e);
+        }
 
         protected override bool OnClick(ClickEvent e)
         {
