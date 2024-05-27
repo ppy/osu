@@ -248,7 +248,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
             {
                 base.LoadComplete();
 
-                ScheduleAfterChildren(() => GetContainingFocusManager()?.ChangeFocus(passwordTextBox));
+                ScheduleAfterChildren(() => GetContainingFocusManager()!.ChangeFocus(passwordTextBox));
                 passwordTextBox.OnCommit += (_, _) => performJoin();
             }
 
@@ -262,7 +262,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
             {
                 passwordTextBox.Text = string.Empty;
 
-                GetContainingFocusManager()?.ChangeFocus(passwordTextBox);
+                GetContainingFocusManager()!.ChangeFocus(passwordTextBox);
 
                 errorText.Text = error;
                 errorText
