@@ -149,7 +149,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             if (boundingBox.Width >= 640 || boundingBox.Height >= 480)
                 return;
 
-            int subpoints = (2f * circularArcProperties.Radius <= 0.1f) ? 2 : Math.Max(2, (int)Math.Ceiling(circularArcProperties.ThetaRange / (2.0 * Math.Acos(1f - 0.1f / circularArcProperties.Radius))));
+            int subpoints = (2f * circularArcProperties.Radius <= 0.1f) ? 2 : Math.Max(2, (int)Math.Ceiling(circularArcProperties.ThetaRange / (2.0 * Math.Acos(1f - (0.1f / circularArcProperties.Radius)))));
 
             //ignore cases where subpoints is int.MaxValue, result will be garbage
             //as well, having this many subpoints will cause an out of memory error, so can't happen during normal useage
@@ -171,7 +171,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
                 if (progress == 0.0f || progress >= (subpoints - 2) / (float)(subpoints - 1))
                     continue;
 
-                double theta = circularArcProperties.ThetaStart + circularArcProperties.Direction * progress * circularArcProperties.ThetaRange;
+                double theta = circularArcProperties.ThetaStart + (circularArcProperties.Direction * progress * circularArcProperties.ThetaRange);
                 Vector2 vector = new Vector2((float)Math.Cos(theta), (float)Math.Sin(theta)) * circularArcProperties.Radius;
 
                 Assert.True(Precision.AlmostEquals(circularArcProperties.Centre + vector, path.PositionAt(progress), 0.01f),
