@@ -110,7 +110,7 @@ namespace osu.Game.Screens.Play
         private readonly List<Drawable> hideTargets;
 
         /// <summary>
-        /// The container for skin components attached to <see cref="TargetArea.Playfield"/>
+        /// The container for skin components attached to <see cref="SkinComponentsContainerLookup.TargetArea.Playfield"/>
         /// </summary>
         internal readonly Drawable PlayfieldSkinLayer;
 
