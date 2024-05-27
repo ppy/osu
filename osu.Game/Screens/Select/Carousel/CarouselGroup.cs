@@ -77,6 +77,7 @@ namespace osu.Game.Screens.Select.Carousel
                 {
                     case CarouselItemState.Collapsed:
                     case CarouselItemState.NotSelected:
+                    case CarouselItemState.SelectedCollapsed:
                         this.items.ForEach(c => c.State.Value = CarouselItemState.Collapsed);
                         break;
 

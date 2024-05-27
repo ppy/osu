@@ -30,6 +30,8 @@ namespace osu.Game.Screens.Select.Carousel
             {
                 if (filtered.NewValue && State.Value == CarouselItemState.Selected)
                     State.Value = CarouselItemState.NotSelected;
+                else if (filtered.NewValue && State.Value == CarouselItemState.SelectedCollapsed)
+                    State.Value = CarouselItemState.Collapsed;
             };
         }
 
@@ -62,5 +64,6 @@ namespace osu.Game.Screens.Select.Carousel
         Collapsed,
         NotSelected,
         Selected,
+        SelectedCollapsed,
     }
 }

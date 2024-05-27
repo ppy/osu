@@ -61,6 +61,8 @@ namespace osu.Game.Screens.Select
 
         private CarouselBeatmap? selectedBeatmap => selectedBeatmapSet?.Beatmaps.FirstOrDefault(s => s.State.Value == CarouselItemState.Selected);
 
+        private CarouselBeatmap? lastSelectedBeatmap;
+
         /// <summary>
         /// The total count of non-filtered beatmaps displayed.
         /// </summary>
@@ -566,7 +568,7 @@ namespace osu.Game.Screens.Select
 
         private void selectNextSet(int direction, bool skipDifficulties)
         {
-            if (selectedBeatmap == null || selectedBeatmapSet == null)
+            if ((selectedBeatmap == null && lastSelectedBeatmap == null) || selectedBeatmapSet == null)
                 return;
 
             var unfilteredSets = beatmapSets.Where(s => !s.Filtered.Value).ToList();
@@ -693,6 +695,38 @@ namespace osu.Game.Screens.Select
             item.State.Value = CarouselItemState.Selected;
         }
 
+        private void collapseSelected(CarouselItem? item)
+        {
+            if (!AllowSelection)
+                return;
+
+            if (item == null) return;
+
+            lastSelectedBeatmap = selectedBeatmap;
+            item.State.Value = CarouselItemState.SelectedCollapsed;
+            itemsCache.Invalidate();
+        }
+
+        public bool tryToCollapse()
+        {
+            if(selectedBeatmapSet != null && selectedBeatmapSet.State.Value == CarouselItemState.Selected)
+            {
+                collapseSelected(selectedBeatmapSet);
+                return true;
+            }
+            return false;
+        }
+
+        public bool tryToExpand()
+        {
+            if (selectedBeatmapSet != null && selectedBeatmapSet.State.Value == CarouselItemState.SelectedCollapsed)
+            {
+                select(selectedBeatmapSet);
+                return true;
+            }
+            return false;
+        }
+
         private FilterCriteria activeCriteria = new FilterCriteria();
 
         protected ScheduledDelegate? PendingFilter;
@@ -807,13 +841,26 @@ namespace osu.Game.Screens.Select
             {
                 case GlobalAction.SelectNext:
                 case GlobalAction.SelectNextGroup:
-                    SelectNext(1, e.Action == GlobalAction.SelectNextGroup);
-                    return true;
+                    if (selectedBeatmapSet != null)
+                    {
+                        SelectNext(1, (e.Action == GlobalAction.SelectNextGroup || selectedBeatmapSet.State.Value == CarouselItemState.SelectedCollapsed));
+                        return true;
+                    }
+                    return false;
 
                 case GlobalAction.SelectPrevious:
                 case GlobalAction.SelectPreviousGroup:
-                    SelectNext(-1, e.Action == GlobalAction.SelectPreviousGroup);
-                    return true;
+                    if (selectedBeatmapSet != null)
+                    {
+                        SelectNext(-1, (e.Action == GlobalAction.SelectPreviousGroup || selectedBeatmapSet.State.Value == CarouselItemState.SelectedCollapsed));
+                        return true;
+                    }
+                    return false;
+
+                case GlobalAction.Select:
+                    return tryToExpand();
+                case GlobalAction.Back:
+                    return tryToCollapse();
             }
 
             return false;
@@ -982,10 +1029,21 @@ namespace osu.Game.Screens.Select
                 GetRecommendedBeatmap = beatmaps => GetRecommendedBeatmap?.Invoke(beatmaps)
             };
 
+            set.State.ValueChanged += setState =>
+            {
+                if (setState.NewValue == CarouselItemState.SelectedCollapsed)
+                {
+                    selectedBeatmapSet = set;
+                    itemsCache.Invalidate();
+                    ScrollToSelected();
+                }
+            };
+
             foreach (var c in set.Beatmaps)
             {
                 c.State.ValueChanged += state =>
                 {
+                    
                     if (state.NewValue == CarouselItemState.Selected)
                     {
                         selectedBeatmapSet = set;
@@ -1026,7 +1084,7 @@ namespace osu.Game.Screens.Select
                         visibleItems.Add(set);
                         set.CarouselYPosition = currentY;
 
-                        if (item.State.Value == CarouselItemState.Selected)
+                        if (item.State.Value == CarouselItemState.Selected || item.State.Value == CarouselItemState.SelectedCollapsed)
                         {
                             // scroll position at currentY makes the set panel appear at the very top of the carousel's screen space
                             // move down by half of visible height (height of the carousel's visible extent, including semi-transparent areas)
@@ -1048,7 +1106,7 @@ namespace osu.Game.Screens.Select
                             }
                         }
 
-                        currentY += set.TotalHeight + panel_padding;
+                        currentY += set.TotalHeight + panel_padding; 
                         break;
                     }
                 }
@@ -1063,7 +1121,7 @@ namespace osu.Game.Screens.Select
             // update and let external consumers know about selection loss.
             if (BeatmapSetsLoaded)
             {
-                bool selectionLost = selectedBeatmapSet != null && selectedBeatmapSet.State.Value != CarouselItemState.Selected;
+                bool selectionLost = selectedBeatmapSet != null && selectedBeatmapSet.State.Value != CarouselItemState.Selected && selectedBeatmapSet.State.Value != CarouselItemState.SelectedCollapsed;
 
                 if (selectionLost)
                 {

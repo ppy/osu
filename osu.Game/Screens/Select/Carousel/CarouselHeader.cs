@@ -78,6 +78,7 @@ namespace osu.Game.Screens.Select.Carousel
                     break;
 
                 case CarouselItemState.Selected:
+                case CarouselItemState.SelectedCollapsed:
                     hoverLayer.InsetForBorder = true;
 
                     BorderContainer.BorderThickness = border_thickness;

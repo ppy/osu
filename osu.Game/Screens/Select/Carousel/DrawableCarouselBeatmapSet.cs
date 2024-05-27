@@ -15,6 +15,7 @@ using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Utils;
+using osu.Framework.Input.Events;
 using osu.Game.Beatmaps;
 using osu.Game.Collections;
 using osu.Game.Database;
@@ -141,6 +142,19 @@ namespace osu.Game.Screens.Select.Carousel
             updateBeatmapDifficulties();
         }
 
+        protected override bool OnClick(ClickEvent e)
+        {
+            Debug.Assert(Item != null);
+
+            if (Item.State.Value == CarouselItemState.Selected)
+                Item.State.Value = CarouselItemState.SelectedCollapsed;
+
+            else
+                Item.State.Value = CarouselItemState.Selected;
+
+            return true;
+        }
+
         private void updateBeatmapDifficulties()
         {
             Debug.Assert(Item != null);
@@ -252,7 +266,9 @@ namespace osu.Game.Screens.Select.Carousel
                     yPos += panel.Item.TotalHeight;
                 }
                 else
+                {
                     panel.MoveToY(0, 800, Easing.OutQuint);
+                }
             }
         }
 
@@ -264,8 +280,11 @@ namespace osu.Game.Screens.Select.Carousel
 
                 List<MenuItem> items = new List<MenuItem>();
 
-                if (Item?.State.Value == CarouselItemState.NotSelected)
+                if (Item?.State.Value == CarouselItemState.NotSelected || Item?.State.Value == CarouselItemState.SelectedCollapsed)
                     items.Add(new OsuMenuItem("Expand", MenuItemType.Highlighted, () => Item.State.Value = CarouselItemState.Selected));
+
+                if (Item?.State.Value == CarouselItemState.Selected)
+                    items.Add(new OsuMenuItem("Collapse", MenuItemType.Highlighted, () => Item.State.Value = CarouselItemState.SelectedCollapsed));
 
                 if (mainMenuItems != null)
                     items.AddRange(mainMenuItems);

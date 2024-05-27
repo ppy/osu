@@ -1015,6 +1015,7 @@ namespace osu.Game.Screens.Select
             switch (e.Action)
             {
                 case GlobalAction.Select:
+
                     FinaliseSelection();
                     return true;
             }

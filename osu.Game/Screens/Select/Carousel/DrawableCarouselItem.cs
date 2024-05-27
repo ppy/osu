@@ -139,6 +139,7 @@ namespace osu.Game.Screens.Select.Carousel
                     break;
 
                 case CarouselItemState.Selected:
+                case CarouselItemState.SelectedCollapsed:
                     Selected();
                     break;
             }

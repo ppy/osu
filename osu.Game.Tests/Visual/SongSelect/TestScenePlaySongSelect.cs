@@ -1204,6 +1204,30 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddAssert("filter count is 6", () => songSelect!.FilterCount, () => Is.EqualTo(6));
         }
 
+        [Test]
+        public void EnterBeatmapAfterCollapsing()
+        {
+            addRulesetImportStep(0);
+
+            createSongSelect();
+
+            AddUntilStep("wait for initial selection", () => !Beatmap.IsDefault);
+
+            WorkingBeatmap? selected = null;
+
+            AddStep("store selected beatmap", () => selected = Beatmap.Value);
+
+            AddUntilStep("wait for beatmaps to load", () => songSelect!.Carousel.ChildrenOfType<DrawableCarouselBeatmap>().Any());
+
+            AddStep("collapse set", () => InputManager.Key(Key.Escape));
+
+            AddStep("expand set", () => InputManager.Key(Key.Enter));
+
+            AddStep("select beatmap", () => InputManager.Key(Key.Enter));
+
+            waitForDismissed();
+        }
+
         private void waitForInitialSelection()
         {
             AddUntilStep("wait for initial selection", () => !Beatmap.IsDefault);

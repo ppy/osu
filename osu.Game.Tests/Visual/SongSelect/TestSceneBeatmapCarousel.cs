@@ -1245,6 +1245,140 @@ namespace osu.Game.Tests.Visual.SongSelect
             }
         }
 
+        [Test]
+        public void TestCollapseFirstBeatmapSetWithEscape()
+        {
+            loadBeatmaps(setCount: 1);
+
+            AddStep("press escape", () => InputManager.PressKey(Key.Escape));
+
+            AddAssert("beatmap collapsed", () => selectedBeatmapCollapsed());
+        }
+
+        [Test]
+        public void TestCollapseFirstBeatmapSetWithMouseClick()
+        {
+            loadBeatmaps();
+
+            setSelected(2, 1);
+
+            DrawableCarouselItem set = null!;
+            AddStep("Find the DrawableCarouselBeatmapSet", () =>
+            {
+                set = carousel.Items.FirstOrDefault(s => s is DrawableCarouselBeatmapSet && s.Item.State.Value == CarouselItemState.Selected);
+            });
+
+            AddStep("Click on a set", () =>
+            {
+                InputManager.MoveMouseTo(set, new osuTK.Vector2(0,-DrawableCarouselBeatmapSet.MAX_HEIGHT));
+
+                InputManager.Click(MouseButton.Left);
+            });
+
+            AddAssert("beatmap collapsed", () => selectedBeatmapCollapsed());
+        }
+
+        [Test]
+        public void TestExpandAfterCollapse()
+        {
+            loadBeatmaps();
+
+            AddStep("select first", () => carousel.SelectBeatmap(carousel.BeatmapSets.First().Beatmaps.First()));
+            waitForSelection(1, 1);
+
+            advanceSelection(direction: 1, diff: false);
+
+            AddStep("press escape", () => InputManager.PressKey(Key.Escape));
+            AddStep("press enter", () => InputManager.PressKey(Key.Enter));
+
+
+            waitForSelection(2, 1);
+
+        }
+
+        [Test]
+        public void TestCollapseAndExpandWithMouse()
+        {
+            loadBeatmaps(setCount: 1);
+
+            setSelected(1, 3);
+
+            DrawableCarouselItem set = null!;
+            AddStep("Find the DrawableCarouselBeatmapSet", () =>
+            {
+                set = carousel.Items.FirstOrDefault(s => s is DrawableCarouselBeatmapSet && s.Item.State.Value == CarouselItemState.Selected);
+            });
+
+            AddStep("collapse with mouse", () =>
+            {
+                InputManager.MoveMouseTo(set, new osuTK.Vector2(0, -DrawableCarouselBeatmapSet.MAX_HEIGHT));
+                InputManager.Click(MouseButton.Left);
+            }
+            );
+
+            AddStep("expand with cursor", () =>
+            {
+                InputManager.MoveMouseTo(set, new osuTK.Vector2(0, DrawableCarouselBeatmapSet.MAX_HEIGHT/3));
+
+                InputManager.Click(MouseButton.Left);
+            });
+
+            waitForSelection(1, 3);
+        }
+
+        [Test]
+        public void TestCollapseWithMouseExpandWithEnter()
+        {
+            loadBeatmaps(setCount: 1);
+
+            setSelected(1, 3);
+
+            DrawableCarouselItem set = null!;
+            AddStep("Find the DrawableCarouselBeatmapSet", () =>
+            {
+                set = carousel.Items.FirstOrDefault(s => s is DrawableCarouselBeatmapSet && s.Item.State.Value == CarouselItemState.Selected);
+            });
+
+            AddStep("collapse with mouse", () =>
+            {
+                InputManager.MoveMouseTo(set, new osuTK.Vector2(0, -DrawableCarouselBeatmapSet.MAX_HEIGHT));
+                InputManager.Click(MouseButton.Left);
+            }
+            );
+
+            AddStep("expand with enter", () => InputManager.PressKey(Key.Enter));
+
+            waitForSelection(1, 3);
+        }
+
+        [Test]
+        public void TestCollapseWithContextMenu()
+        {
+            loadBeatmaps(setCount: 1);
+
+            setSelected(1, 3);
+
+            DrawableCarouselItem set = null!;
+            AddStep("Find the DrawableCarouselBeatmapSet", () =>
+            {
+                set = carousel.Items.FirstOrDefault(s => s is DrawableCarouselBeatmapSet && s.Item.State.Value == CarouselItemState.Selected);
+            });
+
+            AddStep("collapse with escape", () => InputManager.PressKey(Key.Escape));
+
+            AddStep("right click to open context menu", () =>
+            {
+                InputManager.MoveMouseTo(set, new osuTK.Vector2(0, -DrawableCarouselBeatmapSet.MAX_HEIGHT/3));
+                InputManager.Click(MouseButton.Right);
+            });
+
+            AddStep("right click to open context menu", () =>
+            {
+                InputManager.MoveMouseTo(set, new osuTK.Vector2(20, -DrawableCarouselBeatmapSet.MAX_HEIGHT/3 + 20));
+                InputManager.Click(MouseButton.Left);
+            });
+        }
+
         private void loadBeatmaps(List<BeatmapSetInfo> beatmapSets = null, Func<FilterCriteria> initialCriteria = null, Action<BeatmapCarousel> carouselAdjust = null,
                                   int? setCount = null, int? diffCount = null, bool randomDifficulties = false)
         {
@@ -1379,6 +1513,13 @@ namespace osu.Game.Tests.Visual.SongSelect
                 return true;
 
             return currentlySelected.Item!.Visible;
+        }
+
+        private bool selectedBeatmapCollapsed()
+        {
+            var currentlySelected = carousel.Items.FirstOrDefault(s => s.Item is CarouselBeatmapSet && s.Item.State.Value == CarouselItemState.SelectedCollapsed);
+
+            return !(currentlySelected == null);
         }
 
         private void checkInvisibleDifficultiesUnselectable()
