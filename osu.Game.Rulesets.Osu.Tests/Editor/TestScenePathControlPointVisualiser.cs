@@ -31,23 +31,6 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
         });
 
         [Test]
-        public void TestAddOverlappingControlPoints()
-        {
-            createVisualiser(true);
-
-            addControlPointStep(new Vector2(200));
-            addControlPointStep(new Vector2(300));
-            addControlPointStep(new Vector2(300));
-            addControlPointStep(new Vector2(500, 300));
-
-            AddAssert("last connection displayed", () =>
-            {
-                var lastConnection = visualiser.Connections.Last(c => c.ControlPoint.Position == new Vector2(300));
-                return lastConnection.DrawWidth > 50;
-            });
-        }
-
-        [Test]
         public void TestPerfectCurveTooManyPoints()
         {
             createVisualiser(true);
@@ -192,24 +175,6 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
 
             for (int i = 0; i < points.Length; i++)
                 addAssertPointPositionChanged(points, i);
-        }
-
-        [Test]
-        public void TestStackingUpdatesConnectionPosition()
-        {
-            createVisualiser(true);
-
-            Vector2 connectionPosition;
-            addControlPointStep(connectionPosition = new Vector2(300));
-            addControlPointStep(new Vector2(600));
-
-            // Apply a big number in stacking so the person running the test can clearly see if it fails
-            AddStep("apply stacking", () => slider.StackHeightBindable.Value += 10);
-
-            AddAssert($"Connection at {connectionPosition} changed",
-                () => visualiser.Connections[0].Position,
-                () => !Is.EqualTo(connectionPosition)
-            );
         }
 
         private void addAssertPointPositionChanged(Vector2[] points, int index)

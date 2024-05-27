@@ -75,6 +75,12 @@ namespace osu.Game
     {
         public static readonly string[] VIDEO_EXTENSIONS = { ".mp4", ".mov", ".avi", ".flv", ".mpg", ".wmv", ".m4v" };
 
+#if DEBUG
+        public const string GAME_NAME = "osu! (development)";
+#else
+        public const string GAME_NAME = "osu!";
+#endif
+
         public const string OSU_PROTOCOL = "osu://";
 
         public const string CLIENT_STREAM_NAME = @"lazer";
@@ -241,11 +247,7 @@ namespace osu.Game
 
         public OsuGameBase()
         {
-            Name = @"osu!";
-
-#if DEBUG
-            Name += " (development)";
-#endif
+            Name = GAME_NAME;
 
             allowableExceptions = UnhandledExceptionsBeforeCrash;
         }
@@ -576,17 +578,17 @@ namespace osu.Game
                 {
                     case ITabletHandler th:
                         return new TabletSettings(th);
-
-                    case MouseHandler mh:
-                        return new MouseSettings(mh);
-
-                    case JoystickHandler jh:
-                        return new JoystickSettings(jh);
                 }
             }
 
             switch (handler)
             {
+                case MouseHandler mh:
+                    return new MouseSettings(mh);
+
+                case JoystickHandler jh:
+                    return new JoystickSettings(jh);
+
                 case TouchHandler th:
                     return new TouchSettings(th);
 
