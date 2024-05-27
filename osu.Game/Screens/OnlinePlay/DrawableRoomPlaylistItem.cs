@@ -286,7 +286,7 @@ namespace osu.Game.Screens.OnlinePlay
             {
                 difficultyIconContainer.Children = new Drawable[]
                 {
-                    thumbnail = new BeatmapCardThumbnail(beatmap.BeatmapSet!)
+                    thumbnail = new BeatmapCardThumbnail(beatmap.BeatmapSet!, (IBeatmapSetOnlineInfo)beatmap.BeatmapSet!)
                     {
                         Anchor = Anchor.CentreLeft,
                         Origin = Anchor.CentreLeft,

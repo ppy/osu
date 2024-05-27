@@ -35,14 +35,14 @@ namespace osu.Game.Beatmaps.Drawables.Cards
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; } = null!;
 
-        public BeatmapCardThumbnail(IBeatmapSetInfo beatmapSetInfo)
+        public BeatmapCardThumbnail(IBeatmapSetInfo beatmapSetInfo, IBeatmapSetOnlineInfo onlineInfo)
         {
             InternalChildren = new Drawable[]
             {
                 new UpdateableOnlineBeatmapSetCover(BeatmapSetCoverType.List)
                 {
                     RelativeSizeAxes = Axes.Both,
-                    OnlineInfo = beatmapSetInfo as IBeatmapSetOnlineInfo
+                    OnlineInfo = onlineInfo
                 },
                 background = new Box
                 {
