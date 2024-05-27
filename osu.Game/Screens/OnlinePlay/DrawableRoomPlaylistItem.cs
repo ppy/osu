@@ -387,7 +387,7 @@ namespace osu.Game.Screens.OnlinePlay
                                     RelativeSizeAxes = Axes.Y,
                                     Direction = FillDirection.Horizontal,
                                     Spacing = new Vector2(4),
-                                    Margin = new MarginPadding { Right = 8 },
+                                    Margin = new MarginPadding { Right = 4 },
                                 },
                                 mainFillFlow = new MainFlow(() => SelectedItem.Value == Model || !AllowSelection)
                                 {
