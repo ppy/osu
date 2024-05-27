@@ -78,7 +78,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         }
 
         // Generally all the control points are within the visible area all the time.
-        public override bool UpdateSubTreeMasking(Drawable source, RectangleF maskingBounds) => true;
+        public override bool UpdateSubTreeMasking() => true;
 
         /// <summary>
         /// Handles correction of invalid path types.
@@ -435,10 +435,14 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
             var item = new TernaryStateRadioMenuItem(type?.Description ?? "Inherit", MenuItemType.Standard, _ =>
             {
+                changeHandler?.BeginChange();
+
                 foreach (var p in Pieces.Where(p => p.IsSelected.Value))
                     updatePathType(p, type);
 
                 EnsureValidPathTypes();
+
+                changeHandler?.EndChange();
             });
 
             if (countOfState == totalCount)
