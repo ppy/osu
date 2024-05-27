@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -329,6 +330,7 @@ namespace osu.Game.Screens.Ranking
         {
             if (state.NewValue == Visibility.Visible)
             {
+                Debug.Assert(SelectedScore.Value != null);
                 // Detach the panel in its original location, and move into the desired location in the local container.
                 var expandedPanel = ScorePanelList.GetPanelForScore(SelectedScore.Value);
                 var screenSpacePos = expandedPanel.ScreenSpaceDrawQuad.TopLeft;

@@ -85,8 +85,8 @@ namespace osu.Game.Tests.Visual.Gameplay
 
                 if (scaleTransformProvided)
                 {
-                    sprite.TimelineGroup.Scale.Add(Easing.None, Time.Current, Time.Current + 1000, 1, 2);
-                    sprite.TimelineGroup.Scale.Add(Easing.None, Time.Current + 1000, Time.Current + 2000, 2, 1);
+                    sprite.Commands.AddScale(Easing.None, Time.Current, Time.Current + 1000, 1, 2);
+                    sprite.Commands.AddScale(Easing.None, Time.Current + 1000, Time.Current + 2000, 2, 1);
                 }
 
                 layer.Elements.Clear();
@@ -211,7 +211,8 @@ namespace osu.Game.Tests.Visual.Gameplay
             var layer = storyboard.GetLayer("Background");
 
             var sprite = new StoryboardSprite(lookupName, origin, initialPosition);
-            sprite.AddLoop(Time.Current, 100).Alpha.Add(Easing.None, 0, 10000, 1, 1);
+            var loop = sprite.AddLoopingGroup(Time.Current, 100);
+            loop.AddAlpha(Easing.None, 0, 10000, 1, 1);
 
             layer.Elements.Clear();
             layer.Add(sprite);
