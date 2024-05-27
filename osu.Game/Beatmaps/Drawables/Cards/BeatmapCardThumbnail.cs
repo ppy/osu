@@ -61,7 +61,6 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
-                            Size = new Vector2(50),
                             InnerRadius = 0.2f
                         },
                         content = new Container
@@ -92,6 +91,9 @@ namespace osu.Game.Beatmaps.Drawables.Cards
         {
             base.Update();
             progress.Progress = playButton.Progress.Value;
+
+            playButton.Scale = new Vector2(DrawWidth / 100);
+            progress.Size = new Vector2(50 * DrawWidth / 100);
         }
 
         private void updateState()
