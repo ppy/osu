@@ -416,6 +416,8 @@ namespace osu.Game.Screens.OnlinePlay
                                                 new FillFlowContainer
                                                 {
                                                     AutoSizeAxes = Axes.Both,
+                                                    Anchor = Anchor.CentreLeft,
+                                                    Origin = Anchor.CentreLeft,
                                                     Direction = FillDirection.Horizontal,
                                                     Spacing = new Vector2(10f, 0),
                                                     Children = new Drawable[]
@@ -438,7 +440,8 @@ namespace osu.Game.Screens.OnlinePlay
                                                     Child = modDisplay = new ModDisplay
                                                     {
                                                         Scale = new Vector2(0.4f),
-                                                        ExpansionMode = ExpansionMode.AlwaysExpanded
+                                                        ExpansionMode = ExpansionMode.AlwaysExpanded,
+                                                        Margin = new MarginPadding { Vertical = -6 },
                                                     }
                                                 }
                                             }
