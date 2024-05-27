@@ -330,11 +330,18 @@ namespace osu.Game.Rulesets.Objects
                     if (subControlPoints.Length != 3)
                         break;
 
-                    //If a curve's theta range almost equals zero, the radius needed to have more than a
-                    //floating point error difference is very large and results in a nearly straight path.
-                    //Calculate it via a bezier aproximation instead.
-                    //0.0005 corresponds with a radius of 8000 to have a more than 0.001 shift in the X value
-                    if (Math.Abs(new CircularArcProperties(subControlPoints).ThetaRange) <= 0.0005d)
+                    CircularArcProperties circularArcProperties = new CircularArcProperties(subControlPoints);
+
+                    //if false, we'll end up breaking anyways when calculating subPath
+                    if (!circularArcProperties.IsValid)
+                        break;
+
+                    //Coppied from PathApproximator.CircularArcToPiecewiseLinear
+                    int subPoints = (2f * circularArcProperties.Radius <= 0.1f) ? 2 : Math.Max(2, (int)Math.Ceiling(circularArcProperties.ThetaRange / (2.0 * Math.Acos(1f - (0.1f / circularArcProperties.Radius)))));
+
+                    //if the amount of subpoints is int.MaxValue, causes an out of memory issue, so we default to bezier
+                    //this only occurs for very large radii, so the result should be essentially a straight line anyways
+                    if (subPoints == int.MaxValue)
                         break;
 
                     List<Vector2> subPath = PathApproximator.CircularArcToPiecewiseLinear(subControlPoints);
