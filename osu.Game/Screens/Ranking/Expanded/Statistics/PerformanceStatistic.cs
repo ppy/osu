@@ -1,9 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -17,6 +16,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Resources.Localisation.Web;
 using osu.Game.Scoring;
 using osu.Game.Localisation;
+using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Screens.Ranking.Expanded.Statistics
 {
@@ -30,7 +30,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Statistics
 
         private readonly CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
 
-        private RollingCounter<int> counter;
+        private RollingCounter<int> counter = null!;
 
         public PerformanceStatistic(ScoreInfo score)
             : base(BeatmapsetsStrings.ShowScoreboardHeaderspp)
@@ -74,7 +74,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Statistics
                     Alpha = 0.5f;
                     TooltipText = ResultsScreenStrings.NoPPForUnrankedBeatmaps;
                 }
-                else if (scoreInfo.Mods.Any(m => !m.Ranked))
+                else if (hasUnrankedMods(scoreInfo))
                 {
                     Alpha = 0.5f;
                     TooltipText = ResultsScreenStrings.NoPPForUnrankedMods;
@@ -87,6 +87,16 @@ namespace osu.Game.Screens.Ranking.Expanded.Statistics
             }
         }
 
+        private static bool hasUnrankedMods(ScoreInfo scoreInfo)
+        {
+            IEnumerable<Mod> modsToCheck = scoreInfo.Mods;
+
+            if (scoreInfo.IsLegacyScore)
+                modsToCheck = modsToCheck.Where(m => m is not ModClassic);
+
+            return modsToCheck.Any(m => !m.Ranked);
+        }
+
         public override void Appear()
         {
             base.Appear();
@@ -95,7 +105,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Statistics
 
         protected override void Dispose(bool isDisposing)
         {
-            cancellationTokenSource?.Cancel();
+            cancellationTokenSource.Cancel();
             base.Dispose(isDisposing);
         }
 

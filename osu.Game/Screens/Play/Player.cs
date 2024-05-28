@@ -101,6 +101,11 @@ namespace osu.Game.Screens.Play
         /// </summary>
         public IBindable<bool> ShowingOverlayComponents = new Bindable<bool>();
 
+        // Should match PlayerLoader for consistency. Cached here for the rare case we push a Player
+        // without the loading screen (one such usage is the skin editor's scene library).
+        [Cached]
+        private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Purple);
+
         [Resolved]
         private ScoreManager scoreManager { get; set; }
 
@@ -1200,6 +1205,7 @@ namespace osu.Game.Screens.Play
             var importableScore = score.ScoreInfo.DeepClone();
 
             var imported = scoreManager.Import(importableScore, replayReader);
+            Debug.Assert(imported != null);
 
             imported.PerformRead(s =>
             {

@@ -7,7 +7,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Caching;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Primitives;
 using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
@@ -20,7 +19,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
     public partial class TimelineTickDisplay : TimelinePart<PointVisualisation>
     {
         // With current implementation every tick in the sub-tree should be visible, no need to check whether they are masked away.
-        public override bool UpdateSubTreeMasking(Drawable source, RectangleF maskingBounds) => false;
+        public override bool UpdateSubTreeMasking() => false;
 
         [Resolved]
         private EditorBeatmap beatmap { get; set; } = null!;
