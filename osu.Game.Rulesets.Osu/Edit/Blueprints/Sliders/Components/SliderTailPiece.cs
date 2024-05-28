@@ -61,11 +61,38 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             updateCirclePieceColour();
         }
 
+        protected override bool OnKeyDown(KeyDownEvent e)
+        {
+            if (e.Repeat)
+                return false;
+
+            handleDragToggle(e);
+            return base.OnKeyDown(e);
+        }
+
+        protected override void OnKeyUp(KeyUpEvent e)
+        {
+            handleDragToggle(e);
+            base.OnKeyUp(e);
+        }
+
+        private bool lastShiftPressed;
+
+        private void handleDragToggle(KeyboardEvent key)
+        {
+            bool shiftPressed = key.ShiftPressed;
+
+            if (shiftPressed == lastShiftPressed) return;
+
+            lastShiftPressed = shiftPressed;
+            updateCirclePieceColour();
+        }
+
         private void updateCirclePieceColour()
         {
             Color4 colour = colours.Yellow;
 
-            if (IsHovered)
+            if (IsHovered && inputManager.CurrentState.Keyboard.ShiftPressed)
                 colour = colour.Lighten(1);
 
             CirclePiece.Colour = colour;
