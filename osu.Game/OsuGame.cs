@@ -91,6 +91,11 @@ namespace osu.Game
         /// </summary>
         protected const float SIDE_OVERLAY_OFFSET_RATIO = 0.05f;
 
+        /// <summary>
+        /// A common shear factor applied to most components of the game.
+        /// </summary>
+        public const float SHEAR = 0.2f;
+
         public Toolbar Toolbar { get; private set; }
 
         private ChatOverlay chatOverlay;
