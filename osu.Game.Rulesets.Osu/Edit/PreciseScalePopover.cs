@@ -32,6 +32,9 @@ namespace osu.Game.Rulesets.Osu.Edit
         private OsuCheckbox xCheckBox = null!;
         private OsuCheckbox yCheckBox = null!;
 
+        private Bindable<bool> canScaleX = null!;
+        private Bindable<bool> canScaleY = null!;
+
         public PreciseScalePopover(SelectionScaleHandler scaleHandler)
         {
             this.scaleHandler = scaleHandler;
@@ -118,10 +121,15 @@ namespace osu.Game.Rulesets.Osu.Edit
             xCheckBox.Current.BindValueChanged(x => setAxis(x.NewValue, yCheckBox.Current.Value));
             yCheckBox.Current.BindValueChanged(y => setAxis(xCheckBox.Current.Value, y.NewValue));
 
-            scaleHandler.CanScaleFromSelectionOrigin.BindValueChanged(e =>
-            {
-                selectionCentreButton.Selected.Disabled = !e.NewValue;
-            }, true);
+            // aggregate two values into canScaleFromSelectionCentre
+            canScaleX = scaleHandler.CanScaleX.GetBoundCopy();
+            canScaleX.BindValueChanged(_ => updateCanScaleFromSelectionCentre());
+
+            canScaleY = scaleHandler.CanScaleY.GetBoundCopy();
+            canScaleY.BindValueChanged(_ => updateCanScaleFromSelectionCentre(), true);
+
+            void updateCanScaleFromSelectionCentre() =>
+                selectionCentreButton.Selected.Disabled = !(scaleHandler.CanScaleY.Value || scaleHandler.CanScaleFromPlayfieldOrigin.Value);
 
             scaleInfo.BindValueChanged(scale =>
             {

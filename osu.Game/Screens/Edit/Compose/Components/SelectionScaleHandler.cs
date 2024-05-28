@@ -33,11 +33,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
         public Bindable<bool> CanScaleDiagonally { get; private set; } = new BindableBool();
 
         /// <summary>
-        /// Whether scaling anchored by the selection origin can currently be performed.
-        /// </summary>
-        public Bindable<bool> CanScaleFromSelectionOrigin { get; private set; } = new BindableBool();
-
-        /// <summary>
         /// Whether scaling anchored by the center of the playfield can currently be performed.
         /// </summary>
         public Bindable<bool> CanScaleFromPlayfieldOrigin { get; private set; } = new BindableBool();
