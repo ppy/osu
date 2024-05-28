@@ -88,7 +88,7 @@ namespace osu.Game.Scoring
         {
             ScoreInfo? databasedScoreInfo = null;
 
-            if (originalScoreInfo is ScoreInfo scoreInfo)
+            if (originalScoreInfo is ScoreInfo scoreInfo && !string.IsNullOrEmpty(scoreInfo.Hash))
                 databasedScoreInfo = Query(s => s.Hash == scoreInfo.Hash);
 
             if (originalScoreInfo.OnlineID > 0)
