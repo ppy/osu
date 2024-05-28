@@ -58,7 +58,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
                 if (!(currentObj.BaseObject is Spinner))
                 {
-                    double pixelJumpDistance = (osuHitObject.StackedPosition - currentHitObject.StackedEndPosition).Length;
+                    double pixelDistance = (osuHitObject.StackedPosition - currentHitObject.StackedEndPosition).Length;
                     double flashlightRadius = getComboScaleFor(currentObj.CurrentMaxCombo);
                     double objectOpacity = osuCurrent.OpacityAt(currentHitObject.StartTime, hidden);
 
@@ -66,16 +66,16 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                     if (currentHitObject is Slider currentSlider)
                     {
                         Vector2 lazyEndPosition = currentSlider.LazyEndPosition ?? currentSlider.StackedPosition;
-                        pixelJumpDistance = Math.Min(pixelJumpDistance, (osuHitObject.StackedPosition - lazyEndPosition).Length);
+                        pixelDistance = Math.Min(pixelDistance, (osuHitObject.StackedPosition - lazyEndPosition).Length);
                     }
 
                     // Apply a nerf based on the visibility from the current object.
-                    double distanceNerf = Math.Min(1.0, pixelJumpDistance / (flashlightRadius + osuHitObject.Radius - 80));
-                    double visibilityNerf = 1.0 - objectOpacity * (1.0 - distanceNerf);
+                    double radiusVisibility = Math.Min(1.0, pixelDistance / (flashlightRadius + osuHitObject.Radius - 80));
+                    double visibilityNerf = 1.0 - objectOpacity * (1.0 - radiusVisibility);
 
-                    // Jumps within the visible Flashlight radius should be nerfed.
+                    // Small jumps within the visible Flashlight radius should be nerfed.
                     if (i == 0)
-                        smallDistNerf = Math.Min(1.0, pixelJumpDistance / (flashlightRadius - 45));
+                        smallDistNerf = Math.Min(1.0, pixelDistance / (flashlightRadius - 45));
 
                     // Nerf stacks so that only the first object of the stack is accounted for.
                     double stackNerf = Math.Min(1.0, (currentObj.LazyJumpDistance / scalingFactor) / 25.0);
@@ -83,7 +83,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                     // Bonus based on object opacity.
                     double opacityBonus = 1.0 + max_opacity_bonus * (1.0 - objectOpacity);
 
-                    result += visibilityNerf * stackNerf * opacityBonus * scalingFactor * pixelJumpDistance / cumulativeStrainTime;
+                    result += visibilityNerf * stackNerf * opacityBonus * scalingFactor * pixelDistance / cumulativeStrainTime;
 
                     if (currentObj.Angle != null && osuCurrent.Angle != null)
                     {
