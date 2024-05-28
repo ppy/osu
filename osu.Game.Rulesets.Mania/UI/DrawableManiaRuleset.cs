@@ -26,10 +26,12 @@ using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Scoring;
+using osu.Game.Screens.Play;
 using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
+    [Cached]
     public partial class DrawableManiaRuleset : DrawableScrollingRuleset<ManiaHitObject>
     {
         /// <summary>
@@ -42,7 +44,7 @@ namespace osu.Game.Rulesets.Mania.UI
         /// </summary>
         public const double MAX_TIME_RANGE = 11485;
 
-        protected new ManiaPlayfield Playfield => (ManiaPlayfield)base.Playfield;
+        public new ManiaPlayfield Playfield => (ManiaPlayfield)base.Playfield;
 
         public new ManiaBeatmap Beatmap => (ManiaBeatmap)base.Beatmap;
 
@@ -102,6 +104,8 @@ namespace osu.Game.Rulesets.Mania.UI
             configScrollSpeed.BindValueChanged(speed => this.TransformTo(nameof(smoothTimeRange), ComputeScrollTime(speed.NewValue), 200, Easing.OutQuint));
 
             TimeRange.Value = smoothTimeRange = ComputeScrollTime(configScrollSpeed.Value);
+
+            KeyBindingInputManager.Add(new ManiaTouchInputArea());
         }
 
         protected override void AdjustScrollSpeed(int amount) => configScrollSpeed.Value += amount;
@@ -163,6 +167,8 @@ namespace osu.Game.Rulesets.Mania.UI
         protected override ReplayInputHandler CreateReplayInputHandler(Replay replay) => new ManiaFramedReplayInputHandler(replay);
 
         protected override ReplayRecorder CreateReplayRecorder(Score score) => new ManiaReplayRecorder(score);
+
+        protected override ResumeOverlay CreateResumeOverlay() => new DelayedResumeOverlay();
 
         protected override void Dispose(bool isDisposing)
         {

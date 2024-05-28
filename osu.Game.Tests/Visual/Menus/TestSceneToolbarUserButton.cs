@@ -8,8 +8,8 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Testing;
+using osu.Game.Online;
 using osu.Game.Online.API;
-using osu.Game.Online.Solo;
 using osu.Game.Overlays.Toolbar;
 using osu.Game.Scoring;
 using osu.Game.Users;
@@ -100,7 +100,7 @@ namespace osu.Game.Tests.Visual.Menus
             AddStep("Gain", () =>
             {
                 var transientUpdateDisplay = this.ChildrenOfType<TransientUserStatisticsUpdateDisplay>().Single();
-                transientUpdateDisplay.LatestUpdate.Value = new SoloStatisticsUpdate(
+                transientUpdateDisplay.LatestUpdate.Value = new UserStatisticsUpdate(
                     new ScoreInfo(),
                     new UserStatistics
                     {
@@ -116,7 +116,7 @@ namespace osu.Game.Tests.Visual.Menus
             AddStep("Loss", () =>
             {
                 var transientUpdateDisplay = this.ChildrenOfType<TransientUserStatisticsUpdateDisplay>().Single();
-                transientUpdateDisplay.LatestUpdate.Value = new SoloStatisticsUpdate(
+                transientUpdateDisplay.LatestUpdate.Value = new UserStatisticsUpdate(
                     new ScoreInfo(),
                     new UserStatistics
                     {
@@ -132,7 +132,7 @@ namespace osu.Game.Tests.Visual.Menus
             AddStep("No change", () =>
             {
                 var transientUpdateDisplay = this.ChildrenOfType<TransientUserStatisticsUpdateDisplay>().Single();
-                transientUpdateDisplay.LatestUpdate.Value = new SoloStatisticsUpdate(
+                transientUpdateDisplay.LatestUpdate.Value = new UserStatisticsUpdate(
                     new ScoreInfo(),
                     new UserStatistics
                     {
@@ -148,7 +148,7 @@ namespace osu.Game.Tests.Visual.Menus
             AddStep("Was null", () =>
             {
                 var transientUpdateDisplay = this.ChildrenOfType<TransientUserStatisticsUpdateDisplay>().Single();
-                transientUpdateDisplay.LatestUpdate.Value = new SoloStatisticsUpdate(
+                transientUpdateDisplay.LatestUpdate.Value = new UserStatisticsUpdate(
                     new ScoreInfo(),
                     new UserStatistics
                     {
@@ -164,7 +164,7 @@ namespace osu.Game.Tests.Visual.Menus
             AddStep("Became null", () =>
             {
                 var transientUpdateDisplay = this.ChildrenOfType<TransientUserStatisticsUpdateDisplay>().Single();
-                transientUpdateDisplay.LatestUpdate.Value = new SoloStatisticsUpdate(
+                transientUpdateDisplay.LatestUpdate.Value = new UserStatisticsUpdate(
                     new ScoreInfo(),
                     new UserStatistics
                     {

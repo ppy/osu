@@ -114,7 +114,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                                             RequestResults = item =>
                                             {
                                                 Debug.Assert(RoomId.Value != null);
-                                                ParentScreen?.Push(new PlaylistsResultsScreen(null, RoomId.Value.Value, item, false));
+                                                ParentScreen?.Push(new PlaylistsResultsScreen(null, RoomId.Value.Value, item));
                                             }
                                         }
                                     },

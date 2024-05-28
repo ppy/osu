@@ -63,6 +63,7 @@ namespace osu.Game.Rulesets.Edit
         public readonly Bindable<TernaryState> DistanceSnapToggle = new Bindable<TernaryState>();
 
         private bool distanceSnapMomentary;
+        private TernaryState? distanceSnapStateBeforeMomentaryToggle;
 
         private EditorToolboxGroup? toolboxGroup;
 
@@ -132,7 +133,7 @@ namespace osu.Game.Rulesets.Edit
                 if (objTime >= editorClock.CurrentTime)
                     continue;
 
-                if (objTime > lastBefore?.StartTime)
+                if (lastBefore == null || objTime > lastBefore.StartTime)
                     lastBefore = entry.Value.HitObject;
             }
 
@@ -148,7 +149,7 @@ namespace osu.Game.Rulesets.Edit
                 if (objTime < editorClock.CurrentTime)
                     continue;
 
-                if (objTime < firstAfter?.StartTime)
+                if (firstAfter == null || objTime < firstAfter.StartTime)
                     firstAfter = entry.Value.HitObject;
             }
 
@@ -213,10 +214,19 @@ namespace osu.Game.Rulesets.Edit
         {
             bool altPressed = key.AltPressed;
 
-            if (altPressed != distanceSnapMomentary)
+            if (altPressed && !distanceSnapMomentary)
             {
-                distanceSnapMomentary = altPressed;
+                distanceSnapStateBeforeMomentaryToggle = DistanceSnapToggle.Value;
                 DistanceSnapToggle.Value = DistanceSnapToggle.Value == TernaryState.False ? TernaryState.True : TernaryState.False;
+                distanceSnapMomentary = true;
+            }
+
+            if (!altPressed && distanceSnapMomentary)
+            {
+                Debug.Assert(distanceSnapStateBeforeMomentaryToggle != null);
+                DistanceSnapToggle.Value = distanceSnapStateBeforeMomentaryToggle.Value;
+                distanceSnapStateBeforeMomentaryToggle = null;
+                distanceSnapMomentary = false;
             }
         }
 

@@ -30,7 +30,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
         private SessionStatics statics { get; set; } = null!;
 
         private ScoreAccessibleSoloPlayer currentPlayer = null!;
-        private readonly ManualClock manualClock = new ManualClock { Rate = 0 };
+        private readonly ManualClock manualClock = new ManualClock { Rate = 1 };
 
         protected override WorkingBeatmap CreateWorkingBeatmap(IBeatmap beatmap, Storyboard? storyboard = null)
             => new ClockBackedTestWorkingBeatmap(beatmap, storyboard, new FramedClock(manualClock), Audio);
