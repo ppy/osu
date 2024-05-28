@@ -142,7 +142,7 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(new[] { InputKey.Control, InputKey.Shift, InputKey.MouseWheelRight }, GlobalAction.EditorCyclePreviousBeatSnapDivisor),
             new KeyBinding(new[] { InputKey.Control, InputKey.Shift, InputKey.MouseWheelLeft }, GlobalAction.EditorCycleNextBeatSnapDivisor),
             new KeyBinding(new[] { InputKey.Control, InputKey.R }, GlobalAction.EditorToggleRotateControl),
-            new KeyBinding(new[] { InputKey.S }, GlobalAction.EditorToggleScaleControl),
+            new KeyBinding(new[] { InputKey.Control, InputKey.T }, GlobalAction.EditorToggleScaleControl),
         };
 
         private static IEnumerable<KeyBinding> inGameKeyBindings => new[]
