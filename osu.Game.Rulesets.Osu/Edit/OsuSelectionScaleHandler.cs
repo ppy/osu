@@ -24,6 +24,11 @@ namespace osu.Game.Rulesets.Osu.Edit
 {
     public partial class OsuSelectionScaleHandler : SelectionScaleHandler
     {
+        /// <summary>
+        /// Whether scaling anchored by the center of the playfield can currently be performed.
+        /// </summary>
+        public Bindable<bool> CanScaleFromPlayfieldOrigin { get; private set; } = new BindableBool();
+
         [Resolved]
         private IEditorChangeHandler? changeHandler { get; set; }
 
@@ -156,7 +161,13 @@ namespace osu.Game.Rulesets.Osu.Edit
             return (xInBounds, yInBounds);
         }
 
-        public override Vector2 GetClampedScale(Vector2 scale, Vector2? origin = null)
+        /// <summary>
+        /// Clamp scale for multi-object-scaling where selection does not exceed playfield bounds or flip.
+        /// </summary>
+        /// <param name="origin">The origin from which the scale operation is performed</param>
+        /// <param name="scale">The scale to be clamped</param>
+        /// <returns>The clamped scale vector</returns>
+        public Vector2 GetClampedScale(Vector2 scale, Vector2? origin = null)
         {
             //todo: this is not always correct for selections involving sliders. This approximation assumes each point is scaled independently, but sliderends move with the sliderhead.
             if (objectsInScale == null)

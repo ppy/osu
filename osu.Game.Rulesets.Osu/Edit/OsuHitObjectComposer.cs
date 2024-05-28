@@ -104,7 +104,7 @@ namespace osu.Game.Rulesets.Osu.Edit
                     new TransformToolboxGroup
                     {
                         RotationHandler = BlueprintContainer.SelectionHandler.RotationHandler,
-                        ScaleHandler = BlueprintContainer.SelectionHandler.ScaleHandler,
+                        ScaleHandler = (OsuSelectionScaleHandler)BlueprintContainer.SelectionHandler.ScaleHandler,
                     },
                     FreehandlSliderToolboxGroup
                 }
