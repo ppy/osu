@@ -78,7 +78,7 @@ namespace osu.Game.Screens.SelectV2.Footer
         {
             base.LoadComplete();
 
-            ScheduleAfterChildren(() => GetContainingInputManager().ChangeFocus(this));
+            ScheduleAfterChildren(() => GetContainingFocusManager().ChangeFocus(this));
 
             beatmap.BindValueChanged(_ => Hide());
         }
