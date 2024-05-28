@@ -16,6 +16,7 @@ using osu.Game.Extensions;
 using osu.Game.Online.API;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
+using osu.Game.Performance;
 using osu.Game.Rulesets;
 using osu.Game.Scoring;
 using osu.Game.Scoring.Legacy;
@@ -50,6 +51,9 @@ namespace osu.Game.Database
 
         [Resolved]
         private ILocalUserPlayInfo? localUserPlayInfo { get; set; }
+
+        [Resolved]
+        private IHighPerformanceSessionManager? highPerformanceSessionManager { get; set; }
 
         [Resolved]
         private INotificationOverlay? notificationOverlay { get; set; }
@@ -287,14 +291,17 @@ namespace osu.Game.Database
                 {
                     var score = scoreManager.Query(s => s.ID == id);
 
-                    scoreManager.PopulateMaximumStatistics(score);
-
-                    // Can't use async overload because we're not on the update thread.
-                    // ReSharper disable once MethodHasAsyncOverload
-                    realmAccess.Write(r =>
+                    if (score != null)
                     {
-                        r.Find<ScoreInfo>(id)!.MaximumStatisticsJson = JsonConvert.SerializeObject(score.MaximumStatistics);
-                    });
+                        scoreManager.PopulateMaximumStatistics(score);
+
+                        // Can't use async overload because we're not on the update thread.
+                        // ReSharper disable once MethodHasAsyncOverload
+                        realmAccess.Write(r =>
+                        {
+                            r.Find<ScoreInfo>(id)!.MaximumStatisticsJson = JsonConvert.SerializeObject(score.MaximumStatistics);
+                        });
+                    }
 
                     ++processedCount;
                 }
@@ -493,7 +500,9 @@ namespace osu.Game.Database
 
         private void sleepIfRequired()
         {
-            while (localUserPlayInfo?.IsPlaying.Value == true)
+            // Importantly, also sleep if high performance session is active.
+            // If we don't do this, memory usage can become runaway due to GC running in a more lenient mode.
+            while (localUserPlayInfo?.IsPlaying.Value == true || highPerformanceSessionManager?.IsSessionActive == true)
             {
                 Logger.Log("Background processing sleeping due to active gameplay...");
                 Thread.Sleep(TimeToSleepDuringGameplay);

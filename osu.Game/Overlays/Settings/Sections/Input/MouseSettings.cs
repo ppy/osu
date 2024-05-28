@@ -105,12 +105,17 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
             highPrecisionMouse.Current.BindValueChanged(highPrecision =>
             {
-                if (RuntimeInfo.OS != RuntimeInfo.Platform.Windows)
+                switch (RuntimeInfo.OS)
                 {
-                    if (highPrecision.NewValue)
-                        highPrecisionMouse.SetNoticeText(MouseSettingsStrings.HighPrecisionPlatformWarning, true);
-                    else
-                        highPrecisionMouse.ClearNoticeText();
+                    case RuntimeInfo.Platform.Linux:
+                    case RuntimeInfo.Platform.macOS:
+                    case RuntimeInfo.Platform.iOS:
+                        if (highPrecision.NewValue)
+                            highPrecisionMouse.SetNoticeText(MouseSettingsStrings.HighPrecisionPlatformWarning, true);
+                        else
+                            highPrecisionMouse.ClearNoticeText();
+
+                        break;
                 }
             }, true);
         }

@@ -120,6 +120,7 @@ namespace osu.Game.Graphics
         public static IconUsage Cross => get(OsuIconMapping.Cross);
         public static IconUsage CrossCircle => get(OsuIconMapping.CrossCircle);
         public static IconUsage Crown => get(OsuIconMapping.Crown);
+        public static IconUsage DailyChallenge => get(OsuIconMapping.DailyChallenge);
         public static IconUsage Debug => get(OsuIconMapping.Debug);
         public static IconUsage Delete => get(OsuIconMapping.Delete);
         public static IconUsage Details => get(OsuIconMapping.Details);
@@ -175,6 +176,8 @@ namespace osu.Game.Graphics
         public static IconUsage EditorSelect => get(OsuIconMapping.EditorSelect);
         public static IconUsage EditorSound => get(OsuIconMapping.EditorSound);
         public static IconUsage EditorWhistle => get(OsuIconMapping.EditorWhistle);
+        public static IconUsage Tortoise => get(OsuIconMapping.Tortoise);
+        public static IconUsage Hare => get(OsuIconMapping.Hare);
 
         private static IconUsage get(OsuIconMapping glyph) => new IconUsage((char)glyph, FONT_NAME);
 
@@ -215,6 +218,9 @@ namespace osu.Game.Graphics
 
             [Description(@"crown")]
             Crown,
+
+            [Description(@"daily-challenge")]
+            DailyChallenge,
 
             [Description(@"debug")]
             Debug,
@@ -380,6 +386,12 @@ namespace osu.Game.Graphics
 
             [Description(@"Editor/whistle")]
             EditorWhistle,
+
+            [Description(@"tortoise")]
+            Tortoise,
+
+            [Description(@"hare")]
+            Hare,
         }
 
         public class OsuIconStore : ITextureStore, ITexturedGlyphLookupStore
