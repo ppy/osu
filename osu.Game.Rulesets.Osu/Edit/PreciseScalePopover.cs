@@ -35,6 +35,8 @@ namespace osu.Game.Rulesets.Osu.Edit
         private Bindable<bool> canScaleX = null!;
         private Bindable<bool> canScaleY = null!;
 
+        private bool scaleInProgress;
+
         public PreciseScalePopover(SelectionScaleHandler scaleHandler)
         {
             this.scaleHandler = scaleHandler;
@@ -124,15 +126,26 @@ namespace osu.Game.Rulesets.Osu.Edit
             // aggregate two values into canScaleFromSelectionCentre
             canScaleX = scaleHandler.CanScaleX.GetBoundCopy();
             canScaleX.BindValueChanged(_ => updateCanScaleFromSelectionCentre());
+            canScaleX.BindValueChanged(e => updateAxisCheckBoxEnabled(e.NewValue, xCheckBox.Current), true);
 
             canScaleY = scaleHandler.CanScaleY.GetBoundCopy();
             canScaleY.BindValueChanged(_ => updateCanScaleFromSelectionCentre(), true);
+            canScaleY.BindValueChanged(e => updateAxisCheckBoxEnabled(e.NewValue, yCheckBox.Current), true);
 
             void updateCanScaleFromSelectionCentre() =>
                 selectionCentreButton.Selected.Disabled = !(scaleHandler.CanScaleY.Value || scaleHandler.CanScaleFromPlayfieldOrigin.Value);
 
+            void updateAxisCheckBoxEnabled(bool enabled, Bindable<bool> current)
+            {
+                current.Disabled = false; // enable the bindable to allow setting the value
+                current.Value = enabled;
+                current.Disabled = !enabled;
+            }
+
             scaleInfo.BindValueChanged(scale =>
             {
+                if (!scaleInProgress) return;
+
                 var newScale = new Vector2(scale.NewValue.XAxis ? scale.NewValue.Scale : 1, scale.NewValue.YAxis ? scale.NewValue.Scale : 1);
                 scaleHandler.Update(newScale, getOriginPosition(scale.NewValue));
             });
@@ -172,6 +185,7 @@ namespace osu.Game.Rulesets.Osu.Edit
         {
             base.PopIn();
             scaleHandler.Begin();
+            scaleInProgress = true;
             updateMaxScale();
         }
 
@@ -180,7 +194,10 @@ namespace osu.Game.Rulesets.Osu.Edit
             base.PopOut();
 
             if (IsLoaded)
+            {
                 scaleHandler.Commit();
+                scaleInProgress = false;
+            }
         }
     }
 
