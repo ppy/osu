@@ -85,6 +85,8 @@ namespace osu.Game.Beatmaps.Formats
 
             base.ParseStreamInto(stream, beatmap);
 
+            applyDifficultyRestrictions(beatmap.Difficulty, beatmap);
+
             flushPendingPoints();
 
             // Objects may be out of order *only* if a user has manually edited an .osu file.
@@ -103,9 +105,29 @@ namespace osu.Game.Beatmaps.Formats
         }
 
         /// <summary>
+        /// Ensures that all <see cref="BeatmapDifficulty"/> settings are within the allowed ranges.
+        /// See also: https://github.com/peppy/osu-stable-reference/blob/0e425c0d525ef21353c8293c235cc0621d28338b/osu!/GameplayElements/Beatmaps/Beatmap.cs#L567-L614
+        /// </summary>
+        private static void applyDifficultyRestrictions(BeatmapDifficulty difficulty, Beatmap beatmap)
+        {
+            difficulty.DrainRate = Math.Clamp(difficulty.DrainRate, 0, 10);
+
+            // mania uses "circle size" for key count, thus different allowable range
+            difficulty.CircleSize = beatmap.BeatmapInfo.Ruleset.OnlineID != 3
+                ? Math.Clamp(difficulty.CircleSize, 0, 10)
+                : Math.Clamp(difficulty.CircleSize, 1, 18);
+
+            difficulty.OverallDifficulty = Math.Clamp(difficulty.OverallDifficulty, 0, 10);
+            difficulty.ApproachRate = Math.Clamp(difficulty.ApproachRate, 0, 10);
+
+            difficulty.SliderMultiplier = Math.Clamp(difficulty.SliderMultiplier, 0.4, 3.6);
+            difficulty.SliderTickRate = Math.Clamp(difficulty.SliderTickRate, 0.5, 8);
+        }
+
+        /// <summary>
         /// Processes the beatmap such that a new combo is started the first hitobject following each break.
         /// </summary>
-        private void postProcessBreaks(Beatmap beatmap)
+        private static void postProcessBreaks(Beatmap beatmap)
         {
             int currentBreak = 0;
             bool forceNewCombo = false;
@@ -161,7 +183,7 @@ namespace osu.Game.Beatmaps.Formats
         /// This method's intention is to restore those legacy defaults.
         /// See also: https://osu.ppy.sh/wiki/en/Client/File_formats/Osu_%28file_format%29
         /// </summary>
-        private void applyLegacyDefaults(BeatmapInfo beatmapInfo)
+        private static void applyLegacyDefaults(BeatmapInfo beatmapInfo)
         {
             beatmapInfo.WidescreenStoryboard = false;
             beatmapInfo.SamplesMatchPlaybackRate = false;
@@ -402,11 +424,11 @@ namespace osu.Game.Beatmaps.Formats
                     break;
 
                 case @"SliderMultiplier":
-                    difficulty.SliderMultiplier = Math.Clamp(Parsing.ParseDouble(pair.Value), 0.4, 3.6);
+                    difficulty.SliderMultiplier = Parsing.ParseDouble(pair.Value);
                     break;
 
                 case @"SliderTickRate":
-                    difficulty.SliderTickRate = Math.Clamp(Parsing.ParseDouble(pair.Value), 0.5, 8);
+                    difficulty.SliderTickRate = Parsing.ParseDouble(pair.Value);
                     break;
             }
         }

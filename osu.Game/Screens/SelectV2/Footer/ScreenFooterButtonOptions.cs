@@ -8,10 +8,11 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics;
 using osu.Game.Input.Bindings;
+using osu.Game.Screens.Footer;
 
-namespace osu.Game.Screens.Select.FooterV2
+namespace osu.Game.Screens.SelectV2.Footer
 {
-    public partial class FooterButtonOptionsV2 : FooterButtonV2, IHasPopover
+    public partial class ScreenFooterButtonOptions : ScreenFooterButton, IHasPopover
     {
         [BackgroundDependencyLoader]
         private void load(OsuColour colour)
