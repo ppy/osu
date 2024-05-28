@@ -125,21 +125,14 @@ namespace osu.Game.Rulesets.Osu.Edit
             // aggregate two values into canScaleFromSelectionCentre
             canScaleX = scaleHandler.CanScaleX.GetBoundCopy();
             canScaleX.BindValueChanged(_ => updateCanScaleFromSelectionCentre());
-            canScaleX.BindValueChanged(e => updateAxisCheckBoxEnabled(e.NewValue, xCheckBox.Current), true);
+            canScaleX.BindValueChanged(e => updateAxisCheckBoxesEnabled());
 
             canScaleY = scaleHandler.CanScaleY.GetBoundCopy();
             canScaleY.BindValueChanged(_ => updateCanScaleFromSelectionCentre(), true);
-            canScaleY.BindValueChanged(e => updateAxisCheckBoxEnabled(e.NewValue, yCheckBox.Current), true);
+            canScaleY.BindValueChanged(e => updateAxisCheckBoxesEnabled(), true);
 
             void updateCanScaleFromSelectionCentre() =>
-                selectionCentreButton.Selected.Disabled = !(scaleHandler.CanScaleY.Value || scaleHandler.CanScaleFromPlayfieldOrigin.Value);
-
-            void updateAxisCheckBoxEnabled(bool enabled, Bindable<bool> current)
-            {
-                current.Disabled = false; // enable the bindable to allow setting the value
-                current.Value = enabled;
-                current.Disabled = !enabled;
-            }
+                selectionCentreButton.Selected.Disabled = !(scaleHandler.CanScaleX.Value || scaleHandler.CanScaleY.Value);
 
             scaleInfo.BindValueChanged(scale =>
             {
@@ -148,6 +141,27 @@ namespace osu.Game.Rulesets.Osu.Edit
                 var newScale = new Vector2(scale.NewValue.XAxis ? scale.NewValue.Scale : 1, scale.NewValue.YAxis ? scale.NewValue.Scale : 1);
                 scaleHandler.Update(newScale, getOriginPosition(scale.NewValue));
             });
+        }
+
+        private void updateAxisCheckBoxesEnabled()
+        {
+            if (scaleInfo.Value.Origin == ScaleOrigin.PlayfieldCentre)
+            {
+                setBindableEnabled(true, xCheckBox.Current);
+                setBindableEnabled(true, yCheckBox.Current);
+            }
+            else
+            {
+                setBindableEnabled(canScaleX.Value, xCheckBox.Current);
+                setBindableEnabled(canScaleY.Value, yCheckBox.Current);
+            }
+        }
+
+        private void setBindableEnabled(bool enabled, Bindable<bool> current)
+        {
+            current.Disabled = false; // enable the bindable to allow setting the value
+            current.Value = enabled;
+            current.Disabled = !enabled;
         }
 
         private void updateMaxScale()
@@ -170,6 +184,7 @@ namespace osu.Game.Rulesets.Osu.Edit
         {
             scaleInfo.Value = scaleInfo.Value with { Origin = origin };
             updateMaxScale();
+            updateAxisCheckBoxesEnabled();
         }
 
         private Vector2? getOriginPosition(PreciseScaleInfo scale) => scale.Origin == ScaleOrigin.PlayfieldCentre ? OsuPlayfield.BASE_SIZE / 2 : null;
