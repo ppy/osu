@@ -160,6 +160,8 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(InputKey.Enter, GlobalAction.ToggleChatFocus),
             new KeyBinding(InputKey.F1, GlobalAction.SaveReplay),
             new KeyBinding(InputKey.F2, GlobalAction.ExportReplay),
+            new KeyBinding(InputKey.Plus, GlobalAction.IncreaseOffset),
+            new KeyBinding(InputKey.Minus, GlobalAction.DecreaseOffset),
         };
 
         private static IEnumerable<KeyBinding> replayKeyBindings => new[]
@@ -168,6 +170,8 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(InputKey.MouseMiddle, GlobalAction.TogglePauseReplay),
             new KeyBinding(InputKey.Left, GlobalAction.SeekReplayBackward),
             new KeyBinding(InputKey.Right, GlobalAction.SeekReplayForward),
+            new KeyBinding(InputKey.Comma, GlobalAction.StepReplayBackward),
+            new KeyBinding(InputKey.Period, GlobalAction.StepReplayForward),
             new KeyBinding(new[] { InputKey.Control, InputKey.H }, GlobalAction.ToggleReplaySettings),
         };
 
@@ -178,6 +182,8 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(new[] { InputKey.Shift, InputKey.F2 }, GlobalAction.SelectPreviousRandom),
             new KeyBinding(InputKey.F3, GlobalAction.ToggleBeatmapOptions),
             new KeyBinding(InputKey.BackSpace, GlobalAction.DeselectAllMods),
+            new KeyBinding(new[] { InputKey.Control, InputKey.Up }, GlobalAction.IncreaseModSpeed),
+            new KeyBinding(new[] { InputKey.Control, InputKey.Down }, GlobalAction.DecreaseModSpeed),
         };
 
         private static IEnumerable<KeyBinding> audioControlKeyBindings => new[]
@@ -404,6 +410,24 @@ namespace osu.Game.Input.Bindings
 
         [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.EditorToggleRotateControl))]
         EditorToggleRotateControl,
+
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.IncreaseOffset))]
+        IncreaseOffset,
+
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.DecreaseOffset))]
+        DecreaseOffset,
+
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.StepReplayForward))]
+        StepReplayForward,
+
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.StepReplayBackward))]
+        StepReplayBackward,
+
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.IncreaseModSpeed))]
+        IncreaseModSpeed,
+
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.DecreaseModSpeed))]
+        DecreaseModSpeed,
     }
 
     public enum GlobalActionCategory

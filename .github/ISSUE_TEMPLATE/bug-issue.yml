@@ -11,6 +11,10 @@ body:
         - Current open `priority:0` issues, filterable [here](https://github.com/ppy/osu/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc+label%3Apriority%3A0).
         - And most importantly, search for your issue both in the [issue listing](https://github.com/ppy/osu/issues) and the [Q&A discussion listing](https://github.com/ppy/osu/discussions/categories/q-a). If you find that it already exists, respond with a reaction or add any further information that may be helpful.
 
+        # ATTENTION LINUX USERS
+
+        If you are having an issue and it is hardware related, **please open a [q&a discussion](https://github.com/ppy/osu/discussions/categories/q-a)** instead of an issue. There's a high chance your issue is due to your system configuration, and not our software.
+
   - type: dropdown
     attributes:
       label: Type
@@ -38,7 +42,7 @@ body:
   - type: input
     attributes:
       label: Version
-      description: The version you encountered this bug on. This is shown at the bottom of the main menu and also at the end of the settings screen.
+      description: The version you encountered this bug on. This is shown at the end of the settings overlay.
     validations:
       required: true
   - type: markdown

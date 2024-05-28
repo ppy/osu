@@ -34,6 +34,19 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty(@"previous_usernames")]
         public string[] PreviousUsernames;
 
+        [JsonProperty(@"rank_highest")]
+        [CanBeNull]
+        public UserRankHighest RankHighest;
+
+        public class UserRankHighest
+        {
+            [JsonProperty(@"rank")]
+            public int Rank;
+
+            [JsonProperty(@"updated_at")]
+            public DateTimeOffset UpdatedAt;
+        }
+
         [JsonProperty(@"country_code")]
         private string countryCodeString;
 

@@ -325,6 +325,16 @@ namespace osu.Game.Localisation
         public static LocalisableString SeekReplayBackward => new TranslatableString(getKey(@"seek_replay_backward"), @"Seek replay backward");
 
         /// <summary>
+        /// "Seek replay forward one frame"
+        /// </summary>
+        public static LocalisableString StepReplayForward => new TranslatableString(getKey(@"step_replay_forward"), @"Seek replay forward one frame");
+
+        /// <summary>
+        /// "Step replay backward one frame"
+        /// </summary>
+        public static LocalisableString StepReplayBackward => new TranslatableString(getKey(@"step_replay_backward"), @"Step replay backward one frame");
+
+        /// <summary>
         /// "Toggle chat focus"
         /// </summary>
         public static LocalisableString ToggleChatFocus => new TranslatableString(getKey(@"toggle_chat_focus"), @"Toggle chat focus");
@@ -345,9 +355,29 @@ namespace osu.Game.Localisation
         public static LocalisableString ExportReplay => new TranslatableString(getKey(@"export_replay"), @"Export replay");
 
         /// <summary>
+        /// "Increase offset"
+        /// </summary>
+        public static LocalisableString IncreaseOffset => new TranslatableString(getKey(@"increase_offset"), @"Increase offset");
+
+        /// <summary>
+        /// "Decrease offset"
+        /// </summary>
+        public static LocalisableString DecreaseOffset => new TranslatableString(getKey(@"decrease_offset"), @"Decrease offset");
+
+        /// <summary>
         /// "Toggle rotate control"
         /// </summary>
         public static LocalisableString EditorToggleRotateControl => new TranslatableString(getKey(@"editor_toggle_rotate_control"), @"Toggle rotate control");
+
+        /// <summary>
+        /// "Increase mod speed"
+        /// </summary>
+        public static LocalisableString IncreaseModSpeed => new TranslatableString(getKey(@"increase_mod_speed"), @"Increase mod speed");
+
+        /// <summary>
+        /// "Decrease mod speed"
+        /// </summary>
+        public static LocalisableString DecreaseModSpeed => new TranslatableString(getKey(@"decrease_mod_speed"), @"Decrease mod speed");
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }

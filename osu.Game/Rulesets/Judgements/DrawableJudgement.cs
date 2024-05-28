@@ -133,12 +133,11 @@ namespace osu.Game.Rulesets.Judgements
                     case HitResult.None:
                         break;
 
-                    case HitResult.Miss:
-                        ApplyMissAnimations();
-                        break;
-
                     default:
-                        ApplyHitAnimations();
+                        if (Result.Type.IsHit())
+                            ApplyHitAnimations();
+                        else
+                            ApplyMissAnimations();
                         break;
                 }
 

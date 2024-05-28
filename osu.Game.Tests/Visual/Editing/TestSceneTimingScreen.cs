@@ -4,11 +4,13 @@
 #nullable disable
 
 using System;
+using System.Diagnostics;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics.Containers;
@@ -17,6 +19,7 @@ using osu.Game.Rulesets.Edit;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Timing;
 using osu.Game.Screens.Edit.Timing.RowAttributes;
+using osuTK;
 using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Editing
@@ -67,6 +70,48 @@ namespace osu.Game.Tests.Visual.Editing
             AddStep("Reload Editor Beatmap", reloadEditorBeatmap);
 
             AddUntilStep("Wait for rows to load", () => Child.ChildrenOfType<EffectRowAttribute>().Any());
+        }
+
+        [Test]
+        public void TestSelectedRetainedOverUndo()
+        {
+            AddStep("Select first timing point", () =>
+            {
+                InputManager.MoveMouseTo(Child.ChildrenOfType<TimingRowAttribute>().First());
+                InputManager.Click(MouseButton.Left);
+            });
+
+            AddUntilStep("Selection changed", () => timingScreen.SelectedGroup.Value.Time == 2170);
+            AddUntilStep("Ensure seeked to correct time", () => EditorClock.CurrentTimeAccurate == 2170);
+
+            AddStep("Adjust offset", () =>
+            {
+                InputManager.MoveMouseTo(timingScreen.ChildrenOfType<TimingAdjustButton>().First().ScreenSpaceDrawQuad.Centre + new Vector2(20, 0));
+                InputManager.Click(MouseButton.Left);
+            });
+
+            AddUntilStep("wait for offset changed", () =>
+            {
+                return timingScreen.SelectedGroup.Value.ControlPoints.Any(c => c is TimingControlPoint) && timingScreen.SelectedGroup.Value.Time > 2170;
+            });
+
+            AddStep("simulate undo", () =>
+            {
+                var clone = editorBeatmap.ControlPointInfo.DeepClone();
+
+                editorBeatmap.ControlPointInfo.Clear();
+
+                foreach (var group in clone.Groups)
+                {
+                    foreach (var cp in group.ControlPoints)
+                        editorBeatmap.ControlPointInfo.Add(group.Time, cp);
+                }
+            });
+
+            AddUntilStep("selection retained", () =>
+            {
+                return timingScreen.SelectedGroup.Value.ControlPoints.Any(c => c is TimingControlPoint) && timingScreen.SelectedGroup.Value.Time > 2170;
+            });
         }
 
         [Test]
@@ -132,6 +177,43 @@ namespace osu.Game.Tests.Visual.Editing
             AddStep("Seek to last point", () => EditorClock.Seek(101 * 1000));
 
             AddUntilStep("Scrolled to end", () => timingScreen.ChildrenOfType<OsuScrollContainer>().First().IsScrolledToEnd());
+        }
+
+        [Test]
+        public void TestEditThenClickAwayAppliesChanges()
+        {
+            AddStep("Add two control points", () =>
+            {
+                editorBeatmap.ControlPointInfo.Clear();
+                editorBeatmap.ControlPointInfo.Add(1000, new TimingControlPoint());
+                editorBeatmap.ControlPointInfo.Add(2000, new TimingControlPoint());
+            });
+
+            AddStep("Select second timing point", () =>
+            {
+                InputManager.MoveMouseTo(Child.ChildrenOfType<TimingRowAttribute>().Last());
+                InputManager.Click(MouseButton.Left);
+            });
+
+            AddStep("Scroll to end", () => timingScreen.ChildrenOfType<ControlPointSettings>().Single().ChildrenOfType<OsuScrollContainer>().Single().ScrollToEnd(false));
+            AddStep("Modify time signature", () =>
+            {
+                var timeSignatureTextBox = Child.ChildrenOfType<LabelledTimeSignature.TimeSignatureBox>().Single().ChildrenOfType<TextBox>().Single();
+                InputManager.MoveMouseTo(timeSignatureTextBox);
+                InputManager.Click(MouseButton.Left);
+
+                Debug.Assert(!timeSignatureTextBox.Current.Value.Equals("1", StringComparison.Ordinal));
+                timeSignatureTextBox.Current.Value = "1";
+            });
+
+            AddStep("Select first timing point", () =>
+            {
+                InputManager.MoveMouseTo(Child.ChildrenOfType<TimingRowAttribute>().First());
+                InputManager.Click(MouseButton.Left);
+            });
+
+            AddAssert("Second timing point changed time signature", () => editorBeatmap.ControlPointInfo.TimingPoints.Last().TimeSignature.Numerator == 1);
+            AddAssert("First timing point preserved time signature", () => editorBeatmap.ControlPointInfo.TimingPoints.First().TimeSignature.Numerator == 4);
         }
 
         protected override void Dispose(bool isDisposing)
