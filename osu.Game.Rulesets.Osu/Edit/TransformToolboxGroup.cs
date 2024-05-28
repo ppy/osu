@@ -64,15 +64,15 @@ namespace osu.Game.Rulesets.Osu.Edit
             base.LoadComplete();
 
             // aggregate two values into canRotate
-            canRotatePlayfieldOrigin = RotationHandler.CanRotatePlayfieldOrigin.GetBoundCopy();
+            canRotatePlayfieldOrigin = RotationHandler.CanRotateFromPlayfieldOrigin.GetBoundCopy();
             canRotatePlayfieldOrigin.BindValueChanged(_ => updateCanRotateAggregate());
 
-            canRotateSelectionOrigin = RotationHandler.CanRotateSelectionOrigin.GetBoundCopy();
+            canRotateSelectionOrigin = RotationHandler.CanRotateFromSelectionOrigin.GetBoundCopy();
             canRotateSelectionOrigin.BindValueChanged(_ => updateCanRotateAggregate());
 
             void updateCanRotateAggregate()
             {
-                canRotate.Value = RotationHandler.CanRotatePlayfieldOrigin.Value || RotationHandler.CanRotateSelectionOrigin.Value;
+                canRotate.Value = RotationHandler.CanRotateFromPlayfieldOrigin.Value || RotationHandler.CanRotateFromSelectionOrigin.Value;
             }
 
             // aggregate three values into canScale
@@ -82,12 +82,12 @@ namespace osu.Game.Rulesets.Osu.Edit
             canScaleY = ScaleHandler.CanScaleY.GetBoundCopy();
             canScaleY.BindValueChanged(_ => updateCanScaleAggregate());
 
-            canScalePlayfieldOrigin = ScaleHandler.CanScalePlayfieldOrigin.GetBoundCopy();
+            canScalePlayfieldOrigin = ScaleHandler.CanScaleFromPlayfieldOrigin.GetBoundCopy();
             canScalePlayfieldOrigin.BindValueChanged(_ => updateCanScaleAggregate());
 
             void updateCanScaleAggregate()
             {
-                canScale.Value = ScaleHandler.CanScaleX.Value || ScaleHandler.CanScaleY.Value || ScaleHandler.CanScalePlayfieldOrigin.Value;
+                canScale.Value = ScaleHandler.CanScaleX.Value || ScaleHandler.CanScaleY.Value || ScaleHandler.CanScaleFromPlayfieldOrigin.Value;
             }
 
             // bindings to `Enabled` on the buttons are decoupled on purpose

@@ -118,7 +118,7 @@ namespace osu.Game.Rulesets.Osu.Edit
             xCheckBox.Current.BindValueChanged(x => setAxis(x.NewValue, yCheckBox.Current.Value));
             yCheckBox.Current.BindValueChanged(y => setAxis(xCheckBox.Current.Value, y.NewValue));
 
-            scaleHandler.CanScaleSelectionOrigin.BindValueChanged(e =>
+            scaleHandler.CanScaleFromSelectionOrigin.BindValueChanged(e =>
             {
                 selectionCentreButton.Selected.Disabled = !e.NewValue;
             }, true);
