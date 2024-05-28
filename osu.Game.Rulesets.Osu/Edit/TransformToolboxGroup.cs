@@ -32,7 +32,7 @@ namespace osu.Game.Rulesets.Osu.Edit
         private Bindable<bool> canScalePlayfieldOrigin = null!;
 
         public SelectionRotationHandler RotationHandler { get; init; } = null!;
-        public SelectionScaleHandler ScaleHandler { get; init; } = null!;
+        public OsuSelectionScaleHandler ScaleHandler { get; init; } = null!;
 
         public TransformToolboxGroup()
             : base("transform")

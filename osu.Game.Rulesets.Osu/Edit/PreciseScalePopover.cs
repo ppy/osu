@@ -12,14 +12,13 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Screens.Edit.Components.RadioButtons;
-using osu.Game.Screens.Edit.Compose.Components;
 using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Edit
 {
     public partial class PreciseScalePopover : OsuPopover
     {
-        private readonly SelectionScaleHandler scaleHandler;
+        private readonly OsuSelectionScaleHandler scaleHandler;
 
         private readonly Bindable<PreciseScaleInfo> scaleInfo = new Bindable<PreciseScaleInfo>(new PreciseScaleInfo(1, ScaleOrigin.PlayfieldCentre, true, true));
 
@@ -37,7 +36,7 @@ namespace osu.Game.Rulesets.Osu.Edit
 
         private bool scaleInProgress;
 
-        public PreciseScalePopover(SelectionScaleHandler scaleHandler)
+        public PreciseScalePopover(OsuSelectionScaleHandler scaleHandler)
         {
             this.scaleHandler = scaleHandler;
 
