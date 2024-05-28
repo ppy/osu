@@ -25,11 +25,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         protected DrawableSlider DrawableSlider => (DrawableSlider)ParentHitObject;
 
         /// <summary>
-        /// The judgement text is provided by the <see cref="DrawableSlider"/>.
-        /// </summary>
-        public override bool DisplayResult => false;
-
-        /// <summary>
         /// Whether the hit samples only play on successful hits.
         /// If <c>false</c>, the hit samples will also play on misses.
         /// </summary>

@@ -24,14 +24,38 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
         [Test]
         public void TestHotkeyHandling()
         {
-            AddStep("select single circle", () => EditorBeatmap.SelectedHitObjects.Add(EditorBeatmap.HitObjects.OfType<HitCircle>().First()));
+            AddStep("deselect everything", () => EditorBeatmap.SelectedHitObjects.Clear());
             AddStep("press rotate hotkey", () =>
             {
                 InputManager.PressKey(Key.ControlLeft);
                 InputManager.Key(Key.R);
                 InputManager.ReleaseKey(Key.ControlLeft);
             });
-            AddUntilStep("no popover present", () => this.ChildrenOfType<PreciseRotationPopover>().Count(), () => Is.Zero);
+            AddUntilStep("no popover present", getPopover, () => Is.Null);
+
+            AddStep("select single circle",
+                () => EditorBeatmap.SelectedHitObjects.Add(EditorBeatmap.HitObjects.OfType<HitCircle>().First()));
+            AddStep("press rotate hotkey", () =>
+            {
+                InputManager.PressKey(Key.ControlLeft);
+                InputManager.Key(Key.R);
+                InputManager.ReleaseKey(Key.ControlLeft);
+            });
+            AddUntilStep("popover present", getPopover, () => Is.Not.Null);
+            AddAssert("only playfield centre origin rotation available", () =>
+            {
+                var popover = getPopover();
+                var buttons = popover.ChildrenOfType<EditorRadioButton>();
+                return buttons.Any(btn => btn.Text == "Selection centre" && !btn.Enabled.Value)
+                       && buttons.Any(btn => btn.Text == "Playfield centre" && btn.Enabled.Value);
+            });
+            AddStep("press rotate hotkey", () =>
+            {
+                InputManager.PressKey(Key.ControlLeft);
+                InputManager.Key(Key.R);
+                InputManager.ReleaseKey(Key.ControlLeft);
+            });
+            AddUntilStep("no popover present", getPopover, () => Is.Null);
 
             AddStep("select first three objects", () =>
             {
@@ -44,14 +68,23 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
                 InputManager.Key(Key.R);
                 InputManager.ReleaseKey(Key.ControlLeft);
             });
-            AddUntilStep("popover present", () => this.ChildrenOfType<PreciseRotationPopover>().Count(), () => Is.EqualTo(1));
+            AddUntilStep("popover present", getPopover, () => Is.Not.Null);
+            AddAssert("both origin rotation available", () =>
+            {
+                var popover = getPopover();
+                var buttons = popover.ChildrenOfType<EditorRadioButton>();
+                return buttons.Any(btn => btn.Text == "Selection centre" && btn.Enabled.Value)
+                       && buttons.Any(btn => btn.Text == "Playfield centre" && btn.Enabled.Value);
+            });
             AddStep("press rotate hotkey", () =>
             {
                 InputManager.PressKey(Key.ControlLeft);
                 InputManager.Key(Key.R);
                 InputManager.ReleaseKey(Key.ControlLeft);
             });
-            AddUntilStep("no popover present", () => this.ChildrenOfType<PreciseRotationPopover>().Count(), () => Is.Zero);
+            AddUntilStep("no popover present", getPopover, () => Is.Null);
+
+            PreciseRotationPopover? getPopover() => this.ChildrenOfType<PreciseRotationPopover>().SingleOrDefault();
         }
 
         [Test]

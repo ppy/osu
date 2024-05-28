@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -34,10 +35,10 @@ namespace osu.Game.Screens.Select
 
         public override bool AllowExternalScreenChange => true;
 
-        public override MenuItem[] CreateForwardNavigationMenuItemsForBeatmap(BeatmapInfo beatmap) => new MenuItem[]
+        public override MenuItem[] CreateForwardNavigationMenuItemsForBeatmap(Func<BeatmapInfo> getBeatmap) => new MenuItem[]
         {
-            new OsuMenuItem(ButtonSystemStrings.Play.ToSentence(), MenuItemType.Highlighted, () => FinaliseSelection(beatmap)),
-            new OsuMenuItem(ButtonSystemStrings.Edit.ToSentence(), MenuItemType.Standard, () => Edit(beatmap))
+            new OsuMenuItem(ButtonSystemStrings.Play.ToSentence(), MenuItemType.Highlighted, () => FinaliseSelection(getBeatmap())),
+            new OsuMenuItem(ButtonSystemStrings.Edit.ToSentence(), MenuItemType.Standard, () => Edit(getBeatmap()))
         };
 
         protected override UserActivity InitialActivity => new UserActivity.ChoosingBeatmap();
@@ -53,7 +54,7 @@ namespace osu.Game.Screens.Select
         }
 
         protected void PresentScore(ScoreInfo score) =>
-            FinaliseSelection(score.BeatmapInfo, score.Ruleset, () => this.Push(new SoloResultsScreen(score, false)));
+            FinaliseSelection(score.BeatmapInfo, score.Ruleset, () => this.Push(new SoloResultsScreen(score)));
 
         protected override BeatmapDetailArea CreateBeatmapDetailArea()
         {

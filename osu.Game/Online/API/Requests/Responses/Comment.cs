@@ -33,7 +33,7 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty(@"votes_count")]
         public int VotesCount { get; set; }
 
-        [JsonProperty(@"commenatble_type")]
+        [JsonProperty(@"commentable_type")]
         public string CommentableType { get; set; } = null!;
 
         [JsonProperty(@"commentable_id")]

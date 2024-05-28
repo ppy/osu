@@ -13,6 +13,7 @@ using osu.Game.Overlays;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterface;
 using osu.Framework.Graphics.Cursor;
+using osu.Framework.Screens;
 using osu.Game.Graphics.Containers;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
@@ -20,6 +21,10 @@ using osu.Game.Online.Chat;
 using osu.Game.Resources.Localisation.Web;
 using osu.Game.Localisation;
 using osu.Game.Online.Multiplayer;
+using osu.Game.Screens;
+using osu.Game.Screens.Play;
+using osu.Game.Users.Drawables;
+using osuTK;
 
 namespace osu.Game.Users
 {
@@ -61,6 +66,9 @@ namespace osu.Game.Users
         protected OverlayColourProvider? ColourProvider { get; private set; }
 
         [Resolved]
+        private IPerformFromScreenRunner? performer { get; set; }
+
+        [Resolved]
         protected OsuColour Colours { get; private set; } = null!;
 
         [Resolved]
@@ -71,22 +79,17 @@ namespace osu.Game.Users
         {
             Masking = true;
 
-            AddRange(new[]
+            Add(new Box
             {
-                new Box
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = ColourProvider?.Background5 ?? Colours.Gray1
-                },
-                Background = new UserCoverBackground
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    User = User,
-                },
-                CreateLayout()
+                RelativeSizeAxes = Axes.Both,
+                Colour = ColourProvider?.Background5 ?? Colours.Gray1
             });
+
+            var background = CreateBackground();
+            if (background != null)
+                Add(background);
+
+            Add(CreateLayout());
 
             base.Action = ViewProfile = () =>
             {
@@ -95,13 +98,34 @@ namespace osu.Game.Users
             };
         }
 
+        // TODO: this whole api is messy. half these Create methods are expected to by the implementation and half are implictly called.
+
         protected abstract Drawable CreateLayout();
+
+        /// <summary>
+        /// Panel background container. Can be null if a panel doesn't want a background under it's layout
+        /// </summary>
+        protected virtual Drawable? CreateBackground() => Background = new UserCoverBackground
+        {
+            RelativeSizeAxes = Axes.Both,
+            Anchor = Anchor.Centre,
+            Origin = Anchor.Centre,
+            User = User
+        };
 
         protected OsuSpriteText CreateUsername() => new OsuSpriteText
         {
             Font = OsuFont.GetFont(size: 16, weight: FontWeight.Bold),
             Shadow = false,
             Text = User.Username,
+        };
+
+        protected UpdateableAvatar CreateAvatar() => new UpdateableAvatar(User, false);
+
+        protected UpdateableFlag CreateFlag() => new UpdateableFlag(User.CountryCode)
+        {
+            Size = new Vector2(36, 26),
+            Action = Action,
         };
 
         public MenuItem[] ContextMenuItems
@@ -113,23 +137,26 @@ namespace osu.Game.Users
                     new OsuMenuItem(ContextMenuStrings.ViewProfile, MenuItemType.Highlighted, ViewProfile)
                 };
 
-                if (!User.Equals(api.LocalUser.Value))
-                {
-                    items.Add(new OsuMenuItem(UsersStrings.CardSendMessage, MenuItemType.Standard, () =>
-                    {
-                        channelManager?.OpenPrivateChannel(User);
-                        chatOverlay?.Show();
-                    }));
-                }
+                if (User.Equals(api.LocalUser.Value))
+                    return items.ToArray();
 
-                if (
-                    // TODO: uncomment this once lazer / osu-web is updating online states
-                    // User.IsOnline &&
-                    multiplayerClient?.Room != null &&
-                    multiplayerClient.Room.Users.All(u => u.UserID != User.Id)
-                )
+                items.Add(new OsuMenuItem(UsersStrings.CardSendMessage, MenuItemType.Standard, () =>
                 {
-                    items.Add(new OsuMenuItem(ContextMenuStrings.InvitePlayer, MenuItemType.Standard, () => multiplayerClient.InvitePlayer(User.Id)));
+                    channelManager?.OpenPrivateChannel(User);
+                    chatOverlay?.Show();
+                }));
+
+                if (User.IsOnline)
+                {
+                    items.Add(new OsuMenuItem(ContextMenuStrings.SpectatePlayer, MenuItemType.Standard, () =>
+                    {
+                        performer?.PerformFromScreen(s => s.Push(new SoloSpectatorScreen(User)));
+                    }));
+
+                    if (multiplayerClient?.Room?.Users.All(u => u.UserID != User.Id) == true)
+                    {
+                        items.Add(new OsuMenuItem(ContextMenuStrings.InvitePlayer, MenuItemType.Standard, () => multiplayerClient.InvitePlayer(User.Id)));
+                    }
                 }
 
                 return items.ToArray();

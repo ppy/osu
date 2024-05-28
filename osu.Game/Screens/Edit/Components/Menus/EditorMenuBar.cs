@@ -51,7 +51,7 @@ namespace osu.Game.Screens.Edit.Components.Menus
                             Size = new Vector2(26),
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
-                            Icon = HexaconsIcons.Editor,
+                            Icon = OsuIcon.EditCircle,
                         },
                         text = new TextFlowContainer
                         {

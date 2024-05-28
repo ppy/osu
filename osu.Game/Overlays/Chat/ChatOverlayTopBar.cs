@@ -46,7 +46,7 @@ namespace osu.Game.Overlays.Chat
                             {
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
-                                Icon = HexaconsIcons.Messaging,
+                                Icon = OsuIcon.Chat,
                                 Size = new Vector2(24),
                             },
                             // Placeholder text

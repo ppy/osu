@@ -51,7 +51,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             assertHeadJudgement(HitResult.Meh);
             assertTickJudgement(HitResult.LargeTickHit);
-            assertTailJudgement(HitResult.LargeTickHit);
+            assertTailJudgement(HitResult.SliderTailHit);
             assertSliderJudgement(HitResult.IgnoreHit);
         }
 

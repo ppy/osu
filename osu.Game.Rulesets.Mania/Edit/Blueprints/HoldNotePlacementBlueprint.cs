@@ -5,6 +5,7 @@ using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Events;
+using osu.Framework.Utils;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Mania.Edit.Blueprints.Components;
 using osu.Game.Rulesets.Mania.Objects;
@@ -23,7 +24,7 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
         [Resolved]
         private IScrollingInfo scrollingInfo { get; set; } = null!;
 
-        protected override bool IsValidForPlacement => HitObject.Duration > 0;
+        protected override bool IsValidForPlacement => Precision.DefinitelyBigger(HitObject.Duration, 0);
 
         public HoldNotePlacementBlueprint()
             : base(new HoldNote())

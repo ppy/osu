@@ -28,6 +28,7 @@ using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Replays;
 using osu.Game.Rulesets.Osu.Scoring;
 using osu.Game.Rulesets.Osu.Skinning.Argon;
+using osu.Game.Rulesets.Osu.Skinning.Default;
 using osu.Game.Rulesets.Osu.Skinning.Legacy;
 using osu.Game.Rulesets.Osu.Statistics;
 using osu.Game.Rulesets.Osu.UI;
@@ -47,6 +48,8 @@ namespace osu.Game.Rulesets.Osu
         public override DrawableRuleset CreateDrawableRulesetWith(IBeatmap beatmap, IReadOnlyList<Mod>? mods = null) => new DrawableOsuRuleset(this, beatmap, mods);
 
         public override ScoreProcessor CreateScoreProcessor() => new OsuScoreProcessor();
+
+        public override HealthProcessor CreateHealthProcessor(double drainStartTime) => new OsuHealthProcessor(drainStartTime);
 
         public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => new OsuBeatmapConverter(beatmap, this);
 
@@ -209,7 +212,8 @@ namespace osu.Game.Rulesets.Osu
                         new ModAdaptiveSpeed(),
                         new OsuModFreezeFrame(),
                         new OsuModBubbles(),
-                        new OsuModSynesthesia()
+                        new OsuModSynesthesia(),
+                        new OsuModDepth()
                     };
 
                 case ModType.System:
@@ -251,6 +255,9 @@ namespace osu.Game.Rulesets.Osu
 
                 case ArgonSkin:
                     return new OsuArgonSkinTransformer(skin);
+
+                case TrianglesSkin:
+                    return new OsuTrianglesSkinTransformer(skin);
             }
 
             return null;
@@ -274,6 +281,7 @@ namespace osu.Game.Rulesets.Osu
 
                 HitResult.LargeTickHit,
                 HitResult.SmallTickHit,
+                HitResult.SliderTailHit,
                 HitResult.SmallBonus,
                 HitResult.LargeBonus,
             };
@@ -286,6 +294,7 @@ namespace osu.Game.Rulesets.Osu
                 case HitResult.LargeTickHit:
                     return "slider tick";
 
+                case HitResult.SliderTailHit:
                 case HitResult.SmallTickHit:
                     return "slider end";
 

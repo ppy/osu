@@ -58,12 +58,18 @@ namespace osu.Game.Tests.Visual.Multiplayer
                                                               .SkipWhile(r => r.Room.Category.Value == RoomCategory.Spotlight)
                                                               .All(r => r.Room.Category.Value == RoomCategory.Normal));
 
-            AddStep("remove first room", () => RoomManager.RemoveRoom(RoomManager.Rooms.FirstOrDefault(r => r.RoomID.Value == 0)));
+            AddStep("remove first room", () => RoomManager.RemoveRoom(RoomManager.Rooms.First(r => r.RoomID.Value == 0)));
             AddAssert("has 4 rooms", () => container.Rooms.Count == 4);
             AddAssert("first room removed", () => container.Rooms.All(r => r.Room.RoomID.Value != 0));
 
             AddStep("select first room", () => container.Rooms.First().TriggerClick());
             AddAssert("first spotlight selected", () => checkRoomSelected(RoomManager.Rooms.First(r => r.Category.Value == RoomCategory.Spotlight)));
+
+            AddStep("remove last room", () => RoomManager.RemoveRoom(RoomManager.Rooms.MinBy(r => r.RoomID?.Value)));
+            AddAssert("first spotlight still selected", () => checkRoomSelected(RoomManager.Rooms.First(r => r.Category.Value == RoomCategory.Spotlight)));
+
+            AddStep("remove spotlight room", () => RoomManager.RemoveRoom(RoomManager.Rooms.Single(r => r.Category.Value == RoomCategory.Spotlight)));
+            AddAssert("selection vacated", () => checkRoomSelected(null));
         }
 
         [Test]

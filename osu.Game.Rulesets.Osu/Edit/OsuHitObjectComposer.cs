@@ -17,6 +17,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
+using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Tools;
@@ -54,7 +55,7 @@ namespace osu.Game.Rulesets.Osu.Edit
                    .Concat(DistanceSnapProvider.CreateTernaryButtons())
                    .Concat(new[]
                    {
-                       new TernaryButton(rectangularGridSnapToggle, "Grid Snap", () => new SpriteIcon { Icon = FontAwesome.Solid.Th })
+                       new TernaryButton(rectangularGridSnapToggle, "Grid Snap", () => new SpriteIcon { Icon = OsuIcon.EditorGridSnap })
                    });
 
         private BindableList<HitObject> selectedHitObjects;
@@ -333,7 +334,7 @@ namespace osu.Game.Rulesets.Osu.Edit
         /// <returns>The <see cref="OsuDistanceSnapGrid"/> from a selected <see cref="HitObject"/> to a target <see cref="HitObject"/>.</returns>
         private OsuDistanceSnapGrid createGrid(Func<HitObject, bool> sourceSelector, int targetOffset = 1)
         {
-            if (targetOffset < 1) throw new ArgumentOutOfRangeException(nameof(targetOffset));
+            ArgumentOutOfRangeException.ThrowIfNegativeOrZero(targetOffset);
 
             int sourceIndex = -1;
 
