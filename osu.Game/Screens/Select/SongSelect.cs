@@ -39,6 +39,7 @@ using osu.Game.Screens.Play;
 using osu.Game.Screens.Select.Details;
 using osu.Game.Screens.Select.Options;
 using osu.Game.Skinning;
+using osu.Game.Utils;
 using osuTK;
 using osuTK.Graphics;
 using osuTK.Input;
@@ -99,6 +100,9 @@ namespace osu.Game.Screens.Select
         };
 
         [Resolved]
+        private OsuGameBase game { get; set; } = null!;
+
+        [Resolved]
         private Bindable<IReadOnlyList<Mod>> selectedMods { get; set; } = null!;
 
         protected BeatmapCarousel Carousel { get; private set; } = null!;
@@ -133,6 +137,7 @@ namespace osu.Game.Screens.Select
         private double audioFeedbackLastPlaybackTime;
 
         private IDisposable? modSelectOverlayRegistration;
+        private ModSpeedHotkeyHandler modSpeedHotkeyHandler = null!;
 
         private AdvancedStats advancedStats = null!;
 
@@ -319,6 +324,7 @@ namespace osu.Game.Screens.Select
                 {
                     RelativeSizeAxes = Axes.Both,
                 },
+                modSpeedHotkeyHandler = new ModSpeedHotkeyHandler(),
             });
 
             if (ShowFooter)
@@ -1007,10 +1013,19 @@ namespace osu.Game.Screens.Select
 
         public virtual bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
+            if (!this.IsCurrentScreen()) return false;
+
+            switch (e.Action)
+            {
+                case GlobalAction.IncreaseModSpeed:
+                    return modSpeedHotkeyHandler.ChangeSpeed(0.05, ModUtils.FlattenMods(game.AvailableMods.Value.SelectMany(kv => kv.Value)));
+
+                case GlobalAction.DecreaseModSpeed:
+                    return modSpeedHotkeyHandler.ChangeSpeed(-0.05, ModUtils.FlattenMods(game.AvailableMods.Value.SelectMany(kv => kv.Value)));
+            }
+
             if (e.Repeat)
                 return false;
-
-            if (!this.IsCurrentScreen()) return false;
 
             switch (e.Action)
             {
