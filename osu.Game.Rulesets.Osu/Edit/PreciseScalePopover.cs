@@ -26,15 +26,11 @@ namespace osu.Game.Rulesets.Osu.Edit
         private BindableNumber<float> scaleInputBindable = null!;
         private EditorRadioButtonCollection scaleOrigin = null!;
 
+        private RadioButton playfieldCentreButton = null!;
         private RadioButton selectionCentreButton = null!;
 
         private OsuCheckbox xCheckBox = null!;
         private OsuCheckbox yCheckBox = null!;
-
-        private Bindable<bool> canScaleX = null!;
-        private Bindable<bool> canScaleY = null!;
-
-        private bool scaleInProgress;
 
         public PreciseScalePopover(OsuSelectionScaleHandler scaleHandler)
         {
@@ -70,7 +66,7 @@ namespace osu.Game.Rulesets.Osu.Edit
                         RelativeSizeAxes = Axes.X,
                         Items = new[]
                         {
-                            new RadioButton("Playfield centre",
+                            playfieldCentreButton = new RadioButton("Playfield centre",
                                 () => setOrigin(ScaleOrigin.PlayfieldCentre),
                                 () => new SpriteIcon { Icon = FontAwesome.Regular.Square }),
                             selectionCentreButton = new RadioButton("Selection centre",
@@ -101,6 +97,10 @@ namespace osu.Game.Rulesets.Osu.Edit
                     },
                 }
             };
+            playfieldCentreButton.Selected.DisabledChanged += isDisabled =>
+            {
+                playfieldCentreButton.TooltipText = isDisabled ? "Select something other than a single slider to perform playfield-based scaling." : string.Empty;
+            };
             selectionCentreButton.Selected.DisabledChanged += isDisabled =>
             {
                 selectionCentreButton.TooltipText = isDisabled ? "Select more than one object to perform selection-based scaling." : string.Empty;
@@ -117,27 +117,20 @@ namespace osu.Game.Rulesets.Osu.Edit
                 scaleInput.SelectAll();
             });
             scaleInput.Current.BindValueChanged(scale => scaleInfo.Value = scaleInfo.Value with { Scale = scale.NewValue });
-            scaleOrigin.Items.First().Select();
 
             xCheckBox.Current.BindValueChanged(x => setAxis(x.NewValue, yCheckBox.Current.Value));
             yCheckBox.Current.BindValueChanged(y => setAxis(xCheckBox.Current.Value, y.NewValue));
 
-            // aggregate two values into canScaleFromSelectionCentre
-            canScaleX = scaleHandler.CanScaleX.GetBoundCopy();
-            canScaleX.BindValueChanged(_ => updateCanScaleFromSelectionCentre());
-            canScaleX.BindValueChanged(e => updateAxisCheckBoxesEnabled());
+            selectionCentreButton.Selected.Disabled = !(scaleHandler.CanScaleX.Value || scaleHandler.CanScaleY.Value);
+            playfieldCentreButton.Selected.Disabled = scaleHandler.IsScalingSlider.Value && !selectionCentreButton.Selected.Disabled;
 
-            canScaleY = scaleHandler.CanScaleY.GetBoundCopy();
-            canScaleY.BindValueChanged(_ => updateCanScaleFromSelectionCentre(), true);
-            canScaleY.BindValueChanged(e => updateAxisCheckBoxesEnabled(), true);
-
-            void updateCanScaleFromSelectionCentre() =>
-                selectionCentreButton.Selected.Disabled = !(scaleHandler.CanScaleX.Value || scaleHandler.CanScaleY.Value);
+            if (playfieldCentreButton.Selected.Disabled)
+                scaleOrigin.Items.Last().Select();
+            else
+                scaleOrigin.Items.First().Select();
 
             scaleInfo.BindValueChanged(scale =>
             {
-                if (!scaleInProgress) return;
-
                 var newScale = new Vector2(scale.NewValue.XAxis ? scale.NewValue.Scale : 1, scale.NewValue.YAxis ? scale.NewValue.Scale : 1);
                 scaleHandler.Update(newScale, getOriginPosition(scale.NewValue));
             });
@@ -152,8 +145,8 @@ namespace osu.Game.Rulesets.Osu.Edit
             }
             else
             {
-                setBindableEnabled(canScaleX.Value, xCheckBox.Current);
-                setBindableEnabled(canScaleY.Value, yCheckBox.Current);
+                setBindableEnabled(scaleHandler.CanScaleX.Value, xCheckBox.Current);
+                setBindableEnabled(scaleHandler.CanScaleY.Value, yCheckBox.Current);
             }
         }
 
@@ -199,7 +192,6 @@ namespace osu.Game.Rulesets.Osu.Edit
         {
             base.PopIn();
             scaleHandler.Begin();
-            scaleInProgress = true;
             updateMaxScale();
         }
 
@@ -207,11 +199,7 @@ namespace osu.Game.Rulesets.Osu.Edit
         {
             base.PopOut();
 
-            if (IsLoaded)
-            {
-                scaleHandler.Commit();
-                scaleInProgress = false;
-            }
+            if (IsLoaded) scaleHandler.Commit();
         }
     }
 

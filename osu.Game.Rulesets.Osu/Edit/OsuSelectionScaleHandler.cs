@@ -29,6 +29,11 @@ namespace osu.Game.Rulesets.Osu.Edit
         /// </summary>
         public Bindable<bool> CanScaleFromPlayfieldOrigin { get; private set; } = new BindableBool();
 
+        /// <summary>
+        /// Whether a single slider is currently selected, which results in a different scaling behaviour.
+        /// </summary>
+        public Bindable<bool> IsScalingSlider { get; private set; } = new BindableBool();
+
         [Resolved]
         private IEditorChangeHandler? changeHandler { get; set; }
 
@@ -59,6 +64,7 @@ namespace osu.Game.Rulesets.Osu.Edit
             CanScaleY.Value = quad.Height > 0;
             CanScaleDiagonally.Value = CanScaleX.Value && CanScaleY.Value;
             CanScaleFromPlayfieldOrigin.Value = selectedMovableObjects.Any();
+            IsScalingSlider.Value = selectedMovableObjects.Count() == 1 && selectedMovableObjects.First() is Slider;
         }
 
         private Dictionary<OsuHitObject, OriginalHitObjectState>? objectsInScale;
