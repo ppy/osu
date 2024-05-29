@@ -4,7 +4,9 @@
 #nullable disable
 
 using System;
+using System.IO;
 using System.Linq;
+using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
@@ -18,10 +20,13 @@ using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Collections;
 using osu.Game.Configuration;
+using osu.Game.Extensions;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Online.Leaderboards;
+using osu.Game.Online.Notifications.WebSocket;
+using osu.Game.Online.Notifications.WebSocket.Events;
 using osu.Game.Overlays;
 using osu.Game.Overlays.BeatmapListing;
 using osu.Game.Overlays.Mods;
@@ -35,6 +40,7 @@ using osu.Game.Screens.OnlinePlay.Lounge;
 using osu.Game.Screens.OnlinePlay.Match.Components;
 using osu.Game.Screens.OnlinePlay.Playlists;
 using osu.Game.Screens.Play;
+using osu.Game.Screens.Play.HUD;
 using osu.Game.Screens.Ranking;
 using osu.Game.Screens.Select;
 using osu.Game.Screens.Select.Carousel;
@@ -221,6 +227,67 @@ namespace osu.Game.Tests.Visual.Navigation
         }
 
         [Test]
+        public void TestAttemptPlayBeatmapWrongHashFails()
+        {
+            Screens.Select.SongSelect songSelect = null;
+
+            AddStep("import beatmap", () => BeatmapImportHelper.LoadQuickOszIntoOsu(Game).GetResultSafely());
+            PushAndConfirm(() => songSelect = new TestPlaySongSelect());
+            AddUntilStep("wait for song select", () => songSelect.BeatmapSetsLoaded);
+
+            AddUntilStep("wait for selected", () => !Game.Beatmap.IsDefault);
+
+            AddStep("change beatmap files", () =>
+            {
+                foreach (var file in Game.Beatmap.Value.BeatmapSetInfo.Files.Where(f => Path.GetExtension(f.Filename) == ".osu"))
+                {
+                    using (var stream = Game.Storage.GetStream(Path.Combine("files", file.File.GetStoragePath()), FileAccess.ReadWrite))
+                        stream.WriteByte(0);
+                }
+            });
+
+            AddStep("invalidate cache", () =>
+            {
+                ((IWorkingBeatmapCache)Game.BeatmapManager).Invalidate(Game.Beatmap.Value.BeatmapSetInfo);
+            });
+
+            AddStep("select next difficulty", () => InputManager.Key(Key.Down));
+            AddStep("press enter", () => InputManager.Key(Key.Enter));
+
+            AddUntilStep("wait for player loader", () => Game.ScreenStack.CurrentScreen is PlayerLoader);
+            AddUntilStep("wait for song select", () => songSelect.IsCurrentScreen());
+        }
+
+        [Test]
+        public void TestAttemptPlayBeatmapMissingFails()
+        {
+            Screens.Select.SongSelect songSelect = null;
+
+            AddStep("import beatmap", () => BeatmapImportHelper.LoadQuickOszIntoOsu(Game).GetResultSafely());
+            PushAndConfirm(() => songSelect = new TestPlaySongSelect());
+            AddUntilStep("wait for song select", () => songSelect.BeatmapSetsLoaded);
+
+            AddUntilStep("wait for selected", () => !Game.Beatmap.IsDefault);
+
+            AddStep("delete beatmap files", () =>
+            {
+                foreach (var file in Game.Beatmap.Value.BeatmapSetInfo.Files.Where(f => Path.GetExtension(f.Filename) == ".osu"))
+                    Game.Storage.Delete(Path.Combine("files", file.File.GetStoragePath()));
+            });
+
+            AddStep("invalidate cache", () =>
+            {
+                ((IWorkingBeatmapCache)Game.BeatmapManager).Invalidate(Game.Beatmap.Value.BeatmapSetInfo);
+            });
+
+            AddStep("select next difficulty", () => InputManager.Key(Key.Down));
+            AddStep("press enter", () => InputManager.Key(Key.Enter));
+
+            AddUntilStep("wait for player loader", () => Game.ScreenStack.CurrentScreen is PlayerLoader);
+            AddUntilStep("wait for song select", () => songSelect.IsCurrentScreen());
+        }
+
+        [Test]
         public void TestRetryCountIncrements()
         {
             Player player = null;
@@ -274,6 +341,28 @@ namespace osu.Game.Tests.Visual.Navigation
 
             AddStep("attempt to exit", () => player().ChildrenOfType<HotkeyExitOverlay>().First().Action());
             AddUntilStep("wait for results", () => Game.ScreenStack.CurrentScreen is ResultsScreen);
+        }
+
+        [Test]
+        public void TestShowMedalAtResults()
+        {
+            playToResults();
+
+            AddStep("award medal", () => ((DummyAPIAccess)API).NotificationsClient.Receive(new SocketMessage
+            {
+                Event = @"new",
+                Data = JObject.FromObject(new NewPrivateNotificationEvent
+                {
+                    Name = @"user_achievement_unlock",
+                    Details = JObject.FromObject(new UserAchievementUnlock
+                    {
+                        Title = "Time And A Half",
+                        Description = "Having a right ol' time. One and a half of them, almost.",
+                        Slug = @"all-intro-doubletime"
+                    })
+                })
+            }));
+            AddUntilStep("medal overlay shown", () => Game.ChildrenOfType<MedalOverlay>().Single().State.Value, () => Is.EqualTo(Visibility.Visible));
         }
 
         [Test]
@@ -835,6 +924,24 @@ namespace osu.Game.Tests.Visual.Navigation
         }
 
         [Test]
+        public void TestQuickSkinEditorDoesntNukeSkin()
+        {
+            AddStep("import beatmap", () => BeatmapImportHelper.LoadQuickOszIntoOsu(Game).WaitSafely());
+
+            AddStep("open", () => InputManager.Key(Key.Space));
+            AddStep("skin", () => InputManager.Key(Key.E));
+            AddStep("editor", () => InputManager.Key(Key.S));
+            AddStep("and close immediately", () => InputManager.Key(Key.Escape));
+
+            AddStep("open again", () => InputManager.Key(Key.S));
+
+            Player player = null;
+
+            AddUntilStep("wait for player", () => (player = Game.ScreenStack.CurrentScreen as Player) != null);
+            AddUntilStep("wait for gameplay still has health bar", () => player.ChildrenOfType<ArgonHealthDisplay>().Any());
+        }
+
+        [Test]
         public void TestTouchScreenDetectionAtSongSelect()
         {
             AddStep("touch logo", () =>
@@ -965,6 +1072,29 @@ namespace osu.Game.Tests.Visual.Navigation
                     InputManager.Click(MouseButton.Left);
                 }
             }
+        }
+
+        [Test]
+        public void TestPresentBeatmapAfterDeletion()
+        {
+            BeatmapSetInfo beatmap = null;
+
+            Screens.Select.SongSelect songSelect = null;
+            PushAndConfirm(() => songSelect = new TestPlaySongSelect());
+            AddUntilStep("wait for song select", () => songSelect.BeatmapSetsLoaded);
+
+            AddStep("import beatmap", () => BeatmapImportHelper.LoadQuickOszIntoOsu(Game).WaitSafely());
+            AddUntilStep("wait for selected", () => !Game.Beatmap.IsDefault);
+
+            AddStep("delete selected beatmap", () =>
+            {
+                beatmap = Game.Beatmap.Value.BeatmapSetInfo;
+                Game.BeatmapManager.Delete(Game.Beatmap.Value.BeatmapSetInfo);
+            });
+
+            AddUntilStep("nothing selected", () => Game.Beatmap.IsDefault);
+            AddStep("present deleted beatmap", () => Game.PresentBeatmap(beatmap));
+            AddAssert("still nothing selected", () => Game.Beatmap.IsDefault);
         }
 
         private Func<Player> playToResults()

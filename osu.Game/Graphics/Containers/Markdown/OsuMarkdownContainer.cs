@@ -67,7 +67,7 @@ namespace osu.Game.Graphics.Containers.Markdown
 
         protected override MarkdownHeading CreateHeading(HeadingBlock headingBlock) => new OsuMarkdownHeading(headingBlock);
 
-        protected override MarkdownFencedCodeBlock CreateFencedCodeBlock(FencedCodeBlock fencedCodeBlock) => new OsuMarkdownFencedCodeBlock(fencedCodeBlock);
+        protected override MarkdownCodeBlock CreateCodeBlock(CodeBlock codeBlock) => new OsuMarkdownCodeBlock(codeBlock);
 
         protected override MarkdownSeparator CreateSeparator(ThematicBreakBlock thematicBlock) => new OsuMarkdownSeparator();
 

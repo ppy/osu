@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Primitives;
-using osu.Framework.Utils;
 using osu.Game.Rulesets.Objects.Types;
 using osuTK;
 
@@ -28,8 +27,8 @@ namespace osu.Game.Utils
             point.Y -= origin.Y;
 
             Vector2 ret;
-            ret.X = point.X * MathF.Cos(MathUtils.DegreesToRadians(angle)) + point.Y * MathF.Sin(MathUtils.DegreesToRadians(angle));
-            ret.Y = point.X * -MathF.Sin(MathUtils.DegreesToRadians(angle)) + point.Y * MathF.Cos(MathUtils.DegreesToRadians(angle));
+            ret.X = point.X * MathF.Cos(float.DegreesToRadians(angle)) + point.Y * MathF.Sin(float.DegreesToRadians(angle));
+            ret.Y = point.X * -MathF.Sin(float.DegreesToRadians(angle)) + point.Y * MathF.Cos(float.DegreesToRadians(angle));
 
             ret.X += origin.X;
             ret.Y += origin.Y;
@@ -77,6 +76,15 @@ namespace osu.Game.Utils
                 position.Y = selectionQuad.TopLeft.Y + yOffset + (position.Y - selectionQuad.TopLeft.Y) / selectionQuad.Height * (selectionQuad.Height + scale.Y);
 
             return position;
+        }
+
+        /// <summary>
+        /// Given a scale multiplier, an origin, and a position,
+        /// will return the scaled position in screen space coordinates.
+        /// </summary>
+        public static Vector2 GetScaledPosition(Vector2 scale, Vector2 origin, Vector2 position)
+        {
+            return origin + (position - origin) * scale;
         }
 
         /// <summary>

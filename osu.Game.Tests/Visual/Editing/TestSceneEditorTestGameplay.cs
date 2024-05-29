@@ -160,7 +160,7 @@ namespace osu.Game.Tests.Visual.Editing
 
             AddStep("dismiss prompt", () =>
             {
-                var button = DialogOverlay.CurrentDialog.Buttons.Last();
+                var button = DialogOverlay.CurrentDialog!.Buttons.Last();
                 InputManager.MoveMouseTo(button);
                 InputManager.Click(MouseButton.Left);
             });
@@ -185,7 +185,7 @@ namespace osu.Game.Tests.Visual.Editing
             });
             AddUntilStep("save prompt shown", () => DialogOverlay.CurrentDialog is SaveRequiredPopupDialog);
 
-            AddStep("save changes", () => DialogOverlay.CurrentDialog.PerformOkAction());
+            AddStep("save changes", () => DialogOverlay.CurrentDialog!.PerformOkAction());
 
             EditorPlayer editorPlayer = null;
             AddUntilStep("player pushed", () => (editorPlayer = Stack.CurrentScreen as EditorPlayer) != null);

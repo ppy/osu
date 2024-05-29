@@ -18,6 +18,9 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 {
     public partial class TimelineTickDisplay : TimelinePart<PointVisualisation>
     {
+        // With current implementation every tick in the sub-tree should be visible, no need to check whether they are masked away.
+        public override bool UpdateSubTreeMasking() => false;
+
         [Resolved]
         private EditorBeatmap beatmap { get; set; } = null!;
 
@@ -165,7 +168,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
             // save a few drawables beyond the currently used for edge cases.
             while (drawableIndex < Math.Min(usedDrawables + 16, Count))
-                Children[drawableIndex++].Hide();
+                Children[drawableIndex++].Alpha = 0;
 
             // expire any excess
             while (drawableIndex < Count)
@@ -182,7 +185,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                     point = Children[drawableIndex];
 
                 drawableIndex++;
-                point.Show();
+                point.Alpha = 1;
 
                 return point;
             }

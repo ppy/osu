@@ -60,6 +60,8 @@ namespace osu.Game.Tests.Skins
             "Archives/modified-argon-20231106.osk",
             // Covers "Argon" accuracy/score/combo counters, and wedges
             "Archives/modified-argon-20231108.osk",
+            // Covers "Argon" performance points counter
+            "Archives/modified-argon-20240305.osk",
         };
 
         /// <summary>
