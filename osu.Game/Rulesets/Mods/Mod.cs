@@ -168,6 +168,12 @@ namespace osu.Game.Rulesets.Mods
         public virtual bool RequiresConfiguration => false;
 
         /// <summary>
+        /// Whether scores with this mod active can give performance points.
+        /// </summary>
+        [JsonIgnore]
+        public virtual bool Ranked => false;
+
+        /// <summary>
         /// The mods this mod cannot be enabled with.
         /// </summary>
         [JsonIgnore]

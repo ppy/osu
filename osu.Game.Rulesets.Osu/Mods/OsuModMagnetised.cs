@@ -49,8 +49,10 @@ namespace osu.Game.Rulesets.Osu.Mods
         {
             var cursorPos = playfield.Cursor.AsNonNull().ActiveCursor.DrawPosition;
 
-            foreach (var drawable in playfield.HitObjectContainer.AliveObjects)
+            foreach (var entry in playfield.HitObjectContainer.AliveEntries)
             {
+                var drawable = entry.Value;
+
                 switch (drawable)
                 {
                     case DrawableHitCircle circle:

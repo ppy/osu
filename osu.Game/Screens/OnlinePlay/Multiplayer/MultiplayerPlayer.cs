@@ -67,6 +67,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             if (!LoadedBeatmapSuccessfully)
                 return;
 
+            ScoreProcessor.ApplyNewJudgementsWhenFailed = true;
+
             LoadComponentAsync(new GameplayChatDisplay(Room)
             {
                 Expanded = { BindTarget = LeaderboardExpandedState },
@@ -198,7 +200,13 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
             return multiplayerLeaderboard.TeamScores.Count == 2
                 ? new MultiplayerTeamResultsScreen(score, Room.RoomID.Value.Value, PlaylistItem, multiplayerLeaderboard.TeamScores)
-                : new MultiplayerResultsScreen(score, Room.RoomID.Value.Value, PlaylistItem);
+                {
+                    ShowUserStatistics = true,
+                }
+                : new MultiplayerResultsScreen(score, Room.RoomID.Value.Value, PlaylistItem)
+                {
+                    ShowUserStatistics = true
+                };
         }
 
         protected override void Dispose(bool isDisposing)

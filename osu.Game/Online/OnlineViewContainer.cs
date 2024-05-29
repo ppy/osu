@@ -3,6 +3,7 @@
 
 #nullable disable
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -79,10 +80,14 @@ namespace osu.Game.Online
 
                 case APIState.Failing:
                 case APIState.Connecting:
+                case APIState.RequiresSecondFactorAuth:
                     PopContentOut(Content);
                     LoadingSpinner.Show();
                     placeholder.FadeOut(transform_duration / 2, Easing.OutQuint);
                     break;
+
+                default:
+                    throw new ArgumentOutOfRangeException();
             }
         });
 

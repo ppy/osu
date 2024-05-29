@@ -54,7 +54,7 @@ namespace osu.Game.Screens.Select
         }
 
         protected void PresentScore(ScoreInfo score) =>
-            FinaliseSelection(score.BeatmapInfo, score.Ruleset, () => this.Push(new SoloResultsScreen(score, false)));
+            FinaliseSelection(score.BeatmapInfo, score.Ruleset, () => this.Push(new SoloResultsScreen(score)));
 
         protected override BeatmapDetailArea CreateBeatmapDetailArea()
         {
@@ -144,14 +144,6 @@ namespace osu.Game.Screens.Select
 
                 return player;
             }
-        }
-
-        public override void OnSuspending(ScreenTransitionEvent e)
-        {
-            // Scores will be refreshed on arriving at this screen.
-            // Clear them to avoid animation overload on returning to song select.
-            playBeatmapDetailArea.Leaderboard.ClearScores();
-            base.OnSuspending(e);
         }
 
         public override void OnResuming(ScreenTransitionEvent e)

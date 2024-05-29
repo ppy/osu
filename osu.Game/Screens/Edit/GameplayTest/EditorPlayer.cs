@@ -23,7 +23,7 @@ namespace osu.Game.Screens.Edit.GameplayTest
         private readonly EditorState editorState;
         private readonly IBeatmap playableBeatmap;
 
-        protected override UserActivity InitialActivity => new UserActivity.TestingBeatmap(Beatmap.Value.BeatmapInfo, Ruleset.Value);
+        protected override UserActivity InitialActivity => new UserActivity.TestingBeatmap(Beatmap.Value.BeatmapInfo);
 
         [Resolved]
         private MusicController musicController { get; set; } = null!;
