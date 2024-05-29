@@ -124,10 +124,7 @@ namespace osu.Game.Rulesets.Osu.Edit
             selectionCentreButton.Selected.Disabled = !(scaleHandler.CanScaleX.Value || scaleHandler.CanScaleY.Value);
             playfieldCentreButton.Selected.Disabled = scaleHandler.IsScalingSlider.Value && !selectionCentreButton.Selected.Disabled;
 
-            if (playfieldCentreButton.Selected.Disabled)
-                scaleOrigin.Items.Last().Select();
-            else
-                scaleOrigin.Items.First().Select();
+            scaleOrigin.Items.First(b => !b.Selected.Disabled).Select();
 
             scaleInfo.BindValueChanged(scale =>
             {
