@@ -104,7 +104,7 @@ namespace osu.Game.Rulesets.Osu.Edit
             }
             else
             {
-                scale = GetClampedScale(scale, actualOrigin);
+                scale = ClampScaleToPlayfieldBounds(scale, actualOrigin);
 
                 foreach (var (ho, originalState) in objectsInScale)
                 {
@@ -173,7 +173,7 @@ namespace osu.Game.Rulesets.Osu.Edit
         /// <param name="origin">The origin from which the scale operation is performed</param>
         /// <param name="scale">The scale to be clamped</param>
         /// <returns>The clamped scale vector</returns>
-        public Vector2 GetClampedScale(Vector2 scale, Vector2? origin = null)
+        public Vector2 ClampScaleToPlayfieldBounds(Vector2 scale, Vector2? origin = null)
         {
             //todo: this is not always correct for selections involving sliders. This approximation assumes each point is scaled independently, but sliderends move with the sliderhead.
             if (objectsInScale == null)
