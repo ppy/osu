@@ -18,8 +18,8 @@ namespace osu.Game.Rulesets.Osu.Edit
 {
     public partial class TransformToolboxGroup : EditorToolboxGroup, IKeyBindingHandler<GlobalAction>
     {
-        private readonly Bindable<bool> canRotate = new BindableBool();
-        private readonly Bindable<bool> canScale = new BindableBool();
+        private readonly AggregateBindable<bool> canRotate = new AggregateBindable<bool>((x, y) => x || y);
+        private readonly AggregateBindable<bool> canScale = new AggregateBindable<bool>((x, y) => x || y);
 
         private EditorToolButton rotateButton = null!;
         private EditorToolButton scaleButton = null!;
@@ -63,37 +63,17 @@ namespace osu.Game.Rulesets.Osu.Edit
         {
             base.LoadComplete();
 
-            // aggregate two values into canRotate
-            canRotatePlayfieldOrigin = RotationHandler.CanRotateAroundPlayfieldOrigin.GetBoundCopy();
-            canRotatePlayfieldOrigin.BindValueChanged(_ => updateCanRotateAggregate());
+            canRotate.AddSource(RotationHandler.CanRotateAroundPlayfieldOrigin);
+            canRotate.AddSource(RotationHandler.CanRotateAroundSelectionOrigin);
 
-            canRotateSelectionOrigin = RotationHandler.CanRotateAroundSelectionOrigin.GetBoundCopy();
-            canRotateSelectionOrigin.BindValueChanged(_ => updateCanRotateAggregate());
-
-            void updateCanRotateAggregate()
-            {
-                canRotate.Value = RotationHandler.CanRotateAroundPlayfieldOrigin.Value || RotationHandler.CanRotateAroundSelectionOrigin.Value;
-            }
-
-            // aggregate three values into canScale
-            canScaleX = ScaleHandler.CanScaleX.GetBoundCopy();
-            canScaleX.BindValueChanged(_ => updateCanScaleAggregate());
-
-            canScaleY = ScaleHandler.CanScaleY.GetBoundCopy();
-            canScaleY.BindValueChanged(_ => updateCanScaleAggregate());
-
-            canScalePlayfieldOrigin = ScaleHandler.CanScaleFromPlayfieldOrigin.GetBoundCopy();
-            canScalePlayfieldOrigin.BindValueChanged(_ => updateCanScaleAggregate());
-
-            void updateCanScaleAggregate()
-            {
-                canScale.Value = ScaleHandler.CanScaleX.Value || ScaleHandler.CanScaleY.Value || ScaleHandler.CanScaleFromPlayfieldOrigin.Value;
-            }
+            canScale.AddSource(ScaleHandler.CanScaleX);
+            canScale.AddSource(ScaleHandler.CanScaleY);
+            canScale.AddSource(ScaleHandler.CanScaleFromPlayfieldOrigin);
 
             // bindings to `Enabled` on the buttons are decoupled on purpose
             // due to the weird `OsuButton` behaviour of resetting `Enabled` to `false` when `Action` is set.
-            canRotate.BindValueChanged(_ => rotateButton.Enabled.Value = canRotate.Value, true);
-            canScale.BindValueChanged(_ => scaleButton.Enabled.Value = canScale.Value, true);
+            canRotate.Result.BindValueChanged(rotate => rotateButton.Enabled.Value = rotate.NewValue, true);
+            canScale.Result.BindValueChanged(scale => scaleButton.Enabled.Value = scale.NewValue, true);
         }
 
         public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
