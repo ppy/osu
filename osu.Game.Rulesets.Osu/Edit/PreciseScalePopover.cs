@@ -137,21 +137,23 @@ namespace osu.Game.Rulesets.Osu.Edit
         {
             if (scaleInfo.Value.Origin == ScaleOrigin.PlayfieldCentre)
             {
-                setBindableEnabled(true, xCheckBox.Current);
-                setBindableEnabled(true, yCheckBox.Current);
+                toggleAxisAvailable(xCheckBox.Current, true);
+                toggleAxisAvailable(yCheckBox.Current, true);
             }
             else
             {
-                setBindableEnabled(scaleHandler.CanScaleX.Value, xCheckBox.Current);
-                setBindableEnabled(scaleHandler.CanScaleY.Value, yCheckBox.Current);
+                toggleAxisAvailable(xCheckBox.Current, scaleHandler.CanScaleX.Value);
+                toggleAxisAvailable(yCheckBox.Current, scaleHandler.CanScaleY.Value);
             }
         }
 
-        private void setBindableEnabled(bool enabled, Bindable<bool> current)
+        private void toggleAxisAvailable(Bindable<bool> axisBindable, bool available)
         {
-            current.Disabled = false; // enable the bindable to allow setting the value
-            current.Value = enabled;
-            current.Disabled = !enabled;
+            // enable the bindable to allow setting the value
+            axisBindable.Disabled = false;
+            // restore the presumed default value given the axis's new availability state
+            axisBindable.Value = available;
+            axisBindable.Disabled = !available;
         }
 
         private void updateMaxScale()
