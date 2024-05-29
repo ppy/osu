@@ -140,10 +140,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
         private void onIsHittingChanged(ValueChangedEvent<bool> isHitting)
         {
             if (bodySprite is TextureAnimation bodyAnimation)
-            {
-                bodyAnimation.GotoFrame(0);
                 bodyAnimation.IsPlaying = isHitting.NewValue;
-            }
 
             if (lightContainer == null)
                 return;
@@ -218,6 +215,9 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
         protected override void Update()
         {
             base.Update();
+
+            if (!isHitting.Value)
+                (bodySprite as TextureAnimation)?.GotoFrame(0);
 
             if (holdNote.Body.HasHoldBreak)
                 missFadeTime.Value = holdNote.Body.Result.TimeAbsolute;
