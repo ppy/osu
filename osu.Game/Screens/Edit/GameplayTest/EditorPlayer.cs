@@ -21,19 +21,17 @@ namespace osu.Game.Screens.Edit.GameplayTest
     {
         private readonly Editor editor;
         private readonly EditorState editorState;
-        private readonly IBeatmap playableBeatmap;
 
         protected override UserActivity InitialActivity => new UserActivity.TestingBeatmap(Beatmap.Value.BeatmapInfo);
 
         [Resolved]
         private MusicController musicController { get; set; } = null!;
 
-        public EditorPlayer(Editor editor, IBeatmap playableBeatmap)
+        public EditorPlayer(Editor editor)
             : base(new PlayerConfiguration { ShowResults = false })
         {
             this.editor = editor;
             editorState = editor.GetState();
-            this.playableBeatmap = playableBeatmap;
         }
 
         protected override GameplayClockContainer CreateGameplayClockContainer(WorkingBeatmap beatmap, double gameplayStart)
@@ -52,17 +50,7 @@ namespace osu.Game.Screens.Edit.GameplayTest
         {
             base.LoadComplete();
 
-            var frame = new ReplayFrame { Header = new FrameHeader(new ScoreInfo(), new ScoreProcessorStatistics()) };
-
-            foreach (var hitObject in enumerateHitObjects(playableBeatmap.HitObjects.Where(h => h.StartTime < editorState.Time)))
-            {
-                var judgement = hitObject.CreateJudgement();
-                frame.Header.Statistics.TryAdd(judgement.MaxResult, 0);
-                frame.Header.Statistics[judgement.MaxResult]++;
-            }
-
-            HealthProcessor.ResetFromReplayFrame(frame);
-            ScoreProcessor.ResetFromReplayFrame(frame);
+            markPreviousObjectsHit();
 
             ScoreProcessor.HasCompleted.BindValueChanged(completed =>
             {
@@ -75,6 +63,22 @@ namespace osu.Game.Screens.Edit.GameplayTest
                     }, RESULTS_DISPLAY_DELAY);
                 }
             });
+        }
+
+        private void markPreviousObjectsHit()
+        {
+            var frame = new ReplayFrame { Header = new FrameHeader(new ScoreInfo(), new ScoreProcessorStatistics()) };
+
+            foreach (var hitObject in enumerateHitObjects(DrawableRuleset.Objects.Where(h => h.StartTime < editorState.Time)))
+            {
+                var judgement = hitObject.CreateJudgement();
+
+                frame.Header.Statistics.TryAdd(judgement.MaxResult, 0);
+                frame.Header.Statistics[judgement.MaxResult]++;
+            }
+
+            HealthProcessor.ResetFromReplayFrame(frame);
+            ScoreProcessor.ResetFromReplayFrame(frame);
 
             static IEnumerable<HitObject> enumerateHitObjects(IEnumerable<HitObject> hitObjects)
             {
