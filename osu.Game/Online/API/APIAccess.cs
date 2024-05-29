@@ -42,6 +42,10 @@ namespace osu.Game.Online.API
 
         public string WebsiteRootUrl { get; }
 
+        /// <summary>
+        /// The API response version.
+        /// See: https://osu.ppy.sh/docs/index.html#api-versions
+        /// </summary>
         public int APIVersion { get; }
 
         public Exception LastLoginError { get; private set; }
