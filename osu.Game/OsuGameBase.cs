@@ -75,6 +75,12 @@ namespace osu.Game
     {
         public static readonly string[] VIDEO_EXTENSIONS = { ".mp4", ".mov", ".avi", ".flv", ".mpg", ".wmv", ".m4v" };
 
+#if DEBUG
+        public const string GAME_NAME = "osu! (development)";
+#else
+        public const string GAME_NAME = "osu!";
+#endif
+
         public const string OSU_PROTOCOL = "osu://";
 
         public const string CLIENT_STREAM_NAME = @"lazer";
@@ -94,7 +100,7 @@ namespace osu.Game
         public const int SAMPLE_DEBOUNCE_TIME = 20;
 
         /// <summary>
-        /// The maximum volume at which audio tracks should playback. This can be set lower than 1 to create some head-room for sound effects.
+        /// The maximum volume at which audio tracks should play back at. This can be set lower than 1 to create some head-room for sound effects.
         /// </summary>
         private const double global_track_volume_adjust = 0.8;
 
@@ -241,11 +247,7 @@ namespace osu.Game
 
         public OsuGameBase()
         {
-            Name = @"osu!";
-
-#if DEBUG
-            Name += " (development)";
-#endif
+            Name = GAME_NAME;
 
             allowableExceptions = UnhandledExceptionsBeforeCrash;
         }
@@ -576,17 +578,17 @@ namespace osu.Game
                 {
                     case ITabletHandler th:
                         return new TabletSettings(th);
-
-                    case MouseHandler mh:
-                        return new MouseSettings(mh);
-
-                    case JoystickHandler jh:
-                        return new JoystickSettings(jh);
                 }
             }
 
             switch (handler)
             {
+                case MouseHandler mh:
+                    return new MouseSettings(mh);
+
+                case JoystickHandler jh:
+                    return new JoystickSettings(jh);
+
                 case TouchHandler th:
                     return new TouchSettings(th);
 

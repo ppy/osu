@@ -296,7 +296,7 @@ namespace osu.Game.Tests.Visual.Settings
         }
 
         [Test]
-        public void TestBindingConflictResolvedByRollback()
+        public void TestBindingConflictResolvedByRollbackViaMouse()
         {
             AddStep("reset taiko section to default", () =>
             {
@@ -315,7 +315,7 @@ namespace osu.Game.Tests.Visual.Settings
         }
 
         [Test]
-        public void TestBindingConflictResolvedByOverwrite()
+        public void TestBindingConflictResolvedByOverwriteViaMouse()
         {
             AddStep("reset taiko section to default", () =>
             {
@@ -329,6 +329,46 @@ namespace osu.Game.Tests.Visual.Settings
             KeyBindingConflictPopover popover = null;
             AddUntilStep("wait for popover", () => popover = panel.ChildrenOfType<KeyBindingConflictPopover>().SingleOrDefault(), () => Is.Not.Null);
             AddStep("click second button", () => popover.ChildrenOfType<RoundedButton>().ElementAt(1).TriggerClick());
+            checkBinding("Left (centre)", InputSettingsStrings.ActionHasNoKeyBinding.ToString());
+            checkBinding("Left (rim)", "M1");
+        }
+
+        [Test]
+        public void TestBindingConflictResolvedByRollbackViaKeyboard()
+        {
+            AddStep("reset taiko & global sections to default", () =>
+            {
+                panel.ChildrenOfType<VariantBindingsSubsection>().First(section => new TaikoRuleset().RulesetInfo.Equals(section.Ruleset))
+                     .ChildrenOfType<ResetButton>().Single().TriggerClick();
+
+                panel.ChildrenOfType<ResetButton>().First().TriggerClick();
+            });
+            AddStep("move mouse to centre", () => InputManager.MoveMouseTo(panel.ScreenSpaceDrawQuad.Centre));
+            scrollToAndStartBinding("Left (rim)");
+            AddStep("attempt to bind M1 to two keys", () => InputManager.Click(MouseButton.Left));
+
+            AddUntilStep("wait for popover", () => panel.ChildrenOfType<KeyBindingConflictPopover>().SingleOrDefault(), () => Is.Not.Null);
+            AddStep("press Esc", () => InputManager.Key(Key.Escape));
+            checkBinding("Left (centre)", "M1");
+            checkBinding("Left (rim)", "M2");
+        }
+
+        [Test]
+        public void TestBindingConflictResolvedByOverwriteViaKeyboard()
+        {
+            AddStep("reset taiko & global sections to default", () =>
+            {
+                panel.ChildrenOfType<VariantBindingsSubsection>().First(section => new TaikoRuleset().RulesetInfo.Equals(section.Ruleset))
+                     .ChildrenOfType<ResetButton>().Single().TriggerClick();
+
+                panel.ChildrenOfType<ResetButton>().First().TriggerClick();
+            });
+            AddStep("move mouse to centre", () => InputManager.MoveMouseTo(panel.ScreenSpaceDrawQuad.Centre));
+            scrollToAndStartBinding("Left (rim)");
+            AddStep("attempt to bind M1 to two keys", () => InputManager.Click(MouseButton.Left));
+
+            AddUntilStep("wait for popover", () => panel.ChildrenOfType<KeyBindingConflictPopover>().SingleOrDefault(), () => Is.Not.Null);
+            AddStep("press Enter", () => InputManager.Key(Key.Enter));
             checkBinding("Left (centre)", InputSettingsStrings.ActionHasNoKeyBinding.ToString());
             checkBinding("Left (rim)", "M1");
         }
