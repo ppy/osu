@@ -99,11 +99,11 @@ namespace osu.Game.Rulesets.Osu.Edit
             };
             playfieldCentreButton.Selected.DisabledChanged += isDisabled =>
             {
-                playfieldCentreButton.TooltipText = isDisabled ? "Select something other than a single slider to perform playfield-based scaling." : string.Empty;
+                playfieldCentreButton.TooltipText = isDisabled ? "The current selection cannot be scaled relative to playfield centre." : string.Empty;
             };
             selectionCentreButton.Selected.DisabledChanged += isDisabled =>
             {
-                selectionCentreButton.TooltipText = isDisabled ? "Select more than one object to perform selection-based scaling." : string.Empty;
+                selectionCentreButton.TooltipText = isDisabled ? "The current selection cannot be scaled relative to its centre." : string.Empty;
             };
         }
 
