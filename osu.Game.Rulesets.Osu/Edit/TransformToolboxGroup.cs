@@ -64,15 +64,15 @@ namespace osu.Game.Rulesets.Osu.Edit
             base.LoadComplete();
 
             // aggregate two values into canRotate
-            canRotatePlayfieldOrigin = RotationHandler.CanRotateFromPlayfieldOrigin.GetBoundCopy();
+            canRotatePlayfieldOrigin = RotationHandler.CanRotateAroundPlayfieldOrigin.GetBoundCopy();
             canRotatePlayfieldOrigin.BindValueChanged(_ => updateCanRotateAggregate());
 
-            canRotateSelectionOrigin = RotationHandler.CanRotateFromSelectionOrigin.GetBoundCopy();
+            canRotateSelectionOrigin = RotationHandler.CanRotateAroundSelectionOrigin.GetBoundCopy();
             canRotateSelectionOrigin.BindValueChanged(_ => updateCanRotateAggregate());
 
             void updateCanRotateAggregate()
             {
-                canRotate.Value = RotationHandler.CanRotateFromPlayfieldOrigin.Value || RotationHandler.CanRotateFromSelectionOrigin.Value;
+                canRotate.Value = RotationHandler.CanRotateAroundPlayfieldOrigin.Value || RotationHandler.CanRotateAroundSelectionOrigin.Value;
             }
 
             // aggregate three values into canScale
