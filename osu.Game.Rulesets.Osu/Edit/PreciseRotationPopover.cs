@@ -24,6 +24,8 @@ namespace osu.Game.Rulesets.Osu.Edit
         private SliderWithTextBoxInput<float> angleInput = null!;
         private EditorRadioButtonCollection rotationOrigin = null!;
 
+        private RadioButton selectionCentreButton = null!;
+
         public PreciseRotationPopover(SelectionRotationHandler rotationHandler)
         {
             this.rotationHandler = rotationHandler;
@@ -59,12 +61,16 @@ namespace osu.Game.Rulesets.Osu.Edit
                             new RadioButton("Playfield centre",
                                 () => rotationInfo.Value = rotationInfo.Value with { Origin = RotationOrigin.PlayfieldCentre },
                                 () => new SpriteIcon { Icon = FontAwesome.Regular.Square }),
-                            new RadioButton("Selection centre",
+                            selectionCentreButton = new RadioButton("Selection centre",
                                 () => rotationInfo.Value = rotationInfo.Value with { Origin = RotationOrigin.SelectionCentre },
                                 () => new SpriteIcon { Icon = FontAwesome.Solid.VectorSquare })
                         }
                     }
                 }
+            };
+            selectionCentreButton.Selected.DisabledChanged += isDisabled =>
+            {
+                selectionCentreButton.TooltipText = isDisabled ? "Select more than one object to perform selection-based rotation." : string.Empty;
             };
         }
 
@@ -75,6 +81,11 @@ namespace osu.Game.Rulesets.Osu.Edit
             ScheduleAfterChildren(() => angleInput.TakeFocus());
             angleInput.Current.BindValueChanged(angle => rotationInfo.Value = rotationInfo.Value with { Degrees = angle.NewValue });
             rotationOrigin.Items.First().Select();
+
+            rotationHandler.CanRotateSelectionOrigin.BindValueChanged(e =>
+            {
+                selectionCentreButton.Selected.Disabled = !e.NewValue;
+            }, true);
 
             rotationInfo.BindValueChanged(rotation =>
             {

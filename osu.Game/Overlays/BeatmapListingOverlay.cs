@@ -198,6 +198,7 @@ namespace osu.Game.Overlays
         {
             c.Anchor = Anchor.TopCentre;
             c.Origin = Anchor.TopCentre;
+            c.Scale = new Vector2(0.8f);
         })).ToArray();
 
         private static ReverseChildIDFillFlowContainer<BeatmapCard> createCardContainerFor(IEnumerable<BeatmapCard> newCards)

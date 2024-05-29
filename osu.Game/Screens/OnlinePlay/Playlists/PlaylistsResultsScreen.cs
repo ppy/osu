@@ -1,13 +1,10 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -25,23 +22,23 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         private readonly long roomId;
         private readonly PlaylistItem playlistItem;
 
-        protected LoadingSpinner LeftSpinner { get; private set; }
-        protected LoadingSpinner CentreSpinner { get; private set; }
-        protected LoadingSpinner RightSpinner { get; private set; }
+        protected LoadingSpinner LeftSpinner { get; private set; } = null!;
+        protected LoadingSpinner CentreSpinner { get; private set; } = null!;
+        protected LoadingSpinner RightSpinner { get; private set; } = null!;
 
-        private MultiplayerScores higherScores;
-        private MultiplayerScores lowerScores;
-
-        [Resolved]
-        private IAPIProvider api { get; set; }
+        private MultiplayerScores? higherScores;
+        private MultiplayerScores? lowerScores;
 
         [Resolved]
-        private ScoreManager scoreManager { get; set; }
+        private IAPIProvider api { get; set; } = null!;
 
         [Resolved]
-        private RulesetStore rulesets { get; set; }
+        private ScoreManager scoreManager { get; set; } = null!;
 
-        public PlaylistsResultsScreen([CanBeNull] ScoreInfo score, long roomId, PlaylistItem playlistItem)
+        [Resolved]
+        private RulesetStore rulesets { get; set; } = null!;
+
+        public PlaylistsResultsScreen(ScoreInfo? score, long roomId, PlaylistItem playlistItem)
             : base(score)
         {
             this.roomId = roomId;
@@ -123,11 +120,11 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             return userScoreReq;
         }
 
-        protected override APIRequest FetchNextPage(int direction, Action<IEnumerable<ScoreInfo>> scoresCallback)
+        protected override APIRequest? FetchNextPage(int direction, Action<IEnumerable<ScoreInfo>> scoresCallback)
         {
             Debug.Assert(direction == 1 || direction == -1);
 
-            MultiplayerScores pivot = direction == -1 ? higherScores : lowerScores;
+            MultiplayerScores? pivot = direction == -1 ? higherScores : lowerScores;
 
             if (pivot?.Cursor == null)
                 return null;
@@ -147,7 +144,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         /// <param name="scoresCallback">The callback to perform with the resulting scores.</param>
         /// <param name="pivot">An optional score pivot to retrieve scores around. Can be null to retrieve scores from the highest score.</param>
         /// <returns>The indexing <see cref="APIRequest"/>.</returns>
-        private APIRequest createIndexRequest(Action<IEnumerable<ScoreInfo>> scoresCallback, [CanBeNull] MultiplayerScores pivot = null)
+        private APIRequest createIndexRequest(Action<IEnumerable<ScoreInfo>> scoresCallback, MultiplayerScores? pivot = null)
         {
             var indexReq = pivot != null
                 ? new IndexPlaylistScoresRequest(roomId, playlistItem.ID, pivot.Cursor, pivot.Params)
@@ -180,7 +177,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         /// <param name="callback">The callback to invoke with the final <see cref="ScoreInfo"/>s.</param>
         /// <param name="scores">The <see cref="MultiplayerScore"/>s that were retrieved from <see cref="APIRequest"/>s.</param>
         /// <param name="pivot">An optional pivot around which the scores were retrieved.</param>
-        private void performSuccessCallback([NotNull] Action<IEnumerable<ScoreInfo>> callback, [NotNull] List<MultiplayerScore> scores, [CanBeNull] MultiplayerScores pivot = null) => Schedule(() =>
+        private void performSuccessCallback(Action<IEnumerable<ScoreInfo>> callback, List<MultiplayerScore> scores, MultiplayerScores? pivot = null) => Schedule(() =>
         {
             var scoreInfos = scores.Select(s => s.CreateScoreInfo(scoreManager, rulesets, playlistItem, Beatmap.Value.BeatmapInfo)).OrderByTotalScore().ToArray();
 
@@ -201,7 +198,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             hideLoadingSpinners(pivot);
         });
 
-        private void hideLoadingSpinners([CanBeNull] MultiplayerScores pivot = null)
+        private void hideLoadingSpinners(MultiplayerScores? pivot = null)
         {
             CentreSpinner.Hide();
 
@@ -217,7 +214,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         /// <param name="scores">The <see cref="MultiplayerScores"/> to set positions on.</param>
         /// <param name="pivot">The pivot.</param>
         /// <param name="increment">The amount to increment the pivot position by for each <see cref="MultiplayerScore"/> in <paramref name="scores"/>.</param>
-        private void setPositions([NotNull] MultiplayerScores scores, [CanBeNull] MultiplayerScores pivot, int increment)
+        private void setPositions(MultiplayerScores scores, MultiplayerScores? pivot, int increment)
             => setPositions(scores, pivot?.Scores[^1].Position ?? 0, increment);
 
         /// <summary>
@@ -226,7 +223,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         /// <param name="scores">The <see cref="MultiplayerScores"/> to set positions on.</param>
         /// <param name="pivotPosition">The pivot position.</param>
         /// <param name="increment">The amount to increment the pivot position by for each <see cref="MultiplayerScore"/> in <paramref name="scores"/>.</param>
-        private void setPositions([NotNull] MultiplayerScores scores, int pivotPosition, int increment)
+        private void setPositions(MultiplayerScores scores, int pivotPosition, int increment)
         {
             foreach (var s in scores.Scores)
             {

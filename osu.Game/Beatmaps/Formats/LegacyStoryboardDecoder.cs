@@ -9,6 +9,7 @@ using osu.Framework.Graphics;
 using osu.Game.Beatmaps.Legacy;
 using osu.Game.IO;
 using osu.Game.Storyboards;
+using osu.Game.Storyboards.Commands;
 using osuTK;
 using osuTK.Graphics;
 
@@ -17,7 +18,7 @@ namespace osu.Game.Beatmaps.Formats
     public class LegacyStoryboardDecoder : LegacyDecoder<Storyboard>
     {
         private StoryboardSprite? storyboardSprite;
-        private CommandTimelineGroup? timelineGroup;
+        private StoryboardCommandGroup? currentCommandsGroup;
 
         private Storyboard storyboard = null!;
 
@@ -114,7 +115,7 @@ namespace osu.Game.Beatmaps.Formats
                         if (!OsuGameBase.VIDEO_EXTENSIONS.Contains(Path.GetExtension(path).ToLowerInvariant()))
                             break;
 
-                        storyboard.GetLayer("Video").Add(new StoryboardVideo(path, offset));
+                        storyboard.GetLayer("Video").Add(storyboardSprite = new StoryboardVideo(path, offset));
                         break;
                     }
 
@@ -164,7 +165,7 @@ namespace osu.Game.Beatmaps.Formats
             else
             {
                 if (depth < 2)
-                    timelineGroup = storyboardSprite?.TimelineGroup;
+                    currentCommandsGroup = storyboardSprite?.Commands;
 
                 string commandType = split[0];
 
@@ -176,7 +177,7 @@ namespace osu.Game.Beatmaps.Formats
                         double startTime = split.Length > 2 ? Parsing.ParseDouble(split[2]) : double.MinValue;
                         double endTime = split.Length > 3 ? Parsing.ParseDouble(split[3]) : double.MaxValue;
                         int groupNumber = split.Length > 4 ? Parsing.ParseInt(split[4]) : 0;
-                        timelineGroup = storyboardSprite?.AddTrigger(triggerName, startTime, endTime, groupNumber);
+                        currentCommandsGroup = storyboardSprite?.AddTriggerGroup(triggerName, startTime, endTime, groupNumber);
                         break;
                     }
 
@@ -184,7 +185,7 @@ namespace osu.Game.Beatmaps.Formats
                     {
                         double startTime = Parsing.ParseDouble(split[1]);
                         int repeatCount = Parsing.ParseInt(split[2]);
-                        timelineGroup = storyboardSprite?.AddLoop(startTime, Math.Max(0, repeatCount - 1));
+                        currentCommandsGroup = storyboardSprite?.AddLoopingGroup(startTime, Math.Max(0, repeatCount - 1));
                         break;
                     }
 
@@ -203,7 +204,7 @@ namespace osu.Game.Beatmaps.Formats
                             {
                                 float startValue = Parsing.ParseFloat(split[4]);
                                 float endValue = split.Length > 5 ? Parsing.ParseFloat(split[5]) : startValue;
-                                timelineGroup?.Alpha.Add(easing, startTime, endTime, startValue, endValue);
+                                currentCommandsGroup?.AddAlpha(easing, startTime, endTime, startValue, endValue);
                                 break;
                             }
 
@@ -211,7 +212,7 @@ namespace osu.Game.Beatmaps.Formats
                             {
                                 float startValue = Parsing.ParseFloat(split[4]);
                                 float endValue = split.Length > 5 ? Parsing.ParseFloat(split[5]) : startValue;
-                                timelineGroup?.Scale.Add(easing, startTime, endTime, startValue, endValue);
+                                currentCommandsGroup?.AddScale(easing, startTime, endTime, startValue, endValue);
                                 break;
                             }
 
@@ -221,7 +222,7 @@ namespace osu.Game.Beatmaps.Formats
                                 float startY = Parsing.ParseFloat(split[5]);
                                 float endX = split.Length > 6 ? Parsing.ParseFloat(split[6]) : startX;
                                 float endY = split.Length > 7 ? Parsing.ParseFloat(split[7]) : startY;
-                                timelineGroup?.VectorScale.Add(easing, startTime, endTime, new Vector2(startX, startY), new Vector2(endX, endY));
+                                currentCommandsGroup?.AddVectorScale(easing, startTime, endTime, new Vector2(startX, startY), new Vector2(endX, endY));
                                 break;
                             }
 
@@ -229,7 +230,7 @@ namespace osu.Game.Beatmaps.Formats
                             {
                                 float startValue = Parsing.ParseFloat(split[4]);
                                 float endValue = split.Length > 5 ? Parsing.ParseFloat(split[5]) : startValue;
-                                timelineGroup?.Rotation.Add(easing, startTime, endTime, float.RadiansToDegrees(startValue), float.RadiansToDegrees(endValue));
+                                currentCommandsGroup?.AddRotation(easing, startTime, endTime, float.RadiansToDegrees(startValue), float.RadiansToDegrees(endValue));
                                 break;
                             }
 
@@ -239,8 +240,8 @@ namespace osu.Game.Beatmaps.Formats
                                 float startY = Parsing.ParseFloat(split[5]);
                                 float endX = split.Length > 6 ? Parsing.ParseFloat(split[6]) : startX;
                                 float endY = split.Length > 7 ? Parsing.ParseFloat(split[7]) : startY;
-                                timelineGroup?.X.Add(easing, startTime, endTime, startX, endX);
-                                timelineGroup?.Y.Add(easing, startTime, endTime, startY, endY);
+                                currentCommandsGroup?.AddX(easing, startTime, endTime, startX, endX);
+                                currentCommandsGroup?.AddY(easing, startTime, endTime, startY, endY);
                                 break;
                             }
 
@@ -248,7 +249,7 @@ namespace osu.Game.Beatmaps.Formats
                             {
                                 float startValue = Parsing.ParseFloat(split[4]);
                                 float endValue = split.Length > 5 ? Parsing.ParseFloat(split[5]) : startValue;
-                                timelineGroup?.X.Add(easing, startTime, endTime, startValue, endValue);
+                                currentCommandsGroup?.AddX(easing, startTime, endTime, startValue, endValue);
                                 break;
                             }
 
@@ -256,7 +257,7 @@ namespace osu.Game.Beatmaps.Formats
                             {
                                 float startValue = Parsing.ParseFloat(split[4]);
                                 float endValue = split.Length > 5 ? Parsing.ParseFloat(split[5]) : startValue;
-                                timelineGroup?.Y.Add(easing, startTime, endTime, startValue, endValue);
+                                currentCommandsGroup?.AddY(easing, startTime, endTime, startValue, endValue);
                                 break;
                             }
 
@@ -268,7 +269,7 @@ namespace osu.Game.Beatmaps.Formats
                                 float endRed = split.Length > 7 ? Parsing.ParseFloat(split[7]) : startRed;
                                 float endGreen = split.Length > 8 ? Parsing.ParseFloat(split[8]) : startGreen;
                                 float endBlue = split.Length > 9 ? Parsing.ParseFloat(split[9]) : startBlue;
-                                timelineGroup?.Colour.Add(easing, startTime, endTime,
+                                currentCommandsGroup?.AddColour(easing, startTime, endTime,
                                     new Color4(startRed / 255f, startGreen / 255f, startBlue / 255f, 1),
                                     new Color4(endRed / 255f, endGreen / 255f, endBlue / 255f, 1));
                                 break;
@@ -281,16 +282,16 @@ namespace osu.Game.Beatmaps.Formats
                                 switch (type)
                                 {
                                     case "A":
-                                        timelineGroup?.BlendingParameters.Add(easing, startTime, endTime, BlendingParameters.Additive,
+                                        currentCommandsGroup?.AddBlendingParameters(easing, startTime, endTime, BlendingParameters.Additive,
                                             startTime == endTime ? BlendingParameters.Additive : BlendingParameters.Inherit);
                                         break;
 
                                     case "H":
-                                        timelineGroup?.FlipH.Add(easing, startTime, endTime, true, startTime == endTime);
+                                        currentCommandsGroup?.AddFlipH(easing, startTime, endTime, true, startTime == endTime);
                                         break;
 
                                     case "V":
-                                        timelineGroup?.FlipV.Add(easing, startTime, endTime, true, startTime == endTime);
+                                        currentCommandsGroup?.AddFlipV(easing, startTime, endTime, true, startTime == endTime);
                                         break;
                                 }
 
