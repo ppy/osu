@@ -3,6 +3,7 @@
 
 #nullable disable
 
+using System;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -319,6 +320,30 @@ namespace osu.Game.Tests.Visual.Navigation
 
             toggleSkinEditor();
             AddUntilStep("nested input disabled", () => ((Player)Game.ScreenStack.CurrentScreen).ChildrenOfType<PassThroughInputManager>().All(manager => !manager.UseParentInput));
+        }
+
+        [Test]
+        public void TestSkinSavesOnChange()
+        {
+            advanceToSongSelect();
+            openSkinEditor();
+
+            Guid editedSkinId = Guid.Empty;
+            AddStep("save skin id", () => editedSkinId = Game.Dependencies.Get<SkinManager>().CurrentSkinInfo.Value.ID);
+            AddStep("add skinnable component", () =>
+            {
+                skinEditor.ChildrenOfType<SkinComponentToolbox.ToolboxComponentButton>().First().TriggerClick();
+            });
+
+            AddStep("change to triangles skin", () => Game.Dependencies.Get<SkinManager>().SetSkinFromConfiguration(SkinInfo.TRIANGLES_SKIN.ToString()));
+            AddUntilStep("components loaded", () => Game.ChildrenOfType<SkinComponentsContainer>().All(c => c.ComponentsLoaded));
+            // sort of implicitly relies on song select not being skinnable.
+            // TODO: revisit if the above ever changes
+            AddUntilStep("skin changed", () => !skinEditor.ChildrenOfType<SkinBlueprint>().Any());
+
+            AddStep("change back to modified skin", () => Game.Dependencies.Get<SkinManager>().SetSkinFromConfiguration(editedSkinId.ToString()));
+            AddUntilStep("components loaded", () => Game.ChildrenOfType<SkinComponentsContainer>().All(c => c.ComponentsLoaded));
+            AddUntilStep("changes saved", () => skinEditor.ChildrenOfType<SkinBlueprint>().Any());
         }
 
         private void advanceToSongSelect()

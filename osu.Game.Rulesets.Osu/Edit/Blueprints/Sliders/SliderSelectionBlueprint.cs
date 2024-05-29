@@ -403,7 +403,12 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
         public override MenuItem[] ContextMenuItems => new MenuItem[]
         {
-            new OsuMenuItem("Add control point", MenuItemType.Standard, () => addControlPoint(rightClickPosition)),
+            new OsuMenuItem("Add control point", MenuItemType.Standard, () =>
+            {
+                changeHandler?.BeginChange();
+                addControlPoint(rightClickPosition);
+                changeHandler?.EndChange();
+            }),
             new OsuMenuItem("Convert to stream", MenuItemType.Destructive, convertToStream),
         };
 

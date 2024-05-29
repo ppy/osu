@@ -28,6 +28,8 @@ namespace osu.Game.Rulesets.Edit
             new CheckTooShortAudioFiles(),
             new CheckAudioInVideo(),
             new CheckDelayedHitsounds(),
+            new CheckSongFormat(),
+            new CheckHitsoundsFormat(),
 
             // Files
             new CheckZeroByteFiles(),

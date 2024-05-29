@@ -13,6 +13,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Input.Events;
 using osu.Framework.Threading;
+using osu.Framework.Utils;
 using osu.Game.Graphics.Containers;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
@@ -111,7 +112,9 @@ namespace osu.Game.Screens.Menu
 
                 content.AddRange(loaded);
 
-                displayIndex = -1;
+                // Many users don't spend much time at the main menu, so let's randomise where in the
+                // carousel of available images we start at to give each a fair chance.
+                displayIndex = RNG.Next(0, images.NewValue.Images.Length) - 1;
                 showNext();
             }, (cancellationTokenSource ??= new CancellationTokenSource()).Token);
         }
