@@ -339,9 +339,10 @@ namespace osu.Game.Rulesets.Objects
                     //Coppied from PathApproximator.CircularArcToPiecewiseLinear
                     int subPoints = (2f * circularArcProperties.Radius <= 0.1f) ? 2 : Math.Max(2, (int)Math.Ceiling(circularArcProperties.ThetaRange / (2.0 * Math.Acos(1f - (0.1f / circularArcProperties.Radius)))));
 
-                    //if the amount of subpoints is int.MaxValue, causes an out of memory issue, so we default to bezier
-                    //this only occurs for very large radii, so the result should be essentially a straight line anyways
-                    if (subPoints == int.MaxValue)
+                    //theoretically can be int.MaxValue, but lets set this to a lower value anyways
+                    //1000 requires an arc length of over 20 thousand to surpass this limit, which should be safe.
+                    //See here for calculations https://www.desmos.com/calculator/210bwswkbb
+                    if (subPoints >= 1000)
                         break;
 
                     List<Vector2> subPath = PathApproximator.CircularArcToPiecewiseLinear(subControlPoints);
