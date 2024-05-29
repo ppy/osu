@@ -50,6 +50,8 @@ namespace osu.Game.Graphics.UserInterfaceV2
             Component.BorderColour = colours.Blue;
         }
 
+        public bool SelectAll() => Component.SelectAll();
+
         protected virtual OsuTextBox CreateTextBox() => new OsuTextBox();
 
         public override bool AcceptsFocus => true;
