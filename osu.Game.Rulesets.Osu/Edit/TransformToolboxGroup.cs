@@ -24,13 +24,6 @@ namespace osu.Game.Rulesets.Osu.Edit
         private EditorToolButton rotateButton = null!;
         private EditorToolButton scaleButton = null!;
 
-        private Bindable<bool> canRotatePlayfieldOrigin = null!;
-        private Bindable<bool> canRotateSelectionOrigin = null!;
-
-        private Bindable<bool> canScaleX = null!;
-        private Bindable<bool> canScaleY = null!;
-        private Bindable<bool> canScalePlayfieldOrigin = null!;
-
         public SelectionRotationHandler RotationHandler { get; init; } = null!;
         public OsuSelectionScaleHandler ScaleHandler { get; init; } = null!;
 
