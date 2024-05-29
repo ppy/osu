@@ -25,8 +25,7 @@ namespace osu.Game.Screens.Footer
 {
     public partial class ScreenFooterButton : OsuClickableContainer, IKeyBindingHandler<GlobalAction>
     {
-        // This should be 12 by design, but an extra allowance is added due to the corner radius specification.
-        private const float shear_width = 13.5f;
+        private const float shear = OsuGame.SHEAR;
 
         protected const int CORNER_RADIUS = 10;
         protected const int BUTTON_HEIGHT = 90;
@@ -34,7 +33,7 @@ namespace osu.Game.Screens.Footer
 
         public Bindable<Visibility> OverlayState = new Bindable<Visibility>();
 
-        protected static readonly Vector2 BUTTON_SHEAR = new Vector2(shear_width / BUTTON_HEIGHT, 0);
+        protected static readonly Vector2 BUTTON_SHEAR = new Vector2(shear, 0);
 
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; } = null!;
