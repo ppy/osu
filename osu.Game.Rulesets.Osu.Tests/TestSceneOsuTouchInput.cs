@@ -19,6 +19,7 @@ using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Configuration;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
+using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Rulesets.Osu.UI.Cursor;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Tests.Visual;
@@ -578,6 +579,24 @@ namespace osu.Game.Rulesets.Osu.Tests
             assertKeyCounter(1, 1);
         }
 
+        [Test]
+        public void TestTouchJudgedCircle()
+        {
+            addHitCircleAt(TouchSource.Touch1);
+            addHitCircleAt(TouchSource.Touch2);
+
+            beginTouch(TouchSource.Touch1);
+            endTouch(TouchSource.Touch1);
+
+            // Hold the second touch (this becomes the primary touch).
+            beginTouch(TouchSource.Touch2);
+
+            // Touch again on the first circle.
+            // Because it's been judged, the cursor should not move here.
+            beginTouch(TouchSource.Touch1);
+            checkPosition(TouchSource.Touch2);
+        }
+
         private void addHitCircleAt(TouchSource source)
         {
             AddStep($"Add circle at {source}", () =>
@@ -590,6 +609,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 {
                     Clock = new FramedClock(new ManualClock()),
                     Position = mainContent.ToLocalSpace(getSanePositionForSource(source)),
+                    CheckHittable = (_, _, _) => ClickAction.Hit
                 });
             });
         }

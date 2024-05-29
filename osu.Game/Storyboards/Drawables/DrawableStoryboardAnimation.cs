@@ -83,6 +83,7 @@ namespace osu.Game.Storyboards.Drawables
             Origin = animation.Origin;
             Position = animation.InitialPosition;
             Loop = animation.LoopType == AnimationLoopType.LoopForever;
+            Name = animation.Path;
 
             LifetimeStart = animation.StartTime;
             LifetimeEnd = animation.EndTimeForDisplay;

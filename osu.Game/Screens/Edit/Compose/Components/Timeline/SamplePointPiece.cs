@@ -142,7 +142,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             protected override void LoadComplete()
             {
                 base.LoadComplete();
-                ScheduleAfterChildren(() => GetContainingInputManager().ChangeFocus(volume));
+                ScheduleAfterChildren(() => GetContainingFocusManager().ChangeFocus(volume));
             }
 
             private static string? getCommonBank(IList<HitSampleInfo>[] relevantSamples) => relevantSamples.Select(GetBankValue).Distinct().Count() == 1 ? GetBankValue(relevantSamples.First()) : null;

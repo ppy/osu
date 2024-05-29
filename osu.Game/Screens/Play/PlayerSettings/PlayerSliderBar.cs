@@ -1,7 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
+using System.Numerics;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Graphics;
@@ -11,7 +11,7 @@ using osu.Game.Overlays.Settings;
 namespace osu.Game.Screens.Play.PlayerSettings
 {
     public partial class PlayerSliderBar<T> : SettingsSlider<T>
-        where T : struct, IEquatable<T>, IComparable<T>, IConvertible
+        where T : struct, INumber<T>, IMinMaxValue<T>
     {
         public RoundedSliderBar<T> Bar => (RoundedSliderBar<T>)Control;
 

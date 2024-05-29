@@ -580,7 +580,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             {
                 base.LoadComplete();
 
-                GetContainingInputManager().ChangeFocus(this);
+                GetContainingFocusManager().ChangeFocus(this);
                 SelectAll();
             }
         }

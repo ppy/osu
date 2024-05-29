@@ -177,7 +177,7 @@ namespace osu.Game.Rulesets.UI
             modAcronym.Text = value.Acronym;
             modIcon.Icon = value.Icon ?? FontAwesome.Solid.Question;
 
-            if (value.Icon is null)
+            if (value.Icon == null)
             {
                 modIcon.FadeOut();
                 modAcronym.FadeIn();

@@ -311,7 +311,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
             foreach (var splitPoint in controlPointsToSplitAt)
             {
-                if (splitPoint == controlPoints[0] || splitPoint == controlPoints[^1] || splitPoint.Type is null)
+                if (splitPoint == controlPoints[0] || splitPoint == controlPoints[^1] || splitPoint.Type == null)
                     continue;
 
                 // Split off the section of slider before this control point so the remaining control points to split are in the latter part of the slider.
@@ -403,7 +403,12 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
         public override MenuItem[] ContextMenuItems => new MenuItem[]
         {
-            new OsuMenuItem("Add control point", MenuItemType.Standard, () => addControlPoint(rightClickPosition)),
+            new OsuMenuItem("Add control point", MenuItemType.Standard, () =>
+            {
+                changeHandler?.BeginChange();
+                addControlPoint(rightClickPosition);
+                changeHandler?.EndChange();
+            }),
             new OsuMenuItem("Convert to stream", MenuItemType.Destructive, convertToStream),
         };
 
