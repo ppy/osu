@@ -6,12 +6,9 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
-using osu.Game.Online.Spectator;
 using osu.Game.Overlays;
+using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
-using osu.Game.Rulesets.Replays;
-using osu.Game.Rulesets.Scoring;
-using osu.Game.Scoring;
 using osu.Game.Screens.Play;
 using osu.Game.Users;
 
@@ -67,18 +64,13 @@ namespace osu.Game.Screens.Edit.GameplayTest
 
         private void markPreviousObjectsHit()
         {
-            var frame = new ReplayFrame { Header = new FrameHeader(new ScoreInfo(), new ScoreProcessorStatistics()) };
-
             foreach (var hitObject in enumerateHitObjects(DrawableRuleset.Objects, editorState.Time))
             {
                 var judgement = hitObject.Judgement;
 
-                frame.Header.Statistics.TryAdd(judgement.MaxResult, 0);
-                frame.Header.Statistics[judgement.MaxResult]++;
+                HealthProcessor.ApplyResult(new JudgementResult(hitObject, judgement) { Type = judgement.MaxResult });
+                ScoreProcessor.ApplyResult(new JudgementResult(hitObject, judgement) { Type = judgement.MaxResult });
             }
-
-            HealthProcessor.ResetFromReplayFrame(frame);
-            ScoreProcessor.ResetFromReplayFrame(frame);
 
             static IEnumerable<HitObject> enumerateHitObjects(IEnumerable<HitObject> hitObjects, double cutoffTime)
             {
