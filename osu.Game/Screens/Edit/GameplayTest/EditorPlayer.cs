@@ -74,12 +74,16 @@ namespace osu.Game.Screens.Edit.GameplayTest
 
             static IEnumerable<HitObject> enumerateHitObjects(IEnumerable<HitObject> hitObjects, double cutoffTime)
             {
-                foreach (var hitObject in hitObjects.Where(h => h.GetEndTime() < cutoffTime))
+                foreach (var hitObject in hitObjects)
                 {
                     foreach (var nested in enumerateHitObjects(hitObject.NestedHitObjects, cutoffTime))
-                        yield return nested;
+                    {
+                        if (nested.GetEndTime() < cutoffTime)
+                            yield return nested;
+                    }
 
-                    yield return hitObject;
+                    if (hitObject.GetEndTime() < cutoffTime)
+                        yield return hitObject;
                 }
             }
         }
