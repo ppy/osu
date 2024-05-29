@@ -248,8 +248,6 @@ namespace osu.Game.Rulesets.Osu.Objects
 
             if (TailCircle != null)
                 TailCircle.Position = EndPosition;
-
-            // Positions of other nested hitobjects are not updated
         }
 
         protected void UpdateNestedSamples()
