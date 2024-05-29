@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
         private int countOk;
         private int countMeh;
         private int countMiss;
-        private double? estimatedUr;
+        private double? estimatedUnstableRate;
 
         private double effectiveMissCount;
 
@@ -36,7 +36,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             countOk = score.Statistics.GetValueOrDefault(HitResult.Ok);
             countMeh = score.Statistics.GetValueOrDefault(HitResult.Meh);
             countMiss = score.Statistics.GetValueOrDefault(HitResult.Miss);
-            estimatedUr = computeDeviationUpperBound(taikoAttributes) * 10;
+            estimatedUnstableRate = computeDeviationUpperBound(taikoAttributes) * 10;
 
             // The effectiveMissCount is calculated by gaining a ratio for totalSuccessfulHits and increasing the miss penalty for shorter object counts lower than 1000.
             if (totalSuccessfulHits > 0)
@@ -66,7 +66,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
                 Difficulty = difficultyValue,
                 Accuracy = accuracyValue,
                 EffectiveMissCount = effectiveMissCount,
-                EstimatedUr = estimatedUr,
+                EstimatedUnstableRate = estimatedUnstableRate,
                 Total = totalValue
             };
         }
@@ -92,18 +92,18 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             if (score.Mods.Any(m => m is ModFlashlight<TaikoHitObject>))
                 difficultyValue *= 1.050 * lengthBonus;
 
-            if (estimatedUr == null)
+            if (estimatedUnstableRate == null)
                 return 0;
 
-            return difficultyValue * Math.Pow(SpecialFunctions.Erf(400 / (Math.Sqrt(2) * estimatedUr.Value)), 2.0);
+            return difficultyValue * Math.Pow(SpecialFunctions.Erf(400 / (Math.Sqrt(2) * estimatedUnstableRate.Value)), 2.0);
         }
 
         private double computeAccuracyValue(ScoreInfo score, TaikoDifficultyAttributes attributes, bool isConvert)
         {
-            if (attributes.GreatHitWindow <= 0 || estimatedUr == null)
+            if (attributes.GreatHitWindow <= 0 || estimatedUnstableRate == null)
                 return 0;
 
-            double accuracyValue = Math.Pow(70 / estimatedUr.Value, 1.1) * Math.Pow(attributes.StarRating, 0.4) * 100.0;
+            double accuracyValue = Math.Pow(70 / estimatedUnstableRate.Value, 1.1) * Math.Pow(attributes.StarRating, 0.4) * 100.0;
 
             double lengthBonus = Math.Min(1.15, Math.Pow(totalHits / 1500.0, 0.3));
 
