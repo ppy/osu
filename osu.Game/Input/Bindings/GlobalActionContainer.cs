@@ -142,6 +142,7 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(new[] { InputKey.Control, InputKey.Shift, InputKey.MouseWheelRight }, GlobalAction.EditorCyclePreviousBeatSnapDivisor),
             new KeyBinding(new[] { InputKey.Control, InputKey.Shift, InputKey.MouseWheelLeft }, GlobalAction.EditorCycleNextBeatSnapDivisor),
             new KeyBinding(new[] { InputKey.Control, InputKey.R }, GlobalAction.EditorToggleRotateControl),
+            new KeyBinding(new[] { InputKey.Control, InputKey.E }, GlobalAction.EditorToggleScaleControl),
         };
 
         private static IEnumerable<KeyBinding> inGameKeyBindings => new[]
@@ -410,6 +411,9 @@ namespace osu.Game.Input.Bindings
 
         [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.EditorToggleRotateControl))]
         EditorToggleRotateControl,
+
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.EditorToggleScaleControl))]
+        EditorToggleScaleControl,
 
         [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.IncreaseOffset))]
         IncreaseOffset,

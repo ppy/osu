@@ -78,11 +78,15 @@ namespace osu.Game.Rulesets.Osu.Edit
         {
             base.LoadComplete();
 
-            ScheduleAfterChildren(() => angleInput.TakeFocus());
+            ScheduleAfterChildren(() =>
+            {
+                angleInput.TakeFocus();
+                angleInput.SelectAll();
+            });
             angleInput.Current.BindValueChanged(angle => rotationInfo.Value = rotationInfo.Value with { Degrees = angle.NewValue });
             rotationOrigin.Items.First().Select();
 
-            rotationHandler.CanRotateSelectionOrigin.BindValueChanged(e =>
+            rotationHandler.CanRotateAroundSelectionOrigin.BindValueChanged(e =>
             {
                 selectionCentreButton.Selected.Disabled = !e.NewValue;
             }, true);
