@@ -163,7 +163,7 @@ namespace osu.Game.Rulesets.Osu.Edit
                 return;
 
             const float max_scale = 10;
-            var scale = scaleHandler.GetClampedScale(new Vector2(max_scale), getOriginPosition(scaleInfo.Value));
+            var scale = scaleHandler.ClampScaleToPlayfieldBounds(new Vector2(max_scale), getOriginPosition(scaleInfo.Value));
 
             if (!scaleInfo.Value.XAxis)
                 scale.X = max_scale;
