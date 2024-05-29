@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Configuration;
@@ -14,10 +12,10 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
     public partial class DrawableOsuJudgement : DrawableJudgement
     {
-        internal SkinnableLighting Lighting { get; private set; }
+        internal SkinnableLighting Lighting { get; private set; } = null!;
 
         [Resolved]
-        private OsuConfigManager config { get; set; }
+        private OsuConfigManager config { get; set; } = null!;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -38,19 +36,13 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             Lighting.ResetAnimation();
             Lighting.SetColourFrom(JudgedObject, Result);
-
-            if (JudgedObject is DrawableOsuHitObject osuObject)
-            {
-                Position = osuObject.ToSpaceOfOtherDrawable(osuObject.OriginPosition, Parent!);
-                Scale = new Vector2(osuObject.HitObject.Scale);
-            }
         }
 
         protected override void Update()
         {
             base.Update();
 
-            if (JudgedObject is DrawableOsuHitObject osuObject && Parent != null && osuObject.HitObject != null)
+            if (JudgedObject is DrawableOsuHitObject osuObject && JudgedObject.IsInUse)
             {
                 Position = osuObject.ToSpaceOfOtherDrawable(osuObject.OriginPosition, Parent!);
                 Scale = new Vector2(osuObject.HitObject.Scale);
