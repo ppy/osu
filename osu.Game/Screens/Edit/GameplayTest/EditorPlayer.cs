@@ -69,9 +69,9 @@ namespace osu.Game.Screens.Edit.GameplayTest
         {
             var frame = new ReplayFrame { Header = new FrameHeader(new ScoreInfo(), new ScoreProcessorStatistics()) };
 
-            foreach (var hitObject in enumerateHitObjects(DrawableRuleset.Objects.Where(h => h.StartTime < editorState.Time)))
+            foreach (var hitObject in enumerateHitObjects(DrawableRuleset.Objects, editorState.Time))
             {
-                var judgement = hitObject.CreateJudgement();
+                var judgement = hitObject.Judgement;
 
                 frame.Header.Statistics.TryAdd(judgement.MaxResult, 0);
                 frame.Header.Statistics[judgement.MaxResult]++;
@@ -80,11 +80,11 @@ namespace osu.Game.Screens.Edit.GameplayTest
             HealthProcessor.ResetFromReplayFrame(frame);
             ScoreProcessor.ResetFromReplayFrame(frame);
 
-            static IEnumerable<HitObject> enumerateHitObjects(IEnumerable<HitObject> hitObjects)
+            static IEnumerable<HitObject> enumerateHitObjects(IEnumerable<HitObject> hitObjects, double cutoffTime)
             {
-                foreach (var hitObject in hitObjects)
+                foreach (var hitObject in hitObjects.Where(h => h.GetEndTime() < cutoffTime))
                 {
-                    foreach (var nested in enumerateHitObjects(hitObject.NestedHitObjects))
+                    foreach (var nested in enumerateHitObjects(hitObject.NestedHitObjects, cutoffTime))
                         yield return nested;
 
                     yield return hitObject;
