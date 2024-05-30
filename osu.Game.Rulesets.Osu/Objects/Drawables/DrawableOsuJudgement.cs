@@ -17,6 +17,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         [Resolved]
         private OsuConfigManager config { get; set; } = null!;
 
+        private bool positionTransferred;
+
         [BackgroundDependencyLoader]
         private void load()
         {
@@ -36,16 +38,20 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             Lighting.ResetAnimation();
             Lighting.SetColourFrom(JudgedObject, Result);
+
+            positionTransferred = false;
         }
 
         protected override void Update()
         {
             base.Update();
 
-            if (JudgedObject is DrawableOsuHitObject osuObject && JudgedObject.IsInUse)
+            if (!positionTransferred && JudgedObject is DrawableOsuHitObject osuObject && JudgedObject.IsInUse)
             {
                 Position = osuObject.ToSpaceOfOtherDrawable(osuObject.OriginPosition, Parent!);
                 Scale = new Vector2(osuObject.HitObject.Scale);
+
+                positionTransferred = true;
             }
         }
 
