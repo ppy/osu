@@ -17,12 +17,9 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Input.Bindings;
-using osu.Framework.Input.Events;
 using osu.Framework.Screens;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
-using osu.Game.Input.Bindings;
 using osu.Game.Online.API;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
@@ -530,22 +527,6 @@ namespace osu.Game.Screens.OnlinePlay.Match
         /// </summary>
         /// <param name="room">The room to change the settings of.</param>
         protected abstract RoomSettingsOverlay CreateRoomSettingsOverlay(Room room);
-
-        public partial class UserModSelectButton : PurpleRoundedButton, IKeyBindingHandler<GlobalAction>
-        {
-            public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
-            {
-                if (e.Action == GlobalAction.ToggleModSelection && !e.Repeat)
-                {
-                    TriggerClick();
-                    return true;
-                }
-
-                return false;
-            }
-
-            public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e) { }
-        }
 
         protected override void Dispose(bool isDisposing)
         {
