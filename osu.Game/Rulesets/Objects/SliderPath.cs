@@ -332,16 +332,15 @@ namespace osu.Game.Rulesets.Objects
 
                     CircularArcProperties circularArcProperties = new CircularArcProperties(subControlPoints);
 
-                    //if false, we'll end up breaking anyways when calculating subPath
+                    // `PathApproximator` will already internally revert to B-spline if the arc isn't valid.
                     if (!circularArcProperties.IsValid)
                         break;
 
-                    //Coppied from PathApproximator.CircularArcToPiecewiseLinear
+                    // taken from https://github.com/ppy/osu-framework/blob/1201e641699a1d50d2f6f9295192dad6263d5820/osu.Framework/Utils/PathApproximator.cs#L181-L186
                     int subPoints = (2f * circularArcProperties.Radius <= 0.1f) ? 2 : Math.Max(2, (int)Math.Ceiling(circularArcProperties.ThetaRange / (2.0 * Math.Acos(1f - (0.1f / circularArcProperties.Radius)))));
 
-                    //theoretically can be int.MaxValue, but lets set this to a lower value anyways
-                    //1000 requires an arc length of over 20 thousand to surpass this limit, which should be safe.
-                    //See here for calculations https://www.desmos.com/calculator/210bwswkbb
+                    // 1000 subpoints requires an arc length of at least ~120 thousand to occur
+                    // See here for calculations https://www.desmos.com/calculator/umj6jvmcz7
                     if (subPoints >= 1000)
                         break;
 
