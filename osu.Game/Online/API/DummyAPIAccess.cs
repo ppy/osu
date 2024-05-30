@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Bindables;
@@ -84,6 +85,13 @@ namespace osu.Game.Online.API
             {
                 if (HandleRequest?.Invoke(request) != true)
                 {
+                    // Noisy so let's silently allow these to succeed.
+                    if (request is ChatAckRequest ack)
+                    {
+                        ack.TriggerSuccess(new ChatAckResponse());
+                        return;
+                    }
+
                     request.Fail(new InvalidOperationException($@"{nameof(DummyAPIAccess)} cannot process this request."));
                 }
             });
