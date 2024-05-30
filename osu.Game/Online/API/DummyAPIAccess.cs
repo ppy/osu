@@ -84,6 +84,13 @@ namespace osu.Game.Online.API
             {
                 if (HandleRequest?.Invoke(request) != true)
                 {
+                    // Noisy so let's silently allow these to succeed.
+                    if (request is ChatAckRequest ack)
+                    {
+                        ack.TriggerSuccess(new ChatAckResponse());
+                        return;
+                    }
+
                     request.Fail(new InvalidOperationException($@"{nameof(DummyAPIAccess)} cannot process this request."));
                 }
             });
