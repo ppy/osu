@@ -10,6 +10,7 @@ using osu.Framework.Platform;
 using osu.Game.Configuration;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Dialog;
+using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Online.Chat
 {
@@ -44,8 +45,8 @@ namespace osu.Game.Online.Chat
         {
             public ExternalLinkDialog(string url, Action openExternalLinkAction, Action copyExternalLinkAction)
             {
-                HeaderText = "Just checking...";
-                BodyText = $"You are about to leave osu! and open the following link in a web browser:\n\n{url}";
+                HeaderText = "You are leaving osu!";
+                BodyText = $"Are you sure you want to open the following link in a web browser:\n\n{url}";
 
                 Icon = FontAwesome.Solid.ExclamationTriangle;
 
@@ -53,17 +54,17 @@ namespace osu.Game.Online.Chat
                 {
                     new PopupDialogOkButton
                     {
-                        Text = @"Yes. Go for it.",
+                        Text = @"Open in browser",
                         Action = openExternalLinkAction
                     },
                     new PopupDialogCancelButton
                     {
-                        Text = @"Copy URL to the clipboard instead.",
+                        Text = @"Copy URL to the clipboard",
                         Action = copyExternalLinkAction
                     },
                     new PopupDialogCancelButton
                     {
-                        Text = @"No! Abort mission!"
+                        Text = CommonStrings.ButtonsCancel,
                     },
                 };
             }
