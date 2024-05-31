@@ -30,7 +30,7 @@ namespace osu.Game.Overlays.Dialog
 
         protected DangerousActionDialog()
         {
-            HeaderText = DialogStrings.DialogCautionHeader;
+            HeaderText = DialogStrings.Caution;
 
             Icon = FontAwesome.Regular.TrashAlt;
 
@@ -38,7 +38,7 @@ namespace osu.Game.Overlays.Dialog
             {
                 new PopupDialogDangerousButton
                 {
-                    Text = DialogStrings.DialogConfirm,
+                    Text = DialogStrings.Confirm,
                     Action = () => DangerousAction?.Invoke()
                 },
                 new PopupDialogCancelButton
