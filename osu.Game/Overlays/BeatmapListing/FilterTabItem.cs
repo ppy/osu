@@ -5,6 +5,8 @@
 
 using System;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.UserInterface;
@@ -24,17 +26,17 @@ namespace osu.Game.Overlays.BeatmapListing
 
         private OsuSpriteText text;
 
+        protected Sample SelectSample { get; private set; } = null!;
+
         public FilterTabItem(T value)
             : base(value)
         {
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(AudioManager audio)
         {
             AutoSizeAxes = Axes.Both;
-            Anchor = Anchor.BottomLeft;
-            Origin = Anchor.BottomLeft;
             AddRangeInternal(new Drawable[]
             {
                 text = new OsuSpriteText
@@ -42,10 +44,12 @@ namespace osu.Game.Overlays.BeatmapListing
                     Font = OsuFont.GetFont(size: 13, weight: FontWeight.Regular),
                     Text = LabelFor(Value)
                 },
-                new HoverClickSounds(HoverSampleSet.TabSelect)
+                new HoverSounds(HoverSampleSet.TabSelect)
             });
 
             Enabled.Value = true;
+
+            SelectSample = audio.Samples.Get(@"UI/tabselect-select");
         }
 
         protected override void LoadComplete()
@@ -72,6 +76,8 @@ namespace osu.Game.Overlays.BeatmapListing
         protected override void OnActivated() => UpdateState();
 
         protected override void OnDeactivated() => UpdateState();
+
+        protected override void OnActivatedByUser() => SelectSample.Play();
 
         /// <summary>
         /// Returns the label text to be used for the supplied <paramref name="value"/>.

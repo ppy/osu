@@ -22,8 +22,6 @@ namespace osu.Game.Overlays.Mods
     {
         protected const float PADDING = 14;
 
-        public const float SHEAR = 0.2f;
-
         [Cached]
         protected readonly OverlayColourProvider ColourProvider;
 

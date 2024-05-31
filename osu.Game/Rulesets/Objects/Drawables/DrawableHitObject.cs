@@ -11,10 +11,11 @@ using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.ListExtensions;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Primitives;
+using osu.Framework.Lists;
 using osu.Framework.Threading;
 using osu.Framework.Utils;
 using osu.Game.Audio;
@@ -65,7 +66,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         public virtual IEnumerable<HitSampleInfo> GetSamples() => HitObject.Samples;
 
         private readonly List<DrawableHitObject> nestedHitObjects = new List<DrawableHitObject>();
-        public IReadOnlyList<DrawableHitObject> NestedHitObjects => nestedHitObjects;
+        public SlimReadOnlyListWrapper<DrawableHitObject> NestedHitObjects => nestedHitObjects.AsSlimReadOnly();
 
         /// <summary>
         /// Whether this object should handle any user input events.
@@ -630,7 +631,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
         #endregion
 
-        public override bool UpdateSubTreeMasking(Drawable source, RectangleF maskingBounds) => false;
+        public override bool UpdateSubTreeMasking() => false;
 
         protected override void UpdateAfterChildren()
         {
@@ -770,7 +771,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         private void ensureEntryHasResult()
         {
             Debug.Assert(Entry != null);
-            Entry.Result ??= CreateResult(HitObject.CreateJudgement())
+            Entry.Result ??= CreateResult(HitObject.Judgement)
                              ?? throw new InvalidOperationException($"{GetType().ReadableName()} must provide a {nameof(JudgementResult)} through {nameof(CreateResult)}.");
         }
 

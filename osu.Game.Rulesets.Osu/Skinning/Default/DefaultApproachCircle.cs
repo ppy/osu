@@ -25,8 +25,9 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
         {
             Texture = textures.Get(@"Gameplay/osu/approachcircle").WithMaximumSize(OsuHitObject.OBJECT_DIMENSIONS * 2);
 
-            // account for the sprite being used for the default approach circle being taken from stable,
-            // when hitcircles have 5px padding on each size. this should be removed if we update the sprite.
+            // In triangles and argon skins, we expanded hitcircles to take up the full 128 px which are clickable,
+            // but still use the old approach circle sprite. To make it feel correct (ie. disappear as it collides
+            // with the hitcircle, *not when it overlaps the border*) we need to expand it slightly.
             Scale = new Vector2(128 / 118f);
         }
 

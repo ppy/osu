@@ -10,9 +10,9 @@ namespace osu.Game.Localisation
         private const string prefix = @"osu.Game.Resources.Localisation.DeleteConfirmationDialog";
 
         /// <summary>
-        /// "Confirm deletion of"
+        /// "Caution"
         /// </summary>
-        public static LocalisableString HeaderText => new TranslatableString(getKey(@"header_text"), @"Confirm deletion of");
+        public static LocalisableString HeaderText => new TranslatableString(getKey(@"header_text"), @"Caution");
 
         /// <summary>
         /// "Yes. Go for it."
