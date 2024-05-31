@@ -173,6 +173,9 @@ namespace osu.Game.Screens.Menu
 
             private Sprite flash = null!;
 
+            /// <remarks>
+            /// Overridden as a safety for <see cref="openUrlAction"/> functioning correctly.
+            /// </remarks>
             public override bool IsPresent => base.IsPresent || Scheduler.HasPendingTasks;
 
             private ScheduledDelegate? openUrlAction;
