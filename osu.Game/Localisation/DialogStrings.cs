@@ -5,14 +5,14 @@ using osu.Framework.Localisation;
 
 namespace osu.Game.Localisation
 {
-    public static class DeleteConfirmationDialogStrings
+    public static class DialogStrings
     {
-        private const string prefix = @"osu.Game.Resources.Localisation.DeleteConfirmationDialog";
+        private const string prefix = @"osu.Game.Resources.Localisation.Dialog";
 
         /// <summary>
         /// "Caution"
         /// </summary>
-        public static LocalisableString HeaderText => new TranslatableString(getKey(@"header_text"), @"Caution");
+        public static LocalisableString Caution => new TranslatableString(getKey(@"header_text"), @"Caution");
 
         /// <summary>
         /// "Yes. Go for it."
