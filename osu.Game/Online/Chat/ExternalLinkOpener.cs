@@ -46,7 +46,7 @@ namespace osu.Game.Online.Chat
         {
             public ExternalLinkDialog(string url, Action openExternalLinkAction, Action copyExternalLinkAction)
             {
-                HeaderText = DeleteConfirmationDialogStrings.HeaderText;
+                HeaderText = DialogStrings.Caution;
                 BodyText = $"Are you sure you want to open the following link in a web browser?\n\n{url}";
 
                 Icon = FontAwesome.Solid.ExclamationTriangle;
