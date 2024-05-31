@@ -485,10 +485,19 @@ namespace osu.Game
             }
         });
 
-        public void OpenUrlExternally(string url, bool bypassExternalUrlWarning = false) => waitForReady(() => externalLinkOpener, _ =>
+        public void OpenUrlExternally(string url, bool forceBypassExternalUrlWarning = false) => waitForReady(() => externalLinkOpener, _ =>
         {
+            bool isTrustedDomain;
+
             if (url.StartsWith('/'))
-                url = $"{API.APIEndpointUrl}{url}";
+            {
+                url = $"{API.WebsiteRootUrl}{url}";
+                isTrustedDomain = true;
+            }
+            else
+            {
+                isTrustedDomain = url.StartsWith(API.WebsiteRootUrl, StringComparison.Ordinal);
+            }
 
             if (!url.CheckIsValidUrl())
             {
@@ -500,7 +509,7 @@ namespace osu.Game
                 return;
             }
 
-            externalLinkOpener.OpenUrlExternally(url, bypassExternalUrlWarning);
+            externalLinkOpener.OpenUrlExternally(url, forceBypassExternalUrlWarning || isTrustedDomain);
         });
 
         /// <summary>
