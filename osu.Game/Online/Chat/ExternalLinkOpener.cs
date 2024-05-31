@@ -8,9 +8,10 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Platform;
 using osu.Game.Configuration;
+using osu.Game.Localisation;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Dialog;
-using osu.Game.Resources.Localisation.Web;
+using CommonStrings = osu.Game.Resources.Localisation.Web.CommonStrings;
 
 namespace osu.Game.Online.Chat
 {
@@ -45,7 +46,7 @@ namespace osu.Game.Online.Chat
         {
             public ExternalLinkDialog(string url, Action openExternalLinkAction, Action copyExternalLinkAction)
             {
-                HeaderText = "You are leaving osu!";
+                HeaderText = DeleteConfirmationDialogStrings.HeaderText;
                 BodyText = $"Are you sure you want to open the following link in a web browser?\n\n{url}";
 
                 Icon = FontAwesome.Solid.ExclamationTriangle;
