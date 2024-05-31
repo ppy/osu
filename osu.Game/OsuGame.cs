@@ -496,7 +496,7 @@ namespace osu.Game
             }
             else
             {
-                isTrustedDomain = url.StartsWith(API.APIEndpointUrl, StringComparison.Ordinal);
+                isTrustedDomain = url.StartsWith(API.WebsiteRootUrl, StringComparison.Ordinal);
             }
 
             if (!url.CheckIsValidUrl())
