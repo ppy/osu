@@ -63,8 +63,12 @@ namespace osu.Game.Graphics
                 case ScoreRank.C:
                     return Color4Extensions.FromHex(@"ff8e5d");
 
-                default:
+                case ScoreRank.D:
                     return Color4Extensions.FromHex(@"ff5a5a");
+
+                case ScoreRank.F:
+                default:
+                    return Color4Extensions.FromHex(@"3f3f3f");
             }
         }
 

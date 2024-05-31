@@ -113,9 +113,9 @@ namespace osu.Game.Rulesets.Difficulty
         private IEnumerable<HitResult> getPerfectHitResults(HitObject hitObject)
         {
             foreach (HitObject nested in hitObject.NestedHitObjects)
-                yield return nested.CreateJudgement().MaxResult;
+                yield return nested.Judgement.MaxResult;
 
-            yield return hitObject.CreateJudgement().MaxResult;
+            yield return hitObject.Judgement.MaxResult;
         }
     }
 }

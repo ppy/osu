@@ -109,7 +109,10 @@ namespace osu.Game.Screens.Play
 
         private readonly List<Drawable> hideTargets;
 
-        private readonly Drawable playfieldComponents;
+        /// <summary>
+        /// The container for skin components attached to <see cref="SkinComponentsContainerLookup.TargetArea.Playfield"/>
+        /// </summary>
+        internal readonly Drawable PlayfieldSkinLayer;
 
         public HUDOverlay([CanBeNull] DrawableRuleset drawableRuleset, IReadOnlyList<Mod> mods, bool alwaysShowLeaderboard = true)
         {
@@ -129,7 +132,7 @@ namespace osu.Game.Screens.Play
                 drawableRuleset != null
                     ? (rulesetComponents = new HUDComponentsContainer(drawableRuleset.Ruleset.RulesetInfo) { AlwaysPresent = true, })
                     : Empty(),
-                playfieldComponents = drawableRuleset != null
+                PlayfieldSkinLayer = drawableRuleset != null
                     ? new SkinComponentsContainer(new SkinComponentsContainerLookup(SkinComponentsContainerLookup.TargetArea.Playfield, drawableRuleset.Ruleset.RulesetInfo)) { AlwaysPresent = true, }
                     : Empty(),
                 topRightElements = new FillFlowContainer
@@ -171,7 +174,7 @@ namespace osu.Game.Screens.Play
                 },
             };
 
-            hideTargets = new List<Drawable> { mainComponents, playfieldComponents, topRightElements };
+            hideTargets = new List<Drawable> { mainComponents, topRightElements };
 
             if (rulesetComponents != null)
                 hideTargets.Add(rulesetComponents);
@@ -247,10 +250,10 @@ namespace osu.Game.Screens.Play
             {
                 Quad playfieldScreenSpaceDrawQuad = drawableRuleset.Playfield.SkinnableComponentScreenSpaceDrawQuad;
 
-                playfieldComponents.Position = ToLocalSpace(playfieldScreenSpaceDrawQuad.TopLeft);
-                playfieldComponents.Width = (ToLocalSpace(playfieldScreenSpaceDrawQuad.TopRight) - ToLocalSpace(playfieldScreenSpaceDrawQuad.TopLeft)).Length;
-                playfieldComponents.Height = (ToLocalSpace(playfieldScreenSpaceDrawQuad.BottomLeft) - ToLocalSpace(playfieldScreenSpaceDrawQuad.TopLeft)).Length;
-                playfieldComponents.Rotation = drawableRuleset.Playfield.Rotation;
+                PlayfieldSkinLayer.Position = ToLocalSpace(playfieldScreenSpaceDrawQuad.TopLeft);
+                PlayfieldSkinLayer.Width = (ToLocalSpace(playfieldScreenSpaceDrawQuad.TopRight) - ToLocalSpace(playfieldScreenSpaceDrawQuad.TopLeft)).Length;
+                PlayfieldSkinLayer.Height = (ToLocalSpace(playfieldScreenSpaceDrawQuad.BottomLeft) - ToLocalSpace(playfieldScreenSpaceDrawQuad.TopLeft)).Length;
+                PlayfieldSkinLayer.Rotation = drawableRuleset.Playfield.Rotation;
             }
 
             float? lowestTopScreenSpaceLeft = null;
@@ -258,14 +261,10 @@ namespace osu.Game.Screens.Play
 
             Vector2? highestBottomScreenSpace = null;
 
-            foreach (var element in mainComponents.Components)
-                processDrawable(element);
+            processDrawables(mainComponents);
 
             if (rulesetComponents != null)
-            {
-                foreach (var element in rulesetComponents.Components)
-                    processDrawable(element);
-            }
+                processDrawables(rulesetComponents);
 
             if (lowestTopScreenSpaceRight.HasValue)
                 topRightElements.Y = MathHelper.Clamp(ToLocalSpace(new Vector2(0, lowestTopScreenSpaceRight.Value)).Y, 0, DrawHeight - topRightElements.DrawHeight);
@@ -281,6 +280,14 @@ namespace osu.Game.Screens.Play
                 bottomRightElements.Y = BottomScoringElementsHeight = -MathHelper.Clamp(DrawHeight - ToLocalSpace(highestBottomScreenSpace.Value).Y, 0, DrawHeight - bottomRightElements.DrawHeight);
             else
                 bottomRightElements.Y = 0;
+
+            void processDrawables(SkinComponentsContainer components)
+            {
+                // Avoid using foreach due to missing GetEnumerator implementation.
+                // See https://github.com/ppy/osu-framework/blob/e10051e6643731e393b09de40a3a3d209a545031/osu.Framework/Bindables/IBindableList.cs#L41-L44.
+                for (int i = 0; i < components.Components.Count; i++)
+                    processDrawable(components.Components[i]);
+            }
 
             void processDrawable(ISerialisableDrawable element)
             {

@@ -140,10 +140,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
         private void onIsHittingChanged(ValueChangedEvent<bool> isHitting)
         {
             if (bodySprite is TextureAnimation bodyAnimation)
-            {
-                bodyAnimation.GotoFrame(0);
                 bodyAnimation.IsPlaying = isHitting.NewValue;
-            }
 
             if (lightContainer == null)
                 return;
@@ -219,6 +216,9 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
         {
             base.Update();
 
+            if (!isHitting.Value)
+                (bodySprite as TextureAnimation)?.GotoFrame(0);
+
             if (holdNote.Body.HasHoldBreak)
                 missFadeTime.Value = holdNote.Body.Result.TimeAbsolute;
 
@@ -243,7 +243,9 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
 
                         bodySprite.FillMode = FillMode.Stretch;
                         // i dunno this looks about right??
-                        bodySprite.Scale = new Vector2(1, scaleDirection * 32800 / sprite.DrawHeight);
+                        // the guard against zero draw height is intended for zero-length hold notes. yes, such cases have been spotted in the wild.
+                        if (sprite.DrawHeight > 0)
+                            bodySprite.Scale = new Vector2(1, scaleDirection * 32800 / sprite.DrawHeight);
                     }
 
                     break;

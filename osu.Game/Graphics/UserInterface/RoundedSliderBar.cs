@@ -2,7 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using osuTK;
+using System.Numerics;
 using osuTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
@@ -11,11 +11,12 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Game.Overlays;
+using Vector2 = osuTK.Vector2;
 
 namespace osu.Game.Graphics.UserInterface
 {
     public partial class RoundedSliderBar<T> : OsuSliderBar<T>
-        where T : struct, IEquatable<T>, IComparable<T>, IConvertible
+        where T : struct, INumber<T>, IMinMaxValue<T>
     {
         protected readonly Nub Nub;
         protected readonly Box LeftBox;
