@@ -69,6 +69,9 @@ namespace osu.Game.Screens.OnlinePlay
         public Bindable<PlaylistAggregateScore> UserScore { get; private set; }
 
         [Resolved(typeof(Room))]
+        protected Bindable<DateTimeOffset?> StartDate { get; private set; }
+
+        [Resolved(typeof(Room))]
         protected Bindable<DateTimeOffset?> EndDate { get; private set; }
 
         [Resolved(typeof(Room))]
