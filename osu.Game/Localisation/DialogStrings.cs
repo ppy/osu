@@ -7,7 +7,7 @@ namespace osu.Game.Localisation
 {
     public static class DialogStrings
     {
-        private const string prefix = @"osu.Game.Resources.Localisation.DialogStrings";
+        private const string prefix = @"osu.Game.Resources.Localisation.Dialog";
 
         /// <summary>
         /// "Caution"
