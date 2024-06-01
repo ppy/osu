@@ -129,10 +129,10 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
         protected override void OnDragEnd(DragEndEvent e)
         {
-            if (isDragging)
-            {
-                editorBeatmap?.EndChange();
-            }
+            if (!isDragging) return;
+
+            isDragging = false;
+            editorBeatmap?.EndChange();
         }
 
         /// <summary>
