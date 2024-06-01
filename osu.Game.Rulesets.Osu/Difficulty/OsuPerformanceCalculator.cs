@@ -100,7 +100,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double approachRateFactor = 0.0;
             if (attributes.ApproachRate > 10.33)
-                approachRateFactor = 0.25 * (attributes.ApproachRate - 10.33);
+                approachRateFactor = 0.15 * (attributes.ApproachRate - 10.33);
             else if (attributes.ApproachRate < 8.0)
                 approachRateFactor = 0.05 * (8.0 - attributes.ApproachRate);
 
@@ -153,7 +153,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double approachRateFactor = 0.0;
             if (attributes.ApproachRate > 10.33)
-                approachRateFactor = 0.25 * (attributes.ApproachRate - 10.33);
+                approachRateFactor = 0.15 * (attributes.ApproachRate - 10.33);
 
             speedValue *= 1.0 + approachRateFactor * lengthBonus; // Buff for longer maps with high AR.
 
@@ -217,6 +217,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             if (score.Mods.Any(m => m is OsuModFlashlight))
                 accuracyValue *= 1.02;
+            
+            // Scale accuracy by approach rate
+            accuracyValue *= 1 / (1 + Math.Exp((attributes.ApproachRate < 10.33 ? 4 : 8) * (attributes.ApproachRate - 10.33))) + 1;
 
             return accuracyValue;
         }
