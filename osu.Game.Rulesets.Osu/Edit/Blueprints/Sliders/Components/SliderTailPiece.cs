@@ -131,8 +131,37 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         {
             if (!isDragging) return;
 
+            trimExcessControlPoints(Slider.Path);
+
             isDragging = false;
             editorBeatmap?.EndChange();
+        }
+
+        /// <summary>
+        /// Trims control points from the end of the slider path which are not required to reach the expected end of the slider.
+        /// </summary>
+        /// <param name="sliderPath">The slider path to trim control points of.</param>
+        private void trimExcessControlPoints(SliderPath sliderPath)
+        {
+            if (!sliderPath.ExpectedDistance.Value.HasValue)
+                return;
+
+            double[] segmentEnds = sliderPath.GetSegmentEnds().ToArray();
+            int segmentIndex = 0;
+
+            for (int i = 1; i < sliderPath.ControlPoints.Count - 1; i++)
+            {
+                if (!sliderPath.ControlPoints[i].Type.HasValue) continue;
+
+                if (Precision.AlmostBigger(segmentEnds[segmentIndex], 1, 1E-3))
+                {
+                    sliderPath.ControlPoints.RemoveRange(i + 1, sliderPath.ControlPoints.Count - i - 1);
+                    sliderPath.ControlPoints[^1].Type = null;
+                    break;
+                }
+
+                segmentIndex++;
+            }
         }
 
         /// <summary>
