@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -9,11 +11,13 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
+using osu.Framework.Utils;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Overlays;
+using osu.Game.Rulesets.Objects;
 using osuTK;
 
 namespace osu.Game.Screens.Edit.Timing
@@ -32,6 +36,8 @@ namespace osu.Game.Screens.Edit.Timing
         private readonly BindableBool isHandlingTapping = new BindableBool();
 
         private MetronomeDisplay metronome = null!;
+
+        private LabelledSwitchButton adjustPlacedNotes = null!;
 
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider, OsuColour colours)
@@ -58,6 +64,7 @@ namespace osu.Game.Screens.Edit.Timing
                     RowDimensions = new[]
                     {
                         new Dimension(GridSizeMode.Absolute, 200),
+                        new Dimension(GridSizeMode.Absolute, 50),
                         new Dimension(GridSizeMode.Absolute, 50),
                         new Dimension(GridSizeMode.Absolute, TapButton.SIZE + padding),
                     },
@@ -112,6 +119,18 @@ namespace osu.Game.Screens.Edit.Timing
                                         Size = new Vector2(0.48f, 1),
                                         Action = adjustBpm,
                                     }
+                                }
+                            },
+                        },
+                        new Drawable[]
+                        {
+                            new Container
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Padding = new MarginPadding { Bottom = padding, Horizontal = padding },
+                                Children = new Drawable[]
+                                {
+                                    adjustPlacedNotes = new LabelledSwitchButton { Label = "Move already placed notes\nwhen changing the offset/BPM" },
                                 }
                             },
                         },
@@ -192,12 +211,25 @@ namespace osu.Game.Screens.Edit.Timing
             editorClock.Seek(selectedGroup.Value.Time);
         }
 
+        private List<HitObject> hitObjectsInTimingRange(EditorBeatmap beatmap, ControlPointGroup selectedGroup)
+        {
+            // If the first group, we grab all hitobjects prior to the next, if the last group, we grab all remaining hitobjects
+            double firstGroupTime = beatmap.ControlPointInfo.Groups.Any(x => x.ControlPoints.Any(y => y is TimingControlPoint) && x.Time < selectedGroup.Time) ? selectedGroup.Time : double.MinValue;
+            double nextGroupTime = beatmap.ControlPointInfo.Groups.FirstOrDefault(x => x.ControlPoints.Any(y => y is TimingControlPoint) && x.Time > selectedGroup.Time)?.Time ?? double.MaxValue;
+
+            var result = beatmap.HitObjects.Where(x => Precision.AlmostBigger(x.StartTime, firstGroupTime) && Precision.DefinitelyBigger(nextGroupTime, x.StartTime)).ToList();
+            Console.WriteLine(firstGroupTime + ", " + nextGroupTime + ", " + result.Count);
+            return result;
+        }
+
         private void adjustOffset(double adjust)
         {
             if (selectedGroup.Value == null)
                 return;
 
             bool wasAtStart = editorClock.CurrentTimeAccurate == selectedGroup.Value.Time;
+
+            List<HitObject> hitObjectsInRange = hitObjectsInTimingRange(beatmap, selectedGroup.Value);
 
             // VERY TEMPORARY
             var currentGroupItems = selectedGroup.Value.ControlPoints.ToArray();
@@ -212,6 +244,14 @@ namespace osu.Game.Screens.Edit.Timing
             // the control point might not necessarily exist yet, if currentGroupItems was empty.
             selectedGroup.Value = beatmap.ControlPointInfo.GroupAt(newOffset, true);
 
+            if (adjustPlacedNotes.Current.Value)
+            {
+                foreach (HitObject hitObject in hitObjectsInRange)
+                {
+                    hitObject.StartTime += adjust;
+                }
+            }
+
             if (!editorClock.IsRunning && wasAtStart)
                 editorClock.Seek(newOffset);
         }
@@ -223,7 +263,21 @@ namespace osu.Game.Screens.Edit.Timing
             if (timing == null)
                 return;
 
-            timing.BeatLength = 60000 / (timing.BPM + adjust);
+            double newBeatLength = 60000 / (timing.BPM + adjust);
+
+            List<HitObject> hitObjectsInRange = hitObjectsInTimingRange(beatmap, selectedGroup.Value!);
+
+            if (adjustPlacedNotes.Current.Value)
+            {
+                foreach (HitObject hitObject in hitObjectsInRange)
+                {
+                    double beat = (hitObject.StartTime - selectedGroup.Value!.Time) / timing.BeatLength;
+
+                    hitObject.StartTime = beat * newBeatLength + selectedGroup.Value.Time;
+                }
+            }
+
+            timing.BeatLength = newBeatLength;
         }
 
         private partial class InlineButton : OsuButton
