@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -217,9 +216,7 @@ namespace osu.Game.Screens.Edit.Timing
             double firstGroupTime = beatmap.ControlPointInfo.Groups.Any(x => x.ControlPoints.Any(y => y is TimingControlPoint) && x.Time < selectedGroup.Time) ? selectedGroup.Time : double.MinValue;
             double nextGroupTime = beatmap.ControlPointInfo.Groups.FirstOrDefault(x => x.ControlPoints.Any(y => y is TimingControlPoint) && x.Time > selectedGroup.Time)?.Time ?? double.MaxValue;
 
-            var result = beatmap.HitObjects.Where(x => Precision.AlmostBigger(x.StartTime, firstGroupTime) && Precision.DefinitelyBigger(nextGroupTime, x.StartTime)).ToList();
-            Console.WriteLine(firstGroupTime + ", " + nextGroupTime + ", " + result.Count);
-            return result;
+            return beatmap.HitObjects.Where(x => Precision.AlmostBigger(x.StartTime, firstGroupTime) && Precision.DefinitelyBigger(nextGroupTime, x.StartTime)).ToList();
         }
 
         private void adjustOffset(double adjust)
