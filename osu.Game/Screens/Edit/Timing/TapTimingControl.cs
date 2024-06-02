@@ -270,7 +270,7 @@ namespace osu.Game.Screens.Edit.Timing
                 {
                     double beat = (hitObject.StartTime - selectedGroup.Value!.Time) / timing.BeatLength;
 
-                    hitObject.StartTime = beat * newBeatLength + selectedGroup.Value.Time;
+                    hitObject.StartTime = (beat * newBeatLength) + selectedGroup.Value.Time;
                 }
             }
 
