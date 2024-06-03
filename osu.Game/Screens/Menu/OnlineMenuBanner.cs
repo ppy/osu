@@ -73,8 +73,19 @@ namespace osu.Game.Screens.Menu
             Task.Run(() => request.Perform())
                 .ContinueWith(r =>
                 {
+                    if (!FetchOnlineContent)
+                        return;
+
                     if (r.IsCompletedSuccessfully)
-                        Schedule(() => Current.Value = request.ResponseObject);
+                    {
+                        Schedule(() =>
+                        {
+                            if (!FetchOnlineContent)
+                                return;
+
+                            Current.Value = request.ResponseObject;
+                        });
+                    }
 
                     // if the request failed, "observe" the exception.
                     // it isn't very important why this failed, as it's only for display.
@@ -169,6 +180,11 @@ namespace osu.Game.Screens.Menu
             public readonly APIMenuImage Image;
 
             private Sprite flash = null!;
+
+            /// <remarks>
+            /// Overridden as a safety for <see cref="openUrlAction"/> functioning correctly.
+            /// </remarks>
+            public override bool IsPresent => base.IsPresent || Scheduler.HasPendingTasks;
 
             private ScheduledDelegate? openUrlAction;
 
