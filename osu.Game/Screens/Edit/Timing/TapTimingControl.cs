@@ -3,7 +3,6 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -18,6 +17,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Overlays;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Types;
 using osuTK;
 
 namespace osu.Game.Screens.Edit.Timing
@@ -272,6 +272,9 @@ namespace osu.Game.Screens.Edit.Timing
                     double beat = (hitObject.StartTime - selectedGroup.Value!.Time) / timing.BeatLength;
 
                     hitObject.StartTime = (beat * newBeatLength) + selectedGroup.Value.Time;
+
+                    if (hitObject is not IHasRepeats && hitObject is IHasDuration hitObjectWithDuration)
+                        hitObjectWithDuration.Duration *= newBeatLength / timing.BeatLength;
                 }
             }
 
