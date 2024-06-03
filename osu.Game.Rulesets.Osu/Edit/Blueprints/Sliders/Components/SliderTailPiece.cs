@@ -29,7 +29,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
         private readonly Cached<SliderPath> fullPathCache = new Cached<SliderPath>();
 
-        [Resolved(CanBeNull = true)]
+        [Resolved]
         private EditorBeatmap? editorBeatmap { get; set; }
 
         [Resolved]
