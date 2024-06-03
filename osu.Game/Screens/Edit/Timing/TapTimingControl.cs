@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -210,13 +211,13 @@ namespace osu.Game.Screens.Edit.Timing
             editorClock.Seek(selectedGroup.Value.Time);
         }
 
-        private List<HitObject> hitObjectsInTimingRange(EditorBeatmap beatmap, ControlPointGroup selectedGroup)
+        private static List<HitObject> hitObjectsInTimingRange(EditorBeatmap beatmap, ControlPointGroup selectedGroup)
         {
             // If the first group, we grab all hitobjects prior to the next, if the last group, we grab all remaining hitobjects
-            double firstGroupTime = beatmap.ControlPointInfo.Groups.Any(x => x.ControlPoints.Any(y => y is TimingControlPoint) && x.Time < selectedGroup.Time) ? selectedGroup.Time : double.MinValue;
-            double nextGroupTime = beatmap.ControlPointInfo.Groups.FirstOrDefault(x => x.ControlPoints.Any(y => y is TimingControlPoint) && x.Time > selectedGroup.Time)?.Time ?? double.MaxValue;
+            double startTime = beatmap.ControlPointInfo.TimingPoints.Any(x => x.Time < selectedGroup.Time) ? selectedGroup.Time : double.MinValue;
+            double endTime = beatmap.ControlPointInfo.TimingPoints.FirstOrDefault(x => x.Time > selectedGroup.Time)?.Time ?? double.MaxValue;
 
-            return beatmap.HitObjects.Where(x => Precision.AlmostBigger(x.StartTime, firstGroupTime) && Precision.DefinitelyBigger(nextGroupTime, x.StartTime)).ToList();
+            return beatmap.HitObjects.Where(x => Precision.AlmostBigger(x.StartTime, startTime) && Precision.DefinitelyBigger(endTime, x.StartTime)).ToList();
         }
 
         private void adjustOffset(double adjust)
