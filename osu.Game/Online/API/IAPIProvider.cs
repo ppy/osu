@@ -61,7 +61,7 @@ namespace osu.Game.Online.API
         string APIEndpointUrl { get; }
 
         /// <summary>
-        /// The root URL of of the website, excluding the trailing slash.
+        /// The root URL of the website, excluding the trailing slash.
         /// </summary>
         string WebsiteRootUrl { get; }
 

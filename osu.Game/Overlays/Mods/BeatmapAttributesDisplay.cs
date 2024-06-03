@@ -66,7 +66,7 @@ namespace osu.Game.Overlays.Mods
         [BackgroundDependencyLoader]
         private void load()
         {
-            const float shear = ShearedOverlayContainer.SHEAR;
+            const float shear = OsuGame.SHEAR;
 
             LeftContent.AddRange(new Drawable[]
             {
