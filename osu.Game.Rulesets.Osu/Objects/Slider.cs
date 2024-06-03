@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using osu.Game.Rulesets.Objects;
 using System.Linq;
 using System.Threading;
+using JetBrains.Annotations;
 using Newtonsoft.Json;
 using osu.Framework.Bindables;
 using osu.Framework.Caching;
@@ -163,6 +164,7 @@ namespace osu.Game.Rulesets.Osu.Objects
         public SliderTailCircle TailCircle { get; protected set; }
 
         [JsonIgnore]
+        [CanBeNull]
         public SliderRepeat LastRepeat { get; protected set; }
 
         public Slider()
