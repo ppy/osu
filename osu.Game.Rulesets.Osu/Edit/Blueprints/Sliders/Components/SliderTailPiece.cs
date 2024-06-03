@@ -63,29 +63,18 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
         protected override bool OnKeyDown(KeyDownEvent e)
         {
-            if (e.Repeat)
-                return false;
+            if (!e.Repeat && (e.Key == Key.ShiftLeft || e.Key == Key.ShiftRight))
+                updateCirclePieceColour();
 
-            handleDragToggle(e);
             return base.OnKeyDown(e);
         }
 
         protected override void OnKeyUp(KeyUpEvent e)
         {
-            handleDragToggle(e);
+            if (e.Key == Key.ShiftLeft || e.Key == Key.ShiftRight)
+                updateCirclePieceColour();
+
             base.OnKeyUp(e);
-        }
-
-        private bool lastShiftPressed;
-
-        private void handleDragToggle(KeyboardEvent key)
-        {
-            bool shiftPressed = key.ShiftPressed;
-
-            if (shiftPressed == lastShiftPressed) return;
-
-            lastShiftPressed = shiftPressed;
-            updateCirclePieceColour();
         }
 
         private void updateCirclePieceColour()
