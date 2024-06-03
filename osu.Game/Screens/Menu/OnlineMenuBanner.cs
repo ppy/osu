@@ -77,7 +77,15 @@ namespace osu.Game.Screens.Menu
                         return;
 
                     if (r.IsCompletedSuccessfully)
-                        Schedule(() => Current.Value = request.ResponseObject);
+                    {
+                        Schedule(() =>
+                        {
+                            if (!FetchOnlineContent)
+                                return;
+
+                            Current.Value = request.ResponseObject;
+                        });
+                    }
 
                     // if the request failed, "observe" the exception.
                     // it isn't very important why this failed, as it's only for display.
