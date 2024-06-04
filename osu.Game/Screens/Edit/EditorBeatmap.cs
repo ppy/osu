@@ -198,6 +198,11 @@ namespace osu.Game.Screens.Edit
         /// Perform the provided action on every selected hitobject.
         /// Changes will be grouped as one history action.
         /// </summary>
+        /// <remarks>
+        /// Note that this incurs a full state save, and as such requires the entire beatmap to be encoded, etc.
+        /// Very frequent use of this method (e.g. once a frame) is most discouraged.
+        /// If there is need to do so, use local precondition checks to eliminate changes that are known to be no-ops.
+        /// </remarks>
         /// <param name="action">The action to perform.</param>
         public void PerformOnSelection(Action<HitObject> action)
         {
