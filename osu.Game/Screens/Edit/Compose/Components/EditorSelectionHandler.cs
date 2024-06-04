@@ -198,6 +198,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <param name="bankName">The name of the sample bank.</param>
         public void AddSampleBank(string bankName)
         {
+            if (SelectedItems.All(h => h.Samples.All(s => s.Bank == bankName)))
+                return;
+
             EditorBeatmap.PerformOnSelection(h =>
             {
                 if (h.Samples.All(s => s.Bank == bankName))
@@ -214,6 +217,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <param name="sampleName">The name of the hit sample.</param>
         public void AddHitSample(string sampleName)
         {
+            if (SelectedItems.All(h => h.Samples.Any(s => s.Name == sampleName)))
+                return;
+
             EditorBeatmap.PerformOnSelection(h =>
             {
                 // Make sure there isn't already an existing sample
@@ -231,6 +237,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <param name="sampleName">The name of the hit sample.</param>
         public void RemoveHitSample(string sampleName)
         {
+            if (SelectedItems.All(h => h.Samples.All(s => s.Name != sampleName)))
+                return;
+
             EditorBeatmap.PerformOnSelection(h =>
             {
                 h.SamplesBindable.RemoveAll(s => s.Name == sampleName);
@@ -245,6 +254,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <exception cref="InvalidOperationException">Throws if any selected object doesn't implement <see cref="IHasComboInformation"/></exception>
         public void SetNewCombo(bool state)
         {
+            if (SelectedItems.OfType<IHasComboInformation>().All(h => h.NewCombo == state))
+                return;
+
             EditorBeatmap.PerformOnSelection(h =>
             {
                 var comboInfo = h as IHasComboInformation;
