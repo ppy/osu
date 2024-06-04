@@ -6,6 +6,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
@@ -13,6 +14,7 @@ using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Difficulty.Skills;
+using osu.Game.Rulesets.Osu.Difficulty.Skills.Touch;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Scoring;
@@ -39,7 +41,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double aimRating = Math.Sqrt(skills[0].DifficultyValue()) * difficulty_multiplier;
             double aimRatingNoSliders = Math.Sqrt(skills[1].DifficultyValue()) * difficulty_multiplier;
             double speedRating = Math.Sqrt(skills[2].DifficultyValue()) * difficulty_multiplier;
-            double speedNotes = ((Speed)skills[2]).RelevantNoteCount();
 
             double flashlightRating = 0.0;
 
@@ -48,11 +49,19 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double sliderFactor = aimRating > 0 ? aimRatingNoSliders / aimRating : 1;
 
+            double speedNotes = 0;
+
             if (mods.Any(m => m is OsuModTouchDevice))
             {
-                aimRating = Math.Pow(aimRating, 0.8);
-                flashlightRating = Math.Pow(flashlightRating, 0.8);
+                speedNotes = ((TouchSpeed)skills[2]).RelevantNoteCount();
+                double normalAimRating = Math.Sqrt(skills[3].DifficultyValue()) * difficulty_multiplier;
+
+                flashlightRating *= normalAimRating > 0 ? aimRating / normalAimRating : 1;
+
+                Logger.Log($"Aim rating: {aimRating}, speed rating: {speedRating}");
             }
+            else
+                speedNotes = ((Speed)skills[2]).RelevantNoteCount();
 
             if (mods.Any(h => h is OsuModRelax))
             {
@@ -130,11 +139,26 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         protected override Skill[] CreateSkills(IBeatmap beatmap, Mod[] mods, double clockRate)
         {
-            var skills = new List<Skill>
+            List<Skill> skills;
+
+            if (mods.Any(h => h is OsuModTouchDevice))
             {
-                new Aim(mods, true),
-                new Aim(mods, false),
-                new Speed(mods)
+                skills = new List<Skill>
+                {
+                    new TouchAim(mods, clockRate, true),
+                    new TouchAim(mods, clockRate, false),
+                    new TouchSpeed(mods, clockRate),
+                    new Aim(mods, true),
+                };
+            }
+            else
+            {
+                skills = new List<Skill>
+                {
+                    new Aim(mods, true),
+                    new Aim(mods, false),
+                    new Speed(mods),
+                };
             };
 
             if (mods.Any(h => h is OsuModFlashlight))
