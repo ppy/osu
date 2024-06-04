@@ -11,7 +11,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
     public static class AimEvaluator
     {
         private const double wide_angle_multiplier = 1.5;
-        private const double acute_angle_multiplier = 4;
+        private const double acute_angle_multiplier = 2.2;
         private const double slider_multiplier = 1.35;
         private const double velocity_change_multiplier = 0.75;
 
@@ -83,7 +83,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                     {
                         acuteAngleBonus *= calcAcuteAngleBonus(lastAngle) // Multiply by previous angle, we don't want to buff unless this is a wiggle type pattern.
                                            * Math.Min(angleBonus, 125 / osuCurrObj.StrainTime) // The maximum velocity we buff is equal to 125 / strainTime
-                                           * Math.Pow(Math.Sin(Math.PI / 2 * Math.Min(1, (100 - osuCurrObj.StrainTime) / 50)), 2) // scale buff from 300 bpm 1/2 to 400 bpm 1/2
+                                           * Math.Min(1.5, osuCurrObj.StrainTime / 75 * Math.Pow((100 - osuCurrObj.StrainTime) / 25, 2)) // Scale with bpm, capped at ~440bpm 1/2
                                            * Math.Pow(Math.Sin(Math.PI / 2 * (Math.Clamp(osuCurrObj.LazyJumpDistance, 50, 100) - 50) / 50), 2); // Buff distance exceeding 50 (radius) up to 100 (diameter).
                     }
 

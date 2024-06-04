@@ -86,8 +86,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         private double computeAimValue(ScoreInfo score, OsuDifficultyAttributes attributes)
         {
-            double aimValue = Math.Pow(attributes.AimDifficulty, 3.3) * 2.7;
-
+            double aimValue = Math.Pow(5.0 * Math.Max(1.0, attributes.AimDifficulty / 0.0675) - 4.0, 3.0) / 100000.0;
+            
             double lengthBonus = 0.95 + 0.35 * Math.Min(1.0, totalHits / 2000.0) +
                                  (totalHits > 2000 ? Math.Log10(totalHits / 2000.0) * 0.2 : 0.0);
             aimValue *= lengthBonus;
@@ -187,7 +187,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         private double computeAccuracyValue(ScoreInfo score, OsuDifficultyAttributes attributes)
         {
             if (score.Mods.Any(h => h is OsuModRelax))
-                return 0.0;
+                return 0.0; 
 
             // This percentage only considers HitCircles of any value - in this part of the calculation we focus on hitting the timing hit window.
             double betterAccuracyPercentage;
@@ -219,7 +219,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 accuracyValue *= 1.02;
             
             // Scale accuracy by approach rate
-            accuracyValue *= 1 / (1 + Math.Exp((attributes.ApproachRate < 10.33 ? 4 : 8) * (attributes.ApproachRate - 10.33))) + 1;
+            // accuracyValue *= 1 / (1 + Math.Exp((attributes.ApproachRate < 10.33 ? 4 : 8) * (attributes.ApproachRate - 10.33))) + 1;
 
             return accuracyValue;
         }
