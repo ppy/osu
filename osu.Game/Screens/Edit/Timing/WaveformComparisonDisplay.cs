@@ -224,7 +224,7 @@ namespace osu.Game.Screens.Edit.Timing
                 row.Alpha = time < selectedGroupStartTime || time > selectedGroupEndTime ? 0.2f : 1;
                 row.WaveformOffsetTo(-offset, animated);
                 row.WaveformScale = new Vector2(scale, 1);
-                row.BeatIndex = (int)Math.Floor(index);
+                row.BeatIndex = (int)Math.Round(index);
 
                 index++;
             }

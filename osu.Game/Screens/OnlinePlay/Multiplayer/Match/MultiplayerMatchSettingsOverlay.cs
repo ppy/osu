@@ -486,16 +486,16 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             Off = 0,
 
             [Description("30 seconds")]
-            Seconds_30 = 30,
+            Seconds30 = 30,
 
             [Description("1 minute")]
-            Seconds_60 = 60,
+            Seconds60 = 60,
 
             [Description("3 minutes")]
-            Seconds_180 = 180,
+            Seconds180 = 180,
 
             [Description("5 minutes")]
-            Seconds_300 = 300
+            Seconds300 = 300
         }
     }
 }

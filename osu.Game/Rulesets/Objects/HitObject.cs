@@ -38,6 +38,8 @@ namespace osu.Game.Rulesets.Objects
         /// <summary>
         /// Invoked after <see cref="ApplyDefaults"/> has completed on this <see cref="HitObject"/>.
         /// </summary>
+        // TODO: This has no implicit unbind flow. Currently, if a Playfield manages HitObjects it will leave a bound event on this and cause the
+        // playfield to remain in memory.
         public event Action<HitObject> DefaultsApplied;
 
         public readonly Bindable<double> StartTimeBindable = new BindableDouble();
@@ -161,8 +163,19 @@ namespace osu.Game.Rulesets.Objects
         protected void AddNested(HitObject hitObject) => nestedHitObjects.Add(hitObject);
 
         /// <summary>
-        /// Creates the <see cref="Judgement"/> that represents the scoring information for this <see cref="HitObject"/>.
+        /// The <see cref="Judgement"/> that represents the scoring information for this <see cref="HitObject"/>.
         /// </summary>
+        [JsonIgnore]
+        public Judgement Judgement => judgement ??= CreateJudgement();
+
+        private Judgement judgement;
+
+        /// <summary>
+        /// Should be overridden to create a <see cref="Judgement"/> that represents the scoring information for this <see cref="HitObject"/>.
+        /// </summary>
+        /// <remarks>
+        /// For read access, use <see cref="Judgement"/> to avoid unnecessary allocations.
+        /// </remarks>
         [NotNull]
         public virtual Judgement CreateJudgement() => new Judgement();
 

@@ -53,6 +53,9 @@ namespace osu.Game.Rulesets.Taiko.Edit
 
         public void SetStrongState(bool state)
         {
+            if (SelectedItems.OfType<Hit>().All(h => h.IsStrong == state))
+                return;
+
             EditorBeatmap.PerformOnSelection(h =>
             {
                 if (!(h is Hit taikoHit)) return;
@@ -67,6 +70,9 @@ namespace osu.Game.Rulesets.Taiko.Edit
 
         public void SetRimState(bool state)
         {
+            if (SelectedItems.OfType<Hit>().All(h => h.Type == (state ? HitType.Rim : HitType.Centre)))
+                return;
+
             EditorBeatmap.PerformOnSelection(h =>
             {
                 if (h is Hit taikoHit)

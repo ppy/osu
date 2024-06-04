@@ -75,6 +75,9 @@ namespace osu.Game.Rulesets.Judgements
                     case HitResult.LargeTickHit:
                         return HitResult.LargeTickMiss;
 
+                    case HitResult.SliderTailHit:
+                        return HitResult.IgnoreMiss;
+
                     default:
                         return HitResult.Miss;
                 }
@@ -104,6 +107,7 @@ namespace osu.Game.Rulesets.Judgements
                 case HitResult.SmallTickMiss:
                     return -DEFAULT_MAX_HEALTH_INCREASE * 0.5;
 
+                case HitResult.SliderTailHit:
                 case HitResult.LargeTickHit:
                     return DEFAULT_MAX_HEALTH_INCREASE;
 

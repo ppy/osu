@@ -38,8 +38,9 @@ namespace osu.Game.Screens.Play
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
 
-        public Action? OnRetry;
-        public Action? OnQuit;
+        public Action? OnResume { get; init; }
+        public Action? OnRetry { get; init; }
+        public Action? OnQuit { get; init; }
 
         /// <summary>
         /// Action that is invoked when <see cref="GlobalAction.Back"/> is triggered.
@@ -128,6 +129,15 @@ namespace osu.Game.Screens.Play
                     }
                 },
             };
+
+            if (OnResume != null)
+                AddButton(GameplayMenuOverlayStrings.Continue, colours.Green, () => OnResume.Invoke());
+
+            if (OnRetry != null)
+                AddButton(GameplayMenuOverlayStrings.Retry, colours.YellowDark, () => OnRetry.Invoke());
+
+            if (OnQuit != null)
+                AddButton(GameplayMenuOverlayStrings.Quit, new Color4(170, 27, 39, 255), () => OnQuit.Invoke());
 
             State.ValueChanged += _ => InternalButtons.Deselect();
 
