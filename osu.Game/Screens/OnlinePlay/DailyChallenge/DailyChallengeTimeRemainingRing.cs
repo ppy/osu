@@ -9,6 +9,7 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Threading;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
 using osuTK;
 
@@ -28,51 +29,56 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
         [BackgroundDependencyLoader]
         private void load()
         {
-            InternalChild = new DrawSizePreservingFillContainer
+            InternalChildren = new Drawable[]
             {
-                RelativeSizeAxes = Axes.Both,
-                TargetDrawSize = new Vector2(200),
-                Strategy = DrawSizePreservationStrategy.Minimum,
-                Children = new Drawable[]
+                new SectionHeader("Time remaining"),
+                new DrawSizePreservingFillContainer
                 {
-                    new CircularProgress
+                    RelativeSizeAxes = Axes.Both,
+                    Padding = new MarginPadding { Top = 35 },
+                    TargetDrawSize = new Vector2(200),
+                    Strategy = DrawSizePreservationStrategy.Minimum,
+                    Children = new Drawable[]
                     {
-                        Size = new Vector2(180),
-                        InnerRadius = 0.1f,
-                        Progress = 1,
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        Colour = colourProvider.Background5,
-                    },
-                    progress = new CircularProgress
-                    {
-                        Size = new Vector2(180),
-                        InnerRadius = 0.1f,
-                        Progress = 1,
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                    },
-                    new FillFlowContainer
-                    {
-                        AutoSizeAxes = Axes.Both,
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        Direction = FillDirection.Vertical,
-                        Children = new[]
+                        new CircularProgress
                         {
-                            timeText = new OsuSpriteText
+                            Size = new Vector2(180),
+                            InnerRadius = 0.1f,
+                            Progress = 1,
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            Colour = colourProvider.Background5,
+                        },
+                        progress = new CircularProgress
+                        {
+                            Size = new Vector2(180),
+                            InnerRadius = 0.1f,
+                            Progress = 1,
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                        },
+                        new FillFlowContainer
+                        {
+                            AutoSizeAxes = Axes.Both,
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            Direction = FillDirection.Vertical,
+                            Children = new[]
                             {
-                                Text = "00:00:00",
-                                Font = OsuFont.TorusAlternate.With(size: 40),
-                                Anchor = Anchor.Centre,
-                                Origin = Anchor.Centre,
-                            },
-                            new OsuSpriteText
-                            {
-                                Text = "remaining",
-                                Font = OsuFont.Default.With(size: 20),
-                                Anchor = Anchor.Centre,
-                                Origin = Anchor.Centre,
+                                timeText = new OsuSpriteText
+                                {
+                                    Text = "00:00:00",
+                                    Font = OsuFont.TorusAlternate.With(size: 40),
+                                    Anchor = Anchor.Centre,
+                                    Origin = Anchor.Centre,
+                                },
+                                new OsuSpriteText
+                                {
+                                    Text = "remaining",
+                                    Font = OsuFont.Default.With(size: 20),
+                                    Anchor = Anchor.Centre,
+                                    Origin = Anchor.Centre,
+                                }
                             }
                         }
                     }
