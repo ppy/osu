@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
@@ -76,6 +77,13 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
 
         public override Drawable GetDrawableComponent(ISkinComponentLookup lookup)
         {
+            var comboCounter = ReplaceBaseComboCounter(lookup);
+
+            if (comboCounter.IsNotNull())
+            {
+                return comboCounter;
+            }
+
             switch (lookup)
             {
                 case GameplaySkinComponentLookup<HitResult> resultComponent:
@@ -89,6 +97,9 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
                     {
                         case ManiaSkinComponents.ColumnBackground:
                             return new LegacyColumnBackground();
+
+                        case ManiaSkinComponents.ComboCounter:
+                            return new LegacyManiaComboCounter();
 
                         case ManiaSkinComponents.HitTarget:
                             // Legacy skins sandwich the hit target between the column background and the column light.

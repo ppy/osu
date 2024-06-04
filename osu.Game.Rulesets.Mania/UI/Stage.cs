@@ -86,7 +86,7 @@ namespace osu.Game.Rulesets.Mania.UI
                     {
                         new SkinnableDrawable(new ManiaSkinComponentLookup(ManiaSkinComponents.StageBackground), _ => new DefaultStageBackground())
                         {
-                            RelativeSizeAxes = Axes.Both
+                            RelativeSizeAxes = Axes.Both,
                         },
                         columnBackgrounds = new Container
                         {
@@ -118,6 +118,7 @@ namespace osu.Game.Rulesets.Mania.UI
                         {
                             RelativeSizeAxes = Axes.Both
                         },
+                        new SkinnableDrawable(new ManiaSkinComponentLookup(ManiaSkinComponents.ComboCounter)),
                         judgements = new JudgementContainer<DrawableManiaJudgement>
                         {
                             Anchor = Anchor.TopCentre,

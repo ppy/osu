@@ -42,6 +42,7 @@ namespace osu.Game.Skinning
         LeftLineWidth,
         RightLineWidth,
         HitPosition,
+        ComboPosition,
         ScorePosition,
         LightPosition,
         StagePaddingTop,
