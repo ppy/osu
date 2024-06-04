@@ -50,38 +50,18 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => CirclePiece.ReceivePositionalInputAt(screenSpacePos);
 
-        protected override bool OnHover(HoverEvent e)
+        protected override void Update()
         {
             updateCirclePieceColour();
-            return false;
-        }
-
-        protected override void OnHoverLost(HoverLostEvent e)
-        {
-            updateCirclePieceColour();
-        }
-
-        protected override bool OnKeyDown(KeyDownEvent e)
-        {
-            if (!e.Repeat && (e.Key == Key.ShiftLeft || e.Key == Key.ShiftRight))
-                updateCirclePieceColour();
-
-            return base.OnKeyDown(e);
-        }
-
-        protected override void OnKeyUp(KeyUpEvent e)
-        {
-            if (e.Key == Key.ShiftLeft || e.Key == Key.ShiftRight)
-                updateCirclePieceColour();
-
-            base.OnKeyUp(e);
+            base.Update();
         }
 
         private void updateCirclePieceColour()
         {
             Color4 colour = colours.Yellow;
 
-            if (IsHovered && inputManager.CurrentState.Keyboard.ShiftPressed)
+            if (IsHovered && inputManager.CurrentState.Keyboard.ShiftPressed
+                          && !inputManager.HoveredDrawables.Any(o => o is PathControlPointPiece<Slider>))
                 colour = colour.Lighten(1);
 
             CirclePiece.Colour = colour;
