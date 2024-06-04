@@ -6,7 +6,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
@@ -57,8 +56,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 double normalAimRating = Math.Sqrt(skills[3].DifficultyValue()) * difficulty_multiplier;
 
                 flashlightRating *= normalAimRating > 0 ? aimRating / normalAimRating : 1;
-
-                Logger.Log($"Aim rating: {aimRating}, speed rating: {speedRating}");
             }
             else
                 speedNotes = ((Speed)skills[2]).RelevantNoteCount();
