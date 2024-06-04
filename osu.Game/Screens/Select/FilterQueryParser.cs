@@ -61,13 +61,19 @@ namespace osu.Game.Screens.Select
                 case "length":
                     return tryUpdateLengthRange(criteria, op, value);
 
+                case "played":
+                case "lastplayed":
+                    return tryUpdateDateAgoRange(ref criteria.LastPlayed, op, value);
+
                 case "divisor":
                     return TryUpdateCriteriaRange(ref criteria.BeatDivisor, op, value, tryParseInt);
 
                 case "status":
-                    return TryUpdateCriteriaRange(ref criteria.OnlineStatus, op, value, tryParseEnum);
+                    return TryUpdateCriteriaSet(ref criteria.OnlineStatus, op, value);
 
                 case "creator":
+                case "author":
+                case "mapper":
                     return TryUpdateCriteriaText(ref criteria.Creator, op, value);
 
                 case "artist":
@@ -294,6 +300,75 @@ namespace osu.Game.Screens.Select
             where T : struct
             => parseFunction.Invoke(val, out var converted) && tryUpdateCriteriaRange(ref range, op, converted);
 
+        /// <summary>
+        /// Attempts to parse a keyword filter of type <typeparamref name="T"/>,
+        /// from the specified <paramref name="op"/> and <paramref name="filterValue"/>.
+        /// If <paramref name="filterValue"/> can be parsed successfully, the function returns <c>true</c>
+        /// and the resulting range constraint is stored into the <paramref name="range"/>'s expected values.
+        /// </summary>
+        /// <param name="range">The <see cref="FilterCriteria.OptionalSet{T}"/> to store the parsed data into, if successful.</param>
+        /// <param name="op">The operator for the keyword filter.</param>
+        /// <param name="filterValue">The value of the keyword filter.</param>
+        public static bool TryUpdateCriteriaSet<T>(ref FilterCriteria.OptionalSet<T> range, Operator op, string filterValue)
+            where T : struct, Enum
+        {
+            var matchingValues = new HashSet<T>();
+
+            if (op == Operator.Equal && filterValue.Contains(','))
+            {
+                string[] splitValues = filterValue.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+
+                foreach (string splitValue in splitValues)
+                {
+                    if (!tryParseEnum<T>(splitValue, out var parsedValue))
+                        return false;
+
+                    matchingValues.Add(parsedValue);
+                }
+            }
+            else
+            {
+                if (!tryParseEnum<T>(filterValue, out var pivotValue))
+                    return false;
+
+                var allDefinedValues = Enum.GetValues<T>();
+
+                foreach (var val in allDefinedValues)
+                {
+                    int compareResult = Comparer<T>.Default.Compare(val, pivotValue);
+
+                    switch (op)
+                    {
+                        case Operator.Less:
+                            if (compareResult < 0) matchingValues.Add(val);
+                            break;
+
+                        case Operator.LessOrEqual:
+                            if (compareResult <= 0) matchingValues.Add(val);
+                            break;
+
+                        case Operator.Equal:
+                            if (compareResult == 0) matchingValues.Add(val);
+                            break;
+
+                        case Operator.GreaterOrEqual:
+                            if (compareResult >= 0) matchingValues.Add(val);
+                            break;
+
+                        case Operator.Greater:
+                            if (compareResult > 0) matchingValues.Add(val);
+                            break;
+
+                        default:
+                            return false;
+                    }
+                }
+            }
+
+            range.Values.IntersectWith(matchingValues);
+            return true;
+        }
+
         private static bool tryUpdateCriteriaRange<T>(ref FilterCriteria.OptionalRange<T> range, Operator op, T value)
             where T : struct
         {
@@ -373,6 +448,108 @@ namespace osu.Game.Screens.Select
             }
 
             return tryUpdateCriteriaRange(ref criteria.Length, op, totalLength, minScale / 2.0);
+        }
+
+        /// <summary>
+        /// This function is intended for parsing "days / months / years ago" type filters.
+        /// </summary>
+        private static bool tryUpdateDateAgoRange(ref FilterCriteria.OptionalRange<DateTimeOffset> dateRange, Operator op, string val)
+        {
+            switch (op)
+            {
+                case Operator.Equal:
+                    // an equality filter is difficult to define for support here.
+                    // if "3 months 2 days ago" means a single concrete time instant, such a filter is basically useless.
+                    // if it means a range of 24 hours, then that is annoying to write and also comes with its own implications
+                    // (does it mean "time instant 3 months 2 days ago, within 12 hours of tolerance either direction"?
+                    // does it mean "the full calendar day, from midnight to midnight, 3 months 2 days ago"?)
+                    // as such, for simplicity, just refuse to support this.
+                    return false;
+
+                // for the remaining operators, since the value provided to this function is an "ago" type value
+                // (as in, referring to some amount of time back),
+                // we'll want to flip the operator, such that `>5d` means "more than five days ago", as in "*before* five days ago",
+                // as intended by the user.
+                case Operator.Less:
+                    op = Operator.Greater;
+                    break;
+
+                case Operator.LessOrEqual:
+                    op = Operator.GreaterOrEqual;
+                    break;
+
+                case Operator.Greater:
+                    op = Operator.Less;
+                    break;
+
+                case Operator.GreaterOrEqual:
+                    op = Operator.LessOrEqual;
+                    break;
+            }
+
+            GroupCollection? match = null;
+
+            match ??= tryMatchRegex(val, @"^((?<years>\d+)y)?((?<months>\d+)M)?((?<days>\d+(\.\d+)?)d)?((?<hours>\d+(\.\d+)?)h)?((?<minutes>\d+(\.\d+)?)m)?((?<seconds>\d+(\.\d+)?)s)?$");
+            match ??= tryMatchRegex(val, @"^(?<days>\d+(\.\d+)?)$");
+
+            if (match == null)
+                return false;
+
+            DateTimeOffset? dateTimeOffset = null;
+            DateTimeOffset now = DateTimeOffset.Now;
+
+            try
+            {
+                List<string> keys = new List<string> { @"seconds", @"minutes", @"hours", @"days", @"months", @"years" };
+
+                foreach (string key in keys)
+                {
+                    if (!match.TryGetValue(key, out var group) || !group.Success)
+                        continue;
+
+                    if (group.Success)
+                    {
+                        if (!tryParseDoubleWithPoint(group.Value, out double length))
+                            return false;
+
+                        switch (key)
+                        {
+                            case @"seconds":
+                                dateTimeOffset = (dateTimeOffset ?? now).AddSeconds(-length);
+                                break;
+
+                            case @"minutes":
+                                dateTimeOffset = (dateTimeOffset ?? now).AddMinutes(-length);
+                                break;
+
+                            case @"hours":
+                                dateTimeOffset = (dateTimeOffset ?? now).AddHours(-length);
+                                break;
+
+                            case @"days":
+                                dateTimeOffset = (dateTimeOffset ?? now).AddDays(-length);
+                                break;
+
+                            case @"months":
+                                dateTimeOffset = (dateTimeOffset ?? now).AddMonths(-(int)length);
+                                break;
+
+                            case @"years":
+                                dateTimeOffset = (dateTimeOffset ?? now).AddYears(-(int)length);
+                                break;
+                        }
+                    }
+                }
+            }
+            catch (ArgumentOutOfRangeException)
+            {
+                dateTimeOffset = DateTimeOffset.MinValue.AddMilliseconds(1);
+            }
+
+            if (!dateTimeOffset.HasValue)
+                return false;
+
+            return tryUpdateCriteriaRange(ref dateRange, op, dateTimeOffset.Value);
         }
     }
 }

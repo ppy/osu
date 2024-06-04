@@ -396,7 +396,7 @@ namespace osu.Game.Online.Multiplayer
                 switch (state)
                 {
                     case MultiplayerRoomState.Open:
-                        APIRoom.Status.Value = new RoomStatusOpen();
+                        APIRoom.Status.Value = APIRoom.HasPassword.Value ? new RoomStatusOpenPrivate() : new RoomStatusOpen();
                         break;
 
                     case MultiplayerRoomState.Playing:
@@ -816,6 +816,7 @@ namespace osu.Game.Online.Multiplayer
             Room.Settings = settings;
             APIRoom.Name.Value = Room.Settings.Name;
             APIRoom.Password.Value = Room.Settings.Password;
+            APIRoom.Status.Value = string.IsNullOrEmpty(Room.Settings.Password) ? new RoomStatusOpen() : new RoomStatusOpenPrivate();
             APIRoom.Type.Value = Room.Settings.MatchType;
             APIRoom.QueueMode.Value = Room.Settings.QueueMode;
             APIRoom.AutoStartDuration.Value = Room.Settings.AutoStartDuration;

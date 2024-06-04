@@ -8,6 +8,7 @@ using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu;
+using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Osu.Objects;
 using osuTK;
 
@@ -29,7 +30,7 @@ namespace osu.Game.Tests.Visual.Mods
         public void TestMaximumAchievableAccuracy() =>
             CreateModTest(new ModTestData
             {
-                Mod = new ModAccuracyChallenge
+                Mod = new OsuModAccuracyChallenge
                 {
                     MinimumAccuracy = { Value = 0.6 }
                 },
@@ -49,7 +50,7 @@ namespace osu.Game.Tests.Visual.Mods
         public void TestStandardAccuracy() =>
             CreateModTest(new ModTestData
             {
-                Mod = new ModAccuracyChallenge
+                Mod = new OsuModAccuracyChallenge
                 {
                     MinimumAccuracy = { Value = 0.6 },
                     AccuracyJudgeMode = { Value = ModAccuracyChallenge.AccuracyMode.Standard }

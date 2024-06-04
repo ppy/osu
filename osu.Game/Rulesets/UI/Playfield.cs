@@ -247,9 +247,13 @@ namespace osu.Game.Rulesets.UI
             nestedPlayfields.Add(otherPlayfield);
         }
 
+        private Mod[] mods;
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
+
+            mods = Mods?.ToArray();
 
             // in the case a consumer forgets to add the HitObjectContainer, we will add it here.
             if (HitObjectContainer.Parent == null)
@@ -260,9 +264,9 @@ namespace osu.Game.Rulesets.UI
         {
             base.Update();
 
-            if (!IsNested && Mods != null)
+            if (!IsNested && mods != null)
             {
-                foreach (var mod in Mods)
+                foreach (Mod mod in mods)
                 {
                     if (mod is IUpdatableByPlayfield updatable)
                         updatable.Update(this);
@@ -403,10 +407,13 @@ namespace osu.Game.Rulesets.UI
 
                     // If this is the first time this DHO is being used, then apply the DHO mods.
                     // This is done before Apply() so that the state is updated once when the hitobject is applied.
-                    if (Mods != null)
+                    if (mods != null)
                     {
-                        foreach (var m in Mods.OfType<IApplicableToDrawableHitObject>())
-                            m.ApplyToDrawableHitObject(dho);
+                        foreach (Mod mod in mods)
+                        {
+                            if (mod is IApplicableToDrawableHitObject applicable)
+                                applicable.ApplyToDrawableHitObject(dho);
+                        }
                     }
                 }
 

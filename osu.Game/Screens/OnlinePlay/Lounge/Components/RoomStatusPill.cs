@@ -1,13 +1,11 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 using osu.Game.Online.Rooms;
-using osu.Game.Online.Rooms.RoomStatuses;
 
 namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 {
@@ -36,18 +34,10 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 
         private void updateDisplay()
         {
-            RoomStatus status = getDisplayStatus();
+            RoomStatus status = Status.Value;
 
             Pill.Background.FadeColour(status.GetAppropriateColour(colours), 100);
             TextFlow.Text = status.Message;
-        }
-
-        private RoomStatus getDisplayStatus()
-        {
-            if (EndDate.Value < DateTimeOffset.Now)
-                return new RoomStatusEnded();
-
-            return Status.Value;
         }
     }
 }

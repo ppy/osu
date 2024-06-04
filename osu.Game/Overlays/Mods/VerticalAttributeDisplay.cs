@@ -124,7 +124,7 @@ namespace osu.Game.Overlays.Mods
 
         private partial class EffectCounter : RollingCounter<double>
         {
-            protected override double RollingDuration => 500;
+            protected override double RollingDuration => 250;
 
             protected override LocalisableString FormatCount(double count) => count.ToLocalisableString("0.0#");
 
