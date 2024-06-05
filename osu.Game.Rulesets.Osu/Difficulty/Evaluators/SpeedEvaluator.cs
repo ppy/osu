@@ -56,22 +56,29 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             if (strainTime < min_speed_bonus)
                 speedBonus = 1 + 0.75 * Math.Pow((min_speed_bonus - strainTime) / speed_balancing_factor, 2);
 
+            double angleBonus = calculateAngleBonus(osuCurrObj.Angle ?? Math.PI);
+
             double travelDistance = osuPrevObj?.TravelDistance ?? 0;
-            double distance = Math.Min(single_spacing_threshold, travelDistance + osuCurrObj.MinimumJumpDistance);
 
-            // double wideNess = osuCurrObj.Angle is null ? 0 : Math.Sin(osuCurrObj.Angle.Value);
-            double angleBonus = 0.75 + 0.25 * CalculateAngleBonus(osuCurrObj.Angle?? Math.PI);
+            double distance = (travelDistance + osuCurrObj.MinimumJumpDistance) * angleBonus;
+            double distanceBonus = Math.Min(1, Math.Pow(distance / single_spacing_threshold, 3.5));
 
-            double speedDifficulty = (speedBonus + Math.Pow(distance * angleBonus / single_spacing_threshold, 3.5)) * doubletapness / Math.Pow(strainTime, 1.01);
+            double distanceToSpeedRatio = distanceBonus / speedBonus;
+
+            // If spacing is too small for high speed difficulty - nerf distance bonus
+            if (distanceToSpeedRatio < 0.5)
+                distanceBonus *= Math.Sqrt(distanceToSpeedRatio * 2);
+
+            double speedDifficulty = (speedBonus + distanceBonus) * doubletapness / strainTime;
 
             return speedDifficulty;
         }
-        private static double CalculateAngleBonus(double angle)
+        private static double calculateAngleBonus(double angle)
         {
             // A very small multiplier is used here to prevent FP shenanigans
-            if (angle >= Math.PI * 0.99999) return 0;
+            if (angle >= Math.PI * 0.99999) return 1;
             // Max is used to prevent FP
-            return Math.Max(0, (Math.PI - angle) / Math.Sqrt(2 * (1 - Math.Cos(Math.PI - angle))) - 1);
+            return (Math.PI - angle) / Math.Sqrt(2 * (1 - Math.Cos(Math.PI - angle)));
         }
     }
 }
