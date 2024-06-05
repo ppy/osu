@@ -1,11 +1,13 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Humanizer;
 using Humanizer.Localisation;
 using osu.Framework.Bindables;
+using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Online.Rooms
 {
@@ -39,6 +41,17 @@ namespace osu.Game.Online.Rooms
         }
 
         public static string GetTotalDuration(this BindableList<PlaylistItem> playlist) =>
-            playlist.Select(p => p.Beatmap.Length).Sum().Milliseconds().Humanize(minUnit: TimeUnit.Second, maxUnit: TimeUnit.Hour, precision: 2);
+            playlist.Select(p =>
+            {
+                var ruleset = p.Beatmap.Ruleset.CreateInstance();
+                double rate = 1;
+                if (p.RequiredMods.Count() > 0)
+                {
+                    List<Mod> mods = p.RequiredMods.Select(mod => mod.ToMod(ruleset)).ToList();
+                    foreach (var mod in mods.OfType<IApplicableToRate>())
+                        rate = mod.ApplyToRate(0, rate);
+                }
+                return p.Beatmap.Length / rate;
+            }).Sum().Milliseconds().Humanize(minUnit: TimeUnit.Second, maxUnit: TimeUnit.Hour, precision: 2);
     }
 }
