@@ -29,7 +29,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Touch
         private const int maximum_objects_history = 2;
         private const int maximum_difficulty_objects_history = 3;
 
-        private TouchHand lastHand = TouchHand.Right;
+        protected TouchHand LastHand { get; private set; } = TouchHand.Right;
 
         protected RawTouchSkill(double clockRate)
         {
@@ -46,7 +46,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Touch
         {
             CurrentStrain = copy.CurrentStrain;
             ClockRate = copy.ClockRate;
-            lastHand = copy.lastHand;
+            LastHand = copy.LastHand;
 
             LastLeftObjects = new List<OsuHitObject>(copy.LastLeftObjects);
             LastRightObjects = new List<OsuHitObject>(copy.LastRightObjects);
@@ -92,20 +92,18 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Touch
             if (currentHand == TouchHand.Drag)
                 CurrentStrain += StrainValueOf(simulated);
             else
-                CurrentStrain += StrainValueIf(simulated, currentHand, lastHand);
+                CurrentStrain += StrainValueIf(simulated, currentHand);
         }
 
         private void updateHistory(OsuDifficultyHitObject current, TouchHand currentHand)
         {
-            var relevantHand = getRelevantHand(currentHand);
+            LastHand = getRelevantHand(currentHand);
 
-            var lastObjects = relevantHand == TouchHand.Left ? LastLeftObjects : LastRightObjects;
-            var lastDifficultyObjects = relevantHand == TouchHand.Left ? LastLeftDifficultyObjects : LastRightDifficultyObjects;
+            var lastObjects = LastHand == TouchHand.Left ? LastLeftObjects : LastRightObjects;
+            var lastDifficultyObjects = LastHand == TouchHand.Left ? LastLeftDifficultyObjects : LastRightDifficultyObjects;
 
             updateObjectHistory(lastDifficultyObjects, current, maximum_difficulty_objects_history);
             updateObjectHistory(lastObjects, (OsuHitObject)current.BaseObject, maximum_objects_history);
-
-            lastHand = relevantHand;
 
             static void updateObjectHistory<T>(List<T> objects, T obj, int maxLength)
             {
@@ -116,7 +114,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Touch
             }
         }
 
-        private TouchHand getRelevantHand(TouchHand currentHand) => currentHand == TouchHand.Drag ? lastHand : currentHand;
+        private TouchHand getRelevantHand(TouchHand currentHand) => currentHand == TouchHand.Drag ? LastHand : currentHand;
 
         protected TouchHand GetOtherHand(TouchHand currentHand)
         {
@@ -129,7 +127,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Touch
                     return TouchHand.Left;
 
                 default:
-                    return GetOtherHand(lastHand);
+                    return GetOtherHand(LastHand);
             }
         }
 
@@ -137,7 +135,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Touch
 
         protected abstract double StrainValueOf(OsuDifficultyHitObject current);
 
-        protected abstract double StrainValueIf(OsuDifficultyHitObject simulated, TouchHand currentHand, TouchHand lastHand);
+        protected abstract double StrainValueIf(OsuDifficultyHitObject simulated, TouchHand currentHand);
 
         public abstract RawTouchSkill DeepClone();
     }

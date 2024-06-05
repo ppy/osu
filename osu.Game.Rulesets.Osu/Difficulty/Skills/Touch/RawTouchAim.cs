@@ -30,12 +30,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Touch
         protected override double StrainValueOf(OsuDifficultyHitObject current) =>
             AimEvaluator.EvaluateDifficultyOf(current, withSliders) * skillMultiplier;
 
-        protected override double StrainValueIf(OsuDifficultyHitObject simulated, TouchHand currentHand, TouchHand lastHand)
+        protected override double StrainValueIf(OsuDifficultyHitObject simulated, TouchHand currentHand)
         {
             double obstructionBonus = 1;
 
             // Add a bonus for the hand co-ordination required to aim with both hands.
-            if (currentHand != lastHand)
+            if (currentHand != LastHand)
             {
                 double bonus = 1.1;
 

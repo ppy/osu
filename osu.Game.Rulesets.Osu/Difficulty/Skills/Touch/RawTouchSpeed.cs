@@ -25,11 +25,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Touch
         protected override double StrainValueOf(OsuDifficultyHitObject current) =>
             SpeedEvaluator.EvaluateDifficultyOf(current, false) * skillMultiplier;
 
-        protected override double StrainValueIf(OsuDifficultyHitObject simulated, TouchHand currentHand, TouchHand lastHand)
+        protected override double StrainValueIf(OsuDifficultyHitObject simulated, TouchHand currentHand)
         {
             double singletapMultiplier = 1;
 
-            if (currentHand == lastHand)
+            if (currentHand == LastHand)
                 // Reduction in speed value for singletapping consecutive notes.
                 singletapMultiplier *= 0.93;
 
