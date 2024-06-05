@@ -57,37 +57,32 @@ namespace osu.Game.Screens.Edit
                                     RelativeSizeAxes = Axes.Both,
                                     Colour = colourProvider.Background4
                                 },
-                                new Container
+                                new GridContainer
                                 {
                                     Name = "Timeline content",
                                     RelativeSizeAxes = Axes.X,
                                     AutoSizeAxes = Axes.Y,
                                     Padding = new MarginPadding { Horizontal = PADDING, Top = PADDING },
-                                    Child = new GridContainer
+                                    Content = new[]
                                     {
-                                        RelativeSizeAxes = Axes.X,
-                                        AutoSizeAxes = Axes.Y,
-                                        Content = new[]
+                                        new Drawable[]
                                         {
-                                            new Drawable[]
+                                            TimelineContent = new Container
                                             {
-                                                TimelineContent = new Container
-                                                {
-                                                    RelativeSizeAxes = Axes.X,
-                                                    AutoSizeAxes = Axes.Y,
-                                                },
+                                                RelativeSizeAxes = Axes.X,
+                                                AutoSizeAxes = Axes.Y,
                                             },
                                         },
-                                        RowDimensions = new[]
-                                        {
-                                            new Dimension(GridSizeMode.AutoSize),
-                                        },
-                                        ColumnDimensions = new[]
-                                        {
-                                            new Dimension(),
-                                            new Dimension(GridSizeMode.Absolute, 90),
-                                        }
                                     },
+                                    RowDimensions = new[]
+                                    {
+                                        new Dimension(GridSizeMode.AutoSize),
+                                    },
+                                    ColumnDimensions = new[]
+                                    {
+                                        new Dimension(),
+                                        new Dimension(GridSizeMode.Absolute, 90),
+                                    }
                                 }
                             }
                         },

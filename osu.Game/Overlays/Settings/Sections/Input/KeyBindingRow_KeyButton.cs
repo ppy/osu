@@ -140,7 +140,8 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             /// <param name="fullState">A <see cref="KeyCombination"/> generated from the full input state.</param>
             /// <param name="triggerKey">The key which triggered this update, and should be used as the binding.</param>
             public void UpdateKeyCombination(KeyCombination fullState, InputKey triggerKey) =>
-                UpdateKeyCombination(new KeyCombination(fullState.Keys.Where(KeyCombination.IsModifierKey).Append(triggerKey)));
+                // TODO: Distinct() can be removed after https://github.com/ppy/osu-framework/pull/6130 is merged.
+                UpdateKeyCombination(new KeyCombination(fullState.Keys.Where(KeyCombination.IsModifierKey).Append(triggerKey).Distinct().ToArray()));
 
             public void UpdateKeyCombination(KeyCombination newCombination)
             {

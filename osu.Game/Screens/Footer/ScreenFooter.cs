@@ -1,0 +1,86 @@
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
+
+using System.Collections.Generic;
+using osu.Framework.Allocation;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
+using osu.Game.Graphics;
+using osu.Game.Overlays;
+using osuTK;
+
+namespace osu.Game.Screens.Footer
+{
+    public partial class ScreenFooter : InputBlockingContainer
+    {
+        private const int height = 60;
+        private const int padding = 60;
+
+        private readonly List<OverlayContainer> overlays = new List<OverlayContainer>();
+
+        /// <param name="button">The button to be added.</param>
+        /// <param name="overlay">The <see cref="OverlayContainer"/> to be toggled by this button.</param>
+        public void AddButton(ScreenFooterButton button, OverlayContainer? overlay = null)
+        {
+            if (overlay != null)
+            {
+                overlays.Add(overlay);
+                button.Action = () => showOverlay(overlay);
+                button.OverlayState.BindTo(overlay.State);
+            }
+
+            buttons.Add(button);
+        }
+
+        private void showOverlay(OverlayContainer overlay)
+        {
+            foreach (var o in overlays)
+            {
+                if (o == overlay)
+                    o.ToggleVisibility();
+                else
+                    o.Hide();
+            }
+        }
+
+        private FillFlowContainer<ScreenFooterButton> buttons = null!;
+
+        public ScreenFooter()
+        {
+            RelativeSizeAxes = Axes.X;
+            Height = height;
+            Anchor = Anchor.BottomLeft;
+            Origin = Anchor.BottomLeft;
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(OverlayColourProvider colourProvider)
+        {
+            InternalChildren = new Drawable[]
+            {
+                new Box
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = colourProvider.Background5
+                },
+                buttons = new FillFlowContainer<ScreenFooterButton>
+                {
+                    Position = new Vector2(ScreenBackButton.BUTTON_WIDTH + padding, 10),
+                    Anchor = Anchor.BottomLeft,
+                    Origin = Anchor.BottomLeft,
+                    Direction = FillDirection.Horizontal,
+                    Spacing = new Vector2(7, 0),
+                    AutoSizeAxes = Axes.Both
+                },
+                new ScreenBackButton
+                {
+                    Margin = new MarginPadding { Bottom = 10f, Left = 12f },
+                    Anchor = Anchor.BottomLeft,
+                    Origin = Anchor.BottomLeft,
+                    Action = () => { },
+                },
+            };
+        }
+    }
+}

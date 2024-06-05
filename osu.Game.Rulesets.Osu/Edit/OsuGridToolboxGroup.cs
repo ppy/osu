@@ -10,7 +10,6 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
-using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
 using osu.Game.Rulesets.Edit;
@@ -26,9 +25,6 @@ namespace osu.Game.Rulesets.Osu.Edit
     {
         [Resolved]
         private EditorBeatmap editorBeatmap { get; set; } = null!;
-
-        [Resolved]
-        private IExpandingContainer? expandingContainer { get; set; }
 
         /// <summary>
         /// X position of the grid's origin.
