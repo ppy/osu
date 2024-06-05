@@ -20,11 +20,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Touch
 
         protected readonly double ClockRate;
 
-        protected readonly List<OsuHitObject> LastLeftObjects;
-        protected readonly List<OsuHitObject> LastRightObjects;
+        private readonly List<OsuHitObject> lastLeftObjects;
+        private readonly List<OsuHitObject> lastRightObjects;
 
-        protected readonly List<DifficultyHitObject> LastLeftDifficultyObjects;
-        protected readonly List<DifficultyHitObject> LastRightDifficultyObjects;
+        private readonly List<DifficultyHitObject> lastLeftDifficultyObjects;
+        private readonly List<DifficultyHitObject> lastRightDifficultyObjects;
 
         private const int maximum_objects_history = 2;
         private const int maximum_difficulty_objects_history = 3;
@@ -35,11 +35,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Touch
         {
             ClockRate = clockRate;
 
-            LastLeftObjects = new List<OsuHitObject>();
-            LastRightObjects = new List<OsuHitObject>();
+            lastLeftObjects = new List<OsuHitObject>();
+            lastRightObjects = new List<OsuHitObject>();
 
-            LastLeftDifficultyObjects = new List<DifficultyHitObject>();
-            LastRightDifficultyObjects = new List<DifficultyHitObject>();
+            lastLeftDifficultyObjects = new List<DifficultyHitObject>();
+            lastRightDifficultyObjects = new List<DifficultyHitObject>();
         }
 
         protected RawTouchSkill(RawTouchSkill copy)
@@ -48,11 +48,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Touch
             ClockRate = copy.ClockRate;
             LastHand = copy.LastHand;
 
-            LastLeftObjects = new List<OsuHitObject>(copy.LastLeftObjects);
-            LastRightObjects = new List<OsuHitObject>(copy.LastRightObjects);
+            lastLeftObjects = new List<OsuHitObject>(copy.lastLeftObjects);
+            lastRightObjects = new List<OsuHitObject>(copy.lastRightObjects);
 
-            LastLeftDifficultyObjects = new List<DifficultyHitObject>(copy.LastLeftDifficultyObjects);
-            LastRightDifficultyObjects = new List<DifficultyHitObject>(copy.LastRightDifficultyObjects);
+            lastLeftDifficultyObjects = new List<DifficultyHitObject>(copy.lastLeftDifficultyObjects);
+            lastRightDifficultyObjects = new List<DifficultyHitObject>(copy.lastRightDifficultyObjects);
         }
 
         public void Process(OsuDifficultyHitObject current, TouchHand currentHand)
@@ -61,8 +61,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Touch
             {
                 // Automatically assume the first note of a beatmap is hit with
                 // the left hand and the second note is hit with the right.
-                LastLeftObjects.Add((OsuHitObject)current.LastObject);
-                LastRightObjects.Add((OsuHitObject)current.BaseObject);
+                lastLeftObjects.Add((OsuHitObject)current.LastObject);
+                lastRightObjects.Add((OsuHitObject)current.BaseObject);
 
                 return;
             }
@@ -77,8 +77,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Touch
         {
             // A simulated difficulty object is created for hand-specific difficulty properties.
             // Objects before the current object are derived from the same hand.
-            var lastObjects = currentHand == TouchHand.Left ? LastLeftObjects : LastRightObjects;
-            var lastDifficultyObjects = currentHand == TouchHand.Left ? LastLeftDifficultyObjects : LastRightDifficultyObjects;
+            var lastObjects = GetLastObjects(currentHand);
+            var lastDifficultyObjects = GetLastDifficultyObjects(currentHand);
             var lastLast = lastObjects.Count > 1 ? lastObjects[^2] : null;
 
             return new OsuDifficultyHitObject(current.BaseObject, lastObjects.Last(), lastLast, ClockRate, lastDifficultyObjects, lastDifficultyObjects.Count);
@@ -99,8 +99,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Touch
         {
             LastHand = getRelevantHand(currentHand);
 
-            var lastObjects = LastHand == TouchHand.Left ? LastLeftObjects : LastRightObjects;
-            var lastDifficultyObjects = LastHand == TouchHand.Left ? LastLeftDifficultyObjects : LastRightDifficultyObjects;
+            var lastObjects = GetLastObjects(LastHand);
+            var lastDifficultyObjects = GetLastDifficultyObjects(LastHand);
 
             updateObjectHistory(lastDifficultyObjects, current, maximum_difficulty_objects_history);
             updateObjectHistory(lastObjects, (OsuHitObject)current.BaseObject, maximum_objects_history);
@@ -130,6 +130,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Touch
                     return GetOtherHand(LastHand);
             }
         }
+
+        protected List<OsuHitObject> GetLastObjects(TouchHand hand) => hand == TouchHand.Left ? lastLeftObjects : lastRightObjects;
+
+        protected List<DifficultyHitObject> GetLastDifficultyObjects(TouchHand hand) => hand == TouchHand.Left ? lastLeftDifficultyObjects : lastRightDifficultyObjects;
 
         private double strainDecay(double ms) => Math.Pow(StrainDecayBase, ms / 1000);
 

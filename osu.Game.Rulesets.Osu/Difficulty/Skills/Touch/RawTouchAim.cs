@@ -60,10 +60,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Touch
             // Since this is a swap object, the last object was hit by the other hand.
             var otherHand = GetOtherHand(currentHand);
 
-            var last = (otherHand == TouchHand.Left ? LastLeftObjects : LastRightObjects).Last();
-            var lastLast = (currentHand == TouchHand.Left ? LastLeftObjects : LastRightObjects).Last();
+            var last = GetLastObjects(otherHand).Last();
+            var lastLast = GetLastObjects(currentHand).Last();
 
-            var lastDifficultyObjects = currentHand == TouchHand.Left ? LastLeftDifficultyObjects : LastRightDifficultyObjects;
+            var lastDifficultyObjects = GetLastDifficultyObjects(currentHand);
 
             return new OsuDifficultyHitObject(current.BaseObject, last, lastLast, ClockRate, lastDifficultyObjects, lastDifficultyObjects.Count);
         }
