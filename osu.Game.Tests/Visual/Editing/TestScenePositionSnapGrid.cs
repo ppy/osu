@@ -16,7 +16,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual.Editing
 {
-    public partial class TestSceneRectangularPositionSnapGrid : OsuManualInputManagerTestScene
+    public partial class TestScenePositionSnapGrid : OsuManualInputManagerTestScene
     {
         private Container content;
         protected override Container<Drawable> Content => content;
@@ -33,28 +33,34 @@ namespace osu.Game.Tests.Visual.Editing
                 },
                 content = new Container
                 {
-                    RelativeSizeAxes = Axes.Both
+                    RelativeSizeAxes = Axes.Both,
+                    Padding = new MarginPadding(10),
                 }
             });
         }
 
         private static readonly object[][] test_cases =
         {
-            new object[] { new Vector2(0, 0), new Vector2(10, 10) },
-            new object[] { new Vector2(240, 180), new Vector2(10, 15) },
-            new object[] { new Vector2(160, 120), new Vector2(30, 20) },
-            new object[] { new Vector2(480, 360), new Vector2(100, 100) },
+            new object[] { new Vector2(0, 0), new Vector2(10, 10), 0f },
+            new object[] { new Vector2(240, 180), new Vector2(10, 15), 10f },
+            new object[] { new Vector2(160, 120), new Vector2(30, 20), -10f },
+            new object[] { new Vector2(480, 360), new Vector2(100, 100), 0f },
         };
 
         [TestCaseSource(nameof(test_cases))]
-        public void TestRectangularGrid(Vector2 position, Vector2 spacing)
+        public void TestRectangularGrid(Vector2 position, Vector2 spacing, float rotation)
         {
             RectangularPositionSnapGrid grid = null;
 
-            AddStep("create grid", () => Child = grid = new RectangularPositionSnapGrid(position)
+            AddStep("create grid", () =>
             {
-                RelativeSizeAxes = Axes.Both,
-                Spacing = spacing
+                Child = grid = new RectangularPositionSnapGrid
+                {
+                    RelativeSizeAxes = Axes.Both,
+                };
+                grid.StartPosition.Value = position;
+                grid.Spacing.Value = spacing;
+                grid.GridLineRotation.Value = rotation;
             });
 
             AddStep("add snapping cursor", () => Add(new SnappingCursorContainer
