@@ -95,15 +95,15 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Touch
                 CurrentStrain += StrainValueIf(simulated, currentHand);
         }
 
-        private void updateHistory(OsuDifficultyHitObject current, TouchHand currentHand)
+        private void updateHistory(OsuDifficultyHitObject simulated, TouchHand currentHand)
         {
             LastHand = getRelevantHand(currentHand);
 
             var lastObjects = GetLastObjects(LastHand);
             var lastDifficultyObjects = GetLastDifficultyObjects(LastHand);
 
-            updateObjectHistory(lastDifficultyObjects, current, maximum_difficulty_objects_history);
-            updateObjectHistory(lastObjects, (OsuHitObject)current.BaseObject, maximum_objects_history);
+            updateObjectHistory(lastDifficultyObjects, simulated, maximum_difficulty_objects_history);
+            updateObjectHistory(lastObjects, (OsuHitObject)simulated.BaseObject, maximum_objects_history);
 
             static void updateObjectHistory<T>(List<T> objects, T obj, int maxLength)
             {
