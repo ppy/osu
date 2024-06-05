@@ -36,7 +36,7 @@ namespace osu.Game.Overlays.Mods
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 Active = { BindTarget = Active },
-                Shear = new Vector2(-ShearedOverlayContainer.SHEAR, 0),
+                Shear = new Vector2(-OsuGame.SHEAR, 0),
                 Scale = new Vector2(HEIGHT / ModSwitchSmall.DEFAULT_SIZE)
             };
         }
@@ -77,11 +77,11 @@ namespace osu.Game.Overlays.Mods
         /// <seealso cref="ModState.Visible"/>
         public bool Visible => modState.Visible;
 
-        public override IEnumerable<LocalisableString> FilterTerms => new[]
+        public override IEnumerable<LocalisableString> FilterTerms => new LocalisableString[]
         {
             Mod.Name,
+            Mod.Name.Replace(" ", string.Empty),
             Mod.Acronym,
-            Mod.Description
         };
 
         public override bool MatchingFilter

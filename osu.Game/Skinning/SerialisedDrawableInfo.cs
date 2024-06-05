@@ -34,15 +34,15 @@ namespace osu.Game.Skinning
 
         public float Rotation { get; set; }
 
-        public Vector2 Scale { get; set; }
+        public Vector2 Scale { get; set; } = Vector2.One;
 
         public float? Width { get; set; }
 
         public float? Height { get; set; }
 
-        public Anchor Anchor { get; set; }
+        public Anchor Anchor { get; set; } = Anchor.TopLeft;
 
-        public Anchor Origin { get; set; }
+        public Anchor Origin { get; set; } = Anchor.TopLeft;
 
         /// <inheritdoc cref="ISerialisableDrawable.UsesFixedAnchor"/>
         public bool UsesFixedAnchor { get; set; }

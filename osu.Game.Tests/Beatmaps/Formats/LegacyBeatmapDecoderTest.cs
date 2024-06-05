@@ -1188,5 +1188,36 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.That(beatmap.HitObjects[0].GetEndTime(), Is.EqualTo(3153));
             }
         }
+
+        [Test]
+        public void TestBeatmapDifficultyIsClamped()
+        {
+            var decoder = new LegacyBeatmapDecoder { ApplyOffsets = false };
+
+            using (var resStream = TestResources.OpenResource("out-of-range-difficulties.osu"))
+            using (var stream = new LineBufferedReader(resStream))
+            {
+                var decoded = decoder.Decode(stream).Difficulty;
+                Assert.That(decoded.DrainRate, Is.EqualTo(10));
+                Assert.That(decoded.CircleSize, Is.EqualTo(10));
+                Assert.That(decoded.OverallDifficulty, Is.EqualTo(10));
+                Assert.That(decoded.ApproachRate, Is.EqualTo(10));
+                Assert.That(decoded.SliderMultiplier, Is.EqualTo(3.6));
+                Assert.That(decoded.SliderTickRate, Is.EqualTo(8));
+            }
+        }
+
+        [Test]
+        public void TestManiaBeatmapDifficultyCircleSizeClamp()
+        {
+            var decoder = new LegacyBeatmapDecoder { ApplyOffsets = false };
+
+            using (var resStream = TestResources.OpenResource("out-of-range-difficulties-mania.osu"))
+            using (var stream = new LineBufferedReader(resStream))
+            {
+                var decoded = decoder.Decode(stream).Difficulty;
+                Assert.That(decoded.CircleSize, Is.EqualTo(14));
+            }
+        }
     }
 }

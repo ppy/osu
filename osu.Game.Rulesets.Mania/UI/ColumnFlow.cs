@@ -3,17 +3,12 @@
 
 #nullable disable
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Skinning;
 using osu.Game.Skinning;
-using osuTK;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
@@ -28,20 +23,21 @@ namespace osu.Game.Rulesets.Mania.UI
         /// <summary>
         /// All contents added to this <see cref="ColumnFlow{TContent}"/>.
         /// </summary>
-        public IReadOnlyList<TContent> Content => columns.Children.Select(c => c.Count == 0 ? null : (TContent)c.Child).ToList();
+        public TContent[] Content { get; }
 
-        private readonly FillFlowContainer<Container> columns;
+        private readonly FillFlowContainer<Container<TContent>> columns;
         private readonly StageDefinition stageDefinition;
 
         public ColumnFlow(StageDefinition stageDefinition)
         {
             this.stageDefinition = stageDefinition;
+            Content = new TContent[stageDefinition.Columns];
 
             AutoSizeAxes = Axes.X;
 
             Masking = true;
 
-            InternalChild = columns = new FillFlowContainer<Container>
+            InternalChild = columns = new FillFlowContainer<Container<TContent>>
             {
                 RelativeSizeAxes = Axes.Y,
                 AutoSizeAxes = Axes.X,
@@ -49,7 +45,7 @@ namespace osu.Game.Rulesets.Mania.UI
             };
 
             for (int i = 0; i < stageDefinition.Columns; i++)
-                columns.Add(new Container { RelativeSizeAxes = Axes.Y });
+                columns.Add(new Container<TContent> { RelativeSizeAxes = Axes.Y });
         }
 
         private ISkinSource currentSkin;
@@ -61,12 +57,6 @@ namespace osu.Game.Rulesets.Mania.UI
 
             skin.SourceChanged += onSkinChanged;
             onSkinChanged();
-        }
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-            updateMobileSizing();
         }
 
         private void onSkinChanged()
@@ -93,8 +83,6 @@ namespace osu.Game.Rulesets.Mania.UI
 
                 columns[i].Width = width.Value;
             }
-
-            updateMobileSizing();
         }
 
         /// <summary>
@@ -102,31 +90,9 @@ namespace osu.Game.Rulesets.Mania.UI
         /// </summary>
         /// <param name="column">The index of the column to set the content of.</param>
         /// <param name="content">The content.</param>
-        public void SetContentForColumn(int column, TContent content) => columns[column].Child = content;
-
-        private void updateMobileSizing()
+        public void SetContentForColumn(int column, TContent content)
         {
-            if (!IsLoaded || !RuntimeInfo.IsMobile)
-                return;
-
-            // GridContainer+CellContainer containing this stage (gets split up for dual stages).
-            Vector2? containingCell = this.FindClosestParent<Stage>()?.Parent?.DrawSize;
-
-            // Will be null in tests.
-            if (containingCell == null)
-                return;
-
-            float aspectRatio = containingCell.Value.X / containingCell.Value.Y;
-
-            // 2.83 is a mostly arbitrary scale-up (170 / 60, based on original implementation for argon)
-            float mobileAdjust = 2.83f * Math.Min(1, 7f / stageDefinition.Columns);
-            // 1.92 is a "reference" mobile screen aspect ratio for phones.
-            // We should scale it back for cases like tablets which aren't so extreme.
-            mobileAdjust *= aspectRatio / 1.92f;
-
-            // Best effort until we have better mobile support.
-            for (int i = 0; i < stageDefinition.Columns; i++)
-                columns[i].Width *= mobileAdjust;
+            Content[column] = columns[column].Child = content;
         }
 
         protected override void Dispose(bool isDisposing)
