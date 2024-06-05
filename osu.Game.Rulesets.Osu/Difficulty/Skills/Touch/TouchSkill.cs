@@ -13,10 +13,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Touch
 {
     public abstract class TouchSkill : OsuStrainSkill
     {
-        private static readonly int maximum_probabilities = 15;
+        private const int maximum_probabilities = 15;
         private readonly List<TouchProbability> probabilities = new List<TouchProbability>(maximum_probabilities);
 
-        protected TouchSkill(Mod[] mods) : base(mods)
+        protected TouchSkill(Mod[] mods)
+            : base(mods)
         {
         }
 
@@ -69,16 +70,16 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Touch
             }
 
             // Only keep the most probable possibilities.
-            newProbabilities.OrderByDescending(p => p.Probability);
+            var sortedProbabilities = newProbabilities.OrderByDescending(p => p.Probability).ToList();
             probabilities.Clear();
 
             double totalMostProbable = 0;
 
-            for (int i = 0; i < Math.Min(newProbabilities.Count, maximum_probabilities); i++)
+            for (int i = 0; i < Math.Min(sortedProbabilities.Count, maximum_probabilities); i++)
             {
-                totalMostProbable += newProbabilities[i].Probability;
+                totalMostProbable += sortedProbabilities[i].Probability;
 
-                probabilities.Add(newProbabilities[i]);
+                probabilities.Add(sortedProbabilities[i]);
             }
 
             double strain = 0;
@@ -86,7 +87,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Touch
             foreach (var probability in probabilities)
             {
                 // Make sure total probability sums up to 1.
-                probability.Probability = totalMostProbable > 0 ? probability.Probability / totalMostProbable : 1 / probabilities.Count;
+                probability.Probability = totalMostProbable > 0 ? probability.Probability / totalMostProbable : 1.0 / probabilities.Count;
 
                 strain += GetProbabilityStrain(probability) * probability.Probability;
             }

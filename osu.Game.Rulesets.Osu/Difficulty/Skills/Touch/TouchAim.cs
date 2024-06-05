@@ -16,7 +16,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Touch
 
         private double currentStrain;
 
-        public TouchAim(Mod[] mods, double clockRate, bool withSliders) : base(mods)
+        public TouchAim(Mod[] mods, double clockRate, bool withSliders)
+            : base(mods)
         {
             this.clockRate = clockRate;
             this.withSliders = withSliders;

@@ -12,11 +12,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Touch
         private double skillMultiplier => 1375;
         protected override double StrainDecayBase => 0.3;
 
-        public RawTouchSpeed(double clockRate) : base(clockRate)
+        public RawTouchSpeed(double clockRate)
+            : base(clockRate)
         {
         }
 
-        private RawTouchSpeed(RawTouchSpeed copy) : base(copy)
+        private RawTouchSpeed(RawTouchSpeed copy)
+            : base(copy)
         {
         }
 

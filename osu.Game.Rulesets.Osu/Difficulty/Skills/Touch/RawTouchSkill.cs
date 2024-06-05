@@ -26,8 +26,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Touch
         protected readonly List<DifficultyHitObject> LastLeftDifficultyObjects;
         protected readonly List<DifficultyHitObject> LastRightDifficultyObjects;
 
-        private static readonly int maximum_objects_history = 2;
-        private static readonly int maximum_difficulty_objects_history = 3;
+        private const int maximum_objects_history = 2;
+        private const int maximum_difficulty_objects_history = 3;
 
         private TouchHand lastHand = TouchHand.Right;
 
@@ -102,10 +102,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Touch
             var lastObjects = relevantHand == TouchHand.Left ? LastLeftObjects : LastRightObjects;
             var lastDifficultyObjects = relevantHand == TouchHand.Left ? LastLeftDifficultyObjects : LastRightDifficultyObjects;
 
-            updateHistory(lastDifficultyObjects, current, maximum_difficulty_objects_history);
-            updateHistory(lastObjects, (OsuHitObject)current.BaseObject, maximum_objects_history);
+            updateObjectHistory(lastDifficultyObjects, current, maximum_difficulty_objects_history);
+            updateObjectHistory(lastObjects, (OsuHitObject)current.BaseObject, maximum_objects_history);
 
-            static void updateHistory<T>(List<T> objects, T obj, int maxLength)
+            lastHand = relevantHand;
+
+            static void updateObjectHistory<T>(List<T> objects, T obj, int maxLength)
             {
                 objects.Add(obj);
 
@@ -122,8 +124,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Touch
             {
                 case TouchHand.Left:
                     return TouchHand.Right;
+
                 case TouchHand.Right:
                     return TouchHand.Left;
+
                 default:
                     return GetOtherHand(lastHand);
             }

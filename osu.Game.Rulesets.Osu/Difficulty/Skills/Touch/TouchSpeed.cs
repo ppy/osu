@@ -24,7 +24,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Touch
 
         private readonly double clockRate;
 
-        public TouchSpeed(Mod[] mods, double clockRate) : base(mods)
+        public TouchSpeed(Mod[] mods, double clockRate)
+            : base(mods)
         {
             this.clockRate = clockRate;
         }

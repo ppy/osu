@@ -15,12 +15,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Touch
 
         private double skillMultiplier => 23.55;
 
-        public RawTouchAim(double clockRate, bool withSliders) : base(clockRate)
+        public RawTouchAim(double clockRate, bool withSliders)
+            : base(clockRate)
         {
             this.withSliders = withSliders;
         }
 
-        private RawTouchAim(RawTouchAim copy) : base(copy)
+        private RawTouchAim(RawTouchAim copy)
+            : base(copy)
         {
             withSliders = copy.withSliders;
         }
