@@ -165,7 +165,7 @@ namespace osu.Game.Overlays.Mods
                     starRatingDisplay.FinishTransforms(true);
             });
 
-            double rate = ModUtils.CalculateRateWithMods(Mods.Value.ToList());
+            double rate = ModUtils.CalculateRateWithMods(Mods.Value);
 
             bpmDisplay.Current.Value = FormatUtils.RoundBPM(BeatmapInfo.Value.BPM, rate);
 

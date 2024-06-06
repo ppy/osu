@@ -1,13 +1,11 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Humanizer;
 using Humanizer.Localisation;
 using osu.Framework.Bindables;
-using osu.Game.Rulesets.Mods;
 using osu.Game.Utils;
 
 namespace osu.Game.Online.Rooms
@@ -48,7 +46,7 @@ namespace osu.Game.Online.Rooms
             playlist.Select(p =>
             {
                 var ruleset = p.Beatmap.Ruleset.CreateInstance();
-                double rate = ModUtils.CalculateRateWithMods(p.RequiredMods.Select(mod => mod.ToMod(ruleset)).ToList());
+                double rate = ModUtils.CalculateRateWithMods(p.RequiredMods.Select(mod => mod.ToMod(ruleset)));
                 return p.Beatmap.Length / rate;
             }).Sum().Milliseconds().Humanize(minUnit: TimeUnit.Second, maxUnit: TimeUnit.Hour, precision: 2);
     }

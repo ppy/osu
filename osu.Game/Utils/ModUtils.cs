@@ -285,11 +285,10 @@ namespace osu.Game.Utils
         public static double CalculateRateWithMods(IEnumerable<Mod> mods)
         {
             double rate = 1;
-            if (mods != null)
-            {
-                foreach (var mod in mods.OfType<IApplicableToRate>())
-                    rate = mod.ApplyToRate(0, rate);
-            }
+
+            foreach (var mod in mods.OfType<IApplicableToRate>())
+                rate = mod.ApplyToRate(0, rate);
+
             return rate;
         }
     }
