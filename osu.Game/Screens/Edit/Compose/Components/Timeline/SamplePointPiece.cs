@@ -63,9 +63,9 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         {
             return bank switch
             {
-                "normal" => "N",
-                "soft" => "S",
-                "drum" => "D",
+                HitSampleInfo.BANK_NORMAL => @"N",
+                HitSampleInfo.BANK_SOFT => @"S",
+                HitSampleInfo.BANK_DRUM => @"D",
                 _ => bank
             };
         }
