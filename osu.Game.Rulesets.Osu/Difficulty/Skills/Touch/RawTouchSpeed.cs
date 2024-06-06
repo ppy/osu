@@ -26,9 +26,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Touch
         {
             double singletapMultiplier = 1;
 
+            // Reduction in speed value for singletapping consecutive notes.
             if (currentHand == LastHand && currentHand != TouchHand.Drag)
             {
-                // Reduction in speed value for singletapping consecutive notes.
                 singletapMultiplier *= 0.93;
             }
 
@@ -36,13 +36,15 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Touch
             bool tappedWithTouch = currentHand != TouchHand.Drag;
 
             double bonusMultiplier = 1.0;
-            // Add a speed bonus for swapping out from dragging back to tapping.
-            if (currentHand != LastHand && LastHand == TouchHand.Drag)
-                bonusMultiplier += 1.0;
 
-            // Add a slight bonus for switching from tapping to dragging.
-            if (currentHand != LastHand && currentHand == TouchHand.Drag)
-                bonusMultiplier += 0.3;
+            // Add a slight bonus for hand-coordination required to swap hands.
+            if (currentHand != LastHand)
+            {
+                bonusMultiplier += 0.1;
+                // Add a speed bonus for swapping out from dragging back to tapping
+                if (LastHand == TouchHand.Drag)
+                    bonusMultiplier += 0.4;
+            }
 
             return SpeedEvaluator.EvaluateDifficultyOf(simulated, tappedWithTouch) * singletapMultiplier * bonusMultiplier * skillMultiplier;
         }

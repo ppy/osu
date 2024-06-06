@@ -31,23 +31,29 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Touch
         {
             double bonusMultiplier = 1.0;
 
+            double bonus = 0;
+
             // Add a bonus for the hand co-ordination required to aim with both hands.
             if (currentHand != LastHand && currentHand != TouchHand.Drag)
             {
-                double bonus = 0.8;
-
+                bonus += 0.5;
                 // Add an obstrution bonus if the most recent instance of the "other hand" is in between the current object and the previous object with the actual hand.
                 var simulatedSwap = createSimulatedSwapObject(simulated, currentHand);
 
                 if (simulatedSwap.Angle != null)
-                    bonus += 1.5 / (1 + Math.Exp(-(simulatedSwap.Angle.Value - 3 * Math.PI / 5) / 9));
-
-                // Decay by strain time.
-                bonus /= 1 + simulated.StrainTime / 1000;
-
-                bonusMultiplier += bonus;
+                    bonus += 2.0 / (1 + Math.Exp(-(simulatedSwap.Angle.Value - 3 * Math.PI / 5) / 9));
             }
 
+            // Add a slight aim bonus for swapping to dragging after tapping.
+            if (currentHand != LastHand && currentHand == TouchHand.Drag)
+            {
+                bonus += 0.25;
+            }
+
+            // Decay by strain time.
+            bonus /= 1 + simulated.StrainTime / 1000;
+
+            bonusMultiplier += bonus;
             return AimEvaluator.EvaluateDifficultyOf(simulated, withSliders) * bonusMultiplier * skillMultiplier;
         }
 
