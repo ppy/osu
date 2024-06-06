@@ -226,9 +226,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 if (h.Samples.Any(s => s.Name == sampleName))
                     return;
 
-                var sampleToAdd = h.CreateHitSampleInfo(sampleName);
-
-                h.Samples.Add(sampleToAdd);
+                h.Samples.Add(h.CreateHitSampleInfo(sampleName));
 
                 EditorBeatmap.Update(h);
             });
