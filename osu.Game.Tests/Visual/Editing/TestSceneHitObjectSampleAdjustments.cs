@@ -502,7 +502,7 @@ namespace osu.Game.Tests.Visual.Editing
             textBox.Current.Value = bank;
             // force a commit via keyboard.
             // this is needed when testing attempting to set empty bank - which should revert to the previous value, but only on commit.
-            InputManager.ChangeFocus(textBox);
+            ((IFocusManager)InputManager).ChangeFocus(textBox);
             InputManager.Key(Key.Enter);
         });
 
