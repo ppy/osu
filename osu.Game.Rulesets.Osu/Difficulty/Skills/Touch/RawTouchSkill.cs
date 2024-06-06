@@ -67,7 +67,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Touch
                 return;
             }
 
-            var simulated = currentHand == TouchHand.Drag ? current : createSimulatedObject(current, currentHand);
+            var simulated = currentHand == TouchHand.Drag || LastHand == TouchHand.Drag ? createSimulatedObject(current, LastHand) : createSimulatedObject(current, currentHand);
 
             updateStrainValue(current, simulated, currentHand);
             updateHistory(simulated, currentHand);
@@ -88,11 +88,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Touch
         {
             CurrentStrain *= strainDecay(current.StrainTime);
 
-            // For drag, treat the object in the same way as non-touchscreen gameplay.
-            if (currentHand == TouchHand.Drag)
-                CurrentStrain += StrainValueOf(simulated);
-            else
-                CurrentStrain += StrainValueIf(simulated, currentHand);
+            CurrentStrain += StrainValueIf(simulated, currentHand);
         }
 
         private void updateHistory(OsuDifficultyHitObject simulated, TouchHand currentHand)
@@ -136,8 +132,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Touch
         protected List<DifficultyHitObject> GetLastDifficultyObjects(TouchHand hand) => hand == TouchHand.Left ? lastLeftDifficultyObjects : lastRightDifficultyObjects;
 
         private double strainDecay(double ms) => Math.Pow(StrainDecayBase, ms / 1000);
-
-        protected abstract double StrainValueOf(OsuDifficultyHitObject current);
 
         protected abstract double StrainValueIf(OsuDifficultyHitObject simulated, TouchHand currentHand);
 

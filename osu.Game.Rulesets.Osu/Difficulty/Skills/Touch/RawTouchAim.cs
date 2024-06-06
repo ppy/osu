@@ -27,17 +27,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Touch
             withSliders = copy.withSliders;
         }
 
-        protected override double StrainValueOf(OsuDifficultyHitObject current) =>
-            AimEvaluator.EvaluateDifficultyOf(current, withSliders) * skillMultiplier;
-
         protected override double StrainValueIf(OsuDifficultyHitObject simulated, TouchHand currentHand)
         {
-            double obstructionBonus = 1;
+            double bonusMultiplier = 1.0;
 
             // Add a bonus for the hand co-ordination required to aim with both hands.
-            if (currentHand != LastHand)
+            if (currentHand != LastHand && currentHand != TouchHand.Drag)
             {
-                double bonus = 1.1;
+                double bonus = 0.8;
 
                 // Add an obstrution bonus if the most recent instance of the "other hand" is in between the current object and the previous object with the actual hand.
                 var simulatedSwap = createSimulatedSwapObject(simulated, currentHand);
@@ -48,10 +45,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Touch
                 // Decay by strain time.
                 bonus /= 1 + simulated.StrainTime / 1000;
 
-                obstructionBonus += bonus;
+                bonusMultiplier += bonus;
             }
 
-            return AimEvaluator.EvaluateDifficultyOf(simulated, withSliders) * obstructionBonus * skillMultiplier;
+            return AimEvaluator.EvaluateDifficultyOf(simulated, withSliders) * bonusMultiplier * skillMultiplier;
         }
 
         private OsuDifficultyHitObject createSimulatedSwapObject(OsuDifficultyHitObject current, TouchHand currentHand)
