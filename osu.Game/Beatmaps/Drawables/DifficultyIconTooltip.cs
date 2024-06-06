@@ -124,7 +124,9 @@ namespace osu.Game.Beatmaps.Drawables
             difficultyFillFlowContainer.Show();
             miscFillFlowContainer.Show();
 
-            double rate = ModUtils.CalculateRateWithMods(displayedContent.Mods);
+            double rate = 1;
+            if (displayedContent.Mods != null)
+                rate = ModUtils.CalculateRateWithMods(displayedContent.Mods);
 
             double bpmAdjusted = displayedContent.BeatmapInfo.BPM * rate;
 
