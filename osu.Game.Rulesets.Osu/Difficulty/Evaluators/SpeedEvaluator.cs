@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         /// <item><description>and how easily they can be cheesed.</description></item>
         /// </list>
         /// </summary>
-        public static double EvaluateDifficultyOf(DifficultyHitObject current, bool singletapped)
+        public static double EvaluateDifficultyOf(DifficultyHitObject current, bool tappedWithTouch)
         {
             if (current.BaseObject is Spinner)
                 return 0;
@@ -50,8 +50,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             // 0.93 is derived from making sure 260bpm OD8 streams aren't nerfed harshly, whilst 0.92 limits the effect of the cap.
             strainTime /= Math.Clamp((strainTime / osuCurrObj.HitWindowGreat) / 0.93, 0.92, 1);
 
-            // Singletapping the object means the assumption that the object is pressed in an alternate fashion is incorrect.
-            double effectiveStrainTime = singletapped ? strainTime / 2 : strainTime;
+            // Single-tapping the object with a touch device means the assumption that the object is pressed in an alternate fashion is incorrect.
+            double effectiveStrainTime = tappedWithTouch ? strainTime / 2 : strainTime;
 
             // derive speedBonus for calculation
             double speedBonus = 1.0;
