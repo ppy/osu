@@ -49,7 +49,7 @@ namespace osu.Game.Overlays.Chat.ChannelList
         [BackgroundDependencyLoader]
         private void load()
         {
-            Height = 30;
+            Height = 25;
             RelativeSizeAxes = Axes.X;
 
             Children = new Drawable[]
@@ -66,41 +66,37 @@ namespace osu.Game.Overlays.Chat.ChannelList
                     Colour = colourProvider.Background4,
                     Alpha = 0f,
                 },
-                new Container
+                new GridContainer
                 {
                     RelativeSizeAxes = Axes.Both,
                     Padding = new MarginPadding { Left = 18, Right = 10 },
-                    Child = new GridContainer
+                    ColumnDimensions = new[]
                     {
-                        RelativeSizeAxes = Axes.Both,
-                        ColumnDimensions = new[]
-                        {
-                            new Dimension(GridSizeMode.AutoSize),
-                            new Dimension(),
-                            new Dimension(GridSizeMode.AutoSize),
-                            new Dimension(GridSizeMode.AutoSize),
-                        },
-                        Content = new[]
-                        {
-                            new Drawable?[]
-                            {
-                                createIcon(),
-                                text = new TruncatingSpriteText
-                                {
-                                    Anchor = Anchor.CentreLeft,
-                                    Origin = Anchor.CentreLeft,
-                                    Text = Channel.Name,
-                                    Font = OsuFont.Torus.With(size: 17, weight: FontWeight.SemiBold),
-                                    Colour = colourProvider.Light3,
-                                    Margin = new MarginPadding { Bottom = 2 },
-                                    RelativeSizeAxes = Axes.X,
-                                },
-                                createMentionPill(),
-                                close = createCloseButton(),
-                            }
-                        },
+                        new Dimension(GridSizeMode.AutoSize),
+                        new Dimension(),
+                        new Dimension(GridSizeMode.AutoSize),
+                        new Dimension(GridSizeMode.AutoSize),
                     },
-                },
+                    Content = new[]
+                    {
+                        new Drawable?[]
+                        {
+                            createIcon(),
+                            text = new TruncatingSpriteText
+                            {
+                                Anchor = Anchor.CentreLeft,
+                                Origin = Anchor.CentreLeft,
+                                Text = Channel.Name,
+                                Font = OsuFont.Torus.With(size: 14, weight: FontWeight.SemiBold),
+                                Colour = colourProvider.Light3,
+                                Margin = new MarginPadding { Bottom = 2 },
+                                RelativeSizeAxes = Axes.X,
+                            },
+                            createMentionPill(),
+                            close = createCloseButton(),
+                        }
+                    }
+                }
             };
 
             Action = () => OnRequestSelect?.Invoke(Channel);

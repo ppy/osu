@@ -7,6 +7,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Game.Rulesets.Taiko.UI;
 using osu.Game.Skinning;
 using osuTK;
 
@@ -17,22 +18,20 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
     /// </summary>
     internal partial class LegacyInputDrum : Container
     {
-        private Container content = null!;
         private LegacyHalfDrum left = null!;
         private LegacyHalfDrum right = null!;
 
         public LegacyInputDrum()
         {
-            RelativeSizeAxes = Axes.Y;
-            AutoSizeAxes = Axes.X;
+            RelativeSizeAxes = Axes.Both;
         }
 
         [BackgroundDependencyLoader]
         private void load(ISkinSource skin)
         {
-            Child = content = new Container
+            Child = new Container
             {
-                Size = new Vector2(180, 200),
+                RelativeSizeAxes = Axes.Both,
                 Children = new Drawable[]
                 {
                     new Sprite
@@ -65,31 +64,22 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
             const float ratio = 1.6f;
 
             // because the right half is flipped, we need to position using width - position to get the true "topleft" origin position
-            float negativeScaleAdjust = content.Width / ratio;
+            const float negative_scale_adjust = TaikoPlayfield.INPUT_DRUM_WIDTH / ratio;
 
             if (skin.GetConfig<SkinConfiguration.LegacySetting, decimal>(SkinConfiguration.LegacySetting.Version)?.Value >= 2.1m)
             {
                 left.Centre.Position = new Vector2(0, taiko_bar_y) * ratio;
-                right.Centre.Position = new Vector2(negativeScaleAdjust - 56, taiko_bar_y) * ratio;
+                right.Centre.Position = new Vector2(negative_scale_adjust - 56, taiko_bar_y) * ratio;
                 left.Rim.Position = new Vector2(0, taiko_bar_y) * ratio;
-                right.Rim.Position = new Vector2(negativeScaleAdjust - 56, taiko_bar_y) * ratio;
+                right.Rim.Position = new Vector2(negative_scale_adjust - 56, taiko_bar_y) * ratio;
             }
             else
             {
                 left.Centre.Position = new Vector2(18, taiko_bar_y + 31) * ratio;
-                right.Centre.Position = new Vector2(negativeScaleAdjust - 54, taiko_bar_y + 31) * ratio;
+                right.Centre.Position = new Vector2(negative_scale_adjust - 54, taiko_bar_y + 31) * ratio;
                 left.Rim.Position = new Vector2(8, taiko_bar_y + 23) * ratio;
-                right.Rim.Position = new Vector2(negativeScaleAdjust - 53, taiko_bar_y + 23) * ratio;
+                right.Rim.Position = new Vector2(negative_scale_adjust - 53, taiko_bar_y + 23) * ratio;
             }
-        }
-
-        protected override void Update()
-        {
-            base.Update();
-
-            // Relying on RelativeSizeAxes.Both + FillMode.Fit doesn't work due to the precise pixel layout requirements.
-            // This is a bit ugly but makes the non-legacy implementations a lot cleaner to implement.
-            content.Scale = new Vector2(DrawHeight / content.Size.Y);
         }
 
         /// <summary>

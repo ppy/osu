@@ -39,7 +39,7 @@ namespace osu.Game.Overlays.Comments
             base.LoadComplete();
 
             if (!TextBox.ReadOnly)
-                GetContainingInputManager().ChangeFocus(TextBox);
+                GetContainingFocusManager().ChangeFocus(TextBox);
         }
 
         protected override void OnCommit(string text)
@@ -60,7 +60,7 @@ namespace osu.Game.Overlays.Comments
             foreach (var comment in cb.Comments)
                 comment.ParentComment = parentComment;
 
-            var drawables = cb.Comments.Select(commentsContainer.GetDrawableComment).ToArray();
+            var drawables = cb.Comments.Select(c => commentsContainer.GetDrawableComment(c, cb.CommentableMeta)).ToArray();
             OnPost?.Invoke(drawables);
 
             OnCancel!.Invoke();

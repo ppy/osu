@@ -150,6 +150,7 @@ namespace osu.Game.Rulesets.Taiko
                         new TaikoModClassic(),
                         new TaikoModSwap(),
                         new TaikoModSingleTap(),
+                        new TaikoModConstantSpeed(),
                     };
 
                 case ModType.Automation:
@@ -187,6 +188,8 @@ namespace osu.Game.Rulesets.Taiko
         public override Drawable CreateIcon() => new SpriteIcon { Icon = OsuIcon.RulesetTaiko };
 
         public override HitObjectComposer CreateHitObjectComposer() => new TaikoHitObjectComposer(this);
+
+        public override IBeatmapVerifier CreateBeatmapVerifier() => new TaikoBeatmapVerifier();
 
         public override DifficultyCalculator CreateDifficultyCalculator(IWorkingBeatmap beatmap) => new TaikoDifficultyCalculator(RulesetInfo, beatmap);
 

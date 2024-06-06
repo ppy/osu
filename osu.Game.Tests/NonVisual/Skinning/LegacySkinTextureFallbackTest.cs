@@ -169,9 +169,9 @@ namespace osu.Game.Tests.NonVisual.Skinning
 
                 public IRenderer Renderer => new DummyRenderer();
                 public AudioManager AudioManager => null;
-                public IResourceStore<byte[]> Files => null;
-                public IResourceStore<byte[]> Resources => null;
-                public RealmAccess RealmAccess => null;
+                public IResourceStore<byte[]> Files => null!;
+                public IResourceStore<byte[]> Resources => null!;
+                public RealmAccess RealmAccess => null!;
                 public IResourceStore<TextureUpload> CreateTextureLoaderStore(IResourceStore<byte[]> underlyingStore) => textureStore;
             }
         }

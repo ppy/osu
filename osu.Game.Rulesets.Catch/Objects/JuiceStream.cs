@@ -29,7 +29,6 @@ namespace osu.Game.Rulesets.Catch.Objects
 
         public BindableNumber<double> SliderVelocityMultiplierBindable { get; } = new BindableDouble(1)
         {
-            Precision = 0.01,
             MinValue = 0.1,
             MaxValue = 10
         };
