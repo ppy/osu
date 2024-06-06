@@ -63,8 +63,12 @@ namespace osu.Game.Graphics
                 case ScoreRank.C:
                     return Color4Extensions.FromHex(@"ff8e5d");
 
-                default:
+                case ScoreRank.D:
                     return Color4Extensions.FromHex(@"ff5a5a");
+
+                case ScoreRank.F:
+                default:
+                    return Color4Extensions.FromHex(@"3f3f3f");
             }
         }
 
@@ -77,7 +81,7 @@ namespace osu.Game.Graphics
             {
                 case HitResult.IgnoreMiss:
                 case HitResult.SmallTickMiss:
-                    return Orange1;
+                    return Color4.Gray;
 
                 case HitResult.Miss:
                 case HitResult.LargeTickMiss:

@@ -108,6 +108,9 @@ namespace osu.Game.Rulesets.Scoring
                     increaseHp(h);
                 }
 
+                if (topLevelObjectCount == 0)
+                    return testDrop;
+
                 if (!fail && currentHp < lowestHpEnd)
                 {
                     fail = true;
@@ -126,6 +129,13 @@ namespace osu.Game.Rulesets.Scoring
                     OnIterationFail?.Invoke($"FAILED drop {testDrop}: recovery too low ({recovery} < {hpRecoveryAvailable})");
                 }
 
+                if (!fail && double.IsInfinity(HpMultiplierNormal))
+                {
+                    OnIterationSuccess?.Invoke("Drain computation algorithm diverged to infinity. PASSING with zero drop, resetting HP multiplier to 1.");
+                    HpMultiplierNormal = 1;
+                    return 0;
+                }
+
                 if (!fail)
                 {
                     OnIterationSuccess?.Invoke($"PASSED drop {testDrop}");
@@ -141,7 +151,7 @@ namespace osu.Game.Rulesets.Scoring
 
             void increaseHp(HitObject hitObject)
             {
-                double amount = GetHealthIncreaseFor(hitObject, hitObject.CreateJudgement().MaxResult);
+                double amount = GetHealthIncreaseFor(hitObject, hitObject.Judgement.MaxResult);
                 currentHpUncapped += amount;
                 currentHp = Math.Max(0, Math.Min(1, currentHp + amount));
             }

@@ -218,7 +218,7 @@ namespace osu.Game.Rulesets.UI
             {
                 base.ReloadMappings(realmKeyBindings);
 
-                KeyBindings = KeyBindings.Where(b => RealmKeyBindingStore.CheckValidForGameplay(b.KeyCombination)).ToList();
+                KeyBindings = KeyBindings.Where(static b => RealmKeyBindingStore.CheckValidForGameplay(b.KeyCombination)).ToList();
                 RealmKeyBindingStore.ClearDuplicateBindings(KeyBindings);
             }
         }

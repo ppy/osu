@@ -28,6 +28,7 @@ using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Replays;
 using osu.Game.Rulesets.Osu.Scoring;
 using osu.Game.Rulesets.Osu.Skinning.Argon;
+using osu.Game.Rulesets.Osu.Skinning.Default;
 using osu.Game.Rulesets.Osu.Skinning.Legacy;
 using osu.Game.Rulesets.Osu.Statistics;
 using osu.Game.Rulesets.Osu.UI;
@@ -254,6 +255,9 @@ namespace osu.Game.Rulesets.Osu
 
                 case ArgonSkin:
                     return new OsuArgonSkinTransformer(skin);
+
+                case TrianglesSkin:
+                    return new OsuTrianglesSkinTransformer(skin);
             }
 
             return null;

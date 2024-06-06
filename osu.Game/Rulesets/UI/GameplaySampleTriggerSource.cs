@@ -105,7 +105,7 @@ namespace osu.Game.Rulesets.UI
                 // If required, we can make this lookup more efficient by adding support to get next-future-entry in LifetimeEntryManager.
                 var candidate =
                     // Use alive entries first as an optimisation.
-                    hitObjectContainer.AliveEntries.Select(tuple => tuple.Entry).Where(e => !isAlreadyHit(e)).MinBy(e => e.HitObject.StartTime)
+                    hitObjectContainer.AliveEntries.Keys.Where(e => !isAlreadyHit(e)).MinBy(e => e.HitObject.StartTime)
                     ?? hitObjectContainer.Entries.Where(e => !isAlreadyHit(e)).MinBy(e => e.HitObject.StartTime);
 
                 // In the case there are no non-judged objects, the last hit object should be used instead.

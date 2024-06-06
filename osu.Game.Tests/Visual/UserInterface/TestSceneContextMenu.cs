@@ -77,21 +77,21 @@ namespace osu.Game.Tests.Visual.UserInterface
                 new OsuMenuItem(@"Some option"),
                 new OsuMenuItem(@"Highlighted option", MenuItemType.Highlighted),
                 new OsuMenuItem(@"Another option"),
-                new OsuMenuItem(@"Nested option >")
+                new OsuMenuItem(@"Nested option")
                 {
                     Items = new MenuItem[]
                     {
                         new OsuMenuItem(@"Sub-One"),
                         new OsuMenuItem(@"Sub-Two"),
                         new OsuMenuItem(@"Sub-Three"),
-                        new OsuMenuItem(@"Sub-Nested option >")
+                        new OsuMenuItem(@"Sub-Nested option")
                         {
                             Items = new MenuItem[]
                             {
                                 new OsuMenuItem(@"Double Sub-One"),
                                 new OsuMenuItem(@"Double Sub-Two"),
                                 new OsuMenuItem(@"Double Sub-Three"),
-                                new OsuMenuItem(@"Sub-Sub-Nested option >")
+                                new OsuMenuItem(@"Sub-Sub-Nested option")
                                 {
                                     Items = new MenuItem[]
                                     {
