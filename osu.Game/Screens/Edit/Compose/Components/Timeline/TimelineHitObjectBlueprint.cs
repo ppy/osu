@@ -33,7 +33,6 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         private const float circle_size = 38;
 
         private Container? repeatsContainer;
-        private Container? nodeSamplesContainer;
 
         public Action<DragEvent?>? OnDragHandled = null!;
 
@@ -246,16 +245,11 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             }
 
             // Add node sample pieces
-            nodeSamplesContainer?.Expire();
-
-            sampleComponents.Add(nodeSamplesContainer = new Container
-            {
-                RelativeSizeAxes = Axes.Both,
-            });
+            sampleComponents.Clear();
 
             for (int i = 0; i < repeats.RepeatCount + 2; i++)
             {
-                nodeSamplesContainer.Add(new NodeSamplePointPiece(Item, i)
+                sampleComponents.Add(new NodeSamplePointPiece(Item, i)
                 {
                     X = (float)i / (repeats.RepeatCount + 1),
                     RelativePositionAxes = Axes.X,
