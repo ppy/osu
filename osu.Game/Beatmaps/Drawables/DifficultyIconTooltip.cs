@@ -13,6 +13,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Utils;
 using osuTK;
 
 namespace osu.Game.Beatmaps.Drawables
@@ -123,13 +124,7 @@ namespace osu.Game.Beatmaps.Drawables
             difficultyFillFlowContainer.Show();
             miscFillFlowContainer.Show();
 
-            double rate = 1;
-
-            if (displayedContent.Mods != null)
-            {
-                foreach (var mod in displayedContent.Mods.OfType<IApplicableToRate>())
-                    rate = mod.ApplyToRate(0, rate);
-            }
+            double rate = ModUtils.CalculateRateWithMods(displayedContent.Mods);
 
             double bpmAdjusted = displayedContent.BeatmapInfo.BPM * rate;
 
