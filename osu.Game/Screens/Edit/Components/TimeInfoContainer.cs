@@ -47,11 +47,26 @@ namespace osu.Game.Screens.Edit.Components
             };
         }
 
+        private double? lastTime;
+        private double? lastBPM;
+
         protected override void Update()
         {
             base.Update();
-            trackTimer.Text = editorClock.CurrentTime.ToEditorFormattedString();
-            bpm.Text = @$"{editorBeatmap.ControlPointInfo.TimingPointAt(editorClock.CurrentTime).BPM:0} BPM";
+
+            if (lastTime != editorClock.CurrentTime)
+            {
+                lastTime = editorClock.CurrentTime;
+                trackTimer.Text = editorClock.CurrentTime.ToEditorFormattedString();
+            }
+
+            double newBPM = editorBeatmap.ControlPointInfo.TimingPointAt(editorClock.CurrentTime).BPM;
+
+            if (lastBPM != newBPM)
+            {
+                lastBPM = newBPM;
+                bpm.Text = @$"{newBPM:0} BPM";
+            }
         }
     }
 }

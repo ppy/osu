@@ -115,6 +115,11 @@ namespace osu.Game.Collections
             };
         }
 
+        public override bool IsPresent => base.IsPresent
+                                          // Safety for low pass filter potentially getting stuck in applied state due to
+                                          // transforms on `this` causing children to no longer be updated.
+                                          || lowPassFilter.IsAttached;
+
         protected override void PopIn()
         {
             lowPassFilter.CutoffTo(300, 100, Easing.OutCubic);
@@ -132,7 +137,7 @@ namespace osu.Game.Collections
             this.ScaleTo(0.9f, exit_duration);
 
             // Ensure that textboxes commit
-            GetContainingInputManager()?.TriggerFocusContention(this);
+            GetContainingFocusManager()?.TriggerFocusContention(this);
         }
     }
 }

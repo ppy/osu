@@ -92,7 +92,7 @@ namespace osu.Game.Overlays.Mods
                     {
                         Anchor = Anchor.TopCentre,
                         Origin = Anchor.TopCentre,
-                        Direction = FillDirection.Horizontal,
+                        RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
                         Spacing = new Vector2(7),
                         Children = new Drawable[]
@@ -136,7 +136,7 @@ namespace osu.Game.Overlays.Mods
         {
             base.LoadComplete();
 
-            ScheduleAfterChildren(() => GetContainingInputManager().ChangeFocus(nameTextBox));
+            ScheduleAfterChildren(() => GetContainingFocusManager().ChangeFocus(nameTextBox));
         }
 
         public override bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
