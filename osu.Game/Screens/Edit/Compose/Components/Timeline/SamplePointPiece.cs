@@ -85,6 +85,11 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             return samples.Count == 0 ? 0 : samples.Max(o => o.Volume);
         }
 
+        /// <summary>
+        /// Gets the samples to be edited by this sample point piece.
+        /// This could be the samples of the hit object itself, or of one of the nested hit objects. For example a slider repeat.
+        /// </summary>
+        /// <returns>The samples to be edited.</returns>
         protected virtual IList<HitSampleInfo> GetSamples() => HitObject.Samples;
 
         public virtual Popover GetPopover() => new SampleEditPopover(HitObject);
