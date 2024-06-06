@@ -30,7 +30,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Touch
         private const int maximum_difficulty_objects_history = 3;
 
         protected TouchHand LastHand { get; private set; } = TouchHand.Right;
-        protected TouchHand LastNonDragHand = TouchHand.Right;
+        protected TouchHand LastNonDragHand { get; private set; } = TouchHand.Right;
 
         protected RawTouchSkill(double clockRate)
         {
