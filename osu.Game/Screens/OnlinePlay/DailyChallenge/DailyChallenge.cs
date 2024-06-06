@@ -49,7 +49,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
         private readonly Bindable<IReadOnlyList<Mod>> userMods = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
 
         private OnlinePlayScreenWaveContainer waves = null!;
-        private MatchLeaderboard leaderboard = null!;
+        private DailyChallengeLeaderboard leaderboard = null!;
         private RoomModSelectOverlay userModsSelectOverlay = null!;
         private Sample? sampleStart;
         private IDisposable? userModsSelectOverlayRegistration;
@@ -208,33 +208,17 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
                                                                 feed = new DailyChallengeEventFeed
                                                                 {
                                                                     RelativeSizeAxes = Axes.Both,
-                                                                    PresentScore = id =>
-                                                                    {
-                                                                        if (this.IsCurrentScreen())
-                                                                            this.Push(new PlaylistItemScoreResultsScreen(room.RoomID.Value!.Value, playlistItem, id));
-                                                                    }
+                                                                    PresentScore = presentScore
                                                                 }
                                                             ],
                                                         },
                                                     },
                                                     null,
                                                     // Middle column (leaderboard)
-                                                    new GridContainer
+                                                    leaderboard = new DailyChallengeLeaderboard(room, playlistItem)
                                                     {
                                                         RelativeSizeAxes = Axes.Both,
-                                                        Content = new[]
-                                                        {
-                                                            new Drawable[]
-                                                            {
-                                                                new SectionHeader("Leaderboard")
-                                                            },
-                                                            [leaderboard = new MatchLeaderboard { RelativeSizeAxes = Axes.Both }],
-                                                        },
-                                                        RowDimensions = new[]
-                                                        {
-                                                            new Dimension(GridSizeMode.AutoSize),
-                                                            new Dimension(),
-                                                        }
+                                                        PresentScore = presentScore,
                                                     },
                                                     // Spacer
                                                     null,
@@ -330,6 +314,12 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
             metadataClient.MultiplayerRoomScoreSet += onRoomScoreSet;
         }
 
+        private void presentScore(long id)
+        {
+            if (this.IsCurrentScreen())
+                this.Push(new PlaylistItemScoreResultsScreen(room.RoomID.Value!.Value, playlistItem, id));
+        }
+
         private void onRoomScoreSet(MultiplayerRoomScoreSetEvent e)
         {
             if (e.RoomID != room.RoomID.Value || e.PlaylistItemID != playlistItem.ID)
@@ -351,6 +341,9 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
                 {
                     breakdown.AddNewScore(ev);
                     feed.AddNewScore(ev);
+
+                    if (e.NewRank <= 50)
+                        Schedule(() => leaderboard.RefetchScores());
                 });
             });
         }
