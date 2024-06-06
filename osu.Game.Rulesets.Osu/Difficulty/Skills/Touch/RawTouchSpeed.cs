@@ -38,12 +38,15 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Touch
             double bonusMultiplier = 1.0;
 
             // Add a slight bonus for hand-coordination required to swap hands.
-            if (currentHand != LastHand)
+            if (currentHand != LastNonDragHand)
             {
-                bonusMultiplier += 0.1;
-                // Add a speed bonus for swapping out from dragging back to tapping
-                if (LastHand == TouchHand.Drag)
-                    bonusMultiplier += 0.4;
+                bonusMultiplier += 0.08;
+            }
+
+            // Add a speed bonus for swapping from dragging to tapping
+            if (currentHand == GetOtherHand(LastNonDragHand) && LastHand == TouchHand.Drag)
+            {
+                bonusMultiplier += 0.3;
             }
 
             return SpeedEvaluator.EvaluateDifficultyOf(simulated, tappedWithTouch) * singletapMultiplier * bonusMultiplier * skillMultiplier;
