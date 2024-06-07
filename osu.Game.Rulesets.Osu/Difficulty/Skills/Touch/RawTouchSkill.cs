@@ -123,7 +123,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Touch
 
         private void updateHistory(OsuDifficultyHitObject simulated, TouchHand currentHand)
         {
-            LastNonDragHand = getRelevantHand(currentHand);
+            if (currentHand != TouchHand.Drag)
+                LastNonDragHand = currentHand;
+
             LastHand = currentHand;
 
             var lastObjects = GetLastObjects(LastNonDragHand);
@@ -140,8 +142,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Touch
                     objects.RemoveAt(0);
             }
         }
-
-        private TouchHand getRelevantHand(TouchHand currentHand) => currentHand == TouchHand.Drag ? LastNonDragHand : currentHand;
 
         protected TouchHand GetOtherHand(TouchHand currentHand)
         {
