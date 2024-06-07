@@ -44,7 +44,7 @@ namespace osu.Game.Tests.Visual.Menus
                 foreach (var fountain in Children.OfType<StarFountain>())
                 {
                     if (RNG.NextSingle() > 0.8f)
-                        fountain.Shoot();
+                        fountain.Shoot(RNG.Next(-1, 2));
                 }
             }, 150);
         }

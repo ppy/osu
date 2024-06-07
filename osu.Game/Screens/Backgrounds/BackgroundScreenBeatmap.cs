@@ -51,7 +51,7 @@ namespace osu.Game.Screens.Backgrounds
         /// </summary>
         public readonly Bindable<float> DimWhenUserSettingsIgnored = new Bindable<float>();
 
-        internal readonly IBindable<bool> IsBreakTime = new Bindable<bool>();
+        internal readonly Bindable<bool> IsBreakTime = new Bindable<bool>();
 
         private readonly DimmableBackground dimmable;
 
@@ -166,6 +166,8 @@ namespace osu.Game.Screens.Backgrounds
 
             public override void Add(Drawable drawable)
             {
+                ArgumentNullException.ThrowIfNull(drawable);
+
                 if (drawable is Background)
                     throw new InvalidOperationException($"Use {nameof(Background)} to set a background.");
 

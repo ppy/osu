@@ -16,6 +16,8 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Threading;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Multiplayer.Countdown;
+using osu.Game.Overlays;
+using osu.Game.Overlays.Dialog;
 using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
@@ -27,6 +29,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 
         [CanBeNull]
         private IDisposable clickOperation;
+
+        [Resolved(canBeNull: true)]
+        private IDialogOverlay dialogOverlay { get; set; }
 
         private Sample sampleReady;
         private Sample sampleReadyAll;
@@ -56,7 +61,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                         {
                             RelativeSizeAxes = Axes.Both,
                             Size = Vector2.One,
-                            Action = onReadyClick,
+                            Action = onReadyButtonClick,
                         },
                         countdownButton = new MultiplayerCountdownButton
                         {
@@ -101,7 +106,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             endOperation();
         }
 
-        private void onReadyClick()
+        private void onReadyButtonClick()
         {
             if (Room == null)
                 return;
@@ -109,9 +114,24 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             Debug.Assert(clickOperation == null);
             clickOperation = ongoingOperationTracker.BeginOperation();
 
-            if (isReady() && Client.IsHost && !Room.ActiveCountdowns.Any(c => c is MatchStartCountdown))
-                startMatch();
-            else
+            if (Client.IsHost)
+            {
+                if (Room.State == MultiplayerRoomState.Open)
+                {
+                    if (isReady() && !Room.ActiveCountdowns.Any(c => c is MatchStartCountdown))
+                        startMatch();
+                    else
+                        toggleReady();
+                }
+                else
+                {
+                    if (dialogOverlay == null)
+                        abortMatch();
+                    else
+                        dialogOverlay.Push(new ConfirmAbortDialog(abortMatch, endOperation));
+                }
+            }
+            else if (Room.State != MultiplayerRoomState.Closed)
                 toggleReady();
 
             bool isReady() => Client.LocalUser?.State == MultiplayerUserState.Ready || Client.LocalUser?.State == MultiplayerUserState.Spectating;
@@ -128,6 +148,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                 // gameplay was not started due to an exception; unblock button.
                 endOperation();
             });
+
+            void abortMatch() => Client.AbortMatch().FireAndForget(endOperation, _ => endOperation());
         }
 
         private void startCountdown(TimeSpan duration)
@@ -189,7 +211,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             }
 
             readyButton.Enabled.Value = countdownButton.Enabled.Value =
-                Room.State == MultiplayerRoomState.Open
+                Room.State != MultiplayerRoomState.Closed
                 && CurrentPlaylistItem.Value?.ID == Room.Settings.PlaylistItemId
                 && !Room.Playlist.Single(i => i.ID == Room.Settings.PlaylistItemId).Expired
                 && !operationInProgress.Value;
@@ -197,6 +219,13 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             // When the local user is the host and spectating the match, the ready button should be enabled only if any users are ready.
             if (localUser?.State == MultiplayerUserState.Spectating)
                 readyButton.Enabled.Value &= Client.IsHost && newCountReady > 0 && !Room.ActiveCountdowns.Any(c => c is MatchStartCountdown);
+
+            // When the local user is not the host, the button should only be enabled when no match is in progress.
+            if (!Client.IsHost)
+                readyButton.Enabled.Value &= Room.State == MultiplayerRoomState.Open;
+
+            // At all times, the countdown button should only be enabled when no match is in progress.
+            countdownButton.Enabled.Value &= Room.State == MultiplayerRoomState.Open;
 
             if (newCountReady == countReady)
                 return;
@@ -218,6 +247,17 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 
                 countReady = newCountReady;
             });
+        }
+
+        public partial class ConfirmAbortDialog : DangerousActionDialog
+        {
+            public ConfirmAbortDialog(Action abortMatch, Action cancel)
+            {
+                HeaderText = "Are you sure you want to abort the match?";
+
+                DangerousAction = abortMatch;
+                CancelAction = cancel;
+            }
         }
     }
 }

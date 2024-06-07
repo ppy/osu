@@ -25,6 +25,7 @@ namespace osu.Game.Skinning
         {
             Anchor = Anchor.TopRight,
             Origin = Anchor.TopRight,
+            FixedWidth = true,
         };
     }
 }

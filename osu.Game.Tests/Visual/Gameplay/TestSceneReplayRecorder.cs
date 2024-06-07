@@ -120,7 +120,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         protected override void Update()
         {
             base.Update();
-            playbackManager?.ReplayInputHandler.SetFrameFromTime(Time.Current - 100);
+            playbackManager?.ReplayInputHandler?.SetFrameFromTime(Time.Current - 100);
         }
 
         [TearDownSteps]
@@ -220,7 +220,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         public partial class TestInputConsumer : CompositeDrawable, IKeyBindingHandler<TestAction>
         {
-            public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => Parent.ReceivePositionalInputAt(screenSpacePos);
+            public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => Parent!.ReceivePositionalInputAt(screenSpacePos);
 
             private readonly Box box;
 

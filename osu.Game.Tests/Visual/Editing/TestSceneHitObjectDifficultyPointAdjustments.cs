@@ -59,7 +59,7 @@ namespace osu.Game.Tests.Visual.Editing
                             new PathControlPoint(new Vector2(100, 0))
                         }
                     },
-                    SliderVelocity = 2
+                    SliderVelocityMultiplier = 2
                 });
             });
         }
@@ -110,7 +110,7 @@ namespace osu.Game.Tests.Visual.Editing
             AddStep("unify slider velocity", () =>
             {
                 foreach (var h in EditorBeatmap.HitObjects.OfType<IHasSliderVelocity>())
-                    h.SliderVelocity = 1.5;
+                    h.SliderVelocityMultiplier = 1.5;
             });
 
             AddStep("select both objects", () => EditorBeatmap.SelectedHitObjects.AddRange(EditorBeatmap.HitObjects));
@@ -194,7 +194,7 @@ namespace osu.Game.Tests.Visual.Editing
         private void hitObjectHasVelocity(int objectIndex, double velocity) => AddAssert($"{objectIndex.ToOrdinalWords()} has velocity {velocity}", () =>
         {
             var h = EditorBeatmap.HitObjects.ElementAt(objectIndex);
-            return h is IHasSliderVelocity hasSliderVelocity && hasSliderVelocity.SliderVelocity == velocity;
+            return h is IHasSliderVelocity hasSliderVelocity && hasSliderVelocity.SliderVelocityMultiplier == velocity;
         });
     }
 }

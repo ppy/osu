@@ -4,6 +4,7 @@
 using osu.Framework.Graphics;
 using osu.Framework.Input;
 using osu.Framework.Input.Events;
+using osu.Framework.Utils;
 using osu.Game.Rulesets.Catch.Edit.Blueprints.Components;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Edit;
@@ -24,7 +25,7 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints
 
         private InputManager inputManager = null!;
 
-        protected override bool IsValidForPlacement => HitObject.Duration > 0;
+        protected override bool IsValidForPlacement => Precision.DefinitelyBigger(HitObject.Duration, 0);
 
         public JuiceStreamPlacementBlueprint()
         {

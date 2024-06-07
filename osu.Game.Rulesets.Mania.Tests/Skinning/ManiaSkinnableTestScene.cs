@@ -58,7 +58,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Skinning
 
             IBindable<ScrollingDirection> IScrollingInfo.Direction => Direction;
             IBindable<double> IScrollingInfo.TimeRange { get; } = new Bindable<double>(5000);
-            IScrollAlgorithm IScrollingInfo.Algorithm { get; } = new ConstantScrollAlgorithm();
+            IBindable<IScrollAlgorithm> IScrollingInfo.Algorithm { get; } = new Bindable<IScrollAlgorithm>(new ConstantScrollAlgorithm());
         }
     }
 }

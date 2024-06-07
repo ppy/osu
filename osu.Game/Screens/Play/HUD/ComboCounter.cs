@@ -11,11 +11,6 @@ namespace osu.Game.Screens.Play.HUD
     {
         public bool UsesFixedAnchor { get; set; }
 
-        protected ComboCounter()
-        {
-            Current.Value = DisplayedCount = 0;
-        }
-
         protected override double GetProportionalDuration(int currentValue, int newValue)
         {
             return Math.Abs(currentValue - newValue) * RollingDuration * 100.0f;

@@ -44,9 +44,6 @@ namespace osu.Game.Graphics.Containers
 
         private bool shouldPerformRightMouseScroll(MouseButtonEvent e) => RightMouseScrollbar && e.Button == MouseButton.Right;
 
-        private void scrollFromMouseEvent(MouseEvent e) =>
-            ScrollTo(Clamp(ToLocalSpace(e.ScreenSpaceMousePosition)[ScrollDim] / DrawSize[ScrollDim]) * Content.DrawSize[ScrollDim], true, DistanceDecayOnRightMouseScrollbar);
-
         private bool rightMouseDragging;
 
         protected override bool IsDragging => base.IsDragging || rightMouseDragging;
@@ -80,7 +77,7 @@ namespace osu.Game.Graphics.Containers
         {
             if (shouldPerformRightMouseScroll(e))
             {
-                scrollFromMouseEvent(e);
+                ScrollFromMouseEvent(e);
                 return true;
             }
 
@@ -91,7 +88,7 @@ namespace osu.Game.Graphics.Containers
         {
             if (rightMouseDragging)
             {
-                scrollFromMouseEvent(e);
+                ScrollFromMouseEvent(e);
                 return;
             }
 
@@ -128,6 +125,9 @@ namespace osu.Game.Graphics.Containers
 
             return base.OnScroll(e);
         }
+
+        protected virtual void ScrollFromMouseEvent(MouseEvent e) =>
+            ScrollTo(Clamp(ToLocalSpace(e.ScreenSpaceMousePosition)[ScrollDim] / DrawSize[ScrollDim] * Content.DrawSize[ScrollDim]), true, DistanceDecayOnRightMouseScrollbar);
 
         protected override ScrollbarContainer CreateScrollbar(Direction direction) => new OsuScrollbar(direction);
 

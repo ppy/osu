@@ -78,6 +78,11 @@ namespace osu.Game.Online.Multiplayer
         Task StartMatch();
 
         /// <summary>
+        /// As the host of a room, aborts an on-going match.
+        /// </summary>
+        Task AbortMatch();
+
+        /// <summary>
         /// Aborts an ongoing gameplay load.
         /// </summary>
         Task AbortGameplay();
@@ -99,5 +104,13 @@ namespace osu.Game.Online.Multiplayer
         /// </summary>
         /// <param name="playlistItemId">The item to remove.</param>
         Task RemovePlaylistItem(long playlistItemId);
+
+        /// <summary>
+        /// Invites a player to the current room.
+        /// </summary>
+        /// <param name="userId">The user to invite.</param>
+        /// <exception cref="UserBlockedException">The user has blocked or has been blocked by the invited user.</exception>
+        /// <exception cref="UserBlocksPMsException">The invited user does not accept private messages.</exception>
+        Task InvitePlayer(int userId);
     }
 }

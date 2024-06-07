@@ -1,19 +1,25 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
+using osu.Game.Graphics;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation;
 using osu.Game.Rulesets;
-using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Toolbar
 {
     public partial class ToolbarRulesetTabButton : TabItem<RulesetInfo>
     {
         private readonly RulesetButton ruleset;
+
+        private Sample? selectSample;
 
         public ToolbarRulesetTabButton(RulesetInfo value)
             : base(value)
@@ -32,38 +38,44 @@ namespace osu.Game.Overlays.Toolbar
             ruleset.SetIcon(rInstance.CreateIcon());
         }
 
+        [BackgroundDependencyLoader]
+        private void load(AudioManager audio)
+        {
+            selectSample = audio.Samples.Get($@"UI/ruleset-select-{Value.ShortName}");
+        }
+
         protected override void OnActivated() => ruleset.Active = true;
 
         protected override void OnDeactivated() => ruleset.Active = false;
 
+        protected override void OnActivatedByUser() => selectSample?.Play();
+
         private partial class RulesetButton : ToolbarButton
         {
+            protected override HoverSounds CreateHoverSounds(HoverSampleSet sampleSet) => new HoverSounds();
+
+            [Resolved]
+            private OsuColour colours { get; set; } = null!;
+
+            public RulesetButton()
+            {
+                ButtonContent.Padding = new MarginPadding(PADDING)
+                {
+                    Bottom = 5
+                };
+            }
+
             public bool Active
             {
-                set
+                set => Scheduler.AddOnce(() =>
                 {
-                    if (value)
-                    {
-                        IconContainer.Colour = Color4.White;
-                        IconContainer.EdgeEffect = new EdgeEffectParameters
-                        {
-                            Type = EdgeEffectType.Glow,
-                            Colour = new Color4(255, 194, 224, 100),
-                            Radius = 15,
-                            Roundness = 15,
-                        };
-                    }
-                    else
-                    {
-                        IconContainer.Colour = new Color4(255, 194, 224, 255);
-                        IconContainer.EdgeEffect = new EdgeEffectParameters();
-                    }
-                }
+                    IconContainer.Colour = value ? Color4Extensions.FromHex("#00FFAA") : colours.GrayF;
+                });
             }
 
             protected override bool OnClick(ClickEvent e)
             {
-                Parent.TriggerClick();
+                Parent!.TriggerClick();
                 return base.OnClick(e);
             }
         }

@@ -43,7 +43,7 @@ namespace osu.Game.Extensions
         /// <param name="delta">A delta in screen-space coordinates.</param>
         /// <returns>The delta vector in Parent's coordinates.</returns>
         public static Vector2 ScreenSpaceDeltaToParentSpace(this Drawable drawable, Vector2 delta) =>
-            drawable.Parent.ToLocalSpace(drawable.Parent.ToScreenSpace(Vector2.Zero) + delta);
+            drawable.Parent!.ToLocalSpace(drawable.Parent!.ToScreenSpace(Vector2.Zero) + delta);
 
         /// <summary>
         /// Some elements don't handle rewind correctly and fixing them is non-trivial.

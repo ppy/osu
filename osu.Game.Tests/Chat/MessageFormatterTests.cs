@@ -32,8 +32,26 @@ namespace osu.Game.Tests.Chat
             Message result = MessageFormatter.FormatMessage(new Message { Content = "This is a gopher://really-old-protocol we don't support." });
 
             Assert.AreEqual(result.Content, result.DisplayContent);
-            Assert.AreEqual(1, result.Links.Count);
-            Assert.AreEqual("gopher://really-old-protocol", result.Links[0].Url);
+            Assert.AreEqual(0, result.Links.Count);
+        }
+
+        [Test]
+        public void TestFakeProtocolLink()
+        {
+            Message result = MessageFormatter.FormatMessage(new Message { Content = "This is a osunotarealprotocol://completely-made-up-protocol we don't support." });
+
+            Assert.AreEqual(result.Content, result.DisplayContent);
+            Assert.AreEqual(0, result.Links.Count);
+        }
+
+        [Test]
+        public void TestSupportedProtocolLinkParsing()
+        {
+            Message result = MessageFormatter.FormatMessage(new Message { Content = "forgotspacehttps://dev.ppy.sh joinmyosump://12345 jointheosu://chan/#english" });
+
+            Assert.AreEqual("https://dev.ppy.sh", result.Links[0].Url);
+            Assert.AreEqual("osump://12345", result.Links[1].Url);
+            Assert.AreEqual("osu://chan/#english", result.Links[2].Url);
         }
 
         [Test]

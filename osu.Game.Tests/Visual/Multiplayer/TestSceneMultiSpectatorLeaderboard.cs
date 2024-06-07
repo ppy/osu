@@ -49,6 +49,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
                 LoadComponentAsync(leaderboard = new MultiSpectatorLeaderboard(clocks.Keys.Select(id => new MultiplayerRoomUser(id)).ToArray())
                 {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
                     Expanded = { Value = true }
                 }, Add);
             });

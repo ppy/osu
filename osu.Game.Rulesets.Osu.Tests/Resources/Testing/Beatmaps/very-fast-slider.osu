@@ -1,0 +1,21 @@
+osu file format v128
+
+[Difficulty]
+HPDrainRate: 3
+CircleSize: 4
+OverallDifficulty: 9
+ApproachRate: 9.3
+SliderMultiplier: 3.59999990463257
+SliderTickRate: 1
+
+[TimingPoints]
+812,342.857142857143,4,1,1,70,1,0
+57383,-28.5714285714286,4,1,1,70,0,0
+
+[HitObjects]
+// Taken from https://osu.ppy.sh/beatmapsets/881996#osu/1844019
+// This slider is 42 ms in length, triggering the LegacyLastTick edge case.
+// The tick will be at 21.5 ms (sliderDuration / 2) instead of 6 ms (sliderDuration - LAST_TICK_LENIENCE).
+416,41,57383,6,0,L|467:217,1,157.499997329712,2|0,3:3|3:0,3:0:0:0:
+// Include the next slider as well to cover the jump back to the start position.
+407,73,57469,2,0,L|470:215,1,129.599999730835,2|0,0:0|0:0,0:0:0:0:

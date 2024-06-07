@@ -12,16 +12,6 @@ namespace osu.Game.Rulesets.Judgements
     public class Judgement
     {
         /// <summary>
-        /// The score awarded for a small bonus.
-        /// </summary>
-        public const int SMALL_BONUS_SCORE = 10;
-
-        /// <summary>
-        /// The score awarded for a large bonus.
-        /// </summary>
-        public const int LARGE_BONUS_SCORE = 50;
-
-        /// <summary>
         /// The default health increase for a maximum judgement, as a proportion of total health.
         /// By default, each maximum judgement restores 5% of total health.
         /// </summary>
@@ -35,7 +25,40 @@ namespace osu.Game.Rulesets.Judgements
         /// <summary>
         /// The minimum <see cref="HitResult"/> that can be achieved - the inverse of <see cref="MaxResult"/>.
         /// </summary>
-        public HitResult MinResult
+        /// <remarks>
+        /// Defaults to a sane value for the given <see cref="MaxResult"/>. May be overridden to provide a supported custom value:
+        /// <list type="table">
+        ///   <listheader>
+        ///     <term><see cref="MaxResult"/>s</term>
+        ///     <description>Valid <see cref="MinResult"/>s</description>
+        ///   </listheader>
+        /// <item>
+        ///   <term><see cref="HitResult.Perfect"/>, <see cref="HitResult.Great"/>, <see cref="HitResult.Good"/>, <see cref="HitResult.Ok"/>, <see cref="HitResult.Meh"/></term>
+        ///   <description><see cref="HitResult.Miss"/></description>
+        /// </item>
+        /// <item>
+        ///   <term><see cref="HitResult.LargeBonus"/></term>
+        ///   <description><see cref="HitResult.IgnoreMiss"/></description>
+        /// </item>
+        /// <item>
+        ///   <term><see cref="HitResult.SmallBonus"/></term>
+        ///   <description><see cref="HitResult.IgnoreMiss"/></description>
+        /// </item>
+        /// <item>
+        ///   <term><see cref="HitResult.SmallTickHit"/></term>
+        ///   <description><see cref="HitResult.SmallTickMiss"/></description>
+        /// </item>
+        /// <item>
+        ///   <term><see cref="HitResult.LargeTickHit"/></term>
+        ///   <description><see cref="HitResult.LargeTickMiss"/></description>
+        /// </item>
+        /// <item>
+        ///   <term><see cref="HitResult.IgnoreHit"/></term>
+        ///   <description><see cref="HitResult.IgnoreMiss"/>, <see cref="HitResult.ComboBreak"/></description>
+        /// </item>
+        /// </list>
+        /// </remarks>
+        public virtual HitResult MinResult
         {
             get
             {
@@ -52,6 +75,9 @@ namespace osu.Game.Rulesets.Judgements
                     case HitResult.LargeTickHit:
                         return HitResult.LargeTickMiss;
 
+                    case HitResult.SliderTailHit:
+                        return HitResult.IgnoreMiss;
+
                     default:
                         return HitResult.Miss;
                 }
@@ -59,21 +85,9 @@ namespace osu.Game.Rulesets.Judgements
         }
 
         /// <summary>
-        /// The numeric score representation for the maximum achievable result.
-        /// </summary>
-        public int MaxNumericResult => ToNumericResult(MaxResult);
-
-        /// <summary>
         /// The health increase for the maximum achievable result.
         /// </summary>
         public double MaxHealthIncrease => HealthIncreaseFor(MaxResult);
-
-        /// <summary>
-        /// Retrieves the numeric score representation of a <see cref="JudgementResult"/>.
-        /// </summary>
-        /// <param name="result">The <see cref="JudgementResult"/> to find the numeric score representation for.</param>
-        /// <returns>The numeric score representation of <paramref name="result"/>.</returns>
-        public int NumericResultFor(JudgementResult result) => ToNumericResult(result.Type);
 
         /// <summary>
         /// Retrieves the numeric health increase of a <see cref="HitResult"/>.
@@ -93,6 +107,7 @@ namespace osu.Game.Rulesets.Judgements
                 case HitResult.SmallTickMiss:
                     return -DEFAULT_MAX_HEALTH_INCREASE * 0.5;
 
+                case HitResult.SliderTailHit:
                 case HitResult.LargeTickHit:
                     return DEFAULT_MAX_HEALTH_INCREASE;
 
@@ -132,42 +147,6 @@ namespace osu.Game.Rulesets.Judgements
         /// <returns>The numeric health increase of <paramref name="result"/>.</returns>
         public double HealthIncreaseFor(JudgementResult result) => HealthIncreaseFor(result.Type);
 
-        public override string ToString() => $"MaxResult:{MaxResult} MaxScore:{MaxNumericResult}";
-
-        public static int ToNumericResult(HitResult result)
-        {
-            switch (result)
-            {
-                default:
-                    return 0;
-
-                case HitResult.SmallTickHit:
-                    return 10;
-
-                case HitResult.LargeTickHit:
-                    return 30;
-
-                case HitResult.Meh:
-                    return 50;
-
-                case HitResult.Ok:
-                    return 100;
-
-                case HitResult.Good:
-                    return 200;
-
-                case HitResult.Great:
-                    return 300;
-
-                case HitResult.Perfect:
-                    return 315;
-
-                case HitResult.SmallBonus:
-                    return SMALL_BONUS_SCORE;
-
-                case HitResult.LargeBonus:
-                    return LARGE_BONUS_SCORE;
-            }
-        }
+        public override string ToString() => $"MaxResult:{MaxResult}";
     }
 }

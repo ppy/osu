@@ -12,7 +12,7 @@ using osu.Game.Tournament.Models;
 
 namespace osu.Game.Tournament.Screens.Ladder.Components
 {
-    public partial class SettingsTeamDropdown : SettingsDropdown<TournamentTeam>
+    public partial class SettingsTeamDropdown : SettingsDropdown<TournamentTeam?>
     {
         public SettingsTeamDropdown(BindableList<TournamentTeam> teams)
         {

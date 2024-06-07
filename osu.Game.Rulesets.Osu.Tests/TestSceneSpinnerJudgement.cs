@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
@@ -11,14 +10,12 @@ using osu.Game.Beatmaps;
 using osu.Game.Replays;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Osu.Objects;
-using osu.Game.Rulesets.Osu.Replays;
 using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play;
 using osu.Game.Tests.Visual;
-using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Tests
 {
@@ -59,26 +56,9 @@ namespace osu.Game.Rulesets.Osu.Tests
             AddAssert("all max judgements", () => judgementResults.All(result => result.Type == result.Judgement.MaxResult));
         }
 
-        private static List<ReplayFrame> generateReplay(int spins)
-        {
-            var replayFrames = new List<ReplayFrame>();
-
-            const int frames_per_spin = 30;
-
-            for (int i = 0; i < spins * frames_per_spin; ++i)
-            {
-                float totalProgress = i / (float)(spins * frames_per_spin);
-                float spinProgress = (i % frames_per_spin) / (float)frames_per_spin;
-                double time = time_spinner_start + (time_spinner_end - time_spinner_start) * totalProgress;
-                float posX = MathF.Cos(2 * MathF.PI * spinProgress);
-                float posY = MathF.Sin(2 * MathF.PI * spinProgress);
-                Vector2 finalPos = OsuPlayfield.BASE_SIZE / 2 + new Vector2(posX, posY) * 50;
-
-                replayFrames.Add(new OsuReplayFrame(time, finalPos, OsuAction.LeftButton));
-            }
-
-            return replayFrames;
-        }
+        private static List<ReplayFrame> generateReplay(int spins) => new SpinFramesGenerator(time_spinner_start)
+                                                                      .Spin(spins * 360, time_spinner_end - time_spinner_start)
+                                                                      .Build();
 
         private void performTest(List<ReplayFrame> frames)
         {

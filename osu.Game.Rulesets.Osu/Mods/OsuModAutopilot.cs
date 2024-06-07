@@ -16,7 +16,7 @@ using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
-    public class OsuModAutopilot : Mod, IApplicableFailOverride, IUpdatableByPlayfield, IApplicableToDrawableRuleset<OsuHitObject>
+    public class OsuModAutopilot : Mod, IUpdatableByPlayfield, IApplicableToDrawableRuleset<OsuHitObject>
     {
         public override string Name => "Autopilot";
         public override string Acronym => "AP";
@@ -29,16 +29,11 @@ namespace osu.Game.Rulesets.Osu.Mods
         {
             typeof(OsuModSpunOut),
             typeof(ModRelax),
-            typeof(ModFailCondition),
-            typeof(ModNoFail),
             typeof(ModAutoplay),
             typeof(OsuModMagnetised),
-            typeof(OsuModRepel)
+            typeof(OsuModRepel),
+            typeof(ModTouchDevice)
         };
-
-        public bool PerformFail() => false;
-
-        public bool RestartOnFail => false;
 
         private OsuInputManager inputManager = null!;
 
@@ -72,8 +67,6 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             // Generate the replay frames the cursor should follow
             replayFrames = new OsuAutoGenerator(drawableRuleset.Beatmap, drawableRuleset.Mods).Generate().Frames.Cast<OsuReplayFrame>().ToList();
-
-            drawableRuleset.UseResumeOverlay = false;
         }
     }
 }

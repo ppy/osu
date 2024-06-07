@@ -171,10 +171,10 @@ namespace osu.Game.Tests.Visual
 
         public IRenderer Renderer => host.Renderer;
         public AudioManager AudioManager => Audio;
-        public IResourceStore<byte[]> Files => null;
+        public IResourceStore<byte[]> Files => null!;
         public new IResourceStore<byte[]> Resources => base.Resources;
         public IResourceStore<TextureUpload> CreateTextureLoaderStore(IResourceStore<byte[]> underlyingStore) => host.CreateTextureLoaderStore(underlyingStore);
-        RealmAccess IStorageResourceProvider.RealmAccess => null;
+        RealmAccess IStorageResourceProvider.RealmAccess => null!;
 
         #endregion
 
@@ -201,8 +201,8 @@ namespace osu.Game.Tests.Visual
         {
             private readonly bool extrapolateAnimations;
 
-            public TestLegacySkin(SkinInfo skin, IResourceStore<byte[]> storage, IStorageResourceProvider resources, bool extrapolateAnimations)
-                : base(skin, resources, storage)
+            public TestLegacySkin(SkinInfo skin, IResourceStore<byte[]> fallbackStore, IStorageResourceProvider resources, bool extrapolateAnimations)
+                : base(skin, resources, fallbackStore)
             {
                 this.extrapolateAnimations = extrapolateAnimations;
             }

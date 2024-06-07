@@ -116,6 +116,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             updateStacking();
         }
 
+        private readonly Stack<HitObject> currentConcurrentObjects = new Stack<HitObject>();
+
         private void updateStacking()
         {
             // because only blueprints of objects which are alive (via pooling) are displayed in the timeline, it's feasible to do this every-update.
@@ -125,10 +127,12 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             // after the stack gets this tall, we can presume there is space underneath to draw subsequent blueprints.
             const int stack_reset_count = 3;
 
-            Stack<HitObject> currentConcurrentObjects = new Stack<HitObject>();
+            currentConcurrentObjects.Clear();
 
-            foreach (var b in SelectionBlueprints.Reverse())
+            for (int i = SelectionBlueprints.Count - 1; i >= 0; i--)
             {
+                var b = SelectionBlueprints[i];
+
                 // remove objects from the stack as long as their end time is in the past.
                 while (currentConcurrentObjects.TryPeek(out HitObject hitObject))
                 {

@@ -40,10 +40,10 @@ namespace osu.Game.Tournament.Tests
 
             match = CreateSampleMatch();
 
-            Ladder.Rounds.Add(match.Round.Value);
+            Ladder.Rounds.Add(match.Round.Value!);
             Ladder.Matches.Add(match);
-            Ladder.Teams.Add(match.Team1.Value);
-            Ladder.Teams.Add(match.Team2.Value);
+            Ladder.Teams.Add(match.Team1.Value!);
+            Ladder.Teams.Add(match.Team2.Value!);
 
             Ruleset.BindTo(Ladder.Ruleset);
             Dependencies.CacheAs(new StableInfo(storage));
@@ -67,7 +67,7 @@ namespace osu.Game.Tournament.Tests
                     FlagName = { Value = "JP" },
                     FullName = { Value = "Japan" },
                     LastYearPlacing = { Value = 10 },
-                    Seed = { Value = "Low" },
+                    Seed = { Value = "#12" },
                     SeedingResults =
                     {
                         new SeedingResult
@@ -140,6 +140,7 @@ namespace osu.Game.Tournament.Tests
                     Acronym = { Value = "USA" },
                     FlagName = { Value = "US" },
                     FullName = { Value = "United States" },
+                    Seed = { Value = "#3" },
                     Players =
                     {
                         new TournamentUser { Username = "Hello" },
@@ -152,7 +153,7 @@ namespace osu.Game.Tournament.Tests
             },
             Round =
             {
-                Value = new TournamentRound { Name = { Value = "Quarterfinals" } }
+                Value = new TournamentRound { Name = { Value = "Quarterfinals" } },
             }
         };
 

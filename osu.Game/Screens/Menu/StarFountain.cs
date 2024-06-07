@@ -3,6 +3,7 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Textures;
+using osu.Framework.Threading;
 using osu.Framework.Utils;
 using osu.Game.Graphics;
 using osu.Game.Skinning;
@@ -23,7 +24,7 @@ namespace osu.Game.Screens.Menu
             InternalChild = spewer = new StarFountainSpewer();
         }
 
-        public void Shoot() => spewer.Shoot();
+        public void Shoot(int direction) => spewer.Shoot(direction);
 
         protected override void SkinChanged(ISkinSource skin)
         {
@@ -43,8 +44,6 @@ namespace osu.Game.Screens.Menu
 
             private const double shoot_duration = 800;
 
-            protected override bool CanSpawnParticles => lastShootTime != null && Time.Current - lastShootTime < shoot_duration;
-
             [Resolved]
             private ISkinSource skin { get; set; } = null!;
 
@@ -57,7 +56,6 @@ namespace osu.Game.Screens.Menu
             private void load(TextureStore textures)
             {
                 Texture = skin.GetTexture("Menu/fountain-star") ?? textures.Get("Menu/fountain-star");
-                Active.Value = true;
             }
 
             protected override FallingParticle CreateParticle()
@@ -81,10 +79,17 @@ namespace osu.Game.Screens.Menu
                 return lastShootDirection * x_velocity_from_direction * (float)(1 - 2 * (Clock.CurrentTime - lastShootTime!.Value) / shoot_duration) + getRandomVariance(x_velocity_random_variance);
             }
 
-            public void Shoot()
+            private ScheduledDelegate? deactivateDelegate;
+
+            public void Shoot(int direction)
             {
+                Active.Value = true;
+
+                deactivateDelegate?.Cancel();
+                deactivateDelegate = Scheduler.AddDelayed(() => Active.Value = false, shoot_duration);
+
                 lastShootTime = Clock.CurrentTime;
-                lastShootDirection = RNG.Next(-1, 2);
+                lastShootDirection = direction;
             }
 
             private static float getRandomVariance(float variance) => RNG.NextSingle(-variance, variance);

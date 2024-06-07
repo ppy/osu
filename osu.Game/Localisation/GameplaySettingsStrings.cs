@@ -20,11 +20,6 @@ namespace osu.Game.Localisation
         public static LocalisableString BeatmapHeader => new TranslatableString(getKey(@"beatmap_header"), @"Beatmap");
 
         /// <summary>
-        /// "General"
-        /// </summary>
-        public static LocalisableString GeneralHeader => new TranslatableString(getKey(@"general_header"), @"General");
-
-        /// <summary>
         /// "Audio"
         /// </summary>
         public static LocalisableString AudioHeader => new TranslatableString(getKey(@"audio"), @"Audio");

@@ -95,11 +95,11 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             }
 
             private Vector2 getFinalPosition() =>
-                Parent.ToLocalSpace(facade.ScreenSpaceDrawQuad.Centre);
+                Parent!.ToLocalSpace(facade.ScreenSpaceDrawQuad.Centre);
 
             private Vector2 getFinalSize() =>
-                Parent.ToLocalSpace(facade.ScreenSpaceDrawQuad.BottomRight)
-                - Parent.ToLocalSpace(facade.ScreenSpaceDrawQuad.TopLeft);
+                Parent!.ToLocalSpace(facade.ScreenSpaceDrawQuad.BottomRight)
+                - Parent!.ToLocalSpace(facade.ScreenSpaceDrawQuad.TopLeft);
 
             protected override bool OnClick(ClickEvent e)
             {

@@ -88,7 +88,7 @@ namespace osu.Game.Screens.Edit.Setup
                     Description = EditorSetupStrings.BaseVelocityDescription,
                     Current = new BindableDouble(Beatmap.Difficulty.SliderMultiplier)
                     {
-                        Default = 1,
+                        Default = 1.4,
                         MinValue = 0.4,
                         MaxValue = 3.6,
                         Precision = 0.01f,

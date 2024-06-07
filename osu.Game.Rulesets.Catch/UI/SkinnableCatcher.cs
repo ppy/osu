@@ -6,7 +6,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Catch.Skinning.Default;
 using osu.Game.Skinning;
-using osuTK;
 
 namespace osu.Game.Rulesets.Catch.UI
 {
@@ -26,8 +25,8 @@ namespace osu.Game.Rulesets.Catch.UI
             : base(new CatchSkinComponentLookup(CatchSkinComponents.Catcher), _ => new DefaultCatcher())
         {
             Anchor = Anchor.TopCentre;
-            // Sets the origin roughly to the centre of the catcher's plate to allow for correct scaling.
-            OriginPosition = new Vector2(0.5f, 0.06f) * Catcher.BASE_SIZE;
+            Origin = Anchor.TopCentre;
+            CentreComponent = false;
         }
     }
 }

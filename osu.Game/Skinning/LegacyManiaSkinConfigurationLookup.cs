@@ -30,6 +30,8 @@ namespace osu.Game.Skinning
             Lookup = lookup;
             ColumnIndex = columnIndex;
         }
+
+        public override string ToString() => $"[{nameof(LegacyManiaSkinConfigurationLookup)} lookup:{Lookup} col:{ColumnIndex} totalcols:{TotalColumns}]";
     }
 
     public enum LegacyManiaSkinConfigurationLookups
@@ -65,13 +67,17 @@ namespace osu.Game.Skinning
         LeftStageImage,
         RightStageImage,
         BottomStageImage,
+
+        // ReSharper disable once InconsistentNaming
         Hit300g,
+
         Hit300,
         Hit200,
         Hit100,
         Hit50,
         Hit0,
         KeysUnderNotes,
-        NoteBodyStyle
+        NoteBodyStyle,
+        LightFramePerSecond
     }
 }

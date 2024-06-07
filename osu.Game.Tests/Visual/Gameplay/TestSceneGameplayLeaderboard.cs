@@ -3,14 +3,17 @@
 
 #nullable disable
 
+using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.PolygonExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
+using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Screens.Play.HUD;
 using osuTK;
@@ -139,6 +142,37 @@ namespace osu.Game.Tests.Visual.Gameplay
                 => AddAssert($"leaderboard height is {panelCount} panels high", () => leaderboard.DrawHeight == (GameplayLeaderboardScore.PANEL_HEIGHT + leaderboard.Spacing) * panelCount);
         }
 
+        [Test]
+        public void TestFriendScore()
+        {
+            APIUser friend = new APIUser { Username = "my friend", Id = 10000 };
+
+            createLeaderboard();
+            addLocalPlayer();
+
+            AddStep("Add friend to API", () =>
+            {
+                var api = (DummyAPIAccess)API;
+
+                api.Friends.Clear();
+                api.Friends.Add(friend);
+            });
+
+            int playerNumber = 1;
+
+            AddRepeatStep("add 3 other players", () => createRandomScore(new APIUser { Username = $"Player {playerNumber++}" }), 3);
+            AddUntilStep("no pink color scores",
+                () => leaderboard.ChildrenOfType<Box>().Select(b => ((Colour4)b.Colour).ToHex()),
+                () => Does.Not.Contain("#FF549A"));
+
+            AddRepeatStep("add 3 friend score", () => createRandomScore(friend), 3);
+            AddUntilStep("at least one friend score is pink",
+                () => leaderboard.GetAllScoresForUsername("my friend")
+                                 .SelectMany(score => score.ChildrenOfType<Box>())
+                                 .Select(b => ((Colour4)b.Colour).ToHex()),
+                () => Does.Contain("#FF549A"));
+        }
+
         private void addLocalPlayer()
         {
             AddStep("add local player", () =>
@@ -179,6 +213,9 @@ namespace osu.Game.Tests.Visual.Gameplay
 
                 return scoreItem != null && scoreItem.ScorePosition == expectedPosition;
             }
+
+            public IEnumerable<GameplayLeaderboardScore> GetAllScoresForUsername(string username)
+                => Flow.Where(i => i.User?.Username == username);
         }
     }
 }

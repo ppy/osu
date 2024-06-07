@@ -35,6 +35,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
         public string Text
         {
+            get => Component.Text;
             set => Component.Text = value;
         }
 
@@ -49,6 +50,8 @@ namespace osu.Game.Graphics.UserInterfaceV2
             Component.BorderColour = colours.Blue;
         }
 
+        public bool SelectAll() => Component.SelectAll();
+
         protected virtual OsuTextBox CreateTextBox() => new OsuTextBox();
 
         public override bool AcceptsFocus => true;
@@ -56,7 +59,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
         protected override void OnFocus(FocusEvent e)
         {
             base.OnFocus(e);
-            GetContainingInputManager().ChangeFocus(Component);
+            GetContainingFocusManager().ChangeFocus(Component);
         }
 
         protected override OsuTextBox CreateComponent() => CreateTextBox().With(t =>
