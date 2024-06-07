@@ -42,7 +42,11 @@ namespace osu.Game.Online.API
 
         public string WebsiteRootUrl { get; }
 
-        public int APIVersion => 20220705; // We may want to pull this from the game version eventually.
+        /// <summary>
+        /// The API response version.
+        /// See: https://osu.ppy.sh/docs/index.html#api-versions
+        /// </summary>
+        public int APIVersion { get; }
 
         public Exception LastLoginError { get; private set; }
 
@@ -84,12 +88,23 @@ namespace osu.Game.Online.API
             this.config = config;
             this.versionHash = versionHash;
 
+            if (game.IsDeployedBuild)
+                APIVersion = game.AssemblyVersion.Major * 10000 + game.AssemblyVersion.Minor;
+            else
+            {
+                var now = DateTimeOffset.Now;
+                APIVersion = now.Year * 10000 + now.Month * 100 + now.Day;
+            }
+
             APIEndpointUrl = endpointConfiguration.APIEndpointUrl;
             WebsiteRootUrl = endpointConfiguration.WebsiteRootUrl;
             NotificationsClient = setUpNotificationsClient();
 
             authentication = new OAuth(endpointConfiguration.APIClientID, endpointConfiguration.APIClientSecret, APIEndpointUrl);
+
             log = Logger.GetLogger(LoggingTarget.Network);
+            log.Add($@"API endpoint root: {APIEndpointUrl}");
+            log.Add($@"API request version: {APIVersion}");
 
             ProvidedUsername = config.Get<string>(OsuSetting.Username);
 

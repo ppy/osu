@@ -91,6 +91,11 @@ namespace osu.Game
         /// </summary>
         protected const float SIDE_OVERLAY_OFFSET_RATIO = 0.05f;
 
+        /// <summary>
+        /// A common shear factor applied to most components of the game.
+        /// </summary>
+        public const float SHEAR = 0.2f;
+
         public Toolbar Toolbar { get; private set; }
 
         private ChatOverlay chatOverlay;
@@ -480,10 +485,19 @@ namespace osu.Game
             }
         });
 
-        public void OpenUrlExternally(string url, bool bypassExternalUrlWarning = false) => waitForReady(() => externalLinkOpener, _ =>
+        public void OpenUrlExternally(string url, bool forceBypassExternalUrlWarning = false) => waitForReady(() => externalLinkOpener, _ =>
         {
+            bool isTrustedDomain;
+
             if (url.StartsWith('/'))
-                url = $"{API.APIEndpointUrl}{url}";
+            {
+                url = $"{API.WebsiteRootUrl}{url}";
+                isTrustedDomain = true;
+            }
+            else
+            {
+                isTrustedDomain = url.StartsWith(API.WebsiteRootUrl, StringComparison.Ordinal);
+            }
 
             if (!url.CheckIsValidUrl())
             {
@@ -495,7 +509,7 @@ namespace osu.Game
                 return;
             }
 
-            externalLinkOpener.OpenUrlExternally(url, bypassExternalUrlWarning);
+            externalLinkOpener.OpenUrlExternally(url, forceBypassExternalUrlWarning || isTrustedDomain);
         });
 
         /// <summary>

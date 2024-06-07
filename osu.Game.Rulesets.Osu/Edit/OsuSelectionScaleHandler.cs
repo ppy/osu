@@ -24,6 +24,16 @@ namespace osu.Game.Rulesets.Osu.Edit
 {
     public partial class OsuSelectionScaleHandler : SelectionScaleHandler
     {
+        /// <summary>
+        /// Whether scaling anchored by the center of the playfield can currently be performed.
+        /// </summary>
+        public Bindable<bool> CanScaleFromPlayfieldOrigin { get; private set; } = new BindableBool();
+
+        /// <summary>
+        /// Whether a single slider is currently selected, which results in a different scaling behaviour.
+        /// </summary>
+        public Bindable<bool> IsScalingSlider { get; private set; } = new BindableBool();
+
         [Resolved]
         private IEditorChangeHandler? changeHandler { get; set; }
 
@@ -53,6 +63,8 @@ namespace osu.Game.Rulesets.Osu.Edit
             CanScaleX.Value = quad.Width > 0;
             CanScaleY.Value = quad.Height > 0;
             CanScaleDiagonally.Value = CanScaleX.Value && CanScaleY.Value;
+            CanScaleFromPlayfieldOrigin.Value = selectedMovableObjects.Any();
+            IsScalingSlider.Value = selectedMovableObjects.Count() == 1 && selectedMovableObjects.First() is Slider;
         }
 
         private Dictionary<OsuHitObject, OriginalHitObjectState>? objectsInScale;
@@ -67,7 +79,7 @@ namespace osu.Game.Rulesets.Osu.Edit
 
             objectsInScale = selectedMovableObjects.ToDictionary(ho => ho, ho => new OriginalHitObjectState(ho));
             OriginalSurroundingQuad = objectsInScale.Count == 1 && objectsInScale.First().Key is Slider slider
-                ? GeometryUtils.GetSurroundingQuad(slider.Path.ControlPoints.Select(p => p.Position))
+                ? GeometryUtils.GetSurroundingQuad(slider.Path.ControlPoints.Select(p => slider.Position + p.Position))
                 : GeometryUtils.GetSurroundingQuad(objectsInScale.Keys);
             defaultOrigin = OriginalSurroundingQuad.Value.Centre;
         }
@@ -92,7 +104,7 @@ namespace osu.Game.Rulesets.Osu.Edit
             }
             else
             {
-                scale = getClampedScale(OriginalSurroundingQuad.Value, actualOrigin, scale);
+                scale = ClampScaleToPlayfieldBounds(scale, actualOrigin);
 
                 foreach (var (ho, originalState) in objectsInScale)
                 {
@@ -158,27 +170,36 @@ namespace osu.Game.Rulesets.Osu.Edit
         /// <summary>
         /// Clamp scale for multi-object-scaling where selection does not exceed playfield bounds or flip.
         /// </summary>
-        /// <param name="selectionQuad">The quad surrounding the hitobjects</param>
         /// <param name="origin">The origin from which the scale operation is performed</param>
         /// <param name="scale">The scale to be clamped</param>
         /// <returns>The clamped scale vector</returns>
-        private Vector2 getClampedScale(Quad selectionQuad, Vector2 origin, Vector2 scale)
+        public Vector2 ClampScaleToPlayfieldBounds(Vector2 scale, Vector2? origin = null)
         {
             //todo: this is not always correct for selections involving sliders. This approximation assumes each point is scaled independently, but sliderends move with the sliderhead.
+            if (objectsInScale == null)
+                return scale;
 
-            var tl1 = Vector2.Divide(-origin, selectionQuad.TopLeft - origin);
-            var tl2 = Vector2.Divide(OsuPlayfield.BASE_SIZE - origin, selectionQuad.TopLeft - origin);
-            var br1 = Vector2.Divide(-origin, selectionQuad.BottomRight - origin);
-            var br2 = Vector2.Divide(OsuPlayfield.BASE_SIZE - origin, selectionQuad.BottomRight - origin);
+            Debug.Assert(defaultOrigin != null && OriginalSurroundingQuad != null);
 
-            if (!Precision.AlmostEquals(selectionQuad.TopLeft.X - origin.X, 0))
-                scale.X = selectionQuad.TopLeft.X - origin.X < 0 ? MathHelper.Clamp(scale.X, tl2.X, tl1.X) : MathHelper.Clamp(scale.X, tl1.X, tl2.X);
-            if (!Precision.AlmostEquals(selectionQuad.TopLeft.Y - origin.Y, 0))
-                scale.Y = selectionQuad.TopLeft.Y - origin.Y < 0 ? MathHelper.Clamp(scale.Y, tl2.Y, tl1.Y) : MathHelper.Clamp(scale.Y, tl1.Y, tl2.Y);
-            if (!Precision.AlmostEquals(selectionQuad.BottomRight.X - origin.X, 0))
-                scale.X = selectionQuad.BottomRight.X - origin.X < 0 ? MathHelper.Clamp(scale.X, br2.X, br1.X) : MathHelper.Clamp(scale.X, br1.X, br2.X);
-            if (!Precision.AlmostEquals(selectionQuad.BottomRight.Y - origin.Y, 0))
-                scale.Y = selectionQuad.BottomRight.Y - origin.Y < 0 ? MathHelper.Clamp(scale.Y, br2.Y, br1.Y) : MathHelper.Clamp(scale.Y, br1.Y, br2.Y);
+            if (objectsInScale.Count == 1 && objectsInScale.First().Key is Slider slider)
+                origin = slider.Position;
+
+            Vector2 actualOrigin = origin ?? defaultOrigin.Value;
+            var selectionQuad = OriginalSurroundingQuad.Value;
+
+            var tl1 = Vector2.Divide(-actualOrigin, selectionQuad.TopLeft - actualOrigin);
+            var tl2 = Vector2.Divide(OsuPlayfield.BASE_SIZE - actualOrigin, selectionQuad.TopLeft - actualOrigin);
+            var br1 = Vector2.Divide(-actualOrigin, selectionQuad.BottomRight - actualOrigin);
+            var br2 = Vector2.Divide(OsuPlayfield.BASE_SIZE - actualOrigin, selectionQuad.BottomRight - actualOrigin);
+
+            if (!Precision.AlmostEquals(selectionQuad.TopLeft.X - actualOrigin.X, 0))
+                scale.X = selectionQuad.TopLeft.X - actualOrigin.X < 0 ? MathHelper.Clamp(scale.X, tl2.X, tl1.X) : MathHelper.Clamp(scale.X, tl1.X, tl2.X);
+            if (!Precision.AlmostEquals(selectionQuad.TopLeft.Y - actualOrigin.Y, 0))
+                scale.Y = selectionQuad.TopLeft.Y - actualOrigin.Y < 0 ? MathHelper.Clamp(scale.Y, tl2.Y, tl1.Y) : MathHelper.Clamp(scale.Y, tl1.Y, tl2.Y);
+            if (!Precision.AlmostEquals(selectionQuad.BottomRight.X - actualOrigin.X, 0))
+                scale.X = selectionQuad.BottomRight.X - actualOrigin.X < 0 ? MathHelper.Clamp(scale.X, br2.X, br1.X) : MathHelper.Clamp(scale.X, br1.X, br2.X);
+            if (!Precision.AlmostEquals(selectionQuad.BottomRight.Y - actualOrigin.Y, 0))
+                scale.Y = selectionQuad.BottomRight.Y - actualOrigin.Y < 0 ? MathHelper.Clamp(scale.Y, br2.Y, br1.Y) : MathHelper.Clamp(scale.Y, br1.Y, br2.Y);
 
             return Vector2.ComponentMax(scale, new Vector2(Precision.FLOAT_EPSILON));
         }

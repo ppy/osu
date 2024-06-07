@@ -41,8 +41,8 @@ namespace osu.Game.Rulesets.Osu.Edit
         private void updateState()
         {
             var quad = GeometryUtils.GetSurroundingQuad(selectedMovableObjects);
-            CanRotateSelectionOrigin.Value = quad.Width > 0 || quad.Height > 0;
-            CanRotatePlayfieldOrigin.Value = selectedMovableObjects.Any();
+            CanRotateAroundSelectionOrigin.Value = quad.Width > 0 || quad.Height > 0;
+            CanRotateAroundPlayfieldOrigin.Value = selectedMovableObjects.Any();
         }
 
         private OsuHitObject[]? objectsInRotation;
