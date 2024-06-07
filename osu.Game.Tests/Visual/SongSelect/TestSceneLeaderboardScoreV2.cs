@@ -63,7 +63,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
                     Spacing = new Vector2(0f, 2f),
-                    Shear = LeaderboardScoreV2.SHEAR
+                    Shear = new Vector2(OsuGame.SHEAR, 0)
                 },
                 drawWidthText = new OsuSpriteText(),
             };
