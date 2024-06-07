@@ -9,7 +9,6 @@ using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Difficulty.Utils;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Utils;
-using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Touch
 {
@@ -95,38 +94,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Touch
             var lastLast = lastObjects.Count > 1 ? lastObjects[^2] : null;
 
             return new OsuDifficultyHitObject(current, last, lastLast, clockRate, lastDifficultyObjects, lastDifficultyObjects.Count);
-        }
-
-        /// <summary>
-        /// Calculates the angle of the current <see cref="OsuHitObject"/> relative to the last hit objects with different hands.
-        /// This method determines the angle formed by the current object, the last object hit by the other hand, and the last object hit by the same hand.
-        /// </summary>
-        /// <param name="current">The current <see cref="OsuHitObject"/> for which the angle is to be calculated.</param>
-        /// <param name="hand">The <see cref="TouchHand"/> that hit the current <see cref="OsuHitObject"/>.</param>
-        /// <returns>
-        /// The angle formed at the current object between the vector from the last object hit by the other hand to the current object,
-        /// and the vector from the last object hit by this hand to the last object hit by the other hand. The angle is returned as a double wrapped in a nullable type,
-        /// where null might be returned if the calculation cannot be performed.
-        /// </returns>
-        protected double GetSwapAngle(OsuHitObject current, TouchHand hand)
-        {
-            var otherHand = GetOtherHand(hand);
-
-            var last = GetLastObjects(otherHand).Last();
-            var lastLast = GetLastObjects(hand).Last();
-
-            Vector2 currentPos = current.Position;
-            Vector2 lastPos = (last as Slider)?.LazyEndPosition ?? last.Position;
-            Vector2 lastLastPos = (lastLast as Slider)?.LazyEndPosition ?? lastLast.Position;
-
-            Vector2 vectorA = lastPos - lastLastPos;
-            Vector2 vectorB = currentPos - lastPos;
-
-            float dot = Vector2.Dot(vectorA, vectorB);
-            float det = vectorA.X * vectorB.Y - vectorA.Y * vectorB.X;
-            double angle = Math.Abs(Math.Atan2(det, dot));
-
-            return angle;
         }
 
         private void updateStrainValue(OsuDifficultyHitObject current, OsuDifficultyHitObject simulated, TouchHand currentHand)
