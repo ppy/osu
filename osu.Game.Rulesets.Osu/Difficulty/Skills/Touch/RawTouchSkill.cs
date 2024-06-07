@@ -173,6 +173,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Touch
 
         private double strainDecay(double ms) => Math.Pow(StrainDecayBase, ms / 1000);
 
+        /// <summary>
+        /// Computes the strain value of a simulated <see cref="OsuDifficultyHitObject"/> if it is hit with a specific <see cref="TouchHand"/>.
+        /// </summary>
+        /// <param name="simulated">The simulated <see cref="OsuDifficultyHitObject"/>.</param>
+        /// <param name="currentHand">The <see cref="TouchHand"/> that hit the <see cref="OsuDifficultyHitObject"/>.</param>
+        /// <returns>The strain value of the <see cref="OsuDifficultyHitObject"/>.</returns>
         protected abstract double StrainValueIf(OsuDifficultyHitObject simulated, TouchHand currentHand);
 
         public abstract RawTouchSkill DeepClone();
