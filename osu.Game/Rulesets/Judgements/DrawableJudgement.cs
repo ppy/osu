@@ -1,11 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Diagnostics;
-using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -24,13 +21,13 @@ namespace osu.Game.Rulesets.Judgements
     {
         private const float judgement_size = 128;
 
-        public JudgementResult Result { get; private set; }
+        public JudgementResult? Result { get; private set; }
 
-        public DrawableHitObject JudgedObject { get; private set; }
+        public DrawableHitObject? JudgedObject { get; private set; }
 
         public override bool RemoveCompletedTransforms => false;
 
-        protected SkinnableDrawable JudgementBody { get; private set; }
+        protected SkinnableDrawable? JudgementBody { get; private set; }
 
         private readonly Container aboveHitObjectsContent;
 
@@ -97,10 +94,17 @@ namespace osu.Game.Rulesets.Judgements
         /// </summary>
         /// <param name="result">The applicable judgement.</param>
         /// <param name="judgedObject">The drawable object.</param>
-        public void Apply([NotNull] JudgementResult result, [CanBeNull] DrawableHitObject judgedObject)
+        public void Apply(JudgementResult result, DrawableHitObject? judgedObject)
         {
             Result = result;
             JudgedObject = judgedObject;
+        }
+
+        protected override void FreeAfterUse()
+        {
+            base.FreeAfterUse();
+
+            JudgedObject = null;
         }
 
         protected override void PrepareForUse()
@@ -120,6 +124,8 @@ namespace osu.Game.Rulesets.Judgements
             // undo any transforms applies in ApplyMissAnimations/ApplyHitAnimations to get a sane initial state.
             ApplyTransformsAt(double.MinValue, true);
             ClearTransforms(true);
+
+            Debug.Assert(Result != null && JudgementBody != null);
 
             LifetimeStart = Result.TimeAbsolute;
 

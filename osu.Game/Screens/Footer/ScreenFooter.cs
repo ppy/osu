@@ -7,7 +7,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
 using osuTK;
 
@@ -15,9 +14,8 @@ namespace osu.Game.Screens.Footer
 {
     public partial class ScreenFooter : InputBlockingContainer
     {
-        //Should be 60, setting to 50 for now for the sake of matching the current BackButton height.
-        private const int height = 50;
-        private const int padding = 80;
+        private const int height = 60;
+        private const int padding = 60;
 
         private readonly List<OverlayContainer> overlays = new List<OverlayContainer>();
 
@@ -68,13 +66,20 @@ namespace osu.Game.Screens.Footer
                 },
                 buttons = new FillFlowContainer<ScreenFooterButton>
                 {
-                    Position = new Vector2(TwoLayerButton.SIZE_EXTENDED.X + padding, 10),
+                    Position = new Vector2(ScreenBackButton.BUTTON_WIDTH + padding, 10),
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.BottomLeft,
                     Direction = FillDirection.Horizontal,
                     Spacing = new Vector2(7, 0),
                     AutoSizeAxes = Axes.Both
-                }
+                },
+                new ScreenBackButton
+                {
+                    Margin = new MarginPadding { Bottom = 10f, Left = 12f },
+                    Anchor = Anchor.BottomLeft,
+                    Origin = Anchor.BottomLeft,
+                    Action = () => { },
+                },
             };
         }
     }

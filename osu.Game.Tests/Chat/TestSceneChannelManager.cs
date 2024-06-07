@@ -59,7 +59,7 @@ namespace osu.Game.Tests.Chat
                             return true;
 
                         case ChatAckRequest ack:
-                            ack.TriggerSuccess(new ChatAckResponse { Silences = silencedUserIds.Select(u => new ChatSilence { UserId = u }).ToList() });
+                            ack.TriggerSuccess(new ChatAckResponse { Silences = silencedUserIds.Select(u => new ChatSilence { UserId = u }).ToArray() });
                             silencedUserIds.Clear();
                             return true;
 
