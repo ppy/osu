@@ -149,9 +149,35 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Touch
             }
         }
 
-        protected List<OsuHitObject> GetLastObjects(TouchHand hand) => hand == TouchHand.Left ? lastLeftObjects : lastRightObjects;
+        protected List<OsuHitObject> GetLastObjects(TouchHand hand)
+        {
+            switch (hand)
+            {
+                case TouchHand.Left:
+                    return lastLeftObjects;
 
-        protected List<DifficultyHitObject> GetLastDifficultyObjects(TouchHand hand) => hand == TouchHand.Left ? lastLeftDifficultyObjects : lastRightDifficultyObjects;
+                case TouchHand.Right:
+                    return lastRightObjects;
+
+                default:
+                    return GetLastObjects(LastNonDragHand);
+            }
+        }
+
+        protected List<DifficultyHitObject> GetLastDifficultyObjects(TouchHand hand)
+        {
+            switch (hand)
+            {
+                case TouchHand.Left:
+                    return lastLeftDifficultyObjects;
+
+                case TouchHand.Right:
+                    return lastRightDifficultyObjects;
+
+                default:
+                    return GetLastDifficultyObjects(LastNonDragHand);
+            }
+        }
 
         private double strainDecay(double ms) => Math.Pow(StrainDecayBase, ms / 1000);
 
