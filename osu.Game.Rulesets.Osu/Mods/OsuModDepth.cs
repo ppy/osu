@@ -47,18 +47,17 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public void ApplyToDrawableRuleset(DrawableRuleset<OsuHitObject> drawableRuleset)
         {
-            // Hide judgment displays and follow points as they won't make any sense.
+            // Hide follow points as they won't make any sense.
             // Judgements can potentially be turned on in a future where they display at a position relative to their drawable counterpart.
+
             IsDisabled.BindValueChanged(s =>
             {
                 if (s.NewValue)
                 {
-                    drawableRuleset.Playfield.DisplayJudgements.Value = true;
                     (drawableRuleset.Playfield as OsuPlayfield)?.FollowPoints.Show();
                 }
                 else
                 {
-                    drawableRuleset.Playfield.DisplayJudgements.Value = false;
                     (drawableRuleset.Playfield as OsuPlayfield)?.FollowPoints.Hide();
                 }
             });
@@ -86,8 +85,10 @@ namespace osu.Game.Rulesets.Osu.Mods
         {
             double time = playfield.Time.Current;
 
-            foreach (var drawable in playfield.HitObjectContainer.AliveObjects)
+            foreach (var entry in playfield.HitObjectContainer.AliveEntries)
             {
+                var drawable = entry.Value;
+
                 switch (drawable)
                 {
                     case DrawableHitCircle circle:

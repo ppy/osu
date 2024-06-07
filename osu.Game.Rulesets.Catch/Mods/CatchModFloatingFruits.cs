@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Bindables;
-using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Rulesets.Catch.Objects;
@@ -27,7 +26,6 @@ namespace osu.Game.Rulesets.Catch.Mods
             IsDisabled.BindValueChanged(s =>
             {
                 drawableRuleset.PlayfieldAdjustmentContainer.Scale = s.NewValue ? new Vector2(1, 1) : new Vector2(1, -1);
-                drawableRuleset.PlayfieldAdjustmentContainer.Y = 1 - drawableRuleset.PlayfieldAdjustmentContainer.Y;
             }, true);
         }
     }

@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Localisation;
 using osu.Game.Collections;
@@ -28,15 +29,27 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                 Text = MaintenanceSettingsStrings.DeleteAllCollections,
                 Action = () =>
                 {
-                    dialogOverlay?.Push(new MassDeleteConfirmationDialog(deleteAllCollections));
+                    dialogOverlay?.Push(new MassDeleteConfirmationDialog(deleteAllCollections, DeleteConfirmationContentStrings.Collections));
                 }
             });
         }
 
         private void deleteAllCollections()
         {
-            realm.Write(r => r.RemoveAll<BeatmapCollection>());
-            notificationOverlay?.Post(new ProgressCompletionNotification { Text = MaintenanceSettingsStrings.DeletedAllCollections });
+            bool anyDeleted = realm.Write(r =>
+            {
+                if (r.All<BeatmapCollection>().Any())
+                {
+                    r.RemoveAll<BeatmapCollection>();
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            });
+
+            notificationOverlay?.Post(new ProgressCompletionNotification { Text = anyDeleted ? MaintenanceSettingsStrings.DeletedAllCollections : MaintenanceSettingsStrings.NoCollectionsFoundToDelete });
         }
     }
 }

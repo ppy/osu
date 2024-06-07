@@ -24,8 +24,5 @@ namespace osu.Game.Skinning
         {
             Component = component;
         }
-
-        protected virtual string RulesetPrefix => string.Empty;
-        protected virtual string ComponentName => Component.ToString();
     }
 }

@@ -13,7 +13,7 @@ namespace osu.Game.Screens.Play
     public partial class SpectatorResultsScreen : SoloResultsScreen
     {
         public SpectatorResultsScreen(ScoreInfo score)
-            : base(score, false)
+            : base(score)
         {
         }
 

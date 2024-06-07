@@ -113,11 +113,6 @@ namespace osu.Game.Rulesets.Catch.UI
         public Vector2 BodyScale => Scale * body.Scale;
 
         /// <summary>
-        /// Whether the contents of the catcher plate should be visually flipped when the catcher direction is changed.
-        /// </summary>
-        private bool flipCatcherPlate;
-
-        /// <summary>
         /// Width of the area that can be used to attempt catches during gameplay.
         /// </summary>
         public readonly float CatchWidth;
@@ -339,8 +334,6 @@ namespace osu.Game.Rulesets.Catch.UI
                 skin.GetConfig<CatchSkinColour, Color4>(CatchSkinColour.HyperDash)?.Value ??
                 DEFAULT_HYPER_DASH_COLOUR;
 
-            flipCatcherPlate = skin.GetConfig<CatchSkinConfiguration, bool>(CatchSkinConfiguration.FlipCatcherPlate)?.Value ?? true;
-
             runHyperDashStateTransition(HyperDashing);
         }
 
@@ -352,8 +345,7 @@ namespace osu.Game.Rulesets.Catch.UI
 
             body.Scale = scaleFromDirection;
             // Inverse of catcher scale is applied here, as catcher gets scaled by circle size and so do the incoming fruit.
-            caughtObjectContainer.Scale = (1 / Scale.X) * (flipCatcherPlate ? scaleFromDirection : Vector2.One);
-            hitExplosionContainer.Scale = flipCatcherPlate ? scaleFromDirection : Vector2.One;
+            caughtObjectContainer.Scale = new Vector2(1 / Scale.X);
 
             // Correct overshooting.
             if ((hyperDashDirection > 0 && hyperDashTargetPosition < X) ||

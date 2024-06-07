@@ -198,9 +198,14 @@ namespace osu.Game.Screens.Play.HUD
                 bind();
             }
 
+            protected override void Update()
+            {
+                base.Update();
+                circularProgress.Progress = Progress.Value;
+            }
+
             private void bind()
             {
-                ((IBindable<double>)circularProgress.Current).BindTo(Progress);
                 Progress.ValueChanged += progress =>
                 {
                     icon.Scale = new Vector2(1 + (float)progress.NewValue * 0.2f);

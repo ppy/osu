@@ -1,10 +1,9 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -35,12 +34,16 @@ namespace osu.Game.Rulesets.Osu.UI
 
         private readonly JudgementPooler<DrawableOsuJudgement> judgementPooler;
 
+        // For osu! gameplay, everything is always on screen.
+        // Skipping masking calculations improves performance in intense beatmaps (ie. https://osu.ppy.sh/beatmapsets/150945#osu/372245)
+        public override bool UpdateSubTreeMasking() => false;
+
         public SmokeContainer Smoke { get; }
         public FollowPointRenderer FollowPoints { get; }
 
         public static readonly Vector2 BASE_SIZE = new Vector2(512, 384);
 
-        protected override GameplayCursorContainer CreateCursor() => new OsuCursorContainer();
+        protected override GameplayCursorContainer? CreateCursor() => new OsuCursorContainer();
 
         private readonly Container judgementAboveHitObjectLayer;
 
@@ -81,6 +84,7 @@ namespace osu.Game.Rulesets.Osu.UI
         public IHitPolicy HitPolicy
         {
             get => hitPolicy;
+            [MemberNotNull(nameof(hitPolicy))]
             set
             {
                 hitPolicy = value ?? throw new ArgumentNullException(nameof(value));
@@ -116,12 +120,12 @@ namespace osu.Game.Rulesets.Osu.UI
             judgementAboveHitObjectLayer.Add(judgement.ProxiedAboveHitObjectsContent);
         }
 
-        [BackgroundDependencyLoader(true)]
-        private void load(OsuRulesetConfigManager config, IBeatmap beatmap)
+        [BackgroundDependencyLoader]
+        private void load(OsuRulesetConfigManager? config, IBeatmap? beatmap)
         {
             config?.BindWith(OsuRulesetSetting.PlayfieldBorderStyle, playfieldBorder.PlayfieldBorderStyle);
 
-            var osuBeatmap = (OsuBeatmap)beatmap;
+            var osuBeatmap = (OsuBeatmap?)beatmap;
 
             RegisterPool<HitCircle, DrawableHitCircle>(20, 100);
 

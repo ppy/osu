@@ -30,7 +30,7 @@ namespace osu.Game.Rulesets.Judgements
 
         /// <summary>
         /// The time at which this <see cref="JudgementResult"/> occurred.
-        /// Populated when this <see cref="JudgementResult"/> is applied via <see cref="DrawableHitObject.ApplyResult"/>.
+        /// Populated when this <see cref="JudgementResult"/> is applied via <see cref="DrawableHitObject.ApplyResult{T}"/>.
         /// </summary>
         /// <remarks>
         /// This is used instead of <see cref="TimeAbsolute"/> to check whether this <see cref="JudgementResult"/> should be reverted.
