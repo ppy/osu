@@ -89,9 +89,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Touch
         {
             var lastObjects = GetLastObjects(hand);
             var lastDifficultyObjects = GetLastDifficultyObjects(hand);
+
+            var last = lastObjects.Last();
             var lastLast = lastObjects.Count > 1 ? lastObjects[^2] : null;
 
-            return new OsuDifficultyHitObject(current, lastObjects.Last(), lastLast, clockRate, lastDifficultyObjects, lastDifficultyObjects.Count);
+            return new OsuDifficultyHitObject(current, last, lastLast, clockRate, lastDifficultyObjects, lastDifficultyObjects.Count);
         }
 
         /// <summary>
