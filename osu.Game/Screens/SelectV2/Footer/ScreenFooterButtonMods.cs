@@ -72,7 +72,7 @@ namespace osu.Game.Screens.SelectV2.Footer
             Icon = FontAwesome.Solid.ExchangeAlt;
             AccentColour = colours.Lime1;
 
-            TopLevelContent.AddRange(new[]
+            AddRange(new[]
             {
                 unrankedBadge = new UnrankedBadge(),
                 modDisplayBar = new Container
