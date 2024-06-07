@@ -5,6 +5,7 @@ using System;
 using osu.Game.Rulesets.Osu.Difficulty.Evaluators;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Difficulty.Utils;
+using osu.Game.Rulesets.Osu.Objects;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Touch
 {
@@ -36,7 +37,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Touch
                 bonusMultiplier += 0.3;
 
                 // Add an obstrution bonus if the most recent instance of the "other hand" is in between the current object and the previous object with the actual hand.
-                var simulatedSwap = CreateSimulatedSwapObject(simulated, currentHand);
+                var simulatedSwap = CreateSimulatedSwapObject((OsuHitObject)simulated.BaseObject, currentHand);
 
                 if (simulatedSwap.Angle != null)
                     bonusMultiplier += 0.9 / (1 + Math.Exp(-(simulatedSwap.Angle.Value - 3 * Math.PI / 5) / 9));
