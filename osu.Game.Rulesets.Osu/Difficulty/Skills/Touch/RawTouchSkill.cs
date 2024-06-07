@@ -78,6 +78,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Touch
             updateHistory(simulated, currentHand);
         }
 
+        /// <summary>
+        /// Creates an <see cref="OsuDifficultyHitObject"/> that simulates an <see cref="OsuHitObject"/>
+        /// if it and <see cref="OsuHitObject"/>s before it were hit with a specific <see cref="TouchHand"/>.
+        /// </summary>
+        /// <param name="current">The <see cref="OsuHitObject"/> to simulate.</param>
+        /// <param name="hand">The <see cref="TouchHand"/> that hit the <see cref="OsuHitObject"/>.</param>
+        /// <returns>The <see cref="OsuDifficultyHitObject"/> that simulates the <see cref="OsuHitObject"/>.</returns>
         protected OsuDifficultyHitObject CreateSimulatedObject(OsuHitObject current, TouchHand hand)
         {
             var lastObjects = GetLastObjects(hand);
@@ -87,6 +94,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Touch
             return new OsuDifficultyHitObject(current, lastObjects.Last(), lastLast, clockRate, lastDifficultyObjects, lastDifficultyObjects.Count);
         }
 
+        /// <summary>
+        /// Creates an <see cref="OsuDifficultyHitObject"/> that simulates an <see cref="OsuHitObject"/> if
+        /// it was hit with a specific <see cref="TouchHand"/> and the <see cref="OsuHitObject"/> before it
+        /// was hit with the <see cref="TouchHand"/> opposite to <paramref name="hand"/>.
+        /// </summary>
+        /// <param name="current">The <see cref="OsuHitObject"/> to simulate.</param>
+        /// <param name="hand">The <see cref="TouchHand"/> that hit the <see cref="OsuHitObject"/>.</param>
+        /// <returns>The <see cref="OsuDifficultyHitObject"/> that simulates the <see cref="OsuHitObject"/>.</returns>
         protected OsuDifficultyHitObject CreateSimulatedSwapObject(OsuHitObject current, TouchHand hand)
         {
             var otherHand = GetOtherHand(hand);
