@@ -143,9 +143,17 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Touch
             }
         }
 
-        protected TouchHand GetOtherHand(TouchHand currentHand)
+        /// <summary>
+        /// Obtains the <see cref="TouchHand"/> that is the opposite of <paramref name="hand"/>.
+        /// </summary>
+        /// <remarks>
+        /// For <see cref="TouchHand.Drag"/>, the opposite <see cref="TouchHand"/> will be the opposite of <see cref="LastNonDragHand"/>.
+        /// </remarks>
+        /// <param name="hand">The <see cref="TouchHand"/>.</param>
+        /// <returns>The <see cref="TouchHand"/> that is the opposite of <paramref name="hand"/>.</returns>
+        protected TouchHand GetOtherHand(TouchHand hand)
         {
-            switch (currentHand)
+            switch (hand)
             {
                 case TouchHand.Left:
                     return TouchHand.Right;
