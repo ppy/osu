@@ -24,30 +24,24 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Touch
 
         protected override double StrainValueIf(OsuDifficultyHitObject simulated, TouchHand currentHand)
         {
-            double singletapMultiplier = 1;
+            double singletapMultiplier = 1.0;
 
             // Reduction in speed value for singletapping consecutive notes.
             if (currentHand == LastHand && currentHand != TouchHand.Drag)
-            {
                 singletapMultiplier *= 0.93;
-            }
-
-            // Treat drags as regular gameplay in terms of tapping.
-            bool tappedWithTouch = currentHand != TouchHand.Drag;
 
             double bonusMultiplier = 1.0;
 
             // Add a slight bonus for hand-coordination required to swap hands.
             if (currentHand != LastNonDragHand)
-            {
                 bonusMultiplier += 0.08;
-            }
 
-            // Add a speed bonus for swapping from dragging to tapping
+            // Add a speed bonus for swapping from dragging to tapping.
             if (currentHand == GetOtherHand(LastNonDragHand) && LastHand == TouchHand.Drag)
-            {
                 bonusMultiplier += 0.3;
-            }
+
+            // Treat drags as regular gameplay in terms of tapping.
+            bool tappedWithTouch = currentHand != TouchHand.Drag;
 
             return SpeedEvaluator.EvaluateDifficultyOf(simulated, tappedWithTouch) * singletapMultiplier * bonusMultiplier * skillMultiplier;
         }
