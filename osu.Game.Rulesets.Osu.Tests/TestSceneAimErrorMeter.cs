@@ -14,6 +14,7 @@ using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Osu.Judgements;
 using osu.Game.Rulesets.Osu.Objects;
 using NUnit.Framework;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Utils;
 using osu.Framework.Threading;
 using osu.Game.Rulesets.Osu.HUD;
@@ -30,6 +31,22 @@ namespace osu.Game.Rulesets.Osu.Tests
         private CircularContainer gameObject = null!;
 
         private ScheduledDelegate? automaticAdditionDelegate;
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            AddSliderStep("Hit position size", 0f, 12f, 7f, t =>
+            {
+                if (aimErrorMeter.IsNotNull())
+                    aimErrorMeter.HitPositionSize.Value = t;
+            });
+            AddSliderStep("Average position size", 1f, 25f, 7f, t =>
+            {
+                if (aimErrorMeter.IsNotNull())
+                    aimErrorMeter.AverageSize.Value = t;
+            });
+        }
 
         [SetUpSteps]
         public void SetupSteps() => AddStep("Create components", () =>
@@ -117,6 +134,15 @@ namespace osu.Game.Rulesets.Osu.Tests
         public void TestManualPlacement()
         {
             AddStep("return user input", () => InputManager.UseParentInput = true);
+        }
+
+        [Test]
+        public void TestDifferentStyle()
+        {
+            AddStep("Switch hit position style to +", () => aimErrorMeter.HitPositionStyle.Value = AimErrorMeter.HitStyle.Plus);
+            AddStep("Switch hit position style to x", () => aimErrorMeter.HitPositionStyle.Value = AimErrorMeter.HitStyle.X);
+            AddStep("Switch average position style to +", () => aimErrorMeter.AverageStyle.Value = AimErrorMeter.HitStyle.Plus);
+            AddStep("Switch average position style to x", () => aimErrorMeter.AverageStyle.Value = AimErrorMeter.HitStyle.X);
         }
 
         private partial class TestAimErrorMeter : AimErrorMeter
