@@ -6,6 +6,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Rulesets.Scoring;
+using osuTK;
 
 namespace osu.Game.Skinning
 {
@@ -25,12 +26,38 @@ namespace osu.Game.Skinning
         {
             AutoSizeAxes = Axes.Both;
 
-            AddInternal(rank = new Sprite());
+            AddInternal(rank = new Sprite
+            {
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+            });
         }
 
         protected override void LoadComplete()
         {
-            scoreProcessor.Rank.BindValueChanged(v => rank.Texture = source.GetTexture($"ranking-{v.NewValue}-small"), true);
+            scoreProcessor.Rank.BindValueChanged(v =>
+            {
+                var texture = source.GetTexture($"ranking-{v.NewValue}-small");
+
+                rank.Texture = texture;
+
+                if (texture != null)
+                {
+                    var transientRank = new Sprite
+                    {
+                        Texture = texture,
+                        Blending = BlendingParameters.Additive,
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        BypassAutoSizeAxes = Axes.Both,
+                    };
+                    AddInternal(transientRank);
+                    transientRank.FadeOutFromOne(1200, Easing.Out)
+                                 .ScaleTo(new Vector2(1.625f), 1200, Easing.Out)
+                                 .Expire();
+                }
+            }, true);
+            FinishTransforms(true);
         }
     }
 }
