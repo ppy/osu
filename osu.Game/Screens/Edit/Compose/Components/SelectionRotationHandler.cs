@@ -15,12 +15,12 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <summary>
         /// Whether rotation anchored by the selection origin can currently be performed.
         /// </summary>
-        public Bindable<bool> CanRotateSelectionOrigin { get; private set; } = new BindableBool();
+        public Bindable<bool> CanRotateAroundSelectionOrigin { get; private set; } = new BindableBool();
 
         /// <summary>
         /// Whether rotation anchored by the center of the playfield can currently be performed.
         /// </summary>
-        public Bindable<bool> CanRotatePlayfieldOrigin { get; private set; } = new BindableBool();
+        public Bindable<bool> CanRotateAroundPlayfieldOrigin { get; private set; } = new BindableBool();
 
         /// <summary>
         /// Performs a single, instant, atomic rotation operation.

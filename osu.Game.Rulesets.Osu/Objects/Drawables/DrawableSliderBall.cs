@@ -10,9 +10,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Skinning.Default;
-using osu.Game.Screens.Play;
 using osu.Game.Skinning;
-using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
@@ -63,22 +61,20 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             base.ApplyTransformsAt(time, false);
         }
 
-        private Vector2? lastPosition;
-
         public void UpdateProgress(double completionProgress)
         {
-            Position = drawableSlider.HitObject.CurvePositionAt(completionProgress);
+            Slider slider = drawableSlider.HitObject;
+            Position = slider.CurvePositionAt(completionProgress);
 
-            var diff = lastPosition.HasValue ? lastPosition.Value - Position : Position - drawableSlider.HitObject.CurvePositionAt(completionProgress + 0.01f);
-
-            bool rewinding = (Clock as IGameplayClock)?.IsRewinding == true;
+            //0.1 / slider.Path.Distance is the additional progress needed to ensure the diff length is 0.1
+            var diff = slider.CurvePositionAt(completionProgress) - slider.CurvePositionAt(Math.Min(1, completionProgress + 0.1 / slider.Path.Distance));
 
             // Ensure the value is substantially high enough to allow for Atan2 to get a valid angle.
+            // Needed for when near completion, or in case of a very short slider.
             if (diff.LengthFast < 0.01f)
                 return;
 
-            ball.Rotation = -90 + (float)(-Math.Atan2(diff.X, diff.Y) * 180 / Math.PI) + (rewinding ? 180 : 0);
-            lastPosition = Position;
+            ball.Rotation = -90 + (float)(-Math.Atan2(diff.X, diff.Y) * 180 / Math.PI);
         }
     }
 }
