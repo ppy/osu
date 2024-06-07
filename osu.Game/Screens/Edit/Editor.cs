@@ -49,6 +49,7 @@ using osu.Game.Screens.Edit.GameplayTest;
 using osu.Game.Screens.Edit.Setup;
 using osu.Game.Screens.Edit.Timing;
 using osu.Game.Screens.Edit.Verify;
+using osu.Game.Screens.OnlinePlay;
 using osu.Game.Screens.Play;
 using osu.Game.Users;
 using osuTK.Input;
@@ -142,6 +143,8 @@ namespace osu.Game.Screens.Edit
         private readonly Bindable<bool> samplePlaybackDisabled = new Bindable<bool>();
 
         private bool canSave;
+        private readonly List<MenuItem> saveRelatedMenuItems = new List<MenuItem>();
+        public OngoingOperationTracker SaveTracker { get; private set; } = new OngoingOperationTracker();
 
         protected bool ExitConfirmed { get; private set; }
 
@@ -328,7 +331,7 @@ namespace osu.Game.Screens.Edit
                                 {
                                     new MenuItem(CommonStrings.MenuBarFile)
                                     {
-                                        Items = createFileMenuItems()
+                                        Items = createFileMenuItems().ToList()
                                     },
                                     new MenuItem(CommonStrings.MenuBarEdit)
                                     {
@@ -382,6 +385,7 @@ namespace osu.Game.Screens.Edit
                         },
                     },
                     bottomBar = new BottomBar(),
+                    SaveTracker,
                 }
             });
             changeHandler?.CanUndo.BindValueChanged(v => undoMenuItem.Action.Disabled = !v.NewValue, true);
@@ -402,6 +406,12 @@ namespace osu.Game.Screens.Edit
             Mode.BindValueChanged(onModeChanged, true);
 
             musicController.TrackChanged += onTrackChanged;
+
+            SaveTracker.InProgress.BindValueChanged(_ =>
+            {
+                foreach (var item in saveRelatedMenuItems)
+                    item.Action.Disabled = SaveTracker.InProgress.Value;
+            }, true);
         }
 
         protected override void Dispose(bool isDisposing)
@@ -442,9 +452,14 @@ namespace osu.Game.Screens.Edit
             {
                 dialogOverlay.Push(new SaveRequiredPopupDialog("The beatmap will be saved in order to test it.", () =>
                 {
-                    if (!Save()) return;
+                    if (SaveTracker.InProgress.Value) return;
 
-                    pushEditorPlayer();
+                    using (SaveTracker.BeginOperation())
+                    {
+                        if (!Save()) return;
+
+                        pushEditorPlayer();
+                    }
                 }));
             }
             else
@@ -520,7 +535,11 @@ namespace osu.Game.Screens.Edit
                     if (e.Repeat)
                         return false;
 
-                    Save();
+                    if (SaveTracker.InProgress.Value)
+                        return false;
+
+                    using (SaveTracker.BeginOperation())
+                        Save();
                     return true;
             }
 
@@ -787,7 +806,13 @@ namespace osu.Game.Screens.Edit
 
         private void confirmExitWithSave()
         {
-            if (!Save()) return;
+            if (SaveTracker.InProgress.Value) return;
+
+            using (SaveTracker.BeginOperation())
+            {
+                if (!Save())
+                    return;
+            }
 
             ExitConfirmed = true;
             this.Exit();
@@ -1020,25 +1045,41 @@ namespace osu.Game.Screens.Edit
             lastSavedHash = changeHandler?.CurrentStateHash;
         }
 
-        private List<MenuItem> createFileMenuItems() => new List<MenuItem>
+        private IEnumerable<MenuItem> createFileMenuItems()
         {
-            createDifficultyCreationMenu(),
-            createDifficultySwitchMenu(),
-            new OsuMenuItemSpacer(),
-            new EditorMenuItem(EditorStrings.DeleteDifficulty, MenuItemType.Standard, deleteDifficulty) { Action = { Disabled = Beatmap.Value.BeatmapSetInfo.Beatmaps.Count < 2 } },
-            new OsuMenuItemSpacer(),
-            new EditorMenuItem(WebCommonStrings.ButtonsSave, MenuItemType.Standard, () => Save()),
-            createExportMenu(),
-            new OsuMenuItemSpacer(),
-            new EditorMenuItem(CommonStrings.Exit, MenuItemType.Standard, this.Exit)
-        };
+            yield return createDifficultyCreationMenu();
+            yield return createDifficultySwitchMenu();
+            yield return new OsuMenuItemSpacer();
+            yield return new EditorMenuItem(EditorStrings.DeleteDifficulty, MenuItemType.Standard, deleteDifficulty) { Action = { Disabled = Beatmap.Value.BeatmapSetInfo.Beatmaps.Count < 2 } };
+            yield return new OsuMenuItemSpacer();
+
+            var save = new EditorMenuItem(WebCommonStrings.ButtonsSave, MenuItemType.Standard, () =>
+            {
+                if (SaveTracker.InProgress.Value) return;
+
+                using (SaveTracker.BeginOperation())
+                    Save();
+            });
+            saveRelatedMenuItems.Add(save);
+            yield return save;
+
+            if (RuntimeInfo.IsDesktop)
+            {
+                var export = createExportMenu();
+                saveRelatedMenuItems.AddRange(export.Items);
+                yield return export;
+            }
+
+            yield return new OsuMenuItemSpacer();
+            yield return new EditorMenuItem(CommonStrings.Exit, MenuItemType.Standard, this.Exit);
+        }
 
         private EditorMenuItem createExportMenu()
         {
             var exportItems = new List<MenuItem>
             {
-                new EditorMenuItem(EditorStrings.ExportForEditing, MenuItemType.Standard, () => exportBeatmap(false)) { Action = { Disabled = !RuntimeInfo.IsDesktop } },
-                new EditorMenuItem(EditorStrings.ExportForCompatibility, MenuItemType.Standard, () => exportBeatmap(true)) { Action = { Disabled = !RuntimeInfo.IsDesktop } },
+                new EditorMenuItem(EditorStrings.ExportForEditing, MenuItemType.Standard, () => exportBeatmap(false)),
+                new EditorMenuItem(EditorStrings.ExportForCompatibility, MenuItemType.Standard, () => exportBeatmap(true)),
             };
 
             return new EditorMenuItem(CommonStrings.Export) { Items = exportItems };
@@ -1050,22 +1091,35 @@ namespace osu.Game.Screens.Edit
             {
                 dialogOverlay.Push(new SaveRequiredPopupDialog("The beatmap will be saved in order to export it.", () =>
                 {
-                    if (!Save()) return;
+                    if (SaveTracker.InProgress.Value)
+                        return;
 
-                    runExport();
+                    var operation = SaveTracker.BeginOperation();
+
+                    if (!Save())
+                    {
+                        operation.Dispose();
+                        return;
+                    }
+
+                    runExport(operation);
                 }));
             }
             else
             {
-                runExport();
+                if (SaveTracker.InProgress.Value)
+                    return;
+
+                runExport(SaveTracker.BeginOperation());
             }
 
-            void runExport()
+            void runExport(IDisposable operationInProgress)
             {
-                if (legacy)
-                    beatmapManager.ExportLegacy(Beatmap.Value.BeatmapSetInfo);
-                else
-                    beatmapManager.Export(Beatmap.Value.BeatmapSetInfo);
+                var task = legacy
+                    ? beatmapManager.ExportLegacy(Beatmap.Value.BeatmapSetInfo)
+                    : beatmapManager.Export(Beatmap.Value.BeatmapSetInfo);
+
+                task.ContinueWith(_ => operationInProgress.Dispose());
             }
         }
 
@@ -1116,6 +1170,8 @@ namespace osu.Game.Screens.Edit
             foreach (var ruleset in rulesets.AvailableRulesets)
                 rulesetItems.Add(new EditorMenuItem(ruleset.Name, MenuItemType.Standard, () => CreateNewDifficulty(ruleset)));
 
+            saveRelatedMenuItems.AddRange(rulesetItems);
+
             return new EditorMenuItem(EditorStrings.CreateNewDifficulty) { Items = rulesetItems };
         }
 
@@ -1125,10 +1181,16 @@ namespace osu.Game.Screens.Edit
             {
                 dialogOverlay.Push(new SaveRequiredPopupDialog("This beatmap will be saved in order to create another difficulty.", () =>
                 {
-                    if (!Save())
+                    if (SaveTracker.InProgress.Value)
                         return;
 
-                    CreateNewDifficulty(rulesetInfo);
+                    using (SaveTracker.BeginOperation())
+                    {
+                        if (!Save())
+                            return;
+
+                        CreateNewDifficulty(rulesetInfo);
+                    }
                 }));
 
                 return;
