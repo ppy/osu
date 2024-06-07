@@ -211,23 +211,12 @@ namespace osu.Game.Screens.Edit.Timing
             editorClock.Seek(selectedGroup.Value.Time);
         }
 
-        private static List<HitObject> hitObjectsInTimingRange(EditorBeatmap beatmap, ControlPointGroup selectedGroup)
-        {
-            // If the first group, we grab all hitobjects prior to the next, if the last group, we grab all remaining hitobjects
-            double startTime = beatmap.ControlPointInfo.TimingPoints.Any(x => x.Time < selectedGroup.Time) ? selectedGroup.Time : double.MinValue;
-            double endTime = beatmap.ControlPointInfo.TimingPoints.FirstOrDefault(x => x.Time > selectedGroup.Time)?.Time ?? double.MaxValue;
-
-            return beatmap.HitObjects.Where(x => Precision.AlmostBigger(x.StartTime, startTime) && Precision.DefinitelyBigger(endTime, x.StartTime)).ToList();
-        }
-
         private void adjustOffset(double adjust)
         {
             if (selectedGroup.Value == null)
                 return;
 
             bool wasAtStart = editorClock.CurrentTimeAccurate == selectedGroup.Value.Time;
-
-            List<HitObject> hitObjectsInRange = hitObjectsInTimingRange(beatmap, selectedGroup.Value);
 
             // VERY TEMPORARY
             var currentGroupItems = selectedGroup.Value.ControlPoints.ToArray();
@@ -237,25 +226,21 @@ namespace osu.Game.Screens.Edit.Timing
             double newOffset = selectedGroup.Value.Time + adjust;
 
             foreach (var cp in currentGroupItems)
+            {
+                if (adjustPlacedNotes.Current.Value && cp is TimingControlPoint tp)
+                    tp.AdjustHitObjectOffset(beatmap, adjust);
                 beatmap.ControlPointInfo.Add(newOffset, cp);
+            }
 
             // the control point might not necessarily exist yet, if currentGroupItems was empty.
             selectedGroup.Value = beatmap.ControlPointInfo.GroupAt(newOffset, true);
 
-            if (adjustPlacedNotes.Current.Value)
-            {
-                foreach (HitObject hitObject in hitObjectsInRange)
-                {
-                    hitObject.StartTime += adjust;
-                }
-            }
-
             if (!editorClock.IsRunning && wasAtStart)
                 editorClock.Seek(newOffset);
 
-            foreach (HitObject hitObject in hitObjectsInRange)
-                beatmap.Update(hitObject);
+            beatmap.UpdateAllHitObjects();
         }
+
 
         private void adjustBpm(double adjust)
         {
@@ -266,25 +251,12 @@ namespace osu.Game.Screens.Edit.Timing
 
             double newBeatLength = 60000 / (timing.BPM + adjust);
 
-            List<HitObject> hitObjectsInRange = hitObjectsInTimingRange(beatmap, selectedGroup.Value!);
-
             if (adjustPlacedNotes.Current.Value)
-            {
-                foreach (HitObject hitObject in hitObjectsInRange)
-                {
-                    double beat = (hitObject.StartTime - selectedGroup.Value!.Time) / timing.BeatLength;
-
-                    hitObject.StartTime = (beat * newBeatLength) + selectedGroup.Value.Time;
-
-                    if (hitObject is not IHasRepeats && hitObject is IHasDuration hitObjectWithDuration)
-                        hitObjectWithDuration.Duration *= newBeatLength / timing.BeatLength;
-                }
-            }
+                timing.SetHitObjectBPM(beatmap, newBeatLength);
 
             timing.BeatLength = newBeatLength;
 
-            foreach (HitObject hitObject in hitObjectsInRange)
-                beatmap.Update(hitObject);
+            beatmap.UpdateAllHitObjects();
         }
 
         private partial class InlineButton : OsuButton
