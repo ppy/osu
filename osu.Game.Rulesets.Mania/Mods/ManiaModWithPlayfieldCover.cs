@@ -51,6 +51,7 @@ namespace osu.Game.Rulesets.Mania.Mods
                     if (s.NewValue)
                     {
                         pcw.Coverage.UnbindBindings();
+                        pcw.Coverage.MinValue = 0f;
                         pcw.Coverage.Value = 0f;
                     }
                     else
