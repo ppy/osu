@@ -18,7 +18,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Touch
 
         public double CurrentStrain { get; private set; }
 
-        protected readonly double ClockRate;
+        private readonly double clockRate;
 
         private readonly List<OsuHitObject> lastLeftObjects;
         private readonly List<OsuHitObject> lastRightObjects;
@@ -34,7 +34,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Touch
 
         protected RawTouchSkill(double clockRate)
         {
-            ClockRate = clockRate;
+            this.clockRate = clockRate;
 
             lastLeftObjects = new List<OsuHitObject>();
             lastRightObjects = new List<OsuHitObject>();
@@ -46,9 +46,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Touch
         protected RawTouchSkill(RawTouchSkill copy)
         {
             CurrentStrain = copy.CurrentStrain;
-            ClockRate = copy.ClockRate;
             LastHand = copy.LastHand;
             LastNonDragHand = copy.LastNonDragHand;
+            clockRate = copy.clockRate;
 
             lastLeftObjects = new List<OsuHitObject>(copy.lastLeftObjects);
             lastRightObjects = new List<OsuHitObject>(copy.lastRightObjects);
@@ -81,7 +81,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Touch
             var lastDifficultyObjects = GetLastDifficultyObjects(hand);
             var lastLast = lastObjects.Count > 1 ? lastObjects[^2] : null;
 
-            return new OsuDifficultyHitObject(current.BaseObject, lastObjects.Last(), lastLast, ClockRate, lastDifficultyObjects, lastDifficultyObjects.Count);
+            return new OsuDifficultyHitObject(current.BaseObject, lastObjects.Last(), lastLast, clockRate, lastDifficultyObjects, lastDifficultyObjects.Count);
         }
 
         protected OsuDifficultyHitObject CreateSimulatedSwapObject(OsuDifficultyHitObject current, TouchHand hand)
@@ -93,7 +93,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Touch
 
             var lastDifficultyObjects = GetLastDifficultyObjects(hand);
 
-            return new OsuDifficultyHitObject(current.BaseObject, last, lastLast, ClockRate, lastDifficultyObjects, lastDifficultyObjects.Count);
+            return new OsuDifficultyHitObject(current.BaseObject, last, lastLast, clockRate, lastDifficultyObjects, lastDifficultyObjects.Count);
         }
 
         private void updateStrainValue(OsuDifficultyHitObject current, OsuDifficultyHitObject simulated, TouchHand currentHand)
