@@ -69,21 +69,31 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Touch
                 return;
             }
 
-            var simulated = currentHand == TouchHand.Drag || LastHand == TouchHand.Drag ? createSimulatedObject(current, LastNonDragHand) : createSimulatedObject(current, currentHand);
+            var simulated = currentHand == TouchHand.Drag || LastHand == TouchHand.Drag ? CreateSimulatedObject(current, LastNonDragHand) : CreateSimulatedObject(current, currentHand);
 
             updateStrainValue(current, simulated, currentHand);
             updateHistory(simulated, currentHand);
         }
 
-        private OsuDifficultyHitObject createSimulatedObject(OsuDifficultyHitObject current, TouchHand currentHand)
+        protected OsuDifficultyHitObject CreateSimulatedObject(OsuDifficultyHitObject current, TouchHand hand)
         {
-            // A simulated difficulty object is created for hand-specific difficulty properties.
-            // Objects before the current object are derived from the same hand.
-            var lastObjects = GetLastObjects(currentHand);
-            var lastDifficultyObjects = GetLastDifficultyObjects(currentHand);
+            var lastObjects = GetLastObjects(hand);
+            var lastDifficultyObjects = GetLastDifficultyObjects(hand);
             var lastLast = lastObjects.Count > 1 ? lastObjects[^2] : null;
 
             return new OsuDifficultyHitObject(current.BaseObject, lastObjects.Last(), lastLast, ClockRate, lastDifficultyObjects, lastDifficultyObjects.Count);
+        }
+
+        protected OsuDifficultyHitObject CreateSimulatedSwapObject(OsuDifficultyHitObject current, TouchHand hand)
+        {
+            var otherHand = GetOtherHand(hand);
+
+            var last = GetLastObjects(otherHand).Last();
+            var lastLast = GetLastObjects(hand).Last();
+
+            var lastDifficultyObjects = GetLastDifficultyObjects(hand);
+
+            return new OsuDifficultyHitObject(current.BaseObject, last, lastLast, ClockRate, lastDifficultyObjects, lastDifficultyObjects.Count);
         }
 
         private void updateStrainValue(OsuDifficultyHitObject current, OsuDifficultyHitObject simulated, TouchHand currentHand)

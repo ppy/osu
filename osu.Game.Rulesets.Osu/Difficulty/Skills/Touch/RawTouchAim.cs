@@ -37,7 +37,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Touch
                 bonusMultiplier += 0.3;
 
                 // Add an obstrution bonus if the most recent instance of the "other hand" is in between the current object and the previous object with the actual hand.
-                var simulatedSwap = createSimulatedSwapObject(simulated, currentHand);
+                var simulatedSwap = CreateSimulatedSwapObject(simulated, currentHand);
 
                 if (simulatedSwap.Angle != null)
                     bonusMultiplier += 0.9 / (1 + Math.Exp(-(simulatedSwap.Angle.Value - 3 * Math.PI / 5) / 9));
@@ -51,20 +51,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Touch
             bonusMultiplier /= 1 + simulated.StrainTime / 1000;
 
             return AimEvaluator.EvaluateDifficultyOf(simulated, withSliders) * bonusMultiplier * skillMultiplier;
-        }
-
-        private OsuDifficultyHitObject createSimulatedSwapObject(OsuDifficultyHitObject current, TouchHand currentHand)
-        {
-            // A simulated difficulty object is created for hand-specific difficulty properties.
-            // Since this is a swap object, the last object was hit by the other hand.
-            var otherHand = GetOtherHand(currentHand);
-
-            var last = GetLastObjects(otherHand).Last();
-            var lastLast = GetLastObjects(currentHand).Last();
-
-            var lastDifficultyObjects = GetLastDifficultyObjects(currentHand);
-
-            return new OsuDifficultyHitObject(current.BaseObject, last, lastLast, ClockRate, lastDifficultyObjects, lastDifficultyObjects.Count);
         }
 
         public override RawTouchAim DeepClone() => new RawTouchAim(this);
