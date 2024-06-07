@@ -94,7 +94,7 @@ namespace osu.Game.Tournament.Tests.Screens
 
             AddStep("release mouse button", () => InputManager.ReleaseButton(MouseButton.Left));
 
-            AddAssert("assert ladder teams reset", () => Ladder.CurrentMatch.Value.Team1.Value == null && Ladder.CurrentMatch.Value.Team2.Value == null);
+            AddAssert("assert ladder teams reset", () => Ladder.CurrentMatch.Value?.Team1.Value == null && Ladder.CurrentMatch.Value?.Team2.Value == null);
         }
     }
 }

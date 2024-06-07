@@ -15,6 +15,7 @@ using osu.Game.Overlays;
 using osu.Game.Overlays.Dialog;
 using osu.Game.Screens.Select;
 using osu.Game.Screens.Select.Carousel;
+using osu.Game.Screens.Select.Filter;
 using osu.Game.Tests.Online;
 using osu.Game.Tests.Resources;
 using osuTK.Input;
@@ -192,6 +193,57 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddStep("release mouse button", () => InputManager.ReleaseButton(MouseButton.Left));
         }
 
+        [Test]
+        public void TestSplitDisplay()
+        {
+            ArchiveDownloadRequest<IBeatmapSetInfo>? downloadRequest = null;
+
+            AddStep("set difficulty sort mode", () => carousel.Filter(new FilterCriteria { Sort = SortMode.Difficulty }));
+            AddStep("update online hash", () =>
+            {
+                testBeatmapSetInfo.Beatmaps.First().OnlineMD5Hash = "different hash";
+                testBeatmapSetInfo.Beatmaps.First().LastOnlineUpdate = DateTimeOffset.Now;
+
+                carousel.UpdateBeatmapSet(testBeatmapSetInfo);
+            });
+
+            AddUntilStep("multiple \"sets\" visible", () => carousel.ChildrenOfType<DrawableCarouselBeatmapSet>().Count(), () => Is.GreaterThan(1));
+            AddUntilStep("update button visible", getUpdateButton, () => Is.Not.Null);
+
+            AddStep("click button", () => getUpdateButton()?.TriggerClick());
+
+            AddUntilStep("wait for download started", () =>
+            {
+                downloadRequest = beatmapDownloader.GetExistingDownload(testBeatmapSetInfo);
+                return downloadRequest != null;
+            });
+
+            AddUntilStep("wait for button disabled", () => getUpdateButton()?.Enabled.Value == false);
+
+            AddUntilStep("progress download to completion", () =>
+            {
+                if (downloadRequest is TestSceneOnlinePlayBeatmapAvailabilityTracker.TestDownloadRequest testRequest)
+                {
+                    testRequest.SetProgress(testRequest.Progress + 0.1f);
+
+                    if (testRequest.Progress >= 1)
+                    {
+                        testRequest.TriggerSuccess();
+
+                        // usually this would be done by the import process.
+                        testBeatmapSetInfo.Beatmaps.First().MD5Hash = "different hash";
+                        testBeatmapSetInfo.Beatmaps.First().LastOnlineUpdate = DateTimeOffset.Now;
+
+                        // usually this would be done by a realm subscription.
+                        carousel.UpdateBeatmapSet(testBeatmapSetInfo);
+                        return true;
+                    }
+                }
+
+                return false;
+            });
+        }
+
         private BeatmapCarousel createCarousel()
         {
             return carousel = new BeatmapCarousel
@@ -199,7 +251,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 RelativeSizeAxes = Axes.Both,
                 BeatmapSets = new List<BeatmapSetInfo>
                 {
-                    (testBeatmapSetInfo = TestResources.CreateTestBeatmapSetInfo()),
+                    (testBeatmapSetInfo = TestResources.CreateTestBeatmapSetInfo(5)),
                 }
             };
         }

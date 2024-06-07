@@ -11,8 +11,8 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Judgements;
-using osu.Game.Rulesets.Mania;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Judgements;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Play.HUD.JudgementCounter;
@@ -57,7 +57,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             };
         });
 
-        protected override Ruleset CreateRuleset() => new ManiaRuleset();
+        protected override Ruleset CreateRuleset() => new OsuRuleset();
 
         private void applyOneJudgement(HitResult result)
         {
@@ -148,6 +148,16 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         [Test]
+        public void TestNoDuplicates()
+        {
+            AddStep("create counter", () => Child = counterDisplay = new TestJudgementCounterDisplay());
+            AddStep("Show all judgements", () => counterDisplay.Mode.Value = JudgementCounterDisplay.DisplayMode.All);
+            AddAssert("Check no duplicates",
+                () => counterDisplay.CounterFlow.ChildrenOfType<JudgementCounter>().Count(),
+                () => Is.EqualTo(counterDisplay.CounterFlow.ChildrenOfType<JudgementCounter>().Select(c => c.ResultName.Text).Distinct().Count()));
+        }
+
+        [Test]
         public void TestCycleDisplayModes()
         {
             AddStep("create counter", () => Child = counterDisplay = new TestJudgementCounterDisplay());
@@ -163,7 +173,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private int hiddenCount()
         {
-            var num = counterDisplay.CounterFlow.Children.First(child => child.Result.Type == HitResult.LargeTickHit);
+            var num = counterDisplay.CounterFlow.Children.First(child => child.Result.Types.Contains(HitResult.LargeTickHit));
             return num.Result.ResultCount.Value;
         }
 

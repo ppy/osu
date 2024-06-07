@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -22,12 +20,12 @@ namespace osu.Game.Tournament.Screens.TeamIntro
 {
     public partial class SeedingScreen : TournamentMatchScreen
     {
-        private Container mainContainer;
+        private Container mainContainer = null!;
 
-        private readonly Bindable<TournamentTeam> currentTeam = new Bindable<TournamentTeam>();
+        private readonly Bindable<TournamentTeam?> currentTeam = new Bindable<TournamentTeam?>();
 
-        private TourneyButton showFirstTeamButton;
-        private TourneyButton showSecondTeamButton;
+        private TourneyButton showFirstTeamButton = null!;
+        private TourneyButton showSecondTeamButton = null!;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -53,13 +51,13 @@ namespace osu.Game.Tournament.Screens.TeamIntro
                         {
                             RelativeSizeAxes = Axes.X,
                             Text = "Show first team",
-                            Action = () => currentTeam.Value = CurrentMatch.Value.Team1.Value,
+                            Action = () => currentTeam.Value = CurrentMatch.Value?.Team1.Value,
                         },
                         showSecondTeamButton = new TourneyButton
                         {
                             RelativeSizeAxes = Axes.X,
                             Text = "Show second team",
-                            Action = () => currentTeam.Value = CurrentMatch.Value.Team2.Value,
+                            Action = () => currentTeam.Value = CurrentMatch.Value?.Team2.Value,
                         },
                         new SettingsTeamDropdown(LadderInfo.Teams)
                         {
@@ -73,7 +71,7 @@ namespace osu.Game.Tournament.Screens.TeamIntro
             currentTeam.BindValueChanged(teamChanged, true);
         }
 
-        private void teamChanged(ValueChangedEvent<TournamentTeam> team) => updateTeamDisplay();
+        private void teamChanged(ValueChangedEvent<TournamentTeam?> team) => updateTeamDisplay();
 
         public override void Show()
         {
@@ -84,7 +82,7 @@ namespace osu.Game.Tournament.Screens.TeamIntro
             updateTeamDisplay();
         }
 
-        protected override void CurrentMatchChanged(ValueChangedEvent<TournamentMatch> match)
+        protected override void CurrentMatchChanged(ValueChangedEvent<TournamentMatch?> match)
         {
             base.CurrentMatchChanged(match);
 
@@ -256,7 +254,7 @@ namespace osu.Game.Tournament.Screens.TeamIntro
 
         private partial class LeftInfo : CompositeDrawable
         {
-            public LeftInfo(TournamentTeam team)
+            public LeftInfo(TournamentTeam? team)
             {
                 FillFlowContainer fill;
 
@@ -276,7 +274,7 @@ namespace osu.Game.Tournament.Screens.TeamIntro
                             new TeamDisplay(team) { Margin = new MarginPadding { Bottom = 30 } },
                             new RowDisplay("Average Rank:", $"#{team.AverageRank:#,0}"),
                             new RowDisplay("Seed:", team.Seed.Value),
-                            new RowDisplay("Last year's placing:", team.LastYearPlacing.Value > 0 ? $"#{team.LastYearPlacing:#,0}" : "0"),
+                            new RowDisplay("Last year's placing:", team.LastYearPlacing.Value > 0 ? $"#{team.LastYearPlacing:#,0}" : "N/A"),
                             new Container { Margin = new MarginPadding { Bottom = 30 } },
                         }
                     },
@@ -315,7 +313,7 @@ namespace osu.Game.Tournament.Screens.TeamIntro
 
             private partial class TeamDisplay : DrawableTournamentTeam
             {
-                public TeamDisplay(TournamentTeam team)
+                public TeamDisplay(TournamentTeam? team)
                     : base(team)
                 {
                     AutoSizeAxes = Axes.Both;

@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -16,12 +14,12 @@ namespace osu.Game.Tournament.Screens.TeamWin
 {
     public partial class TeamWinScreen : TournamentMatchScreen
     {
-        private Container mainContainer;
+        private Container mainContainer = null!;
 
         private readonly Bindable<bool> currentCompleted = new Bindable<bool>();
 
-        private TourneyVideo blueWinVideo;
-        private TourneyVideo redWinVideo;
+        private TourneyVideo blueWinVideo = null!;
+        private TourneyVideo redWinVideo = null!;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -51,7 +49,7 @@ namespace osu.Game.Tournament.Screens.TeamWin
             currentCompleted.BindValueChanged(_ => update());
         }
 
-        protected override void CurrentMatchChanged(ValueChangedEvent<TournamentMatch> match)
+        protected override void CurrentMatchChanged(ValueChangedEvent<TournamentMatch?> match)
         {
             base.CurrentMatchChanged(match);
 
@@ -70,7 +68,7 @@ namespace osu.Game.Tournament.Screens.TeamWin
         {
             var match = CurrentMatch.Value;
 
-            if (match.Winner == null)
+            if (match?.Winner == null)
             {
                 mainContainer.Clear();
                 return;

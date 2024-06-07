@@ -1,0 +1,21 @@
+osu file format v14
+
+[General]
+StackLeniency: 0.7
+Mode: 0
+
+[Difficulty]
+HPDrainRate:4.7
+CircleSize:3.7
+OverallDifficulty:8.4
+ApproachRate:9
+SliderMultiplier:1.57
+SliderTickRate:1
+
+[TimingPoints]
+476,315.789473684211,4,2,1,50,1,0
+18160,-103.092783505155,4,2,1,70,0,0
+
+[HitObjects]
+326,119,27002,6,0,P|266:96|196:111,1,114.217502701372,14|0,0:2|0:0,0:0:0:0:
+215,85,27318,2,0,P|271:80|323:102,1,114.217502701372,8|0,0:2|0:0,0:0:0:0:

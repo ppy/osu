@@ -31,6 +31,8 @@ namespace osu.Game.Tests.Visual.Gameplay
     {
         protected override bool HasCustomSteps => true;
 
+        protected override bool AllowBackwardsSeeks => true;
+
         protected new OutroPlayer Player => (OutroPlayer)base.Player;
 
         private double currentBeatmapDuration;
@@ -72,12 +74,12 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         [Test]
-        public void TestStoryboardExitDuringOutroStillExits()
+        public void TestStoryboardExitDuringOutroProgressesToResults()
         {
             CreateTest();
             AddUntilStep("completion set by processor", () => Player.ScoreProcessor.HasCompleted.Value);
             AddStep("exit via pause", () => Player.ExitViaPause());
-            AddAssert("player exited", () => !Player.IsCurrentScreen() && Player.GetChildScreen() == null);
+            AddUntilStep("reached results screen", () => Stack.CurrentScreen is ResultsScreen);
         }
 
         [TestCase(false)]
@@ -171,7 +173,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("disable storyboard", () => LocalConfig.SetValue(OsuSetting.ShowStoryboard, false));
             AddUntilStep("completion set by processor", () => Player.ScoreProcessor.HasCompleted.Value);
             AddStep("exit via pause", () => Player.ExitViaPause());
-            AddAssert("player exited", () => Stack.CurrentScreen == null);
+            AddUntilStep("reached results screen", () => Stack.CurrentScreen is ResultsScreen);
         }
 
         [Test]
@@ -214,7 +216,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             var storyboard = new Storyboard();
             var sprite = new StoryboardSprite("unknown", Anchor.TopLeft, Vector2.Zero);
-            sprite.TimelineGroup.Alpha.Add(Easing.None, 0, duration, 1, 0);
+            sprite.Commands.AddAlpha(Easing.None, 0, duration, 1, 0);
             storyboard.GetLayer("Background").Add(sprite);
             return storyboard;
         }

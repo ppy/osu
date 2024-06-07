@@ -1,10 +1,9 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -27,13 +26,13 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
         protected readonly FillFlowContainer<DrawableMatchTeam> Flow;
         private readonly Drawable selectionBox;
         private readonly Drawable currentMatchSelectionBox;
-        private Bindable<TournamentMatch> globalSelection;
+        private Bindable<TournamentMatch>? globalSelection;
 
-        [Resolved(CanBeNull = true)]
-        private LadderEditorInfo editorInfo { get; set; }
+        [Resolved]
+        private LadderEditorInfo? editorInfo { get; set; }
 
-        [Resolved(CanBeNull = true)]
-        private LadderInfo ladderInfo { get; set; }
+        [Resolved]
+        private LadderInfo? ladderInfo { get; set; }
 
         public DrawableTournamentMatch(TournamentMatch match, bool editor = false)
         {
@@ -129,7 +128,7 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
         /// <summary>
         /// Fired when something changed that requires a ladder redraw.
         /// </summary>
-        public Action Changed;
+        public Action? Changed;
 
         private readonly List<IUnbindable> refBindables = new List<IUnbindable>();
 
@@ -201,20 +200,22 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
             }
             else
             {
-                transferProgression(Match.Progression?.Value, Match.Winner);
-                transferProgression(Match.LosersProgression?.Value, Match.Loser);
+                Debug.Assert(Match.Winner != null);
+                transferProgression(Match.Progression.Value, Match.Winner);
+                Debug.Assert(Match.Loser != null);
+                transferProgression(Match.LosersProgression.Value, Match.Loser);
             }
 
             Changed?.Invoke();
         }
 
-        private void transferProgression(TournamentMatch destination, TournamentTeam team)
+        private void transferProgression(TournamentMatch? destination, TournamentTeam team)
         {
             if (destination == null) return;
 
             bool progressionAbove = destination.ID < Match.ID;
 
-            Bindable<TournamentTeam> destinationTeam;
+            Bindable<TournamentTeam?> destinationTeam;
 
             // check for the case where we have already transferred out value
             if (destination.Team1.Value == team)
@@ -268,8 +269,8 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
             {
                 foreach (var conditional in Match.ConditionalMatches)
                 {
-                    bool team1Match = conditional.Acronyms.Contains(Match.Team1Acronym);
-                    bool team2Match = conditional.Acronyms.Contains(Match.Team2Acronym);
+                    bool team1Match = Match.Team1Acronym != null && conditional.Acronyms.Contains(Match.Team1Acronym);
+                    bool team2Match = Match.Team2Acronym != null && conditional.Acronyms.Contains(Match.Team2Acronym);
 
                     if (team1Match && team2Match)
                         Match.Date.Value = conditional.Date.Value;
@@ -343,6 +344,9 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
             Selected = false;
             Match.Progression.Value = null;
             Match.LosersProgression.Value = null;
+
+            if (ladderInfo == null)
+                return;
 
             ladderInfo.Matches.Remove(Match);
 

@@ -4,6 +4,7 @@
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -26,7 +27,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
         [Resolved]
         private SelectionRotationHandler? rotationHandler { get; set; }
 
-        public Func<Vector2, Anchor, bool>? OnScale;
+        [Resolved]
+        private SelectionScaleHandler? scaleHandler { get; set; }
+
         public Func<Direction, bool, bool>? OnFlip;
         public Func<bool>? OnReverse;
 
@@ -56,39 +59,11 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         private readonly IBindable<bool> canRotate = new BindableBool();
 
-        private bool canScaleX;
+        private readonly IBindable<bool> canScaleX = new BindableBool();
 
-        /// <summary>
-        /// Whether horizontal scaling support should be enabled.
-        /// </summary>
-        public bool CanScaleX
-        {
-            get => canScaleX;
-            set
-            {
-                if (canScaleX == value) return;
+        private readonly IBindable<bool> canScaleY = new BindableBool();
 
-                canScaleX = value;
-                recreate();
-            }
-        }
-
-        private bool canScaleY;
-
-        /// <summary>
-        /// Whether vertical scaling support should be enabled.
-        /// </summary>
-        public bool CanScaleY
-        {
-            get => canScaleY;
-            set
-            {
-                if (canScaleY == value) return;
-
-                canScaleY = value;
-                recreate();
-            }
-        }
+        private readonly IBindable<bool> canScaleDiagonally = new BindableBool();
 
         private bool canFlipX;
 
@@ -152,9 +127,19 @@ namespace osu.Game.Screens.Edit.Compose.Components
         private void load()
         {
             if (rotationHandler != null)
-                canRotate.BindTo(rotationHandler.CanRotate);
+                canRotate.BindTo(rotationHandler.CanRotateAroundSelectionOrigin);
 
-            canRotate.BindValueChanged(_ => recreate(), true);
+            if (scaleHandler != null)
+            {
+                canScaleX.BindTo(scaleHandler.CanScaleX);
+                canScaleY.BindTo(scaleHandler.CanScaleY);
+                canScaleDiagonally.BindTo(scaleHandler.CanScaleDiagonally);
+            }
+
+            canRotate.BindValueChanged(_ => recreate());
+            canScaleX.BindValueChanged(_ => recreate());
+            canScaleY.BindValueChanged(_ => recreate());
+            canScaleDiagonally.BindValueChanged(_ => recreate(), true);
         }
 
         protected override bool OnKeyDown(KeyDownEvent e)
@@ -243,9 +228,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 }
             };
 
-            if (CanScaleX) addXScaleComponents();
-            if (CanScaleX && CanScaleY) addFullScaleComponents();
-            if (CanScaleY) addYScaleComponents();
+            if (canScaleX.Value) addXScaleComponents();
+            if (canScaleDiagonally.Value) addFullScaleComponents();
+            if (canScaleY.Value) addYScaleComponents();
             if (CanFlipX) addXFlipComponents();
             if (CanFlipY) addYFlipComponents();
             if (canRotate.Value) addRotationComponents();
@@ -307,12 +292,30 @@ namespace osu.Game.Screens.Edit.Compose.Components
             return button;
         }
 
+        /// <remarks>
+        /// This method should be called when a selection needs to be flipped
+        /// because of an ongoing scale handle drag that would otherwise cause width or height to go negative.
+        /// </remarks>
+        public void PerformFlipFromScaleHandles(Axes axes)
+        {
+            if (axes.HasFlagFast(Axes.X))
+            {
+                dragHandles.FlipScaleHandles(Direction.Horizontal);
+                OnFlip?.Invoke(Direction.Horizontal, false);
+            }
+
+            if (axes.HasFlagFast(Axes.Y))
+            {
+                dragHandles.FlipScaleHandles(Direction.Vertical);
+                OnFlip?.Invoke(Direction.Vertical, false);
+            }
+        }
+
         private void addScaleHandle(Anchor anchor)
         {
             var handle = new SelectionBoxScaleHandle
             {
                 Anchor = anchor,
-                HandleScale = (delta, a) => OnScale?.Invoke(delta, a)
             };
 
             handle.OperationStarted += operationStarted;
@@ -363,7 +366,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
             // Shrink the parent quad to give a bit of padding so the buttons don't stick *right* on the border.
             // AABBFloat assumes no rotation. one would hope the whole editor is not being rotated.
-            var parentQuad = Parent.ScreenSpaceDrawQuad.AABBFloat.Shrink(ToLocalSpace(thisQuad.TopLeft + new Vector2(button_padding * 2)));
+            var parentQuad = Parent!.ScreenSpaceDrawQuad.AABBFloat.Shrink(ToLocalSpace(thisQuad.TopLeft + new Vector2(button_padding * 2)));
 
             float topExcess = thisQuad.TopLeft.Y - parentQuad.TopLeft.Y;
             float bottomExcess = parentQuad.BottomLeft.Y - thisQuad.BottomLeft.Y;
@@ -376,7 +379,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             {
                 buttons.Anchor = Anchor.BottomCentre;
                 buttons.Origin = Anchor.BottomCentre;
-                buttons.Y = Math.Min(0, ToLocalSpace(Parent.ScreenSpaceDrawQuad.BottomLeft).Y - DrawHeight);
+                buttons.Y = Math.Min(0, ToLocalSpace(Parent!.ScreenSpaceDrawQuad.BottomLeft).Y - DrawHeight);
             }
             else if (topExcess > bottomExcess)
             {

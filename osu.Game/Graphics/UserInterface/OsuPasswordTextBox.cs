@@ -23,7 +23,7 @@ namespace osu.Game.Graphics.UserInterface
         protected override Drawable GetDrawableCharacter(char c) => new FallingDownContainer
         {
             AutoSizeAxes = Axes.Both,
-            Child = new PasswordMaskChar(CalculatedTextSize),
+            Child = new PasswordMaskChar(FontSize),
         };
 
         protected override bool AllowUniqueCharacterSamples => false;

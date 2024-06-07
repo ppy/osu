@@ -23,7 +23,18 @@ namespace osu.Game.Screens.OnlinePlay
 {
     public partial class FooterButtonFreeMods : FooterButton, IHasCurrentValue<IReadOnlyList<Mod>>
     {
-        public Bindable<IReadOnlyList<Mod>> Current { get; set; } = new BindableWithCurrent<IReadOnlyList<Mod>>();
+        private readonly BindableWithCurrent<IReadOnlyList<Mod>> current = new BindableWithCurrent<IReadOnlyList<Mod>>(Array.Empty<Mod>());
+
+        public Bindable<IReadOnlyList<Mod>> Current
+        {
+            get => current.Current;
+            set
+            {
+                ArgumentNullException.ThrowIfNull(value);
+
+                current.Current = value;
+            }
+        }
 
         private OsuSpriteText count = null!;
 
@@ -106,17 +117,17 @@ namespace osu.Game.Screens.OnlinePlay
 
         private void updateModDisplay()
         {
-            int current = Current.Value.Count;
+            int currentCount = Current.Value.Count;
 
-            if (current == allAvailableAndValidMods.Count())
+            if (currentCount == allAvailableAndValidMods.Count())
             {
                 count.Text = "all";
                 count.FadeColour(colours.Gray2, 200, Easing.OutQuint);
                 circle.FadeColour(colours.Yellow, 200, Easing.OutQuint);
             }
-            else if (current > 0)
+            else if (currentCount > 0)
             {
-                count.Text = $"{current} mods";
+                count.Text = $"{currentCount} mods";
                 count.FadeColour(colours.Gray2, 200, Easing.OutQuint);
                 circle.FadeColour(colours.YellowDark, 200, Easing.OutQuint);
             }

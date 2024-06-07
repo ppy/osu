@@ -52,11 +52,11 @@ namespace osu.Game.Tests.Visual.Playlists
         [SetUpSteps]
         public void SetupSteps()
         {
-            AddStep("set room", () => SelectedRoom.Value = new Room());
+            AddStep("set room", () => SelectedRoom!.Value = new Room());
 
             importBeatmap();
 
-            AddStep("load match", () => LoadScreen(match = new TestPlaylistsRoomSubScreen(SelectedRoom.Value)));
+            AddStep("load match", () => LoadScreen(match = new TestPlaylistsRoomSubScreen(SelectedRoom!.Value)));
             AddUntilStep("wait for load", () => match.IsCurrentScreen());
         }
 
@@ -75,7 +75,7 @@ namespace osu.Game.Tests.Visual.Playlists
                 });
             });
 
-            AddUntilStep("Progress details are hidden", () => match.ChildrenOfType<RoomLocalUserInfo>().FirstOrDefault()?.Parent.Alpha == 0);
+            AddUntilStep("Progress details are hidden", () => match.ChildrenOfType<RoomLocalUserInfo>().FirstOrDefault()?.Parent!.Alpha == 0);
 
             AddUntilStep("Leaderboard shows two aggregate scores", () => match.ChildrenOfType<MatchLeaderboardScore>().Count(s => s.ScoreText.Text != "0") == 2);
 
@@ -99,7 +99,7 @@ namespace osu.Game.Tests.Visual.Playlists
                 });
             });
 
-            AddUntilStep("Progress details are visible", () => match.ChildrenOfType<RoomLocalUserInfo>().FirstOrDefault()?.Parent.Alpha == 1);
+            AddUntilStep("Progress details are visible", () => match.ChildrenOfType<RoomLocalUserInfo>().FirstOrDefault()?.Parent!.Alpha == 1);
         }
 
         [Test]
@@ -115,7 +115,7 @@ namespace osu.Game.Tests.Visual.Playlists
                 });
             });
 
-            AddAssert("first playlist item selected", () => match.SelectedItem.Value == SelectedRoom.Value.Playlist[0]);
+            AddAssert("first playlist item selected", () => match.SelectedItem.Value == SelectedRoom!.Value.Playlist[0]);
         }
 
         [Test]
@@ -201,7 +201,7 @@ namespace osu.Game.Tests.Visual.Playlists
 
         private void setupAndCreateRoom(Action<Room> room)
         {
-            AddStep("setup room", () => room(SelectedRoom.Value));
+            AddStep("setup room", () => room(SelectedRoom!.Value));
 
             AddStep("click create button", () =>
             {

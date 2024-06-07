@@ -34,6 +34,19 @@ namespace osu.Game.Skinning
 
         public virtual ISample? GetSample(ISampleInfo sampleInfo) => Skin.GetSample(sampleInfo);
 
-        public virtual IBindable<TValue>? GetConfig<TLookup, TValue>(TLookup lookup) where TLookup : notnull where TValue : notnull => Skin.GetConfig<TLookup, TValue>(lookup);
+        public virtual IBindable<TValue>? GetConfig<TLookup, TValue>(TLookup lookup) where TLookup : notnull where TValue : notnull
+        {
+            try
+            {
+                Skinning.Skin.LogLookupDebug(this, lookup, Skinning.Skin.LookupDebugType.Enter);
+                return Skin.GetConfig<TLookup, TValue>(lookup);
+            }
+            finally
+            {
+                Skinning.Skin.LogLookupDebug(this, lookup, Skinning.Skin.LookupDebugType.Exit);
+            }
+        }
+
+        public override string ToString() => $"{nameof(SkinTransformer)} {{ Skin: {Skin} }}";
     }
 }

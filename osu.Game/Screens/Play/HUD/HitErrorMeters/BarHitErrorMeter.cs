@@ -303,13 +303,13 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
                     labelEarly.Child = new SpriteIcon
                     {
                         Size = new Vector2(icon_size),
-                        Icon = FontAwesome.Solid.ShippingFast,
+                        Icon = OsuIcon.Hare
                     };
 
                     labelLate.Child = new SpriteIcon
                     {
                         Size = new Vector2(icon_size),
-                        Icon = FontAwesome.Solid.Bicycle,
+                        Icon = OsuIcon.Tortoise
                     };
 
                     break;
@@ -485,7 +485,14 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
             }
         }
 
-        public override void Clear() => judgementsContainer.Clear();
+        public override void Clear()
+        {
+            foreach (var j in judgementsContainer)
+            {
+                j.ClearTransforms();
+                j.Expire();
+            }
+        }
 
         public enum CentreMarkerStyles
         {

@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Diagnostics;
-using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -20,6 +19,7 @@ using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Configuration;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
+using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Rulesets.Osu.UI.Cursor;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Tests.Visual;
@@ -133,8 +133,11 @@ namespace osu.Game.Rulesets.Osu.Tests
         }
 
         [Test]
-        public void TestSimpleInput()
+        public void TestSimpleInput([Values] bool disableMouseButtons)
         {
+            // OsuSetting.MouseDisableButtons should not affect touch taps
+            AddStep($"{(disableMouseButtons ? "disable" : "enable")} mouse buttons", () => config.SetValue(OsuSetting.MouseDisableButtons, disableMouseButtons));
+
             beginTouch(TouchSource.Touch1);
 
             assertKeyCounter(1, 0);
@@ -468,7 +471,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         [Test]
         public void TestInputWhileMouseButtonsDisabled()
         {
-            AddStep("Disable mouse buttons", () => config.SetValue(OsuSetting.MouseDisableButtons, true));
+            AddStep("Disable gameplay taps", () => config.SetValue(OsuSetting.TouchDisableGameplayTaps, true));
 
             beginTouch(TouchSource.Touch1);
 
@@ -576,6 +579,24 @@ namespace osu.Game.Rulesets.Osu.Tests
             assertKeyCounter(1, 1);
         }
 
+        [Test]
+        public void TestTouchJudgedCircle()
+        {
+            addHitCircleAt(TouchSource.Touch1);
+            addHitCircleAt(TouchSource.Touch2);
+
+            beginTouch(TouchSource.Touch1);
+            endTouch(TouchSource.Touch1);
+
+            // Hold the second touch (this becomes the primary touch).
+            beginTouch(TouchSource.Touch2);
+
+            // Touch again on the first circle.
+            // Because it's been judged, the cursor should not move here.
+            beginTouch(TouchSource.Touch1);
+            checkPosition(TouchSource.Touch2);
+        }
+
         private void addHitCircleAt(TouchSource source)
         {
             AddStep($"Add circle at {source}", () =>
@@ -588,6 +609,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 {
                     Clock = new FramedClock(new ManualClock()),
                     Position = mainContent.ToLocalSpace(getSanePositionForSource(source)),
+                    CheckHittable = (_, _, _) => ClickAction.Hit
                 });
             });
         }
@@ -620,6 +642,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             AddStep("Release all touches", () =>
             {
                 config.SetValue(OsuSetting.MouseDisableButtons, false);
+                config.SetValue(OsuSetting.TouchDisableGameplayTaps, false);
                 foreach (TouchSource source in InputManager.CurrentState.Touch.ActiveSources)
                     InputManager.EndTouch(new Touch(source, osuInputManager.ScreenSpaceDrawQuad.Centre));
             });

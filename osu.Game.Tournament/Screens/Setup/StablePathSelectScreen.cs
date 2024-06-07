@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.IO;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -23,20 +21,20 @@ namespace osu.Game.Tournament.Screens.Setup
 {
     public partial class StablePathSelectScreen : TournamentScreen
     {
-        [Resolved(canBeNull: true)]
-        private TournamentSceneManager sceneManager { get; set; }
+        [Resolved]
+        private TournamentSceneManager? sceneManager { get; set; }
 
         [Resolved]
-        private MatchIPCInfo ipc { get; set; }
+        private MatchIPCInfo ipc { get; set; } = null!;
 
-        private OsuDirectorySelector directorySelector;
-        private DialogOverlay overlay;
+        private OsuDirectorySelector directorySelector = null!;
+        private DialogOverlay? overlay;
 
         [BackgroundDependencyLoader(true)]
         private void load(Storage storage, OsuColour colours)
         {
             var initialStorage = (ipc as FileBasedIPC)?.IPCStorage ?? storage;
-            string initialPath = new DirectoryInfo(initialStorage.GetFullPath(string.Empty)).Parent?.FullName;
+            string? initialPath = new DirectoryInfo(initialStorage.GetFullPath(string.Empty)).Parent?.FullName;
 
             AddRangeInternal(new Drawable[]
             {

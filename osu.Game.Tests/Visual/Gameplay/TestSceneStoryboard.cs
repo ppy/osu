@@ -106,14 +106,12 @@ namespace osu.Game.Tests.Visual.Gameplay
             if (storyboard != null)
                 storyboardContainer.Remove(storyboard, true);
 
-            var decoupledClock = new DecoupleableInterpolatingFramedClock { IsCoupled = true };
-            storyboardContainer.Clock = decoupledClock;
+            storyboardContainer.Clock = new FramedClock(Beatmap.Value.Track);
 
             storyboard = toLoad.CreateDrawable(SelectedMods.Value);
             storyboard.Passing = false;
 
             storyboardContainer.Add(storyboard);
-            decoupledClock.ChangeSource(Beatmap.Value.Track);
         }
 
         private void loadStoryboard(string filename, Action<Storyboard>? setUpStoryboard = null)

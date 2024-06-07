@@ -15,7 +15,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
-    public partial class DrawableSliderTail : DrawableOsuHitObject, IRequireTracking
+    public partial class DrawableSliderTail : DrawableOsuHitObject
     {
         public new SliderTailCircle HitObject => (SliderTailCircle)base.HitObject;
 
@@ -25,17 +25,10 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         protected DrawableSlider DrawableSlider => (DrawableSlider)ParentHitObject;
 
         /// <summary>
-        /// The judgement text is provided by the <see cref="DrawableSlider"/>.
-        /// </summary>
-        public override bool DisplayResult => false;
-
-        /// <summary>
         /// Whether the hit samples only play on successful hits.
         /// If <c>false</c>, the hit samples will also play on misses.
         /// </summary>
         public bool SamplePlaysOnlyOnHit { get; set; } = true;
-
-        public bool Tracking { get; set; }
 
         public SkinnableDrawable CirclePiece { get; private set; }
 
@@ -55,7 +48,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private void load()
         {
             Origin = Anchor.Centre;
-            Size = new Vector2(OsuHitObject.OBJECT_RADIUS * 2);
+            Size = OsuHitObject.OBJECT_DIMENSIONS;
 
             AddRangeInternal(new Drawable[]
             {
@@ -123,11 +116,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             }
         }
 
-        protected override void CheckForResult(bool userTriggered, double timeOffset)
-        {
-            if (!userTriggered && timeOffset >= 0)
-                ApplyResult(r => r.Type = Tracking ? r.Judgement.MaxResult : r.Judgement.MinResult);
-        }
+        protected override void CheckForResult(bool userTriggered, double timeOffset) => DrawableSlider.SliderInputManager.TryJudgeNestedObject(this, timeOffset);
 
         protected override void OnApply()
         {

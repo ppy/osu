@@ -35,8 +35,8 @@ namespace osu.Game.Online.API
 
             for (int i = 0; i < itemCount; i++)
             {
-                output[reader.ReadString()] =
-                    PrimitiveObjectFormatter.Instance.Deserialize(ref reader, options);
+                output[reader.ReadString()!] =
+                    PrimitiveObjectFormatter.Instance.Deserialize(ref reader, options)!;
             }
 
             return output;

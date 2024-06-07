@@ -40,7 +40,9 @@ namespace osu.Game.Overlays.SkinEditor
 
         public override bool Contains(Vector2 screenSpacePos) => drawableQuad.Contains(screenSpacePos);
 
-        public override Vector2 ScreenSpaceSelectionPoint => drawable.ToScreenSpace(drawable.OriginPosition);
+        public override Vector2 ScreenSpaceSelectionPoint =>
+            // Important to use a stable position (not based on origin) as origin may be automatically updated during drag operations.
+            drawable.ScreenSpaceDrawQuad.Centre;
 
         protected override bool ReceivePositionalInputAtSubTree(Vector2 screenSpacePos) =>
             drawableQuad.Contains(screenSpacePos);
@@ -136,9 +138,10 @@ namespace osu.Game.Overlays.SkinEditor
         {
             base.Update();
 
+            Vector2 scale = drawable.DrawInfo.MatrixInverse.ExtractScale().Xy;
             drawableQuad = drawable.ToScreenSpace(
                 drawable.DrawRectangle
-                        .Inflate(SkinSelectionHandler.INFLATE_SIZE));
+                        .Inflate(SkinSelectionHandler.INFLATE_SIZE * scale));
 
             var localSpaceQuad = ToLocalSpace(drawableQuad);
 
@@ -202,7 +205,7 @@ namespace osu.Game.Overlays.SkinEditor
             if (drawable.Parent == null)
                 return;
 
-            var newAnchor = drawable.Parent.ToSpaceOfOtherDrawable(drawable.AnchorPosition, this);
+            var newAnchor = drawable.Parent!.ToSpaceOfOtherDrawable(drawable.AnchorPosition, this);
             anchorPosition = tweenPosition(anchorPosition ?? newAnchor, newAnchor);
             anchorBox.Position = anchorPosition.Value;
 

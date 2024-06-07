@@ -104,7 +104,7 @@ namespace osu.Game.Tests.Visual.Editing
             if (sameRuleset)
             {
                 AddUntilStep("prompt for save dialog shown", () => DialogOverlay.CurrentDialog is PromptForSaveDialog);
-                AddStep("discard changes", () => ((PromptForSaveDialog)DialogOverlay.CurrentDialog).PerformOkAction());
+                AddStep("discard changes", () => ((PromptForSaveDialog)DialogOverlay.CurrentDialog)?.PerformOkAction());
             }
 
             // ensure editor loader didn't resume.

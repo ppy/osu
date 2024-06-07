@@ -15,9 +15,15 @@ namespace osu.Game.Localisation
         public static LocalisableString ModSelectTitle => new TranslatableString(getKey(@"mod_select_title"), @"Mod Select");
 
         /// <summary>
+        /// "{0} mods"
+        /// </summary>
+        public static LocalisableString Mods(int count) => new TranslatableString(getKey(@"mods"), @"{0} mods", count);
+
+        /// <summary>
         /// "Mods provide different ways to enjoy gameplay. Some have an effect on the score you can achieve during ranked play. Others are just for fun."
         /// </summary>
-        public static LocalisableString ModSelectDescription => new TranslatableString(getKey(@"mod_select_description"), @"Mods provide different ways to enjoy gameplay. Some have an effect on the score you can achieve during ranked play. Others are just for fun.");
+        public static LocalisableString ModSelectDescription => new TranslatableString(getKey(@"mod_select_description"),
+            @"Mods provide different ways to enjoy gameplay. Some have an effect on the score you can achieve during ranked play. Others are just for fun.");
 
         /// <summary>
         /// "Mod Customisation"
@@ -43,6 +49,31 @@ namespace osu.Game.Localisation
         /// "tab to search..."
         /// </summary>
         public static LocalisableString TabToSearch => new TranslatableString(getKey(@"tab_to_search"), @"tab to search...");
+
+        /// <summary>
+        /// "Score Multiplier"
+        /// </summary>
+        public static LocalisableString ScoreMultiplier => new TranslatableString(getKey(@"score_multiplier"), @"Score Multiplier");
+
+        /// <summary>
+        /// "Ranked"
+        /// </summary>
+        public static LocalisableString Ranked => new TranslatableString(getKey(@"ranked"), @"Ranked");
+
+        /// <summary>
+        /// "Performance points can be granted for the active mods."
+        /// </summary>
+        public static LocalisableString RankedExplanation => new TranslatableString(getKey(@"ranked_explanation"), @"Performance points can be granted for the active mods.");
+
+        /// <summary>
+        /// "Unranked"
+        /// </summary>
+        public static LocalisableString Unranked => new TranslatableString(getKey(@"unranked"), @"Unranked");
+
+        /// <summary>
+        /// "Performance points will not be granted due to active mods."
+        /// </summary>
+        public static LocalisableString UnrankedExplanation => new TranslatableString(getKey(@"unranked_explanation"), @"Performance points will not be granted due to active mods.");
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }

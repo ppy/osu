@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -56,17 +55,19 @@ namespace osu.Game.Overlays.Mods
 
         protected override void Select()
         {
-            // if the preset is not active at the point of the user click, then set the mods using the preset directly, discarding any previous selections,
-            // which will also have the side effect of activating the preset (see `updateActiveState()`).
-            selectedMods.Value = Preset.Value.Mods.ToArray();
+            // this implicitly presumes that if a system mod declares incompatibility with a non-system mod,
+            // the non-system mod should take precedence.
+            // if this assumption is ever broken, this should be reconsidered.
+            var selectedSystemMods = selectedMods.Value.Where(mod => mod.Type == ModType.System &&
+                                                                     !mod.IncompatibleMods.Any(t => Preset.Value.Mods.Any(t.IsInstanceOfType)));
+
+            // will also have the side effect of activating the preset (see `updateActiveState()`).
+            selectedMods.Value = Preset.Value.Mods.Concat(selectedSystemMods).ToArray();
         }
 
         protected override void Deselect()
         {
-            // if the preset is active when the user has clicked it, then it means that the set of active mods is exactly equal to the set of mods in the preset
-            // (there are no other active mods than what the preset specifies, and the mod settings match exactly).
-            // therefore it's safe to just clear selected mods, since it will have the effect of toggling the preset off.
-            selectedMods.Value = Array.Empty<Mod>();
+            selectedMods.Value = selectedMods.Value.Except(Preset.Value.Mods).ToArray();
         }
 
         private void selectedModsChanged()
@@ -79,7 +80,7 @@ namespace osu.Game.Overlays.Mods
 
         private void updateActiveState()
         {
-            Active.Value = new HashSet<Mod>(Preset.Value.Mods).SetEquals(selectedMods.Value);
+            Active.Value = new HashSet<Mod>(Preset.Value.Mods).SetEquals(selectedMods.Value.Where(mod => mod.Type != ModType.System));
         }
 
         #region Filtering support

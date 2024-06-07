@@ -26,7 +26,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override ModType Type => ModType.Fun;
         public override LocalisableString Description => "Hit objects run away!";
         public override double ScoreMultiplier => 1;
-        public override Type[] IncompatibleMods => new[] { typeof(OsuModAutopilot), typeof(OsuModWiggle), typeof(OsuModTransform), typeof(ModAutoplay), typeof(OsuModMagnetised), typeof(OsuModBubbles) };
+        public override Type[] IncompatibleMods => new[] { typeof(OsuModAutopilot), typeof(OsuModWiggle), typeof(OsuModTransform), typeof(ModAutoplay), typeof(OsuModMagnetised), typeof(OsuModBubbles), typeof(OsuModDepth) };
 
         [SettingSource("Repulsion strength", "How strong the repulsion is.", 0)]
         public BindableFloat RepulsionStrength { get; } = new BindableFloat(0.5f)
@@ -38,9 +38,8 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public void ApplyToDrawableRuleset(DrawableRuleset<OsuHitObject> drawableRuleset)
         {
-            // Hide judgment displays and follow points as they won't make any sense.
+            // Hide follow points as they won't make any sense.
             // Judgements can potentially be turned on in a future where they display at a position relative to their drawable counterpart.
-            drawableRuleset.Playfield.DisplayJudgements.Value = false;
             (drawableRuleset.Playfield as OsuPlayfield)?.FollowPoints.Hide();
         }
 
@@ -48,8 +47,10 @@ namespace osu.Game.Rulesets.Osu.Mods
         {
             var cursorPos = playfield.Cursor.AsNonNull().ActiveCursor.DrawPosition;
 
-            foreach (var drawable in playfield.HitObjectContainer.AliveObjects)
+            foreach (var entry in playfield.HitObjectContainer.AliveEntries)
             {
+                var drawable = entry.Value;
+
                 var destination = Vector2.Clamp(2 * drawable.Position - cursorPos, Vector2.Zero, OsuPlayfield.BASE_SIZE);
 
                 if (drawable.HitObject is Slider thisSlider)

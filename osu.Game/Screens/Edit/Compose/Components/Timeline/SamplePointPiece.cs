@@ -16,6 +16,7 @@ using osu.Game.Audio;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Screens.Edit.Timing;
 using osuTK;
 using osuTK.Graphics;
@@ -101,7 +102,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                             },
                             volume = new IndeterminateSliderWithTextBoxInput<int>("Volume", new BindableInt(100)
                             {
-                                MinValue = 0,
+                                MinValue = DrawableHitObject.MINIMUM_SAMPLE_VOLUME,
                                 MaxValue = 100,
                             })
                         }
@@ -141,7 +142,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             protected override void LoadComplete()
             {
                 base.LoadComplete();
-                ScheduleAfterChildren(() => GetContainingInputManager().ChangeFocus(volume));
+                ScheduleAfterChildren(() => GetContainingFocusManager().ChangeFocus(volume));
             }
 
             private static string? getCommonBank(IList<HitSampleInfo>[] relevantSamples) => relevantSamples.Select(GetBankValue).Distinct().Count() == 1 ? GetBankValue(relevantSamples.First()) : null;
