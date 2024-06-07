@@ -116,8 +116,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Touch
             var lastLast = GetLastObjects(hand).Last();
 
             Vector2 currentPos = current.Position;
-            Vector2 lastPos = last.Position;
-            Vector2 lastLastPos = lastLast.Position;
+            Vector2 lastPos = (last as Slider)?.LazyEndPosition ?? last.Position;
+            Vector2 lastLastPos = (lastLast as Slider)?.LazyEndPosition ?? lastLast.Position;
 
             Vector2 vectorA = lastPos - lastLastPos;
             Vector2 vectorB = currentPos - lastPos;
