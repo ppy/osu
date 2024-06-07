@@ -38,7 +38,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Touch
 
             // Add a speed bonus for swapping from dragging to tapping.
             if (currentHand == GetOtherHand(LastNonDragHand) && LastHand == TouchHand.Drag)
-                bonusMultiplier += 0.3;
+                bonusMultiplier += 0.2;
 
             // Treat drags as regular gameplay in terms of tapping.
             bool tappedWithTouch = currentHand != TouchHand.Drag;

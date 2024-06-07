@@ -34,22 +34,23 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Touch
             // Add a bonus for the hand co-ordination required to aim with both hands.
             if (currentHand != LastNonDragHand && currentHand != TouchHand.Drag)
             {
-                bonusMultiplier += 0.3;
+                bonusMultiplier += 0.25;
 
                 // Add an obstrution bonus if the most recent instance of the "other hand" is in between the current object and the previous object with the actual hand.
                 var simulatedAngle = GetSwapAngle((OsuHitObject)simulated.BaseObject, currentHand);
 
-                bonusMultiplier += 0.9 / (1 + Math.Exp(-(simulatedAngle - 3 * Math.PI / 5) / 9));
+                bonusMultiplier += 0.5 / (1 + Math.Exp(-(simulatedAngle - 3 * Math.PI / 5) / 9));
             }
 
             // Add a slight aim bonus for swapping to dragging after tapping.
             if (currentHand != LastHand && currentHand == TouchHand.Drag)
-                bonusMultiplier += 0.125;
+                bonusMultiplier += 0.08;
 
-            // Decay the bonuses by strain time.
-            bonusMultiplier /= 1 + simulated.StrainTime / 1000;
+            double aimValue = AimEvaluator.EvaluateDifficultyOf(simulated, withSliders);
+            double aimValueNoSliders = AimEvaluator.EvaluateDifficultyOf(simulated, false);
 
-            return AimEvaluator.EvaluateDifficultyOf(simulated, withSliders) * bonusMultiplier * skillMultiplier;
+            // Only apply co-ordination bonuses to regular aim and not slider aim.
+            return (aimValueNoSliders * bonusMultiplier + (aimValue - aimValueNoSliders)) * skillMultiplier;
         }
 
         public override RawTouchAim DeepClone() => new RawTouchAim(this);
