@@ -27,6 +27,7 @@ using osu.Game.Configuration;
 using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets;
 using osu.Game.Overlays.Mods;
+using osu.Game.Utils;
 
 namespace osu.Game.Screens.Select.Details
 {
@@ -179,9 +180,7 @@ namespace osu.Game.Screens.Select.Details
 
                 if (Ruleset.Value != null)
                 {
-                    double rate = 1;
-                    foreach (var mod in mods.Value.OfType<IApplicableToRate>())
-                        rate = mod.ApplyToRate(0, rate);
+                    double rate = ModUtils.CalculateRateWithMods(mods.Value);
 
                     adjustedDifficulty = Ruleset.Value.CreateInstance().GetRateAdjustedDisplayDifficulty(originalDifficulty, rate);
 
