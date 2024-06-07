@@ -149,6 +149,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Touch
             }
         }
 
+        /// <summary>
+        /// Obtains a list of previous <see cref="OsuHitObject"/>s that were hit with a specific <see cref="TouchHand"/>.
+        /// </summary>
+        /// <remarks>
+        /// For <see cref="TouchHand.Drag"/>, the previous <see cref="OsuHitObject"/>s are those hit with <see cref="LastNonDragHand"/>.
+        /// </remarks>
+        /// <param name="hand">The <see cref="TouchHand"/>.</param>
+        /// <returns>A list of previous <see cref="OsuHitObject"/>s that were hit by <paramref name="hand"/>.</returns>
         protected List<OsuHitObject> GetLastObjects(TouchHand hand)
         {
             switch (hand)
@@ -164,6 +172,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Touch
             }
         }
 
+        /// <summary>
+        /// Obtains a list of previous <see cref="DifficultyHitObject"/>s that were hit with a specific <see cref="TouchHand"/>.
+        /// </summary>
+        /// <remarks>
+        /// For <see cref="TouchHand.Drag"/>, the previous <see cref="DifficultyHitObject"/>s are those hit with <see cref="LastNonDragHand"/>.
+        /// </remarks>
+        /// <param name="hand">The <see cref="TouchHand"/>.</param>
+        /// <returns>A list of previous <see cref="DifficultyHitObject"/>s that were hit by <paramref name="hand"/>.</returns>
         protected List<DifficultyHitObject> GetLastDifficultyObjects(TouchHand hand)
         {
             switch (hand)
