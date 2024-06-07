@@ -136,7 +136,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Touch
                     return TouchHand.Left;
 
                 default:
-                    return GetOtherHand(LastHand);
+                    return GetOtherHand(LastNonDragHand);
             }
         }
 
