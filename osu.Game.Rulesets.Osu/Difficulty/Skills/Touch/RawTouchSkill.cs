@@ -9,6 +9,7 @@ using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Difficulty.Utils;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Utils;
+using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Touch
 {
@@ -97,23 +98,35 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Touch
         }
 
         /// <summary>
-        /// Creates an <see cref="OsuDifficultyHitObject"/> that simulates an <see cref="OsuHitObject"/> if
-        /// it was hit with a specific <see cref="TouchHand"/> and the <see cref="OsuHitObject"/> before it
-        /// was hit with the <see cref="TouchHand"/> opposite to <paramref name="hand"/>.
+        /// Calculates the angle of the current <see cref="OsuHitObject"/> relative to the last hit objects with different hands.
+        /// This method determines the angle formed by the current object, the last object hit by the other hand, and the last object hit by the same hand.
         /// </summary>
-        /// <param name="current">The <see cref="OsuHitObject"/> to simulate.</param>
-        /// <param name="hand">The <see cref="TouchHand"/> that hit the <see cref="OsuHitObject"/>.</param>
-        /// <returns>The <see cref="OsuDifficultyHitObject"/> that simulates the <see cref="OsuHitObject"/>.</returns>
-        protected OsuDifficultyHitObject CreateSimulatedSwapObject(OsuHitObject current, TouchHand hand)
+        /// <param name="current">The current <see cref="OsuHitObject"/> for which the angle is to be calculated.</param>
+        /// <param name="hand">The <see cref="TouchHand"/> that hit the current <see cref="OsuHitObject"/>.</param>
+        /// <returns>
+        /// The angle formed at the current object between the vector from the last object hit by the other hand to the current object,
+        /// and the vector from the last object hit by this hand to the last object hit by the other hand. The angle is returned as a double wrapped in a nullable type,
+        /// where null might be returned if the calculation cannot be performed.
+        /// </returns>
+        protected double GetSwapAngle(OsuHitObject current, TouchHand hand)
         {
             var otherHand = GetOtherHand(hand);
 
             var last = GetLastObjects(otherHand).Last();
             var lastLast = GetLastObjects(hand).Last();
 
-            var lastDifficultyObjects = GetLastDifficultyObjects(hand);
+            Vector2 currentPos = current.Position;
+            Vector2 lastPos = last.Position;
+            Vector2 lastLastPos = lastLast.Position;
 
-            return new OsuDifficultyHitObject(current, last, lastLast, clockRate, lastDifficultyObjects, lastDifficultyObjects.Count);
+            Vector2 vectorA = lastPos - lastLastPos;
+            Vector2 vectorB = currentPos - lastPos;
+
+            float dot = Vector2.Dot(vectorA, vectorB);
+            float det = vectorA.X * vectorB.Y - vectorA.Y * vectorB.X;
+            double angle = Math.Abs(Math.Atan2(det, dot));
+
+            return angle;
         }
 
         private void updateStrainValue(OsuDifficultyHitObject current, OsuDifficultyHitObject simulated, TouchHand currentHand)
