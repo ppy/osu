@@ -59,32 +59,35 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Touch
 
         public void Process(OsuDifficultyHitObject current, TouchHand currentHand)
         {
+            var osuCurrentObject = (OsuHitObject)current.BaseObject;
+            var osuLastObject = (OsuHitObject)current.LastObject;
+
             if (current.Index == 0)
             {
                 // Automatically assume the first note of a beatmap is hit with
                 // the left hand and the second note is hit with the right.
-                lastLeftObjects.Add((OsuHitObject)current.LastObject);
-                lastRightObjects.Add((OsuHitObject)current.BaseObject);
+                lastLeftObjects.Add(osuLastObject);
+                lastRightObjects.Add(osuCurrentObject);
 
                 return;
             }
 
-            var simulated = currentHand == TouchHand.Drag || LastHand == TouchHand.Drag ? CreateSimulatedObject(current, LastNonDragHand) : CreateSimulatedObject(current, currentHand);
+            var simulated = currentHand == TouchHand.Drag || LastHand == TouchHand.Drag ? CreateSimulatedObject(osuCurrentObject, LastNonDragHand) : CreateSimulatedObject(osuCurrentObject, currentHand);
 
             updateStrainValue(current, simulated, currentHand);
             updateHistory(simulated, currentHand);
         }
 
-        protected OsuDifficultyHitObject CreateSimulatedObject(OsuDifficultyHitObject current, TouchHand hand)
+        protected OsuDifficultyHitObject CreateSimulatedObject(OsuHitObject current, TouchHand hand)
         {
             var lastObjects = GetLastObjects(hand);
             var lastDifficultyObjects = GetLastDifficultyObjects(hand);
             var lastLast = lastObjects.Count > 1 ? lastObjects[^2] : null;
 
-            return new OsuDifficultyHitObject(current.BaseObject, lastObjects.Last(), lastLast, clockRate, lastDifficultyObjects, lastDifficultyObjects.Count);
+            return new OsuDifficultyHitObject(current, lastObjects.Last(), lastLast, clockRate, lastDifficultyObjects, lastDifficultyObjects.Count);
         }
 
-        protected OsuDifficultyHitObject CreateSimulatedSwapObject(OsuDifficultyHitObject current, TouchHand hand)
+        protected OsuDifficultyHitObject CreateSimulatedSwapObject(OsuHitObject current, TouchHand hand)
         {
             var otherHand = GetOtherHand(hand);
 
@@ -93,7 +96,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Touch
 
             var lastDifficultyObjects = GetLastDifficultyObjects(hand);
 
-            return new OsuDifficultyHitObject(current.BaseObject, last, lastLast, clockRate, lastDifficultyObjects, lastDifficultyObjects.Count);
+            return new OsuDifficultyHitObject(current, last, lastLast, clockRate, lastDifficultyObjects, lastDifficultyObjects.Count);
         }
 
         private void updateStrainValue(OsuDifficultyHitObject current, OsuDifficultyHitObject simulated, TouchHand currentHand)
@@ -136,6 +139,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Touch
                     return TouchHand.Left;
 
                 default:
+                    // When dragging, the last non-drag hand is the current hand.
                     return GetOtherHand(LastNonDragHand);
             }
         }
