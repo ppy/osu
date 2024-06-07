@@ -52,8 +52,8 @@ namespace osu.Game.Skinning
                         BypassAutoSizeAxes = Axes.Both,
                     };
                     AddInternal(transientRank);
-                    transientRank.FadeOutFromOne(1200, Easing.Out)
-                                 .ScaleTo(new Vector2(1.625f), 1200, Easing.Out)
+                    transientRank.FadeOutFromOne(500, Easing.Out)
+                                 .ScaleTo(new Vector2(1.625f), 500, Easing.Out)
                                  .Expire();
                 }
             }, true);
