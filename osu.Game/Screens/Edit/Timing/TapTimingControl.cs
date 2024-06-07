@@ -254,7 +254,7 @@ namespace osu.Game.Screens.Edit.Timing
                 editorClock.Seek(newOffset);
 
             foreach (HitObject hitObject in hitObjectsInRange)
-                hitObject.ApplyDefaults(beatmap.ControlPointInfo, beatmap.Difficulty);
+                beatmap.Update(hitObject);
         }
 
         private void adjustBpm(double adjust)
@@ -284,7 +284,7 @@ namespace osu.Game.Screens.Edit.Timing
             timing.BeatLength = newBeatLength;
 
             foreach (HitObject hitObject in hitObjectsInRange)
-                hitObject.ApplyDefaults(beatmap.ControlPointInfo, beatmap.Difficulty);
+                beatmap.Update(hitObject);
         }
 
         private partial class InlineButton : OsuButton
