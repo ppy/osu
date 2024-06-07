@@ -53,7 +53,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 speedNotes = ((TouchSpeed)skills[2]).RelevantNoteCount();
                 double normalAimRating = Math.Sqrt(skills[3].DifficultyValue()) * difficulty_multiplier;
 
-                flashlightRating *= normalAimRating > 0 ? aimRating / normalAimRating : 1;
+                flashlightRating *= normalAimRating > 0 ? Math.Pow(aimRating / normalAimRating, 5.0 / 2.0) : 1;
             }
             else
                 speedNotes = ((Speed)skills[2]).RelevantNoteCount();
