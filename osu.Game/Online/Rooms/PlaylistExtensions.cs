@@ -6,7 +6,6 @@ using System.Linq;
 using Humanizer;
 using Humanizer.Localisation;
 using osu.Framework.Bindables;
-using osu.Game.Rulesets.Mods;
 using osu.Game.Utils;
 
 namespace osu.Game.Online.Rooms
@@ -46,13 +45,14 @@ namespace osu.Game.Online.Rooms
         public static string GetTotalDuration(this BindableList<PlaylistItem> playlist) =>
             playlist.Select(p =>
             {
-                IEnumerable<Mod> modList = [];
+                double rate = 1;
+
                 if (p.RequiredMods.Length > 0)
                 {
                     var ruleset = p.Beatmap.Ruleset.CreateInstance();
-                    modList = p.RequiredMods.Select(mod => mod.ToMod(ruleset));
+                    rate = ModUtils.CalculateRateWithMods(p.RequiredMods.Select(mod => mod.ToMod(ruleset)));
                 }
-                double rate = ModUtils.CalculateRateWithMods(modList);
+
                 return p.Beatmap.Length / rate;
             }).Sum().Milliseconds().Humanize(minUnit: TimeUnit.Second, maxUnit: TimeUnit.Hour, precision: 2);
     }
