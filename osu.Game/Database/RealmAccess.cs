@@ -1134,7 +1134,17 @@ namespace osu.Game.Database
 
                 case 41:
                     foreach (var score in migration.NewRealm.All<ScoreInfo>())
-                        LegacyScoreDecoder.PopulateTotalScoreWithoutMods(score);
+                    {
+                        try
+                        {
+                            // this can fail e.g. if a user has a score set on a ruleset that can no longer be loaded.
+                            LegacyScoreDecoder.PopulateTotalScoreWithoutMods(score);
+                        }
+                        catch (Exception ex)
+                        {
+                            Logger.Log($@"Failed to populate total score without mods for score {score.ID}: {ex}", LoggingTarget.Database);
+                        }
+                    }
 
                     break;
             }
