@@ -127,11 +127,9 @@ namespace osu.Game.Screens.Footer
                 removedButtonsContainer.Add(oldButton);
 
                 if (buttons.Count > 0)
-                    fadeButtonToLeft(oldButton, i, oldButtons.Length);
+                    makeButtonDisappearToRightAndExpire(oldButton, i, oldButtons.Length);
                 else
-                    fadeButtonToBottom(oldButton, i, oldButtons.Length);
-
-                Scheduler.AddDelayed(() => oldButton.Expire(), oldButton.TopLevelContent.LatestTransformEndTime - Time.Current);
+                    makeButtonDisappearToBottomAndExpire(oldButton, i, oldButtons.Length);
             }
 
             for (int i = 0; i < buttons.Count; i++)
@@ -153,52 +151,24 @@ namespace osu.Game.Screens.Footer
                 newButton.OnLoadComplete += _ =>
                 {
                     if (oldButtons.Length > 0)
-                        fadeButtonFromRight(newButton, index, buttons.Count, 240);
+                        makeButtonAppearFromLeft(newButton, index, buttons.Count, 240);
                     else
-                        fadeButtonFromBottom(newButton, index);
+                        makeButtonAppearFromBottom(newButton, index);
                 };
             }
         }
 
-        private void fadeButtonFromRight(ScreenFooterButton button, int index, int count, float startDelay)
-        {
-            button.TopLevelContent
-                  .MoveToX(-300f)
-                  .FadeOut();
+        private void makeButtonAppearFromLeft(ScreenFooterButton button, int index, int count, float startDelay)
+            => button.AppearFromLeft(startDelay + (count - index) * delay_per_button);
 
-            button.TopLevelContent
-                  .Delay(startDelay + (count - index) * delay_per_button)
-                  .MoveToX(0f, 240, Easing.OutCubic)
-                  .FadeIn(240, Easing.OutCubic);
-        }
+        private void makeButtonAppearFromBottom(ScreenFooterButton button, int index)
+            => button.AppearFromBottom(index * delay_per_button);
 
-        private void fadeButtonFromBottom(ScreenFooterButton button, int index)
-        {
-            button.TopLevelContent
-                  .MoveToY(100f)
-                  .FadeOut();
+        private void makeButtonDisappearToRightAndExpire(ScreenFooterButton button, int index, int count)
+            => button.DisappearToRightAndExpire((count - index) * delay_per_button);
 
-            button.TopLevelContent
-                  .Delay(index * delay_per_button)
-                  .MoveToY(0f, 240, Easing.OutCubic)
-                  .FadeIn(240, Easing.OutCubic);
-        }
-
-        private void fadeButtonToLeft(ScreenFooterButton button, int index, int count)
-        {
-            button.TopLevelContent
-                  .Delay((count - index) * delay_per_button)
-                  .FadeOut(240, Easing.InOutCubic)
-                  .MoveToX(300f, 360, Easing.InOutCubic);
-        }
-
-        private void fadeButtonToBottom(ScreenFooterButton button, int index, int count)
-        {
-            button.TopLevelContent
-                  .Delay((count - index) * delay_per_button)
-                  .FadeOut(240, Easing.InOutCubic)
-                  .MoveToY(100f, 240, Easing.InOutCubic);
-        }
+        private void makeButtonDisappearToBottomAndExpire(ScreenFooterButton button, int index, int count)
+            => button.DisappearToBottomAndExpire((count - index) * delay_per_button);
 
         private void showOverlay(OverlayContainer overlay)
         {

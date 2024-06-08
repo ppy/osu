@@ -719,6 +719,8 @@ namespace osu.Game.Screens.Edit
 
         public override bool OnExiting(ScreenExitEvent e)
         {
+            currentScreen?.OnExiting(e);
+
             if (!ExitConfirmed)
             {
                 // dialog overlay may not be available in visual tests.
