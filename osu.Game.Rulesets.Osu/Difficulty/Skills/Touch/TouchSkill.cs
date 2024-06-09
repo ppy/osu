@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Touch
     public abstract class TouchSkill : OsuStrainSkill
     {
         private const int maximum_probabilities = 15;
-        private readonly List<TouchProbability> probabilities = new List<TouchProbability>(maximum_probabilities);
+        private readonly List<TouchHandSequenceProbability> probabilities = new List<TouchHandSequenceProbability>(maximum_probabilities);
 
         protected TouchSkill(Mod[] mods)
             : base(mods)
@@ -32,7 +32,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Touch
 
             if (current.Index == 0)
             {
-                var probability = new TouchProbability(GetHandSequenceSkills());
+                var probability = new TouchHandSequenceProbability(GetHandSequenceSkills());
 
                 // Process the first object to add to history.
                 probability.Process(osuCurrent, TouchHand.Drag);
@@ -42,14 +42,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Touch
                 return 0;
             }
 
-            var newProbabilities = new List<TouchProbability>(probabilities.Count * 3);
+            var newProbabilities = new List<TouchHandSequenceProbability>(probabilities.Count * 3);
 
             foreach (var probability in probabilities)
             {
                 // Compute the probabilities of the object being hit by all possible hand movements.
-                var leftProbability = new TouchProbability(probability);
-                var rightProbability = new TouchProbability(probability);
-                var dragProbability = new TouchProbability(probability);
+                var leftProbability = new TouchHandSequenceProbability(probability);
+                var rightProbability = new TouchHandSequenceProbability(probability);
+                var dragProbability = new TouchHandSequenceProbability(probability);
 
                 leftProbability.Process(osuCurrent, TouchHand.Left);
                 rightProbability.Process(osuCurrent, TouchHand.Right);
@@ -115,17 +115,17 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Touch
         protected abstract TouchHandSequenceSkill[] GetHandSequenceSkills();
 
         /// <summary>
-        /// Evaluates the strain of a <see cref="TouchProbability"/> that is specific to the skillset that this <see cref="TouchSkill"/> represents.
+        /// Evaluates the strain of a <see cref="TouchHandSequenceProbability"/> that is specific to the skillset that this <see cref="TouchSkill"/> represents.
         /// </summary>
-        /// <param name="probability">The <see cref="TouchProbability"/> to compute for.</param>
-        /// <returns>The strain of the <see cref="TouchProbability"/> that is specific to the skillset that this <see cref="TouchSkill"/> represents.</returns>
-        protected abstract double GetProbabilityStrain(TouchProbability probability);
+        /// <param name="probability">The <see cref="TouchHandSequenceProbability"/> to compute for.</param>
+        /// <returns>The strain of the <see cref="TouchHandSequenceProbability"/> that is specific to the skillset that this <see cref="TouchSkill"/> represents.</returns>
+        protected abstract double GetProbabilityStrain(TouchHandSequenceProbability probability);
 
         /// <summary>
-        /// Evaluates the strain of a <see cref="TouchProbability"/> that applies all necessary <see cref="TouchHandSequenceSkill"/>s.
+        /// Evaluates the strain of a <see cref="TouchHandSequenceProbability"/> that applies all necessary <see cref="TouchHandSequenceSkill"/>s.
         /// </summary>
-        /// <param name="probability">The <see cref="TouchProbability"/> to compute for.</param>
-        /// <returns>The strain of the <see cref="TouchProbability"/> that applies all necessary <see cref="TouchHandSequenceSkill"/>s.</returns>
-        protected abstract double GetProbabilityTotalStrain(TouchProbability probability);
+        /// <param name="probability">The <see cref="TouchHandSequenceProbability"/> to compute for.</param>
+        /// <returns>The strain of the <see cref="TouchHandSequenceProbability"/> that applies all necessary <see cref="TouchHandSequenceSkill"/>s.</returns>
+        protected abstract double GetProbabilityTotalStrain(TouchHandSequenceProbability probability);
     }
 }

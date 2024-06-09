@@ -34,9 +34,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Touch
             return currentStrain;
         }
 
-        protected override double GetProbabilityStrain(TouchProbability probability) => probability.Skills[0].CurrentStrain;
+        protected override double GetProbabilityStrain(TouchHandSequenceProbability probability) => probability.Skills[0].CurrentStrain;
 
-        protected override double GetProbabilityTotalStrain(TouchProbability probability) => CalculateTotalStrain(GetProbabilityStrain(probability), probability.Skills[1].CurrentStrain);
+        protected override double GetProbabilityTotalStrain(TouchHandSequenceProbability probability) => CalculateTotalStrain(GetProbabilityStrain(probability), probability.Skills[1].CurrentStrain);
 
         protected override TouchHandSequenceSkill[] GetHandSequenceSkills() => new TouchHandSequenceSkill[]
         {

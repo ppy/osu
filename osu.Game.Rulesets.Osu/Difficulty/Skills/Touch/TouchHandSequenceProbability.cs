@@ -6,17 +6,17 @@ using osu.Game.Rulesets.Osu.Difficulty.Utils;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Touch
 {
-    public class TouchProbability
+    public class TouchHandSequenceProbability
     {
         public double Probability = 1;
         public readonly TouchHandSequenceSkill[] Skills;
 
-        public TouchProbability(TouchHandSequenceSkill[] skills)
+        public TouchHandSequenceProbability(TouchHandSequenceSkill[] skills)
         {
             Skills = skills;
         }
 
-        public TouchProbability(TouchProbability copy)
+        public TouchHandSequenceProbability(TouchHandSequenceProbability copy)
         {
             Probability = copy.Probability;
             Skills = new TouchHandSequenceSkill[copy.Skills.Length];
