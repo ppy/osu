@@ -42,6 +42,17 @@ namespace osu.Game.Screens.Edit.Timing
             {
                 if (!isRebinding) ChangeHandler?.SaveState();
             }
+
+            bpmTextEntry.Bindable.BindValueChanged(val =>
+            {
+                if (ControlPoint.Value == null)
+                    return;
+
+                ChangeHandler?.BeginChange();
+                ControlPoint.Value.SetHitObjectBPM(Beatmap, val.OldValue);
+                Beatmap.UpdateAllHitObjects();
+                ChangeHandler?.EndChange();
+            });
         }
 
         private bool isRebinding;
