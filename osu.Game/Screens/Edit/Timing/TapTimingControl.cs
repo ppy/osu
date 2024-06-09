@@ -37,8 +37,6 @@ namespace osu.Game.Screens.Edit.Timing
 
         private MetronomeDisplay metronome = null!;
 
-        private LabelledSwitchButton adjustPlacedNotes = null!;
-
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider, OsuColour colours)
         {
@@ -64,7 +62,6 @@ namespace osu.Game.Screens.Edit.Timing
                     RowDimensions = new[]
                     {
                         new Dimension(GridSizeMode.Absolute, 200),
-                        new Dimension(GridSizeMode.Absolute, 50),
                         new Dimension(GridSizeMode.Absolute, 50),
                         new Dimension(GridSizeMode.Absolute, TapButton.SIZE + padding),
                     },
@@ -119,18 +116,6 @@ namespace osu.Game.Screens.Edit.Timing
                                         Size = new Vector2(0.48f, 1),
                                         Action = adjustBpm,
                                     }
-                                }
-                            },
-                        },
-                        new Drawable[]
-                        {
-                            new Container
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                Padding = new MarginPadding { Bottom = padding, Horizontal = padding },
-                                Children = new Drawable[]
-                                {
-                                    adjustPlacedNotes = new LabelledSwitchButton { Label = "Move already placed notes\nwhen changing the offset/BPM" },
                                 }
                             },
                         },
@@ -227,7 +212,7 @@ namespace osu.Game.Screens.Edit.Timing
 
             foreach (var cp in currentGroupItems)
             {
-                if (adjustPlacedNotes.Current.Value && cp is TimingControlPoint tp)
+                if (beatmap.AdjustNotesOnOffsetBPMChange.Value && cp is TimingControlPoint tp)
                     tp.AdjustHitObjectOffset(beatmap, adjust);
                 beatmap.ControlPointInfo.Add(newOffset, cp);
             }
@@ -249,12 +234,10 @@ namespace osu.Game.Screens.Edit.Timing
             if (timing == null)
                 return;
 
-            double newBeatLength = 60000 / (timing.BPM + adjust);
+            timing.BeatLength = 60000 / (timing.BPM + adjust);
 
-            if (adjustPlacedNotes.Current.Value)
-                timing.SetHitObjectBPM(beatmap, newBeatLength);
-
-            timing.BeatLength = newBeatLength;
+            if (beatmap.AdjustNotesOnOffsetBPMChange.Value)
+                timing.SetHitObjectBPM(beatmap, 60000 / (timing.BPM - adjust));
 
             beatmap.UpdateAllHitObjects();
         }

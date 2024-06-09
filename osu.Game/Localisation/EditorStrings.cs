@@ -40,6 +40,11 @@ namespace osu.Game.Localisation
         public static LocalisableString SetPreviewPointToCurrent => new TranslatableString(getKey(@"set_preview_point_to_current"), @"Set preview point to current time");
 
         /// <summary>
+        /// "Move already placed notes when changing the offset / BPM"
+        /// </summary>
+        public static LocalisableString AdjustNotesOnOffsetBPMChange => new TranslatableString(getKey(@"adjust_notes_on_offset_bpm_change"), @"Move already placed notes when changing the offset / BPM");
+
+        /// <summary>
         /// "For editing (.olz)"
         /// </summary>
         public static LocalisableString ExportForEditing => new TranslatableString(getKey(@"export_for_editing"), @"For editing (.olz)");
