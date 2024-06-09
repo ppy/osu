@@ -11,6 +11,11 @@ using osu.Game.Rulesets.Osu.Difficulty.Utils;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Touch
 {
+    /// <summary>
+    /// Processes <see cref="OsuDifficultyHitObject"/>s similar to <see cref="OsuStrainSkill"/>, but takes Touch
+    /// Device gameplay environment into account, where the player can use two hands (or "cursors") to press
+    /// <see cref="OsuDifficultyHitObject"/>s as opposed to just one cursor.
+    /// </summary>
     public abstract class TouchSkill : OsuStrainSkill
     {
         private const int maximum_probabilities = 15;
