@@ -128,16 +128,16 @@ namespace osu.Game.Beatmaps.ControlPoints
             }
         }
 
-        public void SetHitObjectBPM(IBeatmap beatmap, double newBeatLength)
+        public void SetHitObjectBPM(IBeatmap beatmap, double oldBeatLength)
         {
             foreach (HitObject hitObject in HitObjectsInTimingRange(beatmap))
             {
-                double beat = (hitObject.StartTime - Time) / BeatLength;
+                double beat = (hitObject.StartTime - Time) / oldBeatLength;
 
-                hitObject.StartTime = (beat * newBeatLength) + Time;
+                hitObject.StartTime = (beat * BeatLength) + Time;
 
                 if (hitObject is not IHasRepeats && hitObject is IHasDuration hitObjectWithDuration)
-                    hitObjectWithDuration.Duration *= newBeatLength / BeatLength;
+                    hitObjectWithDuration.Duration *= BeatLength / oldBeatLength;
             }
         }
     }
