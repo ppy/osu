@@ -45,7 +45,7 @@ namespace osu.Game.Screens.Edit.Timing
 
             bpmTextEntry.Bindable.BindValueChanged(val =>
             {
-                if (ControlPoint.Value == null)
+                if (!Beatmap.AdjustNotesOnOffsetBPMChange.Value || ControlPoint.Value == null)
                     return;
 
                 ChangeHandler?.BeginChange();
