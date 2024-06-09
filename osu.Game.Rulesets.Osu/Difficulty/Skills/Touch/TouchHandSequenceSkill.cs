@@ -12,7 +12,7 @@ using osu.Game.Utils;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Touch
 {
-    public abstract class RawTouchSkill : IDeepCloneable<RawTouchSkill>
+    public abstract class TouchHandSequenceSkill : IDeepCloneable<TouchHandSequenceSkill>
     {
         protected virtual double StrainDecayBase => 0.15;
 
@@ -32,7 +32,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Touch
         protected TouchHand LastHand { get; private set; } = TouchHand.Right;
         protected TouchHand LastNonDragHand { get; private set; } = TouchHand.Right;
 
-        protected RawTouchSkill(double clockRate)
+        protected TouchHandSequenceSkill(double clockRate)
         {
             this.clockRate = clockRate;
 
@@ -43,7 +43,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Touch
             lastRightDifficultyObjects = new List<DifficultyHitObject>();
         }
 
-        protected RawTouchSkill(RawTouchSkill copy)
+        protected TouchHandSequenceSkill(TouchHandSequenceSkill copy)
         {
             CurrentStrain = copy.CurrentStrain;
             LastHand = copy.LastHand;
@@ -205,6 +205,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Touch
         /// <returns>The strain value of the <see cref="OsuDifficultyHitObject"/>.</returns>
         protected abstract double StrainValueIf(OsuDifficultyHitObject simulated, TouchHand currentHand);
 
-        public abstract RawTouchSkill DeepClone();
+        public abstract TouchHandSequenceSkill DeepClone();
     }
 }

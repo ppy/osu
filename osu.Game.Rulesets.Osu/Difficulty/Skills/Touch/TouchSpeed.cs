@@ -50,10 +50,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Touch
 
         protected override double GetProbabilityTotalStrain(TouchProbability probability) => CalculateTotalStrain(probability.Skills[0].CurrentStrain, GetProbabilityStrain(probability));
 
-        protected override RawTouchSkill[] GetRawSkills() => new RawTouchSkill[]
+        protected override TouchHandSequenceSkill[] GetHandSequenceSkills() => new TouchHandSequenceSkill[]
         {
-            new RawTouchAim(clockRate, true),
-            new RawTouchSpeed(clockRate),
+            new TouchHandSequenceAim(clockRate, true),
+            new TouchHandSequenceSpeed(clockRate),
         };
 
         public double RelevantNoteCount()

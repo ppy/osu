@@ -11,19 +11,19 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Touch
 {
-    public class RawTouchAim : RawTouchSkill
+    public class TouchHandSequenceAim : TouchHandSequenceSkill
     {
         private readonly bool withSliders;
 
         private double skillMultiplier => 23.55;
 
-        public RawTouchAim(double clockRate, bool withSliders)
+        public TouchHandSequenceAim(double clockRate, bool withSliders)
             : base(clockRate)
         {
             this.withSliders = withSliders;
         }
 
-        private RawTouchAim(RawTouchAim copy)
+        private TouchHandSequenceAim(TouchHandSequenceAim copy)
             : base(copy)
         {
             withSliders = copy.withSliders;
@@ -85,6 +85,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Touch
             return Math.Abs(Math.Atan2(det, dot));
         }
 
-        public override RawTouchAim DeepClone() => new RawTouchAim(this);
+        public override TouchHandSequenceAim DeepClone() => new TouchHandSequenceAim(this);
     }
 }

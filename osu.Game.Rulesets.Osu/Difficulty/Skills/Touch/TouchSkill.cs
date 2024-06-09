@@ -32,7 +32,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Touch
 
             if (current.Index == 0)
             {
-                var probability = new TouchProbability(GetRawSkills());
+                var probability = new TouchProbability(GetHandSequenceSkills());
 
                 // Process the first object to add to history.
                 probability.Process(osuCurrent, TouchHand.Drag);
@@ -109,10 +109,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Touch
         protected double CalculateTotalStrain(double aimStrain, double speedStrain) => Math.Pow(Math.Pow(aimStrain, 1.5) + Math.Pow(speedStrain, 1.5), 2.0 / 3);
 
         /// <summary>
-        /// Obtains the <see cref="RawTouchSkill"/>s to be computed by this <see cref="TouchSkill"/>.
+        /// Obtains the <see cref="TouchHandSequenceSkill"/>s to be computed by this <see cref="TouchSkill"/>.
         /// </summary>
-        /// <returns>The <see cref="RawTouchSkill"/>s to compute.</returns>
-        protected abstract RawTouchSkill[] GetRawSkills();
+        /// <returns>The <see cref="TouchHandSequenceSkill"/>s to compute.</returns>
+        protected abstract TouchHandSequenceSkill[] GetHandSequenceSkills();
 
         /// <summary>
         /// Evaluates the strain of a <see cref="TouchProbability"/> that is specific to the skillset that this <see cref="TouchSkill"/> represents.
@@ -122,10 +122,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Touch
         protected abstract double GetProbabilityStrain(TouchProbability probability);
 
         /// <summary>
-        /// Evaluates the strain of a <see cref="TouchProbability"/> that applies all necessary <see cref="RawTouchSkill"/>s.
+        /// Evaluates the strain of a <see cref="TouchProbability"/> that applies all necessary <see cref="TouchHandSequenceSkill"/>s.
         /// </summary>
         /// <param name="probability">The <see cref="TouchProbability"/> to compute for.</param>
-        /// <returns>The strain of the <see cref="TouchProbability"/> that applies all necessary <see cref="RawTouchSkill"/>s.</returns>
+        /// <returns>The strain of the <see cref="TouchProbability"/> that applies all necessary <see cref="TouchHandSequenceSkill"/>s.</returns>
         protected abstract double GetProbabilityTotalStrain(TouchProbability probability);
     }
 }

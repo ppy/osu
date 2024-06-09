@@ -7,17 +7,17 @@ using osu.Game.Rulesets.Osu.Difficulty.Utils;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Touch
 {
-    public class RawTouchSpeed : RawTouchSkill
+    public class TouchHandSequenceSpeed : TouchHandSequenceSkill
     {
         private double skillMultiplier => 1375;
         protected override double StrainDecayBase => 0.3;
 
-        public RawTouchSpeed(double clockRate)
+        public TouchHandSequenceSpeed(double clockRate)
             : base(clockRate)
         {
         }
 
-        private RawTouchSpeed(RawTouchSpeed copy)
+        private TouchHandSequenceSpeed(TouchHandSequenceSpeed copy)
             : base(copy)
         {
         }
@@ -46,6 +46,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Touch
             return SpeedEvaluator.EvaluateDifficultyOf(simulated, tappedWithTouch) * singletapMultiplier * bonusMultiplier * skillMultiplier;
         }
 
-        public override RawTouchSpeed DeepClone() => new RawTouchSpeed(this);
+        public override TouchHandSequenceSpeed DeepClone() => new TouchHandSequenceSpeed(this);
     }
 }

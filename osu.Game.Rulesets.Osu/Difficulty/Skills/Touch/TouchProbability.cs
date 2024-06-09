@@ -9,9 +9,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Touch
     public class TouchProbability
     {
         public double Probability = 1;
-        public readonly RawTouchSkill[] Skills;
+        public readonly TouchHandSequenceSkill[] Skills;
 
-        public TouchProbability(RawTouchSkill[] skills)
+        public TouchProbability(TouchHandSequenceSkill[] skills)
         {
             Skills = skills;
         }
@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Touch
         public TouchProbability(TouchProbability copy)
         {
             Probability = copy.Probability;
-            Skills = new RawTouchSkill[copy.Skills.Length];
+            Skills = new TouchHandSequenceSkill[copy.Skills.Length];
 
             for (int i = 0; i < Skills.Length; i++)
                 Skills[i] = copy.Skills[i].DeepClone();
