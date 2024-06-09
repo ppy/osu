@@ -116,6 +116,11 @@ namespace osu.Game.Tests.Visual.UserInterface
         private partial class TestModSelectOverlay : UserModSelectOverlay
         {
             protected override bool ShowPresets => true;
+
+            public TestModSelectOverlay()
+                : base(OverlayColourScheme.Aquamarine)
+            {
+            }
         }
 
         private partial class TestScreenFooterButtonMods : ScreenFooterButtonMods
