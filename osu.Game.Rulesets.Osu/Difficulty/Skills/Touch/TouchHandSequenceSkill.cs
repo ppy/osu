@@ -45,7 +45,17 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Touch
         private const int maximum_objects_history = 2;
         private const int maximum_difficulty_objects_history = 3;
 
+        /// <summary>
+        /// The hand that hits the previously processed <see cref="OsuHitObject"/>.
+        /// </summary>
         protected TouchHand LastHand { get; private set; } = TouchHand.Right;
+
+        /// <summary>
+        /// The hand that hits the previously processed <see cref="OsuHitObject"/>.
+        /// </summary>
+        /// <remarks>
+        /// Unlike <see cref="LastHand"/>, this does not consider <see cref="TouchHand.Drag"/> as a hand.
+        /// </remarks>
         protected TouchHand LastNonDragHand { get; private set; } = TouchHand.Right;
 
         protected TouchHandSequenceSkill(double clockRate)
