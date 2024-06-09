@@ -7,6 +7,9 @@ using osu.Game.Rulesets.Osu.Difficulty.Utils;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Touch
 {
+    /// <summary>
+    /// Evaluates the speed difficulty of an <see cref="OsuDifficultyHitObject"/> if it was hit with a specific <see cref="TouchHand"/>.
+    /// </summary>
     public class TouchHandSequenceSpeed : TouchHandSequenceSkill
     {
         private double skillMultiplier => 1375;

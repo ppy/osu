@@ -12,6 +12,22 @@ using osu.Game.Utils;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Touch
 {
+    /// <summary>
+    /// Represents a sequence of hand movement that hit <see cref="OsuHitObject"/>s.
+    /// <para>
+    /// In touch device gameplay, a player may hit <see cref="OsuHitObject"/>s with two hands, which can be
+    /// treated as having two cursors instead of one. As such, a hand may not hit every <see cref="OsuHitObject"/>s
+    /// in a beatmap. This means that treating all <see cref="OsuHitObject"/>s to be hit sequentially by one cursor,
+    /// similar to non-touch device gameplay difficulty assessment, is inaccurate.
+    /// </para>
+    /// <para>
+    /// This class keeps track of previous <see cref="OsuHitObject"/>s that were hit by a hand and use them to
+    /// simulate an <see cref="OsuDifficultyHitObject"/> if it is hit by a specific hand. The simulated
+    /// <see cref="OsuDifficultyHitObject"/> uses the previous <see cref="OsuHitObject"/>s that were hit by the
+    /// hand to obtain the correct difficulty properties (e.g. distance, angle) of the <see cref="OsuHitObject"/>,
+    /// which improves the accuracy of the assessment.
+    /// </para>
+    /// </summary>
     public abstract class TouchHandSequenceSkill : IDeepCloneable<TouchHandSequenceSkill>
     {
         protected virtual double StrainDecayBase => 0.15;

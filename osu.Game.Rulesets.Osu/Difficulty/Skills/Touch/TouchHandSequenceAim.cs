@@ -11,6 +11,9 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Touch
 {
+    /// <summary>
+    /// Evaluates the aim difficulty of an <see cref="OsuDifficultyHitObject"/> if it was hit with a specific <see cref="TouchHand"/>.
+    /// </summary>
     public class TouchHandSequenceAim : TouchHandSequenceSkill
     {
         private readonly bool withSliders;
