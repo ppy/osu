@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -8,7 +9,12 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Input.Bindings;
+using osu.Framework.Input.Events;
+using osu.Game.Graphics.Containers;
+using osu.Game.Input.Bindings;
 using osu.Game.Overlays;
+using osu.Game.Screens.Menu;
 using osuTK;
 
 namespace osu.Game.Screens.Footer
@@ -22,19 +28,31 @@ namespace osu.Game.Screens.Footer
 
         private readonly List<OverlayContainer> overlays = new List<OverlayContainer>();
 
+        private ScreenBackButton backButton = null!;
         private FillFlowContainer<ScreenFooterButton> buttonsFlow = null!;
         private Container<ScreenFooterButton> removedButtonsContainer = null!;
+        private LogoTrackingContainer logoTrackingContainer = null!;
 
-        public ScreenFooter()
+        [Cached]
+        private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Aquamarine);
+
+        public Action? OnBack;
+
+        public ScreenFooter(BackReceptor? receptor = null)
         {
             RelativeSizeAxes = Axes.X;
             Height = HEIGHT;
             Anchor = Anchor.BottomLeft;
             Origin = Anchor.BottomLeft;
+
+            if (receptor == null)
+                Add(receptor = new BackReceptor());
+
+            receptor.OnBackPressed = () => backButton.TriggerClick();
         }
 
         [BackgroundDependencyLoader]
-        private void load(OverlayColourProvider colourProvider)
+        private void load()
         {
             InternalChildren = new Drawable[]
             {
@@ -53,12 +71,12 @@ namespace osu.Game.Screens.Footer
                     Spacing = new Vector2(7, 0),
                     AutoSizeAxes = Axes.Both
                 },
-                new ScreenBackButton
+                backButton = new ScreenBackButton
                 {
                     Margin = new MarginPadding { Bottom = 10f, Left = 12f },
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.BottomLeft,
-                    Action = () => { },
+                    Action = () => OnBack?.Invoke(),
                 },
                 removedButtonsContainer = new Container<ScreenFooterButton>
                 {
@@ -68,8 +86,20 @@ namespace osu.Game.Screens.Footer
                     Origin = Anchor.BottomLeft,
                     AutoSizeAxes = Axes.Both,
                 },
+                (logoTrackingContainer = new LogoTrackingContainer
+                {
+                    RelativeSizeAxes = Axes.Both,
+                }).WithChild(logoTrackingContainer.LogoFacade.With(f =>
+                {
+                    f.Anchor = Anchor.BottomRight;
+                    f.Origin = Anchor.Centre;
+                    f.Position = new Vector2(-76, -36);
+                })),
             };
         }
+
+        public void StartTrackingLogo(OsuLogo logo, float duration = 0, Easing easing = Easing.None) => logoTrackingContainer.StartTracking(logo, duration, easing);
+        public void StopTrackingLogo() => logoTrackingContainer.StopTracking();
 
         protected override void PopIn()
         {
@@ -148,6 +178,30 @@ namespace osu.Game.Screens.Footer
                     o.ToggleVisibility();
                 else
                     o.Hide();
+            }
+        }
+
+        public partial class BackReceptor : Drawable, IKeyBindingHandler<GlobalAction>
+        {
+            public Action? OnBackPressed;
+
+            public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
+            {
+                if (e.Repeat)
+                    return false;
+
+                switch (e.Action)
+                {
+                    case GlobalAction.Back:
+                        OnBackPressed?.Invoke();
+                        return true;
+                }
+
+                return false;
+            }
+
+            public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
+            {
             }
         }
     }

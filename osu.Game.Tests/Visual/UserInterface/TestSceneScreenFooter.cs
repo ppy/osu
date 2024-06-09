@@ -3,7 +3,6 @@
 
 using System;
 using NUnit.Framework;
-using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Testing;
@@ -18,9 +17,6 @@ namespace osu.Game.Tests.Visual.UserInterface
     {
         private ScreenFooter screenFooter = null!;
         private TestModSelectOverlay overlay = null!;
-
-        [Cached]
-        private OverlayColourProvider colourProvider { get; set; } = new OverlayColourProvider(OverlayColourScheme.Aquamarine);
 
         [SetUp]
         public void SetUp() => Schedule(() =>
@@ -89,6 +85,11 @@ namespace osu.Game.Tests.Visual.UserInterface
         private partial class TestModSelectOverlay : UserModSelectOverlay
         {
             protected override bool ShowPresets => true;
+
+            public TestModSelectOverlay()
+                : base(OverlayColourScheme.Aquamarine)
+            {
+            }
         }
     }
 }
