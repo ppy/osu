@@ -78,7 +78,7 @@ namespace osu.Game.Screens.Edit
                 }
             };
 
-            saveInProgress = editor.SaveTracker.InProgress.GetBoundCopy();
+            saveInProgress = editor.MutationTracker.InProgress.GetBoundCopy();
         }
 
         protected override void LoadComplete()

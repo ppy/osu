@@ -6,6 +6,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using JetBrains.Annotations;
 using osu.Framework;
 using osu.Framework.Allocation;
@@ -35,6 +36,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
 using osu.Game.Localisation;
 using osu.Game.Online.API;
+using osu.Game.Online.Multiplayer;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Overlays.OSD;
@@ -144,7 +146,12 @@ namespace osu.Game.Screens.Edit
 
         private bool canSave;
         private readonly List<MenuItem> saveRelatedMenuItems = new List<MenuItem>();
-        public OngoingOperationTracker SaveTracker { get; private set; } = new OngoingOperationTracker();
+
+        /// <summary>
+        /// Tracks ongoing mutually-exclusive operations related to changing the beatmap
+        /// (e.g. save, export).
+        /// </summary>
+        public OngoingOperationTracker MutationTracker { get; } = new OngoingOperationTracker();
 
         protected bool ExitConfirmed { get; private set; }
 
@@ -385,7 +392,7 @@ namespace osu.Game.Screens.Edit
                         },
                     },
                     bottomBar = new BottomBar(),
-                    SaveTracker,
+                    MutationTracker,
                 }
             });
             changeHandler?.CanUndo.BindValueChanged(v => undoMenuItem.Action.Disabled = !v.NewValue, true);
@@ -407,10 +414,10 @@ namespace osu.Game.Screens.Edit
 
             musicController.TrackChanged += onTrackChanged;
 
-            SaveTracker.InProgress.BindValueChanged(_ =>
+            MutationTracker.InProgress.BindValueChanged(_ =>
             {
                 foreach (var item in saveRelatedMenuItems)
-                    item.Action.Disabled = SaveTracker.InProgress.Value;
+                    item.Action.Disabled = MutationTracker.InProgress.Value;
             }, true);
         }
 
@@ -450,17 +457,13 @@ namespace osu.Game.Screens.Edit
         {
             if (HasUnsavedChanges)
             {
-                dialogOverlay.Push(new SaveRequiredPopupDialog("The beatmap will be saved in order to test it.", () =>
+                dialogOverlay.Push(new SaveRequiredPopupDialog("The beatmap will be saved in order to test it.", () => attemptMutationOperation(() =>
                 {
-                    if (SaveTracker.InProgress.Value) return;
+                    if (!Save()) return false;
 
-                    using (SaveTracker.BeginOperation())
-                    {
-                        if (!Save()) return;
-
-                        pushEditorPlayer();
-                    }
-                }));
+                    pushEditorPlayer();
+                    return true;
+                })));
             }
             else
             {
@@ -468,6 +471,26 @@ namespace osu.Game.Screens.Edit
             }
 
             void pushEditorPlayer() => this.Push(new EditorPlayerLoader(this));
+        }
+
+        private bool attemptMutationOperation(Func<bool> mutationOperation)
+        {
+            if (MutationTracker.InProgress.Value)
+                return false;
+
+            using (MutationTracker.BeginOperation())
+                return mutationOperation.Invoke();
+        }
+
+        private bool attemptAsyncMutationOperation(Func<Task> mutationTask)
+        {
+            if (MutationTracker.InProgress.Value)
+                return false;
+
+            var operation = MutationTracker.BeginOperation();
+            var task = mutationTask.Invoke();
+            task.FireAndForget(operation.Dispose, _ => operation.Dispose());
+            return true;
         }
 
         /// <summary>
@@ -535,12 +558,7 @@ namespace osu.Game.Screens.Edit
                     if (e.Repeat)
                         return false;
 
-                    if (SaveTracker.InProgress.Value)
-                        return false;
-
-                    using (SaveTracker.BeginOperation())
-                        Save();
-                    return true;
+                    return attemptMutationOperation(Save);
             }
 
             return false;
@@ -806,13 +824,8 @@ namespace osu.Game.Screens.Edit
 
         private void confirmExitWithSave()
         {
-            if (SaveTracker.InProgress.Value) return;
-
-            using (SaveTracker.BeginOperation())
-            {
-                if (!Save())
-                    return;
-            }
+            if (!attemptMutationOperation(Save))
+                return;
 
             ExitConfirmed = true;
             this.Exit();
@@ -1053,13 +1066,7 @@ namespace osu.Game.Screens.Edit
             yield return new EditorMenuItem(EditorStrings.DeleteDifficulty, MenuItemType.Standard, deleteDifficulty) { Action = { Disabled = Beatmap.Value.BeatmapSetInfo.Beatmaps.Count < 2 } };
             yield return new OsuMenuItemSpacer();
 
-            var save = new EditorMenuItem(WebCommonStrings.ButtonsSave, MenuItemType.Standard, () =>
-            {
-                if (SaveTracker.InProgress.Value) return;
-
-                using (SaveTracker.BeginOperation())
-                    Save();
-            });
+            var save = new EditorMenuItem(WebCommonStrings.ButtonsSave, MenuItemType.Standard, () => attemptMutationOperation(Save));
             saveRelatedMenuItems.Add(save);
             yield return save;
 
@@ -1089,37 +1096,25 @@ namespace osu.Game.Screens.Edit
         {
             if (HasUnsavedChanges)
             {
-                dialogOverlay.Push(new SaveRequiredPopupDialog("The beatmap will be saved in order to export it.", () =>
+                dialogOverlay.Push(new SaveRequiredPopupDialog("The beatmap will be saved in order to export it.", () => attemptAsyncMutationOperation(() =>
                 {
-                    if (SaveTracker.InProgress.Value)
-                        return;
-
-                    var operation = SaveTracker.BeginOperation();
-
                     if (!Save())
-                    {
-                        operation.Dispose();
-                        return;
-                    }
+                        return Task.CompletedTask;
 
-                    runExport(operation);
-                }));
+                    return runExport();
+                })));
             }
             else
             {
-                if (SaveTracker.InProgress.Value)
-                    return;
-
-                runExport(SaveTracker.BeginOperation());
+                attemptAsyncMutationOperation(runExport);
             }
 
-            void runExport(IDisposable operationInProgress)
+            Task runExport()
             {
-                var task = legacy
-                    ? beatmapManager.ExportLegacy(Beatmap.Value.BeatmapSetInfo)
-                    : beatmapManager.Export(Beatmap.Value.BeatmapSetInfo);
-
-                task.ContinueWith(_ => operationInProgress.Dispose());
+                if (legacy)
+                    return beatmapManager.ExportLegacy(Beatmap.Value.BeatmapSetInfo);
+                else
+                    return beatmapManager.Export(Beatmap.Value.BeatmapSetInfo);
             }
         }
 
@@ -1181,16 +1176,14 @@ namespace osu.Game.Screens.Edit
             {
                 dialogOverlay.Push(new SaveRequiredPopupDialog("This beatmap will be saved in order to create another difficulty.", () =>
                 {
-                    if (SaveTracker.InProgress.Value)
-                        return;
-
-                    using (SaveTracker.BeginOperation())
+                    attemptMutationOperation(() =>
                     {
                         if (!Save())
-                            return;
+                            return false;
 
                         CreateNewDifficulty(rulesetInfo);
-                    }
+                        return true;
+                    });
                 }));
 
                 return;
