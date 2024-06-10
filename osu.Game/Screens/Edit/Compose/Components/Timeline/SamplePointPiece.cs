@@ -39,7 +39,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         public bool AlternativeColor { get; init; }
 
-        protected override Color4 GetRepresentingColour(OsuColour colours) => AlternativeColor ? colours.PinkDarker : colours.Pink;
+        protected override Color4 GetRepresentingColour(OsuColour colours) => AlternativeColor ? colours.Pink2 : colours.Pink1;
 
         [BackgroundDependencyLoader]
         private void load()
