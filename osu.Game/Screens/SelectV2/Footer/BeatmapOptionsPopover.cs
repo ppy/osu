@@ -20,7 +20,6 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Localisation;
 using osu.Game.Overlays;
-using osu.Game.Screens.Select;
 using osuTK;
 using osuTK.Graphics;
 using osuTK.Input;
@@ -33,18 +32,22 @@ namespace osu.Game.Screens.SelectV2.Footer
         private FillFlowContainer buttonFlow = null!;
         private readonly ScreenFooterButtonOptions footerButton;
 
+        [Cached]
+        private readonly OverlayColourProvider colourProvider;
+
         private WorkingBeatmap beatmapWhenOpening = null!;
 
         [Resolved]
         private IBindable<WorkingBeatmap> beatmap { get; set; } = null!;
 
-        public BeatmapOptionsPopover(ScreenFooterButtonOptions footerButton)
+        public BeatmapOptionsPopover(ScreenFooterButtonOptions footerButton, OverlayColourProvider colourProvider)
         {
             this.footerButton = footerButton;
+            this.colourProvider = colourProvider;
         }
 
         [BackgroundDependencyLoader]
-        private void load(ManageCollectionsDialog? manageCollectionsDialog, SongSelect? songSelect, OsuColour colours, BeatmapManager? beatmapManager)
+        private void load(ManageCollectionsDialog? manageCollectionsDialog, OsuColour colours, BeatmapManager? beatmapManager)
         {
             Content.Padding = new MarginPadding(5);
 
@@ -61,15 +64,15 @@ namespace osu.Game.Screens.SelectV2.Footer
             addButton(SongSelectStrings.ManageCollections, FontAwesome.Solid.Book, () => manageCollectionsDialog?.Show());
 
             addHeader(SongSelectStrings.ForAllDifficulties, beatmapWhenOpening.BeatmapSetInfo.ToString());
-            addButton(SongSelectStrings.DeleteBeatmap, FontAwesome.Solid.Trash, () => songSelect?.DeleteBeatmap(beatmapWhenOpening.BeatmapSetInfo), colours.Red1);
+            addButton(SongSelectStrings.DeleteBeatmap, FontAwesome.Solid.Trash, () => { }, colours.Red1); // songSelect?.DeleteBeatmap(beatmapWhenOpening.BeatmapSetInfo);
 
             addHeader(SongSelectStrings.ForSelectedDifficulty, beatmapWhenOpening.BeatmapInfo.DifficultyName);
             // TODO: make work, and make show "unplayed" or "played" based on status.
             addButton(SongSelectStrings.MarkAsPlayed, FontAwesome.Regular.TimesCircle, null);
-            addButton(SongSelectStrings.ClearAllLocalScores, FontAwesome.Solid.Eraser, () => songSelect?.ClearScores(beatmapWhenOpening.BeatmapInfo), colours.Red1);
+            addButton(SongSelectStrings.ClearAllLocalScores, FontAwesome.Solid.Eraser, () => { }, colours.Red1); // songSelect?.ClearScores(beatmapWhenOpening.BeatmapInfo);
 
-            if (songSelect != null && songSelect.AllowEditing)
-                addButton(SongSelectStrings.EditBeatmap, FontAwesome.Solid.PencilAlt, () => songSelect.Edit(beatmapWhenOpening.BeatmapInfo));
+            // if (songSelect != null && songSelect.AllowEditing)
+            addButton(SongSelectStrings.EditBeatmap, FontAwesome.Solid.PencilAlt, () => { }); // songSelect.Edit(beatmapWhenOpening.BeatmapInfo);
 
             addButton(WebCommonStrings.ButtonsHide.ToSentence(), FontAwesome.Solid.Magic, () => beatmapManager?.Hide(beatmapWhenOpening.BeatmapInfo));
         }
@@ -82,9 +85,6 @@ namespace osu.Game.Screens.SelectV2.Footer
 
             beatmap.BindValueChanged(_ => Hide());
         }
-
-        [Resolved]
-        private OverlayColourProvider overlayColourProvider { get; set; } = null!;
 
         private void addHeader(LocalisableString text, string? context = null)
         {
@@ -102,7 +102,7 @@ namespace osu.Game.Screens.SelectV2.Footer
                 textFlow.NewLine();
                 textFlow.AddText(context, t =>
                 {
-                    t.Colour = overlayColourProvider.Content2;
+                    t.Colour = colourProvider.Content2;
                     t.Font = t.Font.With(size: 13);
                 });
             }
