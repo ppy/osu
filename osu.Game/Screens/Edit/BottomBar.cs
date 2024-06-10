@@ -4,6 +4,7 @@
 #nullable disable
 
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -21,6 +22,8 @@ namespace osu.Game.Screens.Edit
     internal partial class BottomBar : CompositeDrawable
     {
         public TestGameplayButton TestGameplayButton { get; private set; }
+
+        private IBindable<bool> saveInProgress;
 
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider, Editor editor)
@@ -74,6 +77,15 @@ namespace osu.Game.Screens.Edit
                     }
                 }
             };
+
+            saveInProgress = editor.MutationTracker.InProgress.GetBoundCopy();
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            saveInProgress.BindValueChanged(_ => TestGameplayButton.Enabled.Value = !saveInProgress.Value, true);
         }
     }
 }
