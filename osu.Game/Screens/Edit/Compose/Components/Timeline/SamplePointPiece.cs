@@ -180,26 +180,35 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 if (commonVolume != null)
                     volume.Current.Value = commonVolume.Value;
 
-                updateBankPlaceholderText();
+                updatePrimaryBankState();
                 bank.Current.BindValueChanged(val =>
                 {
-                    updateBank(val.NewValue);
-                    updateBankPlaceholderText();
+                    if (string.IsNullOrEmpty(val.NewValue))
+                        return;
+
+                    setBank(val.NewValue);
+                    updatePrimaryBankState();
                 });
                 // on commit, ensure that the value is correct by sourcing it from the objects' samples again.
                 // this ensures that committing empty text causes a revert to the previous value.
-                bank.OnCommit += (_, _) => updateBankText();
+                bank.OnCommit += (_, _) => updatePrimaryBankState();
 
-                updateAdditionBankText();
-                updateAdditionBankVisual();
+                updateAdditionBankState();
                 additionBank.Current.BindValueChanged(val =>
                 {
-                    updateAdditionBank(val.NewValue);
-                    updateAdditionBankVisual();
-                });
-                additionBank.OnCommit += (_, _) => updateAdditionBankText();
+                    if (string.IsNullOrEmpty(val.NewValue))
+                        return;
 
-                volume.Current.BindValueChanged(val => updateVolume(val.NewValue));
+                    setAdditionBank(val.NewValue);
+                    updateAdditionBankState();
+                });
+                additionBank.OnCommit += (_, _) => updateAdditionBankState();
+
+                volume.Current.BindValueChanged(val =>
+                {
+                    if (val.NewValue != null)
+                        setVolume(val.NewValue.Value);
+                });
 
                 createStateBindables();
                 updateTernaryStates();
@@ -209,6 +218,26 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             private string? getCommonBank() => allRelevantSamples.Select(GetBankValue).Distinct().Count() == 1 ? GetBankValue(allRelevantSamples.First()) : null;
             private string? getCommonAdditionBank() => allRelevantSamples.Select(GetAdditionBankValue).Distinct().Count() == 1 ? GetAdditionBankValue(allRelevantSamples.First()) : null;
             private int? getCommonVolume() => allRelevantSamples.Select(GetVolumeValue).Distinct().Count() == 1 ? GetVolumeValue(allRelevantSamples.First()) : null;
+
+            private void updatePrimaryBankState()
+            {
+                string? commonBank = getCommonBank();
+                bank.Current.Value = commonBank;
+                bank.PlaceholderText = string.IsNullOrEmpty(commonBank) ? "(multiple)" : string.Empty;
+            }
+
+            private void updateAdditionBankState()
+            {
+                string? commonAdditionBank = getCommonAdditionBank();
+                additionBank.PlaceholderText = string.IsNullOrEmpty(commonAdditionBank) ? "(multiple)" : string.Empty;
+                additionBank.Current.Value = commonAdditionBank;
+
+                bool anyAdditions = allRelevantSamples.Any(o => o.Any(s => s.Name != HitSampleInfo.HIT_NORMAL));
+                if (anyAdditions)
+                    additionBank.Show();
+                else
+                    additionBank.Hide();
+            }
 
             /// <summary>
             /// Applies the given update action on all samples of <see cref="allRelevantSamples"/>
@@ -229,11 +258,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 beatmap.EndChange();
             }
 
-            private void updateBank(string? newBank)
+            private void setBank(string newBank)
             {
-                if (string.IsNullOrEmpty(newBank))
-                    return;
-
                 updateAllRelevantSamples((_, relevantSamples) =>
                 {
                     for (int i = 0; i < relevantSamples.Count; i++)
@@ -245,11 +271,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 });
             }
 
-            private void updateAdditionBank(string? newBank)
+            private void setAdditionBank(string newBank)
             {
-                if (string.IsNullOrEmpty(newBank))
-                    return;
-
                 updateAllRelevantSamples((_, relevantSamples) =>
                 {
                     for (int i = 0; i < relevantSamples.Count; i++)
@@ -261,47 +284,13 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 });
             }
 
-            private void updateBankText()
+            private void setVolume(int newVolume)
             {
-                bank.Current.Value = getCommonBank();
-            }
-
-            private void updateBankPlaceholderText()
-            {
-                string? commonBank = getCommonBank();
-                bank.PlaceholderText = string.IsNullOrEmpty(commonBank) ? "(multiple)" : string.Empty;
-            }
-
-            private void updateAdditionBankVisual()
-            {
-                string? commonAdditionBank = getCommonAdditionBank();
-                additionBank.PlaceholderText = string.IsNullOrEmpty(commonAdditionBank) ? "(multiple)" : string.Empty;
-
-                bool anyAdditions = allRelevantSamples.Any(o => o.Any(s => s.Name != HitSampleInfo.HIT_NORMAL));
-                if (anyAdditions)
-                    additionBank.Show();
-                else
-                    additionBank.Hide();
-            }
-
-            private void updateAdditionBankText()
-            {
-                string? commonAdditionBank = getCommonAdditionBank();
-                if (string.IsNullOrEmpty(commonAdditionBank)) return;
-
-                additionBank.Current.Value = commonAdditionBank;
-            }
-
-            private void updateVolume(int? newVolume)
-            {
-                if (newVolume == null)
-                    return;
-
                 updateAllRelevantSamples((_, relevantSamples) =>
                 {
                     for (int i = 0; i < relevantSamples.Count; i++)
                     {
-                        relevantSamples[i] = relevantSamples[i].With(newVolume: newVolume.Value);
+                        relevantSamples[i] = relevantSamples[i].With(newVolume: newVolume);
                     }
                 });
             }
@@ -371,8 +360,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                     relevantSamples.Add(relevantSample?.With(sampleName) ?? h.CreateHitSampleInfo(sampleName));
                 });
 
-                updateAdditionBankVisual();
-                updateAdditionBankText();
+                updateAdditionBankState();
             }
 
             private void removeHitSample(string sampleName)
@@ -389,8 +377,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                     }
                 });
 
-                updateAdditionBankText();
-                updateAdditionBankVisual();
+                updateAdditionBankState();
             }
 
             protected override bool OnKeyDown(KeyDownEvent e)
@@ -401,10 +388,14 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 if (e.ShiftPressed)
                 {
                     string? newBank = banks.ElementAtOrDefault(rightIndex);
-                    updateBank(newBank);
-                    updateBankText();
-                    updateAdditionBank(newBank);
-                    updateAdditionBankText();
+
+                    if (string.IsNullOrEmpty(newBank))
+                        return true;
+
+                    setBank(newBank);
+                    updatePrimaryBankState();
+                    setAdditionBank(newBank);
+                    updateAdditionBankState();
                 }
                 else
                 {
