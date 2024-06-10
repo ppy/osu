@@ -62,6 +62,10 @@ namespace osu.Game.Tests.Skins
             "Archives/modified-argon-20231108.osk",
             // Covers "Argon" performance points counter
             "Archives/modified-argon-20240305.osk",
+            // Covers default rank display
+            "Archives/modified-default-20230809.osk",
+            // Covers legacy rank display
+            "Archives/modified-classic-20230809.osk"
         };
 
         /// <summary>

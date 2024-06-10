@@ -55,7 +55,7 @@ namespace osu.Game.Screens.Footer
             set => icon.Icon = value;
         }
 
-        protected LocalisableString Text
+        public LocalisableString Text
         {
             set => text.Text = value;
         }
@@ -69,93 +69,103 @@ namespace osu.Game.Screens.Footer
         private readonly Box glowBox;
         private readonly Box flashLayer;
 
-        public ScreenFooterButton()
+        public readonly OverlayContainer? Overlay;
+
+        public ScreenFooterButton(OverlayContainer? overlay = null)
         {
+            Overlay = overlay;
+
             Size = new Vector2(BUTTON_WIDTH, BUTTON_HEIGHT);
 
-            Child = new Container
+            Children = new Drawable[]
             {
-                EdgeEffect = new EdgeEffectParameters
+                new Container
                 {
-                    Type = EdgeEffectType.Shadow,
-                    Radius = 4,
-                    // Figma says 50% opacity, but it does not match up visually if taken at face value, and looks bad.
-                    Colour = Colour4.Black.Opacity(0.25f),
-                    Offset = new Vector2(0, 2),
-                },
-                Shear = BUTTON_SHEAR,
-                Masking = true,
-                CornerRadius = CORNER_RADIUS,
-                RelativeSizeAxes = Axes.Both,
-                Children = new Drawable[]
-                {
-                    backgroundBox = new Box
+                    EdgeEffect = new EdgeEffectParameters
                     {
-                        RelativeSizeAxes = Axes.Both
+                        Type = EdgeEffectType.Shadow,
+                        Radius = 4,
+                        // Figma says 50% opacity, but it does not match up visually if taken at face value, and looks bad.
+                        Colour = Colour4.Black.Opacity(0.25f),
+                        Offset = new Vector2(0, 2),
                     },
-                    glowBox = new Box
+                    Shear = BUTTON_SHEAR,
+                    Masking = true,
+                    CornerRadius = CORNER_RADIUS,
+                    RelativeSizeAxes = Axes.Both,
+                    Children = new Drawable[]
                     {
-                        RelativeSizeAxes = Axes.Both
-                    },
-                    // For elements that should not be sheared.
-                    new Container
-                    {
-                        Anchor = Anchor.CentreLeft,
-                        Origin = Anchor.CentreLeft,
-                        Shear = -BUTTON_SHEAR,
-                        RelativeSizeAxes = Axes.Both,
-                        Children = new Drawable[]
+                        backgroundBox = new Box
                         {
-                            TextContainer = new Container
+                            RelativeSizeAxes = Axes.Both
+                        },
+                        glowBox = new Box
+                        {
+                            RelativeSizeAxes = Axes.Both
+                        },
+                        // For elements that should not be sheared.
+                        new Container
+                        {
+                            Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.CentreLeft,
+                            Shear = -BUTTON_SHEAR,
+                            RelativeSizeAxes = Axes.Both,
+                            Children = new Drawable[]
                             {
-                                Anchor = Anchor.TopCentre,
-                                Origin = Anchor.TopCentre,
-                                Y = 42,
-                                AutoSizeAxes = Axes.Both,
-                                Child = text = new OsuSpriteText
+                                TextContainer = new Container
                                 {
-                                    // figma design says the size is 16, but due to the issues with font sizes 19 matches better
-                                    Font = OsuFont.TorusAlternate.With(size: 19),
-                                    AlwaysPresent = true
-                                }
-                            },
-                            icon = new SpriteIcon
+                                    Anchor = Anchor.TopCentre,
+                                    Origin = Anchor.TopCentre,
+                                    Y = 42,
+                                    AutoSizeAxes = Axes.Both,
+                                    Child = text = new OsuSpriteText
+                                    {
+                                        // figma design says the size is 16, but due to the issues with font sizes 19 matches better
+                                        Font = OsuFont.TorusAlternate.With(size: 19),
+                                        AlwaysPresent = true
+                                    }
+                                },
+                                icon = new SpriteIcon
+                                {
+                                    Y = 12,
+                                    Size = new Vector2(20),
+                                    Anchor = Anchor.TopCentre,
+                                    Origin = Anchor.TopCentre
+                                },
+                            }
+                        },
+                        new Container
+                        {
+                            Shear = -BUTTON_SHEAR,
+                            Anchor = Anchor.BottomCentre,
+                            Origin = Anchor.Centre,
+                            Y = -CORNER_RADIUS,
+                            Size = new Vector2(120, 6),
+                            Masking = true,
+                            CornerRadius = 3,
+                            Child = bar = new Box
                             {
-                                Y = 12,
-                                Size = new Vector2(20),
-                                Anchor = Anchor.TopCentre,
-                                Origin = Anchor.TopCentre
-                            },
-                        }
-                    },
-                    new Container
-                    {
-                        Shear = -BUTTON_SHEAR,
-                        Anchor = Anchor.BottomCentre,
-                        Origin = Anchor.Centre,
-                        Y = -CORNER_RADIUS,
-                        Size = new Vector2(120, 6),
-                        Masking = true,
-                        CornerRadius = 3,
-                        Child = bar = new Box
+                                RelativeSizeAxes = Axes.Both,
+                            }
+                        },
+                        flashLayer = new Box
                         {
                             RelativeSizeAxes = Axes.Both,
-                        }
+                            Colour = Colour4.White.Opacity(0.9f),
+                            Blending = BlendingParameters.Additive,
+                            Alpha = 0,
+                        },
                     },
-                    flashLayer = new Box
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Colour = Colour4.White.Opacity(0.9f),
-                        Blending = BlendingParameters.Additive,
-                        Alpha = 0,
-                    },
-                },
+                }
             };
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
+
+            if (Overlay != null)
+                OverlayState.BindTo(Overlay.State);
 
             OverlayState.BindValueChanged(_ => updateDisplay());
             Enabled.BindValueChanged(_ => updateDisplay(), true);
@@ -214,6 +224,42 @@ namespace osu.Game.Screens.Footer
             bar.FadeColour(accentColour, 150, Easing.OutQuint);
 
             glowBox.FadeColour(ColourInfo.GradientVertical(buttonAccentColour.Opacity(0f), buttonAccentColour.Opacity(0.2f)), 150, Easing.OutQuint);
+        }
+
+        public void AppearFromLeft(double delay)
+        {
+            Content.MoveToX(-300f)
+                   .FadeOut()
+                   .Delay(delay)
+                   .MoveToX(0f, 240, Easing.OutCubic)
+                   .FadeIn(240, Easing.OutCubic);
+        }
+
+        public void AppearFromBottom(double delay)
+        {
+            Content.MoveToY(100f)
+                   .FadeOut()
+                   .Delay(delay)
+                   .MoveToY(0f, 240, Easing.OutCubic)
+                   .FadeIn(240, Easing.OutCubic);
+        }
+
+        public void DisappearToRightAndExpire(double delay)
+        {
+            Content.Delay(delay)
+                   .FadeOut(240, Easing.InOutCubic)
+                   .MoveToX(300f, 360, Easing.InOutCubic);
+
+            this.Delay(Content.LatestTransformEndTime - Time.Current).Expire();
+        }
+
+        public void DisappearToBottomAndExpire(double delay)
+        {
+            Content.Delay(delay)
+                   .FadeOut(240, Easing.InOutCubic)
+                   .MoveToY(100f, 240, Easing.InOutCubic);
+
+            this.Delay(Content.LatestTransformEndTime - Time.Current).Expire();
         }
     }
 }
