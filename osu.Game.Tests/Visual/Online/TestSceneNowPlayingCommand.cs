@@ -11,8 +11,8 @@ using osu.Game.Beatmaps;
 using osu.Game.Online.API;
 using osu.Game.Online.Chat;
 using osu.Game.Online.Rooms;
-using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Osu;
 using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual.Online
@@ -53,7 +53,7 @@ namespace osu.Game.Tests.Visual.Online
         [Test]
         public void TestPlayActivity()
         {
-            AddStep("Set activity", () => api.Activity.Value = new UserActivity.InSoloGame(new BeatmapInfo(), new RulesetInfo()));
+            AddStep("Set activity", () => api.Activity.Value = new UserActivity.InSoloGame(new BeatmapInfo(), new OsuRuleset().RulesetInfo));
 
             AddStep("Run command", () => Add(new NowPlayingCommand(new Channel())));
 
@@ -82,7 +82,7 @@ namespace osu.Game.Tests.Visual.Online
         [Test]
         public void TestModPresence()
         {
-            AddStep("Set activity", () => api.Activity.Value = new UserActivity.InSoloGame(new BeatmapInfo(), new RulesetInfo()));
+            AddStep("Set activity", () => api.Activity.Value = new UserActivity.InSoloGame(new BeatmapInfo(), new OsuRuleset().RulesetInfo));
 
             AddStep("Add Hidden mod", () => SelectedMods.Value = new[] { Ruleset.Value.CreateInstance().CreateMod<ModHidden>() });
 

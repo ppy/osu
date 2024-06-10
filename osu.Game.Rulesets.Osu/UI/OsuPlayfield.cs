@@ -1,16 +1,13 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Pooling;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
@@ -20,7 +17,6 @@ using osu.Game.Rulesets.Osu.Configuration;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects.Drawables.Connections;
-using osu.Game.Rulesets.Osu.Scoring;
 using osu.Game.Rulesets.Osu.UI.Cursor;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
@@ -36,14 +32,18 @@ namespace osu.Game.Rulesets.Osu.UI
         private readonly ProxyContainer spinnerProxies;
         private readonly JudgementContainer<DrawableOsuJudgement> judgementLayer;
 
+        private readonly JudgementPooler<DrawableOsuJudgement> judgementPooler;
+
+        // For osu! gameplay, everything is always on screen.
+        // Skipping masking calculations improves performance in intense beatmaps (ie. https://osu.ppy.sh/beatmapsets/150945#osu/372245)
+        public override bool UpdateSubTreeMasking() => false;
+
         public SmokeContainer Smoke { get; }
         public FollowPointRenderer FollowPoints { get; }
 
         public static readonly Vector2 BASE_SIZE = new Vector2(512, 384);
 
-        protected override GameplayCursorContainer CreateCursor() => new OsuCursorContainer();
-
-        private readonly IDictionary<HitResult, DrawablePool<DrawableOsuJudgement>> poolDictionary = new Dictionary<HitResult, DrawablePool<DrawableOsuJudgement>>();
+        protected override GameplayCursorContainer? CreateCursor() => new OsuCursorContainer();
 
         private readonly Container judgementAboveHitObjectLayer;
 
@@ -66,11 +66,15 @@ namespace osu.Game.Rulesets.Osu.UI
 
             HitPolicy = new StartTimeOrderedHitPolicy();
 
-            var hitWindows = new OsuHitWindows();
-            foreach (var result in Enum.GetValues<HitResult>().Where(r => r > HitResult.None && hitWindows.IsHitResultAllowed(r)))
-                poolDictionary.Add(result, new DrawableJudgementPool(result, onJudgementLoaded));
-
-            AddRangeInternal(poolDictionary.Values);
+            AddInternal(judgementPooler = new JudgementPooler<DrawableOsuJudgement>(new[]
+            {
+                HitResult.Great,
+                HitResult.Ok,
+                HitResult.Meh,
+                HitResult.Miss,
+                HitResult.LargeTickMiss,
+                HitResult.IgnoreMiss,
+            }, onJudgementLoaded));
 
             NewResult += onNewResult;
         }
@@ -80,6 +84,7 @@ namespace osu.Game.Rulesets.Osu.UI
         public IHitPolicy HitPolicy
         {
             get => hitPolicy;
+            [MemberNotNull(nameof(hitPolicy))]
             set
             {
                 hitPolicy = value ?? throw new ArgumentNullException(nameof(value));
@@ -115,12 +120,12 @@ namespace osu.Game.Rulesets.Osu.UI
             judgementAboveHitObjectLayer.Add(judgement.ProxiedAboveHitObjectsContent);
         }
 
-        [BackgroundDependencyLoader(true)]
-        private void load(OsuRulesetConfigManager config, IBeatmap beatmap)
+        [BackgroundDependencyLoader]
+        private void load(OsuRulesetConfigManager? config, IBeatmap? beatmap)
         {
             config?.BindWith(OsuRulesetSetting.PlayfieldBorderStyle, playfieldBorder.PlayfieldBorderStyle);
 
-            var osuBeatmap = (OsuBeatmap)beatmap;
+            var osuBeatmap = (OsuBeatmap?)beatmap;
 
             RegisterPool<HitCircle, DrawableHitCircle>(20, 100);
 
@@ -170,7 +175,10 @@ namespace osu.Game.Rulesets.Osu.UI
             if (!judgedObject.DisplayResult || !DisplayJudgements.Value)
                 return;
 
-            DrawableOsuJudgement explosion = poolDictionary[result.Type].Get(doj => doj.Apply(result, judgedObject));
+            var explosion = judgementPooler.Get(result.Type, doj => doj.Apply(result, judgedObject));
+
+            if (explosion == null)
+                return;
 
             judgementLayer.Add(explosion);
 
@@ -184,31 +192,6 @@ namespace osu.Game.Rulesets.Osu.UI
         private partial class ProxyContainer : LifetimeManagementContainer
         {
             public void Add(Drawable proxy) => AddInternal(proxy);
-        }
-
-        private partial class DrawableJudgementPool : DrawablePool<DrawableOsuJudgement>
-        {
-            private readonly HitResult result;
-            private readonly Action<DrawableOsuJudgement> onLoaded;
-
-            public DrawableJudgementPool(HitResult result, Action<DrawableOsuJudgement> onLoaded)
-                : base(20)
-            {
-                this.result = result;
-                this.onLoaded = onLoaded;
-            }
-
-            protected override DrawableOsuJudgement CreateNewDrawable()
-            {
-                var judgement = base.CreateNewDrawable();
-
-                // just a placeholder to initialise the correct drawable hierarchy for this pool.
-                judgement.Apply(new JudgementResult(new HitObject(), new Judgement()) { Type = result }, null);
-
-                onLoaded?.Invoke(judgement);
-
-                return judgement;
-            }
         }
 
         private class OsuHitObjectLifetimeEntry : HitObjectLifetimeEntry

@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.UI
         public BindableBool Active { get; } = new BindableBool();
 
         public const float DEFAULT_HEIGHT = 30;
-        private const float width = 73;
+        public const float WIDTH = 73;
 
         protected readonly IMod Mod;
         private readonly bool showExtendedInformation;
@@ -56,7 +56,7 @@ namespace osu.Game.Rulesets.UI
                     Width = 100 + DEFAULT_HEIGHT / 2,
                     RelativeSizeAxes = Axes.Y,
                     Masking = true,
-                    X = width,
+                    X = WIDTH,
                     Margin = new MarginPadding { Left = -DEFAULT_HEIGHT },
                     Children = new Drawable[]
                     {
@@ -77,7 +77,7 @@ namespace osu.Game.Rulesets.UI
                 },
                 new CircularContainer
                 {
-                    Width = width,
+                    Width = WIDTH,
                     RelativeSizeAxes = Axes.Y,
                     Masking = true,
                     Children = new Drawable[]
@@ -106,11 +106,13 @@ namespace osu.Game.Rulesets.UI
         [BackgroundDependencyLoader(true)]
         private void load(OsuColour colours, OverlayColourProvider? colourProvider)
         {
+            var modTypeColour = colours.ForModType(Mod.Type);
+
             inactiveBackgroundColour = colourProvider?.Background5 ?? colours.Gray3;
-            activeBackgroundColour = colours.ForModType(Mod.Type);
+            activeBackgroundColour = modTypeColour;
 
             inactiveForegroundColour = colourProvider?.Background2 ?? colours.Gray5;
-            activeForegroundColour = Interpolation.ValueAt<Colour4>(0.1f, Colour4.Black, activeForegroundColour, 0, 1);
+            activeForegroundColour = Interpolation.ValueAt<Colour4>(0.1f, Colour4.Black, modTypeColour, 0, 1);
         }
 
         protected override void LoadComplete()

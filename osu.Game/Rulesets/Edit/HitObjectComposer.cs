@@ -212,6 +212,14 @@ namespace osu.Game.Rulesets.Edit
                                       .Select(t => new RadioButton(t.Name, () => toolSelected(t), t.CreateIcon))
                                       .ToList();
 
+            foreach (var item in toolboxCollection.Items)
+            {
+                item.Selected.DisabledChanged += isDisabled =>
+                {
+                    item.TooltipText = isDisabled ? "Add at least one timing point first!" : string.Empty;
+                };
+            }
+
             TernaryStates = CreateTernaryButtons().ToArray();
             togglesCollection.AddRange(TernaryStates.Select(b => new DrawableTernaryButton(b)));
 
@@ -244,6 +252,14 @@ namespace osu.Game.Rulesets.Edit
                 if (!timing.NewValue)
                     setSelectTool();
             });
+
+            EditorBeatmap.HasTiming.BindValueChanged(hasTiming =>
+            {
+                foreach (var item in toolboxCollection.Items)
+                {
+                    item.Selected.Disabled = !hasTiming.NewValue;
+                }
+            }, true);
         }
 
         protected override void Update()
@@ -526,7 +542,19 @@ namespace osu.Game.Rulesets.Edit
         /// </summary>
         public abstract bool CursorInPlacementArea { get; }
 
+        /// <summary>
+        /// Returns a string representing the current selection.
+        /// The inverse method to <see cref="SelectFromTimestamp"/>.
+        /// </summary>
         public virtual string ConvertSelectionToString() => string.Empty;
+
+        /// <summary>
+        /// Selects objects based on the supplied <paramref name="timestamp"/> and <paramref name="objectDescription"/>.
+        /// The inverse method to <see cref="ConvertSelectionToString"/>.
+        /// </summary>
+        /// <param name="timestamp">The time instant to seek to, in milliseconds.</param>
+        /// <param name="objectDescription">The ruleset-specific description of objects to select at the given timestamp.</param>
+        public virtual void SelectFromTimestamp(double timestamp, string objectDescription) { }
 
         #region IPositionSnapProvider
 

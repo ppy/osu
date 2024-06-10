@@ -52,7 +52,11 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("show user", () => profile.ShowUser(new APIUser { Id = 1 }));
             AddToggleStep("toggle visibility", visible => profile.State.Value = visible ? Visibility.Visible : Visibility.Hidden);
             AddStep("log out", () => dummyAPI.Logout());
-            AddStep("log back in", () => dummyAPI.Login("username", "password"));
+            AddStep("log back in", () =>
+            {
+                dummyAPI.Login("username", "password");
+                dummyAPI.AuthenticateSecondFactor("abcdefgh");
+            });
         }
 
         [Test]
@@ -74,6 +78,35 @@ namespace osu.Game.Tests.Visual.Online
                 };
             });
             AddStep("show user", () => profile.ShowUser(new APIUser { Id = 1 }));
+            AddWaitStep("wait some", 3);
+            AddStep("complete request", () => pendingRequest.TriggerSuccess(TEST_USER));
+        }
+
+        [Test]
+        public void TestLogin()
+        {
+            GetUserRequest pendingRequest = null!;
+
+            AddStep("set up request handling", () =>
+            {
+                dummyAPI.HandleRequest = req =>
+                {
+                    if (dummyAPI.State.Value == APIState.Online && req is GetUserRequest getUserRequest)
+                    {
+                        pendingRequest = getUserRequest;
+                        return true;
+                    }
+
+                    return false;
+                };
+            });
+            AddStep("logout", () => dummyAPI.Logout());
+            AddStep("show user", () => profile.ShowUser(new APIUser { Id = 1 }));
+            AddStep("login", () =>
+            {
+                dummyAPI.Login("username", "password");
+                dummyAPI.AuthenticateSecondFactor("abcdefgh");
+            });
             AddWaitStep("wait some", 3);
             AddStep("complete request", () => pendingRequest.TriggerSuccess(TEST_USER));
         }
@@ -103,6 +136,11 @@ namespace osu.Game.Tests.Visual.Online
                 @"kudosu",
                 @"top_ranks",
                 @"medals"
+            },
+            RankHighest = new APIUser.UserRankHighest
+            {
+                Rank = 1,
+                UpdatedAt = DateTimeOffset.Now,
             },
             Statistics = new UserStatistics
             {
@@ -173,6 +211,12 @@ namespace osu.Game.Tests.Visual.Online
                 Total = 50
             },
             SupportLevel = 2,
+            Location = "Somewhere",
+            Interests = "Rhythm games",
+            Occupation = "Gamer",
+            Twitter = "test_user",
+            Discord = "test_user",
+            Website = "https://google.com",
         };
     }
 }

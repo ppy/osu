@@ -167,7 +167,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             {
                 StartTime = Time.Current + 500,
                 Position = new Vector2(250),
-                Path = new SliderPath(PathType.Linear, new[]
+                Path = new SliderPath(PathType.LINEAR, new[]
                 {
                     Vector2.Zero,
                     new Vector2(0, 100),
@@ -208,7 +208,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 if (shouldHit && !userTriggered && timeOffset >= 0)
                 {
                     // force success
-                    ApplyResult(r => r.Type = HitResult.Great);
+                    ApplyResult(HitResult.Great);
                 }
                 else
                     base.CheckForResult(userTriggered, timeOffset);

@@ -160,7 +160,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                         {
                             decimal? legacyVersion = skin.GetConfig<SkinConfiguration.LegacySetting, decimal>(SkinConfiguration.LegacySetting.Version)?.Value;
 
-                            if (legacyVersion >= 2.0m)
+                            if (legacyVersion > 1.0m)
                                 // legacy skins of version 2.0 and newer only apply very short fade out to the number piece.
                                 hitCircleText.FadeOut(legacy_fade_duration / 4);
                             else

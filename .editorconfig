@@ -196,6 +196,9 @@ csharp_style_prefer_switch_expression = false:none
 
 csharp_style_namespace_declarations = block_scoped:warning
 
+#Style - C# 12 features
+csharp_style_prefer_primary_constructors = false
+
 [*.{yaml,yml}]
 insert_final_newline = true
 indent_style = space

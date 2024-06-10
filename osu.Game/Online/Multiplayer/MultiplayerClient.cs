@@ -12,7 +12,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Development;
 using osu.Framework.Graphics;
-using osu.Framework.Logging;
 using osu.Game.Database;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
@@ -74,9 +73,9 @@ namespace osu.Game.Online.Multiplayer
         public virtual event Action? LoadRequested;
 
         /// <summary>
-        /// Invoked when the multiplayer server requests loading of play to be aborted.
+        /// Invoked when the multiplayer server requests gameplay to be aborted.
         /// </summary>
-        public event Action? LoadAborted;
+        public event Action<GameplayAbortReason>? GameplayAborted;
 
         /// <summary>
         /// Invoked when the multiplayer server requests gameplay to be started.
@@ -87,6 +86,11 @@ namespace osu.Game.Online.Multiplayer
         /// Invoked when the multiplayer server has finished collating results.
         /// </summary>
         public event Action? ResultsReady;
+
+        /// <summary>
+        /// Invoked just prior to disconnection requested by the server via <see cref="IStatefulUserHubClient.DisconnectRequested"/>.
+        /// </summary>
+        public event Action? Disconnecting;
 
         /// <summary>
         /// Whether the <see cref="MultiplayerClient"/> is currently connected.
@@ -155,10 +159,7 @@ namespace osu.Game.Online.Multiplayer
             {
                 // clean up local room state on server disconnect.
                 if (!connected.NewValue && Room != null)
-                {
-                    Logger.Log("Clearing room due to multiplayer server connection loss.", LoggingTarget.Runtime, LogLevel.Important);
                     LeaveRoom();
-                }
             }));
         }
 
@@ -357,6 +358,8 @@ namespace osu.Game.Online.Multiplayer
 
         public abstract Task ChangeBeatmapAvailability(BeatmapAvailability newBeatmapAvailability);
 
+        public abstract Task DisconnectInternal();
+
         /// <summary>
         /// Change the local user's mods in the currently joined room.
         /// </summary>
@@ -370,6 +373,8 @@ namespace osu.Game.Online.Multiplayer
         public abstract Task StartMatch();
 
         public abstract Task AbortGameplay();
+
+        public abstract Task AbortMatch();
 
         public abstract Task AddPlaylistItem(MultiplayerPlaylistItem item);
 
@@ -391,7 +396,7 @@ namespace osu.Game.Online.Multiplayer
                 switch (state)
                 {
                     case MultiplayerRoomState.Open:
-                        APIRoom.Status.Value = new RoomStatusOpen();
+                        APIRoom.Status.Value = APIRoom.HasPassword.Value ? new RoomStatusOpenPrivate() : new RoomStatusOpen();
                         break;
 
                     case MultiplayerRoomState.Playing:
@@ -679,14 +684,14 @@ namespace osu.Game.Online.Multiplayer
             return Task.CompletedTask;
         }
 
-        Task IMultiplayerClient.LoadAborted()
+        Task IMultiplayerClient.GameplayAborted(GameplayAbortReason reason)
         {
             Scheduler.Add(() =>
             {
                 if (Room == null)
                     return;
 
-                LoadAborted?.Invoke();
+                GameplayAborted?.Invoke(reason);
             }, false);
 
             return Task.CompletedTask;
@@ -811,6 +816,7 @@ namespace osu.Game.Online.Multiplayer
             Room.Settings = settings;
             APIRoom.Name.Value = Room.Settings.Name;
             APIRoom.Password.Value = Room.Settings.Password;
+            APIRoom.Status.Value = string.IsNullOrEmpty(Room.Settings.Password) ? new RoomStatusOpen() : new RoomStatusOpenPrivate();
             APIRoom.Type.Value = Room.Settings.MatchType;
             APIRoom.QueueMode.Value = Room.Settings.QueueMode;
             APIRoom.AutoStartDuration.Value = Room.Settings.AutoStartDuration;
@@ -875,6 +881,16 @@ namespace osu.Game.Online.Multiplayer
             });
 
             return tcs.Task;
+        }
+
+        Task IStatefulUserHubClient.DisconnectRequested()
+        {
+            Schedule(() =>
+            {
+                Disconnecting?.Invoke();
+                DisconnectInternal();
+            });
+            return Task.CompletedTask;
         }
     }
 }

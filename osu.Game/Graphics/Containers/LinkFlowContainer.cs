@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Localisation;
+using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Online;
 using osu.Game.Users;
@@ -47,9 +48,16 @@ namespace osu.Game.Graphics.Containers
 
             foreach (var link in links)
             {
+                string displayText = text.Substring(link.Index, link.Length);
+
+                if (previousLinkEnd > link.Index)
+                {
+                    Logger.Log($@"Link ""{link.Url}"" with text ""{displayText}"" overlaps previous link, ignoring.");
+                    continue;
+                }
+
                 AddText(text[previousLinkEnd..link.Index]);
 
-                string displayText = text.Substring(link.Index, link.Length);
                 object linkArgument = link.Argument;
                 string tooltip = displayText == link.Url ? null : link.Url;
 

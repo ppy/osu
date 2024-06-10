@@ -134,7 +134,7 @@ namespace osu.Game.Graphics.UserInterface
                 lengths.AddRange(Source.bars.InstantaneousLengths);
             }
 
-            public override void Draw(IRenderer renderer)
+            protected override void Draw(IRenderer renderer)
             {
                 base.Draw(renderer);
 
@@ -144,6 +144,13 @@ namespace osu.Game.Graphics.UserInterface
                 {
                     float barHeight = drawSize.Y * ((direction == BarDirection.TopToBottom || direction == BarDirection.BottomToTop) ? lengths[i] : barBreadth);
                     float barWidth = drawSize.X * ((direction == BarDirection.LeftToRight || direction == BarDirection.RightToLeft) ? lengths[i] : barBreadth);
+
+                    if (barHeight == 0 || barWidth == 0)
+                        continue;
+
+                    // Apply minimum sizing to hide the fact that we don't have fractional anti-aliasing.
+                    barHeight = Math.Max(barHeight, 1.5f);
+                    barWidth = Math.Max(barWidth, 1.5f);
 
                     Vector2 topLeft;
 

@@ -3,29 +3,23 @@
 
 #nullable disable
 
-using System.Collections.Generic;
-using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Effects;
-using osuTK;
-using osuTK.Graphics;
-using osu.Framework.Graphics.Shapes;
-using osu.Game.Rulesets;
-using osu.Framework.Graphics.UserInterface;
-using osu.Framework.Input.Events;
-using osuTK.Input;
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Audio;
-using osu.Framework.Audio.Sample;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Input.Events;
+using osu.Game.Rulesets;
+using osuTK;
+using osuTK.Graphics;
+using osuTK.Input;
 
 namespace osu.Game.Overlays.Toolbar
 {
     public partial class ToolbarRulesetSelector : RulesetSelector
     {
         protected Drawable ModeButtonLine { get; private set; }
-
-        private readonly Dictionary<string, Sample> selectionSamples = new Dictionary<string, Sample>();
 
         public ToolbarRulesetSelector()
         {
@@ -34,36 +28,32 @@ namespace osu.Game.Overlays.Toolbar
         }
 
         [BackgroundDependencyLoader]
-        private void load(AudioManager audio)
+        private void load()
         {
             AddRangeInternal(new[]
             {
                 new OpaqueBackground
                 {
                     Depth = 1,
+                    Masking = true,
                 },
                 ModeButtonLine = new Container
                 {
                     Size = new Vector2(Toolbar.HEIGHT, 3),
                     Anchor = Anchor.BottomLeft,
-                    Origin = Anchor.TopLeft,
-                    Masking = true,
-                    EdgeEffect = new EdgeEffectParameters
+                    Origin = Anchor.BottomLeft,
+                    Y = -1,
+                    Children = new Drawable[]
                     {
-                        Type = EdgeEffectType.Glow,
-                        Colour = new Color4(255, 194, 224, 100),
-                        Radius = 15,
-                        Roundness = 15,
-                    },
-                    Child = new Box
-                    {
-                        RelativeSizeAxes = Axes.Both,
+                        new Circle
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            Size = new Vector2(18, 3),
+                        }
                     }
-                }
+                },
             });
-
-            foreach (var ruleset in Rulesets.AvailableRulesets)
-                selectionSamples[ruleset.ShortName] = audio.Samples.Get($"UI/ruleset-select-{ruleset.ShortName}");
         }
 
         protected override void LoadComplete()
@@ -89,11 +79,7 @@ namespace osu.Game.Overlays.Toolbar
         {
             if (SelectedTab != null)
             {
-                ModeButtonLine.MoveToX(SelectedTab.DrawPosition.X, !hasInitialPosition ? 0 : 200, Easing.OutQuint);
-
-                if (hasInitialPosition)
-                    selectionSamples[SelectedTab.Value.ShortName]?.Play();
-
+                ModeButtonLine.MoveToX(SelectedTab.DrawPosition.X, !hasInitialPosition ? 0 : 500, Easing.OutElasticQuarter);
                 hasInitialPosition = true;
             }
         }
@@ -123,7 +109,7 @@ namespace osu.Game.Overlays.Toolbar
 
                 RulesetInfo found = Rulesets.AvailableRulesets.ElementAtOrDefault(requested);
                 if (found != null)
-                    Current.Value = found;
+                    SelectItem(found);
                 return true;
             }
 

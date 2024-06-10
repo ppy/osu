@@ -81,6 +81,19 @@ namespace osu.Game.Rulesets.UI
 
         public override IFrameStableClock FrameStableClock => frameStabilityContainer;
 
+        private bool allowBackwardsSeeks;
+
+        public override bool AllowBackwardsSeeks
+        {
+            get => allowBackwardsSeeks;
+            set
+            {
+                allowBackwardsSeeks = value;
+                if (frameStabilityContainer != null)
+                    frameStabilityContainer.AllowBackwardsSeeks = value;
+            }
+        }
+
         private bool frameStablePlayback = true;
 
         internal override bool FrameStablePlayback
@@ -122,8 +135,7 @@ namespace osu.Game.Rulesets.UI
         protected DrawableRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod> mods = null)
             : base(ruleset)
         {
-            if (beatmap == null)
-                throw new ArgumentNullException(nameof(beatmap), "Beatmap cannot be null.");
+            ArgumentNullException.ThrowIfNull(beatmap);
 
             if (!(beatmap is Beatmap<TObject> tBeatmap))
                 throw new ArgumentException($"{GetType()} expected the beatmap to contain hitobjects of type {typeof(TObject)}.", nameof(beatmap));
@@ -178,6 +190,7 @@ namespace osu.Game.Rulesets.UI
             InternalChild = frameStabilityContainer = new FrameStabilityContainer(GameplayStartTime)
             {
                 FrameStablePlayback = FrameStablePlayback,
+                AllowBackwardsSeeks = AllowBackwardsSeeks,
                 Children = new Drawable[]
                 {
                     FrameStableComponents,
@@ -227,7 +240,7 @@ namespace osu.Game.Rulesets.UI
 
         public override void RequestResume(Action continueResume)
         {
-            if (ResumeOverlay != null && UseResumeOverlay && (Cursor == null || (Cursor.LastFrameState == Visibility.Visible && Contains(Cursor.ActiveCursor.ScreenSpaceDrawQuad.Centre))))
+            if (ResumeOverlay != null && UseResumeOverlay)
             {
                 ResumeOverlay.GameplayCursor = Cursor;
                 ResumeOverlay.ResumeAction = continueResume;
@@ -464,6 +477,12 @@ namespace osu.Game.Rulesets.UI
         internal abstract bool FrameStablePlayback { get; set; }
 
         /// <summary>
+        /// When a replay is not attached, we usually block any backwards seeks.
+        /// This will bypass the check. Should only be used for tests.
+        /// </summary>
+        public abstract bool AllowBackwardsSeeks { get; set; }
+
+        /// <summary>
         /// The mods which are to be applied.
         /// </summary>
         public abstract IReadOnlyList<Mod> Mods { get; }
@@ -510,7 +529,7 @@ namespace osu.Game.Rulesets.UI
         public ResumeOverlay ResumeOverlay { get; protected set; }
 
         /// <summary>
-        /// Whether the <see cref="ResumeOverlay"/> should be used to return the user's cursor position to its previous location after a pause.
+        /// Whether a <see cref="ResumeOverlay"/> should be displayed on resuming after a pause.
         /// </summary>
         /// <remarks>
         /// Defaults to <c>true</c>.

@@ -2,6 +2,8 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
@@ -10,7 +12,9 @@ using osu.Game.Rulesets.Catch.Judgements;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.Scoring;
 using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Rulesets.Scoring.Legacy;
 using osu.Game.Tests.Visual.Gameplay;
 
 namespace osu.Game.Rulesets.Catch.Tests
@@ -37,11 +41,14 @@ namespace osu.Game.Rulesets.Catch.Tests
             return beatmap;
         }
 
-        protected override IScoringAlgorithm CreateScoreV1() => new ScoreV1 { ScoreMultiplier = { BindTarget = scoreMultiplier } };
+        protected override IScoringAlgorithm CreateScoreV1(IReadOnlyList<Mod> selectedMods)
+            => new ScoreV1(selectedMods) { ScoreMultiplier = { BindTarget = scoreMultiplier } };
 
-        protected override IScoringAlgorithm CreateScoreV2(int maxCombo) => new ScoreV2(maxCombo);
+        protected override IScoringAlgorithm CreateScoreV2(int maxCombo, IReadOnlyList<Mod> selectedMods)
+            => new ScoreV2(maxCombo, selectedMods);
 
-        protected override ProcessorBasedScoringAlgorithm CreateScoreAlgorithm(IBeatmap beatmap, ScoringMode mode) => new CatchProcessorBasedScoringAlgorithm(beatmap, mode);
+        protected override ProcessorBasedScoringAlgorithm CreateScoreAlgorithm(IBeatmap beatmap, ScoringMode mode, IReadOnlyList<Mod> selectedMods)
+            => new CatchProcessorBasedScoringAlgorithm(beatmap, mode, selectedMods);
 
         [Test]
         public void TestBasicScenarios()
@@ -69,9 +76,20 @@ namespace osu.Game.Rulesets.Catch.Tests
 
         private class ScoreV1 : IScoringAlgorithm
         {
-            private int currentCombo;
+            private readonly double modMultiplier;
 
             public BindableDouble ScoreMultiplier { get; } = new BindableDouble();
+
+            private int currentCombo;
+
+            public ScoreV1(IReadOnlyList<Mod> selectedMods)
+            {
+                var ruleset = new CatchRuleset();
+                modMultiplier = ruleset.CreateLegacyScoreSimulator().GetLegacyScoreMultiplier(selectedMods, new LegacyBeatmapConversionDifficultyInfo
+                {
+                    SourceRuleset = ruleset.RulesetInfo
+                });
+            }
 
             public void ApplyHit() => applyHitV1(base_great);
 
@@ -91,7 +109,7 @@ namespace osu.Game.Rulesets.Catch.Tests
 
                 // combo multiplier
                 // ReSharper disable once PossibleLossOfFraction
-                TotalScore += (int)(Math.Max(0, currentCombo - 1) * (baseScore / 25 * ScoreMultiplier.Value));
+                TotalScore += (int)(Math.Max(0, currentCombo - 1) * (baseScore / 25 * (ScoreMultiplier.Value * modMultiplier)));
 
                 currentCombo++;
             }
@@ -104,13 +122,23 @@ namespace osu.Game.Rulesets.Catch.Tests
             private int currentCombo;
             private double comboPortion;
 
+            private readonly double modMultiplier;
+
             private readonly double comboPortionMax;
 
             private const double combo_base = 4;
             private const int combo_cap = 200;
 
-            public ScoreV2(int maxCombo)
+            public ScoreV2(int maxCombo, IReadOnlyList<Mod> selectedMods)
             {
+                var ruleset = new CatchRuleset();
+                modMultiplier = ruleset.CreateLegacyScoreSimulator().GetLegacyScoreMultiplier(
+                    selectedMods.Append(new ModScoreV2()).ToList(),
+                    new LegacyBeatmapConversionDifficultyInfo
+                    {
+                        SourceRuleset = ruleset.RulesetInfo
+                    });
+
                 for (int i = 0; i < maxCombo; i++)
                     ApplyHit();
 
@@ -135,13 +163,13 @@ namespace osu.Game.Rulesets.Catch.Tests
             }
 
             public long TotalScore
-                => (int)Math.Round(1000000 * comboPortion / comboPortionMax); // vast simplification, as we're not doing ticks here.
+                => (int)Math.Round((1000000 * comboPortion / comboPortionMax) * modMultiplier); // vast simplification, as we're not doing ticks here.
         }
 
         private class CatchProcessorBasedScoringAlgorithm : ProcessorBasedScoringAlgorithm
         {
-            public CatchProcessorBasedScoringAlgorithm(IBeatmap beatmap, ScoringMode mode)
-                : base(beatmap, mode)
+            public CatchProcessorBasedScoringAlgorithm(IBeatmap beatmap, ScoringMode mode, IReadOnlyList<Mod> selectedMods)
+                : base(beatmap, mode, selectedMods)
             {
             }
 

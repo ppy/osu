@@ -78,6 +78,11 @@ namespace osu.Game.Online.Multiplayer
         Task StartMatch();
 
         /// <summary>
+        /// As the host of a room, aborts an on-going match.
+        /// </summary>
+        Task AbortMatch();
+
+        /// <summary>
         /// Aborts an ongoing gameplay load.
         /// </summary>
         Task AbortGameplay();

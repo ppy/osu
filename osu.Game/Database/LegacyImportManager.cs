@@ -3,6 +3,9 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework;
@@ -53,6 +56,49 @@ namespace osu.Game.Database
         public bool SupportsImportFromStable => RuntimeInfo.IsDesktop;
 
         public void UpdateStorage(string stablePath) => cachedStorage = new StableStorage(stablePath, gameHost as DesktopGameHost);
+
+        /// <summary>
+        /// Checks whether a valid location to run a stable import from can be determined starting from the supplied <paramref name="directory"/>.
+        /// </summary>
+        /// <param name="directory">The directory to check for stable import eligibility.</param>
+        /// <param name="stableRoot">
+        /// If the return value is <see langword="true"/>,
+        /// this parameter will contain the <see cref="DirectoryInfo"/> to use as the root directory for importing.
+        /// </param>
+        public bool IsUsableForStableImport(DirectoryInfo? directory, [NotNullWhen(true)] out DirectoryInfo? stableRoot)
+        {
+            if (directory == null)
+            {
+                stableRoot = null;
+                return false;
+            }
+
+            // A full stable installation will have a configuration file present.
+            // This is the best case scenario, as it may contain a custom beatmap directory we need to traverse to.
+            if (directory.GetFiles(@"osu!.*.cfg").Any())
+            {
+                stableRoot = directory;
+                return true;
+            }
+
+            // The user may only have their songs or skins folders left.
+            // We still want to allow them to import based on this.
+            if (directory.GetDirectories(@"Songs").Any() || directory.GetDirectories(@"Skins").Any())
+            {
+                stableRoot = directory;
+                return true;
+            }
+
+            // The user may have traversed *inside* their songs or skins folders.
+            if (directory.Parent != null && (directory.Name == @"Songs" || directory.Name == @"Skins"))
+            {
+                stableRoot = directory.Parent;
+                return true;
+            }
+
+            stableRoot = null;
+            return false;
+        }
 
         public bool CheckSongsFolderHardLinkAvailability()
         {

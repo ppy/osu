@@ -5,6 +5,7 @@ using System.Linq;
 using System.Collections.Generic;
 using Humanizer;
 using NUnit.Framework;
+using osu.Framework.Input;
 using osu.Framework.Testing;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
@@ -396,7 +397,7 @@ namespace osu.Game.Tests.Visual.Editing
             textBox.Current.Value = bank;
             // force a commit via keyboard.
             // this is needed when testing attempting to set empty bank - which should revert to the previous value, but only on commit.
-            InputManager.ChangeFocus(textBox);
+            ((IFocusManager)InputManager).ChangeFocus(textBox);
             InputManager.Key(Key.Enter);
         });
 

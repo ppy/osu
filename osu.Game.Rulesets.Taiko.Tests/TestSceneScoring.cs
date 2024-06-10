@@ -2,11 +2,15 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Rulesets.Scoring.Legacy;
 using osu.Game.Rulesets.Taiko.Beatmaps;
 using osu.Game.Rulesets.Taiko.Judgements;
 using osu.Game.Rulesets.Taiko.Objects;
@@ -32,10 +36,17 @@ namespace osu.Game.Rulesets.Taiko.Tests
             return beatmap;
         }
 
-        protected override IScoringAlgorithm CreateScoreV1() => new ScoreV1 { ScoreMultiplier = { BindTarget = scoreMultiplier } };
-        protected override IScoringAlgorithm CreateScoreV2(int maxCombo) => new ScoreV2(maxCombo);
+        protected override IScoringAlgorithm CreateScoreV1(IReadOnlyList<Mod> selectedMods)
+            => new ScoreV1(selectedMods)
+            {
+                ScoreMultiplier = { BindTarget = scoreMultiplier }
+            };
 
-        protected override ProcessorBasedScoringAlgorithm CreateScoreAlgorithm(IBeatmap beatmap, ScoringMode mode) => new TaikoProcessorBasedScoringAlgorithm(beatmap, mode);
+        protected override IScoringAlgorithm CreateScoreV2(int maxCombo, IReadOnlyList<Mod> selectedMods)
+            => new ScoreV2(maxCombo, selectedMods);
+
+        protected override ProcessorBasedScoringAlgorithm CreateScoreAlgorithm(IBeatmap beatmap, ScoringMode mode, IReadOnlyList<Mod> selectedMods)
+            => new TaikoProcessorBasedScoringAlgorithm(beatmap, mode, selectedMods);
 
         [Test]
         public void TestBasicScenarios()
@@ -72,7 +83,18 @@ namespace osu.Game.Rulesets.Taiko.Tests
 
         private class ScoreV1 : IScoringAlgorithm
         {
+            private readonly double modMultiplier;
+
             private int currentCombo;
+
+            public ScoreV1(IReadOnlyList<Mod> selectedMods)
+            {
+                var ruleset = new TaikoRuleset();
+                modMultiplier = ruleset.CreateLegacyScoreSimulator().GetLegacyScoreMultiplier(selectedMods, new LegacyBeatmapConversionDifficultyInfo
+                {
+                    SourceRuleset = ruleset.RulesetInfo
+                });
+            }
 
             public BindableDouble ScoreMultiplier { get; } = new BindableDouble();
 
@@ -94,7 +116,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
 
                 // combo multiplier
                 // ReSharper disable once PossibleLossOfFraction
-                TotalScore += (int)((baseScore / 35) * 2 * (ScoreMultiplier.Value + 1)) * (Math.Min(100, currentCombo) / 10);
+                TotalScore += (int)((baseScore / 35) * 2 * (ScoreMultiplier.Value + 1) * modMultiplier) * (Math.Min(100, currentCombo) / 10);
 
                 currentCombo++;
             }
@@ -110,14 +132,23 @@ namespace osu.Game.Rulesets.Taiko.Tests
             private double maxBaseScore;
             private int currentHits;
 
+            private readonly double modMultiplier;
             private readonly double comboPortionMax;
             private readonly int maxCombo;
 
             private const double combo_base = 4;
 
-            public ScoreV2(int maxCombo)
+            public ScoreV2(int maxCombo, IReadOnlyList<Mod> selectedMods)
             {
                 this.maxCombo = maxCombo;
+
+                var ruleset = new TaikoRuleset();
+                modMultiplier = ruleset.CreateLegacyScoreSimulator().GetLegacyScoreMultiplier(
+                    selectedMods.Append(new ModScoreV2()).ToArray(),
+                    new LegacyBeatmapConversionDifficultyInfo
+                    {
+                        SourceRuleset = ruleset.RulesetInfo
+                    });
 
                 for (int i = 0; i < this.maxCombo; i++)
                     ApplyHit();
@@ -161,18 +192,18 @@ namespace osu.Game.Rulesets.Taiko.Tests
                     double accuracy = currentBaseScore / maxBaseScore;
 
                     return (int)Math.Round
-                    (
+                    ((
                         250000 * comboPortion / comboPortionMax +
                         750000 * Math.Pow(accuracy, 3.6) * ((double)currentHits / maxCombo)
-                    );
+                    ) * modMultiplier);
                 }
             }
         }
 
         private class TaikoProcessorBasedScoringAlgorithm : ProcessorBasedScoringAlgorithm
         {
-            public TaikoProcessorBasedScoringAlgorithm(IBeatmap beatmap, ScoringMode mode)
-                : base(beatmap, mode)
+            public TaikoProcessorBasedScoringAlgorithm(IBeatmap beatmap, ScoringMode mode, IReadOnlyList<Mod> selectedMods)
+                : base(beatmap, mode, selectedMods)
             {
             }
 

@@ -180,11 +180,8 @@ namespace osu.Game.Tests.Visual.Online
             });
             AddStep("Show overlay", () => chatOverlay.Show());
             AddAssert("Overlay uses config height", () => chatOverlay.Height == configChatHeight.Default);
-            AddStep("Click top bar", () =>
-            {
-                InputManager.MoveMouseTo(chatOverlayTopBar);
-                InputManager.PressButton(MouseButton.Left);
-            });
+            AddStep("Move mouse to drag bar", () => InputManager.MoveMouseTo(chatOverlayTopBar.DragBar));
+            AddStep("Click drag bar", () => InputManager.PressButton(MouseButton.Left));
             AddStep("Drag overlay to new height", () => InputManager.MoveMouseTo(chatOverlayTopBar, new Vector2(0, -300)));
             AddStep("Stop dragging", () => InputManager.ReleaseButton(MouseButton.Left));
             AddStep("Store new height", () => newHeight = chatOverlay.Height);
@@ -634,7 +631,7 @@ namespace osu.Game.Tests.Visual.Online
             AddAssert("Nothing happened", () => this.ChildrenOfType<ReportChatPopover>().Any());
             AddStep("Set report data", () =>
             {
-                var field = this.ChildrenOfType<ReportChatPopover>().Single().ChildrenOfType<OsuTextBox>().Single();
+                var field = this.ChildrenOfType<ReportChatPopover>().Single().ChildrenOfType<OsuTextBox>().First();
                 field.Current.Value = "test other";
             });
 
