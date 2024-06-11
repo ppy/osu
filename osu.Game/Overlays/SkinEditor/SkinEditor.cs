@@ -540,6 +540,8 @@ namespace osu.Game.Overlays.SkinEditor
 
         protected void Redo() => changeHandler?.RestoreState(1);
 
+        void IEditorChangeHandler.RestoreState(int direction) => changeHandler?.RestoreState(direction);
+
         public void Save(bool userTriggered = true) => save(currentSkin.Value, userTriggered);
 
         private void save(Skin skin, bool userTriggered = true)
