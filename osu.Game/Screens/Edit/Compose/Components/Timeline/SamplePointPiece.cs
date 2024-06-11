@@ -77,7 +77,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         public static string? GetAdditionBankValue(IEnumerable<HitSampleInfo> samples)
         {
-            return samples.FirstOrDefault(o => o.Name != HitSampleInfo.HIT_NORMAL)?.Bank ?? GetBankValue(samples);
+            return samples.FirstOrDefault(o => o.Name != HitSampleInfo.HIT_NORMAL)?.Bank;
         }
 
         public static int GetVolumeValue(ICollection<HitSampleInfo> samples)
@@ -212,7 +212,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             }
 
             private string? getCommonBank() => allRelevantSamples.Select(GetBankValue).Distinct().Count() == 1 ? GetBankValue(allRelevantSamples.First()) : null;
-            private string? getCommonAdditionBank() => allRelevantSamples.Select(GetAdditionBankValue).Distinct().Count() == 1 ? GetAdditionBankValue(allRelevantSamples.First()) : null;
+            private string? getCommonAdditionBank() => allRelevantSamples.Select(GetAdditionBankValue).Where(o => o is not null).Distinct().Count() == 1 ? GetAdditionBankValue(allRelevantSamples.First()) : null;
             private int? getCommonVolume() => allRelevantSamples.Select(GetVolumeValue).Distinct().Count() == 1 ? GetVolumeValue(allRelevantSamples.First()) : null;
 
             private void updatePrimaryBankState()
