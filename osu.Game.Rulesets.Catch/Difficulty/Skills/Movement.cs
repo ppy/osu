@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Game.Rulesets.Catch.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
@@ -49,7 +50,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Skills
         {
             var catchCurrent = (CatchDifficultyHitObject)current;
 
-            lastPlayerPosition ??= catchCurrent.LastNormalizedPosition;
+            lastPlayerPosition ??= catchCurrent.NormalizedPositionLast0;
 
             float playerPosition = Math.Clamp(
                 lastPlayerPosition.Value,
@@ -58,6 +59,23 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Skills
             );
 
             float distanceMoved = playerPosition - lastPlayerPosition.Value;
+
+            if (catchCurrent.NormalizedPositionLast0.IsNotNull() && catchCurrent.NormalizedPositionLast1.IsNotNull())
+            {
+                float lenience = normalized_hitobject_radius * 2;
+                float antiCheese = 1;
+
+                float deltaCurrLast0 = Math.Clamp(lenience - Math.Abs(catchCurrent.NormalizedPosition - catchCurrent.NormalizedPositionLast0), 0, absolute_player_positioning_error);
+                antiCheese *= deltaCurrLast0 / absolute_player_positioning_error;
+
+                float deltaCurrLast1 = Math.Clamp(lenience - Math.Abs((float)(catchCurrent.NormalizedPosition - catchCurrent.NormalizedPositionLast1)), 0, absolute_player_positioning_error);
+                antiCheese *= deltaCurrLast1 / absolute_player_positioning_error;
+
+                float deltaLast0Last1 = Math.Clamp(lenience - Math.Abs((float)(catchCurrent.NormalizedPositionLast0 - catchCurrent.NormalizedPositionLast1)), 0, absolute_player_positioning_error);
+                antiCheese *= deltaLast0Last1 / absolute_player_positioning_error;
+
+                distanceMoved *= 1 - antiCheese;
+            }
 
             double weightedStrainTime = catchCurrent.StrainTime + 13 + (3 / catcherSpeedMultiplier);
 
