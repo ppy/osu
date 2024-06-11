@@ -110,9 +110,31 @@ namespace osu.Game.Rulesets.Mania.Edit.Setup
             tickRateSlider.Current.BindValueChanged(_ => updateValues());
         }
 
+        private bool updatingKeyCount;
+
         private void updateKeyCount(ValueChangedEvent<float> keyCount)
         {
+            if (updatingKeyCount) return;
+
+            updatingKeyCount = true;
+
             updateValues();
+            editor.Reload().ContinueWith(t =>
+            {
+                if (!t.GetResultSafely())
+                {
+                    Schedule(() =>
+                    {
+                        changeHandler.RestoreState(-1);
+                        Beatmap.Difficulty.CircleSize = keyCountSlider.Current.Value = keyCount.OldValue;
+                        updatingKeyCount = false;
+                    });
+                }
+                else
+                {
+                    updatingKeyCount = false;
+                }
+            });
         }
 
         private void updateValues()
