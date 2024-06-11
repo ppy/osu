@@ -172,10 +172,6 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 allRelevantSamples = relevantObjects.Select(GetRelevantSamples).ToArray();
 
                 // even if there are multiple objects selected, we can still display sample volume or bank if they all have the same value.
-                string? commonBank = getCommonBank();
-                if (!string.IsNullOrEmpty(commonBank))
-                    bank.Current.Value = commonBank;
-
                 int? commonVolume = getCommonVolume();
                 if (commonVolume != null)
                     volume.Current.Value = commonVolume.Value;
