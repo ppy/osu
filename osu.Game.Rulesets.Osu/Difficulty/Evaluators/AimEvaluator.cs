@@ -121,11 +121,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             {
                 // Reward sliders based on velocity.
                 sliderBonus = osuLastObj.TravelDistance / osuLastObj.TravelTime;
-
-                double readingBonus = 1.0;
-                readingBonus += calculateSliderShapeReadingDifficulty(slider);
-                readingBonus += calculateSliderEndDistanceDifficulty(slider);
-                sliderBonus *= Math.Max(readingBonus, 1.0);
+                sliderBonus *= calculateCurvature(slider);
             }
 
             // Add in acute angle bonus or wide angle bonus + velocity change bonus, whichever is larger.
@@ -137,150 +133,33 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             return aimStrain;
         }
-        private static Vector2 positionWithRepeats(double relativeTime, Slider slider)
+
+        private static double calculateCurvature(Slider slider)
         {
-            double progress = relativeTime / slider.SpanDuration;
-            if (slider.RepeatCount % 2 == 1)
-                progress = 1 - progress; // revert if odd number of repeats
-            return slider.Position + slider.Path.PositionAt(progress);
-        }
+            if (slider.SpanDuration == 0) return 1;
 
-        private static Vector2 interpolate(Vector2 start, Vector2 end, float progress)
-            => start + (end - start) * progress;
+            //double minFollowRadius = slider.Radius;
+            //double maxFollowRadius = slider.Radius * 2.4;
+            //double deltaFollowRadius = maxFollowRadius - minFollowRadius;
 
-        private static double interpolate(double start, double end, double progress)
-            => start + (end - start) * progress;
+            //OsuHitObject head;
+            //if (slider.RepeatCount == 0)
+            //    head = (OsuHitObject)slider.NestedHitObjects[0];
+            //else
+            //    head = (OsuHitObject)slider.NestedHitObjects.Where(o => o is SliderRepeat).Last();
 
-        private static double getCurveComfort(Vector2 start, Vector2 middle, Vector2 end)
-        {
-            float deltaDistance = Math.Abs(Vector2.Distance(start, middle) - Vector2.Distance(middle, end));
-            float scaleDistance = Vector2.Distance(start, end) / 4;
-            float result = Math.Min(deltaDistance / scaleDistance, 1);
-            return 1 - (double)result;
-        }
+            //var tail = (OsuHitObject)slider.NestedHitObjects[^1];
 
-        private static double getCurveDegree(Vector2 start, Vector2 middle, Vector2 end)
-        {
-            Vector2 middleInterpolated = interpolate(start, end, 0.5f);
-            float distance = Vector2.Distance(middleInterpolated, middle);
+            //double numberOfUpdates = Math.Ceiling(2 * slider.Path.Distance / slider.Radius);
+            //double deltaT = slider.SpanDuration / numberOfUpdates;
 
-            float scaleDistance = Vector2.Distance(start, end);
-            float maxComfortDistance = scaleDistance / 2;
+            //double middleTime = (head.StartTime + tail.StartTime) / 2 - head.StartTime;
+            //var middlePos = positionWithRepeats(middleTime, slider);
 
-            float result = Math.Clamp((distance - maxComfortDistance) / scaleDistance, 0, 1);
-            return 1 - (double)result;
-        }
-        private static double calculateSliderShapeReadingDifficulty(Slider slider)
-        {
-            if (slider.SpanDuration == 0) return 0;
-
-            double minFollowRadius = slider.Radius;
-            double maxFollowRadius = slider.Radius * 2.4;
-            double deltaFollowRadius = maxFollowRadius - minFollowRadius;
-
-            OsuHitObject head;
-            if (slider.RepeatCount == 0)
-                head = (OsuHitObject)slider.NestedHitObjects[0];
-            else
-                head = (OsuHitObject)slider.NestedHitObjects.Where(o => o is SliderRepeat).Last();
-
-            var tail = (OsuHitObject)slider.NestedHitObjects[^1];
-
-            double numberOfUpdates = Math.Ceiling(2 * slider.Path.Distance / slider.Radius);
-            double deltaT = slider.SpanDuration / numberOfUpdates;
-
-            double relativeTime = 0;
-            double middleTime = (head.StartTime + tail.StartTime) / 2 - head.StartTime;
-            var middlePos = positionWithRepeats(middleTime, slider);
-
-            double lineBonus = 0;
-            double curveBonus = 0;
-
-            for (; relativeTime <= middleTime; relativeTime += deltaT)
-            {
-                // calculating position of the normal path
-                Vector2 ballPosition = positionWithRepeats(relativeTime, slider);
-
-                // calculation position of the line path
-                float localProgress = (float)(relativeTime / (slider.EndTime - head.StartTime));
-                localProgress = Math.Clamp(localProgress, 0, 1);
-
-                Vector2 linePosition = interpolate(head.Position, tail.Position, localProgress);
-
-                // buff scales from 0 to 1 when slider follow distance is changing from 1.0x to 2.4x
-                double continousLineBuff = (Vector2.Distance(ballPosition, linePosition) - minFollowRadius) / deltaFollowRadius;
-                continousLineBuff = Math.Clamp(continousLineBuff, 0, 1) * deltaT;
-
-                // calculation position of the curvy path
-                localProgress = (float)(relativeTime / middleTime);
-                localProgress = Math.Clamp(localProgress, 0, 1);
-
-                Vector2 curvyPosition = interpolate(head.Position, middlePos, localProgress);
-
-                // buff scales from 0 to 1 when slider follow distance is changing from 1.0x to 2.4x
-                double continousCurveBuff = (Vector2.Distance(ballPosition, curvyPosition) - minFollowRadius) / deltaFollowRadius;
-                continousCurveBuff = Math.Clamp(continousCurveBuff, 0, 1) * deltaT;
-
-                lineBonus += (float)continousLineBuff;
-                curveBonus += (float)continousCurveBuff;
-            }
-
-            for (; relativeTime <= slider.SpanDuration; relativeTime += deltaT)
-            {
-                // calculating position of the normal path
-                Vector2 ballPosition = positionWithRepeats(relativeTime, slider);
-
-                // calculation position of the line path
-                float localProgress = (float)(relativeTime / (slider.EndTime - head.StartTime));
-                localProgress = Math.Clamp(localProgress, 0, 1);
-
-                Vector2 linePosition = interpolate(head.Position, tail.Position, localProgress);
-
-                // buff scales from 0 to 1 when slider follow distance is changing from 1.0x to 2.4x
-                double continousLineBuff = (Vector2.Distance(ballPosition, linePosition) - minFollowRadius) / deltaFollowRadius;
-                continousLineBuff = Math.Clamp(continousLineBuff, 0, 1) * deltaT;
-
-                // calculation position of the curvy path
-                localProgress = (float)((relativeTime - middleTime) / (slider.SpanDuration - middleTime));
-                localProgress = Math.Clamp(localProgress, 0, 1);
-
-                Vector2 curvyPosition = interpolate(middlePos, tail.Position, localProgress);
-
-                // buff scales from 0 to 1 when slider follow distance is changing from 1.0x to 2.4x
-                double continousCurveBuff = (Vector2.Distance(ballPosition, curvyPosition) - minFollowRadius) / deltaFollowRadius;
-                continousCurveBuff = Math.Clamp(continousCurveBuff, 0, 1) * deltaT;
-
-                lineBonus += (float)continousLineBuff;
-                curveBonus += (float)continousCurveBuff;
-            }
-
-            double comfortableCurveFactor = getCurveComfort(head.Position, middlePos, tail.Position);
-            double curveDegreeFactor = getCurveDegree(head.Position, middlePos, tail.Position);
-
-            curveBonus = interpolate(lineBonus, curveBonus, comfortableCurveFactor * curveDegreeFactor);
-
-            lineBonus *= slider_shape_reading_multiplier / slider.SpanDuration;
-            curveBonus *= slider_shape_reading_multiplier / slider.SpanDuration;
-
-            double curvedLengthBonus = (Vector2.Distance(head.Position, middlePos) + Vector2.Distance(middlePos, tail.Position))
-                / Vector2.Distance(head.Position, tail.Position) - 1;
-            curveBonus += curvedLengthBonus;
-
-            return (float)Math.Min(lineBonus, curveBonus);
-        }
-
-        private static double calculateSliderEndDistanceDifficulty(Slider slider)
-        {
-            if (slider.LazyEndPosition is null) return 0;
-            if (slider.LazyTravelDistance == 0) return 0;
-
-            float visualDistance = Vector2.Distance(slider.StackedEndPosition, (Vector2)slider.LazyEndPosition);
-
-            var preLastObj = (OsuHitObject)slider.NestedHitObjects[^2];
-
-            double minimalMovement = Vector2.Distance((Vector2)slider.LazyEndPosition, preLastObj.Position) - slider.Radius * 4.8;
-            visualDistance *= (float)Math.Clamp(minimalMovement / slider.Radius, 0, 1); // buff only very long sliders
-            return (visualDistance / slider.LazyTravelDistance) * slider_end_distance_multiplier;
+            //double curvedLengthBonus = (Vector2.Distance(head.Position, middlePos) + Vector2.Distance(middlePos, tail.Position))
+            //    / Vector2.Distance(head.Position, tail.Position) - 1;
+            //curveBonus += curvedLengthBonus;
+            return 1;
         }
 
         private static double calcWideAngleBonus(double angle) => Math.Pow(Math.Sin(3.0 / 4 * (Math.Min(5.0 / 6 * Math.PI, Math.Max(Math.PI / 6, angle)) - Math.PI / 6)), 2);
