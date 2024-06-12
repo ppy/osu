@@ -136,6 +136,8 @@ namespace osu.Game.Beatmaps
 
         public CountdownType Countdown { get; set; } = CountdownType.Normal;
 
+        public int CountdownOffset { get; set; }
+
         IBeatmap IBeatmap.Clone() => Clone();
 
         public Beatmap<T> Clone() => (Beatmap<T>)MemberwiseClone();

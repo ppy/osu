@@ -58,7 +58,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
             Assert.AreEqual(false, beatmap.LetterboxInBreaks);
             Assert.AreEqual(false, beatmap.WidescreenStoryboard);
             Assert.AreEqual(CountdownType.None, beatmap.Countdown);
-            Assert.AreEqual(0, beatmapInfo.CountdownOffset);
+            Assert.AreEqual(0, beatmap.CountdownOffset);
         }
 
         [Test]

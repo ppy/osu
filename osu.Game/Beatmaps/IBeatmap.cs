@@ -102,6 +102,11 @@ namespace osu.Game.Beatmaps
         CountdownType Countdown { get; internal set; }
 
         /// <summary>
+        /// The number of beats to move the countdown backwards (compared to its default location).
+        /// </summary>
+        int CountdownOffset { get; internal set; }
+
+        /// <summary>
         /// Creates a shallow-clone of this beatmap and returns it.
         /// </summary>
         /// <returns>The shallow-cloned beatmap.</returns>

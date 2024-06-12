@@ -403,6 +403,12 @@ namespace osu.Game.Rulesets.Difficulty
                 set => baseBeatmap.Countdown = value;
             }
 
+            public int CountdownOffset
+            {
+                get => baseBeatmap.CountdownOffset;
+                set => baseBeatmap.CountdownOffset = value;
+            }
+
             #endregion
         }
     }
