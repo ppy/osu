@@ -48,10 +48,8 @@ namespace osu.Game.Screens.Edit.Timing
                 if (!Beatmap.AdjustNotesOnOffsetBPMChange.Value || ControlPoint.Value == null)
                     return;
 
-                ChangeHandler?.BeginChange();
                 ControlPoint.Value.SetHitObjectBPM(Beatmap, val.OldValue);
                 Beatmap.UpdateAllHitObjects();
-                ChangeHandler?.EndChange();
             });
         }
 
