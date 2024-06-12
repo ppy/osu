@@ -97,8 +97,8 @@ namespace osu.Game.Beatmaps.Formats
             //     writer.WriteLine(@"SkinPreference:" + b.SkinPreference);
             if (beatmap.EpilepsyWarning)
                 writer.WriteLine(@"EpilepsyWarning: 1");
-            if (beatmap.BeatmapInfo.CountdownOffset > 0)
-                writer.WriteLine(FormattableString.Invariant($@"CountdownOffset: {beatmap.BeatmapInfo.CountdownOffset}"));
+            if (beatmap.CountdownOffset > 0)
+                writer.WriteLine(FormattableString.Invariant($@"CountdownOffset: {beatmap.CountdownOffset}"));
             if (onlineRulesetID == 3)
                 writer.WriteLine(FormattableString.Invariant($"SpecialStyle: {(beatmap.SpecialStyle ? '1' : '0')}"));
             writer.WriteLine(FormattableString.Invariant($"WidescreenStoryboard: {(beatmap.WidescreenStoryboard ? '1' : '0')}"));

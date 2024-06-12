@@ -250,6 +250,12 @@ namespace osu.Game.Screens.Edit
             set => PlayableBeatmap.Countdown = value;
         }
 
+        public int CountdownOffset
+        {
+            get => PlayableBeatmap.CountdownOffset;
+            set => PlayableBeatmap.CountdownOffset = value;
+        }
+
         public IBeatmap Clone() => (EditorBeatmap)MemberwiseClone();
 
         private IList mutableHitObjects => (IList)PlayableBeatmap.HitObjects;

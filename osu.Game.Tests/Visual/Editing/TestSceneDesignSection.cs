@@ -94,7 +94,7 @@ namespace osu.Game.Tests.Visual.Editing
             AddStep("commit text", () => InputManager.Key(Key.Enter));
 
             AddAssert($"displayed value is {expectedFinalValue}", () => designSection.CountdownOffset.Current.Value == expectedFinalValue.ToString(CultureInfo.InvariantCulture));
-            AddAssert($"beatmap value is {expectedFinalValue}", () => editorBeatmap.BeatmapInfo.CountdownOffset == expectedFinalValue);
+            AddAssert($"beatmap value is {expectedFinalValue}", () => editorBeatmap.CountdownOffset == expectedFinalValue);
         }
 
         private partial class TestDesignSection : DesignSection

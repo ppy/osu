@@ -58,7 +58,7 @@ namespace osu.Game.Screens.Edit.Setup
                         CountdownOffset = new LabelledNumberBox
                         {
                             Label = EditorSetupStrings.CountdownOffset,
-                            Current = { Value = Beatmap.BeatmapInfo.CountdownOffset.ToString() },
+                            Current = { Value = Beatmap.CountdownOffset.ToString() },
                             Description = EditorSetupStrings.CountdownOffsetDescription,
                         }
                     }
@@ -113,13 +113,13 @@ namespace osu.Game.Screens.Edit.Setup
         {
             updateBeatmap();
             // update displayed text to ensure parsed value matches display (i.e. if empty string was provided).
-            CountdownOffset.Current.Value = Beatmap.BeatmapInfo.CountdownOffset.ToString(CultureInfo.InvariantCulture);
+            CountdownOffset.Current.Value = Beatmap.CountdownOffset.ToString(CultureInfo.InvariantCulture);
         }
 
         private void updateBeatmap()
         {
             Beatmap.Countdown = EnableCountdown.Current.Value ? CountdownSpeed.Current.Value : CountdownType.None;
-            Beatmap.BeatmapInfo.CountdownOffset = int.TryParse(CountdownOffset.Current.Value, NumberStyles.None, CultureInfo.InvariantCulture, out int offset) ? offset : 0;
+            Beatmap.CountdownOffset = int.TryParse(CountdownOffset.Current.Value, NumberStyles.None, CultureInfo.InvariantCulture, out int offset) ? offset : 0;
 
             Beatmap.WidescreenStoryboard = widescreenSupport.Current.Value;
             Beatmap.EpilepsyWarning = epilepsyWarning.Current.Value;

@@ -309,7 +309,7 @@ namespace osu.Game.Beatmaps.Formats
                     break;
 
                 case @"CountdownOffset":
-                    beatmap.BeatmapInfo.CountdownOffset = Parsing.ParseInt(pair.Value);
+                    beatmap.CountdownOffset = Parsing.ParseInt(pair.Value);
                     break;
             }
         }
