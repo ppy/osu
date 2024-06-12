@@ -148,9 +148,6 @@ namespace osu.Game.Beatmaps
         /// </summary>
         public double? EditorTimestamp { get; set; }
 
-        [Ignored]
-        public CountdownType Countdown { get; set; } = CountdownType.Normal;
-
         /// <summary>
         /// The number of beats to move the countdown backwards (compared to its default location).
         /// </summary>

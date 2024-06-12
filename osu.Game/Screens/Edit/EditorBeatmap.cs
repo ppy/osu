@@ -244,6 +244,12 @@ namespace osu.Game.Screens.Edit
             set => PlayableBeatmap.TimelineZoom = value;
         }
 
+        public CountdownType Countdown
+        {
+            get => PlayableBeatmap.Countdown;
+            set => PlayableBeatmap.Countdown = value;
+        }
+
         public IBeatmap Clone() => (EditorBeatmap)MemberwiseClone();
 
         private IList mutableHitObjects => (IList)PlayableBeatmap.HitObjects;

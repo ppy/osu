@@ -51,7 +51,7 @@ namespace osu.Game.Tests.Visual.Editing
         {
             AddStep("turn countdown off", () => designSection.EnableCountdown.Current.Value = false);
 
-            AddAssert("beatmap has correct type", () => editorBeatmap.BeatmapInfo.Countdown == CountdownType.None);
+            AddAssert("beatmap has correct type", () => editorBeatmap.Countdown == CountdownType.None);
             AddUntilStep("other controls hidden", () => !designSection.CountdownSettings.IsPresent);
         }
 
@@ -60,12 +60,12 @@ namespace osu.Game.Tests.Visual.Editing
         {
             AddStep("turn countdown on", () => designSection.EnableCountdown.Current.Value = true);
 
-            AddAssert("beatmap has correct type", () => editorBeatmap.BeatmapInfo.Countdown == CountdownType.Normal);
+            AddAssert("beatmap has correct type", () => editorBeatmap.Countdown == CountdownType.Normal);
             AddUntilStep("other controls shown", () => designSection.CountdownSettings.IsPresent);
 
             AddStep("change countdown speed", () => designSection.CountdownSpeed.Current.Value = CountdownType.DoubleSpeed);
 
-            AddAssert("beatmap has correct type", () => editorBeatmap.BeatmapInfo.Countdown == CountdownType.DoubleSpeed);
+            AddAssert("beatmap has correct type", () => editorBeatmap.Countdown == CountdownType.DoubleSpeed);
             AddUntilStep("other controls still shown", () => designSection.CountdownSettings.IsPresent);
         }
 
@@ -74,7 +74,7 @@ namespace osu.Game.Tests.Visual.Editing
         {
             AddStep("turn countdown on", () => designSection.EnableCountdown.Current.Value = true);
 
-            AddAssert("beatmap has correct type", () => editorBeatmap.BeatmapInfo.Countdown == CountdownType.Normal);
+            AddAssert("beatmap has correct type", () => editorBeatmap.Countdown == CountdownType.Normal);
 
             checkOffsetAfter("1", 1);
             checkOffsetAfter(string.Empty, 0);
