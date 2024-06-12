@@ -120,6 +120,8 @@ namespace osu.Game.Beatmaps
 
         public bool SpecialStyle { get; set; }
 
+        public bool LetterboxInBreaks { get; set; }
+
         IBeatmap IBeatmap.Clone() => Clone();
 
         public Beatmap<T> Clone() => (Beatmap<T>)MemberwiseClone();

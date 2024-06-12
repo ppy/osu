@@ -202,6 +202,12 @@ namespace osu.Game.Screens.Edit
             set => PlayableBeatmap.SpecialStyle = value;
         }
 
+        public bool LetterboxInBreaks
+        {
+            get => PlayableBeatmap.LetterboxInBreaks;
+            set => PlayableBeatmap.LetterboxInBreaks = value;
+        }
+
         public IBeatmap Clone() => (EditorBeatmap)MemberwiseClone();
 
         private IList mutableHitObjects => (IList)PlayableBeatmap.HitObjects;

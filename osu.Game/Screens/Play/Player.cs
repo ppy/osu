@@ -430,7 +430,7 @@ namespace osu.Game.Screens.Play
                 Children = new[]
                 {
                     DimmableStoryboard.OverlayLayerContainer.CreateProxy(),
-                    BreakOverlay = new BreakOverlay(working.Beatmap.BeatmapInfo.LetterboxInBreaks, ScoreProcessor)
+                    BreakOverlay = new BreakOverlay(working.Beatmap.LetterboxInBreaks, ScoreProcessor)
                     {
                         Clock = DrawableRuleset.FrameStableClock,
                         ProcessCustomClock = false,

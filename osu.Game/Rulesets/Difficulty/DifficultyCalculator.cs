@@ -355,6 +355,12 @@ namespace osu.Game.Rulesets.Difficulty
                 set => baseBeatmap.SpecialStyle = value;
             }
 
+            public bool LetterboxInBreaks
+            {
+                get => baseBeatmap.LetterboxInBreaks;
+                set => baseBeatmap.LetterboxInBreaks = value;
+            }
+
             #endregion
         }
     }

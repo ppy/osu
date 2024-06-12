@@ -285,7 +285,7 @@ namespace osu.Game.Beatmaps.Formats
                     break;
 
                 case @"LetterboxInBreaks":
-                    beatmap.BeatmapInfo.LetterboxInBreaks = Parsing.ParseInt(pair.Value) == 1;
+                    beatmap.LetterboxInBreaks = Parsing.ParseInt(pair.Value) == 1;
                     break;
 
                 case @"SpecialStyle":
