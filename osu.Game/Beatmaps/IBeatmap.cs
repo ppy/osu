@@ -99,6 +99,8 @@ namespace osu.Game.Beatmaps
 
         double TimelineZoom { get; internal set; }
 
+        CountdownType Countdown { get; internal set; }
+
         /// <summary>
         /// Creates a shallow-clone of this beatmap and returns it.
         /// </summary>

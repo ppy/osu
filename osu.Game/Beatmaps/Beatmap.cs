@@ -134,6 +134,8 @@ namespace osu.Game.Beatmaps
 
         public double TimelineZoom { get; set; } = 1.0;
 
+        public CountdownType Countdown { get; set; } = CountdownType.Normal;
+
         IBeatmap IBeatmap.Clone() => Clone();
 
         public Beatmap<T> Clone() => (Beatmap<T>)MemberwiseClone();

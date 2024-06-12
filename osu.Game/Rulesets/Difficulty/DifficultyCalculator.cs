@@ -397,6 +397,12 @@ namespace osu.Game.Rulesets.Difficulty
                 set => baseBeatmap.TimelineZoom = value;
             }
 
+            public CountdownType Countdown
+            {
+                get => baseBeatmap.Countdown;
+                set => baseBeatmap.Countdown = value;
+            }
+
             #endregion
         }
     }

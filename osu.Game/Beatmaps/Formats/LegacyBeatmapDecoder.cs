@@ -305,7 +305,7 @@ namespace osu.Game.Beatmaps.Formats
                     break;
 
                 case @"Countdown":
-                    beatmap.BeatmapInfo.Countdown = Enum.Parse<CountdownType>(pair.Value);
+                    beatmap.Countdown = Enum.Parse<CountdownType>(pair.Value);
                     break;
 
                 case @"CountdownOffset":
