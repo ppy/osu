@@ -231,9 +231,6 @@ namespace osu.Game.Screens.Edit.Timing
 
             timing.BeatLength = 60000 / (timing.BPM + adjust);
 
-            if (beatmap.AdjustNotesOnOffsetBPMChange.Value)
-                timing.SetHitObjectBPM(beatmap, 60000 / (timing.BPM - adjust));
-
             beatmap.UpdateAllHitObjects();
         }
 
