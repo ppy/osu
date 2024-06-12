@@ -186,7 +186,7 @@ namespace osu.Game.Beatmaps.Formats
         private static void applyLegacyDefaults(Beatmap beatmap)
         {
             beatmap.WidescreenStoryboard = false;
-            beatmap.BeatmapInfo.SamplesMatchPlaybackRate = false;
+            beatmap.SamplesMatchPlaybackRate = false;
         }
 
         protected override void ParseLine(Beatmap beatmap, Section section, string line)
@@ -301,7 +301,7 @@ namespace osu.Game.Beatmaps.Formats
                     break;
 
                 case @"SamplesMatchPlaybackRate":
-                    beatmap.BeatmapInfo.SamplesMatchPlaybackRate = Parsing.ParseInt(pair.Value) == 1;
+                    beatmap.SamplesMatchPlaybackRate = Parsing.ParseInt(pair.Value) == 1;
                     break;
 
                 case @"Countdown":

@@ -138,8 +138,6 @@ namespace osu.Game.Beatmaps
 
         #region Properties we may not want persisted (but also maybe no harm?)
 
-        public bool SamplesMatchPlaybackRate { get; set; } = true;
-
         /// <summary>
         /// The time at which this beatmap was last played by the local user.
         /// </summary>

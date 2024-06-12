@@ -126,6 +126,8 @@ namespace osu.Game.Beatmaps
 
         public bool EpilepsyWarning { get; set; }
 
+        public bool SamplesMatchPlaybackRate { get; set; } = true;
+
         IBeatmap IBeatmap.Clone() => Clone();
 
         public Beatmap<T> Clone() => (Beatmap<T>)MemberwiseClone();

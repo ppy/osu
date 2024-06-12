@@ -86,7 +86,7 @@ namespace osu.Game.Screens.Edit.Setup
                 {
                     Label = EditorSetupStrings.SamplesMatchPlaybackRate,
                     Description = EditorSetupStrings.SamplesMatchPlaybackRateDescription,
-                    Current = { Value = Beatmap.BeatmapInfo.SamplesMatchPlaybackRate }
+                    Current = { Value = Beatmap.SamplesMatchPlaybackRate }
                 }
             };
         }
@@ -124,7 +124,7 @@ namespace osu.Game.Screens.Edit.Setup
             Beatmap.WidescreenStoryboard = widescreenSupport.Current.Value;
             Beatmap.EpilepsyWarning = epilepsyWarning.Current.Value;
             Beatmap.LetterboxInBreaks = letterboxDuringBreaks.Current.Value;
-            Beatmap.BeatmapInfo.SamplesMatchPlaybackRate = samplesMatchPlaybackRate.Current.Value;
+            Beatmap.SamplesMatchPlaybackRate = samplesMatchPlaybackRate.Current.Value;
 
             Beatmap.SaveState();
         }

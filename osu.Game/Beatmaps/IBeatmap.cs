@@ -80,6 +80,8 @@ namespace osu.Game.Beatmaps
 
         bool EpilepsyWarning { get; internal set; }
 
+        bool SamplesMatchPlaybackRate { get; internal set; }
+
         /// <summary>
         /// Creates a shallow-clone of this beatmap and returns it.
         /// </summary>
