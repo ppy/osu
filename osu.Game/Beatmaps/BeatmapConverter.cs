@@ -71,6 +71,7 @@ namespace osu.Game.Beatmaps
             beatmap.StackLeniency = original.StackLeniency;
             beatmap.SpecialStyle = original.SpecialStyle;
             beatmap.LetterboxInBreaks = original.LetterboxInBreaks;
+            beatmap.WidescreenStoryboard = original.WidescreenStoryboard;
 
             return beatmap;
         }

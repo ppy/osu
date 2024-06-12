@@ -122,6 +122,8 @@ namespace osu.Game.Beatmaps
 
         public bool LetterboxInBreaks { get; set; }
 
+        public bool WidescreenStoryboard { get; set; } = true;
+
         IBeatmap IBeatmap.Clone() => Clone();
 
         public Beatmap<T> Clone() => (Beatmap<T>)MemberwiseClone();

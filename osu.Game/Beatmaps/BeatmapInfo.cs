@@ -138,8 +138,6 @@ namespace osu.Game.Beatmaps
 
         #region Properties we may not want persisted (but also maybe no harm?)
 
-        public bool WidescreenStoryboard { get; set; } = true;
-
         public bool EpilepsyWarning { get; set; }
 
         public bool SamplesMatchPlaybackRate { get; set; } = true;

@@ -361,6 +361,12 @@ namespace osu.Game.Rulesets.Difficulty
                 set => baseBeatmap.LetterboxInBreaks = value;
             }
 
+            public bool WidescreenStoryboard
+            {
+                get => baseBeatmap.WidescreenStoryboard;
+                set => baseBeatmap.WidescreenStoryboard = value;
+            }
+
             #endregion
         }
     }

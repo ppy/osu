@@ -81,7 +81,7 @@ namespace osu.Game.Beatmaps.Formats
             this.beatmap = beatmap;
             this.beatmap.BeatmapInfo.BeatmapVersion = FormatVersion;
 
-            applyLegacyDefaults(this.beatmap.BeatmapInfo);
+            applyLegacyDefaults(this.beatmap);
 
             base.ParseStreamInto(stream, beatmap);
 
@@ -183,10 +183,10 @@ namespace osu.Game.Beatmaps.Formats
         /// This method's intention is to restore those legacy defaults.
         /// See also: https://osu.ppy.sh/wiki/en/Client/File_formats/Osu_%28file_format%29
         /// </summary>
-        private static void applyLegacyDefaults(BeatmapInfo beatmapInfo)
+        private static void applyLegacyDefaults(Beatmap beatmap)
         {
-            beatmapInfo.WidescreenStoryboard = false;
-            beatmapInfo.SamplesMatchPlaybackRate = false;
+            beatmap.WidescreenStoryboard = false;
+            beatmap.BeatmapInfo.SamplesMatchPlaybackRate = false;
         }
 
         protected override void ParseLine(Beatmap beatmap, Section section, string line)
@@ -293,7 +293,7 @@ namespace osu.Game.Beatmaps.Formats
                     break;
 
                 case @"WidescreenStoryboard":
-                    beatmap.BeatmapInfo.WidescreenStoryboard = Parsing.ParseInt(pair.Value) == 1;
+                    beatmap.WidescreenStoryboard = Parsing.ParseInt(pair.Value) == 1;
                     break;
 
                 case @"EpilepsyWarning":
