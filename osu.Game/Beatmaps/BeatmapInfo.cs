@@ -143,8 +143,6 @@ namespace osu.Game.Beatmaps
 
         public int BeatDivisor { get; set; } = 4;
 
-        public double TimelineZoom { get; set; } = 1.0;
-
         /// <summary>
         /// The time in milliseconds when last exiting the editor with this beatmap loaded.
         /// </summary>

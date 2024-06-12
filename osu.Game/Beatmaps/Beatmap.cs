@@ -132,6 +132,8 @@ namespace osu.Game.Beatmaps
 
         public int GridSize { get; set; }
 
+        public double TimelineZoom { get; set; } = 1.0;
+
         IBeatmap IBeatmap.Clone() => Clone();
 
         public Beatmap<T> Clone() => (Beatmap<T>)MemberwiseClone();

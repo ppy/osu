@@ -76,6 +76,7 @@ namespace osu.Game.Beatmaps
             beatmap.SamplesMatchPlaybackRate = original.SamplesMatchPlaybackRate;
             beatmap.DistanceSpacing = original.DistanceSpacing;
             beatmap.GridSize = original.GridSize;
+            beatmap.TimelineZoom = original.TimelineZoom;
 
             return beatmap;
         }

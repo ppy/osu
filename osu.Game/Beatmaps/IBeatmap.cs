@@ -97,6 +97,8 @@ namespace osu.Game.Beatmaps
 
         int GridSize { get; internal set; }
 
+        double TimelineZoom { get; internal set; }
+
         /// <summary>
         /// Creates a shallow-clone of this beatmap and returns it.
         /// </summary>

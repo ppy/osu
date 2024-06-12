@@ -415,7 +415,6 @@ namespace osu.Game.Beatmaps
                         DifficultyName = decodedInfo.DifficultyName,
                         OnlineID = decodedInfo.OnlineID,
                         BeatDivisor = decodedInfo.BeatDivisor,
-                        TimelineZoom = decodedInfo.TimelineZoom,
                         MD5Hash = memoryStream.ComputeMD5Hash(),
                         EndTimeObjectCount = decoded.HitObjects.Count(h => h is IHasDuration),
                         TotalObjectCount = decoded.HitObjects.Count

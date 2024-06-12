@@ -341,7 +341,7 @@ namespace osu.Game.Beatmaps.Formats
                     break;
 
                 case @"TimelineZoom":
-                    beatmap.BeatmapInfo.TimelineZoom = Math.Max(0, Parsing.ParseDouble(pair.Value));
+                    beatmap.TimelineZoom = Math.Max(0, Parsing.ParseDouble(pair.Value));
                     break;
             }
         }
