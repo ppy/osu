@@ -130,6 +130,8 @@ namespace osu.Game.Beatmaps
 
         public double DistanceSpacing { get; set; } = 1.0;
 
+        public int GridSize { get; set; }
+
         IBeatmap IBeatmap.Clone() => Clone();
 
         public Beatmap<T> Clone() => (Beatmap<T>)MemberwiseClone();

@@ -114,7 +114,7 @@ namespace osu.Game.Beatmaps.Formats
                 writer.WriteLine(FormattableString.Invariant($"Bookmarks: {string.Join(',', beatmap.BeatmapInfo.Bookmarks)}"));
             writer.WriteLine(FormattableString.Invariant($"DistanceSpacing: {beatmap.DistanceSpacing}"));
             writer.WriteLine(FormattableString.Invariant($"BeatDivisor: {beatmap.BeatmapInfo.BeatDivisor}"));
-            writer.WriteLine(FormattableString.Invariant($"GridSize: {beatmap.BeatmapInfo.GridSize}"));
+            writer.WriteLine(FormattableString.Invariant($"GridSize: {beatmap.GridSize}"));
             writer.WriteLine(FormattableString.Invariant($"TimelineZoom: {beatmap.BeatmapInfo.TimelineZoom}"));
         }
 

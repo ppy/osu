@@ -385,6 +385,12 @@ namespace osu.Game.Rulesets.Difficulty
                 set => baseBeatmap.DistanceSpacing = value;
             }
 
+            public int GridSize
+            {
+                get => baseBeatmap.GridSize;
+                set => baseBeatmap.GridSize = value;
+            }
+
             #endregion
         }
     }
