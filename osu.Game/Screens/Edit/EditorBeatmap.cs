@@ -214,6 +214,12 @@ namespace osu.Game.Screens.Edit
             set => PlayableBeatmap.WidescreenStoryboard = value;
         }
 
+        public bool EpilepsyWarning
+        {
+            get => PlayableBeatmap.EpilepsyWarning;
+            set => PlayableBeatmap.EpilepsyWarning = value;
+        }
+
         public IBeatmap Clone() => (EditorBeatmap)MemberwiseClone();
 
         private IList mutableHitObjects => (IList)PlayableBeatmap.HitObjects;

@@ -72,6 +72,7 @@ namespace osu.Game.Beatmaps
             beatmap.SpecialStyle = original.SpecialStyle;
             beatmap.LetterboxInBreaks = original.LetterboxInBreaks;
             beatmap.WidescreenStoryboard = original.WidescreenStoryboard;
+            beatmap.EpilepsyWarning = original.EpilepsyWarning;
 
             return beatmap;
         }

@@ -138,7 +138,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             workingBeatmap.Beatmap.AudioLeadIn = 60000;
 
             // Set up data for testing disclaimer display.
-            workingBeatmap.BeatmapInfo.EpilepsyWarning = epilepsyWarning ?? false;
+            workingBeatmap.Beatmap.EpilepsyWarning = epilepsyWarning ?? false;
             workingBeatmap.BeatmapInfo.Status = onlineStatus ?? BeatmapOnlineStatus.Ranked;
 
             Beatmap.Value = workingBeatmap;

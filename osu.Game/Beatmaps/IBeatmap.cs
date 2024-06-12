@@ -78,6 +78,8 @@ namespace osu.Game.Beatmaps
 
         bool WidescreenStoryboard { get; internal set; }
 
+        bool EpilepsyWarning { get; internal set; }
+
         /// <summary>
         /// Creates a shallow-clone of this beatmap and returns it.
         /// </summary>

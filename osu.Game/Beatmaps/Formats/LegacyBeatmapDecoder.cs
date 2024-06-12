@@ -297,7 +297,7 @@ namespace osu.Game.Beatmaps.Formats
                     break;
 
                 case @"EpilepsyWarning":
-                    beatmap.BeatmapInfo.EpilepsyWarning = Parsing.ParseInt(pair.Value) == 1;
+                    beatmap.EpilepsyWarning = Parsing.ParseInt(pair.Value) == 1;
                     break;
 
                 case @"SamplesMatchPlaybackRate":
