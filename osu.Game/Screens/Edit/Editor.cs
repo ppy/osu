@@ -1231,6 +1231,27 @@ namespace osu.Game.Screens.Edit
             loader?.CancelPendingDifficultySwitch();
         }
 
+        public Task<bool> Reload()
+        {
+            var tcs = new TaskCompletionSource<bool>();
+
+            dialogOverlay.Push(new ReloadEditorDialog(
+                reload: () =>
+                {
+                    bool reloadedSuccessfully = attemptMutationOperation(() =>
+                    {
+                        if (!Save())
+                            return false;
+
+                        SwitchToDifficulty(editorBeatmap.BeatmapInfo);
+                        return true;
+                    });
+                    tcs.SetResult(reloadedSuccessfully);
+                },
+                cancel: () => tcs.SetResult(false)));
+            return tcs.Task;
+        }
+
         public void HandleTimestamp(string timestamp)
         {
             if (!EditorTimestampParser.TryParse(timestamp, out var timeSpan, out string selection))
