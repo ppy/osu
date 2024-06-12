@@ -196,6 +196,12 @@ namespace osu.Game.Screens.Edit
             set => PlayableBeatmap.StackLeniency = value;
         }
 
+        public bool SpecialStyle
+        {
+            get => PlayableBeatmap.SpecialStyle;
+            set => PlayableBeatmap.SpecialStyle = value;
+        }
+
         public IBeatmap Clone() => (EditorBeatmap)MemberwiseClone();
 
         private IList mutableHitObjects => (IList)PlayableBeatmap.HitObjects;

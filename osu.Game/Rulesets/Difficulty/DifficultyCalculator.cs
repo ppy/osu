@@ -349,6 +349,12 @@ namespace osu.Game.Rulesets.Difficulty
                 set => baseBeatmap.StackLeniency = value;
             }
 
+            public bool SpecialStyle
+            {
+                get => baseBeatmap.SpecialStyle;
+                set => baseBeatmap.SpecialStyle = value;
+            }
+
             #endregion
         }
     }

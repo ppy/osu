@@ -72,6 +72,8 @@ namespace osu.Game.Beatmaps
 
         float StackLeniency { get; internal set; }
 
+        bool SpecialStyle { get; internal set; }
+
         /// <summary>
         /// Creates a shallow-clone of this beatmap and returns it.
         /// </summary>

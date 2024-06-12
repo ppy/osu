@@ -69,6 +69,7 @@ namespace osu.Game.Beatmaps
             beatmap.UnhandledEventLines = original.UnhandledEventLines;
             beatmap.AudioLeadIn = original.AudioLeadIn;
             beatmap.StackLeniency = original.StackLeniency;
+            beatmap.SpecialStyle = original.SpecialStyle;
 
             return beatmap;
         }
