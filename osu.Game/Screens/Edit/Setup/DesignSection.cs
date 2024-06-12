@@ -80,7 +80,7 @@ namespace osu.Game.Screens.Edit.Setup
                 {
                     Label = EditorSetupStrings.LetterboxDuringBreaks,
                     Description = EditorSetupStrings.LetterboxDuringBreaksDescription,
-                    Current = { Value = Beatmap.BeatmapInfo.LetterboxInBreaks }
+                    Current = { Value = Beatmap.LetterboxInBreaks }
                 },
                 samplesMatchPlaybackRate = new LabelledSwitchButton
                 {
@@ -123,7 +123,7 @@ namespace osu.Game.Screens.Edit.Setup
 
             Beatmap.BeatmapInfo.WidescreenStoryboard = widescreenSupport.Current.Value;
             Beatmap.BeatmapInfo.EpilepsyWarning = epilepsyWarning.Current.Value;
-            Beatmap.BeatmapInfo.LetterboxInBreaks = letterboxDuringBreaks.Current.Value;
+            Beatmap.LetterboxInBreaks = letterboxDuringBreaks.Current.Value;
             Beatmap.BeatmapInfo.SamplesMatchPlaybackRate = samplesMatchPlaybackRate.Current.Value;
 
             Beatmap.SaveState();

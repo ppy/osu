@@ -70,6 +70,7 @@ namespace osu.Game.Beatmaps
             beatmap.AudioLeadIn = original.AudioLeadIn;
             beatmap.StackLeniency = original.StackLeniency;
             beatmap.SpecialStyle = original.SpecialStyle;
+            beatmap.LetterboxInBreaks = original.LetterboxInBreaks;
 
             return beatmap;
         }
