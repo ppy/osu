@@ -343,6 +343,12 @@ namespace osu.Game.Rulesets.Difficulty
                 set => baseBeatmap.AudioLeadIn = value;
             }
 
+            public float StackLeniency
+            {
+                get => baseBeatmap.StackLeniency;
+                set => baseBeatmap.StackLeniency = value;
+            }
+
             #endregion
         }
     }

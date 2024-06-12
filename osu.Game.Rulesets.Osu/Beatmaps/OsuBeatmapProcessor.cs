@@ -51,13 +51,13 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
                     h.StackHeight = 0;
 
                 if (Beatmap.BeatmapInfo.BeatmapVersion >= 6)
-                    applyStacking(Beatmap.BeatmapInfo, hitObjects, 0, hitObjects.Count - 1);
+                    applyStacking(Beatmap, hitObjects, 0, hitObjects.Count - 1);
                 else
-                    applyStackingOld(Beatmap.BeatmapInfo, hitObjects);
+                    applyStackingOld(Beatmap, hitObjects);
             }
         }
 
-        private void applyStacking(BeatmapInfo beatmapInfo, List<OsuHitObject> hitObjects, int startIndex, int endIndex)
+        private void applyStacking(IBeatmap beatmap, List<OsuHitObject> hitObjects, int startIndex, int endIndex)
         {
             ArgumentOutOfRangeException.ThrowIfGreaterThan(startIndex, endIndex);
             ArgumentOutOfRangeException.ThrowIfNegative(startIndex);
@@ -82,7 +82,7 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
                             continue;
 
                         double endTime = stackBaseObject.GetEndTime();
-                        double stackThreshold = objectN.TimePreempt * beatmapInfo.StackLeniency;
+                        double stackThreshold = objectN.TimePreempt * beatmap.StackLeniency;
 
                         if (objectN.StartTime - endTime > stackThreshold)
                             // We are no longer within stacking range of the next object.
@@ -127,7 +127,7 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
                 OsuHitObject objectI = hitObjects[i];
                 if (objectI.StackHeight != 0 || objectI is Spinner) continue;
 
-                double stackThreshold = objectI.TimePreempt * beatmapInfo.StackLeniency;
+                double stackThreshold = objectI.TimePreempt * beatmap.StackLeniency;
 
                 /* If this object is a hitcircle, then we enter this "special" case.
                  * It either ends with a stack of hitcircles only, or a stack of hitcircles that are underneath a slider.
@@ -209,7 +209,7 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
             }
         }
 
-        private void applyStackingOld(BeatmapInfo beatmapInfo, List<OsuHitObject> hitObjects)
+        private void applyStackingOld(IBeatmap beatmap, List<OsuHitObject> hitObjects)
         {
             for (int i = 0; i < hitObjects.Count; i++)
             {
@@ -223,7 +223,7 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
 
                 for (int j = i + 1; j < hitObjects.Count; j++)
                 {
-                    double stackThreshold = hitObjects[i].TimePreempt * beatmapInfo.StackLeniency;
+                    double stackThreshold = hitObjects[i].TimePreempt * beatmap.StackLeniency;
 
                     if (hitObjects[j].StartTime - stackThreshold > startTime)
                         break;

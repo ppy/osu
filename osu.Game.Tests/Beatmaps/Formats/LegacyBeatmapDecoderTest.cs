@@ -82,7 +82,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.AreEqual("03. Renatus - Soleily 192kbps.mp3", metadata.AudioFile);
                 Assert.AreEqual(0, beatmap.AudioLeadIn);
                 Assert.AreEqual(164471, metadata.PreviewTime);
-                Assert.AreEqual(0.7f, beatmapInfo.StackLeniency);
+                Assert.AreEqual(0.7f, beatmap.StackLeniency);
                 Assert.IsTrue(beatmapInfo.Ruleset.OnlineID == 0);
                 Assert.IsFalse(beatmapInfo.LetterboxInBreaks);
                 Assert.IsFalse(beatmapInfo.SpecialStyle);
@@ -951,7 +951,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.Multiple(() =>
                 {
                     Assert.That(decoded.AudioLeadIn, Is.EqualTo(0));
-                    Assert.That(decoded.BeatmapInfo.StackLeniency, Is.EqualTo(0.7f));
+                    Assert.That(decoded.StackLeniency, Is.EqualTo(0.7f));
                     Assert.That(decoded.BeatmapInfo.SpecialStyle, Is.False);
                     Assert.That(decoded.BeatmapInfo.LetterboxInBreaks, Is.False);
                     Assert.That(decoded.BeatmapInfo.WidescreenStoryboard, Is.False);
