@@ -226,6 +226,12 @@ namespace osu.Game.Screens.Edit
             set => PlayableBeatmap.SamplesMatchPlaybackRate = value;
         }
 
+        public double DistanceSpacing
+        {
+            get => PlayableBeatmap.DistanceSpacing;
+            set => PlayableBeatmap.DistanceSpacing = value;
+        }
+
         public IBeatmap Clone() => (EditorBeatmap)MemberwiseClone();
 
         private IList mutableHitObjects => (IList)PlayableBeatmap.HitObjects;

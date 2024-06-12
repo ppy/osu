@@ -329,7 +329,7 @@ namespace osu.Game.Beatmaps.Formats
                     break;
 
                 case @"DistanceSpacing":
-                    beatmap.BeatmapInfo.DistanceSpacing = Math.Max(0, Parsing.ParseDouble(pair.Value));
+                    beatmap.DistanceSpacing = Math.Max(0, Parsing.ParseDouble(pair.Value));
                     break;
 
                 case @"BeatDivisor":

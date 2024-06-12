@@ -74,6 +74,7 @@ namespace osu.Game.Beatmaps
             beatmap.WidescreenStoryboard = original.WidescreenStoryboard;
             beatmap.EpilepsyWarning = original.EpilepsyWarning;
             beatmap.SamplesMatchPlaybackRate = original.SamplesMatchPlaybackRate;
+            beatmap.DistanceSpacing = original.DistanceSpacing;
 
             return beatmap;
         }

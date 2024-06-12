@@ -379,6 +379,12 @@ namespace osu.Game.Rulesets.Difficulty
                 set => baseBeatmap.SamplesMatchPlaybackRate = value;
             }
 
+            public double DistanceSpacing
+            {
+                get => baseBeatmap.DistanceSpacing;
+                set => baseBeatmap.DistanceSpacing = value;
+            }
+
             #endregion
         }
     }
