@@ -16,6 +16,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
@@ -161,7 +162,10 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
                                             {
                                                 new Drawable?[]
                                                 {
-                                                    null,
+                                                    new DailyChallengeTimeRemainingRing
+                                                    {
+                                                        RelativeSizeAxes = Axes.Both,
+                                                    },
                                                     null,
                                                     // Middle column (leaderboard)
                                                     new GridContainer
@@ -171,7 +175,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
                                                         {
                                                             new Drawable[]
                                                             {
-                                                                new OverlinedHeader("Leaderboard")
+                                                                new SectionHeader("Leaderboard")
                                                             },
                                                             [leaderboard = new MatchLeaderboard { RelativeSizeAxes = Axes.Both }],
                                                         },
@@ -191,7 +195,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
                                                         {
                                                             new Drawable[]
                                                             {
-                                                                new OverlinedHeader("Chat")
+                                                                new SectionHeader("Chat")
                                                             },
                                                             [new MatchChatDisplay(room) { RelativeSizeAxes = Axes.Both }]
                                                         },
