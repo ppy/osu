@@ -134,8 +134,6 @@ namespace osu.Game.Beatmaps
                 Status = BeatmapOnlineStatus.None;
         }
 
-        #region Properties we may not want persisted (but also maybe no harm?)
-
         /// <summary>
         /// The time at which this beatmap was last played by the local user.
         /// </summary>
@@ -147,8 +145,6 @@ namespace osu.Game.Beatmaps
         /// The time in milliseconds when last exiting the editor with this beatmap loaded.
         /// </summary>
         public double? EditorTimestamp { get; set; }
-
-        #endregion
 
         public bool Equals(BeatmapInfo? other)
         {
