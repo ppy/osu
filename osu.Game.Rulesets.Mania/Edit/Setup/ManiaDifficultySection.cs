@@ -26,10 +26,10 @@ namespace osu.Game.Rulesets.Mania.Edit.Setup
         private LabelledSliderBar<double> tickRateSlider { get; set; } = null!;
 
         [Resolved]
-        private Editor editor { get; set; } = null!;
+        private Editor? editor { get; set; }
 
         [Resolved]
-        private IEditorChangeHandler changeHandler { get; set; } = null!;
+        private IEditorChangeHandler? changeHandler { get; set; }
 
         [BackgroundDependencyLoader]
         private void load()
@@ -116,16 +116,19 @@ namespace osu.Game.Rulesets.Mania.Edit.Setup
         {
             if (updatingKeyCount) return;
 
+            updateValues();
+
+            if (editor == null) return;
+
             updatingKeyCount = true;
 
-            updateValues();
             editor.Reload().ContinueWith(t =>
             {
                 if (!t.GetResultSafely())
                 {
                     Schedule(() =>
                     {
-                        changeHandler.RestoreState(-1);
+                        changeHandler!.RestoreState(-1);
                         Beatmap.Difficulty.CircleSize = keyCountSlider.Current.Value = keyCount.OldValue;
                         updatingKeyCount = false;
                     });
