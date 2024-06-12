@@ -186,8 +186,8 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
             AddAssert("head note positioned correctly", () => Precision.AlmostEquals(holdNote.ScreenSpaceDrawQuad.BottomLeft, holdNote.Head.ScreenSpaceDrawQuad.BottomLeft));
             AddAssert("tail note positioned correctly", () => Precision.AlmostEquals(holdNote.ScreenSpaceDrawQuad.TopLeft, holdNote.Tail.ScreenSpaceDrawQuad.BottomLeft));
 
-            AddAssert("head blueprint positioned correctly", () => this.ChildrenOfType<EditNotePiece>().ElementAt(0).DrawPosition == holdNote.Head.DrawPosition);
-            AddAssert("tail blueprint positioned correctly", () => this.ChildrenOfType<EditNotePiece>().ElementAt(1).DrawPosition == holdNote.Tail.DrawPosition);
+            AddAssert("head blueprint positioned correctly", () => this.ChildrenOfType<EditHoldNoteEndPiece>().ElementAt(0).DrawPosition == holdNote.Head.DrawPosition);
+            AddAssert("tail blueprint positioned correctly", () => this.ChildrenOfType<EditHoldNoteEndPiece>().ElementAt(1).DrawPosition == holdNote.Tail.DrawPosition);
         }
 
         private void setScrollStep(ScrollingDirection direction)
