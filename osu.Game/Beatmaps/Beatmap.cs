@@ -128,6 +128,8 @@ namespace osu.Game.Beatmaps
 
         public bool SamplesMatchPlaybackRate { get; set; } = true;
 
+        public double DistanceSpacing { get; set; } = 1.0;
+
         IBeatmap IBeatmap.Clone() => Clone();
 
         public Beatmap<T> Clone() => (Beatmap<T>)MemberwiseClone();

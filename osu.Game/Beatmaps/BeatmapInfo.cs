@@ -6,14 +6,12 @@ using System.Diagnostics;
 using System.Linq;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
-using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Collections;
 using osu.Game.Database;
 using osu.Game.Models;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.BeatmapSet.Scores;
 using osu.Game.Rulesets;
-using osu.Game.Rulesets.Edit;
 using osu.Game.Scoring;
 using Realms;
 
@@ -142,18 +140,6 @@ namespace osu.Game.Beatmaps
         /// The time at which this beatmap was last played by the local user.
         /// </summary>
         public DateTimeOffset? LastPlayed { get; set; }
-
-        /// <summary>
-        /// The ratio of distance travelled per time unit.
-        /// Generally used to decouple the spacing between hit objects from the enforced "velocity" of the beatmap (see <see cref="DifficultyControlPoint.SliderVelocity"/>).
-        /// </summary>
-        /// <remarks>
-        /// The most common method of understanding is that at a default value of 1.0, the time-to-distance ratio will match the slider velocity of the beatmap
-        /// at the current point in time. Increasing this value will make hit objects more spaced apart when compared to the cursor movement required to track a slider.
-        ///
-        /// This is only a hint property, used by the editor in <see cref="IDistanceSnapProvider"/> implementations. It does not directly affect the beatmap or gameplay.
-        /// </remarks>
-        public double DistanceSpacing { get; set; } = 1.0;
 
         public int BeatDivisor { get; set; } = 4;
 

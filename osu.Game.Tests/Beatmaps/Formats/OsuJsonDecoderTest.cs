@@ -76,7 +76,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
             Assert.AreEqual(expectedBookmarks.Length, beatmapInfo.Bookmarks.Length);
             for (int i = 0; i < expectedBookmarks.Length; i++)
                 Assert.AreEqual(expectedBookmarks[i], beatmapInfo.Bookmarks[i]);
-            Assert.AreEqual(1.8, beatmapInfo.DistanceSpacing);
+            Assert.AreEqual(1.8, beatmap.DistanceSpacing);
             Assert.AreEqual(4, beatmapInfo.BeatDivisor);
             Assert.AreEqual(4, beatmapInfo.GridSize);
             Assert.AreEqual(2, beatmapInfo.TimelineZoom);

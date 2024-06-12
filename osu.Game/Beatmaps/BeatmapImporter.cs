@@ -414,7 +414,6 @@ namespace osu.Game.Beatmaps
                         Hash = hash,
                         DifficultyName = decodedInfo.DifficultyName,
                         OnlineID = decodedInfo.OnlineID,
-                        DistanceSpacing = decodedInfo.DistanceSpacing,
                         BeatDivisor = decodedInfo.BeatDivisor,
                         GridSize = decodedInfo.GridSize,
                         TimelineZoom = decodedInfo.TimelineZoom,
