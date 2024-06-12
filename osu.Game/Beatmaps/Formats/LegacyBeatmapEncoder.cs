@@ -79,7 +79,7 @@ namespace osu.Game.Beatmaps.Formats
             writer.WriteLine("[General]");
 
             if (!string.IsNullOrEmpty(beatmap.Metadata.AudioFile)) writer.WriteLine(FormattableString.Invariant($"AudioFilename: {Path.GetFileName(beatmap.Metadata.AudioFile)}"));
-            writer.WriteLine(FormattableString.Invariant($"AudioLeadIn: {beatmap.BeatmapInfo.AudioLeadIn}"));
+            writer.WriteLine(FormattableString.Invariant($"AudioLeadIn: {beatmap.AudioLeadIn}"));
             writer.WriteLine(FormattableString.Invariant($"PreviewTime: {beatmap.Metadata.PreviewTime}"));
             writer.WriteLine(FormattableString.Invariant($"Countdown: {(int)beatmap.BeatmapInfo.Countdown}"));
             writer.WriteLine(FormattableString.Invariant(

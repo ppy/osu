@@ -135,7 +135,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             var workingBeatmap = CreateWorkingBeatmap(new OsuRuleset().RulesetInfo);
 
             // Add intro time to test quick retry skipping (TestQuickRetry).
-            workingBeatmap.BeatmapInfo.AudioLeadIn = 60000;
+            workingBeatmap.Beatmap.AudioLeadIn = 60000;
 
             // Set up data for testing disclaimer display.
             workingBeatmap.BeatmapInfo.EpilepsyWarning = epilepsyWarning ?? false;

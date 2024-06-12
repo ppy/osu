@@ -51,7 +51,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
         {
             var beatmap = decodeAsJson(normal);
             var beatmapInfo = beatmap.BeatmapInfo;
-            Assert.AreEqual(0, beatmapInfo.AudioLeadIn);
+            Assert.AreEqual(0, beatmap.AudioLeadIn);
             Assert.AreEqual(0.7f, beatmapInfo.StackLeniency);
             Assert.AreEqual(false, beatmapInfo.SpecialStyle);
             Assert.IsTrue(beatmapInfo.Ruleset.OnlineID == 0);

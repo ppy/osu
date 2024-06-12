@@ -68,6 +68,8 @@ namespace osu.Game.Beatmaps
         /// </summary>
         double GetMostCommonBeatLength();
 
+        double AudioLeadIn { get; internal set; }
+
         /// <summary>
         /// Creates a shallow-clone of this beatmap and returns it.
         /// </summary>

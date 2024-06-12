@@ -114,6 +114,8 @@ namespace osu.Game.Beatmaps
             return mostCommon.beatLength;
         }
 
+        public double AudioLeadIn { get; set; }
+
         IBeatmap IBeatmap.Clone() => Clone();
 
         public Beatmap<T> Clone() => (Beatmap<T>)MemberwiseClone();

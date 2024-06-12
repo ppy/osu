@@ -238,7 +238,7 @@ namespace osu.Game.Beatmaps.Formats
                     break;
 
                 case @"AudioLeadIn":
-                    beatmap.BeatmapInfo.AudioLeadIn = Parsing.ParseInt(pair.Value);
+                    beatmap.AudioLeadIn = Parsing.ParseInt(pair.Value);
                     break;
 
                 case @"PreviewTime":

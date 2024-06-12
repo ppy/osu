@@ -138,8 +138,6 @@ namespace osu.Game.Beatmaps
 
         #region Properties we may not want persisted (but also maybe no harm?)
 
-        public double AudioLeadIn { get; set; }
-
         public float StackLeniency { get; set; } = 0.7f;
 
         public bool SpecialStyle { get; set; }
