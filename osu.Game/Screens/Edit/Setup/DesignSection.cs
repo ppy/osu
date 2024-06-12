@@ -74,7 +74,7 @@ namespace osu.Game.Screens.Edit.Setup
                 {
                     Label = EditorSetupStrings.EpilepsyWarning,
                     Description = EditorSetupStrings.EpilepsyWarningDescription,
-                    Current = { Value = Beatmap.BeatmapInfo.EpilepsyWarning }
+                    Current = { Value = Beatmap.EpilepsyWarning }
                 },
                 letterboxDuringBreaks = new LabelledSwitchButton
                 {
@@ -122,7 +122,7 @@ namespace osu.Game.Screens.Edit.Setup
             Beatmap.BeatmapInfo.CountdownOffset = int.TryParse(CountdownOffset.Current.Value, NumberStyles.None, CultureInfo.InvariantCulture, out int offset) ? offset : 0;
 
             Beatmap.WidescreenStoryboard = widescreenSupport.Current.Value;
-            Beatmap.BeatmapInfo.EpilepsyWarning = epilepsyWarning.Current.Value;
+            Beatmap.EpilepsyWarning = epilepsyWarning.Current.Value;
             Beatmap.LetterboxInBreaks = letterboxDuringBreaks.Current.Value;
             Beatmap.BeatmapInfo.SamplesMatchPlaybackRate = samplesMatchPlaybackRate.Current.Value;
 

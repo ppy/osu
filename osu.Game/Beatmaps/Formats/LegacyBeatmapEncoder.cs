@@ -95,7 +95,7 @@ namespace osu.Game.Beatmaps.Formats
             //     writer.WriteLine(@"OverlayPosition: " + b.OverlayPosition);
             // if (!string.IsNullOrEmpty(b.SkinPreference))
             //     writer.WriteLine(@"SkinPreference:" + b.SkinPreference);
-            if (beatmap.BeatmapInfo.EpilepsyWarning)
+            if (beatmap.EpilepsyWarning)
                 writer.WriteLine(@"EpilepsyWarning: 1");
             if (beatmap.BeatmapInfo.CountdownOffset > 0)
                 writer.WriteLine(FormattableString.Invariant($@"CountdownOffset: {beatmap.BeatmapInfo.CountdownOffset}"));

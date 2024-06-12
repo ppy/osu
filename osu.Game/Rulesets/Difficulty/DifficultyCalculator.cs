@@ -367,6 +367,12 @@ namespace osu.Game.Rulesets.Difficulty
                 set => baseBeatmap.WidescreenStoryboard = value;
             }
 
+            public bool EpilepsyWarning
+            {
+                get => baseBeatmap.EpilepsyWarning;
+                set => baseBeatmap.EpilepsyWarning = value;
+            }
+
             #endregion
         }
     }

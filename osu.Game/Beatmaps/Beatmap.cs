@@ -124,6 +124,8 @@ namespace osu.Game.Beatmaps
 
         public bool WidescreenStoryboard { get; set; } = true;
 
+        public bool EpilepsyWarning { get; set; }
+
         IBeatmap IBeatmap.Clone() => Clone();
 
         public Beatmap<T> Clone() => (Beatmap<T>)MemberwiseClone();

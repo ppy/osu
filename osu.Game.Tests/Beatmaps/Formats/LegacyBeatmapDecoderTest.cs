@@ -955,7 +955,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
                     Assert.That(decoded.SpecialStyle, Is.False);
                     Assert.That(decoded.LetterboxInBreaks, Is.False);
                     Assert.That(decoded.WidescreenStoryboard, Is.False);
-                    Assert.That(decoded.BeatmapInfo.EpilepsyWarning, Is.False);
+                    Assert.That(decoded.EpilepsyWarning, Is.False);
                     Assert.That(decoded.BeatmapInfo.SamplesMatchPlaybackRate, Is.False);
                     Assert.That(decoded.BeatmapInfo.Countdown, Is.EqualTo(CountdownType.Normal));
                     Assert.That(decoded.BeatmapInfo.CountdownOffset, Is.EqualTo(0));
