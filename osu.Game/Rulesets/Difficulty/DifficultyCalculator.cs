@@ -373,6 +373,12 @@ namespace osu.Game.Rulesets.Difficulty
                 set => baseBeatmap.EpilepsyWarning = value;
             }
 
+            public bool SamplesMatchPlaybackRate
+            {
+                get => baseBeatmap.SamplesMatchPlaybackRate;
+                set => baseBeatmap.SamplesMatchPlaybackRate = value;
+            }
+
             #endregion
         }
     }

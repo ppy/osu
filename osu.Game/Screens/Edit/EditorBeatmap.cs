@@ -220,6 +220,12 @@ namespace osu.Game.Screens.Edit
             set => PlayableBeatmap.EpilepsyWarning = value;
         }
 
+        public bool SamplesMatchPlaybackRate
+        {
+            get => PlayableBeatmap.SamplesMatchPlaybackRate;
+            set => PlayableBeatmap.SamplesMatchPlaybackRate = value;
+        }
+
         public IBeatmap Clone() => (EditorBeatmap)MemberwiseClone();
 
         private IList mutableHitObjects => (IList)PlayableBeatmap.HitObjects;

@@ -87,7 +87,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.IsFalse(beatmap.LetterboxInBreaks);
                 Assert.IsFalse(beatmap.SpecialStyle);
                 Assert.IsFalse(beatmap.WidescreenStoryboard);
-                Assert.IsFalse(beatmapInfo.SamplesMatchPlaybackRate);
+                Assert.IsFalse(beatmap.SamplesMatchPlaybackRate);
                 Assert.AreEqual(CountdownType.None, beatmapInfo.Countdown);
                 Assert.AreEqual(0, beatmapInfo.CountdownOffset);
             }
@@ -956,7 +956,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
                     Assert.That(decoded.LetterboxInBreaks, Is.False);
                     Assert.That(decoded.WidescreenStoryboard, Is.False);
                     Assert.That(decoded.EpilepsyWarning, Is.False);
-                    Assert.That(decoded.BeatmapInfo.SamplesMatchPlaybackRate, Is.False);
+                    Assert.That(decoded.SamplesMatchPlaybackRate, Is.False);
                     Assert.That(decoded.BeatmapInfo.Countdown, Is.EqualTo(CountdownType.Normal));
                     Assert.That(decoded.BeatmapInfo.CountdownOffset, Is.EqualTo(0));
                     Assert.That(decoded.BeatmapInfo.Metadata.PreviewTime, Is.EqualTo(-1));
