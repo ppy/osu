@@ -337,7 +337,7 @@ namespace osu.Game.Beatmaps.Formats
                     break;
 
                 case @"GridSize":
-                    beatmap.BeatmapInfo.GridSize = Parsing.ParseInt(pair.Value);
+                    beatmap.GridSize = Parsing.ParseInt(pair.Value);
                     break;
 
                 case @"TimelineZoom":

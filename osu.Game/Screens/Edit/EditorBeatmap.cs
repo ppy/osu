@@ -232,6 +232,12 @@ namespace osu.Game.Screens.Edit
             set => PlayableBeatmap.DistanceSpacing = value;
         }
 
+        public int GridSize
+        {
+            get => PlayableBeatmap.GridSize;
+            set => PlayableBeatmap.GridSize = value;
+        }
+
         public IBeatmap Clone() => (EditorBeatmap)MemberwiseClone();
 
         private IList mutableHitObjects => (IList)PlayableBeatmap.HitObjects;
