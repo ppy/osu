@@ -255,7 +255,7 @@ namespace osu.Game.Beatmaps.Formats
                     break;
 
                 case @"StackLeniency":
-                    beatmap.BeatmapInfo.StackLeniency = Parsing.ParseFloat(pair.Value);
+                    beatmap.StackLeniency = Parsing.ParseFloat(pair.Value);
                     break;
 
                 case @"Mode":

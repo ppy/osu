@@ -70,6 +70,8 @@ namespace osu.Game.Beatmaps
 
         double AudioLeadIn { get; internal set; }
 
+        float StackLeniency { get; internal set; }
+
         /// <summary>
         /// Creates a shallow-clone of this beatmap and returns it.
         /// </summary>

@@ -414,7 +414,6 @@ namespace osu.Game.Beatmaps
                         Hash = hash,
                         DifficultyName = decodedInfo.DifficultyName,
                         OnlineID = decodedInfo.OnlineID,
-                        StackLeniency = decodedInfo.StackLeniency,
                         SpecialStyle = decodedInfo.SpecialStyle,
                         LetterboxInBreaks = decodedInfo.LetterboxInBreaks,
                         WidescreenStoryboard = decodedInfo.WidescreenStoryboard,

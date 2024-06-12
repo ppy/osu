@@ -116,6 +116,8 @@ namespace osu.Game.Beatmaps
 
         public double AudioLeadIn { get; set; }
 
+        public float StackLeniency { get; set; } = 0.7f;
+
         IBeatmap IBeatmap.Clone() => Clone();
 
         public Beatmap<T> Clone() => (Beatmap<T>)MemberwiseClone();

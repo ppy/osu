@@ -190,6 +190,12 @@ namespace osu.Game.Screens.Edit
             set => PlayableBeatmap.AudioLeadIn = value;
         }
 
+        public float StackLeniency
+        {
+            get => PlayableBeatmap.StackLeniency;
+            set => PlayableBeatmap.StackLeniency = value;
+        }
+
         public IBeatmap Clone() => (EditorBeatmap)MemberwiseClone();
 
         private IList mutableHitObjects => (IList)PlayableBeatmap.HitObjects;

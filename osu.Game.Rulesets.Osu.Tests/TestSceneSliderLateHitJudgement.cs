@@ -465,7 +465,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         private void performTest(List<ReplayFrame> frames, Beatmap<OsuHitObject> beatmap)
         {
             beatmap.BeatmapInfo.Ruleset = new OsuRuleset().RulesetInfo;
-            beatmap.BeatmapInfo.StackLeniency = 0;
+            beatmap.StackLeniency = 0;
             beatmap.BeatmapInfo.Difficulty = new BeatmapDifficulty
             {
                 SliderMultiplier = 4,
