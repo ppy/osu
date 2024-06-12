@@ -209,7 +209,7 @@ namespace osu.Game.Screens.Edit.Timing
             foreach (var cp in currentGroupItems)
             {
                 if (beatmap.AdjustNotesOnOffsetBPMChange.Value && cp is TimingControlPoint tp)
-                    tp.AdjustHitObjectOffset(beatmap, adjust);
+                    TimingSectionAdjustments.AdjustHitObjectOffset(beatmap, tp, adjust);
                 beatmap.ControlPointInfo.Add(newOffset, cp);
             }
 

@@ -2,14 +2,9 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using osu.Framework.Bindables;
-using osu.Framework.Utils;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Graphics;
-using osu.Game.Rulesets.Objects;
-using osu.Game.Rulesets.Objects.Types;
 using osuTK.Graphics;
 
 namespace osu.Game.Beatmaps.ControlPoints
@@ -110,35 +105,5 @@ namespace osu.Game.Beatmaps.ControlPoints
                && BeatLength.Equals(other.BeatLength);
 
         public override int GetHashCode() => HashCode.Combine(base.GetHashCode(), TimeSignature, BeatLength, OmitFirstBarLine);
-
-        public List<HitObject> HitObjectsInTimingRange(IBeatmap beatmap)
-        {
-            // If the first group, we grab all hitobjects prior to the next, if the last group, we grab all remaining hitobjects
-            double startTime = beatmap.ControlPointInfo.TimingPoints.Any(x => x.Time < Time) ? Time : double.MinValue;
-            double endTime = beatmap.ControlPointInfo.TimingPoints.FirstOrDefault(x => x.Time > Time)?.Time ?? double.MaxValue;
-
-            return beatmap.HitObjects.Where(x => Precision.AlmostBigger(x.StartTime, startTime) && Precision.DefinitelyBigger(endTime, x.StartTime)).ToList();
-        }
-
-        public void AdjustHitObjectOffset(IBeatmap beatmap, double adjust)
-        {
-            foreach (HitObject hitObject in HitObjectsInTimingRange(beatmap))
-            {
-                hitObject.StartTime += adjust;
-            }
-        }
-
-        public void SetHitObjectBPM(IBeatmap beatmap, double oldBeatLength)
-        {
-            foreach (HitObject hitObject in HitObjectsInTimingRange(beatmap))
-            {
-                double beat = (hitObject.StartTime - Time) / oldBeatLength;
-
-                hitObject.StartTime = (beat * BeatLength) + Time;
-
-                if (hitObject is not IHasRepeats && hitObject is IHasDuration hitObjectWithDuration)
-                    hitObjectWithDuration.Duration *= BeatLength / oldBeatLength;
-            }
-        }
     }
 }
