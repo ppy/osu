@@ -289,7 +289,7 @@ namespace osu.Game.Beatmaps.Formats
                     break;
 
                 case @"SpecialStyle":
-                    beatmap.BeatmapInfo.SpecialStyle = Parsing.ParseInt(pair.Value) == 1;
+                    beatmap.SpecialStyle = Parsing.ParseInt(pair.Value) == 1;
                     break;
 
                 case @"WidescreenStoryboard":

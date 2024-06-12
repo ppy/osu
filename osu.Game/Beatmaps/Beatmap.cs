@@ -118,6 +118,8 @@ namespace osu.Game.Beatmaps
 
         public float StackLeniency { get; set; } = 0.7f;
 
+        public bool SpecialStyle { get; set; }
+
         IBeatmap IBeatmap.Clone() => Clone();
 
         public Beatmap<T> Clone() => (Beatmap<T>)MemberwiseClone();

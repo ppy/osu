@@ -100,7 +100,7 @@ namespace osu.Game.Beatmaps.Formats
             if (beatmap.BeatmapInfo.CountdownOffset > 0)
                 writer.WriteLine(FormattableString.Invariant($@"CountdownOffset: {beatmap.BeatmapInfo.CountdownOffset}"));
             if (onlineRulesetID == 3)
-                writer.WriteLine(FormattableString.Invariant($"SpecialStyle: {(beatmap.BeatmapInfo.SpecialStyle ? '1' : '0')}"));
+                writer.WriteLine(FormattableString.Invariant($"SpecialStyle: {(beatmap.SpecialStyle ? '1' : '0')}"));
             writer.WriteLine(FormattableString.Invariant($"WidescreenStoryboard: {(beatmap.BeatmapInfo.WidescreenStoryboard ? '1' : '0')}"));
             if (beatmap.BeatmapInfo.SamplesMatchPlaybackRate)
                 writer.WriteLine(@"SamplesMatchPlaybackRate: 1");

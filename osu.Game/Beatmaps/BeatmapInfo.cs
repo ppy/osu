@@ -138,8 +138,6 @@ namespace osu.Game.Beatmaps
 
         #region Properties we may not want persisted (but also maybe no harm?)
 
-        public bool SpecialStyle { get; set; }
-
         public bool LetterboxInBreaks { get; set; }
 
         public bool WidescreenStoryboard { get; set; } = true;
