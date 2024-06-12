@@ -145,5 +145,9 @@
 	</array>
 	<key>LSApplicationCategoryType</key>
 	<string>public.app-category.music-games</string>
+	<key>CFBundleExecutable</key>
+	<string></string>
+	<key>GCSupportsGameMode</key>
+	<true/>
 </dict>
 </plist>
