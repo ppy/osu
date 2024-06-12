@@ -76,6 +76,8 @@ namespace osu.Game.Beatmaps
 
         bool LetterboxInBreaks { get; internal set; }
 
+        bool WidescreenStoryboard { get; internal set; }
+
         /// <summary>
         /// Creates a shallow-clone of this beatmap and returns it.
         /// </summary>

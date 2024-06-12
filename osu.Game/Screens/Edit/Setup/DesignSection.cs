@@ -68,7 +68,7 @@ namespace osu.Game.Screens.Edit.Setup
                 {
                     Label = EditorSetupStrings.WidescreenSupport,
                     Description = EditorSetupStrings.WidescreenSupportDescription,
-                    Current = { Value = Beatmap.BeatmapInfo.WidescreenStoryboard }
+                    Current = { Value = Beatmap.WidescreenStoryboard }
                 },
                 epilepsyWarning = new LabelledSwitchButton
                 {
@@ -121,7 +121,7 @@ namespace osu.Game.Screens.Edit.Setup
             Beatmap.BeatmapInfo.Countdown = EnableCountdown.Current.Value ? CountdownSpeed.Current.Value : CountdownType.None;
             Beatmap.BeatmapInfo.CountdownOffset = int.TryParse(CountdownOffset.Current.Value, NumberStyles.None, CultureInfo.InvariantCulture, out int offset) ? offset : 0;
 
-            Beatmap.BeatmapInfo.WidescreenStoryboard = widescreenSupport.Current.Value;
+            Beatmap.WidescreenStoryboard = widescreenSupport.Current.Value;
             Beatmap.BeatmapInfo.EpilepsyWarning = epilepsyWarning.Current.Value;
             Beatmap.LetterboxInBreaks = letterboxDuringBreaks.Current.Value;
             Beatmap.BeatmapInfo.SamplesMatchPlaybackRate = samplesMatchPlaybackRate.Current.Value;

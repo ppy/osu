@@ -208,6 +208,12 @@ namespace osu.Game.Screens.Edit
             set => PlayableBeatmap.LetterboxInBreaks = value;
         }
 
+        public bool WidescreenStoryboard
+        {
+            get => PlayableBeatmap.WidescreenStoryboard;
+            set => PlayableBeatmap.WidescreenStoryboard = value;
+        }
+
         public IBeatmap Clone() => (EditorBeatmap)MemberwiseClone();
 
         private IList mutableHitObjects => (IList)PlayableBeatmap.HitObjects;
