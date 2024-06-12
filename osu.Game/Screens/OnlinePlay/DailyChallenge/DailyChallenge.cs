@@ -257,7 +257,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
 
             if (playlistItem.AllowedMods.Any())
             {
-                footerButtons.Insert(0, new UserModSelectButton
+                footerButtons.Insert(-1, new UserModSelectButton
                 {
                     Text = "Free mods",
                     Anchor = Anchor.Centre,
