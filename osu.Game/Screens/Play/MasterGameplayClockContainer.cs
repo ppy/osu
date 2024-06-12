@@ -95,8 +95,8 @@ namespace osu.Game.Screens.Play
             // some beatmaps specify a current lead-in time which should be used instead of the ruleset-provided value when available.
             // this is not available as an option in the live editor but can still be applied via .osu editing.
             double firstHitObjectTime = beatmap.Beatmap.HitObjects.First().StartTime;
-            if (beatmap.BeatmapInfo.AudioLeadIn > 0)
-                time = Math.Min(time, firstHitObjectTime - beatmap.BeatmapInfo.AudioLeadIn);
+            if (beatmap.Beatmap.AudioLeadIn > 0)
+                time = Math.Min(time, firstHitObjectTime - beatmap.Beatmap.AudioLeadIn);
 
             return time;
         }

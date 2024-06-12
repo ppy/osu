@@ -337,6 +337,12 @@ namespace osu.Game.Rulesets.Difficulty
             public double GetMostCommonBeatLength() => baseBeatmap.GetMostCommonBeatLength();
             public IBeatmap Clone() => new ProgressiveCalculationBeatmap(baseBeatmap.Clone());
 
+            public double AudioLeadIn
+            {
+                get => baseBeatmap.AudioLeadIn;
+                set => baseBeatmap.AudioLeadIn = value;
+            }
+
             #endregion
         }
     }

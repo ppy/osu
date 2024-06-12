@@ -67,6 +67,7 @@ namespace osu.Game.Beatmaps
             beatmap.HitObjects = convertHitObjects(original.HitObjects, original, cancellationToken).OrderBy(s => s.StartTime).ToList();
             beatmap.Breaks = original.Breaks;
             beatmap.UnhandledEventLines = original.UnhandledEventLines;
+            beatmap.AudioLeadIn = original.AudioLeadIn;
 
             return beatmap;
         }

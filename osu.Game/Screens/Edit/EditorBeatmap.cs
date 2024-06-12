@@ -184,6 +184,12 @@ namespace osu.Game.Screens.Edit
 
         public double GetMostCommonBeatLength() => PlayableBeatmap.GetMostCommonBeatLength();
 
+        public double AudioLeadIn
+        {
+            get => PlayableBeatmap.AudioLeadIn;
+            set => PlayableBeatmap.AudioLeadIn = value;
+        }
+
         public IBeatmap Clone() => (EditorBeatmap)MemberwiseClone();
 
         private IList mutableHitObjects => (IList)PlayableBeatmap.HitObjects;
