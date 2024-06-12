@@ -238,6 +238,12 @@ namespace osu.Game.Screens.Edit
             set => PlayableBeatmap.GridSize = value;
         }
 
+        public double TimelineZoom
+        {
+            get => PlayableBeatmap.TimelineZoom;
+            set => PlayableBeatmap.TimelineZoom = value;
+        }
+
         public IBeatmap Clone() => (EditorBeatmap)MemberwiseClone();
 
         private IList mutableHitObjects => (IList)PlayableBeatmap.HitObjects;
