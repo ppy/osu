@@ -199,24 +199,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             sliderReadingValue *= getComboScalingFactor(attributes);
 
-            double approachRateFactor = 0.0;
-            if (attributes.ApproachRate > 10.33)
-                approachRateFactor = 0.3 * (attributes.ApproachRate - 10.33);
-            else if (attributes.ApproachRate < 8.0)
-                approachRateFactor = 0.05 * (8.0 - attributes.ApproachRate);
-
-            if (score.Mods.Any(h => h is OsuModRelax))
-                approachRateFactor = 0.0;
-
-            sliderReadingValue *= 1.0 + approachRateFactor * lengthBonus; // Buff for longer maps with high AR.
-
             if (score.Mods.Any(m => m is OsuModBlinds))
                 sliderReadingValue *= 1.3 + (totalHits * (0.0016 / (1 + 2 * effectiveMissCount)) * Math.Pow(accuracy, 16)) * (1 - 0.003 * attributes.DrainRate * attributes.DrainRate);
-            else if (score.Mods.Any(m => m is OsuModHidden || m is OsuModTraceable))
-            {
-                // We want to give more reward for lower AR when it comes to aim and HD. This nerfs high AR and buffs lower AR.
-                sliderReadingValue *= 1.0 + 0.02 * (12.0 - attributes.ApproachRate);
-            }
 
             // We assume 15% of sliders in a map are difficult since there's no way to tell from the performance calculator.
             double estimateDifficultSliders = attributes.SliderCount * 0.15;

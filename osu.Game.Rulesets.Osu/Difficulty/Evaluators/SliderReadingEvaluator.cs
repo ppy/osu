@@ -73,7 +73,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             return difficulty;
         }
 
-        // Returns curve that goes from 0 to 1 as difference increase, starting to increase on point 1 and getting max on point2
+        /// <summary>
+        /// Returns curve that goes from 0 to 1 as difference increase, starting to increase on point 1 and getting max on point2
+        /// </summary>
+        /// <param name="value1"></param>
+        /// <param name="value2"></param>
+        /// <param name="point1"></param>
+        /// <param name="point2"></param>
+        /// <returns></returns>
         private static double differenceCurve(double value1, double value2, double point1, double point2)
         {
             double similarity = Math.Min(value1, value2) / Math.Max(value1, value2);
@@ -81,7 +88,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             return 1 - sinusCurve(similarity, point1, point2);
         }
 
-        // Increase from 0 on point1 to 1 on point2
+        /// <summary>
+        /// Increase from 0 on point1 to 1 on point2
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="point1"></param>
+        /// <param name="point2"></param>
+        /// <returns></returns>
         private static double sinusCurve(double value, double point1, double point2)
         {
             if (value < point1) return 0.0;
@@ -275,6 +288,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 // Apply bonus
 
                 double angleChangeBonus = sinusCurve(Math.Abs(currAngle - prevAngle), 0.2, 0.7);
+
+                // Punish vide angles
+                angleChangeBonus *= 1 - sinusCurve(Math.Abs(currAngle), Math.PI / 2, Math.PI * 5 / 6);
+
                 double velocityChangeBonus = sinusCurve(Math.Abs(currVelocity - prevVelocity), 0.2, 0.6);
                 totalBonus += (angleChangeBonus + velocityChangeBonus) * 2;
                 objectCount += 1;
@@ -299,8 +316,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         // absolute (signed!!!) angle
         private static double calculateAngleBetweenThreePoints(Vector2 p1, Vector2 p2, Vector2 p3)
         {
-            Vector2 v1 = p1 - p2;
-            Vector2 v2 = p2 - p3;
+            Vector2 v1 = p2 - p1;
+            Vector2 v2 = p1 - p3;
 
             float dot = Vector2.Dot(v1, v2);
             float det = v1.X * v2.Y - v1.Y * v2.X;
