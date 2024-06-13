@@ -12,6 +12,7 @@ using JetBrains.Annotations;
 using Newtonsoft.Json;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.ListExtensions;
+using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.Lists;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
@@ -228,6 +229,8 @@ namespace osu.Game.Rulesets.Objects
 
             return new HitSampleInfo(sampleName);
         }
+
+        public override string ToString() => $"{GetType().ReadableName()} @ {StartTime}";
     }
 
     public static class HitObjectExtensions
