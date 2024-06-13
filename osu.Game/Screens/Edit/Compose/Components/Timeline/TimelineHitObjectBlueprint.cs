@@ -397,6 +397,9 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
                     if (timeline.FindSnappedPositionAndTime(e.ScreenSpaceMousePosition).Time is double time)
                     {
+                        if (beatmap.PlacementObject.Value != null)
+                            return;
+
                         switch (hitObject)
                         {
                             case IHasRepeats repeatHitObject:
