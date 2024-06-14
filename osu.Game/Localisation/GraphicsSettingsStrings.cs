@@ -110,6 +110,11 @@ namespace osu.Game.Localisation
         public static LocalisableString ComboColourNormalisation => new TranslatableString(getKey(@"combo_colour_normalisation"), @"Combo colour normalisation");
 
         /// <summary>
+        /// "Minimum NoScope opacity"
+        /// </summary>
+        public static LocalisableString MinimumNoScopeOpacity => new TranslatableString(getKey(@"minimum_noscope_opacity"), @"Minimum NoScope opacity");
+
+        /// <summary>
         /// "Hit lighting"
         /// </summary>
         public static LocalisableString HitLighting => new TranslatableString(getKey(@"hit_lighting"), @"Hit lighting");

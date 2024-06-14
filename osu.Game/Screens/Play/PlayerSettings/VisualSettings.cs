@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Configuration;
 using osu.Game.Localisation;
@@ -16,6 +17,15 @@ namespace osu.Game.Screens.Play.PlayerSettings
         private readonly PlayerCheckbox showStoryboardToggle;
         private readonly PlayerCheckbox beatmapSkinsToggle;
         private readonly PlayerCheckbox beatmapColorsToggle;
+        private readonly PlayerSliderBar<float> minimumNoScopeAlphaSliderBar;
+
+        public BindableBool ShowNoScopeSettings { get; } = new BindableBool();
+
+        public BindableFloat MinimumNoScopeAlpha { get; } = new BindableFloat()
+        {
+            MinValue = 0.0f,
+            MaxValue = 1.0f
+        };
 
         public VisualSettings()
             : base("Visual Settings")
@@ -40,7 +50,20 @@ namespace osu.Game.Screens.Play.PlayerSettings
                     LabelText = GraphicsSettingsStrings.ComboColourNormalisation,
                     DisplayAsPercentage = true,
                 },
+                minimumNoScopeAlphaSliderBar = new PlayerSliderBar<float>
+                {
+                    LabelText = GraphicsSettingsStrings.MinimumNoScopeOpacity,
+                    DisplayAsPercentage = true,
+                    Current = MinimumNoScopeAlpha
+                },
             };
+
+            ShowNoScopeSettings.BindValueChanged(e =>
+            {
+                minimumNoScopeAlphaSliderBar.Alpha = e.NewValue ? 1 : 0;
+                MinimumNoScopeAlpha.Default = minimumNoScopeAlphaSliderBar.Alpha / 2;
+                MinimumNoScopeAlpha.Value = MinimumNoScopeAlpha.Default;
+            }, true);
         }
 
         [BackgroundDependencyLoader]
