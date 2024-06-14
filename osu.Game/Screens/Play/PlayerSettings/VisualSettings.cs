@@ -17,11 +17,10 @@ namespace osu.Game.Screens.Play.PlayerSettings
         private readonly PlayerCheckbox showStoryboardToggle;
         private readonly PlayerCheckbox beatmapSkinsToggle;
         private readonly PlayerCheckbox beatmapColorsToggle;
-        private readonly PlayerSliderBar<float> minimumNoScopeAlphaSliderBar;
 
         public BindableBool ShowNoScopeSettings { get; } = new BindableBool();
 
-        public BindableFloat MinimumNoScopeAlpha { get; } = new BindableFloat()
+        public BindableFloat MinimumNoScopeAlpha { get; } = new BindableFloat
         {
             MinValue = 0.0f,
             MaxValue = 1.0f
@@ -30,6 +29,8 @@ namespace osu.Game.Screens.Play.PlayerSettings
         public VisualSettings()
             : base("Visual Settings")
         {
+            PlayerSliderBar<float> minimumNoScopeAlphaSliderBar;
+
             Children = new Drawable[]
             {
                 dimSliderBar = new PlayerSliderBar<double>
