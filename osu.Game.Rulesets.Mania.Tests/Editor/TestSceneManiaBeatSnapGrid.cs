@@ -103,7 +103,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
 
         public override SnapResult FindSnappedPositionAndTime(Vector2 screenSpacePosition, SnapType snapType = SnapType.All)
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
     }
 }
