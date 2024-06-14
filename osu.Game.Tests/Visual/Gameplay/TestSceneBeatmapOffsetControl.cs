@@ -137,5 +137,30 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("Remove reference score", () => offsetControl.ReferenceScore.Value = null);
             AddAssert("No calibration button", () => !offsetControl.ChildrenOfType<SettingsButton>().Any());
         }
+
+        [Test]
+        public void TestCalibrationNoChange()
+        {
+            const double average_error = 0;
+
+            AddAssert("Offset is neutral", () => offsetControl.Current.Value == 0);
+            AddAssert("No calibration button", () => !offsetControl.ChildrenOfType<SettingsButton>().Any());
+            AddStep("Set reference score", () =>
+            {
+                offsetControl.ReferenceScore.Value = new ScoreInfo
+                {
+                    HitEvents = TestSceneHitEventTimingDistributionGraph.CreateDistributedHitEvents(average_error),
+                    BeatmapInfo = Beatmap.Value.BeatmapInfo,
+                };
+            });
+
+            AddUntilStep("Has calibration button", () => offsetControl.ChildrenOfType<SettingsButton>().Any());
+            AddStep("Press button", () => offsetControl.ChildrenOfType<SettingsButton>().Single().TriggerClick());
+            AddAssert("Offset is adjusted", () => offsetControl.Current.Value == -average_error);
+
+            AddUntilStep("Button is disabled", () => !offsetControl.ChildrenOfType<SettingsButton>().Single().Enabled.Value);
+            AddStep("Remove reference score", () => offsetControl.ReferenceScore.Value = null);
+            AddAssert("No calibration button", () => !offsetControl.ChildrenOfType<SettingsButton>().Any());
+        }
     }
 }
