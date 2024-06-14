@@ -85,6 +85,8 @@ namespace osu.Game.Screens.Play
 
         private readonly BindableBool replayLoaded = new BindableBool();
 
+        public IBindable<bool> ReplayLoaded => replayLoaded;
+
         private static bool hasShownNotificationOnce;
 
         private readonly FillFlowContainer bottomRightElements;
