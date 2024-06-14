@@ -6,6 +6,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
+using osu.Framework.Utils;
 using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Settings;
@@ -15,7 +16,7 @@ using osu.Game.Screens.Play;
 
 namespace osu.Game.Rulesets.Mods
 {
-    public abstract class ModNoScope : Mod, IApplicableToScoreProcessor, IApplicableToPlayer
+    public abstract class ModNoScope : Mod, IApplicableToScoreProcessor, IApplicableToPlayer, IApplicableToHUD
     {
         public override string Name => "No Scope";
         public override string Acronym => "NS";
@@ -35,7 +36,11 @@ namespace osu.Game.Rulesets.Mods
 
         protected readonly IBindable<bool> IsBreakTime = new Bindable<bool>();
 
-        protected float ComboBasedAlpha;
+        protected readonly BindableFloat MinimumSpectateAlpha = new BindableFloat();
+
+        private float lastUsedMinimumSpectateAlpha;
+
+        private float comboBasedPercentage;
 
         [SettingSource(
             "Hidden at combo",
@@ -51,15 +56,46 @@ namespace osu.Game.Rulesets.Mods
             IsBreakTime.BindTo(player.IsBreakTime);
         }
 
+        private void updatePercentage()
+        {
+            float t;
+            if (HiddenComboCount.Value == 0)
+                t = 1;
+            else
+                t = Math.Clamp((float)CurrentCombo.Value / HiddenComboCount.Value, 0.0f, 1.0f);
+
+            comboBasedPercentage = 1.0f - t;
+        }
+
+        protected float ComputeNewAlpha(float oldAlpha, bool mustBeVisible, double deltaTime)
+        {
+            float oldPercentage = (oldAlpha - lastUsedMinimumSpectateAlpha) / (1 - lastUsedMinimumSpectateAlpha);
+            float targetPercentage = mustBeVisible ? 1 : comboBasedPercentage;
+            float newPercentage = (float)Interpolation.Lerp(oldPercentage, targetPercentage, Math.Clamp(deltaTime / TRANSITION_DURATION, 0, 1));
+
+            float minAlpha = Math.Clamp(MinimumSpectateAlpha.Value, MIN_ALPHA, 0.999f);
+            float newAlpha = newPercentage * (1 - minAlpha) + minAlpha;
+            lastUsedMinimumSpectateAlpha = minAlpha;
+
+            return newAlpha;
+        }
+
         public void ApplyToScoreProcessor(ScoreProcessor scoreProcessor)
         {
             if (HiddenComboCount.Value == 0) return;
 
             CurrentCombo.BindTo(scoreProcessor.Combo);
-            CurrentCombo.BindValueChanged(combo =>
+            CurrentCombo.BindValueChanged(_ => updatePercentage(), true);
+        }
+
+        public void ApplyToHUD(HUDOverlay overlay)
+        {
+            if (overlay.ReplayLoaded.Value)
             {
-                ComboBasedAlpha = Math.Max(MIN_ALPHA, 1 - (float)combo.NewValue / HiddenComboCount.Value);
-            }, true);
+                overlay.PlayerSettingsOverlay.VisualSettings.ShowNoScopeSettings.Value = true;
+                MinimumSpectateAlpha.BindTo(overlay.PlayerSettingsOverlay.VisualSettings.MinimumNoScopeAlpha);
+                MinimumSpectateAlpha.BindValueChanged(_ => updatePercentage(), true);
+            }
         }
     }
 
