@@ -237,6 +237,8 @@ namespace osu.Game.Screens.Play.PlayerSettings
                 }
             });
 
+            useAverageButton.Enabled.Value = !Precision.AlmostEquals(lastPlayAverage, 0, Current.Precision / 2);
+
             if (settings != null)
             {
                 globalOffsetText.AddText("You can also ");
