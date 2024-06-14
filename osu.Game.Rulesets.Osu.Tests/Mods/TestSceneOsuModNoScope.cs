@@ -53,11 +53,11 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
                 }
             });
 
-            AddUntilStep("wait for cursor to hide", () => cursorAlphaAlmostEquals(0));
+            AddUntilStep("wait for cursor to hide", () => cursorAlphaAlmostEquals(expectedSmallestAlpha()));
             AddUntilStep("wait for start of break", isBreak);
             AddUntilStep("wait for cursor to show", () => cursorAlphaAlmostEquals(1));
             AddUntilStep("wait for end of break", () => !isBreak());
-            AddUntilStep("wait for cursor to hide", () => cursorAlphaAlmostEquals(0));
+            AddUntilStep("wait for cursor to hide", () => cursorAlphaAlmostEquals(expectedSmallestAlpha()));
         }
 
         [Test]
@@ -95,11 +95,11 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
                 }
             });
 
-            AddUntilStep("wait for cursor to hide", () => cursorAlphaAlmostEquals(0));
+            AddUntilStep("wait for cursor to hide", () => cursorAlphaAlmostEquals(expectedSmallestAlpha()));
             AddUntilStep("wait for start of spinner", isSpinning);
             AddUntilStep("wait for cursor to show", () => cursorAlphaAlmostEquals(1));
             AddUntilStep("wait for end of spinner", () => !isSpinning());
-            AddUntilStep("wait for cursor to hide", () => cursorAlphaAlmostEquals(0));
+            AddUntilStep("wait for cursor to hide", () => cursorAlphaAlmostEquals(expectedSmallestAlpha()));
         }
 
         [Test]
@@ -146,6 +146,8 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
         private bool isSpinning() => Player.ChildrenOfType<DrawableSpinner>().SingleOrDefault()?.Progress > 0;
 
         private bool isBreak() => Player.IsBreakTime.Value;
+
+        private float expectedSmallestAlpha() => Player.HUDOverlay.PlayerSettingsOverlay.VisualSettings.MinimumNoScopeAlpha.Value;
 
         private OsuPlayfield playfield => (OsuPlayfield)Player.DrawableRuleset.Playfield;
 

@@ -81,11 +81,11 @@ namespace osu.Game.Rulesets.Catch.Tests.Mods
                 }
             });
 
-            AddUntilStep("wait for catcher to hide", () => catcherAlphaAlmostEquals(0));
+            AddUntilStep("wait for catcher to hide", () => catcherAlphaAlmostEquals(expectedSmallestAlpha()));
             AddUntilStep("wait for start of break", isBreak);
             AddUntilStep("wait for catcher to show", () => catcherAlphaAlmostEquals(1));
             AddUntilStep("wait for end of break", () => !isBreak());
-            AddUntilStep("wait for catcher to hide", () => catcherAlphaAlmostEquals(0));
+            AddUntilStep("wait for catcher to hide", () => catcherAlphaAlmostEquals(expectedSmallestAlpha()));
         }
 
         [Test]
@@ -130,6 +130,8 @@ namespace osu.Game.Rulesets.Catch.Tests.Mods
         }
 
         private bool isBreak() => Player.IsBreakTime.Value;
+
+        private float expectedSmallestAlpha() => Player.HUDOverlay.PlayerSettingsOverlay.VisualSettings.MinimumNoScopeAlpha.Value;
 
         private bool catcherAlphaAlmostEquals(float alpha)
         {
