@@ -14,6 +14,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu;
+using osu.Game.Rulesets.Osu.Edit;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Screens.Edit.Compose.Components.Timeline;
 using osu.Game.Tests.Beatmaps;
@@ -355,6 +356,51 @@ namespace osu.Game.Tests.Visual.Editing
             AddStep("end drag", () => InputManager.ReleaseButton(MouseButton.Left));
             assertSelectionIs(addedObjects.Skip(1));
             AddAssert("all blueprints are present", () => blueprintContainer.SelectionBlueprints.Count == EditorBeatmap.SelectedHitObjects.Count);
+        }
+
+        [Test]
+        public void TestDragSelectionDuringPlacement()
+        {
+            var addedObjects = new[]
+            {
+                new Slider
+                {
+                    StartTime = 300,
+                    Path = new SliderPath([
+                        new PathControlPoint(),
+                        new PathControlPoint(new Vector2(200)),
+                    ])
+                },
+            };
+            AddStep("add hitobjects", () => EditorBeatmap.AddRange(addedObjects));
+
+            AddStep("seek to 700", () => EditorClock.Seek(700));
+            AddStep("select spinner placement tool", () =>
+            {
+                InputManager.Key(Key.Number4);
+                InputManager.MoveMouseTo(this.ChildrenOfType<OsuHitObjectComposer>().Single());
+            });
+            AddStep("begin spinner placement", () => InputManager.Click(MouseButton.Left));
+            AddStep("seek to 1500", () => EditorClock.Seek(1500));
+
+            AddStep("start dragging", () =>
+            {
+                var blueprintQuad = blueprintContainer.SelectionBlueprints[1].ScreenSpaceDrawQuad;
+                var dragStartPos = (blueprintQuad.TopLeft + blueprintQuad.BottomLeft) / 2 - new Vector2(30, 0);
+                InputManager.MoveMouseTo(dragStartPos);
+                InputManager.PressButton(MouseButton.Left);
+            });
+
+            AddStep("select entire object", () =>
+            {
+                var blueprintQuad = blueprintContainer.SelectionBlueprints[1].ScreenSpaceDrawQuad;
+                var dragStartPos = (blueprintQuad.TopRight + blueprintQuad.BottomRight) / 2 + new Vector2(30, 0);
+                InputManager.MoveMouseTo(dragStartPos);
+            });
+            AddStep("end drag", () => InputManager.ReleaseButton(MouseButton.Left));
+
+            AddUntilStep("hitobject selected", () => EditorBeatmap.SelectedHitObjects, () => NUnit.Framework.Contains.Item(addedObjects[0]));
+            AddAssert("placement committed", () => EditorBeatmap.HitObjects, () => Has.Count.EqualTo(2));
         }
 
         private void assertSelectionIs(IEnumerable<HitObject> hitObjects)
