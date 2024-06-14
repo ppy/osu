@@ -13,6 +13,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         private const double single_spacing_threshold = 125;
         private const double min_speed_bonus = 70;
         private const double speed_balancing_factor = 38;
+        private const double distance_multiplier = 0.8;
 
         /// <summary>
         /// Evaluates the difficulty of tapping the current object, based on:
@@ -61,7 +62,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             double travelDistance = osuPrevObj?.TravelDistance ?? 0;
 
             double distance = (travelDistance + osuCurrObj.MinimumJumpDistance) * angleBonus;
-            double distanceBonus = Math.Min(1, Math.Pow(distance / single_spacing_threshold, 3.5));
+            double distanceBonus = distance_multiplier * Math.Min(1, Math.Pow(distance / single_spacing_threshold, 3.5));
 
             double distanceToSpeedRatio = distanceBonus / speedBonus;
 
