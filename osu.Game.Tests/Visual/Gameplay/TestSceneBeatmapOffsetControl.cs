@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Graphics;
@@ -19,7 +17,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 {
     public partial class TestSceneBeatmapOffsetControl : OsuTestScene
     {
-        private BeatmapOffsetControl offsetControl;
+        private BeatmapOffsetControl offsetControl = null!;
 
         [SetUpSteps]
         public void SetUpSteps()
