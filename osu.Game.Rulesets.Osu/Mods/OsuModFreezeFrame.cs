@@ -78,7 +78,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                         }
                         else
                         {
-                            connectedComboCount ++;
+                            connectedComboCount++;
                         }
                     }
                 }
