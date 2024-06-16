@@ -2,10 +2,13 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects;
@@ -28,6 +31,17 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public override ModType Type => ModType.Fun;
 
+        [SettingSource("Stack Combos", "How many combos to stack.", 0)]
+        public BindableFloat StackCount { get; } = new BindableFloat(1)
+        {
+            Precision = 1,
+            MinValue = 1,
+            MaxValue = 10
+        };
+
+        [SettingSource("Linear Stacking", "Shifting the stack.", 1)]
+        public BindableBool LinearStacking { get; } = new BindableBool(true);
+
         //mod breaks normal approach circle preempt
         private double originalPreempt;
 
@@ -38,12 +52,36 @@ namespace osu.Game.Rulesets.Osu.Mods
                 return;
 
             double lastNewComboTime = 0;
+            List<double> newComboTimeList = new double[(int)StackCount.Value].ToList();
+            int connectedComboCount = 0;
 
             originalPreempt = firstHitObject.TimePreempt;
 
             foreach (var obj in beatmap.HitObjects.OfType<OsuHitObject>())
             {
-                if (obj.NewCombo) { lastNewComboTime = obj.StartTime; }
+                if (obj.NewCombo)
+                {
+                    if (LinearStacking.Value)
+                    {
+                        newComboTimeList.Add(obj.StartTime);
+
+                        lastNewComboTime = newComboTimeList[0];
+
+                        newComboTimeList.RemoveAt(0);
+                    }
+                    else
+                    {
+                        if (connectedComboCount > StackCount.Value - 1)
+                        {
+                            lastNewComboTime = obj.StartTime;
+                            connectedComboCount = 1;
+                        }
+                        else
+                        {
+                            connectedComboCount ++;
+                        }
+                    }
+                }
 
                 applyFadeInAdjustment(obj);
             }
