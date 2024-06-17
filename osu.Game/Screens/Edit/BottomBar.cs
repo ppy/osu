@@ -1,16 +1,13 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
-using osu.Framework.Graphics.Shapes;
-using osu.Game.Overlays;
+using osu.Framework.Testing;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Screens.Edit.Components;
 using osu.Game.Screens.Edit.Components.Timelines.Summary;
@@ -21,12 +18,13 @@ namespace osu.Game.Screens.Edit
 {
     internal partial class BottomBar : CompositeDrawable
     {
-        public TestGameplayButton TestGameplayButton { get; private set; }
+        public TestGameplayButton TestGameplayButton { get; private set; } = null!;
 
-        private IBindable<bool> saveInProgress;
+        private IBindable<bool> saveInProgress = null!;
+        private Bindable<bool> composerFocusMode = null!;
 
         [BackgroundDependencyLoader]
-        private void load(OverlayColourProvider colourProvider, Editor editor)
+        private void load(Editor editor)
         {
             Anchor = Anchor.BottomLeft;
             Origin = Anchor.BottomLeft;
@@ -45,11 +43,6 @@ namespace osu.Game.Screens.Edit
 
             InternalChildren = new Drawable[]
             {
-                new Box
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = colourProvider.Background4,
-                },
                 new GridContainer
                 {
                     RelativeSizeAxes = Axes.Both,
@@ -79,6 +72,7 @@ namespace osu.Game.Screens.Edit
             };
 
             saveInProgress = editor.MutationTracker.InProgress.GetBoundCopy();
+            composerFocusMode = editor.ComposerFocusMode.GetBoundCopy();
         }
 
         protected override void LoadComplete()
@@ -86,6 +80,13 @@ namespace osu.Game.Screens.Edit
             base.LoadComplete();
 
             saveInProgress.BindValueChanged(_ => TestGameplayButton.Enabled.Value = !saveInProgress.Value, true);
+            composerFocusMode.BindValueChanged(_ =>
+            {
+                float targetAlpha = composerFocusMode.Value ? 0.5f : 1;
+
+                foreach (var c in this.ChildrenOfType<BottomBarContainer>())
+                    c.Background.FadeTo(targetAlpha, 400, Easing.OutQuint);
+            }, true);
         }
     }
 }
