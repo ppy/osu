@@ -62,7 +62,6 @@ namespace osu.Game.Screens.Edit
                                     Name = "Timeline content",
                                     RelativeSizeAxes = Axes.X,
                                     AutoSizeAxes = Axes.Y,
-                                    Padding = new MarginPadding { Horizontal = PADDING, Top = PADDING },
                                     Content = new[]
                                     {
                                         new Drawable[]
