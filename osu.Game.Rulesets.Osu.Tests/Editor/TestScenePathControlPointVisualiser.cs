@@ -15,6 +15,7 @@ using osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Tests.Visual;
 using osuTK;
+using osuTK.Input;
 
 namespace osu.Game.Rulesets.Osu.Tests.Editor
 {
@@ -175,6 +176,60 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
 
             for (int i = 0; i < points.Length; i++)
                 addAssertPointPositionChanged(points, i);
+        }
+
+        [Test]
+        public void TestChangingControlPointTypeViaTab()
+        {
+            createVisualiser(true);
+
+            addControlPointStep(new Vector2(200), PathType.LINEAR);
+            addControlPointStep(new Vector2(300));
+            addControlPointStep(new Vector2(500, 300));
+            addControlPointStep(new Vector2(700, 200));
+            addControlPointStep(new Vector2(500, 100));
+
+            AddStep("select first control point", () => visualiser.Pieces[0].IsSelected.Value = true);
+            AddStep("press tab", () => InputManager.Key(Key.Tab));
+            assertControlPointPathType(0, PathType.BEZIER);
+
+            AddStep("press shift-tab", () =>
+            {
+                InputManager.PressKey(Key.LShift);
+                InputManager.Key(Key.Tab);
+                InputManager.ReleaseKey(Key.LShift);
+            });
+            assertControlPointPathType(0, PathType.LINEAR);
+
+            AddStep("press shift-tab", () =>
+            {
+                InputManager.PressKey(Key.LShift);
+                InputManager.Key(Key.Tab);
+                InputManager.ReleaseKey(Key.LShift);
+            });
+            assertControlPointPathType(0, PathType.BSpline(4));
+
+            AddStep("press shift-tab", () =>
+            {
+                InputManager.PressKey(Key.LShift);
+                InputManager.Key(Key.Tab);
+                InputManager.ReleaseKey(Key.LShift);
+            });
+            assertControlPointPathType(0, PathType.BEZIER);
+
+            AddStep("select third last control point", () =>
+            {
+                visualiser.Pieces[0].IsSelected.Value = false;
+                visualiser.Pieces[2].IsSelected.Value = true;
+            });
+            AddRepeatStep("press tab", () => InputManager.Key(Key.Tab), 3);
+            assertControlPointPathType(2, PathType.PERFECT_CURVE);
+
+            AddStep("press tab", () => InputManager.Key(Key.Tab));
+            assertControlPointPathType(2, PathType.BSpline(4));
+
+            AddStep("press tab", () => InputManager.Key(Key.Tab));
+            assertControlPointPathType(2, null);
         }
 
         private void addAssertPointPositionChanged(Vector2[] points, int index)
