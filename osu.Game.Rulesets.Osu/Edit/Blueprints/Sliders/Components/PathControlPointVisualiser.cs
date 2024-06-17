@@ -245,6 +245,43 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         {
         }
 
+        protected override bool OnKeyDown(KeyDownEvent e)
+        {
+            if (e.Repeat || e.Key != Key.Tab)
+                return false;
+
+            var selectedPieces = Pieces.Where(p => p.IsSelected.Value).ToArray();
+            if (selectedPieces.Length != 1)
+                return false;
+
+            var selectedPoint = selectedPieces.Single().ControlPoint;
+            var validTypes = getValidPathTypes(selectedPoint).ToArray();
+            int currentTypeIndex = Array.IndexOf(validTypes, selectedPoint.Type);
+
+            if (currentTypeIndex < 0 && e.ShiftPressed)
+                currentTypeIndex = 0;
+
+            do
+            {
+                currentTypeIndex = (validTypes.Length + currentTypeIndex + (e.ShiftPressed ? -1 : 1)) % validTypes.Length;
+                selectedPoint.Type = validTypes[currentTypeIndex];
+                EnsureValidPathTypes();
+            } while (selectedPoint.Type != validTypes[currentTypeIndex]);
+
+            return true;
+
+            IEnumerable<PathType?> getValidPathTypes(PathControlPoint pathControlPoint)
+            {
+                if (pathControlPoint != controlPoints[0])
+                    yield return null;
+
+                yield return PathType.LINEAR;
+                yield return PathType.BEZIER;
+                yield return PathType.PERFECT_CURVE;
+                yield return PathType.BSpline(4);
+            }
+        }
+
         private void selectionRequested(PathControlPointPiece<T> piece, MouseButtonEvent e)
         {
             if (e.Button == MouseButton.Left && inputManager.CurrentState.Keyboard.ControlPressed)
