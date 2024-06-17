@@ -70,9 +70,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
             }
         }
 
-        public record NewScoreEvent(
-            IScoreInfo Score,
-            int? NewRank);
+        public record NewScoreEvent(IScoreInfo Score, int? NewRank);
 
         private partial class DailyChallengeEventFeedFlow : FillFlowContainer
         {
