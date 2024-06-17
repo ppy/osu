@@ -273,7 +273,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                 }
             }
 
-            return true;
+            return false;
         }
 
         protected override void Update()
