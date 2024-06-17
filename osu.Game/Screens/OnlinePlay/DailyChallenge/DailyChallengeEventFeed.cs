@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -82,8 +81,6 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
 
         private partial class NewScoreEventRow : CompositeDrawable
         {
-            public Action<IScoreInfo>? PresentScore { get; set; }
-
             private readonly NewScoreEvent newScore;
 
             public NewScoreEventRow(NewScoreEvent newScore)
@@ -124,7 +121,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
 
                 text.AddUserLink(newScore.Score.User);
                 text.AddText(" got ");
-                text.AddLink($"{newScore.Score.TotalScore:N0} points", () => PresentScore?.Invoke(newScore.Score));
+                text.AddLink($"{newScore.Score.TotalScore:N0} points", () => { }); // TODO: present the score here
 
                 if (newScore.NewRank != null)
                     text.AddText($" and achieved rank #{newScore.NewRank.Value:N0}");
