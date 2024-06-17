@@ -159,7 +159,12 @@ namespace osu.Game.Rulesets.Osu.UI
             RegisterPool<SpinnerBonusTick, DrawableSpinnerBonusTick>(10, 200);
 
             if (beatmap != null)
-                borderContainer.Padding = new MarginPadding(OsuHitObject.OBJECT_RADIUS * -LegacyRulesetExtensions.CalculateScaleFromCircleSize(beatmap.Difficulty.CircleSize, true));
+                ApplyCircleSizeToPlayfieldBorder(beatmap);
+        }
+
+        protected void ApplyCircleSizeToPlayfieldBorder(IBeatmap beatmap)
+        {
+            borderContainer.Padding = new MarginPadding(OsuHitObject.OBJECT_RADIUS * -LegacyRulesetExtensions.CalculateScaleFromCircleSize(beatmap.Difficulty.CircleSize, true));
         }
 
         protected override HitObjectLifetimeEntry CreateLifetimeEntry(HitObject hitObject) => new OsuHitObjectLifetimeEntry(hitObject);
