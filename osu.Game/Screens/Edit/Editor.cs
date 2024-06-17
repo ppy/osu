@@ -211,6 +211,8 @@ namespace osu.Game.Screens.Edit
         private Bindable<bool> editorHitMarkers;
         private Bindable<bool> editorAutoSeekOnPlacement;
         private Bindable<bool> editorLimitedDistanceSnap;
+        private Bindable<bool> editorTimelineShowTimingChanges;
+        private Bindable<bool> editorTimelineShowTicks;
 
         public Editor(EditorLoader loader = null)
         {
@@ -305,6 +307,8 @@ namespace osu.Game.Screens.Edit
             editorHitMarkers = config.GetBindable<bool>(OsuSetting.EditorShowHitMarkers);
             editorAutoSeekOnPlacement = config.GetBindable<bool>(OsuSetting.EditorAutoSeekOnPlacement);
             editorLimitedDistanceSnap = config.GetBindable<bool>(OsuSetting.EditorLimitedDistanceSnap);
+            editorTimelineShowTimingChanges = config.GetBindable<bool>(OsuSetting.EditorTimelineShowTimingChanges);
+            editorTimelineShowTicks = config.GetBindable<bool>(OsuSetting.EditorTimelineShowTicks);
 
             AddInternal(new OsuContextMenuContainer
             {
@@ -357,7 +361,21 @@ namespace osu.Game.Screens.Edit
                                     {
                                         Items = new MenuItem[]
                                         {
-                                            new WaveformOpacityMenuItem(config.GetBindable<float>(OsuSetting.EditorWaveformOpacity)),
+                                            new MenuItem(EditorStrings.Timeline)
+                                            {
+                                                Items =
+                                                [
+                                                    new WaveformOpacityMenuItem(config.GetBindable<float>(OsuSetting.EditorWaveformOpacity)),
+                                                    new ToggleMenuItem(EditorStrings.TimelineShowTimingChanges)
+                                                    {
+                                                        State = { BindTarget = editorTimelineShowTimingChanges }
+                                                    },
+                                                    new ToggleMenuItem(EditorStrings.TimelineShowTicks)
+                                                    {
+                                                        State = { BindTarget = editorTimelineShowTicks }
+                                                    },
+                                                ]
+                                            },
                                             new BackgroundDimMenuItem(editorBackgroundDim),
                                             new ToggleMenuItem(EditorStrings.ShowHitMarkers)
                                             {
