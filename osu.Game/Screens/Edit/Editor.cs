@@ -359,7 +359,7 @@ namespace osu.Game.Screens.Edit
                                     },
                                     new MenuItem(CommonStrings.MenuBarView)
                                     {
-                                        Items = new MenuItem[]
+                                        Items = new[]
                                         {
                                             new MenuItem(EditorStrings.Timeline)
                                             {
