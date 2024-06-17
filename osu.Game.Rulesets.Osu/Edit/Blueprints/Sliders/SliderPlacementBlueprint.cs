@@ -253,6 +253,20 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                     return true;
                 }
 
+                case Key.Number1:
+                case Key.Number2:
+                case Key.Number3:
+                case Key.Number4:
+                {
+                    if (!e.AltPressed)
+                        return false;
+
+                    usingCustomSegmentType = true;
+                    segmentStart.Type = path_types[e.Key - Key.Number1];
+                    controlPointVisualiser.EnsureValidPathTypes();
+                    return true;
+                }
+
                 case Key.Tab:
                 {
                     usingCustomSegmentType = true;
