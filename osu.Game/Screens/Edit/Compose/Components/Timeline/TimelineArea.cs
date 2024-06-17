@@ -46,7 +46,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                     {
                         new Dimension(),
                         new Dimension(GridSizeMode.Absolute, 35),
-                        new Dimension(GridSizeMode.Absolute, HitObjectComposer.TOOLBOX_CONTRACTED_SIZE_RIGHT - padding * 2),
+                        new Dimension(GridSizeMode.Absolute, HitObjectComposer.TOOLBOX_CONTRACTED_SIZE_RIGHT),
                     },
                     Content = new[]
                     {
