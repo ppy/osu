@@ -214,6 +214,12 @@ namespace osu.Game.Screens.Edit
         private Bindable<bool> editorTimelineShowTimingChanges;
         private Bindable<bool> editorTimelineShowTicks;
 
+        /// <summary>
+        /// This controls the opacity of components like the timelines, sidebars, etc.
+        /// In "composer focus" mode the opacity of the aforementioned components is reduced so that the user can focus on the composer better.
+        /// </summary>
+        public Bindable<bool> ComposerFocusMode { get; } = new Bindable<bool>();
+
         public Editor(EditorLoader loader = null)
         {
             this.loader = loader;
@@ -323,7 +329,6 @@ namespace osu.Game.Screens.Edit
                         Child = screenContainer = new Container<EditorScreen>
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Masking = true
                         }
                     },
                     new Container
