@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -19,6 +20,9 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         private readonly Drawable userContent;
 
+        private Box timelineBackground = null!;
+        private readonly Bindable<bool> composerFocusMode = new Bindable<bool>();
+
         public TimelineArea(Drawable? content = null)
         {
             RelativeSizeAxes = Axes.X;
@@ -28,12 +32,20 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         }
 
         [BackgroundDependencyLoader]
-        private void load(OverlayColourProvider colourProvider, OsuColour colours)
+        private void load(OverlayColourProvider colourProvider, OsuColour colours, Editor? editor)
         {
             const float padding = 10;
 
             InternalChildren = new Drawable[]
             {
+                new Box
+                {
+                    Anchor = Anchor.TopRight,
+                    Origin = Anchor.TopRight,
+                    Width = 35 + HitObjectComposer.TOOLBOX_CONTRACTED_SIZE_RIGHT,
+                    RelativeSizeAxes = Axes.Y,
+                    Colour = colourProvider.Background4
+                },
                 new GridContainer
                 {
                     RelativeSizeAxes = Axes.X,
@@ -58,7 +70,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                                 AutoSizeAxes = Axes.Y,
                                 Children = new Drawable[]
                                 {
-                                    new Box
+                                    timelineBackground = new Box
                                     {
                                         RelativeSizeAxes = Axes.Both,
                                         Depth = float.MaxValue,
@@ -111,6 +123,16 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                     },
                 }
             };
+
+            if (editor != null)
+                composerFocusMode.BindTo(editor.ComposerFocusMode);
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            composerFocusMode.BindValueChanged(_ => timelineBackground.FadeTo(composerFocusMode.Value ? 0.5f : 1, 400, Easing.OutQuint), true);
         }
     }
 }
