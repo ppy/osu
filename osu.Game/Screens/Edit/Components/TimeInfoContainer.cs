@@ -1,11 +1,17 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
+using System.Globalization;
 using osu.Framework.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Framework.Allocation;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
 using osu.Game.Extensions;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
 using osuTK;
 
@@ -13,7 +19,6 @@ namespace osu.Game.Screens.Edit.Components
 {
     public partial class TimeInfoContainer : BottomBarContainer
     {
-        private OsuSpriteText trackTimer = null!;
         private OsuSpriteText bpm = null!;
 
         [Resolved]
@@ -29,14 +34,7 @@ namespace osu.Game.Screens.Edit.Components
 
             Children = new Drawable[]
             {
-                trackTimer = new OsuSpriteText
-                {
-                    Anchor = Anchor.CentreLeft,
-                    Origin = Anchor.CentreLeft,
-                    Spacing = new Vector2(-2, 0),
-                    Font = OsuFont.Torus.With(size: 36, fixedWidth: true, weight: FontWeight.Light),
-                    Y = -10,
-                },
+                new TimestampControl(),
                 bpm = new OsuSpriteText
                 {
                     Colour = colours.Orange1,
@@ -47,18 +45,11 @@ namespace osu.Game.Screens.Edit.Components
             };
         }
 
-        private double? lastTime;
         private double? lastBPM;
 
         protected override void Update()
         {
             base.Update();
-
-            if (lastTime != editorClock.CurrentTime)
-            {
-                lastTime = editorClock.CurrentTime;
-                trackTimer.Text = editorClock.CurrentTime.ToEditorFormattedString();
-            }
 
             double newBPM = editorBeatmap.ControlPointInfo.TimingPointAt(editorClock.CurrentTime).BPM;
 
@@ -66,6 +57,99 @@ namespace osu.Game.Screens.Edit.Components
             {
                 lastBPM = newBPM;
                 bpm.Text = @$"{newBPM:0} BPM";
+            }
+        }
+
+        private partial class TimestampControl : OsuClickableContainer
+        {
+            private Container hoverLayer = null!;
+            private OsuSpriteText trackTimer = null!;
+            private OsuTextBox inputTextBox = null!;
+
+            [Resolved]
+            private EditorClock editorClock { get; set; } = null!;
+
+            public TimestampControl()
+                : base(HoverSampleSet.Button)
+            {
+            }
+
+            [BackgroundDependencyLoader]
+            private void load()
+            {
+                AutoSizeAxes = Axes.Both;
+
+                AddRangeInternal(new Drawable[]
+                {
+                    hoverLayer = new Container
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Padding = new MarginPadding
+                        {
+                            Top = 5,
+                            Horizontal = -5
+                        },
+                        Child = new Box { RelativeSizeAxes = Axes.Both, },
+                        Alpha = 0,
+                    },
+                    trackTimer = new OsuSpriteText
+                    {
+                        Anchor = Anchor.CentreLeft,
+                        Origin = Anchor.CentreLeft,
+                        Spacing = new Vector2(-2, 0),
+                        Font = OsuFont.Torus.With(size: 36, fixedWidth: true, weight: FontWeight.Light),
+                    },
+                    inputTextBox = new OsuTextBox
+                    {
+                        Width = 150,
+                        Height = 36,
+                        Alpha = 0,
+                        CommitOnFocusLost = true,
+                    },
+                });
+
+                Action = () =>
+                {
+                    trackTimer.Alpha = 0;
+                    inputTextBox.Alpha = 1;
+                    inputTextBox.Text = editorClock.CurrentTime.ToEditorFormattedString();
+                    Schedule(() =>
+                    {
+                        GetContainingFocusManager().ChangeFocus(inputTextBox);
+                        inputTextBox.SelectAll();
+                    });
+                };
+
+                inputTextBox.OnCommit += (_, __) =>
+                {
+                    if (TimeSpan.TryParseExact(inputTextBox.Text, @"mm\:ss\:fff", CultureInfo.InvariantCulture, out var timestamp))
+                        editorClock.SeekSmoothlyTo(timestamp.TotalMilliseconds);
+
+                    trackTimer.Alpha = 1;
+                    inputTextBox.Alpha = 0;
+                };
+            }
+
+            private double? lastTime;
+            private bool showingHoverLayer;
+
+            protected override void Update()
+            {
+                base.Update();
+
+                if (lastTime != editorClock.CurrentTime)
+                {
+                    lastTime = editorClock.CurrentTime;
+                    trackTimer.Text = editorClock.CurrentTime.ToEditorFormattedString();
+                }
+
+                bool shouldShowHoverLayer = IsHovered && inputTextBox.Alpha == 0;
+
+                if (shouldShowHoverLayer != showingHoverLayer)
+                {
+                    hoverLayer.FadeTo(shouldShowHoverLayer ? 0.2f : 0, 400, Easing.OutQuint);
+                    showingHoverLayer = shouldShowHoverLayer;
+                }
             }
         }
     }
