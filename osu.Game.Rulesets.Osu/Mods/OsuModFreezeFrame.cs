@@ -39,9 +39,6 @@ namespace osu.Game.Rulesets.Osu.Mods
             MaxValue = 10
         };
 
-        [SettingSource("Linear Stacking", "Shifting the stack.", 1)]
-        public BindableBool LinearStacking { get; } = new BindableBool(true);
-
         //mod breaks normal approach circle preempt
         private double originalPreempt;
 
@@ -53,7 +50,6 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             double lastNewComboTime = 0;
             List<double> newComboTimeList = new double[(int)StackCount.Value].ToList();
-            int connectedComboCount = 0;
 
             originalPreempt = firstHitObject.TimePreempt;
 
@@ -61,26 +57,11 @@ namespace osu.Game.Rulesets.Osu.Mods
             {
                 if (obj.NewCombo)
                 {
-                    if (LinearStacking.Value)
-                    {
-                        newComboTimeList.Add(obj.StartTime);
+                    newComboTimeList.Add(obj.StartTime);
 
-                        lastNewComboTime = newComboTimeList[0];
+                    lastNewComboTime = newComboTimeList[0];
 
-                        newComboTimeList.RemoveAt(0);
-                    }
-                    else
-                    {
-                        if (connectedComboCount > StackCount.Value - 1)
-                        {
-                            lastNewComboTime = obj.StartTime;
-                            connectedComboCount = 1;
-                        }
-                        else
-                        {
-                            connectedComboCount++;
-                        }
-                    }
+                    newComboTimeList.RemoveAt(0);
                 }
 
                 applyFadeInAdjustment(obj);
