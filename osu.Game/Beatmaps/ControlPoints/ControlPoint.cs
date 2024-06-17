@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using Newtonsoft.Json;
 using osu.Game.Graphics;
 using osu.Game.Utils;
@@ -9,6 +10,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Beatmaps.ControlPoints
 {
+    [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)]
     public abstract class ControlPoint : IComparable<ControlPoint>, IDeepCloneable<ControlPoint>, IEquatable<ControlPoint>, IControlPoint
     {
         [JsonIgnore]
