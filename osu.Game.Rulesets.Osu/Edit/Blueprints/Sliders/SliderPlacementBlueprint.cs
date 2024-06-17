@@ -242,6 +242,17 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
             switch (e.Key)
             {
+                case Key.S:
+                {
+                    if (!canPlaceNewControlPoint(out _))
+                        return false;
+
+                    placeNewControlPoint();
+                    var last = HitObject.Path.ControlPoints.Last(p => p != cursor);
+                    beginNewSegment(last);
+                    return true;
+                }
+
                 case Key.Tab:
                 {
                     usingCustomSegmentType = true;
