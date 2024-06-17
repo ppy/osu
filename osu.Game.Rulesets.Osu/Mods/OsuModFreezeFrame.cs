@@ -31,7 +31,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public override ModType Type => ModType.Fun;
 
-        [SettingSource("Stack Combos", "How many combos to stack.", 0)]
+        [SettingSource("Connecting length", "Length to connect the combo.", 0)]
         public BindableFloat StackCount { get; } = new BindableFloat(1)
         {
             Precision = 1,
