@@ -301,6 +301,9 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
                 case Key.Number4:
                 case Key.Number5:
                 {
+                    if (!e.AltPressed)
+                        return false;
+
                     var type = path_types[e.Key - Key.Number1];
 
                     if (Pieces[0].IsSelected.Value && type == null)
