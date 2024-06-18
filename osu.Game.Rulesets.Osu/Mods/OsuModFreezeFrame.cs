@@ -48,8 +48,8 @@ namespace osu.Game.Rulesets.Osu.Mods
             if (firstHitObject == null)
                 return;
 
-            double lastNewComboTime = 0;
-            List<double> newComboTimeList = new double[(int)StackCount.Value].ToList();
+            double applicableStartTime = 0;
+            List<double> startTimeList = new double[(int)StackCount.Value].ToList();
 
             originalPreempt = firstHitObject.TimePreempt;
 
@@ -57,11 +57,9 @@ namespace osu.Game.Rulesets.Osu.Mods
             {
                 if (obj.NewCombo)
                 {
-                    newComboTimeList.Add(obj.StartTime);
-
-                    lastNewComboTime = newComboTimeList[0];
-
-                    newComboTimeList.RemoveAt(0);
+                    startTimeList.Add(obj.StartTime);
+                    applicableStartTime = startTimeList[0];
+                    startTimeList.RemoveAt(0);
                 }
 
                 applyFadeInAdjustment(obj);
@@ -69,7 +67,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             void applyFadeInAdjustment(OsuHitObject osuObject)
             {
-                osuObject.TimePreempt += osuObject.StartTime - lastNewComboTime;
+                osuObject.TimePreempt += osuObject.StartTime - applicableStartTime;
 
                 foreach (var nested in osuObject.NestedHitObjects.OfType<OsuHitObject>())
                 {
