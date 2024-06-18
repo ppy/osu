@@ -116,7 +116,7 @@ namespace osu.Game.Screens.Edit.Components
                     inputTextBox.Text = editorClock.CurrentTime.ToEditorFormattedString();
                     Schedule(() =>
                     {
-                        GetContainingFocusManager().ChangeFocus(inputTextBox);
+                        GetContainingFocusManager()!.ChangeFocus(inputTextBox);
                         inputTextBox.SelectAll();
                     });
                 };
