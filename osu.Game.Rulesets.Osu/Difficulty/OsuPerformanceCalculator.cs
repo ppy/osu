@@ -203,7 +203,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 sliderReadingValue *= 1.3 + (totalHits * (0.0016 / (1 + 2 * effectiveMissCount)) * Math.Pow(accuracy, 16)) * (1 - 0.003 * attributes.DrainRate * attributes.DrainRate);
 
             // We assume 15% of sliders in a map are difficult since there's no way to tell from the performance calculator.
-            double estimateDifficultSliders = attributes.SliderCount * 0.15;
+            double estimateDifficultSliders = Math.Max(1, attributes.SliderCount * 0.15);
 
             double estimateSliderEndsDropped = Math.Clamp(Math.Min(countOk + countMeh + countMiss, attributes.MaxCombo - scoreMaxCombo), 0, estimateDifficultSliders);
             double sliderNerfFactor = 1 - estimateSliderEndsDropped / estimateDifficultSliders;
