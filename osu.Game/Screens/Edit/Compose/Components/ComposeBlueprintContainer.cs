@@ -228,7 +228,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             yield return new TernaryButton(NewCombo, "New combo", () => new SpriteIcon { Icon = OsuIcon.EditorNewComboA });
 
             foreach (var kvp in SelectionHandler.SelectionSampleStates)
-                yield return new TernaryButton(kvp.Value, kvp.Key.Replace("hit", string.Empty).Titleize(), () => getIconForSample(kvp.Key));
+                yield return new TernaryButton(kvp.Value, kvp.Key.Replace("hit", string.Empty).Titleize(), () => GetIconForSample(kvp.Key));
         }
 
         private IEnumerable<TernaryButton> createSampleBankTernaryButtons()
@@ -264,7 +264,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             };
         }
 
-        private Drawable getIconForSample(string sampleName)
+        public static Drawable GetIconForSample(string sampleName)
         {
             switch (sampleName)
             {
