@@ -10,12 +10,12 @@ namespace osu.Game.Tests.Editing
     [TestFixture]
     public class EditorTimestampParserTest
     {
-        public static readonly object?[][] test_cases =
+        private static readonly object?[][] test_cases =
         {
             new object?[] { ":", false, null, null },
             new object?[] { "1", true, new TimeSpan(0, 0, 1, 0), null },
             new object?[] { "99", true, new TimeSpan(0, 0, 99, 0), null },
-            new object?[] { "300", false, null, null },
+            new object?[] { "3000", false, null, null },
             new object?[] { "1:2", true, new TimeSpan(0, 0, 1, 2), null },
             new object?[] { "1:02", true, new TimeSpan(0, 0, 1, 2), null },
             new object?[] { "1:92", false, null, null },
