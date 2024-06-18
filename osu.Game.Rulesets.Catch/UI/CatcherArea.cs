@@ -84,7 +84,7 @@ namespace osu.Game.Rulesets.Catch.UI
         {
             base.Update();
 
-            var replayState = (GetContainingInputManager().CurrentState as RulesetInputManagerInputState<CatchAction>)?.LastReplayState as CatchFramedReplayInputHandler.CatchReplayState;
+            var replayState = (GetContainingInputManager()!.CurrentState as RulesetInputManagerInputState<CatchAction>)?.LastReplayState as CatchFramedReplayInputHandler.CatchReplayState;
 
             SetCatcherPosition(
                 replayState?.CatcherX ??
