@@ -2,9 +2,10 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Graphics;
-using osu.Game.Screens.Edit.Components.Timelines.Summary.Visualisations;
 
 namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
 {
@@ -20,11 +21,24 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
                 Add(new BreakVisualisation(breakPeriod));
         }
 
-        private partial class BreakVisualisation : DurationVisualisation
+        private partial class BreakVisualisation : Circle
         {
+            private readonly BreakPeriod breakPeriod;
+
             public BreakVisualisation(BreakPeriod breakPeriod)
-                : base(breakPeriod.StartTime, breakPeriod.EndTime)
             {
+                this.breakPeriod = breakPeriod;
+
+                RelativePositionAxes = Axes.X;
+                RelativeSizeAxes = Axes.Both;
+            }
+
+            protected override void Update()
+            {
+                base.Update();
+
+                X = (float)breakPeriod.StartTime;
+                Width = (float)breakPeriod.Duration;
             }
 
             [BackgroundDependencyLoader]
