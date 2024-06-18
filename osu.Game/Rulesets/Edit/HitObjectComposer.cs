@@ -215,14 +215,14 @@ namespace osu.Game.Rulesets.Edit
 
             toolboxCollection.Items = CompositionTools
                                       .Prepend(new SelectTool())
-                                      .Select(t => new RadioButton(t.Name, () => toolSelected(t), t.CreateIcon))
+                                      .Select(t => new HitObjectCompositionToolButton(t, () => toolSelected(t)))
                                       .ToList();
 
             foreach (var item in toolboxCollection.Items)
             {
                 item.Selected.DisabledChanged += isDisabled =>
                 {
-                    item.TooltipText = isDisabled ? "Add at least one timing point first!" : string.Empty;
+                    item.TooltipText = isDisabled ? "Add at least one timing point first!" : ((HitObjectCompositionToolButton)item).TooltipText;
                 };
             }
 
