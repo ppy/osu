@@ -10,14 +10,14 @@ namespace osu.Game.Rulesets.Edit.Tools
     {
         public readonly string Name;
 
-        public LocalisableString TooltipText { get; init; } = default;
+        public LocalisableString TooltipText { get; init; }
 
         protected HitObjectCompositionTool(string name)
         {
             Name = name;
         }
 
-        public abstract PlacementBlueprint CreatePlacementBlueprint();
+        public abstract PlacementBlueprint? CreatePlacementBlueprint();
 
         public virtual Drawable? CreateIcon() => null;
 
