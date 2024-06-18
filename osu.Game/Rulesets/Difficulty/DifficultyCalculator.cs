@@ -122,6 +122,7 @@ namespace osu.Game.Rulesets.Difficulty
                         cancellationToken.ThrowIfCancellationRequested();
                         skill.Process(difficultyObjects[currentIndex]);
                     }
+
                     currentIndex++;
                 }
 
