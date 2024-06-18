@@ -32,10 +32,17 @@ namespace osu.Game.Rulesets.Edit
         /// <item>1:02:300 (1,2,3) - parses to 01:02:300 with selection</item>
         /// </list>
         /// </example>
-        private static readonly Regex time_regex_lenient = new Regex(@"^(((?<minutes>\d{1,3})(:(?<seconds>([0-5]?\d))([:.](?<milliseconds>\d{0,3}))?)?)(?<selection>\s\([^)]+\))?)$", RegexOptions.Compiled);
+        private static readonly Regex time_regex_lenient = new Regex(@"^(((?<minutes>\d{1,3}):(?<seconds>([0-5]?\d))([:.](?<milliseconds>\d{0,3}))?)(?<selection>\s\([^)]+\))?)$", RegexOptions.Compiled);
 
         public static bool TryParse(string timestamp, [NotNullWhen(true)] out TimeSpan? parsedTime, out string? parsedSelection)
         {
+            if (double.TryParse(timestamp, out double msec))
+            {
+                parsedTime = TimeSpan.FromMilliseconds(msec);
+                parsedSelection = null;
+                return true;
+            }
+
             Match match = time_regex_lenient.Match(timestamp);
 
             if (!match.Success)
