@@ -23,7 +23,7 @@ namespace osu.Game.Rulesets.Edit
         /// </summary>
         /// <example>
         /// <list type="bullet">
-        /// <item>1 - parses to 01:00:000</item>
+        /// <item>1 - parses to 00:00:001 (bare numbers are treated as milliseconds)</item>
         /// <item>1:2 - parses to 01:02:000</item>
         /// <item>1:02 - parses to 01:02:000</item>
         /// <item>1:92 - does not parse</item>
