@@ -248,11 +248,11 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         // ReSharper disable once StaticMemberInGenericType
         private static readonly PathType?[] path_types =
         [
-            null,
             PathType.LINEAR,
             PathType.BEZIER,
             PathType.PERFECT_CURVE,
             PathType.BSpline(4),
+            null,
         ];
 
         protected override bool OnKeyDown(KeyDownEvent e)
@@ -260,17 +260,17 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             if (e.Repeat)
                 return false;
 
-            var selectedPieces = Pieces.Where(p => p.IsSelected.Value).ToArray();
-            if (selectedPieces.Length != 1)
-                return false;
-
-            var selectedPiece = selectedPieces.Single();
-            var selectedPoint = selectedPiece.ControlPoint;
-
             switch (e.Key)
             {
                 case Key.Tab:
                 {
+                    var selectedPieces = Pieces.Where(p => p.IsSelected.Value).ToArray();
+                    if (selectedPieces.Length != 1)
+                        return false;
+
+                    var selectedPiece = selectedPieces.Single();
+                    var selectedPoint = selectedPiece.ControlPoint;
+
                     var validTypes = path_types;
 
                     if (selectedPoint == controlPoints[0])
@@ -295,15 +295,15 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
                     return true;
                 }
 
-                case Key.Number0:
                 case Key.Number1:
                 case Key.Number2:
                 case Key.Number3:
                 case Key.Number4:
+                case Key.Number5:
                 {
-                    var type = path_types[e.Key - Key.Number0];
+                    var type = path_types[e.Key - Key.Number1];
 
-                    if (selectedPoint == controlPoints[0] && type == null)
+                    if (Pieces[0].IsSelected.Value && type == null)
                         return false;
 
                     updatePathTypeOfSelectedPieces(type);
