@@ -216,7 +216,7 @@ namespace osu.Game.Overlays.Login
 
         protected override void OnFocus(FocusEvent e)
         {
-            if (form != null) GetContainingFocusManager().ChangeFocus(form);
+            if (form != null) GetContainingFocusManager()!.ChangeFocus(form);
             base.OnFocus(e);
         }
     }
