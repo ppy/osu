@@ -74,8 +74,8 @@ namespace osu.Game.Screens.Edit.Compose
                 RelativeSizeAxes = Axes.Both,
                 Children = new Drawable[]
                 {
+                    new TimelineBlueprintContainer(composer),
                     new TimelineBreakDisplay { RelativeSizeAxes = Axes.Both, },
-                    new TimelineBlueprintContainer(composer)
                 }
             });
         }
