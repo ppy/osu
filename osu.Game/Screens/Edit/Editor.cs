@@ -1275,16 +1275,20 @@ namespace osu.Game.Screens.Edit
             return tcs.Task;
         }
 
-        public void HandleTimestamp(string timestamp)
+        public bool HandleTimestamp(string timestamp, bool notifyOnError = false)
         {
             if (!EditorTimestampParser.TryParse(timestamp, out var timeSpan, out string selection))
             {
-                Schedule(() => notifications?.Post(new SimpleErrorNotification
+                if (notifyOnError)
                 {
-                    Icon = FontAwesome.Solid.ExclamationTriangle,
-                    Text = EditorStrings.FailedToParseEditorLink
-                }));
-                return;
+                    Schedule(() => notifications?.Post(new SimpleErrorNotification
+                    {
+                        Icon = FontAwesome.Solid.ExclamationTriangle,
+                        Text = EditorStrings.FailedToParseEditorLink
+                    }));
+                }
+
+                return false;
             }
 
             editorBeatmap.SelectedHitObjects.Clear();
@@ -1297,7 +1301,7 @@ namespace osu.Game.Screens.Edit
             if (string.IsNullOrEmpty(selection))
             {
                 clock.SeekSmoothlyTo(position);
-                return;
+                return true;
             }
 
             // Seek to the next closest HitObject instead
@@ -1312,6 +1316,7 @@ namespace osu.Game.Screens.Edit
 
             // Delegate handling the selection to the ruleset.
             currentScreen.Dependencies.Get<HitObjectComposer>().SelectFromTimestamp(position, selection);
+            return true;
         }
 
         public double SnapTime(double time, double? referenceTime) => editorBeatmap.SnapTime(time, referenceTime);

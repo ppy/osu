@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
-using System.Globalization;
 using osu.Framework.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Framework.Allocation;
@@ -67,6 +65,9 @@ namespace osu.Game.Screens.Edit.Components
             private OsuTextBox inputTextBox = null!;
 
             [Resolved]
+            private Editor? editor { get; set; }
+
+            [Resolved]
             private EditorClock editorClock { get; set; } = null!;
 
             public TimestampControl()
@@ -120,11 +121,10 @@ namespace osu.Game.Screens.Edit.Components
                     });
                 };
 
+                inputTextBox.Current.BindValueChanged(val => editor?.HandleTimestamp(val.NewValue));
+
                 inputTextBox.OnCommit += (_, __) =>
                 {
-                    if (TimeSpan.TryParseExact(inputTextBox.Text, @"mm\:ss\:fff", CultureInfo.InvariantCulture, out var timestamp))
-                        editorClock.SeekSmoothlyTo(timestamp.TotalMilliseconds);
-
                     trackTimer.Alpha = 1;
                     inputTextBox.Alpha = 0;
                 };
