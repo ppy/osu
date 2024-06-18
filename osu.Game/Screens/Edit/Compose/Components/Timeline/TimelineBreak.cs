@@ -1,13 +1,20 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
+using System.Diagnostics;
+using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Input.Events;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Rulesets.Objects;
+using osuTK;
 
 namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 {
@@ -26,62 +33,184 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             RelativePositionAxes = Axes.X;
             RelativeSizeAxes = Axes.Both;
             Origin = Anchor.TopLeft;
-            X = (float)Break.StartTime;
-            Width = (float)Break.Duration;
-            CornerRadius = 10;
-            Masking = true;
+            Padding = new MarginPadding { Horizontal = -5 };
 
             InternalChildren = new Drawable[]
             {
-                new Box
+                new Container
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = colours.GreyCarmineLight,
-                    Alpha = 0.4f,
+                    Padding = new MarginPadding { Horizontal = 5 },
+                    Child = new Box
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Colour = colours.GreyCarmineLight,
+                        Alpha = 0.4f,
+                    },
                 },
-                new Circle
-                {
-                    Anchor = Anchor.CentreLeft,
-                    Origin = Anchor.CentreLeft,
-                    RelativeSizeAxes = Axes.Y,
-                    Width = 10,
-                    CornerRadius = 5,
-                    Colour = colours.GreyCarmineLighter,
-                },
-                new OsuSpriteText
+                new DragHandle(Break, isStartHandle: true)
                 {
                     Anchor = Anchor.TopLeft,
                     Origin = Anchor.TopLeft,
-                    Text = "Break",
-                    Margin = new MarginPadding
-                    {
-                        Left = 16,
-                        Top = 3,
-                    },
-                    Colour = colours.GreyCarmineLighter,
+                    Action = (time, breakPeriod) => breakPeriod.StartTime = time,
                 },
-                new Circle
-                {
-                    Anchor = Anchor.CentreRight,
-                    Origin = Anchor.CentreRight,
-                    RelativeSizeAxes = Axes.Y,
-                    Width = 10,
-                    CornerRadius = 5,
-                    Colour = colours.GreyCarmineLighter,
-                },
-                new OsuSpriteText
+                new DragHandle(Break, isStartHandle: false)
                 {
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight,
-                    Text = "Break",
-                    Margin = new MarginPadding
-                    {
-                        Right = 16,
-                        Top = 3,
-                    },
-                    Colour = colours.GreyCarmineLighter,
+                    Action = (time, breakPeriod) => breakPeriod.EndTime = time,
                 },
             };
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            X = (float)Break.StartTime;
+            Width = (float)Break.Duration;
+        }
+
+        private partial class DragHandle : FillFlowContainer
+        {
+            public new Anchor Anchor
+            {
+                get => base.Anchor;
+                init => base.Anchor = value;
+            }
+
+            public Action<double, BreakPeriod>? Action { get; init; }
+
+            private readonly BreakPeriod breakPeriod;
+            private readonly bool isStartHandle;
+
+            private Container handle = null!;
+            private (double min, double max)? allowedDragRange;
+
+            [Resolved]
+            private EditorBeatmap beatmap { get; set; } = null!;
+
+            [Resolved]
+            private Timeline timeline { get; set; } = null!;
+
+            [Resolved]
+            private IEditorChangeHandler? changeHandler { get; set; }
+
+            [Resolved]
+            private OsuColour colours { get; set; } = null!;
+
+            public DragHandle(BreakPeriod breakPeriod, bool isStartHandle)
+            {
+                this.breakPeriod = breakPeriod;
+                this.isStartHandle = isStartHandle;
+            }
+
+            [BackgroundDependencyLoader]
+            private void load()
+            {
+                AutoSizeAxes = Axes.X;
+                RelativeSizeAxes = Axes.Y;
+                Direction = FillDirection.Horizontal;
+                Spacing = new Vector2(5);
+
+                Children = new Drawable[]
+                {
+                    handle = new Container
+                    {
+                        Anchor = Anchor,
+                        Origin = Anchor,
+                        RelativeSizeAxes = Axes.Y,
+                        CornerRadius = 5,
+                        Masking = true,
+                        Child = new Box
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Colour = Colour4.White,
+                        },
+                    },
+                    new OsuSpriteText
+                    {
+                        BypassAutoSizeAxes = Axes.X,
+                        Anchor = Anchor,
+                        Origin = Anchor,
+                        Text = "Break",
+                        Margin = new MarginPadding { Top = 2, },
+                    },
+                };
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+
+                updateState();
+                FinishTransforms(true);
+            }
+
+            protected override bool OnHover(HoverEvent e)
+            {
+                updateState();
+                return true;
+            }
+
+            protected override void OnHoverLost(HoverLostEvent e)
+            {
+                updateState();
+                base.OnHoverLost(e);
+            }
+
+            protected override bool OnDragStart(DragStartEvent e)
+            {
+                changeHandler?.BeginChange();
+                updateState();
+
+                double min = beatmap.HitObjects.Last(ho => ho.GetEndTime() <= breakPeriod.StartTime).GetEndTime();
+                double max = beatmap.HitObjects.First(ho => ho.StartTime >= breakPeriod.EndTime).StartTime;
+
+                if (isStartHandle)
+                    max = Math.Min(max, breakPeriod.EndTime - BreakPeriod.MIN_BREAK_DURATION);
+                else
+                    min = Math.Max(min, breakPeriod.StartTime + BreakPeriod.MIN_BREAK_DURATION);
+
+                allowedDragRange = (min, max);
+
+                return true;
+            }
+
+            protected override void OnDrag(DragEvent e)
+            {
+                base.OnDrag(e);
+
+                Debug.Assert(allowedDragRange != null);
+
+                if (timeline.FindSnappedPositionAndTime(e.ScreenSpaceMousePosition).Time is double time
+                    && time > allowedDragRange.Value.min
+                    && time < allowedDragRange.Value.max)
+                {
+                    Action?.Invoke(time, breakPeriod);
+                }
+
+                updateState();
+            }
+
+            protected override void OnDragEnd(DragEndEvent e)
+            {
+                changeHandler?.EndChange();
+                updateState();
+                base.OnDragEnd(e);
+            }
+
+            private void updateState()
+            {
+                bool active = IsHovered || IsDragged;
+
+                var colour = colours.GreyCarmineLighter;
+                if (active)
+                    colour = colour.Lighten(0.3f);
+
+                this.FadeColour(colour, 400, Easing.OutQuint);
+                handle.ResizeWidthTo(active ? 20 : 10, 400, Easing.OutElastic);
+            }
         }
     }
 }
