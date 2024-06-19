@@ -53,7 +53,7 @@ namespace osu.Game.Screens.Edit.Verify
                             if (issue.Time != null)
                             {
                                 clock.Seek(issue.Time.Value);
-                                editor.OnPressed(new KeyBindingPressEvent<GlobalAction>(GetContainingInputManager().CurrentState, GlobalAction.EditorComposeMode));
+                                editor.OnPressed(new KeyBindingPressEvent<GlobalAction>(GetContainingInputManager()!.CurrentState, GlobalAction.EditorComposeMode));
                             }
 
                             if (!issue.HitObjects.Any())
