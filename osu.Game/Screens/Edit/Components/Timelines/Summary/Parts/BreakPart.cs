@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps.Timing;
@@ -14,11 +15,19 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
     /// </summary>
     public partial class BreakPart : TimelinePart
     {
+        private readonly BindableList<BreakPeriod> breaks = new BindableList<BreakPeriod>();
+
         protected override void LoadBeatmap(EditorBeatmap beatmap)
         {
             base.LoadBeatmap(beatmap);
-            foreach (var breakPeriod in beatmap.Breaks)
-                Add(new BreakVisualisation(breakPeriod));
+
+            breaks.UnbindAll();
+            breaks.BindTo(beatmap.Breaks);
+            breaks.BindCollectionChanged((_, _) =>
+            {
+                foreach (var breakPeriod in beatmap.Breaks)
+                    Add(new BreakVisualisation(breakPeriod));
+            }, true);
         }
 
         private partial class BreakVisualisation : Circle
@@ -31,12 +40,6 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
 
                 RelativePositionAxes = Axes.X;
                 RelativeSizeAxes = Axes.Both;
-            }
-
-            protected override void Update()
-            {
-                base.Update();
-
                 X = (float)breakPeriod.StartTime;
                 Width = (float)breakPeriod.Duration;
             }
