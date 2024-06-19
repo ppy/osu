@@ -199,13 +199,13 @@ namespace osu.Game.Rulesets.Osu.Edit
                 switch (v.NewValue)
                 {
                     case PositionSnapGridType.Square:
-                        GridLinesRotation.Value = (GridLinesRotation.Value + 405) % 90 - 45;
+                        GridLinesRotation.Value = ((GridLinesRotation.Value + 405) % 90) - 45;
                         GridLinesRotation.MinValue = -45;
                         GridLinesRotation.MaxValue = 45;
                         break;
 
                     case PositionSnapGridType.Triangle:
-                        GridLinesRotation.Value = (GridLinesRotation.Value + 390) % 60 - 30;
+                        GridLinesRotation.Value = ((GridLinesRotation.Value + 390) % 60) - 30;
                         GridLinesRotation.MinValue = -30;
                         GridLinesRotation.MaxValue = 30;
                         break;
