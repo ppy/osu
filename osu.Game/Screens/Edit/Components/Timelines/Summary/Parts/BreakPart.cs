@@ -32,12 +32,8 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
 
         private partial class BreakVisualisation : Circle
         {
-            private readonly BreakPeriod breakPeriod;
-
             public BreakVisualisation(BreakPeriod breakPeriod)
             {
-                this.breakPeriod = breakPeriod;
-
                 RelativePositionAxes = Axes.X;
                 RelativeSizeAxes = Axes.Both;
                 X = (float)breakPeriod.StartTime;
@@ -45,7 +41,7 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
             }
 
             [BackgroundDependencyLoader]
-            private void load(OsuColour colours) => Colour = colours.GreyCarmineLight;
+            private void load(OsuColour colours) => Colour = colours.Gray7;
         }
     }
 }
