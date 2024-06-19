@@ -27,8 +27,9 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         {
             base.LoadBeatmap(beatmap);
 
-            // TODO: this will have to be mutable soon enough
-            breaks.AddRange(beatmap.Breaks);
+            breaks.UnbindAll();
+            breaks.BindTo(beatmap.Breaks);
+            breaks.BindCollectionChanged((_, _) => breakCache.Invalidate());
         }
 
         protected override void Update()
