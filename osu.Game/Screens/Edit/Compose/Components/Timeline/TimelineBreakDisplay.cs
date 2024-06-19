@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Specialized;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Caching;
@@ -27,8 +28,13 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         {
             base.LoadBeatmap(beatmap);
 
-            // TODO: this will have to be mutable soon enough
-            breaks.AddRange(beatmap.Breaks);
+            breaks.UnbindAll();
+            breaks.BindTo(beatmap.Breaks);
+            breaks.BindCollectionChanged((_, e) =>
+            {
+                if (e.Action != NotifyCollectionChangedAction.Replace)
+                    breakCache.Invalidate();
+            });
         }
 
         protected override void Update()
@@ -56,33 +62,13 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         private void recreateBreaks()
         {
-            // Remove groups outside the visible range
-            foreach (TimelineBreak drawableBreak in this)
-            {
-                if (!shouldBeVisible(drawableBreak.Break))
-                    drawableBreak.Expire();
-            }
+            Clear();
 
-            // Add remaining ones
             for (int i = 0; i < breaks.Count; i++)
             {
                 var breakPeriod = breaks[i];
 
                 if (!shouldBeVisible(breakPeriod))
-                    continue;
-
-                bool alreadyVisible = false;
-
-                foreach (var b in this)
-                {
-                    if (ReferenceEquals(b.Break, breakPeriod))
-                    {
-                        alreadyVisible = true;
-                        break;
-                    }
-                }
-
-                if (alreadyVisible)
                     continue;
 
                 Add(new TimelineBreak(breakPeriod));
