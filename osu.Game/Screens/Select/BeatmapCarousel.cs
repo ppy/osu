@@ -1279,7 +1279,7 @@ namespace osu.Game.Screens.Select
                 {
                     // we need to block right click absolute scrolling when hovering a carousel item so context menus can display.
                     // this can be reconsidered when we have an alternative to right click scrolling.
-                    if (GetContainingInputManager().HoveredDrawables.OfType<DrawableCarouselItem>().Any())
+                    if (GetContainingInputManager()!.HoveredDrawables.OfType<DrawableCarouselItem>().Any())
                     {
                         rightMouseScrollBlocked = true;
                         return false;

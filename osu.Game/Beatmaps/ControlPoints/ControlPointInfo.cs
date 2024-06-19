@@ -17,6 +17,7 @@ using osu.Game.Utils;
 namespace osu.Game.Beatmaps.ControlPoints
 {
     [Serializable]
+    [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)]
     public class ControlPointInfo : IDeepCloneable<ControlPointInfo>
     {
         /// <summary>
