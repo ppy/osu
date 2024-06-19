@@ -49,7 +49,9 @@ namespace osu.Game.Rulesets.Osu.Mods
                 return;
 
             double applicableStartTime = 0;
-            List<double> startTimeList = new double[(int)StackCount.Value].ToList();
+            Queue<double> startTimes = new Queue<double>();
+            for (int i = 0; i < StackCount.Value; i++)
+                startTimes.Enqueue(0);
 
             originalPreempt = firstHitObject.TimePreempt;
 
@@ -57,9 +59,8 @@ namespace osu.Game.Rulesets.Osu.Mods
             {
                 if (obj.NewCombo)
                 {
-                    startTimeList.Add(obj.StartTime);
-                    applicableStartTime = startTimeList[0];
-                    startTimeList.RemoveAt(0);
+                    startTimes.Enqueue(obj.StartTime);
+                    applicableStartTime = startTimes.Dequeue();
                 }
 
                 applyFadeInAdjustment(obj);
