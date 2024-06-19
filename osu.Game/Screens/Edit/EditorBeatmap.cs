@@ -349,13 +349,13 @@ namespace osu.Game.Screens.Edit
             if (batchPendingUpdates.Count == 0 && batchPendingDeletes.Count == 0 && batchPendingInserts.Count == 0)
                 return;
 
-            beatmapProcessor?.PreProcess();
+            beatmapProcessor.PreProcess();
 
             foreach (var h in batchPendingDeletes) processHitObject(h);
             foreach (var h in batchPendingInserts) processHitObject(h);
             foreach (var h in batchPendingUpdates) processHitObject(h);
 
-            beatmapProcessor?.PostProcess();
+            beatmapProcessor.PostProcess();
 
             BeatmapReprocessed?.Invoke();
 
