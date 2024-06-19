@@ -5,7 +5,7 @@ using osu.Game.Beatmaps.Timing;
 
 namespace osu.Game.Screens.Edit
 {
-    public record ManualBreakPeriod : BreakPeriod
+    public class ManualBreakPeriod : BreakPeriod
     {
         public ManualBreakPeriod(double startTime, double endTime)
             : base(startTime, endTime)

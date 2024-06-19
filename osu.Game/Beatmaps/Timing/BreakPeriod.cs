@@ -6,7 +6,7 @@ using osu.Game.Screens.Play;
 
 namespace osu.Game.Beatmaps.Timing
 {
-    public record BreakPeriod
+    public class BreakPeriod : IEquatable<BreakPeriod>
     {
         /// <summary>
         /// The minimum gap between the start of the break and the previous object.
