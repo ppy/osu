@@ -6,22 +6,39 @@ using osu.Game.Screens.Play;
 
 namespace osu.Game.Beatmaps.Timing
 {
-    public readonly struct BreakPeriod : IEquatable<BreakPeriod>
+    public record BreakPeriod
     {
+        /// <summary>
+        /// The minimum gap between the start of the break and the previous object.
+        /// </summary>
+        public const double GAP_BEFORE_BREAK = 200;
+
+        /// <summary>
+        /// The minimum gap between the end of the break and the next object.
+        /// Based on osu! preempt time at AR=10.
+        /// See also: https://github.com/ppy/osu/issues/14330#issuecomment-1002158551
+        /// </summary>
+        public const double GAP_AFTER_BREAK = 450;
+
         /// <summary>
         /// The minimum duration required for a break to have any effect.
         /// </summary>
         public const double MIN_BREAK_DURATION = 650;
 
         /// <summary>
+        /// The minimum required duration of a gap between two objects such that a break can be placed between them.
+        /// </summary>
+        public const double MIN_GAP_DURATION = GAP_BEFORE_BREAK + MIN_BREAK_DURATION + GAP_AFTER_BREAK;
+
+        /// <summary>
         /// The break start time.
         /// </summary>
-        public double StartTime { get; init; }
+        public double StartTime { get; }
 
         /// <summary>
         /// The break end time.
         /// </summary>
-        public double EndTime { get; init; }
+        public double EndTime { get; }
 
         /// <summary>
         /// The break duration.
@@ -51,8 +68,13 @@ namespace osu.Game.Beatmaps.Timing
         /// <returns>Whether the time falls within this <see cref="BreakPeriod"/>.</returns>
         public bool Contains(double time) => time >= StartTime && time <= EndTime - BreakOverlay.BREAK_FADE_DURATION;
 
-        public bool Equals(BreakPeriod other) => StartTime.Equals(other.StartTime) && EndTime.Equals(other.EndTime);
-        public override bool Equals(object? obj) => obj is BreakPeriod other && Equals(other);
+        public bool Intersects(BreakPeriod other) => StartTime <= other.EndTime && EndTime >= other.StartTime;
+
+        public virtual bool Equals(BreakPeriod? other) =>
+            other != null
+            && StartTime == other.StartTime
+            && EndTime == other.EndTime;
+
         public override int GetHashCode() => HashCode.Combine(StartTime, EndTime);
     }
 }
