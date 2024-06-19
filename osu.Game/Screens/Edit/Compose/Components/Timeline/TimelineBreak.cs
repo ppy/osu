@@ -5,6 +5,7 @@ using System;
 using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -20,11 +21,11 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 {
     public partial class TimelineBreak : CompositeDrawable
     {
-        public BreakPeriod Break { get; }
+        public Bindable<BreakPeriod> Break { get; } = new Bindable<BreakPeriod>();
 
         public TimelineBreak(BreakPeriod b)
         {
-            Break = b;
+            Break.Value = b;
         }
 
         [BackgroundDependencyLoader]
@@ -48,40 +49,46 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                         Alpha = 0.4f,
                     },
                 },
-                new DragHandle(Break, isStartHandle: true)
+                new DragHandle(isStartHandle: true)
                 {
+                    Break = { BindTarget = Break },
                     Anchor = Anchor.TopLeft,
                     Origin = Anchor.TopLeft,
-                    Action = (time, breakPeriod) => breakPeriod.StartTime = time,
+                    Action = (time, breakPeriod) => breakPeriod with { StartTime = time },
                 },
-                new DragHandle(Break, isStartHandle: false)
+                new DragHandle(isStartHandle: false)
                 {
+                    Break = { BindTarget = Break },
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight,
-                    Action = (time, breakPeriod) => breakPeriod.EndTime = time,
+                    Action = (time, breakPeriod) => breakPeriod with { EndTime = time },
                 },
             };
         }
 
-        protected override void Update()
+        protected override void LoadComplete()
         {
-            base.Update();
+            base.LoadComplete();
 
-            X = (float)Break.StartTime;
-            Width = (float)Break.Duration;
+            Break.BindValueChanged(_ =>
+            {
+                X = (float)Break.Value.StartTime;
+                Width = (float)Break.Value.Duration;
+            }, true);
         }
 
         private partial class DragHandle : FillFlowContainer
         {
+            public Bindable<BreakPeriod> Break { get; } = new Bindable<BreakPeriod>();
+
             public new Anchor Anchor
             {
                 get => base.Anchor;
                 init => base.Anchor = value;
             }
 
-            public Action<double, BreakPeriod>? Action { get; init; }
+            public Func<double, BreakPeriod, BreakPeriod>? Action { get; init; }
 
-            private readonly BreakPeriod breakPeriod;
             private readonly bool isStartHandle;
 
             private Container handle = null!;
@@ -99,9 +106,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             [Resolved]
             private OsuColour colours { get; set; } = null!;
 
-            public DragHandle(BreakPeriod breakPeriod, bool isStartHandle)
+            public DragHandle(bool isStartHandle)
             {
-                this.breakPeriod = breakPeriod;
                 this.isStartHandle = isStartHandle;
             }
 
@@ -164,13 +170,13 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 changeHandler?.BeginChange();
                 updateState();
 
-                double min = beatmap.HitObjects.Last(ho => ho.GetEndTime() <= breakPeriod.StartTime).GetEndTime();
-                double max = beatmap.HitObjects.First(ho => ho.StartTime >= breakPeriod.EndTime).StartTime;
+                double min = beatmap.HitObjects.Last(ho => ho.GetEndTime() <= Break.Value.StartTime).GetEndTime();
+                double max = beatmap.HitObjects.First(ho => ho.StartTime >= Break.Value.EndTime).StartTime;
 
                 if (isStartHandle)
-                    max = Math.Min(max, breakPeriod.EndTime - BreakPeriod.MIN_BREAK_DURATION);
+                    max = Math.Min(max, Break.Value.EndTime - BreakPeriod.MIN_BREAK_DURATION);
                 else
-                    min = Math.Max(min, breakPeriod.StartTime + BreakPeriod.MIN_BREAK_DURATION);
+                    min = Math.Max(min, Break.Value.StartTime + BreakPeriod.MIN_BREAK_DURATION);
 
                 allowedDragRange = (min, max);
 
@@ -183,11 +189,13 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
                 Debug.Assert(allowedDragRange != null);
 
-                if (timeline.FindSnappedPositionAndTime(e.ScreenSpaceMousePosition).Time is double time
+                if (Action != null
+                    && timeline.FindSnappedPositionAndTime(e.ScreenSpaceMousePosition).Time is double time
                     && time > allowedDragRange.Value.min
                     && time < allowedDragRange.Value.max)
                 {
-                    Action?.Invoke(time, breakPeriod);
+                    int index = beatmap.Breaks.IndexOf(Break.Value);
+                    beatmap.Breaks[index] = Break.Value = Action.Invoke(time, Break.Value);
                 }
 
                 updateState();
