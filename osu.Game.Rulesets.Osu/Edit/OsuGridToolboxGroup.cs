@@ -65,8 +65,8 @@ namespace osu.Game.Rulesets.Osu.Edit
         /// </summary>
         public BindableFloat GridLinesRotation { get; } = new BindableFloat(0f)
         {
-            MinValue = -45f,
-            MaxValue = 45f,
+            MinValue = -180f,
+            MaxValue = 180f,
             Precision = 1f
         };
 
@@ -190,6 +190,26 @@ namespace osu.Game.Rulesets.Osu.Edit
             {
                 gridTypeButtons.FadeTo(v.NewValue ? 1f : 0f, 500, Easing.OutQuint);
                 gridTypeButtons.BypassAutoSizeAxes = !v.NewValue ? Axes.Y : Axes.None;
+            }, true);
+
+            GridType.BindValueChanged(v =>
+            {
+                GridLinesRotation.Disabled = v.NewValue == PositionSnapGridType.Circle;
+
+                switch (v.NewValue)
+                {
+                    case PositionSnapGridType.Square:
+                        GridLinesRotation.Value = (GridLinesRotation.Value + 405) % 90 - 45;
+                        GridLinesRotation.MinValue = -45;
+                        GridLinesRotation.MaxValue = 45;
+                        break;
+
+                    case PositionSnapGridType.Triangle:
+                        GridLinesRotation.Value = (GridLinesRotation.Value + 390) % 60 - 30;
+                        GridLinesRotation.MinValue = -30;
+                        GridLinesRotation.MaxValue = 30;
+                        break;
+                }
             }, true);
         }
 
