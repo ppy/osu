@@ -45,8 +45,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                     Child = new Box
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Colour = colours.PurpleLight,
-                        Alpha = 0.4f,
+                        Colour = colours.Gray5,
+                        Alpha = 0.7f,
                     },
                 },
                 new DragHandle(isStartHandle: true)
@@ -212,7 +212,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             {
                 bool active = IsHovered || IsDragged;
 
-                var colour = colours.PurpleLighter;
+                var colour = colours.Gray8;
                 if (active)
                     colour = colour.Lighten(0.3f);
 
