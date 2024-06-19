@@ -54,14 +54,14 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                     Break = { BindTarget = Break },
                     Anchor = Anchor.TopLeft,
                     Origin = Anchor.TopLeft,
-                    Action = (time, breakPeriod) => breakPeriod with { StartTime = time },
+                    Action = (time, breakPeriod) => new ManualBreakPeriod(time, breakPeriod.EndTime),
                 },
                 new DragHandle(isStartHandle: false)
                 {
                     Break = { BindTarget = Break },
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight,
-                    Action = (time, breakPeriod) => breakPeriod with { EndTime = time },
+                    Action = (time, breakPeriod) => new ManualBreakPeriod(breakPeriod.StartTime, time),
                 },
             };
         }
