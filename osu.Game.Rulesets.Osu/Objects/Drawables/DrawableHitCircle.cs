@@ -19,6 +19,7 @@ using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Skinning;
 using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
@@ -319,5 +320,27 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             {
             }
         }
+
+        #region FOR EDITOR USE ONLY, DO NOT USE FOR ANY OTHER PURPOSE
+
+        internal void SuppressHitAnimations()
+        {
+            UpdateState(ArmedState.Idle);
+            UpdateComboColour();
+
+            using (BeginAbsoluteSequence(StateUpdateTime - 5))
+                this.TransformBindableTo(AccentColour, Color4.White, Math.Max(0, HitStateUpdateTime - StateUpdateTime));
+
+            using (BeginAbsoluteSequence(HitStateUpdateTime))
+                this.FadeOut(700).Expire();
+        }
+
+        internal void RestoreHitAnimations()
+        {
+            UpdateState(ArmedState.Hit, force: true);
+            UpdateComboColour();
+        }
+
+        #endregion
     }
 }
