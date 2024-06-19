@@ -21,6 +21,11 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
     public partial class SliderTailPiece : SliderCircleOverlay
     {
         /// <summary>
+        /// Whether this slider tail is draggable, changing the distance of the slider.
+        /// </summary>
+        public bool IsDraggable { get; set; }
+
+        /// <summary>
         /// Whether this is currently being dragged.
         /// </summary>
         private bool isDragging;
@@ -60,7 +65,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         {
             Color4 colour = colours.Yellow;
 
-            if (IsHovered && inputManager.CurrentState.Keyboard.ShiftPressed
+            if (IsHovered && IsDraggable
                           && !inputManager.HoveredDrawables.Any(o => o is PathControlPointPiece<Slider>))
                 colour = colour.Lighten(1);
 
@@ -69,7 +74,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
         protected override bool OnDragStart(DragStartEvent e)
         {
-            if (e.Button == MouseButton.Right || !inputManager.CurrentState.Keyboard.ShiftPressed)
+            if (e.Button == MouseButton.Right || !IsDraggable)
                 return false;
 
             isDragging = true;
@@ -103,6 +108,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             trimExcessControlPoints(Slider.Path);
 
             isDragging = false;
+            IsDraggable = false;
             editorBeatmap?.EndChange();
         }
 

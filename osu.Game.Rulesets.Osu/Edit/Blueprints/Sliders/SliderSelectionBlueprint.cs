@@ -409,6 +409,10 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                 addControlPoint(rightClickPosition);
                 changeHandler?.EndChange();
             }),
+            new OsuMenuItem("Adjust distance", MenuItemType.Standard, () =>
+            {
+                TailPiece.IsDraggable = true;
+            }),
             new OsuMenuItem("Convert to stream", MenuItemType.Destructive, convertToStream),
         };
 
