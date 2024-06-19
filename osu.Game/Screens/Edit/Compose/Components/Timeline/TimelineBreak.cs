@@ -45,7 +45,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                     Child = new Box
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Colour = colours.GreyCarmineLight,
+                        Colour = colours.PurpleLight,
                         Alpha = 0.4f,
                     },
                 },
@@ -212,12 +212,12 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             {
                 bool active = IsHovered || IsDragged;
 
-                var colour = colours.GreyCarmineLighter;
+                var colour = colours.PurpleLighter;
                 if (active)
                     colour = colour.Lighten(0.3f);
 
                 this.FadeColour(colour, 400, Easing.OutQuint);
-                handle.ResizeWidthTo(active ? 20 : 10, 400, Easing.OutElastic);
+                handle.ResizeWidthTo(active ? 20 : 10, 400, Easing.OutElasticHalf);
             }
         }
     }
