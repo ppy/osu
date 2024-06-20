@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         /// <summary>
         /// A list of keys which can result in hits for this HitObject.
         /// </summary>
-        public TaikoAction[] HitActions { get; private set; }
+        public TaikoAction[] HitActions { get; internal set; }
 
         /// <summary>
         /// The action that caused this <see cref="DrawableHit"/> to be hit.

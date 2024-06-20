@@ -32,8 +32,10 @@ namespace osu.Game.Screens.Edit.Components
         private readonly BindableNumber<double> freqAdjust = new BindableDouble(1);
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OverlayColourProvider colourProvider)
         {
+            Background.Colour = colourProvider.Background4;
+
             Children = new Drawable[]
             {
                 playButton = new IconButton
