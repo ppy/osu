@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.EnumExtensions;
@@ -79,14 +80,16 @@ namespace osu.Game.Rulesets.Edit
 
         protected InputManager InputManager { get; private set; }
 
+        private Box leftToolboxBackground;
+        private Box rightToolboxBackground;
+
         private EditorRadioButtonCollection toolboxCollection;
-
         private FillFlowContainer togglesCollection;
-
         private FillFlowContainer sampleBankTogglesCollection;
 
         private IBindable<bool> hasTiming;
         private Bindable<bool> autoSeekOnPlacement;
+        private readonly Bindable<bool> composerFocusMode = new Bindable<bool>();
 
         protected DrawableRuleset<TObject> DrawableRuleset { get; private set; }
 
@@ -98,10 +101,13 @@ namespace osu.Game.Rulesets.Edit
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent) =>
             dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
 
-        [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
+        [BackgroundDependencyLoader(true)]
+        private void load(OsuConfigManager config, [CanBeNull] Editor editor)
         {
             autoSeekOnPlacement = config.GetBindable<bool>(OsuSetting.EditorAutoSeekOnPlacement);
+
+            if (editor != null)
+                composerFocusMode.BindTo(editor.ComposerFocusMode);
 
             Config = Dependencies.Get<IRulesetConfigCache>().GetConfigFor(Ruleset);
 
@@ -127,7 +133,7 @@ namespace osu.Game.Rulesets.Edit
 
             InternalChildren = new[]
             {
-                PlayfieldContentContainer = new Container
+                PlayfieldContentContainer = new ContentContainer
                 {
                     Name = "Playfield content",
                     RelativeSizeAxes = Axes.Y,
@@ -147,7 +153,7 @@ namespace osu.Game.Rulesets.Edit
                     AutoSizeAxes = Axes.X,
                     Children = new Drawable[]
                     {
-                        new Box
+                        leftToolboxBackground = new Box
                         {
                             Colour = colourProvider.Background5,
                             RelativeSizeAxes = Axes.Both,
@@ -192,7 +198,7 @@ namespace osu.Game.Rulesets.Edit
                     AutoSizeAxes = Axes.X,
                     Children = new Drawable[]
                     {
-                        new Box
+                        rightToolboxBackground = new Box
                         {
                             Colour = colourProvider.Background5,
                             RelativeSizeAxes = Axes.Both,
@@ -260,6 +266,13 @@ namespace osu.Game.Rulesets.Edit
                 {
                     item.Selected.Disabled = !hasTiming.NewValue;
                 }
+            }, true);
+
+            composerFocusMode.BindValueChanged(_ =>
+            {
+                float targetAlpha = composerFocusMode.Value ? 0.5f : 1;
+                leftToolboxBackground.FadeTo(targetAlpha, 400, Easing.OutQuint);
+                rightToolboxBackground.FadeTo(targetAlpha, 400, Easing.OutQuint);
             }, true);
         }
 
@@ -508,6 +521,31 @@ namespace osu.Game.Rulesets.Edit
         }
 
         #endregion
+
+        private partial class ContentContainer : Container
+        {
+            public override bool HandlePositionalInput => true;
+
+            private readonly Bindable<bool> composerFocusMode = new Bindable<bool>();
+
+            [BackgroundDependencyLoader(true)]
+            private void load([CanBeNull] Editor editor)
+            {
+                if (editor != null)
+                    composerFocusMode.BindTo(editor.ComposerFocusMode);
+            }
+
+            protected override bool OnHover(HoverEvent e)
+            {
+                composerFocusMode.Value = true;
+                return false;
+            }
+
+            protected override void OnHoverLost(HoverLostEvent e)
+            {
+                composerFocusMode.Value = false;
+            }
+        }
     }
 
     /// <summary>
