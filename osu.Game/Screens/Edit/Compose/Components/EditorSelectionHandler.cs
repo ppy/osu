@@ -227,6 +227,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                     return;
 
                 h.Samples.Add(h.CreateHitSampleInfo(sampleName));
+
                 EditorBeatmap.Update(h);
             });
         }
