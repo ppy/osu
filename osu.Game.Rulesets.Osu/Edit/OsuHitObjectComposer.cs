@@ -148,7 +148,7 @@ namespace osu.Game.Rulesets.Osu.Edit
                     break;
 
                 default:
-                    throw new NotImplementedException($"{OsuGridToolboxGroup.GridType} has an incorrect value.");
+                    throw new ArgumentOutOfRangeException(nameof(OsuGridToolboxGroup.GridType), OsuGridToolboxGroup.GridType, "Unsupported grid type.");
             }
 
             // Bind the start position to the toolbox sliders.
