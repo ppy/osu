@@ -67,7 +67,8 @@ namespace osu.Game.Rulesets.Edit
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; }
 
-        protected ComposeBlueprintContainer BlueprintContainer { get; private set; }
+        public override ComposeBlueprintContainer BlueprintContainer => blueprintContainer;
+        private ComposeBlueprintContainer blueprintContainer;
 
         protected ExpandingToolboxContainer LeftToolbox { get; private set; }
 
@@ -143,7 +144,7 @@ namespace osu.Game.Rulesets.Edit
                         drawableRulesetWrapper,
                         // layers above playfield
                         drawableRulesetWrapper.CreatePlayfieldAdjustmentContainer()
-                                              .WithChild(BlueprintContainer = CreateBlueprintContainer())
+                                              .WithChild(blueprintContainer = CreateBlueprintContainer())
                     }
                 },
                 new Container
@@ -569,6 +570,8 @@ namespace osu.Game.Rulesets.Edit
         /// The target ruleset's playfield.
         /// </summary>
         public abstract Playfield Playfield { get; }
+
+        public abstract ComposeBlueprintContainer BlueprintContainer { get; }
 
         /// <summary>
         /// All <see cref="DrawableHitObject"/>s in currently loaded beatmap.
