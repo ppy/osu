@@ -10,7 +10,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
-using osu.Game.Audio.Effects;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 
@@ -48,6 +47,9 @@ namespace osu.Game.Overlays.Dialog
 
         private partial class DangerousConfirmContainer : HoldToConfirmContainer
         {
+            [Resolved]
+            private MusicController musicController { get; set; }
+
             public DangerousConfirmContainer()
                 : base(isDangerousAction: true)
             {
@@ -56,7 +58,6 @@ namespace osu.Game.Overlays.Dialog
             private Sample tickSample;
             private Sample confirmSample;
             private double lastTickPlaybackTime;
-            private AudioFilter lowPassFilter = null!;
             private bool mouseDown;
 
             [BackgroundDependencyLoader]
@@ -64,8 +65,6 @@ namespace osu.Game.Overlays.Dialog
             {
                 tickSample = audio.Samples.Get(@"UI/dialog-dangerous-tick");
                 confirmSample = audio.Samples.Get(@"UI/dialog-dangerous-select");
-
-                AddInternal(lowPassFilter = new AudioFilter(audio.SampleMixer));
             }
 
             protected override void LoadComplete()
@@ -76,13 +75,13 @@ namespace osu.Game.Overlays.Dialog
 
             protected override void AbortConfirm()
             {
-                lowPassFilter.CutoffTo(AudioFilter.MAX_LOWPASS_CUTOFF);
+                musicController?.Unduck();
                 base.AbortConfirm();
             }
 
             protected override void Confirm()
             {
-                lowPassFilter.CutoffTo(AudioFilter.MAX_LOWPASS_CUTOFF);
+                musicController?.Duck();
                 confirmSample?.Play();
                 base.Confirm();
             }
@@ -125,8 +124,6 @@ namespace osu.Game.Overlays.Dialog
                 if (progress.NewValue < progress.OldValue) return;
 
                 if (Clock.CurrentTime - lastTickPlaybackTime < 30) return;
-
-                lowPassFilter.CutoffTo((int)(progress.NewValue * AudioFilter.MAX_LOWPASS_CUTOFF * 0.5));
 
                 var channel = tickSample.GetChannel();
 
