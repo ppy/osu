@@ -10,9 +10,7 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Input.Bindings;
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Audio;
 using osu.Framework.Input.Events;
-using osu.Game.Audio.Effects;
 
 namespace osu.Game.Overlays
 {
@@ -23,15 +21,13 @@ namespace osu.Game.Overlays
         protected override string PopInSampleName => "UI/dialog-pop-in";
         protected override string PopOutSampleName => "UI/dialog-pop-out";
 
-        private AudioFilter lowPassFilter;
+        [Resolved]
+        private MusicController musicController { get; set; }
 
         public PopupDialog CurrentDialog { get; private set; }
 
         public override bool IsPresent => Scheduler.HasPendingTasks
-                                          || dialogContainer.Children.Count > 0
-                                          // Safety for low pass filter potentially getting stuck in applied state due to
-                                          // transforms on `this` causing children to no longer be updated.
-                                          || lowPassFilter.IsAttached;
+                                          || dialogContainer.Children.Count > 0;
 
         public DialogOverlay()
         {
@@ -47,12 +43,6 @@ namespace osu.Game.Overlays
 
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(AudioManager audio)
-        {
-            AddInternal(lowPassFilter = new AudioFilter(audio.TrackMixer));
         }
 
         public void Push(PopupDialog dialog)
@@ -105,13 +95,13 @@ namespace osu.Game.Overlays
 
         protected override void PopIn()
         {
-            lowPassFilter.CutoffTo(300, 100, Easing.OutCubic);
+            musicController.Duck(100, 1f);
         }
 
         protected override void PopOut()
         {
             base.PopOut();
-            lowPassFilter.CutoffTo(AudioFilter.MAX_LOWPASS_CUTOFF, 100, Easing.InCubic);
+            musicController.Unduck(100);
 
             // PopOut gets called initially, but we only want to hide dialog when we have been loaded and are present.
             if (IsLoaded && CurrentDialog?.State.Value == Visibility.Visible)
