@@ -3,8 +3,12 @@
 
 #nullable disable
 
+using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -21,6 +25,12 @@ namespace osu.Game.Overlays.Toolbar
     {
         protected Drawable ModeButtonLine { get; private set; }
 
+        [Resolved]
+        private MusicController musicController { get; set; }
+
+        private readonly Dictionary<RulesetInfo, Sample> rulesetSelectionSample = new Dictionary<RulesetInfo, Sample>();
+        private readonly Dictionary<RulesetInfo, SampleChannel> rulesetSelectionChannel = new Dictionary<RulesetInfo, SampleChannel>();
+
         public ToolbarRulesetSelector()
         {
             RelativeSizeAxes = Axes.Y;
@@ -28,7 +38,7 @@ namespace osu.Game.Overlays.Toolbar
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(AudioManager audio)
         {
             AddRangeInternal(new[]
             {
@@ -54,6 +64,11 @@ namespace osu.Game.Overlays.Toolbar
                     }
                 },
             });
+
+            foreach (var r in Rulesets.AvailableRulesets)
+                rulesetSelectionSample[r] = audio.Samples.Get($@"UI/ruleset-select-{r.ShortName}");
+
+            Current.ValueChanged += playRulesetSelectionSample;
         }
 
         protected override void LoadComplete()
@@ -82,6 +97,20 @@ namespace osu.Game.Overlays.Toolbar
                 ModeButtonLine.MoveToX(SelectedTab.DrawPosition.X, !hasInitialPosition ? 0 : 500, Easing.OutElasticQuarter);
                 hasInitialPosition = true;
             }
+        }
+
+        private void playRulesetSelectionSample(ValueChangedEvent<RulesetInfo> r)
+        {
+            if (r.OldValue == null)
+                return;
+
+            if (rulesetSelectionChannel.TryGetValue(r.OldValue, out var sampleChannel))
+                sampleChannel?.Stop();
+
+            rulesetSelectionChannel[r.NewValue] = rulesetSelectionSample[r.NewValue].GetChannel();
+            rulesetSelectionChannel[r.NewValue]?.Play();
+
+            musicController?.TimedDuck(600);
         }
 
         public override bool HandleNonPositionalInput => !Current.Disabled && base.HandleNonPositionalInput;
