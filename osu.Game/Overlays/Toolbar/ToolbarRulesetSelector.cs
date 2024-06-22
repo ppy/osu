@@ -30,6 +30,7 @@ namespace osu.Game.Overlays.Toolbar
 
         private readonly Dictionary<RulesetInfo, Sample> rulesetSelectionSample = new Dictionary<RulesetInfo, Sample>();
         private readonly Dictionary<RulesetInfo, SampleChannel> rulesetSelectionChannel = new Dictionary<RulesetInfo, SampleChannel>();
+        private Sample defaultSelectSample;
 
         public ToolbarRulesetSelector()
         {
@@ -68,6 +69,8 @@ namespace osu.Game.Overlays.Toolbar
             foreach (var r in Rulesets.AvailableRulesets)
                 rulesetSelectionSample[r] = audio.Samples.Get($@"UI/ruleset-select-{r.ShortName}");
 
+            defaultSelectSample = audio.Samples.Get(@"UI/default-select");
+
             Current.ValueChanged += playRulesetSelectionSample;
         }
 
@@ -101,15 +104,24 @@ namespace osu.Game.Overlays.Toolbar
 
         private void playRulesetSelectionSample(ValueChangedEvent<RulesetInfo> r)
         {
+            // Don't play sample on first setting of value
             if (r.OldValue == null)
                 return;
 
-            if (rulesetSelectionChannel.TryGetValue(r.OldValue, out var sampleChannel))
-                sampleChannel?.Stop();
+            var channel = rulesetSelectionSample[r.NewValue]?.GetChannel();
 
-            rulesetSelectionChannel[r.NewValue] = rulesetSelectionSample[r.NewValue].GetChannel();
-            rulesetSelectionChannel[r.NewValue]?.Play();
+            // Skip sample choking and ducking for the default/fallback sample
+            if (channel == null)
+            {
+                defaultSelectSample.Play();
+                return;
+            }
 
+            foreach (var pair in rulesetSelectionChannel)
+                pair.Value?.Stop();
+
+            rulesetSelectionChannel[r.NewValue] = channel;
+            channel.Play();
             musicController?.TimedDuck(600);
         }
 
