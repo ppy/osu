@@ -3,6 +3,7 @@
 
 #nullable disable
 
+using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
@@ -161,6 +162,32 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             AddStep("click", () => InputManager.Click(MouseButton.Left));
             checkControlPointSelected(0, false);
             checkControlPointSelected(1, false);
+        }
+
+        [Test]
+        public void TestAdjustDistance()
+        {
+            AddStep("start adjust length",
+                () => blueprint.ContextMenuItems.Single(o => o.Text.Value == "Adjust length").Action.Value());
+            moveMouseToControlPoint(1);
+            AddStep("end adjust length", () => InputManager.Click(MouseButton.Right));
+            AddAssert("expected distance halved",
+                () => Precision.AlmostEquals(slider.Path.Distance, 172.2, 0.1));
+
+            AddStep("start adjust length",
+                () => blueprint.ContextMenuItems.Single(o => o.Text.Value == "Adjust length").Action.Value());
+            AddStep("move mouse beyond last control point", () =>
+            {
+                Vector2 position = slider.Position + slider.Path.ControlPoints[2].Position + new Vector2(50, 0);
+                InputManager.MoveMouseTo(drawableObject.Parent!.ToScreenSpace(position));
+            });
+            AddStep("end adjust length", () => InputManager.Click(MouseButton.Right));
+            AddAssert("expected distance is calculated distance",
+                () => Precision.AlmostEquals(slider.Path.Distance, slider.Path.CalculatedDistance, 0.1));
+
+            moveMouseToControlPoint(1);
+            AddAssert("expected distance is unchanged",
+                () => Precision.AlmostEquals(slider.Path.Distance, slider.Path.CalculatedDistance, 0.1));
         }
 
         private void moveHitObject()
