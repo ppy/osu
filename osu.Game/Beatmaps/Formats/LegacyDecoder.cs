@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using osu.Framework.Extensions;
 using osu.Framework.Logging;
 using osu.Game.Audio;
@@ -33,21 +32,23 @@ namespace osu.Game.Beatmaps.Formats
 
             while ((line = stream.ReadLine()) != null)
             {
+                ReadOnlySpan<char> lineSpan = line;
+
                 if (ShouldSkipLine(line))
                     continue;
 
                 if (section != Section.Metadata)
                 {
                     // comments should not be stripped from metadata lines, as the song metadata may contain "//" as valid data.
-                    line = StripComments(line);
+                    lineSpan = StripComments(lineSpan);
                 }
 
-                line = line.TrimEnd();
+                lineSpan = lineSpan.TrimEnd();
 
-                if (line.StartsWith('[') && line.EndsWith(']'))
+                if (lineSpan[0] == '[' && lineSpan[^1] == ']')
                 {
-                    if (!Enum.TryParse(line[1..^1], out section))
-                        Logger.Log($"Unknown section \"{line}\" in \"{output}\"");
+                    if (!Enum.TryParse(lineSpan[1..^1], out section))
+                        Logger.Log($"Unknown section \"{lineSpan}\" in \"{output}\"");
 
                     OnBeginNewSection(section);
                     continue;
@@ -55,16 +56,16 @@ namespace osu.Game.Beatmaps.Formats
 
                 try
                 {
-                    ParseLine(output, section, line);
+                    ParseLine(output, section, lineSpan);
                 }
                 catch (Exception e)
                 {
-                    Logger.Log($"Failed to process line \"{line}\" into \"{output}\": {e.Message}");
+                    Logger.Log($"Failed to process line \"{lineSpan}\" into \"{output}\": {e.Message}");
                 }
             }
         }
 
-        protected virtual bool ShouldSkipLine(string line) => string.IsNullOrWhiteSpace(line) || line.AsSpan().TrimStart().StartsWith("//".AsSpan(), StringComparison.Ordinal);
+        protected virtual bool ShouldSkipLine(ReadOnlySpan<char> line) => line.IsWhiteSpace() || line.TrimStart().StartsWith("//".AsSpan(), StringComparison.Ordinal);
 
         /// <summary>
         /// Invoked when a new <see cref="Section"/> has been entered.
@@ -74,7 +75,7 @@ namespace osu.Game.Beatmaps.Formats
         {
         }
 
-        protected virtual void ParseLine(T output, Section section, string line)
+        protected virtual void ParseLine(T output, Section section, ReadOnlySpan<char> line)
         {
             switch (section)
             {
@@ -84,32 +85,33 @@ namespace osu.Game.Beatmaps.Formats
             }
         }
 
-        protected string StripComments(string line)
+        protected ReadOnlySpan<char> StripComments(ReadOnlySpan<char> line)
         {
-            int index = line.AsSpan().IndexOf("//".AsSpan());
+            int index = line.IndexOf("//".AsSpan());
             if (index > 0)
-                return line.Substring(0, index);
+                return line.Slice(0, index);
 
             return line;
         }
 
-        protected void HandleColours<TModel>(TModel output, string line, bool allowAlpha)
+        protected void HandleColours<TModel>(TModel output, ReadOnlySpan<char> line, bool allowAlpha)
         {
             var pair = SplitKeyVal(line);
 
             bool isCombo = pair.Key.StartsWith(@"Combo", StringComparison.Ordinal);
 
-            string[] split = pair.Value.Split(',');
+            Span<Range> ranges = stackalloc Range[5];
+            int splitCount = line.Split(ranges, ',');
 
-            if (split.Length != 3 && split.Length != 4)
+            if (splitCount != 3 && splitCount != 4)
                 throw new InvalidOperationException($@"Color specified in incorrect format (should be R,G,B or R,G,B,A): {pair.Value}");
 
             Color4 colour;
 
             try
             {
-                byte alpha = allowAlpha && split.Length == 4 ? byte.Parse(split[3]) : (byte)255;
-                colour = new Color4(byte.Parse(split[0]), byte.Parse(split[1]), byte.Parse(split[2]), alpha);
+                byte alpha = allowAlpha && splitCount == 4 ? byte.Parse(line[ranges[3]]) : (byte)255;
+                colour = new Color4(byte.Parse(line[ranges[0]]), byte.Parse(line[ranges[1]]), byte.Parse(line[ranges[2]]), alpha);
             }
             catch
             {
@@ -126,19 +128,27 @@ namespace osu.Game.Beatmaps.Formats
             {
                 if (!(output is IHasCustomColours tHasCustomColours)) return;
 
-                tHasCustomColours.CustomColours[pair.Key] = colour;
+                tHasCustomColours.CustomColours[pair.Key.ToString()] = colour;
             }
         }
 
-        protected KeyValuePair<string, string> SplitKeyVal(string line, char separator = ':', bool shouldTrim = true)
+        protected ref struct SpanKeyValuePair
         {
-            string[] split = line.Split(separator, 2, shouldTrim ? StringSplitOptions.TrimEntries : StringSplitOptions.None);
+            public ReadOnlySpan<char> Key;
+            public ReadOnlySpan<char> Value;
+        }
 
-            return new KeyValuePair<string, string>
-            (
-                split[0],
-                split.Length > 1 ? split[1] : string.Empty
-            );
+        protected SpanKeyValuePair SplitKeyVal(ReadOnlySpan<char> line, char separator = ':', bool shouldTrim = true)
+        {
+            Span<Range> ranges = stackalloc Range[2];
+
+            int splitCount = line.Split(ranges, separator, shouldTrim ? StringSplitOptions.TrimEntries : StringSplitOptions.None);
+
+            return new SpanKeyValuePair
+            {
+                Key = line[ranges[0]],
+                Value = splitCount > 1 ? line[ranges[1]] : default
+            };
         }
 
         protected string CleanFilename(string path) => path

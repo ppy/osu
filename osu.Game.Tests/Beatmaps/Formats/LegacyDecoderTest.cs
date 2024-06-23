@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using NUnit.Framework;
 using osu.Game.Beatmaps.Formats;
@@ -38,12 +39,12 @@ namespace osu.Game.Tests.Beatmaps.Formats
             {
             }
 
-            protected override bool ShouldSkipLine(string line)
+            protected override bool ShouldSkipLine(ReadOnlySpan<char> line)
             {
                 bool result = base.ShouldSkipLine(line);
 
                 if (!result)
-                    ParsedLines.Add(line);
+                    ParsedLines.Add(line.ToString());
 
                 return result;
             }
