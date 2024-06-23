@@ -616,7 +616,7 @@ namespace osu.Game.Beatmaps.Formats
             pendingControlPointTypes.Clear();
         }
 
-        private void handleHitObject(string line)
+        private void handleHitObject(ReadOnlySpan<char> line)
         {
             // If the ruleset wasn't specified, assume the osu!standard ruleset.
             parser ??= new Rulesets.Objects.Legacy.Osu.ConvertHitObjectParser(getOffsetTime(), FormatVersion);
