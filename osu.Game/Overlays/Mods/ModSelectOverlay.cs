@@ -109,15 +109,6 @@ namespace osu.Game.Overlays.Mods
 
         protected virtual IEnumerable<ShearedButton> CreateFooterButtons()
         {
-            if (AllowCustomisation)
-            {
-                yield return CustomisationButton = new ShearedToggleButton(BUTTON_WIDTH)
-                {
-                    Text = ModSelectOverlayStrings.ModCustomisation,
-                    Active = { BindTarget = customisationVisible }
-                };
-            }
-
             yield return deselectAllModsButton = new DeselectAllModsButton(this);
         }
 
@@ -125,10 +116,8 @@ namespace osu.Game.Overlays.Mods
 
         public IEnumerable<ModState> AllAvailableMods => AvailableMods.Value.SelectMany(pair => pair.Value);
 
-        private readonly BindableBool customisationVisible = new BindableBool();
         private Bindable<bool> textSearchStartsActive = null!;
 
-        private ModSettingsArea modSettingsArea = null!;
         private ColumnScrollContainer columnScroll = null!;
         private ColumnFlowContainer columnFlow = null!;
         private FillFlowContainer<ShearedButton> footerButtonFlow = null!;
@@ -138,9 +127,9 @@ namespace osu.Game.Overlays.Mods
         private Container aboveColumnsContent = null!;
         private RankingInformationDisplay? rankingInformationDisplay;
         private BeatmapAttributesDisplay? beatmapAttributesDisplay;
+        private ModCustomisationPanel customisationPanel = null!;
 
         protected ShearedButton BackButton { get; private set; } = null!;
-        protected ShearedToggleButton? CustomisationButton { get; private set; }
         protected SelectAllModsButton? SelectAllModsButton { get; set; }
 
         private Sample? columnAppearSample;
@@ -173,35 +162,8 @@ namespace osu.Game.Overlays.Mods
 
             columnAppearSample = audio.Samples.Get(@"SongSelect/mod-column-pop-in");
 
-            AddRange(new Drawable[]
-            {
-                new ClickToReturnContainer
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    HandleMouse = { BindTarget = customisationVisible },
-                    OnClicked = () => customisationVisible.Value = false
-                },
-                modSettingsArea = new ModSettingsArea
-                {
-                    Anchor = Anchor.BottomCentre,
-                    Origin = Anchor.BottomCentre,
-                    Height = 0
-                },
-            });
-
             MainAreaContent.AddRange(new Drawable[]
             {
-                aboveColumnsContent = new Container
-                {
-                    RelativeSizeAxes = Axes.X,
-                    Height = RankingInformationDisplay.HEIGHT,
-                    Padding = new MarginPadding { Horizontal = 100 },
-                    Child = SearchTextBox = new ShearedSearchTextBox
-                    {
-                        HoldFocus = false,
-                        Width = 300
-                    }
-                },
                 new OsuContextMenuContainer
                 {
                     RelativeSizeAxes = Axes.Both,
@@ -237,7 +199,27 @@ namespace osu.Game.Overlays.Mods
                             }
                         }
                     }
-                }
+                },
+                aboveColumnsContent = new Container
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Padding = new MarginPadding { Horizontal = 100, Bottom = 15f },
+                    Children = new Drawable[]
+                    {
+                        SearchTextBox = new ShearedSearchTextBox
+                        {
+                            HoldFocus = false,
+                            Width = 300,
+                        },
+                        customisationPanel = new ModCustomisationPanel
+                        {
+                            Alpha = 0f,
+                            Anchor = Anchor.TopRight,
+                            Origin = Anchor.TopRight,
+                            Width = 400,
+                        }
+                    }
+                },
             });
 
             FooterContent.Add(footerButtonFlow = new FillFlowContainer<ShearedButton>
@@ -320,7 +302,7 @@ namespace osu.Game.Overlays.Mods
             // This is an optimisation to prevent refreshing the available settings controls when it can be
             // reasonably assumed that the settings panel is never to be displayed (e.g. FreeModSelectOverlay).
             if (AllowCustomisation)
-                ((IBindable<IReadOnlyList<Mod>>)modSettingsArea.SelectedMods).BindTo(SelectedMods);
+                ((IBindable<IReadOnlyList<Mod>>)customisationPanel.SelectedMods).BindTo(SelectedMods);
 
             SelectedMods.BindValueChanged(_ =>
             {
@@ -347,7 +329,7 @@ namespace osu.Game.Overlays.Mods
                 }
             }, true);
 
-            customisationVisible.BindValueChanged(_ => updateCustomisationVisualState(), true);
+            customisationPanel.Expanded.BindValueChanged(_ => updateCustomisationVisualState(), true);
 
             SearchTextBox.Current.BindValueChanged(query =>
             {
@@ -491,7 +473,7 @@ namespace osu.Game.Overlays.Mods
 
         private void updateCustomisation()
         {
-            if (CustomisationButton == null)
+            if (!AllowCustomisation)
                 return;
 
             bool anyCustomisableModActive = false;
@@ -506,38 +488,21 @@ namespace osu.Game.Overlays.Mods
 
             if (anyCustomisableModActive)
             {
-                customisationVisible.Disabled = false;
+                customisationPanel.Show();
 
-                if (anyModPendingConfiguration && !customisationVisible.Value)
-                    customisationVisible.Value = true;
+                if (anyModPendingConfiguration)
+                    customisationPanel.Expanded.Value = true;
             }
             else
             {
-                if (customisationVisible.Value)
-                    customisationVisible.Value = false;
-
-                customisationVisible.Disabled = true;
+                customisationPanel.Expanded.Value = false;
+                customisationPanel.Hide();
             }
         }
 
         private void updateCustomisationVisualState()
         {
-            const double transition_duration = 300;
-
-            MainAreaContent.FadeColour(customisationVisible.Value ? Colour4.Gray : Colour4.White, transition_duration, Easing.InOutCubic);
-
-            foreach (var button in footerButtonFlow)
-            {
-                if (button != CustomisationButton)
-                    button.Enabled.Value = !customisationVisible.Value;
-            }
-
-            float modAreaHeight = customisationVisible.Value ? ModSettingsArea.HEIGHT : 0;
-
-            modSettingsArea.ResizeHeightTo(modAreaHeight, transition_duration, Easing.InOutCubic);
-            TopLevelContent.MoveToY(-modAreaHeight, transition_duration, Easing.InOutCubic);
-
-            if (customisationVisible.Value)
+            if (customisationPanel.Expanded.Value)
                 SearchTextBox.KillFocus();
             else
                 setTextBoxFocus(textSearchStartsActive.Value);
@@ -693,6 +658,8 @@ namespace osu.Game.Overlays.Mods
                 if (!allFiltered)
                     nonFilteredColumnCount += 1;
             }
+
+            customisationPanel.Expanded.Value = false;
         }
 
         #endregion
@@ -758,10 +725,9 @@ namespace osu.Game.Overlays.Mods
 
             void hideOverlay(bool immediate)
             {
-                if (customisationVisible.Value)
+                if (customisationPanel.Expanded.Value)
                 {
-                    Debug.Assert(CustomisationButton != null);
-                    CustomisationButton.TriggerClick();
+                    customisationPanel.Expanded.Value = false;
 
                     if (!immediate)
                         return;
@@ -965,39 +931,6 @@ namespace osu.Game.Overlays.Mods
             {
                 base.OnHoverLost(e);
                 updateState();
-            }
-        }
-
-        /// <summary>
-        /// A container which blocks and handles input, managing the "return from customisation" state change.
-        /// </summary>
-        private partial class ClickToReturnContainer : Container
-        {
-            public BindableBool HandleMouse { get; } = new BindableBool();
-
-            public Action? OnClicked { get; set; }
-
-            public override bool HandlePositionalInput => base.HandlePositionalInput && HandleMouse.Value;
-
-            protected override bool Handle(UIEvent e)
-            {
-                if (!HandleMouse.Value)
-                    return base.Handle(e);
-
-                switch (e)
-                {
-                    case ClickEvent:
-                        OnClicked?.Invoke();
-                        return true;
-
-                    case HoverEvent:
-                        return false;
-
-                    case MouseEvent:
-                        return true;
-                }
-
-                return base.Handle(e);
             }
         }
     }
