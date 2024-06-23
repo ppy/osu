@@ -455,14 +455,14 @@ namespace osu.Game.Beatmaps.Formats
                         // Allow the first sprite (by file order) to act as the background in such cases.
                         if (string.IsNullOrEmpty(beatmap.BeatmapInfo.Metadata.BackgroundFile))
                         {
-                            beatmap.BeatmapInfo.Metadata.BackgroundFile = CleanFilename(line[ranges[3]].ToString());
+                            beatmap.BeatmapInfo.Metadata.BackgroundFile = CleanFilename(line[ranges[3]]);
                             lineSupportedByEncoder = true;
                         }
 
                         break;
 
                     case LegacyEventType.Video:
-                        string filename = CleanFilename(line[ranges[2]].ToString());
+                        string filename = CleanFilename(line[ranges[2]]);
 
                         // Some very old beatmaps had incorrect type specifications for their backgrounds (ie. using 1 for VIDEO
                         // instead of 0 for BACKGROUND). To handle this gracefully, check the file extension against known supported
@@ -476,7 +476,7 @@ namespace osu.Game.Beatmaps.Formats
                         break;
 
                     case LegacyEventType.Background:
-                        beatmap.BeatmapInfo.Metadata.BackgroundFile = CleanFilename(line[ranges[2]].ToString());
+                        beatmap.BeatmapInfo.Metadata.BackgroundFile = CleanFilename(line[ranges[2]]);
                         lineSupportedByEncoder = true;
                         break;
 
