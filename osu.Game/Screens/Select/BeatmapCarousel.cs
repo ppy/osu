@@ -704,7 +704,6 @@ namespace osu.Game.Screens.Select
 
             lastSelectedBeatmap = selectedBeatmap;
             item.State.Value = CarouselItemState.SelectedCollapsed;
-            itemsCache.Invalidate();
         }
 
         public bool tryToCollapse()
@@ -1047,6 +1046,7 @@ namespace osu.Game.Screens.Select
                     if (state.NewValue == CarouselItemState.Selected)
                     {
                         selectedBeatmapSet = set;
+                        lastSelectedBeatmap = c;
                         SelectionChanged?.Invoke(c.BeatmapInfo);
 
                         itemsCache.Invalidate();

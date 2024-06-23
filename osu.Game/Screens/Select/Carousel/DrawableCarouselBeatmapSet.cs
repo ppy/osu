@@ -142,6 +142,15 @@ namespace osu.Game.Screens.Select.Carousel
             updateBeatmapDifficulties();
         }
 
+        protected override void Collapsed()
+        {
+            base.Collapsed();
+
+            MovementContainer.MoveToX(-70, 500, Easing.OutExpo);
+
+            updateBeatmapYPositions();
+        }
+
         protected override bool OnClick(ClickEvent e)
         {
             Debug.Assert(Item != null);

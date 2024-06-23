@@ -1288,8 +1288,8 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             advanceSelection(direction: 1, diff: false);
 
-            AddStep("press escape", () => InputManager.PressKey(Key.Escape));
-            AddStep("press enter", () => InputManager.PressKey(Key.Enter));
+            AddStep("press escape", () => InputManager.Key(Key.Escape));
+            AddStep("press enter", () => InputManager.Key(Key.Enter));
 
 
             waitForSelection(2, 1);
@@ -1346,13 +1346,13 @@ namespace osu.Game.Tests.Visual.SongSelect
             }
             );
 
-            AddStep("expand with enter", () => InputManager.PressKey(Key.Enter));
+            AddStep("expand with enter", () => InputManager.Key(Key.Enter));
 
             waitForSelection(1, 3);
         }
 
         [Test]
-        public void TestCollapseWithContextMenu()
+        public void TestExpandWithContextMenu()
         {
             loadBeatmaps(setCount: 1);
 
@@ -1364,7 +1364,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 set = carousel.Items.FirstOrDefault(s => s is DrawableCarouselBeatmapSet && s.Item.State.Value == CarouselItemState.Selected);
             });
 
-            AddStep("collapse with escape", () => InputManager.PressKey(Key.Escape));
+            AddStep("collapse with escape", () => InputManager.Key(Key.Escape));
 
             AddStep("right click to open context menu", () =>
             {
@@ -1377,6 +1377,8 @@ namespace osu.Game.Tests.Visual.SongSelect
                 InputManager.MoveMouseTo(set, new osuTK.Vector2(20, -DrawableCarouselBeatmapSet.MAX_HEIGHT/3 + 20));
                 InputManager.Click(MouseButton.Left);
             });
+
+            waitForSelection(1, 3);
         }
 
         private void loadBeatmaps(List<BeatmapSetInfo> beatmapSets = null, Func<FilterCriteria> initialCriteria = null, Action<BeatmapCarousel> carouselAdjust = null,

@@ -134,12 +134,15 @@ namespace osu.Game.Screens.Select.Carousel
 
             switch (Item.State.Value)
             {
+                case CarouselItemState.SelectedCollapsed:
+                    Collapsed();
+                    break;
+
                 case CarouselItemState.NotSelected:
                     Deselected();
                     break;
 
                 case CarouselItemState.Selected:
-                case CarouselItemState.SelectedCollapsed:
                     Selected();
                     break;
             }
@@ -156,6 +159,10 @@ namespace osu.Game.Screens.Select.Carousel
         }
 
         protected virtual void Deselected()
+        {
+        }
+
+        protected virtual void Collapsed()
         {
         }
 
