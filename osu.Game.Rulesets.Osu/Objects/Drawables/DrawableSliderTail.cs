@@ -3,6 +3,7 @@
 
 #nullable disable
 
+using System;
 using System.Diagnostics;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
@@ -12,6 +13,7 @@ using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Skinning;
 using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
@@ -125,5 +127,27 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             if (Slider != null)
                 Position = Slider.CurvePositionAt(HitObject.RepeatIndex % 2 == 0 ? 1 : 0);
         }
+
+        #region FOR EDITOR USE ONLY, DO NOT USE FOR ANY OTHER PURPOSE
+
+        internal void SuppressHitAnimations()
+        {
+            UpdateState(ArmedState.Idle);
+            UpdateComboColour();
+
+            using (BeginAbsoluteSequence(StateUpdateTime - 5))
+                this.TransformBindableTo(AccentColour, Color4.White, Math.Max(0, HitStateUpdateTime - StateUpdateTime));
+
+            using (BeginAbsoluteSequence(HitStateUpdateTime))
+                this.FadeOut(700).Expire();
+        }
+
+        internal void RestoreHitAnimations()
+        {
+            UpdateState(ArmedState.Hit);
+            UpdateComboColour();
+        }
+
+        #endregion
     }
 }
