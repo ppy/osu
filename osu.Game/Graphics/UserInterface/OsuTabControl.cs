@@ -8,6 +8,8 @@ using System.Linq;
 using osuTK;
 using osuTK.Graphics;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Extensions.Color4Extensions;
@@ -143,13 +145,6 @@ namespace osu.Game.Graphics.UserInterface
                     FadeUnhovered();
             }
 
-            [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
-            {
-                if (accentColour == default)
-                    AccentColour = colours.Blue;
-            }
-
             public OsuTabItem(T value)
                 : base(value)
             {
@@ -196,8 +191,19 @@ namespace osu.Game.Graphics.UserInterface
                         Origin = Anchor.BottomLeft,
                         Anchor = Anchor.BottomLeft,
                     },
-                    new HoverClickSounds(HoverSampleSet.TabSelect)
+                    new HoverSounds(HoverSampleSet.TabSelect)
                 };
+            }
+
+            private Sample selectSample;
+
+            [BackgroundDependencyLoader]
+            private void load(OsuColour colours, AudioManager audio)
+            {
+                if (accentColour == default)
+                    AccentColour = colours.Blue;
+
+                selectSample = audio.Samples.Get(@"UI/tabselect-select");
             }
 
             protected override void OnActivated()
@@ -211,6 +217,8 @@ namespace osu.Game.Graphics.UserInterface
                 Text.Font = Text.Font.With(weight: FontWeight.Medium);
                 FadeUnhovered();
             }
+
+            protected override void OnActivatedByUser() => selectSample.Play();
         }
     }
 }

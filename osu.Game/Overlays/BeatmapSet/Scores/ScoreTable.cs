@@ -160,7 +160,6 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 new UpdateableFlag(score.User.CountryCode)
                 {
                     Size = new Vector2(19, 14),
-                    ShowPlaceholderOnUnknown = false,
                 },
                 username,
 #pragma warning disable 618

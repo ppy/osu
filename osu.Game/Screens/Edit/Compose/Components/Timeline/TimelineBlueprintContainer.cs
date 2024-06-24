@@ -170,6 +170,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         protected override void UpdateSelectionFromDragBox()
         {
+            Composer.BlueprintContainer.CommitIfPlacementActive();
+
             var dragBox = (TimelineDragBox)DragBox;
             double minTime = dragBox.MinTime;
             double maxTime = dragBox.MaxTime;

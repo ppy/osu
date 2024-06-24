@@ -143,8 +143,6 @@ namespace osu.Game.Overlays.Mods
         protected ShearedToggleButton? CustomisationButton { get; private set; }
         protected SelectAllModsButton? SelectAllModsButton { get; set; }
 
-        private bool textBoxShouldFocus;
-
         private Sample? columnAppearSample;
 
         private WorkingBeatmap? beatmap;
@@ -188,7 +186,7 @@ namespace osu.Game.Overlays.Mods
                     Anchor = Anchor.BottomCentre,
                     Origin = Anchor.BottomCentre,
                     Height = 0
-                }
+                },
             });
 
             MainAreaContent.AddRange(new Drawable[]
@@ -229,7 +227,7 @@ namespace osu.Game.Overlays.Mods
                                     Anchor = Anchor.BottomLeft,
                                     Origin = Anchor.BottomLeft,
                                     Direction = FillDirection.Horizontal,
-                                    Shear = new Vector2(SHEAR, 0),
+                                    Shear = new Vector2(OsuGame.SHEAR, 0),
                                     RelativeSizeAxes = Axes.Y,
                                     AutoSizeAxes = Axes.X,
                                     Margin = new MarginPadding { Horizontal = 70 },
@@ -542,7 +540,7 @@ namespace osu.Game.Overlays.Mods
             if (customisationVisible.Value)
                 SearchTextBox.KillFocus();
             else
-                setTextBoxFocus(textBoxShouldFocus);
+                setTextBoxFocus(textSearchStartsActive.Value);
         }
 
         /// <summary>
@@ -781,7 +779,7 @@ namespace osu.Game.Overlays.Mods
         /// </remarks>>
         public bool OnPressed(KeyBindingPressEvent<PlatformAction> e)
         {
-            if (e.Repeat || e.Action != PlatformAction.SelectAll || SelectAllModsButton is null)
+            if (e.Repeat || e.Action != PlatformAction.SelectAll || SelectAllModsButton == null)
                 return false;
 
             SelectAllModsButton.TriggerClick();
@@ -798,15 +796,13 @@ namespace osu.Game.Overlays.Mods
                 return false;
 
             // TODO: should probably eventually support typical platform search shortcuts (`Ctrl-F`, `/`)
-            setTextBoxFocus(!textBoxShouldFocus);
+            setTextBoxFocus(!SearchTextBox.HasFocus);
             return true;
         }
 
-        private void setTextBoxFocus(bool keepFocus)
+        private void setTextBoxFocus(bool focus)
         {
-            textBoxShouldFocus = keepFocus;
-
-            if (textBoxShouldFocus)
+            if (focus)
                 SearchTextBox.TakeFocus();
             else
                 SearchTextBox.KillFocus();
@@ -851,7 +847,7 @@ namespace osu.Game.Overlays.Mods
                     // DrawWidth/DrawPosition do not include shear effects, and we want to know the full extents of the columns post-shear,
                     // so we have to manually compensate.
                     var topLeft = column.ToSpaceOfOtherDrawable(Vector2.Zero, ScrollContent);
-                    var bottomRight = column.ToSpaceOfOtherDrawable(new Vector2(column.DrawWidth - column.DrawHeight * SHEAR, 0), ScrollContent);
+                    var bottomRight = column.ToSpaceOfOtherDrawable(new Vector2(column.DrawWidth - column.DrawHeight * OsuGame.SHEAR, 0), ScrollContent);
 
                     bool isCurrentlyVisible = Precision.AlmostBigger(topLeft.X, leftVisibleBound)
                                               && Precision.DefinitelyBigger(rightVisibleBound, bottomRight.X);
@@ -953,7 +949,7 @@ namespace osu.Game.Overlays.Mods
                     RequestScroll?.Invoke(this);
 
                 // Killing focus is done here because it's the only feasible place on ModSelectOverlay you can click on without triggering any action.
-                Scheduler.Add(() => GetContainingInputManager().ChangeFocus(null));
+                Scheduler.Add(() => GetContainingFocusManager()!.ChangeFocus(null));
 
                 return true;
             }

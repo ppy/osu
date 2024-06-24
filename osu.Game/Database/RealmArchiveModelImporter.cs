@@ -449,16 +449,6 @@ namespace osu.Game.Database
             return reader.Name.ComputeSHA2Hash();
         }
 
-        /// <summary>
-        /// Create all required <see cref="File"/>s for the provided archive, adding them to the global file store.
-        /// </summary>
-        private List<RealmNamedFileUsage> createFileInfos(ArchiveReader reader, RealmFileStore files, Realm realm)
-        {
-            var fileInfos = new List<RealmNamedFileUsage>();
-
-            return fileInfos;
-        }
-
         private IEnumerable<(string original, string shortened)> getShortenedFilenames(ArchiveReader reader)
         {
             string prefix = reader.Filenames.GetCommonPrefix();

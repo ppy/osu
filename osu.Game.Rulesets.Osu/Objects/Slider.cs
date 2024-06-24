@@ -41,7 +41,7 @@ namespace osu.Game.Rulesets.Osu.Objects
 
         public Vector2 StackedPositionAt(double t) => StackedPosition + this.CurvePositionAt(t);
 
-        private readonly SliderPath path = new SliderPath();
+        private readonly SliderPath path = new SliderPath { OptimiseCatmull = true };
 
         public SliderPath Path
         {
@@ -252,6 +252,8 @@ namespace osu.Game.Rulesets.Osu.Objects
 
         protected void UpdateNestedSamples()
         {
+            this.PopulateNodeSamples();
+
             // TODO: remove this when guaranteed sort is present for samples (https://github.com/ppy/osu/issues/1933)
             HitSampleInfo tickSample = (Samples.FirstOrDefault(s => s.Name == HitSampleInfo.HIT_NORMAL) ?? Samples.FirstOrDefault())?.With("slidertick");
 

@@ -5,6 +5,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio.Sample;
@@ -13,6 +14,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Rendering;
 using osu.Framework.Graphics.Textures;
+using osu.Framework.Testing;
 using osu.Framework.Testing.Input;
 using osu.Game.Audio;
 using osu.Game.Rulesets.Osu.Skinning.Legacy;
@@ -47,7 +49,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             createTest(() =>
             {
-                var skinContainer = new LegacySkinContainer(renderer, false);
+                var skinContainer = new LegacySkinContainer(renderer, provideMiddle: false);
                 var legacyCursorTrail = new LegacyCursorTrail(skinContainer);
 
                 skinContainer.Child = legacyCursorTrail;
@@ -61,13 +63,29 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             createTest(() =>
             {
-                var skinContainer = new LegacySkinContainer(renderer, true);
+                var skinContainer = new LegacySkinContainer(renderer, provideMiddle: true);
                 var legacyCursorTrail = new LegacyCursorTrail(skinContainer);
 
                 skinContainer.Child = legacyCursorTrail;
 
                 return skinContainer;
             });
+        }
+
+        [Test]
+        public void TestLegacyDisjointCursorTrailViaNoCursor()
+        {
+            createTest(() =>
+            {
+                var skinContainer = new LegacySkinContainer(renderer, provideMiddle: false, provideCursor: false);
+                var legacyCursorTrail = new LegacyCursorTrail(skinContainer);
+
+                skinContainer.Child = legacyCursorTrail;
+
+                return skinContainer;
+            });
+
+            AddAssert("trail is disjoint", () => this.ChildrenOfType<LegacyCursorTrail>().Single().DisjointTrail, () => Is.True);
         }
 
         private void createTest(Func<Drawable> createContent) => AddStep("create trail", () =>
@@ -86,12 +104,14 @@ namespace osu.Game.Rulesets.Osu.Tests
         private partial class LegacySkinContainer : Container, ISkinSource
         {
             private readonly IRenderer renderer;
-            private readonly bool disjoint;
+            private readonly bool provideMiddle;
+            private readonly bool provideCursor;
 
-            public LegacySkinContainer(IRenderer renderer, bool disjoint)
+            public LegacySkinContainer(IRenderer renderer, bool provideMiddle, bool provideCursor = true)
             {
                 this.renderer = renderer;
-                this.disjoint = disjoint;
+                this.provideMiddle = provideMiddle;
+                this.provideCursor = provideCursor;
 
                 RelativeSizeAxes = Axes.Both;
             }
@@ -102,15 +122,14 @@ namespace osu.Game.Rulesets.Osu.Tests
             {
                 switch (componentName)
                 {
-                    case "cursortrail":
-                        var tex = new Texture(renderer.WhitePixel);
+                    case "cursor":
+                        return provideCursor ? new Texture(renderer.WhitePixel) : null;
 
-                        if (disjoint)
-                            tex.ScaleAdjust = 1 / 25f;
-                        return tex;
+                    case "cursortrail":
+                        return new Texture(renderer.WhitePixel);
 
                     case "cursormiddle":
-                        return disjoint ? null : renderer.WhitePixel;
+                        return provideMiddle ? null : renderer.WhitePixel;
                 }
 
                 return null;

@@ -35,8 +35,6 @@ namespace osu.Desktop
         [Resolved]
         private IBindable<RulesetInfo> ruleset { get; set; } = null!;
 
-        private IBindable<APIUser> user = null!;
-
         [Resolved]
         private IAPIProvider api { get; set; } = null!;
 
@@ -49,9 +47,11 @@ namespace osu.Desktop
         [Resolved]
         private MultiplayerClient multiplayerClient { get; set; } = null!;
 
+        [Resolved]
+        private OsuConfigManager config { get; set; } = null!;
+
         private readonly IBindable<UserStatus?> status = new Bindable<UserStatus?>();
         private readonly IBindable<UserActivity> activity = new Bindable<UserActivity>();
-
         private readonly Bindable<DiscordRichPresenceMode> privacyMode = new Bindable<DiscordRichPresenceMode>();
 
         private readonly RichPresence presence = new RichPresence
@@ -64,8 +64,10 @@ namespace osu.Desktop
             },
         };
 
+        private IBindable<APIUser>? user;
+
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
+        private void load()
         {
             client = new DiscordRpcClient(client_id)
             {
@@ -77,10 +79,27 @@ namespace osu.Desktop
             client.OnReady += onReady;
             client.OnError += (_, e) => Logger.Log($"An error occurred with Discord RPC Client: {e.Message} ({e.Code})", LoggingTarget.Network, LogLevel.Error);
 
-            // A URI scheme is required to support game invitations, as well as informing Discord of the game executable path to support launching the game when a user clicks on join/spectate.
-            client.RegisterUriScheme();
-            client.Subscribe(EventType.Join);
-            client.OnJoin += onJoin;
+            try
+            {
+                client.RegisterUriScheme();
+                client.Subscribe(EventType.Join);
+                client.OnJoin += onJoin;
+            }
+            catch (Exception ex)
+            {
+                // This is known to fail in at least the following sandboxed environments:
+                // - macOS (when packaged as an app bundle)
+                // - flatpak (see: https://github.com/flathub/sh.ppy.osu/issues/170)
+                // There is currently no better way to do this offered by Discord, so the best we can do is simply ignore it for now.
+                Logger.Log($"Failed to register Discord URI scheme: {ex}");
+            }
+
+            client.Initialize();
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
 
             config.BindWith(OsuSetting.DiscordRichPresence, privacyMode);
 
@@ -99,8 +118,6 @@ namespace osu.Desktop
             activity.BindValueChanged(_ => schedulePresenceUpdate());
             privacyMode.BindValueChanged(_ => schedulePresenceUpdate());
             multiplayerClient.RoomUpdated += onRoomUpdated;
-
-            client.Initialize();
         }
 
         private void onReady(object _, ReadyMessage __)
@@ -141,11 +158,14 @@ namespace osu.Desktop
 
         private void updatePresence(bool hideIdentifiableInformation)
         {
+            if (user == null)
+                return;
+
             // user activity
             if (activity.Value != null)
             {
-                presence.State = truncate(activity.Value.GetStatus(hideIdentifiableInformation));
-                presence.Details = truncate(activity.Value.GetDetails(hideIdentifiableInformation) ?? string.Empty);
+                presence.State = clampLength(activity.Value.GetStatus(hideIdentifiableInformation));
+                presence.Details = clampLength(activity.Value.GetDetails(hideIdentifiableInformation) ?? string.Empty);
 
                 if (getBeatmapID(activity.Value) is int beatmapId && beatmapId > 0)
                 {
@@ -190,7 +210,9 @@ namespace osu.Desktop
                     Password = room.Settings.Password,
                 };
 
-                presence.Secrets.JoinSecret = JsonConvert.SerializeObject(roomSecret);
+                if (client.HasRegisteredUriScheme)
+                    presence.Secrets.JoinSecret = JsonConvert.SerializeObject(roomSecret);
+
                 // discord cannot handle both secrets and buttons at the same time, so we need to choose something.
                 // the multiplayer room seems more important.
                 presence.Buttons = null;
@@ -249,8 +271,19 @@ namespace osu.Desktop
 
         private static readonly int ellipsis_length = Encoding.UTF8.GetByteCount(new[] { '…' });
 
-        private static string truncate(string str)
+        private static string clampLength(string str)
         {
+            // Empty strings are fine to discord even though single-character strings are not. Make it make sense.
+            if (string.IsNullOrEmpty(str))
+                return str;
+
+            // As above, discord decides that *non-empty* strings shorter than 2 characters cannot possibly be valid input, because... reasons?
+            // And yes, that is two *characters*, or *codepoints*, not *bytes* as further down below (as determined by empirical testing).
+            // That seems very questionable, and isn't even documented anywhere. So to *make it* accept such valid input,
+            // just tack on enough of U+200B ZERO WIDTH SPACEs at the end.
+            if (str.Length < 2)
+                return str.PadRight(2, '\u200B');
+
             if (Encoding.UTF8.GetByteCount(str) <= 128)
                 return str;
 

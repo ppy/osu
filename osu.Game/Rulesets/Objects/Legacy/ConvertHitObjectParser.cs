@@ -347,7 +347,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
             // Edge-case rules (to match stable).
             if (type == PathType.PERFECT_CURVE)
             {
-                int endPointLength = endPoint is null ? 0 : 1;
+                int endPointLength = endPoint == null ? 0 : 1;
 
                 if (vertices.Length + endPointLength != 3)
                     type = PathType.BEZIER;
