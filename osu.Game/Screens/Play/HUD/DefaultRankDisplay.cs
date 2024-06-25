@@ -44,7 +44,6 @@ namespace osu.Game.Screens.Play.HUD
         {
             base.LoadComplete();
 
-            rank.Rank = scoreProcessor.Rank.Value;
             switch (RankDisplay.Value)
             {
                 case RankDisplayMode.Standard:

@@ -395,8 +395,9 @@ namespace osu.Game.Rulesets.Scoring
 
             MaximumRank.Value = RankFromScore(MaximumAccuracy.Value, ScoreResultCounts);
             // Check if the misses are >= 1, when the misses are more then 1, it clamp max rank no more then A.
+            // Check Accuracy.Value >= accuracy_cutoff_s is for the reduce unnecessary assign causing the icon flicking
             ScoreResultCounts.TryGetValue(HitResult.Miss, out int missesCount);
-            if (missesCount > 1)
+            if (missesCount > 1 && Accuracy.Value >= accuracy_cutoff_s)
                 MaximumRank.Value = ScoreRank.A;
             // detect is 100% acc, so it earn SS or SS+ rank
             else if (Accuracy.Value == 1.0d)
