@@ -109,7 +109,6 @@ namespace osu.Game.Rulesets.Scoring
         /// </remarks>
         public readonly Bindable<ScoreRank> MaximumRank = new Bindable<ScoreRank>(ScoreRank.X);
 
-
         /// <summary>
         /// The highest combo achieved by this score.
         /// </summary>
