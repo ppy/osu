@@ -21,6 +21,14 @@ namespace osu.Game.Beatmaps.ControlPoints
     public class ControlPointInfo : IDeepCloneable<ControlPointInfo>
     {
         /// <summary>
+        /// Invoked on any change to the set of control points.
+        /// </summary>
+        [CanBeNull]
+        public event Action ControlPointsChanged;
+
+        private void raiseControlPointsChanged([CanBeNull] ControlPoint _ = null) => ControlPointsChanged?.Invoke();
+
+        /// <summary>
         /// All control points grouped by time.
         /// </summary>
         [JsonProperty]
@@ -117,6 +125,7 @@ namespace osu.Game.Beatmaps.ControlPoints
             if (addIfNotExisting)
             {
                 newGroup.ItemAdded += GroupItemAdded;
+                newGroup.ItemChanged += raiseControlPointsChanged;
                 newGroup.ItemRemoved += GroupItemRemoved;
 
                 groups.Insert(~i, newGroup);
@@ -132,6 +141,7 @@ namespace osu.Game.Beatmaps.ControlPoints
                 group.Remove(item);
 
             group.ItemAdded -= GroupItemAdded;
+            group.ItemChanged -= raiseControlPointsChanged;
             group.ItemRemoved -= GroupItemRemoved;
 
             groups.Remove(group);
@@ -288,6 +298,8 @@ namespace osu.Game.Beatmaps.ControlPoints
                 default:
                     throw new ArgumentException($"A control point of unexpected type {controlPoint.GetType()} was added to this {nameof(ControlPointInfo)}");
             }
+
+            raiseControlPointsChanged();
         }
 
         protected virtual void GroupItemRemoved(ControlPoint controlPoint)
@@ -302,6 +314,8 @@ namespace osu.Game.Beatmaps.ControlPoints
                     effectPoints.Remove(typed);
                     break;
             }
+
+            raiseControlPointsChanged();
         }
 
         public ControlPointInfo DeepClone()

@@ -214,6 +214,12 @@ namespace osu.Game.Screens.Edit
         private Bindable<bool> editorTimelineShowTimingChanges;
         private Bindable<bool> editorTimelineShowTicks;
 
+        /// <summary>
+        /// This controls the opacity of components like the timelines, sidebars, etc.
+        /// In "composer focus" mode the opacity of the aforementioned components is reduced so that the user can focus on the composer better.
+        /// </summary>
+        public Bindable<bool> ComposerFocusMode { get; } = new Bindable<bool>();
+
         public Editor(EditorLoader loader = null)
         {
             this.loader = loader;
@@ -323,7 +329,6 @@ namespace osu.Game.Screens.Edit
                         Child = screenContainer = new Container<EditorScreen>
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Masking = true
                         }
                     },
                     new Container
@@ -1013,6 +1018,15 @@ namespace osu.Game.Screens.Edit
                 rebindClipboardBindables();
             }
         }
+
+        /// <summary>
+        /// Forces a reload of the compose screen after significant configuration changes.
+        /// </summary>
+        /// <remarks>
+        /// This can be necessary for scrolling rulesets, as they do not easily support control points changing under them.
+        /// The reason that this works is that <see cref="onModeChanged"/> will re-instantiate the screen whenever it is requested next.
+        /// </remarks>
+        public void ReloadComposeScreen() => screenContainer.SingleOrDefault(s => s.Type == EditorScreenMode.Compose)?.RemoveAndDisposeImmediately();
 
         [CanBeNull]
         private ScheduledDelegate playbackDisabledDebounce;
