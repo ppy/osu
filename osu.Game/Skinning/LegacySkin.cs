@@ -19,6 +19,7 @@ using osu.Game.Audio;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Extensions;
 using osu.Game.IO;
+using osu.Game.Rulesets;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Play.HUD;
@@ -56,6 +57,24 @@ namespace osu.Game.Skinning
         protected LegacySkin(SkinInfo skin, IStorageResourceProvider? resources, IResourceStore<byte[]>? fallbackStore, string configurationFilename = @"skin.ini")
             : base(skin, resources, fallbackStore, configurationFilename)
         {
+            if (resources != null
+                && skin.LayoutVersion < 20240625
+                && LayoutInfos.TryGetValue(SkinComponentsContainerLookup.TargetArea.MainHUDComponents, out var hudLayout)
+                && hudLayout.TryGetDrawableInfo(null, out var hudComponents))
+            {
+                var comboCounters = hudComponents.Where(h => h.Type.Name == nameof(LegacyComboCounter)).ToArray();
+
+                if (comboCounters.Any())
+                {
+                    hudLayout.Update(null, hudComponents.Except(comboCounters).ToArray());
+
+                    resources.RealmAccess.Run(r =>
+                    {
+                        foreach (var ruleset in r.All<RulesetInfo>())
+                            hudLayout.Update(ruleset, comboCounters);
+                    });
+                }
+            }
         }
 
         protected override IResourceStore<TextureUpload> CreateTextureLoaderStore(IStorageResourceProvider resources, IResourceStore<byte[]> storage)
