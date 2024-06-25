@@ -13,12 +13,14 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input;
 using osu.Framework.Testing;
+using osu.Game.Database;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Settings;
 using osu.Game.Overlays.SkinEditor;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Screens.Edit;
+using osu.Game.Screens.Play.HUD;
 using osu.Game.Screens.Play.HUD.HitErrorMeters;
 using osu.Game.Skinning;
 using osu.Game.Skinning.Components;
@@ -39,6 +41,9 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Cached]
         public readonly EditorClipboard Clipboard = new EditorClipboard();
 
+        [Resolved]
+        private SkinManager skins { get; set; } = null!;
+
         private SkinComponentsContainer targetContainer => Player.ChildrenOfType<SkinComponentsContainer>().First();
 
         [SetUpSteps]
@@ -46,6 +51,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             base.SetUpSteps();
 
+            AddStep("reset skin", () => skins.CurrentSkinInfo.SetDefault());
             AddUntilStep("wait for hud load", () => targetContainer.ComponentsLoaded);
 
             AddStep("reload skin editor", () =>
@@ -367,6 +373,84 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddAssert("three hit error meters present",
                 () => skinEditor.ChildrenOfType<SkinBlueprint>().Count(b => b.Item is BarHitErrorMeter),
                 () => Is.EqualTo(3));
+        }
+
+        private SkinComponentsContainer globalHUDTarget => Player.ChildrenOfType<SkinComponentsContainer>()
+                                                                 .Single(c => c.Lookup.Target == SkinComponentsContainerLookup.TargetArea.MainHUDComponents && c.Lookup.Ruleset == null);
+
+        private SkinComponentsContainer rulesetHUDTarget => Player.ChildrenOfType<SkinComponentsContainer>()
+                                                                  .Single(c => c.Lookup.Target == SkinComponentsContainerLookup.TargetArea.MainHUDComponents && c.Lookup.Ruleset != null);
+
+        [Test]
+        public void TestMigrationArgon()
+        {
+            AddUntilStep("wait for load", () => globalHUDTarget.ComponentsLoaded);
+            AddStep("add combo to global hud target", () =>
+            {
+                globalHUDTarget.Add(new ArgonComboCounter
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                });
+            });
+
+            Live<SkinInfo> modifiedSkin = null!;
+
+            AddStep("select another skin", () =>
+            {
+                modifiedSkin = skins.CurrentSkinInfo.Value;
+                skins.CurrentSkinInfo.SetDefault();
+            });
+            AddStep("modify version", () => modifiedSkin.PerformWrite(s => s.LayoutVersion = 0));
+            AddStep("select skin again", () => skins.CurrentSkinInfo.Value = modifiedSkin);
+            AddAssert("global hud target does not contain combo", () => !globalHUDTarget.Components.Any(c => c is ArgonComboCounter));
+            AddAssert("ruleset hud target contains both combos", () =>
+            {
+                var target = rulesetHUDTarget;
+
+                return target.Components.Count == 2 &&
+                       target.Components[0] is ArgonComboCounter one && one.Anchor == Anchor.BottomLeft && one.Origin == Anchor.BottomLeft &&
+                       target.Components[1] is ArgonComboCounter two && two.Anchor == Anchor.Centre && two.Origin == Anchor.Centre;
+            });
+            AddStep("save skin", () => skinEditor.Save());
+            AddAssert("version updated", () => modifiedSkin.PerformRead(s => s.LayoutVersion) == SkinInfo.LATEST_LAYOUT_VERSION);
+        }
+
+        [Test]
+        public void TestMigrationLegacy()
+        {
+            AddStep("select legacy skin", () => skins.CurrentSkinInfo.Value = skins.DefaultClassicSkin.SkinInfo);
+
+            AddUntilStep("wait for load", () => globalHUDTarget.ComponentsLoaded);
+            AddStep("add combo to global hud target", () =>
+            {
+                globalHUDTarget.Add(new LegacyComboCounter
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                });
+            });
+
+            Live<SkinInfo> modifiedSkin = null!;
+
+            AddStep("select another skin", () =>
+            {
+                modifiedSkin = skins.CurrentSkinInfo.Value;
+                skins.CurrentSkinInfo.SetDefault();
+            });
+            AddStep("modify version", () => modifiedSkin.PerformWrite(s => s.LayoutVersion = 0));
+            AddStep("select skin again", () => skins.CurrentSkinInfo.Value = modifiedSkin);
+            AddAssert("global hud target does not contain combo", () => !globalHUDTarget.Components.Any(c => c is LegacyComboCounter));
+            AddAssert("ruleset hud target contains both combos", () =>
+            {
+                var target = rulesetHUDTarget;
+
+                return target.Components.Count == 2 &&
+                       target.Components[0] is LegacyComboCounter one && one.Anchor == Anchor.BottomLeft && one.Origin == Anchor.BottomLeft &&
+                       target.Components[1] is LegacyComboCounter two && two.Anchor == Anchor.Centre && two.Origin == Anchor.Centre;
+            });
+            AddStep("save skin", () => skinEditor.Save());
+            AddAssert("version updated", () => modifiedSkin.PerformRead(s => s.LayoutVersion) == SkinInfo.LATEST_LAYOUT_VERSION);
         }
 
         protected override Ruleset CreatePlayerRuleset() => new OsuRuleset();
