@@ -174,7 +174,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
             {
                 base.Update();
 
-                CircularBar.CornerRadius = CircularBar.DrawWidth / 4;
+                CircularBar.CornerRadius = Math.Min(CircularBar.DrawHeight / 2, CircularBar.DrawWidth / 4);
             }
 
             public void UpdateCounts(long newCount, long newMax)
