@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
@@ -10,10 +10,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 {
     public static class SpeedEvaluator
     {
-        private const double single_spacing_threshold = 150;
-        private const double min_speed_bonus = 70;
-        private const double speed_balancing_factor = 38;
-        private const double distance_multiplier = 0.8;
+        private const double single_spacing_threshold = 125;
+        private const double min_speed_bonus = 75; // ~200BPM
+        private const double speed_balancing_factor = 40;
 
         /// <summary>
         /// Evaluates the difficulty of tapping the current object, based on:
@@ -55,31 +54,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             double speedBonus = 1.0;
 
             if (strainTime < min_speed_bonus)
-                speedBonus = 1 + 0.60 * Math.Pow((min_speed_bonus - strainTime) / speed_balancing_factor, 2);
-
-            double angleBonus = calculateAngleBonus(osuCurrObj.Angle ?? Math.PI);
+                speedBonus = 1 + 0.75 * Math.Pow((min_speed_bonus - strainTime) / speed_balancing_factor, 2);
 
             double travelDistance = osuPrevObj?.TravelDistance ?? 0;
+            double distance = Math.Min(single_spacing_threshold, travelDistance + osuCurrObj.MinimumJumpDistance);
 
-            double distance = (travelDistance + osuCurrObj.MinimumJumpDistance) * angleBonus;
-            double distanceBonus = distance_multiplier * Math.Min(1, Math.Pow(distance / single_spacing_threshold, 3.5));
-
-            double distanceToSpeedRatio = distanceBonus / speedBonus;
-
-            // If spacing is too small for high speed difficulty - nerf distance bonus
-            if (distanceToSpeedRatio < 0.5)
-                distanceBonus *= Math.Sqrt(distanceToSpeedRatio * 2);
-
-            double speedDifficulty = (speedBonus + distanceBonus) * doubletapness / strainTime;
-
-            return speedDifficulty;
-        }
-        private static double calculateAngleBonus(double angle)
-        {
-            // A very small multiplier is used here to prevent FP shenanigans
-            if (angle >= Math.PI * 0.99999) return 1;
-            // Max is used to prevent FP
-            return (Math.PI - angle) / Math.Sqrt(2 * (1 - Math.Cos(Math.PI - angle)));
+            return (speedBonus + speedBonus * Math.Pow(distance / single_spacing_threshold, 3.5)) * doubletapness / strainTime;
         }
     }
 }
