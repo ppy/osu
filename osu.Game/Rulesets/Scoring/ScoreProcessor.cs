@@ -400,6 +400,9 @@ namespace osu.Game.Rulesets.Scoring
             ScoreResultCounts.TryGetValue(HitResult.Miss, out int missesCount);
             if (missesCount > 1)
                 MaximumRank.Value = ScoreRank.A;
+            // detect is 100% acc, so it earn SS or SS+ rank
+            else if (Accuracy.Value == 1.0d)
+                MaximumRank.Value = rank.Value;
 
             MinimumRank.Value = RankFromScore(MinimumAccuracy.Value, ScoreResultCounts);
             foreach (var mod in Mods.Value.OfType<IApplicableToScoreProcessor>())
