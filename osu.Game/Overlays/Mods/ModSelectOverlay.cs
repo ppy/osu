@@ -372,6 +372,7 @@ namespace osu.Game.Overlays.Mods
                 footerContentFlow.LayoutDuration = 200;
                 footerContentFlow.LayoutEasing = Easing.OutQuint;
                 footerContentFlow.Direction = screenIsntWideEnough ? FillDirection.Vertical : FillDirection.Horizontal;
+                aboveColumnsContent.Padding = aboveColumnsContent.Padding with { Bottom = screenIsntWideEnough ? 70f : 15f };
             }
         }
 
