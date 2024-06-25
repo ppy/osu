@@ -8,7 +8,6 @@ using System.Linq;
 using MessagePack;
 using osu.Framework.Bindables;
 using osu.Framework.Localisation;
-using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Extensions;
 using osu.Game.Localisation;
