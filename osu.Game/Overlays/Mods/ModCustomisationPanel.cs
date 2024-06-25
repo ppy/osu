@@ -49,7 +49,7 @@ namespace osu.Game.Overlays.Mods
                     Height = header_height,
                     Expanded = { BindTarget = Expanded },
                 },
-                content = new InputBlockingContainer
+                content = new FocusGrabbingContainer
                 {
                     RelativeSizeAxes = Axes.X,
                     BorderColour = colourProvider.Dark3,
@@ -158,6 +158,12 @@ namespace osu.Game.Overlays.Mods
         {
             base.Update();
             scrollContainer.Height = Math.Min(scrollContainer.AvailableContent, DrawHeight - header_height);
+        }
+
+        private partial class FocusGrabbingContainer : InputBlockingContainer
+        {
+            public override bool RequestsFocus => true;
+            public override bool AcceptsFocus => true;
         }
     }
 }
