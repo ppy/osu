@@ -84,7 +84,11 @@ namespace osu.Game.Skinning
                     resources.RealmAccess.Run(r =>
                     {
                         foreach (var ruleset in r.All<RulesetInfo>())
-                            hudLayout.Update(ruleset, comboCounters);
+                        {
+                            hudLayout.Update(ruleset, hudLayout.TryGetDrawableInfo(ruleset, out var rulesetComponents)
+                                ? rulesetComponents.Concat(comboCounters).ToArray()
+                                : comboCounters);
+                        }
                     });
                 }
             }
