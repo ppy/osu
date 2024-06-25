@@ -99,6 +99,17 @@ namespace osu.Game.Rulesets.Scoring
         private readonly Bindable<ScoreRank> rank = new Bindable<ScoreRank>(ScoreRank.X);
 
         /// <summary>
+        /// Using the minimum accuracy as the data source to calculate the minimum rank.
+        /// </summary>
+        public readonly Bindable<ScoreRank> MinimumRank = new Bindable<ScoreRank>(ScoreRank.F);
+
+        /// <summary>
+        /// Using the maximum accuracy as the data source to calculate the minimum rank.
+        /// </summary>
+        public readonly Bindable<ScoreRank> MaximumRank = new Bindable<ScoreRank>(ScoreRank.XH);
+
+
+        /// <summary>
         /// The highest combo achieved by this score.
         /// </summary>
         public readonly BindableInt HighestCombo = new BindableInt();
@@ -382,8 +393,14 @@ namespace osu.Game.Rulesets.Scoring
                 return;
 
             rank.Value = RankFromScore(Accuracy.Value, ScoreResultCounts);
+            MaximumRank.Value = RankFromScore(MaximumAccuracy.Value, ScoreResultCounts);
+            MinimumRank.Value = RankFromScore(MinimumAccuracy.Value, ScoreResultCounts);
             foreach (var mod in Mods.Value.OfType<IApplicableToScoreProcessor>())
+            {
                 rank.Value = mod.AdjustRank(Rank.Value, Accuracy.Value);
+                MaximumRank.Value = mod.AdjustRank(Rank.Value, MaximumAccuracy.Value);
+                MinimumRank.Value = mod.AdjustRank(Rank.Value, MinimumAccuracy.Value);
+            }
         }
 
         protected virtual double ComputeTotalScore(double comboProgress, double accuracyProgress, double bonusPortion)
