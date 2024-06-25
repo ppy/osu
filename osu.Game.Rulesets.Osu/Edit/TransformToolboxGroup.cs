@@ -77,13 +77,15 @@ namespace osu.Game.Rulesets.Osu.Edit
             {
                 case GlobalAction.EditorToggleRotateControl:
                 {
-                    rotateButton.TriggerClick();
+                    if (!RotationHandler.OperationInProgress.Value || rotateButton.Selected.Value)
+                        rotateButton.TriggerClick();
                     return true;
                 }
 
                 case GlobalAction.EditorToggleScaleControl:
                 {
-                    scaleButton.TriggerClick();
+                    if (!ScaleHandler.OperationInProgress.Value || scaleButton.Selected.Value)
+                        scaleButton.TriggerClick();
                     return true;
                 }
             }
