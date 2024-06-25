@@ -32,6 +32,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
             if (scaleHandler == null) return false;
 
+            if (scaleHandler.OperationInProgress.Value)
+                return false;
+
             originalAnchor = Anchor;
 
             scaleHandler.Begin();
