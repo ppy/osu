@@ -8,6 +8,7 @@ using System.Linq;
 using MessagePack;
 using osu.Framework.Bindables;
 using osu.Framework.Localisation;
+using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Extensions;
 using osu.Game.Localisation;
@@ -98,14 +99,14 @@ namespace osu.Game.Rulesets.Scoring
 
         private readonly Bindable<ScoreRank> rank = new Bindable<ScoreRank>(ScoreRank.X);
 
-        /// <summary>
+        /// <remarks>
         /// Using the minimum accuracy as the data source to calculate the minimum rank.
-        /// </summary>
+        /// </remarks>
         public readonly Bindable<ScoreRank> MinimumRank = new Bindable<ScoreRank>(ScoreRank.X);
 
-        /// <summary>
+        /// <remarks>
         /// Using the maximum accuracy as the data source to calculate the minimum rank.
-        /// </summary>
+        /// </remarks>
         public readonly Bindable<ScoreRank> MaximumRank = new Bindable<ScoreRank>(ScoreRank.X);
 
 
@@ -393,21 +394,13 @@ namespace osu.Game.Rulesets.Scoring
                 return;
 
             rank.Value = RankFromScore(Accuracy.Value, ScoreResultCounts);
+
             MaximumRank.Value = RankFromScore(MaximumAccuracy.Value, ScoreResultCounts);
             // Check if the misses are >= 1, when the misses are more then 1, it clamp max rank no more then A.
-            if (
-                !(rank.Value == ScoreRank.S ||
-                rank.Value == ScoreRank.SH ||
-                rank.Value == ScoreRank.X ||
-                rank.Value == ScoreRank.XH) &&
-                (MaximumRank.Value == ScoreRank.S ||
-                MaximumRank.Value == ScoreRank.SH ||
-                MaximumRank.Value == ScoreRank.X ||
-                MaximumRank.Value == ScoreRank.XH)
-            )
-            {
+            ScoreResultCounts.TryGetValue(HitResult.Miss, out int missesCount);
+            if (missesCount > 1)
                 MaximumRank.Value = ScoreRank.A;
-            }
+
             MinimumRank.Value = RankFromScore(MinimumAccuracy.Value, ScoreResultCounts);
             foreach (var mod in Mods.Value.OfType<IApplicableToScoreProcessor>())
             {
