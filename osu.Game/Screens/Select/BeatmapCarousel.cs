@@ -63,6 +63,8 @@ namespace osu.Game.Screens.Select
 
         private CarouselBeatmap? lastSelectedBeatmap;
 
+        private bool wasSelectedCollapsed = false;
+
         /// <summary>
         /// The total count of non-filtered beatmaps displayed.
         /// </summary>
@@ -532,7 +534,13 @@ namespace osu.Game.Screens.Select
                 if (!bypassFilters && item.Filtered.Value)
                     return false;
 
-                select(item);
+                if (!wasSelectedCollapsed)
+                {
+                    select(item);
+                }
+
+                wasSelectedCollapsed = false;
+
 
                 // if we got here and the set is filtered, it means we were bypassing filters.
                 // in this case, reapplying the filter is necessary to ensure the panel is in the correct place
@@ -576,7 +584,15 @@ namespace osu.Game.Screens.Select
             var nextSet = unfilteredSets[(unfilteredSets.IndexOf(selectedBeatmapSet) + direction + unfilteredSets.Count) % unfilteredSets.Count];
 
             if (skipDifficulties)
-                select(nextSet);
+            {
+                if (selectedBeatmapSet.State.Value == CarouselItemState.SelectedCollapsed){
+                    wasSelectedCollapsed = true;
+                    select(nextSet);
+                    collapseSelected(nextSet);
+                }
+                else
+                    select(nextSet);
+            }
             else
                 select(direction > 0 ? nextSet.Beatmaps.First(b => !b.Filtered.Value) : nextSet.Beatmaps.Last(b => !b.Filtered.Value));
         }

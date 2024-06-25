@@ -27,6 +27,8 @@ namespace osu.Game.Screens.Select.Carousel
 
         private readonly HoverLayer hoverLayer;
 
+        private readonly CollapsedLayer collapsedLayer;
+
         protected override Container<Drawable> Content { get; } = new Container { RelativeSizeAxes = Axes.Both };
 
         private const float corner_radius = 10;
@@ -47,6 +49,7 @@ namespace osu.Game.Screens.Select.Carousel
                 {
                     Content,
                     hoverLayer = new HoverLayer(),
+                    collapsedLayer = new CollapsedLayer(),
                     new HeaderSounds(),
                 }
             };
@@ -78,7 +81,6 @@ namespace osu.Game.Screens.Select.Carousel
                     break;
 
                 case CarouselItemState.Selected:
-                case CarouselItemState.SelectedCollapsed:
                     hoverLayer.InsetForBorder = true;
 
                     BorderContainer.BorderThickness = border_thickness;
@@ -90,7 +92,21 @@ namespace osu.Game.Screens.Select.Carousel
                         Roundness = 10,
                     };
                     break;
+
+                case CarouselItemState.SelectedCollapsed:
+                    hoverLayer.InsetForBorder = true;
+
+                    BorderContainer.BorderThickness = border_thickness/1.5f;
+                    BorderContainer.EdgeEffect = new EdgeEffectParameters
+                    {
+                        Type = EdgeEffectType.Glow,
+                        Colour = new Color4(130, 204, 255, 150).Opacity(85),
+                        Radius = 15,
+                        Roundness = 10,
+                    };
+                    break;
             }
+            collapsedLayer.updateState(state);
         }
 
         public partial class HoverLayer : CompositeDrawable
@@ -144,6 +160,46 @@ namespace osu.Game.Screens.Select.Carousel
             {
                 box.FadeOut(1000, Easing.OutQuint);
                 base.OnHoverLost(e);
+            }
+        }
+
+        public partial class CollapsedLayer : CompositeDrawable
+        {
+            private Box box = null!;
+
+            public CollapsedLayer()
+            {
+                RelativeSizeAxes = Axes.Both;
+            }
+
+            [BackgroundDependencyLoader]
+            private void load()
+            {
+                BorderThickness = 0;
+                CornerRadius = 0;
+                Masking = false;
+
+                InternalChild = box = new Box
+                {
+                    Colour = Color4.Black.Opacity(40),
+                    Alpha = 0,
+                    RelativeSizeAxes = Axes.Both,
+                };
+            }
+
+            public void updateState(ValueChangedEvent<CarouselItemState> state)
+            {
+                switch (state.NewValue)
+                {
+                    case CarouselItemState.Selected:
+                    case CarouselItemState.NotSelected:
+                    case CarouselItemState.Collapsed:
+                        box.FadeOut(1000, Easing.OutQuint);
+                        break;
+                    case CarouselItemState.SelectedCollapsed:
+                        box.FadeIn(100, Easing.OutQuint);
+                        break;
+                }
             }
         }
 
