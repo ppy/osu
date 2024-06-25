@@ -101,12 +101,12 @@ namespace osu.Game.Rulesets.Scoring
         /// <summary>
         /// Using the minimum accuracy as the data source to calculate the minimum rank.
         /// </summary>
-        public readonly Bindable<ScoreRank> MinimumRank = new Bindable<ScoreRank>(ScoreRank.F);
+        public readonly Bindable<ScoreRank> MinimumRank = new Bindable<ScoreRank>(ScoreRank.X);
 
         /// <summary>
         /// Using the maximum accuracy as the data source to calculate the minimum rank.
         /// </summary>
-        public readonly Bindable<ScoreRank> MaximumRank = new Bindable<ScoreRank>(ScoreRank.XH);
+        public readonly Bindable<ScoreRank> MaximumRank = new Bindable<ScoreRank>(ScoreRank.X);
 
 
         /// <summary>
@@ -394,6 +394,20 @@ namespace osu.Game.Rulesets.Scoring
 
             rank.Value = RankFromScore(Accuracy.Value, ScoreResultCounts);
             MaximumRank.Value = RankFromScore(MaximumAccuracy.Value, ScoreResultCounts);
+            // Check if the misses are >= 1, when the misses are more then 1, it clamp max rank no more then A.
+            if (
+                !(rank.Value == ScoreRank.S ||
+                rank.Value == ScoreRank.SH ||
+                rank.Value == ScoreRank.X ||
+                rank.Value == ScoreRank.XH) &&
+                (MaximumRank.Value == ScoreRank.S ||
+                MaximumRank.Value == ScoreRank.SH ||
+                MaximumRank.Value == ScoreRank.X ||
+                MaximumRank.Value == ScoreRank.XH)
+            )
+            {
+                MaximumRank.Value = ScoreRank.A;
+            }
             MinimumRank.Value = RankFromScore(MinimumAccuracy.Value, ScoreResultCounts);
             foreach (var mod in Mods.Value.OfType<IApplicableToScoreProcessor>())
             {
