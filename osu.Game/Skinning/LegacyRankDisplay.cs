@@ -41,6 +41,8 @@ namespace osu.Game.Skinning
 
         protected override void LoadComplete()
         {
+            base.LoadComplete();
+
             RankDisplay.BindValueChanged(mode =>
             {
                 switch (mode.OldValue)
@@ -72,7 +74,7 @@ namespace osu.Game.Skinning
                         break;
                 }
             }, true);
-            //FinishTransforms(true);
+            FinishTransforms(true);
         }
 
         private void updateValue(ValueChangedEvent<Scoring.ScoreRank> v)
