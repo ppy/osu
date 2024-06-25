@@ -12,6 +12,7 @@ using osu.Game.Audio;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Extensions;
 using osu.Game.IO;
+using osu.Game.Rulesets;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Screens.Play.HUD.HitErrorMeters;
@@ -69,6 +70,24 @@ namespace osu.Game.Skinning
                 // Purple
                 new Color4(92, 0, 241, 255),
             };
+
+            if (skin.LayoutVersion < 20240625
+                && LayoutInfos.TryGetValue(SkinComponentsContainerLookup.TargetArea.MainHUDComponents, out var hudLayout)
+                && hudLayout.TryGetDrawableInfo(null, out var hudComponents))
+            {
+                var comboCounters = hudComponents.Where(h => h.Type.Name == nameof(ArgonComboCounter)).ToArray();
+
+                if (comboCounters.Any())
+                {
+                    hudLayout.Update(null, hudComponents.Except(comboCounters).ToArray());
+
+                    resources.RealmAccess.Run(r =>
+                    {
+                        foreach (var ruleset in r.All<RulesetInfo>())
+                            hudLayout.Update(ruleset, comboCounters);
+                    });
+                }
+            }
         }
 
         public override Texture? GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT) => Textures?.Get(componentName, wrapModeS, wrapModeT);
