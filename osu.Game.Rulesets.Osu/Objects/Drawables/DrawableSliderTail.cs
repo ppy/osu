@@ -132,7 +132,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         internal void SuppressHitAnimations()
         {
-            UpdateState(ArmedState.Idle);
+            UpdateState(ArmedState.Idle, true);
             UpdateComboColour();
 
             using (BeginAbsoluteSequence(StateUpdateTime - 5))

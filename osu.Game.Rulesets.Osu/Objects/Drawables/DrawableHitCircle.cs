@@ -325,13 +325,14 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         internal void SuppressHitAnimations()
         {
-            UpdateState(ArmedState.Idle);
+            UpdateState(ArmedState.Idle, true);
             UpdateComboColour();
 
             // This method is called every frame. If we need to, the following can likely be converted
             // to code which doesn't use transforms at all.
 
             // Matches stable (see https://github.com/peppy/osu-stable-reference/blob/bb57924c1552adbed11ee3d96cdcde47cf96f2b6/osu!/GameplayElements/HitObjects/Osu/HitCircleOsu.cs#L336-L338)
+
             using (BeginAbsoluteSequence(StateUpdateTime - 5))
                 this.TransformBindableTo(AccentColour, Color4.White, Math.Max(0, HitStateUpdateTime - StateUpdateTime));
 
