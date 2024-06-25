@@ -375,7 +375,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         internal void SuppressHitAnimations()
         {
-            UpdateState(ArmedState.Idle);
+            UpdateState(ArmedState.Idle, true);
             HeadCircle.SuppressHitAnimations();
             TailCircle.SuppressHitAnimations();
         }
