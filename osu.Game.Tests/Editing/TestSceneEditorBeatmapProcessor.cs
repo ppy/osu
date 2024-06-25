@@ -296,5 +296,109 @@ namespace osu.Game.Tests.Editing
                 Assert.That(beatmap.Breaks[0].EndTime, Is.EqualTo(8800));
             });
         }
+
+        [Test]
+        public void TestBreaksAtEndOfBeatmapAreRemoved()
+        {
+            var controlPoints = new ControlPointInfo();
+            controlPoints.Add(0, new TimingControlPoint { BeatLength = 500 });
+            var beatmap = new Beatmap
+            {
+                ControlPointInfo = controlPoints,
+                HitObjects =
+                {
+                    new HitCircle { StartTime = 1000 },
+                    new HitCircle { StartTime = 2000 },
+                },
+                Breaks =
+                {
+                    new BreakPeriod(10000, 15000),
+                }
+            };
+
+            var beatmapProcessor = new EditorBeatmapProcessor(beatmap, new OsuRuleset());
+            beatmapProcessor.PreProcess();
+            beatmapProcessor.PostProcess();
+
+            Assert.That(beatmap.Breaks, Is.Empty);
+        }
+
+        [Test]
+        public void TestManualBreaksAtEndOfBeatmapAreRemoved()
+        {
+            var controlPoints = new ControlPointInfo();
+            controlPoints.Add(0, new TimingControlPoint { BeatLength = 500 });
+            var beatmap = new Beatmap
+            {
+                ControlPointInfo = controlPoints,
+                HitObjects =
+                {
+                    new HitCircle { StartTime = 1000 },
+                    new HitCircle { StartTime = 2000 },
+                },
+                Breaks =
+                {
+                    new ManualBreakPeriod(10000, 15000),
+                }
+            };
+
+            var beatmapProcessor = new EditorBeatmapProcessor(beatmap, new OsuRuleset());
+            beatmapProcessor.PreProcess();
+            beatmapProcessor.PostProcess();
+
+            Assert.That(beatmap.Breaks, Is.Empty);
+        }
+
+        [Test]
+        public void TestBreaksAtStartOfBeatmapAreRemoved()
+        {
+            var controlPoints = new ControlPointInfo();
+            controlPoints.Add(0, new TimingControlPoint { BeatLength = 500 });
+            var beatmap = new Beatmap
+            {
+                ControlPointInfo = controlPoints,
+                HitObjects =
+                {
+                    new HitCircle { StartTime = 10000 },
+                    new HitCircle { StartTime = 11000 },
+                },
+                Breaks =
+                {
+                    new BreakPeriod(0, 9000),
+                }
+            };
+
+            var beatmapProcessor = new EditorBeatmapProcessor(beatmap, new OsuRuleset());
+            beatmapProcessor.PreProcess();
+            beatmapProcessor.PostProcess();
+
+            Assert.That(beatmap.Breaks, Is.Empty);
+        }
+
+        [Test]
+        public void TestManualBreaksAtStartOfBeatmapAreRemoved()
+        {
+            var controlPoints = new ControlPointInfo();
+            controlPoints.Add(0, new TimingControlPoint { BeatLength = 500 });
+            var beatmap = new Beatmap
+            {
+                ControlPointInfo = controlPoints,
+                HitObjects =
+                {
+                    new HitCircle { StartTime = 10000 },
+                    new HitCircle { StartTime = 11000 },
+                },
+                Breaks =
+                {
+                    new ManualBreakPeriod(0, 9000),
+                }
+            };
+
+            var beatmapProcessor = new EditorBeatmapProcessor(beatmap, new OsuRuleset());
+            beatmapProcessor.PreProcess();
+            beatmapProcessor.PostProcess();
+
+            Assert.That(beatmap.Breaks, Is.Empty);
+        }
     }
 }
