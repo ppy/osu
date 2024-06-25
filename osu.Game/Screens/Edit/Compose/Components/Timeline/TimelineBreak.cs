@@ -170,8 +170,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 changeHandler?.BeginChange();
                 updateState();
 
-                double min = beatmap.HitObjects.Last(ho => ho.GetEndTime() <= Break.Value.StartTime).GetEndTime();
-                double max = beatmap.HitObjects.First(ho => ho.StartTime >= Break.Value.EndTime).StartTime;
+                double min = beatmap.HitObjects.LastOrDefault(ho => ho.GetEndTime() <= Break.Value.StartTime)?.GetEndTime() ?? double.NegativeInfinity;
+                double max = beatmap.HitObjects.FirstOrDefault(ho => ho.StartTime >= Break.Value.EndTime)?.StartTime ?? double.PositiveInfinity;
 
                 if (isStartHandle)
                     max = Math.Min(max, Break.Value.EndTime - BreakPeriod.MIN_BREAK_DURATION);
