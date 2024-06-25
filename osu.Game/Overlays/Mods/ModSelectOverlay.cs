@@ -691,7 +691,7 @@ namespace osu.Game.Overlays.Mods
                 // wherein activating the binding will both change the contents of the search text box and deselect all mods.
                 case GlobalAction.DeselectAllMods:
                 {
-                    if (!SearchTextBox.HasFocus)
+                    if (!SearchTextBox.HasFocus && !customisationPanel.Expanded.Value)
                     {
                         deselectAllModsButton.TriggerClick();
                         return true;
@@ -761,6 +761,9 @@ namespace osu.Game.Overlays.Mods
         {
             if (e.Repeat || e.Key != Key.Tab)
                 return false;
+
+            if (customisationPanel.Expanded.Value)
+                return true;
 
             // TODO: should probably eventually support typical platform search shortcuts (`Ctrl-F`, `/`)
             setTextBoxFocus(!SearchTextBox.HasFocus);
