@@ -66,9 +66,9 @@ namespace osu.Game.Tests.Visual.DailyChallenge
         public void TestIntegration()
         {
             GridContainer grid = null!;
-            DailyChallengeCarousel carousel = null!;
             DailyChallengeEventFeed feed = null!;
             DailyChallengeScoreBreakdown breakdown = null!;
+
             AddStep("create content", () => Children = new Drawable[]
             {
                 new Box
@@ -90,7 +90,7 @@ namespace osu.Game.Tests.Visual.DailyChallenge
                     {
                         new Drawable[]
                         {
-                            carousel = new DailyChallengeCarousel
+                            new DailyChallengeCarousel
                             {
                                 RelativeSizeAxes = Axes.Both,
                                 Anchor = Anchor.Centre,
