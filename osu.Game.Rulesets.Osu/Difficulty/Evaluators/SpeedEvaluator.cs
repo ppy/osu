@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Objects;
@@ -33,33 +34,28 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             var osuNextObj = (OsuDifficultyHitObject?)current.Next(0);
 
             double strainTime = osuCurrObj.StrainTime;
-            double doubletapness = 1;
 
             // Nerf doubletappable doubles.
-            if (osuNextObj != null)
-            {
-                double currDeltaTime = Math.Max(1, osuCurrObj.DeltaTime);
-                double nextDeltaTime = Math.Max(1, osuNextObj.DeltaTime);
-                double deltaDifference = Math.Abs(nextDeltaTime - currDeltaTime);
+            double currDeltaTime = Math.Max(1, osuCurrObj.DeltaTime);
 
-                // It's easier to gallop if you have more time between doubles
-                double speedRatio = currDeltaTime / Math.Max(currDeltaTime, deltaDifference);
+            // It's easier to gallop if you have more time between doubles
+            // Get max between next and prev ratio to avoid nerfing triples
+            double speedRatio = Math.Max(getSpeedRatio(osuCurrObj, osuPrevObj), getSpeedRatio(osuCurrObj, osuNextObj));
 
-                // Can't doubletap if circles don't intersect
-                double normalizedDistance = Math.Min(1, osuCurrObj.LazyJumpDistance / (OsuDifficultyHitObject.NORMALISED_RADIUS * 2));
-                double distanceFactor = normalizedDistance < 0.5 ? 1.0 : 1 - Math.Pow((normalizedDistance - 0.5) / 0.5, 0.5);
+            // Can't doubletap if circles don't intersect
+            double normalizedDistance = Math.Min(1, osuCurrObj.LazyJumpDistance / (OsuDifficultyHitObject.NORMALISED_RADIUS * 2));
+            double distanceFactor = normalizedDistance < 0.5 ? 1.0 : 1 - Math.Pow((normalizedDistance - 0.5) / 0.5, 0.5);
 
-                // Use HitWindowGreat * 2, because even if you can't get 300 with doubletapping - you still can gallop
-                const double power = 2;
-                double windowRatio = Math.Pow(Math.Min(1, currDeltaTime / (osuCurrObj.HitWindowGreat * 2)), power);
+            // Use HitWindowGreat * 2, because even if you can't get 300 with doubletapping - you still can gallop
+            const double power = 2;
+            double windowRatio = Math.Pow(Math.Min(1, currDeltaTime / (osuCurrObj.HitWindowGreat * 2)), power);
 
-                // Nerf even more if you don't need to gallop anymore
-                double halfPoint = Math.Pow(0.5, power);
-                if (windowRatio < halfPoint)
-                    windowRatio *= windowRatio / halfPoint;
+            // Nerf even more if you don't need to gallop anymore
+            double halfPoint = Math.Pow(0.5, power);
+            if (windowRatio < halfPoint)
+                windowRatio *= windowRatio / halfPoint;
 
-                doubletapness = Math.Pow(speedRatio, distanceFactor * (1 - windowRatio));
-            }
+            double doubletapness = Math.Pow(speedRatio, distanceFactor * (1 - windowRatio));
 
             // Cap deltatime to the OD 300 hitwindow.
             // 0.93 is derived from making sure 260bpm OD8 streams aren't nerfed harshly, whilst 0.92 limits the effect of the cap.
@@ -75,6 +71,19 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             double distance = Math.Min(single_spacing_threshold, travelDistance + osuCurrObj.MinimumJumpDistance);
 
             return (speedBonus + speedBonus * Math.Pow(distance / single_spacing_threshold, 3.5)) * doubletapness / strainTime;
+        }
+
+        private static double getSpeedRatio(OsuDifficultyHitObject current, OsuDifficultyHitObject? other)
+        {
+            if (other.IsNull())
+                return 0;
+
+            double currDeltaTime = Math.Max(1, current.DeltaTime);
+            double otherDeltaTime = Math.Max(1, other.DeltaTime);
+
+            double deltaDifference = Math.Abs(currDeltaTime - otherDeltaTime);
+
+            return currDeltaTime / Math.Max(currDeltaTime, deltaDifference);
         }
     }
 }
