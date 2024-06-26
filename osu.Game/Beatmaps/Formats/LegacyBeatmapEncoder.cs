@@ -290,10 +290,10 @@ namespace osu.Game.Beatmaps.Formats
                         {
                             double nodeTime = hitObject.StartTime + i * spanDuration;
 
-                            if (hasNodeSamples.NodeSamples[i].Any())
+                            if (hasNodeSamples.NodeSamples[i].Count > 0)
                                 yield return createSampleControlPointFor(nodeTime, hasNodeSamples.NodeSamples[i]);
 
-                            if (spanDuration > LegacyBeatmapDecoder.CONTROL_POINT_LENIENCY + 1)
+                            if (spanDuration > LegacyBeatmapDecoder.CONTROL_POINT_LENIENCY + 1 && hitObject.Samples.Count > 0)
                                 yield return createSampleControlPointFor(nodeTime + LegacyBeatmapDecoder.CONTROL_POINT_LENIENCY + 1, hitObject.Samples);
                         }
                     }
