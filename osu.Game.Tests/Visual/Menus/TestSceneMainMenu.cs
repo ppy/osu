@@ -3,8 +3,6 @@
 
 using System.Linq;
 using NUnit.Framework;
-using NUnit.Framework.Internal;
-using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
 using osu.Game.Online.API.Requests.Responses;
