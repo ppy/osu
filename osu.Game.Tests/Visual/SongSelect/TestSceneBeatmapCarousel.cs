@@ -1252,11 +1252,11 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             AddStep("press escape", () => InputManager.PressKey(Key.Escape));
 
-            AddAssert("beatmap collapsed", () => selectedBeatmapCollapsed());
+            AddAssert("beatmap collapsed", () => selectedBeatmapCollapsed(1));
         }
 
         [Test]
-        public void TestCollapseFirstBeatmapSetWithMouseClick()
+        public void TestCollapseBeatmapSetWithMouseClick()
         {
             loadBeatmaps();
 
@@ -1270,12 +1270,12 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             AddStep("Click on a set", () =>
             {
-                InputManager.MoveMouseTo(set, new osuTK.Vector2(0,-DrawableCarouselBeatmapSet.MAX_HEIGHT));
+                InputManager.MoveMouseTo(set, new osuTK.Vector2(0, -DrawableCarouselBeatmapSet.MAX_HEIGHT));
 
                 InputManager.Click(MouseButton.Left);
             });
 
-            AddAssert("beatmap collapsed", () => selectedBeatmapCollapsed());
+            AddAssert("beatmap collapsed", () => selectedBeatmapCollapsed(2));
         }
 
         [Test]
@@ -1379,6 +1379,31 @@ namespace osu.Game.Tests.Visual.SongSelect
             });
 
             waitForSelection(1, 3);
+        }
+
+        [Test]
+        public void TestNavigateAfterCollapsing()
+        {
+            loadBeatmaps();
+
+            setSelected(2, 1);
+
+            AddStep("collapse with escape", () => InputManager.Key(Key.Escape));
+            AddStep("press arrow down", () => InputManager.Key(Key.Down));
+            AddAssert("beatmap collapsed", () => selectedBeatmapCollapsed(3));
+
+            AddStep("press enter", () => InputManager.Key(Key.Enter));
+
+            waitForSelection(3, 1);
+
+            AddStep("collapse with escape", () => InputManager.Key(Key.Escape));
+            AddStep("press arrow up", () => InputManager.Key(Key.Up));
+            AddStep("press arrow up", () => InputManager.Key(Key.Up));
+            AddAssert("beatmap collapsed", () => selectedBeatmapCollapsed(1));
+
+            AddStep("press enter", () => InputManager.Key(Key.Enter));
+
+            waitForSelection(1, 1);
         }
 
         private void loadBeatmaps(List<BeatmapSetInfo> beatmapSets = null, Func<FilterCriteria> initialCriteria = null, Action<BeatmapCarousel> carouselAdjust = null,
@@ -1517,11 +1542,9 @@ namespace osu.Game.Tests.Visual.SongSelect
             return currentlySelected.Item!.Visible;
         }
 
-        private bool selectedBeatmapCollapsed()
+        private bool selectedBeatmapCollapsed(int set)
         {
-            var currentlySelected = carousel.Items.FirstOrDefault(s => s.Item is CarouselBeatmapSet && s.Item.State.Value == CarouselItemState.SelectedCollapsed);
-
-            return !(currentlySelected == null);
+            return carousel.SelectedBeatmapSet.Equals(carousel.BeatmapSets.Skip(set - 1).First());
         }
 
         private void checkInvisibleDifficultiesUnselectable()

@@ -154,12 +154,7 @@ namespace osu.Game.Screens.Select.Carousel
         protected override bool OnClick(ClickEvent e)
         {
             Debug.Assert(Item != null);
-
-            if (Item.State.Value == CarouselItemState.Selected)
-                Item.State.Value = CarouselItemState.SelectedCollapsed;
-
-            else
-                Item.State.Value = CarouselItemState.Selected;
+            Item.State.Value = (Item.State.Value == CarouselItemState.Selected) ? CarouselItemState.SelectedCollapsed : CarouselItemState.Selected;
 
             return true;
         }
