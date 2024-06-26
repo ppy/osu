@@ -123,7 +123,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
         {
             public Action<NavigationDot>? Clicked { get; set; }
 
-            public BindableBool Active { get; set; } = new BindableBool();
+            public BindableBool Active { get; } = new BindableBool();
 
             private double progress;
 
