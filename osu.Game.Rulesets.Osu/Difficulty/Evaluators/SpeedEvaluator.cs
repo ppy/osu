@@ -41,9 +41,24 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 double currDeltaTime = Math.Max(1, osuCurrObj.DeltaTime);
                 double nextDeltaTime = Math.Max(1, osuNextObj.DeltaTime);
                 double deltaDifference = Math.Abs(nextDeltaTime - currDeltaTime);
+
+                // It's easier to gallop if you have more time between doubles
                 double speedRatio = currDeltaTime / Math.Max(currDeltaTime, deltaDifference);
-                double windowRatio = Math.Pow(Math.Min(1, currDeltaTime / osuCurrObj.HitWindowGreat), 2);
-                doubletapness = Math.Pow(speedRatio, 1 - windowRatio);
+
+                // Can't doubletap if circles don't intersect
+                double normalizedDistance = Math.Min(1, osuCurrObj.LazyJumpDistance / (OsuDifficultyHitObject.NORMALISED_RADIUS * 2));
+                double distanceFactor = normalizedDistance < 0.5 ? 1.0 : 1 - Math.Pow((normalizedDistance - 0.5) / 0.5, 0.5);
+
+                // Use HitWindowGreat * 2, because even if you can't get 300 with doubletapping - you still can gallop
+                const double power = 2;
+                double windowRatio = Math.Pow(Math.Min(1, currDeltaTime / (osuCurrObj.HitWindowGreat * 2)), power);
+
+                // Nerf even more if you don't need to gallop anymore
+                double halfPoint = Math.Pow(0.5, power);
+                if (windowRatio < halfPoint)
+                    windowRatio *= windowRatio / halfPoint;
+
+                doubletapness = Math.Pow(speedRatio, distanceFactor * (1 - windowRatio));
             }
 
             // Cap deltatime to the OD 300 hitwindow.
