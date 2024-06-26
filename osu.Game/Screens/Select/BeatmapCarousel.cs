@@ -1000,8 +1000,6 @@ namespace osu.Game.Screens.Select
             return set;
         }
 
-        private const float panel_padding = 5;
-
         /// <summary>
         /// Computes the target Y positions for every item in the carousel.
         /// </summary>
@@ -1023,10 +1021,18 @@ namespace osu.Game.Screens.Select
                 {
                     case CarouselBeatmapSet set:
                     {
+                        bool isSelected = item.State.Value == CarouselItemState.Selected;
+
+                        float padding = isSelected ? 5 : -5;
+
+                        if (isSelected)
+                            // double padding because we want to cancel the negative padding from the last item.
+                            currentY += padding * 2;
+
                         visibleItems.Add(set);
                         set.CarouselYPosition = currentY;
 
-                        if (item.State.Value == CarouselItemState.Selected)
+                        if (isSelected)
                         {
                             // scroll position at currentY makes the set panel appear at the very top of the carousel's screen space
                             // move down by half of visible height (height of the carousel's visible extent, including semi-transparent areas)
@@ -1048,7 +1054,7 @@ namespace osu.Game.Screens.Select
                             }
                         }
 
-                        currentY += set.TotalHeight + panel_padding;
+                        currentY += set.TotalHeight + padding;
                         break;
                     }
                 }
