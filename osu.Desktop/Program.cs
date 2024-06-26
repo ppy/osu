@@ -3,7 +3,6 @@
 
 using System;
 using System.IO;
-using System.Runtime.Versioning;
 using osu.Desktop.LegacyIpc;
 using osu.Desktop.Windows;
 using osu.Framework;
@@ -14,7 +13,7 @@ using osu.Game;
 using osu.Game.IPC;
 using osu.Game.Tournament;
 using SDL;
-using Squirrel;
+using Velopack;
 
 namespace osu.Desktop
 {
@@ -66,9 +65,9 @@ namespace osu.Desktop
                         return;
                     }
                 }
-
-                setupSquirrel();
             }
+
+            setupVelo();
 
             // NVIDIA profiles are based on the executable name of a process.
             // Lazer and stable share the same executable name.
@@ -177,32 +176,14 @@ namespace osu.Desktop
             return false;
         }
 
-        [SupportedOSPlatform("windows")]
-        private static void setupSquirrel()
+        private static void setupVelo()
         {
-            SquirrelAwareApp.HandleEvents(onInitialInstall: (_, tools) =>
-            {
-                tools.CreateShortcutForThisExe();
-                tools.CreateUninstallerRegistryEntry();
-                WindowsAssociationManager.InstallAssociations();
-            }, onAppUpdate: (_, tools) =>
-            {
-                tools.CreateUninstallerRegistryEntry();
-                WindowsAssociationManager.UpdateAssociations();
-            }, onAppUninstall: (_, tools) =>
-            {
-                tools.RemoveShortcutForThisExe();
-                tools.RemoveUninstallerRegistryEntry();
-                WindowsAssociationManager.UninstallAssociations();
-            }, onEveryRun: (_, _, _) =>
-            {
-                // While setting the `ProcessAppUserModelId` fixes duplicate icons/shortcuts on the taskbar, it currently
-                // causes the right-click context menu to function incorrectly.
-                //
-                // This may turn out to be non-required after an alternative solution is implemented.
-                // see https://github.com/clowd/Clowd.Squirrel/issues/24
-                // tools.SetProcessAppUserModelId();
-            });
+            VelopackApp
+                .Build()
+                .WithFirstRun(v =>
+                {
+                    if (OperatingSystem.IsWindows()) WindowsAssociationManager.InstallAssociations();
+                }).Run();
         }
     }
 }
