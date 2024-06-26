@@ -98,6 +98,16 @@ namespace osu.Game.Rulesets.Scoring
 
         private readonly Bindable<ScoreRank> rank = new Bindable<ScoreRank>(ScoreRank.X);
 
+        /// <remarks>
+        /// Using the minimum accuracy as the data source to calculate the minimum rank.
+        /// </remarks>
+        public readonly Bindable<ScoreRank> MinimumRank = new Bindable<ScoreRank>(ScoreRank.X);
+
+        /// <remarks>
+        /// Using the maximum accuracy as the data source to calculate the minimum rank.
+        /// </remarks>
+        public readonly Bindable<ScoreRank> MaximumRank = new Bindable<ScoreRank>(ScoreRank.X);
+
         /// <summary>
         /// The highest combo achieved by this score.
         /// </summary>
@@ -382,11 +392,28 @@ namespace osu.Game.Rulesets.Scoring
                 return;
 
             ScoreRank newRank = RankFromScore(Accuracy.Value, ScoreResultCounts);
+            ScoreRank newMaxRank = RankFromScore(MaximumAccuracy.Value, ScoreResultCounts);
+            ScoreRank newMinRank = RankFromScore(MinimumAccuracy.Value, ScoreResultCounts);
+
+            // Check if the misses are >= 1, when the misses are more then 1, it clamp max rank no more then A.
+            // Check Accuracy.Value >= accuracy_cutoff_s is for the reduce unnecessary assign causing the icon flicking
+            ScoreResultCounts.TryGetValue(HitResult.Miss, out int missesCount);
+            if (missesCount > 1 && Accuracy.Value >= accuracy_cutoff_s)
+                newMaxRank = ScoreRank.A;
+            // detect is 100% acc, so it earn SS or SS+ rank
+            else if (Accuracy.Value == 1.0d)
+                newMaxRank = newRank;
 
             foreach (var mod in Mods.Value.OfType<IApplicableToScoreProcessor>())
+            {
                 newRank = mod.AdjustRank(newRank, Accuracy.Value);
+                newMaxRank = mod.AdjustRank(newMaxRank, MaximumAccuracy.Value);
+                newMinRank = mod.AdjustRank(newMinRank, MinimumAccuracy.Value);
+            }
 
             rank.Value = newRank;
+            MaximumRank.Value = newMaxRank;
+            MinimumRank.Value = newMinRank;
         }
 
         protected virtual double ComputeTotalScore(double comboProgress, double accuracyProgress, double bonusPortion)
