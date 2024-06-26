@@ -20,6 +20,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Localisation;
 using osu.Game.Overlays;
+using osu.Game.Overlays.Mods;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Footer;
 using osu.Game.Screens.Play.HUD;
@@ -33,11 +34,8 @@ namespace osu.Game.Screens.SelectV2.Footer
     {
         // todo: see https://github.com/ppy/osu-framework/issues/3271
         private const float torus_scale_factor = 1.2f;
-        private const float bar_shear_width = 7f;
         private const float bar_height = 37f;
         private const float mod_display_portion = 0.65f;
-
-        private static readonly Vector2 bar_shear = new Vector2(bar_shear_width / bar_height, 0);
 
         private readonly BindableWithCurrent<IReadOnlyList<Mod>> current = new BindableWithCurrent<IReadOnlyList<Mod>>(Array.Empty<Mod>());
 
@@ -62,6 +60,11 @@ namespace osu.Game.Screens.SelectV2.Footer
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; } = null!;
 
+        public ScreenFooterButtonMods(ModSelectOverlay overlay)
+            : base(overlay)
+        {
+        }
+
         [BackgroundDependencyLoader]
         private void load()
         {
@@ -77,7 +80,7 @@ namespace osu.Game.Screens.SelectV2.Footer
                     Y = -5f,
                     Depth = float.MaxValue,
                     Origin = Anchor.BottomLeft,
-                    Shear = bar_shear,
+                    Shear = BUTTON_SHEAR,
                     CornerRadius = CORNER_RADIUS,
                     Size = new Vector2(BUTTON_WIDTH, bar_height),
                     Masking = true,
@@ -107,7 +110,7 @@ namespace osu.Game.Screens.SelectV2.Footer
                             {
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
-                                Shear = -bar_shear,
+                                Shear = -BUTTON_SHEAR,
                                 UseFullGlyphHeight = false,
                                 Font = OsuFont.Torus.With(size: 14 * torus_scale_factor, weight: FontWeight.Bold)
                             }
@@ -129,7 +132,7 @@ namespace osu.Game.Screens.SelectV2.Footer
                                 {
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
-                                    Shear = -bar_shear,
+                                    Shear = -BUTTON_SHEAR,
                                     Scale = new Vector2(0.6f),
                                     Current = { BindTarget = Current },
                                     ExpansionMode = ExpansionMode.AlwaysContracted,
@@ -138,7 +141,7 @@ namespace osu.Game.Screens.SelectV2.Footer
                                 {
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
-                                    Shear = -bar_shear,
+                                    Shear = -BUTTON_SHEAR,
                                     Font = OsuFont.Torus.With(size: 14 * torus_scale_factor, weight: FontWeight.Bold),
                                     Mods = { BindTarget = Current },
                                 }
@@ -304,7 +307,7 @@ namespace osu.Game.Screens.SelectV2.Footer
                 Y = -5f;
                 Depth = float.MaxValue;
                 Origin = Anchor.BottomLeft;
-                Shear = bar_shear;
+                Shear = BUTTON_SHEAR;
                 CornerRadius = CORNER_RADIUS;
                 AutoSizeAxes = Axes.X;
                 Height = bar_height;
@@ -328,7 +331,7 @@ namespace osu.Game.Screens.SelectV2.Footer
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
-                        Shear = -bar_shear,
+                        Shear = -BUTTON_SHEAR,
                         Text = ModSelectOverlayStrings.Unranked.ToUpper(),
                         Margin = new MarginPadding { Horizontal = 15 },
                         UseFullGlyphHeight = false,

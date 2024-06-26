@@ -1,11 +1,13 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
 using osu.Framework.Bindables;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Overlays;
 using osu.Game.Rulesets;
+using osu.Game.Screens.Footer;
 using osu.Game.Users;
 
 namespace osu.Game.Screens
@@ -19,9 +21,17 @@ namespace osu.Game.Screens
         bool DisallowExternalBeatmapRulesetChanges { get; }
 
         /// <summary>
-        /// Whether the user can exit this this <see cref="IOsuScreen"/> by pressing the back button.
+        /// Whether the user can exit this <see cref="IOsuScreen"/> by pressing the back button.
         /// </summary>
         bool AllowBackButton { get; }
+
+        /// <summary>
+        /// Whether a footer (and a back button) should be displayed underneath the screen.
+        /// </summary>
+        /// <remarks>
+        /// Temporarily, the back button is shown regardless of whether <see cref="AllowBackButton"/> is true.
+        /// </remarks>
+        bool ShowFooter { get; }
 
         /// <summary>
         /// Whether a top-level component should be allowed to exit the current screen to, for example,
@@ -62,6 +72,11 @@ namespace osu.Game.Screens
         Bindable<WorkingBeatmap> Beatmap { get; }
 
         Bindable<RulesetInfo> Ruleset { get; }
+
+        /// <summary>
+        /// A list of footer buttons to be added to the game footer, or empty to display no buttons.
+        /// </summary>
+        IReadOnlyList<ScreenFooterButton> CreateFooterButtons();
 
         /// <summary>
         /// Whether mod track adjustments should be applied on entering this screen.

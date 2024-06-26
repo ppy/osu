@@ -16,8 +16,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
 {
     public partial class RoomModSelectOverlay : UserModSelectOverlay
     {
-        [Resolved]
-        private IBindable<PlaylistItem> selectedItem { get; set; } = null!;
+        public Bindable<PlaylistItem> SelectedItem { get; } = new Bindable<PlaylistItem>();
 
         [Resolved]
         private RulesetStore rulesets { get; set; } = null!;
@@ -33,7 +32,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
         {
             base.LoadComplete();
 
-            selectedItem.BindValueChanged(v =>
+            SelectedItem.BindValueChanged(v =>
             {
                 roomRequiredMods.Clear();
 
