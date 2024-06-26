@@ -109,9 +109,9 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
             lastDisplayed = currentDisplay;
         }
 
-        private void onManualNavigation(NavigationDot obj)
+        private void onManualNavigation(NavigationDot dot)
         {
-            int index = navigationFlow.IndexOf(obj);
+            int index = navigationFlow.IndexOf(dot);
 
             if (index < 0)
                 return;
@@ -121,7 +121,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
 
         private partial class NavigationDot : CompositeDrawable
         {
-            public Action<NavigationDot>? Clicked { get; set; }
+            public required Action<NavigationDot> Clicked { get; init; }
 
             public BindableBool Active { get; } = new BindableBool();
 
@@ -222,7 +222,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
 
             protected override bool OnClick(ClickEvent e)
             {
-                Clicked?.Invoke(this);
+                Clicked(this);
 
                 hoverLayer.FadeTo(1)
                           .Then().FadeTo(IsHovered ? 0.2f : 0, 250, Easing.OutQuint);
