@@ -895,7 +895,6 @@ namespace osu.Game.Screens.Select
                     {
                         var panel = setPool.Get(p => p.Item = item);
 
-                        panel.Depth = item.CarouselYPosition;
                         panel.Y = item.CarouselYPosition;
 
                         Scroll.Add(panel);
@@ -915,6 +914,8 @@ namespace osu.Game.Screens.Select
                 {
                     bool isSelected = item.Item.State.Value == CarouselItemState.Selected;
 
+                    bool hasPassedSelection = item.Item.CarouselYPosition < selectedBeatmapSet?.CarouselYPosition;
+
                     // Cheap way of doing animations when entering / exiting song select.
                     const double half_time = 50;
                     const float panel_x_offset_when_inactive = 200;
@@ -929,6 +930,8 @@ namespace osu.Game.Screens.Select
                         item.Alpha = (float)Interpolation.DampContinuously(item.Alpha, 0, half_time, Clock.ElapsedFrameTime);
                         item.X = (float)Interpolation.DampContinuously(item.X, panel_x_offset_when_inactive, half_time, Clock.ElapsedFrameTime);
                     }
+
+                    Scroll.ChangeChildDepth(item, hasPassedSelection ? -item.Item.CarouselYPosition : item.Item.CarouselYPosition);
                 }
 
                 if (item is DrawableCarouselBeatmapSet set)
