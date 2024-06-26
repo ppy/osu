@@ -3,6 +3,8 @@
 
 using System.Linq;
 using NUnit.Framework;
+using NUnit.Framework.Internal;
+using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
 using osu.Game.Online.API.Requests.Responses;
@@ -20,6 +22,7 @@ namespace osu.Game.Tests.Visual.Menus
         {
             base.SetUpSteps();
             AddStep("don't fetch online content", () => onlineMenuBanner.FetchOnlineContent = false);
+            AddStep("disable return to top on idle", () => Game.ChildrenOfType<ButtonSystem>().Single().ReturnToTopOnIdle = false);
         }
 
         [Test]
