@@ -20,5 +20,11 @@ namespace osu.Game.Online.Metadata
         /// Delivers an update of the <see cref="UserPresence"/> of the user with the supplied <paramref name="userId"/>.
         /// </summary>
         Task UserPresenceUpdated(int userId, UserPresence? status);
+
+        /// <summary>
+        /// Delivers an update of the current "daily challenge" status.
+        /// Null value means there is no "daily challenge" currently active.
+        /// </summary>
+        Task DailyChallengeUpdated(DailyChallengeInfo? info);
     }
 }

@@ -148,6 +148,11 @@ namespace osu.Game.Online.Rooms
 
         // Only supports retrieval for now
         [Cached]
+        [JsonProperty("starts_at")]
+        public readonly Bindable<DateTimeOffset?> StartDate = new Bindable<DateTimeOffset?>();
+
+        // Only supports retrieval for now
+        [Cached]
         [JsonProperty("ends_at")]
         public readonly Bindable<DateTimeOffset?> EndDate = new Bindable<DateTimeOffset?>();
 

@@ -50,6 +50,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         private readonly Border border;
 
         private readonly Container colouredComponents;
+        private readonly Container sampleComponents;
         private readonly OsuSpriteText comboIndexText;
         private readonly SamplePointPiece samplePointPiece;
         private readonly DifficultyPointPiece? difficultyPointPiece;
@@ -107,7 +108,13 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 samplePointPiece = new SamplePointPiece(Item)
                 {
                     Anchor = Anchor.BottomLeft,
-                    Origin = Anchor.TopCentre
+                    Origin = Anchor.TopCentre,
+                    RelativePositionAxes = Axes.X,
+                    AlternativeColor = Item is IHasRepeats
+                },
+                sampleComponents = new Container
+                {
+                    RelativeSizeAxes = Axes.Both,
                 },
             });
 
@@ -236,6 +243,22 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                     X = (float)(i + 1) / (repeats.RepeatCount + 1)
                 });
             }
+
+            // Add node sample pieces
+            sampleComponents.Clear();
+
+            for (int i = 0; i < repeats.RepeatCount + 2; i++)
+            {
+                sampleComponents.Add(new NodeSamplePointPiece(Item, i)
+                {
+                    X = (float)i / (repeats.RepeatCount + 1),
+                    RelativePositionAxes = Axes.X,
+                    Anchor = Anchor.BottomLeft,
+                    Origin = Anchor.TopCentre
+                });
+            }
+
+            samplePointPiece.X = 1f / (repeats.RepeatCount + 1) / 2;
         }
 
         protected override bool ShouldBeConsideredForInput(Drawable child) => true;

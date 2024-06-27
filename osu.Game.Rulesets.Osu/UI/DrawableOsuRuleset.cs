@@ -13,6 +13,7 @@ using osu.Game.Replays;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Configuration;
+using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Replays;
 using osu.Game.Rulesets.UI;
@@ -45,7 +46,13 @@ namespace osu.Game.Rulesets.Osu.UI
 
         public override PlayfieldAdjustmentContainer CreatePlayfieldAdjustmentContainer() => new OsuPlayfieldAdjustmentContainer { AlignWithStoryboard = true };
 
-        protected override ResumeOverlay CreateResumeOverlay() => new OsuResumeOverlay();
+        protected override ResumeOverlay CreateResumeOverlay()
+        {
+            if (Mods.Any(m => m is OsuModAutopilot))
+                return new DelayedResumeOverlay { Scale = new Vector2(0.65f) };
+
+            return new OsuResumeOverlay();
+        }
 
         protected override ReplayInputHandler CreateReplayInputHandler(Replay replay) => new OsuFramedReplayInputHandler(replay);
 
