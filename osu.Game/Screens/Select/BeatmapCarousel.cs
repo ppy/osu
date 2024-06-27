@@ -541,7 +541,6 @@ namespace osu.Game.Screens.Select
 
                 wasSelectedCollapsed = false;
 
-
                 // if we got here and the set is filtered, it means we were bypassing filters.
                 // in this case, reapplying the filter is necessary to ensure the panel is in the correct place
                 // (since it is forcefully being included in the carousel).
@@ -1063,7 +1062,6 @@ namespace osu.Game.Screens.Select
             {
                 c.State.ValueChanged += state =>
                 {
-
                     if (state.NewValue == CarouselItemState.Selected)
                     {
                         selectedBeatmapSet = set;

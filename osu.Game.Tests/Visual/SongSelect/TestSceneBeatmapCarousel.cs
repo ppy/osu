@@ -1291,9 +1291,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddStep("press escape", () => InputManager.Key(Key.Escape));
             AddStep("press enter", () => InputManager.Key(Key.Enter));
 
-
             waitForSelection(2, 1);
-
         }
 
         [Test]
