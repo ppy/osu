@@ -130,7 +130,7 @@ namespace osu.Game.Rulesets.Mania.UI
             }, true);
         }
 
-        private void onDirectionChanged(ValueChangedEvent<ScrollingDirection> direction)
+        public void onDirectionChanged(ValueChangedEvent<ScrollingDirection> direction)
         {
             if (direction.NewValue == ScrollingDirection.Up)
             {

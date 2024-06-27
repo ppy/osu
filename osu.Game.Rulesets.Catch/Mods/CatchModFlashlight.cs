@@ -36,7 +36,7 @@ namespace osu.Game.Rulesets.Catch.Mods
             base.ApplyToDrawableRuleset(drawableRuleset);
         }
 
-        private partial class CatchFlashlight : Flashlight
+        public partial class CatchFlashlight : Flashlight
         {
             private readonly CatchPlayfield playfield;
 
@@ -74,4 +74,6 @@ namespace osu.Game.Rulesets.Catch.Mods
             protected override string FragmentShader => "CircularFlashlight";
         }
     }
+
+
 }

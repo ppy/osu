@@ -20,12 +20,13 @@ namespace osu.Game.Graphics.Backgrounds
     /// </summary>
     public partial class Background : CompositeDrawable, IEquatable<Background>
     {
-        public readonly Sprite Sprite;
+        //public readonly Sprite Sprite;
 
         private readonly string textureName;
 
         private BufferedContainer bufferedContainer;
 
+        public Sprite Sprite;
         public Background(string textureName = @"")
         {
             this.textureName = textureName;
@@ -120,5 +121,6 @@ namespace osu.Game.Graphics.Backgrounds
             return other.GetType() == GetType()
                    && other.textureName == textureName;
         }
+
     }
 }

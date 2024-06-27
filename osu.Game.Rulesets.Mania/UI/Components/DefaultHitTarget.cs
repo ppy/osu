@@ -36,7 +36,7 @@ namespace osu.Game.Rulesets.Mania.UI.Components
         }
 
         [BackgroundDependencyLoader]
-        private void load(IScrollingInfo scrollingInfo)
+        public void load(IScrollingInfo scrollingInfo)
         {
             InternalChildren = new[]
             {
@@ -71,7 +71,7 @@ namespace osu.Game.Rulesets.Mania.UI.Components
             direction.BindValueChanged(onDirectionChanged, true);
         }
 
-        private void onDirectionChanged(ValueChangedEvent<ScrollingDirection> direction)
+        public void onDirectionChanged(ValueChangedEvent<ScrollingDirection> direction)
         {
             if (direction.NewValue == ScrollingDirection.Up)
             {

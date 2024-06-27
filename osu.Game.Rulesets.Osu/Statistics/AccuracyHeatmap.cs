@@ -49,7 +49,7 @@ namespace osu.Game.Rulesets.Osu.Statistics
         /// <summary>
         /// The highest count of any point currently being displayed.
         /// </summary>
-        protected float PeakValue { get; private set; }
+        public float PeakValue { get; private set; }
 
         public AccuracyHeatmap(ScoreInfo score, IBeatmap playableBeatmap)
         {
@@ -227,32 +227,19 @@ namespace osu.Game.Rulesets.Osu.Statistics
             }
         }
 
-        protected void AddPoint(Vector2 start, Vector2 end, Vector2 hitPoint, float radius)
+        public void AddPoint(Vector2 start, Vector2 end, Vector2 hitPoint, float radius)
         {
             if (pointGrid.Content.Count == 0)
+            {
+                Debug.WriteLine("Branch hit: pointGrid.Content.Count == 0");
                 return;
+            }
 
-            double angle1 = Math.Atan2(end.Y - hitPoint.Y, hitPoint.X - end.X); // Angle between the end point and the hit point.
-            double angle2 = Math.Atan2(end.Y - start.Y, start.X - end.X); // Angle between the end point and the start point.
-            double finalAngle = angle2 - angle1; // Angle between start, end, and hit points.
+            double angle1 = Math.Atan2(end.Y - hitPoint.Y, hitPoint.X - end.X);
+            double angle2 = Math.Atan2(end.Y - start.Y, start.X - end.X);
+            double finalAngle = angle2 - angle1;
             float normalisedDistance = Vector2.Distance(hitPoint, end) / radius;
 
-            // Consider two objects placed horizontally, with the start on the left and the end on the right.
-            // The above calculated the angle between {end, start}, and the angle between {end, hitPoint}, in the form:
-            //             +pi | 0
-            //     O --------- O ----->      Note: Math.Atan2 has a range (-pi <= theta <= +pi)
-            //             -pi | 0
-            // E.g. If the hit point was directly above end, it would have an angle pi/2.
-            //
-            // It also calculated the angle separating hitPoint from the line joining {start, end}, that is anti-clockwise in the form:
-            //               0 | pi
-            //     O --------- O ----->
-            //             2pi | pi
-            //
-            // However keep in mind that cos(0)=1 and cos(2pi)=1, whereas we actually want these values to appear on the left, so the x-coordinate needs to be inverted.
-            // Likewise sin(pi/2)=1 and sin(3pi/2)=-1, whereas we actually want these values to appear on the bottom/top respectively, so the y-coordinate also needs to be inverted.
-            //
-            // We also need to apply the anti-clockwise rotation.
             double rotatedAngle = finalAngle - float.DegreesToRadians(rotation);
             var rotatedCoordinate = -1 * new Vector2((float)Math.Cos(rotatedAngle), (float)Math.Sin(rotatedAngle));
 
@@ -260,17 +247,22 @@ namespace osu.Game.Rulesets.Osu.Statistics
             float localRadius = localCentre.X * inner_portion * normalisedDistance;
             Vector2 localPoint = localCentre + localRadius * rotatedCoordinate;
 
-            // Find the most relevant hit point.
             int r = (int)Math.Round(localPoint.Y);
             int c = (int)Math.Round(localPoint.X);
 
             if (r < 0 || r >= points_per_dimension || c < 0 || c >= points_per_dimension)
+            {
+                Debug.WriteLine($"Branch hit: Out of bounds - r: {r}, c: {c}");
                 return;
+            }
 
-            PeakValue = Math.Max(PeakValue, ((GridPoint)pointGrid.Content[r][c]).Increment());
+            PeakValue = Math.Max((float)PeakValue, ((GridPoint)pointGrid.Content[r][c]).Increment());
 
             bufferedGrid.ForceRedraw();
+            Debug.WriteLine($"Branch hit: Point added - r: {r}, c: {c}");
         }
+
+        public decimal PpeakValue { get; }
 
         private abstract partial class GridPoint : CompositeDrawable
         {

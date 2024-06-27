@@ -29,8 +29,8 @@ namespace osu.Game.Rulesets.Osu.Edit
         private RadioButton playfieldCentreButton = null!;
         private RadioButton selectionCentreButton = null!;
 
-        private OsuCheckbox xCheckBox = null!;
-        private OsuCheckbox yCheckBox = null!;
+        public OsuCheckbox xCheckBox = null!;
+        public OsuCheckbox yCheckBox = null!;
 
         public PreciseScalePopover(OsuSelectionScaleHandler scaleHandler)
         {
@@ -40,7 +40,7 @@ namespace osu.Game.Rulesets.Osu.Edit
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        public void load(object unknown)
         {
             Child = new FillFlowContainer
             {
@@ -133,7 +133,7 @@ namespace osu.Game.Rulesets.Osu.Edit
             });
         }
 
-        private void updateAxisCheckBoxesEnabled()
+        public void updateAxisCheckBoxesEnabled()
         {
             if (scaleInfo.Value.Origin == ScaleOrigin.PlayfieldCentre)
             {
