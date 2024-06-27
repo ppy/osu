@@ -11,6 +11,7 @@ using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Online.Metadata;
 using osu.Game.Overlays;
 using osu.Game.Scoring;
 using osuTK;
@@ -21,7 +22,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
     {
         private FillFlowContainer<Bar> barsContainer = null!;
 
-        private const int bin_count = 13;
+        private const int bin_count = MultiplayerPlaylistItemStats.TOTAL_SCORE_DISTRIBUTION_BINS;
         private long[] bins = new long[bin_count];
 
         [BackgroundDependencyLoader]
