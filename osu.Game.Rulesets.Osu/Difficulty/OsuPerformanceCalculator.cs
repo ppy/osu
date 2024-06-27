@@ -59,7 +59,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             bool isLegacy = !score.MaximumStatistics.ContainsKey(HitResult.LargeTickMiss);
 
             // Make stable scores always CL
-            usingSliderAccuracy &= !isLegacy;
+            if (isLegacy) usingSliderAccuracy = false;
 
             if (usingSliderAccuracy)
             {
