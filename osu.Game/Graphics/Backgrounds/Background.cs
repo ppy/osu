@@ -112,13 +112,46 @@ namespace osu.Game.Graphics.Backgrounds
             return MathF.Round(scale / 0.2f, MidpointRounding.AwayFromZero) * 0.2f;
         }
 
+        // Initialize coverage tracking variables
+        private static bool equalsReferenceEqualsNull = false;
+        private static bool equalsReferenceEqualsThis = false;
+        private static bool equalsTypeCheck = false;
+        private static bool equalsTextureNameCheck = false;
+
         public virtual bool Equals(Background other)
         {
-            if (ReferenceEquals(null, other)) return false;
-            if (ReferenceEquals(this, other)) return true;
+            if (ReferenceEquals(null, other))
+            {
+                equalsReferenceEqualsNull = true;
+                return false;
+            }
+            else
+            {
+                equalsReferenceEqualsNull = false;
+            }
 
-            return other.GetType() == GetType()
-                   && other.textureName == textureName;
+            if (ReferenceEquals(this, other))
+            {
+                equalsReferenceEqualsThis = true;
+                return true;
+            }
+            else
+            {
+                equalsReferenceEqualsThis = false;
+            }
+
+            equalsTypeCheck = true;
+            equalsTextureNameCheck = true;
+            PrintCoverage();
+            return other.GetType() == GetType() && other.textureName == textureName;
+        }
+
+        public static void PrintCoverage()
+        {
+            Console.WriteLine("F1Br1D was {0}", equalsReferenceEqualsNull ? "hit" : "not hit");
+            Console.WriteLine("F1Br2D was {0}", equalsReferenceEqualsThis ? "hit" : "not hit");
+            Console.WriteLine("F1Br3D was {0}", equalsTypeCheck ? "hit" : "not hit");
+            Console.WriteLine("F1Br4D was {0}", equalsTextureNameCheck ? "hit" : "not hit");
         }
     }
 }
