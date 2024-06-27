@@ -48,15 +48,20 @@ namespace osu.Game.Screens.Edit
                 }
             }
 
+            double currentMaxEndTime = double.MinValue;
+
             for (int i = 1; i < Beatmap.HitObjects.Count; ++i)
             {
-                double previousObjectEndTime = Beatmap.HitObjects[i - 1].GetEndTime();
+                // Keep track of the maximum end time encountered thus far.
+                // This handles cases like osu!mania's hold notes, which could have concurrent other objects after their start time.
+                currentMaxEndTime = Math.Max(currentMaxEndTime, Beatmap.HitObjects[i - 1].GetEndTime());
+
                 double nextObjectStartTime = Beatmap.HitObjects[i].StartTime;
 
-                if (nextObjectStartTime - previousObjectEndTime < BreakPeriod.MIN_GAP_DURATION)
+                if (nextObjectStartTime - currentMaxEndTime < BreakPeriod.MIN_GAP_DURATION)
                     continue;
 
-                double breakStartTime = previousObjectEndTime + BreakPeriod.GAP_BEFORE_BREAK;
+                double breakStartTime = currentMaxEndTime + BreakPeriod.GAP_BEFORE_BREAK;
                 double breakEndTime = nextObjectStartTime - Math.Max(BreakPeriod.GAP_AFTER_BREAK, Beatmap.ControlPointInfo.TimingPointAt(nextObjectStartTime).BeatLength * 2);
 
                 if (breakEndTime - breakStartTime < BreakPeriod.MIN_BREAK_DURATION)
