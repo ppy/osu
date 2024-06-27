@@ -51,6 +51,8 @@ namespace osu.Game.Rulesets.Osu.Edit
 
         private readonly Bindable<TernaryState> rectangularGridSnapToggle = new Bindable<TernaryState>();
 
+        protected override Drawable CreateHitObjectInspector() => new OsuHitObjectInspector();
+
         protected override IEnumerable<TernaryButton> CreateTernaryButtons()
             => base.CreateTernaryButtons()
                    .Concat(DistanceSnapProvider.CreateTernaryButtons())
@@ -101,7 +103,7 @@ namespace osu.Game.Rulesets.Osu.Edit
 
             updatePositionSnapGrid();
 
-            RightToolbox.AddRange(new EditorToolboxGroup[]
+            RightToolbox.AddRange(new Drawable[]
                 {
                     OsuGridToolboxGroup,
                     new TransformToolboxGroup
