@@ -102,7 +102,7 @@ namespace osu.Game.Rulesets.Osu.Edit
             updatePositionSnapGrid();
 
             RightToolbox.Clear();
-            RightToolbox.AddRange(new EditorToolboxGroup[]
+            RightToolbox.AddRange(new[]
                 {
                     new EditorToolboxGroup("inspector")
                     {
