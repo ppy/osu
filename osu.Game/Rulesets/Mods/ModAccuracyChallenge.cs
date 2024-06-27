@@ -80,8 +80,8 @@ namespace osu.Game.Rulesets.Mods
             {
                 if (ReplaceHealth.Value)
                 {
-                    var accuracyRange = 1 - MinimumAccuracy.Value;
-                    var accuracyMargin = s.NewValue - MinimumAccuracy.Value;
+                    double accuracyRange = 1 - MinimumAccuracy.Value;
+                    double accuracyMargin = s.NewValue - MinimumAccuracy.Value;
                     healthProcessor.Health.Value = accuracyMargin / accuracyRange + Precision.DOUBLE_EPSILON; // Precision.AlmostEquals will be used, so need to add margin.
                 }
 
