@@ -101,8 +101,13 @@ namespace osu.Game.Rulesets.Osu.Edit
 
             updatePositionSnapGrid();
 
+            RightToolbox.Clear();
             RightToolbox.AddRange(new EditorToolboxGroup[]
                 {
+                    new EditorToolboxGroup("inspector")
+                    {
+                        Child = new OsuHitObjectInspector(),
+                    },
                     OsuGridToolboxGroup,
                     new TransformToolboxGroup
                     {
