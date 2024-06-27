@@ -322,6 +322,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             int okCountCircles = Math.Min(countOk, accuracyObjectCount - missCountCircles - mehCountCircles);
             int greatCountCircles = Math.Max(0, accuracyObjectCount - missCountCircles - mehCountCircles - okCountCircles);
 
+            if (greatCountCircles + okCountCircles + mehCountCircles <= 0)
+                return double.PositiveInfinity;
+
             // Assume 100s, 50s, and misses happen on circles. If there are less non-300s on circles than 300s,
             // compute the deviation on circles.
             if (usingSliderAccuracy || greatCountCircles > 0)
@@ -421,41 +424,39 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 relevantCountMiss *= mistapsMultiplier;
             }
 
-            if (relevantCountMiss < speedNoteCount)
-            {
-                double n = Math.Max(1, speedNoteCount - relevantCountMiss - relevantCountMeh);
-                const double z = 2.32634787404; // 99% critical value for the normal distribution (one-tailed).
+            if (relevantCountGreat + relevantCountOk + relevantCountMeh <= 0)
+                return double.PositiveInfinity;
 
-                // Proportion of greats hit on circles, ignoring misses and 50s.
-                double p = relevantCountGreat / n;
+            double n = Math.Max(1, speedNoteCount - relevantCountMiss - relevantCountMeh);
+            const double z = 2.32634787404; // 99% critical value for the normal distribution (one-tailed).
 
-                // We can be 99% confident that p is at least this value.
-                double pLowerBound = (n * p + z * z / 2) / (n + z * z) - z / (n + z * z) * Math.Sqrt(n * p * (1 - p) + z * z / 4);
+            // Proportion of greats hit on circles, ignoring misses and 50s.
+            double p = relevantCountGreat / n;
 
-                // Compute the deviation assuming 300s and 100s are normally distributed, and 50s are uniformly distributed.
-                // Begin with 300s and 100s first. Ignoring 50s, we can be 99% confident that the deviation is not higher than:
-                double estimatedDeviation = hitWindow300 / (Math.Sqrt(2) * SpecialFunctions.ErfInv(pLowerBound));
+            // We can be 99% confident that p is at least this value.
+            double pLowerBound = (n * p + z * z / 2) / (n + z * z) - z / (n + z * z) * Math.Sqrt(n * p * (1 - p) + z * z / 4);
 
-                double randomValue = Math.Sqrt(2 / Math.PI) * hitWindow100 * Math.Exp(-0.5 * Math.Pow(hitWindow100 / estimatedDeviation, 2))
-                    / (estimatedDeviation * SpecialFunctions.Erf(hitWindow100 / (Math.Sqrt(2) * estimatedDeviation)));
+            // Compute the deviation assuming 300s and 100s are normally distributed, and 50s are uniformly distributed.
+            // Begin with 300s and 100s first. Ignoring 50s, we can be 99% confident that the deviation is not higher than:
+            double estimatedDeviation = hitWindow300 / (Math.Sqrt(2) * SpecialFunctions.ErfInv(pLowerBound));
 
-                estimatedDeviation *= Math.Sqrt(1 - randomValue);
+            double randomValue = Math.Sqrt(2 / Math.PI) * hitWindow100 * Math.Exp(-0.5 * Math.Pow(hitWindow100 / estimatedDeviation, 2))
+                / (estimatedDeviation * SpecialFunctions.Erf(hitWindow100 / (Math.Sqrt(2) * estimatedDeviation)));
 
-                // If precision is not enough - use limit value
-                if (pLowerBound == 0 || randomValue >= 1)
-                    estimatedDeviation = hitWindow100 / Math.Sqrt(3);
+            estimatedDeviation *= Math.Sqrt(1 - randomValue);
 
-                // Then compute the variance for 50s.
-                double mehVariance = (hitWindow50 * hitWindow50 + hitWindow100 * hitWindow50 + hitWindow100 * hitWindow100) / 3;
+            // If precision is not enough - use limit value
+            if (pLowerBound == 0 || randomValue >= 1)
+                estimatedDeviation = hitWindow100 / Math.Sqrt(3);
 
-                // Find the total deviation.
-                estimatedDeviation = Math.Sqrt(((relevantCountGreat + relevantCountOk) * Math.Pow(estimatedDeviation, 2) + relevantCountMeh * mehVariance) / (relevantCountGreat + relevantCountOk + relevantCountMeh));
+            // Then compute the variance for 50s.
+            double mehVariance = (hitWindow50 * hitWindow50 + hitWindow100 * hitWindow50 + hitWindow100 * hitWindow100) / 3;
 
-                // Adjust by 0.9 to account for the fact that it's higher bound UR value
-                return estimatedDeviation * 0.9;
-            }
+            // Find the total deviation.
+            estimatedDeviation = Math.Sqrt(((relevantCountGreat + relevantCountOk) * Math.Pow(estimatedDeviation, 2) + relevantCountMeh * mehVariance) / (relevantCountGreat + relevantCountOk + relevantCountMeh));
 
-            return double.PositiveInfinity;
+            // Adjust by 0.9 to account for the fact that it's higher bound UR value
+            return estimatedDeviation * 0.9;
         }
 
         // https://www.desmos.com/calculator/no1pv5gv5g
