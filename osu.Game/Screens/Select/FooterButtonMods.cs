@@ -59,8 +59,8 @@ namespace osu.Game.Screens.Select
         {
             SelectedColour = colours.Yellow;
             DeselectedColour = SelectedColour.Opacity(0.5f);
-            lowMultiplierColour = colours.Red;
-            highMultiplierColour = colours.Green;
+            lowMultiplierColour = colours.Green;
+            highMultiplierColour = colours.Red;
             Text = @"mods";
             Hotkey = GlobalAction.ToggleModSelection;
 
