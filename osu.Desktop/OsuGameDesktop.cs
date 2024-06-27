@@ -114,7 +114,7 @@ namespace osu.Desktop
                     UseShellExecute = true
                 };
                 Process.Start(startInfo);
-                Environment.Exit(0);
+                base.AttemptExit();
                 return true;
             }
             catch (Exception e)
