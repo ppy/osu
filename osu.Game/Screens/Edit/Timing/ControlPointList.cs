@@ -85,8 +85,6 @@ namespace osu.Game.Screens.Edit.Timing
                     ? "+ Clone to current time"
                     : "+ Add at current time";
             }, true);
-
-            //table.OnRowSelected += drawable => scroll.ScrollIntoView(drawable);
         }
 
         protected override bool OnClick(ClickEvent e)
