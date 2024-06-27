@@ -5,6 +5,8 @@ using NUnit.Framework;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Beatmaps.Timing;
+using osu.Game.Rulesets.Mania;
+using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Screens.Edit;
@@ -72,6 +74,50 @@ namespace osu.Game.Tests.Editing
             beatmapProcessor.PostProcess();
 
             Assert.That(beatmap.Breaks, Is.Empty);
+        }
+
+        [Test]
+        public void TestHoldNote()
+        {
+            var controlPoints = new ControlPointInfo();
+            controlPoints.Add(0, new TimingControlPoint { BeatLength = 500 });
+            var beatmap = new Beatmap
+            {
+                ControlPointInfo = controlPoints,
+                HitObjects =
+                {
+                    new HoldNote { StartTime = 1000, Duration = 10000 },
+                }
+            };
+
+            var beatmapProcessor = new EditorBeatmapProcessor(beatmap, new ManiaRuleset());
+            beatmapProcessor.PreProcess();
+            beatmapProcessor.PostProcess();
+
+            Assert.That(beatmap.Breaks, Has.Count.EqualTo(0));
+        }
+
+        [Test]
+        public void TestHoldNoteWithOverlappingNote()
+        {
+            var controlPoints = new ControlPointInfo();
+            controlPoints.Add(0, new TimingControlPoint { BeatLength = 500 });
+            var beatmap = new Beatmap
+            {
+                ControlPointInfo = controlPoints,
+                HitObjects =
+                {
+                    new HoldNote { StartTime = 1000, Duration = 10000 },
+                    new Note { StartTime = 2000 },
+                    new Note { StartTime = 12000 },
+                }
+            };
+
+            var beatmapProcessor = new EditorBeatmapProcessor(beatmap, new ManiaRuleset());
+            beatmapProcessor.PreProcess();
+            beatmapProcessor.PostProcess();
+
+            Assert.That(beatmap.Breaks, Has.Count.EqualTo(0));
         }
 
         [Test]
