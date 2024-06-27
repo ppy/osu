@@ -6,6 +6,7 @@ using System.Globalization;
 using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Localisation;
+using osu.Framework.Utils;
 using osu.Game.Configuration;
 using osu.Game.Localisation.HUD;
 using osu.Game.Overlays.Settings;
@@ -81,7 +82,7 @@ namespace osu.Game.Rulesets.Mods
                 {
                     var accuracyRange = 1 - MinimumAccuracy.Value;
                     var accuracyMargin = s.NewValue - MinimumAccuracy.Value;
-                    healthProcessor.Health.Value = accuracyMargin / accuracyRange;
+                    healthProcessor.Health.Value = accuracyMargin / accuracyRange + Precision.DOUBLE_EPSILON; // Precision.AlmostEquals will be used, so need to add margin.
                 }
 
                 if (s.NewValue < MinimumAccuracy.Value)
