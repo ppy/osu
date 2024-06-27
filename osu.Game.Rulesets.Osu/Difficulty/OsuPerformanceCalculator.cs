@@ -100,11 +100,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             hitWindow100 = (140 - 8 * ((80 - hitWindow300 * clockRate) / 6)) / clockRate;
             hitWindow50 = (200 - 10 * ((80 - hitWindow300 * clockRate) / 6)) / clockRate;
 
-            deviation = calculateDeviation(score, osuAttributes);
-            speedDeviation = calculateSpeedDeviation(score, osuAttributes);
-
             // Bonus for low AR to account for the fact that it's more difficult to get low UR on low AR
             deviationARadjust = 0.475 + 0.7 / (1.0 + Math.Pow(1.73, 7.9 - osuAttributes.ApproachRate));
+
+            deviation = calculateDeviation(score, osuAttributes) * deviationARadjust;
+            speedDeviation = calculateSpeedDeviation(score, osuAttributes) * deviationARadjust;
 
             double aimValue = computeAimValue(score, osuAttributes);
             double speedValue = computeSpeedValue(score, osuAttributes);
@@ -125,8 +125,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 Accuracy = accuracyValue,
                 Flashlight = flashlightValue,
                 EffectiveMissCount = effectiveMissCount,
-                Deviation = deviation,
-                SpeedDeviation = speedDeviation,
+                Deviation = deviation / deviationARadjust,
+                SpeedDeviation = speedDeviation / deviationARadjust,
                 Total = totalValue
             };
         }
@@ -181,7 +181,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             }
 
             // Scale the aim value with  deviation
-            aimValue *= SpecialFunctions.Erf(30 / (Math.Sqrt(2) * deviation * deviationARadjust));
+            aimValue *= SpecialFunctions.Erf(30 / (Math.Sqrt(2) * deviation));
             aimValue *= 0.98 + Math.Pow(100.0 / 9, 2) / 2500; // OD 11 SS stays the same.
 
             return aimValue;
@@ -195,7 +195,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double speedValue = Math.Pow(5.0 * Math.Max(1.0, attributes.SpeedDifficulty / 0.0675) - 4.0, 3.0) / 100000.0;
 
             // Rake tapping nerf
-            speedValue = adjustSpeedWithUR(speedValue, speedDeviation);
+            speedValue = adjustSpeedWithUR(speedValue, speedDeviation / deviationARadjust);
 
             double lengthBonus = 0.95 + 0.4 * Math.Min(1.0, totalHits / 2000.0) +
                                  (totalHits > 2000 ? Math.Log10(totalHits / 2000.0) * 0.5 : 0.0);
@@ -225,7 +225,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             }
 
             // Scale the speed value with speed deviation
-            speedValue *= SpecialFunctions.Erf(20 / (Math.Sqrt(2) * speedDeviation * deviationARadjust));
+            speedValue *= SpecialFunctions.Erf(20 / (Math.Sqrt(2) * speedDeviation));
             speedValue *= 0.95 + Math.Pow(100.0 / 9, 2) / 750; // OD 11 SS stays the same.
 
             return speedValue;
@@ -246,7 +246,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double scaling = Math.Sqrt(2) * Math.Log(1.52163) * SpecialFunctions.ErfInv(1 / (1 + 1 / Math.Min(amountHitObjectsWithAccuracy, threshold))) / 6;
 
             // Accuracy pp formula that's roughly the same as live.
-            double accuracyValue = 2.83 * Math.Pow(1.52163, 40.0 / 3) * liveLengthBonus * Math.Exp(-scaling * deviation * deviationARadjust);
+            double accuracyValue = 2.83 * Math.Pow(1.52163, 40.0 / 3) * liveLengthBonus * Math.Exp(-scaling * deviation);
 
             // Punish very low amount of hits additionally to prevent big pp values right at the start of the map
             if (amountHitObjectsWithAccuracy < 30)
@@ -285,7 +285,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                                (totalHits > 200 ? 0.2 * Math.Min(1.0, (totalHits - 200) / 200.0) : 0.0);
 
             // Scale the flashlight value with deviation
-            flashlightValue *= SpecialFunctions.Erf(50 / (Math.Sqrt(2) * deviation * deviationARadjust));
+            flashlightValue *= SpecialFunctions.Erf(50 / (Math.Sqrt(2) * deviation));
             flashlightValue *= 0.98 + Math.Pow(100.0 / 9, 2) / 2500;  // OD 11 SS stays the same.
 
             return flashlightValue;
@@ -331,9 +331,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (greatCountCircles + okCountCircles + mehCountCircles <= 0)
                 return double.PositiveInfinity;
 
+            double deviation = double.PositiveInfinity;
+
             // Assume 100s, 50s, and misses happen on circles. If there are less non-300s on circles than 300s,
             // compute the deviation on circles.
-            if (usingSliderAccuracy || greatCountCircles > 0)
+            if (accuracyObjectCount > 0)
             {
                 //// The probability that a player hits a circle is unknown, but we can estimate it to be
                 //// the number of greats on circles divided by the number of circles, and then add one
@@ -349,45 +351,46 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
                 // Compute the deviation assuming 300s and 100s are normally distributed, and 50s are uniformly distributed.
                 // Begin with 300s and 100s first. Ignoring 50s, we can be 99% confident that the deviation is not higher than:
-                double estimatedDeviation = hitWindow300 / (Math.Sqrt(2) * SpecialFunctions.ErfInv(pLowerBound));
+                deviation = hitWindow300 / (Math.Sqrt(2) * SpecialFunctions.ErfInv(pLowerBound));
 
-                double randomValue = Math.Sqrt(2 / Math.PI) * hitWindow100 * Math.Exp(-0.5 * Math.Pow(hitWindow100 / estimatedDeviation, 2))
-                    / (estimatedDeviation * SpecialFunctions.Erf(hitWindow100 / (Math.Sqrt(2) * estimatedDeviation)));
+                double randomValue = Math.Sqrt(2 / Math.PI) * hitWindow100 * Math.Exp(-0.5 * Math.Pow(hitWindow100 / deviation, 2))
+                    / (deviation * SpecialFunctions.Erf(hitWindow100 / (Math.Sqrt(2) * deviation)));
 
-                estimatedDeviation *= Math.Sqrt(1 - randomValue);
+                deviation *= Math.Sqrt(1 - randomValue);
 
                 // If precision is not enough - use limit value
                 if (pLowerBound == 0 || randomValue >= 1)
-                    estimatedDeviation = hitWindow100 / Math.Sqrt(3);
+                    deviation = hitWindow100 / Math.Sqrt(3);
 
                 // Then compute the variance for 50s.
                 double mehVariance = (hitWindow50 * hitWindow50 + hitWindow100 * hitWindow50 + hitWindow100 * hitWindow100) / 3;
 
                 // Find the total deviation.
-                estimatedDeviation = Math.Sqrt(((greatCountCircles + okCountCircles) * Math.Pow(estimatedDeviation, 2) + mehCountCircles * mehVariance) / (greatCountCircles + okCountCircles + mehCountCircles));
+                deviation = Math.Sqrt(((greatCountCircles + okCountCircles) * Math.Pow(deviation, 2) + mehCountCircles * mehVariance) / (greatCountCircles + okCountCircles + mehCountCircles));
 
                 // Adjust by 0.9 to account for the fact that it's higher bound UR value
-                return estimatedDeviation * 0.9;
+                deviation *= 0.9;
             }
+
+            if (usingSliderAccuracy) return deviation;
 
             // If there are more non-300s than there are circles, compute the deviation on sliders instead.
             // Here, all that matters is whether or not the slider was missed, since it is impossible
             // to get a 100 or 50 on a slider by mis-tapping it.
+            double deviationOnSliders = double.PositiveInfinity;
             int sliderCount = attributes.SliderCount;
             int missCountSliders = Math.Min(sliderCount, countMiss - missCountCircles);
             int greatCountSliders = sliderCount - missCountSliders;
 
             // We only get here if nothing was hit. In this case, there is no estimate for deviation.
             // Note that this is never negative, so checking if this is only equal to 0 makes sense.
-            if (greatCountSliders == 0)
+            if (greatCountSliders > 0)
             {
-                return double.PositiveInfinity;
+                double greatProbabilitySlider = greatCountSliders / (sliderCount + 1.0);
+                deviationOnSliders = hitWindow50 / (Math.Sqrt(2) * SpecialFunctions.ErfInv(greatProbabilitySlider));
             }
 
-            double greatProbabilitySlider = greatCountSliders / (sliderCount + 1.0);
-            double deviationOnSliders = hitWindow50 / (Math.Sqrt(2) * SpecialFunctions.ErfInv(greatProbabilitySlider));
-
-            return deviationOnSliders;
+            return Math.Min(deviation, deviationOnSliders);
         }
 
         /// <summary>
@@ -444,32 +447,32 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             // Compute the deviation assuming 300s and 100s are normally distributed, and 50s are uniformly distributed.
             // Begin with 300s and 100s first. Ignoring 50s, we can be 99% confident that the deviation is not higher than:
-            double estimatedDeviation = hitWindow300 / (Math.Sqrt(2) * SpecialFunctions.ErfInv(pLowerBound));
+            double deviation = hitWindow300 / (Math.Sqrt(2) * SpecialFunctions.ErfInv(pLowerBound));
 
-            double randomValue = Math.Sqrt(2 / Math.PI) * hitWindow100 * Math.Exp(-0.5 * Math.Pow(hitWindow100 / estimatedDeviation, 2))
-                / (estimatedDeviation * SpecialFunctions.Erf(hitWindow100 / (Math.Sqrt(2) * estimatedDeviation)));
+            double randomValue = Math.Sqrt(2 / Math.PI) * hitWindow100 * Math.Exp(-0.5 * Math.Pow(hitWindow100 / deviation, 2))
+                / (deviation * SpecialFunctions.Erf(hitWindow100 / (Math.Sqrt(2) * deviation)));
 
-            estimatedDeviation *= Math.Sqrt(1 - randomValue);
+            deviation *= Math.Sqrt(1 - randomValue);
 
             // If precision is not enough - use limit value
             if (pLowerBound == 0 || randomValue >= 1)
-                estimatedDeviation = hitWindow100 / Math.Sqrt(3);
+                deviation = hitWindow100 / Math.Sqrt(3);
 
             // Then compute the variance for 50s.
             double mehVariance = (hitWindow50 * hitWindow50 + hitWindow100 * hitWindow50 + hitWindow100 * hitWindow100) / 3;
 
             // Find the total deviation.
-            estimatedDeviation = Math.Sqrt(((relevantCountGreat + relevantCountOk) * Math.Pow(estimatedDeviation, 2) + relevantCountMeh * mehVariance) / (relevantCountGreat + relevantCountOk + relevantCountMeh));
+            deviation = Math.Sqrt(((relevantCountGreat + relevantCountOk) * Math.Pow(deviation, 2) + relevantCountMeh * mehVariance) / (relevantCountGreat + relevantCountOk + relevantCountMeh));
 
             // Adjust by 0.9 to account for the fact that it's higher bound UR value
-            return estimatedDeviation * 0.9;
+            return deviation * 0.9;
         }
 
         // https://www.desmos.com/calculator/no1pv5gv5g
         private double adjustSpeedWithUR(double speedValue, double UR)
         {
             // Starting from this pp amount - penalty will be applied
-            double abusePoint = Math.Pow(400 / UR, 2);
+            double abusePoint = 100 + 220 * Math.Pow(20 / UR, 4.5);
 
             if (speedValue <= abusePoint)
                 return speedValue;
@@ -484,7 +487,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         private double adjustPerformanceWithUR(double performanceValue, double UR)
         {
             // Starting from this pp amount - penalty will be applied
-            double abusePoint = Math.Pow(600 / UR, 2);
+            double abusePoint = 200 + 260 * Math.Pow(20 / UR, 4.5);
 
             if (performanceValue <= abusePoint)
                 return performanceValue;
