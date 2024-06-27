@@ -227,12 +227,25 @@ namespace osu.Game.Rulesets.Osu.Statistics
             }
         }
 
+        private static readonly bool[] branchCoverage = new bool[4]; // Four branches: F1Br1M, F1Br2M, F1Br3M and F1Br4M
+
+        private static void MarkBranchCovered(int index)
+        {
+            if (index >= 0 && index < branchCoverage.Length)
+            {
+                branchCoverage[index] = true;
+            }
+        }
         public void AddPoint(Vector2 start, Vector2 end, Vector2 hitPoint, float radius)
         {
             if (pointGrid.Content.Count == 0)
             {
-                Debug.WriteLine("Branch hit: pointGrid.Content.Count == 0");
+                MarkBranchCovered(0);
                 return;
+            }
+            else
+            {
+                MarkBranchCovered(1);
             }
 
             double angle1 = Math.Atan2(end.Y - hitPoint.Y, hitPoint.X - end.X);
@@ -252,14 +265,28 @@ namespace osu.Game.Rulesets.Osu.Statistics
 
             if (r < 0 || r >= points_per_dimension || c < 0 || c >= points_per_dimension)
             {
-                Debug.WriteLine($"Branch hit: Out of bounds - r: {r}, c: {c}");
+                MarkBranchCovered(2);
                 return;
+            }
+            else
+            {
+                MarkBranchCovered(3);
             }
 
             PeakValue = Math.Max((float)PeakValue, ((GridPoint)pointGrid.Content[r][c]).Increment());
 
             bufferedGrid.ForceRedraw();
-            Debug.WriteLine($"Branch hit: Point added - r: {r}, c: {c}");
+            PrintCoverage();
+        }
+
+        private static void PrintCoverage()
+        {
+            string[] branches = { "F1Br1M", "F1Br2M", "F1Br3M", "F1Br4M" };
+
+            for (int i = 0; i < branchCoverage.Length; i++)
+            {
+                Console.WriteLine($"{branches[i]} was {(branchCoverage[i] ? "hit" : "not hit")}");
+            }
         }
 
         public decimal PpeakValue { get; }
@@ -345,5 +372,11 @@ namespace osu.Game.Rulesets.Osu.Statistics
                 Colour = BaseColour.Lighten(Math.Max(0, amount - lighten_cutoff));
             }
         }
+
+        private void load(Action<object> action)
+        {
+            throw new NotImplementedException();
+        }
+
     }
 }

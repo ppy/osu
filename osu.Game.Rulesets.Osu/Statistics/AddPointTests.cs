@@ -41,9 +41,12 @@ namespace osu.Game.Rulesets.Osu.Statistics
             // Act
             heatmap.AddPoint(start, end, hitPoint, radius);
 
+
             // Assert
             Assert.GreaterOrEqual(heatmap.PeakValue, 1); // PeakValue should have been updated
 
+            // Additional assertions for pointGrid state if needed
+            // Assert.AreEqual(expectedValue, heatmap.pointGrid.Content[r][c].Count);
         }
 
         [Test]

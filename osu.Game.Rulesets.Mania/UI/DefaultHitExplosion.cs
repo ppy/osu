@@ -3,6 +3,7 @@
 
 #nullable disable
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
@@ -130,17 +131,39 @@ namespace osu.Game.Rulesets.Mania.UI
             }, true);
         }
 
+        private static readonly bool[] branchCoverage = new bool[2]; // Four branches: F2Br1M and F2Br2M
+
+        private static void MarkBranchCovered(int index)
+        {
+            if (index >= 0 && index < branchCoverage.Length)
+            {
+                branchCoverage[index] = true;
+            }
+        }
         public void onDirectionChanged(ValueChangedEvent<ScrollingDirection> direction)
         {
             if (direction.NewValue == ScrollingDirection.Up)
             {
+                MarkBranchCovered(0);
                 Anchor = Anchor.TopCentre;
                 Y = DefaultNotePiece.NOTE_HEIGHT / 2;
             }
             else
             {
+                MarkBranchCovered(1);
                 Anchor = Anchor.BottomCentre;
                 Y = -DefaultNotePiece.NOTE_HEIGHT / 2;
+            }
+            PrintCoverage();
+        }
+
+        private static void PrintCoverage()
+        {
+            string[] branches = { "F2Br1M", "F2Br2M" };
+
+            for (int i = 0; i < branchCoverage.Length; i++)
+            {
+                Console.WriteLine($"{branches[i]} was {(branchCoverage[i] ? "hit" : "not hit")}");
             }
         }
 

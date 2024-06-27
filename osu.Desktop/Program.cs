@@ -136,21 +136,6 @@ namespace osu.Desktop
                         legacyIpc = new LegacyTcpIpcProvider();
                         legacyIpc.Bind();
 
-                    //     // Create instances of ScoreInfo and IBeatmap (replace with actual initialization as needed)
-                    //     ScoreInfo score = new ScoreInfo();
-                    //     IBeatmap beatmap = new YourBeatmapImplementation(); // Replace with actual IBeatmap implementation
-                    //
-                    //     // Instantiate AccuracyHeatmap
-                    //     AccuracyHeatmap heatmap = new AccuracyHeatmap(score, beatmap);
-                    //
-                    //     // Example parameters for AddPoint method
-                    //     Vector2 start = new Vector2(0, 0);
-                    //     Vector2 end = new Vector2(100, 100);
-                    //     Vector2 hitPoint = new Vector2(50, 50);
-                    //     float radius = 10.0f;
-                    //
-                    //     // Call AddPoint method
-                    //     heatmap.AddPoint(start, end, hitPoint, radius);
                     }
                     catch (Exception ex)
                     {
@@ -163,6 +148,7 @@ namespace osu.Desktop
                 else
                     host.Run(new OsuGameDesktop(args));
             }
+
         }
 
 
@@ -222,4 +208,6 @@ namespace osu.Desktop
             });
         }
     }
+
+
 }
