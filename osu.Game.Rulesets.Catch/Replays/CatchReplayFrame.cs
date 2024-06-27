@@ -38,22 +38,61 @@ namespace osu.Game.Rulesets.Catch.Replays
             }
         }
 
+        // Initialize coverage tracking variables
+        private static bool fromLegacyDashingCheck = false;
+        private static bool fromLegacyLastFrameCheck = false;
+        private static bool fromLegacyMoveRight = false;
+        private static bool fromLegacyMoveLeft = false;
+
         public void FromLegacy(LegacyReplayFrame currentFrame, IBeatmap beatmap, ReplayFrame? lastFrame = null)
         {
             Position = currentFrame.Position.X;
             Dashing = currentFrame.ButtonState == ReplayButtonState.Left1;
+            fromLegacyDashingCheck = Dashing;
 
             if (Dashing)
+            {
                 Actions.Add(CatchAction.Dash);
+            }
+            else
+            {
+                //do nothing
+            }
 
-            // this probably needs some cross-checking with osu-stable to ensure it is actually correct.
             if (lastFrame is CatchReplayFrame lastCatchFrame)
             {
+                fromLegacyLastFrameCheck = true;
+
                 if (Position > lastCatchFrame.Position)
+                {
+                    fromLegacyMoveRight = true;
                     lastCatchFrame.Actions.Add(CatchAction.MoveRight);
+                }
                 else if (Position < lastCatchFrame.Position)
+                {
+                    fromLegacyMoveLeft = true;
                     lastCatchFrame.Actions.Add(CatchAction.MoveLeft);
+                }
+                else
+                {
+                    fromLegacyMoveRight = false;
+                    fromLegacyMoveLeft = false;
+                }
             }
+            else
+            {
+                fromLegacyLastFrameCheck = false;
+            }
+
+            PrintCoverage();
+        }
+
+        public static void PrintCoverage()
+        {
+            System.Console.WriteLine("F2Br1D was {0}", fromLegacyDashingCheck ? "hit" : "not hit");
+            System.Console.WriteLine("F2Br2D was {0}", fromLegacyLastFrameCheck ? "hit" : "not hit");
+            System.Console.WriteLine("F2Br3D was {0}", fromLegacyMoveRight ? "hit" : "not hit");
+            System.Console.WriteLine("F2Br4D was {0}", fromLegacyMoveLeft ? "hit" : "not hit");
         }
 
         public LegacyReplayFrame ToLegacy(IBeatmap beatmap)
