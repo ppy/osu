@@ -204,6 +204,14 @@ namespace osu.Game.Rulesets.Osu.Edit
             return Vector2.ComponentMax(scale, new Vector2(Precision.FLOAT_EPSILON));
         }
 
+        private static readonly bool[] branchCoverage = new bool[8];
+        private static void MarkBranchCovered(int index)
+        {
+            if (index >= 0 && index < branchCoverage.Length)
+            {
+                branchCoverage[index] = true;
+            }
+        }
         private void moveSelectionInBounds()
         {
             Quad quad = GeometryUtils.GetSurroundingQuad(objectsInScale!.Keys);
@@ -211,20 +219,63 @@ namespace osu.Game.Rulesets.Osu.Edit
             Vector2 delta = Vector2.Zero;
 
             if (quad.TopLeft.X < 0)
+            {
+                MarkBranchCovered(0);
                 delta.X -= quad.TopLeft.X;
+            }
+            else
+            {
+                MarkBranchCovered(1);
+            }
+
             if (quad.TopLeft.Y < 0)
+            {
+                MarkBranchCovered(2);
                 delta.Y -= quad.TopLeft.Y;
+            }
+            else
+            {
+                MarkBranchCovered(3);
+            }
 
             if (quad.BottomRight.X > OsuPlayfield.BASE_SIZE.X)
+            {
+                MarkBranchCovered(4);
                 delta.X -= quad.BottomRight.X - OsuPlayfield.BASE_SIZE.X;
+            }
+            else
+            {
+                MarkBranchCovered(5);
+            }
+
             if (quad.BottomRight.Y > OsuPlayfield.BASE_SIZE.Y)
+            {
+                MarkBranchCovered(6);
                 delta.Y -= quad.BottomRight.Y - OsuPlayfield.BASE_SIZE.Y;
+            }
+            else
+            {
+                MarkBranchCovered(7);
+            }
+
 
             foreach (var (h, _) in objectsInScale!)
                 h.Position += delta;
+
+            PrintCoverage();
         }
 
-        private struct OriginalHitObjectState
+        private static void PrintCoverage()
+        {
+            string[] branches = { "F1Br1L", "F1Br2L", "F1Br3L", "F1Br4L", "F1Br5L", "F1Br6L", "F1Br7L", "F1Br8L"};
+
+            for (int i = 0; i < branchCoverage.Length; i++)
+            {
+                Console.WriteLine($"{branches[i]} was {(branchCoverage[i] ? "hit" : "not hit")}");
+            }
+        }
+
+        public struct OriginalHitObjectState
         {
             public Vector2 Position { get; }
             public Vector2[]? PathControlPointPositions { get; }
