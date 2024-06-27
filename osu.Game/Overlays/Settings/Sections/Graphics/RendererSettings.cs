@@ -67,9 +67,8 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                 if (r.NewValue == RendererType.Automatic && automaticRendererInUse)
                     return;
 
-                if (game?.RestartAppWhenExited() == true)
+                if (game?.RestartApp() == true)
                 {
-                    game.AttemptExit();
                 }
                 else
                 {

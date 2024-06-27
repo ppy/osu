@@ -105,18 +105,23 @@ namespace osu.Desktop
             return new VeloUpdateManager();
         }
 
-        public override bool RestartAppWhenExited()
+        public override bool RestartApp()
         {
             try
             {
-                Process.Start(Process.GetCurrentProcess().MainModule?.FileName ?? throw new InvalidOperationException());
+                var startInfo = new ProcessStartInfo
+                {
+                    FileName = Process.GetCurrentProcess().MainModule!.FileName,
+                    UseShellExecute = true
+                };
+                Process.Start(startInfo);
                 Environment.Exit(0);
                 return true;
             }
             catch (Exception e)
             {
                 Logger.Error(e, "Failed to restart application");
-                return base.RestartAppWhenExited();
+                return base.RestartApp();
             }
         }
 

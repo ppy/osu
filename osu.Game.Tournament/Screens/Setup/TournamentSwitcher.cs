@@ -31,8 +31,7 @@ namespace osu.Game.Tournament.Screens.Setup
 
             Action = () =>
             {
-                game.RestartAppWhenExited();
-                game.AttemptExit();
+                game.RestartApp();
             };
             folderButton.Action = () => storage.PresentExternally();
 
