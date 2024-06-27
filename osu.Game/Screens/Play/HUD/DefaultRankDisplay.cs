@@ -10,6 +10,7 @@ using osu.Game.Configuration;
 using osu.Game.Localisation.HUD;
 using osu.Game.Online.Leaderboards;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Scoring;
 using osu.Game.Skinning;
 using osuTK;
 
@@ -19,6 +20,8 @@ namespace osu.Game.Screens.Play.HUD
     {
         [SettingSource(typeof(GameplayRankDisplayStrings), nameof(GameplayRankDisplayStrings.RankDisplay), nameof(GameplayRankDisplayStrings.RankDisplayDescription))]
         public Bindable<RankDisplayMode> RankDisplay { get; } = new Bindable<RankDisplayMode>();
+
+        private Bindable<ScoreRank> rankBinding = new Bindable<ScoreRank>();
 
         [Resolved]
         private ScoreProcessor scoreProcessor { get; set; } = null!;
@@ -33,7 +36,7 @@ namespace osu.Game.Screens.Play.HUD
 
             InternalChildren = new Drawable[]
             {
-                rank = new UpdateableRank(Scoring.ScoreRank.X)
+                rank = new UpdateableRank(ScoreRank.X)
                 {
                     RelativeSizeAxes = Axes.Both,
                 },
@@ -44,53 +47,24 @@ namespace osu.Game.Screens.Play.HUD
         {
             base.LoadComplete();
 
-            switch (RankDisplay.Value)
-            {
-                case RankDisplayMode.Standard:
-                    rank.Rank = scoreProcessor.Rank.Value;
-                    break;
-
-                case RankDisplayMode.MinimumAchievable:
-                    rank.Rank = scoreProcessor.MinimumRank.Value;
-                    break;
-
-                case RankDisplayMode.MaximumAchievable:
-                    rank.Rank = scoreProcessor.MaximumRank.Value;
-                    break;
-            }
             RankDisplay.BindValueChanged(mode =>
             {
-                switch (mode.OldValue)
-                {
-                    case RankDisplayMode.Standard:
-                        scoreProcessor.Rank.UnbindBindings();
-                        break;
-
-                    case RankDisplayMode.MinimumAchievable:
-                        scoreProcessor.MinimumRank.UnbindBindings();
-                        break;
-
-                    case RankDisplayMode.MaximumAchievable:
-                        scoreProcessor.MaximumRank.UnbindBindings();
-                        break;
-                }
+                rankBinding.UnbindBindings();
                 switch (mode.NewValue)
                 {
                     case RankDisplayMode.Standard:
-                        rank.Rank = scoreProcessor.Rank.Value;
-                        scoreProcessor.Rank.BindValueChanged(v => rank.Rank = v.NewValue);
+                        rankBinding.BindTarget = scoreProcessor.Rank;
                         break;
 
                     case RankDisplayMode.MinimumAchievable:
-                        rank.Rank = scoreProcessor.MinimumRank.Value;
-                        scoreProcessor.MinimumRank.BindValueChanged(v => rank.Rank = v.NewValue);
+                        rankBinding.BindTarget = scoreProcessor.MinimumRank;
                         break;
 
                     case RankDisplayMode.MaximumAchievable:
-                        rank.Rank = scoreProcessor.MaximumRank.Value;
-                        scoreProcessor.MaximumRank.BindValueChanged(v => rank.Rank = v.NewValue);
+                        rankBinding.BindTarget = scoreProcessor.MaximumRank;
                         break;
                 }
+                rankBinding.BindValueChanged(v => rank.Rank = v.NewValue, true);
             }, true);
         }
 

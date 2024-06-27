@@ -20,6 +20,8 @@ namespace osu.Game.Skinning
 
         public bool UsesFixedAnchor { get; set; }
 
+        private Bindable<Scoring.ScoreRank> rankBinding = new Bindable<Scoring.ScoreRank>();
+
         [Resolved]
         private ScoreProcessor scoreProcessor { get; set; } = null!;
 
@@ -45,34 +47,22 @@ namespace osu.Game.Skinning
 
             RankDisplay.BindValueChanged(mode =>
             {
-                switch (mode.OldValue)
-                {
-                    case DefaultRankDisplay.RankDisplayMode.Standard:
-                        scoreProcessor.Rank.UnbindBindings();
-                        break;
-
-                    case DefaultRankDisplay.RankDisplayMode.MinimumAchievable:
-                        scoreProcessor.MinimumRank.UnbindBindings();
-                        break;
-
-                    case DefaultRankDisplay.RankDisplayMode.MaximumAchievable:
-                        scoreProcessor.MaximumRank.UnbindBindings();
-                        break;
-                }
+                rankBinding.UnbindBindings();
                 switch (mode.NewValue)
                 {
                     case DefaultRankDisplay.RankDisplayMode.Standard:
-                        scoreProcessor.Rank.BindValueChanged(v => updateValue(v), true);
+                        rankBinding.BindTarget = scoreProcessor.Rank;
                         break;
 
                     case DefaultRankDisplay.RankDisplayMode.MinimumAchievable:
-                        scoreProcessor.MinimumRank.BindValueChanged(v => updateValue(v), true);
+                        rankBinding.BindTarget = scoreProcessor.MinimumRank;
                         break;
 
                     case DefaultRankDisplay.RankDisplayMode.MaximumAchievable:
-                        scoreProcessor.MaximumRank.BindValueChanged(v => updateValue(v), true);
+                        rankBinding.BindTarget = scoreProcessor.MaximumRank;
                         break;
                 }
+                rankBinding.BindValueChanged(v => updateValue(v), true);
             }, true);
             FinishTransforms(true);
         }
