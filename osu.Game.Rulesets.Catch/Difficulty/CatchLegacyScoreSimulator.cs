@@ -17,7 +17,7 @@ using osu.Game.Rulesets.Scoring.Legacy;
 
 namespace osu.Game.Rulesets.Catch.Difficulty
 {
-    internal class CatchLegacyScoreSimulator : ILegacyScoreSimulator
+    public class CatchLegacyScoreSimulator : ILegacyScoreSimulator
     {
         private readonly ScoreProcessor scoreProcessor = new CatchScoreProcessor();
 
@@ -77,7 +77,15 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             return attributes;
         }
 
-        private void simulateHit(HitObject hitObject, ref LegacyScoreAttributes attributes)
+        private static readonly bool[] branchCoverage = new bool[6];
+        private static void MarkBranchCovered(int index)
+        {
+            if (index >= 0 && index < branchCoverage.Length)
+            {
+                branchCoverage[index] = true;
+            }
+        }
+        public void simulateHit(HitObject hitObject, ref LegacyScoreAttributes attributes)
         {
             bool increaseCombo = true;
             bool addScoreComboMultiplier = false;
@@ -89,55 +97,84 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 
             switch (hitObject)
             {
-                case TinyDroplet:
+                case TinyDroplet _:
                     scoreIncrease = 10;
                     increaseCombo = false;
                     break;
 
-                case Droplet:
+                case Droplet _:
                     scoreIncrease = 100;
                     break;
 
-                case Fruit:
+                case Fruit _:
                     scoreIncrease = 300;
                     addScoreComboMultiplier = true;
                     increaseCombo = true;
                     break;
 
-                case Banana:
+                case Banana _:
                     scoreIncrease = 1100;
                     increaseCombo = false;
                     isBonus = true;
                     bonusResult = HitResult.LargeBonus;
                     break;
 
-                case JuiceStream:
-                    foreach (var nested in hitObject.NestedHitObjects)
+                case JuiceStream juiceStream:
+                    foreach (var nested in juiceStream.NestedHitObjects)
                         simulateHit(nested, ref attributes);
                     return;
 
-                case BananaShower:
-                    foreach (var nested in hitObject.NestedHitObjects)
+                case BananaShower bananaShower:
+                    foreach (var nested in bananaShower.NestedHitObjects)
                         simulateHit(nested, ref attributes);
                     return;
+
+                default:
+                    throw new NotImplementedException($"HitObject type {hitObject.GetType()} not implemented in simulateHit.");
             }
 
             if (addScoreComboMultiplier)
             {
-                // ReSharper disable once PossibleLossOfFraction (intentional to match osu-stable...)
+                MarkBranchCovered(0);
                 attributes.ComboScore += (int)(Math.Max(0, combo - 1) * (scoreIncrease / 25 * scoreMultiplier));
+            }
+            else
+            {
+                MarkBranchCovered(1);
             }
 
             if (isBonus)
             {
+                MarkBranchCovered(2);
                 legacyBonusScore += scoreIncrease;
                 standardisedBonusScore += scoreProcessor.GetBaseScoreForResult(bonusResult);
             }
             else
-                attributes.AccuracyScore += scoreIncrease;
+            {
+                MarkBranchCovered(3);
+            }
 
             if (increaseCombo)
+            {
+                MarkBranchCovered(4);
                 combo++;
+            }
+            else
+            {
+                MarkBranchCovered(5);
+            }
+
+            PrintCoverage();
+        }
+
+        private static void PrintCoverage()
+        {
+            string[] branches = { "F2Br1L", "F2Br2L", "F2Br3L", "F2Br4L", "F2Br5L", "F2Br6L"};
+
+            for (int i = 0; i < branchCoverage.Length; i++)
+            {
+                Console.WriteLine($"{branches[i]} was {(branchCoverage[i] ? "hit" : "not hit")}");
+            }
         }
 
         public double GetLegacyScoreMultiplier(IReadOnlyList<Mod> mods, LegacyBeatmapConversionDifficultyInfo difficulty)
