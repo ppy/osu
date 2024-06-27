@@ -284,14 +284,14 @@ namespace osu.Game.Screens.Select.Carousel
 
                 List<MenuItem> items = new List<MenuItem>();
 
-                if (Item?.State.Value == CarouselItemState.NotSelected || Item?.State.Value == CarouselItemState.SelectedCollapsed)
-                    items.Add(new OsuMenuItem("Expand", MenuItemType.Highlighted, () => Item.State.Value = CarouselItemState.Selected));
-
-                if (Item?.State.Value == CarouselItemState.Selected)
-                    items.Add(new OsuMenuItem("Collapse", MenuItemType.Highlighted, () => Item.State.Value = CarouselItemState.SelectedCollapsed));
-
                 if (mainMenuItems != null)
                     items.AddRange(mainMenuItems);
+
+                if (Item?.State.Value == CarouselItemState.NotSelected || Item?.State.Value == CarouselItemState.SelectedCollapsed)
+                    items.Add(new OsuMenuItem("Expand", MenuItemType.Standard, () => Item.State.Value = CarouselItemState.Selected));
+
+                if (Item?.State.Value == CarouselItemState.Selected)
+                    items.Add(new OsuMenuItem("Collapse", MenuItemType.Standard, () => Item.State.Value = CarouselItemState.SelectedCollapsed));
 
                 if (beatmapSet.OnlineID > 0 && viewDetails != null)
                     items.Add(new OsuMenuItem("Details...", MenuItemType.Standard, () => viewDetails(beatmapSet.OnlineID)));

@@ -57,11 +57,11 @@ namespace osu.Game.Screens.Select
         /// <summary>
         /// The currently selected beatmap.
         /// </summary>
-        public BeatmapInfo? SelectedBeatmapInfo => selectedBeatmap?.BeatmapInfo;
+        public BeatmapInfo? SelectedBeatmapInfo => (selectedBeatmap != null) ? selectedBeatmap?.BeatmapInfo : lastSelectedBeatmap?.BeatmapInfo;
 
         private CarouselBeatmap? selectedBeatmap => selectedBeatmapSet?.Beatmaps.FirstOrDefault(s => s.State.Value == CarouselItemState.Selected);
 
-        private CarouselBeatmap? lastSelectedBeatmap;
+        private CarouselBeatmap? lastSelectedBeatmap = null;
 
         private bool wasSelectedCollapsed = false;
 
@@ -734,6 +734,7 @@ namespace osu.Game.Screens.Select
 
         public bool tryToExpand()
         {
+            lastSelectedBeatmap = null;
             if (selectedBeatmapSet != null && selectedBeatmapSet.State.Value == CarouselItemState.SelectedCollapsed)
             {
                 select(selectedBeatmapSet);
@@ -1098,7 +1099,7 @@ namespace osu.Game.Screens.Select
                 {
                     case CarouselBeatmapSet set:
                     {
-                        bool isSelected = item.State.Value == CarouselItemState.Selected;
+                        bool isSelected = item.State.Value == CarouselItemState.Selected || item.State.Value == CarouselItemState.SelectedCollapsed;
 
                         float padding = isSelected ? 5 : -5;
 
@@ -1109,11 +1110,7 @@ namespace osu.Game.Screens.Select
                         visibleItems.Add(set);
                         set.CarouselYPosition = currentY;
 
-<<<<<<< HEAD
-                        if (item.State.Value == CarouselItemState.Selected || item.State.Value == CarouselItemState.SelectedCollapsed)
-=======
                         if (isSelected)
->>>>>>> upstream/master
                         {
                             // scroll position at currentY makes the set panel appear at the very top of the carousel's screen space
                             // move down by half of visible height (height of the carousel's visible extent, including semi-transparent areas)
@@ -1135,11 +1132,7 @@ namespace osu.Game.Screens.Select
                             }
                         }
 
-<<<<<<< HEAD
-                        currentY += set.TotalHeight + panel_padding; 
-=======
                         currentY += set.TotalHeight + padding;
->>>>>>> upstream/master
                         break;
                     }
                 }
