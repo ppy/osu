@@ -93,7 +93,7 @@ namespace osu.Game.Rulesets.Scoring
             double lastGameplayTime = Math.Clamp(Time.Current - Time.Elapsed, DrainStartTime, gameplayEndTime);
             double currentGameplayTime = Math.Clamp(Time.Current, DrainStartTime, gameplayEndTime);
 
-            if (DrainLenience < 1)
+            if (!OverrideHealth && DrainLenience < 1)
                 Health.Value -= DrainRate * (currentGameplayTime - lastGameplayTime);
         }
 

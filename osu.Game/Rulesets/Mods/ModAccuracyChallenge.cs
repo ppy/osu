@@ -59,6 +59,7 @@ namespace osu.Game.Rulesets.Mods
         {
             base.ApplyToHealthProcessor(healthProcessor);
             this.healthProcessor = healthProcessor;
+            healthProcessor.OverrideHealth = ReplaceHealth.Value;
         }
 
         public void ApplyToScoreProcessor(ScoreProcessor scoreProcessor)

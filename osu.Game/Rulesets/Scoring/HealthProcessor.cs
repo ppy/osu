@@ -22,6 +22,12 @@ namespace osu.Game.Rulesets.Scoring
         public event Func<HealthProcessor, JudgementResult, bool>? FailConditions;
 
         /// <summary>
+        /// Whether to rewrite Health.
+        /// The normal increase or decrease in health will no longer be performed.
+        /// </summary>
+        public bool OverrideHealth { get; set; } = false;
+
+        /// <summary>
         /// The current health.
         /// </summary>
         public readonly BindableDouble Health = new BindableDouble(1) { MinValue = 0, MaxValue = 1 };
@@ -51,7 +57,8 @@ namespace osu.Game.Rulesets.Scoring
             if (HasFailed)
                 return;
 
-            Health.Value += GetHealthIncreaseFor(result);
+            if (!OverrideHealth)
+                Health.Value += GetHealthIncreaseFor(result);
 
             if (meetsAnyFailCondition(result))
                 TriggerFailure();
