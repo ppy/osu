@@ -396,6 +396,32 @@ namespace osu.Game.Tests.Editing
         }
 
         [Test]
+        public void TestManualBreaksAtEndOfBeatmapAreRemovedCorrectlyEvenWithConcurrentObjects()
+        {
+            var controlPoints = new ControlPointInfo();
+            controlPoints.Add(0, new TimingControlPoint { BeatLength = 500 });
+            var beatmap = new Beatmap
+            {
+                ControlPointInfo = controlPoints,
+                HitObjects =
+                {
+                    new HoldNote { StartTime = 1000, EndTime = 20000 },
+                    new HoldNote { StartTime = 2000, EndTime = 3000 },
+                },
+                Breaks =
+                {
+                    new ManualBreakPeriod(10000, 15000),
+                }
+            };
+
+            var beatmapProcessor = new EditorBeatmapProcessor(beatmap, new OsuRuleset());
+            beatmapProcessor.PreProcess();
+            beatmapProcessor.PostProcess();
+
+            Assert.That(beatmap.Breaks, Is.Empty);
+        }
+
+        [Test]
         public void TestBreaksAtStartOfBeatmapAreRemoved()
         {
             var controlPoints = new ControlPointInfo();
