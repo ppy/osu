@@ -126,7 +126,7 @@ namespace osu.Game.Screens.Edit.Timing
         protected override void OnFocus(FocusEvent e)
         {
             base.OnFocus(e);
-            GetContainingInputManager().ChangeFocus(textBox);
+            GetContainingFocusManager()!.ChangeFocus(textBox);
         }
 
         private void updateState()

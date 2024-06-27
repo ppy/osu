@@ -123,7 +123,12 @@ namespace osu.Game.Tournament.Screens.MapPool
 
         private void beatmapChanged(ValueChangedEvent<TournamentBeatmap?> beatmap)
         {
-            if (CurrentMatch.Value == null || CurrentMatch.Value.PicksBans.Count(p => p.Type == ChoiceType.Ban) < 2)
+            if (CurrentMatch.Value?.Round.Value == null)
+                return;
+
+            int totalBansRequired = CurrentMatch.Value.Round.Value.BanCount.Value * 2;
+
+            if (CurrentMatch.Value.PicksBans.Count(p => p.Type == ChoiceType.Ban) < totalBansRequired)
                 return;
 
             // if bans have already been placed, beatmap changes result in a selection being made automatically

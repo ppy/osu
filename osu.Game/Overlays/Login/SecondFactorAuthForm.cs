@@ -141,7 +141,7 @@ namespace osu.Game.Overlays.Login
 
         protected override void OnFocus(FocusEvent e)
         {
-            Schedule(() => { GetContainingInputManager().ChangeFocus(codeTextBox); });
+            Schedule(() => { GetContainingFocusManager()!.ChangeFocus(codeTextBox); });
         }
     }
 }

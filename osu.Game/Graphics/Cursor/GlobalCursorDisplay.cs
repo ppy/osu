@@ -53,7 +53,7 @@ namespace osu.Game.Graphics.Cursor
         {
             base.LoadComplete();
 
-            inputManager = GetContainingInputManager();
+            inputManager = GetContainingInputManager()!;
             showDuringTouch = config.GetBindable<bool>(OsuSetting.GameplayCursorDuringTouch);
         }
 

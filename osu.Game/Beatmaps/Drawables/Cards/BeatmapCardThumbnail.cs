@@ -8,7 +8,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps.Drawables.Cards.Buttons;
-using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
 using osu.Framework.Graphics.UserInterface;
 using osuTK;
@@ -36,14 +35,14 @@ namespace osu.Game.Beatmaps.Drawables.Cards
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; } = null!;
 
-        public BeatmapCardThumbnail(APIBeatmapSet beatmapSetInfo)
+        public BeatmapCardThumbnail(IBeatmapSetInfo beatmapSetInfo, IBeatmapSetOnlineInfo onlineInfo)
         {
             InternalChildren = new Drawable[]
             {
                 new UpdateableOnlineBeatmapSetCover(BeatmapSetCoverType.List)
                 {
                     RelativeSizeAxes = Axes.Both,
-                    OnlineInfo = beatmapSetInfo
+                    OnlineInfo = onlineInfo
                 },
                 background = new Box
                 {
@@ -62,7 +61,6 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
-                            Size = new Vector2(50),
                             InnerRadius = 0.2f
                         },
                         content = new Container
@@ -93,6 +91,9 @@ namespace osu.Game.Beatmaps.Drawables.Cards
         {
             base.Update();
             progress.Progress = playButton.Progress.Value;
+
+            playButton.Scale = new Vector2(DrawWidth / 100);
+            progress.Size = new Vector2(50 * DrawWidth / 100);
         }
 
         private void updateState()

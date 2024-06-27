@@ -53,6 +53,8 @@ namespace osu.Game.Screens.OnlinePlay.Components
 
             req.Success += result =>
             {
+                result = result.Where(r => r.Category.Value != RoomCategory.DailyChallenge).ToList();
+
                 foreach (var existing in RoomManager.Rooms.ToArray())
                 {
                     if (result.All(r => r.RoomID.Value != existing.RoomID.Value))

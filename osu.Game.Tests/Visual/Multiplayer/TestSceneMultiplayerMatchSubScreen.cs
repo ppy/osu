@@ -197,7 +197,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddUntilStep("wait for join", () => RoomJoined);
 
-            ClickButtonWhenEnabled<RoomSubScreen.UserModSelectButton>();
+            ClickButtonWhenEnabled<UserModSelectButton>();
 
             AddUntilStep("mod select contents loaded",
                 () => this.ChildrenOfType<ModColumn>().Any() && this.ChildrenOfType<ModColumn>().All(col => col.IsLoaded && col.ItemsLoaded));
@@ -311,7 +311,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddUntilStep("wait for join", () => RoomJoined);
 
-            ClickButtonWhenEnabled<RoomSubScreen.UserModSelectButton>();
+            ClickButtonWhenEnabled<UserModSelectButton>();
             AddAssert("mod select shows unranked", () => screen.UserModsSelectOverlay.ChildrenOfType<RankingInformationDisplay>().Single().Ranked.Value == false);
             AddAssert("score multiplier = 1.20", () => screen.UserModsSelectOverlay.ChildrenOfType<RankingInformationDisplay>().Single().ModMultiplier.Value, () => Is.EqualTo(1.2).Within(0.01));
 

@@ -41,8 +41,8 @@ namespace osu.Game.Rulesets.Osu.Edit
         private void updateState()
         {
             var quad = GeometryUtils.GetSurroundingQuad(selectedMovableObjects);
-            CanRotateSelectionOrigin.Value = quad.Width > 0 || quad.Height > 0;
-            CanRotatePlayfieldOrigin.Value = selectedMovableObjects.Any();
+            CanRotateAroundSelectionOrigin.Value = quad.Width > 0 || quad.Height > 0;
+            CanRotateAroundPlayfieldOrigin.Value = selectedMovableObjects.Any();
         }
 
         private OsuHitObject[]? objectsInRotation;
@@ -53,8 +53,10 @@ namespace osu.Game.Rulesets.Osu.Edit
 
         public override void Begin()
         {
-            if (objectsInRotation != null)
+            if (OperationInProgress.Value)
                 throw new InvalidOperationException($"Cannot {nameof(Begin)} a rotate operation while another is in progress!");
+
+            base.Begin();
 
             changeHandler?.BeginChange();
 
@@ -68,10 +70,10 @@ namespace osu.Game.Rulesets.Osu.Edit
 
         public override void Update(float rotation, Vector2? origin = null)
         {
-            if (objectsInRotation == null)
+            if (!OperationInProgress.Value)
                 throw new InvalidOperationException($"Cannot {nameof(Update)} a rotate operation without calling {nameof(Begin)} first!");
 
-            Debug.Assert(originalPositions != null && originalPathControlPointPositions != null && defaultOrigin != null);
+            Debug.Assert(objectsInRotation != null && originalPositions != null && originalPathControlPointPositions != null && defaultOrigin != null);
 
             Vector2 actualOrigin = origin ?? defaultOrigin.Value;
 
@@ -91,10 +93,12 @@ namespace osu.Game.Rulesets.Osu.Edit
 
         public override void Commit()
         {
-            if (objectsInRotation == null)
+            if (!OperationInProgress.Value)
                 throw new InvalidOperationException($"Cannot {nameof(Commit)} a rotate operation without calling {nameof(Begin)} first!");
 
             changeHandler?.EndChange();
+
+            base.Commit();
 
             objectsInRotation = null;
             originalPositions = null;

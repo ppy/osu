@@ -33,6 +33,7 @@ using osu.Game.Scoring;
 using osu.Game.Scoring.Legacy;
 using osu.Game.Tests.Resources;
 using osu.Game.Users;
+using osuTK;
 
 namespace osu.Game.Tests.Beatmaps.Formats
 {
@@ -126,17 +127,20 @@ namespace osu.Game.Tests.Beatmaps.Formats
         [TestCase(LegacyBeatmapDecoder.LATEST_VERSION, false)]
         public void TestLegacyBeatmapReplayOffsetsDecode(int beatmapVersion, bool offsetApplied)
         {
-            const double first_frame_time = 48;
-            const double second_frame_time = 65;
+            const double first_frame_time = 31;
+            const double second_frame_time = 48;
+            const double third_frame_time = 65;
 
             var decoder = new TestLegacyScoreDecoder(beatmapVersion);
 
             using (var resourceStream = TestResources.OpenResource("Replays/mania-replay.osr"))
             {
                 var score = decoder.Parse(resourceStream);
+                int offset = offsetApplied ? LegacyBeatmapDecoder.EARLY_VERSION_TIMING_OFFSET : 0;
 
-                Assert.That(score.Replay.Frames[0].Time, Is.EqualTo(first_frame_time + (offsetApplied ? LegacyBeatmapDecoder.EARLY_VERSION_TIMING_OFFSET : 0)));
-                Assert.That(score.Replay.Frames[1].Time, Is.EqualTo(second_frame_time + (offsetApplied ? LegacyBeatmapDecoder.EARLY_VERSION_TIMING_OFFSET : 0)));
+                Assert.That(score.Replay.Frames[0].Time, Is.EqualTo(first_frame_time + offset));
+                Assert.That(score.Replay.Frames[1].Time, Is.EqualTo(second_frame_time + offset));
+                Assert.That(score.Replay.Frames[2].Time, Is.EqualTo(third_frame_time + offset));
             }
         }
 
@@ -175,6 +179,94 @@ namespace osu.Game.Tests.Beatmaps.Formats
 
             Assert.That(decodedAfterEncode.Replay.Frames[0].Time, Is.EqualTo(first_frame_time));
             Assert.That(decodedAfterEncode.Replay.Frames[1].Time, Is.EqualTo(second_frame_time));
+        }
+
+        [Test]
+        public void TestNegativeFrameSkipped()
+        {
+            var ruleset = new OsuRuleset().RulesetInfo;
+            var scoreInfo = TestResources.CreateTestScoreInfo(ruleset);
+            var beatmap = new TestBeatmap(ruleset);
+
+            var score = new Score
+            {
+                ScoreInfo = scoreInfo,
+                Replay = new Replay
+                {
+                    Frames = new List<ReplayFrame>
+                    {
+                        new OsuReplayFrame(0, new Vector2()),
+                        new OsuReplayFrame(1000, OsuPlayfield.BASE_SIZE),
+                        new OsuReplayFrame(500, OsuPlayfield.BASE_SIZE / 2),
+                        new OsuReplayFrame(2000, OsuPlayfield.BASE_SIZE),
+                    }
+                }
+            };
+
+            var decodedAfterEncode = encodeThenDecode(LegacyScoreEncoder.LATEST_VERSION, score, beatmap);
+
+            Assert.That(decodedAfterEncode.Replay.Frames, Has.Count.EqualTo(3));
+            Assert.That(decodedAfterEncode.Replay.Frames[0].Time, Is.EqualTo(0));
+            Assert.That(decodedAfterEncode.Replay.Frames[1].Time, Is.EqualTo(1000));
+            Assert.That(decodedAfterEncode.Replay.Frames[2].Time, Is.EqualTo(2000));
+        }
+
+        [Test]
+        public void FirstTwoFramesSwappedIfInWrongOrder()
+        {
+            var ruleset = new OsuRuleset().RulesetInfo;
+            var scoreInfo = TestResources.CreateTestScoreInfo(ruleset);
+            var beatmap = new TestBeatmap(ruleset);
+
+            var score = new Score
+            {
+                ScoreInfo = scoreInfo,
+                Replay = new Replay
+                {
+                    Frames = new List<ReplayFrame>
+                    {
+                        new OsuReplayFrame(100, new Vector2()),
+                        new OsuReplayFrame(50, OsuPlayfield.BASE_SIZE / 2),
+                        new OsuReplayFrame(1000, OsuPlayfield.BASE_SIZE),
+                    }
+                }
+            };
+
+            var decodedAfterEncode = encodeThenDecode(LegacyScoreEncoder.LATEST_VERSION, score, beatmap);
+
+            Assert.That(decodedAfterEncode.Replay.Frames, Has.Count.EqualTo(3));
+            Assert.That(decodedAfterEncode.Replay.Frames[0].Time, Is.EqualTo(0));
+            Assert.That(decodedAfterEncode.Replay.Frames[1].Time, Is.EqualTo(100));
+            Assert.That(decodedAfterEncode.Replay.Frames[2].Time, Is.EqualTo(1000));
+        }
+
+        [Test]
+        public void FirstTwoFramesPulledTowardThirdIfTheyAreAfterIt()
+        {
+            var ruleset = new OsuRuleset().RulesetInfo;
+            var scoreInfo = TestResources.CreateTestScoreInfo(ruleset);
+            var beatmap = new TestBeatmap(ruleset);
+
+            var score = new Score
+            {
+                ScoreInfo = scoreInfo,
+                Replay = new Replay
+                {
+                    Frames = new List<ReplayFrame>
+                    {
+                        new OsuReplayFrame(0, new Vector2()),
+                        new OsuReplayFrame(500, OsuPlayfield.BASE_SIZE / 2),
+                        new OsuReplayFrame(-1500, OsuPlayfield.BASE_SIZE),
+                    }
+                }
+            };
+
+            var decodedAfterEncode = encodeThenDecode(LegacyScoreEncoder.LATEST_VERSION, score, beatmap);
+
+            Assert.That(decodedAfterEncode.Replay.Frames, Has.Count.EqualTo(3));
+            Assert.That(decodedAfterEncode.Replay.Frames[0].Time, Is.EqualTo(-1500));
+            Assert.That(decodedAfterEncode.Replay.Frames[1].Time, Is.EqualTo(-1500));
+            Assert.That(decodedAfterEncode.Replay.Frames[2].Time, Is.EqualTo(-1500));
         }
 
         [Test]
