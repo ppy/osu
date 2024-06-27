@@ -26,13 +26,13 @@ namespace osu.Game.Rulesets.Mods
 
         public override ModType Type => ModType.DifficultyIncrease;
 
-        public override double ScoreMultiplier => 1.0;
+        public override double ScoreMultiplier => ReplaceHealth.Value ? 0.5 : 1.0;
 
         public override Type[] IncompatibleMods => base.IncompatibleMods.Concat(new[] { typeof(ModEasyWithExtraLives), typeof(ModPerfect) }).ToArray();
 
         public override bool RequiresConfiguration => false;
 
-        public override bool Ranked => true;
+        public override bool Ranked => !ReplaceHealth.Value;
 
         public override string SettingDescription => base.SettingDescription.Replace(MinimumAccuracy.ToString(), MinimumAccuracy.Value.ToString("##%", NumberFormatInfo.InvariantInfo));
 
