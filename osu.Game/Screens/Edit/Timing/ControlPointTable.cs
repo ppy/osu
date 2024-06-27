@@ -100,9 +100,20 @@ namespace osu.Game.Screens.Edit.Timing
 
                 selectedGroup.BindValueChanged(val =>
                 {
+                    // can't use `.ScrollIntoView()` here because of the list virtualisation not giving
+                    // child items valid coordinates from the start, so ballpark something similar
+                    // using estimated row height.
                     var row = Items.FlowingChildren.SingleOrDefault(item => item.Row.Equals(val.NewValue));
-                    if (row != null)
-                        Scroll.ScrollIntoView(row);
+                    if (row == null)
+                        return;
+
+                    float minPos = Items.GetLayoutPosition(row) * row_height;
+                    float maxPos = minPos + row_height;
+
+                    if (minPos < Scroll.Current)
+                        Scroll.ScrollTo(minPos);
+                    else if (maxPos > Scroll.Current + Scroll.DisplayableContent)
+                        Scroll.ScrollTo(maxPos - Scroll.DisplayableContent);
                 });
             }
         }
