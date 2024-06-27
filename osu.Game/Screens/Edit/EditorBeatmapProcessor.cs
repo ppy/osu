@@ -41,7 +41,7 @@ namespace osu.Game.Screens.Edit
             foreach (var manualBreak in Beatmap.Breaks.ToList())
             {
                 if (manualBreak.EndTime <= Beatmap.HitObjects.FirstOrDefault()?.StartTime
-                    || manualBreak.StartTime >= Beatmap.HitObjects.LastOrDefault()?.GetEndTime()
+                    || manualBreak.StartTime >= Beatmap.GetLastObjectTime()
                     || Beatmap.HitObjects.Any(ho => ho.StartTime <= manualBreak.EndTime && ho.GetEndTime() >= manualBreak.StartTime))
                 {
                     Beatmap.Breaks.Remove(manualBreak);
