@@ -20,7 +20,7 @@ namespace osu.Game.Skinning
 
         public bool UsesFixedAnchor { get; set; }
 
-        private Bindable<Scoring.ScoreRank> rankBinding = new Bindable<Scoring.ScoreRank>();
+        private readonly Bindable<Scoring.ScoreRank> rankBinding = new Bindable<Scoring.ScoreRank>();
 
         [Resolved]
         private ScoreProcessor scoreProcessor { get; set; } = null!;
@@ -48,6 +48,7 @@ namespace osu.Game.Skinning
             RankDisplay.BindValueChanged(mode =>
             {
                 rankBinding.UnbindBindings();
+
                 switch (mode.NewValue)
                 {
                     case DefaultRankDisplay.RankDisplayMode.Standard:
@@ -62,7 +63,8 @@ namespace osu.Game.Skinning
                         rankBinding.BindTarget = scoreProcessor.MaximumRank;
                         break;
                 }
-                rankBinding.BindValueChanged(v => updateValue(v), true);
+
+                rankBinding.BindValueChanged(updateValue, true);
             }, true);
             FinishTransforms(true);
         }

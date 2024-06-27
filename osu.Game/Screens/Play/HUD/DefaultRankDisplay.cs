@@ -21,7 +21,7 @@ namespace osu.Game.Screens.Play.HUD
         [SettingSource(typeof(GameplayRankDisplayStrings), nameof(GameplayRankDisplayStrings.RankDisplay), nameof(GameplayRankDisplayStrings.RankDisplayDescription))]
         public Bindable<RankDisplayMode> RankDisplay { get; } = new Bindable<RankDisplayMode>();
 
-        private Bindable<ScoreRank> rankBinding = new Bindable<ScoreRank>();
+        private readonly Bindable<ScoreRank> rankBinding = new Bindable<ScoreRank>();
 
         [Resolved]
         private ScoreProcessor scoreProcessor { get; set; } = null!;
@@ -50,6 +50,7 @@ namespace osu.Game.Screens.Play.HUD
             RankDisplay.BindValueChanged(mode =>
             {
                 rankBinding.UnbindBindings();
+
                 switch (mode.NewValue)
                 {
                     case RankDisplayMode.Standard:
@@ -64,6 +65,7 @@ namespace osu.Game.Screens.Play.HUD
                         rankBinding.BindTarget = scoreProcessor.MaximumRank;
                         break;
                 }
+
                 rankBinding.BindValueChanged(v => rank.Rank = v.NewValue, true);
             }, true);
         }
