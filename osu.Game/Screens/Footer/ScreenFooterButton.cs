@@ -28,8 +28,8 @@ namespace osu.Game.Screens.Footer
         private const float shear = OsuGame.SHEAR;
 
         protected const int CORNER_RADIUS = 10;
-        protected const int BUTTON_HEIGHT = 90;
-        protected const int BUTTON_WIDTH = 140;
+        protected const int BUTTON_HEIGHT = 75;
+        protected const int BUTTON_WIDTH = 116;
 
         public Bindable<Visibility> OverlayState = new Bindable<Visibility>();
 
@@ -116,19 +116,18 @@ namespace osu.Game.Screens.Footer
                                 {
                                     Anchor = Anchor.TopCentre,
                                     Origin = Anchor.TopCentre,
-                                    Y = 42,
+                                    Y = 35,
                                     AutoSizeAxes = Axes.Both,
                                     Child = text = new OsuSpriteText
                                     {
-                                        // figma design says the size is 16, but due to the issues with font sizes 19 matches better
-                                        Font = OsuFont.TorusAlternate.With(size: 19),
+                                        Font = OsuFont.TorusAlternate.With(size: 16),
                                         AlwaysPresent = true
                                     }
                                 },
                                 icon = new SpriteIcon
                                 {
-                                    Y = 12,
-                                    Size = new Vector2(20),
+                                    Y = 10,
+                                    Size = new Vector2(16),
                                     Anchor = Anchor.TopCentre,
                                     Origin = Anchor.TopCentre
                                 },
@@ -140,7 +139,7 @@ namespace osu.Game.Screens.Footer
                             Anchor = Anchor.BottomCentre,
                             Origin = Anchor.Centre,
                             Y = -CORNER_RADIUS,
-                            Size = new Vector2(120, 6),
+                            Size = new Vector2(100, 5),
                             Masking = true,
                             CornerRadius = 3,
                             Child = bar = new Box

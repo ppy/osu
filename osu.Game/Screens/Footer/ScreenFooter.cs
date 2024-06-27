@@ -24,7 +24,7 @@ namespace osu.Game.Screens.Footer
         private const int padding = 60;
         private const float delay_per_button = 30;
 
-        public const int HEIGHT = 60;
+        public const int HEIGHT = 50;
 
         private readonly List<OverlayContainer> overlays = new List<OverlayContainer>();
 
@@ -73,7 +73,7 @@ namespace osu.Game.Screens.Footer
                 },
                 backButton = new ScreenBackButton
                 {
-                    Margin = new MarginPadding { Bottom = 10f, Left = 12f },
+                    Margin = new MarginPadding { Bottom = 15f, Left = 12f },
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.BottomLeft,
                     Action = () => OnBack?.Invoke(),
