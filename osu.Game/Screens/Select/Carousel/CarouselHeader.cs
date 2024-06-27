@@ -96,7 +96,7 @@ namespace osu.Game.Screens.Select.Carousel
                 case CarouselItemState.SelectedCollapsed:
                     hoverLayer.InsetForBorder = true;
 
-                    BorderContainer.BorderThickness = border_thickness/1.5f;
+                    BorderContainer.BorderThickness = border_thickness / 1.5f;
                     BorderContainer.EdgeEffect = new EdgeEffectParameters
                     {
                         Type = EdgeEffectType.Glow,

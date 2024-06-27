@@ -1318,7 +1318,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             AddStep("expand with cursor", () =>
             {
-                InputManager.MoveMouseTo(set, new osuTK.Vector2(0, DrawableCarouselBeatmapSet.MAX_HEIGHT/3));
+                InputManager.MoveMouseTo(set, new osuTK.Vector2(0, DrawableCarouselBeatmapSet.MAX_HEIGHT / 3));
 
                 InputManager.Click(MouseButton.Left);
             });
@@ -1368,13 +1368,13 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             AddStep("right click to open context menu", () =>
             {
-                InputManager.MoveMouseTo(set, new osuTK.Vector2(0, -DrawableCarouselBeatmapSet.MAX_HEIGHT/3));
+                InputManager.MoveMouseTo(set, new osuTK.Vector2(0, -DrawableCarouselBeatmapSet.MAX_HEIGHT / 3));
                 InputManager.Click(MouseButton.Right);
             });
 
             AddStep("right click to open context menu", () =>
             {
-                InputManager.MoveMouseTo(set, new osuTK.Vector2(20, -DrawableCarouselBeatmapSet.MAX_HEIGHT/3 + 20));
+                InputManager.MoveMouseTo(set, new osuTK.Vector2(20, -DrawableCarouselBeatmapSet.MAX_HEIGHT / 3 + 20));
                 InputManager.Click(MouseButton.Left);
             });
 

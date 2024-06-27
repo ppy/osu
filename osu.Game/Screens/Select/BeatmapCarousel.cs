@@ -585,7 +585,8 @@ namespace osu.Game.Screens.Select
 
             if (skipDifficulties)
             {
-                if (selectedBeatmapSet.State.Value == CarouselItemState.SelectedCollapsed){
+                if (selectedBeatmapSet.State.Value == CarouselItemState.SelectedCollapsed)
+                {
                     wasSelectedCollapsed = true;
                     select(nextSet);
                     collapseSelected(nextSet);
@@ -724,7 +725,7 @@ namespace osu.Game.Screens.Select
 
         public bool tryToCollapse()
         {
-            if(selectedBeatmapSet != null && selectedBeatmapSet.State.Value == CarouselItemState.Selected)
+            if (selectedBeatmapSet != null && selectedBeatmapSet.State.Value == CarouselItemState.Selected)
             {
                 collapseSelected(selectedBeatmapSet);
                 return true;
@@ -1062,7 +1063,7 @@ namespace osu.Game.Screens.Select
             {
                 c.State.ValueChanged += state =>
                 {
-                    
+
                     if (state.NewValue == CarouselItemState.Selected)
                     {
                         selectedBeatmapSet = set;
