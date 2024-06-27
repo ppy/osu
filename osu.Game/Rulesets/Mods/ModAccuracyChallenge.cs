@@ -15,7 +15,7 @@ using osu.Game.Scoring;
 
 namespace osu.Game.Rulesets.Mods
 {
-    public class ModAccuracyChallenge : ModFailCondition, IApplicableToScoreProcessor
+    public class ModAccuracyChallenge : ModFailCondition, IApplicableToHealthProcessor, IApplicableToScoreProcessor
     {
         public override string Name => "Accuracy Challenge";
 
@@ -48,7 +48,18 @@ namespace osu.Game.Rulesets.Mods
         [SettingSource("Accuracy mode", "The mode of accuracy that will trigger failure.")]
         public Bindable<AccuracyMode> AccuracyJudgeMode { get; } = new Bindable<AccuracyMode>();
 
+        [SettingSource("Replacing Health", "Fail is only caused by accuracy.")]
+        public BindableBool ReplaceHealth { get; } = new BindableBool();
+
         private readonly Bindable<double> currentAccuracy = new Bindable<double>();
+
+        private HealthProcessor healthProcessor = null!;
+
+        public new void ApplyToHealthProcessor(HealthProcessor healthProcessor)
+        {
+            base.ApplyToHealthProcessor(healthProcessor);
+            this.healthProcessor = healthProcessor;
+        }
 
         public void ApplyToScoreProcessor(ScoreProcessor scoreProcessor)
         {
@@ -65,6 +76,13 @@ namespace osu.Game.Rulesets.Mods
 
             currentAccuracy.BindValueChanged(s =>
             {
+                if (ReplaceHealth.Value)
+                {
+                    var accuracyRange = 1 - MinimumAccuracy.Value;
+                    var accuracyMargin = s.NewValue - MinimumAccuracy.Value;
+                    healthProcessor.Health.Value = accuracyMargin / accuracyRange;
+                }
+
                 if (s.NewValue < MinimumAccuracy.Value)
                 {
                     TriggerFailure();
