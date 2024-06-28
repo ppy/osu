@@ -40,14 +40,14 @@ namespace osu.Game.Overlays.Mods
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
-                    Padding = new MarginPadding(7),
+                    Padding = new MarginPadding { Left = 10, Right = 10, Top = 5, Bottom = 5 },
                     Spacing = new Vector2(7),
                     Children = new[]
                     {
                         descriptionText = new OsuSpriteText
                         {
                             Font = OsuFont.GetFont(weight: FontWeight.Regular),
-                            Colour = colourProvider.Content2,
+                            Colour = colourProvider.Content1,
                         },
                     }
                 }
