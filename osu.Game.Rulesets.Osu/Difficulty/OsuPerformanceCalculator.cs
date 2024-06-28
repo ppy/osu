@@ -466,7 +466,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         private double adjustSpeedWithUR(double speedValue, double UR)
         {
             // Starting from this pp amount - penalty will be applied
-            double abusePoint = 100 + 220 * Math.Pow(20 / UR, 4.5);
+            double abusePoint = 100 + 260 * Math.Pow(20 / UR, 5.8);
 
             if (speedValue <= abusePoint)
                 return speedValue;
@@ -481,7 +481,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         private double adjustPerformanceWithUR(double performanceValue, double UR)
         {
             // Starting from this pp amount - penalty will be applied
-            double abusePoint = 200 + 260 * Math.Pow(20 / UR, 4.5);
+            double abusePoint = 200 + 260 * Math.Pow(20 / UR, 5.8);
 
             if (performanceValue <= abusePoint)
                 return performanceValue;
