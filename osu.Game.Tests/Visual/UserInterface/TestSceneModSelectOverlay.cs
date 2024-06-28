@@ -25,6 +25,7 @@ using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Taiko.Mods;
 using osu.Game.Tests.Mods;
+using osuTK;
 using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.UserInterface
@@ -761,6 +762,19 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddAssert("mod select hidden", () => modSelectOverlay.State.Value == Visibility.Hidden);
         }
 
+        [Test]
+        public void TestCloseViaToggleModSelectionBinding()
+        {
+            createScreen();
+            changeRuleset(0);
+
+            AddStep("select difficulty adjust via panel", () => getPanelForMod(typeof(OsuModDifficultyAdjust)).TriggerClick());
+            assertCustomisationToggleState(disabled: false, active: true);
+
+            AddStep("press F1", () => InputManager.Key(Key.F1));
+            AddAssert("mod select hidden", () => modSelectOverlay.State.Value == Visibility.Hidden);
+        }
+
         /// <summary>
         /// Covers columns hiding/unhiding on changes of <see cref="ModSelectOverlay.IsValidMod"/>.
         /// </summary>
@@ -910,6 +924,68 @@ namespace osu.Game.Tests.Visual.UserInterface
                        columns.ElementAt(1).Mod is OsuModHidden &&
                        columns.ElementAt(2).Mod is OsuModDeflate;
             });
+        }
+
+        [Test]
+        public void TestOpeningCustomisationHidesPresetPopover()
+        {
+            createScreen();
+
+            AddStep("select DT", () => SelectedMods.Value = new Mod[] { new OsuModDoubleTime() });
+            AddStep("click new preset", () =>
+            {
+                InputManager.MoveMouseTo(this.ChildrenOfType<AddPresetButton>().Single());
+                InputManager.Click(MouseButton.Left);
+            });
+
+            AddAssert("preset popover shown", () => this.ChildrenOfType<AddPresetPopover>().SingleOrDefault()?.IsPresent, () => Is.True);
+
+            AddStep("click customisation header", () =>
+            {
+                InputManager.MoveMouseTo(this.ChildrenOfType<ModCustomisationHeader>().Single());
+                InputManager.Click(MouseButton.Left);
+            });
+
+            AddUntilStep("preset popover hidden", () => this.ChildrenOfType<AddPresetPopover>().SingleOrDefault()?.IsPresent, () => Is.Not.True);
+            AddAssert("customisation panel shown", () => this.ChildrenOfType<ModCustomisationPanel>().Single().State.Value, () => Is.EqualTo(Visibility.Visible));
+        }
+
+        [Test]
+        public void TestCustomisationPanelAbsorbsInput([Values] bool textSearchStartsActive)
+        {
+            AddStep($"text search starts active = {textSearchStartsActive}", () => configManager.SetValue(OsuSetting.ModSelectTextSearchStartsActive, textSearchStartsActive));
+            createScreen();
+
+            AddStep("select DT", () => SelectedMods.Value = new Mod[] { new OsuModDoubleTime() });
+            AddStep("open customisation panel", () => this.ChildrenOfType<ModCustomisationHeader>().Single().TriggerClick());
+            AddAssert("search lost focus", () => !this.ChildrenOfType<ShearedSearchTextBox>().Single().HasFocus);
+
+            AddStep("press tab", () => InputManager.Key(Key.Tab));
+            AddAssert("search still not focused", () => !this.ChildrenOfType<ShearedSearchTextBox>().Single().HasFocus);
+
+            AddStep("press q", () => InputManager.Key(Key.Q));
+            AddAssert("easy not selected", () => SelectedMods.Value.Single() is OsuModDoubleTime);
+
+            // the "deselect all mods" action is intentionally disabled when customisation panel is open to not conflict with pressing backspace to delete characters in a textbox.
+            // this is supposed to be handled by the textbox itself especially since it's focused and thus prioritised in input queue,
+            // but it's not for some reason, and figuring out why is probably not going to be a pleasant experience (read TextBox.OnKeyDown for a head start).
+            AddStep("press backspace", () => InputManager.Key(Key.BackSpace));
+            AddAssert("mods not deselected", () => SelectedMods.Value.Single() is OsuModDoubleTime);
+
+            AddStep("move mouse to scroll bar", () => InputManager.MoveMouseTo(modSelectOverlay.ChildrenOfType<ModSelectOverlay.ColumnScrollContainer>().Single().ScreenSpaceDrawQuad.BottomLeft + new Vector2(10f, -5f)));
+
+            AddStep("scroll down", () => InputManager.ScrollVerticalBy(-10f));
+            AddAssert("column not scrolled", () => modSelectOverlay.ChildrenOfType<ModSelectOverlay.ColumnScrollContainer>().Single().IsScrolledToStart());
+
+            AddStep("press mouse", () => InputManager.PressButton(MouseButton.Left));
+            AddAssert("search still not focused", () => !this.ChildrenOfType<ShearedSearchTextBox>().Single().HasFocus);
+            AddStep("release mouse", () => InputManager.ReleaseButton(MouseButton.Left));
+            AddAssert("customisation panel closed by click", () => !this.ChildrenOfType<ModCustomisationPanel>().Single().Expanded.Value);
+
+            if (textSearchStartsActive)
+                AddAssert("search focused", () => this.ChildrenOfType<ShearedSearchTextBox>().Single().HasFocus);
+            else
+                AddAssert("search still not focused", () => !this.ChildrenOfType<ShearedSearchTextBox>().Single().HasFocus);
         }
 
         private void waitForColumnLoad() => AddUntilStep("all column content loaded", () =>
