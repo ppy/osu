@@ -7,12 +7,17 @@ using System.Collections.Specialized;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
+using osu.Game.Graphics;
 using osuTK;
+using osuTK.Graphics;
+using FontWeight = osu.Game.Graphics.FontWeight;
 
 namespace osu.Game.Overlays.BeatmapListing
 {
@@ -95,30 +100,91 @@ namespace osu.Game.Overlays.BeatmapListing
 
         protected partial class MultipleSelectionFilterTabItem : FilterTabItem<T>
         {
-            private readonly Box selectedUnderline;
-
-            protected override bool HighlightOnHoverWhenActive => true;
+            private Drawable activeContent = null!;
+            private Circle background = null!;
 
             public MultipleSelectionFilterTabItem(T value)
                 : base(value)
             {
+            }
+
+            [BackgroundDependencyLoader]
+            private void load()
+            {
+                AutoSizeDuration = 100;
+                AutoSizeEasing = Easing.OutQuint;
+
                 // This doesn't match any actual design, but should make it easier for the user to understand
                 // that filters are applied until we settle on a final design.
-                AddInternal(selectedUnderline = new Box
+                AddInternal(activeContent = new Container
                 {
                     Depth = float.MaxValue,
-                    RelativeSizeAxes = Axes.X,
-                    Height = 1.5f,
-                    Anchor = Anchor.BottomLeft,
-                    Origin = Anchor.CentreLeft,
+                    RelativeSizeAxes = Axes.Both,
+                    Alpha = 0,
+                    Padding = new MarginPadding
+                    {
+                        Left = -16,
+                        Right = -4,
+                        Vertical = -2
+                    },
+                    Children = new Drawable[]
+                    {
+                        background = new Circle
+                        {
+                            Colour = Color4.White,
+                            RelativeSizeAxes = Axes.Both,
+                        },
+                        new SpriteIcon
+                        {
+                            Icon = FontAwesome.Solid.TimesCircle,
+                            Size = new Vector2(10),
+                            Colour = ColourProvider.Background4,
+                            Position = new Vector2(3, 0.5f),
+                            Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.CentreLeft,
+                        }
+                    }
                 });
+            }
+
+            protected override Color4 ColourActive => ColourProvider.Light1;
+
+            public override bool ReceivePositionalInputAt(Vector2 screenSpacePos)
+            {
+                return Active.Value
+                    ? background.ReceivePositionalInputAt(screenSpacePos)
+                    : base.ReceivePositionalInputAt(screenSpacePos);
             }
 
             protected override void UpdateState()
             {
-                base.UpdateState();
-                selectedUnderline.FadeTo(Active.Value ? 1 : 0, 200, Easing.OutQuint);
-                selectedUnderline.FadeColour(ColourForCurrentState, 200, Easing.OutQuint);
+                Color4 colour = Active.Value ? ColourActive : ColourNormal;
+
+                if (IsHovered)
+                    colour = Active.Value ? colour.Darken(0.2f) : colour.Lighten(0.2f);
+
+                if (Active.Value)
+                {
+                    // This just allows enough spacing for adjacent tab items to show the "x".
+                    Padding = new MarginPadding { Left = 12 };
+
+                    activeContent.FadeIn(200, Easing.OutQuint);
+                    background.FadeColour(colour, 200, Easing.OutQuint);
+
+                    // flipping colours
+                    Text.FadeColour(ColourProvider.Background4, 200, Easing.OutQuint);
+                    Text.Font = Text.Font.With(weight: FontWeight.SemiBold);
+                }
+                else
+                {
+                    Padding = new MarginPadding();
+
+                    activeContent.FadeOut();
+
+                    background.FadeColour(colour, 200, Easing.OutQuint);
+                    Text.FadeColour(colour, 200, Easing.OutQuint);
+                    Text.Font = Text.Font.With(weight: FontWeight.Regular);
+                }
             }
 
             protected override bool OnClick(ClickEvent e)

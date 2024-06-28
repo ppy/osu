@@ -85,27 +85,17 @@ namespace osu.Game.Overlays.BeatmapListing
         /// </summary>
         protected virtual LocalisableString LabelFor(T value) => (value as Enum)?.GetLocalisableDescription() ?? value.ToString();
 
-        protected virtual bool HighlightOnHoverWhenActive => false;
-
         protected virtual Color4 ColourActive => ColourProvider.Content1;
         protected virtual Color4 ColourNormal => ColourProvider.Light2;
 
-        protected Color4 ColourForCurrentState
-        {
-            get
-            {
-                Color4 colour = Active.Value ? ColourActive : ColourNormal;
-
-                if (IsHovered && (!Active.Value || HighlightOnHoverWhenActive))
-                    colour = colour.Lighten(0.2f);
-
-                return colour;
-            }
-        }
-
         protected virtual void UpdateState()
         {
-            Text.FadeColour(ColourForCurrentState, 200, Easing.OutQuint);
+            Color4 colour = Active.Value ? ColourActive : ColourNormal;
+
+            if (IsHovered)
+                colour = colour.Lighten(0.2f);
+
+            Text.FadeColour(colour, 200, Easing.OutQuint);
             Text.Font = Text.Font.With(weight: Active.Value ? FontWeight.Bold : FontWeight.Regular);
         }
     }
