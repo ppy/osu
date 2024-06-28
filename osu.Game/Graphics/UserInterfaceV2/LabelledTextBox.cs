@@ -59,7 +59,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
         protected override void OnFocus(FocusEvent e)
         {
             base.OnFocus(e);
-            GetContainingFocusManager().ChangeFocus(Component);
+            GetContainingFocusManager()!.ChangeFocus(Component);
         }
 
         protected override OsuTextBox CreateComponent() => CreateTextBox().With(t =>
