@@ -19,7 +19,7 @@ using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Mods
 {
-    public class ModAdaptiveSpeed : Mod, IApplicableToRate, IApplicableToDrawableHitObject, IApplicableToBeatmap, IUpdatableByPlayfield
+    public class ModAdaptiveSpeed : Mod, IApplicableToRate, IApplicableToDrawableHitObject, IApplicableToBeatmap, IUpdatableByPlayfield, ICanBeToggledDuringReplay
     {
         public override string Name => "Adaptive Speed";
 
@@ -46,6 +46,8 @@ namespace osu.Game.Rulesets.Mods
 
         [SettingSource("Adjust pitch", "Should pitch be adjusted with speed")]
         public BindableBool AdjustPitch { get; } = new BindableBool(true);
+
+        public BindableBool IsDisabled { get; } = new BindableBool();
 
         /// <summary>
         /// The instantaneous rate of the track.
@@ -152,7 +154,7 @@ namespace osu.Game.Rulesets.Mods
 
         public void Update(Playfield playfield)
         {
-            SpeedChange.Value = Interpolation.DampContinuously(SpeedChange.Value, targetRate, 50, playfield.Clock.ElapsedFrameTime);
+            SpeedChange.Value = IsDisabled.Value ? InitialRate.Value : Interpolation.DampContinuously(SpeedChange.Value, targetRate, 50, playfield.Clock.ElapsedFrameTime);
         }
 
         public double ApplyToRate(double time, double rate = 1) => rate * InitialRate.Value;

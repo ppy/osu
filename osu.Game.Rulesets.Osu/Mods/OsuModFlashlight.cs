@@ -68,6 +68,9 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             public void OnSliderTrackingChange(DrawableSlider e)
             {
+                if (IsDisabled.Value)
+                    return;
+
                 // If a slider is in a tracking state, a further dim should be applied to the (remaining) visible portion of the playfield.
                 FlashlightDim = Time.Current >= e.HitObject.StartTime && e.Tracking.Value ? 0.8f : 0.0f;
             }

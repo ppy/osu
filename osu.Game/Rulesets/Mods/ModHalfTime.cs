@@ -36,6 +36,7 @@ namespace osu.Game.Rulesets.Mods
         protected ModHalfTime()
         {
             rateAdjustHelper = new RateAdjustModHelper(SpeedChange);
+            rateAdjustHelper.DisableSpeedChange.BindTo(IsDisabled);
             rateAdjustHelper.HandleAudioAdjustments(AdjustPitch);
         }
 

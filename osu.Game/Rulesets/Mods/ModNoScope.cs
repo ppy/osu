@@ -15,7 +15,7 @@ using osu.Game.Screens.Play;
 
 namespace osu.Game.Rulesets.Mods
 {
-    public abstract class ModNoScope : Mod, IApplicableToScoreProcessor, IApplicableToPlayer
+    public abstract class ModNoScope : Mod, IApplicableToScoreProcessor, IApplicableToPlayer, ICanBeToggledDuringReplay
     {
         public override string Name => "No Scope";
         public override string Acronym => "NS";
@@ -35,7 +35,9 @@ namespace osu.Game.Rulesets.Mods
 
         protected readonly IBindable<bool> IsBreakTime = new Bindable<bool>();
 
-        protected float ComboBasedAlpha;
+        protected float ComboBasedAlpha = MIN_ALPHA;
+
+        public BindableBool IsDisabled { get; } = new BindableBool();
 
         [SettingSource(
             "Hidden at combo",
@@ -53,13 +55,29 @@ namespace osu.Game.Rulesets.Mods
 
         public void ApplyToScoreProcessor(ScoreProcessor scoreProcessor)
         {
-            if (HiddenComboCount.Value == 0) return;
+            if (HiddenComboCount.Value == 0)
+            {
+                IsDisabled.BindValueChanged(s =>
+                {
+                    ComboBasedAlpha = IsDisabled.Value ? 1 : MIN_ALPHA;
+                });
+                return;
+            }
 
             CurrentCombo.BindTo(scoreProcessor.Combo);
             CurrentCombo.BindValueChanged(combo =>
             {
-                ComboBasedAlpha = Math.Max(MIN_ALPHA, 1 - (float)combo.NewValue / HiddenComboCount.Value);
+                if (IsDisabled.Value) return;
+
+                ComboBasedAlpha = updateComboBasedAlpha(combo.NewValue);
             }, true);
+
+            IsDisabled.BindValueChanged(s =>
+            {
+                ComboBasedAlpha = s.NewValue ? 1 : updateComboBasedAlpha(CurrentCombo.Value);
+            });
+
+            float updateComboBasedAlpha(int combo) => Math.Max(MIN_ALPHA, 1 - (float)combo / HiddenComboCount.Value);
         }
     }
 

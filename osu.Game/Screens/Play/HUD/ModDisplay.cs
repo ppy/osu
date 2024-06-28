@@ -20,7 +20,7 @@ namespace osu.Game.Screens.Play.HUD
     /// </summary>
     public partial class ModDisplay : CompositeDrawable, IHasCurrentValue<IReadOnlyList<Mod>>
     {
-        private const int fade_duration = 1000;
+        protected const int FADE_DURATION = 1000;
 
         public ExpansionMode ExpansionMode = ExpansionMode.ExpandOnHover;
 
@@ -59,7 +59,7 @@ namespace osu.Game.Screens.Play.HUD
 
             Current.BindValueChanged(updateDisplay, true);
 
-            iconsContainer.FadeInFromZero(fade_duration, Easing.OutQuint);
+            iconsContainer.FadeInFromZero(FADE_DURATION, Easing.OutQuint);
 
             if (ExpansionMode == ExpansionMode.AlwaysExpanded || ExpansionMode == ExpansionMode.AlwaysContracted)
                 FinishTransforms(true);
@@ -72,10 +72,10 @@ namespace osu.Game.Screens.Play.HUD
             foreach (Mod mod in mods.NewValue.AsOrdered())
                 iconsContainer.Add(new ModIcon(mod, showExtendedInformation: showExtendedInformation) { Scale = new Vector2(0.6f) });
 
-            appearTransform();
+            AppearTransform();
         }
 
-        private void appearTransform()
+        protected void AppearTransform()
         {
             expand();
 
