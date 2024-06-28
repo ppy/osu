@@ -481,13 +481,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         private double adjustPerformanceWithUR(double performanceValue, double UR)
         {
             // Starting from this pp amount - penalty will be applied
-            double abusePoint = 200 + 260 * Math.Pow(20 / UR, 5.8);
+            double abusePoint = 150 + 360 * Math.Pow(20 / UR, 4.2);
 
             if (performanceValue <= abusePoint)
                 return performanceValue;
 
             // Descale value to make log curve look correctly
-            const double scale = 50;
+            const double scale = 150;
             performanceValue = scale * (Math.Log(performanceValue / scale + 1 - abusePoint / scale) + abusePoint / scale);
 
             return performanceValue;
