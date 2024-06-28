@@ -161,9 +161,9 @@ namespace osu.Game.Rulesets.Osu.Tests
 
                     pressed = value;
                     if (value)
-                        OnPressed(new KeyBindingPressEvent<OsuAction>(GetContainingInputManager().CurrentState, OsuAction.LeftButton));
+                        OnPressed(new KeyBindingPressEvent<OsuAction>(GetContainingInputManager()!.CurrentState, OsuAction.LeftButton));
                     else
-                        OnReleased(new KeyBindingReleaseEvent<OsuAction>(GetContainingInputManager().CurrentState, OsuAction.LeftButton));
+                        OnReleased(new KeyBindingReleaseEvent<OsuAction>(GetContainingInputManager()!.CurrentState, OsuAction.LeftButton));
                 }
             }
 
