@@ -20,6 +20,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Localisation;
 using osu.Game.Overlays;
+using osu.Game.Overlays.Mods;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Footer;
 using osu.Game.Screens.Play.HUD;
@@ -58,6 +59,11 @@ namespace osu.Game.Screens.SelectV2.Footer
 
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; } = null!;
+
+        public ScreenFooterButtonMods(ModSelectOverlay overlay)
+            : base(overlay)
+        {
+        }
 
         [BackgroundDependencyLoader]
         private void load()

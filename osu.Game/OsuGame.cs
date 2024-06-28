@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using Humanizer;
@@ -22,6 +23,7 @@ using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
@@ -58,6 +60,7 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osu.Game.Screens;
 using osu.Game.Screens.Edit;
+using osu.Game.Screens.Footer;
 using osu.Game.Screens.Menu;
 using osu.Game.Screens.OnlinePlay.Multiplayer;
 using osu.Game.Screens.Play;
@@ -153,6 +156,8 @@ namespace osu.Game
 
         private float toolbarOffset => (Toolbar?.Position.Y ?? 0) + (Toolbar?.DrawHeight ?? 0);
 
+        private float screenFooterOffset => (ScreenFooter?.DrawHeight ?? 0) - (ScreenFooter?.Position.Y ?? 0);
+
         private IdleTracker idleTracker;
 
         /// <summary>
@@ -177,6 +182,7 @@ namespace osu.Game
         protected OsuScreenStack ScreenStack;
 
         protected BackButton BackButton;
+        protected ScreenFooter ScreenFooter;
 
         protected SettingsOverlay Settings;
 
@@ -485,10 +491,19 @@ namespace osu.Game
             }
         });
 
-        public void OpenUrlExternally(string url, bool bypassExternalUrlWarning = false) => waitForReady(() => externalLinkOpener, _ =>
+        public void OpenUrlExternally(string url, bool forceBypassExternalUrlWarning = false) => waitForReady(() => externalLinkOpener, _ =>
         {
+            bool isTrustedDomain;
+
             if (url.StartsWith('/'))
-                url = $"{API.APIEndpointUrl}{url}";
+            {
+                url = $"{API.WebsiteRootUrl}{url}";
+                isTrustedDomain = true;
+            }
+            else
+            {
+                isTrustedDomain = url.StartsWith(API.WebsiteRootUrl, StringComparison.Ordinal);
+            }
 
             if (!url.CheckIsValidUrl())
             {
@@ -500,7 +515,7 @@ namespace osu.Game
                 return;
             }
 
-            externalLinkOpener.OpenUrlExternally(url, bypassExternalUrlWarning);
+            externalLinkOpener.OpenUrlExternally(url, forceBypassExternalUrlWarning || isTrustedDomain);
         });
 
         /// <summary>
@@ -857,6 +872,9 @@ namespace osu.Game
         {
             base.LoadComplete();
 
+            if (RuntimeInfo.EntryAssembly.GetCustomAttribute<OfficialBuildAttribute>() == null)
+                Logger.Log(NotificationsStrings.NotOfficialBuild.ToString());
+
             var languages = Enum.GetValues<Language>();
 
             var mappings = languages.Select(language =>
@@ -917,7 +935,7 @@ namespace osu.Game
             };
 
             Container logoContainer;
-            BackButton.Receptor receptor;
+            ScreenFooter.BackReceptor backReceptor;
 
             dependencies.CacheAs(idleTracker = new GameIdleTracker(6000));
 
@@ -950,20 +968,28 @@ namespace osu.Game
                             Origin = Anchor.Centre,
                             Children = new Drawable[]
                             {
-                                receptor = new BackButton.Receptor(),
+                                backReceptor = new ScreenFooter.BackReceptor(),
                                 ScreenStack = new OsuScreenStack { RelativeSizeAxes = Axes.Both },
-                                BackButton = new BackButton(receptor)
+                                BackButton = new BackButton(backReceptor)
                                 {
                                     Anchor = Anchor.BottomLeft,
                                     Origin = Anchor.BottomLeft,
-                                    Action = () =>
+                                    Action = () => ScreenFooter.OnBack?.Invoke(),
+                                },
+                                new PopoverContainer
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    Child = ScreenFooter = new ScreenFooter(backReceptor)
                                     {
-                                        if (!(ScreenStack.CurrentScreen is IOsuScreen currentScreen))
-                                            return;
+                                        OnBack = () =>
+                                        {
+                                            if (!(ScreenStack.CurrentScreen is IOsuScreen currentScreen))
+                                                return;
 
-                                        if (!((Drawable)currentScreen).IsLoaded || (currentScreen.AllowBackButton && !currentScreen.OnBackButton()))
-                                            ScreenStack.Exit();
-                                    }
+                                            if (!((Drawable)currentScreen).IsLoaded || (currentScreen.AllowBackButton && !currentScreen.OnBackButton()))
+                                                ScreenStack.Exit();
+                                        }
+                                    },
                                 },
                                 logoContainer = new Container { RelativeSizeAxes = Axes.Both },
                             }
@@ -984,6 +1010,8 @@ namespace osu.Game
                 idleTracker,
                 new ConfineMouseTracker()
             });
+
+            dependencies.Cache(ScreenFooter);
 
             ScreenStack.ScreenPushed += screenPushed;
             ScreenStack.ScreenExited += screenExited;
@@ -1457,6 +1485,7 @@ namespace osu.Game
 
             ScreenOffsetContainer.Padding = new MarginPadding { Top = toolbarOffset };
             overlayOffsetContainer.Padding = new MarginPadding { Top = toolbarOffset };
+            ScreenStack.Padding = new MarginPadding { Bottom = screenFooterOffset };
 
             float horizontalOffset = 0f;
 
@@ -1529,6 +1558,18 @@ namespace osu.Game
                     BackButton.Show();
                 else
                     BackButton.Hide();
+
+                if (newOsuScreen.ShowFooter)
+                {
+                    BackButton.Hide();
+                    ScreenFooter.SetButtons(newOsuScreen.CreateFooterButtons());
+                    ScreenFooter.Show();
+                }
+                else
+                {
+                    ScreenFooter.SetButtons(Array.Empty<ScreenFooterButton>());
+                    ScreenFooter.Hide();
+                }
             }
 
             skinEditor.SetTarget((OsuScreen)newScreen);

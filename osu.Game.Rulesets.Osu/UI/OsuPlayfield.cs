@@ -12,6 +12,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.Objects.Legacy;
 using osu.Game.Rulesets.Osu.Beatmaps;
 using osu.Game.Rulesets.Osu.Configuration;
 using osu.Game.Rulesets.Osu.Objects;
@@ -27,6 +28,7 @@ namespace osu.Game.Rulesets.Osu.UI
     [Cached]
     public partial class OsuPlayfield : Playfield
     {
+        private readonly Container borderContainer;
         private readonly PlayfieldBorder playfieldBorder;
         private readonly ProxyContainer approachCircles;
         private readonly ProxyContainer spinnerProxies;
@@ -54,7 +56,11 @@ namespace osu.Game.Rulesets.Osu.UI
 
             InternalChildren = new Drawable[]
             {
-                playfieldBorder = new PlayfieldBorder { RelativeSizeAxes = Axes.Both },
+                borderContainer = new Container
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Child = playfieldBorder = new PlayfieldBorder { RelativeSizeAxes = Axes.Both },
+                },
                 Smoke = new SmokeContainer { RelativeSizeAxes = Axes.Both },
                 spinnerProxies = new ProxyContainer { RelativeSizeAxes = Axes.Both },
                 FollowPoints = new FollowPointRenderer { RelativeSizeAxes = Axes.Both },
@@ -151,6 +157,14 @@ namespace osu.Game.Rulesets.Osu.UI
             RegisterPool<Spinner, DrawableSpinner>(2, 20);
             RegisterPool<SpinnerTick, DrawableSpinnerTick>(10, 200);
             RegisterPool<SpinnerBonusTick, DrawableSpinnerBonusTick>(10, 200);
+
+            if (beatmap != null)
+                ApplyCircleSizeToPlayfieldBorder(beatmap);
+        }
+
+        protected void ApplyCircleSizeToPlayfieldBorder(IBeatmap beatmap)
+        {
+            borderContainer.Padding = new MarginPadding(OsuHitObject.OBJECT_RADIUS * -LegacyRulesetExtensions.CalculateScaleFromCircleSize(beatmap.Difficulty.CircleSize, true));
         }
 
         protected override HitObjectLifetimeEntry CreateLifetimeEntry(HitObject hitObject) => new OsuHitObjectLifetimeEntry(hitObject);

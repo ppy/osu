@@ -31,6 +31,7 @@ using osu.Game.Overlays.SkinEditor;
 using osu.Game.Rulesets;
 using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Edit;
+using osu.Game.Screens.OnlinePlay.DailyChallenge;
 using osu.Game.Screens.OnlinePlay.Multiplayer;
 using osu.Game.Screens.OnlinePlay.Playlists;
 using osu.Game.Screens.Select;
@@ -149,9 +150,7 @@ namespace osu.Game.Screens.Menu
                             OnPlaylists = () => this.Push(new Playlists()),
                             OnDailyChallenge = room =>
                             {
-                                Playlists playlistsScreen;
-                                this.Push(playlistsScreen = new Playlists());
-                                playlistsScreen.Join(room);
+                                this.Push(new DailyChallenge(room));
                             },
                             OnExit = () =>
                             {
