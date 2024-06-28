@@ -55,12 +55,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             usingSliderAccuracy = !score.Mods.Any(h => h is OsuModClassic cl && cl.NoSliderHeadAccuracy.Value);
 
-            // isLegacy == true on stable scores
-            bool isLegacy = !score.MaximumStatistics.ContainsKey(HitResult.LargeTickMiss);
-
-            // Make stable scores always CL
-            if (isLegacy) usingSliderAccuracy = false;
-
             if (usingSliderAccuracy)
             {
                 effectiveMissCount = countMiss;
