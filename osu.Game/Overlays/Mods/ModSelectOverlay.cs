@@ -162,64 +162,68 @@ namespace osu.Game.Overlays.Mods
 
             columnAppearSample = audio.Samples.Get(@"SongSelect/mod-column-pop-in");
 
-            MainAreaContent.AddRange(new Drawable[]
+            MainAreaContent.Add(new OsuContextMenuContainer
             {
-                new OsuContextMenuContainer
+                RelativeSizeAxes = Axes.Both,
+                Child = new PopoverContainer
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Child = new PopoverContainer
+                    Children = new Drawable[]
                     {
-                        Padding = new MarginPadding
+                        new Container
                         {
-                            Top = RankingInformationDisplay.HEIGHT + PADDING,
-                            Bottom = PADDING
-                        },
-                        RelativeSizeAxes = Axes.Both,
-                        RelativePositionAxes = Axes.Both,
-                        Children = new Drawable[]
-                        {
-                            columnScroll = new ColumnScrollContainer
+                            Padding = new MarginPadding
                             {
-                                RelativeSizeAxes = Axes.Both,
-                                Masking = false,
-                                ClampExtension = 100,
-                                ScrollbarOverlapsContent = false,
-                                Child = columnFlow = new ColumnFlowContainer
+                                Top = RankingInformationDisplay.HEIGHT + PADDING,
+                                Bottom = PADDING
+                            },
+                            RelativeSizeAxes = Axes.Both,
+                            RelativePositionAxes = Axes.Both,
+                            Children = new Drawable[]
+                            {
+                                columnScroll = new ColumnScrollContainer
                                 {
-                                    Anchor = Anchor.BottomLeft,
-                                    Origin = Anchor.BottomLeft,
-                                    Direction = FillDirection.Horizontal,
-                                    Shear = new Vector2(OsuGame.SHEAR, 0),
-                                    RelativeSizeAxes = Axes.Y,
-                                    AutoSizeAxes = Axes.X,
-                                    Margin = new MarginPadding { Horizontal = 70 },
-                                    Padding = new MarginPadding { Bottom = 10 },
-                                    ChildrenEnumerable = createColumns()
+                                    RelativeSizeAxes = Axes.Both,
+                                    Masking = false,
+                                    ClampExtension = 100,
+                                    ScrollbarOverlapsContent = false,
+                                    Child = columnFlow = new ColumnFlowContainer
+                                    {
+                                        Anchor = Anchor.BottomLeft,
+                                        Origin = Anchor.BottomLeft,
+                                        Direction = FillDirection.Horizontal,
+                                        Shear = new Vector2(OsuGame.SHEAR, 0),
+                                        RelativeSizeAxes = Axes.Y,
+                                        AutoSizeAxes = Axes.X,
+                                        Margin = new MarginPadding { Horizontal = 70 },
+                                        Padding = new MarginPadding { Bottom = 10 },
+                                        ChildrenEnumerable = createColumns()
+                                    }
+                                }
+                            }
+                        },
+                        aboveColumnsContent = new Container
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Padding = new MarginPadding { Horizontal = 100, Bottom = 15f },
+                            Children = new Drawable[]
+                            {
+                                SearchTextBox = new ShearedSearchTextBox
+                                {
+                                    HoldFocus = false,
+                                    Width = 300,
+                                },
+                                customisationPanel = new ModCustomisationPanel
+                                {
+                                    Alpha = 0f,
+                                    Anchor = Anchor.TopRight,
+                                    Origin = Anchor.TopRight,
+                                    Width = 400,
                                 }
                             }
                         }
-                    }
-                },
-                aboveColumnsContent = new Container
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Padding = new MarginPadding { Horizontal = 100, Bottom = 15f },
-                    Children = new Drawable[]
-                    {
-                        SearchTextBox = new ShearedSearchTextBox
-                        {
-                            HoldFocus = false,
-                            Width = 300,
-                        },
-                        customisationPanel = new ModCustomisationPanel
-                        {
-                            Alpha = 0f,
-                            Anchor = Anchor.TopRight,
-                            Origin = Anchor.TopRight,
-                            Width = 400,
-                        }
-                    }
-                },
+                    },
+                }
             });
 
             FooterContent.Add(footerButtonFlow = new FillFlowContainer<ShearedButton>
