@@ -55,7 +55,7 @@ namespace osu.Game.Overlays.BeatmapListing
             {
                 RelativeSizeAxes = Axes.X;
                 AutoSizeAxes = Axes.Y;
-                Spacing = new Vector2(10, 0);
+                Spacing = new Vector2(10, 5);
 
                 AddRange(GetValues().Select(CreateTabItem));
             }
