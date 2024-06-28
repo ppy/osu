@@ -48,6 +48,7 @@ namespace osu.Game.Screens.Edit.GameplayTest
             base.LoadComplete();
 
             markPreviousObjectsHit();
+            markVisibleDrawableObjectsHit();
 
             ScoreProcessor.HasCompleted.BindValueChanged(completed =>
             {
@@ -67,9 +68,10 @@ namespace osu.Game.Screens.Edit.GameplayTest
             foreach (var hitObject in enumerateHitObjects(DrawableRuleset.Objects, editorState.Time))
             {
                 var judgement = hitObject.Judgement;
+                var result = new JudgementResult(hitObject, judgement) { Type = judgement.MaxResult };
 
-                HealthProcessor.ApplyResult(new JudgementResult(hitObject, judgement) { Type = judgement.MaxResult });
-                ScoreProcessor.ApplyResult(new JudgementResult(hitObject, judgement) { Type = judgement.MaxResult });
+                HealthProcessor.ApplyResult(result);
+                ScoreProcessor.ApplyResult(result);
             }
 
             static IEnumerable<HitObject> enumerateHitObjects(IEnumerable<HitObject> hitObjects, double cutoffTime)
@@ -84,6 +86,40 @@ namespace osu.Game.Screens.Edit.GameplayTest
 
                     if (hitObject.GetEndTime() < cutoffTime)
                         yield return hitObject;
+                }
+            }
+        }
+
+        private void markVisibleDrawableObjectsHit()
+        {
+            if (!DrawableRuleset.Playfield.IsLoaded)
+            {
+                Schedule(markVisibleDrawableObjectsHit);
+                return;
+            }
+
+            foreach (var drawableObjectEntry in enumerateDrawableEntries(
+                         DrawableRuleset.Playfield.AllHitObjects
+                                        .Select(ho => ho.Entry)
+                                        .Where(e => e != null)
+                                        .Cast<HitObjectLifetimeEntry>(), editorState.Time))
+            {
+                drawableObjectEntry.Result = new JudgementResult(drawableObjectEntry.HitObject, drawableObjectEntry.HitObject.Judgement)
+                    { Type = drawableObjectEntry.HitObject.Judgement.MaxResult };
+            }
+
+            static IEnumerable<HitObjectLifetimeEntry> enumerateDrawableEntries(IEnumerable<HitObjectLifetimeEntry> entries, double cutoffTime)
+            {
+                foreach (var entry in entries)
+                {
+                    foreach (var nested in enumerateDrawableEntries(entry.NestedEntries, cutoffTime))
+                    {
+                        if (nested.HitObject.GetEndTime() < cutoffTime)
+                            yield return nested;
+                    }
+
+                    if (entry.HitObject.GetEndTime() < cutoffTime)
+                        yield return entry;
                 }
             }
         }
