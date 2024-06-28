@@ -30,6 +30,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
                     Width = 400f,
+                    State = { Value = Visibility.Visible },
                     SelectedMods = { BindTarget = SelectedMods },
                 }
             };
