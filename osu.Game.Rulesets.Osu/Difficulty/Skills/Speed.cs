@@ -6,10 +6,8 @@ using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Difficulty.Evaluators;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
-using System.Linq;
-using osu.Game.Rulesets.Osu.Mods;
 using System.Collections.Generic;
-using osu.Game.Rulesets.Osu.Objects;
+using System.Linq;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 {
@@ -28,7 +26,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         protected override double DifficultyMultiplier => 1.04;
 
         // Used to calculate acc punishment
-        private readonly List<double> objectStrains = new List<double>();
+        private readonly List<double> objectStrains = [];
 
         public Speed(Mod[] mods)
             : base(mods)
@@ -47,6 +45,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             currentRhythm = RhythmEvaluator.EvaluateDifficultyOf(current);
 
             double totalStrain = currentStrain * currentRhythm;
+
             objectStrains.Add(totalStrain);
 
             return totalStrain;
