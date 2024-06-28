@@ -30,12 +30,6 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         private readonly Drawable userContent;
 
-        public readonly Bindable<bool> WaveformVisible = new Bindable<bool>();
-
-        public readonly Bindable<bool> ControlPointsVisible = new Bindable<bool>();
-
-        public readonly Bindable<bool> TicksVisible = new Bindable<bool>();
-
         [Resolved]
         private EditorClock editorClock { get; set; }
 
@@ -88,6 +82,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         private Container mainContent;
 
         private Bindable<float> waveformOpacity;
+        private Bindable<bool> controlPointsVisible;
+        private Bindable<bool> ticksVisible;
 
         private double trackLengthForZoom;
 
@@ -139,6 +135,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             });
 
             waveformOpacity = config.GetBindable<float>(OsuSetting.EditorWaveformOpacity);
+            controlPointsVisible = config.GetBindable<bool>(OsuSetting.EditorTimelineShowTimingChanges);
+            ticksVisible = config.GetBindable<bool>(OsuSetting.EditorTimelineShowTicks);
 
             track.BindTo(editorClock.Track);
             track.BindValueChanged(_ =>
@@ -168,12 +166,11 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         {
             base.LoadComplete();
 
-            WaveformVisible.BindValueChanged(_ => updateWaveformOpacity());
             waveformOpacity.BindValueChanged(_ => updateWaveformOpacity(), true);
 
-            TicksVisible.BindValueChanged(visible => ticks.FadeTo(visible.NewValue ? 1 : 0, 200, Easing.OutQuint), true);
+            ticksVisible.BindValueChanged(visible => ticks.FadeTo(visible.NewValue ? 1 : 0, 200, Easing.OutQuint), true);
 
-            ControlPointsVisible.BindValueChanged(visible =>
+            controlPointsVisible.BindValueChanged(visible =>
             {
                 if (visible.NewValue)
                 {
@@ -195,7 +192,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         }
 
         private void updateWaveformOpacity() =>
-            waveform.FadeTo(WaveformVisible.Value ? waveformOpacity.Value : 0, 200, Easing.OutQuint);
+            waveform.FadeTo(waveformOpacity.Value, 200, Easing.OutQuint);
 
         protected override void Update()
         {
