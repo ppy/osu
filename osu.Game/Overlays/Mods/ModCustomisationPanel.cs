@@ -10,16 +10,18 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
+using osu.Game.Input.Bindings;
 using osu.Game.Rulesets.Mods;
 using osuTK;
 
 namespace osu.Game.Overlays.Mods
 {
-    public partial class ModCustomisationPanel : VisibilityContainer
+    public partial class ModCustomisationPanel : OverlayContainer, IKeyBindingHandler<GlobalAction>
     {
         private const float header_height = 42f;
         private const float content_vertical_padding = 20f;
@@ -34,6 +36,12 @@ namespace osu.Game.Overlays.Mods
         public readonly BindableBool Expanded = new BindableBool();
 
         public Bindable<IReadOnlyList<Mod>> SelectedMods { get; } = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
+
+        public override bool HandlePositionalInput => Expanded.Value;
+
+        public override bool HandleNonPositionalInput => Expanded.Value;
+
+        protected override bool BlockPositionalInput => true;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -63,6 +71,7 @@ namespace osu.Game.Overlays.Mods
                         Radius = 20f,
                         Roundness = 5f,
                     },
+                    Expanded = { BindTarget = Expanded },
                     Children = new Drawable[]
                     {
                         new Box
@@ -110,12 +119,30 @@ namespace osu.Game.Overlays.Mods
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
 
-        protected override bool OnMouseDown(MouseDownEvent e)
+        protected override bool OnClick(ClickEvent e)
         {
-            if (Expanded.Value && !content.ReceivePositionalInputAt(e.ScreenSpaceMousePosition))
-                Expanded.Value = false;
+            Expanded.Value = false;
+            return base.OnClick(e);
+        }
 
-            return base.OnMouseDown(e);
+        protected override bool OnKeyDown(KeyDownEvent e) => true;
+
+        protected override bool OnScroll(ScrollEvent e) => true;
+
+        public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
+        {
+            switch (e.Action)
+            {
+                case GlobalAction.Back:
+                    Expanded.Value = false;
+                    return true;
+            }
+
+            return false;
+        }
+
+        public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
+        {
         }
 
         private void updateDisplay()
@@ -162,8 +189,10 @@ namespace osu.Game.Overlays.Mods
 
         private partial class FocusGrabbingContainer : InputBlockingContainer
         {
-            public override bool RequestsFocus => true;
-            public override bool AcceptsFocus => true;
+            public IBindable<bool> Expanded { get; } = new BindableBool();
+
+            public override bool RequestsFocus => Expanded.Value;
+            public override bool AcceptsFocus => Expanded.Value;
         }
     }
 }

@@ -29,6 +29,7 @@ using osu.Game.Localisation;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Utils;
 using osuTK;
+using osuTK.Graphics;
 using osuTK.Input;
 
 namespace osu.Game.Overlays.Mods
@@ -215,7 +216,6 @@ namespace osu.Game.Overlays.Mods
                                 },
                                 customisationPanel = new ModCustomisationPanel
                                 {
-                                    Alpha = 0f,
                                     Anchor = Anchor.TopRight,
                                     Origin = Anchor.TopRight,
                                     Width = 400,
@@ -508,9 +508,17 @@ namespace osu.Game.Overlays.Mods
         private void updateCustomisationVisualState()
         {
             if (customisationPanel.Expanded.Value)
+            {
+                columnScroll.FadeColour(OsuColour.Gray(0.5f), 400, Easing.OutQuint);
+                SearchTextBox.FadeColour(OsuColour.Gray(0.5f), 400, Easing.OutQuint);
                 SearchTextBox.KillFocus();
+            }
             else
+            {
+                columnScroll.FadeColour(Color4.White, 400, Easing.OutQuint);
+                SearchTextBox.FadeColour(Color4.White, 400, Easing.OutQuint);
                 setTextBoxFocus(textSearchStartsActive.Value);
+            }
         }
 
         /// <summary>
@@ -678,16 +686,12 @@ namespace osu.Game.Overlays.Mods
 
             switch (e.Action)
             {
+                // If the customisation panel is expanded, the back action will be handled by it first.
                 case GlobalAction.Back:
-                    // Pressing the back binding should only go back one step at a time.
-                    hideOverlay(false);
-                    return true;
-
                 // This is handled locally here because this overlay is being registered at the game level
                 // and therefore takes away keyboard focus from the screen stack.
                 case GlobalAction.ToggleModSelection:
-                    // Pressing toggle should completely hide the overlay in one shot.
-                    hideOverlay(true);
+                    hideOverlay();
                     return true;
 
                 // This is handled locally here due to conflicts in input handling between the search text box and the deselect all mods button.
@@ -710,7 +714,7 @@ namespace osu.Game.Overlays.Mods
                     // If there is no search in progress, it should exit the dialog (a bit weird, but this is the expectation from stable).
                     if (string.IsNullOrEmpty(SearchTerm))
                     {
-                        hideOverlay(true);
+                        hideOverlay();
                         return true;
                     }
 
@@ -728,18 +732,7 @@ namespace osu.Game.Overlays.Mods
 
             return base.OnPressed(e);
 
-            void hideOverlay(bool immediate)
-            {
-                if (customisationPanel.Expanded.Value)
-                {
-                    customisationPanel.Expanded.Value = false;
-
-                    if (!immediate)
-                        return;
-                }
-
-                BackButton.TriggerClick();
-            }
+            void hideOverlay() => BackButton.TriggerClick();
         }
 
         /// <inheritdoc cref="IKeyBindingHandler{PlatformAction}"/>
