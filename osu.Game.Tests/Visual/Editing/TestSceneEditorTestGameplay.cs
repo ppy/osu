@@ -126,10 +126,11 @@ namespace osu.Game.Tests.Visual.Editing
             AddAssert("sample playback re-enabled", () => !Editor.SamplePlaybackDisabled.Value);
         }
 
-        [Test]
-        public void TestGameplayTestAtEndOfBeatmap()
+        [TestCase(2000)] // chosen to be after last object in the map
+        [TestCase(22000)] // chosen to be in the middle of the last spinner
+        public void TestGameplayTestAtEndOfBeatmap(int offsetFromEnd)
         {
-            AddStep("seek to last 2 seconds", () => EditorClock.Seek(importedBeatmapSet.MaxLength - 2000));
+            AddStep($"seek to end minus {offsetFromEnd}ms", () => EditorClock.Seek(importedBeatmapSet.MaxLength - offsetFromEnd));
             AddStep("click test gameplay button", () =>
             {
                 var button = Editor.ChildrenOfType<TestGameplayButton>().Single();
@@ -140,8 +141,7 @@ namespace osu.Game.Tests.Visual.Editing
 
             AddUntilStep("player pushed", () => Stack.CurrentScreen is EditorPlayer);
 
-            AddWaitStep("wait some", 5);
-            AddAssert("current screen is editor", () => Stack.CurrentScreen is Editor);
+            AddUntilStep("current screen is editor", () => Stack.CurrentScreen is Editor);
         }
 
         [Test]
