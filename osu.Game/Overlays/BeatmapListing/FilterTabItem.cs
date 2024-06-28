@@ -8,6 +8,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Extensions;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
@@ -24,7 +25,7 @@ namespace osu.Game.Overlays.BeatmapListing
         [Resolved]
         protected OverlayColourProvider ColourProvider { get; private set; }
 
-        private OsuSpriteText text;
+        protected OsuSpriteText Text;
 
         protected Sample SelectSample { get; private set; } = null!;
 
@@ -39,7 +40,7 @@ namespace osu.Game.Overlays.BeatmapListing
             AutoSizeAxes = Axes.Both;
             AddRangeInternal(new Drawable[]
             {
-                text = new OsuSpriteText
+                Text = new OsuSpriteText
                 {
                     Font = OsuFont.GetFont(size: 13, weight: FontWeight.Regular),
                     Text = LabelFor(Value)
@@ -86,14 +87,26 @@ namespace osu.Game.Overlays.BeatmapListing
 
         protected virtual bool HighlightOnHoverWhenActive => false;
 
-        protected virtual void UpdateState()
-        {
-            bool highlightHover = IsHovered && (!Active.Value || HighlightOnHoverWhenActive);
+        protected virtual Color4 ColourActive => ColourProvider.Content1;
+        protected virtual Color4 ColourNormal => ColourProvider.Light2;
 
-            text.FadeColour(highlightHover ? ColourProvider.Content2 : GetStateColour(), 200, Easing.OutQuint);
-            text.Font = text.Font.With(weight: Active.Value ? FontWeight.Bold : FontWeight.Regular);
+        protected Color4 ColourForCurrentState
+        {
+            get
+            {
+                Color4 colour = Active.Value ? ColourActive : ColourNormal;
+
+                if (IsHovered && (!Active.Value || HighlightOnHoverWhenActive))
+                    colour = colour.Lighten(0.2f);
+
+                return colour;
+            }
         }
 
-        protected virtual Color4 GetStateColour() => Active.Value ? ColourProvider.Content1 : ColourProvider.Light2;
+        protected virtual void UpdateState()
+        {
+            Text.FadeColour(ColourForCurrentState, 200, Easing.OutQuint);
+            Text.Font = Text.Font.With(weight: Active.Value ? FontWeight.Bold : FontWeight.Regular);
+        }
     }
 }

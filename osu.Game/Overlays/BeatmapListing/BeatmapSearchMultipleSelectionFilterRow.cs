@@ -1,13 +1,10 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
-using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -24,7 +21,7 @@ namespace osu.Game.Overlays.BeatmapListing
     {
         public new readonly BindableList<T> Current = new BindableList<T>();
 
-        private MultipleSelectionFilter filter;
+        private MultipleSelectionFilter filter = null!;
 
         public BeatmapSearchMultipleSelectionFilterRow(LocalisableString header)
             : base(header)
@@ -42,7 +39,6 @@ namespace osu.Game.Overlays.BeatmapListing
         /// <summary>
         /// Creates a filter control that can be used to simultaneously select multiple values of type <typeparamref name="T"/>.
         /// </summary>
-        [NotNull]
         protected virtual MultipleSelectionFilter CreateMultipleSelectionFilter() => new MultipleSelectionFilter();
 
         protected partial class MultipleSelectionFilter : FillFlowContainer<MultipleSelectionFilterTabItem>
@@ -69,7 +65,7 @@ namespace osu.Game.Overlays.BeatmapListing
                 Current.BindCollectionChanged(currentChanged, true);
             }
 
-            private void currentChanged(object sender, NotifyCollectionChangedEventArgs e)
+            private void currentChanged(object? sender, NotifyCollectionChangedEventArgs e)
             {
                 foreach (var c in Children)
                     c.Active.Value = Current.Contains(c.Value);
@@ -122,7 +118,7 @@ namespace osu.Game.Overlays.BeatmapListing
             {
                 base.UpdateState();
                 selectedUnderline.FadeTo(Active.Value ? 1 : 0, 200, Easing.OutQuint);
-                selectedUnderline.FadeColour(IsHovered ? ColourProvider.Content2 : GetStateColour(), 200, Easing.OutQuint);
+                selectedUnderline.FadeColour(ColourForCurrentState, 200, Easing.OutQuint);
             }
 
             protected override bool OnClick(ClickEvent e)
