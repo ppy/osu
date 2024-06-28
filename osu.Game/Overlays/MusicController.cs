@@ -16,6 +16,7 @@ using osu.Framework.Graphics.Audio;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Logging;
 using osu.Framework.Threading;
+using osu.Game.Audio.Effects;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Rulesets.Mods;
@@ -62,6 +63,16 @@ namespace osu.Game.Overlays
 
         [Resolved]
         private RealmAccess realm { get; set; }
+
+        private AudioFilter audioDuckFilter;
+        private readonly BindableDouble audioDuckVolume = new BindableDouble(1);
+
+        [BackgroundDependencyLoader]
+        private void load(AudioManager audio)
+        {
+            AddInternal(audioDuckFilter = new AudioFilter(audio.TrackMixer));
+            audio.Tracks.AddAdjustment(AdjustableProperty.Volume, audioDuckVolume);
+        }
 
         protected override void LoadComplete()
         {
@@ -242,6 +253,52 @@ namespace osu.Game.Overlays
             if (res)
                 onSuccess?.Invoke();
         });
+
+        /// <summary>
+        /// Attenuates the volume and/or filters the currently playing track.
+        /// </summary>
+        /// <param name="duration">Duration of the ducking transition, in ms.</param>
+        /// <param name="duckVolumeTo">Level to drop volume to (1.0 = 100%).</param>
+        /// <param name="duckCutoffTo">Cutoff frequency to drop `AudioFilter` to. Use `AudioFilter.MAX_LOWPASS_CUTOFF` to skip filter effect.</param>
+        /// <param name="easing">Easing for the ducking transition.</param>
+        public void Duck(int duration = 0, float duckVolumeTo = 0.25f, int duckCutoffTo = 300, Easing easing = Easing.InCubic)
+        {
+            Schedule(() =>
+            {
+                audioDuckFilter?.CutoffTo(duckCutoffTo, duration, easing);
+                this.TransformBindableTo(audioDuckVolume, duckVolumeTo, duration, easing);
+            });
+        }
+
+        /// <summary>
+        /// Restores the volume to full and stops filtering the currently playing track after having used <see cref="Duck"/>.
+        /// </summary>
+        /// <param name="duration">Duration of the unducking transition, in ms.</param>
+        /// <param name="easing">Easing for the unducking transition.</param>
+        public void Unduck(int duration = 500, Easing easing = Easing.InCubic)
+        {
+            Schedule(() =>
+            {
+                audioDuckFilter?.CutoffTo(AudioFilter.MAX_LOWPASS_CUTOFF, duration, easing);
+                this.TransformBindableTo(audioDuckVolume, 1, duration, easing);
+            });
+        }
+
+        /// <summary>
+        /// A convenience method that ducks the currently playing track, then after a delay, unducks it.
+        /// </summary>
+        /// <param name="delay">Delay after audio is ducked before unducking begins, in ms.</param>
+        /// <param name="unduckDuration">Duration of the unducking transition, in ms.</param>
+        /// <param name="unduckEasing">Easing for the unducking transition.</param>
+        /// <param name="duckVolumeTo">Level to drop volume to (1.0 = 100%).</param>
+        /// <param name="duckCutoffTo">Cutoff frequency to drop `AudioFilter` to. Use `AudioFilter.MAX_LOWPASS_CUTOFF` to skip filter effect.</param>
+        /// <param name="duckDuration">Duration of the ducking transition, in ms.</param>
+        /// <param name="duckEasing">Easing for the ducking transition.</param>
+        public void TimedDuck(int delay, int unduckDuration = 500, Easing unduckEasing = Easing.InCubic, float duckVolumeTo = 0.25f, int duckCutoffTo = 300, int duckDuration = 0, Easing duckEasing = Easing.InCubic)
+        {
+            Duck(duckDuration, duckVolumeTo, duckCutoffTo, duckEasing);
+            Scheduler.AddDelayed(() => Unduck(unduckDuration, unduckEasing), delay);
+        }
 
         private bool next()
         {
