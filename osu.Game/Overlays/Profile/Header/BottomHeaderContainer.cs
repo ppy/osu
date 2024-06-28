@@ -144,8 +144,8 @@ namespace osu.Game.Overlays.Profile.Header
 
             bool anyInfoAdded = false;
 
-            anyInfoAdded |= tryAddInfo(FontAwesome.Solid.MapMarker, user.Location);
-            anyInfoAdded |= tryAddInfo(OsuIcon.Heart, user.Interests);
+            anyInfoAdded |= tryAddInfo(FontAwesome.Solid.MapMarkerAlt, user.Location);
+            anyInfoAdded |= tryAddInfo(FontAwesome.Regular.Heart, user.Interests);
             anyInfoAdded |= tryAddInfo(FontAwesome.Solid.Suitcase, user.Occupation);
 
             if (anyInfoAdded)
@@ -171,7 +171,7 @@ namespace osu.Game.Overlays.Profile.Header
 
             bottomLinkContainer.AddIcon(icon, text =>
             {
-                text.Font = text.Font.With(size: 10);
+                text.Font = text.Font.With(icon.Family, 10, icon.Weight);
                 text.Colour = iconColour;
             });
 

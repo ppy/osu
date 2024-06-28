@@ -631,7 +631,7 @@ namespace osu.Game.Tests.Visual.Online
             AddAssert("Nothing happened", () => this.ChildrenOfType<ReportChatPopover>().Any());
             AddStep("Set report data", () =>
             {
-                var field = this.ChildrenOfType<ReportChatPopover>().Single().ChildrenOfType<OsuTextBox>().Single();
+                var field = this.ChildrenOfType<ReportChatPopover>().Single().ChildrenOfType<OsuTextBox>().First();
                 field.Current.Value = "test other";
             });
 

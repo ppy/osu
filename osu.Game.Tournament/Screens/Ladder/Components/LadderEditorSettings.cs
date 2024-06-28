@@ -58,7 +58,7 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
             editorInfo.Selected.ValueChanged += selection =>
             {
                 // ensure any ongoing edits are committed out to the *current* selection before changing to a new one.
-                GetContainingInputManager().TriggerFocusContention(null);
+                GetContainingFocusManager()?.TriggerFocusContention(null);
 
                 // Required to avoid cyclic failure in BindableWithCurrent (TriggerChange called during the Current_Set process).
                 // Arguable a framework issue but since we haven't hit it anywhere else a local workaround seems best.

@@ -52,6 +52,9 @@ namespace osu.Game.Rulesets.Catch.Tests
         [TestCase("3644427", new[] { typeof(CatchModEasy), typeof(CatchModFlashlight) })]
         [TestCase("3689906", new[] { typeof(CatchModDoubleTime), typeof(CatchModEasy) })]
         [TestCase("3949367", new[] { typeof(CatchModDoubleTime), typeof(CatchModEasy) })]
+        [TestCase("112643")]
+        [TestCase("1041052", new[] { typeof(CatchModHardRock) })]
+        [TestCase("high-speed-multiplier-precision")]
         public new void Test(string name, params Type[] mods) => base.Test(name, mods);
 
         protected override IEnumerable<ConvertValue> CreateConvertValue(HitObject hitObject)

@@ -19,5 +19,15 @@ namespace osu.Game.Rulesets.Scoring.Legacy
         /// A ratio of standardised score to legacy score for the bonus part of total score.
         /// </summary>
         public double BonusScoreRatio;
+
+        /// <summary>
+        /// The bonus portion of the legacy (ScoreV1) total score.
+        /// </summary>
+        public int BonusScore;
+
+        /// <summary>
+        /// The max combo of the legacy (ScoreV1) total score.
+        /// </summary>
+        public int MaxCombo;
     }
 }

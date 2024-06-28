@@ -50,6 +50,11 @@ namespace osu.Game.Localisation
         public static LocalisableString OpenOsuFolder => new TranslatableString(getKey(@"open_osu_folder"), @"Open osu! folder");
 
         /// <summary>
+        /// "Export logs"
+        /// </summary>
+        public static LocalisableString ExportLogs => new TranslatableString(getKey(@"export_logs"), @"Export logs");
+
+        /// <summary>
         /// "Change folder location..."
         /// </summary>
         public static LocalisableString ChangeFolderLocation => new TranslatableString(getKey(@"change_folder_location"), @"Change folder location...");
