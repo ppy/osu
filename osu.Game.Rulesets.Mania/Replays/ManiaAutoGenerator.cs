@@ -87,15 +87,22 @@ namespace osu.Game.Rulesets.Mania.Replays
         private double calculateReleaseTime(HitObject currentObject, HitObject? nextObject)
         {
             double endTime = currentObject.GetEndTime();
+            double releaseDelay = RELEASE_DELAY;
 
-            if (currentObject is HoldNote)
-                // hold note releases must be timed exactly.
-                return endTime;
+            if (currentObject is HoldNote hold)
+            {
+                if (hold.Duration > 0)
+                    // hold note releases must be timed exactly.
+                    return endTime;
+
+                // Special case for super short hold notes
+                releaseDelay = 1;
+            }
 
             bool canDelayKeyUpFully = nextObject == null ||
-                                      nextObject.StartTime > endTime + RELEASE_DELAY;
+                                      nextObject.StartTime > endTime + releaseDelay;
 
-            return endTime + (canDelayKeyUpFully ? RELEASE_DELAY : (nextObject.AsNonNull().StartTime - endTime) * 0.9);
+            return endTime + (canDelayKeyUpFully ? releaseDelay : (nextObject.AsNonNull().StartTime - endTime) * 0.9);
         }
 
         protected override HitObject? GetNextObject(int currentIndex)

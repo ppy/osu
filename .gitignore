@@ -265,6 +265,7 @@ __pycache__/
 .idea/**/usage.statistics.xml
 .idea/**/dictionaries
 .idea/**/shelf
+.idea/*/.idea/projectSettingsUpdater.xml
 
 # Generated files
 .idea/**/contentModel.xml
@@ -341,3 +342,4 @@ inspectcode
 FodyWeavers.xsd
 
 .idea/.idea.osu.Desktop/.idea/misc.xml
+.idea/.idea.osu.Android/.idea/deploymentTargetDropDown.xml

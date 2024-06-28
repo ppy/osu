@@ -35,7 +35,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 presets.Add(maxDivisor / candidate);
             }
 
-            return new BeatDivisorPresetCollection(BeatDivisorType.Custom, presets.Distinct().OrderBy(d => d));
+            return new BeatDivisorPresetCollection(BeatDivisorType.Custom, presets.Distinct().Order());
         }
     }
 }

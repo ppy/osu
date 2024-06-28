@@ -17,10 +17,10 @@ namespace osu.Game.Rulesets.Osu.Edit
         {
         }
 
-        public BindableFloat Tolerance { get; } = new BindableFloat(1.5f)
+        public BindableFloat Tolerance { get; } = new BindableFloat(1.8f)
         {
             MinValue = 0.05f,
-            MaxValue = 3f,
+            MaxValue = 2.0f,
             Precision = 0.01f
         };
 
@@ -31,8 +31,15 @@ namespace osu.Game.Rulesets.Osu.Edit
             Precision = 0.01f
         };
 
+        public BindableFloat CircleThreshold { get; } = new BindableFloat(0.0015f)
+        {
+            MinValue = 0f,
+            MaxValue = 0.005f,
+            Precision = 0.0001f
+        };
+
         // We map internal ranges to a more standard range of values for display to the user.
-        private readonly BindableInt displayTolerance = new BindableInt(40)
+        private readonly BindableInt displayTolerance = new BindableInt(90)
         {
             MinValue = 5,
             MaxValue = 100
@@ -44,8 +51,15 @@ namespace osu.Game.Rulesets.Osu.Edit
             MaxValue = 100
         };
 
+        private readonly BindableInt displayCircleThreshold = new BindableInt(30)
+        {
+            MinValue = 0,
+            MaxValue = 100
+        };
+
         private ExpandableSlider<int> toleranceSlider = null!;
         private ExpandableSlider<int> cornerThresholdSlider = null!;
+        private ExpandableSlider<int> circleThresholdSlider = null!;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -59,6 +73,10 @@ namespace osu.Game.Rulesets.Osu.Edit
                 cornerThresholdSlider = new ExpandableSlider<int>
                 {
                     Current = displayCornerThreshold
+                },
+                circleThresholdSlider = new ExpandableSlider<int>
+                {
+                    Current = displayCircleThreshold
                 }
             };
         }
@@ -83,18 +101,32 @@ namespace osu.Game.Rulesets.Osu.Edit
                 CornerThreshold.Value = displayToInternalCornerThreshold(threshold.NewValue);
             }, true);
 
+            displayCircleThreshold.BindValueChanged(threshold =>
+            {
+                circleThresholdSlider.ContractedLabelText = $"P. C. T.: {threshold.NewValue:N0}";
+                circleThresholdSlider.ExpandedLabelText = $"Perfect Curve Threshold: {threshold.NewValue:N0}";
+
+                CircleThreshold.Value = displayToInternalCircleThreshold(threshold.NewValue);
+            }, true);
+
             Tolerance.BindValueChanged(tolerance =>
                 displayTolerance.Value = internalToDisplayTolerance(tolerance.NewValue)
             );
             CornerThreshold.BindValueChanged(threshold =>
                 displayCornerThreshold.Value = internalToDisplayCornerThreshold(threshold.NewValue)
             );
+            CircleThreshold.BindValueChanged(threshold =>
+                displayCircleThreshold.Value = internalToDisplayCircleThreshold(threshold.NewValue)
+            );
 
-            float displayToInternalTolerance(float v) => v / 33f;
-            int internalToDisplayTolerance(float v) => (int)Math.Round(v * 33f);
+            float displayToInternalTolerance(float v) => v / 50f;
+            int internalToDisplayTolerance(float v) => (int)Math.Round(v * 50f);
 
             float displayToInternalCornerThreshold(float v) => v / 100f;
             int internalToDisplayCornerThreshold(float v) => (int)Math.Round(v * 100f);
+
+            float displayToInternalCircleThreshold(float v) => v / 20000f;
+            int internalToDisplayCircleThreshold(float v) => (int)Math.Round(v * 20000f);
         }
     }
 }

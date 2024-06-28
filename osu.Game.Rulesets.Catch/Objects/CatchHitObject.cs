@@ -150,7 +150,7 @@ namespace osu.Game.Rulesets.Catch.Objects
         {
             base.ApplyDefaultsToSelf(controlPointInfo, difficulty);
 
-            TimePreempt = (float)IBeatmapDifficultyInfo.DifficultyRange(difficulty.ApproachRate, 1800, 1200, 450);
+            TimePreempt = (float)IBeatmapDifficultyInfo.DifficultyRange(difficulty.ApproachRate, PREEMPT_MAX, PREEMPT_MID, PREEMPT_MIN);
 
             Scale = LegacyRulesetExtensions.CalculateScaleFromCircleSize(difficulty.CircleSize);
         }
@@ -188,6 +188,21 @@ namespace osu.Game.Rulesets.Catch.Objects
 
         // The half of the height of the osu! playfield.
         public const float DEFAULT_LEGACY_CONVERT_Y = 192;
+
+        /// <summary>
+        /// Minimum preempt time at AR=10.
+        /// </summary>
+        public const double PREEMPT_MIN = 450;
+
+        /// <summary>
+        /// Median preempt time at AR=5.
+        /// </summary>
+        public const double PREEMPT_MID = 1200;
+
+        /// <summary>
+        /// Maximum preempt time at AR=0.
+        /// </summary>
+        public const double PREEMPT_MAX = 1800;
 
         /// <summary>
         /// The Y position of the hit object is not used in the normal osu!catch gameplay.

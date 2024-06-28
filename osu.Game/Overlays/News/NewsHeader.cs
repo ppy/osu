@@ -69,7 +69,7 @@ namespace osu.Game.Overlays.News
             {
                 Title = PageTitleStrings.MainNewsControllerDefault;
                 Description = NamedOverlayComponentStrings.NewsDescription;
-                Icon = HexaconsIcons.News;
+                Icon = OsuIcon.News;
             }
         }
     }

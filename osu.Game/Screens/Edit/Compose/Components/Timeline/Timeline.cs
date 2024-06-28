@@ -30,12 +30,6 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         private readonly Drawable userContent;
 
-        public readonly Bindable<bool> WaveformVisible = new Bindable<bool>();
-
-        public readonly Bindable<bool> ControlPointsVisible = new Bindable<bool>();
-
-        public readonly Bindable<bool> TicksVisible = new Bindable<bool>();
-
         [Resolved]
         private EditorClock editorClock { get; set; }
 
@@ -88,6 +82,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         private Container mainContent;
 
         private Bindable<float> waveformOpacity;
+        private Bindable<bool> controlPointsVisible;
+        private Bindable<bool> ticksVisible;
 
         private double trackLengthForZoom;
 
@@ -139,23 +135,42 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             });
 
             waveformOpacity = config.GetBindable<float>(OsuSetting.EditorWaveformOpacity);
+            controlPointsVisible = config.GetBindable<bool>(OsuSetting.EditorTimelineShowTimingChanges);
+            ticksVisible = config.GetBindable<bool>(OsuSetting.EditorTimelineShowTicks);
 
             track.BindTo(editorClock.Track);
-            track.BindValueChanged(_ => waveform.Waveform = beatmap.Value.Waveform, true);
+            track.BindValueChanged(_ =>
+            {
+                waveform.Waveform = beatmap.Value.Waveform;
+                Scheduler.AddOnce(applyVisualOffset, beatmap);
+            }, true);
 
             Zoom = (float)(defaultTimelineZoom * editorBeatmap.BeatmapInfo.TimelineZoom);
+        }
+
+        private void applyVisualOffset(IBindable<WorkingBeatmap> beatmap)
+        {
+            waveform.RelativePositionAxes = Axes.X;
+
+            if (beatmap.Value.Track.Length > 0)
+                waveform.X = -(float)(Editor.WAVEFORM_VISUAL_OFFSET / beatmap.Value.Track.Length);
+            else
+            {
+                // sometimes this can be the case immediately after a track switch.
+                // reschedule with the hope that the track length eventually populates.
+                Scheduler.AddOnce(applyVisualOffset, beatmap);
+            }
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            WaveformVisible.BindValueChanged(_ => updateWaveformOpacity());
             waveformOpacity.BindValueChanged(_ => updateWaveformOpacity(), true);
 
-            TicksVisible.BindValueChanged(visible => ticks.FadeTo(visible.NewValue ? 1 : 0, 200, Easing.OutQuint), true);
+            ticksVisible.BindValueChanged(visible => ticks.FadeTo(visible.NewValue ? 1 : 0, 200, Easing.OutQuint), true);
 
-            ControlPointsVisible.BindValueChanged(visible =>
+            controlPointsVisible.BindValueChanged(visible =>
             {
                 if (visible.NewValue)
                 {
@@ -177,7 +192,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         }
 
         private void updateWaveformOpacity() =>
-            waveform.FadeTo(WaveformVisible.Value ? waveformOpacity.Value : 0, 200, Easing.OutQuint);
+            waveform.FadeTo(waveformOpacity.Value, 200, Easing.OutQuint);
 
         protected override void Update()
         {

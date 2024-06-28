@@ -27,7 +27,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             // it can happen that the hit window of the nested strong hit extends past the lifetime of the parent object.
             // this is a safety to prevent such cases from causing the nested hit to never be judged and as such prevent gameplay from completing.
             if (!Judged && Time.Current > ParentHitObject?.HitObject.GetEndTime())
-                ApplyResult(r => r.Type = r.Judgement.MinResult);
+                ApplyMinResult();
         }
     }
 }

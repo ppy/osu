@@ -33,6 +33,9 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty("total_score")]
         public long TotalScore { get; set; }
 
+        [JsonProperty("total_score_without_mods")]
+        public long TotalScoreWithoutMods { get; set; }
+
         [JsonProperty("accuracy")]
         public double Accuracy { get; set; }
 
@@ -115,6 +118,9 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty("has_replay")]
         public bool HasReplay { get; set; }
 
+        [JsonProperty("ranked")]
+        public bool Ranked { get; set; }
+
         // These properties are calculated or not relevant to any external usage.
         public bool ShouldSerializeID() => false;
         public bool ShouldSerializeUser() => false;
@@ -149,6 +155,12 @@ namespace osu.Game.Online.API.Requests.Responses
         IRulesetInfo IScoreInfo.Ruleset => Beatmap!.Ruleset;
 
         #endregion
+
+        /// <summary>
+        /// Whether this <see cref="ScoreInfo"/> represents a legacy (osu!stable) score.
+        /// </summary>
+        [JsonIgnore]
+        public bool IsLegacyScore => LegacyScoreId != null;
 
         public override string ToString() => $"score_id: {ID} user_id: {UserID}";
 
@@ -191,11 +203,14 @@ namespace osu.Game.Online.API.Requests.Responses
             {
                 OnlineID = OnlineID,
                 LegacyOnlineID = (long?)LegacyScoreId ?? -1,
+                IsLegacyScore = IsLegacyScore,
                 User = User ?? new APIUser { Id = UserID },
                 BeatmapInfo = new BeatmapInfo { OnlineID = BeatmapID },
                 Ruleset = new RulesetInfo { OnlineID = RulesetID },
                 Passed = Passed,
                 TotalScore = TotalScore,
+                TotalScoreWithoutMods = TotalScoreWithoutMods,
+                LegacyTotalScore = LegacyTotalScore,
                 Accuracy = Accuracy,
                 MaxCombo = MaxCombo,
                 Rank = Rank,
@@ -205,6 +220,7 @@ namespace osu.Game.Online.API.Requests.Responses
                 HasOnlineReplay = HasReplay,
                 Mods = mods,
                 PP = PP,
+                Ranked = Ranked,
             };
 
             if (beatmap is BeatmapInfo realmBeatmap)
@@ -227,14 +243,15 @@ namespace osu.Game.Online.API.Requests.Responses
         {
             Rank = score.Rank,
             TotalScore = score.TotalScore,
+            TotalScoreWithoutMods = score.TotalScoreWithoutMods,
             Accuracy = score.Accuracy,
             PP = score.PP,
             MaxCombo = score.MaxCombo,
             RulesetID = score.RulesetID,
             Passed = score.Passed,
             Mods = score.APIMods,
-            Statistics = score.Statistics.Where(kvp => kvp.Value != 0).ToDictionary(kvp => kvp.Key, kvp => kvp.Value),
-            MaximumStatistics = score.MaximumStatistics.Where(kvp => kvp.Value != 0).ToDictionary(kvp => kvp.Key, kvp => kvp.Value),
+            Statistics = score.Statistics.Where(kvp => kvp.Value != 0).ToDictionary(),
+            MaximumStatistics = score.MaximumStatistics.Where(kvp => kvp.Value != 0).ToDictionary(),
         };
     }
 }

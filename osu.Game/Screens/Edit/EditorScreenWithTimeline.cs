@@ -4,7 +4,6 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
 using osu.Game.Screens.Edit.Compose.Components.Timeline;
@@ -52,42 +51,31 @@ namespace osu.Game.Screens.Edit
                             AutoSizeAxes = Axes.Y,
                             Children = new Drawable[]
                             {
-                                new Box
-                                {
-                                    RelativeSizeAxes = Axes.Both,
-                                    Colour = colourProvider.Background4
-                                },
-                                new Container
+                                new GridContainer
                                 {
                                     Name = "Timeline content",
                                     RelativeSizeAxes = Axes.X,
                                     AutoSizeAxes = Axes.Y,
-                                    Padding = new MarginPadding { Horizontal = PADDING, Top = PADDING },
-                                    Child = new GridContainer
+                                    Content = new[]
                                     {
-                                        RelativeSizeAxes = Axes.X,
-                                        AutoSizeAxes = Axes.Y,
-                                        Content = new[]
+                                        new Drawable[]
                                         {
-                                            new Drawable[]
+                                            TimelineContent = new Container
                                             {
-                                                TimelineContent = new Container
-                                                {
-                                                    RelativeSizeAxes = Axes.X,
-                                                    AutoSizeAxes = Axes.Y,
-                                                },
+                                                RelativeSizeAxes = Axes.X,
+                                                AutoSizeAxes = Axes.Y,
                                             },
                                         },
-                                        RowDimensions = new[]
-                                        {
-                                            new Dimension(GridSizeMode.AutoSize),
-                                        },
-                                        ColumnDimensions = new[]
-                                        {
-                                            new Dimension(),
-                                            new Dimension(GridSizeMode.Absolute, 90),
-                                        }
                                     },
+                                    RowDimensions = new[]
+                                    {
+                                        new Dimension(GridSizeMode.AutoSize),
+                                    },
+                                    ColumnDimensions = new[]
+                                    {
+                                        new Dimension(),
+                                        new Dimension(GridSizeMode.Absolute, 90),
+                                    }
                                 }
                             }
                         },

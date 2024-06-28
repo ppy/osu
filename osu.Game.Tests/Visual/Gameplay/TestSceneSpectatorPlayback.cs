@@ -198,7 +198,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             foreach (var legacyFrame in frames.Frames)
             {
                 var frame = new TestReplayFrame();
-                frame.FromLegacy(legacyFrame, null);
+                frame.FromLegacy(legacyFrame, null!);
                 playbackReplay.Frames.Add(frame);
             }
 

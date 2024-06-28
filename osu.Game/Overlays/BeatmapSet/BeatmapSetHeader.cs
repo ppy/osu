@@ -60,7 +60,7 @@ namespace osu.Game.Overlays.BeatmapSet
             public BeatmapHeaderTitle()
             {
                 Title = PageTitleStrings.MainBeatmapsetsControllerShow;
-                Icon = HexaconsIcons.Beatmap;
+                Icon = OsuIcon.Beatmap;
             }
         }
     }

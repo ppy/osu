@@ -134,7 +134,7 @@ namespace osu.Game.Graphics.UserInterface
                 lengths.AddRange(Source.bars.InstantaneousLengths);
             }
 
-            public override void Draw(IRenderer renderer)
+            protected override void Draw(IRenderer renderer)
             {
                 base.Draw(renderer);
 

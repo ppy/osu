@@ -23,9 +23,11 @@ namespace osu.Game.Online.Metadata
         public override IBindable<bool> IsWatchingUserPresence => isWatchingUserPresence;
         private readonly BindableBool isWatchingUserPresence = new BindableBool();
 
-        // ReSharper disable once InconsistentlySynchronizedField
         public override IBindableDictionary<int, UserPresence> UserStates => userStates;
         private readonly BindableDictionary<int, UserPresence> userStates = new BindableDictionary<int, UserPresence>();
+
+        public override IBindable<DailyChallengeInfo?> DailyChallengeInfo => dailyChallengeInfo;
+        private readonly Bindable<DailyChallengeInfo?> dailyChallengeInfo = new Bindable<DailyChallengeInfo?>();
 
         private readonly string endpoint;
 
@@ -59,6 +61,9 @@ namespace osu.Game.Online.Metadata
                     // https://github.com/dotnet/aspnetcore/issues/15198
                     connection.On<BeatmapUpdates>(nameof(IMetadataClient.BeatmapSetsUpdated), ((IMetadataClient)this).BeatmapSetsUpdated);
                     connection.On<int, UserPresence?>(nameof(IMetadataClient.UserPresenceUpdated), ((IMetadataClient)this).UserPresenceUpdated);
+                    connection.On<DailyChallengeInfo?>(nameof(IMetadataClient.DailyChallengeUpdated), ((IMetadataClient)this).DailyChallengeUpdated);
+                    connection.On<MultiplayerRoomScoreSetEvent>(nameof(IMetadataClient.MultiplayerRoomScoreSet), ((IMetadataClient)this).MultiplayerRoomScoreSet);
+                    connection.On(nameof(IStatefulUserHubClient.DisconnectRequested), ((IMetadataClient)this).DisconnectRequested);
                 };
 
                 IsConnected.BindTo(connector.IsConnected);
@@ -97,8 +102,12 @@ namespace osu.Game.Online.Metadata
         {
             if (!connected.NewValue)
             {
-                isWatchingUserPresence.Value = false;
-                userStates.Clear();
+                Schedule(() =>
+                {
+                    isWatchingUserPresence.Value = false;
+                    userStates.Clear();
+                    dailyChallengeInfo.Value = null;
+                });
                 return;
             }
 
@@ -187,13 +196,13 @@ namespace osu.Game.Online.Metadata
 
         public override Task UserPresenceUpdated(int userId, UserPresence? presence)
         {
-            lock (userStates)
+            Schedule(() =>
             {
-                if (presence != null)
+                if (presence?.Status != null)
                     userStates[userId] = presence.Value;
                 else
                     userStates.Remove(userId);
-            }
+            });
 
             return Task.CompletedTask;
         }
@@ -205,7 +214,7 @@ namespace osu.Game.Online.Metadata
 
             Debug.Assert(connection != null);
             await connection.InvokeAsync(nameof(IMetadataServer.BeginWatchingUserPresence)).ConfigureAwait(false);
-            isWatchingUserPresence.Value = true;
+            Schedule(() => isWatchingUserPresence.Value = true);
         }
 
         public override async Task EndWatchingUserPresence()
@@ -215,21 +224,46 @@ namespace osu.Game.Online.Metadata
                 if (connector?.IsConnected.Value != true)
                     throw new OperationCanceledException();
 
-                // must happen synchronously before any remote calls to avoid misordering.
-                userStates.Clear();
+                // must be scheduled before any remote calls to avoid mis-ordering.
+                Schedule(() => userStates.Clear());
                 Debug.Assert(connection != null);
                 await connection.InvokeAsync(nameof(IMetadataServer.EndWatchingUserPresence)).ConfigureAwait(false);
             }
             finally
             {
-                isWatchingUserPresence.Value = false;
+                Schedule(() => isWatchingUserPresence.Value = false);
             }
+        }
+
+        public override Task DailyChallengeUpdated(DailyChallengeInfo? info)
+        {
+            Schedule(() => dailyChallengeInfo.Value = info);
+            return Task.CompletedTask;
+        }
+
+        public override async Task<MultiplayerPlaylistItemStats[]> BeginWatchingMultiplayerRoom(long id)
+        {
+            if (connector?.IsConnected.Value != true)
+                throw new OperationCanceledException();
+
+            Debug.Assert(connection != null);
+            return await connection.InvokeAsync<MultiplayerPlaylistItemStats[]>(nameof(IMetadataServer.BeginWatchingMultiplayerRoom), id).ConfigureAwait(false);
+        }
+
+        public override async Task EndWatchingMultiplayerRoom(long id)
+        {
+            if (connector?.IsConnected.Value != true)
+                throw new OperationCanceledException();
+
+            Debug.Assert(connection != null);
+            await connection.InvokeAsync(nameof(IMetadataServer.EndWatchingMultiplayerRoom)).ConfigureAwait(false);
         }
 
         public override async Task DisconnectRequested()
         {
             await base.DisconnectRequested().ConfigureAwait(false);
-            await EndWatchingUserPresence().ConfigureAwait(false);
+            if (connector != null)
+                await connector.Disconnect().ConfigureAwait(false);
         }
 
         protected override void Dispose(bool isDisposing)

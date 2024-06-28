@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.UI
         public BindableBool Active { get; } = new BindableBool();
 
         public const float DEFAULT_HEIGHT = 30;
-        private const float width = 73;
+        public const float WIDTH = 73;
 
         protected readonly IMod Mod;
         private readonly bool showExtendedInformation;
@@ -56,7 +56,7 @@ namespace osu.Game.Rulesets.UI
                     Width = 100 + DEFAULT_HEIGHT / 2,
                     RelativeSizeAxes = Axes.Y,
                     Masking = true,
-                    X = width,
+                    X = WIDTH,
                     Margin = new MarginPadding { Left = -DEFAULT_HEIGHT },
                     Children = new Drawable[]
                     {
@@ -77,7 +77,7 @@ namespace osu.Game.Rulesets.UI
                 },
                 new CircularContainer
                 {
-                    Width = width,
+                    Width = WIDTH,
                     RelativeSizeAxes = Axes.Y,
                     Masking = true,
                     Children = new Drawable[]

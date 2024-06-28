@@ -31,7 +31,7 @@ namespace osu.Game.Overlays
 {
     public partial class ChatOverlay : OsuFocusedOverlayContainer, INamedOverlayComponent, IKeyBindingHandler<PlatformAction>
     {
-        public IconUsage Icon => HexaconsIcons.Messaging;
+        public IconUsage Icon => OsuIcon.Chat;
         public LocalisableString Title => ChatStrings.HeaderTitle;
         public LocalisableString Description => ChatStrings.HeaderDescription;
 
@@ -55,7 +55,6 @@ namespace osu.Game.Overlays
         private const int transition_length = 500;
         private const float top_bar_height = 40;
         private const float side_bar_width = 190;
-        private const float chat_bar_height = 60;
 
         protected override string PopInSampleName => @"UI/overlay-big-pop-in";
         protected override string PopOutSampleName => @"UI/overlay-big-pop-out";
@@ -136,7 +135,7 @@ namespace osu.Game.Overlays
                                     Padding = new MarginPadding
                                     {
                                         Left = side_bar_width,
-                                        Bottom = chat_bar_height,
+                                        Bottom = ChatTextBar.HEIGHT,
                                     },
                                     Children = new Drawable[]
                                     {

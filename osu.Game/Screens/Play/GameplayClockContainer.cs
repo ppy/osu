@@ -17,6 +17,7 @@ namespace osu.Game.Screens.Play
     /// Encapsulates gameplay timing logic and provides a <see cref="IGameplayClock"/> via DI for gameplay components to use.
     /// </summary>
     [Cached(typeof(IGameplayClock))]
+    [Cached(typeof(GameplayClockContainer))]
     public partial class GameplayClockContainer : Container, IAdjustableClock, IGameplayClock
     {
         public IBindable<bool> IsPaused => isPaused;
@@ -77,8 +78,6 @@ namespace osu.Game.Screens.Play
 
             isPaused.Value = false;
 
-            PrepareStart();
-
             // The case which caused this to be added is FrameStabilityContainer, which manages its own current and elapsed time.
             // Because we generally update our own current time quicker than children can query it (via Start/Seek/Update),
             // this means that the first frame ever exposed to children may have a non-zero current time.
@@ -96,14 +95,6 @@ namespace osu.Game.Screens.Play
 
                 StartGameplayClock();
             });
-        }
-
-        /// <summary>
-        /// When <see cref="Start"/> is called, this will be run to give an opportunity to prepare the clock at the correct
-        /// start location.
-        /// </summary>
-        protected virtual void PrepareStart()
-        {
         }
 
         /// <summary>
@@ -131,8 +122,17 @@ namespace osu.Game.Screens.Play
             StopGameplayClock();
         }
 
-        protected virtual void StartGameplayClock() => GameplayClock.Start();
-        protected virtual void StopGameplayClock() => GameplayClock.Stop();
+        protected virtual void StartGameplayClock()
+        {
+            Logger.Log($"{nameof(GameplayClockContainer)} started via call to {nameof(StartGameplayClock)}");
+            GameplayClock.Start();
+        }
+
+        protected virtual void StopGameplayClock()
+        {
+            Logger.Log($"{nameof(GameplayClockContainer)} stopped via call to {nameof(StopGameplayClock)}");
+            GameplayClock.Stop();
+        }
 
         /// <summary>
         /// Resets this <see cref="GameplayClockContainer"/> and the source to an initial state ready for gameplay.

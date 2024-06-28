@@ -258,7 +258,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
 
             private IUniformBuffer<CursorTrailParameters> cursorTrailParameters;
 
-            public override void Draw(IRenderer renderer)
+            protected override void Draw(IRenderer renderer)
             {
                 base.Draw(renderer);
 

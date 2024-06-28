@@ -14,6 +14,7 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Framework.Utils;
 using osu.Game.Audio;
+using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
@@ -59,6 +60,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         private readonly BindableList<PathControlPoint> controlPoints = new BindableList<PathControlPoint>();
         private readonly IBindable<int> pathVersion = new Bindable<int>();
         private readonly BindableList<HitObject> selectedObjects = new BindableList<HitObject>();
+        private readonly Bindable<bool> showHitMarkers = new Bindable<bool>();
 
         public SliderSelectionBlueprint(Slider slider)
             : base(slider)
@@ -66,7 +68,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OsuConfigManager config)
         {
             InternalChildren = new Drawable[]
             {
@@ -74,6 +76,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                 HeadOverlay = CreateCircleOverlay(HitObject, SliderPosition.Start),
                 TailOverlay = CreateCircleOverlay(HitObject, SliderPosition.End),
             };
+
+            config.BindWith(OsuSetting.EditorShowHitMarkers, showHitMarkers);
         }
 
         protected override void LoadComplete()
@@ -90,6 +94,11 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             if (editorBeatmap != null)
                 selectedObjects.BindTo(editorBeatmap.SelectedHitObjects);
             selectedObjects.BindCollectionChanged((_, _) => updateVisualDefinition(), true);
+            showHitMarkers.BindValueChanged(_ =>
+            {
+                if (!showHitMarkers.Value)
+                    DrawableObject.RestoreHitAnimations();
+            });
         }
 
         public override bool HandleQuickDeletion()
@@ -110,6 +119,9 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
             if (IsSelected)
                 BodyPiece.UpdateFrom(HitObject);
+
+            if (showHitMarkers.Value)
+                DrawableObject.SuppressHitAnimations();
         }
 
         protected override bool OnHover(HoverEvent e)
@@ -171,7 +183,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                     return false; // Allow right click to be handled by context menu
 
                 case MouseButton.Left:
-                    if (e.ControlPressed && IsSelected)
+                    // If there's more than two objects selected, ctrl+click should deselect
+                    if (e.ControlPressed && IsSelected && selectedObjects.Count < 2)
                     {
                         changeHandler?.BeginChange();
                         placementControlPoint = addControlPoint(e.MousePosition);
@@ -254,6 +267,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             // Move the control points from the insertion index onwards to make room for the insertion
             controlPoints.Insert(insertionIndex, pathControlPoint);
 
+            ControlPointVisualiser?.EnsureValidPathTypes();
+
             HitObject.SnapTo(distanceSnapProvider);
 
             return pathControlPoint;
@@ -274,6 +289,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
                 controlPoints.Remove(c);
             }
+
+            ControlPointVisualiser?.EnsureValidPathTypes();
 
             // Snap the slider to the current beat divisor before checking length validity.
             HitObject.SnapTo(distanceSnapProvider);
@@ -306,7 +323,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
             foreach (var splitPoint in controlPointsToSplitAt)
             {
-                if (splitPoint == controlPoints[0] || splitPoint == controlPoints[^1] || splitPoint.Type is null)
+                if (splitPoint == controlPoints[0] || splitPoint == controlPoints[^1] || splitPoint.Type == null)
                     continue;
 
                 // Split off the section of slider before this control point so the remaining control points to split are in the latter part of the slider.
@@ -398,7 +415,12 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
         public override MenuItem[] ContextMenuItems => new MenuItem[]
         {
-            new OsuMenuItem("Add control point", MenuItemType.Standard, () => addControlPoint(rightClickPosition)),
+            new OsuMenuItem("Add control point", MenuItemType.Standard, () =>
+            {
+                changeHandler?.BeginChange();
+                addControlPoint(rightClickPosition);
+                changeHandler?.EndChange();
+            }),
             new OsuMenuItem("Convert to stream", MenuItemType.Destructive, convertToStream),
         };
 
@@ -411,8 +433,22 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             DrawableObject.SliderBody?.ToScreenSpace(DrawableObject.SliderBody.PathEndOffset) ?? BodyPiece.ToScreenSpace(BodyPiece.PathEndLocation)
         };
 
-        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) =>
-            BodyPiece.ReceivePositionalInputAt(screenSpacePos) || ControlPointVisualiser?.Pieces.Any(p => p.ReceivePositionalInputAt(screenSpacePos)) == true;
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos)
+        {
+            if (BodyPiece.ReceivePositionalInputAt(screenSpacePos))
+                return true;
+
+            if (ControlPointVisualiser == null)
+                return false;
+
+            foreach (var p in ControlPointVisualiser.Pieces)
+            {
+                if (p.ReceivePositionalInputAt(screenSpacePos))
+                    return true;
+            }
+
+            return false;
+        }
 
         protected virtual SliderCircleOverlay CreateCircleOverlay(Slider slider, SliderPosition position) => new SliderCircleOverlay(slider, position);
     }

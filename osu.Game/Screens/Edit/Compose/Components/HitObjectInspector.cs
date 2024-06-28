@@ -9,7 +9,7 @@ using osu.Game.Rulesets.Objects.Types;
 
 namespace osu.Game.Screens.Edit.Compose.Components
 {
-    internal partial class HitObjectInspector : EditorInspector
+    public partial class HitObjectInspector : EditorInspector
     {
         protected override void LoadComplete()
         {
@@ -29,6 +29,16 @@ namespace osu.Game.Screens.Edit.Compose.Components
             rollingTextUpdate?.Cancel();
             rollingTextUpdate = null;
 
+            AddInspectorValues();
+
+            // I'd hope there's a better way to do this, but I don't want to bind to each and every property above to watch for changes.
+            // This is a good middle-ground for the time being.
+            if (EditorBeatmap.SelectedHitObjects.Count > 0)
+                rollingTextUpdate ??= Scheduler.AddDelayed(updateInspectorText, 250);
+        }
+
+        protected virtual void AddInspectorValues()
+        {
             switch (EditorBeatmap.SelectedHitObjects.Count)
             {
                 case 0:
@@ -90,9 +100,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
                         AddValue($"{duration.Duration:#,0.##}ms");
                     }
 
-                    // I'd hope there's a better way to do this, but I don't want to bind to each and every property above to watch for changes.
-                    // This is a good middle-ground for the time being.
-                    rollingTextUpdate ??= Scheduler.AddDelayed(updateInspectorText, 250);
                     break;
 
                 default:

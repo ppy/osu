@@ -45,7 +45,7 @@ namespace osu.Game.Screens.Edit.Setup
                 OnFocused?.Invoke();
                 base.OnFocus(e);
 
-                GetContainingInputManager().TriggerFocusContention(this);
+                GetContainingFocusManager()!.TriggerFocusContention(this);
             }
         }
     }
