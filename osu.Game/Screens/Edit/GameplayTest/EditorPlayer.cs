@@ -105,7 +105,9 @@ namespace osu.Game.Screens.Edit.GameplayTest
                                         .Cast<HitObjectLifetimeEntry>(), editorState.Time))
             {
                 drawableObjectEntry.Result = new JudgementResult(drawableObjectEntry.HitObject, drawableObjectEntry.HitObject.Judgement)
-                    { Type = drawableObjectEntry.HitObject.Judgement.MaxResult };
+                {
+                    Type = drawableObjectEntry.HitObject.Judgement.MaxResult
+                };
             }
 
             static IEnumerable<HitObjectLifetimeEntry> enumerateDrawableEntries(IEnumerable<HitObjectLifetimeEntry> entries, double cutoffTime)
