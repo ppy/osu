@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Framework.Threading;
 using osu.Game.Graphics.Containers;
 using osu.Game.Input.Bindings;
 using osu.Game.Overlays;
@@ -24,6 +25,7 @@ namespace osu.Game.Screens.Footer
     {
         private const int padding = 60;
         private const float delay_per_button = 30;
+        private const double transition_duration = 400;
 
         public const int HEIGHT = 50;
 
@@ -36,6 +38,9 @@ namespace osu.Game.Screens.Footer
 
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Aquamarine);
+
+        [Resolved]
+        private OsuGame? game { get; set; }
 
         public ScreenBackButton BackButton { get; private set; } = null!;
 
@@ -101,19 +106,35 @@ namespace osu.Game.Screens.Footer
             };
         }
 
-        public void StartTrackingLogo(OsuLogo logo, float duration = 0, Easing easing = Easing.None) => logoTrackingContainer.StartTracking(logo, duration, easing);
-        public void StopTrackingLogo() => logoTrackingContainer.StopTracking();
+        private ScheduledDelegate? changeLogoDepthDelegate;
+
+        public void StartTrackingLogo(OsuLogo logo, float duration = 0, Easing easing = Easing.None)
+        {
+            changeLogoDepthDelegate?.Cancel();
+            changeLogoDepthDelegate = null;
+
+            logoTrackingContainer.StartTracking(logo, duration, easing);
+            game?.ChangeLogoDepth(inFrontOfFooter: true);
+        }
+
+        public void StopTrackingLogo()
+        {
+            logoTrackingContainer.StopTracking();
+
+            if (game != null)
+                changeLogoDepthDelegate = Scheduler.AddDelayed(() => game.ChangeLogoDepth(inFrontOfFooter: false), transition_duration);
+        }
 
         protected override void PopIn()
         {
-            this.MoveToY(0, 400, Easing.OutQuint)
-                .FadeIn(400, Easing.OutQuint);
+            this.MoveToY(0, transition_duration, Easing.OutQuint)
+                .FadeIn(transition_duration, Easing.OutQuint);
         }
 
         protected override void PopOut()
         {
-            this.MoveToY(HEIGHT, 400, Easing.OutQuint)
-                .FadeOut(400, Easing.OutQuint);
+            this.MoveToY(HEIGHT, transition_duration, Easing.OutQuint)
+                .FadeOut(transition_duration, Easing.OutQuint);
         }
 
         public void SetButtons(IReadOnlyList<ScreenFooterButton> buttons)

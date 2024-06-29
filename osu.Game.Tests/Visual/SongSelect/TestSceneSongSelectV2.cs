@@ -181,12 +181,6 @@ namespace osu.Game.Tests.Visual.SongSelect
 
         #endregion
 
-        protected override void Update()
-        {
-            base.Update();
-            Stack.Padding = new MarginPadding { Bottom = screenScreenFooter.DrawHeight - screenScreenFooter.Y };
-        }
-
         private void updateFooter(IScreen? _, IScreen? newScreen)
         {
             if (newScreen is IOsuScreen osuScreen && osuScreen.ShowFooter)
