@@ -243,22 +243,24 @@ namespace osu.Game.Screens.Footer
                    .FadeIn(240, Easing.OutCubic);
         }
 
-        public void DisappearToRightAndExpire(double delay)
+        public void DisappearToRight(double delay, bool expire)
         {
             Content.Delay(delay)
                    .FadeOut(240, Easing.InOutCubic)
                    .MoveToX(300f, 360, Easing.InOutCubic);
 
-            this.Delay(Content.LatestTransformEndTime - Time.Current).Expire();
+            if (expire)
+                this.Delay(Content.LatestTransformEndTime - Time.Current).Expire();
         }
 
-        public void DisappearToBottomAndExpire(double delay)
+        public void DisappearToBottom(double delay, bool expire)
         {
             Content.Delay(delay)
                    .FadeOut(240, Easing.InOutCubic)
                    .MoveToY(100f, 240, Easing.InOutCubic);
 
-            this.Delay(Content.LatestTransformEndTime - Time.Current).Expire();
+            if (expire)
+                this.Delay(Content.LatestTransformEndTime - Time.Current).Expire();
         }
     }
 }
