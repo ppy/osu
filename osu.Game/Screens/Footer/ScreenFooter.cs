@@ -115,7 +115,10 @@ namespace osu.Game.Screens.Footer
 
         public void SetButtons(IReadOnlyList<ScreenFooterButton> buttons)
         {
+            temporarilyHiddenButtons.Clear();
             overlays.Clear();
+
+            ClearOverlayContent();
 
             var oldButtons = buttonsFlow.ToArray();
 
@@ -127,9 +130,9 @@ namespace osu.Game.Screens.Footer
                 removedButtonsContainer.Add(oldButton);
 
                 if (buttons.Count > 0)
-                    makeButtonDisappearToRightAndExpire(oldButton, i, oldButtons.Length);
+                    makeButtonDisappearToRight(oldButton, i, oldButtons.Length, true);
                 else
-                    makeButtonDisappearToBottomAndExpire(oldButton, i, oldButtons.Length);
+                    makeButtonDisappearToBottom(oldButton, i, oldButtons.Length, true);
             }
 
             for (int i = 0; i < buttons.Count; i++)
@@ -158,17 +161,85 @@ namespace osu.Game.Screens.Footer
             }
         }
 
+        private ShearedOverlayContainer? activeOverlay;
+        private Container? contentContainer;
+        private readonly List<ScreenFooterButton> temporarilyHiddenButtons = new List<ScreenFooterButton>();
+
+        public void SetOverlayContent(ShearedOverlayContainer overlay)
+        {
+            if (contentContainer != null)
+            {
+                throw new InvalidOperationException(@"Cannot set overlay content while one is already present. " +
+                                                    $@"The previous overlay whose content is {contentContainer.Child.GetType().Name} should be hidden first.");
+            }
+
+            activeOverlay = overlay;
+
+            Debug.Assert(temporarilyHiddenButtons.Count == 0);
+
+            var targetButton = buttonsFlow.SingleOrDefault(b => b.Overlay == overlay);
+
+            temporarilyHiddenButtons.AddRange(targetButton != null
+                ? buttonsFlow.SkipWhile(b => b != targetButton).Skip(1)
+                : buttonsFlow);
+
+            for (int i = 0; i < temporarilyHiddenButtons.Count; i++)
+                makeButtonDisappearToBottom(temporarilyHiddenButtons[i], 0, 0, false);
+
+            var fallbackPosition = buttonsFlow.Any()
+                ? buttonsFlow.ToSpaceOfOtherDrawable(Vector2.Zero, this)
+                : BackButton.ToSpaceOfOtherDrawable(BackButton.LayoutRectangle.TopRight + new Vector2(5f, 0f), this);
+
+            var targetPosition = targetButton?.ToSpaceOfOtherDrawable(targetButton.LayoutRectangle.TopRight, this) ?? fallbackPosition;
+
+            var content = overlay.CreateFooterContent();
+
+            Add(contentContainer = new Container
+            {
+                Y = -15f,
+                RelativeSizeAxes = Axes.Both,
+                Padding = new MarginPadding { Left = targetPosition.X },
+                Child = content,
+            });
+
+            if (temporarilyHiddenButtons.Count > 0)
+                this.Delay(60).Schedule(() => content.Show());
+            else
+                content.Show();
+        }
+
+        public void ClearOverlayContent()
+        {
+            if (contentContainer == null)
+                return;
+
+            contentContainer.Child.Hide();
+
+            double timeUntilRun = contentContainer.Child.LatestTransformEndTime - Time.Current;
+
+            Container expireTarget = contentContainer;
+            contentContainer = null;
+            activeOverlay = null;
+
+            for (int i = 0; i < temporarilyHiddenButtons.Count; i++)
+                makeButtonAppearFromBottom(temporarilyHiddenButtons[i], 0);
+
+            temporarilyHiddenButtons.Clear();
+
+            expireTarget.Delay(timeUntilRun).Expire();
+        }
+
         private void makeButtonAppearFromLeft(ScreenFooterButton button, int index, int count, float startDelay)
             => button.AppearFromLeft(startDelay + (count - index) * delay_per_button);
 
         private void makeButtonAppearFromBottom(ScreenFooterButton button, int index)
             => button.AppearFromBottom(index * delay_per_button);
 
-        private void makeButtonDisappearToRightAndExpire(ScreenFooterButton button, int index, int count)
-            => button.DisappearToRightAndExpire((count - index) * delay_per_button);
+        private void makeButtonDisappearToRight(ScreenFooterButton button, int index, int count, bool expire)
+            => button.DisappearToRight((count - index) * delay_per_button, expire);
 
-        private void makeButtonDisappearToBottomAndExpire(ScreenFooterButton button, int index, int count)
-            => button.DisappearToBottomAndExpire((count - index) * delay_per_button);
+        private void makeButtonDisappearToBottom(ScreenFooterButton button, int index, int count, bool expire)
+            => button.DisappearToBottom((count - index) * delay_per_button, expire);
 
         private void showOverlay(OverlayContainer overlay)
         {
