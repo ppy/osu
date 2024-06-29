@@ -64,18 +64,29 @@ namespace osu.Game.Screens.SelectV2
         public override void OnEntering(ScreenTransitionEvent e)
         {
             this.FadeIn();
+
+            modSelectOverlay.SelectedMods.BindTo(Mods);
+
             base.OnEntering(e);
         }
 
         public override void OnResuming(ScreenTransitionEvent e)
         {
             this.FadeIn();
+
+            // required due to https://github.com/ppy/osu-framework/issues/3218
+            modSelectOverlay.SelectedMods.Disabled = false;
+            modSelectOverlay.SelectedMods.BindTo(Mods);
+
             base.OnResuming(e);
         }
 
         public override void OnSuspending(ScreenTransitionEvent e)
         {
             this.Delay(400).FadeOut();
+
+            modSelectOverlay.SelectedMods.UnbindFrom(Mods);
+
             base.OnSuspending(e);
         }
 
