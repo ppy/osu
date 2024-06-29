@@ -313,6 +313,7 @@ namespace osu.Game.Rulesets.Scoring
             hitEvents.RemoveAt(hitEvents.Count - 1);
 
             updateScore();
+            updateRank();
         }
 
         /// <summary>
