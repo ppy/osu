@@ -269,6 +269,7 @@ namespace osu.Game.Rulesets.Scoring
 
                 updateScore();
             }
+            updateRank();
         }
 
         /// <summary>
