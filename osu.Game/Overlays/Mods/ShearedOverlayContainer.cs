@@ -127,6 +127,12 @@ namespace osu.Game.Overlays.Mods
         /// </summary>
         public virtual Drawable CreateFooterContent() => Empty();
 
+        /// <summary>
+        /// Invoked when the back button in the footer is pressed.
+        /// </summary>
+        /// <returns>Whether the back button should not close the overlay.</returns>
+        public virtual bool OnBackButton() => false;
+
         protected override bool OnClick(ClickEvent e)
         {
             if (State.Value == Visibility.Visible)
