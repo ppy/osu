@@ -138,6 +138,8 @@ namespace osu.Game.Overlays.Mods
             return base.OnClick(e);
         }
 
+        private bool hideFooterOnPopOut;
+
         protected override void PopIn()
         {
             const double fade_in_duration = 400;
@@ -149,6 +151,12 @@ namespace osu.Game.Overlays.Mods
             if (UseNewFooter && footer != null)
             {
                 footer.SetOverlayContent(this);
+
+                if (footer.State.Value == Visibility.Hidden)
+                {
+                    footer.Show();
+                    hideFooterOnPopOut = true;
+                }
             }
             else
                 Footer.MoveToY(0, fade_in_duration, Easing.OutQuint);
@@ -166,6 +174,12 @@ namespace osu.Game.Overlays.Mods
             if (UseNewFooter && footer != null)
             {
                 footer.ClearOverlayContent();
+
+                if (hideFooterOnPopOut)
+                {
+                    footer.Hide();
+                    hideFooterOnPopOut = false;
+                }
             }
             else
                 Footer.MoveToY(Footer.DrawHeight, fade_out_duration, Easing.OutQuint);
