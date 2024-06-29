@@ -292,7 +292,7 @@ namespace osu.Game.Screens.Edit
                 dependencies.CacheAs<IEditorChangeHandler>(changeHandler);
             }
 
-            beatDivisor.Value = editorBeatmap.BeatmapInfo.BeatDivisor;
+            beatDivisor.SetArbitraryDivisor(editorBeatmap.BeatmapInfo.BeatDivisor);
             beatDivisor.BindValueChanged(divisor => editorBeatmap.BeatmapInfo.BeatDivisor = divisor.NewValue);
 
             updateLastSavedHash();

@@ -1,11 +1,14 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Overlays;
+using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Screens.Play;
 using osu.Game.Users;
 
@@ -43,6 +46,10 @@ namespace osu.Game.Screens.Edit.GameplayTest
         protected override void LoadComplete()
         {
             base.LoadComplete();
+
+            markPreviousObjectsHit();
+            markVisibleDrawableObjectsHit();
+
             ScoreProcessor.HasCompleted.BindValueChanged(completed =>
             {
                 if (completed.NewValue)
@@ -54,6 +61,69 @@ namespace osu.Game.Screens.Edit.GameplayTest
                     }, RESULTS_DISPLAY_DELAY);
                 }
             });
+        }
+
+        private void markPreviousObjectsHit()
+        {
+            foreach (var hitObject in enumerateHitObjects(DrawableRuleset.Objects, editorState.Time))
+            {
+                var judgement = hitObject.Judgement;
+                var result = new JudgementResult(hitObject, judgement) { Type = judgement.MaxResult };
+
+                HealthProcessor.ApplyResult(result);
+                ScoreProcessor.ApplyResult(result);
+            }
+
+            static IEnumerable<HitObject> enumerateHitObjects(IEnumerable<HitObject> hitObjects, double cutoffTime)
+            {
+                foreach (var hitObject in hitObjects)
+                {
+                    foreach (var nested in enumerateHitObjects(hitObject.NestedHitObjects, cutoffTime))
+                    {
+                        if (nested.GetEndTime() < cutoffTime)
+                            yield return nested;
+                    }
+
+                    if (hitObject.GetEndTime() < cutoffTime)
+                        yield return hitObject;
+                }
+            }
+        }
+
+        private void markVisibleDrawableObjectsHit()
+        {
+            if (!DrawableRuleset.Playfield.IsLoaded)
+            {
+                Schedule(markVisibleDrawableObjectsHit);
+                return;
+            }
+
+            foreach (var drawableObjectEntry in enumerateDrawableEntries(
+                         DrawableRuleset.Playfield.AllHitObjects
+                                        .Select(ho => ho.Entry)
+                                        .Where(e => e != null)
+                                        .Cast<HitObjectLifetimeEntry>(), editorState.Time))
+            {
+                drawableObjectEntry.Result = new JudgementResult(drawableObjectEntry.HitObject, drawableObjectEntry.HitObject.Judgement)
+                {
+                    Type = drawableObjectEntry.HitObject.Judgement.MaxResult
+                };
+            }
+
+            static IEnumerable<HitObjectLifetimeEntry> enumerateDrawableEntries(IEnumerable<HitObjectLifetimeEntry> entries, double cutoffTime)
+            {
+                foreach (var entry in entries)
+                {
+                    foreach (var nested in enumerateDrawableEntries(entry.NestedEntries, cutoffTime))
+                    {
+                        if (nested.HitObject.GetEndTime() < cutoffTime)
+                            yield return nested;
+                    }
+
+                    if (entry.HitObject.GetEndTime() < cutoffTime)
+                        yield return entry;
+                }
+            }
         }
 
         protected override void PrepareReplay()

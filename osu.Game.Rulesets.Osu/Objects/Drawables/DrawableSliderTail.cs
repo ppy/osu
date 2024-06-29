@@ -3,12 +3,12 @@
 
 #nullable disable
 
-using System;
 using System.Diagnostics;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Utils;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Skinning;
@@ -135,11 +135,16 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             UpdateState(ArmedState.Idle);
             UpdateComboColour();
 
-            using (BeginAbsoluteSequence(StateUpdateTime - 5))
-                this.TransformBindableTo(AccentColour, Color4.White, Math.Max(0, HitStateUpdateTime - StateUpdateTime));
+            // This method is called every frame in editor contexts, thus the lack of need for transforms.
 
-            using (BeginAbsoluteSequence(HitStateUpdateTime))
-                this.FadeOut(700).Expire();
+            if (Time.Current >= HitStateUpdateTime)
+            {
+                // More or less matches stable (see https://github.com/peppy/osu-stable-reference/blob/bb57924c1552adbed11ee3d96cdcde47cf96f2b6/osu!/GameplayElements/HitObjects/Osu/HitCircleOsu.cs#L336-L338)
+                AccentColour.Value = Color4.White;
+                Alpha = Interpolation.ValueAt(Time.Current, 1f, 0f, HitStateUpdateTime, HitStateUpdateTime + 700);
+            }
+
+            LifetimeEnd = HitStateUpdateTime + 700;
         }
 
         internal void RestoreHitAnimations()

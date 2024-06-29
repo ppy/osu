@@ -207,7 +207,7 @@ namespace osu.Game.Rulesets.Edit
                         {
                             Child = new EditorToolboxGroup("inspector")
                             {
-                                Child = new HitObjectInspector()
+                                Child = CreateHitObjectInspector()
                             },
                         }
                     }
@@ -328,6 +328,8 @@ namespace osu.Game.Rulesets.Edit
         /// Construct a relevant blueprint container. This will manage hitobject selection/placement input handling and display logic.
         /// </summary>
         protected virtual ComposeBlueprintContainer CreateBlueprintContainer() => new ComposeBlueprintContainer(this);
+
+        protected virtual Drawable CreateHitObjectInspector() => new HitObjectInspector();
 
         /// <summary>
         /// Construct a drawable ruleset for the provided ruleset.
