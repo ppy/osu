@@ -40,7 +40,7 @@ namespace osu.Game.Screens.Footer
 
         private Colour4 buttonAccentColour;
 
-        protected Colour4 AccentColour
+        public Colour4 AccentColour
         {
             set
             {
@@ -50,7 +50,7 @@ namespace osu.Game.Screens.Footer
             }
         }
 
-        protected IconUsage Icon
+        public IconUsage Icon
         {
             set => icon.Icon = value;
         }
