@@ -9,6 +9,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Framework.Utils;
 using osu.Game.Graphics.Containers;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -328,15 +329,16 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             UpdateState(ArmedState.Idle);
             UpdateComboColour();
 
-            // This method is called every frame. If we need to, the following can likely be converted
-            // to code which doesn't use transforms at all.
+            // This method is called every frame in editor contexts, thus the lack of need for transforms.
 
-            // Matches stable (see https://github.com/peppy/osu-stable-reference/blob/bb57924c1552adbed11ee3d96cdcde47cf96f2b6/osu!/GameplayElements/HitObjects/Osu/HitCircleOsu.cs#L336-L338)
-            using (BeginAbsoluteSequence(StateUpdateTime - 5))
-                this.TransformBindableTo(AccentColour, Color4.White, Math.Max(0, HitStateUpdateTime - StateUpdateTime));
+            if (Time.Current >= HitStateUpdateTime)
+            {
+                // More or less matches stable (see https://github.com/peppy/osu-stable-reference/blob/bb57924c1552adbed11ee3d96cdcde47cf96f2b6/osu!/GameplayElements/HitObjects/Osu/HitCircleOsu.cs#L336-L338)
+                AccentColour.Value = Color4.White;
+                Alpha = Interpolation.ValueAt(Time.Current, 1f, 0f, HitStateUpdateTime, HitStateUpdateTime + 700);
+            }
 
-            using (BeginAbsoluteSequence(HitStateUpdateTime))
-                this.FadeOut(700).Expire();
+            LifetimeEnd = HitStateUpdateTime + 700;
         }
 
         internal void RestoreHitAnimations()
