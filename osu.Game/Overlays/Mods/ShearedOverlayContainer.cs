@@ -1,10 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
-using JetBrains.Annotations;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -30,16 +28,15 @@ namespace osu.Game.Overlays.Mods
         /// <summary>
         /// The overlay's header.
         /// </summary>
-        protected ShearedOverlayHeader Header { get; private set; }
+        protected ShearedOverlayHeader Header { get; private set; } = null!;
 
         /// <summary>
         /// The overlay's footer.
         /// </summary>
         protected Container Footer { get; private set; }
 
-        [Resolved(canBeNull: true)]
-        [CanBeNull]
-        private ScreenFooter footer { get; set; }
+        [Resolved]
+        private ScreenFooter? footer { get; set; }
 
         // todo: very temporary property that will be removed once ModSelectOverlay and FirstRunSetupOverlay are updated to use new footer.
         public virtual bool UseNewFooter => false;
@@ -48,12 +45,12 @@ namespace osu.Game.Overlays.Mods
         /// A container containing all content, including the header and footer.
         /// May be used for overlay-wide animations.
         /// </summary>
-        protected Container TopLevelContent { get; private set; }
+        protected Container TopLevelContent { get; private set; } = null!;
 
         /// <summary>
         /// A container for content that is to be displayed between the header and footer.
         /// </summary>
-        protected Container MainAreaContent { get; private set; }
+        protected Container MainAreaContent { get; private set; } = null!;
 
         /// <summary>
         /// A container for content that is to be displayed inside the footer.
@@ -63,6 +60,10 @@ namespace osu.Game.Overlays.Mods
         protected override bool StartHidden => true;
 
         protected override bool BlockNonPositionalInput => true;
+
+        // ShearedOverlayContainers are placed at a layer within the screen container as they rely on ScreenFooter which must be placed there.
+        // Therefore, dimming must be managed locally, since DimMainContent dims the entire screen layer.
+        protected sealed override bool DimMainContent => false;
 
         protected ShearedOverlayContainer(OverlayColourScheme colourScheme)
         {
@@ -81,6 +82,11 @@ namespace osu.Game.Overlays.Mods
                 RelativeSizeAxes = Axes.Both,
                 Children = new Drawable[]
                 {
+                    new Box
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Colour = ColourProvider.Background6.Opacity(0.75f),
+                    },
                     Header = new ShearedOverlayHeader
                     {
                         Anchor = Anchor.TopCentre,
