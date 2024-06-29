@@ -8,8 +8,11 @@ using System.Linq;
 using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Configuration;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Game.Extensions;
+using osu.Game.Localisation;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
@@ -30,17 +33,27 @@ namespace osu.Game.Overlays
         [Resolved]
         private IAPIProvider api { get; set; }
 
+        private readonly Bindable<Language> currentLanguage = new Bindable<Language>();
+
         private GetWikiRequest request;
 
         private CancellationTokenSource cancellationToken;
 
         private bool displayUpdateRequired = true;
 
+        private Bindable<string> languageConfig = null!;
+
         private WikiArticlePage articlePage;
 
         public WikiOverlay()
             : base(OverlayColourScheme.Orange, false)
         {
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(FrameworkConfigManager frameworkConfig)
+        {
+            languageConfig = frameworkConfig.GetBindable<string>(FrameworkSetting.Locale);
         }
 
         public void ShowPage(string pagePath = INDEX_PATH)
@@ -58,8 +71,18 @@ namespace osu.Game.Overlays
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            path.BindValueChanged(onPathChanged);
+            path.BindValueChanged(_ => updatePage());
             wikiData.BindTo(Header.WikiPageData);
+
+            if (LanguageExtensions.TryParseCultureCode(languageConfig.Value, out var language))
+            {
+                currentLanguage.Value = language;
+            }
+
+            bindCurrentLanguageToDropDown();
+            Header.LanguageDropdown.DropDownUpdated += bindCurrentLanguageToDropDown;
+
+            currentLanguage.BindValueChanged(_ => updatePage());
         }
 
         protected override void PopIn()
@@ -100,26 +123,39 @@ namespace osu.Game.Overlays
             }
         }
 
-        private void onPathChanged(ValueChangedEvent<string> e)
+        private void updatePage()
         {
-            // the path could change as a result of redirecting to a newer location of the same page.
-            // we already have the correct wiki data, so we can safely return here.
-            if (e.NewValue == wikiData.Value?.Path)
+            if (State.Value == Visibility.Hidden)
                 return;
 
-            if (e.NewValue == "error")
+            string[] values = path.Value.Split('/', 2);
+
+            // Parse the language first to determine whether the currently requested language is consistent with the content language.
+            if (values.Length > 1 && LanguageExtensions.TryParseCultureCode(values[0], out var language))
+            {
+                path.Value = values[1];
+                currentLanguage.Value = language;
+                return;
+            }
+
+            Language requestLanguage = currentLanguage.Value;
+            string requestPath = path.Value;
+
+            // the path could change as a result of redirecting to a newer location of the same page.
+            // we already have the correct wiki data, so we can safely return here.
+            if (wikiData.Value != null
+                && requestPath == wikiData.Value.Path
+                && LanguageExtensions.TryParseCultureCode(wikiData.Value.Locale, out var contentLanguage)
+                && contentLanguage == requestLanguage)
+                return;
+
+            if (requestPath == "error")
                 return;
 
             cancellationToken?.Cancel();
             request?.Cancel();
 
-            string[] values = e.NewValue.Split('/', 2);
-
-            if (values.Length > 1 && LanguageExtensions.TryParseCultureCode(values[0], out var language))
-                request = new GetWikiRequest(values[1], language);
-            else
-                request = new GetWikiRequest(e.NewValue);
-
+            request = new GetWikiRequest(requestPath, requestLanguage);
             Loading.Show();
 
             request.Success += response => Schedule(() => onSuccess(response));
@@ -135,7 +171,14 @@ namespace osu.Game.Overlays
         private void onSuccess(APIWikiPage response)
         {
             wikiData.Value = response;
+            Header.LanguageDropdown.Current.UnbindBindings();
+            Header.LanguageDropdown.UpdateDropdown(response.AvailableLocales);
             path.Value = response.Path;
+
+            if (LanguageExtensions.TryParseCultureCode(response.Locale, out var pageLanguage))
+            {
+                currentLanguage.Value = pageLanguage;
+            }
 
             if (response.Layout.Equals(INDEX_PATH, StringComparison.OrdinalIgnoreCase))
             {
@@ -168,6 +211,12 @@ namespace osu.Game.Overlays
         {
             string parentPath = string.Join("/", path.Value.Split('/').SkipLast(1));
             ShowPage(parentPath);
+        }
+
+        private void bindCurrentLanguageToDropDown()
+        {
+            Header.LanguageDropdown.Current.Value = currentLanguage.Value;
+            currentLanguage.BindTo(Header.LanguageDropdown.Current);
         }
 
         protected override void Dispose(bool isDisposing)
