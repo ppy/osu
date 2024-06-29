@@ -166,8 +166,8 @@ namespace osu.Game.Screens.Footer
             if (Overlay != null)
                 OverlayState.BindTo(Overlay.State);
 
-            OverlayState.BindValueChanged(_ => updateDisplay());
-            Enabled.BindValueChanged(_ => updateDisplay(), true);
+            OverlayState.BindValueChanged(_ => UpdateDisplay());
+            Enabled.BindValueChanged(_ => UpdateDisplay(), true);
 
             FinishTransforms(true);
         }
@@ -186,11 +186,11 @@ namespace osu.Game.Screens.Footer
 
         protected override bool OnHover(HoverEvent e)
         {
-            updateDisplay();
+            UpdateDisplay();
             return true;
         }
 
-        protected override void OnHoverLost(HoverLostEvent e) => updateDisplay();
+        protected override void OnHoverLost(HoverLostEvent e) => UpdateDisplay();
 
         public virtual bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
@@ -202,7 +202,7 @@ namespace osu.Game.Screens.Footer
 
         public virtual void OnReleased(KeyBindingReleaseEvent<GlobalAction> e) { }
 
-        private void updateDisplay()
+        public void UpdateDisplay()
         {
             Color4 backgroundColour = OverlayState.Value == Visibility.Visible ? buttonAccentColour : colourProvider.Background3;
             Color4 textColour = OverlayState.Value == Visibility.Visible ? colourProvider.Background6 : colourProvider.Content1;

@@ -14,6 +14,7 @@ using osu.Framework.Input.Events;
 using osu.Game.Graphics.Containers;
 using osu.Game.Input.Bindings;
 using osu.Game.Overlays;
+using osu.Game.Overlays.Mods;
 using osu.Game.Screens.Menu;
 using osuTK;
 
@@ -58,7 +59,7 @@ namespace osu.Game.Screens.Footer
         {
             InternalChildren = new Drawable[]
             {
-                new Box
+                background = new Box
                 {
                     RelativeSizeAxes = Axes.Both,
                     Colour = colourProvider.Background5
@@ -194,6 +195,8 @@ namespace osu.Game.Screens.Footer
 
             var targetPosition = targetButton?.ToSpaceOfOtherDrawable(targetButton.LayoutRectangle.TopRight, this) ?? fallbackPosition;
 
+            updateColourScheme(overlay.ColourProvider.ColourScheme);
+
             var content = overlay.CreateFooterContent();
 
             Add(contentContainer = new Container
@@ -229,6 +232,18 @@ namespace osu.Game.Screens.Footer
             temporarilyHiddenButtons.Clear();
 
             expireTarget.Delay(timeUntilRun).Expire();
+
+            updateColourScheme(OverlayColourScheme.Aquamarine);
+        }
+
+        private void updateColourScheme(OverlayColourScheme colourScheme)
+        {
+            colourProvider.ChangeColourScheme(colourScheme);
+
+            background.FadeColour(colourProvider.Background5, 150, Easing.OutQuint);
+
+            foreach (var button in buttonsFlow)
+                button.UpdateDisplay();
         }
 
         private void makeButtonAppearFromLeft(ScreenFooterButton button, int index, int count, float startDelay)
