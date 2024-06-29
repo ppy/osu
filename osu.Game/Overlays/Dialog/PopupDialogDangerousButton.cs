@@ -3,6 +3,7 @@
 
 #nullable disable
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
@@ -71,7 +72,7 @@ namespace osu.Game.Overlays.Dialog
             protected override void LoadComplete()
             {
                 base.LoadComplete();
-                Progress.BindValueChanged(progressChanged);
+                Progress.BindValueChanged(progressChanged, true);
             }
 
             protected override void AbortConfirm()
@@ -122,11 +123,13 @@ namespace osu.Game.Overlays.Dialog
 
             private void progressChanged(ValueChangedEvent<double> progress)
             {
-                if (progress.NewValue < progress.OldValue) return;
+                lowPassFilter.Cutoff = Math.Max(1, (int)(progress.NewValue * AudioFilter.MAX_LOWPASS_CUTOFF * 0.5));
 
-                if (Clock.CurrentTime - lastTickPlaybackTime < 30) return;
+                if (progress.NewValue < progress.OldValue)
+                    return;
 
-                lowPassFilter.CutoffTo((int)(progress.NewValue * AudioFilter.MAX_LOWPASS_CUTOFF * 0.5));
+                if (Clock.CurrentTime - lastTickPlaybackTime < 30)
+                    return;
 
                 var channel = tickSample.GetChannel();
 
