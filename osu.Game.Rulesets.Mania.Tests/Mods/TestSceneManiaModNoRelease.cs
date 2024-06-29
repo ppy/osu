@@ -523,7 +523,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Mods
                                                                       .All(j => !j.Type.IsHit()));
 
             AddAssert("second hold note hit", () => judgementResults.Where(j => beatmap.HitObjects[1].NestedHitObjects.Contains(j.HitObject))
-                                                                       .All(j => j.Type.IsHit()));
+                                                                    .All(j => j.Type.IsHit()));
         }
 
         [Test]
@@ -639,6 +639,5 @@ namespace osu.Game.Rulesets.Mania.Tests.Mods
             {
             }
         }
-
     }
 }
