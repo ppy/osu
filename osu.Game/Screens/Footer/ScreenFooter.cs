@@ -28,13 +28,15 @@ namespace osu.Game.Screens.Footer
 
         private readonly List<OverlayContainer> overlays = new List<OverlayContainer>();
 
-        private ScreenBackButton backButton = null!;
+        private Box background = null!;
         private FillFlowContainer<ScreenFooterButton> buttonsFlow = null!;
         private Container<ScreenFooterButton> removedButtonsContainer = null!;
         private LogoTrackingContainer logoTrackingContainer = null!;
 
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Aquamarine);
+
+        public ScreenBackButton BackButton { get; private set; } = null!;
 
         public Action? OnBack;
 
@@ -48,7 +50,7 @@ namespace osu.Game.Screens.Footer
             if (receptor == null)
                 Add(receptor = new BackReceptor());
 
-            receptor.OnBackPressed = () => backButton.TriggerClick();
+            receptor.OnBackPressed = () => BackButton.TriggerClick();
         }
 
         [BackgroundDependencyLoader]
@@ -71,12 +73,12 @@ namespace osu.Game.Screens.Footer
                     Spacing = new Vector2(7, 0),
                     AutoSizeAxes = Axes.Both
                 },
-                backButton = new ScreenBackButton
+                BackButton = new ScreenBackButton
                 {
                     Margin = new MarginPadding { Bottom = 15f, Left = 12f },
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.BottomLeft,
-                    Action = () => OnBack?.Invoke(),
+                    Action = onBackPressed,
                 },
                 removedButtonsContainer = new Container<ScreenFooterButton>
                 {
@@ -243,13 +245,24 @@ namespace osu.Game.Screens.Footer
 
         private void showOverlay(OverlayContainer overlay)
         {
-            foreach (var o in overlays)
+            foreach (var o in overlays.Where(o => o != overlay))
+                o.Hide();
+
+            overlay.ToggleVisibility();
+        }
+
+        private void onBackPressed()
+        {
+            if (activeOverlay != null)
             {
-                if (o == overlay)
-                    o.ToggleVisibility();
-                else
-                    o.Hide();
+                if (activeOverlay.OnBackButton())
+                    return;
+
+                activeOverlay.Hide();
+                return;
             }
+
+            OnBack?.Invoke();
         }
 
         public partial class BackReceptor : Drawable, IKeyBindingHandler<GlobalAction>
