@@ -172,6 +172,9 @@ namespace osu.Game.Screens.Footer
             FinishTransforms(true);
         }
 
+        // use Content for tracking input as some buttons might be temporarily hidden with DisappearToBottom, and they become hidden by moving Content away from screen.
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => Content.ReceivePositionalInputAt(screenSpacePos);
+
         public GlobalAction? Hotkey;
 
         protected override bool OnClick(ClickEvent e)
