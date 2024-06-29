@@ -249,8 +249,55 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         {
             if (e.Button == MouseButton.Left && inputManager.CurrentState.Keyboard.ControlPressed)
                 piece.IsSelected.Toggle();
+            else if (e.Button == MouseButton.Left && inputManager.CurrentState.Keyboard.ShiftPressed)
+            {
+                PathType? newPathtype = cyclePathType(piece);
+                updatePathType(piece, newPathtype);
+                EnsureValidPathTypes();
+            }
             else
                 SetSelectionTo(piece.ControlPoint);
+        }
+
+        /// <summary>
+        /// Cycle between relevant <see cref="PathType"/>s for this <see cref="PathControlPoint"/>.
+        /// </summary>
+        /// <param name="piece"></param>
+        /// <returns><see cref="PathType"/> to change to</returns>
+        private PathType? cyclePathType(PathControlPointPiece<T> piece)
+        {
+            var oldPathType = piece.ControlPoint.Type;
+
+            // Only allow changing to perfect curve if there's less than 2 inherited points in the segment
+            var pointsInSegment = hitObject.Path.PointsInSegment(piece.ControlPoint);
+            if (pointsInSegment.Count <= 3 && oldPathType == PathType.BEZIER)
+                return PathType.PERFECT_CURVE;
+
+            // Only allow change to B-Spline if it looks different than Bezier
+            if (pointsInSegment.Count >= 6 && oldPathType == PathType.BEZIER)
+                return PathType.BSpline(4);
+
+            // Allow changing to inherited only if it there exists a segment behind the point which isn't a finished perfect curve
+            int? previousSegmentIndex = hitObject.Path.GetPreviousSegmentStarterIndex(piece.ControlPoint);
+            int currentSegmentIndex = hitObject.Path.ControlPoints.IndexOf(piece.ControlPoint);
+            bool isPreviousSegmentPerfectCurve = previousSegmentIndex != null
+                                                 && hitObject.Path.ControlPoints[(int)previousSegmentIndex].Type == PathType.PERFECT_CURVE;
+            bool doesPreviousSegmentHaveExactlyTwoPoints = previousSegmentIndex == currentSegmentIndex - 2;
+            bool isPreviousSegmentAFinishedPerfectCurve = isPreviousSegmentPerfectCurve && doesPreviousSegmentHaveExactlyTwoPoints;
+            if (!isPreviousSegmentAFinishedPerfectCurve && currentSegmentIndex != 0 && oldPathType == PathType.CATMULL)
+                return null;
+
+            PathType? newPathType = oldPathType switch
+            {
+                var _ when oldPathType == null => PathType.BEZIER,
+                var _ when oldPathType == PathType.BEZIER => PathType.LINEAR,
+                var _ when oldPathType == PathType.PERFECT_CURVE => PathType.LINEAR,
+                var _ when oldPathType == PathType.LINEAR => PathType.CATMULL,
+                var _ when oldPathType == PathType.CATMULL => PathType.BEZIER,
+                var _ when ((PathType)oldPathType).Type == SplineType.BSpline => PathType.LINEAR,
+                _ => (PathType)oldPathType
+            };
+            return newPathType;
         }
 
         /// <summary>

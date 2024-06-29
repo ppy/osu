@@ -227,6 +227,21 @@ namespace osu.Game.Rulesets.Objects
             return pointsInCurrentSegment;
         }
 
+        public int? GetPreviousSegmentStarterIndex(PathControlPoint controlPoint)
+        {
+            int currentSegmentIndex = ControlPoints.IndexOf(controlPoint);
+            if (currentSegmentIndex <= 0)
+                return null;
+
+            for (int i = currentSegmentIndex - 1; i >= 0; i--)
+            {
+                if (ControlPoints[i].Type != null)
+                    return i;
+            }
+
+            return 0;
+        }
+
         /// <summary>
         /// Returns the progress values at which (control point) segments of the path end.
         /// Ranges from 0 (beginning of the path) to 1 (end of the path) to infinity (beyond the end of the path).
