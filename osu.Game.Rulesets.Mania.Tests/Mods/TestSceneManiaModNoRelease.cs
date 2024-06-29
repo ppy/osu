@@ -9,9 +9,11 @@ using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Replays;
 using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Mania.Mods;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Replays;
 using osu.Game.Rulesets.Mania.Scoring;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.Scoring;
@@ -19,18 +21,9 @@ using osu.Game.Scoring;
 using osu.Game.Screens.Play;
 using osu.Game.Tests.Visual;
 
-namespace osu.Game.Rulesets.Mania.Tests
+namespace osu.Game.Rulesets.Mania.Tests.Mods
 {
-    /// <summary>
-    /// Diagrams in this class are represented as:
-    /// -   : time
-    /// O   : note
-    /// [ ] : hold note
-    ///
-    /// x   : button press
-    /// o   : button release
-    /// </summary>
-    public partial class TestSceneHoldNoteInput : RateAdjustedBeatmapTestScene
+    public partial class TestSceneManiaModNoRelease : RateAdjustedBeatmapTestScene
     {
         private const double time_before_head = 250;
         private const double time_head = 1500;
@@ -90,8 +83,8 @@ namespace osu.Game.Rulesets.Mania.Tests
             });
 
             assertHeadJudgement(HitResult.Perfect);
-            assertTailJudgement(HitResult.Miss);
-            assertNoteJudgement(HitResult.IgnoreMiss);
+            assertTailJudgement(HitResult.Perfect);
+            assertNoteJudgement(HitResult.IgnoreHit);
         }
 
         /// <summary>
@@ -144,7 +137,7 @@ namespace osu.Game.Rulesets.Mania.Tests
             });
 
             assertHeadJudgement(HitResult.Perfect);
-            assertTailJudgement(HitResult.Miss);
+            assertTailJudgement(HitResult.Perfect);
         }
 
         /// <summary>
@@ -222,7 +215,7 @@ namespace osu.Game.Rulesets.Mania.Tests
             });
 
             assertHeadJudgement(HitResult.Perfect);
-            assertTailJudgement(HitResult.Miss);
+            assertTailJudgement(HitResult.Meh);
         }
 
         /// <summary>
@@ -258,7 +251,7 @@ namespace osu.Game.Rulesets.Mania.Tests
             });
 
             assertHeadJudgement(HitResult.Miss);
-            assertTailJudgement(HitResult.Miss);
+            assertTailJudgement(HitResult.Meh);
         }
 
         /// <summary>
@@ -276,6 +269,44 @@ namespace osu.Game.Rulesets.Mania.Tests
 
             assertHeadJudgement(HitResult.Miss);
             assertTailJudgement(HitResult.Meh);
+        }
+
+        /// <summary>
+        ///     -----[ ]--------------
+        ///             xo
+        /// </summary>
+        [Test]
+        public void TestPressAndReleaseJustAfterTailWithCloseByHead()
+        {
+            const int duration = 30;
+
+            var beatmap = new Beatmap<ManiaHitObject>
+            {
+                HitObjects =
+                {
+                    // hold note is very short, to make the head still in range
+                    new HoldNote
+                    {
+                        StartTime = time_head,
+                        Duration = duration,
+                        Column = 0,
+                    }
+                },
+                BeatmapInfo =
+                {
+                    Difficulty = new BeatmapDifficulty { SliderTickRate = 4 },
+                    Ruleset = new ManiaRuleset().RulesetInfo
+                },
+            };
+
+            performTest(new List<ReplayFrame>
+            {
+                new ManiaReplayFrame(time_head + duration + 20, ManiaAction.Key1),
+                new ManiaReplayFrame(time_head + duration + 30),
+            }, beatmap);
+
+            assertHeadJudgement(HitResult.Good);
+            assertTailJudgement(HitResult.Perfect);
         }
 
         /// <summary>
@@ -371,6 +402,23 @@ namespace osu.Game.Rulesets.Mania.Tests
             assertTailJudgement(HitResult.Miss);
 
             assertHitObjectJudgement(note, HitResult.Good);
+        }
+
+        /// <summary>
+        ///     -----[           ]-----
+        ///                       xo
+        /// </summary>
+        [Test]
+        public void TestPressAndReleaseJustAfterTail()
+        {
+            performTest(new List<ReplayFrame>
+            {
+                new ManiaReplayFrame(time_tail + 20, ManiaAction.Key1),
+                new ManiaReplayFrame(time_tail + 30),
+            });
+
+            assertHeadJudgement(HitResult.Miss);
+            assertTailJudgement(HitResult.Meh);
         }
 
         /// <summary>
@@ -540,7 +588,7 @@ namespace osu.Game.Rulesets.Mania.Tests
                     BeatmapInfo =
                     {
                         Difficulty = new BeatmapDifficulty { SliderTickRate = 4 },
-                        Ruleset = new ManiaRuleset().RulesetInfo
+                        Ruleset = new ManiaRuleset().RulesetInfo,
                     },
                 };
 
@@ -549,6 +597,11 @@ namespace osu.Game.Rulesets.Mania.Tests
 
             AddStep("load player", () =>
             {
+                SelectedMods.Value = new List<Mod>
+                {
+                    new ManiaModNoRelease()
+                };
+
                 Beatmap.Value = CreateWorkingBeatmap(beatmap);
 
                 var p = new ScoreAccessibleReplayPlayer(new Score { Replay = new Replay { Frames = frames } });
@@ -586,5 +639,6 @@ namespace osu.Game.Rulesets.Mania.Tests
             {
             }
         }
+
     }
 }
