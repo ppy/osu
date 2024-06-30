@@ -255,8 +255,6 @@ namespace osu.Game.Overlays.Mods
 
         private ModSelectFooterContent? currentFooterContent;
 
-        public override bool UseNewFooter => true;
-
         public override Drawable CreateFooterContent() => currentFooterContent = new ModSelectFooterContent(this)
         {
             Beatmap = { BindTarget = Beatmap },

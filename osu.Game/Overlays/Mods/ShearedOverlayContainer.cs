@@ -7,7 +7,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
-using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens.Footer;
@@ -30,16 +29,8 @@ namespace osu.Game.Overlays.Mods
         /// </summary>
         protected ShearedOverlayHeader Header { get; private set; } = null!;
 
-        /// <summary>
-        /// The overlay's footer.
-        /// </summary>
-        protected Container Footer { get; private set; }
-
         [Resolved]
         private ScreenFooter? footer { get; set; }
-
-        // todo: very temporary property that will be removed once ModSelectOverlay and FirstRunSetupOverlay are updated to use new footer.
-        public virtual bool UseNewFooter => false;
 
         /// <summary>
         /// A container containing all content, including the header and footer.
@@ -51,11 +42,6 @@ namespace osu.Game.Overlays.Mods
         /// A container for content that is to be displayed between the header and footer.
         /// </summary>
         protected Container MainAreaContent { get; private set; } = null!;
-
-        /// <summary>
-        /// A container for content that is to be displayed inside the footer.
-        /// </summary>
-        protected Container FooterContent { get; private set; }
 
         protected override bool StartHidden => true;
 
@@ -75,8 +61,6 @@ namespace osu.Game.Overlays.Mods
         [BackgroundDependencyLoader]
         private void load()
         {
-            const float footer_height = ScreenFooter.HEIGHT;
-
             Child = TopLevelContent = new Container
             {
                 RelativeSizeAxes = Axes.Both,
@@ -100,30 +84,9 @@ namespace osu.Game.Overlays.Mods
                         Padding = new MarginPadding
                         {
                             Top = ShearedOverlayHeader.HEIGHT,
-                            Bottom = footer_height + PADDING,
+                            Bottom = ScreenFooter.HEIGHT + PADDING,
                         }
                     },
-                    Footer = new InputBlockingContainer
-                    {
-                        RelativeSizeAxes = Axes.X,
-                        Depth = float.MinValue,
-                        Height = footer_height,
-                        Margin = new MarginPadding { Top = PADDING },
-                        Anchor = Anchor.BottomCentre,
-                        Origin = Anchor.BottomCentre,
-                        Children = new Drawable[]
-                        {
-                            new Box
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                Colour = ColourProvider.Background5
-                            },
-                            FooterContent = new Container
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                            },
-                        }
-                    }
                 }
             };
         }
@@ -160,7 +123,7 @@ namespace osu.Game.Overlays.Mods
 
             Header.MoveToY(0, fade_in_duration, Easing.OutQuint);
 
-            if (UseNewFooter && footer != null)
+            if (footer != null)
             {
                 footer.SetOverlayContent(this);
 
@@ -170,8 +133,6 @@ namespace osu.Game.Overlays.Mods
                     hideFooterOnPopOut = true;
                 }
             }
-            else
-                Footer.MoveToY(0, fade_in_duration, Easing.OutQuint);
         }
 
         protected override void PopOut()
@@ -183,7 +144,7 @@ namespace osu.Game.Overlays.Mods
 
             Header.MoveToY(-Header.DrawHeight, fade_out_duration, Easing.OutQuint);
 
-            if (UseNewFooter && footer != null)
+            if (footer != null)
             {
                 footer.ClearOverlayContent();
 
@@ -193,8 +154,6 @@ namespace osu.Game.Overlays.Mods
                     hideFooterOnPopOut = false;
                 }
             }
-            else
-                Footer.MoveToY(Footer.DrawHeight, fade_out_duration, Easing.OutQuint);
         }
     }
 }

@@ -185,8 +185,6 @@ namespace osu.Game.Tests.Visual.UserInterface
 
         private partial class TestShearedOverlayContainer : ShearedOverlayContainer
         {
-            public override bool UseNewFooter => true;
-
             public TestShearedOverlayContainer()
                 : base(OverlayColourScheme.Orange)
             {

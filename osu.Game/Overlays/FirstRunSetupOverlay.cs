@@ -150,8 +150,6 @@ namespace osu.Game.Overlays
 
         private FirstRunSetupFooterContent? currentFooterContent;
 
-        public override bool UseNewFooter => true;
-
         public override Drawable CreateFooterContent() => currentFooterContent = new FirstRunSetupFooterContent
         {
             ShowNextStep = showNextStep,
