@@ -25,6 +25,7 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
             breaks.BindTo(beatmap.Breaks);
             breaks.BindCollectionChanged((_, _) =>
             {
+                Clear();
                 foreach (var breakPeriod in beatmap.Breaks)
                     Add(new BreakVisualisation(breakPeriod));
             }, true);
