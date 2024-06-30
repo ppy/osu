@@ -230,6 +230,7 @@ namespace osu.Game.Screens.Footer
 
         public void AppearFromLeft(double delay)
         {
+            Content.FinishTransforms();
             Content.MoveToX(-300f)
                    .FadeOut()
                    .Delay(delay)
@@ -239,6 +240,7 @@ namespace osu.Game.Screens.Footer
 
         public void AppearFromBottom(double delay)
         {
+            Content.FinishTransforms();
             Content.MoveToY(100f)
                    .FadeOut()
                    .Delay(delay)
@@ -248,6 +250,7 @@ namespace osu.Game.Screens.Footer
 
         public void DisappearToRight(double delay, bool expire)
         {
+            Content.FinishTransforms();
             Content.Delay(delay)
                    .FadeOut(240, Easing.InOutCubic)
                    .MoveToX(300f, 360, Easing.InOutCubic);
@@ -258,6 +261,7 @@ namespace osu.Game.Screens.Footer
 
         public void DisappearToBottom(double delay, bool expire)
         {
+            Content.FinishTransforms();
             Content.Delay(delay)
                    .FadeOut(240, Easing.InOutCubic)
                    .MoveToY(100f, 240, Easing.InOutCubic);
