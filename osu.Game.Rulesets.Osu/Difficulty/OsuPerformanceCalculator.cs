@@ -100,10 +100,18 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             deviation = calculateDeviation(score, osuAttributes) * deviationARadjust;
             speedDeviation = calculateSpeedDeviation(score, osuAttributes) * deviationARadjust;
 
-            double aimValue = computeAimValue(score, osuAttributes);
-            double speedValue = computeSpeedValue(score, osuAttributes);
+            // Use adjusted deviation to not nerf EZHT aim maps
+            double totalAntiRakeMultiplier = calculateTotalRakeNerf(osuAttributes, deviation);
+
+            // Use raw speed deviation to prevent abuse of deviation AR adjust with EZDT
+            double speedAntiRakeMultiplier = calculateSpeedRakeNerf(osuAttributes, speedDeviation / deviationARadjust);
+            speedAntiRakeMultiplier = Math.Min(speedAntiRakeMultiplier, totalAntiRakeMultiplier);
+
+            double aimValue = computeAimValue(score, osuAttributes) * totalAntiRakeMultiplier;
+            double speedValue = computeSpeedValue(score, osuAttributes) * speedAntiRakeMultiplier;
             double accuracyValue = computeAccuracyValue(score, osuAttributes);
-            double flashlightValue = computeFlashlightValue(score, osuAttributes);
+            double flashlightValue = computeFlashlightValue(score, osuAttributes) * totalAntiRakeMultiplier;
+
             double totalValue =
                 Math.Pow(
                     Math.Pow(aimValue, 1.1) +
@@ -131,9 +139,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 return 0.0;
 
             double aimValue = Math.Pow(5.0 * Math.Max(1.0, attributes.AimDifficulty / 0.0675) - 4.0, 3.0) / 100000.0;
-
-            // Rake tapping nerf
-            aimValue = adjustPerformanceWithUR(aimValue, deviation);
 
             double lengthBonus = 0.95 + 0.4 * Math.Min(1.0, totalHits / 2000.0) +
                                  (totalHits > 2000 ? Math.Log10(totalHits / 2000.0) * 0.5 : 0.0);
@@ -187,9 +192,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 return 0.0;
 
             double speedValue = Math.Pow(5.0 * Math.Max(1.0, attributes.SpeedDifficulty / 0.0675) - 4.0, 3.0) / 100000.0;
-
-            // Rake tapping nerf
-            speedValue = adjustSpeedWithUR(speedValue, speedDeviation / deviationARadjust);
 
             double lengthBonus = 0.95 + 0.4 * Math.Min(1.0, totalHits / 2000.0) +
                                  (totalHits > 2000 ? Math.Log10(totalHits / 2000.0) * 0.5 : 0.0);
@@ -264,9 +266,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 return 0.0;
 
             double flashlightValue = Math.Pow(attributes.FlashlightDifficulty, 2.0) * 25.0;
-
-            // Rake tapping nerf
-            flashlightValue = adjustPerformanceWithUR(flashlightValue, deviation);
 
             // Penalize misses by assessing # of misses relative to the total # of objects. Default a 3% reduction for any # of misses.
             if (effectiveMissCount > 0)
@@ -462,35 +461,44 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             return deviation * 0.9;
         }
 
-        // https://www.desmos.com/calculator/no1pv5gv5g
-        private double adjustSpeedWithUR(double speedValue, double UR)
+        // Calculates multiplier for speed accounting for rake based on the deviation and speed difficulty
+        // https://www.desmos.com/calculator/puc1mzdtfv
+        private double calculateSpeedRakeNerf(OsuDifficultyAttributes attributes, double rawSpeedDeviation)
         {
+            // Base speed value
+            double speedValue = Math.Pow(5.0 * Math.Max(1.0, attributes.SpeedDifficulty / 0.0675) - 4.0, 3.0) / 100000.0;
+
             // Starting from this pp amount - penalty will be applied
-            double abusePoint = 100 + 260 * Math.Pow(20 / UR, 5.8);
+            double abusePoint = 100 + 260 * Math.Pow(20 / rawSpeedDeviation, 5.8);
 
             if (speedValue <= abusePoint)
-                return speedValue;
+                return 1.0;
 
-            // Descale values to make log curve look correctly
+            // Use log curve to make additional rise in difficulty unimpactful. Rescale values to make curve have correct steepness
             const double scale = 50;
-            speedValue = scale * (Math.Log(speedValue / scale + 1 - abusePoint / scale) + abusePoint / scale);
+            double adjustedSpeedValue = scale * (Math.Log((speedValue - abusePoint) / scale + 1) + abusePoint / scale);
 
-            return speedValue;
+            return adjustedSpeedValue / speedValue;
         }
 
-        private double adjustPerformanceWithUR(double performanceValue, double UR)
+        // Calculates multiplier for total pp accounting for rake based on the deviation and sliderless aim and speed difficulty
+        private double calculateTotalRakeNerf(OsuDifficultyAttributes attributes, double deviation)
         {
+            // Base values
+            double aimNoSlidersValue = Math.Pow(5.0 * Math.Max(1.0, attributes.AimDifficulty * attributes.SliderFactor / 0.0675) - 4.0, 3.0) / 100000.0;
+            double speedValue = Math.Pow(5.0 * Math.Max(1.0, attributes.SpeedDifficulty / 0.0675) - 4.0, 3.0) / 100000.0;
+            double totalValue = Math.Pow(Math.Pow(aimNoSlidersValue, 1.1) + Math.Pow(speedValue, 1.1), 1 / 1.1);
+
             // Starting from this pp amount - penalty will be applied
-            double abusePoint = 150 + 360 * Math.Pow(20 / UR, 4.2);
+            double abusePoint = 200 + 600 * Math.Pow(20 / deviation, 4.2);
 
-            if (performanceValue <= abusePoint)
-                return performanceValue;
+            if (totalValue <= abusePoint)
+                return 1.0;
 
-            // Descale value to make log curve look correctly
-            const double scale = 150;
-            performanceValue = scale * (Math.Log(performanceValue / scale + 1 - abusePoint / scale) + abusePoint / scale);
+            // Use relax penalty after the point to make values grow slower but still noticeably
+            double adjustedTotalValue = abusePoint + Math.Pow(0.9, 3) * (totalValue - abusePoint);
 
-            return performanceValue;
+            return adjustedTotalValue / totalValue;
         }
 
         private double getComboScalingFactor(OsuDifficultyAttributes attributes) => attributes.MaxCombo <= 0 ? 1.0 : Math.Min(Math.Pow(scoreMaxCombo, 0.8) / Math.Pow(attributes.MaxCombo, 0.8), 1.0);
