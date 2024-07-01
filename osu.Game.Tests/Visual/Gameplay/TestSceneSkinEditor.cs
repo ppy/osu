@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
@@ -24,6 +25,7 @@ using osu.Game.Screens.Play.HUD;
 using osu.Game.Screens.Play.HUD.HitErrorMeters;
 using osu.Game.Skinning;
 using osu.Game.Skinning.Components;
+using osu.Game.Tests.Resources;
 using osuTK;
 using osuTK.Input;
 
@@ -384,73 +386,82 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestMigrationArgon()
         {
-            AddUntilStep("wait for load", () => globalHUDTarget.ComponentsLoaded);
-            AddStep("add combo to global hud target", () =>
-            {
-                globalHUDTarget.Add(new ArgonComboCounter
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                });
-            });
+            Live<SkinInfo> importedSkin = null!;
 
-            Live<SkinInfo> modifiedSkin = null!;
+            AddStep("import old argon skin", () => skins.CurrentSkinInfo.Value = importedSkin = importSkinFromArchives(@"argon-layout-version-0.osk").SkinInfo);
+            AddUntilStep("wait for load", () => globalHUDTarget.ComponentsLoaded && rulesetHUDTarget.ComponentsLoaded);
+            AddAssert("no combo in global target", () => !globalHUDTarget.Components.OfType<ArgonComboCounter>().Any());
+            AddAssert("combo placed in ruleset target", () => rulesetHUDTarget.Components.OfType<ArgonComboCounter>().Count() == 1);
 
-            AddStep("select another skin", () =>
+            AddStep("add combo to global target", () => globalHUDTarget.Add(new ArgonComboCounter
             {
-                modifiedSkin = skins.CurrentSkinInfo.Value;
-                skins.CurrentSkinInfo.SetDefault();
-            });
-            AddStep("modify version", () => modifiedSkin.PerformWrite(s => s.LayoutVersion = 0));
-            AddStep("select skin again", () => skins.CurrentSkinInfo.Value = modifiedSkin);
-            AddAssert("global hud target does not contain combo", () => !globalHUDTarget.Components.Any(c => c is ArgonComboCounter));
-            AddAssert("ruleset hud target contains both combos", () =>
-            {
-                var target = rulesetHUDTarget;
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                Scale = new Vector2(2f),
+            }));
+            AddStep("save skin", () => skins.Save(skins.CurrentSkin.Value));
 
-                return target.Components.Count == 2 &&
-                       target.Components[0] is ArgonComboCounter one && one.Anchor == Anchor.BottomLeft && one.Origin == Anchor.BottomLeft &&
-                       target.Components[1] is ArgonComboCounter two && two.Anchor == Anchor.Centre && two.Origin == Anchor.Centre;
-            });
-            AddStep("save skin", () => skinEditor.Save());
-            AddAssert("version updated", () => modifiedSkin.PerformRead(s => s.LayoutVersion) == SkinInfo.LATEST_LAYOUT_VERSION);
+            AddStep("select another skin", () => skins.CurrentSkinInfo.SetDefault());
+            AddStep("select skin again", () => skins.CurrentSkinInfo.Value = importedSkin);
+            AddUntilStep("wait for load", () => globalHUDTarget.ComponentsLoaded && rulesetHUDTarget.ComponentsLoaded);
+            AddAssert("combo placed in global target", () => globalHUDTarget.Components.OfType<ArgonComboCounter>().Count() == 1);
+            AddAssert("combo placed in ruleset target", () => rulesetHUDTarget.Components.OfType<ArgonComboCounter>().Count() == 1);
+        }
+
+        [Test]
+        public void TestMigrationTriangles()
+        {
+            Live<SkinInfo> importedSkin = null!;
+
+            AddStep("import old triangles skin", () => skins.CurrentSkinInfo.Value = importedSkin = importSkinFromArchives(@"triangles-layout-version-0.osk").SkinInfo);
+            AddUntilStep("wait for load", () => globalHUDTarget.ComponentsLoaded && rulesetHUDTarget.ComponentsLoaded);
+            AddAssert("no combo in global target", () => !globalHUDTarget.Components.OfType<DefaultComboCounter>().Any());
+            AddAssert("combo placed in ruleset target", () => rulesetHUDTarget.Components.OfType<DefaultComboCounter>().Count() == 1);
+
+            AddStep("add combo to global target", () => globalHUDTarget.Add(new DefaultComboCounter
+            {
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                Scale = new Vector2(2f),
+            }));
+            AddStep("save skin", () => skins.Save(skins.CurrentSkin.Value));
+
+            AddStep("select another skin", () => skins.CurrentSkinInfo.SetDefault());
+            AddStep("select skin again", () => skins.CurrentSkinInfo.Value = importedSkin);
+            AddUntilStep("wait for load", () => globalHUDTarget.ComponentsLoaded && rulesetHUDTarget.ComponentsLoaded);
+            AddAssert("combo placed in global target", () => globalHUDTarget.Components.OfType<DefaultComboCounter>().Count() == 1);
+            AddAssert("combo placed in ruleset target", () => rulesetHUDTarget.Components.OfType<DefaultComboCounter>().Count() == 1);
         }
 
         [Test]
         public void TestMigrationLegacy()
         {
-            AddStep("select legacy skin", () => skins.CurrentSkinInfo.Value = skins.DefaultClassicSkin.SkinInfo);
+            Live<SkinInfo> importedSkin = null!;
 
-            AddUntilStep("wait for load", () => globalHUDTarget.ComponentsLoaded);
-            AddStep("add combo to global hud target", () =>
+            AddStep("import old classic skin", () => skins.CurrentSkinInfo.Value = importedSkin = importSkinFromArchives(@"classic-layout-version-0.osk").SkinInfo);
+            AddUntilStep("wait for load", () => globalHUDTarget.ComponentsLoaded && rulesetHUDTarget.ComponentsLoaded);
+            AddAssert("no combo in global target", () => !globalHUDTarget.Components.OfType<LegacyComboCounter>().Any());
+            AddAssert("combo placed in ruleset target", () => rulesetHUDTarget.Components.OfType<LegacyComboCounter>().Count() == 1);
+
+            AddStep("add combo to global target", () => globalHUDTarget.Add(new LegacyComboCounter
             {
-                globalHUDTarget.Add(new LegacyComboCounter
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                });
-            });
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                Scale = new Vector2(2f),
+            }));
+            AddStep("save skin", () => skins.Save(skins.CurrentSkin.Value));
 
-            Live<SkinInfo> modifiedSkin = null!;
+            AddStep("select another skin", () => skins.CurrentSkinInfo.SetDefault());
+            AddStep("select skin again", () => skins.CurrentSkinInfo.Value = importedSkin);
+            AddUntilStep("wait for load", () => globalHUDTarget.ComponentsLoaded && rulesetHUDTarget.ComponentsLoaded);
+            AddAssert("combo placed in global target", () => globalHUDTarget.Components.OfType<LegacyComboCounter>().Count() == 1);
+            AddAssert("combo placed in ruleset target", () => rulesetHUDTarget.Components.OfType<LegacyComboCounter>().Count() == 1);
+        }
 
-            AddStep("select another skin", () =>
-            {
-                modifiedSkin = skins.CurrentSkinInfo.Value;
-                skins.CurrentSkinInfo.SetDefault();
-            });
-            AddStep("modify version", () => modifiedSkin.PerformWrite(s => s.LayoutVersion = 0));
-            AddStep("select skin again", () => skins.CurrentSkinInfo.Value = modifiedSkin);
-            AddAssert("global hud target does not contain combo", () => !globalHUDTarget.Components.Any(c => c is LegacyComboCounter));
-            AddAssert("ruleset hud target contains both combos", () =>
-            {
-                var target = rulesetHUDTarget;
-
-                return target.Components.Count == 2 &&
-                       target.Components[0] is LegacyComboCounter one && one.Anchor == Anchor.BottomLeft && one.Origin == Anchor.BottomLeft &&
-                       target.Components[1] is LegacyComboCounter two && two.Anchor == Anchor.Centre && two.Origin == Anchor.Centre;
-            });
-            AddStep("save skin", () => skinEditor.Save());
-            AddAssert("version updated", () => modifiedSkin.PerformRead(s => s.LayoutVersion) == SkinInfo.LATEST_LAYOUT_VERSION);
+        private Skin importSkinFromArchives(string filename)
+        {
+            var imported = skins.Import(new ImportTask(TestResources.OpenResource($@"Archives/{filename}"), filename)).GetResultSafely();
+            return imported.PerformRead(skinInfo => skins.GetSkin(skinInfo));
         }
 
         protected override Ruleset CreatePlayerRuleset() => new OsuRuleset();
