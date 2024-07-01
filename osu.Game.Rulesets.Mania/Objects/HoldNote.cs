@@ -72,18 +72,18 @@ namespace osu.Game.Rulesets.Mania.Objects
         /// <summary>
         /// The head note of the hold.
         /// </summary>
-        public HeadNote Head { get; private set; }
+        public HeadNote Head { get; protected set; }
 
         /// <summary>
         /// The tail note of the hold.
         /// </summary>
-        public TailNote Tail { get; private set; }
+        public TailNote Tail { get; protected set; }
 
         /// <summary>
         /// The body of the hold.
         /// This is an invisible and silent object that tracks the holding state of the <see cref="HoldNote"/>.
         /// </summary>
-        public HoldNoteBody Body { get; private set; }
+        public HoldNoteBody Body { get; protected set; }
 
         public override double MaximumJudgementOffset => Tail.MaximumJudgementOffset;
 

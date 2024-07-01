@@ -3,7 +3,6 @@
 
 #nullable disable
 
-using System.Diagnostics;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Scoring;
@@ -19,11 +18,6 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
         protected internal DrawableHoldNote HoldNote => (DrawableHoldNote)ParentHitObject;
 
-        /// <summary>
-        /// The minimum uncapped result for a late release.
-        /// </summary>
-        public HitResult LateReleaseResult { get; set; } = HitResult.Miss;
-
         public DrawableHoldNoteTail()
             : this(null)
         {
@@ -38,23 +32,9 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
         public void UpdateResult() => base.UpdateResult(true);
 
-        protected override void CheckForResult(bool userTriggered, double timeOffset)
-        {
-            Debug.Assert(HitObject.HitWindows != null);
-
+        protected override void CheckForResult(bool userTriggered, double timeOffset) =>
             // Factor in the release lenience
-            double scaledTimeOffset = timeOffset / TailNote.RELEASE_WINDOW_LENIENCE;
-
-            // Check for late release
-            if (HoldNote.HoldStartTime != null && scaledTimeOffset > HitObject.HitWindows.WindowFor(LateReleaseResult))
-            {
-                ApplyResult(GetCappedResult(LateReleaseResult));
-            }
-            else
-            {
-                base.CheckForResult(userTriggered, scaledTimeOffset);
-            }
-        }
+            base.CheckForResult(userTriggered, timeOffset / TailNote.RELEASE_WINDOW_LENIENCE);
 
         protected override HitResult GetCappedResult(HitResult result)
         {

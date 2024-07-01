@@ -273,10 +273,10 @@ namespace osu.Game.Rulesets.Mania.Tests.Mods
 
         /// <summary>
         ///     -----[ ]--------------
-        ///             xo
+        ///               xo
         /// </summary>
         [Test]
-        public void TestPressAndReleaseJustAfterTailWithCloseByHead()
+        public void TestPressAndReleaseAfterTailWithCloseByHead()
         {
             const int duration = 30;
 
@@ -301,11 +301,11 @@ namespace osu.Game.Rulesets.Mania.Tests.Mods
 
             performTest(new List<ReplayFrame>
             {
-                new ManiaReplayFrame(time_head + duration + 20, ManiaAction.Key1),
-                new ManiaReplayFrame(time_head + duration + 30),
+                new ManiaReplayFrame(time_head + duration + 60, ManiaAction.Key1),
+                new ManiaReplayFrame(time_head + duration + 70),
             }, beatmap);
 
-            assertHeadJudgement(HitResult.Good);
+            assertHeadJudgement(HitResult.Ok);
             assertTailJudgement(HitResult.Perfect);
         }
 
