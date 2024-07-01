@@ -328,7 +328,12 @@ namespace osu.Game.Rulesets.Difficulty
                 set => baseBeatmap.Difficulty = value;
             }
 
-            public BindableList<BreakPeriod> Breaks => baseBeatmap.Breaks;
+            public BindableList<BreakPeriod> Breaks
+            {
+                get => baseBeatmap.Breaks;
+                set => baseBeatmap.Breaks = value;
+            }
+
             public List<string> UnhandledEventLines => baseBeatmap.UnhandledEventLines;
 
             public double TotalBreakTime => baseBeatmap.TotalBreakTime;

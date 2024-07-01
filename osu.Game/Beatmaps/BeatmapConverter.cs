@@ -7,6 +7,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using osu.Framework.Bindables;
+using osu.Game.Beatmaps.Timing;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Objects;
 
@@ -48,6 +50,9 @@ namespace osu.Game.Beatmaps
             // Can potentially be removed after `Beatmap.Difficulty` doesn't save back to `Beatmap.BeatmapInfo`.
             original.BeatmapInfo = original.BeatmapInfo.Clone();
             original.ControlPointInfo = original.ControlPointInfo.DeepClone();
+
+            // Used in osu!mania conversion.
+            original.Breaks = new BindableList<BreakPeriod>(original.Breaks);
 
             return ConvertBeatmap(original, cancellationToken);
         }

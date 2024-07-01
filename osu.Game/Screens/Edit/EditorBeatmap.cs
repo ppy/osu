@@ -172,7 +172,11 @@ namespace osu.Game.Screens.Edit
             set => PlayableBeatmap.ControlPointInfo = value;
         }
 
-        public BindableList<BreakPeriod> Breaks => PlayableBeatmap.Breaks;
+        public BindableList<BreakPeriod> Breaks
+        {
+            get => PlayableBeatmap.Breaks;
+            set => PlayableBeatmap.Breaks = value;
+        }
 
         public List<string> UnhandledEventLines => PlayableBeatmap.UnhandledEventLines;
 
