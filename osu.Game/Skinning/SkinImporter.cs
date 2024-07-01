@@ -223,8 +223,6 @@ namespace osu.Game.Skinning
                     }
                 }
 
-                s.LayoutVersion = SkinInfo.LATEST_LAYOUT_VERSION;
-
                 string newHash = ComputeHash(s);
 
                 hadChanges = newHash != s.Hash;

@@ -39,21 +39,6 @@ namespace osu.Game.Skinning
 
         public bool Protected { get; set; }
 
-        /// <summary>
-        /// The latest version in YYYYMMDD format for skin layout migrations.
-        /// </summary>
-        /// <remarks>
-        /// <list type="bullet">
-        /// <item><description>20240625: Moves combo counters from ruleset-agnostic to ruleset-specific HUD targets.</description></item>
-        /// </list>
-        /// </remarks>
-        public const int LATEST_LAYOUT_VERSION = 20240625;
-
-        /// <summary>
-        /// A version in YYYYMMDD format for applying skin layout migrations.
-        /// </summary>
-        public int LayoutVersion { get; set; }
-
         public virtual Skin CreateInstance(IStorageResourceProvider resources)
         {
             var type = string.IsNullOrEmpty(InstantiationInfo)
