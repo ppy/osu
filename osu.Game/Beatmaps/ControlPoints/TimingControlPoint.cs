@@ -82,6 +82,13 @@ namespace osu.Game.Beatmaps.ControlPoints
         /// </summary>
         public double BPM => 60000 / BeatLength;
 
+        public TimingControlPoint()
+        {
+            TimeSignatureBindable.BindValueChanged(_ => RaiseChanged());
+            OmitFirstBarLineBindable.BindValueChanged(_ => RaiseChanged());
+            BeatLengthBindable.BindValueChanged(_ => RaiseChanged());
+        }
+
         // Timing points are never redundant as they can change the time signature.
         public override bool IsRedundant(ControlPoint? existing) => false;
 
