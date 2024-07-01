@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.EnumExtensions;
@@ -66,7 +67,8 @@ namespace osu.Game.Rulesets.Edit
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; }
 
-        protected ComposeBlueprintContainer BlueprintContainer { get; private set; }
+        public override ComposeBlueprintContainer BlueprintContainer => blueprintContainer;
+        private ComposeBlueprintContainer blueprintContainer;
 
         protected ExpandingToolboxContainer LeftToolbox { get; private set; }
 
@@ -78,14 +80,16 @@ namespace osu.Game.Rulesets.Edit
 
         protected InputManager InputManager { get; private set; }
 
+        private Box leftToolboxBackground;
+        private Box rightToolboxBackground;
+
         private EditorRadioButtonCollection toolboxCollection;
-
         private FillFlowContainer togglesCollection;
-
         private FillFlowContainer sampleBankTogglesCollection;
 
         private IBindable<bool> hasTiming;
         private Bindable<bool> autoSeekOnPlacement;
+        private readonly Bindable<bool> composerFocusMode = new Bindable<bool>();
 
         protected DrawableRuleset<TObject> DrawableRuleset { get; private set; }
 
@@ -97,10 +101,13 @@ namespace osu.Game.Rulesets.Edit
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent) =>
             dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
 
-        [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
+        [BackgroundDependencyLoader(true)]
+        private void load(OsuConfigManager config, [CanBeNull] Editor editor)
         {
             autoSeekOnPlacement = config.GetBindable<bool>(OsuSetting.EditorAutoSeekOnPlacement);
+
+            if (editor != null)
+                composerFocusMode.BindTo(editor.ComposerFocusMode);
 
             Config = Dependencies.Get<IRulesetConfigCache>().GetConfigFor(Ruleset);
 
@@ -126,7 +133,7 @@ namespace osu.Game.Rulesets.Edit
 
             InternalChildren = new[]
             {
-                PlayfieldContentContainer = new Container
+                PlayfieldContentContainer = new ContentContainer
                 {
                     Name = "Playfield content",
                     RelativeSizeAxes = Axes.Y,
@@ -137,7 +144,7 @@ namespace osu.Game.Rulesets.Edit
                         drawableRulesetWrapper,
                         // layers above playfield
                         drawableRulesetWrapper.CreatePlayfieldAdjustmentContainer()
-                                              .WithChild(BlueprintContainer = CreateBlueprintContainer())
+                                              .WithChild(blueprintContainer = CreateBlueprintContainer())
                     }
                 },
                 new Container
@@ -146,7 +153,7 @@ namespace osu.Game.Rulesets.Edit
                     AutoSizeAxes = Axes.X,
                     Children = new Drawable[]
                     {
-                        new Box
+                        leftToolboxBackground = new Box
                         {
                             Colour = colourProvider.Background5,
                             RelativeSizeAxes = Axes.Both,
@@ -191,7 +198,7 @@ namespace osu.Game.Rulesets.Edit
                     AutoSizeAxes = Axes.X,
                     Children = new Drawable[]
                     {
-                        new Box
+                        rightToolboxBackground = new Box
                         {
                             Colour = colourProvider.Background5,
                             RelativeSizeAxes = Axes.Both,
@@ -200,7 +207,7 @@ namespace osu.Game.Rulesets.Edit
                         {
                             Child = new EditorToolboxGroup("inspector")
                             {
-                                Child = new HitObjectInspector()
+                                Child = CreateHitObjectInspector()
                             },
                         }
                     }
@@ -260,6 +267,13 @@ namespace osu.Game.Rulesets.Edit
                     item.Selected.Disabled = !hasTiming.NewValue;
                 }
             }, true);
+
+            composerFocusMode.BindValueChanged(_ =>
+            {
+                float targetAlpha = composerFocusMode.Value ? 0.5f : 1;
+                leftToolboxBackground.FadeTo(targetAlpha, 400, Easing.OutQuint);
+                rightToolboxBackground.FadeTo(targetAlpha, 400, Easing.OutQuint);
+            }, true);
         }
 
         protected override void Update()
@@ -314,6 +328,8 @@ namespace osu.Game.Rulesets.Edit
         /// Construct a relevant blueprint container. This will manage hitobject selection/placement input handling and display logic.
         /// </summary>
         protected virtual ComposeBlueprintContainer CreateBlueprintContainer() => new ComposeBlueprintContainer(this);
+
+        protected virtual Drawable CreateHitObjectInspector() => new HitObjectInspector();
 
         /// <summary>
         /// Construct a drawable ruleset for the provided ruleset.
@@ -507,6 +523,31 @@ namespace osu.Game.Rulesets.Edit
         }
 
         #endregion
+
+        private partial class ContentContainer : Container
+        {
+            public override bool HandlePositionalInput => true;
+
+            private readonly Bindable<bool> composerFocusMode = new Bindable<bool>();
+
+            [BackgroundDependencyLoader(true)]
+            private void load([CanBeNull] Editor editor)
+            {
+                if (editor != null)
+                    composerFocusMode.BindTo(editor.ComposerFocusMode);
+            }
+
+            protected override bool OnHover(HoverEvent e)
+            {
+                composerFocusMode.Value = true;
+                return false;
+            }
+
+            protected override void OnHoverLost(HoverLostEvent e)
+            {
+                composerFocusMode.Value = false;
+            }
+        }
     }
 
     /// <summary>
@@ -531,6 +572,8 @@ namespace osu.Game.Rulesets.Edit
         /// The target ruleset's playfield.
         /// </summary>
         public abstract Playfield Playfield { get; }
+
+        public abstract ComposeBlueprintContainer BlueprintContainer { get; }
 
         /// <summary>
         /// All <see cref="DrawableHitObject"/>s in currently loaded beatmap.

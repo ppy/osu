@@ -457,7 +457,7 @@ namespace osu.Game.Overlays.SkinEditor
             }
 
             SelectedComponents.Add(component);
-            SkinSelectionHandler.ApplyClosestAnchor(drawableComponent);
+            SkinSelectionHandler.ApplyClosestAnchorOrigin(drawableComponent);
             return true;
         }
 
@@ -540,7 +540,9 @@ namespace osu.Game.Overlays.SkinEditor
 
         protected void Redo() => changeHandler?.RestoreState(1);
 
-        public void Save(bool userTriggered = true) => save(currentSkin.Value);
+        void IEditorChangeHandler.RestoreState(int direction) => changeHandler?.RestoreState(direction);
+
+        public void Save(bool userTriggered = true) => save(currentSkin.Value, userTriggered);
 
         private void save(Skin skin, bool userTriggered = true)
         {
@@ -667,7 +669,7 @@ namespace osu.Game.Overlays.SkinEditor
                 {
                     SpriteName = { Value = file.Name },
                     Origin = Anchor.Centre,
-                    Position = skinnableTarget.ToLocalSpace(GetContainingInputManager().CurrentState.Mouse.Position),
+                    Position = skinnableTarget.ToLocalSpace(GetContainingInputManager()!.CurrentState.Mouse.Position),
                 };
 
                 SelectedComponents.Clear();
