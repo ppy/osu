@@ -466,7 +466,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         private double calculateSpeedRakeNerf(OsuDifficultyAttributes attributes, double rawSpeedDeviation)
         {
             // Base speed value
-            double speedValue = Math.Pow(5.0 * Math.Max(1.0, attributes.SpeedDifficulty / 0.0675) - 4.0, 3.0) / 100000.0;
+            double speedValue = 4 * Math.Pow(attributes.SpeedDifficulty, 3);
 
             // Starting from this pp amount - penalty will be applied
             double abusePoint = 100 + 260 * Math.Pow(20 / rawSpeedDeviation, 5.8);
@@ -485,8 +485,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         private double calculateTotalRakeNerf(OsuDifficultyAttributes attributes, double deviation)
         {
             // Base values
-            double aimNoSlidersValue = Math.Pow(5.0 * Math.Max(1.0, attributes.AimDifficulty * attributes.SliderFactor / 0.0675) - 4.0, 3.0) / 100000.0;
-            double speedValue = Math.Pow(5.0 * Math.Max(1.0, attributes.SpeedDifficulty / 0.0675) - 4.0, 3.0) / 100000.0;
+            double aimNoSlidersValue = 4 * Math.Pow(attributes.AimDifficulty * attributes.SliderFactor, 3);
+            double speedValue = 4 * Math.Pow(attributes.SpeedDifficulty, 3);
             double totalValue = Math.Pow(Math.Pow(aimNoSlidersValue, 1.1) + Math.Pow(speedValue, 1.1), 1 / 1.1);
 
             // Starting from this pp amount - penalty will be applied
