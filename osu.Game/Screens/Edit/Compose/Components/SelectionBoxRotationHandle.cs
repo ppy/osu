@@ -67,6 +67,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
             if (rotationHandler == null) return false;
 
+            if (rotationHandler.OperationInProgress.Value)
+                return false;
+
             rotationHandler.Begin();
             return true;
         }

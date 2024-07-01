@@ -43,5 +43,15 @@ namespace osu.Game.Online.Metadata
         /// Signals to the server that the current user would like to stop receiving updates on other users' online presence.
         /// </summary>
         Task EndWatchingUserPresence();
+
+        /// <summary>
+        /// Signals to the server that the current user would like to begin receiving updates about the state of the multiplayer room with the given <paramref name="id"/>.
+        /// </summary>
+        Task<MultiplayerPlaylistItemStats[]> BeginWatchingMultiplayerRoom(long id);
+
+        /// <summary>
+        /// Signals to the server that the current user would like to stop receiving updates about the state of the multiplayer room with the given <paramref name="id"/>.
+        /// </summary>
+        Task EndWatchingMultiplayerRoom(long id);
     }
 }

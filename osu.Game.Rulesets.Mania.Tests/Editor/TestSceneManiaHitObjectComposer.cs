@@ -186,8 +186,106 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
             AddAssert("head note positioned correctly", () => Precision.AlmostEquals(holdNote.ScreenSpaceDrawQuad.BottomLeft, holdNote.Head.ScreenSpaceDrawQuad.BottomLeft));
             AddAssert("tail note positioned correctly", () => Precision.AlmostEquals(holdNote.ScreenSpaceDrawQuad.TopLeft, holdNote.Tail.ScreenSpaceDrawQuad.BottomLeft));
 
-            AddAssert("head blueprint positioned correctly", () => this.ChildrenOfType<EditNotePiece>().ElementAt(0).DrawPosition == holdNote.Head.DrawPosition);
-            AddAssert("tail blueprint positioned correctly", () => this.ChildrenOfType<EditNotePiece>().ElementAt(1).DrawPosition == holdNote.Tail.DrawPosition);
+            AddAssert("head blueprint positioned correctly", () => this.ChildrenOfType<EditHoldNoteEndPiece>().ElementAt(0).DrawPosition == holdNote.Head.DrawPosition);
+            AddAssert("tail blueprint positioned correctly", () => this.ChildrenOfType<EditHoldNoteEndPiece>().ElementAt(1).DrawPosition == holdNote.Tail.DrawPosition);
+        }
+
+        [Test]
+        public void TestDragHoldNoteHead()
+        {
+            setScrollStep(ScrollingDirection.Down);
+
+            HoldNote holdNote = null;
+            AddStep("setup beatmap", () =>
+            {
+                composer.EditorBeatmap.Clear();
+                composer.EditorBeatmap.Add(holdNote = new HoldNote
+                {
+                    Column = 1,
+                    StartTime = 250,
+                    EndTime = 750,
+                });
+            });
+
+            DrawableHoldNote drawableHoldNote = null;
+            EditHoldNoteEndPiece headPiece = null;
+
+            AddStep("select blueprint", () =>
+            {
+                drawableHoldNote = this.ChildrenOfType<DrawableHoldNote>().Single();
+                InputManager.MoveMouseTo(drawableHoldNote);
+                InputManager.Click(MouseButton.Left);
+            });
+            AddStep("grab hold note head", () =>
+            {
+                headPiece = this.ChildrenOfType<EditHoldNoteEndPiece>().First();
+                InputManager.MoveMouseTo(headPiece);
+                InputManager.PressButton(MouseButton.Left);
+            });
+
+            AddStep("drag head downwards", () =>
+            {
+                InputManager.MoveMouseTo(headPiece, new Vector2(0, 100));
+                InputManager.ReleaseButton(MouseButton.Left);
+            });
+
+            AddAssert("start time moved back", () => holdNote!.StartTime, () => Is.LessThan(250));
+            AddAssert("end time unchanged", () => holdNote.EndTime, () => Is.EqualTo(750));
+
+            AddAssert("head note positioned correctly", () => Precision.AlmostEquals(drawableHoldNote.ScreenSpaceDrawQuad.BottomLeft, drawableHoldNote.Head.ScreenSpaceDrawQuad.BottomLeft));
+            AddAssert("tail note positioned correctly", () => Precision.AlmostEquals(drawableHoldNote.ScreenSpaceDrawQuad.TopLeft, drawableHoldNote.Tail.ScreenSpaceDrawQuad.BottomLeft));
+
+            AddAssert("head blueprint positioned correctly", () => this.ChildrenOfType<EditHoldNoteEndPiece>().ElementAt(0).DrawPosition == drawableHoldNote.Head.DrawPosition);
+            AddAssert("tail blueprint positioned correctly", () => this.ChildrenOfType<EditHoldNoteEndPiece>().ElementAt(1).DrawPosition == drawableHoldNote.Tail.DrawPosition);
+        }
+
+        [Test]
+        public void TestDragHoldNoteTail()
+        {
+            setScrollStep(ScrollingDirection.Down);
+
+            HoldNote holdNote = null;
+            AddStep("setup beatmap", () =>
+            {
+                composer.EditorBeatmap.Clear();
+                composer.EditorBeatmap.Add(holdNote = new HoldNote
+                {
+                    Column = 1,
+                    StartTime = 250,
+                    EndTime = 750,
+                });
+            });
+
+            DrawableHoldNote drawableHoldNote = null;
+            EditHoldNoteEndPiece tailPiece = null;
+
+            AddStep("select blueprint", () =>
+            {
+                drawableHoldNote = this.ChildrenOfType<DrawableHoldNote>().Single();
+                InputManager.MoveMouseTo(drawableHoldNote);
+                InputManager.Click(MouseButton.Left);
+            });
+            AddStep("grab hold note tail", () =>
+            {
+                tailPiece = this.ChildrenOfType<EditHoldNoteEndPiece>().Last();
+                InputManager.MoveMouseTo(tailPiece);
+                InputManager.PressButton(MouseButton.Left);
+            });
+
+            AddStep("drag tail upwards", () =>
+            {
+                InputManager.MoveMouseTo(tailPiece, new Vector2(0, -100));
+                InputManager.ReleaseButton(MouseButton.Left);
+            });
+
+            AddAssert("start time unchanged", () => holdNote!.StartTime, () => Is.EqualTo(250));
+            AddAssert("end time moved forward", () => holdNote.EndTime, () => Is.GreaterThan(750));
+
+            AddAssert("head note positioned correctly", () => Precision.AlmostEquals(drawableHoldNote.ScreenSpaceDrawQuad.BottomLeft, drawableHoldNote.Head.ScreenSpaceDrawQuad.BottomLeft));
+            AddAssert("tail note positioned correctly", () => Precision.AlmostEquals(drawableHoldNote.ScreenSpaceDrawQuad.TopLeft, drawableHoldNote.Tail.ScreenSpaceDrawQuad.BottomLeft));
+
+            AddAssert("head blueprint positioned correctly", () => this.ChildrenOfType<EditHoldNoteEndPiece>().ElementAt(0).DrawPosition == drawableHoldNote.Head.DrawPosition);
+            AddAssert("tail blueprint positioned correctly", () => this.ChildrenOfType<EditHoldNoteEndPiece>().ElementAt(1).DrawPosition == drawableHoldNote.Tail.DrawPosition);
         }
 
         private void setScrollStep(ScrollingDirection direction)

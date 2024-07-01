@@ -13,6 +13,11 @@ namespace osu.Game.Screens.Edit.Compose.Components
     public partial class SelectionRotationHandler : Component
     {
         /// <summary>
+        /// Whether there is any ongoing scale operation right now.
+        /// </summary>
+        public Bindable<bool> OperationInProgress { get; private set; } = new BindableBool();
+
+        /// <summary>
         /// Whether rotation anchored by the selection origin can currently be performed.
         /// </summary>
         public Bindable<bool> CanRotateAroundSelectionOrigin { get; private set; } = new BindableBool();
@@ -50,6 +55,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// </remarks>
         public virtual void Begin()
         {
+            OperationInProgress.Value = true;
         }
 
         /// <summary>
@@ -85,6 +91,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// </remarks>
         public virtual void Commit()
         {
+            OperationInProgress.Value = false;
         }
     }
 }

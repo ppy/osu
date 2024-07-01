@@ -402,9 +402,7 @@ namespace osu.Game.Screens.Select
                     return;
 
                 // this doesn't consider mods which apply variable rates, yet.
-                double rate = 1;
-                foreach (var mod in mods.Value.OfType<IApplicableToRate>())
-                    rate = mod.ApplyToRate(0, rate);
+                double rate = ModUtils.CalculateRateWithMods(mods.Value);
 
                 int bpmMax = FormatUtils.RoundBPM(beatmap.ControlPointInfo.BPMMaximum, rate);
                 int bpmMin = FormatUtils.RoundBPM(beatmap.ControlPointInfo.BPMMinimum, rate);

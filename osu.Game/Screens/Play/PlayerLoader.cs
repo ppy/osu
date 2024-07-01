@@ -249,7 +249,7 @@ namespace osu.Game.Screens.Play
         {
             base.LoadComplete();
 
-            inputManager = GetContainingInputManager();
+            inputManager = GetContainingInputManager()!;
 
             showStoryboards.BindValueChanged(val => epilepsyWarning?.FadeTo(val.NewValue ? 1 : 0, 250, Easing.OutQuint), true);
             epilepsyWarning?.FinishTransforms(true);
