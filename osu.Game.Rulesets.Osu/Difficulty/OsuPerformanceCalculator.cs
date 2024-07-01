@@ -97,7 +97,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             // Bonus for low AR to account for the fact that it's more difficult to get low UR on low AR
             deviationARadjust = 0.475 + 0.7 / (1.0 + Math.Pow(1.73, 7.9 - osuAttributes.ApproachRate));
 
-            deviation = calculateDeviation(score, osuAttributes) * deviationARadjust;
+            deviation = calculateTotalDeviation(score, osuAttributes) * deviationARadjust;
             speedDeviation = calculateSpeedDeviation(score, osuAttributes) * deviationARadjust;
 
             // Use adjusted deviation to not nerf EZHT aim maps
@@ -245,8 +245,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double accuracyValue = 2.83 * Math.Pow(1.52163, 40.0 / 3) * liveLengthBonus * Math.Exp(-scaling * deviation);
 
             // Punish very low amount of hits additionally to prevent big pp values right at the start of the map
-            if (amountHitObjectsWithAccuracy < 30)
-                accuracyValue *= Math.Sqrt((double)amountHitObjectsWithAccuracy / 30);
+            double amountOfHits = Math.Clamp(totalSuccessfulHits - attributes.SpinnerCount, 0, amountHitObjectsWithAccuracy);
+            if (amountOfHits < 30)
+                accuracyValue *= Math.Sqrt(amountOfHits / 30);
 
             // Increasing the accuracy value by object count for Blinds isn't ideal, so the minimum buff is given.
             if (score.Mods.Any(m => m is OsuModBlinds))
@@ -303,12 +304,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         }
 
         /// <summary>
-        /// Estimates the player's tap deviation based on the OD, number of circles and sliders, and number of 300s, 100s, 50s, and misses,
-        /// assuming the player's mean hit error is 0. The estimation is consistent in that two SS scores on the same map with the same settings
-        /// will always return the same deviation. Sliders are treated as circles with a 50 hit window. Misses are ignored because they are usually due to misaiming.
-        /// 300s and 100s are assumed to follow a normal distribution, whereas 50s are assumed to follow a uniform distribution.
+        /// Using <see cref="calculateDeviation"/> estimates player's deviation on accuracy objects.
+        /// Returns deviation for circles and sliders if score was set with slideracc.
+        /// Returns the min between deviation of circles and deviation on circles and sliders (assuming slider hits are 50s), if score was set without slideracc.
         /// </summary>
-        private double calculateDeviation(ScoreInfo score, OsuDifficultyAttributes attributes)
+        private double calculateTotalDeviation(ScoreInfo score, OsuDifficultyAttributes attributes)
         {
             if (totalSuccessfulHits == 0)
                 return double.PositiveInfinity;
@@ -316,80 +316,34 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             int accuracyObjectCount = attributes.HitCircleCount;
             if (usingSliderAccuracy) accuracyObjectCount += attributes.SliderCount;
 
-            int missCountCircles = Math.Min(countMiss, accuracyObjectCount);
-            int mehCountCircles = Math.Min(countMeh, accuracyObjectCount - missCountCircles);
-            int okCountCircles = Math.Min(countOk, accuracyObjectCount - missCountCircles - mehCountCircles);
-            int greatCountCircles = Math.Max(0, accuracyObjectCount - missCountCircles - mehCountCircles - okCountCircles);
+            // Assume worst case: all mistakes was on accuracy objects
+            int relevantCountMiss = Math.Min(countMiss, accuracyObjectCount);
+            int relevantCountMeh = Math.Min(countMeh, accuracyObjectCount - relevantCountMiss);
+            int relevantCountOk = Math.Min(countOk, accuracyObjectCount - relevantCountMiss - relevantCountMeh);
+            int relevantCountGreat = Math.Max(0, accuracyObjectCount - relevantCountMiss - relevantCountMeh - relevantCountOk);
 
-            if (greatCountCircles + okCountCircles + mehCountCircles <= 0)
-                return double.PositiveInfinity;
-
-            double deviation = double.PositiveInfinity;
-
-            // Assume 100s, 50s, and misses happen on circles. If there are less non-300s on circles than 300s,
-            // compute the deviation on circles.
-            if (accuracyObjectCount > 0)
-            {
-                //// The probability that a player hits a circle is unknown, but we can estimate it to be
-                //// the number of greats on circles divided by the number of circles, and then add one
-                //// to the number of circles as a bias correction.
-                double n = Math.Max(1, accuracyObjectCount - missCountCircles - mehCountCircles);
-                const double z = 2.32634787404; // 99% critical value for the normal distribution (one-tailed).
-
-                // Proportion of greats hit on circles, ignoring misses and 50s.
-                double p = greatCountCircles / n;
-
-                // We can be 99% confident that p is at least this value.
-                double pLowerBound = (n * p + z * z / 2) / (n + z * z) - z / (n + z * z) * Math.Sqrt(n * p * (1 - p) + z * z / 4);
-
-                // Compute the deviation assuming 300s and 100s are normally distributed, and 50s are uniformly distributed.
-                // Begin with 300s and 100s first. Ignoring 50s, we can be 99% confident that the deviation is not higher than:
-                deviation = hitWindow300 / (Math.Sqrt(2) * SpecialFunctions.ErfInv(pLowerBound));
-
-                double randomValue = Math.Sqrt(2 / Math.PI) * hitWindow100 * Math.Exp(-0.5 * Math.Pow(hitWindow100 / deviation, 2))
-                    / (deviation * SpecialFunctions.Erf(hitWindow100 / (Math.Sqrt(2) * deviation)));
-
-                deviation *= Math.Sqrt(1 - randomValue);
-
-                // If precision is not enough - use limit value
-                if (pLowerBound == 0 || randomValue >= 1)
-                    deviation = hitWindow100 / Math.Sqrt(3);
-
-                // Then compute the variance for 50s.
-                double mehVariance = (hitWindow50 * hitWindow50 + hitWindow100 * hitWindow50 + hitWindow100 * hitWindow100) / 3;
-
-                // Find the total deviation.
-                deviation = Math.Sqrt(((greatCountCircles + okCountCircles) * Math.Pow(deviation, 2) + mehCountCircles * mehVariance) / (greatCountCircles + okCountCircles + mehCountCircles));
-
-                // Adjust by 0.9 to account for the fact that it's higher bound UR value
-                deviation *= 0.9;
-            }
+            // Calculate deviation on accuracy objects
+            double deviation = calculateDeviation(relevantCountGreat, relevantCountOk, relevantCountMeh, relevantCountMiss);
 
             if (usingSliderAccuracy) return deviation;
 
-            // If there are more non-300s than there are circles, compute the deviation on sliders instead.
-            // Here, all that matters is whether or not the slider was missed, since it is impossible
-            // to get a 100 or 50 on a slider by mis-tapping it.
-            double deviationOnSliders = double.PositiveInfinity;
-            int sliderCount = attributes.SliderCount;
-            int missCountSliders = Math.Min(sliderCount, countMiss - missCountCircles);
-            int greatCountSliders = sliderCount - missCountSliders;
+            // If score was set without slider accuracy - also compute deviation with sliders
+            // Assume that all hits was 50s
+            int totalCountWithSliders = attributes.HitCircleCount + attributes.SliderCount;
+            int missCountWithSliders = Math.Min(totalCountWithSliders, countMiss);
+            int hitCountWithSliders = totalCountWithSliders - missCountWithSliders;
 
-            // We only get here if nothing was hit. In this case, there is no estimate for deviation.
-            // Note that this is never negative, so checking if this is only equal to 0 makes sense.
-            if (greatCountSliders > 0)
-            {
-                double greatProbabilitySlider = greatCountSliders / (sliderCount + 1.0);
-                deviationOnSliders = hitWindow50 / (Math.Sqrt(2) * SpecialFunctions.ErfInv(greatProbabilitySlider));
-            }
+            double hitProbabilityWithSliders = hitCountWithSliders / (totalCountWithSliders + 1.0);
+            double deviationWithSliders = hitWindow50 / (Math.Sqrt(2) * SpecialFunctions.ErfInv(hitProbabilityWithSliders));
 
-            return Math.Min(deviation, deviationOnSliders);
+            // Min is needed for edgecase maps with 1 circle and 999 sliders, as deviation on sliders can be lower in this case
+            return Math.Min(deviation, deviationWithSliders);
         }
 
         /// <summary>
-        /// Does the same as <see cref="calculateDeviation"/>, but only for notes and inaccuracies that are relevant to speed difficulty.
-        /// Treats all difficult speed notes as circles, so this method can sometimes return a lower deviation than <see cref="calculateDeviation"/>.
-        /// This is fine though, since this method is only used to scale speed pp.
+        /// Using <see cref="calculateDeviation"/> estimates player's deviation on speed notes, assuming worst-case.
+        /// Treats all speed notes as hit circles. This is not good way to do this, but fixing this is impossible under the limitation of current speed pp.
+        /// If score was set with slideracc - tries to remove mistaps on sliders from total mistaps.
         /// </summary>
         private double calculateSpeedDeviation(ScoreInfo score, OsuDifficultyAttributes attributes)
         {
@@ -399,37 +353,56 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             // Calculate accuracy assuming the worst case scenario
             double speedNoteCount = attributes.SpeedNoteCount;
 
-            double relevantTotalDiff = totalHits - speedNoteCount;
+            // Assume worst case: all mistakes was on speed notes
+            double relevantCountMiss = Math.Min(countMiss, speedNoteCount);
+            double relevantCountMeh = Math.Min(countMeh, speedNoteCount - relevantCountMiss);
+            double relevantCountOk = Math.Min(countOk, speedNoteCount - relevantCountMiss - relevantCountMeh);
+            double relevantCountGreat = Math.Max(0, speedNoteCount - relevantCountMiss - relevantCountMeh - relevantCountOk);
 
-            double relevantCountGreat = Math.Max(0, countGreat - relevantTotalDiff);
-            double relevantCountOk = Math.Max(0, countOk - Math.Max(0, relevantTotalDiff - countGreat));
-            double relevantCountMeh = Math.Max(0, countMeh - Math.Max(0, relevantTotalDiff - countGreat - countOk));
-            double relevantCountMiss = Math.Max(0, countMiss - Math.Max(0, relevantTotalDiff - countGreat - countOk - countMeh));
-
+            // Adjust amount of mistaps if score was set with slider accuracy
             if (usingSliderAccuracy)
             {
-                double greatsRatio = relevantCountGreat / speedNoteCount;
-                double mistapRatio = 1 - greatsRatio;
+                double greatRatio = relevantCountGreat / speedNoteCount;
+                double mistapRatio = 1 - greatRatio;
 
                 // Assume sliders are 2 times easier to acc than streams
                 double hitcircleRatio = attributes.HitCircleCount / (attributes.HitCircleCount + attributes.SliderCount / 2.0);
                 mistapRatio *= hitcircleRatio;
 
-                // This can't get higher than total value
-                double adjustedGreatsRatio = Math.Min(1 - mistapRatio, (double)countGreat / totalHits);
+                // This can't get higher than normal great value
+                double accuracyObjectsCount = attributes.HitCircleCount + attributes.SliderCount;
+                double accuracyObjectsGreat = Math.Max(0, countGreat - (totalHits - accuracyObjectsCount));
+                double adjustedGreatRatio = Math.Min(1 - mistapRatio, accuracyObjectsGreat / accuracyObjectsCount);
 
-                double mistapsMultiplier = (greatsRatio == 1) ? 0 : (1 - adjustedGreatsRatio) / (1 - greatsRatio);
+                double mistapsMultiplier = (greatRatio == 1) ? 0 : (1 - adjustedGreatRatio) / (1 - greatRatio);
 
-                relevantCountGreat = speedNoteCount * adjustedGreatsRatio;
+                relevantCountGreat = speedNoteCount * adjustedGreatRatio;
                 relevantCountOk *= mistapsMultiplier;
                 relevantCountMeh *= mistapsMultiplier;
                 relevantCountMiss *= mistapsMultiplier;
             }
 
+            // Calculate and return deviation on speed notes
+            return calculateDeviation(relevantCountGreat, relevantCountOk, relevantCountMeh, relevantCountMiss);
+        }
+
+        /// <summary>
+        /// Estimates the player's tap deviation based on the OD, given number of 300s, 100s, 50s and misses,
+        /// assuming the player's mean hit error is 0. The estimation is consistent in that two SS scores on the same map with the same settings
+        /// will always return the same deviation. Misses are ignored because they are usually due to misaiming.
+        /// 300s and 100s are assumed to follow a normal distribution, whereas 50s are assumed to follow a uniform distribution.
+        /// </summary>
+        private double calculateDeviation(double relevantCountGreat, double relevantCountOk, double relevantCountMeh, double relevantCountMiss)
+        {
             if (relevantCountGreat + relevantCountOk + relevantCountMeh <= 0)
                 return double.PositiveInfinity;
 
-            double n = Math.Max(1, speedNoteCount - relevantCountMiss - relevantCountMeh);
+            double objectCount = relevantCountGreat + relevantCountOk + relevantCountMeh + relevantCountMiss;
+
+            //// The probability that a player hits a circle is unknown, but we can estimate it to be
+            //// the number of greats on circles divided by the number of circles, and then add one
+            //// to the number of circles as a bias correction.
+            double n = Math.Max(1, objectCount - relevantCountMiss - relevantCountMeh);
             const double z = 2.32634787404; // 99% critical value for the normal distribution (one-tailed).
 
             // Proportion of greats hit on circles, ignoring misses and 50s.
@@ -447,9 +420,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             deviation *= Math.Sqrt(1 - randomValue);
 
-            // If precision is not enough - use limit value
-            if (pLowerBound == 0 || randomValue >= 1)
-                deviation = hitWindow100 / Math.Sqrt(3);
+            // Value deviation approach as greatCount approaches 0
+            double limitValue = hitWindow100 / Math.Sqrt(3);
+
+            // If precision is not enough to compute true deviation - use limit value
+            if (pLowerBound == 0 || randomValue >= 1 || deviation > limitValue)
+                deviation = limitValue;
 
             // Then compute the variance for 50s.
             double mehVariance = (hitWindow50 * hitWindow50 + hitWindow100 * hitWindow50 + hitWindow100 * hitWindow100) / 3;
