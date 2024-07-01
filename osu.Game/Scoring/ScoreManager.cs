@@ -15,10 +15,10 @@ using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Database;
 using osu.Game.IO.Archives;
+using osu.Game.Online.API;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Scoring;
-using osu.Game.Online.API;
 using osu.Game.Scoring.Legacy;
 
 namespace osu.Game.Scoring
@@ -214,6 +214,7 @@ namespace osu.Game.Scoring
         }
 
         public Task<Live<ScoreInfo>?> ImportAsUpdate(ProgressNotification notification, ImportTask task, ScoreInfo original) => scoreImporter.ImportAsUpdate(notification, task, original);
+        public IDisposable MountForExternalEditing(ScoreInfo model, out string mountedPath) => scoreImporter.MountForExternalEditing(model, out mountedPath);
 
         public Live<ScoreInfo>? Import(ScoreInfo item, ArchiveReader? archive = null, ImportParameters parameters = default, CancellationToken cancellationToken = default) =>
             scoreImporter.ImportModel(item, archive, parameters, cancellationToken);

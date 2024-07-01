@@ -312,6 +312,9 @@ namespace osu.Game.Skinning
         public Task<Live<SkinInfo>> ImportAsUpdate(ProgressNotification notification, ImportTask task, SkinInfo original) =>
             skinImporter.ImportAsUpdate(notification, task, original);
 
+        public IDisposable MountForExternalEditing(SkinInfo model, out string mountedPath) =>
+            skinImporter.MountForExternalEditing(model, out mountedPath);
+
         public Task<Live<SkinInfo>> Import(ImportTask task, ImportParameters parameters = default, CancellationToken cancellationToken = default) =>
             skinImporter.Import(task, parameters, cancellationToken);
 

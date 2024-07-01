@@ -8,6 +8,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Humanizer;
+using osu.Framework.Allocation;
 using osu.Framework.Extensions;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Logging;
@@ -178,6 +179,47 @@ namespace osu.Game.Database
         }
 
         public virtual Task<Live<TModel>?> ImportAsUpdate(ProgressNotification notification, ImportTask task, TModel original) => throw new NotImplementedException();
+
+        public IDisposable MountForExternalEditing(TModel model, out string mountedPath)
+        {
+            mountedPath = Path.Join(Path.GetTempPath(), model.Hash);
+
+            if (Directory.Exists(mountedPath))
+                Directory.Delete(mountedPath, true);
+
+            Directory.CreateDirectory(mountedPath);
+
+            foreach (var realmFile in model.Files)
+            {
+                string sourcePath = Files.Storage.GetFullPath(realmFile.File.GetStoragePath());
+                string destinationPath = Path.Join(mountedPath, realmFile.Filename);
+
+                Directory.CreateDirectory(Path.GetDirectoryName(destinationPath)!);
+
+                using (var inStream = Files.Storage.GetStream(sourcePath))
+                using (var outStream = File.Create(destinationPath))
+                    inStream.CopyTo(outStream);
+            }
+
+            string path = mountedPath;
+            return new InvokeOnDisposal(() =>
+            {
+                if (!Directory.Exists(path))
+                    return;
+
+                Task.Factory.StartNew(async () =>
+                {
+                    await ImportAsUpdate(new ProgressNotification(), new ImportTask(path), model)
+                        .ConfigureAwait(false);
+
+                    try
+                    {
+                        Directory.Delete(path, true);
+                    }
+                    catch { }
+                }, TaskCreationOptions.LongRunning).WaitSafely();
+            });
+        }
 
         /// <summary>
         /// Import one <typeparamref name="TModel"/> from the filesystem and delete the file on success.
