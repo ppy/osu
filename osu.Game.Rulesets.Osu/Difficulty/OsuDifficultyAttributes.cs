@@ -32,6 +32,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         [JsonProperty("speed_note_count")]
         public double SpeedNoteCount { get; set; }
 
+        [JsonProperty("slider_reading")]
+        public double SliderReadingDifficulty { get; set; }
+
         /// <summary>
         /// The difficulty corresponding to the flashlight skill.
         /// </summary>
