@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
 using osu.Game.Rulesets.Mods;
@@ -29,7 +30,20 @@ namespace osu.Game.Rulesets.Taiko.Mods
         /// How long hitobjects take to fade out, in terms of the scrolling length.
         /// Range: [0, 1]
         /// </summary>
-        private const float fade_out_duration = 0.375f;
+        public readonly BindableFloat FadeOutDuration = new BindableFloat(0.375f)
+        {
+            MinValue = 0f,
+            MaxValue = 1f
+        };
+
+        /// <summary>
+        /// The initial alpha of hitobjects when they appear.
+        /// </summary>
+        public readonly BindableFloat InitialAlpha = new BindableFloat(1f)
+        {
+            MinValue = 0f,
+            MaxValue = 1f
+        };
 
         private DrawableTaikoRuleset drawableRuleset = null!;
 
@@ -51,7 +65,8 @@ namespace osu.Game.Rulesets.Taiko.Mods
                 case DrawableHit:
                     double preempt = drawableRuleset.TimeRange.Value / drawableRuleset.ControlPointAt(hitObject.HitObject.StartTime).Multiplier;
                     double start = hitObject.HitObject.StartTime - preempt * fade_out_start_time;
-                    double duration = preempt * fade_out_duration;
+                    double duration = preempt * FadeOutDuration.Value;
+                    hitObject.Alpha = InitialAlpha.Value;
 
                     using (hitObject.BeginAbsoluteSequence(start))
                     {
