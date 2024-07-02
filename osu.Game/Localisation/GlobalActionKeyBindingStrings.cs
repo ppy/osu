@@ -375,14 +375,24 @@ namespace osu.Game.Localisation
         public static LocalisableString EditorToggleScaleControl => new TranslatableString(getKey(@"editor_toggle_scale_control"), @"Toggle scale control");
 
         /// <summary>
-        /// "Test play: Toggle autoplay"
+        /// "Toggle autoplay"
         /// </summary>
-        public static LocalisableString EditorTestPlayToggleAutoplay => new TranslatableString(getKey(@"editor_test_play_toggle_autoplay"), @"Test play: Toggle autoplay");
+        public static LocalisableString EditorTestPlayToggleAutoplay => new TranslatableString(getKey(@"editor_test_play_toggle_autoplay"), @"Toggle autoplay");
 
         /// <summary>
-        /// "Test play: Toggle quick pause"
+        /// "Toggle quick pause"
         /// </summary>
-        public static LocalisableString EditorTestPlayToggleQuickPause => new TranslatableString(getKey(@"editor_test_play_toggle_quick_pause"), @"Test play: Toggle quick pause");
+        public static LocalisableString EditorTestPlayToggleQuickPause => new TranslatableString(getKey(@"editor_test_play_toggle_quick_pause"), @"Toggle quick pause");
+
+        /// <summary>
+        /// "Quick exit to initial time"
+        /// </summary>
+        public static LocalisableString EditorTestPlayQuickExitToInitialTime => new TranslatableString(getKey(@"editor_test_play_quick_exit_to_initial_time"), @"Quick exit to initial time");
+
+        /// <summary>
+        /// "Quick exit to current time"
+        /// </summary>
+        public static LocalisableString EditorTestPlayQuickExitToCurrentTime => new TranslatableString(getKey(@"editor_test_play_quick_exit_to_current_time"), @"Quick exit to current time");
 
         /// <summary>
         /// "Increase mod speed"

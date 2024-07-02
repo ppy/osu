@@ -34,6 +34,7 @@ namespace osu.Game.Input.Bindings
         /// </remarks>
         public override IEnumerable<IKeyBinding> DefaultKeyBindings => globalKeyBindings
                                                                        .Concat(editorKeyBindings)
+                                                                       .Concat(editorTestPlayKeyBindings)
                                                                        .Concat(inGameKeyBindings)
                                                                        .Concat(replayKeyBindings)
                                                                        .Concat(songSelectKeyBindings)
@@ -67,6 +68,9 @@ namespace osu.Game.Input.Bindings
 
                 case GlobalActionCategory.Overlays:
                     return overlayKeyBindings;
+
+                case GlobalActionCategory.EditorTestPlay:
+                    return editorTestPlayKeyBindings;
 
                 default:
                     throw new ArgumentOutOfRangeException(nameof(category), category, $"Unexpected {nameof(GlobalActionCategory)}");
@@ -143,8 +147,14 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(new[] { InputKey.Control, InputKey.Shift, InputKey.MouseWheelLeft }, GlobalAction.EditorCycleNextBeatSnapDivisor),
             new KeyBinding(new[] { InputKey.Control, InputKey.R }, GlobalAction.EditorToggleRotateControl),
             new KeyBinding(new[] { InputKey.Control, InputKey.E }, GlobalAction.EditorToggleScaleControl),
+        };
+
+        private static IEnumerable<KeyBinding> editorTestPlayKeyBindings => new[]
+        {
             new KeyBinding(new[] { InputKey.Tab }, GlobalAction.EditorTestPlayToggleAutoplay),
             new KeyBinding(new[] { InputKey.Control, InputKey.P }, GlobalAction.EditorTestPlayToggleQuickPause),
+            new KeyBinding(new[] { InputKey.F1 }, GlobalAction.EditorTestPlayQuickExitToInitialTime),
+            new KeyBinding(new[] { InputKey.F2 }, GlobalAction.EditorTestPlayQuickExitToCurrentTime),
         };
 
         private static IEnumerable<KeyBinding> inGameKeyBindings => new[]
@@ -440,6 +450,12 @@ namespace osu.Game.Input.Bindings
 
         [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.EditorTestPlayToggleQuickPause))]
         EditorTestPlayToggleQuickPause,
+
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.EditorTestPlayQuickExitToInitialTime))]
+        EditorTestPlayQuickExitToInitialTime,
+
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.EditorTestPlayQuickExitToCurrentTime))]
+        EditorTestPlayQuickExitToCurrentTime,
     }
 
     public enum GlobalActionCategory
@@ -450,6 +466,7 @@ namespace osu.Game.Input.Bindings
         Replay,
         SongSelect,
         AudioControl,
-        Overlays
+        Overlays,
+        EditorTestPlay,
     }
 }
