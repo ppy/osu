@@ -4,15 +4,17 @@
 using System;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Cursor;
 using osu.Framework.Screens;
+using osu.Game.Beatmaps;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Mods;
 using osu.Game.Screens.Footer;
 using osu.Game.Screens.Menu;
 using osu.Game.Screens.Play;
+using osu.Game.Screens.Select;
 using osu.Game.Screens.SelectV2.Footer;
 
 namespace osu.Game.Screens.SelectV2
@@ -21,12 +23,22 @@ namespace osu.Game.Screens.SelectV2
     /// This screen is intended to house all components introduced in the new song select design to add transitions and examine the overall look.
     /// This will be gradually built upon and ultimately replace <see cref="Select.SongSelect"/> once everything is in place.
     /// </summary>
-    public partial class SongSelectV2 : OsuScreen
+    public partial class SongSelectV2 : ScreenWithBeatmapBackground
     {
         private readonly ModSelectOverlay modSelectOverlay = new SoloModSelectOverlay();
 
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Aquamarine);
+
+        // todo: temporary
+        [Cached(typeof(IBindable<IBeatmapInfo>))]
+        private readonly Bindable<IBeatmapInfo> beatmapInfo = new Bindable<IBeatmapInfo>();
+
+        // todo: temporary
+        [Cached(typeof(IBindable<IBeatmapSetInfo>))]
+        private readonly Bindable<IBeatmapSetInfo> beatmapSetInfo = new Bindable<IBeatmapSetInfo>();
+
+        private BeatmapInfoWedgeV2 wedge = null!;
 
         public override bool ShowFooter => true;
 
@@ -35,11 +47,39 @@ namespace osu.Game.Screens.SelectV2
         {
             AddRangeInternal(new Drawable[]
             {
-                new PopoverContainer
+                wedge = new BeatmapInfoWedgeV2
                 {
-                    RelativeSizeAxes = Axes.Both,
+                    Margin = new MarginPadding { Top = 20f },
+                    RelativeSizeAxes = Axes.X,
+                    Width = 0.5f,
                 },
                 modSelectOverlay,
+            });
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            Beatmap.BindValueChanged(_ => beatmapChanged());
+        }
+
+        private void beatmapChanged()
+        {
+            // If not the current screen, this will be applied in OnResuming.
+            if (this.IsCurrentScreen())
+            {
+                ApplyToBackground(backgroundModeBeatmap =>
+                {
+                    backgroundModeBeatmap.Beatmap = Beatmap.Value;
+                });
+            }
+
+            // apparently without this schedule the components read from the previous beatmap instead of the current one,
+            // all the more reason for why this should never exist.
+            Schedule(() =>
+            {
+                beatmapInfo.Value = Beatmap.Value.BeatmapInfo;
+                beatmapSetInfo.Value = Beatmap.Value.BeatmapSetInfo;
             });
         }
 
@@ -53,23 +93,34 @@ namespace osu.Game.Screens.SelectV2
         public override void OnEntering(ScreenTransitionEvent e)
         {
             this.FadeIn();
+
+            wedge.Show();
+
             base.OnEntering(e);
         }
 
         public override void OnResuming(ScreenTransitionEvent e)
         {
             this.FadeIn();
+
+            wedge.Show();
+            beatmapChanged();
+
             base.OnResuming(e);
         }
 
         public override void OnSuspending(ScreenTransitionEvent e)
         {
+            wedge.Hide();
+
             this.Delay(400).FadeOut();
             base.OnSuspending(e);
         }
 
         public override bool OnExiting(ScreenExitEvent e)
         {
+            wedge.Hide();
+
             this.Delay(400).FadeOut();
             return base.OnExiting(e);
         }
