@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Rulesets.Difficulty;
+using osu.Game.Rulesets.Osu.Difficulty.Skills;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
@@ -42,6 +43,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             effectiveMissCount = calculateEffectiveMissCount(osuAttributes);
 
             double multiplier = PERFORMANCE_BASE_MULTIPLIER;
+            double power = OsuDifficultyCalculator.SUM_POWER;
 
             if (score.Mods.Any(m => m is OsuModNoFail))
                 multiplier *= Math.Max(0.90, 1.0 - 0.02 * effectiveMissCount);
@@ -63,33 +65,57 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double aimValue = computeAimValue(score, osuAttributes);
             double speedValue = computeSpeedValue(score, osuAttributes);
+            double mechanicalValue = Math.Pow(Math.Pow(aimValue, power) + Math.Pow(speedValue, power), 1.0 / power);
+
+            // Cognition
+
+            // Get HDFL value for capping reading performance
+            // In theory stuff like AR13, AR13 +HD and AR-INF +HD should use this values
+            // While AR-INF without HD shoud use normal flashlight values
+            // Because in first case you're clicking air, while in AR-INF case you're see the notes
+            // But implementing it is pretty annoying, so I left it "as is"
+            double potentialHiddenFlashlightValue = computeFlashlightValue(score, osuAttributes, true);
+
+            double lowARValue = computeReadingLowARValue(score, osuAttributes);
+
+            double readingARValue = lowARValue;
+
+            double flashlightValue = 0;
+            if (score.Mods.Any(h => h is OsuModFlashlight))
+                flashlightValue = computeFlashlightValue(score, osuAttributes);
+
+            // Reduce AR reading bonus if FL is present
+            double flPower = OsuDifficultyCalculator.FL_SUM_POWER;
+            double flashlightARValue = Math.Pow(Math.Pow(flashlightValue, flPower) + Math.Pow(readingARValue, flPower), 1.0 / flPower);
+
+            double cognitionValue = flashlightARValue;
+            cognitionValue = AdjustCognitionPerformance(cognitionValue, mechanicalValue, potentialHiddenFlashlightValue);
+
             double accuracyValue = computeAccuracyValue(score, osuAttributes);
-            double flashlightValue = computeFlashlightValue(score, osuAttributes);
+
+            // Add cognition value without LP-sum cuz otherwise it makes balancing harder
             double totalValue =
-                Math.Pow(
-                    Math.Pow(aimValue, 1.1) +
-                    Math.Pow(speedValue, 1.1) +
-                    Math.Pow(accuracyValue, 1.1) +
-                    Math.Pow(flashlightValue, 1.1), 1.0 / 1.1
-                ) * multiplier;
+                (Math.Pow(Math.Pow(mechanicalValue, power) + Math.Pow(accuracyValue, power), 1.0 / power)
+                + cognitionValue) * multiplier;
 
             return new OsuPerformanceAttributes
             {
                 Aim = aimValue,
                 Speed = speedValue,
                 Accuracy = accuracyValue,
-                Flashlight = flashlightValue,
+                Cognition = cognitionValue,
                 EffectiveMissCount = effectiveMissCount,
                 Total = totalValue
             };
         }
 
+        public static double CalculateDefaultLengthBonus(int objectsCount) => 0.95 + 0.4 * Math.Min(1.0, objectsCount / 2000.0) + (objectsCount > 2000 ? Math.Log10(objectsCount / 2000.0) * 0.5 : 0.0);
+
         private double computeAimValue(ScoreInfo score, OsuDifficultyAttributes attributes)
         {
-            double aimValue = Math.Pow(5.0 * Math.Max(1.0, attributes.AimDifficulty / 0.0675) - 4.0, 3.0) / 100000.0;
+            double aimValue = OsuStrainSkill.DifficultyToPerformance(attributes.AimDifficulty);
 
-            double lengthBonus = 0.95 + 0.4 * Math.Min(1.0, totalHits / 2000.0) +
-                                 (totalHits > 2000 ? Math.Log10(totalHits / 2000.0) * 0.5 : 0.0);
+            double lengthBonus = CalculateDefaultLengthBonus(totalHits);
             aimValue *= lengthBonus;
 
             // Penalize misses by assessing # of misses relative to the total # of objects. Default a 3% reduction for any # of misses.
@@ -101,8 +127,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double approachRateFactor = 0.0;
             if (attributes.ApproachRate > 10.33)
                 approachRateFactor = 0.3 * (attributes.ApproachRate - 10.33);
-            else if (attributes.ApproachRate < 8.0)
-                approachRateFactor = 0.05 * (8.0 - attributes.ApproachRate);
 
             if (score.Mods.Any(h => h is OsuModRelax))
                 approachRateFactor = 0.0;
@@ -139,10 +163,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (score.Mods.Any(h => h is OsuModRelax))
                 return 0.0;
 
-            double speedValue = Math.Pow(5.0 * Math.Max(1.0, attributes.SpeedDifficulty / 0.0675) - 4.0, 3.0) / 100000.0;
+            double speedValue = OsuStrainSkill.DifficultyToPerformance(attributes.SpeedDifficulty);
 
-            double lengthBonus = 0.95 + 0.4 * Math.Min(1.0, totalHits / 2000.0) +
-                                 (totalHits > 2000 ? Math.Log10(totalHits / 2000.0) * 0.5 : 0.0);
+            double lengthBonus = CalculateDefaultLengthBonus(totalHits);
             speedValue *= lengthBonus;
 
             // Penalize misses by assessing # of misses relative to the total # of objects. Default a 3% reduction for any # of misses.
@@ -162,7 +185,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 // Increasing the speed value by object count for Blinds isn't ideal, so the minimum buff is given.
                 speedValue *= 1.12;
             }
-            else if (score.Mods.Any(m => m is OsuModHidden || m is OsuModTraceable))
+            else if (score.Mods.Any(m => m is OsuModHidden || m is OsuModTraceable)) 
             {
                 // We want to give more reward for lower AR when it comes to aim and HD. This nerfs high AR and buffs lower AR.
                 speedValue *= 1.0 + 0.04 * (12.0 - attributes.ApproachRate);
@@ -218,15 +241,23 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (score.Mods.Any(m => m is OsuModFlashlight))
                 accuracyValue *= 1.02;
 
+            // Visual indication bonus
+            double visualBonus = 0.1 * logistic(8.0 - attributes.ApproachRate);
+
+            // Buff if OD is way lower than AR
+            double ARODDelta = Math.Max(0, attributes.OverallDifficulty - attributes.ApproachRate);
+
+            // This one is goes from 0.0 on delta=0 to 1.0 somewhere around delta=3.4
+            double deltaBonus = (1 - Math.Pow(0.95, Math.Pow(ARODDelta, 4)));
+
+            accuracyValue *= 1 + visualBonus * (1 + 2 * deltaBonus);
+
             return accuracyValue;
         }
 
-        private double computeFlashlightValue(ScoreInfo score, OsuDifficultyAttributes attributes)
+        private double computeFlashlightValue(ScoreInfo score, OsuDifficultyAttributes attributes, bool alwaysUseHD = false)
         {
-            if (!score.Mods.Any(h => h is OsuModFlashlight))
-                return 0.0;
-
-            double flashlightValue = Math.Pow(attributes.FlashlightDifficulty, 2.0) * 25.0;
+            double flashlightValue = Math.Pow(alwaysUseHD ? attributes.HiddenFlashlightDifficulty : attributes.FlashlightDifficulty, 2.0) * 25.0;
 
             // Penalize misses by assessing # of misses relative to the total # of objects. Default a 3% reduction for any # of misses.
             if (effectiveMissCount > 0)
@@ -246,6 +277,38 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             return flashlightValue;
         }
 
+        public static double ComputePerfectFlashlightValue(double flashlightDifficulty, int objectsCount)
+        {
+            double flashlightValue = Flashlight.DifficultyToPerformance(flashlightDifficulty);
+
+            flashlightValue *= 0.7 + 0.1 * Math.Min(1.0, objectsCount / 200.0) +
+                               (objectsCount > 200 ? 0.2 * Math.Min(1.0, (objectsCount - 200) / 200.0) : 0.0);
+
+            return flashlightValue;
+        }
+
+        private double computeReadingLowARValue(ScoreInfo score, OsuDifficultyAttributes attributes)
+        {
+            double rawReading = attributes.ReadingDifficultyLowAR;
+
+            if (score.Mods.Any(m => m is OsuModTouchDevice))
+                rawReading = Math.Pow(rawReading, 0.8);
+
+            double readingValue = ReadingLowAR.DifficultyToPerformance(rawReading);
+
+            // Penalize misses by assessing # of misses relative to the total # of objects. Default a 3% reduction for any # of misses.
+            if (effectiveMissCount > 0)
+                readingValue *= 0.97 * Math.Pow(1 - Math.Pow(effectiveMissCount / totalHits, 0.775), Math.Pow(effectiveMissCount, .875));
+
+            readingValue *= getComboScalingFactor(attributes);
+
+            // Scale the reading value with accuracy _harshly_. Additional note: it would have it's own curve in Statistical Accuracy rework.
+            readingValue *= accuracy * accuracy;
+            // It is important to also consider accuracy difficulty when doing that.
+            readingValue *= Math.Pow(0.98 + Math.Pow(attributes.OverallDifficulty, 2) / 2500, 2);
+
+            return readingValue;
+        }
         private double calculateEffectiveMissCount(OsuDifficultyAttributes attributes)
         {
             // Guess the number of misses + slider breaks from combo
@@ -263,8 +326,23 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             return Math.Max(countMiss, comboBasedMissCount);
         }
-
         private double getComboScalingFactor(OsuDifficultyAttributes attributes) => attributes.MaxCombo <= 0 ? 1.0 : Math.Min(Math.Pow(scoreMaxCombo, 0.8) / Math.Pow(attributes.MaxCombo, 0.8), 1.0);
         private int totalHits => countGreat + countOk + countMeh + countMiss;
+
+        // Adjusts cognition performance accounting for full-memory
+        public static double AdjustCognitionPerformance(double cognitionPerformance, double mechanicalPerformance, double flaslightPerformance)
+        {
+            // Assuming that less than 25 mechanical pp is not worthy for memory
+            double capPerformance = mechanicalPerformance + flaslightPerformance + 25;
+
+            double ratio = cognitionPerformance / capPerformance;
+            if (ratio > 50) return capPerformance;
+
+            ratio = softmin(ratio * 10, 10, 5) / 10;
+            return ratio * capPerformance;
+        }
+
+        private static double softmin(double a, double b, double power = Math.E) => a * b / Math.Log(Math.Pow(power, a) + Math.Pow(power, b), power);
+        private static double logistic(double x) => 1 / (1 + Math.Exp(-x));
     }
 }
