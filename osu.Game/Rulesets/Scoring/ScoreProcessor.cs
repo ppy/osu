@@ -98,6 +98,16 @@ namespace osu.Game.Rulesets.Scoring
 
         private readonly Bindable<ScoreRank> rank = new Bindable<ScoreRank>(ScoreRank.X);
 
+        /// <remarks>
+        /// Using the minimum accuracy as the data source to calculate the minimum rank.
+        /// </remarks>
+        public readonly Bindable<ScoreRank> MinimumRank = new Bindable<ScoreRank>(ScoreRank.X);
+
+        /// <remarks>
+        /// Using the maximum accuracy as the data source to calculate the minimum rank.
+        /// </remarks>
+        public readonly Bindable<ScoreRank> MaximumRank = new Bindable<ScoreRank>(ScoreRank.X);
+
         /// <summary>
         /// The highest combo achieved by this score.
         /// </summary>
@@ -259,6 +269,7 @@ namespace osu.Game.Rulesets.Scoring
 
                 updateScore();
             }
+            updateRank();
         }
 
         /// <summary>
@@ -303,6 +314,7 @@ namespace osu.Game.Rulesets.Scoring
             hitEvents.RemoveAt(hitEvents.Count - 1);
 
             updateScore();
+            updateRank();
         }
 
         /// <summary>
@@ -382,11 +394,19 @@ namespace osu.Game.Rulesets.Scoring
                 return;
 
             ScoreRank newRank = RankFromScore(Accuracy.Value, ScoreResultCounts);
+            ScoreRank newMaxRank = RankFromScore(MaximumAccuracy.Value, ScoreResultCounts);
+            ScoreRank newMinRank = RankFromScore(MinimumAccuracy.Value, ScoreResultCounts);
 
             foreach (var mod in Mods.Value.OfType<IApplicableToScoreProcessor>())
+            {
                 newRank = mod.AdjustRank(newRank, Accuracy.Value);
+                newMaxRank = mod.AdjustRank(newMaxRank, MaximumAccuracy.Value);
+                newMinRank = mod.AdjustRank(newMinRank, MinimumAccuracy.Value);
+            }
 
             rank.Value = newRank;
+            MaximumRank.Value = newMaxRank;
+            MinimumRank.Value = newMinRank;
         }
 
         protected virtual double ComputeTotalScore(double comboProgress, double accuracyProgress, double bonusPortion)
