@@ -10,7 +10,6 @@ using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -505,7 +504,7 @@ namespace osu.Game.Rulesets.Edit
             var playfield = PlayfieldAtScreenSpacePosition(screenSpacePosition);
             double? targetTime = null;
 
-            if (snapType.HasFlagFast(SnapType.GlobalGrids))
+            if (snapType.HasFlag(SnapType.GlobalGrids))
             {
                 if (playfield is ScrollingPlayfield scrollingPlayfield)
                 {

@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -282,7 +281,7 @@ namespace osu.Game.Screens.Ranking.Statistics
 
             protected override bool OnInvalidate(Invalidation invalidation, InvalidationSource source)
             {
-                if (invalidation.HasFlagFast(Invalidation.DrawSize))
+                if (invalidation.HasFlag(Invalidation.DrawSize))
                 {
                     if (lastDrawHeight != null && lastDrawHeight != DrawHeight)
                         Scheduler.AddOnce(updateMetrics, false);
