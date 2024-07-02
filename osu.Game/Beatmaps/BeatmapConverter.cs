@@ -49,6 +49,8 @@ namespace osu.Game.Beatmaps
             // Can potentially be removed after `Beatmap.Difficulty` doesn't save back to `Beatmap.BeatmapInfo`.
             original.BeatmapInfo = original.BeatmapInfo.Clone();
             original.ControlPointInfo = original.ControlPointInfo.DeepClone();
+            // Used in osu!mania conversion.
+            original.Breaks = new List<BreakPeriod>(original.Breaks);
 
             return ConvertBeatmap(original, cancellationToken);
         }
@@ -66,8 +68,6 @@ namespace osu.Game.Beatmaps
             beatmap.BeatmapInfo = original.BeatmapInfo;
             beatmap.ControlPointInfo = original.ControlPointInfo;
             beatmap.HitObjects = convertHitObjects(original.HitObjects, original, cancellationToken).OrderBy(s => s.StartTime).ToList();
-            // Used in osu!mania conversion.
-            beatmap.Breaks = new List<BreakPeriod>(original.Breaks);
             beatmap.UnhandledEventLines = original.UnhandledEventLines;
 
             return beatmap;
