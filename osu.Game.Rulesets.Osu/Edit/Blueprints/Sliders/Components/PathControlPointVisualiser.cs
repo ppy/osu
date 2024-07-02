@@ -245,6 +245,79 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         {
         }
 
+        // ReSharper disable once StaticMemberInGenericType
+        private static readonly PathType?[] path_types =
+        [
+            PathType.LINEAR,
+            PathType.BEZIER,
+            PathType.PERFECT_CURVE,
+            PathType.BSpline(4),
+            null,
+        ];
+
+        protected override bool OnKeyDown(KeyDownEvent e)
+        {
+            if (e.Repeat)
+                return false;
+
+            switch (e.Key)
+            {
+                case Key.Tab:
+                {
+                    var selectedPieces = Pieces.Where(p => p.IsSelected.Value).ToArray();
+                    if (selectedPieces.Length != 1)
+                        return false;
+
+                    var selectedPiece = selectedPieces.Single();
+                    var selectedPoint = selectedPiece.ControlPoint;
+
+                    var validTypes = path_types;
+
+                    if (selectedPoint == controlPoints[0])
+                        validTypes = validTypes.Where(t => t != null).ToArray();
+
+                    int currentTypeIndex = Array.IndexOf(validTypes, selectedPoint.Type);
+
+                    if (currentTypeIndex < 0 && e.ShiftPressed)
+                        currentTypeIndex = 0;
+
+                    changeHandler?.BeginChange();
+
+                    do
+                    {
+                        currentTypeIndex = (validTypes.Length + currentTypeIndex + (e.ShiftPressed ? -1 : 1)) % validTypes.Length;
+
+                        updatePathTypeOfSelectedPieces(validTypes[currentTypeIndex]);
+                    } while (selectedPoint.Type != validTypes[currentTypeIndex]);
+
+                    changeHandler?.EndChange();
+
+                    return true;
+                }
+
+                case Key.Number1:
+                case Key.Number2:
+                case Key.Number3:
+                case Key.Number4:
+                case Key.Number5:
+                {
+                    if (!e.AltPressed)
+                        return false;
+
+                    var type = path_types[e.Key - Key.Number1];
+
+                    if (Pieces[0].IsSelected.Value && type == null)
+                        return false;
+
+                    updatePathTypeOfSelectedPieces(type);
+                    return true;
+                }
+
+                default:
+                    return false;
+            }
+        }
+
         private void selectionRequested(PathControlPointPiece<T> piece, MouseButtonEvent e)
         {
             if (e.Button == MouseButton.Left && inputManager.CurrentState.Keyboard.ControlPressed)
@@ -254,30 +327,38 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         }
 
         /// <summary>
-        /// Attempts to set the given control point piece to the given path type.
+        /// Attempts to set all selected control point pieces to the given path type.
         /// If that would fail, try to change the path such that it instead succeeds
         /// in a UX-friendly way.
         /// </summary>
-        /// <param name="piece">The control point piece that we want to change the path type of.</param>
         /// <param name="type">The path type we want to assign to the given control point piece.</param>
-        private void updatePathType(PathControlPointPiece<T> piece, PathType? type)
+        private void updatePathTypeOfSelectedPieces(PathType? type)
         {
-            var pointsInSegment = hitObject.Path.PointsInSegment(piece.ControlPoint);
-            int indexInSegment = pointsInSegment.IndexOf(piece.ControlPoint);
+            changeHandler?.BeginChange();
 
-            if (type?.Type == SplineType.PerfectCurve)
+            foreach (var p in Pieces.Where(p => p.IsSelected.Value))
             {
-                // Can't always create a circular arc out of 4 or more points,
-                // so we split the segment into one 3-point circular arc segment
-                // and one segment of the previous type.
-                int thirdPointIndex = indexInSegment + 2;
+                var pointsInSegment = hitObject.Path.PointsInSegment(p.ControlPoint);
+                int indexInSegment = pointsInSegment.IndexOf(p.ControlPoint);
 
-                if (pointsInSegment.Count > thirdPointIndex + 1)
-                    pointsInSegment[thirdPointIndex].Type = pointsInSegment[0].Type;
+                if (type?.Type == SplineType.PerfectCurve)
+                {
+                    // Can't always create a circular arc out of 4 or more points,
+                    // so we split the segment into one 3-point circular arc segment
+                    // and one segment of the previous type.
+                    int thirdPointIndex = indexInSegment + 2;
+
+                    if (pointsInSegment.Count > thirdPointIndex + 1)
+                        pointsInSegment[thirdPointIndex].Type = pointsInSegment[0].Type;
+                }
+
+                hitObject.Path.ExpectedDistance.Value = null;
+                p.ControlPoint.Type = type;
             }
 
-            hitObject.Path.ExpectedDistance.Value = null;
-            piece.ControlPoint.Type = type;
+            EnsureValidPathTypes();
+
+            changeHandler?.EndChange();
         }
 
         [Resolved(CanBeNull = true)]
@@ -433,17 +514,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             int totalCount = Pieces.Count(p => p.IsSelected.Value);
             int countOfState = Pieces.Where(p => p.IsSelected.Value).Count(p => p.ControlPoint.Type == type);
 
-            var item = new TernaryStateRadioMenuItem(type?.Description ?? "Inherit", MenuItemType.Standard, _ =>
-            {
-                changeHandler?.BeginChange();
-
-                foreach (var p in Pieces.Where(p => p.IsSelected.Value))
-                    updatePathType(p, type);
-
-                EnsureValidPathTypes();
-
-                changeHandler?.EndChange();
-            });
+            var item = new TernaryStateRadioMenuItem(type?.Description ?? "Inherit", MenuItemType.Standard, _ => updatePathTypeOfSelectedPieces(type));
 
             if (countOfState == totalCount)
                 item.State.Value = TernaryState.True;
