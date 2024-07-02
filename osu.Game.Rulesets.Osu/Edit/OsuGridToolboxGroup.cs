@@ -111,7 +111,7 @@ namespace osu.Game.Rulesets.Osu.Edit
                 },
             };
 
-            Spacing.Value = editorBeatmap.BeatmapInfo.GridSize;
+            Spacing.Value = editorBeatmap.GridSize;
         }
 
         protected override void LoadComplete()
@@ -137,7 +137,7 @@ namespace osu.Game.Rulesets.Osu.Edit
                 spacingSlider.ContractedLabelText = $"S: {spacing.NewValue:N0}";
                 spacingSlider.ExpandedLabelText = $"Spacing: {spacing.NewValue:N0}";
                 SpacingVector.Value = new Vector2(spacing.NewValue);
-                editorBeatmap.BeatmapInfo.GridSize = (int)spacing.NewValue;
+                editorBeatmap.GridSize = (int)spacing.NewValue;
             }, true);
 
             GridLinesRotation.BindValueChanged(rotation =>
