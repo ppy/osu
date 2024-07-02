@@ -375,6 +375,11 @@ namespace osu.Game.Localisation
         public static LocalisableString EditorToggleScaleControl => new TranslatableString(getKey(@"editor_toggle_scale_control"), @"Toggle scale control");
 
         /// <summary>
+        /// "Test play: Toggle autoplay"
+        /// </summary>
+        public static LocalisableString EditorTestPlayToggleAutoplay => new TranslatableString(getKey(@"editor_test_play_toggle_autoplay"), @"Test play: Toggle autoplay");
+
+        /// <summary>
         /// "Increase mod speed"
         /// </summary>
         public static LocalisableString IncreaseModSpeed => new TranslatableString(getKey(@"increase_mod_speed"), @"Increase mod speed");
