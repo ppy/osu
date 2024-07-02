@@ -380,6 +380,11 @@ namespace osu.Game.Localisation
         public static LocalisableString EditorTestPlayToggleAutoplay => new TranslatableString(getKey(@"editor_test_play_toggle_autoplay"), @"Test play: Toggle autoplay");
 
         /// <summary>
+        /// "Test play: Toggle quick pause"
+        /// </summary>
+        public static LocalisableString EditorTestPlayToggleQuickPause => new TranslatableString(getKey(@"editor_test_play_toggle_quick_pause"), @"Test play: Toggle quick pause");
+
+        /// <summary>
         /// "Increase mod speed"
         /// </summary>
         public static LocalisableString IncreaseModSpeed => new TranslatableString(getKey(@"increase_mod_speed"), @"Increase mod speed");

@@ -148,6 +148,10 @@ namespace osu.Game.Screens.Edit.GameplayTest
                     toggleAutoplay();
                     return true;
 
+                case GlobalAction.EditorTestPlayToggleQuickPause:
+                    toggleQuickPause();
+                    return true;
+
                 default:
                     return false;
             }
@@ -176,6 +180,14 @@ namespace osu.Game.Screens.Edit.GameplayTest
             }
             else
                 DrawableRuleset.SetReplayScore(null);
+        }
+
+        private void toggleQuickPause()
+        {
+            if (GameplayClockContainer.IsPaused.Value)
+                GameplayClockContainer.Start();
+            else
+                GameplayClockContainer.Stop();
         }
 
         public override void OnEntering(ScreenTransitionEvent e)
