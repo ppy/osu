@@ -196,7 +196,6 @@ namespace osu.Game.Screens.Edit
         public IBeatmap Clone() => (EditorBeatmap)MemberwiseClone();
 
         private IList mutableHitObjects => (IList)PlayableBeatmap.HitObjects;
-        private IList mutableBreaks => (IList)PlayableBeatmap.Breaks;
 
         private readonly List<HitObject> batchPendingInserts = new List<HitObject>();
 
