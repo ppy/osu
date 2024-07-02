@@ -33,6 +33,8 @@ namespace osu.Game.Overlays.Mods
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; } = null!;
 
+        public readonly BindableBool Enabled = new BindableBool();
+
         public readonly BindableBool Expanded = new BindableBool();
 
         public Bindable<IReadOnlyList<Mod>> SelectedMods { get; } = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
@@ -55,6 +57,7 @@ namespace osu.Game.Overlays.Mods
                     Depth = float.MinValue,
                     RelativeSizeAxes = Axes.X,
                     Height = header_height,
+                    Enabled = { BindTarget = Enabled },
                     Expanded = { BindTarget = Expanded },
                 },
                 content = new FocusGrabbingContainer
@@ -106,6 +109,11 @@ namespace osu.Game.Overlays.Mods
         protected override void LoadComplete()
         {
             base.LoadComplete();
+
+            Enabled.BindValueChanged(e =>
+            {
+                this.FadeColour(OsuColour.Gray(e.NewValue ? 1f : 0.6f), 300, Easing.OutQuint);
+            }, true);
 
             Expanded.BindValueChanged(_ => updateDisplay(), true);
             SelectedMods.BindValueChanged(_ => updateMods(), true);
