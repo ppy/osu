@@ -4,8 +4,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Osu.Difficulty.Evaluators;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Scoring;
@@ -75,6 +77,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         /// <summary>
         /// Angle the player has to take to hit this <see cref="OsuDifficultyHitObject"/>.
         /// Calculated as the angle between the circles (current-2, current-1, current).
+        /// Ranges from 0 to PI
         /// </summary>
         public double? Angle { get; private set; }
 
@@ -83,14 +86,47 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         /// </summary>
         public double HitWindowGreat { get; private set; }
 
+        /// <summary>
+        /// Rhythm difficulty of the object. Saved for optimization, rhythm calculation is very expensive.
+        /// </summary>
+        public double RhythmDifficulty { get; private set; }
+
+        /// <summary>
+        /// Predictabiliy of the angle. Gives high values only in exceptionally repetitive patterns.
+        /// </summary>
+        public double AnglePredictability { get; private set; }
+
+        /// <summary>
+        /// Time in ms between appearence of this <see cref="OsuDifficultyHitObject"/> and moment to click on it.
+        /// </summary>
+        public readonly double Preempt;
+
+        /// <summary>
+        /// Preempt of follow line for this <see cref="OsuDifficultyHitObject"/> adjusted by clockrate.
+        /// Will be equal to 0 if object is New Combo.
+        /// </summary>
+        public readonly double FollowLineTime;
+
+        /// <summary>
+        /// Playback rate of beatmap.
+        /// Will be equal 1.5 on DT and 0.75 on HT.
+        /// </summary>
+        public readonly double ClockRate;
+
         private readonly OsuHitObject? lastLastObject;
         private readonly OsuHitObject lastObject;
 
         public OsuDifficultyHitObject(HitObject hitObject, HitObject lastObject, HitObject? lastLastObject, double clockRate, List<DifficultyHitObject> objects, int index)
             : base(hitObject, lastObject, clockRate, objects, index)
         {
-            this.lastLastObject = lastLastObject as OsuHitObject;
+            OsuHitObject currObject = (OsuHitObject)hitObject;
             this.lastObject = (OsuHitObject)lastObject;
+            this.lastLastObject = lastLastObject as OsuHitObject;
+
+            Preempt = BaseObject.TimePreempt / clockRate;
+            FollowLineTime = 800 / clockRate; // 800ms is follow line appear time
+            FollowLineTime *= (currObject.NewCombo ? 0 : 1); // no follow lines when NC
+            ClockRate = clockRate;
 
             // Capped to 25ms to prevent difficulty calculation breaking from simultaneous objects.
             StrainTime = Math.Max(DeltaTime, min_delta_time);
@@ -105,11 +141,101 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             }
 
             setDistances(clockRate);
+
+            AnglePredictability = CalculateAnglePredictability();
+
+            RhythmDifficulty = RhythmEvaluator.EvaluateDifficultyOf(this);
+        }
+
+        private static double getTimeDifference(double timeA, double timeB)
+        {
+            double similarity = Math.Min(timeA, timeB) / Math.Max(timeA, timeB);
+            if (Math.Max(timeA, timeB) == 0) similarity = 1;
+
+            if (similarity < 0.75) return 1.0;
+            if (similarity > 0.9) return 0.0;
+
+            return (Math.Cos((similarity - 0.75) * Math.PI / 0.15) + 1) / 2; // drops from 1 to 0 as similarity increase from 0.75 to 0.9
+        }
+        public double CalculateAnglePredictability()
+        {
+            OsuDifficultyHitObject? prevObj0 = (OsuDifficultyHitObject?)Previous(0);
+            OsuDifficultyHitObject? prevObj1 = (OsuDifficultyHitObject?)Previous(1);
+            OsuDifficultyHitObject? prevObj2 = (OsuDifficultyHitObject?)Previous(2);
+
+            if (Angle.IsNull() || prevObj0.IsNull() || prevObj0.Angle.IsNull())
+                return 1.0;
+
+            double angleDifference = Math.Abs(prevObj0.Angle.Value - Angle.Value);
+
+            // Assume that very low spacing difference means that angles don't matter
+            if (prevObj0.LazyJumpDistance < NORMALISED_RADIUS)
+                angleDifference *= Math.Pow(prevObj0.LazyJumpDistance / NORMALISED_RADIUS, 2);
+            if (LazyJumpDistance < NORMALISED_RADIUS)
+                angleDifference *= Math.Pow(LazyJumpDistance / NORMALISED_RADIUS, 2);
+
+            // Now research previous angles
+            double angleDifferencePrev = 0;
+
+            // How close the smallest angle of curr and prev is to 0
+            double zeroAngleFactor = 1.0;
+
+            // Nerf alternating angles case
+            if (prevObj1.IsNotNull() && prevObj2.IsNotNull() && prevObj1.Angle.IsNotNull())
+            {
+                angleDifferencePrev = Math.Abs(prevObj1.Angle.Value - Angle.Value);
+                zeroAngleFactor = Math.Pow(1 - Math.Min(Angle.Value, prevObj0.Angle.Value) / Math.PI, 10);
+            }
+
+            // Will be close to 1 if angleDifferencePrev is close to 0
+            double rescaleFactor = Math.Pow(1 - angleDifferencePrev / Math.PI, 5);
+
+            // 0 on different rhythm, 1 on same rhythm
+            double rhythmFactor = 1 - getTimeDifference(StrainTime, prevObj0.StrainTime);
+
+            if (prevObj1.IsNotNull())
+                rhythmFactor *= 1 - getTimeDifference(prevObj0.StrainTime, prevObj1.StrainTime);
+            if (prevObj1.IsNotNull() && prevObj2.IsNotNull())
+                rhythmFactor *= 1 - getTimeDifference(prevObj1.StrainTime, prevObj2.StrainTime);
+
+            // Get the base - how much alternating difference is lower than current difference
+            double prevAngleAdjust = Math.Max(angleDifference - angleDifferencePrev, 0);
+
+            // Don't apply the nerf when angleDifferencePrev is too high
+            prevAngleAdjust *= rescaleFactor;
+
+            // Don't apply the nerf if rhythm is changing
+            prevAngleAdjust *= rhythmFactor;
+
+            // Don't apply the nerf if neither of previous angles isn't close to 0
+            prevAngleAdjust *= zeroAngleFactor;
+
+            angleDifference -= prevAngleAdjust;
+
+            // Bandaid to fix Rubik's Cube +EZ
+            double wideness = 0;
+            if (Angle!.Value > Math.PI * 0.5)
+            {
+                // Goes from 0 to 1 as angle increasing from 90 degrees to 180
+                wideness = (Angle.Value / Math.PI - 0.5) * 2;
+
+                // Transform into cubic scaling
+                wideness = 1 - Math.Pow(1 - wideness, 3);
+            }
+
+            // Angle difference will be considered as 2 times lower if angle is wide
+            angleDifference /= 1 + wideness;
+
+            // Angle difference more than 15 degrees gets no penalty
+            double adjustedAngleDifference = Math.Min(Math.PI / 12, angleDifference);
+            return rhythmFactor * Math.Cos(Math.Min(Math.PI / 2, 6 * adjustedAngleDifference));
         }
 
         public double OpacityAt(double time, bool hidden)
         {
-            if (time > BaseObject.StartTime)
+            var baseObject = BaseObject; // Optimization
+
+            if (time > baseObject.StartTime)
             {
                 // Consider a hitobject as being invisible when its start time is passed.
                 // In reality the hitobject will be visible beyond its start time up until its hittable window has passed,
@@ -117,14 +243,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 return 0.0;
             }
 
-            double fadeInStartTime = BaseObject.StartTime - BaseObject.TimePreempt;
-            double fadeInDuration = BaseObject.TimeFadeIn;
+            double fadeInStartTime = baseObject.StartTime - baseObject.TimePreempt;
+            double fadeInDuration = baseObject.TimeFadeInRaw;
 
             if (hidden)
             {
                 // Taken from OsuModHidden.
-                double fadeOutStartTime = BaseObject.StartTime - BaseObject.TimePreempt + BaseObject.TimeFadeIn;
-                double fadeOutDuration = BaseObject.TimePreempt * OsuModHidden.FADE_OUT_DURATION_MULTIPLIER;
+                double fadeOutStartTime = baseObject.StartTime - baseObject.TimePreempt + baseObject.TimeFadeInRaw;
+                double fadeOutDuration = baseObject.TimePreempt * OsuModHidden.FADE_OUT_DURATION_MULTIPLIER;
 
                 return Math.Min
                 (
@@ -326,6 +452,18 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             }
 
             return pos;
+        }
+
+        public struct ReadingObject
+        {
+            public OsuDifficultyHitObject HitObject;
+            public double Overlapness;
+
+            public ReadingObject(OsuDifficultyHitObject hitObject, double overlapness)
+            {
+                HitObject = hitObject;
+                Overlapness = overlapness;
+            }
         }
     }
 }
