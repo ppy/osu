@@ -40,7 +40,7 @@ namespace osu.Game.Beatmaps
         /// <summary>
         /// The breaks in this beatmap.
         /// </summary>
-        IReadOnlyList<BreakPeriod> Breaks { get; set; }
+        List<BreakPeriod> Breaks { get; set; }
 
         /// <summary>
         /// All lines from the [Events] section which aren't handled in the encoding process yet.

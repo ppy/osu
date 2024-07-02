@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -65,11 +64,8 @@ namespace osu.Game.Database
             foreach (var controlPoint in playableBeatmap.ControlPointInfo.AllControlPoints)
                 controlPoint.Time = Math.Floor(controlPoint.Time);
 
-            var breaks = new List<BreakPeriod>(playableBeatmap.Breaks.Count);
             for (int i = 0; i < playableBeatmap.Breaks.Count; i++)
-                breaks.Add(new BreakPeriod(Math.Floor(playableBeatmap.Breaks[i].StartTime), Math.Floor(playableBeatmap.Breaks[i].EndTime)));
-
-            playableBeatmap.Breaks = breaks;
+                playableBeatmap.Breaks[i] = new BreakPeriod(Math.Floor(playableBeatmap.Breaks[i].StartTime), Math.Floor(playableBeatmap.Breaks[i].EndTime));
 
             foreach (var hitObject in playableBeatmap.HitObjects)
             {
