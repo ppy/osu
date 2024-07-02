@@ -8,7 +8,6 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Beatmaps.ControlPoints;
 using Newtonsoft.Json;
-using osu.Framework.Bindables;
 using osu.Game.IO.Serialization.Converters;
 
 namespace osu.Game.Beatmaps
@@ -62,7 +61,7 @@ namespace osu.Game.Beatmaps
 
         public ControlPointInfo ControlPointInfo { get; set; } = new ControlPointInfo();
 
-        public BindableList<BreakPeriod> Breaks { get; set; } = new BindableList<BreakPeriod>();
+        public List<BreakPeriod> Breaks { get; set; } = new List<BreakPeriod>();
 
         public List<string> UnhandledEventLines { get; set; } = new List<string>();
 
