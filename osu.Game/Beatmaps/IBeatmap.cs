@@ -44,7 +44,7 @@ namespace osu.Game.Beatmaps
 
         /// <summary>
         /// All lines from the [Events] section which aren't handled in the encoding process yet.
-        /// These lines shoule be written out to the beatmap file on save or export.
+        /// These lines should be written out to the beatmap file on save or export.
         /// </summary>
         List<string> UnhandledEventLines { get; }
 
