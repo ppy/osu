@@ -240,9 +240,6 @@ namespace osu.Game.Scoring
             return clone;
         }
 
-        [Ignored]
-        public bool Passed { get; set; } = true;
-
         public int Combo { get; set; }
 
         /// <summary>

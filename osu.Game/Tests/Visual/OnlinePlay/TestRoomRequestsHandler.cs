@@ -126,7 +126,6 @@ namespace osu.Game.Tests.Visual.OnlinePlay
                         ID = currentScoreId++,
                         Accuracy = 1,
                         EndedAt = DateTimeOffset.Now,
-                        Passed = true,
                         Rank = ScoreRank.S,
                         MaxCombo = 1000,
                         TotalScore = 1000000,

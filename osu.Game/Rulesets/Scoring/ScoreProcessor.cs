@@ -470,9 +470,7 @@ namespace osu.Game.Rulesets.Scoring
             if (Rank.Value == ScoreRank.F)
                 return;
 
-            score.Passed = false;
             rank.Value = ScoreRank.F;
-
             PopulateScore(score);
         }
 

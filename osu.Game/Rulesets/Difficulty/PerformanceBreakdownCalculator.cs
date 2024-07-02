@@ -59,7 +59,6 @@ namespace osu.Game.Rulesets.Difficulty
                 Ruleset ruleset = score.Ruleset.CreateInstance();
                 ScoreInfo perfectPlay = score.DeepClone();
                 perfectPlay.Accuracy = 1;
-                perfectPlay.Passed = true;
 
                 // calculate max combo
                 // todo: Get max combo from difficulty calculator instead when diffcalc properly supports lazer-first scores
