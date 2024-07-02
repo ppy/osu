@@ -152,6 +152,14 @@ namespace osu.Game.Screens.Edit.GameplayTest
                     toggleQuickPause();
                     return true;
 
+                case GlobalAction.EditorTestPlayQuickExitToInitialTime:
+                    quickExit(false);
+                    return true;
+
+                case GlobalAction.EditorTestPlayQuickExitToCurrentTime:
+                    quickExit(true);
+                    return true;
+
                 default:
                     return false;
             }
@@ -188,6 +196,15 @@ namespace osu.Game.Screens.Edit.GameplayTest
                 GameplayClockContainer.Start();
             else
                 GameplayClockContainer.Stop();
+        }
+
+        private void quickExit(bool useCurrentTime)
+        {
+            if (useCurrentTime)
+                editorState.Time = GameplayClockContainer.CurrentTime;
+
+            editor.RestoreState(editorState);
+            this.Exit();
         }
 
         public override void OnEntering(ScreenTransitionEvent e)
