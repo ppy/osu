@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
@@ -31,20 +32,32 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             this.rulesets = rulesets;
         }
 
-        protected override void LoadComplete()
+        [SetUp]
+        public void SetUp() => Schedule(() =>
         {
-            base.LoadComplete();
-
-            Add(new Container
+            Child = new Container
             {
                 RelativeSizeAxes = Axes.Both,
                 Padding = new MarginPadding { Top = 20 },
                 Child = infoWedge = new TestBeatmapInfoWedgeV2
                 {
                     RelativeSizeAxes = Axes.X,
+                    Width = 0.6f,
+                    State = { Value = Visibility.Visible },
                 },
-            });
+            };
+        });
 
+        [SetUpSteps]
+        public override void SetUpSteps()
+        {
+            base.SetUpSteps();
+            AddUntilStep("wait for async load", () => infoWedge.DisplayedContent != null);
+        }
+
+        [Test]
+        public void TestDisplay()
+        {
             AddSliderStep("change star difficulty", 0, 11.9, 5.55, v =>
             {
                 foreach (var hasCurrentValue in infoWedge.ChildrenOfType<IHasCurrentValue<StarDifficulty>>())
@@ -53,7 +66,8 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
             AddSliderStep("change relative width", 0, 1f, 0.6f, v =>
             {
-                infoWedge.Width = v;
+                if (infoWedge.IsNotNull())
+                    infoWedge.Width = v;
             });
         }
 
