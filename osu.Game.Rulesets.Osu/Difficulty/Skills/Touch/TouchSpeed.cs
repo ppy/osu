@@ -2,21 +2,16 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Difficulty.Evaluators;
-using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
-using System.Collections.Generic;
-using System.Linq;
 
-namespace osu.Game.Rulesets.Osu.Difficulty.Skills
+namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Touch
 {
-    /// <summary>
-    /// Represents the skill required to press keys with regards to keeping up with the speed at which objects need to be hit.
-    /// </summary>
-    public class Speed : OsuStrainSkill
+    public class TouchSpeed : TouchSkill
     {
-        private double skillMultiplier => 1375;
         private double strainDecayBase => 0.3;
 
         private double currentStrain;
@@ -27,9 +22,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         private readonly List<double> objectStrains = new List<double>();
 
-        public Speed(Mod[] mods)
+        private readonly double clockRate;
+
+        public TouchSpeed(Mod[] mods, double clockRate)
             : base(mods)
         {
+            this.clockRate = clockRate;
         }
 
         private double strainDecay(double ms) => Math.Pow(strainDecayBase, ms / 1000);
@@ -38,9 +36,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         protected override double StrainValueAt(DifficultyHitObject current)
         {
-            currentStrain *= strainDecay(((OsuDifficultyHitObject)current).StrainTime);
-            currentStrain += SpeedEvaluator.EvaluateDifficultyOf(current, false) * skillMultiplier;
-
+            currentStrain = CalculateCurrentStrain(current);
             currentRhythm = RhythmEvaluator.EvaluateDifficultyOf(current);
 
             double totalStrain = currentStrain * currentRhythm;
@@ -49,6 +45,16 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             return totalStrain;
         }
+
+        protected override double GetProbabilityStrain(TouchHandSequenceProbability probability) => probability.Skills[1].CurrentStrain;
+
+        protected override double GetProbabilityTotalStrain(TouchHandSequenceProbability probability) => CalculateTotalStrain(probability.Skills[0].CurrentStrain, GetProbabilityStrain(probability));
+
+        protected override TouchHandSequenceSkill[] GetHandSequenceSkills() => new TouchHandSequenceSkill[]
+        {
+            new TouchHandSequenceAim(clockRate, true),
+            new TouchHandSequenceSpeed(clockRate),
+        };
 
         public double RelevantNoteCount()
         {
