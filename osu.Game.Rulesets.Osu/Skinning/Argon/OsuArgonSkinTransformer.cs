@@ -7,7 +7,7 @@ using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Argon
 {
-    public class OsuArgonSkinTransformer : SkinTransformer
+    public class OsuArgonSkinTransformer : ArgonSkinTransformer
     {
         public OsuArgonSkinTransformer(ISkin skin)
             : base(skin)
