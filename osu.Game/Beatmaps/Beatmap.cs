@@ -61,6 +61,12 @@ namespace osu.Game.Beatmaps
 
         public ControlPointInfo ControlPointInfo { get; set; } = new ControlPointInfo();
 
+        IReadOnlyList<BreakPeriod> IBeatmap.Breaks
+        {
+            get => Breaks;
+            set => Breaks = new List<BreakPeriod>(value);
+        }
+
         public List<BreakPeriod> Breaks { get; set; } = new List<BreakPeriod>();
 
         public List<string> UnhandledEventLines { get; set; } = new List<string>();

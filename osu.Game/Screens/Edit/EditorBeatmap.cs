@@ -177,7 +177,7 @@ namespace osu.Game.Screens.Edit
 
         public readonly BindableList<BreakPeriod> Breaks;
 
-        List<BreakPeriod> IBeatmap.Breaks
+        IReadOnlyList<BreakPeriod> IBeatmap.Breaks
         {
             get => PlayableBeatmap.Breaks;
             set => PlayableBeatmap.Breaks = value;

@@ -327,7 +327,7 @@ namespace osu.Game.Rulesets.Difficulty
                 set => baseBeatmap.Difficulty = value;
             }
 
-            public List<BreakPeriod> Breaks
+            public IReadOnlyList<BreakPeriod> Breaks
             {
                 get => baseBeatmap.Breaks;
                 set => baseBeatmap.Breaks = value;
