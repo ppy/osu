@@ -16,8 +16,7 @@ namespace osu.Game.Rulesets.Edit.Checks
             new IssueTemplateIncorrectMarker(this),
         };
 
-        public IEnumerable<MarkerCheck> MarkerChecks => new MarkerCheck[]
-        {
+        public IEnumerable<MarkerCheck> MarkerChecks = [
             new MarkerCheck("(TV Size)", @"(?i)(tv (size|ver))"),
             new MarkerCheck("(Game Ver.)", @"(?i)(game (size|ver))"),
             new MarkerCheck("(Short Ver.)", @"(?i)(short (size|ver))"),
@@ -26,7 +25,7 @@ namespace osu.Game.Rulesets.Edit.Checks
             new MarkerCheck("(Nightcore Mix)", @"(?i)(?<!& )(nightcore|night core) (ver|mix)"),
             new MarkerCheck("(Sped Up & Cut Ver.)", @"(?i)(sped|speed) ?up (ver)? ?& cut (size|ver)"),
             new MarkerCheck("(Nightcore & Cut Ver.)", @"(?i)(nightcore|night core) (ver|mix)? ?& cut (size|ver)"),
-        };
+        ];
 
         public IEnumerable<Issue> Run(BeatmapVerifierContext context)
         {
