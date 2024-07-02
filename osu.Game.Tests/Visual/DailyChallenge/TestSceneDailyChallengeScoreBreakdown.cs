@@ -7,9 +7,10 @@ using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Utils;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
 using osu.Game.Screens.OnlinePlay.DailyChallenge;
-using osu.Game.Tests.Resources;
+using osu.Game.Screens.OnlinePlay.DailyChallenge.Events;
 
 namespace osu.Game.Tests.Visual.DailyChallenge
 {
@@ -51,10 +52,14 @@ namespace osu.Game.Tests.Visual.DailyChallenge
             AddStep("set initial data", () => breakdown.SetInitialCounts([1, 4, 9, 16, 25, 36, 49, 36, 25, 16, 9, 4, 1]));
             AddStep("add new score", () =>
             {
-                var testScore = TestResources.CreateTestScoreInfo();
-                testScore.TotalScore = RNG.Next(1_000_000);
+                var ev = new NewScoreEvent(1, new APIUser
+                {
+                    Id = 2,
+                    Username = "peppy",
+                    CoverUrl = "https://osu.ppy.sh/images/headers/profile-covers/c3.jpg",
+                }, RNG.Next(1_000_000), null);
 
-                breakdown.AddNewScore(testScore);
+                breakdown.AddNewScore(ev);
             });
         }
     }

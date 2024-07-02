@@ -256,7 +256,7 @@ namespace osu.Game.Online.Metadata
                 throw new OperationCanceledException();
 
             Debug.Assert(connection != null);
-            await connection.InvokeAsync(nameof(IMetadataServer.EndWatchingMultiplayerRoom)).ConfigureAwait(false);
+            await connection.InvokeAsync(nameof(IMetadataServer.EndWatchingMultiplayerRoom), id).ConfigureAwait(false);
         }
 
         public override async Task DisconnectRequested()

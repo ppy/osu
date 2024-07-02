@@ -9,8 +9,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Online.API.Requests.Responses;
-using osu.Game.Scoring;
+using osu.Game.Screens.OnlinePlay.DailyChallenge.Events;
 using osu.Game.Users.Drawables;
 using osuTK;
 
@@ -70,8 +69,6 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
             }
         }
 
-        public record NewScoreEvent(IScoreInfo Score, int? NewRank);
-
         private partial class DailyChallengeEventFeedFlow : FillFlowContainer
         {
             public override IEnumerable<Drawable> FlowingChildren => base.FlowingChildren.Reverse();
@@ -98,8 +95,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
 
                 InternalChildren = new Drawable[]
                 {
-                    // TODO: cast is temporary, will be removed later
-                    new ClickableAvatar((APIUser)newScore.Score.User)
+                    new ClickableAvatar(newScore.User)
                     {
                         Size = new Vector2(16),
                         Masking = true,
@@ -117,9 +113,9 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
                     }
                 };
 
-                text.AddUserLink(newScore.Score.User);
+                text.AddUserLink(newScore.User);
                 text.AddText(" got ");
-                text.AddLink($"{newScore.Score.TotalScore:N0} points", () => { }); // TODO: present the score here
+                text.AddLink($"{newScore.TotalScore:N0} points", () => { }); // TODO: present the score here
 
                 if (newScore.NewRank != null)
                     text.AddText($" and achieved rank #{newScore.NewRank.Value:N0}");
