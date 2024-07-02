@@ -29,6 +29,7 @@ namespace osu.Game.Users
 
         private ProfileValueDisplay globalRankDisplay = null!;
         private ProfileValueDisplay countryRankDisplay = null!;
+        private ProfileValueDisplay ppDisplay = null!;
 
         private readonly IBindable<UserStatistics?> statistics = new Bindable<UserStatistics?>();
 
@@ -49,6 +50,7 @@ namespace osu.Game.Users
             {
                 globalRankDisplay.Content = stats.NewValue?.GlobalRank?.ToLocalisableString("\\##,##0") ?? "-";
                 countryRankDisplay.Content = stats.NewValue?.CountryRank?.ToLocalisableString("\\##,##0") ?? "-";
+                ppDisplay.Content = stats.NewValue?.PP?.ToLocalisableString("#,##0") ?? "0";
             }, true);
         }
 
@@ -152,13 +154,13 @@ namespace osu.Game.Users
                         Margin = new MarginPadding { Top = main_content_height },
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
-                        Padding = new MarginPadding { Left = 80, Vertical = padding },
+                        Padding = new MarginPadding { Left = 80, Right = padding, Vertical = padding },
                         ColumnDimensions = new[]
                         {
                             new Dimension(),
                             new Dimension()
                         },
-                        RowDimensions = new[] { new Dimension(GridSizeMode.AutoSize) },
+                        RowDimensions = new[] { new Dimension(GridSizeMode.AutoSize), new Dimension(GridSizeMode.AutoSize) },
                         Content = new[]
                         {
                             new Drawable[]
@@ -166,13 +168,25 @@ namespace osu.Game.Users
                                 globalRankDisplay = new ProfileValueDisplay(true)
                                 {
                                     Title = UsersStrings.ShowRankGlobalSimple,
+                                    Margin = new MarginPadding { Bottom = padding }
                                     // TODO: implement highest rank tooltip
                                     // `RankHighest` resides in `APIUser`, but `api.LocalUser` doesn't update
                                     // maybe move to `UserStatistics` in api, so `UserStatisticsWatcher` can update the value
                                 },
                                 countryRankDisplay = new ProfileValueDisplay(true)
                                 {
-                                    Title = UsersStrings.ShowRankCountrySimple,
+                                    Title = UsersStrings.ShowRankCountrySimple
+                                }
+                            },
+                            new Drawable[]
+                            {
+                                ppDisplay = new ProfileValueDisplay
+                                {
+                                    Title = "pp"
+                                },
+                                new TotalPlayTime
+                                {
+                                    UserStatistics = { BindTarget = statistics }
                                 }
                             }
                         }
