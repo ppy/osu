@@ -6,19 +6,27 @@ using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Extensions;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
+using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
+using osu.Framework.Utils;
+using osu.Game.Beatmaps;
+using osu.Game.Database;
 using osu.Game.Overlays.Mods;
+using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Screens;
 using osu.Game.Screens.Footer;
 using osu.Game.Screens.Menu;
-using osu.Game.Screens.SelectV2;
 using osu.Game.Screens.SelectV2.Footer;
+using osu.Game.Tests.Resources;
 using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.SongSelect
@@ -30,6 +38,9 @@ namespace osu.Game.Tests.Visual.SongSelect
 
         [Cached]
         private readonly OsuLogo logo;
+
+        private BeatmapManager manager = null!;
+        private RulesetStore rulesets = null!;
 
         public TestSceneSongSelectV2()
         {
@@ -50,6 +61,16 @@ namespace osu.Game.Tests.Visual.SongSelect
             };
         }
 
+        [BackgroundDependencyLoader]
+        private void load(GameHost host, AudioManager audio)
+        {
+            // These DI caches are required to ensure for interactive runs this test scene doesn't nuke all user beatmaps in the local install.
+            // At a point we have isolated interactive test runs enough, this can likely be removed.
+            Dependencies.Cache(rulesets = new RealmRulesetStore(Realm));
+            Dependencies.Cache(Realm);
+            Dependencies.Cache(manager = new BeatmapManager(LocalStorage, Realm, null, audio, Resources, host, Beatmap.Default));
+        }
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
@@ -63,8 +84,33 @@ namespace osu.Game.Tests.Visual.SongSelect
         {
             base.SetUpSteps();
 
-            AddStep("load screen", () => Stack.Push(new SongSelectV2()));
-            AddUntilStep("wait for load", () => Stack.CurrentScreen is SongSelectV2 songSelect && songSelect.IsLoaded);
+            AddStep("load screen", () => Stack.Push(new Screens.SelectV2.SongSelectV2()));
+            AddUntilStep("wait for load", () => Stack.CurrentScreen is Screens.SelectV2.SongSelectV2 songSelect && songSelect.IsLoaded);
+        }
+
+        [Test]
+        public void TestBeatmap()
+        {
+            Live<BeatmapSetInfo> testBeatmap = null!;
+
+            AddStep("import test beatmap", () => testBeatmap = manager.Import(new ImportTask(TestResources.GetTestBeatmapForImport())).GetResultSafely().AsNonNull());
+            AddStep("select random diff", () => selectBeatmap(manager.GetWorkingBeatmap(testBeatmap.Value.Beatmaps.OrderBy(_ => RNG.Next()).First())));
+
+            addManyTestMaps(5);
+
+            AddStep("select beatmap randomly", () => selectBeatmap(manager.GetWorkingBeatmap(manager.GetAllUsableBeatmapSets().SelectMany(bs => bs.Beatmaps).OrderBy(_ => RNG.Next()).First())));
+
+            AddStep("select easy", () => SelectedMods.Value = new[] { Ruleset.Value.CreateInstance().CreateMod<ModEasy>() });
+            AddStep("select hard rock", () => SelectedMods.Value = new[] { Ruleset.Value.CreateInstance().CreateMod<ModHardRock>() });
+            AddStep("select half time", () => SelectedMods.Value = new[] { Ruleset.Value.CreateInstance().CreateMod<ModHalfTime>() });
+            AddStep("select double time", () => SelectedMods.Value = new[] { Ruleset.Value.CreateInstance().CreateMod<ModDoubleTime>() });
+            AddStep("clear mods", () => SelectedMods.Value = Array.Empty<Mod>());
+        }
+
+        private void selectBeatmap(WorkingBeatmap beatmap)
+        {
+            Ruleset.Value = beatmap.BeatmapInfo.Ruleset;
+            Beatmap.Value = beatmap;
         }
 
         #region Footer
@@ -180,6 +226,24 @@ namespace osu.Game.Tests.Visual.SongSelect
         }
 
         #endregion
+
+        /// <summary>
+        /// Imports test beatmap sets to show in the carousel.
+        /// </summary>
+        /// <param name="difficultyCountPerSet">
+        /// The exact count of difficulties to create for each beatmap set.
+        /// A <see langword="null"/> value causes the count of difficulties to be selected randomly.
+        /// </param>
+        private void addManyTestMaps(int? difficultyCountPerSet = null)
+        {
+            AddStep("import test maps", () =>
+            {
+                var usableRulesets = rulesets.AvailableRulesets.Where(r => r.OnlineID != 2).ToArray();
+
+                for (int i = 0; i < 10; i++)
+                    manager.Import(TestResources.CreateTestBeatmapSetInfo(difficultyCountPerSet, usableRulesets));
+            });
+        }
 
         protected override void Update()
         {
