@@ -136,6 +136,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 foreach (var drawableHitObject in NestedHitObjects)
                     drawableHitObject.AccentColour.Value = colour.NewValue;
             }, true);
+
+            slidingSample.BindAdjustments(Samples);
         }
 
         protected override JudgementResult CreateResult(Judgement judgement) => new OsuSliderJudgementResult(HitObject, judgement);
