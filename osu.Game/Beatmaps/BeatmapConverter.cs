@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using osu.Game.Beatmaps.Timing;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Objects;
 
@@ -49,9 +50,6 @@ namespace osu.Game.Beatmaps
             original.BeatmapInfo = original.BeatmapInfo.Clone();
             original.ControlPointInfo = original.ControlPointInfo.DeepClone();
 
-            // Used in osu!mania conversion.
-            original.Breaks = original.Breaks.ToList();
-
             return ConvertBeatmap(original, cancellationToken);
         }
 
@@ -68,7 +66,8 @@ namespace osu.Game.Beatmaps
             beatmap.BeatmapInfo = original.BeatmapInfo;
             beatmap.ControlPointInfo = original.ControlPointInfo;
             beatmap.HitObjects = convertHitObjects(original.HitObjects, original, cancellationToken).OrderBy(s => s.StartTime).ToList();
-            beatmap.Breaks = original.Breaks;
+            // Used in osu!mania conversion.
+            beatmap.Breaks = new List<BreakPeriod>(original.Breaks);
             beatmap.UnhandledEventLines = original.UnhandledEventLines;
 
             return beatmap;
