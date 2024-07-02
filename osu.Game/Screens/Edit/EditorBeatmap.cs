@@ -88,6 +88,8 @@ namespace osu.Game.Screens.Edit
 
         public BindableInt PreviewTime { get; }
 
+        public Bindable<bool> AdjustNotesOnOffsetBPMChange { get; } = new Bindable<bool>(false);
+
         private readonly IBeatmapProcessor beatmapProcessor;
 
         private readonly Dictionary<HitObject, Bindable<double>> startTimeBindables = new Dictionary<HitObject, Bindable<double>>();
