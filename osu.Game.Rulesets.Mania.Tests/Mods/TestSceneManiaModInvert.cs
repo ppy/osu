@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Collections.Generic;
 using NUnit.Framework;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Timing;
@@ -25,10 +24,8 @@ namespace osu.Game.Rulesets.Mania.Tests.Mods
         public void TestBreaksPreservedOnOriginalBeatmap()
         {
             var beatmap = CreateBeatmap(new ManiaRuleset().RulesetInfo);
-            var breaks = (List<BreakPeriod>)beatmap.Breaks;
-
-            breaks.Clear();
-            breaks.Add(new BreakPeriod(0, 1000));
+            beatmap.Breaks.Clear();
+            beatmap.Breaks.Add(new BreakPeriod(0, 1000));
 
             var workingBeatmap = new FlatWorkingBeatmap(beatmap);
 
