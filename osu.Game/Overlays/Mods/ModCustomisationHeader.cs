@@ -30,6 +30,12 @@ namespace osu.Game.Overlays.Mods
 
         public readonly BindableBool Expanded = new BindableBool();
 
+        public ModCustomisationHeader()
+        {
+            Action = Expanded.Toggle;
+            Enabled.Value = false;
+        }
+
         [BackgroundDependencyLoader]
         private void load()
         {
@@ -75,12 +81,17 @@ namespace osu.Game.Overlays.Mods
         {
             base.LoadComplete();
 
+            Enabled.BindValueChanged(e =>
+            {
+                TooltipText = e.NewValue
+                    ? string.Empty
+                    : ModSelectOverlayStrings.CustomisationPanelDisabledReason;
+            }, true);
+
             Expanded.BindValueChanged(v =>
             {
                 icon.RotateTo(v.NewValue ? 180 : 0);
             }, true);
-
-            Action = Expanded.Toggle;
         }
     }
 }
