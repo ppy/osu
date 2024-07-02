@@ -9,7 +9,6 @@ using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
@@ -161,7 +160,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
                                         new Box
                                         {
                                             RelativeSizeAxes = Axes.Both,
-                                            Colour = Color4Extensions.FromHex(@"3e3a44") // Temporary.
+                                            Colour = colourProvider.Background4,
                                         },
                                         new GridContainer
                                         {
@@ -277,7 +276,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
                                         new Box
                                         {
                                             RelativeSizeAxes = Axes.Both,
-                                            Colour = Color4Extensions.FromHex(@"28242d") // Temporary.
+                                            Colour = colourProvider.Background5,
                                         },
                                         footerButtons = new FillFlowContainer
                                         {
