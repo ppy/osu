@@ -71,7 +71,10 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 if (!shouldBeVisible(breakPeriod))
                     continue;
 
-                Add(new TimelineBreak(breakPeriod));
+                Add(new TimelineBreak(breakPeriod)
+                {
+                    OnDeleted = b => breaks.Remove(b),
+                });
             }
         }
 
