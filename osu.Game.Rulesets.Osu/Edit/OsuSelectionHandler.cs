@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.UserInterface;
@@ -23,17 +24,8 @@ namespace osu.Game.Rulesets.Osu.Edit
 {
     public partial class OsuSelectionHandler : EditorSelectionHandler
     {
-        [Resolved(CanBeNull = true)]
-        private IDistanceSnapProvider? snapProvider { get; set; }
-
         [Resolved]
         private OsuGridToolboxGroup gridToolbox { get; set; } = null!;
-
-        /// <summary>
-        /// During a transform, the initial path types of a single selected slider are stored so they
-        /// can be maintained throughout the operation.
-        /// </summary>
-        private List<PathType?>? referencePathTypes;
 
         protected override void OnSelectionChanged()
         {
