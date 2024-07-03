@@ -16,15 +16,16 @@ namespace osu.Game.Rulesets.Edit.Checks
             new IssueTemplateIncorrectMarker(this),
         };
 
-        private IEnumerable<MarkerCheck> markerChecks = [
-            new MarkerCheck("(TV Size)", @"(?i)(tv (size|ver))"),
-            new MarkerCheck("(Game Ver.)", @"(?i)(game (size|ver))"),
-            new MarkerCheck("(Short Ver.)", @"(?i)(short (size|ver))"),
-            new MarkerCheck("(Cut Ver.)", @"(?i)(?<!& )(cut (size|ver))"),
-            new MarkerCheck("(Sped Up Ver.)", @"(?i)(?<!& )(sped|speed) ?up ver"),
-            new MarkerCheck("(Nightcore Mix)", @"(?i)(?<!& )(nightcore|night core) (ver|mix)"),
-            new MarkerCheck("(Sped Up & Cut Ver.)", @"(?i)(sped|speed) ?up (ver)? ?& cut (size|ver)"),
-            new MarkerCheck("(Nightcore & Cut Ver.)", @"(?i)(nightcore|night core) (ver|mix)? ?& cut (size|ver)"),
+        private readonly IEnumerable<MarkerCheck> markerChecks =
+        [
+            new MarkerCheck(@"(TV Size)", @"(?i)(tv (size|ver))"),
+            new MarkerCheck(@"(Game Ver.)", @"(?i)(game (size|ver))"),
+            new MarkerCheck(@"(Short Ver.)", @"(?i)(short (size|ver))"),
+            new MarkerCheck(@"(Cut Ver.)", @"(?i)(?<!& )(cut (size|ver))"),
+            new MarkerCheck(@"(Sped Up Ver.)", @"(?i)(?<!& )(sped|speed) ?up ver"),
+            new MarkerCheck(@"(Nightcore Mix)", @"(?i)(?<!& )(nightcore|night core) (ver|mix)"),
+            new MarkerCheck(@"(Sped Up & Cut Ver.)", @"(?i)(sped|speed) ?up (ver)? ?& cut (size|ver)"),
+            new MarkerCheck(@"(Nightcore & Cut Ver.)", @"(?i)(nightcore|night core) (ver|mix)? ?& cut (size|ver)"),
         ];
 
         public IEnumerable<Issue> Run(BeatmapVerifierContext context)
@@ -50,9 +51,9 @@ namespace osu.Game.Rulesets.Edit.Checks
 
         private class MarkerCheck
         {
-            public string CorrectMarkerFormat;
-            public Regex ExactRegex;
-            public Regex AnyRegex;
+            public readonly string CorrectMarkerFormat;
+            public readonly Regex ExactRegex;
+            public readonly Regex AnyRegex;
 
             public MarkerCheck(string exact, string anyRegex)
             {
