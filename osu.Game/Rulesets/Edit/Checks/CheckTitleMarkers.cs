@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using osu.Game.Rulesets.Edit.Checks.Components;
@@ -37,10 +38,10 @@ namespace osu.Game.Rulesets.Edit.Checks
             {
                 bool hasRomanisedTitle = unicodeTitle != romanisedTitle;
 
-                if (check.AnyRegex.IsMatch(unicodeTitle) && !check.ExactRegex.IsMatch(unicodeTitle))
+                if (check.AnyRegex.IsMatch(unicodeTitle) && !unicodeTitle.Contains(check.CorrectMarkerFormat, StringComparison.Ordinal))
                     yield return new IssueTemplateIncorrectMarker(this).Create("Title", check.CorrectMarkerFormat);
 
-                if (hasRomanisedTitle && check.AnyRegex.IsMatch(romanisedTitle) && !check.ExactRegex.IsMatch(romanisedTitle))
+                if (hasRomanisedTitle && check.AnyRegex.IsMatch(romanisedTitle) && !romanisedTitle.Contains(check.CorrectMarkerFormat, StringComparison.Ordinal))
                     yield return new IssueTemplateIncorrectMarker(this).Create("Romanised title", check.CorrectMarkerFormat);
             }
         }
@@ -48,13 +49,11 @@ namespace osu.Game.Rulesets.Edit.Checks
         private class MarkerCheck
         {
             public readonly string CorrectMarkerFormat;
-            public readonly Regex ExactRegex;
             public readonly Regex AnyRegex;
 
             public MarkerCheck(string exact, string anyRegex)
             {
                 CorrectMarkerFormat = exact;
-                ExactRegex = new Regex(Regex.Escape(exact), RegexOptions.Compiled);
                 AnyRegex = new Regex(anyRegex, RegexOptions.Compiled);
             }
         }
