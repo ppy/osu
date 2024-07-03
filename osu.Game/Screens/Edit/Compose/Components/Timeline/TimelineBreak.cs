@@ -105,7 +105,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             background.FadeColour(IsHovered ? colours.Gray6 : colours.Gray5, 400, Easing.OutQuint);
         }
 
-        public MenuItem[]? ContextMenuItems => new MenuItem[]
+        public MenuItem[] ContextMenuItems => new MenuItem[]
         {
             new OsuMenuItem(CommonStrings.ButtonsDelete, MenuItemType.Destructive, () => OnDeleted?.Invoke(Break.Value)),
         };
