@@ -88,9 +88,18 @@ namespace osu.Game.Screens.Edit.Components
                         Padding = new MarginPadding
                         {
                             Top = 5,
-                            Horizontal = -5
+                            Horizontal = -2
                         },
-                        Child = new Box { RelativeSizeAxes = Axes.Both, },
+                        Child = new Container
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            CornerRadius = 5,
+                            Masking = true,
+                            Children = new Drawable[]
+                            {
+                                new Box { RelativeSizeAxes = Axes.Both, },
+                            }
+                        },
                         Alpha = 0,
                     },
                     trackTimer = new OsuSpriteText
