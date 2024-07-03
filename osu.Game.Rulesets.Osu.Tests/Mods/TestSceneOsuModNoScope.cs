@@ -46,7 +46,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
                             StartTime = 5000,
                         }
                     },
-                    Breaks = new List<BreakPeriod>
+                    Breaks =
                     {
                         new BreakPeriod(2000, 4000),
                     }

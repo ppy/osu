@@ -48,10 +48,20 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             if (!positionTransferred && JudgedObject is DrawableOsuHitObject osuObject && JudgedObject.IsInUse)
             {
-                Position = osuObject.ToSpaceOfOtherDrawable(osuObject.OriginPosition, Parent!);
-                Scale = new Vector2(osuObject.HitObject.Scale);
+                switch (osuObject)
+                {
+                    case DrawableSlider slider:
+                        Position = slider.TailCircle.ToSpaceOfOtherDrawable(slider.TailCircle.OriginPosition, Parent!);
+                        break;
+
+                    default:
+                        Position = osuObject.ToSpaceOfOtherDrawable(osuObject.OriginPosition, Parent!);
+                        break;
+                }
 
                 positionTransferred = true;
+
+                Scale = new Vector2(osuObject.HitObject.Scale);
             }
         }
 
