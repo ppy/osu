@@ -2,9 +2,11 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Graphics;
-using osu.Game.Screens.Edit.Components.Timelines.Summary.Visualisations;
 
 namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
 {
@@ -13,22 +15,34 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
     /// </summary>
     public partial class BreakPart : TimelinePart
     {
+        private readonly BindableList<BreakPeriod> breaks = new BindableList<BreakPeriod>();
+
         protected override void LoadBeatmap(EditorBeatmap beatmap)
         {
             base.LoadBeatmap(beatmap);
-            foreach (var breakPeriod in beatmap.Breaks)
-                Add(new BreakVisualisation(breakPeriod));
+
+            breaks.UnbindAll();
+            breaks.BindTo(beatmap.Breaks);
+            breaks.BindCollectionChanged((_, _) =>
+            {
+                Clear();
+                foreach (var breakPeriod in beatmap.Breaks)
+                    Add(new BreakVisualisation(breakPeriod));
+            }, true);
         }
 
-        private partial class BreakVisualisation : DurationVisualisation
+        private partial class BreakVisualisation : Circle
         {
             public BreakVisualisation(BreakPeriod breakPeriod)
-                : base(breakPeriod.StartTime, breakPeriod.EndTime)
             {
+                RelativePositionAxes = Axes.X;
+                RelativeSizeAxes = Axes.Both;
+                X = (float)breakPeriod.StartTime;
+                Width = (float)breakPeriod.Duration;
             }
 
             [BackgroundDependencyLoader]
-            private void load(OsuColour colours) => Colour = colours.GreyCarmineLight;
+            private void load(OsuColour colours) => Colour = colours.Gray7;
         }
     }
 }
