@@ -61,7 +61,7 @@ namespace osu.Game.Rulesets.Edit.Checks
         public class IssueTemplateIncorrectMarker : IssueTemplate
         {
             public IssueTemplateIncorrectMarker(ICheck check)
-                : base(check, IssueType.Problem, "{0} field has a incorrect format of marker {1}")
+                : base(check, IssueType.Problem, "{0} field has an incorrect format of marker {1}")
             {
             }
 
