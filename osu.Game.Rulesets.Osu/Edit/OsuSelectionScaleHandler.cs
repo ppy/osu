@@ -194,7 +194,7 @@ namespace osu.Game.Rulesets.Osu.Edit
 
         /// <summary>
         /// Clamp scale for multi-object-scaling where selection does not exceed playfield bounds or flip.
-        /// </summary>
+        /// </summary
         /// <param name="origin">The origin from which the scale operation is performed</param>
         /// <param name="scale">The scale to be clamped</param>
         /// <param name="adjustAxis">The axes to adjust the scale in.</param>
@@ -215,54 +215,34 @@ namespace osu.Game.Rulesets.Osu.Edit
             Vector2 actualOrigin = origin ?? defaultOrigin.Value;
             var selectionQuad = OriginalSurroundingQuad.Value;
 
-            scale = clampToBound(scale, selectionQuad.BottomRight, OsuPlayfield.BASE_SIZE.X, Axes.X);
-            scale = clampToBound(scale, selectionQuad.BottomRight, OsuPlayfield.BASE_SIZE.Y, Axes.Y);
-            scale = clampToBound(scale, selectionQuad.TopLeft, 0, Axes.X);
-            scale = clampToBound(scale, selectionQuad.TopLeft, 0, Axes.Y);
+            scale = clampToBound(scale, selectionQuad.BottomRight, OsuPlayfield.BASE_SIZE);
+            scale = clampToBound(scale, selectionQuad.TopLeft, Vector2.Zero);
 
             return Vector2.ComponentMax(scale, new Vector2(Precision.FLOAT_EPSILON));
 
-            Vector2 clampToBound(Vector2 s, Vector2 p, float bound, Axes axis)
+            float minPositiveComponent(Vector2 v) => MathF.Min(v.X < 0 ? float.PositiveInfinity : v.X, v.Y < 0 ? float.PositiveInfinity : v.Y);
+
+            Vector2 clampToBound(Vector2 s, Vector2 p, Vector2 bound)
             {
-                float px = p.X - actualOrigin.X;
-                float py = p.Y - actualOrigin.Y;
-                float c = axis == Axes.X ? bound - actualOrigin.X : bound - actualOrigin.Y;
+                p -= actualOrigin;
+                bound -= actualOrigin;
                 float cos = MathF.Cos(float.DegreesToRadians(-axisRotation));
                 float sin = MathF.Sin(float.DegreesToRadians(-axisRotation));
-                float a, b;
-
-                if (axis == Axes.X)
-                {
-                    a = cos * cos * px - sin * cos * py;
-                    b = sin * sin * px + sin * cos * py;
-                }
-                else
-                {
-                    a = -sin * cos * px + sin * sin * py;
-                    b = sin * cos * px + cos * cos * py;
-                }
+                var a = new Vector2(cos * cos * p.X - sin * cos * p.Y, -sin * cos * p.X + sin * sin * p.Y);
+                var b = new Vector2(sin * sin * p.X + sin * cos * p.Y, sin * cos * p.X + cos * cos * p.Y);
 
                 switch (adjustAxis)
                 {
                     case Axes.X:
-                        if (Precision.AlmostEquals(a, 0) || (c - b) / a < 0)
-                            break;
-
-                        s.X = MathF.Min(scale.X, (c - b) / a);
+                        s.X = MathF.Min(scale.X, minPositiveComponent(Vector2.Divide(bound - b, a)));
                         break;
 
                     case Axes.Y:
-                        if (Precision.AlmostEquals(b, 0) || (c - a) / b < 0)
-                            break;
-
-                        s.Y = MathF.Min(scale.Y, (c - a) / b);
+                        s.Y = MathF.Min(scale.Y, minPositiveComponent(Vector2.Divide(bound - a, b)));
                         break;
 
                     case Axes.Both:
-                        if (Precision.AlmostEquals(a + b, 0) || c / (a * s.X + b * s.Y) < 0)
-                            break;
-
-                        s = Vector2.ComponentMin(s, s * c / (a * s.X + b * s.Y));
+                        s = Vector2.ComponentMin(s, s * minPositiveComponent(Vector2.Divide(bound, a * s.X + b * s.Y)));
                         break;
                 }
 
