@@ -55,7 +55,18 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         [Resolved(CanBeNull = true)]
         private BindableBeatDivisor beatDivisor { get; set; }
 
-        public override Quad SelectionQuad => BodyPiece.ScreenSpaceDrawQuad;
+        public override Quad SelectionQuad
+        {
+            get
+            {
+                var result = BodyPiece.ScreenSpaceDrawQuad.AABBFloat;
+
+                result = RectangleF.Union(result, HeadOverlay.VisibleQuad);
+                result = RectangleF.Union(result, TailOverlay.VisibleQuad);
+
+                return result;
+            }
+        }
 
         private readonly BindableList<PathControlPoint> controlPoints = new BindableList<PathControlPoint>();
         private readonly IBindable<int> pathVersion = new Bindable<int>();
@@ -63,7 +74,6 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
         // Cached slider path which ignored the expected distance value.
         private readonly Cached<SliderPath> fullPathCache = new Cached<SliderPath>();
-        private bool isAdjustingLength;
 
         public SliderSelectionBlueprint(Slider slider)
             : base(slider)
@@ -79,6 +89,10 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                 HeadOverlay = CreateCircleOverlay(HitObject, SliderPosition.Start),
                 TailOverlay = CreateCircleOverlay(HitObject, SliderPosition.End),
             };
+
+            TailOverlay.EndDragMarker!.StartDrag += startAdjustingLength;
+            TailOverlay.EndDragMarker.Drag += adjustLength;
+            TailOverlay.EndDragMarker.EndDrag += endAdjustLength;
         }
 
         protected override void LoadComplete()
@@ -141,9 +155,6 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         {
             base.OnDeselected();
 
-            if (isAdjustingLength)
-                endAdjustLength();
-
             updateVisualDefinition();
             BodyPiece.RecyclePath();
         }
@@ -173,12 +184,6 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
         protected override bool OnMouseDown(MouseDownEvent e)
         {
-            if (isAdjustingLength)
-            {
-                endAdjustLength();
-                return true;
-            }
-
             switch (e.Button)
             {
                 case MouseButton.Right:
@@ -202,18 +207,22 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             return false;
         }
 
+        private Vector2 lengthAdjustMouseOffset;
+
+        private void startAdjustingLength(DragStartEvent e)
+        {
+            lengthAdjustMouseOffset = ToLocalSpace(e.ScreenSpaceMouseDownPosition) - HitObject.Position - HitObject.Path.PositionAt(1);
+            changeHandler?.BeginChange();
+        }
+
         private void endAdjustLength()
         {
             trimExcessControlPoints(HitObject.Path);
-            isAdjustingLength = false;
             changeHandler?.EndChange();
         }
 
-        protected override bool OnMouseMove(MouseMoveEvent e)
+        private void adjustLength(MouseEvent e)
         {
-            if (!isAdjustingLength)
-                return base.OnMouseMove(e);
-
             double oldDistance = HitObject.Path.Distance;
             double proposedDistance = findClosestPathDistance(e);
 
@@ -223,13 +232,11 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                 10 * oldDistance / HitObject.SliderVelocityMultiplier);
 
             if (Precision.AlmostEquals(proposedDistance, oldDistance))
-                return false;
+                return;
 
             HitObject.SliderVelocityMultiplier *= proposedDistance / oldDistance;
             HitObject.Path.ExpectedDistance.Value = proposedDistance;
             editorBeatmap?.Update(HitObject);
-
-            return false;
         }
 
         /// <summary>
@@ -262,12 +269,12 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         /// <summary>
         /// Finds the expected distance value for which the slider end is closest to the mouse position.
         /// </summary>
-        private double findClosestPathDistance(MouseMoveEvent e)
+        private double findClosestPathDistance(MouseEvent e)
         {
             const double step1 = 10;
             const double step2 = 0.1;
 
-            var desiredPosition = e.MousePosition - HitObject.Position;
+            var desiredPosition = ToLocalSpace(e.ScreenSpaceMousePosition) - HitObject.Position - lengthAdjustMouseOffset;
 
             if (!fullPathCache.IsValid)
                 fullPathCache.Value = new SliderPath(HitObject.Path.ControlPoints.ToArray());
@@ -525,11 +532,6 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                 addControlPoint(rightClickPosition);
                 changeHandler?.EndChange();
             }),
-            new OsuMenuItem("Adjust length", MenuItemType.Standard, () =>
-            {
-                isAdjustingLength = true;
-                changeHandler?.BeginChange();
-            }),
             new OsuMenuItem("Convert to stream", MenuItemType.Destructive, convertToStream),
         };
 
@@ -544,9 +546,6 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos)
         {
-            if (isAdjustingLength)
-                return true;
-
             if (BodyPiece.ReceivePositionalInputAt(screenSpacePos))
                 return true;
 

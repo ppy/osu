@@ -3,7 +3,6 @@
 
 #nullable disable
 
-using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
@@ -165,23 +164,35 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
         }
 
         [Test]
-        public void TestAdjustDistance()
+        public void TestAdjustLength()
         {
-            AddStep("start adjust length",
-                () => blueprint.ContextMenuItems.Single(o => o.Text.Value == "Adjust length").Action.Value());
-            moveMouseToControlPoint(1);
-            AddStep("end adjust length", () => InputManager.Click(MouseButton.Right));
+            AddStep("move mouse to drag marker", () =>
+            {
+                Vector2 position = slider.Position + slider.Path.PositionAt(1) + new Vector2(60, 0);
+                InputManager.MoveMouseTo(drawableObject.Parent!.ToScreenSpace(position));
+            });
+            AddStep("start drag", () => InputManager.PressButton(MouseButton.Left));
+            AddStep("move mouse to control point 1", () =>
+            {
+                Vector2 position = slider.Position + slider.Path.ControlPoints[1].Position + new Vector2(60, 0);
+                InputManager.MoveMouseTo(drawableObject.Parent!.ToScreenSpace(position));
+            });
+            AddStep("end adjust length", () => InputManager.ReleaseButton(MouseButton.Left));
             AddAssert("expected distance halved",
                 () => Precision.AlmostEquals(slider.Path.Distance, 172.2, 0.1));
 
-            AddStep("start adjust length",
-                () => blueprint.ContextMenuItems.Single(o => o.Text.Value == "Adjust length").Action.Value());
-            AddStep("move mouse beyond last control point", () =>
+            AddStep("move mouse to drag marker", () =>
             {
-                Vector2 position = slider.Position + slider.Path.ControlPoints[2].Position + new Vector2(50, 0);
+                Vector2 position = slider.Position + slider.Path.PositionAt(1) + new Vector2(60, 0);
                 InputManager.MoveMouseTo(drawableObject.Parent!.ToScreenSpace(position));
             });
-            AddStep("end adjust length", () => InputManager.Click(MouseButton.Right));
+            AddStep("start drag", () => InputManager.PressButton(MouseButton.Left));
+            AddStep("move mouse beyond last control point", () =>
+            {
+                Vector2 position = slider.Position + slider.Path.ControlPoints[2].Position + new Vector2(100, 0);
+                InputManager.MoveMouseTo(drawableObject.Parent!.ToScreenSpace(position));
+            });
+            AddStep("end adjust length", () => InputManager.ReleaseButton(MouseButton.Left));
             AddAssert("expected distance is calculated distance",
                 () => Precision.AlmostEquals(slider.Path.Distance, slider.Path.CalculatedDistance, 0.1));
 
