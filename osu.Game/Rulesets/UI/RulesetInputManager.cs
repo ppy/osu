@@ -109,10 +109,20 @@ namespace osu.Game.Rulesets.UI
             get => replayInputHandler;
             set
             {
+                if (replayInputHandler == value)
+                    return;
+
                 if (replayInputHandler != null)
                 {
                     RemoveHandler(replayInputHandler);
+                    // ensures that all replay keys are released, and that the last replay state is correctly cleared
                     new ReplayStateReset().Apply(CurrentState, this);
+                }
+                else
+                {
+                    // ensures that all user-pressed keys are released, so that the replay handler may trigger them itself
+                    // setting `UseParentInput` will only sync releases (https://github.com/ppy/osu-framework/blob/45cd7c7c702c081334fce41e7771b9dc6481b28d/osu.Framework/Input/PassThroughInputManager.cs#L179-L182)
+                    SyncInputState(CreateInitialState());
                 }
 
                 replayInputHandler = value;
