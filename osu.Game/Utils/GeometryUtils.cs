@@ -113,7 +113,8 @@ namespace osu.Game.Utils
         /// Returns a quad surrounding the provided points.
         /// </summary>
         /// <param name="points">The points to calculate a quad for.</param>
-        public static Quad GetSurroundingQuad(IEnumerable<Vector2> points)
+        /// <param name="axisRotation">The rotation in degrees of the axis to align the quad to.</param>
+        public static Quad GetSurroundingQuad(IEnumerable<Vector2> points, float axisRotation = 0)
         {
             if (!points.Any())
                 return new Quad();
@@ -124,20 +125,25 @@ namespace osu.Game.Utils
             // Go through all hitobjects to make sure they would remain in the bounds of the editor after movement, before any movement is attempted
             foreach (var p in points)
             {
-                minPosition = Vector2.ComponentMin(minPosition, p);
-                maxPosition = Vector2.ComponentMax(maxPosition, p);
+                var pr = RotateVector(p, axisRotation);
+                minPosition = Vector2.ComponentMin(minPosition, pr);
+                maxPosition = Vector2.ComponentMax(maxPosition, pr);
             }
 
-            Vector2 size = maxPosition - minPosition;
+            var p1 = RotateVector(minPosition, -axisRotation);
+            var p2 = RotateVector(new Vector2(minPosition.X, maxPosition.Y), -axisRotation);
+            var p3 = RotateVector(maxPosition, -axisRotation);
+            var p4 = RotateVector(new Vector2(maxPosition.X, minPosition.Y), -axisRotation);
 
-            return new Quad(minPosition.X, minPosition.Y, size.X, size.Y);
+            return new Quad(p1, p2, p3, p4);
         }
 
         /// <summary>
         /// Returns a gamefield-space quad surrounding the provided hit objects.
         /// </summary>
         /// <param name="hitObjects">The hit objects to calculate a quad for.</param>
-        public static Quad GetSurroundingQuad(IEnumerable<IHasPosition> hitObjects) =>
+        /// <param name="axisRotation">The rotation in degrees of the axis to align the quad to.</param>
+        public static Quad GetSurroundingQuad(IEnumerable<IHasPosition> hitObjects, float axisRotation = 0) =>
             GetSurroundingQuad(hitObjects.SelectMany(h =>
             {
                 if (h is IHasPath path)
@@ -151,6 +157,6 @@ namespace osu.Game.Utils
                 }
 
                 return new[] { h.Position };
-            }));
+            }), axisRotation);
     }
 }
