@@ -81,7 +81,7 @@ namespace osu.Game.Overlays.Dialog
 
             protected override void Confirm()
             {
-                musicController?.Duck();
+                musicController?.Duck(100, 1f);
                 confirmSample?.Play();
                 base.Confirm();
             }
