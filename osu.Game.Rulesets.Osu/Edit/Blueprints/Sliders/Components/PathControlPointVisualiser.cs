@@ -534,6 +534,9 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
         private void updateCurveMenuItems()
         {
+            if (curveTypeItems == null)
+                return;
+
             foreach (var item in curveTypeItems.OfType<CurveTypeMenuItem>())
             {
                 int totalCount = Pieces.Count(p => p.IsSelected.Value);
