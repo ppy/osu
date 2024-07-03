@@ -292,7 +292,7 @@ namespace osu.Game.Screens.Edit
                 dependencies.CacheAs<IEditorChangeHandler>(changeHandler);
             }
 
-            beatDivisor.Value = editorBeatmap.BeatmapInfo.BeatDivisor;
+            beatDivisor.SetArbitraryDivisor(editorBeatmap.BeatmapInfo.BeatDivisor);
             beatDivisor.BindValueChanged(divisor => editorBeatmap.BeatmapInfo.BeatDivisor = divisor.NewValue);
 
             updateLastSavedHash();
@@ -1018,6 +1018,15 @@ namespace osu.Game.Screens.Edit
                 rebindClipboardBindables();
             }
         }
+
+        /// <summary>
+        /// Forces a reload of the compose screen after significant configuration changes.
+        /// </summary>
+        /// <remarks>
+        /// This can be necessary for scrolling rulesets, as they do not easily support control points changing under them.
+        /// The reason that this works is that <see cref="onModeChanged"/> will re-instantiate the screen whenever it is requested next.
+        /// </remarks>
+        public void ReloadComposeScreen() => screenContainer.SingleOrDefault(s => s.Type == EditorScreenMode.Compose)?.RemoveAndDisposeImmediately();
 
         [CanBeNull]
         private ScheduledDelegate playbackDisabledDebounce;
