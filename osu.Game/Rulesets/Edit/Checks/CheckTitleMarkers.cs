@@ -58,8 +58,8 @@ namespace osu.Game.Rulesets.Edit.Checks
             public MarkerCheck(string exact, string anyRegex)
             {
                 CorrectMarkerFormat = exact;
-                ExactRegex = new Regex(Regex.Escape(exact));
-                AnyRegex = new Regex(anyRegex);
+                ExactRegex = new Regex(Regex.Escape(exact), RegexOptions.Compiled);
+                AnyRegex = new Regex(anyRegex, RegexOptions.Compiled);
             }
         }
 
