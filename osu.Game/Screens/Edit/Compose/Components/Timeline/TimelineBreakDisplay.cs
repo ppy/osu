@@ -16,7 +16,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         private Timeline timeline { get; set; } = null!;
 
         [Resolved]
-        private IEditorChangeHandler editorChangeHandler { get; set; } = null!;
+        private IEditorChangeHandler? editorChangeHandler { get; set; }
 
         /// <summary>
         /// The visible time/position range of the timeline.
@@ -78,9 +78,9 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 {
                     OnDeleted = b =>
                     {
-                        editorChangeHandler.BeginChange();
+                        editorChangeHandler?.BeginChange();
                         breaks.Remove(b);
-                        editorChangeHandler.EndChange();
+                        editorChangeHandler?.EndChange();
                     },
                 });
             }
