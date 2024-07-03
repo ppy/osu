@@ -6,7 +6,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Humanizer;
 using NUnit.Framework;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Testing;
