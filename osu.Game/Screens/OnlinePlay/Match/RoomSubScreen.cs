@@ -17,12 +17,9 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Input.Bindings;
-using osu.Framework.Input.Events;
 using osu.Framework.Screens;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
-using osu.Game.Input.Bindings;
 using osu.Game.Online.API;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
@@ -75,7 +72,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
         private BeatmapManager beatmapManager { get; set; }
 
         [Resolved]
-        private RulesetStore rulesets { get; set; }
+        protected RulesetStore Rulesets { get; private set; }
 
         [Resolved]
         private IAPIProvider api { get; set; } = null!;
@@ -241,8 +238,9 @@ namespace osu.Game.Screens.OnlinePlay.Match
                 }
             };
 
-            LoadComponent(UserModsSelectOverlay = new UserModSelectOverlay(OverlayColourScheme.Plum)
+            LoadComponent(UserModsSelectOverlay = new RoomModSelectOverlay
             {
+                SelectedItem = { BindTarget = SelectedItem },
                 SelectedMods = { BindTarget = UserMods },
                 IsValidMod = _ => false
             });
@@ -422,7 +420,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
             if (selected == null)
                 return;
 
-            var rulesetInstance = rulesets.GetRuleset(SelectedItem.Value.RulesetID)?.CreateInstance();
+            var rulesetInstance = Rulesets.GetRuleset(SelectedItem.Value.RulesetID)?.CreateInstance();
             Debug.Assert(rulesetInstance != null);
             var allowedMods = SelectedItem.Value.AllowedMods.Select(m => m.ToMod(rulesetInstance));
 
@@ -463,7 +461,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
             if (SelectedItem.Value == null || !this.IsCurrentScreen())
                 return;
 
-            var rulesetInstance = rulesets.GetRuleset(SelectedItem.Value.RulesetID)?.CreateInstance();
+            var rulesetInstance = Rulesets.GetRuleset(SelectedItem.Value.RulesetID)?.CreateInstance();
             Debug.Assert(rulesetInstance != null);
             Mods.Value = UserMods.Value.Concat(SelectedItem.Value.RequiredMods.Select(m => m.ToMod(rulesetInstance))).ToList();
         }
@@ -473,7 +471,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
             if (SelectedItem.Value == null || !this.IsCurrentScreen())
                 return;
 
-            Ruleset.Value = rulesets.GetRuleset(SelectedItem.Value.RulesetID);
+            Ruleset.Value = Rulesets.GetRuleset(SelectedItem.Value.RulesetID);
         }
 
         private void beginHandlingTrack()
@@ -509,7 +507,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
 
         private void cancelTrackLooping()
         {
-            var track = Beatmap?.Value?.Track;
+            var track = Beatmap.Value?.Track;
 
             if (track != null)
                 track.Looping = false;
@@ -530,22 +528,6 @@ namespace osu.Game.Screens.OnlinePlay.Match
         /// </summary>
         /// <param name="room">The room to change the settings of.</param>
         protected abstract RoomSettingsOverlay CreateRoomSettingsOverlay(Room room);
-
-        public partial class UserModSelectButton : PurpleRoundedButton, IKeyBindingHandler<GlobalAction>
-        {
-            public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
-            {
-                if (e.Action == GlobalAction.ToggleModSelection && !e.Repeat)
-                {
-                    TriggerClick();
-                    return true;
-                }
-
-                return false;
-            }
-
-            public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e) { }
-        }
 
         protected override void Dispose(bool isDisposing)
         {

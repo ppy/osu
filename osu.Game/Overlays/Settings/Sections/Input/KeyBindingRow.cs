@@ -465,7 +465,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             }
 
             if (HasFocus)
-                GetContainingInputManager().ChangeFocus(null);
+                GetContainingFocusManager()!.ChangeFocus(null);
 
             cancelAndClearButtons.FadeOut(300, Easing.OutQuint);
             cancelAndClearButtons.BypassAutoSizeAxes |= Axes.Y;

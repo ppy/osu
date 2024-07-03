@@ -401,6 +401,6 @@ namespace osu.Game.Rulesets
         /// <summary>
         /// Can be overridden to alter the difficulty section to the editor beatmap setup screen.
         /// </summary>
-        public virtual DifficultySection? CreateEditorDifficultySection() => null;
+        public virtual SetupSection? CreateEditorDifficultySection() => null;
     }
 }

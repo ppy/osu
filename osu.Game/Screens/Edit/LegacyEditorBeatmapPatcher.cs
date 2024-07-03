@@ -45,6 +45,7 @@ namespace osu.Game.Screens.Edit
             editorBeatmap.BeginChange();
             processHitObjects(result, () => newBeatmap ??= readBeatmap(newState));
             processTimingPoints(() => newBeatmap ??= readBeatmap(newState));
+            processBreaks(() => newBeatmap ??= readBeatmap(newState));
             processHitObjectLocalData(() => newBeatmap ??= readBeatmap(newState));
             editorBeatmap.EndChange();
         }
@@ -72,6 +73,27 @@ namespace osu.Game.Screens.Edit
                     foreach (var point in newGroup.ControlPoints)
                         editorBeatmap.ControlPointInfo.Add(newGroup.Time, point);
                 }
+            }
+        }
+
+        private void processBreaks(Func<IBeatmap> getNewBeatmap)
+        {
+            var newBreaks = getNewBeatmap().Breaks.ToArray();
+
+            foreach (var oldBreak in editorBeatmap.Breaks.ToArray())
+            {
+                if (newBreaks.Any(b => b.Equals(oldBreak)))
+                    continue;
+
+                editorBeatmap.Breaks.Remove(oldBreak);
+            }
+
+            foreach (var newBreak in newBreaks)
+            {
+                if (editorBeatmap.Breaks.Any(b => b.Equals(newBreak)))
+                    continue;
+
+                editorBeatmap.Breaks.Add(newBreak);
             }
         }
 

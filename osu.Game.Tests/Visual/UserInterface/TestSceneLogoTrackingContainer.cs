@@ -282,7 +282,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             /// <summary>
             /// Check that the logo is tracking the position of the facade, with an acceptable precision lenience.
             /// </summary>
-            public bool IsLogoTracking => Precision.AlmostEquals(Logo.Position, ComputeLogoTrackingPosition());
+            public bool IsLogoTracking => Precision.AlmostEquals(Logo!.Position, ComputeLogoTrackingPosition());
         }
     }
 }

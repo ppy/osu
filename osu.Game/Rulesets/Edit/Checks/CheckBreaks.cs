@@ -13,13 +13,7 @@ namespace osu.Game.Rulesets.Edit.Checks
     {
         // Breaks may be off by 1 ms.
         private const int leniency_threshold = 1;
-        private const double minimum_gap_before_break = 200;
 
-        // Break end time depends on the upcoming object's pre-empt time.
-        // As things stand, "pre-empt time" is only defined for osu! standard
-        // This is a generic value representing AR=10
-        // Relevant: https://github.com/ppy/osu/issues/14330#issuecomment-1002158551
-        private const double min_end_threshold = 450;
         public CheckMetadata Metadata => new CheckMetadata(CheckCategory.Events, "Breaks not achievable using the editor");
 
         public IEnumerable<IssueTemplate> PossibleTemplates => new IssueTemplate[]
@@ -31,8 +25,8 @@ namespace osu.Game.Rulesets.Edit.Checks
 
         public IEnumerable<Issue> Run(BeatmapVerifierContext context)
         {
-            var startTimes = context.Beatmap.HitObjects.Select(ho => ho.StartTime).OrderBy(x => x).ToList();
-            var endTimes = context.Beatmap.HitObjects.Select(ho => ho.GetEndTime()).OrderBy(x => x).ToList();
+            var startTimes = context.Beatmap.HitObjects.Select(ho => ho.StartTime).Order().ToList();
+            var endTimes = context.Beatmap.HitObjects.Select(ho => ho.GetEndTime()).Order().ToList();
 
             foreach (var breakPeriod in context.Beatmap.Breaks)
             {
@@ -45,8 +39,8 @@ namespace osu.Game.Rulesets.Edit.Checks
                 if (previousObjectEndTimeIndex >= 0)
                 {
                     double gapBeforeBreak = breakPeriod.StartTime - endTimes[previousObjectEndTimeIndex];
-                    if (gapBeforeBreak < minimum_gap_before_break - leniency_threshold)
-                        yield return new IssueTemplateEarlyStart(this).Create(breakPeriod.StartTime, minimum_gap_before_break - gapBeforeBreak);
+                    if (gapBeforeBreak < BreakPeriod.GAP_BEFORE_BREAK - leniency_threshold)
+                        yield return new IssueTemplateEarlyStart(this).Create(breakPeriod.StartTime, BreakPeriod.GAP_BEFORE_BREAK - gapBeforeBreak);
                 }
 
                 int nextObjectStartTimeIndex = startTimes.BinarySearch(breakPeriod.EndTime);
@@ -55,8 +49,8 @@ namespace osu.Game.Rulesets.Edit.Checks
                 if (nextObjectStartTimeIndex < startTimes.Count)
                 {
                     double gapAfterBreak = startTimes[nextObjectStartTimeIndex] - breakPeriod.EndTime;
-                    if (gapAfterBreak < min_end_threshold - leniency_threshold)
-                        yield return new IssueTemplateLateEnd(this).Create(breakPeriod.StartTime, min_end_threshold - gapAfterBreak);
+                    if (gapAfterBreak < BreakPeriod.GAP_AFTER_BREAK - leniency_threshold)
+                        yield return new IssueTemplateLateEnd(this).Create(breakPeriod.StartTime, BreakPeriod.GAP_AFTER_BREAK - gapAfterBreak);
                 }
             }
         }

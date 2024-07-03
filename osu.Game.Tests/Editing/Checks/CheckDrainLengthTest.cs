@@ -53,7 +53,7 @@ namespace osu.Game.Tests.Editing.Checks
                     new HitCircle { StartTime = 0 },
                     new HitCircle { StartTime = 40_000 }
                 },
-                Breaks = new List<BreakPeriod>
+                Breaks =
                 {
                     new BreakPeriod(10_000, 21_000)
                 }

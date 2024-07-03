@@ -29,9 +29,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
             GridLineRotation.BindValueChanged(_ => GridCache.Invalidate());
         }
 
-        private const float sqrt3 = 1.73205080757f;
-        private const float sqrt3_over2 = 0.86602540378f;
-        private const float one_over_sqrt3 = 0.57735026919f;
+        private static readonly float sqrt3 = float.Sqrt(3);
+        private static readonly float sqrt3_over2 = sqrt3 / 2;
+        private static readonly float one_over_sqrt3 = 1 / sqrt3;
 
         protected override void CreateContent()
         {

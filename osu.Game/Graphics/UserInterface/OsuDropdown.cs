@@ -186,6 +186,8 @@ namespace osu.Game.Graphics.UserInterface
                     : base(item)
                 {
                     Foreground.Padding = new MarginPadding(2);
+                    Foreground.AutoSizeAxes = Axes.Y;
+                    Foreground.RelativeSizeAxes = Axes.X;
 
                     Masking = true;
                     CornerRadius = corner_radius;
@@ -247,11 +249,12 @@ namespace osu.Game.Graphics.UserInterface
                                 Origin = Anchor.CentreLeft,
                                 Anchor = Anchor.CentreLeft,
                             },
-                            Label = new OsuSpriteText
+                            Label = new TruncatingSpriteText
                             {
-                                X = 15,
+                                Padding = new MarginPadding { Left = 15 },
                                 Origin = Anchor.CentreLeft,
                                 Anchor = Anchor.CentreLeft,
+                                RelativeSizeAxes = Axes.X,
                             },
                         };
                     }
@@ -415,16 +418,19 @@ namespace osu.Game.Graphics.UserInterface
                     FontSize = OsuFont.Default.Size,
                 };
 
-                private partial class DropdownSearchTextBox : SearchTextBox
+                private partial class DropdownSearchTextBox : OsuTextBox
                 {
-                    public override bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
+                    [BackgroundDependencyLoader]
+                    private void load(OverlayColourProvider? colourProvider)
                     {
-                        if (e.Action == GlobalAction.Back)
-                            // this method is blocking Dropdown from receiving the back action, despite this text box residing in a separate input manager.
-                            // to fix this properly, a local global action container needs to be added as well, but for simplicity, just don't handle the back action here.
-                            return false;
+                        BackgroundUnfocused = colourProvider?.Background5 ?? new Color4(10, 10, 10, 255);
+                        BackgroundFocused = colourProvider?.Background5 ?? new Color4(10, 10, 10, 255);
+                    }
 
-                        return base.OnPressed(e);
+                    protected override void OnFocus(FocusEvent e)
+                    {
+                        base.OnFocus(e);
+                        BorderThickness = 0;
                     }
                 }
             }

@@ -7,7 +7,7 @@ using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Utils;
 using osuTK;
 
@@ -32,14 +32,14 @@ namespace osu.Game.Screens.Edit.Compose.Components
         {
             var drawSize = DrawSize;
 
-            // Calculate the maximum distance from the origin to the edge of the grid.
-            float maxDist = MathF.Max(
-                MathF.Max(StartPosition.Value.Length, (StartPosition.Value - drawSize).Length),
-                MathF.Max((StartPosition.Value - new Vector2(drawSize.X, 0)).Length, (StartPosition.Value - new Vector2(0, drawSize.Y)).Length)
-            );
+            // Calculate the required number of circles based on the maximum distance from the origin to the edge of the grid.
+            float dx = Math.Max(StartPosition.Value.X, DrawWidth - StartPosition.Value.X);
+            float dy = Math.Max(StartPosition.Value.Y, DrawHeight - StartPosition.Value.Y);
+            float maxDistance = new Vector2(dx, dy).Length;
+            // We need to add one because the first circle starts at zero radius.
+            int requiredCircles = (int)(maxDistance / Spacing.Value) + 1;
 
-            generateCircles((int)(maxDist / Spacing.Value) + 1);
-
+            generateCircles(requiredCircles);
             GenerateOutline(drawSize);
         }
 
@@ -48,30 +48,22 @@ namespace osu.Game.Screens.Edit.Compose.Components
             // Make lines the same width independent of display resolution.
             float lineWidth = 2 * DrawWidth / ScreenSpaceDrawQuad.Width;
 
-            List<CircularContainer> generatedCircles = new List<CircularContainer>();
+            List<CircularProgress> generatedCircles = new List<CircularProgress>();
 
             for (int i = 0; i < count; i++)
             {
                 // Add a minimum diameter so the center circle is clearly visible.
                 float diameter = MathF.Max(lineWidth * 1.5f, i * Spacing.Value * 2);
 
-                var gridCircle = new CircularContainer
+                var gridCircle = new CircularProgress
                 {
-                    BorderColour = Colour4.White,
-                    BorderThickness = lineWidth,
-                    Alpha = 0.2f,
-                    Origin = Anchor.Centre,
-                    RelativeSizeAxes = Axes.None,
-                    Width = diameter,
-                    Height = diameter,
                     Position = StartPosition.Value,
-                    Masking = true,
-                    Child = new Box
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        AlwaysPresent = true,
-                        Alpha = 0f,
-                    }
+                    Origin = Anchor.Centre,
+                    Size = new Vector2(diameter),
+                    InnerRadius = lineWidth * 1f / diameter,
+                    Colour = Colour4.White,
+                    Alpha = 0.2f,
+                    Progress = 1,
                 };
 
                 generatedCircles.Add(gridCircle);

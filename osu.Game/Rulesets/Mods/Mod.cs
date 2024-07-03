@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
@@ -21,6 +22,7 @@ namespace osu.Game.Rulesets.Mods
     /// <summary>
     /// The base class for gameplay modifiers.
     /// </summary>
+    [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)]
     public abstract class Mod : IMod, IEquatable<Mod>, IDeepCloneable<Mod>
     {
         [JsonIgnore]
@@ -166,6 +168,12 @@ namespace osu.Game.Rulesets.Mods
         /// </summary>
         [JsonIgnore]
         public virtual bool RequiresConfiguration => false;
+
+        /// <summary>
+        /// Whether scores with this mod active can give performance points.
+        /// </summary>
+        [JsonIgnore]
+        public virtual bool Ranked => false;
 
         /// <summary>
         /// The mods this mod cannot be enabled with.

@@ -85,6 +85,7 @@ namespace osu.Game.Storyboards.Drawables
             Sprite = sprite;
             Origin = sprite.Origin;
             Position = sprite.InitialPosition;
+            Name = sprite.Path;
 
             LifetimeStart = sprite.StartTime;
             LifetimeEnd = sprite.EndTimeForDisplay;

@@ -50,11 +50,7 @@ namespace osu.Game.Skinning
 
             // legacy judgements don't play any transforms if they are an animation.... UNLESS they are the temporary displayed judgement from new piece.
             if (animation?.FrameCount > 1 && !forceTransforms)
-            {
-                if (isMissedTick())
-                    applyMissedTickScaling();
                 return;
-            }
 
             if (result.IsMiss())
             {
@@ -63,14 +59,10 @@ namespace osu.Game.Skinning
                 // missed ticks / slider end don't get the normal animation.
                 if (isMissedTick())
                 {
-                    this.ScaleTo(1.6f);
-                    this.ScaleTo(1, 100, Easing.In);
+                    this.ScaleTo(1.2f);
+                    this.ScaleTo(1f, 100, Easing.In);
 
-                    if (legacyVersion > 1.0m)
-                    {
-                        this.MoveTo(new Vector2(0, -2f));
-                        this.MoveToOffset(new Vector2(0, 10), fade_out_delay + fade_out_length, Easing.In);
-                    }
+                    this.Delay(fade_out_delay / 2).FadeOut(fade_out_length);
                 }
                 else
                 {
@@ -105,12 +97,6 @@ namespace osu.Game.Skinning
         }
 
         private bool isMissedTick() => result.IsMiss() && result != HitResult.Miss;
-
-        private void applyMissedTickScaling()
-        {
-            this.ScaleTo(0.6f);
-            this.ScaleTo(0.3f, 100, Easing.In);
-        }
 
         public Drawable GetAboveHitObjectsProxiedContent() => CreateProxy();
     }

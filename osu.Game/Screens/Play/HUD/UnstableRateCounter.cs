@@ -23,7 +23,7 @@ namespace osu.Game.Screens.Play.HUD
     {
         public bool UsesFixedAnchor { get; set; }
 
-        protected override double RollingDuration => 750;
+        protected override double RollingDuration => 375;
 
         private const float alpha_when_invalid = 0.3f;
         private readonly Bindable<bool> valid = new Bindable<bool>();
