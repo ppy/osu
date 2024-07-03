@@ -84,6 +84,8 @@ namespace osu.Game.Tests.Visual.Editing
 
                 targetContainer = getTargetContainer();
                 initialRotation = targetContainer!.Rotation;
+
+                base.Begin();
             }
 
             public override void Update(float rotation, Vector2? origin = null)
@@ -102,6 +104,8 @@ namespace osu.Game.Tests.Visual.Editing
 
                 targetContainer = null;
                 initialRotation = null;
+
+                base.Commit();
             }
         }
 

@@ -8,12 +8,16 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics;
 using osu.Game.Input.Bindings;
+using osu.Game.Overlays;
 using osu.Game.Screens.Footer;
 
 namespace osu.Game.Screens.SelectV2.Footer
 {
     public partial class ScreenFooterButtonOptions : ScreenFooterButton, IHasPopover
     {
+        [Resolved]
+        private OverlayColourProvider colourProvider { get; set; } = null!;
+
         [BackgroundDependencyLoader]
         private void load(OsuColour colour)
         {
@@ -25,6 +29,6 @@ namespace osu.Game.Screens.SelectV2.Footer
             Action = this.ShowPopover;
         }
 
-        public Popover GetPopover() => new BeatmapOptionsPopover(this);
+        public Popover GetPopover() => new BeatmapOptionsPopover(this, colourProvider);
     }
 }

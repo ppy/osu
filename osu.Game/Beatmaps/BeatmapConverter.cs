@@ -49,6 +49,9 @@ namespace osu.Game.Beatmaps
             original.BeatmapInfo = original.BeatmapInfo.Clone();
             original.ControlPointInfo = original.ControlPointInfo.DeepClone();
 
+            // Used in osu!mania conversion.
+            original.Breaks = original.Breaks.ToList();
+
             return ConvertBeatmap(original, cancellationToken);
         }
 
