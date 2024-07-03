@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -32,12 +30,12 @@ namespace osu.Game.Rulesets.UI
 
         public readonly KeyBindingContainer<T> KeyBindingContainer;
 
-        [Resolved(CanBeNull = true)]
-        private ScoreProcessor scoreProcessor { get; set; }
+        [Resolved]
+        private ScoreProcessor? scoreProcessor { get; set; }
 
-        private ReplayRecorder recorder;
+        private ReplayRecorder? recorder;
 
-        public ReplayRecorder Recorder
+        public ReplayRecorder? Recorder
         {
             set
             {
@@ -103,9 +101,9 @@ namespace osu.Game.Rulesets.UI
 
         #region IHasReplayHandler
 
-        private ReplayInputHandler replayInputHandler;
+        private ReplayInputHandler? replayInputHandler;
 
-        public ReplayInputHandler ReplayInputHandler
+        public ReplayInputHandler? ReplayInputHandler
         {
             get => replayInputHandler;
             set
@@ -124,8 +122,8 @@ namespace osu.Game.Rulesets.UI
 
         #region Setting application (disables etc.)
 
-        private Bindable<bool> mouseDisabled;
-        private Bindable<bool> tapsDisabled;
+        private Bindable<bool> mouseDisabled = null!;
+        private Bindable<bool> tapsDisabled = null!;
 
         protected override bool Handle(UIEvent e)
         {
@@ -227,9 +225,9 @@ namespace osu.Game.Rulesets.UI
     public class RulesetInputManagerInputState<T> : InputState
         where T : struct
     {
-        public ReplayState<T> LastReplayState;
+        public ReplayState<T>? LastReplayState;
 
-        public RulesetInputManagerInputState(InputState state = null)
+        public RulesetInputManagerInputState(InputState state)
             : base(state)
         {
         }
