@@ -10,7 +10,6 @@ using System.Text.RegularExpressions;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Caching;
-using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
@@ -50,6 +49,8 @@ namespace osu.Game.Rulesets.Osu.Edit
         };
 
         private readonly Bindable<TernaryState> rectangularGridSnapToggle = new Bindable<TernaryState>();
+
+        protected override Drawable CreateHitObjectInspector() => new OsuHitObjectInspector();
 
         protected override IEnumerable<TernaryButton> CreateTernaryButtons()
             => base.CreateTernaryButtons()
@@ -101,7 +102,7 @@ namespace osu.Game.Rulesets.Osu.Edit
 
             updatePositionSnapGrid();
 
-            RightToolbox.AddRange(new EditorToolboxGroup[]
+            RightToolbox.AddRange(new Drawable[]
                 {
                     OsuGridToolboxGroup,
                     new TransformToolboxGroup
@@ -192,7 +193,7 @@ namespace osu.Game.Rulesets.Osu.Edit
 
         public override SnapResult FindSnappedPositionAndTime(Vector2 screenSpacePosition, SnapType snapType = SnapType.All)
         {
-            if (snapType.HasFlagFast(SnapType.NearbyObjects) && snapToVisibleBlueprints(screenSpacePosition, out var snapResult))
+            if (snapType.HasFlag(SnapType.NearbyObjects) && snapToVisibleBlueprints(screenSpacePosition, out var snapResult))
             {
                 // In the case of snapping to nearby objects, a time value is not provided.
                 // This matches the stable editor (which also uses current time), but with the introduction of time-snapping distance snap
@@ -202,7 +203,7 @@ namespace osu.Game.Rulesets.Osu.Edit
                 // We want to ensure that in this particular case, the time-snapping component of distance snap is still applied.
                 // The easiest way to ensure this is to attempt application of distance snap after a nearby object is found, and copy over
                 // the time value if the proposed positions are roughly the same.
-                if (snapType.HasFlagFast(SnapType.RelativeGrids) && DistanceSnapProvider.DistanceSnapToggle.Value == TernaryState.True && distanceSnapGrid != null)
+                if (snapType.HasFlag(SnapType.RelativeGrids) && DistanceSnapProvider.DistanceSnapToggle.Value == TernaryState.True && distanceSnapGrid != null)
                 {
                     (Vector2 distanceSnappedPosition, double distanceSnappedTime) = distanceSnapGrid.GetSnappedPosition(distanceSnapGrid.ToLocalSpace(snapResult.ScreenSpacePosition));
                     if (Precision.AlmostEquals(distanceSnapGrid.ToScreenSpace(distanceSnappedPosition), snapResult.ScreenSpacePosition, 1))
@@ -214,7 +215,7 @@ namespace osu.Game.Rulesets.Osu.Edit
 
             SnapResult result = base.FindSnappedPositionAndTime(screenSpacePosition, snapType);
 
-            if (snapType.HasFlagFast(SnapType.RelativeGrids))
+            if (snapType.HasFlag(SnapType.RelativeGrids))
             {
                 if (DistanceSnapProvider.DistanceSnapToggle.Value == TernaryState.True && distanceSnapGrid != null)
                 {
@@ -225,7 +226,7 @@ namespace osu.Game.Rulesets.Osu.Edit
                 }
             }
 
-            if (snapType.HasFlagFast(SnapType.GlobalGrids))
+            if (snapType.HasFlag(SnapType.GlobalGrids))
             {
                 if (rectangularGridSnapToggle.Value == TernaryState.True)
                 {

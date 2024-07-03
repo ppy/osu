@@ -4,7 +4,6 @@
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -298,13 +297,13 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// </remarks>
         public void PerformFlipFromScaleHandles(Axes axes)
         {
-            if (axes.HasFlagFast(Axes.X))
+            if (axes.HasFlag(Axes.X))
             {
                 dragHandles.FlipScaleHandles(Direction.Horizontal);
                 OnFlip?.Invoke(Direction.Horizontal, false);
             }
 
-            if (axes.HasFlagFast(Axes.Y))
+            if (axes.HasFlag(Axes.Y))
             {
                 dragHandles.FlipScaleHandles(Direction.Vertical);
                 OnFlip?.Invoke(Direction.Vertical, false);

@@ -6,7 +6,9 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Skinning.Default;
 
@@ -22,6 +24,8 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override bool Ranked => true;
 
         public override Type[] IncompatibleMods => new[] { typeof(IHidesApproachCircles), typeof(OsuModDepth) };
+
+        protected override bool IsFirstAdjustableObject(HitObject hitObject) => !(hitObject is Spinner || hitObject is SpinnerTick);
 
         protected override void ApplyIncreasedVisibilityState(DrawableHitObject hitObject, ArmedState state)
         {

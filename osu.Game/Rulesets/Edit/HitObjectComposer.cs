@@ -10,7 +10,6 @@ using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -207,7 +206,7 @@ namespace osu.Game.Rulesets.Edit
                         {
                             Child = new EditorToolboxGroup("inspector")
                             {
-                                Child = new HitObjectInspector()
+                                Child = CreateHitObjectInspector()
                             },
                         }
                     }
@@ -328,6 +327,8 @@ namespace osu.Game.Rulesets.Edit
         /// Construct a relevant blueprint container. This will manage hitobject selection/placement input handling and display logic.
         /// </summary>
         protected virtual ComposeBlueprintContainer CreateBlueprintContainer() => new ComposeBlueprintContainer(this);
+
+        protected virtual Drawable CreateHitObjectInspector() => new HitObjectInspector();
 
         /// <summary>
         /// Construct a drawable ruleset for the provided ruleset.
@@ -503,7 +504,7 @@ namespace osu.Game.Rulesets.Edit
             var playfield = PlayfieldAtScreenSpacePosition(screenSpacePosition);
             double? targetTime = null;
 
-            if (snapType.HasFlagFast(SnapType.GlobalGrids))
+            if (snapType.HasFlag(SnapType.GlobalGrids))
             {
                 if (playfield is ScrollingPlayfield scrollingPlayfield)
                 {
