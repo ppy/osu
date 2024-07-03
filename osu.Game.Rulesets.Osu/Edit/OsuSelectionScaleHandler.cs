@@ -194,7 +194,7 @@ namespace osu.Game.Rulesets.Osu.Edit
 
         /// <summary>
         /// Clamp scale for multi-object-scaling where selection does not exceed playfield bounds or flip.
-        /// </summary
+        /// </summary>
         /// <param name="origin">The origin from which the scale operation is performed</param>
         /// <param name="scale">The scale to be clamped</param>
         /// <param name="adjustAxis">The axes to adjust the scale in.</param>
