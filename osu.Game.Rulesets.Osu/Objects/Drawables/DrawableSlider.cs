@@ -370,5 +370,23 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private partial class DefaultSliderBody : PlaySliderBody
         {
         }
+
+        #region FOR EDITOR USE ONLY, DO NOT USE FOR ANY OTHER PURPOSE
+
+        internal void SuppressHitAnimations()
+        {
+            UpdateState(ArmedState.Idle);
+            HeadCircle.SuppressHitAnimations();
+            TailCircle.SuppressHitAnimations();
+        }
+
+        internal void RestoreHitAnimations()
+        {
+            UpdateState(ArmedState.Hit);
+            HeadCircle.RestoreHitAnimations();
+            TailCircle.RestoreHitAnimations();
+        }
+
+        #endregion
     }
 }

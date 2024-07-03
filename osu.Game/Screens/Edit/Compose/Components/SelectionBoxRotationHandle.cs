@@ -4,7 +4,6 @@
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Sprites;
@@ -46,8 +45,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 Icon = FontAwesome.Solid.Redo,
                 Scale = new Vector2
                 {
-                    X = Anchor.HasFlagFast(Anchor.x0) ? 1f : -1f,
-                    Y = Anchor.HasFlagFast(Anchor.y0) ? 1f : -1f
+                    X = Anchor.HasFlag(Anchor.x0) ? 1f : -1f,
+                    Y = Anchor.HasFlag(Anchor.y0) ? 1f : -1f
                 }
             });
         }
@@ -66,6 +65,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 return false;
 
             if (rotationHandler == null) return false;
+
+            if (rotationHandler.OperationInProgress.Value)
+                return false;
 
             rotationHandler.Begin();
             return true;

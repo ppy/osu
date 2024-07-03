@@ -50,6 +50,12 @@ namespace osu.Game.Beatmaps.ControlPoints
             set => KiaiModeBindable.Value = value;
         }
 
+        public EffectControlPoint()
+        {
+            KiaiModeBindable.BindValueChanged(_ => RaiseChanged());
+            ScrollSpeedBindable.BindValueChanged(_ => RaiseChanged());
+        }
+
         public override bool IsRedundant(ControlPoint? existing)
             => existing is EffectControlPoint existingEffect
                && KiaiMode == existingEffect.KiaiMode
