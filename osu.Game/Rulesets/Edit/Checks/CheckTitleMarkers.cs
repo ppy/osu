@@ -37,15 +37,11 @@ namespace osu.Game.Rulesets.Edit.Checks
             {
                 bool hasRomanisedTitle = unicodeTitle != romanisedTitle;
 
-                if (check.AnyRegex.IsMatch(romanisedTitle) && !check.ExactRegex.IsMatch(romanisedTitle))
-                {
-                    yield return new IssueTemplateIncorrectMarker(this).Create(hasRomanisedTitle ? "Romanised title" : "Title", check.CorrectMarkerFormat);
-                }
-
-                if (hasRomanisedTitle && check.AnyRegex.IsMatch(unicodeTitle) && !check.ExactRegex.IsMatch(unicodeTitle))
-                {
+                if (check.AnyRegex.IsMatch(unicodeTitle) && !check.ExactRegex.IsMatch(unicodeTitle))
                     yield return new IssueTemplateIncorrectMarker(this).Create("Title", check.CorrectMarkerFormat);
-                }
+
+                if (hasRomanisedTitle && check.AnyRegex.IsMatch(romanisedTitle) && !check.ExactRegex.IsMatch(romanisedTitle))
+                    yield return new IssueTemplateIncorrectMarker(this).Create("Romanised title", check.CorrectMarkerFormat);
             }
         }
 
