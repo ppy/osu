@@ -86,7 +86,7 @@ namespace osu.Game.Rulesets.Osu.Edit
             defaultOrigin = OriginalSurroundingQuad.Value.Centre;
         }
 
-        public override void Update(Vector2 scale, Vector2? origin = null, Axes adjustAxis = Axes.Both)
+        public override void Update(Vector2 scale, Vector2? origin = null, Axes adjustAxis = Axes.Both, float axisRotation = 0)
         {
             if (!OperationInProgress.Value)
                 throw new InvalidOperationException($"Cannot {nameof(Update)} a scale operation without calling {nameof(Begin)} first!");
@@ -94,6 +94,7 @@ namespace osu.Game.Rulesets.Osu.Edit
             Debug.Assert(objectsInScale != null && defaultOrigin != null && OriginalSurroundingQuad != null);
 
             Vector2 actualOrigin = origin ?? defaultOrigin.Value;
+            scale = clampScaleToAdjustAxis(scale, adjustAxis);
 
             // for the time being, allow resizing of slider paths only if the slider is
             // the only hit object selected. with a group selection, it's likely the user
@@ -102,15 +103,15 @@ namespace osu.Game.Rulesets.Osu.Edit
             {
                 var originalInfo = objectsInScale[slider];
                 Debug.Assert(originalInfo.PathControlPointPositions != null && originalInfo.PathControlPointTypes != null);
-                scaleSlider(slider, scale, originalInfo.PathControlPointPositions, originalInfo.PathControlPointTypes);
+                scaleSlider(slider, scale, originalInfo.PathControlPointPositions, originalInfo.PathControlPointTypes, axisRotation);
             }
             else
             {
-                scale = ClampScaleToPlayfieldBounds(scale, actualOrigin);
+                scale = ClampScaleToPlayfieldBounds(scale, actualOrigin, adjustAxis, axisRotation);
 
                 foreach (var (ho, originalState) in objectsInScale)
                 {
-                    ho.Position = GeometryUtils.GetScaledPosition(scale, actualOrigin, originalState.Position);
+                    ho.Position = GeometryUtils.GetScaledPosition(scale, actualOrigin, originalState.Position, axisRotation);
                 }
             }
 
@@ -134,14 +135,34 @@ namespace osu.Game.Rulesets.Osu.Edit
         private IEnumerable<OsuHitObject> selectedMovableObjects => selectedItems.Cast<OsuHitObject>()
                                                                                  .Where(h => h is not Spinner);
 
-        private void scaleSlider(Slider slider, Vector2 scale, Vector2[] originalPathPositions, PathType?[] originalPathTypes)
+        private Vector2 clampScaleToAdjustAxis(Vector2 scale, Axes adjustAxis)
+        {
+            switch (adjustAxis)
+            {
+                case Axes.Y:
+                    scale.X = 1;
+                    break;
+
+                case Axes.X:
+                    scale.Y = 1;
+                    break;
+
+                case Axes.None:
+                    scale = Vector2.One;
+                    break;
+            }
+
+            return scale;
+        }
+
+        private void scaleSlider(Slider slider, Vector2 scale, Vector2[] originalPathPositions, PathType?[] originalPathTypes, float axisRotation = 0)
         {
             scale = Vector2.ComponentMax(scale, new Vector2(Precision.FLOAT_EPSILON));
 
             // Maintain the path types in case they were defaulted to bezier at some point during scaling
             for (int i = 0; i < slider.Path.ControlPoints.Count; i++)
             {
-                slider.Path.ControlPoints[i].Position = originalPathPositions[i] * scale;
+                slider.Path.ControlPoints[i].Position = GeometryUtils.GetScaledPosition(scale, Vector2.Zero, originalPathPositions[i], axisRotation);
                 slider.Path.ControlPoints[i].Type = originalPathTypes[i];
             }
 
@@ -176,11 +197,13 @@ namespace osu.Game.Rulesets.Osu.Edit
         /// </summary>
         /// <param name="origin">The origin from which the scale operation is performed</param>
         /// <param name="scale">The scale to be clamped</param>
+        /// <param name="adjustAxis">The axes to adjust the scale in.</param>
+        /// <param name="axisRotation">The rotation of the axes in degrees</param>
         /// <returns>The clamped scale vector</returns>
-        public Vector2 ClampScaleToPlayfieldBounds(Vector2 scale, Vector2? origin = null)
+        public Vector2 ClampScaleToPlayfieldBounds(Vector2 scale, Vector2? origin = null, Axes adjustAxis = Axes.Both, float axisRotation = 0)
         {
             //todo: this is not always correct for selections involving sliders. This approximation assumes each point is scaled independently, but sliderends move with the sliderhead.
-            if (objectsInScale == null)
+            if (objectsInScale == null || adjustAxis == Axes.None)
                 return scale;
 
             Debug.Assert(defaultOrigin != null && OriginalSurroundingQuad != null);
@@ -188,24 +211,63 @@ namespace osu.Game.Rulesets.Osu.Edit
             if (objectsInScale.Count == 1 && objectsInScale.First().Key is Slider slider)
                 origin = slider.Position;
 
+            scale = clampScaleToAdjustAxis(scale, adjustAxis);
             Vector2 actualOrigin = origin ?? defaultOrigin.Value;
             var selectionQuad = OriginalSurroundingQuad.Value;
 
-            var tl1 = Vector2.Divide(-actualOrigin, selectionQuad.TopLeft - actualOrigin);
-            var tl2 = Vector2.Divide(OsuPlayfield.BASE_SIZE - actualOrigin, selectionQuad.TopLeft - actualOrigin);
-            var br1 = Vector2.Divide(-actualOrigin, selectionQuad.BottomRight - actualOrigin);
-            var br2 = Vector2.Divide(OsuPlayfield.BASE_SIZE - actualOrigin, selectionQuad.BottomRight - actualOrigin);
-
-            if (!Precision.AlmostEquals(selectionQuad.TopLeft.X - actualOrigin.X, 0))
-                scale.X = selectionQuad.TopLeft.X - actualOrigin.X < 0 ? MathHelper.Clamp(scale.X, tl2.X, tl1.X) : MathHelper.Clamp(scale.X, tl1.X, tl2.X);
-            if (!Precision.AlmostEquals(selectionQuad.TopLeft.Y - actualOrigin.Y, 0))
-                scale.Y = selectionQuad.TopLeft.Y - actualOrigin.Y < 0 ? MathHelper.Clamp(scale.Y, tl2.Y, tl1.Y) : MathHelper.Clamp(scale.Y, tl1.Y, tl2.Y);
-            if (!Precision.AlmostEquals(selectionQuad.BottomRight.X - actualOrigin.X, 0))
-                scale.X = selectionQuad.BottomRight.X - actualOrigin.X < 0 ? MathHelper.Clamp(scale.X, br2.X, br1.X) : MathHelper.Clamp(scale.X, br1.X, br2.X);
-            if (!Precision.AlmostEquals(selectionQuad.BottomRight.Y - actualOrigin.Y, 0))
-                scale.Y = selectionQuad.BottomRight.Y - actualOrigin.Y < 0 ? MathHelper.Clamp(scale.Y, br2.Y, br1.Y) : MathHelper.Clamp(scale.Y, br1.Y, br2.Y);
+            scale = clampToBound(scale, selectionQuad.BottomRight, OsuPlayfield.BASE_SIZE.X, Axes.X);
+            scale = clampToBound(scale, selectionQuad.BottomRight, OsuPlayfield.BASE_SIZE.Y, Axes.Y);
+            scale = clampToBound(scale, selectionQuad.TopLeft, 0, Axes.X);
+            scale = clampToBound(scale, selectionQuad.TopLeft, 0, Axes.Y);
 
             return Vector2.ComponentMax(scale, new Vector2(Precision.FLOAT_EPSILON));
+
+            Vector2 clampToBound(Vector2 s, Vector2 p, float bound, Axes axis)
+            {
+                float px = p.X - actualOrigin.X;
+                float py = p.Y - actualOrigin.Y;
+                float c = axis == Axes.X ? bound - actualOrigin.X : bound - actualOrigin.Y;
+                float cos = MathF.Cos(float.DegreesToRadians(-axisRotation));
+                float sin = MathF.Sin(float.DegreesToRadians(-axisRotation));
+                float a, b;
+
+                if (axis == Axes.X)
+                {
+                    a = cos * cos * px - sin * cos * py;
+                    b = sin * sin * px + sin * cos * py;
+                }
+                else
+                {
+                    a = -sin * cos * px + sin * sin * py;
+                    b = sin * cos * px + cos * cos * py;
+                }
+
+                switch (adjustAxis)
+                {
+                    case Axes.X:
+                        if (Precision.AlmostEquals(a, 0) || (c - b) / a < 0)
+                            break;
+
+                        s.X = MathF.Min(scale.X, (c - b) / a);
+                        break;
+
+                    case Axes.Y:
+                        if (Precision.AlmostEquals(b, 0) || (c - a) / b < 0)
+                            break;
+
+                        s.Y = MathF.Min(scale.Y, (c - a) / b);
+                        break;
+
+                    case Axes.Both:
+                        if (Precision.AlmostEquals(a + b, 0) || c / (a * s.X + b * s.Y) < 0)
+                            break;
+
+                        s = Vector2.ComponentMin(s, s * c / (a * s.X + b * s.Y));
+                        break;
+                }
+
+                return s;
+            }
         }
 
         private void moveSelectionInBounds()
