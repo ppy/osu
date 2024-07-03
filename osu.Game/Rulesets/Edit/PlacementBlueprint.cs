@@ -158,10 +158,16 @@ namespace osu.Game.Rulesets.Edit
 
             if (AutomaticBankAssignment)
             {
-                // Take the hitnormal sample of the last hit object
-                var lastHitNormal = getPreviousHitObject()?.Samples?.FirstOrDefault(o => o.Name == HitSampleInfo.HIT_NORMAL);
-                if (lastHitNormal != null)
-                    HitObject.Samples[0] = lastHitNormal;
+                // Create samples based on the sample settings of the previous hit object
+                var lastHitObject = getPreviousHitObject();
+
+                if (lastHitObject != null)
+                {
+                    for (int i = 0; i < HitObject.Samples.Count; i++)
+                    {
+                        HitObject.Samples[i] = lastHitObject.CreateHitSampleInfo(HitObject.Samples[i].Name);
+                    }
+                }
             }
         }
 
