@@ -15,6 +15,7 @@ using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Objects;
+using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Screens.Edit.Compose.Components;
 using osu.Game.Utils;
 using osuTK;
@@ -118,6 +119,9 @@ namespace osu.Game.Rulesets.Osu.Edit
             foreach (var h in hitObjects)
             {
                 var flippedPosition = GeometryUtils.GetFlippedPosition(flipAxis, flipQuad, h.Position);
+
+                // Clamp the flipped position inside the playfield bounds, because the flipped position might be outside the playfield bounds if the origin is not centered.
+                flippedPosition = Vector2.Clamp(flippedPosition, Vector2.Zero, OsuPlayfield.BASE_SIZE);
 
                 if (!Precision.AlmostEquals(flippedPosition, h.Position))
                 {
