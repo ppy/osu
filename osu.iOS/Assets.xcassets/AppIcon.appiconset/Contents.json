@@ -1,1 +1,14 @@
-{"images":[{"size":"20x20","idiom":"iphone","filename":"iPhoneNotification2x.png","scale":"2x"},{"size":"20x20","idiom":"iphone","filename":"iPhoneNotification3x.png","scale":"3x"},{"size":"29x29","idiom":"iphone","filename":"iPhoneSettings2x.png","scale":"2x"},{"size":"29x29","idiom":"iphone","filename":"iPhoneSettings3x.png","scale":"3x"},{"size":"40x40","idiom":"iphone","filename":"iPhoneSpotlight2x.png","scale":"2x"},{"size":"40x40","idiom":"iphone","filename":"iPhoneSpotlight3x.png","scale":"3x"},{"size":"60x60","idiom":"iphone","filename":"iPhoneApp2x.png","scale":"2x"},{"size":"60x60","idiom":"iphone","filename":"iPhoneApp3x.png","scale":"3x"},{"size":"20x20","idiom":"ipad","filename":"iPadNotification1x.png","scale":"1x"},{"size":"20x20","idiom":"ipad","filename":"iPadNotification2x.png","scale":"2x"},{"size":"29x29","idiom":"ipad","filename":"iPadSettings1x.png","scale":"1x"},{"size":"29x29","idiom":"ipad","filename":"iPadSettings2x.png","scale":"2x"},{"size":"40x40","idiom":"ipad","filename":"iPadSpotlight1x.png","scale":"1x"},{"size":"40x40","idiom":"ipad","filename":"iPadSpotlight2x.png","scale":"2x"},{"size":"76x76","idiom":"ipad","filename":"iPadApp1x.png","scale":"1x"},{"size":"76x76","idiom":"ipad","filename":"iPadApp2x.png","scale":"2x"},{"size":"83.5x83.5","idiom":"ipad","filename":"iPadProApp2x.png","scale":"2x"},{"size":"1024x1024","idiom":"ios-marketing","filename":"iOSAppStore.png","scale":"1x"}],"info":{"version":1,"author":"xcode"}}
+{
+  "images" : [
+    {
+      "filename" : "300076680-5cbe0121-ed68-414f-9ddc-dd993ac97e62.png",
+      "idiom" : "universal",
+      "platform" : "ios",
+      "size" : "1024x1024"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}

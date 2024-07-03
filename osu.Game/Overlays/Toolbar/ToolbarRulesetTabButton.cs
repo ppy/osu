@@ -2,9 +2,10 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
@@ -17,6 +18,8 @@ namespace osu.Game.Overlays.Toolbar
     public partial class ToolbarRulesetTabButton : TabItem<RulesetInfo>
     {
         private readonly RulesetButton ruleset;
+
+        private Sample? selectSample;
 
         public ToolbarRulesetTabButton(RulesetInfo value)
             : base(value)
@@ -35,9 +38,17 @@ namespace osu.Game.Overlays.Toolbar
             ruleset.SetIcon(rInstance.CreateIcon());
         }
 
+        [BackgroundDependencyLoader]
+        private void load(AudioManager audio)
+        {
+            selectSample = audio.Samples.Get($@"UI/ruleset-select-{Value.ShortName}");
+        }
+
         protected override void OnActivated() => ruleset.Active = true;
 
         protected override void OnDeactivated() => ruleset.Active = false;
+
+        protected override void OnActivatedByUser() => selectSample?.Play();
 
         private partial class RulesetButton : ToolbarButton
         {
@@ -48,7 +59,7 @@ namespace osu.Game.Overlays.Toolbar
 
             public RulesetButton()
             {
-                Padding = new MarginPadding(3)
+                ButtonContent.Padding = new MarginPadding(PADDING)
                 {
                     Bottom = 5
                 };
@@ -58,15 +69,7 @@ namespace osu.Game.Overlays.Toolbar
             {
                 set => Scheduler.AddOnce(() =>
                 {
-                    if (value)
-                    {
-                        IconContainer.Colour = Color4Extensions.FromHex("#00FFAA");
-                    }
-                    else
-                    {
-                        IconContainer.Colour = colours.GrayF;
-                        IconContainer.EdgeEffect = new EdgeEffectParameters();
-                    }
+                    IconContainer.Colour = value ? Color4Extensions.FromHex("#00FFAA") : colours.GrayF;
                 });
             }
 

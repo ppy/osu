@@ -78,7 +78,7 @@ namespace osu.Game.Overlays
             this.FadeIn(transition_time, Easing.OutQuint);
             FadeEdgeEffectTo(WaveContainer.SHADOW_OPACITY, WaveContainer.APPEAR_DURATION, Easing.Out);
 
-            ScheduleAfterChildren(() => GetContainingInputManager().ChangeFocus(panel));
+            ScheduleAfterChildren(() => GetContainingFocusManager()!.ChangeFocus(panel));
         }
 
         protected override void PopOut()

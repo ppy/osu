@@ -32,8 +32,10 @@ namespace osu.Game.Screens.Edit.Components
         private readonly BindableNumber<double> freqAdjust = new BindableDouble(1);
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OverlayColourProvider colourProvider)
         {
+            Background.Colour = colourProvider.Background4;
+
             Children = new Drawable[]
             {
                 playButton = new IconButton
@@ -97,11 +99,14 @@ namespace osu.Game.Screens.Edit.Components
                 editorClock.Start();
         }
 
+        private static readonly IconUsage play_icon = FontAwesome.Regular.PlayCircle;
+        private static readonly IconUsage pause_icon = FontAwesome.Regular.PauseCircle;
+
         protected override void Update()
         {
             base.Update();
 
-            playButton.Icon = editorClock.IsRunning ? FontAwesome.Regular.PauseCircle : FontAwesome.Regular.PlayCircle;
+            playButton.Icon = editorClock.IsRunning ? pause_icon : play_icon;
         }
 
         private partial class PlaybackTabControl : OsuTabControl<double>

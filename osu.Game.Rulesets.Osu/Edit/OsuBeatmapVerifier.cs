@@ -21,6 +21,9 @@ namespace osu.Game.Rulesets.Osu.Edit
             new CheckTimeDistanceEquality(),
             new CheckLowDiffOverlaps(),
             new CheckTooShortSliders(),
+
+            // Settings
+            new CheckOsuAbnormalDifficultySettings(),
         };
 
         public IEnumerable<Issue> Run(BeatmapVerifierContext context)

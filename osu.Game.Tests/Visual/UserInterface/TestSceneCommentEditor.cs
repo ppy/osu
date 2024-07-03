@@ -125,7 +125,11 @@ namespace osu.Game.Tests.Visual.UserInterface
             assertLoggedOutState();
 
             // moving from logged out -> logged in
-            AddStep("log back in", () => dummyAPI.Login("username", "password"));
+            AddStep("log back in", () =>
+            {
+                dummyAPI.Login("username", "password");
+                dummyAPI.AuthenticateSecondFactor("abcdefgh");
+            });
             assertLoggedInState();
         }
 

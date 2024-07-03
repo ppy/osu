@@ -10,7 +10,6 @@ using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Caching;
-using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Pooling;
@@ -96,18 +95,19 @@ namespace osu.Game.Screens.Select
         /// <summary>
         /// Extend the range to retain already loaded pooled drawables.
         /// </summary>
-        private const float distance_offscreen_before_unload = 1024;
+        private const float distance_offscreen_before_unload = 2048;
 
         /// <summary>
         /// Extend the range to update positions / retrieve pooled drawables outside of visible range.
         /// </summary>
-        private const float distance_offscreen_to_preload = 512; // todo: adjust this appropriately once we can make set panel contents load while off-screen.
+        private const float distance_offscreen_to_preload = 768;
 
         /// <summary>
         /// Whether carousel items have completed asynchronously loaded.
         /// </summary>
         public bool BeatmapSetsLoaded { get; private set; }
 
+        [Cached]
         protected readonly CarouselScrollContainer Scroll;
 
         private readonly NoResultsPlaceholder noResultsPlaceholder;
@@ -214,6 +214,12 @@ namespace osu.Game.Screens.Select
             InternalChild = new OsuContextMenuContainer
             {
                 RelativeSizeAxes = Axes.Both,
+                Padding = new MarginPadding
+                {
+                    // Avoid clash between scrollbar and osu! logo.
+                    Top = 10,
+                    Bottom = 100,
+                },
                 Children = new Drawable[]
                 {
                     setPool,
@@ -821,7 +827,7 @@ namespace osu.Game.Screens.Select
         protected override bool OnInvalidate(Invalidation invalidation, InvalidationSource source)
         {
             // handles the vertical size of the carousel changing (ie. on window resize when aspect ratio has changed).
-            if (invalidation.HasFlagFast(Invalidation.DrawSize))
+            if (invalidation.HasFlag(Invalidation.DrawSize))
                 itemsCache.Invalidate();
 
             return base.OnInvalidate(invalidation, source);
@@ -867,7 +873,7 @@ namespace osu.Game.Screens.Select
                 {
                     var toDisplay = visibleItems.GetRange(displayedRange.first, displayedRange.last - displayedRange.first + 1);
 
-                    foreach (var panel in Scroll.Children)
+                    foreach (var panel in Scroll)
                     {
                         Debug.Assert(panel.Item != null);
 
@@ -888,7 +894,6 @@ namespace osu.Game.Screens.Select
                     {
                         var panel = setPool.Get(p => p.Item = item);
 
-                        panel.Depth = item.CarouselYPosition;
                         panel.Y = item.CarouselYPosition;
 
                         Scroll.Add(panel);
@@ -898,7 +903,7 @@ namespace osu.Game.Screens.Select
 
             // Update externally controlled state of currently visible items (e.g. x-offset and opacity).
             // This is a per-frame update on all drawable panels.
-            foreach (DrawableCarouselItem item in Scroll.Children)
+            foreach (DrawableCarouselItem item in Scroll)
             {
                 updateItem(item);
 
@@ -907,6 +912,8 @@ namespace osu.Game.Screens.Select
                 if (item.Item.Visible)
                 {
                     bool isSelected = item.Item.State.Value == CarouselItemState.Selected;
+
+                    bool hasPassedSelection = item.Item.CarouselYPosition < selectedBeatmapSet?.CarouselYPosition;
 
                     // Cheap way of doing animations when entering / exiting song select.
                     const double half_time = 50;
@@ -922,6 +929,8 @@ namespace osu.Game.Screens.Select
                         item.Alpha = (float)Interpolation.DampContinuously(item.Alpha, 0, half_time, Clock.ElapsedFrameTime);
                         item.X = (float)Interpolation.DampContinuously(item.X, panel_x_offset_when_inactive, half_time, Clock.ElapsedFrameTime);
                     }
+
+                    Scroll.ChangeChildDepth(item, hasPassedSelection ? -item.Item.CarouselYPosition : item.Item.CarouselYPosition);
                 }
 
                 if (item is DrawableCarouselBeatmapSet set)
@@ -993,8 +1002,6 @@ namespace osu.Game.Screens.Select
             return set;
         }
 
-        private const float panel_padding = 5;
-
         /// <summary>
         /// Computes the target Y positions for every item in the carousel.
         /// </summary>
@@ -1016,10 +1023,18 @@ namespace osu.Game.Screens.Select
                 {
                     case CarouselBeatmapSet set:
                     {
+                        bool isSelected = item.State.Value == CarouselItemState.Selected;
+
+                        float padding = isSelected ? 5 : -5;
+
+                        if (isSelected)
+                            // double padding because we want to cancel the negative padding from the last item.
+                            currentY += padding * 2;
+
                         visibleItems.Add(set);
                         set.CarouselYPosition = currentY;
 
-                        if (item.State.Value == CarouselItemState.Selected)
+                        if (isSelected)
                         {
                             // scroll position at currentY makes the set panel appear at the very top of the carousel's screen space
                             // move down by half of visible height (height of the carousel's visible extent, including semi-transparent areas)
@@ -1041,7 +1056,7 @@ namespace osu.Game.Screens.Select
                             }
                         }
 
-                        currentY += set.TotalHeight + panel_padding;
+                        currentY += set.TotalHeight + padding;
                         break;
                     }
                 }
@@ -1093,7 +1108,7 @@ namespace osu.Game.Screens.Select
                         // to enter clamp-special-case mode where it animates completely differently to normal.
                         float scrollChange = scrollTarget.Value - Scroll.Current;
                         Scroll.ScrollTo(scrollTarget.Value, false);
-                        foreach (var i in Scroll.Children)
+                        foreach (var i in Scroll)
                             i.Y += scrollChange;
                         break;
                 }
@@ -1251,7 +1266,7 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        protected partial class CarouselScrollContainer : UserTrackingScrollContainer<DrawableCarouselItem>
+        public partial class CarouselScrollContainer : UserTrackingScrollContainer<DrawableCarouselItem>
         {
             private bool rightMouseScrollBlocked;
 
@@ -1272,7 +1287,7 @@ namespace osu.Game.Screens.Select
                 {
                     // we need to block right click absolute scrolling when hovering a carousel item so context menus can display.
                     // this can be reconsidered when we have an alternative to right click scrolling.
-                    if (GetContainingInputManager().HoveredDrawables.OfType<DrawableCarouselItem>().Any())
+                    if (GetContainingInputManager()!.HoveredDrawables.OfType<DrawableCarouselItem>().Any())
                     {
                         rightMouseScrollBlocked = true;
                         return false;
