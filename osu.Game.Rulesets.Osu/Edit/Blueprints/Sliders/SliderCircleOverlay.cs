@@ -36,7 +36,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
         private readonly Slider slider;
         private readonly SliderPosition position;
-        private readonly HitCircleOverlapMarker marker;
+        private readonly HitCircleOverlapMarker? marker;
         private readonly Container? endDragMarkerContainer;
 
         public SliderCircleOverlay(Slider slider, SliderPosition position)
@@ -44,11 +44,10 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             this.slider = slider;
             this.position = position;
 
-            InternalChildren = new Drawable[]
-            {
-                marker = new HitCircleOverlapMarker(),
-                CirclePiece = new HitCirclePiece(),
-            };
+            if (position == SliderPosition.Start)
+                AddInternal(marker = new HitCircleOverlapMarker());
+
+            AddInternal(CirclePiece = new HitCirclePiece());
 
             if (position == SliderPosition.End)
             {
@@ -73,7 +72,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                 slider.RepeatCount % 2 == 0 ? slider.TailCircle : slider.LastRepeat!;
 
             CirclePiece.UpdateFrom(circle);
-            marker.UpdateFrom(circle);
+            marker?.UpdateFrom(circle);
 
             if (endDragMarkerContainer != null)
             {

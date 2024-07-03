@@ -10,7 +10,6 @@ using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -67,7 +66,8 @@ namespace osu.Game.Rulesets.Edit
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; }
 
-        protected ComposeBlueprintContainer BlueprintContainer { get; private set; }
+        public override ComposeBlueprintContainer BlueprintContainer => blueprintContainer;
+        private ComposeBlueprintContainer blueprintContainer;
 
         protected ExpandingToolboxContainer LeftToolbox { get; private set; }
 
@@ -143,7 +143,7 @@ namespace osu.Game.Rulesets.Edit
                         drawableRulesetWrapper,
                         // layers above playfield
                         drawableRulesetWrapper.CreatePlayfieldAdjustmentContainer()
-                                              .WithChild(BlueprintContainer = CreateBlueprintContainer())
+                                              .WithChild(blueprintContainer = CreateBlueprintContainer())
                     }
                 },
                 new Container
@@ -206,7 +206,7 @@ namespace osu.Game.Rulesets.Edit
                         {
                             Child = new EditorToolboxGroup("inspector")
                             {
-                                Child = new HitObjectInspector()
+                                Child = CreateHitObjectInspector()
                             },
                         }
                     }
@@ -327,6 +327,8 @@ namespace osu.Game.Rulesets.Edit
         /// Construct a relevant blueprint container. This will manage hitobject selection/placement input handling and display logic.
         /// </summary>
         protected virtual ComposeBlueprintContainer CreateBlueprintContainer() => new ComposeBlueprintContainer(this);
+
+        protected virtual Drawable CreateHitObjectInspector() => new HitObjectInspector();
 
         /// <summary>
         /// Construct a drawable ruleset for the provided ruleset.
@@ -502,7 +504,7 @@ namespace osu.Game.Rulesets.Edit
             var playfield = PlayfieldAtScreenSpacePosition(screenSpacePosition);
             double? targetTime = null;
 
-            if (snapType.HasFlagFast(SnapType.GlobalGrids))
+            if (snapType.HasFlag(SnapType.GlobalGrids))
             {
                 if (playfield is ScrollingPlayfield scrollingPlayfield)
                 {
@@ -569,6 +571,8 @@ namespace osu.Game.Rulesets.Edit
         /// The target ruleset's playfield.
         /// </summary>
         public abstract Playfield Playfield { get; }
+
+        public abstract ComposeBlueprintContainer BlueprintContainer { get; }
 
         /// <summary>
         /// All <see cref="DrawableHitObject"/>s in currently loaded beatmap.
