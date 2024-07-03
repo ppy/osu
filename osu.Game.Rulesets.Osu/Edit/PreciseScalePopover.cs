@@ -10,7 +10,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
-using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Screens.Edit.Components.RadioButtons;
 using osuTK;
 
@@ -19,6 +18,8 @@ namespace osu.Game.Rulesets.Osu.Edit
     public partial class PreciseScalePopover : OsuPopover
     {
         private readonly OsuSelectionScaleHandler scaleHandler;
+
+        private readonly OsuGridToolboxGroup gridToolbox;
 
         private readonly Bindable<PreciseScaleInfo> scaleInfo = new Bindable<PreciseScaleInfo>(new PreciseScaleInfo(1, ScaleOrigin.PlayfieldCentre, true, true));
 
@@ -32,9 +33,10 @@ namespace osu.Game.Rulesets.Osu.Edit
         private OsuCheckbox xCheckBox = null!;
         private OsuCheckbox yCheckBox = null!;
 
-        public PreciseScalePopover(OsuSelectionScaleHandler scaleHandler)
+        public PreciseScalePopover(OsuSelectionScaleHandler scaleHandler, OsuGridToolboxGroup gridToolbox)
         {
             this.scaleHandler = scaleHandler;
+            this.gridToolbox = gridToolbox;
 
             AllowableAnchors = new[] { Anchor.CentreLeft, Anchor.CentreRight };
         }
@@ -179,7 +181,7 @@ namespace osu.Game.Rulesets.Osu.Edit
             updateAxisCheckBoxesEnabled();
         }
 
-        private Vector2? getOriginPosition(PreciseScaleInfo scale) => scale.Origin == ScaleOrigin.PlayfieldCentre ? OsuPlayfield.BASE_SIZE / 2 : null;
+        private Vector2? getOriginPosition(PreciseScaleInfo scale) => scale.Origin == ScaleOrigin.PlayfieldCentre ? gridToolbox.StartPosition.Value : null;
 
         private void setAxis(bool x, bool y)
         {
