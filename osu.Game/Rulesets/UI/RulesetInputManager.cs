@@ -10,6 +10,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Framework.Input.StateChanges;
 using osu.Framework.Input.StateChanges.Events;
 using osu.Framework.Input.States;
 using osu.Game.Configuration;
@@ -108,7 +109,11 @@ namespace osu.Game.Rulesets.UI
             get => replayInputHandler;
             set
             {
-                if (replayInputHandler != null) RemoveHandler(replayInputHandler);
+                if (replayInputHandler != null)
+                {
+                    RemoveHandler(replayInputHandler);
+                    new ReplayStateReset().Apply(CurrentState, this);
+                }
 
                 replayInputHandler = value;
                 UseParentInput = replayInputHandler == null;
@@ -218,6 +223,19 @@ namespace osu.Game.Rulesets.UI
 
                 KeyBindings = KeyBindings.Where(static b => RealmKeyBindingStore.CheckValidForGameplay(b.KeyCombination)).ToList();
                 RealmKeyBindingStore.ClearDuplicateBindings(KeyBindings);
+            }
+        }
+
+        private class ReplayStateReset : IInput
+        {
+            public void Apply(InputState state, IInputStateChangeHandler handler)
+            {
+                if (!(state is RulesetInputManagerInputState<T> inputState))
+                    throw new InvalidOperationException($"{nameof(ReplayState<T>)} should only be applied to a {nameof(RulesetInputManagerInputState<T>)}");
+
+                inputState.LastReplayState = null;
+
+                handler.HandleInputStateChange(new ReplayStateChangeEvent<T>(state, this, inputState.LastReplayState?.PressedActions.ToArray() ?? [], []));
             }
         }
     }
