@@ -483,20 +483,26 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
                 curveTypeItems = new List<MenuItem>();
 
-                if (!selectedPieces.Contains(Pieces[0]))
+                // todo: hide/disable items which aren't valid for selected points
+                foreach (PathType? type in path_types)
                 {
-                    curveTypeItems.Add(createMenuItemForPathType(null));
-                    curveTypeItems.Add(new OsuMenuItemSpacer());
+                    // special inherit case
+                    if (type == null)
+                    {
+                        if (selectedPieces.Contains(Pieces[0]))
+                            continue;
+
+                        curveTypeItems.Add(new OsuMenuItemSpacer());
+                    }
+
+                    curveTypeItems.Add(createMenuItemForPathType(type));
                 }
 
-                // todo: hide/disable items which aren't valid for selected points
-                curveTypeItems.Add(createMenuItemForPathType(PathType.LINEAR));
-                curveTypeItems.Add(createMenuItemForPathType(PathType.PERFECT_CURVE));
-                curveTypeItems.Add(createMenuItemForPathType(PathType.BEZIER));
-                curveTypeItems.Add(createMenuItemForPathType(PathType.BSpline(4)));
-
                 if (selectedPieces.Any(piece => piece.ControlPoint.Type?.Type == SplineType.Catmull))
+                {
+                    curveTypeItems.Add(new OsuMenuItemSpacer());
                     curveTypeItems.Add(createMenuItemForPathType(PathType.CATMULL));
+                }
 
                 var menuItems = new List<MenuItem>
                 {
