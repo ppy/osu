@@ -204,6 +204,7 @@ namespace osu.Game.Rulesets.Scoring
         public ScoreProcessor(Ruleset ruleset)
         {
             Ruleset = ruleset;
+            Accuracy.ValueChanged += _ => updateRank();
 
             Combo.ValueChanged += combo => HighestCombo.Value = Math.Max(HighestCombo.Value, combo.NewValue);
 
