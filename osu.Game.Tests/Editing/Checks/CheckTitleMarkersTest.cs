@@ -44,7 +44,7 @@ namespace osu.Game.Tests.Editing.Checks
         }
 
         [Test]
-        public void TestTVSizeMarker()
+        public void TestTvSizeMarker()
         {
             beatmap.BeatmapInfo.Metadata.Title += " (TV Size)";
             beatmap.BeatmapInfo.Metadata.TitleUnicode += " (TV Size)";
@@ -55,7 +55,7 @@ namespace osu.Game.Tests.Editing.Checks
         }
 
         [Test]
-        public void TestMalformedTVSizeMarker()
+        public void TestMalformedTvSizeMarker()
         {
             beatmap.BeatmapInfo.Metadata.Title += " (tv size)";
             beatmap.BeatmapInfo.Metadata.TitleUnicode += " (tv size)";
