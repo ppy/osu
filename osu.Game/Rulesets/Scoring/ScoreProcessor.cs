@@ -206,7 +206,6 @@ namespace osu.Game.Rulesets.Scoring
             Ruleset = ruleset;
 
             Combo.ValueChanged += combo => HighestCombo.Value = Math.Max(HighestCombo.Value, combo.NewValue);
-            Accuracy.ValueChanged += _ => updateRank();
 
             Mods.ValueChanged += mods =>
             {
@@ -215,8 +214,7 @@ namespace osu.Game.Rulesets.Scoring
                 foreach (var m in mods.NewValue)
                     scoreMultiplier *= m.ScoreMultiplier;
 
-                updateScore();
-                updateRank();
+                updateScoreAndRank();
             };
         }
 
@@ -267,9 +265,8 @@ namespace osu.Game.Rulesets.Scoring
                     lastHitObject = result.HitObject;
                 }
 
-                updateScore();
+                updateScoreAndRank();
             }
-            updateRank();
         }
 
         /// <summary>
@@ -313,8 +310,7 @@ namespace osu.Game.Rulesets.Scoring
             lastHitObject = hitEvents[^1].LastHitObject;
             hitEvents.RemoveAt(hitEvents.Count - 1);
 
-            updateScore();
-            updateRank();
+            updateScoreAndRank();
         }
 
         /// <summary>
@@ -374,6 +370,12 @@ namespace osu.Game.Rulesets.Scoring
         {
         }
 
+        private void updateScoreAndRank()
+        {
+            updateScore();
+            updateRank();
+        }
+
         private void updateScore()
         {
             Accuracy.Value = currentMaximumBaseScore > 0 ? currentBaseScore / currentMaximumBaseScore : 1;
@@ -423,7 +425,7 @@ namespace osu.Game.Rulesets.Scoring
         protected override void Reset(bool storeResults)
         {
             // Run one last time to store max values.
-            updateScore();
+            updateScoreAndRank();
 
             base.Reset(storeResults);
 
@@ -512,7 +514,7 @@ namespace osu.Game.Rulesets.Scoring
 
             SetScoreProcessorStatistics(frame.Header.ScoreProcessorStatistics);
 
-            updateScore();
+            updateScoreAndRank();
 
             OnResetFromReplayFrame?.Invoke();
         }
