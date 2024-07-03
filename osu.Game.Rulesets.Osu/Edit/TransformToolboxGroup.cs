@@ -49,7 +49,7 @@ namespace osu.Game.Rulesets.Osu.Edit
                         () => new PreciseRotationPopover(RotationHandler, GridToolbox)),
                     scaleButton = new EditorToolButton("Scale",
                         () => new SpriteIcon { Icon = FontAwesome.Solid.ArrowsAlt },
-                        () => new PreciseScalePopover(ScaleHandler))
+                        () => new PreciseScalePopover(ScaleHandler, GridToolbox))
                 }
             };
         }
