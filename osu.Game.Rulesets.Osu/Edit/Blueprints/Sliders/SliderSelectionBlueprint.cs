@@ -3,6 +3,7 @@
 
 #nullable disable
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
@@ -273,6 +274,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         {
             const double step1 = 10;
             const double step2 = 0.1;
+            const double longer_distance_bias = 0.01;
 
             var desiredPosition = ToLocalSpace(e.ScreenSpaceMousePosition) - HitObject.Position - lengthAdjustMouseOffset;
 
@@ -286,7 +288,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             for (double d = 0; d <= fullPathCache.Value.CalculatedDistance; d += step1)
             {
                 double t = d / fullPathCache.Value.CalculatedDistance;
-                float dist = Vector2.Distance(fullPathCache.Value.PositionAt(t), desiredPosition);
+                double dist = Vector2.Distance(fullPathCache.Value.PositionAt(t), desiredPosition) - d * longer_distance_bias;
 
                 if (dist >= minDistance) continue;
 
@@ -295,10 +297,12 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             }
 
             // Do another linear search to fine-tune the result.
-            for (double d = bestValue - step1; d <= bestValue + step1; d += step2)
+            double maxValue = Math.Min(bestValue + step1, fullPathCache.Value.CalculatedDistance);
+
+            for (double d = bestValue - step1; d <= maxValue; d += step2)
             {
                 double t = d / fullPathCache.Value.CalculatedDistance;
-                float dist = Vector2.Distance(fullPathCache.Value.PositionAt(t), desiredPosition);
+                double dist = Vector2.Distance(fullPathCache.Value.PositionAt(t), desiredPosition) - d * longer_distance_bias;
 
                 if (dist >= minDistance) continue;
 
