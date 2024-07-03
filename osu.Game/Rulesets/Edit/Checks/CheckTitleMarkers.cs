@@ -16,7 +16,7 @@ namespace osu.Game.Rulesets.Edit.Checks
             new IssueTemplateIncorrectMarker(this),
         };
 
-        public IEnumerable<MarkerCheck> MarkerChecks = [
+        private IEnumerable<MarkerCheck> markerChecks = [
             new MarkerCheck("(TV Size)", @"(?i)(tv (size|ver))"),
             new MarkerCheck("(Game Ver.)", @"(?i)(game (size|ver))"),
             new MarkerCheck("(Short Ver.)", @"(?i)(short (size|ver))"),
@@ -32,7 +32,7 @@ namespace osu.Game.Rulesets.Edit.Checks
             string romanisedTitle = context.Beatmap.Metadata.Title;
             string unicodeTitle = context.Beatmap.Metadata.TitleUnicode;
 
-            foreach (var check in MarkerChecks)
+            foreach (var check in markerChecks)
             {
                 bool hasRomanisedTitle = unicodeTitle != romanisedTitle;
 
@@ -48,7 +48,7 @@ namespace osu.Game.Rulesets.Edit.Checks
             }
         }
 
-        public class MarkerCheck
+        private class MarkerCheck
         {
             public string CorrectMarkerFormat;
             public Regex ExactRegex;
