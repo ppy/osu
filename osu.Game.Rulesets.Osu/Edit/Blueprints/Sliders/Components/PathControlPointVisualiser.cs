@@ -483,7 +483,6 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
                 curveTypeItems = new List<MenuItem>();
 
-                // todo: hide/disable items which aren't valid for selected points
                 foreach (PathType? type in path_types)
                 {
                     // special inherit case
