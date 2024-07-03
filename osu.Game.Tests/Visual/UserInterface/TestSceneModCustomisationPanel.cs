@@ -18,6 +18,8 @@ namespace osu.Game.Tests.Visual.UserInterface
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Aquamarine);
 
+        private ModCustomisationPanel panel = null!;
+
         [SetUp]
         public void SetUp() => Schedule(() =>
         {
@@ -25,7 +27,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             {
                 RelativeSizeAxes = Axes.Both,
                 Padding = new MarginPadding(20f),
-                Child = new ModCustomisationPanel
+                Child = panel = new ModCustomisationPanel
                 {
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
@@ -39,10 +41,26 @@ namespace osu.Game.Tests.Visual.UserInterface
         [Test]
         public void TestDisplay()
         {
-            AddStep("set DT", () => SelectedMods.Value = new[] { new OsuModDoubleTime() });
-            AddStep("set DA", () => SelectedMods.Value = new Mod[] { new OsuModDifficultyAdjust() });
-            AddStep("set FL+WU+DA+AD", () => SelectedMods.Value = new Mod[] { new OsuModFlashlight(), new ModWindUp(), new OsuModDifficultyAdjust(), new OsuModApproachDifferent() });
-            AddStep("set empty", () => SelectedMods.Value = Array.Empty<Mod>());
+            AddStep("set DT", () =>
+            {
+                SelectedMods.Value = new[] { new OsuModDoubleTime() };
+                panel.Enabled.Value = panel.Expanded.Value = true;
+            });
+            AddStep("set DA", () =>
+            {
+                SelectedMods.Value = new Mod[] { new OsuModDifficultyAdjust() };
+                panel.Enabled.Value = panel.Expanded.Value = true;
+            });
+            AddStep("set FL+WU+DA+AD", () =>
+            {
+                SelectedMods.Value = new Mod[] { new OsuModFlashlight(), new ModWindUp(), new OsuModDifficultyAdjust(), new OsuModApproachDifferent() };
+                panel.Enabled.Value = panel.Expanded.Value = true;
+            });
+            AddStep("set empty", () =>
+            {
+                SelectedMods.Value = Array.Empty<Mod>();
+                panel.Enabled.Value = panel.Expanded.Value = false;
+            });
         }
     }
 }
