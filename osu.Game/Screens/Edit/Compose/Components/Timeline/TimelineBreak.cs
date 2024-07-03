@@ -9,19 +9,30 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.UserInterface;
+using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets.Objects;
 using osuTK;
 
 namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 {
-    public partial class TimelineBreak : CompositeDrawable
+    public partial class TimelineBreak : CompositeDrawable, IHasContextMenu
     {
         public Bindable<BreakPeriod> Break { get; } = new Bindable<BreakPeriod>();
+
+        public Action<BreakPeriod>? OnDeleted { get; init; }
+
+        private Box background = null!;
+
+        [Resolved]
+        private OsuColour colours { get; set; } = null!;
 
         public TimelineBreak(BreakPeriod b)
         {
@@ -42,7 +53,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 {
                     RelativeSizeAxes = Axes.Both,
                     Padding = new MarginPadding { Horizontal = 5 },
-                    Child = new Box
+                    Child = background = new Box
                     {
                         RelativeSizeAxes = Axes.Both,
                         Colour = colours.Gray5,
@@ -76,6 +87,28 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 Width = (float)Break.Value.Duration;
             }, true);
         }
+
+        protected override bool OnHover(HoverEvent e)
+        {
+            updateState();
+            return true;
+        }
+
+        protected override void OnHoverLost(HoverLostEvent e)
+        {
+            updateState();
+            base.OnHoverLost(e);
+        }
+
+        private void updateState()
+        {
+            background.FadeColour(IsHovered ? colours.Gray6 : colours.Gray5, 400, Easing.OutQuint);
+        }
+
+        public MenuItem[] ContextMenuItems => new MenuItem[]
+        {
+            new OsuMenuItem(CommonStrings.ButtonsDelete, MenuItemType.Destructive, () => OnDeleted?.Invoke(Break.Value)),
+        };
 
         private partial class DragHandle : FillFlowContainer
         {

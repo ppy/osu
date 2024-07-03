@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using osu.Framework.Extensions;
-using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Logging;
 using osu.Game.Audio;
 using osu.Game.Beatmaps.ControlPoints;
@@ -33,7 +32,7 @@ namespace osu.Game.Beatmaps.Formats
         /// <remarks>
         /// Compare: https://github.com/peppy/osu-stable-reference/blob/master/osu!/GameplayElements/HitObjects/HitObject.cs#L319
         /// </remarks>
-        private const double control_point_leniency = 5;
+        public const double CONTROL_POINT_LENIENCY = 5;
 
         internal static RulesetStore? RulesetStore;
 
@@ -160,19 +159,23 @@ namespace osu.Game.Beatmaps.Formats
 
         private void applySamples(HitObject hitObject)
         {
-            SampleControlPoint sampleControlPoint = (beatmap.ControlPointInfo as LegacyControlPointInfo)?.SamplePointAt(hitObject.GetEndTime() + control_point_leniency) ?? SampleControlPoint.DEFAULT;
-
-            hitObject.Samples = hitObject.Samples.Select(o => sampleControlPoint.ApplyTo(o)).ToList();
-
             if (hitObject is IHasRepeats hasRepeats)
             {
+                SampleControlPoint sampleControlPoint = (beatmap.ControlPointInfo as LegacyControlPointInfo)?.SamplePointAt(hitObject.StartTime + CONTROL_POINT_LENIENCY + 1) ?? SampleControlPoint.DEFAULT;
+                hitObject.Samples = hitObject.Samples.Select(o => sampleControlPoint.ApplyTo(o)).ToList();
+
                 for (int i = 0; i < hasRepeats.NodeSamples.Count; i++)
                 {
-                    double time = hitObject.StartTime + i * hasRepeats.Duration / hasRepeats.SpanCount() + control_point_leniency;
+                    double time = hitObject.StartTime + i * hasRepeats.Duration / hasRepeats.SpanCount() + CONTROL_POINT_LENIENCY;
                     var nodeSamplePoint = (beatmap.ControlPointInfo as LegacyControlPointInfo)?.SamplePointAt(time) ?? SampleControlPoint.DEFAULT;
 
                     hasRepeats.NodeSamples[i] = hasRepeats.NodeSamples[i].Select(o => nodeSamplePoint.ApplyTo(o)).ToList();
                 }
+            }
+            else
+            {
+                SampleControlPoint sampleControlPoint = (beatmap.ControlPointInfo as LegacyControlPointInfo)?.SamplePointAt(hitObject.GetEndTime() + CONTROL_POINT_LENIENCY) ?? SampleControlPoint.DEFAULT;
+                hitObject.Samples = hitObject.Samples.Select(o => sampleControlPoint.ApplyTo(o)).ToList();
             }
         }
 
@@ -528,8 +531,8 @@ namespace osu.Game.Beatmaps.Formats
             if (split.Length >= 8)
             {
                 LegacyEffectFlags effectFlags = (LegacyEffectFlags)Parsing.ParseInt(split[7]);
-                kiaiMode = effectFlags.HasFlagFast(LegacyEffectFlags.Kiai);
-                omitFirstBarSignature = effectFlags.HasFlagFast(LegacyEffectFlags.OmitFirstBarLine);
+                kiaiMode = effectFlags.HasFlag(LegacyEffectFlags.Kiai);
+                omitFirstBarSignature = effectFlags.HasFlag(LegacyEffectFlags.OmitFirstBarLine);
             }
 
             string stringSampleSet = sampleSet.ToString().ToLowerInvariant();
