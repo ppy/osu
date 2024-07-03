@@ -34,7 +34,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
     public partial class PathControlPointVisualiser<T> : CompositeDrawable, IKeyBindingHandler<PlatformAction>, IHasContextMenu
         where T : OsuHitObject, IHasPath
     {
-        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true; // allow context menu to appear outside of the playfield.
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true; // allow context menu to appear outside the playfield.
 
         internal readonly Container<PathControlPointPiece<T>> Pieces;
 
@@ -196,6 +196,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
                             if (allowSelection)
                                 d.RequestSelection = selectionRequested;
 
+                            d.ControlPoint.Changed += controlPointChanged;
                             d.DragStarted = DragStarted;
                             d.DragInProgress = DragInProgress;
                             d.DragEnded = DragEnded;
@@ -209,6 +210,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
                     foreach (var point in e.OldItems.Cast<PathControlPoint>())
                     {
+                        point.Changed -= controlPointChanged;
+
                         foreach (var piece in Pieces.Where(p => p.ControlPoint == point).ToArray())
                             piece.RemoveAndDisposeImmediately();
                     }
@@ -216,6 +219,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
                     break;
             }
         }
+
+        private void controlPointChanged() => updateCurveMenuItems();
 
         protected override bool OnClick(ClickEvent e)
         {
@@ -318,6 +323,13 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             }
         }
 
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+            foreach (var p in Pieces)
+                p.ControlPoint.Changed -= controlPointChanged;
+        }
+
         private void selectionRequested(PathControlPointPiece<T> piece, MouseButtonEvent e)
         {
             if (e.Button == MouseButton.Left && inputManager.CurrentState.Keyboard.ControlPressed)
@@ -328,7 +340,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
         /// <summary>
         /// Attempts to set all selected control point pieces to the given path type.
-        /// If that would fail, try to change the path such that it instead succeeds
+        /// If that fails, try to change the path such that it instead succeeds
         /// in a UX-friendly way.
         /// </summary>
         /// <param name="type">The path type we want to assign to the given control point piece.</param>
@@ -370,6 +382,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         private PathType?[] dragPathTypes;
         private int draggedControlPointIndex;
         private HashSet<PathControlPoint> selectedControlPoints;
+
+        private List<MenuItem> curveTypeItems;
 
         public void DragStarted(PathControlPoint controlPoint)
         {
@@ -467,7 +481,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
                 var splittablePieces = selectedPieces.Where(isSplittable).ToList();
                 int splittableCount = splittablePieces.Count;
 
-                List<MenuItem> curveTypeItems = new List<MenuItem>();
+                curveTypeItems = new List<MenuItem>();
 
                 if (!selectedPieces.Contains(Pieces[0]))
                 {
@@ -505,25 +519,39 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
                         () => DeleteSelected())
                 );
 
+                updateCurveMenuItems();
+
                 return menuItems.ToArray();
+
+                CurveTypeMenuItem createMenuItemForPathType(PathType? type) => new CurveTypeMenuItem(type, _ => updatePathTypeOfSelectedPieces(type));
             }
         }
 
-        private MenuItem createMenuItemForPathType(PathType? type)
+        private void updateCurveMenuItems()
         {
-            int totalCount = Pieces.Count(p => p.IsSelected.Value);
-            int countOfState = Pieces.Where(p => p.IsSelected.Value).Count(p => p.ControlPoint.Type == type);
+            foreach (var item in curveTypeItems.OfType<CurveTypeMenuItem>())
+            {
+                int totalCount = Pieces.Count(p => p.IsSelected.Value);
+                int countOfState = Pieces.Where(p => p.IsSelected.Value).Count(p => p.ControlPoint.Type == item.PathType);
 
-            var item = new TernaryStateRadioMenuItem(type?.Description ?? "Inherit", MenuItemType.Standard, _ => updatePathTypeOfSelectedPieces(type));
+                if (countOfState == totalCount)
+                    item.State.Value = TernaryState.True;
+                else if (countOfState > 0)
+                    item.State.Value = TernaryState.Indeterminate;
+                else
+                    item.State.Value = TernaryState.False;
+            }
+        }
 
-            if (countOfState == totalCount)
-                item.State.Value = TernaryState.True;
-            else if (countOfState > 0)
-                item.State.Value = TernaryState.Indeterminate;
-            else
-                item.State.Value = TernaryState.False;
+        private class CurveTypeMenuItem : TernaryStateRadioMenuItem
+        {
+            public readonly PathType? PathType;
 
-            return item;
+            public CurveTypeMenuItem(PathType? pathType, Action<TernaryState> action)
+                : base(pathType?.Description ?? "Inherit", MenuItemType.Standard, action)
+            {
+                PathType = pathType;
+            }
         }
     }
 }
