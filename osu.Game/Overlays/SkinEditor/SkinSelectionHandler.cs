@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions;
-using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.UserInterface;
@@ -145,9 +144,9 @@ namespace osu.Game.Overlays.SkinEditor
                     var blueprintItem = ((Drawable)blueprint.Item);
                     blueprintItem.Scale = Vector2.One;
 
-                    if (blueprintItem.RelativeSizeAxes.HasFlagFast(Axes.X))
+                    if (blueprintItem.RelativeSizeAxes.HasFlag(Axes.X))
                         blueprintItem.Width = 1;
-                    if (blueprintItem.RelativeSizeAxes.HasFlagFast(Axes.Y))
+                    if (blueprintItem.RelativeSizeAxes.HasFlag(Axes.Y))
                         blueprintItem.Height = 1;
                 }
             });

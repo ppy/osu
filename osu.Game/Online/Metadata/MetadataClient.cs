@@ -68,6 +68,24 @@ namespace osu.Game.Online.Metadata
 
         #endregion
 
+        #region Multiplayer room watching
+
+        public abstract Task<MultiplayerPlaylistItemStats[]> BeginWatchingMultiplayerRoom(long id);
+
+        public abstract Task EndWatchingMultiplayerRoom(long id);
+
+        public event Action<MultiplayerRoomScoreSetEvent>? MultiplayerRoomScoreSet;
+
+        Task IMetadataClient.MultiplayerRoomScoreSet(MultiplayerRoomScoreSetEvent roomScoreSetEvent)
+        {
+            if (MultiplayerRoomScoreSet != null)
+                Schedule(MultiplayerRoomScoreSet, roomScoreSetEvent);
+
+            return Task.CompletedTask;
+        }
+
+        #endregion
+
         #region Disconnection handling
 
         public event Action? Disconnecting;
