@@ -118,6 +118,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 sliderBonus = osuLastObj.TravelDistance / osuLastObj.TravelTime;
             }
 
+            // The spacing bonus in speed evaluation
+            double flowBonus = Math.Pow((osuLastObj?.MinimumJumpDistance?? 0) / 125, 3.5);
+            // Part of the aiming difficulty for this object is accounted for in the speed evaluator, so reduce aim difficulty here
+            if (flowBonus < 1)
+            {
+                aimStrain *= 0.5 + 0.5 * Math.Sqrt(flowBonus);
+                wideAngleBonus *= 0.5 + 0.5 * Math.Sqrt(flowBonus);
+            }
             // Add in acute angle bonus or wide angle bonus + velocity change bonus, whichever is larger.
             aimStrain += Math.Max(acuteAngleBonus * acute_angle_multiplier, wideAngleBonus * wide_angle_multiplier + velocityChangeBonus * velocity_change_multiplier);
 
