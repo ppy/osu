@@ -292,7 +292,7 @@ namespace osu.Game.Screens.Edit
                 dependencies.CacheAs<IEditorChangeHandler>(changeHandler);
             }
 
-            beatDivisor.Value = editorBeatmap.BeatmapInfo.BeatDivisor;
+            beatDivisor.SetArbitraryDivisor(editorBeatmap.BeatmapInfo.BeatDivisor);
             beatDivisor.BindValueChanged(divisor => editorBeatmap.BeatmapInfo.BeatDivisor = divisor.NewValue);
 
             updateLastSavedHash();
@@ -1019,6 +1019,15 @@ namespace osu.Game.Screens.Edit
             }
         }
 
+        /// <summary>
+        /// Forces a reload of the compose screen after significant configuration changes.
+        /// </summary>
+        /// <remarks>
+        /// This can be necessary for scrolling rulesets, as they do not easily support control points changing under them.
+        /// The reason that this works is that <see cref="onModeChanged"/> will re-instantiate the screen whenever it is requested next.
+        /// </remarks>
+        public void ReloadComposeScreen() => screenContainer.SingleOrDefault(s => s.Type == EditorScreenMode.Compose)?.RemoveAndDisposeImmediately();
+
         [CanBeNull]
         private ScheduledDelegate playbackDisabledDebounce;
 
@@ -1275,16 +1284,20 @@ namespace osu.Game.Screens.Edit
             return tcs.Task;
         }
 
-        public void HandleTimestamp(string timestamp)
+        public bool HandleTimestamp(string timestamp, bool notifyOnError = false)
         {
             if (!EditorTimestampParser.TryParse(timestamp, out var timeSpan, out string selection))
             {
-                Schedule(() => notifications?.Post(new SimpleErrorNotification
+                if (notifyOnError)
                 {
-                    Icon = FontAwesome.Solid.ExclamationTriangle,
-                    Text = EditorStrings.FailedToParseEditorLink
-                }));
-                return;
+                    Schedule(() => notifications?.Post(new SimpleErrorNotification
+                    {
+                        Icon = FontAwesome.Solid.ExclamationTriangle,
+                        Text = EditorStrings.FailedToParseEditorLink
+                    }));
+                }
+
+                return false;
             }
 
             editorBeatmap.SelectedHitObjects.Clear();
@@ -1297,7 +1310,7 @@ namespace osu.Game.Screens.Edit
             if (string.IsNullOrEmpty(selection))
             {
                 clock.SeekSmoothlyTo(position);
-                return;
+                return true;
             }
 
             // Seek to the next closest HitObject instead
@@ -1312,6 +1325,7 @@ namespace osu.Game.Screens.Edit
 
             // Delegate handling the selection to the ruleset.
             currentScreen.Dependencies.Get<HitObjectComposer>().SelectFromTimestamp(position, selection);
+            return true;
         }
 
         public double SnapTime(double time, double? referenceTime) => editorBeatmap.SnapTime(time, referenceTime);

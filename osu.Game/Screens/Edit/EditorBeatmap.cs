@@ -110,6 +110,9 @@ namespace osu.Game.Screens.Edit
             foreach (var obj in HitObjects)
                 trackStartTime(obj);
 
+            Breaks = new BindableList<BreakPeriod>(playableBeatmap.Breaks);
+            Breaks.BindCollectionChanged((_, _) => playableBeatmap.Breaks = Breaks.ToList());
+
             PreviewTime = new BindableInt(BeatmapInfo.Metadata.PreviewTime);
             PreviewTime.BindValueChanged(s =>
             {
@@ -172,7 +175,13 @@ namespace osu.Game.Screens.Edit
             set => PlayableBeatmap.ControlPointInfo = value;
         }
 
-        public BindableList<BreakPeriod> Breaks => PlayableBeatmap.Breaks;
+        public readonly BindableList<BreakPeriod> Breaks;
+
+        List<BreakPeriod> IBeatmap.Breaks
+        {
+            get => PlayableBeatmap.Breaks;
+            set => PlayableBeatmap.Breaks = value;
+        }
 
         public List<string> UnhandledEventLines => PlayableBeatmap.UnhandledEventLines;
 
