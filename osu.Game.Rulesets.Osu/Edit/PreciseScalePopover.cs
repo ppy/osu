@@ -130,8 +130,8 @@ namespace osu.Game.Rulesets.Osu.Edit
 
             scaleInfo.BindValueChanged(scale =>
             {
-                var newScale = new Vector2(scale.NewValue.XAxis ? scale.NewValue.Scale : 1, scale.NewValue.YAxis ? scale.NewValue.Scale : 1);
-                scaleHandler.Update(newScale, getOriginPosition(scale.NewValue));
+                var newScale = new Vector2(scale.NewValue.Scale, scale.NewValue.Scale);
+                scaleHandler.Update(newScale, getOriginPosition(scale.NewValue), getAdjustAxis(scale.NewValue), gridToolbox.GridLinesRotation.Value);
             });
         }
 
@@ -164,7 +164,7 @@ namespace osu.Game.Rulesets.Osu.Edit
                 return;
 
             const float max_scale = 10;
-            var scale = scaleHandler.ClampScaleToPlayfieldBounds(new Vector2(max_scale), getOriginPosition(scaleInfo.Value));
+            var scale = scaleHandler.ClampScaleToPlayfieldBounds(new Vector2(max_scale), getOriginPosition(scaleInfo.Value), getAdjustAxis(scaleInfo.Value), gridToolbox.GridLinesRotation.Value);
 
             if (!scaleInfo.Value.XAxis)
                 scale.X = max_scale;
@@ -182,6 +182,8 @@ namespace osu.Game.Rulesets.Osu.Edit
         }
 
         private Vector2? getOriginPosition(PreciseScaleInfo scale) => scale.Origin == ScaleOrigin.PlayfieldCentre ? gridToolbox.StartPosition.Value : null;
+
+        private Axes getAdjustAxis(PreciseScaleInfo scale) => scale.XAxis ? scale.YAxis ? Axes.Both : Axes.X : Axes.Y;
 
         private void setAxis(bool x, bool y)
         {
