@@ -20,6 +20,7 @@ using osu.Game.Input.Handlers;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Screens.Play.HUD.ClicksPerSecond;
+using osuTK;
 using static osu.Game.Input.Handlers.ReplayInputHandler;
 
 namespace osu.Game.Rulesets.UI
@@ -113,17 +114,12 @@ namespace osu.Game.Rulesets.UI
                     return;
 
                 if (replayInputHandler != null)
-                {
                     RemoveHandler(replayInputHandler);
-                    // ensures that all replay keys are released, and that the last replay state is correctly cleared
-                    new ReplayStateReset().Apply(CurrentState, this);
-                }
-                else
-                {
-                    // ensures that all user-pressed keys are released, so that the replay handler may trigger them itself
-                    // setting `UseParentInput` will only sync releases (https://github.com/ppy/osu-framework/blob/45cd7c7c702c081334fce41e7771b9dc6481b28d/osu.Framework/Input/PassThroughInputManager.cs#L179-L182)
-                    SyncInputState(CreateInitialState());
-                }
+
+                // ensures that all replay keys are released, that the last replay state is correctly cleared,
+                // and that all user-pressed keys are released, so that the replay handler may trigger them itself
+                // setting `UseParentInput` will only sync releases (https://github.com/ppy/osu-framework/blob/17d65f476d51cc5f2aaea818534f8fbac47e5fe6/osu.Framework/Input/PassThroughInputManager.cs#L179-L182)
+                new ReplayStateReset().Apply(CurrentState, this);
 
                 replayInputHandler = value;
                 UseParentInput = replayInputHandler == null;
@@ -243,9 +239,16 @@ namespace osu.Game.Rulesets.UI
                 if (!(state is RulesetInputManagerInputState<T> inputState))
                     throw new InvalidOperationException($"{nameof(ReplayState<T>)} should only be applied to a {nameof(RulesetInputManagerInputState<T>)}");
 
-                inputState.LastReplayState = null;
+                new MouseButtonInput([], state.Mouse.Buttons).Apply(state, handler);
+                new KeyboardKeyInput([], state.Keyboard.Keys).Apply(state, handler);
+                new TouchInput(Enum.GetValues<TouchSource>().Select(s => new Touch(s, Vector2.Zero)), false).Apply(state, handler);
+                new JoystickButtonInput([], state.Joystick.Buttons).Apply(state, handler);
+                new MidiKeyInput(new MidiState(), state.Midi).Apply(state, handler);
+                new TabletPenButtonInput([], state.Tablet.PenButtons).Apply(state, handler);
+                new TabletAuxiliaryButtonInput([], state.Tablet.AuxiliaryButtons).Apply(state, handler);
 
                 handler.HandleInputStateChange(new ReplayStateChangeEvent<T>(state, this, inputState.LastReplayState?.PressedActions.ToArray() ?? [], []));
+                inputState.LastReplayState = null;
             }
         }
     }
