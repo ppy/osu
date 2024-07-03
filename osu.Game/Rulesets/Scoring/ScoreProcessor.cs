@@ -425,7 +425,7 @@ namespace osu.Game.Rulesets.Scoring
         protected override void Reset(bool storeResults)
         {
             // Run one last time to store max values.
-            updateScoreAndRank();
+            updateScore();
 
             base.Reset(storeResults);
 
