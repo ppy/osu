@@ -49,6 +49,11 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
                     KeyboardStep = 0.01f,
                     DisplayAsPercentage = true
                 },
+                new SettingsCheckbox
+                {
+                    LabelText = AudioSettingsStrings.MuteHitsounds,
+                    Current = config.GetBindable<bool>(OsuSetting.MuteHitsounds)
+                },
             };
         }
 

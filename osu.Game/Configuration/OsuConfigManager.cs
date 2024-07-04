@@ -211,6 +211,8 @@ namespace osu.Game.Configuration
 
             SetDefault(OsuSetting.EditorTimelineShowTimingChanges, true);
             SetDefault(OsuSetting.EditorTimelineShowTicks, true);
+
+            SetDefault(OsuSetting.MuteHitsounds, false);
         }
 
         protected override bool CheckLookupContainsPrivateInformation(OsuSetting lookup)
@@ -444,5 +446,6 @@ namespace osu.Game.Configuration
         HideCountryFlags,
         EditorTimelineShowTimingChanges,
         EditorTimelineShowTicks,
+        MuteHitsounds,
     }
 }

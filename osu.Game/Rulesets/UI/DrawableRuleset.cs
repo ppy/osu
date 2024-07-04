@@ -211,6 +211,12 @@ namespace osu.Game.Rulesets.UI
                         .WithChild(ResumeOverlay)));
             }
 
+            var muteHitsounds = config.GetBindable<bool>(OsuSetting.MuteHitsounds);
+
+            BindableNumber<double> hitsoundMultiplier = new BindableDouble(muteHitsounds.Value ? 0.0 : 1.0);
+            muteHitsounds.ValueChanged += _ => { hitsoundMultiplier.Value = muteHitsounds.Value ? 0.0 : 1.0; };
+            audioContainer.AddAdjustment(AdjustableProperty.Volume, hitsoundMultiplier);
+
             applyRulesetMods(Mods, config);
 
             loadObjects(cancellationToken ?? default);
