@@ -5,11 +5,13 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
+using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Input.Bindings;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Osu;
+using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Edit.Compose.Components;
 using osu.Game.Tests.Beatmaps;
@@ -101,6 +103,57 @@ namespace osu.Game.Tests.Visual.Editing
 
             AddStep("change tool to circle", () => InputManager.Key(Key.Number2));
             AddAssert("slider placed", () => EditorBeatmap.HitObjects.Count, () => Is.EqualTo(1));
+        }
+
+        [Test]
+        public void TestAutomaticBankAssignment()
+        {
+            AddStep("add object with soft bank", () => EditorBeatmap.Add(new HitCircle
+            {
+                StartTime = 0,
+                Samples =
+                {
+                    new HitSampleInfo(name: HitSampleInfo.HIT_NORMAL, bank: HitSampleInfo.BANK_SOFT, volume: 70),
+                    new HitSampleInfo(name: HitSampleInfo.HIT_WHISTLE, bank: HitSampleInfo.BANK_SOFT, volume: 70),
+                }
+            }));
+            AddStep("seek to 500", () => EditorClock.Seek(500));
+            AddStep("enable automatic bank assignment", () =>
+            {
+                InputManager.PressKey(Key.LShift);
+                InputManager.Key(Key.Q);
+                InputManager.ReleaseKey(Key.LShift);
+            });
+            AddStep("select circle placement tool", () => InputManager.Key(Key.Number2));
+            AddStep("move mouse to center of playfield", () => InputManager.MoveMouseTo(this.ChildrenOfType<Playfield>().Single()));
+            AddStep("place circle", () => InputManager.Click(MouseButton.Left));
+            AddAssert("circle has soft bank", () => EditorBeatmap.HitObjects[1].Samples.All(s => s.Bank == HitSampleInfo.BANK_SOFT));
+            AddAssert("circle inherited volume", () => EditorBeatmap.HitObjects[1].Samples.All(s => s.Volume == 70));
+        }
+
+        [Test]
+        public void TestVolumeIsInheritedFromLastObject()
+        {
+            AddStep("add object with soft bank", () => EditorBeatmap.Add(new HitCircle
+            {
+                StartTime = 0,
+                Samples =
+                {
+                    new HitSampleInfo(name: HitSampleInfo.HIT_NORMAL, bank: HitSampleInfo.BANK_SOFT, volume: 70),
+                }
+            }));
+            AddStep("seek to 500", () => EditorClock.Seek(500));
+            AddStep("select drum bank", () =>
+            {
+                InputManager.PressKey(Key.LShift);
+                InputManager.Key(Key.R);
+                InputManager.ReleaseKey(Key.LShift);
+            });
+            AddStep("select circle placement tool", () => InputManager.Key(Key.Number2));
+            AddStep("move mouse to center of playfield", () => InputManager.MoveMouseTo(this.ChildrenOfType<Playfield>().Single()));
+            AddStep("place circle", () => InputManager.Click(MouseButton.Left));
+            AddAssert("circle has drum bank", () => EditorBeatmap.HitObjects[1].Samples.All(s => s.Bank == HitSampleInfo.BANK_DRUM));
+            AddAssert("circle inherited volume", () => EditorBeatmap.HitObjects[1].Samples.All(s => s.Volume == 70));
         }
     }
 }
