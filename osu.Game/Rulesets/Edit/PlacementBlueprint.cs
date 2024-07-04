@@ -156,24 +156,20 @@ namespace osu.Game.Rulesets.Edit
                     comboInformation.UpdateComboInformation(getPreviousHitObject() as IHasComboInformation);
             }
 
-            if (AutomaticBankAssignment)
-            {
-                // Take the hitnormal sample of the last hit object
-                var lastHitNormal = getPreviousHitObject()?.Samples?.FirstOrDefault(o => o.Name == HitSampleInfo.HIT_NORMAL);
-                if (lastHitNormal != null)
-                    HitObject.Samples[0] = lastHitNormal;
-            }
-            else
-            {
-                // Only inherit the volume from the previous hit object
-                var lastHitNormal = getPreviousHitObject()?.Samples?.FirstOrDefault(o => o.Name == HitSampleInfo.HIT_NORMAL);
+            var lastHitNormal = getPreviousHitObject()?.Samples?.FirstOrDefault(o => o.Name == HitSampleInfo.HIT_NORMAL);
 
-                if (lastHitNormal != null)
+            if (lastHitNormal != null)
+            {
+                if (AutomaticBankAssignment)
                 {
+                    // Take the hitnormal sample of the last hit object
+                    HitObject.Samples[0] = lastHitNormal;
+                }
+                else
+                {
+                    // Only inherit the volume from the previous hit object
                     for (int i = 0; i < HitObject.Samples.Count; i++)
-                    {
                         HitObject.Samples[i] = HitObject.Samples[i].With(newVolume: lastHitNormal.Volume);
-                    }
                 }
             }
         }
