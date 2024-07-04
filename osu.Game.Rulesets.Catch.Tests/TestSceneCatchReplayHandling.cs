@@ -25,8 +25,10 @@ namespace osu.Game.Rulesets.Catch.Tests
             AddStep("store catcher position", () => catcherPosition = drawableRuleset.ChildrenOfType<Catcher>().Single().X);
             AddStep("hold down left", () => InputManager.PressKey(Key.Left));
             AddAssert("catcher didn't move", () => drawableRuleset.ChildrenOfType<Catcher>().Single().X, () => Is.EqualTo(catcherPosition));
+            AddStep("release left", () => InputManager.ReleaseKey(Key.Left));
 
             AddStep("detach replay", () => drawableRuleset.SetReplayScore(null));
+            AddStep("hold down left", () => InputManager.PressKey(Key.Left));
             AddUntilStep("catcher moved", () => drawableRuleset.ChildrenOfType<Catcher>().Single().X, () => Is.Not.EqualTo(catcherPosition));
             AddStep("release left", () => InputManager.ReleaseKey(Key.Left));
         }
