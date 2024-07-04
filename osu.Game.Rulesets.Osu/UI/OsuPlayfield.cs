@@ -8,6 +8,7 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Primitives;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
@@ -46,6 +47,8 @@ namespace osu.Game.Rulesets.Osu.UI
         public static readonly Vector2 BASE_SIZE = new Vector2(512, 384);
 
         protected override GameplayCursorContainer? CreateCursor() => new OsuCursorContainer();
+
+        public override Quad SkinnableComponentScreenSpaceDrawQuad => playfieldBorder.ScreenSpaceDrawQuad;
 
         private readonly Container judgementAboveHitObjectLayer;
 
