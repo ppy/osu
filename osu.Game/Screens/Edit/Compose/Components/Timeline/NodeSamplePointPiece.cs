@@ -2,7 +2,9 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Input.Events;
 using osu.Game.Audio;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
@@ -20,6 +22,14 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 throw new System.ArgumentException($"HitObject must implement {nameof(IHasRepeats)}", nameof(hitObject));
 
             NodeIndex = nodeIndex;
+        }
+
+        protected override bool OnDoubleClick(DoubleClickEvent e)
+        {
+            var hasRepeats = (IHasRepeats)HitObject;
+            EditorClock?.SeekSmoothlyTo(HitObject.StartTime + hasRepeats.Duration * NodeIndex / hasRepeats.SpanCount());
+            this.ShowPopover();
+            return true;
         }
 
         protected override IList<HitSampleInfo> GetSamples()
