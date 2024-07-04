@@ -267,8 +267,7 @@ namespace osu.Game.Overlays
         /// <param name="unduckEasing">Easing for the unducking transition.</param>
         public IDisposable Duck(int duration = 0, float duckVolumeTo = 0.25f, int? duckCutoffTo = 300, Easing easing = Easing.OutCubic, int unduckDuration = 500, Easing unduckEasing = Easing.InCubic)
         {
-            if (audioDuckActive)
-                throw new InvalidOperationException("Cannot perform Duck() while another Duck() is in progress.");
+            if (audioDuckActive) return null;
 
             audioDuckActive = true;
 
