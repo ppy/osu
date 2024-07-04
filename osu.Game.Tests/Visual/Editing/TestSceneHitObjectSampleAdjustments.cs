@@ -7,6 +7,7 @@ using Humanizer;
 using NUnit.Framework;
 using osu.Framework.Input;
 using osu.Framework.Testing;
+using osu.Framework.Utils;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.UserInterface;
@@ -308,6 +309,40 @@ namespace osu.Game.Tests.Visual.Editing
         }
 
         [Test]
+        public void TestSamplePointSeek()
+        {
+            AddStep("add slider", () =>
+            {
+                EditorBeatmap.Clear();
+                EditorBeatmap.Add(new Slider
+                {
+                    Position = new Vector2(256, 256),
+                    StartTime = 0,
+                    Path = new SliderPath(new[] { new PathControlPoint(Vector2.Zero), new PathControlPoint(new Vector2(250, 0)) }),
+                    Samples =
+                    {
+                        new HitSampleInfo(HitSampleInfo.HIT_NORMAL)
+                    },
+                    NodeSamples =
+                    {
+                        new List<HitSampleInfo> { new HitSampleInfo(HitSampleInfo.HIT_NORMAL) },
+                        new List<HitSampleInfo> { new HitSampleInfo(HitSampleInfo.HIT_NORMAL) },
+                    },
+                    RepeatCount = 1
+                });
+            });
+
+            doubleClickNodeSamplePiece(0, 0);
+            editorTimeIs(0);
+            doubleClickNodeSamplePiece(0, 1);
+            editorTimeIs(813);
+            doubleClickNodeSamplePiece(0, 2);
+            editorTimeIs(1627);
+            doubleClickSamplePiece(0);
+            editorTimeIs(0);
+        }
+
+        [Test]
         public void TestHotkeysMultipleSelectionWithSameSampleBank()
         {
             AddStep("unify sample bank", () =>
@@ -500,6 +535,24 @@ namespace osu.Game.Tests.Visual.Editing
             InputManager.Click(MouseButton.Left);
         });
 
+        private void doubleClickSamplePiece(int objectIndex) => AddStep($"double-click {objectIndex.ToOrdinalWords()} sample piece", () =>
+        {
+            var samplePiece = this.ChildrenOfType<SamplePointPiece>().Single(piece => piece is not NodeSamplePointPiece && piece.HitObject == EditorBeatmap.HitObjects.ElementAt(objectIndex));
+
+            InputManager.MoveMouseTo(samplePiece);
+            InputManager.Click(MouseButton.Left);
+            InputManager.Click(MouseButton.Left);
+        });
+
+        private void doubleClickNodeSamplePiece(int objectIndex, int nodeIndex) => AddStep($"double-click {objectIndex.ToOrdinalWords()} object {nodeIndex.ToOrdinalWords()} node sample piece", () =>
+        {
+            var samplePiece = this.ChildrenOfType<NodeSamplePointPiece>().Where(piece => piece.HitObject == EditorBeatmap.HitObjects.ElementAt(objectIndex)).ToArray()[nodeIndex];
+
+            InputManager.MoveMouseTo(samplePiece);
+            InputManager.Click(MouseButton.Left);
+            InputManager.Click(MouseButton.Left);
+        });
+
         private void samplePopoverHasNoFocus() => AddUntilStep("sample popover textbox not focused", () =>
         {
             var popover = this.ChildrenOfType<SamplePointPiece.SampleEditPopover>().SingleOrDefault();
@@ -644,5 +697,7 @@ namespace osu.Game.Tests.Visual.Editing
             var h = EditorBeatmap.HitObjects.ElementAt(objectIndex) as IHasRepeats;
             return h is not null && h.NodeSamples[nodeIndex].Where(o => o.Name != HitSampleInfo.HIT_NORMAL).All(o => o.Bank == bank);
         });
+
+        private void editorTimeIs(double time) => AddAssert($"editor time is {time}", () => Precision.AlmostEquals(EditorClock.CurrentTimeAccurate, time, 1));
     }
 }
