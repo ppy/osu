@@ -87,7 +87,6 @@ namespace osu.Game.Overlays.Mods
                         scrollContainer = new OsuScrollContainer(Direction.Vertical)
                         {
                             RelativeSizeAxes = Axes.X,
-                            ScrollbarOverlapsContent = false,
                             // The +2f is a workaround for masking issues (see https://github.com/ppy/osu-framework/issues/1675#issuecomment-910023157)
                             // Note that this actually causes the full scroll range to be reduced by 2px at the bottom, but it's not really noticeable.
                             Margin = new MarginPadding { Top = header_height + 2f },
