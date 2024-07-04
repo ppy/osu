@@ -30,19 +30,9 @@ namespace osu.Desktop
         [STAThread]
         public static void Main(string[] args)
         {
-            /*
-             * WARNING: DO NOT PLACE **ANY** CODE ABOVE THE FOLLOWING BLOCK!
-             *
-             * Logic handling Squirrel MUST run before EVERYTHING if you do not want to break it.
-             * To be more precise: Squirrel is internally using a rather... crude method to determine whether it is running under NUnit,
-             * namely by checking loaded assemblies:
-             * https://github.com/clowd/Clowd.Squirrel/blob/24427217482deeeb9f2cacac555525edfc7bd9ac/src/Squirrel/SimpleSplat/PlatformModeDetector.cs#L17-L32
-             *
-             * If it finds ANY assembly from the ones listed above - REGARDLESS of the reason why it is loaded -
-             * the app will then do completely broken things like:
-             * - not creating system shortcuts (as the logic is if'd out if "running tests")
-             * - not exiting after the install / first-update / uninstall hooks are ran (as the `Environment.Exit()` calls are if'd out if "running tests")
-             */
+            // Velopack needs to run before anything else
+            setupVelo();
+
             if (OperatingSystem.IsWindows())
             {
                 var windowsVersion = Environment.OSVersion.Version;
@@ -66,8 +56,6 @@ namespace osu.Desktop
                     }
                 }
             }
-
-            setupVelo();
 
             // NVIDIA profiles are based on the executable name of a process.
             // Lazer and stable share the same executable name.
