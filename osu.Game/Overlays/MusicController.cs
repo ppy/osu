@@ -67,6 +67,7 @@ namespace osu.Game.Overlays
 
         private AudioFilter audioDuckFilter;
         private readonly BindableDouble audioDuckVolume = new BindableDouble(1);
+        private bool audioDuckActive;
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
@@ -262,8 +263,15 @@ namespace osu.Game.Overlays
         /// <param name="duckVolumeTo">Level to drop volume to (1.0 = 100%).</param>
         /// <param name="duckCutoffTo">Cutoff frequency to drop `AudioFilter` to. Use `null` to skip filter effect.</param>
         /// <param name="easing">Easing for the ducking transition.</param>
-        public void Duck(int duration = 0, float duckVolumeTo = 0.25f, int? duckCutoffTo = 300, Easing easing = Easing.OutCubic)
+        /// <param name="unduckDuration">Duration of the unducking transition, in ms.</param>
+        /// <param name="unduckEasing">Easing for the unducking transition.</param>
+        public IDisposable Duck(int duration = 0, float duckVolumeTo = 0.25f, int? duckCutoffTo = 300, Easing easing = Easing.OutCubic, int unduckDuration = 500, Easing unduckEasing = Easing.InCubic)
         {
+            if (audioDuckActive)
+                throw new InvalidOperationException("Cannot perform Duck() while another Duck() is in progress.");
+
+            audioDuckActive = true;
+
             Schedule(() =>
             {
                 if (duckCutoffTo.IsNotNull())
@@ -271,20 +279,8 @@ namespace osu.Game.Overlays
 
                 this.TransformBindableTo(audioDuckVolume, duckVolumeTo, duration, easing);
             });
-        }
 
-        /// <summary>
-        /// Restores the volume to full and stops filtering the currently playing track after having used <see cref="Duck"/>.
-        /// </summary>
-        /// <param name="duration">Duration of the unducking transition, in ms.</param>
-        /// <param name="easing">Easing for the unducking transition.</param>
-        public void Unduck(int duration = 500, Easing easing = Easing.InCubic)
-        {
-            Schedule(() =>
-            {
-                audioDuckFilter?.CutoffTo(AudioFilter.MAX_LOWPASS_CUTOFF, duration, easing);
-                this.TransformBindableTo(audioDuckVolume, 1, duration, easing);
-            });
+            return new InvokeOnDisposal(() => unduck(unduckDuration, unduckEasing));
         }
 
         /// <summary>
@@ -299,8 +295,23 @@ namespace osu.Game.Overlays
         /// <param name="duckEasing">Easing for the ducking transition.</param>
         public void TimedDuck(int delay, int unduckDuration = 500, Easing unduckEasing = Easing.InCubic, float duckVolumeTo = 0.25f, int? duckCutoffTo = 300, int duckDuration = 0, Easing duckEasing = Easing.OutCubic)
         {
+            if (audioDuckActive) return;
+
             Duck(duckDuration, duckVolumeTo, duckCutoffTo, duckEasing);
-            Scheduler.AddDelayed(() => Unduck(unduckDuration, unduckEasing), delay);
+            Scheduler.AddDelayed(() => unduck(unduckDuration, unduckEasing), delay);
+        }
+
+        private void unduck(int duration, Easing easing)
+        {
+            if (!audioDuckActive) return;
+
+            audioDuckActive = false;
+
+            Schedule(() =>
+            {
+                audioDuckFilter?.CutoffTo(AudioFilter.MAX_LOWPASS_CUTOFF, duration, easing);
+                this.TransformBindableTo(audioDuckVolume, 1, duration, easing);
+            });
         }
 
         private bool next()
