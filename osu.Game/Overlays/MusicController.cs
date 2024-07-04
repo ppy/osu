@@ -292,7 +292,7 @@ namespace osu.Game.Overlays
         /// <param name="duckCutoffTo">Cutoff frequency to drop `AudioFilter` to. Use `null` to skip filter effect.</param>
         /// <param name="duckDuration">Duration of the ducking transition, in ms.</param>
         /// <param name="duckEasing">Easing for the ducking transition.</param>
-        public void TimedDuck(int delay, int unduckDuration = 500, Easing unduckEasing = Easing.InCubic, float duckVolumeTo = 0.25f, int? duckCutoffTo = 300, int duckDuration = 0, Easing duckEasing = Easing.OutCubic)
+        public void DuckMomentarily(int delay, int unduckDuration = 500, Easing unduckEasing = Easing.InCubic, float duckVolumeTo = 0.25f, int? duckCutoffTo = 300, int duckDuration = 0, Easing duckEasing = Easing.OutCubic)
         {
             if (audioDuckActive) return;
 
