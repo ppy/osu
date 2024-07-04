@@ -381,9 +381,12 @@ namespace osu.Game.Rulesets.Scoring
             if (rank.Value == ScoreRank.F)
                 return;
 
-            rank.Value = RankFromScore(Accuracy.Value, ScoreResultCounts);
+            ScoreRank newRank = RankFromScore(Accuracy.Value, ScoreResultCounts);
+
             foreach (var mod in Mods.Value.OfType<IApplicableToScoreProcessor>())
-                rank.Value = mod.AdjustRank(Rank.Value, Accuracy.Value);
+                newRank = mod.AdjustRank(newRank, Accuracy.Value);
+
+            rank.Value = newRank;
         }
 
         protected virtual double ComputeTotalScore(double comboProgress, double accuracyProgress, double bonusPortion)

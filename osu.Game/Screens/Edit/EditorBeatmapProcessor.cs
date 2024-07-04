@@ -12,11 +12,13 @@ namespace osu.Game.Screens.Edit
 {
     public class EditorBeatmapProcessor : IBeatmapProcessor
     {
-        public IBeatmap Beatmap { get; }
+        public EditorBeatmap Beatmap { get; }
+
+        IBeatmap IBeatmapProcessor.Beatmap => Beatmap;
 
         private readonly IBeatmapProcessor? rulesetBeatmapProcessor;
 
-        public EditorBeatmapProcessor(IBeatmap beatmap, Ruleset ruleset)
+        public EditorBeatmapProcessor(EditorBeatmap beatmap, Ruleset ruleset)
         {
             Beatmap = beatmap;
             rulesetBeatmapProcessor = ruleset.CreateBeatmapProcessor(beatmap);
@@ -40,19 +42,30 @@ namespace osu.Game.Screens.Edit
 
             foreach (var manualBreak in Beatmap.Breaks.ToList())
             {
-                if (Beatmap.HitObjects.Any(ho => ho.StartTime <= manualBreak.EndTime && ho.GetEndTime() >= manualBreak.StartTime))
+                if (manualBreak.EndTime <= Beatmap.HitObjects.FirstOrDefault()?.StartTime
+                    || manualBreak.StartTime >= Beatmap.GetLastObjectTime()
+                    || Beatmap.HitObjects.Any(ho => ho.StartTime <= manualBreak.EndTime && ho.GetEndTime() >= manualBreak.StartTime))
+                {
                     Beatmap.Breaks.Remove(manualBreak);
+                }
             }
+
+            double currentMaxEndTime = double.MinValue;
 
             for (int i = 1; i < Beatmap.HitObjects.Count; ++i)
             {
-                double previousObjectEndTime = Beatmap.HitObjects[i - 1].GetEndTime();
+                // Keep track of the maximum end time encountered thus far.
+                // This handles cases like osu!mania's hold notes, which could have concurrent other objects after their start time.
+                // Note that we're relying on the implicit assumption that objects are sorted by start time,
+                // which is why similar tracking is not done for start time.
+                currentMaxEndTime = Math.Max(currentMaxEndTime, Beatmap.HitObjects[i - 1].GetEndTime());
+
                 double nextObjectStartTime = Beatmap.HitObjects[i].StartTime;
 
-                if (nextObjectStartTime - previousObjectEndTime < BreakPeriod.MIN_GAP_DURATION)
+                if (nextObjectStartTime - currentMaxEndTime < BreakPeriod.MIN_GAP_DURATION)
                     continue;
 
-                double breakStartTime = previousObjectEndTime + BreakPeriod.GAP_BEFORE_BREAK;
+                double breakStartTime = currentMaxEndTime + BreakPeriod.GAP_BEFORE_BREAK;
                 double breakEndTime = nextObjectStartTime - Math.Max(BreakPeriod.GAP_AFTER_BREAK, Beatmap.ControlPointInfo.TimingPointAt(nextObjectStartTime).BeatLength * 2);
 
                 if (breakEndTime - breakStartTime < BreakPeriod.MIN_BREAK_DURATION)
