@@ -10,12 +10,13 @@ using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Screens.Play;
 using osu.Game.Updater;
+using Velopack.Sources;
 
 namespace osu.Desktop.Updater
 {
     public partial class VeloUpdateManager : UpdateManager
     {
-        private Velopack.UpdateManager? updateManager;
+        private readonly Velopack.UpdateManager updateManager;
         private INotificationOverlay notificationOverlay = null!;
 
         [Resolved]
@@ -23,6 +24,12 @@ namespace osu.Desktop.Updater
 
         [Resolved]
         private ILocalUserPlayInfo? localUserInfo { get; set; }
+
+        public VeloUpdateManager()
+        {
+            const string? github_token = null; // TODO: populate.
+            updateManager = new Velopack.UpdateManager(new GithubSource(@"https://github.com/ppy/osu", github_token, false));
+        }
 
         [BackgroundDependencyLoader]
         private void load(INotificationOverlay notifications)
@@ -37,36 +44,30 @@ namespace osu.Desktop.Updater
             // should we schedule a retry on completion of this check?
             bool scheduleRecheck = true;
 
-            const string? github_token = null; // TODO: populate.
-
             try
             {
                 // Avoid any kind of update checking while gameplay is running.
                 if (localUserInfo?.IsPlaying.Value == true)
                     return false;
 
-                updateManager ??= new Velopack.UpdateManager(new Velopack.Sources.GithubSource(@"https://github.com/ppy/osu", github_token, false));
-
                 var info = await updateManager.CheckForUpdatesAsync().ConfigureAwait(false);
 
+                // Handle no updates available.
                 if (info == null)
                 {
-                    // If there is an update pending restart, show the notification again.
-                    if (updateManager.IsUpdatePendingRestart)
-                    {
-                        notificationOverlay.Post(new UpdateApplicationCompleteNotification
-                        {
-                            Activated = () =>
-                            {
-                                restartToApplyUpdate();
-                                return true;
-                            }
-                        });
-                        return true;
-                    }
+                    // If there's no updates pending restart, bail and retry later.
+                    if (!updateManager.IsUpdatePendingRestart) return false;
 
-                    // Otherwise there's no updates available. Bail and retry later.
-                    return false;
+                    // If there is an update pending restart, show the notification to restart again.
+                    notificationOverlay.Post(new UpdateApplicationCompleteNotification
+                    {
+                        Activated = () =>
+                        {
+                            restartToApplyUpdate();
+                            return true;
+                        }
+                    });
+                    return true;
                 }
 
                 scheduleRecheck = false;
@@ -87,8 +88,6 @@ namespace osu.Desktop.Updater
                 {
                     await updateManager.DownloadUpdatesAsync(info, p => notification.Progress = p / 100f).ConfigureAwait(false);
 
-                    notification.StartInstall();
-
                     notification.State = ProgressNotificationState.Completed;
                 }
                 catch (Exception e)
@@ -98,10 +97,11 @@ namespace osu.Desktop.Updater
                         Logger.Error(e, @"update failed!");
                 }
             }
-            catch (Exception)
+            catch (Exception e)
             {
                 // we'll ignore this and retry later. can be triggered by no internet connection or thread abortion.
                 scheduleRecheck = true;
+                Logger.Error(e, @"update check failed!");
             }
             finally
             {
@@ -117,9 +117,6 @@ namespace osu.Desktop.Updater
 
         private bool restartToApplyUpdate()
         {
-            if (updateManager == null)
-                return false;
-
             updateManager.WaitExitThenApplyUpdates(null);
             Schedule(() => game.AttemptExit());
             return true;
