@@ -10,6 +10,7 @@ using osu.Game.Overlays.Dialog;
 using osu.Game.Graphics.Containers;
 using osu.Game.Input.Bindings;
 using System.Linq;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Input.Events;
 
@@ -30,7 +31,8 @@ namespace osu.Game.Overlays
         public override bool IsPresent => Scheduler.HasPendingTasks
                                           || dialogContainer.Children.Count > 0;
 
-        private IDisposable? audioDucker;
+        [CanBeNull]
+        private IDisposable audioDucker;
 
         public DialogOverlay()
         {
