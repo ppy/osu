@@ -107,7 +107,7 @@ namespace osu.Desktop
         {
             try
             {
-                Velopack.UpdateExe.Start(null, true);
+                Velopack.UpdateExe.Start();
                 return true;
             }
             catch (Exception e)
