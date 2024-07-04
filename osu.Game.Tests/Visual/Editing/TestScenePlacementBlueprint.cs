@@ -10,6 +10,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Input.Bindings;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Edit;
+using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.UI;
@@ -175,6 +176,49 @@ namespace osu.Game.Tests.Visual.Editing
             AddStep("place circle", () => InputManager.Click(MouseButton.Left));
             AddAssert("circle has drum bank", () => EditorBeatmap.HitObjects[1].Samples.All(s => s.Bank == HitSampleInfo.BANK_DRUM));
             AddAssert("circle inherited volume", () => EditorBeatmap.HitObjects[1].Samples.All(s => s.Volume == 70));
+        }
+
+        [Test]
+        public void TestNodeSamplesAndSamplesAreSame()
+        {
+            Playfield playfield = null!;
+
+            AddStep("select drum bank", () =>
+            {
+                InputManager.PressKey(Key.LShift);
+                InputManager.Key(Key.R);
+                InputManager.ReleaseKey(Key.LShift);
+            });
+            AddStep("enable clap addition", () => InputManager.Key(Key.R));
+
+            AddStep("select slider placement tool", () => InputManager.Key(Key.Number3));
+            AddStep("move mouse to top left of playfield", () =>
+            {
+                playfield = this.ChildrenOfType<Playfield>().Single();
+                var location = (3 * playfield.ScreenSpaceDrawQuad.TopLeft + playfield.ScreenSpaceDrawQuad.BottomRight) / 4;
+                InputManager.MoveMouseTo(location);
+            });
+            AddStep("begin placement", () => InputManager.Click(MouseButton.Left));
+            AddStep("move mouse to bottom right of playfield", () =>
+            {
+                var location = (playfield.ScreenSpaceDrawQuad.TopLeft + 3 * playfield.ScreenSpaceDrawQuad.BottomRight) / 4;
+                InputManager.MoveMouseTo(location);
+            });
+            AddStep("confirm via global action", () =>
+            {
+                globalActionContainer.TriggerPressed(GlobalAction.Select);
+                globalActionContainer.TriggerReleased(GlobalAction.Select);
+            });
+            AddAssert("slider placed", () => EditorBeatmap.HitObjects.Count, () => Is.EqualTo(1));
+
+            AddAssert("slider samples have drum bank", () => EditorBeatmap.HitObjects[0].Samples.All(s => s.Bank == HitSampleInfo.BANK_DRUM));
+            AddAssert("slider node samples have drum bank",
+                () => ((IHasRepeats)EditorBeatmap.HitObjects[0]).NodeSamples.SelectMany(s => s).All(s => s.Bank == HitSampleInfo.BANK_DRUM));
+
+            AddAssert("slider samples have clap addition",
+                () => EditorBeatmap.HitObjects[0].Samples.Select(s => s.Name), () => Does.Contain(HitSampleInfo.HIT_CLAP));
+            AddAssert("slider node samples have clap addition",
+                () => ((IHasRepeats)EditorBeatmap.HitObjects[0]).NodeSamples.All(samples => samples.Any(s => s.Name == HitSampleInfo.HIT_CLAP)));
         }
     }
 }
