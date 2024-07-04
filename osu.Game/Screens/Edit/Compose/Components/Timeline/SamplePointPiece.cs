@@ -32,6 +32,9 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
     {
         public readonly HitObject HitObject;
 
+        [Resolved]
+        protected EditorClock? EditorClock { get; private set; }
+
         public SamplePointPiece(HitObject hitObject)
         {
             HitObject = hitObject;
@@ -50,6 +53,13 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         protected override bool OnClick(ClickEvent e)
         {
+            this.ShowPopover();
+            return true;
+        }
+
+        protected override bool OnDoubleClick(DoubleClickEvent e)
+        {
+            EditorClock?.SeekSmoothlyTo(HitObject.StartTime);
             this.ShowPopover();
             return true;
         }
