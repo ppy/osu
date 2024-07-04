@@ -92,9 +92,9 @@ namespace osu.Desktop.Updater
                 }
                 catch (Exception e)
                 {
-                        // In the case of an error, a separate notification will be displayed.
-                        notification.FailDownload();
-                        Logger.Error(e, @"update failed!");
+                    // In the case of an error, a separate notification will be displayed.
+                    notification.FailDownload();
+                    Logger.Error(e, @"update failed!");
                 }
             }
             catch (Exception e)
