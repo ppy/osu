@@ -408,6 +408,7 @@ namespace osu.Game.Tests.Rulesets.Scoring
                     Type = i == beatmap.HitObjects.Count - 101 ? HitResult.Ok : HitResult.Perfect
                 });
             }
+
             Assert.That(scoreProcessor.Rank.Value, Is.EqualTo(ScoreRank.S));
             Assert.That(scoreProcessor.MaximumRank.Value, Is.EqualTo(ScoreRank.S));
             Assert.That(scoreProcessor.MinimumRank.Value, Is.EqualTo(ScoreRank.D));
@@ -441,6 +442,7 @@ namespace osu.Game.Tests.Rulesets.Scoring
                     Type = i == beatmap.HitObjects.Count - 101 ? HitResult.Ok : HitResult.Perfect
                 });
             }
+
             Assert.That(scoreProcessor.Rank.Value, Is.EqualTo(ScoreRank.SH));
             Assert.That(scoreProcessor.MaximumRank.Value, Is.EqualTo(ScoreRank.SH));
             Assert.That(scoreProcessor.MinimumRank.Value, Is.EqualTo(ScoreRank.D));
@@ -471,6 +473,7 @@ namespace osu.Game.Tests.Rulesets.Scoring
                     Type = i == beatmap.HitObjects.Count - 101 ? HitResult.Ok : HitResult.Perfect
                 });
             }
+
             Assert.That(scoreProcessor.Rank.Value, Is.EqualTo(ScoreRank.SH));
             Assert.That(scoreProcessor.MaximumRank.Value, Is.EqualTo(ScoreRank.SH));
             Assert.That(scoreProcessor.MinimumRank.Value, Is.EqualTo(ScoreRank.D));
