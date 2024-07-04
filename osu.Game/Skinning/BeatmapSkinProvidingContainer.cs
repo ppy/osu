@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -17,9 +15,9 @@ namespace osu.Game.Skinning
     /// </summary>
     public partial class BeatmapSkinProvidingContainer : SkinProvidingContainer
     {
-        private Bindable<bool> beatmapSkins;
-        private Bindable<bool> beatmapColours;
-        private Bindable<bool> beatmapHitsounds;
+        private Bindable<bool> beatmapSkins = null!;
+        private Bindable<bool> beatmapColours = null!;
+        private Bindable<bool> beatmapHitsounds = null!;
 
         protected override bool AllowConfigurationLookup
         {
@@ -68,11 +66,15 @@ namespace osu.Game.Skinning
         }
 
         private readonly ISkin skin;
+        private readonly ISkin? classicFallback;
 
-        public BeatmapSkinProvidingContainer(ISkin skin)
+        private Bindable<Skin> currentSkin = null!;
+
+        public BeatmapSkinProvidingContainer(ISkin skin, ISkin? classicFallback = null)
             : base(skin)
         {
             this.skin = skin;
+            this.classicFallback = classicFallback;
         }
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
@@ -93,15 +95,19 @@ namespace osu.Game.Skinning
             beatmapColours.BindValueChanged(_ => TriggerSourceChanged());
             beatmapHitsounds.BindValueChanged(_ => TriggerSourceChanged());
 
-            // If the beatmap skin looks to have skinnable resources, add the default classic skin as a fallback opportunity.
-            if (skin is LegacySkinTransformer legacySkin && legacySkin.IsProvidingLegacyResources)
+            currentSkin = skins.CurrentSkin.GetBoundCopy();
+            currentSkin.BindValueChanged(_ =>
             {
-                SetSources(new[]
-                {
-                    skin,
-                    skins.DefaultClassicSkin
-                });
-            }
+                bool userSkinIsLegacy = skins.CurrentSkin.Value is LegacySkin;
+                bool beatmapProvidingResources = skin is LegacySkinTransformer legacySkin && legacySkin.IsProvidingLegacyResources;
+
+                // If the beatmap skin looks to have skinnable resources and the user's skin choice is not a legacy skin,
+                // add the default classic skin as a fallback opportunity.
+                if (!userSkinIsLegacy && beatmapProvidingResources && classicFallback != null)
+                    SetSources(new[] { skin, classicFallback });
+                else
+                    SetSources(new[] { skin });
+            }, true);
         }
     }
 }
