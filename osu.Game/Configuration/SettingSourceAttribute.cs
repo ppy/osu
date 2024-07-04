@@ -13,10 +13,8 @@ using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
-using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Settings;
-using osuTK;
 
 namespace osu.Game.Configuration
 {
@@ -276,37 +274,8 @@ namespace osu.Game.Configuration
 
             private partial class ModDropdownControl : DropdownControl
             {
-                protected override DropdownMenu CreateMenu() => new ModDropdownMenu();
-
-                private partial class ModDropdownMenu : OsuDropdownMenu
-                {
-                    public ModDropdownMenu()
-                    {
-                        // Set menu's max height low enough to workaround nested scroll issues (see https://github.com/ppy/osu-framework/issues/4536).
-                        MaxHeight = 100;
-                    }
-
-                    protected override void UpdateSize(Vector2 newSize)
-                    {
-                        base.UpdateSize(newSize);
-
-                        // todo: probably move this to OsuDropdown so that settings overlay can benefit from this as well.
-                        if (newSize.Y > 0)
-                        {
-                            var scroll = this.FindClosestParent<OsuScrollContainer>();
-
-                            if (scroll != null)
-                            {
-                                const float padding = 15;
-
-                                float target = scroll.GetChildPosInContent(this, new Vector2(0, newSize.Y + padding));
-
-                                if (target > scroll.Current + scroll.DisplayableContent)
-                                    scroll.ScrollTo(target - scroll.DisplayableContent);
-                            }
-                        }
-                    }
-                }
+                // Set menu's max height low enough to workaround nested scroll issues (see https://github.com/ppy/osu-framework/issues/4536).
+                protected override DropdownMenu CreateMenu() => base.CreateMenu().With(m => m.MaxHeight = 100);
             }
         }
     }
