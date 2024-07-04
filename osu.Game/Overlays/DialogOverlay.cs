@@ -3,6 +3,7 @@
 
 #nullable disable
 
+using System;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Overlays.Dialog;
@@ -29,6 +30,8 @@ namespace osu.Game.Overlays
         public override bool IsPresent => Scheduler.HasPendingTasks
                                           || dialogContainer.Children.Count > 0;
 
+        private IDisposable? audioDucker;
+
         public DialogOverlay()
         {
             AutoSizeAxes = Axes.Y;
@@ -43,6 +46,12 @@ namespace osu.Game.Overlays
 
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+            audioDucker?.Dispose();
         }
 
         public void Push(PopupDialog dialog)
@@ -95,13 +104,13 @@ namespace osu.Game.Overlays
 
         protected override void PopIn()
         {
-            musicController.Duck(100, 1f);
+            audioDucker = musicController.Duck(100, 1f, unduckDuration: 100);
         }
 
         protected override void PopOut()
         {
             base.PopOut();
-            musicController.Unduck(100);
+            audioDucker?.Dispose();
 
             // PopOut gets called initially, but we only want to hide dialog when we have been loaded and are present.
             if (IsLoaded && CurrentDialog?.State.Value == Visibility.Visible)

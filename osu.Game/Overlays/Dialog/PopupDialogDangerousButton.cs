@@ -47,9 +47,6 @@ namespace osu.Game.Overlays.Dialog
 
         private partial class DangerousConfirmContainer : HoldToConfirmContainer
         {
-            [Resolved]
-            private MusicController musicController { get; set; }
-
             public DangerousConfirmContainer()
                 : base(isDangerousAction: true)
             {
@@ -73,15 +70,8 @@ namespace osu.Game.Overlays.Dialog
                 Progress.BindValueChanged(progressChanged);
             }
 
-            protected override void AbortConfirm()
-            {
-                musicController?.Unduck();
-                base.AbortConfirm();
-            }
-
             protected override void Confirm()
             {
-                musicController?.Duck(100, 1f);
                 confirmSample?.Play();
                 base.Confirm();
             }
