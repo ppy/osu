@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Runtime.Versioning;
@@ -104,23 +103,17 @@ namespace osu.Desktop
             return new VeloUpdateManager();
         }
 
-        public override bool RestartApp()
+        public override bool RestartAppWhenExited()
         {
             try
             {
-                var startInfo = new ProcessStartInfo
-                {
-                    FileName = Process.GetCurrentProcess().MainModule!.FileName,
-                    UseShellExecute = true
-                };
-                Process.Start(startInfo);
-                base.AttemptExit();
+                Velopack.UpdateExe.Start(null, true);
                 return true;
             }
             catch (Exception e)
             {
                 Logger.Error(e, "Failed to restart application");
-                return base.RestartApp();
+                return base.RestartAppWhenExited();
             }
         }
 
