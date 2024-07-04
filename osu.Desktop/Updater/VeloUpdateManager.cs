@@ -9,14 +9,15 @@ using osu.Game;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Screens.Play;
-using osu.Game.Updater;
+using Velopack;
 using Velopack.Sources;
+using UpdateManager = Velopack.UpdateManager;
 
 namespace osu.Desktop.Updater
 {
-    public partial class VeloUpdateManager : UpdateManager
+    public partial class VeloUpdateManager : Game.Updater.UpdateManager
     {
-        private readonly Velopack.UpdateManager updateManager;
+        private readonly UpdateManager updateManager;
         private INotificationOverlay notificationOverlay = null!;
 
         [Resolved]
@@ -28,7 +29,10 @@ namespace osu.Desktop.Updater
         public VeloUpdateManager()
         {
             const string? github_token = null; // TODO: populate.
-            updateManager = new Velopack.UpdateManager(new GithubSource(@"https://github.com/ppy/osu", github_token, false));
+            updateManager = new UpdateManager(new GithubSource(@"https://github.com/ppy/osu", github_token, false), new UpdateOptions
+            {
+                AllowVersionDowngrade = true
+            });
         }
 
         [BackgroundDependencyLoader]
