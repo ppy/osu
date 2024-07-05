@@ -1,0 +1,134 @@
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
+
+using System;
+using NUnit.Framework;
+using osu.Game.Audio.Effects;
+using osu.Game.Overlays;
+
+namespace osu.Game.Tests.Visual.Menus
+{
+    public partial class TestSceneAudioDucking : OsuGameTestScene
+    {
+        [Test]
+        public void TestMomentaryDuck()
+        {
+            AddStep("duck momentarily", () => Game.MusicController.DuckMomentarily(1000, new DuckParameters
+            {
+                DuckDuration = 300,
+            }));
+        }
+
+        [Test]
+        public void TestMultipleDucks()
+        {
+            IDisposable duckOp1 = null!;
+            IDisposable duckOp2 = null!;
+
+            double normalVolume = 1;
+
+            AddStep("get initial volume", () =>
+            {
+                normalVolume = Game.Audio.Tracks.AggregateVolume.Value;
+            });
+
+            AddStep("duck one", () =>
+            {
+                duckOp1 = Game.MusicController.Duck(new DuckParameters
+                {
+                    DuckVolumeTo = 0.5f,
+                });
+            });
+
+            AddUntilStep("wait for duck to complete", () => Game.Audio.Tracks.AggregateVolume.Value, () => Is.EqualTo(normalVolume * 0.5f).Within(float.Epsilon));
+
+            AddStep("duck two", () =>
+            {
+                duckOp2 = Game.MusicController.Duck(new DuckParameters
+                {
+                    DuckVolumeTo = 0.2f,
+                });
+            });
+
+            AddUntilStep("wait for duck to complete", () => Game.Audio.Tracks.AggregateVolume.Value, () => Is.EqualTo(normalVolume * 0.2f).Within(float.Epsilon));
+
+            AddStep("restore two", () => duckOp2.Dispose());
+            AddUntilStep("wait for restore to complete", () => Game.Audio.Tracks.AggregateVolume.Value, () => Is.EqualTo(normalVolume * 0.5f).Within(float.Epsilon));
+
+            AddStep("restore one", () => duckOp1.Dispose());
+            AddUntilStep("wait for restore to complete", () => Game.Audio.Tracks.AggregateVolume.Value, () => Is.EqualTo(normalVolume).Within(float.Epsilon));
+        }
+
+        [Test]
+        public void TestMultipleDucksReverseOrder()
+        {
+            IDisposable duckOp1 = null!;
+            IDisposable duckOp2 = null!;
+
+            double normalVolume = 1;
+
+            AddStep("get initial volume", () =>
+            {
+                normalVolume = Game.Audio.Tracks.AggregateVolume.Value;
+            });
+
+            AddStep("duck one", () =>
+            {
+                duckOp1 = Game.MusicController.Duck(new DuckParameters
+                {
+                    DuckVolumeTo = 0.5f,
+                });
+            });
+
+            AddUntilStep("wait for duck to complete", () => Game.Audio.Tracks.AggregateVolume.Value, () => Is.EqualTo(normalVolume * 0.5f).Within(float.Epsilon));
+
+            AddStep("duck two", () =>
+            {
+                duckOp2 = Game.MusicController.Duck(new DuckParameters
+                {
+                    DuckVolumeTo = 0.2f,
+                });
+            });
+
+            AddUntilStep("wait for duck to complete", () => Game.Audio.Tracks.AggregateVolume.Value, () => Is.EqualTo(normalVolume * 0.2f).Within(float.Epsilon));
+
+            AddStep("restore one", () => duckOp1.Dispose());
+
+            // reverse order, less extreme duck removed so won't change
+            AddUntilStep("wait for restore to complete", () => Game.Audio.Tracks.AggregateVolume.Value, () => Is.EqualTo(normalVolume * 0.2f).Within(float.Epsilon));
+
+            AddStep("restore two", () => duckOp2.Dispose());
+            AddUntilStep("wait for restore to complete", () => Game.Audio.Tracks.AggregateVolume.Value, () => Is.EqualTo(normalVolume).Within(float.Epsilon));
+        }
+
+        [Test]
+        public void TestMultipleDucksDifferentPieces()
+        {
+            IDisposable duckOp1 = null!;
+            IDisposable duckOp2 = null!;
+
+            AddStep("duck volume", () =>
+            {
+                duckOp1 = Game.MusicController.Duck(new DuckParameters
+                {
+                    DuckVolumeTo = 0.2f,
+                    DuckCutoffTo = AudioFilter.MAX_LOWPASS_CUTOFF,
+                    DuckDuration = 500,
+                });
+            });
+
+            AddStep("duck lowpass", () =>
+            {
+                duckOp2 = Game.MusicController.Duck(new DuckParameters
+                {
+                    DuckVolumeTo = 1,
+                    DuckCutoffTo = 300,
+                    DuckDuration = 500,
+                });
+            });
+
+            AddStep("restore lowpass", () => duckOp2.Dispose());
+            AddStep("restore volume", () => duckOp1.Dispose());
+        }
+    }
+}
