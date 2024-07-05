@@ -1,12 +1,9 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
@@ -30,7 +27,7 @@ namespace osu.Game.Overlays
     public partial class MusicController : CompositeDrawable
     {
         [Resolved]
-        private BeatmapManager beatmaps { get; set; }
+        private BeatmapManager beatmaps { get; set; } = null!;
 
         /// <summary>
         /// Point in time after which the current track will be restarted on triggering a "previous track" action.
@@ -51,19 +48,18 @@ namespace osu.Game.Overlays
         /// Fired when the global <see cref="WorkingBeatmap"/> has changed.
         /// Includes direction information for display purposes.
         /// </summary>
-        public event Action<WorkingBeatmap, TrackChangeDirection> TrackChanged;
+        public event Action<WorkingBeatmap, TrackChangeDirection>? TrackChanged;
 
         [Resolved]
-        private IBindable<WorkingBeatmap> beatmap { get; set; }
+        private IBindable<WorkingBeatmap> beatmap { get; set; } = null!;
 
         [Resolved]
-        private IBindable<IReadOnlyList<Mod>> mods { get; set; }
+        private IBindable<IReadOnlyList<Mod>> mods { get; set; } = null!;
 
-        [NotNull]
         public DrawableTrack CurrentTrack { get; private set; } = new DrawableTrack(new TrackVirtual(1000));
 
         [Resolved]
-        private RealmAccess realm { get; set; }
+        private RealmAccess realm { get; set; } = null!;
 
         private AudioFilter audioDuckFilter;
         private readonly BindableDouble audioDuckVolume = new BindableDouble(1);
@@ -80,7 +76,11 @@ namespace osu.Game.Overlays
         {
             base.LoadComplete();
 
-            beatmap.BindValueChanged(b => changeBeatmap(b.NewValue), true);
+            beatmap.BindValueChanged(b =>
+            {
+                if (b.NewValue != null)
+                    changeBeatmap(b.NewValue);
+            }, true);
             mods.BindValueChanged(_ => ResetTrackAdjustments(), true);
         }
 
@@ -89,6 +89,9 @@ namespace osu.Game.Overlays
         /// </summary>
         public void ReloadCurrentTrack()
         {
+            if (current == null)
+                return;
+
             changeTrack();
             TrackChanged?.Invoke(current, TrackChangeDirection.None);
         }
@@ -103,7 +106,7 @@ namespace osu.Game.Overlays
         /// </summary>
         public bool TrackLoaded => CurrentTrack.TrackLoaded;
 
-        private ScheduledDelegate seekDelegate;
+        private ScheduledDelegate? seekDelegate;
 
         public void SeekTo(double position)
         {
@@ -205,7 +208,7 @@ namespace osu.Game.Overlays
         /// Play the previous track or restart the current track if it's current time below <see cref="restart_cutoff_point"/>.
         /// </summary>
         /// <param name="onSuccess">Invoked when the operation has been performed successfully.</param>
-        public void PreviousTrack(Action<PreviousTrackResult> onSuccess = null) => Schedule(() =>
+        public void PreviousTrack(Action<PreviousTrackResult>? onSuccess = null) => Schedule(() =>
         {
             PreviousTrackResult res = prev();
             if (res != PreviousTrackResult.None)
@@ -231,7 +234,7 @@ namespace osu.Game.Overlays
 
             queuedDirection = TrackChangeDirection.Prev;
 
-            var playableSet = getBeatmapSets().AsEnumerable().TakeWhile(i => !i.Equals(current.BeatmapSetInfo)).LastOrDefault()
+            var playableSet = getBeatmapSets().AsEnumerable().TakeWhile(i => !i.Equals(current?.BeatmapSetInfo)).LastOrDefault()
                               ?? getBeatmapSets().LastOrDefault();
 
             if (playableSet != null)
@@ -249,7 +252,7 @@ namespace osu.Game.Overlays
         /// </summary>
         /// <param name="onSuccess">Invoked when the operation has been performed successfully.</param>
         /// <returns>A <see cref="ScheduledDelegate"/> of the operation.</returns>
-        public void NextTrack(Action onSuccess = null) => Schedule(() =>
+        public void NextTrack(Action? onSuccess = null) => Schedule(() =>
         {
             bool res = next();
             if (res)
@@ -320,7 +323,7 @@ namespace osu.Game.Overlays
 
             queuedDirection = TrackChangeDirection.Next;
 
-            var playableSet = getBeatmapSets().AsEnumerable().SkipWhile(i => !i.Equals(current.BeatmapSetInfo)).ElementAtOrDefault(1)
+            var playableSet = getBeatmapSets().AsEnumerable().SkipWhile(i => !i.Equals(current?.BeatmapSetInfo)).ElementAtOrDefault(1)
                               ?? getBeatmapSets().FirstOrDefault();
 
             var playableBeatmap = playableSet?.Beatmaps.FirstOrDefault();
@@ -342,7 +345,7 @@ namespace osu.Game.Overlays
             Schedule(() => CurrentTrack.RestartAsync());
         }
 
-        private WorkingBeatmap current;
+        private WorkingBeatmap? current;
 
         private TrackChangeDirection? queuedDirection;
 
@@ -359,7 +362,7 @@ namespace osu.Game.Overlays
 
             TrackChangeDirection direction = TrackChangeDirection.None;
 
-            bool audioEquals = newWorking?.BeatmapInfo?.AudioEquals(current?.BeatmapInfo) == true;
+            bool audioEquals = newWorking.BeatmapInfo?.AudioEquals(current?.BeatmapInfo) == true;
 
             if (current != null)
             {
@@ -374,7 +377,7 @@ namespace osu.Game.Overlays
                 {
                     // figure out the best direction based on order in playlist.
                     int last = getBeatmapSets().AsEnumerable().TakeWhile(b => !b.Equals(current.BeatmapSetInfo)).Count();
-                    int next = newWorking == null ? -1 : getBeatmapSets().AsEnumerable().TakeWhile(b => !b.Equals(newWorking.BeatmapSetInfo)).Count();
+                    int next = getBeatmapSets().AsEnumerable().TakeWhile(b => !b.Equals(newWorking.BeatmapSetInfo)).Count();
 
                     direction = last > next ? TrackChangeDirection.Prev : TrackChangeDirection.Next;
                 }
@@ -431,7 +434,7 @@ namespace osu.Game.Overlays
         {
             // Important to keep this in its own method to avoid inadvertently capturing unnecessary variables in the callback.
             // Can lead to leaks.
-            var queuedTrack = new DrawableTrack(current.LoadTrack());
+            var queuedTrack = new DrawableTrack(current!.LoadTrack());
             queuedTrack.Completed += onTrackCompleted;
             return queuedTrack;
         }
@@ -460,7 +463,7 @@ namespace osu.Game.Overlays
             }
         }
 
-        private AudioAdjustments modTrackAdjustments;
+        private AudioAdjustments? modTrackAdjustments;
 
         /// <summary>
         /// Resets the adjustments currently applied on <see cref="CurrentTrack"/> and applies the mod adjustments if <see cref="ApplyModTrackAdjustments"/> is <c>true</c>.
