@@ -1082,26 +1082,12 @@ namespace osu.Game.Screens.Edit
         {
             double currentTime = clock.CurrentTimeAccurate;
 
+            // Check if we are currently inside a hit object with node samples, if so seek to the next node sample point
             var current = direction < 1
                 ? editorBeatmap.HitObjects.LastOrDefault(p => p is IHasRepeats r && p.StartTime < currentTime && r.EndTime >= currentTime)
                 : editorBeatmap.HitObjects.LastOrDefault(p => p is IHasRepeats r && p.StartTime <= currentTime && r.EndTime > currentTime);
 
-            if (current == null)
-            {
-                if (direction < 1)
-                {
-                    current = editorBeatmap.HitObjects.LastOrDefault(p => p.StartTime < currentTime);
-                    if (current != null)
-                        clock.SeekSmoothlyTo(current is IHasRepeats r ? r.EndTime : current.StartTime);
-                }
-                else
-                {
-                    current = editorBeatmap.HitObjects.FirstOrDefault(p => p.StartTime > currentTime);
-                    if (current != null)
-                        clock.SeekSmoothlyTo(current.StartTime);
-                }
-            }
-            else
+            if (current != null)
             {
                 // Find the next node sample point
                 var r = (IHasRepeats)current;
@@ -1121,6 +1107,21 @@ namespace osu.Game.Screens.Edit
                     : nodeSamplePointTimes.First(p => p > currentTime);
 
                 clock.SeekSmoothlyTo(found);
+            }
+            else
+            {
+                if (direction < 1)
+                {
+                    current = editorBeatmap.HitObjects.LastOrDefault(p => p.StartTime < currentTime);
+                    if (current != null)
+                        clock.SeekSmoothlyTo(current is IHasRepeats r ? r.EndTime : current.StartTime);
+                }
+                else
+                {
+                    current = editorBeatmap.HitObjects.FirstOrDefault(p => p.StartTime > currentTime);
+                    if (current != null)
+                        clock.SeekSmoothlyTo(current.StartTime);
+                }
             }
 
             // Show the sample edit popover at the current time
