@@ -7,8 +7,10 @@ using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Utils;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
 using osu.Game.Screens.OnlinePlay.DailyChallenge;
+using osu.Game.Screens.OnlinePlay.DailyChallenge.Events;
 using osu.Game.Tests.Resources;
 
 namespace osu.Game.Tests.Visual.DailyChallenge
@@ -50,26 +52,41 @@ namespace osu.Game.Tests.Visual.DailyChallenge
 
             AddStep("add normal score", () =>
             {
-                var testScore = TestResources.CreateTestScoreInfo();
-                testScore.TotalScore = RNG.Next(1_000_000);
+                var ev = new NewScoreEvent(1, new APIUser
+                {
+                    Id = 2,
+                    Username = "peppy",
+                    CoverUrl = "https://osu.ppy.sh/images/headers/profile-covers/c3.jpg",
+                }, RNG.Next(1_000_000), null);
 
-                feed.AddNewScore(new DailyChallengeEventFeed.NewScoreEvent(testScore, null));
+                feed.AddNewScore(ev);
             });
 
             AddStep("add new user best", () =>
             {
+                var ev = new NewScoreEvent(1, new APIUser
+                {
+                    Id = 2,
+                    Username = "peppy",
+                    CoverUrl = "https://osu.ppy.sh/images/headers/profile-covers/c3.jpg",
+                }, RNG.Next(1_000_000), RNG.Next(11, 1000));
+
                 var testScore = TestResources.CreateTestScoreInfo();
                 testScore.TotalScore = RNG.Next(1_000_000);
 
-                feed.AddNewScore(new DailyChallengeEventFeed.NewScoreEvent(testScore, RNG.Next(1, 1000)));
+                feed.AddNewScore(ev);
             });
 
             AddStep("add top 10 score", () =>
             {
-                var testScore = TestResources.CreateTestScoreInfo();
-                testScore.TotalScore = RNG.Next(1_000_000);
+                var ev = new NewScoreEvent(1, new APIUser
+                {
+                    Id = 2,
+                    Username = "peppy",
+                    CoverUrl = "https://osu.ppy.sh/images/headers/profile-covers/c3.jpg",
+                }, RNG.Next(1_000_000), RNG.Next(1, 10));
 
-                feed.AddNewScore(new DailyChallengeEventFeed.NewScoreEvent(testScore, RNG.Next(1, 10)));
+                feed.AddNewScore(ev);
             });
         }
     }

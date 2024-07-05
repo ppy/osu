@@ -1,9 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Graphics;
+using osu.Framework.Localisation;
 
 namespace osu.Game.Rulesets.Edit.Tools
 {
@@ -11,14 +10,16 @@ namespace osu.Game.Rulesets.Edit.Tools
     {
         public readonly string Name;
 
+        public LocalisableString TooltipText { get; init; }
+
         protected HitObjectCompositionTool(string name)
         {
             Name = name;
         }
 
-        public abstract PlacementBlueprint CreatePlacementBlueprint();
+        public abstract PlacementBlueprint? CreatePlacementBlueprint();
 
-        public virtual Drawable CreateIcon() => null;
+        public virtual Drawable? CreateIcon() => null;
 
         public override string ToString() => Name;
     }
