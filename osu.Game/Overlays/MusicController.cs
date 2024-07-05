@@ -262,6 +262,7 @@ namespace osu.Game.Overlays
         /// <summary>
         /// Attenuates the volume and/or filters the currently playing track.
         /// </summary>
+        /// <returns>A <see cref="IDisposable"/> which will restore the duck operation when disposed, or <c>null</c> if another duck operation was already in progress.</returns>
         public IDisposable? Duck(DuckParameters? parameters = null)
         {
             parameters ??= new DuckParameters();
