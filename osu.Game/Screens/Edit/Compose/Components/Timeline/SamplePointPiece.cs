@@ -57,7 +57,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             updateText();
 
             if (editor != null)
-                editor.ShowSampleEditPopoverRequested += OnShowSampleEditPopoverRequested;
+                editor.ShowSampleEditPopoverRequested += onShowSampleEditPopoverRequested;
         }
 
         protected override void Dispose(bool isDisposing)
@@ -65,10 +65,10 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             base.Dispose(isDisposing);
 
             if (editor != null)
-                editor.ShowSampleEditPopoverRequested -= OnShowSampleEditPopoverRequested;
+                editor.ShowSampleEditPopoverRequested -= onShowSampleEditPopoverRequested;
         }
 
-        private void OnShowSampleEditPopoverRequested(double time)
+        private void onShowSampleEditPopoverRequested(double time)
         {
             if (time == GetTime())
                 this.ShowPopover();
