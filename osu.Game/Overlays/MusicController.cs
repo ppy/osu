@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -284,8 +283,8 @@ namespace osu.Game.Overlays
 
             void restoreDucking() => Schedule(() =>
             {
-                Debug.Assert(duckOperations.Contains(parameters));
-                duckOperations.Remove(parameters);
+                if (!duckOperations.Remove(parameters))
+                    return;
 
                 DuckParameters? restoreVolumeOperation = duckOperations.MinBy(p => p.DuckVolumeTo);
                 DuckParameters? restoreLowPassOperation = duckOperations.MinBy(p => p.DuckCutoffTo);

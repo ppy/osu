@@ -102,6 +102,16 @@ namespace osu.Game.Tests.Visual.Menus
         }
 
         [Test]
+        public void TestMultipleDisposalIsNoop()
+        {
+            IDisposable duckOp1 = null!;
+
+            AddStep("duck", () => duckOp1 = Game.MusicController.Duck());
+            AddStep("restore", () => duckOp1.Dispose());
+            AddStep("restore", () => duckOp1.Dispose());
+        }
+
+        [Test]
         public void TestMultipleDucksDifferentPieces()
         {
             IDisposable duckOp1 = null!;
