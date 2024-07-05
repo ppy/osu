@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -62,8 +63,7 @@ namespace osu.Game.Overlays
 
         private readonly BindableDouble audioDuckVolume = new BindableDouble(1);
 
-        private AudioFilter? audioDuckFilter;
-        private bool audioDuckActive;
+        private AudioFilter audioDuckFilter = null!;
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
@@ -259,40 +259,41 @@ namespace osu.Game.Overlays
                 onSuccess?.Invoke();
         });
 
+        private readonly List<DuckParameters> duckOperations = new List<DuckParameters>();
+
         /// <summary>
-        /// Attenuates the volume and/or filters the currently playing track.
+        /// Applies ducking, attenuating the volume and/or low-pass cutoff of the currently playing track to make headroom for effects (or just to apply an effect).
         /// </summary>
-        /// <returns>A <see cref="IDisposable"/> which will restore the duck operation when disposed, or <c>null</c> if another duck operation was already in progress.</returns>
-        public IDisposable? Duck(DuckParameters? parameters = null)
+        /// <returns>A <see cref="IDisposable"/> which will restore the duck operation when disposed.</returns>
+        public IDisposable Duck(DuckParameters? parameters = null)
         {
             parameters ??= new DuckParameters();
 
-            if (audioDuckActive) return null;
+            if (duckOperations.Contains(parameters))
+                throw new ArgumentException("Ducking has already been applied for the provided parameters.", nameof(parameters));
 
-            audioDuckActive = true;
+            duckOperations.Add(parameters);
 
-            Schedule(() =>
-            {
-                if (parameters.DuckCutoffTo != null)
-                    audioDuckFilter?.CutoffTo(parameters.DuckCutoffTo.Value, parameters.DuckDuration, parameters.DuckEasing);
+            DuckParameters volumeOperation = duckOperations.MinBy(p => p.DuckVolumeTo)!;
+            DuckParameters lowPassOperation = duckOperations.MinBy(p => p.DuckCutoffTo)!;
 
-                this.TransformBindableTo(audioDuckVolume, parameters.DuckVolumeTo, parameters.DuckDuration, parameters.DuckEasing);
-            });
+            audioDuckFilter.CutoffTo(lowPassOperation.DuckCutoffTo, lowPassOperation.DuckDuration, lowPassOperation.DuckEasing);
+            this.TransformBindableTo(audioDuckVolume, volumeOperation.DuckVolumeTo, volumeOperation.DuckDuration, volumeOperation.DuckEasing);
 
             return new InvokeOnDisposal(restoreDucking);
 
-            void restoreDucking()
+            void restoreDucking() => Schedule(() =>
             {
-                if (!audioDuckActive) return;
+                Debug.Assert(duckOperations.Contains(parameters));
+                duckOperations.Remove(parameters);
 
-                audioDuckActive = false;
+                DuckParameters? restoreVolumeOperation = duckOperations.MinBy(p => p.DuckVolumeTo);
+                DuckParameters? restoreLowPassOperation = duckOperations.MinBy(p => p.DuckCutoffTo);
 
-                Schedule(() =>
-                {
-                    audioDuckFilter?.CutoffTo(AudioFilter.MAX_LOWPASS_CUTOFF, parameters.RestoreDuration, parameters.RestoreEasing);
-                    this.TransformBindableTo(audioDuckVolume, 1, parameters.RestoreDuration, parameters.RestoreEasing);
-                });
-            }
+                // If another duck operation is in the list, restore ducking to its level, else reset back to defaults.
+                audioDuckFilter.CutoffTo(restoreLowPassOperation?.DuckCutoffTo ?? AudioFilter.MAX_LOWPASS_CUTOFF, parameters.RestoreDuration, parameters.RestoreEasing);
+                this.TransformBindableTo(audioDuckVolume, restoreVolumeOperation?.DuckVolumeTo ?? 1, parameters.RestoreDuration, parameters.RestoreEasing);
+            });
         }
 
         /// <summary>
@@ -304,10 +305,7 @@ namespace osu.Game.Overlays
         {
             parameters ??= new DuckParameters();
 
-            IDisposable? duckOperation = Duck(parameters);
-
-            if (duckOperation == null)
-                return;
+            IDisposable duckOperation = Duck(parameters);
 
             Scheduler.AddDelayed(() => duckOperation.Dispose(), delayUntilRestore);
         }
@@ -485,7 +483,7 @@ namespace osu.Game.Overlays
         }
     }
 
-    public record DuckParameters
+    public class DuckParameters
     {
         /// <summary>
         /// The duration of the ducking transition in milliseconds.
@@ -500,10 +498,10 @@ namespace osu.Game.Overlays
         public float DuckVolumeTo = 0.25f;
 
         /// <summary>
-        /// The low-pass cutoff frequency which should be reached during ducking. Use `null` to skip filter effect.
+        /// The low-pass cutoff frequency which should be reached during ducking. If not required, set to <see cref="AudioFilter.MAX_LOWPASS_CUTOFF"/>.
         /// Defaults to 300 Hz.
         /// </summary>
-        public int? DuckCutoffTo = 300;
+        public int DuckCutoffTo = 300;
 
         /// <summary>
         /// The easing curve to be applied during ducking.
