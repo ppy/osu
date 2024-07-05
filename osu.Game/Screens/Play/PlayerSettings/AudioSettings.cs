@@ -17,7 +17,6 @@ namespace osu.Game.Screens.Play.PlayerSettings
         private Bindable<ScoreInfo> referenceScore { get; } = new Bindable<ScoreInfo>();
 
         private readonly PlayerCheckbox beatmapHitsoundsToggle;
-        private readonly PlayerCheckbox muteHitSoundsToggle;
 
         public AudioSettings()
             : base("Audio Settings")
@@ -25,7 +24,6 @@ namespace osu.Game.Screens.Play.PlayerSettings
             Children = new Drawable[]
             {
                 beatmapHitsoundsToggle = new PlayerCheckbox { LabelText = SkinSettingsStrings.BeatmapHitsounds },
-                muteHitSoundsToggle = new PlayerCheckbox { LabelText = AudioSettingsStrings.MuteHitsounds },
                 new BeatmapOffsetControl
                 {
                     ReferenceScore = { BindTarget = referenceScore },
@@ -37,7 +35,6 @@ namespace osu.Game.Screens.Play.PlayerSettings
         private void load(OsuConfigManager config, SessionStatics statics)
         {
             beatmapHitsoundsToggle.Current = config.GetBindable<bool>(OsuSetting.BeatmapHitsounds);
-            muteHitSoundsToggle.Current = config.GetBindable<bool>(OsuSetting.MuteHitsounds);
             statics.BindWith(Static.LastLocalUserScore, referenceScore);
         }
     }

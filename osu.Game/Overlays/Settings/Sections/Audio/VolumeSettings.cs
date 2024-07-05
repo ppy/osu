@@ -36,23 +36,24 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
                 },
                 new VolumeAdjustSlider
                 {
-                    LabelText = AudioSettingsStrings.EffectVolume,
-                    Current = audio.VolumeSample,
-                    KeyboardStep = 0.01f,
-                    DisplayAsPercentage = true
-                },
-
-                new VolumeAdjustSlider
-                {
                     LabelText = AudioSettingsStrings.MusicVolume,
                     Current = audio.VolumeTrack,
                     KeyboardStep = 0.01f,
                     DisplayAsPercentage = true
                 },
-                new SettingsCheckbox
+                new VolumeAdjustSlider
                 {
-                    LabelText = AudioSettingsStrings.MuteHitsounds,
-                    Current = config.GetBindable<bool>(OsuSetting.MuteHitsounds)
+                    LabelText = AudioSettingsStrings.EffectVolume,
+                    Current = audio.VolumeSample,
+                    KeyboardStep = 0.01f,
+                    DisplayAsPercentage = true
+                },
+                new SettingsSlider<double>
+                {
+                    LabelText = AudioSettingsStrings.GameplayVolume,
+                    Current = config.GetBindable<double>(OsuSetting.GameplayVolume),
+                    KeyboardStep = 0.01f,
+                    DisplayAsPercentage = true
                 },
             };
         }

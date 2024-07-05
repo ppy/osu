@@ -12,6 +12,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Audio;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Input;
@@ -69,7 +70,7 @@ namespace osu.Game.Rulesets.UI
 
         public override IAdjustableAudioComponent Audio => audioContainer;
 
-        private readonly AudioContainer audioContainer = new AudioContainer { RelativeSizeAxes = Axes.Both };
+        private readonly DrawableAudioMixer audioContainer = new DrawableAudioMixer { RelativeSizeAxes = Axes.Both, Name="GameplayMixer" };
 
         /// <summary>
         /// A container which encapsulates the <see cref="Playfield"/> and provides any adjustments to
@@ -211,11 +212,7 @@ namespace osu.Game.Rulesets.UI
                         .WithChild(ResumeOverlay)));
             }
 
-            var muteHitsounds = config.GetBindable<bool>(OsuSetting.MuteHitsounds);
-
-            BindableNumber<double> hitsoundMultiplier = new BindableDouble(muteHitsounds.Value ? 0.0 : 1.0);
-            muteHitsounds.ValueChanged += _ => { hitsoundMultiplier.Value = muteHitsounds.Value ? 0.0 : 1.0; };
-            audioContainer.AddAdjustment(AdjustableProperty.Volume, hitsoundMultiplier);
+            audioContainer.Volume.BindTo(config.GetBindable<double>(OsuSetting.GameplayVolume));
 
             applyRulesetMods(Mods, config);
 
