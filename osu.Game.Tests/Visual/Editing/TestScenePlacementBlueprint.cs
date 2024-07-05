@@ -114,10 +114,11 @@ namespace osu.Game.Tests.Visual.Editing
                 Samples =
                 {
                     new HitSampleInfo(name: HitSampleInfo.HIT_NORMAL, bank: HitSampleInfo.BANK_SOFT, volume: 70),
-                    new HitSampleInfo(name: HitSampleInfo.HIT_WHISTLE, bank: HitSampleInfo.BANK_SOFT, volume: 70),
+                    new HitSampleInfo(name: HitSampleInfo.HIT_WHISTLE, bank: HitSampleInfo.BANK_DRUM, volume: 70),
                 }
             }));
-            AddStep("seek to 500", () => EditorClock.Seek(500));
+
+            AddStep("seek to 500", () => EditorClock.Seek(500)); // previous object is the one at time 0
             AddStep("enable automatic bank assignment", () =>
             {
                 InputManager.PressKey(Key.LShift);
@@ -127,8 +128,28 @@ namespace osu.Game.Tests.Visual.Editing
             AddStep("select circle placement tool", () => InputManager.Key(Key.Number2));
             AddStep("move mouse to center of playfield", () => InputManager.MoveMouseTo(this.ChildrenOfType<Playfield>().Single()));
             AddStep("place circle", () => InputManager.Click(MouseButton.Left));
-            AddAssert("circle has soft bank", () => EditorBeatmap.HitObjects[1].Samples.All(s => s.Bank == HitSampleInfo.BANK_SOFT));
+            AddAssert("circle has soft bank", () => EditorBeatmap.HitObjects[1].Samples.Single().Bank, () => Is.EqualTo(HitSampleInfo.BANK_SOFT));
             AddAssert("circle inherited volume", () => EditorBeatmap.HitObjects[1].Samples.All(s => s.Volume == 70));
+
+            AddStep("seek to 250", () => EditorClock.Seek(250)); // previous object is the one at time 0
+            AddStep("enable clap addition", () => InputManager.Key(Key.R));
+            AddStep("select circle placement tool", () => InputManager.Key(Key.Number2));
+            AddStep("move mouse to center of playfield", () => InputManager.MoveMouseTo(this.ChildrenOfType<Playfield>().Single()));
+            AddStep("place circle", () => InputManager.Click(MouseButton.Left));
+            AddAssert("circle has 2 samples", () => EditorBeatmap.HitObjects[1].Samples, () => Has.Count.EqualTo(2));
+            AddAssert("normal sample has soft bank", () => EditorBeatmap.HitObjects[1].Samples.Single(s => s.Name == HitSampleInfo.HIT_NORMAL).Bank,
+                () => Is.EqualTo(HitSampleInfo.BANK_SOFT));
+            AddAssert("clap sample has drum bank", () => EditorBeatmap.HitObjects[1].Samples.Single(s => s.Name == HitSampleInfo.HIT_CLAP).Bank,
+                () => Is.EqualTo(HitSampleInfo.BANK_DRUM));
+            AddAssert("circle inherited volume", () => EditorBeatmap.HitObjects[1].Samples.All(s => s.Volume == 70));
+
+            AddStep("seek to 1000", () => EditorClock.Seek(1000)); // previous object is the one at time 500, which has no additions
+            AddStep("select circle placement tool", () => InputManager.Key(Key.Number2));
+            AddStep("move mouse to center of playfield", () => InputManager.MoveMouseTo(this.ChildrenOfType<Playfield>().Single()));
+            AddStep("place circle", () => InputManager.Click(MouseButton.Left));
+            AddAssert("circle has 2 samples", () => EditorBeatmap.HitObjects[3].Samples, () => Has.Count.EqualTo(2));
+            AddAssert("all samples have soft bank", () => EditorBeatmap.HitObjects[3].Samples.All(s => s.Bank == HitSampleInfo.BANK_SOFT));
+            AddAssert("circle inherited volume", () => EditorBeatmap.HitObjects[3].Samples.All(s => s.Volume == 70));
         }
 
         [Test]
