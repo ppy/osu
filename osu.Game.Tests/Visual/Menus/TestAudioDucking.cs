@@ -13,10 +13,7 @@ namespace osu.Game.Tests.Visual.Menus
         [Test]
         public void TestMomentaryDuck()
         {
-            AddStep("duck momentarily", () => Game.MusicController.DuckMomentarily(1000, new DuckParameters
-            {
-                DuckDuration = 300,
-            }));
+            AddStep("duck momentarily", () => Game.MusicController.DuckMomentarily(1000));
         }
 
         [Test]
