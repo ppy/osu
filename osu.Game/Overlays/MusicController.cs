@@ -8,7 +8,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Audio;
 using osu.Framework.Graphics.Containers;
@@ -263,59 +262,53 @@ namespace osu.Game.Overlays
         /// <summary>
         /// Attenuates the volume and/or filters the currently playing track.
         /// </summary>
-        /// <param name="duration">Duration of the ducking transition, in ms.</param>
-        /// <param name="duckVolumeTo">Level to drop volume to (1.0 = 100%).</param>
-        /// <param name="duckCutoffTo">Cutoff frequency to drop `AudioFilter` to. Use `null` to skip filter effect.</param>
-        /// <param name="easing">Easing for the ducking transition.</param>
-        /// <param name="unduckDuration">Duration of the unducking transition, in ms.</param>
-        /// <param name="unduckEasing">Easing for the unducking transition.</param>
-        public IDisposable? Duck(int duration = 0, float duckVolumeTo = 0.25f, int? duckCutoffTo = 300, Easing easing = Easing.Out, int unduckDuration = 500, Easing unduckEasing = Easing.In)
+        public IDisposable? Duck(DuckParameters? parameters = null)
         {
+            parameters ??= new DuckParameters();
+
             if (audioDuckActive) return null;
 
             audioDuckActive = true;
 
             Schedule(() =>
             {
-                if (duckCutoffTo.IsNotNull())
-                    audioDuckFilter?.CutoffTo((int)duckCutoffTo, duration, easing);
+                if (parameters.DuckCutoffTo != null)
+                    audioDuckFilter?.CutoffTo(parameters.DuckCutoffTo.Value, parameters.DuckDuration, parameters.DuckEasing);
 
-                this.TransformBindableTo(audioDuckVolume, duckVolumeTo, duration, easing);
+                this.TransformBindableTo(audioDuckVolume, parameters.DuckVolumeTo, parameters.DuckDuration, parameters.DuckEasing);
             });
 
-            return new InvokeOnDisposal(() => unduck(unduckDuration, unduckEasing));
+            return new InvokeOnDisposal(restoreDucking);
+
+            void restoreDucking()
+            {
+                if (!audioDuckActive) return;
+
+                audioDuckActive = false;
+
+                Schedule(() =>
+                {
+                    audioDuckFilter?.CutoffTo(AudioFilter.MAX_LOWPASS_CUTOFF, parameters.RestoreDuration, parameters.RestoreEasing);
+                    this.TransformBindableTo(audioDuckVolume, 1, parameters.RestoreDuration, parameters.RestoreEasing);
+                });
+            }
         }
 
         /// <summary>
-        /// A convenience method that ducks the currently playing track, then after a delay, unducks it.
+        /// A convenience method that ducks the currently playing track, then after a delay, restores automatically.
         /// </summary>
-        /// <param name="delay">Delay after audio is ducked before unducking begins, in ms.</param>
-        /// <param name="unduckDuration">Duration of the unducking transition, in ms.</param>
-        /// <param name="unduckEasing">Easing for the unducking transition.</param>
-        /// <param name="duckVolumeTo">Level to drop volume to (1.0 = 100%).</param>
-        /// <param name="duckCutoffTo">Cutoff frequency to drop `AudioFilter` to. Use `null` to skip filter effect.</param>
-        /// <param name="duckDuration">Duration of the ducking transition, in ms.</param>
-        /// <param name="duckEasing">Easing for the ducking transition.</param>
-        public void DuckMomentarily(int delay, int unduckDuration = 500, Easing unduckEasing = Easing.In, float duckVolumeTo = 0.25f, int? duckCutoffTo = 300, int duckDuration = 0,
-                                    Easing duckEasing = Easing.Out)
+        /// <param name="delayUntilRestore">A delay in milliseconds which defines how long to delay restoration after ducking completes.</param>
+        /// <param name="parameters">Parameters defining the ducking operation.</param>
+        public void DuckMomentarily(double delayUntilRestore, DuckParameters? parameters = null)
         {
-            if (audioDuckActive) return;
+            parameters ??= new DuckParameters();
 
-            Duck(duckDuration, duckVolumeTo, duckCutoffTo, duckEasing);
-            Scheduler.AddDelayed(() => unduck(unduckDuration, unduckEasing), delay);
-        }
+            IDisposable? duckOperation = Duck(parameters);
 
-        private void unduck(int duration, Easing easing)
-        {
-            if (!audioDuckActive) return;
+            if (duckOperation == null)
+                return;
 
-            audioDuckActive = false;
-
-            Schedule(() =>
-            {
-                audioDuckFilter?.CutoffTo(AudioFilter.MAX_LOWPASS_CUTOFF, duration, easing);
-                this.TransformBindableTo(audioDuckVolume, 1, duration, easing);
-            });
+            Scheduler.AddDelayed(() => duckOperation.Dispose(), delayUntilRestore);
         }
 
         private bool next()
@@ -489,6 +482,45 @@ namespace osu.Game.Overlays
                     mod.ApplyToTrack(modTrackAdjustments);
             }
         }
+    }
+
+    public record DuckParameters
+    {
+        /// <summary>
+        /// The duration of the ducking transition in milliseconds.
+        /// Defaults to no duration (immediate ducking).
+        /// </summary>
+        public double DuckDuration = 0;
+
+        /// <summary>
+        /// The final volume which should be reached during ducking, when 0 is silent and 1 is original volume.
+        /// Defaults to 25%.
+        /// </summary>
+        public float DuckVolumeTo = 0.25f;
+
+        /// <summary>
+        /// The low-pass cutoff frequency which should be reached during ducking. Use `null` to skip filter effect.
+        /// Defaults to 300 Hz.
+        /// </summary>
+        public int? DuckCutoffTo = 300;
+
+        /// <summary>
+        /// The easing curve to be applied during ducking.
+        /// Defaults to <see cref="Easing.Out"/>.
+        /// </summary>
+        public Easing DuckEasing = Easing.Out;
+
+        /// <summary>
+        /// The duration of the restoration transition in milliseconds.
+        /// Defaults to 500 ms.
+        /// </summary>
+        public double RestoreDuration = 500;
+
+        /// <summary>
+        /// The easing curve to be applied during restoration.
+        /// Defaults to <see cref="Easing.In"/>.
+        /// </summary>
+        public Easing RestoreEasing = Easing.In;
     }
 
     public enum TrackChangeDirection
