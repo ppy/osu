@@ -24,7 +24,7 @@ namespace osu.Game.Collections
         protected override string PopInSampleName => @"UI/overlay-big-pop-in";
         protected override string PopOutSampleName => @"UI/overlay-big-pop-out";
 
-        private IDisposable? audioDucker;
+        private IDisposable? duckOperation;
 
         [Resolved]
         private MusicController? musicController { get; set; }
@@ -120,12 +120,17 @@ namespace osu.Game.Collections
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
-            audioDucker?.Dispose();
+            duckOperation?.Dispose();
         }
 
         protected override void PopIn()
         {
-            audioDucker = musicController?.Duck(100, 1f, unduckDuration: 100);
+            duckOperation = musicController?.Duck(new DuckParameters
+            {
+                DuckDuration = 100,
+                DuckVolumeTo = 1,
+                RestoreDuration = 100,
+            });
 
             this.FadeIn(enter_duration, Easing.OutQuint);
             this.ScaleTo(0.9f).Then().ScaleTo(1f, enter_duration, Easing.OutQuint);
@@ -135,7 +140,7 @@ namespace osu.Game.Collections
         {
             base.PopOut();
 
-            audioDucker?.Dispose();
+            duckOperation?.Dispose();
 
             this.FadeOut(exit_duration, Easing.OutQuint);
             this.ScaleTo(0.9f, exit_duration);

@@ -32,7 +32,7 @@ namespace osu.Game.Overlays
                                           || dialogContainer.Children.Count > 0;
 
         [CanBeNull]
-        private IDisposable audioDucker;
+        private IDisposable duckOperation;
 
         public DialogOverlay()
         {
@@ -53,7 +53,7 @@ namespace osu.Game.Overlays
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
-            audioDucker?.Dispose();
+            duckOperation?.Dispose();
         }
 
         public void Push(PopupDialog dialog)
@@ -106,13 +106,18 @@ namespace osu.Game.Overlays
 
         protected override void PopIn()
         {
-            audioDucker = musicController.Duck(100, 1f, unduckDuration: 100);
+            duckOperation = musicController?.Duck(new DuckParameters
+            {
+                DuckDuration = 100,
+                DuckVolumeTo = 1,
+                RestoreDuration = 100,
+            });
         }
 
         protected override void PopOut()
         {
             base.PopOut();
-            audioDucker?.Dispose();
+            duckOperation?.Dispose();
 
             // PopOut gets called initially, but we only want to hide dialog when we have been loaded and are present.
             if (IsLoaded && CurrentDialog?.State.Value == Visibility.Visible)
