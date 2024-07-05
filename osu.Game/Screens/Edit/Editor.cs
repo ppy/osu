@@ -43,6 +43,7 @@ using osu.Game.Overlays.OSD;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Screens.Edit.Components.Menus;
 using osu.Game.Screens.Edit.Compose;
 using osu.Game.Screens.Edit.Compose.Components.Timeline;
@@ -1074,11 +1075,66 @@ namespace osu.Game.Screens.Edit
                 clock.SeekSmoothlyTo(found.StartTime);
         }
 
+        [CanBeNull]
+        public event Action<double> ShowSampleEditPopoverRequested;
+
+        private void seekSamplePoint(int direction)
+        {
+            double currentTime = clock.CurrentTimeAccurate;
+
+            var current = direction < 1
+                ? editorBeatmap.HitObjects.LastOrDefault(p => p is IHasRepeats r && p.StartTime < currentTime && r.EndTime >= currentTime)
+                : editorBeatmap.HitObjects.LastOrDefault(p => p is IHasRepeats r && p.StartTime <= currentTime && r.EndTime > currentTime);
+
+            if (current == null)
+            {
+                if (direction < 1)
+                {
+                    current = editorBeatmap.HitObjects.LastOrDefault(p => p.StartTime < currentTime);
+                    if (current != null)
+                        clock.SeekSmoothlyTo(current is IHasRepeats r ? r.EndTime : current.StartTime);
+                }
+                else
+                {
+                    current = editorBeatmap.HitObjects.FirstOrDefault(p => p.StartTime > currentTime);
+                    if (current != null)
+                        clock.SeekSmoothlyTo(current.StartTime);
+                }
+            }
+            else
+            {
+                // Find the next node sample point
+                var r = (IHasRepeats)current;
+                double[] nodeSamplePointTimes = new double[r.RepeatCount + 3];
+
+                nodeSamplePointTimes[0] = current.StartTime;
+                // The sample point for the main samples is sandwiched between the head and the first repeat
+                nodeSamplePointTimes[1] = current.StartTime + r.Duration / r.SpanCount() / 2;
+
+                for (int i = 0; i < r.SpanCount(); i++)
+                {
+                    nodeSamplePointTimes[i + 2] = current.StartTime + r.Duration / r.SpanCount() * (i + 1);
+                }
+
+                double found = direction < 1
+                    ? nodeSamplePointTimes.Last(p => p < currentTime)
+                    : nodeSamplePointTimes.First(p => p > currentTime);
+
+                clock.SeekSmoothlyTo(found);
+            }
+
+            // Show the sample edit popover at the current time
+            ShowSampleEditPopoverRequested?.Invoke(clock.CurrentTimeAccurate);
+        }
+
         private void seek(UIEvent e, int direction)
         {
             if (e.AltPressed)
             {
-                seekHitObject(direction);
+                if (e.ShiftPressed)
+                    seekSamplePoint(direction);
+                else
+                    seekHitObject(direction);
                 return;
             }
 

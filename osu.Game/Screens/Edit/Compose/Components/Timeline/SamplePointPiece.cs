@@ -21,6 +21,7 @@ using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Screens.Edit.Components.TernaryButtons;
 using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Screens.Edit.Timing;
 using osuTK;
 using osuTK.Graphics;
@@ -33,7 +34,10 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         public readonly HitObject HitObject;
 
         [Resolved]
-        protected EditorClock? EditorClock { get; private set; }
+        private EditorClock? editorClock { get; set; }
+
+        [Resolved]
+        private Editor? editor { get; set; }
 
         public SamplePointPiece(HitObject hitObject)
         {
@@ -44,11 +48,30 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         protected override Color4 GetRepresentingColour(OsuColour colours) => AlternativeColor ? colours.Pink2 : colours.Pink1;
 
+        protected virtual double GetTime() => HitObject is IHasRepeats r ? HitObject.StartTime + r.Duration / r.SpanCount() / 2 : HitObject.StartTime;
+
         [BackgroundDependencyLoader]
         private void load()
         {
             HitObject.DefaultsApplied += _ => updateText();
             updateText();
+
+            if (editor != null)
+                editor.ShowSampleEditPopoverRequested += OnShowSampleEditPopoverRequested;
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (editor != null)
+                editor.ShowSampleEditPopoverRequested -= OnShowSampleEditPopoverRequested;
+        }
+
+        private void OnShowSampleEditPopoverRequested(double time)
+        {
+            if (time == GetTime())
+                this.ShowPopover();
         }
 
         protected override bool OnClick(ClickEvent e)
@@ -59,7 +82,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         protected override bool OnDoubleClick(DoubleClickEvent e)
         {
-            EditorClock?.SeekSmoothlyTo(HitObject.StartTime);
+            editorClock?.SeekSmoothlyTo(GetTime());
             this.ShowPopover();
             return true;
         }
