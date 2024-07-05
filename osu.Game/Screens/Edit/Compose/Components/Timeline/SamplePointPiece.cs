@@ -76,12 +76,6 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         protected override bool OnClick(ClickEvent e)
         {
-            this.ShowPopover();
-            return true;
-        }
-
-        protected override bool OnDoubleClick(DoubleClickEvent e)
-        {
             editorClock?.SeekSmoothlyTo(GetTime());
             this.ShowPopover();
             return true;
