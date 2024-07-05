@@ -593,7 +593,7 @@ namespace osu.Game.Screens.Edit
 
         protected override bool OnKeyDown(KeyDownEvent e)
         {
-            if (e.ControlPressed || e.AltPressed || e.SuperPressed) return false;
+            if (e.ControlPressed || e.SuperPressed) return false;
 
             switch (e.Key)
             {
@@ -674,7 +674,7 @@ namespace osu.Game.Screens.Edit
 
         protected override bool OnScroll(ScrollEvent e)
         {
-            if (e.ControlPressed || e.AltPressed || e.SuperPressed)
+            if (e.ControlPressed || e.SuperPressed)
                 return false;
 
             const double precision = 1;
@@ -1064,8 +1064,24 @@ namespace osu.Game.Screens.Edit
                 clock.Seek(found.Time);
         }
 
+        private void seekHitObject(int direction)
+        {
+            var found = direction < 1
+                ? editorBeatmap.HitObjects.LastOrDefault(p => p.StartTime < clock.CurrentTimeAccurate)
+                : editorBeatmap.HitObjects.FirstOrDefault(p => p.StartTime > clock.CurrentTimeAccurate);
+
+            if (found != null)
+                clock.SeekSmoothlyTo(found.StartTime);
+        }
+
         private void seek(UIEvent e, int direction)
         {
+            if (e.AltPressed)
+            {
+                seekHitObject(direction);
+                return;
+            }
+
             double amount = e.ShiftPressed ? 4 : 1;
 
             bool trackPlaying = clock.IsRunning;
