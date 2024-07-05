@@ -122,7 +122,7 @@ namespace osu.Game.Overlays.Toolbar
 
             rulesetSelectionChannel[r.NewValue] = channel;
             channel.Play();
-            musicController?.DuckMomentarily(500);
+            musicController?.DuckMomentarily(500, new DuckParameters { DuckDuration = 0 });
         }
 
         public override bool HandleNonPositionalInput => !Current.Disabled && base.HandleNonPositionalInput;

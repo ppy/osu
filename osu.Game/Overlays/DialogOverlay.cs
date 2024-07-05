@@ -108,8 +108,8 @@ namespace osu.Game.Overlays
         {
             duckOperation = musicController?.Duck(new DuckParameters
             {
-                DuckDuration = 100,
                 DuckVolumeTo = 1,
+                DuckDuration = 100,
                 RestoreDuration = 100,
             });
         }

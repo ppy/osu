@@ -486,9 +486,9 @@ namespace osu.Game.Overlays
     {
         /// <summary>
         /// The duration of the ducking transition in milliseconds.
-        /// Defaults to no duration (immediate ducking).
+        /// Defaults to 100 ms.
         /// </summary>
-        public double DuckDuration = 0;
+        public double DuckDuration = 100;
 
         /// <summary>
         /// The final volume which should be reached during ducking, when 0 is silent and 1 is original volume.
