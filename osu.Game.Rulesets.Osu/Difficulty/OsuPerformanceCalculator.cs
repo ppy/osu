@@ -14,6 +14,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 {
     public class OsuPerformanceCalculator : PerformanceCalculator
     {
+        // This multiplier will be applied to total pp value. Use when 
+        public const double PERFORMANCE_MULTIPLIER = 1.14;
+
         private double accuracy;
         private int scoreMaxCombo;
         private int countGreat;
@@ -40,6 +43,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             countMiss = score.Statistics.GetValueOrDefault(HitResult.Miss);
             effectiveMissCount = calculateEffectiveMissCount(osuAttributes);
 
+            double multiplier = PERFORMANCE_MULTIPLIER;
+
+            if (score.Mods.Any(m => m is OsuModNoFail))
+                multiplier *= Math.Max(0.90, 1.0 - 0.02 * effectiveMissCount);
+
+            if (score.Mods.Any(m => m is OsuModSpunOut) && totalHits > 0)
+                multiplier *= 1.0 - Math.Pow((double)osuAttributes.SpinnerCount / totalHits, 0.85);
+
             if (score.Mods.Any(h => h is OsuModRelax))
             {
                 // https://www.desmos.com/calculator/bc9eybdthb
@@ -64,7 +75,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                     Math.Pow(speedValue, power) +
                     Math.Pow(accuracyValue, power) +
                     Math.Pow(flashlightValue, power), 1.0 / power
-                );
+                ) * multiplier;
 
             return new OsuPerformanceAttributes
             {
@@ -208,6 +219,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             if (score.Mods.Any(m => m is OsuModFlashlight))
                 accuracyValue *= 1.02;
+
+            // Apply arbitrary scaling to make accuracy pp affected by difficulty multiplier
+            accuracyValue *= 14.39 * OsuDifficultyCalculator.DIFFICULTY_MULTIPLIER;
 
             return accuracyValue;
         }

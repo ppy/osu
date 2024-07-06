@@ -10,8 +10,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 {
     public static class FlashlightEvaluator
     {
-        private const double skill_multiplier = 0.052;
-
         private const double max_opacity_bonus = 0.4;
         private const double hidden_bonus = 0.2;
 
@@ -112,7 +110,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             result += sliderBonus * slider_multiplier;
 
-            return skill_multiplier * result;
+            return result;
         }
     }
 }

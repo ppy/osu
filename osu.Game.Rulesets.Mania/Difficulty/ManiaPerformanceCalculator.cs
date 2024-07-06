@@ -59,10 +59,14 @@ namespace osu.Game.Rulesets.Mania.Difficulty
 
         private double computeDifficultyValue(ManiaDifficultyAttributes attributes)
         {
-            double rawDifficulty = Math.Pow(attributes.StarRating / 1.61, 1 / 0.79);
-            double difficultyValue = 0.8818 * Math.Pow(rawDifficulty, 2.24) // Star rating to pp curve
-                                     * Math.Max(0, 5 * scoreAccuracy - 4) // From 80% accuracy, 1/20th of total pp is awarded per additional 1% accuracy
-                                     * (1 + 0.1 * Math.Min(1, totalHits / 1500)); // Length bonus, capped at 1500 notes
+            // Star rating to pp curve
+            double difficultyValue = Math.Pow(Math.Max(attributes.StarRating - 0.15, 0.05), 2.2);
+
+            // From 80% accuracy, 1/20th of total pp is awarded per additional 1% accuracy
+            difficultyValue *= Math.Max(0, 5 * scoreAccuracy - 4);
+
+            // Length bonus, capped at 1500 notes
+            difficultyValue *= (1 + 0.1 * Math.Min(1, totalHits / 1500));
 
             return difficultyValue;
         }

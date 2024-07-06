@@ -13,6 +13,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
     /// </summary>
     public class Aim : OsuStrainSkill
     {
+        private const double skill_multiplier = 23.55;
+
         public Aim(Mod[] mods, bool withSliders)
             : base(mods)
         {
@@ -24,7 +26,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         protected override double StrainValueAt(DifficultyHitObject current)
         {
             CurrentStrain *= StrainDecay(current.DeltaTime);
-            CurrentStrain += AimEvaluator.EvaluateDifficultyOf(current, withSliders);
+            CurrentStrain += AimEvaluator.EvaluateDifficultyOf(current, withSliders) * skill_multiplier;
 
             return CurrentStrain;
         }

@@ -47,7 +47,6 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             hitWindows.SetDifficulty(beatmap.Difficulty.OverallDifficulty);
 
             double difficulty = skills[0].DifficultyValue();
-            difficulty = 1.61 * Math.Pow(difficulty, 0.79);
 
             ManiaDifficultyAttributes attributes = new ManiaDifficultyAttributes
             {

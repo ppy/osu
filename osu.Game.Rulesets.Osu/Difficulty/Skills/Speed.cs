@@ -16,6 +16,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
     /// </summary>
     public class Speed : OsuStrainSkill
     {
+        private const double skill_multiplier = 1.35;
         private double currentRhythm;
 
         protected override int ReducedSectionCount => 5;
@@ -34,7 +35,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         protected override double StrainValueAt(DifficultyHitObject current)
         {
             CurrentStrain *= StrainDecay(((OsuDifficultyHitObject)current).StrainTime);
-            CurrentStrain += SpeedEvaluator.EvaluateDifficultyOf(current);
+            CurrentStrain += SpeedEvaluator.EvaluateDifficultyOf(current) * skill_multiplier;
 
             currentRhythm = RhythmEvaluator.EvaluateDifficultyOf(current);
 

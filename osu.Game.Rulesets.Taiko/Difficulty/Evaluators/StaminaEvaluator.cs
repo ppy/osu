@@ -10,8 +10,6 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
 {
     public class StaminaEvaluator
     {
-        private const double skill_multiplier = 1.1;
-
         /// <summary>
         /// Applies a speed bonus dependent on the time since the last hit performed using this finger.
         /// </summary>
@@ -71,7 +69,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
 
             double objectStrain = 0.5; // Add a base strain to all objects
             objectStrain += speedBonus(taikoCurrent.StartTime - keyPrevious.StartTime);
-            return skill_multiplier * objectStrain;
+            return objectStrain;
         }
     }
 }

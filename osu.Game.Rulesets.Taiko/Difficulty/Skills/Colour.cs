@@ -13,6 +13,8 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
     /// </summary>
     public class Colour : StrainDecaySkill
     {
+        private const double skill_multiplier = 0.12;
+
         // This is set to decay slower than other skills, due to the fact that only the first note of each encoding class
         //  having any difficulty values, and we want to allow colour difficulty to be able to build up even on
         // slower maps.
@@ -25,7 +27,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
 
         protected override double StrainValueOf(DifficultyHitObject current)
         {
-            return ColourEvaluator.EvaluateDifficultyOf(current);
+            return ColourEvaluator.EvaluateDifficultyOf(current) * skill_multiplier;
         }
     }
 }

@@ -22,6 +22,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 {
     public class OsuDifficultyCalculator : DifficultyCalculator
     {
+        // This multiplier will be applied to all skills (and only skills)
         public const double DIFFICULTY_MULTIPLIER = 0.0695;
         public const double SUM_POWER = 1.1;
 
@@ -76,7 +77,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                     Math.Pow(baseFlashlightPerformance, SUM_POWER), 1.0 / SUM_POWER
                 );
 
-            double starRating = 1.028 * Math.Cbrt(basePerformance);
+            double starRating = 0.027 * (Math.Cbrt(100000 / Math.Pow(2, 1 / 1.1) * basePerformance) + 4) * Math.Cbrt(OsuPerformanceCalculator.PERFORMANCE_MULTIPLIER);
 
             double preempt = IBeatmapDifficultyInfo.DifficultyRange(beatmap.Difficulty.ApproachRate, 1800, 1200, 450) / clockRate;
             double drainRate = beatmap.Difficulty.DrainRate;

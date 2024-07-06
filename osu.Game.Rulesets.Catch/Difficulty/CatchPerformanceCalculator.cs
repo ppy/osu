@@ -78,8 +78,6 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             if (score.Mods.Any(m => m is ModNoFail))
                 value *= Math.Max(0.90, 1.0 - 0.02 * numMiss);
 
-            value = Math.Pow(value, 1.25) / 6.95;
-
             return new CatchPerformanceAttributes
             {
                 Total = value

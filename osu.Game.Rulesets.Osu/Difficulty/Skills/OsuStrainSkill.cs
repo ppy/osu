@@ -7,6 +7,7 @@ using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Mods;
 using System.Linq;
 using osu.Framework.Utils;
+using System.Xml.Linq;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 {
@@ -57,6 +58,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             return Math.Sqrt(difficulty) * OsuDifficultyCalculator.DIFFICULTY_MULTIPLIER;
         }
 
-        public static double DifficultyToPerformance(double difficulty) => 4.49 * Math.Pow(difficulty, 3);
+        public static double DifficultyToPerformance(double difficulty) => Math.Pow(5.0 * Math.Max(1.0, difficulty / 0.0675) - 4.0, 3.0) / 100000.0;
     }
 }
