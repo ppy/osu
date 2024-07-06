@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 {
     public class CatchDifficultyCalculator : DifficultyCalculator
     {
-        public const double DIFFICULTY_MULTIPLIER = 0.153;
+        public const double DIFFICULTY_MULTIPLIER = 4.59;
 
         private float halfCatcherWidth;
 
@@ -41,7 +41,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 
             CatchDifficultyAttributes attributes = new CatchDifficultyAttributes
             {
-                StarRating = skills[0].DifficultyValue(),
+                StarRating = Math.Sqrt(skills[0].DifficultyValue()) * DIFFICULTY_MULTIPLIER,
                 Mods = mods,
                 ApproachRate = preempt > 1200.0 ? -(preempt - 1800.0) / 120.0 : -(preempt - 1200.0) / 150.0 + 5.0,
                 MaxCombo = beatmap.HitObjects.Count(h => h is Fruit) + beatmap.HitObjects.OfType<JuiceStream>().SelectMany(j => j.NestedHitObjects).Count(h => !(h is TinyDroplet)),

@@ -14,9 +14,9 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
     /// <summary>
     /// Calculates the rhythm coefficient of taiko difficulty.
     /// </summary>
-    public class Rhythm : StrainDecaySkill
+    public class Rhythm : StrainSkill
     {
-        private const double skill_multiplier = 10;
+        public override double SkillMultiplier => 10;
         protected override double StrainDecayBase => 0;
 
         /// <summary>
@@ -73,7 +73,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
                 return 0.0;
             }
 
-            double objectStrain = skill_multiplier * hitObject.Rhythm.Difficulty;
+            double objectStrain = hitObject.Rhythm.Difficulty;
 
             objectStrain *= repetitionPenalties(hitObject);
             objectStrain *= patternLengthPenalty(notesSinceRhythmChange);

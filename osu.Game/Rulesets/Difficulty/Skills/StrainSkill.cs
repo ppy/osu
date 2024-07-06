@@ -16,6 +16,11 @@ namespace osu.Game.Rulesets.Difficulty.Skills
     public abstract class StrainSkill : Skill
     {
         /// <summary>
+        /// Strain values are multiplied by this number for the given skill. Used to balance the value of different skills between each other.
+        /// </summary>
+        public virtual double SkillMultiplier => 1;
+
+        /// <summary>
         /// The weight by which each strain value decays when summing strains.
         /// </summary>
         protected virtual double SumDecay => 0.9;
@@ -50,9 +55,20 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         protected double StrainDecay(double ms) => Math.Pow(StrainDecayBase, ms / 1000);
 
         /// <summary>
+        /// Calculates the strain value of a <see cref="DifficultyHitObject"/>. This value is affected by previously processed objects.
+        /// </summary>
+        protected abstract double StrainValueOf(DifficultyHitObject current);
+
+        /// <summary>
         /// Returns the strain value at <see cref="DifficultyHitObject"/>. This value is calculated with or without respect to previous objects.
         /// </summary>
-        protected abstract double StrainValueAt(DifficultyHitObject current);
+        protected virtual double StrainValueAt(DifficultyHitObject current)
+        {
+            CurrentStrain *= StrainDecay(current.DeltaTime);
+            CurrentStrain += StrainValueOf(current) * SkillMultiplier;
+
+            return CurrentStrain;
+        }
 
         /// <summary>
         /// Process a <see cref="DifficultyHitObject"/> and update current strain values accordingly.

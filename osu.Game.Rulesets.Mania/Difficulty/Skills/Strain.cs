@@ -10,7 +10,7 @@ using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Rulesets.Mania.Difficulty.Skills
 {
-    public class Strain : StrainDecaySkill
+    public class Strain : StrainSkill
     {
         private const double individual_decay_base = 0.125;
         private const double overall_decay_base = 0.30;
@@ -99,10 +99,5 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
 
         private double applyDecay(double value, double deltaTime, double decayBase)
             => value * Math.Pow(decayBase, deltaTime / 1000);
-
-        public override double DifficultyValue()
-        {
-            return base.DifficultyValue() * ManiaDifficultyCalculator.DIFFICULTY_MULTIPLIER;
-        }
     }
 }

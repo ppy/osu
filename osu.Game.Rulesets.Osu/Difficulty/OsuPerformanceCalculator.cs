@@ -14,7 +14,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 {
     public class OsuPerformanceCalculator : PerformanceCalculator
     {
-        // This multiplier will be applied to total pp value. Use when 
+        // This multiplier will be applied to total pp value
         public const double PERFORMANCE_MULTIPLIER = 1.14;
 
         private double accuracy;
@@ -219,9 +219,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             if (score.Mods.Any(m => m is OsuModFlashlight))
                 accuracyValue *= 1.02;
-
-            // Apply arbitrary scaling to make accuracy pp affected by difficulty multiplier
-            accuracyValue *= 14.39 * OsuDifficultyCalculator.DIFFICULTY_MULTIPLIER;
 
             return accuracyValue;
         }

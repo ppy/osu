@@ -22,31 +22,35 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 {
     public class OsuDifficultyCalculator : DifficultyCalculator
     {
-        // This multiplier will be applied to all skills (and only skills)
-        public const double DIFFICULTY_MULTIPLIER = 0.0695;
-        public const double SUM_POWER = 1.1;
-
         public override int Version => 20220902;
+
+        public const double SUM_POWER = 1.1;
 
         public OsuDifficultyCalculator(IRulesetInfo ruleset, IWorkingBeatmap beatmap)
             : base(ruleset, beatmap)
         {
         }
 
+        /// <summary>
+        /// Arbitrary scaling to preserve illusion of star rating being sum of difficulty values.
+        /// Don't change it for the sake of balancing. Use <see cref="OsuPerformanceCalculator.PERFORMANCE_MULTIPLIER"/> instead
+        /// </summary>>
+        private double scaleDifficulty(double difficulty) => Math.Sqrt(difficulty) * 0.0695;
+
         protected override DifficultyAttributes CreateDifficultyAttributes(IBeatmap beatmap, Mod[] mods, Skill[] skills, double clockRate)
         {
             if (beatmap.HitObjects.Count == 0)
                 return new OsuDifficultyAttributes { Mods = mods };
 
-            double aimRating = skills[0].DifficultyValue();
-            double aimRatingNoSliders = skills[1].DifficultyValue();
-            double speedRating = skills[2].DifficultyValue();
+            double aimRating = scaleDifficulty(skills[0].DifficultyValue());
+            double aimRatingNoSliders = scaleDifficulty(skills[1].DifficultyValue());
+            double speedRating = scaleDifficulty(skills[2].DifficultyValue());
             double speedNotes = ((Speed)skills[2]).RelevantNoteCount();
 
             double flashlightRating = 0.0;
 
             if (mods.Any(h => h is OsuModFlashlight))
-                flashlightRating = skills[3].DifficultyValue();
+                flashlightRating = scaleDifficulty(skills[3].DifficultyValue());
 
             double sliderFactor = aimRating > 0 ? aimRatingNoSliders / aimRating : 1;
 
@@ -75,9 +79,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                     Math.Pow(baseAimPerformance, SUM_POWER) +
                     Math.Pow(baseSpeedPerformance, SUM_POWER) +
                     Math.Pow(baseFlashlightPerformance, SUM_POWER), 1.0 / SUM_POWER
-                );
+                ) * OsuPerformanceCalculator.PERFORMANCE_MULTIPLIER;
 
-            double starRating = 0.027 * (Math.Cbrt(100000 / Math.Pow(2, 1 / 1.1) * basePerformance) + 4) * Math.Cbrt(OsuPerformanceCalculator.PERFORMANCE_MULTIPLIER);
+            double starRating = 0.027 * (Math.Cbrt(100000 / Math.Pow(2, 1 / 1.1) * basePerformance) + 4);
 
             double preempt = IBeatmapDifficultyInfo.DifficultyRange(beatmap.Difficulty.ApproachRate, 1800, 1200, 450) / clockRate;
             double drainRate = beatmap.Difficulty.DrainRate;
