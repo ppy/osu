@@ -40,11 +40,11 @@ namespace osu.Game.Beatmaps
         /// <summary>
         /// The breaks in this beatmap.
         /// </summary>
-        List<BreakPeriod> Breaks { get; }
+        List<BreakPeriod> Breaks { get; set; }
 
         /// <summary>
         /// All lines from the [Events] section which aren't handled in the encoding process yet.
-        /// These lines shoule be written out to the beatmap file on save or export.
+        /// These lines should be written out to the beatmap file on save or export.
         /// </summary>
         List<string> UnhandledEventLines { get; }
 

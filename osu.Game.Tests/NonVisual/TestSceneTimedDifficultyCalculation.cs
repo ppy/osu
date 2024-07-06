@@ -22,7 +22,7 @@ namespace osu.Game.Tests.NonVisual
     public class TestSceneTimedDifficultyCalculation
     {
         [Test]
-        public void TestAttributesGeneratedForAllNonSkippedObjects()
+        public void TestAttributesGeneratedForEachObjectOnce()
         {
             var beatmap = new Beatmap<TestHitObject>
             {
@@ -40,15 +40,14 @@ namespace osu.Game.Tests.NonVisual
 
             List<TimedDifficultyAttributes> attribs = new TestDifficultyCalculator(new TestWorkingBeatmap(beatmap)).CalculateTimed();
 
-            Assert.That(attribs.Count, Is.EqualTo(4));
+            Assert.That(attribs.Count, Is.EqualTo(3));
             assertEquals(attribs[0], beatmap.HitObjects[0]);
             assertEquals(attribs[1], beatmap.HitObjects[0], beatmap.HitObjects[1]);
-            assertEquals(attribs[2], beatmap.HitObjects[0], beatmap.HitObjects[1]); // From the nested object.
-            assertEquals(attribs[3], beatmap.HitObjects[0], beatmap.HitObjects[1], beatmap.HitObjects[2]);
+            assertEquals(attribs[2], beatmap.HitObjects[0], beatmap.HitObjects[1], beatmap.HitObjects[2]);
         }
 
         [Test]
-        public void TestAttributesNotGeneratedForSkippedObjects()
+        public void TestAttributesGeneratedForSkippedObjects()
         {
             var beatmap = new Beatmap<TestHitObject>
             {
@@ -72,35 +71,14 @@ namespace osu.Game.Tests.NonVisual
 
             List<TimedDifficultyAttributes> attribs = new TestDifficultyCalculator(new TestWorkingBeatmap(beatmap)).CalculateTimed();
 
-            Assert.That(attribs.Count, Is.EqualTo(1));
-            assertEquals(attribs[0], beatmap.HitObjects[0], beatmap.HitObjects[1], beatmap.HitObjects[2]);
-        }
-
-        [Test]
-        public void TestNestedObjectOnlyAddsParentOnce()
-        {
-            var beatmap = new Beatmap<TestHitObject>
-            {
-                HitObjects =
-                {
-                    new TestHitObject
-                    {
-                        StartTime = 1,
-                        Skip = true,
-                        Nested = 2
-                    },
-                }
-            };
-
-            List<TimedDifficultyAttributes> attribs = new TestDifficultyCalculator(new TestWorkingBeatmap(beatmap)).CalculateTimed();
-
-            Assert.That(attribs.Count, Is.EqualTo(2));
+            Assert.That(attribs.Count, Is.EqualTo(3));
             assertEquals(attribs[0], beatmap.HitObjects[0]);
-            assertEquals(attribs[1], beatmap.HitObjects[0]);
+            assertEquals(attribs[1], beatmap.HitObjects[0], beatmap.HitObjects[1]);
+            assertEquals(attribs[2], beatmap.HitObjects[0], beatmap.HitObjects[1], beatmap.HitObjects[2]);
         }
 
         [Test]
-        public void TestSkippedLastObjectAddedInLastIteration()
+        public void TestAttributesGeneratedOnceForSkippedObjects()
         {
             var beatmap = new Beatmap<TestHitObject>
             {
@@ -110,6 +88,7 @@ namespace osu.Game.Tests.NonVisual
                     new TestHitObject
                     {
                         StartTime = 2,
+                        Nested = 5,
                         Skip = true
                     },
                     new TestHitObject
@@ -122,8 +101,10 @@ namespace osu.Game.Tests.NonVisual
 
             List<TimedDifficultyAttributes> attribs = new TestDifficultyCalculator(new TestWorkingBeatmap(beatmap)).CalculateTimed();
 
-            Assert.That(attribs.Count, Is.EqualTo(1));
-            assertEquals(attribs[0], beatmap.HitObjects[0], beatmap.HitObjects[1], beatmap.HitObjects[2]);
+            Assert.That(attribs.Count, Is.EqualTo(3));
+            assertEquals(attribs[0], beatmap.HitObjects[0]);
+            assertEquals(attribs[1], beatmap.HitObjects[0], beatmap.HitObjects[1]);
+            assertEquals(attribs[2], beatmap.HitObjects[0], beatmap.HitObjects[1], beatmap.HitObjects[2]);
         }
 
         private void assertEquals(TimedDifficultyAttributes attribs, params HitObject[] expected)

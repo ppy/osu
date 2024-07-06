@@ -6,6 +6,8 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
+using osu.Game.Graphics;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets.Mods;
 using osuTK;
 
@@ -16,6 +18,8 @@ namespace osu.Game.Overlays.Mods
         protected override Container<Drawable> Content { get; }
 
         private const double transition_duration = 200;
+
+        private readonly OsuSpriteText descriptionText;
 
         public ModPresetTooltip(OverlayColourProvider colourProvider)
         {
@@ -36,8 +40,16 @@ namespace osu.Game.Overlays.Mods
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
-                    Padding = new MarginPadding(7),
-                    Spacing = new Vector2(7)
+                    Padding = new MarginPadding { Left = 10, Right = 10, Top = 5, Bottom = 5 },
+                    Spacing = new Vector2(7),
+                    Children = new[]
+                    {
+                        descriptionText = new OsuSpriteText
+                        {
+                            Font = OsuFont.GetFont(weight: FontWeight.Regular),
+                            Colour = colourProvider.Content1,
+                        },
+                    }
                 }
             };
         }
@@ -49,8 +61,12 @@ namespace osu.Game.Overlays.Mods
             if (ReferenceEquals(preset, lastPreset))
                 return;
 
+            descriptionText.Text = preset.Description;
+
             lastPreset = preset;
-            Content.ChildrenEnumerable = preset.Mods.AsOrdered().Select(mod => new ModPresetRow(mod));
+
+            Content.RemoveAll(d => d is ModPresetRow, true);
+            Content.AddRange(preset.Mods.AsOrdered().Select(mod => new ModPresetRow(mod)));
         }
 
         protected override void PopIn() => this.FadeIn(transition_duration, Easing.OutQuint);

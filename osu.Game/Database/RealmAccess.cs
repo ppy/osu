@@ -15,7 +15,6 @@ using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Development;
 using osu.Framework.Extensions;
-using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
@@ -1035,7 +1034,7 @@ namespace osu.Game.Database
 
                             var legacyMods = (LegacyMods)sr.ReadInt32();
 
-                            if (!legacyMods.HasFlagFast(LegacyMods.ScoreV2) || score.APIMods.Any(mod => mod.Acronym == @"SV2"))
+                            if (!legacyMods.HasFlag(LegacyMods.ScoreV2) || score.APIMods.Any(mod => mod.Acronym == @"SV2"))
                                 return;
 
                             score.APIMods = score.APIMods.Append(new APIMod(new ModScoreV2())).ToArray();
@@ -1134,7 +1133,17 @@ namespace osu.Game.Database
 
                 case 41:
                     foreach (var score in migration.NewRealm.All<ScoreInfo>())
-                        LegacyScoreDecoder.PopulateTotalScoreWithoutMods(score);
+                    {
+                        try
+                        {
+                            // this can fail e.g. if a user has a score set on a ruleset that can no longer be loaded.
+                            LegacyScoreDecoder.PopulateTotalScoreWithoutMods(score);
+                        }
+                        catch (Exception ex)
+                        {
+                            Logger.Log($@"Failed to populate total score without mods for score {score.ID}: {ex}", LoggingTarget.Database);
+                        }
+                    }
 
                     break;
             }
