@@ -23,6 +23,11 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
     {
         public const double DIFFICULTY_MULTIPLIER = 0.084375;
 
+        private const double final_multiplier = 0.0625;
+        private const double rhythm_skill_multiplier = 0.2 * final_multiplier;
+        private const double colour_skill_multiplier = 0.375 * final_multiplier;
+        private const double stamina_skill_multiplier = 0.375 * final_multiplier;
+
         public override int Version => 20221107;
 
         public TaikoDifficultyCalculator(IRulesetInfo ruleset, IWorkingBeatmap beatmap)
