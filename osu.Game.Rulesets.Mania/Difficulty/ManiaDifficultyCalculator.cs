@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
 {
     public class ManiaDifficultyCalculator : DifficultyCalculator
     {
-        public const double difficulty_multiplier = 0.018;
+        private const double difficulty_multiplier = 0.018;
 
         private readonly bool isForCurrentRuleset;
         private readonly double originalOverallDifficulty;
