@@ -25,6 +25,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         {
             hasHiddenMod = mods.Any(m => m is OsuModHidden);
         }
+
         protected override double StrainValueOf(DifficultyHitObject current) => FlashlightEvaluator.EvaluateDifficultyOf(current, hasHiddenMod);
 
         public override double DifficultyValue() => GetCurrentStrainPeaks().Sum();

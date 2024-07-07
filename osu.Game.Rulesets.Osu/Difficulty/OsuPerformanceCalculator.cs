@@ -63,7 +63,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 effectiveMissCount = Math.Min(effectiveMissCount + countOk * okMultiplier + countMeh * mehMultiplier, totalHits);
             }
 
-            double power = OsuDifficultyCalculator.SUM_POWER;
+            const double power = OsuDifficultyCalculator.SUM_POWER;
 
             double aimValue = computeAimValue(score, osuAttributes);
             double speedValue = computeSpeedValue(score, osuAttributes);
@@ -269,7 +269,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         private double getComboScalingFactor(OsuDifficultyAttributes attributes) => attributes.MaxCombo <= 0 ? 1.0 : Math.Min(Math.Pow(scoreMaxCombo, 0.8) / Math.Pow(attributes.MaxCombo, 0.8), 1.0);
 
         private double getDefaultLengthBonus(int objects) => 0.95 + 0.4 * Math.Min(1.0, objects / 2000.0) +
-                                 (objects > 2000 ? Math.Log10(objects / 2000.0) * 0.5 : 0.0);
+            (objects > 2000 ? Math.Log10(objects / 2000.0) * 0.5 : 0.0);
+
         private int totalHits => countGreat + countOk + countMeh + countMiss;
     }
 }
