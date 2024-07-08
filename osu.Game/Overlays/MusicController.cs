@@ -494,7 +494,7 @@ namespace osu.Game.Overlays
         /// The final volume which should be reached during ducking, when 0 is silent and 1 is original volume.
         /// Defaults to 25%.
         /// </summary>
-        public float DuckVolumeTo = 0.25f;
+        public double DuckVolumeTo = 0.25;
 
         /// <summary>
         /// The low-pass cutoff frequency which should be reached during ducking. If not required, set to <see cref="AudioFilter.MAX_LOWPASS_CUTOFF"/>.

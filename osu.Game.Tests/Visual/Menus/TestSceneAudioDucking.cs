@@ -33,7 +33,7 @@ namespace osu.Game.Tests.Visual.Menus
             {
                 duckOp1 = Game.MusicController.Duck(new DuckParameters
                 {
-                    DuckVolumeTo = 0.5f,
+                    DuckVolumeTo = 0.5,
                 });
             });
 
@@ -43,7 +43,7 @@ namespace osu.Game.Tests.Visual.Menus
             {
                 duckOp2 = Game.MusicController.Duck(new DuckParameters
                 {
-                    DuckVolumeTo = 0.2f,
+                    DuckVolumeTo = 0.2,
                 });
             });
 
@@ -73,7 +73,7 @@ namespace osu.Game.Tests.Visual.Menus
             {
                 duckOp1 = Game.MusicController.Duck(new DuckParameters
                 {
-                    DuckVolumeTo = 0.5f,
+                    DuckVolumeTo = 0.5,
                 });
             });
 
@@ -83,7 +83,7 @@ namespace osu.Game.Tests.Visual.Menus
             {
                 duckOp2 = Game.MusicController.Duck(new DuckParameters
                 {
-                    DuckVolumeTo = 0.2f,
+                    DuckVolumeTo = 0.2,
                 });
             });
 
@@ -118,7 +118,7 @@ namespace osu.Game.Tests.Visual.Menus
             {
                 duckOp1 = Game.MusicController.Duck(new DuckParameters
                 {
-                    DuckVolumeTo = 0.2f,
+                    DuckVolumeTo = 0.2,
                     DuckCutoffTo = AudioFilter.MAX_LOWPASS_CUTOFF,
                     DuckDuration = 500,
                 });
