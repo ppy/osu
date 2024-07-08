@@ -280,6 +280,8 @@ namespace osu.Game.Screens.Select
             {
                 realmBeatmapSets.Clear();
                 realmBeatmapSets.AddRange(sender.Select(r => r.ID));
+                setsRequiringRemoval.Clear();
+                setsRequiringUpdate.Clear();
 
                 loadBeatmapSets(sender);
             }
