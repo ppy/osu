@@ -102,6 +102,17 @@ namespace osu.Game.Tests.Visual.Editing
             AddUntilStep("time is clamped to track length", () => EditorClock.CurrentTime, () => Is.EqualTo(EditorClock.TrackLength));
         }
 
+        [Test]
+        public void TestCurrentTimeDoubleTransform()
+        {
+            AddAssert("seek smoothly twice and current time is accurate", () =>
+            {
+                EditorClock.SeekSmoothlyTo(1000);
+                EditorClock.SeekSmoothlyTo(2000);
+                return 2000 == EditorClock.CurrentTimeAccurate;
+            });
+        }
+
         protected override void Dispose(bool isDisposing)
         {
             Beatmap.Disabled = false;
