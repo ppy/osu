@@ -198,7 +198,6 @@ namespace osu.Game.Screens.Select
 
         private IDisposable? subscriptionSets;
         private IDisposable? subscriptionBeatmaps;
-        private IDisposable? subscriptionHiddenBeatmaps;
 
         private readonly DrawablePool<DrawableCarouselBeatmapSet> setPool = new DrawablePool<DrawableCarouselBeatmapSet>(100);
 
@@ -263,10 +262,6 @@ namespace osu.Game.Screens.Select
 
             subscriptionSets = realm.RegisterForNotifications(getBeatmapSets, beatmapSetsChanged);
             subscriptionBeatmaps = realm.RegisterForNotifications(r => r.All<BeatmapInfo>().Where(b => !b.Hidden), beatmapsChanged);
-
-            // Can't use main subscriptions because we can't lookup deleted indices.
-            // https://github.com/realm/realm-dotnet/discussions/2634#discussioncomment-1605595.
-            subscriptionHiddenBeatmaps = realm.RegisterForNotifications(r => r.All<BeatmapInfo>().Where(b => b.Hidden), beatmapsChanged);
         }
 
         private void beatmapSetsChanged(IRealmCollection<BeatmapSetInfo> sender, ChangeSet? changes)
@@ -1279,7 +1274,6 @@ namespace osu.Game.Screens.Select
 
             subscriptionSets?.Dispose();
             subscriptionBeatmaps?.Dispose();
-            subscriptionHiddenBeatmaps?.Dispose();
         }
     }
 }
