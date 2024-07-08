@@ -1023,11 +1023,15 @@ namespace osu.Game.Screens.Edit
         /// <summary>
         /// Forces a reload of the compose screen after significant configuration changes.
         /// </summary>
-        /// <remarks>
-        /// This can be necessary for scrolling rulesets, as they do not easily support control points changing under them.
-        /// The reason that this works is that <see cref="onModeChanged"/> will re-instantiate the screen whenever it is requested next.
-        /// </remarks>
-        public void ReloadComposeScreen() => screenContainer.SingleOrDefault(s => s.Type == EditorScreenMode.Compose)?.RemoveAndDisposeImmediately();
+        public void ReloadComposeScreen()
+        {
+            screenContainer.SingleOrDefault(s => s.Type == EditorScreenMode.Compose)?.RemoveAndDisposeImmediately();
+
+            // If not currently on compose screen, the reload will happen on next mode change.
+            // That said, control points *can* change on compose screen (e.g. via undo), so we have to handle that case too.
+            if (Mode.Value == EditorScreenMode.Compose)
+                Mode.TriggerChange();
+        }
 
         [CanBeNull]
         private ScheduledDelegate playbackDisabledDebounce;
