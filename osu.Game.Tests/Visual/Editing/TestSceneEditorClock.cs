@@ -105,6 +105,17 @@ namespace osu.Game.Tests.Visual.Editing
         }
 
         [Test]
+        public void TestCurrentTimeDoubleTransform()
+        {
+            AddAssert("seek smoothly twice and current time is accurate", () =>
+            {
+                EditorClock.SeekSmoothlyTo(1000);
+                EditorClock.SeekSmoothlyTo(2000);
+                return 2000 == EditorClock.CurrentTimeAccurate;
+            });
+        }
+
+        [Test]
         public void TestAdjustmentsRemovedOnDisposal()
         {
             AddStep("reset clock", () => EditorClock.Seek(0));
