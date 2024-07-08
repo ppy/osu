@@ -10,6 +10,7 @@ using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Lists;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Beatmaps.Legacy;
@@ -111,7 +112,11 @@ namespace osu.Game.Screens.Edit
                 trackStartTime(obj);
 
             Breaks = new BindableList<BreakPeriod>(playableBeatmap.Breaks);
-            Breaks.BindCollectionChanged((_, _) => playableBeatmap.Breaks = Breaks.ToList());
+            Breaks.BindCollectionChanged((_, _) =>
+            {
+                playableBeatmap.Breaks.Clear();
+                playableBeatmap.Breaks.AddRange(Breaks);
+            });
 
             PreviewTime = new BindableInt(BeatmapInfo.Metadata.PreviewTime);
             PreviewTime.BindValueChanged(s =>
@@ -177,7 +182,7 @@ namespace osu.Game.Screens.Edit
 
         public readonly BindableList<BreakPeriod> Breaks;
 
-        List<BreakPeriod> IBeatmap.Breaks
+        SortedList<BreakPeriod> IBeatmap.Breaks
         {
             get => PlayableBeatmap.Breaks;
             set => PlayableBeatmap.Breaks = value;
