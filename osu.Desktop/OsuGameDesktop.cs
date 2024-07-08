@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Runtime.Versioning;
@@ -19,7 +18,6 @@ using osu.Desktop.Windows;
 using osu.Framework.Allocation;
 using osu.Game.IO;
 using osu.Game.IPC;
-using osu.Game.Online.Multiplayer;
 using osu.Game.Performance;
 using osu.Game.Utils;
 
@@ -102,35 +100,21 @@ namespace osu.Desktop
             if (!string.IsNullOrEmpty(packageManaged))
                 return new NoActionUpdateManager();
 
-            switch (RuntimeInfo.OS)
-            {
-                case RuntimeInfo.Platform.Windows:
-                    Debug.Assert(OperatingSystem.IsWindows());
-
-                    return new SquirrelUpdateManager();
-
-                default:
-                    return new SimpleUpdateManager();
-            }
+            return new VeloUpdateManager();
         }
 
         public override bool RestartAppWhenExited()
         {
-            switch (RuntimeInfo.OS)
+            try
             {
-                case RuntimeInfo.Platform.Windows:
-                    Debug.Assert(OperatingSystem.IsWindows());
-
-                    // Of note, this is an async method in squirrel that adds an arbitrary delay before returning
-                    // likely to ensure the external process is in a good state.
-                    //
-                    // We're not waiting on that here, but the outro playing before the actual exit should be enough
-                    // to cover this.
-                    Squirrel.UpdateManager.RestartAppWhenExited().FireAndForget();
-                    return true;
+                Velopack.UpdateExe.Start();
+                return true;
             }
-
-            return base.RestartAppWhenExited();
+            catch (Exception e)
+            {
+                Logger.Error(e, "Failed to restart application");
+                return base.RestartAppWhenExited();
+            }
         }
 
         protected override void LoadComplete()
