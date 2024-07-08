@@ -35,7 +35,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         /// Arbitrary scaling to preserve illusion of star rating being sum of difficulty values.
         /// Don't change it for the sake of balancing. Use <see cref="OsuPerformanceCalculator.PERFORMANCE_MULTIPLIER"/> instead
         /// </summary>>
-        private double scaleDifficulty(double difficulty) => Math.Sqrt(difficulty) * 0.0695;
+        private double scaleDifficulty(double difficulty) => Math.Sqrt(difficulty * 1.06) * 0.0675;
 
         protected override DifficultyAttributes CreateDifficultyAttributes(IBeatmap beatmap, Mod[] mods, Skill[] skills, double clockRate)
         {
@@ -79,9 +79,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                     Math.Pow(baseAimPerformance, SUM_POWER) +
                     Math.Pow(baseSpeedPerformance, SUM_POWER) +
                     Math.Pow(baseFlashlightPerformance, SUM_POWER), 1.0 / SUM_POWER
-                ) * OsuPerformanceCalculator.PERFORMANCE_MULTIPLIER;
+                );
 
-            double starRating = 0.027 * (Math.Cbrt(100000 / Math.Pow(2, 1 / 1.1) * basePerformance) + 4);
+            double starRating = 0.027 * (Math.Cbrt(100000 / Math.Pow(2, 1 / 1.1) * basePerformance) + 4) * Math.Cbrt(OsuPerformanceCalculator.PERFORMANCE_MULTIPLIER);
 
             double preempt = IBeatmapDifficultyInfo.DifficultyRange(beatmap.Difficulty.ApproachRate, 1800, 1200, 450) / clockRate;
             double drainRate = beatmap.Difficulty.DrainRate;
