@@ -17,8 +17,6 @@ namespace osu.Game.Screens.Edit.Components
 {
     public partial class TimeInfoContainer : BottomBarContainer
     {
-        private OsuSpriteText bpm = null!;
-
         [Resolved]
         private EditorBeatmap editorBeatmap { get; set; } = null!;
 
@@ -26,36 +24,14 @@ namespace osu.Game.Screens.Edit.Components
         private EditorClock editorClock { get; set; } = null!;
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, OverlayColourProvider colourProvider)
+        private void load(OverlayColourProvider colourProvider)
         {
             Background.Colour = colourProvider.Background5;
 
             Children = new Drawable[]
             {
                 new TimestampControl(),
-                bpm = new OsuSpriteText
-                {
-                    Colour = colours.Orange1,
-                    Anchor = Anchor.CentreLeft,
-                    Font = OsuFont.Torus.With(size: 18, weight: FontWeight.SemiBold),
-                    Position = new Vector2(2, 5),
-                }
             };
-        }
-
-        private double? lastBPM;
-
-        protected override void Update()
-        {
-            base.Update();
-
-            double newBPM = editorBeatmap.ControlPointInfo.TimingPointAt(editorClock.CurrentTime).BPM;
-
-            if (lastBPM != newBPM)
-            {
-                lastBPM = newBPM;
-                bpm.Text = @$"{newBPM:0} BPM";
-            }
         }
 
         private partial class TimestampControl : OsuClickableContainer
