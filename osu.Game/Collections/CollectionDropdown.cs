@@ -163,7 +163,7 @@ namespace osu.Game.Collections
             public CollectionDropdownHeader()
             {
                 Height = 25;
-                Icon.Size = new Vector2(16);
+                Chevron.Size = new Vector2(16);
                 Foreground.Padding = new MarginPadding { Top = 4, Bottom = 4, Left = 8, Right = 4 };
             }
         }
