@@ -62,7 +62,7 @@ namespace osu.Game.Beatmaps
 
         public ControlPointInfo ControlPointInfo { get; set; } = new ControlPointInfo();
 
-        public SortedList<BreakPeriod> Breaks { get; set; } = new SortedList<BreakPeriod>();
+        public SortedList<BreakPeriod> Breaks { get; set; } = new SortedList<BreakPeriod>(Comparer<BreakPeriod>.Default);
 
         public List<string> UnhandledEventLines { get; set; } = new List<string>();
 
