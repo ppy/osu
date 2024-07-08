@@ -27,6 +27,7 @@ namespace osu.Game.Overlays.Mods
     {
         private const float header_height = 42f;
         private const float content_vertical_padding = 20f;
+        private const float content_border_thickness = 2f;
 
         private Container content = null!;
         private OsuScrollContainer scrollContainer = null!;
@@ -68,7 +69,7 @@ namespace osu.Game.Overlays.Mods
                 {
                     RelativeSizeAxes = Axes.X,
                     BorderColour = colourProvider.Dark3,
-                    BorderThickness = 2f,
+                    BorderThickness = content_border_thickness,
                     CornerRadius = 10f,
                     Masking = true,
                     EdgeEffect = new EdgeEffectParameters
@@ -90,9 +91,11 @@ namespace osu.Game.Overlays.Mods
                         scrollContainer = new OsuScrollContainer(Direction.Vertical)
                         {
                             RelativeSizeAxes = Axes.X,
-                            // The +2f is a workaround for masking issues (see https://github.com/ppy/osu-framework/issues/1675#issuecomment-910023157)
-                            // Note that this actually causes the full scroll range to be reduced by 2px at the bottom, but it's not really noticeable.
-                            Margin = new MarginPadding { Top = header_height + 2f },
+                            Margin = new MarginPadding
+                            {
+                                Top = header_height + content_border_thickness,
+                                Bottom = content_border_thickness
+                            },
                             Child = sectionsFlow = new FillFlowContainer
                             {
                                 RelativeSizeAxes = Axes.X,
