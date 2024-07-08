@@ -113,8 +113,11 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                     setPositions(lowerScores, userScore.Position.Value, 1);
                 }
 
-                Schedule(() => PerformSuccessCallback(scoresCallback, allScores));
-                hideLoadingSpinners();
+                Schedule(() =>
+                {
+                    PerformSuccessCallback(scoresCallback, allScores);
+                    hideLoadingSpinners();
+                });
             };
 
             // On failure, fallback to a normal index.
@@ -169,7 +172,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                 Schedule(() =>
                 {
                     PerformSuccessCallback(scoresCallback, r.Scores, r);
-                    hideLoadingSpinners(pivot);
+                    hideLoadingSpinners(r);
                 });
             };
 
