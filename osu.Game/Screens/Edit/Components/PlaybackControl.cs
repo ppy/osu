@@ -105,7 +105,7 @@ namespace osu.Game.Screens.Edit.Components
 
         protected override void Dispose(bool isDisposing)
         {
-            Track.Value?.RemoveAdjustment(AdjustableProperty.Frequency, tempoAdjustment);
+            Track.Value?.RemoveAdjustment(AdjustableProperty.Tempo, tempoAdjustment);
 
             base.Dispose(isDisposing);
         }
