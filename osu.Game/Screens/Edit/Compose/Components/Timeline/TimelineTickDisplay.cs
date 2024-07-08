@@ -9,6 +9,7 @@ using osu.Framework.Caching;
 using osu.Framework.Graphics;
 using osu.Framework.Logging;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Screens.Edit.Components.Timelines.Summary.Parts;
 using osu.Game.Screens.Edit.Components.Timelines.Summary.Visualisations;
@@ -41,16 +42,21 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             RelativeSizeAxes = Axes.Both;
         }
 
+        private readonly BindableBool showTimingChanges = new BindableBool(true);
+
         private readonly Cached tickCache = new Cached();
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OsuConfigManager configManager)
         {
             beatDivisor.BindValueChanged(_ => invalidateTicks());
 
             if (changeHandler != null)
                 // currently this is the best way to handle any kind of timing changes.
                 changeHandler.OnStateChange += invalidateTicks;
+
+            configManager.BindWith(OsuSetting.EditorTimelineShowTimingChanges, showTimingChanges);
+            showTimingChanges.BindValueChanged(_ => invalidateTicks());
         }
 
         private void invalidateTicks()
@@ -142,7 +148,20 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                         var line = getNextUsableLine();
                         line.X = xPos;
                         line.Width = PointVisualisation.MAX_WIDTH * size.X;
-                        line.Height = 0.9f * size.Y;
+
+                        if (showTimingChanges.Value)
+                        {
+                            line.Anchor = Anchor.BottomLeft;
+                            line.Origin = Anchor.BottomCentre;
+                            line.Height = 0.7f + size.Y * 0.28f;
+                        }
+                        else
+                        {
+                            line.Anchor = Anchor.CentreLeft;
+                            line.Origin = Anchor.Centre;
+                            line.Height = 0.92f + size.Y * 0.07f;
+                        }
+
                         line.Colour = colour;
                     }
 

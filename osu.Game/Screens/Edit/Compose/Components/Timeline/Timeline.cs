@@ -25,7 +25,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
     [Cached]
     public partial class Timeline : ZoomableScrollContainer, IPositionSnapProvider
     {
-        private const float timeline_height = 72;
+        private const float timeline_height = 80;
         private const float timeline_expanded_height = 94;
 
         private readonly Drawable userContent;
@@ -97,6 +97,11 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             // We don't want the centre marker to scroll
             AddInternal(centreMarker = new CentreMarker());
 
+            ticks = new TimelineTickDisplay
+            {
+                Padding = new MarginPadding { Vertical = 2, },
+            };
+
             AddRange(new Drawable[]
             {
                 controlPoints = new TimelineControlPointDisplay
@@ -104,6 +109,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                     RelativeSizeAxes = Axes.X,
                     Height = timeline_expanded_height,
                 },
+                ticks,
                 mainContent = new Container
                 {
                     RelativeSizeAxes = Axes.X,
@@ -120,7 +126,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                             HighColour = colours.BlueDarker,
                         },
                         centreMarker.CreateProxy(),
-                        ticks = new TimelineTickDisplay(),
+                        ticks.CreateProxy(),
                         new Box
                         {
                             Name = "zero marker",
@@ -175,7 +181,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 if (visible.NewValue)
                 {
                     this.ResizeHeightTo(timeline_expanded_height, 200, Easing.OutQuint);
-                    mainContent.MoveToY(20, 200, Easing.OutQuint);
+                    mainContent.MoveToY(15, 200, Easing.OutQuint);
 
                     // delay the fade in else masking looks weird.
                     controlPoints.Delay(180).FadeIn(400, Easing.OutQuint);
