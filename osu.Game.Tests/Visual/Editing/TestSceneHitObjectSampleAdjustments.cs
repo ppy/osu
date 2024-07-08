@@ -484,6 +484,25 @@ namespace osu.Game.Tests.Visual.Editing
             hitObjectNodeHasSamples(2, 1, HitSampleInfo.HIT_NORMAL, HitSampleInfo.HIT_WHISTLE);
         }
 
+        [Test]
+        public void TestSelectingObjectDoesNotMutateSamples()
+        {
+            clickSamplePiece(0);
+            toggleAdditionViaPopover(1);
+            setAdditionBankViaPopover(HitSampleInfo.BANK_SOFT);
+            dismissPopover();
+
+            hitObjectHasSamples(0, HitSampleInfo.HIT_NORMAL, HitSampleInfo.HIT_FINISH);
+            hitObjectHasSampleNormalBank(0, HitSampleInfo.BANK_NORMAL);
+            hitObjectHasSampleAdditionBank(0, HitSampleInfo.BANK_SOFT);
+
+            AddStep("select first object", () => EditorBeatmap.SelectedHitObjects.Add(EditorBeatmap.HitObjects[0]));
+
+            hitObjectHasSamples(0, HitSampleInfo.HIT_NORMAL, HitSampleInfo.HIT_FINISH);
+            hitObjectHasSampleNormalBank(0, HitSampleInfo.BANK_NORMAL);
+            hitObjectHasSampleAdditionBank(0, HitSampleInfo.BANK_SOFT);
+        }
+
         private void clickSamplePiece(int objectIndex) => AddStep($"click {objectIndex.ToOrdinalWords()} sample piece", () =>
         {
             var samplePiece = this.ChildrenOfType<SamplePointPiece>().Single(piece => piece.HitObject == EditorBeatmap.HitObjects.ElementAt(objectIndex));
