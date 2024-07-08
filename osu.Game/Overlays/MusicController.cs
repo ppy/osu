@@ -268,9 +268,6 @@ namespace osu.Game.Overlays
         {
             parameters ??= new DuckParameters();
 
-            if (duckOperations.Contains(parameters))
-                throw new ArgumentException("Ducking has already been applied for the provided parameters.", nameof(parameters));
-
             duckOperations.Add(parameters);
 
             DuckParameters volumeOperation = duckOperations.MinBy(p => p.DuckVolumeTo)!;
