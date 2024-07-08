@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
@@ -18,6 +19,7 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Input.Bindings;
 using osu.Game.Rulesets.Mods;
 using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Mods
 {
@@ -75,6 +77,7 @@ namespace osu.Game.Overlays.Mods
                         Offset = new Vector2(0f, 5f),
                         Radius = 20f,
                         Roundness = 5f,
+                        Colour = Color4.Black.Opacity(0.25f),
                     },
                     Expanded = { BindTarget = Expanded },
                     Children = new Drawable[]
@@ -161,13 +164,13 @@ namespace osu.Game.Overlays.Mods
                 content.AutoSizeDuration = 400;
                 content.AutoSizeEasing = Easing.OutQuint;
                 content.AutoSizeAxes = Axes.Y;
-                content.FadeEdgeEffectTo(0.25f, 120, Easing.OutQuint);
+                content.FadeIn(120, Easing.OutQuint);
             }
             else
             {
                 content.AutoSizeAxes = Axes.None;
                 content.ResizeHeightTo(header_height, 400, Easing.OutQuint);
-                content.FadeEdgeEffectTo(0f, 400, Easing.OutQuint);
+                content.FadeOut(400, Easing.OutSine);
             }
         }
 
