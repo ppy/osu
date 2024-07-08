@@ -154,7 +154,7 @@ namespace osu.Game.Screens.Edit
         /// The current time of this clock, include any active transform seeks performed via <see cref="SeekSmoothlyTo"/>.
         /// </summary>
         public double CurrentTimeAccurate =>
-            Transforms.OfType<TransformSeek>().FirstOrDefault()?.EndValue ?? CurrentTime;
+            Transforms.OfType<TransformSeek>().LastOrDefault()?.EndValue ?? CurrentTime;
 
         public double CurrentTime => underlyingClock.CurrentTime;
 
