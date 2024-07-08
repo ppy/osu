@@ -343,6 +343,7 @@ namespace osu.Game.Screens.Edit
                                 Anchor = Anchor.CentreLeft,
                                 Origin = Anchor.CentreLeft,
                                 RelativeSizeAxes = Axes.Both,
+                                MaxHeight = 600,
                                 Items = new[]
                                 {
                                     new MenuItem(CommonStrings.MenuBarFile)
