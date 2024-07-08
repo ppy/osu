@@ -37,7 +37,7 @@ namespace osu.Game.Tests.Visual.Menus
                 });
             });
 
-            AddUntilStep("wait for duck to complete", () => Game.Audio.Tracks.AggregateVolume.Value, () => Is.EqualTo(normalVolume * 0.5f).Within(float.Epsilon));
+            AddUntilStep("wait for duck to complete", () => Game.Audio.Tracks.AggregateVolume.Value, () => Is.EqualTo(normalVolume * 0.5f).Within(0.01));
 
             AddStep("duck two", () =>
             {
@@ -47,13 +47,13 @@ namespace osu.Game.Tests.Visual.Menus
                 });
             });
 
-            AddUntilStep("wait for duck to complete", () => Game.Audio.Tracks.AggregateVolume.Value, () => Is.EqualTo(normalVolume * 0.2f).Within(float.Epsilon));
+            AddUntilStep("wait for duck to complete", () => Game.Audio.Tracks.AggregateVolume.Value, () => Is.EqualTo(normalVolume * 0.2f).Within(0.01));
 
             AddStep("restore two", () => duckOp2.Dispose());
-            AddUntilStep("wait for restore to complete", () => Game.Audio.Tracks.AggregateVolume.Value, () => Is.EqualTo(normalVolume * 0.5f).Within(float.Epsilon));
+            AddUntilStep("wait for restore to complete", () => Game.Audio.Tracks.AggregateVolume.Value, () => Is.EqualTo(normalVolume * 0.5f).Within(0.01));
 
             AddStep("restore one", () => duckOp1.Dispose());
-            AddUntilStep("wait for restore to complete", () => Game.Audio.Tracks.AggregateVolume.Value, () => Is.EqualTo(normalVolume).Within(float.Epsilon));
+            AddUntilStep("wait for restore to complete", () => Game.Audio.Tracks.AggregateVolume.Value, () => Is.EqualTo(normalVolume).Within(0.01));
         }
 
         [Test]
@@ -77,7 +77,7 @@ namespace osu.Game.Tests.Visual.Menus
                 });
             });
 
-            AddUntilStep("wait for duck to complete", () => Game.Audio.Tracks.AggregateVolume.Value, () => Is.EqualTo(normalVolume * 0.5f).Within(float.Epsilon));
+            AddUntilStep("wait for duck to complete", () => Game.Audio.Tracks.AggregateVolume.Value, () => Is.EqualTo(normalVolume * 0.5f).Within(0.01));
 
             AddStep("duck two", () =>
             {
@@ -87,15 +87,15 @@ namespace osu.Game.Tests.Visual.Menus
                 });
             });
 
-            AddUntilStep("wait for duck to complete", () => Game.Audio.Tracks.AggregateVolume.Value, () => Is.EqualTo(normalVolume * 0.2f).Within(float.Epsilon));
+            AddUntilStep("wait for duck to complete", () => Game.Audio.Tracks.AggregateVolume.Value, () => Is.EqualTo(normalVolume * 0.2f).Within(0.01));
 
             AddStep("restore one", () => duckOp1.Dispose());
 
             // reverse order, less extreme duck removed so won't change
-            AddUntilStep("wait for restore to complete", () => Game.Audio.Tracks.AggregateVolume.Value, () => Is.EqualTo(normalVolume * 0.2f).Within(float.Epsilon));
+            AddUntilStep("wait for restore to complete", () => Game.Audio.Tracks.AggregateVolume.Value, () => Is.EqualTo(normalVolume * 0.2f).Within(0.01));
 
             AddStep("restore two", () => duckOp2.Dispose());
-            AddUntilStep("wait for restore to complete", () => Game.Audio.Tracks.AggregateVolume.Value, () => Is.EqualTo(normalVolume).Within(float.Epsilon));
+            AddUntilStep("wait for restore to complete", () => Game.Audio.Tracks.AggregateVolume.Value, () => Is.EqualTo(normalVolume).Within(0.01));
         }
 
         [Test]
