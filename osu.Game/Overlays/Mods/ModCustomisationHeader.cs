@@ -88,7 +88,7 @@ namespace osu.Game.Overlays.Mods
 
             Expanded.BindValueChanged(v =>
             {
-                icon.RotateTo(v.NewValue ? 180 : 0);
+                icon.ScaleTo(v.NewValue ? new Vector2(1, -1) : Vector2.One, 300, Easing.OutQuint);
             }, true);
         }
     }
