@@ -13,6 +13,7 @@ using osu.Framework.Graphics.Audio;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Logging;
 using osu.Framework.Threading;
+using osu.Game.Audio.Effects;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Rulesets.Mods;
@@ -58,6 +59,17 @@ namespace osu.Game.Overlays
 
         [Resolved]
         private RealmAccess realm { get; set; } = null!;
+
+        private readonly BindableDouble audioDuckVolume = new BindableDouble(1);
+
+        private AudioFilter audioDuckFilter = null!;
+
+        [BackgroundDependencyLoader]
+        private void load(AudioManager audio)
+        {
+            AddInternal(audioDuckFilter = new AudioFilter(audio.TrackMixer));
+            audio.Tracks.AddAdjustment(AdjustableProperty.Volume, audioDuckVolume);
+        }
 
         protected override void LoadComplete()
         {
@@ -246,6 +258,54 @@ namespace osu.Game.Overlays
                 onSuccess?.Invoke();
         });
 
+        private readonly List<DuckParameters> duckOperations = new List<DuckParameters>();
+
+        /// <summary>
+        /// Applies ducking, attenuating the volume and/or low-pass cutoff of the currently playing track to make headroom for effects (or just to apply an effect).
+        /// </summary>
+        /// <returns>A <see cref="IDisposable"/> which will restore the duck operation when disposed.</returns>
+        public IDisposable Duck(DuckParameters? parameters = null)
+        {
+            parameters ??= new DuckParameters();
+
+            duckOperations.Add(parameters);
+
+            DuckParameters volumeOperation = duckOperations.MinBy(p => p.DuckVolumeTo)!;
+            DuckParameters lowPassOperation = duckOperations.MinBy(p => p.DuckCutoffTo)!;
+
+            audioDuckFilter.CutoffTo(lowPassOperation.DuckCutoffTo, lowPassOperation.DuckDuration, lowPassOperation.DuckEasing);
+            this.TransformBindableTo(audioDuckVolume, volumeOperation.DuckVolumeTo, volumeOperation.DuckDuration, volumeOperation.DuckEasing);
+
+            return new InvokeOnDisposal(restoreDucking);
+
+            void restoreDucking() => Schedule(() =>
+            {
+                if (!duckOperations.Remove(parameters))
+                    return;
+
+                DuckParameters? restoreVolumeOperation = duckOperations.MinBy(p => p.DuckVolumeTo);
+                DuckParameters? restoreLowPassOperation = duckOperations.MinBy(p => p.DuckCutoffTo);
+
+                // If another duck operation is in the list, restore ducking to its level, else reset back to defaults.
+                audioDuckFilter.CutoffTo(restoreLowPassOperation?.DuckCutoffTo ?? AudioFilter.MAX_LOWPASS_CUTOFF, parameters.RestoreDuration, parameters.RestoreEasing);
+                this.TransformBindableTo(audioDuckVolume, restoreVolumeOperation?.DuckVolumeTo ?? 1, parameters.RestoreDuration, parameters.RestoreEasing);
+            });
+        }
+
+        /// <summary>
+        /// A convenience method that ducks the currently playing track, then after a delay, restores automatically.
+        /// </summary>
+        /// <param name="delayUntilRestore">A delay in milliseconds which defines how long to delay restoration after ducking completes.</param>
+        /// <param name="parameters">Parameters defining the ducking operation.</param>
+        public void DuckMomentarily(double delayUntilRestore, DuckParameters? parameters = null)
+        {
+            parameters ??= new DuckParameters();
+
+            IDisposable duckOperation = Duck(parameters);
+
+            Scheduler.AddDelayed(() => duckOperation.Dispose(), delayUntilRestore);
+        }
+
         private bool next()
         {
             if (beatmap.Disabled || !AllowTrackControl.Value)
@@ -417,6 +477,45 @@ namespace osu.Game.Overlays
                     mod.ApplyToTrack(modTrackAdjustments);
             }
         }
+    }
+
+    public class DuckParameters
+    {
+        /// <summary>
+        /// The duration of the ducking transition in milliseconds.
+        /// Defaults to 100 ms.
+        /// </summary>
+        public double DuckDuration = 100;
+
+        /// <summary>
+        /// The final volume which should be reached during ducking, when 0 is silent and 1 is original volume.
+        /// Defaults to 25%.
+        /// </summary>
+        public double DuckVolumeTo = 0.25;
+
+        /// <summary>
+        /// The low-pass cutoff frequency which should be reached during ducking. If not required, set to <see cref="AudioFilter.MAX_LOWPASS_CUTOFF"/>.
+        /// Defaults to 300 Hz.
+        /// </summary>
+        public int DuckCutoffTo = 300;
+
+        /// <summary>
+        /// The easing curve to be applied during ducking.
+        /// Defaults to <see cref="Easing.Out"/>.
+        /// </summary>
+        public Easing DuckEasing = Easing.Out;
+
+        /// <summary>
+        /// The duration of the restoration transition in milliseconds.
+        /// Defaults to 500 ms.
+        /// </summary>
+        public double RestoreDuration = 500;
+
+        /// <summary>
+        /// The easing curve to be applied during restoration.
+        /// Defaults to <see cref="Easing.In"/>.
+        /// </summary>
+        public Easing RestoreEasing = Easing.In;
     }
 
     public enum TrackChangeDirection
