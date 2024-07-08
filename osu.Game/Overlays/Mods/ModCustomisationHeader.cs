@@ -18,8 +18,6 @@ namespace osu.Game.Overlays.Mods
 {
     public partial class ModCustomisationHeader : OsuHoverContainer
     {
-        public override bool HandlePositionalInput => true;
-
         private Box background = null!;
         private SpriteIcon icon = null!;
 
