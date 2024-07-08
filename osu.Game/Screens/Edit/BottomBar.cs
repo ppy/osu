@@ -31,7 +31,7 @@ namespace osu.Game.Screens.Edit
 
             RelativeSizeAxes = Axes.X;
 
-            Height = 60;
+            Height = 40;
 
             Masking = true;
             EdgeEffect = new EdgeEffectParameters
