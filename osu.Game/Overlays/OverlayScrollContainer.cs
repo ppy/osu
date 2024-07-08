@@ -163,7 +163,7 @@ namespace osu.Game.Overlays
 
                 LastScrollTarget.BindValueChanged(target =>
                 {
-                    spriteIcon.RotateTo(target.NewValue != null ? 180 : 0, fade_duration, Easing.OutQuint);
+                    spriteIcon.ScaleTo(target.NewValue != null ? new Vector2(1f, -1f) : Vector2.One, fade_duration, Easing.OutQuint);
                     TooltipText = target.NewValue != null ? CommonStrings.ButtonsBackToPrevious : CommonStrings.ButtonsBackToTop;
                 }, true);
             }
