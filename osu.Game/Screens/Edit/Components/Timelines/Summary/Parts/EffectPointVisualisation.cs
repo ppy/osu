@@ -6,9 +6,9 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics;
-using osu.Game.Screens.Edit.Components.Timelines.Summary.Visualisations;
 
 namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
 {
@@ -91,12 +91,13 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
 
                 Width = (float)(nextControlPoint.Time - effect.Time);
 
-                AddInternal(new PointVisualisation
+                AddInternal(new Circle
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Origin = Anchor.TopLeft,
+                    Anchor = Anchor.BottomLeft,
+                    Origin = Anchor.CentreLeft,
                     Width = 1,
-                    Height = 0.25f,
+                    Height = 0.75f,
                     Depth = float.MaxValue,
                     Colour = effect.GetRepresentingColour(colours).Darken(0.5f),
                 });
