@@ -32,6 +32,7 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
             public PreviewTimeVisualisation(double time)
                 : base(time)
             {
+                Width = 2;
             }
 
             [BackgroundDependencyLoader]

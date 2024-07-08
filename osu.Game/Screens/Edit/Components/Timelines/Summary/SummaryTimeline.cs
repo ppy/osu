@@ -23,13 +23,11 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary
 
             Children = new Drawable[]
             {
-                new MarkerPart { RelativeSizeAxes = Axes.Both },
                 new ControlPointPart
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.BottomCentre,
                     RelativeSizeAxes = Axes.Both,
-                    Y = -10,
                     Height = 0.35f
                 },
                 new BookmarkPart
@@ -80,8 +78,9 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     RelativeSizeAxes = Axes.Both,
-                    Height = 0.10f
-                }
+                    Height = 0.15f
+                },
+                new MarkerPart { RelativeSizeAxes = Axes.Both },
             };
         }
     }

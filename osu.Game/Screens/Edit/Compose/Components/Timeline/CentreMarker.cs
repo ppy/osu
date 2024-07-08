@@ -5,7 +5,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Game.Graphics;
+using osu.Game.Overlays;
 using osuTK;
 
 namespace osu.Game.Screens.Edit.Compose.Components.Timeline
@@ -44,9 +44,9 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load(OverlayColourProvider colours)
         {
-            Colour = colours.Red1;
+            Colour = colours.Highlight1;
         }
     }
 }

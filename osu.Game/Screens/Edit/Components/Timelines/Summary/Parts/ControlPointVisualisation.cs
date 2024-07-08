@@ -16,9 +16,7 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
         public ControlPointVisualisation(ControlPoint point)
         {
             Point = point;
-
-            Height = 0.25f;
-            Origin = Anchor.TopCentre;
+            Width = 2;
         }
 
         [BackgroundDependencyLoader]
