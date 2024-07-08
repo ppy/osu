@@ -57,6 +57,45 @@ namespace osu.Game.Tests.Visual.Menus
         }
 
         [Test]
+        public void TestMultipleDucksSameParameters()
+        {
+            var duckParameters = new DuckParameters
+            {
+                DuckVolumeTo = 0.5,
+            };
+
+            IDisposable duckOp1 = null!;
+            IDisposable duckOp2 = null!;
+
+            double normalVolume = 1;
+
+            AddStep("get initial volume", () =>
+            {
+                normalVolume = Game.Audio.Tracks.AggregateVolume.Value;
+            });
+
+            AddStep("duck one", () =>
+            {
+                duckOp1 = Game.MusicController.Duck(duckParameters);
+            });
+
+            AddUntilStep("wait for duck to complete", () => Game.Audio.Tracks.AggregateVolume.Value, () => Is.EqualTo(normalVolume * 0.5f).Within(0.01));
+
+            AddStep("duck two", () =>
+            {
+                duckOp2 = Game.MusicController.Duck(duckParameters);
+            });
+
+            AddUntilStep("wait for duck to complete", () => Game.Audio.Tracks.AggregateVolume.Value, () => Is.EqualTo(normalVolume * 0.5f).Within(0.01));
+
+            AddStep("restore two", () => duckOp2.Dispose());
+            AddUntilStep("wait for restore to complete", () => Game.Audio.Tracks.AggregateVolume.Value, () => Is.EqualTo(normalVolume * 0.5f).Within(0.01));
+
+            AddStep("restore one", () => duckOp1.Dispose());
+            AddUntilStep("wait for restore to complete", () => Game.Audio.Tracks.AggregateVolume.Value, () => Is.EqualTo(normalVolume).Within(0.01));
+        }
+
+        [Test]
         public void TestMultipleDucksReverseOrder()
         {
             IDisposable duckOp1 = null!;
