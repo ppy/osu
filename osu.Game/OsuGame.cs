@@ -605,7 +605,7 @@ namespace osu.Game
                 return;
             }
 
-            editor.HandleTimestamp(timestamp);
+            editor.HandleTimestamp(timestamp, notifyOnError: true);
         }
 
         /// <summary>

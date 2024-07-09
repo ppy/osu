@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
@@ -18,6 +19,7 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Input.Bindings;
 using osu.Game.Rulesets.Mods;
 using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Mods
 {
@@ -25,6 +27,7 @@ namespace osu.Game.Overlays.Mods
     {
         private const float header_height = 42f;
         private const float content_vertical_padding = 20f;
+        private const float content_border_thickness = 2f;
 
         private Container content = null!;
         private OsuScrollContainer scrollContainer = null!;
@@ -33,15 +36,19 @@ namespace osu.Game.Overlays.Mods
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; } = null!;
 
+        public readonly BindableBool Enabled = new BindableBool();
+
         public readonly BindableBool Expanded = new BindableBool();
 
         public Bindable<IReadOnlyList<Mod>> SelectedMods { get; } = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
 
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
+
+        // Handle{Non}PositionalInput controls whether the panel should act as a blocking layer on the screen. only block when the panel is expanded.
+        // These properties are used because they correctly handle blocking/unblocking hover when mouse is pointing at a drawable outside
+        // (returning Expanded.Value to OnHover or overriding Block{Non}PositionalInput doesn't work).
         public override bool HandlePositionalInput => Expanded.Value;
-
         public override bool HandleNonPositionalInput => Expanded.Value;
-
-        protected override bool BlockPositionalInput => true;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -55,13 +62,14 @@ namespace osu.Game.Overlays.Mods
                     Depth = float.MinValue,
                     RelativeSizeAxes = Axes.X,
                     Height = header_height,
+                    Enabled = { BindTarget = Enabled },
                     Expanded = { BindTarget = Expanded },
                 },
                 content = new FocusGrabbingContainer
                 {
                     RelativeSizeAxes = Axes.X,
                     BorderColour = colourProvider.Dark3,
-                    BorderThickness = 2f,
+                    BorderThickness = content_border_thickness,
                     CornerRadius = 10f,
                     Masking = true,
                     EdgeEffect = new EdgeEffectParameters
@@ -70,6 +78,7 @@ namespace osu.Game.Overlays.Mods
                         Offset = new Vector2(0f, 5f),
                         Radius = 20f,
                         Roundness = 5f,
+                        Colour = Color4.Black.Opacity(0.25f),
                     },
                     Expanded = { BindTarget = Expanded },
                     Children = new Drawable[]
@@ -82,10 +91,11 @@ namespace osu.Game.Overlays.Mods
                         scrollContainer = new OsuScrollContainer(Direction.Vertical)
                         {
                             RelativeSizeAxes = Axes.X,
-                            ScrollbarOverlapsContent = false,
-                            // The +2f is a workaround for masking issues (see https://github.com/ppy/osu-framework/issues/1675#issuecomment-910023157)
-                            // Note that this actually causes the full scroll range to be reduced by 2px at the bottom, but it's not really noticeable.
-                            Margin = new MarginPadding { Top = header_height + 2f },
+                            Margin = new MarginPadding
+                            {
+                                Top = header_height + content_border_thickness,
+                                Bottom = content_border_thickness
+                            },
                             Child = sectionsFlow = new FillFlowContainer
                             {
                                 RelativeSizeAxes = Axes.X,
@@ -107,6 +117,11 @@ namespace osu.Game.Overlays.Mods
         {
             base.LoadComplete();
 
+            Enabled.BindValueChanged(e =>
+            {
+                this.FadeColour(OsuColour.Gray(e.NewValue ? 1f : 0.6f), 300, Easing.OutQuint);
+            }, true);
+
             Expanded.BindValueChanged(_ => updateDisplay(), true);
             SelectedMods.BindValueChanged(_ => updateMods(), true);
 
@@ -116,8 +131,6 @@ namespace osu.Game.Overlays.Mods
         protected override void PopIn() => this.FadeIn(300, Easing.OutQuint);
 
         protected override void PopOut() => this.FadeOut(300, Easing.OutQuint);
-
-        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
 
         protected override bool OnClick(ClickEvent e)
         {
@@ -154,13 +167,13 @@ namespace osu.Game.Overlays.Mods
                 content.AutoSizeDuration = 400;
                 content.AutoSizeEasing = Easing.OutQuint;
                 content.AutoSizeAxes = Axes.Y;
-                content.FadeEdgeEffectTo(0.25f, 120, Easing.OutQuint);
+                content.FadeIn(120, Easing.OutQuint);
             }
             else
             {
                 content.AutoSizeAxes = Axes.None;
                 content.ResizeHeightTo(header_height, 400, Easing.OutQuint);
-                content.FadeEdgeEffectTo(0f, 400, Easing.OutQuint);
+                content.FadeOut(400, Easing.OutSine);
             }
         }
 

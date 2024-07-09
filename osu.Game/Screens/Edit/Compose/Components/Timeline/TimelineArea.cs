@@ -132,7 +132,13 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         {
             base.LoadComplete();
 
-            composerFocusMode.BindValueChanged(_ => timelineBackground.FadeTo(composerFocusMode.Value ? 0.5f : 1, 400, Easing.OutQuint), true);
+            composerFocusMode.BindValueChanged(_ =>
+            {
+                if (!composerFocusMode.Value)
+                    timelineBackground.FadeIn(750, Easing.OutQuint);
+                else
+                    timelineBackground.Delay(600).FadeTo(0.5f, 4000, Easing.OutQuint);
+            }, true);
         }
     }
 }

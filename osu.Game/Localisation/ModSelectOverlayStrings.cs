@@ -80,6 +80,11 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString CustomisationPanelHeader => new TranslatableString(getKey(@"customisation_panel_header"), @"Customise");
 
+        /// <summary>
+        /// "No mod selected which can be customised."
+        /// </summary>
+        public static LocalisableString CustomisationPanelDisabledReason => new TranslatableString(getKey(@"customisation_panel_disabled_reason"), @"No mod selected which can be customised.");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }
