@@ -117,7 +117,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                                     break;
                                 }
 
-                                AddSampleBank(bankName);
+                                SetSampleBank(bankName);
                             }
 
                             break;
@@ -177,14 +177,27 @@ namespace osu.Game.Screens.Edit.Compose.Components
         {
             SelectionNewComboState.Value = GetStateFromSelection(SelectedItems.OfType<IHasComboInformation>(), h => h.NewCombo);
 
+            var samplesInSelection = SelectedItems.SelectMany(enumerateAllSamples).ToArray();
+
             foreach ((string sampleName, var bindable) in SelectionSampleStates)
             {
-                bindable.Value = GetStateFromSelection(SelectedItems, h => h.Samples.Any(s => s.Name == sampleName));
+                bindable.Value = GetStateFromSelection(samplesInSelection, h => h.Any(s => s.Name == sampleName));
             }
 
             foreach ((string bankName, var bindable) in SelectionBankStates)
             {
-                bindable.Value = GetStateFromSelection(SelectedItems, h => h.Samples.All(s => s.Bank == bankName));
+                bindable.Value = GetStateFromSelection(samplesInSelection.SelectMany(s => s), h => h.Bank == bankName);
+            }
+
+            IEnumerable<IList<HitSampleInfo>> enumerateAllSamples(HitObject hitObject)
+            {
+                yield return hitObject.Samples;
+
+                if (hitObject is IHasRepeats withRepeats)
+                {
+                    foreach (var node in withRepeats.NodeSamples)
+                        yield return node;
+                }
             }
         }
 
@@ -193,12 +206,25 @@ namespace osu.Game.Screens.Edit.Compose.Components
         #region Ternary state changes
 
         /// <summary>
-        /// Adds a sample bank to all selected <see cref="HitObject"/>s.
+        /// Sets the sample bank for all selected <see cref="HitObject"/>s.
         /// </summary>
         /// <param name="bankName">The name of the sample bank.</param>
-        public void AddSampleBank(string bankName)
+        public void SetSampleBank(string bankName)
         {
-            if (SelectedItems.All(h => h.Samples.All(s => s.Bank == bankName)))
+            bool hasRelevantBank(HitObject hitObject)
+            {
+                bool result = hitObject.Samples.All(s => s.Bank == bankName);
+
+                if (hitObject is IHasRepeats hasRepeats)
+                {
+                    foreach (var node in hasRepeats.NodeSamples)
+                        result &= node.All(s => s.Bank == bankName);
+                }
+
+                return result;
+            }
+
+            if (SelectedItems.All(hasRelevantBank))
                 return;
 
             EditorBeatmap.PerformOnSelection(h =>
@@ -207,8 +233,28 @@ namespace osu.Game.Screens.Edit.Compose.Components
                     return;
 
                 h.Samples = h.Samples.Select(s => s.With(newBank: bankName)).ToList();
+
+                if (h is IHasRepeats hasRepeats)
+                {
+                    for (int i = 0; i < hasRepeats.NodeSamples.Count; ++i)
+                        hasRepeats.NodeSamples[i] = hasRepeats.NodeSamples[i].Select(s => s.With(newBank: bankName)).ToList();
+                }
+
                 EditorBeatmap.Update(h);
             });
+        }
+
+        private bool hasRelevantSample(HitObject hitObject, string sampleName)
+        {
+            bool result = hitObject.Samples.Any(s => s.Name == sampleName);
+
+            if (hitObject is IHasRepeats hasRepeats)
+            {
+                foreach (var node in hasRepeats.NodeSamples)
+                    result &= node.Any(s => s.Name == sampleName);
+            }
+
+            return result;
         }
 
         /// <summary>
@@ -217,7 +263,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <param name="sampleName">The name of the hit sample.</param>
         public void AddHitSample(string sampleName)
         {
-            if (SelectedItems.All(h => h.Samples.Any(s => s.Name == sampleName)))
+            if (SelectedItems.All(h => hasRelevantSample(h, sampleName)))
                 return;
 
             EditorBeatmap.PerformOnSelection(h =>
@@ -227,6 +273,23 @@ namespace osu.Game.Screens.Edit.Compose.Components
                     return;
 
                 h.Samples.Add(h.CreateHitSampleInfo(sampleName));
+
+                if (h is IHasRepeats hasRepeats)
+                {
+                    foreach (var node in hasRepeats.NodeSamples)
+                    {
+                        if (node.Any(s => s.Name == sampleName))
+                            continue;
+
+                        var hitSample = h.CreateHitSampleInfo(sampleName);
+
+                        string? existingAdditionBank = node.FirstOrDefault(s => s.Name != HitSampleInfo.HIT_NORMAL)?.Bank;
+                        if (existingAdditionBank != null)
+                            hitSample = hitSample.With(newBank: existingAdditionBank);
+
+                        node.Add(hitSample);
+                    }
+                }
 
                 EditorBeatmap.Update(h);
             });
@@ -238,12 +301,19 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <param name="sampleName">The name of the hit sample.</param>
         public void RemoveHitSample(string sampleName)
         {
-            if (SelectedItems.All(h => h.Samples.All(s => s.Name != sampleName)))
+            if (SelectedItems.All(h => !hasRelevantSample(h, sampleName)))
                 return;
 
             EditorBeatmap.PerformOnSelection(h =>
             {
                 h.SamplesBindable.RemoveAll(s => s.Name == sampleName);
+
+                if (h is IHasRepeats hasRepeats)
+                {
+                    for (int i = 0; i < hasRepeats.NodeSamples.Count; ++i)
+                        hasRepeats.NodeSamples[i] = hasRepeats.NodeSamples[i].Where(s => s.Name != sampleName).ToList();
+                }
+
                 EditorBeatmap.Update(h);
             });
         }

@@ -219,6 +219,7 @@ namespace osu.Game.Overlays.Mods
                                     Anchor = Anchor.TopRight,
                                     Origin = Anchor.TopRight,
                                     Width = 400,
+                                    State = { Value = Visibility.Visible },
                                 }
                             }
                         }
@@ -493,7 +494,7 @@ namespace osu.Game.Overlays.Mods
 
             if (anyCustomisableModActive)
             {
-                customisationPanel.Show();
+                customisationPanel.Enabled.Value = true;
 
                 if (anyModPendingConfiguration)
                     customisationPanel.Expanded.Value = true;
@@ -501,7 +502,7 @@ namespace osu.Game.Overlays.Mods
             else
             {
                 customisationPanel.Expanded.Value = false;
-                customisationPanel.Hide();
+                customisationPanel.Enabled.Value = false;
             }
         }
 

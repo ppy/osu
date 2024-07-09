@@ -18,8 +18,6 @@ namespace osu.Game.Overlays.Mods
 {
     public partial class ModCustomisationHeader : OsuHoverContainer
     {
-        public override bool HandlePositionalInput => true;
-
         private Box background = null!;
         private SpriteIcon icon = null!;
 
@@ -29,6 +27,12 @@ namespace osu.Game.Overlays.Mods
         protected override IEnumerable<Drawable> EffectTargets => new[] { background };
 
         public readonly BindableBool Expanded = new BindableBool();
+
+        public ModCustomisationHeader()
+        {
+            Action = Expanded.Toggle;
+            Enabled.Value = false;
+        }
 
         [BackgroundDependencyLoader]
         private void load()
@@ -75,12 +79,17 @@ namespace osu.Game.Overlays.Mods
         {
             base.LoadComplete();
 
-            Expanded.BindValueChanged(v =>
+            Enabled.BindValueChanged(e =>
             {
-                icon.RotateTo(v.NewValue ? 180 : 0);
+                TooltipText = e.NewValue
+                    ? string.Empty
+                    : ModSelectOverlayStrings.CustomisationPanelDisabledReason;
             }, true);
 
-            Action = Expanded.Toggle;
+            Expanded.BindValueChanged(v =>
+            {
+                icon.ScaleTo(v.NewValue ? new Vector2(1, -1) : Vector2.One, 300, Easing.OutQuint);
+            }, true);
         }
     }
 }
