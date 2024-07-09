@@ -417,16 +417,23 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        public void UpdateBeatmapSet(BeatmapSetInfo beatmapSet) => Schedule(() =>
+        public void UpdateBeatmapSet(BeatmapSetInfo beatmapSet)
         {
-            updateBeatmapSet(beatmapSet);
-            invalidateAfterChange();
-        });
+            beatmapSet = beatmapSet.Detach();
+
+            Schedule(() =>
+            {
+                updateBeatmapSet(beatmapSet);
+                invalidateAfterChange();
+            });
+        }
 
         private void updateBeatmapSet(BeatmapSetInfo beatmapSet)
         {
+            beatmapSet = beatmapSet.Detach();
+
             originalBeatmapSetsDetached.RemoveAll(set => set.ID == beatmapSet.ID);
-            originalBeatmapSetsDetached.Add(beatmapSet.Detach());
+            originalBeatmapSetsDetached.Add(beatmapSet);
 
             var newSets = new List<CarouselBeatmapSet>();
 
