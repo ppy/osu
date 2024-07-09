@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -10,11 +11,15 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Platform;
+using osu.Framework.Screens;
+using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Overlays;
 using osu.Game.Screens.OnlinePlay.Match.Components;
 using osuTK;
@@ -31,9 +36,13 @@ namespace osu.Game.Screens.Edit
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; } = null!;
 
-        private readonly Editor? editor;
+        private readonly Editor editor;
 
         private ExternalEditOperation<BeatmapSetInfo>? operation;
+
+        private double timeLoaded;
+
+        private FillFlowContainer flow = null!;
 
         public ExternalEditScreen(Task<ExternalEditOperation<BeatmapSetInfo>> fileMountOperation, Editor editor)
         {
@@ -60,64 +69,78 @@ namespace osu.Game.Screens.Edit
                         Colour = colourProvider.Background5,
                         RelativeSizeAxes = Axes.Both,
                     },
-                    new FillFlowContainer
+                    flow = new FillFlowContainer
                     {
                         Margin = new MarginPadding(20),
                         AutoSizeAxes = Axes.Both,
                         Direction = FillDirection.Vertical,
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
+                        Anchor = Anchor.TopCentre,
+                        Origin = Anchor.TopCentre,
                         Spacing = new Vector2(15),
-                        Children = new Drawable[]
-                        {
-                            new OsuSpriteText
-                            {
-                                Text = "Beatmap is mounted externally",
-                                Font = OsuFont.Default.With(size: 30),
-                                Anchor = Anchor.Centre,
-                                Origin = Anchor.Centre,
-                            },
-                            new FillFlowContainer
-                            {
-                                AutoSizeAxes = Axes.Both,
-                                Direction = FillDirection.Horizontal,
-                                Anchor = Anchor.Centre,
-                                Origin = Anchor.Centre,
-                                Spacing = new Vector2(15),
-                                Children = new Drawable[]
-                                {
-                                }
-                            },
-                            new PurpleRoundedButton
-                            {
-                                Text = "Open folder",
-                                Width = 350,
-                                Anchor = Anchor.Centre,
-                                Origin = Anchor.Centre,
-                                Action = open,
-                            },
-                            new DangerousRoundedButton
-                            {
-                                Text = "Finish editing and import changes",
-                                Width = 350,
-                                Anchor = Anchor.Centre,
-                                Origin = Anchor.Centre,
-                                Action = finish,
-                            }
-                        }
                     }
                 }
             };
+
+            showSpinner("Exporting for edit...");
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
+            timeLoaded = Time.Current;
+
             fileMountOperation.ContinueWith(t =>
             {
                 operation = t.GetResultSafely();
-                Schedule(open);
+
+                Scheduler.AddDelayed(() =>
+                {
+                    flow.Children = new Drawable[]
+                    {
+                        new OsuSpriteText
+                        {
+                            Text = "Beatmap is mounted externally",
+                            Font = OsuFont.Default.With(size: 30),
+                            Anchor = Anchor.TopCentre,
+                            Origin = Anchor.TopCentre,
+                        },
+                        new OsuTextFlowContainer
+                        {
+                            Padding = new MarginPadding(5),
+                            Anchor = Anchor.TopCentre,
+                            Origin = Anchor.TopCentre,
+                            Width = 350,
+                            AutoSizeAxes = Axes.Y,
+                            Text = "Any changes made to the exported folder will be imported to the game, including file additions, modifications and deletions.",
+                        },
+                        new PurpleRoundedButton
+                        {
+                            Text = "Open folder",
+                            Width = 350,
+                            Anchor = Anchor.TopCentre,
+                            Origin = Anchor.TopCentre,
+                            Action = open,
+                            Enabled = { Value = false }
+                        },
+                        new DangerousRoundedButton
+                        {
+                            Text = "Finish editing and import changes",
+                            Width = 350,
+                            Anchor = Anchor.TopCentre,
+                            Origin = Anchor.TopCentre,
+                            Action = finish,
+                            Enabled = { Value = false }
+                        }
+                    };
+
+                    Scheduler.AddDelayed(() =>
+                    {
+                        foreach (var b in flow.ChildrenOfType<RoundedButton>())
+                            b.Enabled.Value = true;
+                        open();
+                    }, 1000);
+                }, Math.Max(0, 1000 - (Time.Current - timeLoaded)));
             });
         }
 
@@ -130,15 +153,62 @@ namespace osu.Game.Screens.Edit
             gameHost.OpenFileExternally(operation.MountedPath.TrimDirectorySeparator() + Path.DirectorySeparatorChar);
         }
 
+        public override bool OnExiting(ScreenExitEvent e)
+        {
+            if (!fileMountOperation.IsCompleted)
+                return false;
+
+            if (operation != null)
+            {
+                finish();
+                return false;
+            }
+
+            return base.OnExiting(e);
+        }
+
         private void finish()
         {
-            fileMountOperation.GetResultSafely().Finish().ContinueWith(t =>
+            showSpinner("Cleaning up...");
+
+            EditOperation!.Finish().ContinueWith(t =>
             {
                 Schedule(() =>
                 {
-                    editor?.SwitchToDifficulty(t.GetResultSafely<Live<BeatmapSetInfo>>().Value.Detach().Beatmaps.First());
+                    // Setting to null will allow exit to succeed.
+                    operation = null;
+
+                    var beatmap = t.GetResultSafely();
+
+                    if (beatmap == null)
+                        this.Exit();
+                    else
+                        editor.SwitchToDifficulty(beatmap.Value.Detach().Beatmaps.First());
                 });
             });
+        }
+
+        private void showSpinner(string text)
+        {
+            foreach (var b in flow.ChildrenOfType<RoundedButton>())
+                b.Enabled.Value = false;
+
+            flow.Children = new Drawable[]
+            {
+                new OsuSpriteText
+                {
+                    Text = text,
+                    Font = OsuFont.Default.With(size: 30),
+                    Anchor = Anchor.TopCentre,
+                    Origin = Anchor.TopCentre,
+                },
+                new LoadingSpinner
+                {
+                    Anchor = Anchor.TopCentre,
+                    Origin = Anchor.TopCentre,
+                    State = { Value = Visibility.Visible }
+                },
+            };
         }
     }
 }
