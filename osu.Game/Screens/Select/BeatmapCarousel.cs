@@ -302,8 +302,10 @@ namespace osu.Game.Screens.Select
                 {
                     Guid id = sender[i].ID;
 
-                    realmBeatmapSets.Insert(i, id);
+                    setsRequiringRemoval.Remove(id);
                     setsRequiringUpdate.Add(id);
+
+                    realmBeatmapSets.Insert(i, id);
                 }
 
                 foreach (int i in changes.NewModifiedIndices)
