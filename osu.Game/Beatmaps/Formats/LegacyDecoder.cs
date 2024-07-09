@@ -99,19 +99,20 @@ namespace osu.Game.Beatmaps.Formats
             var pair = SplitKeyVal(line);
 
             bool isCombo = pair.Key.StartsWith(@"Combo", StringComparison.Ordinal);
+            var colourValue = pair.Value;
 
             Span<Range> ranges = stackalloc Range[5];
-            int splitCount = line.Split(ranges, ',');
+            int splitCount = colourValue.Split(ranges, ',');
 
             if (splitCount != 3 && splitCount != 4)
-                throw new InvalidOperationException($@"Color specified in incorrect format (should be R,G,B or R,G,B,A): {pair.Value}");
+                throw new InvalidOperationException($@"Color specified in incorrect format (should be R,G,B or R,G,B,A): {colourValue}");
 
             Color4 colour;
 
             try
             {
-                byte alpha = allowAlpha && splitCount == 4 ? byte.Parse(line[ranges[3]]) : (byte)255;
-                colour = new Color4(byte.Parse(line[ranges[0]]), byte.Parse(line[ranges[1]]), byte.Parse(line[ranges[2]]), alpha);
+                byte alpha = allowAlpha && splitCount == 4 ? byte.Parse(colourValue[ranges[3]]) : (byte)255;
+                colour = new Color4(byte.Parse(colourValue[ranges[0]]), byte.Parse(colourValue[ranges[1]]), byte.Parse(colourValue[ranges[2]]), alpha);
             }
             catch
             {
