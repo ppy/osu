@@ -30,6 +30,35 @@ namespace osu.Game.Tests.Visual.Navigation
     public partial class TestSceneBeatmapEditorNavigation : OsuGameTestScene
     {
         [Test]
+        public void TestSaveThenDeleteActuallyDeletesAtSongSelect()
+        {
+            BeatmapSetInfo beatmapSet = null!;
+
+            AddStep("import test beatmap", () => Game.BeatmapManager.Import(TestResources.GetTestBeatmapForImport()).WaitSafely());
+            AddStep("retrieve beatmap", () => beatmapSet = Game.BeatmapManager.QueryBeatmapSet(set => !set.Protected).AsNonNull().Value.Detach());
+
+            AddStep("present beatmap", () => Game.PresentBeatmap(beatmapSet));
+            AddUntilStep("wait for song select",
+                () => Game.Beatmap.Value.BeatmapSetInfo.Equals(beatmapSet)
+                      && Game.ScreenStack.CurrentScreen is PlaySongSelect songSelect
+                      && songSelect.IsLoaded);
+
+            AddStep("open editor", () => ((PlaySongSelect)Game.ScreenStack.CurrentScreen).Edit(beatmapSet.Beatmaps.First(beatmap => beatmap.Ruleset.OnlineID == 0)));
+            AddUntilStep("wait for editor open", () => Game.ScreenStack.CurrentScreen is Editor editor && editor.ReadyForUse);
+
+            makeMetadataChange();
+
+            AddAssert("save", () => Game.ChildrenOfType<Editor>().Single().Save());
+
+            AddStep("delete beatmap", () => Game.BeatmapManager.Delete(beatmapSet));
+
+            AddStep("exit", () => Game.ChildrenOfType<Editor>().Single().Exit());
+
+            AddUntilStep("wait for song select", () => Game.ScreenStack.CurrentScreen is PlaySongSelect songSelect
+                                                       && songSelect.Beatmap.Value is DummyWorkingBeatmap);
+        }
+
+        [Test]
         public void TestChangeMetadataExitWhileTextboxFocusedPromptsSave()
         {
             BeatmapSetInfo beatmapSet = null!;
@@ -47,6 +76,15 @@ namespace osu.Game.Tests.Visual.Navigation
             AddStep("open editor", () => ((PlaySongSelect)Game.ScreenStack.CurrentScreen).Edit(beatmapSet.Beatmaps.First(beatmap => beatmap.Ruleset.OnlineID == 0)));
             AddUntilStep("wait for editor open", () => Game.ScreenStack.CurrentScreen is Editor editor && editor.ReadyForUse);
 
+            makeMetadataChange(commit: false);
+
+            AddStep("exit", () => Game.ChildrenOfType<Editor>().Single().Exit());
+
+            AddUntilStep("save dialog displayed", () => Game.ChildrenOfType<DialogOverlay>().SingleOrDefault()?.CurrentDialog is PromptForSaveDialog);
+        }
+
+        private void makeMetadataChange(bool commit = true)
+        {
             AddStep("change to song setup", () => InputManager.Key(Key.F4));
 
             TextBox textbox = null!;
@@ -77,9 +115,7 @@ namespace osu.Game.Tests.Visual.Navigation
                 InputManager.Keys(PlatformAction.Paste);
             });
 
-            AddStep("exit", () => Game.ChildrenOfType<Editor>().Single().Exit());
-
-            AddUntilStep("save dialog displayed", () => Game.ChildrenOfType<DialogOverlay>().SingleOrDefault()?.CurrentDialog is PromptForSaveDialog);
+            if (commit) AddStep("commit", () => InputManager.Key(Key.Enter));
         }
 
         [Test]
