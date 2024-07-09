@@ -401,7 +401,20 @@ namespace osu.Game.Rulesets.Scoring
 
             ScoreRank newRank = RankFromScore(Accuracy.Value, ScoreResultCounts);
             ScoreRank newMaxRank = RankFromScore(MaximumAccuracy.Value, ScoreResultCounts);
+
+            //To prevent the minimum rank got into >S, before completed the entire map,
+            //So that in here it fill the rest of the part with miss.
+            // (i.e. simulating the worse situation of all misses)
+            //ref: https://github.com/ppy/osu/pull/28614#discussion_r1670392366
+            if (ScoreResultCounts.TryGetValue(HitResult.Miss, out int currentMissCounts))
+                ScoreResultCounts[HitResult.Miss] = MaxHits - JudgedHits + currentMissCounts;
+            else
+                ScoreResultCounts[HitResult.Miss] = MaxHits - JudgedHits;
+
             ScoreRank newMinRank = RankFromScore(MinimumAccuracy.Value, ScoreResultCounts);
+
+            //Restore that to previous value, in order to calculate the normal value,
+            ScoreResultCounts[HitResult.Miss] = currentMissCounts;
 
             foreach (var mod in Mods.Value.OfType<IApplicableToScoreProcessor>())
             {
