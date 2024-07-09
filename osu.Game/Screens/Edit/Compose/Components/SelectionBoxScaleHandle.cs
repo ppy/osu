@@ -3,7 +3,6 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Extensions;
-using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Events;
 using osu.Framework.Utils;
@@ -128,6 +127,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
             }
         }
 
-        private bool isCornerAnchor(Anchor anchor) => !anchor.HasFlagFast(Anchor.x1) && !anchor.HasFlagFast(Anchor.y1);
+        private bool isCornerAnchor(Anchor anchor) => !anchor.HasFlag(Anchor.x1) && !anchor.HasFlag(Anchor.y1);
     }
 }
