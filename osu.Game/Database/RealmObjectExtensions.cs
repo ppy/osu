@@ -302,7 +302,10 @@ namespace osu.Game.Database
                     // Realm might coalesce the initial callback, meaning we never receive a `ChangeSet` of `null` marking the first callback.
                     // Let's decouple it for simplicity in handling.
                     if (changes != null)
+                    {
                         callback(sender, null);
+                        return;
+                    }
                 }
 
                 callback(sender, changes);

@@ -85,7 +85,7 @@ namespace osu.Game.Tests.Database
 
                 realm.Run(r => r.Refresh());
 
-                Assert.That(receivedChangesCount, Is.EqualTo(2));
+                Assert.That(receivedChangesCount, Is.EqualTo(1));
                 Assert.That(firstChanges, Is.Null);
 
                 registration.Dispose();
