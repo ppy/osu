@@ -169,6 +169,8 @@ namespace osu.Game.Screens.Edit
 
         private void finish()
         {
+            string originalDifficulty = editor.Beatmap.Value.Beatmap.BeatmapInfo.DifficultyName;
+
             showSpinner("Cleaning up...");
 
             EditOperation!.Finish().ContinueWith(t =>
@@ -178,12 +180,18 @@ namespace osu.Game.Screens.Edit
                     // Setting to null will allow exit to succeed.
                     operation = null;
 
-                    var beatmap = t.GetResultSafely();
+                    Live<BeatmapSetInfo>? beatmap = t.GetResultSafely();
 
                     if (beatmap == null)
                         this.Exit();
                     else
-                        editor.SwitchToDifficulty(beatmap.Value.Detach().Beatmaps.First());
+                    {
+                        var closestMatchingBeatmap =
+                            beatmap.Value.Beatmaps.FirstOrDefault(b => b.DifficultyName == originalDifficulty)
+                            ?? beatmap.Value.Beatmaps.First();
+
+                        editor.SwitchToDifficulty(closestMatchingBeatmap);
+                    }
                 });
             });
         }
