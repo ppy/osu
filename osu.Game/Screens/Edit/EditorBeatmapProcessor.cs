@@ -12,11 +12,13 @@ namespace osu.Game.Screens.Edit
 {
     public class EditorBeatmapProcessor : IBeatmapProcessor
     {
-        public IBeatmap Beatmap { get; }
+        public EditorBeatmap Beatmap { get; }
+
+        IBeatmap IBeatmapProcessor.Beatmap => Beatmap;
 
         private readonly IBeatmapProcessor? rulesetBeatmapProcessor;
 
-        public EditorBeatmapProcessor(IBeatmap beatmap, Ruleset ruleset)
+        public EditorBeatmapProcessor(EditorBeatmap beatmap, Ruleset ruleset)
         {
             Beatmap = beatmap;
             rulesetBeatmapProcessor = ruleset.CreateBeatmapProcessor(beatmap);

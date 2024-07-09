@@ -1003,7 +1003,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
         private void assertCustomisationToggleState(bool disabled, bool active)
         {
-            AddUntilStep($"customisation panel is {(disabled ? "" : "not ")}disabled", () => modSelectOverlay.ChildrenOfType<ModCustomisationPanel>().Single().State.Value == (disabled ? Visibility.Hidden : Visibility.Visible));
+            AddUntilStep($"customisation panel is {(disabled ? "" : "not ")}disabled", () => modSelectOverlay.ChildrenOfType<ModCustomisationPanel>().Single().Enabled.Value == !disabled);
             AddAssert($"customisation panel is {(active ? "" : "not ")}active", () => modSelectOverlay.ChildrenOfType<ModCustomisationPanel>().Single().Expanded.Value == active);
         }
 
