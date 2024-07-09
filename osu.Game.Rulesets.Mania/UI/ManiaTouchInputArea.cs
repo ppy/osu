@@ -192,12 +192,12 @@ namespace osu.Game.Rulesets.Mania.UI
 
                 if (press)
                 {
-                    inputManager?.KeyBindingContainer?.TriggerPressed(Action.Value);
+                    inputManager?.KeyBindingContainer.TriggerPressed(Action.Value);
                     highlightOverlay.FadeTo(0.1f, 80, Easing.OutQuint);
                 }
                 else
                 {
-                    inputManager?.KeyBindingContainer?.TriggerReleased(Action.Value);
+                    inputManager?.KeyBindingContainer.TriggerReleased(Action.Value);
                     highlightOverlay.FadeTo(0, 400, Easing.OutQuint);
                 }
             }
