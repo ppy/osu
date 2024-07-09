@@ -404,6 +404,26 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString DecreaseModSpeed => new TranslatableString(getKey(@"decrease_mod_speed"), @"Decrease mod speed");
 
+        /// <summary>
+        /// "Seek to previous hit object"
+        /// </summary>
+        public static LocalisableString EditorSeekToPreviousHitObject => new TranslatableString(getKey(@"editor_seek_to_previous_hit_object"), @"Seek to previous hit object");
+
+        /// <summary>
+        /// "Seek to next hit object"
+        /// </summary>
+        public static LocalisableString EditorSeekToNextHitObject => new TranslatableString(getKey(@"editor_seek_to_next_hit_object"), @"Seek to next hit object");
+
+        /// <summary>
+        /// "Seek to previous sample point"
+        /// </summary>
+        public static LocalisableString EditorSeekToPreviousSamplePoint => new TranslatableString(getKey(@"editor_seek_to_previous_sample_point"), @"Seek to previous sample point");
+
+        /// <summary>
+        /// "Seek to next sample point"
+        /// </summary>
+        public static LocalisableString EditorSeekToNextSamplePoint => new TranslatableString(getKey(@"editor_seek_to_next_sample_point"), @"Seek to next sample point");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }

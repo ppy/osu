@@ -594,7 +594,7 @@ namespace osu.Game.Screens.Edit
 
         protected override bool OnKeyDown(KeyDownEvent e)
         {
-            if (e.ControlPressed || e.SuperPressed) return false;
+            if (e.ControlPressed || e.AltPressed || e.SuperPressed) return false;
 
             switch (e.Key)
             {
@@ -744,6 +744,22 @@ namespace osu.Game.Screens.Edit
 
                 case GlobalAction.EditorTestGameplay:
                     bottomBar.TestGameplayButton.TriggerClick();
+                    return true;
+
+                case GlobalAction.EditorSeekToPreviousHitObject:
+                    seekHitObject(-1);
+                    return true;
+
+                case GlobalAction.EditorSeekToNextHitObject:
+                    seekHitObject(1);
+                    return true;
+
+                case GlobalAction.EditorSeekToPreviousSamplePoint:
+                    seekSamplePoint(-1);
+                    return true;
+
+                case GlobalAction.EditorSeekToNextSamplePoint:
+                    seekSamplePoint(1);
                     return true;
 
                 default:
@@ -1130,15 +1146,6 @@ namespace osu.Game.Screens.Edit
 
         private void seek(UIEvent e, int direction)
         {
-            if (e.AltPressed)
-            {
-                if (e.ShiftPressed)
-                    seekSamplePoint(direction);
-                else
-                    seekHitObject(direction);
-                return;
-            }
-
             double amount = e.ShiftPressed ? 4 : 1;
 
             bool trackPlaying = clock.IsRunning;
