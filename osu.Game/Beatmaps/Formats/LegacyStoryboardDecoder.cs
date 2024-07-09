@@ -70,7 +70,7 @@ namespace osu.Game.Beatmaps.Formats
             switch (pair.Key)
             {
                 case "UseSkinSprites":
-                    storyboard.UseSkinSprites = pair.Value.SequenceEqual("1");
+                    storyboard.UseSkinSprites = pair.Value is "1";
                     break;
             }
         }

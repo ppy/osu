@@ -34,7 +34,7 @@ namespace osu.Game.Skinning
                                 return;
 
                             case @"Version":
-                                if (pair.Value.SequenceEqual("latest"))
+                                if (pair.Value is "latest")
                                     skin.LegacyVersion = SkinConfiguration.LATEST_VERSION;
                                 else if (decimal.TryParse(pair.Value, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out decimal version))
                                     skin.LegacyVersion = version;

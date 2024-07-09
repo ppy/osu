@@ -99,11 +99,11 @@ namespace osu.Game.Skinning
                         break;
 
                     case "JudgementLine":
-                        currentConfig.ShowJudgementLine = pair.Value == "1";
+                        currentConfig.ShowJudgementLine = pair.Value is "1";
                         break;
 
                     case "KeysUnderNotes":
-                        currentConfig.KeysUnderNotes = pair.Value == "1";
+                        currentConfig.KeysUnderNotes = pair.Value is "1";
                         break;
 
                     case "LightingNWidth":
