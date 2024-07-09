@@ -154,11 +154,11 @@ namespace osu.Game.Beatmaps.Formats
 
         protected string CleanFilename(ReadOnlySpan<char> path) =>
             path
-            .ToString()
-            // User error which is supported by stable (https://github.com/ppy/osu/issues/21204)
-            .Replace(@"\\", @"\")
-            .Trim('"')
-            .ToStandardisedPath();
+                .ToString()
+                // User error which is supported by stable (https://github.com/ppy/osu/issues/21204)
+                .Replace(@"\\", @"\")
+                .Trim('"')
+                .ToStandardisedPath();
 
         public enum Section
         {

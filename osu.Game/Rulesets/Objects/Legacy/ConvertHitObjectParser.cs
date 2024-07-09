@@ -10,7 +10,6 @@ using System.Collections.Generic;
 using System.IO;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Audio;
-using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps.ControlPoints;
@@ -286,6 +285,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
                 for (int i = 0; i < splitCount; i++)
                 {
                     ReadOnlySpan<char> s = pointString[splitRanges[i]];
+
                     if (char.IsLetter(s[0]))
                     {
                         // The start of a new segment(indicated by having an alpha character at position 0).
