@@ -269,9 +269,16 @@ namespace osu.Game.Rulesets.Edit
 
             composerFocusMode.BindValueChanged(_ =>
             {
-                float targetAlpha = composerFocusMode.Value ? 0.5f : 1;
-                leftToolboxBackground.FadeTo(targetAlpha, 400, Easing.OutQuint);
-                rightToolboxBackground.FadeTo(targetAlpha, 400, Easing.OutQuint);
+                if (!composerFocusMode.Value)
+                {
+                    leftToolboxBackground.FadeIn(750, Easing.OutQuint);
+                    rightToolboxBackground.FadeIn(750, Easing.OutQuint);
+                }
+                else
+                {
+                    leftToolboxBackground.Delay(600).FadeTo(0.5f, 4000, Easing.OutQuint);
+                    rightToolboxBackground.Delay(600).FadeTo(0.5f, 4000, Easing.OutQuint);
+                }
             }, true);
         }
 
