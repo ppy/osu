@@ -5,7 +5,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
@@ -14,7 +13,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
@@ -24,7 +22,6 @@ using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Framework.Logging;
-using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Framework.Threading;
@@ -823,9 +820,6 @@ namespace osu.Game.Screens.Edit
 
             resetTrack();
 
-            fileMountOperation?.Dispose();
-            fileMountOperation = null;
-
             refetchBeatmap();
 
             return base.OnExiting(e);
@@ -1101,11 +1095,6 @@ namespace osu.Game.Screens.Edit
             lastSavedHash = changeHandler?.CurrentStateHash;
         }
 
-        private EditorMenuItem mountFilesItem;
-
-        [CanBeNull]
-        private Task<ExternalEditOperation<BeatmapSetInfo>> fileMountOperation;
-
         private IEnumerable<MenuItem> createFileMenuItems()
         {
             yield return createDifficultyCreationMenu();
@@ -1124,41 +1113,13 @@ namespace osu.Game.Screens.Edit
                 saveRelatedMenuItems.AddRange(export.Items);
                 yield return export;
 
-                yield return mountFilesItem = new EditorMenuItem("Mount files", MenuItemType.Standard, mountFiles);
+                var externalEdit = new EditorMenuItem("Edit externally", MenuItemType.Standard, editExternally);
+                saveRelatedMenuItems.Add(externalEdit);
+                yield return externalEdit;
             }
 
             yield return new OsuMenuItemSpacer();
             yield return new EditorMenuItem(CommonStrings.Exit, MenuItemType.Standard, this.Exit);
-        }
-
-        [Resolved]
-        private GameHost gameHost { get; set; }
-
-        private void mountFiles()
-        {
-            if (fileMountOperation == null)
-            {
-                Save();
-
-                fileMountOperation = beatmapManager.BeginExternalEditing(editorBeatmap.BeatmapInfo.BeatmapSet!);
-                mountFilesItem.Text.Value = "Dismount files";
-
-                fileMountOperation.ContinueWith(t =>
-                {
-                    var operation = t.GetResultSafely();
-
-                    // Ensure the trailing separator is present in order to show the folder contents.
-                    gameHost.OpenFileExternally(operation.MountedPath.TrimDirectorySeparator() + Path.DirectorySeparatorChar);
-                });
-            }
-            else
-            {
-                fileMountOperation.GetResultSafely().Finish().ContinueWith(t => Schedule(() =>
-                {
-                    fileMountOperation = null;
-                    SwitchToDifficulty(t.GetResultSafely().Value.Detach().Beatmaps.First());
-                }));
-            }
         }
 
         private EditorMenuItem createExportMenu()
@@ -1170,6 +1131,14 @@ namespace osu.Game.Screens.Edit
             };
 
             return new EditorMenuItem(CommonStrings.Export) { Items = exportItems };
+        }
+
+        private void editExternally()
+        {
+            Save();
+
+            var editOperation = beatmapManager.BeginExternalEditing(editorBeatmap.BeatmapInfo.BeatmapSet!);
+            this.Push(new ExternalEditScreen(editOperation, this));
         }
 
         private void exportBeatmap(bool legacy)
@@ -1303,7 +1272,11 @@ namespace osu.Game.Screens.Edit
             return new EditorMenuItem(EditorStrings.ChangeDifficulty) { Items = difficultyItems };
         }
 
-        protected void SwitchToDifficulty(BeatmapInfo nextBeatmap) => loader?.ScheduleSwitchToExistingDifficulty(nextBeatmap, GetState(nextBeatmap.Ruleset));
+        public void SwitchToDifficulty(BeatmapInfo nextBeatmap)
+        {
+            switchingDifficulty = true;
+            loader?.ScheduleSwitchToExistingDifficulty(nextBeatmap, GetState(nextBeatmap.Ruleset));
+        }
 
         private void cancelExit()
         {
