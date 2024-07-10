@@ -44,7 +44,7 @@ namespace osu.Game.Screens.Menu
                     text += $"{n.Text} ({n.Progress:0%})\n";
 
                 if (ongoingOperations.Length > 10)
-                    text += $"\nAnd {ongoingOperations.Length - 10} other operation(s).\n";
+                    text += $"\nand {ongoingOperations.Length - 10} other operation(s).\n";
 
                 text += "\nLast chance to turn back";
 
