@@ -334,6 +334,12 @@ namespace osu.Game.Rulesets.Difficulty
                 set => baseBeatmap.Breaks = value;
             }
 
+            public List<int> Bookmarks
+            {
+                get => baseBeatmap.Bookmarks;
+                set => baseBeatmap.Bookmarks = value;
+            }
+
             public List<string> UnhandledEventLines => baseBeatmap.UnhandledEventLines;
 
             public double TotalBreakTime => baseBeatmap.TotalBreakTime;
