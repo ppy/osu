@@ -4,6 +4,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using osu.Framework.Allocation;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Tools;
@@ -12,6 +13,7 @@ using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
+using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Compose.Components;
 using osuTK;
 
@@ -20,6 +22,9 @@ namespace osu.Game.Rulesets.Mania.Edit
     public partial class ManiaHitObjectComposer : ScrollingHitObjectComposer<ManiaHitObject>
     {
         private DrawableManiaEditorRuleset drawableRuleset = null!;
+
+        [Resolved]
+        private EditorScreenWithTimeline? screenWithTimeline { get; set; }
 
         public ManiaHitObjectComposer(Ruleset ruleset)
             : base(ruleset)
@@ -80,6 +85,14 @@ namespace osu.Game.Rulesets.Mania.Edit
                 if (i < objectDescriptions.Length - 1)
                     remainingHitObjects = remainingHitObjects.Where(h => h != current && h.StartTime >= current.StartTime).ToList();
             }
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            if (screenWithTimeline?.TimelineArea.Timeline != null)
+                drawableRuleset.TimelineTimeRange = EditorClock.TrackLength / screenWithTimeline.TimelineArea.Timeline.CurrentZoom / 2;
         }
     }
 }
