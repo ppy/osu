@@ -33,6 +33,7 @@ using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Components;
 using osu.Game.Screens.Edit.Components.Menus;
 using osu.Game.Skinning;
+using osu.Framework.Graphics.Cursor;
 
 namespace osu.Game.Overlays.SkinEditor
 {
@@ -117,6 +118,9 @@ namespace osu.Game.Overlays.SkinEditor
 
             InternalChild = new OsuContextMenuContainer
             {
+                RelativeSizeAxes = Axes.Both,
+                Child = new PopoverContainer
+                {
                 RelativeSizeAxes = Axes.Both,
                 Child = new GridContainer
                 {
@@ -220,6 +224,7 @@ namespace osu.Game.Overlays.SkinEditor
                             }
                         },
                     }
+                }
                 }
             };
 
