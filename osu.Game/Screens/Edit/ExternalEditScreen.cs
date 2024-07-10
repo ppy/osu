@@ -156,12 +156,12 @@ namespace osu.Game.Screens.Edit
         public override bool OnExiting(ScreenExitEvent e)
         {
             if (!fileMountOperation.IsCompleted)
-                return false;
+                return true;
 
             if (EditOperation != null)
             {
                 finish();
-                return false;
+                return true;
             }
 
             return base.OnExiting(e);
