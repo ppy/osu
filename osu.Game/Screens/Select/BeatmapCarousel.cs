@@ -267,7 +267,7 @@ namespace osu.Game.Screens.Select
             subscriptionBeatmaps = realm.RegisterForNotifications(r => r.All<BeatmapInfo>().Where(b => !b.Hidden), beatmapsChanged);
         }
 
-        private readonly HashSet<BeatmapSetInfo> setsRequiringUpdate = new HashSet<BeatmapSetInfo>();
+        private readonly HashSet<Guid> setsRequiringUpdate = new HashSet<Guid>();
         private readonly HashSet<Guid> setsRequiringRemoval = new HashSet<Guid>();
 
         private void beatmapSetsChanged(IRealmCollection<BeatmapSetInfo> sender, ChangeSet? changes)
@@ -280,6 +280,7 @@ namespace osu.Game.Screens.Select
             {
                 realmBeatmapSets.Clear();
                 realmBeatmapSets.AddRange(sender.Select(r => r.ID));
+
                 setsRequiringRemoval.Clear();
                 setsRequiringUpdate.Clear();
 
@@ -289,18 +290,26 @@ namespace osu.Game.Screens.Select
             {
                 foreach (int i in changes.DeletedIndices.OrderDescending())
                 {
-                    setsRequiringRemoval.Add(realmBeatmapSets[i]);
+                    Guid id = realmBeatmapSets[i];
+
+                    setsRequiringRemoval.Add(id);
+                    setsRequiringUpdate.Remove(id);
+
                     realmBeatmapSets.RemoveAt(i);
                 }
 
                 foreach (int i in changes.InsertedIndices)
                 {
-                    realmBeatmapSets.Insert(i, sender[i].ID);
-                    setsRequiringUpdate.Add(sender[i].Detach());
+                    Guid id = sender[i].ID;
+
+                    setsRequiringRemoval.Remove(id);
+                    setsRequiringUpdate.Add(id);
+
+                    realmBeatmapSets.Insert(i, id);
                 }
 
                 foreach (int i in changes.NewModifiedIndices)
-                    setsRequiringUpdate.Add(sender[i].Detach());
+                    setsRequiringUpdate.Add(sender[i].ID);
             }
 
             Scheduler.AddOnce(processBeatmapChanges);
@@ -316,7 +325,7 @@ namespace osu.Game.Screens.Select
             {
                 foreach (var set in setsRequiringRemoval) removeBeatmapSet(set);
 
-                foreach (var set in setsRequiringUpdate) updateBeatmapSet(set);
+                foreach (var set in setsRequiringUpdate) updateBeatmapSet(fetchFromID(set)!);
 
                 if (setsRequiringRemoval.Count > 0 && SelectedBeatmapInfo != null)
                 {
@@ -326,7 +335,7 @@ namespace osu.Game.Screens.Select
                     // To handle the beatmap update flow, attempt to track selection changes across delete-insert transactions.
                     // When an update occurs, the previous beatmap set is either soft or hard deleted.
                     // Check if the current selection was potentially deleted by re-querying its validity.
-                    bool selectedSetMarkedDeleted = realm.Run(r => r.Find<BeatmapSetInfo>(SelectedBeatmapSet.ID)?.DeletePending != false);
+                    bool selectedSetMarkedDeleted = fetchFromID(SelectedBeatmapSet.ID)?.DeletePending != false;
 
                     if (selectedSetMarkedDeleted && setsRequiringUpdate.Any())
                     {
@@ -334,7 +343,7 @@ namespace osu.Game.Screens.Select
                         // This relies on the full update operation being in a single transaction, so please don't change that.
                         foreach (var set in setsRequiringUpdate)
                         {
-                            foreach (var beatmapInfo in set.Beatmaps)
+                            foreach (var beatmapInfo in fetchFromID(set)!.Beatmaps)
                             {
                                 if (!((IBeatmapMetadataInfo)beatmapInfo.Metadata).Equals(SelectedBeatmapInfo.Metadata)) continue;
 
@@ -349,7 +358,7 @@ namespace osu.Game.Screens.Select
 
                         // If a direct selection couldn't be made, it's feasible that the difficulty name (or beatmap metadata) changed.
                         // Let's attempt to follow set-level selection anyway.
-                        SelectBeatmap(setsRequiringUpdate.First().Beatmaps.First());
+                        SelectBeatmap(fetchFromID(setsRequiringUpdate.First())!.Beatmaps.First());
                     }
                 }
             }
@@ -361,6 +370,8 @@ namespace osu.Game.Screens.Select
 
             setsRequiringRemoval.Clear();
             setsRequiringUpdate.Clear();
+
+            BeatmapSetInfo? fetchFromID(Guid id) => realm.Realm.Find<BeatmapSetInfo>(id);
         }
 
         private void beatmapsChanged(IRealmCollection<BeatmapInfo> sender, ChangeSet? changes)
@@ -417,16 +428,23 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        public void UpdateBeatmapSet(BeatmapSetInfo beatmapSet) => Schedule(() =>
+        public void UpdateBeatmapSet(BeatmapSetInfo beatmapSet)
         {
-            updateBeatmapSet(beatmapSet);
-            invalidateAfterChange();
-        });
+            beatmapSet = beatmapSet.Detach();
+
+            Schedule(() =>
+            {
+                updateBeatmapSet(beatmapSet);
+                invalidateAfterChange();
+            });
+        }
 
         private void updateBeatmapSet(BeatmapSetInfo beatmapSet)
         {
+            beatmapSet = beatmapSet.Detach();
+
             originalBeatmapSetsDetached.RemoveAll(set => set.ID == beatmapSet.ID);
-            originalBeatmapSetsDetached.Add(beatmapSet.Detach());
+            originalBeatmapSetsDetached.Add(beatmapSet);
 
             var newSets = new List<CarouselBeatmapSet>();
 
