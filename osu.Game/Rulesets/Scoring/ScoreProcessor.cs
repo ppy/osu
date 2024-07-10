@@ -199,10 +199,6 @@ namespace osu.Game.Rulesets.Scoring
 
         protected readonly Dictionary<HitResult, int> ScoreResultCounts = new Dictionary<HitResult, int>();
         protected readonly Dictionary<HitResult, int> MaximumResultCounts = new Dictionary<HitResult, int>();
-        /// <summary>
-        /// for calculate the minRank
-        /// </summary>
-        private readonly Dictionary<HitResult, int> minimumResultCounts = new Dictionary<HitResult, int>();
 
         private readonly List<HitEvent> hitEvents = new List<HitEvent>();
         private HitObject? lastHitObject;
@@ -380,11 +376,6 @@ namespace osu.Game.Rulesets.Scoring
 
         private void updateScoreAndRank()
         {
-            // update the minimumResultCounts so that the newMinRank can be calculated.
-            if (minimumResultCounts.TryGetValue(HitResult.Miss, out int currentMissCounts))
-                minimumResultCounts[HitResult.Miss] = MaxHits - JudgedHits + currentMissCounts;
-            else
-                minimumResultCounts[HitResult.Miss] = MaxHits - JudgedHits;
             updateScore();
             updateRank();
         }
@@ -402,6 +393,8 @@ namespace osu.Game.Rulesets.Scoring
             TotalScore.Value = (long)Math.Round(TotalScoreWithoutMods.Value * scoreMultiplier);
         }
 
+        private readonly Dictionary<HitResult, int> minimumAccuracyResultCounts = new Dictionary<HitResult, int>();
+
         private void updateRank()
         {
             // Once failed, we shouldn't update the rank anymore.
@@ -410,7 +403,13 @@ namespace osu.Game.Rulesets.Scoring
 
             ScoreRank newRank = RankFromScore(Accuracy.Value, ScoreResultCounts);
             ScoreRank newMaxRank = RankFromScore(MaximumAccuracy.Value, ScoreResultCounts);
-            ScoreRank newMinRank = RankFromScore(MinimumAccuracy.Value, minimumResultCounts);
+
+            // this arbitrarily only fills HitResult.Miss because it's the only hit result that can affect the state of RankFromScore in the main rulesets (see OsuScoreProcessor).
+            // eventually (whenever it's needed), other miss result types should be correctly filled and this dictionary should be updated regularly next to ScoreResultCounts,
+            // but this is sufficient for now.
+            minimumAccuracyResultCounts[HitResult.Miss] = MaxHits - JudgedHits + ScoreResultCounts.GetValueOrDefault(HitResult.Miss);
+
+            ScoreRank newMinRank = RankFromScore(MinimumAccuracy.Value, minimumAccuracyResultCounts);
 
             foreach (var mod in Mods.Value.OfType<IApplicableToScoreProcessor>())
             {
@@ -459,7 +458,6 @@ namespace osu.Game.Rulesets.Scoring
             }
 
             ScoreResultCounts.Clear();
-            minimumResultCounts[HitResult.Miss] = MaxHits;
 
             currentBaseScore = 0;
             currentMaximumBaseScore = 0;
