@@ -29,6 +29,11 @@ namespace osu.Game.Overlays.Mods
         /// </summary>
         protected ShearedOverlayHeader Header { get; private set; } = null!;
 
+        /// <summary>
+        /// The overlay's footer.
+        /// </summary>
+        protected Container Footer { get; private set; } = null!;
+
         [Resolved]
         private ScreenFooter? footer { get; set; }
 
@@ -42,6 +47,11 @@ namespace osu.Game.Overlays.Mods
         /// A container for content that is to be displayed between the header and footer.
         /// </summary>
         protected Container MainAreaContent { get; private set; } = null!;
+
+        /// <summary>
+        /// A container for content that is to be displayed inside the footer.
+        /// </summary>
+        protected Container FooterContent { get; private set; } = null!;
 
         protected override bool StartHidden => true;
 
@@ -125,7 +135,7 @@ namespace osu.Game.Overlays.Mods
 
             if (footer != null)
             {
-                footer.SetOverlayContent(this);
+                footer.SetActiveOverlayContainer(this);
 
                 if (footer.State.Value == Visibility.Hidden)
                 {
@@ -146,7 +156,7 @@ namespace osu.Game.Overlays.Mods
 
             if (footer != null)
             {
-                footer.ClearOverlayContent();
+                footer.ClearActiveOverlayContainer();
 
                 if (hideFooterOnPopOut)
                 {
