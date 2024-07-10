@@ -188,6 +188,12 @@ namespace osu.Game.Screens.Edit
             set => PlayableBeatmap.Breaks = value;
         }
 
+        public List<int> Bookmarks
+        {        
+            get => PlayableBeatmap.Bookmarks;
+            set => PlayableBeatmap.Bookmarks = value;
+        }
+
         public List<string> UnhandledEventLines => PlayableBeatmap.UnhandledEventLines;
 
         public double TotalBreakTime => PlayableBeatmap.TotalBreakTime;
