@@ -107,6 +107,9 @@ namespace osu.Game.Database
                 hasPath.Path.ControlPoints.AddRange(newControlPoints);
             }
 
+            // Include bookmarks in exported map
+            playableBeatmap.Bookmarks = beatmapContent.Bookmarks;
+
             // Encode to legacy format
             var stream = new MemoryStream();
             using (var sw = new StreamWriter(stream, Encoding.UTF8, 1024, true))
