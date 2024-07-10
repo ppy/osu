@@ -44,6 +44,11 @@ namespace osu.Game.Beatmaps
         SortedList<BreakPeriod> Breaks { get; set; }
 
         /// <summary>
+        /// The bookmarks in this beatmap
+        /// </summary>
+        List<int> Bookmarks { get; set; }
+
+        /// <summary>
         /// All lines from the [Events] section which aren't handled in the encoding process yet.
         /// These lines should be written out to the beatmap file on save or export.
         /// </summary>
