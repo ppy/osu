@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -21,7 +19,7 @@ namespace osu.Game.Rulesets.Mania.Edit
 {
     public partial class ManiaHitObjectComposer : ScrollingHitObjectComposer<ManiaHitObject>
     {
-        private DrawableManiaEditorRuleset drawableRuleset;
+        private DrawableManiaEditorRuleset drawableRuleset = null!;
 
         public ManiaHitObjectComposer(Ruleset ruleset)
             : base(ruleset)
@@ -72,7 +70,7 @@ namespace osu.Game.Rulesets.Mania.Edit
                 if (!double.TryParse(split[0], out double time) || !int.TryParse(split[1], out int column))
                     continue;
 
-                ManiaHitObject current = remainingHitObjects.FirstOrDefault(h => h.StartTime == time && h.Column == column);
+                ManiaHitObject? current = remainingHitObjects.FirstOrDefault(h => h.StartTime == time && h.Column == column);
 
                 if (current == null)
                     continue;
