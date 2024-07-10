@@ -336,7 +336,11 @@ namespace osu.Game.Rulesets.Osu
             };
         }
 
-        public override RulesetSetupSection CreateEditorSetupSection() => new OsuSetupSection();
+        public override IEnumerable<SetupSection> CreateEditorSetupSections() =>
+        [
+            new OsuDifficultySection(),
+            new ColoursSection(),
+        ];
 
         /// <seealso cref="OsuHitObject.ApplyDefaultsToSelf"/>
         /// <seealso cref="OsuHitWindows"/>

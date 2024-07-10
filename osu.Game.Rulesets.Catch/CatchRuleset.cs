@@ -28,6 +28,7 @@ using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Scoring.Legacy;
 using osu.Game.Rulesets.UI;
 using osu.Game.Scoring;
+using osu.Game.Screens.Edit.Setup;
 using osu.Game.Screens.Ranking.Statistics;
 using osu.Game.Skinning;
 
@@ -221,6 +222,12 @@ namespace osu.Game.Rulesets.Catch
         public override IConvertibleReplayFrame CreateConvertibleReplayFrame() => new CatchReplayFrame();
 
         public override HitObjectComposer CreateHitObjectComposer() => new CatchHitObjectComposer(this);
+
+        public override IEnumerable<SetupSection> CreateEditorSetupSections() =>
+        [
+            new DifficultySection(),
+            new ColoursSection(),
+        ];
 
         public override IBeatmapVerifier CreateBeatmapVerifier() => new CatchBeatmapVerifier();
 
