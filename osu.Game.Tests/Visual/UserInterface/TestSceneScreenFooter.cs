@@ -210,7 +210,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                 return false;
             }
 
-            public override Drawable CreateFooterContent() => new TestFooterContent();
+            public override VisibilityContainer CreateFooterContent() => new TestFooterContent();
 
             public partial class TestFooterContent : VisibilityContainer
             {

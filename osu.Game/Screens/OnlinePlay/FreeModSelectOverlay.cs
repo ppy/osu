@@ -6,6 +6,7 @@ using osu.Game.Overlays;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Mods;
 using osu.Game.Rulesets.Mods;
@@ -34,7 +35,7 @@ namespace osu.Game.Screens.OnlinePlay
 
         protected override ModColumn CreateModColumn(ModType modType) => new ModColumn(modType, true);
 
-        public override Drawable CreateFooterContent() => currentFooterContent = new FreeModSelectFooterContent(this)
+        public override VisibilityContainer CreateFooterContent() => currentFooterContent = new FreeModSelectFooterContent(this)
         {
             Beatmap = { BindTarget = Beatmap },
             ActiveMods = { BindTarget = ActiveMods },
