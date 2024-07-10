@@ -328,7 +328,7 @@ namespace osu.Game.Beatmaps.Formats
                     {
                         bool result = int.TryParse(v, out int val);
                         return new { result, val };
-                    }).Where(p => p.result).Select(p => p.val).ToList();
+                    }).Where(p => p.result).Select(p => p.val).ToArray();
                     break;
 
                 case @"DistanceSpacing":

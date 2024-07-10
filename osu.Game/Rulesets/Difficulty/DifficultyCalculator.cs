@@ -334,7 +334,7 @@ namespace osu.Game.Rulesets.Difficulty
                 set => baseBeatmap.Breaks = value;
             }
 
-            public List<int> Bookmarks
+            public int[] Bookmarks
             {
                 get => baseBeatmap.Bookmarks;
                 set => baseBeatmap.Bookmarks = value;

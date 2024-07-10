@@ -110,7 +110,7 @@ namespace osu.Game.Beatmaps.Formats
         {
             writer.WriteLine("[Editor]");
 
-            if (beatmap.Bookmarks.Any())
+            if (beatmap.Bookmarks.Length > 0)
                 writer.WriteLine(FormattableString.Invariant($"Bookmarks: {string.Join(',', beatmap.Bookmarks)}"));
             writer.WriteLine(FormattableString.Invariant($"DistanceSpacing: {beatmap.BeatmapInfo.DistanceSpacing}"));
             writer.WriteLine(FormattableString.Invariant($"BeatDivisor: {beatmap.BeatmapInfo.BeatDivisor}"));

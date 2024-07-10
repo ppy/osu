@@ -66,7 +66,7 @@ namespace osu.Game.Beatmaps
 
         public List<string> UnhandledEventLines { get; set; } = new List<string>();
 
-        public List<int> Bookmarks { get; set; } = new List<int>();
+        public int[] Bookmarks { get; set; } = Array.Empty<int>();
 
         [JsonIgnore]
         public double TotalBreakTime => Breaks.Sum(b => b.Duration);

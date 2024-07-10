@@ -188,8 +188,8 @@ namespace osu.Game.Screens.Edit
             set => PlayableBeatmap.Breaks = value;
         }
 
-        public List<int> Bookmarks
-        {        
+        public int[] Bookmarks
+        {
             get => PlayableBeatmap.Bookmarks;
             set => PlayableBeatmap.Bookmarks = value;
         }

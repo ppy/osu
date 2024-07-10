@@ -46,7 +46,7 @@ namespace osu.Game.Beatmaps
         /// <summary>
         /// The bookmarks in this beatmap
         /// </summary>
-        List<int> Bookmarks { get; set; }
+        int[] Bookmarks { get; set; }
 
         /// <summary>
         /// All lines from the [Events] section which aren't handled in the encoding process yet.
