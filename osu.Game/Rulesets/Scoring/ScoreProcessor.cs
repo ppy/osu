@@ -199,6 +199,10 @@ namespace osu.Game.Rulesets.Scoring
 
         protected readonly Dictionary<HitResult, int> ScoreResultCounts = new Dictionary<HitResult, int>();
         protected readonly Dictionary<HitResult, int> MaximumResultCounts = new Dictionary<HitResult, int>();
+        /// <summary>
+        /// for calculate the minRank
+        /// </summary>
+        private readonly Dictionary<HitResult, int> minimumResultCounts = new Dictionary<HitResult, int>();
 
         private readonly List<HitEvent> hitEvents = new List<HitEvent>();
         private HitObject? lastHitObject;
@@ -209,6 +213,7 @@ namespace osu.Game.Rulesets.Scoring
         {
             Ruleset = ruleset;
 
+            minimumResultCounts[HitResult.Miss] = MaxHits;
             Combo.ValueChanged += combo => HighestCombo.Value = Math.Max(HighestCombo.Value, combo.NewValue);
 
             Mods.ValueChanged += mods =>
@@ -376,6 +381,11 @@ namespace osu.Game.Rulesets.Scoring
 
         private void updateScoreAndRank()
         {
+            // update the minimumResultCounts so that the newMinRank can be calculated.
+            if (minimumResultCounts.TryGetValue(HitResult.Miss, out int currentMissCounts))
+                minimumResultCounts[HitResult.Miss] = MaxHits - JudgedHits + currentMissCounts;
+            else
+                minimumResultCounts[HitResult.Miss] = MaxHits - JudgedHits;
             updateScore();
             updateRank();
         }
@@ -401,19 +411,7 @@ namespace osu.Game.Rulesets.Scoring
 
             ScoreRank newRank = RankFromScore(Accuracy.Value, ScoreResultCounts);
             ScoreRank newMaxRank = RankFromScore(MaximumAccuracy.Value, ScoreResultCounts);
-
-            //To prevent the minimum rank got into >S, before completed the entire map,
-            //So that in here it fill the rest of the part with miss.
-            // (i.e. simulating the worse situation of all misses)
-            if (ScoreResultCounts.TryGetValue(HitResult.Miss, out int currentMissCounts))
-                ScoreResultCounts[HitResult.Miss] = MaxHits - JudgedHits + currentMissCounts;
-            else
-                ScoreResultCounts[HitResult.Miss] = MaxHits - JudgedHits;
-
-            ScoreRank newMinRank = RankFromScore(MinimumAccuracy.Value, ScoreResultCounts);
-
-            //Restore that to previous value, in order to calculate the normal value,
-            ScoreResultCounts[HitResult.Miss] = currentMissCounts;
+            ScoreRank newMinRank = RankFromScore(MinimumAccuracy.Value, minimumResultCounts);
 
             foreach (var mod in Mods.Value.OfType<IApplicableToScoreProcessor>())
             {
