@@ -6,6 +6,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
+using osu.Game.Rulesets.Mania.Configuration;
 using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.UI;
@@ -17,6 +18,8 @@ namespace osu.Game.Rulesets.Mania.Edit
     public partial class DrawableManiaEditorRuleset : DrawableManiaRuleset, ISupportConstantAlgorithmToggle
     {
         public BindableBool ShowSpeedChanges { get; } = new BindableBool();
+
+        public double? TimelineTimeRange { get; set; }
 
         public new IScrollingInfo ScrollingInfo => base.ScrollingInfo;
 
@@ -38,5 +41,11 @@ namespace osu.Game.Rulesets.Mania.Edit
             Origin = Anchor.Centre,
             Size = Vector2.One
         };
+
+        protected override void Update()
+        {
+            TargetTimeRange = TimelineTimeRange == null || ShowSpeedChanges.Value ? ComputeScrollTime(Config.Get<int>(ManiaRulesetSetting.ScrollSpeed)) : TimelineTimeRange.Value;
+            base.Update();
+        }
     }
 }
