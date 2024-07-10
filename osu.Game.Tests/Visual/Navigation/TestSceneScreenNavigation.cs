@@ -1098,6 +1098,33 @@ namespace osu.Game.Tests.Visual.Navigation
             AddAssert("still nothing selected", () => Game.Beatmap.IsDefault);
         }
 
+        [Test]
+        public void TestVolumeOverlayIgnoredDuringGameplay()
+        {
+            Screens.Select.SongSelect songSelect = null;
+            PushAndConfirm(() => songSelect = new TestPlaySongSelect());
+            AddUntilStep("wait for song select", () => songSelect.BeatmapSetsLoaded);
+
+            AddStep("import beatmap", () => BeatmapImportHelper.LoadOszIntoOsu(Game, virtualTrack: true).WaitSafely());
+            AddUntilStep("wait for selected", () => !Game.Beatmap.IsDefault);
+
+            AddStep("press enter", () => InputManager.Key(Key.Enter));
+            AddUntilStep("wait for player", () => Game.ScreenStack.CurrentScreen is Player);
+
+            AddStep("show volume overlay", () =>
+            {
+                InputManager.PressKey(Key.AltLeft);
+                InputManager.PressKey(Key.Left);
+                InputManager.ReleaseKey(Key.AltLeft);
+                InputManager.ReleaseKey(Key.Left);
+            });
+            AddStep("hover volume overlay", () => InputManager.MoveMouseTo(Game.ChildrenOfType<VolumeOverlay>().Single()));
+            AddStep("hold left", () => InputManager.PressKey(Key.Left));
+
+            AddUntilStep("volume overlay still hides eventually", () => Game.ChildrenOfType<VolumeOverlay>().Single().State.Value == Visibility.Hidden);
+            AddStep("release left", () => InputManager.ReleaseKey(Key.Left));
+        }
+
         private Func<Player> playToResults()
         {
             var player = playToCompletion();
