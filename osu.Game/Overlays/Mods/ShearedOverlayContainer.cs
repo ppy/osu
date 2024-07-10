@@ -152,7 +152,7 @@ namespace osu.Game.Overlays.Mods
 
             if (UseNewFooter && footer != null)
             {
-                footer.SetOverlayContent(this);
+                footer.SetActiveOverlayContainer(this);
 
                 if (footer.State.Value == Visibility.Hidden)
                 {
@@ -175,7 +175,7 @@ namespace osu.Game.Overlays.Mods
 
             if (UseNewFooter && footer != null)
             {
-                footer.ClearOverlayContent();
+                footer.ClearActiveOverlayContainer();
 
                 if (hideFooterOnPopOut)
                 {
