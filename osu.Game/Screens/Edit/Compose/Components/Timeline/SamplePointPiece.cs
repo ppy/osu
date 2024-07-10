@@ -148,10 +148,12 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                             bank = new LabelledTextBox
                             {
                                 Label = "Bank Name",
+                                SelectAllOnFocus = true,
                             },
                             additionBank = new LabelledTextBox
                             {
                                 Label = "Addition Bank",
+                                SelectAllOnFocus = true,
                             },
                             volume = new IndeterminateSliderWithTextBoxInput<int>("Volume", new BindableInt(100)
                             {
