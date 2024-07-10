@@ -267,6 +267,9 @@ namespace osu.Game.Screens.Edit
                 return;
             }
 
+            // Copy bookmarks to PlayableBeatmap
+            playableBeatmap.Bookmarks = loadableBeatmap.Beatmap.Bookmarks;
+
             // Todo: should probably be done at a DrawableRuleset level to share logic with Player.
             clock = new EditorClock(playableBeatmap, beatDivisor);
             clock.ChangeSource(loadableBeatmap.Track);
