@@ -38,6 +38,8 @@ namespace osu.Game.Overlays
 
         private SelectionCycleFillFlowContainer<VolumeMeter> volumeMeters;
 
+        public readonly IBindable<bool> LocalUserPlaying = new BindableBool();
+
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, OsuColour colours)
         {
@@ -87,6 +89,12 @@ namespace osu.Game.Overlays
                 else
                     audio.RemoveAdjustment(AdjustableProperty.Volume, muteAdjustment);
             });
+
+            LocalUserPlaying.BindValueChanged(v =>
+            {
+                if (v.NewValue)
+                    schedulePopOut();
+            }, true);
         }
 
         protected override void LoadComplete()
@@ -181,6 +189,11 @@ namespace osu.Game.Overlays
 
         protected override bool OnKeyDown(KeyDownEvent e)
         {
+            // disable navigation via arrows when user is playing, as to not conflict with ruleset input keys (e.g. osu!catch).
+            // this is sort-of hacky, but there's no other way to easily resolve this (moving the key handling to VolumeControlReceptor is not enough to fix the issue).
+            if (LocalUserPlaying.Value)
+                return false;
+
             switch (e.Key)
             {
                 case Key.Left:
@@ -220,7 +233,7 @@ namespace osu.Game.Overlays
             popOutDelegate?.Cancel();
             this.Delay(1000).Schedule(() =>
             {
-                if (!IsHovered)
+                if (!IsHovered || LocalUserPlaying.Value)
                     Hide();
             }, out popOutDelegate);
         }

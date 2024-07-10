@@ -1049,7 +1049,10 @@ namespace osu.Game
                 },
             }, topMostOverlayContent.Add);
 
-            loadComponentSingleFile(volume = new VolumeOverlay(), leftFloatingOverlayContent.Add, true);
+            loadComponentSingleFile(volume = new VolumeOverlay
+            {
+                LocalUserPlaying = { BindTarget = LocalUserPlaying },
+            }, leftFloatingOverlayContent.Add, true);
 
             var onScreenDisplay = new OnScreenDisplay();
 
