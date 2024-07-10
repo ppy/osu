@@ -38,7 +38,7 @@ namespace osu.Game.Screens.Edit
 
         private readonly Editor editor;
 
-        private ExternalEditOperation<BeatmapSetInfo>? operation;
+        public ExternalEditOperation<BeatmapSetInfo>? EditOperation;
 
         private double timeLoaded;
 
@@ -92,7 +92,7 @@ namespace osu.Game.Screens.Edit
 
             fileMountOperation.ContinueWith(t =>
             {
-                operation = t.GetResultSafely();
+                EditOperation = t.GetResultSafely();
 
                 Scheduler.AddDelayed(() =>
                 {
@@ -146,11 +146,11 @@ namespace osu.Game.Screens.Edit
 
         private void open()
         {
-            if (operation == null)
+            if (EditOperation == null)
                 return;
 
             // Ensure the trailing separator is present in order to show the folder contents.
-            gameHost.OpenFileExternally(operation.MountedPath.TrimDirectorySeparator() + Path.DirectorySeparatorChar);
+            gameHost.OpenFileExternally(EditOperation.MountedPath.TrimDirectorySeparator() + Path.DirectorySeparatorChar);
         }
 
         public override bool OnExiting(ScreenExitEvent e)
@@ -158,7 +158,7 @@ namespace osu.Game.Screens.Edit
             if (!fileMountOperation.IsCompleted)
                 return false;
 
-            if (operation != null)
+            if (EditOperation != null)
             {
                 finish();
                 return false;
@@ -178,7 +178,7 @@ namespace osu.Game.Screens.Edit
                 Schedule(() =>
                 {
                     // Setting to null will allow exit to succeed.
-                    operation = null;
+                    EditOperation = null;
 
                     Live<BeatmapSetInfo>? beatmap = t.GetResultSafely();
 
