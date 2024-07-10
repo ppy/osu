@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -123,6 +124,7 @@ namespace osu.Game.Overlays.Mods
             return base.OnClick(e);
         }
 
+        private IDisposable? activeOverlayRegistration;
         private bool hideFooterOnPopOut;
 
         protected override void PopIn()
@@ -135,7 +137,7 @@ namespace osu.Game.Overlays.Mods
 
             if (footer != null)
             {
-                footer.SetActiveOverlayContainer(this);
+                activeOverlayRegistration = footer.RegisterActiveOverlayContainer(this);
 
                 if (footer.State.Value == Visibility.Hidden)
                 {
@@ -156,7 +158,8 @@ namespace osu.Game.Overlays.Mods
 
             if (footer != null)
             {
-                footer.ClearActiveOverlayContainer();
+                activeOverlayRegistration?.Dispose();
+                activeOverlayRegistration = null;
 
                 if (hideFooterOnPopOut)
                 {
