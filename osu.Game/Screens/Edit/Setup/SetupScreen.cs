@@ -29,18 +29,13 @@ namespace osu.Game.Screens.Edit.Setup
         {
             var ruleset = beatmap.BeatmapInfo.Ruleset.CreateInstance();
 
-            var sectionsEnumerable = new List<SetupSection>
-            {
-                new ResourcesSection(),
-                new MetadataSection(),
-                ruleset.CreateEditorDifficultySection() ?? new DifficultySection(),
-                new ColoursSection(),
-                new DesignSection(),
-            };
+            // ReSharper disable once UseObjectOrCollectionInitializer
+            var sectionsEnumerable = new List<SetupSection>();
 
-            var rulesetSpecificSection = ruleset.CreateEditorSetupSection();
-            if (rulesetSpecificSection != null)
-                sectionsEnumerable.Add(rulesetSpecificSection);
+            sectionsEnumerable.Add(new ResourcesSection());
+            sectionsEnumerable.Add(new MetadataSection());
+            sectionsEnumerable.AddRange(ruleset.CreateEditorSetupSections());
+            sectionsEnumerable.Add(new DesignSection());
 
             Add(new Box
             {
