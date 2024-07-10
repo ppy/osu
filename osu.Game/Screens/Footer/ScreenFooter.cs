@@ -121,7 +121,7 @@ namespace osu.Game.Screens.Footer
             temporarilyHiddenButtons.Clear();
             overlays.Clear();
 
-            ClearOverlayContent();
+            ClearActiveOverlayContainer();
 
             var oldButtons = buttonsFlow.ToArray();
 
@@ -168,7 +168,7 @@ namespace osu.Game.Screens.Footer
         private Container? contentContainer;
         private readonly List<ScreenFooterButton> temporarilyHiddenButtons = new List<ScreenFooterButton>();
 
-        public void SetOverlayContent(ShearedOverlayContainer overlay)
+        public void SetActiveOverlayContainer(ShearedOverlayContainer overlay)
         {
             if (contentContainer != null)
             {
@@ -213,7 +213,7 @@ namespace osu.Game.Screens.Footer
                 content.Show();
         }
 
-        public void ClearOverlayContent()
+        public void ClearActiveOverlayContainer()
         {
             if (contentContainer == null)
                 return;
