@@ -36,8 +36,12 @@ namespace osu.Game.Tests.Visual.Navigation
         [Test]
         public void TestExternalEditingNoChange()
         {
+            string difficultyName = null!;
+
             prepareBeatmap();
             openEditor();
+
+            AddStep("store difficulty name", () => difficultyName = getEditor().Beatmap.Value.BeatmapInfo.DifficultyName);
 
             AddStep("open file menu", () => getEditor().ChildrenOfType<Menu.DrawableMenuItem>().Single(m => m.Item.Text.Value.ToString() == "File").TriggerClick());
             AddStep("click external edit", () => getEditor().ChildrenOfType<Menu.DrawableMenuItem>().Single(m => m.Item.Text.Value.ToString() == "Edit externally").TriggerClick());
@@ -50,15 +54,20 @@ namespace osu.Game.Tests.Visual.Navigation
 
             AddUntilStep("wait for editor", () => Game.ScreenStack.CurrentScreen is Editor editor && editor.ReadyForUse);
 
-            AddAssert("beatmap didn't change", () => getEditor().Beatmap.Value.BeatmapSetInfo.Equals(beatmapSet));
+            AddAssert("beatmapset didn't change", () => getEditor().Beatmap.Value.BeatmapSetInfo, () => Is.EqualTo(beatmapSet));
+            AddAssert("difficulty didn't change", () => getEditor().Beatmap.Value.BeatmapInfo.DifficultyName, () => Is.EqualTo(difficultyName));
             AddAssert("old beatmapset not deleted", () => Game.BeatmapManager.QueryBeatmapSet(s => s.ID == beatmapSet.ID), () => Is.Not.Null);
         }
 
         [Test]
         public void TestExternalEditingWithChange()
         {
+            string difficultyName = null!;
+
             prepareBeatmap();
             openEditor();
+
+            AddStep("store difficulty name", () => difficultyName = getEditor().Beatmap.Value.BeatmapInfo.DifficultyName);
 
             AddStep("open file menu", () => getEditor().ChildrenOfType<Menu.DrawableMenuItem>().Single(m => m.Item.Text.Value.ToString() == "File").TriggerClick());
             AddStep("click external edit", () => getEditor().ChildrenOfType<Menu.DrawableMenuItem>().Single(m => m.Item.Text.Value.ToString() == "Edit externally").TriggerClick());
@@ -77,7 +86,8 @@ namespace osu.Game.Tests.Visual.Navigation
 
             AddUntilStep("wait for editor", () => Game.ScreenStack.CurrentScreen is Editor editor && editor.ReadyForUse);
 
-            AddAssert("beatmap changed", () => !getEditor().Beatmap.Value.BeatmapSetInfo.Equals(beatmapSet));
+            AddAssert("beatmapset changed", () => getEditor().Beatmap.Value.BeatmapSetInfo, () => Is.Not.EqualTo(beatmapSet));
+            AddAssert("difficulty didn't change", () => getEditor().Beatmap.Value.BeatmapInfo.DifficultyName, () => Is.EqualTo(difficultyName));
             AddAssert("old beatmapset deleted", () => Game.BeatmapManager.QueryBeatmapSet(s => s.ID == beatmapSet.ID), () => Is.Null);
         }
 
