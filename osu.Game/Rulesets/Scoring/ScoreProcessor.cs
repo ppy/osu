@@ -213,7 +213,6 @@ namespace osu.Game.Rulesets.Scoring
         {
             Ruleset = ruleset;
 
-            minimumResultCounts[HitResult.Miss] = MaxHits;
             Combo.ValueChanged += combo => HighestCombo.Value = Math.Max(HighestCombo.Value, combo.NewValue);
 
             Mods.ValueChanged += mods =>
@@ -460,6 +459,7 @@ namespace osu.Game.Rulesets.Scoring
             }
 
             ScoreResultCounts.Clear();
+            minimumResultCounts[HitResult.Miss] = MaxHits;
 
             currentBaseScore = 0;
             currentMaximumBaseScore = 0;
