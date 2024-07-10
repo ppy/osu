@@ -104,7 +104,7 @@ namespace osu.Game.Overlays.Mods
         /// <summary>
         /// Creates content to be displayed on the game-wide footer.
         /// </summary>
-        public virtual Drawable CreateFooterContent() => Empty();
+        public virtual VisibilityContainer? CreateFooterContent() => null;
 
         /// <summary>
         /// Invoked when the back button in the footer is pressed.

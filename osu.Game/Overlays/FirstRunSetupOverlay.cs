@@ -150,7 +150,7 @@ namespace osu.Game.Overlays
 
         private FirstRunSetupFooterContent? currentFooterContent;
 
-        public override Drawable CreateFooterContent()
+        public override VisibilityContainer CreateFooterContent()
         {
             currentFooterContent = new FirstRunSetupFooterContent
             {

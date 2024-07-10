@@ -218,7 +218,7 @@ namespace osu.Game.Screens.Footer
 
             updateColourScheme(overlay.ColourProvider.ColourScheme);
 
-            var content = overlay.CreateFooterContent();
+            var content = overlay.CreateFooterContent() ?? Empty();
 
             Add(contentContainer = new Container
             {

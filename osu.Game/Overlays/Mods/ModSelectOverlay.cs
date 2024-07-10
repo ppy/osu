@@ -256,7 +256,7 @@ namespace osu.Game.Overlays.Mods
 
         private ModSelectFooterContent? currentFooterContent;
 
-        public override Drawable CreateFooterContent() => currentFooterContent = new ModSelectFooterContent(this)
+        public override VisibilityContainer CreateFooterContent() => currentFooterContent = new ModSelectFooterContent(this)
         {
             Beatmap = { BindTarget = Beatmap },
             ActiveMods = { BindTarget = ActiveMods },
