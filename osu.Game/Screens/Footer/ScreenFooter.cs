@@ -142,7 +142,7 @@ namespace osu.Game.Screens.Footer
             temporarilyHiddenButtons.Clear();
             overlays.Clear();
 
-            ClearActiveOverlayContainer();
+            clearActiveOverlayContainer();
 
             var oldButtons = buttonsFlow.ToArray();
 
@@ -187,14 +187,15 @@ namespace osu.Game.Screens.Footer
 
         private ShearedOverlayContainer? activeOverlay;
         private Container? contentContainer;
+
         private readonly List<ScreenFooterButton> temporarilyHiddenButtons = new List<ScreenFooterButton>();
 
-        public void SetActiveOverlayContainer(ShearedOverlayContainer overlay)
+        public IDisposable RegisterActiveOverlayContainer(ShearedOverlayContainer overlay)
         {
-            if (contentContainer != null)
+            if (activeOverlay != null)
             {
                 throw new InvalidOperationException(@"Cannot set overlay content while one is already present. " +
-                                                    $@"The previous overlay whose content is {contentContainer.Child.GetType().Name} should be hidden first.");
+                                                    $@"The previous overlay ({activeOverlay.GetType().Name}) should be hidden first.");
             }
 
             activeOverlay = overlay;
@@ -232,29 +233,30 @@ namespace osu.Game.Screens.Footer
                 this.Delay(60).Schedule(() => content.Show());
             else
                 content.Show();
+
+            return new InvokeOnDisposal(clearActiveOverlayContainer);
         }
 
-        public void ClearActiveOverlayContainer()
+        private void clearActiveOverlayContainer()
         {
-            if (contentContainer == null)
+            if (activeOverlay == null)
                 return;
 
+            Debug.Assert(contentContainer != null);
             contentContainer.Child.Hide();
 
             double timeUntilRun = contentContainer.Child.LatestTransformEndTime - Time.Current;
-
-            Container expireTarget = contentContainer;
-            contentContainer = null;
-            activeOverlay = null;
 
             for (int i = 0; i < temporarilyHiddenButtons.Count; i++)
                 makeButtonAppearFromBottom(temporarilyHiddenButtons[i], 0);
 
             temporarilyHiddenButtons.Clear();
 
-            expireTarget.Delay(timeUntilRun).Expire();
-
             updateColourScheme(OverlayColourScheme.Aquamarine);
+
+            contentContainer.Delay(timeUntilRun).Expire();
+            contentContainer = null;
+            activeOverlay = null;
         }
 
         private void updateColourScheme(OverlayColourScheme colourScheme)
