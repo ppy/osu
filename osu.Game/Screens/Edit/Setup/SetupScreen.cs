@@ -29,11 +29,12 @@ namespace osu.Game.Screens.Edit.Setup
         {
             var ruleset = beatmap.BeatmapInfo.Ruleset.CreateInstance();
 
-            // ReSharper disable once UseObjectOrCollectionInitializer
-            var sectionsEnumerable = new List<SetupSection>();
+            List<SetupSection> sectionsEnumerable =
+            [
+                new ResourcesSection(),
+                new MetadataSection()
+            ];
 
-            sectionsEnumerable.Add(new ResourcesSection());
-            sectionsEnumerable.Add(new MetadataSection());
             sectionsEnumerable.AddRange(ruleset.CreateEditorSetupSections());
             sectionsEnumerable.Add(new DesignSection());
 
