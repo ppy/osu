@@ -3,6 +3,7 @@
 
 #nullable disable
 
+using System;
 using System.Collections.Generic;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -75,15 +76,13 @@ namespace osu.Game.Screens.Play
                         AutoSizeAxes = Axes.Y,
                         RelativeSizeAxes = Axes.X,
                         Width = 0,
-                        Child = remainingTimeBox = new Container
+                        Child = remainingTimeBox = new Circle
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             RelativeSizeAxes = Axes.X,
                             Height = 8,
-                            CornerRadius = 4,
                             Masking = true,
-                            Child = new Box { RelativeSizeAxes = Axes.Both }
                         }
                     },
                     remainingTimeCounter = new RemainingTimeCounter
@@ -117,6 +116,13 @@ namespace osu.Game.Screens.Play
                 info.AccuracyDisplay.Current.BindTo(scoreProcessor.Accuracy);
                 ((IBindable<ScoreRank>)info.GradeDisplay.Current).BindTo(scoreProcessor.Rank);
             }
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            remainingTimeBox.Height = Math.Min(8, remainingTimeBox.DrawWidth);
         }
 
         private void initializeBreaks()
