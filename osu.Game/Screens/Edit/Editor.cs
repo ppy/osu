@@ -1135,7 +1135,8 @@ namespace osu.Game.Screens.Edit
 
         private void editExternally()
         {
-            Save();
+            if (!Save())
+                return;
 
             var editOperation = beatmapManager.BeginExternalEditing(editorBeatmap.BeatmapInfo.BeatmapSet!);
             this.Push(new ExternalEditScreen(editOperation, this));
