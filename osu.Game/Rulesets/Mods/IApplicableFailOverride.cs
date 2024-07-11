@@ -18,5 +18,10 @@ namespace osu.Game.Rulesets.Mods
         /// Whether we want to restart on fail. Only used if <see cref="PerformFail"/> returns true.
         /// </summary>
         bool RestartOnFail { get; }
+
+        /// <summary>
+        /// Whether mod triggered the fail.
+        /// </summary>
+        bool TriggeredFail { get; }
     }
 }
