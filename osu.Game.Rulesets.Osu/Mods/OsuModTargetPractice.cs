@@ -16,6 +16,7 @@ using osu.Game.Beatmaps.Timing;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Overlays.Settings;
+using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Types;
@@ -32,7 +33,7 @@ using osuTK.Graphics;
 namespace osu.Game.Rulesets.Osu.Mods
 {
     public class OsuModTargetPractice : ModWithVisibilityAdjustment, IApplicableToDrawableRuleset<OsuHitObject>,
-                                        IApplicableToHealthProcessor, IApplicableToDifficulty, IApplicableFailOverride, IHasSeed, IHidesApproachCircles
+                                        IApplicableToHealthProcessor, IApplicableToDifficulty, IApplicableFailOverride, IHasSeed, IHidesApproachCircles, IHasFailCondition
     {
         public override string Name => "Target Practice";
         public override string Acronym => "TP";
@@ -103,12 +104,14 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public bool RestartOnFail => false;
 
-        public void ApplyToHealthProcessor(HealthProcessor healthProcessor)
-        {
-            // Sudden death
-            healthProcessor.FailConditions += (_, result)
+        // Sudden death
+        public bool FailCondition(JudgementResult result)
                 => result.Type.AffectsCombo()
                    && !result.IsHit;
+
+        public void ApplyToHealthProcessor(HealthProcessor healthProcessor)
+        {
+            healthProcessor.FailConditions.Add(this);
         }
 
         #endregion
