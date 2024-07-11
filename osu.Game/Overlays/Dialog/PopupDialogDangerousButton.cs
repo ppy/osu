@@ -67,7 +67,7 @@ namespace osu.Game.Overlays.Dialog
             protected override void LoadComplete()
             {
                 base.LoadComplete();
-                Progress.BindValueChanged(progressChanged, true);
+                Progress.BindValueChanged(progressChanged);
             }
 
             protected override void Confirm()
@@ -114,13 +114,13 @@ namespace osu.Game.Overlays.Dialog
                 if (progress.NewValue < progress.OldValue)
                     return;
 
-                if (Clock.CurrentTime - lastTickPlaybackTime < 30)
+                if (Clock.CurrentTime - lastTickPlaybackTime < 40)
                     return;
 
                 var channel = tickSample.GetChannel();
 
-                channel.Frequency.Value = 1 + progress.NewValue * 0.5f;
-                channel.Volume.Value = 0.5f + progress.NewValue / 2f;
+                channel.Frequency.Value = 1 + progress.NewValue;
+                channel.Volume.Value = 0.1f + progress.NewValue / 2f;
 
                 channel.Play();
 
