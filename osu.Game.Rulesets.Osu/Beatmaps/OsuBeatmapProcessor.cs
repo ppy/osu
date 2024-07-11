@@ -42,7 +42,12 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
         {
             base.PostProcess();
 
-            var hitObjects = Beatmap.HitObjects as List<OsuHitObject> ?? Beatmap.HitObjects.OfType<OsuHitObject>().ToList();
+            ApplyStacking(Beatmap);
+        }
+
+        internal static void ApplyStacking(IBeatmap beatmap)
+        {
+            var hitObjects = beatmap.HitObjects as List<OsuHitObject> ?? beatmap.HitObjects.OfType<OsuHitObject>().ToList();
 
             if (hitObjects.Count > 0)
             {
@@ -50,14 +55,14 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
                 foreach (var h in hitObjects)
                     h.StackHeight = 0;
 
-                if (Beatmap.BeatmapInfo.BeatmapVersion >= 6)
-                    applyStacking(Beatmap.BeatmapInfo, hitObjects, 0, hitObjects.Count - 1);
+                if (beatmap.BeatmapInfo.BeatmapVersion >= 6)
+                    applyStacking(beatmap.BeatmapInfo, hitObjects, 0, hitObjects.Count - 1);
                 else
-                    applyStackingOld(Beatmap.BeatmapInfo, hitObjects);
+                    applyStackingOld(beatmap.BeatmapInfo, hitObjects);
             }
         }
 
-        private void applyStacking(BeatmapInfo beatmapInfo, List<OsuHitObject> hitObjects, int startIndex, int endIndex)
+        private static void applyStacking(BeatmapInfo beatmapInfo, List<OsuHitObject> hitObjects, int startIndex, int endIndex)
         {
             ArgumentOutOfRangeException.ThrowIfGreaterThan(startIndex, endIndex);
             ArgumentOutOfRangeException.ThrowIfNegative(startIndex);
@@ -209,7 +214,7 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
             }
         }
 
-        private void applyStackingOld(BeatmapInfo beatmapInfo, List<OsuHitObject> hitObjects)
+        private static void applyStackingOld(BeatmapInfo beatmapInfo, List<OsuHitObject> hitObjects)
         {
             for (int i = 0; i < hitObjects.Count; i++)
             {

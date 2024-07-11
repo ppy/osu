@@ -13,6 +13,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
+using osu.Game.Rulesets.Osu.Beatmaps;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Screens.Edit.Compose.Components;
@@ -72,10 +73,10 @@ namespace osu.Game.Rulesets.Osu.Edit
             // but this will be corrected.
             moveSelectionInBounds();
 
-            // update all of the objects in order to update stacking.
-            // in particular, this causes stacked objects to instantly unstack on drag.
-            foreach (var h in hitObjects)
-                EditorBeatmap.Update(h);
+            // manually update stacking.
+            // this intentionally bypasses the editor `UpdateState()` / beatmap processor flow for performance reasons,
+            // as the entire flow is too expensive to run on every movement.
+            Scheduler.AddOnce(OsuBeatmapProcessor.ApplyStacking, EditorBeatmap);
 
             return true;
         }
