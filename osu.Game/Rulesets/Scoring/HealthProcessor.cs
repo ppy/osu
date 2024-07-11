@@ -35,7 +35,7 @@ namespace osu.Game.Rulesets.Scoring
         public bool HasFailed { get; private set; }
 
         /// <summary>
-        /// Object that triggered fail
+        /// List of triggers that caused fail
         /// </summary>
         public List<IHasFailCondition> FailTriggers = new List<IHasFailCondition>();
 

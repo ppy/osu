@@ -33,18 +33,6 @@ namespace osu.Game.Rulesets.Mods
         /// </summary>
         protected void TriggerFailure() => triggerFailureDelegate?.Invoke(this);
 
-        /// <summary>
-        /// Determines whether <paramref name="result"/> should trigger a failure. Called every time a
-        /// judgement is applied to <paramref name="healthProcessor"/>.
-        /// </summary>
-        /// <param name="healthProcessor">The loaded <see cref="HealthProcessor"/>.</param>
-        /// <param name="result">The latest <see cref="JudgementResult"/>.</param>
-        /// <returns>Whether the fail condition has been met.</returns>
-        /// <remarks>
-        /// This method should only be used to trigger failures based on <paramref name="result"/>.
-        /// Using outside values to evaluate failure may introduce event ordering discrepancies, use
-        /// an <see cref="IApplicableMod"/> with <see cref="TriggerFailure"/> instead.
-        /// </remarks>
         public abstract bool FailCondition(JudgementResult result);
     }
 }
