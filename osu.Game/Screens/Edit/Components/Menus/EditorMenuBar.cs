@@ -1,11 +1,11 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Textures;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
@@ -31,7 +31,7 @@ namespace osu.Game.Screens.Edit.Components.Menus
         }
 
         [BackgroundDependencyLoader]
-        private void load(OverlayColourProvider colourProvider, TextureStore textures)
+        private void load(OverlayColourProvider colourProvider, Editor editor)
         {
             BackgroundColour = colourProvider.Background3;
 
@@ -69,6 +69,8 @@ namespace osu.Game.Screens.Edit.Components.Menus
                 t.Font = OsuFont.TorusAlternate;
                 t.Colour = colourProvider.Highlight1;
             });
+
+            editor.RegisterMainUIElement(this, Enumerable.Empty<Drawable>());
         }
 
         protected override Framework.Graphics.UserInterface.Menu CreateSubMenu() => new SubMenu
