@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Bindables;
@@ -19,7 +17,6 @@ using osu.Game.Input.Bindings;
 using osu.Game.Overlays.Volume;
 using osuTK;
 using osuTK.Graphics;
-using osuTK.Input;
 
 namespace osu.Game.Overlays
 {
@@ -27,16 +24,16 @@ namespace osu.Game.Overlays
     {
         private const float offset = 10;
 
-        private VolumeMeter volumeMeterMaster;
-        private VolumeMeter volumeMeterEffect;
-        private VolumeMeter volumeMeterMusic;
-        private MuteButton muteButton;
+        private VolumeMeter volumeMeterMaster = null!;
+        private VolumeMeter volumeMeterEffect = null!;
+        private VolumeMeter volumeMeterMusic = null!;
+        private MuteButton muteButton = null!;
+
+        private SelectionCycleFillFlowContainer<VolumeMeter> volumeMeters = null!;
 
         private readonly BindableDouble muteAdjustment = new BindableDouble();
 
         public Bindable<bool> IsMuted { get; } = new Bindable<bool>();
-
-        private SelectionCycleFillFlowContainer<VolumeMeter> volumeMeters;
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, OsuColour colours)
@@ -140,8 +137,6 @@ namespace osu.Game.Overlays
             return false;
         }
 
-        private ScheduledDelegate popOutDelegate;
-
         public void FocusMasterVolume()
         {
             volumeMeters.Select(volumeMeterMaster);
@@ -190,6 +185,8 @@ namespace osu.Game.Overlays
             schedulePopOut();
             base.OnHoverLost(e);
         }
+
+        private ScheduledDelegate? popOutDelegate;
 
         private void schedulePopOut()
         {
