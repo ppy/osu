@@ -219,7 +219,7 @@ namespace osu.Game.Screens.Edit
         /// In "composer focus" mode the opacity of the aforementioned components is reduced so that the user can focus on the composer better.
         /// </summary>
         /// <remarks>
-        /// The state of this bindable is controlled by <see cref="HitObjectComposer"/>.
+        /// The state of this bindable is controlled by <see cref="HitObjectComposer"/> when in <see cref="EditorScreenMode.Compose"/> mode.
         /// </remarks>
         public Bindable<bool> ComposerFocusMode { get; } = new Bindable<bool>();
 
@@ -1018,6 +1018,9 @@ namespace osu.Game.Screens.Edit
             }
             finally
             {
+                if (Mode.Value != EditorScreenMode.Compose)
+                    ComposerFocusMode.Value = false;
+
                 updateSampleDisabledState();
                 rebindClipboardBindables();
             }
