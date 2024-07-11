@@ -1135,11 +1135,27 @@ namespace osu.Game.Screens.Edit
 
         private void editExternally()
         {
-            if (!Save())
-                return;
+            if (HasUnsavedChanges)
+            {
+                dialogOverlay.Push(new SaveRequiredPopupDialog(() => attemptMutationOperation(() =>
+                {
+                    if (!Save())
+                        return false;
 
-            var editOperation = beatmapManager.BeginExternalEditing(editorBeatmap.BeatmapInfo.BeatmapSet!);
-            this.Push(new ExternalEditScreen(editOperation, this));
+                    startEdit();
+                    return true;
+                })));
+            }
+            else
+            {
+                startEdit();
+            }
+
+            void startEdit()
+            {
+                var editOperation = beatmapManager.BeginExternalEditing(editorBeatmap.BeatmapInfo.BeatmapSet!);
+                this.Push(new ExternalEditScreen(editOperation, this));
+            }
         }
 
         private void exportBeatmap(bool legacy)
