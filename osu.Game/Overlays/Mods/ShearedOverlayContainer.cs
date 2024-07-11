@@ -102,6 +102,8 @@ namespace osu.Game.Overlays.Mods
             };
         }
 
+        public VisibilityContainer? DisplayedFooterContent { get; private set; }
+
         /// <summary>
         /// Creates content to be displayed on the game-wide footer.
         /// </summary>
@@ -137,7 +139,8 @@ namespace osu.Game.Overlays.Mods
 
             if (footer != null)
             {
-                activeOverlayRegistration = footer.RegisterActiveOverlayContainer(this);
+                activeOverlayRegistration = footer.RegisterActiveOverlayContainer(this, out var footerContent);
+                DisplayedFooterContent = footerContent;
 
                 if (footer.State.Value == Visibility.Hidden)
                 {
@@ -160,6 +163,7 @@ namespace osu.Game.Overlays.Mods
             {
                 activeOverlayRegistration?.Dispose();
                 activeOverlayRegistration = null;
+                DisplayedFooterContent = null;
 
                 if (hideFooterOnPopOut)
                 {

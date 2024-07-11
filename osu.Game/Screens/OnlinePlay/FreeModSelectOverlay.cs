@@ -23,9 +23,7 @@ namespace osu.Game.Screens.OnlinePlay
             set => base.IsValidMod = m => m.UserPlayable && value.Invoke(m);
         }
 
-        private FreeModSelectFooterContent? currentFooterContent;
-
-        protected override SelectAllModsButton? SelectAllModsButton => currentFooterContent?.SelectAllModsButton;
+        protected override SelectAllModsButton? SelectAllModsButton => DisplayedFooterContent?.SelectAllModsButton;
 
         public FreeModSelectOverlay()
             : base(OverlayColourScheme.Plum)
@@ -35,13 +33,15 @@ namespace osu.Game.Screens.OnlinePlay
 
         protected override ModColumn CreateModColumn(ModType modType) => new ModColumn(modType, true);
 
-        public override VisibilityContainer CreateFooterContent() => currentFooterContent = new FreeModSelectFooterContent(this)
+        public new FreeModSelectFooterContent? DisplayedFooterContent => base.DisplayedFooterContent as FreeModSelectFooterContent;
+
+        public override VisibilityContainer CreateFooterContent() => new FreeModSelectFooterContent(this)
         {
             Beatmap = { BindTarget = Beatmap },
             ActiveMods = { BindTarget = ActiveMods },
         };
 
-        private partial class FreeModSelectFooterContent : ModSelectFooterContent
+        public partial class FreeModSelectFooterContent : ModSelectFooterContent
         {
             private readonly FreeModSelectOverlay overlay;
 

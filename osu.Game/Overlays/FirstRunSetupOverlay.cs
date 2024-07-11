@@ -45,7 +45,7 @@ namespace osu.Game.Overlays
 
         private ScreenStack? stack;
 
-        public ShearedButton? NextButton => currentFooterContent?.NextButton;
+        public ShearedButton? NextButton => DisplayedFooterContent?.NextButton;
 
         private readonly Bindable<bool> showFirstRunSetup = new Bindable<bool>();
 
@@ -148,17 +148,17 @@ namespace osu.Game.Overlays
         [Resolved]
         private ScreenFooter footer { get; set; } = null!;
 
-        private FirstRunSetupFooterContent? currentFooterContent;
+        public new FirstRunSetupFooterContent? DisplayedFooterContent => base.DisplayedFooterContent as FirstRunSetupFooterContent;
 
         public override VisibilityContainer CreateFooterContent()
         {
-            currentFooterContent = new FirstRunSetupFooterContent
+            var footerContent = new FirstRunSetupFooterContent
             {
                 ShowNextStep = showNextStep,
             };
 
-            currentFooterContent.OnLoadComplete += _ => updateButtons();
-            return currentFooterContent;
+            footerContent.OnLoadComplete += _ => updateButtons();
+            return footerContent;
         }
 
         public override bool OnBackButton()
@@ -182,7 +182,7 @@ namespace osu.Game.Overlays
                 switch (e.Action)
                 {
                     case GlobalAction.Select:
-                        currentFooterContent?.NextButton.TriggerClick();
+                        DisplayedFooterContent?.NextButton.TriggerClick();
                         return true;
 
                     case GlobalAction.Back:
@@ -287,9 +287,9 @@ namespace osu.Game.Overlays
             updateButtons();
         }
 
-        private void updateButtons() => currentFooterContent?.UpdateButtons(currentStepIndex, steps);
+        private void updateButtons() => DisplayedFooterContent?.UpdateButtons(currentStepIndex, steps);
 
-        private partial class FirstRunSetupFooterContent : VisibilityContainer
+        public partial class FirstRunSetupFooterContent : VisibilityContainer
         {
             public ShearedButton NextButton { get; private set; } = null!;
 

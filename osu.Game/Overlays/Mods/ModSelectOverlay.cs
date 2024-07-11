@@ -254,9 +254,9 @@ namespace osu.Game.Overlays.Mods
             });
         }
 
-        private ModSelectFooterContent? currentFooterContent;
+        public new ModSelectFooterContent? DisplayedFooterContent => base.DisplayedFooterContent as ModSelectFooterContent;
 
-        public override VisibilityContainer CreateFooterContent() => currentFooterContent = new ModSelectFooterContent(this)
+        public override VisibilityContainer CreateFooterContent() => new ModSelectFooterContent(this)
         {
             Beatmap = { BindTarget = Beatmap },
             ActiveMods = { BindTarget = ActiveMods },
@@ -270,7 +270,7 @@ namespace osu.Game.Overlays.Mods
             base.Update();
 
             SearchTextBox.PlaceholderText = SearchTextBox.HasFocus ? input_search_placeholder : tab_to_search_placeholder;
-            aboveColumnsContent.Padding = aboveColumnsContent.Padding with { Bottom = currentFooterContent?.DisplaysStackedVertically == true ? 75f : 15f };
+            aboveColumnsContent.Padding = aboveColumnsContent.Padding with { Bottom = DisplayedFooterContent?.DisplaysStackedVertically == true ? 75f : 15f };
         }
 
         /// <summary>
@@ -573,7 +573,7 @@ namespace osu.Game.Overlays.Mods
                 {
                     if (!SearchTextBox.HasFocus && !customisationPanel.Expanded.Value)
                     {
-                        currentFooterContent?.DeselectAllModsButton?.TriggerClick();
+                        DisplayedFooterContent?.DeselectAllModsButton?.TriggerClick();
                         return true;
                     }
 
