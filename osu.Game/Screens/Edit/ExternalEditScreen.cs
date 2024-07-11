@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -9,6 +10,7 @@ using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
@@ -116,8 +118,9 @@ namespace osu.Game.Screens.Edit
             {
                 EditOperation = await beatmapManager.BeginExternalEditing(editorBeatmap.BeatmapInfo.BeatmapSet!).ConfigureAwait(true);
             }
-            catch
+            catch (Exception ex)
             {
+                Logger.Log($@"Failed to initiate external edit operation: {ex}", LoggingTarget.Database);
                 fileMountOperation = null;
                 showSpinner("Export failed!");
                 await Task.Delay(1000).ConfigureAwait(true);
@@ -191,8 +194,9 @@ namespace osu.Game.Screens.Edit
             {
                 beatmap = await EditOperation!.Finish().ConfigureAwait(true);
             }
-            catch
+            catch (Exception ex)
             {
+                Logger.Log($@"Failed to finish external edit operation: {ex}", LoggingTarget.Database);
                 showSpinner("Import failed!");
                 await Task.Delay(1000).ConfigureAwait(true);
             }
