@@ -179,30 +179,6 @@ namespace osu.Game.Overlays
             return base.OnMouseMove(e);
         }
 
-        protected override bool OnKeyDown(KeyDownEvent e)
-        {
-            switch (e.Key)
-            {
-                case Key.Left:
-                    Adjust(GlobalAction.PreviousVolumeMeter);
-                    return true;
-
-                case Key.Right:
-                    Adjust(GlobalAction.NextVolumeMeter);
-                    return true;
-
-                case Key.Down:
-                    Adjust(GlobalAction.DecreaseVolume);
-                    return true;
-
-                case Key.Up:
-                    Adjust(GlobalAction.IncreaseVolume);
-                    return true;
-            }
-
-            return base.OnKeyDown(e);
-        }
-
         protected override bool OnHover(HoverEvent e)
         {
             schedulePopOut();
