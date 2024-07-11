@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -11,45 +9,52 @@ using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Screens.Footer;
 
 namespace osu.Game.Overlays.Mods
 {
     /// <summary>
-    /// A sheared overlay which provides a header and footer and basic animations.
-    /// Exposes <see cref="TopLevelContent"/>, <see cref="MainAreaContent"/> and <see cref="Footer"/> as valid targets for content.
+    /// A sheared overlay which provides a header and basic animations.
+    /// Exposes <see cref="TopLevelContent"/> and <see cref="MainAreaContent"/> as valid targets for content.
     /// </summary>
     public abstract partial class ShearedOverlayContainer : OsuFocusedOverlayContainer
     {
-        protected const float PADDING = 14;
+        public const float PADDING = 14;
 
         [Cached]
-        protected readonly OverlayColourProvider ColourProvider;
+        public readonly OverlayColourProvider ColourProvider;
 
         /// <summary>
         /// The overlay's header.
         /// </summary>
-        protected ShearedOverlayHeader Header { get; private set; }
+        protected ShearedOverlayHeader Header { get; private set; } = null!;
 
         /// <summary>
         /// The overlay's footer.
         /// </summary>
-        protected Container Footer { get; private set; }
+        protected Container Footer { get; private set; } = null!;
+
+        [Resolved]
+        private ScreenFooter? footer { get; set; }
+
+        // todo: very temporary property that will be removed once ModSelectOverlay and FirstRunSetupOverlay are updated to use new footer.
+        public virtual bool UseNewFooter => false;
 
         /// <summary>
         /// A container containing all content, including the header and footer.
         /// May be used for overlay-wide animations.
         /// </summary>
-        protected Container TopLevelContent { get; private set; }
+        protected Container TopLevelContent { get; private set; } = null!;
 
         /// <summary>
         /// A container for content that is to be displayed between the header and footer.
         /// </summary>
-        protected Container MainAreaContent { get; private set; }
+        protected Container MainAreaContent { get; private set; } = null!;
 
         /// <summary>
         /// A container for content that is to be displayed inside the footer.
         /// </summary>
-        protected Container FooterContent { get; private set; }
+        protected Container FooterContent { get; private set; } = null!;
 
         protected override bool StartHidden => true;
 
@@ -65,7 +70,7 @@ namespace osu.Game.Overlays.Mods
         [BackgroundDependencyLoader]
         private void load()
         {
-            const float footer_height = 50;
+            const float footer_height = ScreenFooter.HEIGHT;
 
             Child = TopLevelContent = new Container
             {
@@ -113,6 +118,17 @@ namespace osu.Game.Overlays.Mods
             };
         }
 
+        /// <summary>
+        /// Creates content to be displayed on the game-wide footer.
+        /// </summary>
+        public virtual Drawable CreateFooterContent() => Empty();
+
+        /// <summary>
+        /// Invoked when the back button in the footer is pressed.
+        /// </summary>
+        /// <returns>Whether the back button should not close the overlay.</returns>
+        public virtual bool OnBackButton() => false;
+
         protected override bool OnClick(ClickEvent e)
         {
             if (State.Value == Visibility.Visible)
@@ -124,6 +140,8 @@ namespace osu.Game.Overlays.Mods
             return base.OnClick(e);
         }
 
+        private bool hideFooterOnPopOut;
+
         protected override void PopIn()
         {
             const double fade_in_duration = 400;
@@ -131,7 +149,19 @@ namespace osu.Game.Overlays.Mods
             this.FadeIn(fade_in_duration, Easing.OutQuint);
 
             Header.MoveToY(0, fade_in_duration, Easing.OutQuint);
-            Footer.MoveToY(0, fade_in_duration, Easing.OutQuint);
+
+            if (UseNewFooter && footer != null)
+            {
+                footer.SetActiveOverlayContainer(this);
+
+                if (footer.State.Value == Visibility.Hidden)
+                {
+                    footer.Show();
+                    hideFooterOnPopOut = true;
+                }
+            }
+            else
+                Footer.MoveToY(0, fade_in_duration, Easing.OutQuint);
         }
 
         protected override void PopOut()
@@ -142,7 +172,19 @@ namespace osu.Game.Overlays.Mods
             this.FadeOut(fade_out_duration, Easing.OutQuint);
 
             Header.MoveToY(-Header.DrawHeight, fade_out_duration, Easing.OutQuint);
-            Footer.MoveToY(Footer.DrawHeight, fade_out_duration, Easing.OutQuint);
+
+            if (UseNewFooter && footer != null)
+            {
+                footer.ClearActiveOverlayContainer();
+
+                if (hideFooterOnPopOut)
+                {
+                    footer.Hide();
+                    hideFooterOnPopOut = false;
+                }
+            }
+            else
+                Footer.MoveToY(Footer.DrawHeight, fade_out_duration, Easing.OutQuint);
         }
     }
 }
