@@ -481,7 +481,7 @@ namespace osu.Game.Screens.Edit
         {
             if (HasUnsavedChanges)
             {
-                dialogOverlay.Push(new SaveRequiredPopupDialog("The beatmap will be saved in order to test it.", () => attemptMutationOperation(() =>
+                dialogOverlay.Push(new SaveRequiredPopupDialog(() => attemptMutationOperation(() =>
                 {
                     if (!Save()) return false;
 
@@ -1112,6 +1112,10 @@ namespace osu.Game.Screens.Edit
                 var export = createExportMenu();
                 saveRelatedMenuItems.AddRange(export.Items);
                 yield return export;
+
+                var externalEdit = new EditorMenuItem("Edit externally", MenuItemType.Standard, editExternally);
+                saveRelatedMenuItems.Add(externalEdit);
+                yield return externalEdit;
             }
 
             yield return new OsuMenuItemSpacer();
@@ -1129,11 +1133,35 @@ namespace osu.Game.Screens.Edit
             return new EditorMenuItem(CommonStrings.Export) { Items = exportItems };
         }
 
+        private void editExternally()
+        {
+            if (HasUnsavedChanges)
+            {
+                dialogOverlay.Push(new SaveRequiredPopupDialog(() => attemptMutationOperation(() =>
+                {
+                    if (!Save())
+                        return false;
+
+                    startEdit();
+                    return true;
+                })));
+            }
+            else
+            {
+                startEdit();
+            }
+
+            void startEdit()
+            {
+                this.Push(new ExternalEditScreen());
+            }
+        }
+
         private void exportBeatmap(bool legacy)
         {
             if (HasUnsavedChanges)
             {
-                dialogOverlay.Push(new SaveRequiredPopupDialog("The beatmap will be saved in order to export it.", () => attemptAsyncMutationOperation(() =>
+                dialogOverlay.Push(new SaveRequiredPopupDialog(() => attemptAsyncMutationOperation(() =>
                 {
                     if (!Save())
                         return Task.CompletedTask;
@@ -1211,17 +1239,14 @@ namespace osu.Game.Screens.Edit
         {
             if (isNewBeatmap)
             {
-                dialogOverlay.Push(new SaveRequiredPopupDialog("This beatmap will be saved in order to create another difficulty.", () =>
+                dialogOverlay.Push(new SaveRequiredPopupDialog(() => attemptMutationOperation(() =>
                 {
-                    attemptMutationOperation(() =>
-                    {
-                        if (!Save())
-                            return false;
+                    if (!Save())
+                        return false;
 
-                        CreateNewDifficulty(rulesetInfo);
-                        return true;
-                    });
-                }));
+                    CreateNewDifficulty(rulesetInfo);
+                    return true;
+                })));
 
                 return;
             }
@@ -1260,7 +1285,11 @@ namespace osu.Game.Screens.Edit
             return new EditorMenuItem(EditorStrings.ChangeDifficulty) { Items = difficultyItems };
         }
 
-        protected void SwitchToDifficulty(BeatmapInfo nextBeatmap) => loader?.ScheduleSwitchToExistingDifficulty(nextBeatmap, GetState(nextBeatmap.Ruleset));
+        public void SwitchToDifficulty(BeatmapInfo nextBeatmap)
+        {
+            switchingDifficulty = true;
+            loader?.ScheduleSwitchToExistingDifficulty(nextBeatmap, GetState(nextBeatmap.Ruleset));
+        }
 
         private void cancelExit()
         {
