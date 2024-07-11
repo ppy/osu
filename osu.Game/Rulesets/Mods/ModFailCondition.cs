@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Mods
 
         public virtual bool RestartOnFail => Restart.Value;
 
-        private Action? triggerFailureDelegate;
+        private Action<object>? triggerFailureDelegate;
 
         public void ApplyToHealthProcessor(HealthProcessor healthProcessor)
         {
@@ -31,7 +31,7 @@ namespace osu.Game.Rulesets.Mods
         /// <summary>
         /// Immediately triggers a failure on the loaded <see cref="HealthProcessor"/>.
         /// </summary>
-        protected void TriggerFailure() => triggerFailureDelegate?.Invoke();
+        protected void TriggerFailure() => triggerFailureDelegate?.Invoke(this);
 
         /// <summary>
         /// Determines whether <paramref name="result"/> should trigger a failure. Called every time a
