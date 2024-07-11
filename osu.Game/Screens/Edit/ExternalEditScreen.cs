@@ -204,6 +204,16 @@ namespace osu.Game.Screens.Edit
                 this.Exit();
             else
             {
+                // the `ImportAsUpdate()` flow will yield beatmap(sets) with online status of `None` if online lookup fails.
+                // coerce such models to `LocallyModified` state instead to unify behaviour with normal editing flow.
+                beatmap.PerformWrite(s =>
+                {
+                    if (s.Status == BeatmapOnlineStatus.None)
+                        s.Status = BeatmapOnlineStatus.LocallyModified;
+                    foreach (var difficulty in s.Beatmaps.Where(b => b.Status == BeatmapOnlineStatus.None))
+                        difficulty.Status = BeatmapOnlineStatus.LocallyModified;
+                });
+
                 var closestMatchingBeatmap =
                     beatmap.Value.Beatmaps.FirstOrDefault(b => b.DifficultyName == originalDifficulty)
                     ?? beatmap.Value.Beatmaps.First();
