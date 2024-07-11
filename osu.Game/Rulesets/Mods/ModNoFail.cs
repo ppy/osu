@@ -31,8 +31,6 @@ namespace osu.Game.Rulesets.Mods
 
         public bool RestartOnFail => false;
 
-        public bool TriggeredFail => false;
-
         public void ReadFromConfig(OsuConfigManager config)
         {
             config.BindWith(OsuSetting.ShowHealthDisplayWhenCantFail, showHealthBar);
