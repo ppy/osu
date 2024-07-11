@@ -5,6 +5,7 @@ using System;
 using osu.Framework.Bindables;
 using osu.Framework.Utils;
 using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Rulesets.Scoring
 {
@@ -32,15 +33,23 @@ namespace osu.Game.Rulesets.Scoring
         public bool HasFailed { get; private set; }
 
         /// <summary>
+        /// Object that triggered fail
+        /// </summary>
+        public object? FailTrigger;
+
+        /// <summary>
         /// Immediately triggers a failure for this HealthProcessor.
         /// </summary>
-        public void TriggerFailure()
+        public void TriggerFailure(object? Trigger = null)
         {
             if (HasFailed)
                 return;
 
             if (Failed?.Invoke() != false)
                 HasFailed = true;
+
+            if (Trigger != null)
+                FailTrigger = Trigger;
         }
 
         protected override void ApplyResultInternal(JudgementResult result)
@@ -92,7 +101,10 @@ namespace osu.Game.Rulesets.Scoring
                 {
                     bool conditionResult = (bool)condition.Method.Invoke(condition.Target, new object[] { this, result })!;
                     if (conditionResult)
+                    {
+                        FailTrigger = condition.Target;
                         return true;
+                    }
                 }
             }
 
