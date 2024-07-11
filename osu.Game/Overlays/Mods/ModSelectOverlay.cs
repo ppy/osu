@@ -604,7 +604,13 @@ namespace osu.Game.Overlays.Mods
 
             return base.OnPressed(e);
 
-            void hideOverlay() => footer?.BackButton.TriggerClick();
+            void hideOverlay()
+            {
+                if (footer != null)
+                    footer.BackButton.TriggerClick();
+                else
+                    Hide();
+            }
         }
 
         /// <inheritdoc cref="IKeyBindingHandler{PlatformAction}"/>
