@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
@@ -21,7 +22,6 @@ namespace osu.Game.Screens.Edit
         public TestGameplayButton TestGameplayButton { get; private set; } = null!;
 
         private IBindable<bool> saveInProgress = null!;
-        private Bindable<bool> composerFocusMode = null!;
 
         [BackgroundDependencyLoader]
         private void load(Editor editor)
@@ -72,24 +72,14 @@ namespace osu.Game.Screens.Edit
             };
 
             saveInProgress = editor.MutationTracker.InProgress.GetBoundCopy();
-            composerFocusMode = editor.ComposerFocusMode.GetBoundCopy();
+
+            editor.RegisterMainUIElement(this, this.ChildrenOfType<BottomBarContainer>().Select(c => c.Background));
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
-
             saveInProgress.BindValueChanged(_ => TestGameplayButton.Enabled.Value = !saveInProgress.Value, true);
-            composerFocusMode.BindValueChanged(_ =>
-            {
-                foreach (var c in this.ChildrenOfType<BottomBarContainer>())
-                {
-                    if (!composerFocusMode.Value)
-                        c.Background.FadeIn(750, Easing.OutQuint);
-                    else
-                        c.Background.Delay(600).FadeTo(0.5f, 4000, Easing.OutQuint);
-                }
-            }, true);
         }
     }
 }

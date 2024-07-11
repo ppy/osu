@@ -124,21 +124,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 }
             };
 
-            if (editor != null)
-                composerFocusMode.BindTo(editor.ComposerFocusMode);
-        }
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            composerFocusMode.BindValueChanged(_ =>
-            {
-                if (!composerFocusMode.Value)
-                    timelineBackground.FadeIn(750, Easing.OutQuint);
-                else
-                    timelineBackground.Delay(600).FadeTo(0.5f, 4000, Easing.OutQuint);
-            }, true);
+            editor?.RegisterMainUIElement(this, new[] { timelineBackground });
         }
     }
 }

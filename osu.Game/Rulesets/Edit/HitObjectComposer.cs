@@ -88,7 +88,6 @@ namespace osu.Game.Rulesets.Edit
 
         private IBindable<bool> hasTiming;
         private Bindable<bool> autoSeekOnPlacement;
-        private readonly Bindable<bool> composerFocusMode = new Bindable<bool>();
 
         protected DrawableRuleset<TObject> DrawableRuleset { get; private set; }
 
@@ -104,9 +103,6 @@ namespace osu.Game.Rulesets.Edit
         private void load(OsuConfigManager config, [CanBeNull] Editor editor)
         {
             autoSeekOnPlacement = config.GetBindable<bool>(OsuSetting.EditorAutoSeekOnPlacement);
-
-            if (editor != null)
-                composerFocusMode.BindTo(editor.ComposerFocusMode);
 
             Config = Dependencies.Get<IRulesetConfigCache>().GetConfigFor(Ruleset);
 
@@ -132,7 +128,7 @@ namespace osu.Game.Rulesets.Edit
 
             InternalChildren = new[]
             {
-                PlayfieldContentContainer = new ContentContainer
+                PlayfieldContentContainer = new Container
                 {
                     Name = "Playfield content",
                     RelativeSizeAxes = Axes.Y,
@@ -234,6 +230,9 @@ namespace osu.Game.Rulesets.Edit
             setSelectTool();
 
             EditorBeatmap.SelectedHitObjects.CollectionChanged += selectionChanged;
+
+            editor?.RegisterMainUIElement(leftToolboxBackground, new[] { leftToolboxBackground });
+            editor?.RegisterMainUIElement(rightToolboxBackground, new[] { rightToolboxBackground });
         }
 
         /// <summary>
@@ -264,20 +263,6 @@ namespace osu.Game.Rulesets.Edit
                 foreach (var item in toolboxCollection.Items)
                 {
                     item.Selected.Disabled = !hasTiming.NewValue;
-                }
-            }, true);
-
-            composerFocusMode.BindValueChanged(_ =>
-            {
-                if (!composerFocusMode.Value)
-                {
-                    leftToolboxBackground.FadeIn(750, Easing.OutQuint);
-                    rightToolboxBackground.FadeIn(750, Easing.OutQuint);
-                }
-                else
-                {
-                    leftToolboxBackground.Delay(600).FadeTo(0.5f, 4000, Easing.OutQuint);
-                    rightToolboxBackground.Delay(600).FadeTo(0.5f, 4000, Easing.OutQuint);
                 }
             }, true);
         }
@@ -529,31 +514,6 @@ namespace osu.Game.Rulesets.Edit
         }
 
         #endregion
-
-        private partial class ContentContainer : Container
-        {
-            public override bool HandlePositionalInput => true;
-
-            private readonly Bindable<bool> composerFocusMode = new Bindable<bool>();
-
-            [BackgroundDependencyLoader(true)]
-            private void load([CanBeNull] Editor editor)
-            {
-                if (editor != null)
-                    composerFocusMode.BindTo(editor.ComposerFocusMode);
-            }
-
-            protected override bool OnHover(HoverEvent e)
-            {
-                composerFocusMode.Value = true;
-                return false;
-            }
-
-            protected override void OnHoverLost(HoverLostEvent e)
-            {
-                composerFocusMode.Value = false;
-            }
-        }
     }
 
     /// <summary>

@@ -214,12 +214,6 @@ namespace osu.Game.Screens.Edit
         private Bindable<bool> editorTimelineShowTimingChanges;
         private Bindable<bool> editorTimelineShowTicks;
 
-        /// <summary>
-        /// This controls the opacity of components like the timelines, sidebars, etc.
-        /// In "composer focus" mode the opacity of the aforementioned components is reduced so that the user can focus on the composer better.
-        /// </summary>
-        public Bindable<bool> ComposerFocusMode { get; } = new Bindable<bool>();
-
         public Editor(EditorLoader loader = null)
         {
             this.loader = loader;
@@ -590,6 +584,12 @@ namespace osu.Game.Screens.Edit
 
         public void OnReleased(KeyBindingReleaseEvent<PlatformAction> e)
         {
+        }
+
+        protected override bool OnMouseMove(MouseMoveEvent e)
+        {
+            updateHoverFocusState(e);
+            return base.OnMouseMove(e);
         }
 
         protected override bool OnKeyDown(KeyDownEvent e)
@@ -1338,6 +1338,47 @@ namespace osu.Game.Screens.Edit
         public double GetBeatLengthAtTime(double referenceTime) => editorBeatmap.GetBeatLengthAtTime(referenceTime);
 
         public int BeatDivisor => beatDivisor.Value;
+
+        #region Main UI Dimming
+
+        private bool? mainUIDimmed;
+        private readonly List<(Drawable container, Drawable[] dimmableElements)> mainUIElements = new List<(Drawable, Drawable[])>();
+
+        /// <summary>
+        /// Register an editor UI element that has background layers which can be made semi-transparent when not focused (aka hovered).
+        /// </summary>
+        /// <param name="container">The main UI element's container to be used for checking whether hovered.</param>
+        /// <param name="backgroundElements">Any elements which should have their alpha transformed when not focused.</param>
+        internal void RegisterMainUIElement(Drawable container, IEnumerable<Drawable> backgroundElements)
+        {
+            mainUIElements.Add((container, backgroundElements.ToArray()));
+
+            // force reapplication
+            mainUIDimmed = null;
+        }
+
+        private void updateHoverFocusState(MouseMoveEvent e)
+        {
+            bool canDim = !mainUIElements.Any(l => l.container.Contains(e.ScreenSpaceMousePosition));
+
+            if (canDim != mainUIDimmed)
+            {
+                foreach (var l in mainUIElements)
+                {
+                    foreach (var c in l.dimmableElements)
+                    {
+                        if (canDim)
+                            c.Delay(600).FadeTo(0.5f, 4000, Easing.OutQuint);
+                        else
+                            c.FadeIn(750, Easing.OutQuint);
+                    }
+                }
+
+                mainUIDimmed = canDim;
+            }
+        }
+
+        #endregion
 
         ControlPointInfo IBeatSyncProvider.ControlPoints => editorBeatmap.ControlPointInfo;
         IClock IBeatSyncProvider.Clock => clock;
