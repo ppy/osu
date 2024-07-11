@@ -132,7 +132,7 @@ namespace osu.Game.Rulesets.Edit
 
             InternalChildren = new[]
             {
-                PlayfieldContentContainer = new ContentContainer
+                PlayfieldContentContainer = new Container
                 {
                     Name = "Playfield content",
                     RelativeSizeAxes = Axes.Y,
@@ -269,6 +269,7 @@ namespace osu.Game.Rulesets.Edit
 
             composerFocusMode.BindValueChanged(_ =>
             {
+                // Transforms should be kept in sync with other usages of composer focus mode.
                 if (!composerFocusMode.Value)
                 {
                     leftToolboxBackground.FadeIn(750, Easing.OutQuint);
@@ -303,6 +304,8 @@ namespace osu.Game.Rulesets.Edit
                 PlayfieldContentContainer.Width = Math.Max(1024, DrawWidth) - (TOOLBOX_CONTRACTED_SIZE_LEFT + TOOLBOX_CONTRACTED_SIZE_RIGHT);
                 PlayfieldContentContainer.X = TOOLBOX_CONTRACTED_SIZE_LEFT;
             }
+
+            composerFocusMode.Value = PlayfieldContentContainer.Contains(InputManager.CurrentState.Mouse.Position);
         }
 
         public override Playfield Playfield => drawableRulesetWrapper.Playfield;
@@ -529,31 +532,6 @@ namespace osu.Game.Rulesets.Edit
         }
 
         #endregion
-
-        private partial class ContentContainer : Container
-        {
-            public override bool HandlePositionalInput => true;
-
-            private readonly Bindable<bool> composerFocusMode = new Bindable<bool>();
-
-            [BackgroundDependencyLoader(true)]
-            private void load([CanBeNull] Editor editor)
-            {
-                if (editor != null)
-                    composerFocusMode.BindTo(editor.ComposerFocusMode);
-            }
-
-            protected override bool OnHover(HoverEvent e)
-            {
-                composerFocusMode.Value = true;
-                return false;
-            }
-
-            protected override void OnHoverLost(HoverLostEvent e)
-            {
-                composerFocusMode.Value = false;
-            }
-        }
     }
 
     /// <summary>
