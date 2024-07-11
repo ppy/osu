@@ -103,11 +103,13 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public bool RestartOnFail => false;
 
+        public bool TriggeredFail { get; set; } = false;
+
         public void ApplyToHealthProcessor(HealthProcessor healthProcessor)
         {
             // Sudden death
             healthProcessor.FailConditions += (_, result)
-                => result.Type.AffectsCombo()
+                => TriggeredFail = result.Type.AffectsCombo()
                    && !result.IsHit;
         }
 

@@ -35,7 +35,11 @@ namespace osu.Game.Rulesets.Mods
 
         public bool PerformFail()
         {
-            if (retries == 0) return true;
+            if (retries == 0)
+            {
+                TriggeredFail = true;
+                return true;
+            }
 
             health.Value = health.MaxValue;
             retries--;
@@ -44,6 +48,8 @@ namespace osu.Game.Rulesets.Mods
         }
 
         public bool RestartOnFail => false;
+
+        public bool TriggeredFail { get; set; } = false;
 
         public void ApplyToHealthProcessor(HealthProcessor healthProcessor)
         {

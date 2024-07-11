@@ -51,5 +51,7 @@ namespace osu.Game.Rulesets.Mods
         public bool PerformFail() => false;
 
         public bool RestartOnFail => false;
+
+        public bool TriggeredFail => false;
     }
 }
