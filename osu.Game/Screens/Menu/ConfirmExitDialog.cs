@@ -40,11 +40,11 @@ namespace osu.Game.Screens.Menu
 
                 var ongoingOperations = notifications.OngoingOperations.ToArray();
 
-                foreach (var n in ongoingOperations.Take(Math.Min(ongoingOperations.Length, 10)))
+                foreach (var n in ongoingOperations.Take(10))
                     text += $"{n.Text} ({n.Progress:0%})\n";
 
                 if (ongoingOperations.Length > 10)
-                    text += $"\nAnd {ongoingOperations.Length - 10} other operation(s).\n";
+                    text += $"\nand {ongoingOperations.Length - 10} other operation(s).\n";
 
                 text += "\nLast chance to turn back";
 
