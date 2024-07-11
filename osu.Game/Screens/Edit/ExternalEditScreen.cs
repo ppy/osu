@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -20,6 +19,7 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
+using osu.Game.Online.Multiplayer;
 using osu.Game.Overlays;
 using osu.Game.Screens.OnlinePlay.Match.Components;
 using osuTK;
@@ -28,27 +28,26 @@ namespace osu.Game.Screens.Edit
 {
     internal partial class ExternalEditScreen : OsuScreen
     {
-        private readonly Task<ExternalEditOperation<BeatmapSetInfo>> fileMountOperation;
-
         [Resolved]
         private GameHost gameHost { get; set; } = null!;
 
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; } = null!;
 
-        private readonly Editor editor;
+        [Resolved]
+        private BeatmapManager beatmapManager { get; set; } = null!;
+
+        [Resolved]
+        private Editor editor { get; set; } = null!;
+
+        [Resolved]
+        private EditorBeatmap editorBeatmap { get; set; } = null!;
+
+        private Task? fileMountOperation;
 
         public ExternalEditOperation<BeatmapSetInfo>? EditOperation;
 
-        private double timeLoaded;
-
         private FillFlowContainer flow = null!;
-
-        public ExternalEditScreen(Task<ExternalEditOperation<BeatmapSetInfo>> fileMountOperation, Editor editor)
-        {
-            this.fileMountOperation = fileMountOperation;
-            this.editor = editor;
-        }
 
         [BackgroundDependencyLoader]
         private void load()
@@ -80,71 +79,98 @@ namespace osu.Game.Screens.Edit
                     }
                 }
             };
-
-            showSpinner("Exporting for edit...");
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            timeLoaded = Time.Current;
-
-            fileMountOperation.ContinueWith(t =>
-            {
-                EditOperation = t.GetResultSafely();
-
-                Scheduler.AddDelayed(() =>
-                {
-                    flow.Children = new Drawable[]
-                    {
-                        new OsuSpriteText
-                        {
-                            Text = "Beatmap is mounted externally",
-                            Font = OsuFont.Default.With(size: 30),
-                            Anchor = Anchor.TopCentre,
-                            Origin = Anchor.TopCentre,
-                        },
-                        new OsuTextFlowContainer
-                        {
-                            Padding = new MarginPadding(5),
-                            Anchor = Anchor.TopCentre,
-                            Origin = Anchor.TopCentre,
-                            Width = 350,
-                            AutoSizeAxes = Axes.Y,
-                            Text = "Any changes made to the exported folder will be imported to the game, including file additions, modifications and deletions.",
-                        },
-                        new PurpleRoundedButton
-                        {
-                            Text = "Open folder",
-                            Width = 350,
-                            Anchor = Anchor.TopCentre,
-                            Origin = Anchor.TopCentre,
-                            Action = open,
-                            Enabled = { Value = false }
-                        },
-                        new DangerousRoundedButton
-                        {
-                            Text = "Finish editing and import changes",
-                            Width = 350,
-                            Anchor = Anchor.TopCentre,
-                            Origin = Anchor.TopCentre,
-                            Action = finish,
-                            Enabled = { Value = false }
-                        }
-                    };
-
-                    Scheduler.AddDelayed(() =>
-                    {
-                        foreach (var b in flow.ChildrenOfType<RoundedButton>())
-                            b.Enabled.Value = true;
-                        open();
-                    }, 1000);
-                }, Math.Max(0, 1000 - (Time.Current - timeLoaded)));
-            });
+            fileMountOperation = begin();
         }
 
-        private void open()
+        public override bool OnExiting(ScreenExitEvent e)
+        {
+            // Don't allow exiting until the file mount operation has completed.
+            // This is mainly to simplify the flow (once the screen is pushed we are guaranteed an attempted mount).
+            if (fileMountOperation?.IsCompleted == false)
+                return true;
+
+            // If the operation completed successfully, ensure that we finish the operation before exiting.
+            // The finish() call will subsequently call Exit() when done.
+            if (EditOperation != null)
+            {
+                finish().FireAndForget();
+                return true;
+            }
+
+            return base.OnExiting(e);
+        }
+
+        private async Task begin()
+        {
+            showSpinner("Exporting for edit...");
+
+            await Task.Delay(500).ConfigureAwait(true);
+
+            try
+            {
+                EditOperation = await beatmapManager.BeginExternalEditing(editorBeatmap.BeatmapInfo.BeatmapSet!).ConfigureAwait(true);
+            }
+            catch
+            {
+                fileMountOperation = null;
+                showSpinner("Export failed!");
+                await Task.Delay(1000).ConfigureAwait(true);
+                this.Exit();
+            }
+
+            flow.Children = new Drawable[]
+            {
+                new OsuSpriteText
+                {
+                    Text = "Beatmap is mounted externally",
+                    Font = OsuFont.Default.With(size: 30),
+                    Anchor = Anchor.TopCentre,
+                    Origin = Anchor.TopCentre,
+                },
+                new OsuTextFlowContainer
+                {
+                    Padding = new MarginPadding(5),
+                    Anchor = Anchor.TopCentre,
+                    Origin = Anchor.TopCentre,
+                    Width = 350,
+                    AutoSizeAxes = Axes.Y,
+                    Text = "Any changes made to the exported folder will be imported to the game, including file additions, modifications and deletions.",
+                },
+                new PurpleRoundedButton
+                {
+                    Text = "Open folder",
+                    Width = 350,
+                    Anchor = Anchor.TopCentre,
+                    Origin = Anchor.TopCentre,
+                    Action = openDirectory,
+                    Enabled = { Value = false }
+                },
+                new DangerousRoundedButton
+                {
+                    Text = "Finish editing and import changes",
+                    Width = 350,
+                    Anchor = Anchor.TopCentre,
+                    Origin = Anchor.TopCentre,
+                    Action = () => finish().FireAndForget(),
+                    Enabled = { Value = false }
+                }
+            };
+
+            Scheduler.AddDelayed(() =>
+            {
+                foreach (var b in flow.ChildrenOfType<RoundedButton>())
+                    b.Enabled.Value = true;
+                openDirectory();
+            }, 1000);
+        }
+
+        private void openDirectory()
         {
             if (EditOperation == null)
                 return;
@@ -153,47 +179,37 @@ namespace osu.Game.Screens.Edit
             gameHost.OpenFileExternally(EditOperation.MountedPath.TrimDirectorySeparator() + Path.DirectorySeparatorChar);
         }
 
-        public override bool OnExiting(ScreenExitEvent e)
-        {
-            if (!fileMountOperation.IsCompleted)
-                return true;
-
-            if (EditOperation != null)
-            {
-                finish();
-                return true;
-            }
-
-            return base.OnExiting(e);
-        }
-
-        private void finish()
+        private async Task finish()
         {
             string originalDifficulty = editor.Beatmap.Value.Beatmap.BeatmapInfo.DifficultyName;
 
             showSpinner("Cleaning up...");
 
-            EditOperation!.Finish().ContinueWith(t =>
+            Live<BeatmapSetInfo>? beatmap = null;
+
+            try
             {
-                Schedule(() =>
-                {
-                    // Setting to null will allow exit to succeed.
-                    EditOperation = null;
+                beatmap = await EditOperation!.Finish().ConfigureAwait(true);
+            }
+            catch
+            {
+                showSpinner("Import failed!");
+                await Task.Delay(1000).ConfigureAwait(true);
+            }
 
-                    Live<BeatmapSetInfo>? beatmap = t.GetResultSafely();
+            // Setting to null will allow exit to succeed.
+            EditOperation = null;
 
-                    if (beatmap == null)
-                        this.Exit();
-                    else
-                    {
-                        var closestMatchingBeatmap =
-                            beatmap.Value.Beatmaps.FirstOrDefault(b => b.DifficultyName == originalDifficulty)
-                            ?? beatmap.Value.Beatmaps.First();
+            if (beatmap == null)
+                this.Exit();
+            else
+            {
+                var closestMatchingBeatmap =
+                    beatmap.Value.Beatmaps.FirstOrDefault(b => b.DifficultyName == originalDifficulty)
+                    ?? beatmap.Value.Beatmaps.First();
 
-                        editor.SwitchToDifficulty(closestMatchingBeatmap);
-                    }
-                });
-            });
+                editor.SwitchToDifficulty(closestMatchingBeatmap);
+            }
         }
 
         private void showSpinner(string text)
