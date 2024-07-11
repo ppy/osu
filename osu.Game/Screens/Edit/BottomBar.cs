@@ -82,10 +82,13 @@ namespace osu.Game.Screens.Edit
             saveInProgress.BindValueChanged(_ => TestGameplayButton.Enabled.Value = !saveInProgress.Value, true);
             composerFocusMode.BindValueChanged(_ =>
             {
-                float targetAlpha = composerFocusMode.Value ? 0.5f : 1;
-
                 foreach (var c in this.ChildrenOfType<BottomBarContainer>())
-                    c.Background.FadeTo(targetAlpha, 400, Easing.OutQuint);
+                {
+                    if (!composerFocusMode.Value)
+                        c.Background.FadeIn(750, Easing.OutQuint);
+                    else
+                        c.Background.Delay(600).FadeTo(0.5f, 4000, Easing.OutQuint);
+                }
             }, true);
         }
     }
