@@ -5,7 +5,6 @@ using System;
 using osu.Framework.Bindables;
 using osu.Framework.Utils;
 using osu.Game.Rulesets.Judgements;
-using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Rulesets.Scoring
 {
