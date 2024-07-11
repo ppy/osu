@@ -190,7 +190,7 @@ namespace osu.Game.Screens.Footer
 
         private readonly List<ScreenFooterButton> temporarilyHiddenButtons = new List<ScreenFooterButton>();
 
-        public IDisposable RegisterActiveOverlayContainer(ShearedOverlayContainer overlay)
+        public IDisposable RegisterActiveOverlayContainer(ShearedOverlayContainer overlay, out VisibilityContainer? footerContent)
         {
             if (activeOverlay != null)
             {
@@ -219,7 +219,9 @@ namespace osu.Game.Screens.Footer
 
             updateColourScheme(overlay.ColourProvider.ColourScheme);
 
-            var content = overlay.CreateFooterContent() ?? Empty();
+            footerContent = overlay.CreateFooterContent();
+
+            var content = footerContent ?? Empty();
 
             Add(contentContainer = new Container
             {
