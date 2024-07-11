@@ -2,9 +2,12 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Utils;
 using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Rulesets.Scoring
 {
@@ -19,7 +22,7 @@ namespace osu.Game.Rulesets.Scoring
         /// <summary>
         /// Additional conditions on top of <see cref="CheckDefaultFailCondition"/> that cause a failing state.
         /// </summary>
-        public event Func<HealthProcessor, JudgementResult, bool>? FailConditions;
+        public List<IHasFailCondition> FailConditions = new List<IHasFailCondition>();
 
         /// <summary>
         /// The current health.
@@ -34,12 +37,12 @@ namespace osu.Game.Rulesets.Scoring
         /// <summary>
         /// Object that triggered fail
         /// </summary>
-        public object? FailTrigger;
+        public List<IHasFailCondition> FailTriggers = new List<IHasFailCondition>();
 
         /// <summary>
         /// Immediately triggers a failure for this HealthProcessor.
         /// </summary>
-        public void TriggerFailure(object? Trigger = null)
+        public void TriggerFailure(IHasFailCondition? Trigger = null)
         {
             if (HasFailed)
                 return;
@@ -48,7 +51,7 @@ namespace osu.Game.Rulesets.Scoring
                 HasFailed = true;
 
             if (Trigger != null)
-                FailTrigger = Trigger;
+                FailTriggers.Add(Trigger);
         }
 
         protected override void ApplyResultInternal(JudgementResult result)
@@ -94,17 +97,16 @@ namespace osu.Game.Rulesets.Scoring
             if (CheckDefaultFailCondition(result))
                 return true;
 
-            if (FailConditions != null)
+            if (FailConditions.Any())
             {
-                foreach (var condition in FailConditions.GetInvocationList())
+                foreach (var condition in FailConditions)
                 {
-                    bool conditionResult = (bool)condition.Method.Invoke(condition.Target, new object[] { this, result })!;
-                    if (conditionResult)
-                    {
-                        FailTrigger = condition.Target;
-                        return true;
-                    }
+                    if (condition.FailCondition(result))
+                        FailTriggers.Add(condition);
                 }
+
+                if (FailTriggers.Any())
+                    return true;
             }
 
             return false;
