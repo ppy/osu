@@ -134,6 +134,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
             composerFocusMode.BindValueChanged(_ =>
             {
+                // Transforms should be kept in sync with other usages of composer focus mode.
                 if (!composerFocusMode.Value)
                     timelineBackground.FadeIn(750, Easing.OutQuint);
                 else
