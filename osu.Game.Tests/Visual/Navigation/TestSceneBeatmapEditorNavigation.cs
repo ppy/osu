@@ -87,6 +87,8 @@ namespace osu.Game.Tests.Visual.Navigation
             AddUntilStep("wait for editor", () => Game.ScreenStack.CurrentScreen is Editor editor && editor.ReadyForUse);
 
             AddAssert("beatmapset changed", () => getEditor().Beatmap.Value.BeatmapSetInfo, () => Is.Not.EqualTo(beatmapSet));
+            AddAssert("beatmapset is locally modified", () => getEditor().Beatmap.Value.BeatmapSetInfo.Status, () => Is.EqualTo(BeatmapOnlineStatus.LocallyModified));
+            AddAssert("all difficulties are locally modified", () => getEditor().Beatmap.Value.BeatmapSetInfo.Beatmaps.All(b => b.Status == BeatmapOnlineStatus.LocallyModified));
             AddAssert("difficulty didn't change", () => getEditor().Beatmap.Value.BeatmapInfo.DifficultyName, () => Is.EqualTo(difficultyName));
             AddAssert("old beatmapset deleted", () => Game.BeatmapManager.QueryBeatmapSet(s => s.ID == beatmapSet.ID), () => Is.Null);
         }
