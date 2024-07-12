@@ -13,6 +13,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Overlays;
 using osu.Game.Rulesets.Edit;
@@ -38,6 +39,8 @@ namespace osu.Game.Screens.Edit.Verify
         private IBeatmapVerifier rulesetVerifier;
         private BeatmapVerifier generalVerifier;
         private BeatmapVerifierContext context;
+
+        private LoadingLayer loading;
 
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colours)
@@ -79,6 +82,7 @@ namespace osu.Game.Screens.Edit.Verify
                         },
                     }
                 },
+                loading = new LoadingLayer()
             };
         }
 
@@ -100,6 +104,7 @@ namespace osu.Game.Screens.Edit.Verify
             if (refreshOperation?.IsCompleted == false)
                 return;
 
+            loading.Show();
             table.Issues.Clear();
 
             refreshOperation = Task.Run(() =>
@@ -117,6 +122,7 @@ namespace osu.Game.Screens.Edit.Verify
                 Schedule(() =>
                 {
                     table.Issues.AddRange(issues);
+                    loading.Hide();
                     refreshOperation = null;
                 });
             });
