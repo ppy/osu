@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Framework.Threading;
 using osu.Game.Graphics.Containers;
 using osu.Game.Input.Bindings;
 using osu.Game.Overlays;
@@ -24,6 +25,7 @@ namespace osu.Game.Screens.Footer
     {
         private const int padding = 60;
         private const float delay_per_button = 30;
+        private const double transition_duration = 400;
 
         public const int HEIGHT = 50;
 
@@ -37,7 +39,12 @@ namespace osu.Game.Screens.Footer
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Aquamarine);
 
+        [Resolved]
+        private OsuGame? game { get; set; }
+
         public ScreenBackButton BackButton { get; private set; } = null!;
+
+        public Action<bool>? RequestLogoInFront { get; set; }
 
         public Action? OnBack;
 
@@ -101,19 +108,35 @@ namespace osu.Game.Screens.Footer
             };
         }
 
-        public void StartTrackingLogo(OsuLogo logo, float duration = 0, Easing easing = Easing.None) => logoTrackingContainer.StartTracking(logo, duration, easing);
-        public void StopTrackingLogo() => logoTrackingContainer.StopTracking();
+        private ScheduledDelegate? changeLogoDepthDelegate;
+
+        public void StartTrackingLogo(OsuLogo logo, float duration = 0, Easing easing = Easing.None)
+        {
+            changeLogoDepthDelegate?.Cancel();
+            changeLogoDepthDelegate = null;
+
+            logoTrackingContainer.StartTracking(logo, duration, easing);
+            RequestLogoInFront?.Invoke(true);
+        }
+
+        public void StopTrackingLogo()
+        {
+            logoTrackingContainer.StopTracking();
+
+            if (game != null)
+                changeLogoDepthDelegate = Scheduler.AddDelayed(() => RequestLogoInFront?.Invoke(false), transition_duration);
+        }
 
         protected override void PopIn()
         {
-            this.MoveToY(0, 400, Easing.OutQuint)
-                .FadeIn(400, Easing.OutQuint);
+            this.MoveToY(0, transition_duration, Easing.OutQuint)
+                .FadeIn(transition_duration, Easing.OutQuint);
         }
 
         protected override void PopOut()
         {
-            this.MoveToY(HEIGHT, 400, Easing.OutQuint)
-                .FadeOut(400, Easing.OutQuint);
+            this.MoveToY(HEIGHT, transition_duration, Easing.OutQuint)
+                .FadeOut(transition_duration, Easing.OutQuint);
         }
 
         public void SetButtons(IReadOnlyList<ScreenFooterButton> buttons)
@@ -121,7 +144,7 @@ namespace osu.Game.Screens.Footer
             temporarilyHiddenButtons.Clear();
             overlays.Clear();
 
-            ClearActiveOverlayContainer();
+            clearActiveOverlayContainer();
 
             var oldButtons = buttonsFlow.ToArray();
 
@@ -166,14 +189,15 @@ namespace osu.Game.Screens.Footer
 
         private ShearedOverlayContainer? activeOverlay;
         private Container? contentContainer;
+
         private readonly List<ScreenFooterButton> temporarilyHiddenButtons = new List<ScreenFooterButton>();
 
-        public void SetActiveOverlayContainer(ShearedOverlayContainer overlay)
+        public IDisposable RegisterActiveOverlayContainer(ShearedOverlayContainer overlay, out VisibilityContainer? footerContent)
         {
-            if (contentContainer != null)
+            if (activeOverlay != null)
             {
                 throw new InvalidOperationException(@"Cannot set overlay content while one is already present. " +
-                                                    $@"The previous overlay whose content is {contentContainer.Child.GetType().Name} should be hidden first.");
+                                                    $@"The previous overlay ({activeOverlay.GetType().Name}) should be hidden first.");
             }
 
             activeOverlay = overlay;
@@ -197,7 +221,9 @@ namespace osu.Game.Screens.Footer
 
             updateColourScheme(overlay.ColourProvider.ColourScheme);
 
-            var content = overlay.CreateFooterContent();
+            footerContent = overlay.CreateFooterContent();
+
+            var content = footerContent ?? Empty();
 
             Add(contentContainer = new Container
             {
@@ -211,29 +237,30 @@ namespace osu.Game.Screens.Footer
                 this.Delay(60).Schedule(() => content.Show());
             else
                 content.Show();
+
+            return new InvokeOnDisposal(clearActiveOverlayContainer);
         }
 
-        public void ClearActiveOverlayContainer()
+        private void clearActiveOverlayContainer()
         {
-            if (contentContainer == null)
+            if (activeOverlay == null)
                 return;
 
+            Debug.Assert(contentContainer != null);
             contentContainer.Child.Hide();
 
             double timeUntilRun = contentContainer.Child.LatestTransformEndTime - Time.Current;
-
-            Container expireTarget = contentContainer;
-            contentContainer = null;
-            activeOverlay = null;
 
             for (int i = 0; i < temporarilyHiddenButtons.Count; i++)
                 makeButtonAppearFromBottom(temporarilyHiddenButtons[i], 0);
 
             temporarilyHiddenButtons.Clear();
 
-            expireTarget.Delay(timeUntilRun).Expire();
-
             updateColourScheme(OverlayColourScheme.Aquamarine);
+
+            contentContainer.Delay(timeUntilRun).Expire();
+            contentContainer = null;
+            activeOverlay = null;
         }
 
         private void updateColourScheme(OverlayColourScheme colourScheme)
