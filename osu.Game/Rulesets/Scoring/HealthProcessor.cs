@@ -97,7 +97,7 @@ namespace osu.Game.Rulesets.Scoring
             if (CheckDefaultFailCondition(result))
                 return true;
 
-            foreach (var condition in Mods.Value.OrderByDescending(m => m is IApplicableFailOverride).OfType<IHasFailCondition>())
+            foreach (var condition in Mods.Value.OfType<IHasFailCondition>().OrderByDescending(m => m is IApplicableFailOverride))
             {
                 if (condition.FailCondition(result))
                 {
