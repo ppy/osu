@@ -82,6 +82,7 @@ namespace osu.Game.Screens.Edit
             saveInProgress.BindValueChanged(_ => TestGameplayButton.Enabled.Value = !saveInProgress.Value, true);
             composerFocusMode.BindValueChanged(_ =>
             {
+                // Transforms should be kept in sync with other usages of composer focus mode.
                 foreach (var c in this.ChildrenOfType<BottomBarContainer>())
                 {
                     if (!composerFocusMode.Value)

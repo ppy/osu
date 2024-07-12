@@ -218,6 +218,9 @@ namespace osu.Game.Screens.Edit
         /// This controls the opacity of components like the timelines, sidebars, etc.
         /// In "composer focus" mode the opacity of the aforementioned components is reduced so that the user can focus on the composer better.
         /// </summary>
+        /// <remarks>
+        /// The state of this bindable is controlled by <see cref="HitObjectComposer"/> when in <see cref="EditorScreenMode.Compose"/> mode.
+        /// </remarks>
         public Bindable<bool> ComposerFocusMode { get; } = new Bindable<bool>();
 
         public Editor(EditorLoader loader = null)
@@ -1015,6 +1018,9 @@ namespace osu.Game.Screens.Edit
             }
             finally
             {
+                if (Mode.Value != EditorScreenMode.Compose)
+                    ComposerFocusMode.Value = false;
+
                 updateSampleDisabledState();
                 rebindClipboardBindables();
             }
