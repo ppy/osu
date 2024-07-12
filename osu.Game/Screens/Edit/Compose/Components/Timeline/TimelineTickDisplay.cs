@@ -147,20 +147,12 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
                         var line = getNextUsableLine();
                         line.X = xPos;
-                        line.Width = PointVisualisation.MAX_WIDTH * size.X;
 
-                        if (showTimingChanges.Value)
-                        {
-                            line.Anchor = Anchor.BottomLeft;
-                            line.Origin = Anchor.BottomCentre;
-                            line.Height = 0.7f + size.Y * 0.28f;
-                        }
-                        else
-                        {
-                            line.Anchor = Anchor.CentreLeft;
-                            line.Origin = Anchor.Centre;
-                            line.Height = 0.92f + size.Y * 0.07f;
-                        }
+                        line.Anchor = Anchor.CentreLeft;
+                        line.Origin = Anchor.Centre;
+
+                        line.Height = 0.6f + size.Y * 0.4f;
+                        line.Width = PointVisualisation.MAX_WIDTH * (0.6f + 0.4f * size.X);
 
                         line.Colour = colour;
                     }
