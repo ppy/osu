@@ -75,7 +75,13 @@ namespace osu.Game.Screens.Edit.Compose
                 Children = new Drawable[]
                 {
                     new TimelineBlueprintContainer(composer),
-                    new TimelineBreakDisplay { RelativeSizeAxes = Axes.Both, },
+                    new TimelineBreakDisplay
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Anchor = Anchor.CentreLeft,
+                        Origin = Anchor.CentreLeft,
+                        Height = 0.75f,
+                    },
                 }
             });
         }
