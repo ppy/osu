@@ -23,7 +23,7 @@ namespace osu.Game.Tests.Visual.UserInterface
     {
         private DependencyProvidingContainer contentContainer = null!;
         private ScreenFooter screenFooter = null!;
-        private TestModSelectOverlay overlay = null!;
+        private TestModSelectOverlay modOverlay = null!;
 
         [SetUp]
         public void SetUp() => Schedule(() =>
@@ -39,7 +39,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                 },
                 Children = new Drawable[]
                 {
-                    overlay = new TestModSelectOverlay(),
+                    modOverlay = new TestModSelectOverlay(),
                     new PopoverContainer
                     {
                         RelativeSizeAxes = Axes.Both,
@@ -51,7 +51,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             screenFooter.SetButtons(new ScreenFooterButton[]
             {
-                new ScreenFooterButtonMods(overlay) { Current = SelectedMods },
+                new ScreenFooterButtonMods(modOverlay) { Current = SelectedMods },
                 new ScreenFooterButtonRandom(),
                 new ScreenFooterButtonOptions(),
             });
@@ -178,6 +178,24 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddAssert("footer hidden", () => screenFooter.State.Value == Visibility.Hidden);
         }
 
+        [Test]
+        public void TestLoadOverlayAfterFooterIsDisplayed()
+        {
+            TestShearedOverlayContainer externalOverlay = null!;
+
+            AddStep("show mod overlay", () => modOverlay.Show());
+            AddUntilStep("mod footer content shown", () => this.ChildrenOfType<ModSelectFooterContent>().SingleOrDefault()?.IsPresent, () => Is.True);
+
+            AddStep("add external overlay", () => contentContainer.Add(externalOverlay = new TestShearedOverlayContainer()));
+            AddUntilStep("wait for load", () => externalOverlay.IsLoaded);
+            AddAssert("mod footer content still shown", () => this.ChildrenOfType<ModSelectFooterContent>().SingleOrDefault()?.IsPresent, () => Is.True);
+            AddAssert("external overlay content not shown", () => this.ChildrenOfType<TestShearedOverlayContainer.TestFooterContent>().SingleOrDefault()?.IsPresent, () => Is.Not.True);
+
+            AddStep("hide mod overlay", () => modOverlay.Hide());
+            AddUntilStep("mod footer content hidden", () => this.ChildrenOfType<ModSelectFooterContent>().SingleOrDefault()?.IsPresent, () => Is.Not.True);
+            AddAssert("external overlay content still not shown", () => this.ChildrenOfType<TestShearedOverlayContainer.TestFooterContent>().SingleOrDefault()?.IsPresent, () => Is.Not.True);
+        }
+
         private partial class TestModSelectOverlay : UserModSelectOverlay
         {
             protected override bool ShowPresets => true;
@@ -185,8 +203,6 @@ namespace osu.Game.Tests.Visual.UserInterface
 
         private partial class TestShearedOverlayContainer : ShearedOverlayContainer
         {
-            public override bool UseNewFooter => true;
-
             public TestShearedOverlayContainer()
                 : base(OverlayColourScheme.Orange)
             {
@@ -212,7 +228,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                 return false;
             }
 
-            public override Drawable CreateFooterContent() => new TestFooterContent();
+            public override VisibilityContainer CreateFooterContent() => new TestFooterContent();
 
             public partial class TestFooterContent : VisibilityContainer
             {

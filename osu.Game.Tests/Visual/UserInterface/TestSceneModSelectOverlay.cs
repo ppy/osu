@@ -24,6 +24,7 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Taiko.Mods;
+using osu.Game.Screens.Footer;
 using osu.Game.Tests.Mods;
 using osuTK;
 using osuTK.Input;
@@ -94,12 +95,28 @@ namespace osu.Game.Tests.Visual.UserInterface
 
         private void createScreen()
         {
-            AddStep("create screen", () => Child = modSelectOverlay = new TestModSelectOverlay
+            AddStep("create screen", () =>
             {
-                RelativeSizeAxes = Axes.Both,
-                State = { Value = Visibility.Visible },
-                Beatmap = Beatmap.Value,
-                SelectedMods = { BindTarget = SelectedMods }
+                var receptor = new ScreenFooter.BackReceptor();
+                var footer = new ScreenFooter(receptor);
+
+                Child = new DependencyProvidingContainer
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    CachedDependencies = new[] { (typeof(ScreenFooter), (object)footer) },
+                    Children = new Drawable[]
+                    {
+                        receptor,
+                        modSelectOverlay = new TestModSelectOverlay
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            State = { Value = Visibility.Visible },
+                            Beatmap = { Value = Beatmap.Value },
+                            SelectedMods = { BindTarget = SelectedMods },
+                        },
+                        footer,
+                    }
+                };
             });
             waitForColumnLoad();
         }
@@ -120,7 +137,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddAssert("mod multiplier correct", () =>
             {
                 double multiplier = SelectedMods.Value.Aggregate(1d, (m, mod) => m * mod.ScoreMultiplier);
-                return Precision.AlmostEquals(multiplier, modSelectOverlay.ChildrenOfType<RankingInformationDisplay>().Single().ModMultiplier.Value);
+                return Precision.AlmostEquals(multiplier, this.ChildrenOfType<RankingInformationDisplay>().Single().ModMultiplier.Value);
             });
             assertCustomisationToggleState(disabled: false, active: false);
             AddAssert("setting items created", () => modSelectOverlay.ChildrenOfType<ISettingsItem>().Any());
@@ -135,7 +152,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddAssert("mod multiplier correct", () =>
             {
                 double multiplier = SelectedMods.Value.Aggregate(1d, (m, mod) => m * mod.ScoreMultiplier);
-                return Precision.AlmostEquals(multiplier, modSelectOverlay.ChildrenOfType<RankingInformationDisplay>().Single().ModMultiplier.Value);
+                return Precision.AlmostEquals(multiplier, this.ChildrenOfType<RankingInformationDisplay>().Single().ModMultiplier.Value);
             });
             assertCustomisationToggleState(disabled: false, active: false);
             AddAssert("setting items created", () => modSelectOverlay.ChildrenOfType<ISettingsItem>().Any());
@@ -757,7 +774,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             AddStep("click back button", () =>
             {
-                InputManager.MoveMouseTo(modSelectOverlay.BackButton);
+                InputManager.MoveMouseTo(this.ChildrenOfType<ScreenBackButton>().Single());
                 InputManager.Click(MouseButton.Left);
             });
             AddAssert("mod select hidden", () => modSelectOverlay.State.Value == Visibility.Hidden);
@@ -885,7 +902,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                 InputManager.Click(MouseButton.Left);
             });
             AddAssert("difficulty multiplier display shows correct value",
-                () => modSelectOverlay.ChildrenOfType<RankingInformationDisplay>().Single().ModMultiplier.Value, () => Is.EqualTo(0.1).Within(Precision.DOUBLE_EPSILON));
+                () => this.ChildrenOfType<RankingInformationDisplay>().Single().ModMultiplier.Value, () => Is.EqualTo(0.1).Within(Precision.DOUBLE_EPSILON));
 
             // this is highly unorthodox in a test, but because the `ModSettingChangeTracker` machinery heavily leans on events and object disposal and re-creation,
             // it is instrumental in the reproduction of the failure scenario that this test is supposed to cover.
@@ -895,7 +912,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddStep("reset half time speed to default", () => modSelectOverlay.ChildrenOfType<ModCustomisationPanel>().Single()
                                                                               .ChildrenOfType<RevertToDefaultButton<double>>().Single().TriggerClick());
             AddUntilStep("difficulty multiplier display shows correct value",
-                () => modSelectOverlay.ChildrenOfType<RankingInformationDisplay>().Single().ModMultiplier.Value, () => Is.EqualTo(0.3).Within(Precision.DOUBLE_EPSILON));
+                () => this.ChildrenOfType<RankingInformationDisplay>().Single().ModMultiplier.Value, () => Is.EqualTo(0.3).Within(Precision.DOUBLE_EPSILON));
         }
 
         [Test]
@@ -1015,8 +1032,6 @@ namespace osu.Game.Tests.Visual.UserInterface
         private partial class TestModSelectOverlay : UserModSelectOverlay
         {
             protected override bool ShowPresets => true;
-
-            public new ShearedButton BackButton => base.BackButton;
         }
 
         private class TestUnimplementedMod : Mod
