@@ -35,6 +35,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         public SamplePointPiece(HitObject hitObject)
         {
             HitObject = hitObject;
+            Y = 2.5f;
         }
 
         public bool AlternativeColor { get; init; }

@@ -11,12 +11,15 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Visualisations
     /// </summary>
     public partial class PointVisualisation : Circle
     {
+        public readonly double StartTime;
+
         public const float MAX_WIDTH = 4;
 
         public PointVisualisation(double startTime)
             : this()
         {
             X = (float)startTime;
+            StartTime = startTime;
         }
 
         public PointVisualisation()
@@ -28,7 +31,7 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Visualisations
             Origin = Anchor.Centre;
 
             Width = MAX_WIDTH;
-            Height = 0.75f;
+            Height = 0.4f;
         }
     }
 }
