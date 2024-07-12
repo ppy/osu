@@ -244,6 +244,7 @@ namespace osu.Game.Screens.Play
 
             HealthProcessor = gameplayMods.OfType<IApplicableHealthProcessor>().FirstOrDefault()?.CreateHealthProcessor(playableBeatmap.HitObjects[0].StartTime);
             HealthProcessor ??= ruleset.CreateHealthProcessor(playableBeatmap.HitObjects[0].StartTime);
+            HealthProcessor.Mods.Value = gameplayMods;
             HealthProcessor.ApplyBeatmap(playableBeatmap);
 
             dependencies.CacheAs(HealthProcessor);
@@ -955,7 +956,7 @@ namespace osu.Game.Screens.Play
                     ScoreProcessor.FailScore(Score.ScoreInfo);
                     OnFail();
 
-                    if (HealthProcessor.FailTriggers.OfType<IApplicableFailOverride>().Any(m => m.RestartOnFail))
+                    if (HealthProcessor.TriggeringMod is IApplicableFailOverride mod && mod.RestartOnFail)
                         Restart(true);
                 });
             }
