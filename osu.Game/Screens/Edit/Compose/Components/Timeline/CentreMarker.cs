@@ -2,13 +2,13 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Overlays;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 {
@@ -39,7 +39,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                     RelativeSizeAxes = Axes.Y,
                     Width = bar_width,
                     Blending = BlendingParameters.Additive,
-                    Colour = ColourInfo.GradientVertical(colours.Colour2, Color4.Black),
+                    Colour = ColourInfo.GradientVertical(colours.Colour2.Opacity(0.6f), colours.Colour2.Opacity(0)),
                 },
                 new Triangle
                 {
