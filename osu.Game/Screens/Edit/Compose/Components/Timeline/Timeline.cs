@@ -125,8 +125,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                             MidColour = colours.BlueDark,
                             HighColour = colours.BlueDarker,
                         },
-                        centreMarker.CreateProxy(),
                         ticks.CreateProxy(),
+                        centreMarker.CreateProxy(),
                         new Box
                         {
                             Name = "zero marker",
