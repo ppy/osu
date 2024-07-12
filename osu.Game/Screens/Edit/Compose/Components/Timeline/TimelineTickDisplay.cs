@@ -191,7 +191,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             {
                 PointVisualisation point;
                 if (drawableIndex >= Count)
-                    Add(point = new PointVisualisation());
+                    Add(point = new PointVisualisation(0));
                 else
                     point = Children[drawableIndex];
 
