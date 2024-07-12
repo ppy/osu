@@ -37,12 +37,12 @@ namespace osu.Game.Rulesets.Scoring
         /// <summary>
         /// Mod that triggered failure
         /// </summary>
-        public Mod? TriggeringMod;
+        public Mod? ModTriggeringFailure;
 
         /// <summary>
         /// Immediately triggers a failure for this HealthProcessor.
         /// </summary>
-        public void TriggerFailure(Mod? Trigger = null)
+        public void TriggerFailure(Mod? triggeringMod = null)
         {
             if (HasFailed)
                 return;
@@ -50,8 +50,8 @@ namespace osu.Game.Rulesets.Scoring
             if (Failed?.Invoke() != false)
                 HasFailed = true;
 
-            if (Trigger != null)
-                TriggeringMod = Trigger;
+            if (triggeringMod != null)
+                ModTriggeringFailure = triggeringMod;
         }
 
         protected override void ApplyResultInternal(JudgementResult result)
@@ -101,7 +101,7 @@ namespace osu.Game.Rulesets.Scoring
             {
                 if (condition.FailCondition(result))
                 {
-                    TriggeringMod = condition as Mod;
+                    ModTriggeringFailure = condition as Mod;
                     return true;
                 }
             }

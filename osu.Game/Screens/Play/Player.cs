@@ -956,7 +956,7 @@ namespace osu.Game.Screens.Play
                     ScoreProcessor.FailScore(Score.ScoreInfo);
                     OnFail();
 
-                    if (HealthProcessor.TriggeringMod is IApplicableFailOverride mod && mod.RestartOnFail)
+                    if (HealthProcessor.ModTriggeringFailure is IApplicableFailOverride mod && mod.RestartOnFail)
                         Restart(true);
                 });
             }
