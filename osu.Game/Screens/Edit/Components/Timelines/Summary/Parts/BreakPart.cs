@@ -51,7 +51,7 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
 
         private partial class BreakVisualisation : PoolableDrawable, IHasTooltip
         {
-            private BreakPeriod breakPeriod;
+            private BreakPeriod breakPeriod = null!;
 
             public BreakPeriod BreakPeriod
             {
