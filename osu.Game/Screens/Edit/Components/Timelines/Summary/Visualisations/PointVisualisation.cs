@@ -16,13 +16,6 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Visualisations
         public const float MAX_WIDTH = 4;
 
         public PointVisualisation(double startTime)
-            : this()
-        {
-            X = (float)startTime;
-            StartTime = startTime;
-        }
-
-        public PointVisualisation()
         {
             RelativePositionAxes = Axes.Both;
             RelativeSizeAxes = Axes.Y;
@@ -32,6 +25,9 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Visualisations
 
             Width = MAX_WIDTH;
             Height = 0.4f;
+
+            X = (float)startTime;
+            StartTime = startTime;
         }
     }
 }

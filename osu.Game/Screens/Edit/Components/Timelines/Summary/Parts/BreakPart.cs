@@ -4,9 +4,12 @@
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Pooling;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Localisation;
 using osu.Game.Beatmaps.Timing;
+using osu.Game.Extensions;
 using osu.Game.Graphics;
 
 namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
@@ -46,12 +49,15 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
             }, true);
         }
 
-        private partial class BreakVisualisation : PoolableDrawable
+        private partial class BreakVisualisation : PoolableDrawable, IHasTooltip
         {
+            private BreakPeriod breakPeriod;
+
             public BreakPeriod BreakPeriod
             {
                 set
                 {
+                    breakPeriod = value;
                     X = (float)value.StartTime;
                     Width = (float)value.Duration;
                 }
@@ -66,6 +72,8 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
                 InternalChild = new Circle { RelativeSizeAxes = Axes.Both };
                 Colour = colours.Gray6;
             }
+
+            public LocalisableString TooltipText => $"{breakPeriod.StartTime.ToEditorFormattedString()} - {breakPeriod.EndTime.ToEditorFormattedString()} break time";
         }
     }
 }
