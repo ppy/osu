@@ -84,7 +84,7 @@ namespace osu.Game
     public partial class OsuGame : OsuGameBase, IKeyBindingHandler<GlobalAction>, ILocalUserPlayInfo, IPerformFromScreenRunner, IOverlayManager, ILinkHandler
     {
 #if DEBUG
-        // Different port allows runnning release and debug builds alongside each other.
+        // Different port allows running release and debug builds alongside each other.
         public const int IPC_PORT = 44824;
 #else
         public const int IPC_PORT = 44823;
@@ -136,8 +136,6 @@ namespace osu.Game
         private Container footerBasedOverlayContent;
 
         protected ScalingContainer ScreenContainer { get; private set; }
-
-        private Container logoContainer;
 
         protected Container ScreenOffsetContainer { get; private set; }
 
@@ -953,6 +951,8 @@ namespace osu.Game
             });
 
             Add(sessionIdleTracker);
+
+            Container logoContainer;
 
             AddRange(new Drawable[]
             {
