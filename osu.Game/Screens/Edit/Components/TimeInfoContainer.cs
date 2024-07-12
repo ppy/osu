@@ -17,6 +17,8 @@ namespace osu.Game.Screens.Edit.Components
 {
     public partial class TimeInfoContainer : BottomBarContainer
     {
+        private OsuSpriteText bpm = null!;
+
         [Resolved]
         private EditorBeatmap editorBeatmap { get; set; } = null!;
 
@@ -24,14 +26,36 @@ namespace osu.Game.Screens.Edit.Components
         private EditorClock editorClock { get; set; } = null!;
 
         [BackgroundDependencyLoader]
-        private void load(OverlayColourProvider colourProvider)
+        private void load(OsuColour colours, OverlayColourProvider colourProvider)
         {
             Background.Colour = colourProvider.Background5;
 
             Children = new Drawable[]
             {
                 new TimestampControl(),
+                bpm = new OsuSpriteText
+                {
+                    Colour = colours.Orange1,
+                    Anchor = Anchor.CentreLeft,
+                    Font = OsuFont.Torus.With(size: 14, weight: FontWeight.SemiBold),
+                    Position = new Vector2(2, 4),
+                }
             };
+        }
+
+        private double? lastBPM;
+
+        protected override void Update()
+        {
+            base.Update();
+
+            double newBPM = editorBeatmap.ControlPointInfo.TimingPointAt(editorClock.CurrentTime).BPM;
+
+            if (lastBPM != newBPM)
+            {
+                lastBPM = newBPM;
+                bpm.Text = @$"{newBPM:0} BPM";
+            }
         }
 
         private partial class TimestampControl : OsuClickableContainer
@@ -63,7 +87,8 @@ namespace osu.Game.Screens.Edit.Components
                         RelativeSizeAxes = Axes.Both,
                         Padding = new MarginPadding
                         {
-                            Top = 5,
+                            Top = 4,
+                            Bottom = 1,
                             Horizontal = -2
                         },
                         Child = new Container
@@ -83,12 +108,13 @@ namespace osu.Game.Screens.Edit.Components
                         Anchor = Anchor.CentreLeft,
                         Origin = Anchor.CentreLeft,
                         Spacing = new Vector2(-2, 0),
-                        Font = OsuFont.Torus.With(size: 36, fixedWidth: true, weight: FontWeight.Light),
+                        Font = OsuFont.Torus.With(size: 32, fixedWidth: true, weight: FontWeight.Light),
                     },
-                    inputTextBox = new OsuTextBox
+                    inputTextBox = new TimestampTextBox
                     {
-                        Width = 150,
-                        Height = 36,
+                        Position = new Vector2(-2, 4),
+                        Width = 128,
+                        Height = 26,
                         Alpha = 0,
                         CommitOnFocusLost = true,
                     },
@@ -134,6 +160,14 @@ namespace osu.Game.Screens.Edit.Components
                 {
                     hoverLayer.FadeTo(shouldShowHoverLayer ? 0.2f : 0, 400, Easing.OutQuint);
                     showingHoverLayer = shouldShowHoverLayer;
+                }
+            }
+
+            private partial class TimestampTextBox : OsuTextBox
+            {
+                public TimestampTextBox()
+                {
+                    TextContainer.Height = 0.8f;
                 }
             }
         }
