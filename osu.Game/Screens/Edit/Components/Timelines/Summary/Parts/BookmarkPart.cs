@@ -24,6 +24,7 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
             public BookmarkVisualisation(double startTime)
                 : base(startTime)
             {
+                Width = 2;
             }
 
             [BackgroundDependencyLoader]

@@ -64,7 +64,7 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
                 RelativeSizeAxes = Axes.Both;
 
                 InternalChild = new Circle { RelativeSizeAxes = Axes.Both };
-                Colour = colours.Gray7;
+                Colour = colours.Gray6;
             }
         }
     }
