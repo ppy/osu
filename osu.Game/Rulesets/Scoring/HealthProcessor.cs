@@ -20,9 +20,9 @@ namespace osu.Game.Rulesets.Scoring
         public event Func<bool>? Failed;
 
         /// <summary>
-        /// Additional conditions on top of <see cref="CheckDefaultFailCondition"/> that cause a failing state.
+        /// List of Mods that are being iterated in <see cref="meetsAnyFailCondition"/>
         /// </summary>
-        public List<IHasFailCondition> FailConditions = new List<IHasFailCondition>();
+        public readonly Bindable<IReadOnlyList<Mod>> Mods = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
 
         /// <summary>
         /// The current health.
@@ -35,14 +35,14 @@ namespace osu.Game.Rulesets.Scoring
         public bool HasFailed { get; private set; }
 
         /// <summary>
-        /// List of triggers that caused fail
+        /// Mod that triggered failure
         /// </summary>
-        public List<IHasFailCondition> FailTriggers = new List<IHasFailCondition>();
+        public Mod? TriggeringMod;
 
         /// <summary>
         /// Immediately triggers a failure for this HealthProcessor.
         /// </summary>
-        public void TriggerFailure(IHasFailCondition? Trigger = null)
+        public void TriggerFailure(Mod? Trigger = null)
         {
             if (HasFailed)
                 return;
@@ -51,7 +51,7 @@ namespace osu.Game.Rulesets.Scoring
                 HasFailed = true;
 
             if (Trigger != null)
-                FailTriggers.Add(Trigger);
+                TriggeringMod = Trigger;
         }
 
         protected override void ApplyResultInternal(JudgementResult result)
@@ -97,16 +97,13 @@ namespace osu.Game.Rulesets.Scoring
             if (CheckDefaultFailCondition(result))
                 return true;
 
-            if (FailConditions.Any())
+            foreach (var condition in Mods.Value.OfType<IHasFailCondition>())
             {
-                foreach (var condition in FailConditions)
+                if (condition.FailCondition(result))
                 {
-                    if (condition.FailCondition(result))
-                        FailTriggers.Add(condition);
-                }
-
-                if (FailTriggers.Any())
+                    TriggeringMod = condition as Mod;
                     return true;
+                }
             }
 
             return false;
