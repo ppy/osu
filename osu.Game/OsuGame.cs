@@ -297,8 +297,6 @@ namespace osu.Game
             if (hideToolbar) Toolbar.Hide();
         }
 
-        public void ChangeLogoDepth(bool inFrontOfFooter) => ScreenContainer.ChangeChildDepth(logoContainer, inFrontOfFooter ? float.MinValue : 0);
-
         protected override UserInputManager CreateUserInputManager()
         {
             var userInputManager = base.CreateUserInputManager();
@@ -996,6 +994,7 @@ namespace osu.Game
                                     RelativeSizeAxes = Axes.Both,
                                     Child = ScreenFooter = new ScreenFooter(backReceptor)
                                     {
+                                        RequestLogoInFront = inFront => ScreenContainer.ChangeChildDepth(logoContainer, inFront ? float.MinValue : 0),
                                         OnBack = () =>
                                         {
                                             if (!(ScreenStack.CurrentScreen is IOsuScreen currentScreen))
