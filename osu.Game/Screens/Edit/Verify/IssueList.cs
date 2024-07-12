@@ -5,6 +5,8 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -90,19 +92,34 @@ namespace osu.Game.Screens.Edit.Verify
             Refresh();
         }
 
+        [CanBeNull]
+        private Task refreshOperation;
+
         public void Refresh()
         {
-            var issues = generalVerifier.Run(context);
-
-            if (rulesetVerifier != null)
-                issues = issues.Concat(rulesetVerifier.Run(context));
-
-            issues = filter(issues);
+            if (refreshOperation?.IsCompleted == false)
+                return;
 
             table.Issues.Clear();
-            table.Issues.AddRange(issues
-                                  .OrderBy(issue => issue.Template.Type)
-                                  .ThenBy(issue => issue.Check.Metadata.Category));
+
+            refreshOperation = Task.Run(() =>
+            {
+                IEnumerable<Issue> issues = generalVerifier.Run(context);
+
+                if (rulesetVerifier != null)
+                    issues = issues.Concat(rulesetVerifier.Run(context));
+
+                issues = filter(issues)
+                         .OrderBy(issue => issue.Template.Type)
+                         .ThenBy(issue => issue.Check.Metadata.Category)
+                         .ToArray();
+
+                Schedule(() =>
+                {
+                    table.Issues.AddRange(issues);
+                    refreshOperation = null;
+                });
+            });
         }
 
         private IEnumerable<Issue> filter(IEnumerable<Issue> issues)
