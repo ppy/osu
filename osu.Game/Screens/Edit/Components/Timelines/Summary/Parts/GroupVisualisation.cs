@@ -39,7 +39,10 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
                     switch (point)
                     {
                         case TimingControlPoint:
-                            AddInternal(new ControlPointVisualisation(point));
+                            AddInternal(new ControlPointVisualisation(point)
+                            {
+                                Y = -0.4f,
+                            });
                             break;
 
                         case EffectControlPoint effect:

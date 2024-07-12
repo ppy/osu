@@ -3,7 +3,6 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -96,10 +95,9 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
                     RelativeSizeAxes = Axes.Both,
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.CentreLeft,
-                    Width = 1,
-                    Height = 0.75f,
+                    Height = 0.4f,
                     Depth = float.MaxValue,
-                    Colour = effect.GetRepresentingColour(colours).Darken(0.5f),
+                    Colour = effect.GetRepresentingColour(colours),
                 });
             }
         }
