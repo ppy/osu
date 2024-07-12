@@ -44,6 +44,8 @@ namespace osu.Game.Screens.Footer
 
         public ScreenBackButton BackButton { get; private set; } = null!;
 
+        public Action<bool>? RequestLogoInFront { get; set; }
+
         public Action? OnBack;
 
         public ScreenFooter(BackReceptor? receptor = null)
@@ -114,7 +116,7 @@ namespace osu.Game.Screens.Footer
             changeLogoDepthDelegate = null;
 
             logoTrackingContainer.StartTracking(logo, duration, easing);
-            game?.ChangeLogoDepth(inFrontOfFooter: true);
+            RequestLogoInFront?.Invoke(true);
         }
 
         public void StopTrackingLogo()
@@ -122,7 +124,7 @@ namespace osu.Game.Screens.Footer
             logoTrackingContainer.StopTracking();
 
             if (game != null)
-                changeLogoDepthDelegate = Scheduler.AddDelayed(() => game.ChangeLogoDepth(inFrontOfFooter: false), transition_duration);
+                changeLogoDepthDelegate = Scheduler.AddDelayed(() => RequestLogoInFront?.Invoke(false), transition_duration);
         }
 
         protected override void PopIn()
