@@ -9,7 +9,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Overlays;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 {
@@ -40,7 +39,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                     RelativeSizeAxes = Axes.Y,
                     Width = bar_width,
                     Blending = BlendingParameters.Additive,
-                    Colour = ColourInfo.GradientVertical(colours.Colour2, Color4.Black),
+                    Colour = ColourInfo.GradientVertical(colours.Colour2.Opacity(0.6f), colours.Colour2.Opacity(0)),
                 },
                 new Triangle
                 {
