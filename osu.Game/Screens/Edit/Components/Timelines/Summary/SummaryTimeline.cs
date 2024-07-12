@@ -71,7 +71,7 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary
                     Anchor = Anchor.Centre,
                     Origin = Anchor.TopCentre,
                     RelativeSizeAxes = Axes.Both,
-                    Height = 0.35f
+                    Height = 0.4f
                 },
                 new BreakPart
                 {
