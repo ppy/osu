@@ -23,27 +23,6 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary
 
             Children = new Drawable[]
             {
-                new ControlPointPart
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.BottomCentre,
-                    RelativeSizeAxes = Axes.Both,
-                    Height = 0.35f
-                },
-                new BookmarkPart
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.TopCentre,
-                    RelativeSizeAxes = Axes.Both,
-                    Height = 0.35f
-                },
-                new PreviewTimePart
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.TopCentre,
-                    RelativeSizeAxes = Axes.Both,
-                    Height = 0.35f
-                },
                 new Container
                 {
                     Name = "centre line",
@@ -72,6 +51,27 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary
                             Size = new Vector2(5)
                         },
                     }
+                },
+                new PreviewTimePart
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.TopCentre,
+                    RelativeSizeAxes = Axes.Both,
+                    Height = 0.4f,
+                },
+                new ControlPointPart
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.BottomCentre,
+                    RelativeSizeAxes = Axes.Both,
+                    Height = 0.4f
+                },
+                new BookmarkPart
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.TopCentre,
+                    RelativeSizeAxes = Axes.Both,
+                    Height = 0.35f
                 },
                 new BreakPart
                 {
