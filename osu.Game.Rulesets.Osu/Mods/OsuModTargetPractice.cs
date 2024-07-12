@@ -33,7 +33,7 @@ using osuTK.Graphics;
 namespace osu.Game.Rulesets.Osu.Mods
 {
     public class OsuModTargetPractice : ModWithVisibilityAdjustment, IApplicableToDrawableRuleset<OsuHitObject>,
-                                        IApplicableToHealthProcessor, IApplicableToDifficulty, IApplicableFailOverride, IHasSeed, IHidesApproachCircles, IHasFailCondition
+                                        IApplicableToDifficulty, IApplicableFailOverride, IHasSeed, IHidesApproachCircles, IHasFailCondition
     {
         public override string Name => "Target Practice";
         public override string Acronym => "TP";
@@ -108,11 +108,6 @@ namespace osu.Game.Rulesets.Osu.Mods
         public bool FailCondition(JudgementResult result)
                 => result.Type.AffectsCombo()
                    && !result.IsHit;
-
-        public void ApplyToHealthProcessor(HealthProcessor healthProcessor)
-        {
-            healthProcessor.FailConditions.Add(this);
-        }
 
         #endregion
 

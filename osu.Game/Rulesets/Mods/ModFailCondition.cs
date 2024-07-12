@@ -20,12 +20,11 @@ namespace osu.Game.Rulesets.Mods
 
         public virtual bool RestartOnFail => Restart.Value;
 
-        private Action<IHasFailCondition>? triggerFailureDelegate;
+        private Action<Mod>? triggerFailureDelegate;
 
         public void ApplyToHealthProcessor(HealthProcessor healthProcessor)
         {
             triggerFailureDelegate = healthProcessor.TriggerFailure;
-            healthProcessor.FailConditions.Add(this);
         }
 
         /// <summary>
