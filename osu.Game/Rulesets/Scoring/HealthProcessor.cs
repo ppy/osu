@@ -42,6 +42,7 @@ namespace osu.Game.Rulesets.Scoring
         /// <summary>
         /// Immediately triggers a failure for this HealthProcessor.
         /// </summary>
+        /// <param name="triggeringMod">An optional mod that triggered failure.</param>
         public void TriggerFailure(Mod? triggeringMod = null)
         {
             if (HasFailed)
