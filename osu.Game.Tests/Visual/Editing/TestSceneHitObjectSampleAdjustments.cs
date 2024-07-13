@@ -13,9 +13,12 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Edit;
+using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.UI;
+using osu.Game.Screens.Edit.Components.TernaryButtons;
 using osu.Game.Screens.Edit.Compose.Components.Timeline;
 using osu.Game.Screens.Edit.Timing;
 using osu.Game.Tests.Beatmaps;
@@ -79,10 +82,10 @@ namespace osu.Game.Tests.Visual.Editing
         }
 
         [Test]
-        public void TestPopoverHasFocus()
+        public void TestPopoverHasNoFocus()
         {
             clickSamplePiece(0);
-            samplePopoverHasFocus();
+            samplePopoverHasNoFocus();
         }
 
         [Test]
@@ -227,6 +230,84 @@ namespace osu.Game.Tests.Visual.Editing
         }
 
         [Test]
+        public void TestPopoverAddSampleAddition()
+        {
+            clickSamplePiece(0);
+
+            setBankViaPopover(HitSampleInfo.BANK_SOFT);
+            hitObjectHasSampleBank(0, HitSampleInfo.BANK_SOFT);
+
+            toggleAdditionViaPopover(0);
+
+            hitObjectHasSampleBank(0, HitSampleInfo.BANK_SOFT);
+            hitObjectHasSamples(0, HitSampleInfo.HIT_NORMAL, HitSampleInfo.HIT_WHISTLE);
+
+            setAdditionBankViaPopover(HitSampleInfo.BANK_DRUM);
+
+            hitObjectHasSampleNormalBank(0, HitSampleInfo.BANK_SOFT);
+            hitObjectHasSampleAdditionBank(0, HitSampleInfo.BANK_DRUM);
+
+            toggleAdditionViaPopover(0);
+
+            hitObjectHasSampleBank(0, HitSampleInfo.BANK_SOFT);
+            hitObjectHasSamples(0, HitSampleInfo.HIT_NORMAL);
+        }
+
+        [Test]
+        public void TestNodeSamplePopover()
+        {
+            AddStep("add slider", () =>
+            {
+                EditorBeatmap.Clear();
+                EditorBeatmap.Add(new Slider
+                {
+                    Position = new Vector2(256, 256),
+                    StartTime = 0,
+                    Path = new SliderPath(new[] { new PathControlPoint(Vector2.Zero), new PathControlPoint(new Vector2(250, 0)) }),
+                    Samples =
+                    {
+                        new HitSampleInfo(HitSampleInfo.HIT_NORMAL)
+                    },
+                    NodeSamples =
+                    {
+                        new List<HitSampleInfo> { new HitSampleInfo(HitSampleInfo.HIT_NORMAL) },
+                        new List<HitSampleInfo> { new HitSampleInfo(HitSampleInfo.HIT_NORMAL) },
+                    }
+                });
+            });
+
+            clickNodeSamplePiece(0, 1);
+
+            setBankViaPopover(HitSampleInfo.BANK_SOFT);
+            hitObjectNodeHasSampleBank(0, 0, HitSampleInfo.BANK_NORMAL);
+            hitObjectNodeHasSampleBank(0, 1, HitSampleInfo.BANK_SOFT);
+
+            toggleAdditionViaPopover(0);
+
+            hitObjectNodeHasSampleBank(0, 0, HitSampleInfo.BANK_NORMAL);
+            hitObjectNodeHasSampleBank(0, 1, HitSampleInfo.BANK_SOFT);
+            hitObjectNodeHasSamples(0, 0, HitSampleInfo.HIT_NORMAL);
+            hitObjectNodeHasSamples(0, 1, HitSampleInfo.HIT_NORMAL, HitSampleInfo.HIT_WHISTLE);
+
+            setAdditionBankViaPopover(HitSampleInfo.BANK_DRUM);
+
+            hitObjectNodeHasSampleBank(0, 0, HitSampleInfo.BANK_NORMAL);
+            hitObjectNodeHasSampleNormalBank(0, 1, HitSampleInfo.BANK_SOFT);
+            hitObjectNodeHasSampleAdditionBank(0, 1, HitSampleInfo.BANK_DRUM);
+
+            toggleAdditionViaPopover(0);
+
+            hitObjectNodeHasSampleBank(0, 1, HitSampleInfo.BANK_SOFT);
+            hitObjectNodeHasSamples(0, 0, HitSampleInfo.HIT_NORMAL);
+            hitObjectNodeHasSamples(0, 1, HitSampleInfo.HIT_NORMAL);
+
+            setVolumeViaPopover(10);
+
+            hitObjectNodeHasSampleVolume(0, 0, 100);
+            hitObjectNodeHasSampleVolume(0, 1, 10);
+        }
+
+        [Test]
         public void TestHotkeysMultipleSelectionWithSameSampleBank()
         {
             AddStep("unify sample bank", () =>
@@ -321,6 +402,107 @@ namespace osu.Game.Tests.Visual.Editing
             void checkPlacementSample(string expected) => AddAssert($"Placement sample is {expected}", () => EditorBeatmap.PlacementObject.Value.Samples.First().Bank, () => Is.EqualTo(expected));
         }
 
+        [Test]
+        public void TestHotkeysAffectNodeSamples()
+        {
+            AddStep("add slider", () =>
+            {
+                EditorBeatmap.Add(new Slider
+                {
+                    Position = new Vector2(256, 256),
+                    StartTime = 1000,
+                    Path = new SliderPath(new[] { new PathControlPoint(Vector2.Zero), new PathControlPoint(new Vector2(250, 0)) }),
+                    Samples =
+                    {
+                        new HitSampleInfo(HitSampleInfo.HIT_NORMAL)
+                    },
+                    NodeSamples = new List<IList<HitSampleInfo>>
+                    {
+                        new List<HitSampleInfo>
+                        {
+                            new HitSampleInfo(HitSampleInfo.HIT_NORMAL, bank: HitSampleInfo.BANK_DRUM),
+                            new HitSampleInfo(HitSampleInfo.HIT_CLAP, bank: HitSampleInfo.BANK_DRUM),
+                        },
+                        new List<HitSampleInfo>
+                        {
+                            new HitSampleInfo(HitSampleInfo.HIT_NORMAL, bank: HitSampleInfo.BANK_SOFT),
+                            new HitSampleInfo(HitSampleInfo.HIT_WHISTLE, bank: HitSampleInfo.BANK_SOFT),
+                        },
+                    }
+                });
+            });
+            AddStep("select everything", () => EditorBeatmap.SelectedHitObjects.AddRange(EditorBeatmap.HitObjects));
+
+            AddStep("add clap addition", () => InputManager.Key(Key.R));
+
+            hitObjectHasSampleBank(0, HitSampleInfo.BANK_NORMAL);
+            hitObjectHasSamples(0, HitSampleInfo.HIT_NORMAL, HitSampleInfo.HIT_CLAP);
+
+            hitObjectHasSampleBank(1, HitSampleInfo.BANK_SOFT);
+            hitObjectHasSamples(1, HitSampleInfo.HIT_NORMAL, HitSampleInfo.HIT_CLAP);
+
+            hitObjectHasSampleBank(2, HitSampleInfo.BANK_NORMAL);
+            hitObjectHasSamples(2, HitSampleInfo.HIT_NORMAL, HitSampleInfo.HIT_CLAP);
+            hitObjectNodeHasSampleBank(2, 0, HitSampleInfo.BANK_DRUM);
+            hitObjectNodeHasSamples(2, 0, HitSampleInfo.HIT_NORMAL, HitSampleInfo.HIT_CLAP);
+            hitObjectNodeHasSampleBank(2, 1, HitSampleInfo.BANK_SOFT);
+            hitObjectNodeHasSamples(2, 1, HitSampleInfo.HIT_NORMAL, HitSampleInfo.HIT_WHISTLE, HitSampleInfo.HIT_CLAP);
+
+            AddStep("remove clap addition", () => InputManager.Key(Key.R));
+
+            hitObjectHasSampleBank(0, HitSampleInfo.BANK_NORMAL);
+            hitObjectHasSamples(0, HitSampleInfo.HIT_NORMAL);
+
+            hitObjectHasSampleBank(1, HitSampleInfo.BANK_SOFT);
+            hitObjectHasSamples(1, HitSampleInfo.HIT_NORMAL);
+
+            hitObjectHasSampleBank(2, HitSampleInfo.BANK_NORMAL);
+            hitObjectHasSamples(2, HitSampleInfo.HIT_NORMAL);
+            hitObjectNodeHasSampleBank(2, 0, HitSampleInfo.BANK_DRUM);
+            hitObjectNodeHasSamples(2, 0, HitSampleInfo.HIT_NORMAL);
+            hitObjectNodeHasSampleBank(2, 1, HitSampleInfo.BANK_SOFT);
+            hitObjectNodeHasSamples(2, 1, HitSampleInfo.HIT_NORMAL, HitSampleInfo.HIT_WHISTLE);
+
+            AddStep("set drum bank", () =>
+            {
+                InputManager.PressKey(Key.LShift);
+                InputManager.Key(Key.R);
+                InputManager.ReleaseKey(Key.LShift);
+            });
+
+            hitObjectHasSampleBank(0, HitSampleInfo.BANK_DRUM);
+            hitObjectHasSamples(0, HitSampleInfo.HIT_NORMAL);
+
+            hitObjectHasSampleBank(1, HitSampleInfo.BANK_DRUM);
+            hitObjectHasSamples(1, HitSampleInfo.HIT_NORMAL);
+
+            hitObjectHasSampleBank(2, HitSampleInfo.BANK_DRUM);
+            hitObjectHasSamples(2, HitSampleInfo.HIT_NORMAL);
+            hitObjectNodeHasSampleBank(2, 0, HitSampleInfo.BANK_DRUM);
+            hitObjectNodeHasSamples(2, 0, HitSampleInfo.HIT_NORMAL);
+            hitObjectNodeHasSampleBank(2, 1, HitSampleInfo.BANK_DRUM);
+            hitObjectNodeHasSamples(2, 1, HitSampleInfo.HIT_NORMAL, HitSampleInfo.HIT_WHISTLE);
+        }
+
+        [Test]
+        public void TestSelectingObjectDoesNotMutateSamples()
+        {
+            clickSamplePiece(0);
+            toggleAdditionViaPopover(1);
+            setAdditionBankViaPopover(HitSampleInfo.BANK_SOFT);
+            dismissPopover();
+
+            hitObjectHasSamples(0, HitSampleInfo.HIT_NORMAL, HitSampleInfo.HIT_FINISH);
+            hitObjectHasSampleNormalBank(0, HitSampleInfo.BANK_NORMAL);
+            hitObjectHasSampleAdditionBank(0, HitSampleInfo.BANK_SOFT);
+
+            AddStep("select first object", () => EditorBeatmap.SelectedHitObjects.Add(EditorBeatmap.HitObjects[0]));
+
+            hitObjectHasSamples(0, HitSampleInfo.HIT_NORMAL, HitSampleInfo.HIT_FINISH);
+            hitObjectHasSampleNormalBank(0, HitSampleInfo.BANK_NORMAL);
+            hitObjectHasSampleAdditionBank(0, HitSampleInfo.BANK_SOFT);
+        }
+
         private void clickSamplePiece(int objectIndex) => AddStep($"click {objectIndex.ToOrdinalWords()} sample piece", () =>
         {
             var samplePiece = this.ChildrenOfType<SamplePointPiece>().Single(piece => piece.HitObject == EditorBeatmap.HitObjects.ElementAt(objectIndex));
@@ -329,13 +511,21 @@ namespace osu.Game.Tests.Visual.Editing
             InputManager.Click(MouseButton.Left);
         });
 
-        private void samplePopoverHasFocus() => AddUntilStep("sample popover textbox focused", () =>
+        private void clickNodeSamplePiece(int objectIndex, int nodeIndex) => AddStep($"click {objectIndex.ToOrdinalWords()} object {nodeIndex.ToOrdinalWords()} node sample piece", () =>
+        {
+            var samplePiece = this.ChildrenOfType<NodeSamplePointPiece>().Where(piece => piece.HitObject == EditorBeatmap.HitObjects.ElementAt(objectIndex)).ToArray()[nodeIndex];
+
+            InputManager.MoveMouseTo(samplePiece);
+            InputManager.Click(MouseButton.Left);
+        });
+
+        private void samplePopoverHasNoFocus() => AddUntilStep("sample popover textbox not focused", () =>
         {
             var popover = this.ChildrenOfType<SamplePointPiece.SampleEditPopover>().SingleOrDefault();
             var slider = popover?.ChildrenOfType<IndeterminateSliderWithTextBoxInput<int>>().Single();
             var textbox = slider?.ChildrenOfType<OsuTextBox>().Single();
 
-            return textbox?.HasFocus == true;
+            return textbox?.HasFocus == false;
         });
 
         private void samplePopoverHasSingleVolume(int volume) => AddUntilStep($"sample popover has volume {volume}", () =>
@@ -372,7 +562,6 @@ namespace osu.Game.Tests.Visual.Editing
 
         private void dismissPopover()
         {
-            AddStep("unfocus textbox", () => InputManager.Key(Key.Escape));
             AddStep("dismiss popover", () => InputManager.Key(Key.Escape));
             AddUntilStep("wait for dismiss", () => !this.ChildrenOfType<SamplePointPiece.SampleEditPopover>().Any(popover => popover.IsPresent));
         }
@@ -390,6 +579,12 @@ namespace osu.Game.Tests.Visual.Editing
             return h.Samples.All(o => o.Volume == volume);
         });
 
+        private void hitObjectNodeHasSampleVolume(int objectIndex, int nodeIndex, int volume) => AddAssert($"{objectIndex.ToOrdinalWords()} object {nodeIndex.ToOrdinalWords()} node has volume {volume}", () =>
+        {
+            var h = EditorBeatmap.HitObjects.ElementAt(objectIndex) as IHasRepeats;
+            return h is not null && h.NodeSamples[nodeIndex].All(o => o.Volume == volume);
+        });
+
         private void setBankViaPopover(string bank) => AddStep($"set bank {bank} via popover", () =>
         {
             var popover = this.ChildrenOfType<SamplePointPiece.SampleEditPopover>().Single();
@@ -399,6 +594,26 @@ namespace osu.Game.Tests.Visual.Editing
             // this is needed when testing attempting to set empty bank - which should revert to the previous value, but only on commit.
             ((IFocusManager)InputManager).ChangeFocus(textBox);
             InputManager.Key(Key.Enter);
+        });
+
+        private void setAdditionBankViaPopover(string bank) => AddStep($"set addition bank {bank} via popover", () =>
+        {
+            var popover = this.ChildrenOfType<SamplePointPiece.SampleEditPopover>().Single();
+            var textBox = popover.ChildrenOfType<LabelledTextBox>().ToArray()[1];
+            textBox.Current.Value = bank;
+            // force a commit via keyboard.
+            // this is needed when testing attempting to set empty bank - which should revert to the previous value, but only on commit.
+            ((IFocusManager)InputManager).ChangeFocus(textBox);
+            InputManager.Key(Key.Enter);
+        });
+
+        private void toggleAdditionViaPopover(int index) => AddStep($"toggle addition {index} via popover", () =>
+        {
+            var popover = this.ChildrenOfType<SamplePointPiece.SampleEditPopover>().First();
+            var ternaryButton = popover.ChildrenOfType<DrawableTernaryButton>().ToArray()[index];
+            InputManager.MoveMouseTo(ternaryButton);
+            InputManager.PressButton(MouseButton.Left);
+            InputManager.ReleaseButton(MouseButton.Left);
         });
 
         private void hitObjectHasSamples(int objectIndex, params string[] samples) => AddAssert($"{objectIndex.ToOrdinalWords()} has samples {string.Join(',', samples)}", () =>
@@ -411,6 +626,42 @@ namespace osu.Game.Tests.Visual.Editing
         {
             var h = EditorBeatmap.HitObjects.ElementAt(objectIndex);
             return h.Samples.All(o => o.Bank == bank);
+        });
+
+        private void hitObjectHasSampleNormalBank(int objectIndex, string bank) => AddAssert($"{objectIndex.ToOrdinalWords()} has normal bank {bank}", () =>
+        {
+            var h = EditorBeatmap.HitObjects.ElementAt(objectIndex);
+            return h.Samples.Where(o => o.Name == HitSampleInfo.HIT_NORMAL).All(o => o.Bank == bank);
+        });
+
+        private void hitObjectHasSampleAdditionBank(int objectIndex, string bank) => AddAssert($"{objectIndex.ToOrdinalWords()} has addition bank {bank}", () =>
+        {
+            var h = EditorBeatmap.HitObjects.ElementAt(objectIndex);
+            return h.Samples.Where(o => o.Name != HitSampleInfo.HIT_NORMAL).All(o => o.Bank == bank);
+        });
+
+        private void hitObjectNodeHasSamples(int objectIndex, int nodeIndex, params string[] samples) => AddAssert($"{objectIndex.ToOrdinalWords()} object {nodeIndex.ToOrdinalWords()} node has samples {string.Join(',', samples)}", () =>
+        {
+            var h = EditorBeatmap.HitObjects.ElementAt(objectIndex) as IHasRepeats;
+            return h is not null && h.NodeSamples[nodeIndex].Select(s => s.Name).SequenceEqual(samples);
+        });
+
+        private void hitObjectNodeHasSampleBank(int objectIndex, int nodeIndex, string bank) => AddAssert($"{objectIndex.ToOrdinalWords()} object {nodeIndex.ToOrdinalWords()} node has bank {bank}", () =>
+        {
+            var h = EditorBeatmap.HitObjects.ElementAt(objectIndex) as IHasRepeats;
+            return h is not null && h.NodeSamples[nodeIndex].All(o => o.Bank == bank);
+        });
+
+        private void hitObjectNodeHasSampleNormalBank(int objectIndex, int nodeIndex, string bank) => AddAssert($"{objectIndex.ToOrdinalWords()} object {nodeIndex.ToOrdinalWords()} node has normal bank {bank}", () =>
+        {
+            var h = EditorBeatmap.HitObjects.ElementAt(objectIndex) as IHasRepeats;
+            return h is not null && h.NodeSamples[nodeIndex].Where(o => o.Name == HitSampleInfo.HIT_NORMAL).All(o => o.Bank == bank);
+        });
+
+        private void hitObjectNodeHasSampleAdditionBank(int objectIndex, int nodeIndex, string bank) => AddAssert($"{objectIndex.ToOrdinalWords()} object {nodeIndex.ToOrdinalWords()} node has addition bank {bank}", () =>
+        {
+            var h = EditorBeatmap.HitObjects.ElementAt(objectIndex) as IHasRepeats;
+            return h is not null && h.NodeSamples[nodeIndex].Where(o => o.Name != HitSampleInfo.HIT_NORMAL).All(o => o.Bank == bank);
         });
     }
 }
