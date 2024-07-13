@@ -18,7 +18,7 @@ namespace osu.Game.Beatmaps.ControlPoints
 {
     [Serializable]
     [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)]
-    public class ControlPointInfo : IDeepCloneable<ControlPointInfo>
+    public class ControlPointInfo : IDeepCloneable<ControlPointInfo>, IControlPointInfo
     {
         /// <summary>
         /// Invoked on any change to the set of control points.
@@ -28,62 +28,34 @@ namespace osu.Game.Beatmaps.ControlPoints
 
         private void raiseControlPointsChanged([CanBeNull] ControlPoint _ = null) => ControlPointsChanged?.Invoke();
 
-        /// <summary>
-        /// All control points grouped by time.
-        /// </summary>
         [JsonProperty]
         public IBindableList<ControlPointGroup> Groups => groups;
 
         private readonly BindableList<ControlPointGroup> groups = new BindableList<ControlPointGroup>();
 
-        /// <summary>
-        /// All timing points.
-        /// </summary>
         [JsonProperty]
         public IReadOnlyList<TimingControlPoint> TimingPoints => timingPoints;
 
         private readonly SortedList<TimingControlPoint> timingPoints = new SortedList<TimingControlPoint>(Comparer<TimingControlPoint>.Default);
 
-        /// <summary>
-        /// All effect points.
-        /// </summary>
         [JsonProperty]
         public IReadOnlyList<EffectControlPoint> EffectPoints => effectPoints;
 
         private readonly SortedList<EffectControlPoint> effectPoints = new SortedList<EffectControlPoint>(Comparer<EffectControlPoint>.Default);
 
-        /// <summary>
-        /// All control points, of all types.
-        /// </summary>
         [JsonIgnore]
         public IEnumerable<ControlPoint> AllControlPoints => Groups.SelectMany(g => g.ControlPoints).ToArray();
 
-        /// <summary>
-        /// Finds the effect control point that is active at <paramref name="time"/>.
-        /// </summary>
-        /// <param name="time">The time to find the effect control point at.</param>
-        /// <returns>The effect control point.</returns>
         [NotNull]
         public EffectControlPoint EffectPointAt(double time) => BinarySearchWithFallback(EffectPoints, time, EffectControlPoint.DEFAULT);
 
-        /// <summary>
-        /// Finds the timing control point that is active at <paramref name="time"/>.
-        /// </summary>
-        /// <param name="time">The time to find the timing control point at.</param>
-        /// <returns>The timing control point.</returns>
         [NotNull]
         public TimingControlPoint TimingPointAt(double time) => BinarySearchWithFallback(TimingPoints, time, TimingPoints.Count > 0 ? TimingPoints[0] : TimingControlPoint.DEFAULT);
 
-        /// <summary>
-        /// Finds the maximum BPM represented by any timing control point.
-        /// </summary>
         [JsonIgnore]
         public double BPMMaximum =>
             60000 / (TimingPoints.MinBy(c => c.BeatLength) ?? TimingControlPoint.DEFAULT).BeatLength;
 
-        /// <summary>
-        /// Finds the minimum BPM represented by any timing control point.
-        /// </summary>
         [JsonIgnore]
         public double BPMMinimum =>
             60000 / (TimingPoints.MaxBy(c => c.BeatLength) ?? TimingControlPoint.DEFAULT).BeatLength;
@@ -147,29 +119,14 @@ namespace osu.Game.Beatmaps.ControlPoints
             groups.Remove(group);
         }
 
-        /// <summary>
-        /// Returns the time on the given beat divisor closest to the given time.
-        /// </summary>
-        /// <param name="time">The time to find the closest snapped time to.</param>
-        /// <param name="beatDivisor">The beat divisor to snap to.</param>
-        /// <param name="referenceTime">An optional reference point to use for timing point lookup.</param>
         public double GetClosestSnappedTime(double time, int beatDivisor, double? referenceTime = null)
         {
             var timingPoint = TimingPointAt(referenceTime ?? time);
             return getClosestSnappedTime(timingPoint, time, beatDivisor);
         }
 
-        /// <summary>
-        /// Returns the time on *ANY* valid beat divisor, favouring the divisor closest to the given time.
-        /// </summary>
-        /// <param name="time">The time to find the closest snapped time to.</param>
         public double GetClosestSnappedTime(double time) => GetClosestSnappedTime(time, GetClosestBeatDivisor(time));
 
-        /// <summary>
-        /// Returns the beat snap divisor closest to the given time. If two are equally close, the smallest divisor is returned.
-        /// </summary>
-        /// <param name="time">The time to find the closest beat snap divisor to.</param>
-        /// <param name="referenceTime">An optional reference point to use for timing point lookup.</param>
         public int GetClosestBeatDivisor(double time, double? referenceTime = null)
         {
             TimingControlPoint timingPoint = TimingPointAt(referenceTime ?? time);
