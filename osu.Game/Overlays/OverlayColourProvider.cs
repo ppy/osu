@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using osuTK;
 using osuTK.Graphics;
 
@@ -59,54 +58,20 @@ namespace osu.Game.Overlays
 
         private Color4 getColour(float saturation, float lightness) => Color4.FromHsl(new Vector4(getBaseHue(ColourScheme), saturation, lightness, 1));
 
-        // See https://github.com/ppy/osu-web/blob/5a536d217a21582aad999db50a981003d3ad5659/app/helpers.php#L1620-L1628
-        private static float getBaseHue(OverlayColourScheme colourScheme)
-        {
-            switch (colourScheme)
-            {
-                default:
-                    throw new ArgumentException($@"{colourScheme} colour scheme does not provide a hue value in {nameof(getBaseHue)}.");
-
-                case OverlayColourScheme.Red:
-                    return 0;
-
-                case OverlayColourScheme.Pink:
-                    return 333 / 360f;
-
-                case OverlayColourScheme.Orange:
-                    return 45 / 360f;
-
-                case OverlayColourScheme.Lime:
-                    return 90 / 360f;
-
-                case OverlayColourScheme.Green:
-                    return 125 / 360f;
-
-                case OverlayColourScheme.Aquamarine:
-                    return 160 / 360f;
-
-                case OverlayColourScheme.Purple:
-                    return 255 / 360f;
-
-                case OverlayColourScheme.Blue:
-                    return 200 / 360f;
-
-                case OverlayColourScheme.Plum:
-                    return 320 / 360f;
-            }
-        }
+        private static float getBaseHue(OverlayColourScheme colourScheme) => (int)colourScheme / 360f;
     }
 
+    // See https://github.com/ppy/osu-web/blob/5a536d217a21582aad999db50a981003d3ad5659/app/helpers.php#L1620-L1628
     public enum OverlayColourScheme
     {
-        Red,
-        Pink,
-        Orange,
-        Lime,
-        Green,
-        Purple,
-        Blue,
-        Plum,
-        Aquamarine
+        Red = 0,
+        Orange = 45,
+        Lime = 90,
+        Green = 125,
+        Aquamarine = 160,
+        Blue = 200,
+        Purple = 255,
+        Plum = 320,
+        Pink = 333,
     }
 }
