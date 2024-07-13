@@ -19,21 +19,7 @@ namespace osu.Game.Screens.Play.HUD.ClicksPerSecond
         [Resolved]
         private ClicksPerSecondController controller { get; set; } = null!;
 
-        [Resolved]
-        private IBindable<WorkingBeatmap> beatmap { get; set; } = null!;
-
         protected override double RollingDuration => 100;
-
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
-        {
-            Colour = colours.BlueLighter;
-        }
-
-        public ClicksSpeedBpmCounter()
-        {
-            Current.Value = 0;
-        }
 
         protected override void Update()
         {
@@ -72,14 +58,31 @@ namespace osu.Game.Screens.Play.HUD.ClicksPerSecond
                             Origin = Anchor.BottomLeft,
                             Font = OsuFont.Numeric.With(size: 16, fixedWidth: true)
                         },
-                        new OsuSpriteText
+                        new FillFlowContainer
                         {
                             Anchor = Anchor.BottomLeft,
                             Origin = Anchor.BottomLeft,
-                            Font = OsuFont.Numeric.With(size: 8, fixedWidth: false),
-                            Text = @"BPM",
-                            Padding = new MarginPadding { Bottom = 2f },
-                        },
+                            Direction = FillDirection.Vertical,
+                            AutoSizeAxes = Axes.Both,
+                            Children = new Drawable[]
+                            {
+                                new OsuSpriteText
+                                {
+                                    Anchor = Anchor.TopLeft,
+                                    Origin = Anchor.TopLeft,
+                                    Font = OsuFont.Numeric.With(size: 6, fixedWidth: false),
+                                    Text = @"clicks",
+                                },
+                                new OsuSpriteText
+                                {
+                                    Anchor = Anchor.TopLeft,
+                                    Origin = Anchor.TopLeft,
+                                    Font = OsuFont.Numeric.With(size: 6, fixedWidth: false),
+                                    Text = @"bpm",
+                                    Padding = new MarginPadding { Bottom = 3f },
+                                }
+                            }
+                        }
                     }
                 };
             }
