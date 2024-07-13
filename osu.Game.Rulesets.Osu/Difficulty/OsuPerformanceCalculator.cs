@@ -217,9 +217,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             if (score.Mods.Any(m => m is OsuModFlashlight))
                 accuracyValue *= 1.02;
-            
-            // Scale accuracy by approach rate
-            // accuracyValue *= 1 / (1 + Math.Exp((attributes.ApproachRate < 10.33 ? 4 : 8) * (attributes.ApproachRate - 10.33))) + 1;
 
             return accuracyValue;
         }
