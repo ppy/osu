@@ -49,6 +49,7 @@ using osu.Game.Screens.Select.Options;
 using osu.Game.Tests.Beatmaps.IO;
 using osuTK;
 using osuTK.Input;
+using SharpCompress;
 
 namespace osu.Game.Tests.Visual.Navigation
 {
@@ -837,21 +838,25 @@ namespace osu.Game.Tests.Visual.Navigation
         [Test]
         public void TestExitWithOperationInProgress()
         {
-            AddUntilStep("wait for dialog overlay", () => Game.ChildrenOfType<DialogOverlay>().SingleOrDefault() != null);
+            int x = 0;
 
-            ProgressNotification progressNotification = null!;
-
-            AddStep("start ongoing operation", () =>
+            AddUntilStep("wait for dialog overlay", () =>
             {
-                progressNotification = new ProgressNotification
-                {
-                    Text = "Something is still running",
-                    Progress = 0.5f,
-                    State = ProgressNotificationState.Active,
-                };
-                Game.Notifications.Post(progressNotification);
+                x = 0;
+                return Game.ChildrenOfType<DialogOverlay>().SingleOrDefault() != null;
             });
 
+            AddRepeatStep("start ongoing operation", () =>
+            {
+                Game.Notifications.Post(new ProgressNotification
+                {
+                    Text = $"Something is still running #{++x}",
+                    Progress = 0.5f,
+                    State = ProgressNotificationState.Active,
+                });
+            }, 15);
+
+            AddAssert("all notifications = 15", () => Game.Notifications.AllNotifications.Count(), () => Is.EqualTo(15));
             AddStep("Hold escape", () => InputManager.PressKey(Key.Escape));
             AddUntilStep("confirmation dialog shown", () => Game.ChildrenOfType<DialogOverlay>().Single().CurrentDialog is ConfirmExitDialog);
             AddStep("Release escape", () => InputManager.ReleaseKey(Key.Escape));
@@ -861,8 +866,11 @@ namespace osu.Game.Tests.Visual.Navigation
 
             AddStep("complete operation", () =>
             {
-                progressNotification.Progress = 100;
-                progressNotification.State = ProgressNotificationState.Completed;
+                this.ChildrenOfType<ProgressNotification>().ForEach(n =>
+                {
+                    n.Progress = 100;
+                    n.State = ProgressNotificationState.Completed;
+                });
             });
 
             AddStep("Hold escape", () => InputManager.PressKey(Key.Escape));
@@ -878,7 +886,7 @@ namespace osu.Game.Tests.Visual.Navigation
             AddStep("set hold delay to 0", () => Game.LocalConfig.SetValue(OsuSetting.UIHoldActivationDelay, 0.0));
             AddUntilStep("wait for dialog overlay", () => Game.ChildrenOfType<DialogOverlay>().SingleOrDefault() != null);
 
-            AddStep("start ongoing operation", () =>
+            AddRepeatStep("start ongoing operation", () =>
             {
                 Game.Notifications.Post(new ProgressNotification
                 {
@@ -886,7 +894,7 @@ namespace osu.Game.Tests.Visual.Navigation
                     Progress = 0.5f,
                     State = ProgressNotificationState.Active,
                 });
-            });
+            }, 15);
 
             AddRepeatStep("attempt force exit", () => Game.ScreenStack.CurrentScreen.Exit(), 2);
             AddUntilStep("stopped at exit confirm", () => Game.ChildrenOfType<DialogOverlay>().Single().CurrentDialog is ConfirmExitDialog);
