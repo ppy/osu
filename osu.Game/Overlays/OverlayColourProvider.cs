@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Overlays
@@ -56,14 +55,9 @@ namespace osu.Game.Overlays
             ColourScheme = colourScheme;
         }
 
-        private Color4 getColour(float saturation, float lightness) => Color4.FromHsl(new Vector4(getBaseHue(ColourScheme), saturation, lightness, 1));
+        private Color4 getColour(float saturation, float lightness) => Framework.Graphics.Colour4.FromHSL(getBaseHue(ColourScheme), saturation, lightness);
 
-        private static float getBaseHue(OverlayColourScheme colourScheme)
-        {
-            // intentionally round hue number back to zero when it's 360, because that number apparently gives off a nice-looking gray colour scheme but is totally against expectation (maybe we can use this one day).
-            int hueNumber = (int)colourScheme % 360;
-            return hueNumber / 360f;
-        }
+        private static float getBaseHue(OverlayColourScheme colourScheme) => (int)colourScheme / 360f;
     }
 
     // See https://github.com/ppy/osu-web/blob/5a536d217a21582aad999db50a981003d3ad5659/app/helpers.php#L1620-L1628
