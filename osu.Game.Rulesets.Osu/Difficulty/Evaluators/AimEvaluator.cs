@@ -119,7 +119,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             }
 
             // The spacing bonus in speed evaluation
-            double flowBonus = Math.Pow((osuLastObj?.MinimumJumpDistance?? 0) / 125, 3.5);
+            double flowBonus = Math.Pow((osuLastObj?.MinimumJumpDistance?? 0) / SpeedEvaluator.single_spacing_threshold, 3.5);
             // Part of the aiming difficulty for this object is accounted for in the speed evaluator, so reduce aim difficulty here
             if (flowBonus < 1)
             {
