@@ -14,6 +14,7 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Framework.Utils;
 using osu.Game.Audio;
+using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
@@ -54,11 +55,26 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         [Resolved(CanBeNull = true)]
         private BindableBeatDivisor beatDivisor { get; set; }
 
-        public override Quad SelectionQuad => BodyPiece.ScreenSpaceDrawQuad;
+        public override Quad SelectionQuad
+        {
+            get
+            {
+                var result = BodyPiece.ScreenSpaceDrawQuad.AABBFloat;
+
+                if (ControlPointVisualiser != null)
+                {
+                    foreach (var piece in ControlPointVisualiser.Pieces)
+                        result = RectangleF.Union(result, piece.ScreenSpaceDrawQuad.AABBFloat);
+                }
+
+                return result;
+            }
+        }
 
         private readonly BindableList<PathControlPoint> controlPoints = new BindableList<PathControlPoint>();
         private readonly IBindable<int> pathVersion = new Bindable<int>();
         private readonly BindableList<HitObject> selectedObjects = new BindableList<HitObject>();
+        private readonly Bindable<bool> showHitMarkers = new Bindable<bool>();
 
         public SliderSelectionBlueprint(Slider slider)
             : base(slider)
@@ -66,7 +82,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OsuConfigManager config)
         {
             InternalChildren = new Drawable[]
             {
@@ -74,6 +90,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                 HeadOverlay = CreateCircleOverlay(HitObject, SliderPosition.Start),
                 TailOverlay = CreateCircleOverlay(HitObject, SliderPosition.End),
             };
+
+            config.BindWith(OsuSetting.EditorShowHitMarkers, showHitMarkers);
         }
 
         protected override void LoadComplete()
@@ -90,6 +108,11 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             if (editorBeatmap != null)
                 selectedObjects.BindTo(editorBeatmap.SelectedHitObjects);
             selectedObjects.BindCollectionChanged((_, _) => updateVisualDefinition(), true);
+            showHitMarkers.BindValueChanged(_ =>
+            {
+                if (!showHitMarkers.Value)
+                    DrawableObject.RestoreHitAnimations();
+            });
         }
 
         public override bool HandleQuickDeletion()
@@ -110,6 +133,9 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
             if (IsSelected)
                 BodyPiece.UpdateFrom(HitObject);
+
+            if (showHitMarkers.Value)
+                DrawableObject.SuppressHitAnimations();
         }
 
         protected override bool OnHover(HoverEvent e)
@@ -403,7 +429,12 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
         public override MenuItem[] ContextMenuItems => new MenuItem[]
         {
-            new OsuMenuItem("Add control point", MenuItemType.Standard, () => addControlPoint(rightClickPosition)),
+            new OsuMenuItem("Add control point", MenuItemType.Standard, () =>
+            {
+                changeHandler?.BeginChange();
+                addControlPoint(rightClickPosition);
+                changeHandler?.EndChange();
+            }),
             new OsuMenuItem("Convert to stream", MenuItemType.Destructive, convertToStream),
         };
 
