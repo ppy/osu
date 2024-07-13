@@ -168,11 +168,11 @@ namespace osu.Game.Tests.Database
                 Assert.That(importAfterUpdate, Is.Not.Null);
                 Debug.Assert(importAfterUpdate != null);
 
+                realm.Run(r => r.Refresh());
+
                 // should only contain the modified beatmap (others purged).
                 Assert.That(importBeforeUpdate.Value.Beatmaps, Has.Count.EqualTo(1));
                 Assert.That(importAfterUpdate.Value.Beatmaps, Has.Count.EqualTo(count_beatmaps));
-
-                realm.Run(r => r.Refresh());
 
                 checkCount<BeatmapInfo>(realm, count_beatmaps + 1);
                 checkCount<BeatmapMetadata>(realm, count_beatmaps + 1);

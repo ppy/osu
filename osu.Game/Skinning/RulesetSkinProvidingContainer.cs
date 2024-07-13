@@ -28,25 +28,33 @@ namespace osu.Game.Skinning
         protected readonly Ruleset Ruleset;
         protected readonly IBeatmap Beatmap;
 
+        [CanBeNull]
+        private readonly ISkin beatmapSkin;
+
         /// <remarks>
         /// This container already re-exposes all parent <see cref="ISkinSource"/> sources in a ruleset-usable form.
         /// Therefore disallow falling back to any parent <see cref="ISkinSource"/> any further.
         /// </remarks>
         protected override bool AllowFallingBackToParent => false;
 
-        protected override Container<Drawable> Content { get; }
+        protected override Container<Drawable> Content { get; } = new Container
+        {
+            RelativeSizeAxes = Axes.Both,
+        };
 
         public RulesetSkinProvidingContainer(Ruleset ruleset, IBeatmap beatmap, [CanBeNull] ISkin beatmapSkin)
         {
             Ruleset = ruleset;
             Beatmap = beatmap;
+            this.beatmapSkin = beatmapSkin;
+        }
 
-            InternalChild = new BeatmapSkinProvidingContainer(GetRulesetTransformedSkin(beatmapSkin))
+        [BackgroundDependencyLoader]
+        private void load(SkinManager skinManager)
+        {
+            InternalChild = new BeatmapSkinProvidingContainer(GetRulesetTransformedSkin(beatmapSkin), GetRulesetTransformedSkin(skinManager.DefaultClassicSkin))
             {
-                Child = Content = new Container
-                {
-                    RelativeSizeAxes = Axes.Both,
-                }
+                Child = Content,
             };
         }
 

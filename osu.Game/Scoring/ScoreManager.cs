@@ -15,10 +15,10 @@ using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Database;
 using osu.Game.IO.Archives;
+using osu.Game.Online.API;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Scoring;
-using osu.Game.Online.API;
 using osu.Game.Scoring.Legacy;
 
 namespace osu.Game.Scoring
@@ -88,14 +88,14 @@ namespace osu.Game.Scoring
         {
             ScoreInfo? databasedScoreInfo = null;
 
+            if (originalScoreInfo is ScoreInfo scoreInfo && !string.IsNullOrEmpty(scoreInfo.Hash))
+                databasedScoreInfo = Query(s => s.Hash == scoreInfo.Hash);
+
             if (originalScoreInfo.OnlineID > 0)
-                databasedScoreInfo = Query(s => s.OnlineID == originalScoreInfo.OnlineID);
+                databasedScoreInfo ??= Query(s => s.OnlineID == originalScoreInfo.OnlineID);
 
             if (originalScoreInfo.LegacyOnlineID > 0)
                 databasedScoreInfo ??= Query(s => s.LegacyOnlineID == originalScoreInfo.LegacyOnlineID);
-
-            if (originalScoreInfo is ScoreInfo scoreInfo)
-                databasedScoreInfo ??= Query(s => s.Hash == scoreInfo.Hash);
 
             if (databasedScoreInfo == null)
             {
@@ -214,6 +214,7 @@ namespace osu.Game.Scoring
         }
 
         public Task<Live<ScoreInfo>?> ImportAsUpdate(ProgressNotification notification, ImportTask task, ScoreInfo original) => scoreImporter.ImportAsUpdate(notification, task, original);
+        public Task<ExternalEditOperation<ScoreInfo>> BeginExternalEditing(ScoreInfo model) => scoreImporter.BeginExternalEditing(model);
 
         public Live<ScoreInfo>? Import(ScoreInfo item, ArchiveReader? archive = null, ImportParameters parameters = default, CancellationToken cancellationToken = default) =>
             scoreImporter.ImportModel(item, archive, parameters, cancellationToken);
