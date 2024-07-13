@@ -669,7 +669,7 @@ namespace osu.Game.Overlays.SkinEditor
                 {
                     SpriteName = { Value = file.Name },
                     Origin = Anchor.Centre,
-                    Position = skinnableTarget.ToLocalSpace(GetContainingInputManager().CurrentState.Mouse.Position),
+                    Position = skinnableTarget.ToLocalSpace(GetContainingInputManager()!.CurrentState.Mouse.Position),
                 };
 
                 SelectedComponents.Clear();
