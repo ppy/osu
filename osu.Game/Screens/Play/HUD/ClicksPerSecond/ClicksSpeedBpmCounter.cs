@@ -1,0 +1,88 @@
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
+
+using osu.Framework.Allocation;
+using osu.Framework.Bindables;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Sprites;
+using osu.Framework.Localisation;
+using osu.Game.Beatmaps;
+using osu.Game.Graphics;
+using osu.Game.Graphics.Sprites;
+using osuTK;
+
+namespace osu.Game.Screens.Play.HUD.ClicksPerSecond
+{
+    public partial class ClicksSpeedBpmCounter : ClicksPerSecondCounter
+    {
+        [Resolved]
+        private ClicksPerSecondController controller { get; set; } = null!;
+
+        [Resolved]
+        private IBindable<WorkingBeatmap> beatmap { get; set; } = null!;
+
+        protected override double RollingDuration => 100;
+
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
+        {
+            Colour = colours.BlueLighter;
+        }
+
+        public ClicksSpeedBpmCounter()
+        {
+            Current.Value = 0;
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            // multiply by 60 * (1 / 4) to convert Hertz to BPM
+            Current.Value = (int)(controller.Value * 60f * (1f / 4f));
+        }
+
+        protected override IHasText CreateText() => new TextComponent();
+
+        private partial class TextComponent : CompositeDrawable, IHasText
+        {
+            public LocalisableString Text
+            {
+                get => text.Text;
+                set => text.Text = value;
+            }
+
+            private readonly OsuSpriteText text;
+
+            public TextComponent()
+            {
+                AutoSizeAxes = Axes.Both;
+
+                InternalChild = new FillFlowContainer
+                {
+                    AutoSizeAxes = Axes.Both,
+                    Spacing = new Vector2(2),
+                    Direction = FillDirection.Horizontal,
+                    Children = new Drawable[]
+                    {
+                        text = new OsuSpriteText
+                        {
+                            Anchor = Anchor.BottomLeft,
+                            Origin = Anchor.BottomLeft,
+                            Font = OsuFont.Numeric.With(size: 16, fixedWidth: true)
+                        },
+                        new OsuSpriteText
+                        {
+                            Anchor = Anchor.BottomLeft,
+                            Origin = Anchor.BottomLeft,
+                            Font = OsuFont.Numeric.With(size: 8, fixedWidth: false),
+                            Text = @"BPM",
+                            Padding = new MarginPadding { Bottom = 2f },
+                        },
+                    }
+                };
+            }
+        }
+    }
+}
