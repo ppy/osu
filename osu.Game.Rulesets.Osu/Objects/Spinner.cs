@@ -58,7 +58,7 @@ namespace osu.Game.Rulesets.Osu.Objects
 
         public override Vector2 StackOffset => Vector2.Zero;
 
-        protected override void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, IBeatmapDifficultyInfo difficulty)
+        protected override void ApplyDefaultsToSelf(IControlPointInfo controlPointInfo, IBeatmapDifficultyInfo difficulty)
         {
             base.ApplyDefaultsToSelf(controlPointInfo, difficulty);
 

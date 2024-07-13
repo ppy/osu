@@ -146,7 +146,7 @@ namespace osu.Game.Rulesets.Catch.Objects
         /// </summary>
         public int RandomSeed => (int)StartTime;
 
-        protected override void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, IBeatmapDifficultyInfo difficulty)
+        protected override void ApplyDefaultsToSelf(IControlPointInfo controlPointInfo, IBeatmapDifficultyInfo difficulty)
         {
             base.ApplyDefaultsToSelf(controlPointInfo, difficulty);
 
