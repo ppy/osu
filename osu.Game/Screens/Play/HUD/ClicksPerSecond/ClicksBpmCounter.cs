@@ -12,7 +12,7 @@ using osuTK;
 
 namespace osu.Game.Screens.Play.HUD.ClicksPerSecond
 {
-    public partial class ClicksSpeedBpmCounter : ClicksPerSecondCounter
+    public partial class ClicksBpmCounter : ClicksPerSecondCounter
     {
         [Resolved]
         private ClicksPerSecondController controller { get; set; } = null!;
