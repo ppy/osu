@@ -58,7 +58,12 @@ namespace osu.Game.Overlays
 
         private Color4 getColour(float saturation, float lightness) => Color4.FromHsl(new Vector4(getBaseHue(ColourScheme), saturation, lightness, 1));
 
-        private static float getBaseHue(OverlayColourScheme colourScheme) => (int)colourScheme / 360f;
+        private static float getBaseHue(OverlayColourScheme colourScheme)
+        {
+            // intentionally round hue number back to zero when it's 360, because that number apparently gives off a nice-looking gray colour scheme but is totally against expectation (maybe we can use this one day).
+            int hueNumber = (int)colourScheme % 360;
+            return hueNumber / 360f;
+        }
     }
 
     // See https://github.com/ppy/osu-web/blob/5a536d217a21582aad999db50a981003d3ad5659/app/helpers.php#L1620-L1628
