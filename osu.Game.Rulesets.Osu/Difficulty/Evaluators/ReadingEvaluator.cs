@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
+using osu.Game.Rulesets.Osu.Difficulty.Skills;
 using osu.Game.Rulesets.Osu.Objects;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
@@ -348,8 +349,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             else
                 value = Math.Exp(9.07583 - 80.0 * preempt / 3);
 
-            // The power is 2 times higher to compensate sqrt in high AR skill
-            return Math.Pow(value, 2);
+            return Math.Pow(value, 1.0 / ReadingHighAR.MECHANICAL_PP_POWER);
         }
     }
 }

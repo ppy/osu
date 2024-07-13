@@ -118,9 +118,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
     public class ReadingHighAR : GraphSkill
     {
-
-        private const double skill_multiplier = 0.13727;
-        private const double component_default_value_multiplier = 445;
+        public const double MECHANICAL_PP_POWER = 0.6;
+        private const double skill_multiplier = 9.3;
+        private const double component_default_value_multiplier = 280;
         public ReadingHighAR(Mod[] mods)
             : base(mods)
         {
@@ -169,8 +169,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         public override double DifficultyValue()
         {
             // Simulating summing to get the most correct value possible
-            double aimValue = Math.Sqrt(aimComponent.DifficultyValue() * skill_multiplier) * OsuDifficultyCalculator.DIFFICULTY_MULTIPLIER;
-            double speedValue = Math.Sqrt(speedComponent.DifficultyValue() * skill_multiplier) * OsuDifficultyCalculator.DIFFICULTY_MULTIPLIER;
+            double aimValue = Math.Sqrt(aimComponent.DifficultyValue()) * OsuDifficultyCalculator.DIFFICULTY_MULTIPLIER;
+            double speedValue = Math.Sqrt(speedComponent.DifficultyValue()) * OsuDifficultyCalculator.DIFFICULTY_MULTIPLIER;
 
             double aimPerformance = OsuStrainSkill.DifficultyToPerformance(aimValue);
             double speedPerformance = OsuStrainSkill.DifficultyToPerformance(speedValue);
@@ -180,13 +180,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             // Length bonus is in SR to not inflate Star Rating of short AR11 maps
             double lengthBonus = OsuPerformanceCalculator.CalculateDefaultLengthBonus(objectsCount);
+            lengthBonus = Math.Pow(lengthBonus, 0.5 / MECHANICAL_PP_POWER);
 
             // Get average preempt of objects
             double averagePreempt = objectsPreemptSum / objectsCount / 1000;
 
             // Increase length bonus for long maps with very high AR
             // https://www.desmos.com/calculator/wz9wckqgzu
-            double lengthBonusPower = 2 + 2 * Math.Pow(0.1, Math.Pow(2.3 * averagePreempt, 8));
+            double lengthBonusPower = 1 + 0.75 * Math.Pow(0.1, Math.Pow(2.3 * averagePreempt, 8));
 
             // Be sure that increasing AR won't decrease pp
             if (lengthBonus < 1) lengthBonusPower = 2;
@@ -197,7 +198,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             double difficultyValue = Math.Pow(adjustedDifficulty / OsuDifficultyCalculator.DIFFICULTY_MULTIPLIER, 2.0);
 
             // Sqrt value to make difficulty depend less on mechanical difficulty
-            return 53.2 * Math.Sqrt(difficultyValue);
+            return skill_multiplier * Math.Pow(difficultyValue, MECHANICAL_PP_POWER);
         }
 
         public class HighARAimComponent : Aim
