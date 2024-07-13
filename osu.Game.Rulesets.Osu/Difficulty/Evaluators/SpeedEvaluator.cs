@@ -10,9 +10,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 {
     public static class SpeedEvaluator
     {
-        private const double single_spacing_threshold = 125;
+        public const double single_spacing_threshold = 125;
         private const double min_speed_bonus = 75; // ~200BPM
         private const double speed_balancing_factor = 40;
+        private const double distance_multiplier = 1.0;
 
         /// <summary>
         /// Evaluates the difficulty of tapping the current object, based on:
@@ -54,12 +55,23 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             double speedBonus = 1.0;
 
             if (strainTime < min_speed_bonus)
-                speedBonus = 1 + 0.75 * Math.Pow((min_speed_bonus - strainTime) / speed_balancing_factor, 2);
+                speedBonus = 1 + 0.70 * Math.Pow((min_speed_bonus - strainTime) / speed_balancing_factor, 2);
 
+            double angleBonus = calculateAngleBonus(osuCurrObj.Angle ?? Math.PI);
             double travelDistance = osuPrevObj?.TravelDistance ?? 0;
-            double distance = Math.Min(single_spacing_threshold, travelDistance + osuCurrObj.MinimumJumpDistance);
+            double distance = (travelDistance + osuCurrObj.MinimumJumpDistance) * angleBonus;
+            double distanceBonus = distance_multiplier * Math.Min(1, Math.Pow(distance / single_spacing_threshold, 3.5));
 
-            return (speedBonus + speedBonus * Math.Pow(distance / single_spacing_threshold, 3.5)) * doubletapness / strainTime;
+            double speedDifficulty = (speedBonus + distanceBonus) * doubletapness / strainTime;
+
+            return speedDifficulty;
+        }
+        private static double calculateAngleBonus(double angle)
+        {
+            // A very small multiplier is used here to prevent FP shenanigans
+            if (angle >= Math.PI * 0.99999) return 1;
+            // Max is used to prevent FP
+            return (Math.PI - angle) / Math.Sqrt(2 * (1 - Math.Cos(Math.PI - angle)));
         }
     }
 }
