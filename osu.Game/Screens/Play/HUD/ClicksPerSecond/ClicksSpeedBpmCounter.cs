@@ -23,7 +23,7 @@ namespace osu.Game.Screens.Play.HUD.ClicksPerSecond
         {
             base.Update();
 
-            // multiply by 60 * (1 / 4) to convert Hertz to BPM
+            // multiply by 60 * (1 / 4) to convert CPS to BPM
             Current.Value = (int)(controller.Value * 60f * (1f / 4f));
         }
 
