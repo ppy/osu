@@ -107,10 +107,28 @@ namespace osu.Game.Rulesets.Osu.Edit
 
             // If we're flipping over the origin, we take the grid origin position from the grid toolbox.
             var flipQuad = flipOverOrigin ? new Quad(gridToolbox.StartPositionX.Value, gridToolbox.StartPositionY.Value, 0, 0) : GeometryUtils.GetSurroundingQuad(hitObjects);
-            // If we're flipping over the origin, we take the grid rotation from the grid toolbox.
-            // We want to normalize the rotation angle to -45 to 45 degrees, so horizontal vs vertical flip is not mixed up by the rotation and it stays intuitive to use.
-            var flipAxis = flipOverOrigin ? GeometryUtils.RotateVector(Vector2.UnitX, -((gridToolbox.GridLinesRotation.Value + 405) % 90 - 45)) : Vector2.UnitX;
-            flipAxis = direction == Direction.Vertical ? flipAxis.PerpendicularLeft : flipAxis;
+            Vector2 flipAxis = direction == Direction.Vertical ? Vector2.UnitY : Vector2.UnitX;
+
+            if (flipOverOrigin)
+            {
+                // If we're flipping over the origin, we take one of the axes of the grid.
+                // Take the axis closest to the direction we want to flip over.
+                switch (gridToolbox.GridType.Value)
+                {
+                    case PositionSnapGridType.Square:
+                        flipAxis = GeometryUtils.RotateVector(Vector2.UnitX, -((gridToolbox.GridLinesRotation.Value + 405) % 90 - 45));
+                        flipAxis = direction == Direction.Vertical ? flipAxis.PerpendicularLeft : flipAxis;
+                        break;
+
+                    case PositionSnapGridType.Triangle:
+                        // Hex grid has 3 axes, so you can not directly flip over one of the axes,
+                        // however it's still possible to achieve that flip by combining multiple flips over the other axes.
+                        flipAxis = direction == Direction.Vertical
+                            ? GeometryUtils.RotateVector(Vector2.UnitX, -((gridToolbox.GridLinesRotation.Value + 390) % 60 + 60))
+                            : GeometryUtils.RotateVector(Vector2.UnitX, -((gridToolbox.GridLinesRotation.Value + 390) % 60 - 60));
+                        break;
+                }
+            }
 
             var controlPointFlipQuad = new Quad();
 
