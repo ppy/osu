@@ -62,7 +62,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
         private void load()
         {
             MainTernaryStates = CreateTernaryButtons().ToArray();
-            SampleBankTernaryStates = createSampleBankTernaryButtons().ToArray();
+            SampleBankTernaryStates = createSampleBankTernaryButtons(SelectionHandler.SelectionBankStates).ToArray();
+            SampleAdditionBankTernaryStates = createSampleBankTernaryButtons(SelectionHandler.SelectionAdditionBankStates).ToArray();
 
             AddInternal(new DrawableRulesetDependenciesProvidingContainer(Composer.Ruleset)
             {
@@ -219,6 +220,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         public TernaryButton[] SampleBankTernaryStates { get; private set; }
 
+        public TernaryButton[] SampleAdditionBankTernaryStates { get; private set; }
+
         /// <summary>
         /// Create all ternary states required to be displayed to the user.
         /// </summary>
@@ -231,9 +234,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 yield return new TernaryButton(kvp.Value, kvp.Key.Replace("hit", string.Empty).Titleize(), () => GetIconForSample(kvp.Key));
         }
 
-        private IEnumerable<TernaryButton> createSampleBankTernaryButtons()
+        private IEnumerable<TernaryButton> createSampleBankTernaryButtons(Dictionary<string, Bindable<TernaryState>> sampleBankStates)
         {
-            foreach (var kvp in SelectionHandler.SelectionBankStates)
+            foreach (var kvp in sampleBankStates)
                 yield return new TernaryButton(kvp.Value, kvp.Key.Titleize(), () => getIconForBank(kvp.Key));
         }
 
