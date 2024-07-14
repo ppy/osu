@@ -99,9 +99,8 @@ namespace osu.Game.Overlays
             if (user.OnlineID == Header.User.Value?.User.Id && ruleset?.MatchesOnlineID(Header.User.Value?.Ruleset) == true)
                 return;
 
-            sectionsContainer?.ScrollToTop();
-            sectionsContainer?.Clear();
-            tabs?.Clear();
+            if (sectionsContainer != null)
+                sectionsContainer.ExpandableHeader = null;
 
             userReq?.Cancel();
             lastSection = null;
@@ -119,7 +118,7 @@ namespace osu.Game.Overlays
                 }
                 : Array.Empty<ProfileSection>();
 
-            setupBaseContent(OverlayColourScheme.Pink);
+            setupBaseContent(OverlayColourScheme.Pink, forceContentRecreation: true);
 
             if (API.State.Value != APIState.Offline)
             {
@@ -138,7 +137,7 @@ namespace osu.Game.Overlays
             // reuse header and content if same colour scheme, otherwise recreate both.
             var profileScheme = (OverlayColourScheme?)loadedUser.ProfileHue ?? OverlayColourScheme.Pink;
             if (profileScheme != ColourProvider.ColourScheme)
-                setupBaseContent(profileScheme);
+                setupBaseContent(profileScheme, forceContentRecreation: false);
 
             var actualRuleset = rulesets.GetRuleset(userRuleset?.ShortName ?? loadedUser.PlayMode).AsNonNull();
 
@@ -164,16 +163,18 @@ namespace osu.Game.Overlays
             loadingLayer.Hide();
         }
 
-        private void setupBaseContent(OverlayColourScheme colourScheme)
+        private void setupBaseContent(OverlayColourScheme colourScheme, bool forceContentRecreation)
         {
             var previousColourScheme = ColourProvider.ColourScheme;
             ColourProvider.ChangeColourScheme(colourScheme);
 
-            if (sectionsContainer != null && colourScheme == previousColourScheme)
+            if (colourScheme != previousColourScheme)
+            {
+                RecreateHeader();
+                UpdateColours();
+            }
+            else if (!forceContentRecreation)
                 return;
-
-            RecreateHeader();
-            UpdateColours();
 
             Child = new OsuContextMenuContainer
             {
