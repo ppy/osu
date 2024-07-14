@@ -9,6 +9,7 @@ using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
+using osu.Framework.Logging;
 using osu.Game.Audio;
 using osu.Game.IO;
 using osu.Game.IO.Archives;
@@ -65,7 +66,9 @@ namespace osu.Game.Tests.Skins
             // Covers default rank display
             "Archives/modified-default-20230809.osk",
             // Covers legacy rank display
-            "Archives/modified-classic-20230809.osk"
+            "Archives/modified-classic-20230809.osk",
+            // Covers clicks bpm counter
+            "Archives/modified-argon-20240714.osk"
         };
 
         /// <summary>
@@ -78,6 +81,7 @@ namespace osu.Game.Tests.Skins
 
             foreach (string oskFile in available_skins)
             {
+                Logger.Log(oskFile);
                 using (var stream = TestResources.OpenResource(oskFile))
                 using (var storage = new ZipArchiveReader(stream))
                 {
