@@ -373,6 +373,8 @@ namespace osu.Game.Rulesets.Edit
             if (e.ControlPressed || e.SuperPressed)
                 return false;
 
+            bool handled = false;
+
             if (checkLeftToggleFromKey(e.Key, out int leftIndex))
             {
                 var item = toolboxCollection.Items.ElementAtOrDefault(leftIndex);
@@ -387,20 +389,30 @@ namespace osu.Game.Rulesets.Edit
 
             if (checkRightToggleFromKey(e.Key, out int rightIndex))
             {
-                var item = e.AltPressed
-                    ? sampleAdditionBankTogglesCollection.ElementAtOrDefault(rightIndex)
-                    : e.ShiftPressed
-                        ? sampleBankTogglesCollection.ElementAtOrDefault(rightIndex)
-                        : togglesCollection.ElementAtOrDefault(rightIndex);
+                if (e.ShiftPressed || e.AltPressed)
+                {
+                    if (e.ShiftPressed)
+                        attemptToggle(rightIndex, sampleBankTogglesCollection);
+
+                    if (e.AltPressed)
+                        attemptToggle(rightIndex, sampleAdditionBankTogglesCollection);
+                }
+                else
+                    attemptToggle(rightIndex, togglesCollection);
+            }
+
+            return handled || base.OnKeyDown(e);
+
+            void attemptToggle(int index, FillFlowContainer collection)
+            {
+                var item = collection.ElementAtOrDefault(index);
 
                 if (item is DrawableTernaryButton button)
                 {
                     button.Button.Toggle();
-                    return true;
+                    handled = true;
                 }
             }
-
-            return base.OnKeyDown(e);
         }
 
         private bool checkLeftToggleFromKey(Key key, out int index)
