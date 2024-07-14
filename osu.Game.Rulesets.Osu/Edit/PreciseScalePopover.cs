@@ -10,6 +10,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
+using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Screens.Edit.Components.RadioButtons;
 using osuTK;
 
@@ -27,6 +28,7 @@ namespace osu.Game.Rulesets.Osu.Edit
         private BindableNumber<float> scaleInputBindable = null!;
         private EditorRadioButtonCollection scaleOrigin = null!;
 
+        private RadioButton gridCentreButton = null!;
         private RadioButton playfieldCentreButton = null!;
         private RadioButton selectionCentreButton = null!;
 
@@ -68,9 +70,12 @@ namespace osu.Game.Rulesets.Osu.Edit
                         RelativeSizeAxes = Axes.X,
                         Items = new[]
                         {
-                            playfieldCentreButton = new RadioButton("Grid centre",
+                            gridCentreButton = new RadioButton("Grid centre",
                                 () => setOrigin(ScaleOrigin.GridCentre),
                                 () => new SpriteIcon { Icon = FontAwesome.Regular.PlusSquare }),
+                            playfieldCentreButton = new RadioButton("Playfield centre",
+                                () => setOrigin(ScaleOrigin.PlayfieldCentre),
+                                () => new SpriteIcon { Icon = FontAwesome.Regular.Square }),
                             selectionCentreButton = new RadioButton("Selection centre",
                                 () => setOrigin(ScaleOrigin.SelectionCentre),
                                 () => new SpriteIcon { Icon = FontAwesome.Solid.VectorSquare })
@@ -99,6 +104,10 @@ namespace osu.Game.Rulesets.Osu.Edit
                     },
                 }
             };
+            gridCentreButton.Selected.DisabledChanged += isDisabled =>
+            {
+                gridCentreButton.TooltipText = isDisabled ? "The current selection cannot be scaled relative to grid centre." : string.Empty;
+            };
             playfieldCentreButton.Selected.DisabledChanged += isDisabled =>
             {
                 playfieldCentreButton.TooltipText = isDisabled ? "The current selection cannot be scaled relative to playfield centre." : string.Empty;
@@ -125,6 +134,7 @@ namespace osu.Game.Rulesets.Osu.Edit
 
             selectionCentreButton.Selected.Disabled = !(scaleHandler.CanScaleX.Value || scaleHandler.CanScaleY.Value);
             playfieldCentreButton.Selected.Disabled = scaleHandler.IsScalingSlider.Value && !selectionCentreButton.Selected.Disabled;
+            gridCentreButton.Selected.Disabled = playfieldCentreButton.Selected.Disabled;
 
             scaleOrigin.Items.First(b => !b.Selected.Disabled).Select();
 
@@ -137,7 +147,7 @@ namespace osu.Game.Rulesets.Osu.Edit
 
         private void updateAxisCheckBoxesEnabled()
         {
-            if (scaleInfo.Value.Origin == ScaleOrigin.GridCentre)
+            if (scaleInfo.Value.Origin != ScaleOrigin.SelectionCentre)
             {
                 toggleAxisAvailable(xCheckBox.Current, true);
                 toggleAxisAvailable(yCheckBox.Current, true);
@@ -181,7 +191,14 @@ namespace osu.Game.Rulesets.Osu.Edit
             updateAxisCheckBoxesEnabled();
         }
 
-        private Vector2? getOriginPosition(PreciseScaleInfo scale) => scale.Origin == ScaleOrigin.GridCentre ? gridToolbox.StartPosition.Value : null;
+        private Vector2? getOriginPosition(PreciseScaleInfo scale) =>
+            scale.Origin switch
+            {
+                ScaleOrigin.GridCentre => gridToolbox.StartPosition.Value,
+                ScaleOrigin.PlayfieldCentre => OsuPlayfield.BASE_SIZE / 2,
+                ScaleOrigin.SelectionCentre => null,
+                _ => throw new ArgumentOutOfRangeException(nameof(scale))
+            };
 
         private Axes getAdjustAxis(PreciseScaleInfo scale) => scale.XAxis ? scale.YAxis ? Axes.Both : Axes.X : Axes.Y;
 
@@ -211,6 +228,7 @@ namespace osu.Game.Rulesets.Osu.Edit
     public enum ScaleOrigin
     {
         GridCentre,
+        PlayfieldCentre,
         SelectionCentre
     }
 
