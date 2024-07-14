@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -8,6 +9,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics.UserInterfaceV2;
+using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Screens.Edit.Components.RadioButtons;
 using osu.Game.Screens.Edit.Compose.Components;
 using osuTK;
@@ -63,6 +65,9 @@ namespace osu.Game.Rulesets.Osu.Edit
                             new RadioButton("Grid centre",
                                 () => rotationInfo.Value = rotationInfo.Value with { Origin = RotationOrigin.GridCentre },
                                 () => new SpriteIcon { Icon = FontAwesome.Regular.PlusSquare }),
+                            new RadioButton("Playfield centre",
+                                () => rotationInfo.Value = rotationInfo.Value with { Origin = RotationOrigin.PlayfieldCentre },
+                                () => new SpriteIcon { Icon = FontAwesome.Regular.Square }),
                             selectionCentreButton = new RadioButton("Selection centre",
                                 () => rotationInfo.Value = rotationInfo.Value with { Origin = RotationOrigin.SelectionCentre },
                                 () => new SpriteIcon { Icon = FontAwesome.Solid.VectorSquare })
@@ -95,9 +100,18 @@ namespace osu.Game.Rulesets.Osu.Edit
 
             rotationInfo.BindValueChanged(rotation =>
             {
-                rotationHandler.Update(rotation.NewValue.Degrees, rotation.NewValue.Origin == RotationOrigin.GridCentre ? gridToolbox.StartPosition.Value : null);
+                rotationHandler.Update(rotation.NewValue.Degrees, getOriginPosition(rotation.NewValue));
             });
         }
+
+        private Vector2? getOriginPosition(PreciseRotationInfo rotation) =>
+            rotation.Origin switch
+            {
+                RotationOrigin.GridCentre => gridToolbox.StartPosition.Value,
+                RotationOrigin.PlayfieldCentre => OsuPlayfield.BASE_SIZE / 2,
+                RotationOrigin.SelectionCentre => null,
+                _ => throw new ArgumentOutOfRangeException(nameof(rotation))
+            };
 
         protected override void PopIn()
         {
@@ -117,6 +131,7 @@ namespace osu.Game.Rulesets.Osu.Edit
     public enum RotationOrigin
     {
         GridCentre,
+        PlayfieldCentre,
         SelectionCentre
     }
 
