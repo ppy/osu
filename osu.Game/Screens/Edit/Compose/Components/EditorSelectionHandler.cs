@@ -176,8 +176,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
                                     break;
                                 }
 
-                                // If none of the selected objects have any addition samples, we should not apply the bank.
-                                if (SelectedItems.All(h => h.Samples.All(o => o.Name == HitSampleInfo.HIT_NORMAL)))
+                                // If none of the selected objects have any addition samples, we should not apply the addition bank.
+                                if (SelectedItems.SelectMany(enumerateAllSamples).All(h => h.All(o => o.Name == HitSampleInfo.HIT_NORMAL)))
                                 {
                                     bindable.Value = TernaryState.False;
                                     break;
@@ -260,16 +260,16 @@ namespace osu.Game.Screens.Edit.Compose.Components
             {
                 bindable.Value = GetStateFromSelection(samplesInSelection.SelectMany(s => s).Where(o => o.Name != HitSampleInfo.HIT_NORMAL), h => h.Bank == bankName);
             }
+        }
 
-            IEnumerable<IList<HitSampleInfo>> enumerateAllSamples(HitObject hitObject)
+        private IEnumerable<IList<HitSampleInfo>> enumerateAllSamples(HitObject hitObject)
+        {
+            yield return hitObject.Samples;
+
+            if (hitObject is IHasRepeats withRepeats)
             {
-                yield return hitObject.Samples;
-
-                if (hitObject is IHasRepeats withRepeats)
-                {
-                    foreach (var node in withRepeats.NodeSamples)
-                        yield return node;
-                }
+                foreach (var node in withRepeats.NodeSamples)
+                    yield return node;
             }
         }
 
@@ -340,7 +340,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
             EditorBeatmap.PerformOnSelection(h =>
             {
-                if (h.Samples.Where(o => o.Name != HitSampleInfo.HIT_NORMAL).All(s => s.Bank == bankName))
+                if (enumerateAllSamples(h).SelectMany(o => o).Where(o => o.Name != HitSampleInfo.HIT_NORMAL).All(s => s.Bank == bankName))
                     return;
 
                 h.Samples = h.Samples.Select(s => s.Name != HitSampleInfo.HIT_NORMAL ? s.With(newBank: bankName) : s).ToList();
