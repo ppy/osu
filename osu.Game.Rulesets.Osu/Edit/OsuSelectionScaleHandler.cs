@@ -69,6 +69,7 @@ namespace osu.Game.Rulesets.Osu.Edit
 
         private Dictionary<OsuHitObject, OriginalHitObjectState>? objectsInScale;
         private Vector2? defaultOrigin;
+        private List<Vector2>? originalConvexHull;
 
         public override void Begin()
         {
@@ -84,6 +85,9 @@ namespace osu.Game.Rulesets.Osu.Edit
                 ? GeometryUtils.GetSurroundingQuad(slider.Path.ControlPoints.Select(p => slider.Position + p.Position))
                 : GeometryUtils.GetSurroundingQuad(objectsInScale.Keys);
             defaultOrigin = OriginalSurroundingQuad.Value.Centre;
+            originalConvexHull = objectsInScale.Count == 1 && objectsInScale.First().Key is Slider slider2
+                ? GeometryUtils.GetConvexHull(slider2.Path.ControlPoints.Select(p => slider2.Position + p.Position))
+                : GeometryUtils.GetConvexHull(objectsInScale.Keys);
         }
 
         public override void Update(Vector2 scale, Vector2? origin = null, Axes adjustAxis = Axes.Both, float axisRotation = 0)
@@ -211,12 +215,31 @@ namespace osu.Game.Rulesets.Osu.Edit
             if (objectsInScale.Count == 1 && objectsInScale.First().Key is Slider slider)
                 origin = slider.Position;
 
+            float cos = MathF.Cos(float.DegreesToRadians(-axisRotation));
+            float sin = MathF.Sin(float.DegreesToRadians(-axisRotation));
             scale = clampScaleToAdjustAxis(scale, adjustAxis);
             Vector2 actualOrigin = origin ?? defaultOrigin.Value;
-            var selectionQuad = OriginalSurroundingQuad.Value;
+            IEnumerable<Vector2> points;
 
-            scale = clampToBound(scale, selectionQuad.BottomRight, OsuPlayfield.BASE_SIZE);
-            scale = clampToBound(scale, selectionQuad.TopLeft, Vector2.Zero);
+            if (axisRotation == 0)
+            {
+                var selectionQuad = OriginalSurroundingQuad.Value;
+                points = new[]
+                {
+                    selectionQuad.TopLeft,
+                    selectionQuad.TopRight,
+                    selectionQuad.BottomLeft,
+                    selectionQuad.BottomRight
+                };
+            }
+            else
+                points = originalConvexHull!;
+
+            foreach (var point in points)
+            {
+                scale = clampToBound(scale, point, Vector2.Zero);
+                scale = clampToBound(scale, point, OsuPlayfield.BASE_SIZE);
+            }
 
             return Vector2.ComponentMax(scale, new Vector2(Precision.FLOAT_EPSILON));
 
@@ -226,8 +249,6 @@ namespace osu.Game.Rulesets.Osu.Edit
             {
                 p -= actualOrigin;
                 bound -= actualOrigin;
-                float cos = MathF.Cos(float.DegreesToRadians(-axisRotation));
-                float sin = MathF.Sin(float.DegreesToRadians(-axisRotation));
                 var a = new Vector2(cos * cos * p.X - sin * cos * p.Y, -sin * cos * p.X + sin * sin * p.Y);
                 var b = new Vector2(sin * sin * p.X + sin * cos * p.Y, sin * cos * p.X + cos * cos * p.Y);
 

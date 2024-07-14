@@ -138,7 +138,52 @@ namespace osu.Game.Utils
         /// </summary>
         /// <param name="hitObjects">The hit objects to calculate a quad for.</param>
         public static Quad GetSurroundingQuad(IEnumerable<IHasPosition> hitObjects) =>
-            GetSurroundingQuad(hitObjects.SelectMany(h =>
+            GetSurroundingQuad(enumerateStartAndEndPositions(hitObjects));
+
+        /// <summary>
+        /// Returns the points that make up the convex hull of the provided points.
+        /// </summary>
+        /// <param name="points">The points to calculate a convex hull.</param>
+        public static List<Vector2> GetConvexHull(IEnumerable<Vector2> points)
+        {
+            List<Vector2> p = points.ToList();
+
+            if (p.Count <= 1)
+                return p;
+
+            int n = p.Count, k = 0;
+            List<Vector2> hull = new List<Vector2>(new Vector2[2 * n]);
+
+            p.Sort((a, b) => a.X == b.X ? a.Y.CompareTo(b.Y) : a.X.CompareTo(b.X));
+
+            // Build lower hull
+            for (int i = 0; i < n; ++i)
+            {
+                while (k >= 2 && cross(hull[k - 2], hull[k - 1], p[i]) <= 0)
+                    k--;
+                hull[k] = p[i];
+                k++;
+            }
+
+            // Build upper hull
+            for (int i = n - 2, t = k + 1; i >= 0; i--)
+            {
+                while (k >= t && cross(hull[k - 2], hull[k - 1], p[i]) <= 0)
+                    k--;
+                hull[k] = p[i];
+                k++;
+            }
+
+            return hull.Take(k - 1).ToList();
+
+            float cross(Vector2 o, Vector2 a, Vector2 b) => (a.X - o.X) * (b.Y - o.Y) - (a.Y - o.Y) * (b.X - o.X);
+        }
+
+        public static List<Vector2> GetConvexHull(IEnumerable<IHasPosition> hitObjects) =>
+            GetConvexHull(enumerateStartAndEndPositions(hitObjects));
+
+        private static IEnumerable<Vector2> enumerateStartAndEndPositions(IEnumerable<IHasPosition> hitObjects) =>
+            hitObjects.SelectMany(h =>
             {
                 if (h is IHasPath path)
                 {
@@ -151,6 +196,6 @@ namespace osu.Game.Utils
                 }
 
                 return new[] { h.Position };
-            }));
+            });
     }
 }
