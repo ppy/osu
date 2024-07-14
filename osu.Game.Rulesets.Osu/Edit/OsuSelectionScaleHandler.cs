@@ -80,30 +80,10 @@ namespace osu.Game.Rulesets.Osu.Edit
             changeHandler?.BeginChange();
 
             objectsInScale = selectedMovableObjects.ToDictionary(ho => ho, ho => new OriginalHitObjectState(ho));
-            OriginalSurroundingQuad = getOriginalSurroundingQuad()!;
+            OriginalSurroundingQuad = objectsInScale.Count == 1 && objectsInScale.First().Key is Slider slider
+                ? GeometryUtils.GetSurroundingQuad(slider.Path.ControlPoints.Select(p => slider.Position + p.Position))
+                : GeometryUtils.GetSurroundingQuad(objectsInScale.Keys);
             defaultOrigin = OriginalSurroundingQuad.Value.Centre;
-        }
-
-        private Quad? getOriginalSurroundingQuad(float axisRotation = 0)
-        {
-            if (objectsInScale == null)
-                return null;
-
-            return objectsInScale.Count == 1 && objectsInScale.First().Value.PathControlPointPositions != null
-                ? GeometryUtils.GetSurroundingQuad(objectsInScale.First().Value.PathControlPointPositions!.Select(p => objectsInScale.First().Value.Position + p), axisRotation)
-                : GeometryUtils.GetSurroundingQuad(objectsInScale.Values.SelectMany(s =>
-                {
-                    if (s.EndPosition.HasValue)
-                    {
-                        return new[]
-                        {
-                            s.Position,
-                            s.Position + s.EndPosition.Value
-                        };
-                    }
-
-                    return new[] { s.Position };
-                }), axisRotation);
         }
 
         public override void Update(Vector2 scale, Vector2? origin = null, Axes adjustAxis = Axes.Both, float axisRotation = 0)
@@ -233,23 +213,10 @@ namespace osu.Game.Rulesets.Osu.Edit
 
             scale = clampScaleToAdjustAxis(scale, adjustAxis);
             Vector2 actualOrigin = origin ?? defaultOrigin.Value;
-            var selectionQuad = axisRotation == 0 ? OriginalSurroundingQuad.Value : getOriginalSurroundingQuad(axisRotation)!.Value;
-            var points = new[]
-            {
-                selectionQuad.TopLeft,
-                selectionQuad.TopRight,
-                selectionQuad.BottomLeft,
-                selectionQuad.BottomRight
-            };
+            var selectionQuad = OriginalSurroundingQuad.Value;
 
-            float cos = MathF.Cos(float.DegreesToRadians(-axisRotation));
-            float sin = MathF.Sin(float.DegreesToRadians(-axisRotation));
-
-            foreach (var point in points)
-            {
-                scale = clampToBound(scale, point, Vector2.Zero);
-                scale = clampToBound(scale, point, OsuPlayfield.BASE_SIZE);
-            }
+            scale = clampToBound(scale, selectionQuad.BottomRight, OsuPlayfield.BASE_SIZE);
+            scale = clampToBound(scale, selectionQuad.TopLeft, Vector2.Zero);
 
             return Vector2.ComponentMax(scale, new Vector2(Precision.FLOAT_EPSILON));
 
@@ -259,17 +226,19 @@ namespace osu.Game.Rulesets.Osu.Edit
             {
                 p -= actualOrigin;
                 bound -= actualOrigin;
+                float cos = MathF.Cos(float.DegreesToRadians(-axisRotation));
+                float sin = MathF.Sin(float.DegreesToRadians(-axisRotation));
                 var a = new Vector2(cos * cos * p.X - sin * cos * p.Y, -sin * cos * p.X + sin * sin * p.Y);
                 var b = new Vector2(sin * sin * p.X + sin * cos * p.Y, sin * cos * p.X + cos * cos * p.Y);
 
                 switch (adjustAxis)
                 {
                     case Axes.X:
-                        s.X = MathF.Min(s.X, minPositiveComponent(Vector2.Divide(bound - b, a)));
+                        s.X = MathF.Min(scale.X, minPositiveComponent(Vector2.Divide(bound - b, a)));
                         break;
 
                     case Axes.Y:
-                        s.Y = MathF.Min(s.Y, minPositiveComponent(Vector2.Divide(bound - a, b)));
+                        s.Y = MathF.Min(scale.Y, minPositiveComponent(Vector2.Divide(bound - a, b)));
                         break;
 
                     case Axes.Both:
@@ -306,14 +275,12 @@ namespace osu.Game.Rulesets.Osu.Edit
             public Vector2 Position { get; }
             public Vector2[]? PathControlPointPositions { get; }
             public PathType?[]? PathControlPointTypes { get; }
-            public Vector2? EndPosition { get; }
 
             public OriginalHitObjectState(OsuHitObject hitObject)
             {
                 Position = hitObject.Position;
                 PathControlPointPositions = (hitObject as IHasPath)?.Path.ControlPoints.Select(p => p.Position).ToArray();
                 PathControlPointTypes = (hitObject as IHasPath)?.Path.ControlPoints.Select(p => p.Type).ToArray();
-                EndPosition = (hitObject as IHasPath)?.Path.PositionAt(1);
             }
         }
     }
