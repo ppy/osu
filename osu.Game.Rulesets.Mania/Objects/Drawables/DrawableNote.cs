@@ -89,16 +89,24 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             if (!userTriggered)
             {
                 if (!HitObject.HitWindows.CanBeHit(timeOffset))
-                    ApplyResult(r => r.Type = r.Judgement.MinResult);
+                    ApplyMinResult();
+
                 return;
             }
 
             var result = HitObject.HitWindows.ResultFor(timeOffset);
+
             if (result == HitResult.None)
                 return;
 
-            ApplyResult(r => r.Type = result);
+            result = GetCappedResult(result);
+            ApplyResult(result);
         }
+
+        /// <summary>
+        /// Some objects in mania may want to limit the max result.
+        /// </summary>
+        protected virtual HitResult GetCappedResult(HitResult result) => result;
 
         public virtual bool OnPressed(KeyBindingPressEvent<ManiaAction> e)
         {

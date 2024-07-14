@@ -122,19 +122,9 @@ namespace osu.Game.Tests.Visual.Editing
 
             AddAssert("Beatmap has correct timing point", () => EditorBeatmap.ControlPointInfo.TimingPoints.Single().Time == 500);
 
-            // After placement these must be non-default as defaults are read-only.
-            AddAssert("Placed object has non-default control points", () =>
-                !ReferenceEquals(EditorBeatmap.HitObjects[0].SampleControlPoint, SampleControlPoint.DEFAULT) &&
-                !ReferenceEquals(EditorBeatmap.HitObjects[0].DifficultyControlPoint, DifficultyControlPoint.DEFAULT));
-
             ReloadEditorToSameBeatmap();
 
             AddAssert("Beatmap still has correct timing point", () => EditorBeatmap.ControlPointInfo.TimingPoints.Single().Time == 500);
-
-            // After placement these must be non-default as defaults are read-only.
-            AddAssert("Placed object still has non-default control points", () =>
-                !ReferenceEquals(EditorBeatmap.HitObjects[0].SampleControlPoint, SampleControlPoint.DEFAULT) &&
-                !ReferenceEquals(EditorBeatmap.HitObjects[0].DifficultyControlPoint, DifficultyControlPoint.DEFAULT));
         }
 
         [Test]
@@ -202,6 +192,21 @@ namespace osu.Game.Tests.Visual.Editing
             AddStep("Exit editor", () => Editor.Exit());
             AddUntilStep("Wait for song select", () => Game.ScreenStack.CurrentScreen is PlaySongSelect);
             AddAssert("Tags reverted correctly", () => Game.Beatmap.Value.BeatmapInfo.Metadata.Tags == tags_to_save);
+        }
+
+        [Test]
+        public void TestBeatDivisor()
+        {
+            AddStep("Set custom beat divisor", () => Editor.Dependencies.Get<BindableBeatDivisor>().SetArbitraryDivisor(7));
+
+            SaveEditor();
+            AddAssert("Hash updated", () => !string.IsNullOrEmpty(EditorBeatmap.BeatmapInfo.BeatmapSet?.Hash));
+            AddAssert("Beatmap has correct beat divisor", () => EditorBeatmap.BeatmapInfo.BeatDivisor, () => Is.EqualTo(7));
+
+            ReloadEditorToSameBeatmap();
+
+            AddAssert("Beatmap still has correct beat divisor", () => EditorBeatmap.BeatmapInfo.BeatDivisor, () => Is.EqualTo(7));
+            AddAssert("Correct beat divisor actually active", () => Editor.BeatDivisor, () => Is.EqualTo(7));
         }
     }
 }

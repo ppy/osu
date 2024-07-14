@@ -8,7 +8,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Framework.Threading;
-using osu.Game.Graphics;
+using osu.Game.Overlays;
 using osuTK;
 
 namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
@@ -91,21 +91,21 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
                     {
                         Anchor = Anchor.BottomCentre,
                         Origin = Anchor.BottomCentre,
-                        Size = new Vector2(10, 5)
+                        Size = new Vector2(10, 5),
                     },
                     new Box
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         RelativeSizeAxes = Axes.Y,
-                        Width = 2,
+                        Width = 1.4f,
                         EdgeSmoothness = new Vector2(1, 0)
                     }
                 };
             }
 
             [BackgroundDependencyLoader]
-            private void load(OsuColour colours) => Colour = colours.Red;
+            private void load(OverlayColourProvider colours) => Colour = colours.Highlight1;
         }
     }
 }

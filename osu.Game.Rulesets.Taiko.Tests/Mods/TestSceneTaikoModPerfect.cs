@@ -10,7 +10,7 @@ using osu.Game.Tests.Visual;
 
 namespace osu.Game.Rulesets.Taiko.Tests.Mods
 {
-    public partial class TestSceneTaikoModPerfect : ModPerfectTestScene
+    public partial class TestSceneTaikoModPerfect : ModFailConditionTestScene
     {
         protected override Ruleset CreatePlayerRuleset() => new TestTaikoRuleset();
 

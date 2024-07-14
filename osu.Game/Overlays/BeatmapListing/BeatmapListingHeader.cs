@@ -3,6 +3,8 @@
 
 #nullable disable
 
+using osu.Framework.Graphics;
+using osu.Game.Graphics;
 using osu.Game.Localisation;
 using osu.Game.Resources.Localisation.Web;
 
@@ -10,7 +12,11 @@ namespace osu.Game.Overlays.BeatmapListing
 {
     public partial class BeatmapListingHeader : OverlayHeader
     {
+        public BeatmapListingFilterControl FilterControl { get; private set; }
+
         protected override OverlayTitle CreateTitle() => new BeatmapListingTitle();
+
+        protected override Drawable CreateContent() => FilterControl = new BeatmapListingFilterControl();
 
         private partial class BeatmapListingTitle : OverlayTitle
         {
@@ -18,7 +24,7 @@ namespace osu.Game.Overlays.BeatmapListing
             {
                 Title = PageTitleStrings.MainBeatmapsetsControllerIndex;
                 Description = NamedOverlayComponentStrings.BeatmapListingDescription;
-                IconTexture = "Icons/Hexacons/beatmap";
+                Icon = OsuIcon.Beatmap;
             }
         }
     }

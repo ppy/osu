@@ -11,6 +11,7 @@ using osu.Game.Beatmaps.Timing;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Objects;
+using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Play;
@@ -26,7 +27,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         private const double flash_duration = 1000;
 
-        private DrawableRuleset<OsuHitObject> ruleset = null!;
+        private DrawableOsuRuleset ruleset = null!;
 
         protected OsuAction? LastAcceptedAction { get; private set; }
 
@@ -42,8 +43,8 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public void ApplyToDrawableRuleset(DrawableRuleset<OsuHitObject> drawableRuleset)
         {
-            ruleset = drawableRuleset;
-            drawableRuleset.KeyBindingInputManager.Add(new InputInterceptor(this));
+            ruleset = (DrawableOsuRuleset)drawableRuleset;
+            ruleset.KeyBindingInputManager.Add(new InputInterceptor(this));
 
             var periods = new List<Period>();
 

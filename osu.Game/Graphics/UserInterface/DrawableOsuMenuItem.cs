@@ -3,6 +3,7 @@
 
 #nullable disable
 
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -12,6 +13,7 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Game.Graphics.Sprites;
+using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Graphics.UserInterface
@@ -41,7 +43,34 @@ namespace osu.Game.Graphics.UserInterface
 
             updateTextColour();
 
+            bool hasSubmenu = Item.Items.Any();
+
+            // Only add right chevron if direction of menu items is vertical (i.e. width is relative size, see `DrawableMenuItem.SetFlowDirection()`).
+            if (hasSubmenu && RelativeSizeAxes == Axes.X)
+            {
+                AddInternal(new SpriteIcon
+                {
+                    Margin = new MarginPadding(6),
+                    Size = new Vector2(8),
+                    Icon = FontAwesome.Solid.ChevronRight,
+                    Anchor = Anchor.CentreRight,
+                    Origin = Anchor.CentreRight,
+                });
+
+                text.Padding = new MarginPadding
+                {
+                    // Add some padding for the chevron above.
+                    Right = 5,
+                };
+            }
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
             Item.Action.BindDisabledChanged(_ => updateState(), true);
+            FinishTransforms();
         }
 
         private void updateTextColour()
@@ -77,10 +106,10 @@ namespace osu.Game.Graphics.UserInterface
 
         private void updateState()
         {
-            hoverClickSounds.Enabled.Value = !Item.Action.Disabled;
-            Alpha = Item.Action.Disabled ? 0.2f : 1;
+            hoverClickSounds.Enabled.Value = IsActionable;
+            Alpha = IsActionable ? 1 : 0.2f;
 
-            if (IsHovered && !Item.Action.Disabled)
+            if (IsHovered && IsActionable)
             {
                 text.BoldText.FadeIn(transition_length, Easing.OutQuint);
                 text.NormalText.FadeOut(transition_length, Easing.OutQuint);

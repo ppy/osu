@@ -1,7 +1,5 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using System;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
@@ -32,7 +30,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             // derive strainTime for calculation
             var osuCurrObj = (OsuDifficultyHitObject)current;
             var osuPrevObj = current.Index > 0 ? (OsuDifficultyHitObject)current.Previous(0) : null;
-            var osuNextObj = (OsuDifficultyHitObject)current.Next(0);
+            var osuNextObj = (OsuDifficultyHitObject?)current.Next(0);
 
             double strainTime = osuCurrObj.StrainTime;
             double doubletapness = 1;

@@ -167,6 +167,29 @@ namespace osu.Game.Tests.Visual.Collections
         }
 
         [Test]
+        public void TestCollectionNameCollisionsWithBuiltInItems()
+        {
+            AddStep("add dropdown", () =>
+            {
+                Add(new CollectionDropdown
+                {
+                    Anchor = Anchor.TopRight,
+                    Origin = Anchor.TopRight,
+                    RelativeSizeAxes = Axes.X,
+                    Width = 0.4f,
+                });
+            });
+            AddStep("add two collections which collide with default items", () => Realm.Write(r => r.Add(new[]
+            {
+                new BeatmapCollection(name: "All beatmaps"),
+                new BeatmapCollection(name: "Manage collections...")
+                {
+                    BeatmapMD5Hashes = { beatmapManager.GetAllUsableBeatmapSets().First().Beatmaps[0].MD5Hash }
+                },
+            })));
+        }
+
+        [Test]
         public void TestRemoveCollectionViaButton()
         {
             AddStep("add two collections", () => Realm.Write(r => r.Add(new[]
@@ -264,8 +287,9 @@ namespace osu.Game.Tests.Visual.Collections
             assertCollectionName(1, "First");
         }
 
-        [Test]
-        public void TestCollectionRenamedOnTextChange()
+        [TestCase(false)]
+        [TestCase(true)]
+        public void TestCollectionRenamedOnTextChange(bool commitWithEnter)
         {
             BeatmapCollection first = null!;
             DrawableCollectionListItem firstItem = null!;
@@ -293,8 +317,18 @@ namespace osu.Game.Tests.Visual.Collections
             AddStep("change first collection name", () =>
             {
                 firstItem.ChildrenOfType<TextBox>().First().Text = "First";
-                InputManager.Key(Key.Enter);
             });
+
+            if (commitWithEnter)
+                AddStep("commit via enter", () => InputManager.Key(Key.Enter));
+            else
+            {
+                AddStep("commit via click away", () =>
+                {
+                    InputManager.MoveMouseTo(firstItem.ScreenSpaceDrawQuad.TopLeft - new Vector2(10));
+                    InputManager.Click(MouseButton.Left);
+                });
+            }
 
             AddUntilStep("collection has new name", () => first.Name == "First");
         }

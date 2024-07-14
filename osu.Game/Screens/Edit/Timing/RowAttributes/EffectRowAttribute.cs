@@ -11,18 +11,15 @@ namespace osu.Game.Screens.Edit.Timing.RowAttributes
     public partial class EffectRowAttribute : RowAttribute
     {
         private readonly Bindable<bool> kiaiMode;
-        private readonly Bindable<bool> omitBarLine;
         private readonly BindableNumber<double> scrollSpeed;
 
         private AttributeText kiaiModeBubble = null!;
-        private AttributeText omitBarLineBubble = null!;
         private AttributeText text = null!;
 
         public EffectRowAttribute(EffectControlPoint effect)
             : base(effect, "effect")
         {
             kiaiMode = effect.KiaiModeBindable.GetBoundCopy();
-            omitBarLine = effect.OmitFirstBarLineBindable.GetBoundCopy();
             scrollSpeed = effect.ScrollSpeedBindable.GetBoundCopy();
         }
 
@@ -37,11 +34,9 @@ namespace osu.Game.Screens.Edit.Timing.RowAttributes
                 },
                 text = new AttributeText(Point) { Width = 45 },
                 kiaiModeBubble = new AttributeText(Point) { Text = "kiai" },
-                omitBarLineBubble = new AttributeText(Point) { Text = "no barline" },
             });
 
             kiaiMode.BindValueChanged(enabled => kiaiModeBubble.FadeTo(enabled.NewValue ? 1 : 0), true);
-            omitBarLine.BindValueChanged(enabled => omitBarLineBubble.FadeTo(enabled.NewValue ? 1 : 0), true);
             scrollSpeed.BindValueChanged(_ => updateText(), true);
         }
 

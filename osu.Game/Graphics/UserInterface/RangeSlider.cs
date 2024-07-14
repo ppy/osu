@@ -158,7 +158,7 @@ namespace osu.Game.Graphics.UserInterface
                 && screenSpacePos.X >= Nub.ScreenSpaceDrawQuad.TopLeft.X;
         }
 
-        protected partial class BoundSlider : OsuSliderBar<double>
+        protected partial class BoundSlider : RoundedSliderBar<double>
         {
             public string? DefaultString;
             public LocalisableString? DefaultTooltip;

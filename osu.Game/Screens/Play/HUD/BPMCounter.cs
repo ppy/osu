@@ -16,9 +16,9 @@ using osuTK;
 
 namespace osu.Game.Screens.Play.HUD
 {
-    public partial class BPMCounter : RollingCounter<double>, ISkinnableDrawable
+    public partial class BPMCounter : RollingCounter<double>, ISerialisableDrawable
     {
-        protected override double RollingDuration => 750;
+        protected override double RollingDuration => 375;
 
         [Resolved]
         private IBindable<WorkingBeatmap> beatmap { get; set; } = null!;
@@ -37,11 +37,8 @@ namespace osu.Game.Screens.Play.HUD
         {
             base.Update();
 
-            //We don't want it going to 0 when we pause. so we block the updates
-            if (gameplayClock.IsPaused.Value) return;
-
             // We want to check Rate every update to cover windup/down
-            Current.Value = beatmap.Value.Beatmap.ControlPointInfo.TimingPointAt(gameplayClock.CurrentTime).BPM * gameplayClock.Rate;
+            Current.Value = beatmap.Value.Beatmap.ControlPointInfo.TimingPointAt(gameplayClock.CurrentTime).BPM * gameplayClock.GetTrueGameplayRate();
         }
 
         protected override OsuSpriteText CreateSpriteText()

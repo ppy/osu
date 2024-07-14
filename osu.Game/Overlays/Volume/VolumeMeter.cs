@@ -5,6 +5,7 @@
 
 using System;
 using System.Globalization;
+using JetBrains.Annotations;
 using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -48,6 +49,7 @@ namespace osu.Game.Overlays.Volume
         private Sample notchSample;
         private double sampleLastPlaybackTime;
 
+        [CanBeNull]
         public event Action<SelectionState> StateChanged;
 
         private SelectionState state;
@@ -233,7 +235,7 @@ namespace osu.Game.Overlays.Volume
 
             Bindable.BindValueChanged(volume => { this.TransformTo(nameof(DisplayVolume), volume.NewValue, 400, Easing.OutQuint); }, true);
 
-            bgProgress.Current.Value = 0.75f;
+            bgProgress.Progress = 0.75f;
         }
 
         private int? displayVolumeInt;
@@ -263,8 +265,8 @@ namespace osu.Game.Overlays.Volume
                     text.Text = intValue.ToString(CultureInfo.CurrentCulture);
                 }
 
-                volumeCircle.Current.Value = displayVolume * 0.75f;
-                volumeCircleGlow.Current.Value = displayVolume * 0.75f;
+                volumeCircle.Progress = displayVolume * 0.75f;
+                volumeCircleGlow.Progress = displayVolume * 0.75f;
 
                 if (intVolumeChanged && IsLoaded)
                     Scheduler.AddOnce(playTickSound);
@@ -312,6 +314,33 @@ namespace osu.Game.Overlays.Volume
         private ScheduledDelegate accelerationDebounce;
 
         private void resetAcceleration() => accelerationModifier = 1;
+
+        private float dragDelta;
+
+        protected override bool OnDragStart(DragStartEvent e)
+        {
+            dragDelta = 0;
+            adjustFromDrag(e.Delta);
+            return true;
+        }
+
+        protected override void OnDrag(DragEvent e)
+        {
+            adjustFromDrag(e.Delta);
+            base.OnDrag(e);
+        }
+
+        private void adjustFromDrag(Vector2 delta)
+        {
+            const float mouse_drag_divisor = 200;
+
+            dragDelta += delta.Y / mouse_drag_divisor;
+
+            if (Math.Abs(dragDelta) < 0.01) return;
+
+            Volume -= dragDelta;
+            dragDelta = 0;
+        }
 
         private void adjust(double delta, bool isPrecise)
         {

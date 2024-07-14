@@ -4,20 +4,20 @@
 #nullable disable
 
 using System.Collections.Generic;
-using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Effects;
-using osuTK;
-using osuTK.Graphics;
-using osu.Framework.Graphics.Shapes;
-using osu.Game.Rulesets;
-using osu.Framework.Graphics.UserInterface;
-using osu.Framework.Input.Events;
-using osuTK.Input;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
+using osu.Framework.Bindables;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Input.Events;
+using osu.Game.Rulesets;
+using osuTK;
+using osuTK.Graphics;
+using osuTK.Input;
 
 namespace osu.Game.Overlays.Toolbar
 {
@@ -25,7 +25,12 @@ namespace osu.Game.Overlays.Toolbar
     {
         protected Drawable ModeButtonLine { get; private set; }
 
-        private readonly Dictionary<string, Sample> selectionSamples = new Dictionary<string, Sample>();
+        [Resolved]
+        private MusicController musicController { get; set; }
+
+        private readonly Dictionary<RulesetInfo, Sample> rulesetSelectionSample = new Dictionary<RulesetInfo, Sample>();
+        private readonly Dictionary<RulesetInfo, SampleChannel> rulesetSelectionChannel = new Dictionary<RulesetInfo, SampleChannel>();
+        private Sample defaultSelectSample;
 
         public ToolbarRulesetSelector()
         {
@@ -41,29 +46,32 @@ namespace osu.Game.Overlays.Toolbar
                 new OpaqueBackground
                 {
                     Depth = 1,
+                    Masking = true,
                 },
                 ModeButtonLine = new Container
                 {
                     Size = new Vector2(Toolbar.HEIGHT, 3),
                     Anchor = Anchor.BottomLeft,
-                    Origin = Anchor.TopLeft,
-                    Masking = true,
-                    EdgeEffect = new EdgeEffectParameters
+                    Origin = Anchor.BottomLeft,
+                    Y = -1,
+                    Children = new Drawable[]
                     {
-                        Type = EdgeEffectType.Glow,
-                        Colour = new Color4(255, 194, 224, 100),
-                        Radius = 15,
-                        Roundness = 15,
-                    },
-                    Child = new Box
-                    {
-                        RelativeSizeAxes = Axes.Both,
+                        new Circle
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            Size = new Vector2(18, 3),
+                        }
                     }
-                }
+                },
             });
 
-            foreach (var ruleset in Rulesets.AvailableRulesets)
-                selectionSamples[ruleset.ShortName] = audio.Samples.Get($"UI/ruleset-select-{ruleset.ShortName}");
+            foreach (var r in Rulesets.AvailableRulesets)
+                rulesetSelectionSample[r] = audio.Samples.Get($@"UI/ruleset-select-{r.ShortName}");
+
+            defaultSelectSample = audio.Samples.Get(@"UI/default-select");
+
+            Current.ValueChanged += playRulesetSelectionSample;
         }
 
         protected override void LoadComplete()
@@ -89,13 +97,32 @@ namespace osu.Game.Overlays.Toolbar
         {
             if (SelectedTab != null)
             {
-                ModeButtonLine.MoveToX(SelectedTab.DrawPosition.X, !hasInitialPosition ? 0 : 200, Easing.OutQuint);
-
-                if (hasInitialPosition)
-                    selectionSamples[SelectedTab.Value.ShortName]?.Play();
-
+                ModeButtonLine.MoveToX(SelectedTab.DrawPosition.X, !hasInitialPosition ? 0 : 500, Easing.OutElasticQuarter);
                 hasInitialPosition = true;
             }
+        }
+
+        private void playRulesetSelectionSample(ValueChangedEvent<RulesetInfo> r)
+        {
+            // Don't play sample on first setting of value
+            if (r.OldValue == null)
+                return;
+
+            var channel = rulesetSelectionSample[r.NewValue]?.GetChannel();
+
+            // Skip sample choking and ducking for the default/fallback sample
+            if (channel == null)
+            {
+                defaultSelectSample.Play();
+                return;
+            }
+
+            foreach (var pair in rulesetSelectionChannel)
+                pair.Value?.Stop();
+
+            rulesetSelectionChannel[r.NewValue] = channel;
+            channel.Play();
+            musicController?.DuckMomentarily(500, new DuckParameters { DuckDuration = 0 });
         }
 
         public override bool HandleNonPositionalInput => !Current.Disabled && base.HandleNonPositionalInput;
@@ -123,7 +150,7 @@ namespace osu.Game.Overlays.Toolbar
 
                 RulesetInfo found = Rulesets.AvailableRulesets.ElementAtOrDefault(requested);
                 if (found != null)
-                    Current.Value = found;
+                    SelectItem(found);
                 return true;
             }
 

@@ -35,20 +35,20 @@ namespace osu.Game.Tests.Visual.Gameplay
             var referenceBeatmap = CreateBeatmap(new OsuRuleset().RulesetInfo);
 
             AddUntilStep("score above zero", () => Player.ScoreProcessor.TotalScore.Value > 0);
-            AddUntilStep("key counter counted keys", () => Player.HUDOverlay.KeyCounter.Children.Any(kc => kc.CountPresses > 2));
+            AddUntilStep("key counter counted keys", () => Player.HUDOverlay.InputCountController.Triggers.Any(kc => kc.ActivationCount.Value > 2));
 
             seekTo(referenceBeatmap.Breaks[0].StartTime);
-            AddAssert("keys not counting", () => !Player.HUDOverlay.KeyCounter.IsCounting);
+            AddAssert("keys not counting", () => !Player.HUDOverlay.InputCountController.IsCounting.Value);
             AddAssert("overlay displays 100% accuracy", () => Player.BreakOverlay.ChildrenOfType<BreakInfo>().Single().AccuracyDisplay.Current.Value == 1);
 
             AddStep("rewind", () => Player.GameplayClockContainer.Seek(-80000));
-            AddUntilStep("key counter reset", () => Player.HUDOverlay.KeyCounter.Children.All(kc => kc.CountPresses == 0));
+            AddUntilStep("key counter reset", () => Player.HUDOverlay.InputCountController.Triggers.All(kc => kc.ActivationCount.Value == 0));
 
             seekTo(referenceBeatmap.HitObjects[^1].GetEndTime());
             AddUntilStep("results displayed", () => getResultsScreen()?.IsLoaded == true);
 
-            AddAssert("score has combo", () => getResultsScreen().Score.Combo > 100);
-            AddAssert("score has no misses", () => getResultsScreen().Score.Statistics[HitResult.Miss] == 0);
+            AddAssert("score has combo", () => getResultsScreen().Score!.Combo > 100);
+            AddAssert("score has no misses", () => getResultsScreen().Score!.Statistics[HitResult.Miss] == 0);
 
             AddUntilStep("avatar displayed", () => getAvatar() != null);
             AddAssert("avatar not clickable", () => getAvatar().ChildrenOfType<OsuClickableContainer>().First().Action == null);

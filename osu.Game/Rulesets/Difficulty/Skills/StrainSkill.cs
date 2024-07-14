@@ -1,7 +1,5 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using System;
 using System.Collections.Generic;
@@ -110,7 +108,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
 
             // Difficulty is the weighted sum of the highest strains from every section.
             // We're sorting from highest to lowest strain.
-            foreach (double strain in peaks.OrderByDescending(d => d))
+            foreach (double strain in peaks.OrderDescending())
             {
                 difficulty += strain * weight;
                 weight *= DecayWeight;

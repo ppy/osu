@@ -7,14 +7,12 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Animations;
-using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Catch.UI;
 using osu.Game.Skinning;
-using osuTK;
 
 namespace osu.Game.Rulesets.Catch.Skinning.Legacy
 {
-    public partial class LegacyCatcherNew : CompositeDrawable
+    public partial class LegacyCatcherNew : LegacyCatcher
     {
         [Resolved]
         private Bindable<CatcherAnimationState> currentState { get; set; } = null!;
@@ -23,25 +21,12 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
 
         private Drawable currentDrawable = null!;
 
-        public LegacyCatcherNew()
-        {
-            RelativeSizeAxes = Axes.Both;
-        }
-
         [BackgroundDependencyLoader]
         private void load(ISkinSource skin)
         {
             foreach (var state in Enum.GetValues<CatcherAnimationState>())
             {
-                AddInternal(drawables[state] = getDrawableFor(state).With(d =>
-                {
-                    d.Anchor = Anchor.TopCentre;
-                    d.Origin = Anchor.TopCentre;
-                    d.RelativeSizeAxes = Axes.Both;
-                    d.Size = Vector2.One;
-                    d.FillMode = FillMode.Fit;
-                    d.Alpha = 0;
-                }));
+                AddInternal(drawables[state] = getDrawableFor(state).With(d => d.Alpha = 0));
             }
 
             currentDrawable = drawables[CatcherAnimationState.Idle];

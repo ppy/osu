@@ -14,12 +14,12 @@ using osuTK;
 
 namespace osu.Game.Screens.Play.HUD.ClicksPerSecond
 {
-    public partial class ClicksPerSecondCounter : RollingCounter<int>, ISkinnableDrawable
+    public partial class ClicksPerSecondCounter : RollingCounter<int>, ISerialisableDrawable
     {
         [Resolved]
-        private ClicksPerSecondCalculator calculator { get; set; } = null!;
+        private ClicksPerSecondController controller { get; set; } = null!;
 
-        protected override double RollingDuration => 350;
+        protected override double RollingDuration => 175;
 
         public bool UsesFixedAnchor { get; set; }
 
@@ -38,7 +38,7 @@ namespace osu.Game.Screens.Play.HUD.ClicksPerSecond
         {
             base.Update();
 
-            Current.Value = calculator.Value;
+            Current.Value = controller.Value;
         }
 
         protected override IHasText CreateText() => new TextComponent();

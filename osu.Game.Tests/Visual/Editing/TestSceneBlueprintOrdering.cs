@@ -1,7 +1,5 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using System.Linq;
 using NUnit.Framework;
@@ -66,7 +64,7 @@ namespace osu.Game.Tests.Visual.Editing
 
             AddStep("move mouse to common point", () =>
             {
-                var pos = blueprintContainer.ChildrenOfType<PathControlPointPiece>().ElementAt(1).ScreenSpaceDrawQuad.Centre;
+                var pos = blueprintContainer.ChildrenOfType<PathControlPointPiece<Slider>>().ElementAt(1).ScreenSpaceDrawQuad.Centre;
                 InputManager.MoveMouseTo(pos);
             });
             AddStep("right click", () => InputManager.Click(MouseButton.Right));

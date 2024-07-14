@@ -64,8 +64,6 @@ namespace osu.Game.Rulesets.UI.Scrolling
             MaxValue = time_span_max
         };
 
-        protected virtual ScrollVisualisationMethod VisualisationMethod => ScrollVisualisationMethod.Sequential;
-
         ScrollVisualisationMethod IDrawableScrollingRuleset.VisualisationMethod => VisualisationMethod;
 
         /// <summary>
@@ -83,7 +81,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
         /// </summary>
         protected readonly SortedList<MultiplierControlPoint> ControlPoints = new SortedList<MultiplierControlPoint>(Comparer<MultiplierControlPoint>.Default);
 
-        protected IScrollingInfo ScrollingInfo => scrollingInfo;
+        public IScrollingInfo ScrollingInfo => scrollingInfo;
 
         [Cached(Type = typeof(IScrollingInfo))]
         private readonly LocalScrollingInfo scrollingInfo;
@@ -99,20 +97,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
         [BackgroundDependencyLoader]
         private void load()
         {
-            switch (VisualisationMethod)
-            {
-                case ScrollVisualisationMethod.Sequential:
-                    scrollingInfo.Algorithm = new SequentialScrollAlgorithm(ControlPoints);
-                    break;
-
-                case ScrollVisualisationMethod.Overlapping:
-                    scrollingInfo.Algorithm = new OverlappingScrollAlgorithm(ControlPoints);
-                    break;
-
-                case ScrollVisualisationMethod.Constant:
-                    scrollingInfo.Algorithm = new ConstantScrollAlgorithm();
-                    break;
-            }
+            updateScrollAlgorithm();
 
             double lastObjectTime = Beatmap.HitObjects.Any() ? Beatmap.GetLastObjectTime() : double.MaxValue;
             double baseBeatLength = TimingControlPoint.DEFAULT_BEAT_LENGTH;
@@ -178,6 +163,36 @@ namespace osu.Game.Rulesets.UI.Scrolling
                 throw new ArgumentException($"{nameof(Playfield)} must be a {nameof(ScrollingPlayfield)} when using {nameof(DrawableScrollingRuleset<TObject>)}.");
         }
 
+        private ScrollVisualisationMethod visualisationMethod = ScrollVisualisationMethod.Sequential;
+
+        public ScrollVisualisationMethod VisualisationMethod
+        {
+            get => visualisationMethod;
+            set
+            {
+                visualisationMethod = value;
+                updateScrollAlgorithm();
+            }
+        }
+
+        private void updateScrollAlgorithm()
+        {
+            switch (VisualisationMethod)
+            {
+                case ScrollVisualisationMethod.Sequential:
+                    scrollingInfo.Algorithm.Value = new SequentialScrollAlgorithm(ControlPoints);
+                    break;
+
+                case ScrollVisualisationMethod.Overlapping:
+                    scrollingInfo.Algorithm.Value = new OverlappingScrollAlgorithm(ControlPoints);
+                    break;
+
+                case ScrollVisualisationMethod.Constant:
+                    scrollingInfo.Algorithm.Value = new ConstantScrollAlgorithm();
+                    break;
+            }
+        }
+
         /// <summary>
         /// Adjusts the scroll speed of <see cref="HitObject"/>s.
         /// </summary>
@@ -217,7 +232,9 @@ namespace osu.Game.Rulesets.UI.Scrolling
 
             public IBindable<double> TimeRange { get; } = new BindableDouble();
 
-            public IScrollAlgorithm Algorithm { get; set; }
+            public readonly Bindable<IScrollAlgorithm> Algorithm = new Bindable<IScrollAlgorithm>(new ConstantScrollAlgorithm());
+
+            IBindable<IScrollAlgorithm> IScrollingInfo.Algorithm => Algorithm;
         }
     }
 }

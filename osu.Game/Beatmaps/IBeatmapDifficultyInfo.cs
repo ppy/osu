@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
+
 namespace osu.Game.Beatmaps
 {
     /// <summary>
@@ -34,7 +36,8 @@ namespace osu.Game.Beatmaps
         float ApproachRate { get; }
 
         /// <summary>
-        /// The slider multiplier of the associated beatmap.
+        /// The base slider velocity of the associated beatmap.
+        /// This was known as "SliderMultiplier" in the .osu format and stable editor.
         /// </summary>
         double SliderMultiplier { get; }
 
@@ -54,12 +57,19 @@ namespace osu.Game.Beatmaps
         static double DifficultyRange(double difficulty, double min, double mid, double max)
         {
             if (difficulty > 5)
-                return mid + (max - mid) * (difficulty - 5) / 5;
+                return mid + (max - mid) * DifficultyRange(difficulty);
             if (difficulty < 5)
-                return mid - (mid - min) * (5 - difficulty) / 5;
+                return mid + (mid - min) * DifficultyRange(difficulty);
 
             return mid;
         }
+
+        /// <summary>
+        /// Maps a difficulty value [0, 10] to a linear range of [-1, 1].
+        /// </summary>
+        /// <param name="difficulty">The difficulty value to be mapped.</param>
+        /// <returns>Value to which the difficulty value maps in the specified range.</returns>
+        static double DifficultyRange(double difficulty) => (difficulty - 5) / 5;
 
         /// <summary>
         /// Maps a difficulty value [0, 10] to a two-piece linear range of values.
@@ -84,5 +94,21 @@ namespace osu.Game.Beatmaps
         /// <returns>Value to which the difficulty value maps in the specified range.</returns>
         static double DifficultyRange(double difficulty, (double od0, double od5, double od10) range)
             => DifficultyRange(difficulty, range.od0, range.od5, range.od10);
+
+        /// <summary>
+        /// Inverse function to <see cref="DifficultyRange(double,double,double,double)"/>.
+        /// Maps a value returned by the function above back to the difficulty that produced it.
+        /// </summary>
+        /// <param name="difficultyValue">The difficulty-dependent value to be unmapped.</param>
+        /// <param name="diff0">Minimum of the resulting range which will be achieved by a difficulty value of 0.</param>
+        /// <param name="diff5">Midpoint of the resulting range which will be achieved by a difficulty value of 5.</param>
+        /// <param name="diff10">Maximum of the resulting range which will be achieved by a difficulty value of 10.</param>
+        /// <returns>Value to which the difficulty value maps in the specified range.</returns>
+        static double InverseDifficultyRange(double difficultyValue, double diff0, double diff5, double diff10)
+        {
+            return Math.Sign(difficultyValue - diff5) == Math.Sign(diff10 - diff5)
+                ? (difficultyValue - diff5) / (diff10 - diff5) * 5 + 5
+                : (difficultyValue - diff5) / (diff5 - diff0) * 5 + 5;
+        }
     }
 }

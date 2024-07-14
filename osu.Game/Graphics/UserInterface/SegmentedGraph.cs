@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Rendering;
 using osu.Framework.Graphics.Shaders;
@@ -48,17 +49,14 @@ namespace osu.Game.Graphics.UserInterface
             }
         }
 
-        private Colour4[] tierColours;
+        private IReadOnlyList<Colour4> tierColours;
 
-        public Colour4[] TierColours
+        public IReadOnlyList<Colour4> TierColours
         {
             get => tierColours;
             set
             {
-                if (value.Length == 0 || value == tierColours)
-                    return;
-
-                tierCount = value.Length;
+                tierCount = value.Count;
                 tierColours = value;
 
                 graphNeedsUpdate = true;
@@ -154,8 +152,6 @@ namespace osu.Game.Graphics.UserInterface
             segments.Sort();
         }
 
-        private Colour4 getTierColour(int tier) => tier >= 0 ? tierColours[tier] : new Colour4(0, 0, 0, 0);
-
         protected override DrawNode CreateDrawNode() => new SegmentedGraphDrawNode(this);
 
         protected struct SegmentInfo
@@ -203,6 +199,7 @@ namespace osu.Game.Graphics.UserInterface
             private IShader shader = null!;
             private readonly List<SegmentInfo> segments = new List<SegmentInfo>();
             private Vector2 drawSize;
+            private readonly List<Colour4> tierColours = new List<Colour4>();
 
             public SegmentedGraphDrawNode(SegmentedGraph<T> source)
                 : base(source)
@@ -216,11 +213,15 @@ namespace osu.Game.Graphics.UserInterface
                 texture = Source.texture;
                 shader = Source.shader;
                 drawSize = Source.DrawSize;
+
                 segments.Clear();
                 segments.AddRange(Source.segments.Where(s => s.Length * drawSize.X > 1));
+
+                tierColours.Clear();
+                tierColours.AddRange(Source.tierColours);
             }
 
-            public override void Draw(IRenderer renderer)
+            protected override void Draw(IRenderer renderer)
             {
                 base.Draw(renderer);
 
@@ -240,10 +241,20 @@ namespace osu.Game.Graphics.UserInterface
                             Vector2Extensions.Transform(topRight, DrawInfo.Matrix),
                             Vector2Extensions.Transform(bottomLeft, DrawInfo.Matrix),
                             Vector2Extensions.Transform(bottomRight, DrawInfo.Matrix)),
-                        Source.getTierColour(segment.Tier));
+                        getSegmentColour(segment));
                 }
 
                 shader.Unbind();
+            }
+
+            private ColourInfo getSegmentColour(SegmentInfo segment)
+            {
+                var segmentColour = DrawColourInfo.Colour.Interpolate(new Quad(segment.Start, 0f, segment.End - segment.Start, 1f));
+
+                var tierColour = segment.Tier >= 0 ? tierColours[segment.Tier] : new Colour4(0, 0, 0, 0);
+                segmentColour.ApplyChild(tierColour);
+
+                return segmentColour;
             }
         }
 

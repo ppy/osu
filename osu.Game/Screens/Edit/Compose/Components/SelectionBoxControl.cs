@@ -24,7 +24,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         public event Action OperationStarted;
         public event Action OperationEnded;
 
-        private Circle circle;
+        protected Circle Circle { get; private set; }
 
         /// <summary>
         /// Whether the user is currently holding the control with mouse.
@@ -41,7 +41,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
             InternalChildren = new Drawable[]
             {
-                circle = new Circle
+                Circle = new Circle
                 {
                     RelativeSizeAxes = Axes.Both,
                     Anchor = Anchor.Centre,
@@ -85,9 +85,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
         protected virtual void UpdateHoverState()
         {
             if (IsHeld)
-                circle.FadeColour(Colours.GrayF, TRANSFORM_DURATION, Easing.OutQuint);
+                Circle.FadeColour(Colours.GrayF, TRANSFORM_DURATION, Easing.OutQuint);
             else
-                circle.FadeColour(IsHovered ? Colours.Red : Colours.YellowDark, TRANSFORM_DURATION, Easing.OutQuint);
+                Circle.FadeColour(IsHovered ? Colours.Red : Colours.YellowDark, TRANSFORM_DURATION, Easing.OutQuint);
 
             this.ScaleTo(IsHeld || IsHovered ? 1.5f : 1, TRANSFORM_DURATION, Easing.OutQuint);
         }

@@ -64,7 +64,7 @@ namespace osu.Game.Rulesets.Edit.Checks
                 yield break;
 
             // Samples that allow themselves to be overridden by control points have a volume of 0.
-            int maxVolume = sampledHitObject.Samples.Max(sample => sample.Volume > 0 ? sample.Volume : sampledHitObject.SampleControlPoint.SampleVolume);
+            int maxVolume = sampledHitObject.Samples.Max(sample => sample.Volume);
             double samplePlayTime = sampledHitObject.GetEndTime();
 
             EdgeType edgeType = getEdgeAtTime(hitObject, samplePlayTime);

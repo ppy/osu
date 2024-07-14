@@ -3,13 +3,16 @@
 
 #nullable disable
 
+using System;
 using System.Collections.Generic;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Scoring;
 using osu.Game.Screens.Play.Break;
 
 namespace osu.Game.Screens.Play
@@ -46,12 +49,13 @@ namespace osu.Game.Screens.Play
         private readonly Container remainingTimeBox;
         private readonly RemainingTimeCounter remainingTimeCounter;
         private readonly BreakArrows breakArrows;
+        private readonly ScoreProcessor scoreProcessor;
+        private readonly BreakInfo info;
 
         public BreakOverlay(bool letterboxing, ScoreProcessor scoreProcessor)
         {
+            this.scoreProcessor = scoreProcessor;
             RelativeSizeAxes = Axes.Both;
-
-            BreakInfo info;
 
             Child = fadeContainer = new Container
             {
@@ -72,15 +76,13 @@ namespace osu.Game.Screens.Play
                         AutoSizeAxes = Axes.Y,
                         RelativeSizeAxes = Axes.X,
                         Width = 0,
-                        Child = remainingTimeBox = new Container
+                        Child = remainingTimeBox = new Circle
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             RelativeSizeAxes = Axes.X,
                             Height = 8,
-                            CornerRadius = 4,
                             Masking = true,
-                            Child = new Box { RelativeSizeAxes = Axes.Both }
                         }
                     },
                     remainingTimeCounter = new RemainingTimeCounter
@@ -102,18 +104,25 @@ namespace osu.Game.Screens.Play
                     }
                 }
             };
-
-            if (scoreProcessor != null)
-            {
-                info.AccuracyDisplay.Current.BindTo(scoreProcessor.Accuracy);
-                info.GradeDisplay.Current.BindTo(scoreProcessor.Rank);
-            }
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
             initializeBreaks();
+
+            if (scoreProcessor != null)
+            {
+                info.AccuracyDisplay.Current.BindTo(scoreProcessor.Accuracy);
+                ((IBindable<ScoreRank>)info.GradeDisplay.Current).BindTo(scoreProcessor.Rank);
+            }
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            remainingTimeBox.Height = Math.Min(8, remainingTimeBox.DrawWidth);
         }
 
         private void initializeBreaks()

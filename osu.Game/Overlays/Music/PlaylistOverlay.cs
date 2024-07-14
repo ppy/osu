@@ -8,7 +8,6 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
-using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
@@ -109,7 +108,7 @@ namespace osu.Game.Overlays.Music
             beatmap.BindValueChanged(working => list.SelectedSet.Value = working.NewValue.BeatmapSetInfo.ToLive(realm), true);
         }
 
-        private void beatmapsChanged(IRealmCollection<BeatmapSetInfo> sender, ChangeSet changes, Exception error)
+        private void beatmapsChanged(IRealmCollection<BeatmapSetInfo> sender, ChangeSet changes)
         {
             if (changes == null)
             {
@@ -122,7 +121,7 @@ namespace osu.Game.Overlays.Music
             foreach (int i in changes.InsertedIndices)
                 beatmapSets.Insert(i, sender[i].ToLive(realm));
 
-            foreach (int i in changes.DeletedIndices.OrderByDescending(i => i))
+            foreach (int i in changes.DeletedIndices.OrderDescending())
                 beatmapSets.RemoveAt(i);
         }
 
@@ -131,7 +130,7 @@ namespace osu.Game.Overlays.Music
             filter.Search.HoldFocus = true;
             Schedule(() => filter.Search.TakeFocus());
 
-            this.ResizeTo(new Vector2(1, RelativeSizeAxes.HasFlagFast(Axes.Y) ? 1f : PLAYLIST_HEIGHT), transition_duration, Easing.OutQuint);
+            this.ResizeTo(new Vector2(1, RelativeSizeAxes.HasFlag(Axes.Y) ? 1f : PLAYLIST_HEIGHT), transition_duration, Easing.OutQuint);
             this.FadeIn(transition_duration, Easing.OutQuint);
         }
 

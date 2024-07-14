@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -14,10 +12,11 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays;
 using osu.Game.Overlays.BeatmapListing;
 using osuTK;
+using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public partial class TestSceneBeatmapListingSortTabControl : OsuTestScene
+    public partial class TestSceneBeatmapListingSortTabControl : OsuManualInputManagerTestScene
     {
         private readonly BeatmapListingSortTabControl control;
 
@@ -109,6 +108,29 @@ namespace osu.Game.Tests.Visual.UserInterface
             resetUsesCriteriaOnCategory(SortCriteria.Updated, SearchCategory.Wip);
             resetUsesCriteriaOnCategory(SortCriteria.Updated, SearchCategory.Graveyard);
             resetUsesCriteriaOnCategory(SortCriteria.Updated, SearchCategory.Mine);
+        }
+
+        [Test]
+        public void TestSortDirectionOnCriteriaChange()
+        {
+            AddStep("set category to leaderboard", () => control.Reset(SearchCategory.Leaderboard, false));
+            AddAssert("sort direction is descending", () => control.SortDirection.Value == SortDirection.Descending);
+
+            AddStep("click ranked sort button", () =>
+            {
+                InputManager.MoveMouseTo(control.TabControl.ChildrenOfType<BeatmapListingSortTabControl.BeatmapTabButton>().Single(s => s.Active.Value));
+                InputManager.Click(MouseButton.Left);
+            });
+
+            AddAssert("sort direction is ascending", () => control.SortDirection.Value == SortDirection.Ascending);
+
+            AddStep("click first inactive sort button", () =>
+            {
+                InputManager.MoveMouseTo(control.TabControl.ChildrenOfType<BeatmapListingSortTabControl.BeatmapTabButton>().First(s => !s.Active.Value));
+                InputManager.Click(MouseButton.Left);
+            });
+
+            AddAssert("sort direction is descending", () => control.SortDirection.Value == SortDirection.Descending);
         }
 
         private void criteriaShowsOnCategory(bool expected, SortCriteria criteria, SearchCategory category)

@@ -42,7 +42,7 @@ namespace osu.Game.Overlays.Toolbar
         protected readonly IBindable<OverlayActivation> OverlayActivationMode = new Bindable<OverlayActivation>(OverlayActivation.All);
 
         // Toolbar and its components need keyboard input even when hidden.
-        public override bool PropagateNonPositionalInputSubTree => true;
+        public override bool PropagateNonPositionalInputSubTree => OverlayActivationMode.Value != OverlayActivation.Disabled;
 
         public Toolbar()
         {
@@ -164,11 +164,11 @@ namespace osu.Game.Overlays.Toolbar
                                         {
                                             new ToolbarNewsButton(),
                                             new ToolbarChangelogButton(),
+                                            new ToolbarWikiButton(),
                                             new ToolbarRankingsButton(),
                                             new ToolbarBeatmapListingButton(),
                                             new ToolbarChatButton(),
                                             new ToolbarSocialButton(),
-                                            new ToolbarWikiButton(),
                                             new ToolbarMusicButton(),
                                             //new ToolbarButton
                                             //{
@@ -224,9 +224,9 @@ namespace osu.Game.Overlays.Toolbar
                         RelativeSizeAxes = Axes.X,
                         Anchor = Anchor.BottomLeft,
                         Alpha = 0,
-                        Height = 100,
+                        Height = 80,
                         Colour = ColourInfo.GradientVertical(
-                            OsuColour.Gray(0).Opacity(0.9f), OsuColour.Gray(0).Opacity(0)),
+                            OsuColour.Gray(0f).Opacity(0.7f), OsuColour.Gray(0).Opacity(0)),
                     },
                 };
             }
@@ -241,9 +241,9 @@ namespace osu.Game.Overlays.Toolbar
             private void updateState()
             {
                 if (ShowGradient.Value)
-                    gradientBackground.FadeIn(transition_time, Easing.OutQuint);
+                    gradientBackground.FadeIn(2500, Easing.OutQuint);
                 else
-                    gradientBackground.FadeOut(transition_time, Easing.OutQuint);
+                    gradientBackground.FadeOut(200, Easing.OutQuint);
             }
         }
 

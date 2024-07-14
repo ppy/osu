@@ -68,9 +68,6 @@ namespace osu.Game.Screens.Select.Leaderboards
         }
 
         [Resolved]
-        private ScoreManager scoreManager { get; set; } = null!;
-
-        [Resolved]
         private IBindable<RulesetInfo> ruleset { get; set; } = null!;
 
         [Resolved]
@@ -104,6 +101,9 @@ namespace osu.Game.Screens.Select.Leaderboards
 
         protected override APIRequest? FetchScores(CancellationToken cancellationToken)
         {
+            scoreRetrievalRequest?.Cancel();
+            scoreRetrievalRequest = null;
+
             var fetchBeatmapInfo = BeatmapInfo;
 
             if (fetchBeatmapInfo == null)
@@ -152,8 +152,6 @@ namespace osu.Game.Screens.Select.Leaderboards
             else if (filterMods)
                 requestMods = mods.Value;
 
-            scoreRetrievalRequest?.Cancel();
-
             var newRequest = new GetScoresRequest(fetchBeatmapInfo, fetchRuleset, Scope, requestMods);
             newRequest.Success += response => Schedule(() =>
             {
@@ -163,7 +161,7 @@ namespace osu.Game.Screens.Select.Leaderboards
                     return;
 
                 SetScores(
-                    scoreManager.OrderByTotalScore(response.Scores.Select(s => s.ToScoreInfo(rulesets, fetchBeatmapInfo))),
+                    response.Scores.Select(s => s.ToScoreInfo(rulesets, fetchBeatmapInfo)).OrderByTotalScore(),
                     response.UserScore?.CreateScoreInfo(rulesets, fetchBeatmapInfo)
                 );
             });
@@ -190,11 +188,12 @@ namespace osu.Game.Screens.Select.Leaderboards
 
             scoreSubscription = realm.RegisterForNotifications(r =>
                 r.All<ScoreInfo>().Filter($"{nameof(ScoreInfo.BeatmapInfo)}.{nameof(BeatmapInfo.ID)} == $0"
+                                          + $" AND {nameof(ScoreInfo.BeatmapInfo)}.{nameof(BeatmapInfo.Hash)} == {nameof(ScoreInfo.BeatmapHash)}"
                                           + $" AND {nameof(ScoreInfo.Ruleset)}.{nameof(RulesetInfo.ShortName)} == $1"
                                           + $" AND {nameof(ScoreInfo.DeletePending)} == false"
                     , beatmapInfo.ID, ruleset.Value.ShortName), localScoresChanged);
 
-            void localScoresChanged(IRealmCollection<ScoreInfo> sender, ChangeSet? changes, Exception exception)
+            void localScoresChanged(IRealmCollection<ScoreInfo> sender, ChangeSet? changes)
             {
                 if (cancellationToken.IsCancellationRequested)
                     return;
@@ -220,7 +219,7 @@ namespace osu.Game.Screens.Select.Leaderboards
                     scores = scores.Where(s => selectedMods.SetEquals(s.Mods.Select(m => m.Acronym)));
                 }
 
-                scores = scoreManager.OrderByTotalScore(scores.Detach());
+                scores = scores.Detach().OrderByTotalScore();
 
                 SetScores(scores);
             }

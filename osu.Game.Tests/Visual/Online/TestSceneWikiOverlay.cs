@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Linq;
 using System.Net;
@@ -20,7 +18,7 @@ namespace osu.Game.Tests.Visual.Online
     {
         private DummyAPIAccess dummyAPI => (DummyAPIAccess)API;
 
-        private WikiOverlay wiki;
+        private WikiOverlay wiki = null!;
 
         [SetUp]
         public void SetUp() => Schedule(() => Child = wiki = new WikiOverlay());
@@ -29,13 +27,13 @@ namespace osu.Game.Tests.Visual.Online
         public void TestMainPage()
         {
             setUpWikiResponse(responseMainPage);
-            AddStep("Show main page", () => wiki.Show());
+            AddStep("Show main page", () => wiki.ShowPage());
         }
 
         [Test]
         public void TestCancellationDoesntShowError()
         {
-            AddStep("Show main page", () => wiki.Show());
+            AddStep("Show main page", () => wiki.ShowPage());
             AddStep("Show another page", () => wiki.ShowPage("Article_styling_criteria/Formatting"));
 
             AddUntilStep("Current path is not error", () => wiki.CurrentPath != "error");
@@ -73,7 +71,23 @@ namespace osu.Game.Tests.Visual.Online
             AddUntilStep("Error message correct", () => wiki.ChildrenOfType<SpriteText>().Any(text => text.Text == "\"This_page_will_error_out\"."));
         }
 
-        private void setUpWikiResponse(APIWikiPage r, string redirectionPath = null)
+        [Test]
+        public void TestReturnAfterErrorPage()
+        {
+            setUpWikiResponse(responseArticlePage);
+
+            AddStep("Show article page", () => wiki.ShowPage("Article_styling_criteria/Formatting"));
+            AddUntilStep("Wait for non-error page", () => wiki.CurrentPath == "Article_styling_criteria/Formatting");
+
+            AddStep("Show nonexistent page", () => wiki.ShowPage("This_page_will_error_out"));
+            AddUntilStep("Wait for error page", () => wiki.CurrentPath == "error");
+
+            AddStep("Show article page", () => wiki.ShowPage("Article_styling_criteria/Formatting"));
+            AddUntilStep("Wait for non-error page", () => wiki.CurrentPath == "Article_styling_criteria/Formatting");
+            AddUntilStep("Error message not displayed", () => wiki.ChildrenOfType<SpriteText>().All(text => text.Text != "\"This_page_will_error_out\"."));
+        }
+
+        private void setUpWikiResponse(APIWikiPage r, string? redirectionPath = null)
             => AddStep("set up response", () =>
             {
                 dummyAPI.HandleRequest = request =>
@@ -93,12 +107,12 @@ namespace osu.Game.Tests.Visual.Online
                 };
             });
 
-        // From https://osu.ppy.sh/api/v2/wiki/en/Main_Page
+        // From https://osu.ppy.sh/api/v2/wiki/en/Main_page
         private APIWikiPage responseMainPage => new APIWikiPage
         {
-            Title = "Main Page",
-            Layout = "main_page",
-            Path = "Main_Page",
+            Title = "Main page",
+            Layout = WikiOverlay.INDEX_PATH.ToLowerInvariant(), // custom classes are always lower snake.
+            Path = WikiOverlay.INDEX_PATH,
             Locale = "en",
             Subtitle = null,
             Markdown =

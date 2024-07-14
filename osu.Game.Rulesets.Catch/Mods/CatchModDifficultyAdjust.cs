@@ -16,7 +16,7 @@ namespace osu.Game.Rulesets.Catch.Mods
         public DifficultyBindable CircleSize { get; } = new DifficultyBindable
         {
             Precision = 0.1f,
-            MinValue = 1,
+            MinValue = 0,
             MaxValue = 10,
             ExtendedMaxValue = 11,
             ReadCurrentFromDifficulty = diff => diff.CircleSize,
@@ -26,7 +26,7 @@ namespace osu.Game.Rulesets.Catch.Mods
         public DifficultyBindable ApproachRate { get; } = new DifficultyBindable
         {
             Precision = 0.1f,
-            MinValue = 1,
+            MinValue = 0,
             MaxValue = 10,
             ExtendedMaxValue = 11,
             ReadCurrentFromDifficulty = diff => diff.ApproachRate,

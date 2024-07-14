@@ -10,6 +10,7 @@ namespace osu.Game.Rulesets.Osu
         Cursor,
         CursorTrail,
         CursorParticles,
+        CursorRipple,
         SliderScorePoint,
         ReverseArrow,
         HitCircleText,

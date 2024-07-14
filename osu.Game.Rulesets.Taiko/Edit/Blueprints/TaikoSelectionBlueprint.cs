@@ -1,7 +1,5 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Edit;
@@ -32,8 +30,8 @@ namespace osu.Game.Rulesets.Taiko.Edit.Blueprints
             var topLeft = new Vector2(float.MaxValue, float.MaxValue);
             var bottomRight = new Vector2(float.MinValue, float.MinValue);
 
-            topLeft = Vector2.ComponentMin(topLeft, Parent.ToLocalSpace(DrawableObject.ScreenSpaceDrawQuad.TopLeft));
-            bottomRight = Vector2.ComponentMax(bottomRight, Parent.ToLocalSpace(DrawableObject.ScreenSpaceDrawQuad.BottomRight));
+            topLeft = Vector2.ComponentMin(topLeft, Parent!.ToLocalSpace(DrawableObject.ScreenSpaceDrawQuad.TopLeft));
+            bottomRight = Vector2.ComponentMax(bottomRight, Parent!.ToLocalSpace(DrawableObject.ScreenSpaceDrawQuad.BottomRight));
 
             Size = bottomRight - topLeft;
             Position = topLeft;

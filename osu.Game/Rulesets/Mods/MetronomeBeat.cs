@@ -36,7 +36,7 @@ namespace osu.Game.Rulesets.Mods
             int timeSignature = timingPoint.TimeSignature.Numerator;
 
             // play metronome from one measure before the first object.
-            if (BeatSyncSource.Clock?.CurrentTime < firstHitTime - timingPoint.BeatLength * timeSignature)
+            if (BeatSyncSource.Clock.CurrentTime < firstHitTime - timingPoint.BeatLength * timeSignature)
                 return;
 
             sample.Frequency.Value = beatIndex % timeSignature == 0 ? 1 : 0.5f;

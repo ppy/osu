@@ -11,7 +11,7 @@ using osu.Game.Replays;
 
 namespace osu.Game.Rulesets.Mods
 {
-    public abstract class ModAutoplay : Mod, IApplicableFailOverride, ICreateReplayData
+    public abstract class ModAutoplay : Mod, ICreateReplayData
     {
         public override string Name => "Autoplay";
         public override string Acronym => "AT";
@@ -20,15 +20,11 @@ namespace osu.Game.Rulesets.Mods
         public override LocalisableString Description => "Watch a perfect automated play through the song.";
         public override double ScoreMultiplier => 1;
 
-        public bool PerformFail() => false;
+        public sealed override bool UserPlayable => false;
+        public sealed override bool ValidForMultiplayer => false;
+        public sealed override bool ValidForMultiplayerAsFreeMod => false;
 
-        public bool RestartOnFail => false;
-
-        public override bool UserPlayable => false;
-        public override bool ValidForMultiplayer => false;
-        public override bool ValidForMultiplayerAsFreeMod => false;
-
-        public override Type[] IncompatibleMods => new[] { typeof(ModCinema), typeof(ModRelax), typeof(ModFailCondition), typeof(ModNoFail), typeof(ModAdaptiveSpeed) };
+        public override Type[] IncompatibleMods => new[] { typeof(ModCinema), typeof(ModRelax), typeof(ModAdaptiveSpeed), typeof(ModTouchDevice) };
 
         public override bool HasImplementation => GetType().GenericTypeArguments.Length == 0;
 

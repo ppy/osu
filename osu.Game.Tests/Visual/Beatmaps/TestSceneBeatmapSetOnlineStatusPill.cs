@@ -1,7 +1,5 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using System;
 using System.Collections.Generic;
@@ -49,7 +47,35 @@ namespace osu.Game.Tests.Visual.Beatmaps
                 pill.AutoSizeAxes = Axes.Y;
                 pill.Width = 90;
             }));
+
             AddStep("unset fixed width", () => statusPills.ForEach(pill => pill.AutoSizeAxes = Axes.Both));
+        }
+
+        [Test]
+        public void TestChangeLabels()
+        {
+            AddStep("Change labels", () =>
+            {
+                foreach (var pill in this.ChildrenOfType<BeatmapSetOnlineStatusPill>())
+                {
+                    switch (pill.Status)
+                    {
+                        // cycle at end
+                        case BeatmapOnlineStatus.Loved:
+                            pill.Status = BeatmapOnlineStatus.LocallyModified;
+                            break;
+
+                        // skip none
+                        case BeatmapOnlineStatus.LocallyModified:
+                            pill.Status = BeatmapOnlineStatus.Graveyard;
+                            break;
+
+                        default:
+                            pill.Status = (pill.Status + 1);
+                            break;
+                    }
+                }
+            });
         }
     }
 }

@@ -63,12 +63,12 @@ namespace osu.Game.Rulesets.Catch.UI
             updateCombo(result.ComboAtJudgement + 1, judgedObject.AccentColour.Value);
         }
 
-        public void OnRevertResult(DrawableCatchHitObject judgedObject, JudgementResult result)
+        public void OnRevertResult(JudgementResult result)
         {
             if (!result.Type.AffectsCombo() || !result.HasResult)
                 return;
 
-            updateCombo(result.ComboAtJudgement, judgedObject.AccentColour.Value);
+            updateCombo(result.ComboAtJudgement, null);
         }
 
         private void updateCombo(int newCombo, Color4? hitObjectColour)

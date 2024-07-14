@@ -16,7 +16,6 @@ using osu.Game.Beatmaps;
 using osu.Game.Extensions;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Resources.Localisation.Web;
 using osuTK;
 
@@ -26,9 +25,9 @@ namespace osu.Game.Overlays.BeatmapSet
     {
         private readonly Statistic length, bpm, circleCount, sliderCount;
 
-        private APIBeatmapSet beatmapSet;
+        private IBeatmapSetInfo beatmapSet;
 
-        public APIBeatmapSet BeatmapSet
+        public IBeatmapSetInfo BeatmapSet
         {
             get => beatmapSet;
             set
@@ -58,23 +57,25 @@ namespace osu.Game.Overlays.BeatmapSet
 
         private void updateDisplay()
         {
-            bpm.Value = BeatmapSet?.BPM.ToLocalisableString(@"0.##") ?? (LocalisableString)"-";
-
             if (beatmapInfo == null)
             {
+                bpm.Value = "-";
+
                 length.Value = string.Empty;
                 circleCount.Value = string.Empty;
                 sliderCount.Value = string.Empty;
             }
             else
             {
-                length.TooltipText = BeatmapsetsStrings.ShowStatsTotalLength(TimeSpan.FromMilliseconds(beatmapInfo.Length).ToFormattedDuration());
+                bpm.Value = beatmapInfo.BPM.ToLocalisableString(@"0.##");
+
                 length.Value = TimeSpan.FromMilliseconds(beatmapInfo.Length).ToFormattedDuration();
 
-                var onlineInfo = beatmapInfo as IBeatmapOnlineInfo;
+                if (beatmapInfo is not IBeatmapOnlineInfo onlineInfo) return;
 
-                circleCount.Value = (onlineInfo?.CircleCount ?? 0).ToLocalisableString(@"N0");
-                sliderCount.Value = (onlineInfo?.SliderCount ?? 0).ToLocalisableString(@"N0");
+                circleCount.Value = onlineInfo.CircleCount.ToLocalisableString(@"N0");
+                sliderCount.Value = onlineInfo.SliderCount.ToLocalisableString(@"N0");
+                length.TooltipText = BeatmapsetsStrings.ShowStatsTotalLength(TimeSpan.FromMilliseconds(onlineInfo.HitLength).ToFormattedDuration());
             }
         }
 

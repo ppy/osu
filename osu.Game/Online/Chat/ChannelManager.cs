@@ -16,7 +16,6 @@ using osu.Game.Database;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
-using osu.Game.Online.Notifications;
 using osu.Game.Overlays.Chat.Listing;
 
 namespace osu.Game.Online.Chat
@@ -64,13 +63,8 @@ namespace osu.Game.Online.Chat
         /// </summary>
         public IBindableList<Channel> AvailableChannels => availableChannels;
 
-        /// <summary>
-        /// Whether the client responsible for channel notifications is connected.
-        /// </summary>
-        public bool NotificationsConnected => connector.IsConnected.Value;
-
         private readonly IAPIProvider api;
-        private readonly NotificationsClientConnector connector;
+        private readonly IChatClient chatClient;
 
         [Resolved]
         private UserLookupCache users { get; set; }
@@ -85,7 +79,7 @@ namespace osu.Game.Online.Chat
         {
             this.api = api;
 
-            connector = api.GetNotificationsConnector();
+            chatClient = api.GetChatClient();
 
             CurrentChannel.ValueChanged += currentChannelChanged;
         }
@@ -93,15 +87,11 @@ namespace osu.Game.Online.Chat
         [BackgroundDependencyLoader]
         private void load()
         {
-            connector.ChannelJoined += ch => Schedule(() => joinChannel(ch));
-
-            connector.ChannelParted += ch => Schedule(() => LeaveChannel(getChannel(ch)));
-
-            connector.NewMessages += msgs => Schedule(() => addMessages(msgs));
-
-            connector.PresenceReceived += () => Schedule(initializeChannels);
-
-            connector.Start();
+            chatClient.ChannelJoined += ch => Schedule(() => joinChannel(ch));
+            chatClient.ChannelParted += ch => Schedule(() => leaveChannel(getChannel(ch), false));
+            chatClient.NewMessages += msgs => Schedule(() => addMessages(msgs));
+            chatClient.PresenceReceived += () => Schedule(initializeChannels);
+            chatClient.RequestPresence();
 
             apiState.BindTo(api.State);
             apiState.BindValueChanged(_ => SendAck(), true);
@@ -247,7 +237,7 @@ namespace osu.Game.Online.Chat
             string command = parameters[0];
             string content = parameters.Length == 2 ? parameters[1] : string.Empty;
 
-            switch (command)
+            switch (command.ToLowerInvariant())
             {
                 case "np":
                     AddInternal(new NowPlayingCommand(target));
@@ -558,7 +548,9 @@ namespace osu.Game.Online.Chat
         /// Leave the specified channel. Can be called from any thread.
         /// </summary>
         /// <param name="channel">The channel to leave.</param>
-        public void LeaveChannel(Channel channel) => Schedule(() =>
+        public void LeaveChannel(Channel channel) => Schedule(() => leaveChannel(channel, true));
+
+        private void leaveChannel(Channel channel, bool sendLeaveRequest)
         {
             if (channel == null) return;
 
@@ -581,10 +573,11 @@ namespace osu.Game.Online.Chat
 
             if (channel.Joined.Value)
             {
-                api.Queue(new LeaveChannelRequest(channel));
+                if (sendLeaveRequest)
+                    api.Queue(new LeaveChannelRequest(channel));
                 channel.Joined.Value = false;
             }
-        });
+        }
 
         /// <summary>
         /// Opens the most recently closed channel that has not already been reopened,
@@ -652,7 +645,7 @@ namespace osu.Game.Online.Chat
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
-            connector?.Dispose();
+            chatClient?.Dispose();
         }
     }
 

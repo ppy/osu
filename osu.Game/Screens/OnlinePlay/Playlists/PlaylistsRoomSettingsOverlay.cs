@@ -23,6 +23,8 @@ using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
 using osu.Game.Screens.OnlinePlay.Match.Components;
 using osuTK;
+using osu.Game.Localisation;
+using osu.Game.Rulesets;
 
 namespace osu.Game.Screens.OnlinePlay.Playlists
 {
@@ -77,9 +79,13 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             [Resolved]
             private IAPIProvider api { get; set; } = null!;
 
+            [Resolved]
+            private RulesetStore rulesets { get; set; } = null!;
+
             private IBindable<APIUser> localUser = null!;
 
             private readonly Room room;
+            private OsuSpriteText durationNoticeText = null!;
 
             public MatchSettings(Room room)
             {
@@ -141,14 +147,22 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                                                         },
                                                         new Section("Duration")
                                                         {
-                                                            Child = new Container
+                                                            Children = new Drawable[]
                                                             {
-                                                                RelativeSizeAxes = Axes.X,
-                                                                Height = 40,
-                                                                Child = DurationField = new DurationDropdown
+                                                                new Container
                                                                 {
-                                                                    RelativeSizeAxes = Axes.X
-                                                                }
+                                                                    RelativeSizeAxes = Axes.X,
+                                                                    Height = 40,
+                                                                    Child = DurationField = new DurationDropdown
+                                                                    {
+                                                                        RelativeSizeAxes = Axes.X
+                                                                    },
+                                                                },
+                                                                durationNoticeText = new OsuSpriteText
+                                                                {
+                                                                    Alpha = 0,
+                                                                    Colour = colours.Yellow,
+                                                                },
                                                             }
                                                         },
                                                         new Section("Allowed attempts (across all playlist items)")
@@ -305,6 +319,17 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                 MaxAttempts.BindValueChanged(count => MaxAttemptsField.Text = count.NewValue?.ToString(), true);
                 Duration.BindValueChanged(duration => DurationField.Current.Value = duration.NewValue ?? TimeSpan.FromMinutes(30), true);
 
+                DurationField.Current.BindValueChanged(duration =>
+                {
+                    if (hasValidDuration)
+                        durationNoticeText.Hide();
+                    else
+                    {
+                        durationNoticeText.Show();
+                        durationNoticeText.Text = OnlinePlayStrings.SupporterOnlyDurationNotice;
+                    }
+                });
+
                 localUser = api.LocalUser.GetBoundCopy();
                 localUser.BindValueChanged(populateDurations, true);
 
@@ -314,6 +339,10 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 
             private void populateDurations(ValueChangedEvent<APIUser> user)
             {
+                // roughly correct (see https://github.com/Humanizr/Humanizer/blob/18167e56c082449cc4fe805b8429e3127a7b7f93/readme.md?plain=1#L427)
+                // if we want this to be more accurate we might consider sending an actual end time, not a time span. probably not required though.
+                const int days_in_month = 31;
+
                 DurationField.Items = new[]
                 {
                     TimeSpan.FromMinutes(30),
@@ -326,18 +355,9 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                     TimeSpan.FromDays(3),
                     TimeSpan.FromDays(7),
                     TimeSpan.FromDays(14),
+                    TimeSpan.FromDays(days_in_month),
+                    TimeSpan.FromDays(days_in_month * 3),
                 };
-
-                // TODO: show these in the interface at all times.
-                if (user.NewValue.IsSupporter)
-                {
-                    // roughly correct (see https://github.com/Humanizr/Humanizer/blob/18167e56c082449cc4fe805b8429e3127a7b7f93/readme.md?plain=1#L427)
-                    // if we want this to be more accurate we might consider sending an actual end time, not a time span. probably not required though.
-                    const int days_in_month = 31;
-
-                    DurationField.AddDropdownItem(TimeSpan.FromDays(days_in_month));
-                    DurationField.AddDropdownItem(TimeSpan.FromDays(days_in_month * 3));
-                }
             }
 
             protected override void Update()
@@ -350,9 +370,12 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             public void SelectBeatmap() => editPlaylistButton.TriggerClick();
 
             private void onPlaylistChanged(object? sender, NotifyCollectionChangedEventArgs e) =>
-                playlistLength.Text = $"Length: {Playlist.GetTotalDuration()}";
+                playlistLength.Text = $"Length: {Playlist.GetTotalDuration(rulesets)}";
 
-            private bool hasValidSettings => RoomID.Value == null && NameField.Text.Length > 0 && Playlist.Count > 0;
+            private bool hasValidSettings => RoomID.Value == null && NameField.Text.Length > 0 && Playlist.Count > 0
+                                             && hasValidDuration;
+
+            private bool hasValidDuration => DurationField.Current.Value <= TimeSpan.FromDays(14) || localUser.Value.IsSupporter;
 
             private void apply()
             {

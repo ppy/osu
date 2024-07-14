@@ -63,7 +63,7 @@ namespace osu.Game.Overlays.Rankings
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
-                    Padding = new MarginPadding { Horizontal = UserProfileOverlay.CONTENT_X_MARGIN },
+                    Padding = new MarginPadding { Horizontal = WaveOverlayContainer.HORIZONTAL_PADDING },
                     Child = new FillFlowContainer
                     {
                         RelativeSizeAxes = Axes.X,
@@ -200,7 +200,7 @@ namespace osu.Game.Overlays.Rankings
                     Text.Font = OsuFont.GetFont(size: 15);
                     Text.Padding = new MarginPadding { Vertical = 1.5f }; // osu-web line-height difference compensation
                     Foreground.Padding = new MarginPadding { Horizontal = 10, Vertical = 15 };
-                    Margin = Icon.Margin = new MarginPadding(0);
+                    Margin = Chevron.Margin = new MarginPadding(0);
                 }
 
                 [BackgroundDependencyLoader]

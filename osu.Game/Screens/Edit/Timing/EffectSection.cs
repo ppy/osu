@@ -14,7 +14,6 @@ namespace osu.Game.Screens.Edit.Timing
     internal partial class EffectSection : Section<EffectControlPoint>
     {
         private LabelledSwitchButton kiai = null!;
-        private LabelledSwitchButton omitBarLine = null!;
 
         private SliderWithTextBoxInput<double> scrollSpeedSlider = null!;
 
@@ -24,7 +23,6 @@ namespace osu.Game.Screens.Edit.Timing
             Flow.AddRange(new Drawable[]
             {
                 kiai = new LabelledSwitchButton { Label = "Kiai Time" },
-                omitBarLine = new LabelledSwitchButton { Label = "Skip Bar Line" },
                 scrollSpeedSlider = new SliderWithTextBoxInput<double>("Scroll Speed")
                 {
                     Current = new EffectControlPoint().ScrollSpeedBindable,
@@ -38,7 +36,6 @@ namespace osu.Game.Screens.Edit.Timing
             base.LoadComplete();
 
             kiai.Current.BindValueChanged(_ => saveChanges());
-            omitBarLine.Current.BindValueChanged(_ => saveChanges());
             scrollSpeedSlider.Current.BindValueChanged(_ => saveChanges());
 
             var drawableRuleset = Beatmap.BeatmapInfo.Ruleset.CreateInstance().CreateDrawableRulesetWith(Beatmap.PlayableBeatmap);
@@ -55,16 +52,36 @@ namespace osu.Game.Screens.Edit.Timing
 
         protected override void OnControlPointChanged(ValueChangedEvent<EffectControlPoint?> point)
         {
-            if (point.NewValue != null)
+            scrollSpeedSlider.Current.ValueChanged -= updateControlPointFromSlider;
+
+            if (point.NewValue is EffectControlPoint newEffectPoint)
             {
                 isRebinding = true;
 
-                kiai.Current = point.NewValue.KiaiModeBindable;
-                omitBarLine.Current = point.NewValue.OmitFirstBarLineBindable;
-                scrollSpeedSlider.Current = point.NewValue.ScrollSpeedBindable;
+                kiai.Current = newEffectPoint.KiaiModeBindable;
+                scrollSpeedSlider.Current = new BindableDouble
+                {
+                    MinValue = 0.01,
+                    MaxValue = 10,
+                    Precision = 0.01,
+                    Value = newEffectPoint.ScrollSpeedBindable.Value
+                };
+                scrollSpeedSlider.Current.ValueChanged += updateControlPointFromSlider;
+                // at this point in time the above is enough to keep the slider control in sync with reality,
+                // since undo/redo causes `OnControlPointChanged()` to fire.
+                // whenever that stops being the case, or there is a possibility that the scroll speed could be changed
+                // by something else other than this control, this code should probably be revisited to have a binding in the other direction, too.
 
                 isRebinding = false;
             }
+        }
+
+        private void updateControlPointFromSlider(ValueChangedEvent<double> scrollSpeed)
+        {
+            if (ControlPoint.Value is not EffectControlPoint effectPoint || isRebinding)
+                return;
+
+            effectPoint.ScrollSpeedBindable.Value = scrollSpeed.NewValue;
         }
 
         protected override EffectControlPoint CreatePoint()
@@ -74,7 +91,6 @@ namespace osu.Game.Screens.Edit.Timing
             return new EffectControlPoint
             {
                 KiaiMode = reference.KiaiMode,
-                OmitFirstBarLine = reference.OmitFirstBarLine,
                 ScrollSpeed = reference.ScrollSpeed,
             };
         }

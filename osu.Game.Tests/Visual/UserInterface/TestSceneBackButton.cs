@@ -1,12 +1,11 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Screens.Footer;
 using osuTK;
 using osuTK.Graphics;
 
@@ -17,7 +16,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         public TestSceneBackButton()
         {
             BackButton button;
-            BackButton.Receptor receptor = new BackButton.Receptor();
+            ScreenFooter.BackReceptor receptor = new ScreenFooter.BackReceptor();
 
             Child = new Container
             {

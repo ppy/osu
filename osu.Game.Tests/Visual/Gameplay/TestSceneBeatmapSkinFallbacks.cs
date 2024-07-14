@@ -1,20 +1,18 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Lists;
 using osu.Framework.Testing;
 using osu.Framework.Timing;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
-using osu.Game.Extensions;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Skinning.Legacy;
@@ -28,10 +26,10 @@ namespace osu.Game.Tests.Visual.Gameplay
 {
     public partial class TestSceneBeatmapSkinFallbacks : OsuPlayerTestScene
     {
-        private ISkin currentBeatmapSkin;
+        private ISkin currentBeatmapSkin = null!;
 
         [Resolved]
-        private SkinManager skinManager { get; set; }
+        private SkinManager skinManager { get; set; } = null!;
 
         protected override bool HasCustomSteps => true;
 
@@ -39,8 +37,8 @@ namespace osu.Game.Tests.Visual.Gameplay
         public void TestEmptyLegacyBeatmapSkinFallsBack()
         {
             CreateSkinTest(TrianglesSkin.CreateInfo(), () => new LegacyBeatmapSkin(new BeatmapInfo(), null));
-            AddUntilStep("wait for hud load", () => Player.ChildrenOfType<SkinnableTargetContainer>().All(c => c.ComponentsLoaded));
-            AddAssert("hud from default skin", () => AssertComponentsFromExpectedSource(GlobalSkinComponentLookup.LookupType.MainHUDComponents, skinManager.CurrentSkin.Value));
+            AddUntilStep("wait for hud load", () => Player.ChildrenOfType<SkinComponentsContainer>().All(c => c.ComponentsLoaded));
+            AddAssert("hud from default skin", () => AssertComponentsFromExpectedSource(SkinComponentsContainerLookup.TargetArea.MainHUDComponents, skinManager.CurrentSkin.Value));
         }
 
         protected void CreateSkinTest(SkinInfo gameCurrentSkin, Func<ISkin> getBeatmapSkin)
@@ -55,23 +53,23 @@ namespace osu.Game.Tests.Visual.Gameplay
             });
         }
 
-        protected bool AssertComponentsFromExpectedSource(GlobalSkinComponentLookup.LookupType target, ISkin expectedSource)
+        protected bool AssertComponentsFromExpectedSource(SkinComponentsContainerLookup.TargetArea target, ISkin expectedSource)
         {
-            var actualComponentsContainer = Player.ChildrenOfType<SkinnableTargetContainer>().First(s => s.Target == target)
-                                                  .ChildrenOfType<SkinnableTargetComponentsContainer>().SingleOrDefault();
+            var targetContainer = Player.ChildrenOfType<SkinComponentsContainer>().First(s => s.Lookup.Target == target);
+            var actualComponentsContainer = targetContainer.ChildrenOfType<Container>().SingleOrDefault(c => c.Parent == targetContainer);
 
             if (actualComponentsContainer == null)
                 return false;
 
-            var actualInfo = actualComponentsContainer.CreateSkinnableInfo();
+            var actualInfo = actualComponentsContainer.CreateSerialisedInfo();
 
-            var expectedComponentsContainer = (SkinnableTargetComponentsContainer)expectedSource.GetDrawableComponent(new GlobalSkinComponentLookup(target));
+            var expectedComponentsContainer = expectedSource.GetDrawableComponent(new SkinComponentsContainerLookup(target)) as Container;
             if (expectedComponentsContainer == null)
                 return false;
 
             var expectedComponentsAdjustmentContainer = new DependencyProvidingContainer
             {
-                Position = actualComponentsContainer.Parent.ToSpaceOfOtherDrawable(actualComponentsContainer.DrawPosition, Content),
+                Position = actualComponentsContainer.Parent!.ToSpaceOfOtherDrawable(actualComponentsContainer.DrawPosition, Content),
                 Size = actualComponentsContainer.DrawSize,
                 Child = expectedComponentsContainer,
                 // proxy the same required dependencies that `actualComponentsContainer` is using.
@@ -80,29 +78,30 @@ namespace osu.Game.Tests.Visual.Gameplay
                     (typeof(ScoreProcessor), actualComponentsContainer.Dependencies.Get<ScoreProcessor>()),
                     (typeof(HealthProcessor), actualComponentsContainer.Dependencies.Get<HealthProcessor>()),
                     (typeof(GameplayState), actualComponentsContainer.Dependencies.Get<GameplayState>()),
-                    (typeof(IGameplayClock), actualComponentsContainer.Dependencies.Get<IGameplayClock>())
+                    (typeof(IGameplayClock), actualComponentsContainer.Dependencies.Get<IGameplayClock>()),
+                    (typeof(InputCountController), actualComponentsContainer.Dependencies.Get<InputCountController>())
                 },
             };
 
             Add(expectedComponentsAdjustmentContainer);
             expectedComponentsAdjustmentContainer.UpdateSubTree();
-            var expectedInfo = expectedComponentsContainer.CreateSkinnableInfo();
+            var expectedInfo = expectedComponentsContainer.CreateSerialisedInfo();
             Remove(expectedComponentsAdjustmentContainer, true);
 
             return almostEqual(actualInfo, expectedInfo);
         }
 
-        private static bool almostEqual(SkinnableInfo info, SkinnableInfo other) =>
+        private static bool almostEqual(SerialisedDrawableInfo drawableInfo, SerialisedDrawableInfo? other) =>
             other != null
-            && info.Type == other.Type
-            && info.Anchor == other.Anchor
-            && info.Origin == other.Origin
-            && Precision.AlmostEquals(info.Position, other.Position, 1)
-            && Precision.AlmostEquals(info.Scale, other.Scale)
-            && Precision.AlmostEquals(info.Rotation, other.Rotation)
-            && info.Children.SequenceEqual(other.Children, new FuncEqualityComparer<SkinnableInfo>(almostEqual));
+            && drawableInfo.Type == other.Type
+            && drawableInfo.Anchor == other.Anchor
+            && drawableInfo.Origin == other.Origin
+            && Precision.AlmostEquals(drawableInfo.Position, other.Position, 1)
+            && Precision.AlmostEquals(drawableInfo.Scale, other.Scale)
+            && Precision.AlmostEquals(drawableInfo.Rotation, other.Rotation)
+            && drawableInfo.Children.SequenceEqual(other.Children, new FuncEqualityComparer<SerialisedDrawableInfo>(almostEqual));
 
-        protected override WorkingBeatmap CreateWorkingBeatmap(IBeatmap beatmap, Storyboard storyboard = null)
+        protected override WorkingBeatmap CreateWorkingBeatmap(IBeatmap beatmap, Storyboard? storyboard = null)
             => new CustomSkinWorkingBeatmap(beatmap, storyboard, Clock, Audio, currentBeatmapSkin);
 
         protected override Ruleset CreatePlayerRuleset() => new TestOsuRuleset();
@@ -111,7 +110,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             private readonly ISkin beatmapSkin;
 
-            public CustomSkinWorkingBeatmap(IBeatmap beatmap, Storyboard storyboard, IFrameBasedClock referenceClock, AudioManager audio, ISkin beatmapSkin)
+            public CustomSkinWorkingBeatmap(IBeatmap beatmap, Storyboard? storyboard, IFrameBasedClock referenceClock, AudioManager audio, ISkin beatmapSkin)
                 : base(beatmap, storyboard, referenceClock, audio)
             {
                 this.beatmapSkin = beatmapSkin;

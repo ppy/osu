@@ -58,7 +58,7 @@ namespace osu.Game.Screens.Select.Carousel
 
                 item = value;
 
-                if (IsLoaded)
+                if (IsLoaded && !IsDisposed)
                     UpdateItem();
             }
         }
@@ -144,9 +144,9 @@ namespace osu.Game.Screens.Select.Carousel
             }
 
             if (!Item.Visible)
-                this.FadeOut(300, Easing.OutQuint);
+                this.FadeOut(100, Easing.OutQuint);
             else
-                this.FadeIn(250);
+                this.FadeIn(400, Easing.OutQuint);
         }
 
         protected virtual void Selected()
@@ -164,6 +164,14 @@ namespace osu.Game.Screens.Select.Carousel
 
             Item.State.Value = CarouselItemState.Selected;
             return true;
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            // This is important to clean up event subscriptions.
+            Item = null;
         }
     }
 }

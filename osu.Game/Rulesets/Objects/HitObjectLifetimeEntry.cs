@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
+using System.Collections.Generic;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Performance;
 using osu.Game.Rulesets.Judgements;
@@ -19,12 +21,45 @@ namespace osu.Game.Rulesets.Objects
         public readonly HitObject HitObject;
 
         /// <summary>
+        /// The list of <see cref="HitObjectLifetimeEntry"/> for the <see cref="HitObject"/>'s nested objects (if any).
+        /// </summary>
+        public List<HitObjectLifetimeEntry> NestedEntries { get; internal set; } = new List<HitObjectLifetimeEntry>();
+
+        /// <summary>
         /// The result that <see cref="HitObject"/> was judged with.
         /// This is set by the accompanying <see cref="DrawableHitObject"/>, and reused when required for rewinding.
         /// </summary>
         internal JudgementResult? Result;
 
+        /// <summary>
+        /// Whether <see cref="HitObject"/> has been judged.
+        /// Note: This does NOT include nested hitobjects.
+        /// </summary>
+        public bool Judged => Result?.HasResult ?? false;
+
+        /// <summary>
+        /// Whether <see cref="HitObject"/> and all of its nested objects have been judged.
+        /// </summary>
+        public bool AllJudged
+        {
+            get
+            {
+                if (!Judged)
+                    return false;
+
+                foreach (var entry in NestedEntries)
+                {
+                    if (!entry.AllJudged)
+                        return false;
+                }
+
+                return true;
+            }
+        }
+
         private readonly IBindable<double> startTimeBindable = new BindableDouble();
+
+        internal event Action? RevertResult;
 
         /// <summary>
         /// Creates a new <see cref="HitObjectLifetimeEntry"/>.
@@ -95,5 +130,7 @@ namespace osu.Game.Rulesets.Objects
         /// Set <see cref="LifetimeEntry.LifetimeStart"/> using <see cref="InitialLifetimeOffset"/>.
         /// </summary>
         internal void SetInitialLifetime() => LifetimeStart = HitObject.StartTime - InitialLifetimeOffset;
+
+        internal void OnRevertResult() => RevertResult?.Invoke();
     }
 }

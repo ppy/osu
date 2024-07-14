@@ -1,7 +1,5 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using System;
 using System.Collections.Generic;
@@ -11,6 +9,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Audio;
+using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
@@ -20,8 +19,14 @@ namespace osu.Game.Screens.Edit.Compose.Components
 {
     public partial class EditorSelectionHandler : SelectionHandler<HitObject>
     {
+        /// <summary>
+        /// A special bank name that is only used in the editor UI.
+        /// When selected and in placement mode, the bank of the last hit object will always be used.
+        /// </summary>
+        public const string HIT_BANK_AUTO = "auto";
+
         [Resolved]
-        protected EditorBeatmap EditorBeatmap { get; private set; }
+        protected EditorBeatmap EditorBeatmap { get; private set; } = null!;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -49,10 +54,82 @@ namespace osu.Game.Screens.Edit.Compose.Components
         public readonly Dictionary<string, Bindable<TernaryState>> SelectionSampleStates = new Dictionary<string, Bindable<TernaryState>>();
 
         /// <summary>
+        /// The state of each sample bank type for all selected hitobjects.
+        /// </summary>
+        public readonly Dictionary<string, Bindable<TernaryState>> SelectionBankStates = new Dictionary<string, Bindable<TernaryState>>();
+
+        /// <summary>
         /// Set up ternary state bindables and bind them to selection/hitobject changes (in both directions)
         /// </summary>
         private void createStateBindables()
         {
+            foreach (string bankName in HitSampleInfo.AllBanks.Prepend(HIT_BANK_AUTO))
+            {
+                var bindable = new Bindable<TernaryState>
+                {
+                    Description = bankName.Titleize()
+                };
+
+                bindable.ValueChanged += state =>
+                {
+                    switch (state.NewValue)
+                    {
+                        case TernaryState.False:
+                            if (SelectedItems.Count == 0)
+                            {
+                                // Ensure that if this is the last selected bank, it should remain selected.
+                                if (SelectionBankStates.Values.All(b => b.Value == TernaryState.False))
+                                    bindable.Value = TernaryState.True;
+                            }
+                            else
+                            {
+                                // Auto should never apply when there is a selection made.
+                                // This is also required to stop a bindable feedback loop when a HitObject has zero samples (and LINQ `All` below becomes true).
+                                if (bankName == HIT_BANK_AUTO)
+                                    break;
+
+                                // Never remove a sample bank.
+                                // These are basically radio buttons, not toggles.
+                                if (SelectedItems.All(h => h.Samples.All(s => s.Bank == bankName)))
+                                    bindable.Value = TernaryState.True;
+                            }
+
+                            break;
+
+                        case TernaryState.True:
+                            if (SelectedItems.Count == 0)
+                            {
+                                // Ensure the user can't stack multiple bank selections when there's no hitobject selection.
+                                // Note that in normal scenarios this is sorted out by the feedback from applying the bank to the selected objects.
+                                foreach (var other in SelectionBankStates.Values)
+                                {
+                                    if (other != bindable)
+                                        other.Value = TernaryState.False;
+                                }
+                            }
+                            else
+                            {
+                                // Auto should just not apply if there's a selection already made.
+                                // Maybe we could make it a disabled button in the future, but right now the editor buttons don't support disabled state.
+                                if (bankName == HIT_BANK_AUTO)
+                                {
+                                    bindable.Value = TernaryState.False;
+                                    break;
+                                }
+
+                                SetSampleBank(bankName);
+                            }
+
+                            break;
+                    }
+                };
+
+                SelectionBankStates[bankName] = bindable;
+            }
+
+            // start with normal selected.
+            SelectionBankStates[SampleControlPoint.DEFAULT_BANK].Value = TernaryState.True;
+
             foreach (string sampleName in HitSampleInfo.AllAdditions)
             {
                 var bindable = new Bindable<TernaryState>
@@ -100,9 +177,27 @@ namespace osu.Game.Screens.Edit.Compose.Components
         {
             SelectionNewComboState.Value = GetStateFromSelection(SelectedItems.OfType<IHasComboInformation>(), h => h.NewCombo);
 
+            var samplesInSelection = SelectedItems.SelectMany(enumerateAllSamples).ToArray();
+
             foreach ((string sampleName, var bindable) in SelectionSampleStates)
             {
-                bindable.Value = GetStateFromSelection(SelectedItems, h => h.Samples.Any(s => s.Name == sampleName));
+                bindable.Value = GetStateFromSelection(samplesInSelection, h => h.Any(s => s.Name == sampleName));
+            }
+
+            foreach ((string bankName, var bindable) in SelectionBankStates)
+            {
+                bindable.Value = GetStateFromSelection(samplesInSelection.SelectMany(s => s), h => h.Bank == bankName);
+            }
+
+            IEnumerable<IList<HitSampleInfo>> enumerateAllSamples(HitObject hitObject)
+            {
+                yield return hitObject.Samples;
+
+                if (hitObject is IHasRepeats withRepeats)
+                {
+                    foreach (var node in withRepeats.NodeSamples)
+                        yield return node;
+                }
             }
         }
 
@@ -111,18 +206,91 @@ namespace osu.Game.Screens.Edit.Compose.Components
         #region Ternary state changes
 
         /// <summary>
+        /// Sets the sample bank for all selected <see cref="HitObject"/>s.
+        /// </summary>
+        /// <param name="bankName">The name of the sample bank.</param>
+        public void SetSampleBank(string bankName)
+        {
+            bool hasRelevantBank(HitObject hitObject)
+            {
+                bool result = hitObject.Samples.All(s => s.Bank == bankName);
+
+                if (hitObject is IHasRepeats hasRepeats)
+                {
+                    foreach (var node in hasRepeats.NodeSamples)
+                        result &= node.All(s => s.Bank == bankName);
+                }
+
+                return result;
+            }
+
+            if (SelectedItems.All(hasRelevantBank))
+                return;
+
+            EditorBeatmap.PerformOnSelection(h =>
+            {
+                if (h.Samples.All(s => s.Bank == bankName))
+                    return;
+
+                h.Samples = h.Samples.Select(s => s.With(newBank: bankName)).ToList();
+
+                if (h is IHasRepeats hasRepeats)
+                {
+                    for (int i = 0; i < hasRepeats.NodeSamples.Count; ++i)
+                        hasRepeats.NodeSamples[i] = hasRepeats.NodeSamples[i].Select(s => s.With(newBank: bankName)).ToList();
+                }
+
+                EditorBeatmap.Update(h);
+            });
+        }
+
+        private bool hasRelevantSample(HitObject hitObject, string sampleName)
+        {
+            bool result = hitObject.Samples.Any(s => s.Name == sampleName);
+
+            if (hitObject is IHasRepeats hasRepeats)
+            {
+                foreach (var node in hasRepeats.NodeSamples)
+                    result &= node.Any(s => s.Name == sampleName);
+            }
+
+            return result;
+        }
+
+        /// <summary>
         /// Adds a hit sample to all selected <see cref="HitObject"/>s.
         /// </summary>
         /// <param name="sampleName">The name of the hit sample.</param>
         public void AddHitSample(string sampleName)
         {
+            if (SelectedItems.All(h => hasRelevantSample(h, sampleName)))
+                return;
+
             EditorBeatmap.PerformOnSelection(h =>
             {
                 // Make sure there isn't already an existing sample
                 if (h.Samples.Any(s => s.Name == sampleName))
                     return;
 
-                h.Samples.Add(new HitSampleInfo(sampleName));
+                h.Samples.Add(h.CreateHitSampleInfo(sampleName));
+
+                if (h is IHasRepeats hasRepeats)
+                {
+                    foreach (var node in hasRepeats.NodeSamples)
+                    {
+                        if (node.Any(s => s.Name == sampleName))
+                            continue;
+
+                        var hitSample = h.CreateHitSampleInfo(sampleName);
+
+                        string? existingAdditionBank = node.FirstOrDefault(s => s.Name != HitSampleInfo.HIT_NORMAL)?.Bank;
+                        if (existingAdditionBank != null)
+                            hitSample = hitSample.With(newBank: existingAdditionBank);
+
+                        node.Add(hitSample);
+                    }
+                }
+
                 EditorBeatmap.Update(h);
             });
         }
@@ -133,9 +301,19 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <param name="sampleName">The name of the hit sample.</param>
         public void RemoveHitSample(string sampleName)
         {
+            if (SelectedItems.All(h => !hasRelevantSample(h, sampleName)))
+                return;
+
             EditorBeatmap.PerformOnSelection(h =>
             {
                 h.SamplesBindable.RemoveAll(s => s.Name == sampleName);
+
+                if (h is IHasRepeats hasRepeats)
+                {
+                    for (int i = 0; i < hasRepeats.NodeSamples.Count; ++i)
+                        hasRepeats.NodeSamples[i] = hasRepeats.NodeSamples[i].Where(s => s.Name != sampleName).ToList();
+                }
+
                 EditorBeatmap.Update(h);
             });
         }
@@ -147,6 +325,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <exception cref="InvalidOperationException">Throws if any selected object doesn't implement <see cref="IHasComboInformation"/></exception>
         public void SetNewCombo(bool state)
         {
+            if (SelectedItems.OfType<IHasComboInformation>().All(h => h.NewCombo == state))
+                return;
+
             EditorBeatmap.PerformOnSelection(h =>
             {
                 var comboInfo = h as IHasComboInformation;
@@ -174,9 +355,15 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 yield return new TernaryStateToggleMenuItem("New combo") { State = { BindTarget = SelectionNewComboState } };
             }
 
-            yield return new OsuMenuItem("Sound")
+            yield return new OsuMenuItem("Sample")
             {
                 Items = SelectionSampleStates.Select(kvp =>
+                    new TernaryStateToggleMenuItem(kvp.Value.Description) { State = { BindTarget = kvp.Value } }).ToArray()
+            };
+
+            yield return new OsuMenuItem("Bank")
+            {
+                Items = SelectionBankStates.Select(kvp =>
                     new TernaryStateToggleMenuItem(kvp.Value.Description) { State = { BindTarget = kvp.Value } }).ToArray()
             };
         }

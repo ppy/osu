@@ -16,6 +16,7 @@ using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Threading;
 using osu.Framework.Utils;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -31,6 +32,8 @@ namespace osu.Game.Screens.Play.HUD
 
         public readonly Bindable<bool> IsPaused = new Bindable<bool>();
 
+        public readonly Bindable<bool> ReplayLoaded = new Bindable<bool>();
+
         private HoldButton button;
 
         public Action Action { get; set; }
@@ -42,6 +45,8 @@ namespace osu.Game.Screens.Play.HUD
             Direction = FillDirection.Horizontal;
             Spacing = new Vector2(20, 0);
             Margin = new MarginPadding(10);
+
+            AlwaysPresent = true;
         }
 
         [BackgroundDependencyLoader(true)]
@@ -60,11 +65,18 @@ namespace osu.Game.Screens.Play.HUD
                     HoverGained = () => text.FadeIn(500, Easing.OutQuint),
                     HoverLost = () => text.FadeOut(500, Easing.OutQuint),
                     IsPaused = { BindTarget = IsPaused },
+                    ReplayLoaded = { BindTarget = ReplayLoaded },
                     Action = () => Action(),
                 }
             };
+
             AutoSizeAxes = Axes.Both;
         }
+
+        [Resolved]
+        private SessionStatics sessionStatics { get; set; }
+
+        private Bindable<bool> touchActive;
 
         protected override void LoadComplete()
         {
@@ -75,7 +87,20 @@ namespace osu.Game.Screens.Play.HUD
                     : "press for menu";
             }, true);
 
-            text.FadeInFromZero(500, Easing.OutQuint).Delay(1500).FadeOut(500, Easing.OutQuint);
+            touchActive = sessionStatics.GetBindable<bool>(Static.TouchInputActive);
+
+            if (touchActive.Value)
+            {
+                Alpha = 1f;
+                text.FadeInFromZero(500, Easing.OutQuint)
+                    .Delay(1500)
+                    .FadeOut(500, Easing.OutQuint);
+            }
+            else
+            {
+                Alpha = 0;
+                text.Alpha = 0f;
+            }
 
             base.LoadComplete();
         }
@@ -84,7 +109,7 @@ namespace osu.Game.Screens.Play.HUD
 
         protected override bool OnMouseMove(MouseMoveEvent e)
         {
-            positionalAdjust = Vector2.Distance(e.MousePosition, button.ToSpaceOfOtherDrawable(button.DrawRectangle.Centre, Parent)) / 100;
+            positionalAdjust = Vector2.Distance(e.MousePosition, button.ToSpaceOfOtherDrawable(button.DrawRectangle.Centre, Parent!)) / 100;
             return base.OnMouseMove(e);
         }
 
@@ -96,9 +121,11 @@ namespace osu.Game.Screens.Play.HUD
                 Alpha = 1;
             else
             {
+                float minAlpha = touchActive.Value ? .08f : 0;
+
                 Alpha = Interpolation.ValueAt(
                     Math.Clamp(Clock.ElapsedFrameTime, 0, 200),
-                    Alpha, Math.Clamp(1 - positionalAdjust, 0.04f, 1), 0, 200, Easing.OutQuint);
+                    Alpha, Math.Clamp(1 - positionalAdjust, minAlpha, 1), 0, 200, Easing.OutQuint);
             }
         }
 
@@ -109,6 +136,8 @@ namespace osu.Game.Screens.Play.HUD
             private Circle overlayCircle;
 
             public readonly Bindable<bool> IsPaused = new Bindable<bool>();
+
+            public readonly Bindable<bool> ReplayLoaded = new Bindable<bool>();
 
             protected override bool AllowMultipleFires => true;
 
@@ -169,9 +198,14 @@ namespace osu.Game.Screens.Play.HUD
                 bind();
             }
 
+            protected override void Update()
+            {
+                base.Update();
+                circularProgress.Progress = Progress.Value;
+            }
+
             private void bind()
             {
-                ((IBindable<double>)circularProgress.Current).BindTo(Progress);
                 Progress.ValueChanged += progress =>
                 {
                     icon.Scale = new Vector2(1 + (float)progress.NewValue * 0.2f);
@@ -251,7 +285,14 @@ namespace osu.Game.Screens.Play.HUD
                 switch (e.Action)
                 {
                     case GlobalAction.Back:
-                    case GlobalAction.PauseGameplay: // in the future this behaviour will differ for replays etc.
+                        if (!pendingAnimation)
+                            BeginConfirm();
+                        return true;
+
+                    case GlobalAction.PauseGameplay:
+                        // handled by replay player
+                        if (ReplayLoaded.Value) return false;
+
                         if (!pendingAnimation)
                             BeginConfirm();
                         return true;
@@ -265,7 +306,12 @@ namespace osu.Game.Screens.Play.HUD
                 switch (e.Action)
                 {
                     case GlobalAction.Back:
+                        AbortConfirm();
+                        break;
+
                     case GlobalAction.PauseGameplay:
+                        if (ReplayLoaded.Value) return;
+
                         AbortConfirm();
                         break;
                 }

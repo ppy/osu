@@ -11,7 +11,7 @@ using osu.Framework.Platform;
 using osu.Framework.Threading;
 using osu.Game.Database;
 using osu.Game.Online.API;
-using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Types;
 
 namespace osu.Game.Beatmaps
 {
@@ -42,24 +42,26 @@ namespace osu.Game.Beatmaps
         /// Queue a beatmap for background processing.
         /// </summary>
         /// <param name="beatmapSet">The managed beatmap set to update. A transaction will be opened to apply changes.</param>
-        /// <param name="preferOnlineFetch">Whether metadata from an online source should be preferred. If <c>true</c>, the local cache will be skipped to ensure the freshest data state possible.</param>
-        public void Queue(Live<BeatmapSetInfo> beatmapSet, bool preferOnlineFetch = false)
+        /// <param name="lookupScope">The preferred scope to use for metadata lookup.</param>
+        public void Queue(Live<BeatmapSetInfo> beatmapSet, MetadataLookupScope lookupScope = MetadataLookupScope.LocalCacheFirst)
         {
             Logger.Log($"Queueing change for local beatmap {beatmapSet}");
-            Task.Factory.StartNew(() => beatmapSet.PerformRead(b => Process(b, preferOnlineFetch)), default, TaskCreationOptions.HideScheduler | TaskCreationOptions.RunContinuationsAsynchronously, updateScheduler);
+            Task.Factory.StartNew(() => beatmapSet.PerformRead(b => Process(b, lookupScope)), default, TaskCreationOptions.HideScheduler | TaskCreationOptions.RunContinuationsAsynchronously,
+                updateScheduler);
         }
 
         /// <summary>
         /// Run all processing on a beatmap immediately.
         /// </summary>
         /// <param name="beatmapSet">The managed beatmap set to update. A transaction will be opened to apply changes.</param>
-        /// <param name="preferOnlineFetch">Whether metadata from an online source should be preferred. If <c>true</c>, the local cache will be skipped to ensure the freshest data state possible.</param>
-        public void Process(BeatmapSetInfo beatmapSet, bool preferOnlineFetch = false) => beatmapSet.Realm.Write(r =>
+        /// <param name="lookupScope">The preferred scope to use for metadata lookup.</param>
+        public void Process(BeatmapSetInfo beatmapSet, MetadataLookupScope lookupScope = MetadataLookupScope.LocalCacheFirst) => beatmapSet.Realm!.Write(_ =>
         {
             // Before we use below, we want to invalidate.
             workingBeatmapCache.Invalidate(beatmapSet);
 
-            metadataLookup.Update(beatmapSet, preferOnlineFetch);
+            if (lookupScope != MetadataLookupScope.None)
+                metadataLookup.Update(beatmapSet, lookupScope == MetadataLookupScope.OnlineFirst);
 
             foreach (var beatmap in beatmapSet.Beatmaps)
             {
@@ -73,27 +75,30 @@ namespace osu.Game.Beatmaps
                 var calculator = ruleset.CreateDifficultyCalculator(working);
 
                 beatmap.StarRating = calculator.Calculate().StarRating;
-                beatmap.Length = calculateLength(working.Beatmap);
+                beatmap.Length = working.Beatmap.CalculatePlayableLength();
                 beatmap.BPM = 60000 / working.Beatmap.GetMostCommonBeatLength();
+                beatmap.EndTimeObjectCount = working.Beatmap.HitObjects.Count(h => h is IHasDuration);
+                beatmap.TotalObjectCount = working.Beatmap.HitObjects.Count;
             }
 
             // And invalidate again afterwards as re-fetching the most up-to-date database metadata will be required.
             workingBeatmapCache.Invalidate(beatmapSet);
         });
 
-        private double calculateLength(IBeatmap b)
+        public void ProcessObjectCounts(BeatmapInfo beatmapInfo, MetadataLookupScope lookupScope = MetadataLookupScope.LocalCacheFirst) => beatmapInfo.Realm!.Write(_ =>
         {
-            if (!b.HitObjects.Any())
-                return 0;
+            // Before we use below, we want to invalidate.
+            workingBeatmapCache.Invalidate(beatmapInfo);
 
-            var lastObject = b.HitObjects.Last();
+            var working = workingBeatmapCache.GetWorkingBeatmap(beatmapInfo);
+            var beatmap = working.Beatmap;
 
-            //TODO: this isn't always correct (consider mania where a non-last object may last for longer than the last in the list).
-            double endTime = lastObject.GetEndTime();
-            double startTime = b.HitObjects.First().StartTime;
+            beatmapInfo.EndTimeObjectCount = beatmap.HitObjects.Count(h => h is IHasDuration);
+            beatmapInfo.TotalObjectCount = beatmap.HitObjects.Count;
 
-            return endTime - startTime;
-        }
+            // And invalidate again afterwards as re-fetching the most up-to-date database metadata will be required.
+            workingBeatmapCache.Invalidate(beatmapInfo);
+        });
 
         #region Implementation of IDisposable
 

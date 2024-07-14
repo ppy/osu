@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
         private void load(IScrollingInfo scrollingInfo)
         {
             RelativeSizeAxes = Axes.X;
-            Height = ArgonNotePiece.NOTE_HEIGHT;
+            Height = ArgonNotePiece.NOTE_HEIGHT * ArgonNotePiece.NOTE_ACCENT_RATIO;
 
             Masking = true;
             CornerRadius = ArgonNotePiece.CORNER_RADIUS;

@@ -107,7 +107,7 @@ namespace osu.Game.Overlays.BeatmapListing
                     Padding = new MarginPadding
                     {
                         Vertical = 20,
-                        Horizontal = 40,
+                        Horizontal = WaveOverlayContainer.HORIZONTAL_PADDING,
                     },
                     Child = new FillFlowContainer
                     {
@@ -128,6 +128,7 @@ namespace osu.Game.Overlays.BeatmapListing
                                 RelativeSizeAxes = Axes.X,
                                 Direction = FillDirection.Vertical,
                                 Padding = new MarginPadding { Horizontal = 10 },
+                                Spacing = new Vector2(5),
                                 Children = new Drawable[]
                                 {
                                     generalFilter = new BeatmapSearchGeneralFilterRow(),

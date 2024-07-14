@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -17,19 +15,20 @@ using osu.Game.Overlays.Settings;
 using osu.Game.Screens.Menu;
 using osuTK;
 using osuTK.Graphics;
+using osu.Game.Localisation;
 
 namespace osu.Game.Overlays.AccountCreation
 {
     public partial class ScreenWarning : AccountCreationScreen
     {
-        private OsuTextFlowContainer multiAccountExplanationText;
-        private LinkFlowContainer furtherAssistance;
+        private OsuTextFlowContainer multiAccountExplanationText = null!;
+        private LinkFlowContainer furtherAssistance = null!;
 
-        [Resolved(canBeNull: true)]
-        private IAPIProvider api { get; set; }
+        [Resolved]
+        private IAPIProvider? api { get; set; }
 
-        [Resolved(canBeNull: true)]
-        private OsuGame game { get; set; }
+        [Resolved]
+        private OsuGame? game { get; set; }
 
         private const string help_centre_url = "/help/wiki/Help_Centre#login";
 
@@ -101,13 +100,13 @@ namespace osu.Game.Overlays.AccountCreation
                         },
                         new SettingsButton
                         {
-                            Text = "Help, I can't access my account!",
+                            Text = AccountCreationStrings.MultiAccountWarningHelp,
                             Margin = new MarginPadding { Top = 50 },
                             Action = () => game?.OpenUrlExternally(help_centre_url)
                         },
                         new DangerousSettingsButton
                         {
-                            Text = "I understand. This account isn't for me.",
+                            Text = AccountCreationStrings.MultiAccountWarningAccept,
                             Action = () => this.Push(new ScreenEntry())
                         },
                         furtherAssistance = new LinkFlowContainer(cp => cp.Font = cp.Font.With(size: 12))

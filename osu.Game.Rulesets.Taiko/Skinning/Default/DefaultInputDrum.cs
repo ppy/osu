@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Default
     {
         public DefaultInputDrum()
         {
-            RelativeSizeAxes = Axes.Y;
+            RelativeSizeAxes = Axes.X;
         }
 
         [BackgroundDependencyLoader]
@@ -148,7 +148,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Default
                     back = rim;
                 }
 
-                if (target != null)
+                if (target != null && back != null)
                 {
                     const float scale_amount = 0.05f;
                     const float alpha_amount = 0.5f;

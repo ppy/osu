@@ -20,35 +20,35 @@ namespace osu.Game.Tests.Visual
     {
         protected sealed override bool HasCustomSteps => true;
 
-        private ModTestData currentTestData;
+        protected ModTestData CurrentTestData { get; private set; }
 
         protected void CreateModTest(ModTestData testData) => CreateTest(() =>
         {
-            AddStep("set test data", () => currentTestData = testData);
+            AddStep("set test data", () => CurrentTestData = testData);
         });
 
         public override void TearDownSteps()
         {
             AddUntilStep("test passed", () =>
             {
-                if (currentTestData == null)
+                if (CurrentTestData == null)
                     return true;
 
-                return currentTestData.PassCondition?.Invoke() ?? false;
+                return CurrentTestData.PassCondition?.Invoke() ?? false;
             });
 
             base.TearDownSteps();
         }
 
-        protected sealed override IBeatmap CreateBeatmap(RulesetInfo ruleset) => currentTestData?.Beatmap ?? base.CreateBeatmap(ruleset);
+        protected sealed override IBeatmap CreateBeatmap(RulesetInfo ruleset) => CurrentTestData?.Beatmap ?? base.CreateBeatmap(ruleset);
 
         protected sealed override TestPlayer CreatePlayer(Ruleset ruleset)
         {
             var mods = new List<Mod>(SelectedMods.Value);
 
-            if (currentTestData.Mods != null)
-                mods.AddRange(currentTestData.Mods);
-            if (currentTestData.Autoplay)
+            if (CurrentTestData.Mods != null)
+                mods.AddRange(CurrentTestData.Mods);
+            if (CurrentTestData.Autoplay)
                 mods.Add(ruleset.GetAutoplayMod());
 
             SelectedMods.Value = mods;
@@ -56,7 +56,7 @@ namespace osu.Game.Tests.Visual
             return CreateModPlayer(ruleset);
         }
 
-        protected virtual TestPlayer CreateModPlayer(Ruleset ruleset) => new ModTestPlayer(currentTestData, AllowFail);
+        protected virtual TestPlayer CreateModPlayer(Ruleset ruleset) => new ModTestPlayer(CurrentTestData, AllowFail);
 
         protected partial class ModTestPlayer : TestPlayer
         {
@@ -66,7 +66,7 @@ namespace osu.Game.Tests.Visual
             protected override bool CheckModsAllowFailure() => allowFail;
 
             public ModTestPlayer(ModTestData data, bool allowFail)
-                : base(false, false)
+                : base(true, false)
             {
                 this.allowFail = allowFail;
                 currentTestData = data;
