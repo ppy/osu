@@ -57,21 +57,25 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             if (strainTime < min_speed_bonus)
                 speedBonus = 1 + 0.70 * Math.Pow((min_speed_bonus - strainTime) / speed_balancing_factor, 2);
 
-            double angleBonus = calculateAngleBonus(osuCurrObj.Angle ?? Math.PI);
             double travelDistance = osuPrevObj?.TravelDistance ?? 0;
-            double distance = (travelDistance + osuCurrObj.MinimumJumpDistance) * angleBonus;
+            double distance = travelDistance + osuCurrObj.MinimumJumpDistance;
             double distanceBonus = distance_multiplier * Math.Min(1, Math.Pow(distance / single_spacing_threshold, 3.5));
 
-            double speedDifficulty = (speedBonus + distanceBonus) * doubletapness / strainTime;
+            double adjustedDistanceScale = 1.0;
 
-            return speedDifficulty;
-        }
-        private static double calculateAngleBonus(double angle)
-        {
-            // A very small multiplier is used here to prevent FP shenanigans
-            if (angle >= Math.PI * 0.99999) return 1;
-            // Max is used to prevent FP
-            return (Math.PI - angle) / Math.Sqrt(2 * (1 - Math.Cos(Math.PI - angle)));
+            if (osuCurrObj.Angle.HasValue && osuPrevObj?.Angle != null && osuCurrObj.Angle != osuPrevObj.Angle)
+            {
+                double currAngleDegrees = osuCurrObj.Angle.Value * 180.0 / Math.PI;
+                double prevAngleDegrees = osuPrevObj.Angle.Value * 180.0 / Math.PI;
+
+                double angleDifference = Math.Abs(currAngleDegrees - prevAngleDegrees);
+                double angleDifferenceAdjusted = Math.Sin((Math.PI * angleDifference) / 360.0) * 180.0;
+                double angularVelocity = angleDifferenceAdjusted / (0.1 * strainTime);
+                double angularVelocityBonus = Math.Max(0.0, Math.Pow(angularVelocity, 0.4) - 1.0); //Math.Max(0.0, 1.0 - 1.0 / angularVelocity);
+                adjustedDistanceScale = 0.65 + angularVelocityBonus * 0.45;
+            }
+
+            return (speedBonus * (1 + distanceBonus * adjustedDistanceScale)) * doubletapness / strainTime;
         }
     }
 }
