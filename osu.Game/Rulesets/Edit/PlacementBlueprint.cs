@@ -38,6 +38,11 @@ namespace osu.Game.Rulesets.Edit
         public bool AutomaticBankAssignment { get; set; }
 
         /// <summary>
+        /// Whether the sample addition bank should be taken from the previous hit objects.
+        /// </summary>
+        public bool AutomaticAdditionBankAssignment { get; set; }
+
+        /// <summary>
         /// The <see cref="HitObject"/> that is being placed.
         /// </summary>
         public readonly HitObject HitObject;
@@ -157,26 +162,26 @@ namespace osu.Game.Rulesets.Edit
             }
 
             var lastHitObject = getPreviousHitObject();
+            var lastHitNormal = lastHitObject?.Samples?.FirstOrDefault(o => o.Name == HitSampleInfo.HIT_NORMAL);
 
-            if (AutomaticBankAssignment)
+            if (AutomaticAdditionBankAssignment)
             {
-                // Create samples based on the sample settings of the previous hit object
-                if (lastHitObject != null)
-                {
-                    for (int i = 0; i < HitObject.Samples.Count; i++)
-                        HitObject.Samples[i] = lastHitObject.CreateHitSampleInfo(HitObject.Samples[i].Name);
-                }
+                // Inherit the addition bank from the previous hit object
+                // If there is no previous addition, inherit from the normal sample
+                var lastAddition = lastHitObject?.Samples?.FirstOrDefault(o => o.Name != HitSampleInfo.HIT_NORMAL) ?? lastHitNormal;
+
+                if (lastAddition != null)
+                    HitObject.Samples = HitObject.Samples.Select(s => s.Name != HitSampleInfo.HIT_NORMAL ? s.With(newBank: lastAddition.Bank) : s).ToList();
             }
-            else
-            {
-                var lastHitNormal = lastHitObject?.Samples?.FirstOrDefault(o => o.Name == HitSampleInfo.HIT_NORMAL);
 
-                if (lastHitNormal != null)
-                {
-                    // Only inherit the volume from the previous hit object
-                    for (int i = 0; i < HitObject.Samples.Count; i++)
-                        HitObject.Samples[i] = HitObject.Samples[i].With(newVolume: lastHitNormal.Volume);
-                }
+            if (lastHitNormal != null)
+            {
+                if (AutomaticBankAssignment)
+                    // Inherit the bank from the previous hit object
+                    HitObject.Samples = HitObject.Samples.Select(s => s.Name == HitSampleInfo.HIT_NORMAL ? s.With(newBank: lastHitNormal.Bank) : s).ToList();
+
+                // Inherit the volume from the previous hit object
+                HitObject.Samples = HitObject.Samples.Select(s => s.With(newVolume: lastHitNormal.Volume)).ToList();
             }
 
             if (HitObject is IHasRepeats hasRepeats)
