@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Osu.Edit
 
         private readonly OsuGridToolboxGroup gridToolbox;
 
-        private readonly Bindable<PreciseRotationInfo> rotationInfo = new Bindable<PreciseRotationInfo>(new PreciseRotationInfo(0, RotationOrigin.PlayfieldCentre));
+        private readonly Bindable<PreciseRotationInfo> rotationInfo = new Bindable<PreciseRotationInfo>(new PreciseRotationInfo(0, RotationOrigin.GridCentre));
 
         private SliderWithTextBoxInput<float> angleInput = null!;
         private EditorRadioButtonCollection rotationOrigin = null!;
@@ -60,9 +60,9 @@ namespace osu.Game.Rulesets.Osu.Edit
                         RelativeSizeAxes = Axes.X,
                         Items = new[]
                         {
-                            new RadioButton("Playfield centre",
-                                () => rotationInfo.Value = rotationInfo.Value with { Origin = RotationOrigin.PlayfieldCentre },
-                                () => new SpriteIcon { Icon = FontAwesome.Regular.Square }),
+                            new RadioButton("Grid centre",
+                                () => rotationInfo.Value = rotationInfo.Value with { Origin = RotationOrigin.GridCentre },
+                                () => new SpriteIcon { Icon = FontAwesome.Regular.PlusSquare }),
                             selectionCentreButton = new RadioButton("Selection centre",
                                 () => rotationInfo.Value = rotationInfo.Value with { Origin = RotationOrigin.SelectionCentre },
                                 () => new SpriteIcon { Icon = FontAwesome.Solid.VectorSquare })
@@ -95,7 +95,7 @@ namespace osu.Game.Rulesets.Osu.Edit
 
             rotationInfo.BindValueChanged(rotation =>
             {
-                rotationHandler.Update(rotation.NewValue.Degrees, rotation.NewValue.Origin == RotationOrigin.PlayfieldCentre ? gridToolbox.StartPosition.Value : null);
+                rotationHandler.Update(rotation.NewValue.Degrees, rotation.NewValue.Origin == RotationOrigin.GridCentre ? gridToolbox.StartPosition.Value : null);
             });
         }
 
@@ -116,7 +116,7 @@ namespace osu.Game.Rulesets.Osu.Edit
 
     public enum RotationOrigin
     {
-        PlayfieldCentre,
+        GridCentre,
         SelectionCentre
     }
 
