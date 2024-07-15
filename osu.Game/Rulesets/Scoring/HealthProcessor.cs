@@ -8,19 +8,20 @@ using osu.Framework.Bindables;
 using osu.Framework.Utils;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Screens.Play;
 
 namespace osu.Game.Rulesets.Scoring
 {
     public abstract partial class HealthProcessor : JudgementProcessor
     {
         /// <summary>
-        /// Invoked when the <see cref="ScoreProcessor"/> is in a failed state.
+        /// Invoked when the <see cref="HealthProcessor"/> is in a failed state.
         /// Return true if the fail was permitted.
         /// </summary>
         public event Func<bool>? Failed;
 
         /// <summary>
-        /// List of Mods that are being iterated in <see cref="meetsAnyFailCondition"/>
+        /// The current selected mods.
         /// </summary>
         public readonly Bindable<IReadOnlyList<Mod>> Mods = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
 
@@ -30,13 +31,16 @@ namespace osu.Game.Rulesets.Scoring
         public readonly BindableDouble Health = new BindableDouble(1) { MinValue = 0, MaxValue = 1 };
 
         /// <summary>
-        /// Whether this ScoreProcessor has already triggered the failed state.
+        /// Whether this <see cref="HealthProcessor"/> has already triggered the failed state.
         /// </summary>
         public bool HasFailed { get; private set; }
 
         /// <summary>
-        /// Mod that triggered failure
+        /// If this <see cref="HealthProcessor"/> is in a failed state due to a mod, this returns the instance of that mod.
         /// </summary>
+        /// <remarks>
+        /// Used in <see cref="Player"/> to determine whether to perform a restart on failure, if the triggering mod is configured as such.
+        /// </remarks>
         public Mod? ModTriggeringFailure;
 
         /// <summary>
