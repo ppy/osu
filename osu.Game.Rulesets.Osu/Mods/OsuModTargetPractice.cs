@@ -33,7 +33,7 @@ using osuTK.Graphics;
 namespace osu.Game.Rulesets.Osu.Mods
 {
     public class OsuModTargetPractice : ModWithVisibilityAdjustment, IApplicableToDrawableRuleset<OsuHitObject>,
-                                        IApplicableToDifficulty, IApplicableFailOverride, IHasSeed, IHidesApproachCircles, IHasFailCondition
+                                        IApplicableToDifficulty, IHasSeed, IHidesApproachCircles, IHasFailCondition
     {
         public override string Name => "Target Practice";
         public override string Acronym => "TP";

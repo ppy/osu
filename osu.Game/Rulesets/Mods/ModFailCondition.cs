@@ -9,7 +9,7 @@ using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Mods
 {
-    public abstract class ModFailCondition : Mod, IApplicableToHealthProcessor, IApplicableFailOverride, IHasFailCondition
+    public abstract class ModFailCondition : Mod, IApplicableToHealthProcessor, IHasFailCondition
     {
         public override Type[] IncompatibleMods => new[] { typeof(ModNoFail), typeof(ModCinema) };
 

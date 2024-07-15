@@ -7,9 +7,10 @@ using osu.Game.Rulesets.Scoring;
 namespace osu.Game.Rulesets.Mods
 {
     /// <summary>
-    /// Interface for a <see cref="Mod"/> with fail condition
+    /// Interface for a <see cref="Mod"/> that specifies its own conditions for failure.
     /// </summary>
-    public interface IHasFailCondition
+    // todo: maybe IHasFailCondition and IApplicableFailOverride should be combined into a single interface.
+    public interface IHasFailCondition : IApplicableFailOverride
     {
         /// <summary>
         /// Determines whether <paramref name="result"/> should trigger a failure. Called every time a
