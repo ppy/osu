@@ -3,6 +3,7 @@
 
 #nullable disable
 
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -10,6 +11,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osu.Game.Audio;
+using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API.Requests.Responses;
@@ -24,11 +26,12 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
 
         private readonly BindableBool playing = new BindableBool();
 
+        [CanBeNull]
         public PreviewTrack Preview { get; private set; }
 
-        private APIBeatmapSet beatmapSet;
+        private IBeatmapSetInfo beatmapSet;
 
-        public APIBeatmapSet BeatmapSet
+        public IBeatmapSetInfo BeatmapSet
         {
             get => beatmapSet;
             set

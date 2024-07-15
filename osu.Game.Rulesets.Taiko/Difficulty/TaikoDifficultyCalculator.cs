@@ -1,7 +1,5 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using System;
 using System.Collections.Generic;
@@ -25,7 +23,12 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
     {
         private const double difficulty_multiplier = 1.35;
 
-        public override int Version => 20220902;
+        private const double final_multiplier = 0.0625;
+        private const double rhythm_skill_multiplier = 0.2 * final_multiplier;
+        private const double colour_skill_multiplier = 0.375 * final_multiplier;
+        private const double stamina_skill_multiplier = 0.375 * final_multiplier;
+
+        public override int Version => 20221107;
 
         public TaikoDifficultyCalculator(IRulesetInfo ruleset, IWorkingBeatmap beatmap)
             : base(ruleset, beatmap)
@@ -36,7 +39,9 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
         {
             return new Skill[]
             {
-                new Peaks(mods)
+                new Rhythm(mods),
+                new Colour(mods),
+                new Stamina(mods)
             };
         }
 
@@ -74,19 +79,21 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             if (beatmap.HitObjects.Count == 0)
                 return new TaikoDifficultyAttributes { Mods = mods };
 
-            var combined = (Peaks)skills[0];
+            Colour colour = (Colour)skills.First(x => x is Colour);
+            Rhythm rhythm = (Rhythm)skills.First(x => x is Rhythm);
+            Stamina stamina = (Stamina)skills.First(x => x is Stamina);
 
-            double colourRating = combined.ColourDifficultyValue * difficulty_multiplier;
-            double rhythmRating = combined.RhythmDifficultyValue * difficulty_multiplier;
-            double staminaRating = combined.StaminaDifficultyValue * difficulty_multiplier;
+            double colourRating = colour.DifficultyValue() * colour_skill_multiplier * difficulty_multiplier;
+            double rhythmRating = rhythm.DifficultyValue() * rhythm_skill_multiplier * difficulty_multiplier;
+            double staminaRating = stamina.DifficultyValue() * stamina_skill_multiplier * difficulty_multiplier;
 
-            double combinedRating = combined.DifficultyValue() * difficulty_multiplier;
+            double combinedRating = combinedDifficultyValue(rhythm, colour, stamina) * difficulty_multiplier;
             double starRating = rescale(combinedRating * 1.4);
 
             HitWindows hitWindows = new TaikoHitWindows();
             hitWindows.SetDifficulty(beatmap.Difficulty.OverallDifficulty);
 
-            return new TaikoDifficultyAttributes
+            TaikoDifficultyAttributes attributes = new TaikoDifficultyAttributes
             {
                 StarRating = starRating,
                 Mods = mods,
@@ -97,6 +104,8 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
                 GreatHitWindow = hitWindows.WindowFor(HitResult.Great) / clockRate,
                 MaxCombo = beatmap.HitObjects.Count(h => h is Hit),
             };
+
+            return attributes;
         }
 
         /// <summary>
@@ -109,5 +118,54 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
 
             return 10.43 * Math.Log(sr / 8 + 1);
         }
+
+        /// <summary>
+        /// Returns the combined star rating of the beatmap, calculated using peak strains from all sections of the map.
+        /// </summary>
+        /// <remarks>
+        /// For each section, the peak strains of all separate skills are combined into a single peak strain for the section.
+        /// The resulting partial rating of the beatmap is a weighted sum of the combined peaks (higher peaks are weighted more).
+        /// </remarks>
+        private double combinedDifficultyValue(Rhythm rhythm, Colour colour, Stamina stamina)
+        {
+            List<double> peaks = new List<double>();
+
+            var colourPeaks = colour.GetCurrentStrainPeaks().ToList();
+            var rhythmPeaks = rhythm.GetCurrentStrainPeaks().ToList();
+            var staminaPeaks = stamina.GetCurrentStrainPeaks().ToList();
+
+            for (int i = 0; i < colourPeaks.Count; i++)
+            {
+                double colourPeak = colourPeaks[i] * colour_skill_multiplier;
+                double rhythmPeak = rhythmPeaks[i] * rhythm_skill_multiplier;
+                double staminaPeak = staminaPeaks[i] * stamina_skill_multiplier;
+
+                double peak = norm(1.5, colourPeak, staminaPeak);
+                peak = norm(2, peak, rhythmPeak);
+
+                // Sections with 0 strain are excluded to avoid worst-case time complexity of the following sort (e.g. /b/2351871).
+                // These sections will not contribute to the difficulty.
+                if (peak > 0)
+                    peaks.Add(peak);
+            }
+
+            double difficulty = 0;
+            double weight = 1;
+
+            foreach (double strain in peaks.OrderDescending())
+            {
+                difficulty += strain * weight;
+                weight *= 0.9;
+            }
+
+            return difficulty;
+        }
+
+        /// <summary>
+        /// Returns the <i>p</i>-norm of an <i>n</i>-dimensional vector.
+        /// </summary>
+        /// <param name="p">The value of <i>p</i> to calculate the norm for.</param>
+        /// <param name="values">The coefficients of the vector.</param>
+        private double norm(double p, params double[] values) => Math.Pow(values.Sum(x => Math.Pow(x, p)), 1 / p);
     }
 }

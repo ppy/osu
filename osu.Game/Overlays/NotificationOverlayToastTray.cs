@@ -28,6 +28,11 @@ namespace osu.Game.Overlays
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => toastFlow.ReceivePositionalInputAt(screenSpacePos);
 
+        /// <summary>
+        /// All notifications currently being displayed by the toast tray.
+        /// </summary>
+        public IEnumerable<Notification> Notifications => toastFlow.Concat(InternalChildren.OfType<Notification>());
+
         public bool IsDisplayingToasts => toastFlow.Count > 0;
 
         private FillFlowContainer<Notification> toastFlow = null!;
@@ -38,12 +43,7 @@ namespace osu.Game.Overlays
 
         public Action<Notification>? ForwardNotificationToPermanentStore { get; set; }
 
-        public int UnreadCount => allDisplayedNotifications.Count(n => !n.WasClosed && !n.Read);
-
-        /// <summary>
-        /// Notifications contained in the toast flow, or in a detached state while they animate during forwarding to the main overlay.
-        /// </summary>
-        private IEnumerable<Notification> allDisplayedNotifications => toastFlow.Concat(InternalChildren.OfType<Notification>());
+        public int UnreadCount => Notifications.Count(n => !n.WasClosed && !n.Read);
 
         private int runningDepth;
 
@@ -86,11 +86,7 @@ namespace osu.Game.Overlays
             };
         }
 
-        public void MarkAllRead()
-        {
-            toastFlow.Children.ForEach(n => n.Read = true);
-            InternalChildren.OfType<Notification>().ForEach(n => n.Read = true);
-        }
+        public void MarkAllRead() => Notifications.ForEach(n => n.Read = true);
 
         public void FlushAllToasts()
         {

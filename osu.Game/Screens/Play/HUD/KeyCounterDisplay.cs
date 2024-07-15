@@ -1,24 +1,21 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using System.Collections.Specialized;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Input.Events;
 using osu.Game.Configuration;
-using osuTK;
+using osu.Game.Rulesets.UI;
+using osu.Game.Skinning;
 
 namespace osu.Game.Screens.Play.HUD
 {
     /// <summary>
     /// A flowing display of all gameplay keys. Individual keys can be added using <see cref="InputTrigger"/> implementations.
     /// </summary>
-    public abstract partial class KeyCounterDisplay : CompositeDrawable
+    public abstract partial class KeyCounterDisplay : CompositeDrawable, ISerialisableDrawable
     {
         /// <summary>
         /// Whether the key counter should be visible regardless of the configuration value.
@@ -26,95 +23,60 @@ namespace osu.Game.Screens.Play.HUD
         /// </summary>
         public Bindable<bool> AlwaysVisible { get; } = new Bindable<bool>(true);
 
-        /// <summary>
-        /// The <see cref="KeyCounter"/>s contained in this <see cref="KeyCounterDisplay"/>.
-        /// </summary>
-        public IEnumerable<KeyCounter> Counters => KeyFlow;
-
         protected abstract FillFlowContainer<KeyCounter> KeyFlow { get; }
-
-        /// <summary>
-        /// Whether the actions reported by all <see cref="InputTrigger"/>s within this <see cref="KeyCounterDisplay"/> should be counted.
-        /// </summary>
-        public Bindable<bool> IsCounting { get; } = new BindableBool(true);
 
         protected readonly Bindable<bool> ConfigVisibility = new Bindable<bool>();
 
-        protected abstract void UpdateVisibility();
+        private readonly IBindableList<InputTrigger> triggers = new BindableList<InputTrigger>();
 
-        private Receptor? receptor;
+        [Resolved]
+        private InputCountController controller { get; set; } = null!;
 
-        public void SetReceptor(Receptor receptor)
+        private const int duration = 100;
+
+        protected void UpdateVisibility()
         {
-            if (this.receptor != null)
-                throw new InvalidOperationException("Cannot set a new receptor when one is already active");
+            bool visible = AlwaysVisible.Value || ConfigVisibility.Value;
 
-            this.receptor = receptor;
+            // Isolate changing visibility of the key counters from fading this component.
+            KeyFlow.FadeTo(visible ? 1 : 0, duration);
+
+            // Ensure a valid size is immediately obtained even if partially off-screen
+            // See https://github.com/ppy/osu/issues/14793.
+            KeyFlow.AlwaysPresent = visible;
         }
-
-        /// <summary>
-        /// Add a <see cref="InputTrigger"/> to this display.
-        /// </summary>
-        public void Add(InputTrigger trigger)
-        {
-            var keyCounter = CreateCounter(trigger);
-
-            KeyFlow.Add(keyCounter);
-
-            IsCounting.BindTo(keyCounter.IsCounting);
-        }
-
-        /// <summary>
-        /// Add a range of <see cref="InputTrigger"/> to this display.
-        /// </summary>
-        public void AddRange(IEnumerable<InputTrigger> triggers) => triggers.ForEach(Add);
 
         protected abstract KeyCounter CreateCounter(InputTrigger trigger);
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
+        private void load(OsuConfigManager config, DrawableRuleset? drawableRuleset)
         {
+            AutoSizeAxes = Axes.Both;
+
             config.BindWith(OsuSetting.KeyOverlay, ConfigVisibility);
+
+            if (drawableRuleset != null)
+                AlwaysVisible.BindTo(drawableRuleset.HasReplayLoaded);
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
+            triggers.BindTo(controller.Triggers);
+            triggers.BindCollectionChanged(triggersChanged, true);
+
             AlwaysVisible.BindValueChanged(_ => UpdateVisibility());
             ConfigVisibility.BindValueChanged(_ => UpdateVisibility(), true);
         }
 
-        public override bool HandleNonPositionalInput => receptor == null;
-
-        public override bool HandlePositionalInput => receptor == null;
-
-        public partial class Receptor : Drawable
+        private void triggersChanged(object? sender, NotifyCollectionChangedEventArgs e)
         {
-            protected readonly KeyCounterDisplay Target;
-
-            public Receptor(KeyCounterDisplay target)
-            {
-                RelativeSizeAxes = Axes.Both;
-                Depth = float.MinValue;
-                Target = target;
-            }
-
-            public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
-
-            protected override bool Handle(UIEvent e)
-            {
-                switch (e)
-                {
-                    case KeyDownEvent:
-                    case KeyUpEvent:
-                    case MouseDownEvent:
-                    case MouseUpEvent:
-                        return Target.InternalChildren.Any(c => c.TriggerEvent(e));
-                }
-
-                return base.Handle(e);
-            }
+            KeyFlow.Clear();
+            foreach (var trigger in controller.Triggers)
+                KeyFlow.Add(CreateCounter(trigger));
         }
+
+        public bool UsesFixedAnchor { get; set; }
     }
 }

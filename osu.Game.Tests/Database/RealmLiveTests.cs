@@ -355,7 +355,7 @@ namespace osu.Game.Tests.Database
                     return null;
                 });
 
-                void gotChange(IRealmCollection<BeatmapInfo> sender, ChangeSet changes, Exception error)
+                void gotChange(IRealmCollection<BeatmapInfo> sender, ChangeSet? changes)
                 {
                     changesTriggered++;
                 }

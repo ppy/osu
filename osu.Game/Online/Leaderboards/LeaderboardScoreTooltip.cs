@@ -118,7 +118,7 @@ namespace osu.Game.Online.Leaderboards
             topScoreStatistics.Clear();
             bottomScoreStatistics.Clear();
 
-            foreach (var mod in score.Mods)
+            foreach (var mod in score.Mods.AsOrdered())
             {
                 modStatistics.Add(new ModCell(mod));
             }
@@ -210,7 +210,7 @@ namespace osu.Game.Online.Leaderboards
                     Spacing = new Vector2(2f, 0f),
                     Children = new Drawable[]
                     {
-                        new ModIcon(mod, showTooltip: false).With(icon =>
+                        new ModIcon(mod, showTooltip: false, showExtendedInformation: false).With(icon =>
                         {
                             icon.Origin = Anchor.CentreLeft;
                             icon.Anchor = Anchor.CentreLeft;

@@ -14,7 +14,7 @@ namespace osu.Game.Skinning
 {
     [MapTo("Skin")]
     [JsonObject(MemberSerialization.OptIn)]
-    public class SkinInfo : RealmObject, IHasRealmFiles, IEquatable<SkinInfo>, IHasGuidPrimaryKey, ISoftDelete, IHasNamedFiles
+    public class SkinInfo : RealmObject, IHasRealmFiles, IEquatable<SkinInfo>, IHasGuidPrimaryKey, ISoftDelete
     {
         internal static readonly Guid TRIANGLES_SKIN = new Guid("2991CFD8-2140-469A-BCB9-2EC23FBCE4AD");
         internal static readonly Guid ARGON_SKIN = new Guid("CFFA69DE-B3E3-4DEE-8563-3C4F425C05D0");

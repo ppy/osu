@@ -13,14 +13,14 @@ using osu.Game.Localisation;
 
 namespace osu.Game.Screens.Edit.Setup
 {
-    internal partial class DifficultySection : SetupSection
+    public partial class DifficultySection : SetupSection
     {
-        private LabelledSliderBar<float> circleSizeSlider = null!;
-        private LabelledSliderBar<float> healthDrainSlider = null!;
-        private LabelledSliderBar<float> approachRateSlider = null!;
-        private LabelledSliderBar<float> overallDifficultySlider = null!;
-        private LabelledSliderBar<double> baseVelocitySlider = null!;
-        private LabelledSliderBar<double> tickRateSlider = null!;
+        private LabelledSliderBar<float> circleSizeSlider { get; set; } = null!;
+        private LabelledSliderBar<float> healthDrainSlider { get; set; } = null!;
+        private LabelledSliderBar<float> approachRateSlider { get; set; } = null!;
+        private LabelledSliderBar<float> overallDifficultySlider { get; set; } = null!;
+        private LabelledSliderBar<double> baseVelocitySlider { get; set; } = null!;
+        private LabelledSliderBar<double> tickRateSlider { get; set; } = null!;
 
         public override LocalisableString Title => EditorSetupStrings.DifficultyHeader;
 
@@ -88,7 +88,7 @@ namespace osu.Game.Screens.Edit.Setup
                     Description = EditorSetupStrings.BaseVelocityDescription,
                     Current = new BindableDouble(Beatmap.Difficulty.SliderMultiplier)
                     {
-                        Default = 1,
+                        Default = 1.4,
                         MinValue = 0.4,
                         MaxValue = 3.6,
                         Precision = 0.01f,

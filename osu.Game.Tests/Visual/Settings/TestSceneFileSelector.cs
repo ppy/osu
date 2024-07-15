@@ -1,7 +1,5 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -16,14 +14,14 @@ namespace osu.Game.Tests.Visual.Settings
     public partial class TestSceneFileSelector : ThemeComparisonTestScene
     {
         [Resolved]
-        private OsuColour colours { get; set; }
+        private OsuColour colours { get; set; } = null!;
 
         [Test]
         public void TestJpgFilesOnly()
         {
             AddStep("create", () =>
             {
-                Cell(0, 0).Children = new Drawable[]
+                ContentContainer.Children = new Drawable[]
                 {
                     new Box
                     {

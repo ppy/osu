@@ -1,7 +1,5 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using osu.Framework.Allocation;
 using osu.Framework.Extensions;
@@ -14,7 +12,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
     public partial class RoomSpecialCategoryPill : OnlinePlayPill
     {
         [Resolved]
-        private OsuColour colours { get; set; }
+        private OsuColour colours { get; set; } = null!;
 
         protected override FontUsage Font => base.Font.With(weight: FontWeight.SemiBold);
 

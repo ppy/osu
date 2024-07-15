@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Collections.Generic;
 using osuTK.Graphics;
 
@@ -13,7 +11,7 @@ namespace osu.Game.Beatmaps.Formats
         /// <summary>
         /// Retrieves the list of combo colours for presentation only.
         /// </summary>
-        IReadOnlyList<Color4> ComboColours { get; }
+        IReadOnlyList<Color4>? ComboColours { get; }
 
         /// <summary>
         /// The list of custom combo colours.

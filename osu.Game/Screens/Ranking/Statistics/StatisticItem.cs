@@ -1,10 +1,7 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
-using JetBrains.Annotations;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
 
@@ -15,6 +12,11 @@ namespace osu.Game.Screens.Ranking.Statistics
     /// </summary>
     public class StatisticItem
     {
+        /// <summary>
+        /// The recommended font size to use in statistic items to make sure they match others.
+        /// </summary>
+        public const float FONT_SIZE = 13;
+
         /// <summary>
         /// The name of this item.
         /// </summary>
@@ -36,7 +38,7 @@ namespace osu.Game.Screens.Ranking.Statistics
         /// <param name="name">The name of the item. Can be <see langword="null"/> to hide the item header.</param>
         /// <param name="createContent">A function returning the <see cref="Drawable"/> content to be displayed.</param>
         /// <param name="requiresHitEvents">Whether this item requires hit events. If true, <see cref="CreateContent"/> will not be called if no hit events are available.</param>
-        public StatisticItem(LocalisableString name, [NotNull] Func<Drawable> createContent, bool requiresHitEvents = false)
+        public StatisticItem(LocalisableString name, Func<Drawable> createContent, bool requiresHitEvents = false)
         {
             Name = name;
             RequiresHitEvents = requiresHitEvents;

@@ -1,320 +1,130 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
-using osuTK;
-using osuTK.Graphics;
-using osu.Framework.Extensions.Color4Extensions;
+using System.Collections.Generic;
+using System.Linq;
+using osu.Framework.Allocation;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Colour;
-using osu.Framework.Graphics.Sprites;
-using osu.Game.Users;
-using osu.Game.Graphics;
-using osu.Game.Graphics.Backgrounds;
-using osu.Game.Overlays.MedalSplash;
-using osu.Framework.Allocation;
-using osu.Framework.Audio.Sample;
-using osu.Framework.Audio;
-using osu.Framework.Graphics.Textures;
-using osuTK.Input;
-using osu.Framework.Graphics.Shapes;
-using System;
-using osu.Framework.Graphics.Effects;
 using osu.Framework.Input.Events;
-using osu.Framework.Utils;
+using osu.Game.Graphics.Containers;
+using osu.Game.Input.Bindings;
+using osu.Game.Online.API;
+using osu.Game.Online.Notifications.WebSocket;
+using osu.Game.Online.Notifications.WebSocket.Events;
+using osu.Game.Users;
 
 namespace osu.Game.Overlays
 {
-    public partial class MedalOverlay : FocusedOverlayContainer
+    public partial class MedalOverlay : OsuFocusedOverlayContainer
     {
-        public const float DISC_SIZE = 400;
+        protected override string? PopInSampleName => null;
+        protected override string? PopOutSampleName => null;
 
-        private const float border_width = 5;
+        public override bool IsPresent => base.IsPresent || Scheduler.HasPendingTasks;
 
-        private readonly Medal medal;
-        private readonly Box background;
-        private readonly Container backgroundStrip, particleContainer;
-        private readonly BackgroundStrip leftStrip, rightStrip;
-        private readonly CircularContainer disc;
-        private readonly Sprite innerSpin, outerSpin;
-        private DrawableMedal drawableMedal;
+        protected override void PopIn() => this.FadeIn();
 
-        private Sample getSample;
+        protected override void PopOut() => this.FadeOut();
 
-        private readonly Container content;
+        private readonly Queue<MedalAnimation> queuedMedals = new Queue<MedalAnimation>();
 
-        public MedalOverlay(Medal medal)
-        {
-            this.medal = medal;
-            RelativeSizeAxes = Axes.Both;
+        [Resolved]
+        private IAPIProvider api { get; set; } = null!;
 
-            Child = content = new Container
-            {
-                Alpha = 0,
-                RelativeSizeAxes = Axes.Both,
-                Children = new Drawable[]
-                {
-                    background = new Box
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Colour = Color4.Black.Opacity(60),
-                    },
-                    outerSpin = new Sprite
-                    {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        Size = new Vector2(DISC_SIZE + 500),
-                        Alpha = 0f,
-                    },
-                    backgroundStrip = new Container
-                    {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        RelativeSizeAxes = Axes.X,
-                        Height = border_width,
-                        Alpha = 0f,
-                        Children = new[]
-                        {
-                            new Container
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                Anchor = Anchor.Centre,
-                                Origin = Anchor.CentreRight,
-                                Width = 0.5f,
-                                Padding = new MarginPadding { Right = DISC_SIZE / 2 },
-                                Children = new[]
-                                {
-                                    leftStrip = new BackgroundStrip(0f, 1f)
-                                    {
-                                        Anchor = Anchor.TopRight,
-                                        Origin = Anchor.TopRight,
-                                    },
-                                },
-                            },
-                            new Container
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                Anchor = Anchor.Centre,
-                                Origin = Anchor.CentreLeft,
-                                Width = 0.5f,
-                                Padding = new MarginPadding { Left = DISC_SIZE / 2 },
-                                Children = new[]
-                                {
-                                    rightStrip = new BackgroundStrip(1f, 0f),
-                                },
-                            },
-                        },
-                    },
-                    particleContainer = new Container
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Alpha = 0f,
-                    },
-                    disc = new CircularContainer
-                    {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        Alpha = 0f,
-                        Masking = true,
-                        AlwaysPresent = true,
-                        BorderColour = Color4.White,
-                        BorderThickness = border_width,
-                        Size = new Vector2(DISC_SIZE),
-                        Scale = new Vector2(0.8f),
-                        Children = new Drawable[]
-                        {
-                            new Box
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                Colour = Color4Extensions.FromHex(@"05262f"),
-                            },
-                            new Triangles
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                TriangleScale = 2,
-                                ColourDark = Color4Extensions.FromHex(@"04222b"),
-                                ColourLight = Color4Extensions.FromHex(@"052933"),
-                            },
-                            innerSpin = new Sprite
-                            {
-                                Anchor = Anchor.Centre,
-                                Origin = Anchor.Centre,
-                                RelativeSizeAxes = Axes.Both,
-                                Size = new Vector2(1.05f),
-                                Alpha = 0.25f,
-                            },
-                        },
-                    },
-                }
-            };
-
-            Show();
-        }
+        private Container<Drawable> medalContainer = null!;
+        private MedalAnimation? lastAnimation;
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, TextureStore textures, AudioManager audio)
+        private void load()
         {
-            getSample = audio.Samples.Get(@"MedalSplash/medal-get");
-            innerSpin.Texture = outerSpin.Texture = textures.Get(@"MedalSplash/disc-spin");
+            RelativeSizeAxes = Axes.Both;
 
-            disc.EdgeEffect = leftStrip.EdgeEffect = rightStrip.EdgeEffect = new EdgeEffectParameters
+            api.NotificationsClient.MessageReceived += handleMedalMessages;
+
+            Add(medalContainer = new Container
             {
-                Type = EdgeEffectType.Glow,
-                Colour = colours.Blue.Opacity(0.5f),
-                Radius = 50,
-            };
+                RelativeSizeAxes = Axes.Both
+            });
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            LoadComponentAsync(drawableMedal = new DrawableMedal(medal)
+            OverlayActivationMode.BindValueChanged(val =>
             {
-                Anchor = Anchor.TopCentre,
-                Origin = Anchor.TopCentre,
-                RelativeSizeAxes = Axes.Both,
-            }, loaded =>
+                if (val.NewValue == OverlayActivation.All && (queuedMedals.Any() || medalContainer.Any() || lastAnimation?.IsLoaded == false))
+                    Show();
+            }, true);
+        }
+
+        private void handleMedalMessages(SocketMessage obj)
+        {
+            if (obj.Event != @"new")
+                return;
+
+            var data = obj.Data?.ToObject<NewPrivateNotificationEvent>();
+            if (data == null || data.Name != @"user_achievement_unlock")
+                return;
+
+            var details = data.Details?.ToObject<UserAchievementUnlock>();
+            if (details == null)
+                return;
+
+            var medal = new Medal
             {
-                disc.Add(loaded);
-                startAnimation();
-            });
+                Name = details.Title,
+                InternalName = details.Slug,
+                Description = details.Description,
+            };
+
+            var medalAnimation = new MedalAnimation(medal);
+            queuedMedals.Enqueue(medalAnimation);
+            if (OverlayActivationMode.Value == OverlayActivation.All)
+                Scheduler.AddOnce(Show);
         }
 
         protected override void Update()
         {
             base.Update();
 
-            particleContainer.Add(new MedalParticle(RNG.Next(0, 359)));
+            if (medalContainer.Any() || lastAnimation?.IsLoaded == false)
+                return;
+
+            if (!queuedMedals.TryDequeue(out lastAnimation))
+            {
+                Hide();
+                return;
+            }
+
+            LoadComponentAsync(lastAnimation, medalContainer.Add);
         }
 
         protected override bool OnClick(ClickEvent e)
         {
-            dismiss();
+            lastAnimation?.Dismiss();
             return true;
         }
 
-        protected override void OnFocusLost(FocusLostEvent e)
+        public override bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
-            if (e.CurrentState.Keyboard.Keys.IsPressed(Key.Escape)) dismiss();
-        }
-
-        private const double initial_duration = 400;
-        private const double step_duration = 900;
-
-        private void startAnimation()
-        {
-            content.Show();
-
-            background.FlashColour(Color4.White.Opacity(0.25f), 400);
-
-            getSample.Play();
-
-            innerSpin.Spin(20000, RotationDirection.Clockwise);
-            outerSpin.Spin(40000, RotationDirection.Clockwise);
-
-            using (BeginDelayedSequence(200))
+            if (e.Action == GlobalAction.Back)
             {
-                disc.FadeIn(initial_duration)
-                    .ScaleTo(1f, initial_duration * 2, Easing.OutElastic);
-
-                particleContainer.FadeIn(initial_duration);
-                outerSpin.FadeTo(0.1f, initial_duration * 2);
-
-                using (BeginDelayedSequence(initial_duration + 200))
-                {
-                    backgroundStrip.FadeIn(step_duration);
-                    leftStrip.ResizeWidthTo(1f, step_duration, Easing.OutQuint);
-                    rightStrip.ResizeWidthTo(1f, step_duration, Easing.OutQuint);
-
-                    this.Animate().Schedule(() =>
-                    {
-                        if (drawableMedal.State != DisplayState.Full)
-                            drawableMedal.State = DisplayState.Icon;
-                    }).Delay(step_duration).Schedule(() =>
-                    {
-                        if (drawableMedal.State != DisplayState.Full)
-                            drawableMedal.State = DisplayState.MedalUnlocked;
-                    }).Delay(step_duration).Schedule(() =>
-                    {
-                        if (drawableMedal.State != DisplayState.Full)
-                            drawableMedal.State = DisplayState.Full;
-                    });
-                }
-            }
-        }
-
-        protected override void PopOut()
-        {
-            base.PopOut();
-            this.FadeOut(200);
-        }
-
-        private void dismiss()
-        {
-            if (drawableMedal.State != DisplayState.Full)
-            {
-                // if we haven't yet, play out the animation fully
-                drawableMedal.State = DisplayState.Full;
-                FinishTransforms(true);
-                return;
+                lastAnimation?.Dismiss();
+                return true;
             }
 
-            Hide();
-            Expire();
+            return base.OnPressed(e);
         }
 
-        private partial class BackgroundStrip : Container
+        protected override void Dispose(bool isDisposing)
         {
-            public BackgroundStrip(float start, float end)
-            {
-                RelativeSizeAxes = Axes.Both;
-                Width = 0f;
-                Colour = ColourInfo.GradientHorizontal(Color4.White.Opacity(start), Color4.White.Opacity(end));
-                Masking = true;
+            base.Dispose(isDisposing);
 
-                Children = new[]
-                {
-                    new Box
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Colour = Color4.White,
-                    }
-                };
-            }
-        }
-
-        private partial class MedalParticle : CircularContainer
-        {
-            private readonly float direction;
-
-            private Vector2 positionForOffset(float offset) => new Vector2((float)(offset * Math.Sin(direction)), (float)(offset * Math.Cos(direction)));
-
-            public MedalParticle(float direction)
-            {
-                this.direction = direction;
-                Anchor = Anchor.Centre;
-                Origin = Anchor.Centre;
-                Position = positionForOffset(DISC_SIZE / 2);
-                Masking = true;
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
-            {
-                EdgeEffect = new EdgeEffectParameters
-                {
-                    Type = EdgeEffectType.Glow,
-                    Colour = colours.Blue.Opacity(0.5f),
-                    Radius = 5,
-                };
-
-                this.MoveTo(positionForOffset(DISC_SIZE / 2 + 200), 500);
-                this.FadeOut(500);
-                Expire();
-            }
+            if (api.IsNotNull())
+                api.NotificationsClient.MessageReceived -= handleMedalMessages;
         }
     }
 }

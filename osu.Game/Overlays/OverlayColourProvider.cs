@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using osuTK;
 using osuTK.Graphics;
@@ -11,11 +9,11 @@ namespace osu.Game.Overlays
 {
     public class OverlayColourProvider
     {
-        private readonly OverlayColourScheme colourScheme;
+        public OverlayColourScheme ColourScheme { get; private set; }
 
         public OverlayColourProvider(OverlayColourScheme colourScheme)
         {
-            this.colourScheme = colourScheme;
+            ColourScheme = colourScheme;
         }
 
         // Note that the following five colours are also defined in `OsuColour` as `{colourScheme}{0,1,2,3,4}`.
@@ -49,7 +47,17 @@ namespace osu.Game.Overlays
         public Color4 Background5 => getColour(0.1f, 0.15f);
         public Color4 Background6 => getColour(0.1f, 0.1f);
 
-        private Color4 getColour(float saturation, float lightness) => Color4.FromHsl(new Vector4(getBaseHue(colourScheme), saturation, lightness, 1));
+        /// <summary>
+        /// Changes the value of <see cref="ColourScheme"/> to a different colour scheme.
+        /// Note that this does not trigger any kind of signal to any drawable that received colours from here, all drawables need to be updated manually.
+        /// </summary>
+        /// <param name="colourScheme">The proposed colour scheme.</param>
+        public void ChangeColourScheme(OverlayColourScheme colourScheme)
+        {
+            ColourScheme = colourScheme;
+        }
+
+        private Color4 getColour(float saturation, float lightness) => Color4.FromHsl(new Vector4(getBaseHue(ColourScheme), saturation, lightness, 1));
 
         // See https://github.com/ppy/osu-web/blob/5a536d217a21582aad999db50a981003d3ad5659/app/helpers.php#L1620-L1628
         private static float getBaseHue(OverlayColourScheme colourScheme)

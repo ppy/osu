@@ -7,7 +7,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Animations;
 using osu.Game.Rulesets.Judgements;
-using osu.Game.Rulesets.Mania.Judgements;
 using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Skinning;
@@ -44,11 +43,8 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
             if (tmp is IFramedAnimation tmpAnimation && tmpAnimation.FrameCount > 0)
                 frameLength = Math.Max(1000 / 60.0, 170.0 / tmpAnimation.FrameCount);
 
-            explosion = skin.GetAnimation(imageName, true, false, frameLength: frameLength).With(d =>
+            explosion = skin.GetAnimation(imageName, true, false, frameLength: frameLength)?.With(d =>
             {
-                if (d == null)
-                    return;
-
                 d.Origin = Anchor.Centre;
                 d.Blending = BlendingParameters.Additive;
                 d.Scale = new Vector2(explosionScale);
@@ -69,9 +65,6 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
 
         public void Animate(JudgementResult result)
         {
-            if (result.Judgement is HoldNoteTickJudgement)
-                return;
-
             (explosion as IFramedAnimation)?.GotoFrame(0);
 
             explosion?.FadeInFromZero(FADE_IN_DURATION)

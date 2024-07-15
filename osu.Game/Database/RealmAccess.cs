@@ -21,14 +21,21 @@ using osu.Framework.Platform;
 using osu.Framework.Statistics;
 using osu.Framework.Threading;
 using osu.Game.Beatmaps;
+using osu.Game.Beatmaps.Legacy;
 using osu.Game.Configuration;
+using osu.Game.Extensions;
+using osu.Game.Input;
 using osu.Game.Input.Bindings;
 using osu.Game.Models;
+using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
+using osu.Game.Scoring.Legacy;
 using osu.Game.Skinning;
+using osu.Game.Utils;
+using osuTK.Input;
 using Realms;
 using Realms.Exceptions;
 
@@ -71,8 +78,22 @@ namespace osu.Game.Database
         /// 24   2022-08-22    Added MaximumStatistics to ScoreInfo.
         /// 25   2022-09-18    Remove skins to add with new naming.
         /// 26   2023-02-05    Added BeatmapHash to ScoreInfo.
+        /// 27   2023-06-06    Added EditorTimestamp to BeatmapInfo.
+        /// 28   2023-06-08    Added IsLegacyScore to ScoreInfo, parsed from replay files.
+        /// 29   2023-06-12    Run migration of old lazer scores to be best-effort in the new scoring number space. No actual realm changes.
+        /// 30   2023-06-16    Run migration of old lazer scores again. This time with more correct rounding considerations.
+        /// 31   2023-06-26    Add Version and LegacyTotalScore to ScoreInfo, set Version to 30000002 and copy TotalScore into LegacyTotalScore for legacy scores.
+        /// 32   2023-07-09    Populate legacy scores with the ScoreV2 mod (and restore TotalScore to the legacy total for such scores) using replay files.
+        /// 33   2023-08-16    Reset default chat toggle key binding to avoid conflict with newly added leaderboard toggle key binding.
+        /// 34   2023-08-21    Add BackgroundReprocessingFailed flag to ScoreInfo to track upgrade failures.
+        /// 35   2023-10-16    Clear key combinations of keybindings that are assigned to more than one action in a given settings section.
+        /// 36   2023-10-26    Add LegacyOnlineID to ScoreInfo. Move osu_scores_*_high IDs stored in OnlineID to LegacyOnlineID. Reset anomalous OnlineIDs.
+        /// 38   2023-12-10    Add EndTimeObjectCount and TotalObjectCount to BeatmapInfo.
+        /// 39   2023-12-19    Migrate any EndTimeObjectCount and TotalObjectCount values of 0 to -1 to better identify non-calculated values.
+        /// 40   2023-12-21    Add ScoreInfo.Version to keep track of which build scores were set on.
+        /// 41   2024-04-17    Add ScoreInfo.TotalScoreWithoutMods for future mod multiplier rebalances.
         /// </summary>
-        private const int schema_version = 26;
+        private const int schema_version = 41;
 
         /// <summary>
         /// Lock object which is held during <see cref="BlockAllOperations"/> sections, blocking realm retrieval during blocking periods.
@@ -301,12 +322,32 @@ namespace osu.Game.Database
                 {
                     Logger.Error(e, "Your local database is too new to work with this version of osu!. Please close osu! and install the latest release to recover your data.");
 
-                    // If a newer version database already exists, don't backup again. We can presume that the first backup is the one we care about.
+                    // If a newer version database already exists, don't create another backup. We can presume that the first backup is the one we care about.
                     if (!storage.Exists(newerVersionFilename))
                         createBackup(newerVersionFilename);
                 }
                 else
                 {
+                    // This error can occur due to file handles still being open by a previous instance.
+                    // If this is the case, rather than assuming the realm file is corrupt, block game startup.
+                    if (e.Message.StartsWith("SetEndOfFile() failed", StringComparison.Ordinal))
+                    {
+                        // This will throw if the realm file is not available for write access after 5 seconds.
+                        FileUtils.AttemptOperation(() =>
+                        {
+                            if (storage.Exists(Filename))
+                            {
+                                using (var _ = storage.GetStream(Filename, FileAccess.ReadWrite))
+                                {
+                                }
+                            }
+                        }, 20);
+
+                        // If the above eventually succeeds, try and continue startup as per normal.
+                        // This may throw again but let's allow it to, and block startup.
+                        return getRealmInstance();
+                    }
+
                     Logger.Error(e, "Realm startup failed with unrecoverable error; starting with a fresh database. A backup of your database has been made.");
                     createBackup($"{Filename.Replace(realm_extension, string.Empty)}_{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}_corrupt{realm_extension}");
                 }
@@ -469,8 +510,7 @@ namespace osu.Game.Database
         /// <param name="action">The work to run.</param>
         public Task WriteAsync(Action<Realm> action)
         {
-            if (isDisposed)
-                throw new ObjectDisposedException(nameof(RealmAccess));
+            ObjectDisposedException.ThrowIf(isDisposed, this);
 
             // Required to ensure the write is tracked and accounted for before disposal.
             // Can potentially be avoided if we have a need to do so in the future.
@@ -527,7 +567,7 @@ namespace osu.Game.Database
             lock (notificationsResetMap)
             {
                 // Store an action which is used when blocking to ensure consumers don't use results of a stale changeset firing.
-                notificationsResetMap.Add(action, () => callback(new EmptyRealmSet<T>(), null, null));
+                notificationsResetMap.Add(action, () => callback(new EmptyRealmSet<T>(), null));
             }
 
             return RegisterCustomSubscription(action);
@@ -655,8 +695,7 @@ namespace osu.Game.Database
 
         private Realm getRealmInstance()
         {
-            if (isDisposed)
-                throw new ObjectDisposedException(nameof(RealmAccess));
+            ObjectDisposedException.ThrowIf(isDisposed, this);
 
             bool tookSemaphoreLock = false;
 
@@ -719,6 +758,13 @@ namespace osu.Game.Database
 
         private void applyMigrationsForVersion(Migration migration, ulong targetVersion)
         {
+            Logger.Log($"Running realm migration to version {targetVersion}...");
+            Stopwatch stopwatch = new Stopwatch();
+
+            var files = new RealmFileStore(this, storage);
+
+            stopwatch.Start();
+
             switch (targetVersion)
             {
                 case 7:
@@ -742,10 +788,10 @@ namespace osu.Game.Database
 
                         for (int i = 0; i < itemCount; i++)
                         {
-                            dynamic? oldItem = oldItems.ElementAt(i);
-                            dynamic? newItem = newItems.ElementAt(i);
+                            dynamic oldItem = oldItems.ElementAt(i);
+                            dynamic newItem = newItems.ElementAt(i);
 
-                            long? nullableOnlineID = oldItem?.OnlineID;
+                            long? nullableOnlineID = oldItem.OnlineID;
                             newItem.OnlineID = (int)(nullableOnlineID ?? -1);
                         }
                     }
@@ -753,6 +799,7 @@ namespace osu.Game.Database
                     break;
 
                 case 8:
+                {
                     // Ctrl -/+ now adjusts UI scale so let's clear any bindings which overlap these combinations.
                     // New defaults will be populated by the key store afterwards.
                     var keyBindings = migration.NewRealm.All<RealmKeyBinding>();
@@ -766,6 +813,7 @@ namespace osu.Game.Database
                         migration.NewRealm.Remove(decreaseSpeedBinding);
 
                     break;
+                }
 
                 case 9:
                     // Pretty pointless to do this as beatmaps aren't really loaded via realm yet, but oh well.
@@ -782,7 +830,7 @@ namespace osu.Game.Database
 
                     for (int i = 0; i < metadataCount; i++)
                     {
-                        dynamic? oldItem = oldMetadata.ElementAt(i);
+                        dynamic oldItem = oldMetadata.ElementAt(i);
                         var newItem = newMetadata.ElementAt(i);
 
                         string username = oldItem.Author;
@@ -805,7 +853,7 @@ namespace osu.Game.Database
 
                     for (int i = 0; i < newSettings.Count; i++)
                     {
-                        dynamic? oldItem = oldSettings.ElementAt(i);
+                        dynamic oldItem = oldSettings.ElementAt(i);
                         var newItem = newSettings.ElementAt(i);
 
                         long rulesetId = oldItem.RulesetID;
@@ -820,6 +868,7 @@ namespace osu.Game.Database
                     break;
 
                 case 11:
+                {
                     string keyBindingClassName = getMappedOrOriginalName(typeof(RealmKeyBinding));
 
                     if (!migration.OldRealm.Schema.TryFindObjectSchema(keyBindingClassName, out _))
@@ -830,7 +879,7 @@ namespace osu.Game.Database
 
                     for (int i = 0; i < newKeyBindings.Count; i++)
                     {
-                        dynamic? oldItem = oldKeyBindings.ElementAt(i);
+                        dynamic oldItem = oldKeyBindings.ElementAt(i);
                         var newItem = newKeyBindings.ElementAt(i);
 
                         if (oldItem.RulesetID == null)
@@ -846,6 +895,7 @@ namespace osu.Game.Database
                     }
 
                     break;
+                }
 
                 case 14:
                     foreach (var beatmap in migration.NewRealm.All<BeatmapInfo>())
@@ -879,14 +929,226 @@ namespace osu.Game.Database
                     break;
 
                 case 26:
+                {
                     // Add ScoreInfo.BeatmapHash property to ensure scores correspond to the correct version of beatmap.
                     var scores = migration.NewRealm.All<ScoreInfo>();
 
                     foreach (var score in scores)
-                        score.BeatmapHash = score.BeatmapInfo.Hash;
+                        score.BeatmapHash = score.BeatmapInfo?.Hash ?? string.Empty;
+
+                    break;
+                }
+
+                case 28:
+                {
+                    var scores = migration.NewRealm.All<ScoreInfo>();
+
+                    foreach (var score in scores)
+                    {
+                        score.PopulateFromReplay(files, sr =>
+                        {
+                            sr.ReadByte(); // Ruleset.
+                            int version = sr.ReadInt32();
+                            if (version < LegacyScoreEncoder.FIRST_LAZER_VERSION)
+                                score.IsLegacyScore = true;
+                        });
+                    }
+
+                    break;
+                }
+
+                case 29:
+                case 30:
+                {
+                    var scores = migration.NewRealm
+                                          .All<ScoreInfo>()
+                                          .Where(s => !s.IsLegacyScore);
+
+                    foreach (var score in scores)
+                    {
+                        try
+                        {
+                            if (StandardisedScoreMigrationTools.ShouldMigrateToNewStandardised(score))
+                            {
+                                try
+                                {
+                                    long calculatedNew = StandardisedScoreMigrationTools.GetNewStandardised(score);
+                                    score.TotalScore = calculatedNew;
+                                }
+                                catch
+                                {
+                                }
+                            }
+                        }
+                        catch { }
+                    }
+
+                    break;
+                }
+
+                case 31:
+                {
+                    foreach (var score in migration.NewRealm.All<ScoreInfo>())
+                    {
+                        if (score.IsLegacyScore && score.Ruleset.IsLegacyRuleset())
+                        {
+                            // Scores with this version will trigger the score upgrade process in BackgroundBeatmapProcessor.
+                            score.TotalScoreVersion = 30000002;
+
+                            // Transfer known legacy scores to a permanent storage field for preservation.
+                            score.LegacyTotalScore = score.TotalScore;
+                        }
+                        else
+                            score.TotalScoreVersion = LegacyScoreEncoder.LATEST_VERSION;
+                    }
+
+                    break;
+                }
+
+                case 32:
+                {
+                    foreach (var score in migration.NewRealm.All<ScoreInfo>())
+                    {
+                        if (!score.IsLegacyScore || !score.Ruleset.IsLegacyRuleset())
+                            continue;
+
+                        score.PopulateFromReplay(files, sr =>
+                        {
+                            sr.ReadByte(); // Ruleset.
+                            sr.ReadInt32(); // Version.
+                            sr.ReadString(); // Beatmap hash.
+                            sr.ReadString(); // Username.
+                            sr.ReadString(); // MD5Hash.
+                            sr.ReadUInt16(); // Count300.
+                            sr.ReadUInt16(); // Count100.
+                            sr.ReadUInt16(); // Count50.
+                            sr.ReadUInt16(); // CountGeki.
+                            sr.ReadUInt16(); // CountKatu.
+                            sr.ReadUInt16(); // CountMiss.
+
+                            // we should have this in LegacyTotalScore already, but if we're reading through this anyways...
+                            int totalScore = sr.ReadInt32();
+
+                            sr.ReadUInt16(); // Max combo.
+                            sr.ReadBoolean(); // Perfect.
+
+                            var legacyMods = (LegacyMods)sr.ReadInt32();
+
+                            if (!legacyMods.HasFlag(LegacyMods.ScoreV2) || score.APIMods.Any(mod => mod.Acronym == @"SV2"))
+                                return;
+
+                            score.APIMods = score.APIMods.Append(new APIMod(new ModScoreV2())).ToArray();
+                            score.LegacyTotalScore = score.TotalScore = totalScore;
+                        });
+                    }
+
+                    break;
+                }
+
+                case 33:
+                {
+                    // Clear default bindings for the chat focus toggle,
+                    // as they would conflict with the newly-added leaderboard toggle.
+                    var keyBindings = migration.NewRealm.All<RealmKeyBinding>();
+
+                    var toggleChatBind = keyBindings.FirstOrDefault(bind => bind.ActionInt == (int)GlobalAction.ToggleChatFocus);
+                    if (toggleChatBind != null && toggleChatBind.KeyCombination.Keys.SequenceEqual(new[] { InputKey.Tab }))
+                        migration.NewRealm.Remove(toggleChatBind);
+
+                    break;
+                }
+
+                case 35:
+                {
+                    // catch used `Shift` twice as a default key combination for dash, which generally was bothersome and causes issues elsewhere.
+                    // the duplicate binding logic below had to account for it, it could also break keybinding conflict resolution on revert-to-default.
+                    // as such, detect this situation and fix it before proceeding further.
+                    var catchDashBindings = migration.NewRealm.All<RealmKeyBinding>()
+                                                     .Where(kb => kb.RulesetName == @"fruits" && kb.ActionInt == 2)
+                                                     .ToList();
+
+                    if (catchDashBindings.All(kb => kb.KeyCombination.Equals(new KeyCombination(InputKey.Shift))))
+                    {
+                        Debug.Assert(catchDashBindings.Count == 2);
+                        catchDashBindings.Last().KeyCombination = KeyCombination.FromMouseButton(MouseButton.Left);
+                    }
+
+                    // with the catch case dealt with, de-duplicate the remaining bindings.
+                    int countCleared = 0;
+
+                    var globalBindings = migration.NewRealm.All<RealmKeyBinding>().Where(kb => kb.RulesetName == null).ToList();
+
+                    foreach (var category in Enum.GetValues<GlobalActionCategory>())
+                    {
+                        var categoryActions = GlobalActionContainer.GetGlobalActionsFor(category).Cast<int>().ToHashSet();
+                        var categoryBindings = globalBindings.Where(kb => categoryActions.Contains(kb.ActionInt));
+                        countCleared += RealmKeyBindingStore.ClearDuplicateBindings(categoryBindings);
+                    }
+
+                    var rulesetBindings = migration.NewRealm.All<RealmKeyBinding>().Where(kb => kb.RulesetName != null).ToList();
+
+                    foreach (var variantGroup in rulesetBindings.GroupBy(kb => (kb.RulesetName, kb.Variant)))
+                        countCleared += RealmKeyBindingStore.ClearDuplicateBindings(variantGroup);
+
+                    if (countCleared > 0)
+                    {
+                        Logger.Log($"{countCleared} of your keybinding(s) have been cleared due to being bound to multiple actions. "
+                                   + "Please choose new unique ones in the settings panel.", level: LogLevel.Important);
+                    }
+
+                    break;
+                }
+
+                case 36:
+                {
+                    foreach (var score in migration.NewRealm.All<ScoreInfo>())
+                    {
+                        if (score.OnlineID > 0)
+                        {
+                            score.LegacyOnlineID = score.OnlineID;
+                            score.OnlineID = -1;
+                        }
+                        else
+                        {
+                            score.LegacyOnlineID = score.OnlineID = -1;
+                        }
+                    }
+
+                    break;
+                }
+
+                case 39:
+                    foreach (var b in migration.NewRealm.All<BeatmapInfo>())
+                    {
+                        // Either actually no objects, or processing ran and failed.
+                        // Reset to -1 so the next time they become zero we know that processing was attempted.
+                        if (b.TotalObjectCount == 0 && b.EndTimeObjectCount == 0)
+                        {
+                            b.TotalObjectCount = -1;
+                            b.EndTimeObjectCount = -1;
+                        }
+                    }
+
+                    break;
+
+                case 41:
+                    foreach (var score in migration.NewRealm.All<ScoreInfo>())
+                    {
+                        try
+                        {
+                            // this can fail e.g. if a user has a score set on a ruleset that can no longer be loaded.
+                            LegacyScoreDecoder.PopulateTotalScoreWithoutMods(score);
+                        }
+                        catch (Exception ex)
+                        {
+                            Logger.Log($@"Failed to populate total score without mods for score {score.ID}: {ex}", LoggingTarget.Database);
+                        }
+                    }
 
                     break;
             }
+
+            Logger.Log($"Migration completed in {stopwatch.ElapsedMilliseconds}ms");
         }
 
         private string? getRulesetShortNameFromLegacyID(long rulesetId)
@@ -917,33 +1179,18 @@ namespace osu.Game.Database
         {
             Logger.Log($"Creating full realm database backup at {backupFilename}", LoggingTarget.Database);
 
-            int attempts = 10;
-
-            while (true)
+            FileUtils.AttemptOperation(() =>
             {
-                try
+                using (var source = storage.GetStream(Filename, mode: FileMode.Open))
                 {
-                    using (var source = storage.GetStream(Filename, mode: FileMode.Open))
-                    {
-                        // source may not exist.
-                        if (source == null)
-                            return;
+                    // source may not exist.
+                    if (source == null)
+                        return;
 
-                        using (var destination = storage.GetStream(backupFilename, FileAccess.Write, FileMode.CreateNew))
-                            source.CopyTo(destination);
-                    }
-
-                    return;
+                    using (var destination = storage.GetStream(backupFilename, FileAccess.Write, FileMode.CreateNew))
+                        source.CopyTo(destination);
                 }
-                catch (IOException)
-                {
-                    if (attempts-- <= 0)
-                        throw;
-
-                    // file may be locked during use.
-                    Thread.Sleep(500);
-                }
-            }
+            }, 20);
         }
 
         /// <summary>
@@ -962,8 +1209,7 @@ namespace osu.Game.Database
             if (!ThreadSafety.IsUpdateThread)
                 throw new InvalidOperationException(@$"{nameof(BlockAllOperations)} must be called from the update thread.");
 
-            if (isDisposed)
-                throw new ObjectDisposedException(nameof(RealmAccess));
+            ObjectDisposedException.ThrowIf(isDisposed, this);
 
             SynchronizationContext? syncContext = null;
 

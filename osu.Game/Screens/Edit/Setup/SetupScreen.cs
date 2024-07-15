@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Screens;
 using osu.Game.Graphics.Containers;
 using osu.Game.Overlays;
 
@@ -26,18 +27,16 @@ namespace osu.Game.Screens.Edit.Setup
         [BackgroundDependencyLoader]
         private void load(EditorBeatmap beatmap, OverlayColourProvider colourProvider)
         {
-            var sectionsEnumerable = new List<SetupSection>
-            {
-                new ResourcesSection(),
-                new MetadataSection(),
-                new DifficultySection(),
-                new ColoursSection(),
-                new DesignSection(),
-            };
+            var ruleset = beatmap.BeatmapInfo.Ruleset.CreateInstance();
 
-            var rulesetSpecificSection = beatmap.BeatmapInfo.Ruleset.CreateInstance().CreateEditorSetupSection();
-            if (rulesetSpecificSection != null)
-                sectionsEnumerable.Add(rulesetSpecificSection);
+            List<SetupSection> sectionsEnumerable =
+            [
+                new ResourcesSection(),
+                new MetadataSection()
+            ];
+
+            sectionsEnumerable.AddRange(ruleset.CreateEditorSetupSections());
+            sectionsEnumerable.Add(new DesignSection());
 
             Add(new Box
             {
@@ -51,6 +50,17 @@ namespace osu.Game.Screens.Edit.Setup
                 s.ChildrenEnumerable = sectionsEnumerable;
                 s.FixedHeader = header;
             }));
+        }
+
+        public override void OnExiting(ScreenExitEvent e)
+        {
+            base.OnExiting(e);
+
+            // Before exiting, trigger a focus loss.
+            //
+            // This is important to ensure that if the user is still editing a textbox, it will commit
+            // (and potentially block the exit procedure for save).
+            GetContainingFocusManager()?.TriggerFocusContention(this);
         }
 
         private partial class SetupScreenSectionsContainer : SectionsContainer<SetupSection>

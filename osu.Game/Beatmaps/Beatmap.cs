@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Rulesets.Objects;
@@ -10,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Beatmaps.ControlPoints;
 using Newtonsoft.Json;
+using osu.Framework.Lists;
 using osu.Game.IO.Serialization.Converters;
 
 namespace osu.Game.Beatmaps
@@ -26,8 +25,7 @@ namespace osu.Game.Beatmaps
             {
                 difficulty = value;
 
-                if (beatmapInfo != null)
-                    beatmapInfo.Difficulty = difficulty.Clone();
+                beatmapInfo.Difficulty = difficulty.Clone();
             }
         }
 
@@ -40,8 +38,7 @@ namespace osu.Game.Beatmaps
             {
                 beatmapInfo = value;
 
-                if (beatmapInfo?.Difficulty != null)
-                    Difficulty = beatmapInfo.Difficulty.Clone();
+                Difficulty = beatmapInfo.Difficulty.Clone();
             }
         }
 
@@ -65,7 +62,9 @@ namespace osu.Game.Beatmaps
 
         public ControlPointInfo ControlPointInfo { get; set; } = new ControlPointInfo();
 
-        public List<BreakPeriod> Breaks { get; set; } = new List<BreakPeriod>();
+        public SortedList<BreakPeriod> Breaks { get; set; } = new SortedList<BreakPeriod>(Comparer<BreakPeriod>.Default);
+
+        public List<string> UnhandledEventLines { get; set; } = new List<string>();
 
         [JsonIgnore]
         public double TotalBreakTime => Breaks.Sum(b => b.Duration);
@@ -119,12 +118,11 @@ namespace osu.Game.Beatmaps
         IBeatmap IBeatmap.Clone() => Clone();
 
         public Beatmap<T> Clone() => (Beatmap<T>)MemberwiseClone();
+
+        public override string ToString() => BeatmapInfo.ToString();
     }
 
     public class Beatmap : Beatmap<HitObject>
     {
-        public new Beatmap Clone() => (Beatmap)base.Clone();
-
-        public override string ToString() => BeatmapInfo?.ToString() ?? base.ToString();
     }
 }

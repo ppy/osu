@@ -56,9 +56,9 @@ namespace osu.Game.Tests.Rulesets
 
             public override IEnumerable<Mod> GetModsFor(ModType type) => new Mod[] { null };
 
-            public override DrawableRuleset CreateDrawableRulesetWith(IBeatmap beatmap, IReadOnlyList<Mod> mods = null) => null;
-            public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => null;
-            public override DifficultyCalculator CreateDifficultyCalculator(IWorkingBeatmap beatmap) => null;
+            public override DrawableRuleset CreateDrawableRulesetWith(IBeatmap beatmap, IReadOnlyList<Mod> mods = null) => null!;
+            public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => null!;
+            public override DifficultyCalculator CreateDifficultyCalculator(IWorkingBeatmap beatmap) => null!;
         }
 
         private class TestAPIIncompatibleRuleset : Ruleset
@@ -69,11 +69,9 @@ namespace osu.Game.Tests.Rulesets
             // simulate API incompatibility by throwing similar exceptions.
             public override IEnumerable<Mod> GetModsFor(ModType type) => throw new MissingMethodException();
 
-            public override DrawableRuleset CreateDrawableRulesetWith(IBeatmap beatmap, IReadOnlyList<Mod> mods = null) => null;
-            public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => null;
-            public override DifficultyCalculator CreateDifficultyCalculator(IWorkingBeatmap beatmap) => null;
+            public override DrawableRuleset CreateDrawableRulesetWith(IBeatmap beatmap, IReadOnlyList<Mod> mods = null) => null!;
+            public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => null!;
+            public override DifficultyCalculator CreateDifficultyCalculator(IWorkingBeatmap beatmap) => null!;
         }
-
-#nullable enable
     }
 }

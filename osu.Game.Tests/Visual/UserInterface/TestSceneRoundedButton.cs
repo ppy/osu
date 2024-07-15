@@ -1,7 +1,5 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using System.Linq;
 using NUnit.Framework;
@@ -55,8 +53,8 @@ namespace osu.Game.Tests.Visual.UserInterface
         public void TestBackgroundColour()
         {
             AddStep("set red scheme", () => CreateThemedContent(OverlayColourScheme.Red));
-            AddAssert("rounded button has correct colour", () => Cell(0, 1).ChildrenOfType<RoundedButton>().First().BackgroundColour == new OverlayColourProvider(OverlayColourScheme.Red).Colour3);
-            AddAssert("settings button has correct colour", () => Cell(0, 1).ChildrenOfType<SettingsButton>().First().BackgroundColour == new OverlayColourProvider(OverlayColourScheme.Red).Colour3);
+            AddAssert("rounded button has correct colour", () => ContentContainer.ChildrenOfType<RoundedButton>().First().BackgroundColour == new OverlayColourProvider(OverlayColourScheme.Red).Colour3);
+            AddAssert("settings button has correct colour", () => ContentContainer.ChildrenOfType<SettingsButton>().First().BackgroundColour == new OverlayColourProvider(OverlayColourScheme.Red).Colour3);
         }
     }
 }

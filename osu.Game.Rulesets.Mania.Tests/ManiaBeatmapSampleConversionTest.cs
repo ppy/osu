@@ -18,7 +18,7 @@ namespace osu.Game.Rulesets.Mania.Tests
     [TestFixture]
     public class ManiaBeatmapSampleConversionTest : BeatmapConversionTest<ConvertMapping<SampleConvertValue>, SampleConvertValue>
     {
-        protected override string ResourceAssembly => "osu.Game.Rulesets.Mania";
+        protected override string ResourceAssembly => "osu.Game.Rulesets.Mania.Tests";
 
         [TestCase("convert-samples")]
         [TestCase("mania-samples")]

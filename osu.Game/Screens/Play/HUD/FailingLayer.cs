@@ -29,6 +29,8 @@ namespace osu.Game.Screens.Play.HUD
         /// </summary>
         public readonly Bindable<bool> ShowHealth = new Bindable<bool>();
 
+        protected override bool PlayInitialIncreaseAnimation => false;
+
         private const float max_alpha = 0.4f;
         private const int fade_time = 400;
         private const float gradient_size = 0.2f;
@@ -98,11 +100,11 @@ namespace osu.Game.Screens.Play.HUD
 
         protected override void Update()
         {
+            base.Update();
+
             double target = Math.Clamp(max_alpha * (1 - Current.Value / low_health_threshold), 0, max_alpha);
 
             boxes.Alpha = (float)Interpolation.Lerp(boxes.Alpha, target, Clock.ElapsedFrameTime * 0.01f);
-
-            base.Update();
         }
     }
 }

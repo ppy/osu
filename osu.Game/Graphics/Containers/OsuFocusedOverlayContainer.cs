@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
@@ -20,10 +18,11 @@ namespace osu.Game.Graphics.Containers
     [Cached(typeof(IPreviewTrackOwner))]
     public abstract partial class OsuFocusedOverlayContainer : FocusedOverlayContainer, IPreviewTrackOwner, IKeyBindingHandler<GlobalAction>
     {
-        private Sample samplePopIn;
-        private Sample samplePopOut;
-        protected virtual string PopInSampleName => "UI/overlay-pop-in";
-        protected virtual string PopOutSampleName => "UI/overlay-pop-out";
+        protected readonly IBindable<OverlayActivation> OverlayActivationMode = new Bindable<OverlayActivation>(OverlayActivation.All);
+
+        protected virtual string? PopInSampleName => @"UI/overlay-pop-in";
+        protected virtual string? PopOutSampleName => @"UI/overlay-pop-out";
+        protected virtual double PopInOutSampleBalance => 0;
 
         protected override bool BlockNonPositionalInput => true;
 
@@ -33,19 +32,23 @@ namespace osu.Game.Graphics.Containers
         /// </summary>
         protected virtual bool DimMainContent => true;
 
-        [Resolved(CanBeNull = true)]
-        private IOverlayManager overlayManager { get; set; }
+        [Resolved]
+        private IOverlayManager? overlayManager { get; set; }
 
         [Resolved]
-        private PreviewTrackManager previewTrackManager { get; set; }
+        private PreviewTrackManager previewTrackManager { get; set; } = null!;
 
-        protected readonly IBindable<OverlayActivation> OverlayActivationMode = new Bindable<OverlayActivation>(OverlayActivation.All);
+        private Sample? samplePopIn;
+        private Sample? samplePopOut;
 
-        [BackgroundDependencyLoader(true)]
-        private void load(AudioManager audio)
+        [BackgroundDependencyLoader]
+        private void load(AudioManager? audio)
         {
-            samplePopIn = audio.Samples.Get(PopInSampleName);
-            samplePopOut = audio.Samples.Get(PopOutSampleName);
+            if (!string.IsNullOrEmpty(PopInSampleName))
+                samplePopIn = audio?.Samples.Get(PopInSampleName);
+
+            if (!string.IsNullOrEmpty(PopOutSampleName))
+                samplePopOut = audio?.Samples.Get(PopOutSampleName);
         }
 
         protected override void LoadComplete()
@@ -133,15 +136,21 @@ namespace osu.Game.Graphics.Containers
                         return;
                     }
 
-                    if (didChange)
-                        samplePopIn?.Play();
+                    if (didChange && samplePopIn != null)
+                    {
+                        samplePopIn.Balance.Value = PopInOutSampleBalance;
+                        samplePopIn.Play();
+                    }
 
                     if (BlockScreenWideMouse && DimMainContent) overlayManager?.ShowBlockingOverlay(this);
                     break;
 
                 case Visibility.Hidden:
-                    if (didChange)
-                        samplePopOut?.Play();
+                    if (didChange && samplePopOut != null)
+                    {
+                        samplePopOut.Balance.Value = PopInOutSampleBalance;
+                        samplePopOut.Play();
+                    }
 
                     if (BlockScreenWideMouse) overlayManager?.HideBlockingOverlay(this);
                     break;
@@ -152,7 +161,6 @@ namespace osu.Game.Graphics.Containers
 
         protected override void PopOut()
         {
-            base.PopOut();
             previewTrackManager.StopAnyPlaying(this);
         }
 

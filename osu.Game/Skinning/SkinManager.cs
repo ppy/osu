@@ -182,7 +182,10 @@ namespace osu.Game.Skinning
                     Name = NamingUtils.GetNextBestName(existingSkinNames, $@"{s.Name} (modified)")
                 };
 
-                var result = skinImporter.ImportModel(skinInfo);
+                var result = skinImporter.ImportModel(skinInfo, parameters: new ImportParameters
+                {
+                    ImportImmediately = true // to avoid possible deadlocks when editing skin during gameplay.
+                });
 
                 if (result != null)
                 {
@@ -261,13 +264,22 @@ namespace osu.Game.Skinning
         private T lookupWithFallback<T>(Func<ISkin, T> lookupFunction)
             where T : class
         {
-            foreach (var source in AllSources)
+            try
             {
-                if (lookupFunction(source) is T skinSourced)
-                    return skinSourced;
-            }
+                Skin.LogLookupDebug(this, lookupFunction, Skin.LookupDebugType.Enter);
 
-            return null;
+                foreach (var source in AllSources)
+                {
+                    if (lookupFunction(source) is T skinSourced)
+                        return skinSourced;
+                }
+
+                return null;
+            }
+            finally
+            {
+                Skin.LogLookupDebug(this, lookupFunction, Skin.LookupDebugType.Exit);
+            }
         }
 
         #region IResourceStorageProvider
@@ -299,6 +311,8 @@ namespace osu.Game.Skinning
 
         public Task<Live<SkinInfo>> ImportAsUpdate(ProgressNotification notification, ImportTask task, SkinInfo original) =>
             skinImporter.ImportAsUpdate(notification, task, original);
+
+        public Task<ExternalEditOperation<SkinInfo>> BeginExternalEditing(SkinInfo model) => skinImporter.BeginExternalEditing(model);
 
         public Task<Live<SkinInfo>> Import(ImportTask task, ImportParameters parameters = default, CancellationToken cancellationToken = default) =>
             skinImporter.Import(task, parameters, cancellationToken);

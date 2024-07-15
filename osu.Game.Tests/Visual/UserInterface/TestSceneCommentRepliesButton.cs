@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Game.Overlays.Comments.Buttons;
 using osu.Framework.Graphics;
 using osu.Framework.Allocation;
@@ -49,9 +47,9 @@ namespace osu.Game.Tests.Visual.UserInterface
         public void TestArrowDirection()
         {
             AddStep("Set upwards", () => button.SetIconDirection(true));
-            AddAssert("Icon facing upwards", () => button.Icon.Scale.Y == -1);
+            AddUntilStep("Icon facing upwards", () => button.Icon.Scale.Y == -1);
             AddStep("Set downwards", () => button.SetIconDirection(false));
-            AddAssert("Icon facing downwards", () => button.Icon.Scale.Y == 1);
+            AddUntilStep("Icon facing downwards", () => button.Icon.Scale.Y == 1);
         }
 
         private partial class TestButton : CommentRepliesButton

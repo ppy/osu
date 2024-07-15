@@ -2,10 +2,12 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using osu.Framework.Input.Bindings;
+using osu.Framework.Input.Events;
 
 namespace osu.Game.Screens.Play.HUD
 {
-    public partial class KeyCounterActionTrigger<T> : InputTrigger
+    public partial class KeyCounterActionTrigger<T> : InputTrigger, IKeyBindingHandler<T>
         where T : struct
     {
         public T Action { get; }
@@ -16,21 +18,21 @@ namespace osu.Game.Screens.Play.HUD
             Action = action;
         }
 
-        public bool OnPressed(T action, bool forwards)
+        public bool OnPressed(KeyBindingPressEvent<T> e)
         {
-            if (!EqualityComparer<T>.Default.Equals(action, Action))
+            if (!EqualityComparer<T>.Default.Equals(e.Action, Action))
                 return false;
 
-            Activate(forwards);
+            Activate(Clock.Rate >= 0);
             return false;
         }
 
-        public void OnReleased(T action, bool forwards)
+        public void OnReleased(KeyBindingReleaseEvent<T> e)
         {
-            if (!EqualityComparer<T>.Default.Equals(action, Action))
+            if (!EqualityComparer<T>.Default.Equals(e.Action, Action))
                 return;
 
-            Deactivate(forwards);
+            Deactivate(Clock.Rate >= 0);
         }
     }
 }

@@ -1,11 +1,10 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using NUnit.Framework;
 using osu.Game.Beatmaps.Legacy;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Taiko.Mods;
 using osu.Game.Tests.Beatmaps;
 
@@ -26,8 +25,8 @@ namespace osu.Game.Rulesets.Taiko.Tests
             new object[] { LegacyMods.HalfTime, new[] { typeof(TaikoModHalfTime) } },
             new object[] { LegacyMods.Flashlight, new[] { typeof(TaikoModFlashlight) } },
             new object[] { LegacyMods.Autoplay, new[] { typeof(TaikoModAutoplay) } },
-            new object[] { LegacyMods.Random, new[] { typeof(TaikoModRandom) } },
-            new object[] { LegacyMods.HardRock | LegacyMods.DoubleTime, new[] { typeof(TaikoModHardRock), typeof(TaikoModDoubleTime) } }
+            new object[] { LegacyMods.HardRock | LegacyMods.DoubleTime, new[] { typeof(TaikoModHardRock), typeof(TaikoModDoubleTime) } },
+            new object[] { LegacyMods.ScoreV2, new[] { typeof(ModScoreV2) } },
         };
 
         [TestCaseSource(nameof(taiko_mod_mapping))]

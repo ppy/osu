@@ -1,7 +1,5 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using System.Linq;
 using osu.Framework.Allocation;
@@ -140,7 +138,7 @@ namespace osu.Game.Tournament.Screens.Editors
                     public SeedingBeatmap Model { get; }
 
                     [Resolved]
-                    protected IAPIProvider API { get; private set; }
+                    protected IAPIProvider API { get; private set; } = null!;
 
                     private readonly Bindable<int?> beatmapId = new Bindable<int?>();
 

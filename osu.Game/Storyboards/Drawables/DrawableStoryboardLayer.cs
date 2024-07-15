@@ -1,8 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
+using System.Collections.Generic;
 using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -32,9 +31,11 @@ namespace osu.Game.Storyboards.Drawables
             InternalChild = ElementContainer = new LayerElementContainer(layer);
         }
 
-        protected partial class LayerElementContainer : LifetimeManagementContainer
+        public partial class LayerElementContainer : LifetimeManagementContainer
         {
             private readonly StoryboardLayer storyboardLayer;
+
+            public IEnumerable<Drawable> Elements => InternalChildren;
 
             public LayerElementContainer(StoryboardLayer layer)
             {

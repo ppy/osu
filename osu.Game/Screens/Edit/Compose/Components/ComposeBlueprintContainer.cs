@@ -40,11 +40,14 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         public PlacementBlueprint CurrentPlacement { get; private set; }
 
+        [Resolved(canBeNull: true)]
+        private EditorScreenWithTimeline editorScreen { get; set; }
+
         /// <remarks>
         /// Positional input must be received outside the container's bounds,
         /// in order to handle composer blueprints which are partially offscreen.
         /// </remarks>
-        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => editorScreen?.MainContent.ReceivePositionalInputAt(screenSpacePos) ?? base.ReceivePositionalInputAt(screenSpacePos);
 
         public ComposeBlueprintContainer(HitObjectComposer composer)
             : base(composer)
@@ -222,10 +225,10 @@ namespace osu.Game.Screens.Edit.Compose.Components
         protected virtual IEnumerable<TernaryButton> CreateTernaryButtons()
         {
             //TODO: this should only be enabled (visible?) for rulesets that provide combo-supporting HitObjects.
-            yield return new TernaryButton(NewCombo, "New combo", () => new SpriteIcon { Icon = FontAwesome.Regular.DotCircle });
+            yield return new TernaryButton(NewCombo, "New combo", () => new SpriteIcon { Icon = OsuIcon.EditorNewComboA });
 
             foreach (var kvp in SelectionHandler.SelectionSampleStates)
-                yield return new TernaryButton(kvp.Value, kvp.Key.Replace("hit", string.Empty).Titleize(), () => getIconForSample(kvp.Key));
+                yield return new TernaryButton(kvp.Value, kvp.Key.Replace("hit", string.Empty).Titleize(), () => GetIconForSample(kvp.Key));
         }
 
         private IEnumerable<TernaryButton> createSampleBankTernaryButtons()
@@ -261,7 +264,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             };
         }
 
-        private Drawable getIconForSample(string sampleName)
+        public static Drawable GetIconForSample(string sampleName)
         {
             switch (sampleName)
             {
@@ -269,10 +272,10 @@ namespace osu.Game.Screens.Edit.Compose.Components
                     return new SpriteIcon { Icon = FontAwesome.Solid.Hands };
 
                 case HitSampleInfo.HIT_WHISTLE:
-                    return new SpriteIcon { Icon = FontAwesome.Solid.Bullhorn };
+                    return new SpriteIcon { Icon = OsuIcon.EditorWhistle };
 
                 case HitSampleInfo.HIT_FINISH:
-                    return new SpriteIcon { Icon = FontAwesome.Solid.DrumSteelpan };
+                    return new SpriteIcon { Icon = OsuIcon.EditorFinish };
             }
 
             return null;
@@ -369,7 +372,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             }
         }
 
-        private void commitIfPlacementActive()
+        public void CommitIfPlacementActive()
         {
             CurrentPlacement?.EndPlacement(CurrentPlacement.PlacementActive == PlacementBlueprint.PlacementState.Active);
             removePlacement();
@@ -399,7 +402,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 currentTool = value;
 
                 // As per stable editor, when changing tools, we should forcefully commit any pending placement.
-                commitIfPlacementActive();
+                CommitIfPlacementActive();
             }
         }
     }

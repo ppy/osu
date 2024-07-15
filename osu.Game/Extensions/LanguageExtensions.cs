@@ -21,7 +21,12 @@ namespace osu.Game.Extensions
         /// This is required as enum member names are not allowed to contain hyphens.
         /// </remarks>
         public static string ToCultureCode(this Language language)
-            => language.ToString().Replace("_", "-");
+        {
+            if (language == Language.zh_hant)
+                return @"zh-tw";
+
+            return language.ToString().Replace("_", "-");
+        }
 
         /// <summary>
         /// Attempts to parse the supplied <paramref name="cultureCode"/> to a <see cref="Language"/> value.
@@ -30,7 +35,15 @@ namespace osu.Game.Extensions
         /// <param name="language">The parsed <see cref="Language"/>. Valid only if the return value of the method is <see langword="true" />.</param>
         /// <returns>Whether the parsing succeeded.</returns>
         public static bool TryParseCultureCode(string cultureCode, out Language language)
-            => Enum.TryParse(cultureCode.Replace("-", "_"), out language);
+        {
+            if (cultureCode == @"zh-tw")
+            {
+                language = Language.zh_hant;
+                return true;
+            }
+
+            return Enum.TryParse(cultureCode.Replace("-", "_"), out language);
+        }
 
         /// <summary>
         /// Parses the <see cref="Language"/> that is specified in <paramref name="frameworkLocale"/>,

@@ -4,6 +4,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.IEnumerableExtensions;
@@ -96,7 +97,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddStep("Begin drag top left", () =>
             {
-                InputManager.MoveMouseTo(box1.ScreenSpaceDrawQuad.TopLeft - new Vector2(box1.ScreenSpaceDrawQuad.Width / 4));
+                InputManager.MoveMouseTo(box1.ScreenSpaceDrawQuad.TopLeft - new Vector2(box1.ScreenSpaceDrawQuad.Width / 4, box1.ScreenSpaceDrawQuad.Height / 8));
                 InputManager.PressButton(MouseButton.Left);
             });
 
@@ -138,24 +139,27 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestCyclicSelection()
         {
-            SkinBlueprint[] blueprints = null!;
+            List<SkinBlueprint> blueprints = new List<SkinBlueprint>();
 
-            AddStep("Add big black boxes", () =>
+            AddStep("clear list", () => blueprints.Clear());
+
+            for (int i = 0; i < 3; i++)
             {
-                InputManager.MoveMouseTo(skinEditor.ChildrenOfType<BigBlackBox>().First());
-                InputManager.Click(MouseButton.Left);
-                InputManager.Click(MouseButton.Left);
-                InputManager.Click(MouseButton.Left);
-            });
+                AddStep("Add big black box", () =>
+                {
+                    skinEditor.ChildrenOfType<SkinComponentToolbox.ToolboxComponentButton>().First(b => b.ChildrenOfType<BigBlackBox>().FirstOrDefault() != null).TriggerClick();
+                });
+
+                AddStep("store box", () =>
+                {
+                    // Add blueprints one-by-one so we have a stable order for testing reverse cyclic selection against.
+                    blueprints.Add(skinEditor.ChildrenOfType<SkinBlueprint>().Single(s => s.IsSelected));
+                });
+            }
 
             AddAssert("Three black boxes added", () => targetContainer.Components.OfType<BigBlackBox>().Count(), () => Is.EqualTo(3));
 
-            AddStep("Store black box blueprints", () =>
-            {
-                blueprints = skinEditor.ChildrenOfType<SkinBlueprint>().Where(b => b.Item is BigBlackBox).ToArray();
-            });
-
-            AddAssert("Selection is black box 1", () => skinEditor.SelectedComponents.Single(), () => Is.EqualTo(blueprints[0].Item));
+            AddAssert("Selection is last", () => skinEditor.SelectedComponents.Single(), () => Is.EqualTo(blueprints[2].Item));
 
             AddStep("move cursor to black box", () =>
             {
@@ -164,13 +168,13 @@ namespace osu.Game.Tests.Visual.Gameplay
             });
 
             AddStep("click on black box stack", () => InputManager.Click(MouseButton.Left));
-            AddAssert("Selection is black box 2", () => skinEditor.SelectedComponents.Single(), () => Is.EqualTo(blueprints[1].Item));
+            AddAssert("Selection is second last", () => skinEditor.SelectedComponents.Single(), () => Is.EqualTo(blueprints[1].Item));
 
             AddStep("click on black box stack", () => InputManager.Click(MouseButton.Left));
-            AddAssert("Selection is black box 3", () => skinEditor.SelectedComponents.Single(), () => Is.EqualTo(blueprints[2].Item));
+            AddAssert("Selection is last", () => skinEditor.SelectedComponents.Single(), () => Is.EqualTo(blueprints[0].Item));
 
             AddStep("click on black box stack", () => InputManager.Click(MouseButton.Left));
-            AddAssert("Selection is black box 1", () => skinEditor.SelectedComponents.Single(), () => Is.EqualTo(blueprints[0].Item));
+            AddAssert("Selection is first", () => skinEditor.SelectedComponents.Single(), () => Is.EqualTo(blueprints[2].Item));
 
             AddStep("select all boxes", () =>
             {
@@ -239,7 +243,9 @@ namespace osu.Game.Tests.Visual.Gameplay
             void revertAndCheckUnchanged()
             {
                 AddStep("Revert changes", () => changeHandler.RestoreState(int.MinValue));
-                AddAssert("Current state is same as default", () => defaultState.SequenceEqual(changeHandler.GetCurrentState()));
+                AddAssert("Current state is same as default",
+                    () => Encoding.UTF8.GetString(defaultState),
+                    () => Is.EqualTo(Encoding.UTF8.GetString(changeHandler.GetCurrentState())));
             }
         }
 
@@ -327,6 +333,40 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("adjust slider via keyboard", () => InputManager.Key(Key.Left));
 
             AddAssert("value is less than default", () => hitErrorMeter.JudgementLineThickness.Value < hitErrorMeter.JudgementLineThickness.Default);
+        }
+
+        [Test]
+        public void TestCopyPaste()
+        {
+            AddStep("paste", () =>
+            {
+                InputManager.PressKey(Key.LControl);
+                InputManager.Key(Key.V);
+                InputManager.ReleaseKey(Key.LControl);
+            });
+            // no assertions. just make sure nothing crashes.
+
+            AddStep("select bar hit error blueprint", () =>
+            {
+                var blueprint = skinEditor.ChildrenOfType<SkinBlueprint>().First(b => b.Item is BarHitErrorMeter);
+                skinEditor.SelectedComponents.Clear();
+                skinEditor.SelectedComponents.Add(blueprint.Item);
+            });
+            AddStep("copy", () =>
+            {
+                InputManager.PressKey(Key.LControl);
+                InputManager.Key(Key.C);
+                InputManager.ReleaseKey(Key.LControl);
+            });
+            AddStep("paste", () =>
+            {
+                InputManager.PressKey(Key.LControl);
+                InputManager.Key(Key.V);
+                InputManager.ReleaseKey(Key.LControl);
+            });
+            AddAssert("three hit error meters present",
+                () => skinEditor.ChildrenOfType<SkinBlueprint>().Count(b => b.Item is BarHitErrorMeter),
+                () => Is.EqualTo(3));
         }
 
         protected override Ruleset CreatePlayerRuleset() => new OsuRuleset();

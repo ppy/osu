@@ -1,7 +1,5 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -32,7 +30,7 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                 },
                 new SettingsCheckbox
                 {
-                    Keywords = new[] { "combo", "override" },
+                    Keywords = new[] { "combo", "override", "color" },
                     LabelText = SkinSettingsStrings.BeatmapColours,
                     Current = config.GetBindable<bool>(OsuSetting.BeatmapColours)
                 },
@@ -49,6 +47,7 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                 },
                 new SettingsSlider<float>
                 {
+                    Keywords = new[] { "color" },
                     LabelText = GraphicsSettingsStrings.ComboColourNormalisation,
                     Current = comboColourNormalisation,
                     DisplayAsPercentage = true,

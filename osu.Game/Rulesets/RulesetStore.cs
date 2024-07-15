@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using osu.Framework;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 
@@ -17,6 +18,8 @@ namespace osu.Game.Rulesets
         private const string ruleset_library_prefix = @"osu.Game.Rulesets";
 
         protected readonly Dictionary<Assembly, Type> LoadedAssemblies = new Dictionary<Assembly, Type>();
+        protected readonly HashSet<Assembly> UserRulesetAssemblies = new HashSet<Assembly>();
+        protected readonly Storage? RulesetStorage;
 
         /// <summary>
         /// All available rulesets.
@@ -32,7 +35,7 @@ namespace osu.Game.Rulesets
             // This null check prevents Android from attempting to load the rulesets from disk,
             // as the underlying path "AppContext.BaseDirectory", despite being non-nullable, it returns null on android.
             // See https://github.com/xamarin/xamarin-android/issues/3489.
-            if (RuntimeInfo.StartupDirectory != null)
+            if (RuntimeInfo.StartupDirectory.IsNotNull())
                 loadFromDisk();
 
             // the event handler contains code for resolving dependency on the game assembly for rulesets located outside the base game directory.
@@ -40,9 +43,9 @@ namespace osu.Game.Rulesets
             // to load as unable to locate the game core assembly.
             AppDomain.CurrentDomain.AssemblyResolve += resolveRulesetDependencyAssembly;
 
-            var rulesetStorage = storage?.GetStorageForDirectory(@"rulesets");
-            if (rulesetStorage != null)
-                loadUserRulesets(rulesetStorage);
+            RulesetStorage = storage?.GetStorageForDirectory(@"rulesets");
+            if (RulesetStorage != null)
+                loadUserRulesets(RulesetStorage);
         }
 
         /// <summary>
@@ -104,7 +107,11 @@ namespace osu.Game.Rulesets
             var rulesets = rulesetStorage.GetFiles(@".", @$"{ruleset_library_prefix}.*.dll");
 
             foreach (string? ruleset in rulesets.Where(f => !f.Contains(@"Tests")))
-                loadRulesetFromFile(rulesetStorage.GetFullPath(ruleset));
+            {
+                var assembly = loadRulesetFromFile(rulesetStorage.GetFullPath(ruleset));
+                if (assembly != null)
+                    UserRulesetAssemblies.Add(assembly);
+            }
         }
 
         private void loadFromDisk()
@@ -125,21 +132,25 @@ namespace osu.Game.Rulesets
             }
         }
 
-        private void loadRulesetFromFile(string file)
+        private Assembly? loadRulesetFromFile(string file)
         {
             string filename = Path.GetFileNameWithoutExtension(file);
 
             if (LoadedAssemblies.Values.Any(t => Path.GetFileNameWithoutExtension(t.Assembly.Location) == filename))
-                return;
+                return null;
 
             try
             {
-                addRuleset(Assembly.LoadFrom(file));
+                var assembly = Assembly.LoadFrom(file);
+                addRuleset(assembly);
+                return assembly;
             }
             catch (Exception e)
             {
                 LogFailedLoad(filename, e);
             }
+
+            return null;
         }
 
         private void addRuleset(Assembly assembly)
