@@ -106,8 +106,8 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         // Sudden death
         public bool FailCondition(JudgementResult result)
-                => result.Type.AffectsCombo()
-                   && !result.IsHit;
+            => result.Type.AffectsCombo()
+               && !result.IsHit;
 
         #endregion
 

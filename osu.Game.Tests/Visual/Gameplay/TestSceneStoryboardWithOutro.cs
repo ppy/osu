@@ -15,10 +15,9 @@ using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Graphics.Containers;
 using osu.Game.Rulesets;
-using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Objects;
-using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Ranking;
@@ -40,15 +39,12 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private bool showResults = true;
 
-        private event Func<HealthProcessor, JudgementResult, bool> currentFailConditions;
-
         [SetUpSteps]
         public override void SetUpSteps()
         {
             base.SetUpSteps();
             AddStep("enable storyboard", () => LocalConfig.SetValue(OsuSetting.ShowStoryboard, true));
             AddStep("set dim level to 0", () => LocalConfig.SetValue<double>(OsuSetting.DimLevel, 0));
-            AddStep("reset fail conditions", () => currentFailConditions = (_, _) => false);
             AddStep("set beatmap duration to 0s", () => currentBeatmapDuration = 0);
             AddStep("set storyboard duration to 8s", () => currentStoryboardDuration = 8000);
             AddStep("set ShowResults = true", () => showResults = true);
@@ -95,10 +91,8 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestOutroEndsDuringFailAnimation()
         {
-            CreateTest(() =>
+            createTestWithFailingPlayer(() =>
             {
-                AddStep("fail on first judgement", () => currentFailConditions = (_, _) => true);
-
                 // Fail occurs at 164ms with the provided beatmap.
                 // Fail animation runs for 2.5s realtime but the gameplay time change is *variable* due to the frequency transform being applied, so we need a bit of lenience.
                 AddStep("set storyboard duration to 0.6s", () => currentStoryboardDuration = 600);
@@ -112,11 +106,11 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestSaveFailedReplayWithStoryboardEndedDoesNotProgress()
         {
-            CreateTest(() =>
+            createTestWithFailingPlayer(() =>
             {
-                AddStep("fail on first judgement", () => currentFailConditions = (_, _) => true);
                 AddStep("set storyboard duration to 0s", () => currentStoryboardDuration = 0);
             });
+
             AddUntilStep("storyboard ends", () => Player.GameplayClockContainer.CurrentTime >= currentStoryboardDuration);
             AddUntilStep("wait for fail", () => Player.GameplayState.HasFailed);
 
@@ -198,7 +192,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         protected override Ruleset CreatePlayerRuleset() => new OsuRuleset();
 
-        protected override TestPlayer CreatePlayer(Ruleset ruleset) => new OutroPlayer(currentFailConditions, showResults);
+        protected override TestPlayer CreatePlayer(Ruleset ruleset) => new OutroPlayer(showResults);
 
         protected override IBeatmap CreateBeatmap(RulesetInfo ruleset)
         {
@@ -210,6 +204,14 @@ namespace osu.Game.Tests.Visual.Gameplay
         protected override WorkingBeatmap CreateWorkingBeatmap(IBeatmap beatmap, Storyboard storyboard = null)
         {
             return base.CreateWorkingBeatmap(beatmap, createStoryboard(currentStoryboardDuration));
+        }
+
+        private void createTestWithFailingPlayer(Action action)
+        {
+            action?.Invoke();
+
+            AddStep($"Load failing player for {CreatePlayerRuleset().Description}", () => LoadPlayer(new Mod[] { Ruleset.Value.CreateInstance().CreateMod<ModSuddenDeath>() }));
+            AddUntilStep("player loaded", () => Player.IsLoaded && Player.Alpha == 1);
         }
 
         private Storyboard createStoryboard(double duration)
@@ -229,18 +231,9 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             public bool IsScoreShown => !this.IsCurrentScreen() && this.GetChildScreen() is ResultsScreen;
 
-            private event Func<HealthProcessor, JudgementResult, bool> failConditions;
-
-            public OutroPlayer(Func<HealthProcessor, JudgementResult, bool> failConditions, bool showResults = true)
+            public OutroPlayer(bool showResults = true)
                 : base(showResults: showResults)
             {
-                this.failConditions = failConditions;
-            }
-
-            protected override void LoadComplete()
-            {
-                base.LoadComplete();
-                HealthProcessor.FailConditions += failConditions;
             }
 
             protected override Task ImportScore(Score score)
