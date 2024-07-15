@@ -23,22 +23,39 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
         protected override Ruleset CreateEditorRuleset() => new OsuRuleset();
 
         [Test]
-        public void TestTapSliderButtonThenDragAfterTouchingComposeArea()
+        public void TestTouchInputAfterTouchingComposeArea()
         {
-            AddStep("tap slider", () => tap(this.ChildrenOfType<EditorRadioButton>().Single(b => b.Button.Label == "Slider")));
+            AddStep("tap circle", () => tap(this.ChildrenOfType<EditorRadioButton>().Single(b => b.Button.Label == "HitCircle")));
 
             // this input is just for interacting with compose area
-            AddStep("begin hold", () => InputManager.BeginTouch(new Touch(TouchSource.Touch1, this.ChildrenOfType<Playfield>().Single().ScreenSpaceDrawQuad.Centre)));
-            AddStep("drag to draw", () => InputManager.MoveTouchTo(new Touch(TouchSource.Touch1, this.ChildrenOfType<Playfield>().Single().ToScreenSpace(new Vector2(200, 50)))));
-            AddStep("end", () => InputManager.EndTouch(new Touch(TouchSource.Touch1, InputManager.CurrentState.Touch.GetTouchPosition(TouchSource.Touch1)!.Value)));
+            AddStep("tap playfield", () => tap(this.ChildrenOfType<Playfield>().Single()));
 
             AddStep("move current time", () => InputManager.Key(Key.Right));
 
-            AddStep("begin hold", () => InputManager.BeginTouch(new Touch(TouchSource.Touch1, this.ChildrenOfType<Playfield>().Single().ToScreenSpace(new Vector2(50, 20)))));
+            AddStep("tap to place circle", () => tap(this.ChildrenOfType<Playfield>().Single().ToScreenSpace(new Vector2(10, 10))));
+            AddAssert("circle placed correctly", () =>
+            {
+                var circle = (HitCircle)EditorBeatmap.HitObjects.Single(h => h.StartTime == EditorClock.CurrentTimeAccurate);
+                Assert.Multiple(() =>
+                {
+                    Assert.That(circle.Position.X, Is.EqualTo(10f).Within(0.01f));
+                    Assert.That(circle.Position.Y, Is.EqualTo(10f).Within(0.01f));
+                });
+
+                return true;
+            });
+
+            AddStep("tap slider", () => tap(this.ChildrenOfType<EditorRadioButton>().Single(b => b.Button.Label == "Slider")));
+
+            // this input is just for interacting with compose area
+            AddStep("tap playfield", () => tap(this.ChildrenOfType<Playfield>().Single()));
+
+            AddStep("move current time", () => InputManager.Key(Key.Right));
+
+            AddStep("hold to draw slider", () => InputManager.BeginTouch(new Touch(TouchSource.Touch1, this.ChildrenOfType<Playfield>().Single().ToScreenSpace(new Vector2(50, 20)))));
             AddStep("drag to draw", () => InputManager.MoveTouchTo(new Touch(TouchSource.Touch1, this.ChildrenOfType<Playfield>().Single().ToScreenSpace(new Vector2(200, 50)))));
             AddAssert("selection not initiated", () => this.ChildrenOfType<DragBox>().All(d => d.State == Visibility.Hidden));
             AddStep("end", () => InputManager.EndTouch(new Touch(TouchSource.Touch1, InputManager.CurrentState.Touch.GetTouchPosition(TouchSource.Touch1)!.Value)));
-
             AddAssert("slider placed correctly", () =>
             {
                 var slider = (Slider)EditorBeatmap.HitObjects.Single(h => h.StartTime == EditorClock.CurrentTimeAccurate);
@@ -58,10 +75,12 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             });
         }
 
-        private void tap(Drawable drawable)
+        private void tap(Drawable drawable) => tap(drawable.ScreenSpaceDrawQuad.Centre);
+
+        private void tap(Vector2 position)
         {
-            InputManager.BeginTouch(new Touch(TouchSource.Touch1, drawable.ScreenSpaceDrawQuad.Centre));
-            InputManager.EndTouch(new Touch(TouchSource.Touch1, drawable.ScreenSpaceDrawQuad.Centre));
+            InputManager.BeginTouch(new Touch(TouchSource.Touch1, position));
+            InputManager.EndTouch(new Touch(TouchSource.Touch1, position));
         }
     }
 }
