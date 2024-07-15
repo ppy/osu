@@ -38,7 +38,7 @@ namespace osu.Game.Rulesets.Mods
         public override LocalisableString Description => "Restricted view area.";
         public override bool Ranked => UsesDefaultConfiguration;
 
-        private float findClosestMultipleFrom(int value, float multiple) => MathF.Round(value / multiple) * multiple;
+        private float ceilSnap(int value, float step) => MathF.Ceiling(value / step) * step;
 
         protected ModFlashlight()
         {
@@ -49,9 +49,11 @@ namespace osu.Game.Rulesets.Mods
             {
                 int newChangeSizeComboDivisor = e.NewValue;
 
-                FinalChangeSizeCombo.MinValue = newChangeSizeComboDivisor;
-                FinalChangeSizeCombo.MaxValue = findClosestMultipleFrom(ChangeSizeComboDivisor.MaxValue, newChangeSizeComboDivisor);
                 FinalChangeSizeCombo.Precision = newChangeSizeComboDivisor;
+                FinalChangeSizeCombo.MinValue = newChangeSizeComboDivisor;
+
+                // The previously triggered bindable events may cause the bindable value to overflow a rounded snap, so we must account to the worst case by ceiling.
+                FinalChangeSizeCombo.MaxValue = ceilSnap(ChangeSizeComboDivisor.MaxValue, newChangeSizeComboDivisor);
             }, true);
 
             // The final flashlight size shouldn't exceed the starting flashlight size.
