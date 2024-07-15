@@ -149,7 +149,6 @@ namespace osu.Game.Rulesets.Mods
 
             internal Func<Vector2>? GetPlayfieldScale;
 
-
             protected Flashlight(ModFlashlight modFlashlight)
             {
                 changeSizeCombo = modFlashlight.ChangeSizeComboDivisor.Value;
@@ -197,7 +196,7 @@ namespace osu.Game.Rulesets.Mods
 
                     Debug.Assert(Precision.AlmostEquals(Math.Abs(playfieldScale.X), Math.Abs(playfieldScale.Y)),
                         @"Playfield has non-proportional scaling. Flashlight implementations should be revisited with regard to balance.");
-                    size *= Math.Abs(playfieldScale.X);
+                    scale *= Math.Abs(playfieldScale.X);
                 }
 
                 if (isBreakTime.Value)
