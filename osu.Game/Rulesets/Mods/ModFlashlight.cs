@@ -53,6 +53,12 @@ namespace osu.Game.Rulesets.Mods
                 FinalChangeSizeCombo.MaxValue = findClosestMultipleFrom(ChangeSizeComboDivisor.MaxValue, newChangeSizeComboDivisor);
                 FinalChangeSizeCombo.Precision = newChangeSizeComboDivisor;
             }, true);
+
+            // The final flashlight size shouldn't exceed the starting flashlight size.
+            StartingFlashlightSize.BindValueChanged(e =>
+            {
+                FinalFlashlightSize.MaxValue = e.NewValue;
+            });
         }
 
         [SettingSource("Starting flashlight size", "Multiplier applied to the default flashlight size.")]
