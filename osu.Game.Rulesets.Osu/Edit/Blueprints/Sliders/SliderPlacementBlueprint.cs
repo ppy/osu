@@ -145,10 +145,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             switch (state)
             {
                 case SliderPlacementState.Initial:
-                    // beginning slider placement relies on the latest snap result provided in UpdateTimeAndPosition. if we begin curve now, we'll be using the mouse position from last frame.
-                    // to ensure that we're using the mouse position of *this* frame, schedule the beginCurve call so that it runs after our parent issues an UpdateTimeAndPosition call using this frame's information.
-                    // this is especially important in touch input, where a mouse position and mouse down can be triggered at a single frame.
-                    Schedule(beginCurve);
+                    beginCurve();
                     break;
 
                 case SliderPlacementState.ControlPoints:
