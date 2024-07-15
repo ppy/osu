@@ -60,7 +60,7 @@ namespace osu.Game.Rulesets.Mods
             StartingFlashlightSize.BindValueChanged(e =>
             {
                 FinalFlashlightSize.MaxValue = e.NewValue;
-            });
+            }, true);
         }
 
         [SettingSource("Starting flashlight size", "Multiplier applied to the default flashlight size.")]
@@ -70,7 +70,6 @@ namespace osu.Game.Rulesets.Mods
         public BindableFloat FinalFlashlightSize { get; } = new BindableFloat(0.625f)
         {
             MinValue = 0.5f,
-            MaxValue = 1,
             Precision = 0.05f
         };
 
