@@ -74,7 +74,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                     // Rewarding angles, take the smaller velocity as base.
                     double angleBonus = Math.Min(currVelocity, prevVelocity);
 
-                    wideAngleBonus = calcWideAngleBonus(currAngle);
+                    wideAngleBonus = calcWideAngleBonus(lastAngle);
                     acuteAngleBonus = calcAcuteAngleBonus(currAngle);
 
                     if (osuCurrObj.StrainTime > 100) // Only buff deltaTime exceeding 300 bpm 1/2.
@@ -88,9 +88,21 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                     }
 
                     // Penalize wide angles if they're repeated, reducing the penalty as the lastAngle gets more acute.
-                    wideAngleBonus *= angleBonus * (1 - Math.Min(wideAngleBonus, Math.Pow(calcWideAngleBonus(lastAngle), 3)));
+                    wideAngleBonus *= angleBonus * (1 - Math.Min(wideAngleBonus, Math.Pow(calcWideAngleBonus(lastLastAngle), 3)));
                     // Penalize acute angles if they're repeated, reducing the penalty as the lastLastAngle gets more obtuse.
                     acuteAngleBonus *= 0.5 + 0.5 * (1 - Math.Min(acuteAngleBonus, Math.Pow(calcAcuteAngleBonus(lastLastAngle), 3)));
+
+                    // If objects just go back and forth through a middle point - don't give as much wide bonus
+                    var lastLastBaseObject = (OsuHitObject)osuLastLastObj.BaseObject;
+                    var currBaseObject = (OsuHitObject)osuCurrObj.BaseObject;
+
+                    float scalingFactor = OsuDifficultyHitObject.NORMALISED_RADIUS / (float)currBaseObject.Radius;
+                    float distance = (lastLastBaseObject.StackedPosition * scalingFactor - currBaseObject.StackedPosition * scalingFactor).Length;
+
+                    if (distance < 1)
+                    {
+                        wideAngleBonus *= 1 - 0.35 * (1 - distance);
+                    }
                 }
             }
 
@@ -125,7 +137,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             if (withSliderTravelDistance)
                 aimStrain += sliderBonus * slider_multiplier;
 
-            return aimStrain;
+            return osuCurrObj.SmallCircleBonus * aimStrain;
         }
 
         private static double calcWideAngleBonus(double angle) => Math.Pow(Math.Sin(3.0 / 4 * (Math.Min(5.0 / 6 * Math.PI, Math.Max(Math.PI / 6, angle)) - Math.PI / 6)), 2);
