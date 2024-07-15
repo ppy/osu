@@ -393,7 +393,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             AddStep("move mouse to a random point", () => InputManager.MoveMouseTo(InputManager.ToScreenSpace(Vector2.Zero)));
             AddStep("begin touch at start point", () => InputManager.BeginTouch(new Touch(TouchSource.Touch1, InputManager.ToScreenSpace(startPoint))));
 
-            for (int i = 0; i < 20; i++)
+            for (int i = 1; i < 20; i++)
                 addTouchMovementStep(startPoint + new Vector2(i * 40, MathF.Sin(i * MathF.PI / 5) * 50));
 
             AddStep("release touch at end point", () => InputManager.EndTouch(new Touch(TouchSource.Touch1, InputManager.CurrentState.Touch.GetTouchPosition(TouchSource.Touch1)!.Value)));
