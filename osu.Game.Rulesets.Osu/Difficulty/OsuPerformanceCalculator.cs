@@ -87,7 +87,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         private double computeAimValue(ScoreInfo score, OsuDifficultyAttributes attributes)
         {
             double aimValue = Math.Pow(5.0 * Math.Max(1.0, attributes.AimDifficulty / 0.0675) - 4.0, 3.0) / 100000.0;
-            
+
             double lengthBonus = 0.98 + 0.4 * Math.Pow(Math.Min(0.95, totalHits / 2000.0), 1.5) +
                                  (totalHits > 1900 ? Math.Log10(totalHits / 1900.0) * 0.2 : 0.0);
             aimValue *= lengthBonus;
