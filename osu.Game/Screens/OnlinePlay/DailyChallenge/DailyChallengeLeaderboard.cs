@@ -122,7 +122,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
         {
             var request = new IndexPlaylistScoresRequest(room.RoomID.Value!.Value, playlistItem.ID);
 
-            request.Success += req =>
+            request.Success += req => Schedule(() =>
             {
                 var best = req.Scores.Select(s => s.CreateScoreInfo(scoreManager, rulesets, playlistItem, beatmap.Value.BeatmapInfo)).ToArray();
                 var userBest = req.UserScore?.CreateScoreInfo(scoreManager, rulesets, playlistItem, beatmap.Value.BeatmapInfo);
@@ -165,7 +165,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
                 }
 
                 userBestHeader.FadeTo(userBest == null ? 0 : 1);
-            };
+            });
 
             loadingLayer.Show();
             scoreFlow.FadeTo(0.5f, 400, Easing.OutQuint);
