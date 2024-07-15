@@ -27,12 +27,14 @@ namespace osu.Game.Tests.Visual
         protected PlacementBlueprintTestScene()
         {
             // ensure the placement handler is added beneath the input manager layer, for correct input behaviour.
-            base.Content.Add(placementHandler = new TestPlacementHandler
+            var contentContainer = CreateContentContainer();
+            contentContainer.Add(HitObjectContainer = new Container { Clock = new FramedClock(new StopwatchClock()) });
+
+            base.Content.Add(placementHandler = new TestPlacementHandler(contentContainer)
             {
                 CreateBlueprint = CreateBlueprint,
                 SnapForBlueprint = SnapForBlueprint,
                 AddHitObject = h => AddHitObject(CreateHitObject(h)),
-                Child = HitObjectContainer = CreateHitObjectContainer().With(c => c.Clock = new FramedClock(new StopwatchClock()))
             });
         }
 
@@ -73,22 +75,27 @@ namespace osu.Game.Tests.Visual
 
         protected virtual void AddHitObject(DrawableHitObject hitObject) => HitObjectContainer.Add(hitObject);
 
-        protected virtual Container CreateHitObjectContainer() => new Container { RelativeSizeAxes = Axes.Both };
+        protected virtual Container CreateContentContainer() => new Container { RelativeSizeAxes = Axes.Both };
 
         protected abstract DrawableHitObject CreateHitObject(HitObject hitObject);
         protected abstract PlacementBlueprint CreateBlueprint();
 
-        private partial class TestPlacementHandler : Container, IPlacementHandler
+        private partial class TestPlacementHandler : CompositeDrawable, IPlacementHandler
         {
+            private readonly Container contentContainer;
+
             public PlacementBlueprint CurrentBlueprint { get; private set; }
 
             public Func<PlacementBlueprint> CreateBlueprint;
             public Func<PlacementBlueprint, SnapResult> SnapForBlueprint;
             public Action<HitObject> AddHitObject;
 
-            public TestPlacementHandler()
+            public TestPlacementHandler(Container contentContainer)
             {
+                this.contentContainer = contentContainer;
+
                 RelativeSizeAxes = Axes.Both;
+                InternalChild = contentContainer;
             }
 
             public void BeginPlacement(HitObject hitObject)
@@ -106,8 +113,8 @@ namespace osu.Game.Tests.Visual
             public void ResetPlacement()
             {
                 if (CurrentBlueprint != null)
-                    RemoveInternal(CurrentBlueprint, true);
-                AddInternal(CurrentBlueprint = CreateBlueprint());
+                    contentContainer.Remove(CurrentBlueprint, true);
+                contentContainer.Add(CurrentBlueprint = CreateBlueprint());
             }
 
             protected override void Update()
