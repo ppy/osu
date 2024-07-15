@@ -13,6 +13,7 @@ using osu.Game.Screens.Edit.Components.RadioButtons;
 using osu.Game.Screens.Edit.Compose.Components;
 using osu.Game.Tests.Visual;
 using osuTK;
+using osuTK.Input;
 
 namespace osu.Game.Rulesets.Osu.Tests.Editor
 {
@@ -22,15 +23,23 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
         protected override Ruleset CreateEditorRuleset() => new OsuRuleset();
 
         [Test]
-        public void TestTapSliderButtonThenDragAfterTappingPlayfield()
+        public void TestTapSliderButtonThenDragAfterTouchingComposeArea()
         {
             AddStep("tap slider", () => tap(this.ChildrenOfType<EditorRadioButton>().Single(b => b.Button.Label == "Slider")));
-            AddStep("tap playfield", () => tap(this.ChildrenOfType<Playfield>().Single()));
+
+            // this input is just for interacting with compose area
+            AddStep("begin hold", () => InputManager.BeginTouch(new Touch(TouchSource.Touch1, this.ChildrenOfType<Playfield>().Single().ScreenSpaceDrawQuad.Centre)));
+            AddStep("drag to draw", () => InputManager.MoveTouchTo(new Touch(TouchSource.Touch1, this.ChildrenOfType<Playfield>().Single().ToScreenSpace(new Vector2(200, 50)))));
+            AddStep("end", () => InputManager.EndTouch(new Touch(TouchSource.Touch1, InputManager.CurrentState.Touch.GetTouchPosition(TouchSource.Touch1)!.Value)));
+
+            AddStep("move current time", () => InputManager.Key(Key.Right));
+
             AddStep("begin hold", () => InputManager.BeginTouch(new Touch(TouchSource.Touch1, this.ChildrenOfType<Playfield>().Single().ToScreenSpace(new Vector2(50, 20)))));
             AddStep("drag to draw", () => InputManager.MoveTouchTo(new Touch(TouchSource.Touch1, this.ChildrenOfType<Playfield>().Single().ToScreenSpace(new Vector2(200, 50)))));
             AddAssert("selection not initiated", () => this.ChildrenOfType<DragBox>().All(d => d.State == Visibility.Hidden));
             AddStep("end", () => InputManager.EndTouch(new Touch(TouchSource.Touch1, InputManager.CurrentState.Touch.GetTouchPosition(TouchSource.Touch1)!.Value)));
-            AddAssert("slider placed", () =>
+
+            AddAssert("slider placed correctly", () =>
             {
                 var slider = (Slider)EditorBeatmap.HitObjects.Single(h => h.StartTime == EditorClock.CurrentTimeAccurate);
                 Assert.Multiple(() =>
