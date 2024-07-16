@@ -10,22 +10,37 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Skinning;
+using osu.Framework.Bindables;
 using osuTK;
+using osu.Game.Configuration;
+using osu.Game.Localisation.HUD;
 
 namespace osu.Game.Screens.Play.HUD.ClicksPerSecond
 {
-    public partial class ClicksPerSecondCounter : RollingCounter<int>, ISerialisableDrawable
+    public partial class ClicksSpeedCounter : RollingCounter<int>, ISerialisableDrawable
     {
         [Resolved]
         private ClicksPerSecondController controller { get; set; } = null!;
 
+        [SettingSource(typeof(ClicksSpeedCounterDisplayString), nameof(ClicksSpeedCounterDisplayString.ClicksSpeedDisplay), nameof(ClicksSpeedCounterDisplayString.ClicksSpeedDisplayDescription))]
+        public Bindable<ClicksSpeedDisplayUnit> DisplayUnit { get; } = new Bindable<ClicksSpeedDisplayUnit>();
+
+        private Bindable<string> displayUnitString = new Bindable<string>();
         protected override double RollingDuration => 175;
 
         public bool UsesFixedAnchor { get; set; }
 
-        public ClicksPerSecondCounter()
+        public ClicksSpeedCounter()
         {
             Current.Value = 0;
+
+            DisplayUnit.BindValueChanged(v =>
+            {
+                if (v.NewValue == ClicksSpeedDisplayUnit.Bpm)
+                    displayUnitString.Value = "BPM";
+                else
+                    displayUnitString.Value = "/sec";
+            }, true);
         }
 
         [BackgroundDependencyLoader]
@@ -38,10 +53,14 @@ namespace osu.Game.Screens.Play.HUD.ClicksPerSecond
         {
             base.Update();
 
-            Current.Value = controller.Value;
+            if (DisplayUnit.Value == ClicksSpeedDisplayUnit.Bpm)
+                // multiply by 60 * (1 / 4) to convert CPS to BPM
+                Current.Value = (int)(controller.Value * 60f * (1f / 4f));
+            else
+                Current.Value = controller.Value;
         }
 
-        protected override IHasText CreateText() => new TextComponent();
+        protected override IHasText CreateText() => new TextComponent(displayUnitString);
 
         private partial class TextComponent : CompositeDrawable, IHasText
         {
@@ -53,7 +72,9 @@ namespace osu.Game.Screens.Play.HUD.ClicksPerSecond
 
             private readonly OsuSpriteText text;
 
-            public TextComponent()
+            private readonly OsuSpriteText unitText;
+
+            public TextComponent(IBindable<string> displayUnit)
             {
                 AutoSizeAxes = Axes.Both;
 
@@ -62,7 +83,7 @@ namespace osu.Game.Screens.Play.HUD.ClicksPerSecond
                     AutoSizeAxes = Axes.Both,
                     Spacing = new Vector2(2),
                     Children = new Drawable[]
-                    {
+                {
                         text = new OsuSpriteText
                         {
                             Anchor = Anchor.BottomLeft,
@@ -84,19 +105,33 @@ namespace osu.Game.Screens.Play.HUD.ClicksPerSecond
                                     Font = OsuFont.Numeric.With(size: 6, fixedWidth: false),
                                     Text = @"clicks",
                                 },
-                                new OsuSpriteText
+                                unitText = new OsuSpriteText
                                 {
                                     Anchor = Anchor.TopLeft,
                                     Origin = Anchor.TopLeft,
                                     Font = OsuFont.Numeric.With(size: 6, fixedWidth: false),
-                                    Text = @"/sec",
+                                    Text = displayUnit.Value,
                                     Padding = new MarginPadding { Bottom = 3f }, // align baseline better
                                 }
                             }
                         }
-                    }
+                }
                 };
+
+                displayUnit.BindValueChanged(v => unitText.Text = v.NewValue, true);
             }
+        }
+
+        public enum ClicksSpeedDisplayUnit
+        {
+            [LocalisableDescription(typeof(ClicksSpeedCounterDisplayString), nameof(ClicksSpeedCounterDisplayString.ClicksSpeedDisplayUnitBpm))]
+            Bpm,
+
+            /// <summary>
+            /// clicks per second
+            /// </summary>
+            [LocalisableDescription(typeof(ClicksSpeedCounterDisplayString), nameof(ClicksSpeedCounterDisplayString.ClicksSpeedDisplayUnitCps))]
+            Cps,
         }
     }
 }

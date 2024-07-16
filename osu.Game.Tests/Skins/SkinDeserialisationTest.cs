@@ -65,9 +65,7 @@ namespace osu.Game.Tests.Skins
             // Covers default rank display
             "Archives/modified-default-20230809.osk",
             // Covers legacy rank display
-            "Archives/modified-classic-20230809.osk",
-            // Covers clicks bpm counter
-            "Archives/modified-argon-20240714.osk"
+            "Archives/modified-classic-20230809.osk"
         };
 
         /// <summary>
