@@ -41,7 +41,7 @@ namespace osu.Game.Rulesets.Scoring
         /// <remarks>
         /// Used in <see cref="Player"/> to determine whether to perform a restart on failure, if the triggering mod is configured as such.
         /// </remarks>
-        public Mod? ModTriggeringFailure;
+        public Mod? ModTriggeringFailure { get; private set; }
 
         /// <summary>
         /// Immediately triggers a failure for this HealthProcessor.
