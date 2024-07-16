@@ -41,6 +41,8 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
                         case TimingControlPoint:
                             AddInternal(new ControlPointVisualisation(point)
                             {
+                                // importantly, override the x position being set since we do that above.
+                                X = 0,
                                 Y = -0.4f,
                             });
                             break;
