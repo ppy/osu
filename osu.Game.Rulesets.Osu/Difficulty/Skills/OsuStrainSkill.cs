@@ -46,7 +46,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             // Sections with 0 strain are excluded to avoid worst-case time complexity of the following sort (e.g. /b/2351871).
             // These sections will not contribute to the difficulty.
-            var peaks = GetCurrentStrainPeaks().Where(p => p > 0).ToList();
+            var peaks = GetCurrentStrainPeaks().Where(p => p > 0);
 
             List<double> strains = peaks.OrderDescending().ToList();
 
