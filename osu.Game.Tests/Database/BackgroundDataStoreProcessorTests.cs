@@ -172,7 +172,7 @@ namespace osu.Game.Tests.Database
                         Ruleset = r.All<RulesetInfo>().First(),
                     })
                     {
-                        TotalScoreVersion = 30000002,
+                        TotalScoreVersion = 30000013,
                         IsLegacyScore = true,
                     });
                 });
@@ -181,7 +181,7 @@ namespace osu.Game.Tests.Database
             AddStep("Run background processor", () => Add(new TestBackgroundDataStoreProcessor()));
 
             AddUntilStep("Score marked as failed", () => Realm.Run(r => r.Find<ScoreInfo>(scoreInfo.ID)!.BackgroundReprocessingFailed), () => Is.True);
-            AddAssert("Score version not upgraded", () => Realm.Run(r => r.Find<ScoreInfo>(scoreInfo.ID)!.TotalScoreVersion), () => Is.EqualTo(30000002));
+            AddAssert("Score version not upgraded", () => Realm.Run(r => r.Find<ScoreInfo>(scoreInfo.ID)!.TotalScoreVersion), () => Is.EqualTo(30000013));
         }
 
         [Test]
