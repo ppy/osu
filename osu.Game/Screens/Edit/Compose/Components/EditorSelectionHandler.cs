@@ -150,9 +150,23 @@ namespace osu.Game.Screens.Edit.Compose.Components
                                 if (SelectionAdditionBankStates.Values.All(b => b.Value == TernaryState.False))
                                     bindable.Value = TernaryState.True;
                             }
+                            else
+                            {
+                                // Auto should never apply when there is a selection made.
+                                if (bankName == HIT_BANK_AUTO)
+                                    break;
 
-                            // Auto should never apply when there is a selection made.
-                            // Completely empty selections should be allowed in the case that none of the selected objects have any addition samples.
+                                // Completely empty selections should be allowed in the case that none of the selected objects have any addition samples.
+                                // This is also required to stop a bindable feedback loop when a HitObject has zero addition samples (and LINQ `All` below becomes true).
+                                if (SelectedItems.SelectMany(enumerateAllSamples).All(h => h.All(o => o.Name == HitSampleInfo.HIT_NORMAL)))
+                                    break;
+
+                                // Never remove a sample bank.
+                                // These are basically radio buttons, not toggles.
+                                if (SelectedItems.SelectMany(enumerateAllSamples).All(h => h.Where(o => o.Name != HitSampleInfo.HIT_NORMAL).All(s => s.Bank == bankName)))
+                                    bindable.Value = TernaryState.True;
+                            }
+
                             break;
 
                         case TernaryState.True:
