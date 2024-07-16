@@ -125,7 +125,7 @@ namespace osu.Game.Rulesets.Osu.Edit
                         // however it's still possible to achieve that flip by combining multiple flips over the other axes.
                         flipAxis = direction == Direction.Vertical
                             ? GeometryUtils.RotateVector(Vector2.UnitX, -((gridToolbox.GridLinesRotation.Value + 390) % 60 + 60))
-                            : GeometryUtils.RotateVector(Vector2.UnitX, -((gridToolbox.GridLinesRotation.Value + 390) % 60 - 60));
+                            : GeometryUtils.RotateVector(Vector2.UnitX, -((gridToolbox.GridLinesRotation.Value + 360) % 60 - 30));
                         break;
                 }
             }
