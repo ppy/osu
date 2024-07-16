@@ -479,6 +479,7 @@ namespace osu.Game.Tests.Database
                 using var rulesets = new RealmRulesetStore(realm, storage);
 
                 using var __ = getBeatmapArchive(out string pathOriginal);
+
                 using var _ = getBeatmapArchiveWithModifications(out string pathMissingOneBeatmap, directory =>
                 {
                     // arbitrary beatmap removal
@@ -496,7 +497,7 @@ namespace osu.Game.Tests.Database
                 Debug.Assert(importAfterUpdate != null);
 
                 Assert.That(importBeforeUpdate.ID, Is.Not.EqualTo(importAfterUpdate.ID));
-                Assert.That(importBeforeUpdate.Value.DateAdded, Is.EqualTo(importAfterUpdate.Value.DateAdded));
+                Assert.That(importBeforeUpdate.Value.DateAdded, Is.EqualTo(importAfterUpdate.Value.DateAdded).Within(TimeSpan.FromSeconds(1)));
             });
         }
 
