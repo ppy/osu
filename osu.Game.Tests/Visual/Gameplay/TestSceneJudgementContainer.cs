@@ -16,7 +16,7 @@ using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    public class TestSceneJudgementContainer : OsuTestScene
+    public partial class TestSceneJudgementContainer : OsuTestScene
     {
         private JudgementContainer<DrawableOsuJudgement> judgementContainer = null!;
 
