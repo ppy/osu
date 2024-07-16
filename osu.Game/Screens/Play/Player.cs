@@ -244,7 +244,7 @@ namespace osu.Game.Screens.Play
 
             HealthProcessor = gameplayMods.OfType<IApplicableHealthProcessor>().FirstOrDefault()?.CreateHealthProcessor(playableBeatmap.HitObjects[0].StartTime);
             HealthProcessor ??= ruleset.CreateHealthProcessor(playableBeatmap.HitObjects[0].StartTime);
-            HealthProcessor.Mods.Value = gameplayMods;
+            HealthProcessor.Mods.Value = gameplayMods.OrderByDescending(m => m is IHasFailCondition mod && mod.RestartOnFail).ToArray();
             HealthProcessor.ApplyBeatmap(playableBeatmap);
 
             dependencies.CacheAs(HealthProcessor);
