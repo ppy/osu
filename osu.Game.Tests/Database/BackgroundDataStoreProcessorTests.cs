@@ -179,7 +179,9 @@ namespace osu.Game.Tests.Database
                 });
             });
 
-            AddStep("Run background processor", () => Add(new TestBackgroundDataStoreProcessor()));
+            TestBackgroundDataStoreProcessor processor = null!;
+            AddStep("Run background processor", () => Add(processor = new TestBackgroundDataStoreProcessor()));
+            AddUntilStep("Wait for completion", () => processor.Completed);
 
             AddUntilStep("Score marked as failed", () => Realm.Run(r => r.Find<ScoreInfo>(scoreInfo.ID)!.BackgroundReprocessingFailed), () => Is.True);
             AddAssert("Score version not upgraded", () => Realm.Run(r => r.Find<ScoreInfo>(scoreInfo.ID)!.TotalScoreVersion), () => Is.EqualTo(scoreVersion));
