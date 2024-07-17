@@ -118,7 +118,7 @@ namespace osu.Game.Overlays
                 }
                 : Array.Empty<ProfileSection>();
 
-            setupBaseContent(OverlayColourScheme.Pink, forceContentRecreation: true);
+            setupBaseContent(OverlayColourScheme.Pink.GetHue(), forceContentRecreation: true);
 
             if (API.State.Value != APIState.Offline)
             {
@@ -135,9 +135,9 @@ namespace osu.Game.Overlays
             Debug.Assert(sections != null && sectionsContainer != null && tabs != null);
 
             // reuse header and content if same colour scheme, otherwise recreate both.
-            var profileScheme = (OverlayColourScheme?)loadedUser.ProfileHue ?? OverlayColourScheme.Pink;
-            if (profileScheme != ColourProvider.ColourScheme)
-                setupBaseContent(profileScheme, forceContentRecreation: false);
+            int profileHue = loadedUser.ProfileHue ?? OverlayColourScheme.Pink.GetHue();
+            if (profileHue != ColourProvider.Hue)
+                setupBaseContent(profileHue, forceContentRecreation: false);
 
             var actualRuleset = rulesets.GetRuleset(userRuleset?.ShortName ?? loadedUser.PlayMode).AsNonNull();
 
@@ -163,12 +163,12 @@ namespace osu.Game.Overlays
             loadingLayer.Hide();
         }
 
-        private void setupBaseContent(OverlayColourScheme colourScheme, bool forceContentRecreation)
+        private void setupBaseContent(int hue, bool forceContentRecreation)
         {
-            var previousColourScheme = ColourProvider.ColourScheme;
-            ColourProvider.ChangeColourScheme(colourScheme);
+            int previousHue = ColourProvider.Hue;
+            ColourProvider.ChangeColourScheme(hue);
 
-            if (colourScheme != previousColourScheme)
+            if (hue != previousHue)
             {
                 RecreateHeader();
                 UpdateColours();
