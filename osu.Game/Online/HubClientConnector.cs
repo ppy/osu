@@ -19,6 +19,9 @@ namespace osu.Game.Online
     {
         public const string SERVER_SHUTDOWN_MESSAGE = "Server is shutting down.";
 
+        public const string VERSION_HASH_HEADER = @"X-Osu-Version-Hash";
+        public const string CLIENT_SESSION_ID_HEADER = @"X-Client-Session-ID";
+
         /// <summary>
         /// Invoked whenever a new hub connection is built, to configure it before it's started.
         /// </summary>
@@ -68,8 +71,11 @@ namespace osu.Game.Online
                             options.Proxy.Credentials = CredentialCache.DefaultCredentials;
                     }
 
-                    options.Headers.Add("Authorization", $"Bearer {API.AccessToken}");
-                    options.Headers.Add("OsuVersionHash", versionHash);
+                    options.Headers.Add(@"Authorization", @$"Bearer {API.AccessToken}");
+                    // non-standard header name kept for backwards compatibility, can be removed after server side has migrated to `VERSION_HASH_HEADER`
+                    options.Headers.Add(@"OsuVersionHash", versionHash);
+                    options.Headers.Add(VERSION_HASH_HEADER, versionHash);
+                    options.Headers.Add(CLIENT_SESSION_ID_HEADER, API.SessionIdentifier.ToString());
                 });
 
             if (RuntimeFeature.IsDynamicCodeCompiled && preferMessagePack)
