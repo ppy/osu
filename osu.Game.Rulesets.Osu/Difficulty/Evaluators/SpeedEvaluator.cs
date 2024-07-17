@@ -65,7 +65,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             if (osuCurrObj.Angle.HasValue && osuPrevObj?.Angle != null && osuCurrObj.Angle != osuPrevObj.Angle)
             {
-
                 double angleDifference = Math.Abs(osuCurrObj.Angle.Value - osuPrevObj.Angle.Value);
                 double angleDifferenceAdjusted = Math.Sin((angleDifference) / 2) * 180.0;
                 double angularVelocity = angleDifferenceAdjusted / (0.1 * strainTime);
