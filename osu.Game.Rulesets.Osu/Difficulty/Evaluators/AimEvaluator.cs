@@ -127,6 +127,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 double retainedStrain = 1 / (1 + Math.Exp(-3 * (velocityChange - 1)));
                 aimStrain *= retainedStrain + (1 - retainedStrain) * Math.Sqrt(flowBonus);
             }
+
             // Add in acute angle bonus or wide angle bonus + velocity change bonus, whichever is larger.
             aimStrain += Math.Max(acuteAngleBonus * acute_angle_multiplier, wideAngleBonus * wide_angle_multiplier + velocityChangeBonus * velocity_change_multiplier);
 
