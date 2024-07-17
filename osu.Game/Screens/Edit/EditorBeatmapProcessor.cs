@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Timing;
@@ -12,11 +13,18 @@ namespace osu.Game.Screens.Edit
 {
     public class EditorBeatmapProcessor : IBeatmapProcessor
     {
-        public IBeatmap Beatmap { get; }
+        public EditorBeatmap Beatmap { get; }
+
+        IBeatmap IBeatmapProcessor.Beatmap => Beatmap;
 
         private readonly IBeatmapProcessor? rulesetBeatmapProcessor;
 
-        public EditorBeatmapProcessor(IBeatmap beatmap, Ruleset ruleset)
+        /// <summary>
+        /// Kept for the purposes of reducing redundant regeneration of automatic breaks.
+        /// </summary>
+        private HashSet<(double, double)> objectDurationCache = new HashSet<(double, double)>();
+
+        public EditorBeatmapProcessor(EditorBeatmap beatmap, Ruleset ruleset)
         {
             Beatmap = beatmap;
             rulesetBeatmapProcessor = ruleset.CreateBeatmapProcessor(beatmap);
@@ -36,6 +44,13 @@ namespace osu.Game.Screens.Edit
 
         private void autoGenerateBreaks()
         {
+            var objectDuration = Beatmap.HitObjects.Select(ho => (ho.StartTime, ho.GetEndTime())).ToHashSet();
+
+            if (objectDuration.SetEquals(objectDurationCache))
+                return;
+
+            objectDurationCache = objectDuration;
+
             Beatmap.Breaks.RemoveAll(b => b is not ManualBreakPeriod);
 
             foreach (var manualBreak in Beatmap.Breaks.ToList())
