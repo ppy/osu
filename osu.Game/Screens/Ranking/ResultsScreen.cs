@@ -15,6 +15,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
@@ -22,6 +23,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
 using osu.Game.Localisation;
 using osu.Game.Online.API;
+using osu.Game.Online.API.Requests;
 using osu.Game.Online.Placeholders;
 using osu.Game.Overlays;
 using osu.Game.Scoring;
@@ -76,7 +78,7 @@ namespace osu.Game.Screens.Ranking
 
         /// <summary>
         /// Whether the user's personal statistics should be shown on the extended statistics panel
-        /// after clicking the score panel associated with the <see cref="ResultsScreen.Score"/> being presented.
+        /// after clicking the score panel associated with the <see cref="Score"/> being presented.
         /// Requires <see cref="Score"/> to be present.
         /// </summary>
         public bool ShowUserStatistics { get; init; }
@@ -201,6 +203,27 @@ namespace osu.Game.Screens.Ranking
                         player?.Restart(true);
                     },
                 });
+            }
+
+            // Do not render if user is not logged in or the mapset does not have a valid online ID.
+            if (api.IsLoggedIn && Score?.BeatmapInfo?.BeatmapSet != null && Score.BeatmapInfo.BeatmapSet.OnlineID > 0)
+            {
+                GetBeatmapSetRequest beatmapSetRequest;
+                beatmapSetRequest = new GetBeatmapSetRequest(Score.BeatmapInfo.BeatmapSet.OnlineID);
+
+                beatmapSetRequest.Success += (beatmapSet) =>
+                {
+                    buttons.Add(new FavouriteButton(beatmapSet)
+                    {
+                        Width = 75
+                    });
+                };
+                beatmapSetRequest.Failure += e =>
+                {
+                    Logger.Error(e, $"Failed to fetch beatmap info: {e.Message}");
+                };
+
+                api.Queue(beatmapSetRequest);
             }
         }
 
