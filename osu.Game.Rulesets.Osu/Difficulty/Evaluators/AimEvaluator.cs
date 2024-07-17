@@ -123,8 +123,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             // Part of the aiming difficulty for this object is accounted for in the speed evaluator, so reduce aim difficulty here
             if (flowBonus < 1)
             {
-                aimStrain *= 0.5 + 0.5 * Math.Sqrt(flowBonus);
-                wideAngleBonus *= 0.5 + 0.5 * Math.Sqrt(flowBonus);
+                double velocityChange = (prevVelocity == 0) ? 1 : currVelocity / prevVelocity;
+                double retainedStrain = 1 / (1 + Math.Exp(-3 * (velocityChange - 1)));
+                aimStrain *= retainedStrain + (1 - retainedStrain) * Math.Sqrt(flowBonus);
             }
             // Add in acute angle bonus or wide angle bonus + velocity change bonus, whichever is larger.
             aimStrain += Math.Max(acuteAngleBonus * acute_angle_multiplier, wideAngleBonus * wide_angle_multiplier + velocityChangeBonus * velocity_change_multiplier);
