@@ -102,7 +102,7 @@ namespace osu.Game.Overlays.Music
         {
             base.LoadComplete();
 
-            beatmapSubscription = realm.RegisterForNotifications(r => r.All<BeatmapSetInfo>().Where(s => !s.DeletePending), beatmapsChanged);
+            beatmapSubscription = realm.RegisterForNotifications(r => r.All<BeatmapSetInfo>().Where(s => !s.DeletePending && !s.Protected), beatmapsChanged);
 
             list.Items.BindTo(beatmapSets);
             beatmap.BindValueChanged(working => list.SelectedSet.Value = working.NewValue.BeatmapSetInfo.ToLive(realm), true);
