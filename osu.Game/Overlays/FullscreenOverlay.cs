@@ -100,7 +100,10 @@ namespace osu.Game.Overlays
             }
         }
 
-        public void UpdateColours()
+        /// <summary>
+        /// Updates the colours of the background and the top waves with the latest colour shades provided by <see cref="ColourProvider"/>.
+        /// </summary>
+        protected void UpdateColours()
         {
             Waves.FirstWaveColour = ColourProvider.Light4;
             Waves.SecondWaveColour = ColourProvider.Light3;
