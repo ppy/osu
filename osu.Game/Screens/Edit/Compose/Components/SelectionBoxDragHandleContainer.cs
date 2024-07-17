@@ -7,7 +7,6 @@ using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
-using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 
@@ -74,9 +73,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
         {
             foreach (var handle in scaleHandles)
             {
-                if (direction == Direction.Horizontal && !handle.Anchor.HasFlagFast(Anchor.x1))
+                if (direction == Direction.Horizontal && !handle.Anchor.HasFlag(Anchor.x1))
                     handle.Anchor ^= Anchor.x0 | Anchor.x2;
-                if (direction == Direction.Vertical && !handle.Anchor.HasFlagFast(Anchor.y1))
+                if (direction == Direction.Vertical && !handle.Anchor.HasFlag(Anchor.y1))
                     handle.Anchor ^= Anchor.y0 | Anchor.y2;
             }
         }
