@@ -25,7 +25,7 @@ namespace osu.Game.Screens.Play.HUD.ClicksPerSecond
         [SettingSource(typeof(ClicksSpeedCounterDisplayString), nameof(ClicksSpeedCounterDisplayString.ClicksSpeedDisplay), nameof(ClicksSpeedCounterDisplayString.ClicksSpeedDisplayDescription))]
         public Bindable<ClicksSpeedDisplayUnit> DisplayUnit { get; } = new Bindable<ClicksSpeedDisplayUnit>();
 
-        private Bindable<string> displayUnitString = new Bindable<string>();
+        private readonly Bindable<string> displayUnitString = new Bindable<string>();
         protected override double RollingDuration => 175;
 
         public bool UsesFixedAnchor { get; set; }
@@ -72,10 +72,10 @@ namespace osu.Game.Screens.Play.HUD.ClicksPerSecond
 
             private readonly OsuSpriteText text;
 
-            private readonly OsuSpriteText unitText;
-
             public TextComponent(IBindable<string> displayUnit)
             {
+                OsuSpriteText unitText;
+
                 AutoSizeAxes = Axes.Both;
 
                 InternalChild = new FillFlowContainer
@@ -83,7 +83,7 @@ namespace osu.Game.Screens.Play.HUD.ClicksPerSecond
                     AutoSizeAxes = Axes.Both,
                     Spacing = new Vector2(2),
                     Children = new Drawable[]
-                {
+                    {
                         text = new OsuSpriteText
                         {
                             Anchor = Anchor.BottomLeft,
@@ -115,7 +115,7 @@ namespace osu.Game.Screens.Play.HUD.ClicksPerSecond
                                 }
                             }
                         }
-                }
+                    }
                 };
 
                 displayUnit.BindValueChanged(v => unitText.Text = v.NewValue, true);
