@@ -69,7 +69,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 double angleDifference = Math.Abs(osuCurrObj.Angle.Value - osuPrevObj.Angle.Value);
                 double angleDifferenceAdjusted = Math.Sin((angleDifference) / 2) * 180.0;
                 double angularVelocity = angleDifferenceAdjusted / (0.1 * strainTime);
-                double angularVelocityBonus = Math.Max(0.0, Math.Pow(angularVelocity, 0.4) - 1.0); //Math.Max(0.0, 1.0 - 1.0 / angularVelocity);
+                double angularVelocityBonus = Math.Max(0.0, Math.Pow(angularVelocity, 0.4) - 1.0);
                 adjustedDistanceScale = 0.65 + angularVelocityBonus * 0.45;
             }
 
