@@ -7,11 +7,19 @@ namespace osu.Game.Overlays
 {
     public class OverlayColourProvider
     {
-        public OverlayColourScheme ColourScheme { get; private set; }
+        /// <summary>
+        /// The hue degree associated with the colour shades provided by this <see cref="OverlayColourProvider"/>.
+        /// </summary>
+        public int Hue { get; private set; }
 
         public OverlayColourProvider(OverlayColourScheme colourScheme)
+            : this(colourScheme.GetHue())
         {
-            ColourScheme = colourScheme;
+        }
+
+        public OverlayColourProvider(int hue)
+        {
+            Hue = hue;
         }
 
         // Note that the following five colours are also defined in `OsuColour` as `{colourScheme}{0,1,2,3,4}`.
@@ -46,31 +54,19 @@ namespace osu.Game.Overlays
         public Color4 Background6 => getColour(0.1f, 0.1f);
 
         /// <summary>
-        /// Changes the value of <see cref="ColourScheme"/> to a different colour scheme.
+        /// Changes the <see cref="Hue"/> to a different degree.
         /// Note that this does not trigger any kind of signal to any drawable that received colours from here, all drawables need to be updated manually.
         /// </summary>
         /// <param name="colourScheme">The proposed colour scheme.</param>
-        public void ChangeColourScheme(OverlayColourScheme colourScheme)
-        {
-            ColourScheme = colourScheme;
-        }
+        public void ChangeColourScheme(OverlayColourScheme colourScheme) => ChangeColourScheme(colourScheme.GetHue());
 
-        private Color4 getColour(float saturation, float lightness) => Framework.Graphics.Colour4.FromHSL(getBaseHue(ColourScheme), saturation, lightness);
+        /// <summary>
+        /// Changes the <see cref="Hue"/> to a different degree.
+        /// Note that this does not trigger any kind of signal to any drawable that received colours from here, all drawables need to be updated manually.
+        /// </summary>
+        /// <param name="hue">The proposed hue degree.</param>
+        public void ChangeColourScheme(int hue) => Hue = hue;
 
-        private static float getBaseHue(OverlayColourScheme colourScheme) => (int)colourScheme / 360f;
-    }
-
-    // See https://github.com/ppy/osu-web/blob/5a536d217a21582aad999db50a981003d3ad5659/app/helpers.php#L1620-L1628
-    public enum OverlayColourScheme
-    {
-        Red = 0,
-        Orange = 45,
-        Lime = 90,
-        Green = 125,
-        Aquamarine = 160,
-        Blue = 200,
-        Purple = 255,
-        Plum = 320,
-        Pink = 333,
+        private Color4 getColour(float saturation, float lightness) => Framework.Graphics.Colour4.FromHSL(Hue / 360f, saturation, lightness);
     }
 }
