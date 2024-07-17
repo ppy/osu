@@ -118,7 +118,8 @@ namespace osu.Game.Overlays
                 }
                 : Array.Empty<ProfileSection>();
 
-            setupBaseContent(OverlayColourScheme.Pink.GetHue(), forceContentRecreation: true);
+            changeOverlayColours(OverlayColourScheme.Pink.GetHue());
+            recreateBaseContent();
 
             if (API.State.Value != APIState.Offline)
             {
@@ -136,8 +137,9 @@ namespace osu.Game.Overlays
 
             // reuse header and content if same colour scheme, otherwise recreate both.
             int profileHue = loadedUser.ProfileHue ?? OverlayColourScheme.Pink.GetHue();
-            if (profileHue != ColourProvider.Hue)
-                setupBaseContent(profileHue, forceContentRecreation: false);
+
+            if (changeOverlayColours(profileHue))
+                recreateBaseContent();
 
             var actualRuleset = rulesets.GetRuleset(userRuleset?.ShortName ?? loadedUser.PlayMode).AsNonNull();
 
@@ -163,19 +165,8 @@ namespace osu.Game.Overlays
             loadingLayer.Hide();
         }
 
-        private void setupBaseContent(int hue, bool forceContentRecreation)
+        private void recreateBaseContent()
         {
-            int previousHue = ColourProvider.Hue;
-            ColourProvider.ChangeColourScheme(hue);
-
-            if (hue != previousHue)
-            {
-                RecreateHeader();
-                UpdateColours();
-            }
-            else if (!forceContentRecreation)
-                return;
-
             Child = new OsuContextMenuContainer
             {
                 RelativeSizeAxes = Axes.Both,
@@ -222,6 +213,18 @@ namespace osu.Game.Overlays
                     sectionsContainer.ScrollTo(lastSection);
                 }
             };
+        }
+
+        private bool changeOverlayColours(int hue)
+        {
+            if (hue == ColourProvider.Hue)
+                return false;
+
+            ColourProvider.ChangeColourScheme(hue);
+
+            RecreateHeader();
+            UpdateColours();
+            return true;
         }
 
         private partial class ProfileSectionTabControl : OsuTabControl<ProfileSection>
