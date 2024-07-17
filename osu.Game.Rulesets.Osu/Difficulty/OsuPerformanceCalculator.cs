@@ -21,7 +21,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         private double accuracy;
         private int scoreMaxCombo;
-
         private int countGreat;
         private int countOk;
         private int countMeh;
