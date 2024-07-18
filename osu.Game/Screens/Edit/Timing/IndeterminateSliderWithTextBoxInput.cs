@@ -75,6 +75,7 @@ namespace osu.Game.Screens.Edit.Timing
                         textBox = new LabelledTextBox
                         {
                             Label = labelText,
+                            SelectAllOnFocus = true,
                         },
                         slider = new SettingsSlider<T>
                         {

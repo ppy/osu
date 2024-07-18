@@ -51,6 +51,7 @@ using osu.Game.Online.Chat;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
 using osu.Game.Overlays.BeatmapListing;
+using osu.Game.Overlays.Mods;
 using osu.Game.Overlays.Music;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Overlays.SkinEditor;
@@ -83,7 +84,7 @@ namespace osu.Game
     public partial class OsuGame : OsuGameBase, IKeyBindingHandler<GlobalAction>, ILocalUserPlayInfo, IPerformFromScreenRunner, IOverlayManager, ILinkHandler
     {
 #if DEBUG
-        // Different port allows runnning release and debug builds alongside each other.
+        // Different port allows running release and debug builds alongside each other.
         public const int IPC_PORT = 44824;
 #else
         public const int IPC_PORT = 44823;
@@ -132,6 +133,8 @@ namespace osu.Game
 
         private Container topMostOverlayContent;
 
+        private Container footerBasedOverlayContent;
+
         protected ScalingContainer ScreenContainer { get; private set; }
 
         protected Container ScreenOffsetContainer { get; private set; }
@@ -155,8 +158,6 @@ namespace osu.Game
         public virtual StableStorage GetStorageForStableInstall() => null;
 
         private float toolbarOffset => (Toolbar?.Position.Y ?? 0) + (Toolbar?.DrawHeight ?? 0);
-
-        private float screenFooterOffset => (ScreenFooter?.DrawHeight ?? 0) - (ScreenFooter?.Position.Y ?? 0);
 
         private IdleTracker idleTracker;
 
@@ -242,7 +243,11 @@ namespace osu.Game
                 throw new ArgumentException($@"{overlayContainer} has already been registered via {nameof(IOverlayManager.RegisterBlockingOverlay)} once.");
 
             externalOverlays.Add(overlayContainer);
-            overlayContent.Add(overlayContainer);
+
+            if (overlayContainer is ShearedOverlayContainer)
+                footerBasedOverlayContent.Add(overlayContainer);
+            else
+                overlayContent.Add(overlayContainer);
 
             if (overlayContainer is OsuFocusedOverlayContainer focusedOverlayContainer)
                 focusedOverlays.Add(focusedOverlayContainer);
@@ -934,7 +939,6 @@ namespace osu.Game
                 return string.Join(" / ", combinations);
             };
 
-            Container logoContainer;
             ScreenFooter.BackReceptor backReceptor;
 
             dependencies.CacheAs(idleTracker = new GameIdleTracker(6000));
@@ -947,6 +951,8 @@ namespace osu.Game
             });
 
             Add(sessionIdleTracker);
+
+            Container logoContainer;
 
             AddRange(new Drawable[]
             {
@@ -976,11 +982,19 @@ namespace osu.Game
                                     Origin = Anchor.BottomLeft,
                                     Action = () => ScreenFooter.OnBack?.Invoke(),
                                 },
+                                logoContainer = new Container { RelativeSizeAxes = Axes.Both },
+                                footerBasedOverlayContent = new Container
+                                {
+                                    Depth = -1,
+                                    RelativeSizeAxes = Axes.Both,
+                                },
                                 new PopoverContainer
                                 {
+                                    Depth = -1,
                                     RelativeSizeAxes = Axes.Both,
                                     Child = ScreenFooter = new ScreenFooter(backReceptor)
                                     {
+                                        RequestLogoInFront = inFront => ScreenContainer.ChangeChildDepth(logoContainer, inFront ? float.MinValue : 0),
                                         OnBack = () =>
                                         {
                                             if (!(ScreenStack.CurrentScreen is IOsuScreen currentScreen))
@@ -991,7 +1005,6 @@ namespace osu.Game
                                         }
                                     },
                                 },
-                                logoContainer = new Container { RelativeSizeAxes = Axes.Both },
                             }
                         },
                     }
@@ -1025,7 +1038,7 @@ namespace osu.Game
 
             if (!IsDeployedBuild)
             {
-                dependencies.Cache(versionManager = new VersionManager { Depth = int.MinValue });
+                dependencies.Cache(versionManager = new VersionManager());
                 loadComponentSingleFile(versionManager, ScreenContainer.Add);
             }
 
@@ -1072,7 +1085,7 @@ namespace osu.Game
             loadComponentSingleFile(CreateUpdateManager(), Add, true);
 
             // overlay elements
-            loadComponentSingleFile(FirstRunOverlay = new FirstRunSetupOverlay(), overlayContent.Add, true);
+            loadComponentSingleFile(FirstRunOverlay = new FirstRunSetupOverlay(), footerBasedOverlayContent.Add, true);
             loadComponentSingleFile(new ManageCollectionsDialog(), overlayContent.Add, true);
             loadComponentSingleFile(beatmapListing = new BeatmapListingOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(dashboard = new DashboardOverlay(), overlayContent.Add, true);
@@ -1137,7 +1150,7 @@ namespace osu.Game
             }
 
             // ensure only one of these overlays are open at once.
-            var singleDisplayOverlays = new OverlayContainer[] { FirstRunOverlay, chatOverlay, news, dashboard, beatmapListing, changelogOverlay, rankingsOverlay, wikiOverlay };
+            var singleDisplayOverlays = new OverlayContainer[] { chatOverlay, news, dashboard, beatmapListing, changelogOverlay, rankingsOverlay, wikiOverlay };
 
             foreach (var overlay in singleDisplayOverlays)
             {
@@ -1485,7 +1498,6 @@ namespace osu.Game
 
             ScreenOffsetContainer.Padding = new MarginPadding { Top = toolbarOffset };
             overlayOffsetContainer.Padding = new MarginPadding { Top = toolbarOffset };
-            ScreenStack.Padding = new MarginPadding { Bottom = screenFooterOffset };
 
             float horizontalOffset = 0f;
 
