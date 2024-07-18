@@ -18,9 +18,6 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         /// <summary>
         /// The beatmap. Can be local/online depending on the context.
         /// </summary>
-        /// <remarks>
-        /// This is the same as <see cref="apiBeatmap"/> if online.
-        /// </remarks>
         [Cached(typeof(IBindable<IBeatmapInfo?>))]
         protected readonly Bindable<IBeatmapInfo?> BeatmapInfo = new Bindable<IBeatmapInfo?>();
 
@@ -29,12 +26,6 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         /// </summary>
         [Cached(typeof(IBindable<IBeatmapSetInfo?>))]
         private readonly Bindable<IBeatmapSetInfo?> beatmapSetInfo = new Bindable<IBeatmapSetInfo?>();
-
-        /// <summary>
-        /// The online beatmap fetched from the api.
-        /// </summary>
-        [Cached(typeof(IBindable<APIBeatmap?>))]
-        private readonly Bindable<APIBeatmap?> apiBeatmap = new Bindable<APIBeatmap?>();
 
         protected override void LoadComplete()
         {
@@ -52,7 +43,6 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             BeatmapInfo.BindValueChanged(b =>
             {
                 beatmapSetInfo.Value = b.NewValue?.BeatmapSet as APIBeatmapSet;
-                apiBeatmap.Value = b.NewValue as APIBeatmap;
             });
         }
 
@@ -65,7 +55,6 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                 SelectedMods.SetDefault();
                 BeatmapInfo.Value = null;
                 beatmapSetInfo.Value = null;
-                apiBeatmap.Value = null;
             });
         }
     }
