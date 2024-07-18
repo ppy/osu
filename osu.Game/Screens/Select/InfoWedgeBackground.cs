@@ -27,7 +27,7 @@ namespace osu.Game.Screens.Select
             Padding = new MarginPadding
             {
                 Top = 10,
-                Left = -SongSelect.WEDGE_CORNER_RADIUS,
+                Left = -BeatmapInfoWedgeV2.WEDGE_CORNER_RADIUS,
 
                 // TODO: should account top wedge's shear width for alignment (hard to do as this auto-sizes height right now)
                 Right = BeatmapInfoWedgeV2.SHEAR_WIDTH + BeatmapInfoWedgeV2.COLOUR_BAR_WIDTH
@@ -43,8 +43,8 @@ namespace osu.Game.Screens.Select
                 {
                     RelativeSizeAxes = Axes.Both,
                     Masking = true,
-                    CornerRadius = SongSelect.WEDGE_CORNER_RADIUS,
-                    Shear = SongSelect.WEDGED_CONTAINER_SHEAR,
+                    CornerRadius = BeatmapInfoWedgeV2.WEDGE_CORNER_RADIUS,
+                    Shear = BeatmapInfoWedgeV2.WEDGED_CONTAINER_SHEAR,
                     Child = new Box
                     {
                         RelativeSizeAxes = Axes.Both,

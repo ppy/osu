@@ -24,8 +24,11 @@ namespace osu.Game.Screens.Select
     public partial class BeatmapInfoWedgeV2 : VisibilityContainer
     {
         public const float WEDGE_HEIGHT = 120;
-        public const float SHEAR_WIDTH = SongSelect.SHEAR_X * WEDGE_HEIGHT;
+        public const float WEDGE_CORNER_RADIUS = 10;
+        public const float SHEAR_WIDTH = shear_x * WEDGE_HEIGHT;
+        public static readonly Vector2 WEDGED_CONTAINER_SHEAR = new Vector2(shear_x, 0);
 
+        private const float shear_x = 0.175f;
         private const float transition_duration = 250;
         public const float COLOUR_BAR_WIDTH = 30;
 
@@ -74,16 +77,16 @@ namespace osu.Game.Screens.Select
                     {
                         RelativeSizeAxes = Axes.X,
                         Height = WEDGE_HEIGHT,
-                        Shear = SongSelect.WEDGED_CONTAINER_SHEAR,
+                        Shear = WEDGED_CONTAINER_SHEAR,
                         Masking = true,
-                        Padding = new MarginPadding { Left = -SongSelect.WEDGE_CORNER_RADIUS },
+                        Padding = new MarginPadding { Left = -WEDGE_CORNER_RADIUS },
                         EdgeEffect = new EdgeEffectParameters
                         {
                             Colour = Colour4.Black.Opacity(0.2f),
                             Type = EdgeEffectType.Shadow,
                             Radius = 3,
                         },
-                        CornerRadius = SongSelect.WEDGE_CORNER_RADIUS,
+                        CornerRadius = WEDGE_CORNER_RADIUS,
                         Children = new Drawable[]
                         {
                             // These elements can't be grouped with the rest of the content, due to being present either outside or under the backgrounds area
@@ -96,14 +99,14 @@ namespace osu.Game.Screens.Select
                                 RelativeSizeAxes = Axes.Y,
 
                                 // By limiting the width we avoid this box showing up as an outline around the drawables that are on top of it.
-                                Width = COLOUR_BAR_WIDTH + SongSelect.WEDGE_CORNER_RADIUS,
+                                Width = COLOUR_BAR_WIDTH + WEDGE_CORNER_RADIUS,
                                 Child = new Box { RelativeSizeAxes = Axes.Both }
                             },
                             new Container
                             {
                                 // Applying the shear to this container and nesting the starCounter inside avoids
                                 // the deformation that occurs if the shear is applied to the starCounter whilst rotated
-                                Shear = -SongSelect.WEDGED_CONTAINER_SHEAR,
+                                Shear = -WEDGED_CONTAINER_SHEAR,
                                 X = -COLOUR_BAR_WIDTH / 2,
                                 Anchor = Anchor.CentreRight,
                                 Origin = Anchor.Centre,
@@ -111,7 +114,7 @@ namespace osu.Game.Screens.Select
                                 Width = COLOUR_BAR_WIDTH,
                                 Child = starCounter = new StarCounter
                                 {
-                                    Rotation = (float)(Math.Atan(SongSelect.SHEAR_X) * (180 / Math.PI)),
+                                    Rotation = (float)(Math.Atan(shear_x) * (180 / Math.PI)),
                                     Colour = Colour4.Transparent,
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
@@ -135,7 +138,7 @@ namespace osu.Game.Screens.Select
                                     {
                                         Anchor = Anchor.TopRight,
                                         Origin = Anchor.TopRight,
-                                        Shear = -SongSelect.WEDGED_CONTAINER_SHEAR,
+                                        Shear = -WEDGED_CONTAINER_SHEAR,
                                         Alpha = 0,
                                     },
                                     statusPill = new BeatmapSetOnlineStatusPill
@@ -143,7 +146,7 @@ namespace osu.Game.Screens.Select
                                         AutoSizeAxes = Axes.Both,
                                         Anchor = Anchor.TopRight,
                                         Origin = Anchor.TopRight,
-                                        Shear = -SongSelect.WEDGED_CONTAINER_SHEAR,
+                                        Shear = -WEDGED_CONTAINER_SHEAR,
                                         TextSize = 11,
                                         TextPadding = new MarginPadding { Horizontal = 8, Vertical = 2 },
                                         Alpha = 0,
@@ -244,14 +247,14 @@ namespace osu.Game.Screens.Select
                     Child = new Container
                     {
                         Masking = true,
-                        CornerRadius = SongSelect.WEDGE_CORNER_RADIUS,
+                        CornerRadius = WEDGE_CORNER_RADIUS,
                         RelativeSizeAxes = Axes.Both,
                         Children = new Drawable[]
                         {
                             // TODO: New wedge design uses a coloured horizontal gradient for its background, however this lacks implementation information in the figma draft.
                             // pending https://www.figma.com/file/DXKwqZhD5yyb1igc3mKo1P?node-id=2980:3361#340801912 being answered.
-                            new BeatmapInfoWedgeBackground(beatmap.Value) { Shear = -SongSelect.WEDGED_CONTAINER_SHEAR },
-                            Info = new WedgeInfoText(beatmap.Value) { Shear = -SongSelect.WEDGED_CONTAINER_SHEAR }
+                            new BeatmapInfoWedgeBackground(beatmap.Value) { Shear = -WEDGED_CONTAINER_SHEAR },
+                            Info = new WedgeInfoText(beatmap.Value) { Shear = -WEDGED_CONTAINER_SHEAR }
                         }
                     }
                 }, d =>
