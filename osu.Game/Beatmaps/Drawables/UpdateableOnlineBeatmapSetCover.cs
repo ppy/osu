@@ -27,6 +27,12 @@ namespace osu.Game.Beatmaps.Drawables
             set => base.Masking = value;
         }
 
+        public new float CornerRadius
+        {
+            get => base.CornerRadius;
+            set => base.CornerRadius = value;
+        }
+
         protected override double LoadDelay { get; }
 
         private readonly double timeBeforeUnload;

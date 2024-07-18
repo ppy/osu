@@ -42,7 +42,9 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                 new UpdateableOnlineBeatmapSetCover(BeatmapSetCoverType.List)
                 {
                     RelativeSizeAxes = Axes.Both,
-                    OnlineInfo = onlineInfo
+                    OnlineInfo = onlineInfo,
+                    Masking = Masking,
+                    CornerRadius = CornerRadius,
                 },
                 background = new Box
                 {
