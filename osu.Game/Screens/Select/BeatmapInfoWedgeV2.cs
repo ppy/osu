@@ -155,6 +155,12 @@ namespace osu.Game.Screens.Select
                     },
                     new InfoWedgeBackground
                     {
+                        Padding = new MarginPadding
+                        {
+                            Top = 10,
+                            Left = -WEDGE_CORNER_RADIUS,
+                            Right = SHEAR_WIDTH + COLOUR_BAR_WIDTH
+                        },
                         Child = new BasicBeatmapInfoContent
                         {
                             Padding = new MarginPadding
@@ -167,6 +173,12 @@ namespace osu.Game.Screens.Select
                     },
                     new InfoWedgeBackground
                     {
+                        Padding = new MarginPadding
+                        {
+                            Top = 5,
+                            Left = -WEDGE_CORNER_RADIUS,
+                            Right = SHEAR_WIDTH + COLOUR_BAR_WIDTH + 8f,
+                        },
                         Child = new ExtendedBeatmapInfoContent
                         {
                             Padding = new MarginPadding
