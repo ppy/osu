@@ -149,7 +149,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             }
 
             // Apply antirake nerf
-            double totalAntiRakeMultiplier = calculateTotalRakeNerf(attributes, deviation);
+            double totalAntiRakeMultiplier = calculateTotalRakeNerf(attributes);
             aimValue *= totalAntiRakeMultiplier;
 
             // Scale the aim value with adjusted deviation
@@ -194,10 +194,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 speedValue *= 1.0 + 0.04 * (12.0 - attributes.ApproachRate);
             }
 
-            // Apply antirake nerf, while taking the bigger nerf between speed nerf and total nerf
-            double speedAntiRakeMultiplier = calculateSpeedRakeNerf(attributes, speedDeviation);
-            double totalAntiRakeMultiplier = calculateTotalRakeNerf(attributes, deviation);
-            speedAntiRakeMultiplier = Math.Min(speedAntiRakeMultiplier, totalAntiRakeMultiplier);
+            // Apply antirake nerf
+            double speedAntiRakeMultiplier = calculateSpeedRakeNerf(attributes);
             speedValue *= speedAntiRakeMultiplier;
 
             // Scale the speed value with adjusted speed deviation
@@ -262,7 +260,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                                (totalHits > 200 ? 0.2 * Math.Min(1.0, (totalHits - 200) / 200.0) : 0.0);
 
             // Apply antirake nerf
-            double totalAntiRakeMultiplier = calculateTotalRakeNerf(attributes, deviation);
+            double totalAntiRakeMultiplier = calculateTotalRakeNerf(attributes);
             flashlightValue *= totalAntiRakeMultiplier;
 
             // Scale the flashlight value with adjusted deviation
@@ -401,13 +399,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         // Calculates multiplier for speed accounting for rake based on the deviation and speed difficulty
         // https://www.desmos.com/calculator/puc1mzdtfv
-        private double calculateSpeedRakeNerf(OsuDifficultyAttributes attributes, double rawSpeedDeviation)
+        private double calculateSpeedRakeNerf(OsuDifficultyAttributes attributes)
         {
             // Base speed value
             double speedValue = 4 * Math.Pow(attributes.SpeedDifficulty, 3);
 
             // Starting from this pp amount - penalty will be applied
-            double abusePoint = 100 + 260 * Math.Pow(20 / rawSpeedDeviation, 5.8);
+            double abusePoint = 100 + 260 * Math.Pow(20 / speedDeviation, 5.8);
 
             if (speedValue <= abusePoint)
                 return 1.0;
@@ -416,14 +414,16 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             const double scale = 50;
             double adjustedSpeedValue = scale * (Math.Log((speedValue - abusePoint) / scale + 1) + abusePoint / scale);
 
-            return adjustedSpeedValue / speedValue;
+            double speedRakeNerf = adjustedSpeedValue / speedValue;
+
+            return Math.Min(speedRakeNerf, calculateTotalRakeNerf(attributes));
         }
 
         // Calculates multiplier for total pp accounting for rake based on the deviation and sliderless aim and speed difficulty
-        private double calculateTotalRakeNerf(OsuDifficultyAttributes attributes, double deviation)
+        private double calculateTotalRakeNerf(OsuDifficultyAttributes attributes)
         {
             // Use adjusted deviation to not nerf EZHT aim maps
-            deviation *= calculateDeviationArAdjust(attributes.ApproachRate);
+            double adjustedDeviation = deviation * calculateDeviationArAdjust(attributes.ApproachRate);
 
             // Base values
             double aimNoSlidersValue = 4 * Math.Pow(attributes.AimDifficulty * attributes.SliderFactor, 3);
@@ -431,7 +431,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double totalValue = Math.Pow(Math.Pow(aimNoSlidersValue, 1.1) + Math.Pow(speedValue, 1.1), 1 / 1.1);
 
             // Starting from this pp amount - penalty will be applied
-            double abusePoint = 200 + 600 * Math.Pow(20 / deviation, 4.2);
+            double abusePoint = 200 + 600 * Math.Pow(20 / adjustedDeviation, 4.2);
 
             if (totalValue <= abusePoint)
                 return 1.0;
