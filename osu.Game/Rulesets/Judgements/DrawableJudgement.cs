@@ -24,8 +24,6 @@ namespace osu.Game.Rulesets.Judgements
 
         public JudgementResult? Result { get; private set; }
 
-        public DrawableHitObject? JudgedObject { get; private set; }
-
         public HitObject? JudgedHitObject { get; private set; }
 
         public override bool RemoveCompletedTransforms => false;
@@ -97,10 +95,9 @@ namespace osu.Game.Rulesets.Judgements
         /// </summary>
         /// <param name="result">The applicable judgement.</param>
         /// <param name="judgedObject">The drawable object.</param>
-        public void Apply(JudgementResult result, DrawableHitObject? judgedObject)
+        public virtual void Apply(JudgementResult result, DrawableHitObject? judgedObject)
         {
             Result = result;
-            JudgedObject = judgedObject;
             JudgedHitObject = judgedObject?.HitObject;
         }
 
@@ -108,7 +105,6 @@ namespace osu.Game.Rulesets.Judgements
         {
             base.FreeAfterUse();
 
-            JudgedObject = null;
             JudgedHitObject = null;
         }
 
