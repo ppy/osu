@@ -92,6 +92,7 @@ namespace osu.Game.Screens.Edit.Components.Menus
                 BackgroundColour = colourProvider.Background2;
                 ForegroundColourHover = colourProvider.Content1;
                 BackgroundColourHover = colourProvider.Background1;
+                Text.CheckboxContainer.Alpha = 0;
             }
 
             protected override void LoadComplete()
