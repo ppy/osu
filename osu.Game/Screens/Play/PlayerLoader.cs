@@ -18,6 +18,7 @@ using osu.Framework.Threading;
 using osu.Framework.Utils;
 using osu.Game.Audio;
 using osu.Game.Audio.Effects;
+using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
@@ -25,6 +26,7 @@ using osu.Game.Input;
 using osu.Game.Localisation;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
+using osu.Game.Performance;
 using osu.Game.Screens.Menu;
 using osu.Game.Screens.Play.PlayerSettings;
 using osu.Game.Skinning;
@@ -41,7 +43,7 @@ namespace osu.Game.Screens.Play
 
         protected const double CONTENT_OUT_DURATION = 300;
 
-        protected virtual double PlayerPushDelay => 1800;
+        protected virtual double PlayerPushDelay => 1800 + disclaimers.Count * 500;
 
         public override bool HideOverlaysOnEnter => hideOverlays;
 
@@ -70,6 +72,7 @@ namespace osu.Game.Screens.Play
 
         protected Task? DisposalTask { get; private set; }
 
+        private FillFlowContainer disclaimers = null!;
         private OsuScrollContainer settingsScroll = null!;
 
         private Bindable<bool> showStoryboards = null!;
@@ -107,10 +110,10 @@ namespace osu.Game.Screens.Play
             && ReadyForGameplay;
 
         protected virtual bool ReadyForGameplay =>
-            // not ready if the user is hovering one of the panes, unless they are idle.
-            (IsHovered || idleTracker.IsIdle.Value)
+            // not ready if the user is hovering one of the panes (logo is excluded), unless they are idle.
+            (IsHovered || osuLogo?.IsHovered == true || idleTracker.IsIdle.Value)
             // not ready if the user is dragging a slider or otherwise.
-            && inputManager.DraggedDrawable == null
+            && (inputManager.DraggedDrawable == null || inputManager.DraggedDrawable is OsuLogo)
             // not ready if a focused overlay is visible, like settings.
             && inputManager.FocusedDrawable == null;
 
@@ -136,9 +139,11 @@ namespace osu.Game.Screens.Play
 
         private ScheduledDelegate? scheduledPushPlayer;
 
-        private EpilepsyWarning? epilepsyWarning;
+        private PlayerLoaderDisclaimer? epilepsyWarning;
 
         private bool quickRestart;
+
+        private IDisposable? highPerformanceSession;
 
         [Resolved]
         private INotificationOverlay? notificationOverlay { get; set; }
@@ -151,6 +156,9 @@ namespace osu.Game.Screens.Play
 
         [Resolved]
         private BatteryInfo? batteryInfo { get; set; }
+
+        [Resolved]
+        private IHighPerformanceSessionManager? highPerformanceSessionManager { get; set; }
 
         public PlayerLoader(Func<Player> createPlayer)
         {
@@ -182,6 +190,18 @@ namespace osu.Game.Screens.Play
                         Origin = Anchor.Centre,
                     },
                 }),
+                disclaimers = new FillFlowContainer
+                {
+                    Anchor = Anchor.TopLeft,
+                    Origin = Anchor.TopLeft,
+                    Width = SettingsToolboxGroup.CONTAINER_WIDTH + padding * 2,
+                    AutoSizeAxes = Axes.Y,
+                    AutoSizeDuration = 250,
+                    AutoSizeEasing = Easing.OutQuint,
+                    Direction = FillDirection.Vertical,
+                    Padding = new MarginPadding(padding),
+                    Spacing = new Vector2(20),
+                },
                 settingsScroll = new OsuScrollContainer
                 {
                     Anchor = Anchor.TopRight,
@@ -210,11 +230,18 @@ namespace osu.Game.Screens.Play
 
             if (Beatmap.Value.BeatmapInfo.EpilepsyWarning)
             {
-                AddInternal(epilepsyWarning = new EpilepsyWarning
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                });
+                disclaimers.Add(epilepsyWarning = new PlayerLoaderDisclaimer(PlayerLoaderStrings.EpilepsyWarningTitle, PlayerLoaderStrings.EpilepsyWarningContent));
+            }
+
+            switch (Beatmap.Value.BeatmapInfo.Status)
+            {
+                case BeatmapOnlineStatus.Loved:
+                    disclaimers.Add(new PlayerLoaderDisclaimer(PlayerLoaderStrings.LovedBeatmapDisclaimerTitle, PlayerLoaderStrings.LovedBeatmapDisclaimerContent));
+                    break;
+
+                case BeatmapOnlineStatus.Qualified:
+                    disclaimers.Add(new PlayerLoaderDisclaimer(PlayerLoaderStrings.QualifiedBeatmapDisclaimerTitle, PlayerLoaderStrings.QualifiedBeatmapDisclaimerContent));
+                    break;
             }
         }
 
@@ -222,7 +249,10 @@ namespace osu.Game.Screens.Play
         {
             base.LoadComplete();
 
-            inputManager = GetContainingInputManager();
+            inputManager = GetContainingInputManager()!;
+
+            showStoryboards.BindValueChanged(val => epilepsyWarning?.FadeTo(val.NewValue ? 1 : 0, 250, Easing.OutQuint), true);
+            epilepsyWarning?.FinishTransforms(true);
         }
 
         #region Screen handling
@@ -231,22 +261,18 @@ namespace osu.Game.Screens.Play
         {
             base.OnEntering(e);
 
-            ApplyToBackground(b =>
-            {
-                if (epilepsyWarning != null)
-                    epilepsyWarning.DimmableBackground = b;
-            });
-
             Beatmap.Value.Track.AddAdjustment(AdjustableProperty.Volume, volumeAdjustment);
 
-            // Start off-screen.
+            // Start side content off-screen.
+            disclaimers.MoveToX(-disclaimers.DrawWidth);
             settingsScroll.MoveToX(settingsScroll.DrawWidth);
 
             content.ScaleTo(0.7f);
 
-            contentIn();
+            const double metadata_delay = 500;
 
-            MetadataInfo.Delay(750).FadeIn(500, Easing.OutQuint);
+            MetadataInfo.Delay(metadata_delay).FadeIn(500, Easing.OutQuint);
+            contentIn(metadata_delay + 250);
 
             // after an initial delay, start the debounced load check.
             // this will continue to execute even after resuming back on restart.
@@ -261,6 +287,9 @@ namespace osu.Game.Screens.Play
             base.OnResuming(e);
 
             Debug.Assert(CurrentPlayer != null);
+
+            highPerformanceSession?.Dispose();
+            highPerformanceSession = null;
 
             // prepare for a retry.
             CurrentPlayer = null;
@@ -292,9 +321,6 @@ namespace osu.Game.Screens.Play
             cancelLoad();
             ContentOut();
 
-            // If the load sequence was interrupted, the epilepsy warning may already be displayed (or in the process of being displayed).
-            epilepsyWarning?.Hide();
-
             // Ensure the screen doesn't expire until all the outwards fade operations have completed.
             this.Delay(CONTENT_OUT_DURATION).FadeOut();
 
@@ -303,12 +329,19 @@ namespace osu.Game.Screens.Play
             BackgroundBrightnessReduction = false;
             Beatmap.Value.Track.RemoveAdjustment(AdjustableProperty.Volume, volumeAdjustment);
 
+            highPerformanceSession?.Dispose();
+            highPerformanceSession = null;
+
             return base.OnExiting(e);
         }
+
+        private OsuLogo? osuLogo;
 
         protected override void LogoArriving(OsuLogo logo, bool resuming)
         {
             base.LogoArriving(logo, resuming);
+
+            osuLogo = logo;
 
             const double duration = 300;
 
@@ -321,13 +354,14 @@ namespace osu.Game.Screens.Play
             {
                 if (this.IsCurrentScreen())
                     content.StartTracking(logo, resuming ? 0 : 500, Easing.InOutExpo);
-            }, resuming ? 0 : 500);
+            }, resuming ? 0 : 250);
         }
 
         protected override void LogoExiting(OsuLogo logo)
         {
             base.LogoExiting(logo);
             content.StopTracking();
+            osuLogo = null;
         }
 
         protected override void LogoSuspending(OsuLogo logo)
@@ -338,6 +372,8 @@ namespace osu.Game.Screens.Play
             logo
                 .FadeOut(CONTENT_OUT_DURATION / 2, Easing.OutQuint)
                 .ScaleTo(logo.Scale * 0.8f, CONTENT_OUT_DURATION * 2, Easing.OutQuint);
+
+            osuLogo = null;
         }
 
         #endregion
@@ -414,15 +450,21 @@ namespace osu.Game.Screens.Play
             this.MakeCurrent();
         }
 
-        private void contentIn()
+        private void contentIn(double delayBeforeSideDisplays = 0)
         {
             MetadataInfo.Loading = true;
 
             content.FadeInFromZero(500, Easing.OutQuint);
             content.ScaleTo(1, 650, Easing.OutQuint).Then().Schedule(prepareNewPlayer);
 
-            settingsScroll.FadeInFromZero(500, Easing.Out)
-                          .MoveToX(0, 500, Easing.OutQuint);
+            using (BeginDelayedSequence(delayBeforeSideDisplays))
+            {
+                settingsScroll.FadeInFromZero(500, Easing.Out)
+                              .MoveToX(0, 500, Easing.OutQuint);
+
+                disclaimers.FadeInFromZero(500, Easing.Out)
+                           .MoveToX(0, 500, Easing.OutQuint);
+            }
 
             AddRangeInternal(new[]
             {
@@ -454,6 +496,8 @@ namespace osu.Game.Screens.Play
                        lowPassFilter = null;
                    });
 
+            disclaimers.FadeOut(CONTENT_OUT_DURATION, Easing.Out)
+                       .MoveToX(-disclaimers.DrawWidth, CONTENT_OUT_DURATION * 2, Easing.OutQuint);
             settingsScroll.FadeOut(CONTENT_OUT_DURATION, Easing.OutQuint)
                           .MoveToX(settingsScroll.DrawWidth, CONTENT_OUT_DURATION * 2, Easing.OutQuint);
 
@@ -478,6 +522,10 @@ namespace osu.Game.Screens.Play
             if (scheduledPushPlayer != null)
                 return;
 
+            // Now that everything's been loaded, we can safely switch to a higher performance session without incurring too much overhead.
+            // Doing this prior to the game being pushed gives us a bit of time to stabilise into the high performance mode before gameplay starts.
+            highPerformanceSession ??= highPerformanceSessionManager?.BeginSession();
+
             scheduledPushPlayer = Scheduler.AddDelayed(() =>
             {
                 // ensure that once we have reached this "point of no return", readyForPush will be false for all future checks (until a new player instance is prepared).
@@ -487,33 +535,8 @@ namespace osu.Game.Screens.Play
 
                 TransformSequence<PlayerLoader> pushSequence = this.Delay(0);
 
-                // only show if the warning was created (i.e. the beatmap needs it)
-                // and this is not a restart of the map (the warning expires after first load).
-                //
-                // note the late check of storyboard enable as the user may have just changed it
-                // from the settings on the loader screen.
-                if (epilepsyWarning?.IsAlive == true && showStoryboards.Value)
-                {
-                    const double epilepsy_display_length = 3000;
-
-                    pushSequence
-                        .Delay(CONTENT_OUT_DURATION)
-                        .Schedule(() => epilepsyWarning.State.Value = Visibility.Visible)
-                        .TransformBindableTo(volumeAdjustment, 0.25, EpilepsyWarning.FADE_DURATION, Easing.OutQuint)
-                        .Delay(epilepsy_display_length)
-                        .Schedule(() =>
-                        {
-                            epilepsyWarning.Hide();
-                            epilepsyWarning.Expire();
-                        })
-                        .Delay(EpilepsyWarning.FADE_DURATION);
-                }
-                else
-                {
-                    // This goes hand-in-hand with the restoration of low pass filter in contentOut().
-                    this.TransformBindableTo(volumeAdjustment, 0, CONTENT_OUT_DURATION, Easing.OutCubic);
-                    epilepsyWarning?.Expire();
-                }
+                // This goes hand-in-hand with the restoration of low pass filter in contentOut().
+                this.TransformBindableTo(volumeAdjustment, 0, CONTENT_OUT_DURATION, Easing.OutCubic);
 
                 pushSequence.Schedule(() =>
                 {

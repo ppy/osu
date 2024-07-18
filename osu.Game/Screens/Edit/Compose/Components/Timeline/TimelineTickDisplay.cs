@@ -9,6 +9,7 @@ using osu.Framework.Caching;
 using osu.Framework.Graphics;
 using osu.Framework.Logging;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Screens.Edit.Components.Timelines.Summary.Parts;
 using osu.Game.Screens.Edit.Components.Timelines.Summary.Visualisations;
@@ -18,6 +19,9 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 {
     public partial class TimelineTickDisplay : TimelinePart<PointVisualisation>
     {
+        // With current implementation every tick in the sub-tree should be visible, no need to check whether they are masked away.
+        public override bool UpdateSubTreeMasking() => false;
+
         [Resolved]
         private EditorBeatmap beatmap { get; set; } = null!;
 
@@ -38,16 +42,21 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             RelativeSizeAxes = Axes.Both;
         }
 
+        private readonly BindableBool showTimingChanges = new BindableBool(true);
+
         private readonly Cached tickCache = new Cached();
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OsuConfigManager configManager)
         {
             beatDivisor.BindValueChanged(_ => invalidateTicks());
 
             if (changeHandler != null)
                 // currently this is the best way to handle any kind of timing changes.
                 changeHandler.OnStateChange += invalidateTicks;
+
+            configManager.BindWith(OsuSetting.EditorTimelineShowTimingChanges, showTimingChanges);
+            showTimingChanges.BindValueChanged(_ => invalidateTicks());
         }
 
         private void invalidateTicks()
@@ -138,8 +147,13 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
                         var line = getNextUsableLine();
                         line.X = xPos;
-                        line.Width = PointVisualisation.MAX_WIDTH * size.X;
-                        line.Height = 0.9f * size.Y;
+
+                        line.Anchor = Anchor.CentreLeft;
+                        line.Origin = Anchor.Centre;
+
+                        line.Height = 0.6f + size.Y * 0.4f;
+                        line.Width = PointVisualisation.MAX_WIDTH * (0.6f + 0.4f * size.X);
+
                         line.Colour = colour;
                     }
 
@@ -165,7 +179,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
             // save a few drawables beyond the currently used for edge cases.
             while (drawableIndex < Math.Min(usedDrawables + 16, Count))
-                Children[drawableIndex++].Hide();
+                Children[drawableIndex++].Alpha = 0;
 
             // expire any excess
             while (drawableIndex < Count)
@@ -177,12 +191,12 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             {
                 PointVisualisation point;
                 if (drawableIndex >= Count)
-                    Add(point = new PointVisualisation());
+                    Add(point = new PointVisualisation(0));
                 else
                     point = Children[drawableIndex];
 
                 drawableIndex++;
-                point.Show();
+                point.Alpha = 1;
 
                 return point;
             }
