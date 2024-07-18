@@ -50,35 +50,73 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             });
         }
 
-        [SetUp]
-        public void Setup() => Schedule(() =>
+        [Test]
+        public void TestSheared()
         {
-            Children = new Drawable[]
+            AddStep("create content", () =>
             {
-                fillFlow = new FillFlowContainer
+                Children = new Drawable[]
                 {
-                    Width = relativeWidth,
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
-                    Spacing = new Vector2(0f, 2f),
-                    Shear = new Vector2(OsuGame.SHEAR, 0)
-                },
-                drawWidthText = new OsuSpriteText(),
-            };
+                    fillFlow = new FillFlowContainer
+                    {
+                        Width = relativeWidth,
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        RelativeSizeAxes = Axes.X,
+                        AutoSizeAxes = Axes.Y,
+                        Spacing = new Vector2(0f, 2f),
+                        Shear = new Vector2(OsuGame.SHEAR, 0)
+                    },
+                    drawWidthText = new OsuSpriteText(),
+                };
 
-            foreach (var scoreInfo in getTestScores())
+                foreach (var scoreInfo in getTestScores())
+                {
+                    fillFlow.Add(new LeaderboardScoreV2(scoreInfo)
+                    {
+                        Rank = scoreInfo.Position,
+                        IsPersonalBest = scoreInfo.User.Id == 2,
+                        Shear = Vector2.Zero,
+                    });
+                }
+
+                foreach (var score in fillFlow.Children)
+                    score.Show();
+            });
+        }
+
+        [Test]
+        public void TestNonSheared()
+        {
+            AddStep("create content", () =>
             {
-                fillFlow.Add(new LeaderboardScoreV2(scoreInfo, scoreInfo.Position, scoreInfo.User.Id == 2)
+                Children = new Drawable[]
                 {
-                    Shear = Vector2.Zero,
-                });
-            }
+                    fillFlow = new FillFlowContainer
+                    {
+                        Width = relativeWidth,
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        RelativeSizeAxes = Axes.X,
+                        AutoSizeAxes = Axes.Y,
+                        Spacing = new Vector2(0f, 2f),
+                    },
+                    drawWidthText = new OsuSpriteText(),
+                };
 
-            foreach (var score in fillFlow.Children)
-                score.Show();
-        });
+                foreach (var scoreInfo in getTestScores())
+                {
+                    fillFlow.Add(new LeaderboardScoreV2(scoreInfo)
+                    {
+                        Rank = scoreInfo.Position,
+                        IsPersonalBest = scoreInfo.User.Id == 2,
+                    });
+                }
+
+                foreach (var score in fillFlow.Children)
+                    score.Show();
+            });
+        }
 
         [SetUpSteps]
         public void SetUpSteps()

@@ -25,6 +25,8 @@ namespace osu.Game.Screens.SelectV2
     /// </summary>
     public partial class SongSelectV2 : ScreenWithBeatmapBackground
     {
+        private const float logo_scale = 0.4f;
+
         private readonly ModSelectOverlay modSelectOverlay = new SoloModSelectOverlay();
 
         [Cached]
@@ -41,6 +43,9 @@ namespace osu.Game.Screens.SelectV2
         private BeatmapInfoWedgeV2 wedge = null!;
 
         public override bool ShowFooter => true;
+
+        [Resolved]
+        private OsuLogo? logo { get; set; }
 
         [BackgroundDependencyLoader]
         private void load()
@@ -90,11 +95,24 @@ namespace osu.Game.Screens.SelectV2
             new ScreenFooterButtonOptions(),
         };
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            modSelectOverlay.State.BindValueChanged(v =>
+            {
+                logo?.ScaleTo(v.NewValue == Visibility.Visible ? 0f : logo_scale, 400, Easing.OutQuint)
+                    .FadeTo(v.NewValue == Visibility.Visible ? 0f : 1f, 200, Easing.OutQuint);
+            }, true);
+        }
+
         public override void OnEntering(ScreenTransitionEvent e)
         {
             this.FadeIn();
 
             wedge.Show();
+
+            modSelectOverlay.SelectedMods.BindTo(Mods);
 
             base.OnEntering(e);
         }
@@ -106,6 +124,10 @@ namespace osu.Game.Screens.SelectV2
             wedge.Show();
             beatmapChanged();
 
+            // required due to https://github.com/ppy/osu-framework/issues/3218
+            modSelectOverlay.SelectedMods.Disabled = false;
+            modSelectOverlay.SelectedMods.BindTo(Mods);
+
             base.OnResuming(e);
         }
 
@@ -114,6 +136,9 @@ namespace osu.Game.Screens.SelectV2
             wedge.Hide();
 
             this.Delay(400).FadeOut();
+
+            modSelectOverlay.SelectedMods.UnbindFrom(Mods);
+
             base.OnSuspending(e);
         }
 
@@ -123,17 +148,6 @@ namespace osu.Game.Screens.SelectV2
 
             this.Delay(400).FadeOut();
             return base.OnExiting(e);
-        }
-
-        public override bool OnBackButton()
-        {
-            if (modSelectOverlay.State.Value == Visibility.Visible)
-            {
-                modSelectOverlay.Hide();
-                return true;
-            }
-
-            return false;
         }
 
         protected override void LogoArriving(OsuLogo logo, bool resuming)
@@ -150,7 +164,7 @@ namespace osu.Game.Screens.SelectV2
             }
 
             logo.FadeIn(240, Easing.OutQuint);
-            logo.ScaleTo(0.4f, 240, Easing.OutQuint);
+            logo.ScaleTo(logo_scale, 240, Easing.OutQuint);
 
             logo.Action = () =>
             {
@@ -173,14 +187,9 @@ namespace osu.Game.Screens.SelectV2
             logo.FadeOut(120, Easing.Out);
         }
 
-        private partial class SoloModSelectOverlay : ModSelectOverlay
+        private partial class SoloModSelectOverlay : UserModSelectOverlay
         {
             protected override bool ShowPresets => true;
-
-            public SoloModSelectOverlay()
-                : base(OverlayColourScheme.Aquamarine)
-            {
-            }
         }
 
         private partial class PlayerLoaderV2 : PlayerLoader
