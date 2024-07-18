@@ -212,7 +212,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         private double computeAccuracyValue(ScoreInfo score, OsuDifficultyAttributes attributes)
         {
-            if (deviation == double.PositiveInfinity || score.Mods.Any(h => h is OsuModRelax) || deviation == double.PositiveInfinity)
+            if (score.Mods.Any(h => h is OsuModRelax) || deviation == double.PositiveInfinity)
                 return 0.0;
 
             int amountHitObjectsWithAccuracy = attributes.HitCircleCount;
