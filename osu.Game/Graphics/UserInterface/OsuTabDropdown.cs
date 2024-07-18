@@ -123,7 +123,7 @@ namespace osu.Game.Graphics.UserInterface
                     }
                 };
 
-                Padding = new MarginPadding { Left = 5, Right = 5 };
+                Margin = new MarginPadding { Left = 5, Right = 5 };
             }
 
             protected override bool OnHover(HoverEvent e)
