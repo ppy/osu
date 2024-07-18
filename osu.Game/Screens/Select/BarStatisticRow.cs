@@ -11,7 +11,6 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
-using osu.Game.Rulesets.Mods;
 using osuTK.Graphics;
 
 namespace osu.Game.Screens.Select
@@ -73,15 +72,13 @@ namespace osu.Game.Screens.Select
                 {
                     bar.Alpha = 0.75f;
                     modBar.Alpha = 0.5f;
-                    modBar.AccentColour = valueText.Colour = colours.ForModType(ModType.DifficultyIncrease);
+                    modBar.AccentColour = valueText.Colour = colours.Red1;
                 }
                 else if (value.adjustedValue < value.baseValue)
                 {
                     bar.Alpha = 0.25f;
                     modBar.Alpha = 1;
-
-                    // can't be `colours.ForModType(ModType.DifficultyReduction)` as it's green and the unchanged bar colour also is another green by default (i.e. with `OverlayColourScheme.Aquamarine`)...
-                    modBar.AccentColour = valueText.Colour = colours.BlueDark;
+                    modBar.AccentColour = valueText.Colour = colours.Blue1;
                 }
             }
         }
