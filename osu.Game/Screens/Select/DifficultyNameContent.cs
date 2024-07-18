@@ -24,9 +24,6 @@ namespace osu.Game.Screens.Select
         [Resolved]
         private IBindable<IBeatmapInfo?> beatmapInfo { get; set; } = null!;
 
-        [Resolved]
-        private IBindable<IBeatmapSetInfo?> beatmapSetInfo { get; set; } = null!;
-
         public DifficultyNameContent()
         {
             RelativeSizeAxes = Axes.X;
@@ -71,8 +68,6 @@ namespace osu.Game.Screens.Select
                 difficultyName.Text = b.NewValue?.DifficultyName ?? string.Empty;
                 updateMapper();
             }, true);
-
-            beatmapSetInfo.BindValueChanged(_ => updateMapper());
         }
 
         private void updateMapper()
@@ -87,7 +82,7 @@ namespace osu.Game.Screens.Select
                     break;
 
                 case APIBeatmap apiBeatmap:
-                    var beatmapSet = (APIBeatmapSet?)beatmapSetInfo.Value;
+                    var beatmapSet = apiBeatmap.BeatmapSet;
 
                     APIUser? user = beatmapSet?.RelatedUsers?.SingleOrDefault(u => u.OnlineID == apiBeatmap.AuthorID);
 

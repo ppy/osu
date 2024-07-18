@@ -36,10 +36,6 @@ namespace osu.Game.Screens.SelectV2
         [Cached(typeof(IBindable<IBeatmapInfo>))]
         private readonly Bindable<IBeatmapInfo> beatmapInfo = new Bindable<IBeatmapInfo>();
 
-        // todo: temporary
-        [Cached(typeof(IBindable<IBeatmapSetInfo>))]
-        private readonly Bindable<IBeatmapSetInfo> beatmapSetInfo = new Bindable<IBeatmapSetInfo>();
-
         private BeatmapInfoWedgeV2 wedge = null!;
 
         public override bool ShowFooter => true;
@@ -91,7 +87,6 @@ namespace osu.Game.Screens.SelectV2
             Schedule(() =>
             {
                 beatmapInfo.Value = Beatmap.Value.BeatmapInfo;
-                beatmapSetInfo.Value = Beatmap.Value.BeatmapSetInfo;
             });
         }
 

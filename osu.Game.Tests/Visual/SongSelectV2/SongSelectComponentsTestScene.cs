@@ -5,7 +5,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
-using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
 
 namespace osu.Game.Tests.Visual.SongSelectV2
@@ -21,12 +20,6 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         [Cached(typeof(IBindable<IBeatmapInfo?>))]
         protected readonly Bindable<IBeatmapInfo?> BeatmapInfo = new Bindable<IBeatmapInfo?>();
 
-        /// <summary>
-        /// The beatmap set. Can be local/online depending on the context.
-        /// </summary>
-        [Cached(typeof(IBindable<IBeatmapSetInfo?>))]
-        private readonly Bindable<IBeatmapSetInfo?> beatmapSetInfo = new Bindable<IBeatmapSetInfo?>();
-
         protected override void LoadComplete()
         {
             base.LoadComplete();
@@ -35,14 +28,6 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             Beatmap.BindValueChanged(b =>
             {
                 BeatmapInfo.Value = b.NewValue.BeatmapInfo;
-                beatmapSetInfo.Value = b.NewValue?.BeatmapSetInfo;
-            });
-
-            // mimics beatmap set overlay's `APIBeatmap` binding
-            // after selecting first beatmap from set response (done this way for simplicity)
-            BeatmapInfo.BindValueChanged(b =>
-            {
-                beatmapSetInfo.Value = b.NewValue?.BeatmapSet as APIBeatmapSet;
             });
         }
 
@@ -54,7 +39,6 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                 Beatmap.Value = Beatmap.Default;
                 SelectedMods.SetDefault();
                 BeatmapInfo.Value = null;
-                beatmapSetInfo.Value = null;
             });
         }
     }
