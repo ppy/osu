@@ -188,7 +188,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         private BarStatisticRow barAt(int index) => difficultySettingsContent.ChildrenOfType<BarStatisticRow>().ElementAt(index);
 
         private bool barIsWhiteAt(int index) => barAt(index).ChildrenOfType<Bar>().ElementAt(1).AccentColour == ColourProvider.Highlight1;
-        private bool modBarIsBlueAt(int index) => barAt(index).ChildrenOfType<Bar>().ElementAt(2).AccentColour == colours.BlueDark;
+        private bool modBarIsBlueAt(int index) => barAt(index).ChildrenOfType<Bar>().ElementAt(2).AccentColour == colours.Blue1;
         private bool modBarIsRedAt(int index) => barAt(index).ChildrenOfType<Bar>().ElementAt(2).AccentColour == colours.Red1;
     }
 }
