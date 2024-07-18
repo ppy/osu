@@ -25,8 +25,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         protected override int ReducedSectionCount => 5;
         protected override double DifficultyMultiplier => 1.04;
 
-        // Used to calculate acc punishment
-        private readonly List<double> objectStrains = new();
+        private readonly List<double> objectStrains = new List<double>();
 
         public Speed(Mod[] mods)
             : base(mods)
