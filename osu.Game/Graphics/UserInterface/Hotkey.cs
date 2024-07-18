@@ -13,9 +13,9 @@ namespace osu.Game.Graphics.UserInterface
 {
     public struct Hotkey
     {
-        public KeyCombination[]? KeyCombinations { get; }
-        public GlobalAction? GlobalAction { get; }
-        public PlatformAction? PlatformAction { get; }
+        public KeyCombination[]? KeyCombinations { get; init; }
+        public GlobalAction? GlobalAction { get; init; }
+        public PlatformAction? PlatformAction { get; init; }
 
         public Hotkey(params KeyCombination[] keyCombinations)
         {
@@ -34,20 +34,26 @@ namespace osu.Game.Graphics.UserInterface
 
         public IEnumerable<string> ResolveKeyCombination(ReadableKeyCombinationProvider keyCombinationProvider, RealmKeyBindingStore keyBindingStore, GameHost gameHost)
         {
+            var result = new List<string>();
+
             if (KeyCombinations != null)
-                return KeyCombinations.Select(keyCombinationProvider.GetReadableString);
+            {
+                result.AddRange(KeyCombinations.Select(keyCombinationProvider.GetReadableString));
+            }
 
             if (GlobalAction != null)
-                return keyBindingStore.GetReadableKeyCombinationsFor(GlobalAction.Value);
+            {
+                result.AddRange(keyBindingStore.GetReadableKeyCombinationsFor(GlobalAction.Value));
+            }
 
             if (PlatformAction != null)
             {
                 var action = PlatformAction.Value;
                 var bindings = gameHost.PlatformKeyBindings.Where(kb => (PlatformAction)kb.Action == action);
-                return bindings.Select(b => keyCombinationProvider.GetReadableString(b.KeyCombination));
+                result.AddRange(bindings.Select(b => keyCombinationProvider.GetReadableString(b.KeyCombination)));
             }
 
-            return Enumerable.Empty<string>();
+            return result;
         }
     }
 }
