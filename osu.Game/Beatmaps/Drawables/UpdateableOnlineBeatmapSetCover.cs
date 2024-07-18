@@ -62,8 +62,8 @@ namespace osu.Game.Beatmaps.Drawables
             return new OnlineBeatmapSetCover(model, coverType)
             {
                 RelativeSizeAxes = Axes.Both,
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
+                Anchor = Anchor.CentreRight,
+                Origin = Anchor.CentreRight,
                 FillMode = FillMode.Fill,
             };
         }
