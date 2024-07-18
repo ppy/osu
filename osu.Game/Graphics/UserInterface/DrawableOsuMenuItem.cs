@@ -124,7 +124,7 @@ namespace osu.Game.Graphics.UserInterface
         protected sealed override Drawable CreateContent() => text = CreateTextContainer();
         protected virtual TextContainer CreateTextContainer() => new TextContainer();
 
-        protected partial class TextContainer : Container, IHasText
+        protected partial class TextContainer : FillFlowContainer, IHasText
         {
             public LocalisableString Text
             {
@@ -145,25 +145,32 @@ namespace osu.Game.Graphics.UserInterface
                 Origin = Anchor.CentreLeft;
 
                 AutoSizeAxes = Axes.Both;
+                Spacing = new Vector2(10);
+                Direction = FillDirection.Horizontal;
 
-                Children = new Drawable[]
+                Child = new Container
                 {
-                    NormalText = new OsuSpriteText
+                    Anchor = Anchor.CentreLeft,
+                    Origin = Anchor.CentreLeft,
+                    AutoSizeAxes = Axes.Both,
+                    Margin = new MarginPadding { Horizontal = MARGIN_HORIZONTAL, Vertical = MARGIN_VERTICAL },
+                    Children = new Drawable[]
                     {
-                        AlwaysPresent = true, // ensures that the menu item does not change width when switching between normal and bold text.
-                        Anchor = Anchor.CentreLeft,
-                        Origin = Anchor.CentreLeft,
-                        Font = OsuFont.GetFont(size: text_size),
-                        Margin = new MarginPadding { Horizontal = MARGIN_HORIZONTAL, Vertical = MARGIN_VERTICAL },
-                    },
-                    BoldText = new OsuSpriteText
-                    {
-                        AlwaysPresent = true, // ensures that the menu item does not change width when switching between normal and bold text.
-                        Alpha = 0,
-                        Anchor = Anchor.CentreLeft,
-                        Origin = Anchor.CentreLeft,
-                        Font = OsuFont.GetFont(size: text_size, weight: FontWeight.Bold),
-                        Margin = new MarginPadding { Horizontal = MARGIN_HORIZONTAL, Vertical = MARGIN_VERTICAL },
+                        NormalText = new OsuSpriteText
+                        {
+                            AlwaysPresent = true, // ensures that the menu item does not change width when switching between normal and bold text.
+                            Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.CentreLeft,
+                            Font = OsuFont.GetFont(size: text_size),
+                        },
+                        BoldText = new OsuSpriteText
+                        {
+                            AlwaysPresent = true, // ensures that the menu item does not change width when switching between normal and bold text.
+                            Alpha = 0,
+                            Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.CentreLeft,
+                            Font = OsuFont.GetFont(size: text_size, weight: FontWeight.Bold),
+                        }
                     }
                 };
             }
