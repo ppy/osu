@@ -1212,6 +1212,20 @@ namespace osu.Game.Tests.Visual.SongSelect
         }
 
         [Test]
+        [Solo]
+        public void TestHardDeleteHandledCorrectly()
+        {
+            createSongSelect();
+
+            addRulesetImportStep(0);
+            AddAssert("3 matching shown", () => songSelect.ChildrenOfType<FilterControl>().Single().InformationalText == "3 matches");
+
+            AddStep("hard delete beatmap", () => Realm.Write(r => r.RemoveRange(r.All<BeatmapSetInfo>().Where(s => !s.Protected))));
+
+            AddUntilStep("0 matching shown", () => songSelect.ChildrenOfType<FilterControl>().Single().InformationalText == "0 matches");
+        }
+
+        [Test]
         public void TestDeleteHotkey()
         {
             createSongSelect();

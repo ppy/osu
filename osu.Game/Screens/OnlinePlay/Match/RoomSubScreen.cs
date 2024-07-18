@@ -80,6 +80,9 @@ namespace osu.Game.Screens.OnlinePlay.Match
         [Resolved(canBeNull: true)]
         protected OnlinePlayScreen ParentScreen { get; private set; }
 
+        [Resolved]
+        private PreviewTrackManager previewTrackManager { get; set; } = null!;
+
         [Cached]
         private readonly OnlinePlayBeatmapAvailabilityTracker beatmapAvailabilityTracker = new OnlinePlayBeatmapAvailabilityTracker();
 
@@ -453,7 +456,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
             // Retrieve the corresponding local beatmap, since we can't directly use the playlist's beatmap info
             var localBeatmap = beatmap == null ? null : beatmapManager.QueryBeatmap(b => b.OnlineID == beatmap.OnlineID);
 
-            UserModsSelectOverlay.Beatmap = Beatmap.Value = beatmapManager.GetWorkingBeatmap(localBeatmap);
+            UserModsSelectOverlay.Beatmap.Value = Beatmap.Value = beatmapManager.GetWorkingBeatmap(localBeatmap);
         }
 
         protected virtual void UpdateMods()
@@ -483,6 +486,8 @@ namespace osu.Game.Screens.OnlinePlay.Match
         {
             UserModsSelectOverlay.Hide();
             endHandlingTrack();
+
+            previewTrackManager.StopAnyPlaying(this);
         }
 
         private void endHandlingTrack()

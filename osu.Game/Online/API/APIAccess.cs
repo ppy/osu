@@ -164,6 +164,8 @@ namespace osu.Game.Online.API
 
         public string AccessToken => authentication.RequestAccessToken();
 
+        public Guid SessionIdentifier { get; } = Guid.NewGuid();
+
         /// <summary>
         /// Number of consecutive requests which failed due to network issues.
         /// </summary>

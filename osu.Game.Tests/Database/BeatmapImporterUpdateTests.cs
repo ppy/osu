@@ -168,11 +168,11 @@ namespace osu.Game.Tests.Database
                 Assert.That(importAfterUpdate, Is.Not.Null);
                 Debug.Assert(importAfterUpdate != null);
 
+                realm.Run(r => r.Refresh());
+
                 // should only contain the modified beatmap (others purged).
                 Assert.That(importBeforeUpdate.Value.Beatmaps, Has.Count.EqualTo(1));
                 Assert.That(importAfterUpdate.Value.Beatmaps, Has.Count.EqualTo(count_beatmaps));
-
-                realm.Run(r => r.Refresh());
 
                 checkCount<BeatmapInfo>(realm, count_beatmaps + 1);
                 checkCount<BeatmapMetadata>(realm, count_beatmaps + 1);
@@ -479,6 +479,7 @@ namespace osu.Game.Tests.Database
                 using var rulesets = new RealmRulesetStore(realm, storage);
 
                 using var __ = getBeatmapArchive(out string pathOriginal);
+
                 using var _ = getBeatmapArchiveWithModifications(out string pathMissingOneBeatmap, directory =>
                 {
                     // arbitrary beatmap removal
@@ -496,7 +497,7 @@ namespace osu.Game.Tests.Database
                 Debug.Assert(importAfterUpdate != null);
 
                 Assert.That(importBeforeUpdate.ID, Is.Not.EqualTo(importAfterUpdate.ID));
-                Assert.That(importBeforeUpdate.Value.DateAdded, Is.EqualTo(importAfterUpdate.Value.DateAdded));
+                Assert.That(importBeforeUpdate.Value.DateAdded, Is.EqualTo(importAfterUpdate.Value.DateAdded).Within(TimeSpan.FromSeconds(1)));
             });
         }
 

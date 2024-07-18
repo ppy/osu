@@ -5,6 +5,8 @@
 
 using System.Collections.Generic;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -112,8 +114,12 @@ namespace osu.Game.Overlays
 
             public Bindable<float?> LastScrollTarget = new Bindable<float?>();
 
+            protected override HoverSounds CreateHoverSounds(HoverSampleSet sampleSet) => new HoverSounds();
+
+            private Sample scrollToTopSample;
+            private Sample scrollToPreviousSample;
+
             public ScrollBackButton()
-                : base(HoverSampleSet.ScrollToTop)
             {
                 Size = new Vector2(50);
                 Alpha = 0;
@@ -150,11 +156,14 @@ namespace osu.Game.Overlays
             }
 
             [BackgroundDependencyLoader]
-            private void load(OverlayColourProvider colourProvider)
+            private void load(OverlayColourProvider colourProvider, AudioManager audio)
             {
                 IdleColour = colourProvider.Background6;
                 HoverColour = colourProvider.Background5;
                 flashColour = colourProvider.Light1;
+
+                scrollToTopSample = audio.Samples.Get(@"UI/scroll-to-top");
+                scrollToPreviousSample = audio.Samples.Get(@"UI/scroll-to-previous");
             }
 
             protected override void LoadComplete()
@@ -163,7 +172,7 @@ namespace osu.Game.Overlays
 
                 LastScrollTarget.BindValueChanged(target =>
                 {
-                    spriteIcon.RotateTo(target.NewValue != null ? 180 : 0, fade_duration, Easing.OutQuint);
+                    spriteIcon.ScaleTo(target.NewValue != null ? new Vector2(1f, -1f) : Vector2.One, fade_duration, Easing.OutQuint);
                     TooltipText = target.NewValue != null ? CommonStrings.ButtonsBackToPrevious : CommonStrings.ButtonsBackToTop;
                 }, true);
             }
@@ -171,6 +180,12 @@ namespace osu.Game.Overlays
             protected override bool OnClick(ClickEvent e)
             {
                 background.FlashColour(flashColour, 800, Easing.OutQuint);
+
+                if (LastScrollTarget.Value == null)
+                    scrollToTopSample?.Play();
+                else
+                    scrollToPreviousSample?.Play();
+
                 return base.OnClick(e);
             }
 

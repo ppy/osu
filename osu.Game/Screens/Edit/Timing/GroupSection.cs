@@ -51,7 +51,8 @@ namespace osu.Game.Screens.Edit.Timing
                     {
                         textBox = new LabelledTextBox
                         {
-                            Label = "Time"
+                            Label = "Time",
+                            SelectAllOnFocus = true,
                         },
                         button = new RoundedButton
                         {

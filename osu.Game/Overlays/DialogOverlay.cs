@@ -3,16 +3,16 @@
 
 #nullable disable
 
+using System;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Overlays.Dialog;
 using osu.Game.Graphics.Containers;
 using osu.Game.Input.Bindings;
 using System.Linq;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
-using osu.Framework.Audio;
 using osu.Framework.Input.Events;
-using osu.Game.Audio.Effects;
 
 namespace osu.Game.Overlays
 {
@@ -23,15 +23,16 @@ namespace osu.Game.Overlays
         protected override string PopInSampleName => "UI/dialog-pop-in";
         protected override string PopOutSampleName => "UI/dialog-pop-out";
 
-        private AudioFilter lowPassFilter;
+        [Resolved]
+        private MusicController musicController { get; set; }
 
         public PopupDialog CurrentDialog { get; private set; }
 
         public override bool IsPresent => Scheduler.HasPendingTasks
-                                          || dialogContainer.Children.Count > 0
-                                          // Safety for low pass filter potentially getting stuck in applied state due to
-                                          // transforms on `this` causing children to no longer be updated.
-                                          || lowPassFilter.IsAttached;
+                                          || dialogContainer.Children.Count > 0;
+
+        [CanBeNull]
+        private IDisposable duckOperation;
 
         public DialogOverlay()
         {
@@ -49,10 +50,10 @@ namespace osu.Game.Overlays
             Origin = Anchor.Centre;
         }
 
-        [BackgroundDependencyLoader]
-        private void load(AudioManager audio)
+        protected override void Dispose(bool isDisposing)
         {
-            AddInternal(lowPassFilter = new AudioFilter(audio.TrackMixer));
+            base.Dispose(isDisposing);
+            duckOperation?.Dispose();
         }
 
         public void Push(PopupDialog dialog)
@@ -105,13 +106,18 @@ namespace osu.Game.Overlays
 
         protected override void PopIn()
         {
-            lowPassFilter.CutoffTo(300, 100, Easing.OutCubic);
+            duckOperation = musicController?.Duck(new DuckParameters
+            {
+                DuckVolumeTo = 1,
+                DuckDuration = 100,
+                RestoreDuration = 100,
+            });
         }
 
         protected override void PopOut()
         {
             base.PopOut();
-            lowPassFilter.CutoffTo(AudioFilter.MAX_LOWPASS_CUTOFF, 100, Easing.InCubic);
+            duckOperation?.Dispose();
 
             // PopOut gets called initially, but we only want to hide dialog when we have been loaded and are present.
             if (IsLoaded && CurrentDialog?.State.Value == Visibility.Visible)

@@ -20,6 +20,7 @@ namespace osu.Game.Rulesets.Mania.Edit.Setup
         public override LocalisableString Title => EditorSetupStrings.DifficultyHeader;
 
         private LabelledSliderBar<float> keyCountSlider { get; set; } = null!;
+        private LabelledSwitchButton specialStyle { get; set; } = null!;
         private LabelledSliderBar<float> healthDrainSlider { get; set; } = null!;
         private LabelledSliderBar<float> overallDifficultySlider { get; set; } = null!;
         private LabelledSliderBar<double> baseVelocitySlider { get; set; } = null!;
@@ -48,6 +49,13 @@ namespace osu.Game.Rulesets.Mania.Edit.Setup
                         MaxValue = 10,
                         Precision = 1,
                     }
+                },
+                specialStyle = new LabelledSwitchButton
+                {
+                    Label = "Use special (N+1) style",
+                    FixedLabelWidth = LABEL_WIDTH,
+                    Description = "Changes one column to act as a classic \"scratch\" or \"special\" column, which can be moved around by the user's skin (to the left/right/centre). Generally used in 6K (5+1) or 8K (7+1) configurations.",
+                    Current = { Value = Beatmap.BeatmapInfo.SpecialStyle }
                 },
                 healthDrainSlider = new LabelledSliderBar<float>
                 {
@@ -145,6 +153,7 @@ namespace osu.Game.Rulesets.Mania.Edit.Setup
             // for now, update these on commit rather than making BeatmapMetadata bindables.
             // after switching database engines we can reconsider if switching to bindables is a good direction.
             Beatmap.Difficulty.CircleSize = keyCountSlider.Current.Value;
+            Beatmap.BeatmapInfo.SpecialStyle = specialStyle.Current.Value;
             Beatmap.Difficulty.DrainRate = healthDrainSlider.Current.Value;
             Beatmap.Difficulty.OverallDifficulty = overallDifficultySlider.Current.Value;
             Beatmap.Difficulty.SliderMultiplier = baseVelocitySlider.Current.Value;

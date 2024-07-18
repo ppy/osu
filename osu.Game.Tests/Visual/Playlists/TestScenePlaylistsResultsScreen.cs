@@ -413,7 +413,7 @@ namespace osu.Game.Tests.Visual.Playlists
             };
         }
 
-        private partial class TestResultsScreen : PlaylistsResultsScreen
+        private partial class TestResultsScreen : PlaylistItemUserResultsScreen
         {
             public new LoadingSpinner LeftSpinner => base.LeftSpinner;
             public new LoadingSpinner CentreSpinner => base.CentreSpinner;
