@@ -11,6 +11,7 @@ using osu.Framework.Caching;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Utils;
 using osu.Game.Audio;
@@ -593,8 +594,14 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                 changeHandler?.BeginChange();
                 addControlPoint(lastRightClickPosition);
                 changeHandler?.EndChange();
-            }),
-            new OsuMenuItem("Convert to stream", MenuItemType.Destructive, convertToStream),
+            })
+            {
+                Hotkey = new Hotkey(new KeyCombination(InputKey.Control, InputKey.MouseLeft))
+            },
+            new OsuMenuItem("Convert to stream", MenuItemType.Destructive, convertToStream)
+            {
+                Hotkey = new Hotkey(new KeyCombination(InputKey.Control, InputKey.Shift, InputKey.F))
+            },
         };
 
         // Always refer to the drawable object's slider body so subsequent movement deltas are calculated with updated positions.
