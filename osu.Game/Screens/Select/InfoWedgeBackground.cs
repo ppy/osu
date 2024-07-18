@@ -6,6 +6,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Overlays;
+using osuTK;
 
 namespace osu.Game.Screens.Select
 {
@@ -44,7 +45,7 @@ namespace osu.Game.Screens.Select
                     RelativeSizeAxes = Axes.Both,
                     Masking = true,
                     CornerRadius = BeatmapInfoWedgeV2.WEDGE_CORNER_RADIUS,
-                    Shear = BeatmapInfoWedgeV2.WEDGED_CONTAINER_SHEAR,
+                    Shear = new Vector2(OsuGame.SHEAR, 0),
                     Child = new Box
                     {
                         RelativeSizeAxes = Axes.Both,

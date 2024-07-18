@@ -25,10 +25,8 @@ namespace osu.Game.Screens.Select
     {
         public const float WEDGE_HEIGHT = 120;
         public const float WEDGE_CORNER_RADIUS = 10;
-        public const float SHEAR_WIDTH = shear_x * WEDGE_HEIGHT;
-        public static readonly Vector2 WEDGED_CONTAINER_SHEAR = new Vector2(shear_x, 0);
+        public const float SHEAR_WIDTH = OsuGame.SHEAR * WEDGE_HEIGHT;
 
-        private const float shear_x = 0.175f;
         private const float transition_duration = 250;
         public const float COLOUR_BAR_WIDTH = 30;
 
@@ -77,7 +75,7 @@ namespace osu.Game.Screens.Select
                     {
                         RelativeSizeAxes = Axes.X,
                         Height = WEDGE_HEIGHT,
-                        Shear = WEDGED_CONTAINER_SHEAR,
+                        Shear = new Vector2(OsuGame.SHEAR, 0),
                         Masking = true,
                         Padding = new MarginPadding { Left = -WEDGE_CORNER_RADIUS },
                         EdgeEffect = new EdgeEffectParameters
@@ -106,7 +104,7 @@ namespace osu.Game.Screens.Select
                             {
                                 // Applying the shear to this container and nesting the starCounter inside avoids
                                 // the deformation that occurs if the shear is applied to the starCounter whilst rotated
-                                Shear = -WEDGED_CONTAINER_SHEAR,
+                                Shear = -new Vector2(OsuGame.SHEAR, 0),
                                 X = -COLOUR_BAR_WIDTH / 2,
                                 Anchor = Anchor.CentreRight,
                                 Origin = Anchor.Centre,
@@ -114,7 +112,7 @@ namespace osu.Game.Screens.Select
                                 Width = COLOUR_BAR_WIDTH,
                                 Child = starCounter = new StarCounter
                                 {
-                                    Rotation = (float)(Math.Atan(shear_x) * (180 / Math.PI)),
+                                    Rotation = (float)(Math.Atan(OsuGame.SHEAR) * (180 / Math.PI)),
                                     Colour = Colour4.Transparent,
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
@@ -138,7 +136,7 @@ namespace osu.Game.Screens.Select
                                     {
                                         Anchor = Anchor.TopRight,
                                         Origin = Anchor.TopRight,
-                                        Shear = -WEDGED_CONTAINER_SHEAR,
+                                        Shear = -new Vector2(OsuGame.SHEAR, 0),
                                         Alpha = 0,
                                     },
                                     statusPill = new BeatmapSetOnlineStatusPill
@@ -146,7 +144,7 @@ namespace osu.Game.Screens.Select
                                         AutoSizeAxes = Axes.Both,
                                         Anchor = Anchor.TopRight,
                                         Origin = Anchor.TopRight,
-                                        Shear = -WEDGED_CONTAINER_SHEAR,
+                                        Shear = -new Vector2(OsuGame.SHEAR, 0),
                                         TextSize = 11,
                                         TextPadding = new MarginPadding { Horizontal = 8, Vertical = 2 },
                                         Alpha = 0,
@@ -253,8 +251,8 @@ namespace osu.Game.Screens.Select
                         {
                             // TODO: New wedge design uses a coloured horizontal gradient for its background, however this lacks implementation information in the figma draft.
                             // pending https://www.figma.com/file/DXKwqZhD5yyb1igc3mKo1P?node-id=2980:3361#340801912 being answered.
-                            new BeatmapInfoWedgeBackground(beatmap.Value) { Shear = -WEDGED_CONTAINER_SHEAR },
-                            Info = new WedgeInfoText(beatmap.Value) { Shear = -WEDGED_CONTAINER_SHEAR }
+                            new BeatmapInfoWedgeBackground(beatmap.Value) { Shear = -new Vector2(OsuGame.SHEAR, 0) },
+                            Info = new WedgeInfoText(beatmap.Value) { Shear = -new Vector2(OsuGame.SHEAR, 0) }
                         }
                     }
                 }, d =>
