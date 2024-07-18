@@ -291,8 +291,6 @@ namespace osu.Game.Screens.OnlinePlay
                         Anchor = Anchor.CentreLeft,
                         Origin = Anchor.CentreLeft,
                         Width = 60,
-                        Masking = true,
-                        CornerRadius = 10,
                         RelativeSizeAxes = Axes.Y,
                         Dimmed = { Value = IsHovered }
                     },
