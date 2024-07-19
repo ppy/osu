@@ -952,6 +952,8 @@ namespace osu.Game.Tests.Visual.Navigation
         [Test]
         public void TestTouchScreenDetectionAtSongSelect()
         {
+            AddUntilStep("wait for settings", () => Game.Settings.IsLoaded);
+
             AddStep("touch logo", () =>
             {
                 var button = Game.ChildrenOfType<OsuLogo>().Single();
