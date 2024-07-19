@@ -77,7 +77,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                     wideAngleBonus = calcWideAngleBonus(currAngle);
                     acuteAngleBonus = calcAcuteAngleBonus(currAngle);
 
-                    if (osuCurrObj.StrainTime > 100 || osuCurrObj.LazyJumpDistance < 50) // Only buff deltaTime exceeding 300 bpm 1/2 and spacing exceeding one radius (to ensure easily cheesable patterns aren't buffed)
+                    if (osuCurrObj.StrainTime > 100) // Only buff deltaTime exceeding 300 bpm 1/2
                         acuteAngleBonus = 0;
                     else
                     {
