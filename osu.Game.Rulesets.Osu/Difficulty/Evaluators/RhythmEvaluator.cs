@@ -32,7 +32,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 Deltas.Add(existingDelta == default ? delta : existingDelta);
             }
 
-            public double AverageDelta() => Math.Max(Deltas.Average(), OsuDifficultyHitObject.MIN_DELTA_TIME);
+            public double AverageDelta() => Deltas.Count > 0 ? Math.Max(Deltas.Average(), OsuDifficultyHitObject.MIN_DELTA_TIME) : 0;
+
+            public bool IsSimilarPolarity(Island other, double epsilon)
+            {
+                // consider islands to be of similar polarity only if they're having the same average delta (we don't want to consider 3 singletaps similar to a triple)
+                return Math.Abs(AverageDelta() - other.AverageDelta()) < epsilon &&
+                       Deltas.Count % 2 == other.Deltas.Count % 2;
+            }
 
             public override int GetHashCode()
             {
@@ -53,7 +60,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         }
 
         private const int history_time_max = 5 * 1000; // 5 seconds of calculatingRhythmBonus max.
-        private const double rhythm_multiplier = 1.14;
+        private const double rhythm_multiplier = 1.05;
         private const int max_island_size = 7;
 
         /// <summary>
@@ -61,8 +68,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         /// </summary>
         public static double EvaluateDifficultyOf(DifficultyHitObject current)
         {
-            Dictionary<Island, int> islandCounts = new Dictionary<Island, int>();
-
             if (current.BaseObject is Spinner)
                 return 0;
 
@@ -70,6 +75,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             var island = new Island();
             var previousIsland = new Island();
+            Dictionary<Island, int> islandCounts = new Dictionary<Island, int>();
 
             double startRatio = 0; // store the ratio of the current start of an island to buff for tighter rhythms
 
@@ -97,7 +103,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 double prevDelta = prevObj.StrainTime;
                 double lastDelta = lastObj.StrainTime;
 
-                double currRatio = 1.0 + 6.0 * Math.Min(0.5, Math.Pow(Math.Sin(Math.PI / (Math.Min(prevDelta, currDelta) / Math.Max(prevDelta, currDelta))), 2)); // fancy function to calculate rhythmbonuses.
+                double currRatio = 1.0 + 10.0 * Math.Min(0.5, Math.Pow(Math.Sin(Math.PI / (Math.Min(prevDelta, currDelta) / Math.Max(prevDelta, currDelta))), 2)); // fancy function to calculate rhythmbonuses.
 
                 double windowPenalty = Math.Min(1, Math.Max(0, Math.Abs(prevDelta - currDelta) - currObj.HitWindowGreat * 0.3) / (currObj.HitWindowGreat * 0.3));
 
@@ -125,23 +131,19 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                         if (prevObj.BaseObject is Slider) // bpm change was from a slider, this is easier typically than circle -> circle
                             effectiveRatio *= 0.25;
 
-                        if (previousIsland.Deltas.Count % 2 == island.Deltas.Count % 2) // repeated island polartiy (2 -> 4, 3 -> 5)
+                        if (island.IsSimilarPolarity(previousIsland, deltaDifferenceEpsilon)) // repeated island polartiy (2 -> 4, 3 -> 5)
                             effectiveRatio *= 0.50;
 
                         if (lastDelta > prevDelta + deltaDifferenceEpsilon && prevDelta > currDelta + deltaDifferenceEpsilon) // previous increase happened a note ago, 1/1->1/2-1/4, dont want to buff this.
                             effectiveRatio *= 0.125;
 
-                        if (islandCounts.ContainsKey(island))
+                        if (!islandCounts.TryAdd(island, 1))
                         {
                             islandCounts[island]++;
 
                             // repeated island (ex: triplet -> triplet)
-                            double power = Math.Max(0.75, logistic(island.AverageDelta(), 3, 0.15, 9));
-                            effectiveRatio *= Math.Pow(1.0 / islandCounts[island], power);
-                        }
-                        else
-                        {
-                            islandCounts.Add(island, 1);
+                            double power = logistic(island.AverageDelta(), 4, 0.165, 10);
+                            effectiveRatio *= Math.Min(1.0 / islandCounts[island], Math.Pow(1.0 / islandCounts[island], power));
                         }
 
                         rhythmComplexitySum += Math.Sqrt(effectiveRatio * startRatio) * currHistoricalDecay;
