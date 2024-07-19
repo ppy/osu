@@ -100,7 +100,7 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
                     Origin = Anchor.CentreLeft,
                     Height = 0.4f,
                     Depth = float.MaxValue,
-                    Colour = effect.GetRepresentingColour(colours),
+                    Colour = colours.Purple1,
                 });
             }
         }
