@@ -62,14 +62,22 @@ namespace osu.Game.Tests.Visual.Menus
             AddUntilStep("track restarted", () => Game.MusicController.CurrentTrack.CurrentTime < 5000);
 
             AddStep("press previous", () => globalActionContainer.TriggerPressed(GlobalAction.MusicPrev));
-            AddAssert("track changed to previous", () =>
+            AddUntilStep("track changed to previous", () =>
                 trackChangeQueue.Count == 1 &&
                 trackChangeQueue.Dequeue().changeDirection == TrackChangeDirection.Prev);
 
             AddStep("press next", () => globalActionContainer.TriggerPressed(GlobalAction.MusicNext));
-            AddAssert("track changed to next", () =>
+            AddUntilStep("track changed to next", () =>
                 trackChangeQueue.Count == 1 &&
-                trackChangeQueue.Dequeue().changeDirection == TrackChangeDirection.Next);
+                trackChangeQueue.Peek().changeDirection == TrackChangeDirection.Next);
+
+            AddUntilStep("wait until track switches", () => trackChangeQueue.Count == 2);
+
+            AddStep("press next", () => globalActionContainer.TriggerPressed(GlobalAction.MusicNext));
+            AddUntilStep("track changed to next", () =>
+                trackChangeQueue.Count == 3 &&
+                trackChangeQueue.Peek().changeDirection == TrackChangeDirection.Next);
+            AddAssert("track actually changed", () => !trackChangeQueue.First().working.BeatmapInfo.Equals(trackChangeQueue.Last().working.BeatmapInfo));
         }
     }
 }
