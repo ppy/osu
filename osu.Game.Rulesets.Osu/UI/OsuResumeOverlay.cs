@@ -116,7 +116,7 @@ namespace osu.Game.Rulesets.Osu.UI
 
                         scaleTransitionContainer.ScaleTo(2, TRANSITION_TIME, Easing.OutQuint);
 
-                        ResumeRequested?.Invoke();
+                        Schedule(() => ResumeRequested?.Invoke());
                         return true;
                 }
 
