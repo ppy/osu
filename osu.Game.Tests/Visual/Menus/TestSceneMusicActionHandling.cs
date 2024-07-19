@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
@@ -34,7 +32,7 @@ namespace osu.Game.Tests.Visual.Menus
         [Test]
         public void TestMusicNavigationActions()
         {
-            Queue<(IWorkingBeatmap working, TrackChangeDirection changeDirection)> trackChangeQueue = null;
+            Queue<(IWorkingBeatmap working, TrackChangeDirection changeDirection)> trackChangeQueue = null!;
 
             // ensure we have at least two beatmaps available to identify the direction the music controller navigated to.
             AddRepeatStep("import beatmap", () => Game.BeatmapManager.Import(TestResources.CreateTestBeatmapSetInfo()), 5);
