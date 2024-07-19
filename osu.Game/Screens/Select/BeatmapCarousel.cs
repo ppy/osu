@@ -278,13 +278,27 @@ namespace osu.Game.Screens.Select
 
             if (changes == null)
             {
+                // Usually we'd handle the initial load case here, but that's already done in load() as an optimisation.
+                // So the only thing we need to handle here is the edge case where realm blocks-resumes all operations.
                 realmBeatmapSets.Clear();
                 realmBeatmapSets.AddRange(sender.Select(r => r.ID));
 
+                // Do a full two-way check on missing beatmaps.
+                // Let's assume that the worst that can happen is deletions or additions.
                 setsRequiringRemoval.Clear();
                 setsRequiringUpdate.Clear();
 
-                loadBeatmapSets(sender);
+                foreach (Guid id in realmBeatmapSets)
+                {
+                    if (!root.BeatmapSetsByID.ContainsKey(id))
+                        setsRequiringUpdate.Add(id);
+                }
+
+                foreach (Guid id in root.BeatmapSetsByID.Keys)
+                {
+                    if (!realmBeatmapSets.Contains(id))
+                        setsRequiringRemoval.Add(id);
+                }
             }
             else
             {
