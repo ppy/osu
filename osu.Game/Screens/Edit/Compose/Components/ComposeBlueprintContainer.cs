@@ -3,6 +3,7 @@
 
 #nullable disable
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Humanizer;
@@ -67,6 +68,11 @@ namespace osu.Game.Screens.Edit.Compose.Components
             AddInternal(new DrawableRulesetDependenciesProvidingContainer(Composer.Ruleset)
             {
                 Child = placementBlueprintContainer
+            });
+
+            AddInternal(new PlacementBlueprintPositionUpdater
+            {
+                UpdatePosition = updatePlacementPosition,
             });
         }
 
@@ -294,6 +300,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         private void updatePlacementPosition()
         {
+            if (CurrentPlacement == null)
+                return;
+
             var snapResult = Composer.FindSnappedPositionAndTime(InputManager.CurrentState.Mouse.Position);
 
             // if no time was found from positional snapping, we should still quantize to the beat.
@@ -403,6 +412,30 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
                 // As per stable editor, when changing tools, we should forcefully commit any pending placement.
                 CommitIfPlacementActive();
+            }
+        }
+
+        /// <summary>
+        /// A component sitting at the front of the blueprint container ensuring that the current placement is updated with the latest snapped position before handling input.
+        /// </summary>
+        /// <remarks>
+        /// This is necessary for touch input to work with editor, as tapping on the compose area issues both a mouse-move and mouse-down event in a single frame,
+        /// therefore requiring <see cref="SnapResult"/> to be updated before the blueprint handles the mouse-down event to finalise a placement (or begin a placement in the slider case).
+        /// </remarks>
+        private partial class PlacementBlueprintPositionUpdater : Drawable
+        {
+            public Action UpdatePosition;
+
+            public PlacementBlueprintPositionUpdater()
+            {
+                RelativeSizeAxes = Axes.Both;
+                Depth = float.MinValue;
+            }
+
+            protected override bool OnMouseMove(MouseMoveEvent e)
+            {
+                UpdatePosition?.Invoke();
+                return false;
             }
         }
     }

@@ -16,7 +16,6 @@ using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
-using osu.Game.Tests.Visual;
 using osuTK.Input;
 
 namespace osu.Game.Rulesets.Mania.Tests.Editor
@@ -30,7 +29,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
 
             ResetPlacement();
 
-            ((ScrollingTestContainer)HitObjectContainer).Direction = ScrollingDirection.Down;
+            ScrollingInfo.Direction.Value = ScrollingDirection.Down;
         });
 
         [Test]

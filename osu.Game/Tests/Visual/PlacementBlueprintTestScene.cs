@@ -3,6 +3,7 @@
 
 #nullable disable
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -16,14 +17,25 @@ using osu.Game.Screens.Edit.Compose;
 
 namespace osu.Game.Tests.Visual
 {
-    public abstract partial class PlacementBlueprintTestScene : OsuManualInputManagerTestScene, IPlacementHandler
+    public abstract partial class PlacementBlueprintTestScene : OsuManualInputManagerTestScene
     {
+        private readonly TestPlacementHandler placementHandler;
+
         protected readonly Container HitObjectContainer;
-        protected PlacementBlueprint CurrentBlueprint { get; private set; }
+        protected PlacementBlueprint CurrentBlueprint => placementHandler.CurrentBlueprint;
 
         protected PlacementBlueprintTestScene()
         {
-            base.Content.Add(HitObjectContainer = CreateHitObjectContainer().With(c => c.Clock = new FramedClock(new StopwatchClock())));
+            // ensure the placement handler is added beneath the input manager layer, for correct input behaviour.
+            var contentContainer = CreateContentContainer();
+            contentContainer.Add(HitObjectContainer = new Container { Clock = new FramedClock(new StopwatchClock()) });
+
+            base.Content.Add(placementHandler = new TestPlacementHandler(contentContainer)
+            {
+                CreateBlueprint = CreateBlueprint,
+                SnapForBlueprint = SnapForBlueprint,
+                AddHitObject = h => AddHitObject(CreateHitObject(h)),
+            });
         }
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
@@ -53,59 +65,78 @@ namespace osu.Game.Tests.Visual
         protected override void LoadComplete()
         {
             base.LoadComplete();
-
             ResetPlacement();
         }
 
-        public void BeginPlacement(HitObject hitObject)
-        {
-        }
-
-        public void EndPlacement(HitObject hitObject, bool commit)
-        {
-            if (commit)
-                AddHitObject(CreateHitObject(hitObject));
-
-            ResetPlacement();
-        }
-
-        protected void ResetPlacement()
-        {
-            if (CurrentBlueprint != null)
-                Remove(CurrentBlueprint, true);
-            Add(CurrentBlueprint = CreateBlueprint());
-        }
-
-        public void Delete(HitObject hitObject)
-        {
-        }
-
-        protected override void Update()
-        {
-            base.Update();
-
-            CurrentBlueprint.UpdateTimeAndPosition(SnapForBlueprint(CurrentBlueprint));
-        }
+        protected void ResetPlacement() => placementHandler.ResetPlacement();
 
         protected virtual SnapResult SnapForBlueprint(PlacementBlueprint blueprint) =>
             new SnapResult(InputManager.CurrentState.Mouse.Position, null);
 
-        public override void Add(Drawable drawable)
-        {
-            base.Add(drawable);
-
-            if (drawable is PlacementBlueprint blueprint)
-            {
-                blueprint.Show();
-                blueprint.UpdateTimeAndPosition(SnapForBlueprint(blueprint));
-            }
-        }
-
         protected virtual void AddHitObject(DrawableHitObject hitObject) => HitObjectContainer.Add(hitObject);
 
-        protected virtual Container CreateHitObjectContainer() => new Container { RelativeSizeAxes = Axes.Both };
+        protected virtual Container CreateContentContainer() => new Container { RelativeSizeAxes = Axes.Both };
 
         protected abstract DrawableHitObject CreateHitObject(HitObject hitObject);
         protected abstract PlacementBlueprint CreateBlueprint();
+
+        private partial class TestPlacementHandler : CompositeDrawable, IPlacementHandler
+        {
+            private readonly Container contentContainer;
+
+            public PlacementBlueprint CurrentBlueprint { get; private set; }
+
+            public Func<PlacementBlueprint> CreateBlueprint;
+            public Func<PlacementBlueprint, SnapResult> SnapForBlueprint;
+            public Action<HitObject> AddHitObject;
+
+            public TestPlacementHandler(Container contentContainer)
+            {
+                this.contentContainer = contentContainer;
+
+                RelativeSizeAxes = Axes.Both;
+                InternalChild = contentContainer;
+            }
+
+            public void BeginPlacement(HitObject hitObject)
+            {
+            }
+
+            public void EndPlacement(HitObject hitObject, bool commit)
+            {
+                if (commit)
+                    AddHitObject(hitObject);
+
+                ResetPlacement();
+            }
+
+            public void ResetPlacement()
+            {
+                if (CurrentBlueprint != null)
+                    contentContainer.Remove(CurrentBlueprint, true);
+                contentContainer.Add(CurrentBlueprint = CreateBlueprint());
+            }
+
+            protected override void Update()
+            {
+                base.Update();
+                CurrentBlueprint.UpdateTimeAndPosition(SnapForBlueprint(CurrentBlueprint));
+            }
+
+            public void Delete(HitObject hitObject)
+            {
+            }
+
+            protected override void AddInternal(Drawable drawable)
+            {
+                base.AddInternal(drawable);
+
+                if (drawable is PlacementBlueprint blueprint)
+                {
+                    blueprint.Show();
+                    blueprint.UpdateTimeAndPosition(SnapForBlueprint(blueprint));
+                }
+            }
+        }
     }
 }

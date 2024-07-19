@@ -6,7 +6,6 @@
 using System;
 using System.Collections.Generic;
 using NUnit.Framework;
-using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
 using osu.Framework.Timing;
@@ -29,16 +28,7 @@ namespace osu.Game.Rulesets.Catch.Tests.Editor
 
         protected new ScrollingHitObjectContainer HitObjectContainer => contentContainer.Playfield.HitObjectContainer;
 
-        protected override Container<Drawable> Content => contentContainer;
-
-        private readonly CatchEditorTestSceneContainer contentContainer;
-
-        protected CatchPlacementBlueprintTestScene()
-        {
-            base.Content.Add(contentContainer = new CatchEditorTestSceneContainer());
-
-            contentContainer.Playfield.Clock = new FramedClock(new ManualClock());
-        }
+        private CatchEditorTestSceneContainer contentContainer;
 
         [SetUp]
         public void Setup() => Schedule(() =>
@@ -62,8 +52,10 @@ namespace osu.Game.Rulesets.Catch.Tests.Editor
 
         protected IEnumerable<FruitOutline> FruitOutlines => Content.ChildrenOfType<FruitOutline>();
 
-        // Unused because AddHitObject is overriden
-        protected override Container CreateHitObjectContainer() => new Container();
+        protected override Container CreateContentContainer() => contentContainer = new CatchEditorTestSceneContainer
+        {
+            Playfield = { Clock = new FramedClock(new StopwatchClock()) }
+        };
 
         protected override void AddHitObject(DrawableHitObject hitObject)
         {

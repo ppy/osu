@@ -7,7 +7,6 @@ using System;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Timing;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Mania.Beatmaps;
@@ -29,14 +28,14 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
         private IReadOnlyList<Mod> mods { get; set; } = Array.Empty<Mod>();
 
         [Cached(typeof(IScrollingInfo))]
-        private IScrollingInfo scrollingInfo;
+        public ScrollingTestContainer.TestScrollingInfo ScrollingInfo { get; }
 
         [Cached]
         private readonly StageDefinition stage = new StageDefinition(5);
 
         protected ManiaPlacementBlueprintTestScene()
         {
-            scrollingInfo = ((ScrollingTestContainer)HitObjectContainer).ScrollingInfo;
+            ScrollingInfo = new ScrollingTestContainer.TestScrollingInfo { Direction = { Value = ScrollingDirection.Down } };
 
             Add(column = new Column(0, false)
             {
@@ -55,10 +54,6 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
             return new SnapResult(pos, time, column);
         }
 
-        protected override Container CreateHitObjectContainer() => new ScrollingTestContainer(ScrollingDirection.Down) { RelativeSizeAxes = Axes.Both };
-
         protected override void AddHitObject(DrawableHitObject hitObject) => column.Add((DrawableManiaHitObject)hitObject);
-
-        public ManiaPlayfield Playfield => null;
     }
 }
