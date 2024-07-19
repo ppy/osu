@@ -609,7 +609,7 @@ namespace osu.Game.Screens.Select
                 // clear pending task immediately to track any potential nested debounce operation.
                 selectionChangedDebounce = null;
 
-                Logger.Log($"Song select updating selection with beatmap:{beatmap?.ID.ToString() ?? "null"} ruleset:{ruleset?.ShortName ?? "null"}");
+                Logger.Log($"Song select updating selection with beatmap: {beatmap} {beatmap?.ID.ToString() ?? "null"} ruleset:{ruleset?.ShortName ?? "null"}");
 
                 if (transferRulesetValue())
                 {
