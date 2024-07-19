@@ -278,12 +278,21 @@ namespace osu.Game.Screens.Select
 
             if (changes == null)
             {
-                // Usually we'd handle the initial load case here, but that's already done in load() as an optimisation.
-                // So the only thing we need to handle here is the edge case where realm blocks-resumes all operations.
                 realmBeatmapSets.Clear();
                 realmBeatmapSets.AddRange(sender.Select(r => r.ID));
 
-                // Do a full two-way check on missing beatmaps.
+                if (originalBeatmapSetsDetached.Count > 0 && sender.Count == 0)
+                {
+                    // Usually we'd reset stuff here, but doing so triggers a silly flow which ends up deadlocking realm.
+                    // Additionally, user should not be at song select when realm is blocking all operations in the first place.
+                    //
+                    // Note that due to the catch-up logic below, once operations are restored we will still be in a roughly
+                    // correct state. The only things that this return will change is the carousel will not empty *during* the blocking
+                    // operation.
+                    return;
+                }
+
+                // Do a full two-way check for missing (or incorrectly present) beatmaps.
                 // Let's assume that the worst that can happen is deletions or additions.
                 setsRequiringRemoval.Clear();
                 setsRequiringUpdate.Clear();
