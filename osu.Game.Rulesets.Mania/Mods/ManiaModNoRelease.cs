@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Linq;
 using System.Threading;
 using osu.Framework.Localisation;
@@ -26,6 +27,8 @@ namespace osu.Game.Rulesets.Mania.Mods
         public override double ScoreMultiplier => 0.9;
 
         public override ModType Type => ModType.DifficultyReduction;
+
+        public override Type[] IncompatibleMods => new[] { typeof(ManiaModHoldOff) };
 
         public void ApplyToBeatmap(IBeatmap beatmap)
         {
