@@ -71,23 +71,20 @@ namespace osu.Game.Screens.Ranking
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, IAPIProvider api)
+        private void load()
         {
-            this.api = api;
-
             updateState();
 
             localUser.BindTo(api.LocalUser);
             localUser.BindValueChanged(_ => updateEnabled());
 
-            Action = () => toggleFavouriteStatus();
+            Action = toggleFavouriteStatus;
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            Action = toggleFavouriteStatus;
             current.BindValueChanged(_ => updateState(), true);
         }
 
