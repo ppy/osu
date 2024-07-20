@@ -987,14 +987,14 @@ namespace osu.Game.Screens.Play
         /// <summary>
         /// The amount of gameplay time after which a second pause is allowed.
         /// </summary>
-        private const double pause_cooldown = 1000;
+        protected virtual double PauseCooldownDuration => 1000;
 
         protected PauseOverlay PauseOverlay { get; private set; }
 
         private double? lastPauseActionTime;
 
         protected bool PauseCooldownActive =>
-            lastPauseActionTime.HasValue && GameplayClockContainer.CurrentTime < lastPauseActionTime + pause_cooldown;
+            lastPauseActionTime.HasValue && GameplayClockContainer.CurrentTime < lastPauseActionTime + PauseCooldownDuration;
 
         /// <summary>
         /// A set of conditionals which defines whether the current game state and configuration allows for
