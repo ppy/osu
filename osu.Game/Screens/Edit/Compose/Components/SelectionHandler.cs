@@ -85,10 +85,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 SelectionBox = CreateSelectionBox(),
             });
 
-            SelectedItems.CollectionChanged += (_, _) =>
-            {
-                Scheduler.AddOnce(updateVisibility);
-            };
+            SelectedItems.BindCollectionChanged((_, _) => Scheduler.AddOnce(updateVisibility), true);
         }
 
         public SelectionBox CreateSelectionBox()
