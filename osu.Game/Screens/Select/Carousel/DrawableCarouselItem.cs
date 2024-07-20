@@ -144,9 +144,9 @@ namespace osu.Game.Screens.Select.Carousel
             }
 
             if (!Item.Visible)
-                this.FadeOut(300, Easing.OutQuint);
+                this.FadeOut(100, Easing.OutQuint);
             else
-                this.FadeIn(250);
+                this.FadeIn(400, Easing.OutQuint);
         }
 
         protected virtual void Selected()

@@ -11,6 +11,7 @@ using osu.Framework.Testing;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
 using osuTK;
+using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
@@ -59,6 +60,22 @@ namespace osu.Game.Tests.Visual.UserInterface
             expectedValue(numberBoxes, "123");
 
             clearTextboxes(numberBoxes);
+        }
+
+        [Test]
+        public void TestSelectAllOnFocus()
+        {
+            AddStep("create themed content", () => CreateThemedContent(OverlayColourScheme.Red));
+
+            AddStep("enter numbers", () => numberBoxes.ForEach(numberBox => numberBox.Text = "987654321"));
+
+            AddAssert("nothing selected", () => string.IsNullOrEmpty(numberBoxes.First().SelectedText));
+            AddStep("click on a number box", () =>
+            {
+                InputManager.MoveMouseTo(numberBoxes.First());
+                InputManager.Click(MouseButton.Left);
+            });
+            AddAssert("text selected", () => numberBoxes.First().SelectedText == "987654321");
         }
 
         private void clearTextboxes(IEnumerable<OsuTextBox> textBoxes) => AddStep("clear textbox", () => textBoxes.ForEach(textBox => textBox.Text = null));

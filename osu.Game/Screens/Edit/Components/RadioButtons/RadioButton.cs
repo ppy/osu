@@ -24,11 +24,11 @@ namespace osu.Game.Screens.Edit.Components.RadioButtons
         /// <summary>
         /// A function which creates a drawable icon to represent this item. If null, a sane default should be used.
         /// </summary>
-        public readonly Func<Drawable>? CreateIcon;
+        public readonly Func<Drawable?>? CreateIcon;
 
         private readonly Action? action;
 
-        public RadioButton(string label, Action? action, Func<Drawable>? createIcon = null)
+        public RadioButton(string label, Action? action, Func<Drawable?>? createIcon = null)
         {
             Label = label;
             CreateIcon = createIcon;

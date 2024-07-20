@@ -89,7 +89,7 @@ namespace osu.Game.Overlays.Comments.Buttons
             background.Colour = colourProvider.Background2;
         }
 
-        protected void SetIconDirection(bool upwards) => icon.ScaleTo(new Vector2(1, upwards ? -1 : 1));
+        protected void SetIconDirection(bool upwards) => icon.ScaleTo(upwards ? new Vector2(1f, -1f) : Vector2.One, 300, Easing.OutQuint);
 
         public void ToggleTextVisibility(bool visible) => text.FadeTo(visible ? 1 : 0, 200, Easing.OutQuint);
 
