@@ -22,6 +22,8 @@ namespace osu.Game.Overlays.BeatmapSet
                 beatmapSet.Value = value;
 
                 Current.Value = TabContainer.TabItems.FirstOrDefault(t => t.Enabled.Value)?.Value;
+
+                UpdateBottomBarPosition();
             }
         }
 
