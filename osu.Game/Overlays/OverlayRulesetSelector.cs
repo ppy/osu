@@ -35,7 +35,7 @@ namespace osu.Game.Overlays
                     {
                         Margin = new MarginPadding
                         {
-                            Top = BottomBarHeight / 2.0,
+                            Top = BottomBarHeight / 2.0f,
                         },
                         Anchor = Anchor.TopCentre,
                         Origin = Anchor.TopCentre,
