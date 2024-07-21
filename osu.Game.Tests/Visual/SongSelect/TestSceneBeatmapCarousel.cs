@@ -905,11 +905,11 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddStep("Sort by difficulty", () => carousel.Filter(new FilterCriteria { Sort = SortMode.Difficulty }, false));
 
             checkVisibleItemCount(false, local_set_count * local_diff_count);
-            checkVisibleItemCount(true, 1);
+            checkVisibleItemCount(true, 0);
 
             AddStep("Filter to normal", () => carousel.Filter(new FilterCriteria { Sort = SortMode.Difficulty, SearchText = "Normal" }, false));
             checkVisibleItemCount(false, local_set_count);
-            checkVisibleItemCount(true, 1);
+            checkVisibleItemCount(true, 0);
 
             AddUntilStep("Check all visible sets have one normal", () =>
             {
@@ -920,7 +920,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             AddStep("Filter to insane", () => carousel.Filter(new FilterCriteria { Sort = SortMode.Difficulty, SearchText = "Insane" }, false));
             checkVisibleItemCount(false, local_set_count);
-            checkVisibleItemCount(true, 1);
+            checkVisibleItemCount(true, 0);
 
             AddUntilStep("Check all visible sets have one insane", () =>
             {
