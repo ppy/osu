@@ -6,6 +6,7 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Game.Rulesets;
 using System.Linq;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Framework.Logging;
 
 namespace osu.Game.Overlays.BeatmapSet
 {
@@ -22,8 +23,6 @@ namespace osu.Game.Overlays.BeatmapSet
                 beatmapSet.Value = value;
 
                 Current.Value = TabContainer.TabItems.FirstOrDefault(t => t.Enabled.Value)?.Value;
-
-                UpdateBottomBarPosition();
             }
         }
 

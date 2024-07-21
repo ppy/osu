@@ -49,12 +49,12 @@ namespace osu.Game.Overlays
             Current.BindValueChanged(_ => UpdateBottomBarPosition(), true);
         }
 
-        protected void UpdateBottomBarPosition(float? width = null)
+        protected void UpdateBottomBarPosition()
         {
             if (SelectedTab != null)
                 BottomBar
                     .ResizeHeightTo(BottomBarHeight, 500, Easing.OutElasticQuarter)
-                    .ResizeWidthTo(width ?? SelectedTab.DrawWidth, 500, Easing.OutElasticQuarter)
+                    .ResizeWidthTo(SelectedTab.DrawWidth, 500, Easing.OutElasticQuarter)
                     .MoveTo(new Vector2(SelectedTab.DrawPosition.X, 0), 500, Easing.OutElasticQuarter);
             else
                 BottomBar
