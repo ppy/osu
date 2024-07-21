@@ -9,6 +9,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Logging;
+using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables.Cards;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
@@ -24,15 +25,10 @@ namespace osu.Game.Screens.Ranking
     {
         private readonly Box background;
         private readonly SpriteIcon icon;
-        private readonly BindableWithCurrent<BeatmapSetFavouriteState> current;
 
-        public Bindable<BeatmapSetFavouriteState> Current
-        {
-            get => current.Current;
-            set => current.Current = value;
-        }
-
-        private readonly APIBeatmapSet beatmapSet;
+        private readonly BeatmapSetInfo beatmapSetInfo;
+        private APIBeatmapSet beatmapSet;
+        private Bindable<BeatmapSetFavouriteState> current;
 
         private PostBeatmapFavouriteRequest favouriteRequest;
         private LoadingLayer loading;
@@ -45,10 +41,9 @@ namespace osu.Game.Screens.Ranking
         [Resolved]
         private OsuColour colours { get; set; }
 
-        public FavouriteButton(APIBeatmapSet beatmapSet)
+        public FavouriteButton(BeatmapSetInfo beatmapSetInfo)
         {
-            this.beatmapSet = beatmapSet;
-            current = new BindableWithCurrent<BeatmapSetFavouriteState>(new BeatmapSetFavouriteState(this.beatmapSet.HasFavourited, this.beatmapSet.FavouriteCount));
+            this.beatmapSetInfo = beatmapSetInfo;
 
             Size = new Vector2(50, 30);
 
@@ -68,24 +63,42 @@ namespace osu.Game.Screens.Ranking
                 },
                 loading = new LoadingLayer(true, false),
             };
+
+            Action = toggleFavouriteStatus;
         }
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            updateState();
+            current = new BindableWithCurrent<BeatmapSetFavouriteState>(new BeatmapSetFavouriteState(false, 0));
+            current.BindValueChanged(_ => updateState(), true);
 
             localUser.BindTo(api.LocalUser);
-            localUser.BindValueChanged(_ => updateEnabled());
-
-            Action = toggleFavouriteStatus;
+            localUser.BindValueChanged(_ => updateUser(), true);
         }
 
-        protected override void LoadComplete()
+        private void getBeatmapSet()
         {
-            base.LoadComplete();
+            GetBeatmapSetRequest beatmapSetRequest;
+            beatmapSetRequest = new GetBeatmapSetRequest(beatmapSetInfo.OnlineID);
 
-            current.BindValueChanged(_ => updateState(), true);
+            loading.Show();
+            beatmapSetRequest.Success += beatmapSet =>
+            {
+                this.beatmapSet = beatmapSet;
+                current.Value = new BeatmapSetFavouriteState(this.beatmapSet.HasFavourited, this.beatmapSet.FavouriteCount);
+
+                loading.Hide();
+                Enabled.Value = true;
+            };
+            beatmapSetRequest.Failure += e =>
+            {
+                Logger.Error(e, $"Failed to fetch beatmap info: {e.Message}");
+
+                loading.Hide();
+                Enabled.Value = false;
+            };
+            api.Queue(beatmapSetRequest);
         }
 
         private void toggleFavouriteStatus()
@@ -118,7 +131,18 @@ namespace osu.Game.Screens.Ranking
             api.Queue(favouriteRequest);
         }
 
-        private void updateEnabled() => Enabled.Value = !(localUser.Value is GuestUser) && beatmapSet.OnlineID > 0;
+        private void updateUser()
+        {
+            if (!(localUser.Value is GuestUser) && beatmapSetInfo.OnlineID > 0)
+                getBeatmapSet();
+            else
+            {
+                Enabled.Value = false;
+                current.Value = new BeatmapSetFavouriteState(false, 0);
+                updateState();
+                TooltipText = BeatmapsetsStrings.ShowDetailsFavouriteLogin;
+            }
+        }
 
         private void updateState()
         {
