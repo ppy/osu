@@ -31,9 +31,12 @@ namespace osu.Game.Overlays
                     Height = BottomBarHeight,
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.BottomLeft,
-                    Y = -1,
                     Child = new Circle
                     {
+                        Margin = new MarginPadding
+                        {
+                            Top = BottomBarHeight / 2,
+                        },
                         Anchor = Anchor.TopCentre,
                         Origin = Anchor.TopCentre,
                         RelativeSizeAxes = Axes.Both
@@ -52,13 +55,17 @@ namespace osu.Game.Overlays
         protected void UpdateBottomBarPosition()
         {
             if (SelectedTab != null)
+            {
                 BottomBar
                     .ResizeHeightTo(BottomBarHeight, 500, Easing.OutElasticQuarter)
                     .ResizeWidthTo(SelectedTab.DrawWidth, 500, Easing.OutElasticQuarter)
                     .MoveTo(new Vector2(SelectedTab.DrawPosition.X, 0), 500, Easing.OutElasticQuarter);
+            }
             else
+            {
                 BottomBar
-                   .ResizeHeightTo(0, 500, Easing.OutElasticQuarter);
+                    .ResizeHeightTo(0, 500, Easing.OutElasticQuarter);
+            }
         }
 
         protected override TabItem<RulesetInfo> CreateTabItem(RulesetInfo value) => new OverlayRulesetTabItem(value);
