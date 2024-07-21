@@ -26,12 +26,12 @@ namespace osu.Game.Screens.Ranking
         private readonly Box background;
         private readonly SpriteIcon icon;
 
-        private readonly BeatmapSetInfo beatmapSetInfo;
+        public readonly BeatmapSetInfo BeatmapSetInfo;
         private APIBeatmapSet beatmapSet;
-        private Bindable<BeatmapSetFavouriteState> current;
+        private readonly Bindable<BeatmapSetFavouriteState> current;
 
         private PostBeatmapFavouriteRequest favouriteRequest;
-        private LoadingLayer loading;
+        private readonly LoadingLayer loading;
 
         private readonly IBindable<APIUser> localUser = new Bindable<APIUser>();
 
@@ -43,7 +43,8 @@ namespace osu.Game.Screens.Ranking
 
         public FavouriteButton(BeatmapSetInfo beatmapSetInfo)
         {
-            this.beatmapSetInfo = beatmapSetInfo;
+            BeatmapSetInfo = beatmapSetInfo;
+            current = new BindableWithCurrent<BeatmapSetFavouriteState>(new BeatmapSetFavouriteState(false, 0));
 
             Size = new Vector2(50, 30);
 
@@ -70,7 +71,6 @@ namespace osu.Game.Screens.Ranking
         [BackgroundDependencyLoader]
         private void load()
         {
-            current = new BindableWithCurrent<BeatmapSetFavouriteState>(new BeatmapSetFavouriteState(false, 0));
             current.BindValueChanged(_ => updateState(), true);
 
             localUser.BindTo(api.LocalUser);
@@ -80,7 +80,7 @@ namespace osu.Game.Screens.Ranking
         private void getBeatmapSet()
         {
             GetBeatmapSetRequest beatmapSetRequest;
-            beatmapSetRequest = new GetBeatmapSetRequest(beatmapSetInfo.OnlineID);
+            beatmapSetRequest = new GetBeatmapSetRequest(BeatmapSetInfo.OnlineID);
 
             loading.Show();
             beatmapSetRequest.Success += beatmapSet =>
@@ -133,7 +133,7 @@ namespace osu.Game.Screens.Ranking
 
         private void updateUser()
         {
-            if (!(localUser.Value is GuestUser) && beatmapSetInfo.OnlineID > 0)
+            if (!(localUser.Value is GuestUser) && BeatmapSetInfo.OnlineID > 0)
                 getBeatmapSet();
             else
             {
