@@ -11,5 +11,6 @@
   </PropertyGroup>
   <ItemGroup Label="Project References">
     <ProjectReference Include="..\osu.Game.Rulesets.Taiko\osu.Game.Rulesets.Taiko.csproj" />
+    <ProjectReference Include="..\osu.Game.Tests\osu.Game.Tests.csproj" />
   </ItemGroup>
 </Project>
