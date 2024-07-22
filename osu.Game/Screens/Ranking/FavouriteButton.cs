@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -27,19 +25,19 @@ namespace osu.Game.Screens.Ranking
         private readonly SpriteIcon icon;
 
         public readonly BeatmapSetInfo BeatmapSetInfo;
-        private APIBeatmapSet beatmapSet;
+        private APIBeatmapSet? beatmapSet;
         private readonly Bindable<BeatmapSetFavouriteState> current;
 
-        private PostBeatmapFavouriteRequest favouriteRequest;
+        private PostBeatmapFavouriteRequest? favouriteRequest;
         private readonly LoadingLayer loading;
 
         private readonly IBindable<APIUser> localUser = new Bindable<APIUser>();
 
         [Resolved]
-        private IAPIProvider api { get; set; }
+        private IAPIProvider api { get; set; } = null!;
 
         [Resolved]
-        private OsuColour colours { get; set; }
+        private OsuColour colours { get; set; } = null!;
 
         public FavouriteButton(BeatmapSetInfo beatmapSetInfo)
         {
@@ -102,6 +100,9 @@ namespace osu.Game.Screens.Ranking
 
         private void toggleFavouriteStatus()
         {
+            if (beatmapSet == null)
+                return;
+
             Enabled.Value = false;
             loading.Show();
 
@@ -144,9 +145,6 @@ namespace osu.Game.Screens.Ranking
 
         private void updateState()
         {
-            if (current?.Value == null)
-                return;
-
             if (current.Value.Favourited)
             {
                 background.Colour = colours.Green;

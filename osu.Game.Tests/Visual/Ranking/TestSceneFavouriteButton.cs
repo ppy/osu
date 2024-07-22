@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Testing;
@@ -17,7 +15,7 @@ namespace osu.Game.Tests.Visual.Ranking
 {
     public partial class TestSceneFavouriteButton : OsuTestScene
     {
-        private FavouriteButton favourite;
+        private FavouriteButton? favourite;
 
         private readonly BeatmapSetInfo beatmapSetInfo = new BeatmapSetInfo { OnlineID = 88 };
         private readonly BeatmapSetInfo invalidBeatmapSetInfo = new BeatmapSetInfo();
@@ -83,7 +81,7 @@ namespace osu.Game.Tests.Visual.Ranking
 
         private void checkEnabled(bool expected)
         {
-            AddAssert("is " + (expected ? "enabled" : "disabled"), () => favourite.Enabled.Value == expected);
+            AddAssert("is " + (expected ? "enabled" : "disabled"), () => favourite!.Enabled.Value == expected);
         }
     }
 }
