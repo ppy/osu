@@ -13,6 +13,7 @@ using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.UI.Scrolling;
+using osu.Game.Screens.Edit;
 using osuTK;
 
 namespace osu.Game.Rulesets.Catch.Edit.Blueprints.Components
@@ -41,6 +42,9 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints.Components
 
         [Resolved]
         private IBeatSnapProvider? beatSnapProvider { get; set; }
+
+        [Resolved]
+        protected EditorBeatmap? EditorBeatmap { get; private set; }
 
         protected EditablePath(Func<float, double> positionToTime)
         {
@@ -112,6 +116,7 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints.Components
             double endTime = hitObject.StartTime + path.Duration;
             double snappedEndTime = beatSnapProvider.SnapTime(endTime, hitObject.StartTime);
             hitObject.Path.ExpectedDistance.Value = (snappedEndTime - hitObject.StartTime) * hitObject.Velocity;
+            EditorBeatmap?.Update(hitObject);
         }
 
         public Vector2 ToRelativePosition(Vector2 screenSpacePosition)
