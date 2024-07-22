@@ -52,7 +52,7 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints.Components
             if (index == -1 || VertexStates[index].IsFixed)
                 return false;
 
-            if (e.Button == MouseButton.Left && e.ShiftPressed)
+            if (e.Button == MouseButton.Right && e.ShiftPressed)
             {
                 changeHandler?.BeginChange();
                 RemoveVertex(index);
