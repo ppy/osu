@@ -54,7 +54,11 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints.Components
 
             if (e.Button == MouseButton.Left && e.ShiftPressed)
             {
+                changeHandler?.BeginChange();
                 RemoveVertex(index);
+                UpdateHitObjectFromPath(juiceStream);
+                changeHandler?.EndChange();
+
                 return true;
             }
 
@@ -125,11 +129,17 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints.Components
 
         private void deleteSelectedVertices()
         {
+            changeHandler?.BeginChange();
+
             for (int i = VertexCount - 1; i >= 0; i--)
             {
                 if (VertexStates[i].IsSelected)
                     RemoveVertex(i);
             }
+
+            UpdateHitObjectFromPath(juiceStream);
+
+            changeHandler?.EndChange();
         }
     }
 }
