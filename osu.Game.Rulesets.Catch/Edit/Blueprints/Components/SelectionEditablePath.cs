@@ -9,6 +9,7 @@ using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Screens.Edit;
 using osuTK;
 using osuTK.Input;
@@ -19,22 +20,28 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints.Components
     {
         public MenuItem[] ContextMenuItems => getContextMenuItems().ToArray();
 
+        private readonly JuiceStream juiceStream;
+
         // To handle when the editor is scrolled while dragging.
         private Vector2 dragStartPosition;
 
         [Resolved]
         private IEditorChangeHandler? changeHandler { get; set; }
 
-        public SelectionEditablePath(Func<float, double> positionToTime)
+        public SelectionEditablePath(JuiceStream juiceStream, Func<float, double> positionToTime)
             : base(positionToTime)
         {
+            this.juiceStream = juiceStream;
         }
 
         public void AddVertex(Vector2 relativePosition)
         {
+            changeHandler?.BeginChange();
             double time = Math.Max(0, PositionToTime(relativePosition.Y));
             int index = AddVertex(time, relativePosition.X);
+            UpdateHitObjectFromPath(juiceStream);
             selectOnly(index);
+            changeHandler?.EndChange();
         }
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => InternalChildren.Any(d => d.ReceivePositionalInputAt(screenSpacePos));
