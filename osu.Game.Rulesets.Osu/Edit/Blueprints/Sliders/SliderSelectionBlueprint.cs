@@ -227,10 +227,19 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         }
 
         private Vector2 lengthAdjustMouseOffset;
+        private double oldDuration;
+        private double oldVelocity;
+        private double desiredDistance;
+        private bool isAdjustingLength;
+        private bool adjustVelocityMomentary;
 
         private void startAdjustingLength(DragStartEvent e)
         {
+            isAdjustingLength = true;
+            adjustVelocityMomentary = e.ShiftPressed;
             lengthAdjustMouseOffset = ToLocalSpace(e.ScreenSpaceMouseDownPosition) - HitObject.Position - HitObject.Path.PositionAt(1);
+            oldDuration = HitObject.Path.Distance / HitObject.SliderVelocityMultiplier;
+            oldVelocity = HitObject.SliderVelocityMultiplier;
             changeHandler?.BeginChange();
         }
 
@@ -238,22 +247,27 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         {
             trimExcessControlPoints(HitObject.Path);
             changeHandler?.EndChange();
+            isAdjustingLength = false;
         }
 
-        private void adjustLength(MouseEvent e)
+        private void adjustLength(MouseEvent e) => adjustLength(findClosestPathDistance(e), e.ShiftPressed);
+
+        private void adjustLength(double proposedDistance, bool adjustVelocity)
         {
-            double oldDistance = HitObject.Path.Distance;
-            double proposedDistance = findClosestPathDistance(e);
+            desiredDistance = proposedDistance;
+            proposedDistance = MathHelper.Clamp(proposedDistance, 1, HitObject.Path.CalculatedDistance);
+            double proposedVelocity = oldVelocity;
 
-            proposedDistance = MathHelper.Clamp(proposedDistance, 0, HitObject.Path.CalculatedDistance);
-            proposedDistance = MathHelper.Clamp(proposedDistance,
-                0.1 * oldDistance / HitObject.SliderVelocityMultiplier,
-                10 * oldDistance / HitObject.SliderVelocityMultiplier);
+            if (adjustVelocity)
+            {
+                proposedDistance = MathHelper.Clamp(proposedDistance, 0.1 * oldDuration, 10 * oldDuration);
+                proposedVelocity = proposedDistance / oldDuration;
+            }
 
-            if (Precision.AlmostEquals(proposedDistance, oldDistance))
+            if (Precision.AlmostEquals(proposedDistance, HitObject.Path.Distance) && Precision.AlmostEquals(proposedVelocity, HitObject.SliderVelocityMultiplier))
                 return;
 
-            HitObject.SliderVelocityMultiplier *= proposedDistance / oldDistance;
+            HitObject.SliderVelocityMultiplier = proposedVelocity;
             HitObject.Path.ExpectedDistance.Value = proposedDistance;
             editorBeatmap?.Update(HitObject);
         }
@@ -374,7 +388,22 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                 return true;
             }
 
+            if (isAdjustingLength && e.ShiftPressed != adjustVelocityMomentary)
+            {
+                adjustVelocityMomentary = e.ShiftPressed;
+                adjustLength(desiredDistance, adjustVelocityMomentary);
+                return true;
+            }
+
             return false;
+        }
+
+        protected override void OnKeyUp(KeyUpEvent e)
+        {
+            if (!IsSelected || !isAdjustingLength || e.ShiftPressed == adjustVelocityMomentary) return;
+
+            adjustVelocityMomentary = e.ShiftPressed;
+            adjustLength(desiredDistance, adjustVelocityMomentary);
         }
 
         private PathControlPoint addControlPoint(Vector2 position)
