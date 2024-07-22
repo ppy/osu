@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Graphics;
@@ -18,7 +16,7 @@ namespace osu.Game.Tests.Visual.Ranking
 {
     public partial class TestSceneCollectionButton : OsuManualInputManagerTestScene
     {
-        private CollectionButton collectionButton;
+        private CollectionButton? collectionButton;
         private readonly BeatmapInfo beatmapInfo = new BeatmapInfo { OnlineID = 88 };
 
         [SetUpSteps]
@@ -43,7 +41,7 @@ namespace osu.Game.Tests.Visual.Ranking
         {
             AddStep("click collection button", () =>
             {
-                InputManager.MoveMouseTo(collectionButton);
+                InputManager.MoveMouseTo(collectionButton!);
                 InputManager.Click(MouseButton.Left);
             });
 
@@ -59,7 +57,7 @@ namespace osu.Game.Tests.Visual.Ranking
 
             AddStep("click collection button", () =>
             {
-                InputManager.MoveMouseTo(collectionButton);
+                InputManager.MoveMouseTo(collectionButton!);
                 InputManager.Click(MouseButton.Left);
             });
 
