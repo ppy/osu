@@ -201,6 +201,9 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty(@"playmode")]
         public string PlayMode;
 
+        [JsonProperty(@"profile_hue")]
+        public int? ProfileHue;
+
         [JsonProperty(@"profile_order")]
         public string[] ProfileOrder;
 
