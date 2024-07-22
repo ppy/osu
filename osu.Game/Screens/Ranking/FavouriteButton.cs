@@ -79,8 +79,7 @@ namespace osu.Game.Screens.Ranking
 
         private void getBeatmapSet()
         {
-            GetBeatmapSetRequest beatmapSetRequest;
-            beatmapSetRequest = new GetBeatmapSetRequest(BeatmapSetInfo.OnlineID);
+            GetBeatmapSetRequest beatmapSetRequest = new GetBeatmapSetRequest(BeatmapSetInfo.OnlineID);
 
             loading.Show();
             beatmapSetRequest.Success += beatmapSet =>
@@ -103,7 +102,6 @@ namespace osu.Game.Screens.Ranking
 
         private void toggleFavouriteStatus()
         {
-
             Enabled.Value = false;
             loading.Show();
 

@@ -17,15 +17,16 @@ namespace osu.Game.Screens.Ranking
 {
     public partial class CollectionPopover : OsuPopover
     {
-        private OsuMenu menu;
         private readonly BeatmapInfo beatmapInfo;
 
         [Resolved]
         private RealmAccess realm { get; set; } = null!;
-        [Resolved]
-        private ManageCollectionsDialog? manageCollectionsDialog { get; set; }
 
-        public CollectionPopover(BeatmapInfo beatmapInfo) : base(false)
+        [Resolved]
+        private ManageCollectionsDialog manageCollectionsDialog { get; set; }
+
+        public CollectionPopover(BeatmapInfo beatmapInfo)
+            : base(false)
         {
             this.beatmapInfo = beatmapInfo;
         }
@@ -38,7 +39,7 @@ namespace osu.Game.Screens.Ranking
 
             Children = new[]
             {
-                menu = new OsuMenu(Direction.Vertical, true)
+                new OsuMenu(Direction.Vertical, true)
                 {
                     Items = items,
                 },
@@ -56,9 +57,9 @@ namespace osu.Game.Screens.Ranking
             get
             {
                 var collectionItems = realm.Realm.All<BeatmapCollection>()
-                                       .OrderBy(c => c.Name)
-                                       .AsEnumerable()
-                                       .Select(c => new CollectionToggleMenuItem(c.ToLive(realm), beatmapInfo)).Cast<OsuMenuItem>().ToList();
+                                           .OrderBy(c => c.Name)
+                                           .AsEnumerable()
+                                           .Select(c => new CollectionToggleMenuItem(c.ToLive(realm), beatmapInfo)).Cast<OsuMenuItem>().ToList();
 
                 if (manageCollectionsDialog != null)
                     collectionItems.Add(new OsuMenuItem("Manage...", MenuItemType.Standard, manageCollectionsDialog.Show));

@@ -19,7 +19,7 @@ namespace osu.Game.Tests.Visual.Ranking
     public partial class TestSceneCollectionButton : OsuManualInputManagerTestScene
     {
         private CollectionButton collectionButton;
-        private BeatmapInfo beatmapInfo = new BeatmapInfo { OnlineID = 88 };
+        private readonly BeatmapInfo beatmapInfo = new BeatmapInfo { OnlineID = 88 };
 
         [SetUpSteps]
         public void SetUpSteps()

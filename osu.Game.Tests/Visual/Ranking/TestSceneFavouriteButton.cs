@@ -24,7 +24,6 @@ namespace osu.Game.Tests.Visual.Ranking
 
         private DummyAPIAccess dummyAPI => (DummyAPIAccess)API;
 
-
         [SetUpSteps]
         public void SetUpSteps()
         {
