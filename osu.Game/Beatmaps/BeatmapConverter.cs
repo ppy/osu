@@ -73,6 +73,11 @@ namespace osu.Game.Beatmaps
             beatmap.HitObjects = convertHitObjects(original.HitObjects, original, cancellationToken).OrderBy(s => s.StartTime).ToList();
             beatmap.Breaks = original.Breaks;
             beatmap.UnhandledEventLines = original.UnhandledEventLines;
+            beatmap.GridSize = original.GridSize;
+            beatmap.GridRotation = original.GridRotation;
+            beatmap.GridStartPositionX = original.GridStartPositionX;
+            beatmap.GridStartPositionY = original.GridStartPositionY;
+            beatmap.GridType = original.GridType;
 
             return beatmap;
         }

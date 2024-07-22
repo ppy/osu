@@ -341,6 +341,12 @@ namespace osu.Game.Rulesets.Difficulty
             public double GetMostCommonBeatLength() => baseBeatmap.GetMostCommonBeatLength();
             public IBeatmap Clone() => new ProgressiveCalculationBeatmap(baseBeatmap.Clone());
 
+            public int GridSize { get; set; }
+            public int GridRotation { get; set; }
+            public int GridStartPositionX { get; set; }
+            public int GridStartPositionY { get; set; }
+            public string GridType { get; set; }
+
             #endregion
         }
     }

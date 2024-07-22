@@ -426,8 +426,6 @@ namespace osu.Game.Beatmaps
                         SamplesMatchPlaybackRate = decodedInfo.SamplesMatchPlaybackRate,
                         DistanceSpacing = decodedInfo.DistanceSpacing,
                         BeatDivisor = decodedInfo.BeatDivisor,
-                        GridSize = decodedInfo.GridSize,
-                        GridRotation = decodedInfo.GridRotation,
                         TimelineZoom = decodedInfo.TimelineZoom,
                         MD5Hash = memoryStream.ComputeMD5Hash(),
                         EndTimeObjectCount = decoded.HitObjects.Count(h => h is IHasDuration),

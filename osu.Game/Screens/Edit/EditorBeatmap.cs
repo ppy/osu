@@ -89,6 +89,32 @@ namespace osu.Game.Screens.Edit
 
         public BindableInt PreviewTime { get; }
 
+        public int GridSize
+        {
+            get => PlayableBeatmap.GridSize;
+            set => PlayableBeatmap.GridSize = value;
+        }
+        public int GridRotation
+        {
+            get => PlayableBeatmap.GridRotation;
+            set => PlayableBeatmap.GridRotation = value;
+        }
+        public int GridStartPositionX
+        {
+            get => PlayableBeatmap.GridStartPositionX;
+            set => PlayableBeatmap.GridStartPositionX = value;
+        }
+        public int GridStartPositionY
+        {
+            get => PlayableBeatmap.GridStartPositionY;
+            set => PlayableBeatmap.GridStartPositionY = value;
+        }
+        public string GridType
+        {
+            get => PlayableBeatmap.GridType;
+            set => PlayableBeatmap.GridType = value;
+        }
+
         private readonly IBeatmapProcessor beatmapProcessor;
 
         private readonly Dictionary<HitObject, Bindable<double>> startTimeBindables = new Dictionary<HitObject, Bindable<double>>();

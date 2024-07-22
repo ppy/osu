@@ -115,6 +115,12 @@ namespace osu.Game.Beatmaps
             return mostCommon.beatLength;
         }
 
+        public int GridSize { get; set; }
+        public int GridRotation { get; set; }
+        public int GridStartPositionX { get; set; }
+        public int GridStartPositionY { get; set; }
+        public string GridType { get; set; }
+
         IBeatmap IBeatmap.Clone() => Clone();
 
         public Beatmap<T> Clone() => (Beatmap<T>)MemberwiseClone();

@@ -19,6 +19,7 @@ using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Components.RadioButtons;
 using osuTK;
 using osuTK.Graphics;
+using Vortice.DXGI;
 
 namespace osu.Game.Rulesets.Osu.Edit
 {
@@ -149,9 +150,30 @@ namespace osu.Game.Rulesets.Osu.Edit
                 },
             };
 
-            Spacing.Value = editorBeatmap.BeatmapInfo.GridSize;
+            Spacing.Value = editorBeatmap.GridSize;
+            GridLinesRotation.Value = editorBeatmap.GridRotation;
+            if (editorBeatmap.GridStartPositionX != 0)
+            {
+                StartPositionX.Value = editorBeatmap.GridStartPositionX;
+            }
+            if (editorBeatmap.GridStartPositionY != 0)
+            {
+                StartPositionY.Value = editorBeatmap.GridStartPositionY;
+            }
 
-            GridLinesRotation.Value = editorBeatmap.BeatmapInfo.GridRotation;
+            switch (editorBeatmap.GridType)
+            {
+                case "Square":
+                    GridType.Value = PositionSnapGridType.Square;
+                    break;
+                case "Triangle":
+                    GridType.Value = PositionSnapGridType.Triangle;
+                    break;
+                case "Circle":
+                    GridType.Value = PositionSnapGridType.Circle;
+                    break;
+            }
+
         }
 
         protected override void LoadComplete()
@@ -165,6 +187,7 @@ namespace osu.Game.Rulesets.Osu.Edit
                 startPositionXSlider.ContractedLabelText = $"X: {x.NewValue:N0}";
                 startPositionXSlider.ExpandedLabelText = $"X Offset: {x.NewValue:N0}";
                 StartPosition.Value = new Vector2(x.NewValue, StartPosition.Value.Y);
+                editorBeatmap.GridStartPositionX = (int)x.NewValue;
             }, true);
 
             StartPositionY.BindValueChanged(y =>
@@ -172,6 +195,7 @@ namespace osu.Game.Rulesets.Osu.Edit
                 startPositionYSlider.ContractedLabelText = $"Y: {y.NewValue:N0}";
                 startPositionYSlider.ExpandedLabelText = $"Y Offset: {y.NewValue:N0}";
                 StartPosition.Value = new Vector2(StartPosition.Value.X, y.NewValue);
+                editorBeatmap.GridStartPositionY = (int)y.NewValue;
             }, true);
 
             Spacing.BindValueChanged(spacing =>
@@ -179,14 +203,14 @@ namespace osu.Game.Rulesets.Osu.Edit
                 spacingSlider.ContractedLabelText = $"S: {spacing.NewValue:N0}";
                 spacingSlider.ExpandedLabelText = $"Spacing: {spacing.NewValue:N0}";
                 SpacingVector.Value = new Vector2(spacing.NewValue);
-                editorBeatmap.BeatmapInfo.GridSize = (int)spacing.NewValue;
+                editorBeatmap.GridSize = (int)spacing.NewValue;
             }, true);
 
             GridLinesRotation.BindValueChanged(rotation =>
             {
                 gridLinesRotationSlider.ContractedLabelText = $"R: {rotation.NewValue:#,0.##}";
                 gridLinesRotationSlider.ExpandedLabelText = $"Rotation: {rotation.NewValue:#,0.##}";
-                editorBeatmap.BeatmapInfo.GridRotation = (int)rotation.NewValue;
+                editorBeatmap.GridRotation = (int)rotation.NewValue;
             }, true);
 
             expandingContainer?.Expanded.BindValueChanged(v =>
@@ -205,12 +229,18 @@ namespace osu.Game.Rulesets.Osu.Edit
                         GridLinesRotation.Value = ((GridLinesRotation.Value + 405) % 90) - 45;
                         GridLinesRotation.MinValue = -45;
                         GridLinesRotation.MaxValue = 45;
+                        editorBeatmap.GridType = "Square";
                         break;
 
                     case PositionSnapGridType.Triangle:
                         GridLinesRotation.Value = ((GridLinesRotation.Value + 390) % 60) - 30;
                         GridLinesRotation.MinValue = -30;
                         GridLinesRotation.MaxValue = 30;
+                        editorBeatmap.GridType = "Triangle";
+                        break;
+
+                    case PositionSnapGridType.Circle:
+                        editorBeatmap.GridType = "Circle";
                         break;
                 }
             }, true);

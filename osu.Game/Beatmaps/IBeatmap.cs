@@ -74,6 +74,15 @@ namespace osu.Game.Beatmaps
         /// </summary>
         /// <returns>The shallow-cloned beatmap.</returns>
         IBeatmap Clone();
+
+        /// <summary>
+        /// Grid settings for the beatmap
+        /// </summary>
+        public int GridSize { get; set; }
+        public int GridRotation { get; set; }
+        public int GridStartPositionX { get; set; }
+        public int GridStartPositionY { get; set; }
+        public string GridType { get; set; }
     }
 
     /// <summary>
