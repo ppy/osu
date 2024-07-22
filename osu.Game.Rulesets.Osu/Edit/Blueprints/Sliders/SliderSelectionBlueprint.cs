@@ -228,7 +228,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
         private Vector2 lengthAdjustMouseOffset;
         private double oldDuration;
-        private double oldVelocity;
+        private double oldVelocityMultiplier;
         private double desiredDistance;
         private bool isAdjustingLength;
         private bool adjustVelocityMomentary;
@@ -239,7 +239,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             adjustVelocityMomentary = e.ShiftPressed;
             lengthAdjustMouseOffset = ToLocalSpace(e.ScreenSpaceMouseDownPosition) - HitObject.Position - HitObject.Path.PositionAt(1);
             oldDuration = HitObject.Path.Distance / HitObject.SliderVelocityMultiplier;
-            oldVelocity = HitObject.SliderVelocityMultiplier;
+            oldVelocityMultiplier = HitObject.SliderVelocityMultiplier;
             changeHandler?.BeginChange();
         }
 
@@ -255,13 +255,17 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         private void adjustLength(double proposedDistance, bool adjustVelocity)
         {
             desiredDistance = proposedDistance;
-            proposedDistance = MathHelper.Clamp(proposedDistance, 1, HitObject.Path.CalculatedDistance);
-            double proposedVelocity = oldVelocity;
+            double proposedVelocity = oldVelocityMultiplier;
 
             if (adjustVelocity)
             {
-                proposedDistance = MathHelper.Clamp(proposedDistance, 0.1 * oldDuration, 10 * oldDuration);
                 proposedVelocity = proposedDistance / oldDuration;
+                proposedDistance = MathHelper.Clamp(proposedDistance, 0.1 * oldDuration, 10 * oldDuration);
+            }
+            else
+            {
+                double minDistance = distanceSnapProvider?.GetBeatSnapDistanceAt(HitObject, false) * oldVelocityMultiplier ?? 1;
+                proposedDistance = MathHelper.Clamp(proposedDistance, minDistance, HitObject.Path.CalculatedDistance);
             }
 
             if (Precision.AlmostEquals(proposedDistance, HitObject.Path.Distance) && Precision.AlmostEquals(proposedVelocity, HitObject.SliderVelocityMultiplier))
