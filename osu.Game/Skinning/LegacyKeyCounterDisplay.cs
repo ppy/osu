@@ -7,6 +7,8 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Screens.Play.HUD;
 using osuTK.Graphics;
 using osu.Framework.Allocation;
+using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Textures;
 
 namespace osu.Game.Skinning
 {
@@ -16,17 +18,18 @@ namespace osu.Game.Skinning
 
         protected override FillFlowContainer<KeyCounter> KeyFlow { get; } = null!;
 
+        private Sprite backgroundSprite = null!;
+
         public LegacyKeyCounterDisplay()
         {
             AutoSizeAxes = Axes.Both;
 
             AddRangeInternal(new Drawable[]
             {
-                 new SkinnableSprite
+                 backgroundSprite = new Sprite
                  {
                      Anchor = Anchor.TopLeft,
                      Origin = Anchor.TopLeft,
-                     SpriteName = { Value= "inputoverlay-background" },
                  },
                  KeyFlow = new FillFlowContainer<KeyCounter>
                  {
@@ -49,6 +52,11 @@ namespace osu.Game.Skinning
             {
                 KeyTextColor = v.NewValue;
             }, true);
+
+            Texture? backgroundTexture = source.GetTexture($"inputoverlay-background");
+
+            if (backgroundTexture != null)
+                backgroundSprite.Texture = backgroundTexture;
         }
 
         protected override KeyCounter CreateCounter(InputTrigger trigger) => new LegacyKeyCounter(trigger)
