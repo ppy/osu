@@ -230,7 +230,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 return;
             }
 
-            amount = Math.Sign(amount) * Math.Min(max_velocity, Math.Abs(MathF.Pow(amount, 2) / (MathF.Pow(scroll_tolerance, 2))));
+            amount = Math.Sign(amount) * Math.Min(max_velocity, MathF.Pow(Math.Clamp(Math.Abs(amount), 0, scroll_tolerance), 2));
             dragTimeAccumulated += (float)Clock.ElapsedFrameTime;
 
             timeline.ScrollBy(amount * (float)Clock.ElapsedFrameTime * Math.Min(1, dragTimeAccumulated / time_ramp_multiplier));
