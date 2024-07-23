@@ -13,7 +13,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         public const double single_spacing_threshold = 125;
         private const double min_speed_bonus = 75; // ~200BPM
         private const double speed_balancing_factor = 40;
-        private const double distance_multiplier = 1.0;
+        private const double distance_multiplier = 1.1;
 
         /// <summary>
         /// Evaluates the difficulty of tapping the current object, based on:

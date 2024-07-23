@@ -10,7 +10,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 {
     public static class AimEvaluator
     {
-        private const double wide_angle_multiplier = 1.5;
+        private const double wide_angle_multiplier = 1.2;
         private const double acute_angle_multiplier = 1.95;
         private const double slider_multiplier = 1.35;
         private const double velocity_change_multiplier = 0.75;
