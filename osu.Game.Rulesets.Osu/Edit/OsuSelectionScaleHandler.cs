@@ -72,8 +72,10 @@ namespace osu.Game.Rulesets.Osu.Edit
 
         public override void Begin()
         {
-            if (objectsInScale != null)
+            if (OperationInProgress.Value)
                 throw new InvalidOperationException($"Cannot {nameof(Begin)} a scale operation while another is in progress!");
+
+            base.Begin();
 
             changeHandler?.BeginChange();
 
@@ -86,10 +88,10 @@ namespace osu.Game.Rulesets.Osu.Edit
 
         public override void Update(Vector2 scale, Vector2? origin = null, Axes adjustAxis = Axes.Both)
         {
-            if (objectsInScale == null)
+            if (!OperationInProgress.Value)
                 throw new InvalidOperationException($"Cannot {nameof(Update)} a scale operation without calling {nameof(Begin)} first!");
 
-            Debug.Assert(defaultOrigin != null && OriginalSurroundingQuad != null);
+            Debug.Assert(objectsInScale != null && defaultOrigin != null && OriginalSurroundingQuad != null);
 
             Vector2 actualOrigin = origin ?? defaultOrigin.Value;
 
@@ -117,10 +119,12 @@ namespace osu.Game.Rulesets.Osu.Edit
 
         public override void Commit()
         {
-            if (objectsInScale == null)
+            if (!OperationInProgress.Value)
                 throw new InvalidOperationException($"Cannot {nameof(Commit)} a rotate operation without calling {nameof(Begin)} first!");
 
             changeHandler?.EndChange();
+
+            base.Commit();
 
             objectsInScale = null;
             OriginalSurroundingQuad = null;

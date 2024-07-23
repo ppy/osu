@@ -3,12 +3,14 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
+using osu.Framework.Graphics.Shapes;
+using osu.Framework.Localisation;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Extensions;
 using osu.Game.Graphics;
-using osu.Game.Screens.Edit.Components.Timelines.Summary.Visualisations;
 
 namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
 {
@@ -91,16 +93,30 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
 
                 Width = (float)(nextControlPoint.Time - effect.Time);
 
-                AddInternal(new PointVisualisation
+                AddInternal(new KiaiVisualisation(effect.Time, nextControlPoint.Time)
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Origin = Anchor.TopLeft,
-                    Width = 1,
-                    Height = 0.25f,
+                    Anchor = Anchor.BottomLeft,
+                    Origin = Anchor.CentreLeft,
+                    Height = 0.4f,
                     Depth = float.MaxValue,
-                    Colour = effect.GetRepresentingColour(colours).Darken(0.5f),
+                    Colour = colours.Purple1,
                 });
             }
+        }
+
+        private partial class KiaiVisualisation : Circle, IHasTooltip
+        {
+            private readonly double startTime;
+            private readonly double endTime;
+
+            public KiaiVisualisation(double startTime, double endTime)
+            {
+                this.startTime = startTime;
+                this.endTime = endTime;
+            }
+
+            public LocalisableString TooltipText => $"{startTime.ToEditorFormattedString()} - {endTime.ToEditorFormattedString()} kiai time";
         }
 
         // kiai sections display duration, so are required to be visualised.

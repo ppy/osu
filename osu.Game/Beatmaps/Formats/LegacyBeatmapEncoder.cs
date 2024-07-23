@@ -282,18 +282,38 @@ namespace osu.Game.Beatmaps.Formats
             {
                 foreach (var hitObject in hitObjects)
                 {
-                    if (hitObject.Samples.Count > 0)
+                    if (hitObject is IHasRepeats hasNodeSamples)
                     {
-                        int volume = hitObject.Samples.Max(o => o.Volume);
-                        int customIndex = hitObject.Samples.Any(o => o is ConvertHitObjectParser.LegacyHitSampleInfo)
-                            ? hitObject.Samples.OfType<ConvertHitObjectParser.LegacyHitSampleInfo>().Max(o => o.CustomSampleBank)
-                            : -1;
+                        double spanDuration = hasNodeSamples.Duration / hasNodeSamples.SpanCount();
 
-                        yield return new LegacyBeatmapDecoder.LegacySampleControlPoint { Time = hitObject.GetEndTime(), SampleVolume = volume, CustomSampleBank = customIndex };
+                        for (int i = 0; i < hasNodeSamples.NodeSamples.Count; ++i)
+                        {
+                            double nodeTime = hitObject.StartTime + i * spanDuration;
+
+                            if (hasNodeSamples.NodeSamples[i].Count > 0)
+                                yield return createSampleControlPointFor(nodeTime, hasNodeSamples.NodeSamples[i]);
+
+                            if (spanDuration > LegacyBeatmapDecoder.CONTROL_POINT_LENIENCY + 1 && hitObject.Samples.Count > 0 && i < hasNodeSamples.NodeSamples.Count - 1)
+                                yield return createSampleControlPointFor(nodeTime + LegacyBeatmapDecoder.CONTROL_POINT_LENIENCY + 1, hitObject.Samples);
+                        }
+                    }
+                    else if (hitObject.Samples.Count > 0)
+                    {
+                        yield return createSampleControlPointFor(hitObject.GetEndTime(), hitObject.Samples);
                     }
 
                     foreach (var nested in collectSampleControlPoints(hitObject.NestedHitObjects))
                         yield return nested;
+                }
+
+                SampleControlPoint createSampleControlPointFor(double time, IList<HitSampleInfo> samples)
+                {
+                    int volume = samples.Max(o => o.Volume);
+                    int customIndex = samples.Any(o => o is ConvertHitObjectParser.LegacyHitSampleInfo)
+                        ? samples.OfType<ConvertHitObjectParser.LegacyHitSampleInfo>().Max(o => o.CustomSampleBank)
+                        : -1;
+
+                    return new LegacyBeatmapDecoder.LegacySampleControlPoint { Time = time, SampleVolume = volume, CustomSampleBank = customIndex };
                 }
             }
 

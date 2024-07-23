@@ -14,8 +14,11 @@ using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.IO;
 using osu.Game.Overlays;
+using osu.Game.Rulesets.Osu;
+using osu.Game.Screens.Play;
 using osu.Game.Storyboards;
 using osu.Game.Storyboards.Drawables;
+using osu.Game.Tests.Gameplay;
 using osu.Game.Tests.Resources;
 using osuTK.Graphics;
 
@@ -28,14 +31,14 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private DrawableStoryboard? storyboard;
 
+        [Cached]
+        private GameplayState testGameplayState = TestGameplayState.Create(new OsuRuleset());
+
         [Test]
         public void TestStoryboard()
         {
             AddStep("Restart", restart);
-            AddToggleStep("Passing", passing =>
-            {
-                if (storyboard != null) storyboard.Passing = passing;
-            });
+            AddToggleStep("Toggle passing state", passing => testGameplayState.HealthProcessor.Health.Value = passing ? 1 : 0);
         }
 
         [Test]
@@ -109,7 +112,6 @@ namespace osu.Game.Tests.Visual.Gameplay
             storyboardContainer.Clock = new FramedClock(Beatmap.Value.Track);
 
             storyboard = toLoad.CreateDrawable(SelectedMods.Value);
-            storyboard.Passing = false;
 
             storyboardContainer.Add(storyboard);
         }

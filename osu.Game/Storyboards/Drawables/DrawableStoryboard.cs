@@ -37,20 +37,6 @@ namespace osu.Game.Storyboards.Drawables
 
         protected override Vector2 DrawScale => new Vector2(Parent!.DrawHeight / 480);
 
-        private bool passing = true;
-
-        public bool Passing
-        {
-            get => passing;
-            set
-            {
-                if (passing == value) return;
-
-                passing = value;
-                updateLayerVisibility();
-            }
-        }
-
         public override bool RemoveCompletedTransforms => false;
 
         private double? lastEventEndTime;
@@ -65,6 +51,9 @@ namespace osu.Game.Storyboards.Drawables
         private RealmAccess realm { get; set; } = null!;
 
         private DependencyContainer dependencies = null!;
+
+        private BindableNumber<double> health = null!;
+        private readonly BindableBool passing = new BindableBool(true);
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent) =>
             dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
@@ -91,8 +80,8 @@ namespace osu.Game.Storyboards.Drawables
             });
         }
 
-        [BackgroundDependencyLoader(true)]
-        private void load(IGameplayClock? clock, CancellationToken? cancellationToken)
+        [BackgroundDependencyLoader]
+        private void load(IGameplayClock? clock, CancellationToken? cancellationToken, GameplayState? gameplayState)
         {
             if (clock != null)
                 Clock = clock;
@@ -110,6 +99,16 @@ namespace osu.Game.Storyboards.Drawables
             }
 
             lastEventEndTime = Storyboard.LatestEventTime;
+
+            health = gameplayState?.HealthProcessor.Health.GetBoundCopy() ?? new BindableDouble(1);
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            health.BindValueChanged(val => passing.Value = val.NewValue >= 0.5, true);
+            passing.BindValueChanged(_ => updateLayerVisibility(), true);
         }
 
         protected virtual IResourceStore<byte[]> CreateResourceLookupStore() => new StoryboardResourceLookupStore(Storyboard, realm, host);
@@ -125,7 +124,7 @@ namespace osu.Game.Storyboards.Drawables
         private void updateLayerVisibility()
         {
             foreach (var layer in Children)
-                layer.Enabled = passing ? layer.Layer.VisibleWhenPassing : layer.Layer.VisibleWhenFailing;
+                layer.Enabled = passing.Value ? layer.Layer.VisibleWhenPassing : layer.Layer.VisibleWhenFailing;
         }
 
         private class StoryboardResourceLookupStore : IResourceStore<byte[]>

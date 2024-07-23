@@ -72,6 +72,35 @@ namespace osu.Game.Tests.Database
         }
 
         [Test]
+        public void TestSubscriptionInitialChangeSetNull()
+        {
+            ChangeSet? firstChanges = null;
+            int receivedChangesCount = 0;
+
+            RunTestWithRealm((realm, _) =>
+            {
+                var registration = realm.RegisterForNotifications(r => r.All<BeatmapSetInfo>(), onChanged);
+
+                realm.WriteAsync(r => r.Add(TestResources.CreateTestBeatmapSetInfo())).WaitSafely();
+
+                realm.Run(r => r.Refresh());
+
+                Assert.That(receivedChangesCount, Is.EqualTo(1));
+                Assert.That(firstChanges, Is.Null);
+
+                registration.Dispose();
+            });
+
+            void onChanged(IRealmCollection<BeatmapSetInfo> sender, ChangeSet? changes)
+            {
+                if (receivedChangesCount == 0)
+                    firstChanges = changes;
+
+                receivedChangesCount++;
+            }
+        }
+
+        [Test]
         public void TestSubscriptionWithAsyncWrite()
         {
             ChangeSet? lastChanges = null;

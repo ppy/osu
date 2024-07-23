@@ -85,10 +85,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 SelectionBox = CreateSelectionBox(),
             });
 
-            SelectedItems.CollectionChanged += (_, _) =>
-            {
-                Scheduler.AddOnce(updateVisibility);
-            };
+            SelectedItems.BindCollectionChanged((_, _) => Scheduler.AddOnce(updateVisibility), true);
         }
 
         public SelectionBox CreateSelectionBox()
@@ -313,7 +310,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <summary>
         /// Given a selection target and a function of truth, retrieve the correct ternary state for display.
         /// </summary>
-        protected static TernaryState GetStateFromSelection<TObject>(IEnumerable<TObject> selection, Func<TObject, bool> func)
+        public static TernaryState GetStateFromSelection<TObject>(IEnumerable<TObject> selection, Func<TObject, bool> func)
         {
             if (selection.Any(func))
                 return selection.All(func) ? TernaryState.True : TernaryState.Indeterminate;

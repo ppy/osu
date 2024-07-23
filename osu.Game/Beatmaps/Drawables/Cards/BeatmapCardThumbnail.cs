@@ -101,7 +101,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
             bool shouldDim = Dimmed.Value || playButton.Playing.Value;
 
             playButton.FadeTo(shouldDim ? 1 : 0, BeatmapCard.TRANSITION_DURATION, Easing.OutQuint);
-            background.FadeColour(colourProvider.Background6.Opacity(shouldDim ? 0.8f : 0f), BeatmapCard.TRANSITION_DURATION, Easing.OutQuint);
+            background.FadeColour(colourProvider.Background6.Opacity(shouldDim ? 0.6f : 0f), BeatmapCard.TRANSITION_DURATION, Easing.OutQuint);
         }
     }
 }
