@@ -395,9 +395,11 @@ namespace osu.Game.Skinning
                                 if (keyCounter != null)
                                 {
                                     keyCounter.Rotation = 90f;
-                                    keyCounter.Anchor = Anchor.BottomRight;
+                                    // set the anchor to top right so that it won't squash to the return button to the top
+                                    keyCounter.Anchor = Anchor.TopRight;
                                     keyCounter.Origin = Anchor.TopCentre;
-                                    keyCounter.Position = new Vector2(0, -340);
+                                    keyCounter.X = 0;
+                                    keyCounter.Y = container.ToLocalSpace(container.ScreenSpaceDrawQuad.BottomRight).Y - 340;
                                 }
                             })
                             {
