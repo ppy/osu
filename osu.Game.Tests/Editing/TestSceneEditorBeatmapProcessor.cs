@@ -8,7 +8,6 @@ using osu.Game.Beatmaps.Timing;
 using osu.Game.Rulesets.Mania;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Osu;
-using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Screens.Edit;
 
 namespace osu.Game.Tests.Editing
@@ -45,7 +44,7 @@ namespace osu.Game.Tests.Editing
                 BeatmapInfo = { Ruleset = new OsuRuleset().RulesetInfo },
                 HitObjects =
                 {
-                    new HitCircle { StartTime = 1000 },
+                    new Note { StartTime = 1000 },
                 }
             });
 
@@ -67,8 +66,8 @@ namespace osu.Game.Tests.Editing
                 BeatmapInfo = { Ruleset = new OsuRuleset().RulesetInfo },
                 HitObjects =
                 {
-                    new HitCircle { StartTime = 1000 },
-                    new HitCircle { StartTime = 2000 },
+                    new Note { StartTime = 1000 },
+                    new Note { StartTime = 2000 },
                 }
             });
 
@@ -136,8 +135,8 @@ namespace osu.Game.Tests.Editing
                 BeatmapInfo = { Ruleset = new OsuRuleset().RulesetInfo },
                 HitObjects =
                 {
-                    new HitCircle { StartTime = 1000 },
-                    new HitCircle { StartTime = 5000 },
+                    new Note { StartTime = 1000 },
+                    new Note { StartTime = 5000 },
                 }
             });
 
@@ -164,8 +163,8 @@ namespace osu.Game.Tests.Editing
                 BeatmapInfo = { Ruleset = new OsuRuleset().RulesetInfo },
                 HitObjects =
                 {
-                    new HitCircle { StartTime = 1000 },
-                    new HitCircle { StartTime = 9000 },
+                    new Note { StartTime = 1000 },
+                    new Note { StartTime = 9000 },
                 },
                 Breaks =
                 {
@@ -197,9 +196,9 @@ namespace osu.Game.Tests.Editing
                 BeatmapInfo = { Ruleset = new OsuRuleset().RulesetInfo },
                 HitObjects =
                 {
-                    new HitCircle { StartTime = 1000 },
-                    new HitCircle { StartTime = 5000 },
-                    new HitCircle { StartTime = 9000 },
+                    new Note { StartTime = 1000 },
+                    new Note { StartTime = 5000 },
+                    new Note { StartTime = 9000 },
                 },
                 Breaks =
                 {
@@ -232,8 +231,8 @@ namespace osu.Game.Tests.Editing
                 BeatmapInfo = { Ruleset = new OsuRuleset().RulesetInfo },
                 HitObjects =
                 {
-                    new HitCircle { StartTime = 1100 },
-                    new HitCircle { StartTime = 9000 },
+                    new Note { StartTime = 1100 },
+                    new Note { StartTime = 9000 },
                 },
                 Breaks =
                 {
@@ -264,8 +263,8 @@ namespace osu.Game.Tests.Editing
                 BeatmapInfo = { Ruleset = new OsuRuleset().RulesetInfo },
                 HitObjects =
                 {
-                    new HitCircle { StartTime = 1000 },
-                    new HitCircle { StartTime = 9000 },
+                    new Note { StartTime = 1000 },
+                    new Note { StartTime = 9000 },
                 },
                 Breaks =
                 {
@@ -299,9 +298,9 @@ namespace osu.Game.Tests.Editing
                 BeatmapInfo = { Ruleset = new OsuRuleset().RulesetInfo },
                 HitObjects =
                 {
-                    new HitCircle { StartTime = 1000 },
-                    new HitCircle { StartTime = 5000 },
-                    new HitCircle { StartTime = 9000 },
+                    new Note { StartTime = 1000 },
+                    new Note { StartTime = 5000 },
+                    new Note { StartTime = 9000 },
                 },
                 Breaks =
                 {
@@ -334,8 +333,8 @@ namespace osu.Game.Tests.Editing
                 BeatmapInfo = { Ruleset = new OsuRuleset().RulesetInfo },
                 HitObjects =
                 {
-                    new HitCircle { StartTime = 1000 },
-                    new HitCircle { StartTime = 9000 },
+                    new Note { StartTime = 1000 },
+                    new Note { StartTime = 9000 },
                 },
                 Breaks =
                 {
@@ -366,8 +365,8 @@ namespace osu.Game.Tests.Editing
                 BeatmapInfo = { Ruleset = new OsuRuleset().RulesetInfo },
                 HitObjects =
                 {
-                    new HitCircle { StartTime = 1000 },
-                    new HitCircle { StartTime = 2000 },
+                    new Note { StartTime = 1000 },
+                    new Note { StartTime = 2000 },
                 },
                 Breaks =
                 {
@@ -393,8 +392,8 @@ namespace osu.Game.Tests.Editing
                 BeatmapInfo = { Ruleset = new OsuRuleset().RulesetInfo },
                 HitObjects =
                 {
-                    new HitCircle { StartTime = 1000 },
-                    new HitCircle { StartTime = 2000 },
+                    new Note { StartTime = 1000 },
+                    new Note { StartTime = 2000 },
                 },
                 Breaks =
                 {
@@ -447,8 +446,8 @@ namespace osu.Game.Tests.Editing
                 BeatmapInfo = { Ruleset = new OsuRuleset().RulesetInfo },
                 HitObjects =
                 {
-                    new HitCircle { StartTime = 10000 },
-                    new HitCircle { StartTime = 11000 },
+                    new Note { StartTime = 10000 },
+                    new Note { StartTime = 11000 },
                 },
                 Breaks =
                 {
@@ -474,8 +473,8 @@ namespace osu.Game.Tests.Editing
                 BeatmapInfo = { Ruleset = new OsuRuleset().RulesetInfo },
                 HitObjects =
                 {
-                    new HitCircle { StartTime = 10000 },
-                    new HitCircle { StartTime = 11000 },
+                    new Note { StartTime = 10000 },
+                    new Note { StartTime = 11000 },
                 },
                 Breaks =
                 {
