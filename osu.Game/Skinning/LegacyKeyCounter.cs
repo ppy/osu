@@ -20,6 +20,17 @@ namespace osu.Game.Skinning
 
         public Colour4 KeyDownBackgroundColour { get; set; } = Colour4.Yellow;
 
+        private float keyTextRotation = 0f;
+        public float KeyTextRotation
+        {
+            get => keyTextRotation;
+            set
+            {
+                keyTextRotation = value;
+                overlayKeyText.Rotation = value;
+            }
+        }
+
         public Colour4 KeyUpBackgroundColour { get; set; } = Colour4.White;
 
         private Container keyContainer = null!;
@@ -56,6 +67,7 @@ namespace osu.Game.Skinning
                         Text = trigger.Name,
                         Colour = KeyTextColour,
                         Font = OsuFont.Default.With(fixedWidth: true),
+                        Rotation = KeyTextRotation
                     },
                 }
             };
@@ -65,7 +77,7 @@ namespace osu.Game.Skinning
         {
             base.LoadComplete();
             Width = Math.Max(overlayKey.Width, 48 * 0.95f);
-            Height = Math.Max(overlayKey.Height, 48 * 0.95f);
+            Height = Math.Max(overlayKey.Height, 46 * 0.95f);
         }
 
         protected override void Activate(bool forwardPlayback = true)

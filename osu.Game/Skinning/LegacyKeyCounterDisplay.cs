@@ -57,7 +57,16 @@ namespace osu.Game.Skinning
         {
             TransitionDuration = key_transition_time,
             KeyTextColour = keyTextColor,
+            KeyTextRotation = -Rotation,
         };
+
+        protected override void Update()
+        {
+            base.Update();
+            // keep the text are always horizontal
+            foreach (var child in KeyFlow.Cast<LegacyKeyCounter>())
+                child.KeyTextRotation = -Rotation;
+        }
 
         private Color4 keyTextColor = Color4.White;
 
