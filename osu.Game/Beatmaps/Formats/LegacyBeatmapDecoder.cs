@@ -80,7 +80,7 @@ namespace osu.Game.Beatmaps.Formats
             this.beatmap = beatmap;
             this.beatmap.BeatmapInfo.BeatmapVersion = FormatVersion;
 
-            applyLegacyDefaults(this.beatmap);
+            ApplyLegacyDefaults(this.beatmap);
 
             base.ParseStreamInto(stream, beatmap);
 
@@ -186,7 +186,7 @@ namespace osu.Game.Beatmaps.Formats
         /// This method's intention is to restore those legacy defaults.
         /// See also: https://osu.ppy.sh/wiki/en/Client/File_formats/Osu_%28file_format%29
         /// </summary>
-        private static void applyLegacyDefaults(Beatmap beatmap)
+        internal static void ApplyLegacyDefaults(Beatmap beatmap)
         {
             beatmap.WidescreenStoryboard = false;
             beatmap.SamplesMatchPlaybackRate = false;
