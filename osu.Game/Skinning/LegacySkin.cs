@@ -395,9 +395,9 @@ namespace osu.Game.Skinning
                                 if (keyCounter != null)
                                 {
                                     keyCounter.Rotation = 90f;
-                                    keyCounter.Anchor = Anchor.CentreRight;
+                                    keyCounter.Anchor = Anchor.BottomRight;
                                     keyCounter.Origin = Anchor.TopCentre;
-                                    keyCounter.Position = new Vector2(0);
+                                    keyCounter.Position = new Vector2(0, -340);
                                 }
                             })
                             {
@@ -409,7 +409,6 @@ namespace osu.Game.Skinning
                                     new LegacySongProgress(),
                                     new LegacyHealthDisplay(),
                                     new BarHitErrorMeter(),
-                                    //new DefaultKeyCounterDisplay(),
                                     new LegacyKeyCounterDisplay(),
                                 }
                             };
