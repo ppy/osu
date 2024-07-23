@@ -158,14 +158,14 @@ namespace osu.Game.Rulesets.Catch.Tests.Editor
             float[] positions = { 200, 200 };
             addBlueprintStep(times, positions, 0.2);
 
-            addAddVertexSteps(500, 150);
-            addVertexCheckStep(3, 1, 500, 150);
+            addAddVertexSteps(500, 180);
+            addVertexCheckStep(3, 1, 500, 180);
 
             addAddVertexSteps(90, 200);
             addVertexCheckStep(4, 1, times[0], positions[0]);
 
-            addAddVertexSteps(750, 180);
-            addVertexCheckStep(5, 4, 750, 180);
+            addAddVertexSteps(750, 200);
+            addVertexCheckStep(5, 4, 750, 200);
             AddAssert("duration is changed", () => Precision.AlmostEquals(hitObject.Duration, 800 - times[0], 1e-3));
         }
 
@@ -265,7 +265,7 @@ namespace osu.Game.Rulesets.Catch.Tests.Editor
             AddStep("delete vertex", () =>
             {
                 InputManager.PressKey(Key.ShiftLeft);
-                InputManager.Click(MouseButton.Left);
+                InputManager.Click(MouseButton.Right);
                 InputManager.ReleaseKey(Key.ShiftLeft);
             });
         }
