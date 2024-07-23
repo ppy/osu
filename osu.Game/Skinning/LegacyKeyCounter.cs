@@ -1,8 +1,11 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Textures;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Screens.Play.HUD;
@@ -22,6 +25,7 @@ namespace osu.Game.Skinning
         public Colour4 KeyUpBackgroundColour { get; set; } = Colour4.White;
 
         private float keyTextRotation = 0f;
+
         public float KeyTextRotation
         {
             get => keyTextRotation;
@@ -36,6 +40,8 @@ namespace osu.Game.Skinning
 
         private OsuSpriteText overlayKeyText = null!;
 
+        private Sprite keySprite = null!;
+
         public LegacyKeyCounter(InputTrigger trigger)
             : base(trigger)
         {
@@ -48,12 +54,11 @@ namespace osu.Game.Skinning
                 Anchor = Anchor.Centre,
                 Children = new Drawable[]
                 {
-                    new SkinnableSprite
+                    keySprite = new Sprite
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         BypassAutoSizeAxes = Axes.Both,
-                        SpriteName = { Value = "inputoverlay-key" },
                         Rotation = -90,
                     },
                     overlayKeyText = new OsuSpriteText
@@ -70,6 +75,15 @@ namespace osu.Game.Skinning
 
             // Legacy key counter size
             Height = Width = 48 * 0.95f;
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(ISkinSource source)
+        {
+            Texture? keyTexture = source.GetTexture($"inputoverlay-key");
+
+            if (keyTexture != null)
+                keySprite.Texture = keyTexture;
         }
 
         protected override void Activate(bool forwardPlayback = true)
