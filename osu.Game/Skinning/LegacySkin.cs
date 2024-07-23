@@ -15,7 +15,6 @@ using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
-using osu.Framework.Logging;
 using osu.Game.Audio;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Extensions;
@@ -396,10 +395,11 @@ namespace osu.Game.Skinning
                                 {
                                     keyCounter.Rotation = 90f;
                                     // set the anchor to top right so that it won't squash to the return button to the top
-                                    keyCounter.Anchor = Anchor.TopRight;
+                                    keyCounter.Anchor = Anchor.CentreRight;
                                     keyCounter.Origin = Anchor.TopCentre;
                                     keyCounter.X = 0;
-                                    keyCounter.Y = container.ToLocalSpace(container.ScreenSpaceDrawQuad.BottomRight).Y - 340;
+                                    // 340px is the default height inherit from stable
+                                    keyCounter.Y = container.ToLocalSpace(new Vector2(0, container.ScreenSpaceDrawQuad.Centre.Y - 340f)).Y;
                                 }
                             })
                             {
