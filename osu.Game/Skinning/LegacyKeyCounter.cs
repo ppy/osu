@@ -64,8 +64,8 @@ namespace osu.Game.Skinning
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            Width = Math.Max(overlayKey.Width, 43 * 1.05f);
-            Height = Math.Max(overlayKey.Height, 43 * 1.05f);
+            Width = Math.Max(overlayKey.Width, 48 * 0.95f);
+            Height = Math.Max(overlayKey.Height, 48 * 0.95f);
         }
 
         protected override void Activate(bool forwardPlayback = true)

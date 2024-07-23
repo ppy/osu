@@ -28,15 +28,14 @@ namespace osu.Game.Skinning
                  {
                      Anchor = Anchor.TopLeft,
                      Origin = Anchor.TopLeft,
-                     //BypassAutoSizeAxes = Axes.Both,
                      SpriteName = { Value= "inputoverlay-background" },
                  },
                  KeyFlow = new FillFlowContainer<KeyCounter>
                  {
-                     Padding = new MarginPadding
-                     {
-                         Horizontal = 7f * 1.05f,
-                     },
+                     // https://osu.ppy.sh/wiki/en/Skinning/Interface#input-overlay
+                     // 24px away from the container, there're 4 counter in legacy, so divide by 4
+                     // "inputoverlay-background.png" are 1.05x in-game. so *1.05f to the X coordinate
+                     X = (24 / 4) * 1.05f,
                      Anchor = Anchor.TopLeft,
                      Origin = Anchor.TopLeft,
                      Direction = FillDirection.Horizontal,
