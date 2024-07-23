@@ -8,6 +8,7 @@ using osu.Game.Beatmaps.Timing;
 using osu.Game.Rulesets.Mania;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Osu;
+using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Screens.Edit;
 
 namespace osu.Game.Tests.Editing
@@ -487,6 +488,56 @@ namespace osu.Game.Tests.Editing
             beatmapProcessor.PostProcess();
 
             Assert.That(beatmap.Breaks, Is.Empty);
+        }
+
+        [Test]
+        public void TestTimePreemptIsRespected()
+        {
+            var controlPoints = new ControlPointInfo();
+            controlPoints.Add(0, new TimingControlPoint { BeatLength = 500 });
+            var beatmap = new EditorBeatmap(new Beatmap
+            {
+                ControlPointInfo = controlPoints,
+                BeatmapInfo = { Ruleset = new OsuRuleset().RulesetInfo },
+                Difficulty =
+                {
+                    ApproachRate = 10,
+                },
+                HitObjects =
+                {
+                    new HitCircle { StartTime = 1000 },
+                    new HitCircle { StartTime = 5000 },
+                }
+            });
+
+            foreach (var ho in beatmap.HitObjects)
+                ho.ApplyDefaults(beatmap.ControlPointInfo, beatmap.Difficulty);
+
+            var beatmapProcessor = new EditorBeatmapProcessor(beatmap, new OsuRuleset());
+            beatmapProcessor.PreProcess();
+            beatmapProcessor.PostProcess();
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(beatmap.Breaks, Has.Count.EqualTo(1));
+                Assert.That(beatmap.Breaks[0].StartTime, Is.EqualTo(1200));
+                Assert.That(beatmap.Breaks[0].EndTime, Is.EqualTo(5000 - OsuHitObject.PREEMPT_MIN));
+            });
+
+            beatmap.Difficulty.ApproachRate = 0;
+
+            foreach (var ho in beatmap.HitObjects)
+                ho.ApplyDefaults(beatmap.ControlPointInfo, beatmap.Difficulty);
+
+            beatmapProcessor.PreProcess();
+            beatmapProcessor.PostProcess();
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(beatmap.Breaks, Has.Count.EqualTo(1));
+                Assert.That(beatmap.Breaks[0].StartTime, Is.EqualTo(1200));
+                Assert.That(beatmap.Breaks[0].EndTime, Is.EqualTo(5000 - OsuHitObject.PREEMPT_MAX));
+            });
         }
     }
 }
