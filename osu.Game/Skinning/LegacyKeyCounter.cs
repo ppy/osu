@@ -67,7 +67,7 @@ namespace osu.Game.Skinning
                         Origin = Anchor.Centre,
                         Text = trigger.Name,
                         Colour = KeyTextColour,
-                        Font = OsuFont.Default.With(fixedWidth: true),
+                        Font = OsuFont.GetFont(size: 20),
                         Rotation = KeyTextRotation
                     },
                 }
