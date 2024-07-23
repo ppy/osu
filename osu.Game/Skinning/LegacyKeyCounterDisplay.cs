@@ -5,7 +5,6 @@ using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Screens.Play.HUD;
-using osuTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
@@ -45,10 +44,13 @@ namespace osu.Game.Skinning
             });
         }
 
-        [BackgroundDependencyLoader]
-        private void load(ISkinSource source)
+        [Resolved]
+        private ISkinSource source { get; set; } = null!;
+
+        protected override void LoadComplete()
         {
-            source.GetConfig<string, Colour4>("InputOverlayText")?.BindValueChanged(v =>
+            base.LoadComplete();
+            source.GetConfig<SkinConfiguration.LegacySetting, Colour4>(SkinConfiguration.LegacySetting.InputOverlayText)?.BindValueChanged(v =>
             {
                 KeyTextColor = v.NewValue;
             }, true);
@@ -69,14 +71,15 @@ namespace osu.Game.Skinning
         protected override void Update()
         {
             base.Update();
+
             // keep the text are always horizontal
             foreach (var child in KeyFlow.Cast<LegacyKeyCounter>())
                 child.KeyTextRotation = -Rotation;
         }
 
-        private Color4 keyTextColor = Color4.White;
+        private Colour4 keyTextColor = Colour4.White;
 
-        public Color4 KeyTextColor
+        public Colour4 KeyTextColor
         {
             get => keyTextColor;
             set
