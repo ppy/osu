@@ -34,8 +34,6 @@ namespace osu.Game.Skinning
 
         private Container keyContainer = null!;
 
-        private SkinnableSprite overlayKey = null!;
-
         private OsuSpriteText overlayKeyText = null!;
 
         public LegacyKeyCounter(InputTrigger trigger)
@@ -50,9 +48,8 @@ namespace osu.Game.Skinning
                 Anchor = Anchor.Centre,
                 Children = new Drawable[]
                 {
-                    overlayKey = new SkinnableSprite
+                    new SkinnableSprite
                     {
-                        Blending = Multiplicative,
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         BypassAutoSizeAxes = Axes.Both,
@@ -88,21 +85,6 @@ namespace osu.Game.Skinning
             base.Deactivate(forwardPlayback);
             keyContainer.ScaleTo(1f, TransitionDuration);
             keyContainer.FadeColour(KeyUpBackgroundColour, TransitionDuration);
-        }
-
-        public static BlendingParameters Multiplicative
-        {
-            get
-            {
-                BlendingParameters result = default(BlendingParameters);
-                result.Source = BlendingType.SrcAlpha;
-                result.Destination = BlendingType.OneMinusSrcAlpha;
-                result.SourceAlpha = BlendingType.One;
-                result.DestinationAlpha = BlendingType.One;
-                result.RGBEquation = BlendingEquation.Add;
-                result.AlphaEquation = BlendingEquation.Add;
-                return result;
-            }
         }
     }
 }
