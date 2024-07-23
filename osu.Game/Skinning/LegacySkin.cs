@@ -15,6 +15,7 @@ using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
+using osu.Framework.Logging;
 using osu.Game.Audio;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Extensions;
@@ -381,22 +382,22 @@ namespace osu.Game.Skinning
                                 }
 
                                 var hitError = container.OfType<HitErrorMeter>().FirstOrDefault();
-                                var keyCounter = container.OfType<DefaultKeyCounterDisplay>().FirstOrDefault();
 
                                 if (hitError != null)
                                 {
                                     hitError.Anchor = Anchor.BottomCentre;
                                     hitError.Origin = Anchor.CentreLeft;
                                     hitError.Rotation = -90;
+                                }
 
-                                    if (keyCounter != null)
-                                    {
-                                        const float padding = 10;
+                                var keyCounter = container.OfType<LegacyKeyCounterDisplay>().FirstOrDefault();
 
-                                        keyCounter.Anchor = Anchor.BottomRight;
-                                        keyCounter.Origin = Anchor.BottomRight;
-                                        keyCounter.Position = new Vector2(-padding, -(padding + hitError.Width));
-                                    }
+                                if (keyCounter != null)
+                                {
+                                    keyCounter.Rotation = 90f;
+                                    keyCounter.Anchor = Anchor.CentreRight;
+                                    keyCounter.Origin = Anchor.TopCentre;
+                                    keyCounter.Position = new Vector2(0);
                                 }
                             })
                             {
@@ -408,7 +409,8 @@ namespace osu.Game.Skinning
                                     new LegacySongProgress(),
                                     new LegacyHealthDisplay(),
                                     new BarHitErrorMeter(),
-                                    new DefaultKeyCounterDisplay()
+                                    //new DefaultKeyCounterDisplay(),
+                                    new LegacyKeyCounterDisplay(),
                                 }
                             };
                     }
