@@ -3,6 +3,7 @@
 
 #nullable disable
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -100,10 +101,14 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             return base.OnDragStart(e);
         }
 
+        private float dragTimeAccumulated;
+
         protected override void Update()
         {
             if (IsDragged || hitObjectDragged)
                 handleScrollViaDrag();
+            else
+                dragTimeAccumulated = 0;
 
             if (Composer != null && timeline != null)
             {
@@ -193,25 +198,42 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         private void handleScrollViaDrag()
         {
+            // The amount of time dragging before we reach maximum drag speed.
+            const float time_ramp_multiplier = 5000;
+
+            // A maximum drag speed to ensure things don't get out of hand.
+            const float max_velocity = 10;
+
             if (timeline == null) return;
 
-            var timelineQuad = timeline.ScreenSpaceDrawQuad;
-            float mouseX = InputManager.CurrentState.Mouse.Position.X;
+            var mousePos = timeline.ToLocalSpace(InputManager.CurrentState.Mouse.Position);
 
             // for better UX do not require the user to drag all the way to the edge and beyond to initiate a drag-scroll.
             // this is especially important in scenarios like fullscreen, where mouse confine will usually be on
             // and the user physically *won't be able to* drag beyond the edge of the timeline
             // (since its left edge is co-incident with the window edge).
-            const float scroll_tolerance = 20;
+            const float scroll_tolerance = 40;
 
-            float leftBound = timelineQuad.TopLeft.X + scroll_tolerance;
-            float rightBound = timelineQuad.TopRight.X - scroll_tolerance;
+            float leftBound = timeline.BoundingBox.TopLeft.X + scroll_tolerance;
+            float rightBound = timeline.BoundingBox.TopRight.X - scroll_tolerance;
 
-            // scroll if in a drag and dragging outside visible extents
-            if (mouseX > rightBound)
-                timeline.ScrollBy((float)((mouseX - rightBound) / 10 * Clock.ElapsedFrameTime));
-            else if (mouseX < leftBound)
-                timeline.ScrollBy((float)((mouseX - leftBound) / 10 * Clock.ElapsedFrameTime));
+            float amount = 0;
+
+            if (mousePos.X > rightBound)
+                amount = mousePos.X - rightBound;
+            else if (mousePos.X < leftBound)
+                amount = mousePos.X - leftBound;
+
+            if (amount == 0)
+            {
+                dragTimeAccumulated = 0;
+                return;
+            }
+
+            amount = Math.Sign(amount) * Math.Min(max_velocity, Math.Abs(MathF.Pow(amount, 2) / (MathF.Pow(scroll_tolerance, 2))));
+            dragTimeAccumulated += (float)Clock.ElapsedFrameTime;
+
+            timeline.ScrollBy(amount * (float)Clock.ElapsedFrameTime * Math.Min(1, dragTimeAccumulated / time_ramp_multiplier));
         }
 
         private partial class SelectableAreaBackground : CompositeDrawable
