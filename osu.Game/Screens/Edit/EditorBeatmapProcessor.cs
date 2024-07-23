@@ -45,7 +45,7 @@ namespace osu.Game.Screens.Edit
 
         private void autoGenerateBreaks()
         {
-            var objectDuration = Beatmap.HitObjects.Select(ho => (ho.StartTime, ho.GetEndTime())).ToHashSet();
+            var objectDuration = Beatmap.HitObjects.Select(ho => (ho.StartTime - ((ho as IHasTimePreempt)?.TimePreempt ?? 0), ho.GetEndTime())).ToHashSet();
 
             if (objectDuration.SetEquals(objectDurationCache))
                 return;
