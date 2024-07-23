@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
@@ -20,6 +19,8 @@ namespace osu.Game.Skinning
 
         public Colour4 KeyDownBackgroundColour { get; set; } = Colour4.Yellow;
 
+        public Colour4 KeyUpBackgroundColour { get; set; } = Colour4.White;
+
         private float keyTextRotation = 0f;
         public float KeyTextRotation
         {
@@ -30,8 +31,6 @@ namespace osu.Game.Skinning
                 overlayKeyText.Rotation = value;
             }
         }
-
-        public Colour4 KeyUpBackgroundColour { get; set; } = Colour4.White;
 
         private Container keyContainer = null!;
 
@@ -71,13 +70,9 @@ namespace osu.Game.Skinning
                     },
                 }
             };
-        }
 
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-            Width = Math.Max(overlayKey.Width, 48 * 0.95f);
-            Height = Math.Max(overlayKey.Height, 46 * 0.95f);
+            // Legacy key counter size
+            Height = Width = 48 * 0.95f;
         }
 
         protected override void Activate(bool forwardPlayback = true)

@@ -16,15 +16,13 @@ namespace osu.Game.Skinning
 
         protected override FillFlowContainer<KeyCounter> KeyFlow { get; } = null!;
 
-        private SkinnableSprite overlayBackground = null!;
-
         public LegacyKeyCounterDisplay()
         {
             AutoSizeAxes = Axes.Both;
 
             AddRangeInternal(new Drawable[]
             {
-                 overlayBackground = new SkinnableSprite
+                 new SkinnableSprite
                  {
                      Anchor = Anchor.TopLeft,
                      Origin = Anchor.TopLeft,
