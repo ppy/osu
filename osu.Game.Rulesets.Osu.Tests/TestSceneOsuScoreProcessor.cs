@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Osu.Tests
     public partial class TestSceneOsuScoreProcessor : OsuTestScene
     {
         [Test]
-        public void TestMinimumRankNeverReachesSRank()
+        public void TestMinimumRankShouldNeverReachSRankBeforeComplete()
         {
             var beatmap = new Beatmap<HitObject>
             {
