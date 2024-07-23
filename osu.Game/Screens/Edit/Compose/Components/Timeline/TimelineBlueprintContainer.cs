@@ -198,11 +198,20 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             var timelineQuad = timeline.ScreenSpaceDrawQuad;
             float mouseX = InputManager.CurrentState.Mouse.Position.X;
 
+            // for better UX do not require the user to drag all the way to the edge and beyond to initiate a drag-scroll.
+            // this is especially important in scenarios like fullscreen, where mouse confine will usually be on
+            // and the user physically *won't be able to* drag beyond the edge of the timeline
+            // (since its left edge is co-incident with the window edge).
+            const float scroll_tolerance = 20;
+
+            float leftBound = timelineQuad.TopLeft.X + scroll_tolerance;
+            float rightBound = timelineQuad.TopRight.X - scroll_tolerance;
+
             // scroll if in a drag and dragging outside visible extents
-            if (mouseX > timelineQuad.TopRight.X)
-                timeline.ScrollBy((float)((mouseX - timelineQuad.TopRight.X) / 10 * Clock.ElapsedFrameTime));
-            else if (mouseX < timelineQuad.TopLeft.X)
-                timeline.ScrollBy((float)((mouseX - timelineQuad.TopLeft.X) / 10 * Clock.ElapsedFrameTime));
+            if (mouseX > rightBound)
+                timeline.ScrollBy((float)((mouseX - rightBound) / 10 * Clock.ElapsedFrameTime));
+            else if (mouseX < leftBound)
+                timeline.ScrollBy((float)((mouseX - leftBound) / 10 * Clock.ElapsedFrameTime));
         }
 
         private partial class SelectableAreaBackground : CompositeDrawable
