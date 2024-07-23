@@ -69,7 +69,21 @@ namespace osu.Game.Screens.Edit.Compose
             if (ruleset == null || composer == null)
                 return base.CreateTimelineContent();
 
-            return wrapSkinnableContent(new TimelineBlueprintContainer(composer));
+            return wrapSkinnableContent(new Container
+            {
+                RelativeSizeAxes = Axes.Both,
+                Children = new Drawable[]
+                {
+                    new TimelineBlueprintContainer(composer),
+                    new TimelineBreakDisplay
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Anchor = Anchor.CentreLeft,
+                        Origin = Anchor.CentreLeft,
+                        Height = 0.75f,
+                    },
+                }
+            });
         }
 
         private Drawable wrapSkinnableContent(Drawable content)

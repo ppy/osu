@@ -208,6 +208,9 @@ namespace osu.Game.Configuration
 
             SetDefault(OsuSetting.ComboColourNormalisationAmount, 0.2f, 0f, 1f, 0.01f);
             SetDefault<UserStatus?>(OsuSetting.UserOnlineStatus, null);
+
+            SetDefault(OsuSetting.EditorTimelineShowTimingChanges, true);
+            SetDefault(OsuSetting.EditorTimelineShowTicks, true);
         }
 
         protected override bool CheckLookupContainsPrivateInformation(OsuSetting lookup)
@@ -439,5 +442,7 @@ namespace osu.Game.Configuration
         UserOnlineStatus,
         MultiplayerRoomFilter,
         HideCountryFlags,
+        EditorTimelineShowTimingChanges,
+        EditorTimelineShowTicks,
     }
 }

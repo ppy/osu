@@ -43,6 +43,9 @@ namespace osu.Game.Screens.SelectV2.Leaderboards
 {
     public partial class LeaderboardScoreV2 : OsuClickableContainer, IHasContextMenu, IHasCustomTooltip<ScoreInfo>
     {
+        public int? Rank { get; init; }
+        public bool IsPersonalBest { get; init; }
+
         private const float expanded_right_content_width = 210;
         private const float grade_width = 40;
         private const float username_min_width = 125;
@@ -52,14 +55,11 @@ namespace osu.Game.Screens.SelectV2.Leaderboards
         private const float rank_label_visibility_width_cutoff = rank_label_width + height + username_min_width + statistics_regular_min_width + expanded_right_content_width;
 
         private readonly ScoreInfo score;
+        private readonly bool sheared;
 
         private const int height = 60;
         private const int corner_radius = 10;
         private const int transition_duration = 200;
-
-        private readonly int? rank;
-
-        private readonly bool isPersonalBest;
 
         private Colour4 foregroundColour;
         private Colour4 backgroundColour;
@@ -104,13 +104,12 @@ namespace osu.Game.Screens.SelectV2.Leaderboards
         public ITooltip<ScoreInfo> GetCustomTooltip() => new LeaderboardScoreTooltip();
         public virtual ScoreInfo TooltipContent => score;
 
-        public LeaderboardScoreV2(ScoreInfo score, int? rank, bool isPersonalBest = false)
+        public LeaderboardScoreV2(ScoreInfo score, bool sheared = true)
         {
             this.score = score;
-            this.rank = rank;
-            this.isPersonalBest = isPersonalBest;
+            this.sheared = sheared;
 
-            Shear = new Vector2(OsuGame.SHEAR, 0);
+            Shear = new Vector2(sheared ? OsuGame.SHEAR : 0, 0);
             RelativeSizeAxes = Axes.X;
             Height = height;
         }
@@ -120,8 +119,8 @@ namespace osu.Game.Screens.SelectV2.Leaderboards
         {
             var user = score.User;
 
-            foregroundColour = isPersonalBest ? colourProvider.Background1 : colourProvider.Background5;
-            backgroundColour = isPersonalBest ? colourProvider.Background2 : colourProvider.Background4;
+            foregroundColour = IsPersonalBest ? colourProvider.Background1 : colourProvider.Background5;
+            backgroundColour = IsPersonalBest ? colourProvider.Background2 : colourProvider.Background4;
             totalScoreBackgroundGradient = ColourInfo.GradientHorizontal(backgroundColour.Opacity(0), backgroundColour);
 
             statisticsLabels = GetStatistics(score).Select(s => new ScoreComponentLabel(s, score)
@@ -159,7 +158,7 @@ namespace osu.Game.Screens.SelectV2.Leaderboards
                                 {
                                     AutoSizeAxes = Axes.X,
                                     RelativeSizeAxes = Axes.Y,
-                                    Child = rankLabel = new RankLabel(rank)
+                                    Child = rankLabel = new RankLabel(Rank, sheared)
                                     {
                                         Width = rank_label_width,
                                         RelativeSizeAxes = Axes.Y,
@@ -243,7 +242,7 @@ namespace osu.Game.Screens.SelectV2.Leaderboards
                 {
                     RelativeSizeAxes = Axes.Both,
                     User = score.User,
-                    Shear = new Vector2(-OsuGame.SHEAR, 0),
+                    Shear = new Vector2(sheared ? -OsuGame.SHEAR : 0, 0),
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.BottomLeft,
                     Colour = ColourInfo.GradientHorizontal(Colour4.White.Opacity(0.5f), Colour4.FromHex(@"222A27").Opacity(1)),
@@ -274,7 +273,7 @@ namespace osu.Game.Screens.SelectV2.Leaderboards
                                             Anchor = Anchor.Centre,
                                             Origin = Anchor.Centre,
                                             Scale = new Vector2(1.1f),
-                                            Shear = new Vector2(-OsuGame.SHEAR, 0),
+                                            Shear = new Vector2(sheared ? -OsuGame.SHEAR : 0, 0),
                                             RelativeSizeAxes = Axes.Both,
                                         })
                                     {
@@ -292,7 +291,7 @@ namespace osu.Game.Screens.SelectV2.Leaderboards
                                                 RelativeSizeAxes = Axes.Both,
                                                 Colour = Colour4.Black.Opacity(0.5f),
                                             },
-                                            new RankLabel(rank)
+                                            new RankLabel(Rank, sheared)
                                             {
                                                 AutoSizeAxes = Axes.Both,
                                                 Anchor = Anchor.Centre,
@@ -314,7 +313,7 @@ namespace osu.Game.Screens.SelectV2.Leaderboards
                                 {
                                     flagBadgeAndDateContainer = new FillFlowContainer
                                     {
-                                        Shear = new Vector2(-OsuGame.SHEAR, 0),
+                                        Shear = new Vector2(sheared ? -OsuGame.SHEAR : 0, 0),
                                         Direction = FillDirection.Horizontal,
                                         Spacing = new Vector2(5),
                                         AutoSizeAxes = Axes.Both,
@@ -338,7 +337,7 @@ namespace osu.Game.Screens.SelectV2.Leaderboards
                                     nameLabel = new TruncatingSpriteText
                                     {
                                         RelativeSizeAxes = Axes.X,
-                                        Shear = new Vector2(-OsuGame.SHEAR, 0),
+                                        Shear = new Vector2(sheared ? -OsuGame.SHEAR : 0, 0),
                                         Text = user.Username,
                                         Font = OsuFont.GetFont(size: 20, weight: FontWeight.SemiBold)
                                     }
@@ -354,7 +353,7 @@ namespace osu.Game.Screens.SelectV2.Leaderboards
                                     Name = @"Statistics container",
                                     Padding = new MarginPadding { Right = 40 },
                                     Spacing = new Vector2(25, 0),
-                                    Shear = new Vector2(-OsuGame.SHEAR, 0),
+                                    Shear = new Vector2(sheared ? -OsuGame.SHEAR : 0, 0),
                                     Anchor = Anchor.CentreRight,
                                     Origin = Anchor.CentreRight,
                                     AutoSizeAxes = Axes.Both,
@@ -412,7 +411,7 @@ namespace osu.Game.Screens.SelectV2.Leaderboards
                     },
                     RankContainer = new Container
                     {
-                        Shear = new Vector2(-OsuGame.SHEAR, 0),
+                        Shear = new Vector2(sheared ? -OsuGame.SHEAR : 0, 0),
                         Anchor = Anchor.CentreRight,
                         Origin = Anchor.CentreRight,
                         RelativeSizeAxes = Axes.Y,
@@ -470,7 +469,7 @@ namespace osu.Game.Screens.SelectV2.Leaderboards
                                             Anchor = Anchor.TopRight,
                                             Origin = Anchor.TopRight,
                                             UseFullGlyphHeight = false,
-                                            Shear = new Vector2(-OsuGame.SHEAR, 0),
+                                            Shear = new Vector2(sheared ? -OsuGame.SHEAR : 0, 0),
                                             Current = scoreManager.GetBindableTotalScoreString(score),
                                             Font = OsuFont.GetFont(size: 30, weight: FontWeight.Light),
                                         },
@@ -478,7 +477,7 @@ namespace osu.Game.Screens.SelectV2.Leaderboards
                                         {
                                             Anchor = Anchor.TopRight,
                                             Origin = Anchor.TopRight,
-                                            Shear = new Vector2(-OsuGame.SHEAR, 0),
+                                            Shear = new Vector2(sheared ? -OsuGame.SHEAR : 0, 0),
                                             AutoSizeAxes = Axes.Both,
                                             Direction = FillDirection.Horizontal,
                                             Spacing = new Vector2(2f, 0f),
@@ -656,14 +655,14 @@ namespace osu.Game.Screens.SelectV2.Leaderboards
 
         private partial class RankLabel : Container, IHasTooltip
         {
-            public RankLabel(int? rank)
+            public RankLabel(int? rank, bool sheared)
             {
                 if (rank >= 1000)
                     TooltipText = $"#{rank:N0}";
 
                 Child = new OsuSpriteText
                 {
-                    Shear = new Vector2(-OsuGame.SHEAR, 0),
+                    Shear = new Vector2(sheared ? -OsuGame.SHEAR : 0, 0),
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Font = OsuFont.GetFont(size: 20, weight: FontWeight.SemiBold, italics: true),

@@ -8,20 +8,28 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Extensions;
 using osu.Framework.Extensions.LocalisationExtensions;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
+using osu.Game.Database;
 using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation;
+using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Online.Metadata;
+using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.OnlinePlay.Components;
+using osu.Game.Screens.OnlinePlay.DailyChallenge.Events;
 using osu.Game.Screens.OnlinePlay.Match;
 using osu.Game.Screens.OnlinePlay.Match.Components;
 using osu.Game.Screens.OnlinePlay.Playlists;
@@ -41,10 +49,13 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
         private readonly Bindable<IReadOnlyList<Mod>> userMods = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
 
         private OnlinePlayScreenWaveContainer waves = null!;
-        private MatchLeaderboard leaderboard = null!;
+        private DailyChallengeLeaderboard leaderboard = null!;
         private RoomModSelectOverlay userModsSelectOverlay = null!;
         private Sample? sampleStart;
         private IDisposable? userModsSelectOverlayRegistration;
+
+        private DailyChallengeScoreBreakdown breakdown = null!;
+        private DailyChallengeEventFeed feed = null!;
 
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Plum);
@@ -66,6 +77,12 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
 
         [Resolved]
         private IOverlayManager? overlayManager { get; set; }
+
+        [Resolved]
+        private MetadataClient metadataClient { get; set; } = null!;
+
+        [Resolved]
+        private UserLookupCache userLookupCache { get; set; } = null!;
 
         public override bool DisallowExternalBeatmapRulesetChanges => true;
 
@@ -143,7 +160,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
                                         new Box
                                         {
                                             RelativeSizeAxes = Axes.Both,
-                                            Colour = Color4Extensions.FromHex(@"3e3a44") // Temporary.
+                                            Colour = colourProvider.Background4,
                                         },
                                         new GridContainer
                                         {
@@ -161,25 +178,47 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
                                             {
                                                 new Drawable?[]
                                                 {
-                                                    null,
-                                                    null,
-                                                    // Middle column (leaderboard)
                                                     new GridContainer
                                                     {
                                                         RelativeSizeAxes = Axes.Both,
+                                                        Anchor = Anchor.Centre,
+                                                        Origin = Anchor.Centre,
+                                                        RowDimensions =
+                                                        [
+                                                            new Dimension(),
+                                                            new Dimension()
+                                                        ],
                                                         Content = new[]
                                                         {
                                                             new Drawable[]
                                                             {
-                                                                new OverlinedHeader("Leaderboard")
+                                                                new DailyChallengeCarousel
+                                                                {
+                                                                    RelativeSizeAxes = Axes.Both,
+                                                                    Anchor = Anchor.Centre,
+                                                                    Origin = Anchor.Centre,
+                                                                    Children = new Drawable[]
+                                                                    {
+                                                                        new DailyChallengeTimeRemainingRing(),
+                                                                        breakdown = new DailyChallengeScoreBreakdown(),
+                                                                    }
+                                                                }
                                                             },
-                                                            [leaderboard = new MatchLeaderboard { RelativeSizeAxes = Axes.Both }],
+                                                            [
+                                                                feed = new DailyChallengeEventFeed
+                                                                {
+                                                                    RelativeSizeAxes = Axes.Both,
+                                                                    PresentScore = presentScore
+                                                                }
+                                                            ],
                                                         },
-                                                        RowDimensions = new[]
-                                                        {
-                                                            new Dimension(GridSizeMode.AutoSize),
-                                                            new Dimension(),
-                                                        }
+                                                    },
+                                                    null,
+                                                    // Middle column (leaderboard)
+                                                    leaderboard = new DailyChallengeLeaderboard(room, playlistItem)
+                                                    {
+                                                        RelativeSizeAxes = Axes.Both,
+                                                        PresentScore = presentScore,
                                                     },
                                                     // Spacer
                                                     null,
@@ -191,7 +230,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
                                                         {
                                                             new Drawable[]
                                                             {
-                                                                new OverlinedHeader("Chat")
+                                                                new SectionHeader("Chat")
                                                             },
                                                             [new MatchChatDisplay(room) { RelativeSizeAxes = Axes.Both }]
                                                         },
@@ -221,7 +260,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
                                         new Box
                                         {
                                             RelativeSizeAxes = Axes.Both,
-                                            Colour = Color4Extensions.FromHex(@"28242d") // Temporary.
+                                            Colour = colourProvider.Background5,
                                         },
                                         footerButtons = new FillFlowContainer
                                         {
@@ -271,6 +310,42 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
                 var allowedMods = playlistItem.AllowedMods.Select(m => m.ToMod(rulesetInstance));
                 userModsSelectOverlay.IsValidMod = m => allowedMods.Any(a => a.GetType() == m.GetType());
             }
+
+            metadataClient.MultiplayerRoomScoreSet += onRoomScoreSet;
+        }
+
+        private void presentScore(long id)
+        {
+            if (this.IsCurrentScreen())
+                this.Push(new PlaylistItemScoreResultsScreen(room.RoomID.Value!.Value, playlistItem, id));
+        }
+
+        private void onRoomScoreSet(MultiplayerRoomScoreSetEvent e)
+        {
+            if (e.RoomID != room.RoomID.Value || e.PlaylistItemID != playlistItem.ID)
+                return;
+
+            userLookupCache.GetUserAsync(e.UserID).ContinueWith(t =>
+            {
+                if (t.Exception != null)
+                {
+                    Logger.Log($@"Could not display room score set event: {t.Exception}", LoggingTarget.Network);
+                    return;
+                }
+
+                APIUser? user = t.GetResultSafely();
+                if (user == null) return;
+
+                var ev = new NewScoreEvent(e.ScoreID, user, e.TotalScore, e.NewRank);
+                Schedule(() =>
+                {
+                    breakdown.AddNewScore(ev);
+                    feed.AddNewScore(ev);
+
+                    if (e.NewRank <= 50)
+                        Schedule(() => leaderboard.RefetchScores());
+                });
+            });
         }
 
         protected override void LoadComplete()
@@ -290,6 +365,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
             var beatmap = beatmapManager.QueryBeatmap(b => b.OnlineID == playlistItem.Beatmap.OnlineID);
             Beatmap.Value = beatmapManager.GetWorkingBeatmap(beatmap); // this will gracefully fall back to dummy beatmap if missing locally.
             Ruleset.Value = rulesets.GetRuleset(playlistItem.RulesetID);
+            applyLoopingToTrack();
         }
 
         public override void OnEntering(ScreenTransitionEvent e)
@@ -299,6 +375,25 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
             waves.Show();
             roomManager.JoinRoom(room);
             applyLoopingToTrack();
+
+            metadataClient.BeginWatchingMultiplayerRoom(room.RoomID.Value!.Value).ContinueWith(t =>
+            {
+                if (t.Exception != null)
+                {
+                    Logger.Error(t.Exception, @"Failed to subscribe to room updates", LoggingTarget.Network);
+                    return;
+                }
+
+                MultiplayerPlaylistItemStats[] stats = t.GetResultSafely();
+                var itemStats = stats.SingleOrDefault(item => item.PlaylistItemID == playlistItem.ID);
+                if (itemStats == null) return;
+
+                Schedule(() => breakdown.SetInitialCounts(itemStats.TotalScoreDistribution));
+            });
+
+            beatmapAvailabilityTracker.SelectedItem.Value = playlistItem;
+            beatmapAvailabilityTracker.Availability.BindValueChanged(_ => trySetDailyChallengeBeatmap(), true);
+            userModsSelectOverlay.SelectedItem.Value = playlistItem;
         }
 
         public override void OnResuming(ScreenTransitionEvent e)
@@ -323,6 +418,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
             this.Delay(WaveContainer.DISAPPEAR_DURATION).FadeOut();
 
             roomManager.PartRoom();
+            metadataClient.EndWatchingMultiplayerRoom(room.RoomID.Value!.Value).FireAndForget();
 
             return base.OnExiting(e);
         }
@@ -371,6 +467,9 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
             base.Dispose(isDisposing);
 
             userModsSelectOverlayRegistration?.Dispose();
+
+            if (metadataClient.IsNotNull())
+                metadataClient.MultiplayerRoomScoreSet -= onRoomScoreSet;
         }
     }
 }

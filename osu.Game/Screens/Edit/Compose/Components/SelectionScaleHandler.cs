@@ -14,6 +14,11 @@ namespace osu.Game.Screens.Edit.Compose.Components
     public partial class SelectionScaleHandler : Component
     {
         /// <summary>
+        /// Whether there is any ongoing scale operation right now.
+        /// </summary>
+        public Bindable<bool> OperationInProgress { get; private set; } = new BindableBool();
+
+        /// <summary>
         /// Whether horizontal scaling (from the left or right edge) support should be enabled.
         /// </summary>
         public Bindable<bool> CanScaleX { get; private set; } = new BindableBool();
@@ -63,6 +68,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// </remarks>
         public virtual void Begin()
         {
+            OperationInProgress.Value = true;
         }
 
         /// <summary>
@@ -99,6 +105,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// </remarks>
         public virtual void Commit()
         {
+            OperationInProgress.Value = false;
         }
     }
 }

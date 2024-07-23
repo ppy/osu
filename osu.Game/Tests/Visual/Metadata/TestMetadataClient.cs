@@ -86,5 +86,10 @@ namespace osu.Game.Tests.Visual.Metadata
             dailyChallengeInfo.Value = info;
             return Task.CompletedTask;
         }
+
+        public override Task<MultiplayerPlaylistItemStats[]> BeginWatchingMultiplayerRoom(long id)
+            => Task.FromResult(new MultiplayerPlaylistItemStats[MultiplayerPlaylistItemStats.TOTAL_SCORE_DISTRIBUTION_BINS]);
+
+        public override Task EndWatchingMultiplayerRoom(long id) => Task.CompletedTask;
     }
 }

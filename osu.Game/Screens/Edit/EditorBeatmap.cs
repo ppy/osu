@@ -10,6 +10,7 @@ using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Lists;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Beatmaps.Legacy;
@@ -105,10 +106,17 @@ namespace osu.Game.Screens.Edit
                 BeatmapSkin.BeatmapSkinChanged += SaveState;
             }
 
-            beatmapProcessor = playableBeatmap.BeatmapInfo.Ruleset.CreateInstance().CreateBeatmapProcessor(this);
+            beatmapProcessor = new EditorBeatmapProcessor(this, playableBeatmap.BeatmapInfo.Ruleset.CreateInstance());
 
             foreach (var obj in HitObjects)
                 trackStartTime(obj);
+
+            Breaks = new BindableList<BreakPeriod>(playableBeatmap.Breaks);
+            Breaks.BindCollectionChanged((_, _) =>
+            {
+                playableBeatmap.Breaks.Clear();
+                playableBeatmap.Breaks.AddRange(Breaks);
+            });
 
             PreviewTime = new BindableInt(BeatmapInfo.Metadata.PreviewTime);
             PreviewTime.BindValueChanged(s =>
@@ -172,7 +180,13 @@ namespace osu.Game.Screens.Edit
             set => PlayableBeatmap.ControlPointInfo = value;
         }
 
-        public List<BreakPeriod> Breaks => PlayableBeatmap.Breaks;
+        public readonly BindableList<BreakPeriod> Breaks;
+
+        SortedList<BreakPeriod> IBeatmap.Breaks
+        {
+            get => PlayableBeatmap.Breaks;
+            set => PlayableBeatmap.Breaks = value;
+        }
 
         public List<string> UnhandledEventLines => PlayableBeatmap.UnhandledEventLines;
 
@@ -421,13 +435,13 @@ namespace osu.Game.Screens.Edit
             if (batchPendingUpdates.Count == 0 && batchPendingDeletes.Count == 0 && batchPendingInserts.Count == 0)
                 return;
 
-            beatmapProcessor?.PreProcess();
+            beatmapProcessor.PreProcess();
 
             foreach (var h in batchPendingDeletes) processHitObject(h);
             foreach (var h in batchPendingInserts) processHitObject(h);
             foreach (var h in batchPendingUpdates) processHitObject(h);
 
-            beatmapProcessor?.PostProcess();
+            beatmapProcessor.PostProcess();
 
             BeatmapReprocessed?.Invoke();
 

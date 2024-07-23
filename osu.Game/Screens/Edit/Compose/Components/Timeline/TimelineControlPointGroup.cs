@@ -24,7 +24,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
             Origin = Anchor.TopLeft;
 
-            X = (float)group.Time;
+            // offset visually to avoid overlapping timeline tick display.
+            X = (float)group.Time + 6;
         }
 
         protected override void LoadComplete()

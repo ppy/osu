@@ -7,7 +7,6 @@ using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using osu.Framework.Allocation;
-using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Rendering;
@@ -243,14 +242,14 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
 
                 originPosition = Vector2.Zero;
 
-                if (Source.TrailOrigin.HasFlagFast(Anchor.x1))
+                if (Source.TrailOrigin.HasFlag(Anchor.x1))
                     originPosition.X = 0.5f;
-                else if (Source.TrailOrigin.HasFlagFast(Anchor.x2))
+                else if (Source.TrailOrigin.HasFlag(Anchor.x2))
                     originPosition.X = 1f;
 
-                if (Source.TrailOrigin.HasFlagFast(Anchor.y1))
+                if (Source.TrailOrigin.HasFlag(Anchor.y1))
                     originPosition.Y = 0.5f;
-                else if (Source.TrailOrigin.HasFlagFast(Anchor.y2))
+                else if (Source.TrailOrigin.HasFlag(Anchor.y2))
                     originPosition.Y = 1f;
 
                 Source.parts.CopyTo(parts, 0);

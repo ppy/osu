@@ -26,7 +26,6 @@ namespace osu.Game.Tests.Beatmaps
 
             BeatmapInfo = baseBeatmap.BeatmapInfo;
             ControlPointInfo = baseBeatmap.ControlPointInfo;
-            Breaks = baseBeatmap.Breaks;
             UnhandledEventLines = baseBeatmap.UnhandledEventLines;
             AudioLeadIn = baseBeatmap.AudioLeadIn;
             StackLeniency = baseBeatmap.StackLeniency;
@@ -41,7 +40,10 @@ namespace osu.Game.Tests.Beatmaps
             CountdownOffset = baseBeatmap.CountdownOffset;
 
             if (withHitObjects)
+            {
                 HitObjects = baseBeatmap.HitObjects;
+                Breaks = baseBeatmap.Breaks;
+            }
 
             BeatmapInfo.Ruleset = ruleset;
             BeatmapInfo.Length = 75000;

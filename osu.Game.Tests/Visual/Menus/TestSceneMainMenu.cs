@@ -20,6 +20,7 @@ namespace osu.Game.Tests.Visual.Menus
         {
             base.SetUpSteps();
             AddStep("don't fetch online content", () => onlineMenuBanner.FetchOnlineContent = false);
+            AddStep("disable return to top on idle", () => Game.ChildrenOfType<ButtonSystem>().Single().ReturnToTopOnIdle = false);
         }
 
         [Test]
