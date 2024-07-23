@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using osu.Framework.Graphics;
 using osu.Game.Beatmaps.Formats;
 using osuTK.Graphics;
 
@@ -38,7 +39,10 @@ namespace osu.Game.Skinning
             AnimationFramerate,
             LayeredHitSounds,
             AllowSliderBallTint,
+            InputOverlayText,
         }
+
+        public Colour4? InputOverlayText { get; internal set; }
 
         public static List<Color4> DefaultComboColours { get; } = new List<Color4>
         {

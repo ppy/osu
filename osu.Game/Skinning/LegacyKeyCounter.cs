@@ -16,13 +16,19 @@ namespace osu.Game.Skinning
     {
         public bool UsesFixedAnchor { get; set; }
 
-        public float TransitionDuration { get; set; } = 150f;
+        public float TransitionDuration { get; set; } = 50f;
 
-        public Colour4 KeyTextColour { get; set; } = Colour4.White;
+        public Colour4 KeyTextColour
+        {
+            get => keyTextColour;
+            set
+            {
+                keyTextColour = value;
+                overlayKeyText.Colour = value;
+            }
+        }
 
-        public Colour4 KeyDownBackgroundColour { get; set; } = Colour4.Yellow;
-
-        public Colour4 KeyUpBackgroundColour { get; set; } = Colour4.White;
+        private Colour4 keyTextColour = Colour4.White;
 
         private float keyTextRotation = 0f;
 
@@ -66,7 +72,7 @@ namespace osu.Game.Skinning
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         Text = trigger.Name,
-                        Colour = KeyTextColour,
+                        Colour = keyTextColour,
                         Font = OsuFont.GetFont(size: 20),
                         Rotation = KeyTextRotation
                     },
@@ -89,8 +95,7 @@ namespace osu.Game.Skinning
         protected override void Activate(bool forwardPlayback = true)
         {
             base.Activate(forwardPlayback);
-            keyContainer.ScaleTo(0.75f, TransitionDuration);
-            keyContainer.FadeColour(KeyDownBackgroundColour, TransitionDuration);
+            keyContainer.ScaleTo(0.8f, TransitionDuration);
             overlayKeyText.Text = CountPresses.Value.ToString();
         }
 
@@ -98,7 +103,6 @@ namespace osu.Game.Skinning
         {
             base.Deactivate(forwardPlayback);
             keyContainer.ScaleTo(1f, TransitionDuration);
-            keyContainer.FadeColour(KeyUpBackgroundColour, TransitionDuration);
         }
     }
 }
