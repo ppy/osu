@@ -15,26 +15,24 @@ namespace osu.Game.Skinning
 {
     public partial class LegacyKeyCounter : KeyCounter
     {
-        public bool UsesFixedAnchor { get; set; }
+        private const float transition_duration = 160;
 
-        public float TransitionDuration { get; set; } = 50f;
+        public Colour4 ActiveColour { get; set; }
 
-        public Colour4 KeyTextColour
+        private Colour4 textColour;
+
+        public Colour4 TextColour
         {
-            get => keyTextColour;
+            get => textColour;
             set
             {
-                keyTextColour = value;
+                textColour = value;
                 overlayKeyText.Colour = value;
             }
         }
 
-        private Colour4 keyTextColour = Colour4.White;
-
         private readonly Container keyContainer;
-
         private readonly OsuSpriteText overlayKeyText;
-
         private readonly Sprite keySprite;
 
         public LegacyKeyCounter(InputTrigger trigger)
@@ -64,7 +62,7 @@ namespace osu.Game.Skinning
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             Text = trigger.Name,
-                            Colour = keyTextColour,
+                            Colour = textColour,
                             Font = OsuFont.GetFont(size: 20),
                         },
                     },
@@ -87,14 +85,17 @@ namespace osu.Game.Skinning
         protected override void Activate(bool forwardPlayback = true)
         {
             base.Activate(forwardPlayback);
-            keyContainer.ScaleTo(0.75f, TransitionDuration, Easing.OutQuad);
+            keyContainer.ScaleTo(0.75f, transition_duration, Easing.Out);
+            keySprite.Colour = ActiveColour;
             overlayKeyText.Text = CountPresses.Value.ToString();
+            overlayKeyText.Font = overlayKeyText.Font.With(weight: FontWeight.Bold);
         }
 
         protected override void Deactivate(bool forwardPlayback = true)
         {
             base.Deactivate(forwardPlayback);
-            keyContainer.ScaleTo(1f, TransitionDuration);
+            keyContainer.ScaleTo(1f, transition_duration, Easing.Out);
+            keySprite.Colour = Colour4.White;
         }
     }
 }
