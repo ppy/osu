@@ -30,7 +30,7 @@ namespace osu.Game.Skinning
 
         private Colour4 keyTextColour = Colour4.White;
 
-        private float keyTextRotation = 0f;
+        private float keyTextRotation;
 
         public float KeyTextRotation
         {
@@ -42,11 +42,11 @@ namespace osu.Game.Skinning
             }
         }
 
-        private Container keyContainer = null!;
+        private readonly Container keyContainer;
 
-        private OsuSpriteText overlayKeyText = null!;
+        private readonly OsuSpriteText overlayKeyText;
 
-        private Sprite keySprite = null!;
+        private readonly Sprite keySprite;
 
         public LegacyKeyCounter(InputTrigger trigger)
             : base(trigger)
@@ -86,7 +86,7 @@ namespace osu.Game.Skinning
         [BackgroundDependencyLoader]
         private void load(ISkinSource source)
         {
-            Texture? keyTexture = source.GetTexture($"inputoverlay-key");
+            Texture? keyTexture = source.GetTexture(@"inputoverlay-key");
 
             if (keyTexture != null)
                 keySprite.Texture = keyTexture;

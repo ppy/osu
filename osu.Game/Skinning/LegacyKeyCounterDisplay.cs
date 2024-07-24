@@ -8,7 +8,6 @@ using osu.Game.Screens.Play.HUD;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
-using osuTK;
 
 namespace osu.Game.Skinning
 {
@@ -16,9 +15,9 @@ namespace osu.Game.Skinning
     {
         private const float key_transition_time = 100;
 
-        protected override FillFlowContainer<KeyCounter> KeyFlow { get; } = null!;
+        protected override FillFlowContainer<KeyCounter> KeyFlow { get; }
 
-        private Sprite backgroundSprite = null!;
+        private readonly Sprite backgroundSprite;
 
         public LegacyKeyCounterDisplay()
         {
@@ -26,22 +25,22 @@ namespace osu.Game.Skinning
 
             AddRangeInternal(new Drawable[]
             {
-                 backgroundSprite = new Sprite
-                 {
-                     Anchor = Anchor.TopLeft,
-                     Origin = Anchor.TopLeft,
-                 },
-                 KeyFlow = new FillFlowContainer<KeyCounter>
-                 {
-                     // https://osu.ppy.sh/wiki/en/Skinning/Interface#input-overlay
-                     // 24px away from the container, there're 4 counter in legacy, so divide by 4
-                     // "inputoverlay-background.png" are 1.05x in-game. so *1.05f to the X coordinate
-                     X = (24 / 4) * 1f,
-                     Anchor = Anchor.TopLeft,
-                     Origin = Anchor.TopLeft,
-                     Direction = FillDirection.Horizontal,
-                     AutoSizeAxes = Axes.Both,
-                 },
+                backgroundSprite = new Sprite
+                {
+                    Anchor = Anchor.TopLeft,
+                        Origin = Anchor.TopLeft,
+                },
+                KeyFlow = new FillFlowContainer<KeyCounter>
+                {
+                    // https://osu.ppy.sh/wiki/en/Skinning/Interface#input-overlay
+                    // 24px away from the container, there're 4 counter in legacy, so divide by 4
+                    // "inputoverlay-background.png" are 1.05x in-game. so *1.05f to the X coordinate
+                    X = 24f / 4f,
+                    Anchor = Anchor.TopLeft,
+                    Origin = Anchor.TopLeft,
+                    Direction = FillDirection.Horizontal,
+                    AutoSizeAxes = Axes.Both,
+                },
             });
         }
 
@@ -56,7 +55,7 @@ namespace osu.Game.Skinning
                 KeyTextColor = v.NewValue;
             }, true);
 
-            Texture? backgroundTexture = source.GetTexture($"inputoverlay-background");
+            Texture? backgroundTexture = source.GetTexture(@"inputoverlay-background");
 
             if (backgroundTexture != null)
                 backgroundSprite.Texture = backgroundTexture;
