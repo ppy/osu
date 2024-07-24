@@ -138,9 +138,9 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
                 }
                 else
                 {
-                    LoadComponentsAsync(best.Select(s => new LeaderboardScoreV2(s, sheared: false)
+                    LoadComponentsAsync(best.Select((s, index) => new LeaderboardScoreV2(s, sheared: false)
                     {
-                        Rank = s.Position,
+                        Rank = index + 1,
                         IsPersonalBest = s.UserID == api.LocalUser.Value.Id,
                         Action = () => PresentScore?.Invoke(s.OnlineID),
                     }), loaded =>
