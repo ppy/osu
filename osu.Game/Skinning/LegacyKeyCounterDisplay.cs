@@ -8,6 +8,7 @@ using osu.Game.Screens.Play.HUD;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
+using osuTK;
 
 namespace osu.Game.Skinning
 {
@@ -27,18 +28,19 @@ namespace osu.Game.Skinning
             {
                 backgroundSprite = new Sprite
                 {
-                    Anchor = Anchor.TopLeft,
+                    Anchor = Anchor.TopRight,
                     Origin = Anchor.TopLeft,
+                    Scale = new Vector2(1.05f, 1),
+                    Rotation = 90,
                 },
                 KeyFlow = new FillFlowContainer<KeyCounter>
                 {
-                    // https://osu.ppy.sh/wiki/en/Skinning/Interface#input-overlay
-                    // 24px away from the container, there're 4 counter in legacy, so divide by 4
-                    // "inputoverlay-background.png" are 1.05x in-game. so *1.05f to the X coordinate
-                    X = 24f / 4f,
-                    Anchor = Anchor.TopLeft,
-                    Origin = Anchor.TopLeft,
-                    Direction = FillDirection.Horizontal,
+                    Anchor = Anchor.TopRight,
+                    Origin = Anchor.TopRight,
+                    X = -1.5f,
+                    Y = 7,
+                    Spacing = new Vector2(1.8f),
+                    Direction = FillDirection.Vertical,
                     AutoSizeAxes = Axes.Both,
                 },
             });
@@ -65,17 +67,7 @@ namespace osu.Game.Skinning
         {
             TransitionDuration = key_transition_time,
             KeyTextColour = keyTextColor,
-            KeyTextRotation = -Rotation,
         };
-
-        protected override void Update()
-        {
-            base.Update();
-
-            // keep the text are always horizontal
-            foreach (var child in KeyFlow.Cast<LegacyKeyCounter>())
-                child.KeyTextRotation = -Rotation;
-        }
 
         private Colour4 keyTextColor = Colour4.White;
 
