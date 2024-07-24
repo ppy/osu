@@ -28,7 +28,7 @@ namespace osu.Game.Skinning
                 backgroundSprite = new Sprite
                 {
                     Anchor = Anchor.TopLeft,
-                        Origin = Anchor.TopLeft,
+                    Origin = Anchor.TopLeft,
                 },
                 KeyFlow = new FillFlowContainer<KeyCounter>
                 {
