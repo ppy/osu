@@ -9,7 +9,6 @@ using osu.Game.Audio;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.IO;
 using osu.Game.Rulesets.Objects.Legacy;
-using osu.Game.Skinning;
 using osuTK.Graphics;
 
 namespace osu.Game.Beatmaps.Formats
@@ -134,15 +133,6 @@ namespace osu.Game.Beatmaps.Formats
                 if (!(output is IHasCustomColours tHasCustomColours)) return;
 
                 tHasCustomColours.CustomColours[pair.Key] = colour;
-            }
-
-            bool isInputOverlayText = pair.Key == @"InputOverlayText";
-
-            if (isInputOverlayText)
-            {
-                if (!(output is SkinConfiguration tSkinConfiguration)) return;
-
-                tSkinConfiguration.InputOverlayText = colour;
             }
         }
 
