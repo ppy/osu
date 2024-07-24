@@ -7,6 +7,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Screens.Play.HUD;
 
@@ -30,18 +31,6 @@ namespace osu.Game.Skinning
 
         private Colour4 keyTextColour = Colour4.White;
 
-        private float keyTextRotation;
-
-        public float KeyTextRotation
-        {
-            get => keyTextRotation;
-            set
-            {
-                keyTextRotation = value;
-                overlayKeyText.Rotation = value;
-            }
-        }
-
         private readonly Container keyContainer;
 
         private readonly OsuSpriteText overlayKeyText;
@@ -55,7 +44,7 @@ namespace osu.Game.Skinning
             Anchor = Anchor.Centre;
             Child = keyContainer = new Container
             {
-                RelativeSizeAxes = Axes.Both,
+                AutoSizeAxes = Axes.Both,
                 Origin = Anchor.Centre,
                 Anchor = Anchor.Centre,
                 Children = new Drawable[]
@@ -64,23 +53,26 @@ namespace osu.Game.Skinning
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
-                        BypassAutoSizeAxes = Axes.Both,
-                        Rotation = -90,
                     },
-                    overlayKeyText = new OsuSpriteText
+                    new UprightAspectMaintainingContainer
                     {
+                        AutoSizeAxes = Axes.Both,
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
-                        Text = trigger.Name,
-                        Colour = keyTextColour,
-                        Font = OsuFont.GetFont(size: 20),
-                        Rotation = KeyTextRotation
+                        Child = overlayKeyText = new OsuSpriteText
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            Text = trigger.Name,
+                            Colour = keyTextColour,
+                            Font = OsuFont.GetFont(size: 20),
+                        },
                     },
                 }
             };
 
-            // Legacy key counter size
-            Height = Width = 48 * 0.95f;
+            // matches longest dimension of default skin asset
+            Height = Width = 46;
         }
 
         [BackgroundDependencyLoader]

@@ -396,10 +396,9 @@ namespace osu.Game.Skinning
 
                                 if (keyCounter != null)
                                 {
-                                    keyCounter.Rotation = 90f;
                                     // set the anchor to top right so that it won't squash to the return button to the top
                                     keyCounter.Anchor = Anchor.CentreRight;
-                                    keyCounter.Origin = Anchor.TopCentre;
+                                    keyCounter.Origin = Anchor.CentreRight;
                                     keyCounter.X = 0;
                                     // 340px is the default height inherit from stable
                                     keyCounter.Y = container.ToLocalSpace(new Vector2(0, container.ScreenSpaceDrawQuad.Centre.Y - 340f)).Y;

@@ -37,6 +37,6 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         protected override Drawable CreateDefaultImplementation() => new ArgonKeyCounterDisplay();
 
-        protected override Drawable CreateLegacyImplementation() => new LegacyKeyCounterDisplay(); //{ Rotation = 90, };
+        protected override Drawable CreateLegacyImplementation() => new LegacyKeyCounterDisplay();
     }
 }
