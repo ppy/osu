@@ -13,7 +13,7 @@ namespace osu.Game.Skinning
 {
     public partial class LegacyKeyCounterDisplay : KeyCounterDisplay
     {
-        private const float key_transition_time = 50;
+        private const float key_transition_time = 100;
 
         protected override FillFlowContainer<KeyCounter> KeyFlow { get; } = null!;
 

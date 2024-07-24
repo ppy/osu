@@ -95,7 +95,7 @@ namespace osu.Game.Skinning
         protected override void Activate(bool forwardPlayback = true)
         {
             base.Activate(forwardPlayback);
-            keyContainer.ScaleTo(0.8f, TransitionDuration);
+            keyContainer.ScaleTo(0.75f, TransitionDuration, Easing.OutQuad);
             overlayKeyText.Text = CountPresses.Value.ToString();
         }
 
