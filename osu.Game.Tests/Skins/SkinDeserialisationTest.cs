@@ -66,7 +66,7 @@ namespace osu.Game.Tests.Skins
             "Archives/modified-default-20230809.osk",
             // Covers legacy rank display
             "Archives/modified-classic-20230809.osk",
-            // Covcers legacy key counter
+            // Covers legacy key counter
             "Archives/modified-classic-20240724.osk"
         };
 
