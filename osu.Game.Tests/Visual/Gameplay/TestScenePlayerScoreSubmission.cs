@@ -102,7 +102,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("seek to completion", () => Player.GameplayClockContainer.Seek(Player.DrawableRuleset.Objects.Last().GetEndTime()));
 
             AddUntilStep("results displayed", () => Player.GetChildScreen() is ResultsScreen);
-            AddAssert("ensure passing submission", () => Player.SubmittedScore?.ScoreInfo.Passed == true);
+            AddAssert("ensure passing submission", () => Player.SubmittedScore?.ScoreInfo.Rank != ScoreRank.F);
         }
 
         [Test]
@@ -121,7 +121,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("seek to completion", () => Player.GameplayClockContainer.Seek(Player.DrawableRuleset.Objects.Last().GetEndTime()));
 
             AddUntilStep("results displayed", () => Player.GetChildScreen() is ResultsScreen);
-            AddAssert("ensure passing submission", () => Player.SubmittedScore?.ScoreInfo.Passed == true);
+            AddAssert("ensure passing submission", () => Player.SubmittedScore?.ScoreInfo.Rank != ScoreRank.F);
             AddAssert("submitted score has correct ruleset ID", () => Player.SubmittedScore?.ScoreInfo.Ruleset.ShortName == new TaikoRuleset().RulesetInfo.ShortName);
         }
 
@@ -141,7 +141,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("seek to completion", () => Player.GameplayClockContainer.Seek(Player.DrawableRuleset.Objects.Last().GetEndTime()));
 
             AddUntilStep("results displayed", () => Player.GetChildScreen() is ResultsScreen);
-            AddAssert("ensure passing submission", () => Player.SubmittedScore?.ScoreInfo.Passed == true);
+            AddAssert("ensure passing submission", () => Player.SubmittedScore?.ScoreInfo.Rank != ScoreRank.F);
             AddAssert("submitted score has correct ruleset ID", () => Player.SubmittedScore?.ScoreInfo.Ruleset.ShortName == new ManiaRuleset().RulesetInfo.ShortName);
         }
 
@@ -191,7 +191,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddUntilStep("wait for fail", () => Player.GameplayState.HasFailed);
 
             AddUntilStep("wait for submission", () => Player.SubmittedScore != null);
-            AddAssert("ensure failing submission", () => Player.SubmittedScore.ScoreInfo.Passed == false);
+            AddAssert("ensure failing submission", () => Player.SubmittedScore.ScoreInfo.Rank == ScoreRank.F);
         }
 
         [Test]
@@ -221,7 +221,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("exit", () => Player.Exit());
 
             AddUntilStep("wait for submission", () => Player.SubmittedScore != null);
-            AddAssert("ensure failing submission", () => Player.SubmittedScore.ScoreInfo.Passed == false);
+            AddAssert("ensure failing submission", () => Player.SubmittedScore.ScoreInfo.Rank == ScoreRank.F);
         }
 
         [Test]
@@ -342,7 +342,6 @@ namespace osu.Game.Tests.Visual.Gameplay
                                     MaxCombo = requestScore.MaxCombo,
                                     Mods = requestScore.Mods,
                                     Statistics = requestScore.Statistics,
-                                    Passed = requestScore.Passed,
                                     EndedAt = DateTimeOffset.Now,
                                     Position = 1
                                 });
