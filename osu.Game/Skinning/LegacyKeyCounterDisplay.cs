@@ -8,6 +8,7 @@ using osu.Game.Screens.Play.HUD;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
+using osuTK;
 
 namespace osu.Game.Skinning
 {
@@ -35,7 +36,7 @@ namespace osu.Game.Skinning
                      // https://osu.ppy.sh/wiki/en/Skinning/Interface#input-overlay
                      // 24px away from the container, there're 4 counter in legacy, so divide by 4
                      // "inputoverlay-background.png" are 1.05x in-game. so *1.05f to the X coordinate
-                     X = (24 / 4) * 1.05f,
+                     X = (24 / 4) * 1f,
                      Anchor = Anchor.TopLeft,
                      Origin = Anchor.TopLeft,
                      Direction = FillDirection.Horizontal,
