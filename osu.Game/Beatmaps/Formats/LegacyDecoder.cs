@@ -110,6 +110,7 @@ namespace osu.Game.Beatmaps.Formats
             {
                 throw new InvalidOperationException(@"Color must be specified with 8-bit integer components");
             }
+
             return colour;
         }
 
@@ -134,11 +135,13 @@ namespace osu.Game.Beatmaps.Formats
 
                 tHasCustomColours.CustomColours[pair.Key] = colour;
             }
-            bool isInputOverlayText = pair.Key.StartsWith(@"InputOverlayText");
+
+            bool isInputOverlayText = pair.Key == @"InputOverlayText";
 
             if (isInputOverlayText)
             {
                 if (!(output is SkinConfiguration tSkinConfiguration)) return;
+
                 tSkinConfiguration.InputOverlayText = colour;
             }
         }

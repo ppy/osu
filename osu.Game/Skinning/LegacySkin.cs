@@ -309,8 +309,10 @@ namespace osu.Game.Skinning
             {
                 case SkinConfiguration.LegacySetting.Version:
                     return SkinUtils.As<TValue>(new Bindable<decimal>(Configuration.LegacyVersion ?? SkinConfiguration.LATEST_VERSION));
+
                 case SkinConfiguration.LegacySetting.InputOverlayText:
                     return SkinUtils.As<TValue>(new Bindable<Colour4>(Configuration.InputOverlayText ?? Colour4.White));
+
                 default:
                     return genericLookup<SkinConfiguration.LegacySetting, TValue>(legacySetting);
             }
