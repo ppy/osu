@@ -91,7 +91,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                 InputManager.MoveMouseTo(textContainer.ScreenSpaceDrawQuad.TopRight);
             });
             AddStep("hold mouse", () => InputManager.PressButton(MouseButton.Left));
-            AddStep("drag to half", () => InputManager.MoveMouseTo(textContainer.ScreenSpaceDrawQuad.BottomRight - new Vector2(textContainer.ScreenSpaceDrawQuad.Width / 2, 0)));
+            AddStep("drag to half", () => InputManager.MoveMouseTo(textContainer.ScreenSpaceDrawQuad.BottomRight - new Vector2(textContainer.ScreenSpaceDrawQuad.Width / 2 + 1f, 0)));
             AddStep("release mouse", () => InputManager.ReleaseButton(MouseButton.Left));
             AddAssert("half text selected", () => numberBoxes.First().SelectedText == "54321");
         }
