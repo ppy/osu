@@ -14,7 +14,8 @@ namespace osu.Game.Skinning
 {
     public partial class LegacyKeyCounterDisplay : KeyCounterDisplay
     {
-        private const float key_transition_time = 100;
+        private static readonly Colour4 active_colour_top = Colour4.FromHex(@"#ffde00");
+        private static readonly Colour4 active_colour_bottom = Colour4.FromHex(@"#f8009e");
 
         protected override FillFlowContainer<KeyCounter> KeyFlow { get; }
 
@@ -61,12 +62,16 @@ namespace osu.Game.Skinning
 
             if (backgroundTexture != null)
                 backgroundSprite.Texture = backgroundTexture;
+
+            for (int i = 0; i < KeyFlow.Count; ++i)
+            {
+                ((LegacyKeyCounter)KeyFlow[i]).ActiveColour = i < 2 ? active_colour_top : active_colour_bottom;
+            }
         }
 
         protected override KeyCounter CreateCounter(InputTrigger trigger) => new LegacyKeyCounter(trigger)
         {
-            TransitionDuration = key_transition_time,
-            KeyTextColour = keyTextColor,
+            TextColour = keyTextColor,
         };
 
         private Colour4 keyTextColor = Colour4.White;
@@ -80,7 +85,7 @@ namespace osu.Game.Skinning
                 {
                     keyTextColor = value;
                     foreach (var child in KeyFlow.Cast<LegacyKeyCounter>())
-                        child.KeyTextColour = value;
+                        child.TextColour = value;
                 }
             }
         }
