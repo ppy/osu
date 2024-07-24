@@ -311,7 +311,7 @@ namespace osu.Game.Skinning
                     return SkinUtils.As<TValue>(new Bindable<decimal>(Configuration.LegacyVersion ?? SkinConfiguration.LATEST_VERSION));
 
                 case SkinConfiguration.LegacySetting.InputOverlayText:
-                    return SkinUtils.As<TValue>(new Bindable<Colour4>(Configuration.InputOverlayText ?? Colour4.White));
+                    return SkinUtils.As<TValue>(new Bindable<Colour4>(Configuration.CustomColours.TryGetValue(@"InputOverlayText", out var colour) ? colour : Colour4.Black));
 
                 default:
                     return genericLookup<SkinConfiguration.LegacySetting, TValue>(legacySetting);
