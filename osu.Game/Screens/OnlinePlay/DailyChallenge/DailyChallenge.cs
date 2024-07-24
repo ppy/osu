@@ -21,6 +21,7 @@ using osu.Game.Database;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation;
+using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Metadata;
 using osu.Game.Online.Multiplayer;
@@ -47,6 +48,8 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
         /// Any mods applied by/to the local user.
         /// </summary>
         private readonly Bindable<IReadOnlyList<Mod>> userMods = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
+
+        private readonly IBindable<APIState> apiState = new Bindable<APIState>();
 
         private OnlinePlayScreenWaveContainer waves = null!;
         private DailyChallengeLeaderboard leaderboard = null!;
@@ -83,6 +86,9 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
 
         [Resolved]
         private UserLookupCache userLookupCache { get; set; } = null!;
+
+        [Resolved]
+        protected IAPIProvider API { get; private set; } = null!;
 
         public override bool DisallowExternalBeatmapRulesetChanges => true;
 
@@ -358,6 +364,9 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
             userModsSelectOverlayRegistration = overlayManager?.RegisterBlockingOverlay(userModsSelectOverlay);
             userModsSelectOverlay.SelectedItem.Value = playlistItem;
             userMods.BindValueChanged(_ => Scheduler.AddOnce(updateMods), true);
+
+            apiState.BindTo(API.State);
+            apiState.BindValueChanged(onlineStateChanged, true);
         }
 
         private void trySetDailyChallengeBeatmap()
@@ -366,6 +375,25 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
             Beatmap.Value = beatmapManager.GetWorkingBeatmap(beatmap); // this will gracefully fall back to dummy beatmap if missing locally.
             Ruleset.Value = rulesets.GetRuleset(playlistItem.RulesetID);
             applyLoopingToTrack();
+        }
+
+        private void onlineStateChanged(ValueChangedEvent<APIState> state) => Schedule(() =>
+        {
+            if (state.NewValue != APIState.Online)
+                Schedule(forcefullyExit);
+        });
+
+        private void forcefullyExit()
+        {
+            Logger.Log($"{this} forcefully exiting due to loss of API connection");
+
+            // This is temporary since we don't currently have a way to force screens to be exited
+            // See also: `OnlinePlayScreen.forcefullyExit()`
+            if (this.IsCurrentScreen())
+            {
+                while (this.IsCurrentScreen())
+                    this.Exit();
+            }
         }
 
         public override void OnEntering(ScreenTransitionEvent e)
