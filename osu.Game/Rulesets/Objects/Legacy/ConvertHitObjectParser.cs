@@ -549,7 +549,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
             /// </summary>
             public bool BankSpecified;
 
-            public LegacyHitSampleInfo(string name, string? bank = null, int volume = 0, int customSampleBank = 0, bool isLayered = false)
+            public LegacyHitSampleInfo(string name, string? bank = null, int volume = 0, int customSampleBank = 1, bool isLayered = false)
                 : base(name, bank ?? SampleControlPoint.DEFAULT_BANK, customSampleBank >= 2 ? customSampleBank.ToString() : null, volume)
             {
                 CustomSampleBank = customSampleBank;
