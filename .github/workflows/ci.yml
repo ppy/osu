@@ -64,7 +64,8 @@ jobs:
        matrix:
           os:
             - { prettyname: Windows, fullname: windows-latest }
-            - { prettyname: macOS, fullname: macos-latest }
+            # macOS runner performance has gotten unbearably slow so let's turn them off temporarily.
+            # - { prettyname: macOS, fullname: macos-latest }
             - { prettyname: Linux, fullname: ubuntu-latest }
           threadingMode: ['SingleThread', 'MultiThreaded']
     timeout-minutes: 120
