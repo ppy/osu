@@ -193,7 +193,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
 
         private void addPart(Vector2 screenSpacePosition)
         {
-            parts[currentIndex].Position = screenSpacePosition;
+            parts[currentIndex].Position = ToLocalSpace(screenSpacePosition);
             parts[currentIndex].Time = time + 1;
             ++parts[currentIndex].InvalidationID;
 
@@ -285,9 +285,11 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                     if (time - part.Time >= 1)
                         continue;
 
+                    Vector2 screenSpacePos = Source.ToScreenSpace(part.Position);
+
                     vertexBatch.Add(new TexturedTrailVertex
                     {
-                        Position = new Vector2(part.Position.X - size.X * originPosition.X, part.Position.Y + size.Y * (1 - originPosition.Y)),
+                        Position = new Vector2(screenSpacePos.X - size.X * originPosition.X, screenSpacePos.Y + size.Y * (1 - originPosition.Y)),
                         TexturePosition = textureRect.BottomLeft,
                         TextureRect = new Vector4(0, 0, 1, 1),
                         Colour = DrawColourInfo.Colour.BottomLeft.Linear,
@@ -296,7 +298,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
 
                     vertexBatch.Add(new TexturedTrailVertex
                     {
-                        Position = new Vector2(part.Position.X + size.X * (1 - originPosition.X), part.Position.Y + size.Y * (1 - originPosition.Y)),
+                        Position = new Vector2(screenSpacePos.X + size.X * (1 - originPosition.X), screenSpacePos.Y + size.Y * (1 - originPosition.Y)),
                         TexturePosition = textureRect.BottomRight,
                         TextureRect = new Vector4(0, 0, 1, 1),
                         Colour = DrawColourInfo.Colour.BottomRight.Linear,
@@ -305,7 +307,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
 
                     vertexBatch.Add(new TexturedTrailVertex
                     {
-                        Position = new Vector2(part.Position.X + size.X * (1 - originPosition.X), part.Position.Y - size.Y * originPosition.Y),
+                        Position = new Vector2(screenSpacePos.X + size.X * (1 - originPosition.X), screenSpacePos.Y - size.Y * originPosition.Y),
                         TexturePosition = textureRect.TopRight,
                         TextureRect = new Vector4(0, 0, 1, 1),
                         Colour = DrawColourInfo.Colour.TopRight.Linear,
@@ -314,7 +316,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
 
                     vertexBatch.Add(new TexturedTrailVertex
                     {
-                        Position = new Vector2(part.Position.X - size.X * originPosition.X, part.Position.Y - size.Y * originPosition.Y),
+                        Position = new Vector2(screenSpacePos.X - size.X * originPosition.X, screenSpacePos.Y - size.Y * originPosition.Y),
                         TexturePosition = textureRect.TopLeft,
                         TextureRect = new Vector4(0, 0, 1, 1),
                         Colour = DrawColourInfo.Colour.TopLeft.Linear,
