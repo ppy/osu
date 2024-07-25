@@ -398,7 +398,8 @@ namespace osu.Game.Screens.Ranking
                     break;
 
                 case GlobalAction.Select:
-                    StatisticsPanel.ToggleVisibility();
+                    if (SelectedScore.Value != null)
+                        StatisticsPanel.ToggleVisibility();
                     return true;
             }
 
