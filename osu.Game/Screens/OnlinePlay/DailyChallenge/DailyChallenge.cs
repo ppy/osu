@@ -13,6 +13,7 @@ using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Logging;
 using osu.Framework.Screens;
@@ -126,169 +127,173 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
                         RelativeSizeAxes = Axes.Both,
                     },
                     new Header(ButtonSystemStrings.DailyChallenge.ToSentence(), null),
-                    new GridContainer
+                    new PopoverContainer
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Padding = new MarginPadding
+                        Child = new GridContainer
                         {
-                            Horizontal = WaveOverlayContainer.WIDTH_PADDING,
-                            Top = Header.HEIGHT,
-                        },
-                        RowDimensions =
-                        [
-                            new Dimension(GridSizeMode.AutoSize),
-                            new Dimension(GridSizeMode.Absolute, 10),
-                            new Dimension(),
-                            new Dimension(GridSizeMode.Absolute, 30),
-                            new Dimension(GridSizeMode.Absolute, 50)
-                        ],
-                        Content = new[]
-                        {
-                            new Drawable[]
+                            RelativeSizeAxes = Axes.Both,
+                            Padding = new MarginPadding
                             {
-                                new DrawableRoomPlaylistItem(playlistItem)
-                                {
-                                    RelativeSizeAxes = Axes.X,
-                                    AllowReordering = false,
-                                    Scale = new Vector2(1.4f),
-                                    Width = 1 / 1.4f,
-                                }
+                                Horizontal = WaveOverlayContainer.WIDTH_PADDING,
+                                Top = Header.HEIGHT,
                             },
-                            null,
+                            RowDimensions =
                             [
-                                new Container
+                                new Dimension(GridSizeMode.AutoSize),
+                                new Dimension(GridSizeMode.Absolute, 10),
+                                new Dimension(),
+                                new Dimension(GridSizeMode.Absolute, 30),
+                                new Dimension(GridSizeMode.Absolute, 50)
+                            ],
+                            Content = new[]
+                            {
+                                new Drawable[]
                                 {
-                                    RelativeSizeAxes = Axes.Both,
-                                    Masking = true,
-                                    CornerRadius = 10,
-                                    Children = new Drawable[]
+                                    new DrawableRoomPlaylistItem(playlistItem)
                                     {
-                                        new Box
+                                        RelativeSizeAxes = Axes.X,
+                                        AllowReordering = false,
+                                        Scale = new Vector2(1.4f),
+                                        Width = 1 / 1.4f,
+                                    }
+                                },
+                                null,
+                                [
+                                    new Container
+                                    {
+                                        RelativeSizeAxes = Axes.Both,
+                                        Masking = true,
+                                        CornerRadius = 10,
+                                        Children = new Drawable[]
                                         {
-                                            RelativeSizeAxes = Axes.Both,
-                                            Colour = colourProvider.Background4,
-                                        },
-                                        new GridContainer
-                                        {
-                                            RelativeSizeAxes = Axes.Both,
-                                            Padding = new MarginPadding(10),
-                                            ColumnDimensions =
-                                            [
-                                                new Dimension(),
-                                                new Dimension(GridSizeMode.Absolute, 10),
-                                                new Dimension(),
-                                                new Dimension(GridSizeMode.Absolute, 10),
-                                                new Dimension()
-                                            ],
-                                            Content = new[]
+                                            new Box
                                             {
-                                                new Drawable?[]
+                                                RelativeSizeAxes = Axes.Both,
+                                                Colour = colourProvider.Background4,
+                                            },
+                                            new GridContainer
+                                            {
+                                                RelativeSizeAxes = Axes.Both,
+                                                Padding = new MarginPadding(10),
+                                                ColumnDimensions =
+                                                [
+                                                    new Dimension(),
+                                                    new Dimension(GridSizeMode.Absolute, 10),
+                                                    new Dimension(),
+                                                    new Dimension(GridSizeMode.Absolute, 10),
+                                                    new Dimension()
+                                                ],
+                                                Content = new[]
                                                 {
-                                                    new GridContainer
+                                                    new Drawable?[]
                                                     {
-                                                        RelativeSizeAxes = Axes.Both,
-                                                        Anchor = Anchor.Centre,
-                                                        Origin = Anchor.Centre,
-                                                        RowDimensions =
-                                                        [
-                                                            new Dimension(),
-                                                            new Dimension()
-                                                        ],
-                                                        Content = new[]
+                                                        new GridContainer
                                                         {
-                                                            new Drawable[]
-                                                            {
-                                                                new DailyChallengeCarousel
-                                                                {
-                                                                    RelativeSizeAxes = Axes.Both,
-                                                                    Anchor = Anchor.Centre,
-                                                                    Origin = Anchor.Centre,
-                                                                    Children = new Drawable[]
-                                                                    {
-                                                                        new DailyChallengeTimeRemainingRing(),
-                                                                        breakdown = new DailyChallengeScoreBreakdown(),
-                                                                    }
-                                                                }
-                                                            },
+                                                            RelativeSizeAxes = Axes.Both,
+                                                            Anchor = Anchor.Centre,
+                                                            Origin = Anchor.Centre,
+                                                            RowDimensions =
                                                             [
-                                                                feed = new DailyChallengeEventFeed
-                                                                {
-                                                                    RelativeSizeAxes = Axes.Both,
-                                                                    PresentScore = presentScore
-                                                                }
+                                                                new Dimension(),
+                                                                new Dimension()
                                                             ],
-                                                        },
-                                                    },
-                                                    null,
-                                                    // Middle column (leaderboard)
-                                                    leaderboard = new DailyChallengeLeaderboard(room, playlistItem)
-                                                    {
-                                                        RelativeSizeAxes = Axes.Both,
-                                                        PresentScore = presentScore,
-                                                    },
-                                                    // Spacer
-                                                    null,
-                                                    // Main right column
-                                                    new GridContainer
-                                                    {
-                                                        RelativeSizeAxes = Axes.Both,
-                                                        Content = new[]
-                                                        {
-                                                            new Drawable[]
+                                                            Content = new[]
                                                             {
-                                                                new SectionHeader("Chat")
+                                                                new Drawable[]
+                                                                {
+                                                                    new DailyChallengeCarousel
+                                                                    {
+                                                                        RelativeSizeAxes = Axes.Both,
+                                                                        Anchor = Anchor.Centre,
+                                                                        Origin = Anchor.Centre,
+                                                                        Children = new Drawable[]
+                                                                        {
+                                                                            new DailyChallengeTimeRemainingRing(),
+                                                                            breakdown = new DailyChallengeScoreBreakdown(),
+                                                                        }
+                                                                    }
+                                                                },
+                                                                [
+                                                                    feed = new DailyChallengeEventFeed
+                                                                    {
+                                                                        RelativeSizeAxes = Axes.Both,
+                                                                        PresentScore = presentScore
+                                                                    }
+                                                                ],
                                                             },
-                                                            [new MatchChatDisplay(room) { RelativeSizeAxes = Axes.Both }]
                                                         },
-                                                        RowDimensions =
-                                                        [
-                                                            new Dimension(GridSizeMode.AutoSize),
-                                                            new Dimension()
-                                                        ]
-                                                    },
+                                                        null,
+                                                        // Middle column (leaderboard)
+                                                        leaderboard = new DailyChallengeLeaderboard(room, playlistItem)
+                                                        {
+                                                            RelativeSizeAxes = Axes.Both,
+                                                            PresentScore = presentScore,
+                                                        },
+                                                        // Spacer
+                                                        null,
+                                                        // Main right column
+                                                        new GridContainer
+                                                        {
+                                                            RelativeSizeAxes = Axes.Both,
+                                                            Content = new[]
+                                                            {
+                                                                new Drawable[]
+                                                                {
+                                                                    new SectionHeader("Chat")
+                                                                },
+                                                                [new MatchChatDisplay(room) { RelativeSizeAxes = Axes.Both }]
+                                                            },
+                                                            RowDimensions =
+                                                            [
+                                                                new Dimension(GridSizeMode.AutoSize),
+                                                                new Dimension()
+                                                            ]
+                                                        },
+                                                    }
                                                 }
                                             }
                                         }
                                     }
-                                }
-                            ],
-                            null,
-                            [
-                                new Container
-                                {
-                                    RelativeSizeAxes = Axes.Both,
-                                    Padding = new MarginPadding
+                                ],
+                                null,
+                                [
+                                    new Container
                                     {
-                                        Horizontal = -WaveOverlayContainer.WIDTH_PADDING,
-                                    },
-                                    Children = new Drawable[]
-                                    {
-                                        new Box
+                                        RelativeSizeAxes = Axes.Both,
+                                        Padding = new MarginPadding
                                         {
-                                            RelativeSizeAxes = Axes.Both,
-                                            Colour = colourProvider.Background5,
+                                            Horizontal = -WaveOverlayContainer.WIDTH_PADDING,
                                         },
-                                        footerButtons = new FillFlowContainer
+                                        Children = new Drawable[]
                                         {
-                                            RelativeSizeAxes = Axes.Both,
-                                            Direction = FillDirection.Horizontal,
-                                            Padding = new MarginPadding(5),
-                                            Spacing = new Vector2(10),
-                                            Children = new Drawable[]
+                                            new Box
                                             {
-                                                new PlaylistsReadyButton
+                                                RelativeSizeAxes = Axes.Both,
+                                                Colour = colourProvider.Background5,
+                                            },
+                                            footerButtons = new FillFlowContainer
+                                            {
+                                                RelativeSizeAxes = Axes.Both,
+                                                Direction = FillDirection.Horizontal,
+                                                Padding = new MarginPadding(5),
+                                                Spacing = new Vector2(10),
+                                                Children = new Drawable[]
                                                 {
-                                                    Anchor = Anchor.Centre,
-                                                    Origin = Anchor.Centre,
-                                                    RelativeSizeAxes = Axes.Y,
-                                                    Size = new Vector2(250, 1),
-                                                    Action = startPlay
+                                                    new PlaylistsReadyButton
+                                                    {
+                                                        Anchor = Anchor.Centre,
+                                                        Origin = Anchor.Centre,
+                                                        RelativeSizeAxes = Axes.Y,
+                                                        Size = new Vector2(250, 1),
+                                                        Action = startPlay
+                                                    }
                                                 }
-                                            }
-                                        },
+                                            },
+                                        }
                                     }
-                                }
-                            ],
+                                ],
+                            }
                         }
                     }
                 }
