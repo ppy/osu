@@ -349,7 +349,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
                     feed.AddNewScore(ev);
 
                     if (e.NewRank <= 50)
-                        Schedule(() => leaderboard.RefetchScores());
+                        Scheduler.AddOnce(() => leaderboard.RefetchScores());
                 });
             });
         }
@@ -486,7 +486,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
             sampleStart?.Play();
             this.Push(new PlayerLoader(() => new PlaylistsPlayer(room, playlistItem)
             {
-                Exited = () => leaderboard.RefetchScores()
+                Exited = () => Scheduler.AddOnce(() => leaderboard.RefetchScores())
             }));
         }
 
