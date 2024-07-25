@@ -35,6 +35,7 @@ namespace osu.Game.Tests.Visual.DailyChallenge
                 feed = new DailyChallengeEventFeed
                 {
                     RelativeSizeAxes = Axes.Both,
+                    Height = 0.3f,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                 }
@@ -44,13 +45,13 @@ namespace osu.Game.Tests.Visual.DailyChallenge
                 if (feed.IsNotNull())
                     feed.Width = width;
             });
-            AddSliderStep("adjust height", 0.1f, 1, 1, height =>
+            AddSliderStep("adjust height", 0.1f, 1, 0.3f, height =>
             {
                 if (feed.IsNotNull())
                     feed.Height = height;
             });
 
-            AddStep("add normal score", () =>
+            AddRepeatStep("add normal score", () =>
             {
                 var ev = new NewScoreEvent(1, new APIUser
                 {
@@ -60,9 +61,9 @@ namespace osu.Game.Tests.Visual.DailyChallenge
                 }, RNG.Next(1_000_000), null);
 
                 feed.AddNewScore(ev);
-            });
+            }, 50);
 
-            AddStep("add new user best", () =>
+            AddRepeatStep("add new user best", () =>
             {
                 var ev = new NewScoreEvent(1, new APIUser
                 {
@@ -75,9 +76,9 @@ namespace osu.Game.Tests.Visual.DailyChallenge
                 testScore.TotalScore = RNG.Next(1_000_000);
 
                 feed.AddNewScore(ev);
-            });
+            }, 50);
 
-            AddStep("add top 10 score", () =>
+            AddRepeatStep("add top 10 score", () =>
             {
                 var ev = new NewScoreEvent(1, new APIUser
                 {
@@ -87,7 +88,7 @@ namespace osu.Game.Tests.Visual.DailyChallenge
                 }, RNG.Next(1_000_000), RNG.Next(1, 10));
 
                 feed.AddNewScore(ev);
-            });
+            }, 50);
         }
     }
 }
