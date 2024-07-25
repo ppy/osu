@@ -6,6 +6,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
@@ -17,14 +18,14 @@ namespace osu.Game.Tests.Visual.DailyChallenge
 {
     public partial class TestSceneDailyChallengeEventFeed : OsuTestScene
     {
+        private DailyChallengeEventFeed feed = null!;
+
         [Cached]
         private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Plum);
 
-        [Test]
-        public void TestBasicAppearance()
+        [SetUpSteps]
+        public void SetUpSteps()
         {
-            DailyChallengeEventFeed feed = null!;
-
             AddStep("create content", () => Children = new Drawable[]
             {
                 new Box
@@ -40,6 +41,7 @@ namespace osu.Game.Tests.Visual.DailyChallenge
                     Origin = Anchor.Centre,
                 }
             });
+
             AddSliderStep("adjust width", 0.1f, 1, 1, width =>
             {
                 if (feed.IsNotNull())
@@ -50,7 +52,11 @@ namespace osu.Game.Tests.Visual.DailyChallenge
                 if (feed.IsNotNull())
                     feed.Height = height;
             });
+        }
 
+        [Test]
+        public void TestBasicAppearance()
+        {
             AddRepeatStep("add normal score", () =>
             {
                 var ev = new NewScoreEvent(1, new APIUser
@@ -89,6 +95,25 @@ namespace osu.Game.Tests.Visual.DailyChallenge
 
                 feed.AddNewScore(ev);
             }, 50);
+        }
+
+        [Test]
+        public void TestMassAdd()
+        {
+            AddStep("add 1000 scores at once", () =>
+            {
+                for (int i = 0; i < 1000; i++)
+                {
+                    var ev = new NewScoreEvent(1, new APIUser
+                    {
+                        Id = 2,
+                        Username = "peppy",
+                        CoverUrl = "https://osu.ppy.sh/images/headers/profile-covers/c3.jpg",
+                    }, RNG.Next(1_000_000), null);
+
+                    feed.AddNewScore(ev);
+                }
+            });
         }
     }
 }
