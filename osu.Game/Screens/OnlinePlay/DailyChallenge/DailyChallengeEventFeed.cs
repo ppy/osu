@@ -54,7 +54,6 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
                 PresentScore = PresentScore,
             };
             flow.Add(row);
-            row.Delay(15000).Then().FadeOut(300, Easing.OutQuint).Expire();
         }
 
         protected override void Update()
@@ -64,6 +63,8 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
             for (int i = 0; i < flow.Count; ++i)
             {
                 var row = flow[i];
+
+                row.Alpha = Math.Max(0, (row.Y + flow.DrawHeight) / flow.DrawHeight);
 
                 if (row.Y < -flow.DrawHeight)
                 {
