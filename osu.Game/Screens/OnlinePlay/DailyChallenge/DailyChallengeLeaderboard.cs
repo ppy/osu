@@ -118,9 +118,14 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
             RefetchScores();
         }
 
+        private IndexPlaylistScoresRequest? request;
+
         public void RefetchScores()
         {
-            var request = new IndexPlaylistScoresRequest(room.RoomID.Value!.Value, playlistItem.ID);
+            if (request?.CompletionState == APIRequestCompletionState.Waiting)
+                return;
+
+            request = new IndexPlaylistScoresRequest(room.RoomID.Value!.Value, playlistItem.ID);
 
             request.Success += req => Schedule(() =>
             {
