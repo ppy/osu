@@ -22,6 +22,8 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
 
         public Action<long>? PresentScore { get; init; }
 
+        private readonly Queue<NewScoreEvent> newScores = new Queue<NewScoreEvent>();
+
         [BackgroundDependencyLoader]
         private void load()
         {
@@ -47,18 +49,26 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
 
         public void AddNewScore(NewScoreEvent newScoreEvent)
         {
-            var row = new NewScoreEventRow(newScoreEvent)
-            {
-                Anchor = Anchor.BottomCentre,
-                Origin = Anchor.BottomCentre,
-                PresentScore = PresentScore,
-            };
-            flow.Add(row);
+            newScores.Enqueue(newScoreEvent);
+
+            // ensure things don't get too out-of-hand.
+            if (newScores.Count > 25)
+                newScores.Dequeue();
         }
 
         protected override void Update()
         {
             base.Update();
+
+            while (newScores.TryDequeue(out var newScore))
+            {
+                flow.Add(new NewScoreEventRow(newScore)
+                {
+                    Anchor = Anchor.BottomCentre,
+                    Origin = Anchor.BottomCentre,
+                    PresentScore = PresentScore,
+                });
+            }
 
             for (int i = 0; i < flow.Count; ++i)
             {
