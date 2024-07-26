@@ -7,6 +7,7 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Utils;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
@@ -74,7 +75,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
             {
                 var row = flow[i];
 
-                row.Alpha = Math.Max(0, (row.Y + flow.DrawHeight) / flow.DrawHeight);
+                row.Alpha = Interpolation.ValueAt(Math.Clamp(row.Y + flow.DrawHeight, 0, flow.DrawHeight), 0f, 1f, 0, flow.DrawHeight, Easing.Out);
 
                 if (row.Y < -flow.DrawHeight)
                 {
