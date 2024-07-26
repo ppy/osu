@@ -21,8 +21,8 @@ namespace osu.Game.Screens.OnlinePlay.Components
         private void load(OnlinePlayBeatmapAvailabilityTracker beatmapTracker)
         {
             availability.BindTo(beatmapTracker.Availability);
-
             availability.BindValueChanged(_ => updateState());
+
             Enabled.BindValueChanged(_ => updateState(), true);
         }
 
@@ -33,7 +33,7 @@ namespace osu.Game.Screens.OnlinePlay.Components
         {
             get
             {
-                if (Enabled.Value)
+                if (base.Enabled.Value)
                     return string.Empty;
 
                 if (availability.Value.State != DownloadState.LocallyAvailable)
