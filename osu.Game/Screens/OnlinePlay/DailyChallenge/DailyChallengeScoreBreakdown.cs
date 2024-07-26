@@ -6,6 +6,7 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Localisation;
 using osu.Game.Graphics;
@@ -44,23 +45,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
 
             for (int i = 0; i < bin_count; ++i)
             {
-                LocalisableString? label = null;
-
-                switch (i)
-                {
-                    case 2:
-                    case 4:
-                    case 6:
-                    case 8:
-                        label = @$"{100 * i}k";
-                        break;
-
-                    case 10:
-                        label = @"1M";
-                        break;
-                }
-
-                barsContainer.Add(new Bar(label)
+                barsContainer.Add(new Bar(100_000 * i, 100_000 * (i + 1) - 1)
                 {
                     Width = 1f / bin_count,
                 });
@@ -113,18 +98,20 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
                 barsContainer[i].UpdateCounts(bins[i], max);
         }
 
-        private partial class Bar : CompositeDrawable
+        private partial class Bar : CompositeDrawable, IHasTooltip
         {
-            private readonly LocalisableString? label;
+            private readonly int binStart;
+            private readonly int binEnd;
 
             private long count;
             private long max;
 
             public Container CircularBar { get; private set; } = null!;
 
-            public Bar(LocalisableString? label = null)
+            public Bar(int binStart, int binEnd)
             {
-                this.label = label;
+                this.binStart = binStart;
+                this.binEnd = binEnd;
             }
 
             [BackgroundDependencyLoader]
@@ -159,13 +146,29 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
                     }
                 });
 
+                string? label = null;
+
+                switch (binStart)
+                {
+                    case 200_000:
+                    case 400_000:
+                    case 600_000:
+                    case 800_000:
+                        label = @$"{binStart / 1000}k";
+                        break;
+
+                    case 1_000_000:
+                        label = @"1M";
+                        break;
+                }
+
                 if (label != null)
                 {
                     AddInternal(new OsuSpriteText
                     {
                         Anchor = Anchor.BottomLeft,
                         Origin = Anchor.BottomCentre,
-                        Text = label.Value,
+                        Text = label,
                         Colour = colourProvider.Content2,
                     });
                 }
@@ -189,6 +192,8 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
                 if (isIncrement)
                     CircularBar.FlashColour(Colour4.White, 600, Easing.OutQuint);
             }
+
+            public LocalisableString TooltipText => LocalisableString.Format("{0:N0} passes in {1:N0} - {2:N0} range", count, binStart, binEnd);
         }
     }
 }
