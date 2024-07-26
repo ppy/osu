@@ -59,6 +59,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
         private IDisposable? userModsSelectOverlayRegistration;
 
         private DailyChallengeScoreBreakdown breakdown = null!;
+        private DailyChallengeTotalsDisplay totals = null!;
         private DailyChallengeEventFeed feed = null!;
 
         [Cached]
@@ -211,6 +212,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
                                                                         {
                                                                             new DailyChallengeTimeRemainingRing(),
                                                                             breakdown = new DailyChallengeScoreBreakdown(),
+                                                                            totals = new DailyChallengeTotalsDisplay(),
                                                                         }
                                                                     }
                                                                 },
@@ -352,6 +354,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
                 Schedule(() =>
                 {
                     breakdown.AddNewScore(ev);
+                    totals.AddNewScore(ev);
                     feed.AddNewScore(ev);
 
                     if (e.NewRank <= 50)
@@ -423,7 +426,11 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
                 var itemStats = stats.SingleOrDefault(item => item.PlaylistItemID == playlistItem.ID);
                 if (itemStats == null) return;
 
-                Schedule(() => breakdown.SetInitialCounts(itemStats.TotalScoreDistribution));
+                Schedule(() =>
+                {
+                    breakdown.SetInitialCounts(itemStats.TotalScoreDistribution);
+                    totals.SetInitialCounts(itemStats.TotalScoreDistribution.Sum(c => c), itemStats.CumulativeScore);
+                });
             });
 
             beatmapAvailabilityTracker.SelectedItem.Value = playlistItem;
