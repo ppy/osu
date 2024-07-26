@@ -113,11 +113,26 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
 
         private partial class TotalRollingCounter : RollingCounter<long>
         {
-            protected override double RollingDuration => 400;
+            protected override double RollingDuration => 1000;
+
+            protected override Easing RollingEasing => Easing.OutPow10;
+
+            protected override bool IsRollingProportional => true;
+
+            protected override double GetProportionalDuration(long currentValue, long newValue)
+            {
+                long change = Math.Abs(newValue - currentValue);
+
+                if (change < 10)
+                    return 0;
+
+                return Math.Min(6000, RollingDuration * Math.Sqrt(change) / 100);
+            }
 
             protected override OsuSpriteText CreateSpriteText() => new OsuSpriteText
             {
                 Font = OsuFont.Default.With(size: 80f, fixedWidth: true),
+                Spacing = new Vector2(-2, 0)
             };
 
             protected override LocalisableString FormatCount(long count) => count.ToLocalisableString(@"N0");
