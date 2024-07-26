@@ -175,6 +175,22 @@ namespace osu.Game.Overlays.Mods
                 content.ResizeHeightTo(header_height, 400, Easing.OutQuint);
                 content.FadeOut(400, Easing.OutSine);
             }
+
+            expandedByHovering = false;
+        }
+
+        private bool expandedByHovering = false;
+        public void UpdateHoverExpansion(bool hovered)
+        {
+            if (hovered && !Expanded.Value)
+            {
+                Expanded.Value = true;
+                expandedByHovering = true;
+            }
+            else if (!hovered && expandedByHovering)
+            {
+                Expanded.Value = false;
+            }
         }
 
         private void updateMods()
@@ -206,6 +222,14 @@ namespace osu.Game.Overlays.Mods
 
             public override bool RequestsFocus => Expanded.Value;
             public override bool AcceptsFocus => Expanded.Value;
+
+            public new ModCustomisationPanel Parent => (ModCustomisationPanel)base.Parent;
+
+            protected override void OnHoverLost(HoverLostEvent e)
+            {
+                Parent.UpdateHoverExpansion(false);
+                base.OnHoverLost(e);
+            }
         }
     }
 }
