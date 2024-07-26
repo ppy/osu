@@ -4,6 +4,7 @@
 using System;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
@@ -13,6 +14,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Metadata;
+using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
 using osu.Game.Screens.OnlinePlay.DailyChallenge.Events;
 using osuTK;
@@ -21,6 +23,8 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
 {
     public partial class DailyChallengeScoreBreakdown : CompositeDrawable
     {
+        public Bindable<MultiplayerScore?> UserBestScore { get; } = new Bindable<MultiplayerScore?>();
+
         private FillFlowContainer<Bar> barsContainer = null!;
 
         private const int bin_count = MultiplayerPlaylistItemStats.TOTAL_SCORE_DISTRIBUTION_BINS;
@@ -50,6 +54,17 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
                     Width = 1f / bin_count,
                 });
             }
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            UserBestScore.BindValueChanged(_ =>
+            {
+                foreach (var bar in barsContainer)
+                    bar.ContainsLocalUser.Value = UserBestScore.Value is not null && bar.BinStart <= UserBestScore.Value.TotalScore && UserBestScore.Value.TotalScore <= bar.BinEnd;
+            });
         }
 
         public void AddNewScore(NewScoreEvent newScoreEvent)
@@ -100,19 +115,31 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
 
         private partial class Bar : CompositeDrawable, IHasTooltip
         {
-            private readonly int binStart;
-            private readonly int binEnd;
+            public BindableBool ContainsLocalUser { get; } = new BindableBool();
+
+            public readonly int BinStart;
+            public readonly int BinEnd;
 
             private long count;
             private long max;
 
             public Container CircularBar { get; private set; } = null!;
 
+            private Box fill = null!;
+            private Box flashLayer = null!;
+            private OsuSpriteText userIndicator = null!;
+
             public Bar(int binStart, int binEnd)
             {
-                this.binStart = binStart;
-                this.binEnd = binEnd;
+                this.BinStart = binStart;
+                this.BinEnd = binEnd;
             }
+
+            [Resolved]
+            private OverlayColourProvider colourProvider { get; set; } = null!;
+
+            [Resolved]
+            private OsuColour colours { get; set; } = null!;
 
             [BackgroundDependencyLoader]
             private void load(OverlayColourProvider colourProvider)
@@ -129,32 +156,52 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
                     },
                     Anchor = Anchor.BottomCentre,
                     Origin = Anchor.BottomCentre,
-                    Masking = true,
-                    Child = CircularBar = new Container
+                    Children = new Drawable[]
                     {
-                        RelativeSizeAxes = Axes.Both,
-                        Anchor = Anchor.BottomCentre,
-                        Origin = Anchor.BottomCentre,
-                        Height = 0.01f,
-                        Masking = true,
-                        CornerRadius = 10,
-                        Colour = colourProvider.Highlight1,
-                        Child = new Box
+                        CircularBar = new Container
                         {
                             RelativeSizeAxes = Axes.Both,
+                            Anchor = Anchor.BottomCentre,
+                            Origin = Anchor.BottomCentre,
+                            Height = 0.01f,
+                            Masking = true,
+                            CornerRadius = 10,
+                            Children = new Drawable[]
+                            {
+                                fill = new Box
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                },
+                                flashLayer = new Box
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    Alpha = 0,
+                                },
+                            }
+                        },
+                        userIndicator = new OsuSpriteText
+                        {
+                            Anchor = Anchor.BottomCentre,
+                            Origin = Anchor.BottomCentre,
+                            Colour = colours.Orange1,
+                            Text = "You",
+                            Font = OsuFont.Default.With(weight: FontWeight.Bold),
+                            Alpha = 0,
+                            RelativePositionAxes = Axes.Y,
+                            Margin = new MarginPadding { Bottom = 5, },
                         }
-                    }
+                    },
                 });
 
                 string? label = null;
 
-                switch (binStart)
+                switch (BinStart)
                 {
                     case 200_000:
                     case 400_000:
                     case 600_000:
                     case 800_000:
-                        label = @$"{binStart / 1000}k";
+                        label = @$"{BinStart / 1000}k";
                         break;
 
                     case 1_000_000:
@@ -174,6 +221,18 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
                 }
             }
 
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+
+                ContainsLocalUser.BindValueChanged(_ =>
+                {
+                    fill.FadeColour(ContainsLocalUser.Value ? colours.Orange1 : colourProvider.Highlight1, 300, Easing.OutQuint);
+                    userIndicator.FadeTo(ContainsLocalUser.Value ? 1 : 0, 300, Easing.OutQuint);
+                }, true);
+                FinishTransforms(true);
+            }
+
             protected override void Update()
             {
                 base.Update();
@@ -188,12 +247,14 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
                 count = newCount;
                 max = newMax;
 
-                CircularBar.ResizeHeightTo(0.01f + 0.99f * count / max, 300, Easing.OutQuint);
+                float height = 0.01f + 0.99f * count / max;
+                CircularBar.ResizeHeightTo(height, 300, Easing.OutQuint);
+                userIndicator.MoveToY(-height, 300, Easing.OutQuint);
                 if (isIncrement)
-                    CircularBar.FlashColour(Colour4.White, 600, Easing.OutQuint);
+                    flashLayer.FadeOutFromOne(600, Easing.OutQuint);
             }
 
-            public LocalisableString TooltipText => LocalisableString.Format("{0:N0} passes in {1:N0} - {2:N0} range", count, binStart, binEnd);
+            public LocalisableString TooltipText => LocalisableString.Format("{0:N0} passes in {1:N0} - {2:N0} range", count, BinStart, BinEnd);
         }
     }
 }
