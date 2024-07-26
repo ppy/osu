@@ -131,8 +131,8 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
 
             public Bar(int binStart, int binEnd)
             {
-                this.BinStart = binStart;
-                this.BinEnd = binEnd;
+                BinStart = binStart;
+                BinEnd = binEnd;
             }
 
             [Resolved]

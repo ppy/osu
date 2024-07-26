@@ -23,7 +23,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
     public partial class DailyChallengeLeaderboard : CompositeDrawable
     {
         public IBindable<MultiplayerScore?> UserBestScore => userBestScore;
-        private Bindable<MultiplayerScore?> userBestScore = new Bindable<MultiplayerScore?>();
+        private readonly Bindable<MultiplayerScore?> userBestScore = new Bindable<MultiplayerScore?>();
 
         public Action<long>? PresentScore { get; init; }
 
