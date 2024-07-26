@@ -427,7 +427,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
                 Schedule(() =>
                 {
                     breakdown.SetInitialCounts(itemStats.TotalScoreDistribution);
-                    totals.SetInitialCounts(itemStats.TotalScoreDistribution.Sum(c => c), itemStats.TotalPlaylistScore);
+                    totals.SetInitialCounts(itemStats.TotalScoreDistribution.Sum(c => c), itemStats.CumulativeScore);
                 });
             });
 
