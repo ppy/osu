@@ -8,6 +8,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -27,6 +28,8 @@ namespace osu.Game.Overlays.Mods
         protected override IEnumerable<Drawable> EffectTargets => new[] { background };
 
         public readonly BindableBool Expanded = new BindableBool();
+
+        protected new ModCustomisationPanel Parent => (ModCustomisationPanel)base.Parent;
 
         public ModCustomisationHeader()
         {
@@ -90,6 +93,16 @@ namespace osu.Game.Overlays.Mods
             {
                 icon.ScaleTo(v.NewValue ? new Vector2(1, -1) : Vector2.One, 300, Easing.OutQuint);
             }, true);
+        }
+
+        protected override bool OnHover(HoverEvent e)
+        {
+            if (Enabled.Value)
+            {
+                Parent.UpdateHoverExpansion(true);
+            }
+
+            return base.OnHover(e);
         }
     }
 }
