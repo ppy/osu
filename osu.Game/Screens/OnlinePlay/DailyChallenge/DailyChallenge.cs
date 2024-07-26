@@ -333,6 +333,8 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
             }
 
             metadataClient.MultiplayerRoomScoreSet += onRoomScoreSet;
+
+            ((IBindable<MultiplayerScore?>)breakdown.UserBestScore).BindTo(leaderboard.UserBestScore);
         }
 
         private void presentScore(long id)

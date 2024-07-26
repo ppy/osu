@@ -22,6 +22,9 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
 {
     public partial class DailyChallengeLeaderboard : CompositeDrawable
     {
+        public IBindable<MultiplayerScore?> UserBestScore => userBestScore;
+        private readonly Bindable<MultiplayerScore?> userBestScore = new Bindable<MultiplayerScore?>();
+
         public Action<long>? PresentScore { get; init; }
 
         private readonly Room room;
@@ -130,7 +133,9 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
             request.Success += req => Schedule(() =>
             {
                 var best = req.Scores.Select(s => s.CreateScoreInfo(scoreManager, rulesets, playlistItem, beatmap.Value.BeatmapInfo)).ToArray();
-                var userBest = req.UserScore?.CreateScoreInfo(scoreManager, rulesets, playlistItem, beatmap.Value.BeatmapInfo);
+
+                userBestScore.Value = req.UserScore;
+                var userBest = userBestScore.Value?.CreateScoreInfo(scoreManager, rulesets, playlistItem, beatmap.Value.BeatmapInfo);
 
                 cancellationTokenSource?.Cancel();
                 cancellationTokenSource = null;

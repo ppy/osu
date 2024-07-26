@@ -8,6 +8,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Utils;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
 using osu.Game.Screens.OnlinePlay.DailyChallenge;
 using osu.Game.Screens.OnlinePlay.DailyChallenge.Events;
@@ -61,6 +62,8 @@ namespace osu.Game.Tests.Visual.DailyChallenge
 
                 breakdown.AddNewScore(ev);
             });
+            AddStep("set user score", () => breakdown.UserBestScore.Value = new MultiplayerScore { TotalScore = RNG.Next(1_000_000) });
+            AddStep("unset user score", () => breakdown.UserBestScore.Value = null);
         }
     }
 }
