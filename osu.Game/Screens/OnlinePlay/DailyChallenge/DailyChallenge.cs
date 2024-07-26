@@ -106,6 +106,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
             this.room = room;
             playlistItem = room.Playlist.Single();
             roomManager = new RoomManager();
+            Padding = new MarginPadding { Horizontal = -HORIZONTAL_OVERFLOW_PADDING };
         }
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
