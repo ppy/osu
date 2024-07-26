@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -10,6 +11,7 @@ using osu.Game.Overlays;
 using osu.Game.Overlays.Mods;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Mods;
+using osuTK;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
@@ -19,6 +21,8 @@ namespace osu.Game.Tests.Visual.UserInterface
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Aquamarine);
 
         private ModCustomisationPanel panel = null!;
+        private ModCustomisationHeader header = null!;
+        private Container content = null!;
 
         [SetUp]
         public void SetUp() => Schedule(() =>
@@ -36,6 +40,9 @@ namespace osu.Game.Tests.Visual.UserInterface
                     SelectedMods = { BindTarget = SelectedMods },
                 }
             };
+
+            header = panel.Children.OfType<ModCustomisationHeader>().First();
+            content = panel.Children.OfType<Container>().First();
         });
 
         [Test]
@@ -61,6 +68,69 @@ namespace osu.Game.Tests.Visual.UserInterface
                 SelectedMods.Value = Array.Empty<Mod>();
                 panel.Enabled.Value = panel.Expanded.Value = false;
             });
+        }
+
+        [Test]
+        public void TestHoverExpand()
+        {
+            // Can not expand by hovering when no supported mod
+            {
+                AddStep("hover header", () => InputManager.MoveMouseTo(header));
+
+                AddAssert("not expanded", () => !panel.Expanded.Value);
+
+                AddStep("hover content", () => InputManager.MoveMouseTo(content));
+
+                AddAssert("neither expanded", () => !panel.Expanded.Value);
+
+                AddStep("left from content", () => InputManager.MoveMouseTo(Vector2.One));
+            }
+
+            AddStep("add customisable mod", () =>
+            {
+                SelectedMods.Value = new[] { new OsuModDoubleTime() };
+                panel.Enabled.Value = true;
+            });
+
+            // Can expand by hovering when supported mod
+            {
+                AddStep("hover header", () => InputManager.MoveMouseTo(header));
+
+                AddAssert("expanded", () => panel.Expanded.Value);
+
+                AddStep("hover content", () => InputManager.MoveMouseTo(content));
+
+                AddAssert("still expanded", () => panel.Expanded.Value);
+            }
+
+            // Will collapse when mouse left from content
+            {
+                AddStep("left from content", () => InputManager.MoveMouseTo(Vector2.One));
+
+                AddAssert("not expanded", () => !panel.Expanded.Value);
+            }
+
+            // Will collapse when mouse left from header
+            {
+                AddStep("hover header", () => InputManager.MoveMouseTo(header));
+
+                AddAssert("expanded", () => panel.Expanded.Value);
+
+                AddStep("left from header", () => InputManager.MoveMouseTo(Vector2.One));
+
+                AddAssert("not expanded", () => !panel.Expanded.Value);
+            }
+
+            // Not collapse when mouse left if not expanded by hovering
+            {
+                AddStep("expand not by hovering", () => panel.Expanded.Value = true);
+
+                AddStep("hover content", () => InputManager.MoveMouseTo(content));
+
+                AddStep("moust left", () => InputManager.MoveMouseTo(Vector2.One));
+
+                AddAssert("still expanded", () => panel.Expanded.Value);
+            }
         }
     }
 }
