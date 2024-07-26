@@ -88,6 +88,8 @@ namespace osu.Game.Screens.Ranking
                 State.ValueChanged -= exportWhenReady;
 
                 downloadTracker?.RemoveAndDisposeImmediately();
+                downloadTracker = null;
+                State.SetDefault();
 
                 if (score.NewValue != null)
                 {
