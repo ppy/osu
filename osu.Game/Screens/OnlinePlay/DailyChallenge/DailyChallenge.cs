@@ -301,6 +301,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
 
             LoadComponent(userModsSelectOverlay = new RoomModSelectOverlay
             {
+                Beatmap = { BindTarget = Beatmap },
                 SelectedMods = { BindTarget = userMods },
                 IsValidMod = _ => false
             });
@@ -379,8 +380,6 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
             var beatmap = beatmapManager.QueryBeatmap(b => b.OnlineID == playlistItem.Beatmap.OnlineID);
             Beatmap.Value = beatmapManager.GetWorkingBeatmap(beatmap); // this will gracefully fall back to dummy beatmap if missing locally.
             Ruleset.Value = rulesets.GetRuleset(playlistItem.RulesetID);
-
-            userModsSelectOverlay.Beatmap.Value = Beatmap.Value;
 
             applyLoopingToTrack();
         }
