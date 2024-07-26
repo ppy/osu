@@ -121,7 +121,14 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
                     },
                     text = new LinkFlowContainer(t =>
                     {
-                        t.Font = OsuFont.Default.With(weight: newScore.NewRank == null ? FontWeight.Medium : FontWeight.Bold);
+                        FontWeight fontWeight = FontWeight.Medium;
+
+                        if (newScore.NewRank < 100)
+                            fontWeight = FontWeight.Bold;
+                        else if (newScore.NewRank < 1000)
+                            fontWeight = FontWeight.SemiBold;
+
+                        t.Font = OsuFont.Default.With(weight: fontWeight);
                         t.Colour = newScore.NewRank < 10 ? colours.Orange1 : Colour4.White;
                     })
                     {
@@ -132,8 +139,8 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
                 };
 
                 text.AddUserLink(newScore.User);
-                text.AddText(" got ");
-                text.AddLink($"{newScore.TotalScore:N0} points", () => PresentScore?.Invoke(newScore.ScoreID));
+                text.AddText(" scored ");
+                text.AddLink($"{newScore.TotalScore:N0}", () => PresentScore?.Invoke(newScore.ScoreID));
 
                 if (newScore.NewRank != null)
                     text.AddText($" and achieved rank #{newScore.NewRank.Value:N0}");
