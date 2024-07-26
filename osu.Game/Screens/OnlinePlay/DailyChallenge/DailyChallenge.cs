@@ -17,6 +17,7 @@ using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Logging;
 using osu.Framework.Screens;
+using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Graphics.Containers;
@@ -40,7 +41,8 @@ using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.DailyChallenge
 {
-    public partial class DailyChallenge : OsuScreen
+    [Cached(typeof(IPreviewTrackOwner))]
+    public partial class DailyChallenge : OsuScreen, IPreviewTrackOwner
     {
         private readonly Room room;
         private readonly PlaylistItem playlistItem;
@@ -91,6 +93,9 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
 
         [Resolved]
         protected IAPIProvider API { get; private set; } = null!;
+
+        [Resolved]
+        private PreviewTrackManager previewTrackManager { get; set; } = null!;
 
         public override bool DisallowExternalBeatmapRulesetChanges => true;
 
@@ -452,6 +457,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
 
             userModsSelectOverlay.Hide();
             cancelTrackLooping();
+            previewTrackManager.StopAnyPlaying(this);
         }
 
         public override bool OnExiting(ScreenExitEvent e)
@@ -459,6 +465,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
             waves.Hide();
             userModsSelectOverlay.Hide();
             cancelTrackLooping();
+            previewTrackManager.StopAnyPlaying(this);
             this.Delay(WaveContainer.DISAPPEAR_DURATION).FadeOut();
 
             roomManager.PartRoom();
