@@ -132,7 +132,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
             protected override OsuSpriteText CreateSpriteText() => new OsuSpriteText
             {
                 Font = OsuFont.Default.With(size: 80f, fixedWidth: true),
-                Spacing = new Vector2(-2, 0)
+                Spacing = new Vector2(-4, 0)
             };
 
             protected override LocalisableString FormatCount(long count) => count.ToLocalisableString(@"N0");
