@@ -93,6 +93,8 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
 
         public override bool DisallowExternalBeatmapRulesetChanges => true;
 
+        public override bool? ApplyModTrackAdjustments => true;
+
         public DailyChallenge(Room room)
         {
             this.room = room;
