@@ -26,6 +26,7 @@ namespace osu.Game.Skinning.Components
             base.LoadComplete();
 
             Beatmap.ValueChanged += _ => updateBindableDifficulty();
+            updateBindableDifficulty();
         }
 
         private void updateBindableDifficulty()
