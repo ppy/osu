@@ -22,7 +22,7 @@ namespace osu.Game.Skinning.Components
         [SettingSource(typeof(BeatmapAttributeTextStrings), nameof(BeatmapAttributeTextStrings.Attribute), nameof(BeatmapAttributeTextStrings.AttributeDescription))]
         public Bindable<BeatmapDifficultyAttribute> Attribute { get; } = new();
 
-        [SettingSource(typeof(BeatmapAttributeTextStrings), "Account for Rate", "Approach Rate and Accuracy will use effective value, accounting for rate-changing mods.")]
+        [SettingSource("Account for Rate", "Approach Rate and Accuracy will use effective value, accounting for rate-changing mods.")]
         public Bindable<bool> AccountForRate { get; } = new();
 
         private static readonly ImmutableDictionary<BeatmapDifficultyAttribute, LocalisableString> label_dictionary = new Dictionary<BeatmapDifficultyAttribute, LocalisableString>
