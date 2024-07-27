@@ -12,7 +12,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Game.Configuration;
@@ -232,28 +231,12 @@ namespace osu.Game.Overlays.Mods
 
             public new ModCustomisationPanel? Parent => (ModCustomisationPanel?)base.Parent;
 
-            private InputManager inputManager = null!;
-
-            protected override void LoadComplete()
-            {
-                base.LoadComplete();
-                inputManager = GetContainingInputManager()!;
-            }
-
             protected override void OnHoverLost(HoverLostEvent e)
             {
-                if (ExpandedByHovering.Value && !hasHoveredchild())
+                if (ExpandedByHovering.Value && !ReceivePositionalInputAt(e.ScreenSpaceMousePosition))
                     Parent?.UpdateHoverExpansion(false);
 
                 base.OnHoverLost(e);
-            }
-
-            private bool hasHoveredchild()
-            {
-                return inputManager.HoveredDrawables.Any(parentIsThis);
-
-                bool parentIsThis(Drawable? d)
-                    => d is not null && (d == this || parentIsThis(d.Parent));
             }
         }
     }
