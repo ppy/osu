@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -11,6 +12,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Game.Configuration;
@@ -81,6 +83,7 @@ namespace osu.Game.Overlays.Mods
                         Colour = Color4.Black.Opacity(0.25f),
                     },
                     Expanded = { BindTarget = Expanded },
+                    ExpandedByHovering = { BindTarget = ExpandedByHovering },
                     Children = new Drawable[]
                     {
                         new Box
@@ -176,20 +179,22 @@ namespace osu.Game.Overlays.Mods
                 content.FadeOut(400, Easing.OutSine);
             }
 
-            expandedByHovering = false;
+            ExpandedByHovering.Value = false;
         }
 
-        private bool expandedByHovering;
+        public readonly BindableBool ExpandedByHovering = new BindableBool();
 
         public void UpdateHoverExpansion(bool hovered)
         {
             if (hovered && !Expanded.Value)
             {
                 Expanded.Value = true;
-                expandedByHovering = true;
+                ExpandedByHovering.Value = true;
             }
-            else if (!hovered && expandedByHovering)
+            else if (!hovered && ExpandedByHovering.Value)
             {
+                Debug.Assert(Expanded.Value);
+
                 Expanded.Value = false;
             }
         }
@@ -220,16 +225,34 @@ namespace osu.Game.Overlays.Mods
         private partial class FocusGrabbingContainer : InputBlockingContainer
         {
             public IBindable<bool> Expanded { get; } = new BindableBool();
+            public IBindable<bool> ExpandedByHovering { get; } = new BindableBool();
 
             public override bool RequestsFocus => Expanded.Value;
             public override bool AcceptsFocus => Expanded.Value;
 
             public new ModCustomisationPanel? Parent => (ModCustomisationPanel?)base.Parent;
 
+            private InputManager inputManager = null!;
+
+            protected override void LoadComplete()
+            {
+                inputManager = GetContainingInputManager();
+            }
+
             protected override void OnHoverLost(HoverLostEvent e)
             {
-                Parent?.UpdateHoverExpansion(false);
+                if (ExpandedByHovering.Value && !hasHoveredchild())
+                    Parent?.UpdateHoverExpansion(false);
+
                 base.OnHoverLost(e);
+            }
+
+            private bool hasHoveredchild()
+            {
+                return inputManager.HoveredDrawables.Any(parentIsThis);
+
+                bool parentIsThis(Drawable d)
+                    => d is not null && (d == this || parentIsThis(d.Parent));
             }
         }
     }
