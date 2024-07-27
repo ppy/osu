@@ -4,15 +4,11 @@
 using System;
 using System.Linq;
 using NUnit.Framework;
-using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Logging;
 using osu.Framework.Testing;
-using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Chat;
-using osu.Game.Overlays;
 using osu.Game.Overlays.Chat;
 
 namespace osu.Game.Tests.Visual.Online
@@ -47,6 +43,7 @@ namespace osu.Game.Tests.Visual.Online
                 Id = 3,
                 Username = "LocalUser"
             };
+
             string uuid = Guid.NewGuid().ToString();
             AddStep("add local echo message", () => channel.AddLocalEcho(new LocalEchoMessage
             {
@@ -104,7 +101,7 @@ namespace osu.Game.Tests.Visual.Online
 
             int messageCount = 1;
 
-            AddRepeatStep($"add messages", () =>
+            AddRepeatStep("add messages", () =>
             {
                 channel.AddNewMessages(new Message(messageCount)
                 {
@@ -115,7 +112,6 @@ namespace osu.Game.Tests.Visual.Online
                 });
                 messageCount++;
             }, 10);
-
 
             AddUntilStep("10 message present", () => drawableChannel.ChildrenOfType<ChatLine>().Count() == 10);
 

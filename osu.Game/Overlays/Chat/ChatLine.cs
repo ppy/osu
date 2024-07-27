@@ -81,12 +81,14 @@ namespace osu.Game.Overlays.Chat
                 alteringBackground = value;
 
                 if (background == null)
+                {
                     AddInternal(background = new Box
                     {
                         BypassAutoSizeAxes = Axes.Both,
                         RelativeSizeAxes = Axes.Both,
                         Colour = Color4.White,
                     });
+                }
 
                 background.Alpha = value ? 0.04f : 0f;
             }
