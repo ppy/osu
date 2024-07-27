@@ -104,6 +104,13 @@ namespace osu.Game.Overlays.Chat
             highlightedMessage.Value = null;
         });
 
+        private void processMessageBackgroundAltering()
+        {
+            for (int i = 0; i < ChatLineFlow.Count(); i++)
+                if (ChatLineFlow[i] is ChatLine chatline)
+                    chatline.AlteringBackground = i % 2 == 0;
+        }
+
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
@@ -158,6 +165,7 @@ namespace osu.Game.Overlays.Chat
                 scroll.ScrollToEnd();
 
             processMessageHighlighting();
+            processMessageBackgroundAltering();
         });
 
         private void pendingMessageResolved(Message existing, Message updated) => Schedule(() =>
