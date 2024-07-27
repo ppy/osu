@@ -128,6 +128,9 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty(@"converts")]
         public APIBeatmap[]? Converts { get; set; }
 
+        [JsonProperty(@"recent_favourites")]
+        public APIUser[]? RecentFavourites { get; set; }
+
         private BeatmapMetadata metadata => new BeatmapMetadata
         {
             Title = Title,
@@ -146,9 +149,7 @@ namespace osu.Game.Online.API.Requests.Responses
         #region Implementation of IBeatmapSetInfo
 
         IEnumerable<IBeatmapInfo> IBeatmapSetInfo.Beatmaps => Beatmaps;
-
         IBeatmapMetadataInfo IBeatmapSetInfo.Metadata => metadata;
-
         DateTimeOffset IBeatmapSetInfo.DateAdded => throw new NotImplementedException();
         IEnumerable<INamedFileUsage> IHasNamedFiles.Files => throw new NotImplementedException();
         double IBeatmapSetInfo.MaxStarDifficulty => throw new NotImplementedException();
