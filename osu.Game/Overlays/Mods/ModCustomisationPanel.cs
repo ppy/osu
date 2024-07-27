@@ -236,7 +236,8 @@ namespace osu.Game.Overlays.Mods
 
             protected override void LoadComplete()
             {
-                inputManager = GetContainingInputManager();
+                base.LoadComplete();
+                inputManager = GetContainingInputManager()!;
             }
 
             protected override void OnHoverLost(HoverLostEvent e)
@@ -251,7 +252,7 @@ namespace osu.Game.Overlays.Mods
             {
                 return inputManager.HoveredDrawables.Any(parentIsThis);
 
-                bool parentIsThis(Drawable d)
+                bool parentIsThis(Drawable? d)
                     => d is not null && (d == this || parentIsThis(d.Parent));
             }
         }
