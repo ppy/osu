@@ -10,10 +10,8 @@ using System.Threading.Tasks;
 using JetBrains.Annotations;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Game.Beatmaps;
-using osu.Game.Rulesets.Mods;
-using osu.Game.Rulesets.Objects;
-using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
+using osu.Game.Utils;
 
 namespace osu.Game.Rulesets.Difficulty
 {
@@ -57,36 +55,7 @@ namespace osu.Game.Rulesets.Difficulty
             return Task.Run(async () =>
             {
                 Ruleset ruleset = score.Ruleset.CreateInstance();
-                ScoreInfo perfectPlay = score.DeepClone();
-                perfectPlay.Accuracy = 1;
-                perfectPlay.Passed = true;
-
-                // calculate max combo
-                // todo: Get max combo from difficulty calculator instead when diffcalc properly supports lazer-first scores
-                perfectPlay.MaxCombo = calculateMaxCombo(playableBeatmap);
-
-                // create statistics assuming all hit objects have perfect hit result
-                var statistics = playableBeatmap.HitObjects
-                                                .SelectMany(getPerfectHitResults)
-                                                .GroupBy(hr => hr, (hr, list) => (hitResult: hr, count: list.Count()))
-                                                .ToDictionary(pair => pair.hitResult, pair => pair.count);
-                perfectPlay.Statistics = statistics;
-                perfectPlay.MaximumStatistics = statistics;
-
-                // calculate total score
-                ScoreProcessor scoreProcessor = ruleset.CreateScoreProcessor();
-                scoreProcessor.Mods.Value = perfectPlay.Mods;
-                scoreProcessor.ApplyBeatmap(playableBeatmap);
-                perfectPlay.TotalScore = scoreProcessor.MaximumTotalScore;
-
-                // compute rank achieved
-                // default to SS, then adjust the rank with mods
-                perfectPlay.Rank = ScoreRank.X;
-
-                foreach (IApplicableToScoreProcessor mod in perfectPlay.Mods.OfType<IApplicableToScoreProcessor>())
-                {
-                    perfectPlay.Rank = mod.AdjustRank(perfectPlay.Rank, 1);
-                }
+                ScoreInfo perfectPlay = ScoreUtils.GetPerfectPlay(playableBeatmap, score.Ruleset, baseScore: score);
 
                 // calculate performance for this perfect score
                 var difficulty = await difficultyCache.GetDifficultyAsync(
@@ -103,19 +72,6 @@ namespace osu.Game.Rulesets.Difficulty
 
                 return await performanceCalculator.CalculateAsync(perfectPlay, difficulty.Value.Attributes.AsNonNull(), cancellationToken).ConfigureAwait(false);
             }, cancellationToken);
-        }
-
-        private int calculateMaxCombo(IBeatmap beatmap)
-        {
-            return beatmap.HitObjects.SelectMany(getPerfectHitResults).Count(r => r.AffectsCombo());
-        }
-
-        private IEnumerable<HitResult> getPerfectHitResults(HitObject hitObject)
-        {
-            foreach (HitObject nested in hitObject.NestedHitObjects)
-                yield return nested.Judgement.MaxResult;
-
-            yield return hitObject.Judgement.MaxResult;
         }
     }
 }
