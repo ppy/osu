@@ -69,6 +69,29 @@ namespace osu.Game.Overlays.Chat
 
         private Container? highlight;
 
+        private Drawable? background;
+
+        private bool alteringBackground;
+
+        public bool AlteringBackground
+        {
+            get => alteringBackground;
+            set
+            {
+                alteringBackground = value;
+
+                if (background == null)
+                    AddInternal(background = new Box
+                    {
+                        BypassAutoSizeAxes = Axes.Both,
+                        RelativeSizeAxes = Axes.Both,
+                        Colour = Color4.White,
+                    });
+
+                background.Alpha = value ? 0.04f : 0f;
+            }
+        }
+
         /// <summary>
         /// The colour used to paint the author's username.
         /// </summary>
