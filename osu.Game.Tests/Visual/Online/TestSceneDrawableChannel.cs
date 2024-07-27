@@ -5,7 +5,6 @@ using System;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Graphics;
-using osu.Framework.Logging;
 using osu.Framework.Testing;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Chat;
@@ -31,8 +30,6 @@ namespace osu.Game.Tests.Visual.Online
             {
                 RelativeSizeAxes = Axes.Both
             });
-            Logger.Log("v.dwadwaawddwa");
-
         }
 
         [Test]
