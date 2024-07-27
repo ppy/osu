@@ -4,10 +4,15 @@
 using System;
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Logging;
 using osu.Framework.Testing;
+using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Chat;
+using osu.Game.Overlays;
 using osu.Game.Overlays.Chat;
 
 namespace osu.Game.Tests.Visual.Online
@@ -30,6 +35,8 @@ namespace osu.Game.Tests.Visual.Online
             {
                 RelativeSizeAxes = Axes.Both
             });
+            Logger.Log("v.dwadwaawddwa");
+
         }
 
         [Test]
@@ -82,6 +89,44 @@ namespace osu.Game.Tests.Visual.Online
             }));
             AddUntilStep("three day separators present", () => drawableChannel.ChildrenOfType<DaySeparator>().Count() == 3);
             AddAssert("last day separator is from correct day", () => drawableChannel.ChildrenOfType<DaySeparator>().Last().Date.Date == new DateTime(2022, 11, 22));
+        }
+
+        [Test]
+        public void TestBackgroundAltering()
+        {
+            var localUser = new APIUser
+            {
+                Id = 3,
+                Username = "LocalUser"
+            };
+
+            string uuid = Guid.NewGuid().ToString();
+
+            int messageCount = 1;
+
+            AddRepeatStep($"add messages", () =>
+            {
+                channel.AddNewMessages(new Message(messageCount)
+                {
+                    Sender = localUser,
+                    Content = "Hi there all!",
+                    Timestamp = new DateTimeOffset(2022, 11, 21, 20, 11, 13, TimeSpan.Zero),
+                    Uuid = uuid,
+                });
+                messageCount++;
+            }, 10);
+
+
+            AddUntilStep("10 message present", () => drawableChannel.ChildrenOfType<ChatLine>().Count() == 10);
+
+            int checkCount = 0;
+
+            AddRepeatStep("check background", () =>
+            {
+                // +1 because the day separator take one index
+                Assert.AreEqual((checkCount + 1) % 2 == 0, drawableChannel.ChildrenOfType<ChatLine>().ToList()[checkCount].AlteringBackground);
+                checkCount++;
+            }, 10);
         }
     }
 }
