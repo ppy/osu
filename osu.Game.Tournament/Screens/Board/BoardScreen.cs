@@ -22,7 +22,7 @@ namespace osu.Game.Tournament.Screens.Board
 {
     public partial class BoardScreen : TournamentMatchScreen
     {
-        private FillFlowContainer<FillFlowContainer<TournamentBeatmapPanel>> mapFlows = null!;
+        private FillFlowContainer<FillFlowContainer<BoardBeatmapPanel>> mapFlows = null!;
 
         [Resolved]
         private TournamentSceneManager? sceneManager { get; set; }
@@ -40,10 +40,6 @@ namespace osu.Game.Tournament.Screens.Board
         private OsuButton buttonRedWin = null!;
         private OsuButton buttonBlueWin = null!;
 
-
-
-
-
         private ScheduledDelegate? scheduledScreenChange;
 
         [BackgroundDependencyLoader]
@@ -60,7 +56,7 @@ namespace osu.Game.Tournament.Screens.Board
                 {
                     ShowScores = true,
                 },
-                mapFlows = new FillFlowContainer<FillFlowContainer<TournamentBeatmapPanel>>
+                mapFlows = new FillFlowContainer<FillFlowContainer<BoardBeatmapPanel>>
                 {
                     Y = 160,
                     Spacing = new Vector2(10, 10),
@@ -313,7 +309,7 @@ namespace osu.Game.Tournament.Screens.Board
 
             if (CurrentMatch.Value.Round.Value != null)
             {
-                FillFlowContainer<TournamentBeatmapPanel>? currentFlow = null;
+                FillFlowContainer<BoardBeatmapPanel>? currentFlow = null;
                 string? currentMods = null;
                 int flowCount = 0;
 
@@ -321,9 +317,9 @@ namespace osu.Game.Tournament.Screens.Board
                 {
                     if (currentFlow == null || (LadderInfo.SplitMapPoolByMods.Value && currentMods != b.Mods))
                     {
-                        mapFlows.Add(currentFlow = new FillFlowContainer<TournamentBeatmapPanel>
+                        mapFlows.Add(currentFlow = new FillFlowContainer<BoardBeatmapPanel>
                         {
-                            Spacing = new Vector2(10, 5),
+                            Spacing = new Vector2(10, 10),
                             Direction = FillDirection.Full,
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y
@@ -341,11 +337,11 @@ namespace osu.Game.Tournament.Screens.Board
                         flowCount = 1;
                     }
 
-                    currentFlow.Add(new TournamentBeatmapPanel(b.Beatmap, b.Mods)
+                    currentFlow.Add(new BoardBeatmapPanel(b.Beatmap, b.Mods)
                     {
                         Anchor = Anchor.TopCentre,
                         Origin = Anchor.TopCentre,
-                        Height = 42,
+                        Height = 150,
                     });
                 }
             }
