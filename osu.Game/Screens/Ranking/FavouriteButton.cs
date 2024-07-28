@@ -3,8 +3,6 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Graphics;
-using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Logging;
 using osu.Game.Beatmaps;
@@ -19,17 +17,14 @@ using osuTK;
 
 namespace osu.Game.Screens.Ranking
 {
-    public partial class FavouriteButton : OsuAnimatedButton
+    public partial class FavouriteButton : GrayButton
     {
-        private readonly Box background;
-        private readonly SpriteIcon icon;
-
         public readonly BeatmapSetInfo BeatmapSetInfo;
         private APIBeatmapSet? beatmapSet;
         private readonly Bindable<BeatmapSetFavouriteState> current;
 
         private PostBeatmapFavouriteRequest? favouriteRequest;
-        private readonly LoadingLayer loading;
+        private LoadingLayer loading = null!;
 
         private readonly IBindable<APIUser> localUser = new Bindable<APIUser>();
 
@@ -40,28 +35,12 @@ namespace osu.Game.Screens.Ranking
         private OsuColour colours { get; set; } = null!;
 
         public FavouriteButton(BeatmapSetInfo beatmapSetInfo)
+            : base(FontAwesome.Regular.Heart)
         {
             BeatmapSetInfo = beatmapSetInfo;
             current = new BindableWithCurrent<BeatmapSetFavouriteState>(new BeatmapSetFavouriteState(false, 0));
 
             Size = new Vector2(50, 30);
-
-            Children = new Drawable[]
-            {
-                background = new Box
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Depth = float.MaxValue
-                },
-                icon = new SpriteIcon
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Size = new Vector2(13),
-                    Icon = FontAwesome.Regular.Heart,
-                },
-                loading = new LoadingLayer(true, false),
-            };
 
             Action = toggleFavouriteStatus;
         }
@@ -69,6 +48,8 @@ namespace osu.Game.Screens.Ranking
         [BackgroundDependencyLoader]
         private void load()
         {
+            Add(loading = new LoadingLayer(true, false));
+
             current.BindValueChanged(_ => updateState(), true);
 
             localUser.BindTo(api.LocalUser);
@@ -147,14 +128,14 @@ namespace osu.Game.Screens.Ranking
         {
             if (current.Value.Favourited)
             {
-                background.Colour = colours.Green;
-                icon.Icon = FontAwesome.Solid.Heart;
+                Background.Colour = colours.Green;
+                Icon.Icon = FontAwesome.Solid.Heart;
                 TooltipText = BeatmapsetsStrings.ShowDetailsUnfavourite;
             }
             else
             {
-                background.Colour = colours.Gray4;
-                icon.Icon = FontAwesome.Regular.Heart;
+                Background.Colour = colours.Gray4;
+                Icon.Icon = FontAwesome.Regular.Heart;
                 TooltipText = BeatmapsetsStrings.ShowDetailsFavourite;
             }
         }
