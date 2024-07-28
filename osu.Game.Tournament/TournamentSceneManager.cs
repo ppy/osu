@@ -145,13 +145,12 @@ namespace osu.Game.Tournament
                                 new ScreenButton(typeof(TeamIntroScreen), Key.I) { Text = "Team Intro", RequestSelection = SetScreen },
                                 new ScreenButton(typeof(SeedingScreen), Key.D) { Text = "Seeding", RequestSelection = SetScreen },
                                 new Separator(),
+                                /* Append new screen "board" for board display */
+                                new ScreenButton(typeof(BoardScreen), Key.C) { Text = "Board", RequestSelection = SetScreen },
                                 new ScreenButton(typeof(MapPoolScreen), Key.M) { Text = "Map Pool", RequestSelection = SetScreen },
                                 new ScreenButton(typeof(GameplayScreen), Key.G) { Text = "Gameplay", RequestSelection = SetScreen },
                                 new Separator(),
                                 new ScreenButton(typeof(TeamWinScreen), Key.W) { Text = "Win", RequestSelection = SetScreen },
-
-                                /* Append new screen "board" for board display ↓ */
-                                new ScreenButton(typeof(BoardScreen), Key.C) { Text = "Board", RequestSelection = SetScreen },
                                 new Separator(),
                                 new ScreenButton(typeof(DrawingsScreen)) { Text = "Drawings", RequestSelection = SetScreen },
                                 new ScreenButton(typeof(ShowcaseScreen)) { Text = "Showcase", RequestSelection = SetScreen },
@@ -242,7 +241,7 @@ namespace osu.Game.Tournament
             public Separator()
             {
                 RelativeSizeAxes = Axes.X;
-                Height = 20;
+                Height = 5;
             }
         }
 
