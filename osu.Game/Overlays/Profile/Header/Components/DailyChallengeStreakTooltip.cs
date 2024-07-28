@@ -2,18 +2,21 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
-using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Scoring;
 using osuTK;
+using Box = osu.Framework.Graphics.Shapes.Box;
+using Color4 = osuTK.Graphics.Color4;
 
 namespace osu.Game.Overlays.Profile.Header.Components
 {
@@ -38,6 +41,13 @@ namespace osu.Game.Overlays.Profile.Header.Components
             AutoSizeAxes = Axes.Both;
             CornerRadius = 20f;
             Masking = true;
+
+            EdgeEffect = new EdgeEffectParameters
+            {
+                Type = EdgeEffectType.Shadow,
+                Colour = Color4.Black.Opacity(0.5f),
+                Radius = 30f,
+            };
 
             Children = new Drawable[]
             {
