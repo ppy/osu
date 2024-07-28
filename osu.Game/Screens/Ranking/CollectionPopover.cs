@@ -28,7 +28,6 @@ namespace osu.Game.Screens.Ranking
         {
             this.beatmapInfo = beatmapInfo;
 
-            Margin = new MarginPadding(5);
             Body.CornerRadius = 4;
         }
 
