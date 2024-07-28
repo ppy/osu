@@ -44,10 +44,12 @@ namespace osu.Game.Overlays.Mods
                     Spacing = new Vector2(7),
                     Children = new[]
                     {
-                        descriptionText = new OsuSpriteText
+                        descriptionText = new TruncatingSpriteText
                         {
+                            RelativeSizeAxes = Axes.X,
                             Font = OsuFont.GetFont(weight: FontWeight.Regular),
                             Colour = colourProvider.Content1,
+                            AllowMultiline = true,
                         },
                     }
                 }
