@@ -36,8 +36,9 @@ namespace osu.Game.Screens.Footer
         private Container<ScreenFooterButton> removedLeftButtonsContainer = null!;
         private LogoTrackingContainer logoTrackingContainer = null!;
 
+        // TODO: this should take the screen's colourProvider instead. hardcode plum for now as daily challenge is the only usage shown to users
         [Cached]
-        private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Aquamarine);
+        private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Plum);
 
         [Resolved]
         private OsuGame? game { get; set; }
@@ -256,7 +257,7 @@ namespace osu.Game.Screens.Footer
 
             temporarilyHiddenLeftButtons.Clear();
 
-            updateColourScheme(OverlayColourScheme.Aquamarine.GetHue());
+            updateColourScheme(OverlayColourScheme.Plum.GetHue());
 
             contentContainer.Delay(timeUntilRun).Expire();
             contentContainer = null;
