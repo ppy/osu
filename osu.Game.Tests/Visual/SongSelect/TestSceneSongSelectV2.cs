@@ -186,12 +186,12 @@ namespace osu.Game.Tests.Visual.SongSelect
             if (newScreen is IOsuScreen osuScreen && osuScreen.ShowFooter)
             {
                 screenScreenFooter.Show();
-                screenScreenFooter.SetButtons(osuScreen.CreateFooterButtons());
+                screenScreenFooter.SetLeftButtons(osuScreen.CreateFooterButtons());
             }
             else
             {
                 screenScreenFooter.Hide();
-                screenScreenFooter.SetButtons(Array.Empty<ScreenFooterButton>());
+                screenScreenFooter.SetLeftButtons(Array.Empty<ScreenFooterButton>());
             }
         }
     }

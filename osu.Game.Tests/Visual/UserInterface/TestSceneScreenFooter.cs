@@ -49,7 +49,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                 },
             };
 
-            screenFooter.SetButtons(new ScreenFooterButton[]
+            screenFooter.SetLeftButtons(new ScreenFooterButton[]
             {
                 new ScreenFooterButtonMods(modOverlay) { Current = SelectedMods },
                 new ScreenFooterButtonRandom(),
@@ -77,7 +77,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         [Test]
         public void TestButtonsOut()
         {
-            AddStep("clear buttons", () => screenFooter.SetButtons(Array.Empty<ScreenFooterButton>()));
+            AddStep("clear buttons", () => screenFooter.SetLeftButtons(Array.Empty<ScreenFooterButton>()));
         }
 
         /// <summary>
@@ -86,7 +86,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         [Test]
         public void TestReplaceButtons()
         {
-            AddStep("replace buttons", () => screenFooter.SetButtons(new[]
+            AddStep("replace buttons", () => screenFooter.SetLeftButtons(new[]
             {
                 new ScreenFooterButton { Text = "One", Action = () => { } },
                 new ScreenFooterButton { Text = "Two", Action = () => { } },
@@ -100,7 +100,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             TestShearedOverlayContainer externalOverlay = null!;
 
             AddStep("add overlay", () => contentContainer.Add(externalOverlay = new TestShearedOverlayContainer()));
-            AddStep("set buttons", () => screenFooter.SetButtons(new[]
+            AddStep("set buttons", () => screenFooter.SetLeftButtons(new[]
             {
                 new ScreenFooterButton(externalOverlay)
                 {
@@ -128,7 +128,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             TestShearedOverlayContainer externalOverlay = null!;
 
             AddStep("hide footer", () => screenFooter.Hide());
-            AddStep("remove buttons", () => screenFooter.SetButtons(Array.Empty<ScreenFooterButton>()));
+            AddStep("remove buttons", () => screenFooter.SetLeftButtons(Array.Empty<ScreenFooterButton>()));
 
             AddStep("add external overlay", () => contentContainer.Add(externalOverlay = new TestShearedOverlayContainer()));
             AddStep("show external overlay", () => externalOverlay.Show());
@@ -158,7 +158,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             TestShearedOverlayContainer externalOverlay = null!;
 
             AddStep("hide footer", () => screenFooter.Hide());
-            AddStep("remove buttons", () => screenFooter.SetButtons(Array.Empty<ScreenFooterButton>()));
+            AddStep("remove buttons", () => screenFooter.SetLeftButtons(Array.Empty<ScreenFooterButton>()));
 
             AddStep("add external overlay", () => contentContainer.Add(externalOverlay = new TestShearedOverlayContainer()));
             AddStep("show external overlay", () => externalOverlay.Show());
