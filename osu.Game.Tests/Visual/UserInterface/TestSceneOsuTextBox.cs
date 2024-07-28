@@ -76,6 +76,24 @@ namespace osu.Game.Tests.Visual.UserInterface
                 InputManager.Click(MouseButton.Left);
             });
             AddAssert("text selected", () => numberBoxes.First().SelectedText == "987654321");
+
+            AddStep("click away", () =>
+            {
+                InputManager.MoveMouseTo(Vector2.Zero);
+                InputManager.Click(MouseButton.Left);
+            });
+
+            Drawable textContainer = null!;
+
+            AddStep("move mouse to end of text", () =>
+            {
+                textContainer = numberBoxes.First().ChildrenOfType<Container>().ElementAt(1);
+                InputManager.MoveMouseTo(textContainer.ScreenSpaceDrawQuad.TopRight);
+            });
+            AddStep("hold mouse", () => InputManager.PressButton(MouseButton.Left));
+            AddStep("drag to half", () => InputManager.MoveMouseTo(textContainer.ScreenSpaceDrawQuad.BottomRight - new Vector2(textContainer.ScreenSpaceDrawQuad.Width / 2 + 1f, 0)));
+            AddStep("release mouse", () => InputManager.ReleaseButton(MouseButton.Left));
+            AddAssert("half text selected", () => numberBoxes.First().SelectedText == "54321");
         }
 
         private void clearTextboxes(IEnumerable<OsuTextBox> textBoxes) => AddStep("clear textbox", () => textBoxes.ForEach(textBox => textBox.Text = null));

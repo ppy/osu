@@ -22,6 +22,9 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
 {
     public partial class DailyChallengeLeaderboard : CompositeDrawable
     {
+        public IBindable<MultiplayerScore?> UserBestScore => userBestScore;
+        private readonly Bindable<MultiplayerScore?> userBestScore = new Bindable<MultiplayerScore?>();
+
         public Action<long>? PresentScore { get; init; }
 
         private readonly Room room;
@@ -118,14 +121,21 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
             RefetchScores();
         }
 
+        private IndexPlaylistScoresRequest? request;
+
         public void RefetchScores()
         {
-            var request = new IndexPlaylistScoresRequest(room.RoomID.Value!.Value, playlistItem.ID);
+            if (request?.CompletionState == APIRequestCompletionState.Waiting)
+                return;
+
+            request = new IndexPlaylistScoresRequest(room.RoomID.Value!.Value, playlistItem.ID);
 
             request.Success += req => Schedule(() =>
             {
                 var best = req.Scores.Select(s => s.CreateScoreInfo(scoreManager, rulesets, playlistItem, beatmap.Value.BeatmapInfo)).ToArray();
-                var userBest = req.UserScore?.CreateScoreInfo(scoreManager, rulesets, playlistItem, beatmap.Value.BeatmapInfo);
+
+                userBestScore.Value = req.UserScore;
+                var userBest = userBestScore.Value?.CreateScoreInfo(scoreManager, rulesets, playlistItem, beatmap.Value.BeatmapInfo);
 
                 cancellationTokenSource?.Cancel();
                 cancellationTokenSource = null;
@@ -138,9 +148,9 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
                 }
                 else
                 {
-                    LoadComponentsAsync(best.Select(s => new LeaderboardScoreV2(s, sheared: false)
+                    LoadComponentsAsync(best.Select((s, index) => new LeaderboardScoreV2(s, sheared: false)
                     {
-                        Rank = s.Position,
+                        Rank = index + 1,
                         IsPersonalBest = s.UserID == api.LocalUser.Value.Id,
                         Action = () => PresentScore?.Invoke(s.OnlineID),
                     }), loaded =>
