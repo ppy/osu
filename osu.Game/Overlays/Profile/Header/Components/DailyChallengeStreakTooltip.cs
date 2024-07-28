@@ -17,11 +17,8 @@ using osuTK;
 
 namespace osu.Game.Overlays.Profile.Header.Components
 {
-    public partial class DailyChallengeStreakTooltip : VisibilityContainer, ITooltip<APIUserDailyChallengeStatistics>
+    public partial class DailyChallengeStreakTooltip : VisibilityContainer, ITooltip<DailyChallengeStreakTooltipData>
     {
-        [Cached]
-        private readonly OverlayColourProvider colourProvider;
-
         private StreakPiece currentDaily = null!;
         private StreakPiece currentWeekly = null!;
         private StatisticsPiece bestDaily = null!;
@@ -29,13 +26,11 @@ namespace osu.Game.Overlays.Profile.Header.Components
         private StatisticsPiece topTen = null!;
         private StatisticsPiece topFifty = null!;
 
+        private Box topBackground = null!;
+        private Box background = null!;
+
         [Resolved]
         private OsuColour colours { get; set; } = null!;
-
-        public DailyChallengeStreakTooltip(OverlayColourProvider colourProvider)
-        {
-            this.colourProvider = colourProvider;
-        }
 
         [BackgroundDependencyLoader]
         private void load()
@@ -46,10 +41,9 @@ namespace osu.Game.Overlays.Profile.Header.Components
 
             Children = new Drawable[]
             {
-                new Box
+                background = new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = colourProvider.Background4,
                 },
                 new FillFlowContainer
                 {
@@ -62,10 +56,9 @@ namespace osu.Game.Overlays.Profile.Header.Components
                             AutoSizeAxes = Axes.Both,
                             Children = new Drawable[]
                             {
-                                new Box
+                                topBackground = new Box
                                 {
                                     RelativeSizeAxes = Axes.Both,
-                                    Colour = colourProvider.Background5,
                                 },
                                 new FillFlowContainer
                                 {
@@ -106,26 +99,35 @@ namespace osu.Game.Overlays.Profile.Header.Components
             };
         }
 
-        public void SetContent(APIUserDailyChallengeStatistics content)
+        public void SetContent(DailyChallengeStreakTooltipData content)
         {
+            var statistics = content.Statistics;
+            var colourProvider = content.ColourProvider;
+
+            background.Colour = colourProvider.Background4;
+            topBackground.Colour = colourProvider.Background5;
+
             // currentDaily.Value = UsersStrings.ShowDailyChallengeUnitDay(content.DailyStreakCurrent.ToLocalisableString(@"N0"));
-            currentDaily.Value = $"{content.DailyStreakCurrent:N0}d";
-            currentDaily.ValueColour = colours.ForRankingTier(TierForDaily(content.DailyStreakCurrent));
+            currentDaily.Value = $"{statistics.DailyStreakCurrent:N0}d";
+            currentDaily.ValueColour = colours.ForRankingTier(TierForDaily(statistics.DailyStreakCurrent));
 
-            // currentWeekly.Value = UsersStrings.ShowDailyChallengeUnitWeek(content.WeeklyStreakCurrent.ToLocalisableString(@"N0"));
-            currentWeekly.Value = $"{content.WeeklyStreakCurrent:N0}w";
-            currentWeekly.ValueColour = colours.ForRankingTier(TierForWeekly(content.WeeklyStreakCurrent));
+            // currentWeekly.Value = UsersStrings.ShowDailyChallengeUnitWeek(statistics.WeeklyStreakCurrent.ToLocalisableString(@"N0"));
+            currentWeekly.Value = $"{statistics.WeeklyStreakCurrent:N0}w";
+            currentWeekly.ValueColour = colours.ForRankingTier(TierForWeekly(statistics.WeeklyStreakCurrent));
 
-            // bestDaily.Value = UsersStrings.ShowDailyChallengeUnitDay(content.DailyStreakBest.ToLocalisableString(@"N0"));
-            bestDaily.Value = $"{content.DailyStreakBest:N0}d";
-            bestDaily.ValueColour = colours.ForRankingTier(TierForDaily(content.DailyStreakBest));
+            // bestDaily.Value = UsersStrings.ShowDailyChallengeUnitDay(statistics.DailyStreakBest.ToLocalisableString(@"N0"));
+            bestDaily.Value = $"{statistics.DailyStreakBest:N0}d";
+            bestDaily.ValueColour = colours.ForRankingTier(TierForDaily(statistics.DailyStreakBest));
 
-            // bestWeekly.Value = UsersStrings.ShowDailyChallengeUnitWeek(content.WeeklyStreakBest.ToLocalisableString(@"N0"));
-            bestWeekly.Value = $"{content.WeeklyStreakBest:N0}w";
-            bestWeekly.ValueColour = colours.ForRankingTier(TierForWeekly(content.WeeklyStreakBest));
+            // bestWeekly.Value = UsersStrings.ShowDailyChallengeUnitWeek(statistics.WeeklyStreakBest.ToLocalisableString(@"N0"));
+            bestWeekly.Value = $"{statistics.WeeklyStreakBest:N0}w";
+            bestWeekly.ValueColour = colours.ForRankingTier(TierForWeekly(statistics.WeeklyStreakBest));
 
-            topTen.Value = content.Top10PercentPlacements.ToLocalisableString(@"N0");
-            topFifty.Value = content.Top50PercentPlacements.ToLocalisableString(@"N0");
+            topTen.Value = statistics.Top10PercentPlacements.ToLocalisableString(@"N0");
+            topTen.ValueColour = colourProvider.Content2;
+
+            topFifty.Value = statistics.Top50PercentPlacements.ToLocalisableString(@"N0");
+            topFifty.ValueColour = colourProvider.Content2;
         }
 
         // reference: https://github.com/ppy/osu-web/blob/8206e0e91eeea80ccf92f0586561346dd40e085e/resources/js/profile-page/daily-challenge.tsx#L13-L43
@@ -232,12 +234,8 @@ namespace osu.Game.Overlays.Profile.Header.Components
                     }
                 };
             }
-
-            [BackgroundDependencyLoader]
-            private void load(OverlayColourProvider colourProvider)
-            {
-                valueText.Colour = colourProvider.Content2;
-            }
         }
     }
+
+    public record DailyChallengeStreakTooltipData(OverlayColourProvider ColourProvider, APIUserDailyChallengeStatistics Statistics);
 }
