@@ -7,6 +7,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Pooling;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Skinning;
@@ -23,7 +24,7 @@ namespace osu.Game.Rulesets.Judgements
 
         public JudgementResult? Result { get; private set; }
 
-        public DrawableHitObject? JudgedObject { get; private set; }
+        public HitObject? JudgedHitObject { get; private set; }
 
         public override bool RemoveCompletedTransforms => false;
 
@@ -94,17 +95,17 @@ namespace osu.Game.Rulesets.Judgements
         /// </summary>
         /// <param name="result">The applicable judgement.</param>
         /// <param name="judgedObject">The drawable object.</param>
-        public void Apply(JudgementResult result, DrawableHitObject? judgedObject)
+        public virtual void Apply(JudgementResult result, DrawableHitObject? judgedObject)
         {
             Result = result;
-            JudgedObject = judgedObject;
+            JudgedHitObject = judgedObject?.HitObject;
         }
 
         protected override void FreeAfterUse()
         {
             base.FreeAfterUse();
 
-            JudgedObject = null;
+            JudgedHitObject = null;
         }
 
         protected override void PrepareForUse()

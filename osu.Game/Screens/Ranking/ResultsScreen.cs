@@ -186,11 +186,11 @@ namespace osu.Game.Screens.Ranking
                 Scheduler.AddDelayed(() => OverlayActivationMode.Value = OverlayActivation.All, shouldFlair ? AccuracyCircle.TOTAL_DURATION + 1000 : 0);
             }
 
-            if (SelectedScore.Value != null && AllowWatchingReplay)
+            if (AllowWatchingReplay)
             {
                 buttons.Add(new ReplayDownloadButton(SelectedScore.Value)
                 {
-                    Score = { BindTarget = SelectedScore! },
+                    Score = { BindTarget = SelectedScore },
                     Width = 300
                 });
             }
@@ -411,7 +411,8 @@ namespace osu.Game.Screens.Ranking
                     break;
 
                 case GlobalAction.Select:
-                    StatisticsPanel.ToggleVisibility();
+                    if (SelectedScore.Value != null)
+                        StatisticsPanel.ToggleVisibility();
                     return true;
             }
 
