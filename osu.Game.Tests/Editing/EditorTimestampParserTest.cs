@@ -16,6 +16,7 @@ namespace osu.Game.Tests.Editing
             new object?[] { "1", true, TimeSpan.FromMilliseconds(1), null },
             new object?[] { "99", true, TimeSpan.FromMilliseconds(99), null },
             new object?[] { "320000", true, TimeSpan.FromMilliseconds(320000), null },
+            new object?[] { "1:2", true, new TimeSpan(0, 0, 1, 2), null },
             new object?[] { "1:02", true, new TimeSpan(0, 0, 1, 2), null },
             new object?[] { "1:92", false, null, null },
             new object?[] { "1:002", false, null, null },
