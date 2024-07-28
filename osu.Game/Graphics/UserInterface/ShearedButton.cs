@@ -30,7 +30,12 @@ namespace osu.Game.Graphics.UserInterface
         public float TextSize
         {
             get => text.Font.Size;
-            set => text.Font = OsuFont.TorusAlternate.With(size: value);
+            set => text.Font = text.Font.With(size: value);
+        }
+
+        public FontWeight TextWeight
+        {
+            set => text.Font = text.Font.With(weight: value);
         }
 
         public Colour4 DarkerColour
