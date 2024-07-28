@@ -10,15 +10,14 @@ using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Overlays.Profile.Header.Components
 {
-    public partial class DailyChallengeStreakDisplay : CompositeDrawable, IHasCustomTooltip<APIUserDailyChallengeStatistics>
+    public partial class DailyChallengeStreakDisplay : CompositeDrawable, IHasCustomTooltip<DailyChallengeStreakTooltipData>
     {
         public readonly Bindable<UserProfileData?> User = new Bindable<UserProfileData?>();
 
-        public APIUserDailyChallengeStatistics? TooltipContent { get; private set; }
+        public DailyChallengeStreakTooltipData? TooltipContent { get; private set; }
 
         private OsuSpriteText dailyStreak = null!;
 
@@ -104,9 +103,9 @@ namespace osu.Game.Overlays.Profile.Header.Components
             // dailyStreak.Text = UsersStrings.ShowDailyChallengeUnitDay(statistics.DailyStreakCurrent);
             dailyStreak.Text = $"{statistics.DailyStreakCurrent}d";
             dailyStreak.Colour = colours.ForRankingTier(DailyChallengeStreakTooltip.TierForDaily(statistics.DailyStreakCurrent));
-            TooltipContent = statistics;
+            TooltipContent = new DailyChallengeStreakTooltipData(colourProvider, statistics);
         }
 
-        public ITooltip<APIUserDailyChallengeStatistics> GetCustomTooltip() => new DailyChallengeStreakTooltip(colourProvider);
+        public ITooltip<DailyChallengeStreakTooltipData> GetCustomTooltip() => new DailyChallengeStreakTooltip();
     }
 }
