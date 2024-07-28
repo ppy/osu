@@ -100,9 +100,7 @@ namespace osu.Game.Screens.Ranking
 
             InternalChild = new PopoverContainer
             {
-                Depth = -1,
                 RelativeSizeAxes = Axes.Both,
-                Padding = new MarginPadding(0),
                 Child = new GridContainer
                 {
                     RelativeSizeAxes = Axes.Both,
