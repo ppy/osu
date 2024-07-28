@@ -282,6 +282,15 @@ namespace osu.Game.Tests.Visual.Online
                     ImageUrlLowRes = "https://assets.ppy.sh/profile-badges/contributor.png",
                 },
             },
+            DailyChallengeStatistics = new APIUserDailyChallengeStatistics
+            {
+                DailyStreakCurrent = 231,
+                WeeklyStreakCurrent = 18,
+                DailyStreakBest = 370,
+                WeeklyStreakBest = 51,
+                Top10PercentPlacements = 345,
+                Top50PercentPlacements = 427,
+            },
             Title = "osu!volunteer",
             Colour = "ff0000",
             Achievements = Array.Empty<APIUserAchievement>(),
