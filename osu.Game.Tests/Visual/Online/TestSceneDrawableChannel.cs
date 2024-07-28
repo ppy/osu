@@ -94,8 +94,6 @@ namespace osu.Game.Tests.Visual.Online
                 Username = "LocalUser"
             };
 
-            string uuid = Guid.NewGuid().ToString();
-
             int messageCount = 1;
 
             AddRepeatStep("add messages", () =>
@@ -104,8 +102,8 @@ namespace osu.Game.Tests.Visual.Online
                 {
                     Sender = localUser,
                     Content = "Hi there all!",
-                    Timestamp = new DateTimeOffset(2022, 11, 21, 20, 11, 13, TimeSpan.Zero),
-                    Uuid = uuid,
+                    Timestamp = new DateTimeOffset(2022, 11, 21, 20, messageCount, 13, TimeSpan.Zero),
+                    Uuid = Guid.NewGuid().ToString(),
                 });
                 messageCount++;
             }, 10);
