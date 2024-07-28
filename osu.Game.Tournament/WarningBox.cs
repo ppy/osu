@@ -24,7 +24,7 @@ namespace osu.Game.Tournament
             {
                 new Box
                 {
-                    Colour = Color4.Red,
+                    Colour = Color4.Orange,
                     RelativeSizeAxes = Axes.Both,
                 },
                 new TournamentSpriteText

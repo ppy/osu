@@ -84,7 +84,7 @@ namespace osu.Game.Tournament
                     {
                         Depth = float.MinValue,
                     },
-                    heightWarning = new WarningBox("Please make the window wider")
+                    heightWarning = new WarningBox($"Please make the window wider.\nThe minimum window width is {TournamentSceneManager.REQUIRED_WIDTH}.")
                     {
                         Anchor = Anchor.BottomCentre,
                         Origin = Anchor.BottomCentre,
