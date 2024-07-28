@@ -23,7 +23,6 @@ namespace osu.Game.Tests.Visual.Ranking
         {
             AddStep("create button", () => Child = new PopoverContainer
             {
-                Depth = -1,
                 RelativeSizeAxes = Axes.Both,
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
