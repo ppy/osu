@@ -3,9 +3,7 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Extensions;
-using osu.Framework.Graphics;
 using osu.Framework.Graphics.Cursor;
-using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Beatmaps;
@@ -15,33 +13,16 @@ using osuTK;
 
 namespace osu.Game.Screens.Ranking
 {
-    public partial class CollectionButton : OsuAnimatedButton, IHasPopover
+    public partial class CollectionButton : GrayButton, IHasPopover
     {
-        private readonly Box background;
-
         private readonly BeatmapInfo beatmapInfo;
 
         public CollectionButton(BeatmapInfo beatmapInfo)
+            : base(FontAwesome.Solid.Book)
         {
             this.beatmapInfo = beatmapInfo;
 
             Size = new Vector2(50, 30);
-
-            Children = new Drawable[]
-            {
-                background = new Box
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Depth = float.MaxValue
-                },
-                new SpriteIcon
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Size = new Vector2(13),
-                    Icon = FontAwesome.Solid.Book,
-                },
-            };
 
             TooltipText = "collections";
         }
@@ -49,7 +30,7 @@ namespace osu.Game.Screens.Ranking
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            background.Colour = colours.Green;
+            Background.Colour = colours.Green;
 
             Action = this.ShowPopover;
         }
