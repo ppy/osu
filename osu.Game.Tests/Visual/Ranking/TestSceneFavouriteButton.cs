@@ -9,7 +9,6 @@ using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Screens.Ranking;
-using osuTK;
 
 namespace osu.Game.Tests.Visual.Ranking
 {
@@ -27,8 +26,6 @@ namespace osu.Game.Tests.Visual.Ranking
         {
             AddStep("create button", () => Child = favourite = new FavouriteButton(beatmapSetInfo)
             {
-                RelativeSizeAxes = Axes.None,
-                Size = new Vector2(50),
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
             });
@@ -66,8 +63,6 @@ namespace osu.Game.Tests.Visual.Ranking
         {
             AddStep("make beatmap invalid", () => Child = favourite = new FavouriteButton(invalidBeatmapSetInfo)
             {
-                RelativeSizeAxes = Axes.None,
-                Size = new Vector2(50),
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
             });

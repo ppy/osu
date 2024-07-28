@@ -40,7 +40,7 @@ namespace osu.Game.Screens.Ranking
             BeatmapSetInfo = beatmapSetInfo;
             current = new BindableWithCurrent<BeatmapSetFavouriteState>(new BeatmapSetFavouriteState(false, 0));
 
-            Size = new Vector2(50, 30);
+            Size = new Vector2(75, 30);
         }
 
         [BackgroundDependencyLoader]
