@@ -27,14 +27,14 @@ namespace osu.Game.Screens.Ranking
             : base(false)
         {
             this.beatmapInfo = beatmapInfo;
+
+            Margin = new MarginPadding(5);
+            Body.CornerRadius = 4;
         }
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            Margin = new MarginPadding(5);
-            Body.CornerRadius = 4;
-
             Children = new[]
             {
                 new OsuMenu(Direction.Vertical, true)
