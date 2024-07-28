@@ -18,6 +18,7 @@ using osu.Framework.Localisation;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Input.Bindings;
 using osu.Game.Localisation;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Mods;
@@ -61,13 +62,14 @@ namespace osu.Game.Screens.SelectV2.Footer
         public ScreenFooterButtonMods(ModSelectOverlay overlay)
             : base(overlay)
         {
+            Text = "Mods";
+            Icon = FontAwesome.Solid.ExchangeAlt;
+            Hotkey = GlobalAction.ToggleModSelection;
         }
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            Text = "Mods";
-            Icon = FontAwesome.Solid.ExchangeAlt;
             AccentColour = colours.Lime1;
 
             AddRange(new[]
