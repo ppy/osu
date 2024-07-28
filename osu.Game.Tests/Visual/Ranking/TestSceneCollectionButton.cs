@@ -9,7 +9,6 @@ using osu.Framework.Graphics.Cursor;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Screens.Ranking;
-using osuTK;
 using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Ranking
@@ -30,9 +29,9 @@ namespace osu.Game.Tests.Visual.Ranking
                 Origin = Anchor.Centre,
                 Child = collectionButton = new CollectionButton(beatmapInfo)
                 {
-                    RelativeSizeAxes = Axes.None,
-                    Size = new Vector2(50),
-                }
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                },
             });
         }
 

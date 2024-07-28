@@ -22,7 +22,7 @@ namespace osu.Game.Screens.Ranking
         {
             this.beatmapInfo = beatmapInfo;
 
-            Size = new Vector2(50, 30);
+            Size = new Vector2(75, 30);
 
             TooltipText = "collections";
         }

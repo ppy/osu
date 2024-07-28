@@ -211,17 +211,10 @@ namespace osu.Game.Screens.Ranking
             }
 
             if (Score?.BeatmapInfo != null)
-            {
-                buttons.Add(new CollectionButton(Score.BeatmapInfo) { Width = 75 });
-            }
+                buttons.Add(new CollectionButton(Score.BeatmapInfo));
 
             if (Score?.BeatmapInfo?.BeatmapSet != null && Score.BeatmapInfo.BeatmapSet.OnlineID > 0)
-            {
-                buttons.Add(new FavouriteButton(Score.BeatmapInfo.BeatmapSet)
-                {
-                    Width = 75
-                });
-            }
+                buttons.Add(new FavouriteButton(Score.BeatmapInfo.BeatmapSet));
         }
 
         protected override void LoadComplete()
