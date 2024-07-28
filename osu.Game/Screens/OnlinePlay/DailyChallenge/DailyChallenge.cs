@@ -21,6 +21,7 @@ using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation;
 using osu.Game.Online.API;
@@ -31,12 +32,14 @@ using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Screens.Footer;
 using osu.Game.Screens.OnlinePlay.Components;
 using osu.Game.Screens.OnlinePlay.DailyChallenge.Events;
 using osu.Game.Screens.OnlinePlay.Match;
 using osu.Game.Screens.OnlinePlay.Match.Components;
 using osu.Game.Screens.OnlinePlay.Playlists;
 using osu.Game.Screens.Play;
+using osu.Game.Screens.SelectV2.Footer;
 using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.DailyChallenge
@@ -56,9 +59,8 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
 
         private OnlinePlayScreenWaveContainer waves = null!;
         private DailyChallengeLeaderboard leaderboard = null!;
-        private RoomModSelectOverlay userModsSelectOverlay = null!;
+        private readonly RoomModSelectOverlay userModsSelectOverlay = new RoomModSelectOverlay();
         private Sample? sampleStart;
-        private IDisposable? userModsSelectOverlayRegistration;
 
         private DailyChallengeScoreBreakdown breakdown = null!;
         private DailyChallengeTotalsDisplay totals = null!;
@@ -83,9 +85,6 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
         private MusicController musicController { get; set; } = null!;
 
         [Resolved]
-        private IOverlayManager? overlayManager { get; set; }
-
-        [Resolved]
         private MetadataClient metadataClient { get; set; } = null!;
 
         [Resolved]
@@ -96,6 +95,21 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
 
         [Resolved]
         private PreviewTrackManager previewTrackManager { get; set; } = null!;
+
+        public override bool ShowFooter => true;
+
+        public override IReadOnlyList<ScreenFooterButton> CreateFooterButtons() => new[]
+        {
+            new ScreenFooterButtonFreeMods(userModsSelectOverlay)
+            {
+                Current = { BindTarget = userMods },
+            },
+        };
+
+        public override ShearedButton CreateRightFooterButton() => new LetsGoButton
+        {
+            Action = startPlay,
+        };
 
         public override bool DisallowExternalBeatmapRulesetChanges => true;
 
@@ -120,8 +134,6 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
         private void load(AudioManager audio)
         {
             sampleStart = audio.Samples.Get(@"SongSelect/confirm-selection");
-
-            FillFlowContainer footerButtons;
 
             InternalChild = waves = new OnlinePlayScreenWaveContainer
             {
@@ -168,7 +180,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
                                 },
                                 null,
                                 [
-                                    new Container
+                                    new OsuContextMenuContainer
                                     {
                                         RelativeSizeAxes = Axes.Both,
                                         Masking = true,
@@ -270,36 +282,6 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
                                     new Container
                                     {
                                         RelativeSizeAxes = Axes.Both,
-                                        Padding = new MarginPadding
-                                        {
-                                            Horizontal = -WaveOverlayContainer.WIDTH_PADDING,
-                                        },
-                                        Children = new Drawable[]
-                                        {
-                                            new Box
-                                            {
-                                                RelativeSizeAxes = Axes.Both,
-                                                Colour = colourProvider.Background5,
-                                            },
-                                            footerButtons = new FillFlowContainer
-                                            {
-                                                RelativeSizeAxes = Axes.Both,
-                                                Direction = FillDirection.Horizontal,
-                                                Padding = new MarginPadding(5),
-                                                Spacing = new Vector2(10),
-                                                Children = new Drawable[]
-                                                {
-                                                    new PlaylistsReadyButton
-                                                    {
-                                                        Anchor = Anchor.Centre,
-                                                        Origin = Anchor.Centre,
-                                                        RelativeSizeAxes = Axes.Y,
-                                                        Size = new Vector2(250, 1),
-                                                        Action = startPlay
-                                                    }
-                                                }
-                                            },
-                                        }
                                     }
                                 ],
                             }
@@ -308,25 +290,15 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
                 }
             };
 
-            LoadComponent(userModsSelectOverlay = new RoomModSelectOverlay
+            AddInternal(userModsSelectOverlay.With(o =>
             {
-                Beatmap = { BindTarget = Beatmap },
-                SelectedMods = { BindTarget = userMods },
-                IsValidMod = _ => false
-            });
+                o.Beatmap.BindTo(Beatmap);
+                o.SelectedMods.BindTo(userMods);
+                o.IsValidMod = _ => false;
+            }));
 
             if (playlistItem.AllowedMods.Any())
             {
-                footerButtons.Insert(-1, new UserModSelectButton
-                {
-                    Text = "Free mods",
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    RelativeSizeAxes = Axes.Y,
-                    Size = new Vector2(250, 1),
-                    Action = () => userModsSelectOverlay.Show(),
-                });
-
                 var rulesetInstance = rulesets.GetRuleset(playlistItem.RulesetID)!.CreateInstance();
                 var allowedMods = playlistItem.AllowedMods.Select(m => m.ToMod(rulesetInstance));
                 userModsSelectOverlay.IsValidMod = m => allowedMods.Any(a => a.GetType() == m.GetType());
@@ -379,7 +351,6 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
             beatmapAvailabilityTracker.SelectedItem.Value = playlistItem;
             beatmapAvailabilityTracker.Availability.BindValueChanged(_ => trySetDailyChallengeBeatmap(), true);
 
-            userModsSelectOverlayRegistration = overlayManager?.RegisterBlockingOverlay(userModsSelectOverlay);
             userModsSelectOverlay.SelectedItem.Value = playlistItem;
             userMods.BindValueChanged(_ => Scheduler.AddOnce(updateMods), true);
 
@@ -518,8 +489,6 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
-
-            userModsSelectOverlayRegistration?.Dispose();
 
             if (metadataClient.IsNotNull())
                 metadataClient.MultiplayerRoomScoreSet -= onRoomScoreSet;

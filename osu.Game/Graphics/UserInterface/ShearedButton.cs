@@ -221,5 +221,44 @@ namespace osu.Game.Graphics.UserInterface
 
             ButtonContent.FadeColour(colourContent, 150, Easing.OutQuint);
         }
+
+        public void AppearFromLeft(double delay)
+        {
+            Content.FinishTransforms();
+            Content.MoveToX(-300f)
+                   .FadeOut()
+                   .Delay(delay)
+                   .MoveToX(0f, 240, Easing.OutCubic)
+                   .FadeIn(240, Easing.OutCubic);
+        }
+
+        public void AppearFromBottom()
+        {
+            Content.FinishTransforms();
+            Content.MoveToY(100f)
+                   .FadeOut()
+                   .MoveToY(0f, 240, Easing.OutCubic)
+                   .FadeIn(240, Easing.OutCubic);
+        }
+
+        public void DisappearToRight(bool expire)
+        {
+            Content.FinishTransforms();
+            Content.FadeOut(240, Easing.InOutCubic)
+                   .MoveToX(300f, 360, Easing.InOutCubic);
+
+            if (expire)
+                this.Delay(Content.LatestTransformEndTime - Time.Current).Expire();
+        }
+
+        public void DisappearToBottom(bool expire)
+        {
+            Content.FinishTransforms();
+            Content.FadeOut(240, Easing.InOutCubic)
+                   .MoveToY(100f, 240, Easing.InOutCubic);
+
+            if (expire)
+                this.Delay(Content.LatestTransformEndTime - Time.Current).Expire();
+        }
     }
 }

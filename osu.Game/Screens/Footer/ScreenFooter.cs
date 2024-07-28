@@ -13,6 +13,7 @@ using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Threading;
 using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Mods;
@@ -33,7 +34,9 @@ namespace osu.Game.Screens.Footer
 
         private Box background = null!;
         private FillFlowContainer<ScreenFooterButton> leftButtonsFlow = null!;
+        private Container<ShearedButton?> rightButtonContainer = null!;
         private Container<ScreenFooterButton> removedLeftButtonsContainer = null!;
+        private Container<ShearedButton?> removedRightButtonContainer = null!;
         private LogoTrackingContainer logoTrackingContainer = null!;
 
         // TODO: this should take the screen's colourProvider instead. hardcode plum for now as daily challenge is the only usage shown to users
@@ -82,6 +85,13 @@ namespace osu.Game.Screens.Footer
                     Spacing = new Vector2(7, 0),
                     AutoSizeAxes = Axes.Both
                 },
+                rightButtonContainer = new Container<ShearedButton?>
+                {
+                    Margin = new MarginPadding { Bottom = 15f, Right = 12f },
+                    Anchor = Anchor.BottomRight,
+                    Origin = Anchor.BottomRight,
+                    AutoSizeAxes = Axes.Both
+                },
                 BackButton = new ScreenBackButton
                 {
                     Margin = new MarginPadding { Bottom = 15f, Left = 12f },
@@ -96,6 +106,13 @@ namespace osu.Game.Screens.Footer
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.BottomLeft,
                     AutoSizeAxes = Axes.Both,
+                },
+                removedRightButtonContainer = new Container<ShearedButton?>
+                {
+                    Margin = new MarginPadding { Bottom = 15f, Right = 12f },
+                    Anchor = Anchor.BottomRight,
+                    Origin = Anchor.BottomRight,
+                    AutoSizeAxes = Axes.Both
                 },
                 (logoTrackingContainer = new LogoTrackingContainer
                 {
@@ -188,10 +205,51 @@ namespace osu.Game.Screens.Footer
             }
         }
 
+        public void SetRightButton(ShearedButton? button)
+        {
+            temporarilyHiddenRightButton = null;
+
+            clearActiveOverlayContainer();
+
+            ShearedButton? oldButton = null;
+
+            if (rightButtonContainer.Count == 1)
+                oldButton = rightButtonContainer.Child;
+
+            if (oldButton != null)
+            {
+                rightButtonContainer.Remove(oldButton, false);
+                removedRightButtonContainer.Add(oldButton);
+
+                if (button != null)
+                    makeRightButtonDisappearToRight(oldButton, true);
+                else
+                    makeRightButtonDisappearToBottom(oldButton, true);
+            }
+
+            if (button != null)
+            {
+                var newButton = button;
+
+                Debug.Assert(!newButton.IsLoaded);
+                rightButtonContainer.Add(newButton);
+
+                // ensure transforms are added after LoadComplete to not be aborted by the FinishTransforms call.
+                newButton.OnLoadComplete += _ =>
+                {
+                    if (oldButton != null)
+                        makeRightButtonAppearFromLeft(newButton, 240);
+                    else
+                        makeRightButtonAppearFromBottom(newButton);
+                };
+            }
+        }
+
         private ShearedOverlayContainer? activeOverlay;
         private Container? contentContainer;
 
         private readonly List<ScreenFooterButton> temporarilyHiddenLeftButtons = new List<ScreenFooterButton>();
+        private ShearedButton? temporarilyHiddenRightButton;
 
         public IDisposable RegisterActiveOverlayContainer(ShearedOverlayContainer overlay, out VisibilityContainer? footerContent)
         {
@@ -204,6 +262,7 @@ namespace osu.Game.Screens.Footer
             activeOverlay = overlay;
 
             Debug.Assert(temporarilyHiddenLeftButtons.Count == 0);
+            Debug.Assert(temporarilyHiddenRightButton == null);
 
             var targetButton = leftButtonsFlow.SingleOrDefault(b => b.Overlay == overlay);
 
@@ -211,8 +270,14 @@ namespace osu.Game.Screens.Footer
                 ? leftButtonsFlow.SkipWhile(b => b != targetButton).Skip(1)
                 : leftButtonsFlow);
 
+            if (rightButtonContainer.Count == 1)
+                temporarilyHiddenRightButton = rightButtonContainer.Child;
+
             for (int i = 0; i < temporarilyHiddenLeftButtons.Count; i++)
                 makeLeftButtonDisappearToBottom(temporarilyHiddenLeftButtons[i], 0, 0, false);
+
+            if (temporarilyHiddenRightButton != null)
+                makeRightButtonDisappearToBottom(temporarilyHiddenRightButton, false);
 
             var fallbackPosition = leftButtonsFlow.Any()
                 ? leftButtonsFlow.ToSpaceOfOtherDrawable(Vector2.Zero, this)
@@ -255,7 +320,12 @@ namespace osu.Game.Screens.Footer
             for (int i = 0; i < temporarilyHiddenLeftButtons.Count; i++)
                 makeLeftButtonAppearFromBottom(temporarilyHiddenLeftButtons[i], 0);
 
+            if (temporarilyHiddenRightButton != null)
+                makeRightButtonAppearFromBottom(temporarilyHiddenRightButton);
+
             temporarilyHiddenLeftButtons.Clear();
+
+            temporarilyHiddenRightButton = null;
 
             updateColourScheme(OverlayColourScheme.Plum.GetHue());
 
@@ -285,6 +355,18 @@ namespace osu.Game.Screens.Footer
 
         private void makeLeftButtonDisappearToBottom(ScreenFooterButton button, int index, int count, bool expire)
             => button.DisappearToBottom((count - index) * delay_per_button, expire);
+
+        private void makeRightButtonAppearFromLeft(ShearedButton button, float startDelay)
+            => button.AppearFromLeft(startDelay);
+
+        private void makeRightButtonAppearFromBottom(ShearedButton button)
+            => button.AppearFromBottom();
+
+        private void makeRightButtonDisappearToRight(ShearedButton button, bool expire)
+            => button.DisappearToRight(expire);
+
+        private void makeRightButtonDisappearToBottom(ShearedButton button, bool expire)
+            => button.DisappearToBottom(expire);
 
         private void showOverlay(OverlayContainer overlay)
         {

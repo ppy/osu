@@ -13,6 +13,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
@@ -306,6 +307,7 @@ namespace osu.Game.Screens
         protected virtual BackgroundScreen CreateBackground() => null;
 
         public virtual IReadOnlyList<ScreenFooterButton> CreateFooterButtons() => Array.Empty<ScreenFooterButton>();
+        public virtual ShearedButton CreateRightFooterButton() => null;
 
         public virtual bool OnBackButton() => false;
     }

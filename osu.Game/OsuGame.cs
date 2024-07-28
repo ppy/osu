@@ -1588,11 +1588,13 @@ namespace osu.Game
                 {
                     BackButton.Hide();
                     ScreenFooter.SetLeftButtons(newOsuScreen.CreateFooterButtons());
+                    ScreenFooter.SetRightButton(newOsuScreen.CreateRightFooterButton());
                     ScreenFooter.Show();
                 }
                 else
                 {
                     ScreenFooter.SetLeftButtons(Array.Empty<ScreenFooterButton>());
+                    ScreenFooter.SetRightButton(null);
                     ScreenFooter.Hide();
                 }
             }
