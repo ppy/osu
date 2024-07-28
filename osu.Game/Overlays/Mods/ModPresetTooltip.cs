@@ -23,8 +23,7 @@ namespace osu.Game.Overlays.Mods
 
         public ModPresetTooltip(OverlayColourProvider colourProvider)
         {
-            Width = 250;
-            AutoSizeAxes = Axes.Y;
+            AutoSizeAxes = Axes.Both;
 
             Masking = true;
             CornerRadius = 7;
@@ -38,18 +37,16 @@ namespace osu.Game.Overlays.Mods
                 },
                 Content = new FillFlowContainer
                 {
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
+                    AutoSizeAxes = Axes.Both,
+                    Direction = FillDirection.Vertical,
                     Padding = new MarginPadding { Left = 10, Right = 10, Top = 5, Bottom = 5 },
                     Spacing = new Vector2(7),
                     Children = new[]
                     {
-                        descriptionText = new TruncatingSpriteText
+                        descriptionText = new OsuSpriteText
                         {
-                            RelativeSizeAxes = Axes.X,
                             Font = OsuFont.GetFont(weight: FontWeight.Regular),
                             Colour = colourProvider.Content1,
-                            AllowMultiline = true,
                         },
                     }
                 }
@@ -68,7 +65,11 @@ namespace osu.Game.Overlays.Mods
             lastPreset = preset;
 
             Content.RemoveAll(d => d is ModPresetRow, true);
-            Content.AddRange(preset.Mods.AsOrdered().Select(mod => new ModPresetRow(mod)));
+            Content.AddRange(preset.Mods.AsOrdered().Select(mod => new ModPresetRow(mod)
+            {
+                RelativeSizeAxes = Axes.None,
+                AutoSizeAxes = Axes.Both,
+            }));
         }
 
         protected override void PopIn() => this.FadeIn(transition_duration, Easing.OutQuint);
