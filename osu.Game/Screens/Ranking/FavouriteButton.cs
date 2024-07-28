@@ -41,14 +41,19 @@ namespace osu.Game.Screens.Ranking
             current = new BindableWithCurrent<BeatmapSetFavouriteState>(new BeatmapSetFavouriteState(false, 0));
 
             Size = new Vector2(50, 30);
-
-            Action = toggleFavouriteStatus;
         }
 
         [BackgroundDependencyLoader]
         private void load()
         {
             Add(loading = new LoadingLayer(true, false));
+
+            Action = toggleFavouriteStatus;
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
 
             current.BindValueChanged(_ => updateState(), true);
 
