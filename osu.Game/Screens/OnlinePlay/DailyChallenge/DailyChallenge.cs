@@ -164,7 +164,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
                                 new Dimension(GridSizeMode.Absolute, 10),
                                 new Dimension(),
                                 new Dimension(GridSizeMode.Absolute, 30),
-                                new Dimension(GridSizeMode.Absolute, 50)
+                                new Dimension(GridSizeMode.Absolute, 60)
                             ],
                             Content = new[]
                             {
