@@ -21,7 +21,7 @@ namespace osu.Game.Tests.Visual.Metadata
         public override IBindableDictionary<int, UserPresence> UserStates => userStates;
         private readonly BindableDictionary<int, UserPresence> userStates = new BindableDictionary<int, UserPresence>();
 
-        public override IBindable<DailyChallengeInfo?> DailyChallengeInfo => dailyChallengeInfo;
+        public override Bindable<DailyChallengeInfo?> DailyChallengeInfo => dailyChallengeInfo;
         private readonly Bindable<DailyChallengeInfo?> dailyChallengeInfo = new Bindable<DailyChallengeInfo?>();
 
         [Resolved]
