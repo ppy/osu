@@ -154,8 +154,8 @@ namespace osu.Game.Tournament
                                 new Separator(),
                                 new ScreenButton(typeof(TeamWinScreen), Key.W) { Text = "Win", RequestSelection = SetScreen },
                                 new Separator(),
-                                new ScreenButton(typeof(DrawingsScreen), Key.F10) { Text = "Drawings", RequestSelection = SetScreen },
-                                new ScreenButton(typeof(ShowcaseScreen), Key.F12) { Text = "Showcase", RequestSelection = SetScreen },
+                                new ScreenButton(typeof(DrawingsScreen)) { Text = "Drawings", RequestSelection = SetScreen },
+                                new ScreenButton(typeof(ShowcaseScreen)) { Text = "Showcase", RequestSelection = SetScreen },
                             }
                         },
                     },
