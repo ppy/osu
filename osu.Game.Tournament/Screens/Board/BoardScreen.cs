@@ -76,30 +76,35 @@ namespace osu.Game.Tournament.Screens.Board
                         {
                             RelativeSizeAxes = Axes.X,
                             Text = "Red Ban",
+                            BackgroundColour = TournamentGame.COLOUR_RED,
                             Action = () => setMode(TeamColour.Red, ChoiceType.Ban)
                         },
                         buttonBlueBan = new TourneyButton
                         {
                             RelativeSizeAxes = Axes.X,
                             Text = "Blue Ban",
+                            BackgroundColour = TournamentGame.COLOUR_BLUE,
                             Action = () => setMode(TeamColour.Blue, ChoiceType.Ban)
                         },
                         buttonRedPick = new TourneyButton
                         {
                             RelativeSizeAxes = Axes.X,
                             Text = "Red Pick",
+                            BackgroundColour = TournamentGame.COLOUR_RED,
                             Action = () => setMode(TeamColour.Red, ChoiceType.Pick)
                         },
                         buttonBluePick = new TourneyButton
                         {
                             RelativeSizeAxes = Axes.X,
                             Text = "Blue Pick",
+                            BackgroundColour = TournamentGame.COLOUR_BLUE,
                             Action = () => setMode(TeamColour.Blue, ChoiceType.Pick)
                         },
                         buttonRedProtect = new TourneyButton
                         {
                             RelativeSizeAxes = Axes.X,
                             Text = "Red Protect",
+                            BackgroundColour = TournamentGame.COLOUR_RED,
                             Action = () => setMode(TeamColour.Red, ChoiceType.Protect)
 
                         },
@@ -107,6 +112,7 @@ namespace osu.Game.Tournament.Screens.Board
                         {
                             RelativeSizeAxes = Axes.X,
                             Text = "Blue Protect",
+                            BackgroundColour = TournamentGame.COLOUR_BLUE,
                             Action = () => setMode(TeamColour.Blue, ChoiceType.Protect)
 
                         },
@@ -114,21 +120,22 @@ namespace osu.Game.Tournament.Screens.Board
                         {
                             RelativeSizeAxes = Axes.X,
                             Text = "Red Win",
+                            BackgroundColour = TournamentGame.COLOUR_RED,
                             Action = () => setMode(TeamColour.Red, ChoiceType.Win)
-
                         },
                         buttonBlueWin = new TourneyButton
                         {
                             RelativeSizeAxes = Axes.X,
                             Text = "Blue Win",
+                            BackgroundColour = TournamentGame.COLOUR_BLUE,
                             Action = () => setMode(TeamColour.Blue, ChoiceType.Win)
-
                         },
                         new ControlPanel.Spacer(),
                         new TourneyButton
                         {
                             RelativeSizeAxes = Axes.X,
                             Text = "Reset",
+                            BackgroundColour = Color4.Orange,
                             Action = reset
                         },
                         new ControlPanel.Spacer(),
@@ -185,6 +192,7 @@ namespace osu.Game.Tournament.Screens.Board
 
 
             static Color4 setColour(bool active) => active ? Color4.White : Color4.Gray;
+            // Odd color?
             static Color4 setProtect(bool active) => active ? Color4.Aqua : Color4.Yellow;
             static Color4 setWin(bool active) => active ? Color4.White : Color4.Gray;
         }
