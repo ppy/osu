@@ -74,30 +74,34 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
         {
             int targetBin = (int)Math.Clamp(Math.Floor((float)newScoreEvent.TotalScore / 100000), 0, bin_count - 1);
             bins[targetBin] += 1;
-            updateCounts();
 
-            var text = new OsuSpriteText
-            {
-                Text = newScoreEvent.TotalScore.ToString(@"N0"),
-                Anchor = Anchor.TopCentre,
-                Origin = Anchor.BottomCentre,
-                Font = OsuFont.Default.With(size: 30),
-                RelativePositionAxes = Axes.X,
-                X = (targetBin + 0.5f) / bin_count - 0.5f,
-                Alpha = 0,
-            };
-            AddInternal(text);
+            Scheduler.AddOnce(updateCounts);
 
-            Scheduler.AddDelayed(() =>
+            if (Alpha > 0)
             {
-                float startY = ToLocalSpace(barsContainer[targetBin].CircularBar.ScreenSpaceDrawQuad.TopLeft).Y;
-                text.FadeInFromZero()
-                    .ScaleTo(new Vector2(0.8f), 500, Easing.OutElasticHalf)
-                    .MoveToY(startY)
-                    .MoveToOffset(new Vector2(0, -50), 2500, Easing.OutQuint)
-                    .FadeOut(2500, Easing.OutQuint)
-                    .Expire();
-            }, 150);
+                var text = new OsuSpriteText
+                {
+                    Text = newScoreEvent.TotalScore.ToString(@"N0"),
+                    Anchor = Anchor.TopCentre,
+                    Origin = Anchor.BottomCentre,
+                    Font = OsuFont.Default.With(size: 30),
+                    RelativePositionAxes = Axes.X,
+                    X = (targetBin + 0.5f) / bin_count - 0.5f,
+                    Alpha = 0,
+                };
+                AddInternal(text);
+
+                Scheduler.AddDelayed(() =>
+                {
+                    float startY = ToLocalSpace(barsContainer[targetBin].CircularBar.ScreenSpaceDrawQuad.TopLeft).Y;
+                    text.FadeInFromZero()
+                        .ScaleTo(new Vector2(0.8f), 500, Easing.OutElasticHalf)
+                        .MoveToY(startY)
+                        .MoveToOffset(new Vector2(0, -50), 2500, Easing.OutQuint)
+                        .FadeOut(2500, Easing.OutQuint)
+                        .Expire();
+                }, 150);
+            }
         }
 
         public void SetInitialCounts(long[] counts)
