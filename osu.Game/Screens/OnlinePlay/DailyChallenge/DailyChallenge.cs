@@ -454,6 +454,9 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
         {
             base.OnResuming(e);
             applyLoopingToTrack();
+            // re-apply mods as they may have been changed by a child screen
+            // (one known instance of this is showing a replay).
+            updateMods();
         }
 
         public override void OnSuspending(ScreenTransitionEvent e)
