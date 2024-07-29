@@ -28,18 +28,12 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
         private readonly Bindable<MultiplayerScore?> userBestScore = new Bindable<MultiplayerScore?>();
         public Bindable<IReadOnlyList<Mod>> SelectedMods = new Bindable<IReadOnlyList<Mod>>();
 
-        private Func<Mod, bool> isValidMod = _ => true;
-
         /// <summary>
         /// A function determining whether each mod in the score can be selected.
         /// A return value of <see langword="true"/> means that the mod can be selected in the current context.
         /// A return value of <see langword="false"/> means that the mod cannot be selected in the current context.
         /// </summary>
-        public Func<Mod, bool> IsValidMod
-        {
-            get => isValidMod;
-            set => isValidMod = value ?? throw new ArgumentNullException(nameof(value));
-        }
+        public Func<Mod, bool> IsValidMod { get; set; } = _ => true;
 
         public Action<long>? PresentScore { get; init; }
 
@@ -170,7 +164,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
                         IsPersonalBest = s.UserID == api.LocalUser.Value.Id,
                         Action = () => PresentScore?.Invoke(s.OnlineID),
                         SelectedMods = { BindTarget = SelectedMods },
-                        IsValidMod = isValidMod,
+                        IsValidMod = IsValidMod,
                     }), loaded =>
                     {
                         scoreFlow.Clear();
@@ -190,7 +184,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
                         IsPersonalBest = true,
                         Action = () => PresentScore?.Invoke(userBest.OnlineID),
                         SelectedMods = { BindTarget = SelectedMods },
-                        IsValidMod = isValidMod,
+                        IsValidMod = IsValidMod,
                     });
                 }
 
