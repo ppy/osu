@@ -50,6 +50,8 @@ namespace osu.Game.Tests.Visual.DailyChallenge
                     breakdown.Height = height;
             });
 
+            AddToggleStep("toggle visible", v => breakdown.Alpha = v ? 1 : 0);
+
             AddStep("set initial data", () => breakdown.SetInitialCounts([1, 4, 9, 16, 25, 36, 49, 36, 25, 16, 9, 4, 1]));
             AddStep("add new score", () =>
             {
