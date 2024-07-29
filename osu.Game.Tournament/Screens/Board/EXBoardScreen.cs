@@ -232,6 +232,7 @@ namespace osu.Game.Tournament.Screens.Board
 
                 foreach (var b in CurrentMatch.Value.Round.Value.Beatmaps)
                 {
+                    if (b.Mods != "EX") continue;
                     if (currentFlow == null)
                     {
                         mapFlows.Add(currentFlow = new FillFlowContainer<EXBoardBeatmapPanel>
