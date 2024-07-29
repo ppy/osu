@@ -599,6 +599,7 @@ namespace osu.Game.Online.API
             password = null;
             SecondFactorCode = null;
             authentication.Clear();
+            configStatus.Value = UserStatus.Online;
 
             // Scheduled prior to state change such that the state changed event is invoked with the correct user and their friends present
             Schedule(() =>
