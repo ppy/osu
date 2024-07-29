@@ -59,14 +59,26 @@ namespace osu.Game.Tournament.Screens.Board
                 {
                     ShowScores = true,
                 },
+                new TournamentMatchChatDisplay
+                {
+                    RelativeSizeAxes = Axes.None,
+                    Height = 600,
+                    Width = 600
+                },
                 mapFlows = new FillFlowContainer<FillFlowContainer<BoardBeatmapPanel>>
                 {
-                    Y = 160,
-                    Spacing = new Vector2(10, 10),
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    // RelativeSizeAxes = Axes.Both,
                     Direction = FillDirection.Vertical,
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
+                    X = 300,
+                    Y = -270,
+                    // Height = 0.5f,
+                    Width = 700,
+                    Padding = new MarginPadding{ Left = 50 },
+                    Spacing = new Vector2(10, 10),
                 },
+
                 new ControlPanel
                 {
                     Children = new Drawable[]
