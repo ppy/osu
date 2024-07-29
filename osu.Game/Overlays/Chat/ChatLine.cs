@@ -79,18 +79,7 @@ namespace osu.Game.Overlays.Chat
             set
             {
                 alteringBackground = value;
-
-                if (background == null)
-                {
-                    AddInternal(background = new Box
-                    {
-                        BypassAutoSizeAxes = Axes.Both,
-                        RelativeSizeAxes = Axes.Both,
-                        Colour = Color4.White,
-                    });
-                }
-
-                background.Alpha = value ? 0.04f : 0f;
+                updateBackground();
             }
         }
 
@@ -283,5 +272,20 @@ namespace osu.Game.Overlays.Chat
             Color4Extensions.FromHex("812a96"),
             Color4Extensions.FromHex("992861"),
         };
+
+        private void updateBackground()
+        {
+            if (background == null)
+            {
+                AddInternal(background = new Box
+                {
+                    BypassAutoSizeAxes = Axes.Both,
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = Color4.White,
+                });
+            }
+
+            background.Alpha = alteringBackground ? 0.04f : 0f;
+        }
     }
 }
