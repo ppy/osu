@@ -305,6 +305,7 @@ namespace osu.Game.Tournament.Screens.Board
             if (CurrentMatch.Value == null)
                 return;
 
+            // const int maxRows = 4;
             int totalRows = 0;
 
             if (CurrentMatch.Value.Round.Value != null)
@@ -337,7 +338,7 @@ namespace osu.Game.Tournament.Screens.Board
                         flowCount = 1;
                     }
 
-                    currentFlow.Add(new BoardBeatmapPanel(b.Beatmap, b.Mods)
+                    currentFlow.Add(new BoardBeatmapPanel(b.Beatmap, b.Mods, b.ModIndex)
                     {
                         Anchor = Anchor.TopCentre,
                         Origin = Anchor.TopCentre,

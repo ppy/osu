@@ -6,6 +6,7 @@ using System.Collections.Specialized;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -22,6 +23,8 @@ namespace osu.Game.Tournament.Components
     {
         public readonly IBeatmapInfo? Beatmap;
 
+        private readonly string index;
+
         private readonly string mod;
 
         public const float HEIGHT = 150;
@@ -30,9 +33,10 @@ namespace osu.Game.Tournament.Components
 
         private Box flash = null!;
 
-        public BoardBeatmapPanel(IBeatmapInfo? beatmap, string mod = "")
+        public BoardBeatmapPanel(IBeatmapInfo? beatmap, string mod = "", string index = "")
         {
             Beatmap = beatmap;
+            this.index = index;
             this.mod = mod;
 
             Width = HEIGHT;
@@ -67,6 +71,7 @@ namespace osu.Game.Tournament.Components
                     Origin = Anchor.CentreLeft,
                     Padding = new MarginPadding(15),
                     Direction = FillDirection.Vertical,
+                    // Width = HEIGHT * 4 + 10 * 3
                     /*Children = new Drawable[]
                     {
                         new TournamentSpriteText
@@ -119,7 +124,7 @@ namespace osu.Game.Tournament.Components
 
             if (!string.IsNullOrEmpty(mod))
             {
-                AddInternal(new TournamentModIcon(mod)
+                AddInternal(new TournamentModIcon(index.IsNull() ? mod : mod + index)
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
@@ -167,7 +172,7 @@ namespace osu.Game.Tournament.Components
 
                 switch (newChoice.Type)
                 {
-                    case ChoiceType.Pick:
+                    case ChoiceType.Pick or ChoiceType.Win:
                         Colour = Color4.White;
                         Alpha = 1;
                         break;
@@ -175,6 +180,11 @@ namespace osu.Game.Tournament.Components
                     case ChoiceType.Ban:
                         Colour = Color4.Gray;
                         Alpha = 0.5f;
+                        break;
+
+                    case ChoiceType.Protect:
+                        Colour = Color4.LightSeaGreen;
+                        Alpha = 0.9f;
                         break;
                 }
             }

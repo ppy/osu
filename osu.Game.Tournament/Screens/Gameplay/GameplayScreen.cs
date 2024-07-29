@@ -126,8 +126,6 @@ namespace osu.Game.Tournament.Screens.Gameplay
 
             LadderInfo.ChromaKeyWidth.BindValueChanged(width => chroma.Width = width.NewValue, true);
 
-            chatToggle.Current.BindValueChanged(_ => updateChat());
-
             warmup.BindValueChanged(w =>
             {
                 header.ShowScores = !w.NewValue;
@@ -153,6 +151,7 @@ namespace osu.Game.Tournament.Screens.Gameplay
             base.LoadComplete();
 
             warmupToggle.Current.BindValueChanged(_ => updateWarmup(), true);
+            chatToggle.Current.BindValueChanged(_ => updateChat());
 
             State.BindTo(ipc.State);
             State.BindValueChanged(_ => updateState(), true);

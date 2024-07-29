@@ -6,6 +6,7 @@ using System.Collections.Specialized;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -22,6 +23,8 @@ namespace osu.Game.Tournament.Components
     {
         public readonly IBeatmapInfo? Beatmap;
 
+        private readonly string modIndex;
+
         private readonly string mod;
 
         public const float HEIGHT = 50;
@@ -30,9 +33,10 @@ namespace osu.Game.Tournament.Components
 
         private Box flash = null!;
 
-        public TournamentBeatmapPanel(IBeatmapInfo? beatmap, string mod = "")
+        public TournamentBeatmapPanel(IBeatmapInfo? beatmap, string mod = "", string index = "")
         {
             Beatmap = beatmap;
+            this.modIndex = index;
             this.mod = mod;
 
             Width = 400;
@@ -118,7 +122,7 @@ namespace osu.Game.Tournament.Components
 
             if (!string.IsNullOrEmpty(mod))
             {
-                AddInternal(new TournamentModIcon(mod)
+                AddInternal(new TournamentModIcon(modIndex.IsNull() ? mod : mod + modIndex)
                 {
                     Anchor = Anchor.CentreRight,
                     Origin = Anchor.CentreRight,

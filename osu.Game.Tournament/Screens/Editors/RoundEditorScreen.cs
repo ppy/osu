@@ -4,6 +4,7 @@
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -161,6 +162,8 @@ namespace osu.Game.Tournament.Screens.Editors
 
                     private readonly Bindable<int?> beatmapId = new Bindable<int?>();
 
+                    private readonly Bindable<string> modIndex = new Bindable<string>(string.Empty);
+
                     private readonly Bindable<string> mods = new Bindable<string>(string.Empty);
 
                     private readonly Container drawableContainer;
@@ -204,8 +207,15 @@ namespace osu.Game.Tournament.Screens.Editors
                                     {
                                         LabelText = "Mods",
                                         RelativeSizeAxes = Axes.None,
-                                        Width = 200,
+                                        Width = 100,
                                         Current = mods,
+                                    },
+                                    new SettingsTextBox
+                                    {
+                                        LabelText = "Mod Index",
+                                        RelativeSizeAxes = Axes.None,
+                                        Width = 100,
+                                        Current = modIndex,
                                     },
                                     drawableContainer = new Container
                                     {
@@ -265,6 +275,8 @@ namespace osu.Game.Tournament.Screens.Editors
 
                         mods.Value = Model.Mods;
                         mods.BindValueChanged(modString => Model.Mods = modString.NewValue);
+                        modIndex.Value = Model.ModIndex;
+                        modIndex.BindValueChanged(newIndex => Model.ModIndex = newIndex.NewValue);
                     }
 
                     private void updatePanel() => Schedule(() =>
@@ -273,11 +285,11 @@ namespace osu.Game.Tournament.Screens.Editors
 
                         if (Model.Beatmap != null)
                         {
-                            drawableContainer.Child = new TournamentBeatmapPanel(Model.Beatmap, Model.Mods)
+                            drawableContainer.Child = new TournamentBeatmapPanel(Model.Beatmap, Model.Mods, Model.ModIndex)
                             {
                                 Anchor = Anchor.CentreLeft,
                                 Origin = Anchor.CentreLeft,
-                                Width = 300
+                                Width = 500
                             };
                         }
                     });
