@@ -31,7 +31,7 @@ namespace osu.Game.Tournament.Components
             Anchor = Anchor.BottomLeft;
             Origin = Anchor.BottomLeft;
 
-            Background.Alpha = 0;
+            Background.Alpha = 0.7f;
 
             CornerRadius = 0;
         }
