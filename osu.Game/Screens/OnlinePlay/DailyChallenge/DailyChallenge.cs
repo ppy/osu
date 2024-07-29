@@ -21,6 +21,7 @@ using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation;
 using osu.Game.Online.API;
@@ -169,7 +170,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
                                 },
                                 null,
                                 [
-                                    new Container
+                                    new OsuContextMenuContainer
                                     {
                                         RelativeSizeAxes = Axes.Both,
                                         Masking = true,
@@ -239,6 +240,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
                                                         {
                                                             RelativeSizeAxes = Axes.Both,
                                                             PresentScore = presentScore,
+                                                            SelectedMods = { BindTarget = userMods },
                                                         },
                                                         // Spacer
                                                         null,
@@ -330,7 +332,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
 
                 var rulesetInstance = rulesets.GetRuleset(playlistItem.RulesetID)!.CreateInstance();
                 var allowedMods = playlistItem.AllowedMods.Select(m => m.ToMod(rulesetInstance));
-                userModsSelectOverlay.IsValidMod = m => allowedMods.Any(a => a.GetType() == m.GetType());
+                userModsSelectOverlay.IsValidMod = leaderboard.IsValidMod = m => allowedMods.Any(a => a.GetType() == m.GetType());
             }
 
             metadataClient.MultiplayerRoomScoreSet += onRoomScoreSet;
