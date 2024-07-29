@@ -104,7 +104,7 @@ namespace osu.Game.Overlays.Chat
             highlightedMessage.Value = null;
         });
 
-        private void processMessageBackgroundAltering()
+        private void processChatlineBackgroundAltering()
         {
             for (int i = 0; i < ChatLineFlow.Count; i++)
             {
@@ -169,7 +169,7 @@ namespace osu.Game.Overlays.Chat
                 scroll.ScrollToEnd();
 
             processMessageHighlighting();
-            processMessageBackgroundAltering();
+            processChatlineBackgroundAltering();
         });
 
         private void pendingMessageResolved(Message existing, Message updated) => Schedule(() =>
