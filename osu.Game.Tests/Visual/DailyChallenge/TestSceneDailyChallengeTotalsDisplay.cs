@@ -49,6 +49,7 @@ namespace osu.Game.Tests.Visual.DailyChallenge
                 if (totals.IsNotNull())
                     totals.Height = height;
             });
+            AddToggleStep("toggle visible", v => totals.Alpha = v ? 1 : 0);
 
             AddStep("set counts", () => totals.SetInitialCounts(totalPassCount: 9650, cumulativeTotalScore: 10_000_000_000));
 

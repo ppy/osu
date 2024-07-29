@@ -50,7 +50,6 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
         {
             drawable.RelativeSizeAxes = Axes.Both;
             drawable.Size = Vector2.One;
-            drawable.AlwaysPresent = true;
             drawable.Alpha = 0;
 
             base.Add(drawable);
