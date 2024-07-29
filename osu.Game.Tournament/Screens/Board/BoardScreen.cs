@@ -62,8 +62,10 @@ namespace osu.Game.Tournament.Screens.Board
                 new TournamentMatchChatDisplay
                 {
                     RelativeSizeAxes = Axes.None,
-                    Height = 600,
-                    Width = 600
+                    Height = 400,
+                    Width = 600,
+                    Origin = Anchor.CentreLeft,
+                    Position = new Vector2(30, -350),
                 },
                 mapFlows = new FillFlowContainer<FillFlowContainer<BoardBeatmapPanel>>
                 {
@@ -73,8 +75,8 @@ namespace osu.Game.Tournament.Screens.Board
                     Direction = FillDirection.Vertical,
                     X = 300,
                     Y = -270,
-                    // Height = 0.5f,
-                    Width = 700,
+                    Height = 1f,
+                    Width = 900,
                     Padding = new MarginPadding{ Left = 50 },
                     Spacing = new Vector2(10, 10),
                 },
