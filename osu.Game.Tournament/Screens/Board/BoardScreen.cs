@@ -207,6 +207,7 @@ namespace osu.Game.Tournament.Screens.Board
             static Color4 setWin(bool active) => active ? Color4.White : Color4.Gray;
         }
 
+        /*
         private void setNextMode()
         {
             if (CurrentMatch.Value?.Round.Value == null)
@@ -238,25 +239,37 @@ namespace osu.Game.Tournament.Screens.Board
             setMode(nextColour, hasAllBans ? ChoiceType.Pick : ChoiceType.Ban);
 
             TeamColour getOppositeTeamColour(TeamColour colour) => colour == TeamColour.Red ? TeamColour.Blue : TeamColour.Red;
-        }
+        } 
+        */
 
         protected override bool OnMouseDown(MouseDownEvent e)
         {
             var maps = mapFlows.Select(f => f.FirstOrDefault(m => m.ReceivePositionalInputAt(e.ScreenSpaceMousePosition)));
             var map = maps.FirstOrDefault(m => m != null);
-
             if (map != null)
             {
                 if (e.Button == MouseButton.Left && map.Beatmap?.OnlineID > 0)
-                    addForBeatmap(map.Beatmap.OnlineID);
-                else
+                {
+                    // Handle updating status to Red/Blue Win
+                    if (pickType == ChoiceType.RedWin || pickType == ChoiceType.BlueWin)
+                    {
+                        var existing = CurrentMatch.Value?.PicksBans.FirstOrDefault(p => p.BeatmapID == map.Beatmap?.OnlineID);
+                        CurrentMatch.Value?.PicksBans.Remove(existing);
+                        updateWinStatusForBeatmap(map.Beatmap.OnlineID);
+                    }
+                    else
+                    {
+                        addForBeatmap(map.Beatmap.OnlineID);
+                    }
+                }
+                else if (e.Button == MouseButton.Right)
                 {
                     var existing = CurrentMatch.Value?.PicksBans.FirstOrDefault(p => p.BeatmapID == map.Beatmap?.OnlineID);
 
                     if (existing != null)
                     {
                         CurrentMatch.Value?.PicksBans.Remove(existing);
-                        setNextMode();
+                        // setNextMode();
                     }
                 }
 
@@ -266,10 +279,30 @@ namespace osu.Game.Tournament.Screens.Board
             return base.OnMouseDown(e);
         }
 
+        private void updateWinStatusForBeatmap(int beatmapId)
+        {
+            var existing = CurrentMatch.Value?.PicksBans.FirstOrDefault(p => p.BeatmapID == beatmapId);
+            if (existing != null)
+            {
+                existing.Type = pickType;
+                // Ensure the pickColour is set correctly for the win types.
+                existing.Team = pickType == ChoiceType.RedWin ? TeamColour.Red : TeamColour.Blue;
+            }
+            else
+            {
+                CurrentMatch.Value?.PicksBans.Add(new BeatmapChoice
+                {
+                    Team = pickType == ChoiceType.RedWin ? TeamColour.Red : TeamColour.Blue,
+                    Type = pickType,
+                    BeatmapID = beatmapId
+                });
+            }
+            // setNextMode(); // Uncomment if you still want to automatically set the next mode
+        }
         private void reset()
         {
             CurrentMatch.Value?.PicksBans.Clear();
-            setNextMode();
+            //setNextMode();
         }
 
         private void addForBeatmap(int beatmapId)
@@ -281,8 +314,8 @@ namespace osu.Game.Tournament.Screens.Board
                 // don't attempt to add if the beatmap isn't in our pool
                 return;
 
-            if (CurrentMatch.Value.PicksBans.Any(p => p.BeatmapID == beatmapId))
-                // don't attempt to add if already exists.
+            if (CurrentMatch.Value.PicksBans.Any(p => p.BeatmapID == beatmapId && (p.Type != ChoiceType.RedWin && p.Type != ChoiceType.BlueWin)))
+                // don't attempt to add if already exists and it's not a win type.
                 return;
 
             CurrentMatch.Value.PicksBans.Add(new BeatmapChoice
@@ -292,7 +325,7 @@ namespace osu.Game.Tournament.Screens.Board
                 BeatmapID = beatmapId
             });
 
-            setNextMode();
+            // setNextMode(); // Uncomment if you still want to automatically set the next mode
 
             if (LadderInfo.AutoProgressScreens.Value)
             {
@@ -303,7 +336,6 @@ namespace osu.Game.Tournament.Screens.Board
                 }
             }
         }
-
         public override void Hide()
         {
             scheduledScreenChange?.Cancel();
