@@ -57,6 +57,7 @@ namespace osu.Game.Tournament.Components
                 {
                     RelativeSizeAxes = Axes.Both,
                     Colour = Color4.Black,
+                    Alpha = 0.5f
                 },
                 new NoUnloadBeatmapSetCover
                 {
@@ -71,47 +72,6 @@ namespace osu.Game.Tournament.Components
                     Origin = Anchor.CentreLeft,
                     Padding = new MarginPadding(15),
                     Direction = FillDirection.Vertical,
-                    // Width = HEIGHT * 4 + 10 * 3
-                    /*Children = new Drawable[]
-                    {
-                        new TournamentSpriteText
-                        {
-                            Text = Beatmap?.GetDisplayTitleRomanisable(false, false) ?? (LocalisableString)@"unknown",
-                            Font = OsuFont.Torus.With(weight: FontWeight.Bold),
-                        },
-                        new FillFlowContainer
-                        {
-                            AutoSizeAxes = Axes.Both,
-                            Direction = FillDirection.Horizontal,
-                            Children = new Drawable[]
-                            {
-                                new TournamentSpriteText
-                                {
-                                    Text = "mapper",
-                                    Padding = new MarginPadding { Right = 5 },
-                                    Font = OsuFont.Torus.With(weight: FontWeight.Regular, size: 14)
-                                },
-                                new TournamentSpriteText
-                                {
-                                    Text = Beatmap?.Metadata.Author.Username ?? "unknown",
-                                    Padding = new MarginPadding { Right = 20 },
-                                    Font = OsuFont.Torus.With(weight: FontWeight.Bold, size: 14)
-                                },
-                                new TournamentSpriteText
-                                {
-                                    Text = "difficulty",
-                                    Padding = new MarginPadding { Right = 5 },
-                                    Font = OsuFont.Torus.With(weight: FontWeight.Regular, size: 14)
-                                },
-                                new TournamentSpriteText
-                                {
-                                    Text = Beatmap?.DifficultyName ?? "unknown",
-                                    Font = OsuFont.Torus.With(weight: FontWeight.Bold, size: 14)
-                                },
-                            }
-                        }
-                    },
-                    */
                 },
                 flash = new Box
                 {
@@ -172,7 +132,7 @@ namespace osu.Game.Tournament.Components
 
                 switch (newChoice.Type)
                 {
-                    case ChoiceType.Pick or ChoiceType.Win:
+                    case ChoiceType.Pick:
                         Colour = Color4.White;
                         Alpha = 1;
                         break;
@@ -183,8 +143,23 @@ namespace osu.Game.Tournament.Components
                         break;
 
                     case ChoiceType.Protect:
-                        Colour = Color4.LightSeaGreen;
+                        Colour = new OsuColour().Cyan;
                         Alpha = 0.9f;
+                        break;
+
+                    case ChoiceType.RedWin:
+                        Colour = new OsuColour().Pink;
+                        Alpha = 1;
+                        break;
+
+                    case ChoiceType.BlueWin:
+                        Colour = new OsuColour().Blue;
+                        Alpha = 1;
+                        break;
+
+                    case ChoiceType.Trap:
+                        Colour = new OsuColour().PurpleLight;
+                        Alpha = 1;
                         break;
                 }
             }

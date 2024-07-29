@@ -179,6 +179,26 @@ namespace osu.Game.Tournament.Components
                         Colour = Color4.Gray;
                         Alpha = 0.5f;
                         break;
+
+                    case ChoiceType.Protect:
+                        Colour = new OsuColour().Cyan;
+                        Alpha = 0.9f;
+                        break;
+
+                    case ChoiceType.RedWin:
+                        Colour = new OsuColour().Pink;
+                        Alpha = 1;
+                        break;
+
+                    case ChoiceType.BlueWin:
+                        Colour = new OsuColour().Blue;
+                        Alpha = 1;
+                        break;
+
+                    case ChoiceType.Trap:
+                        Colour = new OsuColour().PurpleLight;
+                        Alpha = 1;
+                        break;
                 }
             }
             else

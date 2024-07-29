@@ -26,7 +26,8 @@ namespace osu.Game.Tournament.Models
     public enum TeamColour
     {
         Red,
-        Blue
+        Blue,
+        Neutral
     }
 
     [JsonConverter(typeof(StringEnumConverter))]
@@ -35,6 +36,9 @@ namespace osu.Game.Tournament.Models
         Pick,
         Ban,
         Protect,
-        Win,
+        RedWin,
+        BlueWin,
+        Trap,
+        Draw
     }
 }
