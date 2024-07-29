@@ -1,4 +1,4 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Linq;
@@ -20,9 +20,9 @@ using osuTK.Input;
 
 namespace osu.Game.Tournament.Screens.Board
 {
-    public partial class BoardScreen : TournamentMatchScreen
+    public partial class EXBoardScreen : TournamentMatchScreen
     {
-        private FillFlowContainer<FillFlowContainer<BoardBeatmapPanel>> mapFlows = null!;
+        private FillFlowContainer<FillFlowContainer<EXBoardBeatmapPanel>> mapFlows = null!;
 
         [Resolved]
         private TournamentSceneManager? sceneManager { get; set; }
@@ -30,17 +30,9 @@ namespace osu.Game.Tournament.Screens.Board
         private TeamColour pickColour;
         private ChoiceType pickType;
 
-        private OsuButton buttonRedBan = null!;
-        private OsuButton buttonBlueBan = null!;
-        private OsuButton buttonRedPick = null!;
-        private OsuButton buttonBluePick = null!;
-
-        private OsuButton buttonRedProtect = null!;
-        private OsuButton buttonBlueProtect = null!;
+        private OsuButton buttonPick = null!;
         private OsuButton buttonRedWin = null!;
         private OsuButton buttonBlueWin = null!;
-        private OsuButton buttonRedTrap = null!;
-        private OsuButton buttonBlueTrap = null!;
         private OsuButton buttonDraw = null!;
 
         private ScheduledDelegate? scheduledScreenChange;
@@ -59,7 +51,8 @@ namespace osu.Game.Tournament.Screens.Board
                 {
                     ShowScores = true,
                 },
-                mapFlows = new FillFlowContainer<FillFlowContainer<BoardBeatmapPanel>>
+
+                mapFlows = new FillFlowContainer<FillFlowContainer<EXBoardBeatmapPanel>>
                 {
                     Y = 160,
                     Spacing = new Vector2(10, 10),
@@ -75,49 +68,12 @@ namespace osu.Game.Tournament.Screens.Board
                         {
                             Text = "Current Mode"
                         },
-                        buttonRedBan = new TourneyButton
+                        buttonPick = new TourneyButton
                         {
                             RelativeSizeAxes = Axes.X,
-                            Text = "Red Ban",
-                            BackgroundColour = TournamentGame.COLOUR_RED,
-                            Action = () => setMode(TeamColour.Red, ChoiceType.Ban)
-                        },
-                        buttonBlueBan = new TourneyButton
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            Text = "Blue Ban",
-                            BackgroundColour = TournamentGame.COLOUR_BLUE,
-                            Action = () => setMode(TeamColour.Blue, ChoiceType.Ban)
-                        },
-                        buttonRedPick = new TourneyButton
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            Text = "Red Pick",
-                            BackgroundColour = TournamentGame.COLOUR_RED,
-                            Action = () => setMode(TeamColour.Red, ChoiceType.Pick)
-                        },
-                        buttonBluePick = new TourneyButton
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            Text = "Blue Pick",
-                            BackgroundColour = TournamentGame.COLOUR_BLUE,
-                            Action = () => setMode(TeamColour.Blue, ChoiceType.Pick)
-                        },
-                        buttonRedProtect = new TourneyButton
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            Text = "Red Protect",
-                            BackgroundColour = TournamentGame.COLOUR_RED,
-                            Action = () => setMode(TeamColour.Red, ChoiceType.Protect)
-
-                        },
-                        buttonBlueProtect = new TourneyButton
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            Text = "Blue Protect",
-                            BackgroundColour = TournamentGame.COLOUR_BLUE,
-                            Action = () => setMode(TeamColour.Blue, ChoiceType.Protect)
-
+                            Text = "Pick",
+                            BackgroundColour = Color4.Indigo,
+                            Action = () => setMode(TeamColour.Neutral, ChoiceType.Pick)
                         },
                         buttonRedWin = new TourneyButton
                         {
@@ -132,20 +88,6 @@ namespace osu.Game.Tournament.Screens.Board
                             Text = "Blue Win",
                             BackgroundColour = TournamentGame.COLOUR_BLUE,
                             Action = () => setMode(TeamColour.Blue, ChoiceType.BlueWin)
-                        },
-                        buttonRedTrap = new TourneyButton
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            Text = "Red Trap",
-                            BackgroundColour = TournamentGame.COLOUR_RED,
-                            Action = () => setMode(TeamColour.Red, ChoiceType.Trap)
-                        },
-                        buttonBlueTrap = new TourneyButton
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            Text = "Blue Trap",
-                            BackgroundColour = TournamentGame.COLOUR_BLUE,
-                            Action = () => setMode(TeamColour.Blue, ChoiceType.Trap)
                         },
                         buttonDraw = new TourneyButton
                         {
@@ -169,6 +111,7 @@ namespace osu.Game.Tournament.Screens.Board
             ipc.Beatmap.BindValueChanged(beatmapChanged);
         }
 
+
         private void beatmapChanged(ValueChangedEvent<TournamentBeatmap?> beatmap)
         {
             if (CurrentMatch.Value?.Round.Value == null)
@@ -189,55 +132,15 @@ namespace osu.Game.Tournament.Screens.Board
             pickColour = colour;
             pickType = choiceType;
 
-            buttonRedBan.Colour = setColour(pickColour == TeamColour.Red && pickType == ChoiceType.Ban);
-            buttonBlueBan.Colour = setColour(pickColour == TeamColour.Blue && pickType == ChoiceType.Ban);
-            buttonRedPick.Colour = setColour(pickColour == TeamColour.Red && pickType == ChoiceType.Pick);
-            buttonBluePick.Colour = setColour(pickColour == TeamColour.Blue && pickType == ChoiceType.Pick);
-            buttonRedProtect.Colour = setProtect(pickColour == TeamColour.Red && pickType == ChoiceType.Protect);
-            buttonBlueProtect.Colour = setProtect(pickColour == TeamColour.Blue && pickType == ChoiceType.Protect);
+            buttonPick.Colour = setColour(pickColour == TeamColour.Neutral && pickType == ChoiceType.Pick);
             buttonRedWin.Colour = setWin(pickColour == TeamColour.Red && pickType == ChoiceType.RedWin);
             buttonBlueWin.Colour = setWin(pickColour == TeamColour.Blue && pickType == ChoiceType.BlueWin);
-            buttonRedTrap.Colour = setColour(pickColour == TeamColour.Red && pickType == ChoiceType.Trap);
-            buttonBlueTrap.Colour = setColour(pickColour == TeamColour.Blue && pickType == ChoiceType.Trap);
             buttonDraw.Colour = setColour(pickColour == TeamColour.Neutral && pickType == ChoiceType.Draw);
 
             static Color4 setColour(bool active) => active ? Color4.White : Color4.Gray;
             // Odd color?
             static Color4 setProtect(bool active) => active ? Color4.Aqua : Color4.Yellow;
             static Color4 setWin(bool active) => active ? Color4.White : Color4.Gray;
-        }
-
-        private void setNextMode()
-        {
-            if (CurrentMatch.Value?.Round.Value == null)
-                return;
-
-            int totalBansRequired = CurrentMatch.Value.Round.Value.BanCount.Value * 2;
-
-            TeamColour lastPickColour = CurrentMatch.Value.PicksBans.LastOrDefault()?.Team ?? TeamColour.Red;
-
-            TeamColour nextColour;
-
-            bool hasAllBans = CurrentMatch.Value.PicksBans.Count(p => p.Type == ChoiceType.Ban) >= totalBansRequired;
-
-            if (!hasAllBans)
-            {
-                // Ban phase: switch teams every second ban.
-                nextColour = CurrentMatch.Value.PicksBans.Count % 2 == 1
-                    ? getOppositeTeamColour(lastPickColour)
-                    : lastPickColour;
-            }
-            else
-            {
-                // Pick phase : switch teams every pick, except for the first pick which generally goes to the team that placed the last ban.
-                nextColour = pickType == ChoiceType.Pick
-                    ? getOppositeTeamColour(lastPickColour)
-                    : lastPickColour;
-            }
-
-            setMode(nextColour, hasAllBans ? ChoiceType.Pick : ChoiceType.Ban);
-
-            TeamColour getOppositeTeamColour(TeamColour colour) => colour == TeamColour.Red ? TeamColour.Blue : TeamColour.Red;
         }
 
         protected override bool OnMouseDown(MouseDownEvent e)
@@ -256,7 +159,6 @@ namespace osu.Game.Tournament.Screens.Board
                     if (existing != null)
                     {
                         CurrentMatch.Value?.PicksBans.Remove(existing);
-                        setNextMode();
                     }
                 }
 
@@ -269,7 +171,6 @@ namespace osu.Game.Tournament.Screens.Board
         private void reset()
         {
             CurrentMatch.Value?.PicksBans.Clear();
-            setNextMode();
         }
 
         private void addForBeatmap(int beatmapId)
@@ -291,8 +192,6 @@ namespace osu.Game.Tournament.Screens.Board
                 Type = pickType,
                 BeatmapID = beatmapId
             });
-
-            setNextMode();
 
             if (LadderInfo.AutoProgressScreens.Value)
             {
@@ -323,12 +222,11 @@ namespace osu.Game.Tournament.Screens.Board
             if (CurrentMatch.Value == null)
                 return;
 
-            // const int maxRows = 4;
             int totalRows = 0;
 
             if (CurrentMatch.Value.Round.Value != null)
             {
-                FillFlowContainer<BoardBeatmapPanel>? currentFlow = null;
+                FillFlowContainer<EXBoardBeatmapPanel>? currentFlow = null;
                 string? currentMods;
                 int flowCount = 0;
 
@@ -336,7 +234,7 @@ namespace osu.Game.Tournament.Screens.Board
                 {
                     if (currentFlow == null)
                     {
-                        mapFlows.Add(currentFlow = new FillFlowContainer<BoardBeatmapPanel>
+                        mapFlows.Add(currentFlow = new FillFlowContainer<EXBoardBeatmapPanel>
                         {
                             Spacing = new Vector2(10, 10),
                             Direction = FillDirection.Full,
@@ -356,7 +254,7 @@ namespace osu.Game.Tournament.Screens.Board
                         flowCount = 1;
                     }
 
-                    currentFlow.Add(new BoardBeatmapPanel(b.Beatmap, b.Mods, b.ModIndex)
+                    currentFlow.Add(new EXBoardBeatmapPanel(b.Beatmap, b.Mods, b.ModIndex)
                     {
                         Anchor = Anchor.TopCentre,
                         Origin = Anchor.TopCentre,

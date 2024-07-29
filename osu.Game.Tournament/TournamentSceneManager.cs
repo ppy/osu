@@ -104,7 +104,8 @@ namespace osu.Game.Tournament
                                 new DrawingsScreen(),
                                 new GameplayScreen(),
                                 new TeamWinScreen(),
-                                new BoardScreen()
+                                new BoardScreen(),
+                                new EXBoardScreen()
                             }
                         },
                         chatContainer = new Container
@@ -147,6 +148,7 @@ namespace osu.Game.Tournament
                                 new Separator(),
                                 /* Append new screen "board" for board display */
                                 new ScreenButton(typeof(BoardScreen), Key.C) { Text = "Board", RequestSelection = SetScreen },
+                                new ScreenButton(typeof(EXBoardScreen), Key.E) { Text = "EX Stage", RequestSelection = SetScreen },
                                 new ScreenButton(typeof(MapPoolScreen), Key.M) { Text = "Map Pool", RequestSelection = SetScreen },
                                 new ScreenButton(typeof(GameplayScreen), Key.G) { Text = "Gameplay", RequestSelection = SetScreen },
                                 new Separator(),
