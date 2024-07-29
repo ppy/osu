@@ -48,6 +48,10 @@ namespace osu.Game.Overlays.Mods
                             f.Font = OsuFont.GetFont(weight: FontWeight.Regular);
                             f.Colour = colourProvider.Content1;
                         })
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
+                        }
                     }
                 }
             };
