@@ -30,6 +30,7 @@ using osu.Game.Online.Metadata;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
+using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.OnlinePlay.Components;
@@ -54,6 +55,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
         private readonly Bindable<IReadOnlyList<Mod>> userMods = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
 
         private readonly IBindable<APIState> apiState = new Bindable<APIState>();
+        private readonly IBindable<DailyChallengeInfo?> dailyChallengeInfo = new Bindable<DailyChallengeInfo?>();
 
         private OnlinePlayScreenWaveContainer waves = null!;
         private DailyChallengeLeaderboard leaderboard = null!;
@@ -64,6 +66,8 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
         private DailyChallengeScoreBreakdown breakdown = null!;
         private DailyChallengeTotalsDisplay totals = null!;
         private DailyChallengeEventFeed feed = null!;
+
+        private SimpleNotification? waitForNextChallengeNotification;
 
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Plum);
@@ -97,6 +101,9 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
 
         [Resolved]
         private PreviewTrackManager previewTrackManager { get; set; } = null!;
+
+        [Resolved]
+        private INotificationOverlay? notificationOverlay { get; set; }
 
         public override bool DisallowExternalBeatmapRulesetChanges => true;
 
@@ -336,6 +343,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
             }
 
             metadataClient.MultiplayerRoomScoreSet += onRoomScoreSet;
+            dailyChallengeInfo.BindTo(metadataClient.DailyChallengeInfo);
 
             ((IBindable<MultiplayerScore?>)breakdown.UserBestScore).BindTo(leaderboard.UserBestScore);
         }
@@ -388,6 +396,8 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
 
             apiState.BindTo(API.State);
             apiState.BindValueChanged(onlineStateChanged, true);
+
+            dailyChallengeInfo.BindValueChanged(dailyChallengeChanged);
         }
 
         private void trySetDailyChallengeBeatmap()
@@ -404,6 +414,29 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
             if (state.NewValue != APIState.Online)
                 Schedule(forcefullyExit);
         });
+
+        private void dailyChallengeChanged(ValueChangedEvent<DailyChallengeInfo?> change)
+        {
+            if (change.OldValue?.RoomID == room.RoomID.Value && change.NewValue == null)
+            {
+                notificationOverlay?.Post(waitForNextChallengeNotification = new SimpleNotification
+                {
+                    Text = "Today's daily challenge has concluded. Thanks for playing! The next one should appear in a few minutes."
+                });
+            }
+
+            if (change.NewValue != null && change.NewValue.Value.RoomID != room.RoomID.Value)
+            {
+                var roomRequest = new GetRoomRequest(change.NewValue.Value.RoomID);
+
+                roomRequest.Success += room =>
+                {
+                    waitForNextChallengeNotification?.Close(false);
+                    notificationOverlay?.Post(new NewDailyChallengeNotification(room));
+                };
+                API.Queue(roomRequest);
+            }
+        }
 
         private void forcefullyExit()
         {
