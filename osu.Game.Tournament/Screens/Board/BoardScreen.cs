@@ -223,6 +223,7 @@ namespace osu.Game.Tournament.Screens.Board
             static Color4 setWin(bool active) => active ? Color4.White : Color4.Gray;
         }
 
+        /*
         private void setNextMode()
         {
             if (CurrentMatch.Value?.Round.Value == null)
@@ -254,7 +255,8 @@ namespace osu.Game.Tournament.Screens.Board
             setMode(nextColour, hasAllBans ? ChoiceType.Pick : ChoiceType.Ban);
 
             TeamColour getOppositeTeamColour(TeamColour colour) => colour == TeamColour.Red ? TeamColour.Blue : TeamColour.Red;
-        }
+        } 
+        */
 
         protected override bool OnMouseDown(MouseDownEvent e)
         {
@@ -272,7 +274,7 @@ namespace osu.Game.Tournament.Screens.Board
                     if (existing != null)
                     {
                         CurrentMatch.Value?.PicksBans.Remove(existing);
-                        setNextMode();
+                        //setNextMode();
                     }
                 }
 
@@ -285,7 +287,7 @@ namespace osu.Game.Tournament.Screens.Board
         private void reset()
         {
             CurrentMatch.Value?.PicksBans.Clear();
-            setNextMode();
+            //setNextMode();
         }
 
         private void addForBeatmap(int beatmapId)
@@ -308,7 +310,7 @@ namespace osu.Game.Tournament.Screens.Board
                 BeatmapID = beatmapId
             });
 
-            setNextMode();
+            //setNextMode();
 
             if (LadderInfo.AutoProgressScreens.Value)
             {
