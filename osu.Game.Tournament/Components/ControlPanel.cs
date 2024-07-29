@@ -38,8 +38,9 @@ namespace osu.Game.Tournament.Components
                 {
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
+                    Padding = new MarginPadding{ Top = 10 },
                     Text = "Control Panel",
-                    Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 22)
+                    Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 24)
                 },
                 buttons = new FillFlowContainer
                 {
