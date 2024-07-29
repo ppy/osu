@@ -76,8 +76,12 @@ namespace osu.Game.Tests.Visual.DailyChallenge
             AddStep("set daily challenge info", () => metadataClient.DailyChallengeInfo.Value = new DailyChallengeInfo { RoomID = 1234 });
             AddStep("push screen", () => LoadScreen(new Screens.OnlinePlay.DailyChallenge.DailyChallenge(room)));
             AddStep("daily challenge ended", () => metadataClient.DailyChallengeInfo.Value = null);
+
+            Func<APIRequest, bool>? previousHandler = null;
+
             AddStep("install custom handler", () =>
             {
+                previousHandler = ((DummyAPIAccess)API).HandleRequest;
                 ((DummyAPIAccess)API).HandleRequest = req =>
                 {
                     switch (req)
@@ -108,6 +112,8 @@ namespace osu.Game.Tests.Visual.DailyChallenge
                 };
             });
             AddStep("next daily challenge started", () => metadataClient.DailyChallengeInfo.Value = new DailyChallengeInfo { RoomID = 1235 });
+
+            AddStep("restore previous handler", () => ((DummyAPIAccess)API).HandleRequest = previousHandler);
         }
     }
 }
