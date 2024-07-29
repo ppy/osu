@@ -29,6 +29,8 @@ namespace osu.Game.Tournament.Components
 
         public const float HEIGHT = 150;
 
+        private const float CONTAINER_HEIGHT = 50;
+
         private readonly Bindable<TournamentMatch?> currentMatch = new Bindable<TournamentMatch?>();
 
         private Box flash = null!;
@@ -72,6 +74,65 @@ namespace osu.Game.Tournament.Components
                     Origin = Anchor.CentreLeft,
                     Padding = new MarginPadding(15),
                     Direction = FillDirection.Vertical,
+                
+                    /* This section of code adds Beatmap Information to the Board grid. */
+                    Children = new Drawable[]
+                    {
+                        new Container
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            Height = CONTAINER_HEIGHT, // Set a fixed height for consistency
+                            Width = 0.5f, // Ensure the container takes up the full width
+                            Children = new Drawable[]
+                            {
+                                new TextFlowContainer
+                                {
+                                    AutoSizeAxes = Axes.Y,
+                                    RelativeSizeAxes = Axes.X,
+                                    TextAnchor = Anchor.TopLeft,
+                                    Width = 1f, // Ensure the container takes up the full width
+                                    Margin = new MarginPadding { Top = -45, Left = -8 }, // Adjust padding as needed
+                                }.With(t => t.AddParagraph(Beatmap?.GetDisplayTitleRomanisable(false, false) ?? (LocalisableString)@"unknown", s =>
+                                {
+                                    s.Font = OsuFont.Torus.With(weight: FontWeight.Bold);
+                                }))
+                            }
+                        },
+                        new FillFlowContainer
+                        {
+                            AutoSizeAxes = Axes.Both,
+                            Direction = FillDirection.Horizontal,
+                            Margin = new MarginPadding { Top = -50 }, // Adjust this value to change the distance
+                            Children = new Drawable[]
+                            {
+                                new TournamentSpriteText
+                                {
+                                    Text = "mapper",
+                                    Padding = new MarginPadding { Right = 5 },
+                                    Font = OsuFont.Torus.With(weight: FontWeight.Regular, size: 14),
+                                    Margin = new MarginPadding { Right = 10 }, // Adjusts the space to the right of the mapper label
+                                },
+                                new TournamentSpriteText
+                                {
+                                    Text = Beatmap?.Metadata.Author.Username ?? "unknown",
+                                    Font = OsuFont.Torus.With(weight: FontWeight.Bold, size: 14),
+                                    Margin = new MarginPadding { Right = 20 }, // Adjusts the space to the right of the mapper name
+                                },
+                                new TournamentSpriteText
+                                {
+                                    Text = "difficulty",
+                                    Padding = new MarginPadding { Right = 5 },
+                                    Font = OsuFont.Torus.With(weight: FontWeight.Regular, size: 14),
+                                    Margin = new MarginPadding { Right = 10 }, // Adjusts the space to the right of the difficulty label
+                                },
+                                new TournamentSpriteText
+                                {
+                                    Text = Beatmap?.DifficultyName ?? "unknown",
+                                    Font = OsuFont.Torus.With(weight: FontWeight.Bold, size: 14),
+                                },
+                            }
+                        }
+                    },
                 },
                 flash = new Box
                 {
@@ -91,7 +152,7 @@ namespace osu.Game.Tournament.Components
                     Margin = new MarginPadding(10),
                     Width = 60,
                     RelativeSizeAxes = Axes.Y,
-                    Position = new osuTK.Vector2(40, -17) // Adjust these values to position the icon precisely
+                    Position = new osuTK.Vector2(40, -17) // (x, y). Increment of x = Move right; Increment of y = Move upwards. 
                 });
             }
         }
