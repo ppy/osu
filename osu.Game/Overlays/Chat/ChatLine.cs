@@ -21,7 +21,6 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Chat;
 using osuTK.Graphics;
-using Message = osu.Game.Online.Chat.Message;
 
 namespace osu.Game.Overlays.Chat
 {
@@ -118,6 +117,11 @@ namespace osu.Game.Overlays.Chat
 
             InternalChild = new GridContainer
             {
+                Margin = new MarginPadding
+                {
+                    Horizontal = 10,
+                    Vertical = 1,
+                },
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
                 RowDimensions = new[] { new Dimension(GridSizeMode.AutoSize) },
@@ -275,17 +279,23 @@ namespace osu.Game.Overlays.Chat
 
         private void updateBackground()
         {
-            if (background == null)
+            if (alteringBackground)
             {
-                AddInternal(background = new Box
+                if (background?.IsAlive != true)
                 {
-                    BypassAutoSizeAxes = Axes.Both,
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = Color4.White,
-                });
-            }
+                    AddInternal(background = new Circle
+                    {
+                        MaskingSmoothness = 2.5f,
+                        Depth = float.MaxValue,
+                        RelativeSizeAxes = Axes.Both,
+                        Colour = Color4.White,
+                    });
+                }
 
-            background.Alpha = alteringBackground ? 0.04f : 0f;
+                background.Alpha = 0.04f;
+            }
+            else
+                background?.Expire();
         }
     }
 }
