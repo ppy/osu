@@ -77,6 +77,9 @@ namespace osu.Game.Overlays.Chat
             get => alternatingBackground;
             set
             {
+                if (alternatingBackground == value)
+                    return;
+
                 alternatingBackground = value;
                 updateBackground();
             }
@@ -122,6 +125,7 @@ namespace osu.Game.Overlays.Chat
                     Masking = true,
                     Blending = BlendingParameters.Additive,
                     CornerRadius = 4,
+                    Alpha = 0,
                     RelativeSizeAxes = Axes.Both,
                     Child = new Box
                     {

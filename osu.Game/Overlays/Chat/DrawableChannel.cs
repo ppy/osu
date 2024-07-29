@@ -84,6 +84,17 @@ namespace osu.Game.Overlays.Chat
             highlightedMessage.BindValueChanged(_ => processMessageHighlighting(), true);
         }
 
+        protected override void Update()
+        {
+            base.Update();
+
+            for (int i = 0; i < ChatLineFlow.Count; i++)
+            {
+                if (ChatLineFlow[i] is ChatLine chatline)
+                    chatline.AlternatingBackground = i % 2 == 0;
+            }
+        }
+
         /// <summary>
         /// Processes any pending message in <see cref="highlightedMessage"/>.
         /// </summary>
@@ -103,17 +114,6 @@ namespace osu.Game.Overlays.Chat
 
             highlightedMessage.Value = null;
         });
-
-        private void updateBackgroundAlternating()
-        {
-            for (int i = 0; i < ChatLineFlow.Count; i++)
-            {
-                if (ChatLineFlow[i] is ChatLine chatline)
-                {
-                    chatline.AlternatingBackground = i % 2 == 0;
-                }
-            }
-        }
 
         protected override void Dispose(bool isDisposing)
         {
@@ -169,7 +169,6 @@ namespace osu.Game.Overlays.Chat
                 scroll.ScrollToEnd();
 
             processMessageHighlighting();
-            updateBackgroundAlternating();
         });
 
         private void pendingMessageResolved(Message existing, Message updated) => Schedule(() =>
