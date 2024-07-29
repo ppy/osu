@@ -86,11 +86,12 @@ namespace osu.Game.Tournament.Components
             {
                 AddInternal(new TournamentModIcon(index.IsNull() ? mod : mod + index)
                 {
-                    Anchor = Anchor.Centre,
+                    Anchor = Anchor.BottomCentre,
                     Origin = Anchor.Centre,
                     Margin = new MarginPadding(10),
                     Width = 60,
                     RelativeSizeAxes = Axes.Y,
+                    Position = new osuTK.Vector2(40, -17) // Adjust these values to position the icon precisely
                 });
             }
         }
