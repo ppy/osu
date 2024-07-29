@@ -86,7 +86,7 @@ namespace osu.Game.Tests.Visual.Online
         }
 
         [Test]
-        public void TestBackgroundAltering()
+        public void TestBackgroundAlternating()
         {
             var localUser = new APIUser
             {
