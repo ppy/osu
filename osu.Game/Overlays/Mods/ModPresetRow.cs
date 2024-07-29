@@ -24,7 +24,8 @@ namespace osu.Game.Overlays.Mods
             {
                 new FillFlowContainer
                 {
-                    AutoSizeAxes = Axes.Both,
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
                     Direction = FillDirection.Horizontal,
                     Spacing = new Vector2(7),
                     Children = new Drawable[]
