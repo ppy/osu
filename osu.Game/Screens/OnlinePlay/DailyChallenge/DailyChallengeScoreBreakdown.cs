@@ -27,6 +27,9 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
 
         private FillFlowContainer<Bar> barsContainer = null!;
 
+        // we're always present so that we can update while hidden, but we don't want tooltips to be displayed, therefore directly use alpha comparison here.
+        public override bool PropagatePositionalInputSubTree => base.PropagatePositionalInputSubTree && Alpha > 0;
+
         private const int bin_count = MultiplayerPlaylistItemStats.TOTAL_SCORE_DISTRIBUTION_BINS;
         private long[] bins = new long[bin_count];
 
