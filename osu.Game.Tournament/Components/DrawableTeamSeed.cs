@@ -4,6 +4,7 @@
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Game.Tournament.Models;
+using osuTK.Graphics;
 
 namespace osu.Game.Tournament.Components
 {
@@ -26,6 +27,8 @@ namespace osu.Game.Tournament.Components
         private void load()
         {
             Text.Font = Text.Font.With(size: 36);
+            Text.Colour = Color4.White;
+            Background.Alpha = 0;
         }
 
         protected override void LoadComplete()

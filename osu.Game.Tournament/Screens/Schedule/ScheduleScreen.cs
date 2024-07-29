@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -193,12 +194,28 @@ namespace osu.Game.Tournament.Screens.Schedule
                             Origin = Anchor.CentreLeft,
                             Scale = new Vector2(0.5f)
                         },
+                        new TournamentSpriteTextWithBackground(text: currentMatch.Value.Team1.Value?.FullName.Value ?? string.Empty,
+                            backgroundColor: TournamentGame.COLOUR_RED, textColor: Color4.White,
+                            fontSize: 30, textWeight: FontWeight.SemiBold
+                        )
+                        {
+                            Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.CentreLeft
+                        },
                         new TournamentSpriteText
                         {
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
-                            Text = currentMatch.Value.Team1.Value?.FullName + " vs " + currentMatch.Value.Team2.Value?.FullName,
+                            Text = "vs",
                             Font = OsuFont.Torus.With(size: 24, weight: FontWeight.SemiBold)
+                        },
+                        new TournamentSpriteTextWithBackground(text: currentMatch.Value.Team2.Value?.FullName.Value ?? string.Empty,
+                            backgroundColor: TournamentGame.COLOUR_BLUE, textColor: Color4.White,
+                            fontSize: 30, textWeight: FontWeight.SemiBold
+                        )
+                        {
+                            Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.CentreLeft,
                         },
                         new FillFlowContainer
                         {
@@ -286,7 +303,9 @@ namespace osu.Game.Tournament.Screens.Schedule
                         Direction = FillDirection.Vertical,
                         Children = new Drawable[]
                         {
-                            new TournamentSpriteTextWithBackground(title.ToUpperInvariant())
+                            new TournamentSpriteTextWithBackground(text: title.ToUpperInvariant(),
+                                backgroundColor: Color4Extensions.Opacity(Color4.White, 0), textColor: Color4.White
+                            )
                             {
                                 Scale = new Vector2(0.5f)
                             },

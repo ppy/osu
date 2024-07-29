@@ -4,12 +4,14 @@
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Game.Online.API;
 using osu.Game.Online.Chat;
 using osu.Game.Overlays.Chat;
 using osu.Game.Tournament.IPC;
 using osu.Game.Tournament.Models;
+using osuTK.Graphics;
 
 namespace osu.Game.Tournament.Components
 {
@@ -28,6 +30,8 @@ namespace osu.Game.Tournament.Components
             Height = 144;
             Anchor = Anchor.BottomLeft;
             Origin = Anchor.BottomLeft;
+
+            Background.Alpha = 0;
 
             CornerRadius = 0;
         }
