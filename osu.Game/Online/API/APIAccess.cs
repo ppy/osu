@@ -118,12 +118,11 @@ namespace osu.Game.Online.API
                 u.OldValue?.Activity.UnbindFrom(activity);
                 u.NewValue.Activity.BindTo(activity);
 
-                if (u.OldValue != null)
-                    localUserStatus.UnbindFrom(u.OldValue.Status);
-                localUserStatus.BindTo(u.NewValue.Status);
+                u.OldValue?.Status.UnbindFrom(localUserStatus);
+                u.NewValue.Status.BindTo(localUserStatus);
             }, true);
 
-            localUserStatus.BindValueChanged(val => configStatus.Value = val.NewValue);
+            localUserStatus.BindTo(configStatus);
 
             var thread = new Thread(run)
             {
