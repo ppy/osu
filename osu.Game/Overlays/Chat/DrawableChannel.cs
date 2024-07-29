@@ -104,13 +104,13 @@ namespace osu.Game.Overlays.Chat
             highlightedMessage.Value = null;
         });
 
-        private void processChatlineBackgroundAltering()
+        private void updateBackgroundAlternating()
         {
             for (int i = 0; i < ChatLineFlow.Count; i++)
             {
                 if (ChatLineFlow[i] is ChatLine chatline)
                 {
-                    chatline.AlteringBackground = i % 2 == 0;
+                    chatline.AlternatingBackground = i % 2 == 0;
                 }
             }
         }
@@ -169,7 +169,7 @@ namespace osu.Game.Overlays.Chat
                 scroll.ScrollToEnd();
 
             processMessageHighlighting();
-            processChatlineBackgroundAltering();
+            updateBackgroundAlternating();
         });
 
         private void pendingMessageResolved(Message existing, Message updated) => Schedule(() =>

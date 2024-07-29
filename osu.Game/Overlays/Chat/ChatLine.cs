@@ -70,14 +70,14 @@ namespace osu.Game.Overlays.Chat
 
         private Drawable? background;
 
-        private bool alteringBackground;
+        private bool alternatingBackground;
 
-        public bool AlteringBackground
+        public bool AlternatingBackground
         {
-            get => alteringBackground;
+            get => alternatingBackground;
             set
             {
-                alteringBackground = value;
+                alternatingBackground = value;
                 updateBackground();
             }
         }
@@ -115,53 +115,70 @@ namespace osu.Game.Overlays.Chat
             configManager.BindWith(OsuSetting.Prefer24HourTime, prefer24HourTime);
             prefer24HourTime.BindValueChanged(_ => updateTimestamp());
 
-            InternalChild = new GridContainer
+            InternalChildren = new[]
             {
-                Margin = new MarginPadding
+                background = new Container
                 {
-                    Horizontal = 10,
-                    Vertical = 1,
-                },
-                RelativeSizeAxes = Axes.X,
-                AutoSizeAxes = Axes.Y,
-                RowDimensions = new[] { new Dimension(GridSizeMode.AutoSize) },
-                ColumnDimensions = new[]
-                {
-                    new Dimension(GridSizeMode.AutoSize),
-                    new Dimension(GridSizeMode.Absolute, Spacing + UsernameWidth + Spacing),
-                    new Dimension(),
-                },
-                Content = new[]
-                {
-                    new Drawable[]
+                    Masking = true,
+                    Blending = BlendingParameters.Additive,
+                    CornerRadius = 4,
+                    RelativeSizeAxes = Axes.Both,
+                    Child = new Box
                     {
-                        drawableTimestamp = new OsuSpriteText
-                        {
-                            Shadow = false,
-                            Anchor = Anchor.CentreLeft,
-                            Origin = Anchor.CentreLeft,
-                            Font = OsuFont.GetFont(size: FontSize * 0.75f, weight: FontWeight.SemiBold, fixedWidth: true),
-                            AlwaysPresent = true,
-                        },
-                        drawableUsername = new DrawableChatUsername(message.Sender)
-                        {
-                            Width = UsernameWidth,
-                            FontSize = FontSize,
-                            AutoSizeAxes = Axes.Y,
-                            Origin = Anchor.TopRight,
-                            Anchor = Anchor.TopRight,
-                            Margin = new MarginPadding { Horizontal = Spacing },
-                            AccentColour = UsernameColour,
-                            Inverted = !string.IsNullOrEmpty(message.Sender.Colour),
-                        },
-                        drawableContentFlow = new LinkFlowContainer(styleMessageContent)
-                        {
-                            AutoSizeAxes = Axes.Y,
-                            RelativeSizeAxes = Axes.X,
-                        }
+                        Colour = Color4.White,
+                        RelativeSizeAxes = Axes.Both,
                     },
+                },
+                new GridContainer
+                {
+                    Margin = new MarginPadding
+                    {
+                        Horizontal = 10,
+                        Vertical = 1,
+                    },
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    RowDimensions = new[] { new Dimension(GridSizeMode.AutoSize) },
+                    ColumnDimensions = new[]
+                    {
+                        new Dimension(GridSizeMode.AutoSize),
+                        new Dimension(GridSizeMode.Absolute, Spacing + UsernameWidth + Spacing),
+                        new Dimension(),
+                    },
+                    Content = new[]
+                    {
+                        new Drawable[]
+                        {
+                            drawableTimestamp = new OsuSpriteText
+                            {
+                                Shadow = false,
+                                Anchor = Anchor.CentreLeft,
+                                Origin = Anchor.CentreLeft,
+                                Font = OsuFont.GetFont(size: FontSize * 0.75f, weight: FontWeight.SemiBold, fixedWidth: true),
+                                AlwaysPresent = true,
+                            },
+                            drawableUsername = new DrawableChatUsername(message.Sender)
+                            {
+                                Width = UsernameWidth,
+                                FontSize = FontSize,
+                                AutoSizeAxes = Axes.Y,
+                                Origin = Anchor.TopRight,
+                                Anchor = Anchor.TopRight,
+                                Margin = new MarginPadding { Horizontal = Spacing },
+                                AccentColour = UsernameColour,
+                                Inverted = !string.IsNullOrEmpty(message.Sender.Colour),
+                            },
+                            drawableContentFlow = new LinkFlowContainer(styleMessageContent)
+                            {
+                                AutoSizeAxes = Axes.Y,
+                                RelativeSizeAxes = Axes.X,
+                            }
+                        },
+                    }
                 }
             };
+
+            updateBackground();
         }
 
         protected override void LoadComplete()
@@ -279,23 +296,8 @@ namespace osu.Game.Overlays.Chat
 
         private void updateBackground()
         {
-            if (alteringBackground)
-            {
-                if (background?.IsAlive != true)
-                {
-                    AddInternal(background = new Circle
-                    {
-                        MaskingSmoothness = 2.5f,
-                        Depth = float.MaxValue,
-                        RelativeSizeAxes = Axes.Both,
-                        Colour = Color4.White,
-                    });
-                }
-
-                background.Alpha = 0.04f;
-            }
-            else
-                background?.Expire();
+            if (background != null)
+                background.Alpha = alternatingBackground ? 0.03f : 0;
         }
     }
 }

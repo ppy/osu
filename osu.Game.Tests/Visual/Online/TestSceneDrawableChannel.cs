@@ -115,7 +115,7 @@ namespace osu.Game.Tests.Visual.Online
             AddRepeatStep("check background", () =>
             {
                 // +1 because the day separator take one index
-                Assert.AreEqual((checkCount + 1) % 2 == 0, drawableChannel.ChildrenOfType<ChatLine>().ToList()[checkCount].AlteringBackground);
+                Assert.AreEqual((checkCount + 1) % 2 == 0, drawableChannel.ChildrenOfType<ChatLine>().ToList()[checkCount].AlternatingBackground);
                 checkCount++;
             }, 10);
         }
