@@ -18,6 +18,7 @@ using osu.Game.Tournament.Components;
 using osu.Game.Tournament.Models;
 using osu.Game.Tournament.Screens.Editors.Components;
 using osuTK;
+using Realms;
 
 namespace osu.Game.Tournament.Screens.Editors
 {
@@ -160,6 +161,9 @@ namespace osu.Game.Tournament.Screens.Editors
                     [Resolved]
                     protected IAPIProvider API { get; private set; } = null!;
 
+                    [Resolved]
+                    private IDialogOverlay? dialogOverlay { get; set; }
+
                     private readonly Bindable<int?> beatmapId = new Bindable<int?>();
 
                     private readonly Bindable<string> modIndex = new Bindable<string>(string.Empty);
@@ -230,11 +234,11 @@ namespace osu.Game.Tournament.Screens.Editors
                                 RelativeSizeAxes = Axes.None,
                                 Width = 150,
                                 Text = "Delete Beatmap",
-                                Action = () =>
+                                Action = () => dialogOverlay?.Push(new DeleteBeatmapDialog(Model, () =>
                                 {
                                     Expire();
                                     team.Beatmaps.Remove(beatmap);
-                                },
+                                })),
                             }
                         };
                     }

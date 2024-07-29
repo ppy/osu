@@ -27,14 +27,21 @@ namespace osu.Game.Tournament.Screens.Editors
     {
         protected override BindableList<TournamentTeam> Storage => LadderInfo.Teams;
 
+        [Resolved]
+        private IDialogOverlay? dialogOverlay { get; set; }
+
         [BackgroundDependencyLoader]
         private void load()
         {
-            ControlPanel.Add(new TourneyButton
+            ControlPanel.Add(new DangerousSettingsButton
             {
                 RelativeSizeAxes = Axes.X,
                 Text = "Add all countries",
-                Action = addAllCountries
+                Action = () => dialogOverlay?.Push(new AddAllDialog(() =>
+                {
+                    Expire();
+                    addAllCountries();
+                }))
             });
         }
 
@@ -219,6 +226,9 @@ namespace osu.Game.Tournament.Screens.Editors
                     [Resolved]
                     private TournamentGameBase game { get; set; } = null!;
 
+                    [Resolved]
+                    private IDialogOverlay? dialogOverlay { get; set; }
+
                     private readonly Bindable<int?> playerId = new Bindable<int?>();
 
                     private readonly Container userPanelContainer;
@@ -271,11 +281,11 @@ namespace osu.Game.Tournament.Screens.Editors
                                 RelativeSizeAxes = Axes.None,
                                 Width = 150,
                                 Text = "Delete Player",
-                                Action = () =>
+                                Action = () => dialogOverlay?.Push(new DeletePlayerDialog(user, () =>
                                 {
                                     Expire();
                                     team.Players.Remove(user);
-                                },
+                                }))
                             }
                         };
                     }
