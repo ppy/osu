@@ -21,7 +21,6 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Chat;
 using osuTK.Graphics;
-using Message = osu.Game.Online.Chat.Message;
 
 namespace osu.Game.Overlays.Chat
 {
@@ -69,6 +68,23 @@ namespace osu.Game.Overlays.Chat
 
         private Container? highlight;
 
+        private Drawable? background;
+
+        private bool alternatingBackground;
+
+        public bool AlternatingBackground
+        {
+            get => alternatingBackground;
+            set
+            {
+                if (alternatingBackground == value)
+                    return;
+
+                alternatingBackground = value;
+                updateBackground();
+            }
+        }
+
         /// <summary>
         /// The colour used to paint the author's username.
         /// </summary>
@@ -102,48 +118,73 @@ namespace osu.Game.Overlays.Chat
             configManager.BindWith(OsuSetting.Prefer24HourTime, prefer24HourTime);
             prefer24HourTime.BindValueChanged(_ => updateTimestamp());
 
-            InternalChild = new GridContainer
+            Padding = new MarginPadding { Right = 5 };
+
+            InternalChildren = new[]
             {
-                RelativeSizeAxes = Axes.X,
-                AutoSizeAxes = Axes.Y,
-                RowDimensions = new[] { new Dimension(GridSizeMode.AutoSize) },
-                ColumnDimensions = new[]
+                background = new Container
                 {
-                    new Dimension(GridSizeMode.AutoSize),
-                    new Dimension(GridSizeMode.Absolute, Spacing + UsernameWidth + Spacing),
-                    new Dimension(),
-                },
-                Content = new[]
-                {
-                    new Drawable[]
+                    Masking = true,
+                    CornerRadius = 4,
+                    Alpha = 0,
+                    RelativeSizeAxes = Axes.Both,
+                    Blending = BlendingParameters.Additive,
+                    Child = new Box
                     {
-                        drawableTimestamp = new OsuSpriteText
-                        {
-                            Shadow = false,
-                            Anchor = Anchor.CentreLeft,
-                            Origin = Anchor.CentreLeft,
-                            Font = OsuFont.GetFont(size: FontSize * 0.75f, weight: FontWeight.SemiBold, fixedWidth: true),
-                            AlwaysPresent = true,
-                        },
-                        drawableUsername = new DrawableChatUsername(message.Sender)
-                        {
-                            Width = UsernameWidth,
-                            FontSize = FontSize,
-                            AutoSizeAxes = Axes.Y,
-                            Origin = Anchor.TopRight,
-                            Anchor = Anchor.TopRight,
-                            Margin = new MarginPadding { Horizontal = Spacing },
-                            AccentColour = UsernameColour,
-                            Inverted = !string.IsNullOrEmpty(message.Sender.Colour),
-                        },
-                        drawableContentFlow = new LinkFlowContainer(styleMessageContent)
-                        {
-                            AutoSizeAxes = Axes.Y,
-                            RelativeSizeAxes = Axes.X,
-                        }
+                        Colour = Colour4.FromHex("#3b3234"),
+                        RelativeSizeAxes = Axes.Both,
                     },
+                },
+                new GridContainer
+                {
+                    Padding = new MarginPadding
+                    {
+                        Horizontal = 2,
+                        Vertical = 2,
+                    },
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    RowDimensions = new[] { new Dimension(GridSizeMode.AutoSize) },
+                    ColumnDimensions = new[]
+                    {
+                        new Dimension(GridSizeMode.AutoSize),
+                        new Dimension(GridSizeMode.Absolute, Spacing + UsernameWidth + Spacing),
+                        new Dimension(),
+                    },
+                    Content = new[]
+                    {
+                        new Drawable[]
+                        {
+                            drawableTimestamp = new OsuSpriteText
+                            {
+                                Shadow = false,
+                                Anchor = Anchor.CentreLeft,
+                                Origin = Anchor.CentreLeft,
+                                Font = OsuFont.GetFont(size: FontSize * 0.75f, weight: FontWeight.SemiBold, fixedWidth: true),
+                                AlwaysPresent = true,
+                            },
+                            drawableUsername = new DrawableChatUsername(message.Sender)
+                            {
+                                Width = UsernameWidth,
+                                FontSize = FontSize,
+                                AutoSizeAxes = Axes.Y,
+                                Origin = Anchor.TopRight,
+                                Anchor = Anchor.TopRight,
+                                Margin = new MarginPadding { Horizontal = Spacing },
+                                AccentColour = UsernameColour,
+                                Inverted = !string.IsNullOrEmpty(message.Sender.Colour),
+                            },
+                            drawableContentFlow = new LinkFlowContainer(styleMessageContent)
+                            {
+                                AutoSizeAxes = Axes.Y,
+                                RelativeSizeAxes = Axes.X,
+                            }
+                        },
+                    }
                 }
             };
+
+            updateBackground();
         }
 
         protected override void LoadComplete()
@@ -258,5 +299,11 @@ namespace osu.Game.Overlays.Chat
             Color4Extensions.FromHex("812a96"),
             Color4Extensions.FromHex("992861"),
         };
+
+        private void updateBackground()
+        {
+            if (background != null)
+                background.Alpha = alternatingBackground ? 0.2f : 0;
+        }
     }
 }
