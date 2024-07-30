@@ -61,7 +61,7 @@ namespace osu.Game.Overlays.Chat
                     Padding = new MarginPadding { Bottom = 5 },
                     Child = ChatLineFlow = new FillFlowContainer
                     {
-                        Padding = new MarginPadding { Horizontal = 10 },
+                        Padding = new MarginPadding { Left = 3, Right = 10 },
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
                         Direction = FillDirection.Vertical,
@@ -88,10 +88,18 @@ namespace osu.Game.Overlays.Chat
         {
             base.Update();
 
+            long? lastMinutes = null;
+
             for (int i = 0; i < ChatLineFlow.Count; i++)
             {
                 if (ChatLineFlow[i] is ChatLine chatline)
+                {
+                    long minutes = chatline.Message.Timestamp.ToUnixTimeSeconds() / 60;
+
                     chatline.AlternatingBackground = i % 2 == 0;
+                    chatline.RequiresTimestamp = minutes != lastMinutes;
+                    lastMinutes = minutes;
+                }
             }
         }
 
