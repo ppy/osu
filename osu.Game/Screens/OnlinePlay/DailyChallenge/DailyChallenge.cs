@@ -419,7 +419,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
             {
                 notificationOverlay?.Post(new SimpleNotification
                 {
-                    Text = "Today's daily challenge has concluded. Thanks for playing! The next one should appear in a few minutes."
+                    Text = "Today's daily challenge has concluded – thanks for playing!\n\nTomorrow's challenge is now being prepared and will appear soon."
                 });
             }
         }
