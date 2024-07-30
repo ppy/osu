@@ -82,7 +82,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         private Container mainContent;
 
         private Bindable<float> waveformOpacity;
-        private Bindable<bool> controlPointsVisible;
+        private Bindable<bool> alwaysShowControlPoints;
+        private readonly Bindable<bool> controlPointsVisible = new Bindable<bool>();
         private Bindable<bool> ticksVisible;
 
         private double trackLengthForZoom;
@@ -90,7 +91,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         private readonly IBindable<Track> track = new Bindable<Track>();
 
         [BackgroundDependencyLoader]
-        private void load(IBindable<WorkingBeatmap> beatmap, OsuColour colours, OsuConfigManager config)
+        private void load(IBindable<WorkingBeatmap> beatmap, OsuColour colours, OsuConfigManager config, Editor editor)
         {
             CentreMarker centreMarker;
 
@@ -141,8 +142,12 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             });
 
             waveformOpacity = config.GetBindable<float>(OsuSetting.EditorWaveformOpacity);
-            controlPointsVisible = config.GetBindable<bool>(OsuSetting.EditorTimelineShowTimingChanges);
             ticksVisible = config.GetBindable<bool>(OsuSetting.EditorTimelineShowTicks);
+
+            alwaysShowControlPoints = config.GetBindable<bool>(OsuSetting.EditorTimelineShowTimingChanges);
+            alwaysShowControlPoints.BindValueChanged(_ => updateControlPointsVisible(editor));
+            editor.Mode.BindValueChanged(_ => updateControlPointsVisible(editor));
+            updateControlPointsVisible(editor);
 
             track.BindTo(editorClock.Track);
             track.BindValueChanged(_ =>
@@ -152,6 +157,11 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             }, true);
 
             Zoom = (float)(defaultTimelineZoom * editorBeatmap.BeatmapInfo.TimelineZoom);
+        }
+
+        private void updateControlPointsVisible(Editor editor)
+        {
+            controlPointsVisible.Value = alwaysShowControlPoints.Value || editor.Mode.Value == EditorScreenMode.Timing;
         }
 
         private void applyVisualOffset(IBindable<WorkingBeatmap> beatmap)
@@ -176,24 +186,26 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
             ticksVisible.BindValueChanged(visible => ticks.FadeTo(visible.NewValue ? 1 : 0, 200, Easing.OutQuint), true);
 
-            controlPointsVisible.BindValueChanged(visible =>
+            alwaysShowControlPoints.BindValueChanged(visible =>
             {
                 if (visible.NewValue)
                 {
                     this.ResizeHeightTo(timeline_expanded_height, 200, Easing.OutQuint);
                     mainContent.MoveToY(15, 200, Easing.OutQuint);
-
-                    // delay the fade in else masking looks weird.
-                    controlPoints.Delay(180).FadeIn(400, Easing.OutQuint);
                 }
                 else
                 {
-                    controlPoints.FadeOut(200, Easing.OutQuint);
-
-                    // likewise, delay the resize until the fade is complete.
-                    this.Delay(180).ResizeHeightTo(timeline_height, 200, Easing.OutQuint);
-                    mainContent.Delay(180).MoveToY(0, 200, Easing.OutQuint);
+                    this.ResizeHeightTo(timeline_height, 200, Easing.OutQuint);
+                    mainContent.MoveToY(0, 200, Easing.OutQuint);
                 }
+            }, true);
+
+            controlPointsVisible.BindValueChanged(visible =>
+            {
+                if (visible.NewValue)
+                    controlPoints.FadeIn(400, Easing.OutQuint);
+                else
+                    controlPoints.FadeOut(200, Easing.OutQuint);
             }, true);
         }
 
