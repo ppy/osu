@@ -102,7 +102,6 @@ namespace osu.Game.Overlays.Profile.Header.Components
             var statistics = User.Value.User.DailyChallengeStatistics;
             // dailyStreak.Text = UsersStrings.ShowDailyChallengeUnitDay(statistics.DailyStreakCurrent);
             dailyStreak.Text = $"{statistics.DailyStreakCurrent}d";
-            dailyStreak.Colour = colours.ForRankingTier(DailyChallengeStreakTooltip.TierForDaily(statistics.DailyStreakCurrent));
             TooltipContent = new DailyChallengeStreakTooltipData(colourProvider, statistics);
         }
 
