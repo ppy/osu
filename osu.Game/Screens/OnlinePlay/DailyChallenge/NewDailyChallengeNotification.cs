@@ -26,7 +26,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
         [BackgroundDependencyLoader]
         private void load(OsuGame? game)
         {
-            Text = "Today's daily challenge is here! Click here to play.";
+            Text = "Today's daily challenge is now live! Click here to play.";
             Content.Add(card = new BeatmapCardNano((APIBeatmapSet)room.Playlist.Single().Beatmap.BeatmapSet!));
             Activated = () =>
             {
