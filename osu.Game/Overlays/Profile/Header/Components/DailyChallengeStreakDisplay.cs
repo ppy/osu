@@ -97,8 +97,8 @@ namespace osu.Game.Overlays.Profile.Header.Components
             }
 
             var statistics = User.Value.User.DailyChallengeStatistics;
-            // dailyStreak.Text = UsersStrings.ShowDailyChallengeUnitDay(statistics.DailyStreakCurrent);
-            dailyStreak.Text = $"{statistics.DailyStreakCurrent}d";
+            // dailyStreak.Text = UsersStrings.ShowDailyChallengeUnitDay(statistics.PlayCount);
+            dailyStreak.Text = $"{statistics.PlayCount}d";
             TooltipContent = new DailyChallengeStreakTooltipData(colourProvider, statistics);
             Show();
         }
