@@ -35,6 +35,7 @@ namespace osu.Game.Tests.Visual.Online
             AddSliderStep("weekly best", 0, 250, 1, v => update(s => s.WeeklyStreakBest = v));
             AddSliderStep("top 10%", 0, 999, 0, v => update(s => s.Top10PercentPlacements = v));
             AddSliderStep("top 50%", 0, 999, 0, v => update(s => s.Top50PercentPlacements = v));
+            AddSliderStep("playcount", 0, 999, 0, v => update(s => s.PlayCount = v));
             AddStep("create", () =>
             {
                 Clear();
