@@ -13,6 +13,7 @@ using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
+using osu.Game.Screens.Footer;
 using osuTK;
 using osuTK.Input;
 
@@ -37,15 +38,8 @@ namespace osu.Game.Tests.Visual.UserInterface
 
                 if (bigButton)
                 {
-                    Child = button = new ShearedButton(400, 80)
+                    Child = button = new LetsGoButton
                     {
-                        LighterColour = Colour4.FromHex("#FFFFFF"),
-                        DarkerColour = Colour4.FromHex("#FFCC22"),
-                        TextColour = Colour4.Black,
-                        TextSize = 36,
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        Text = "Let's GO!",
                         Action = () => actionFired = true,
                     };
                 }

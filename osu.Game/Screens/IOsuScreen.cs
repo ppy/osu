@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using osu.Framework.Bindables;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
 using osu.Game.Rulesets;
 using osu.Game.Screens.Footer;
@@ -77,6 +78,8 @@ namespace osu.Game.Screens
         /// A list of footer buttons to be added to the game footer, or empty to display no buttons.
         /// </summary>
         IReadOnlyList<ScreenFooterButton> CreateFooterButtons();
+
+        ShearedButton? CreateRightFooterButton();
 
         /// <summary>
         /// Whether mod track adjustments should be applied on entering this screen.

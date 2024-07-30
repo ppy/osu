@@ -1588,12 +1588,14 @@ namespace osu.Game
                 if (newOsuScreen.ShowFooter)
                 {
                     BackButton.Hide();
-                    ScreenFooter.SetButtons(newOsuScreen.CreateFooterButtons());
+                    ScreenFooter.SetLeftButtons(newOsuScreen.CreateFooterButtons());
+                    ScreenFooter.SetRightButton(newOsuScreen.CreateRightFooterButton());
                     ScreenFooter.Show();
                 }
                 else
                 {
-                    ScreenFooter.SetButtons(Array.Empty<ScreenFooterButton>());
+                    ScreenFooter.SetLeftButtons(Array.Empty<ScreenFooterButton>());
+                    ScreenFooter.SetRightButton(null);
                     ScreenFooter.Hide();
                 }
             }
