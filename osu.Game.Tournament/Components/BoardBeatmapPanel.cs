@@ -210,7 +210,7 @@ namespace osu.Game.Tournament.Components
             {
                 if (shouldFlash)
                 {
-                    flash.FadeOutFromOne(2000);
+                    flash.FadeOutFromOne(900).Loop(0, 3);
                     icon.FadeInFromZero(500);
                 }
 
@@ -222,42 +222,46 @@ namespace osu.Game.Tournament.Components
                 {
                     case ChoiceType.Pick:
                         Colour = Color4.White;
-                        Alpha = 1;
+                        Alpha = 0.7f;
                         icon.Icon = FontAwesome.Solid.Check;
                         break;
 
                     case ChoiceType.Ban:
                         Colour = Color4.Gray;
-                        Alpha = 0.9f;
+                        Alpha = 0.3f;
                         icon.Icon = FontAwesome.Solid.Ban;
                         break;
 
                     case ChoiceType.Protect:
-                        Alpha = 0.9f;
+                        Alpha = 0.4f;
                         icon.Icon = FontAwesome.Solid.Lock;
                         icon.Colour = new OsuColour().Cyan;
+                        icon.Alpha = 1;
                         break;
 
                     case ChoiceType.RedWin:
-                        Alpha = 1;
+                        Alpha = 1f;
                         icon.Icon = FontAwesome.Solid.Trophy;
-                        icon.Colour = new OsuColour().Pink;
+                        icon.Colour = new OsuColour().Red;
+                        icon.Alpha = 0.73f; // Added this line to distinguish last win from other wins
                         break;
 
                     case ChoiceType.BlueWin:
-                        Alpha = 1;
+                        Alpha = 1f;
                         icon.Icon = FontAwesome.Solid.Trophy;
                         icon.Colour = new OsuColour().Blue;
+                        icon.Alpha = 0.73f; // Added this line to distinguish last win from other wins
                         break;
 
                     case ChoiceType.Trap:
-                        Alpha = 1;
+                        Alpha = 0.4f;
                         icon.Icon = FontAwesome.Solid.ExclamationCircle;
-                        icon.Colour = new OsuColour().PurpleLight;
+                        icon.Colour = Color4.White;
+                        icon.Alpha = 1;
                         break;
 
                     case ChoiceType.Draw:
-                        Alpha = 1;
+                        Alpha = 0.4f;
                         icon.Icon = FontAwesome.Solid.BalanceScale;
                         icon.Colour = Color4.White;
                         break;
