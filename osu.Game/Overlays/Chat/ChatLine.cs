@@ -20,6 +20,7 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Chat;
+using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Chat
@@ -50,7 +51,7 @@ namespace osu.Game.Overlays.Chat
 
         protected virtual float Spacing => 15;
 
-        protected virtual float UsernameWidth => 130;
+        protected virtual float UsernameWidth => 150;
 
         [Resolved]
         private ChannelManager? chatManager { get; set; }
@@ -72,7 +73,6 @@ namespace osu.Game.Overlays.Chat
 
         private bool alternatingBackground;
         private bool requiresTimestamp = true;
-
 
         public bool RequiresTimestamp
         {
@@ -166,7 +166,7 @@ namespace osu.Game.Overlays.Chat
                     RowDimensions = new[] { new Dimension(GridSizeMode.AutoSize) },
                     ColumnDimensions = new[]
                     {
-                        new Dimension(GridSizeMode.AutoSize),
+                        new Dimension(GridSizeMode.Absolute, 45),
                         new Dimension(GridSizeMode.Absolute, Spacing + UsernameWidth + Spacing),
                         new Dimension(),
                     },
@@ -177,9 +177,10 @@ namespace osu.Game.Overlays.Chat
                             drawableTimestamp = new OsuSpriteText
                             {
                                 Shadow = false,
-                                Anchor = Anchor.CentreLeft,
-                                Origin = Anchor.CentreLeft,
-                                Font = OsuFont.GetFont(size: FontSize * 0.75f, weight: FontWeight.SemiBold, fixedWidth: true),
+                                Anchor = Anchor.TopLeft,
+                                Origin = Anchor.TopLeft,
+                                Spacing = new Vector2(-1, 0),
+                                Font = OsuFont.GetFont(size: FontSize, weight: FontWeight.SemiBold, fixedWidth: true),
                                 AlwaysPresent = true,
                             },
                             drawableUsername = new DrawableChatUsername(message.Sender)
