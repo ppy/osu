@@ -45,7 +45,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
             EdgeEffect = new EdgeEffectParameters
             {
                 Type = EdgeEffectType.Shadow,
-                Colour = Color4.Black.Opacity(0.5f),
+                Colour = Color4.Black.Opacity(0.25f),
                 Radius = 30f,
             };
 
