@@ -195,15 +195,17 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 }
                 else
                 {
-                    this.ResizeHeightTo(timeline_height, 200, Easing.OutQuint);
-                    mainContent.MoveToY(0, 200, Easing.OutQuint);
+                    // delay the resize until the fade is complete.
+                    this.Delay(180).ResizeHeightTo(timeline_height, 200, Easing.OutQuint);
+                    mainContent.Delay(180).MoveToY(0, 200, Easing.OutQuint);
                 }
             }, true);
 
             controlPointsVisible.BindValueChanged(visible =>
             {
                 if (visible.NewValue)
-                    controlPoints.FadeIn(400, Easing.OutQuint);
+                    // delay the fade in else masking looks weird.
+                    controlPoints.Delay(180).FadeIn(400, Easing.OutQuint);
                 else
                     controlPoints.FadeOut(200, Easing.OutQuint);
             }, true);
