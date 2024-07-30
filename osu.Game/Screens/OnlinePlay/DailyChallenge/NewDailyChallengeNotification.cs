@@ -9,6 +9,7 @@ using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Screens.Menu;
+using osu.Game.Localisation;
 
 namespace osu.Game.Screens.OnlinePlay.DailyChallenge
 {
@@ -26,7 +27,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
         [BackgroundDependencyLoader]
         private void load(OsuGame? game)
         {
-            Text = "Today's daily challenge is now live! Click here to play.";
+            Text = DailyChallengeStrings.ChallengeLiveNotification;
             Content.Add(card = new BeatmapCardNano((APIBeatmapSet)room.Playlist.Single().Beatmap.BeatmapSet!));
             Activated = () =>
             {
