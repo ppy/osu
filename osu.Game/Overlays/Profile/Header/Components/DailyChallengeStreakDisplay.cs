@@ -93,9 +93,9 @@ namespace osu.Game.Overlays.Profile.Header.Components
 
         private void updateDisplay()
         {
-            if (User.Value == null)
+            if (User.Value == null || User.Value.Ruleset.OnlineID != 0)
             {
-                dailyStreak.Text = "-";
+                Hide();
                 return;
             }
 
@@ -103,6 +103,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
             // dailyStreak.Text = UsersStrings.ShowDailyChallengeUnitDay(statistics.DailyStreakCurrent);
             dailyStreak.Text = $"{statistics.DailyStreakCurrent}d";
             TooltipContent = new DailyChallengeStreakTooltipData(colourProvider, statistics);
+            Show();
         }
 
         public ITooltip<DailyChallengeStreakTooltipData> GetCustomTooltip() => new DailyChallengeStreakTooltip();
