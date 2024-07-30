@@ -85,7 +85,7 @@ namespace osu.Game.Tournament.Components
                         {
                             RelativeSizeAxes = Axes.X,
                             Height = CONTAINER_HEIGHT, // Set a fixed height for consistency
-                            Width = 0.9f, // Ensure the container takes up the full width
+                            Width = 0.87f, // Ensure the container takes up the full width
                             Children = new Drawable[]
                             {
                                 new TextFlowContainer
