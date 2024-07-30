@@ -71,6 +71,25 @@ namespace osu.Game.Overlays.Chat
         private Drawable? background;
 
         private bool alternatingBackground;
+        private bool requiresTimestamp = true;
+
+
+        public bool RequiresTimestamp
+        {
+            get => requiresTimestamp;
+            set
+            {
+                if (requiresTimestamp == value)
+                    return;
+
+                requiresTimestamp = value;
+
+                if (!IsLoaded)
+                    return;
+
+                updateMessageContent();
+            }
+        }
 
         public bool AlternatingBackground
         {
@@ -244,9 +263,17 @@ namespace osu.Game.Overlays.Chat
         private void updateMessageContent()
         {
             this.FadeTo(message is LocalEchoMessage ? 0.4f : 1.0f, 500, Easing.OutQuint);
-            drawableTimestamp.FadeTo(message is LocalEchoMessage ? 0 : 1, 500, Easing.OutQuint);
 
-            updateTimestamp();
+            if (requiresTimestamp && !(message is LocalEchoMessage))
+            {
+                drawableTimestamp.Show();
+                updateTimestamp();
+            }
+            else
+            {
+                drawableTimestamp.Hide();
+            }
+
             drawableUsername.Text = $@"{message.Sender.Username}";
 
             // remove non-existent channels from the link list
