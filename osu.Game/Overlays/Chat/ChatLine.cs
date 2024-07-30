@@ -123,13 +123,13 @@ namespace osu.Game.Overlays.Chat
                 background = new Container
                 {
                     Masking = true,
-                    Blending = BlendingParameters.Additive,
                     CornerRadius = 4,
                     Alpha = 0,
                     RelativeSizeAxes = Axes.Both,
+                    Blending = BlendingParameters.Additive,
                     Child = new Box
                     {
-                        Colour = Color4.White,
+                        Colour = Colour4.FromHex("#3b3234"),
                         RelativeSizeAxes = Axes.Both,
                     },
                 },
@@ -301,7 +301,7 @@ namespace osu.Game.Overlays.Chat
         private void updateBackground()
         {
             if (background != null)
-                background.Alpha = alternatingBackground ? 0.03f : 0;
+                background.Alpha = alternatingBackground ? 0.2f : 0;
         }
     }
 }
