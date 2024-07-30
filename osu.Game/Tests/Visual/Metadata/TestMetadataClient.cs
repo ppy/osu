@@ -88,7 +88,14 @@ namespace osu.Game.Tests.Visual.Metadata
         }
 
         public override Task<MultiplayerPlaylistItemStats[]> BeginWatchingMultiplayerRoom(long id)
-            => Task.FromResult(new MultiplayerPlaylistItemStats[MultiplayerPlaylistItemStats.TOTAL_SCORE_DISTRIBUTION_BINS]);
+        {
+            var stats = new MultiplayerPlaylistItemStats[MultiplayerPlaylistItemStats.TOTAL_SCORE_DISTRIBUTION_BINS];
+
+            for (int i = 0; i < stats.Length; i++)
+                stats[i] = new MultiplayerPlaylistItemStats { PlaylistItemID = i };
+
+            return Task.FromResult(stats);
+        }
 
         public override Task EndWatchingMultiplayerRoom(long id) => Task.CompletedTask;
     }
