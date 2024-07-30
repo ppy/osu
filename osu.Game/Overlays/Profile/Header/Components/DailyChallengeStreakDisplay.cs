@@ -24,9 +24,6 @@ namespace osu.Game.Overlays.Profile.Header.Components
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; } = null!;
 
-        [Resolved]
-        private OsuColour colours { get; set; } = null!;
-
         [BackgroundDependencyLoader]
         private void load()
         {
