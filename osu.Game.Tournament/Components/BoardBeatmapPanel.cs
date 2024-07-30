@@ -105,7 +105,7 @@ namespace osu.Game.Tournament.Components
                         {
                             AutoSizeAxes = Axes.Both,
                             Direction = FillDirection.Horizontal,
-                            // Margin = new MarginPadding { Top = -5 }, // Adjust this value to change the distance
+                            Margin = new MarginPadding { Left = -7 }, // Adjust this value to change the distance
                             Children = new Drawable[]
                             {
                                 new TournamentSpriteText
@@ -127,7 +127,7 @@ namespace osu.Game.Tournament.Components
                         {
                             AutoSizeAxes = Axes.Both,
                             Direction = FillDirection.Horizontal,
-                            // Margin = new MarginPadding { Top = -5 }, // Adjust this value to change the distance
+                            Margin = new MarginPadding { Left = -7 }, // Adjust this value to change the distance
                             Children = new Drawable[]
                             {
                                 new TournamentSpriteText
