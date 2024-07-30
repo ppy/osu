@@ -29,6 +29,7 @@ namespace osu.Game.Tests.Visual.DailyChallenge
         private void load()
         {
             base.Content.Add(notificationOverlay);
+            base.Content.Add(metadataClient);
         }
 
         [Test]
@@ -63,7 +64,7 @@ namespace osu.Game.Tests.Visual.DailyChallenge
                 Name = { Value = "Daily Challenge: June 4, 2024" },
                 Playlist =
                 {
-                    new PlaylistItem(CreateAPIBeatmapSet().Beatmaps.First())
+                    new PlaylistItem(TestResources.CreateTestBeatmapSetInfo().Beatmaps.First())
                     {
                         RequiredMods = [new APIMod(new OsuModTraceable())],
                         AllowedMods = [new APIMod(new OsuModDoubleTime())]
