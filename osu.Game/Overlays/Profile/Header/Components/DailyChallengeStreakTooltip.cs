@@ -203,7 +203,6 @@ namespace osu.Game.Overlays.Profile.Header.Components
                     },
                     valueText = new OsuSpriteText
                     {
-                        // Colour = colour
                         Font = OsuFont.GetFont(size: 40, weight: FontWeight.Light),
                     }
                 };
