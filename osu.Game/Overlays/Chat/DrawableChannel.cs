@@ -88,15 +88,17 @@ namespace osu.Game.Overlays.Chat
         {
             base.Update();
 
-            int? minute = null;
+            int? lastMinutes = null;
 
             for (int i = 0; i < ChatLineFlow.Count; i++)
             {
                 if (ChatLineFlow[i] is ChatLine chatline)
                 {
+                    int minutes = chatline.Message.Timestamp.TotalOffsetMinutes;
+
                     chatline.AlternatingBackground = i % 2 == 0;
-                    chatline.RequiresTimestamp = chatline.Message.Timestamp.Minute != minute;
-                    minute = chatline.Message.Timestamp.Minute;
+                    chatline.RequiresTimestamp = minutes != lastMinutes;
+                    lastMinutes = minutes;
                 }
             }
         }
