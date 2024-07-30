@@ -46,7 +46,7 @@ namespace osu.Game.Overlays.Chat
 
         public IReadOnlyCollection<Drawable> DrawableContentFlow => drawableContentFlow;
 
-        protected virtual float FontSize => 14;
+        protected virtual float FontSize => 12;
 
         protected virtual float Spacing => 15;
 
