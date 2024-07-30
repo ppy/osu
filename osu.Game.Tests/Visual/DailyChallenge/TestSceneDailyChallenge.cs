@@ -80,44 +80,6 @@ namespace osu.Game.Tests.Visual.DailyChallenge
             AddStep("push screen", () => LoadScreen(screen = new Screens.OnlinePlay.DailyChallenge.DailyChallenge(room)));
             AddUntilStep("wait for screen", () => screen.IsCurrentScreen());
             AddStep("daily challenge ended", () => metadataClient.DailyChallengeInfo.Value = null);
-
-            Func<APIRequest, bool>? previousHandler = null;
-
-            AddStep("install custom handler", () =>
-            {
-                previousHandler = ((DummyAPIAccess)API).HandleRequest;
-                ((DummyAPIAccess)API).HandleRequest = req =>
-                {
-                    switch (req)
-                    {
-                        case GetRoomRequest r:
-                        {
-                            r.TriggerSuccess(new Room
-                            {
-                                RoomID = { Value = 1235, },
-                                Name = { Value = "Daily Challenge: June 5, 2024" },
-                                Playlist =
-                                {
-                                    new PlaylistItem(CreateAPIBeatmapSet().Beatmaps.First())
-                                    {
-                                        RequiredMods = [new APIMod(new OsuModTraceable())],
-                                        AllowedMods = [new APIMod(new OsuModDoubleTime())]
-                                    }
-                                },
-                                EndDate = { Value = DateTimeOffset.Now.AddHours(12) },
-                                Category = { Value = RoomCategory.DailyChallenge }
-                            });
-                            return true;
-                        }
-
-                        default:
-                            return false;
-                    }
-                };
-            });
-            AddStep("next daily challenge started", () => metadataClient.DailyChallengeInfo.Value = new DailyChallengeInfo { RoomID = 1235 });
-
-            AddStep("restore previous handler", () => ((DummyAPIAccess)API).HandleRequest = previousHandler);
         }
     }
 }

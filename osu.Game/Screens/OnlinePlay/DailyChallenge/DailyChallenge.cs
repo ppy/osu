@@ -424,18 +424,6 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
                     Text = "Today's daily challenge has concluded. Thanks for playing! The next one should appear in a few minutes."
                 });
             }
-
-            if (change.NewValue != null && change.NewValue.Value.RoomID != room.RoomID.Value)
-            {
-                var roomRequest = new GetRoomRequest(change.NewValue.Value.RoomID);
-
-                roomRequest.Success += room =>
-                {
-                    waitForNextChallengeNotification?.Close(false);
-                    notificationOverlay?.Post(new NewDailyChallengeNotification(room));
-                };
-                API.Queue(roomRequest);
-            }
         }
 
         private void forcefullyExit()
