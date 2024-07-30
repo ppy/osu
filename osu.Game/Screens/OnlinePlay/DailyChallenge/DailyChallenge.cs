@@ -417,16 +417,13 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
         {
             if (change.OldValue?.RoomID == room.RoomID.Value && change.NewValue == null)
             {
-                notificationOverlay?.Post(new SimpleNotification
-                {
-                    Text = "Today's daily challenge has concluded – thanks for playing!\n\nTomorrow's challenge is now being prepared and will appear soon."
-                });
+                notificationOverlay?.Post(new SimpleNotification { Text = DailyChallengeStrings.ChallengeEndedNotification });
             }
         }
 
         private void forcefullyExit()
         {
-            Logger.Log($"{this} forcefully exiting due to loss of API connection");
+            Logger.Log(@$"{this} forcefully exiting due to loss of API connection");
 
             // This is temporary since we don't currently have a way to force screens to be exited
             // See also: `OnlinePlayScreen.forcefullyExit()`
