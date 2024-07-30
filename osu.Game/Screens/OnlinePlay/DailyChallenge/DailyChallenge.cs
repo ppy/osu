@@ -67,8 +67,6 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
         private DailyChallengeTotalsDisplay totals = null!;
         private DailyChallengeEventFeed feed = null!;
 
-        private SimpleNotification? waitForNextChallengeNotification;
-
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Plum);
 
@@ -419,7 +417,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
         {
             if (change.OldValue?.RoomID == room.RoomID.Value && change.NewValue == null)
             {
-                notificationOverlay?.Post(waitForNextChallengeNotification = new SimpleNotification
+                notificationOverlay?.Post(new SimpleNotification
                 {
                     Text = "Today's daily challenge has concluded. Thanks for playing! The next one should appear in a few minutes."
                 });
