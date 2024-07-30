@@ -58,7 +58,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
                     {
                         case IHasPosition pos:
                             AddHeader("Position");
-                            AddValue($"x:{pos.X:#,0.##} y:{pos.Y:#,0.##}");
+                            AddValue($"x:{pos.X:#,0.##}");
+                            AddValue($"y:{pos.Y:#,0.##}");
                             break;
 
                         case IHasXPosition x:
