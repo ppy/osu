@@ -5,6 +5,7 @@ using System;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Screens;
 using osu.Game.Online.API;
 using osu.Game.Online.Metadata;
 using osu.Game.Online.Rooms;
@@ -74,7 +75,10 @@ namespace osu.Game.Tests.Visual.DailyChallenge
 
             AddStep("add room", () => API.Perform(new CreateRoomRequest(room)));
             AddStep("set daily challenge info", () => metadataClient.DailyChallengeInfo.Value = new DailyChallengeInfo { RoomID = 1234 });
-            AddStep("push screen", () => LoadScreen(new Screens.OnlinePlay.DailyChallenge.DailyChallenge(room)));
+
+            Screens.OnlinePlay.DailyChallenge.DailyChallenge screen = null!;
+            AddStep("push screen", () => LoadScreen(screen = new Screens.OnlinePlay.DailyChallenge.DailyChallenge(room)));
+            AddUntilStep("wait for screen", () => screen.IsCurrentScreen());
             AddStep("daily challenge ended", () => metadataClient.DailyChallengeInfo.Value = null);
 
             Func<APIRequest, bool>? previousHandler = null;
