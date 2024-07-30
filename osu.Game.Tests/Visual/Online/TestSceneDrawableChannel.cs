@@ -6,6 +6,7 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Testing;
+using osu.Framework.Utils;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Chat;
 using osu.Game.Overlays.Chat;
@@ -88,19 +89,17 @@ namespace osu.Game.Tests.Visual.Online
         [Test]
         public void TestBackgroundAlternating()
         {
-            var localUser = new APIUser
-            {
-                Id = 3,
-                Username = "LocalUser"
-            };
-
             int messageCount = 1;
 
             AddRepeatStep("add messages", () =>
             {
                 channel.AddNewMessages(new Message(messageCount)
                 {
-                    Sender = localUser,
+                    Sender = new APIUser
+                    {
+                        Id = 3,
+                        Username = "LocalUser " + RNG.Next(0, int.MaxValue - 100).ToString("N")
+                    },
                     Content = "Hi there all!",
                     Timestamp = new DateTimeOffset(2022, 11, 21, 20, messageCount, 13, TimeSpan.Zero),
                     Uuid = Guid.NewGuid().ToString(),
