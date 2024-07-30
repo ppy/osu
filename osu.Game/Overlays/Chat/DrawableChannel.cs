@@ -84,6 +84,17 @@ namespace osu.Game.Overlays.Chat
             highlightedMessage.BindValueChanged(_ => processMessageHighlighting(), true);
         }
 
+        protected override void Update()
+        {
+            base.Update();
+
+            for (int i = 0; i < ChatLineFlow.Count; i++)
+            {
+                if (ChatLineFlow[i] is ChatLine chatline)
+                    chatline.AlternatingBackground = i % 2 == 0;
+            }
+        }
+
         /// <summary>
         /// Processes any pending message in <see cref="highlightedMessage"/>.
         /// </summary>

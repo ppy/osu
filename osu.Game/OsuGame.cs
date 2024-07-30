@@ -63,7 +63,6 @@ using osu.Game.Screens;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Footer;
 using osu.Game.Screens.Menu;
-using osu.Game.Screens.OnlinePlay;
 using osu.Game.Screens.OnlinePlay.DailyChallenge;
 using osu.Game.Screens.OnlinePlay.Multiplayer;
 using osu.Game.Screens.Play;
@@ -757,11 +756,13 @@ namespace osu.Game
             // As a special case, if the beatmap and ruleset already match, allow immediately displaying the score from song select.
             // This is guaranteed to not crash, and feels better from a user's perspective (ie. if they are clicking a score in the
             // song select leaderboard).
-            // Similar exemptions are made here for online flows where there are good chances that beatmap and ruleset match
-            // (playlists / multiplayer / daily challenge).
+            // Similar exemptions are made here for daily challenge where it is guaranteed that beatmap and ruleset match.
+            // `OnlinePlayScreen` is excluded because when resuming back to it,
+            // `RoomSubScreen` changes the global beatmap to the next playlist item on resume,
+            // which may not match the score, and thus crash.
             IEnumerable<Type> validScreens =
                 Beatmap.Value.BeatmapInfo.Equals(databasedBeatmap) && Ruleset.Value.Equals(databasedScore.ScoreInfo.Ruleset)
-                    ? new[] { typeof(SongSelect), typeof(OnlinePlayScreen), typeof(DailyChallenge) }
+                    ? new[] { typeof(SongSelect), typeof(DailyChallenge) }
                     : Array.Empty<Type>();
 
             PerformFromScreen(screen =>
