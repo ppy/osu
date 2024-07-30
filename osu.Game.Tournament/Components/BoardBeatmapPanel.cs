@@ -226,38 +226,38 @@ namespace osu.Game.Tournament.Components
 
                     case ChoiceType.Ban:
                         Colour = Color4.Gray;
-                        Alpha = 0.5f;
-                        icon.Icon = FontAwesome.Regular.WindowClose;
+                        Alpha = 0.9f;
+                        icon.Icon = FontAwesome.Solid.Ban;
                         break;
 
                     case ChoiceType.Protect:
-                        Colour = new OsuColour().Cyan;
                         Alpha = 0.9f;
                         icon.Icon = FontAwesome.Solid.Lock;
+                        icon.Colour = new OsuColour().Cyan;
                         break;
 
                     case ChoiceType.RedWin:
-                        Colour = new OsuColour().Pink;
                         Alpha = 1;
                         icon.Icon = FontAwesome.Solid.Trophy;
+                        icon.Colour = new OsuColour().Pink;
                         break;
 
                     case ChoiceType.BlueWin:
-                        Colour = new OsuColour().Blue;
                         Alpha = 1;
                         icon.Icon = FontAwesome.Solid.Trophy;
+                        icon.Colour = new OsuColour().Blue;
                         break;
 
                     case ChoiceType.Trap:
-                        Colour = new OsuColour().PurpleLight;
                         Alpha = 1;
                         icon.Icon = FontAwesome.Solid.ExclamationCircle;
+                        icon.Colour = new OsuColour().PurpleLight;
                         break;
 
                     case ChoiceType.Draw:
-                        Colour = Color4.White;
                         Alpha = 1;
                         icon.Icon = FontAwesome.Solid.BalanceScale;
+                        icon.Colour = Color4.White;
                         break;
 
                 }
@@ -268,6 +268,7 @@ namespace osu.Game.Tournament.Components
                 BorderThickness = 0;
                 Alpha = 1;
                 icon.Alpha = 0;
+                icon.Colour = Color4.White;
             }
 
             choice = newChoice;
