@@ -94,7 +94,7 @@ namespace osu.Game.Tournament.Components
                                     RelativeSizeAxes = Axes.X,
                                     TextAnchor = Anchor.TopLeft,
                                     Width = 1f, // Ensure the container takes up the full width
-                                    Margin = new MarginPadding { Top = -15, Left = -8 }, // Adjust padding as needed
+                                    Margin = new MarginPadding { Top = -30, Left = -8 }, // Adjust padding as needed
                                 }.With(t => t.AddParagraph(Beatmap?.GetDisplayTitleRomanisable(false, false) ?? (LocalisableString)@"unknown", s =>
                                 {
                                     s.Font = OsuFont.Torus.With(weight: FontWeight.Bold);
@@ -119,6 +119,7 @@ namespace osu.Game.Tournament.Components
                                 {
                                     Text = Beatmap?.Metadata.Author.Username ?? "unknown",
                                     Font = OsuFont.Torus.With(weight: FontWeight.Bold, size: 14),
+                                    MaxWidth = 79,
                                     Margin = new MarginPadding { Right = 20 }, // Adjusts the space to the right of the mapper name
                                 },
                             }
@@ -140,6 +141,7 @@ namespace osu.Game.Tournament.Components
                                 new TournamentSpriteText
                                 {
                                     Text = Beatmap?.DifficultyName ?? "unknown",
+                                    MaxWidth = 75,
                                     Font = OsuFont.Torus.With(weight: FontWeight.Bold, size: 14),
                                 },
                             }
