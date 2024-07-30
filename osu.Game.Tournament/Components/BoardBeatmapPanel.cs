@@ -208,8 +208,8 @@ namespace osu.Game.Tournament.Components
             {
                 if (shouldFlash)
                 {
-                    flash.FadeOutFromOne(500).Loop(0, 10);
-                    icon.FadeOutFromOne(500).Loop(0, 10);
+                    flash.FadeOutFromOne(2000);
+                    icon.FadeInFromZero(500);
                 }
 
                 BorderThickness = 6;
@@ -267,6 +267,7 @@ namespace osu.Game.Tournament.Components
                 Colour = Color4.White;
                 BorderThickness = 0;
                 Alpha = 1;
+                icon.Alpha = 0;
             }
 
             choice = newChoice;
