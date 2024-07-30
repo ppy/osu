@@ -118,6 +118,8 @@ namespace osu.Game.Overlays.Chat
             configManager.BindWith(OsuSetting.Prefer24HourTime, prefer24HourTime);
             prefer24HourTime.BindValueChanged(_ => updateTimestamp());
 
+            Padding = new MarginPadding { Right = 5 };
+
             InternalChildren = new[]
             {
                 background = new Container
@@ -135,10 +137,10 @@ namespace osu.Game.Overlays.Chat
                 },
                 new GridContainer
                 {
-                    Margin = new MarginPadding
+                    Padding = new MarginPadding
                     {
-                        Horizontal = 10,
-                        Vertical = 1,
+                        Horizontal = 2,
+                        Vertical = 2,
                     },
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
