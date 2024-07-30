@@ -79,6 +79,13 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
         protected override GameplayLeaderboard CreateGameplayLeaderboard() => multiplayerLeaderboard = new MultiplayerGameplayLeaderboard(users);
 
+        private Bindable<double> convertBindableLongToDouble(BindableLong bindableLong)
+        {
+            var bindableDouble = new BindableDouble();
+            bindableLong.BindValueChanged(longValue => bindableDouble.Value = longValue.NewValue);
+            return bindableDouble;
+        }
+
         protected override void AddLeaderboardToHUD(GameplayLeaderboard leaderboard)
         {
             Debug.Assert(leaderboard == multiplayerLeaderboard);
@@ -87,10 +94,14 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
             if (multiplayerLeaderboard.TeamScores.Count >= 2)
             {
+                // Convert BindableLong to Bindable<double> before binding
+                var team1ScoreBindableDouble = convertBindableLongToDouble(multiplayerLeaderboard.TeamScores.First().Value);
+                var team2ScoreBindableDouble = convertBindableLongToDouble(multiplayerLeaderboard.TeamScores.Last().Value);
+
                 LoadComponentAsync(new GameplayMatchScoreDisplay
                 {
-                    Team1Score = { BindTarget = multiplayerLeaderboard.TeamScores.First().Value },
-                    Team2Score = { BindTarget = multiplayerLeaderboard.TeamScores.Last().Value },
+                    Team1Score = { BindTarget = team1ScoreBindableDouble },
+                    Team2Score = { BindTarget = team2ScoreBindableDouble },
                     Expanded = { BindTarget = HUDOverlay.ShowHud },
                 }, scoreDisplay => HUDOverlay.LeaderboardFlow.Insert(1, scoreDisplay));
             }

@@ -19,8 +19,9 @@ namespace osu.Game.Screens.Play.HUD
         private const float bar_height = 18;
         private const float font_size = 50;
 
-        public BindableLong Team1Score = new BindableLong();
-        public BindableLong Team2Score = new BindableLong();
+        // Change these to BindableDouble
+        public BindableDouble Team1Score = new BindableDouble();
+        public BindableDouble Team2Score = new BindableDouble();
 
         protected MatchScoreCounter Score1Text = null!;
         protected MatchScoreCounter Score2Text = null!;
@@ -121,8 +122,8 @@ namespace osu.Game.Screens.Play.HUD
 
         private void updateScores()
         {
-            Score1Text.Current.Value = Team1Score.Value;
-            Score2Text.Current.Value = Team2Score.Value;
+            Score1Text.Current.Value = (long)Team1Score.Value;
+            Score2Text.Current.Value = (long)Team2Score.Value;
 
             int comparison = Team1Score.Value.CompareTo(Team2Score.Value);
 
@@ -145,13 +146,13 @@ namespace osu.Game.Screens.Play.HUD
             var winningBar = Team1Score.Value > Team2Score.Value ? score1Bar : score2Bar;
             var losingBar = Team1Score.Value <= Team2Score.Value ? score1Bar : score2Bar;
 
-            long diff = Math.Max(Team1Score.Value, Team2Score.Value) - Math.Min(Team1Score.Value, Team2Score.Value);
+            double diff = Math.Max(Team1Score.Value, Team2Score.Value) - Math.Min(Team1Score.Value, Team2Score.Value);
 
             losingBar.ResizeWidthTo(0, 400, Easing.OutQuint);
-            winningBar.ResizeWidthTo(Math.Min(0.4f, MathF.Pow(diff / 1500000f, 0.5f) / 2), 400, Easing.OutQuint);
+            winningBar.ResizeWidthTo(Math.Min(0.4f, MathF.Pow((float)diff / 1500000f, 0.5f) / 2), 400, Easing.OutQuint);
 
             scoreDiffText.Alpha = diff != 0 ? 1 : 0;
-            scoreDiffText.Current.Value = -diff;
+            scoreDiffText.Current.Value = -(long)diff;
             scoreDiffText.Origin = Team1Score.Value > Team2Score.Value ? Anchor.TopLeft : Anchor.TopRight;
         }
 

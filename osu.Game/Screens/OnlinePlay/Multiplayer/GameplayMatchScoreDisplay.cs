@@ -10,6 +10,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 {
     public partial class GameplayMatchScoreDisplay : MatchScoreDisplay
     {
+
+        public new Bindable<double> Team1Score { get; } = new BindableDouble();
+        public new Bindable<double> Team2Score { get; } = new BindableDouble();
         public Bindable<bool> Expanded = new Bindable<bool>();
 
         protected override void LoadComplete()

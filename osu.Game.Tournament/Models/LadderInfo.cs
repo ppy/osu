@@ -43,13 +43,12 @@ namespace osu.Game.Tournament.Models
             MinValue = 0.0f,
             MaxValue = 3.0f,
         };
-        
         public Bindable<float> BlueMultiplier = new BindableFloat(1.0f)
         {
             MinValue = 0.0f,
             MaxValue = 3.0f,
         };
-        
+
 
         public Bindable<bool> AutoProgressScreens = new BindableBool(true);
 
