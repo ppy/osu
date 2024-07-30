@@ -94,7 +94,7 @@ namespace osu.Game.Tournament.Components
                                     RelativeSizeAxes = Axes.X,
                                     TextAnchor = Anchor.TopLeft,
                                     Width = 1f, // Ensure the container takes up the full width
-                                    Margin = new MarginPadding { Top = -45, Left = -8 }, // Adjust padding as needed
+                                    Margin = new MarginPadding { Top = -15, Left = -8 }, // Adjust padding as needed
                                 }.With(t => t.AddParagraph(Beatmap?.GetDisplayTitleRomanisable(false, false) ?? (LocalisableString)@"unknown", s =>
                                 {
                                     s.Font = OsuFont.Torus.With(weight: FontWeight.Bold);
@@ -105,7 +105,7 @@ namespace osu.Game.Tournament.Components
                         {
                             AutoSizeAxes = Axes.Both,
                             Direction = FillDirection.Horizontal,
-                            Margin = new MarginPadding { Top = -50 }, // Adjust this value to change the distance
+                            // Margin = new MarginPadding { Top = -5 }, // Adjust this value to change the distance
                             Children = new Drawable[]
                             {
                                 new TournamentSpriteText
@@ -121,6 +121,15 @@ namespace osu.Game.Tournament.Components
                                     Font = OsuFont.Torus.With(weight: FontWeight.Bold, size: 14),
                                     Margin = new MarginPadding { Right = 20 }, // Adjusts the space to the right of the mapper name
                                 },
+                            }
+                        },
+                        new FillFlowContainer
+                        {
+                            AutoSizeAxes = Axes.Both,
+                            Direction = FillDirection.Horizontal,
+                            // Margin = new MarginPadding { Top = -5 }, // Adjust this value to change the distance
+                            Children = new Drawable[]
+                            {
                                 new TournamentSpriteText
                                 {
                                     Text = "difficulty",
@@ -199,8 +208,8 @@ namespace osu.Game.Tournament.Components
             {
                 if (shouldFlash)
                 {
-                    flash.FadeOutFromOne(500).Loop(0, 10);
-                    icon.FadeOutFromOne(500).Loop(0, 10);
+                    flash.FadeOutFromOne(2000);
+                    icon.FadeInFromZero(500);
                 }
 
                 BorderThickness = 6;
@@ -217,38 +226,38 @@ namespace osu.Game.Tournament.Components
 
                     case ChoiceType.Ban:
                         Colour = Color4.Gray;
-                        Alpha = 0.5f;
-                        icon.Icon = FontAwesome.Regular.WindowClose;
+                        Alpha = 0.9f;
+                        icon.Icon = FontAwesome.Solid.Ban;
                         break;
 
                     case ChoiceType.Protect:
-                        Colour = new OsuColour().Cyan;
                         Alpha = 0.9f;
                         icon.Icon = FontAwesome.Solid.Lock;
+                        icon.Colour = new OsuColour().Cyan;
                         break;
 
                     case ChoiceType.RedWin:
-                        Colour = new OsuColour().Pink;
                         Alpha = 1;
                         icon.Icon = FontAwesome.Solid.Trophy;
+                        icon.Colour = new OsuColour().Pink;
                         break;
 
                     case ChoiceType.BlueWin:
-                        Colour = new OsuColour().Blue;
                         Alpha = 1;
                         icon.Icon = FontAwesome.Solid.Trophy;
+                        icon.Colour = new OsuColour().Blue;
                         break;
 
                     case ChoiceType.Trap:
-                        Colour = new OsuColour().PurpleLight;
                         Alpha = 1;
                         icon.Icon = FontAwesome.Solid.ExclamationCircle;
+                        icon.Colour = new OsuColour().PurpleLight;
                         break;
 
                     case ChoiceType.Draw:
-                        Colour = Color4.White;
                         Alpha = 1;
                         icon.Icon = FontAwesome.Solid.BalanceScale;
+                        icon.Colour = Color4.White;
                         break;
 
                 }
@@ -258,6 +267,8 @@ namespace osu.Game.Tournament.Components
                 Colour = Color4.White;
                 BorderThickness = 0;
                 Alpha = 1;
+                icon.Alpha = 0;
+                icon.Colour = Color4.White;
             }
 
             choice = newChoice;
