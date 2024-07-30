@@ -138,8 +138,6 @@ namespace osu.Game.Tournament.Screens.Board
             buttonDraw.Colour = setColour(pickColour == TeamColour.Neutral && pickType == ChoiceType.Draw);
 
             static Color4 setColour(bool active) => active ? Color4.White : Color4.Gray;
-            // Odd color?
-            static Color4 setProtect(bool active) => active ? Color4.Aqua : Color4.Yellow;
             static Color4 setWin(bool active) => active ? Color4.White : Color4.Gray;
         }
 

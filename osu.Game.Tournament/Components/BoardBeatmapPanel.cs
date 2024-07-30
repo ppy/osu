@@ -94,7 +94,7 @@ namespace osu.Game.Tournament.Components
                                     RelativeSizeAxes = Axes.X,
                                     TextAnchor = Anchor.TopLeft,
                                     Width = 1f, // Ensure the container takes up the full width
-                                    Margin = new MarginPadding { Top = -45, Left = -8 }, // Adjust padding as needed
+                                    Margin = new MarginPadding { Top = -15, Left = -8 }, // Adjust padding as needed
                                 }.With(t => t.AddParagraph(Beatmap?.GetDisplayTitleRomanisable(false, false) ?? (LocalisableString)@"unknown", s =>
                                 {
                                     s.Font = OsuFont.Torus.With(weight: FontWeight.Bold);
@@ -105,7 +105,7 @@ namespace osu.Game.Tournament.Components
                         {
                             AutoSizeAxes = Axes.Both,
                             Direction = FillDirection.Horizontal,
-                            Margin = new MarginPadding { Top = -50 }, // Adjust this value to change the distance
+                            // Margin = new MarginPadding { Top = -5 }, // Adjust this value to change the distance
                             Children = new Drawable[]
                             {
                                 new TournamentSpriteText
@@ -121,6 +121,15 @@ namespace osu.Game.Tournament.Components
                                     Font = OsuFont.Torus.With(weight: FontWeight.Bold, size: 14),
                                     Margin = new MarginPadding { Right = 20 }, // Adjusts the space to the right of the mapper name
                                 },
+                            }
+                        },
+                        new FillFlowContainer
+                        {
+                            AutoSizeAxes = Axes.Both,
+                            Direction = FillDirection.Horizontal,
+                            // Margin = new MarginPadding { Top = -5 }, // Adjust this value to change the distance
+                            Children = new Drawable[]
+                            {
                                 new TournamentSpriteText
                                 {
                                     Text = "difficulty",
