@@ -122,7 +122,7 @@ namespace osu.Game.Tournament.Screens.Board
                         },
                         new SettingsTextBox
                         {
-                            LabelText = "EX mapID",
+                            LabelText = "EX4 mapID",
                             Width = 0.2f,
                         },
                     },
