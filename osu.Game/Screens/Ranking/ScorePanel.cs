@@ -100,6 +100,7 @@ namespace osu.Game.Screens.Ranking
         private AudioContainer audioContent = null!;
 
         private bool displayWithFlair;
+        private readonly bool isNewLocalScore;
 
         private Container topLayerContainer = null!;
         private Drawable topLayerBackground = null!;
@@ -111,6 +112,12 @@ namespace osu.Game.Screens.Ranking
         private Container middleLayerContentContainer = null!;
         private Drawable? middleLayerContent;
 
+        /**
+         * Used for preventing the applause sound from stopping when the panel is contracted
+         * Only used when isNewLocalScore is true
+         */
+        private Drawable? expandedPanelMiddleContent;
+
         private ScorePanelTrackingContainer? trackingContainer;
 
         private DrawableSample? samplePanelFocus;
@@ -119,6 +126,7 @@ namespace osu.Game.Screens.Ranking
         {
             Score = score;
             displayWithFlair = isNewLocalScore;
+            this.isNewLocalScore = isNewLocalScore;
 
             ScorePosition.Value = score.Position;
         }
@@ -240,7 +248,9 @@ namespace osu.Game.Screens.Ranking
         private void updateState()
         {
             topLayerContent?.FadeOut(content_fade_duration).Expire();
-            middleLayerContent?.FadeOut(content_fade_duration).Expire();
+
+            if (!isNewLocalScore || state != PanelState.Contracted)
+                middleLayerContent?.FadeOut(content_fade_duration).Expire();
 
             switch (state)
             {
@@ -252,7 +262,14 @@ namespace osu.Game.Screens.Ranking
 
                     bool firstLoad = topLayerContent == null;
                     topLayerContentContainer.Add(topLayerContent = new ExpandedPanelTopContent(Score.User, firstLoad) { Alpha = 0 });
-                    middleLayerContentContainer.Add(middleLayerContent = new ExpandedPanelMiddleContent(Score, displayWithFlair) { Alpha = 0 });
+
+                    if (isNewLocalScore && expandedPanelMiddleContent != null)
+                        expandedPanelMiddleContent?.Show();
+                    else
+                    {
+                        middleLayerContentContainer.Add(expandedPanelMiddleContent = middleLayerContent = new ExpandedPanelMiddleContent(Score, displayWithFlair) { Alpha = 0 });
+                        if (expandedPanelMiddleContent != null) expandedPanelMiddleContent.AlwaysPresent = true;
+                    }
 
                     // only the first expanded display should happen with flair.
                     displayWithFlair = false;
@@ -260,6 +277,8 @@ namespace osu.Game.Screens.Ranking
 
                 case PanelState.Contracted:
                     Size = new Vector2(CONTRACTED_WIDTH, contracted_height);
+
+                    expandedPanelMiddleContent?.Hide();
 
                     topLayerBackground.FadeColour(contracted_top_layer_colour, RESIZE_DURATION, Easing.OutQuint);
                     middleLayerBackground.FadeColour(contracted_middle_layer_colour, RESIZE_DURATION, Easing.OutQuint);
