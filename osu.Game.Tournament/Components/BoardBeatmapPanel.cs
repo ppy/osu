@@ -73,8 +73,8 @@ namespace osu.Game.Tournament.Components
                 new FillFlowContainer
                 {
                     AutoSizeAxes = Axes.Both,
-                    Anchor = Anchor.CentreLeft,
-                    Origin = Anchor.CentreLeft,
+                    Anchor = Anchor.TopLeft,
+                    Origin = Anchor.TopLeft,
                     Padding = new MarginPadding(15),
                     Direction = FillDirection.Vertical,
                 
@@ -87,7 +87,7 @@ namespace osu.Game.Tournament.Components
                             RelativeSizeAxes = Axes.X,
                             TextAnchor = Anchor.TopLeft,
                             Width = 1f, // Ensure the container takes up the full width
-                            Margin = new MarginPadding { Top = -30, Left = -8 }, // Adjust padding as needed
+                            Margin = new MarginPadding { Left = -8 }, // Adjust padding as needed
                         }.With(t => t.AddParagraph(Beatmap?.GetDisplayTitleRomanisable(false, false) ?? (LocalisableString)@"unknown", s =>
                         {
                             s.Font = OsuFont.Torus.With(weight: FontWeight.Bold);
