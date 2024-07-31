@@ -104,11 +104,11 @@ namespace osu.Game.Tournament.Screens.Gameplay
                             Label = "Warmup stage",
                             Current = warmup,
                         },
-                        chatToggle = new LabelledSwitchButton
+                        new TourneyButton
                         {
                             RelativeSizeAxes = Axes.X,
-                            Label = "Show chat",
-                            Current = { Value = State.Value == TourneyState.Idle }
+                            Text = "Toggle chat",
+                            Action = () => { State.Value = State.Value == TourneyState.Idle ? TourneyState.Playing : TourneyState.Idle; }
                         },
                         new SettingsSlider<int>
                         {
