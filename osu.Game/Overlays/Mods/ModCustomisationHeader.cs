@@ -115,11 +115,6 @@ namespace osu.Game.Overlays.Mods
                 if (!touchedThisFrame)
                     Parent?.UpdateHoverExpansion(true);
             }
-            if (Enabled.Value)
-            {
-                if (!touchedThisFrame)
-                    Parent?.UpdateHoverExpansion(true);
-            }
 
             return base.OnHover(e);
         }
