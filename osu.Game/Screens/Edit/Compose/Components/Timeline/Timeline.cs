@@ -28,6 +28,21 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         private readonly Drawable userContent;
 
+        private bool alwaysShowControlPoints;
+
+        public bool AlwaysShowControlPoints
+        {
+            get => alwaysShowControlPoints;
+            set
+            {
+                if (value == alwaysShowControlPoints)
+                    return;
+
+                alwaysShowControlPoints = value;
+                controlPointsVisible.TriggerChange();
+            }
+        }
+
         [Resolved]
         private EditorClock editorClock { get; set; } = null!;
 
@@ -176,7 +191,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
             controlPointsVisible.BindValueChanged(visible =>
             {
-                if (visible.NewValue)
+                if (visible.NewValue || alwaysShowControlPoints)
                 {
                     this.ResizeHeightTo(timeline_expanded_height, 200, Easing.OutQuint);
                     mainContent.MoveToY(15, 200, Easing.OutQuint);
