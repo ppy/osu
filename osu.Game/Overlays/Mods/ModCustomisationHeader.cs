@@ -95,11 +95,30 @@ namespace osu.Game.Overlays.Mods
             }, true);
         }
 
+        private bool touchedThisFrame;
+
+        protected override bool OnTouchDown(TouchDownEvent e)
+        {
+            if (Enabled.Value)
+            {
+                touchedThisFrame = true;
+                Schedule(() => touchedThisFrame = false);
+            }
+
+            return base.OnTouchDown(e);
+        }
+
         protected override bool OnHover(HoverEvent e)
         {
             if (Enabled.Value)
             {
-                Parent?.UpdateHoverExpansion(true);
+                if (!touchedThisFrame)
+                    Parent?.UpdateHoverExpansion(true);
+            }
+            if (Enabled.Value)
+            {
+                if (!touchedThisFrame)
+                    Parent?.UpdateHoverExpansion(true);
             }
 
             return base.OnHover(e);
