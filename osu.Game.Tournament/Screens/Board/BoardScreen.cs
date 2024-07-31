@@ -24,6 +24,8 @@ namespace osu.Game.Tournament.Screens.Board
     {
         private FillFlowContainer<FillFlowContainer<BoardBeatmapPanel>> mapFlows = null!;
 
+        private readonly Bindable<TournamentMatch?> currentMatch = new Bindable<TournamentMatch?>();
+
         [Resolved]
         private TournamentSceneManager? sceneManager { get; set; }
 
@@ -67,14 +69,26 @@ namespace osu.Game.Tournament.Screens.Board
                     Origin = Anchor.CentreLeft,
                     Position = new Vector2(30, -350),
                 },
+                new DrawableTeamPlayerList(LadderInfo.CurrentMatch.Value?.Team1.Value)
+                {
+                    Anchor = Anchor.TopLeft,
+                    Origin = Anchor.TopLeft,
+                    Position = new Vector2(30, 110),
+                },
+                new DrawableTeamPlayerList(LadderInfo.CurrentMatch.Value?.Team2.Value)
+                {
+                    Anchor = Anchor.TopRight,
+                    Origin = Anchor.TopRight,
+                    Position = new Vector2(-30, 110),
+                },
                 mapFlows = new FillFlowContainer<FillFlowContainer<BoardBeatmapPanel>>
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     // RelativeSizeAxes = Axes.Both,
                     Direction = FillDirection.Vertical,
-                    X = 300,
-                    Y = -270,
+                    X = 0,
+                    Y = -350,
                     Height = 1f,
                     Width = 900,
                     Padding = new MarginPadding{ Left = 50 },
