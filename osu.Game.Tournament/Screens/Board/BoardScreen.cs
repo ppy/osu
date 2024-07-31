@@ -380,6 +380,9 @@ namespace osu.Game.Tournament.Screens.Board
 
                 foreach (var b in CurrentMatch.Value.Round.Value.Beatmaps)
                 {
+                    // Exclude EX beatmaps from the list
+                    if (b.Mods == "EX") continue;
+
                     if (currentFlow == null)
                     {
                         mapFlows.Add(currentFlow = new FillFlowContainer<BoardBeatmapPanel>
