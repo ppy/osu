@@ -10,6 +10,7 @@ using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
@@ -32,6 +33,8 @@ namespace osu.Game.Tournament.Components
         private readonly Bindable<TournamentMatch?> currentMatch = new Bindable<TournamentMatch?>();
 
         private Box flash = null!;
+
+        private SpriteIcon icon = null!;
 
         public TournamentBeatmapPanel(IBeatmapInfo? beatmap, string mod = "", string index = "")
         {
@@ -118,6 +121,15 @@ namespace osu.Game.Tournament.Components
                     Blending = BlendingParameters.Additive,
                     Alpha = 0,
                 },
+                icon = new SpriteIcon
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = Color4.White,
+                    Size = new osuTK.Vector2(0.2f),
+                    Alpha = 0
+                }
             });
 
             if (!string.IsNullOrEmpty(mod))
@@ -181,6 +193,8 @@ namespace osu.Game.Tournament.Components
                         break;
 
                     case ChoiceType.Protect:
+                        icon.Icon = FontAwesome.Solid.Lock;
+                        icon.Alpha = 0.9f;
                         Colour = new OsuColour().Cyan;
                         Alpha = 0.9f;
                         break;
