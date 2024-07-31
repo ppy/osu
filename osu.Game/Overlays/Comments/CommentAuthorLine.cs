@@ -1,15 +1,18 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
+using osu.Framework.Logging;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -139,11 +142,13 @@ namespace osu.Game.Overlays.Comments
             }
         }
 
-        private partial class ParentUsername : FillFlowContainer, IHasTooltip
+        private partial class ParentUsername : FillFlowContainer, IHasCustomTooltip<LocalisableString>
         {
-            public LocalisableString TooltipText => getParentMessage();
+            public ITooltip<LocalisableString> GetCustomTooltip() => new CommentTooltip();
 
-            private readonly Comment? parentComment;
+            LocalisableString IHasCustomTooltip<LocalisableString>.TooltipContent => getParentMessage();
+
+            private Comment? parentComment { get; }
 
             public ParentUsername(Comment comment)
             {
@@ -175,6 +180,61 @@ namespace osu.Game.Overlays.Comments
 
                 return parentComment.HasMessage ? parentComment.Message : parentComment.IsDeleted ? CommentsStrings.Deleted : string.Empty;
             }
+        }
+
+        private partial class CommentTooltip : VisibilityContainer, ITooltip<LocalisableString>
+        {
+            private const int max_width = 500;
+
+            private TextFlowContainer content { get; set; } = null!;
+
+            [BackgroundDependencyLoader]
+            private void load(OsuColour colours)
+            {
+                AutoSizeAxes = Axes.Both;
+
+                Masking = true;
+                CornerRadius = 7;
+
+                Children = new Drawable[]
+                {
+                    new Box
+                    {
+                        Colour = colours.Gray3,
+                        RelativeSizeAxes = Axes.Both
+                    },
+                    content = new TextFlowContainer(f =>
+                    {
+                        f.Font = OsuFont.Default;
+                        f.Truncate = true;
+                        f.MaxWidth = max_width;
+                    })
+                    {
+                        Margin = new MarginPadding(3),
+                        AutoSizeAxes = Axes.Both,
+                        MaximumSize = new Vector2(max_width, float.PositiveInfinity),
+                    }
+                };
+
+                FinishTransforms();
+            }
+
+            private LocalisableString lastPresent;
+
+            public void SetContent(LocalisableString content)
+            {
+                if (lastPresent.Equals(content))
+                    return;
+
+                this.content.Text = content;
+                lastPresent = content;
+            }
+
+            public void Move(Vector2 pos) => Position = pos;
+
+            protected override void PopIn() => this.FadeIn(200, Easing.OutQuint);
+
+            protected override void PopOut() => this.FadeOut(200, Easing.OutQuint);
         }
     }
 }
