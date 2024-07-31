@@ -73,34 +73,25 @@ namespace osu.Game.Tournament.Components
                 new FillFlowContainer
                 {
                     AutoSizeAxes = Axes.Both,
-                    Anchor = Anchor.CentreLeft,
-                    Origin = Anchor.CentreLeft,
+                    Anchor = Anchor.TopLeft,
+                    Origin = Anchor.TopLeft,
                     Padding = new MarginPadding(15),
                     Direction = FillDirection.Vertical,
                 
                     /* This section of code adds Beatmap Information to the Board grid. */
                     Children = new Drawable[]
                     {
-                        new Container
+                        new TextFlowContainer
                         {
+                            AutoSizeAxes = Axes.Y,
                             RelativeSizeAxes = Axes.X,
-                            Height = CONTAINER_HEIGHT, // Set a fixed height for consistency
-                            Width = 0.87f, // Ensure the container takes up the full width
-                            Children = new Drawable[]
-                            {
-                                new TextFlowContainer
-                                {
-                                    AutoSizeAxes = Axes.Y,
-                                    RelativeSizeAxes = Axes.X,
-                                    TextAnchor = Anchor.TopLeft,
-                                    Width = 1f, // Ensure the container takes up the full width
-                                    Margin = new MarginPadding { Top = -30, Left = -8 }, // Adjust padding as needed
-                                }.With(t => t.AddParagraph(Beatmap?.GetDisplayTitleRomanisable(false, false) ?? (LocalisableString)@"unknown", s =>
-                                {
-                                    s.Font = OsuFont.Torus.With(weight: FontWeight.Bold);
-                                }))
-                            }
-                        },
+                            TextAnchor = Anchor.TopLeft,
+                            Width = 1f, // Ensure the container takes up the full width
+                            Margin = new MarginPadding { Left = -8 }, // Adjust padding as needed
+                        }.With(t => t.AddParagraph(Beatmap?.GetDisplayTitleRomanisable(false, false) ?? (LocalisableString)@"unknown", s =>
+                        {
+                            s.Font = OsuFont.Torus.With(weight: FontWeight.Bold);
+                        })),
                         new FillFlowContainer
                         {
                             AutoSizeAxes = Axes.Both,
