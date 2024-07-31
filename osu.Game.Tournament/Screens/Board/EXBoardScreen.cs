@@ -105,26 +105,6 @@ namespace osu.Game.Tournament.Screens.Board
                             BackgroundColour = Color4.Orange,
                             Action = reset
                         },
-                        new SettingsTextBox
-                        {
-                            LabelText = "EX1 mapID",
-                            Width = 0.2f,
-                        },
-                        new SettingsTextBox
-                        {
-                            LabelText = "EX2 mapID",
-                            Width = 0.2f,
-                        },
-                        new SettingsTextBox
-                        {
-                            LabelText = "EX3 mapID",
-                            Width = 0.2f,
-                        },
-                        new SettingsTextBox
-                        {
-                            LabelText = "EX4 mapID",
-                            Width = 0.2f,
-                        },
                     },
                 }
             };
