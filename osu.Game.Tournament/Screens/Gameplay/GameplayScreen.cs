@@ -25,7 +25,7 @@ namespace osu.Game.Tournament.Screens.Gameplay
 
         public readonly Bindable<TourneyState> State = new Bindable<TourneyState>();
         private LabelledSwitchButton warmupToggle = null!;
-        private LabelledSwitchButton chatToggle = null!;
+        private TourneyButton chatToggle = null!;
         private SettingsSlider<float> redMultiplier = null!;
         private SettingsSlider<float> blueMultiplier = null!;
         private MatchIPCInfo ipc = null!;
@@ -104,7 +104,7 @@ namespace osu.Game.Tournament.Screens.Gameplay
                             Label = "Warmup stage",
                             Current = warmup,
                         },
-                        new TourneyButton
+                        chatToggle = new TourneyButton
                         {
                             RelativeSizeAxes = Axes.X,
                             Text = "Toggle chat",
@@ -146,13 +146,6 @@ namespace osu.Game.Tournament.Screens.Gameplay
             }, true);
         }
 
-        private void updateChat()
-        {
-            State.Value = chatToggle.Current.Value ? TourneyState.Idle : TourneyState.Playing;
-            updateState();
-            chatToggle.Current.Value = State.Value == TourneyState.Idle;
-        }
-
         private void updateWarmup()
         {
             warmup.Value = warmupToggle.Current.Value;
@@ -165,7 +158,6 @@ namespace osu.Game.Tournament.Screens.Gameplay
             base.LoadComplete();
 
             warmupToggle.Current.BindValueChanged(_ => updateWarmup(), true);
-            chatToggle.Current.BindValueChanged(_ => updateChat());
 
             State.BindTo(ipc.State);
             State.BindValueChanged(_ => updateState(), true);
