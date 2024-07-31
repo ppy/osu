@@ -9,6 +9,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
 using osu.Framework.Threading;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Overlays.Settings;
 using osu.Game.Tournament.Components;
 using osu.Game.Tournament.IPC;
 using osu.Game.Tournament.Models;
@@ -103,6 +104,26 @@ namespace osu.Game.Tournament.Screens.Board
                             Text = "Reset",
                             BackgroundColour = Color4.Orange,
                             Action = reset
+                        },
+                        new SettingsTextBox
+                        {
+                            LabelText = "EX1 mapID",
+                            Width = 0.2f,
+                        },
+                        new SettingsTextBox
+                        {
+                            LabelText = "EX2 mapID",
+                            Width = 0.2f,
+                        },
+                        new SettingsTextBox
+                        {
+                            LabelText = "EX3 mapID",
+                            Width = 0.2f,
+                        },
+                        new SettingsTextBox
+                        {
+                            LabelText = "EX mapID",
+                            Width = 0.2f,
                         },
                     },
                 }
