@@ -212,8 +212,6 @@ namespace osu.Game.Overlays.Comments
                         MaximumSize = new Vector2(max_width, float.PositiveInfinity),
                     }
                 };
-
-                FinishTransforms();
             }
 
             private LocalisableString lastPresent;
