@@ -22,7 +22,7 @@ namespace osu.Game.Tournament.Components
         [Resolved]
         private LadderInfo ladderInfo { get; set; } = null!;
 
-        public TournamentMatchChatDisplay()
+        public TournamentMatchChatDisplay(float cornerRadius = 0)
         {
             RelativeSizeAxes = Axes.X;
             Height = 144;
@@ -31,7 +31,7 @@ namespace osu.Game.Tournament.Components
 
             Background.Alpha = 0.7f;
 
-            CornerRadius = 0;
+            CornerRadius = cornerRadius;
         }
 
         [BackgroundDependencyLoader]

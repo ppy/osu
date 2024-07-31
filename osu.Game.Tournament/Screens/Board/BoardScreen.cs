@@ -59,7 +59,7 @@ namespace osu.Game.Tournament.Screens.Board
                 {
                     ShowScores = true,
                 },
-                new TournamentMatchChatDisplay
+                new TournamentMatchChatDisplay(cornerRadius: 10)
                 {
                     RelativeSizeAxes = Axes.None,
                     Height = 400,
