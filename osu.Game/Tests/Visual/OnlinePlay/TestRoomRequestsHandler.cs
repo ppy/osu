@@ -197,9 +197,8 @@ namespace osu.Game.Tests.Visual.OnlinePlay
 
                 case GetBeatmapSetRequest getBeatmapSetRequest:
                 {
-                    var baseBeatmap = getBeatmapSetRequest.Type == BeatmapSetLookupType.BeatmapId
-                        ? beatmapManager.QueryBeatmap(b => b.OnlineID == getBeatmapSetRequest.ID)
-                        : beatmapManager.QueryBeatmap(b => b.BeatmapSet.OnlineID == getBeatmapSetRequest.ID);
+                    // Incorrect logic, see https://github.com/ppy/osu/pull/28991#issuecomment-2256721076 for reason why this change
+                    var baseBeatmap = beatmapManager.QueryBeatmap(b => b.OnlineID == getBeatmapSetRequest.ID);
 
                     if (baseBeatmap == null)
                     {
