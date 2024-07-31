@@ -275,6 +275,9 @@ namespace osu.Game.Tournament.Screens.MapPool
 
                 foreach (var b in CurrentMatch.Value.Round.Value.Beatmaps)
                 {
+                    // Exclude EX beatmaps from the list
+                    if (b.Mods == "EX") continue;
+
                     if (currentFlow == null || (LadderInfo.SplitMapPoolByMods.Value && currentMods != b.Mods))
                     {
                         mapFlows.Add(currentFlow = new FillFlowContainer<TournamentBeatmapPanel>
