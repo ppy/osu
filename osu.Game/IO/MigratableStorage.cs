@@ -6,6 +6,7 @@
 using System;
 using System.IO;
 using System.Linq;
+using osu.Framework;
 using osu.Framework.Platform;
 using osu.Game.Utils;
 
@@ -49,6 +50,9 @@ namespace osu.Game.IO
             // using Uri is the easiest way to check equality and contains (https://stackoverflow.com/a/7710620)
             var sourceUri = new Uri(source.FullName + Path.DirectorySeparatorChar);
             var destinationUri = new Uri(destination.FullName + Path.DirectorySeparatorChar);
+
+            if (Environment.IsPrivilegedProcess)
+                throw new ArgumentException($"Changing folder location under {(RuntimeInfo.IsUnix ? "root" : "administrator")} privileges may break integrations and poses a security risk. Please run the game as a normal user.");
 
             if (sourceUri == destinationUri)
                 throw new ArgumentException("Destination provided is already the current location", destination.FullName);
