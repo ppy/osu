@@ -55,7 +55,7 @@ namespace osu.Game.Tournament.Screens.Board
 
                 mapFlows = new FillFlowContainer<FillFlowContainer<EXBoardBeatmapPanel>>
                 {
-                    Y = 160,
+                    Y = 30,
                     Spacing = new Vector2(10, 10),
                     Direction = FillDirection.Vertical,
                     RelativeSizeAxes = Axes.X,
@@ -257,7 +257,7 @@ namespace osu.Game.Tournament.Screens.Board
                         mapFlows.Add(currentFlow = new FillFlowContainer<EXBoardBeatmapPanel>
                         {
                             Spacing = new Vector2(10, 10),
-                            Direction = FillDirection.Full,
+                            Direction = FillDirection.Vertical,
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y
                         });
