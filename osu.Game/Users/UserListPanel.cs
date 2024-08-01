@@ -18,6 +18,7 @@ namespace osu.Game.Users
 {
     public partial class UserListPanel : ExtendedUserPanel
     {
+        public ColourInfo BackgroundColour = ColourInfo.GradientHorizontal(Color4.White.Opacity(1), Color4.White.Opacity(0.3f));
         public UserListPanel(APIUser user)
             : base(user)
         {
@@ -32,7 +33,7 @@ namespace osu.Game.Users
             Background.Width = 0.5f;
             Background.Origin = Anchor.CentreRight;
             Background.Anchor = Anchor.CentreRight;
-            Background.Colour = ColourInfo.GradientHorizontal(Color4.White.Opacity(1), Color4.White.Opacity(0.3f));
+            Background.Colour = BackgroundColour;
         }
 
         protected new OsuSpriteText CreateUserrank()

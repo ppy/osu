@@ -43,7 +43,6 @@ namespace osu.Game.Tournament.Screens.Board
         private OsuButton buttonBlueWin = null!;
         private OsuButton buttonRedTrap = null!;
         private OsuButton buttonBlueTrap = null!;
-        private OsuButton buttonDraw = null!;
 
         private DrawableTeamPlayerList team1List = null!;
         private DrawableTeamPlayerList team2List = null!;
@@ -64,7 +63,8 @@ namespace osu.Game.Tournament.Screens.Board
                 },
                 new MatchHeader
                 {
-                    ShowScores = true,
+                    // For OFFC
+                    ShowScores = false,
                     ShowRound = false,
                 },
                 new FillFlowContainer
@@ -223,13 +223,6 @@ namespace osu.Game.Tournament.Screens.Board
                             BackgroundColour = TournamentGame.COLOUR_BLUE,
                             Action = () => setMode(TeamColour.Blue, ChoiceType.Trap)
                         },
-                        buttonDraw = new TourneyButton
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            Text = "Mark Draw",
-                            BackgroundColour = Color4.Indigo,
-                            Action = () => setMode(TeamColour.Neutral, ChoiceType.Draw)
-                        },
                         new ControlPanel.Spacer(),
                         new TourneyButton
                         {
@@ -269,18 +262,14 @@ namespace osu.Game.Tournament.Screens.Board
             buttonBlueBan.Colour = setColour(pickColour == TeamColour.Blue && pickType == ChoiceType.Ban);
             buttonRedPick.Colour = setColour(pickColour == TeamColour.Red && pickType == ChoiceType.Pick);
             buttonBluePick.Colour = setColour(pickColour == TeamColour.Blue && pickType == ChoiceType.Pick);
-            buttonRedProtect.Colour = setProtect(pickColour == TeamColour.Red && pickType == ChoiceType.Protect);
-            buttonBlueProtect.Colour = setProtect(pickColour == TeamColour.Blue && pickType == ChoiceType.Protect);
-            buttonRedWin.Colour = setWin(pickColour == TeamColour.Red && pickType == ChoiceType.RedWin);
-            buttonBlueWin.Colour = setWin(pickColour == TeamColour.Blue && pickType == ChoiceType.BlueWin);
+            buttonRedProtect.Colour = setColour(pickColour == TeamColour.Red && pickType == ChoiceType.Protect);
+            buttonBlueProtect.Colour = setColour(pickColour == TeamColour.Blue && pickType == ChoiceType.Protect);
+            buttonRedWin.Colour = setColour(pickColour == TeamColour.Red && pickType == ChoiceType.RedWin);
+            buttonBlueWin.Colour = setColour(pickColour == TeamColour.Blue && pickType == ChoiceType.BlueWin);
             buttonRedTrap.Colour = setColour(pickColour == TeamColour.Red && pickType == ChoiceType.Trap);
             buttonBlueTrap.Colour = setColour(pickColour == TeamColour.Blue && pickType == ChoiceType.Trap);
-            buttonDraw.Colour = setColour(pickColour == TeamColour.Neutral && pickType == ChoiceType.Draw);
 
             static Color4 setColour(bool active) => active ? Color4.White : Color4.Gray;
-            // Odd color?
-            static Color4 setProtect(bool active) => active ? Color4.Aqua : Color4.Yellow;
-            static Color4 setWin(bool active) => active ? Color4.White : Color4.Gray;
         }
 
         /*

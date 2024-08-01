@@ -34,7 +34,6 @@ namespace osu.Game.Tournament.Screens.Board
         private OsuButton buttonPick = null!;
         private OsuButton buttonRedWin = null!;
         private OsuButton buttonBlueWin = null!;
-        private OsuButton buttonDraw = null!;
 
         private DrawableTeamPlayerList team1List = null!;
         private DrawableTeamPlayerList team2List = null!;
@@ -55,7 +54,7 @@ namespace osu.Game.Tournament.Screens.Board
                 },
                 new MatchHeader
                 {
-                    ShowScores = true,
+                    ShowScores = false,
                     ShowRound = false,
                 },
                 new FillFlowContainer
@@ -157,13 +156,6 @@ namespace osu.Game.Tournament.Screens.Board
                             BackgroundColour = TournamentGame.COLOUR_BLUE,
                             Action = () => setMode(TeamColour.Blue, ChoiceType.BlueWin)
                         },
-                        buttonDraw = new TourneyButton
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            Text = "Mark Draw",
-                            BackgroundColour = Color4.Indigo,
-                            Action = () => setMode(TeamColour.Neutral, ChoiceType.Draw)
-                        },
                         new ControlPanel.Spacer(),
                         new TourneyButton
                         {
@@ -203,7 +195,6 @@ namespace osu.Game.Tournament.Screens.Board
             buttonPick.Colour = setColour(pickColour == TeamColour.Neutral && pickType == ChoiceType.Pick);
             buttonRedWin.Colour = setWin(pickColour == TeamColour.Red && pickType == ChoiceType.RedWin);
             buttonBlueWin.Colour = setWin(pickColour == TeamColour.Blue && pickType == ChoiceType.BlueWin);
-            buttonDraw.Colour = setColour(pickColour == TeamColour.Neutral && pickType == ChoiceType.Draw);
 
             static Color4 setColour(bool active) => active ? Color4.White : Color4.Gray;
             static Color4 setWin(bool active) => active ? Color4.White : Color4.Gray;
