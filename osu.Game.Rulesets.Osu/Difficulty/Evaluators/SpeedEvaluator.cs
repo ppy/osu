@@ -65,7 +65,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             if (osuCurrObj.Angle.HasValue &&
                 osuPrevObj?.Angle != null &&
-                osuCurrObj.Angle != osuPrevObj.Angle &&
                 Math.Abs(osuCurrObj.DeltaTime - osuPrevObj.DeltaTime) < 10)
             {
                 double angleDifference = Math.Abs(osuCurrObj.Angle.Value - osuPrevObj.Angle.Value);
