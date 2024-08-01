@@ -63,7 +63,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             double adjustedDistanceScale = 1.0;
 
-            if (osuCurrObj.Angle.HasValue && osuPrevObj?.Angle != null && osuCurrObj.Angle != osuPrevObj.Angle)
+            if (osuCurrObj.Angle.HasValue &&
+                osuPrevObj?.Angle != null &&
+                Math.Abs(osuCurrObj.DeltaTime - osuPrevObj.DeltaTime) < 10)
             {
                 double angleDifference = Math.Abs(osuCurrObj.Angle.Value - osuPrevObj.Angle.Value);
                 double angleDifferenceAdjusted = Math.Sin((angleDifference) / 2) * 180.0;
