@@ -91,20 +91,23 @@ namespace osu.Game.Users
                         Margin = new MarginPadding { Right = 10 },
                         Children = new Drawable[]
                         {
-                            CreateUserrank().With(rank =>
-                            {
-                                rank.Anchor = Anchor.CentreRight;
-                                rank.Origin = Anchor.CentreRight;
-                            }),
                             CreateStatusIcon().With(icon =>
                             {
                                 icon.Anchor = Anchor.CentreRight;
                                 icon.Origin = Anchor.CentreRight;
                             }),
+                            CreateUserrank().With(rank =>
+                            {
+                                rank.Anchor = Anchor.CentreRight;
+                                rank.Origin = Anchor.CentreRight;
+                            }),
+
+                            // Disable this function will cause a strange exception, using Alpha = 0f; instead
                             CreateStatusMessage(true).With(message =>
                             {
                                 message.Anchor = Anchor.CentreRight;
                                 message.Origin = Anchor.CentreRight;
+                                message.Alpha = 0f;
                             })
                         }
                     }
