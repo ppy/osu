@@ -22,10 +22,11 @@ namespace osu.Game.Tournament.Components
         [Resolved]
         private LadderInfo ladderInfo { get; set; } = null!;
 
-        public TournamentMatchChatDisplay(float cornerRadius = 0)
+        public TournamentMatchChatDisplay(float cornerRadius = 0, bool AutoSizeY = false)
         {
+            AutoSizeAxes = AutoSizeY ? Axes.Y : Axes.None;
             RelativeSizeAxes = Axes.X;
-            Height = 144;
+            if (!AutoSizeY) Height = 144;
             Anchor = Anchor.BottomLeft;
             Origin = Anchor.BottomLeft;
 

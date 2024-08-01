@@ -1,46 +1,45 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Tournament.Models;
-using osuTK;
 using osu.Game.Users;
+using osuTK;
 
 namespace osu.Game.Tournament.Components
 {
-    public partial class DrawableTeamPlayerList : CompositeDrawable
+    public partial class DrawableTeamPlayerList : FillFlowContainer
     {
-        private FillFlowContainer playerContainer = null!;
+        private int totalHeight;
+        private const int entryheight = 50;
+        private const int spacing = 10;
         public DrawableTeamPlayerList(TournamentTeam? team)
         {
-            AutoSizeAxes = Axes.Both;
-
             var players = team?.Players ?? new BindableList<TournamentUser>();
 
-            InternalChildren = new Drawable[]
-            {
-                playerContainer = new FillFlowContainer
-                {
-                    AutoSizeAxes = Axes.Y,
-                    Width = 300,
-                    // Height = 300,
-                    Direction = FillDirection.Vertical,
-                    Spacing = new Vector2(10),
-                },
-            };
-
-            foreach (TournamentUser p in players)
-            {
-                playerContainer.Add(new UserListPanel(p.ToAPIUser())
-                {
-                    Anchor = Anchor.BottomLeft,
-                    Origin = Anchor.BottomLeft,
-                    Height = 50,
-                    Scale = new Vector2(1f),
-                });
-            }
+            AutoSizeAxes = Axes.Y;
+            RelativeSizeAxes = Axes.None;
+            Width = 300;
+            Direction = FillDirection.Vertical;
+            Spacing = new Vector2(spacing);
+            totalHeight = players.Count * (entryheight + spacing) + spacing;
+            // We need to provide all children upon definition of a widget,
+            // Since it's impossible to change its height after that.
+            ChildrenEnumerable = players.Select(createCard);
         }
+        private UserListPanel createCard(TournamentUser user) => new UserListPanel(user.ToAPIUser())
+        {
+            RelativeSizeAxes = Axes.None,
+            Anchor = Anchor.BottomLeft,
+            Origin = Anchor.BottomLeft,
+            Width = 300,
+            Height = entryheight,
+            Scale = new Vector2(1f),
+        };
+
+        public int GetHeight() => totalHeight;
     }
 }
