@@ -11,7 +11,6 @@ using osu.Game.Online.API.Requests.Responses;
 using osuTK;
 using osu.Game.Users.Drawables;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Sprites;
 using osu.Game.Tournament;
 
 namespace osu.Game.Users

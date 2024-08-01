@@ -39,6 +39,5 @@ namespace osu.Game.Tournament.Models
         RedWin,
         BlueWin,
         Trap,
-        Draw
     }
 }

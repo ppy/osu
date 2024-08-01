@@ -43,7 +43,6 @@ namespace osu.Game.Tournament.Screens.Board
         private OsuButton buttonBlueWin = null!;
         private OsuButton buttonRedTrap = null!;
         private OsuButton buttonBlueTrap = null!;
-        private OsuButton buttonDraw = null!;
 
         private DrawableTeamPlayerList team1List = null!;
         private DrawableTeamPlayerList team2List = null!;
@@ -223,13 +222,6 @@ namespace osu.Game.Tournament.Screens.Board
                             BackgroundColour = TournamentGame.COLOUR_BLUE,
                             Action = () => setMode(TeamColour.Blue, ChoiceType.Trap)
                         },
-                        buttonDraw = new TourneyButton
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            Text = "Mark Draw",
-                            BackgroundColour = Color4.Indigo,
-                            Action = () => setMode(TeamColour.Neutral, ChoiceType.Draw)
-                        },
                         new ControlPanel.Spacer(),
                         new TourneyButton
                         {
@@ -275,7 +267,6 @@ namespace osu.Game.Tournament.Screens.Board
             buttonBlueWin.Colour = setWin(pickColour == TeamColour.Blue && pickType == ChoiceType.BlueWin);
             buttonRedTrap.Colour = setColour(pickColour == TeamColour.Red && pickType == ChoiceType.Trap);
             buttonBlueTrap.Colour = setColour(pickColour == TeamColour.Blue && pickType == ChoiceType.Trap);
-            buttonDraw.Colour = setColour(pickColour == TeamColour.Neutral && pickType == ChoiceType.Draw);
 
             static Color4 setColour(bool active) => active ? Color4.White : Color4.Gray;
             // Odd color?
