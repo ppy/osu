@@ -23,7 +23,7 @@ namespace osu.Game.Screens.Ranking
     public partial class CollectionButton : GrayButton, IHasPopover
     {
         private readonly BeatmapInfo beatmapInfo;
-        private readonly Bindable<bool> current;
+        private readonly Bindable<bool> isInAnyCollection;
 
         [Resolved]
         private RealmAccess realmAccess { get; set; } = null!;
@@ -37,7 +37,7 @@ namespace osu.Game.Screens.Ranking
             : base(FontAwesome.Solid.Book)
         {
             this.beatmapInfo = beatmapInfo;
-            current = new Bindable<bool>(false);
+            isInAnyCollection = new Bindable<bool>(false);
 
             Size = new Vector2(75, 30);
 
@@ -54,9 +54,9 @@ namespace osu.Game.Screens.Ranking
         {
             base.LoadComplete();
 
-            collectionSubscription = realmAccess.RegisterForNotifications(r => r.All<BeatmapCollection>(), updateRealm);
+            collectionSubscription = realmAccess.RegisterForNotifications(r => r.All<BeatmapCollection>(), collectionsChanged);
 
-            current.BindValueChanged(_ => updateState(), true);
+            isInAnyCollection.BindValueChanged(_ => updateState(), true);
         }
 
         protected override void Dispose(bool isDisposing)
@@ -66,14 +66,14 @@ namespace osu.Game.Screens.Ranking
             collectionSubscription?.Dispose();
         }
 
-        private void updateRealm(IRealmCollection<BeatmapCollection> sender, ChangeSet? changes)
+        private void collectionsChanged(IRealmCollection<BeatmapCollection> sender, ChangeSet? changes)
         {
-            current.Value = sender.AsEnumerable().Any(c => c.BeatmapMD5Hashes.Contains(beatmapInfo.MD5Hash));
+            isInAnyCollection.Value = sender.AsEnumerable().Any(c => c.BeatmapMD5Hashes.Contains(beatmapInfo.MD5Hash));
         }
 
         private void updateState()
         {
-            Background.FadeColour(current.Value ? colours.Green : colours.Gray4, 500, Easing.InOutExpo);
+            Background.FadeColour(isInAnyCollection.Value ? colours.Green : colours.Gray4, 500, Easing.InOutExpo);
         }
 
         public Popover GetPopover() => new CollectionPopover(beatmapInfo);
