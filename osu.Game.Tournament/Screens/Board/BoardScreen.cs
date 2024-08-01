@@ -261,17 +261,14 @@ namespace osu.Game.Tournament.Screens.Board
             buttonBlueBan.Colour = setColour(pickColour == TeamColour.Blue && pickType == ChoiceType.Ban);
             buttonRedPick.Colour = setColour(pickColour == TeamColour.Red && pickType == ChoiceType.Pick);
             buttonBluePick.Colour = setColour(pickColour == TeamColour.Blue && pickType == ChoiceType.Pick);
-            buttonRedProtect.Colour = setProtect(pickColour == TeamColour.Red && pickType == ChoiceType.Protect);
-            buttonBlueProtect.Colour = setProtect(pickColour == TeamColour.Blue && pickType == ChoiceType.Protect);
-            buttonRedWin.Colour = setWin(pickColour == TeamColour.Red && pickType == ChoiceType.RedWin);
-            buttonBlueWin.Colour = setWin(pickColour == TeamColour.Blue && pickType == ChoiceType.BlueWin);
+            buttonRedProtect.Colour = setColour(pickColour == TeamColour.Red && pickType == ChoiceType.Protect);
+            buttonBlueProtect.Colour = setColour(pickColour == TeamColour.Blue && pickType == ChoiceType.Protect);
+            buttonRedWin.Colour = setColour(pickColour == TeamColour.Red && pickType == ChoiceType.RedWin);
+            buttonBlueWin.Colour = setColour(pickColour == TeamColour.Blue && pickType == ChoiceType.BlueWin);
             buttonRedTrap.Colour = setColour(pickColour == TeamColour.Red && pickType == ChoiceType.Trap);
             buttonBlueTrap.Colour = setColour(pickColour == TeamColour.Blue && pickType == ChoiceType.Trap);
 
             static Color4 setColour(bool active) => active ? Color4.White : Color4.Gray;
-            // Odd color?
-            static Color4 setProtect(bool active) => active ? Color4.Aqua : Color4.Yellow;
-            static Color4 setWin(bool active) => active ? Color4.White : Color4.Gray;
         }
 
         /*
