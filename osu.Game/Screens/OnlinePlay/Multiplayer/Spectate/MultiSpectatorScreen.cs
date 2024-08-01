@@ -9,7 +9,6 @@ using osu.Framework.Audio;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Logging;
-using osu.Framework.Bindables;
 using osu.Game.Graphics;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
@@ -59,14 +58,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
 
         private readonly Room room;
         private readonly MultiplayerRoomUser[] users;
-
-        private Bindable<double> convertBindableLongToDouble(BindableLong bindableLong)
-        {
-            var bindableDouble = new BindableDouble();
-            bindableLong.BindValueChanged(longValue => bindableDouble.Value = longValue.NewValue);
-            return bindableDouble;
-        }
-
 
         /// <summary>
         /// Creates a new <see cref="MultiSpectatorScreen"/>.
@@ -153,13 +144,10 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
 
                 if (leaderboard.TeamScores.Count == 2)
                 {
-                    var redScore = convertBindableLongToDouble(leaderboard.TeamScores.First().Value);
-                    var blueScore = convertBindableLongToDouble(leaderboard.TeamScores.Last().Value);
-
                     LoadComponentAsync(new MatchScoreDisplay
                     {
-                        Team1Score = { BindTarget = redScore },
-                        Team2Score = { BindTarget = blueScore },
+                        Team1Score = { BindTarget = leaderboard.TeamScores.First().Value },
+                        Team2Score = { BindTarget = leaderboard.TeamScores.Last().Value },
                     }, scoreDisplayContainer.Add);
                 }
             });
