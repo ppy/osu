@@ -64,10 +64,10 @@ namespace osu.Game.Tournament.Screens.Board
                 new TournamentMatchChatDisplay(cornerRadius: 10)
                 {
                     RelativeSizeAxes = Axes.None,
-                    Height = 400,
-                    Width = 600,
+                    Height = 130,
+                    Width = 320,
                     Origin = Anchor.CentreLeft,
-                    Position = new Vector2(30, -350),
+                    Position = new Vector2(18, -80),
                 },
                 new DrawableTeamPlayerList(LadderInfo.CurrentMatch.Value?.Team1.Value)
                 {
