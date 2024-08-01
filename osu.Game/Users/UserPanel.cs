@@ -25,6 +25,10 @@ using osu.Game.Screens;
 using osu.Game.Screens.Play;
 using osu.Game.Users.Drawables;
 using osuTK;
+using osu.Game.Overlays.Profile.Header.Components;
+using osu.Framework.Bindables;
+using osu.Framework.Extensions.LocalisationExtensions;
+using osu.Framework.Localisation;
 
 namespace osu.Game.Users
 {
@@ -39,6 +43,8 @@ namespace osu.Game.Users
         public new Action? Action;
 
         protected Action ViewProfile { get; private set; } = null!;
+
+        private readonly IBindable<UserStatistics?> statistics = new Bindable<UserStatistics?>();
 
         protected Drawable Background { get; private set; } = null!;
 
@@ -62,10 +68,15 @@ namespace osu.Game.Users
         [Resolved]
         private ChatOverlay? chatOverlay { get; set; }
 
+        private OsuSpriteText globalRankDisplay = null!;
+
+        private LocalisableString globalRank;
+
         [Resolved]
         protected OverlayColourProvider? ColourProvider { get; private set; }
 
         [Resolved]
+
         private IPerformFromScreenRunner? performer { get; set; }
 
         [Resolved]
@@ -77,6 +88,25 @@ namespace osu.Game.Users
         [BackgroundDependencyLoader]
         private void load()
         {
+            // Initialize globalRankDisplay
+            globalRankDisplay = new OsuSpriteText
+            {
+                Font = OsuFont.GetFont(size: 16, weight: FontWeight.Bold),
+                Shadow = false
+            };
+
+            statistics.BindTo(api.Statistics);
+            statistics.BindValueChanged(stats =>
+            {
+                globalRank = stats.NewValue?.GlobalRank?.ToLocalisableString("\\##,##0") ?? "-";
+
+                // Ensure globalRankDisplay is not null before setting its content
+                if (globalRankDisplay != null)
+                {
+                    globalRankDisplay.Text = globalRank;
+                }
+            }, true);
+
             Masking = true;
 
             Add(new Box
@@ -118,6 +148,13 @@ namespace osu.Game.Users
             Font = OsuFont.GetFont(size: 16, weight: FontWeight.Bold),
             Shadow = false,
             Text = User.Username,
+        };
+
+        protected OsuSpriteText CreateUserrank() => new OsuSpriteText
+        {
+            Font = OsuFont.GetFont(size: 16, weight: FontWeight.Bold),
+            Shadow = false,
+            Text = globalRank
         };
 
         protected UpdateableAvatar CreateAvatar() => new UpdateableAvatar(User, false);

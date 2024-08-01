@@ -18,6 +18,7 @@
         "Rulesets",
         "serialisation",
         "Updateable",
+        "Userrank",
         "visualise"
     ]
 }

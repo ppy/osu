@@ -10,6 +10,9 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Online.API.Requests.Responses;
 using osuTK;
 using osu.Game.Overlays.Profile.Header.Components;
+using osu.Game.Graphics.Sprites;
+using osu.Framework.Extensions.LocalisationExtensions;
+using osu.Game.Graphics;
 
 namespace osu.Game.Users
 {
@@ -30,6 +33,19 @@ namespace osu.Game.Users
             Background.Origin = Anchor.CentreRight;
             Background.Anchor = Anchor.CentreRight;
             Background.Colour = ColourInfo.GradientHorizontal(Color4.White.Opacity(1), Color4.White.Opacity(0.3f));
+        }
+
+        protected new OsuSpriteText CreateUserrank()
+        {
+            // Assuming statistics is a property of APIUser and contains the necessary rank information
+            var globalRank = User.Statistics?.GlobalRank.ToLocalisableString("\\##,##0") ?? "-";
+
+            return new OsuSpriteText
+            {
+                Font = OsuFont.GetFont(size: 16, weight: FontWeight.Bold),
+                Shadow = false,
+                Text = globalRank
+            };
         }
 
         protected override Drawable CreateLayout()
@@ -57,13 +73,6 @@ namespace osu.Game.Users
                                 avatar.Size = new Vector2(40);
                                 avatar.Margin = new MarginPadding { Left = 12 };
                             }),
-                            /* Hide flags due to some issues.
-                            CreateFlag().With(flag =>
-                            {
-                                flag.Anchor = Anchor.CentreLeft;
-                                flag.Origin = Anchor.CentreLeft;
-                            }),
-                            */
                             CreateUsername().With(username =>
                             {
                                 username.Anchor = Anchor.CentreLeft;
@@ -82,6 +91,11 @@ namespace osu.Game.Users
                         Margin = new MarginPadding { Right = 10 },
                         Children = new Drawable[]
                         {
+                            CreateUserrank().With(rank =>
+                            {
+                                rank.Anchor = Anchor.CentreRight;
+                                rank.Origin = Anchor.CentreRight;
+                            }),
                             CreateStatusIcon().With(icon =>
                             {
                                 icon.Anchor = Anchor.CentreRight;
