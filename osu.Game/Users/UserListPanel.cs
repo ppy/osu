@@ -55,12 +55,15 @@ namespace osu.Game.Users
                                 avatar.Anchor = Anchor.CentreLeft;
                                 avatar.Origin = Anchor.CentreLeft;
                                 avatar.Size = new Vector2(40);
+                                avatar.Margin = new MarginPadding { Left = 12 };
                             }),
+                            /* Hide flags due to some issues.
                             CreateFlag().With(flag =>
                             {
                                 flag.Anchor = Anchor.CentreLeft;
                                 flag.Origin = Anchor.CentreLeft;
                             }),
+                            */
                             CreateUsername().With(username =>
                             {
                                 username.Anchor = Anchor.CentreLeft;
