@@ -50,6 +50,23 @@ namespace osu.Game.Tournament.Screens.Gameplay.Components
             }
         }
 
+        private bool showRound = true;
+
+        public bool ShowRound
+        {
+            get => showRound;
+            set
+            {
+                if (value == showRound)
+                    return;
+
+                showRound = value;
+
+                if (IsLoaded)
+                    updateDisplay();
+            }
+        }
+
         [BackgroundDependencyLoader]
         private void load()
         {

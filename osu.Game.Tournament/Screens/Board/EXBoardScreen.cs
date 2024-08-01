@@ -51,8 +51,8 @@ namespace osu.Game.Tournament.Screens.Board
                 new MatchHeader
                 {
                     ShowScores = true,
+                    ShowRound = false,
                 },
-
                 mapFlows = new FillFlowContainer<FillFlowContainer<EXBoardBeatmapPanel>>
                 {
                     Y = 30,
