@@ -3,11 +3,14 @@
 
 using System.Linq;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Tournament.Models;
 using osu.Game.Users;
 using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Tournament.Components
 {
@@ -38,6 +41,7 @@ namespace osu.Game.Tournament.Components
             Width = 300,
             Height = entryheight,
             Scale = new Vector2(1f),
+            BackgroundColour = ColourInfo.GradientHorizontal(Color4.White.Opacity(1), Color4.White.Opacity(0.7f)),
         };
 
         public int GetHeight() => totalHeight;
