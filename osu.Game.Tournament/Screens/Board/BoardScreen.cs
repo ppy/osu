@@ -151,6 +151,21 @@ namespace osu.Game.Tournament.Screens.Board
                         {
                             Text = "Current Mode"
                         },
+                        buttonRedProtect = new TourneyButton
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            Text = "Red Protect",
+                            BackgroundColour = TournamentGame.COLOUR_RED,
+                            Action = () => setMode(TeamColour.Red, ChoiceType.Protect)
+
+                        },
+                        buttonBlueProtect = new TourneyButton
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            Text = "Blue Protect",
+                            BackgroundColour = TournamentGame.COLOUR_BLUE,
+                            Action = () => setMode(TeamColour.Blue, ChoiceType.Protect)
+                        },
                         buttonRedBan = new TourneyButton
                         {
                             RelativeSizeAxes = Axes.X,
@@ -178,22 +193,6 @@ namespace osu.Game.Tournament.Screens.Board
                             Text = "Blue Pick",
                             BackgroundColour = TournamentGame.COLOUR_BLUE,
                             Action = () => setMode(TeamColour.Blue, ChoiceType.Pick)
-                        },
-                        buttonRedProtect = new TourneyButton
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            Text = "Red Protect",
-                            BackgroundColour = TournamentGame.COLOUR_RED,
-                            Action = () => setMode(TeamColour.Red, ChoiceType.Protect)
-
-                        },
-                        buttonBlueProtect = new TourneyButton
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            Text = "Blue Protect",
-                            BackgroundColour = TournamentGame.COLOUR_BLUE,
-                            Action = () => setMode(TeamColour.Blue, ChoiceType.Protect)
-
                         },
                         buttonRedWin = new TourneyButton
                         {
