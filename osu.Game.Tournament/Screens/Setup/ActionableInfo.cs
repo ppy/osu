@@ -4,6 +4,7 @@
 using System;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
 using osuTK;
@@ -23,6 +24,8 @@ namespace osu.Game.Tournament.Screens.Setup
 
         private TournamentSpriteText valueText = null!;
 
+        private SpriteIcon warningIcon = null!;
+
         public ActionableInfo()
             : base(true)
         {
@@ -40,7 +43,11 @@ namespace osu.Game.Tournament.Screens.Setup
 
         public bool Failing
         {
-            set => valueText.Colour = value ? Color4.Red : Color4.White;
+            set
+            {
+                valueText.Colour = value ? Color4.Orange : Color4.White;
+                warningIcon.Alpha = value ? 1f : 0f;
+            }
         }
 
         protected override Drawable CreateComponent() => new Container
@@ -49,10 +56,29 @@ namespace osu.Game.Tournament.Screens.Setup
             RelativeSizeAxes = Axes.X,
             Children = new Drawable[]
             {
-                valueText = new TournamentSpriteText
+                new FillFlowContainer
                 {
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft,
+                    Direction = FillDirection.Horizontal,
+                    Children = new Drawable[]
+                    {
+                        valueText = new TournamentSpriteText
+                        {
+                            Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.CentreLeft,
+                        },
+                        warningIcon = new SpriteIcon
+                        {
+                            Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.CentreLeft,
+                            Icon = FontAwesome.Solid.ExclamationTriangle,
+                            Colour = Color4.Orange,
+                            Alpha = 0,
+                            Size = new Vector2(24),
+                            Margin = new MarginPadding { Left = 15 },
+                        },
+                    },
                 },
                 FlowContainer = new FillFlowContainer
                 {
