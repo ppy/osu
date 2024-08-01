@@ -28,8 +28,7 @@ namespace osu.Game.Utils
             ScoreInfo perfectPlay = baseScore == null ? new ScoreInfo(beatmap.BeatmapInfo, ruleset) : baseScore.DeepClone();
 
             // Initialize mods: if mods given - use them, else try use mods from base score, else use empty mod array
-            if (mods == null)
-                mods = baseScore != null ? baseScore.Mods : [];
+            mods ??= baseScore != null ? baseScore.Mods : [];
 
             perfectPlay.Mods = mods;
 
@@ -42,9 +41,9 @@ namespace osu.Game.Utils
 
             // create statistics assuming all hit objects have perfect hit result
             var statistics = beatmap.HitObjects
-                                            .SelectMany(getPerfectHitResults)
-                                            .GroupBy(hr => hr, (hr, list) => (hitResult: hr, count: list.Count()))
-                                            .ToDictionary(pair => pair.hitResult, pair => pair.count);
+                                    .SelectMany(getPerfectHitResults)
+                                    .GroupBy(hr => hr, (hr, list) => (hitResult: hr, count: list.Count()))
+                                    .ToDictionary(pair => pair.hitResult, pair => pair.count);
             perfectPlay.Statistics = statistics;
             perfectPlay.MaximumStatistics = statistics;
 
@@ -65,6 +64,7 @@ namespace osu.Game.Utils
 
             return perfectPlay;
         }
+
         private static int calculateMaxCombo(IBeatmap beatmap)
         {
             return beatmap.HitObjects.SelectMany(getPerfectHitResults).Count(r => r.AffectsCombo());

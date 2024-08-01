@@ -207,7 +207,7 @@ namespace osu.Game.Skinning.Components
         }
 
         private static bool isMetadata(BeatmapAttribute attribute) => (attribute >= BeatmapAttribute.Title && attribute <= BeatmapAttribute.Creator)
-            || attribute == BeatmapAttribute.RankedStatus || attribute == BeatmapAttribute.Source;
+                                                                      || attribute == BeatmapAttribute.RankedStatus || attribute == BeatmapAttribute.Source;
 
         private static bool isBeatmapDifficultyAttribute(BeatmapAttribute attribute) => (attribute <= BeatmapAttribute.ApproachRate);
 
@@ -233,7 +233,7 @@ namespace osu.Game.Skinning.Components
             if (!isDiffcalcInfo(Attribute.Value))
                 return;
 
-            cancellationTokenSource = new();
+            cancellationTokenSource = new CancellationTokenSource();
 
             bindableDifficulty = (Bindable<StarDifficulty?>)difficultyCache.GetBindableDifficulty(beatmapInfo, cancellationTokenSource.Token);
             bindableDifficulty.BindValueChanged(d =>
@@ -263,9 +263,6 @@ namespace osu.Game.Skinning.Components
             ScoreInfo perfectScore = ScoreUtils.GetPerfectPlay(playableBeatmap, ruleset.Value, mods.Value.ToArray());
 
             var performanceAttributes = await performanceCalculator.CalculateAsync(perfectScore, difficultyAttributes, cancellationTokenSource.Token).ConfigureAwait(false);
-
-            if (performanceAttributes == null)
-                return 0;
 
             return performanceAttributes.Total;
         }
