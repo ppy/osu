@@ -122,6 +122,9 @@ namespace osu.Game.Tournament.Screens.Gameplay
                             Current = LadderInfo.PlayersPerTeam,
                             KeyboardStep = 1,
                         },
+                        
+                        /* Experimental feature for Live score calculation! See https://github.com/CloneWith/osu/issues/2
+                        
                         redMultiplier = new SettingsSlider<float>
                         {
                             LabelText = "Red score multiplier",
@@ -134,6 +137,7 @@ namespace osu.Game.Tournament.Screens.Gameplay
                             Current = LadderInfo.BlueMultiplier,
                             KeyboardStep = 0.1f,
                         },
+                        */
                     }
                 }
             });
