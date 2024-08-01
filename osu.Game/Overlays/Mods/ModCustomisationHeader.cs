@@ -29,10 +29,11 @@ namespace osu.Game.Overlays.Mods
 
         public readonly BindableBool Expanded = new BindableBool();
 
-        protected new ModCustomisationPanel? Parent => (ModCustomisationPanel?)base.Parent;
+        private readonly ModCustomisationPanel panel;
 
-        public ModCustomisationHeader()
+        public ModCustomisationHeader(ModCustomisationPanel panel)
         {
+            this.panel = panel;
             Action = Expanded.Toggle;
             Enabled.Value = false;
         }
@@ -113,7 +114,7 @@ namespace osu.Game.Overlays.Mods
             if (Enabled.Value)
             {
                 if (!touchedThisFrame)
-                    Parent?.UpdateHoverExpansion(true);
+                    panel.UpdateHoverExpansion(true);
             }
 
             return base.OnHover(e);

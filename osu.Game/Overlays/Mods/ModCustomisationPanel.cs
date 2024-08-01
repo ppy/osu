@@ -58,7 +58,7 @@ namespace osu.Game.Overlays.Mods
 
             InternalChildren = new Drawable[]
             {
-                new ModCustomisationHeader
+                new ModCustomisationHeader(this)
                 {
                     Depth = float.MinValue,
                     RelativeSizeAxes = Axes.X,
@@ -66,7 +66,7 @@ namespace osu.Game.Overlays.Mods
                     Enabled = { BindTarget = Enabled },
                     Expanded = { BindTarget = Expanded },
                 },
-                content = new FocusGrabbingContainer
+                content = new FocusGrabbingContainer(this)
                 {
                     RelativeSizeAxes = Axes.X,
                     BorderColour = colourProvider.Dark3,
@@ -229,12 +229,17 @@ namespace osu.Game.Overlays.Mods
             public override bool RequestsFocus => Expanded.Value;
             public override bool AcceptsFocus => Expanded.Value;
 
-            public new ModCustomisationPanel? Parent => (ModCustomisationPanel?)base.Parent;
+            private readonly ModCustomisationPanel panel;
+
+            public FocusGrabbingContainer(ModCustomisationPanel panel)
+            {
+                this.panel = panel;
+            }
 
             protected override void OnHoverLost(HoverLostEvent e)
             {
                 if (ExpandedByHovering.Value && !ReceivePositionalInputAt(e.ScreenSpaceMousePosition))
-                    Parent?.UpdateHoverExpansion(false);
+                    panel.UpdateHoverExpansion(false);
 
                 base.OnHoverLost(e);
             }
