@@ -145,7 +145,7 @@ namespace osu.Game.Users
 
         protected OsuSpriteText CreateUsername() => new OsuSpriteText
         {
-            Font = OsuFont.GetFont(size: 16, weight: FontWeight.Bold),
+            Font = OsuFont.GetFont(size: 20, weight: FontWeight.Bold),
             Shadow = false,
             Text = User.Username,
         };
