@@ -94,25 +94,25 @@ namespace osu.Game.Skinning.Components
         {
             base.LoadComplete();
 
+            // Init dict
+            foreach (var attribute in Enum.GetValues<BeatmapAttribute>())
+                valueDictionary[attribute] = "";
+
             ruleset = game.Ruleset.GetBoundCopy();
 
-            Attribute.BindValueChanged(_ => updateLabel());
+            Attribute.BindValueChanged(_ => updateAll());
             Template.BindValueChanged(_ => updateLabel());
 
-            ruleset.BindValueChanged(_ => updateAllContent());
-            beatmap.BindValueChanged(_ =>
-            {
-                updateBindableDifficulty();
-                updateAllContent();
-            }, true);
+            ruleset.BindValueChanged(_ => updateAll());
+            beatmap.BindValueChanged(_ => updateAll());
 
             mods.BindValueChanged(_ =>
             {
                 modSettingChangeTracker?.Dispose();
                 modSettingChangeTracker = new ModSettingChangeTracker(mods.Value);
-                modSettingChangeTracker.SettingChanged += _ => updateModSpecificContent();
-                updateModSpecificContent();
-            });
+                modSettingChangeTracker.SettingChanged += _ => updateAll();
+                updateAll();
+            }, true);
         }
 
         private void updateLabel()
@@ -142,22 +142,36 @@ namespace osu.Game.Skinning.Components
 
         protected override void SetFont(FontUsage font) => text.Font = font.With(size: 40);
 
-        private void updateAllContent()
+        // This function will update only necessary info
+        private void updateAll()
         {
-            // Metadata info
+            updateMetadata();
+            updateBeatmapDifficultyAttributes();
+            updateTimingData();
+            updateBindableDifficulty();
+            updateLabel();
+        }
+
+        private void updateMetadata()
+        {
+            // Skip if not relevant attribute
+            if (!isMetadata(Attribute.Value))
+                return;
+
             valueDictionary[BeatmapAttribute.Title] = new RomanisableString(beatmap.Value.BeatmapInfo.Metadata.TitleUnicode, beatmap.Value.BeatmapInfo.Metadata.Title);
             valueDictionary[BeatmapAttribute.Artist] = new RomanisableString(beatmap.Value.BeatmapInfo.Metadata.ArtistUnicode, beatmap.Value.BeatmapInfo.Metadata.Artist);
             valueDictionary[BeatmapAttribute.DifficultyName] = beatmap.Value.BeatmapInfo.DifficultyName;
             valueDictionary[BeatmapAttribute.Creator] = beatmap.Value.BeatmapInfo.Metadata.Author.Username;
             valueDictionary[BeatmapAttribute.Source] = beatmap.Value.BeatmapInfo.Metadata.Source;
             valueDictionary[BeatmapAttribute.RankedStatus] = beatmap.Value.BeatmapInfo.Status.GetLocalisableDescription();
-
-            // Calculatable info except Star Rating and pp
-            updateModSpecificContent();
         }
 
-        private void updateModSpecificContent()
+        private void updateBeatmapDifficultyAttributes()
         {
+            // Skip if not relevant attribute
+            if (!isBeatmapDifficultyAttribute(Attribute.Value))
+                return;
+
             double rate = ModUtils.CalculateRateWithMods(mods.Value);
 
             BeatmapDifficulty difficulty = new BeatmapDifficulty(beatmapInfo.Difficulty);
@@ -167,35 +181,51 @@ namespace osu.Game.Skinning.Components
 
             difficulty = ruleset.Value.CreateInstance().GetRateAdjustedDisplayDifficulty(difficulty, rate);
 
-            valueDictionary[BeatmapAttribute.Length] = TimeSpan.FromMilliseconds(beatmapInfo.Length / rate).ToFormattedDuration();
-            valueDictionary[BeatmapAttribute.BPM] = FormatUtils.RoundBPM(beatmapInfo.BPM, rate).ToLocalisableString(@"F0");
             valueDictionary[BeatmapAttribute.CircleSize] = difficulty.CircleSize.ToLocalisableString(@"F2");
             valueDictionary[BeatmapAttribute.HPDrain] = difficulty.DrainRate.ToLocalisableString(@"F2");
             valueDictionary[BeatmapAttribute.Accuracy] = difficulty.OverallDifficulty.ToLocalisableString(@"F2");
             valueDictionary[BeatmapAttribute.ApproachRate] = difficulty.ApproachRate.ToLocalisableString(@"F2");
-
-            // Init Star Rating and pp anyway, even if they're not calcualted yet 
-            if (!valueDictionary.ContainsKey(BeatmapAttribute.StarRating))
-            {
-                valueDictionary[BeatmapAttribute.StarRating] = "";
-                valueDictionary[BeatmapAttribute.MaxPerformance] = "";
-            }
-
-            updateLabel();
         }
+
+        private void updateTimingData()
+        {
+            // Skip if not relevant attribute
+            if (!isTimingData(Attribute.Value))
+                return;
+
+            double rate = ModUtils.CalculateRateWithMods(mods.Value);
+
+            valueDictionary[BeatmapAttribute.Length] = TimeSpan.FromMilliseconds(beatmapInfo.Length / rate).ToFormattedDuration();
+            valueDictionary[BeatmapAttribute.BPM] = FormatUtils.RoundBPM(beatmapInfo.BPM, rate).ToLocalisableString(@"F0");
+        }
+
+        private static bool isMetadata(BeatmapAttribute attribute) => (attribute >= BeatmapAttribute.Title && attribute <= BeatmapAttribute.Creator)
+            || attribute == BeatmapAttribute.RankedStatus || attribute == BeatmapAttribute.Source;
+
+        private static bool isBeatmapDifficultyAttribute(BeatmapAttribute attribute) => (attribute <= BeatmapAttribute.ApproachRate);
+
+        private static bool isTimingData(BeatmapAttribute attribute) => attribute == BeatmapAttribute.Length || attribute == BeatmapAttribute.BPM;
+
+        private static bool isDiffcalcInfo(BeatmapAttribute attribute) => attribute == BeatmapAttribute.StarRating || attribute == BeatmapAttribute.MaxPerformance;
 
         #region diffcalc stuff
 
         [Resolved]
         private BeatmapDifficultyCache difficultyCache { get; set; } = null!;
 
-        private Bindable<StarDifficulty?> bindableDifficulty = null!;
+        private Bindable<StarDifficulty?>? bindableDifficulty;
 
         private CancellationTokenSource? cancellationTokenSource;
 
         private void updateBindableDifficulty()
         {
             cancellationTokenSource?.Cancel();
+            bindableDifficulty?.UnbindEvents();
+
+            // Skip if not relevant attribute
+            if (!isDiffcalcInfo(Attribute.Value))
+                return;
+
             cancellationTokenSource = new();
 
             bindableDifficulty = (Bindable<StarDifficulty?>)difficultyCache.GetBindableDifficulty(beatmapInfo, cancellationTokenSource.Token);
