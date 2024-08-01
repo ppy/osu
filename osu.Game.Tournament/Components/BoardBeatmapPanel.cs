@@ -250,13 +250,6 @@ namespace osu.Game.Tournament.Components
                         icon.Colour = Color4.White;
                         icon.Alpha = 1;
                         break;
-
-                    case ChoiceType.Draw:
-                        Alpha = 0.4f;
-                        icon.Icon = FontAwesome.Solid.BalanceScale;
-                        icon.Colour = Color4.White;
-                        break;
-
                 }
             }
             else
