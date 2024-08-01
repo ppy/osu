@@ -30,7 +30,7 @@ namespace osu.Game.Tournament.Components
             // Since it's impossible to change its height after that.
             ChildrenEnumerable = players.Select(createCard);
         }
-        private UserListPanel createCard(TournamentUser user) => new UserListPanel(user.ToAPIUser())
+        private TeamPlayerCard createCard(TournamentUser user) => new TeamPlayerCard(user.ToAPIUser())
         {
             RelativeSizeAxes = Axes.None,
             Anchor = Anchor.BottomLeft,
