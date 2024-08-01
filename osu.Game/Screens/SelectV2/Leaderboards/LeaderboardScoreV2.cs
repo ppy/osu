@@ -43,6 +43,15 @@ namespace osu.Game.Screens.SelectV2.Leaderboards
 {
     public partial class LeaderboardScoreV2 : OsuClickableContainer, IHasContextMenu, IHasCustomTooltip<ScoreInfo>
     {
+        public Bindable<IReadOnlyList<Mod>> SelectedMods = new Bindable<IReadOnlyList<Mod>>();
+
+        /// <summary>
+        /// A function determining whether each mod in the score can be selected.
+        /// A return value of <see langword="true"/> means that the mod can be selected in the current context.
+        /// A return value of <see langword="false"/> means that the mod cannot be selected in the current context.
+        /// </summary>
+        public Func<Mod, bool> IsValidMod { get; set; } = _ => true;
+
         public int? Rank { get; init; }
         public bool IsPersonalBest { get; init; }
 
@@ -67,9 +76,6 @@ namespace osu.Game.Screens.SelectV2.Leaderboards
 
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; } = null!;
-
-        [Resolved]
-        private SongSelect? songSelect { get; set; }
 
         [Resolved]
         private IDialogOverlay? dialogOverlay { get; set; }
@@ -738,8 +744,8 @@ namespace osu.Game.Screens.SelectV2.Leaderboards
             {
                 List<MenuItem> items = new List<MenuItem>();
 
-                if (score.Mods.Length > 0 && songSelect != null)
-                    items.Add(new OsuMenuItem("Use these mods", MenuItemType.Highlighted, () => songSelect.Mods.Value = score.Mods));
+                if (score.Mods.Length > 0)
+                    items.Add(new OsuMenuItem("Use these mods", MenuItemType.Highlighted, () => SelectedMods.Value = score.Mods.Where(m => IsValidMod.Invoke(m)).ToArray()));
 
                 if (score.Files.Count <= 0) return items.ToArray();
 
