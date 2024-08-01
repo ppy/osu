@@ -63,7 +63,8 @@ namespace osu.Game.Tournament.Screens.Board
                 },
                 new MatchHeader
                 {
-                    ShowScores = true,
+                    // For OFFC
+                    ShowScores = false,
                     ShowRound = false,
                 },
                 new FillFlowContainer

@@ -54,7 +54,7 @@ namespace osu.Game.Tournament.Screens.Board
                 },
                 new MatchHeader
                 {
-                    ShowScores = true,
+                    ShowScores = false,
                     ShowRound = false,
                 },
                 new FillFlowContainer
