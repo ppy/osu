@@ -29,14 +29,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         private Container winnerBackground = null!;
         private Drawable winnerText = null!;
 
-        private Bindable<double> convertBindableLongToDouble(BindableLong bindableLong)
-        {
-            var bindableDouble = new BindableDouble();
-            bindableLong.BindValueChanged(longValue => bindableDouble.Value = longValue.NewValue);
-            return bindableDouble;
-        }
-
-
         public MultiplayerTeamResultsScreen(ScoreInfo score, long roomId, PlaylistItem playlistItem, SortedDictionary<int, BindableLong> teamScores)
             : base(score, roomId, playlistItem)
         {
@@ -58,8 +50,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             VerticalScrollContent.Scale = new Vector2(0.9f);
             VerticalScrollContent.Y = 75;
 
-            var redScore = convertBindableLongToDouble(teamScores.First().Value);
-            var blueScore = convertBindableLongToDouble(teamScores.Last().Value);
+            var redScore = teamScores.First().Value;
+            var blueScore = teamScores.Last().Value;
 
             LocalisableString winner;
             Colour4 winnerColour;
