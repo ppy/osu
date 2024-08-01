@@ -26,8 +26,8 @@ namespace osu.Game.Tournament.Screens.Gameplay
         public readonly Bindable<TourneyState> State = new Bindable<TourneyState>();
         private LabelledSwitchButton warmupToggle = null!;
         private TourneyButton chatToggle = null!;
-        private SettingsSlider<float> redMultiplier = null!;
-        private SettingsSlider<float> blueMultiplier = null!;
+        // private SettingsSlider<float> redMultiplier = null!;
+        // private SettingsSlider<float> blueMultiplier = null!;
         private MatchIPCInfo ipc = null!;
 
         [Resolved]
