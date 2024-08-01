@@ -41,7 +41,7 @@ namespace osu.Game.Tournament.Components
             Width = 300,
             Height = entryheight,
             Scale = new Vector2(1f),
-            BackgroundColour = ColourInfo.GradientHorizontal(Color4.White.Opacity(1), Color4.White.Opacity(0.7f)),
+            // BackgroundColour = ColourInfo.GradientHorizontal(Color4.White.Opacity(1), Color4.White.Opacity(0.7f)),
         };
 
         public int GetHeight() => totalHeight;
