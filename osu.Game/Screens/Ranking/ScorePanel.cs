@@ -99,8 +99,7 @@ namespace osu.Game.Screens.Ranking
 
         private AudioContainer audioContent = null!;
 
-        private bool displayWithFlair;
-        private readonly bool isNewLocalScore;
+        private readonly bool displayWithFlair;
 
         private Container topLayerContainer = null!;
         private Drawable topLayerBackground = null!;
@@ -126,7 +125,6 @@ namespace osu.Game.Screens.Ranking
         {
             Score = score;
             displayWithFlair = isNewLocalScore;
-            this.isNewLocalScore = isNewLocalScore;
 
             ScorePosition.Value = score.Position;
         }
@@ -249,7 +247,7 @@ namespace osu.Game.Screens.Ranking
         {
             topLayerContent?.FadeOut(content_fade_duration).Expire();
 
-            if (!isNewLocalScore || state != PanelState.Contracted)
+            if (!displayWithFlair || state != PanelState.Contracted)
                 middleLayerContent?.FadeOut(content_fade_duration).Expire();
 
             switch (state)
@@ -263,7 +261,7 @@ namespace osu.Game.Screens.Ranking
                     bool firstLoad = topLayerContent == null;
                     topLayerContentContainer.Add(topLayerContent = new ExpandedPanelTopContent(Score.User, firstLoad) { Alpha = 0 });
 
-                    if (isNewLocalScore && expandedPanelMiddleContent != null)
+                    if (displayWithFlair && expandedPanelMiddleContent != null)
                         expandedPanelMiddleContent?.Show();
                     else
                     {
@@ -271,8 +269,6 @@ namespace osu.Game.Screens.Ranking
                         if (expandedPanelMiddleContent != null) expandedPanelMiddleContent.AlwaysPresent = true;
                     }
 
-                    // only the first expanded display should happen with flair.
-                    displayWithFlair = false;
                     break;
 
                 case PanelState.Contracted:
