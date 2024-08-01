@@ -36,6 +36,11 @@ namespace osu.Game.Tournament.Screens.Board
         private OsuButton buttonBlueWin = null!;
         private OsuButton buttonDraw = null!;
 
+        private DrawableTeamPlayerList team1List = null!;
+        private DrawableTeamPlayerList team2List = null!;
+
+        private readonly int sideListHeight = 660;
+
         private ScheduledDelegate? scheduledScreenChange;
 
         [BackgroundDependencyLoader]
@@ -51,11 +56,73 @@ namespace osu.Game.Tournament.Screens.Board
                 new MatchHeader
                 {
                     ShowScores = true,
+                    ShowRound = false,
                 },
-
+                new FillFlowContainer
+                {
+                    Anchor = Anchor.TopLeft,
+                    Origin = Anchor.TopLeft,
+                    RelativeSizeAxes = Axes.None,
+                    Position = new Vector2(30, 110),
+                    Width = 320,
+                    Height = sideListHeight,
+                    Direction = FillDirection.Vertical,
+                    Children = new Drawable[]
+                    {
+                        team1List = new DrawableTeamPlayerList(LadderInfo.CurrentMatch.Value?.Team1.Value)
+                        {
+                            RelativeSizeAxes = Axes.None,
+                            Width = 300,
+                            Anchor = Anchor.TopLeft,
+                            Origin = Anchor.TopLeft,
+                        },
+                        new TournamentMatchChatDisplay(cornerRadius: 10)
+                        {
+                            RelativeSizeAxes = Axes.None,
+                            Height = sideListHeight - team1List.GetHeight() - 10,
+                            Width = 300,
+                            Anchor = Anchor.TopLeft,
+                            Origin = Anchor.TopLeft,
+                            Margin = new MarginPadding { Top = 10 },
+                        },
+                    },
+                },
+                new FillFlowContainer
+                {
+                    Anchor = Anchor.TopRight,
+                    Origin = Anchor.TopRight,
+                    RelativeSizeAxes = Axes.None,
+                    Position = new Vector2(-30, 110),
+                    Width = 320,
+                    Height = sideListHeight,
+                    Direction = FillDirection.Vertical,
+                    Children = new Drawable[]
+                    {
+                        team2List = new DrawableTeamPlayerList(LadderInfo.CurrentMatch.Value?.Team2.Value)
+                        {
+                            RelativeSizeAxes = Axes.None,
+                            Width = 300,
+                            Anchor = Anchor.TopRight,
+                            Origin = Anchor.TopRight,
+                        },
+                        // A single Box for livestream danmakus.
+                        // Wrapped in a container for round corners.
+                        new EmptyBox(cornerRadius: 10)
+                        {
+                            Anchor = Anchor.TopRight,
+                            Origin = Anchor.TopRight,
+                            RelativeSizeAxes = Axes.None,
+                            Width = 300,
+                            Height = sideListHeight - team2List.GetHeight() - 10,
+                            Margin = new MarginPadding { Top = 10 },
+                            Colour = Color4.Black,
+                            Alpha = 0.7f,
+                        },
+                    },
+                },
                 mapFlows = new FillFlowContainer<FillFlowContainer<EXBoardBeatmapPanel>>
                 {
-                    Y = 160,
+                    Y = 30,
                     Spacing = new Vector2(10, 10),
                     Direction = FillDirection.Vertical,
                     RelativeSizeAxes = Axes.X,
@@ -237,7 +304,7 @@ namespace osu.Game.Tournament.Screens.Board
                         mapFlows.Add(currentFlow = new FillFlowContainer<EXBoardBeatmapPanel>
                         {
                             Spacing = new Vector2(10, 10),
-                            Direction = FillDirection.Full,
+                            Direction = FillDirection.Vertical,
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y
                         });

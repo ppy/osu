@@ -6,7 +6,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Framework.Threading;
 using osu.Game.Graphics.UserInterface;
@@ -66,6 +65,7 @@ namespace osu.Game.Tournament.Screens.Board
                 new MatchHeader
                 {
                     ShowScores = true,
+                    ShowRound = false,
                 },
                 new FillFlowContainer
                 {
