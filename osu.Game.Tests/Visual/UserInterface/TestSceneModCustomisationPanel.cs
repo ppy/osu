@@ -51,22 +51,22 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddStep("set DT", () =>
             {
                 SelectedMods.Value = new[] { new OsuModDoubleTime() };
-                panel.Enabled.Value = panel.Expanded.Value = true;
+                panel.Enabled.Value = panel.Expanded = true;
             });
             AddStep("set DA", () =>
             {
                 SelectedMods.Value = new Mod[] { new OsuModDifficultyAdjust() };
-                panel.Enabled.Value = panel.Expanded.Value = true;
+                panel.Enabled.Value = panel.Expanded = true;
             });
             AddStep("set FL+WU+DA+AD", () =>
             {
                 SelectedMods.Value = new Mod[] { new OsuModFlashlight(), new ModWindUp(), new OsuModDifficultyAdjust(), new OsuModApproachDifferent() };
-                panel.Enabled.Value = panel.Expanded.Value = true;
+                panel.Enabled.Value = panel.Expanded = true;
             });
             AddStep("set empty", () =>
             {
                 SelectedMods.Value = Array.Empty<Mod>();
-                panel.Enabled.Value = panel.Expanded.Value = false;
+                panel.Enabled.Value = panel.Expanded = false;
             });
         }
 
@@ -77,11 +77,11 @@ namespace osu.Game.Tests.Visual.UserInterface
             {
                 AddStep("hover header", () => InputManager.MoveMouseTo(header));
 
-                AddAssert("not expanded", () => !panel.Expanded.Value);
+                AddAssert("not expanded", () => !panel.Expanded);
 
                 AddStep("hover content", () => InputManager.MoveMouseTo(content));
 
-                AddAssert("neither expanded", () => !panel.Expanded.Value);
+                AddAssert("neither expanded", () => !panel.Expanded);
 
                 AddStep("left from content", () => InputManager.MoveMouseTo(Vector2.One));
             }
@@ -96,40 +96,40 @@ namespace osu.Game.Tests.Visual.UserInterface
             {
                 AddStep("hover header", () => InputManager.MoveMouseTo(header));
 
-                AddAssert("expanded", () => panel.Expanded.Value);
+                AddAssert("expanded", () => panel.Expanded);
 
                 AddStep("hover content", () => InputManager.MoveMouseTo(content));
 
-                AddAssert("still expanded", () => panel.Expanded.Value);
+                AddAssert("still expanded", () => panel.Expanded);
             }
 
             // Will collapse when mouse left from content
             {
                 AddStep("left from content", () => InputManager.MoveMouseTo(Vector2.One));
 
-                AddAssert("not expanded", () => !panel.Expanded.Value);
+                AddAssert("not expanded", () => !panel.Expanded);
             }
 
             // Will collapse when mouse left from header
             {
                 AddStep("hover header", () => InputManager.MoveMouseTo(header));
 
-                AddAssert("expanded", () => panel.Expanded.Value);
+                AddAssert("expanded", () => panel.Expanded);
 
                 AddStep("left from header", () => InputManager.MoveMouseTo(Vector2.One));
 
-                AddAssert("not expanded", () => !panel.Expanded.Value);
+                AddAssert("not expanded", () => !panel.Expanded);
             }
 
             // Not collapse when mouse left if not expanded by hovering
             {
-                AddStep("expand not by hovering", () => panel.Expanded.Value = true);
+                AddStep("expand not by hovering", () => panel.Expanded = true);
 
                 AddStep("hover content", () => InputManager.MoveMouseTo(content));
 
                 AddStep("moust left", () => InputManager.MoveMouseTo(Vector2.One));
 
-                AddAssert("still expanded", () => panel.Expanded.Value);
+                AddAssert("still expanded", () => panel.Expanded);
             }
         }
     }

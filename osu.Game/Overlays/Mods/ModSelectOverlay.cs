@@ -237,7 +237,7 @@ namespace osu.Game.Overlays.Mods
                 ActiveMods.Value = ComputeActiveMods();
             }, true);
 
-            customisationPanel.Expanded.BindValueChanged(_ => updateCustomisationVisualState(), true);
+            customisationPanel.ExpandedState.BindValueChanged(_ => updateCustomisationVisualState(), true);
 
             SearchTextBox.Current.BindValueChanged(query =>
             {
@@ -368,18 +368,18 @@ namespace osu.Game.Overlays.Mods
                 customisationPanel.Enabled.Value = true;
 
                 if (anyModPendingConfiguration)
-                    customisationPanel.Expanded.Value = true;
+                    customisationPanel.Expanded = true;
             }
             else
             {
-                customisationPanel.Expanded.Value = false;
+                customisationPanel.Expanded = false;
                 customisationPanel.Enabled.Value = false;
             }
         }
 
         private void updateCustomisationVisualState()
         {
-            if (customisationPanel.Expanded.Value)
+            if (customisationPanel.Expanded)
             {
                 columnScroll.FadeColour(OsuColour.Gray(0.5f), 400, Easing.OutQuint);
                 SearchTextBox.FadeColour(OsuColour.Gray(0.5f), 400, Easing.OutQuint);
@@ -544,7 +544,7 @@ namespace osu.Game.Overlays.Mods
                     nonFilteredColumnCount += 1;
             }
 
-            customisationPanel.Expanded.Value = false;
+            customisationPanel.Expanded = false;
         }
 
         #endregion
@@ -571,7 +571,7 @@ namespace osu.Game.Overlays.Mods
                 // wherein activating the binding will both change the contents of the search text box and deselect all mods.
                 case GlobalAction.DeselectAllMods:
                 {
-                    if (!SearchTextBox.HasFocus && !customisationPanel.Expanded.Value)
+                    if (!SearchTextBox.HasFocus && !customisationPanel.Expanded)
                     {
                         DisplayedFooterContent?.DeselectAllModsButton?.TriggerClick();
                         return true;
@@ -637,7 +637,7 @@ namespace osu.Game.Overlays.Mods
             if (e.Repeat || e.Key != Key.Tab)
                 return false;
 
-            if (customisationPanel.Expanded.Value)
+            if (customisationPanel.Expanded)
                 return true;
 
             // TODO: should probably eventually support typical platform search shortcuts (`Ctrl-F`, `/`)
