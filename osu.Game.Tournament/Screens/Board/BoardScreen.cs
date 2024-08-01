@@ -6,6 +6,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Framework.Threading;
 using osu.Game.Graphics.UserInterface;
@@ -23,6 +24,8 @@ namespace osu.Game.Tournament.Screens.Board
     public partial class BoardScreen : TournamentMatchScreen
     {
         private FillFlowContainer<FillFlowContainer<BoardBeatmapPanel>> mapFlows = null!;
+
+        private readonly Bindable<TournamentMatch?> currentMatch = new Bindable<TournamentMatch?>();
 
         [Resolved]
         private TournamentSceneManager? sceneManager { get; set; }
@@ -43,6 +46,11 @@ namespace osu.Game.Tournament.Screens.Board
         private OsuButton buttonBlueTrap = null!;
         private OsuButton buttonDraw = null!;
 
+        private DrawableTeamPlayerList team1List = null!;
+        private DrawableTeamPlayerList team2List = null!;
+
+        private readonly int sideListHeight = 660;
+
         private ScheduledDelegate? scheduledScreenChange;
 
         [BackgroundDependencyLoader]
@@ -59,13 +67,67 @@ namespace osu.Game.Tournament.Screens.Board
                 {
                     ShowScores = true,
                 },
-                new TournamentMatchChatDisplay(cornerRadius: 10)
+                new FillFlowContainer
                 {
+                    Anchor = Anchor.TopLeft,
+                    Origin = Anchor.TopLeft,
                     RelativeSizeAxes = Axes.None,
-                    Height = 400,
-                    Width = 600,
-                    Origin = Anchor.CentreLeft,
-                    Position = new Vector2(30, -350),
+                    Position = new Vector2(30, 110),
+                    Width = 320,
+                    Height = sideListHeight,
+                    Direction = FillDirection.Vertical,
+                    Children = new Drawable[]
+                    {
+                        team1List = new DrawableTeamPlayerList(LadderInfo.CurrentMatch.Value?.Team1.Value)
+                        {
+                            RelativeSizeAxes = Axes.None,
+                            Width = 300,
+                            Anchor = Anchor.TopLeft,
+                            Origin = Anchor.TopLeft,
+                        },
+                        new TournamentMatchChatDisplay(cornerRadius: 10)
+                        {
+                            RelativeSizeAxes = Axes.None,
+                            Height = sideListHeight - team1List.GetHeight() - 10,
+                            Width = 300,
+                            Anchor = Anchor.TopLeft,
+                            Origin = Anchor.TopLeft,
+                            Margin = new MarginPadding { Top = 10 },
+                        },
+                    },
+                },
+                new FillFlowContainer
+                {
+                    Anchor = Anchor.TopRight,
+                    Origin = Anchor.TopRight,
+                    RelativeSizeAxes = Axes.None,
+                    Position = new Vector2(-30, 110),
+                    Width = 320,
+                    Height = sideListHeight,
+                    Direction = FillDirection.Vertical,
+                    Children = new Drawable[]
+                    {
+                        team2List = new DrawableTeamPlayerList(LadderInfo.CurrentMatch.Value?.Team2.Value)
+                        {
+                            RelativeSizeAxes = Axes.None,
+                            Width = 300,
+                            Anchor = Anchor.TopRight,
+                            Origin = Anchor.TopRight,
+                        },
+                        // A single Box for livestream danmakus.
+                        // Wrapped in a container for round corners.
+                        new EmptyBox(cornerRadius: 10)
+                        {
+                            Anchor = Anchor.TopRight,
+                            Origin = Anchor.TopRight,
+                            RelativeSizeAxes = Axes.None,
+                            Width = 300,
+                            Height = sideListHeight - team2List.GetHeight() - 10,
+                            Margin = new MarginPadding { Top = 10 },
+                            Colour = Color4.Black,
+                            Alpha = 0.7f,
+                        },
+                    },
                 },
                 mapFlows = new FillFlowContainer<FillFlowContainer<BoardBeatmapPanel>>
                 {
@@ -73,8 +135,8 @@ namespace osu.Game.Tournament.Screens.Board
                     Origin = Anchor.Centre,
                     // RelativeSizeAxes = Axes.Both,
                     Direction = FillDirection.Vertical,
-                    X = 300,
-                    Y = -270,
+                    X = 0,
+                    Y = -350,
                     Height = 1f,
                     Width = 900,
                     Padding = new MarginPadding{ Left = 50 },
