@@ -999,7 +999,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddStep("press mouse", () => InputManager.PressButton(MouseButton.Left));
             AddAssert("search still not focused", () => !this.ChildrenOfType<ShearedSearchTextBox>().Single().HasFocus);
             AddStep("release mouse", () => InputManager.ReleaseButton(MouseButton.Left));
-            AddAssert("customisation panel closed by click", () => !this.ChildrenOfType<ModCustomisationPanel>().Single().Expanded.Value);
+            AddAssert("customisation panel closed by click", () => !this.ChildrenOfType<ModCustomisationPanel>().Single().Expanded);
 
             if (textSearchStartsActive)
                 AddAssert("search focused", () => this.ChildrenOfType<ShearedSearchTextBox>().Single().HasFocus);
@@ -1022,7 +1022,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         private void assertCustomisationToggleState(bool disabled, bool active)
         {
             AddUntilStep($"customisation panel is {(disabled ? "" : "not ")}disabled", () => modSelectOverlay.ChildrenOfType<ModCustomisationPanel>().Single().Enabled.Value == !disabled);
-            AddAssert($"customisation panel is {(active ? "" : "not ")}active", () => modSelectOverlay.ChildrenOfType<ModCustomisationPanel>().Single().Expanded.Value == active);
+            AddAssert($"customisation panel is {(active ? "" : "not ")}active", () => modSelectOverlay.ChildrenOfType<ModCustomisationPanel>().Single().Expanded == active);
         }
 
         private T getSelectedMod<T>() where T : Mod => SelectedMods.Value.OfType<T>().Single();

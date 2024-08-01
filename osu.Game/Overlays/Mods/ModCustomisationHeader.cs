@@ -14,6 +14,7 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osuTK;
 using osu.Game.Localisation;
+using static osu.Game.Overlays.Mods.ModCustomisationPanel;
 
 namespace osu.Game.Overlays.Mods
 {
@@ -27,14 +28,13 @@ namespace osu.Game.Overlays.Mods
 
         protected override IEnumerable<Drawable> EffectTargets => new[] { background };
 
-        public readonly BindableBool Expanded = new BindableBool();
+        public readonly Bindable<ModCustomisationPanelState> ExpandedState = new Bindable<ModCustomisationPanelState>(ModCustomisationPanelState.Collapsed);
 
         private readonly ModCustomisationPanel panel;
 
         public ModCustomisationHeader(ModCustomisationPanel panel)
         {
             this.panel = panel;
-            Action = Expanded.Toggle;
             Enabled.Value = false;
         }
 
@@ -90,10 +90,24 @@ namespace osu.Game.Overlays.Mods
                     : ModSelectOverlayStrings.CustomisationPanelDisabledReason;
             }, true);
 
-            Expanded.BindValueChanged(v =>
+            ExpandedState.BindValueChanged(v =>
             {
-                icon.ScaleTo(v.NewValue ? new Vector2(1, -1) : Vector2.One, 300, Easing.OutQuint);
+                icon.ScaleTo(v.NewValue > ModCustomisationPanelState.Collapsed ? new Vector2(1, -1) : Vector2.One, 300, Easing.OutQuint);
             }, true);
+        }
+
+        protected override bool OnClick(ClickEvent e)
+        {
+            if (Enabled.Value)
+            {
+                ExpandedState.Value = ExpandedState.Value switch
+                {
+                    ModCustomisationPanelState.Collapsed => ModCustomisationPanelState.Expanded,
+                    _ => ModCustomisationPanelState.Collapsed
+                };
+            }
+
+            return base.OnClick(e);
         }
 
         private bool touchedThisFrame;
@@ -114,7 +128,7 @@ namespace osu.Game.Overlays.Mods
             if (Enabled.Value)
             {
                 if (!touchedThisFrame)
-                    panel.UpdateHoverExpansion(true);
+                    panel.UpdateHoverExpansion(ModCustomisationPanelState.ExpandedByHover);
             }
 
             return base.OnHover(e);
