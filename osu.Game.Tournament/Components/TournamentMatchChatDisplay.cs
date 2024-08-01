@@ -93,6 +93,9 @@ namespace osu.Game.Tournament.Components
             public MatchMessage(Message message, LadderInfo info)
                 : base(message)
             {
+                // Disable line background alternating, see https://github.com/ppy/osu/pull/29137
+                AlternatingBackground = false;
+
                 if (info.CurrentMatch.Value is TournamentMatch match)
                 {
                     if (match.Team1.Value?.Players.Any(u => u.OnlineID == Message.Sender.OnlineID) == true)
