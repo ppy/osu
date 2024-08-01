@@ -100,11 +100,19 @@ namespace osu.Game.Skinning.Components
 
             ruleset = game.Ruleset.GetBoundCopy();
 
-            Attribute.BindValueChanged(_ => updateAll());
             Template.BindValueChanged(_ => updateLabel());
+            Attribute.BindValueChanged(_ =>
+            {
+                updateBindableDifficulty();
+                updateAll();
+            });
 
             ruleset.BindValueChanged(_ => updateAll());
-            beatmap.BindValueChanged(_ => updateAll());
+            beatmap.BindValueChanged(_ =>
+            {
+                updateBindableDifficulty();
+                updateAll();
+            });
 
             mods.BindValueChanged(_ =>
             {
@@ -142,13 +150,12 @@ namespace osu.Game.Skinning.Components
 
         protected override void SetFont(FontUsage font) => text.Font = font.With(size: 40);
 
-        // This function will update only necessary info
+        // This function will update only necessary info. DON'T update bindable difficulty to avoid excessive bindable creations.
         private void updateAll()
         {
             updateMetadata();
             updateBeatmapDifficultyAttributes();
             updateTimingData();
-            updateBindableDifficulty();
             updateLabel();
         }
 
