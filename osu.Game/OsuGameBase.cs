@@ -476,6 +476,10 @@ namespace osu.Game
             AddFont(Resources, @"Fonts/Venera/Venera-Bold");
             AddFont(Resources, @"Fonts/Venera/Venera-Black");
 
+            AddFont(Resources, @"Fonts/HarmonyOSSans/HarmonyOSSans-Regular");
+            AddFont(Resources, @"Fonts/HarmonyOSSans/HarmonyOSSans-Medium");
+            AddFont(Resources, @"Fonts/HarmonyOSSans/HarmonyOSSans-Bold");
+
             Fonts.AddStore(new OsuIcon.OsuIconStore(Textures));
         }
 
