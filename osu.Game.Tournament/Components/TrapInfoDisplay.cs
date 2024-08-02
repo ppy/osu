@@ -62,7 +62,9 @@ namespace osu.Game.Tournament.Components
                         Anchor = Anchor.CentreLeft,
                         Origin = Anchor.CentreLeft,
                         Direction = FillDirection.Vertical,
-                        // Margin = new MarginPadding { Left = 25 },
+
+                        // Add Margin to the bottom inorder to let Trap messages fit in the box.
+                        Margin = new MarginPadding { Bottom = 12 },
                         Children = new Drawable[]
                         {
                             new TournamentSpriteText
