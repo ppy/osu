@@ -28,6 +28,8 @@ namespace osu.Game.Graphics
 
         public static FontUsage Inter => GetFont(Typeface.Inter, weight: FontWeight.Regular);
 
+        public static FontUsage HarmonyOSSans => GetFont(Typeface.HarmonyOSSans, weight: FontWeight.Regular);
+
         /// <summary>
         /// Retrieves a <see cref="FontUsage"/>.
         /// </summary>
@@ -70,6 +72,9 @@ namespace osu.Game.Graphics
 
                 case Typeface.Inter:
                     return @"Inter";
+
+                case Typeface.HarmonyOSSans:
+                    return @"HarmonyOSSans";
             }
 
             return null;
@@ -120,6 +125,7 @@ namespace osu.Game.Graphics
         [Description("Torus (alternate)")]
         TorusAlternate,
         Inter,
+        HarmonyOSSans,
     }
 
     public enum FontWeight
