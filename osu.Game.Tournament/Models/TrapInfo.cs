@@ -70,6 +70,13 @@ namespace osu.Game.Tournament.Models
                     icon.Colour = new OsuColour().Pink1;
                     break;
 
+                case TrapType.Unused:
+                    name = @"陷阱无效";
+                    description = @"布置方触发了陷阱，将不会生效。";
+                    icon.Icon = FontAwesome.Solid.Check;
+                    icon.Colour = Color4.White;
+                    break;
+
                 default:
                     name = @"Unknown Trap";
                     description = @"We don't know this one.";
@@ -125,6 +132,10 @@ namespace osu.Game.Tournament.Models
         /// Perform an 1v1 play, with each player having at least one mod on (including the one bundled with the map).
         /// </summary>
         Solo,
+        /// <summary>
+        /// The trap has no effect.
+        /// </summary>
+        Unused,
         /// <summary>
         /// Placeholder for unimplemented or empty traps.
         /// </summary>

@@ -192,11 +192,10 @@ namespace osu.Game.Tournament.Screens.Board
             pickType = choiceType;
 
             buttonPick.Colour = setColour(pickColour == TeamColour.Neutral && pickType == ChoiceType.Pick);
-            buttonRedWin.Colour = setWin(pickColour == TeamColour.Red && pickType == ChoiceType.RedWin);
-            buttonBlueWin.Colour = setWin(pickColour == TeamColour.Blue && pickType == ChoiceType.BlueWin);
+            buttonRedWin.Colour = setColour(pickColour == TeamColour.Red && pickType == ChoiceType.RedWin);
+            buttonBlueWin.Colour = setColour(pickColour == TeamColour.Blue && pickType == ChoiceType.BlueWin);
 
             static Color4 setColour(bool active) => active ? Color4.White : Color4.Gray;
-            static Color4 setWin(bool active) => active ? Color4.White : Color4.Gray;
         }
 
         protected override bool OnMouseDown(MouseDownEvent e)
@@ -227,6 +226,11 @@ namespace osu.Game.Tournament.Screens.Board
         private void reset()
         {
             CurrentMatch.Value?.PicksBans.Clear();
+
+            // Reset buttons
+            buttonPick.Colour = Color4.White;
+            buttonBlueWin.Colour = Color4.White;
+            buttonRedWin.Colour = Color4.White;
         }
 
         private void addForBeatmap(int beatmapId)
@@ -238,9 +242,12 @@ namespace osu.Game.Tournament.Screens.Board
                 // don't attempt to add if the beatmap isn't in our pool
                 return;
 
+            // In EX stage, just remove any existing marks before adding a new one.
             if (CurrentMatch.Value.PicksBans.Any(p => p.BeatmapID == beatmapId))
-                // don't attempt to add if already exists.
-                return;
+            {
+                var existing = CurrentMatch.Value.PicksBans.FirstOrDefault(p => p.BeatmapID == beatmapId);
+                CurrentMatch.Value.PicksBans.Remove(existing);
+            }
 
             CurrentMatch.Value.PicksBans.Add(new BeatmapChoice
             {
