@@ -6,12 +6,14 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Framework.Threading;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Tournament.Components;
 using osu.Game.Tournament.IPC;
 using osu.Game.Tournament.Models;
+using osu.Game.Tournament.Screens.Board.Components;
 using osu.Game.Tournament.Screens.Gameplay;
 using osu.Game.Tournament.Screens.Gameplay.Components;
 using osuTK;
@@ -43,6 +45,8 @@ namespace osu.Game.Tournament.Screens.Board
         private OsuButton buttonBlueWin = null!;
         private OsuButton buttonRedTrap = null!;
         private OsuButton buttonBlueTrap = null!;
+
+        private TrapTypeDropdown trapTypeDropdown = null!;
 
         private DrawableTeamPlayerList team1List = null!;
         private DrawableTeamPlayerList team2List = null!;
@@ -224,6 +228,8 @@ namespace osu.Game.Tournament.Screens.Board
                             BackgroundColour = TournamentGame.COLOUR_BLUE,
                             Action = () => setMode(TeamColour.Blue, ChoiceType.BlueWin)
                         },
+                        new ControlPanel.Spacer(),
+                        trapTypeDropdown = new TrapTypeDropdown(),
                         buttonRedTrap = new TourneyButton
                         {
                             RelativeSizeAxes = Axes.X,
@@ -331,10 +337,10 @@ namespace osu.Game.Tournament.Screens.Board
                 if (e.Button == MouseButton.Left && map.Beatmap?.OnlineID > 0)
                 {
                     // Handle updating status to Red/Blue Win
-                    if (pickType == ChoiceType.RedWin || pickType == ChoiceType.BlueWin)
+                    if (isPickWin)
                     {
                         var existing = CurrentMatch.Value?.PicksBans.FirstOrDefault(p => p.BeatmapID == map.Beatmap?.OnlineID);
-                        CurrentMatch.Value?.PicksBans.Remove(existing);
+                        if (existing != null) CurrentMatch.Value?.PicksBans.Remove(existing);
                         updateWinStatusForBeatmap(map.Beatmap.OnlineID);
                     }
                     else
@@ -350,6 +356,13 @@ namespace osu.Game.Tournament.Screens.Board
                     {
                         CurrentMatch.Value?.PicksBans.Remove(existing);
                         // setNextMode();
+                    }
+                    else
+                    {
+                        var existingProtect = CurrentMatch.Value?.Protects.FirstOrDefault(p => p.BeatmapID == map.Beatmap?.OnlineID);
+                        var existingTrap = CurrentMatch.Value?.Traps.FirstOrDefault(p => p.BeatmapID == map.Beatmap?.OnlineID);
+                        if (existingProtect != null) CurrentMatch.Value?.Protects.Remove(existingProtect);
+                        if (existingTrap != null) CurrentMatch.Value?.Traps.Remove(existingTrap);
                     }
                 }
 
@@ -382,8 +395,12 @@ namespace osu.Game.Tournament.Screens.Board
         private void reset()
         {
             CurrentMatch.Value?.PicksBans.Clear();
+            CurrentMatch.Value?.Protects.Clear();
+            CurrentMatch.Value?.Traps.Clear();
             //setNextMode();
         }
+
+        private bool isPickWin => pickType == ChoiceType.RedWin || pickType == ChoiceType.BlueWin;
 
         private void addForBeatmap(int beatmapId)
         {
@@ -394,16 +411,45 @@ namespace osu.Game.Tournament.Screens.Board
                 // don't attempt to add if the beatmap isn't in our pool
                 return;
 
-            if (CurrentMatch.Value.PicksBans.Any(p => p.BeatmapID == beatmapId && (p.Type != ChoiceType.RedWin && p.Type != ChoiceType.BlueWin)))
-                // don't attempt to add if already exists and it's not a win type.
+            if (CurrentMatch.Value.PicksBans.Any(p => p.BeatmapID == beatmapId && (p.Type == ChoiceType.Ban && !isPickWin)))
+                // don't attempt to add if already banned and it's not a win type.
                 return;
 
-            CurrentMatch.Value.PicksBans.Add(new BeatmapChoice
+            if (CurrentMatch.Value.Protects.Any(p => p.BeatmapID == beatmapId && (pickType == ChoiceType.Ban || pickType == ChoiceType.Trap)))
+                // don't attempt to ban a protected map
+                return;
+
+            // Trap action specific
+            if (pickType == ChoiceType.Trap)
             {
-                Team = pickColour,
-                Type = pickType,
-                BeatmapID = beatmapId
-            });
+                CurrentMatch.Value.Traps.Add(new TrapInfo
+                {
+                    Team = pickColour,
+                    Mode = new TrapInfo().GetReversedType(trapTypeDropdown.Current.Value),
+                    BeatmapID = beatmapId
+                });
+            }
+
+            // Not to add a same map reference of the same type twice!
+            if (pickType == ChoiceType.Protect && !CurrentMatch.Value.Protects.Any(p => p.BeatmapID == beatmapId))
+            {
+                CurrentMatch.Value.Protects.Add(new BeatmapChoice
+                {
+                    Team = pickColour,
+                    Type = pickType,
+                    BeatmapID = beatmapId
+                });
+            }
+
+            if (!CurrentMatch.Value.PicksBans.Any(p => p.BeatmapID == beatmapId && p.Type == pickType))
+            {
+                CurrentMatch.Value.PicksBans.Add(new BeatmapChoice
+                {
+                    Team = pickColour,
+                    Type = pickType,
+                    BeatmapID = beatmapId
+                });
+            }
 
             // setNextMode(); // Uncomment if you still want to automatically set the next mode
 

@@ -2,15 +2,12 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Graphics;
-using osu.Game.Rulesets;
 using osuTK.Graphics;
 
 namespace osu.Game.Tournament.Models
@@ -35,10 +32,16 @@ namespace osu.Game.Tournament.Models
             Colour = Color4.White,
         };
 
-        private LocalisableString name;
-        private LocalisableString description;
+        private LocalisableString name = string.Empty;
+        private LocalisableString description = string.Empty;
 
-        public TrapInfo(TeamColour colour, TrapType type, int mapID)
+        /// <summary>
+        /// A constructor to set up an instance of <see cref="TrapInfo"/>.
+        /// </summary>
+        /// <param name="colour">The team which set the trap (if exists).</param>
+        /// <param name="type">The trap type (see <see cref="TrapType"/> for available values).</param>
+        /// <param name="mapID">The beatmap ID which the trap is set on.</param>
+        public TrapInfo(TeamColour colour = TeamColour.Neutral, TrapType type = TrapType.Unknown, int mapID = 0)
         {
             Team = colour;
             Mode = type;
@@ -78,14 +81,53 @@ namespace osu.Game.Tournament.Models
         public LocalisableString Description => description;
         public IconUsage Icon => icon.Icon;
         public ColourInfo IconColor => icon.Colour;
+
+        /// <summary>
+        /// Get the original trap type based on a string.
+        /// The string should exactly match the name of the trap.
+        /// </summary>
+        /// <param name="typeString">A <see cref="LocalisableString"/>, the string to handle</param>
+        /// <returns>A <see cref="TrapType"/>, representing the trap type</returns>
+        public TrapType GetReversedType(LocalisableString typeString)
+        {
+            switch (typeString.ToString())
+            {
+                case @"决一死战":
+                    return TrapType.Solo;
+
+                case @"大陆漂移":
+                    return TrapType.Swap;
+
+                case @"时空之门":
+                    return TrapType.Follow;
+
+                default:
+                    return TrapType.Unknown;
+            }
+        }
     }
 
+    /// <summary>
+    /// Lists out all available trap types.
+    /// </summary>
     [JsonConverter(typeof(StringEnumConverter))]
     public enum TrapType
     {
+        /// <summary>
+        /// Gets extra chances to choose beatmaps.
+        /// </summary>
         Follow,
+        /// <summary>
+        /// Swap the specified map block with another after the current gameplay comes to an end.
+        /// </summary>
         Swap,
+        /// <summary>
+        /// Perform an 1v1 play, with each player having at least one mod on (including the one bundled with the map).
+        /// </summary>
         Solo,
+        /// <summary>
+        /// Placeholder for unimplemented or empty traps.
+        /// </summary>
         Unknown,
     }
 }

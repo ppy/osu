@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Specialized;
 using System.Linq;
+using ManagedBass.Fx;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.ObjectExtensions;
@@ -29,8 +30,6 @@ namespace osu.Game.Tournament.Components
         private readonly string mod;
 
         public const float HEIGHT = 150;
-
-        private const float CONTAINER_HEIGHT = 50;
 
         private readonly Bindable<TournamentMatch?> currentMatch = new Bindable<TournamentMatch?>();
 
@@ -174,9 +173,17 @@ namespace osu.Game.Tournament.Components
         private void matchChanged(ValueChangedEvent<TournamentMatch?> match)
         {
             if (match.OldValue != null)
+            {
                 match.OldValue.PicksBans.CollectionChanged -= picksBansOnCollectionChanged;
+                match.OldValue.Protects.CollectionChanged -= picksBansOnCollectionChanged;
+                match.OldValue.Traps.CollectionChanged -= picksBansOnCollectionChanged;
+            }
             if (match.NewValue != null)
+            {
                 match.NewValue.PicksBans.CollectionChanged += picksBansOnCollectionChanged;
+                match.NewValue.Protects.CollectionChanged += picksBansOnCollectionChanged;
+                match.NewValue.Traps.CollectionChanged += picksBansOnCollectionChanged;
+            }
 
             Scheduler.AddOnce(updateState);
         }
@@ -193,7 +200,18 @@ namespace osu.Game.Tournament.Components
                 return;
             }
 
+            bool isProtected = currentMatch.Value.Protects.Any(p => p.BeatmapID == Beatmap?.OnlineID);
+
+            bool isTrapped = currentMatch.Value.Traps.Any(p => p.BeatmapID == Beatmap?.OnlineID);
+
             var newChoice = currentMatch.Value.PicksBans.FirstOrDefault(p => p.BeatmapID == Beatmap?.OnlineID);
+
+            var nextPureChoice = newChoice;
+
+            if (isProtected) nextPureChoice = currentMatch.Value.PicksBans.FirstOrDefault(p => (p.BeatmapID == Beatmap?.OnlineID && p.Type != ChoiceType.Protect));
+            else if (isTrapped) nextPureChoice = currentMatch.Value.PicksBans.FirstOrDefault(p => (p.BeatmapID == Beatmap?.OnlineID && p.Type != ChoiceType.Trap));
+
+            newChoice = nextPureChoice ?? newChoice;
 
             bool shouldFlash = newChoice != choice;
 
@@ -213,18 +231,20 @@ namespace osu.Game.Tournament.Components
                 {
                     case ChoiceType.Pick:
                         Colour = Color4.White;
-                        Alpha = 0.7f;
+                        Alpha = 1f;
                         icon.Icon = FontAwesome.Solid.Check;
+                        icon.Colour = isProtected ? new OsuColour().Cyan : (isTrapped ? new OsuColour().Purple : Color4.White);
                         break;
 
                     case ChoiceType.Ban:
                         Colour = Color4.Gray;
                         Alpha = 0.3f;
                         icon.Icon = FontAwesome.Solid.Ban;
+                        icon.Colour = Color4.White;
                         break;
 
                     case ChoiceType.Protect:
-                        Alpha = 0.4f;
+                        Alpha = 0.8f;
                         icon.Icon = FontAwesome.Solid.Lock;
                         icon.Colour = new OsuColour().Cyan;
                         icon.Alpha = 1;
@@ -234,6 +254,7 @@ namespace osu.Game.Tournament.Components
                         Alpha = 1f;
                         icon.Icon = FontAwesome.Solid.Trophy;
                         icon.Colour = new OsuColour().Red;
+                        icon.Colour = isProtected ? new OsuColour().Pink : Color4.Red;
                         icon.Alpha = 0.73f; // Added this line to distinguish last win from other wins
                         break;
 
@@ -241,11 +262,12 @@ namespace osu.Game.Tournament.Components
                         Alpha = 1f;
                         icon.Icon = FontAwesome.Solid.Trophy;
                         icon.Colour = new OsuColour().Blue;
+                        icon.Colour = isProtected ? new OsuColour().Sky : Color4.Blue;
                         icon.Alpha = 0.73f; // Added this line to distinguish last win from other wins
                         break;
 
                     case ChoiceType.Trap:
-                        Alpha = 0.4f;
+                        Alpha = 0.7f;
                         icon.Icon = FontAwesome.Solid.ExclamationCircle;
                         icon.Colour = Color4.White;
                         icon.Alpha = 1;
