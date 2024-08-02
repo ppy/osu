@@ -6,10 +6,11 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osu.Framework.Threading;
+using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Overlays.Settings;
 using osu.Game.Tournament.Components;
 using osu.Game.Tournament.IPC;
 using osu.Game.Tournament.Models;
@@ -127,6 +128,76 @@ namespace osu.Game.Tournament.Screens.Board
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
                 },
+                new EmptyBox(cornerRadius: 10)
+                {
+                    Anchor = Anchor.BottomCentre,
+                    Origin = Anchor.BottomCentre,
+                    RelativeSizeAxes = Axes.None,
+                    Height = 80,
+                    Width = 500,
+                    Colour = Color4.Black,
+                    Margin = new MarginPadding { Bottom = 12 },
+                    Alpha = 0.7f,
+                },
+                new FillFlowContainer
+                {
+                    Anchor = Anchor.BottomCentre,
+                    Origin = Anchor.BottomCentre,
+                    RelativeSizeAxes = Axes.None,
+                    AutoSizeAxes = Axes.X,
+                    Y = -7,
+                    Height = 60,
+                    CornerRadius = 10,
+                    Margin = new MarginPadding { Bottom = 10 },
+                    Direction = FillDirection.Horizontal,
+                    AlwaysPresent = true,
+                    Children = new Drawable[]
+                    {
+                        new SpriteIcon
+                        {
+                            Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.CentreLeft,
+                            Icon = FontAwesome.Solid.Bolt,
+                            Colour = Color4.Orange,
+                            Size = new Vector2(36),
+                            Margin = new MarginPadding { Left = 12, Right = 12 },
+                        },
+                        new FillFlowContainer
+                        {
+                            Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.CentreLeft,
+                            AutoSizeAxes = Axes.X,
+                            RelativeSizeAxes = Axes.Y,
+                            Height = 0.9f,
+                            Direction = FillDirection.Vertical,
+                            Children = new Drawable[]
+                            {
+                                new TournamentSpriteText
+                                {
+                                    Anchor = Anchor.CentreLeft,
+                                    Origin = Anchor.CentreLeft,
+                                    Text = @"欢迎来到 EX 阶段",
+                                    Font = OsuFont.HarmonyOSSans.With(size: 32, weight: FontWeight.Bold),
+                                },
+                                new TournamentSpriteText
+                                {
+                                    Anchor = Anchor.CentreLeft,
+                                    Origin = Anchor.CentreLeft,
+                                    Text = @"从上到下依次循环进行，获胜方可更改任意格子颜色。",
+                                    Font = OsuFont.HarmonyOSSans.With(size: 20, weight: FontWeight.Regular),
+                                },
+                                new TournamentSpriteText
+                                {
+                                    Anchor = Anchor.CentreLeft,
+                                    Origin = Anchor.CentreLeft,
+                                    Text = @"可用棋盘获胜时将自动退出此状态。",
+                                    Colour = Color4.Orange,
+                                    Font = OsuFont.HarmonyOSSans.With(size: 20, weight: FontWeight.Regular),
+                                },
+                            },
+                        },
+                    },
+                },
                 new ControlPanel
                 {
                     Children = new Drawable[]
@@ -193,11 +264,10 @@ namespace osu.Game.Tournament.Screens.Board
             pickType = choiceType;
 
             buttonPick.Colour = setColour(pickColour == TeamColour.Neutral && pickType == ChoiceType.Pick);
-            buttonRedWin.Colour = setWin(pickColour == TeamColour.Red && pickType == ChoiceType.RedWin);
-            buttonBlueWin.Colour = setWin(pickColour == TeamColour.Blue && pickType == ChoiceType.BlueWin);
+            buttonRedWin.Colour = setColour(pickColour == TeamColour.Red && pickType == ChoiceType.RedWin);
+            buttonBlueWin.Colour = setColour(pickColour == TeamColour.Blue && pickType == ChoiceType.BlueWin);
 
             static Color4 setColour(bool active) => active ? Color4.White : Color4.Gray;
-            static Color4 setWin(bool active) => active ? Color4.White : Color4.Gray;
         }
 
         protected override bool OnMouseDown(MouseDownEvent e)
@@ -228,6 +298,11 @@ namespace osu.Game.Tournament.Screens.Board
         private void reset()
         {
             CurrentMatch.Value?.PicksBans.Clear();
+
+            // Reset buttons
+            buttonPick.Colour = Color4.White;
+            buttonBlueWin.Colour = Color4.White;
+            buttonRedWin.Colour = Color4.White;
         }
 
         private void addForBeatmap(int beatmapId)
@@ -239,9 +314,12 @@ namespace osu.Game.Tournament.Screens.Board
                 // don't attempt to add if the beatmap isn't in our pool
                 return;
 
+            // In EX stage, just remove any existing marks before adding a new one.
             if (CurrentMatch.Value.PicksBans.Any(p => p.BeatmapID == beatmapId))
-                // don't attempt to add if already exists.
-                return;
+            {
+                var existing = CurrentMatch.Value.PicksBans.FirstOrDefault(p => p.BeatmapID == beatmapId);
+                CurrentMatch.Value.PicksBans.Remove(existing);
+            }
 
             CurrentMatch.Value.PicksBans.Add(new BeatmapChoice
             {

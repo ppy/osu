@@ -1,23 +1,29 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Graphics;
 using osu.Framework.Allocation;
-using osu.Framework.Graphics.Colour;
 using osu.Framework.Extensions.Color4Extensions;
-using osuTK.Graphics;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Online.API.Requests.Responses;
-using osuTK;
-using osu.Game.Users.Drawables;
 using osu.Game.Graphics;
-using osu.Game.Tournament;
+using osu.Game.Online.API;
+using osu.Game.Online.API.Requests;
+using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Users;
+using osu.Game.Users.Drawables;
+using osuTK;
+using osuTK.Graphics;
 
-namespace osu.Game.Users
+namespace osu.Game.Tournament.Components
 {
     public partial class TeamPlayerCard : UserPanel
     {
-        private readonly APIUser? teamPlayer = null!;
+        private readonly APIUser? teamPlayer;
+        private FillFlowContainer details = null!;
+
+        [Resolved]
+        private IAPIProvider api { get; set; } = null!;
 
         public TeamPlayerCard(APIUser user)
             : base(user)
@@ -34,18 +40,44 @@ namespace osu.Game.Users
             Background.Origin = Anchor.CentreRight;
             Background.Anchor = Anchor.CentreRight;
             Background.Colour = ColourInfo.GradientHorizontal(Color4.White.Opacity(1), Color4.White.Opacity(0.8f));
+
+            var request = new GetUserRequest(User.Id);
+
+            request.Success += user =>
+            {
+                Scheduler.Add(() =>
+                {
+                    details.Children = new Drawable[]
+                    {
+                        new TournamentSpriteText
+                        {
+                            Anchor = Anchor.CentreRight,
+                            Origin = Anchor.CentreRight,
+                            Text = $"#{user.Statistics.GlobalRank}",
+                            Font = OsuFont.TorusAlternate.With(weight: FontWeight.Medium, size: 20),
+                        },
+                        new TournamentSpriteText
+                        {
+                            Anchor = Anchor.CentreRight,
+                            Origin = Anchor.CentreRight,
+                            Text = $"{user.Statistics.PP}pp",
+                            Font = OsuFont.TorusAlternate.With(weight: FontWeight.Medium, size: 15),
+                        }
+                    };
+                });
+            };
+
+            api.Queue(request);
         }
 
         protected override Drawable CreateLayout()
         {
-            FillFlowContainer details;
-
             var layout = new Container
             {
                 RelativeSizeAxes = Axes.Both,
                 Children = new Drawable[]
                 {
-                    details = new FillFlowContainer
+                    new FillFlowContainer
                     {
                         Anchor = Anchor.CentreLeft,
                         Origin = Anchor.CentreLeft,
@@ -78,7 +110,7 @@ namespace osu.Game.Users
                             })
                         }
                     },
-                    new FillFlowContainer
+                    details = new FillFlowContainer
                     {
                         Anchor = Anchor.CentreRight,
                         Origin = Anchor.CentreRight,
@@ -86,27 +118,10 @@ namespace osu.Game.Users
                         Direction = FillDirection.Vertical,
                         Spacing = new Vector2(10, 0),
                         Margin = new MarginPadding { Right = 10 },
-                        Children = new Drawable[]
-                        {
-                            new TournamentSpriteText
-                            {
-                                Anchor = Anchor.CentreRight,
-                                Origin = Anchor.CentreRight,
-                                Text = $"#{teamPlayer?.Statistics.GlobalRank}",
-                                Font = OsuFont.TorusAlternate.With(weight: FontWeight.Medium, size: 20),
-                            },
-                            /* The API won't return an available PP.
-                            new TournamentSpriteText
-                            {
-                                Anchor = Anchor.CentreRight,
-                                Origin = Anchor.CentreRight,
-                                Text = $"{teamPlayer?.Statistics.PP}pp",
-                                Font = OsuFont.TorusAlternate.With(weight: FontWeight.Medium, size: 15),
-                            }*/
-                        }
                     }
                 }
             };
+
             return layout;
         }
     }

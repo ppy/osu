@@ -32,8 +32,6 @@ namespace osu.Game.Tournament.Components
 
         public const float HEIGHT = 150;
 
-        private const float CONTAINER_HEIGHT = 50;
-
         private readonly Bindable<TournamentMatch?> currentMatch = new Bindable<TournamentMatch?>();
 
         private Box flash = null!;
@@ -186,9 +184,17 @@ namespace osu.Game.Tournament.Components
         private void matchChanged(ValueChangedEvent<TournamentMatch?> match)
         {
             if (match.OldValue != null)
+            {
                 match.OldValue.PicksBans.CollectionChanged -= picksBansOnCollectionChanged;
+                match.OldValue.Protects.CollectionChanged -= picksBansOnCollectionChanged;
+                match.OldValue.Traps.CollectionChanged -= picksBansOnCollectionChanged;
+            }
             if (match.NewValue != null)
+            {
                 match.NewValue.PicksBans.CollectionChanged += picksBansOnCollectionChanged;
+                match.NewValue.Protects.CollectionChanged += picksBansOnCollectionChanged;
+                match.NewValue.Traps.CollectionChanged += picksBansOnCollectionChanged;
+            }
 
             Scheduler.AddOnce(updateState);
         }
@@ -205,7 +211,18 @@ namespace osu.Game.Tournament.Components
                 return;
             }
 
+            bool isProtected = currentMatch.Value.Protects.Any(p => p.BeatmapID == Beatmap?.OnlineID);
+
+            bool isTrapped = currentMatch.Value.Traps.Any(p => p.BeatmapID == Beatmap?.OnlineID);
+
             var newChoice = currentMatch.Value.PicksBans.FirstOrDefault(p => p.BeatmapID == Beatmap?.OnlineID);
+
+            var nextPureChoice = newChoice;
+
+            if (isProtected) nextPureChoice = currentMatch.Value.PicksBans.FirstOrDefault(p => (p.BeatmapID == Beatmap?.OnlineID && p.Type != ChoiceType.Protect));
+            else if (isTrapped) nextPureChoice = currentMatch.Value.PicksBans.FirstOrDefault(p => (p.BeatmapID == Beatmap?.OnlineID && p.Type != ChoiceType.Trap));
+
+            newChoice = nextPureChoice ?? newChoice;
 
             bool shouldFlash = newChoice != choice;
 

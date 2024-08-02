@@ -39,7 +39,7 @@ namespace osu.Game.Tournament.Components
         public TournamentBeatmapPanel(IBeatmapInfo? beatmap, string mod = "", string index = "")
         {
             Beatmap = beatmap;
-            this.modIndex = index;
+            modIndex = index;
             this.mod = mod;
 
             Width = 400;
