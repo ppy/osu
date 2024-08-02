@@ -25,8 +25,9 @@ namespace osu.Game.Tournament.Screens.Gameplay
 
         public readonly Bindable<TourneyState> State = new Bindable<TourneyState>();
         private LabelledSwitchButton warmupToggle = null!;
-        private LabelledSwitchButton chatToggle = null!;
-
+        private TourneyButton chatToggle = null!;
+        // private SettingsSlider<float> redMultiplier = null!;
+        // private SettingsSlider<float> blueMultiplier = null!;
         private MatchIPCInfo ipc = null!;
 
         [Resolved]
@@ -103,11 +104,11 @@ namespace osu.Game.Tournament.Screens.Gameplay
                             Label = "Warmup stage",
                             Current = warmup,
                         },
-                        chatToggle = new LabelledSwitchButton
+                        chatToggle = new TourneyButton
                         {
                             RelativeSizeAxes = Axes.X,
-                            Label = "Show chat",
-                            Current = { Value = State.Value == TourneyState.Idle }
+                            Text = "Toggle chat",
+                            Action = () => { State.Value = State.Value == TourneyState.Idle ? TourneyState.Playing : TourneyState.Idle; }
                         },
                         new SettingsSlider<int>
                         {
@@ -121,6 +122,22 @@ namespace osu.Game.Tournament.Screens.Gameplay
                             Current = LadderInfo.PlayersPerTeam,
                             KeyboardStep = 1,
                         },
+                        
+                        /* Experimental feature for Live score calculation! See https://github.com/CloneWith/osu/issues/2
+                        
+                        redMultiplier = new SettingsSlider<float>
+                        {
+                            LabelText = "Red score multiplier",
+                            Current = LadderInfo.RedMultiplier,
+                            KeyboardStep = 0.1f,
+                        },
+                        blueMultiplier = new SettingsSlider<float>
+                        {
+                            LabelText = "Blue score multiplier",
+                            Current = LadderInfo.BlueMultiplier,
+                            KeyboardStep = 0.1f,
+                        },
+                        */
                     }
                 }
             });
@@ -131,13 +148,6 @@ namespace osu.Game.Tournament.Screens.Gameplay
             {
                 header.ShowScores = !w.NewValue;
             }, true);
-        }
-
-        private void updateChat()
-        {
-            State.Value = chatToggle.Current.Value ? TourneyState.Idle : TourneyState.Playing;
-            updateState();
-            chatToggle.Current.Value = State.Value == TourneyState.Idle;
         }
 
         private void updateWarmup()
@@ -152,7 +162,6 @@ namespace osu.Game.Tournament.Screens.Gameplay
             base.LoadComplete();
 
             warmupToggle.Current.BindValueChanged(_ => updateWarmup(), true);
-            chatToggle.Current.BindValueChanged(_ => updateChat());
 
             State.BindTo(ipc.State);
             State.BindValueChanged(_ => updateState(), true);

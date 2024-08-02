@@ -10,6 +10,9 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Online.API.Requests.Responses;
 using osuTK;
 using osu.Game.Overlays.Profile.Header.Components;
+using osu.Game.Graphics.Sprites;
+using osu.Framework.Extensions.LocalisationExtensions;
+using osu.Game.Graphics;
 
 namespace osu.Game.Users
 {
@@ -31,6 +34,31 @@ namespace osu.Game.Users
             Background.Origin = Anchor.CentreRight;
             Background.Anchor = Anchor.CentreRight;
             Background.Colour = BackgroundColour;
+        }
+
+        protected new OsuSpriteText CreateUserrank()
+        {
+            // Assuming statistics is a property of APIUser and contains the necessary rank information
+            var globalRank = User.Statistics?.GlobalRank.ToLocalisableString("\\##,##0") ?? "-";
+
+            return new OsuSpriteText
+            {
+                Font = OsuFont.GetFont(size: 16, weight: FontWeight.Bold),
+                Shadow = false,
+                Text = globalRank
+            };
+        }
+
+        protected OsuSpriteText CreateUserPP()
+        {
+            string performance = User.Statistics?.PP?.ToString("N0") ?? "-";
+
+            return new OsuSpriteText
+            {
+                Font = OsuFont.GetFont(size: 16, weight: FontWeight.Bold),
+                Shadow = false,
+                Text = performance
+            };
         }
 
         protected override Drawable CreateLayout()
@@ -56,11 +84,7 @@ namespace osu.Game.Users
                                 avatar.Anchor = Anchor.CentreLeft;
                                 avatar.Origin = Anchor.CentreLeft;
                                 avatar.Size = new Vector2(40);
-                            }),
-                            CreateFlag().With(flag =>
-                            {
-                                flag.Anchor = Anchor.CentreLeft;
-                                flag.Origin = Anchor.CentreLeft;
+                                avatar.Margin = new MarginPadding { Left = 12 };
                             }),
                             CreateUsername().With(username =>
                             {
@@ -80,15 +104,28 @@ namespace osu.Game.Users
                         Margin = new MarginPadding { Right = 10 },
                         Children = new Drawable[]
                         {
-                            CreateStatusIcon().With(icon =>
+                            CreateUserPP().With(pp =>
                             {
-                                icon.Anchor = Anchor.CentreRight;
-                                icon.Origin = Anchor.CentreRight;
+                                pp.Anchor = Anchor.CentreRight;
+                                pp.Origin = Anchor.CentreRight;
                             }),
+                            CreateUserrank().With(rank =>
+                            {
+                                rank.Anchor = Anchor.CentreRight;
+                                rank.Origin = Anchor.CentreRight;
+                            }),
+                            // Disable these two function will cause a strange exception, using Alpha = 0f; instead
                             CreateStatusMessage(true).With(message =>
                             {
                                 message.Anchor = Anchor.CentreRight;
                                 message.Origin = Anchor.CentreRight;
+                                message.Alpha = 0f;
+                            }),
+                            CreateStatusIcon().With(icon =>
+                            {
+                                icon.Anchor = Anchor.CentreRight;
+                                icon.Origin = Anchor.CentreRight;
+                                icon.Alpha = 0f;
                             })
                         }
                     }

@@ -71,6 +71,19 @@ namespace osu.Game.Tournament.Screens.Board
                     ShowScores = false,
                     ShowRound = false,
                 },
+
+                // Box for trap type / display of other info.
+                new EmptyBox(cornerRadius: 10)
+                {
+                    Anchor = Anchor.BottomCentre,
+                    Origin = Anchor.BottomCentre,
+                    RelativeSizeAxes = Axes.None,
+                    Width = 650,
+                    Height = 80,
+                    Margin = new MarginPadding { Bottom = 12 },
+                    Colour = Color4.Black,
+                    Alpha = 0.7f,
+                },
                 new FillFlowContainer
                 {
                     Anchor = Anchor.TopLeft,
@@ -92,7 +105,7 @@ namespace osu.Game.Tournament.Screens.Board
                         new TournamentMatchChatDisplay(cornerRadius: 10)
                         {
                             RelativeSizeAxes = Axes.None,
-                            Height = sideListHeight - team1List.GetHeight() - 10,
+                            Height = sideListHeight - team1List.GetHeight() - 5,
                             Width = 300,
                             Anchor = Anchor.TopLeft,
                             Origin = Anchor.TopLeft,
@@ -126,7 +139,7 @@ namespace osu.Game.Tournament.Screens.Board
                             Origin = Anchor.TopRight,
                             RelativeSizeAxes = Axes.None,
                             Width = 300,
-                            Height = sideListHeight - team2List.GetHeight() - 10,
+                            Height = sideListHeight - team2List.GetHeight() - 5,
                             Margin = new MarginPadding { Top = 10 },
                             Colour = Color4.Black,
                             Alpha = 0.7f,
