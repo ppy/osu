@@ -3,6 +3,7 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
@@ -10,6 +11,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Overlays.Profile.Header.Components
 {
@@ -50,8 +52,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
                         new OsuTextFlowContainer(s => s.Font = OsuFont.GetFont(size: 12))
                         {
                             AutoSizeAxes = Axes.Both,
-                            // Text = UsersStrings.ShowDailyChallengeTitle
-                            Text = "Daily\nChallenge",
+                            Text = UsersStrings.ShowDailyChallengeTitle,
                             Margin = new MarginPadding { Horizontal = 5f, Bottom = 2f },
                         },
                         new Container
@@ -97,9 +98,8 @@ namespace osu.Game.Overlays.Profile.Header.Components
             }
 
             var statistics = User.Value.User.DailyChallengeStatistics;
-            // dailyStreak.Text = UsersStrings.ShowDailyChallengeUnitDay(statistics.PlayCount);
-            dailyStreak.Text = $"{statistics.PlayCount}d";
-            TooltipContent = new DailyChallengeStreakTooltipData(colourProvider, statistics);
+            dailyStreak.Text = UsersStrings.ShowDailyChallengeUnitDay(statistics.PlayCount.ToLocalisableString("N0"));
+            TooltipContent = new DailyChallengeTooltipData(colourProvider, statistics);
             Show();
         }
 
