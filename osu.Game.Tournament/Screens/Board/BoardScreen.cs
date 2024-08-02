@@ -133,16 +133,19 @@ namespace osu.Game.Tournament.Screens.Board
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    // RelativeSizeAxes = Axes.Both,
+                    RelativeSizeAxes = Axes.Y,
                     Direction = FillDirection.Vertical,
-                    X = 0,
-                    Y = -350,
+                    // X = 0,
+                    Y = 35,
                     Height = 1f,
                     Width = 900,
                     Padding = new MarginPadding{ Left = 50 },
                     Spacing = new Vector2(10, 10),
                 },
-
+                new TrapInfoDisplay()
+                {
+                    // TODO: Add parameters and more
+                },
                 new ControlPanel
                 {
                     Children = new Drawable[]
