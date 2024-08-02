@@ -13,18 +13,16 @@ using osuTK.Graphics;
 
 namespace osu.Game.Tournament.Components
 {
-    public partial class TrapInfoDisplay : CompositeDrawable
+    public partial class InstructionDisplay : CompositeDrawable
     {
-        private readonly TrapInfo thisTrap = null!;
+        private readonly InstructionInfo thisStep = null!;
 
-        public TrapInfoDisplay(TrapType trap = TrapType.Unknown,
-            TeamColour team = TeamColour.Neutral, int mapID = 0)
+        public InstructionDisplay(TeamColour team = TeamColour.Neutral, Steps step = Steps.Default)
         {
-            thisTrap = new TrapInfo
+            thisStep = new InstructionInfo
             (
-                colour: team,
-                type: trap,
-                mapID: mapID
+                team: team,
+                step: step
             );
             Anchor = Anchor.BottomCentre;
             Origin = Anchor.BottomCentre;
@@ -45,9 +43,9 @@ namespace osu.Game.Tournament.Components
                     {
                         Anchor = Anchor.CentreLeft,
                         Origin = Anchor.CentreLeft,
-                        Icon = thisTrap.Icon,
+                        Icon = thisStep.Icon,
                         Size = new Vector2(56),
-                        Colour = thisTrap.IconColor,
+                        Colour = thisStep.IconColor,
                         Alpha = 1,
                         Shadow = true,
                         ShadowColour = Color4.Black.Opacity(0.5f),
@@ -77,7 +75,7 @@ namespace osu.Game.Tournament.Components
                             {
                                 Anchor = Anchor.CentreLeft,
                                 Origin = Anchor.CentreLeft,
-                                Text = thisTrap.Name,
+                                Text = thisStep.Name,
                                 Font = OsuFont.GetFont(typeface: Typeface.HarmonyOSSans, size: 49, weight: FontWeight.Bold),
                                 //OsuFont.Default.With(size: 49, weight: FontWeight.Bold),
                             },
@@ -85,7 +83,7 @@ namespace osu.Game.Tournament.Components
                             {
                                 Anchor = Anchor.CentreLeft,
                                 Origin = Anchor.CentreLeft,
-                                Text = thisTrap.Description,
+                                Text = thisStep.Description,
                                 Font = OsuFont.GetFont(typeface: Typeface.HarmonyOSSans, size: 30, weight: FontWeight.Regular),
                                 // OsuFont.Default.With(size: 30, weight: FontWeight.Regular),
                             },

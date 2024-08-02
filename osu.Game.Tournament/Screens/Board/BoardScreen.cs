@@ -6,10 +6,10 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Framework.Threading;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Screens.Play.Break;
 using osu.Game.Tournament.Components;
 using osu.Game.Tournament.IPC;
 using osu.Game.Tournament.Models;
@@ -47,6 +47,8 @@ namespace osu.Game.Tournament.Screens.Board
         private OsuButton buttonBlueTrap = null!;
 
         private TrapTypeDropdown trapTypeDropdown = null!;
+        private Container trapInfoDisplayHolder = null!;
+        private Container InstructionDisplayHolder = null!;
 
         private DrawableTeamPlayerList team1List = null!;
         private DrawableTeamPlayerList team2List = null!;
@@ -79,7 +81,7 @@ namespace osu.Game.Tournament.Screens.Board
                     Origin = Anchor.BottomCentre,
                     RelativeSizeAxes = Axes.None,
                     Width = 650,
-                    Height = 80,
+                    Height = 100,
                     Margin = new MarginPadding { Bottom = 12 },
                     Colour = Color4.Black,
                     Alpha = 0.7f,
@@ -153,15 +155,28 @@ namespace osu.Game.Tournament.Screens.Board
                     RelativeSizeAxes = Axes.Y,
                     Direction = FillDirection.Vertical,
                     // X = 0,
-                    Y = 35,
+                    Y = 15,
                     Height = 1f,
                     Width = 900,
                     Padding = new MarginPadding{ Left = 50 },
                     Spacing = new Vector2(10, 10),
                 },
-                new TrapInfoDisplay()
+                trapInfoDisplayHolder = new Container
                 {
-                    // TODO: Add parameters and more
+                    Alpha = 0,
+                    Anchor = Anchor.BottomCentre,
+                    Origin = Anchor.BottomCentre,
+                    Height = 100,
+                    Width = 500,
+                },
+                InstructionDisplayHolder = new Container
+                {
+                    Alpha = 1,
+                    Anchor = Anchor.BottomCentre,
+                    Origin = Anchor.BottomCentre,
+                    Height = 100,
+                    Width = 500,
+                    Child = new InstructionDisplay(),
                 },
                 new ControlPanel
                 {
@@ -291,6 +306,36 @@ namespace osu.Game.Tournament.Screens.Board
             buttonBlueTrap.Colour = setColour(pickColour == TeamColour.Blue && pickType == ChoiceType.Trap);
 
             static Color4 setColour(bool active) => active ? Color4.White : Color4.Gray;
+
+            switch (choiceType)
+            {
+                case ChoiceType.Protect:
+                    InstructionDisplayHolder.Child = new InstructionDisplay(step: Steps.Protect);
+                    break;
+
+                case ChoiceType.Pick:
+                    InstructionDisplayHolder.Child = new InstructionDisplay(step: Steps.Pick);
+                    break;
+
+                case ChoiceType.Trap:
+                    InstructionDisplayHolder.Child = new InstructionDisplay(step: Steps.Trap);
+                    break;
+
+                case ChoiceType.Ban:
+                    InstructionDisplayHolder.Child = new InstructionDisplay(step: Steps.Ban);
+                    break;
+
+                case ChoiceType.RedWin or ChoiceType.BlueWin:
+                    InstructionDisplayHolder.Child = new InstructionDisplay(team: pickColour, step: Steps.Win);
+                    break;
+
+                default:
+                    InstructionDisplayHolder.Child = new InstructionDisplay(step: Steps.Default);
+                    break;
+            }
+
+            trapInfoDisplayHolder.FadeOut(duration: 250, easing: Easing.OutCubic);
+            InstructionDisplayHolder.FadeInFromZero(duration: 250, easing: Easing.InCubic);
         }
 
         /*
@@ -418,6 +463,14 @@ namespace osu.Game.Tournament.Screens.Board
             if (CurrentMatch.Value.Protects.Any(p => p.BeatmapID == beatmapId && (pickType == ChoiceType.Ban || pickType == ChoiceType.Trap)))
                 // don't attempt to ban a protected map
                 return;
+
+            if (CurrentMatch.Value.Traps.Any(p => p.BeatmapID == beatmapId && pickType == ChoiceType.Pick))
+            {
+                var matchTrap = CurrentMatch.Value.Traps.First(p => p.BeatmapID == beatmapId);
+                trapInfoDisplayHolder.Child = new TrapInfoDisplay(trap: matchTrap.Mode, team: matchTrap.Team, mapID: matchTrap.BeatmapID);
+                InstructionDisplayHolder.FadeOut(duration: 250, easing: Easing.OutCubic);
+                trapInfoDisplayHolder.FadeInFromZero(duration: 250, easing: Easing.InCubic);
+            }
 
             // Trap action specific
             if (pickType == ChoiceType.Trap)
