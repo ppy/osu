@@ -4,6 +4,7 @@
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -12,8 +13,9 @@ using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
-using osuTK;
 using osu.Game.Localisation;
+using osuTK;
+using osuTK.Graphics;
 using static osu.Game.Overlays.Mods.ModCustomisationPanel;
 
 namespace osu.Game.Overlays.Mods
@@ -21,6 +23,7 @@ namespace osu.Game.Overlays.Mods
     public partial class ModCustomisationHeader : OsuHoverContainer
     {
         private Box background = null!;
+        private Box backgroundFlash = null!;
         private SpriteIcon icon = null!;
 
         [Resolved]
@@ -49,6 +52,12 @@ namespace osu.Game.Overlays.Mods
                 background = new Box
                 {
                     RelativeSizeAxes = Axes.Both,
+                },
+                backgroundFlash = new Box
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = Color4.White.Opacity(0.4f),
+                    Blending = BlendingParameters.Additive,
                 },
                 new OsuSpriteText
                 {
@@ -88,6 +97,12 @@ namespace osu.Game.Overlays.Mods
                 TooltipText = e.NewValue
                     ? string.Empty
                     : ModSelectOverlayStrings.CustomisationPanelDisabledReason;
+
+                if (e.NewValue)
+                {
+                    backgroundFlash.FadeInFromZero(150, Easing.OutQuad).Then()
+                                   .FadeOutFromOne(350, Easing.OutQuad);
+                }
             }, true);
 
             ExpandedState.BindValueChanged(v =>

@@ -17,9 +17,11 @@ using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Logging;
 using osu.Framework.Screens;
+using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation;
 using osu.Game.Online.API;
@@ -28,6 +30,7 @@ using osu.Game.Online.Metadata;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
+using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.OnlinePlay.Components;
@@ -40,7 +43,8 @@ using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.DailyChallenge
 {
-    public partial class DailyChallenge : OsuScreen
+    [Cached(typeof(IPreviewTrackOwner))]
+    public partial class DailyChallenge : OsuScreen, IPreviewTrackOwner
     {
         private readonly Room room;
         private readonly PlaylistItem playlistItem;
@@ -51,6 +55,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
         private readonly Bindable<IReadOnlyList<Mod>> userMods = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
 
         private readonly IBindable<APIState> apiState = new Bindable<APIState>();
+        private readonly IBindable<DailyChallengeInfo?> dailyChallengeInfo = new Bindable<DailyChallengeInfo?>();
 
         private OnlinePlayScreenWaveContainer waves = null!;
         private DailyChallengeLeaderboard leaderboard = null!;
@@ -59,6 +64,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
         private IDisposable? userModsSelectOverlayRegistration;
 
         private DailyChallengeScoreBreakdown breakdown = null!;
+        private DailyChallengeTotalsDisplay totals = null!;
         private DailyChallengeEventFeed feed = null!;
 
         [Cached]
@@ -91,13 +97,22 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
         [Resolved]
         protected IAPIProvider API { get; private set; } = null!;
 
+        [Resolved]
+        private PreviewTrackManager previewTrackManager { get; set; } = null!;
+
+        [Resolved]
+        private INotificationOverlay? notificationOverlay { get; set; }
+
         public override bool DisallowExternalBeatmapRulesetChanges => true;
+
+        public override bool? ApplyModTrackAdjustments => true;
 
         public DailyChallenge(Room room)
         {
             this.room = room;
             playlistItem = room.Playlist.Single();
             roomManager = new RoomManager();
+            Padding = new MarginPadding { Horizontal = -HORIZONTAL_OVERFLOW_PADDING };
         }
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
@@ -160,7 +175,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
                                 },
                                 null,
                                 [
-                                    new Container
+                                    new OsuContextMenuContainer
                                     {
                                         RelativeSizeAxes = Axes.Both,
                                         Masking = true,
@@ -211,6 +226,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
                                                                         {
                                                                             new DailyChallengeTimeRemainingRing(),
                                                                             breakdown = new DailyChallengeScoreBreakdown(),
+                                                                            totals = new DailyChallengeTotalsDisplay(),
                                                                         }
                                                                     }
                                                                 },
@@ -229,6 +245,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
                                                         {
                                                             RelativeSizeAxes = Axes.Both,
                                                             PresentScore = presentScore,
+                                                            SelectedMods = { BindTarget = userMods },
                                                         },
                                                         // Spacer
                                                         null,
@@ -301,6 +318,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
 
             LoadComponent(userModsSelectOverlay = new RoomModSelectOverlay
             {
+                Beatmap = { BindTarget = Beatmap },
                 SelectedMods = { BindTarget = userMods },
                 IsValidMod = _ => false
             });
@@ -319,10 +337,13 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
 
                 var rulesetInstance = rulesets.GetRuleset(playlistItem.RulesetID)!.CreateInstance();
                 var allowedMods = playlistItem.AllowedMods.Select(m => m.ToMod(rulesetInstance));
-                userModsSelectOverlay.IsValidMod = m => allowedMods.Any(a => a.GetType() == m.GetType());
+                userModsSelectOverlay.IsValidMod = leaderboard.IsValidMod = m => allowedMods.Any(a => a.GetType() == m.GetType());
             }
 
             metadataClient.MultiplayerRoomScoreSet += onRoomScoreSet;
+            dailyChallengeInfo.BindTo(metadataClient.DailyChallengeInfo);
+
+            ((IBindable<MultiplayerScore?>)breakdown.UserBestScore).BindTo(leaderboard.UserBestScore);
         }
 
         private void presentScore(long id)
@@ -351,6 +372,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
                 Schedule(() =>
                 {
                     breakdown.AddNewScore(ev);
+                    totals.AddNewScore(ev);
                     feed.AddNewScore(ev);
 
                     if (e.NewRank <= 50)
@@ -372,6 +394,8 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
 
             apiState.BindTo(API.State);
             apiState.BindValueChanged(onlineStateChanged, true);
+
+            dailyChallengeInfo.BindValueChanged(dailyChallengeChanged);
         }
 
         private void trySetDailyChallengeBeatmap()
@@ -379,6 +403,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
             var beatmap = beatmapManager.QueryBeatmap(b => b.OnlineID == playlistItem.Beatmap.OnlineID);
             Beatmap.Value = beatmapManager.GetWorkingBeatmap(beatmap); // this will gracefully fall back to dummy beatmap if missing locally.
             Ruleset.Value = rulesets.GetRuleset(playlistItem.RulesetID);
+
             applyLoopingToTrack();
         }
 
@@ -388,9 +413,17 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
                 Schedule(forcefullyExit);
         });
 
+        private void dailyChallengeChanged(ValueChangedEvent<DailyChallengeInfo?> change)
+        {
+            if (change.OldValue?.RoomID == room.RoomID.Value && change.NewValue == null)
+            {
+                notificationOverlay?.Post(new SimpleNotification { Text = DailyChallengeStrings.ChallengeEndedNotification });
+            }
+        }
+
         private void forcefullyExit()
         {
-            Logger.Log($"{this} forcefully exiting due to loss of API connection");
+            Logger.Log(@$"{this} forcefully exiting due to loss of API connection");
 
             // This is temporary since we don't currently have a way to force screens to be exited
             // See also: `OnlinePlayScreen.forcefullyExit()`
@@ -421,7 +454,11 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
                 var itemStats = stats.SingleOrDefault(item => item.PlaylistItemID == playlistItem.ID);
                 if (itemStats == null) return;
 
-                Schedule(() => breakdown.SetInitialCounts(itemStats.TotalScoreDistribution));
+                Schedule(() =>
+                {
+                    breakdown.SetInitialCounts(itemStats.TotalScoreDistribution);
+                    totals.SetInitialCounts(itemStats.TotalScoreDistribution.Sum(c => c), itemStats.CumulativeScore);
+                });
             });
 
             beatmapAvailabilityTracker.SelectedItem.Value = playlistItem;
@@ -433,6 +470,9 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
         {
             base.OnResuming(e);
             applyLoopingToTrack();
+            // re-apply mods as they may have been changed by a child screen
+            // (one known instance of this is showing a replay).
+            updateMods();
         }
 
         public override void OnSuspending(ScreenTransitionEvent e)
@@ -441,6 +481,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
 
             userModsSelectOverlay.Hide();
             cancelTrackLooping();
+            previewTrackManager.StopAnyPlaying(this);
         }
 
         public override bool OnExiting(ScreenExitEvent e)
@@ -448,6 +489,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
             waves.Hide();
             userModsSelectOverlay.Hide();
             cancelTrackLooping();
+            previewTrackManager.StopAnyPlaying(this);
             this.Delay(WaveContainer.DISAPPEAR_DURATION).FadeOut();
 
             roomManager.PartRoom();

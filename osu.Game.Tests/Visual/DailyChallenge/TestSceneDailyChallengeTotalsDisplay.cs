@@ -6,26 +6,25 @@ using osu.Framework.Allocation;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Online.API.Requests.Responses;
-using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
 using osu.Game.Screens.OnlinePlay.DailyChallenge;
 using osu.Game.Screens.OnlinePlay.DailyChallenge.Events;
+using osu.Game.Tests.Resources;
 
 namespace osu.Game.Tests.Visual.DailyChallenge
 {
-    public partial class TestSceneDailyChallengeScoreBreakdown : OsuTestScene
+    public partial class TestSceneDailyChallengeTotalsDisplay : OsuTestScene
     {
         [Cached]
         private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Plum);
 
-        private DailyChallengeScoreBreakdown breakdown = null!;
-
-        [SetUpSteps]
-        public void SetUpSteps()
+        [Test]
+        public void TestBasicAppearance()
         {
+            DailyChallengeTotalsDisplay totals = null!;
+
             AddStep("create content", () => Children = new Drawable[]
             {
                 new Box
@@ -33,7 +32,7 @@ namespace osu.Game.Tests.Visual.DailyChallenge
                     RelativeSizeAxes = Axes.Both,
                     Colour = colourProvider.Background4,
                 },
-                breakdown = new DailyChallengeScoreBreakdown
+                totals = new DailyChallengeTotalsDisplay
                 {
                     RelativeSizeAxes = Axes.Both,
                     Anchor = Anchor.Centre,
@@ -42,24 +41,19 @@ namespace osu.Game.Tests.Visual.DailyChallenge
             });
             AddSliderStep("adjust width", 0.1f, 1, 1, width =>
             {
-                if (breakdown.IsNotNull())
-                    breakdown.Width = width;
+                if (totals.IsNotNull())
+                    totals.Width = width;
             });
             AddSliderStep("adjust height", 0.1f, 1, 1, height =>
             {
-                if (breakdown.IsNotNull())
-                    breakdown.Height = height;
+                if (totals.IsNotNull())
+                    totals.Height = height;
             });
+            AddToggleStep("toggle visible", v => totals.Alpha = v ? 1 : 0);
 
-            AddToggleStep("toggle visible", v => breakdown.Alpha = v ? 1 : 0);
+            AddStep("set counts", () => totals.SetInitialCounts(totalPassCount: 9650, cumulativeTotalScore: 10_000_000_000));
 
-            AddStep("set initial data", () => breakdown.SetInitialCounts([1, 4, 9, 16, 25, 36, 49, 36, 25, 16, 9, 4, 1]));
-        }
-
-        [Test]
-        public void TestBasicAppearance()
-        {
-            AddStep("add new score", () =>
+            AddStep("add normal score", () =>
             {
                 var ev = new NewScoreEvent(1, new APIUser
                 {
@@ -68,27 +62,24 @@ namespace osu.Game.Tests.Visual.DailyChallenge
                     CoverUrl = "https://osu.ppy.sh/images/headers/profile-covers/c3.jpg",
                 }, RNG.Next(1_000_000), null);
 
-                breakdown.AddNewScore(ev);
+                totals.AddNewScore(ev);
             });
-            AddStep("set user score", () => breakdown.UserBestScore.Value = new MultiplayerScore { TotalScore = RNG.Next(1_000_000) });
-            AddStep("unset user score", () => breakdown.UserBestScore.Value = null);
-        }
 
-        [Test]
-        public void TestMassAdd()
-        {
-            AddStep("add 1000 scores at once", () =>
+            AddStep("spam scores", () =>
             {
-                for (int i = 0; i < 1000; i++)
+                for (int i = 0; i < 1000; ++i)
                 {
                     var ev = new NewScoreEvent(1, new APIUser
                     {
                         Id = 2,
                         Username = "peppy",
                         CoverUrl = "https://osu.ppy.sh/images/headers/profile-covers/c3.jpg",
-                    }, RNG.Next(1_000_000), null);
+                    }, RNG.Next(1_000_000), RNG.Next(11, 1000));
 
-                    breakdown.AddNewScore(ev);
+                    var testScore = TestResources.CreateTestScoreInfo();
+                    testScore.TotalScore = RNG.Next(1_000_000);
+
+                    totals.AddNewScore(ev);
                 }
             });
         }

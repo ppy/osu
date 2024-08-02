@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using osu.Framework.Allocation;
@@ -14,6 +15,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osu.Game.Screens.SelectV2.Leaderboards;
 using osuTK;
@@ -22,6 +24,17 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
 {
     public partial class DailyChallengeLeaderboard : CompositeDrawable
     {
+        public IBindable<MultiplayerScore?> UserBestScore => userBestScore;
+        private readonly Bindable<MultiplayerScore?> userBestScore = new Bindable<MultiplayerScore?>();
+        public Bindable<IReadOnlyList<Mod>> SelectedMods = new Bindable<IReadOnlyList<Mod>>();
+
+        /// <summary>
+        /// A function determining whether each mod in the score can be selected.
+        /// A return value of <see langword="true"/> means that the mod can be selected in the current context.
+        /// A return value of <see langword="false"/> means that the mod cannot be selected in the current context.
+        /// </summary>
+        public Func<Mod, bool> IsValidMod { get; set; } = _ => true;
+
         public Action<long>? PresentScore { get; init; }
 
         private readonly Room room;
@@ -130,7 +143,9 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
             request.Success += req => Schedule(() =>
             {
                 var best = req.Scores.Select(s => s.CreateScoreInfo(scoreManager, rulesets, playlistItem, beatmap.Value.BeatmapInfo)).ToArray();
-                var userBest = req.UserScore?.CreateScoreInfo(scoreManager, rulesets, playlistItem, beatmap.Value.BeatmapInfo);
+
+                userBestScore.Value = req.UserScore;
+                var userBest = userBestScore.Value?.CreateScoreInfo(scoreManager, rulesets, playlistItem, beatmap.Value.BeatmapInfo);
 
                 cancellationTokenSource?.Cancel();
                 cancellationTokenSource = null;
@@ -148,6 +163,8 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
                         Rank = index + 1,
                         IsPersonalBest = s.UserID == api.LocalUser.Value.Id,
                         Action = () => PresentScore?.Invoke(s.OnlineID),
+                        SelectedMods = { BindTarget = SelectedMods },
+                        IsValidMod = IsValidMod,
                     }), loaded =>
                     {
                         scoreFlow.Clear();
@@ -166,6 +183,8 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
                         Rank = userBest.Position,
                         IsPersonalBest = true,
                         Action = () => PresentScore?.Invoke(userBest.OnlineID),
+                        SelectedMods = { BindTarget = SelectedMods },
+                        IsValidMod = IsValidMod,
                     });
                 }
 
