@@ -43,6 +43,9 @@ namespace osu.Game.Collections
             //
             // if we want to support user sorting (but changes will need to be made to realm to persist).
             ShowDragHandle.Value = false;
+
+            Masking = true;
+            CornerRadius = item_height / 2;
         }
 
         protected override Drawable CreateContent() => new ItemContent(Model);
@@ -50,7 +53,7 @@ namespace osu.Game.Collections
         /// <summary>
         /// The main content of the <see cref="DrawableCollectionListItem"/>.
         /// </summary>
-        private partial class ItemContent : CircularContainer
+        private partial class ItemContent : CompositeDrawable
         {
             private readonly Live<BeatmapCollection> collection;
 
@@ -65,13 +68,12 @@ namespace osu.Game.Collections
 
                 RelativeSizeAxes = Axes.X;
                 Height = item_height;
-                Masking = true;
             }
 
             [BackgroundDependencyLoader]
             private void load()
             {
-                Children = new[]
+                InternalChildren = new[]
                 {
                     collection.IsManaged
                         ? new DeleteButton(collection)
