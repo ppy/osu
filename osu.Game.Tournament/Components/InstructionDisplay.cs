@@ -34,6 +34,7 @@ namespace osu.Game.Tournament.Components
             {
                 Anchor = Anchor.BottomCentre,
                 Origin = Anchor.BottomCentre,
+                Y = -15,
                 Direction = FillDirection.Horizontal,
                 AutoSizeAxes = Axes.Both,
                 Spacing = new Vector2(20, 0),
@@ -47,9 +48,6 @@ namespace osu.Game.Tournament.Components
                         Size = new Vector2(56),
                         Colour = thisStep.IconColor,
                         Alpha = 1,
-                        Shadow = true,
-                        ShadowColour = Color4.Black.Opacity(0.5f),
-                        ShadowOffset = new Vector2(2, 3),
                     },
                     new Box
                     {
@@ -57,7 +55,7 @@ namespace osu.Game.Tournament.Components
                         Origin = Anchor.CentreLeft,
                         Colour = Color4.White,
                         RelativeSizeAxes = Axes.Y,
-                        Height = 0.85f,
+                        Height = 0.75f,
                         Width = 3,
                     },
                     new FillFlowContainer
@@ -67,8 +65,6 @@ namespace osu.Game.Tournament.Components
                         Origin = Anchor.CentreLeft,
                         Direction = FillDirection.Vertical,
 
-                        // Add Margin to the bottom inorder to let Trap messages fit in the box.
-                        Margin = new MarginPadding { Bottom = 12 },
                         Children = new Drawable[]
                         {
                             new TournamentSpriteText
@@ -77,7 +73,6 @@ namespace osu.Game.Tournament.Components
                                 Origin = Anchor.CentreLeft,
                                 Text = thisStep.Name,
                                 Font = OsuFont.GetFont(typeface: Typeface.HarmonyOSSans, size: 49, weight: FontWeight.Bold),
-                                //OsuFont.Default.With(size: 49, weight: FontWeight.Bold),
                             },
                             new TournamentSpriteText
                             {
@@ -85,7 +80,6 @@ namespace osu.Game.Tournament.Components
                                 Origin = Anchor.CentreLeft,
                                 Text = thisStep.Description,
                                 Font = OsuFont.GetFont(typeface: Typeface.HarmonyOSSans, size: 30, weight: FontWeight.Regular),
-                                // OsuFont.Default.With(size: 30, weight: FontWeight.Regular),
                             },
                         }
                     }
