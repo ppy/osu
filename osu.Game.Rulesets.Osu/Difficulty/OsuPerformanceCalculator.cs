@@ -92,9 +92,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                                  (totalHits > 2000 ? Math.Log10(totalHits / 2000.0) * 0.5 : 0.0);
             aimValue *= lengthBonus;
 
-            // Penalize misses by assessing # of misses relative to the total # of objects. Default a 3% reduction for any # of misses.
-            if (effectiveMissCount > 0)
-                aimValue *= 0.97 * Math.Pow(1 - Math.Pow(effectiveMissCount / totalHits, 0.775), effectiveMissCount);
+            // Penalize misses by assessing # of misses relative to the total # of objects. Default a 3% reduction for at least 1 miss.
+            double missPenaltyBase = 1 - 0.03 * Math.Min(effectiveMissCount, 1);
+            aimValue *= missPenaltyBase * Math.Pow(1 - Math.Pow(effectiveMissCount / totalHits, 0.775), effectiveMissCount);
 
             aimValue *= getComboScalingFactor(attributes);
 
@@ -146,8 +146,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             speedValue *= lengthBonus;
 
             // Penalize misses by assessing # of misses relative to the total # of objects. Default a 3% reduction for any # of misses.
-            if (effectiveMissCount > 0)
-                speedValue *= 0.97 * Math.Pow(1 - Math.Pow(effectiveMissCount / totalHits, 0.775), Math.Pow(effectiveMissCount, .875));
+            double missPenaltyBase = 1 - 0.03 * Math.Min(effectiveMissCount, 1);
+            speedValue *= missPenaltyBase * Math.Pow(1 - Math.Pow(effectiveMissCount / totalHits, 0.775), Math.Pow(effectiveMissCount, .875));
 
             speedValue *= getComboScalingFactor(attributes);
 
@@ -229,8 +229,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double flashlightValue = Math.Pow(attributes.FlashlightDifficulty, 2.0) * 25.0;
 
             // Penalize misses by assessing # of misses relative to the total # of objects. Default a 3% reduction for any # of misses.
-            if (effectiveMissCount > 0)
-                flashlightValue *= 0.97 * Math.Pow(1 - Math.Pow(effectiveMissCount / totalHits, 0.775), Math.Pow(effectiveMissCount, .875));
+            double missPenaltyBase = 1 - 0.03 * Math.Min(effectiveMissCount, 1);
+            flashlightValue *= missPenaltyBase * Math.Pow(1 - Math.Pow(effectiveMissCount / totalHits, 0.775), Math.Pow(effectiveMissCount, .875));
 
             flashlightValue *= getComboScalingFactor(attributes);
 
@@ -253,9 +253,20 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             if (attributes.SliderCount > 0)
             {
-                double fullComboThreshold = attributes.MaxCombo - 0.1 * attributes.SliderCount;
-                if (scoreMaxCombo < fullComboThreshold)
-                    comboBasedMissCount = fullComboThreshold / Math.Max(1.0, scoreMaxCombo);
+                double fullComboThreshold = attributes.MaxCombo - 0.12 * attributes.SliderCount;
+
+                // Value for backwards compatibility with previous formula
+                double fullComboThresholdBase = attributes.MaxCombo - 0.1 * attributes.SliderCount;
+
+                // Curve for misscounts > 1
+                double mainCurve = fullComboThresholdBase / Math.Max(1.0, scoreMaxCombo);
+
+                // Curve for transition from misscount 0 to 1
+                double transitionCurve = Math.Max(0, 1 - 2 * (scoreMaxCombo - fullComboThreshold) / (attributes.MaxCombo - fullComboThreshold));
+
+                // Combine two curves with min, because main curve is always bigger than transition before fullComboThreshold
+                // While transition curve grows much faster than main curve
+                comboBasedMissCount = Math.Min(mainCurve, transitionCurve);
             }
 
             // Clamp miss count to maximum amount of possible breaks
