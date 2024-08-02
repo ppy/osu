@@ -35,6 +35,8 @@ namespace osu.Game.Tournament.Models
         private LocalisableString name = string.Empty;
         private LocalisableString description = string.Empty;
 
+        private LocalisableString teamPrompt = string.Empty;
+
         /// <summary>
         /// A constructor to set up an instance of <see cref="InstructionInfo"/>.
         /// </summary>
@@ -44,38 +46,40 @@ namespace osu.Game.Tournament.Models
         {
             Step = step;
 
+            teamPrompt = team == TeamColour.Red ? @"·红队" : (team == TeamColour.Blue ? @"·蓝队" : string.Empty);
+
             switch (Step)
             {
                 case Steps.Protect:
-                    name = @"标记保图";
+                    name = @$"标记保图{teamPrompt}";
                     description = @"被保护的图无法被禁与设置陷阱。";
                     icon.Icon = FontAwesome.Solid.Lock;
                     icon.Colour = new OsuColour().Cyan;
                     break;
 
                 case Steps.Ban:
-                    name = @"标记禁图";
+                    name = @$"标记禁图{teamPrompt}";
                     description = @"被禁止的图无法被选与设置陷阱。";
                     icon.Icon = FontAwesome.Solid.Ban;
                     icon.Colour = Color4.Orange;
                     break;
 
                 case Steps.Trap:
-                    name = @"设置陷阱";
+                    name = @$"设置陷阱{teamPrompt}";
                     description = @"请队长*私信*告知裁判，禁止外泄。";
                     icon.Icon = FontAwesome.Solid.ExclamationCircle;
                     icon.Colour = new OsuColour().Pink1;
                     break;
 
                 case Steps.Pick:
-                    name = @"标记选图";
+                    name = @$"标记选图{teamPrompt}";
                     description = @"选择该轮要游玩的图。";
                     icon.Icon = FontAwesome.Solid.Check;
                     icon.Colour = new OsuColour().Green;
                     break;
 
                 case Steps.Win:
-                    name = @"胜方染色";
+                    name = @$"胜方染色{teamPrompt}";
                     description = @"此图所在格将染成获胜队颜色。";
                     icon.Icon = FontAwesome.Solid.Trophy;
                     icon.Colour = team == TeamColour.Red ? new OsuColour().Pink : (team == TeamColour.Blue ? new OsuColour().Sky : new OsuColour().Yellow);

@@ -313,19 +313,19 @@ namespace osu.Game.Tournament.Screens.Board
             switch (choiceType)
             {
                 case ChoiceType.Protect:
-                    InstructionDisplayHolder.Child = new InstructionDisplay(step: Steps.Protect);
+                    InstructionDisplayHolder.Child = new InstructionDisplay(team: pickColour, step: Steps.Protect);
                     break;
 
                 case ChoiceType.Pick:
-                    InstructionDisplayHolder.Child = new InstructionDisplay(step: Steps.Pick);
+                    InstructionDisplayHolder.Child = new InstructionDisplay(team: pickColour, step: Steps.Pick);
                     break;
 
                 case ChoiceType.Trap:
-                    InstructionDisplayHolder.Child = new InstructionDisplay(step: Steps.Trap);
+                    InstructionDisplayHolder.Child = new InstructionDisplay(team: pickColour, step: Steps.Trap);
                     break;
 
                 case ChoiceType.Ban:
-                    InstructionDisplayHolder.Child = new InstructionDisplay(step: Steps.Ban);
+                    InstructionDisplayHolder.Child = new InstructionDisplay(team: pickColour, step: Steps.Ban);
                     break;
 
                 case ChoiceType.RedWin or ChoiceType.BlueWin:
@@ -486,10 +486,18 @@ namespace osu.Game.Tournament.Screens.Board
                 // don't attempt to ban a protected map
                 return;
 
+            // Show the trap description
             if (CurrentMatch.Value.Traps.Any(p => p.BeatmapID == beatmapId && pickType == ChoiceType.Pick))
             {
                 var matchTrap = CurrentMatch.Value.Traps.First(p => p.BeatmapID == beatmapId);
-                trapInfoDisplayHolder.Child = new TrapInfoDisplay(trap: matchTrap.Mode, team: matchTrap.Team, mapID: matchTrap.BeatmapID);
+                if (matchTrap.Team != pickColour)
+                {
+                    trapInfoDisplayHolder.Child = new TrapInfoDisplay(trap: matchTrap.Mode, team: matchTrap.Team, mapID: matchTrap.BeatmapID);
+                }
+                else
+                {
+                    trapInfoDisplayHolder.Child = new TrapInfoDisplay(trap: TrapType.Unused, team: matchTrap.Team, mapID: matchTrap.BeatmapID);
+                }
                 InstructionDisplayHolder.FadeOut(duration: 250, easing: Easing.OutCubic);
                 trapInfoDisplayHolder.FadeInFromZero(duration: 250, easing: Easing.InCubic);
             }
