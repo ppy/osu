@@ -26,8 +26,6 @@ namespace osu.Game.Tournament.Screens.Gameplay
         public readonly Bindable<TourneyState> State = new Bindable<TourneyState>();
         private LabelledSwitchButton warmupToggle = null!;
         private LabelledSwitchButton chatToggle = null!;
-        private SettingsSlider<float> redMultiplier = null!;
-        private SettingsSlider<float> blueMultiplier = null!;
         private MatchIPCInfo ipc = null!;
 
         [Resolved]
@@ -121,18 +119,6 @@ namespace osu.Game.Tournament.Screens.Gameplay
                             LabelText = "Players per team",
                             Current = LadderInfo.PlayersPerTeam,
                             KeyboardStep = 1,
-                        },
-                        redMultiplier = new SettingsSlider<float>
-                        {
-                            LabelText = "Red score multiplier",
-                            Current = LadderInfo.RedMultiplier,
-                            KeyboardStep = 0.1f,
-                        },
-                        blueMultiplier = new SettingsSlider<float>
-                        {
-                            LabelText = "Blue score multiplier",
-                            Current = LadderInfo.BlueMultiplier,
-                            KeyboardStep = 0.1f,
                         },
                     }
                 }
