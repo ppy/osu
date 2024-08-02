@@ -55,6 +55,8 @@ namespace osu.Game.Tests.Visual.DailyChallenge
                 if (ring.IsNotNull())
                     ring.Height = height;
             });
+            AddToggleStep("toggle visible", v => ring.Alpha = v ? 1 : 0);
+
             AddStep("just started", () =>
             {
                 room.Value.StartDate.Value = DateTimeOffset.Now.AddMinutes(-1);
