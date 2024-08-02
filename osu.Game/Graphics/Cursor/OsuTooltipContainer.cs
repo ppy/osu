@@ -27,7 +27,7 @@ namespace osu.Game.Graphics.Cursor
 
         public partial class OsuTooltip : Tooltip
         {
-            private const float max_width = 1024;
+            private const float max_width = 500;
 
             private readonly Box background;
             private readonly TextFlowContainer text;
