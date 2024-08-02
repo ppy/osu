@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Audio.Track;
@@ -30,11 +28,26 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         private readonly Drawable userContent;
 
-        [Resolved]
-        private EditorClock editorClock { get; set; }
+        private bool alwaysShowControlPoints;
+
+        public bool AlwaysShowControlPoints
+        {
+            get => alwaysShowControlPoints;
+            set
+            {
+                if (value == alwaysShowControlPoints)
+                    return;
+
+                alwaysShowControlPoints = value;
+                controlPointsVisible.TriggerChange();
+            }
+        }
 
         [Resolved]
-        private EditorBeatmap editorBeatmap { get; set; }
+        private EditorClock editorClock { get; set; } = null!;
+
+        [Resolved]
+        private EditorBeatmap editorBeatmap { get; set; } = null!;
 
         /// <summary>
         /// The timeline's scroll position in the last frame.
@@ -61,6 +74,22 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         /// </summary>
         private float defaultTimelineZoom;
 
+        private WaveformGraph waveform = null!;
+
+        private TimelineTickDisplay ticks = null!;
+
+        private TimelineControlPointDisplay controlPoints = null!;
+
+        private Container mainContent = null!;
+
+        private Bindable<float> waveformOpacity = null!;
+        private Bindable<bool> controlPointsVisible = null!;
+        private Bindable<bool> ticksVisible = null!;
+
+        private double trackLengthForZoom;
+
+        private readonly IBindable<Track> track = new Bindable<Track>();
+
         public Timeline(Drawable userContent)
         {
             this.userContent = userContent;
@@ -72,22 +101,6 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             ZoomEasing = Easing.OutQuint;
             ScrollbarVisible = false;
         }
-
-        private WaveformGraph waveform;
-
-        private TimelineTickDisplay ticks;
-
-        private TimelineControlPointDisplay controlPoints;
-
-        private Container mainContent;
-
-        private Bindable<float> waveformOpacity;
-        private Bindable<bool> controlPointsVisible;
-        private Bindable<bool> ticksVisible;
-
-        private double trackLengthForZoom;
-
-        private readonly IBindable<Track> track = new Bindable<Track>();
 
         [BackgroundDependencyLoader]
         private void load(IBindable<WorkingBeatmap> beatmap, OsuColour colours, OsuConfigManager config)
@@ -178,7 +191,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
             controlPointsVisible.BindValueChanged(visible =>
             {
-                if (visible.NewValue)
+                if (visible.NewValue || alwaysShowControlPoints)
                 {
                     this.ResizeHeightTo(timeline_expanded_height, 200, Easing.OutQuint);
                     mainContent.MoveToY(15, 200, Easing.OutQuint);
@@ -318,7 +331,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         }
 
         [Resolved]
-        private IBeatSnapProvider beatSnapProvider { get; set; }
+        private IBeatSnapProvider beatSnapProvider { get; set; } = null!;
 
         /// <summary>
         /// The total amount of time visible on the timeline.
