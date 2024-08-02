@@ -75,8 +75,6 @@ namespace osu.Game.Graphics.Cursor
                     text = new TextFlowContainer(f =>
                     {
                         f.Font = OsuFont.GetFont(weight: FontWeight.Regular);
-                        f.Truncate = true;
-                        f.MaxWidth = max_width;
                     })
                     {
                         Margin = new MarginPadding(5),
