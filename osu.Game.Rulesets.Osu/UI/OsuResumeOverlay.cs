@@ -33,9 +33,26 @@ namespace osu.Game.Rulesets.Osu.UI
         [BackgroundDependencyLoader]
         private void load()
         {
+            OsuResumeOverlayInputBlocker? inputBlocker = null;
+
+            if (drawableRuleset != null)
+            {
+                var osuPlayfield = (OsuPlayfield)drawableRuleset.Playfield;
+                osuPlayfield.AttachResumeOverlayInputBlocker(inputBlocker = new OsuResumeOverlayInputBlocker());
+            }
+
             Add(cursorScaleContainer = new Container
             {
-                Child = clickToResumeCursor = new OsuClickToResumeCursor { ResumeRequested = Resume }
+                Child = clickToResumeCursor = new OsuClickToResumeCursor
+                {
+                    ResumeRequested = () =>
+                    {
+                        if (inputBlocker != null)
+                            inputBlocker.BlockNextPress = true;
+
+                        Resume();
+                    }
+                }
             });
         }
 
@@ -138,6 +155,33 @@ namespace osu.Game.Rulesets.Osu.UI
             private void updateColour()
             {
                 this.FadeColour(IsHovered ? Color4.White : Color4.Orange, 400, Easing.OutQuint);
+            }
+        }
+
+        public partial class OsuResumeOverlayInputBlocker : Drawable, IKeyBindingHandler<OsuAction>
+        {
+            public bool BlockNextPress;
+
+            public OsuResumeOverlayInputBlocker()
+            {
+                RelativeSizeAxes = Axes.Both;
+                Depth = float.MinValue;
+            }
+
+            public bool OnPressed(KeyBindingPressEvent<OsuAction> e)
+            {
+                try
+                {
+                    return BlockNextPress;
+                }
+                finally
+                {
+                    BlockNextPress = false;
+                }
+            }
+
+            public void OnReleased(KeyBindingReleaseEvent<OsuAction> e)
+            {
             }
         }
     }
