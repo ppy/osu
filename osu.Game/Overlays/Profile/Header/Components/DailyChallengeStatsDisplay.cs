@@ -11,7 +11,9 @@ using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Resources.Localisation.Web;
+using osu.Game.Scoring;
 
 namespace osu.Game.Overlays.Profile.Header.Components
 {
@@ -21,7 +23,10 @@ namespace osu.Game.Overlays.Profile.Header.Components
 
         public DailyChallengeTooltipData? TooltipContent { get; private set; }
 
-        private OsuSpriteText dailyStreak = null!;
+        private OsuSpriteText dailyPlayCount = null!;
+
+        [Resolved]
+        private OsuColour colours { get; set; } = null!;
 
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; } = null!;
@@ -68,7 +73,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
                                     RelativeSizeAxes = Axes.Both,
                                     Colour = colourProvider.Background6,
                                 },
-                                dailyStreak = new OsuSpriteText
+                                dailyPlayCount = new OsuSpriteText
                                 {
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
@@ -97,10 +102,16 @@ namespace osu.Game.Overlays.Profile.Header.Components
                 return;
             }
 
-            var statistics = User.Value.User.DailyChallengeStatistics;
-            dailyStreak.Text = UsersStrings.ShowDailyChallengeUnitDay(statistics.PlayCount.ToLocalisableString("N0"));
-            TooltipContent = new DailyChallengeTooltipData(colourProvider, statistics);
+            APIUserDailyChallengeStatistics stats = User.Value.User.DailyChallengeStatistics;
+
+            dailyPlayCount.Text = UsersStrings.ShowDailyChallengeUnitDay(stats.PlayCount.ToLocalisableString("N0"));
+            dailyPlayCount.Colour = colours.ForRankingTier(tierForPlayCount(stats.PlayCount));
+
+            TooltipContent = new DailyChallengeTooltipData(colourProvider, stats);
+
             Show();
+
+            static RankingTier tierForPlayCount(int playCount) => DailyChallengeStatsTooltip.TierForDaily(playCount / 3);
         }
 
         public ITooltip<DailyChallengeTooltipData> GetCustomTooltip() => new DailyChallengeStatsTooltip();
