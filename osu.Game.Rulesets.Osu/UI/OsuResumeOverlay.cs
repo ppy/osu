@@ -47,6 +47,10 @@ namespace osu.Game.Rulesets.Osu.UI
                 {
                     ResumeRequested = () =>
                     {
+                        // since the user had to press a button to tap the resume cursor,
+                        // block that press event from potentially reaching a hit circle that's behind the cursor.
+                        // we cannot do this from OsuClickToResumeCursor directly since we're in a different input manager tree than the gameplay one,
+                        // so we rely on a dedicated input blocking component that's implanted in there to do that for us.
                         if (inputBlocker != null)
                             inputBlocker.BlockNextPress = true;
 
