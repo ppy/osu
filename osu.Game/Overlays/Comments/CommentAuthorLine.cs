@@ -139,13 +139,11 @@ namespace osu.Game.Overlays.Comments
             }
         }
 
-        private partial class ParentUsername : FillFlowContainer, IHasCustomTooltip<LocalisableString>
+        private partial class ParentUsername : FillFlowContainer, IHasTooltip
         {
-            public ITooltip<LocalisableString> GetCustomTooltip() => new CommentTooltip();
+            public LocalisableString TooltipText => getParentMessage();
 
-            LocalisableString IHasCustomTooltip<LocalisableString>.TooltipContent => getParentMessage();
-
-            private Comment? parentComment { get; }
+            private readonly Comment? parentComment;
 
             public ParentUsername(Comment comment)
             {
@@ -177,59 +175,6 @@ namespace osu.Game.Overlays.Comments
 
                 return parentComment.HasMessage ? parentComment.Message : parentComment.IsDeleted ? CommentsStrings.Deleted : string.Empty;
             }
-        }
-
-        private partial class CommentTooltip : VisibilityContainer, ITooltip<LocalisableString>
-        {
-            private const int max_width = 500;
-
-            private TextFlowContainer content { get; set; } = null!;
-
-            [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
-            {
-                AutoSizeAxes = Axes.Both;
-
-                Masking = true;
-                CornerRadius = 7;
-
-                Children = new Drawable[]
-                {
-                    new Box
-                    {
-                        Colour = colours.Gray3,
-                        RelativeSizeAxes = Axes.Both
-                    },
-                    content = new TextFlowContainer(f =>
-                    {
-                        f.Font = OsuFont.Default;
-                        f.Truncate = true;
-                        f.MaxWidth = max_width;
-                    })
-                    {
-                        Margin = new MarginPadding(3),
-                        AutoSizeAxes = Axes.Both,
-                        MaximumSize = new Vector2(max_width, float.PositiveInfinity),
-                    }
-                };
-            }
-
-            private LocalisableString lastPresent;
-
-            public void SetContent(LocalisableString content)
-            {
-                if (lastPresent.Equals(content))
-                    return;
-
-                this.content.Text = content;
-                lastPresent = content;
-            }
-
-            public void Move(Vector2 pos) => Position = pos;
-
-            protected override void PopIn() => this.FadeIn(200, Easing.OutQuint);
-
-            protected override void PopOut() => this.FadeOut(200, Easing.OutQuint);
         }
     }
 }
