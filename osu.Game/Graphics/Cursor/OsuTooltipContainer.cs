@@ -10,7 +10,7 @@ using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Localisation;
-using osu.Game.Graphics.Sprites;
+using osu.Framework.Graphics.Containers;
 
 namespace osu.Game.Graphics.Cursor
 {
@@ -27,13 +27,18 @@ namespace osu.Game.Graphics.Cursor
 
         public partial class OsuTooltip : Tooltip
         {
+            private const float max_width = 1024;
+
             private readonly Box background;
-            private readonly OsuSpriteText text;
+            private readonly TextFlowContainer text;
             private bool instantMovement = true;
+
+            private LocalisableString lastPresent;
 
             public override void SetContent(LocalisableString contentString)
             {
-                if (contentString == text.Text) return;
+                if (contentString.Equals(lastPresent))
+                    return;
 
                 text.Text = contentString;
 
@@ -44,6 +49,8 @@ namespace osu.Game.Graphics.Cursor
                 }
                 else
                     AutoSizeDuration = 0;
+
+                lastPresent = contentString;
             }
 
             public OsuTooltip()
@@ -65,10 +72,16 @@ namespace osu.Game.Graphics.Cursor
                         RelativeSizeAxes = Axes.Both,
                         Alpha = 0.9f,
                     },
-                    text = new OsuSpriteText
+                    text = new TextFlowContainer(f =>
                     {
-                        Padding = new MarginPadding(5),
-                        Font = OsuFont.GetFont(weight: FontWeight.Regular)
+                        f.Font = OsuFont.GetFont(weight: FontWeight.Regular);
+                        f.Truncate = true;
+                        f.MaxWidth = max_width;
+                    })
+                    {
+                        Margin = new MarginPadding(5),
+                        AutoSizeAxes = Axes.Both,
+                        MaximumSize = new Vector2(max_width, float.PositiveInfinity),
                     }
                 };
             }
