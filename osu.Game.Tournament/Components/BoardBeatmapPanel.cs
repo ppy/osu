@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Specialized;
 using System.Linq;
-using ManagedBass.Fx;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.ObjectExtensions;
