@@ -439,10 +439,29 @@ namespace osu.Game.Tournament.Screens.Board
         }
         private void reset()
         {
+            // Clear map marking lists
             CurrentMatch.Value?.PicksBans.Clear();
             CurrentMatch.Value?.Protects.Clear();
             CurrentMatch.Value?.Traps.Clear();
-            //setNextMode();
+
+            // Reset bottom display
+            trapInfoDisplayHolder.FadeOut(duration: 200, easing: Easing.OutCubic);
+            InstructionDisplayHolder.FadeInFromZero(duration: 200, easing: Easing.InCubic);
+            InstructionDisplayHolder.Child = new InstructionDisplay();
+
+            // Reset button group
+            buttonBlueProtect.Colour = Color4.White;
+            buttonBlueBan.Colour = Color4.White;
+            buttonBluePick.Colour = Color4.White;
+            buttonBlueWin.Colour = Color4.White;
+            buttonBlueTrap.Colour = Color4.White;
+            buttonRedProtect.Colour = Color4.White;
+            buttonRedBan.Colour = Color4.White;
+            buttonRedPick.Colour = Color4.White;
+            buttonRedWin.Colour = Color4.White;
+            buttonRedTrap.Colour = Color4.White;
+
+            // setNextMode();
         }
 
         private bool isPickWin => pickType == ChoiceType.RedWin || pickType == ChoiceType.BlueWin;
