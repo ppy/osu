@@ -13,6 +13,7 @@ using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Resources.Localisation.Web;
 using osu.Game.Scoring;
 using osuTK;
 using Box = osu.Framework.Graphics.Shapes.Box;
@@ -78,10 +79,8 @@ namespace osu.Game.Overlays.Profile.Header.Components
                                     Spacing = new Vector2(30f),
                                     Children = new[]
                                     {
-                                        // currentDaily = new StreakPiece(UsersStrings.ShowDailyChallengeDailyStreakCurrent),
-                                        // currentWeekly = new StreakPiece(UsersStrings.ShowDailyChallengeWeeklyStreakCurrent),
-                                        currentDaily = new StreakPiece("Current Daily Streak"),
-                                        currentWeekly = new StreakPiece("Current Weekly Streak"),
+                                        currentDaily = new StreakPiece(UsersStrings.ShowDailyChallengeDailyStreakCurrent),
+                                        currentWeekly = new StreakPiece(UsersStrings.ShowDailyChallengeWeeklyStreakCurrent),
                                     }
                                 },
                             }
@@ -94,14 +93,10 @@ namespace osu.Game.Overlays.Profile.Header.Components
                             Spacing = new Vector2(10f),
                             Children = new[]
                             {
-                                // bestDaily = new StatisticsPiece(UsersStrings.ShowDailyChallengeDailyStreakBest),
-                                // bestWeekly = new StatisticsPiece(UsersStrings.ShowDailyChallengeWeeklyStreakBest),
-                                // topTen = new StatisticsPiece(UsersStrings.ShowDailyChallengeTop10pPlacements),
-                                // topFifty = new StatisticsPiece(UsersStrings.ShowDailyChallengeTop50pPlacements),
-                                bestDaily = new StatisticsPiece("Best Daily Streak"),
-                                bestWeekly = new StatisticsPiece("Best Weekly Streak"),
-                                topTen = new StatisticsPiece("Top 10% Placements"),
-                                topFifty = new StatisticsPiece("Top 50% Placements"),
+                                bestDaily = new StatisticsPiece(UsersStrings.ShowDailyChallengeDailyStreakBest),
+                                bestWeekly = new StatisticsPiece(UsersStrings.ShowDailyChallengeWeeklyStreakBest),
+                                topTen = new StatisticsPiece(UsersStrings.ShowDailyChallengeTop10pPlacements),
+                                topFifty = new StatisticsPiece(UsersStrings.ShowDailyChallengeTop50pPlacements),
                             }
                         },
                     }
@@ -117,20 +112,16 @@ namespace osu.Game.Overlays.Profile.Header.Components
             background.Colour = colourProvider.Background4;
             topBackground.Colour = colourProvider.Background5;
 
-            // currentDaily.Value = UsersStrings.ShowDailyChallengeUnitDay(content.DailyStreakCurrent.ToLocalisableString(@"N0"));
-            currentDaily.Value = $"{statistics.DailyStreakCurrent:N0}d";
+            currentDaily.Value = UsersStrings.ShowDailyChallengeUnitDay(content.Statistics.DailyStreakCurrent.ToLocalisableString(@"N0"));
             currentDaily.ValueColour = colours.ForRankingTier(TierForDaily(statistics.DailyStreakCurrent));
 
-            // currentWeekly.Value = UsersStrings.ShowDailyChallengeUnitWeek(statistics.WeeklyStreakCurrent.ToLocalisableString(@"N0"));
-            currentWeekly.Value = $"{statistics.WeeklyStreakCurrent:N0}w";
+            currentWeekly.Value = UsersStrings.ShowDailyChallengeUnitWeek(statistics.WeeklyStreakCurrent.ToLocalisableString(@"N0"));
             currentWeekly.ValueColour = colours.ForRankingTier(TierForWeekly(statistics.WeeklyStreakCurrent));
 
-            // bestDaily.Value = UsersStrings.ShowDailyChallengeUnitDay(statistics.DailyStreakBest.ToLocalisableString(@"N0"));
-            bestDaily.Value = $"{statistics.DailyStreakBest:N0}d";
+            bestDaily.Value = UsersStrings.ShowDailyChallengeUnitDay(statistics.DailyStreakBest.ToLocalisableString(@"N0"));
             bestDaily.ValueColour = colours.ForRankingTier(TierForDaily(statistics.DailyStreakBest));
 
-            // bestWeekly.Value = UsersStrings.ShowDailyChallengeUnitWeek(statistics.WeeklyStreakBest.ToLocalisableString(@"N0"));
-            bestWeekly.Value = $"{statistics.WeeklyStreakBest:N0}w";
+            bestWeekly.Value = UsersStrings.ShowDailyChallengeUnitWeek(statistics.WeeklyStreakBest.ToLocalisableString(@"N0"));
             bestWeekly.ValueColour = colours.ForRankingTier(TierForWeekly(statistics.WeeklyStreakBest));
 
             topTen.Value = statistics.Top10PercentPlacements.ToLocalisableString(@"N0");
