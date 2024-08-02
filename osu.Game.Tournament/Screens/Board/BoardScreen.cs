@@ -244,7 +244,10 @@ namespace osu.Game.Tournament.Screens.Board
                             Action = () => setMode(TeamColour.Blue, ChoiceType.BlueWin)
                         },
                         new ControlPanel.Spacer(),
-                        trapTypeDropdown = new TrapTypeDropdown(),
+                        trapTypeDropdown = new TrapTypeDropdown
+                        {
+                            LabelText = "Trap type"
+                        },
                         buttonRedTrap = new TourneyButton
                         {
                             RelativeSizeAxes = Axes.X,
