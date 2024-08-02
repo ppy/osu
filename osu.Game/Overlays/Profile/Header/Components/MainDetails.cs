@@ -72,7 +72,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
                                 {
                                     Title = UsersStrings.ShowRankCountrySimple,
                                 },
-                                new DailyChallengeStreakDisplay
+                                new DailyChallengeStatsDisplay
                                 {
                                     Anchor = Anchor.TopRight,
                                     Origin = Anchor.TopRight,

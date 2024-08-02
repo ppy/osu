@@ -27,7 +27,7 @@ namespace osu.Game.Tests.Visual.Online
         {
             base.LoadComplete();
 
-            DailyChallengeStreakDisplay display = null!;
+            DailyChallengeStatsDisplay display = null!;
 
             AddSliderStep("daily", 0, 999, 2, v => update(s => s.DailyStreakCurrent = v));
             AddSliderStep("daily best", 0, 999, 2, v => update(s => s.DailyStreakBest = v));
@@ -44,7 +44,7 @@ namespace osu.Game.Tests.Visual.Online
                     RelativeSizeAxes = Axes.Both,
                     Colour = colourProvider.Background2,
                 });
-                Add(display = new DailyChallengeStreakDisplay
+                Add(display = new DailyChallengeStatsDisplay
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,

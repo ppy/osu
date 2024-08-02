@@ -15,11 +15,11 @@ using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Overlays.Profile.Header.Components
 {
-    public partial class DailyChallengeStreakDisplay : CompositeDrawable, IHasCustomTooltip<DailyChallengeStreakTooltipData>
+    public partial class DailyChallengeStatsDisplay : CompositeDrawable, IHasCustomTooltip<DailyChallengeTooltipData>
     {
         public readonly Bindable<UserProfileData?> User = new Bindable<UserProfileData?>();
 
-        public DailyChallengeStreakTooltipData? TooltipContent { get; private set; }
+        public DailyChallengeTooltipData? TooltipContent { get; private set; }
 
         private OsuSpriteText dailyStreak = null!;
 
@@ -103,6 +103,6 @@ namespace osu.Game.Overlays.Profile.Header.Components
             Show();
         }
 
-        public ITooltip<DailyChallengeStreakTooltipData> GetCustomTooltip() => new DailyChallengeStreakTooltip();
+        public ITooltip<DailyChallengeTooltipData> GetCustomTooltip() => new DailyChallengeStatsTooltip();
     }
 }
