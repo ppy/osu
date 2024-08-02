@@ -20,7 +20,12 @@ namespace osu.Game.Tournament.Components
         public TrapInfoDisplay(TrapType trap = TrapType.Unknown,
             TeamColour team = TeamColour.Neutral, int mapID = 0)
         {
-            thisTrap = new TrapInfo(colour: team, type: trap, mapID: mapID);
+            thisTrap = new TrapInfo
+            {
+                Team = team,
+                Mode = trap,
+                BeatmapID = mapID
+            };
             Anchor = Anchor.BottomCentre;
             Origin = Anchor.BottomCentre;
             Height = 100;
