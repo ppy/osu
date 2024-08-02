@@ -8,6 +8,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
@@ -16,6 +17,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
 using osu.Game.Tournament.Models;
+using osu.Game.Users.Drawables;
 using osuTK.Graphics;
 
 namespace osu.Game.Tournament.Components
@@ -37,6 +39,7 @@ namespace osu.Game.Tournament.Components
         private Box flash = null!;
 
         private SpriteIcon icon = null!;
+        private SpriteIcon statusIcon = null!;
 
         public BoardBeatmapPanel(IBeatmapInfo? beatmap, string mod = "", string index = "")
         {
@@ -139,13 +142,6 @@ namespace osu.Game.Tournament.Components
                         }
                     },
                 },
-                flash = new Box
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = Color4.Gray,
-                    Blending = BlendingParameters.Additive,
-                    Alpha = 0,
-                },
                 icon = new SpriteIcon
                 {
                     Anchor = Anchor.Centre,
@@ -153,8 +149,24 @@ namespace osu.Game.Tournament.Components
                     RelativeSizeAxes = Axes.Both,
                     Colour = Color4.White,
                     Size = new osuTK.Vector2(0.4f),
-                    Alpha = 0
-                }
+                    Alpha = 0,
+                },
+                statusIcon = new SpriteIcon
+                {
+                    Anchor = Anchor.BottomLeft,
+                    Origin = Anchor.BottomLeft,
+                    Colour = Color4.White,
+                    Size = new osuTK.Vector2(24),
+                    Position = new osuTK.Vector2(5, -5),
+                    Alpha = 0,
+                },
+                flash = new Box
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = Color4.Gray,
+                    Blending = BlendingParameters.Additive,
+                    Alpha = 0,
+                },
             });
 
             if (!string.IsNullOrEmpty(mod))
@@ -205,7 +217,7 @@ namespace osu.Game.Tournament.Components
                     icon.FadeInFromZero(500);
                 }
 
-                BorderThickness = 6;
+                BorderThickness = 4;
 
                 BorderColour = TournamentGame.GetTeamColour(newChoice.Team);
 
@@ -213,42 +225,48 @@ namespace osu.Game.Tournament.Components
                 {
                     case ChoiceType.Pick:
                         Colour = Color4.White;
-                        Alpha = 0.7f;
-                        icon.Icon = FontAwesome.Solid.Check;
+                        Alpha = 1f;
+                        icon.FadeOut(duration: 200, easing: Easing.OutCubic);
                         break;
 
                     case ChoiceType.Ban:
                         Colour = Color4.Gray;
                         Alpha = 0.3f;
                         icon.Icon = FontAwesome.Solid.Ban;
+                        icon.Colour = newChoice.Team == TeamColour.Red ? new OsuColour().TeamColourRed : new OsuColour().Sky;
+                        BorderColour = Color4.White;
+                        BorderThickness = 0;
                         break;
 
                     case ChoiceType.Protect:
-                        Alpha = 0.4f;
-                        icon.Icon = FontAwesome.Solid.Lock;
-                        icon.Colour = new OsuColour().Cyan;
-                        icon.Alpha = 1;
+                        Alpha = 1f;
+                        statusIcon.FadeIn(duration: 200, easing: Easing.InCubic);
+                        statusIcon.Icon = FontAwesome.Solid.Lock;
+                        statusIcon.Colour = newChoice.Team == TeamColour.Red ? new OsuColour().TeamColourRed : new OsuColour().Sky;
                         break;
 
                     case ChoiceType.RedWin:
-                        Alpha = 1f;
+                        Alpha = 0.7f;
+                        Colour = Color4.Red;
                         icon.Icon = FontAwesome.Solid.Trophy;
-                        icon.Colour = new OsuColour().Red;
+                        icon.Colour = new OsuColour().TeamColourRed;
                         icon.Alpha = 0.73f; // Added this line to distinguish last win from other wins
                         break;
 
                     case ChoiceType.BlueWin:
-                        Alpha = 1f;
+                        Alpha = 0.7f;
+                        Colour = new OsuColour().Sky;
                         icon.Icon = FontAwesome.Solid.Trophy;
-                        icon.Colour = new OsuColour().Blue;
+                        icon.Colour = new OsuColour().TeamColourBlue;
                         icon.Alpha = 0.73f; // Added this line to distinguish last win from other wins
                         break;
 
                     case ChoiceType.Trap:
-                        Alpha = 0.4f;
-                        icon.Icon = FontAwesome.Solid.ExclamationCircle;
-                        icon.Colour = Color4.White;
-                        icon.Alpha = 1;
+                        Alpha = 1f;
+                        statusIcon.FadeIn(duration: 200, easing: Easing.InCubic);
+                        statusIcon.Icon = FontAwesome.Solid.ExclamationCircle;
+                        icon.Colour = newChoice.Team == TeamColour.Red ? new OsuColour().TeamColourRed : new OsuColour().Sky;
+                        BorderColour = Color4.White;
                         break;
                 }
             }
@@ -259,6 +277,7 @@ namespace osu.Game.Tournament.Components
                 Alpha = 1;
                 icon.Alpha = 0;
                 icon.Colour = Color4.White;
+                statusIcon.FadeOut(duration: 200, easing: Easing.OutCubic);
             }
 
             choice = newChoice;
