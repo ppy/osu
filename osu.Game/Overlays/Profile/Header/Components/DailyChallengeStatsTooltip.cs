@@ -21,7 +21,7 @@ using Color4 = osuTK.Graphics.Color4;
 
 namespace osu.Game.Overlays.Profile.Header.Components
 {
-    public partial class DailyChallengeStreakTooltip : VisibilityContainer, ITooltip<DailyChallengeStreakTooltipData>
+    public partial class DailyChallengeStatsTooltip : VisibilityContainer, ITooltip<DailyChallengeTooltipData>
     {
         private StreakPiece currentDaily = null!;
         private StreakPiece currentWeekly = null!;
@@ -104,7 +104,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
             };
         }
 
-        public void SetContent(DailyChallengeStreakTooltipData content)
+        public void SetContent(DailyChallengeTooltipData content)
         {
             var statistics = content.Statistics;
             var colourProvider = content.ColourProvider;
@@ -237,5 +237,5 @@ namespace osu.Game.Overlays.Profile.Header.Components
         }
     }
 
-    public record DailyChallengeStreakTooltipData(OverlayColourProvider ColourProvider, APIUserDailyChallengeStatistics Statistics);
+    public record DailyChallengeTooltipData(OverlayColourProvider ColourProvider, APIUserDailyChallengeStatistics Statistics);
 }
