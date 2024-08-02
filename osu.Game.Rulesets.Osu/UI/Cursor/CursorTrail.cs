@@ -65,6 +65,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
             }
 
             AddLayout(partSizeCache);
+            AddLayout(scaleRatioCache);
         }
 
         [BackgroundDependencyLoader]
@@ -154,8 +155,16 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
             return base.OnMouseMove(e);
         }
 
+        private readonly LayoutValue<Vector2> scaleRatioCache = new LayoutValue<Vector2>(Invalidation.DrawInfo | Invalidation.RequiredParentSizeToFit | Invalidation.Presence);
+
+        private Vector2 scaleRatio => scaleRatioCache.IsValid
+            ? scaleRatioCache.Value
+            : (scaleRatioCache.Value = DrawInfo.MatrixInverse.ExtractScale().Xy);
+
         protected void AddTrail(Vector2 position)
         {
+            position = ToLocalSpace(position);
+
             if (InterpolateMovements)
             {
                 if (!lastPosition.HasValue)
@@ -174,10 +183,10 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                     float distance = diff.Length;
                     Vector2 direction = diff / distance;
 
-                    float interval = partSize.X / 2.5f * IntervalMultiplier;
-                    float stopAt = distance - (AvoidDrawingNearCursor ? interval : 0);
+                    Vector2 interval = partSize.X / 2.5f * IntervalMultiplier * scaleRatio;
+                    float stopAt = distance - (AvoidDrawingNearCursor ? interval.Length : 0);
 
-                    for (float d = interval; d < stopAt; d += interval)
+                    for (Vector2 d = interval; d.Length < stopAt; d += interval)
                     {
                         lastPosition = pos1 + direction * d;
                         addPart(lastPosition.Value);
@@ -191,9 +200,9 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
             }
         }
 
-        private void addPart(Vector2 screenSpacePosition)
+        private void addPart(Vector2 localSpacePosition)
         {
-            parts[currentIndex].Position = ToLocalSpace(screenSpacePosition);
+            parts[currentIndex].Position = localSpacePosition;
             parts[currentIndex].Time = time + 1;
             ++parts[currentIndex].InvalidationID;
 
