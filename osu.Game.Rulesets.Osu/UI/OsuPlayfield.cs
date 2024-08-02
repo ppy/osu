@@ -206,7 +206,7 @@ namespace osu.Game.Rulesets.Osu.UI
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => HitObjectContainer.ReceivePositionalInputAt(screenSpacePos);
 
-        private OsuResumeOverlay.OsuResumeOverlayInputBlocker resumeInputBlocker;
+        private OsuResumeOverlay.OsuResumeOverlayInputBlocker? resumeInputBlocker;
 
         public void AttachResumeOverlayInputBlocker(OsuResumeOverlay.OsuResumeOverlayInputBlocker resumeInputBlocker)
         {
