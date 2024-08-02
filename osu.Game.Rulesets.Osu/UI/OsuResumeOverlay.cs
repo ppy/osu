@@ -115,10 +115,7 @@ namespace osu.Game.Rulesets.Osu.UI
                             return false;
 
                         scaleTransitionContainer.ScaleTo(2, TRANSITION_TIME, Easing.OutQuint);
-
-                        // When resuming with a button, we do not want the osu! input manager to see this button press and include it in the score.
-                        // To ensure that this works correctly, schedule the resume operation one frame forward, since the resume operation enables the input manager to see input events.
-                        Schedule(() => ResumeRequested?.Invoke());
+                        ResumeRequested?.Invoke();
                         return true;
                 }
 
