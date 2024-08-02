@@ -16,7 +16,6 @@ using osu.Framework.Graphics.Shaders.Types;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Input;
 using osu.Framework.Input.Events;
-using osu.Framework.Layout;
 using osu.Framework.Timing;
 using osuTK;
 using osuTK.Graphics;
@@ -63,9 +62,6 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                 // -1 signals that the part is unusable, and should not be drawn
                 parts[i].InvalidationID = -1;
             }
-
-            AddLayout(partSizeCache);
-            AddLayout(scaleRatioCache);
         }
 
         [BackgroundDependencyLoader]
@@ -95,12 +91,6 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                 Invalidate(Invalidation.DrawNode);
             }
         }
-
-        private readonly LayoutValue<Vector2> partSizeCache = new LayoutValue<Vector2>(Invalidation.DrawInfo | Invalidation.RequiredParentSizeToFit | Invalidation.Presence);
-
-        private Vector2 partSize => partSizeCache.IsValid
-            ? partSizeCache.Value
-            : (partSizeCache.Value = new Vector2(Texture.DisplayWidth, Texture.DisplayHeight) * DrawInfo.Matrix.ExtractScale().Xy);
 
         /// <summary>
         /// The amount of time to fade the cursor trail pieces.
@@ -155,12 +145,6 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
             return base.OnMouseMove(e);
         }
 
-        private readonly LayoutValue<Vector2> scaleRatioCache = new LayoutValue<Vector2>(Invalidation.DrawInfo | Invalidation.RequiredParentSizeToFit | Invalidation.Presence);
-
-        private Vector2 scaleRatio => scaleRatioCache.IsValid
-            ? scaleRatioCache.Value
-            : (scaleRatioCache.Value = DrawInfo.MatrixInverse.ExtractScale().Xy);
-
         protected void AddTrail(Vector2 position)
         {
             position = ToLocalSpace(position);
@@ -183,10 +167,10 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                     float distance = diff.Length;
                     Vector2 direction = diff / distance;
 
-                    Vector2 interval = partSize.X / 2.5f * IntervalMultiplier * scaleRatio;
-                    float stopAt = distance - (AvoidDrawingNearCursor ? interval.Length : 0);
+                    float interval = Texture.DisplayWidth / 2.5f * IntervalMultiplier;
+                    float stopAt = distance - (AvoidDrawingNearCursor ? interval : 0);
 
-                    for (Vector2 d = interval; d.Length < stopAt; d += interval)
+                    for (float d = interval; d < stopAt; d += interval)
                     {
                         lastPosition = pos1 + direction * d;
                         addPart(lastPosition.Value);
