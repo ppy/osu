@@ -39,5 +39,9 @@ namespace osu.Game.Tournament.Models
         RedWin,
         BlueWin,
         Trap,
+        /// <summary>
+        /// A special type, Swap specific
+        /// </summary>
+        TrapSwap,
     }
 }

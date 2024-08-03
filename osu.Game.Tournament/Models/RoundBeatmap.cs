@@ -11,6 +11,10 @@ namespace osu.Game.Tournament.Models
         public string ModIndex = string.Empty;
         public string Mods = string.Empty;
 
+        // Board view specific
+        public int BoardX;
+        public int BoardY;
+
         [JsonProperty("BeatmapInfo")]
         public TournamentBeatmap? Beatmap;
     }

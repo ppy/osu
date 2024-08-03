@@ -229,11 +229,6 @@ namespace osu.Game.Tournament
                     chatContainer.ResizeWidthTo(0.5f, 500, Easing.OutQuint);
                     break;
 
-                case EXBoardScreen:
-                    chatContainer.FadeIn(TournamentScreen.FADE_DELAY);
-                    chatContainer.ResizeWidthTo(1, 500, Easing.OutQuint);
-                    break;
-
                 default:
                     chatContainer.FadeOut(TournamentScreen.FADE_DELAY);
                     break;
