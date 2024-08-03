@@ -27,7 +27,9 @@ namespace osu.Game.Tests.Gameplay
             var scoreProcessor = ruleset.CreateScoreProcessor();
             scoreProcessor.ApplyBeatmap(playableBeatmap);
 
-            return new GameplayState(playableBeatmap, ruleset, mods, score, scoreProcessor);
+            var healthProcessor = ruleset.CreateHealthProcessor(beatmap.HitObjects[0].StartTime);
+
+            return new GameplayState(playableBeatmap, ruleset, mods, score, scoreProcessor, healthProcessor);
         }
     }
 }

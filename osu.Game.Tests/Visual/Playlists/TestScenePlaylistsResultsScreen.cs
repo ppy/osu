@@ -413,16 +413,17 @@ namespace osu.Game.Tests.Visual.Playlists
             };
         }
 
-        private partial class TestResultsScreen : PlaylistsResultsScreen
+        private partial class TestResultsScreen : PlaylistItemUserResultsScreen
         {
             public new LoadingSpinner LeftSpinner => base.LeftSpinner;
             public new LoadingSpinner CentreSpinner => base.CentreSpinner;
             public new LoadingSpinner RightSpinner => base.RightSpinner;
             public new ScorePanelList ScorePanelList => base.ScorePanelList;
 
-            public TestResultsScreen([CanBeNull] ScoreInfo score, int roomId, PlaylistItem playlistItem, bool allowRetry = true)
-                : base(score, roomId, playlistItem, allowRetry)
+            public TestResultsScreen([CanBeNull] ScoreInfo score, int roomId, PlaylistItem playlistItem)
+                : base(score, roomId, playlistItem)
             {
+                AllowRetry = true;
             }
         }
     }

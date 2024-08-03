@@ -666,6 +666,56 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddAssert($"Check {zzz_lowercase} is second last", () => carousel.BeatmapSets.SkipLast(1).Last().Metadata.Artist == zzz_lowercase);
         }
 
+        [Test]
+        public void TestSortByArtistUsesTitleAsTiebreaker()
+        {
+            var sets = new List<BeatmapSetInfo>();
+
+            AddStep("Populuate beatmap sets", () =>
+            {
+                sets.Clear();
+
+                for (int i = 0; i < 20; i++)
+                {
+                    var set = TestResources.CreateTestBeatmapSetInfo();
+
+                    if (i == 4)
+                    {
+                        set.Beatmaps.ForEach(b =>
+                        {
+                            b.Metadata.Artist = "ZZZ";
+                            b.Metadata.Title = "AAA";
+                        });
+                    }
+
+                    if (i == 8)
+                    {
+                        set.Beatmaps.ForEach(b =>
+                        {
+                            b.Metadata.Artist = "ZZZ";
+                            b.Metadata.Title = "ZZZ";
+                        });
+                    }
+
+                    sets.Add(set);
+                }
+            });
+
+            loadBeatmaps(sets);
+
+            AddStep("Sort by artist", () => carousel.Filter(new FilterCriteria { Sort = SortMode.Artist }, false));
+            AddAssert("Check last item", () =>
+            {
+                var lastItem = carousel.BeatmapSets.Last();
+                return lastItem.Metadata.Artist == "ZZZ" && lastItem.Metadata.Title == "ZZZ";
+            });
+            AddAssert("Check second last item", () =>
+            {
+                var secondLastItem = carousel.BeatmapSets.SkipLast(1).Last();
+                return secondLastItem.Metadata.Artist == "ZZZ" && secondLastItem.Metadata.Title == "AAA";
+            });
+        }
+
         /// <summary>
         /// Ensures stability is maintained on different sort modes for items with equal properties.
         /// </summary>

@@ -75,7 +75,7 @@ namespace osu.Game.Configuration
 #pragma warning restore CS0618 // Type or member is obsolete
             SetDefault(OsuSetting.AutomaticallyDownloadMissingBeatmaps, false);
 
-            SetDefault(OsuSetting.SavePassword, false).ValueChanged += enabled =>
+            SetDefault(OsuSetting.SavePassword, true).ValueChanged += enabled =>
             {
                 if (enabled.NewValue)
                     SetValue(OsuSetting.SaveUsername, true);
@@ -200,12 +200,17 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.EditorLimitedDistanceSnap, false);
             SetDefault(OsuSetting.EditorShowSpeedChanges, false);
 
+            SetDefault(OsuSetting.HideCountryFlags, false);
+
             SetDefault(OsuSetting.MultiplayerRoomFilter, RoomPermissionsFilter.All);
 
             SetDefault(OsuSetting.LastProcessedMetadataId, -1);
 
             SetDefault(OsuSetting.ComboColourNormalisationAmount, 0.2f, 0f, 1f, 0.01f);
             SetDefault<UserStatus?>(OsuSetting.UserOnlineStatus, null);
+
+            SetDefault(OsuSetting.EditorTimelineShowTimingChanges, true);
+            SetDefault(OsuSetting.EditorTimelineShowTicks, true);
         }
 
         protected override bool CheckLookupContainsPrivateInformation(OsuSetting lookup)
@@ -435,6 +440,9 @@ namespace osu.Game.Configuration
         TouchDisableGameplayTaps,
         ModSelectTextSearchStartsActive,
         UserOnlineStatus,
-        MultiplayerRoomFilter
+        MultiplayerRoomFilter,
+        HideCountryFlags,
+        EditorTimelineShowTimingChanges,
+        EditorTimelineShowTicks,
     }
 }

@@ -14,10 +14,10 @@ using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Database;
+using osu.Game.Online;
 using osu.Game.Online.API;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
-using osu.Game.Online.Solo;
 using osu.Game.Online.Spectator;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
@@ -45,7 +45,7 @@ namespace osu.Game.Screens.Play
 
         [Resolved(canBeNull: true)]
         [CanBeNull]
-        private SoloStatisticsWatcher soloStatisticsWatcher { get; set; }
+        private UserStatisticsWatcher userStatisticsWatcher { get; set; }
 
         private readonly object scoreSubmissionLock = new object();
         private TaskCompletionSource<bool> scoreSubmissionSource;
@@ -152,6 +152,10 @@ namespace osu.Game.Screens.Play
                                 Logger.Log($"Please ensure that you are using the latest version of the official game releases.\n\n{whatWillHappen}", level: LogLevel.Important);
                                 break;
 
+                            case @"invalid beatmap_hash":
+                                Logger.Log($"This beatmap does not match the online version. Please update or redownload it.\n\n{whatWillHappen}", level: LogLevel.Important);
+                                break;
+
                             case @"expired token":
                                 Logger.Log($"Your system clock is set incorrectly. Please check your system time, date and timezone.\n\n{whatWillHappen}", level: LogLevel.Important);
                                 break;
@@ -189,7 +193,7 @@ namespace osu.Game.Screens.Play
 
             await submitScore(score).ConfigureAwait(false);
             spectatorClient.EndPlaying(GameplayState);
-            soloStatisticsWatcher?.RegisterForStatisticsUpdateAfter(score.ScoreInfo);
+            userStatisticsWatcher?.RegisterForStatisticsUpdateAfter(score.ScoreInfo);
         }
 
         [Resolved]

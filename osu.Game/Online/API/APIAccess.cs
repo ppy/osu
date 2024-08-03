@@ -42,7 +42,11 @@ namespace osu.Game.Online.API
 
         public string WebsiteRootUrl { get; }
 
-        public int APIVersion => 20220705; // We may want to pull this from the game version eventually.
+        /// <summary>
+        /// The API response version.
+        /// See: https://osu.ppy.sh/docs/index.html#api-versions
+        /// </summary>
+        public int APIVersion { get; }
 
         public Exception LastLoginError { get; private set; }
 
@@ -84,12 +88,23 @@ namespace osu.Game.Online.API
             this.config = config;
             this.versionHash = versionHash;
 
+            if (game.IsDeployedBuild)
+                APIVersion = game.AssemblyVersion.Major * 10000 + game.AssemblyVersion.Minor;
+            else
+            {
+                var now = DateTimeOffset.Now;
+                APIVersion = now.Year * 10000 + now.Month * 100 + now.Day;
+            }
+
             APIEndpointUrl = endpointConfiguration.APIEndpointUrl;
             WebsiteRootUrl = endpointConfiguration.WebsiteRootUrl;
             NotificationsClient = setUpNotificationsClient();
 
             authentication = new OAuth(endpointConfiguration.APIClientID, endpointConfiguration.APIClientSecret, APIEndpointUrl);
+
             log = Logger.GetLogger(LoggingTarget.Network);
+            log.Add($@"API endpoint root: {APIEndpointUrl}");
+            log.Add($@"API request version: {APIVersion}");
 
             ProvidedUsername = config.Get<string>(OsuSetting.Username);
 
@@ -103,12 +118,11 @@ namespace osu.Game.Online.API
                 u.OldValue?.Activity.UnbindFrom(activity);
                 u.NewValue.Activity.BindTo(activity);
 
-                if (u.OldValue != null)
-                    localUserStatus.UnbindFrom(u.OldValue.Status);
-                localUserStatus.BindTo(u.NewValue.Status);
+                u.OldValue?.Status.UnbindFrom(localUserStatus);
+                u.NewValue.Status.BindTo(localUserStatus);
             }, true);
 
-            localUserStatus.BindValueChanged(val => configStatus.Value = val.NewValue);
+            localUserStatus.BindTo(configStatus);
 
             var thread = new Thread(run)
             {
@@ -148,6 +162,8 @@ namespace osu.Game.Online.API
         internal new void Schedule(Action action) => base.Schedule(action);
 
         public string AccessToken => authentication.RequestAccessToken();
+
+        public Guid SessionIdentifier { get; } = Guid.NewGuid();
 
         /// <summary>
         /// Number of consecutive requests which failed due to network issues.
@@ -583,6 +599,7 @@ namespace osu.Game.Online.API
             password = null;
             SecondFactorCode = null;
             authentication.Clear();
+            configStatus.Value = UserStatus.Online;
 
             // Scheduled prior to state change such that the state changed event is invoked with the correct user and their friends present
             Schedule(() =>

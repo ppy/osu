@@ -200,7 +200,13 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
             return multiplayerLeaderboard.TeamScores.Count == 2
                 ? new MultiplayerTeamResultsScreen(score, Room.RoomID.Value.Value, PlaylistItem, multiplayerLeaderboard.TeamScores)
-                : new MultiplayerResultsScreen(score, Room.RoomID.Value.Value, PlaylistItem);
+                {
+                    ShowUserStatistics = true,
+                }
+                : new MultiplayerResultsScreen(score, Room.RoomID.Value.Value, PlaylistItem)
+                {
+                    ShowUserStatistics = true
+                };
         }
 
         protected override void Dispose(bool isDisposing)
