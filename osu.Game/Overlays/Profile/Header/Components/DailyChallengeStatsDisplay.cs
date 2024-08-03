@@ -57,7 +57,9 @@ namespace osu.Game.Overlays.Profile.Header.Components
                         new OsuTextFlowContainer(s => s.Font = OsuFont.GetFont(size: 12))
                         {
                             AutoSizeAxes = Axes.Both,
-                            Text = UsersStrings.ShowDailyChallengeTitle,
+                            // can't use this because osu-web does weird stuff with \\n.
+                            // Text = UsersStrings.ShowDailyChallengeTitle.,
+                            Text = "Daily\nChallenge",
                             Margin = new MarginPadding { Horizontal = 5f, Bottom = 2f },
                         },
                         new Container
