@@ -45,6 +45,8 @@ namespace osu.Game.Tournament.Screens.Board
         private OsuButton buttonRedTrap = null!;
         private OsuButton buttonBlueTrap = null!;
 
+        private OsuButton buttonTrapSwap = null!;
+
         private TrapTypeDropdown trapTypeDropdown = null!;
         private Container trapInfoDisplayHolder = null!;
         private Container InstructionDisplayHolder = null!;
@@ -261,6 +263,13 @@ namespace osu.Game.Tournament.Screens.Board
                             BackgroundColour = TournamentGame.COLOUR_BLUE,
                             Action = () => setMode(TeamColour.Blue, ChoiceType.Trap)
                         },
+                        buttonTrapSwap = new TourneyButton
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            Text = "Perform Swap",
+                            BackgroundColour = Color4.Indigo,
+                            Action = () => setMode(TeamColour.Neutral, ChoiceType.TrapSwap)
+                        },
                         new ControlPanel.Spacer(),
                         new TourneyButton
                         {
@@ -306,6 +315,7 @@ namespace osu.Game.Tournament.Screens.Board
             buttonBlueWin.Colour = setColour(pickColour == TeamColour.Blue && pickType == ChoiceType.BlueWin);
             buttonRedTrap.Colour = setColour(pickColour == TeamColour.Red && pickType == ChoiceType.Trap);
             buttonBlueTrap.Colour = setColour(pickColour == TeamColour.Blue && pickType == ChoiceType.Trap);
+            buttonTrapSwap.Colour = setColour(pickType == ChoiceType.TrapSwap);
 
             static Color4 setColour(bool active) => active ? Color4.White : Color4.Gray;
 
@@ -331,13 +341,22 @@ namespace osu.Game.Tournament.Screens.Board
                     InstructionDisplayHolder.Child = new InstructionDisplay(team: pickColour, step: Steps.Win);
                     break;
 
+                case ChoiceType.TrapSwap:
+                    trapInfoDisplayHolder.Child = new TrapInfoDisplay(trap: TrapType.Swap);
+                    InstructionDisplayHolder.FadeOut(duration: 250, easing: Easing.OutCubic);
+                    trapInfoDisplayHolder.FadeInFromZero(duration: 250, easing: Easing.InCubic);
+                    break;
+
                 default:
                     InstructionDisplayHolder.Child = new InstructionDisplay(step: Steps.Default);
                     break;
             }
 
-            trapInfoDisplayHolder.FadeOut(duration: 250, easing: Easing.OutCubic);
-            InstructionDisplayHolder.FadeInFromZero(duration: 250, easing: Easing.InCubic);
+            if (choiceType != ChoiceType.TrapSwap)
+            {
+                trapInfoDisplayHolder.FadeOut(duration: 250, easing: Easing.OutCubic);
+                InstructionDisplayHolder.FadeInFromZero(duration: 250, easing: Easing.InCubic);
+            }
         }
 
         /*
