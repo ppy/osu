@@ -272,6 +272,9 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty("groups")]
         public APIUserGroup[] Groups;
 
+        [JsonProperty("daily_challenge_user_stats")]
+        public APIUserDailyChallengeStatistics DailyChallengeStatistics = new APIUserDailyChallengeStatistics();
+
         public override string ToString() => Username;
 
         /// <summary>
