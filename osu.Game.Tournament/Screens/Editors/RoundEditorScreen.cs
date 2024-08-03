@@ -9,6 +9,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
@@ -95,6 +96,12 @@ namespace osu.Game.Tournament.Screens.Editors
                                 Width = 0.33f,
                                 Current = Model.BestOf
                             },
+                            new OsuCheckbox
+                            {
+                                LabelText = "Board Mode",
+                                Width = 0.33f,
+                                Current = Model.UseBoard,
+                            },
                             new SettingsButton
                             {
                                 Width = 0.2f,
@@ -170,6 +177,9 @@ namespace osu.Game.Tournament.Screens.Editors
 
                     private readonly Bindable<string> mods = new Bindable<string>(string.Empty);
 
+                    private readonly Bindable<int?> boardX = new Bindable<int?>();
+                    private readonly Bindable<int?> boardY = new Bindable<int?>();
+
                     private readonly Container drawableContainer;
 
                     public RoundBeatmapRow(TournamentRound team, RoundBeatmap beatmap)
@@ -204,7 +214,7 @@ namespace osu.Game.Tournament.Screens.Editors
                                     {
                                         LabelText = "Beatmap ID",
                                         RelativeSizeAxes = Axes.None,
-                                        Width = 200,
+                                        Width = 125,
                                         Current = beatmapId,
                                     },
                                     new SettingsTextBox
@@ -220,6 +230,20 @@ namespace osu.Game.Tournament.Screens.Editors
                                         RelativeSizeAxes = Axes.None,
                                         Width = 100,
                                         Current = modIndex,
+                                    },
+                                    new SettingsNumberBox
+                                    {
+                                        LabelText = "Board Row",
+                                        RelativeSizeAxes = Axes.None,
+                                        Width = 100,
+                                        Current = boardX,
+                                    },
+                                    new SettingsNumberBox
+                                    {
+                                        LabelText = "Board Column",
+                                        RelativeSizeAxes = Axes.None,
+                                        Width = 100,
+                                        Current = boardY,
                                     },
                                     drawableContainer = new Container
                                     {
@@ -281,6 +305,10 @@ namespace osu.Game.Tournament.Screens.Editors
                         mods.BindValueChanged(modString => Model.Mods = modString.NewValue);
                         modIndex.Value = Model.ModIndex;
                         modIndex.BindValueChanged(newIndex => Model.ModIndex = newIndex.NewValue);
+                        boardX.Value = Model.BoardX;
+                        boardX.BindValueChanged(newX => { Model.BoardX = newX.NewValue ?? 0; });
+                        boardY.Value = Model.BoardY;
+                        boardY.BindValueChanged(newY => { Model.BoardY = newY.NewValue ?? 0; });
                     }
 
                     private void updatePanel() => Schedule(() =>
