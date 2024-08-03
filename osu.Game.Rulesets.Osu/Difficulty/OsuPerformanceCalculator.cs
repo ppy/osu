@@ -145,7 +145,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                                  (totalHits > 2000 ? Math.Log10(totalHits / 2000.0) * 0.5 : 0.0);
             speedValue *= lengthBonus;
 
-            // Penalize misses by assessing # of misses relative to the total # of objects. Default a 3% reduction for any # of misses.
+            // Penalize misses by assessing # of misses relative to the total # of objects. Default a 3% reduction for at least 1 miss.
             double missPenaltyBase = 1 - 0.03 * Math.Min(effectiveMissCount, 1);
             speedValue *= missPenaltyBase * Math.Pow(1 - Math.Pow(effectiveMissCount / totalHits, 0.775), Math.Pow(effectiveMissCount, .875));
 
@@ -228,7 +228,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double flashlightValue = Math.Pow(attributes.FlashlightDifficulty, 2.0) * 25.0;
 
-            // Penalize misses by assessing # of misses relative to the total # of objects. Default a 3% reduction for any # of misses.
+            // Penalize misses by assessing # of misses relative to the total # of objects. Default a 3% reduction for at least 1 miss.
             double missPenaltyBase = 1 - 0.03 * Math.Min(effectiveMissCount, 1);
             flashlightValue *= missPenaltyBase * Math.Pow(1 - Math.Pow(effectiveMissCount / totalHits, 0.775), Math.Pow(effectiveMissCount, .875));
 
