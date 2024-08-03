@@ -1,29 +1,30 @@
-{
-  "solution": {
-    "path": "osu.sln",
-    "projects": [
-      "osu.Desktop\\osu.Desktop.csproj",
-      "osu.Game.Benchmarks\\osu.Game.Benchmarks.csproj",
-      "osu.Game.Rulesets.Catch.Tests\\osu.Game.Rulesets.Catch.Tests.csproj",
-      "osu.Game.Rulesets.Catch\\osu.Game.Rulesets.Catch.csproj",
-      "osu.Game.Rulesets.Mania.Tests\\osu.Game.Rulesets.Mania.Tests.csproj",
-      "osu.Game.Rulesets.Mania\\osu.Game.Rulesets.Mania.csproj",
-      "osu.Game.Rulesets.Osu.Tests\\osu.Game.Rulesets.Osu.Tests.csproj",
-      "osu.Game.Rulesets.Osu\\osu.Game.Rulesets.Osu.csproj",
-      "osu.Game.Rulesets.Taiko.Tests\\osu.Game.Rulesets.Taiko.Tests.csproj",
-      "osu.Game.Rulesets.Taiko\\osu.Game.Rulesets.Taiko.csproj",
-      "osu.Game.Tests\\osu.Game.Tests.csproj",
-      "osu.Game.Tournament.Tests\\osu.Game.Tournament.Tests.csproj",
-      "osu.Game.Tournament\\osu.Game.Tournament.csproj",
-      "osu.Game\\osu.Game.csproj",
-      "Templates\\Rulesets\\ruleset-empty\\osu.Game.Rulesets.EmptyFreeform.Tests\\osu.Game.Rulesets.EmptyFreeform.Tests.csproj",
-      "Templates\\Rulesets\\ruleset-empty\\osu.Game.Rulesets.EmptyFreeform\\osu.Game.Rulesets.EmptyFreeform.csproj",
-      "Templates\\Rulesets\\ruleset-example\\osu.Game.Rulesets.Pippidon.Tests\\osu.Game.Rulesets.Pippidon.Tests.csproj",
-      "Templates\\Rulesets\\ruleset-example\\osu.Game.Rulesets.Pippidon\\osu.Game.Rulesets.Pippidon.csproj",
-      "Templates\\Rulesets\\ruleset-scrolling-empty\\osu.Game.Rulesets.EmptyScrolling.Tests\\osu.Game.Rulesets.EmptyScrolling.Tests.csproj",
-      "Templates\\Rulesets\\ruleset-scrolling-empty\\osu.Game.Rulesets.EmptyScrolling\\osu.Game.Rulesets.EmptyScrolling.csproj",
-      "Templates\\Rulesets\\ruleset-scrolling-example\\osu.Game.Rulesets.Pippidon.Tests\\osu.Game.Rulesets.Pippidon.Tests.csproj",
-      "Templates\\Rulesets\\ruleset-scrolling-example\\osu.Game.Rulesets.Pippidon\\osu.Game.Rulesets.Pippidon.csproj"
-    ]
-  }
+﻿{
+    "solution":  {
+                     "path":  "osu.sln",
+                     "projects":  [
+                                      "osu.Desktop\\osu.Desktop.csproj",
+                                      "osu.Game.Benchmarks\\osu.Game.Benchmarks.csproj",
+                                      "osu.Game.Rulesets.Catch.Tests\\osu.Game.Rulesets.Catch.Tests.csproj",
+                                      "osu.Game.Rulesets.Catch\\osu.Game.Rulesets.Catch.csproj",
+                                      "osu.Game.Rulesets.Mania.Tests\\osu.Game.Rulesets.Mania.Tests.csproj",
+                                      "osu.Game.Rulesets.Mania\\osu.Game.Rulesets.Mania.csproj",
+                                      "osu.Game.Rulesets.Osu.Tests\\osu.Game.Rulesets.Osu.Tests.csproj",
+                                      "osu.Game.Rulesets.Osu\\osu.Game.Rulesets.Osu.csproj",
+                                      "osu.Game.Rulesets.Taiko.Tests\\osu.Game.Rulesets.Taiko.Tests.csproj",
+                                      "osu.Game.Rulesets.Taiko\\osu.Game.Rulesets.Taiko.csproj",
+                                      "osu.Game.Tests\\osu.Game.Tests.csproj",
+                                      "osu.Game.Tournament.Tests\\osu.Game.Tournament.Tests.csproj",
+                                      "osu.Game.Tournament\\osu.Game.Tournament.csproj",
+                                      "osu.Game\\osu.Game.csproj",
+                                      "Templates\\Rulesets\\ruleset-empty\\osu.Game.Rulesets.EmptyFreeform.Tests\\osu.Game.Rulesets.EmptyFreeform.Tests.csproj",
+                                      "Templates\\Rulesets\\ruleset-empty\\osu.Game.Rulesets.EmptyFreeform\\osu.Game.Rulesets.EmptyFreeform.csproj",
+                                      "Templates\\Rulesets\\ruleset-example\\osu.Game.Rulesets.Pippidon.Tests\\osu.Game.Rulesets.Pippidon.Tests.csproj",
+                                      "Templates\\Rulesets\\ruleset-example\\osu.Game.Rulesets.Pippidon\\osu.Game.Rulesets.Pippidon.csproj",
+                                      "Templates\\Rulesets\\ruleset-scrolling-empty\\osu.Game.Rulesets.EmptyScrolling.Tests\\osu.Game.Rulesets.EmptyScrolling.Tests.csproj",
+                                      "Templates\\Rulesets\\ruleset-scrolling-empty\\osu.Game.Rulesets.EmptyScrolling\\osu.Game.Rulesets.EmptyScrolling.csproj",
+                                      "Templates\\Rulesets\\ruleset-scrolling-example\\osu.Game.Rulesets.Pippidon.Tests\\osu.Game.Rulesets.Pippidon.Tests.csproj",
+                                      "Templates\\Rulesets\\ruleset-scrolling-example\\osu.Game.Rulesets.Pippidon\\osu.Game.Rulesets.Pippidon.csproj",
+                                      "../osu-resources/osu.Game.Resources/osu.Game.Resources.csproj"
+                                  ]
+                 }
 }

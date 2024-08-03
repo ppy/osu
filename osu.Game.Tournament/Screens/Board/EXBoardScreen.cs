@@ -79,7 +79,7 @@ namespace osu.Game.Tournament.Screens.Board
                         new TournamentMatchChatDisplay(cornerRadius: 10)
                         {
                             RelativeSizeAxes = Axes.None,
-                            Height = sideListHeight - team1List.GetHeight() - 10,
+                            Height = sideListHeight - team1List.GetHeight() - 5,
                             Width = 300,
                             Anchor = Anchor.TopLeft,
                             Origin = Anchor.TopLeft,
@@ -113,7 +113,7 @@ namespace osu.Game.Tournament.Screens.Board
                             Origin = Anchor.TopRight,
                             RelativeSizeAxes = Axes.None,
                             Width = 300,
-                            Height = sideListHeight - team2List.GetHeight() - 10,
+                            Height = sideListHeight - team2List.GetHeight() - 5,
                             Margin = new MarginPadding { Top = 10 },
                             Colour = Color4.Black,
                             Alpha = 0.7f,
@@ -183,14 +183,14 @@ namespace osu.Game.Tournament.Screens.Board
                                 {
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.CentreLeft,
-                                    Text = @"从上到下依次循环进行，获胜方可更改任意格子颜色。",
+                                    Text = @"从上到下依次循环进行，获胜方可更改任意格子颜色",
                                     Font = OsuFont.HarmonyOSSans.With(size: 20, weight: FontWeight.Regular),
                                 },
                                 new TournamentSpriteText
                                 {
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.CentreLeft,
-                                    Text = @"可用棋盘获胜时将自动退出此状态。",
+                                    Text = @"可用棋盘获胜时将自动退出此状态",
                                     Colour = Color4.Orange,
                                     Font = OsuFont.HarmonyOSSans.With(size: 20, weight: FontWeight.Regular),
                                 },

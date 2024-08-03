@@ -28,6 +28,7 @@ namespace osu.Game.Tournament.Screens.Gameplay
         private TourneyButton chatToggle = null!;
         // private SettingsSlider<float> redMultiplier = null!;
         // private SettingsSlider<float> blueMultiplier = null!;
+
         private MatchIPCInfo ipc = null!;
 
         [Resolved]
