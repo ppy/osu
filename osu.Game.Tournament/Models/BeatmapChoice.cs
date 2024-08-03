@@ -43,5 +43,9 @@ namespace osu.Game.Tournament.Models
         /// A special type, Swap specific
         /// </summary>
         TrapSwap,
+        /// <summary>
+        /// Another special type placeholder, shouldn't be used in normal conditions
+        /// </summary>
+        Neutral,
     }
 }

@@ -26,6 +26,8 @@ namespace osu.Game.Tournament.Models
 
         public int BeatmapID;
 
+        public bool IsTriggered = false;
+
         private SpriteIcon icon = new SpriteIcon
         {
             Icon = FontAwesome.Solid.QuestionCircle,
@@ -46,6 +48,7 @@ namespace osu.Game.Tournament.Models
             Team = colour;
             Mode = type;
             BeatmapID = mapID;
+            IsTriggered = false;
 
             switch (type)
             {
