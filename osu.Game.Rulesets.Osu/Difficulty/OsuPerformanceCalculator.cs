@@ -246,6 +246,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             return flashlightValue;
         }
 
+        // https://www.desmos.com/calculator/knduquaytu
         private double calculateEffectiveMissCount(OsuDifficultyAttributes attributes)
         {
             // Guess the number of misses + slider breaks from combo
