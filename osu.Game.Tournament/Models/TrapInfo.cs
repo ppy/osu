@@ -51,28 +51,28 @@ namespace osu.Game.Tournament.Models
             {
                 case TrapType.Follow:
                     name = @"时空之门";
-                    description = @"陷阱设置方获得额外两次选图机会。";
+                    description = @"陷阱设置方获得额外两次选图机会";
                     icon.Icon = FontAwesome.Solid.Clock;
                     icon.Colour = new OsuColour().Purple1;
                     break;
 
                 case TrapType.Swap:
                     name = @"大陆漂移";
-                    description = @"游玩结束后，此格子将与另一格子完全交换。";
+                    description = @"游玩结束后，此格子将与另一格子完全交换";
                     icon.Icon = FontAwesome.Solid.ExchangeAlt;
                     icon.Colour = Color4.Orange;
                     break;
 
                 case TrapType.Solo:
                     name = @"决一死战";
-                    description = @"两队各派1人游玩，FM图必须选择Mod。";
+                    description = @"两队各派1人游玩，FM图必须选择Mod";
                     icon.Icon = FontAwesome.Solid.UserCircle;
                     icon.Colour = new OsuColour().Pink1;
                     break;
 
                 case TrapType.Unused:
                     name = @"陷阱无效";
-                    description = @"布置方触发了陷阱，将不会生效。";
+                    description = @"布置方触发了陷阱，将不会生效";
                     icon.Icon = FontAwesome.Solid.Check;
                     icon.Colour = Color4.White;
                     break;
