@@ -33,14 +33,14 @@ namespace osu.Game.Graphics.Cursor
             private readonly TextFlowContainer text;
             private bool instantMovement = true;
 
-            private LocalisableString lastPresent;
+            private LocalisableString lastContent;
 
-            public override void SetContent(LocalisableString contentString)
+            public override void SetContent(LocalisableString content)
             {
-                if (contentString.Equals(lastPresent))
+                if (content.Equals(lastContent))
                     return;
 
-                text.Text = contentString;
+                text.Text = content;
 
                 if (IsPresent)
                 {
@@ -50,7 +50,7 @@ namespace osu.Game.Graphics.Cursor
                 else
                     AutoSizeDuration = 0;
 
-                lastPresent = contentString;
+                lastContent = content;
             }
 
             public OsuTooltip()
