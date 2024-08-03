@@ -96,7 +96,7 @@ namespace osu.Game.Overlays.Chat
             get => alternatingBackground;
             set
             {
-                if (alternatingBackground == value)
+                if (alternatingBackground == false)
                     return;
 
                 alternatingBackground = value;
