@@ -46,42 +46,56 @@ namespace osu.Game.Tournament.Models
         {
             Step = step;
 
-            teamPrompt = team == TeamColour.Red ? @"·红队" : (team == TeamColour.Blue ? @"·蓝队" : string.Empty);
+            teamPrompt = team == TeamColour.Red ? @"红队" : (team == TeamColour.Blue ? @"蓝队" : string.Empty);
 
             switch (Step)
             {
                 case Steps.Protect:
-                    name = @$"标记保图{teamPrompt}";
+                    name = @$"标记保图·{teamPrompt}";
                     description = @"被保护的图无法被禁与设置陷阱。";
                     icon.Icon = FontAwesome.Solid.Lock;
                     icon.Colour = new OsuColour().Cyan;
                     break;
 
                 case Steps.Ban:
-                    name = @$"标记禁图{teamPrompt}";
+                    name = @$"标记禁图·{teamPrompt}";
                     description = @"被禁止的图无法被选与设置陷阱。";
                     icon.Icon = FontAwesome.Solid.Ban;
                     icon.Colour = Color4.Orange;
                     break;
 
                 case Steps.Trap:
-                    name = @$"设置陷阱{teamPrompt}";
+                    name = @$"设置陷阱·{teamPrompt}";
                     description = @"请队长*私信*告知裁判，禁止外泄。";
                     icon.Icon = FontAwesome.Solid.ExclamationCircle;
                     icon.Colour = new OsuColour().Pink1;
                     break;
 
                 case Steps.Pick:
-                    name = @$"标记选图{teamPrompt}";
+                    name = @$"标记选图·{teamPrompt}";
                     description = @"选择该轮要游玩的图。";
                     icon.Icon = FontAwesome.Solid.Check;
                     icon.Colour = new OsuColour().Green;
                     break;
 
                 case Steps.Win:
-                    name = @$"胜方染色{teamPrompt}";
+                    name = @$"胜方染色·{teamPrompt}";
                     description = @"此图所在格将染成获胜队颜色。";
                     icon.Icon = FontAwesome.Solid.Trophy;
+                    icon.Colour = team == TeamColour.Red ? new OsuColour().Pink : (team == TeamColour.Blue ? new OsuColour().Sky : new OsuColour().Yellow);
+                    break;
+
+                case Steps.EX:
+                    name = @"即将进入 EX 模式";
+                    description = @"当前棋盘不足以任一方取胜，需要重新染色。";
+                    icon.Icon = FontAwesome.Solid.Bolt;
+                    icon.Colour = Color4.Orange;
+                    break;
+
+                case Steps.FinalWin:
+                    name = @$"{teamPrompt}获胜！";
+                    description = @$"恭喜{teamPrompt}获得最终胜利！";
+                    icon.Icon = FontAwesome.Solid.Medal;
                     icon.Colour = team == TeamColour.Red ? new OsuColour().Pink : (team == TeamColour.Blue ? new OsuColour().Sky : new OsuColour().Yellow);
                     break;
 
@@ -122,6 +136,9 @@ namespace osu.Game.Tournament.Models
                 case @"胜方染色":
                     return Steps.Win;
 
+                case @"即将进入 EX 模式":
+                    return Steps.EX;
+
                 default:
                     return Steps.Default;
             }
@@ -154,6 +171,14 @@ namespace osu.Game.Tournament.Models
         /// Mark colours.
         /// </summary>
         Win,
+        /// <summary>
+        /// The EX stage.
+        /// </summary>
+        EX,
+        /// <summary>
+        /// The winner is decided.
+        /// </summary>
+        FinalWin,
         /// <summary>
         /// Placeholder for default conditions.
         /// </summary>

@@ -318,7 +318,7 @@ namespace osu.Game.Tournament.Screens.Board
             if (CurrentMatch.Value.PicksBans.Any(p => p.BeatmapID == beatmapId))
             {
                 var existing = CurrentMatch.Value.PicksBans.FirstOrDefault(p => p.BeatmapID == beatmapId);
-                CurrentMatch.Value.PicksBans.Remove(existing);
+                if (existing != null) CurrentMatch.Value.PicksBans.Remove(existing);
             }
 
             CurrentMatch.Value.PicksBans.Add(new BeatmapChoice

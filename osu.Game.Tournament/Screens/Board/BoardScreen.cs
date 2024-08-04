@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -33,6 +34,8 @@ namespace osu.Game.Tournament.Screens.Board
         private TeamColour pickColour;
         private ChoiceType pickType;
 
+        private TeamColour teamWinner = TeamColour.Neutral;
+
         private OsuButton buttonRedBan = null!;
         private OsuButton buttonBlueBan = null!;
         private OsuButton buttonRedPick = null!;
@@ -47,9 +50,13 @@ namespace osu.Game.Tournament.Screens.Board
 
         private OsuButton buttonTrapSwap = null!;
 
+        private OsuButton buttonIndicator = null!;
+
+        private bool useEX = false;
+
         private TrapTypeDropdown trapTypeDropdown = null!;
         private Container trapInfoDisplayHolder = null!;
-        private Container InstructionDisplayHolder = null!;
+        private Container instructionDisplayHolder = null!;
 
         private DrawableTeamPlayerList team1List = null!;
         private DrawableTeamPlayerList team2List = null!;
@@ -170,7 +177,7 @@ namespace osu.Game.Tournament.Screens.Board
                     Height = 100,
                     Width = 500,
                 },
-                InstructionDisplayHolder = new Container
+                instructionDisplayHolder = new Container
                 {
                     Alpha = 1,
                     Anchor = Anchor.BottomCentre,
@@ -271,6 +278,14 @@ namespace osu.Game.Tournament.Screens.Board
                             Action = () => setMode(TeamColour.Neutral, ChoiceType.TrapSwap)
                         },
                         new ControlPanel.Spacer(),
+                        buttonIndicator = new TourneyButton
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            Text = "EX Indicator",
+                            BackgroundColour = Color4.Purple,
+                            Colour = Color4.Gray,
+                            Action = () => setMode(TeamColour.Neutral, ChoiceType.Neutral)
+                        },
                         new TourneyButton
                         {
                             RelativeSizeAxes = Axes.X,
@@ -322,40 +337,40 @@ namespace osu.Game.Tournament.Screens.Board
             switch (choiceType)
             {
                 case ChoiceType.Protect:
-                    InstructionDisplayHolder.Child = new InstructionDisplay(team: pickColour, step: Steps.Protect);
+                    instructionDisplayHolder.Child = new InstructionDisplay(team: pickColour, step: Steps.Protect);
                     break;
 
                 case ChoiceType.Pick:
-                    InstructionDisplayHolder.Child = new InstructionDisplay(team: pickColour, step: Steps.Pick);
+                    instructionDisplayHolder.Child = new InstructionDisplay(team: pickColour, step: Steps.Pick);
                     break;
 
                 case ChoiceType.Trap:
-                    InstructionDisplayHolder.Child = new InstructionDisplay(team: pickColour, step: Steps.Trap);
+                    instructionDisplayHolder.Child = new InstructionDisplay(team: pickColour, step: Steps.Trap);
                     break;
 
                 case ChoiceType.Ban:
-                    InstructionDisplayHolder.Child = new InstructionDisplay(team: pickColour, step: Steps.Ban);
+                    instructionDisplayHolder.Child = new InstructionDisplay(team: pickColour, step: Steps.Ban);
                     break;
 
                 case ChoiceType.RedWin or ChoiceType.BlueWin:
-                    InstructionDisplayHolder.Child = new InstructionDisplay(team: pickColour, step: Steps.Win);
+                    instructionDisplayHolder.Child = new InstructionDisplay(team: pickColour, step: Steps.Win);
                     break;
 
                 case ChoiceType.TrapSwap:
                     trapInfoDisplayHolder.Child = new TrapInfoDisplay(trap: TrapType.Swap);
-                    InstructionDisplayHolder.FadeOut(duration: 250, easing: Easing.OutCubic);
+                    instructionDisplayHolder.FadeOut(duration: 250, easing: Easing.OutCubic);
                     trapInfoDisplayHolder.FadeInFromZero(duration: 250, easing: Easing.InCubic);
                     break;
 
                 default:
-                    InstructionDisplayHolder.Child = new InstructionDisplay(step: Steps.Default);
+                    instructionDisplayHolder.Child = new InstructionDisplay(team: teamWinner, step: DetectWin() ? Steps.FinalWin : (useEX ? Steps.EX : Steps.Default));
                     break;
             }
 
             if (choiceType != ChoiceType.TrapSwap)
             {
                 trapInfoDisplayHolder.FadeOut(duration: 250, easing: Easing.OutCubic);
-                InstructionDisplayHolder.FadeInFromZero(duration: 250, easing: Easing.InCubic);
+                instructionDisplayHolder.FadeInFromZero(duration: 250, easing: Easing.InCubic);
             }
         }
 
@@ -432,6 +447,22 @@ namespace osu.Game.Tournament.Screens.Board
                     }
                 }
 
+                // Automatically detect EX & win conditions
+                if (CurrentMatch.Value != null)
+                {
+                    buttonIndicator.Colour = DetectWin() ? Color4.Orange : (DetectEX() ? Color4.White : Color4.Gray);
+                    if (teamWinner != TeamColour.Neutral)
+                    {
+                        instructionDisplayHolder.Child = new InstructionDisplay(team: teamWinner, step: Steps.FinalWin);
+                        instructionDisplayHolder.FadeInFromZero(duration: 500, easing: Easing.InCubic);
+                    }
+                    else if (useEX)
+                    {
+                        instructionDisplayHolder.Child = new InstructionDisplay(step: Steps.EX);
+                        instructionDisplayHolder.FadeInFromZero(duration: 200, easing: Easing.InCubic);
+                    }
+                }
+
                 return true;
             }
 
@@ -464,11 +495,12 @@ namespace osu.Game.Tournament.Screens.Board
             CurrentMatch.Value?.PicksBans.Clear();
             CurrentMatch.Value?.Protects.Clear();
             CurrentMatch.Value?.Traps.Clear();
+            CurrentMatch.Value?.PendingSwaps.Clear();
 
             // Reset bottom display
             trapInfoDisplayHolder.FadeOut(duration: 200, easing: Easing.OutCubic);
-            InstructionDisplayHolder.FadeInFromZero(duration: 200, easing: Easing.InCubic);
-            InstructionDisplayHolder.Child = new InstructionDisplay();
+            instructionDisplayHolder.FadeInFromZero(duration: 200, easing: Easing.InCubic);
+            instructionDisplayHolder.Child = new InstructionDisplay();
 
             // Reset button group
             buttonBlueProtect.Colour = Color4.White;
@@ -481,6 +513,8 @@ namespace osu.Game.Tournament.Screens.Board
             buttonRedPick.Colour = Color4.White;
             buttonRedWin.Colour = Color4.White;
             buttonRedTrap.Colour = Color4.White;
+            buttonTrapSwap.Colour = Color4.White;
+            buttonIndicator.Colour = Color4.Gray;
 
             // setNextMode();
         }
@@ -489,6 +523,9 @@ namespace osu.Game.Tournament.Screens.Board
 
         private void addForBeatmap(int beatmapId)
         {
+            if (pickType == ChoiceType.Neutral)
+                return;
+
             if (CurrentMatch.Value?.Round.Value == null)
                 return;
 
@@ -505,19 +542,55 @@ namespace osu.Game.Tournament.Screens.Board
                 return;
 
             // Show the trap description
-            if (CurrentMatch.Value.Traps.Any(p => p.BeatmapID == beatmapId && pickType == ChoiceType.Pick))
+            if (CurrentMatch.Value.Traps.Any(p => p.BeatmapID == beatmapId && !p.IsTriggered))
             {
                 var matchTrap = CurrentMatch.Value.Traps.First(p => p.BeatmapID == beatmapId);
-                if (matchTrap.Team != pickColour)
+                if (pickType == ChoiceType.Pick)
                 {
-                    trapInfoDisplayHolder.Child = new TrapInfoDisplay(trap: matchTrap.Mode, team: matchTrap.Team, mapID: matchTrap.BeatmapID);
+                    // Add as a pending Swap operation
+                    if (matchTrap.Mode == TrapType.Swap)
+                    {
+                        CurrentMatch.Value.PendingSwaps.Add(new BeatmapChoice
+                        {
+                            Team = TeamColour.Neutral,
+                            Type = ChoiceType.Neutral,
+                            BeatmapID = beatmapId,
+                        });
+                    }
+
+                    if (matchTrap.Team != pickColour)
+                    {
+                        trapInfoDisplayHolder.Child = new TrapInfoDisplay(trap: matchTrap.Mode, team: matchTrap.Team, mapID: matchTrap.BeatmapID);
+                    }
+                    else
+                    {
+                        trapInfoDisplayHolder.Child = new TrapInfoDisplay(trap: TrapType.Unused, team: matchTrap.Team, mapID: matchTrap.BeatmapID);
+                    }
+                    instructionDisplayHolder.FadeOut(duration: 250, easing: Easing.OutCubic);
+                    trapInfoDisplayHolder.FadeInFromZero(duration: 250, easing: Easing.InCubic);
                 }
                 else
                 {
-                    trapInfoDisplayHolder.Child = new TrapInfoDisplay(trap: TrapType.Unused, team: matchTrap.Team, mapID: matchTrap.BeatmapID);
+                    // Specially designed for Swap trap: Apply then "Trigger" as done
+                    if (isPickWin && matchTrap.Mode != TrapType.Swap)
+                    {
+                        matchTrap.IsTriggered = true;
+                    }
                 }
-                InstructionDisplayHolder.FadeOut(duration: 250, easing: Easing.OutCubic);
-                trapInfoDisplayHolder.FadeInFromZero(duration: 250, easing: Easing.InCubic);
+            }
+
+            // Perform a Swap with the latest untriggered Swap
+            if (pickType == ChoiceType.TrapSwap)
+            {
+                // Normally there should be one match.
+                var source = CurrentMatch.Value.PendingSwaps.FirstOrDefault();
+                if (source != null)
+                {
+                    // "Trigger" the trap upon final swap, after marking colors
+                    var targetTrap = CurrentMatch.Value.Traps.FirstOrDefault(p => (p.BeatmapID == source.BeatmapID && !p.IsTriggered));
+                    if (targetTrap != null) targetTrap.IsTriggered = true;
+                    SwapMap(source.BeatmapID, beatmapId);
+                }
             }
 
             // Trap action specific
@@ -575,6 +648,211 @@ namespace osu.Game.Tournament.Screens.Board
             updateDisplay();
         }
 
+        protected void SwapMap(int sourceMapID, int targetMapID)
+        {
+            var source = CurrentMatch.Value?.Round.Value?.Beatmaps.FirstOrDefault(p => p.Beatmap?.OnlineID == sourceMapID);
+            var target = CurrentMatch.Value?.Round.Value?.Beatmaps.FirstOrDefault(p => p.Beatmap?.OnlineID == targetMapID);
+
+            if (source != null && target != null)
+            {
+                if (!CurrentMatch.Value.Round.Value.UseBoard.Value) return;
+
+                int middleX = source.BoardX;
+                int middleY = source.BoardY;
+
+                source.BoardX = target.BoardX;
+                source.BoardY = target.BoardY;
+
+                target.BoardX = middleX;
+                target.BoardY = middleY;
+
+                CurrentMatch.Value?.PendingSwaps.Clear();
+
+                // TODO: A better way to reload maps
+                DetectWin();
+                DetectEX();
+                updateDisplay();
+            }
+            else
+            {
+                // Rare, but may happen
+                throw new InvalidOperationException("Cannot get the corresponding maps.");
+            }
+        }
+
+        /// <summary>
+        /// Detects if someone has won the match.
+        /// </summary>
+        /// <returns>true if has, otherwise false</returns>
+        public bool DetectWin()
+        {
+            // Don't detect if not defining board coordinates
+            if (CurrentMatch.Value?.Round.Value?.Beatmaps == null) return false;
+            if (!CurrentMatch.Value.Round.Value.UseBoard.Value) return false;
+            if (CurrentMatch.Value.PendingSwaps.Any()) return false;
+
+            var winner = TeamColour.Neutral;
+            int i = 0;
+
+            while (i == 0)
+            {
+                if ((winner = isWin(1, 1, 1, 4)) != TeamColour.Neutral) break;
+                if ((winner = isWin(2, 1, 2, 4)) != TeamColour.Neutral) break;
+                if ((winner = isWin(3, 1, 3, 4)) != TeamColour.Neutral) break;
+                if ((winner = isWin(4, 1, 4, 4)) != TeamColour.Neutral) break;
+                if ((winner = isWin(1, 1, 4, 1)) != TeamColour.Neutral) break;
+                if ((winner = isWin(1, 2, 4, 2)) != TeamColour.Neutral) break;
+                if ((winner = isWin(1, 3, 4, 3)) != TeamColour.Neutral) break;
+                if ((winner = isWin(1, 4, 4, 4)) != TeamColour.Neutral) break;
+                if ((winner = isWin(1, 1, 4, 4)) != TeamColour.Neutral) break;
+                if ((winner = isWin(1, 4, 4, 1)) != TeamColour.Neutral) break;
+                i++;
+            }
+
+            if (winner == TeamColour.Neutral) return false;
+            else
+            {
+                // 6 is just enough to fill the score bar, subject to change
+                teamWinner = winner;
+                if (winner == TeamColour.Red)
+                {
+                    CurrentMatch.Value.Team1Score.Value = 6;
+                    CurrentMatch.Value.Team2Score.Value = 0;
+                }
+                else
+                {
+                    CurrentMatch.Value.Team2Score.Value = 6;
+                    CurrentMatch.Value.Team1Score.Value = 0;
+                }
+                return true;
+            }
+        }
+
+        /// <summary>
+        /// Detects if either team has won.
+        ///
+        /// <br></br>The given line should be either a straight line or a diagonal line.
+        /// </summary>
+        /// <param name="startX">The start point of the line, X value.</param>
+        /// <param name="startY">The start point of the line, Y value.</param>
+        /// <param name="endX">The end point of the line, X value.</param>
+        /// <param name="endY">The end point of the line, Y value.</param>
+        /// <returns>the winner team's colour, or <see cref="TeamColour.Neutral"/> if there isn't one</returns>
+        private TeamColour isWin(int startX, int startY, int endX, int endY)
+        {
+            const TeamColour colourfalse = TeamColour.Neutral;
+            TeamColour thisColour = TeamColour.Neutral;
+
+            // Currently limited to 4x4 use only
+            if ((endX - startX) % 3 != 0 || (endY - startY) % 3 != 0) return colourfalse;
+
+            // Reject null matches
+            if (CurrentMatch.Value == null) return colourfalse;
+
+            // Exclusively for cases like from (1, 4) to (4, 1)
+            for (int i = startX; endX > startX ? i <= endX : i >= endX; i += (endX - startX) / 3)
+            {
+                for (int j = startY; endY > startY ? j <= endY : j >= endY; j += (endY - startY) / 3)
+                {
+                    var next = getBoardMap(i, j);
+                    if (next == null) continue;
+                    // Get the coloured map
+                    var pickedMap = CurrentMatch.Value.PicksBans.FirstOrDefault(p => (p.BeatmapID == next.Beatmap?.OnlineID &&
+                        (p.Type == ChoiceType.RedWin || p.Type == ChoiceType.BlueWin)));
+                    // Have banned maps: Cannot win
+                    if (CurrentMatch.Value.PicksBans.Any(p => (p.BeatmapID == next.Beatmap?.OnlineID && p.Type == ChoiceType.Ban))) return colourfalse;
+                    if (pickedMap != null)
+                    {
+                        // Set the default colour
+                        if (thisColour == TeamColour.Neutral) { thisColour = pickedMap.Team; }
+                        // Different mark colour: Cannot win
+                        else { if (thisColour != pickedMap.Team) return colourfalse; }
+                    }
+                    else return colourfalse;
+
+                    if (endY == startY) break;
+                }
+                if (endX == startX) break;
+            }
+            // Finally: Can win
+            return thisColour;
+        }
+
+        /// <summary>
+        /// Detects if the board satisfies the conditions to enter the EX stage.
+        /// </summary>
+        /// <returns>true if satisfies, otherwise false.</returns>
+        public bool DetectEX()
+        {
+            if (CurrentMatch.Value?.Round.Value?.Beatmaps == null) return false;
+            if (!CurrentMatch.Value.Round.Value.UseBoard.Value) return false;
+            if (CurrentMatch.Value.PendingSwaps.Any()) return false;
+
+            // Manba out
+            bool isRowAvailable = canWin(1, 1, 1, 4) || canWin(2, 1, 2, 4) || canWin(3, 1, 3, 4) || canWin(4, 1, 4, 4);
+            bool isColumnAvailable = canWin(1, 1, 4, 1) || canWin(1, 2, 4, 2) || canWin(1, 3, 4, 3) || canWin(1, 4, 4, 4);
+            bool isDiagonalAvailable = canWin(1, 1, 4, 4) || canWin(1, 4, 4, 1);
+
+            useEX = !isDiagonalAvailable && !isRowAvailable && !isColumnAvailable;
+            return useEX;
+        }
+
+        /// <summary>
+        /// Detects if either team could use the given line to win.
+        ///
+        /// <br></br>The given line should be either a straight line or a diagonal line.
+        /// </summary>
+        /// <param name="startX">The start point of the line, X value.</param>
+        /// <param name="startY">The start point of the line, Y value.</param>
+        /// <param name="endX">The end point of the line, X value.</param>
+        /// <param name="endY">The end point of the line, Y value.</param>
+        /// <returns>true if can, otherwise false</returns>
+        private bool canWin(int startX, int startY, int endX, int endY)
+        {
+            TeamColour thisColour = TeamColour.Neutral;
+
+            // Currently limited to 4x4 use only
+            if ((endX - startX) % 3 != 0 || (endY - startY) % 3 != 0) return false;
+
+            // Reject null matches
+            if (CurrentMatch.Value == null) return false;
+
+            // Exclusively for cases like from (1, 4) to (4, 1)
+            for (int i = startX; endX > startX ? i <= endX : i >= endX; i += (endX - startX) / 3)
+            {
+                for (int j = startY; endY > startY ? j <= endY : j >= endY; j += (endY - startY) / 3)
+                {
+                    var next = getBoardMap(i, j);
+                    if (next == null) continue;
+                    // Get the coloured map
+                    var pickedMap = CurrentMatch.Value.PicksBans.FirstOrDefault(p => (p.BeatmapID == next.Beatmap?.OnlineID &&
+                        (p.Type == ChoiceType.RedWin || p.Type == ChoiceType.BlueWin)));
+                    // Have banned maps: Cannot win
+                    if (CurrentMatch.Value.PicksBans.Any(p => (p.BeatmapID == next.Beatmap?.OnlineID && p.Type == ChoiceType.Ban))) return false;
+                    if (pickedMap != null)
+                    {
+                        // Set the default colour
+                        if (thisColour == TeamColour.Neutral) { thisColour = pickedMap.Team; }
+                        // Different mark colour: Cannot win
+                        else { if (thisColour != pickedMap.Team) return false; }
+                    }
+                    if (endY == startY) break;
+                }
+                if (endX == startX) break;
+            }
+            // Finally: Can win
+            return true;
+        }
+
+        /// <summary>
+        /// Get a beatmap placed on a specific point on the board.
+        /// </summary>
+        /// <param name="X">The X coordinate value of the beatmap.</param>
+        /// <param name="Y">The Y coordinate value of the beatmap.</param>
+        /// <returns>A <see cref="RoundBeatmap"/>, pointing to the corresponding beatmap.</returns>
+        private RoundBeatmap? getBoardMap(int X, int Y)
+            => CurrentMatch.Value?.Round.Value?.Beatmaps.FirstOrDefault(p => (p.BoardX == X && p.BoardY == Y)) ?? null;
+
         private void updateDisplay()
         {
             mapFlows.Clear();
@@ -588,15 +866,12 @@ namespace osu.Game.Tournament.Screens.Board
             if (CurrentMatch.Value.Round.Value != null)
             {
                 FillFlowContainer<BoardBeatmapPanel>? currentFlow = null;
-                string? currentMods;
                 int flowCount = 0;
 
-                foreach (var b in CurrentMatch.Value.Round.Value.Beatmaps)
+                // Use predefined Board coodinate
+                if (CurrentMatch.Value.Round.Value.UseBoard.Value)
                 {
-                    // Exclude EX beatmaps from the list
-                    if (b.Mods == "EX") continue;
-
-                    if (currentFlow == null)
+                    for (int i = 1; i <= 4; i++)
                     {
                         mapFlows.Add(currentFlow = new FillFlowContainer<BoardBeatmapPanel>
                         {
@@ -606,24 +881,58 @@ namespace osu.Game.Tournament.Screens.Board
                             AutoSizeAxes = Axes.Y
                         });
 
-                        currentMods = b.Mods;
+                        for (int j = 1; j <= 4; j++)
+                        {
+                            var nextMap = CurrentMatch.Value.Round.Value.Beatmaps.FirstOrDefault(p => (p.Mods != "EX" && p.BoardX == i && p.BoardY == j));
+                            if (nextMap != null)
+                            {
+                                currentFlow.Add(new BoardBeatmapPanel(nextMap.Beatmap, nextMap.Mods, nextMap.ModIndex)
+                                {
+                                    Anchor = Anchor.TopCentre,
+                                    Origin = Anchor.TopCentre,
+                                    Height = 150,
+                                });
+                            }
 
-                        totalRows++;
-                        flowCount = 0;
+                        }
                     }
-
-                    if (++flowCount > 2)
+                }
+                // Normal placement
+                else
+                {
+                    foreach (var b in CurrentMatch.Value.Round.Value.Beatmaps)
                     {
-                        totalRows++;
-                        flowCount = 1;
+                        // Exclude EX beatmaps from the list
+                        if (b.Mods == "EX") continue;
+
+                        if (currentFlow == null)
+                        {
+                            mapFlows.Add(currentFlow = new FillFlowContainer<BoardBeatmapPanel>
+                            {
+                                Spacing = new Vector2(10, 10),
+                                Direction = FillDirection.Full,
+                                RelativeSizeAxes = Axes.X,
+                                AutoSizeAxes = Axes.Y
+                            });
+
+                            totalRows++;
+                            flowCount = 0;
+                        }
+
+                        // One flow per row
+                        if (++flowCount > 2)
+                        {
+                            totalRows++;
+                            flowCount = 1;
+                        }
+
+                        currentFlow.Add(new BoardBeatmapPanel(b.Beatmap, b.Mods, b.ModIndex)
+                        {
+                            Anchor = Anchor.TopCentre,
+                            Origin = Anchor.TopCentre,
+                            Height = 150,
+                        });
                     }
-
-                    currentFlow.Add(new BoardBeatmapPanel(b.Beatmap, b.Mods, b.ModIndex)
-                    {
-                        Anchor = Anchor.TopCentre,
-                        Origin = Anchor.TopCentre,
-                        Height = 150,
-                    });
                 }
             }
 

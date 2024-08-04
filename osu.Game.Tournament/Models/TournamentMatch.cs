@@ -54,6 +54,8 @@ namespace osu.Game.Tournament.Models
 
         public readonly ObservableCollection<TrapInfo> Traps = new ObservableCollection<TrapInfo>();
 
+        public readonly ObservableCollection<BeatmapChoice> PendingSwaps = new ObservableCollection<BeatmapChoice>();
+
         [JsonIgnore]
         public readonly Bindable<TournamentRound?> Round = new Bindable<TournamentRound?>();
 
@@ -131,6 +133,7 @@ namespace osu.Game.Tournament.Models
             PicksBans.Clear();
             Protects.Clear();
             Traps.Clear();
+            PendingSwaps.Clear();
         }
     }
 }
