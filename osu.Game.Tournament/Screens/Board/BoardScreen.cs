@@ -683,6 +683,9 @@ namespace osu.Game.Tournament.Screens.Board
         /// <returns>true if has, otherwise false</returns>
         public bool DetectWin()
         {
+            if (CurrentMatch.Value?.Round.Value?.Beatmaps == null) return false;
+            if (CurrentMatch.Value.PendingSwaps.Any()) return false;
+
             var winner = TeamColour.Neutral;
             int i = 0;
 
