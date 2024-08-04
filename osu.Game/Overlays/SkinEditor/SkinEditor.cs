@@ -115,7 +115,7 @@ namespace osu.Game.Overlays.SkinEditor
         {
             RelativeSizeAxes = Axes.Both;
 
-            InternalChild = new OsuContextMenuContainer
+            InternalChild = new EditorContextMenuContainer
             {
                 RelativeSizeAxes = Axes.Both,
                 Child = new GridContainer
