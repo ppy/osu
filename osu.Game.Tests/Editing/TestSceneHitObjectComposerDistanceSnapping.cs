@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -10,6 +11,7 @@ using osu.Framework.Graphics.Cursor;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Graphics.Cursor;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu;
@@ -52,9 +54,13 @@ namespace osu.Game.Tests.Editing
         [SetUp]
         public void Setup() => Schedule(() =>
         {
-            Children = new Drawable[]
+            Child = new DependencyProvidingContainer
             {
-                composer = new TestHitObjectComposer()
+                CachedDependencies = new (Type, object)[]
+                {
+                    (typeof(OsuContextMenuContainer), new OsuContextMenuContainer()),
+                },
+                Child = composer = new TestHitObjectComposer(),
             };
 
             BeatDivisor.Value = 1;
