@@ -33,20 +33,16 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
     {
         private TestComposer composer;
 
+        [Cached]
+        public readonly OsuContextMenuContainer ContextMenuContainer = new OsuContextMenuContainer();
+
         [SetUp]
         public void Setup() => Schedule(() =>
         {
             BeatDivisor.Value = 8;
             EditorClock.Seek(0);
 
-            Child = new DependencyProvidingContainer
-            {
-                CachedDependencies = new (Type, object)[]
-                {
-                    (typeof(OsuContextMenuContainer), new OsuContextMenuContainer()),
-                },
-                Child = composer = new TestComposer { RelativeSizeAxes = Axes.Both },
-            };
+            Child = composer = new TestComposer { RelativeSizeAxes = Axes.Both };
         });
 
         [Test]

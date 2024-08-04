@@ -33,6 +33,9 @@ namespace osu.Game.Tests.Editing
         [Cached(typeof(IBeatSnapProvider))]
         private readonly EditorBeatmap editorBeatmap;
 
+        [Cached]
+        public readonly OsuContextMenuContainer ContextMenuContainer = new OsuContextMenuContainer();
+
         protected override Container<Drawable> Content { get; } = new PopoverContainer { RelativeSizeAxes = Axes.Both };
 
         public TestSceneHitObjectComposerDistanceSnapping()
@@ -54,14 +57,7 @@ namespace osu.Game.Tests.Editing
         [SetUp]
         public void Setup() => Schedule(() =>
         {
-            Child = new DependencyProvidingContainer
-            {
-                CachedDependencies = new (Type, object)[]
-                {
-                    (typeof(OsuContextMenuContainer), new OsuContextMenuContainer()),
-                },
-                Child = composer = new TestHitObjectComposer(),
-            };
+            Child = composer = new TestHitObjectComposer();
 
             BeatDivisor.Value = 1;
 
