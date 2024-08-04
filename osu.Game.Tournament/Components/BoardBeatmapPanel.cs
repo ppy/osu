@@ -254,7 +254,8 @@ namespace osu.Game.Tournament.Components
                         icon.Icon = FontAwesome.Solid.Trophy;
                         icon.Colour = new OsuColour().Red;
                         icon.Colour = isProtected ? new OsuColour().Pink : Color4.Red;
-                        icon.Alpha = 0.73f; // Added this line to distinguish last win from other wins
+                        /* Commented out this line, as it will cause some degree of visual distraction.
+                        icon.Alpha = 0.73f; // Added this line to distinguish last win from other wins */
                         break;
 
                     case ChoiceType.BlueWin:
@@ -262,7 +263,8 @@ namespace osu.Game.Tournament.Components
                         icon.Icon = FontAwesome.Solid.Trophy;
                         icon.Colour = new OsuColour().Blue;
                         icon.Colour = isProtected ? new OsuColour().Sky : Color4.Blue;
-                        icon.Alpha = 0.73f; // Added this line to distinguish last win from other wins
+                        /* Commented out this line, as it will cause some degree of visual distraction.
+                        icon.Alpha = 0.73f; // Added this line to distinguish last win from other wins */
                         break;
 
                     case ChoiceType.Trap:
