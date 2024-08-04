@@ -16,6 +16,7 @@ using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Screens.Edit;
+using osu.Game.Screens.Edit.Components;
 using osu.Game.Screens.Edit.Compose.Components.Timeline;
 using osu.Game.Storyboards;
 using osuTK;
@@ -51,7 +52,7 @@ namespace osu.Game.Tests.Visual.Editing
 
             Composer.Alpha = 0;
 
-            Add(new OsuContextMenuContainer
+            var contextMenuContainer = new OsuContextMenuContainer
             {
                 RelativeSizeAxes = Axes.Both,
                 Children = new Drawable[]
@@ -75,7 +76,11 @@ namespace osu.Game.Tests.Visual.Editing
                         Origin = Anchor.Centre,
                     }
                 }
-            });
+            };
+
+            Dependencies.Cache(contextMenuContainer);
+
+            Add(contextMenuContainer);
         }
 
         [SetUpSteps]

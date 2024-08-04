@@ -3,6 +3,7 @@
 
 #nullable disable
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
@@ -12,6 +13,7 @@ using osu.Framework.Graphics.Cursor;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Graphics.Cursor;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Tools;
 using osu.Game.Rulesets.Objects;
@@ -70,13 +72,21 @@ namespace osu.Game.Tests.Visual.Editing
 
             AddStep("Create composer", () =>
             {
-                Child = editorBeatmapContainer = new EditorBeatmapContainer(Beatmap.Value)
+                Child = new DependencyProvidingContainer
                 {
-                    Child = hitObjectComposer = new OsuHitObjectComposer(new OsuRuleset())
+                    RelativeSizeAxes = Axes.Both,
+                    CachedDependencies = new (Type, object)[]
                     {
-                        // force the composer to fully overlap the playfield area by setting a 4:3 aspect ratio.
-                        FillMode = FillMode.Fit,
-                        FillAspectRatio = 4 / 3f
+                        (typeof(OsuContextMenuContainer), new OsuContextMenuContainer())
+                    },
+                    Child = editorBeatmapContainer = new EditorBeatmapContainer(Beatmap.Value)
+                    {
+                        Child = hitObjectComposer = new OsuHitObjectComposer(new OsuRuleset())
+                        {
+                            // force the composer to fully overlap the playfield area by setting a 4:3 aspect ratio.
+                            FillMode = FillMode.Fit,
+                            FillAspectRatio = 4 / 3f
+                        }
                     }
                 };
             });
