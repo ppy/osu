@@ -22,7 +22,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         private TestTooltipContainer container = null!;
 
         [SetUp]
-        public void SetUp()
+        public void SetUp() => Schedule(() =>
         {
             Child = new Container
             {
@@ -48,7 +48,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                     },
                 },
             };
-        }
+        });
 
         private static readonly string[] test_case_tooltip_string =
         [
@@ -57,6 +57,9 @@ namespace osu.Game.Tests.Visual.UserInterface
             $"H{new string('e', 500)}llo",
         ];
 
+        //TODO: o!f issue: https://github.com/ppy/osu-framework/issues/5007
+        //Enable after o!f fixed
+        [Ignore("o!f issue https://github.com/ppy/osu-framework/issues/5007")]
         [Test]
         public void TestTooltipBasic([Values(0, 1, 2)] int index)
         {
