@@ -655,6 +655,8 @@ namespace osu.Game.Tournament.Screens.Board
 
             if (source != null && target != null)
             {
+                if (!CurrentMatch.Value.Round.Value.UseBoard.Value) return;
+
                 int middleX = source.BoardX;
                 int middleY = source.BoardY;
 
@@ -665,6 +667,7 @@ namespace osu.Game.Tournament.Screens.Board
                 target.BoardY = middleY;
 
                 CurrentMatch.Value?.PendingSwaps.Clear();
+
                 // TODO: A better way to reload maps
                 DetectWin();
                 DetectEX();
@@ -683,7 +686,9 @@ namespace osu.Game.Tournament.Screens.Board
         /// <returns>true if has, otherwise false</returns>
         public bool DetectWin()
         {
+            // Don't detect if not defining board coordinates
             if (CurrentMatch.Value?.Round.Value?.Beatmaps == null) return false;
+            if (!CurrentMatch.Value.Round.Value.UseBoard.Value) return false;
             if (CurrentMatch.Value.PendingSwaps.Any()) return false;
 
             var winner = TeamColour.Neutral;
@@ -780,6 +785,7 @@ namespace osu.Game.Tournament.Screens.Board
         public bool DetectEX()
         {
             if (CurrentMatch.Value?.Round.Value?.Beatmaps == null) return false;
+            if (!CurrentMatch.Value.Round.Value.UseBoard.Value) return false;
             if (CurrentMatch.Value.PendingSwaps.Any()) return false;
 
             // Manba out
