@@ -32,6 +32,7 @@ using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Components;
 using osu.Game.Screens.Edit.Components.Menus;
 using osu.Game.Skinning;
+using osu.Game.Graphics.Cursor;
 
 namespace osu.Game.Overlays.SkinEditor
 {
@@ -101,7 +102,7 @@ namespace osu.Game.Overlays.SkinEditor
         private IDialogOverlay? dialogOverlay { get; set; }
 
         [Cached]
-        public EditorContextMenuContainer ContextMenuContainer { get; private set; } = new EditorContextMenuContainer
+        public OsuContextMenuContainer ContextMenuContainer { get; private set; } = new OsuContextMenuContainer
         {
             RelativeSizeAxes = Axes.Both,
         };

@@ -13,11 +13,18 @@ namespace osu.Game.Graphics.Cursor
         [Cached]
         private OsuContextMenuSamples samples = new OsuContextMenuSamples();
 
-        public OsuContextMenuContainer()
+        private OsuContextMenu menu = null!;
+
+        protected override Menu CreateMenu() => menu = new OsuContextMenu(true);
+
+        public void ShowMenu()
         {
-            AddInternal(samples);
+            menu.Show();
         }
 
-        protected override Menu CreateMenu() => new OsuContextMenu(true);
+        public void CloseMenu()
+        {
+            menu.Close();
+        }
     }
 }

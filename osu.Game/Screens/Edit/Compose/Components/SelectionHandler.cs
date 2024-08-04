@@ -16,11 +16,11 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
 using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets.Edit;
-using osu.Game.Screens.Edit.Components;
 using osu.Game.Screens.Edit.Compose.Components.Timeline;
 using osuTK;
 using osuTK.Input;
@@ -61,7 +61,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         public SelectionScaleHandler ScaleHandler { get; private set; }
 
         [Resolved]
-        private EditorContextMenuContainer editorContextMenuContainer { get; set; }
+        private OsuContextMenuContainer editorContextMenuContainer { get; set; }
 
         protected SelectionHandler()
         {
