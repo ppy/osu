@@ -31,7 +31,6 @@ using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Configuration;
 using osu.Game.Database;
-using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
 using osu.Game.Localisation;
@@ -78,7 +77,7 @@ namespace osu.Game.Screens.Edit
         public const float WAVEFORM_VISUAL_OFFSET = 20;
 
         [Cached]
-        public EditorContextMenuContainer ContextMenuContainer { get; private set; } = new EditorContextMenuContainer()
+        public EditorContextMenuContainer ContextMenuContainer { get; private set; } = new EditorContextMenuContainer
         {
             RelativeSizeAxes = Axes.Both
         };
