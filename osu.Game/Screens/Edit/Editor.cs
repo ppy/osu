@@ -43,6 +43,7 @@ using osu.Game.Overlays.OSD;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Screens.Edit.Components;
 using osu.Game.Screens.Edit.Components.Menus;
 using osu.Game.Screens.Edit.Compose;
 using osu.Game.Screens.Edit.Compose.Components.Timeline;
@@ -319,7 +320,7 @@ namespace osu.Game.Screens.Edit
             editorTimelineShowTimingChanges = config.GetBindable<bool>(OsuSetting.EditorTimelineShowTimingChanges);
             editorTimelineShowTicks = config.GetBindable<bool>(OsuSetting.EditorTimelineShowTicks);
 
-            AddInternal(new OsuContextMenuContainer
+            AddInternal(new EditorContextMenuContainer
             {
                 RelativeSizeAxes = Axes.Both,
                 Children = new Drawable[]
