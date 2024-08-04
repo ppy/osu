@@ -16,7 +16,6 @@ using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Screens.Edit;
-using osu.Game.Screens.Edit.Components;
 using osu.Game.Screens.Edit.Compose.Components.Timeline;
 using osu.Game.Storyboards;
 using osuTK;
