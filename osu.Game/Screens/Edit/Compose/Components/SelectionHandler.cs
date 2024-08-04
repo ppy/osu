@@ -213,7 +213,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
             {
                 case PlatformAction.Delete:
                     DeleteSelected();
-                    return true;
+                    // Pass to the `EditorContextMenuContainer` to handle the menu close
+                    return false;
             }
 
             return false;
