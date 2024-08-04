@@ -85,6 +85,13 @@ namespace osu.Game.Tournament.Models
                     icon.Colour = team == TeamColour.Red ? new OsuColour().Pink : (team == TeamColour.Blue ? new OsuColour().Sky : new OsuColour().Yellow);
                     break;
 
+                case Steps.EX:
+                    name = @"即将进入 EX 模式";
+                    description = @"当前棋盘不足以任一方取胜，需要重新染色。";
+                    icon.Icon = FontAwesome.Solid.Bolt;
+                    icon.Colour = Color4.Orange;
+                    break;
+
                 default:
                     name = @"欢迎来到 OFFC";
                     description = @"祝游玩愉快！";
@@ -122,6 +129,9 @@ namespace osu.Game.Tournament.Models
                 case @"胜方染色":
                     return Steps.Win;
 
+                case @"即将进入 EX 模式":
+                    return Steps.EX;
+
                 default:
                     return Steps.Default;
             }
@@ -154,6 +164,10 @@ namespace osu.Game.Tournament.Models
         /// Mark colours.
         /// </summary>
         Win,
+        /// <summary>
+        /// The EX stage.
+        /// </summary>
+        EX,
         /// <summary>
         /// Placeholder for default conditions.
         /// </summary>

@@ -50,6 +50,8 @@ namespace osu.Game.Tournament.Screens.Board
 
         private OsuButton buttonIndicator = null!;
 
+        private bool useEX = false;
+
         private TrapTypeDropdown trapTypeDropdown = null!;
         private Container trapInfoDisplayHolder = null!;
         private Container instructionDisplayHolder = null!;
@@ -279,7 +281,8 @@ namespace osu.Game.Tournament.Screens.Board
                             RelativeSizeAxes = Axes.X,
                             Text = "EX Indicator",
                             BackgroundColour = Color4.Purple,
-                            Colour = Color4.Gray
+                            Colour = Color4.Gray,
+                            Action = () => setMode(TeamColour.Neutral, ChoiceType.Neutral)
                         },
                         new TourneyButton
                         {
@@ -358,7 +361,7 @@ namespace osu.Game.Tournament.Screens.Board
                     break;
 
                 default:
-                    instructionDisplayHolder.Child = new InstructionDisplay(step: Steps.Default);
+                    instructionDisplayHolder.Child = new InstructionDisplay(step: useEX ? Steps.EX : Steps.Default);
                     break;
             }
 
@@ -443,9 +446,14 @@ namespace osu.Game.Tournament.Screens.Board
                 }
 
                 // Automatically detect EX conditions
-                if (CurrentMatch.Value != null && !CurrentMatch.Value.PendingSwaps.Any())
+                if (CurrentMatch.Value != null)
                 {
                     buttonIndicator.Colour = DetectEX() ? Color4.White : Color4.Gray;
+                    if (useEX)
+                    {
+                        instructionDisplayHolder.Child = new InstructionDisplay(step: Steps.EX);
+                        instructionDisplayHolder.FadeInFromZero(duration: 200, easing: Easing.InCubic);
+                    }
                 }
 
                 return true;
@@ -508,6 +516,9 @@ namespace osu.Game.Tournament.Screens.Board
 
         private void addForBeatmap(int beatmapId)
         {
+            if (pickType == ChoiceType.Neutral)
+                return;
+
             if (CurrentMatch.Value?.Round.Value == null)
                 return;
 
@@ -646,7 +657,9 @@ namespace osu.Game.Tournament.Screens.Board
                 target.BoardX = middleX;
                 target.BoardY = middleY;
 
+                CurrentMatch.Value?.PendingSwaps.Clear();
                 // TODO: A better way to reload maps
+                DetectEX();
                 updateDisplay();
             }
             else
@@ -663,13 +676,15 @@ namespace osu.Game.Tournament.Screens.Board
         public bool DetectEX()
         {
             if (CurrentMatch.Value?.Round.Value?.Beatmaps == null) return false;
+            if (CurrentMatch.Value.PendingSwaps.Any()) return false;
 
             // Manba out
             bool isRowAvailable = canWin(1, 1, 1, 4) || canWin(2, 1, 2, 4) || canWin(3, 1, 3, 4) || canWin(4, 1, 4, 4);
             bool isColumnAvailable = canWin(1, 1, 4, 1) || canWin(1, 2, 4, 2) || canWin(1, 3, 4, 3) || canWin(1, 4, 4, 4);
             bool isDiagonalAvailable = canWin(1, 1, 4, 4) || canWin(1, 4, 4, 1);
 
-            return !isDiagonalAvailable && !isRowAvailable && !isColumnAvailable;
+            useEX = !isDiagonalAvailable && !isRowAvailable && !isColumnAvailable;
+            return useEX;
         }
 
         /// <summary>
