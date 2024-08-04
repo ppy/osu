@@ -10,6 +10,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Game.Input.Bindings;
+using osu.Game.Localisation;
 using osu.Game.Online.Rooms;
 using osu.Game.Screens.OnlinePlay.Match.Components;
 using osu.Game.Screens.Play;
@@ -42,6 +43,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             Background.Alpha = 0.2f;
 
             TextBox.FocusLost = () => expandedFromTextBoxFocus.Value = false;
+            TextBox.PlaceholderText = ChatStrings.IngameInputPlaceholder;
         }
 
         protected override bool OnHover(HoverEvent e) => true; // use UI mouse cursor.
