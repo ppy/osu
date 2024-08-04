@@ -23,7 +23,6 @@ using osu.Framework.Testing;
 using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
-using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation;
 using osu.Game.Overlays.Dialog;
@@ -101,6 +100,12 @@ namespace osu.Game.Overlays.SkinEditor
         [Resolved]
         private IDialogOverlay? dialogOverlay { get; set; }
 
+        [Cached]
+        public EditorContextMenuContainer ContextMenuContainer { get; private set; } = new EditorContextMenuContainer
+        {
+            RelativeSizeAxes = Axes.Both,
+        };
+
         public SkinEditor()
         {
         }
@@ -115,113 +120,110 @@ namespace osu.Game.Overlays.SkinEditor
         {
             RelativeSizeAxes = Axes.Both;
 
-            InternalChild = new EditorContextMenuContainer
+            ContextMenuContainer.Child = new GridContainer
             {
                 RelativeSizeAxes = Axes.Both,
-                Child = new GridContainer
+                RowDimensions = new[]
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    RowDimensions = new[]
+                    new Dimension(GridSizeMode.AutoSize),
+                    new Dimension(GridSizeMode.AutoSize),
+                    new Dimension(),
+                },
+                Content = new[]
+                {
+                    new Drawable[]
                     {
-                        new Dimension(GridSizeMode.AutoSize),
-                        new Dimension(GridSizeMode.AutoSize),
-                        new Dimension(),
-                    },
-
-                    Content = new[]
-                    {
-                        new Drawable[]
+                        new Container
                         {
-                            new Container
+                            Name = @"Menu container",
+                            RelativeSizeAxes = Axes.X,
+                            Depth = float.MinValue,
+                            Height = MENU_HEIGHT,
+                            Children = new Drawable[]
                             {
-                                Name = @"Menu container",
-                                RelativeSizeAxes = Axes.X,
-                                Depth = float.MinValue,
-                                Height = MENU_HEIGHT,
-                                Children = new Drawable[]
+                                new EditorMenuBar
                                 {
-                                    new EditorMenuBar
+                                    Anchor = Anchor.CentreLeft,
+                                    Origin = Anchor.CentreLeft,
+                                    RelativeSizeAxes = Axes.Both,
+                                    Items = new[]
                                     {
-                                        Anchor = Anchor.CentreLeft,
-                                        Origin = Anchor.CentreLeft,
-                                        RelativeSizeAxes = Axes.Both,
-                                        Items = new[]
+                                        new MenuItem(CommonStrings.MenuBarFile)
                                         {
-                                            new MenuItem(CommonStrings.MenuBarFile)
+                                            Items = new OsuMenuItem[]
                                             {
-                                                Items = new OsuMenuItem[]
-                                                {
-                                                    new EditorMenuItem(Web.CommonStrings.ButtonsSave, MenuItemType.Standard, () => Save()),
-                                                    new EditorMenuItem(CommonStrings.Export, MenuItemType.Standard, () => skins.ExportCurrentSkin()) { Action = { Disabled = !RuntimeInfo.IsDesktop } },
-                                                    new OsuMenuItemSpacer(),
-                                                    new EditorMenuItem(CommonStrings.RevertToDefault, MenuItemType.Destructive, () => dialogOverlay?.Push(new RevertConfirmDialog(revert))),
-                                                    new OsuMenuItemSpacer(),
-                                                    new EditorMenuItem(CommonStrings.Exit, MenuItemType.Standard, () => skinEditorOverlay?.Hide()),
-                                                },
+                                                new EditorMenuItem(Web.CommonStrings.ButtonsSave, MenuItemType.Standard, () => Save()),
+                                                new EditorMenuItem(CommonStrings.Export, MenuItemType.Standard, () => skins.ExportCurrentSkin()) { Action = { Disabled = !RuntimeInfo.IsDesktop } },
+                                                new OsuMenuItemSpacer(),
+                                                new EditorMenuItem(CommonStrings.RevertToDefault, MenuItemType.Destructive, () => dialogOverlay?.Push(new RevertConfirmDialog(revert))),
+                                                new OsuMenuItemSpacer(),
+                                                new EditorMenuItem(CommonStrings.Exit, MenuItemType.Standard, () => skinEditorOverlay?.Hide()),
                                             },
-                                            new MenuItem(CommonStrings.MenuBarEdit)
-                                            {
-                                                Items = new OsuMenuItem[]
-                                                {
-                                                    undoMenuItem = new EditorMenuItem(CommonStrings.Undo, MenuItemType.Standard, Undo),
-                                                    redoMenuItem = new EditorMenuItem(CommonStrings.Redo, MenuItemType.Standard, Redo),
-                                                    new OsuMenuItemSpacer(),
-                                                    cutMenuItem = new EditorMenuItem(CommonStrings.Cut, MenuItemType.Standard, Cut),
-                                                    copyMenuItem = new EditorMenuItem(CommonStrings.Copy, MenuItemType.Standard, Copy),
-                                                    pasteMenuItem = new EditorMenuItem(CommonStrings.Paste, MenuItemType.Standard, Paste),
-                                                    cloneMenuItem = new EditorMenuItem(CommonStrings.Clone, MenuItemType.Standard, Clone),
-                                                }
-                                            },
-                                        }
-                                    },
-                                    headerText = new OsuTextFlowContainer
-                                    {
-                                        TextAnchor = Anchor.TopRight,
-                                        Padding = new MarginPadding(5),
-                                        Anchor = Anchor.TopRight,
-                                        Origin = Anchor.TopRight,
-                                        AutoSizeAxes = Axes.X,
-                                        RelativeSizeAxes = Axes.Y,
-                                    },
-                                },
-                            },
-                        },
-                        new Drawable[]
-                        {
-                            new SkinEditorSceneLibrary
-                            {
-                                RelativeSizeAxes = Axes.X,
-                            },
-                        },
-                        new Drawable[]
-                        {
-                            new GridContainer
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                ColumnDimensions = new[]
-                                {
-                                    new Dimension(GridSizeMode.AutoSize),
-                                    new Dimension(),
-                                    new Dimension(GridSizeMode.AutoSize),
-                                },
-                                Content = new[]
-                                {
-                                    new Drawable[]
-                                    {
-                                        componentsSidebar = new EditorSidebar(),
-                                        content = new Container
-                                        {
-                                            Depth = float.MaxValue,
-                                            RelativeSizeAxes = Axes.Both,
                                         },
-                                        settingsSidebar = new EditorSidebar(),
+                                        new MenuItem(CommonStrings.MenuBarEdit)
+                                        {
+                                            Items = new OsuMenuItem[]
+                                            {
+                                                undoMenuItem = new EditorMenuItem(CommonStrings.Undo, MenuItemType.Standard, Undo),
+                                                redoMenuItem = new EditorMenuItem(CommonStrings.Redo, MenuItemType.Standard, Redo),
+                                                new OsuMenuItemSpacer(),
+                                                cutMenuItem = new EditorMenuItem(CommonStrings.Cut, MenuItemType.Standard, Cut),
+                                                copyMenuItem = new EditorMenuItem(CommonStrings.Copy, MenuItemType.Standard, Copy),
+                                                pasteMenuItem = new EditorMenuItem(CommonStrings.Paste, MenuItemType.Standard, Paste),
+                                                cloneMenuItem = new EditorMenuItem(CommonStrings.Clone, MenuItemType.Standard, Clone),
+                                            }
+                                        },
                                     }
+                                },
+                                headerText = new OsuTextFlowContainer
+                                {
+                                    TextAnchor = Anchor.TopRight,
+                                    Padding = new MarginPadding(5),
+                                    Anchor = Anchor.TopRight,
+                                    Origin = Anchor.TopRight,
+                                    AutoSizeAxes = Axes.X,
+                                    RelativeSizeAxes = Axes.Y,
+                                },
+                            },
+                        },
+                    },
+                    new Drawable[]
+                    {
+                        new SkinEditorSceneLibrary
+                        {
+                            RelativeSizeAxes = Axes.X,
+                        },
+                    },
+                    new Drawable[]
+                    {
+                        new GridContainer
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            ColumnDimensions = new[]
+                            {
+                                new Dimension(GridSizeMode.AutoSize),
+                                new Dimension(),
+                                new Dimension(GridSizeMode.AutoSize),
+                            },
+                            Content = new[]
+                            {
+                                new Drawable[]
+                                {
+                                    componentsSidebar = new EditorSidebar(),
+                                    content = new Container
+                                    {
+                                        Depth = float.MaxValue,
+                                        RelativeSizeAxes = Axes.Both,
+                                    },
+                                    settingsSidebar = new EditorSidebar(),
                                 }
                             }
-                        },
-                    }
+                        }
+                    },
                 }
             };
+
+            AddInternal(ContextMenuContainer);
 
             clipboardContent = clipboard.Content.GetBoundCopy();
         }
