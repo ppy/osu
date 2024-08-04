@@ -3,7 +3,6 @@
 
 #nullable disable
 
-using System;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
