@@ -34,6 +34,8 @@ namespace osu.Game.Tournament.Screens.Board
         private TeamColour pickColour;
         private ChoiceType pickType;
 
+        private TeamColour teamWinner = TeamColour.Neutral;
+
         private OsuButton buttonRedBan = null!;
         private OsuButton buttonBlueBan = null!;
         private OsuButton buttonRedPick = null!;
@@ -361,7 +363,7 @@ namespace osu.Game.Tournament.Screens.Board
                     break;
 
                 default:
-                    instructionDisplayHolder.Child = new InstructionDisplay(step: useEX ? Steps.EX : Steps.Default);
+                    instructionDisplayHolder.Child = new InstructionDisplay(team: teamWinner, step: DetectWin() ? Steps.FinalWin : (useEX ? Steps.EX : Steps.Default));
                     break;
             }
 
@@ -445,11 +447,16 @@ namespace osu.Game.Tournament.Screens.Board
                     }
                 }
 
-                // Automatically detect EX conditions
+                // Automatically detect EX & win conditions
                 if (CurrentMatch.Value != null)
                 {
-                    buttonIndicator.Colour = DetectEX() ? Color4.White : Color4.Gray;
-                    if (useEX)
+                    buttonIndicator.Colour = DetectWin() ? Color4.Orange : (DetectEX() ? Color4.White : Color4.Gray);
+                    if (teamWinner != TeamColour.Neutral)
+                    {
+                        instructionDisplayHolder.Child = new InstructionDisplay(team: teamWinner, step: Steps.FinalWin);
+                        instructionDisplayHolder.FadeInFromZero(duration: 500, easing: Easing.InCubic);
+                    }
+                    else if (useEX)
                     {
                         instructionDisplayHolder.Child = new InstructionDisplay(step: Steps.EX);
                         instructionDisplayHolder.FadeInFromZero(duration: 200, easing: Easing.InCubic);
@@ -659,6 +666,7 @@ namespace osu.Game.Tournament.Screens.Board
 
                 CurrentMatch.Value?.PendingSwaps.Clear();
                 // TODO: A better way to reload maps
+                DetectWin();
                 DetectEX();
                 updateDisplay();
             }
@@ -667,6 +675,99 @@ namespace osu.Game.Tournament.Screens.Board
                 // Rare, but may happen
                 throw new InvalidOperationException("Cannot get the corresponding maps.");
             }
+        }
+
+        /// <summary>
+        /// Detects if someone has won the match.
+        /// </summary>
+        /// <returns>true if has, otherwise false</returns>
+        public bool DetectWin()
+        {
+            var winner = TeamColour.Neutral;
+            int i = 0;
+
+            while (i == 0)
+            {
+                if ((winner = isWin(1, 1, 1, 4)) != TeamColour.Neutral) break;
+                if ((winner = isWin(2, 1, 2, 4)) != TeamColour.Neutral) break;
+                if ((winner = isWin(3, 1, 3, 4)) != TeamColour.Neutral) break;
+                if ((winner = isWin(4, 1, 4, 4)) != TeamColour.Neutral) break;
+                if ((winner = isWin(1, 1, 4, 1)) != TeamColour.Neutral) break;
+                if ((winner = isWin(1, 2, 4, 2)) != TeamColour.Neutral) break;
+                if ((winner = isWin(1, 3, 4, 3)) != TeamColour.Neutral) break;
+                if ((winner = isWin(1, 4, 4, 4)) != TeamColour.Neutral) break;
+                if ((winner = isWin(1, 1, 4, 4)) != TeamColour.Neutral) break;
+                if ((winner = isWin(1, 4, 4, 1)) != TeamColour.Neutral) break;
+                i++;
+            }
+
+            if (winner == TeamColour.Neutral) return false;
+            else
+            {
+                // 6 is just enough to fill the score bar, subject to change
+                teamWinner = winner;
+                if (winner == TeamColour.Red)
+                {
+                    CurrentMatch.Value.Team1Score.Value = 6;
+                    CurrentMatch.Value.Team2Score.Value = 0;
+                }
+                else
+                {
+                    CurrentMatch.Value.Team2Score.Value = 6;
+                    CurrentMatch.Value.Team1Score.Value = 0;
+                }
+                return true;
+            }
+        }
+
+        /// <summary>
+        /// Detects if either team has won.
+        ///
+        /// <br></br>The given line should be either a straight line or a diagonal line.
+        /// </summary>
+        /// <param name="startX">The start point of the line, X value.</param>
+        /// <param name="startY">The start point of the line, Y value.</param>
+        /// <param name="endX">The end point of the line, X value.</param>
+        /// <param name="endY">The end point of the line, Y value.</param>
+        /// <returns>the winner team's colour, or <see cref="TeamColour.Neutral"/> if there isn't one</returns>
+        private TeamColour isWin(int startX, int startY, int endX, int endY)
+        {
+            const TeamColour colourfalse = TeamColour.Neutral;
+            TeamColour thisColour = TeamColour.Neutral;
+
+            // Currently limited to 4x4 use only
+            if ((endX - startX) % 3 != 0 || (endY - startY) % 3 != 0) return colourfalse;
+
+            // Reject null matches
+            if (CurrentMatch.Value == null) return colourfalse;
+
+            // Exclusively for cases like from (1, 4) to (4, 1)
+            for (int i = startX; endX > startX ? i <= endX : i >= endX; i += (endX - startX) / 3)
+            {
+                for (int j = startY; endY > startY ? j <= endY : j >= endY; j += (endY - startY) / 3)
+                {
+                    var next = getBoardMap(i, j);
+                    if (next == null) continue;
+                    // Get the coloured map
+                    var pickedMap = CurrentMatch.Value.PicksBans.FirstOrDefault(p => (p.BeatmapID == next.Beatmap?.OnlineID &&
+                        (p.Type == ChoiceType.RedWin || p.Type == ChoiceType.BlueWin)));
+                    // Have banned maps: Cannot win
+                    if (CurrentMatch.Value.PicksBans.Any(p => (p.BeatmapID == next.Beatmap?.OnlineID && p.Type == ChoiceType.Ban))) return colourfalse;
+                    if (pickedMap != null)
+                    {
+                        // Set the default colour
+                        if (thisColour == TeamColour.Neutral) { thisColour = pickedMap.Team; }
+                        // Different mark colour: Cannot win
+                        else { if (thisColour != pickedMap.Team) return colourfalse; }
+                    }
+                    else return colourfalse;
+
+                    if (endY == startY) break;
+                }
+                if (endX == startX) break;
+            }
+            // Finally: Can win
+            return thisColour;
         }
 
         /// <summary>
@@ -696,7 +797,7 @@ namespace osu.Game.Tournament.Screens.Board
         /// <param name="startY">The start point of the line, Y value.</param>
         /// <param name="endX">The end point of the line, X value.</param>
         /// <param name="endY">The end point of the line, Y value.</param>
-        /// <returns></returns>
+        /// <returns>true if can, otherwise false</returns>
         private bool canWin(int startX, int startY, int endX, int endY)
         {
             TeamColour thisColour = TeamColour.Neutral;
