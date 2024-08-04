@@ -442,6 +442,12 @@ namespace osu.Game.Tournament.Screens.Board
                     }
                 }
 
+                // Automatically detect EX conditions
+                if (CurrentMatch.Value != null && !CurrentMatch.Value.PendingSwaps.Any())
+                {
+                    buttonIndicator.Colour = DetectEX() ? Color4.White : Color4.Gray;
+                }
+
                 return true;
             }
 
@@ -493,6 +499,7 @@ namespace osu.Game.Tournament.Screens.Board
             buttonRedWin.Colour = Color4.White;
             buttonRedTrap.Colour = Color4.White;
             buttonTrapSwap.Colour = Color4.White;
+            buttonIndicator.Colour = Color4.Gray;
 
             // setNextMode();
         }
@@ -601,12 +608,6 @@ namespace osu.Game.Tournament.Screens.Board
             }
 
             // setNextMode(); // Uncomment if you still want to automatically set the next mode
-
-            // Automatically detect EX conditions
-            if (!CurrentMatch.Value.PendingSwaps.Any())
-            {
-                buttonIndicator.Colour = DetectEX() ? Color4.White : Color4.Gray;
-            }
 
             if (LadderInfo.AutoProgressScreens.Value)
             {
