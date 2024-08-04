@@ -217,7 +217,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             {
                 case PlatformAction.Delete:
                     DeleteSelected();
-                    return false;
+                    return true;
             }
 
             return false;
