@@ -48,6 +48,8 @@ namespace osu.Game.Tournament.Screens.Board
 
         private OsuButton buttonTrapSwap = null!;
 
+        private OsuButton buttonIndicator = null!;
+
         private TrapTypeDropdown trapTypeDropdown = null!;
         private Container trapInfoDisplayHolder = null!;
         private Container instructionDisplayHolder = null!;
@@ -272,6 +274,13 @@ namespace osu.Game.Tournament.Screens.Board
                             Action = () => setMode(TeamColour.Neutral, ChoiceType.TrapSwap)
                         },
                         new ControlPanel.Spacer(),
+                        buttonIndicator = new TourneyButton
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            Text = "EX Indicator",
+                            BackgroundColour = Color4.Purple,
+                            Colour = Color4.Gray
+                        },
                         new TourneyButton
                         {
                             RelativeSizeAxes = Axes.X,
@@ -538,7 +547,7 @@ namespace osu.Game.Tournament.Screens.Board
                 else
                 {
                     // Specially designed for Swap trap: Apply then "Trigger" as done
-                    if (isPickWin)
+                    if (isPickWin && matchTrap.Mode != TrapType.Swap)
                     {
                         matchTrap.IsTriggered = true;
                     }
@@ -552,6 +561,9 @@ namespace osu.Game.Tournament.Screens.Board
                 var source = CurrentMatch.Value.PendingSwaps.FirstOrDefault();
                 if (source != null)
                 {
+                    // "Trigger" the trap upon final swap, after marking colors
+                    var targetTrap = CurrentMatch.Value.Traps.FirstOrDefault(p => (p.BeatmapID == source.BeatmapID && !p.IsTriggered));
+                    if (targetTrap != null) targetTrap.IsTriggered = true;
                     SwapMap(source.BeatmapID, beatmapId);
                 }
             }
@@ -590,6 +602,12 @@ namespace osu.Game.Tournament.Screens.Board
 
             // setNextMode(); // Uncomment if you still want to automatically set the next mode
 
+            // Automatically detect EX conditions
+            if (!CurrentMatch.Value.PendingSwaps.Any())
+            {
+                buttonIndicator.Colour = DetectEX() ? Color4.White : Color4.Gray;
+            }
+
             if (LadderInfo.AutoProgressScreens.Value)
             {
                 if (pickType == ChoiceType.Pick && CurrentMatch.Value.PicksBans.Any(i => i.Type == ChoiceType.Pick))
@@ -611,7 +629,7 @@ namespace osu.Game.Tournament.Screens.Board
             updateDisplay();
         }
 
-        public void SwapMap(int sourceMapID, int targetMapID)
+        protected void SwapMap(int sourceMapID, int targetMapID)
         {
             var source = CurrentMatch.Value?.Round.Value?.Beatmaps.FirstOrDefault(p => p.Beatmap?.OnlineID == sourceMapID);
             var target = CurrentMatch.Value?.Round.Value?.Beatmaps.FirstOrDefault(p => p.Beatmap?.OnlineID == targetMapID);
@@ -636,6 +654,78 @@ namespace osu.Game.Tournament.Screens.Board
                 throw new InvalidOperationException("Cannot get the corresponding maps.");
             }
         }
+
+        /// <summary>
+        /// Detects if the board satisfies the conditions to enter the EX stage.
+        /// </summary>
+        /// <returns>true if satisfies, otherwise false.</returns>
+        public bool DetectEX()
+        {
+            if (CurrentMatch.Value?.Round.Value?.Beatmaps == null) return false;
+
+            // Manba out
+            bool isRowAvailable = canWin(1, 1, 1, 4) || canWin(2, 1, 2, 4) || canWin(3, 1, 3, 4) || canWin(4, 1, 4, 4);
+            bool isColumnAvailable = canWin(1, 1, 4, 1) || canWin(1, 2, 4, 2) || canWin(1, 3, 4, 3) || canWin(1, 4, 4, 4);
+            bool isDiagonalAvailable = canWin(1, 1, 4, 4) || canWin(1, 4, 4, 1);
+
+            return !isDiagonalAvailable && !isRowAvailable && !isColumnAvailable;
+        }
+
+        /// <summary>
+        /// Detects if either team could use the given line to win.
+        ///
+        /// <br></br>The given line should be either a straight line or a diagonal line.
+        /// </summary>
+        /// <param name="startX">The start point of the line, X value.</param>
+        /// <param name="startY">The start point of the line, Y value.</param>
+        /// <param name="endX">The end point of the line, X value.</param>
+        /// <param name="endY">The end point of the line, Y value.</param>
+        /// <returns></returns>
+        private bool canWin(int startX, int startY, int endX, int endY)
+        {
+            TeamColour thisColour = TeamColour.Neutral;
+
+            // Currently limited to 4x4 use only
+            if ((endX - startX) % 3 != 0 || (endY - startY) % 3 != 0) return false;
+
+            // Reject null matches
+            if (CurrentMatch.Value == null) return false;
+
+            // Exclusively for cases like from (1, 4) to (4, 1)
+            for (int i = startX; endX > startX ? i <= endX : i >= endX; i += (endX - startX) / 3)
+            {
+                for (int j = startY; endY > startY ? j <= endY : j >= endY; j += (endY - startY) / 3)
+                {
+                    var next = getBoardMap(i, j);
+                    if (next == null) continue;
+                    // Get the coloured map
+                    var pickedMap = CurrentMatch.Value.PicksBans.FirstOrDefault(p => (p.BeatmapID == next.Beatmap?.OnlineID &&
+                        (p.Type == ChoiceType.RedWin || p.Type == ChoiceType.BlueWin)));
+                    // Have banned maps: Cannot win
+                    if (CurrentMatch.Value.PicksBans.Any(p => (p.BeatmapID == next.Beatmap?.OnlineID && p.Type == ChoiceType.Ban))) return false;
+                    if (pickedMap != null)
+                    {
+                        // Set the default colour
+                        if (thisColour == TeamColour.Neutral) { thisColour = pickedMap.Team; }
+                        // Different mark colour: Cannot win
+                        else { if (thisColour != pickedMap.Team) return false; }
+                    }
+                    if (endY == startY) break;
+                }
+                if (endX == startX) break;
+            }
+            // Finally: Can win
+            return true;
+        }
+
+        /// <summary>
+        /// Get a beatmap placed on a specific point on the board.
+        /// </summary>
+        /// <param name="X">The X coordinate value of the beatmap.</param>
+        /// <param name="Y">The Y coordinate value of the beatmap.</param>
+        /// <returns>A <see cref="RoundBeatmap"/>, pointing to the corresponding beatmap.</returns>
+        private RoundBeatmap? getBoardMap(int X, int Y)
+            => CurrentMatch.Value?.Round.Value?.Beatmaps.FirstOrDefault(p => (p.BoardX == X && p.BoardY == Y)) ?? null;
 
         private void updateDisplay()
         {
