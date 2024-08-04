@@ -20,6 +20,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
 using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets.Edit;
+using osu.Game.Screens.Edit.Components;
 using osu.Game.Screens.Edit.Compose.Components.Timeline;
 using osuTK;
 using osuTK.Input;
@@ -58,6 +59,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
         public SelectionRotationHandler RotationHandler { get; private set; }
 
         public SelectionScaleHandler ScaleHandler { get; private set; }
+
+        [Resolved]
+        private EditorContextMenuContainer editorContextMenuContainer { get; set; }
 
         protected SelectionHandler()
         {
@@ -230,7 +234,11 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <summary>
         /// Deselect all selected items.
         /// </summary>
-        protected void DeselectAll() => SelectedItems.Clear();
+        protected void DeselectAll()
+        {
+            SelectedItems.Clear();
+            editorContextMenuContainer.CloseMenu();
+        }
 
         /// <summary>
         /// Handle a blueprint becoming selected.

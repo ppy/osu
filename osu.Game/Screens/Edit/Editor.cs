@@ -77,6 +77,12 @@ namespace osu.Game.Screens.Edit
         /// </remarks>
         public const float WAVEFORM_VISUAL_OFFSET = 20;
 
+        [Cached]
+        public EditorContextMenuContainer ContextMenuContainer { get; private set; } = new EditorContextMenuContainer()
+        {
+            RelativeSizeAxes = Axes.Both
+        };
+
         public override float BackgroundParallaxAmount => 0.1f;
 
         public override bool AllowBackButton => false;
@@ -320,109 +326,108 @@ namespace osu.Game.Screens.Edit
             editorTimelineShowTimingChanges = config.GetBindable<bool>(OsuSetting.EditorTimelineShowTimingChanges);
             editorTimelineShowTicks = config.GetBindable<bool>(OsuSetting.EditorTimelineShowTicks);
 
-            AddInternal(new EditorContextMenuContainer
+            ContextMenuContainer.AddRange(new Drawable[]
             {
-                RelativeSizeAxes = Axes.Both,
-                Children = new Drawable[]
+                new Container
                 {
-                    new Container
+                    Name = "Screen container",
+                    RelativeSizeAxes = Axes.Both,
+                    Padding = new MarginPadding { Top = 40, Bottom = 50 },
+                    Child = screenContainer = new Container<EditorScreen>
                     {
-                        Name = "Screen container",
                         RelativeSizeAxes = Axes.Both,
-                        Padding = new MarginPadding { Top = 40, Bottom = 50 },
-                        Child = screenContainer = new Container<EditorScreen>
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                        }
-                    },
-                    new Container
+                    }
+                },
+                new Container
+                {
+                    Name = "Top bar",
+                    RelativeSizeAxes = Axes.X,
+                    Height = 40,
+                    Children = new Drawable[]
                     {
-                        Name = "Top bar",
-                        RelativeSizeAxes = Axes.X,
-                        Height = 40,
-                        Children = new Drawable[]
+                        new EditorMenuBar
                         {
-                            new EditorMenuBar
+                            Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.CentreLeft,
+                            RelativeSizeAxes = Axes.Both,
+                            MaxHeight = 600,
+                            Items = new[]
                             {
-                                Anchor = Anchor.CentreLeft,
-                                Origin = Anchor.CentreLeft,
-                                RelativeSizeAxes = Axes.Both,
-                                MaxHeight = 600,
-                                Items = new[]
+                                new MenuItem(CommonStrings.MenuBarFile)
                                 {
-                                    new MenuItem(CommonStrings.MenuBarFile)
+                                    Items = createFileMenuItems().ToList()
+                                },
+                                new MenuItem(CommonStrings.MenuBarEdit)
+                                {
+                                    Items = new[]
                                     {
-                                        Items = createFileMenuItems().ToList()
-                                    },
-                                    new MenuItem(CommonStrings.MenuBarEdit)
+                                        undoMenuItem = new EditorMenuItem(CommonStrings.Undo, MenuItemType.Standard, Undo),
+                                        redoMenuItem = new EditorMenuItem(CommonStrings.Redo, MenuItemType.Standard, Redo),
+                                        new OsuMenuItemSpacer(),
+                                        cutMenuItem = new EditorMenuItem(CommonStrings.Cut, MenuItemType.Standard, Cut),
+                                        copyMenuItem = new EditorMenuItem(CommonStrings.Copy, MenuItemType.Standard, Copy),
+                                        pasteMenuItem = new EditorMenuItem(CommonStrings.Paste, MenuItemType.Standard, Paste),
+                                        cloneMenuItem = new EditorMenuItem(CommonStrings.Clone, MenuItemType.Standard, Clone),
+                                    }
+                                },
+                                new MenuItem(CommonStrings.MenuBarView)
+                                {
+                                    Items = new[]
                                     {
-                                        Items = new[]
+                                        new MenuItem(EditorStrings.Timeline)
                                         {
-                                            undoMenuItem = new EditorMenuItem(CommonStrings.Undo, MenuItemType.Standard, Undo),
-                                            redoMenuItem = new EditorMenuItem(CommonStrings.Redo, MenuItemType.Standard, Redo),
-                                            new OsuMenuItemSpacer(),
-                                            cutMenuItem = new EditorMenuItem(CommonStrings.Cut, MenuItemType.Standard, Cut),
-                                            copyMenuItem = new EditorMenuItem(CommonStrings.Copy, MenuItemType.Standard, Copy),
-                                            pasteMenuItem = new EditorMenuItem(CommonStrings.Paste, MenuItemType.Standard, Paste),
-                                            cloneMenuItem = new EditorMenuItem(CommonStrings.Clone, MenuItemType.Standard, Clone),
-                                        }
-                                    },
-                                    new MenuItem(CommonStrings.MenuBarView)
-                                    {
-                                        Items = new[]
+                                            Items =
+                                            [
+                                                new WaveformOpacityMenuItem(config.GetBindable<float>(OsuSetting.EditorWaveformOpacity)),
+                                                new ToggleMenuItem(EditorStrings.TimelineShowTimingChanges)
+                                                {
+                                                    State = { BindTarget = editorTimelineShowTimingChanges }
+                                                },
+                                                new ToggleMenuItem(EditorStrings.TimelineShowTicks)
+                                                {
+                                                    State = { BindTarget = editorTimelineShowTicks }
+                                                },
+                                            ]
+                                        },
+                                        new BackgroundDimMenuItem(editorBackgroundDim),
+                                        new ToggleMenuItem(EditorStrings.ShowHitMarkers)
                                         {
-                                            new MenuItem(EditorStrings.Timeline)
-                                            {
-                                                Items =
-                                                [
-                                                    new WaveformOpacityMenuItem(config.GetBindable<float>(OsuSetting.EditorWaveformOpacity)),
-                                                    new ToggleMenuItem(EditorStrings.TimelineShowTimingChanges)
-                                                    {
-                                                        State = { BindTarget = editorTimelineShowTimingChanges }
-                                                    },
-                                                    new ToggleMenuItem(EditorStrings.TimelineShowTicks)
-                                                    {
-                                                        State = { BindTarget = editorTimelineShowTicks }
-                                                    },
-                                                ]
-                                            },
-                                            new BackgroundDimMenuItem(editorBackgroundDim),
-                                            new ToggleMenuItem(EditorStrings.ShowHitMarkers)
-                                            {
-                                                State = { BindTarget = editorHitMarkers },
-                                            },
-                                            new ToggleMenuItem(EditorStrings.AutoSeekOnPlacement)
-                                            {
-                                                State = { BindTarget = editorAutoSeekOnPlacement },
-                                            },
-                                            new ToggleMenuItem(EditorStrings.LimitedDistanceSnap)
-                                            {
-                                                State = { BindTarget = editorLimitedDistanceSnap },
-                                            }
-                                        }
-                                    },
-                                    new MenuItem(EditorStrings.Timing)
-                                    {
-                                        Items = new MenuItem[]
+                                            State = { BindTarget = editorHitMarkers },
+                                        },
+                                        new ToggleMenuItem(EditorStrings.AutoSeekOnPlacement)
                                         {
-                                            new EditorMenuItem(EditorStrings.SetPreviewPointToCurrent, MenuItemType.Standard, SetPreviewPointToCurrentTime)
+                                            State = { BindTarget = editorAutoSeekOnPlacement },
+                                        },
+                                        new ToggleMenuItem(EditorStrings.LimitedDistanceSnap)
+                                        {
+                                            State = { BindTarget = editorLimitedDistanceSnap },
                                         }
                                     }
+                                },
+                                new MenuItem(EditorStrings.Timing)
+                                {
+                                    Items = new MenuItem[]
+                                    {
+                                        new EditorMenuItem(EditorStrings.SetPreviewPointToCurrent, MenuItemType.Standard, SetPreviewPointToCurrentTime)
+                                    }
                                 }
-                            },
-                            screenSwitcher = new EditorScreenSwitcherControl
-                            {
-                                Anchor = Anchor.BottomRight,
-                                Origin = Anchor.BottomRight,
-                                X = -10,
-                                Current = Mode,
-                            },
+                            }
+                        },
+                        screenSwitcher = new EditorScreenSwitcherControl
+                        {
+                            Anchor = Anchor.BottomRight,
+                            Origin = Anchor.BottomRight,
+                            X = -10,
+                            Current = Mode,
                         },
                     },
-                    bottomBar = new BottomBar(),
-                    MutationTracker,
-                }
+                },
+                bottomBar = new BottomBar(),
+                MutationTracker,
             });
+
+            AddInternal(ContextMenuContainer);
+
             changeHandler?.CanUndo.BindValueChanged(v => undoMenuItem.Action.Disabled = !v.NewValue, true);
             changeHandler?.CanRedo.BindValueChanged(v => redoMenuItem.Action.Disabled = !v.NewValue, true);
 
