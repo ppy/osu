@@ -15,7 +15,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
-using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
 using osu.Game.Rulesets.Edit;
@@ -46,9 +45,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
         private IEditorChangeHandler changeHandler { get; set; }
 
         protected readonly BindableList<T> SelectedItems = new BindableList<T>();
-
-        [Resolved(CanBeNull = true)]
-        private OsuContextMenuContainer contextMenuContainer { get; set; }
 
         protected BlueprintContainer()
         {
