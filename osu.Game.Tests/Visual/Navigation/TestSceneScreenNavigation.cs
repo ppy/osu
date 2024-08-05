@@ -838,18 +838,25 @@ namespace osu.Game.Tests.Visual.Navigation
         [Test]
         public void TestExitWithOperationInProgress()
         {
-            AddUntilStep("wait for dialog overlay", () => Game.ChildrenOfType<DialogOverlay>().SingleOrDefault() != null);
+            int x = 0;
+
+            AddUntilStep("wait for dialog overlay", () =>
+            {
+                x = 0;
+                return Game.ChildrenOfType<DialogOverlay>().SingleOrDefault() != null;
+            });
 
             AddRepeatStep("start ongoing operation", () =>
             {
                 Game.Notifications.Post(new ProgressNotification
                 {
-                    Text = "Something is still running",
+                    Text = $"Something is still running #{++x}",
                     Progress = 0.5f,
                     State = ProgressNotificationState.Active,
                 });
             }, 15);
 
+            AddAssert("all notifications = 15", () => Game.Notifications.AllNotifications.Count(), () => Is.EqualTo(15));
             AddStep("Hold escape", () => InputManager.PressKey(Key.Escape));
             AddUntilStep("confirmation dialog shown", () => Game.ChildrenOfType<DialogOverlay>().Single().CurrentDialog is ConfirmExitDialog);
             AddStep("Release escape", () => InputManager.ReleaseKey(Key.Escape));
@@ -945,6 +952,8 @@ namespace osu.Game.Tests.Visual.Navigation
         [Test]
         public void TestTouchScreenDetectionAtSongSelect()
         {
+            AddUntilStep("wait for settings", () => Game.Settings.IsLoaded);
+
             AddStep("touch logo", () =>
             {
                 var button = Game.ChildrenOfType<OsuLogo>().Single();

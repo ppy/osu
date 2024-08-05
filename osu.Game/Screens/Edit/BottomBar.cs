@@ -31,7 +31,7 @@ namespace osu.Game.Screens.Edit
 
             RelativeSizeAxes = Axes.X;
 
-            Height = 60;
+            Height = 50;
 
             Masking = true;
             EdgeEffect = new EdgeEffectParameters
@@ -48,7 +48,7 @@ namespace osu.Game.Screens.Edit
                     RelativeSizeAxes = Axes.Both,
                     ColumnDimensions = new[]
                     {
-                        new Dimension(GridSizeMode.Absolute, 170),
+                        new Dimension(GridSizeMode.Absolute, 150),
                         new Dimension(),
                         new Dimension(GridSizeMode.Absolute, 220),
                         new Dimension(GridSizeMode.Absolute, HitObjectComposer.TOOLBOX_CONTRACTED_SIZE_RIGHT),
@@ -82,6 +82,7 @@ namespace osu.Game.Screens.Edit
             saveInProgress.BindValueChanged(_ => TestGameplayButton.Enabled.Value = !saveInProgress.Value, true);
             composerFocusMode.BindValueChanged(_ =>
             {
+                // Transforms should be kept in sync with other usages of composer focus mode.
                 foreach (var c in this.ChildrenOfType<BottomBarContainer>())
                 {
                     if (!composerFocusMode.Value)

@@ -1,12 +1,13 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
-using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens.Footer;
@@ -37,9 +38,6 @@ namespace osu.Game.Overlays.Mods
         [Resolved]
         private ScreenFooter? footer { get; set; }
 
-        // todo: very temporary property that will be removed once ModSelectOverlay and FirstRunSetupOverlay are updated to use new footer.
-        public virtual bool UseNewFooter => false;
-
         /// <summary>
         /// A container containing all content, including the header and footer.
         /// May be used for overlay-wide animations.
@@ -60,6 +58,10 @@ namespace osu.Game.Overlays.Mods
 
         protected override bool BlockNonPositionalInput => true;
 
+        // ShearedOverlayContainers are placed at a layer within the screen container as they rely on ScreenFooter which must be placed there.
+        // Therefore, dimming must be managed locally, since DimMainContent dims the entire screen layer.
+        protected sealed override bool DimMainContent => false;
+
         protected ShearedOverlayContainer(OverlayColourScheme colourScheme)
         {
             RelativeSizeAxes = Axes.Both;
@@ -70,13 +72,16 @@ namespace osu.Game.Overlays.Mods
         [BackgroundDependencyLoader]
         private void load()
         {
-            const float footer_height = ScreenFooter.HEIGHT;
-
             Child = TopLevelContent = new Container
             {
                 RelativeSizeAxes = Axes.Both,
                 Children = new Drawable[]
                 {
+                    new Box
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Colour = ColourProvider.Background6.Opacity(0.75f),
+                    },
                     Header = new ShearedOverlayHeader
                     {
                         Anchor = Anchor.TopCentre,
@@ -90,38 +95,19 @@ namespace osu.Game.Overlays.Mods
                         Padding = new MarginPadding
                         {
                             Top = ShearedOverlayHeader.HEIGHT,
-                            Bottom = footer_height + PADDING,
+                            Bottom = ScreenFooter.HEIGHT + PADDING,
                         }
                     },
-                    Footer = new InputBlockingContainer
-                    {
-                        RelativeSizeAxes = Axes.X,
-                        Depth = float.MinValue,
-                        Height = footer_height,
-                        Margin = new MarginPadding { Top = PADDING },
-                        Anchor = Anchor.BottomCentre,
-                        Origin = Anchor.BottomCentre,
-                        Children = new Drawable[]
-                        {
-                            new Box
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                Colour = ColourProvider.Background5
-                            },
-                            FooterContent = new Container
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                            },
-                        }
-                    }
                 }
             };
         }
 
+        public VisibilityContainer? DisplayedFooterContent { get; private set; }
+
         /// <summary>
         /// Creates content to be displayed on the game-wide footer.
         /// </summary>
-        public virtual Drawable CreateFooterContent() => Empty();
+        public virtual VisibilityContainer? CreateFooterContent() => null;
 
         /// <summary>
         /// Invoked when the back button in the footer is pressed.
@@ -140,6 +126,7 @@ namespace osu.Game.Overlays.Mods
             return base.OnClick(e);
         }
 
+        private IDisposable? activeOverlayRegistration;
         private bool hideFooterOnPopOut;
 
         protected override void PopIn()
@@ -150,9 +137,10 @@ namespace osu.Game.Overlays.Mods
 
             Header.MoveToY(0, fade_in_duration, Easing.OutQuint);
 
-            if (UseNewFooter && footer != null)
+            if (footer != null)
             {
-                footer.SetActiveOverlayContainer(this);
+                activeOverlayRegistration = footer.RegisterActiveOverlayContainer(this, out var footerContent);
+                DisplayedFooterContent = footerContent;
 
                 if (footer.State.Value == Visibility.Hidden)
                 {
@@ -160,8 +148,6 @@ namespace osu.Game.Overlays.Mods
                     hideFooterOnPopOut = true;
                 }
             }
-            else
-                Footer.MoveToY(0, fade_in_duration, Easing.OutQuint);
         }
 
         protected override void PopOut()
@@ -173,9 +159,11 @@ namespace osu.Game.Overlays.Mods
 
             Header.MoveToY(-Header.DrawHeight, fade_out_duration, Easing.OutQuint);
 
-            if (UseNewFooter && footer != null)
+            if (footer != null)
             {
-                footer.ClearActiveOverlayContainer();
+                activeOverlayRegistration?.Dispose();
+                activeOverlayRegistration = null;
+                DisplayedFooterContent = null;
 
                 if (hideFooterOnPopOut)
                 {
@@ -183,8 +171,6 @@ namespace osu.Game.Overlays.Mods
                     hideFooterOnPopOut = false;
                 }
             }
-            else
-                Footer.MoveToY(Footer.DrawHeight, fade_out_duration, Easing.OutQuint);
         }
     }
 }

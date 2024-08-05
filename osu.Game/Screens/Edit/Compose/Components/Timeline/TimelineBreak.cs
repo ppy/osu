@@ -29,11 +29,6 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         public Action<BreakPeriod>? OnDeleted { get; init; }
 
-        private Box background = null!;
-
-        [Resolved]
-        private OsuColour colours { get; set; } = null!;
-
         public TimelineBreak(BreakPeriod b)
         {
             Break.Value = b;
@@ -53,11 +48,11 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 {
                     RelativeSizeAxes = Axes.Both,
                     Padding = new MarginPadding { Horizontal = 5 },
-                    Child = background = new Box
+                    Child = new Box
                     {
                         RelativeSizeAxes = Axes.Both,
                         Colour = colours.Gray5,
-                        Alpha = 0.7f,
+                        Alpha = 0.9f,
                     },
                 },
                 new DragHandle(isStartHandle: true)
@@ -86,23 +81,6 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 X = (float)Break.Value.StartTime;
                 Width = (float)Break.Value.Duration;
             }, true);
-        }
-
-        protected override bool OnHover(HoverEvent e)
-        {
-            updateState();
-            return true;
-        }
-
-        protected override void OnHoverLost(HoverLostEvent e)
-        {
-            updateState();
-            base.OnHoverLost(e);
-        }
-
-        private void updateState()
-        {
-            background.FadeColour(IsHovered ? colours.Gray6 : colours.Gray5, 400, Easing.OutQuint);
         }
 
         public MenuItem[] ContextMenuItems => new MenuItem[]
@@ -159,7 +137,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                         Anchor = Anchor,
                         Origin = Anchor,
                         RelativeSizeAxes = Axes.Y,
-                        CornerRadius = 5,
+                        CornerRadius = 4,
                         Masking = true,
                         Child = new Box
                         {
@@ -249,8 +227,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 if (active)
                     colour = colour.Lighten(0.3f);
 
-                this.FadeColour(colour, 400, Easing.OutQuint);
-                handle.ResizeWidthTo(active ? 20 : 10, 400, Easing.OutElasticHalf);
+                handle.FadeColour(colour, 400, Easing.OutQuint);
+                handle.ResizeWidthTo(active ? 10 : 8, 400, Easing.OutElasticHalf);
             }
         }
     }
