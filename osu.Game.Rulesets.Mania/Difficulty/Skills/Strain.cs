@@ -10,13 +10,12 @@ using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Rulesets.Mania.Difficulty.Skills
 {
-    public class Strain : StrainDecaySkill
+    public class Strain : StrainSkill
     {
         private const double individual_decay_base = 0.125;
         private const double overall_decay_base = 0.30;
         private const double release_threshold = 30;
 
-        protected override double SkillMultiplier => 1;
         protected override double StrainDecayBase => 1;
 
         private readonly double[] startTimes;

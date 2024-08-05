@@ -16,14 +16,30 @@ namespace osu.Game.Rulesets.Difficulty.Skills
     public abstract class StrainSkill : Skill
     {
         /// <summary>
-        /// The weight by which each strain value decays.
+        /// Strain values are multiplied by this number for the given skill. Used to balance the value of different skills between each other.
         /// </summary>
-        protected virtual double DecayWeight => 0.9;
+        public virtual double SkillMultiplier => 1;
+
+        /// <summary>
+        /// The weight by which each strain value decays when summing strains.
+        /// </summary>
+        protected virtual double SumDecay => 0.9;
 
         /// <summary>
         /// The length of each strain section.
         /// </summary>
         protected virtual int SectionLength => 400;
+
+        /// <summary>
+        /// Determines how quickly strain decays for the given skill.
+        /// For example a value of 0.15 indicates that strain decays to 15% of its original value in one second.
+        /// </summary>
+        protected virtual double StrainDecayBase => 0.15;
+
+        /// <summary>
+        /// The current strain level.
+        /// </summary>
+        protected double CurrentStrain;
 
         private double currentSectionPeak; // We also keep track of the peak strain level in the current section.
 
@@ -36,10 +52,23 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         {
         }
 
+        protected double StrainDecay(double ms) => Math.Pow(StrainDecayBase, ms / 1000);
+
+        /// <summary>
+        /// Calculates the strain value of a <see cref="DifficultyHitObject"/>. This value is affected by previously processed objects.
+        /// </summary>
+        protected abstract double StrainValueOf(DifficultyHitObject current);
+
         /// <summary>
         /// Returns the strain value at <see cref="DifficultyHitObject"/>. This value is calculated with or without respect to previous objects.
         /// </summary>
-        protected abstract double StrainValueAt(DifficultyHitObject current);
+        protected virtual double StrainValueAt(DifficultyHitObject current)
+        {
+            CurrentStrain *= StrainDecay(current.DeltaTime);
+            CurrentStrain += StrainValueOf(current) * SkillMultiplier;
+
+            return CurrentStrain;
+        }
 
         /// <summary>
         /// Process a <see cref="DifficultyHitObject"/> and update current strain values accordingly.
@@ -86,7 +115,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// <param name="time">The time to retrieve the peak strain at.</param>
         /// <param name="current">The current hit object.</param>
         /// <returns>The peak strain.</returns>
-        protected abstract double CalculateInitialStrain(double time, DifficultyHitObject current);
+        protected virtual double CalculateInitialStrain(double time, DifficultyHitObject current) => CurrentStrain * StrainDecay(time - current.Previous(0).StartTime);
 
         /// <summary>
         /// Returns a live enumerable of the peak strains for each <see cref="SectionLength"/> section of the beatmap,
@@ -111,7 +140,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
             foreach (double strain in peaks.OrderDescending())
             {
                 difficulty += strain * weight;
-                weight *= DecayWeight;
+                weight *= SumDecay;
             }
 
             return difficulty;
