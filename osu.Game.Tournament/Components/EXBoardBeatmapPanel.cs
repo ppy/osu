@@ -80,7 +80,7 @@ namespace osu.Game.Tournament.Components
                         new TournamentSpriteText
                         {
                             Text = Beatmap?.GetDisplayTitleRomanisable(false, false) ?? (LocalisableString)@"unknown",
-                            Font = OsuFont.Torus.With(weight: FontWeight.Bold, size: 36),
+                            Font = OsuFont.Torus.With(weight: FontWeight.Bold, size: 26),
                         },
                         new FillFlowContainer
                         {
@@ -98,13 +98,13 @@ namespace osu.Game.Tournament.Components
                                         {
                                             Text = "mapper",
                                             Padding = new MarginPadding { Right = 5 },
-                                            Font = OsuFont.Torus.With(weight: FontWeight.Regular, size: 22)
+                                            Font = OsuFont.Torus.With(weight: FontWeight.Regular, size: 18)
                                         },
                                         new TournamentSpriteText
                                         {
                                             Text = Beatmap?.Metadata.Author.Username ?? "unknown",
                                             Padding = new MarginPadding { Right = 20 },
-                                            Font = OsuFont.Torus.With(weight: FontWeight.SemiBold, size: 22)
+                                            Font = OsuFont.Torus.With(weight: FontWeight.SemiBold, size: 18)
                                         },
                                     }
                                 },
@@ -112,7 +112,7 @@ namespace osu.Game.Tournament.Components
                                 new TournamentSpriteText
                                 {
                                     Text = Beatmap?.DifficultyName ?? "unknown",
-                                    Font = OsuFont.Torus.With(weight: FontWeight.Bold, size: 26)
+                                    Font = OsuFont.Torus.With(weight: FontWeight.Bold, size: 16)
                                 },
                             }
                         }
@@ -134,6 +134,7 @@ namespace osu.Game.Tournament.Components
                     Anchor = Anchor.CentreRight,
                     Origin = Anchor.CentreRight,
                     Margin = new MarginPadding(25),
+                    Position = new osuTK.Vector2(0, 50),
                     Size = new osuTK.Vector2(96),
                     RelativeSizeAxes = Axes.Y,
                 });
