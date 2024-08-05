@@ -10,7 +10,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Database;
-using osu.Game.Graphics.Cursor;
 using osu.Game.Overlays;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Mania.Beatmaps;
@@ -53,7 +52,6 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
                         (typeof(EditorBeatmap), editorBeatmap),
                         (typeof(IBeatSnapProvider), editorBeatmap),
                         (typeof(OverlayColourProvider), new OverlayColourProvider(OverlayColourScheme.Green)),
-                        (typeof(OsuContextMenuContainer), new OsuContextMenuContainer()),
                     },
                     Children = new Drawable[]
                     {

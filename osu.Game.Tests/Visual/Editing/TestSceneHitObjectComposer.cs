@@ -72,21 +72,13 @@ namespace osu.Game.Tests.Visual.Editing
 
             AddStep("Create composer", () =>
             {
-                Child = new DependencyProvidingContainer
+                Child = editorBeatmapContainer = new EditorBeatmapContainer(Beatmap.Value)
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    CachedDependencies = new (Type, object)[]
+                    Child = hitObjectComposer = new OsuHitObjectComposer(new OsuRuleset())
                     {
-                        (typeof(OsuContextMenuContainer), new OsuContextMenuContainer())
-                    },
-                    Child = editorBeatmapContainer = new EditorBeatmapContainer(Beatmap.Value)
-                    {
-                        Child = hitObjectComposer = new OsuHitObjectComposer(new OsuRuleset())
-                        {
-                            // force the composer to fully overlap the playfield area by setting a 4:3 aspect ratio.
-                            FillMode = FillMode.Fit,
-                            FillAspectRatio = 4 / 3f
-                        }
+                        // force the composer to fully overlap the playfield area by setting a 4:3 aspect ratio.
+                        FillMode = FillMode.Fit,
+                        FillAspectRatio = 4 / 3f
                     }
                 };
             });

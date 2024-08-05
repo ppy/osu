@@ -1,12 +1,10 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Graphics.Cursor;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Taiko.Beatmaps;
 using osu.Game.Rulesets.Taiko.Edit;
@@ -24,14 +22,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Editor
             BeatDivisor.Value = 8;
             EditorClock.Seek(0);
 
-            Child = new DependencyProvidingContainer
-            {
-                CachedDependencies = new (Type, object)[]
-                {
-                    (typeof(OsuContextMenuContainer), new OsuContextMenuContainer()),
-                },
-                Child = new TestComposer { RelativeSizeAxes = Axes.Both },
-            };
+            Child = new TestComposer { RelativeSizeAxes = Axes.Both };
         });
 
         [Test]

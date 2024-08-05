@@ -16,7 +16,6 @@ using osu.Framework.Input;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps.ControlPoints;
-using osu.Game.Graphics.Cursor;
 using osu.Game.Overlays;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Osu.Beatmaps;
@@ -80,7 +79,6 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
         {
             var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
             dependencies.CacheAs(composer.DistanceSnapProvider);
-            dependencies.Cache(new OsuContextMenuContainer());
             return dependencies;
         }
 
