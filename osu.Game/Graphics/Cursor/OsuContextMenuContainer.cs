@@ -17,11 +17,6 @@ namespace osu.Game.Graphics.Cursor
 
         protected override Menu CreateMenu() => menu = new OsuContextMenu(true);
 
-        public void ShowMenu()
-        {
-            menu.Show();
-        }
-
         public void CloseMenu()
         {
             menu.Close();
