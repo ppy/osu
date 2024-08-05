@@ -4,6 +4,7 @@
 using System;
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
 using osu.Game.Online.API;
@@ -24,7 +25,17 @@ namespace osu.Game.Tests.Visual.Online
         [SetUpSteps]
         public void SetUp()
         {
-            AddStep("create profile overlay", () => Child = profile = new UserProfileOverlay());
+            AddStep("create profile overlay", () =>
+            {
+                profile = new UserProfileOverlay();
+
+                Child = new DependencyProvidingContainer
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    CachedDependencies = new (Type, object)[] { (typeof(UserProfileOverlay), profile) },
+                    Child = profile,
+                };
+            });
         }
 
         [Test]
@@ -131,6 +142,7 @@ namespace osu.Game.Tests.Visual.Online
                             CountryCode = CountryCode.JP,
                             CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c2.jpg",
                             ProfileHue = hue,
+                            PlayMode = "osu",
                         });
                         return true;
                     }
@@ -174,6 +186,7 @@ namespace osu.Game.Tests.Visual.Online
                 CountryCode = CountryCode.JP,
                 CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c2.jpg",
                 ProfileHue = hue,
+                PlayMode = "osu",
             }));
 
             int hue2 = 0;
@@ -189,6 +202,7 @@ namespace osu.Game.Tests.Visual.Online
                 CountryCode = CountryCode.JP,
                 CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c2.jpg",
                 ProfileHue = hue2,
+                PlayMode = "osu",
             }));
         }
 
@@ -281,6 +295,15 @@ namespace osu.Game.Tests.Visual.Online
                     ImageUrl = "https://assets.ppy.sh/profile-badges/contributor@2x.png",
                     ImageUrlLowRes = "https://assets.ppy.sh/profile-badges/contributor.png",
                 },
+            },
+            DailyChallengeStatistics = new APIUserDailyChallengeStatistics
+            {
+                DailyStreakCurrent = 231,
+                WeeklyStreakCurrent = 18,
+                DailyStreakBest = 370,
+                WeeklyStreakBest = 51,
+                Top10PercentPlacements = 345,
+                Top50PercentPlacements = 427,
             },
             Title = "osu!volunteer",
             Colour = "ff0000",
