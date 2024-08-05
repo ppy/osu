@@ -10,7 +10,6 @@ using osu.Framework.Graphics.Cursor;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps.ControlPoints;
-using osu.Game.Graphics.Cursor;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu;
@@ -31,9 +30,6 @@ namespace osu.Game.Tests.Editing
         [Cached(typeof(EditorBeatmap))]
         [Cached(typeof(IBeatSnapProvider))]
         private readonly EditorBeatmap editorBeatmap;
-
-        [Cached]
-        public readonly OsuContextMenuContainer ContextMenuContainer = new OsuContextMenuContainer();
 
         protected override Container<Drawable> Content { get; } = new PopoverContainer { RelativeSizeAxes = Axes.Both };
 

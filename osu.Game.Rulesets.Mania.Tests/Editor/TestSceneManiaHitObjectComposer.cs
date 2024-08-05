@@ -11,7 +11,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
-using osu.Game.Graphics.Cursor;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Edit;
@@ -31,9 +30,6 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
     public partial class TestSceneManiaHitObjectComposer : EditorClockTestScene
     {
         private TestComposer composer;
-
-        [Cached]
-        public readonly OsuContextMenuContainer ContextMenuContainer = new OsuContextMenuContainer();
 
         [SetUp]
         public void Setup() => Schedule(() =>
