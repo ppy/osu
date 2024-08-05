@@ -118,12 +118,11 @@ namespace osu.Game.Online.API
                 u.OldValue?.Activity.UnbindFrom(activity);
                 u.NewValue.Activity.BindTo(activity);
 
-                if (u.OldValue != null)
-                    localUserStatus.UnbindFrom(u.OldValue.Status);
-                localUserStatus.BindTo(u.NewValue.Status);
+                u.OldValue?.Status.UnbindFrom(localUserStatus);
+                u.NewValue.Status.BindTo(localUserStatus);
             }, true);
 
-            localUserStatus.BindValueChanged(val => configStatus.Value = val.NewValue);
+            localUserStatus.BindTo(configStatus);
 
             var thread = new Thread(run)
             {
@@ -163,6 +162,8 @@ namespace osu.Game.Online.API
         internal new void Schedule(Action action) => base.Schedule(action);
 
         public string AccessToken => authentication.RequestAccessToken();
+
+        public Guid SessionIdentifier { get; } = Guid.NewGuid();
 
         /// <summary>
         /// Number of consecutive requests which failed due to network issues.
@@ -598,6 +599,7 @@ namespace osu.Game.Online.API
             password = null;
             SecondFactorCode = null;
             authentication.Clear();
+            configStatus.Value = UserStatus.Online;
 
             // Scheduled prior to state change such that the state changed event is invoked with the correct user and their friends present
             Schedule(() =>
