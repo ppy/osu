@@ -174,14 +174,9 @@ namespace osu.Game.Rulesets.Osu.UI
 
             public bool OnPressed(KeyBindingPressEvent<OsuAction> e)
             {
-                try
-                {
-                    return BlockNextPress;
-                }
-                finally
-                {
-                    BlockNextPress = false;
-                }
+                bool block = BlockNextPress;
+                BlockNextPress = false;
+                return block;
             }
 
             public void OnReleased(KeyBindingReleaseEvent<OsuAction> e)
