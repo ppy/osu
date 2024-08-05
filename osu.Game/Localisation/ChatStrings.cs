@@ -27,7 +27,7 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "press enter to type message..."
         /// </summary>
-        public static LocalisableString InGameInputPlaceholder => new TranslatableString(getKey(@"in_game_input_placeholder"), @"press enter to type message...");
+        public static LocalisableString InGameInputPlaceholder => new TranslatableString(getKey(@"in_game_input_placeholder"), @"press enter to chat...");
 
         private static string getKey(string key) => $"{prefix}:{key}";
     }
