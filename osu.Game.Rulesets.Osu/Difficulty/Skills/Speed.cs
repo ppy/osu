@@ -22,10 +22,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private double currentStrain;
         private double currentRhythm;
 
+        private double currentStrainNoDistance;
+
         protected override int ReducedSectionCount => 5;
         protected override double DifficultyMultiplier => 1.04;
 
-        private readonly List<double> objectStrains = new List<double>();
+        private readonly List<double> objectStrainsNoDistance = new List<double>();
 
         public Speed(Mod[] mods)
             : base(mods)
@@ -41,26 +43,34 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             currentStrain *= strainDecay(((OsuDifficultyHitObject)current).StrainTime);
             currentStrain += SpeedEvaluator.EvaluateDifficultyOf(current) * skillMultiplier;
 
+            // Disregard distance when computing the number of speed notes.
+            double travelDistance = current.Index > 0 ? ((OsuDifficultyHitObject)current.Previous(0)).TravelDistance : 0;
+            double distance = Math.Min(125, travelDistance + ((OsuDifficultyHitObject)current).MinimumJumpDistance);
+
+            currentStrainNoDistance *= strainDecay(((OsuDifficultyHitObject)current).StrainTime);
+            currentStrainNoDistance += SpeedEvaluator.EvaluateDifficultyOf(current) / (1 + Math.Pow(distance / 125, 3.5)) * skillMultiplier;
+
             currentRhythm = RhythmEvaluator.EvaluateDifficultyOf(current);
 
             double totalStrain = currentStrain * currentRhythm;
+            double totalStrainNoDistance = currentStrainNoDistance * currentRhythm;
 
-            objectStrains.Add(totalStrain);
+            objectStrainsNoDistance.Add(totalStrainNoDistance);
 
             return totalStrain;
         }
 
         public double RelevantNoteCount()
         {
-            if (objectStrains.Count == 0)
+            if (objectStrainsNoDistance.Count == 0)
                 return 0;
 
-            double maxStrain = objectStrains.Max();
+            double maxStrain = objectStrainsNoDistance.Max();
 
             if (maxStrain == 0)
                 return 0;
 
-            return objectStrains.Sum(strain => 1.0 / (1.0 + Math.Exp(-(strain / maxStrain * 12.0 - 6.0))));
+            return objectStrainsNoDistance.Sum(strain => strain / maxStrain);
         }
     }
 }
