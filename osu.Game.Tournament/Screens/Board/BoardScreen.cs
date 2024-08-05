@@ -461,6 +461,13 @@ namespace osu.Game.Tournament.Screens.Board
                         instructionDisplayHolder.Child = new InstructionDisplay(step: Steps.EX);
                         instructionDisplayHolder.FadeInFromZero(duration: 200, easing: Easing.InCubic);
                     }
+                    else
+                    {
+                        // Restore to the last state
+                        setMode(pickColour, pickType);
+                        // instructionDisplayHolder.Child = new InstructionDisplay();
+                        instructionDisplayHolder.FadeInFromZero(duration: 200, easing: Easing.InCubic);
+                    }
                 }
 
                 return true;
@@ -709,7 +716,15 @@ namespace osu.Game.Tournament.Screens.Board
                 i++;
             }
 
-            if (winner == TeamColour.Neutral) return false;
+            if (winner == TeamColour.Neutral)
+            {
+                // Reset the round winner to Neutral
+                teamWinner = TeamColour.Neutral;
+                // Reset team scores
+                CurrentMatch.Value.Team1Score.Value = 0;
+                CurrentMatch.Value.Team2Score.Value = 0;
+                return false;
+            }
             else
             {
                 // 6 is just enough to fill the score bar, subject to change
