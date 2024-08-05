@@ -13,6 +13,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
     public class Aim : OsuStrainSkill
     {
         public override double SkillMultiplier => 23.55;
+
         public Aim(Mod[] mods, bool withSliders)
             : base(mods)
         {
