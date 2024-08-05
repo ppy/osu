@@ -60,10 +60,10 @@ namespace osu.Game.Tests.Visual.UserInterface
             };
         });
 
-        [Test]
-        public void TestTooltipBasic([Values(0, 1, 2)] int index)
+        [TestCaseSource(nameof(test_case_tooltip_string))]
+        public void TestTooltipBasic(string text)
         {
-            AddStep("Set tooltip content", () => container.TooltipText = test_case_tooltip_string[index]);
+            AddStep("Set tooltip content", () => container.TooltipText = text);
 
             AddStep("Move mouse to container", () => InputManager.MoveMouseTo(new Vector2(InputManager.ScreenSpaceDrawQuad.Centre.X, InputManager.ScreenSpaceDrawQuad.Centre.Y)));
 
