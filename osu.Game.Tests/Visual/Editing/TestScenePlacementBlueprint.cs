@@ -29,6 +29,51 @@ namespace osu.Game.Tests.Visual.Editing
         private GlobalActionContainer globalActionContainer => this.ChildrenOfType<GlobalActionContainer>().Single();
 
         [Test]
+        public void TestDeleteUsingMiddleMouse()
+        {
+            AddStep("select circle placement tool", () => InputManager.Key(Key.Number2));
+            AddStep("move mouse to center of playfield", () => InputManager.MoveMouseTo(this.ChildrenOfType<Playfield>().Single()));
+            AddStep("place circle", () => InputManager.Click(MouseButton.Left));
+
+            AddAssert("one circle added", () => EditorBeatmap.HitObjects, () => Has.One.Items);
+            AddStep("delete with middle mouse", () => InputManager.Click(MouseButton.Middle));
+            AddAssert("circle removed", () => EditorBeatmap.HitObjects, () => Is.Empty);
+        }
+
+        [Test]
+        public void TestDeleteUsingShiftRightClick()
+        {
+            AddStep("select circle placement tool", () => InputManager.Key(Key.Number2));
+            AddStep("move mouse to center of playfield", () => InputManager.MoveMouseTo(this.ChildrenOfType<Playfield>().Single()));
+            AddStep("place circle", () => InputManager.Click(MouseButton.Left));
+
+            AddAssert("one circle added", () => EditorBeatmap.HitObjects, () => Has.One.Items);
+            AddStep("delete with right mouse", () =>
+            {
+                InputManager.PressKey(Key.ShiftLeft);
+                InputManager.Click(MouseButton.Right);
+                InputManager.ReleaseKey(Key.ShiftLeft);
+            });
+            AddAssert("circle removed", () => EditorBeatmap.HitObjects, () => Is.Empty);
+        }
+
+        [Test]
+        public void TestContextMenu()
+        {
+            AddStep("select circle placement tool", () => InputManager.Key(Key.Number2));
+            AddStep("move mouse to center of playfield", () => InputManager.MoveMouseTo(this.ChildrenOfType<Playfield>().Single()));
+            AddStep("place circle", () => InputManager.Click(MouseButton.Left));
+
+            AddAssert("one circle added", () => EditorBeatmap.HitObjects, () => Has.One.Items);
+            AddStep("delete with right mouse", () =>
+            {
+                InputManager.Click(MouseButton.Right);
+            });
+            AddAssert("circle not removed", () => EditorBeatmap.HitObjects, () => Has.One.Items);
+            AddAssert("circle selected", () => EditorBeatmap.SelectedHitObjects, () => Has.One.Items);
+        }
+
+        [Test]
         public void TestCommitPlacementViaGlobalAction()
         {
             Playfield playfield = null!;
