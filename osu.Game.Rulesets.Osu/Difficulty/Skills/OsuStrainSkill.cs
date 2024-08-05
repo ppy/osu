@@ -23,7 +23,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         /// </summary>
         protected virtual double ReducedStrainBaseline => 0.75;
 
-
         protected OsuStrainSkill(Mod[] mods)
             : base(mods)
         {
