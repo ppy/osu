@@ -60,8 +60,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         public SelectionScaleHandler ScaleHandler { get; private set; }
 
-        [Resolved]
-        private OsuContextMenuContainer editorContextMenuContainer { get; set; }
+        [Resolved(CanBeNull = true)]
+        protected OsuContextMenuContainer ContextMenuContainer { get; private set; }
 
         protected SelectionHandler()
         {
@@ -237,7 +237,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         protected void DeselectAll()
         {
             SelectedItems.Clear();
-            editorContextMenuContainer.CloseMenu();
+            ContextMenuContainer?.CloseMenu();
         }
 
         /// <summary>
