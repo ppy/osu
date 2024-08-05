@@ -11,11 +11,12 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Skills
 {
     public class Movement : StrainSkill
     {
+        public override double SkillMultiplier => 900;
+
         private const float absolute_player_positioning_error = 16f;
         private const float normalized_hitobject_radius = 41.0f;
         private const double direction_change_bonus = 21.0;
 
-        public override double SkillMultiplier => 900;
         protected override double StrainDecayBase => 0.2;
 
         protected override double SumDecay => 0.94;

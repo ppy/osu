@@ -16,6 +16,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
     /// </summary>
     public class Flashlight : StrainSkill
     {
+        public override double SkillMultiplier => 0.052;
         private readonly bool hasHiddenMod;
 
         public Flashlight(Mod[] mods)
@@ -23,7 +24,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         {
             hasHiddenMod = mods.Any(m => m is OsuModHidden);
         }
-        public override double SkillMultiplier => 0.052;
 
         protected override double StrainValueOf(DifficultyHitObject current) => FlashlightEvaluator.EvaluateDifficultyOf(current, hasHiddenMod);
 
