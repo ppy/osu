@@ -79,6 +79,7 @@ namespace osu.Game.Tournament.Components
                     /* This section of code adds Beatmap Information to the Board grid. */
                     Children = new Drawable[]
                     {
+                        /* Disable text display
                         new TextFlowContainer
                         {
                             AutoSizeAxes = Axes.Y,
@@ -89,7 +90,7 @@ namespace osu.Game.Tournament.Components
                         }.With(t => t.AddParagraph(Beatmap?.GetDisplayTitleRomanisable(false, false) ?? (LocalisableString)@"unknown", s =>
                         {
                             s.Font = OsuFont.Torus.With(weight: FontWeight.Bold);
-                        })),
+                        })),*/
                         new FillFlowContainer
                         {
                             AutoSizeAxes = Axes.Both,
@@ -97,6 +98,7 @@ namespace osu.Game.Tournament.Components
                             Margin = new MarginPadding { Left = -7 }, // Adjust this value to change the distance
                             Children = new Drawable[]
                             {
+                                /* Disable text display
                                 new TournamentSpriteText
                                 {
                                     Text = "mapper",
@@ -110,7 +112,7 @@ namespace osu.Game.Tournament.Components
                                     Font = OsuFont.Torus.With(weight: FontWeight.Bold, size: 14),
                                     MaxWidth = 79,
                                     Margin = new MarginPadding { Right = 20 }, // Adjusts the space to the right of the mapper name
-                                },
+                                },*/
                             }
                         },
                         new FillFlowContainer
@@ -120,6 +122,7 @@ namespace osu.Game.Tournament.Components
                             Margin = new MarginPadding { Left = -7 }, // Adjust this value to change the distance
                             Children = new Drawable[]
                             {
+                                /* Disable text display
                                 new TournamentSpriteText
                                 {
                                     Text = "difficulty",
@@ -132,7 +135,7 @@ namespace osu.Game.Tournament.Components
                                     Text = Beatmap?.DifficultyName ?? "unknown",
                                     MaxWidth = 75,
                                     Font = OsuFont.Torus.With(weight: FontWeight.Bold, size: 14),
-                                },
+                                },*/
                             }
                         }
                     },
