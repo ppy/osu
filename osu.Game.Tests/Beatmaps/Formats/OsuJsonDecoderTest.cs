@@ -51,14 +51,14 @@ namespace osu.Game.Tests.Beatmaps.Formats
         {
             var beatmap = decodeAsJson(normal);
             var beatmapInfo = beatmap.BeatmapInfo;
-            Assert.AreEqual(0, beatmapInfo.AudioLeadIn);
-            Assert.AreEqual(0.7f, beatmapInfo.StackLeniency);
-            Assert.AreEqual(false, beatmapInfo.SpecialStyle);
+            Assert.AreEqual(0, beatmap.AudioLeadIn);
+            Assert.AreEqual(0.7f, beatmap.StackLeniency);
+            Assert.AreEqual(false, beatmap.SpecialStyle);
             Assert.IsTrue(beatmapInfo.Ruleset.OnlineID == 0);
-            Assert.AreEqual(false, beatmapInfo.LetterboxInBreaks);
-            Assert.AreEqual(false, beatmapInfo.WidescreenStoryboard);
-            Assert.AreEqual(CountdownType.None, beatmapInfo.Countdown);
-            Assert.AreEqual(0, beatmapInfo.CountdownOffset);
+            Assert.AreEqual(false, beatmap.LetterboxInBreaks);
+            Assert.AreEqual(false, beatmap.WidescreenStoryboard);
+            Assert.AreEqual(CountdownType.None, beatmap.Countdown);
+            Assert.AreEqual(0, beatmap.CountdownOffset);
         }
 
         [Test]
@@ -76,10 +76,10 @@ namespace osu.Game.Tests.Beatmaps.Formats
             Assert.AreEqual(expectedBookmarks.Length, beatmapInfo.Bookmarks.Length);
             for (int i = 0; i < expectedBookmarks.Length; i++)
                 Assert.AreEqual(expectedBookmarks[i], beatmapInfo.Bookmarks[i]);
-            Assert.AreEqual(1.8, beatmapInfo.DistanceSpacing);
+            Assert.AreEqual(1.8, beatmap.DistanceSpacing);
             Assert.AreEqual(4, beatmapInfo.BeatDivisor);
-            Assert.AreEqual(4, beatmapInfo.GridSize);
-            Assert.AreEqual(2, beatmapInfo.TimelineZoom);
+            Assert.AreEqual(4, beatmap.GridSize);
+            Assert.AreEqual(2, beatmap.TimelineZoom);
         }
 
         [Test]

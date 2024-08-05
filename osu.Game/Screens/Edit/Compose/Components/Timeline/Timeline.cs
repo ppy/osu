@@ -164,7 +164,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 Scheduler.AddOnce(applyVisualOffset, beatmap);
             }, true);
 
-            Zoom = (float)(defaultTimelineZoom * editorBeatmap.BeatmapInfo.TimelineZoom);
+            Zoom = (float)(defaultTimelineZoom * editorBeatmap.TimelineZoom);
         }
 
         private void applyVisualOffset(IBindable<WorkingBeatmap> beatmap)
@@ -231,7 +231,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 float minimumZoom = getZoomLevelForVisibleMilliseconds(10000);
                 float maximumZoom = getZoomLevelForVisibleMilliseconds(500);
 
-                float initialZoom = (float)Math.Clamp(defaultTimelineZoom * (editorBeatmap.BeatmapInfo.TimelineZoom == 0 ? 1 : editorBeatmap.BeatmapInfo.TimelineZoom), minimumZoom, maximumZoom);
+                float initialZoom = (float)Math.Clamp(defaultTimelineZoom * (editorBeatmap.TimelineZoom == 0 ? 1 : editorBeatmap.TimelineZoom), minimumZoom, maximumZoom);
 
                 SetupZoom(initialZoom, minimumZoom, maximumZoom);
 
@@ -253,7 +253,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         protected override void OnZoomChanged()
         {
             base.OnZoomChanged();
-            editorBeatmap.BeatmapInfo.TimelineZoom = Zoom / defaultTimelineZoom;
+            editorBeatmap.TimelineZoom = Zoom / defaultTimelineZoom;
         }
 
         protected override void UpdateAfterChildren()

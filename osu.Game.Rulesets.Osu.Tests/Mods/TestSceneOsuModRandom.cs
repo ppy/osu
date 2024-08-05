@@ -74,12 +74,12 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
             {
                 BeatmapInfo = new BeatmapInfo
                 {
-                    StackLeniency = 0,
                     Difficulty = new BeatmapDifficulty
                     {
                         ApproachRate = 8.5f
                     }
                 },
+                StackLeniency = 0,
                 ControlPointInfo = controlPointInfo
             };
 
