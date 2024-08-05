@@ -77,11 +77,16 @@ namespace osu.Game.Tournament.Components
                     Direction = FillDirection.Vertical,
                     Children = new Drawable[]
                     {
-                        new TournamentSpriteText
+                        new TextFlowContainer
                         {
-                            Text = Beatmap?.GetDisplayTitleRomanisable(false, false) ?? (LocalisableString)@"unknown",
-                            Font = OsuFont.Torus.With(weight: FontWeight.Bold, size: 36),
-                        },
+                            AutoSizeAxes = Axes.Y,
+                            Width = WIDTH * 0.9f,
+                            TextAnchor = Anchor.TopLeft,
+                            // Margin = new MarginPadding { Left = -8 }, // Adjust padding as needed
+                        }.With(t => t.AddParagraph(Beatmap?.GetDisplayTitleRomanisable(false, false) ?? (LocalisableString)@"unknown", s =>
+                        {
+                            s.Font = OsuFont.Torus.With(weight: FontWeight.Bold, size: 36);
+                        })),
                         new FillFlowContainer
                         {
                             AutoSizeAxes = Axes.Both,
