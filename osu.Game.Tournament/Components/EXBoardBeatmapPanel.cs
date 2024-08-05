@@ -85,7 +85,7 @@ namespace osu.Game.Tournament.Components
                             // Margin = new MarginPadding { Left = -8 }, // Adjust padding as needed
                         }.With(t => t.AddParagraph(Beatmap?.GetDisplayTitleRomanisable(false, false) ?? (LocalisableString)@"unknown", s =>
                         {
-                            s.Font = OsuFont.Torus.With(weight: FontWeight.Bold, size: 36);
+                            s.Font = OsuFont.Torus.With(weight: FontWeight.Bold, size: 26);
                         })),
                         new FillFlowContainer
                         {
