@@ -43,7 +43,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             Background.Alpha = 0.2f;
 
             TextBox.FocusLost = () => expandedFromTextBoxFocus.Value = false;
-            TextBox.PlaceholderText = ChatStrings.IngameInputPlaceholder;
+            TextBox.PlaceholderText = ChatStrings.InGameInputPlaceholder;
         }
 
         protected override bool OnHover(HoverEvent e) => true; // use UI mouse cursor.
