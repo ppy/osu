@@ -21,6 +21,16 @@ namespace osu.Game.Tests.Visual.UserInterface
     {
         private TestTooltipContainer container = null!;
 
+        private static readonly string[] test_case_tooltip_string =
+        [
+            "Hello!!",
+            string.Concat(Enumerable.Repeat("Hello ", 100)),
+
+            //TODO: o!f issue: https://github.com/ppy/osu-framework/issues/5007
+            //Enable after o!f fixed
+            // $"H{new string('e', 500)}llo",
+        ];
+
         [SetUp]
         public void SetUp() => Schedule(() =>
         {
@@ -50,28 +60,12 @@ namespace osu.Game.Tests.Visual.UserInterface
             };
         });
 
-        private static readonly string[] test_case_tooltip_string =
-        [
-            "Hello!!",
-            string.Concat(Enumerable.Repeat("Hello ", 100)),
-            $"H{new string('e', 500)}llo",
-        ];
-
-        //TODO: o!f issue: https://github.com/ppy/osu-framework/issues/5007
-        //Enable after o!f fixed
-        [Ignore("o!f issue https://github.com/ppy/osu-framework/issues/5007")]
         [Test]
         public void TestTooltipBasic([Values(0, 1, 2)] int index)
         {
-            AddStep("Set tooltip content", () =>
-            {
-                container.TooltipText = test_case_tooltip_string[index];
-            });
+            AddStep("Set tooltip content", () => container.TooltipText = test_case_tooltip_string[index]);
 
-            AddStep("Move to container", () =>
-            {
-                InputManager.MoveMouseTo(new Vector2(InputManager.ScreenSpaceDrawQuad.Centre.X, InputManager.ScreenSpaceDrawQuad.Centre.Y));
-            });
+            AddStep("Move mouse to container", () => InputManager.MoveMouseTo(new Vector2(InputManager.ScreenSpaceDrawQuad.Centre.X, InputManager.ScreenSpaceDrawQuad.Centre.Y)));
 
             OsuTooltipContainer.OsuTooltip? tooltip = null!;
 
@@ -81,7 +75,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                 return tooltip != null && tooltip.Alpha == 1;
             });
 
-            AddAssert("Is tooltip obey 500 width limit", () => tooltip != null && tooltip.Width <= 500);
+            AddAssert("Check tooltip is under width limit", () => tooltip != null && tooltip.Width <= 500);
         }
 
         internal sealed partial class TestTooltipContainer : Container, IHasTooltip
