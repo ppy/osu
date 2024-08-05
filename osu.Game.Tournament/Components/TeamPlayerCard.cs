@@ -54,7 +54,7 @@ namespace osu.Game.Tournament.Components
                             Anchor = Anchor.CentreRight,
                             Origin = Anchor.CentreRight,
                             Text = $"{user.Statistics.PP}pp",
-                            Font = OsuFont.TorusAlternate.With(weight: FontWeight.SemiBold, size: 15),
+                            Font = OsuFont.TorusAlternate.With(weight: FontWeight.SemiBold, size: 20),
                             Shadow = true
                         },
                         new TournamentSpriteText
@@ -62,7 +62,7 @@ namespace osu.Game.Tournament.Components
                             Anchor = Anchor.CentreRight,
                             Origin = Anchor.CentreRight,
                             Text = $"#{user.Statistics.GlobalRank}",
-                            Font = OsuFont.TorusAlternate.With(weight: FontWeight.Medium, size: 20),
+                            Font = OsuFont.TorusAlternate.With(weight: FontWeight.Medium, size: 15),
                             Shadow = true
                         }
                     };
