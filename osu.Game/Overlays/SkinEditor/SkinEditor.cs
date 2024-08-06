@@ -115,7 +115,7 @@ namespace osu.Game.Overlays.SkinEditor
         {
             RelativeSizeAxes = Axes.Both;
 
-            AddInternal(new OsuContextMenuContainer
+            InternalChild = new OsuContextMenuContainer
             {
                 RelativeSizeAxes = Axes.Both,
                 Child = new GridContainer
@@ -220,7 +220,7 @@ namespace osu.Game.Overlays.SkinEditor
                         },
                     }
                 }
-            });
+            };
 
             clipboardContent = clipboard.Content.GetBoundCopy();
         }
