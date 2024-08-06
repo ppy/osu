@@ -16,11 +16,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
     /// </summary>
     public class Speed : OsuStrainSkill
     {
-        private double skillMultiplier => 1375;
-        private double strainDecayBase => 0.3;
+        protected double SkillMultiplier => 1375;
+        protected override double StrainDecayBase => 0.3;
 
-        private double currentStrain;
-        private double currentRhythm;
+        protected double CurrentStrain;
+        protected double CurrentRhythm;
 
         protected override int ReducedSectionCount => 5;
         protected override double DifficultyMultiplier => 1.04;
@@ -32,18 +32,17 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         {
         }
 
-        private double strainDecay(double ms) => Math.Pow(strainDecayBase, ms / 1000);
-
-        protected override double CalculateInitialStrain(double time, DifficultyHitObject current) => (currentStrain * currentRhythm) * strainDecay(time - current.Previous(0).StartTime);
+        protected override double CalculateInitialStrain(double time, DifficultyHitObject current) => (CurrentStrain * CurrentRhythm) * StrainDecay(time - current.Previous(0).StartTime);
 
         protected override double StrainValueAt(DifficultyHitObject current)
         {
-            currentStrain *= strainDecay(((OsuDifficultyHitObject)current).StrainTime);
-            currentStrain += SpeedEvaluator.EvaluateDifficultyOf(current) * skillMultiplier;
+            OsuDifficultyHitObject currODHO = (OsuDifficultyHitObject)current;
 
-            currentRhythm = RhythmEvaluator.EvaluateDifficultyOf(current);
+            CurrentStrain *= StrainDecay(currODHO.StrainTime);
+            CurrentStrain += SpeedEvaluator.EvaluateDifficultyOf(current) * SkillMultiplier;
 
-            double totalStrain = currentStrain * currentRhythm;
+            CurrentRhythm = currODHO.RhythmDifficulty;
+            double totalStrain = CurrentStrain * CurrentRhythm;
 
             objectStrains.Add(totalStrain);
 
