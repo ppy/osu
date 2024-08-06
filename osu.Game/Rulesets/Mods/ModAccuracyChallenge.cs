@@ -74,7 +74,7 @@ namespace osu.Game.Rulesets.Mods
 
         public ScoreRank AdjustRank(ScoreRank rank, double accuracy) => rank;
 
-        public override bool FailCondition(JudgementResult result) => false;
+        public override FailState CheckFail(JudgementResult? result) => FailState.Allow;
 
         public enum AccuracyMode
         {

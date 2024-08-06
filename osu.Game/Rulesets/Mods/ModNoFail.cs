@@ -7,6 +7,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
+using osu.Game.Rulesets.Judgements;
 using osu.Game.Screens.Play;
 
 namespace osu.Game.Rulesets.Mods
@@ -24,12 +25,12 @@ namespace osu.Game.Rulesets.Mods
 
         private readonly Bindable<bool> showHealthBar = new Bindable<bool>();
 
+        public bool RestartOnFail => false;
+
         /// <summary>
         /// We never fail, 'yo.
         /// </summary>
-        public bool PerformFail() => false;
-
-        public bool RestartOnFail => false;
+        public FailState CheckFail(JudgementResult? result) => FailState.Block;
 
         public void ReadFromConfig(OsuConfigManager config)
         {

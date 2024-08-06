@@ -6,6 +6,7 @@ using System.Linq;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Graphics;
+using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Play;
@@ -48,8 +49,8 @@ namespace osu.Game.Rulesets.Mods
             player.BreakOverlay.Hide();
         }
 
-        public bool PerformFail() => false;
-
         public bool RestartOnFail => false;
+
+        public FailState CheckFail(JudgementResult? result) => FailState.Block;
     }
 }

@@ -102,9 +102,9 @@ namespace osu.Game.Rulesets.Scoring
             if (CheckDefaultFailCondition(result))
                 return true;
 
-            foreach (var condition in Mods.Value.OfType<IHasFailCondition>())
+            foreach (var condition in Mods.Value.OfType<IApplicableFailOverride>())
             {
-                if (condition.FailCondition(result))
+                if (condition.CheckFail(result) == FailState.Force)
                 {
                     ModTriggeringFailure = condition as Mod;
                     return true;

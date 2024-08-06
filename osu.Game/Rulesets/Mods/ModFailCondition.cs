@@ -9,17 +9,16 @@ using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Mods
 {
-    public abstract class ModFailCondition : Mod, IApplicableToHealthProcessor, IHasFailCondition
+    public abstract class ModFailCondition : Mod, IApplicableToHealthProcessor, IApplicableFailOverride
     {
         public override Type[] IncompatibleMods => new[] { typeof(ModNoFail), typeof(ModCinema) };
 
         [SettingSource("Restart on fail", "Automatically restarts when failed.")]
         public BindableBool Restart { get; } = new BindableBool();
 
-        public virtual bool PerformFail() => true;
+        public virtual bool AllowFail => true;
 
         public virtual bool RestartOnFail => Restart.Value;
-
         private Action<Mod>? triggerFailureDelegate;
 
         public void ApplyToHealthProcessor(HealthProcessor healthProcessor)
@@ -32,6 +31,6 @@ namespace osu.Game.Rulesets.Mods
         /// </summary>
         protected void TriggerFailure() => triggerFailureDelegate?.Invoke(this);
 
-        public abstract bool FailCondition(JudgementResult result);
+        public abstract FailState CheckFail(JudgementResult? result);
     }
 }
