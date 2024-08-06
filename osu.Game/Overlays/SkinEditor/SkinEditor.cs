@@ -23,6 +23,7 @@ using osu.Framework.Testing;
 using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation;
 using osu.Game.Overlays.Dialog;
@@ -32,7 +33,6 @@ using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Components;
 using osu.Game.Screens.Edit.Components.Menus;
 using osu.Game.Skinning;
-using osu.Game.Graphics.Cursor;
 
 namespace osu.Game.Overlays.SkinEditor
 {
@@ -127,6 +127,7 @@ namespace osu.Game.Overlays.SkinEditor
                         new Dimension(GridSizeMode.AutoSize),
                         new Dimension(),
                     },
+
                     Content = new[]
                     {
                         new Drawable[]
