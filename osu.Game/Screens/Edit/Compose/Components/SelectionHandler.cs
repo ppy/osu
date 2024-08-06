@@ -263,7 +263,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <returns>Whether a selection was performed.</returns>
         internal virtual bool MouseDownSelectionRequested(SelectionBlueprint<T> blueprint, MouseButtonEvent e)
         {
-            if (e.ShiftPressed && e.Button == MouseButton.Right)
+            if (e.Button == MouseButton.Middle || (e.ShiftPressed && e.Button == MouseButton.Right))
             {
                 handleQuickDeletion(blueprint);
                 return true;
