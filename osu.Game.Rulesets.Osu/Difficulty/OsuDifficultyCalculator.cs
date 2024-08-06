@@ -61,8 +61,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 flashlightRating *= 0.7;
             }
 
-            double baseAimPerformance = Math.Pow(5 * Math.Max(1, aimRating / 0.0675) - 4, 3) / 100000;
-            double baseSpeedPerformance = Math.Pow(5 * Math.Max(1, speedRating / 0.0675) - 4, 3) / 100000;
+            double baseAimPerformance = Math.Pow(Math.Max(0, aimRating - 0.054), 3.0) * 4.065;
+            double baseSpeedPerformance = Math.Pow(Math.Max(0, speedRating - 0.054), 3.0) * 4.065;
             double baseFlashlightPerformance = 0.0;
 
             if (mods.Any(h => h is OsuModFlashlight))
@@ -75,9 +75,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                     Math.Pow(baseFlashlightPerformance, 1.1), 1.0 / 1.1
                 );
 
-            double starRating = basePerformance > 0.00001
-                ? Math.Cbrt(OsuPerformanceCalculator.PERFORMANCE_BASE_MULTIPLIER) * 0.027 * (Math.Cbrt(100000 / Math.Pow(2, 1 / 1.1) * basePerformance) + 4)
-                : 0;
+            double starRating = 1.016 * (Math.Cbrt(basePerformance) + 0.106) * Math.Cbrt(OsuPerformanceCalculator.PERFORMANCE_BASE_MULTIPLIER);
 
             double preempt = IBeatmapDifficultyInfo.DifficultyRange(beatmap.Difficulty.ApproachRate, 1800, 1200, 450) / clockRate;
             double drainRate = beatmap.Difficulty.DrainRate;

@@ -34,7 +34,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             numMiss = score.GetCountMiss() ?? 0; // HitResult.Miss PLUS HitResult.LargeTickMiss
 
             // We are heavily relying on aim in catch the beat
-            double value = Math.Pow(5.0 * Math.Max(1.0, catchAttributes.StarRating / 0.0049) - 4.0, 2.0) / 100000.0;
+            double value = Math.Pow(Math.Max(0, catchAttributes.StarRating - 0.004), 2.0) * 10.413;
 
             // Longer maps are worth more. "Longer" means how many hits there are which can contribute to combo
             int numTotalHits = totalComboHits();
