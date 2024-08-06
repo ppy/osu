@@ -11,7 +11,6 @@ using osu.Framework.Input.Events;
 using osu.Framework.Threading;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Tournament.Components;
-using osu.Game.Tournament.IPC;
 using osu.Game.Tournament.Models;
 using osu.Game.Tournament.Screens.Board.Components;
 using osu.Game.Tournament.Screens.Gameplay;
@@ -25,8 +24,6 @@ namespace osu.Game.Tournament.Screens.Board
     public partial class BoardScreen : TournamentMatchScreen
     {
         private FillFlowContainer<FillFlowContainer<BoardBeatmapPanel>> mapFlows = null!;
-
-        private readonly Bindable<TournamentMatch?> currentMatch = new Bindable<TournamentMatch?>();
 
         [Resolved]
         private TournamentSceneManager? sceneManager { get; set; }
@@ -66,7 +63,7 @@ namespace osu.Game.Tournament.Screens.Board
         private ScheduledDelegate? scheduledScreenChange;
 
         [BackgroundDependencyLoader]
-        private void load(MatchIPCInfo ipc)
+        private void load()
         {
             InternalChildren = new Drawable[]
             {
@@ -296,8 +293,6 @@ namespace osu.Game.Tournament.Screens.Board
                     },
                 }
             };
-
-            ipc.Beatmap.BindValueChanged(beatmapChanged);
         }
 
         private void beatmapChanged(ValueChangedEvent<TournamentBeatmap?> beatmap)
@@ -660,9 +655,12 @@ namespace osu.Game.Tournament.Screens.Board
             var source = CurrentMatch.Value?.Round.Value?.Beatmaps.FirstOrDefault(p => p.Beatmap?.OnlineID == sourceMapID);
             var target = CurrentMatch.Value?.Round.Value?.Beatmaps.FirstOrDefault(p => p.Beatmap?.OnlineID == targetMapID);
 
+            // Already detected null here, no need to do again
             if (source != null && target != null)
             {
+#pragma warning disable CS8602 // Null reference
                 if (!CurrentMatch.Value.Round.Value.UseBoard.Value) return;
+#pragma warning restore CS8602
 
                 int middleX = source.BoardX;
                 int middleY = source.BoardY;
