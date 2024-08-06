@@ -49,7 +49,4 @@
     <PackageReference Include="System.Runtime.InteropServices" Version="4.3.0" />
     <PackageReference Include="System.Runtime.Handles" Version="4.3.0" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\osu-resources\osu.Game.Resources\osu.Game.Resources.csproj" />
-  </ItemGroup>
 </Project>
