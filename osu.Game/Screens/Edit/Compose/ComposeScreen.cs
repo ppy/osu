@@ -69,19 +69,24 @@ namespace osu.Game.Screens.Edit.Compose
             if (ruleset == null || composer == null)
                 return base.CreateTimelineContent();
 
+            TimelineBreakDisplay breakDisplay = new TimelineBreakDisplay
+            {
+                RelativeSizeAxes = Axes.Both,
+                Anchor = Anchor.CentreLeft,
+                Origin = Anchor.CentreLeft,
+                Height = 0.75f,
+            };
+
             return wrapSkinnableContent(new Container
             {
                 RelativeSizeAxes = Axes.Both,
-                Children = new Drawable[]
+                Children = new[]
                 {
+                    // We want to display this below hitobjects to better expose placement objects visually.
+                    // It needs to be above the blueprint container to handle drags on breaks though.
+                    breakDisplay.CreateProxy(),
                     new TimelineBlueprintContainer(composer),
-                    new TimelineBreakDisplay
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Anchor = Anchor.CentreLeft,
-                        Origin = Anchor.CentreLeft,
-                        Height = 0.75f,
-                    },
+                    breakDisplay
                 }
             });
         }

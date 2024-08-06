@@ -58,6 +58,7 @@ namespace osu.Game.Overlays.Mods
                     RelativeSizeAxes = Axes.Both,
                     Colour = Color4.White.Opacity(0.4f),
                     Blending = BlendingParameters.Additive,
+                    Alpha = 0,
                 },
                 new OsuSpriteText
                 {
