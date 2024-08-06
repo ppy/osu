@@ -63,7 +63,7 @@ namespace osu.Game.Skinning
                             Origin = Anchor.Centre,
                             Text = trigger.Name,
                             Colour = textColour,
-                            Font = OsuFont.GetFont(size: 20),
+                            Font = OsuFont.GetFont(weight: FontWeight.SemiBold),
                         },
                     },
                 }
@@ -88,7 +88,7 @@ namespace osu.Game.Skinning
             keyContainer.ScaleTo(0.75f, transition_duration, Easing.Out);
             keySprite.Colour = ActiveColour;
             overlayKeyText.Text = CountPresses.Value.ToString();
-            overlayKeyText.Font = overlayKeyText.Font.With(weight: FontWeight.Bold);
+            overlayKeyText.Font = overlayKeyText.Font.With(weight: FontWeight.SemiBold);
         }
 
         protected override void Deactivate(bool forwardPlayback = true)
