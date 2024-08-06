@@ -61,7 +61,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         public SelectionScaleHandler ScaleHandler { get; private set; }
 
         [Resolved(CanBeNull = true)]
-        protected OsuContextMenuContainer ContextMenuContainer { get; private set; }
+        protected OsuContextMenuContainer? ContextMenuContainer { get; private set; }
 
         protected SelectionHandler()
         {
@@ -251,6 +251,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 SelectedItems.Add(blueprint.Item);
 
             selectedBlueprints.Add(blueprint);
+
+            ContextMenuContainer?.CloseMenu();
         }
 
         /// <summary>
