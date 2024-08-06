@@ -8,7 +8,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
@@ -17,7 +16,6 @@ using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
 using osu.Game.Tournament.Models;
-using osu.Game.Users.Drawables;
 using osuTK.Graphics;
 
 namespace osu.Game.Tournament.Components
@@ -46,6 +44,7 @@ namespace osu.Game.Tournament.Components
 
         private readonly Bindable<TournamentMatch?> currentMatch = new Bindable<TournamentMatch?>();
 
+        private Box backgroundAddition = null!;
         private Box flash = null!;
 
         private SpriteIcon icon = null!;
@@ -81,17 +80,17 @@ namespace osu.Game.Tournament.Components
 
             AddRangeInternal(new Drawable[]
             {
-                new Box
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = Color4.Black,
-                    Alpha = 0.5f
-                },
                 new NoUnloadBeatmapSetCover
                 {
                     RelativeSizeAxes = Axes.Both,
                     Colour = OsuColour.Gray(0.5f),
                     OnlineInfo = (Beatmap as IBeatmapSetOnlineInfo),
+                },
+                backgroundAddition = new Box
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = Color4.Black,
+                    Alpha = 0.1f
                 },
                 new FillFlowContainer
                 {
@@ -278,6 +277,7 @@ namespace osu.Game.Tournament.Components
                         icon.FadeOut(duration: 200, easing: Easing.OutCubic);
                         break;
 
+                    // Ban: All darker
                     case ChoiceType.Ban:
                         Colour = Color4.Gray;
                         Alpha = 0.3f;
@@ -294,9 +294,11 @@ namespace osu.Game.Tournament.Components
                         statusIcon.Colour = newChoice.Team == TeamColour.Red ? new OsuColour().TeamColourRed : new OsuColour().Sky;
                         break;
 
+                    // Win: Background colour
                     case ChoiceType.RedWin:
-                        Alpha = 0.7f;
-                        Colour = Color4.Red;
+                        // Alpha = 0.7f;
+                        backgroundAddition.Colour = Color4.Red;
+                        backgroundAddition.Alpha = 0.4f;
                         icon.Icon = FontAwesome.Solid.Trophy;
                         icon.Colour = new OsuColour().Red;
                         // icon.Colour = isProtected ? new OsuColour().Pink : Color4.Red;
@@ -305,8 +307,9 @@ namespace osu.Game.Tournament.Components
                         break;
 
                     case ChoiceType.BlueWin:
-                        Alpha = 0.7f;
-                        Colour = new OsuColour().Sky;
+                        // Alpha = 0.7f;
+                        backgroundAddition.Colour = new OsuColour().Sky;
+                        backgroundAddition.Alpha = 0.7f;
                         icon.Icon = FontAwesome.Solid.Trophy;
                         icon.Colour = new OsuColour().Blue;
                         // icon.Colour = isProtected ? new OsuColour().Sky : Color4.Blue;
