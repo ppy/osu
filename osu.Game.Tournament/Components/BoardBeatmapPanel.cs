@@ -257,7 +257,7 @@ namespace osu.Game.Tournament.Components
             if (isProtected) nextPureChoice = currentMatch.Value.PicksBans.FirstOrDefault(p => (p.BeatmapID == Beatmap?.OnlineID && p.Type != ChoiceType.Protect));
             else if (isTrapped) nextPureChoice = currentMatch.Value.PicksBans.FirstOrDefault(p => (p.BeatmapID == Beatmap?.OnlineID && p.Type != ChoiceType.Trap));
 
-            // newChoice = nextPureChoice ?? newChoice;
+            newChoice = nextPureChoice ?? newChoice;
 
             bool shouldFlash = newChoice != choice;
 
