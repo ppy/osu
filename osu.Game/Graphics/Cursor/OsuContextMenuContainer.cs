@@ -8,6 +8,7 @@ using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Graphics.Cursor
 {
+    [Cached(typeof(OsuContextMenuContainer))]
     public partial class OsuContextMenuContainer : ContextMenuContainer
     {
         [Cached]

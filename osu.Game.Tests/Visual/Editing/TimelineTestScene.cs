@@ -51,7 +51,7 @@ namespace osu.Game.Tests.Visual.Editing
 
             Composer.Alpha = 0;
 
-            var contextMenuContainer = new OsuContextMenuContainer
+            Add(new OsuContextMenuContainer
             {
                 RelativeSizeAxes = Axes.Both,
                 Children = new Drawable[]
@@ -75,11 +75,7 @@ namespace osu.Game.Tests.Visual.Editing
                         Origin = Anchor.Centre,
                     }
                 }
-            };
-
-            Dependencies.Cache(contextMenuContainer);
-
-            Add(contextMenuContainer);
+            });
         }
 
         [SetUpSteps]
