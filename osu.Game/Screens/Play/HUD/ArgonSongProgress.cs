@@ -9,6 +9,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Localisation.HUD;
+using osu.Game.Localisation.SkinComponents;
 using osu.Game.Rulesets.Objects;
 
 namespace osu.Game.Screens.Play.HUD
@@ -28,6 +29,8 @@ namespace osu.Game.Screens.Play.HUD
 
         [SettingSource(typeof(SongProgressStrings), nameof(SongProgressStrings.ShowTime), nameof(SongProgressStrings.ShowTimeDescription))]
         public Bindable<bool> ShowTime { get; } = new BindableBool(true);
+        [SettingSource(typeof(SkinnableComponentStrings), nameof(SkinnableComponentStrings.Colour), nameof(SkinnableComponentStrings.ColourDescription))]
+        public new BindableColour4 Colour { get; } = new BindableColour4(Colour4.White);
 
         [Resolved]
         private Player? player { get; set; }
@@ -114,6 +117,7 @@ namespace osu.Game.Screens.Play.HUD
             base.Update();
             content.Height = bar.Height + bar_height + info.Height;
             graphContainer.Height = bar.Height;
+            base.Colour = Colour.Value;
         }
 
         protected override void UpdateProgress(double progress, bool isIntro)

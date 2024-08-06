@@ -59,6 +59,26 @@ namespace osu.Game.Localisation.SkinComponents
         /// </summary>
         public static LocalisableString ShowLabelDescription => new TranslatableString(getKey(@"show_label_description"), @"Whether the component's label should be shown.");
 
+        /// <summary>
+        /// "Colour"
+        /// </summary>
+        public static LocalisableString Colour => new TranslatableString(getKey(@"colour"), @"Colour");
+
+        /// <summary>
+        /// "The colour of the component."
+        /// </summary>
+        public static LocalisableString ColourDescription => new TranslatableString(getKey(@"colour_description"), @"The colour of the component.");
+
+        /// <summary>
+        /// "Font colour"
+        /// </summary>
+        public static LocalisableString FontColour => new TranslatableString(getKey(@"font_colour"), @"Font colour");
+
+        /// <summary>
+        /// "The colour of the font."
+        /// </summary>
+        public static LocalisableString FontColourDescription => new TranslatableString(getKey(@"font_colour_description"), @"The colour of the font.");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }
