@@ -34,6 +34,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="ppy.osu.Game.Resources" Version="2024.802.0" />
     <PackageReference Include="Realm" Version="11.5.0" />
     <PackageReference Include="ppy.osu.Framework" Version="2024.720.0" />
     <PackageReference Include="Sentry" Version="4.3.0" />
@@ -48,5 +49,8 @@
     <PackageReference Include="System.IO.FileSystem.Primitives" Version="4.3.0" />
     <PackageReference Include="System.Runtime.InteropServices" Version="4.3.0" />
     <PackageReference Include="System.Runtime.Handles" Version="4.3.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\osu.Game.Resources.Custom\osu.Game.Resources.Custom.csproj" />
   </ItemGroup>
 </Project>
