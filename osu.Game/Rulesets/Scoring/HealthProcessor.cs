@@ -26,6 +26,11 @@ namespace osu.Game.Rulesets.Scoring
         public readonly Bindable<IReadOnlyList<Mod>> Mods = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
 
         /// <summary>
+        /// Mods which can override fail ordered in the correct order for checks.
+        /// </summary>
+        public IApplicableFailOverride[] OrderedFailOverrideMods { get; private set; } = Array.Empty<IApplicableFailOverride>();
+
+        /// <summary>
         /// The current health.
         /// </summary>
         public readonly BindableDouble Health = new BindableDouble(1) { MinValue = 0, MaxValue = 1 };
@@ -57,6 +62,14 @@ namespace osu.Game.Rulesets.Scoring
 
             if (triggeringMod != null)
                 ModTriggeringFailure = triggeringMod;
+        }
+
+        protected HealthProcessor()
+        {
+            Mods.BindValueChanged(mods =>
+            {
+                OrderedFailOverrideMods = mods.NewValue.OfType<IApplicableFailOverride>().OrderByDescending(m => m.RestartOnFail).ToArray();
+            });
         }
 
         protected override void ApplyResultInternal(JudgementResult result)
@@ -102,7 +115,7 @@ namespace osu.Game.Rulesets.Scoring
             if (CheckDefaultFailCondition(result))
                 return true;
 
-            foreach (var condition in Mods.Value.OfType<IApplicableFailOverride>())
+            foreach (var condition in OrderedFailOverrideMods)
             {
                 if (condition.CheckFail(result) == FailState.Force)
                 {
