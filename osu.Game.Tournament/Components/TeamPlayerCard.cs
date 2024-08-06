@@ -62,7 +62,7 @@ namespace osu.Game.Tournament.Components
                             Anchor = Anchor.CentreRight,
                             Origin = Anchor.CentreRight,
                             Text = $"#{user.Statistics.GlobalRank}",
-                            Font = OsuFont.TorusAlternate.With(weight: FontWeight.Medium, size: 15),
+                            Font = OsuFont.TorusAlternate.With(weight: FontWeight.Medium, size: 17),
                             Shadow = true
                         }
                     };
