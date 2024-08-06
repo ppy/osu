@@ -20,6 +20,18 @@ using osuTK.Graphics;
 
 namespace osu.Game.Tournament.Components
 {
+
+    public static class StringExtensions
+    {
+        public static string TruncateWithEllipsis(this string text, int maxLength)
+        {
+            if (string.IsNullOrEmpty(text) || text.Length <= maxLength)
+                return text;
+
+            return text.Substring(0, maxLength - 3) + "...";
+        }
+    }
+
     public partial class BoardBeatmapPanel : CompositeDrawable
     {
         public readonly IBeatmapInfo? Beatmap;
@@ -46,11 +58,21 @@ namespace osu.Game.Tournament.Components
             Height = HEIGHT;
         }
 
+
         [BackgroundDependencyLoader]
         private void load(LadderInfo ladder)
         {
             currentMatch.BindValueChanged(matchChanged);
             currentMatch.BindTo(ladder.CurrentMatch);
+
+
+            var displayTitle = Beatmap?.GetDisplayTitleRomanisable(false, false) ?? (LocalisableString)@"unknown";
+            string songName = displayTitle.ToString().Split('-').Last().Trim();
+            string truncatedSongName = songName.TruncateWithEllipsis(17);
+
+            string displayDifficulty = Beatmap?.DifficultyName ?? "unknown";
+            string difficultyName = displayDifficulty.ToString().Split('-').Last().Trim();
+            string truncatedDifficultyName = difficultyName.TruncateWithEllipsis(19);
 
             Masking = true;
 
@@ -79,6 +101,13 @@ namespace osu.Game.Tournament.Components
                     /* This section of code adds Beatmap Information to the Board grid. */
                     Children = new Drawable[]
                     {
+                        new TournamentSpriteText
+                        {
+                            Text = truncatedSongName,
+                            Padding = new MarginPadding { Left = 0 },
+                            Font = OsuFont.Torus.With(weight: FontWeight.Bold, size: 18),
+                            Margin = new MarginPadding { Left = -9, Top = -7 },
+                        },
                         /* Disable text display
                         new TextFlowContainer
                         {
@@ -119,23 +148,23 @@ namespace osu.Game.Tournament.Components
                         {
                             AutoSizeAxes = Axes.Both,
                             Direction = FillDirection.Horizontal,
-                            Margin = new MarginPadding { Left = -7 }, // Adjust this value to change the distance
+                            Margin = new MarginPadding { Left = -9 , Top = 5}, // Adjust this value to change the distance
                             Children = new Drawable[]
                             {
-                                /* Disable text display
+                                /* Disable "difficulty" display
                                 new TournamentSpriteText
                                 {
                                     Text = "difficulty",
                                     Padding = new MarginPadding { Right = 5 },
                                     Font = OsuFont.Torus.With(weight: FontWeight.Regular, size: 14),
                                     Margin = new MarginPadding { Right = 10 }, // Adjusts the space to the right of the difficulty label
-                                },
+                                },*/
                                 new TournamentSpriteText
                                 {
-                                    Text = Beatmap?.DifficultyName ?? "unknown",
-                                    MaxWidth = 75,
-                                    Font = OsuFont.Torus.With(weight: FontWeight.Bold, size: 14),
-                                },*/
+                                    Text = truncatedDifficultyName,
+                                    MaxWidth = 120,
+                                    Font = OsuFont.Torus.With(weight: FontWeight.Medium, size: 14),
+                                },
                             }
                         }
                     },
