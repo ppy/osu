@@ -148,7 +148,7 @@ namespace osu.Game.Tournament.Components
                         {
                             AutoSizeAxes = Axes.Both,
                             Direction = FillDirection.Horizontal,
-                            Margin = new MarginPadding { Left = -9 , Top = 5}, // Adjust this value to change the distance
+                            Margin = new MarginPadding { Left = -9, Top = 5 }, // Adjust this value to change the distance
                             Children = new Drawable[]
                             {
                                 /* Disable "difficulty" display

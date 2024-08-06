@@ -80,8 +80,8 @@ namespace osu.Game.Tournament.Components
                 new FillFlowContainer
                 {
                     AutoSizeAxes = Axes.Both,
-                    Anchor = Anchor.CentreLeft,
-                    Origin = Anchor.CentreLeft,
+                    Anchor = Anchor.TopLeft,
+                    Origin = Anchor.TopLeft,
                     Padding = new MarginPadding(15),
                     Direction = FillDirection.Vertical,
                     Children = new Drawable[]
@@ -143,7 +143,7 @@ namespace osu.Game.Tournament.Components
                 {
                     Anchor = Anchor.CentreRight,
                     Origin = Anchor.CentreRight,
-                    Margin = new MarginPadding(25),
+                    Margin = new MarginPadding { Right = 20, Top = 90 },
                     Size = new osuTK.Vector2(96),
                     RelativeSizeAxes = Axes.Y,
                 });
