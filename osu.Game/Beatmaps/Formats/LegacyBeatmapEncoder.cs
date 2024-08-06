@@ -617,7 +617,7 @@ namespace osu.Game.Beatmaps.Formats
             if (hitSampleInfo is ConvertHitObjectParser.LegacyHitSampleInfo legacy)
                 return legacy.CustomSampleBank;
 
-            return 0;
+            return 1;
         }
 
         private struct LegacyControlPointProperties
