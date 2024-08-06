@@ -23,7 +23,6 @@ using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Screens.Play.HUD.HitErrorMeters;
-using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Skinning
@@ -356,15 +355,56 @@ namespace osu.Game.Skinning
             switch (lookup)
             {
                 case SkinComponentsContainerLookup containerLookup:
+                    // Only handle global level defaults for now.
+                    if (containerLookup.Ruleset != null)
+                        return null;
 
                     switch (containerLookup.Target)
                     {
                         case SkinComponentsContainerLookup.TargetArea.MainHUDComponents:
-                            return createDefaultHUDComponents(containerLookup);
+                            return new DefaultSkinComponentsContainer(container =>
+                            {
+                                var score = container.OfType<LegacyScoreCounter>().FirstOrDefault();
+                                var accuracy = container.OfType<GameplayAccuracyCounter>().FirstOrDefault();
 
-                        default:
-                            return null;
+                                if (score != null && accuracy != null)
+                                {
+                                    accuracy.Y = container.ToLocalSpace(score.ScreenSpaceDrawQuad.BottomRight).Y;
+                                }
+
+                                var songProgress = container.OfType<LegacySongProgress>().FirstOrDefault();
+
+                                if (songProgress != null && accuracy != null)
+                                {
+                                    songProgress.Anchor = Anchor.TopRight;
+                                    songProgress.Origin = Anchor.CentreRight;
+                                    songProgress.X = -accuracy.ScreenSpaceDeltaToParentSpace(accuracy.ScreenSpaceDrawQuad.Size).X - 18;
+                                    songProgress.Y = container.ToLocalSpace(accuracy.ScreenSpaceDrawQuad.TopLeft).Y + (accuracy.ScreenSpaceDeltaToParentSpace(accuracy.ScreenSpaceDrawQuad.Size).Y / 2);
+                                }
+
+                                var hitError = container.OfType<HitErrorMeter>().FirstOrDefault();
+
+                                if (hitError != null)
+                                {
+                                    hitError.Anchor = Anchor.BottomCentre;
+                                    hitError.Origin = Anchor.CentreLeft;
+                                    hitError.Rotation = -90;
+                                }
+                            })
+                            {
+                                Children = new Drawable[]
+                                {
+                                    new LegacyComboCounter(),
+                                    new LegacyScoreCounter(),
+                                    new LegacyAccuracyCounter(),
+                                    new LegacySongProgress(),
+                                    new LegacyHealthDisplay(),
+                                    new BarHitErrorMeter(),
+                                }
+                            };
                     }
+
+                    return null;
 
                 case GameplaySkinComponentLookup<HitResult> resultComponent:
 
@@ -386,84 +426,6 @@ namespace osu.Game.Skinning
             }
 
             return null;
-        }
-
-        private static DefaultSkinComponentsContainer? createDefaultHUDComponents(SkinComponentsContainerLookup containerLookup)
-        {
-            switch (containerLookup.Ruleset?.ShortName)
-            {
-                case null:
-                {
-                    return new DefaultSkinComponentsContainer(container =>
-                    {
-                        var score = container.OfType<LegacyScoreCounter>().FirstOrDefault();
-                        var accuracy = container.OfType<GameplayAccuracyCounter>().FirstOrDefault();
-
-                        if (score != null && accuracy != null)
-                        {
-                            accuracy.Y = container.ToLocalSpace(score.ScreenSpaceDrawQuad.BottomRight).Y;
-                        }
-
-                        var songProgress = container.OfType<LegacySongProgress>().FirstOrDefault();
-
-                        if (songProgress != null && accuracy != null)
-                        {
-                            songProgress.Anchor = Anchor.TopRight;
-                            songProgress.Origin = Anchor.CentreRight;
-                            songProgress.X = -accuracy.ScreenSpaceDeltaToParentSpace(accuracy.ScreenSpaceDrawQuad.Size).X - 18;
-                            songProgress.Y = container.ToLocalSpace(accuracy.ScreenSpaceDrawQuad.TopLeft).Y + (accuracy.ScreenSpaceDeltaToParentSpace(accuracy.ScreenSpaceDrawQuad.Size).Y / 2);
-                        }
-
-                        var hitError = container.OfType<HitErrorMeter>().FirstOrDefault();
-
-                        if (hitError != null)
-                        {
-                            hitError.Anchor = Anchor.BottomCentre;
-                            hitError.Origin = Anchor.CentreLeft;
-                            hitError.Rotation = -90;
-                        }
-                    })
-                    {
-                        Children = new Drawable[]
-                        {
-                            new LegacyComboCounter(),
-                            new LegacyScoreCounter(),
-                            new LegacyAccuracyCounter(),
-                            new LegacySongProgress(),
-                            new LegacyHealthDisplay(),
-                            new BarHitErrorMeter(),
-                        }
-                    };
-                }
-
-                case @"osu":
-                case @"fruits":
-                {
-                    return new DefaultSkinComponentsContainer(container =>
-                    {
-                        var keyCounter = container.OfType<LegacyKeyCounterDisplay>().FirstOrDefault();
-
-                        if (keyCounter != null)
-                        {
-                            // set the anchor to top right so that it won't squash to the return button to the top
-                            keyCounter.Anchor = Anchor.CentreRight;
-                            keyCounter.Origin = Anchor.CentreRight;
-                            keyCounter.X = 0;
-                            // 340px is the default height inherit from stable
-                            keyCounter.Y = container.ToLocalSpace(new Vector2(0, container.ScreenSpaceDrawQuad.Centre.Y - 340f)).Y;
-                        }
-                    })
-                    {
-                        Children = new Drawable[]
-                        {
-                            new LegacyKeyCounterDisplay(),
-                        }
-                    };
-                }
-
-                default:
-                    return null;
-            }
         }
 
         private Texture? getParticleTexture(HitResult result)
