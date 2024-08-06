@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -51,14 +49,14 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         private readonly List<SelectionBlueprint<T>> selectedBlueprints;
 
-        protected SelectionBox SelectionBox { get; private set; }
+        protected SelectionBox SelectionBox { get; private set; } = null!;
 
         [Resolved(CanBeNull = true)]
-        protected IEditorChangeHandler ChangeHandler { get; private set; }
+        protected IEditorChangeHandler? ChangeHandler { get; private set; }
 
-        public SelectionRotationHandler RotationHandler { get; private set; }
+        public SelectionRotationHandler RotationHandler { get; private set; } = null!;
 
-        public SelectionScaleHandler ScaleHandler { get; private set; }
+        public SelectionScaleHandler ScaleHandler { get; private set; } = null!;
 
         [Resolved(CanBeNull = true)]
         protected OsuContextMenuContainer? ContextMenuContainer { get; private set; }
