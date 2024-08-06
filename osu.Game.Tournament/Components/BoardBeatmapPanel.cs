@@ -44,9 +44,11 @@ namespace osu.Game.Tournament.Components
 
         private readonly Bindable<TournamentMatch?> currentMatch = new Bindable<TournamentMatch?>();
 
+        private Box backgroundAddition = null!;
         private Box flash = null!;
 
         private SpriteIcon icon = null!;
+        private SpriteIcon statusIcon = null!;
 
         public BoardBeatmapPanel(IBeatmapInfo? beatmap, string mod = "", string index = "")
         {
@@ -78,17 +80,17 @@ namespace osu.Game.Tournament.Components
 
             AddRangeInternal(new Drawable[]
             {
-                new Box
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = Color4.Black,
-                    Alpha = 0.5f
-                },
                 new NoUnloadBeatmapSetCover
                 {
                     RelativeSizeAxes = Axes.Both,
                     Colour = OsuColour.Gray(0.5f),
                     OnlineInfo = (Beatmap as IBeatmapSetOnlineInfo),
+                },
+                backgroundAddition = new Box
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = Color4.Black,
+                    Alpha = 0.1f
                 },
                 new FillFlowContainer
                 {
@@ -169,13 +171,6 @@ namespace osu.Game.Tournament.Components
                         }
                     },
                 },
-                flash = new Box
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = Color4.Gray,
-                    Blending = BlendingParameters.Additive,
-                    Alpha = 0,
-                },
                 icon = new SpriteIcon
                 {
                     Anchor = Anchor.Centre,
@@ -183,8 +178,24 @@ namespace osu.Game.Tournament.Components
                     RelativeSizeAxes = Axes.Both,
                     Colour = Color4.White,
                     Size = new osuTK.Vector2(0.4f),
-                    Alpha = 0
-                }
+                    Alpha = 0,
+                },
+                statusIcon = new SpriteIcon
+                {
+                    Anchor = Anchor.BottomLeft,
+                    Origin = Anchor.BottomLeft,
+                    Colour = Color4.White,
+                    Size = new osuTK.Vector2(24),
+                    Position = new osuTK.Vector2(5, -5),
+                    Alpha = 0,
+                },
+                flash = new Box
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = Color4.Gray,
+                    Blending = BlendingParameters.Additive,
+                    Alpha = 0,
+                },
             });
 
             if (!string.IsNullOrEmpty(mod))
@@ -233,12 +244,16 @@ namespace osu.Game.Tournament.Components
 
             bool isProtected = currentMatch.Value.Protects.Any(p => p.BeatmapID == Beatmap?.OnlineID);
 
-            bool isTrapped = currentMatch.Value.Traps.Any(p => p.BeatmapID == Beatmap?.OnlineID);
+            bool isTrapped = currentMatch.Value.Traps.Any(p => p.BeatmapID == Beatmap?.OnlineID && !p.IsTriggered);
+
+            bool isBothTrapped = currentMatch.Value.Traps.Any(p => (p.BeatmapID == Beatmap?.OnlineID && p.Team == TeamColour.Red))
+                && currentMatch.Value.Traps.Any(p => (p.BeatmapID == Beatmap?.OnlineID && p.Team == TeamColour.Blue));
 
             var newChoice = currentMatch.Value.PicksBans.FirstOrDefault(p => p.BeatmapID == Beatmap?.OnlineID);
 
             var nextPureChoice = newChoice;
 
+            // Check: We need this?
             if (isProtected) nextPureChoice = currentMatch.Value.PicksBans.FirstOrDefault(p => (p.BeatmapID == Beatmap?.OnlineID && p.Type != ChoiceType.Protect));
             else if (isTrapped) nextPureChoice = currentMatch.Value.PicksBans.FirstOrDefault(p => (p.BeatmapID == Beatmap?.OnlineID && p.Type != ChoiceType.Trap));
 
@@ -250,11 +265,10 @@ namespace osu.Game.Tournament.Components
             {
                 if (shouldFlash)
                 {
-                    flash.FadeOutFromOne(900).Loop(0, 3);
-                    icon.FadeInFromZero(500);
+                    flash.FadeOutFromOne(duration: 900, easing: Easing.OutSine).Loop(0, 3);
                 }
 
-                BorderThickness = 6;
+                BorderThickness = 4;
 
                 BorderColour = TournamentGame.GetTeamColour(newChoice.Team);
 
@@ -263,57 +277,79 @@ namespace osu.Game.Tournament.Components
                     case ChoiceType.Pick:
                         Colour = Color4.White;
                         Alpha = 1f;
-                        icon.Icon = FontAwesome.Solid.Check;
-                        icon.Colour = isProtected ? new OsuColour().Cyan : (isTrapped ? new OsuColour().Purple : Color4.White);
+                        backgroundAddition.FadeTo(newAlpha: 0, duration: 150, easing: Easing.InCubic);
+                        icon.FadeOut(duration: 100, easing: Easing.OutCubic);
                         break;
 
+                    // Ban: All darker
                     case ChoiceType.Ban:
-                        Colour = Color4.Gray;
-                        Alpha = 0.3f;
+                        backgroundAddition.Colour = Color4.Gray;
+                        backgroundAddition.FadeTo(newAlpha: 0.7f, duration: 150, easing: Easing.InCubic);
                         icon.Icon = FontAwesome.Solid.Ban;
-                        icon.Colour = Color4.White;
+                        icon.Colour = newChoice.Team == TeamColour.Red ? new OsuColour().TeamColourRed : new OsuColour().Sky;
+                        icon.FadeIn(duration: 200, easing: Easing.InCubic);
+                        BorderColour = Color4.White;
+                        BorderThickness = 0;
                         break;
 
                     case ChoiceType.Protect:
-                        Alpha = 0.8f;
-                        icon.Icon = FontAwesome.Solid.Lock;
-                        icon.Colour = new OsuColour().Cyan;
-                        icon.Alpha = 1;
+                        Alpha = 1f;
+                        backgroundAddition.FadeTo(newAlpha: 0, duration: 150, easing: Easing.InCubic);
+                        statusIcon.FadeIn(duration: 150, easing: Easing.InCubic);
+                        statusIcon.Icon = FontAwesome.Solid.Lock;
+                        statusIcon.Colour = newChoice.Team == TeamColour.Red ? new OsuColour().TeamColourRed : new OsuColour().Sky;
                         break;
 
+                    // Win: Background colour
                     case ChoiceType.RedWin:
-                        Alpha = 1f;
+                        backgroundAddition.Colour = Color4.Red;
+                        backgroundAddition.FadeTo(newAlpha: 0.4f, duration: 150, easing: Easing.InCubic);
+                        icon.FadeIn(duration: 150, easing: Easing.InCubic);
                         icon.Icon = FontAwesome.Solid.Trophy;
                         icon.Colour = new OsuColour().Red;
-                        icon.Colour = isProtected ? new OsuColour().Pink : Color4.Red;
+                        // icon.Colour = isProtected ? new OsuColour().Pink : Color4.Red;
                         /* Commented out this line, as it will cause some degree of visual distraction.
                         icon.Alpha = 0.73f; // Added this line to distinguish last win from other wins */
                         break;
 
                     case ChoiceType.BlueWin:
-                        Alpha = 1f;
+                        backgroundAddition.Colour = new OsuColour().Sky;
+                        backgroundAddition.FadeTo(newAlpha: 0.5f, duration: 150, easing: Easing.InCubic);
+                        icon.FadeIn(duration: 150, easing: Easing.InCubic);
                         icon.Icon = FontAwesome.Solid.Trophy;
                         icon.Colour = new OsuColour().Blue;
-                        icon.Colour = isProtected ? new OsuColour().Sky : Color4.Blue;
+                        // icon.Colour = isProtected ? new OsuColour().Sky : Color4.Blue;
                         /* Commented out this line, as it will cause some degree of visual distraction.
                         icon.Alpha = 0.73f; // Added this line to distinguish last win from other wins */
                         break;
 
                     case ChoiceType.Trap:
-                        Alpha = 0.7f;
-                        icon.Icon = FontAwesome.Solid.ExclamationCircle;
-                        icon.Colour = Color4.White;
-                        icon.Alpha = 1;
+                        Alpha = 1f;
+                        backgroundAddition.FadeTo(newAlpha: 0, duration: 150, easing: Easing.InCubic);
+                        statusIcon.FadeIn(duration: 150, easing: Easing.InCubic);
+                        statusIcon.Icon = FontAwesome.Solid.ExclamationCircle;
+                        statusIcon.Colour = isBothTrapped ? Color4.White : (newChoice.Team == TeamColour.Red ? new OsuColour().TeamColourRed : new OsuColour().Sky);
+                        BorderColour = Color4.White;
                         break;
                 }
             }
             else
             {
-                Colour = Color4.White;
+                // Stop all transforms first, to make relative properties adjustable.
+                icon.ClearTransforms();
+                statusIcon.ClearTransforms();
+                flash.ClearTransforms();
+
+                // Then we can change them to the default state.
                 BorderThickness = 0;
-                Alpha = 1;
-                icon.Alpha = 0;
+                flash.Alpha = 0;
+                this.FadeIn(duration: 100, easing: Easing.InCubic);
+                backgroundAddition.FadeOut(duration: 100, easing: Easing.OutCubic);
+                icon.FadeOut(duration: 100, easing: Easing.OutCubic);
+                statusIcon.FadeOut(duration: 100, easing: Easing.OutCubic);
+                Colour = Color4.White;
                 icon.Colour = Color4.White;
+                backgroundAddition.Colour = Color4.White;
             }
 
             choice = newChoice;

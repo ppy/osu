@@ -35,6 +35,8 @@ namespace osu.Game.Tournament.Components
 
         private Box flash = null!;
 
+        private Box backgroundAddition = null!;
+
         public EXBoardBeatmapPanel(IBeatmapInfo? beatmap, string mod = "", string index = "")
         {
             Beatmap = beatmap;
@@ -52,30 +54,53 @@ namespace osu.Game.Tournament.Components
             currentMatch.BindTo(ladder.CurrentMatch);
 
             var displayTitle = Beatmap?.GetDisplayTitleRomanisable(false, false) ?? (LocalisableString)@"unknown";
-            string songName = displayTitle.ToString().Split('-').Last().Trim();
-            string truncatedSongName = songName.TruncateWithEllipsis(39);
+
+            string[] songNameList = displayTitle.ToString().Split(' ');
+
+            int firstHyphenIndex = 0;
+
+            // Find the first " - " (Hopefully it isn't in the Artists field)
+            for (int i = 0; i < songNameList.Count(); i++)
+            {
+                string obj = songNameList.ElementAt(i);
+                if (obj == "-")
+                {
+                    firstHyphenIndex = i;
+                    break;
+                }
+            }
+
+            var TitleList = songNameList.Skip(firstHyphenIndex + 1);
+
+            // Re-construct
+            string songName = string.Empty;
+            for (int i = 0; i < TitleList.Count(); i++)
+            {
+                songName += TitleList.ElementAt(i).Trim();
+                if (i != TitleList.Count() - 1) songName += ' ';
+            }
+
+            string truncatedSongName = songName.Trim().TruncateWithEllipsis(39);
 
             string displayDifficulty = Beatmap?.DifficultyName ?? "unknown";
-            string difficultyName = displayDifficulty.ToString().Split('-').Last().Trim();
-            string truncatedDifficultyName = difficultyName.TruncateWithEllipsis(25);
-
+            string truncatedDifficultyName = displayDifficulty.TruncateWithEllipsis(25);
 
             Masking = true;
             CornerRadius = 10;
 
             AddRangeInternal(new Drawable[]
             {
-                new Box
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = Color4.Black,
-                    Alpha = 0.7f
-                },
                 new NoUnloadBeatmapSetCover
                 {
                     RelativeSizeAxes = Axes.Both,
                     Colour = OsuColour.Gray(0.5f),
                     OnlineInfo = (Beatmap as IBeatmapSetOnlineInfo),
+                },
+                backgroundAddition = new Box
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = Color4.Black,
+                    Alpha = 0.1f
                 },
                 new FillFlowContainer
                 {
@@ -108,7 +133,7 @@ namespace osu.Game.Tournament.Components
                                         {
                                             Text = "mapper",
                                             Padding = new MarginPadding { Right = 5 },
-                                            Font = OsuFont.Torus.With(weight: FontWeight.Regular, size: 22)
+                                            Font = OsuFont.Torus.With(weight: FontWeight.Regular, size: 18)
                                         },
                                         new TournamentSpriteText
                                         {
@@ -179,7 +204,7 @@ namespace osu.Game.Tournament.Components
             if (newChoice != null)
             {
                 if (shouldFlash)
-                    flash.FadeOutFromOne(500).Loop(0, 10);
+                    flash.FadeOutFromOne(duration: 900, easing: Easing.OutSine).Loop(0, 3);
 
                 BorderThickness = 6;
 
@@ -188,41 +213,51 @@ namespace osu.Game.Tournament.Components
                 switch (newChoice.Type)
                 {
                     case ChoiceType.Pick:
-                        Colour = Color4.White;
+                        backgroundAddition.Colour = Color4.White;
+                        backgroundAddition.FadeTo(newAlpha: 0, duration: 150, easing: Easing.InCubic);
                         Alpha = 1;
                         break;
 
                     case ChoiceType.Ban:
-                        Colour = Color4.Gray;
+                        backgroundAddition.Colour = Color4.Gray;
+                        backgroundAddition.FadeTo(newAlpha: 0.5f, duration: 150, easing: Easing.InCubic);
                         Alpha = 0.5f;
                         break;
 
                     case ChoiceType.Protect:
-                        Colour = new OsuColour().Cyan;
+                        backgroundAddition.Colour = new OsuColour().Cyan;
+                        backgroundAddition.FadeTo(newAlpha: 0.3f, duration: 150, easing: Easing.InCubic);
                         Alpha = 0.9f;
                         break;
 
                     case ChoiceType.RedWin:
-                        Colour = new OsuColour().Pink;
+                        backgroundAddition.Colour = new OsuColour().Red;
+                        backgroundAddition.FadeTo(newAlpha: 0.35f, duration: 100, easing: Easing.InCubic);
                         Alpha = 1;
                         break;
 
                     case ChoiceType.BlueWin:
-                        Colour = new OsuColour().Blue;
+                        backgroundAddition.Colour = new OsuColour().Sky;
+                        backgroundAddition.FadeTo(newAlpha: 0.4f, duration: 100, easing: Easing.InCubic);
                         Alpha = 1;
                         break;
 
                     case ChoiceType.Trap:
-                        Colour = new OsuColour().PurpleLight;
+                        backgroundAddition.Colour = new OsuColour().PurpleLight;
+                        backgroundAddition.FadeTo(newAlpha: 0.2f, duration: 150, easing: Easing.InCubic);
                         Alpha = 1;
                         break;
                 }
             }
             else
             {
-                Colour = Color4.White;
+                flash.ClearTransforms();
+                backgroundAddition.ClearTransforms();
+                backgroundAddition.FadeOut(duration: 100, easing: Easing.OutCubic);
+                backgroundAddition.Colour = Color4.White;
                 BorderThickness = 0;
                 Alpha = 1;
+                flash.Alpha = 0;
             }
 
             choice = newChoice;

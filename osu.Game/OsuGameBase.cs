@@ -268,6 +268,7 @@ namespace osu.Game
             }
 
             Resources.AddStore(new DllResourceStore(OsuResources.ResourceAssembly));
+            Resources.AddStore(new DllResourceStore(Game.Resources.Custom.CustomResources.ResourceAssembly));
 
             dependencies.Cache(realm = new RealmAccess(Storage, CLIENT_DATABASE_FILENAME, Host.UpdateThread));
 

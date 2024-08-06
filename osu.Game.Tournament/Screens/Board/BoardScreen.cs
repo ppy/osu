@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -11,7 +12,6 @@ using osu.Framework.Input.Events;
 using osu.Framework.Threading;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Tournament.Components;
-using osu.Game.Tournament.IPC;
 using osu.Game.Tournament.Models;
 using osu.Game.Tournament.Screens.Board.Components;
 using osu.Game.Tournament.Screens.Gameplay;
@@ -25,8 +25,6 @@ namespace osu.Game.Tournament.Screens.Board
     public partial class BoardScreen : TournamentMatchScreen
     {
         private FillFlowContainer<FillFlowContainer<BoardBeatmapPanel>> mapFlows = null!;
-
-        private readonly Bindable<TournamentMatch?> currentMatch = new Bindable<TournamentMatch?>();
 
         [Resolved]
         private TournamentSceneManager? sceneManager { get; set; }
@@ -66,7 +64,7 @@ namespace osu.Game.Tournament.Screens.Board
         private ScheduledDelegate? scheduledScreenChange;
 
         [BackgroundDependencyLoader]
-        private void load(MatchIPCInfo ipc)
+        private void load()
         {
             InternalChildren = new Drawable[]
             {
@@ -296,8 +294,6 @@ namespace osu.Game.Tournament.Screens.Board
                     },
                 }
             };
-
-            ipc.Beatmap.BindValueChanged(beatmapChanged);
         }
 
         private void beatmapChanged(ValueChangedEvent<TournamentBeatmap?> beatmap)
@@ -459,6 +455,13 @@ namespace osu.Game.Tournament.Screens.Board
                     else if (useEX)
                     {
                         instructionDisplayHolder.Child = new InstructionDisplay(step: Steps.EX);
+                        instructionDisplayHolder.FadeInFromZero(duration: 200, easing: Easing.InCubic);
+                    }
+                    else
+                    {
+                        // Restore to the last state
+                        setMode(pickColour, pickType);
+                        // instructionDisplayHolder.Child = new InstructionDisplay();
                         instructionDisplayHolder.FadeInFromZero(duration: 200, easing: Easing.InCubic);
                     }
                 }
@@ -653,9 +656,12 @@ namespace osu.Game.Tournament.Screens.Board
             var source = CurrentMatch.Value?.Round.Value?.Beatmaps.FirstOrDefault(p => p.Beatmap?.OnlineID == sourceMapID);
             var target = CurrentMatch.Value?.Round.Value?.Beatmaps.FirstOrDefault(p => p.Beatmap?.OnlineID == targetMapID);
 
+            // Already detected null here, no need to do again
             if (source != null && target != null)
             {
+#pragma warning disable CS8602 // Null reference
                 if (!CurrentMatch.Value.Round.Value.UseBoard.Value) return;
+#pragma warning restore CS8602
 
                 int middleX = source.BoardX;
                 int middleY = source.BoardY;
@@ -709,7 +715,15 @@ namespace osu.Game.Tournament.Screens.Board
                 i++;
             }
 
-            if (winner == TeamColour.Neutral) return false;
+            if (winner == TeamColour.Neutral)
+            {
+                // Reset the round winner to Neutral
+                teamWinner = TeamColour.Neutral;
+                // Reset team scores
+                CurrentMatch.Value.Team1Score.Value = 0;
+                CurrentMatch.Value.Team2Score.Value = 0;
+                return false;
+            }
             else
             {
                 // 6 is just enough to fill the score bar, subject to change
@@ -729,6 +743,41 @@ namespace osu.Game.Tournament.Screens.Board
         }
 
         /// <summary>
+        /// Get all beatmaps on a specified line.
+        /// </summary>
+        /// <param name="startX">The start point of the line, X value.</param>
+        /// <param name="startY">The start point of the line, Y value.</param>
+        /// <param name="endX">The end point of the line, X value.</param>
+        /// <param name="endY">The end point of the line, Y value.</param>
+        /// <returns>A <see langword="List"/> of <see cref="RoundBeatmap"/>.</returns>
+        private List<RoundBeatmap> getMapLine(int startX, int startY, int endX, int endY)
+        {
+            List<RoundBeatmap> mapLine = new List<RoundBeatmap>();
+
+            // Reject null matches
+            if (CurrentMatch.Value == null) return mapLine;
+
+            if (startX == endX)
+            {
+                for (int i = startY; i <= endY; i++) mapLine.Add(getBoardMap(startX, i));
+            }
+            else if (startY == endY)
+            {
+                for (int i = startX; i <= endX; i++) mapLine.Add(getBoardMap(i, startY));
+            }
+            else
+            {
+                int stepX = endX > startX ? 1 : -1;
+                int stepY = endY > startY ? 1 : -1;
+                for (int i = 0; i <= 3; i++)
+                {
+                    mapLine.Add(getBoardMap(startX + i * stepX, startY + i * stepY));
+                }
+            }
+            return mapLine;
+        }
+
+        /// <summary>
         /// Detects if either team has won.
         ///
         /// <br></br>The given line should be either a straight line or a diagonal line.
@@ -740,6 +789,7 @@ namespace osu.Game.Tournament.Screens.Board
         /// <returns>the winner team's colour, or <see cref="TeamColour.Neutral"/> if there isn't one</returns>
         private TeamColour isWin(int startX, int startY, int endX, int endY)
         {
+            List<RoundBeatmap> mapLine = new List<RoundBeatmap>();
             const TeamColour colourfalse = TeamColour.Neutral;
             TeamColour thisColour = TeamColour.Neutral;
 
@@ -749,31 +799,26 @@ namespace osu.Game.Tournament.Screens.Board
             // Reject null matches
             if (CurrentMatch.Value == null) return colourfalse;
 
-            // Exclusively for cases like from (1, 4) to (4, 1)
-            for (int i = startX; endX > startX ? i <= endX : i >= endX; i += (endX - startX) / 3)
-            {
-                for (int j = startY; endY > startY ? j <= endY : j >= endY; j += (endY - startY) / 3)
-                {
-                    var next = getBoardMap(i, j);
-                    if (next == null) continue;
-                    // Get the coloured map
-                    var pickedMap = CurrentMatch.Value.PicksBans.FirstOrDefault(p => (p.BeatmapID == next.Beatmap?.OnlineID &&
-                        (p.Type == ChoiceType.RedWin || p.Type == ChoiceType.BlueWin)));
-                    // Have banned maps: Cannot win
-                    if (CurrentMatch.Value.PicksBans.Any(p => (p.BeatmapID == next.Beatmap?.OnlineID && p.Type == ChoiceType.Ban))) return colourfalse;
-                    if (pickedMap != null)
-                    {
-                        // Set the default colour
-                        if (thisColour == TeamColour.Neutral) { thisColour = pickedMap.Team; }
-                        // Different mark colour: Cannot win
-                        else { if (thisColour != pickedMap.Team) return colourfalse; }
-                    }
-                    else return colourfalse;
+            mapLine = getMapLine(startX, startY, endX, endY);
 
-                    if (endY == startY) break;
+            foreach (RoundBeatmap b in mapLine)
+            {
+                // Get the coloured map
+                var pickedMap = CurrentMatch.Value.PicksBans.FirstOrDefault(p => (p.BeatmapID == b.Beatmap?.OnlineID &&
+                        (p.Type == ChoiceType.RedWin || p.Type == ChoiceType.BlueWin)));
+
+                // Have banned maps: Cannot win
+                if (CurrentMatch.Value.PicksBans.Any(p => (p.BeatmapID == b.Beatmap?.OnlineID && p.Type == ChoiceType.Ban))) return colourfalse;
+                if (pickedMap != null)
+                {
+                    // Set the default colour
+                    if (thisColour == TeamColour.Neutral) { thisColour = pickedMap.Team; }
+                    // Different mark colour: Cannot win
+                    else { if (thisColour != pickedMap.Team) return colourfalse; }
                 }
-                if (endX == startX) break;
+                else return colourfalse;
             }
+
             // Finally: Can win
             return thisColour;
         }
@@ -809,6 +854,7 @@ namespace osu.Game.Tournament.Screens.Board
         /// <returns>true if can, otherwise false</returns>
         private bool canWin(int startX, int startY, int endX, int endY)
         {
+            List<RoundBeatmap> mapLine = new List<RoundBeatmap>();
             TeamColour thisColour = TeamColour.Neutral;
 
             // Currently limited to 4x4 use only
@@ -817,29 +863,24 @@ namespace osu.Game.Tournament.Screens.Board
             // Reject null matches
             if (CurrentMatch.Value == null) return false;
 
-            // Exclusively for cases like from (1, 4) to (4, 1)
-            for (int i = startX; endX > startX ? i <= endX : i >= endX; i += (endX - startX) / 3)
+            mapLine = getMapLine(startX, startY, endX, endY);
+
+            foreach (RoundBeatmap b in mapLine)
             {
-                for (int j = startY; endY > startY ? j <= endY : j >= endY; j += (endY - startY) / 3)
+                // Get the coloured map
+                var pickedMap = CurrentMatch.Value.PicksBans.FirstOrDefault(p => (p.BeatmapID == b.Beatmap?.OnlineID &&
+                    (p.Type == ChoiceType.RedWin || p.Type == ChoiceType.BlueWin)));
+                // Have banned maps: Cannot win
+                if (CurrentMatch.Value.PicksBans.Any(p => (p.BeatmapID == b.Beatmap?.OnlineID && p.Type == ChoiceType.Ban))) return false;
+                if (pickedMap != null)
                 {
-                    var next = getBoardMap(i, j);
-                    if (next == null) continue;
-                    // Get the coloured map
-                    var pickedMap = CurrentMatch.Value.PicksBans.FirstOrDefault(p => (p.BeatmapID == next.Beatmap?.OnlineID &&
-                        (p.Type == ChoiceType.RedWin || p.Type == ChoiceType.BlueWin)));
-                    // Have banned maps: Cannot win
-                    if (CurrentMatch.Value.PicksBans.Any(p => (p.BeatmapID == next.Beatmap?.OnlineID && p.Type == ChoiceType.Ban))) return false;
-                    if (pickedMap != null)
-                    {
-                        // Set the default colour
-                        if (thisColour == TeamColour.Neutral) { thisColour = pickedMap.Team; }
-                        // Different mark colour: Cannot win
-                        else { if (thisColour != pickedMap.Team) return false; }
-                    }
-                    if (endY == startY) break;
+                    // Set the default colour
+                    if (thisColour == TeamColour.Neutral) { thisColour = pickedMap.Team; }
+                    // Different mark colour: Cannot win
+                    else { if (thisColour != pickedMap.Team) return false; }
                 }
-                if (endX == startX) break;
             }
+
             // Finally: Can win
             return true;
         }
