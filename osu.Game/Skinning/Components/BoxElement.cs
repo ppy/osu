@@ -27,6 +27,9 @@ namespace osu.Game.Skinning.Components
             Precision = 0.01f
         };
 
+        [SettingSource(typeof(SkinnableComponentStrings), nameof(SkinnableComponentStrings.Colour), nameof(SkinnableComponentStrings.ColourDescription))]
+        public new BindableColour4 Colour { get; } = new BindableColour4(Colour4.White);
+
         public BoxElement()
         {
             Size = new Vector2(400, 80);
@@ -48,6 +51,7 @@ namespace osu.Game.Skinning.Components
             base.Update();
 
             base.CornerRadius = CornerRadius.Value * Math.Min(DrawWidth, DrawHeight);
+            base.Colour = Colour.Value;
         }
     }
 }

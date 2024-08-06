@@ -10,6 +10,7 @@ using osu.Framework.Utils;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Localisation.HUD;
+using osu.Game.Localisation.SkinComponents;
 using osu.Game.Rulesets.Objects;
 using osuTK;
 
@@ -35,6 +36,8 @@ namespace osu.Game.Screens.Play.HUD
 
         [SettingSource(typeof(SongProgressStrings), nameof(SongProgressStrings.ShowTime), nameof(SongProgressStrings.ShowTimeDescription))]
         public Bindable<bool> ShowTime { get; } = new BindableBool(true);
+        [SettingSource(typeof(SkinnableComponentStrings), nameof(SkinnableComponentStrings.Colour), nameof(SkinnableComponentStrings.ColourDescription))]
+        public new BindableColour4 Colour { get; } = new BindableColour4(Colour4.White);
 
         [Resolved]
         private Player? player { get; set; }
@@ -114,6 +117,8 @@ namespace osu.Game.Screens.Play.HUD
 
             if (!Precision.AlmostEquals(Height, newHeight, 5f))
                 content.Height = newHeight;
+
+            base.Colour = Colour.Value;
         }
 
         private void updateBarVisibility()
