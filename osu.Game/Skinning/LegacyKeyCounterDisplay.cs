@@ -26,7 +26,7 @@ namespace osu.Game.Skinning
         {
             AutoSizeAxes = Axes.Both;
 
-            AddRangeInternal(new Drawable[]
+            AddRange(new Drawable[]
             {
                 backgroundSprite = new Sprite
                 {
