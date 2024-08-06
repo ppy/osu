@@ -12,6 +12,7 @@ using osu.Game.Overlays.Mods;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Mods;
 using osuTK;
+using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
@@ -27,6 +28,9 @@ namespace osu.Game.Tests.Visual.UserInterface
         [SetUp]
         public void SetUp() => Schedule(() =>
         {
+            SelectedMods.Value = Array.Empty<Mod>();
+            InputManager.MoveMouseTo(Vector2.One);
+
             Child = new Container
             {
                 RelativeSizeAxes = Axes.Both,
@@ -71,66 +75,87 @@ namespace osu.Game.Tests.Visual.UserInterface
         }
 
         [Test]
-        public void TestHoverExpand()
+        public void TestHoverDoesNotExpandWhenNoCustomisableMods()
         {
-            // Can not expand by hovering when no supported mod
-            {
-                AddStep("hover header", () => InputManager.MoveMouseTo(header));
+            AddStep("hover header", () => InputManager.MoveMouseTo(header));
 
-                AddAssert("not expanded", () => !panel.Expanded);
+            checkExpanded(false);
 
-                AddStep("hover content", () => InputManager.MoveMouseTo(content));
+            AddStep("hover content", () => InputManager.MoveMouseTo(content));
 
-                AddAssert("neither expanded", () => !panel.Expanded);
+            checkExpanded(false);
 
-                AddStep("left from content", () => InputManager.MoveMouseTo(Vector2.One));
-            }
+            AddStep("left from content", () => InputManager.MoveMouseTo(Vector2.One));
+        }
 
+        [Test]
+        public void TestHoverExpandsWithCustomisableMods()
+        {
             AddStep("add customisable mod", () =>
             {
                 SelectedMods.Value = new[] { new OsuModDoubleTime() };
                 panel.Enabled.Value = true;
             });
 
-            // Can expand by hovering when supported mod
+            AddStep("hover header", () => InputManager.MoveMouseTo(header));
+            checkExpanded(true);
+
+            AddStep("move to content", () => InputManager.MoveMouseTo(content));
+            checkExpanded(true);
+
+            AddStep("move away", () => InputManager.MoveMouseTo(Vector2.One));
+            checkExpanded(false);
+
+            AddStep("hover header", () => InputManager.MoveMouseTo(header));
+            checkExpanded(true);
+
+            AddStep("move away", () => InputManager.MoveMouseTo(Vector2.One));
+            checkExpanded(false);
+        }
+
+        [Test]
+        public void TestExpandedStatePersistsWhenClicked()
+        {
+            AddStep("add customisable mod", () =>
             {
-                AddStep("hover header", () => InputManager.MoveMouseTo(header));
+                SelectedMods.Value = new[] { new OsuModDoubleTime() };
+                panel.Enabled.Value = true;
+            });
 
-                AddAssert("expanded", () => panel.Expanded);
+            AddStep("hover header", () => InputManager.MoveMouseTo(header));
+            checkExpanded(true);
 
-                AddStep("hover content", () => InputManager.MoveMouseTo(content));
+            AddStep("click", () => InputManager.Click(MouseButton.Left));
+            checkExpanded(false);
+            AddStep("click", () => InputManager.Click(MouseButton.Left));
+            checkExpanded(true);
 
-                AddAssert("still expanded", () => panel.Expanded);
-            }
+            AddStep("move away", () => InputManager.MoveMouseTo(Vector2.One));
+            checkExpanded(true);
 
-            // Will collapse when mouse left from content
+            AddStep("click", () => InputManager.Click(MouseButton.Left));
+            checkExpanded(false);
+        }
+
+        [Test]
+        public void TestHoverExpandsAndCollapsesWhenHeaderClicked()
+        {
+            AddStep("add customisable mod", () =>
             {
-                AddStep("left from content", () => InputManager.MoveMouseTo(Vector2.One));
+                SelectedMods.Value = new[] { new OsuModDoubleTime() };
+                panel.Enabled.Value = true;
+            });
 
-                AddAssert("not expanded", () => !panel.Expanded);
-            }
+            AddStep("hover header", () => InputManager.MoveMouseTo(header));
+            checkExpanded(true);
 
-            // Will collapse when mouse left from header
-            {
-                AddStep("hover header", () => InputManager.MoveMouseTo(header));
+            AddStep("click", () => InputManager.Click(MouseButton.Left));
+            checkExpanded(false);
+        }
 
-                AddAssert("expanded", () => panel.Expanded);
-
-                AddStep("left from header", () => InputManager.MoveMouseTo(Vector2.One));
-
-                AddAssert("not expanded", () => !panel.Expanded);
-            }
-
-            // Not collapse when mouse left if not expanded by hovering
-            {
-                AddStep("expand not by hovering", () => panel.Expanded = true);
-
-                AddStep("hover content", () => InputManager.MoveMouseTo(content));
-
-                AddStep("moust left", () => InputManager.MoveMouseTo(Vector2.One));
-
-                AddAssert("still expanded", () => panel.Expanded);
-            }
+        private void checkExpanded(bool expanded)
+        {
+            AddUntilStep(expanded ? "is expanded" : "not expanded", () => panel.Expanded, () => Is.EqualTo(expanded));
         }
     }
 }
