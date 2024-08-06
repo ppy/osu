@@ -86,7 +86,7 @@ namespace osu.Game.Tournament.Components
                     Direction = FillDirection.Vertical,
                     Children = new Drawable[]
                     {
-                        new TextFlowContainer
+                        new TournamentSpriteText
                         {
                             Text = truncatedSongName,
                             Font = OsuFont.Torus.With(weight: FontWeight.Bold, size: 32),
