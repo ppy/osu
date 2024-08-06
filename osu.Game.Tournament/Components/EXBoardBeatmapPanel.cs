@@ -35,6 +35,8 @@ namespace osu.Game.Tournament.Components
 
         private Box flash = null!;
 
+        private Box backgroundAddition = null!;
+
         public EXBoardBeatmapPanel(IBeatmapInfo? beatmap, string mod = "", string index = "")
         {
             Beatmap = beatmap;
@@ -88,17 +90,17 @@ namespace osu.Game.Tournament.Components
 
             AddRangeInternal(new Drawable[]
             {
-                new Box
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = Color4.Black,
-                    Alpha = 0.7f
-                },
                 new NoUnloadBeatmapSetCover
                 {
                     RelativeSizeAxes = Axes.Both,
                     Colour = OsuColour.Gray(0.5f),
                     OnlineInfo = (Beatmap as IBeatmapSetOnlineInfo),
+                },
+                backgroundAddition = new Box
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = Color4.Black,
+                    Alpha = 0.1f
                 },
                 new FillFlowContainer
                 {
@@ -203,7 +205,7 @@ namespace osu.Game.Tournament.Components
             if (newChoice != null)
             {
                 if (shouldFlash)
-                    flash.FadeOutFromOne(500).Loop(0, 10);
+                    flash.FadeOutFromOne(duration: 900, easing: Easing.OutSine).Loop(0, 3);
 
                 BorderThickness = 6;
 
@@ -212,41 +214,51 @@ namespace osu.Game.Tournament.Components
                 switch (newChoice.Type)
                 {
                     case ChoiceType.Pick:
-                        Colour = Color4.White;
+                        backgroundAddition.Colour = Color4.White;
+                        backgroundAddition.FadeTo(newAlpha: 0, duration: 150, easing: Easing.InCubic);
                         Alpha = 1;
                         break;
 
                     case ChoiceType.Ban:
-                        Colour = Color4.Gray;
+                        backgroundAddition.Colour = Color4.Gray;
+                        backgroundAddition.FadeTo(newAlpha: 0.5f, duration: 150, easing: Easing.InCubic);
                         Alpha = 0.5f;
                         break;
 
                     case ChoiceType.Protect:
-                        Colour = new OsuColour().Cyan;
+                        backgroundAddition.Colour = new OsuColour().Cyan;
+                        backgroundAddition.FadeTo(newAlpha: 0.3f, duration: 150, easing: Easing.InCubic);
                         Alpha = 0.9f;
                         break;
 
                     case ChoiceType.RedWin:
-                        Colour = new OsuColour().Pink;
+                        backgroundAddition.Colour = new OsuColour().Red;
+                        backgroundAddition.FadeTo(newAlpha: 0.35f, duration: 100, easing: Easing.InCubic);
                         Alpha = 1;
                         break;
 
                     case ChoiceType.BlueWin:
-                        Colour = new OsuColour().Blue;
+                        backgroundAddition.Colour = new OsuColour().Sky;
+                        backgroundAddition.FadeTo(newAlpha: 0.4f, duration: 100, easing: Easing.InCubic);
                         Alpha = 1;
                         break;
 
                     case ChoiceType.Trap:
-                        Colour = new OsuColour().PurpleLight;
+                        backgroundAddition.Colour = new OsuColour().PurpleLight;
+                        backgroundAddition.FadeTo(newAlpha: 0.2f, duration: 150, easing: Easing.InCubic);
                         Alpha = 1;
                         break;
                 }
             }
             else
             {
-                Colour = Color4.White;
+                flash.ClearTransforms();
+                backgroundAddition.ClearTransforms();
+                backgroundAddition.FadeOut(duration: 100, easing: Easing.OutCubic);
+                backgroundAddition.Colour = Color4.White;
                 BorderThickness = 0;
                 Alpha = 1;
+                flash.Alpha = 0;
             }
 
             choice = newChoice;

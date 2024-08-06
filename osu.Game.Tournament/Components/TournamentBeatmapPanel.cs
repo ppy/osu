@@ -34,6 +34,8 @@ namespace osu.Game.Tournament.Components
 
         private Box flash = null!;
 
+        private Box backgroundAddition = null!;
+
         private SpriteIcon icon = null!;
 
         public TournamentBeatmapPanel(IBeatmapInfo? beatmap, string mod = "", string index = "")
@@ -56,16 +58,17 @@ namespace osu.Game.Tournament.Components
 
             AddRangeInternal(new Drawable[]
             {
-                new Box
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = Color4.Black,
-                },
                 new NoUnloadBeatmapSetCover
                 {
                     RelativeSizeAxes = Axes.Both,
                     Colour = OsuColour.Gray(0.5f),
                     OnlineInfo = (Beatmap as IBeatmapSetOnlineInfo),
+                },
+                backgroundAddition = new Box
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = Color4.Black,
+                    Alpha = 0.1f
                 },
                 new FillFlowContainer
                 {
@@ -184,42 +187,55 @@ namespace osu.Game.Tournament.Components
                 {
                     case ChoiceType.Pick:
                         Colour = Color4.White;
+                        backgroundAddition.FadeTo(newAlpha: 0, duration: 150, easing: Easing.InCubic);
                         Alpha = 1;
                         break;
 
                     case ChoiceType.Ban:
                         Colour = Color4.Gray;
-                        Alpha = 0.5f;
+                        backgroundAddition.FadeTo(newAlpha: 0, duration: 150, easing: Easing.InCubic);
+                        this.FadeTo(newAlpha: 0.5f, duration: 150, easing: Easing.InCubic);
                         break;
 
                     case ChoiceType.Protect:
                         icon.Icon = FontAwesome.Solid.Lock;
                         icon.Alpha = 0.9f;
-                        Colour = new OsuColour().Cyan;
-                        Alpha = 0.9f;
+                        Alpha = 1;
+                        backgroundAddition.Colour = new OsuColour().Cyan;
+                        backgroundAddition.FadeTo(newAlpha: 0.5f, duration: 150, easing: Easing.InCubic);
                         break;
 
                     case ChoiceType.RedWin:
-                        Colour = new OsuColour().Pink;
                         Alpha = 1;
+                        backgroundAddition.Colour = new OsuColour().Red;
+                        backgroundAddition.FadeTo(newAlpha: 0.4f, duration: 150, easing: Easing.InCubic);
                         break;
 
                     case ChoiceType.BlueWin:
-                        Colour = new OsuColour().Blue;
                         Alpha = 1;
+                        backgroundAddition.Colour = new OsuColour().Blue;
+                        backgroundAddition.FadeTo(newAlpha: 0.6f, duration: 150, easing: Easing.InCubic);
                         break;
 
                     case ChoiceType.Trap:
-                        Colour = new OsuColour().PurpleLight;
                         Alpha = 1;
+                        backgroundAddition.Colour = new OsuColour().PurpleLight;
+                        backgroundAddition.FadeTo(newAlpha: 0.4f, duration: 150, easing: Easing.InCubic);
                         break;
                 }
             }
             else
             {
+                flash.ClearTransforms();
+                icon.ClearTransforms();
+
                 Colour = Color4.White;
+                backgroundAddition.Colour = Color4.White;
                 BorderThickness = 0;
                 Alpha = 1;
+                flash.Alpha = 0;
+                icon.FadeOut(duration: 100, easing: Easing.OutCubic);
+                backgroundAddition.FadeOut(duration: 100, easing: Easing.OutCubic);
             }
 
             choice = newChoice;

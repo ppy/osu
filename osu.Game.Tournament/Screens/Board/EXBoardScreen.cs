@@ -176,14 +176,14 @@ namespace osu.Game.Tournament.Screens.Board
                                 {
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.CentreLeft,
-                                    Text = @"欢迎来到 EX 阶段",
+                                    Text = @"欢迎进入 EX 阶段",
                                     Font = OsuFont.HarmonyOSSans.With(size: 32, weight: FontWeight.Bold),
                                 },
                                 new TournamentSpriteText
                                 {
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.CentreLeft,
-                                    Text = @"从上到下依次循环进行，获胜方可更改任意格子颜色",
+                                    Text = @"从上到下依次循环进行，获胜方可更改保图外的任意格子颜色",
                                     Font = OsuFont.HarmonyOSSans.With(size: 20, weight: FontWeight.Regular),
                                 },
                                 new TournamentSpriteText

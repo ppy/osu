@@ -244,16 +244,20 @@ namespace osu.Game.Tournament.Components
 
             bool isProtected = currentMatch.Value.Protects.Any(p => p.BeatmapID == Beatmap?.OnlineID);
 
-            bool isTrapped = currentMatch.Value.Traps.Any(p => p.BeatmapID == Beatmap?.OnlineID);
+            bool isTrapped = currentMatch.Value.Traps.Any(p => p.BeatmapID == Beatmap?.OnlineID && !p.IsTriggered);
+
+            bool isBothTrapped = currentMatch.Value.Traps.Any(p => (p.BeatmapID == Beatmap?.OnlineID && p.Team == TeamColour.Red))
+                && currentMatch.Value.Traps.Any(p => (p.BeatmapID == Beatmap?.OnlineID && p.Team == TeamColour.Blue));
 
             var newChoice = currentMatch.Value.PicksBans.FirstOrDefault(p => p.BeatmapID == Beatmap?.OnlineID);
 
             var nextPureChoice = newChoice;
 
+            // Check: We need this?
             if (isProtected) nextPureChoice = currentMatch.Value.PicksBans.FirstOrDefault(p => (p.BeatmapID == Beatmap?.OnlineID && p.Type != ChoiceType.Protect));
             else if (isTrapped) nextPureChoice = currentMatch.Value.PicksBans.FirstOrDefault(p => (p.BeatmapID == Beatmap?.OnlineID && p.Type != ChoiceType.Trap));
 
-            newChoice = nextPureChoice ?? newChoice;
+            // newChoice = nextPureChoice ?? newChoice;
 
             bool shouldFlash = newChoice != choice;
 
@@ -261,8 +265,7 @@ namespace osu.Game.Tournament.Components
             {
                 if (shouldFlash)
                 {
-                    flash.FadeOutFromOne(900).Loop(0, 3);
-                    icon.FadeInFromZero(500);
+                    flash.FadeOutFromOne(duration: 900, easing: Easing.OutSine).Loop(0, 3);
                 }
 
                 BorderThickness = 4;
@@ -274,31 +277,34 @@ namespace osu.Game.Tournament.Components
                     case ChoiceType.Pick:
                         Colour = Color4.White;
                         Alpha = 1f;
-                        icon.FadeOut(duration: 200, easing: Easing.OutCubic);
+                        backgroundAddition.FadeTo(newAlpha: 0, duration: 150, easing: Easing.InCubic);
+                        icon.FadeOut(duration: 100, easing: Easing.OutCubic);
                         break;
 
                     // Ban: All darker
                     case ChoiceType.Ban:
-                        Colour = Color4.Gray;
-                        Alpha = 0.3f;
+                        backgroundAddition.Colour = Color4.Gray;
+                        backgroundAddition.FadeTo(newAlpha: 0.7f, duration: 150, easing: Easing.InCubic);
                         icon.Icon = FontAwesome.Solid.Ban;
                         icon.Colour = newChoice.Team == TeamColour.Red ? new OsuColour().TeamColourRed : new OsuColour().Sky;
+                        icon.FadeIn(duration: 200, easing: Easing.InCubic);
                         BorderColour = Color4.White;
                         BorderThickness = 0;
                         break;
 
                     case ChoiceType.Protect:
                         Alpha = 1f;
-                        statusIcon.FadeIn(duration: 200, easing: Easing.InCubic);
+                        backgroundAddition.FadeTo(newAlpha: 0, duration: 150, easing: Easing.InCubic);
+                        statusIcon.FadeIn(duration: 150, easing: Easing.InCubic);
                         statusIcon.Icon = FontAwesome.Solid.Lock;
                         statusIcon.Colour = newChoice.Team == TeamColour.Red ? new OsuColour().TeamColourRed : new OsuColour().Sky;
                         break;
 
                     // Win: Background colour
                     case ChoiceType.RedWin:
-                        // Alpha = 0.7f;
                         backgroundAddition.Colour = Color4.Red;
-                        backgroundAddition.Alpha = 0.4f;
+                        backgroundAddition.FadeTo(newAlpha: 0.4f, duration: 150, easing: Easing.InCubic);
+                        icon.FadeIn(duration: 150, easing: Easing.InCubic);
                         icon.Icon = FontAwesome.Solid.Trophy;
                         icon.Colour = new OsuColour().Red;
                         // icon.Colour = isProtected ? new OsuColour().Pink : Color4.Red;
@@ -307,9 +313,9 @@ namespace osu.Game.Tournament.Components
                         break;
 
                     case ChoiceType.BlueWin:
-                        // Alpha = 0.7f;
                         backgroundAddition.Colour = new OsuColour().Sky;
-                        backgroundAddition.Alpha = 0.7f;
+                        backgroundAddition.FadeTo(newAlpha: 0.5f, duration: 150, easing: Easing.InCubic);
+                        icon.FadeIn(duration: 150, easing: Easing.InCubic);
                         icon.Icon = FontAwesome.Solid.Trophy;
                         icon.Colour = new OsuColour().Blue;
                         // icon.Colour = isProtected ? new OsuColour().Sky : Color4.Blue;
@@ -319,21 +325,31 @@ namespace osu.Game.Tournament.Components
 
                     case ChoiceType.Trap:
                         Alpha = 1f;
-                        statusIcon.FadeIn(duration: 200, easing: Easing.InCubic);
+                        backgroundAddition.FadeTo(newAlpha: 0, duration: 150, easing: Easing.InCubic);
+                        statusIcon.FadeIn(duration: 150, easing: Easing.InCubic);
                         statusIcon.Icon = FontAwesome.Solid.ExclamationCircle;
-                        icon.Colour = newChoice.Team == TeamColour.Red ? new OsuColour().TeamColourRed : new OsuColour().Sky;
+                        statusIcon.Colour = isBothTrapped ? Color4.White : (newChoice.Team == TeamColour.Red ? new OsuColour().TeamColourRed : new OsuColour().Sky);
                         BorderColour = Color4.White;
                         break;
                 }
             }
             else
             {
-                Colour = Color4.White;
+                // Stop all transforms first, to make relative properties adjustable.
+                icon.ClearTransforms();
+                statusIcon.ClearTransforms();
+                flash.ClearTransforms();
+
+                // Then we can change them to the default state.
                 BorderThickness = 0;
-                Alpha = 1;
-                icon.Alpha = 0;
+                flash.Alpha = 0;
+                this.FadeIn(duration: 100, easing: Easing.InCubic);
+                backgroundAddition.FadeOut(duration: 100, easing: Easing.OutCubic);
+                icon.FadeOut(duration: 100, easing: Easing.OutCubic);
+                statusIcon.FadeOut(duration: 100, easing: Easing.OutCubic);
+                Colour = Color4.White;
                 icon.Colour = Color4.White;
-                statusIcon.FadeOut(duration: 200, easing: Easing.OutCubic);
+                backgroundAddition.Colour = Color4.White;
             }
 
             choice = newChoice;
