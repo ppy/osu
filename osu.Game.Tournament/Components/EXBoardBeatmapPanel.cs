@@ -105,8 +105,8 @@ namespace osu.Game.Tournament.Components
                 new FillFlowContainer
                 {
                     AutoSizeAxes = Axes.Both,
-                    Anchor = Anchor.CentreLeft,
-                    Origin = Anchor.CentreLeft,
+                    Anchor = Anchor.TopLeft,
+                    Origin = Anchor.TopLeft,
                     Padding = new MarginPadding(15),
                     Direction = FillDirection.Vertical,
                     Children = new Drawable[]
@@ -122,12 +122,21 @@ namespace osu.Game.Tournament.Components
                             Direction = FillDirection.Vertical,
                             Children = new Drawable[]
                             {
+                                new TournamentSpriteText
+                                {
+                                    Text = truncatedDifficultyName,
+                                    Font = OsuFont.Torus.With(weight: FontWeight.Bold, size: 23)
+                                },
+
                                 new FillFlowContainer
                                 {
                                     AutoSizeAxes = Axes.Both,
                                     Direction = FillDirection.Horizontal,
+                                    Margin = new MarginPadding { Left = -2, Top = 5 },
                                     Children = new Drawable[]
                                     {
+                                        new StarRatingDisplay(new StarDifficulty(Beatmap?.StarRating ?? 0, 0))
+
                                         /* Hide "mapper" and mapperName display
                                         new TournamentSpriteText
                                         {
@@ -142,12 +151,6 @@ namespace osu.Game.Tournament.Components
                                             Font = OsuFont.Torus.With(weight: FontWeight.SemiBold, size: 22)
                                         },*/
                                     }
-                                },
-
-                                new TournamentSpriteText
-                                {
-                                    Text = truncatedDifficultyName,
-                                    Font = OsuFont.Torus.With(weight: FontWeight.Bold, size: 23)
                                 },
                             }
                         }
@@ -168,8 +171,7 @@ namespace osu.Game.Tournament.Components
                 {
                     Anchor = Anchor.CentreRight,
                     Origin = Anchor.CentreRight,
-                    Margin = new MarginPadding(25),
-                    Position = new osuTK.Vector2(0, 50),
+                    Margin = new MarginPadding { Right = 20, Top = 90 },
                     Size = new osuTK.Vector2(96),
                     RelativeSizeAxes = Axes.Y,
                 });
