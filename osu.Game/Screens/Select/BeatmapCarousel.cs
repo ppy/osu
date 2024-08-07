@@ -281,10 +281,33 @@ namespace osu.Game.Screens.Select
                 realmBeatmapSets.Clear();
                 realmBeatmapSets.AddRange(sender.Select(r => r.ID));
 
+                if (originalBeatmapSetsDetached.Count > 0 && sender.Count == 0)
+                {
+                    // Usually we'd reset stuff here, but doing so triggers a silly flow which ends up deadlocking realm.
+                    // Additionally, user should not be at song select when realm is blocking all operations in the first place.
+                    //
+                    // Note that due to the catch-up logic below, once operations are restored we will still be in a roughly
+                    // correct state. The only things that this return will change is the carousel will not empty *during* the blocking
+                    // operation.
+                    return;
+                }
+
+                // Do a full two-way check for missing (or incorrectly present) beatmaps.
+                // Let's assume that the worst that can happen is deletions or additions.
                 setsRequiringRemoval.Clear();
                 setsRequiringUpdate.Clear();
 
-                loadBeatmapSets(sender);
+                foreach (Guid id in realmBeatmapSets)
+                {
+                    if (!root.BeatmapSetsByID.ContainsKey(id))
+                        setsRequiringUpdate.Add(id);
+                }
+
+                foreach (Guid id in root.BeatmapSetsByID.Keys)
+                {
+                    if (!realmBeatmapSets.Contains(id))
+                        setsRequiringRemoval.Add(id);
+                }
             }
             else
             {

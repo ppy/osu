@@ -261,7 +261,8 @@ namespace osu.Game.Graphics.UserInterface
 
             base.OnFocus(e);
 
-            if (SelectAllOnFocus)
+            // we may become focused from an ongoing drag operation, we don't want to overwrite selection in that case.
+            if (SelectAllOnFocus && string.IsNullOrEmpty(SelectedText))
                 SelectAll();
         }
 

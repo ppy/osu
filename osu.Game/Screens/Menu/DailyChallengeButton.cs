@@ -23,6 +23,7 @@ using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Metadata;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
+using osu.Game.Screens.OnlinePlay.DailyChallenge;
 using osuTK;
 using osuTK.Graphics;
 using osuTK.Input;
@@ -43,6 +44,9 @@ namespace osu.Game.Screens.Menu
 
         [Resolved]
         private IAPIProvider api { get; set; } = null!;
+
+        [Resolved]
+        private INotificationOverlay? notificationOverlay { get; set; }
 
         public DailyChallengeButton(string sampleName, Color4 colour, Action<MainMenuButton>? clickAction = null, params Key[] triggerKeys)
             : base(ButtonSystemStrings.DailyChallenge, sampleName, OsuIcon.DailyChallenge, colour, clickAction, triggerKeys)
@@ -100,7 +104,8 @@ namespace osu.Game.Screens.Menu
         {
             base.LoadComplete();
 
-            info.BindValueChanged(updateDisplay, true);
+            info.BindValueChanged(_ => dailyChallengeChanged(postNotification: true));
+            dailyChallengeChanged(postNotification: false);
         }
 
         protected override void Update()
@@ -126,26 +131,29 @@ namespace osu.Game.Screens.Menu
             }
         }
 
-        private void updateDisplay(ValueChangedEvent<DailyChallengeInfo?> info)
+        private void dailyChallengeChanged(bool postNotification)
         {
             UpdateState();
 
             scheduledCountdownUpdate?.Cancel();
             scheduledCountdownUpdate = null;
 
-            if (info.NewValue == null)
+            if (info.Value == null)
             {
                 Room = null;
                 cover.OnlineInfo = TooltipContent = null;
             }
             else
             {
-                var roomRequest = new GetRoomRequest(info.NewValue.Value.RoomID);
+                var roomRequest = new GetRoomRequest(info.Value.Value.RoomID);
 
                 roomRequest.Success += room =>
                 {
                     Room = room;
                     cover.OnlineInfo = TooltipContent = room.Playlist.FirstOrDefault()?.Beatmap.BeatmapSet as APIBeatmapSet;
+
+                    if (postNotification)
+                        notificationOverlay?.Post(new NewDailyChallengeNotification(room));
 
                     updateCountdown();
                     Scheduler.AddDelayed(updateCountdown, 1000, true);

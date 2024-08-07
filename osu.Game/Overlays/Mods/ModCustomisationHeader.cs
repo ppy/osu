@@ -4,21 +4,26 @@
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
-using osuTK;
 using osu.Game.Localisation;
+using osuTK;
+using osuTK.Graphics;
+using static osu.Game.Overlays.Mods.ModCustomisationPanel;
 
 namespace osu.Game.Overlays.Mods
 {
     public partial class ModCustomisationHeader : OsuHoverContainer
     {
         private Box background = null!;
+        private Box backgroundFlash = null!;
         private SpriteIcon icon = null!;
 
         [Resolved]
@@ -26,11 +31,13 @@ namespace osu.Game.Overlays.Mods
 
         protected override IEnumerable<Drawable> EffectTargets => new[] { background };
 
-        public readonly BindableBool Expanded = new BindableBool();
+        public readonly Bindable<ModCustomisationPanelState> ExpandedState = new Bindable<ModCustomisationPanelState>(ModCustomisationPanelState.Collapsed);
 
-        public ModCustomisationHeader()
+        private readonly ModCustomisationPanel panel;
+
+        public ModCustomisationHeader(ModCustomisationPanel panel)
         {
-            Action = Expanded.Toggle;
+            this.panel = panel;
             Enabled.Value = false;
         }
 
@@ -45,6 +52,13 @@ namespace osu.Game.Overlays.Mods
                 background = new Box
                 {
                     RelativeSizeAxes = Axes.Both,
+                },
+                backgroundFlash = new Box
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = Color4.White.Opacity(0.4f),
+                    Blending = BlendingParameters.Additive,
+                    Alpha = 0,
                 },
                 new OsuSpriteText
                 {
@@ -84,12 +98,56 @@ namespace osu.Game.Overlays.Mods
                 TooltipText = e.NewValue
                     ? string.Empty
                     : ModSelectOverlayStrings.CustomisationPanelDisabledReason;
+
+                if (e.NewValue)
+                {
+                    backgroundFlash.FadeInFromZero(150, Easing.OutQuad).Then()
+                                   .FadeOutFromOne(350, Easing.OutQuad);
+                }
             }, true);
 
-            Expanded.BindValueChanged(v =>
+            ExpandedState.BindValueChanged(v =>
             {
-                icon.ScaleTo(v.NewValue ? new Vector2(1, -1) : Vector2.One, 300, Easing.OutQuint);
+                icon.ScaleTo(v.NewValue > ModCustomisationPanelState.Collapsed ? new Vector2(1, -1) : Vector2.One, 300, Easing.OutQuint);
             }, true);
+        }
+
+        protected override bool OnClick(ClickEvent e)
+        {
+            if (Enabled.Value)
+            {
+                ExpandedState.Value = ExpandedState.Value switch
+                {
+                    ModCustomisationPanelState.Collapsed => ModCustomisationPanelState.Expanded,
+                    _ => ModCustomisationPanelState.Collapsed
+                };
+            }
+
+            return base.OnClick(e);
+        }
+
+        private bool touchedThisFrame;
+
+        protected override bool OnTouchDown(TouchDownEvent e)
+        {
+            if (Enabled.Value)
+            {
+                touchedThisFrame = true;
+                Schedule(() => touchedThisFrame = false);
+            }
+
+            return base.OnTouchDown(e);
+        }
+
+        protected override bool OnHover(HoverEvent e)
+        {
+            if (Enabled.Value)
+            {
+                if (!touchedThisFrame && panel.ExpandedState.Value == ModCustomisationPanelState.Collapsed)
+                    panel.ExpandedState.Value = ModCustomisationPanelState.ExpandedByHover;
+            }
+
+            return base.OnHover(e);
         }
     }
 }

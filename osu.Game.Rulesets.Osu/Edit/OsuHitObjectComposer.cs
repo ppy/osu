@@ -295,6 +295,12 @@ namespace osu.Game.Rulesets.Osu.Edit
 
                 if (Vector2.Distance(closestSnapPosition, screenSpacePosition) < snapRadius)
                 {
+                    // if the snap target is a stacked object, snap to its unstacked position rather than its stacked position.
+                    // this is intended to make working with stacks easier (because thanks to this, you can drag an object to any
+                    // of the items on the stack to add an object to it, rather than having to drag to the position of the *first* object on it at all times).
+                    if (b.Item is OsuHitObject osuObject && osuObject.StackOffset != Vector2.Zero)
+                        closestSnapPosition = b.ToScreenSpace(b.ToLocalSpace(closestSnapPosition) - osuObject.StackOffset);
+
                     // only return distance portion, since time is not really valid
                     snapResult = new SnapResult(closestSnapPosition, null, playfield);
                     return true;

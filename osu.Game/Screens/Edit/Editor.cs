@@ -6,6 +6,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using osu.Framework;
@@ -159,7 +160,7 @@ namespace osu.Game.Screens.Edit
 
         private string lastSavedHash;
 
-        private Container<EditorScreen> screenContainer;
+        private ScreenContainer screenContainer;
 
         [CanBeNull]
         private readonly EditorLoader loader;
@@ -328,8 +329,8 @@ namespace osu.Game.Screens.Edit
                     {
                         Name = "Screen container",
                         RelativeSizeAxes = Axes.Both,
-                        Padding = new MarginPadding { Top = 40, Bottom = 40 },
-                        Child = screenContainer = new Container<EditorScreen>
+                        Padding = new MarginPadding { Top = 40, Bottom = 50 },
+                        Child = screenContainer = new ScreenContainer
                         {
                             RelativeSizeAxes = Axes.Both,
                         }
@@ -422,6 +423,7 @@ namespace osu.Game.Screens.Edit
                     MutationTracker,
                 }
             });
+
             changeHandler?.CanUndo.BindValueChanged(v => undoMenuItem.Action.Disabled = !v.NewValue, true);
             changeHandler?.CanRedo.BindValueChanged(v => redoMenuItem.Action.Disabled = !v.NewValue, true);
 
@@ -1007,7 +1009,7 @@ namespace osu.Game.Screens.Edit
                         throw new InvalidOperationException("Editor menu bar switched to an unsupported mode");
                 }
 
-                LoadComponentAsync(currentScreen, newScreen =>
+                screenContainer.LoadComponentAsync(currentScreen, newScreen =>
                 {
                     if (newScreen == currentScreen)
                     {
@@ -1384,6 +1386,13 @@ namespace osu.Game.Screens.Edit
                 : base(InputSettingsStrings.EditorSection, value, beatmapDisplayName)
             {
             }
+        }
+
+        private partial class ScreenContainer : Container<EditorScreen>
+        {
+            public new Task LoadComponentAsync<TLoadable>([NotNull] TLoadable component, Action<TLoadable> onLoaded = null, CancellationToken cancellation = default, Scheduler scheduler = null)
+                where TLoadable : Drawable
+                => base.LoadComponentAsync(component, onLoaded, cancellation, scheduler);
         }
     }
 }
