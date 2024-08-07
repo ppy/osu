@@ -128,6 +128,9 @@ namespace osu.Game.Online.Chat
 
         public partial class ChatTextBox : HistoryTextBox
         {
+            public Action Focus;
+            public Action FocusLost;
+
             protected override bool OnKeyDown(KeyDownEvent e)
             {
                 // Chat text boxes are generally used in places where they retain focus, but shouldn't block interaction with other
@@ -153,13 +156,18 @@ namespace osu.Game.Online.Chat
                 BackgroundFocused = new Color4(10, 10, 10, 255);
             }
 
+            protected override void OnFocus(FocusEvent e)
+            {
+                base.OnFocus(e);
+                Focus?.Invoke();
+            }
+
             protected override void OnFocusLost(FocusLostEvent e)
             {
                 base.OnFocusLost(e);
                 FocusLost?.Invoke();
             }
 
-            public Action FocusLost;
         }
 
         public partial class StandAloneDrawableChannel : DrawableChannel
