@@ -1161,7 +1161,7 @@ namespace osu.Game.Database
                     void remapKeyBindingsForVariant(int columns, bool dual)
                     {
                         // https://github.com/ppy/osu/blob/8773c2f7ebc226942d6124eb95c07a83934272ea/osu.Game.Rulesets.Mania/ManiaRuleset.cs#L327-L336
-                        int variant = dual ? 1000 + columns * 2 : columns;
+                        int variant = dual ? 1000 + (columns * 2) : columns;
 
                         var oldKeyBindingsQuery = migration.NewRealm
                                                            .All<RealmKeyBinding>()
