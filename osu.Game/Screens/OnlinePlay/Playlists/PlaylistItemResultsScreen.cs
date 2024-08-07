@@ -17,10 +17,10 @@ using osu.Game.Screens.Ranking;
 
 namespace osu.Game.Screens.OnlinePlay.Playlists
 {
-    public partial class PlaylistsResultsScreen : ResultsScreen
+    public abstract partial class PlaylistItemResultsScreen : ResultsScreen
     {
-        private readonly long roomId;
-        private readonly PlaylistItem playlistItem;
+        protected readonly long RoomId;
+        protected readonly PlaylistItem PlaylistItem;
 
         protected LoadingSpinner LeftSpinner { get; private set; } = null!;
         protected LoadingSpinner CentreSpinner { get; private set; } = null!;
@@ -30,19 +30,19 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         private MultiplayerScores? lowerScores;
 
         [Resolved]
-        private IAPIProvider api { get; set; } = null!;
+        protected IAPIProvider API { get; private set; } = null!;
 
         [Resolved]
-        private ScoreManager scoreManager { get; set; } = null!;
+        protected ScoreManager ScoreManager { get; private set; } = null!;
 
         [Resolved]
-        private RulesetStore rulesets { get; set; } = null!;
+        protected RulesetStore Rulesets { get; private set; } = null!;
 
-        public PlaylistsResultsScreen(ScoreInfo? score, long roomId, PlaylistItem playlistItem)
+        protected PlaylistItemResultsScreen(ScoreInfo? score, long roomId, PlaylistItem playlistItem)
             : base(score)
         {
-            this.roomId = roomId;
-            this.playlistItem = playlistItem;
+            RoomId = roomId;
+            PlaylistItem = playlistItem;
         }
 
         [BackgroundDependencyLoader]
@@ -74,13 +74,15 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             });
         }
 
-        protected override APIRequest FetchScores(Action<IEnumerable<ScoreInfo>> scoresCallback)
+        protected abstract APIRequest<MultiplayerScore> CreateScoreRequest();
+
+        protected sealed override APIRequest FetchScores(Action<IEnumerable<ScoreInfo>> scoresCallback)
         {
             // This performs two requests:
-            // 1. A request to show the user's score (and scores around).
+            // 1. A request to show the relevant score (and scores around).
             // 2. If that fails, a request to index the room starting from the highest score.
 
-            var userScoreReq = new ShowPlaylistUserScoreRequest(roomId, playlistItem.ID, api.LocalUser.Value.Id);
+            var userScoreReq = CreateScoreRequest();
 
             userScoreReq.Success += userScore =>
             {
@@ -111,11 +113,15 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                     setPositions(lowerScores, userScore.Position.Value, 1);
                 }
 
-                performSuccessCallback(scoresCallback, allScores);
+                Schedule(() =>
+                {
+                    PerformSuccessCallback(scoresCallback, allScores);
+                    hideLoadingSpinners();
+                });
             };
 
             // On failure, fallback to a normal index.
-            userScoreReq.Failure += _ => api.Queue(createIndexRequest(scoresCallback));
+            userScoreReq.Failure += _ => API.Queue(createIndexRequest(scoresCallback));
 
             return userScoreReq;
         }
@@ -147,8 +153,8 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         private APIRequest createIndexRequest(Action<IEnumerable<ScoreInfo>> scoresCallback, MultiplayerScores? pivot = null)
         {
             var indexReq = pivot != null
-                ? new IndexPlaylistScoresRequest(roomId, playlistItem.ID, pivot.Cursor, pivot.Params)
-                : new IndexPlaylistScoresRequest(roomId, playlistItem.ID);
+                ? new IndexPlaylistScoresRequest(RoomId, PlaylistItem.ID, pivot.Cursor, pivot.Params)
+                : new IndexPlaylistScoresRequest(RoomId, PlaylistItem.ID);
 
             indexReq.Success += r =>
             {
@@ -163,7 +169,11 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                     setPositions(r, pivot, -1);
                 }
 
-                performSuccessCallback(scoresCallback, r.Scores, r);
+                Schedule(() =>
+                {
+                    PerformSuccessCallback(scoresCallback, r.Scores, r);
+                    hideLoadingSpinners(r);
+                });
             };
 
             indexReq.Failure += _ => hideLoadingSpinners(pivot);
@@ -177,26 +187,15 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         /// <param name="callback">The callback to invoke with the final <see cref="ScoreInfo"/>s.</param>
         /// <param name="scores">The <see cref="MultiplayerScore"/>s that were retrieved from <see cref="APIRequest"/>s.</param>
         /// <param name="pivot">An optional pivot around which the scores were retrieved.</param>
-        private void performSuccessCallback(Action<IEnumerable<ScoreInfo>> callback, List<MultiplayerScore> scores, MultiplayerScores? pivot = null) => Schedule(() =>
+        protected virtual ScoreInfo[] PerformSuccessCallback(Action<IEnumerable<ScoreInfo>> callback, List<MultiplayerScore> scores, MultiplayerScores? pivot = null)
         {
-            var scoreInfos = scores.Select(s => s.CreateScoreInfo(scoreManager, rulesets, playlistItem, Beatmap.Value.BeatmapInfo)).OrderByTotalScore().ToArray();
+            var scoreInfos = scores.Select(s => s.CreateScoreInfo(ScoreManager, Rulesets, PlaylistItem, Beatmap.Value.BeatmapInfo)).OrderByTotalScore().ToArray();
 
-            // Select a score if we don't already have one selected.
-            // Note: This is done before the callback so that the panel list centres on the selected score before panels are added (eliminating initial scroll).
-            if (SelectedScore.Value == null)
-            {
-                Schedule(() =>
-                {
-                    // Prefer selecting the local user's score, or otherwise default to the first visible score.
-                    SelectedScore.Value = scoreInfos.FirstOrDefault(s => s.User.OnlineID == api.LocalUser.Value.Id) ?? scoreInfos.FirstOrDefault();
-                });
-            }
+            // Invoke callback to add the scores.
+            callback.Invoke(scoreInfos);
 
-            // Invoke callback to add the scores. Exclude the user's current score which was added previously.
-            callback.Invoke(scoreInfos.Where(s => s.OnlineID != Score?.OnlineID));
-
-            hideLoadingSpinners(pivot);
-        });
+            return scoreInfos;
+        }
 
         private void hideLoadingSpinners(MultiplayerScores? pivot = null)
         {

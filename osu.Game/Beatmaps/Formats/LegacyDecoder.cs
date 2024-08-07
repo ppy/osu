@@ -93,14 +93,8 @@ namespace osu.Game.Beatmaps.Formats
             return line;
         }
 
-        protected void HandleColours<TModel>(TModel output, string line, bool allowAlpha)
+        private Color4 convertSettingStringToColor4(string[] split, bool allowAlpha, KeyValuePair<string, string> pair)
         {
-            var pair = SplitKeyVal(line);
-
-            bool isCombo = pair.Key.StartsWith(@"Combo", StringComparison.Ordinal);
-
-            string[] split = pair.Value.Split(',');
-
             if (split.Length != 3 && split.Length != 4)
                 throw new InvalidOperationException($@"Color specified in incorrect format (should be R,G,B or R,G,B,A): {pair.Value}");
 
@@ -115,6 +109,18 @@ namespace osu.Game.Beatmaps.Formats
             {
                 throw new InvalidOperationException(@"Color must be specified with 8-bit integer components");
             }
+
+            return colour;
+        }
+
+        protected void HandleColours<TModel>(TModel output, string line, bool allowAlpha)
+        {
+            var pair = SplitKeyVal(line);
+
+            string[] split = pair.Value.Split(',');
+            Color4 colour = convertSettingStringToColor4(split, allowAlpha, pair);
+
+            bool isCombo = pair.Key.StartsWith(@"Combo", StringComparison.Ordinal);
 
             if (isCombo)
             {

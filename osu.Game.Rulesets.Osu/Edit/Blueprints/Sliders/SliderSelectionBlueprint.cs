@@ -55,7 +55,21 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         [Resolved(CanBeNull = true)]
         private BindableBeatDivisor beatDivisor { get; set; }
 
-        public override Quad SelectionQuad => BodyPiece.ScreenSpaceDrawQuad;
+        public override Quad SelectionQuad
+        {
+            get
+            {
+                var result = BodyPiece.ScreenSpaceDrawQuad.AABBFloat;
+
+                if (ControlPointVisualiser != null)
+                {
+                    foreach (var piece in ControlPointVisualiser.Pieces)
+                        result = RectangleF.Union(result, piece.ScreenSpaceDrawQuad.AABBFloat);
+                }
+
+                return result;
+            }
+        }
 
         private readonly BindableList<PathControlPoint> controlPoints = new BindableList<PathControlPoint>();
         private readonly IBindable<int> pathVersion = new Bindable<int>();

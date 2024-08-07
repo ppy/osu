@@ -21,10 +21,11 @@ namespace osu.Game.Tests.Editing
         {
             var controlPoints = new ControlPointInfo();
             controlPoints.Add(0, new TimingControlPoint { BeatLength = 500 });
-            var beatmap = new Beatmap
+            var beatmap = new EditorBeatmap(new Beatmap
             {
                 ControlPointInfo = controlPoints,
-            };
+                BeatmapInfo = { Ruleset = new OsuRuleset().RulesetInfo },
+            });
 
             var beatmapProcessor = new EditorBeatmapProcessor(beatmap, new OsuRuleset());
             beatmapProcessor.PreProcess();
@@ -38,14 +39,15 @@ namespace osu.Game.Tests.Editing
         {
             var controlPoints = new ControlPointInfo();
             controlPoints.Add(0, new TimingControlPoint { BeatLength = 500 });
-            var beatmap = new Beatmap
+            var beatmap = new EditorBeatmap(new Beatmap
             {
                 ControlPointInfo = controlPoints,
+                BeatmapInfo = { Ruleset = new OsuRuleset().RulesetInfo },
                 HitObjects =
                 {
-                    new HitCircle { StartTime = 1000 },
+                    new Note { StartTime = 1000 },
                 }
-            };
+            });
 
             var beatmapProcessor = new EditorBeatmapProcessor(beatmap, new OsuRuleset());
             beatmapProcessor.PreProcess();
@@ -59,15 +61,16 @@ namespace osu.Game.Tests.Editing
         {
             var controlPoints = new ControlPointInfo();
             controlPoints.Add(0, new TimingControlPoint { BeatLength = 500 });
-            var beatmap = new Beatmap
+            var beatmap = new EditorBeatmap(new Beatmap
             {
                 ControlPointInfo = controlPoints,
+                BeatmapInfo = { Ruleset = new OsuRuleset().RulesetInfo },
                 HitObjects =
                 {
-                    new HitCircle { StartTime = 1000 },
-                    new HitCircle { StartTime = 2000 },
+                    new Note { StartTime = 1000 },
+                    new Note { StartTime = 2000 },
                 }
-            };
+            });
 
             var beatmapProcessor = new EditorBeatmapProcessor(beatmap, new OsuRuleset());
             beatmapProcessor.PreProcess();
@@ -81,14 +84,15 @@ namespace osu.Game.Tests.Editing
         {
             var controlPoints = new ControlPointInfo();
             controlPoints.Add(0, new TimingControlPoint { BeatLength = 500 });
-            var beatmap = new Beatmap
+            var beatmap = new EditorBeatmap(new Beatmap
             {
                 ControlPointInfo = controlPoints,
+                BeatmapInfo = { Ruleset = new ManiaRuleset().RulesetInfo },
                 HitObjects =
                 {
                     new HoldNote { StartTime = 1000, Duration = 10000 },
                 }
-            };
+            });
 
             var beatmapProcessor = new EditorBeatmapProcessor(beatmap, new ManiaRuleset());
             beatmapProcessor.PreProcess();
@@ -102,16 +106,17 @@ namespace osu.Game.Tests.Editing
         {
             var controlPoints = new ControlPointInfo();
             controlPoints.Add(0, new TimingControlPoint { BeatLength = 500 });
-            var beatmap = new Beatmap
+            var beatmap = new EditorBeatmap(new Beatmap
             {
                 ControlPointInfo = controlPoints,
+                BeatmapInfo = { Ruleset = new ManiaRuleset().RulesetInfo },
                 HitObjects =
                 {
                     new HoldNote { StartTime = 1000, Duration = 10000 },
                     new Note { StartTime = 2000 },
                     new Note { StartTime = 12000 },
                 }
-            };
+            });
 
             var beatmapProcessor = new EditorBeatmapProcessor(beatmap, new ManiaRuleset());
             beatmapProcessor.PreProcess();
@@ -125,15 +130,16 @@ namespace osu.Game.Tests.Editing
         {
             var controlPoints = new ControlPointInfo();
             controlPoints.Add(0, new TimingControlPoint { BeatLength = 500 });
-            var beatmap = new Beatmap
+            var beatmap = new EditorBeatmap(new Beatmap
             {
                 ControlPointInfo = controlPoints,
+                BeatmapInfo = { Ruleset = new OsuRuleset().RulesetInfo },
                 HitObjects =
                 {
-                    new HitCircle { StartTime = 1000 },
-                    new HitCircle { StartTime = 5000 },
+                    new Note { StartTime = 1000 },
+                    new Note { StartTime = 5000 },
                 }
-            };
+            });
 
             var beatmapProcessor = new EditorBeatmapProcessor(beatmap, new OsuRuleset());
             beatmapProcessor.PreProcess();
@@ -152,20 +158,21 @@ namespace osu.Game.Tests.Editing
         {
             var controlPoints = new ControlPointInfo();
             controlPoints.Add(0, new TimingControlPoint { BeatLength = 500 });
-            var beatmap = new Beatmap
+            var beatmap = new EditorBeatmap(new Beatmap
             {
                 ControlPointInfo = controlPoints,
+                BeatmapInfo = { Ruleset = new OsuRuleset().RulesetInfo },
                 HitObjects =
                 {
-                    new HitCircle { StartTime = 1000 },
-                    new HitCircle { StartTime = 9000 },
+                    new Note { StartTime = 1000 },
+                    new Note { StartTime = 9000 },
                 },
                 Breaks =
                 {
                     new BreakPeriod(1200, 4000),
                     new BreakPeriod(5200, 8000),
                 }
-            };
+            });
 
             var beatmapProcessor = new EditorBeatmapProcessor(beatmap, new OsuRuleset());
             beatmapProcessor.PreProcess();
@@ -184,20 +191,21 @@ namespace osu.Game.Tests.Editing
         {
             var controlPoints = new ControlPointInfo();
             controlPoints.Add(0, new TimingControlPoint { BeatLength = 500 });
-            var beatmap = new Beatmap
+            var beatmap = new EditorBeatmap(new Beatmap
             {
                 ControlPointInfo = controlPoints,
+                BeatmapInfo = { Ruleset = new OsuRuleset().RulesetInfo },
                 HitObjects =
                 {
-                    new HitCircle { StartTime = 1000 },
-                    new HitCircle { StartTime = 5000 },
-                    new HitCircle { StartTime = 9000 },
+                    new Note { StartTime = 1000 },
+                    new Note { StartTime = 5000 },
+                    new Note { StartTime = 9000 },
                 },
                 Breaks =
                 {
                     new BreakPeriod(1200, 8000),
                 }
-            };
+            });
 
             var beatmapProcessor = new EditorBeatmapProcessor(beatmap, new OsuRuleset());
             beatmapProcessor.PreProcess();
@@ -218,19 +226,20 @@ namespace osu.Game.Tests.Editing
         {
             var controlPoints = new ControlPointInfo();
             controlPoints.Add(0, new TimingControlPoint { BeatLength = 500 });
-            var beatmap = new Beatmap
+            var beatmap = new EditorBeatmap(new Beatmap
             {
                 ControlPointInfo = controlPoints,
+                BeatmapInfo = { Ruleset = new OsuRuleset().RulesetInfo },
                 HitObjects =
                 {
-                    new HitCircle { StartTime = 1100 },
-                    new HitCircle { StartTime = 9000 },
+                    new Note { StartTime = 1100 },
+                    new Note { StartTime = 9000 },
                 },
                 Breaks =
                 {
                     new BreakPeriod(1200, 8000),
                 }
-            };
+            });
 
             var beatmapProcessor = new EditorBeatmapProcessor(beatmap, new OsuRuleset());
             beatmapProcessor.PreProcess();
@@ -249,20 +258,21 @@ namespace osu.Game.Tests.Editing
         {
             var controlPoints = new ControlPointInfo();
             controlPoints.Add(0, new TimingControlPoint { BeatLength = 500 });
-            var beatmap = new Beatmap
+            var beatmap = new EditorBeatmap(new Beatmap
             {
                 ControlPointInfo = controlPoints,
+                BeatmapInfo = { Ruleset = new OsuRuleset().RulesetInfo },
                 HitObjects =
                 {
-                    new HitCircle { StartTime = 1000 },
-                    new HitCircle { StartTime = 9000 },
+                    new Note { StartTime = 1000 },
+                    new Note { StartTime = 9000 },
                 },
                 Breaks =
                 {
                     new ManualBreakPeriod(1200, 4000),
                     new ManualBreakPeriod(5200, 8000),
                 }
-            };
+            });
 
             var beatmapProcessor = new EditorBeatmapProcessor(beatmap, new OsuRuleset());
             beatmapProcessor.PreProcess();
@@ -283,20 +293,21 @@ namespace osu.Game.Tests.Editing
         {
             var controlPoints = new ControlPointInfo();
             controlPoints.Add(0, new TimingControlPoint { BeatLength = 500 });
-            var beatmap = new Beatmap
+            var beatmap = new EditorBeatmap(new Beatmap
             {
                 ControlPointInfo = controlPoints,
+                BeatmapInfo = { Ruleset = new OsuRuleset().RulesetInfo },
                 HitObjects =
                 {
-                    new HitCircle { StartTime = 1000 },
-                    new HitCircle { StartTime = 5000 },
-                    new HitCircle { StartTime = 9000 },
+                    new Note { StartTime = 1000 },
+                    new Note { StartTime = 5000 },
+                    new Note { StartTime = 9000 },
                 },
                 Breaks =
                 {
                     new ManualBreakPeriod(1200, 8000),
                 }
-            };
+            });
 
             var beatmapProcessor = new EditorBeatmapProcessor(beatmap, new OsuRuleset());
             beatmapProcessor.PreProcess();
@@ -317,19 +328,20 @@ namespace osu.Game.Tests.Editing
         {
             var controlPoints = new ControlPointInfo();
             controlPoints.Add(0, new TimingControlPoint { BeatLength = 500 });
-            var beatmap = new Beatmap
+            var beatmap = new EditorBeatmap(new Beatmap
             {
                 ControlPointInfo = controlPoints,
+                BeatmapInfo = { Ruleset = new OsuRuleset().RulesetInfo },
                 HitObjects =
                 {
-                    new HitCircle { StartTime = 1000 },
-                    new HitCircle { StartTime = 9000 },
+                    new Note { StartTime = 1000 },
+                    new Note { StartTime = 9000 },
                 },
                 Breaks =
                 {
                     new ManualBreakPeriod(1200, 8800),
                 }
-            };
+            });
 
             var beatmapProcessor = new EditorBeatmapProcessor(beatmap, new OsuRuleset());
             beatmapProcessor.PreProcess();
@@ -348,19 +360,20 @@ namespace osu.Game.Tests.Editing
         {
             var controlPoints = new ControlPointInfo();
             controlPoints.Add(0, new TimingControlPoint { BeatLength = 500 });
-            var beatmap = new Beatmap
+            var beatmap = new EditorBeatmap(new Beatmap
             {
                 ControlPointInfo = controlPoints,
+                BeatmapInfo = { Ruleset = new OsuRuleset().RulesetInfo },
                 HitObjects =
                 {
-                    new HitCircle { StartTime = 1000 },
-                    new HitCircle { StartTime = 2000 },
+                    new Note { StartTime = 1000 },
+                    new Note { StartTime = 2000 },
                 },
                 Breaks =
                 {
                     new BreakPeriod(10000, 15000),
                 }
-            };
+            });
 
             var beatmapProcessor = new EditorBeatmapProcessor(beatmap, new OsuRuleset());
             beatmapProcessor.PreProcess();
@@ -374,19 +387,20 @@ namespace osu.Game.Tests.Editing
         {
             var controlPoints = new ControlPointInfo();
             controlPoints.Add(0, new TimingControlPoint { BeatLength = 500 });
-            var beatmap = new Beatmap
+            var beatmap = new EditorBeatmap(new Beatmap
             {
                 ControlPointInfo = controlPoints,
+                BeatmapInfo = { Ruleset = new OsuRuleset().RulesetInfo },
                 HitObjects =
                 {
-                    new HitCircle { StartTime = 1000 },
-                    new HitCircle { StartTime = 2000 },
+                    new Note { StartTime = 1000 },
+                    new Note { StartTime = 2000 },
                 },
                 Breaks =
                 {
                     new ManualBreakPeriod(10000, 15000),
                 }
-            };
+            });
 
             var beatmapProcessor = new EditorBeatmapProcessor(beatmap, new OsuRuleset());
             beatmapProcessor.PreProcess();
@@ -400,9 +414,10 @@ namespace osu.Game.Tests.Editing
         {
             var controlPoints = new ControlPointInfo();
             controlPoints.Add(0, new TimingControlPoint { BeatLength = 500 });
-            var beatmap = new Beatmap
+            var beatmap = new EditorBeatmap(new Beatmap
             {
                 ControlPointInfo = controlPoints,
+                BeatmapInfo = { Ruleset = new OsuRuleset().RulesetInfo },
                 HitObjects =
                 {
                     new HoldNote { StartTime = 1000, EndTime = 20000 },
@@ -412,7 +427,7 @@ namespace osu.Game.Tests.Editing
                 {
                     new ManualBreakPeriod(10000, 15000),
                 }
-            };
+            });
 
             var beatmapProcessor = new EditorBeatmapProcessor(beatmap, new OsuRuleset());
             beatmapProcessor.PreProcess();
@@ -426,19 +441,20 @@ namespace osu.Game.Tests.Editing
         {
             var controlPoints = new ControlPointInfo();
             controlPoints.Add(0, new TimingControlPoint { BeatLength = 500 });
-            var beatmap = new Beatmap
+            var beatmap = new EditorBeatmap(new Beatmap
             {
                 ControlPointInfo = controlPoints,
+                BeatmapInfo = { Ruleset = new OsuRuleset().RulesetInfo },
                 HitObjects =
                 {
-                    new HitCircle { StartTime = 10000 },
-                    new HitCircle { StartTime = 11000 },
+                    new Note { StartTime = 10000 },
+                    new Note { StartTime = 11000 },
                 },
                 Breaks =
                 {
                     new BreakPeriod(0, 9000),
                 }
-            };
+            });
 
             var beatmapProcessor = new EditorBeatmapProcessor(beatmap, new OsuRuleset());
             beatmapProcessor.PreProcess();
@@ -452,25 +468,76 @@ namespace osu.Game.Tests.Editing
         {
             var controlPoints = new ControlPointInfo();
             controlPoints.Add(0, new TimingControlPoint { BeatLength = 500 });
-            var beatmap = new Beatmap
+            var beatmap = new EditorBeatmap(new Beatmap
             {
                 ControlPointInfo = controlPoints,
+                BeatmapInfo = { Ruleset = new OsuRuleset().RulesetInfo },
                 HitObjects =
                 {
-                    new HitCircle { StartTime = 10000 },
-                    new HitCircle { StartTime = 11000 },
+                    new Note { StartTime = 10000 },
+                    new Note { StartTime = 11000 },
                 },
                 Breaks =
                 {
                     new ManualBreakPeriod(0, 9000),
                 }
-            };
+            });
 
             var beatmapProcessor = new EditorBeatmapProcessor(beatmap, new OsuRuleset());
             beatmapProcessor.PreProcess();
             beatmapProcessor.PostProcess();
 
             Assert.That(beatmap.Breaks, Is.Empty);
+        }
+
+        [Test]
+        public void TestTimePreemptIsRespected()
+        {
+            var controlPoints = new ControlPointInfo();
+            controlPoints.Add(0, new TimingControlPoint { BeatLength = 500 });
+            var beatmap = new EditorBeatmap(new Beatmap
+            {
+                ControlPointInfo = controlPoints,
+                BeatmapInfo = { Ruleset = new OsuRuleset().RulesetInfo },
+                Difficulty =
+                {
+                    ApproachRate = 10,
+                },
+                HitObjects =
+                {
+                    new HitCircle { StartTime = 1000 },
+                    new HitCircle { StartTime = 5000 },
+                }
+            });
+
+            foreach (var ho in beatmap.HitObjects)
+                ho.ApplyDefaults(beatmap.ControlPointInfo, beatmap.Difficulty);
+
+            var beatmapProcessor = new EditorBeatmapProcessor(beatmap, new OsuRuleset());
+            beatmapProcessor.PreProcess();
+            beatmapProcessor.PostProcess();
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(beatmap.Breaks, Has.Count.EqualTo(1));
+                Assert.That(beatmap.Breaks[0].StartTime, Is.EqualTo(1200));
+                Assert.That(beatmap.Breaks[0].EndTime, Is.EqualTo(5000 - OsuHitObject.PREEMPT_MIN));
+            });
+
+            beatmap.Difficulty.ApproachRate = 0;
+
+            foreach (var ho in beatmap.HitObjects)
+                ho.ApplyDefaults(beatmap.ControlPointInfo, beatmap.Difficulty);
+
+            beatmapProcessor.PreProcess();
+            beatmapProcessor.PostProcess();
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(beatmap.Breaks, Has.Count.EqualTo(1));
+                Assert.That(beatmap.Breaks[0].StartTime, Is.EqualTo(1200));
+                Assert.That(beatmap.Breaks[0].EndTime, Is.EqualTo(5000 - OsuHitObject.PREEMPT_MAX));
+            });
         }
     }
 }

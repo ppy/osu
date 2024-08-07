@@ -528,8 +528,17 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.AreEqual("Gameplay/normal-hitnormal2", getTestableSampleInfo(hitObjects[2]).LookupNames.First());
                 Assert.AreEqual("Gameplay/normal-hitnormal", getTestableSampleInfo(hitObjects[3]).LookupNames.First());
 
-                // The control point at the end time of the slider should be applied
-                Assert.AreEqual("Gameplay/soft-hitnormal8", getTestableSampleInfo(hitObjects[4]).LookupNames.First());
+                // The fourth object is a slider.
+                // `Samples` of a slider are presumed to control the volume of sounds that last the entire duration of the slider
+                // (such as ticks, slider slide sounds, etc.)
+                // Thus, the point of query of control points used for `Samples` is just beyond the start time of the slider.
+                Assert.AreEqual("Gameplay/soft-hitnormal11", getTestableSampleInfo(hitObjects[4]).LookupNames.First());
+
+                // That said, the `NodeSamples` of the slider are responsible for the sounds of the slider's head / tail / repeats / large ticks etc.
+                // Therefore, they should be read at the time instant correspondent to the given node.
+                // This means that the tail should use bank 8 rather than 11.
+                Assert.AreEqual("Gameplay/soft-hitnormal11", ((ConvertSlider)hitObjects[4]).NodeSamples[0][0].LookupNames.First());
+                Assert.AreEqual("Gameplay/soft-hitnormal8", ((ConvertSlider)hitObjects[4]).NodeSamples[1][0].LookupNames.First());
             }
 
             static HitSampleInfo getTestableSampleInfo(HitObject hitObject) => hitObject.Samples[0];
