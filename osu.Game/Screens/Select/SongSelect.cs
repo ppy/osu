@@ -505,6 +505,13 @@ namespace osu.Game.Screens.Select
             var beatmap = e?.NewValue ?? Beatmap.Value;
             if (beatmap is DummyWorkingBeatmap || !this.IsCurrentScreen()) return;
 
+            if (beatmap.BeatmapSetInfo.Protected && e != null)
+            {
+                Logger.Log($"Denying working beatmap switch to protected beatmap {beatmap}");
+                Beatmap.Value = e.OldValue;
+                return;
+            }
+
             Logger.Log($"Song select working beatmap updated to {beatmap}");
 
             if (!Carousel.SelectBeatmap(beatmap.BeatmapInfo, false))
@@ -602,7 +609,7 @@ namespace osu.Game.Screens.Select
                 // clear pending task immediately to track any potential nested debounce operation.
                 selectionChangedDebounce = null;
 
-                Logger.Log($"Song select updating selection with beatmap:{beatmap?.ID.ToString() ?? "null"} ruleset:{ruleset?.ShortName ?? "null"}");
+                Logger.Log($"Song select updating selection with beatmap: {beatmap} {beatmap?.ID.ToString() ?? "null"} ruleset:{ruleset?.ShortName ?? "null"}");
 
                 if (transferRulesetValue())
                 {

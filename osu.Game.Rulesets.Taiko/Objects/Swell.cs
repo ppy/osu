@@ -33,6 +33,7 @@ namespace osu.Game.Rulesets.Taiko.Objects
                 cancellationToken.ThrowIfCancellationRequested();
                 AddNested(new SwellTick
                 {
+                    StartTime = StartTime,
                     Samples = Samples
                 });
             }

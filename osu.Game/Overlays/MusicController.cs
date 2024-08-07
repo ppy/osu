@@ -133,7 +133,7 @@ namespace osu.Game.Overlays
                     return;
 
                 Logger.Log($"{nameof(MusicController)} skipping next track to {nameof(EnsurePlayingSomething)}");
-                NextTrack();
+                NextTrack(allowProtectedTracks: true);
             }
             else if (!IsPlaying)
             {
@@ -207,9 +207,10 @@ namespace osu.Game.Overlays
         /// Play the previous track or restart the current track if it's current time below <see cref="restart_cutoff_point"/>.
         /// </summary>
         /// <param name="onSuccess">Invoked when the operation has been performed successfully.</param>
-        public void PreviousTrack(Action<PreviousTrackResult>? onSuccess = null) => Schedule(() =>
+        /// <param name="allowProtectedTracks">Whether to include <see cref="BeatmapSetInfo.Protected"/> beatmap sets when navigating.</param>
+        public void PreviousTrack(Action<PreviousTrackResult>? onSuccess = null, bool allowProtectedTracks = false) => Schedule(() =>
         {
-            PreviousTrackResult res = prev();
+            PreviousTrackResult res = prev(allowProtectedTracks);
             if (res != PreviousTrackResult.None)
                 onSuccess?.Invoke(res);
         });
@@ -217,8 +218,9 @@ namespace osu.Game.Overlays
         /// <summary>
         /// Play the previous track or restart the current track if it's current time below <see cref="restart_cutoff_point"/>.
         /// </summary>
+        /// <param name="allowProtectedTracks">Whether to include <see cref="BeatmapSetInfo.Protected"/> beatmap sets when navigating.</param>
         /// <returns>The <see cref="PreviousTrackResult"/> that indicate the decided action.</returns>
-        private PreviousTrackResult prev()
+        private PreviousTrackResult prev(bool allowProtectedTracks)
         {
             if (beatmap.Disabled || !AllowTrackControl.Value)
                 return PreviousTrackResult.None;
@@ -233,8 +235,8 @@ namespace osu.Game.Overlays
 
             queuedDirection = TrackChangeDirection.Prev;
 
-            var playableSet = getBeatmapSets().AsEnumerable().TakeWhile(i => !i.Equals(current?.BeatmapSetInfo)).LastOrDefault()
-                              ?? getBeatmapSets().LastOrDefault();
+            var playableSet = getBeatmapSets().AsEnumerable().TakeWhile(i => !i.Equals(current?.BeatmapSetInfo)).LastOrDefault(s => !s.Protected || allowProtectedTracks)
+                              ?? getBeatmapSets().AsEnumerable().LastOrDefault(s => !s.Protected || allowProtectedTracks);
 
             if (playableSet != null)
             {
@@ -250,10 +252,11 @@ namespace osu.Game.Overlays
         /// Play the next random or playlist track.
         /// </summary>
         /// <param name="onSuccess">Invoked when the operation has been performed successfully.</param>
+        /// <param name="allowProtectedTracks">Whether to include <see cref="BeatmapSetInfo.Protected"/> beatmap sets when navigating.</param>
         /// <returns>A <see cref="ScheduledDelegate"/> of the operation.</returns>
-        public void NextTrack(Action? onSuccess = null) => Schedule(() =>
+        public void NextTrack(Action? onSuccess = null, bool allowProtectedTracks = false) => Schedule(() =>
         {
-            bool res = next();
+            bool res = next(allowProtectedTracks);
             if (res)
                 onSuccess?.Invoke();
         });
@@ -306,15 +309,15 @@ namespace osu.Game.Overlays
             Scheduler.AddDelayed(() => duckOperation.Dispose(), delayUntilRestore);
         }
 
-        private bool next()
+        private bool next(bool allowProtectedTracks)
         {
             if (beatmap.Disabled || !AllowTrackControl.Value)
                 return false;
 
             queuedDirection = TrackChangeDirection.Next;
 
-            var playableSet = getBeatmapSets().AsEnumerable().SkipWhile(i => !i.Equals(current?.BeatmapSetInfo)).ElementAtOrDefault(1)
-                              ?? getBeatmapSets().FirstOrDefault();
+            var playableSet = getBeatmapSets().AsEnumerable().SkipWhile(i => !i.Equals(current?.BeatmapSetInfo) || (i.Protected && !allowProtectedTracks)).ElementAtOrDefault(1)
+                              ?? getBeatmapSets().AsEnumerable().FirstOrDefault(i => !i.Protected || allowProtectedTracks);
 
             var playableBeatmap = playableSet?.Beatmaps.FirstOrDefault();
 
@@ -432,7 +435,7 @@ namespace osu.Game.Overlays
         private void onTrackCompleted()
         {
             if (!CurrentTrack.Looping && !beatmap.Disabled && AllowTrackControl.Value)
-                NextTrack();
+                NextTrack(allowProtectedTracks: true);
         }
 
         private bool applyModTrackAdjustments;
