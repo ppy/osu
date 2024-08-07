@@ -320,6 +320,11 @@ namespace osu.Game.Tournament.Screens.Board
 
             buttonTrapSwap.Text = CurrentMatch.Value.PendingSwaps.Any() ? @$"Free Swap (Target)" : @$"Free Swap";
 
+            if (hasTrap)
+            {
+                return;
+            }
+
             static Color4 setColour(bool active) => active ? Color4.White : Color4.Gray;
 
             switch (choiceType)
@@ -351,11 +356,6 @@ namespace osu.Game.Tournament.Screens.Board
                 default:
                     informatiomDisplayContainer.Child = new InstructionDisplay(team: teamWinner, step: DetectWin() ? Steps.FinalWin : (useEX ? Steps.EX : Steps.Default));
                     break;
-            }
-
-            if (!hasTrap && choiceType != ChoiceType.Swap)
-            {
-                informatiomDisplayContainer.Child = new InstructionDisplay();
             }
         }
 
@@ -398,6 +398,7 @@ namespace osu.Game.Tournament.Screens.Board
         {
             var maps = mapFlows.Select(f => f.FirstOrDefault(m => m.ReceivePositionalInputAt(e.ScreenSpaceMousePosition)));
             var map = maps.FirstOrDefault(m => m != null);
+
             if (map != null)
             {
                 if (e.Button == MouseButton.Left && map.Beatmap?.OnlineID > 0)
@@ -544,8 +545,6 @@ namespace osu.Game.Tournament.Screens.Board
 
                     matchTrap.IsTriggered = true;
                     hasTrap = true;
-                    informatiomDisplayContainer.FadeOut(duration: 250, easing: Easing.OutCubic);
-                    informatiomDisplayContainer.FadeInFromZero(duration: 250, easing: Easing.InCubic);
                 }
                 else
                 {
