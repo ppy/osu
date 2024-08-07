@@ -559,6 +559,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
             // If the import was for a different beatmap, pass the duty off to global handling.
             if (beatmap.BeatmapSetInfo.OnlineID != playlistItem.Beatmap.BeatmapSet!.OnlineID)
             {
+                this.Exit();
                 game?.PresentBeatmap(beatmap.BeatmapSetInfo, b => b.ID == beatmap.BeatmapInfo.ID);
             }
 
