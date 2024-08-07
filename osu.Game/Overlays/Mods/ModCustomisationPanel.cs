@@ -177,14 +177,6 @@ namespace osu.Game.Overlays.Mods
             }
         }
 
-        public void UpdateHoverExpansion(ModCustomisationPanelState state)
-        {
-            if (state > ModCustomisationPanelState.Collapsed && state <= ExpandedState.Value)
-                return;
-
-            ExpandedState.Value = state;
-        }
-
         private void updateMods()
         {
             ExpandedState.Value = ModCustomisationPanelState.Collapsed;
