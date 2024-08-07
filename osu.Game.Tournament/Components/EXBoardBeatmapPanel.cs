@@ -120,6 +120,7 @@ namespace osu.Game.Tournament.Components
                         {
                             AutoSizeAxes = Axes.Both,
                             Direction = FillDirection.Vertical,
+                            Spacing = new osuTK.Vector2(5),
                             Children = new Drawable[]
                             {
                                 new TournamentSpriteText
@@ -127,31 +128,7 @@ namespace osu.Game.Tournament.Components
                                     Text = truncatedDifficultyName,
                                     Font = OsuFont.Torus.With(weight: FontWeight.Bold, size: 23)
                                 },
-
-                                new FillFlowContainer
-                                {
-                                    AutoSizeAxes = Axes.Both,
-                                    Direction = FillDirection.Horizontal,
-                                    Margin = new MarginPadding { Left = -2, Top = 5 },
-                                    Children = new Drawable[]
-                                    {
-                                        new StarRatingDisplay(new StarDifficulty(Beatmap?.StarRating ?? 0, 0))
-
-                                        /* Hide "mapper" and mapperName display
-                                        new TournamentSpriteText
-                                        {
-                                            Text = "mapper",
-                                            Padding = new MarginPadding { Right = 5 },
-                                            Font = OsuFont.Torus.With(weight: FontWeight.Regular, size: 18)
-                                        },
-                                        new TournamentSpriteText
-                                        {
-                                            Text = Beatmap?.Metadata.Author.Username ?? "unknown",
-                                            Padding = new MarginPadding { Right = 20 },
-                                            Font = OsuFont.Torus.With(weight: FontWeight.SemiBold, size: 22)
-                                        },*/
-                                    }
-                                },
+                                new StarRatingDisplay(starDifficulty: new StarDifficulty(Beatmap?.StarRating ?? 0, 0), animated: true),
                             }
                         }
                     },
