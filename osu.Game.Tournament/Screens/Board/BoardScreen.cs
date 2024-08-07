@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
@@ -417,6 +418,7 @@ namespace osu.Game.Tournament.Screens.Board
                     if (existing != null)
                     {
                         CurrentMatch.Value?.PicksBans.Remove(existing);
+                        hasTrap = false;
                         // setNextMode();
                     }
                     else
@@ -426,6 +428,7 @@ namespace osu.Game.Tournament.Screens.Board
                         var PBTrap = CurrentMatch.Value?.PicksBans.FirstOrDefault(p => p.BeatmapID == map.Beatmap?.OnlineID && p.Type == ChoiceType.Trap);
                         if (existingProtect != null) CurrentMatch.Value?.Protects.Remove(existingProtect);
                         if (existingTrap != null) CurrentMatch.Value?.Traps.Remove(existingTrap);
+                        if (PBTrap != null) CurrentMatch.Value?.PicksBans.Remove(PBTrap);
                     }
                 }
 
@@ -531,15 +534,18 @@ namespace osu.Game.Tournament.Screens.Board
             // Show the trap description
             if (CurrentMatch.Value.Traps.Any(p => p.BeatmapID == beatmapId && !p.IsTriggered))
             {
-                var matchTrap = CurrentMatch.Value.Traps.First(p => p.BeatmapID == beatmapId && !p.IsTriggered);
+                var matchTrap = CurrentMatch.Value.Traps.FirstOrDefault(p => p.BeatmapID == beatmapId && !p.IsTriggered);
+                var PBTrap = CurrentMatch.Value.PicksBans.FirstOrDefault(p => p.BeatmapID == beatmapId && p.Type == ChoiceType.Trap);
 
-                if (pickType == ChoiceType.Pick)
+                if (pickType == ChoiceType.Pick && matchTrap != null)
                 {
                     informatiomDisplayContainer.Child = matchTrap.Team != pickColour
                         ? new TrapInfoDisplay(trap: matchTrap.Mode, team: matchTrap.Team, mapID: matchTrap.BeatmapID)
                         : new TrapInfoDisplay(trap: TrapType.Unused, team: matchTrap.Team, mapID: matchTrap.BeatmapID);
 
-                    matchTrap.IsTriggered = true;
+                    CurrentMatch.Value.Traps.Remove(matchTrap);
+                    if (PBTrap != null) CurrentMatch.Value.PicksBans.Remove(PBTrap);
+                    // matchTrap.IsTriggered = true;
                     hasTrap = true;
                 }
                 else
