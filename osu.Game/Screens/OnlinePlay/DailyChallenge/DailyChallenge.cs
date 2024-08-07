@@ -44,7 +44,7 @@ using osuTK;
 namespace osu.Game.Screens.OnlinePlay.DailyChallenge
 {
     [Cached(typeof(IPreviewTrackOwner))]
-    public partial class DailyChallenge : OsuScreen, IPreviewTrackOwner
+    public partial class DailyChallenge : OsuScreen, IPreviewTrackOwner, IHandlePresentBeatmap
     {
         private readonly Room room;
         private readonly PlaylistItem playlistItem;
@@ -545,6 +545,24 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
 
             if (metadataClient.IsNotNull())
                 metadataClient.MultiplayerRoomScoreSet -= onRoomScoreSet;
+        }
+
+        [Resolved]
+        private OsuGame? game { get; set; }
+
+        public void PresentBeatmap(WorkingBeatmap beatmap, RulesetInfo ruleset)
+        {
+            if (!this.IsCurrentScreen())
+                return;
+
+            // We can only handle the current daily challenge beatmap.
+            // If the import was for a different beatmap, pass the duty off to global handling.
+            if (beatmap.BeatmapSetInfo.OnlineID != playlistItem.Beatmap.BeatmapSet!.OnlineID)
+            {
+                game?.PresentBeatmap(beatmap.BeatmapSetInfo, b => b.ID == beatmap.BeatmapInfo.ID);
+            }
+
+            // And if we're handling, we don't really have much to do here.
         }
     }
 }
