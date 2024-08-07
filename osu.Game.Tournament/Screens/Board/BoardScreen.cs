@@ -271,9 +271,9 @@ namespace osu.Game.Tournament.Screens.Board
                         buttonTrapSwap = new TourneyButton
                         {
                             RelativeSizeAxes = Axes.X,
-                            Text = "Perform Swap",
+                            Text = "Free Swap",
                             BackgroundColour = Color4.Indigo,
-                            Action = () => setMode(TeamColour.Neutral, ChoiceType.TrapSwap)
+                            Action = () => setMode(TeamColour.Neutral, ChoiceType.Swap)
                         },
                         new ControlPanel.Spacer(),
                         buttonIndicator = new TourneyButton
@@ -326,7 +326,9 @@ namespace osu.Game.Tournament.Screens.Board
             buttonBlueWin.Colour = setColour(pickColour == TeamColour.Blue && pickType == ChoiceType.BlueWin);
             buttonRedTrap.Colour = setColour(pickColour == TeamColour.Red && pickType == ChoiceType.Trap);
             buttonBlueTrap.Colour = setColour(pickColour == TeamColour.Blue && pickType == ChoiceType.Trap);
-            buttonTrapSwap.Colour = setColour(pickType == ChoiceType.TrapSwap);
+            buttonTrapSwap.Colour = setColour(pickType == ChoiceType.Swap);
+
+            buttonTrapSwap.Text = CurrentMatch.Value.PendingSwaps.Any() ? @$"Free Swap (Target)" : @$"Free Swap";
 
             static Color4 setColour(bool active) => active ? Color4.White : Color4.Gray;
 
@@ -352,7 +354,7 @@ namespace osu.Game.Tournament.Screens.Board
                     instructionDisplayHolder.Child = new InstructionDisplay(team: pickColour, step: Steps.Win);
                     break;
 
-                case ChoiceType.TrapSwap:
+                case ChoiceType.Swap:
                     trapInfoDisplayHolder.Child = new TrapInfoDisplay(trap: TrapType.Swap);
                     instructionDisplayHolder.FadeOut(duration: 250, easing: Easing.OutCubic);
                     trapInfoDisplayHolder.FadeInFromZero(duration: 250, easing: Easing.InCubic);
@@ -363,7 +365,7 @@ namespace osu.Game.Tournament.Screens.Board
                     break;
             }
 
-            if (choiceType != ChoiceType.TrapSwap)
+            if (choiceType != ChoiceType.Swap)
             {
                 trapInfoDisplayHolder.FadeOut(duration: 250, easing: Easing.OutCubic);
                 instructionDisplayHolder.FadeInFromZero(duration: 250, easing: Easing.InCubic);
@@ -447,13 +449,17 @@ namespace osu.Game.Tournament.Screens.Board
                 if (CurrentMatch.Value != null)
                 {
                     buttonIndicator.Colour = DetectWin() ? Color4.Orange : (DetectEX() ? Color4.White : Color4.Gray);
-                    if (teamWinner != TeamColour.Neutral)
+                    bool havePendingSwap = CurrentMatch.Value.PendingSwaps.Any();
+
+                    if (teamWinner != TeamColour.Neutral && !havePendingSwap)
                     {
+                        trapInfoDisplayHolder.FadeOut(duration: 100, easing: Easing.OutCubic);
                         instructionDisplayHolder.Child = new InstructionDisplay(team: teamWinner, step: Steps.FinalWin);
                         instructionDisplayHolder.FadeInFromZero(duration: 500, easing: Easing.InCubic);
                     }
-                    else if (useEX)
+                    else if (useEX && !havePendingSwap)
                     {
+                        trapInfoDisplayHolder.FadeOut(duration: 100, easing: Easing.OutCubic);
                         instructionDisplayHolder.Child = new InstructionDisplay(step: Steps.EX);
                         instructionDisplayHolder.FadeInFromZero(duration: 200, easing: Easing.InCubic);
                     }
@@ -461,8 +467,6 @@ namespace osu.Game.Tournament.Screens.Board
                     {
                         // Restore to the last state
                         setMode(pickColour, pickType);
-                        // instructionDisplayHolder.Child = new InstructionDisplay();
-                        instructionDisplayHolder.FadeInFromZero(duration: 200, easing: Easing.InCubic);
                     }
                 }
 
@@ -550,17 +554,6 @@ namespace osu.Game.Tournament.Screens.Board
                 var matchTrap = CurrentMatch.Value.Traps.First(p => p.BeatmapID == beatmapId);
                 if (pickType == ChoiceType.Pick)
                 {
-                    // Add as a pending Swap operation
-                    if (matchTrap.Mode == TrapType.Swap)
-                    {
-                        CurrentMatch.Value.PendingSwaps.Add(new BeatmapChoice
-                        {
-                            Team = TeamColour.Neutral,
-                            Type = ChoiceType.Neutral,
-                            BeatmapID = beatmapId,
-                        });
-                    }
-
                     if (matchTrap.Team != pickColour)
                     {
                         trapInfoDisplayHolder.Child = new TrapInfoDisplay(trap: matchTrap.Mode, team: matchTrap.Team, mapID: matchTrap.BeatmapID);
@@ -583,9 +576,9 @@ namespace osu.Game.Tournament.Screens.Board
             }
 
             // Perform a Swap with the latest untriggered Swap
-            if (pickType == ChoiceType.TrapSwap)
+            if (pickType == ChoiceType.Swap)
             {
-                // Normally there should be one match.
+                // Already have one: perform a Swap
                 var source = CurrentMatch.Value.PendingSwaps.FirstOrDefault();
                 if (source != null)
                 {
@@ -593,6 +586,16 @@ namespace osu.Game.Tournament.Screens.Board
                     var targetTrap = CurrentMatch.Value.Traps.FirstOrDefault(p => (p.BeatmapID == source.BeatmapID && !p.IsTriggered));
                     if (targetTrap != null) targetTrap.IsTriggered = true;
                     SwapMap(source.BeatmapID, beatmapId);
+                }
+                else
+                {
+                    // Add as a pending Swap operation
+                    CurrentMatch.Value.PendingSwaps.Add(new BeatmapChoice
+                    {
+                        Team = TeamColour.Neutral,
+                        Type = ChoiceType.Neutral,
+                        BeatmapID = beatmapId,
+                    });
                 }
             }
 
