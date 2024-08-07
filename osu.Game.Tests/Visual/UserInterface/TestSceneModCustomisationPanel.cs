@@ -55,22 +55,26 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddStep("set DT", () =>
             {
                 SelectedMods.Value = new[] { new OsuModDoubleTime() };
-                panel.Enabled.Value = panel.Expanded = true;
+                panel.Enabled.Value = true;
+                panel.ExpandedState.Value = ModCustomisationPanel.ModCustomisationPanelState.Expanded;
             });
             AddStep("set DA", () =>
             {
                 SelectedMods.Value = new Mod[] { new OsuModDifficultyAdjust() };
-                panel.Enabled.Value = panel.Expanded = true;
+                panel.Enabled.Value = true;
+                panel.ExpandedState.Value = ModCustomisationPanel.ModCustomisationPanelState.Expanded;
             });
             AddStep("set FL+WU+DA+AD", () =>
             {
                 SelectedMods.Value = new Mod[] { new OsuModFlashlight(), new ModWindUp(), new OsuModDifficultyAdjust(), new OsuModApproachDifferent() };
-                panel.Enabled.Value = panel.Expanded = true;
+                panel.Enabled.Value = true;
+                panel.ExpandedState.Value = ModCustomisationPanel.ModCustomisationPanelState.Expanded;
             });
             AddStep("set empty", () =>
             {
                 SelectedMods.Value = Array.Empty<Mod>();
-                panel.Enabled.Value = panel.Expanded = false;
+                panel.Enabled.Value = false;
+                panel.ExpandedState.Value = ModCustomisationPanel.ModCustomisationPanelState.Collapsed;
             });
         }
 
@@ -155,7 +159,8 @@ namespace osu.Game.Tests.Visual.UserInterface
 
         private void checkExpanded(bool expanded)
         {
-            AddUntilStep(expanded ? "is expanded" : "not expanded", () => panel.Expanded, () => Is.EqualTo(expanded));
+            AddUntilStep(expanded ? "is expanded" : "not expanded", () => panel.ExpandedState.Value,
+                () => expanded ? Is.Not.EqualTo(ModCustomisationPanel.ModCustomisationPanelState.Collapsed) : Is.EqualTo(ModCustomisationPanel.ModCustomisationPanelState.Collapsed));
         }
     }
 }

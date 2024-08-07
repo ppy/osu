@@ -38,13 +38,7 @@ namespace osu.Game.Overlays.Mods
 
         public readonly BindableBool Enabled = new BindableBool();
 
-        public readonly Bindable<ModCustomisationPanelState> ExpandedState = new Bindable<ModCustomisationPanelState>(ModCustomisationPanelState.Collapsed);
-
-        public bool Expanded
-        {
-            get => ExpandedState.Value > ModCustomisationPanelState.Collapsed;
-            set => ExpandedState.Value = value ? ModCustomisationPanelState.Expanded : ModCustomisationPanelState.Collapsed;
-        }
+        public readonly Bindable<ModCustomisationPanelState> ExpandedState = new Bindable<ModCustomisationPanelState>();
 
         public Bindable<IReadOnlyList<Mod>> SelectedMods { get; } = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
 
@@ -52,9 +46,9 @@ namespace osu.Game.Overlays.Mods
 
         // Handle{Non}PositionalInput controls whether the panel should act as a blocking layer on the screen. only block when the panel is expanded.
         // These properties are used because they correctly handle blocking/unblocking hover when mouse is pointing at a drawable outside
-        // (returning Expanded.Value to OnHover or overriding Block{Non}PositionalInput doesn't work).
-        public override bool HandlePositionalInput => Expanded;
-        public override bool HandleNonPositionalInput => Expanded;
+        // (handling OnHover or overriding Block{Non}PositionalInput doesn't work).
+        public override bool HandlePositionalInput => ExpandedState.Value != ModCustomisationPanelState.Collapsed;
+        public override bool HandleNonPositionalInput => ExpandedState.Value != ModCustomisationPanelState.Collapsed;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -140,7 +134,7 @@ namespace osu.Game.Overlays.Mods
 
         protected override bool OnClick(ClickEvent e)
         {
-            Expanded = false;
+            ExpandedState.Value = ModCustomisationPanelState.Collapsed;
             return base.OnClick(e);
         }
 
@@ -153,7 +147,7 @@ namespace osu.Game.Overlays.Mods
             switch (e.Action)
             {
                 case GlobalAction.Back:
-                    Expanded = false;
+                    ExpandedState.Value = ModCustomisationPanelState.Collapsed;
                     return true;
             }
 
@@ -168,7 +162,7 @@ namespace osu.Game.Overlays.Mods
         {
             content.ClearTransforms();
 
-            if (Expanded)
+            if (ExpandedState.Value != ModCustomisationPanelState.Collapsed)
             {
                 content.AutoSizeDuration = 400;
                 content.AutoSizeEasing = Easing.OutQuint;
@@ -193,7 +187,7 @@ namespace osu.Game.Overlays.Mods
 
         private void updateMods()
         {
-            Expanded = false;
+            ExpandedState.Value = ModCustomisationPanelState.Collapsed;
             sectionsFlow.Clear();
 
             // Importantly, the selected mods bindable is already ordered by the mod select overlay (following the order of mod columns and panels).
@@ -216,10 +210,10 @@ namespace osu.Game.Overlays.Mods
 
         private partial class FocusGrabbingContainer : InputBlockingContainer
         {
-            public readonly IBindable<ModCustomisationPanelState> ExpandedState = new Bindable<ModCustomisationPanelState>(ModCustomisationPanelState.Collapsed);
+            public readonly Bindable<ModCustomisationPanelState> ExpandedState = new Bindable<ModCustomisationPanelState>();
 
-            public override bool RequestsFocus => panel.Expanded;
-            public override bool AcceptsFocus => panel.Expanded;
+            public override bool RequestsFocus => panel.ExpandedState.Value != ModCustomisationPanelState.Collapsed;
+            public override bool AcceptsFocus => panel.ExpandedState.Value != ModCustomisationPanelState.Collapsed;
 
             private readonly ModCustomisationPanel panel;
 
@@ -233,7 +227,7 @@ namespace osu.Game.Overlays.Mods
                 if (ExpandedState.Value is ModCustomisationPanelState.ExpandedByHover
                     && !ReceivePositionalInputAt(e.ScreenSpaceMousePosition))
                 {
-                    panel.UpdateHoverExpansion(ModCustomisationPanelState.Collapsed);
+                    ExpandedState.Value = ModCustomisationPanelState.Collapsed;
                 }
 
                 base.OnHoverLost(e);
