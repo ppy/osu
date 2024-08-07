@@ -206,8 +206,9 @@ namespace osu.Game.Tournament.Components
                     Origin = Anchor.Centre,
                     Margin = new MarginPadding(10),
                     Width = 60,
+                    Size = new osuTK.Vector2(80),
                     RelativeSizeAxes = Axes.Y,
-                    Position = new osuTK.Vector2(40, -17) // (x, y). Increment of x = Move right; Increment of y = Move upwards. 
+                    Position = new osuTK.Vector2(34, -18) // (x, y). Increment of x = Move right; Decrement of y = Move upwards. 
                 });
             }
         }
