@@ -247,8 +247,8 @@ namespace osu.Game.Tournament.Components
 
             bool isTrapped = currentMatch.Value.Traps.Any(p => p.BeatmapID == Beatmap?.OnlineID && !p.IsTriggered);
 
-            bool isBothTrapped = currentMatch.Value.Traps.Any(p => (p.BeatmapID == Beatmap?.OnlineID && p.Team == TeamColour.Red))
-                && currentMatch.Value.Traps.Any(p => (p.BeatmapID == Beatmap?.OnlineID && p.Team == TeamColour.Blue));
+            bool isBothTrapped = currentMatch.Value.Traps.Any(p => (p.BeatmapID == Beatmap?.OnlineID && p.Team == TeamColour.Red && !p.IsTriggered))
+                && currentMatch.Value.Traps.Any(p => (p.BeatmapID == Beatmap?.OnlineID && p.Team == TeamColour.Blue && !p.IsTriggered));
 
             var newChoice = currentMatch.Value.PicksBans.FirstOrDefault(p => p.BeatmapID == Beatmap?.OnlineID);
 

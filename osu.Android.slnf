@@ -11,6 +11,7 @@
       "osu.Game.Rulesets.Osu\\osu.Game.Rulesets.Osu.csproj",
       "osu.Game.Rulesets.Taiko.Tests.Android\\osu.Game.Rulesets.Taiko.Tests.Android.csproj",
       "osu.Game.Rulesets.Taiko\\osu.Game.Rulesets.Taiko.csproj",
+	  "osu.Game.Resources.Custom\\osu.Game.Resources.Custom.csproj",
       "osu.Game.Tests.Android\\osu.Game.Tests.Android.csproj",
       "osu.Game.Tests\\osu.Game.Tests.csproj",
       "osu.Game\\osu.Game.csproj"

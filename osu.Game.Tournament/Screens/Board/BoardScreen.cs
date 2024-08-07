@@ -51,6 +51,7 @@ namespace osu.Game.Tournament.Screens.Board
         private OsuButton buttonIndicator = null!;
 
         private bool useEX = false;
+        private bool hasTrap = false;
 
         private TrapTypeDropdown trapTypeDropdown = null!;
         private Container trapInfoDisplayHolder = null!;
@@ -365,7 +366,7 @@ namespace osu.Game.Tournament.Screens.Board
                     break;
             }
 
-            if (choiceType != ChoiceType.Swap)
+            if (!hasTrap && choiceType != ChoiceType.Swap)
             {
                 trapInfoDisplayHolder.FadeOut(duration: 250, easing: Easing.OutCubic);
                 instructionDisplayHolder.FadeInFromZero(duration: 250, easing: Easing.InCubic);
@@ -544,14 +545,14 @@ namespace osu.Game.Tournament.Screens.Board
                 // don't attempt to add if already banned and it's not a win type.
                 return;
 
-            if (CurrentMatch.Value.Protects.Any(p => p.BeatmapID == beatmapId && (pickType == ChoiceType.Ban || pickType == ChoiceType.Trap)))
+            if (CurrentMatch.Value.Protects.Any(p => p.BeatmapID == beatmapId && pickType == ChoiceType.Ban))
                 // don't attempt to ban a protected map
                 return;
 
             // Show the trap description
             if (CurrentMatch.Value.Traps.Any(p => p.BeatmapID == beatmapId && !p.IsTriggered))
             {
-                var matchTrap = CurrentMatch.Value.Traps.First(p => p.BeatmapID == beatmapId);
+                var matchTrap = CurrentMatch.Value.Traps.First(p => p.BeatmapID == beatmapId && !p.IsTriggered);
                 if (pickType == ChoiceType.Pick)
                 {
                     if (matchTrap.Team != pickColour)
@@ -562,16 +563,14 @@ namespace osu.Game.Tournament.Screens.Board
                     {
                         trapInfoDisplayHolder.Child = new TrapInfoDisplay(trap: TrapType.Unused, team: matchTrap.Team, mapID: matchTrap.BeatmapID);
                     }
+                    matchTrap.IsTriggered = true;
+                    hasTrap = true;
                     instructionDisplayHolder.FadeOut(duration: 250, easing: Easing.OutCubic);
                     trapInfoDisplayHolder.FadeInFromZero(duration: 250, easing: Easing.InCubic);
                 }
                 else
                 {
-                    // Specially designed for Swap trap: Apply then "Trigger" as done
-                    if (isPickWin && matchTrap.Mode != TrapType.Swap)
-                    {
-                        matchTrap.IsTriggered = true;
-                    }
+                    hasTrap = false;
                 }
             }
 
@@ -606,7 +605,8 @@ namespace osu.Game.Tournament.Screens.Board
                 {
                     Team = pickColour,
                     Mode = new TrapInfo().GetReversedType(trapTypeDropdown.Current.Value),
-                    BeatmapID = beatmapId
+                    BeatmapID = beatmapId,
+                    IsTriggered = false,
                 });
             }
 
@@ -621,7 +621,7 @@ namespace osu.Game.Tournament.Screens.Board
                 });
             }
 
-            if (!CurrentMatch.Value.PicksBans.Any(p => p.BeatmapID == beatmapId && p.Type == pickType))
+            if (pickType != ChoiceType.Swap && !CurrentMatch.Value.PicksBans.Any(p => p.BeatmapID == beatmapId && p.Type == pickType))
             {
                 CurrentMatch.Value.PicksBans.Add(new BeatmapChoice
                 {

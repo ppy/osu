@@ -13,6 +13,7 @@
       "osu.Game.Tests.iOS\\osu.Game.Tests.iOS.csproj",
       "osu.Game.Tests\\osu.Game.Tests.csproj",
       "osu.Game\\osu.Game.csproj",
+	  "osu.Game.Resources.Custom\\osu.Game.Resources.Custom.csproj",
       "osu.iOS\\osu.iOS.csproj"
     ]
   }
