@@ -9,8 +9,8 @@ using System.Linq;
 using System.Threading;
 using JetBrains.Annotations;
 using osu.Framework.Audio.Track;
-using osu.Framework.Bindables;
 using osu.Framework.Extensions.IEnumerableExtensions;
+using osu.Framework.Lists;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Beatmaps.Timing;
@@ -328,7 +328,12 @@ namespace osu.Game.Rulesets.Difficulty
                 set => baseBeatmap.Difficulty = value;
             }
 
-            public BindableList<BreakPeriod> Breaks => baseBeatmap.Breaks;
+            public SortedList<BreakPeriod> Breaks
+            {
+                get => baseBeatmap.Breaks;
+                set => baseBeatmap.Breaks = value;
+            }
+
             public List<string> UnhandledEventLines => baseBeatmap.UnhandledEventLines;
 
             public double TotalBreakTime => baseBeatmap.TotalBreakTime;
