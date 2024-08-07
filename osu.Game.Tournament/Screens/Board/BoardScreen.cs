@@ -320,11 +320,6 @@ namespace osu.Game.Tournament.Screens.Board
 
             buttonTrapSwap.Text = CurrentMatch.Value.PendingSwaps.Any() ? @$"Free Swap (Target)" : @$"Free Swap";
 
-            if (hasTrap)
-            {
-                return;
-            }
-
             static Color4 setColour(bool active) => active ? Color4.White : Color4.Gray;
 
             switch (choiceType)
@@ -428,6 +423,7 @@ namespace osu.Game.Tournament.Screens.Board
                     {
                         var existingProtect = CurrentMatch.Value?.Protects.FirstOrDefault(p => p.BeatmapID == map.Beatmap?.OnlineID);
                         var existingTrap = CurrentMatch.Value?.Traps.FirstOrDefault(p => p.BeatmapID == map.Beatmap?.OnlineID);
+                        var PBTrap = CurrentMatch.Value?.PicksBans.FirstOrDefault(p => p.BeatmapID == map.Beatmap?.OnlineID && p.Type == ChoiceType.Trap);
                         if (existingProtect != null) CurrentMatch.Value?.Protects.Remove(existingProtect);
                         if (existingTrap != null) CurrentMatch.Value?.Traps.Remove(existingTrap);
                     }
@@ -447,7 +443,7 @@ namespace osu.Game.Tournament.Screens.Board
                     {
                         informatiomDisplayContainer.Child = new InstructionDisplay(step: Steps.EX);
                     }
-                    else
+                    else if (!hasTrap)
                     {
                         // Restore to the last state
                         setMode(pickColour, pickType);
