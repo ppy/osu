@@ -107,7 +107,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             KeyCounter counter = null!;
 
             loadPlayer(() => new ManiaRuleset());
-            AddStep("get key counter", () => counter = this.ChildrenOfType<KeyCounter>().Single(k => k.Trigger is KeyCounterActionTrigger<ManiaAction> actionTrigger && actionTrigger.Action == ManiaAction.Special1));
+            AddStep("get key counter", () => counter = this.ChildrenOfType<KeyCounter>().Single(k => k.Trigger is KeyCounterActionTrigger<ManiaAction> actionTrigger && actionTrigger.Action == ManiaAction.Key4));
             checkKey(() => counter, 0, false);
 
             AddStep("press space", () => InputManager.PressKey(Key.Space));
@@ -174,7 +174,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             KeyCounter counter = null!;
 
             loadPlayer(() => new ManiaRuleset());
-            AddStep("get key counter", () => counter = this.ChildrenOfType<KeyCounter>().Single(k => k.Trigger is KeyCounterActionTrigger<ManiaAction> actionTrigger && actionTrigger.Action == ManiaAction.Special1));
+            AddStep("get key counter", () => counter = this.ChildrenOfType<KeyCounter>().Single(k => k.Trigger is KeyCounterActionTrigger<ManiaAction> actionTrigger && actionTrigger.Action == ManiaAction.Key4));
 
             AddStep("press space", () => InputManager.PressKey(Key.Space));
             AddStep("pause", () => Player.Pause());
@@ -237,7 +237,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             KeyCounter counter = null!;
 
             loadPlayer(() => new ManiaRuleset());
-            AddStep("get key counter", () => counter = this.ChildrenOfType<KeyCounter>().Single(k => k.Trigger is KeyCounterActionTrigger<ManiaAction> actionTrigger && actionTrigger.Action == ManiaAction.Special1));
+            AddStep("get key counter", () => counter = this.ChildrenOfType<KeyCounter>().Single(k => k.Trigger is KeyCounterActionTrigger<ManiaAction> actionTrigger && actionTrigger.Action == ManiaAction.Key4));
 
             AddStep("press space", () => InputManager.PressKey(Key.Space));
             checkKey(() => counter, 1, true);
