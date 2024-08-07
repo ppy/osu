@@ -110,12 +110,7 @@ namespace osu.Game.Screens.Ranking
         private Drawable middleLayerBackground = null!;
         private Container middleLayerContentContainer = null!;
         private Drawable? middleLayerContent;
-
-        /**
-         * Used for preventing the applause sound from stopping when the panel is contracted
-         * Only used when isNewLocalScore is true
-         */
-        private Drawable? expandedPanelMiddleContent;
+        private ExpandedPanelMiddleContent? expandedPanelMiddleContent;
 
         private ScorePanelTrackingContainer? trackingContainer;
 
@@ -247,6 +242,9 @@ namespace osu.Game.Screens.Ranking
         {
             topLayerContent?.FadeOut(content_fade_duration).Expire();
 
+            // we do not want to be expiring panels with flair when they contract,
+            // since they may have associated sound effects,
+            // which would be potentially cut short if we did so.
             if (!displayWithFlair || state != PanelState.Contracted)
                 middleLayerContent?.FadeOut(content_fade_duration).Expire();
 
@@ -261,12 +259,18 @@ namespace osu.Game.Screens.Ranking
                     bool firstLoad = topLayerContent == null;
                     topLayerContentContainer.Add(topLayerContent = new ExpandedPanelTopContent(Score.User, firstLoad) { Alpha = 0 });
 
+                    // the panel is being displayed with flair, and the expanded content is available from an earlier display
+                    // (it was preserved to make sure audio effects play out).
+                    // therefore, just reuse it again rather than reinstantiating.
                     if (displayWithFlair && expandedPanelMiddleContent != null)
                         expandedPanelMiddleContent?.Show();
                     else
                     {
-                        middleLayerContentContainer.Add(expandedPanelMiddleContent = middleLayerContent = new ExpandedPanelMiddleContent(Score, displayWithFlair) { Alpha = 0 });
-                        if (expandedPanelMiddleContent != null) expandedPanelMiddleContent.AlwaysPresent = true;
+                        middleLayerContentContainer.Add(middleLayerContent = expandedPanelMiddleContent = new ExpandedPanelMiddleContent(Score, displayWithFlair)
+                        {
+                            Alpha = 0,
+                            AlwaysPresent = true,
+                        });
                     }
 
                     break;
