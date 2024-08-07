@@ -167,7 +167,6 @@ namespace osu.Game.Online.Chat
                 base.OnFocusLost(e);
                 FocusLost?.Invoke();
             }
-
         }
 
         public partial class StandAloneDrawableChannel : DrawableChannel
