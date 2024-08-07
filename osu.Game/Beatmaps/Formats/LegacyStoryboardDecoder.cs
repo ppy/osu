@@ -43,7 +43,7 @@ namespace osu.Game.Beatmaps.Formats
             base.ParseStreamInto(stream, storyboard);
         }
 
-        protected override void ParseLine(Storyboard storyboard, Section section, string line)
+        protected override void ParseLine(Storyboard storyboard, Section section, ReadOnlySpan<char> line)
         {
             switch (section)
             {
@@ -63,49 +63,42 @@ namespace osu.Game.Beatmaps.Formats
             base.ParseLine(storyboard, section, line);
         }
 
-        private void handleGeneral(Storyboard storyboard, string line)
+        private void handleGeneral(Storyboard storyboard, ReadOnlySpan<char> line)
         {
             var pair = SplitKeyVal(line);
 
             switch (pair.Key)
             {
                 case "UseSkinSprites":
-                    storyboard.UseSkinSprites = pair.Value == "1";
+                    storyboard.UseSkinSprites = pair.Value is "1";
                     break;
             }
         }
 
-        private void handleEvents(string line)
+        private void handleEvents(ReadOnlySpan<char> line)
         {
-            decodeVariables(ref line);
+            line = decodeVariables(line);
 
-            int depth = 0;
+            int depth = line.IndexOfAnyExcept(' ', '_');
 
-            foreach (char c in line)
-            {
-                if (c == ' ' || c == '_')
-                    depth++;
-                else
-                    break;
-            }
+            line = line.Slice(depth);
 
-            line = line.Substring(depth);
-
-            string[] split = line.Split(',');
+            Span<Range> ranges = stackalloc Range[11];
+            int splitCount = line.Split(ranges, ',');
 
             if (depth == 0)
             {
                 storyboardSprite = null;
 
-                if (!Enum.TryParse(split[0], out LegacyEventType type))
-                    throw new InvalidDataException($@"Unknown event type: {split[0]}");
+                if (!Enum.TryParse(line[ranges[0]], out LegacyEventType type))
+                    throw new InvalidDataException($@"Unknown event type: {line[ranges[0]]}");
 
                 switch (type)
                 {
                     case LegacyEventType.Video:
                     {
-                        int offset = Parsing.ParseInt(split[1]);
-                        string path = CleanFilename(split[2]);
+                        int offset = Parsing.ParseInt(line[ranges[1]]);
+                        string path = CleanFilename(line[ranges[2]]);
 
                         // See handling in LegacyBeatmapDecoder for the special case where a video type is used but
                         // the file extension is not a valid video.
@@ -121,11 +114,11 @@ namespace osu.Game.Beatmaps.Formats
 
                     case LegacyEventType.Sprite:
                     {
-                        string layer = parseLayer(split[1]);
-                        var origin = parseOrigin(split[2]);
-                        string path = CleanFilename(split[3]);
-                        float x = Parsing.ParseFloat(split[4], Parsing.MAX_COORDINATE_VALUE);
-                        float y = Parsing.ParseFloat(split[5], Parsing.MAX_COORDINATE_VALUE);
+                        string layer = parseLayer(line[ranges[1]]);
+                        var origin = parseOrigin(line[ranges[2]]);
+                        string path = CleanFilename(line[ranges[3]]);
+                        float x = Parsing.ParseFloat(line[ranges[4]], Parsing.MAX_COORDINATE_VALUE);
+                        float y = Parsing.ParseFloat(line[ranges[5]], Parsing.MAX_COORDINATE_VALUE);
                         storyboardSprite = new StoryboardSprite(path, origin, new Vector2(x, y));
                         storyboard.GetLayer(layer).Add(storyboardSprite);
                         break;
@@ -133,19 +126,19 @@ namespace osu.Game.Beatmaps.Formats
 
                     case LegacyEventType.Animation:
                     {
-                        string layer = parseLayer(split[1]);
-                        var origin = parseOrigin(split[2]);
-                        string path = CleanFilename(split[3]);
-                        float x = Parsing.ParseFloat(split[4], Parsing.MAX_COORDINATE_VALUE);
-                        float y = Parsing.ParseFloat(split[5], Parsing.MAX_COORDINATE_VALUE);
-                        int frameCount = Parsing.ParseInt(split[6]);
-                        double frameDelay = Parsing.ParseDouble(split[7]);
+                        string layer = parseLayer(line[ranges[1]]);
+                        var origin = parseOrigin(line[ranges[2]]);
+                        string path = CleanFilename(line[ranges[3]]);
+                        float x = Parsing.ParseFloat(line[ranges[4]], Parsing.MAX_COORDINATE_VALUE);
+                        float y = Parsing.ParseFloat(line[ranges[5]], Parsing.MAX_COORDINATE_VALUE);
+                        int frameCount = Parsing.ParseInt(line[ranges[6]]);
+                        double frameDelay = Parsing.ParseDouble(line[ranges[7]]);
 
                         if (FormatVersion < 6)
                             // this is random as hell but taken straight from osu-stable.
                             frameDelay = Math.Round(0.015 * frameDelay) * 1.186 * (1000 / 60f);
 
-                        var loopType = split.Length > 8 ? parseAnimationLoopType(split[8]) : AnimationLoopType.LoopForever;
+                        var loopType = splitCount > 8 ? parseAnimationLoopType(line[ranges[8]]) : AnimationLoopType.LoopForever;
                         storyboardSprite = new StoryboardAnimation(path, origin, new Vector2(x, y), frameCount, frameDelay, loopType);
                         storyboard.GetLayer(layer).Add(storyboardSprite);
                         break;
@@ -153,10 +146,10 @@ namespace osu.Game.Beatmaps.Formats
 
                     case LegacyEventType.Sample:
                     {
-                        double time = Parsing.ParseDouble(split[1]);
-                        string layer = parseLayer(split[2]);
-                        string path = CleanFilename(split[3]);
-                        float volume = split.Length > 4 ? Parsing.ParseFloat(split[4]) : 100;
+                        double time = Parsing.ParseDouble(line[ranges[1]]);
+                        string layer = parseLayer(line[ranges[2]]);
+                        string path = CleanFilename(line[ranges[3]]);
+                        float volume = splitCount > 4 ? Parsing.ParseFloat(line[ranges[4]]) : 100;
                         storyboard.GetLayer(layer).Add(new StoryboardSampleInfo(path, time, (int)volume));
                         break;
                     }
@@ -167,79 +160,79 @@ namespace osu.Game.Beatmaps.Formats
                 if (depth < 2)
                     currentCommandsGroup = storyboardSprite?.Commands;
 
-                string commandType = split[0];
+                ReadOnlySpan<char> commandType = line[ranges[0]];
 
                 switch (commandType)
                 {
                     case "T":
                     {
-                        string triggerName = split[1];
-                        double startTime = split.Length > 2 ? Parsing.ParseDouble(split[2]) : double.MinValue;
-                        double endTime = split.Length > 3 ? Parsing.ParseDouble(split[3]) : double.MaxValue;
-                        int groupNumber = split.Length > 4 ? Parsing.ParseInt(split[4]) : 0;
+                        string triggerName = line[ranges[1]].ToString();
+                        double startTime = splitCount > 2 ? Parsing.ParseDouble(line[ranges[2]]) : double.MinValue;
+                        double endTime = splitCount > 3 ? Parsing.ParseDouble(line[ranges[3]]) : double.MaxValue;
+                        int groupNumber = splitCount > 4 ? Parsing.ParseInt(line[ranges[4]]) : 0;
                         currentCommandsGroup = storyboardSprite?.AddTriggerGroup(triggerName, startTime, endTime, groupNumber);
                         break;
                     }
 
                     case "L":
                     {
-                        double startTime = Parsing.ParseDouble(split[1]);
-                        int repeatCount = Parsing.ParseInt(split[2]);
+                        double startTime = Parsing.ParseDouble(line[ranges[1]]);
+                        int repeatCount = Parsing.ParseInt(line[ranges[2]]);
                         currentCommandsGroup = storyboardSprite?.AddLoopingGroup(startTime, Math.Max(0, repeatCount - 1));
                         break;
                     }
 
                     default:
                     {
-                        if (string.IsNullOrEmpty(split[3]))
-                            split[3] = split[2];
+                        if (line[ranges[3]].IsEmpty)
+                            ranges[3] = ranges[2];
 
-                        var easing = (Easing)Parsing.ParseInt(split[1]);
-                        double startTime = Parsing.ParseDouble(split[2]);
-                        double endTime = Parsing.ParseDouble(split[3]);
+                        var easing = (Easing)Parsing.ParseInt(line[ranges[1]]);
+                        double startTime = Parsing.ParseDouble(line[ranges[2]]);
+                        double endTime = Parsing.ParseDouble(line[ranges[3]]);
 
                         switch (commandType)
                         {
                             case "F":
                             {
-                                float startValue = Parsing.ParseFloat(split[4]);
-                                float endValue = split.Length > 5 ? Parsing.ParseFloat(split[5]) : startValue;
+                                float startValue = Parsing.ParseFloat(line[ranges[4]]);
+                                float endValue = splitCount > 5 ? Parsing.ParseFloat(line[ranges[5]]) : startValue;
                                 currentCommandsGroup?.AddAlpha(easing, startTime, endTime, startValue, endValue);
                                 break;
                             }
 
                             case "S":
                             {
-                                float startValue = Parsing.ParseFloat(split[4]);
-                                float endValue = split.Length > 5 ? Parsing.ParseFloat(split[5]) : startValue;
+                                float startValue = Parsing.ParseFloat(line[ranges[4]]);
+                                float endValue = splitCount > 5 ? Parsing.ParseFloat(line[ranges[5]]) : startValue;
                                 currentCommandsGroup?.AddScale(easing, startTime, endTime, startValue, endValue);
                                 break;
                             }
 
                             case "V":
                             {
-                                float startX = Parsing.ParseFloat(split[4]);
-                                float startY = Parsing.ParseFloat(split[5]);
-                                float endX = split.Length > 6 ? Parsing.ParseFloat(split[6]) : startX;
-                                float endY = split.Length > 7 ? Parsing.ParseFloat(split[7]) : startY;
+                                float startX = Parsing.ParseFloat(line[ranges[4]]);
+                                float startY = Parsing.ParseFloat(line[ranges[5]]);
+                                float endX = splitCount > 6 ? Parsing.ParseFloat(line[ranges[6]]) : startX;
+                                float endY = splitCount > 7 ? Parsing.ParseFloat(line[ranges[7]]) : startY;
                                 currentCommandsGroup?.AddVectorScale(easing, startTime, endTime, new Vector2(startX, startY), new Vector2(endX, endY));
                                 break;
                             }
 
                             case "R":
                             {
-                                float startValue = Parsing.ParseFloat(split[4]);
-                                float endValue = split.Length > 5 ? Parsing.ParseFloat(split[5]) : startValue;
+                                float startValue = Parsing.ParseFloat(line[ranges[4]]);
+                                float endValue = splitCount > 5 ? Parsing.ParseFloat(line[ranges[5]]) : startValue;
                                 currentCommandsGroup?.AddRotation(easing, startTime, endTime, float.RadiansToDegrees(startValue), float.RadiansToDegrees(endValue));
                                 break;
                             }
 
                             case "M":
                             {
-                                float startX = Parsing.ParseFloat(split[4]);
-                                float startY = Parsing.ParseFloat(split[5]);
-                                float endX = split.Length > 6 ? Parsing.ParseFloat(split[6]) : startX;
-                                float endY = split.Length > 7 ? Parsing.ParseFloat(split[7]) : startY;
+                                float startX = Parsing.ParseFloat(line[ranges[4]]);
+                                float startY = Parsing.ParseFloat(line[ranges[5]]);
+                                float endX = splitCount > 6 ? Parsing.ParseFloat(line[ranges[6]]) : startX;
+                                float endY = splitCount > 7 ? Parsing.ParseFloat(line[ranges[7]]) : startY;
                                 currentCommandsGroup?.AddX(easing, startTime, endTime, startX, endX);
                                 currentCommandsGroup?.AddY(easing, startTime, endTime, startY, endY);
                                 break;
@@ -247,28 +240,28 @@ namespace osu.Game.Beatmaps.Formats
 
                             case "MX":
                             {
-                                float startValue = Parsing.ParseFloat(split[4]);
-                                float endValue = split.Length > 5 ? Parsing.ParseFloat(split[5]) : startValue;
+                                float startValue = Parsing.ParseFloat(line[ranges[4]]);
+                                float endValue = splitCount > 5 ? Parsing.ParseFloat(line[ranges[5]]) : startValue;
                                 currentCommandsGroup?.AddX(easing, startTime, endTime, startValue, endValue);
                                 break;
                             }
 
                             case "MY":
                             {
-                                float startValue = Parsing.ParseFloat(split[4]);
-                                float endValue = split.Length > 5 ? Parsing.ParseFloat(split[5]) : startValue;
+                                float startValue = Parsing.ParseFloat(line[ranges[4]]);
+                                float endValue = splitCount > 5 ? Parsing.ParseFloat(line[ranges[5]]) : startValue;
                                 currentCommandsGroup?.AddY(easing, startTime, endTime, startValue, endValue);
                                 break;
                             }
 
                             case "C":
                             {
-                                float startRed = Parsing.ParseFloat(split[4]);
-                                float startGreen = Parsing.ParseFloat(split[5]);
-                                float startBlue = Parsing.ParseFloat(split[6]);
-                                float endRed = split.Length > 7 ? Parsing.ParseFloat(split[7]) : startRed;
-                                float endGreen = split.Length > 8 ? Parsing.ParseFloat(split[8]) : startGreen;
-                                float endBlue = split.Length > 9 ? Parsing.ParseFloat(split[9]) : startBlue;
+                                float startRed = Parsing.ParseFloat(line[ranges[4]]);
+                                float startGreen = Parsing.ParseFloat(line[ranges[5]]);
+                                float startBlue = Parsing.ParseFloat(line[ranges[6]]);
+                                float endRed = splitCount > 7 ? Parsing.ParseFloat(line[ranges[7]]) : startRed;
+                                float endGreen = splitCount > 8 ? Parsing.ParseFloat(line[ranges[8]]) : startGreen;
+                                float endBlue = splitCount > 9 ? Parsing.ParseFloat(line[ranges[9]]) : startBlue;
                                 currentCommandsGroup?.AddColour(easing, startTime, endTime,
                                     new Color4(startRed / 255f, startGreen / 255f, startBlue / 255f, 1),
                                     new Color4(endRed / 255f, endGreen / 255f, endBlue / 255f, 1));
@@ -277,7 +270,7 @@ namespace osu.Game.Beatmaps.Formats
 
                             case "P":
                             {
-                                string type = split[4];
+                                ReadOnlySpan<char> type = line[ranges[4]];
 
                                 switch (type)
                                 {
@@ -308,9 +301,9 @@ namespace osu.Game.Beatmaps.Formats
             }
         }
 
-        private string parseLayer(string value) => Enum.Parse<LegacyStoryLayer>(value).ToString();
+        private string parseLayer(ReadOnlySpan<char> value) => Enum.Parse<LegacyStoryLayer>(value).ToString();
 
-        private Anchor parseOrigin(string value)
+        private Anchor parseOrigin(ReadOnlySpan<char> value)
         {
             var origin = Enum.Parse<LegacyOrigins>(value);
 
@@ -348,34 +341,36 @@ namespace osu.Game.Beatmaps.Formats
             }
         }
 
-        private AnimationLoopType parseAnimationLoopType(string value)
+        private AnimationLoopType parseAnimationLoopType(ReadOnlySpan<char> value)
         {
             var parsed = Enum.Parse<AnimationLoopType>(value);
             return Enum.IsDefined(parsed) ? parsed : AnimationLoopType.LoopForever;
         }
 
-        private void handleVariables(string line)
+        private void handleVariables(ReadOnlySpan<char> line)
         {
             var pair = SplitKeyVal(line, '=', false);
-            variables[pair.Key] = pair.Value;
+            variables[pair.Key.ToString()] = pair.Value.ToString();
         }
 
         /// <summary>
         /// Decodes any beatmap variables present in a line into their real values.
         /// </summary>
         /// <param name="line">The line which may contains variables.</param>
-        private void decodeVariables(ref string line)
+        private ReadOnlySpan<char> decodeVariables(ReadOnlySpan<char> line)
         {
             while (line.Contains('$'))
             {
-                string origLine = line;
+                ReadOnlySpan<char> origLine = line.ToString();
 
                 foreach (var v in variables)
-                    line = line.Replace(v.Key, v.Value);
+                    line = line.ToString().Replace(v.Key, v.Value);
 
-                if (line == origLine)
+                if (line.SequenceEqual(origLine))
                     break;
             }
+
+            return line;
         }
     }
 }

@@ -31,7 +31,7 @@ namespace osu.Game.Skinning
             currentConfig = null;
         }
 
-        protected override void ParseLine(List<LegacyManiaSkinConfiguration> output, Section section, string line)
+        protected override void ParseLine(List<LegacyManiaSkinConfiguration> output, Section section, ReadOnlySpan<char> line)
         {
             switch (section)
             {
@@ -52,7 +52,7 @@ namespace osu.Game.Skinning
                             break;
 
                         default:
-                            pendingLines.Add(line);
+                            pendingLines.Add(line.ToString());
 
                             // Hold all lines until a "Keys" item is found.
                             if (currentConfig != null)
@@ -99,11 +99,11 @@ namespace osu.Game.Skinning
                         break;
 
                     case "JudgementLine":
-                        currentConfig.ShowJudgementLine = pair.Value == "1";
+                        currentConfig.ShowJudgementLine = pair.Value is "1";
                         break;
 
                     case "KeysUnderNotes":
-                        currentConfig.KeysUnderNotes = pair.Value == "1";
+                        currentConfig.KeysUnderNotes = pair.Value is "1";
                         break;
 
                     case "LightingNWidth":
@@ -128,17 +128,17 @@ namespace osu.Game.Skinning
                         currentConfig.LightFramePerSecond = lightFramePerSecond > 0 ? lightFramePerSecond : 24;
                         break;
 
-                    case string when pair.Key.StartsWith("Colour", StringComparison.Ordinal):
+                    case { } when pair.Key.StartsWith("Colour", StringComparison.Ordinal):
                         HandleColours(currentConfig, line, true);
                         break;
 
                     // Custom sprite paths
-                    case string when pair.Key.StartsWith("NoteImage", StringComparison.Ordinal):
-                    case string when pair.Key.StartsWith("KeyImage", StringComparison.Ordinal):
-                    case string when pair.Key.StartsWith("Hit", StringComparison.Ordinal):
-                    case string when pair.Key.StartsWith("Stage", StringComparison.Ordinal):
-                    case string when pair.Key.StartsWith("Lighting", StringComparison.Ordinal):
-                        currentConfig.ImageLookups[pair.Key] = pair.Value;
+                    case { } when pair.Key.StartsWith("NoteImage", StringComparison.Ordinal):
+                    case { } when pair.Key.StartsWith("KeyImage", StringComparison.Ordinal):
+                    case { } when pair.Key.StartsWith("Hit", StringComparison.Ordinal):
+                    case { } when pair.Key.StartsWith("Stage", StringComparison.Ordinal):
+                    case { } when pair.Key.StartsWith("Lighting", StringComparison.Ordinal):
+                        currentConfig.ImageLookups[pair.Key.ToString()] = pair.Value.ToString();
                         break;
                 }
             }
@@ -146,16 +146,18 @@ namespace osu.Game.Skinning
             pendingLines.Clear();
         }
 
-        private void parseArrayValue(string value, float[] output, bool applyScaleFactor = true)
+        private void parseArrayValue(ReadOnlySpan<char> value, float[] output, bool applyScaleFactor = true)
         {
-            string[] values = value.Split(',');
+            int valuesCount = value.Count(',') + 1;
+            Span<Range> ranges = valuesCount <= 256 ? stackalloc Range[valuesCount] : new Range[valuesCount];
+            value.Split(ranges, ',');
 
-            for (int i = 0; i < values.Length; i++)
+            for (int i = 0; i < ranges.Length; i++)
             {
                 if (i >= output.Length)
                     break;
 
-                if (!float.TryParse(values[i], NumberStyles.Float, CultureInfo.InvariantCulture, out float parsedValue))
+                if (!float.TryParse(value[ranges[i]], NumberStyles.Float, CultureInfo.InvariantCulture, out float parsedValue))
                     // some skins may provide incorrect entries in array values. to match stable behaviour, read such entries as zero.
                     // see: https://github.com/ppy/osu/issues/26464, stable code: https://github.com/peppy/osu-stable-reference/blob/3ea48705eb67172c430371dcfc8a16a002ed0d3d/osu!/Graphics/Skinning/Components/Section.cs#L134-L137
                     parsedValue = 0;

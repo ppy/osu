@@ -192,7 +192,7 @@ namespace osu.Game.Beatmaps.Formats
             beatmapInfo.SamplesMatchPlaybackRate = false;
         }
 
-        protected override void ParseLine(Beatmap beatmap, Section section, string line)
+        protected override void ParseLine(Beatmap beatmap, Section section, ReadOnlySpan<char> line)
         {
             switch (section)
             {
@@ -228,7 +228,7 @@ namespace osu.Game.Beatmaps.Formats
             base.ParseLine(beatmap, section, line);
         }
 
-        private void handleGeneral(string line)
+        private void handleGeneral(ReadOnlySpan<char> line)
         {
             var pair = SplitKeyVal(line);
 
@@ -237,7 +237,7 @@ namespace osu.Game.Beatmaps.Formats
             switch (pair.Key)
             {
                 case @"AudioFilename":
-                    metadata.AudioFile = pair.Value.ToStandardisedPath();
+                    metadata.AudioFile = pair.Value.ToString().ToStandardisedPath();
                     break;
 
                 case @"AudioLeadIn":
@@ -317,14 +317,14 @@ namespace osu.Game.Beatmaps.Formats
             }
         }
 
-        private void handleEditor(string line)
+        private void handleEditor(ReadOnlySpan<char> line)
         {
             var pair = SplitKeyVal(line);
 
             switch (pair.Key)
             {
                 case @"Bookmarks":
-                    beatmap.BeatmapInfo.Bookmarks = pair.Value.Split(',').Select(v =>
+                    beatmap.BeatmapInfo.Bookmarks = pair.Value.ToString().Split(',').Select(v =>
                     {
                         bool result = int.TryParse(v, out int val);
                         return new { result, val };
@@ -349,7 +349,7 @@ namespace osu.Game.Beatmaps.Formats
             }
         }
 
-        private void handleMetadata(string line)
+        private void handleMetadata(ReadOnlySpan<char> line)
         {
             var pair = SplitKeyVal(line);
 
@@ -358,35 +358,35 @@ namespace osu.Game.Beatmaps.Formats
             switch (pair.Key)
             {
                 case @"Title":
-                    metadata.Title = pair.Value;
+                    metadata.Title = pair.Value.ToString();
                     break;
 
                 case @"TitleUnicode":
-                    metadata.TitleUnicode = pair.Value;
+                    metadata.TitleUnicode = pair.Value.ToString();
                     break;
 
                 case @"Artist":
-                    metadata.Artist = pair.Value;
+                    metadata.Artist = pair.Value.ToString();
                     break;
 
                 case @"ArtistUnicode":
-                    metadata.ArtistUnicode = pair.Value;
+                    metadata.ArtistUnicode = pair.Value.ToString();
                     break;
 
                 case @"Creator":
-                    metadata.Author.Username = pair.Value;
+                    metadata.Author.Username = pair.Value.ToString();
                     break;
 
                 case @"Version":
-                    beatmap.BeatmapInfo.DifficultyName = pair.Value;
+                    beatmap.BeatmapInfo.DifficultyName = pair.Value.ToString();
                     break;
 
                 case @"Source":
-                    metadata.Source = pair.Value;
+                    metadata.Source = pair.Value.ToString();
                     break;
 
                 case @"Tags":
-                    metadata.Tags = pair.Value;
+                    metadata.Tags = pair.Value.ToString();
                     break;
 
                 case @"BeatmapID":
@@ -399,7 +399,7 @@ namespace osu.Game.Beatmaps.Formats
             }
         }
 
-        private void handleDifficulty(string line)
+        private void handleDifficulty(ReadOnlySpan<char> line)
         {
             var pair = SplitKeyVal(line);
 
@@ -436,15 +436,16 @@ namespace osu.Game.Beatmaps.Formats
             }
         }
 
-        private void handleEvent(string line)
+        private void handleEvent(ReadOnlySpan<char> line)
         {
-            string[] split = line.Split(',');
+            Span<Range> ranges = stackalloc Range[5];
+            line.Split(ranges, ',');
 
             // Until we have full storyboard encoder coverage, let's track any lines which aren't handled
             // and store them to a temporary location such that they aren't lost on editor save / export.
             bool lineSupportedByEncoder = false;
 
-            if (Enum.TryParse(split[0], out LegacyEventType type))
+            if (Enum.TryParse(line[ranges[0]], out LegacyEventType type))
             {
                 switch (type)
                 {
@@ -454,14 +455,14 @@ namespace osu.Game.Beatmaps.Formats
                         // Allow the first sprite (by file order) to act as the background in such cases.
                         if (string.IsNullOrEmpty(beatmap.BeatmapInfo.Metadata.BackgroundFile))
                         {
-                            beatmap.BeatmapInfo.Metadata.BackgroundFile = CleanFilename(split[3]);
+                            beatmap.BeatmapInfo.Metadata.BackgroundFile = CleanFilename(line[ranges[3]]);
                             lineSupportedByEncoder = true;
                         }
 
                         break;
 
                     case LegacyEventType.Video:
-                        string filename = CleanFilename(split[2]);
+                        string filename = CleanFilename(line[ranges[2]]);
 
                         // Some very old beatmaps had incorrect type specifications for their backgrounds (ie. using 1 for VIDEO
                         // instead of 0 for BACKGROUND). To handle this gracefully, check the file extension against known supported
@@ -475,13 +476,13 @@ namespace osu.Game.Beatmaps.Formats
                         break;
 
                     case LegacyEventType.Background:
-                        beatmap.BeatmapInfo.Metadata.BackgroundFile = CleanFilename(split[2]);
+                        beatmap.BeatmapInfo.Metadata.BackgroundFile = CleanFilename(line[ranges[2]]);
                         lineSupportedByEncoder = true;
                         break;
 
                     case LegacyEventType.Break:
-                        double start = getOffsetTime(Parsing.ParseDouble(split[1]));
-                        double end = Math.Max(start, getOffsetTime(Parsing.ParseDouble(split[2])));
+                        double start = getOffsetTime(Parsing.ParseDouble(line[ranges[1]]));
+                        double end = Math.Max(start, getOffsetTime(Parsing.ParseDouble(line[ranges[2]])));
 
                         beatmap.Breaks.Add(new BreakPeriod(start, end));
                         lineSupportedByEncoder = true;
@@ -490,47 +491,48 @@ namespace osu.Game.Beatmaps.Formats
             }
 
             if (!lineSupportedByEncoder)
-                beatmap.UnhandledEventLines.Add(line);
+                beatmap.UnhandledEventLines.Add(line.ToString());
         }
 
-        private void handleTimingPoint(string line)
+        private void handleTimingPoint(ReadOnlySpan<char> line)
         {
-            string[] split = line.Split(',');
+            Span<Range> ranges = stackalloc Range[9];
+            int splitCount = line.Split(ranges, ',');
 
-            double time = getOffsetTime(Parsing.ParseDouble(split[0].Trim()));
+            double time = getOffsetTime(Parsing.ParseDouble(line[ranges[0]].Trim()));
 
             // beatLength is allowed to be NaN to handle an edge case in which some beatmaps use NaN slider velocity to disable slider tick generation (see LegacyDifficultyControlPoint).
-            double beatLength = Parsing.ParseDouble(split[1].Trim(), allowNaN: true);
+            double beatLength = Parsing.ParseDouble(line[ranges[1]].Trim(), allowNaN: true);
 
             // If beatLength is NaN, speedMultiplier should still be 1 because all comparisons against NaN are false.
             double speedMultiplier = beatLength < 0 ? 100.0 / -beatLength : 1;
 
             TimeSignature timeSignature = TimeSignature.SimpleQuadruple;
-            if (split.Length >= 3)
-                timeSignature = split[2][0] == '0' ? TimeSignature.SimpleQuadruple : new TimeSignature(Parsing.ParseInt(split[2]));
+            if (splitCount >= 3)
+                timeSignature = line[ranges[2]][0] == '0' ? TimeSignature.SimpleQuadruple : new TimeSignature(Parsing.ParseInt(line[ranges[2]]));
 
             LegacySampleBank sampleSet = defaultSampleBank;
-            if (split.Length >= 4)
-                sampleSet = (LegacySampleBank)Parsing.ParseInt(split[3]);
+            if (splitCount >= 4)
+                sampleSet = (LegacySampleBank)Parsing.ParseInt(line[ranges[3]]);
 
             int customSampleBank = 0;
-            if (split.Length >= 5)
-                customSampleBank = Parsing.ParseInt(split[4]);
+            if (splitCount >= 5)
+                customSampleBank = Parsing.ParseInt(line[ranges[4]]);
 
             int sampleVolume = defaultSampleVolume;
-            if (split.Length >= 6)
-                sampleVolume = Parsing.ParseInt(split[5]);
+            if (splitCount >= 6)
+                sampleVolume = Parsing.ParseInt(line[ranges[5]]);
 
             bool timingChange = true;
-            if (split.Length >= 7)
-                timingChange = split[6][0] == '1';
+            if (splitCount >= 7)
+                timingChange = line[ranges[6]][0] == '1';
 
             bool kiaiMode = false;
             bool omitFirstBarSignature = false;
 
-            if (split.Length >= 8)
+            if (splitCount >= 8)
             {
-                LegacyEffectFlags effectFlags = (LegacyEffectFlags)Parsing.ParseInt(split[7]);
+                LegacyEffectFlags effectFlags = (LegacyEffectFlags)Parsing.ParseInt(line[ranges[7]]);
                 kiaiMode = effectFlags.HasFlag(LegacyEffectFlags.Kiai);
                 omitFirstBarSignature = effectFlags.HasFlag(LegacyEffectFlags.OmitFirstBarLine);
             }
@@ -614,7 +616,7 @@ namespace osu.Game.Beatmaps.Formats
             pendingControlPointTypes.Clear();
         }
 
-        private void handleHitObject(string line)
+        private void handleHitObject(ReadOnlySpan<char> line)
         {
             // If the ruleset wasn't specified, assume the osu!standard ruleset.
             parser ??= new Rulesets.Objects.Legacy.Osu.ConvertHitObjectParser(getOffsetTime(), FormatVersion);
