@@ -4,6 +4,7 @@
 using System;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -12,7 +13,6 @@ using osu.Framework.Screens;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
-using osu.Game.Extensions;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.Rooms;
@@ -40,6 +40,14 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
 
         private bool beatmapBackgroundLoaded;
 
+        private bool animationBegan;
+        private bool trackContent;
+
+        private IBindable<StarDifficulty?> starDifficulty = null!;
+
+        private const float initial_v_shift = 32;
+        private const float final_v_shift = 340;
+
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Plum);
 
@@ -54,9 +62,13 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
         protected override BackgroundScreen CreateBackground() => new DailyChallengeIntroBackgroundScreen(colourProvider);
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(BeatmapDifficultyCache difficultyCache)
         {
+            const float horizontal_info_size = 500f;
+
             Ruleset ruleset = Ruleset.Value.CreateInstance();
+
+            StarRatingDisplay starRatingDisplay;
 
             InternalChildren = new Drawable[]
             {
@@ -85,7 +97,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
                                 {
                                     Anchor = Anchor.TopCentre,
                                     Origin = Anchor.TopCentre,
-                                    Size = new Vector2(500f, 150f),
+                                    Size = new Vector2(horizontal_info_size, 150f),
                                     CornerRadius = 20f,
                                     BorderColour = colourProvider.Content2,
                                     BorderThickness = 3f,
@@ -110,7 +122,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
                                 {
                                     Anchor = Anchor.TopCentre,
                                     Origin = Anchor.TopCentre,
-                                    Width = 500f,
+                                    Width = horizontal_info_size,
                                     AutoSizeAxes = Axes.Y,
                                     CornerRadius = 10f,
                                     Masking = true,
@@ -121,28 +133,82 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
                                             Colour = colourProvider.Background3,
                                             RelativeSizeAxes = Axes.Both,
                                         },
-                                        new TruncatingSpriteText
+                                        new FillFlowContainer
                                         {
-                                            Anchor = Anchor.Centre,
-                                            Origin = Anchor.Centre,
                                             RelativeSizeAxes = Axes.X,
-                                            Shear = new Vector2(-OsuGame.SHEAR, 0f),
-                                            Text = item.Beatmap.GetDisplayString(),
-                                            Padding = new MarginPadding { Vertical = 5f, Horizontal = 5f },
-                                            Font = OsuFont.GetFont(size: 24),
+                                            AutoSizeAxes = Axes.Y,
+                                            Anchor = Anchor.TopCentre,
+                                            Origin = Anchor.TopCentre,
+                                            Direction = FillDirection.Vertical,
+                                            Padding = new MarginPadding(5f),
+                                            Children = new Drawable[]
+                                            {
+                                                new TruncatingSpriteText
+                                                {
+                                                    Anchor = Anchor.TopCentre,
+                                                    Origin = Anchor.TopCentre,
+                                                    Shear = new Vector2(-OsuGame.SHEAR, 0f),
+                                                    MaxWidth = horizontal_info_size,
+                                                    Text = item.Beatmap.BeatmapSet!.Metadata.GetDisplayTitleRomanisable(false),
+                                                    Padding = new MarginPadding { Horizontal = 5f },
+                                                    Font = OsuFont.GetFont(size: 26),
+                                                },
+                                                new TruncatingSpriteText
+                                                {
+                                                    Text = $"Difficulty: {item.Beatmap.DifficultyName}",
+                                                    Font = OsuFont.GetFont(size: 20, italics: true),
+                                                    MaxWidth = horizontal_info_size,
+                                                    Shear = new Vector2(-OsuGame.SHEAR, 0f),
+                                                    Anchor = Anchor.TopCentre,
+                                                    Origin = Anchor.TopCentre,
+                                                },
+                                                new TruncatingSpriteText
+                                                {
+                                                    Text = $"by {item.Beatmap.Metadata.Author.Username}",
+                                                    Font = OsuFont.GetFont(size: 16, italics: true),
+                                                    MaxWidth = horizontal_info_size,
+                                                    Shear = new Vector2(-OsuGame.SHEAR, 0f),
+                                                    Anchor = Anchor.TopCentre,
+                                                    Origin = Anchor.TopCentre,
+                                                },
+                                                starRatingDisplay = new StarRatingDisplay(default)
+                                                {
+                                                    Shear = new Vector2(-OsuGame.SHEAR, 0f),
+                                                    Margin = new MarginPadding(5),
+                                                    Anchor = Anchor.TopCentre,
+                                                    Origin = Anchor.TopCentre,
+                                                }
+                                            }
                                         },
                                     }
                                 },
-                                new ModFlowDisplay
+                                new Container
                                 {
                                     Anchor = Anchor.TopCentre,
                                     Origin = Anchor.TopCentre,
-                                    AutoSizeAxes = Axes.Both,
-                                    Shear = new Vector2(-OsuGame.SHEAR, 0f),
-                                    Current =
+                                    Width = horizontal_info_size,
+                                    AutoSizeAxes = Axes.Y,
+                                    CornerRadius = 10f,
+                                    Masking = true,
+                                    Children = new Drawable[]
                                     {
-                                        Value = item.RequiredMods.Select(m => m.ToMod(ruleset)).ToArray()
-                                    },
+                                        new Box
+                                        {
+                                            Colour = colourProvider.Background3,
+                                            RelativeSizeAxes = Axes.Both,
+                                        },
+                                        new ModFlowDisplay
+                                        {
+                                            Anchor = Anchor.TopCentre,
+                                            Origin = Anchor.TopCentre,
+                                            AutoSizeAxes = Axes.Both,
+                                            Shear = new Vector2(-OsuGame.SHEAR, 0f),
+                                            Current =
+                                            {
+                                                Value = item.RequiredMods.Select(m => m.ToMod(ruleset)).ToArray()
+                                            },
+                                        }
+                                    }
                                 }
                             }
                         },
@@ -200,6 +266,13 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
                 }
             };
 
+            starDifficulty = difficultyCache.GetBindableDifficulty(item.Beatmap);
+            starDifficulty.BindValueChanged(star =>
+            {
+                if (star.NewValue != null)
+                    starRatingDisplay.Current.Value = star.NewValue.Value;
+            }, true);
+
             LoadComponentAsync(new OnlineBeatmapSetCover(item.Beatmap.BeatmapSet as IBeatmapSetOnlineInfo)
             {
                 RelativeSizeAxes = Axes.Both,
@@ -216,12 +289,6 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
                 updateAnimationState();
             });
         }
-
-        private bool animationBegan;
-        private bool trackContent;
-
-        private const float initial_v_shift = 32;
-        private const float final_v_shift = 340;
 
         protected override void Update()
         {
@@ -248,7 +315,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
 
         public override void OnSuspending(ScreenTransitionEvent e)
         {
-            this.FadeOut(200, Easing.OutQuint);
+            this.FadeOut(800, Easing.OutQuint);
             base.OnSuspending(e);
         }
 
@@ -290,21 +357,21 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
                     beatmapContent
                         .ScaleTo(1f, 500, Easing.InQuint)
                         .Then()
-                        .ScaleTo(1.1f, 3000);
+                        .ScaleTo(1.02f, 3000);
 
                     using (BeginDelayedSequence(240))
                     {
                         beatmapContent.FadeInFromZero(280, Easing.InQuad);
 
-                        flash
-                            .Delay(400)
-                            .FadeOutFromOne(5000, Easing.OutQuint);
+                        using (BeginDelayedSequence(300))
+                            Schedule(() => ApplyToBackground(bs => ((RoomBackgroundScreen)bs).SelectedItem.Value = item));
 
-                        ApplyToBackground(bs => ((RoomBackgroundScreen)bs).SelectedItem.Value = item);
+                        using (BeginDelayedSequence(400))
+                            flash.FadeOutFromOne(5000, Easing.OutQuint);
 
                         using (BeginDelayedSequence(2600))
                         {
-                            introContent.FadeOut(200, Easing.OutQuint).OnComplete(_ =>
+                            Schedule(() =>
                             {
                                 if (this.IsCurrentScreen())
                                     this.Push(new DailyChallenge(room));
