@@ -32,14 +32,12 @@ namespace osu.Game.Rulesets.Osu.Mods
             Precision = default_follow_delay,
         };
 
-        public override BindableFloat SizeMultiplier { get; } = new BindableFloat(1)
+        public override BindableFloat StartingFlashlightSize { get; } = new BindableFloat(1)
         {
             MinValue = 0.5f,
             MaxValue = 2f,
             Precision = 0.1f
         };
-
-        public override BindableBool ComboBasedSize { get; } = new BindableBool(true);
 
         public override float DefaultFlashlightSize => 200;
 
