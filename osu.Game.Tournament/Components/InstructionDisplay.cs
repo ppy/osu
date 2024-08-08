@@ -102,8 +102,8 @@ namespace osu.Game.Tournament.Components
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft,
                     // Feel free to changed based on the texture's size
-                    Size = new Vector2(84),
-                    X = -5,
+                    Size = new Vector2(100),
+                    X = -20,
                     Alpha = 1,
                     Texture = textures.Get("Icons/welcome-img")
                 };

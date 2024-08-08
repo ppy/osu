@@ -61,7 +61,7 @@ namespace osu.Game.Tournament.Models
 
                 case TrapType.Swap:
                     name = @"大陆漂移";
-                    description = @"游玩结束后，此格子将与另一格子完全交换";
+                    description = @"游玩结束后，此格子将与另一个交换";
                     icon.Icon = FontAwesome.Solid.ExchangeAlt;
                     icon.Colour = Color4.Orange;
                     break;

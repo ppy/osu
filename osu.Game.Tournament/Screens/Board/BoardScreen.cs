@@ -6,9 +6,10 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Textures;
 using osu.Framework.Input.Events;
 using osu.Framework.Threading;
 using osu.Game.Graphics.UserInterface;
@@ -56,6 +57,7 @@ namespace osu.Game.Tournament.Screens.Board
 
         private TrapTypeDropdown trapTypeDropdown = null!;
         private Container informatiomDisplayContainer = null!;
+        private Sprite additionalIcon = null!;
 
         private DrawableTeamPlayerList team1List = null!;
         private DrawableTeamPlayerList team2List = null!;
@@ -65,7 +67,7 @@ namespace osu.Game.Tournament.Screens.Board
         private ScheduledDelegate? scheduledScreenChange;
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(TextureStore textures)
         {
             InternalChildren = new Drawable[]
             {
@@ -176,6 +178,14 @@ namespace osu.Game.Tournament.Screens.Board
                     Height = 100,
                     Width = 500,
                     Child = new InstructionDisplay(),
+                },
+                additionalIcon = new Sprite
+                {
+                    Anchor = Anchor.BottomCentre,
+                    Origin = Anchor.BottomRight,
+                    Position = new Vector2(300, -20),
+                    Size = new Vector2(85),
+                    Texture = textures.Get("Icons/additional-icon"),
                 },
                 new ControlPanel
                 {

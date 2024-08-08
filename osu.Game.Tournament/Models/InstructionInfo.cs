@@ -101,7 +101,7 @@ namespace osu.Game.Tournament.Models
 
                 default:
                     name = @"欢迎来到 OFFC";
-                    description = @"祝游玩愉快！";
+                    description = @"祝游玩愉快·by OFFC staff";
                     break;
             };
         }
