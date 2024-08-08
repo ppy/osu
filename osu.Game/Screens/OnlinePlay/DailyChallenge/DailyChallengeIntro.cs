@@ -15,6 +15,7 @@ using osu.Game.Beatmaps.Drawables;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Online;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
 using osu.Game.Rulesets;
@@ -53,6 +54,11 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Plum);
 
+        [Cached]
+        private readonly OnlinePlayBeatmapAvailabilityTracker beatmapAvailabilityTracker = new OnlinePlayBeatmapAvailabilityTracker();
+
+        private bool shouldBePlayingMusic;
+
         [Resolved]
         private BeatmapManager beatmapManager { get; set; } = null!;
 
@@ -83,6 +89,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
 
             InternalChildren = new Drawable[]
             {
+                beatmapAvailabilityTracker,
                 introContent = new Container
                 {
                     Alpha = 0f,
@@ -322,8 +329,12 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
         {
             base.OnEntering(e);
 
-            beatmapAvailabilityTracker.SelectedItem.Value = playlistItem;
-            beatmapAvailabilityTracker.Availability.BindValueChanged(_ => TrySetDailyChallengeBeatmap(this, beatmapManager, rulesets, musicController, playlistItem), true);
+            beatmapAvailabilityTracker.SelectedItem.Value = item;
+            beatmapAvailabilityTracker.Availability.BindValueChanged(availability =>
+            {
+                if (shouldBePlayingMusic && availability.NewValue.State == DownloadState.LocallyAvailable)
+                    DailyChallenge.TrySetDailyChallengeBeatmap(this, beatmapManager, rulesets, musicController, item);
+            }, true);
 
             this.FadeInFromZero(400, Easing.OutQuint);
             updateAnimationState();
@@ -392,6 +403,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
                         {
                             Schedule(() =>
                             {
+                                shouldBePlayingMusic = true;
                                 DailyChallenge.TrySetDailyChallengeBeatmap(this, beatmapManager, rulesets, musicController, item);
                                 ApplyToBackground(bs => ((RoomBackgroundScreen)bs).SelectedItem.Value = item);
                             });
