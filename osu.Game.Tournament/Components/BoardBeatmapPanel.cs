@@ -283,11 +283,11 @@ namespace osu.Game.Tournament.Components
 
                     // Ban: All darker
                     case ChoiceType.Ban:
-                        backgroundAddition.Colour = Color4.Gray;
+                        backgroundAddition.Colour = Color4.Black;
                         backgroundAddition.FadeTo(newAlpha: 0.7f, duration: 150, easing: Easing.InCubic);
                         icon.Icon = FontAwesome.Solid.Ban;
                         icon.Colour = newChoice.Team == TeamColour.Red ? new OsuColour().TeamColourRed : new OsuColour().Sky;
-                        icon.FadeIn(duration: 200, easing: Easing.InCubic);
+                        icon.FadeTo(newAlpha: 0.6f, duration: 200, easing: Easing.InCubic);
                         BorderColour = Color4.White;
                         BorderThickness = 0;
                         break;
