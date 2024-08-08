@@ -39,7 +39,7 @@ namespace osu.Game.Users
         protected new OsuSpriteText CreateUserrank()
         {
             // Assuming statistics is a property of APIUser and contains the necessary rank information
-            var globalRank = User.Statistics?.GlobalRank.ToLocalisableString("\\##,##0") ?? "-";
+            var globalRank = User.Statistics?.GlobalRank?.ToLocalisableString("\\##,##0") ?? "-";
 
             return new OsuSpriteText
             {

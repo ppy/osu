@@ -329,7 +329,7 @@ namespace osu.Game.Tournament.Screens.Board
             buttonBlueTrap.Colour = setColour(pickColour == TeamColour.Blue && pickType == ChoiceType.Trap);
             buttonTrapSwap.Colour = setColour(pickType == ChoiceType.Swap);
 
-            buttonTrapSwap.Text = CurrentMatch.Value.PendingSwaps.Any() ? @$"Free Swap (Target)" : @$"Free Swap";
+            buttonTrapSwap.Text = CurrentMatch.Value?.PendingSwaps.Any() ?? false ? @$"Free Swap (Target)" : @$"Free Swap";
 
             static Color4 setColour(bool active) => active ? Color4.White : Color4.Gray;
 
@@ -762,11 +762,19 @@ namespace osu.Game.Tournament.Screens.Board
 
             if (startX == endX)
             {
-                for (int i = startY; i <= endY; i++) mapLine.Add(getBoardMap(startX, i));
+                for (int i = startY; i <= endY; i++)
+                {
+                    var map = getBoardMap(startX, i);
+                    if (map != null) mapLine.Add(map);
+                }
             }
             else if (startY == endY)
             {
-                for (int i = startX; i <= endX; i++) mapLine.Add(getBoardMap(i, startY));
+                for (int i = startX; i <= endX; i++)
+                {
+                    var map = getBoardMap(startY, i);
+                    if (map != null) mapLine.Add(map);
+                }
             }
             else
             {
@@ -774,7 +782,8 @@ namespace osu.Game.Tournament.Screens.Board
                 int stepY = endY > startY ? 1 : -1;
                 for (int i = 0; i <= 3; i++)
                 {
-                    mapLine.Add(getBoardMap(startX + i * stepX, startY + i * stepY));
+                    var map = getBoardMap(startX + i * stepX, startY + i * stepY);
+                    if (map != null) mapLine.Add(map);
                 }
             }
             return mapLine;
