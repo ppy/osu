@@ -26,6 +26,10 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
 {
     public partial class DailyChallengeIntro : OsuScreen
     {
+        public override bool DisallowExternalBeatmapRulesetChanges => true;
+
+        public override bool? ApplyModTrackAdjustments => true;
+
         private readonly Room room;
         private readonly PlaylistItem item;
 
@@ -47,6 +51,15 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
 
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Plum);
+
+        [Resolved]
+        private BeatmapManager beatmapManager { get; set; } = null!;
+
+        [Resolved]
+        private RulesetStore rulesets { get; set; } = null!;
+
+        [Resolved]
+        private MusicController musicController { get; set; } = null!;
 
         public DailyChallengeIntro(Room room)
         {
@@ -365,7 +378,13 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
                         beatmapContent.FadeInFromZero(280, Easing.InQuad);
 
                         using (BeginDelayedSequence(300))
-                            Schedule(() => ApplyToBackground(bs => ((RoomBackgroundScreen)bs).SelectedItem.Value = item));
+                        {
+                            Schedule(() =>
+                            {
+                                DailyChallenge.TrySetDailyChallengeBeatmap(this, beatmapManager, rulesets, musicController, item);
+                                ApplyToBackground(bs => ((RoomBackgroundScreen)bs).SelectedItem.Value = item);
+                            });
+                        }
 
                         using (BeginDelayedSequence(400))
                             flash.FadeOutFromOne(5000, Easing.OutQuint);
