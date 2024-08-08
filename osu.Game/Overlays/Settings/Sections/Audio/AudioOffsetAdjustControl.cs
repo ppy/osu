@@ -8,22 +8,27 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.IEnumerableExtensions;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Localisation;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Localisation;
+using osu.Game.Screens.Play.PlayerSettings;
 using osuTK;
 
 namespace osu.Game.Overlays.Settings.Sections.Audio
 {
     public partial class AudioOffsetAdjustControl : SettingsItem<double>
     {
+        public IBindable<double?> SuggestedOffset => ((AudioOffsetPreview)Control).SuggestedOffset;
+
         [BackgroundDependencyLoader]
         private void load()
         {
@@ -44,7 +49,7 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
 
             private readonly IBindableList<SessionAverageHitErrorTracker.DataPoint> averageHitErrorHistory = new BindableList<SessionAverageHitErrorTracker.DataPoint>();
 
-            private readonly Bindable<double?> suggestedOffset = new Bindable<double?>();
+            public readonly Bindable<double?> SuggestedOffset = new Bindable<double?>();
 
             private Container<Box> notchContainer = null!;
             private TextFlowContainer hintText = null!;
@@ -65,7 +70,7 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
                     Direction = FillDirection.Vertical,
                     Children = new Drawable[]
                     {
-                        new TimeSlider
+                        new OffsetSliderBar
                         {
                             RelativeSizeAxes = Axes.X,
                             Current = { BindTarget = Current },
@@ -87,11 +92,11 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
                         applySuggestion = new RoundedButton
                         {
                             RelativeSizeAxes = Axes.X,
-                            Text = "Apply suggested offset",
+                            Text = AudioSettingsStrings.ApplySuggestedOffset,
                             Action = () =>
                             {
-                                if (suggestedOffset.Value.HasValue)
-                                    current.Value = suggestedOffset.Value.Value;
+                                if (SuggestedOffset.Value.HasValue)
+                                    current.Value = SuggestedOffset.Value.Value;
                                 hitErrorTracker.ClearHistory();
                             }
                         }
@@ -104,7 +109,7 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
                 base.LoadComplete();
 
                 averageHitErrorHistory.BindCollectionChanged(updateDisplay, true);
-                suggestedOffset.BindValueChanged(_ => updateHintText(), true);
+                SuggestedOffset.BindValueChanged(_ => updateHintText(), true);
             }
 
             private void updateDisplay(object? _, NotifyCollectionChangedEventArgs e)
@@ -143,17 +148,22 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
                         break;
                 }
 
-                suggestedOffset.Value = averageHitErrorHistory.Any() ? -averageHitErrorHistory.Average(dataPoint => dataPoint.SuggestedGlobalAudioOffset) : null;
+                SuggestedOffset.Value = averageHitErrorHistory.Any() ? averageHitErrorHistory.Average(dataPoint => dataPoint.SuggestedGlobalAudioOffset) : null;
             }
 
             private float getXPositionForOffset(double offset) => (float)(Math.Clamp(offset, current.MinValue, current.MaxValue) / (2 * current.MaxValue));
 
             private void updateHintText()
             {
-                hintText.Text = suggestedOffset.Value == null
-                    ? @"Play a few beatmaps to receive a suggested offset!"
-                    : $@"Based on the last {averageHitErrorHistory.Count} play(s), the suggested offset is {suggestedOffset.Value:N0} ms.";
-                applySuggestion.Enabled.Value = suggestedOffset.Value != null;
+                hintText.Text = SuggestedOffset.Value == null
+                    ? AudioSettingsStrings.SuggestedOffsetNote
+                    : AudioSettingsStrings.SuggestedOffsetValueReceived(averageHitErrorHistory.Count, SuggestedOffset.Value.ToLocalisableString(@"N0"));
+                applySuggestion.Enabled.Value = SuggestedOffset.Value != null;
+            }
+
+            private partial class OffsetSliderBar : RoundedSliderBar<double>
+            {
+                public override LocalisableString TooltipText => BeatmapOffsetControl.GetOffsetExplanatoryText(Current.Value);
             }
         }
     }

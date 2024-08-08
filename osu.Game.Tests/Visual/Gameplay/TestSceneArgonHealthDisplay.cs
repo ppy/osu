@@ -7,6 +7,7 @@ using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Testing;
+using osu.Framework.Threading;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Judgements;
@@ -98,6 +99,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
                 Scheduler.AddDelayed(applyMiss, 500 + 30);
             });
+            AddUntilStep("wait for sequence", () => !Scheduler.HasPendingTasks);
         }
 
         [Test]
@@ -119,6 +121,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                     }
                 }
             });
+            AddUntilStep("wait for sequence", () => !Scheduler.HasPendingTasks);
         }
 
         [Test]
@@ -158,6 +161,16 @@ namespace osu.Game.Tests.Visual.Gameplay
             {
                 Type = HitResult.Perfect
             });
+        }
+
+        [Test]
+        public void TestSimulateDrain()
+        {
+            ScheduledDelegate del = null!;
+
+            AddStep("simulate drain", () => del = Scheduler.AddDelayed(() => healthProcessor.Health.Value -= 0.00025f * Time.Elapsed, 0, true));
+            AddUntilStep("wait until zero", () => healthProcessor.Health.Value == 0);
+            AddStep("cancel drain", () => del.Cancel());
         }
     }
 }

@@ -48,6 +48,7 @@ namespace osu.Game.Skinning.Components
             [BeatmapAttribute.Artist] = EditorSetupStrings.Artist,
             [BeatmapAttribute.DifficultyName] = EditorSetupStrings.DifficultyHeader,
             [BeatmapAttribute.Creator] = EditorSetupStrings.Creator,
+            [BeatmapAttribute.Source] = EditorSetupStrings.Source,
             [BeatmapAttribute.Length] = ArtistStrings.TracklistLength.ToTitle(),
             [BeatmapAttribute.RankedStatus] = BeatmapDiscussionsStrings.IndexFormBeatmapsetStatusDefault,
             [BeatmapAttribute.BPM] = BeatmapsetsStrings.ShowStatsBpm,
@@ -88,6 +89,7 @@ namespace osu.Game.Skinning.Components
             valueDictionary[BeatmapAttribute.Artist] = new RomanisableString(workingBeatmap.BeatmapInfo.Metadata.ArtistUnicode, workingBeatmap.BeatmapInfo.Metadata.Artist);
             valueDictionary[BeatmapAttribute.DifficultyName] = workingBeatmap.BeatmapInfo.DifficultyName;
             valueDictionary[BeatmapAttribute.Creator] = workingBeatmap.BeatmapInfo.Metadata.Author.Username;
+            valueDictionary[BeatmapAttribute.Source] = workingBeatmap.BeatmapInfo.Metadata.Source;
             valueDictionary[BeatmapAttribute.Length] = TimeSpan.FromMilliseconds(workingBeatmap.BeatmapInfo.Length).ToFormattedDuration();
             valueDictionary[BeatmapAttribute.RankedStatus] = workingBeatmap.BeatmapInfo.Status.GetLocalisableDescription();
             valueDictionary[BeatmapAttribute.BPM] = workingBeatmap.BeatmapInfo.BPM.ToLocalisableString(@"F2");
@@ -123,6 +125,8 @@ namespace osu.Game.Skinning.Components
         protected override void SetFont(FontUsage font) => text.Font = font.With(size: 40);
     }
 
+    // WARNING: DO NOT ADD ANY VALUES TO THIS ENUM ANYWHERE ELSE THAN AT THE END.
+    // Doing so will break existing user skins.
     public enum BeatmapAttribute
     {
         CircleSize,
@@ -137,5 +141,6 @@ namespace osu.Game.Skinning.Components
         Length,
         RankedStatus,
         BPM,
+        Source,
     }
 }

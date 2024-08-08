@@ -7,21 +7,27 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Input.Bindings;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play.HUD;
+using osu.Game.Screens.Play.PlayerSettings;
 using osu.Game.Screens.Ranking;
 using osu.Game.Users;
 
 namespace osu.Game.Screens.Play
 {
+    [Cached]
     public partial class ReplayPlayer : Player, IKeyBindingHandler<GlobalAction>
     {
+        public const double BASE_SEEK_AMOUNT = 1000;
+
         private readonly Func<IBeatmap, IReadOnlyList<Mod>, Score> createScore;
 
         private readonly bool replayIsFailedScore;
@@ -49,6 +55,24 @@ namespace osu.Game.Screens.Play
             this.createScore = createScore;
         }
 
+        [BackgroundDependencyLoader]
+        private void load(OsuConfigManager config)
+        {
+            if (!LoadedBeatmapSuccessfully)
+                return;
+
+            var playbackSettings = new PlaybackSettings
+            {
+                Depth = float.MaxValue,
+                Expanded = { BindTarget = config.GetBindable<bool>(OsuSetting.ReplayPlaybackControlsExpanded) }
+            };
+
+            if (GameplayClockContainer is MasterGameplayClockContainer master)
+                playbackSettings.UserPlaybackRate.BindTo(master.UserPlaybackRate);
+
+            HUDOverlay.PlayerSettingsOverlay.AddAtStart(playbackSettings);
+        }
+
         protected override void PrepareReplay()
         {
             DrawableRuleset?.SetReplayScore(Score);
@@ -68,20 +92,26 @@ namespace osu.Game.Screens.Play
                 Scores = { BindTarget = LeaderboardScores }
             };
 
-        protected override ResultsScreen CreateResults(ScoreInfo score) => new SoloResultsScreen(score, false);
+        protected override ResultsScreen CreateResults(ScoreInfo score) => new SoloResultsScreen(score);
 
         public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
-            const double keyboard_seek_amount = 5000;
-
             switch (e.Action)
             {
+                case GlobalAction.StepReplayBackward:
+                    StepFrame(-1);
+                    return true;
+
+                case GlobalAction.StepReplayForward:
+                    StepFrame(1);
+                    return true;
+
                 case GlobalAction.SeekReplayBackward:
-                    keyboardSeek(-1);
+                    SeekInDirection(-5);
                     return true;
 
                 case GlobalAction.SeekReplayForward:
-                    keyboardSeek(1);
+                    SeekInDirection(5);
                     return true;
 
                 case GlobalAction.TogglePauseReplay:
@@ -93,13 +123,28 @@ namespace osu.Game.Screens.Play
             }
 
             return false;
+        }
 
-            void keyboardSeek(int direction)
-            {
-                double target = Math.Clamp(GameplayClockContainer.CurrentTime + direction * keyboard_seek_amount, 0, GameplayState.Beatmap.GetLastObjectTime());
+        public void StepFrame(int direction)
+        {
+            GameplayClockContainer.Stop();
 
-                Seek(target);
-            }
+            var frames = GameplayState.Score.Replay.Frames;
+
+            if (frames.Count == 0)
+                return;
+
+            GameplayClockContainer.Seek(direction < 0
+                ? (frames.LastOrDefault(f => f.Time < GameplayClockContainer.CurrentTime) ?? frames.First()).Time
+                : (frames.FirstOrDefault(f => f.Time > GameplayClockContainer.CurrentTime) ?? frames.Last()).Time
+            );
+        }
+
+        public void SeekInDirection(float amount)
+        {
+            double target = Math.Clamp(GameplayClockContainer.CurrentTime + amount * BASE_SEEK_AMOUNT, 0, GameplayState.Beatmap.GetLastObjectTime());
+
+            Seek(target);
         }
 
         public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)

@@ -173,9 +173,9 @@ namespace osu.Game.Screens.OnlinePlay
             IsValidMod = IsValidMod
         };
 
-        protected override IEnumerable<(FooterButton, OverlayContainer?)> CreateFooterButtons()
+        protected override IEnumerable<(FooterButton, OverlayContainer?)> CreateSongSelectFooterButtons()
         {
-            var baseButtons = base.CreateFooterButtons().ToList();
+            var baseButtons = base.CreateSongSelectFooterButtons().ToList();
             var freeModsButton = new FooterButtonFreeMods(freeModSelectOverlay) { Current = FreeMods };
 
             baseButtons.Insert(baseButtons.FindIndex(b => b.Item1 is FooterButtonMods) + 1, (freeModsButton, freeModSelectOverlay));

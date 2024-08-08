@@ -14,6 +14,7 @@ using osu.Game.Extensions;
 using osu.Game.IO;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Screens.Play.HUD.HitErrorMeters;
+using osu.Game.Skinning.Triangles;
 using osuTK;
 using osuTK.Graphics;
 
@@ -63,7 +64,7 @@ namespace osu.Game.Skinning
             // Temporary until default skin has a valid hit lighting.
             if ((lookup as SkinnableSprite.SpriteComponentLookup)?.LookupName == @"lighting") return Drawable.Empty();
 
-            if (base.GetDrawableComponent(lookup) is Drawable c)
+            if (base.GetDrawableComponent(lookup) is UserConfiguredLayoutContainer c)
                 return c;
 
             switch (lookup)
@@ -167,7 +168,7 @@ namespace osu.Game.Skinning
                                     new DefaultKeyCounterDisplay(),
                                     new BarHitErrorMeter(),
                                     new BarHitErrorMeter(),
-                                    new PerformancePointsCounter()
+                                    new TrianglesPerformancePointsCounter()
                                 }
                             };
 

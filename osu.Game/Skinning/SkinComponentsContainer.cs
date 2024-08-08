@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using osu.Framework.Bindables;
@@ -42,20 +41,6 @@ namespace osu.Game.Skinning
         public SkinComponentsContainer(SkinComponentsContainerLookup lookup)
         {
             Lookup = lookup;
-        }
-
-        public void Reload(SerialisedDrawableInfo[] skinnableInfo)
-        {
-            var drawables = new List<Drawable>();
-
-            foreach (var i in skinnableInfo)
-                drawables.Add(i.CreateInstance());
-
-            Reload(new Container
-            {
-                RelativeSizeAxes = Axes.Both,
-                Children = drawables,
-            });
         }
 
         public void Reload() => Reload(CurrentSkin.GetDrawableComponent(Lookup) as Container);

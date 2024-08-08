@@ -53,7 +53,7 @@ namespace osu.Game.Beatmaps
 
         protected override IBeatmap GetBeatmap() => new Beatmap();
 
-        public override Texture GetBackground() => textures?.Get(@"Backgrounds/bg4");
+        public override Texture GetBackground() => textures?.Get(@"Backgrounds/bg2");
 
         protected override Track GetBeatmapTrack() => GetVirtualTrack();
 

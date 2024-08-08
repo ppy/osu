@@ -361,13 +361,20 @@ namespace osu.Game.Beatmaps
         /// </summary>
         public void DeleteVideos(List<BeatmapSetInfo> items, bool silent = false)
         {
-            if (items.Count == 0) return;
+            const string no_videos_message = "No videos found to delete!";
+
+            if (items.Count == 0)
+            {
+                if (!silent)
+                    PostNotification?.Invoke(new ProgressCompletionNotification { Text = no_videos_message });
+                return;
+            }
 
             var notification = new ProgressNotification
             {
                 Progress = 0,
                 Text = $"Preparing to delete all {HumanisedModelName} videos...",
-                CompletionText = "No videos found to delete!",
+                CompletionText = no_videos_message,
                 State = ProgressNotificationState.Active,
             };
 
@@ -407,6 +414,9 @@ namespace osu.Game.Beatmaps
 
         public Task<Live<BeatmapSetInfo>?> ImportAsUpdate(ProgressNotification notification, ImportTask importTask, BeatmapSetInfo original) =>
             beatmapImporter.ImportAsUpdate(notification, importTask, original);
+
+        public Task<ExternalEditOperation<BeatmapSetInfo>> BeginExternalEditing(BeatmapSetInfo model) =>
+            beatmapImporter.BeginExternalEditing(model);
 
         public Task Export(BeatmapSetInfo beatmap) => beatmapExporter.ExportAsync(beatmap.ToLive(Realm));
 

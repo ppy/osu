@@ -2,10 +2,12 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Game.Graphics;
+using osu.Game.Overlays;
 using osuTK;
 
 namespace osu.Game.Screens.Edit.Compose.Components.Timeline
@@ -23,7 +25,11 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
             Anchor = Anchor.TopCentre;
             Origin = Anchor.TopCentre;
+        }
 
+        [BackgroundDependencyLoader]
+        private void load(OverlayColourProvider colours)
+        {
             InternalChildren = new Drawable[]
             {
                 new Box
@@ -32,21 +38,18 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                     Origin = Anchor.Centre,
                     RelativeSizeAxes = Axes.Y,
                     Width = bar_width,
+                    Blending = BlendingParameters.Additive,
+                    Colour = ColourInfo.GradientVertical(colours.Colour2.Opacity(0.6f), colours.Colour2.Opacity(0)),
                 },
                 new Triangle
                 {
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.BottomCentre,
                     Size = new Vector2(triangle_width, triangle_width * 0.8f),
-                    Scale = new Vector2(1, -1)
+                    Scale = new Vector2(1, -1),
+                    Colour = colours.Colour2,
                 },
             };
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
-        {
-            Colour = colours.Red1;
         }
     }
 }

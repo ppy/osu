@@ -41,7 +41,7 @@ namespace osu.Game.Rulesets.Osu.Objects
 
         public Vector2 StackedPositionAt(double t) => StackedPosition + this.CurvePositionAt(t);
 
-        private readonly SliderPath path = new SliderPath();
+        private readonly SliderPath path = new SliderPath { OptimiseCatmull = true };
 
         public SliderPath Path
         {
@@ -252,18 +252,27 @@ namespace osu.Game.Rulesets.Osu.Objects
 
         protected void UpdateNestedSamples()
         {
-            var firstSample = Samples.FirstOrDefault(s => s.Name == HitSampleInfo.HIT_NORMAL)
-                              ?? Samples.FirstOrDefault(); // TODO: remove this when guaranteed sort is present for samples (https://github.com/ppy/osu/issues/1933)
-            var sampleList = new List<HitSampleInfo>();
+            this.PopulateNodeSamples();
 
-            if (firstSample != null)
-                sampleList.Add(firstSample.With("slidertick"));
+            // TODO: remove this when guaranteed sort is present for samples (https://github.com/ppy/osu/issues/1933)
+            HitSampleInfo tickSample = (Samples.FirstOrDefault(s => s.Name == HitSampleInfo.HIT_NORMAL) ?? Samples.FirstOrDefault())?.With("slidertick");
 
-            foreach (var tick in NestedHitObjects.OfType<SliderTick>())
-                tick.Samples = sampleList;
+            foreach (var nested in NestedHitObjects)
+            {
+                switch (nested)
+                {
+                    case SliderTick tick:
+                        tick.SamplesBindable.Clear();
 
-            foreach (var repeat in NestedHitObjects.OfType<SliderRepeat>())
-                repeat.Samples = this.GetNodeSamples(repeat.RepeatIndex + 1);
+                        if (tickSample != null)
+                            tick.SamplesBindable.Add(tickSample);
+                        break;
+
+                    case SliderRepeat repeat:
+                        repeat.Samples = this.GetNodeSamples(repeat.RepeatIndex + 1);
+                        break;
+                }
+            }
 
             if (HeadCircle != null)
                 HeadCircle.Samples = this.GetNodeSamples(0);

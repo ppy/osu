@@ -100,6 +100,7 @@ namespace osu.Game.Tests.NonVisual
             public override Container FrameStableComponents { get; }
             public override IFrameStableClock FrameStableClock { get; }
             internal override bool FrameStablePlayback { get; set; }
+            public override bool AllowBackwardsSeeks { get; set; }
             public override IReadOnlyList<Mod> Mods { get; }
 
             public override double GameplayStartTime { get; }

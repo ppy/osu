@@ -12,15 +12,19 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Platform;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
+using osu.Game.Beatmaps.Drawables.Cards;
 using osu.Game.Database;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Cursor;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Models;
 using osu.Game.Online.API;
+using osu.Game.Online.Chat;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
@@ -300,6 +304,38 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 p.AllowShowingResults = true;
                 p.AllowEditing = true;
             });
+        }
+
+        [Test]
+        public void TestSelectableMouseHandling()
+        {
+            bool resultsRequested = false;
+
+            AddStep("reset flag", () => resultsRequested = false);
+            createPlaylist(p =>
+            {
+                p.AllowSelection = true;
+                p.AllowShowingResults = true;
+                p.RequestResults = _ => resultsRequested = true;
+            });
+
+            AddUntilStep("wait for load", () => playlist.ChildrenOfType<DrawableLinkCompiler>().Any() && playlist.ChildrenOfType<BeatmapCardThumbnail>().First().DrawWidth > 0);
+
+            AddStep("move mouse to first item title", () => InputManager.MoveMouseTo(playlist.ChildrenOfType<LinkFlowContainer>().First().ChildrenOfType<SpriteText>().First()));
+            AddAssert("first item title not hovered", () => playlist.ChildrenOfType<DrawableLinkCompiler>().First().IsHovered, () => Is.False);
+
+            AddStep("click title", () =>
+            {
+                InputManager.MoveMouseTo(playlist.ChildrenOfType<LinkFlowContainer>().First().ChildrenOfType<SpriteText>().First());
+                InputManager.Click(MouseButton.Left);
+            });
+
+            AddUntilStep("first item selected", () => playlist.ChildrenOfType<DrawableRoomPlaylistItem>().First().IsSelectedItem, () => Is.True);
+            AddUntilStep("first item title hovered", () => playlist.ChildrenOfType<DrawableLinkCompiler>().First().IsHovered, () => Is.True);
+
+            AddStep("move mouse to second item results button", () => InputManager.MoveMouseTo(playlist.ChildrenOfType<GrayButton>().ElementAt(5)));
+            AddStep("click left mouse", () => InputManager.Click(MouseButton.Left));
+            AddUntilStep("results requested", () => resultsRequested);
         }
 
         private void moveToItem(int index, Vector2? offset = null)

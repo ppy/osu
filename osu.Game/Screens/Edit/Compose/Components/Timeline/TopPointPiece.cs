@@ -19,12 +19,12 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         protected OsuSpriteText Label { get; private set; } = null!;
 
-        private const float width = 80;
+        public const float WIDTH = 80;
 
         public TopPointPiece(ControlPoint point)
         {
             Point = point;
-            Width = width;
+            Width = WIDTH;
             Height = 16;
             Margin = new MarginPadding { Vertical = 4 };
 
@@ -65,7 +65,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 new Container
                 {
                     RelativeSizeAxes = Axes.Y,
-                    Width = width - triangle_portion,
+                    Width = WIDTH - triangle_portion,
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft,
                     Colour = Point.GetRepresentingColour(colours),

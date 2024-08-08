@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
@@ -61,7 +59,7 @@ namespace osu.Game.Screens.Ranking.Statistics
     /// </summary>
     public partial class SimpleStatisticItem<TValue> : SimpleStatisticItem
     {
-        private TValue value;
+        private TValue value = default!;
 
         /// <summary>
         /// The statistic's value to be displayed.
@@ -80,7 +78,7 @@ namespace osu.Game.Screens.Ranking.Statistics
         /// Used to convert <see cref="Value"/> to a text representation.
         /// Defaults to using <see cref="object.ToString"/>.
         /// </summary>
-        protected virtual string DisplayValue(TValue value) => value.ToString();
+        protected virtual string DisplayValue(TValue value) => value!.ToString() ?? string.Empty;
 
         public SimpleStatisticItem(string name)
             : base(name)

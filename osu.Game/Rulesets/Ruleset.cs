@@ -212,19 +212,7 @@ namespace osu.Game.Rulesets
         /// <param name="skin">The source skin.</param>
         /// <param name="beatmap">The current beatmap.</param>
         /// <returns>A skin with a transformer applied, or null if no transformation is provided by this ruleset.</returns>
-        public virtual ISkin? CreateSkinTransformer(ISkin skin, IBeatmap beatmap)
-        {
-            switch (skin)
-            {
-                case LegacySkin:
-                    return new LegacySkinTransformer(skin);
-
-                case ArgonSkin:
-                    return new ArgonSkinTransformer(skin);
-            }
-
-            return null;
-        }
+        public virtual ISkin? CreateSkinTransformer(ISkin skin, IBeatmap beatmap) => null;
 
         protected Ruleset()
         {
@@ -406,13 +394,12 @@ namespace osu.Game.Rulesets
         public virtual IRulesetFilterCriteria? CreateRulesetFilterCriteria() => null;
 
         /// <summary>
-        /// Can be overridden to add a ruleset-specific section to the editor beatmap setup screen.
+        /// Can be overridden to add ruleset-specific sections to the editor beatmap setup screen.
         /// </summary>
-        public virtual RulesetSetupSection? CreateEditorSetupSection() => null;
-
-        /// <summary>
-        /// Can be overridden to alter the difficulty section to the editor beatmap setup screen.
-        /// </summary>
-        public virtual DifficultySection? CreateEditorDifficultySection() => null;
+        public virtual IEnumerable<SetupSection> CreateEditorSetupSections() =>
+        [
+            new DifficultySection(),
+            new ColoursSection(),
+        ];
     }
 }

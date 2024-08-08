@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Linq;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Scoring;
 
@@ -25,11 +24,5 @@ namespace osu.Game.Skinning
         {
             Component = component;
         }
-
-        protected virtual string RulesetPrefix => string.Empty;
-        protected virtual string ComponentName => Component.ToString();
-
-        public string LookupName =>
-            string.Join('/', new[] { "Gameplay", RulesetPrefix, ComponentName }.Where(s => !string.IsNullOrEmpty(s)));
     }
 }

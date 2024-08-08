@@ -6,7 +6,7 @@ using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Catch.Skinning.Argon
 {
-    public class CatchArgonSkinTransformer : ArgonSkinTransformer
+    public class CatchArgonSkinTransformer : SkinTransformer
     {
         public CatchArgonSkinTransformer(ISkin skin)
             : base(skin)

@@ -5,13 +5,9 @@ using System;
 using Android.App;
 using Microsoft.Maui.Devices;
 using osu.Framework.Allocation;
-using osu.Framework.Android.Input;
 using osu.Framework.Extensions.ObjectExtensions;
-using osu.Framework.Input.Handlers;
 using osu.Framework.Platform;
 using osu.Game;
-using osu.Game.Overlays.Settings;
-using osu.Game.Overlays.Settings.Sections.Input;
 using osu.Game.Updater;
 using osu.Game.Utils;
 
@@ -87,24 +83,6 @@ namespace osu.Android
         protected override UpdateManager CreateUpdateManager() => new SimpleUpdateManager();
 
         protected override BatteryInfo CreateBatteryInfo() => new AndroidBatteryInfo();
-
-        public override SettingsSubsection CreateSettingsSubsectionFor(InputHandler handler)
-        {
-            switch (handler)
-            {
-                case AndroidMouseHandler mh:
-                    return new AndroidMouseSettings(mh);
-
-                case AndroidJoystickHandler jh:
-                    return new AndroidJoystickSettings(jh);
-
-                case AndroidTouchHandler th:
-                    return new TouchSettings(th);
-
-                default:
-                    return base.CreateSettingsSubsectionFor(handler);
-            }
-        }
 
         private class AndroidBatteryInfo : BatteryInfo
         {

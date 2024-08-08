@@ -175,7 +175,7 @@ namespace osu.Game.Tests.Gameplay
                 var hitObject = new HitObject { StartTime = Time.Current };
                 lifetimeEntry = new HitObjectLifetimeEntry(hitObject)
                 {
-                    Result = new JudgementResult(hitObject, hitObject.CreateJudgement())
+                    Result = new JudgementResult(hitObject, hitObject.Judgement)
                     {
                         Type = HitResult.Great
                     }
@@ -216,7 +216,7 @@ namespace osu.Game.Tests.Gameplay
                     LifetimeStart = LIFETIME_ON_APPLY;
             }
 
-            public void MissForcefully() => ApplyResult(r => r.Type = HitResult.Miss);
+            public void MissForcefully() => ApplyResult(HitResult.Miss);
 
             protected override void UpdateHitStateTransforms(ArmedState state)
             {

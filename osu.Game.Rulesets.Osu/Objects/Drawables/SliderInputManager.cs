@@ -5,11 +5,14 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Input;
 using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Types;
+using osu.Game.Screens.Play;
 using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
@@ -20,6 +23,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         /// Whether the slider is currently being tracked.
         /// </summary>
         public bool Tracking { get; private set; }
+
+        [Resolved]
+        private IGameplayClock? gameplayClock { get; set; }
 
         /// <summary>
         /// The point in time after which we can accept any key for tracking. Before this time, we may need to restrict tracking to the key used to hit the head circle.
@@ -49,6 +55,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         public SliderInputManager(DrawableSlider slider)
         {
             this.slider = slider;
+            this.slider.HitObjectApplied += resetState;
         }
 
         /// <summary>
@@ -208,14 +215,26 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         /// <param name="isValidTrackingPosition">Whether the current mouse position is valid to begin tracking.</param>
         private void updateTracking(bool isValidTrackingPosition)
         {
+            if (gameplayClock?.IsRewinding == true)
+            {
+                var trackingHistory = slider.Result.TrackingHistory;
+                while (trackingHistory.TryPeek(out var historyEntry) && Time.Current < historyEntry.time)
+                    trackingHistory.Pop();
+
+                Debug.Assert(trackingHistory.Count > 0);
+
+                Tracking = trackingHistory.Peek().tracking;
+                return;
+            }
+
+            bool wasTracking = Tracking;
+
             // from the point at which the head circle is hit, this will be non-null.
             // it may be null if the head circle was missed.
             OsuAction? headCircleHitAction = getInitialHitAction();
 
             if (headCircleHitAction == null)
                 timeToAcceptAnyKeyAfter = null;
-
-            var actions = slider.OsuActionInputManager?.PressedActions;
 
             // if the head circle was hit with a specific key, tracking should only occur while that key is pressed.
             if (headCircleHitAction != null && timeToAcceptAnyKeyAfter == null)
@@ -227,6 +246,20 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     timeToAcceptAnyKeyAfter = Time.Current;
             }
 
+            if (slider.OsuActionInputManager == null)
+                return;
+
+            lastPressedActions.Clear();
+            bool validTrackingAction = false;
+
+            foreach (OsuAction action in slider.OsuActionInputManager.PressedActions)
+            {
+                if (isValidTrackingAction(action))
+                    validTrackingAction = true;
+
+                lastPressedActions.Add(action);
+            }
+
             Tracking =
                 // even in an edge case where current time has exceeded the slider's time, we may not have finished judging.
                 // we don't want to potentially update from Tracking=true to Tracking=false at this point.
@@ -234,11 +267,10 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 // in valid position range
                 && isValidTrackingPosition
                 // valid action
-                && (actions?.Any(isValidTrackingAction) ?? false);
+                && validTrackingAction;
 
-            lastPressedActions.Clear();
-            if (actions != null)
-                lastPressedActions.AddRange(actions);
+            if (wasTracking != Tracking)
+                slider.Result.TrackingHistory.Push((Time.Current, Tracking));
         }
 
         private OsuAction? getInitialHitAction() => slider.HeadCircle?.HitAction;
@@ -255,6 +287,21 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 return action == hitAction;
 
             return action == OsuAction.LeftButton || action == OsuAction.RightButton;
+        }
+
+        private void resetState(DrawableHitObject obj)
+        {
+            Tracking = false;
+            timeToAcceptAnyKeyAfter = null;
+            lastPressedActions.Clear();
+            screenSpaceMousePosition = null;
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            slider.HitObjectApplied -= resetState;
         }
     }
 }
