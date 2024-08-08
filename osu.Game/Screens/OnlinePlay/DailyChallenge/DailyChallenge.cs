@@ -492,6 +492,9 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
 
         public static void TrySetDailyChallengeBeatmap(OsuScreen screen, BeatmapManager beatmaps, RulesetStore rulesets, MusicController music, PlaylistItem item)
         {
+            if (!screen.IsCurrentScreen())
+                return;
+
             var beatmap = beatmaps.QueryBeatmap(b => b.OnlineID == item.Beatmap.OnlineID);
 
             screen.Beatmap.Value = beatmaps.GetWorkingBeatmap(beatmap); // this will gracefully fall back to dummy beatmap if missing locally.

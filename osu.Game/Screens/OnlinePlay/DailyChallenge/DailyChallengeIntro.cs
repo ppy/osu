@@ -12,6 +12,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.Rooms;
@@ -72,7 +73,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
         protected override BackgroundScreen CreateBackground() => new DailyChallengeIntroBackgroundScreen(colourProvider);
 
         [BackgroundDependencyLoader]
-        private void load(BeatmapDifficultyCache difficultyCache)
+        private void load(BeatmapDifficultyCache difficultyCache, BeatmapModelDownloader beatmapDownloader, OsuConfigManager config)
         {
             const float horizontal_info_size = 500f;
 
@@ -309,11 +310,21 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
                 beatmapBackgroundLoaded = true;
                 updateAnimationState();
             });
+
+            if (config.Get<bool>(OsuSetting.AutomaticallyDownloadMissingBeatmaps))
+            {
+                if (!beatmapManager.IsAvailableLocally(new BeatmapSetInfo { OnlineID = item.Beatmap.BeatmapSet!.OnlineID }))
+                    beatmapDownloader.Download(item.Beatmap.BeatmapSet!, config.Get<bool>(OsuSetting.PreferNoVideo));
+            }
         }
 
         public override void OnEntering(ScreenTransitionEvent e)
         {
             base.OnEntering(e);
+
+            beatmapAvailabilityTracker.SelectedItem.Value = playlistItem;
+            beatmapAvailabilityTracker.Availability.BindValueChanged(_ => TrySetDailyChallengeBeatmap(this, beatmapManager, rulesets, musicController, playlistItem), true);
+
             this.FadeInFromZero(400, Easing.OutQuint);
             updateAnimationState();
         }
