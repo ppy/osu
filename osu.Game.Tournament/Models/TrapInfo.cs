@@ -66,13 +66,6 @@ namespace osu.Game.Tournament.Models
                     icon.Colour = Color4.Orange;
                     break;
 
-                case TrapType.Solo:
-                    name = @"决一死战";
-                    description = @"两队各派1人游玩，FM图必须选择Mod";
-                    icon.Icon = FontAwesome.Solid.UserCircle;
-                    icon.Colour = new OsuColour().Pink1;
-                    break;
-
                 case TrapType.Unused:
                     name = @"陷阱无效";
                     description = @"布置方触发了陷阱，将不会生效";
@@ -102,9 +95,6 @@ namespace osu.Game.Tournament.Models
         {
             switch (typeString.ToString())
             {
-                case @"决一死战":
-                    return TrapType.Solo;
-
                 case @"大陆漂移":
                     return TrapType.Swap;
 
@@ -131,10 +121,6 @@ namespace osu.Game.Tournament.Models
         /// Swap the specified map block with another after the current gameplay comes to an end.
         /// </summary>
         Swap,
-        /// <summary>
-        /// Perform an 1v1 play, with each player having at least one mod on (including the one bundled with the map).
-        /// </summary>
-        Solo,
         /// <summary>
         /// The trap has no effect.
         /// </summary>
