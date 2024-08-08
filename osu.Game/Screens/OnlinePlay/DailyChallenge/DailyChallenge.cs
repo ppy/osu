@@ -77,6 +77,9 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
         private readonly OnlinePlayBeatmapAvailabilityTracker beatmapAvailabilityTracker = new OnlinePlayBeatmapAvailabilityTracker();
 
         [Resolved]
+        private OsuGame? game { get; set; }
+
+        [Resolved]
         private BeatmapManager beatmapManager { get; set; } = null!;
 
         [Resolved]
@@ -546,9 +549,6 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
             if (metadataClient.IsNotNull())
                 metadataClient.MultiplayerRoomScoreSet -= onRoomScoreSet;
         }
-
-        [Resolved]
-        private OsuGame? game { get; set; }
 
         public void PresentBeatmap(WorkingBeatmap beatmap, RulesetInfo ruleset)
         {
