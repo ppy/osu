@@ -3,7 +3,6 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Skinning;
@@ -49,7 +48,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
         private void updateAnchor()
         {
             // if the anchor isn't a vertical center, set top or bottom anchor based on scroll direction
-            if (!Anchor.HasFlagFast(Anchor.y1))
+            if (!Anchor.HasFlag(Anchor.y1))
             {
                 Anchor &= ~(Anchor.y0 | Anchor.y2);
                 Anchor |= direction.Value == ScrollingDirection.Up ? Anchor.y2 : Anchor.y0;

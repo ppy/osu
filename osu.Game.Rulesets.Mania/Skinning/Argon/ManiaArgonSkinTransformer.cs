@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -15,7 +14,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Mania.Skinning.Argon
 {
-    public class ManiaArgonSkinTransformer : ArgonSkinTransformer
+    public class ManiaArgonSkinTransformer : SkinTransformer
     {
         private readonly ManiaBeatmap beatmap;
 
@@ -30,32 +29,31 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
             switch (lookup)
             {
                 case SkinComponentsContainerLookup containerLookup:
-                    switch (containerLookup.Target)
+                    if (containerLookup.Target != SkinComponentsContainerLookup.TargetArea.MainHUDComponents)
+                        return base.GetDrawableComponent(lookup);
+
+                    // Only handle per ruleset defaults here.
+                    if (containerLookup.Ruleset == null)
+                        return base.GetDrawableComponent(lookup);
+
+                    // Skin has configuration.
+                    if (base.GetDrawableComponent(lookup) is UserConfiguredLayoutContainer d)
+                        return d;
+
+                    return new DefaultSkinComponentsContainer(container =>
                     {
-                        case SkinComponentsContainerLookup.TargetArea.MainHUDComponents when containerLookup.Ruleset != null:
-                            Debug.Assert(containerLookup.Ruleset.ShortName == ManiaRuleset.SHORT_NAME);
+                        var combo = container.ChildrenOfType<ArgonManiaComboCounter>().FirstOrDefault();
 
-                            var rulesetHUDComponents = Skin.GetDrawableComponent(lookup);
-
-                            rulesetHUDComponents ??= new DefaultSkinComponentsContainer(container =>
-                            {
-                                var combo = container.ChildrenOfType<ArgonManiaComboCounter>().FirstOrDefault();
-
-                                if (combo != null)
-                                {
-                                    combo.Anchor = Anchor.TopCentre;
-                                    combo.Origin = Anchor.Centre;
-                                    combo.Y = 200;
-                                }
-                            })
-                            {
-                                new ArgonManiaComboCounter(),
-                            };
-
-                            return rulesetHUDComponents;
-                    }
-
-                    break;
+                        if (combo != null)
+                        {
+                            combo.Anchor = Anchor.TopCentre;
+                            combo.Origin = Anchor.Centre;
+                            combo.Y = 200;
+                        }
+                    })
+                    {
+                        new ArgonManiaComboCounter(),
+                    };
 
                 case GameplaySkinComponentLookup<HitResult> resultComponent:
                     // This should eventually be moved to a skin setting, when supported.
