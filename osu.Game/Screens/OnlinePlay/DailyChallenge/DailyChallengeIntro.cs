@@ -10,7 +10,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Screens;
-using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
@@ -38,10 +37,11 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
 
         private FillFlowContainer beatmapContent = null!;
 
+        private Container titleContainer = null!;
+
         private bool beatmapBackgroundLoaded;
 
         private bool animationBegan;
-        private bool trackContent;
 
         private IBindable<StarDifficulty?> starDifficulty = null!;
 
@@ -78,6 +78,67 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
                     Shear = new Vector2(OsuGame.SHEAR, 0f),
                     Children = new Drawable[]
                     {
+                        titleContainer = new Container
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            RelativeSizeAxes = Axes.Both,
+                            Children = new Drawable[]
+                            {
+                                topTitleDisplay = new Container
+                                {
+                                    Anchor = Anchor.Centre,
+                                    Origin = Anchor.CentreRight,
+                                    AutoSizeAxes = Axes.Both,
+                                    CornerRadius = 10f,
+                                    Masking = true,
+                                    X = -10,
+                                    Children = new Drawable[]
+                                    {
+                                        new Box
+                                        {
+                                            Colour = colourProvider.Background3,
+                                            RelativeSizeAxes = Axes.Both,
+                                        },
+                                        new OsuSpriteText
+                                        {
+                                            Anchor = Anchor.Centre,
+                                            Origin = Anchor.Centre,
+                                            Text = "Today's Challenge",
+                                            Margin = new MarginPadding { Horizontal = 10f, Vertical = 5f },
+                                            Shear = new Vector2(-OsuGame.SHEAR, 0f),
+                                            Font = OsuFont.GetFont(size: 32, weight: FontWeight.Light, typeface: Typeface.TorusAlternate),
+                                        },
+                                    }
+                                },
+                                bottomDateDisplay = new Container
+                                {
+                                    Anchor = Anchor.Centre,
+                                    Origin = Anchor.CentreLeft,
+                                    AutoSizeAxes = Axes.Both,
+                                    CornerRadius = 10f,
+                                    Masking = true,
+                                    X = 10,
+                                    Children = new Drawable[]
+                                    {
+                                        new Box
+                                        {
+                                            Colour = colourProvider.Background3,
+                                            RelativeSizeAxes = Axes.Both,
+                                        },
+                                        new OsuSpriteText
+                                        {
+                                            Anchor = Anchor.Centre,
+                                            Origin = Anchor.Centre,
+                                            Text = room.Name.Value.Split(':', StringSplitOptions.TrimEntries).Last(),
+                                            Margin = new MarginPadding { Horizontal = 10f, Vertical = 5f },
+                                            Shear = new Vector2(-OsuGame.SHEAR, 0f),
+                                            Font = OsuFont.GetFont(size: 32, weight: FontWeight.Light, typeface: Typeface.TorusAlternate),
+                                        },
+                                    }
+                                },
+                            }
+                        },
                         beatmapContent = new FillFlowContainer
                         {
                             AlwaysPresent = true, // so we can get the size ahead of time
@@ -209,56 +270,6 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
                                 }
                             }
                         },
-                        topTitleDisplay = new Container
-                        {
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.CentreRight,
-                            AutoSizeAxes = Axes.Both,
-                            CornerRadius = 10f,
-                            Masking = true,
-                            Children = new Drawable[]
-                            {
-                                new Box
-                                {
-                                    Colour = colourProvider.Background3,
-                                    RelativeSizeAxes = Axes.Both,
-                                },
-                                new OsuSpriteText
-                                {
-                                    Anchor = Anchor.Centre,
-                                    Origin = Anchor.Centre,
-                                    Text = "Today's Challenge",
-                                    Margin = new MarginPadding { Horizontal = 10f, Vertical = 5f },
-                                    Shear = new Vector2(-OsuGame.SHEAR, 0f),
-                                    Font = OsuFont.GetFont(size: 32, weight: FontWeight.Light, typeface: Typeface.TorusAlternate),
-                                },
-                            }
-                        },
-                        bottomDateDisplay = new Container
-                        {
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.CentreLeft,
-                            AutoSizeAxes = Axes.Both,
-                            CornerRadius = 10f,
-                            Masking = true,
-                            Children = new Drawable[]
-                            {
-                                new Box
-                                {
-                                    Colour = colourProvider.Background3,
-                                    RelativeSizeAxes = Axes.Both,
-                                },
-                                new OsuSpriteText
-                                {
-                                    Anchor = Anchor.Centre,
-                                    Origin = Anchor.Centre,
-                                    Text = room.Name.Value.Split(':', StringSplitOptions.TrimEntries).Last(),
-                                    Margin = new MarginPadding { Horizontal = 10f, Vertical = 5f },
-                                    Shear = new Vector2(-OsuGame.SHEAR, 0f),
-                                    Font = OsuFont.GetFont(size: 32, weight: FontWeight.Light, typeface: Typeface.TorusAlternate),
-                                },
-                            }
-                        },
                     }
                 }
             };
@@ -285,20 +296,6 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
                 beatmapBackgroundLoaded = true;
                 updateAnimationState();
             });
-        }
-
-        protected override void Update()
-        {
-            base.Update();
-
-            if (trackContent)
-            {
-                float yPos = (beatmapContent.DrawHeight * beatmapContent.Scale.Y) / 2 - 20 * beatmapContent.Scale.Y;
-                float xPos = getShearForY(yPos) + beatmapContent.Scale.Y * 320;
-
-                topTitleDisplay.Position = new Vector2(-xPos, yPos);
-                bottomDateDisplay.Position = new Vector2(xPos, -yPos);
-            }
         }
 
         public override void OnEntering(ScreenTransitionEvent e)
@@ -328,32 +325,43 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
 
         private void beginAnimation()
         {
-            const float v_spacing = 5;
-            const float initial_h_shift = 300;
-
-            introContent.ScaleTo(1.2f, 8000);
-
             using (BeginDelayedSequence(200))
             {
                 introContent.Show();
 
-                topTitleDisplay.MoveToX(getShearForY(topTitleDisplay.Y) - initial_h_shift)
-                               .MoveToX(getShearForY(topTitleDisplay.Y) - v_spacing, 300, Easing.OutQuint)
-                               .FadeInFromZero(400, Easing.OutQuint);
+                const float y_offset_start = 260;
+                const float y_offset_end = 20;
 
-                bottomDateDisplay.MoveToX(getShearForY(bottomDateDisplay.Y) + initial_h_shift)
-                                 .MoveToX(getShearForY(bottomDateDisplay.Y) + v_spacing, 300, Easing.OutQuint)
-                                 .FadeInFromZero(400, Easing.OutQuint);
+                topTitleDisplay
+                    .FadeInFromZero(400, Easing.OutQuint);
+
+                topTitleDisplay.MoveToY(-y_offset_start)
+                               .MoveToY(-y_offset_end, 300, Easing.OutQuint)
+                               .Then()
+                               .MoveToY(0, 4000);
+
+                bottomDateDisplay.MoveToY(y_offset_start)
+                                 .MoveToY(y_offset_end, 300, Easing.OutQuint)
+                                 .Then()
+                                 .MoveToY(0, 4000);
 
                 using (BeginDelayedSequence(500))
                 {
                     beatmapContent
-                        .ScaleTo(1f, 500, Easing.InQuint);
+                        .ScaleTo(3)
+                        .ScaleTo(1f, 500, Easing.In)
+                        .Then()
+                        .ScaleTo(1.1f, 4000);
+
+                    using (BeginDelayedSequence(100))
+                    {
+                        titleContainer
+                            .ScaleTo(0.4f, 400, Easing.In)
+                            .FadeOut(500, Easing.OutQuint);
+                    }
 
                     using (BeginDelayedSequence(240))
                     {
-                        Schedule(() => trackContent = true);
-
                         beatmapContent.FadeInFromZero(280, Easing.InQuad);
 
                         using (BeginDelayedSequence(300))
@@ -374,8 +382,6 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
                 }
             }
         }
-
-        private static float getShearForY(float yPos) => yPos * -OsuGame.SHEAR * 2;
 
         private partial class DailyChallengeIntroBackgroundScreen : RoomBackgroundScreen
         {
