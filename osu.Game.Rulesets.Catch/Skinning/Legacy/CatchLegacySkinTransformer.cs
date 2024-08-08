@@ -37,25 +37,14 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
 
                     // Modifications for global components.
                     if (containerLookup.Ruleset == null)
-                    {
-                        var components = base.GetDrawableComponent(lookup) as Container;
-
-                        if (providesComboCounter && components != null)
-                        {
-                            // catch may provide its own combo counter; hide the default.
-                            // todo: this should be done in an elegant way per ruleset, defining which HUD skin components should be displayed.
-                            foreach (var legacyComboCounter in components.OfType<LegacyComboCounter>())
-                                legacyComboCounter.HiddenByRulesetImplementation = false;
-                        }
-
-                        return components;
-                    }
+                        return base.GetDrawableComponent(lookup) as Container;
 
                     // Skin has configuration.
-                    if (base.GetDrawableComponent(lookup) is Drawable d)
+                    if (base.GetDrawableComponent(lookup) is UserConfiguredLayoutContainer d)
                         return d;
 
                     // Our own ruleset components default.
+                    // todo: remove CatchSkinComponents.CatchComboCounter and refactor LegacyCatchComboCounter to be added here instead.
                     return new DefaultSkinComponentsContainer(container =>
                     {
                         var keyCounter = container.OfType<LegacyKeyCounterDisplay>().FirstOrDefault();
