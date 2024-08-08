@@ -171,7 +171,8 @@ namespace osu.Game.Tournament.Screens.Board
                 informatiomDisplayContainer = new Container
                 {
                     Anchor = Anchor.BottomCentre,
-                    Origin = Anchor.BottomCentre,
+                    Origin = Anchor.BottomLeft,
+                    Position = new Vector2(-300, 7),
                     Height = 100,
                     Width = 500,
                     Child = new InstructionDisplay(),
@@ -353,6 +354,7 @@ namespace osu.Game.Tournament.Screens.Board
                     informatiomDisplayContainer.Child = new InstructionDisplay(team: teamWinner, step: DetectWin() ? Steps.FinalWin : (useEX ? Steps.EX : Steps.Default));
                     break;
             }
+            informatiomDisplayContainer.FadeInFromZero(duration: 200, easing: Easing.InCubic);
         }
 
         /*

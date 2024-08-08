@@ -134,7 +134,7 @@ namespace osu.Game.Tournament.Screens.Board
                     Origin = Anchor.BottomCentre,
                     RelativeSizeAxes = Axes.None,
                     Height = 80,
-                    Width = 500,
+                    Width = 650,
                     Colour = Color4.Black,
                     Margin = new MarginPadding { Bottom = 12 },
                     Alpha = 0.7f,
@@ -142,9 +142,10 @@ namespace osu.Game.Tournament.Screens.Board
                 new FillFlowContainer
                 {
                     Anchor = Anchor.BottomCentre,
-                    Origin = Anchor.BottomCentre,
+                    Origin = Anchor.BottomLeft,
                     RelativeSizeAxes = Axes.None,
                     AutoSizeAxes = Axes.X,
+                    X = -310,
                     Y = -7,
                     Height = 60,
                     CornerRadius = 10,

@@ -24,16 +24,16 @@ namespace osu.Game.Tournament.Components
                 team: team,
                 step: step
             );
-            Anchor = Anchor.BottomCentre;
-            Origin = Anchor.BottomCentre;
+            Anchor = Anchor.CentreLeft;
+            Origin = Anchor.CentreLeft;
             Height = 100;
             Width = 500;
             AlwaysPresent = true;
 
             InternalChild = new FillFlowContainer
             {
-                Anchor = Anchor.BottomCentre,
-                Origin = Anchor.BottomCentre,
+                Anchor = Anchor.CentreLeft,
+                Origin = Anchor.CentreLeft,
                 Y = -15,
                 Direction = FillDirection.Horizontal,
                 AutoSizeAxes = Axes.Both,
