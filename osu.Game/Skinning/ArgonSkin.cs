@@ -7,6 +7,7 @@ using JetBrains.Annotations;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Audio;
 using osu.Game.Beatmaps.Formats;
@@ -93,15 +94,12 @@ namespace osu.Game.Skinning
             // Temporary until default skin has a valid hit lighting.
             if ((lookup as SkinnableSprite.SpriteComponentLookup)?.LookupName == @"lighting") return Drawable.Empty();
 
-            if (base.GetDrawableComponent(lookup) is Drawable c)
+            if (base.GetDrawableComponent(lookup) is UserConfiguredLayoutContainer c)
                 return c;
 
             switch (lookup)
             {
                 case SkinComponentsContainerLookup containerLookup:
-                    // Only handle global level defaults for now.
-                    if (containerLookup.Ruleset != null)
-                        return null;
 
                     switch (containerLookup.Target)
                     {
@@ -114,6 +112,21 @@ namespace osu.Game.Skinning
                             return songSelectComponents;
 
                         case SkinComponentsContainerLookup.TargetArea.MainHUDComponents:
+                            if (containerLookup.Ruleset != null)
+                            {
+                                return new Container
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    Child = new ArgonComboCounter
+                                    {
+                                        Anchor = Anchor.BottomLeft,
+                                        Origin = Anchor.BottomLeft,
+                                        Position = new Vector2(36, -66),
+                                        Scale = new Vector2(1.3f),
+                                    },
+                                };
+                            }
+
                             var mainHUDComponents = new DefaultSkinComponentsContainer(container =>
                             {
                                 var health = container.OfType<ArgonHealthDisplay>().FirstOrDefault();
