@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
@@ -446,6 +447,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
 
                 MultiplayerPlaylistItemStats[] stats = t.GetResultSafely();
                 var itemStats = stats.SingleOrDefault(item => item.PlaylistItemID == playlistItem.ID);
+
                 if (itemStats == null) return;
 
                 Schedule(() =>
@@ -453,7 +455,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
                     breakdown.SetInitialCounts(itemStats.TotalScoreDistribution);
                     totals.SetInitialCounts(itemStats.TotalScoreDistribution.Sum(c => c), itemStats.CumulativeScore);
                 });
-            });
+            }, TaskContinuationOptions.OnlyOnRanToCompletion);
 
             userModsSelectOverlay.SelectedItem.Value = playlistItem;
         }
