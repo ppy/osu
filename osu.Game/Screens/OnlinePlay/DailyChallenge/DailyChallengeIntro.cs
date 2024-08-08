@@ -345,7 +345,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
                                  .Then()
                                  .MoveToY(0, 4000);
 
-                using (BeginDelayedSequence(500))
+                using (BeginDelayedSequence(1000))
                 {
                     beatmapContent
                         .ScaleTo(3)
