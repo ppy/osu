@@ -7,8 +7,10 @@
   </PropertyGroup>
   <ItemGroup>
     <EmbeddedResource Include="Fonts\**\*" />
+    <EmbeddedResource Include="Textures\**\*" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Properties\" />
+    <Folder Include="Textures\" />
   </ItemGroup>
 </Project>
