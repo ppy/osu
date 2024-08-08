@@ -45,7 +45,6 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
 
         private IBindable<StarDifficulty?> starDifficulty = null!;
 
-        private const float initial_v_shift = 32;
         private const float final_v_shift = 340;
 
         [Cached]
@@ -296,10 +295,10 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
 
             if (trackContent)
             {
-                float vShift = initial_v_shift + (beatmapContent.DrawHeight * beatmapContent.Scale.Y) / 2;
+                float vShift = (beatmapContent.DrawHeight * beatmapContent.Scale.Y) / 2;
 
                 float yPos = (float)Interpolation.DampContinuously(bottomDateDisplay.Y, vShift, 16, Clock.ElapsedFrameTime);
-                float xPos = (float)Interpolation.DampContinuously(bottomDateDisplay.X, getShearForY(vShift) + final_v_shift, 16, Clock.ElapsedFrameTime);
+                float xPos = (float)Interpolation.DampContinuously(bottomDateDisplay.X, getShearForY(vShift) + beatmapContent.Scale.Y * final_v_shift, 16, Clock.ElapsedFrameTime);
 
                 topTitleDisplay.Position = new Vector2(-xPos, -yPos);
                 bottomDateDisplay.Position = new Vector2(xPos, yPos);
@@ -333,34 +332,32 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
 
         private void beginAnimation()
         {
-            const float v_spacing = 0;
+            const float v_spacing = 5;
+            const float initial_h_shift = 300;
 
             using (BeginDelayedSequence(200))
             {
                 introContent.Show();
 
-                topTitleDisplay.MoveToOffset(new Vector2(getShearForY(-initial_v_shift), -initial_v_shift));
-                bottomDateDisplay.MoveToOffset(new Vector2(getShearForY(initial_v_shift), initial_v_shift));
-
-                topTitleDisplay.MoveToX(getShearForY(topTitleDisplay.Y) - 500)
+                topTitleDisplay.MoveToX(getShearForY(topTitleDisplay.Y) - initial_h_shift)
                                .MoveToX(getShearForY(topTitleDisplay.Y) - v_spacing, 300, Easing.OutQuint)
                                .FadeInFromZero(400, Easing.OutQuint);
 
-                bottomDateDisplay.MoveToX(getShearForY(bottomDateDisplay.Y) + 500)
+                bottomDateDisplay.MoveToX(getShearForY(bottomDateDisplay.Y) + initial_h_shift)
                                  .MoveToX(getShearForY(bottomDateDisplay.Y) + v_spacing, 300, Easing.OutQuint)
                                  .FadeInFromZero(400, Easing.OutQuint);
 
                 using (BeginDelayedSequence(500))
                 {
-                    Schedule(() => trackContent = true);
-
                     beatmapContent
                         .ScaleTo(1f, 500, Easing.InQuint)
                         .Then()
-                        .ScaleTo(1.02f, 3000);
+                        .ScaleTo(1.1f, 3000);
 
                     using (BeginDelayedSequence(240))
                     {
+                        Schedule(() => trackContent = true);
+
                         beatmapContent.FadeInFromZero(280, Easing.InQuad);
 
                         using (BeginDelayedSequence(300))
