@@ -455,8 +455,6 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
                 });
             });
 
-            beatmapAvailabilityTracker.SelectedItem.Value = playlistItem;
-            beatmapAvailabilityTracker.Availability.BindValueChanged(_ => TrySetDailyChallengeBeatmap(this, beatmapManager, rulesets, musicController, playlistItem), true);
             userModsSelectOverlay.SelectedItem.Value = playlistItem;
         }
 
