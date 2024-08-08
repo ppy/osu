@@ -56,7 +56,7 @@ namespace osu.Game.Tournament.Screens.Board
         private bool hasTrap = false;
 
         private TrapTypeDropdown trapTypeDropdown = null!;
-        private Container informatiomDisplayContainer = null!;
+        private Container informationDisplayContainer = null!;
         private Sprite additionalIcon = null!;
 
         private DrawableTeamPlayerList team1List = null!;
@@ -170,7 +170,7 @@ namespace osu.Game.Tournament.Screens.Board
                     Padding = new MarginPadding{ Left = 50 },
                     Spacing = new Vector2(10, 10),
                 },
-                informatiomDisplayContainer = new Container
+                informationDisplayContainer = new Container
                 {
                     Anchor = Anchor.BottomCentre,
                     Origin = Anchor.BottomLeft,
@@ -337,34 +337,34 @@ namespace osu.Game.Tournament.Screens.Board
             switch (choiceType)
             {
                 case ChoiceType.Protect:
-                    informatiomDisplayContainer.Child = new InstructionDisplay(team: pickColour, step: Steps.Protect);
+                    informationDisplayContainer.Child = new InstructionDisplay(team: pickColour, step: Steps.Protect);
                     break;
 
                 case ChoiceType.Pick:
-                    informatiomDisplayContainer.Child = new InstructionDisplay(team: pickColour, step: Steps.Pick);
+                    informationDisplayContainer.Child = new InstructionDisplay(team: pickColour, step: Steps.Pick);
                     break;
 
                 case ChoiceType.Trap:
-                    informatiomDisplayContainer.Child = new InstructionDisplay(team: pickColour, step: Steps.Trap);
+                    informationDisplayContainer.Child = new InstructionDisplay(team: pickColour, step: Steps.Trap);
                     break;
 
                 case ChoiceType.Ban:
-                    informatiomDisplayContainer.Child = new InstructionDisplay(team: pickColour, step: Steps.Ban);
+                    informationDisplayContainer.Child = new InstructionDisplay(team: pickColour, step: Steps.Ban);
                     break;
 
                 case ChoiceType.RedWin or ChoiceType.BlueWin:
-                    informatiomDisplayContainer.Child = new InstructionDisplay(team: pickColour, step: Steps.Win);
+                    informationDisplayContainer.Child = new InstructionDisplay(team: pickColour, step: Steps.Win);
                     break;
 
                 case ChoiceType.Swap:
-                    informatiomDisplayContainer.Child = new TrapInfoDisplay(trap: TrapType.Swap);
+                    informationDisplayContainer.Child = new TrapInfoDisplay(trap: TrapType.Swap);
                     break;
 
                 default:
-                    informatiomDisplayContainer.Child = new InstructionDisplay(team: teamWinner, step: DetectWin() ? Steps.FinalWin : (useEX ? Steps.EX : Steps.Default));
+                    informationDisplayContainer.Child = new InstructionDisplay(team: teamWinner, step: DetectWin() ? Steps.FinalWin : (useEX ? Steps.EX : Steps.Default));
                     break;
             }
-            informatiomDisplayContainer.FadeInFromZero(duration: 200, easing: Easing.InCubic);
+            informationDisplayContainer.FadeInFromZero(duration: 200, easing: Easing.InCubic);
         }
 
         /*
@@ -452,11 +452,11 @@ namespace osu.Game.Tournament.Screens.Board
 
                     if (teamWinner != TeamColour.Neutral && !havePendingSwap)
                     {
-                        informatiomDisplayContainer.Child = new InstructionDisplay(team: teamWinner, step: Steps.FinalWin);
+                        informationDisplayContainer.Child = new InstructionDisplay(team: teamWinner, step: Steps.FinalWin);
                     }
                     else if (useEX && !havePendingSwap)
                     {
-                        informatiomDisplayContainer.Child = new InstructionDisplay(step: Steps.EX);
+                        informationDisplayContainer.Child = new InstructionDisplay(step: Steps.EX);
                     }
                     else if (!hasTrap)
                     {
@@ -502,7 +502,7 @@ namespace osu.Game.Tournament.Screens.Board
             CurrentMatch.Value?.PendingSwaps.Clear();
 
             // Reset bottom display
-            informatiomDisplayContainer.Child = new InstructionDisplay();
+            informationDisplayContainer.Child = new InstructionDisplay();
 
             // Reset button group
             buttonBlueProtect.Colour = Color4.White;
@@ -560,7 +560,7 @@ namespace osu.Game.Tournament.Screens.Board
 
                 if (pickType == ChoiceType.Pick && matchTrap != null)
                 {
-                    informatiomDisplayContainer.Child = matchTrap.Team != pickColour
+                    informationDisplayContainer.Child = matchTrap.Team != pickColour
                         ? new TrapInfoDisplay(trap: matchTrap.Mode, team: matchTrap.Team, mapID: matchTrap.BeatmapID)
                         : new TrapInfoDisplay(trap: TrapType.Unused, team: matchTrap.Team, mapID: matchTrap.BeatmapID);
 
