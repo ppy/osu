@@ -114,12 +114,7 @@ namespace osu.Game.Screens.Play.HUD
 
         protected override void UpdateProgress(double progress, bool isIntro)
         {
-            bar.TrackTime = GameplayClock.CurrentTime;
-
-            if (isIntro)
-                bar.CurrentTime = 0;
-            else
-                bar.CurrentTime = FrameStableClock.CurrentTime;
+            bar.Progress = isIntro ? 0 : progress;
         }
     }
 }

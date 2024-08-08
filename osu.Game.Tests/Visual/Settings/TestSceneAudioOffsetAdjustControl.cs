@@ -3,7 +3,7 @@
 
 using NUnit.Framework;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Utils;
@@ -25,9 +25,15 @@ namespace osu.Game.Tests.Visual.Settings
         private Container content = null!;
         protected override Container Content => content;
 
+        private OsuConfigManager localConfig = null!;
+        private AudioOffsetAdjustControl adjustControl = null!;
+
         [BackgroundDependencyLoader]
         private void load()
         {
+            localConfig = new OsuConfigManager(LocalStorage);
+            Dependencies.CacheAs(localConfig);
+
             base.Content.AddRange(new Drawable[]
             {
                 tracker,
@@ -41,23 +47,85 @@ namespace osu.Game.Tests.Visual.Settings
             });
         }
 
-        [Test]
-        public void TestBehaviour()
+        [SetUp]
+        public void SetUp() => Schedule(() =>
         {
-            AddStep("create control", () => Child = new AudioOffsetAdjustControl
+            Child = adjustControl = new AudioOffsetAdjustControl
             {
-                Current = new BindableDouble
-                {
-                    MinValue = -500,
-                    MaxValue = 500
-                }
-            });
+                Current = localConfig.GetBindable<double>(OsuSetting.AudioOffset),
+            };
+
+            localConfig.SetValue(OsuSetting.AudioOffset, 0.0);
+            tracker.ClearHistory();
+        });
+
+        [Test]
+        public void TestDisplay()
+        {
             AddStep("set new score", () => statics.SetValue(Static.LastLocalUserScore, new ScoreInfo
             {
                 HitEvents = TestSceneHitEventTimingDistributionGraph.CreateDistributedHitEvents(RNG.NextDouble(-100, 100)),
                 BeatmapInfo = Beatmap.Value.BeatmapInfo,
             }));
             AddStep("clear history", () => tracker.ClearHistory());
+        }
+
+        [Test]
+        public void TestBehaviour()
+        {
+            AddStep("set score with -20ms", () => setScore(-20));
+            AddAssert("suggested global offset is 20ms", () => adjustControl.SuggestedOffset.Value, () => Is.EqualTo(20));
+            AddStep("clear history", () => tracker.ClearHistory());
+
+            AddStep("set score with 40ms", () => setScore(40));
+            AddAssert("suggested global offset is -40ms", () => adjustControl.SuggestedOffset.Value, () => Is.EqualTo(-40));
+            AddStep("clear history", () => tracker.ClearHistory());
+        }
+
+        [Test]
+        public void TestNonZeroGlobalOffset()
+        {
+            AddStep("set global offset to -20ms", () => localConfig.SetValue(OsuSetting.AudioOffset, -20.0));
+            AddStep("set score with -20ms", () => setScore(-20));
+            AddAssert("suggested global offset is 0ms", () => adjustControl.SuggestedOffset.Value, () => Is.EqualTo(0));
+            AddStep("clear history", () => tracker.ClearHistory());
+
+            AddStep("set global offset to 20ms", () => localConfig.SetValue(OsuSetting.AudioOffset, 20.0));
+            AddStep("set score with 40ms", () => setScore(40));
+            AddAssert("suggested global offset is -20ms", () => adjustControl.SuggestedOffset.Value, () => Is.EqualTo(-20));
+            AddStep("clear history", () => tracker.ClearHistory());
+        }
+
+        [Test]
+        public void TestMultiplePlays()
+        {
+            AddStep("set score with -20ms", () => setScore(-20));
+            AddStep("set score with -10ms", () => setScore(-10));
+            AddAssert("suggested global offset is 15ms", () => adjustControl.SuggestedOffset.Value, () => Is.EqualTo(15));
+            AddStep("clear history", () => tracker.ClearHistory());
+
+            AddStep("set score with -20ms", () => setScore(-20));
+            AddStep("set global offset to 30ms", () => localConfig.SetValue(OsuSetting.AudioOffset, 30.0));
+            AddStep("set score with 10ms", () => setScore(10));
+            AddAssert("suggested global offset is 20ms", () => adjustControl.SuggestedOffset.Value, () => Is.EqualTo(20));
+            AddStep("clear history", () => tracker.ClearHistory());
+        }
+
+        private void setScore(double averageHitError)
+        {
+            statics.SetValue(Static.LastLocalUserScore, new ScoreInfo
+            {
+                HitEvents = TestSceneHitEventTimingDistributionGraph.CreateDistributedHitEvents(averageHitError),
+                BeatmapInfo = Beatmap.Value.BeatmapInfo,
+            });
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            if (localConfig.IsNotNull())
+                localConfig.Dispose();
+
+            base.Dispose(isDisposing);
         }
     }
 }

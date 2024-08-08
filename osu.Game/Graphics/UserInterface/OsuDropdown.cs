@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -29,6 +30,12 @@ namespace osu.Game.Graphics.UserInterface
         protected override DropdownHeader CreateHeader() => new OsuDropdownHeader();
 
         protected override DropdownMenu CreateMenu() => new OsuDropdownMenu();
+
+        public OsuDropdown()
+        {
+            if (Header is OsuDropdownHeader osuHeader)
+                osuHeader.Dropdown = this;
+        }
 
         public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
@@ -186,6 +193,8 @@ namespace osu.Game.Graphics.UserInterface
                     : base(item)
                 {
                     Foreground.Padding = new MarginPadding(2);
+                    Foreground.AutoSizeAxes = Axes.Y;
+                    Foreground.RelativeSizeAxes = Axes.X;
 
                     Masking = true;
                     CornerRadius = corner_radius;
@@ -247,11 +256,12 @@ namespace osu.Game.Graphics.UserInterface
                                 Origin = Anchor.CentreLeft,
                                 Anchor = Anchor.CentreLeft,
                             },
-                            Label = new OsuSpriteText
+                            Label = new TruncatingSpriteText
                             {
-                                X = 15,
+                                Padding = new MarginPadding { Left = 15 },
                                 Origin = Anchor.CentreLeft,
                                 Anchor = Anchor.CentreLeft,
+                                RelativeSizeAxes = Axes.X,
                             },
                         };
                     }
@@ -304,7 +314,9 @@ namespace osu.Game.Graphics.UserInterface
                 set => Text.Text = value;
             }
 
-            protected readonly SpriteIcon Icon;
+            protected readonly SpriteIcon Chevron;
+
+            public OsuDropdown<T>? Dropdown { get; set; }
 
             public OsuDropdownHeader()
             {
@@ -338,7 +350,7 @@ namespace osu.Game.Graphics.UserInterface
                                 Origin = Anchor.CentreLeft,
                                 RelativeSizeAxes = Axes.X,
                             },
-                            Icon = new SpriteIcon
+                            Chevron = new SpriteIcon
                             {
                                 Icon = FontAwesome.Solid.ChevronDown,
                                 Anchor = Anchor.CentreRight,
@@ -361,6 +373,9 @@ namespace osu.Game.Graphics.UserInterface
             protected override void LoadComplete()
             {
                 base.LoadComplete();
+
+                if (Dropdown != null)
+                    Dropdown.Menu.StateChanged += _ => updateChevron();
 
                 SearchBar.State.ValueChanged += _ => updateColour();
                 Enabled.BindValueChanged(_ => updateColour());
@@ -389,14 +404,21 @@ namespace osu.Game.Graphics.UserInterface
 
                 if (SearchBar.State.Value == Visibility.Visible)
                 {
-                    Icon.Colour = hovered ? hoveredColour.Lighten(0.5f) : Colour4.White;
+                    Chevron.Colour = hovered ? hoveredColour.Lighten(0.5f) : Colour4.White;
                     Background.Colour = unhoveredColour;
                 }
                 else
                 {
-                    Icon.Colour = Color4.White;
+                    Chevron.Colour = Color4.White;
                     Background.Colour = hovered ? hoveredColour : unhoveredColour;
                 }
+            }
+
+            private void updateChevron()
+            {
+                Debug.Assert(Dropdown != null);
+                bool open = Dropdown.Menu.State == MenuState.Open;
+                Chevron.ScaleTo(open ? new Vector2(1f, -1f) : Vector2.One, 300, Easing.OutQuint);
             }
 
             protected override DropdownSearchBar CreateSearchBar() => new OsuDropdownSearchBar
@@ -415,16 +437,19 @@ namespace osu.Game.Graphics.UserInterface
                     FontSize = OsuFont.Default.Size,
                 };
 
-                private partial class DropdownSearchTextBox : SearchTextBox
+                private partial class DropdownSearchTextBox : OsuTextBox
                 {
-                    public override bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
+                    [BackgroundDependencyLoader]
+                    private void load(OverlayColourProvider? colourProvider)
                     {
-                        if (e.Action == GlobalAction.Back)
-                            // this method is blocking Dropdown from receiving the back action, despite this text box residing in a separate input manager.
-                            // to fix this properly, a local global action container needs to be added as well, but for simplicity, just don't handle the back action here.
-                            return false;
+                        BackgroundUnfocused = colourProvider?.Background5 ?? new Color4(10, 10, 10, 255);
+                        BackgroundFocused = colourProvider?.Background5 ?? new Color4(10, 10, 10, 255);
+                    }
 
-                        return base.OnPressed(e);
+                    protected override void OnFocus(FocusEvent e)
+                    {
+                        base.OnFocus(e);
+                        BorderThickness = 0;
                     }
                 }
             }

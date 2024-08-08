@@ -14,7 +14,7 @@ namespace osu.Game.Graphics.UserInterface
     /// </summary>
     public partial class PercentageCounter : RollingCounter<double>
     {
-        protected override double RollingDuration => 750;
+        protected override double RollingDuration => 375;
 
         private float epsilon => 1e-10f;
 

@@ -153,7 +153,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             if (tracking.NewValue)
             {
-                if (!spinningSample.IsPlaying)
+                if (!spinningSample.RequestedPlaying)
                     spinningSample.Play();
 
                 spinningSample.VolumeTo(1, 300);
@@ -258,15 +258,16 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             foreach (var tick in ticks.Where(t => !t.Result.HasResult))
                 tick.TriggerResult(false);
 
-            ApplyResult(r =>
+            ApplyResult(static (r, hitObject) =>
             {
-                if (Progress >= 1)
+                var spinner = (DrawableSpinner)hitObject;
+                if (spinner.Progress >= 1)
                     r.Type = HitResult.Great;
-                else if (Progress > .9)
+                else if (spinner.Progress > .9)
                     r.Type = HitResult.Ok;
-                else if (Progress > .75)
+                else if (spinner.Progress > .75)
                     r.Type = HitResult.Meh;
-                else if (Time.Current >= HitObject.EndTime)
+                else if (spinner.Time.Current >= spinner.HitObject.EndTime)
                     r.Type = r.Judgement.MinResult;
             });
         }
@@ -278,10 +279,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             if (HandleUserInput)
             {
                 bool isValidSpinningTime = Time.Current >= HitObject.StartTime && Time.Current <= HitObject.EndTime;
-                bool correctButtonPressed = (OsuActionInputManager?.PressedActions.Any(x => x == OsuAction.LeftButton || x == OsuAction.RightButton) ?? false);
 
                 RotationTracker.Tracking = !Result.HasResult
-                                           && correctButtonPressed
+                                           && correctButtonPressed()
                                            && isValidSpinningTime;
             }
 
@@ -291,11 +291,34 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             // Ticks can theoretically be judged at any point in the spinner's duration.
             // A tick must be alive to correctly play back samples,
             // but for performance reasons, we only want to keep the next tick alive.
-            var next = NestedHitObjects.FirstOrDefault(h => !h.Judged);
+            DrawableHitObject nextTick = null;
+
+            foreach (var nested in NestedHitObjects)
+            {
+                if (!nested.Judged)
+                {
+                    nextTick = nested;
+                    break;
+                }
+            }
 
             // See default `LifetimeStart` as set in `DrawableSpinnerTick`.
-            if (next?.LifetimeStart == double.MaxValue)
-                next.LifetimeStart = HitObject.StartTime;
+            if (nextTick?.LifetimeStart == double.MaxValue)
+                nextTick.LifetimeStart = HitObject.StartTime;
+        }
+
+        private bool correctButtonPressed()
+        {
+            if (OsuActionInputManager == null)
+                return false;
+
+            foreach (var action in OsuActionInputManager.PressedActions)
+            {
+                if (action == OsuAction.LeftButton || action == OsuAction.RightButton)
+                    return true;
+            }
+
+            return false;
         }
 
         protected override void UpdateAfterChildren()

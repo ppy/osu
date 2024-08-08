@@ -248,6 +248,9 @@ namespace osu.Game.Online.Spectator
 
                 isPlaying = false;
                 currentBeatmap = null;
+                currentScore = null;
+                currentScoreProcessor = null;
+                currentScoreToken = null;
 
                 if (state.HasPassed)
                     currentState.State = SpectatedUserState.Passed;
@@ -264,13 +267,12 @@ namespace osu.Game.Online.Spectator
         {
             Debug.Assert(ThreadSafety.IsUpdateThread);
 
-            if (watchedUsersRefCounts.ContainsKey(userId))
+            if (!watchedUsersRefCounts.TryAdd(userId, 1))
             {
                 watchedUsersRefCounts[userId]++;
                 return;
             }
 
-            watchedUsersRefCounts.Add(userId, 1);
             WatchUserInternal(userId);
         }
 

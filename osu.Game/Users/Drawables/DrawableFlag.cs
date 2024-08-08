@@ -15,11 +15,12 @@ namespace osu.Game.Users.Drawables
     {
         private readonly CountryCode countryCode;
 
-        public LocalisableString TooltipText => countryCode == CountryCode.Unknown ? string.Empty : countryCode.GetDescription();
+        public LocalisableString TooltipText { get; }
 
         public DrawableFlag(CountryCode countryCode)
         {
             this.countryCode = countryCode;
+            TooltipText = countryCode == CountryCode.Unknown ? string.Empty : countryCode.GetDescription();
         }
 
         [BackgroundDependencyLoader]

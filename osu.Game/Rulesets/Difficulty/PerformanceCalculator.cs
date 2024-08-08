@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Threading;
+using System.Threading.Tasks;
 using osu.Game.Beatmaps;
 using osu.Game.Scoring;
 
@@ -14,6 +16,9 @@ namespace osu.Game.Rulesets.Difficulty
         {
             Ruleset = ruleset;
         }
+
+        public Task<PerformanceAttributes> CalculateAsync(ScoreInfo score, DifficultyAttributes attributes, CancellationToken cancellationToken)
+            => Task.Run(() => CreatePerformanceAttributes(score, attributes), cancellationToken);
 
         public PerformanceAttributes Calculate(ScoreInfo score, DifficultyAttributes attributes)
             => CreatePerformanceAttributes(score, attributes);
