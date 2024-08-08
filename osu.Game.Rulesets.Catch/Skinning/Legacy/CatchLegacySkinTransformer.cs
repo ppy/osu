@@ -40,7 +40,7 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
                         return base.GetDrawableComponent(lookup) as Container;
 
                     // Skin has configuration.
-                    if (base.GetDrawableComponent(lookup) is Drawable d)
+                    if (base.GetDrawableComponent(lookup) is UserConfiguredLayoutContainer d)
                         return d;
 
                     // Our own ruleset components default.

@@ -14,7 +14,6 @@ using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
 using osu.Framework.Logging;
@@ -26,7 +25,7 @@ using osu.Game.Screens.Play.HUD;
 
 namespace osu.Game.Skinning
 {
-    public abstract class Skin : IDisposable, ISkin
+    public abstract partial class Skin : IDisposable, ISkin
     {
         private readonly IStorageResourceProvider? resources;
 
@@ -195,7 +194,7 @@ namespace osu.Game.Skinning
                     if (!LayoutInfos.TryGetValue(containerLookup.Target, out var layoutInfo)) return null;
                     if (!layoutInfo.TryGetDrawableInfo(containerLookup.Ruleset, out var drawableInfos)) return null;
 
-                    return new Container
+                    return new UserConfiguredLayoutContainer
                     {
                         RelativeSizeAxes = Axes.Both,
                         ChildrenEnumerable = drawableInfos.Select(i => i.CreateInstance())

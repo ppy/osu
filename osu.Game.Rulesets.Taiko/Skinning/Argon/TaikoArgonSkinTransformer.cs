@@ -7,7 +7,7 @@ using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Taiko.Skinning.Argon
 {
-    public class TaikoArgonSkinTransformer : ArgonSkinTransformer
+    public class TaikoArgonSkinTransformer : SkinTransformer
     {
         public TaikoArgonSkinTransformer(ISkin skin)
             : base(skin)
