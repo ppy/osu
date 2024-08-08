@@ -66,11 +66,11 @@ namespace osu.Game.Tournament.Models
                     icon.Colour = Color4.Orange;
                     break;
 
-                case TrapType.Solo:
-                    name = @"决一死战";
-                    description = @"两队各派1人游玩，FM图必须选择Mod";
-                    icon.Icon = FontAwesome.Solid.UserCircle;
-                    icon.Colour = new OsuColour().Pink1;
+                case TrapType.Reverse:
+                    name = @"逆向时间";
+                    description = @"以对方胜利进行结算，此后回到原状态";
+                    icon.Icon = FontAwesome.Solid.Clock;
+                    icon.Colour = Color4.SkyBlue;
                     break;
 
                 case TrapType.Unused:
@@ -102,14 +102,17 @@ namespace osu.Game.Tournament.Models
         {
             switch (typeString.ToString())
             {
-                case @"决一死战":
-                    return TrapType.Solo;
+                case @"时空之门":
+                    return TrapType.Follow;
 
                 case @"大陆漂移":
                     return TrapType.Swap;
 
-                case @"时空之门":
-                    return TrapType.Follow;
+                case @"陷阱无效":
+                    return TrapType.Unused;
+
+                case @"逆向时间":
+                    return TrapType.Reverse;
 
                 default:
                     return TrapType.Unknown;
@@ -132,9 +135,9 @@ namespace osu.Game.Tournament.Models
         /// </summary>
         Swap,
         /// <summary>
-        /// Perform an 1v1 play, with each player having at least one mod on (including the one bundled with the map).
+        /// Set a temporary Win state for this block, then reset to Pick.
         /// </summary>
-        Solo,
+        Reverse,
         /// <summary>
         /// The trap has no effect.
         /// </summary>

@@ -525,6 +525,8 @@ namespace osu.Game.Tournament.Screens.Board
 
         private void addForBeatmap(int beatmapId)
         {
+            bool hasReversed = false;
+
             if (pickType == ChoiceType.Neutral)
                 return;
 
@@ -543,6 +545,13 @@ namespace osu.Game.Tournament.Screens.Board
                 // don't attempt to ban a protected map
                 return;
 
+            // Remove the latest win state for Reverse Trap
+            if (CurrentMatch.Value.PicksBans.Any(p => p.BeatmapID == beatmapId && (p.Type == ChoiceType.RedWin || p.Type == ChoiceType.BlueWin) && pickType == ChoiceType.Pick))
+            {
+                var latestWin = CurrentMatch.Value.PicksBans.LastOrDefault(p => p.BeatmapID == beatmapId && (p.Type == ChoiceType.RedWin || p.Type == ChoiceType.BlueWin));
+                if (latestWin != null) CurrentMatch.Value.PicksBans.Remove(latestWin);
+            }
+
             // Show the trap description
             if (CurrentMatch.Value.Traps.Any(p => p.BeatmapID == beatmapId && !p.IsTriggered))
             {
@@ -557,6 +566,17 @@ namespace osu.Game.Tournament.Screens.Board
 
                     CurrentMatch.Value.Traps.Remove(matchTrap);
                     if (PBTrap != null) CurrentMatch.Value.PicksBans.Remove(PBTrap);
+                    if (matchTrap.Mode == TrapType.Reverse)
+                    {
+                        // Add Win status first
+                        hasReversed = true;
+                        CurrentMatch.Value.PicksBans.Add(new BeatmapChoice
+                        {
+                            BeatmapID = beatmapId,
+                            Team = matchTrap.Team == TeamColour.Red ? TeamColour.Red : TeamColour.Blue,
+                            Type = matchTrap.Team == TeamColour.Red ? ChoiceType.RedWin : ChoiceType.BlueWin,
+                        });
+                    }
                     // matchTrap.IsTriggered = true;
                     hasTrap = true;
                 }
@@ -614,7 +634,7 @@ namespace osu.Game.Tournament.Screens.Board
                 });
             }
 
-            if (pickType != ChoiceType.Swap && !CurrentMatch.Value.PicksBans.Any(p => p.BeatmapID == beatmapId && p.Type == pickType))
+            if (pickType != ChoiceType.Swap && !hasReversed && !CurrentMatch.Value.PicksBans.Any(p => p.BeatmapID == beatmapId && p.Type == pickType))
             {
                 CurrentMatch.Value.PicksBans.Add(new BeatmapChoice
                 {

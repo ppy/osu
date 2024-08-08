@@ -13,7 +13,7 @@ namespace osu.Game.Tournament.Screens.Board.Components
         {
             add(new TrapInfo(type: TrapType.Follow).Name);
             add(new TrapInfo(type: TrapType.Swap).Name);
-            add(new TrapInfo(type: TrapType.Solo).Name);
+            add(new TrapInfo(type: TrapType.Reverse).Name);
             add(new TrapInfo(type: TrapType.Unknown).Name);
         }
 
