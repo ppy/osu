@@ -77,6 +77,9 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
         private readonly OnlinePlayBeatmapAvailabilityTracker beatmapAvailabilityTracker = new OnlinePlayBeatmapAvailabilityTracker();
 
         [Resolved]
+        private OsuGame? game { get; set; }
+
+        [Resolved]
         private BeatmapManager beatmapManager { get; set; } = null!;
 
         [Resolved]
@@ -547,9 +550,6 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
                 metadataClient.MultiplayerRoomScoreSet -= onRoomScoreSet;
         }
 
-        [Resolved]
-        private OsuGame? game { get; set; }
-
         public void PresentBeatmap(WorkingBeatmap beatmap, RulesetInfo ruleset)
         {
             if (!this.IsCurrentScreen())
@@ -559,6 +559,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
             // If the import was for a different beatmap, pass the duty off to global handling.
             if (beatmap.BeatmapSetInfo.OnlineID != playlistItem.Beatmap.BeatmapSet!.OnlineID)
             {
+                this.Exit();
                 game?.PresentBeatmap(beatmap.BeatmapSetInfo, b => b.ID == beatmap.BeatmapInfo.ID);
             }
 
