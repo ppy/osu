@@ -65,8 +65,8 @@ namespace osu.Game.Tournament.Models
                     break;
 
                 case Steps.Trap:
-                    name = @$"设置陷阱·{teamPrompt}";
-                    description = @"请队长*私信*告知裁判，禁止外泄。";
+                    name = @$"设置陷阱";
+                    description = @"请队长*私信*告知裁判，切勿外泄。";
                     icon.Icon = FontAwesome.Solid.ExclamationCircle;
                     icon.Colour = new OsuColour().Pink1;
                     break;
