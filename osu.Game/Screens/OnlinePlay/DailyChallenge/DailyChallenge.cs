@@ -458,6 +458,8 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
             }, TaskContinuationOptions.OnlyOnRanToCompletion);
 
             userModsSelectOverlay.SelectedItem.Value = playlistItem;
+
+            TrySetDailyChallengeBeatmap(this, beatmapManager, rulesets, musicController, playlistItem);
         }
 
         public override void OnResuming(ScreenTransitionEvent e)
