@@ -8,6 +8,9 @@ using static osu.Game.Skinning.SkinConfiguration;
 
 namespace osu.Game.Skinning
 {
+    /// <summary>
+    /// Transformer used to handle support of legacy features for individual rulesets.
+    /// </summary>
     public abstract class LegacySkinTransformer : SkinTransformer
     {
         /// <summary>

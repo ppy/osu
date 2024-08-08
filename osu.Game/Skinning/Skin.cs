@@ -25,7 +25,7 @@ using osu.Game.Screens.Play.HUD;
 
 namespace osu.Game.Skinning
 {
-    public abstract partial class Skin : IDisposable, ISkin
+    public abstract class Skin : IDisposable, ISkin
     {
         private readonly IStorageResourceProvider? resources;
 
