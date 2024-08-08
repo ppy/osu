@@ -240,12 +240,19 @@ namespace osu.Game.Skinning.Components
             {
                 StarDifficulty difficulty = d.NewValue ?? new StarDifficulty();
 
-                calculateMaxPerformance(difficulty.Attributes).ContinueWith(t =>
+                if (Attribute.Value == BeatmapAttribute.StarRating)
                 {
                     valueDictionary[BeatmapAttribute.StarRating] = difficulty.Stars.ToLocalisableString(@"F2");
-                    valueDictionary[BeatmapAttribute.MaxPerformance] = t.GetResultSafely().ToLocalisableString(@"0pp");
                     updateLabel();
-                }, cancellationTokenSource.Token);
+                }
+                else if (Attribute.Value == BeatmapAttribute.MaxPerformance)
+                {
+                    calculateMaxPerformance(difficulty.Attributes).ContinueWith(t =>
+                    {
+                        valueDictionary[BeatmapAttribute.MaxPerformance] = t.GetResultSafely().ToLocalisableString(@"0pp");
+                        updateLabel();
+                    }, cancellationTokenSource.Token);
+                }
             });
         }
 
