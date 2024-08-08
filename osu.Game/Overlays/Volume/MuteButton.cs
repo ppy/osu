@@ -35,16 +35,16 @@ namespace osu.Game.Overlays.Volume
 
         private Color4 hoveredColour, unhoveredColour;
 
-        private const float width = 100;
-        public const float HEIGHT = 35;
-
         public MuteButton()
         {
+            const float width = 30;
+            const float height = 30;
+
             Content.BorderThickness = 3;
-            Content.CornerRadius = HEIGHT / 2;
+            Content.CornerRadius = height / 2;
             Content.CornerExponent = 2;
 
-            Size = new Vector2(width, HEIGHT);
+            Size = new Vector2(width, height);
 
             Action = () => Current.Value = !Current.Value;
         }
@@ -52,7 +52,7 @@ namespace osu.Game.Overlays.Volume
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            hoveredColour = colours.YellowDark;
+            hoveredColour = colours.PinkLight;
 
             Content.BorderColour = unhoveredColour = colours.Gray1;
             BackgroundColour = colours.Gray1;
