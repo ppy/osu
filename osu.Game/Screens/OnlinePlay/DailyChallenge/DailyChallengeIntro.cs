@@ -45,8 +45,6 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
 
         private IBindable<StarDifficulty?> starDifficulty = null!;
 
-        private const float final_v_shift = 340;
-
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Plum);
 
@@ -295,13 +293,11 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
 
             if (trackContent)
             {
-                float vShift = (beatmapContent.DrawHeight * beatmapContent.Scale.Y) / 2;
+                float yPos = (beatmapContent.DrawHeight * beatmapContent.Scale.Y) / 2 - 20 * beatmapContent.Scale.Y;
+                float xPos = getShearForY(yPos) + beatmapContent.Scale.Y * 320;
 
-                float yPos = (float)Interpolation.DampContinuously(bottomDateDisplay.Y, vShift, 16, Clock.ElapsedFrameTime);
-                float xPos = (float)Interpolation.DampContinuously(bottomDateDisplay.X, getShearForY(vShift) + beatmapContent.Scale.Y * final_v_shift, 16, Clock.ElapsedFrameTime);
-
-                topTitleDisplay.Position = new Vector2(-xPos, -yPos);
-                bottomDateDisplay.Position = new Vector2(xPos, yPos);
+                topTitleDisplay.Position = new Vector2(-xPos, yPos);
+                bottomDateDisplay.Position = new Vector2(xPos, -yPos);
             }
         }
 
@@ -335,6 +331,8 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
             const float v_spacing = 5;
             const float initial_h_shift = 300;
 
+            introContent.ScaleTo(1.2f, 8000);
+
             using (BeginDelayedSequence(200))
             {
                 introContent.Show();
@@ -350,9 +348,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
                 using (BeginDelayedSequence(500))
                 {
                     beatmapContent
-                        .ScaleTo(1f, 500, Easing.InQuint)
-                        .Then()
-                        .ScaleTo(1.1f, 3000);
+                        .ScaleTo(1f, 500, Easing.InQuint);
 
                     using (BeginDelayedSequence(240))
                     {
