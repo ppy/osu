@@ -140,6 +140,11 @@ Click to see what's new!", version);
         /// </summary>
         public static LocalisableString InstallingUpdate => new TranslatableString(getKey(@"installing_update"), @"Installing update...");
 
+        /// <summary>
+        /// "Failed to paste objects: Invalid clipboard content."
+        /// </summary>
+        public static LocalisableString InvalidHitObjectClipboardContent => new TranslatableString(getKey(@"invalid_hitobject_clipboard_content"), @"Failed to paste objects: Invalid clipboard content.");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }
