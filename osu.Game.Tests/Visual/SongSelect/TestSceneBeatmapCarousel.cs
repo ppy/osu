@@ -11,10 +11,12 @@ using osu.Framework.Allocation;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
+using osu.Game.Overlays;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Catch;
 using osu.Game.Rulesets.Osu;
@@ -30,6 +32,9 @@ namespace osu.Game.Tests.Visual.SongSelect
     [TestFixture]
     public partial class TestSceneBeatmapCarousel : OsuManualInputManagerTestScene
     {
+        [Cached]
+        private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Aquamarine);
+
         private TestBeatmapCarousel carousel;
         private RulesetStore rulesets;
 
@@ -45,6 +50,18 @@ namespace osu.Game.Tests.Visual.SongSelect
         private void load(RulesetStore rulesets)
         {
             this.rulesets = rulesets;
+        }
+
+        [Test]
+        public void TestBasic()
+        {
+            loadBeatmaps(setCount: 10, randomDifficulties: true);
+
+            AddSliderStep("change star difficulty", 0, 11.9, 5.55, v =>
+            {
+                foreach (var hasCurrentValue in carousel.ChildrenOfType<IHasCurrentValue<StarDifficulty>>())
+                    hasCurrentValue.Current.Value = new StarDifficulty(v, 0);
+            });
         }
 
         [Test]
@@ -888,11 +905,11 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddStep("Sort by difficulty", () => carousel.Filter(new FilterCriteria { Sort = SortMode.Difficulty }, false));
 
             checkVisibleItemCount(false, local_set_count * local_diff_count);
-            checkVisibleItemCount(true, 1);
+            checkVisibleItemCount(true, 0);
 
             AddStep("Filter to normal", () => carousel.Filter(new FilterCriteria { Sort = SortMode.Difficulty, SearchText = "Normal" }, false));
             checkVisibleItemCount(false, local_set_count);
-            checkVisibleItemCount(true, 1);
+            checkVisibleItemCount(true, 0);
 
             AddUntilStep("Check all visible sets have one normal", () =>
             {
@@ -903,7 +920,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             AddStep("Filter to insane", () => carousel.Filter(new FilterCriteria { Sort = SortMode.Difficulty, SearchText = "Insane" }, false));
             checkVisibleItemCount(false, local_set_count);
-            checkVisibleItemCount(true, 1);
+            checkVisibleItemCount(true, 0);
 
             AddUntilStep("Check all visible sets have one insane", () =>
             {
