@@ -4,41 +4,13 @@
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Sprites;
-using osu.Game.Graphics;
-using osu.Game.Graphics.Sprites;
-using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Screens.Play.HUD;
-using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Mania.Skinning.Argon
 {
-    public partial class ArgonManiaComboCounter : ComboCounter
+    public partial class ArgonManiaComboCounter : ArgonComboCounter
     {
-        private OsuSpriteText text = null!;
-
-        protected override double RollingDuration => 500;
-        protected override Easing RollingEasing => Easing.OutQuint;
-
-        [BackgroundDependencyLoader]
-        private void load(ScoreProcessor scoreProcessor)
-        {
-            Current.BindTo(scoreProcessor.Combo);
-            Current.BindValueChanged(combo =>
-            {
-                if (combo.OldValue == 0 && combo.NewValue > 0)
-                    text.FadeIn(200, Easing.OutQuint);
-                else if (combo.OldValue > 0 && combo.NewValue == 0)
-                {
-                    if (combo.OldValue > 1)
-                        text.FlashColour(Color4.Red, 2000, Easing.OutQuint);
-
-                    text.FadeOut(200, Easing.InQuint);
-                }
-            });
-        }
-
         [Resolved]
         private IScrollingInfo scrollingInfo { get; set; } = null!;
 
@@ -47,7 +19,6 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            text.Alpha = Current.Value > 0 ? 1 : 0;
 
             direction = scrollingInfo.Direction.GetBoundCopy();
             direction.BindValueChanged(_ => updateAnchor());
@@ -67,10 +38,5 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
             if ((Y < 0 && direction.Value == ScrollingDirection.Down) || (Y > 0 && direction.Value == ScrollingDirection.Up))
                 Y = -Y;
         }
-
-        protected override IHasText CreateText() => text = new OsuSpriteText
-        {
-            Font = OsuFont.Torus.With(size: 32, fixedWidth: true),
-        };
     }
 }
