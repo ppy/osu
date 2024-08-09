@@ -123,9 +123,6 @@ namespace osu.Game.Skinning.Components
 
         private void updateLabel()
         {
-            if (IsLoaded == false)
-                return;
-
             string numberedTemplate = Template.Value
                                               .Replace("{", "{{")
                                               .Replace("}", "}}")
