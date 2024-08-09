@@ -50,7 +50,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                         return base.GetDrawableComponent(lookup);
 
                     // Skin has configuration.
-                    if (base.GetDrawableComponent(lookup) is Drawable d)
+                    if (base.GetDrawableComponent(lookup) is UserConfiguredLayoutContainer d)
                         return d;
 
                     // Our own ruleset components default.
@@ -74,6 +74,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                             {
                                 Children = new Drawable[]
                                 {
+                                    new LegacyComboCounter(),
                                     new LegacyKeyCounterDisplay(),
                                 }
                             };
