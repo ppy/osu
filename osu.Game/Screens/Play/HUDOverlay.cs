@@ -53,7 +53,7 @@ namespace osu.Game.Screens.Play
             return child == bottomRightElements;
         }
 
-        public readonly ModDisplay ModDisplay;
+        public readonly ClickableModDisplay ModDisplay;
         public readonly HoldForMenuButton HoldToQuit;
         public readonly PlayerSettingsOverlay PlayerSettingsOverlay;
 
@@ -145,7 +145,7 @@ namespace osu.Game.Screens.Play
                     Direction = FillDirection.Vertical,
                     Children = new Drawable[]
                     {
-                        ModDisplay = CreateModsContainer(),
+                        ModDisplay = CreateModsContainer(replayLoaded),
                         PlayerSettingsOverlay = CreatePlayerSettingsOverlay(),
                     }
                 },
@@ -381,7 +381,7 @@ namespace osu.Game.Screens.Play
             Origin = Anchor.BottomRight,
         };
 
-        protected ModDisplay CreateModsContainer() => new ModDisplay
+        protected ClickableModDisplay CreateModsContainer(Bindable<bool> replayLoaded) => new ClickableModDisplay(replayLoaded)
         {
             Anchor = Anchor.TopRight,
             Origin = Anchor.TopRight,
