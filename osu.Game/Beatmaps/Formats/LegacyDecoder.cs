@@ -18,6 +18,12 @@ namespace osu.Game.Beatmaps.Formats
     {
         public const int LATEST_VERSION = 14;
 
+        /// <summary>
+        /// The .osu format (beatmap) version.
+        ///
+        /// osu!stable's versions end at <see cref="LATEST_VERSION"/>.
+        /// osu!lazer's versions starts at <see cref="LegacyBeatmapEncoder.FIRST_LAZER_VERSION"/>.
+        /// </summary>
         protected readonly int FormatVersion;
 
         protected LegacyDecoder(int version)
