@@ -11,10 +11,8 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Mania.Skinning.Legacy
 {
-    public partial class LegacyManiaComboCounter : LegacyComboCounter, ISerialisableDrawable
+    public partial class LegacyManiaComboCounter : LegacyComboCounter
     {
-        bool ISerialisableDrawable.SupportsClosestAnchor => false;
-
         [BackgroundDependencyLoader]
         private void load(ISkinSource skin)
         {
