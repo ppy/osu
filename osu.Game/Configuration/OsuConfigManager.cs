@@ -96,6 +96,7 @@ namespace osu.Game.Configuration
 
             // Audio
             SetDefault(OsuSetting.VolumeInactive, 0.25, 0, 1, 0.01);
+            SetDefault(OsuSetting.GameplayVolume, 0.6, 0, 1, 0.01);
 
             SetDefault(OsuSetting.MenuVoice, true);
             SetDefault(OsuSetting.MenuMusic, true);
@@ -429,5 +430,6 @@ namespace osu.Game.Configuration
         HideCountryFlags,
         EditorTimelineShowTimingChanges,
         EditorTimelineShowTicks,
+        GameplayVolume,
     }
 }
