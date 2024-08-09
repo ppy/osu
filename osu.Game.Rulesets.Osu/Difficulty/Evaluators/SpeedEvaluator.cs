@@ -56,10 +56,27 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             if (strainTime < min_speed_bonus)
                 speedBonus = 1 + 0.75 * Math.Pow((min_speed_bonus - strainTime) / speed_balancing_factor, 2);
 
-            double travelDistance = osuPrevObj?.TravelDistance ?? 0;
-            double distance = Math.Min(single_spacing_threshold, travelDistance + osuCurrObj.MinimumJumpDistance);
+            double distance = Math.Min(single_spacing_threshold, osuCurrObj.JumpDistance);
 
-            return (speedBonus + speedBonus * Math.Pow(distance / single_spacing_threshold, 3.5)) * doubletapness / strainTime;
+            double sliderStreamMultiplier = 1;
+
+            if (osuCurrObj.BaseObject is Slider slider && osuPrevObj?.BaseObject is Slider)
+            {
+                double sliderStreamBonus = 0.25;
+
+                // If slider was slower than notes before - punish it
+                if (osuCurrObj.StrainTime > osuPrevObj.StrainTime)
+                    sliderStreamBonus *= AimEvaluator.CalcRhythmDifferenceMultiplier(osuCurrObj.StrainTime, osuPrevObj.StrainTime);
+
+                // Punish too short sliders to prevent cheesing (cheesing is still possible, but it's very rare)
+                double sliderLength = slider.Velocity * slider.SpanDuration;
+                if (sliderLength < slider.Radius)
+                    sliderStreamBonus *= sliderLength / slider.Radius;
+
+                sliderStreamMultiplier += sliderStreamBonus;
+            }
+
+            return (speedBonus + speedBonus * Math.Pow(distance / single_spacing_threshold, 3.5)) * doubletapness * sliderStreamMultiplier / strainTime;
         }
     }
 }
