@@ -3,11 +3,13 @@
 
 #nullable disable
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Caching;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.UserInterface;
@@ -61,6 +63,9 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             {
                 var result = BodyPiece.ScreenSpaceDrawQuad.AABBFloat;
 
+                result = RectangleF.Union(result, HeadOverlay.VisibleQuad);
+                result = RectangleF.Union(result, TailOverlay.VisibleQuad);
+
                 if (ControlPointVisualiser != null)
                 {
                     foreach (var piece in ControlPointVisualiser.Pieces)
@@ -75,6 +80,9 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         private readonly IBindable<int> pathVersion = new Bindable<int>();
         private readonly BindableList<HitObject> selectedObjects = new BindableList<HitObject>();
         private readonly Bindable<bool> showHitMarkers = new Bindable<bool>();
+
+        // Cached slider path which ignored the expected distance value.
+        private readonly Cached<SliderPath> fullPathCache = new Cached<SliderPath>();
 
         public SliderSelectionBlueprint(Slider slider)
             : base(slider)
@@ -91,6 +99,10 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                 TailOverlay = CreateCircleOverlay(HitObject, SliderPosition.End),
             };
 
+            TailOverlay.EndDragMarker!.StartDrag += startAdjustingLength;
+            TailOverlay.EndDragMarker.Drag += adjustLength;
+            TailOverlay.EndDragMarker.EndDrag += endAdjustLength;
+
             config.BindWith(OsuSetting.EditorShowHitMarkers, showHitMarkers);
         }
 
@@ -99,6 +111,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             base.LoadComplete();
 
             controlPoints.BindTo(HitObject.Path.ControlPoints);
+            controlPoints.CollectionChanged += (_, _) => fullPathCache.Invalidate();
 
             pathVersion.BindTo(HitObject.Path.Version);
             pathVersion.BindValueChanged(_ => editorBeatmap?.Update(HitObject));
@@ -197,6 +210,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                     return false; // Allow right click to be handled by context menu
 
                 case MouseButton.Left:
+
                     // If there's more than two objects selected, ctrl+click should deselect
                     if (e.ControlPressed && IsSelected && selectedObjects.Count < 2)
                     {
@@ -210,6 +224,129 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             }
 
             return false;
+        }
+
+        private Vector2 lengthAdjustMouseOffset;
+        private double oldDuration;
+        private double oldVelocityMultiplier;
+        private double desiredDistance;
+        private bool isAdjustingLength;
+        private bool adjustVelocityMomentary;
+
+        private void startAdjustingLength(DragStartEvent e)
+        {
+            isAdjustingLength = true;
+            adjustVelocityMomentary = e.ShiftPressed;
+            lengthAdjustMouseOffset = ToLocalSpace(e.ScreenSpaceMouseDownPosition) - HitObject.Position - HitObject.Path.PositionAt(1);
+            oldDuration = HitObject.Path.Distance / HitObject.SliderVelocityMultiplier;
+            oldVelocityMultiplier = HitObject.SliderVelocityMultiplier;
+            changeHandler?.BeginChange();
+        }
+
+        private void endAdjustLength()
+        {
+            trimExcessControlPoints(HitObject.Path);
+            changeHandler?.EndChange();
+            isAdjustingLength = false;
+        }
+
+        private void adjustLength(MouseEvent e) => adjustLength(findClosestPathDistance(e), e.ShiftPressed);
+
+        private void adjustLength(double proposedDistance, bool adjustVelocity)
+        {
+            desiredDistance = proposedDistance;
+            double proposedVelocity = oldVelocityMultiplier;
+
+            if (adjustVelocity)
+            {
+                proposedVelocity = proposedDistance / oldDuration;
+                proposedDistance = MathHelper.Clamp(proposedDistance, 0.1 * oldDuration, 10 * oldDuration);
+            }
+            else
+            {
+                double minDistance = distanceSnapProvider?.GetBeatSnapDistanceAt(HitObject, false) * oldVelocityMultiplier ?? 1;
+                proposedDistance = MathHelper.Clamp(proposedDistance, minDistance, HitObject.Path.CalculatedDistance);
+            }
+
+            if (Precision.AlmostEquals(proposedDistance, HitObject.Path.Distance) && Precision.AlmostEquals(proposedVelocity, HitObject.SliderVelocityMultiplier))
+                return;
+
+            HitObject.SliderVelocityMultiplier = proposedVelocity;
+            HitObject.Path.ExpectedDistance.Value = proposedDistance;
+            editorBeatmap?.Update(HitObject);
+        }
+
+        /// <summary>
+        /// Trims control points from the end of the slider path which are not required to reach the expected end of the slider.
+        /// </summary>
+        /// <param name="sliderPath">The slider path to trim control points of.</param>
+        private void trimExcessControlPoints(SliderPath sliderPath)
+        {
+            if (!sliderPath.ExpectedDistance.Value.HasValue)
+                return;
+
+            double[] segmentEnds = sliderPath.GetSegmentEnds().ToArray();
+            int segmentIndex = 0;
+
+            for (int i = 1; i < sliderPath.ControlPoints.Count - 1; i++)
+            {
+                if (!sliderPath.ControlPoints[i].Type.HasValue) continue;
+
+                if (Precision.AlmostBigger(segmentEnds[segmentIndex], 1, 1E-3))
+                {
+                    sliderPath.ControlPoints.RemoveRange(i + 1, sliderPath.ControlPoints.Count - i - 1);
+                    sliderPath.ControlPoints[^1].Type = null;
+                    break;
+                }
+
+                segmentIndex++;
+            }
+        }
+
+        /// <summary>
+        /// Finds the expected distance value for which the slider end is closest to the mouse position.
+        /// </summary>
+        private double findClosestPathDistance(MouseEvent e)
+        {
+            const double step1 = 10;
+            const double step2 = 0.1;
+            const double longer_distance_bias = 0.01;
+
+            var desiredPosition = ToLocalSpace(e.ScreenSpaceMousePosition) - HitObject.Position - lengthAdjustMouseOffset;
+
+            if (!fullPathCache.IsValid)
+                fullPathCache.Value = new SliderPath(HitObject.Path.ControlPoints.ToArray());
+
+            // Do a linear search to find the closest point on the path to the mouse position.
+            double bestValue = 0;
+            double minDistance = double.MaxValue;
+
+            for (double d = 0; d <= fullPathCache.Value.CalculatedDistance; d += step1)
+            {
+                double t = d / fullPathCache.Value.CalculatedDistance;
+                double dist = Vector2.Distance(fullPathCache.Value.PositionAt(t), desiredPosition) - d * longer_distance_bias;
+
+                if (dist >= minDistance) continue;
+
+                minDistance = dist;
+                bestValue = d;
+            }
+
+            // Do another linear search to fine-tune the result.
+            double maxValue = Math.Min(bestValue + step1, fullPathCache.Value.CalculatedDistance);
+
+            for (double d = bestValue - step1; d <= maxValue; d += step2)
+            {
+                double t = d / fullPathCache.Value.CalculatedDistance;
+                double dist = Vector2.Distance(fullPathCache.Value.PositionAt(t), desiredPosition) - d * longer_distance_bias;
+
+                if (dist >= minDistance) continue;
+
+                minDistance = dist;
+                bestValue = d;
+            }
+
+            return bestValue;
         }
 
         [CanBeNull]
@@ -255,7 +392,22 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                 return true;
             }
 
+            if (isAdjustingLength && e.ShiftPressed != adjustVelocityMomentary)
+            {
+                adjustVelocityMomentary = e.ShiftPressed;
+                adjustLength(desiredDistance, adjustVelocityMomentary);
+                return true;
+            }
+
             return false;
+        }
+
+        protected override void OnKeyUp(KeyUpEvent e)
+        {
+            if (!IsSelected || !isAdjustingLength || e.ShiftPressed == adjustVelocityMomentary) return;
+
+            adjustVelocityMomentary = e.ShiftPressed;
+            adjustLength(desiredDistance, adjustVelocityMomentary);
         }
 
         private PathControlPoint addControlPoint(Vector2 position)
