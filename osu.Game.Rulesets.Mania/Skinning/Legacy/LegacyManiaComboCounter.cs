@@ -22,8 +22,6 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
             PopOutCountText.Anchor = Anchor.Centre;
             PopOutCountText.Origin = Anchor.Centre;
             PopOutCountText.Colour = skin.GetManiaSkinConfig<Color4>(LegacyManiaSkinConfigurationLookups.ComboBreakColour)?.Value ?? Color4.Red;
-
-            UsesFixedAnchor = true;
         }
 
         [Resolved]

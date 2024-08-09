@@ -37,8 +37,6 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
                     text.FadeOut(200, Easing.InQuint);
                 }
             });
-
-            UsesFixedAnchor = true;
         }
 
         [Resolved]
