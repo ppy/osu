@@ -130,6 +130,8 @@ namespace osu.Game.Screens.Menu
             }
         }
 
+        private long? lastNotifiedDailyChallengeRoomId;
+
         private void dailyChallengeChanged(ValueChangedEvent<DailyChallengeInfo?> info)
         {
             UpdateState();
@@ -152,8 +154,11 @@ namespace osu.Game.Screens.Menu
                     cover.OnlineInfo = TooltipContent = room.Playlist.FirstOrDefault()?.Beatmap.BeatmapSet as APIBeatmapSet;
 
                     // We only want to notify the user if a new challenge recently went live.
-                    if (Math.Abs((DateTimeOffset.Now - room.StartDate.Value!.Value).TotalSeconds) < 600)
+                    if (Math.Abs((DateTimeOffset.Now - room.StartDate.Value!.Value).TotalSeconds) < 600 && room.RoomID.Value != lastNotifiedDailyChallengeRoomId)
+                    {
+                        lastNotifiedDailyChallengeRoomId = room.RoomID.Value;
                         notificationOverlay?.Post(new NewDailyChallengeNotification(room));
+                    }
 
                     updateCountdown();
                     Scheduler.AddDelayed(updateCountdown, 1000, true);
