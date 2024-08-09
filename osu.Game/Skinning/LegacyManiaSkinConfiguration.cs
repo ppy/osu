@@ -44,6 +44,7 @@ namespace osu.Game.Skinning
         public bool KeysUnderNotes;
         public int LightFramePerSecond = 60;
 
+        public HoldNoteTailOrigin HoldNoteTailOrigin;
         public LegacyNoteBodyStyle? NoteBodyStyle;
 
         public LegacyManiaSkinConfiguration(int keys)

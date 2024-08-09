@@ -56,6 +56,7 @@ namespace osu.Game.Skinning
         HoldNoteBodyImage,
         HoldNoteLightImage,
         HoldNoteLightScale,
+        HoldNoteTailOrigin,
         WidthForNoteHeightScale,
         ExplosionImage,
         ExplosionScale,
@@ -79,5 +80,11 @@ namespace osu.Game.Skinning
         KeysUnderNotes,
         NoteBodyStyle,
         LightFramePerSecond
+    }
+
+    public enum HoldNoteTailOrigin
+    {
+        Regular = 0,
+        Inverted = 1
     }
 }
