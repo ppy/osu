@@ -162,17 +162,19 @@ namespace osu.Game.Tests.Visual.SongSelect
             {
                 double starRating = lookup.BeatmapInfo.Difficulty.OverallDifficulty;
 
-                ModDoubleTime? DT = lookup.OrderedMods.OfType<ModDoubleTime>().SingleOrDefault();
-                if (DT != null) starRating *= DT.SpeedChange.Value;
+                ModDoubleTime? dt = lookup.OrderedMods.OfType<ModDoubleTime>().SingleOrDefault();
+                if (dt != null) starRating *= dt.SpeedChange.Value;
 
                 starRating += (double)lookup.Ruleset.OnlineID / 10;
 
-                var attributes = new DifficultyAttributes();
-                attributes.StarRating = starRating;
-                attributes.Mods = lookup.OrderedMods;
+                var attributes = new DifficultyAttributes
+                {
+                    StarRating = starRating,
+                    Mods = lookup.OrderedMods,
 
-                // Use this as ruleset ID field
-                attributes.MaxCombo = lookup.Ruleset.OnlineID;
+                    // Use this as ruleset ID field
+                    MaxCombo = lookup.Ruleset.OnlineID
+                };
 
                 return Task.FromResult<StarDifficulty?>(new StarDifficulty(attributes));
             }
@@ -180,7 +182,8 @@ namespace osu.Game.Tests.Visual.SongSelect
 
         private partial class TestPerformanceCalculator : PerformanceCalculator
         {
-            public TestPerformanceCalculator(Ruleset ruleset) : base(ruleset)
+            public TestPerformanceCalculator(Ruleset ruleset)
+                : base(ruleset)
             {
             }
 
@@ -191,10 +194,10 @@ namespace osu.Game.Tests.Visual.SongSelect
                 Assert.AreEqual(Ruleset.RulesetInfo.OnlineID, score.Ruleset.OnlineID);
                 Assert.AreEqual(Ruleset.RulesetInfo.OnlineID, attributes.MaxCombo);
 
-                var result = new PerformanceAttributes();
-                result.Total = attributes.StarRating * 100;
-
-                result.Total += Ruleset.RulesetInfo.OnlineID;
+                var result = new PerformanceAttributes
+                {
+                    Total = attributes.StarRating * 100 + Ruleset.RulesetInfo.OnlineID
+                };
 
                 if (attributes.Mods.Any(m => m is ModHidden))
                     result.Total += 69;

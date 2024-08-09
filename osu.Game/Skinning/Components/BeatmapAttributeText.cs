@@ -158,7 +158,7 @@ namespace osu.Game.Skinning.Components
         {
             // Skip if not relevant attribute
             if (!((Attribute.Value >= BeatmapAttribute.Title && Attribute.Value <= BeatmapAttribute.Creator)
-                || Attribute.Value == BeatmapAttribute.RankedStatus || Attribute.Value == BeatmapAttribute.Source))
+                  || Attribute.Value == BeatmapAttribute.RankedStatus || Attribute.Value == BeatmapAttribute.Source))
                 return;
 
             valueDictionary[BeatmapAttribute.Title] = new RomanisableString(beatmap.Value.BeatmapInfo.Metadata.TitleUnicode, beatmap.Value.BeatmapInfo.Metadata.Title);
