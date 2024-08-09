@@ -99,7 +99,7 @@ namespace osu.Game.Screens.Ranking
 
         private AudioContainer audioContent = null!;
 
-        private bool displayWithFlair;
+        private readonly bool displayWithFlair;
 
         private Container topLayerContainer = null!;
         private Drawable topLayerBackground = null!;
@@ -110,6 +110,7 @@ namespace osu.Game.Screens.Ranking
         private Drawable middleLayerBackground = null!;
         private Container middleLayerContentContainer = null!;
         private Drawable? middleLayerContent;
+        private ExpandedPanelMiddleContent? expandedPanelMiddleContent;
 
         private ScorePanelTrackingContainer? trackingContainer;
 
@@ -240,7 +241,12 @@ namespace osu.Game.Screens.Ranking
         private void updateState()
         {
             topLayerContent?.FadeOut(content_fade_duration).Expire();
-            middleLayerContent?.FadeOut(content_fade_duration).Expire();
+
+            // we do not want to be expiring panels with flair when they contract,
+            // since they may have associated sound effects,
+            // which would be potentially cut short if we did so.
+            if (!displayWithFlair || state != PanelState.Contracted)
+                middleLayerContent?.FadeOut(content_fade_duration).Expire();
 
             switch (state)
             {
@@ -252,14 +258,27 @@ namespace osu.Game.Screens.Ranking
 
                     bool firstLoad = topLayerContent == null;
                     topLayerContentContainer.Add(topLayerContent = new ExpandedPanelTopContent(Score.User, firstLoad) { Alpha = 0 });
-                    middleLayerContentContainer.Add(middleLayerContent = new ExpandedPanelMiddleContent(Score, displayWithFlair) { Alpha = 0 });
 
-                    // only the first expanded display should happen with flair.
-                    displayWithFlair = false;
+                    // the panel is being displayed with flair, and the expanded content is available from an earlier display
+                    // (it was preserved to make sure audio effects play out).
+                    // therefore, just reuse it again rather than reinstantiating.
+                    if (displayWithFlair && expandedPanelMiddleContent != null)
+                        expandedPanelMiddleContent?.Show();
+                    else
+                    {
+                        middleLayerContentContainer.Add(middleLayerContent = expandedPanelMiddleContent = new ExpandedPanelMiddleContent(Score, displayWithFlair)
+                        {
+                            Alpha = 0,
+                            AlwaysPresent = true,
+                        });
+                    }
+
                     break;
 
                 case PanelState.Contracted:
                     Size = new Vector2(CONTRACTED_WIDTH, contracted_height);
+
+                    expandedPanelMiddleContent?.Hide();
 
                     topLayerBackground.FadeColour(contracted_top_layer_colour, RESIZE_DURATION, Easing.OutQuint);
                     middleLayerBackground.FadeColour(contracted_middle_layer_colour, RESIZE_DURATION, Easing.OutQuint);
