@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -438,9 +439,11 @@ namespace osu.Game.Tournament.Screens.Board
                         var existingProtect = CurrentMatch.Value?.Protects.FirstOrDefault(p => p.BeatmapID == map.Beatmap?.OnlineID);
                         var existingTrap = CurrentMatch.Value?.Traps.FirstOrDefault(p => p.BeatmapID == map.Beatmap?.OnlineID);
                         var PBTrap = CurrentMatch.Value?.PicksBans.FirstOrDefault(p => p.BeatmapID == map.Beatmap?.OnlineID && p.Type == ChoiceType.Trap);
+                        var existingPendingSwap = CurrentMatch.Value?.PendingSwaps.FirstOrDefault(p => p.BeatmapID == map.Beatmap?.OnlineID);
                         if (existingProtect != null) CurrentMatch.Value?.Protects.Remove(existingProtect);
                         if (existingTrap != null) CurrentMatch.Value?.Traps.Remove(existingTrap);
                         if (PBTrap != null) CurrentMatch.Value?.PicksBans.Remove(PBTrap);
+                        if (existingPendingSwap != null) CurrentMatch.Value?.PendingSwaps.Remove(existingPendingSwap);
                     }
                 }
 
@@ -597,6 +600,12 @@ namespace osu.Game.Tournament.Screens.Board
                     // "Trigger" the trap upon final swap, after marking colors
                     var targetTrap = CurrentMatch.Value.Traps.FirstOrDefault(p => (p.BeatmapID == source.BeatmapID && !p.IsTriggered));
                     if (targetTrap != null) targetTrap.IsTriggered = true;
+                    CurrentMatch.Value.PendingSwaps.Add(new BeatmapChoice
+                    {
+                        Team = TeamColour.Neutral,
+                        Type = ChoiceType.Neutral,
+                        BeatmapID = beatmapId,
+                    });
                     SwapMap(source.BeatmapID, beatmapId);
                 }
                 else
@@ -687,12 +696,12 @@ namespace osu.Game.Tournament.Screens.Board
                 target.BoardX = middleX;
                 target.BoardY = middleY;
 
-                CurrentMatch.Value?.PendingSwaps.Clear();
 
                 // TODO: A better way to reload maps
                 DetectWin();
                 DetectEX();
                 updateDisplay();
+                // CurrentMatch.Value?.PendingSwaps.Clear();
             }
             else
             {
@@ -953,12 +962,14 @@ namespace osu.Game.Tournament.Screens.Board
 
                             if (nextMap != null)
                             {
-                                currentFlow.Add(new BoardBeatmapPanel(nextMap.Beatmap, nextMap.Mods, nextMap.ModIndex)
+                                var hasSwappedMap = CurrentMatch.Value.PendingSwaps.FirstOrDefault(p => p.BeatmapID == nextMap.Beatmap?.OnlineID);
+                                currentFlow.Add(new BoardBeatmapPanel(nextMap.Beatmap, nextMap.Mods, nextMap.ModIndex, hasSwappedMap != null)
                                 {
                                     Anchor = Anchor.TopCentre,
                                     Origin = Anchor.TopCentre,
                                     Height = 150,
                                 });
+                                CurrentMatch.Value.PendingSwaps.Remove(hasSwappedMap);
                             }
                         }
                     }
