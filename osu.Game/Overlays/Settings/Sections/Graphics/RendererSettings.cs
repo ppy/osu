@@ -67,11 +67,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                 if (r.NewValue == RendererType.Automatic && automaticRendererInUse)
                     return;
 
-                if (game?.RestartAppWhenExited() == true)
-                {
-                    game.AttemptExit();
-                }
-                else
+                if (game?.Restart() != true)
                 {
                     dialogOverlay?.Push(new ConfirmDialog(GraphicsSettingsStrings.ChangeRendererConfirmation, () => game?.AttemptExit(), () =>
                     {

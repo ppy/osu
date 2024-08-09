@@ -90,6 +90,7 @@ namespace osu.Game.Screens.Menu
 
         private Bindable<double> holdDelay;
         private Bindable<bool> loginDisplayed;
+        private Bindable<bool> isRestarting;
 
         private HoldToExitGameOverlay holdToExitGameOverlay;
 
@@ -114,6 +115,7 @@ namespace osu.Game.Screens.Menu
         {
             holdDelay = config.GetBindable<double>(OsuSetting.UIHoldActivationDelay);
             loginDisplayed = statics.GetBindable<bool>(Static.LoginOverlayDisplayed);
+            isRestarting = statics.GetBindable<bool>(Static.RestartRequested);
 
             if (host.CanExit)
             {
@@ -393,8 +395,10 @@ namespace osu.Game.Screens.Menu
                 dialogOverlay != null
                 // if the dialog has already displayed and been accepted by the user, we are good.
                 && !exitConfirmedViaDialog
-                // Only require confirmation if there is either an ongoing operation or the user exited via a non-hold escape press.
-                && (notifications.HasOngoingOperations || !exitConfirmedViaHoldOrClick);
+                // Only require confirmation if there is either an ongoing operation or the exit process wasn't triggered via user intention.
+                && (notifications.HasOngoingOperations || (!exitConfirmedViaHoldOrClick && !isRestarting.Value));
+
+            isRestarting.Value = false;
 
             if (requiresConfirmation)
             {

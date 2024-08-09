@@ -9,18 +9,19 @@ using System.Runtime.Versioning;
 using Microsoft.Win32;
 using osu.Desktop.Performance;
 using osu.Desktop.Security;
+using osu.Desktop.Updater;
+using osu.Desktop.Windows;
+using osu.Framework;
+using osu.Framework.Allocation;
+using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game;
-using osu.Desktop.Updater;
-using osu.Framework;
-using osu.Framework.Logging;
-using osu.Game.Updater;
-using osu.Desktop.Windows;
-using osu.Framework.Allocation;
+using osu.Game.Configuration;
 using osu.Game.IO;
 using osu.Game.IPC;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Performance;
+using osu.Game.Updater;
 using osu.Game.Utils;
 
 namespace osu.Desktop
@@ -114,8 +115,10 @@ namespace osu.Desktop
             }
         }
 
-        public override bool RestartAppWhenExited()
+        public override bool Restart()
         {
+            SessionStatics.SetValue(Static.RestartRequested, true);
+
             switch (RuntimeInfo.OS)
             {
                 case RuntimeInfo.Platform.Windows:
@@ -130,7 +133,9 @@ namespace osu.Desktop
                     return true;
             }
 
-            return base.RestartAppWhenExited();
+            AttemptExit();
+
+            return base.Restart();
         }
 
         protected override void LoadComplete()
