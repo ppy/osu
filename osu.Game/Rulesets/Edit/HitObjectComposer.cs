@@ -85,6 +85,7 @@ namespace osu.Game.Rulesets.Edit
         private EditorRadioButtonCollection toolboxCollection;
         private FillFlowContainer togglesCollection;
         private FillFlowContainer sampleBankTogglesCollection;
+        private FillFlowContainer sampleAdditionBankTogglesCollection;
 
         private IBindable<bool> hasTiming;
         private Bindable<bool> autoSeekOnPlacement;
@@ -184,7 +185,17 @@ namespace osu.Game.Rulesets.Edit
                                         Direction = FillDirection.Vertical,
                                         Spacing = new Vector2(0, 5),
                                     },
-                                }
+                                },
+                                new EditorToolboxGroup("additions (Alt-Q~R)")
+                                {
+                                    Child = sampleAdditionBankTogglesCollection = new FillFlowContainer
+                                    {
+                                        RelativeSizeAxes = Axes.X,
+                                        AutoSizeAxes = Axes.Y,
+                                        Direction = FillDirection.Vertical,
+                                        Spacing = new Vector2(0, 5),
+                                    },
+                                },
                             }
                         },
                     }
@@ -230,6 +241,7 @@ namespace osu.Game.Rulesets.Edit
             togglesCollection.AddRange(TernaryStates.Select(b => new DrawableTernaryButton(b)));
 
             sampleBankTogglesCollection.AddRange(BlueprintContainer.SampleBankTernaryStates.Select(b => new DrawableTernaryButton(b)));
+            sampleAdditionBankTogglesCollection.AddRange(BlueprintContainer.SampleAdditionBankTernaryStates.Select(b => new DrawableTernaryButton(b)));
 
             setSelectTool();
 
@@ -360,8 +372,10 @@ namespace osu.Game.Rulesets.Edit
 
         protected override bool OnKeyDown(KeyDownEvent e)
         {
-            if (e.ControlPressed || e.AltPressed || e.SuperPressed)
+            if (e.ControlPressed || e.SuperPressed)
                 return false;
+
+            bool handled = false;
 
             if (checkLeftToggleFromKey(e.Key, out int leftIndex))
             {
@@ -377,18 +391,30 @@ namespace osu.Game.Rulesets.Edit
 
             if (checkRightToggleFromKey(e.Key, out int rightIndex))
             {
-                var item = e.ShiftPressed
-                    ? sampleBankTogglesCollection.ElementAtOrDefault(rightIndex)
-                    : togglesCollection.ElementAtOrDefault(rightIndex);
+                if (e.ShiftPressed || e.AltPressed)
+                {
+                    if (e.ShiftPressed)
+                        attemptToggle(rightIndex, sampleBankTogglesCollection);
+
+                    if (e.AltPressed)
+                        attemptToggle(rightIndex, sampleAdditionBankTogglesCollection);
+                }
+                else
+                    attemptToggle(rightIndex, togglesCollection);
+            }
+
+            return handled || base.OnKeyDown(e);
+
+            void attemptToggle(int index, FillFlowContainer collection)
+            {
+                var item = collection.ElementAtOrDefault(index);
 
                 if (item is DrawableTernaryButton button)
                 {
                     button.Button.Toggle();
-                    return true;
+                    handled = true;
                 }
             }
-
-            return base.OnKeyDown(e);
         }
 
         private bool checkLeftToggleFromKey(Key key, out int index)

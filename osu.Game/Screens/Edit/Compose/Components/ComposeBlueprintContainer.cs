@@ -63,7 +63,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
         private void load()
         {
             MainTernaryStates = CreateTernaryButtons().ToArray();
-            SampleBankTernaryStates = createSampleBankTernaryButtons().ToArray();
+            SampleBankTernaryStates = createSampleBankTernaryButtons(SelectionHandler.SelectionBankStates).ToArray();
+            SampleAdditionBankTernaryStates = createSampleBankTernaryButtons(SelectionHandler.SelectionAdditionBankStates).ToArray();
 
             AddInternal(new DrawableRulesetDependenciesProvidingContainer(Composer.Ruleset)
             {
@@ -88,6 +89,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 kvp.Value.BindValueChanged(_ => updatePlacementSamples());
 
             foreach (var kvp in SelectionHandler.SelectionBankStates)
+                kvp.Value.BindValueChanged(_ => updatePlacementSamples());
+
+            foreach (var kvp in SelectionHandler.SelectionAdditionBankStates)
                 kvp.Value.BindValueChanged(_ => updatePlacementSamples());
         }
 
@@ -177,6 +181,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
             foreach (var kvp in SelectionHandler.SelectionBankStates)
                 bankChanged(kvp.Key, kvp.Value.Value);
+
+            foreach (var kvp in SelectionHandler.SelectionAdditionBankStates)
+                additionBankChanged(kvp.Key, kvp.Value.Value);
         }
 
         private void sampleChanged(string sampleName, TernaryState state)
@@ -208,7 +215,17 @@ namespace osu.Game.Screens.Edit.Compose.Components
             if (bankName == EditorSelectionHandler.HIT_BANK_AUTO)
                 CurrentPlacement.AutomaticBankAssignment = state == TernaryState.True;
             else if (state == TernaryState.True)
-                CurrentPlacement.HitObject.Samples = CurrentPlacement.HitObject.Samples.Select(s => s.With(newBank: bankName)).ToList();
+                CurrentPlacement.HitObject.Samples = CurrentPlacement.HitObject.Samples.Select(s => s.Name == HitSampleInfo.HIT_NORMAL ? s.With(newBank: bankName) : s).ToList();
+        }
+
+        private void additionBankChanged(string bankName, TernaryState state)
+        {
+            if (CurrentPlacement == null) return;
+
+            if (bankName == EditorSelectionHandler.HIT_BANK_AUTO)
+                CurrentPlacement.AutomaticAdditionBankAssignment = state == TernaryState.True;
+            else if (state == TernaryState.True)
+                CurrentPlacement.HitObject.Samples = CurrentPlacement.HitObject.Samples.Select(s => s.Name != HitSampleInfo.HIT_NORMAL ? s.With(newBank: bankName) : s).ToList();
         }
 
         public readonly Bindable<TernaryState> NewCombo = new Bindable<TernaryState> { Description = "New Combo" };
@@ -219,6 +236,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
         public TernaryButton[] MainTernaryStates { get; private set; }
 
         public TernaryButton[] SampleBankTernaryStates { get; private set; }
+
+        public TernaryButton[] SampleAdditionBankTernaryStates { get; private set; }
 
         /// <summary>
         /// Create all ternary states required to be displayed to the user.
@@ -232,9 +251,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 yield return new TernaryButton(kvp.Value, kvp.Key.Replace("hit", string.Empty).Titleize(), () => GetIconForSample(kvp.Key));
         }
 
-        private IEnumerable<TernaryButton> createSampleBankTernaryButtons()
+        private IEnumerable<TernaryButton> createSampleBankTernaryButtons(Dictionary<string, Bindable<TernaryState>> sampleBankStates)
         {
-            foreach (var kvp in SelectionHandler.SelectionBankStates)
+            foreach (var kvp in sampleBankStates)
                 yield return new TernaryButton(kvp.Value, kvp.Key.Titleize(), () => getIconForBank(kvp.Key));
         }
 
