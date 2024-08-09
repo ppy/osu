@@ -98,6 +98,20 @@ namespace osu.Game.Rulesets.Scoring
 
         private readonly Bindable<ScoreRank> rank = new Bindable<ScoreRank>(ScoreRank.X);
 
+        /// <remarks>
+        /// The minimum-achievable rank.
+        /// </remarks>
+        public IBindable<ScoreRank> MinimumRank => minimumRank;
+
+        private readonly Bindable<ScoreRank> minimumRank = new Bindable<ScoreRank>(ScoreRank.D);
+
+        /// <remarks>
+        /// The maximum-achievable rank.
+        /// </remarks>
+        public IBindable<ScoreRank> MaximumRank => maximumRank;
+
+        private readonly Bindable<ScoreRank> maximumRank = new Bindable<ScoreRank>(ScoreRank.X);
+
         /// <summary>
         /// The highest combo achieved by this score.
         /// </summary>
@@ -196,7 +210,6 @@ namespace osu.Game.Rulesets.Scoring
             Ruleset = ruleset;
 
             Combo.ValueChanged += combo => HighestCombo.Value = Math.Max(HighestCombo.Value, combo.NewValue);
-            Accuracy.ValueChanged += _ => updateRank();
 
             Mods.ValueChanged += mods =>
             {
@@ -205,8 +218,7 @@ namespace osu.Game.Rulesets.Scoring
                 foreach (var m in mods.NewValue)
                     scoreMultiplier *= m.ScoreMultiplier;
 
-                updateScore();
-                updateRank();
+                updateScoreAndRank();
             };
         }
 
@@ -257,7 +269,7 @@ namespace osu.Game.Rulesets.Scoring
                     lastHitObject = result.HitObject;
                 }
 
-                updateScore();
+                updateScoreAndRank();
             }
         }
 
@@ -302,7 +314,7 @@ namespace osu.Game.Rulesets.Scoring
             lastHitObject = hitEvents[^1].LastHitObject;
             hitEvents.RemoveAt(hitEvents.Count - 1);
 
-            updateScore();
+            updateScoreAndRank();
         }
 
         /// <summary>
@@ -362,6 +374,12 @@ namespace osu.Game.Rulesets.Scoring
         {
         }
 
+        private void updateScoreAndRank()
+        {
+            updateScore();
+            updateRank();
+        }
+
         private void updateScore()
         {
             Accuracy.Value = currentMaximumBaseScore > 0 ? currentBaseScore / currentMaximumBaseScore : 1;
@@ -375,6 +393,8 @@ namespace osu.Game.Rulesets.Scoring
             TotalScore.Value = (long)Math.Round(TotalScoreWithoutMods.Value * scoreMultiplier);
         }
 
+        private readonly Dictionary<HitResult, int> minimumAccuracyResultCounts = new Dictionary<HitResult, int>();
+
         private void updateRank()
         {
             // Once failed, we shouldn't update the rank anymore.
@@ -382,11 +402,25 @@ namespace osu.Game.Rulesets.Scoring
                 return;
 
             ScoreRank newRank = RankFromScore(Accuracy.Value, ScoreResultCounts);
+            ScoreRank newMaxRank = RankFromScore(MaximumAccuracy.Value, ScoreResultCounts);
+
+            // this arbitrarily only fills HitResult.Miss because it's the only hit result that can affect the state of RankFromScore in the main rulesets (see OsuScoreProcessor).
+            // eventually (whenever it's needed), other miss result types should be correctly filled and this dictionary should be updated regularly next to ScoreResultCounts,
+            // but this is sufficient for now.
+            minimumAccuracyResultCounts[HitResult.Miss] = MaxHits - JudgedHits + ScoreResultCounts.GetValueOrDefault(HitResult.Miss);
+
+            ScoreRank newMinRank = RankFromScore(MinimumAccuracy.Value, minimumAccuracyResultCounts);
 
             foreach (var mod in Mods.Value.OfType<IApplicableToScoreProcessor>())
+            {
                 newRank = mod.AdjustRank(newRank, Accuracy.Value);
+                newMaxRank = mod.AdjustRank(newMaxRank, MaximumAccuracy.Value);
+                newMinRank = mod.AdjustRank(newMinRank, MinimumAccuracy.Value);
+            }
 
             rank.Value = newRank;
+            maximumRank.Value = newMaxRank;
+            minimumRank.Value = newMinRank;
         }
 
         protected virtual double ComputeTotalScore(double comboProgress, double accuracyProgress, double bonusPortion)
@@ -492,7 +526,7 @@ namespace osu.Game.Rulesets.Scoring
 
             SetScoreProcessorStatistics(frame.Header.ScoreProcessorStatistics);
 
-            updateScore();
+            updateScoreAndRank();
 
             OnResetFromReplayFrame?.Invoke();
         }

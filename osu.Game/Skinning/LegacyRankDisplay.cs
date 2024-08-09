@@ -3,30 +3,26 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
-using osu.Game.Rulesets.Scoring;
+using osu.Game.Screens.Play.HUD;
 using osuTK;
 
 namespace osu.Game.Skinning
 {
-    public partial class LegacyRankDisplay : CompositeDrawable, ISerialisableDrawable
+    public partial class LegacyRankDisplay : GameplayRankDisplay, ISerialisableDrawable
     {
         public bool UsesFixedAnchor { get; set; }
 
         [Resolved]
-        private ScoreProcessor scoreProcessor { get; set; } = null!;
-
-        [Resolved]
         private ISkinSource source { get; set; } = null!;
 
-        private readonly Sprite rank;
+        private readonly Sprite rankSprite;
 
         public LegacyRankDisplay()
         {
             AutoSizeAxes = Axes.Both;
 
-            AddInternal(rank = new Sprite
+            AddInternal(rankSprite = new Sprite
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
@@ -35,11 +31,13 @@ namespace osu.Game.Skinning
 
         protected override void LoadComplete()
         {
-            scoreProcessor.Rank.BindValueChanged(v =>
-            {
-                var texture = source.GetTexture($"ranking-{v.NewValue}-small");
+            base.LoadComplete();
 
-                rank.Texture = texture;
+            Current.BindValueChanged(rank =>
+            {
+                var texture = source.GetTexture($"ranking-{rank.NewValue}-small");
+
+                rankSprite.Texture = texture;
 
                 if (texture != null)
                 {
@@ -57,7 +55,6 @@ namespace osu.Game.Skinning
                                  .Expire();
                 }
             }, true);
-            FinishTransforms(true);
         }
     }
 }
