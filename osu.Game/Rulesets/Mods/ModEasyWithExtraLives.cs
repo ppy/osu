@@ -7,6 +7,7 @@ using Humanizer;
 using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
+using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Mods
@@ -33,17 +34,21 @@ namespace osu.Game.Rulesets.Mods
             retries = Retries.Value;
         }
 
-        public bool PerformFail()
+        public bool RestartOnFail => false;
+
+        public FailState CheckFail(JudgementResult? result)
         {
-            if (retries == 0) return true;
+            if (result != null)
+                return FailState.Block;
+
+            if (retries == 0)
+                return FailState.Allow;
 
             health.Value = health.MaxValue;
             retries--;
 
-            return false;
+            return FailState.Block;
         }
-
-        public bool RestartOnFail => false;
 
         public void ApplyToHealthProcessor(HealthProcessor healthProcessor)
         {
