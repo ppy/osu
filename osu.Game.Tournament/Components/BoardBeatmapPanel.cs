@@ -250,15 +250,15 @@ namespace osu.Game.Tournament.Components
             bool isBothTrapped = currentMatch.Value.Traps.Any(p => (p.BeatmapID == Beatmap?.OnlineID && p.Team == TeamColour.Red && !p.IsTriggered))
                 && currentMatch.Value.Traps.Any(p => (p.BeatmapID == Beatmap?.OnlineID && p.Team == TeamColour.Blue && !p.IsTriggered));
 
-            var newChoice = currentMatch.Value.PicksBans.FirstOrDefault(p => p.BeatmapID == Beatmap?.OnlineID);
+            var newChoice = currentMatch.Value.PicksBans.LastOrDefault(p => p.BeatmapID == Beatmap?.OnlineID);
 
             var nextPureChoice = newChoice;
 
             // Check: We need this?
-            if (isProtected) nextPureChoice = currentMatch.Value.PicksBans.FirstOrDefault(p => (p.BeatmapID == Beatmap?.OnlineID && p.Type != ChoiceType.Protect));
-            else if (isTrapped) nextPureChoice = currentMatch.Value.PicksBans.FirstOrDefault(p => (p.BeatmapID == Beatmap?.OnlineID && p.Type != ChoiceType.Trap));
+            if (isProtected) nextPureChoice = currentMatch.Value.PicksBans.LastOrDefault(p => (p.BeatmapID == Beatmap?.OnlineID && p.Type != ChoiceType.Protect));
+            else if (isTrapped) nextPureChoice = currentMatch.Value.PicksBans.LastOrDefault(p => (p.BeatmapID == Beatmap?.OnlineID && p.Type != ChoiceType.Trap));
 
-            newChoice = nextPureChoice ?? newChoice;
+            // newChoice = nextPureChoice ?? newChoice;
 
             bool shouldFlash = newChoice != choice;
 

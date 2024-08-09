@@ -17,8 +17,7 @@ namespace osu.Game.Tournament.Components
     {
         private readonly TrapInfo thisTrap = null!;
 
-        public TrapInfoDisplay(TrapType trap = TrapType.Unknown,
-            TeamColour team = TeamColour.Neutral, int mapID = 0)
+        public TrapInfoDisplay(TrapType trap = TrapType.Unknown, TeamColour team = TeamColour.Neutral, int mapID = 0)
         {
             thisTrap = new TrapInfo
             (
