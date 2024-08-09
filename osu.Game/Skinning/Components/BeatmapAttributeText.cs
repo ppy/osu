@@ -61,6 +61,8 @@ namespace osu.Game.Skinning.Components
 
         private readonly OsuSpriteText text;
 
+        public LocalisableString Text => text.Text;
+
         [Resolved]
         private IBindable<RulesetInfo> ruleset { get; set; } = null!;
 
