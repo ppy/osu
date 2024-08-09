@@ -62,7 +62,7 @@ namespace osu.Game.Skinning.Components
         private readonly OsuSpriteText text;
 
         [Resolved]
-        private IBindable<IRulesetInfo> ruleset { get; set; } = null!;
+        private IBindable<RulesetInfo> ruleset { get; set; } = null!;
 
         [Resolved]
         private Bindable<WorkingBeatmap> beatmap { get; set; } = null!;
