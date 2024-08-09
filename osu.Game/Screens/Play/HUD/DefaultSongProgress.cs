@@ -89,7 +89,6 @@ namespace osu.Game.Screens.Play.HUD
 
             base.LoadComplete();
         }
-        
 
         protected override void UpdateObjects(IEnumerable<HitObject> objects)
         {
