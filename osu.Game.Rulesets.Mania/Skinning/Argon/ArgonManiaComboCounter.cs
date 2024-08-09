@@ -10,19 +10,16 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Screens.Play.HUD;
-using osu.Game.Skinning;
 using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Mania.Skinning.Argon
 {
-    public partial class ArgonManiaComboCounter : ComboCounter, ISerialisableDrawable
+    public partial class ArgonManiaComboCounter : ComboCounter
     {
         private OsuSpriteText text = null!;
 
         protected override double RollingDuration => 500;
         protected override Easing RollingEasing => Easing.OutQuint;
-
-        bool ISerialisableDrawable.SupportsClosestAnchor => false;
 
         [BackgroundDependencyLoader]
         private void load(ScoreProcessor scoreProcessor)
