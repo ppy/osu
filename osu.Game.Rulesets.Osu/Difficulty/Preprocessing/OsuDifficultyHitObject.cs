@@ -83,6 +83,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         /// </summary>
         public double HitWindowGreat { get; private set; }
 
+        /// <summary>
+        /// Selective bonus for maps with higher circle size.
+        /// </summary>
+        public double SmallCircleBonus { get; private set; } = 1.0;
+
         private readonly OsuHitObject? lastLastObject;
         private readonly OsuHitObject lastObject;
 
@@ -155,8 +160,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
             if (BaseObject.Radius < 30)
             {
-                float smallCircleBonus = Math.Min(30 - (float)BaseObject.Radius, 5) / 50;
-                scalingFactor *= 1 + smallCircleBonus;
+                SmallCircleBonus = 1.0 + Math.Min(30 - BaseObject.Radius, 30) / 38;
             }
 
             Vector2 lastCursorPosition = getEndCursorPosition(lastObject);
