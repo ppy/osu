@@ -46,6 +46,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
 
                         if (combo != null)
                         {
+                            combo.ShowLabel.Value = false;
                             combo.Anchor = Anchor.TopCentre;
                             combo.Origin = Anchor.Centre;
                             combo.Y = 200;
