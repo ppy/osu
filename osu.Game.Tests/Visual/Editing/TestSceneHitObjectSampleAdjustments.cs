@@ -7,6 +7,7 @@ using Humanizer;
 using NUnit.Framework;
 using osu.Framework.Input;
 using osu.Framework.Testing;
+using osu.Framework.Utils;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.UserInterface;
@@ -308,6 +309,55 @@ namespace osu.Game.Tests.Visual.Editing
         }
 
         [Test]
+        public void TestSamplePointSeek()
+        {
+            AddStep("add slider", () =>
+            {
+                EditorBeatmap.Clear();
+                EditorBeatmap.Add(new Slider
+                {
+                    Position = new Vector2(256, 256),
+                    StartTime = 0,
+                    Path = new SliderPath(new[] { new PathControlPoint(Vector2.Zero), new PathControlPoint(new Vector2(250, 0)) }),
+                    Samples =
+                    {
+                        new HitSampleInfo(HitSampleInfo.HIT_NORMAL)
+                    },
+                    NodeSamples =
+                    {
+                        new List<HitSampleInfo> { new HitSampleInfo(HitSampleInfo.HIT_NORMAL) },
+                        new List<HitSampleInfo> { new HitSampleInfo(HitSampleInfo.HIT_NORMAL) },
+                    },
+                    RepeatCount = 1
+                });
+            });
+
+            clickNodeSamplePiece(0, 0);
+            editorTimeIs(0);
+            clickNodeSamplePiece(0, 1);
+            editorTimeIs(813);
+            clickNodeSamplePiece(0, 2);
+            editorTimeIs(1627);
+            clickSamplePiece(0);
+            editorTimeIs(406);
+
+            seekSamplePiece(-1);
+            editorTimeIs(0);
+            samplePopoverIsOpen();
+            seekSamplePiece(-1);
+            editorTimeIs(0);
+            samplePopoverIsOpen();
+            seekSamplePiece(1);
+            editorTimeIs(406);
+            seekSamplePiece(1);
+            editorTimeIs(813);
+            seekSamplePiece(1);
+            editorTimeIs(1627);
+            seekSamplePiece(1);
+            editorTimeIs(1627);
+        }
+
+        [Test]
         public void TestHotkeysMultipleSelectionWithSameSampleBank()
         {
             AddStep("unify sample bank", () =>
@@ -569,7 +619,7 @@ namespace osu.Game.Tests.Visual.Editing
 
         private void clickSamplePiece(int objectIndex) => AddStep($"click {objectIndex.ToOrdinalWords()} sample piece", () =>
         {
-            var samplePiece = this.ChildrenOfType<SamplePointPiece>().Single(piece => piece.HitObject == EditorBeatmap.HitObjects.ElementAt(objectIndex));
+            var samplePiece = this.ChildrenOfType<SamplePointPiece>().Single(piece => piece is not NodeSamplePointPiece && piece.HitObject == EditorBeatmap.HitObjects.ElementAt(objectIndex));
 
             InputManager.MoveMouseTo(samplePiece);
             InputManager.Click(MouseButton.Left);
@@ -581,6 +631,21 @@ namespace osu.Game.Tests.Visual.Editing
 
             InputManager.MoveMouseTo(samplePiece);
             InputManager.Click(MouseButton.Left);
+        });
+
+        private void seekSamplePiece(int direction) => AddStep($"seek sample piece {direction}", () =>
+        {
+            InputManager.PressKey(Key.ShiftLeft);
+            InputManager.PressKey(Key.AltLeft);
+            InputManager.Key(direction < 1 ? Key.Left : Key.Right);
+            InputManager.ReleaseKey(Key.AltLeft);
+            InputManager.ReleaseKey(Key.ShiftLeft);
+        });
+
+        private void samplePopoverIsOpen() => AddUntilStep("sample popover is open", () =>
+        {
+            var popover = this.ChildrenOfType<SamplePointPiece.SampleEditPopover>().SingleOrDefault(o => o.IsPresent);
+            return popover != null;
         });
 
         private void samplePopoverHasNoFocus() => AddUntilStep("sample popover textbox not focused", () =>
@@ -727,5 +792,7 @@ namespace osu.Game.Tests.Visual.Editing
             var h = EditorBeatmap.HitObjects.ElementAt(objectIndex) as IHasRepeats;
             return h is not null && h.NodeSamples[nodeIndex].Where(o => o.Name != HitSampleInfo.HIT_NORMAL).All(o => o.Bank == bank);
         });
+
+        private void editorTimeIs(double time) => AddAssert($"editor time is {time}", () => Precision.AlmostEquals(EditorClock.CurrentTimeAccurate, time, 1));
     }
 }
