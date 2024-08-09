@@ -5,10 +5,9 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Testing;
 using osu.Game.Screens.Menu;
-using osu.Game.Screens.SelectV2;
 using osuTK.Input;
 
-namespace osu.Game.Tests.Visual.SongSelect
+namespace osu.Game.Tests.Visual.SongSelectV2
 {
     public partial class TestSceneSongSelectV2Navigation : OsuGameTestScene
     {
@@ -17,7 +16,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             base.SetUpSteps();
             AddStep("press enter", () => InputManager.Key(Key.Enter));
             AddWaitStep("wait", 5);
-            PushAndConfirm(() => new SongSelectV2());
+            PushAndConfirm(() => new Screens.SelectV2.SongSelectV2());
         }
 
         [Test]

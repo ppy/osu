@@ -24,7 +24,7 @@ using osu.Game.Tests.Resources;
 using osu.Game.Users;
 using osuTK;
 
-namespace osu.Game.Tests.Visual.SongSelect
+namespace osu.Game.Tests.Visual.SongSelectV2
 {
     public partial class TestSceneLeaderboardScoreV2 : OsuTestScene
     {

@@ -10,10 +10,10 @@ using osu.Framework.Graphics.Shapes;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public partial class Bar : Container, IHasAccentColour
+    public partial class Bar : CompositeDrawable, IHasAccentColour
     {
-        private readonly Box background;
-        private readonly Box bar;
+        private readonly Container background;
+        private readonly Container bar;
 
         private const int resize_duration = 250;
 
@@ -58,19 +58,37 @@ namespace osu.Game.Graphics.UserInterface
             }
         }
 
+        /// <summary>
+        /// Sets the background and bar's corner radius. Also implicitly turns on masking if the value is not zero.
+        /// </summary>
+        public new float CornerRadius
+        {
+            get => bar.CornerRadius;
+            set
+            {
+                background.Masking = value != 0;
+                background.CornerRadius = value;
+
+                bar.Masking = value != 0;
+                bar.CornerRadius = value;
+            }
+        }
+
         public Bar()
         {
-            Children = new[]
+            InternalChildren = new Drawable[]
             {
-                background = new Box
+                background = new Container
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = new Color4(0, 0, 0, 0)
+                    Colour = new Color4(0, 0, 0, 0),
+                    Child = new Box { RelativeSizeAxes = Axes.Both },
                 },
-                bar = new Box
+                bar = new Container
                 {
                     RelativeSizeAxes = Axes.Both,
                     Width = 0,
+                    Child = new Box { RelativeSizeAxes = Axes.Both },
                 },
             };
         }
