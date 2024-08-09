@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.Catch.Tests
                 CreateTest();
             }
 
-            AddAssert("legacy HUD combo counter not added", () => !Player.ChildrenOfType<LegacyComboCounter>().Any());
+            AddAssert("legacy HUD combo counter not added", () => !Player.ChildrenOfType<LegacyDefaultComboCounter>().Any());
         }
     }
 }

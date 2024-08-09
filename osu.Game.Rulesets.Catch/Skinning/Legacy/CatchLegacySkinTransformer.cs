@@ -4,7 +4,6 @@
 using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Game.Skinning;
 using osuTK;
 using osuTK.Graphics;
@@ -37,7 +36,7 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
 
                     // Modifications for global components.
                     if (containerLookup.Ruleset == null)
-                        return base.GetDrawableComponent(lookup) as Container;
+                        return base.GetDrawableComponent(lookup);
 
                     // Skin has configuration.
                     if (base.GetDrawableComponent(lookup) is UserConfiguredLayoutContainer d)

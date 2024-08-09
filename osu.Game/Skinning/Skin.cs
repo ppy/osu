@@ -213,6 +213,7 @@ namespace osu.Game.Skinning
             // handle namespace changes...
             jsonContent = jsonContent.Replace(@"osu.Game.Screens.Play.SongProgress", @"osu.Game.Screens.Play.HUD.DefaultSongProgress");
             jsonContent = jsonContent.Replace(@"osu.Game.Screens.Play.HUD.LegacyComboCounter", @"osu.Game.Skinning.LegacyComboCounter");
+            jsonContent = jsonContent.Replace(@"osu.Game.Skinning.LegacyComboCounter", @"osu.Game.Skinning.LegacyDefaultComboCounter");
             jsonContent = jsonContent.Replace(@"osu.Game.Screens.Play.HUD.PerformancePointsCounter", @"osu.Game.Skinning.Triangles.TrianglesPerformancePointsCounter");
 
             try
@@ -250,13 +251,15 @@ namespace osu.Game.Skinning
             {
                 case 1:
                 {
+                    // Combo counters were moved out of the global HUD components into per-ruleset.
+                    // This is to allow some rulesets to customise further (ie. mania and catch moving the combo to within their play area).
                     if (target != SkinComponentsContainerLookup.TargetArea.MainHUDComponents ||
                         !layout.TryGetDrawableInfo(null, out var globalHUDComponents) ||
                         resources == null)
                         break;
 
                     var comboCounters = globalHUDComponents.Where(c =>
-                        c.Type.Name == nameof(LegacyComboCounter) ||
+                        c.Type.Name == nameof(LegacyDefaultComboCounter) ||
                         c.Type.Name == nameof(DefaultComboCounter) ||
                         c.Type.Name == nameof(ArgonComboCounter)).ToArray();
 
