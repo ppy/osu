@@ -7,6 +7,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Textures;
 using osu.Framework.Input.Events;
 using osu.Framework.Threading;
 using osu.Game.Graphics;
@@ -36,6 +37,8 @@ namespace osu.Game.Tournament.Screens.Board
         private OsuButton buttonRedWin = null!;
         private OsuButton buttonBlueWin = null!;
 
+        private Sprite additionalIcon = null!;
+
         private DrawableTeamPlayerList team1List = null!;
         private DrawableTeamPlayerList team2List = null!;
 
@@ -44,7 +47,7 @@ namespace osu.Game.Tournament.Screens.Board
         private ScheduledDelegate? scheduledScreenChange;
 
         [BackgroundDependencyLoader]
-        private void load(MatchIPCInfo ipc)
+        private void load(TextureStore textures, MatchIPCInfo ipc)
         {
             InternalChildren = new Drawable[]
             {
@@ -134,7 +137,7 @@ namespace osu.Game.Tournament.Screens.Board
                     Origin = Anchor.BottomCentre,
                     RelativeSizeAxes = Axes.None,
                     Height = 80,
-                    Width = 500,
+                    Width = 650,
                     Colour = Color4.Black,
                     Margin = new MarginPadding { Bottom = 12 },
                     Alpha = 0.7f,
@@ -142,9 +145,10 @@ namespace osu.Game.Tournament.Screens.Board
                 new FillFlowContainer
                 {
                     Anchor = Anchor.BottomCentre,
-                    Origin = Anchor.BottomCentre,
+                    Origin = Anchor.BottomLeft,
                     RelativeSizeAxes = Axes.None,
                     AutoSizeAxes = Axes.X,
+                    X = -310,
                     Y = -7,
                     Height = 60,
                     CornerRadius = 10,
@@ -183,7 +187,7 @@ namespace osu.Game.Tournament.Screens.Board
                                 {
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.CentreLeft,
-                                    Text = @"从上到下依次循环进行，获胜方可更改保图外的任意格子颜色",
+                                    Text = @"从上到下循环进行，获胜方可将除对方保图外的有色格子染成己方颜色",
                                     Font = OsuFont.HarmonyOSSans.With(size: 20, weight: FontWeight.Regular),
                                 },
                                 new TournamentSpriteText
@@ -197,6 +201,14 @@ namespace osu.Game.Tournament.Screens.Board
                             },
                         },
                     },
+                },
+                additionalIcon = new Sprite
+                {
+                    Anchor = Anchor.BottomCentre,
+                    Origin = Anchor.BottomRight,
+                    Position = new Vector2(300, -20),
+                    Size = new Vector2(64),
+                    Texture = textures.Get("Icons/additional-icon"),
                 },
                 new ControlPanel
                 {

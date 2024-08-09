@@ -5,6 +5,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Textures;
 using osu.Game.Graphics;
 using osu.Game.Tournament.Models;
 using osuTK;
@@ -16,6 +17,8 @@ namespace osu.Game.Tournament.Components
     {
         private readonly InstructionInfo thisStep = null!;
 
+        private Container iconHolder = null!;
+
         public InstructionDisplay(TeamColour team = TeamColour.Neutral, Steps step = Steps.Default)
         {
             thisStep = new InstructionInfo
@@ -23,29 +26,27 @@ namespace osu.Game.Tournament.Components
                 team: team,
                 step: step
             );
-            Anchor = Anchor.BottomCentre;
-            Origin = Anchor.BottomCentre;
+            Anchor = Anchor.CentreLeft;
+            Origin = Anchor.CentreLeft;
             Height = 100;
             Width = 500;
             AlwaysPresent = true;
 
             InternalChild = new FillFlowContainer
             {
-                Anchor = Anchor.BottomCentre,
-                Origin = Anchor.BottomCentre,
+                Anchor = Anchor.CentreLeft,
+                Origin = Anchor.CentreLeft,
                 Y = -15,
                 Direction = FillDirection.Horizontal,
                 AutoSizeAxes = Axes.Both,
                 Spacing = new Vector2(20, 0),
                 Children = new Drawable[]
                 {
-                    new SpriteIcon
+                    iconHolder = new Container
                     {
                         Anchor = Anchor.CentreLeft,
                         Origin = Anchor.CentreLeft,
-                        Icon = thisStep.Icon,
                         Size = new Vector2(56),
-                        Colour = thisStep.IconColor,
                         Alpha = 1,
                     },
                     new Box
@@ -84,6 +85,39 @@ namespace osu.Game.Tournament.Components
                     }
                 }
             };
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(TextureStore textures)
+        {
+            // Put one under the tournament match directory
+            Texture welcomeTexture = textures.Get("Icons/welcome-img");
+
+            if (thisStep.Step == Steps.Default && welcomeTexture != null)
+            {
+                iconHolder.Child = new Sprite
+                {
+                    Anchor = Anchor.CentreLeft,
+                    Origin = Anchor.CentreLeft,
+                    // Feel free to changed based on the texture's size
+                    Size = new Vector2(100),
+                    X = -20,
+                    Alpha = 1,
+                    Texture = textures.Get("Icons/welcome-img")
+                };
+            }
+            else
+            {
+                iconHolder.Child = new SpriteIcon
+                {
+                    Anchor = Anchor.CentreLeft,
+                    Origin = Anchor.CentreLeft,
+                    Icon = thisStep.Icon,
+                    Size = new Vector2(56),
+                    Colour = thisStep.IconColor,
+                    Alpha = 1,
+                };
+            }
         }
     }
 }

@@ -52,18 +52,18 @@ namespace osu.Game.Tournament.Models
 
             switch (type)
             {
-                case TrapType.Follow:
-                    name = @"时空之门";
-                    description = @"陷阱设置方获得额外两次选图机会";
-                    icon.Icon = FontAwesome.Solid.Clock;
-                    icon.Colour = new OsuColour().Purple1;
-                    break;
-
                 case TrapType.Swap:
                     name = @"大陆漂移";
-                    description = @"游玩结束后，此格子将与另一格子完全交换";
+                    description = @"游玩结束后，此格子将与另一个交换";
                     icon.Icon = FontAwesome.Solid.ExchangeAlt;
                     icon.Colour = Color4.Orange;
+                    break;
+
+                case TrapType.Reverse:
+                    name = @"时空之门";
+                    description = @"以对方胜利进行结算，此后回到原状态";
+                    icon.Icon = FontAwesome.Solid.Clock;
+                    icon.Colour = Color4.SkyBlue;
                     break;
 
                 case TrapType.Unused:
@@ -95,11 +95,14 @@ namespace osu.Game.Tournament.Models
         {
             switch (typeString.ToString())
             {
+                case @"时空之门":
+                    return TrapType.Reverse;
+
                 case @"大陆漂移":
                     return TrapType.Swap;
 
-                case @"时空之门":
-                    return TrapType.Follow;
+                case @"陷阱无效":
+                    return TrapType.Unused;
 
                 default:
                     return TrapType.Unknown;
@@ -114,13 +117,13 @@ namespace osu.Game.Tournament.Models
     public enum TrapType
     {
         /// <summary>
-        /// Gets extra chances to choose beatmaps.
-        /// </summary>
-        Follow,
-        /// <summary>
         /// Swap the specified map block with another after the current gameplay comes to an end.
         /// </summary>
         Swap,
+        /// <summary>
+        /// Set a temporary Win state for this block, then reset to Pick.
+        /// </summary>
+        Reverse,
         /// <summary>
         /// The trap has no effect.
         /// </summary>

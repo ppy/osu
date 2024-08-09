@@ -48,13 +48,17 @@ namespace osu.Game.Tournament.Components
         private Box flash = null!;
 
         private SpriteIcon icon = null!;
+        private SpriteIcon swapIcon = null!;
         private SpriteIcon statusIcon = null!;
 
-        public BoardBeatmapPanel(IBeatmapInfo? beatmap, string mod = "", string index = "")
+        private bool justSwapped = false;
+
+        public BoardBeatmapPanel(IBeatmapInfo? beatmap, string mod = "", string index = "", bool showSwap = false)
         {
             Beatmap = beatmap;
             this.index = index;
             this.mod = mod;
+            justSwapped = showSwap;
 
             Width = HEIGHT;
             Height = HEIGHT;
@@ -180,6 +184,16 @@ namespace osu.Game.Tournament.Components
                     Size = new osuTK.Vector2(0.4f),
                     Alpha = 0,
                 },
+                swapIcon = new SpriteIcon
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = Color4.Yellow,
+                    Size = new osuTK.Vector2(0.4f),
+                    Icon = FontAwesome.Solid.ExchangeAlt,
+                    Alpha = 0,
+                },
                 statusIcon = new SpriteIcon
                 {
                     Anchor = Anchor.BottomLeft,
@@ -211,6 +225,17 @@ namespace osu.Game.Tournament.Components
                     Position = new osuTK.Vector2(34, -18) // (x, y). Increment of x = Move right; Decrement of y = Move upwards. 
                 });
             }
+
+            if (justSwapped)
+            {
+                // icon.Icon = FontAwesome.Solid.ExchangeAlt;
+                // icon.Alpha = 1;
+                // icon.Colour = Color4.Yellow;
+                flash.Colour = Color4.White;
+                swapIcon.FadeOutFromOne(duration: 3000, easing: Easing.OutSine);
+                flash.FadeOutFromOne(duration: 1000, easing: Easing.OutCubic);
+                justSwapped = false;
+            }
         }
 
         private void matchChanged(ValueChangedEvent<TournamentMatch?> match)
@@ -220,12 +245,14 @@ namespace osu.Game.Tournament.Components
                 match.OldValue.PicksBans.CollectionChanged -= picksBansOnCollectionChanged;
                 match.OldValue.Protects.CollectionChanged -= picksBansOnCollectionChanged;
                 match.OldValue.Traps.CollectionChanged -= picksBansOnCollectionChanged;
+                match.OldValue.PendingSwaps.CollectionChanged -= picksBansOnCollectionChanged;
             }
             if (match.NewValue != null)
             {
                 match.NewValue.PicksBans.CollectionChanged += picksBansOnCollectionChanged;
                 match.NewValue.Protects.CollectionChanged += picksBansOnCollectionChanged;
                 match.NewValue.Traps.CollectionChanged += picksBansOnCollectionChanged;
+                match.NewValue.PendingSwaps.CollectionChanged += picksBansOnCollectionChanged;
             }
 
             Scheduler.AddOnce(updateState);
@@ -238,7 +265,7 @@ namespace osu.Game.Tournament.Components
 
         private void updateState()
         {
-            if (currentMatch.Value == null)
+            if (currentMatch.Value == null || justSwapped)
             {
                 return;
             }
@@ -260,7 +287,9 @@ namespace osu.Game.Tournament.Components
 
             // newChoice = nextPureChoice ?? newChoice;
 
-            bool shouldFlash = newChoice != choice;
+            bool isSwapping = currentMatch.Value.PendingSwaps.Any(p => p.BeatmapID == Beatmap?.OnlineID);
+            if (isSwapping) newChoice = currentMatch.Value.PendingSwaps.FirstOrDefault(p => p.BeatmapID == Beatmap?.OnlineID);
+            bool shouldFlash = newChoice != choice || isSwapping;
 
             if (newChoice != null)
             {
@@ -273,6 +302,12 @@ namespace osu.Game.Tournament.Components
 
                 BorderColour = TournamentGame.GetTeamColour(newChoice.Team);
 
+                if (isSwapping)
+                {
+                    // icon.Icon = FontAwesome.Solid.ExchangeAlt;
+                    swapIcon.FadeInFromZero(duration: 800, easing: Easing.InCubic);
+                }
+
                 switch (newChoice.Type)
                 {
                     case ChoiceType.Pick:
@@ -284,11 +319,11 @@ namespace osu.Game.Tournament.Components
 
                     // Ban: All darker
                     case ChoiceType.Ban:
-                        backgroundAddition.Colour = Color4.Gray;
+                        backgroundAddition.Colour = Color4.Black;
                         backgroundAddition.FadeTo(newAlpha: 0.7f, duration: 150, easing: Easing.InCubic);
                         icon.Icon = FontAwesome.Solid.Ban;
                         icon.Colour = newChoice.Team == TeamColour.Red ? new OsuColour().TeamColourRed : new OsuColour().Sky;
-                        icon.FadeIn(duration: 200, easing: Easing.InCubic);
+                        icon.FadeTo(newAlpha: 0.6f, duration: 200, easing: Easing.InCubic);
                         BorderColour = Color4.White;
                         BorderThickness = 0;
                         break;
@@ -334,7 +369,7 @@ namespace osu.Game.Tournament.Components
                         break;
                 }
             }
-            else
+            else if (!justSwapped)
             {
                 // Stop all transforms first, to make relative properties adjustable.
                 icon.ClearTransforms();
@@ -352,7 +387,6 @@ namespace osu.Game.Tournament.Components
                 icon.Colour = Color4.White;
                 backgroundAddition.Colour = Color4.White;
             }
-
             choice = newChoice;
         }
 

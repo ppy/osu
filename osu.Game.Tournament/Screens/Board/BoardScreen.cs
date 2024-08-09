@@ -4,11 +4,14 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Textures;
 using osu.Framework.Input.Events;
 using osu.Framework.Threading;
 using osu.Game.Graphics.UserInterface;
@@ -55,7 +58,8 @@ namespace osu.Game.Tournament.Screens.Board
         private bool hasTrap = false;
 
         private TrapTypeDropdown trapTypeDropdown = null!;
-        private Container informatiomDisplayContainer = null!;
+        private Container informationDisplayContainer = null!;
+        private Sprite additionalIcon = null!;
 
         private DrawableTeamPlayerList team1List = null!;
         private DrawableTeamPlayerList team2List = null!;
@@ -65,7 +69,7 @@ namespace osu.Game.Tournament.Screens.Board
         private ScheduledDelegate? scheduledScreenChange;
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(TextureStore textures)
         {
             InternalChildren = new Drawable[]
             {
@@ -168,13 +172,22 @@ namespace osu.Game.Tournament.Screens.Board
                     Padding = new MarginPadding{ Left = 50 },
                     Spacing = new Vector2(10, 10),
                 },
-                informatiomDisplayContainer = new Container
+                informationDisplayContainer = new Container
                 {
                     Anchor = Anchor.BottomCentre,
-                    Origin = Anchor.BottomCentre,
+                    Origin = Anchor.BottomLeft,
+                    Position = new Vector2(-300, 7),
                     Height = 100,
                     Width = 500,
                     Child = new InstructionDisplay(),
+                },
+                additionalIcon = new Sprite
+                {
+                    Anchor = Anchor.BottomCentre,
+                    Origin = Anchor.BottomRight,
+                    Position = new Vector2(300, -20),
+                    Size = new Vector2(85),
+                    Texture = textures.Get("Icons/additional-icon"),
                 },
                 new ControlPanel
                 {
@@ -326,33 +339,34 @@ namespace osu.Game.Tournament.Screens.Board
             switch (choiceType)
             {
                 case ChoiceType.Protect:
-                    informatiomDisplayContainer.Child = new InstructionDisplay(team: pickColour, step: Steps.Protect);
+                    informationDisplayContainer.Child = new InstructionDisplay(team: pickColour, step: Steps.Protect);
                     break;
 
                 case ChoiceType.Pick:
-                    informatiomDisplayContainer.Child = new InstructionDisplay(team: pickColour, step: Steps.Pick);
+                    informationDisplayContainer.Child = new InstructionDisplay(team: pickColour, step: Steps.Pick);
                     break;
 
                 case ChoiceType.Trap:
-                    informatiomDisplayContainer.Child = new InstructionDisplay(team: pickColour, step: Steps.Trap);
+                    informationDisplayContainer.Child = new InstructionDisplay(team: pickColour, step: Steps.Trap);
                     break;
 
                 case ChoiceType.Ban:
-                    informatiomDisplayContainer.Child = new InstructionDisplay(team: pickColour, step: Steps.Ban);
+                    informationDisplayContainer.Child = new InstructionDisplay(team: pickColour, step: Steps.Ban);
                     break;
 
                 case ChoiceType.RedWin or ChoiceType.BlueWin:
-                    informatiomDisplayContainer.Child = new InstructionDisplay(team: pickColour, step: Steps.Win);
+                    informationDisplayContainer.Child = new InstructionDisplay(team: pickColour, step: Steps.Win);
                     break;
 
                 case ChoiceType.Swap:
-                    informatiomDisplayContainer.Child = new TrapInfoDisplay(trap: TrapType.Swap);
+                    informationDisplayContainer.Child = new TrapInfoDisplay(trap: TrapType.Swap);
                     break;
 
                 default:
-                    informatiomDisplayContainer.Child = new InstructionDisplay(team: teamWinner, step: DetectWin() ? Steps.FinalWin : (useEX ? Steps.EX : Steps.Default));
+                    informationDisplayContainer.Child = new InstructionDisplay(team: teamWinner, step: DetectWin() ? Steps.FinalWin : (useEX ? Steps.EX : Steps.Default));
                     break;
             }
+            informationDisplayContainer.FadeInFromZero(duration: 200, easing: Easing.InCubic);
         }
 
         /*
@@ -426,9 +440,11 @@ namespace osu.Game.Tournament.Screens.Board
                         var existingProtect = CurrentMatch.Value?.Protects.FirstOrDefault(p => p.BeatmapID == map.Beatmap?.OnlineID);
                         var existingTrap = CurrentMatch.Value?.Traps.FirstOrDefault(p => p.BeatmapID == map.Beatmap?.OnlineID);
                         var PBTrap = CurrentMatch.Value?.PicksBans.FirstOrDefault(p => p.BeatmapID == map.Beatmap?.OnlineID && p.Type == ChoiceType.Trap);
+                        var existingPendingSwap = CurrentMatch.Value?.PendingSwaps.FirstOrDefault(p => p.BeatmapID == map.Beatmap?.OnlineID);
                         if (existingProtect != null) CurrentMatch.Value?.Protects.Remove(existingProtect);
                         if (existingTrap != null) CurrentMatch.Value?.Traps.Remove(existingTrap);
                         if (PBTrap != null) CurrentMatch.Value?.PicksBans.Remove(PBTrap);
+                        if (existingPendingSwap != null) CurrentMatch.Value?.PendingSwaps.Remove(existingPendingSwap);
                     }
                 }
 
@@ -440,11 +456,11 @@ namespace osu.Game.Tournament.Screens.Board
 
                     if (teamWinner != TeamColour.Neutral && !havePendingSwap)
                     {
-                        informatiomDisplayContainer.Child = new InstructionDisplay(team: teamWinner, step: Steps.FinalWin);
+                        informationDisplayContainer.Child = new InstructionDisplay(team: teamWinner, step: Steps.FinalWin);
                     }
                     else if (useEX && !havePendingSwap)
                     {
-                        informatiomDisplayContainer.Child = new InstructionDisplay(step: Steps.EX);
+                        informationDisplayContainer.Child = new InstructionDisplay(step: Steps.EX);
                     }
                     else if (!hasTrap)
                     {
@@ -490,7 +506,7 @@ namespace osu.Game.Tournament.Screens.Board
             CurrentMatch.Value?.PendingSwaps.Clear();
 
             // Reset bottom display
-            informatiomDisplayContainer.Child = new InstructionDisplay();
+            informationDisplayContainer.Child = new InstructionDisplay();
 
             // Reset button group
             buttonBlueProtect.Colour = Color4.White;
@@ -513,6 +529,8 @@ namespace osu.Game.Tournament.Screens.Board
 
         private void addForBeatmap(int beatmapId)
         {
+            bool hasReversed = false;
+
             if (pickType == ChoiceType.Neutral)
                 return;
 
@@ -531,6 +549,13 @@ namespace osu.Game.Tournament.Screens.Board
                 // don't attempt to ban a protected map
                 return;
 
+            // Remove the latest win state for Reverse Trap
+            if (CurrentMatch.Value.PicksBans.Any(p => p.BeatmapID == beatmapId && (p.Type == ChoiceType.RedWin || p.Type == ChoiceType.BlueWin) && pickType == ChoiceType.Pick))
+            {
+                var latestWin = CurrentMatch.Value.PicksBans.LastOrDefault(p => p.BeatmapID == beatmapId && (p.Type == ChoiceType.RedWin || p.Type == ChoiceType.BlueWin));
+                if (latestWin != null) CurrentMatch.Value.PicksBans.Remove(latestWin);
+            }
+
             // Show the trap description
             if (CurrentMatch.Value.Traps.Any(p => p.BeatmapID == beatmapId && !p.IsTriggered))
             {
@@ -539,12 +564,23 @@ namespace osu.Game.Tournament.Screens.Board
 
                 if (pickType == ChoiceType.Pick && matchTrap != null)
                 {
-                    informatiomDisplayContainer.Child = matchTrap.Team != pickColour
+                    informationDisplayContainer.Child = matchTrap.Team != pickColour
                         ? new TrapInfoDisplay(trap: matchTrap.Mode, team: matchTrap.Team, mapID: matchTrap.BeatmapID)
                         : new TrapInfoDisplay(trap: TrapType.Unused, team: matchTrap.Team, mapID: matchTrap.BeatmapID);
 
                     CurrentMatch.Value.Traps.Remove(matchTrap);
                     if (PBTrap != null) CurrentMatch.Value.PicksBans.Remove(PBTrap);
+                    if (matchTrap.Mode == TrapType.Reverse)
+                    {
+                        // Add Win status first
+                        hasReversed = true;
+                        CurrentMatch.Value.PicksBans.Add(new BeatmapChoice
+                        {
+                            BeatmapID = beatmapId,
+                            Team = matchTrap.Team == TeamColour.Red ? TeamColour.Red : TeamColour.Blue,
+                            Type = matchTrap.Team == TeamColour.Red ? ChoiceType.RedWin : ChoiceType.BlueWin,
+                        });
+                    }
                     // matchTrap.IsTriggered = true;
                     hasTrap = true;
                 }
@@ -565,6 +601,12 @@ namespace osu.Game.Tournament.Screens.Board
                     // "Trigger" the trap upon final swap, after marking colors
                     var targetTrap = CurrentMatch.Value.Traps.FirstOrDefault(p => (p.BeatmapID == source.BeatmapID && !p.IsTriggered));
                     if (targetTrap != null) targetTrap.IsTriggered = true;
+                    CurrentMatch.Value.PendingSwaps.Add(new BeatmapChoice
+                    {
+                        Team = TeamColour.Neutral,
+                        Type = ChoiceType.Neutral,
+                        BeatmapID = beatmapId,
+                    });
                     SwapMap(source.BeatmapID, beatmapId);
                 }
                 else
@@ -602,7 +644,7 @@ namespace osu.Game.Tournament.Screens.Board
                 });
             }
 
-            if (pickType != ChoiceType.Swap && !CurrentMatch.Value.PicksBans.Any(p => p.BeatmapID == beatmapId && p.Type == pickType))
+            if (pickType != ChoiceType.Swap && !hasReversed && !CurrentMatch.Value.PicksBans.Any(p => p.BeatmapID == beatmapId && p.Type == pickType))
             {
                 CurrentMatch.Value.PicksBans.Add(new BeatmapChoice
                 {
@@ -655,12 +697,12 @@ namespace osu.Game.Tournament.Screens.Board
                 target.BoardX = middleX;
                 target.BoardY = middleY;
 
-                CurrentMatch.Value?.PendingSwaps.Clear();
 
                 // TODO: A better way to reload maps
                 DetectWin();
                 DetectEX();
                 updateDisplay();
+                // CurrentMatch.Value?.PendingSwaps.Clear();
             }
             else
             {
@@ -930,12 +972,14 @@ namespace osu.Game.Tournament.Screens.Board
 
                             if (nextMap != null)
                             {
-                                currentFlow.Add(new BoardBeatmapPanel(nextMap.Beatmap, nextMap.Mods, nextMap.ModIndex)
+                                var hasSwappedMap = CurrentMatch.Value.PendingSwaps.FirstOrDefault(p => p.BeatmapID == nextMap.Beatmap?.OnlineID);
+                                currentFlow.Add(new BoardBeatmapPanel(nextMap.Beatmap, nextMap.Mods, nextMap.ModIndex, hasSwappedMap != null)
                                 {
                                     Anchor = Anchor.TopCentre,
                                     Origin = Anchor.TopCentre,
                                     Height = 150,
                                 });
+                                CurrentMatch.Value.PendingSwaps.Remove(hasSwappedMap);
                             }
                         }
                     }

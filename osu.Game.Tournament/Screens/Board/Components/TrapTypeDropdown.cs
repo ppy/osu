@@ -11,8 +11,8 @@ namespace osu.Game.Tournament.Screens.Board.Components
     {
         public TrapTypeDropdown()
         {
-            add(new TrapInfo(type: TrapType.Follow).Name);
             add(new TrapInfo(type: TrapType.Swap).Name);
+            add(new TrapInfo(type: TrapType.Reverse).Name);
             add(new TrapInfo(type: TrapType.Unknown).Name);
         }
 
