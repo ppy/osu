@@ -10,7 +10,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 {
     public static class AimEvaluator
     {
-        private const double wide_angle_multiplier = 1.5;
+        private const double wide_angle_multiplier = 1.2;
         private const double acute_angle_multiplier = 1.95;
         private const double slider_multiplier = 1.35;
         private const double velocity_change_multiplier = 0.75;
@@ -116,6 +116,16 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             {
                 // Reward sliders based on velocity.
                 sliderBonus = osuLastObj.TravelDistance / osuLastObj.TravelTime;
+            }
+
+            // The spacing bonus in speed evaluation
+            double flowBonus = Math.Pow((osuLastObj?.MinimumJumpDistance?? 0) / SpeedEvaluator.single_spacing_threshold, 3.5);
+            // Part of the aiming difficulty for this object is accounted for in the speed evaluator, so reduce aim difficulty here
+            if (flowBonus < 1)
+            {
+                double velocityChange = (prevVelocity == 0) ? 1 : currVelocity / prevVelocity;
+                double retainedStrain = 1 / (1 + Math.Exp(-3 * (velocityChange - 1)));
+                aimStrain *= retainedStrain + (1 - retainedStrain) * Math.Sqrt(flowBonus);
             }
 
             // Add in acute angle bonus or wide angle bonus + velocity change bonus, whichever is larger.
