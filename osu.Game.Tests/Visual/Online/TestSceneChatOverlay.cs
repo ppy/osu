@@ -717,9 +717,12 @@ namespace osu.Game.Tests.Visual.Online
             Type = ChannelType.Public,
         };
 
+        private static int privateChannelUser = DummyAPIAccess.DUMMY_USER_ID + 1;
+
         private Channel createPrivateChannel()
         {
-            int id = RNG.Next(0, DummyAPIAccess.DUMMY_USER_ID - 1);
+            int id = Interlocked.Increment(ref privateChannelUser);
+
             return new Channel(new APIUser
             {
                 Id = id,
