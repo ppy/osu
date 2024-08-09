@@ -404,6 +404,11 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString DecreaseModSpeed => new TranslatableString(getKey(@"decrease_mod_speed"), @"Decrease mod speed");
 
+        /// <summary>
+	    /// "Boss Key"
+        /// </summary>
+        public static LocalisableString BossKey => new TranslatableString(getKey(@"boss_key"), @"Boss Key");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }
