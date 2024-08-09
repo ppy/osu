@@ -32,6 +32,7 @@ using osu.Game.Overlays.Chat.ChannelList;
 using osuTK;
 using osuTK.Input;
 using osu.Game.Graphics.UserInterfaceV2;
+using osu.Game.Tests.Resources;
 
 namespace osu.Game.Tests.Visual.Online
 {
@@ -121,7 +122,7 @@ namespace osu.Game.Tests.Visual.Online
                             return true;
 
                         case PostMessageRequest postMessage:
-                            postMessage.TriggerSuccess(new Message(getNextTestID())
+                            postMessage.TriggerSuccess(new Message(TestResources.GetNextTestID())
                             {
                                 Content = postMessage.Message.Content,
                                 ChannelId = postMessage.Message.ChannelId,
@@ -718,7 +719,7 @@ namespace osu.Game.Tests.Visual.Online
 
         private Channel createPrivateChannel()
         {
-            int id = getNextTestID();
+            int id = TestResources.GetNextTestID();
 
             return new Channel(new APIUser
             {
@@ -738,10 +739,6 @@ namespace osu.Game.Tests.Visual.Online
                 Id = announce_channel_id,
             };
         }
-
-        private static int testId = DummyAPIAccess.DUMMY_USER_ID + 1;
-
-        private static int getNextTestID() => Interlocked.Increment(ref testId);
 
         private partial class TestChatOverlay : ChatOverlay
         {
