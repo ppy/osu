@@ -4,6 +4,8 @@
 using System;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -68,6 +70,18 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
         [Resolved]
         private MusicController musicController { get; set; } = null!;
 
+        private Sample? dateWindupSample;
+        private Sample? dateImpactSample;
+        private Sample? beatmapWindupSample;
+        private Sample? beatmapImpactSample;
+
+        private SampleChannel? dateWindupChannel;
+        private SampleChannel? dateImpactChannel;
+        private SampleChannel? beatmapWindupChannel;
+        private SampleChannel? beatmapImpactChannel;
+
+        private IDisposable? duckOperation;
+
         public DailyChallengeIntro(Room room)
         {
             this.room = room;
@@ -79,7 +93,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
         protected override BackgroundScreen CreateBackground() => new DailyChallengeIntroBackgroundScreen(colourProvider);
 
         [BackgroundDependencyLoader]
-        private void load(BeatmapDifficultyCache difficultyCache, BeatmapModelDownloader beatmapDownloader, OsuConfigManager config)
+        private void load(BeatmapDifficultyCache difficultyCache, BeatmapModelDownloader beatmapDownloader, OsuConfigManager config, AudioManager audio)
         {
             const float horizontal_info_size = 500f;
 
@@ -323,6 +337,11 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
                 if (!beatmapManager.IsAvailableLocally(new BeatmapSetInfo { OnlineID = item.Beatmap.BeatmapSet!.OnlineID }))
                     beatmapDownloader.Download(item.Beatmap.BeatmapSet!, config.Get<bool>(OsuSetting.PreferNoVideo));
             }
+
+            dateWindupSample = audio.Samples.Get(@"DailyChallenge/date-windup");
+            dateImpactSample = audio.Samples.Get(@"DailyChallenge/date-impact");
+            beatmapWindupSample = audio.Samples.Get(@"DailyChallenge/beatmap-windup");
+            beatmapImpactSample = audio.Samples.Get(@"DailyChallenge/beatmap-impact");
         }
 
         public override void OnEntering(ScreenTransitionEvent e)
@@ -338,12 +357,20 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
 
             this.FadeInFromZero(400, Easing.OutQuint);
             updateAnimationState();
+
+            playDateWindupSample();
         }
 
         public override void OnSuspending(ScreenTransitionEvent e)
         {
             this.FadeOut(800, Easing.OutQuint);
             base.OnSuspending(e);
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            resetAudio();
+            base.Dispose(isDisposing);
         }
 
         private void updateAnimationState()
@@ -380,6 +407,29 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
                                  .Then()
                                  .MoveToY(0, 4000);
 
+                using (BeginDelayedSequence(150))
+                {
+                    Schedule(() =>
+                    {
+                        playDateImpactSample();
+                        playBeatmapWindupSample();
+
+                        duckOperation?.Dispose();
+                        duckOperation = musicController.Duck(new DuckParameters
+                        {
+                            RestoreDuration = 1500f,
+                        });
+                    });
+
+                    using (BeginDelayedSequence(2750))
+                    {
+                        Schedule(() =>
+                        {
+                            duckOperation?.Dispose();
+                        });
+                    }
+                }
+
                 using (BeginDelayedSequence(1000))
                 {
                     beatmapContent
@@ -406,6 +456,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
                                 shouldBePlayingMusic = true;
                                 DailyChallenge.TrySetDailyChallengeBeatmap(this, beatmapManager, rulesets, musicController, item);
                                 ApplyToBackground(bs => ((RoomBackgroundScreen)bs).SelectedItem.Value = item);
+                                playBeatmapImpactSample();
                             });
                         }
 
@@ -423,6 +474,39 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
                     }
                 }
             }
+        }
+
+        private void playDateWindupSample()
+        {
+            dateWindupChannel = dateWindupSample?.GetChannel();
+            dateWindupChannel?.Play();
+        }
+
+        private void playDateImpactSample()
+        {
+            dateImpactChannel = dateImpactSample?.GetChannel();
+            dateImpactChannel?.Play();
+        }
+
+        private void playBeatmapWindupSample()
+        {
+            beatmapWindupChannel = beatmapWindupSample?.GetChannel();
+            beatmapWindupChannel?.Play();
+        }
+
+        private void playBeatmapImpactSample()
+        {
+            beatmapImpactChannel = beatmapImpactSample?.GetChannel();
+            beatmapImpactChannel?.Play();
+        }
+
+        private void resetAudio()
+        {
+            dateWindupChannel?.Stop();
+            dateImpactChannel?.Stop();
+            beatmapWindupChannel?.Stop();
+            beatmapImpactChannel?.Stop();
+            duckOperation?.Dispose();
         }
 
         private partial class DailyChallengeIntroBackgroundScreen : RoomBackgroundScreen
