@@ -17,15 +17,15 @@ namespace osu.Game.Utils
         /// <summary>
         /// Simulates perfect play on <see cref="Beatmap"/>.
         /// </summary>
-        /// <param name="beatmap">Beatmap, on which perfect play will be simulated</param>
-        /// <param name="ruleset">Ruleset, for which perfect play will be simulated</param>
-        /// <param name="mods">(Optional) set of mods that will be accounted for in simulation</param>
-        /// <param name="baseScore">(Optional) score that will be used as a base</param>
+        /// <param name="beatmap">Beatmap, on which perfect play will be simulated.</param>
+        /// <param name="ruleset">Ruleset, for which perfect play will be simulated.</param>
+        /// <param name="mods">Optional set of mods that will be accounted for in simulation.</param>
+        /// <param name="baseScore">Optional score that will be used as a base.</param>
         /// <returns><see cref="ScoreInfo"/> of simulated play</returns>
-        public static ScoreInfo GetPerfectPlay(IBeatmap beatmap, RulesetInfo ruleset, Mod[]? mods = null, ScoreInfo? baseScore = null)
+        public static ScoreInfo GetPerfectPlay(IBeatmap beatmap, IRulesetInfo ruleset, Mod[]? mods = null, ScoreInfo? baseScore = null)
         {
             Ruleset rulesetInstance = ruleset.CreateInstance();
-            ScoreInfo perfectPlay = baseScore == null ? new ScoreInfo(beatmap.BeatmapInfo, ruleset) : baseScore.DeepClone();
+            ScoreInfo perfectPlay = baseScore == null ? new ScoreInfo(beatmap.BeatmapInfo, rulesetInstance.RulesetInfo) : baseScore.DeepClone();
 
             // Initialize mods: if mods given - use them, else try use mods from base score, else use empty mod array
             mods ??= baseScore != null ? baseScore.Mods : [];

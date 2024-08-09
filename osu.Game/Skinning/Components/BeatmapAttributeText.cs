@@ -62,9 +62,7 @@ namespace osu.Game.Skinning.Components
         private readonly OsuSpriteText text;
 
         [Resolved]
-        private OsuGameBase game { get; set; } = null!;
-
-        private Bindable<RulesetInfo> ruleset = null!;
+        private IBindable<IRulesetInfo> ruleset { get; set; } = null!;
 
         [Resolved]
         private Bindable<WorkingBeatmap> beatmap { get; set; } = null!;
@@ -94,11 +92,10 @@ namespace osu.Game.Skinning.Components
         {
             base.LoadComplete();
 
-            // Init dict
             foreach (var attribute in Enum.GetValues<BeatmapAttribute>())
-                valueDictionary[attribute] = "";
+                valueDictionary[attribute] = string.Empty;
 
-            ruleset = game.Ruleset.GetBoundCopy();
+            ruleset.BindValueChanged(_ => updateAll());
 
             Template.BindValueChanged(_ => updateLabel());
             Attribute.BindValueChanged(_ =>
@@ -107,7 +104,6 @@ namespace osu.Game.Skinning.Components
                 updateAll();
             });
 
-            ruleset.BindValueChanged(_ => updateAll());
             beatmap.BindValueChanged(_ =>
             {
                 updateBindableDifficulty();
