@@ -160,7 +160,8 @@ namespace osu.Game.Skinning.Components
         private void updateMetadata()
         {
             // Skip if not relevant attribute
-            if (!isMetadata(Attribute.Value))
+            if (!((Attribute.Value >= BeatmapAttribute.Title && Attribute.Value <= BeatmapAttribute.Creator)
+                || Attribute.Value == BeatmapAttribute.RankedStatus || Attribute.Value == BeatmapAttribute.Source))
                 return;
 
             valueDictionary[BeatmapAttribute.Title] = new RomanisableString(beatmap.Value.BeatmapInfo.Metadata.TitleUnicode, beatmap.Value.BeatmapInfo.Metadata.Title);
@@ -174,7 +175,7 @@ namespace osu.Game.Skinning.Components
         private void updateBeatmapDifficultyAttributes()
         {
             // Skip if not relevant attribute
-            if (!isBeatmapDifficultyAttribute(Attribute.Value))
+            if (!(Attribute.Value <= BeatmapAttribute.ApproachRate))
                 return;
 
             double rate = ModUtils.CalculateRateWithMods(mods.Value);
@@ -195,7 +196,7 @@ namespace osu.Game.Skinning.Components
         private void updateTimingData()
         {
             // Skip if not relevant attribute
-            if (!isTimingData(Attribute.Value))
+            if (!(Attribute.Value == BeatmapAttribute.Length || Attribute.Value == BeatmapAttribute.BPM))
                 return;
 
             double rate = ModUtils.CalculateRateWithMods(mods.Value);
@@ -203,15 +204,6 @@ namespace osu.Game.Skinning.Components
             valueDictionary[BeatmapAttribute.Length] = TimeSpan.FromMilliseconds(beatmapInfo.Length / rate).ToFormattedDuration();
             valueDictionary[BeatmapAttribute.BPM] = FormatUtils.RoundBPM(beatmapInfo.BPM, rate).ToLocalisableString(@"F0");
         }
-
-        private static bool isMetadata(BeatmapAttribute attribute) => (attribute >= BeatmapAttribute.Title && attribute <= BeatmapAttribute.Creator)
-                                                                      || attribute == BeatmapAttribute.RankedStatus || attribute == BeatmapAttribute.Source;
-
-        private static bool isBeatmapDifficultyAttribute(BeatmapAttribute attribute) => (attribute <= BeatmapAttribute.ApproachRate);
-
-        private static bool isTimingData(BeatmapAttribute attribute) => attribute == BeatmapAttribute.Length || attribute == BeatmapAttribute.BPM;
-
-        private static bool isDiffcalcInfo(BeatmapAttribute attribute) => attribute == BeatmapAttribute.StarRating || attribute == BeatmapAttribute.MaxPerformance;
 
         #region diffcalc stuff
 
@@ -228,7 +220,7 @@ namespace osu.Game.Skinning.Components
             bindableDifficulty?.UnbindEvents();
 
             // Skip if not relevant attribute
-            if (!isDiffcalcInfo(Attribute.Value))
+            if (!(Attribute.Value == BeatmapAttribute.StarRating || Attribute.Value == BeatmapAttribute.MaxPerformance))
                 return;
 
             cancellationTokenSource = new CancellationTokenSource();
