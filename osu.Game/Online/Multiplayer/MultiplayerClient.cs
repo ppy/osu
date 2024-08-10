@@ -782,7 +782,21 @@ namespace osu.Game.Online.Multiplayer
                 }
                 catch (Exception ex)
                 {
-                    throw new AggregateException($"Item: {JsonConvert.SerializeObject(createPlaylistItem(item))}\n\nRoom:{JsonConvert.SerializeObject(APIRoom)}", ex);
+                    // Temporary code to attempt to figure out long-term failing tests.
+                    bool success = true;
+                    int indexOf = -1234;
+
+                    try
+                    {
+                        indexOf = Room.Playlist.IndexOf(Room.Playlist.Single(existing => existing.ID == item.ID));
+                        Room.Playlist[indexOf] = item;
+                    }
+                    catch
+                    {
+                        success = false;
+                    }
+
+                    throw new AggregateException($"Index: {indexOf} Length: {Room.Playlist.Count} Retry success: {success} Item: {JsonConvert.SerializeObject(createPlaylistItem(item))}\n\nRoom:{JsonConvert.SerializeObject(APIRoom)}", ex);
                 }
 
                 ItemChanged?.Invoke(item);

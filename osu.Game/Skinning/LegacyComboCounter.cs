@@ -43,18 +43,6 @@ namespace osu.Game.Skinning
 
         private readonly Container counterContainer;
 
-        /// <summary>
-        /// Hides the combo counter internally without affecting its <see cref="SerialisedDrawableInfo"/>.
-        /// </summary>
-        /// <remarks>
-        /// This is used for rulesets that provide their own combo counter and don't want this HUD one to be visible,
-        /// without potentially affecting the user's selected skin.
-        /// </remarks>
-        public bool HiddenByRulesetImplementation
-        {
-            set => counterContainer.Alpha = value ? 1 : 0;
-        }
-
         public bool UsesFixedAnchor { get; set; }
 
         public LegacyComboCounter()
