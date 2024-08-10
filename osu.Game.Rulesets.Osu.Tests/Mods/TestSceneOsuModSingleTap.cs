@@ -175,7 +175,8 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
         [Test]
         public void TestInputIndicationOnly() => CreateModTest(new ModTestData
         {
-            Mod = new OsuModSingleTap{
+            Mod = new OsuModSingleTap
+            {
                 IndicationOnly = { Value = true }
             },
             PassCondition = () => Player.ScoreProcessor.Combo.Value == 2,
