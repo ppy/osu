@@ -15,10 +15,12 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Localisation.HUD;
 using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects.Legacy;
 using osu.Game.Rulesets.Osu.Judgements;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Statistics;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Play.HUD.HitErrorMeters;
 using osuTK;
 using osuTK.Graphics;
@@ -84,7 +86,7 @@ namespace osu.Game.Rulesets.Osu.HUD
         }
 
         [BackgroundDependencyLoader]
-        private void load(IBindable<WorkingBeatmap> beatmap)
+        private void load(IBindable<WorkingBeatmap> beatmap, ScoreProcessor processor)
         {
             InternalChild = new Container
             {
@@ -260,7 +262,21 @@ namespace osu.Game.Rulesets.Osu.HUD
                 }
             };
 
-            objectRadius = OsuHitObject.OBJECT_RADIUS * LegacyRulesetExtensions.CalculateScaleFromCircleSize(beatmap.Value.Beatmap.Difficulty.CircleSize, true);
+            // handle IApplicableToDifficulty for CS change.
+            BeatmapDifficulty newDifficulty = new BeatmapDifficulty();
+            beatmap.Value.Beatmap.Difficulty.CopyTo(newDifficulty);
+
+            var mods = processor.Mods.Value;
+
+            if (mods.Any(m => m is IApplicableToDifficulty))
+            {
+                foreach (var mod in mods.OfType<IApplicableToDifficulty>())
+                {
+                    mod.ApplyToDifficulty(newDifficulty);
+                }
+            }
+
+            objectRadius = OsuHitObject.OBJECT_RADIUS * LegacyRulesetExtensions.CalculateScaleFromCircleSize(newDifficulty.CircleSize, true);
 
             AverageSize.BindValueChanged(size => averagePositionContainer.Size = new Vector2(size.NewValue), true);
             AverageStyle.BindValueChanged(style => averagePositionRotateContainer.Rotation = style.NewValue == HitStyle.Plus ? 0 : 45, true);
