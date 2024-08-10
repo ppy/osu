@@ -4,10 +4,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Game.Beatmaps.Timing;
+using osu.Game.Configuration;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Objects;
@@ -24,6 +26,10 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override double ScoreMultiplier => 1.0;
         public override Type[] IncompatibleMods => new[] { typeof(ModAutoplay), typeof(ModRelax), typeof(OsuModCinema) };
         public override ModType Type => ModType.Conversion;
+        public override bool Ranked => IndicationOnly.Value;
+
+        [SettingSource("Indication Only", "Just indicate wrong inputs without affecting scoring")]
+        public BindableBool IndicationOnly { get; } = new BindableBool(false);
 
         private const double flash_duration = 1000;
 
@@ -94,6 +100,8 @@ namespace osu.Game.Rulesets.Osu.Mods
             }
 
             ruleset.Cursor.FlashColour(Colour4.Red, flash_duration, Easing.OutQuint);
+            if (IndicationOnly.Value)
+                return true;
             return false;
         }
 

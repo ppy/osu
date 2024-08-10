@@ -177,5 +177,37 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
                 }
             ).ToList()
         });
+
+        [Test]
+        public void TestInputIndicationOnly() => CreateModTest(new ModTestData
+        {
+            Mod = new OsuModAlternate{
+                IndicationOnly = { Value = true }
+            },
+            PassCondition = () => Player.ScoreProcessor.Combo.Value == 2,
+            Autoplay = false,
+            Beatmap = new Beatmap
+            {
+                HitObjects = new List<HitObject>
+                {
+                    new HitCircle
+                    {
+                        StartTime = 500,
+                        Position = new Vector2(100),
+                    },
+                    new HitCircle
+                    {
+                        StartTime = 1000,
+                        Position = new Vector2(200, 100),
+                    },
+                },
+            },
+            ReplayFrames = new List<ReplayFrame>
+            {
+                new OsuReplayFrame(500, new Vector2(100), OsuAction.LeftButton),
+                new OsuReplayFrame(501, new Vector2(100)),
+                new OsuReplayFrame(1000, new Vector2(200, 100), OsuAction.LeftButton),
+            }
+        });
     }
 }
