@@ -57,6 +57,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddStep("reset ruleset", () => Ruleset.Value = rulesetStore.GetRuleset(0));
             AddStep("reset mods", () => SelectedMods.SetDefault());
             AddStep("reset config", () => configManager.SetValue(OsuSetting.ModSelectTextSearchStartsActive, true));
+            AddStep("reset mouse", () => InputManager.MoveMouseTo(Vector2.One));
             AddStep("set beatmap", () => Beatmap.Value = CreateWorkingBeatmap(new OsuRuleset().RulesetInfo));
             AddStep("set up presets", () =>
             {
@@ -998,7 +999,9 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddStep("press mouse", () => InputManager.PressButton(MouseButton.Left));
             AddAssert("search still not focused", () => !this.ChildrenOfType<ShearedSearchTextBox>().Single().HasFocus);
             AddStep("release mouse", () => InputManager.ReleaseButton(MouseButton.Left));
-            AddAssert("customisation panel closed by click", () => !this.ChildrenOfType<ModCustomisationPanel>().Single().Expanded.Value);
+            AddAssert("customisation panel closed by click",
+                () => this.ChildrenOfType<ModCustomisationPanel>().Single().ExpandedState.Value,
+                () => Is.EqualTo(ModCustomisationPanel.ModCustomisationPanelState.Collapsed));
 
             if (textSearchStartsActive)
                 AddAssert("search focused", () => this.ChildrenOfType<ShearedSearchTextBox>().Single().HasFocus);
@@ -1021,7 +1024,9 @@ namespace osu.Game.Tests.Visual.UserInterface
         private void assertCustomisationToggleState(bool disabled, bool active)
         {
             AddUntilStep($"customisation panel is {(disabled ? "" : "not ")}disabled", () => modSelectOverlay.ChildrenOfType<ModCustomisationPanel>().Single().Enabled.Value == !disabled);
-            AddAssert($"customisation panel is {(active ? "" : "not ")}active", () => modSelectOverlay.ChildrenOfType<ModCustomisationPanel>().Single().Expanded.Value == active);
+            AddAssert($"customisation panel is {(active ? "" : "not ")}active",
+                () => modSelectOverlay.ChildrenOfType<ModCustomisationPanel>().Single().ExpandedState.Value,
+                () => active ? Is.Not.EqualTo(ModCustomisationPanel.ModCustomisationPanelState.Collapsed) : Is.EqualTo(ModCustomisationPanel.ModCustomisationPanelState.Collapsed));
         }
 
         private T getSelectedMod<T>() where T : Mod => SelectedMods.Value.OfType<T>().Single();
