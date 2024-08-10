@@ -7,19 +7,18 @@ using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Input.Bindings;
-using osu.Framework.Input.Events;
-using osu.Game.Input.Bindings;
+using osu.Game.Screens.Footer;
 
 namespace osu.Game.Graphics.UserInterface
 {
+    // todo: remove this once all screens migrate to display the new game footer and back button.
     public partial class BackButton : VisibilityContainer
     {
         public Action Action;
 
         private readonly TwoLayerButton button;
 
-        public BackButton(Receptor receptor = null)
+        public BackButton(ScreenFooter.BackReceptor receptor = null)
         {
             Size = TwoLayerButton.SIZE_EXTENDED;
 
@@ -35,7 +34,7 @@ namespace osu.Game.Graphics.UserInterface
             if (receptor == null)
             {
                 // if a receptor wasn't provided, create our own locally.
-                Add(receptor = new Receptor());
+                Add(receptor = new ScreenFooter.BackReceptor());
             }
 
             receptor.OnBackPressed = () => button.TriggerClick();
@@ -58,30 +57,6 @@ namespace osu.Game.Graphics.UserInterface
         {
             button.MoveToX(-TwoLayerButton.SIZE_EXTENDED.X / 2, 400, Easing.OutQuint);
             button.FadeOut(400, Easing.OutQuint);
-        }
-
-        public partial class Receptor : Drawable, IKeyBindingHandler<GlobalAction>
-        {
-            public Action OnBackPressed;
-
-            public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
-            {
-                if (e.Repeat)
-                    return false;
-
-                switch (e.Action)
-                {
-                    case GlobalAction.Back:
-                        OnBackPressed?.Invoke();
-                        return true;
-                }
-
-                return false;
-            }
-
-            public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
-            {
-            }
         }
     }
 }

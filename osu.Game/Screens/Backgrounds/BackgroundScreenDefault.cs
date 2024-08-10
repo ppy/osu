@@ -42,11 +42,6 @@ namespace osu.Game.Screens.Backgrounds
 
         protected virtual bool AllowStoryboardBackground => true;
 
-        public BackgroundScreenDefault(bool animateOnEnter = true)
-            : base(animateOnEnter)
-        {
-        }
-
         [BackgroundDependencyLoader]
         private void load(IAPIProvider api, SkinManager skinManager, OsuConfigManager config)
         {

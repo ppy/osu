@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Audio.Track;
@@ -25,22 +23,31 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
     [Cached]
     public partial class Timeline : ZoomableScrollContainer, IPositionSnapProvider
     {
-        private const float timeline_height = 72;
+        private const float timeline_height = 80;
         private const float timeline_expanded_height = 94;
 
         private readonly Drawable userContent;
 
-        public readonly Bindable<bool> WaveformVisible = new Bindable<bool>();
+        private bool alwaysShowControlPoints;
 
-        public readonly Bindable<bool> ControlPointsVisible = new Bindable<bool>();
+        public bool AlwaysShowControlPoints
+        {
+            get => alwaysShowControlPoints;
+            set
+            {
+                if (value == alwaysShowControlPoints)
+                    return;
 
-        public readonly Bindable<bool> TicksVisible = new Bindable<bool>();
+                alwaysShowControlPoints = value;
+                controlPointsVisible.TriggerChange();
+            }
+        }
 
         [Resolved]
-        private EditorClock editorClock { get; set; }
+        private EditorClock editorClock { get; set; } = null!;
 
         [Resolved]
-        private EditorBeatmap editorBeatmap { get; set; }
+        private EditorBeatmap editorBeatmap { get; set; } = null!;
 
         /// <summary>
         /// The timeline's scroll position in the last frame.
@@ -67,6 +74,22 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         /// </summary>
         private float defaultTimelineZoom;
 
+        private WaveformGraph waveform = null!;
+
+        private TimelineTickDisplay ticks = null!;
+
+        private TimelineControlPointDisplay controlPoints = null!;
+
+        private Container mainContent = null!;
+
+        private Bindable<float> waveformOpacity = null!;
+        private Bindable<bool> controlPointsVisible = null!;
+        private Bindable<bool> ticksVisible = null!;
+
+        private double trackLengthForZoom;
+
+        private readonly IBindable<Track> track = new Bindable<Track>();
+
         public Timeline(Drawable userContent)
         {
             this.userContent = userContent;
@@ -79,20 +102,6 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             ScrollbarVisible = false;
         }
 
-        private WaveformGraph waveform;
-
-        private TimelineTickDisplay ticks;
-
-        private TimelineControlPointDisplay controlPoints;
-
-        private Container mainContent;
-
-        private Bindable<float> waveformOpacity;
-
-        private double trackLengthForZoom;
-
-        private readonly IBindable<Track> track = new Bindable<Track>();
-
         [BackgroundDependencyLoader]
         private void load(IBindable<WorkingBeatmap> beatmap, OsuColour colours, OsuConfigManager config)
         {
@@ -101,6 +110,11 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             // We don't want the centre marker to scroll
             AddInternal(centreMarker = new CentreMarker());
 
+            ticks = new TimelineTickDisplay
+            {
+                Padding = new MarginPadding { Vertical = 2, },
+            };
+
             AddRange(new Drawable[]
             {
                 controlPoints = new TimelineControlPointDisplay
@@ -108,6 +122,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                     RelativeSizeAxes = Axes.X,
                     Height = timeline_expanded_height,
                 },
+                ticks,
                 mainContent = new Container
                 {
                     RelativeSizeAxes = Axes.X,
@@ -123,8 +138,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                             MidColour = colours.BlueDark,
                             HighColour = colours.BlueDarker,
                         },
+                        ticks.CreateProxy(),
                         centreMarker.CreateProxy(),
-                        ticks = new TimelineTickDisplay(),
                         new Box
                         {
                             Name = "zero marker",
@@ -139,6 +154,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             });
 
             waveformOpacity = config.GetBindable<float>(OsuSetting.EditorWaveformOpacity);
+            controlPointsVisible = config.GetBindable<bool>(OsuSetting.EditorTimelineShowTimingChanges);
+            ticksVisible = config.GetBindable<bool>(OsuSetting.EditorTimelineShowTicks);
 
             track.BindTo(editorClock.Track);
             track.BindValueChanged(_ =>
@@ -168,17 +185,16 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         {
             base.LoadComplete();
 
-            WaveformVisible.BindValueChanged(_ => updateWaveformOpacity());
             waveformOpacity.BindValueChanged(_ => updateWaveformOpacity(), true);
 
-            TicksVisible.BindValueChanged(visible => ticks.FadeTo(visible.NewValue ? 1 : 0, 200, Easing.OutQuint), true);
+            ticksVisible.BindValueChanged(visible => ticks.FadeTo(visible.NewValue ? 1 : 0, 200, Easing.OutQuint), true);
 
-            ControlPointsVisible.BindValueChanged(visible =>
+            controlPointsVisible.BindValueChanged(visible =>
             {
-                if (visible.NewValue)
+                if (visible.NewValue || alwaysShowControlPoints)
                 {
                     this.ResizeHeightTo(timeline_expanded_height, 200, Easing.OutQuint);
-                    mainContent.MoveToY(20, 200, Easing.OutQuint);
+                    mainContent.MoveToY(15, 200, Easing.OutQuint);
 
                     // delay the fade in else masking looks weird.
                     controlPoints.Delay(180).FadeIn(400, Easing.OutQuint);
@@ -195,7 +211,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         }
 
         private void updateWaveformOpacity() =>
-            waveform.FadeTo(WaveformVisible.Value ? waveformOpacity.Value : 0, 200, Easing.OutQuint);
+            waveform.FadeTo(waveformOpacity.Value, 200, Easing.OutQuint);
 
         protected override void Update()
         {
@@ -315,7 +331,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         }
 
         [Resolved]
-        private IBeatSnapProvider beatSnapProvider { get; set; }
+        private IBeatSnapProvider beatSnapProvider { get; set; } = null!;
 
         /// <summary>
         /// The total amount of time visible on the timeline.

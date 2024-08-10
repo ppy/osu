@@ -56,14 +56,15 @@ namespace osu.Game.Overlays.BeatmapListing
             [Resolved(canBeNull: true)]
             private IDialogOverlay dialogOverlay { get; set; }
 
-            protected override Color4 GetStateColour() => colours.Orange1;
-
             protected override void LoadComplete()
             {
                 base.LoadComplete();
 
                 disclaimerShown = sessionStatics.GetBindable<bool>(Static.FeaturedArtistDisclaimerShownOnce);
             }
+
+            protected override Color4 ColourNormal => colours.Orange1;
+            protected override Color4 ColourActive => colours.Orange2;
 
             protected override bool OnClick(ClickEvent e)
             {

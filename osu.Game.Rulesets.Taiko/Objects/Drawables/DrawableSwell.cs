@@ -43,6 +43,11 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
         public override bool DisplayResult => false;
 
+        /// <summary>
+        /// Whether the player must alternate centre and rim hits.
+        /// </summary>
+        public bool MustAlternate { get; internal set; } = true;
+
         public DrawableSwell()
             : this(null)
         {
@@ -292,7 +297,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             bool isCentre = e.Action == TaikoAction.LeftCentre || e.Action == TaikoAction.RightCentre;
 
             // Ensure alternating centre and rim hits
-            if (lastWasCentre == isCentre)
+            if (lastWasCentre == isCentre && MustAlternate)
                 return false;
 
             // If we've already successfully judged a tick this frame, do not judge more.
