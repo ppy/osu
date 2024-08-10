@@ -60,7 +60,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         }
 
         private const int history_time_max = 5 * 1000; // 5 seconds of calculatingRhythmBonus max.
-        private const double rhythm_multiplier = 1.05;
+        private const double rhythm_multiplier = 1.1;
         private const int max_island_size = 7;
 
         /// <summary>
@@ -103,7 +103,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 double prevDelta = prevObj.StrainTime;
                 double lastDelta = lastObj.StrainTime;
 
-                double currRatio = 1.0 + 8.0 * Math.Min(0.5, Math.Pow(Math.Sin(Math.PI / (Math.Min(prevDelta, currDelta) / Math.Max(prevDelta, currDelta))), 2)); // fancy function to calculate rhythmbonuses.
+                double currRatio = 1.0 + 8.4 * Math.Min(0.5, Math.Pow(Math.Sin(Math.PI / (Math.Min(prevDelta, currDelta) / Math.Max(prevDelta, currDelta))), 2)); // fancy function to calculate rhythmbonuses.
 
                 double windowPenalty = Math.Min(1, Math.Max(0, Math.Abs(prevDelta - currDelta) - currObj.HitWindowGreat * 0.3) / (currObj.HitWindowGreat * 0.3));
 
@@ -132,7 +132,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                             effectiveRatio *= 0.25;
 
                         if (island.IsSimilarPolarity(previousIsland, deltaDifferenceEpsilon)) // repeated island polartiy (2 -> 4, 3 -> 5)
-                            effectiveRatio *= 0.50;
+                            effectiveRatio *= 0.35;
 
                         if (lastDelta > prevDelta + deltaDifferenceEpsilon && prevDelta > currDelta + deltaDifferenceEpsilon) // previous increase happened a note ago, 1/1->1/2-1/4, dont want to buff this.
                             effectiveRatio *= 0.125;
