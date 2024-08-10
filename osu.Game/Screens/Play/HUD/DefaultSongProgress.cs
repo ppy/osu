@@ -140,7 +140,6 @@ namespace osu.Game.Screens.Play.HUD
             updateInfoMargin();
         }
 
-
         private void updateInfoMargin()
         {
             float finalMargin = bottom_bar_height + (Interactive.Value ? handle_size.Y : 0) + (ShowGraph.Value ? graph_height : 0);
