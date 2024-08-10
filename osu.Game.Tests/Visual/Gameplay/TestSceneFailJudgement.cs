@@ -61,7 +61,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 public override double ScoreMultiplier => 1.0;
                 public override string Acronym => "";
 
-                public override FailState CheckFail(JudgementResult? result) => FailState.Force;
+                public override FailState CheckFail(JudgementResult result) => FailState.Force;
             }
         }
     }

@@ -9,11 +9,8 @@ namespace osu.Game.Rulesets.Mania.Mods
 {
     public class ManiaModPerfect : ModPerfect
     {
-        public override FailState CheckFail(JudgementResult? result)
+        public override FailState CheckFail(JudgementResult result)
         {
-            if (result == null)
-                return FailState.Allow;
-
             if (!isRelevantResult(result.Judgement.MinResult) && !isRelevantResult(result.Judgement.MaxResult) && !isRelevantResult(result.Type))
                 return FailState.Allow;
 

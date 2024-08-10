@@ -30,7 +30,7 @@ namespace osu.Game.Rulesets.Mods
         /// <summary>
         /// We never fail, 'yo.
         /// </summary>
-        public FailState CheckFail(JudgementResult? result) => FailState.Block;
+        public FailState CheckFail(JudgementResult result) => FailState.Block;
 
         public void ReadFromConfig(OsuConfigManager config)
         {

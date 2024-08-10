@@ -440,7 +440,7 @@ namespace osu.Game.Tests.Gameplay
                 this.type = type;
             }
 
-            public override FailState CheckFail(JudgementResult result) => result?.Type == type ? FailState.Force : FailState.Allow;
+            public override FailState CheckFail(JudgementResult result) => result.Type == type ? FailState.Force : FailState.Allow;
         }
     }
 }

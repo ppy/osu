@@ -102,11 +102,8 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public bool RestartOnFail => false;
 
-        public FailState CheckFail(JudgementResult? result)
+        public FailState CheckFail(JudgementResult result)
         {
-            if (result == null)
-                return FailState.Allow;
-
             return result.Type.AffectsCombo() && !result.IsHit ? FailState.Force : FailState.Allow;
         }
 

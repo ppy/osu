@@ -36,11 +36,8 @@ namespace osu.Game.Rulesets.Mods
 
         public bool RestartOnFail => false;
 
-        public FailState CheckFail(JudgementResult? result)
+        public FailState CheckFail(JudgementResult result)
         {
-            if (result != null)
-                return FailState.Block;
-
             if (retries == 0)
                 return FailState.Allow;
 

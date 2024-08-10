@@ -28,11 +28,8 @@ namespace osu.Game.Rulesets.Mods
             Restart.Value = Restart.Default = true;
         }
 
-        public override FailState CheckFail(JudgementResult? result)
+        public override FailState CheckFail(JudgementResult result)
         {
-            if (result == null)
-                return FailState.Allow;
-
             return (isRelevantResult(result.Judgement.MinResult) || isRelevantResult(result.Judgement.MaxResult) || isRelevantResult(result.Type))
                    && result.Type != result.Judgement.MaxResult
                 ? FailState.Force

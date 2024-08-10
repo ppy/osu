@@ -23,11 +23,8 @@ namespace osu.Game.Rulesets.Mods
 
         public override Type[] IncompatibleMods => base.IncompatibleMods.Append(typeof(ModPerfect)).ToArray();
 
-        public override FailState CheckFail(JudgementResult? result)
+        public override FailState CheckFail(JudgementResult result)
         {
-            if (result == null)
-                return FailState.Allow;
-
             return result.Type.AffectsCombo() && !result.IsHit ? FailState.Force : FailState.Allow;
         }
     }
