@@ -18,9 +18,9 @@ namespace osu.Game.Rulesets.Mods
         /// <summary>
         /// Check the current failure allowance for this mod.
         /// </summary>
-        /// <param name="result">The judgement result which should be considered. Importantly, will be <c>null</c> if a failure has already being triggered.</param>
+        /// <param name="result">The judgement result which should be considered.</param>
         /// <returns>The current failure allowance (see <see cref="FailState"/>).</returns>
-        FailState CheckFail(JudgementResult? result);
+        FailState CheckFail(JudgementResult result);
     }
 
     public enum FailState

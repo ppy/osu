@@ -87,11 +87,6 @@ namespace osu.Game.Rulesets.Scoring
         public readonly BindableInt Combo = new BindableInt();
 
         /// <summary>
-        /// The current selected mods
-        /// </summary>
-        public readonly Bindable<IReadOnlyList<Mod>> Mods = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
-
-        /// <summary>
         /// The current rank.
         /// </summary>
         public IBindable<ScoreRank> Rank => rank;
