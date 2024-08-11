@@ -53,7 +53,7 @@ namespace osu.Game.Beatmaps.Legacy
             {
                 case SampleControlPoint:
                     // intentionally don't use SamplePointAt (we always need to consider the first sample point).
-                    var existing = BinarySearch(SamplePoints, time);
+                    var existing = BinarySearch(SamplePoints, time).Point;
                     return newPoint.IsRedundant(existing);
 
                 case DifficultyControlPoint:

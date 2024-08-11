@@ -216,7 +216,7 @@ namespace osu.Game.Beatmaps.ControlPoints
         public static T BinarySearchWithFallback<T>(IReadOnlyList<T> list, double time, T fallback)
             where T : class, IControlPoint
         {
-            return BinarySearch(list, time) ?? fallback;
+            return BinarySearch(list, time).Point ?? fallback;
         }
 
         /// <summary>
@@ -224,20 +224,20 @@ namespace osu.Game.Beatmaps.ControlPoints
         /// </summary>
         /// <param name="list">The list to search.</param>
         /// <param name="time">The time to find the control point at.</param>
-        /// <returns>The active control point at <paramref name="time"/>. Will return <c>null</c> if there are no control points, or if the time is before the first control point.</returns>
-        public static T BinarySearch<T>(IReadOnlyList<T> list, double time)
+        /// <returns>The active control point at <paramref name="time"/> and its index. Will return <c>null, -1</c> if there are no control points, or if the time is before the first control point.</returns>
+        public static (T Point, int Index) BinarySearch<T>(IReadOnlyList<T> list, double time)
             where T : class, IControlPoint
         {
             ArgumentNullException.ThrowIfNull(list);
 
             if (list.Count == 0)
-                return null;
+                return (null, -1);
 
             if (time < list[0].Time)
-                return null;
+                return (null, -1);
 
             if (time >= list[^1].Time)
-                return list[^1];
+                return (list[^1], list.Count - 1);
 
             int l = 0;
             int r = list.Count - 2;
@@ -251,11 +251,11 @@ namespace osu.Game.Beatmaps.ControlPoints
                 else if (list[pivot].Time > time)
                     r = pivot - 1;
                 else
-                    return list[pivot];
+                    return (list[pivot], pivot);
             }
 
             // l will be the first control point with Time > time, but we want the one before it
-            return list[l - 1];
+            return (list[l - 1], l - 1);
         }
 
         /// <summary>
@@ -272,7 +272,7 @@ namespace osu.Game.Beatmaps.ControlPoints
             {
                 case TimingControlPoint:
                     // Timing points are a special case and need to be added regardless of fallback availability.
-                    existing = BinarySearch(TimingPoints, time);
+                    existing = BinarySearch(TimingPoints, time).Point;
                     break;
 
                 case EffectControlPoint:

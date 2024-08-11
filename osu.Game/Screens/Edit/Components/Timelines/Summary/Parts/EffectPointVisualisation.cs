@@ -56,16 +56,9 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
             {
                 EffectControlPoint? next = null;
 
-                for (int i = 0; i < beatmap.ControlPointInfo.EffectPoints.Count; i++)
-                {
-                    var point = beatmap.ControlPointInfo.EffectPoints[i];
-
-                    if (point.Time > effect.Time)
-                    {
-                        next = point;
-                        break;
-                    }
-                }
+                int activePointIndex = ControlPointInfo.BinarySearch(beatmap.ControlPointInfo.EffectPoints, effect.Time).Index;
+                if (activePointIndex + 1 <= beatmap.ControlPointInfo.EffectPoints.Count - 1)
+                    next = beatmap.ControlPointInfo.EffectPoints[activePointIndex + 1];
 
                 if (!ReferenceEquals(nextControlPoint, next))
                 {
