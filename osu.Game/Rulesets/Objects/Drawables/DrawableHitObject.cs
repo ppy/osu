@@ -10,6 +10,7 @@ using System.Diagnostics;
 using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.ListExtensions;
 using osu.Framework.Extensions.ObjectExtensions;
