@@ -367,12 +367,6 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
             base.OnSuspending(e);
         }
 
-        protected override void Dispose(bool isDisposing)
-        {
-            resetAudio();
-            base.Dispose(isDisposing);
-        }
-
         private void updateAnimationState()
         {
             if (!beatmapBackgroundLoaded || !this.IsCurrentScreen())
@@ -498,6 +492,12 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
         {
             beatmapImpactChannel = beatmapImpactSample?.GetChannel();
             beatmapImpactChannel?.Play();
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            resetAudio();
+            base.Dispose(isDisposing);
         }
 
         private void resetAudio()
