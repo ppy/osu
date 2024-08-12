@@ -41,6 +41,11 @@ namespace osu.Game.Overlays.Settings.Sections.DebugSettings
                 {
                     Text = DebugSettingsStrings.RunLatencyCertifier,
                     Action = () => performer?.PerformFromScreen(menu => menu.Push(new LatencyCertifierScreen()))
+                },
+                new SettingsSlider<float>
+                {
+                    LabelText = "Performance overlay scale",
+                    Current = frameworkConfig.GetBindable<float>(FrameworkSetting.PerformanceOverlayScale)
                 }
             };
         }
