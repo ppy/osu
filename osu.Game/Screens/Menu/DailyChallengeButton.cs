@@ -132,21 +132,21 @@ namespace osu.Game.Screens.Menu
 
         private long? lastNotifiedDailyChallengeRoomId;
 
-        private void dailyChallengeChanged(ValueChangedEvent<DailyChallengeInfo?> info)
+        private void dailyChallengeChanged(ValueChangedEvent<DailyChallengeInfo?> _)
         {
             UpdateState();
 
             scheduledCountdownUpdate?.Cancel();
             scheduledCountdownUpdate = null;
 
-            if (this.info.Value == null)
+            if (info.Value == null)
             {
                 Room = null;
                 cover.OnlineInfo = TooltipContent = null;
             }
             else
             {
-                var roomRequest = new GetRoomRequest(this.info.Value.Value.RoomID);
+                var roomRequest = new GetRoomRequest(info.Value.Value.RoomID);
 
                 roomRequest.Success += room =>
                 {
