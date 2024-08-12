@@ -154,7 +154,9 @@ namespace osu.Game.Screens.Menu
                     cover.OnlineInfo = TooltipContent = room.Playlist.FirstOrDefault()?.Beatmap.BeatmapSet as APIBeatmapSet;
 
                     // We only want to notify the user if a new challenge recently went live.
-                    if (Math.Abs((DateTimeOffset.Now - room.StartDate.Value!.Value).TotalSeconds) < 600 && room.RoomID.Value != lastNotifiedDailyChallengeRoomId)
+                    if (room.StartDate.Value != null
+                        && Math.Abs((DateTimeOffset.Now - room.StartDate.Value!.Value).TotalSeconds) < 600
+                        && room.RoomID.Value != lastNotifiedDailyChallengeRoomId)
                     {
                         lastNotifiedDailyChallengeRoomId = room.RoomID.Value;
                         notificationOverlay?.Post(new NewDailyChallengeNotification(room));
