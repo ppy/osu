@@ -45,9 +45,6 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
             switch (lookup)
             {
                 case SkinComponentsContainerLookup containerLookup:
-                    if (containerLookup.Target != SkinComponentsContainerLookup.TargetArea.MainHUDComponents)
-                        return base.GetDrawableComponent(lookup);
-
                     // Only handle per ruleset defaults here.
                     if (containerLookup.Ruleset == null)
                         return base.GetDrawableComponent(lookup);
@@ -56,42 +53,50 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                     if (base.GetDrawableComponent(lookup) is UserConfiguredLayoutContainer d)
                         return d;
 
-                    return new DefaultSkinComponentsContainer(container =>
+                    // Our own ruleset components default.
+                    switch (containerLookup.Target)
                     {
-                        var keyCounter = container.OfType<LegacyKeyCounterDisplay>().FirstOrDefault();
+                        case SkinComponentsContainerLookup.TargetArea.MainHUDComponents:
+                            return new DefaultSkinComponentsContainer(container =>
+                            {
+                                var keyCounter = container.OfType<LegacyKeyCounterDisplay>().FirstOrDefault();
 
-                        if (keyCounter != null)
-                        {
-                            // set the anchor to top right so that it won't squash to the return button to the top
-                            keyCounter.Anchor = Anchor.CentreRight;
-                            keyCounter.Origin = Anchor.CentreRight;
-                            keyCounter.X = 0;
-                            // 340px is the default height inherit from stable
-                            keyCounter.Y = container.ToLocalSpace(new Vector2(0, container.ScreenSpaceDrawQuad.Centre.Y - 340f)).Y;
-                        }
+                                if (keyCounter != null)
+                                {
+                                    // set the anchor to top right so that it won't squash to the return button to the top
+                                    keyCounter.Anchor = Anchor.CentreRight;
+                                    keyCounter.Origin = Anchor.CentreRight;
+                                    keyCounter.X = 0;
+                                    // 340px is the default height inherit from stable
+                                    keyCounter.Y = container.ToLocalSpace(new Vector2(0, container.ScreenSpaceDrawQuad.Centre.Y - 340f)).Y;
+                                }
 
-                        var combo = container.OfType<LegacyDefaultComboCounter>().FirstOrDefault();
+                                var combo = container.OfType<LegacyDefaultComboCounter>().FirstOrDefault();
 
-                        if (combo != null)
-                        {
-                            combo.Anchor = Anchor.BottomLeft;
-                            combo.Origin = Anchor.BottomLeft;
-                            combo.Scale = new Vector2(1.28f);
-                        }
-                    })
-                    {
-                        Children = new Drawable[]
-                        {
-                            new LegacyDefaultComboCounter(),
-                            new LegacyKeyCounterDisplay(),
-                        }
-                    };
+                                if (combo != null)
+                                {
+                                    combo.Anchor = Anchor.BottomLeft;
+                                    combo.Origin = Anchor.BottomLeft;
+                                    combo.Scale = new Vector2(1.28f);
+                                }
+                            })
+                            {
+                                Children = new Drawable[]
+                                {
+                                    new LegacyDefaultComboCounter(),
+                                    new LegacyKeyCounterDisplay(),
+                                }
+                            };
+                    }
+
+                    return null;
 
                 case OsuSkinComponentLookup osuComponent:
                     switch (osuComponent.Component)
                     {
                         case OsuSkinComponents.FollowPoint:
-                            return this.GetAnimation("followpoint", true, true, true, startAtCurrentTime: false, maxSize: new Vector2(OsuHitObject.OBJECT_RADIUS * 2, OsuHitObject.OBJECT_RADIUS));
+                            return this.GetAnimation("followpoint", true, true, true, startAtCurrentTime: false,
+                                maxSize: new Vector2(OsuHitObject.OBJECT_RADIUS * 2, OsuHitObject.OBJECT_RADIUS));
 
                         case OsuSkinComponents.SliderScorePoint:
                             return this.GetAnimation("sliderscorepoint", false, false, maxSize: OsuHitObject.OBJECT_DIMENSIONS);
