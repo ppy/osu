@@ -22,7 +22,6 @@ using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Database;
 using osu.Game.Graphics.Containers;
-using osu.Game.Graphics.Cursor;
 using osu.Game.Input.Bindings;
 using osu.Game.Screens.Select.Carousel;
 using osuTK;
@@ -209,7 +208,7 @@ namespace osu.Game.Screens.Select
         public BeatmapCarousel()
         {
             root = new CarouselRoot(this);
-            InternalChild = new OsuContextMenuContainer
+            InternalChild = new Container
             {
                 RelativeSizeAxes = Axes.Both,
                 Padding = new MarginPadding
