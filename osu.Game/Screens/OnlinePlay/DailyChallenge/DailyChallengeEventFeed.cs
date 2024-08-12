@@ -1,16 +1,17 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Utils;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Online.API.Requests.Responses;
-using osu.Game.Scoring;
+using osu.Game.Screens.OnlinePlay.DailyChallenge.Events;
 using osu.Game.Users.Drawables;
 using osuTK;
 
@@ -19,6 +20,10 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
     public partial class DailyChallengeEventFeed : CompositeDrawable
     {
         private DailyChallengeEventFeedFlow flow = null!;
+
+        public Action<long>? PresentScore { get; init; }
+
+        private readonly Queue<NewScoreEvent> newScores = new Queue<NewScoreEvent>();
 
         [BackgroundDependencyLoader]
         private void load()
@@ -45,22 +50,32 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
 
         public void AddNewScore(NewScoreEvent newScoreEvent)
         {
-            var row = new NewScoreEventRow(newScoreEvent)
-            {
-                Anchor = Anchor.BottomCentre,
-                Origin = Anchor.BottomCentre,
-            };
-            flow.Add(row);
-            row.Delay(15000).Then().FadeOut(300, Easing.OutQuint).Expire();
+            newScores.Enqueue(newScoreEvent);
+
+            // ensure things don't get too out-of-hand.
+            if (newScores.Count > 25)
+                newScores.Dequeue();
         }
 
         protected override void Update()
         {
             base.Update();
 
+            while (newScores.TryDequeue(out var newScore))
+            {
+                flow.Add(new NewScoreEventRow(newScore)
+                {
+                    Anchor = Anchor.BottomCentre,
+                    Origin = Anchor.BottomCentre,
+                    PresentScore = PresentScore,
+                });
+            }
+
             for (int i = 0; i < flow.Count; ++i)
             {
                 var row = flow[i];
+
+                row.Alpha = Interpolation.ValueAt(Math.Clamp(row.Y + flow.DrawHeight, 0, flow.DrawHeight), 0f, 1f, 0, flow.DrawHeight, Easing.Out);
 
                 if (row.Y < -flow.DrawHeight)
                 {
@@ -70,8 +85,6 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
             }
         }
 
-        public record NewScoreEvent(IScoreInfo Score, int? NewRank);
-
         private partial class DailyChallengeEventFeedFlow : FillFlowContainer
         {
             public override IEnumerable<Drawable> FlowingChildren => base.FlowingChildren.Reverse();
@@ -80,6 +93,8 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
         private partial class NewScoreEventRow : CompositeDrawable
         {
             private readonly NewScoreEvent newScore;
+
+            public Action<long>? PresentScore { get; init; }
 
             public NewScoreEventRow(NewScoreEvent newScore)
             {
@@ -98,8 +113,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
 
                 InternalChildren = new Drawable[]
                 {
-                    // TODO: cast is temporary, will be removed later
-                    new ClickableAvatar((APIUser)newScore.Score.User)
+                    new ClickableAvatar(newScore.User)
                     {
                         Size = new Vector2(16),
                         Masking = true,
@@ -107,7 +121,14 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
                     },
                     text = new LinkFlowContainer(t =>
                     {
-                        t.Font = OsuFont.Default.With(weight: newScore.NewRank == null ? FontWeight.Medium : FontWeight.Bold);
+                        FontWeight fontWeight = FontWeight.Medium;
+
+                        if (newScore.NewRank < 100)
+                            fontWeight = FontWeight.Bold;
+                        else if (newScore.NewRank < 1000)
+                            fontWeight = FontWeight.SemiBold;
+
+                        t.Font = OsuFont.Default.With(weight: fontWeight);
                         t.Colour = newScore.NewRank < 10 ? colours.Orange1 : Colour4.White;
                     })
                     {
@@ -117,9 +138,9 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
                     }
                 };
 
-                text.AddUserLink(newScore.Score.User);
-                text.AddText(" got ");
-                text.AddLink($"{newScore.Score.TotalScore:N0} points", () => { }); // TODO: present the score here
+                text.AddUserLink(newScore.User);
+                text.AddText(" scored ");
+                text.AddLink($"{newScore.TotalScore:N0}", () => PresentScore?.Invoke(newScore.ScoreID));
 
                 if (newScore.NewRank != null)
                     text.AddText($" and achieved rank #{newScore.NewRank.Value:N0}");

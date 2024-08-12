@@ -135,7 +135,7 @@ namespace osu.Game.Tests.Visual.Playlists
                 AddAssert("right loading spinner shown", () => resultsScreen.RightSpinner.State.Value == Visibility.Visible);
                 waitForDisplay();
 
-                AddAssert($"count increased by {scores_per_result}", () => this.ChildrenOfType<ScorePanel>().Count() >= beforePanelCount + scores_per_result);
+                AddAssert($"count increased by {scores_per_result}", () => this.ChildrenOfType<ScorePanel>().Count() == beforePanelCount + scores_per_result);
                 AddAssert("right loading spinner hidden", () => resultsScreen.RightSpinner.State.Value == Visibility.Hidden);
             }
         }
@@ -156,7 +156,7 @@ namespace osu.Game.Tests.Visual.Playlists
             AddAssert("right loading spinner shown", () => resultsScreen.RightSpinner.State.Value == Visibility.Visible);
             waitForDisplay();
 
-            AddAssert($"count increased by {scores_per_result}", () => this.ChildrenOfType<ScorePanel>().Count() >= beforePanelCount + scores_per_result);
+            AddAssert($"count increased by {scores_per_result}", () => this.ChildrenOfType<ScorePanel>().Count() == beforePanelCount + scores_per_result);
             AddAssert("right loading spinner hidden", () => resultsScreen.RightSpinner.State.Value == Visibility.Hidden);
 
             AddStep("get panel count", () => beforePanelCount = this.ChildrenOfType<ScorePanel>().Count());
@@ -191,7 +191,7 @@ namespace osu.Game.Tests.Visual.Playlists
                 AddAssert("left loading spinner shown", () => resultsScreen.LeftSpinner.State.Value == Visibility.Visible);
                 waitForDisplay();
 
-                AddAssert($"count increased by {scores_per_result}", () => this.ChildrenOfType<ScorePanel>().Count() >= beforePanelCount + scores_per_result);
+                AddAssert($"count increased by {scores_per_result}", () => this.ChildrenOfType<ScorePanel>().Count() == beforePanelCount + scores_per_result);
                 AddAssert("left loading spinner hidden", () => resultsScreen.LeftSpinner.State.Value == Visibility.Hidden);
             }
         }
@@ -413,7 +413,7 @@ namespace osu.Game.Tests.Visual.Playlists
             };
         }
 
-        private partial class TestResultsScreen : PlaylistsResultsScreen
+        private partial class TestResultsScreen : PlaylistItemUserResultsScreen
         {
             public new LoadingSpinner LeftSpinner => base.LeftSpinner;
             public new LoadingSpinner CentreSpinner => base.CentreSpinner;
