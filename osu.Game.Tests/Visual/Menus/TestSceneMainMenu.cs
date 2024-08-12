@@ -48,6 +48,7 @@ namespace osu.Game.Tests.Visual.Menus
                             {
                                 new PlaylistItem(beatmap)
                             },
+                            StartDate = { Value = DateTimeOffset.Now.AddMinutes(-30) },
                             EndDate = { Value = DateTimeOffset.Now.AddSeconds(60) }
                         });
                         return true;
