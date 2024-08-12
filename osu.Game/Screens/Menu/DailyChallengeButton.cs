@@ -155,7 +155,7 @@ namespace osu.Game.Screens.Menu
 
                     // We only want to notify the user if a new challenge recently went live.
                     if (room.StartDate.Value != null
-                        && Math.Abs((DateTimeOffset.Now - room.StartDate.Value!.Value).TotalSeconds) < 600
+                        && Math.Abs((DateTimeOffset.Now - room.StartDate.Value!.Value).TotalSeconds) < 1800
                         && room.RoomID.Value != lastNotifiedDailyChallengeRoomId)
                     {
                         lastNotifiedDailyChallengeRoomId = room.RoomID.Value;
