@@ -12,8 +12,10 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Online;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
 using osu.Game.Rulesets;
@@ -26,6 +28,10 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
 {
     public partial class DailyChallengeIntro : OsuScreen
     {
+        public override bool DisallowExternalBeatmapRulesetChanges => true;
+
+        public override bool? ApplyModTrackAdjustments => true;
+
         private readonly Room room;
         private readonly PlaylistItem item;
 
@@ -48,6 +54,20 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Plum);
 
+        [Cached]
+        private readonly OnlinePlayBeatmapAvailabilityTracker beatmapAvailabilityTracker = new OnlinePlayBeatmapAvailabilityTracker();
+
+        private bool shouldBePlayingMusic;
+
+        [Resolved]
+        private BeatmapManager beatmapManager { get; set; } = null!;
+
+        [Resolved]
+        private RulesetStore rulesets { get; set; } = null!;
+
+        [Resolved]
+        private MusicController musicController { get; set; } = null!;
+
         public DailyChallengeIntro(Room room)
         {
             this.room = room;
@@ -59,7 +79,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
         protected override BackgroundScreen CreateBackground() => new DailyChallengeIntroBackgroundScreen(colourProvider);
 
         [BackgroundDependencyLoader]
-        private void load(BeatmapDifficultyCache difficultyCache)
+        private void load(BeatmapDifficultyCache difficultyCache, BeatmapModelDownloader beatmapDownloader, OsuConfigManager config)
         {
             const float horizontal_info_size = 500f;
 
@@ -69,6 +89,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
 
             InternalChildren = new Drawable[]
             {
+                beatmapAvailabilityTracker,
                 introContent = new Container
                 {
                     Alpha = 0f,
@@ -296,11 +317,25 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
                 beatmapBackgroundLoaded = true;
                 updateAnimationState();
             });
+
+            if (config.Get<bool>(OsuSetting.AutomaticallyDownloadMissingBeatmaps))
+            {
+                if (!beatmapManager.IsAvailableLocally(new BeatmapSetInfo { OnlineID = item.Beatmap.BeatmapSet!.OnlineID }))
+                    beatmapDownloader.Download(item.Beatmap.BeatmapSet!, config.Get<bool>(OsuSetting.PreferNoVideo));
+            }
         }
 
         public override void OnEntering(ScreenTransitionEvent e)
         {
             base.OnEntering(e);
+
+            beatmapAvailabilityTracker.SelectedItem.Value = item;
+            beatmapAvailabilityTracker.Availability.BindValueChanged(availability =>
+            {
+                if (shouldBePlayingMusic && availability.NewValue.State == DownloadState.LocallyAvailable)
+                    DailyChallenge.TrySetDailyChallengeBeatmap(this, beatmapManager, rulesets, musicController, item);
+            }, true);
+
             this.FadeInFromZero(400, Easing.OutQuint);
             updateAnimationState();
         }
@@ -365,7 +400,14 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
                         beatmapContent.FadeInFromZero(280, Easing.InQuad);
 
                         using (BeginDelayedSequence(300))
-                            Schedule(() => ApplyToBackground(bs => ((RoomBackgroundScreen)bs).SelectedItem.Value = item));
+                        {
+                            Schedule(() =>
+                            {
+                                shouldBePlayingMusic = true;
+                                DailyChallenge.TrySetDailyChallengeBeatmap(this, beatmapManager, rulesets, musicController, item);
+                                ApplyToBackground(bs => ((RoomBackgroundScreen)bs).SelectedItem.Value = item);
+                            });
+                        }
 
                         using (BeginDelayedSequence(400))
                             flash.FadeOutFromOne(5000, Easing.OutQuint);
