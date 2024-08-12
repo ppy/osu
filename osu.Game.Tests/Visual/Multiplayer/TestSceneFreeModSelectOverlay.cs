@@ -3,6 +3,7 @@
 
 #nullable disable
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
@@ -16,6 +17,7 @@ using osu.Framework.Testing;
 using osu.Game.Overlays.Mods;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Screens.Footer;
 using osu.Game.Screens.OnlinePlay;
 using osu.Game.Utils;
 using osuTK.Input;
@@ -26,6 +28,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
     {
         private FreeModSelectOverlay freeModSelectOverlay;
         private FooterButtonFreeMods footerButtonFreeMods;
+        private ScreenFooter footer;
         private readonly Bindable<Dictionary<ModType, IReadOnlyList<Mod>>> availableMods = new Bindable<Dictionary<ModType, IReadOnlyList<Mod>>>();
 
         [BackgroundDependencyLoader]
@@ -58,7 +61,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddStep("select difficulty adjust", () => freeModSelectOverlay.SelectedMods.Value = new[] { new OsuModDifficultyAdjust() });
             AddWaitStep("wait some", 3);
-            AddAssert("customisation area not expanded", () => this.ChildrenOfType<ModSettingsArea>().Single().Height == 0);
+            AddAssert("customisation area not expanded",
+                () => this.ChildrenOfType<ModCustomisationPanel>().Single().ExpandedState.Value,
+                () => Is.EqualTo(ModCustomisationPanel.ModCustomisationPanelState.Collapsed));
         }
 
         [Test]
@@ -127,7 +132,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             createFreeModSelect();
 
-            AddAssert("overlay select all button enabled", () => freeModSelectOverlay.ChildrenOfType<SelectAllModsButton>().Single().Enabled.Value);
+            AddAssert("overlay select all button enabled", () => this.ChildrenOfType<SelectAllModsButton>().Single().Enabled.Value);
             AddAssert("footer button displays off", () => footerButtonFreeMods.ChildrenOfType<IHasText>().Any(t => t.Text == "off"));
 
             AddStep("click footer select all button", () =>
@@ -150,19 +155,27 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         private void createFreeModSelect()
         {
-            AddStep("create free mod select screen", () => Children = new Drawable[]
+            AddStep("create free mod select screen", () => Child = new DependencyProvidingContainer
             {
-                freeModSelectOverlay = new FreeModSelectOverlay
+                RelativeSizeAxes = Axes.Both,
+                Children = new Drawable[]
                 {
-                    State = { Value = Visibility.Visible }
+                    freeModSelectOverlay = new FreeModSelectOverlay
+                    {
+                        State = { Value = Visibility.Visible }
+                    },
+                    footerButtonFreeMods = new FooterButtonFreeMods(freeModSelectOverlay)
+                    {
+                        Anchor = Anchor.BottomRight,
+                        Origin = Anchor.BottomRight,
+                        Y = -ScreenFooter.HEIGHT,
+                        Current = { BindTarget = freeModSelectOverlay.SelectedMods },
+                    },
+                    footer = new ScreenFooter(),
                 },
-                footerButtonFreeMods = new FooterButtonFreeMods(freeModSelectOverlay)
-                {
-                    Anchor = Anchor.BottomRight,
-                    Origin = Anchor.BottomRight,
-                    Current = { BindTarget = freeModSelectOverlay.SelectedMods },
-                },
+                CachedDependencies = new (Type, object)[] { (typeof(ScreenFooter), footer) },
             });
+
             AddUntilStep("all column content loaded",
                 () => freeModSelectOverlay.ChildrenOfType<ModColumn>().Any()
                       && freeModSelectOverlay.ChildrenOfType<ModColumn>().All(column => column.IsLoaded && column.ItemsLoaded));

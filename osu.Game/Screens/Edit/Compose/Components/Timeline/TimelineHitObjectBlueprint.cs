@@ -519,7 +519,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                     {
                         Type = EdgeEffectType.Shadow,
                         Radius = 5,
-                        Colour = Color4.Black.Opacity(0.4f)
+                        Colour = Color4.Black.Opacity(0.05f)
                     }
                 };
             }

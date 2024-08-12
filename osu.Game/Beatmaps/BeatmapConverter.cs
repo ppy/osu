@@ -7,6 +7,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using osu.Framework.Lists;
+using osu.Game.Beatmaps.Timing;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Objects;
 
@@ -50,7 +52,8 @@ namespace osu.Game.Beatmaps
             original.ControlPointInfo = original.ControlPointInfo.DeepClone();
 
             // Used in osu!mania conversion.
-            original.Breaks = original.Breaks.ToList();
+            original.Breaks = new SortedList<BreakPeriod>(Comparer<BreakPeriod>.Default);
+            original.Breaks.AddRange(Beatmap.Breaks);
 
             return ConvertBeatmap(original, cancellationToken);
         }
