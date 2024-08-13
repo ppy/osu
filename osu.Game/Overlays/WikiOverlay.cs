@@ -10,6 +10,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Extensions;
+using osu.Game.Localisation;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
@@ -38,9 +39,18 @@ namespace osu.Game.Overlays
 
         private WikiArticlePage articlePage;
 
+        private Bindable<Language> language;
+
         public WikiOverlay()
             : base(OverlayColourScheme.Orange, false)
         {
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(OsuGameBase game)
+        {
+            // Fetch current language on load for translated pages (if possible)
+            language = game.CurrentLanguage.GetBoundCopy();
         }
 
         public void ShowPage(string pagePath = INDEX_PATH)
@@ -113,12 +123,13 @@ namespace osu.Game.Overlays
             cancellationToken?.Cancel();
             request?.Cancel();
 
+            // Language code + path, or just path1 + path2 in case
             string[] values = e.NewValue.Split('/', 2);
 
-            if (values.Length > 1 && LanguageExtensions.TryParseCultureCode(values[0], out var language))
-                request = new GetWikiRequest(values[1], language);
+            if (values.Length > 1 && LanguageExtensions.TryParseCultureCode(values[0], out var lang))
+                request = new GetWikiRequest(values[1], lang);
             else
-                request = new GetWikiRequest(e.NewValue);
+                request = new GetWikiRequest(e.NewValue, language.Value);
 
             Loading.Show();
 
