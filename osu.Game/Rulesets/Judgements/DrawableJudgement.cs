@@ -7,6 +7,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Pooling;
+using osu.Framework.Logging;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Scoring;
@@ -111,6 +112,9 @@ namespace osu.Game.Rulesets.Judgements
         protected override void PrepareForUse()
         {
             base.PrepareForUse();
+
+            if (!IsInPool)
+                Logger.Log($"{nameof(DrawableJudgement)} for judgement type {Result} was not retrieved from a pool. Consider adding to a JudgementPooler.");
 
             Debug.Assert(Result != null);
 
