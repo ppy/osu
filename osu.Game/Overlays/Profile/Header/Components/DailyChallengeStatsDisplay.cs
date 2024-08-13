@@ -8,11 +8,11 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.API.Requests.Responses;
-using osu.Game.Resources.Localisation.Web;
 using osu.Game.Scoring;
 
 namespace osu.Game.Overlays.Profile.Header.Components
@@ -106,7 +106,9 @@ namespace osu.Game.Overlays.Profile.Header.Components
 
             APIUserDailyChallengeStatistics stats = User.Value.User.DailyChallengeStatistics;
 
-            dailyPlayCount.Text = UsersStrings.ShowDailyChallengeUnitDay(stats.PlayCount.ToLocalisableString("N0"));
+            // todo: ideally we want to use UsersStrings.ShowDailyChallengeUnit{Day,Week}(...), but it's broken right now.
+            // see: https://github.com/ppy/osu/issues/29355#issuecomment-2277139889
+            dailyPlayCount.Text = LocalisableString.Interpolate($"{stats.PlayCount.ToLocalisableString("N0")}d");
             dailyPlayCount.Colour = colours.ForRankingTier(tierForPlayCount(stats.PlayCount));
 
             TooltipContent = new DailyChallengeTooltipData(colourProvider, stats);

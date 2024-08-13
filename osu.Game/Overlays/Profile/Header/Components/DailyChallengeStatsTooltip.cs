@@ -112,16 +112,18 @@ namespace osu.Game.Overlays.Profile.Header.Components
             background.Colour = colourProvider.Background4;
             topBackground.Colour = colourProvider.Background5;
 
-            currentDaily.Value = UsersStrings.ShowDailyChallengeUnitDay(content.Statistics.DailyStreakCurrent.ToLocalisableString(@"N0"));
+            // todo: ideally we want to use UsersStrings.ShowDailyChallengeUnit{Day,Week}(...), but it's broken right now.
+            // see: https://github.com/ppy/osu/issues/29355#issuecomment-2277139889
+            currentDaily.Value = LocalisableString.Interpolate($"{statistics.DailyStreakCurrent.ToLocalisableString("N0")}d");
             currentDaily.ValueColour = colours.ForRankingTier(TierForDaily(statistics.DailyStreakCurrent));
 
-            currentWeekly.Value = UsersStrings.ShowDailyChallengeUnitWeek(statistics.WeeklyStreakCurrent.ToLocalisableString(@"N0"));
+            currentWeekly.Value = LocalisableString.Interpolate($"{statistics.WeeklyStreakCurrent.ToLocalisableString(@"N0")}w");
             currentWeekly.ValueColour = colours.ForRankingTier(TierForWeekly(statistics.WeeklyStreakCurrent));
 
-            bestDaily.Value = UsersStrings.ShowDailyChallengeUnitDay(statistics.DailyStreakBest.ToLocalisableString(@"N0"));
+            bestDaily.Value = LocalisableString.Interpolate($"{statistics.DailyStreakBest.ToLocalisableString(@"N0")}d");
             bestDaily.ValueColour = colours.ForRankingTier(TierForDaily(statistics.DailyStreakBest));
 
-            bestWeekly.Value = UsersStrings.ShowDailyChallengeUnitWeek(statistics.WeeklyStreakBest.ToLocalisableString(@"N0"));
+            bestWeekly.Value = LocalisableString.Interpolate($"{statistics.WeeklyStreakBest.ToLocalisableString(@"N0")}w");
             bestWeekly.ValueColour = colours.ForRankingTier(TierForWeekly(statistics.WeeklyStreakBest));
 
             topTen.Value = statistics.Top10PercentPlacements.ToLocalisableString(@"N0");
