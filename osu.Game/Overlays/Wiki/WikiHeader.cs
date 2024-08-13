@@ -7,6 +7,7 @@ using System;
 using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Localisation;
@@ -24,6 +25,8 @@ namespace osu.Game.Overlays.Wiki
         public Action ShowIndexPage;
         public Action ShowParentPage;
 
+        public WikiLanguageDropdown LanguageDropdown;
+
         public WikiHeader()
         {
             TabControl.AddItem(IndexPageString);
@@ -31,6 +34,20 @@ namespace osu.Game.Overlays.Wiki
 
             WikiPageData.BindValueChanged(onWikiPageChange);
             Current.BindValueChanged(onCurrentChange);
+        }
+
+        protected override Drawable CreateTabControlContent()
+        {
+            return new Container
+            {
+                Height = 40,
+                AutoSizeAxes = Axes.X,
+                Child = LanguageDropdown = new WikiLanguageDropdown
+                {
+                    Anchor = Anchor.TopRight,
+                    Origin = Anchor.TopRight
+                }
+            };
         }
 
         private void onWikiPageChange(ValueChangedEvent<APIWikiPage> e)
