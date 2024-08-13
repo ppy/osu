@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Mania
     public enum ManiaAction
     {
         [Description("Key 1")]
-        Key1,
+        Key1 = 1,
 
         [Description("Key 2")]
         Key2,
