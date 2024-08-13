@@ -119,9 +119,6 @@ namespace osu.Game.Rulesets.Judgements
 
         private void runAnimation()
         {
-            // is a no-op if the drawables are already in a correct state.
-            prepareDrawables();
-
             // undo any transforms applies in ApplyMissAnimations/ApplyHitAnimations to get a sane initial state.
             ApplyTransformsAt(double.MinValue, true);
             ClearTransforms(true);
