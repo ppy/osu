@@ -13,6 +13,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
+using osu.Game.Rulesets.Osu.Beatmaps;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Screens.Edit.Compose.Components;
@@ -50,12 +51,33 @@ namespace osu.Game.Rulesets.Osu.Edit
         {
             var hitObjects = selectedMovableObjects;
 
+            var localDelta = this.ScreenSpaceDeltaToParentSpace(moveEvent.ScreenSpaceDelta);
+
+            // this conditional is a rather ugly special case for stacks.
+            // as it turns out, adding the `EditorBeatmap.Update()` call at the end of this would cause stacked objects to jitter when moved around
+            // (they would stack and then unstack every frame).
+            // the reason for that is that the selection handling abstractions are not aware of the distinction between "displayed" and "actual" position
+            // which is unique to osu! due to stacking being applied as a post-processing step.
+            // therefore, the following loop would occur:
+            // - on frame 1 the blueprint is snapped to the stack's baseline position. `EditorBeatmap.Update()` applies stacking successfully,
+            //   the blueprint moves up the stack from its original drag position.
+            // - on frame 2 the blueprint's position is now the *stacked* position, which is interpreted higher up as *manually performing an unstack*
+            //   to the blueprint's unstacked position (as the machinery higher up only cares about differences in screen space position).
+            if (hitObjects.Any(h => Precision.AlmostEquals(localDelta, -h.StackOffset)))
+                return true;
+
             // this will potentially move the selection out of bounds...
             foreach (var h in hitObjects)
-                h.Position += this.ScreenSpaceDeltaToParentSpace(moveEvent.ScreenSpaceDelta);
+                h.Position += localDelta;
 
             // but this will be corrected.
             moveSelectionInBounds();
+
+            // manually update stacking.
+            // this intentionally bypasses the editor `UpdateState()` / beatmap processor flow for performance reasons,
+            // as the entire flow is too expensive to run on every movement.
+            Scheduler.AddOnce(OsuBeatmapProcessor.ApplyStacking, EditorBeatmap);
+
             return true;
         }
 

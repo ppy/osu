@@ -26,6 +26,7 @@ using osu.Game.Collections;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
 using osu.Game.Overlays;
@@ -1081,7 +1082,7 @@ namespace osu.Game.Screens.Select
                 Anchor = Anchor.Centre;
                 Origin = Anchor.Centre;
                 Width = panel_overflow; // avoid horizontal masking so the panels don't clip when screen stack is pushed.
-                InternalChild = Content = new Container
+                InternalChild = Content = new OsuContextMenuContainer
                 {
                     RelativeSizeAxes = Axes.Both,
                     Anchor = Anchor.Centre,

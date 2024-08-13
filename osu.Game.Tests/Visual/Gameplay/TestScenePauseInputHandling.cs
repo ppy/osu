@@ -6,6 +6,7 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
+using osu.Framework.Graphics;
 using osu.Framework.Testing;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
@@ -13,6 +14,7 @@ using osu.Game.Configuration;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mania;
 using osu.Game.Rulesets.Osu;
+using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Skinning;
@@ -31,6 +33,23 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         [Resolved]
         private AudioManager audioManager { get; set; } = null!;
+
+        protected override IBeatmap CreateBeatmap(RulesetInfo ruleset) => new Beatmap
+        {
+            HitObjects =
+            {
+                new HitCircle
+                {
+                    Position = OsuPlayfield.BASE_SIZE / 2,
+                    StartTime = 0,
+                },
+                new HitCircle
+                {
+                    Position = OsuPlayfield.BASE_SIZE / 2,
+                    StartTime = 5000,
+                }
+            }
+        };
 
         protected override WorkingBeatmap CreateWorkingBeatmap(IBeatmap beatmap, Storyboard? storyboard = null) =>
             new ClockBackedTestWorkingBeatmap(beatmap, storyboard, new FramedClock(new ManualClock { Rate = 1 }), audioManager);
@@ -70,18 +89,16 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("resume", () => Player.Resume());
             AddStep("go to resume cursor", () => InputManager.MoveMouseTo(this.ChildrenOfType<OsuResumeOverlay.OsuClickToResumeCursor>().Single()));
             AddStep("press Z to resume", () => InputManager.PressKey(Key.Z));
-
-            // Z key was released before pause, resuming should not trigger it
-            checkKey(() => counter, 1, false);
-
-            AddStep("release Z", () => InputManager.ReleaseKey(Key.Z));
-            checkKey(() => counter, 1, false);
-
-            AddStep("press Z", () => InputManager.PressKey(Key.Z));
             checkKey(() => counter, 2, true);
 
             AddStep("release Z", () => InputManager.ReleaseKey(Key.Z));
             checkKey(() => counter, 2, false);
+
+            AddStep("press Z", () => InputManager.PressKey(Key.Z));
+            checkKey(() => counter, 3, true);
+
+            AddStep("release Z", () => InputManager.ReleaseKey(Key.Z));
+            checkKey(() => counter, 3, false);
         }
 
         [Test]
@@ -90,30 +107,29 @@ namespace osu.Game.Tests.Visual.Gameplay
             KeyCounter counter = null!;
 
             loadPlayer(() => new ManiaRuleset());
-            AddStep("get key counter", () => counter = this.ChildrenOfType<KeyCounter>().Single(k => k.Trigger is KeyCounterActionTrigger<ManiaAction> actionTrigger && actionTrigger.Action == ManiaAction.Key1));
+            AddStep("get key counter", () => counter = this.ChildrenOfType<KeyCounter>().Single(k => k.Trigger is KeyCounterActionTrigger<ManiaAction> actionTrigger && actionTrigger.Action == ManiaAction.Special1));
             checkKey(() => counter, 0, false);
 
-            AddStep("press D", () => InputManager.PressKey(Key.D));
+            AddStep("press space", () => InputManager.PressKey(Key.Space));
             checkKey(() => counter, 1, true);
 
-            AddStep("release D", () => InputManager.ReleaseKey(Key.D));
+            AddStep("release space", () => InputManager.ReleaseKey(Key.Space));
             checkKey(() => counter, 1, false);
 
             AddStep("pause", () => Player.Pause());
-            AddStep("press D", () => InputManager.PressKey(Key.D));
+            AddStep("press space", () => InputManager.PressKey(Key.Space));
             checkKey(() => counter, 1, false);
 
-            AddStep("release D", () => InputManager.ReleaseKey(Key.D));
+            AddStep("release space", () => InputManager.ReleaseKey(Key.Space));
             checkKey(() => counter, 1, false);
 
             AddStep("resume", () => Player.Resume());
             AddUntilStep("wait for resume", () => Player.GameplayClockContainer.IsRunning);
-            checkKey(() => counter, 1, false);
 
-            AddStep("press D", () => InputManager.PressKey(Key.D));
+            AddStep("press space", () => InputManager.PressKey(Key.Space));
             checkKey(() => counter, 2, true);
 
-            AddStep("release D", () => InputManager.ReleaseKey(Key.D));
+            AddStep("release space", () => InputManager.ReleaseKey(Key.Space));
             checkKey(() => counter, 2, false);
         }
 
@@ -145,8 +161,11 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("resume", () => Player.Resume());
             AddStep("go to resume cursor", () => InputManager.MoveMouseTo(this.ChildrenOfType<OsuResumeOverlay.OsuClickToResumeCursor>().Single()));
             AddStep("press Z to resume", () => InputManager.PressKey(Key.Z));
-            checkKey(() => counterZ, 1, false);
+            checkKey(() => counterZ, 2, true);
             checkKey(() => counterX, 1, false);
+
+            AddStep("release Z", () => InputManager.ReleaseKey(Key.Z));
+            checkKey(() => counterZ, 2, false);
         }
 
         [Test]
@@ -155,12 +174,12 @@ namespace osu.Game.Tests.Visual.Gameplay
             KeyCounter counter = null!;
 
             loadPlayer(() => new ManiaRuleset());
-            AddStep("get key counter", () => counter = this.ChildrenOfType<KeyCounter>().Single(k => k.Trigger is KeyCounterActionTrigger<ManiaAction> actionTrigger && actionTrigger.Action == ManiaAction.Key1));
+            AddStep("get key counter", () => counter = this.ChildrenOfType<KeyCounter>().Single(k => k.Trigger is KeyCounterActionTrigger<ManiaAction> actionTrigger && actionTrigger.Action == ManiaAction.Special1));
 
-            AddStep("press D", () => InputManager.PressKey(Key.D));
+            AddStep("press space", () => InputManager.PressKey(Key.Space));
             AddStep("pause", () => Player.Pause());
 
-            AddStep("release D", () => InputManager.ReleaseKey(Key.D));
+            AddStep("release space", () => InputManager.ReleaseKey(Key.Space));
             checkKey(() => counter, 1, true);
 
             AddStep("resume", () => Player.Resume());
@@ -202,12 +221,14 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("resume", () => Player.Resume());
             AddStep("go to resume cursor", () => InputManager.MoveMouseTo(this.ChildrenOfType<OsuResumeOverlay.OsuClickToResumeCursor>().Single()));
             AddStep("press Z to resume", () => InputManager.PressKey(Key.Z));
-            checkKey(() => counterZ, 1, false);
+            checkKey(() => counterZ, 2, true);
             checkKey(() => counterX, 1, true);
 
             AddStep("release X", () => InputManager.ReleaseKey(Key.X));
-            checkKey(() => counterZ, 1, false);
             checkKey(() => counterX, 1, false);
+
+            AddStep("release Z", () => InputManager.ReleaseKey(Key.Z));
+            checkKey(() => counterZ, 2, false);
         }
 
         [Test]
@@ -216,22 +237,48 @@ namespace osu.Game.Tests.Visual.Gameplay
             KeyCounter counter = null!;
 
             loadPlayer(() => new ManiaRuleset());
-            AddStep("get key counter", () => counter = this.ChildrenOfType<KeyCounter>().Single(k => k.Trigger is KeyCounterActionTrigger<ManiaAction> actionTrigger && actionTrigger.Action == ManiaAction.Key1));
+            AddStep("get key counter", () => counter = this.ChildrenOfType<KeyCounter>().Single(k => k.Trigger is KeyCounterActionTrigger<ManiaAction> actionTrigger && actionTrigger.Action == ManiaAction.Special1));
 
-            AddStep("press D", () => InputManager.PressKey(Key.D));
+            AddStep("press space", () => InputManager.PressKey(Key.Space));
             checkKey(() => counter, 1, true);
 
             AddStep("pause", () => Player.Pause());
 
-            AddStep("release D", () => InputManager.ReleaseKey(Key.D));
-            AddStep("press D", () => InputManager.PressKey(Key.D));
+            AddStep("release space", () => InputManager.ReleaseKey(Key.Space));
+            AddStep("press space", () => InputManager.PressKey(Key.Space));
 
             AddStep("resume", () => Player.Resume());
             AddUntilStep("wait for resume", () => Player.GameplayClockContainer.IsRunning);
             checkKey(() => counter, 1, true);
 
-            AddStep("release D", () => InputManager.ReleaseKey(Key.D));
+            AddStep("release space", () => InputManager.ReleaseKey(Key.Space));
             checkKey(() => counter, 1, false);
+        }
+
+        [Test]
+        public void TestOsuRegisterInputFromPressingOrangeCursorButPressIsBlocked()
+        {
+            KeyCounter counter = null!;
+
+            loadPlayer(() => new OsuRuleset());
+            AddStep("get key counter", () => counter = this.ChildrenOfType<KeyCounter>().Single(k => k.Trigger is KeyCounterActionTrigger<OsuAction> actionTrigger && actionTrigger.Action == OsuAction.LeftButton));
+
+            AddStep("pause", () => Player.Pause());
+            AddStep("resume", () => Player.Resume());
+            AddStep("go to resume cursor", () => InputManager.MoveMouseTo(this.ChildrenOfType<OsuResumeOverlay.OsuClickToResumeCursor>().Single()));
+            AddStep("press Z to resume", () => InputManager.PressKey(Key.Z));
+
+            // ensure the input manager receives the Z button press...
+            checkKey(() => counter, 1, true);
+            AddAssert("button is pressed in kbc", () => Player.DrawableRuleset.Playfield.FindClosestParent<OsuInputManager>()!.PressedActions.Single() == OsuAction.LeftButton);
+
+            // ...but also ensure the hit circle in front of the cursor isn't hit by checking max combo.
+            AddAssert("circle not hit", () => Player.ScoreProcessor.HighestCombo.Value, () => Is.EqualTo(0));
+
+            AddStep("release Z", () => InputManager.ReleaseKey(Key.Z));
+
+            checkKey(() => counter, 1, false);
+            AddAssert("button is released in kbc", () => !Player.DrawableRuleset.Playfield.FindClosestParent<OsuInputManager>()!.PressedActions.Any());
         }
 
         private void loadPlayer(Func<Ruleset> createRuleset)
@@ -241,9 +288,10 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddUntilStep("player loaded", () => Player.IsLoaded && Player.Alpha == 1);
             AddUntilStep("wait for hud", () => Player.HUDOverlay.ChildrenOfType<SkinComponentsContainer>().All(s => s.ComponentsLoaded));
 
-            AddStep("seek to gameplay", () => Player.GameplayClockContainer.Seek(20000));
-            AddUntilStep("wait for seek to finish", () => Player.DrawableRuleset.FrameStableClock.CurrentTime, () => Is.EqualTo(20000).Within(500));
+            AddStep("seek to gameplay", () => Player.GameplayClockContainer.Seek(0));
+            AddUntilStep("wait for seek to finish", () => Player.DrawableRuleset.FrameStableClock.CurrentTime, () => Is.EqualTo(0).Within(500));
             AddAssert("not in break", () => !Player.IsBreakTime.Value);
+            AddStep("move cursor to center", () => InputManager.MoveMouseTo(Player.DrawableRuleset.Playfield));
         }
 
         private void checkKey(Func<KeyCounter> counter, int count, bool active)

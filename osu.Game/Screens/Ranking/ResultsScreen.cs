@@ -267,7 +267,8 @@ namespace osu.Game.Screens.Ranking
             foreach (var s in scores)
                 addScore(s);
 
-            lastFetchCompleted = true;
+            // allow a frame for scroll container to adjust its dimensions with the added scores before fetching again.
+            Schedule(() => lastFetchCompleted = true);
 
             if (ScorePanelList.IsEmpty)
             {

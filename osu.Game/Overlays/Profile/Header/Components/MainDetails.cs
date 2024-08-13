@@ -44,22 +44,41 @@ namespace osu.Game.Overlays.Profile.Header.Components
                 Spacing = new Vector2(0, 15),
                 Children = new Drawable[]
                 {
-                    new FillFlowContainer
+                    new GridContainer
                     {
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
-                        Direction = FillDirection.Horizontal,
-                        Spacing = new Vector2(20),
-                        Children = new Drawable[]
+                        ColumnDimensions = new[]
                         {
-                            detailGlobalRank = new ProfileValueDisplay(true)
+                            new Dimension(GridSizeMode.AutoSize),
+                            new Dimension(GridSizeMode.Absolute, 20),
+                            new Dimension(),
+                            new Dimension(GridSizeMode.AutoSize),
+                        },
+                        RowDimensions = new[]
+                        {
+                            new Dimension(GridSizeMode.AutoSize),
+                        },
+                        Content = new[]
+                        {
+                            new[]
                             {
-                                Title = UsersStrings.ShowRankGlobalSimple,
-                            },
-                            detailCountryRank = new ProfileValueDisplay(true)
-                            {
-                                Title = UsersStrings.ShowRankCountrySimple,
-                            },
+                                detailGlobalRank = new ProfileValueDisplay(true)
+                                {
+                                    Title = UsersStrings.ShowRankGlobalSimple,
+                                },
+                                Empty(),
+                                detailCountryRank = new ProfileValueDisplay(true)
+                                {
+                                    Title = UsersStrings.ShowRankCountrySimple,
+                                },
+                                new DailyChallengeStatsDisplay
+                                {
+                                    Anchor = Anchor.TopRight,
+                                    Origin = Anchor.TopRight,
+                                    User = { BindTarget = User },
+                                }
+                            }
                         }
                     },
                     new Container
