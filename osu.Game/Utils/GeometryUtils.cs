@@ -51,6 +51,9 @@ namespace osu.Game.Utils
         /// Given a flip direction, a surrounding quad for all selected objects, and a position,
         /// will return the flipped position in screen space coordinates.
         /// </summary>
+        /// <param name="direction">The direction to flip towards.</param>
+        /// <param name="quad">The quad surrounding all selected objects. The center of this determines the position of the axis.</param>
+        /// <param name="position">The position to flip.</param>
         public static Vector2 GetFlippedPosition(Direction direction, Quad quad, Vector2 position)
         {
             var centre = quad.Centre;
@@ -73,6 +76,9 @@ namespace osu.Game.Utils
         /// Given a flip axis vector, a surrounding quad for all selected objects, and a position,
         /// will return the flipped position in screen space coordinates.
         /// </summary>
+        /// <param name="axis">The vector indicating the direction to flip towards. This is perpendicular to the mirroring axis.</param>
+        /// <param name="quad">The quad surrounding all selected objects. The center of this determines the position of the axis.</param>
+        /// <param name="position">The position to flip.</param>
         public static Vector2 GetFlippedPosition(Vector2 axis, Quad quad, Vector2 position)
         {
             var centre = quad.Centre;
