@@ -138,15 +138,17 @@ namespace osu.Game.Rulesets.Osu.Edit
                 switch (gridToolbox.GridType.Value)
                 {
                     case PositionSnapGridType.Square:
-                        flipAxis = GeometryUtils.RotateVector(Vector2.UnitX, -((gridToolbox.GridLinesRotation.Value + 405) % 90 - 45));
+                        flipAxis = GeometryUtils.RotateVector(Vector2.UnitX, -((gridToolbox.GridLinesRotation.Value + 360 + 45) % 90 - 45));
                         flipAxis = direction == Direction.Vertical ? flipAxis.PerpendicularLeft : flipAxis;
                         break;
 
                     case PositionSnapGridType.Triangle:
                         // Hex grid has 3 axes, so you can not directly flip over one of the axes,
                         // however it's still possible to achieve that flip by combining multiple flips over the other axes.
+                        // Angle degree range for vertical = (-120, -60]
+                        // Angle degree range for horizontal = [-30, 30)
                         flipAxis = direction == Direction.Vertical
-                            ? GeometryUtils.RotateVector(Vector2.UnitX, -((gridToolbox.GridLinesRotation.Value + 390) % 60 + 60))
+                            ? GeometryUtils.RotateVector(Vector2.UnitX, -((gridToolbox.GridLinesRotation.Value + 360 + 30) % 60 + 60))
                             : GeometryUtils.RotateVector(Vector2.UnitX, -((gridToolbox.GridLinesRotation.Value + 360) % 60 - 30));
                         break;
                 }
