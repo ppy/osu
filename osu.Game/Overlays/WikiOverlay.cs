@@ -68,7 +68,9 @@ namespace osu.Game.Overlays
         protected override void LoadComplete()
         {
             base.LoadComplete();
+
             path.BindValueChanged(onPathChanged);
+            language.BindValueChanged(onLangChanged);
             wikiData.BindTo(Header.WikiPageData);
         }
 
@@ -110,26 +112,18 @@ namespace osu.Game.Overlays
             }
         }
 
-        private void onPathChanged(ValueChangedEvent<string> e)
+        private void loadPage(string path, Language lang)
         {
-            // the path could change as a result of redirecting to a newer location of the same page.
-            // we already have the correct wiki data, so we can safely return here.
-            if (e.NewValue == wikiData.Value?.Path)
-                return;
-
-            if (e.NewValue == "error")
-                return;
-
             cancellationToken?.Cancel();
             request?.Cancel();
 
             // Language code + path, or just path1 + path2 in case
-            string[] values = e.NewValue.Split('/', 2);
+            string[] values = path.Split('/', 2);
 
-            if (values.Length > 1 && LanguageExtensions.TryParseCultureCode(values[0], out var lang))
-                request = new GetWikiRequest(values[1], lang);
+            if (values.Length > 1 && LanguageExtensions.TryParseCultureCode(values[0], out var parsedLang))
+                request = new GetWikiRequest(values[1], parsedLang);
             else
-                request = new GetWikiRequest(e.NewValue, language.Value);
+                request = new GetWikiRequest(path, lang);
 
             Loading.Show();
 
@@ -141,6 +135,25 @@ namespace osu.Game.Overlays
             };
 
             api.PerformAsync(request);
+        }
+
+        private void onPathChanged(ValueChangedEvent<string> e)
+        {
+            // the path could change as a result of redirecting to a newer location of the same page.
+            // we already have the correct wiki data, so we can safely return here.
+            if (e.NewValue == wikiData.Value?.Path)
+                return;
+
+            if (e.NewValue == "error")
+                return;
+
+            loadPage(e.NewValue, language.Value);
+        }
+
+        private void onLangChanged(ValueChangedEvent<Language> e)
+        {
+            // Path unmodified, just reload the page with new language value.
+            loadPage(path.Value, e.NewValue);
         }
 
         private void onSuccess(APIWikiPage response)
