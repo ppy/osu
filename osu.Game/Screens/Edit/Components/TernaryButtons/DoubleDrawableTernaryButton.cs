@@ -5,7 +5,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
-using osu.Game.Graphics.Sprites;
+using osu.Game.Rulesets.Edit;
 
 namespace osu.Game.Screens.Edit.Components.TernaryButtons
 {
@@ -67,7 +67,7 @@ namespace osu.Game.Screens.Edit.Components.TernaryButtons
             Icon.X = 4.5f;
         }
 
-        protected override SpriteText CreateText() => new OsuSpriteText
+        protected override SpriteText CreateText() => new ExpandableSpriteText
         {
             Depth = -1,
             Origin = Anchor.CentreLeft,
