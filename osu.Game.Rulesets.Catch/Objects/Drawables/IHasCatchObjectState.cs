@@ -31,7 +31,6 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
             target.AccentColour.Value,
             target.HyperDash.Value,
             target.IndexInBeatmap.Value,
-            target.DisplayStartTime,
             target.DisplayPosition,
             target.DisplaySize,
             target.DisplayRotation);
@@ -42,7 +41,6 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
         Color4 AccentColour,
         bool HyperDash,
         int IndexInBeatmap,
-        double DisplayStartTime,
         Vector2 DisplayPosition,
         Vector2 DisplaySize,
         float DisplayRotation);
