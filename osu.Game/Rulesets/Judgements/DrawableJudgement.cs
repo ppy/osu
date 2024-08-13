@@ -36,17 +36,6 @@ namespace osu.Game.Rulesets.Judgements
         private readonly Lazy<Drawable> proxiedAboveHitObjectsContent;
         public Drawable ProxiedAboveHitObjectsContent => proxiedAboveHitObjectsContent.Value;
 
-        /// <summary>
-        /// Creates a drawable which visualises a <see cref="Judgements.Judgement"/>.
-        /// </summary>
-        /// <param name="result">The judgement to visualise.</param>
-        /// <param name="judgedObject">The object which was judged.</param>
-        public DrawableJudgement(JudgementResult result, DrawableHitObject judgedObject)
-            : this()
-        {
-            Apply(result, judgedObject);
-        }
-
         public DrawableJudgement()
         {
             Size = new Vector2(judgement_size);
