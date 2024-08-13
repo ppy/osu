@@ -96,7 +96,8 @@ namespace osu.Game.Overlays
         {
             Debug.Assert(user != null);
 
-            if (user.OnlineID == Header.User.Value?.User.Id && ruleset?.MatchesOnlineID(Header.User.Value?.Ruleset) == true)
+            bool sameUser = user.OnlineID == Header.User.Value?.User.Id;
+            if (sameUser && ruleset?.MatchesOnlineID(Header.User.Value?.Ruleset) == true)
                 return;
 
             if (sectionsContainer != null)
@@ -118,7 +119,9 @@ namespace osu.Game.Overlays
                 }
                 : Array.Empty<ProfileSection>();
 
-            changeOverlayColours(OverlayColourScheme.Pink.GetHue());
+            if (!sameUser)
+                changeOverlayColours(OverlayColourScheme.Pink.GetHue());
+
             recreateBaseContent();
 
             if (API.State.Value != APIState.Offline)
