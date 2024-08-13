@@ -71,7 +71,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.AreEqual(ScoreRank.B, score.ScoreInfo.Rank);
 
                 Assert.That(score.Replay.Frames, Has.One.Matches<ManiaReplayFrame>(frame =>
-                    frame.Time == 414 && frame.Actions.SequenceEqual(new[] { ManiaAction.Key1, ManiaAction.Key16 })));
+                    frame.Time == 414 && frame.Actions.SequenceEqual(new[] { ManiaAction.Key1, ManiaAction.Key18 })));
             }
         }
 
