@@ -67,5 +67,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             return difficulty * DifficultyMultiplier;
         }
+
+        public static double DifficultyToPerformance(double difficulty) => Math.Pow(5.0 * Math.Max(1.0, difficulty / 0.0675) - 4.0, 3.0) / 100000.0;
     }
 }

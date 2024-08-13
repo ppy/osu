@@ -13,6 +13,7 @@ using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
 using osu.Game.Audio;
@@ -23,7 +24,6 @@ using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Screens.Play.HUD.HitErrorMeters;
-using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Skinning
@@ -310,6 +310,9 @@ namespace osu.Game.Skinning
                 case SkinConfiguration.LegacySetting.Version:
                     return SkinUtils.As<TValue>(new Bindable<decimal>(Configuration.LegacyVersion ?? SkinConfiguration.LATEST_VERSION));
 
+                case SkinConfiguration.LegacySetting.InputOverlayText:
+                    return SkinUtils.As<TValue>(new Bindable<Colour4>(Configuration.CustomColours.TryGetValue(@"InputOverlayText", out var colour) ? colour : Colour4.Black));
+
                 default:
                     return genericLookup<SkinConfiguration.LegacySetting, TValue>(legacySetting);
             }
@@ -347,19 +350,24 @@ namespace osu.Game.Skinning
 
         public override Drawable? GetDrawableComponent(ISkinComponentLookup lookup)
         {
-            if (base.GetDrawableComponent(lookup) is Drawable c)
+            if (base.GetDrawableComponent(lookup) is UserConfiguredLayoutContainer c)
                 return c;
 
             switch (lookup)
             {
                 case SkinComponentsContainerLookup containerLookup:
-                    // Only handle global level defaults for now.
-                    if (containerLookup.Ruleset != null)
-                        return null;
-
                     switch (containerLookup.Target)
                     {
                         case SkinComponentsContainerLookup.TargetArea.MainHUDComponents:
+                            if (containerLookup.Ruleset != null)
+                            {
+                                return new Container
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    Child = new LegacyComboCounter(),
+                                };
+                            }
+
                             return new DefaultSkinComponentsContainer(container =>
                             {
                                 var score = container.OfType<LegacyScoreCounter>().FirstOrDefault();
@@ -381,34 +389,22 @@ namespace osu.Game.Skinning
                                 }
 
                                 var hitError = container.OfType<HitErrorMeter>().FirstOrDefault();
-                                var keyCounter = container.OfType<DefaultKeyCounterDisplay>().FirstOrDefault();
 
                                 if (hitError != null)
                                 {
                                     hitError.Anchor = Anchor.BottomCentre;
                                     hitError.Origin = Anchor.CentreLeft;
                                     hitError.Rotation = -90;
-
-                                    if (keyCounter != null)
-                                    {
-                                        const float padding = 10;
-
-                                        keyCounter.Anchor = Anchor.BottomRight;
-                                        keyCounter.Origin = Anchor.BottomRight;
-                                        keyCounter.Position = new Vector2(-padding, -(padding + hitError.Width));
-                                    }
                                 }
                             })
                             {
                                 Children = new Drawable[]
                                 {
-                                    new LegacyComboCounter(),
                                     new LegacyScoreCounter(),
                                     new LegacyAccuracyCounter(),
                                     new LegacySongProgress(),
                                     new LegacyHealthDisplay(),
                                     new BarHitErrorMeter(),
-                                    new DefaultKeyCounterDisplay()
                                 }
                             };
                     }
