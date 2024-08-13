@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Linq;
 using System.Threading;
@@ -25,32 +23,35 @@ namespace osu.Game.Overlays
         public string CurrentPath => path.Value;
 
         private readonly Bindable<string> path = new Bindable<string>(INDEX_PATH);
-
-        private readonly Bindable<APIWikiPage> wikiData = new Bindable<APIWikiPage>();
+        private readonly Bindable<APIWikiPage?> wikiData = new Bindable<APIWikiPage?>();
+        private readonly IBindable<Language> language = new Bindable<Language>();
 
         [Resolved]
-        private IAPIProvider api { get; set; }
+        private IAPIProvider api { get; set; } = null!;
 
-        private GetWikiRequest request;
+        [Resolved]
+        private OsuGameBase game { get; set; } = null!;
 
-        private CancellationTokenSource cancellationToken;
+        private GetWikiRequest? request;
+        private CancellationTokenSource? cancellationToken;
+        private WikiArticlePage? articlePage;
 
         private bool displayUpdateRequired = true;
-
-        private WikiArticlePage articlePage;
-
-        private Bindable<Language> language;
 
         public WikiOverlay()
             : base(OverlayColourScheme.Orange, false)
         {
         }
 
-        [BackgroundDependencyLoader]
-        private void load(OsuGameBase game)
+        protected override void LoadComplete()
         {
-            // Fetch current language on load for translated pages (if possible)
-            language = game.CurrentLanguage.GetBoundCopy();
+            base.LoadComplete();
+
+            path.BindValueChanged(onPathChanged);
+            wikiData.BindTo(Header.WikiPageData);
+
+            language.BindTo(game.CurrentLanguage);
+            language.BindValueChanged(onLangChanged);
         }
 
         public void ShowPage(string pagePath = INDEX_PATH)
@@ -64,15 +65,6 @@ namespace osu.Game.Overlays
             ShowIndexPage = () => ShowPage(),
             ShowParentPage = showParentPage,
         };
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            path.BindValueChanged(onPathChanged);
-            language.BindValueChanged(onLangChanged);
-            wikiData.BindTo(Header.WikiPageData);
-        }
 
         protected override void PopIn()
         {
