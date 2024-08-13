@@ -21,7 +21,7 @@ namespace osu.Game.Screens.Edit.Components.TernaryButtons
         private Color4 selectedBackgroundColour;
         private Color4 selectedIconColour;
 
-        private Drawable icon = null!;
+        protected Drawable Icon = null!;
 
         public readonly TernaryButton Button;
 
@@ -43,7 +43,7 @@ namespace osu.Game.Screens.Edit.Components.TernaryButtons
             defaultIconColour = defaultBackgroundColour.Darken(0.5f);
             selectedIconColour = selectedBackgroundColour.Lighten(0.5f);
 
-            Add(icon = (Button.CreateIcon?.Invoke() ?? new Circle()).With(b =>
+            Add(Icon = (Button.CreateIcon?.Invoke() ?? new Circle()).With(b =>
             {
                 b.Blending = BlendingParameters.Additive;
                 b.Anchor = Anchor.CentreLeft;
@@ -75,17 +75,17 @@ namespace osu.Game.Screens.Edit.Components.TernaryButtons
             switch (Button.Bindable.Value)
             {
                 case TernaryState.Indeterminate:
-                    icon.Colour = selectedIconColour.Darken(0.5f);
+                    Icon.Colour = selectedIconColour.Darken(0.5f);
                     BackgroundColour = selectedBackgroundColour.Darken(0.5f);
                     break;
 
                 case TernaryState.False:
-                    icon.Colour = defaultIconColour;
+                    Icon.Colour = defaultIconColour;
                     BackgroundColour = defaultBackgroundColour;
                     break;
 
                 case TernaryState.True:
-                    icon.Colour = selectedIconColour;
+                    Icon.Colour = selectedIconColour;
                     BackgroundColour = selectedBackgroundColour;
                     break;
             }

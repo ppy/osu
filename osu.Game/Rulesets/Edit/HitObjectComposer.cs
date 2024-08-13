@@ -18,6 +18,7 @@ using osu.Framework.Input.Events;
 using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
+using osu.Game.Graphics;
 using osu.Game.Overlays;
 using osu.Game.Rulesets.Configuration;
 using osu.Game.Rulesets.Edit.Tools;
@@ -85,7 +86,6 @@ namespace osu.Game.Rulesets.Edit
         private EditorRadioButtonCollection toolboxCollection;
         private FillFlowContainer togglesCollection;
         private FillFlowContainer sampleBankTogglesCollection;
-        private FillFlowContainer sampleAdditionBankTogglesCollection;
 
         private IBindable<bool> hasTiming;
         private Bindable<bool> autoSeekOnPlacement;
@@ -176,25 +176,55 @@ namespace osu.Game.Rulesets.Edit
                                         Spacing = new Vector2(0, 5),
                                     },
                                 },
-                                new EditorToolboxGroup("bank (Shift-Q~R)")
+                                new EditorToolboxGroup("bank (Shift/Alt-Q~R)")
                                 {
-                                    Child = sampleBankTogglesCollection = new FillFlowContainer
+                                    Child = new FillFlowContainer
                                     {
                                         RelativeSizeAxes = Axes.X,
                                         AutoSizeAxes = Axes.Y,
                                         Direction = FillDirection.Vertical,
                                         Spacing = new Vector2(0, 5),
-                                    },
-                                },
-                                new EditorToolboxGroup("additions (Alt-Q~R)")
-                                {
-                                    Child = sampleAdditionBankTogglesCollection = new FillFlowContainer
-                                    {
-                                        RelativeSizeAxes = Axes.X,
-                                        AutoSizeAxes = Axes.Y,
-                                        Direction = FillDirection.Vertical,
-                                        Spacing = new Vector2(0, 5),
-                                    },
+                                        Children = new Drawable[]
+                                        {
+                                            new Container
+                                            {
+                                                RelativeSizeAxes = Axes.X,
+                                                AutoSizeAxes = Axes.Y,
+                                                Children = new Drawable[]
+                                                {
+                                                    new ExpandableSpriteText
+                                                    {
+                                                        Text = "Normal",
+                                                        AlwaysPresent = true,
+                                                        AllowMultiline = false,
+                                                        RelativePositionAxes = Axes.X,
+                                                        X = 0.25f,
+                                                        Origin = Anchor.TopCentre,
+                                                        Anchor = Anchor.TopLeft,
+                                                        Font = OsuFont.GetFont(weight: FontWeight.Regular, size: 17),
+                                                    },
+                                                    new ExpandableSpriteText
+                                                    {
+                                                        Text = "Addition",
+                                                        AlwaysPresent = true,
+                                                        AllowMultiline = false,
+                                                        RelativePositionAxes = Axes.X,
+                                                        X = 0.75f,
+                                                        Origin = Anchor.TopCentre,
+                                                        Anchor = Anchor.TopLeft,
+                                                        Font = OsuFont.GetFont(weight: FontWeight.Regular, size: 17),
+                                                    },
+                                                }
+                                            },
+                                            sampleBankTogglesCollection = new FillFlowContainer
+                                            {
+                                                RelativeSizeAxes = Axes.X,
+                                                AutoSizeAxes = Axes.Y,
+                                                Direction = FillDirection.Vertical,
+                                                Spacing = new Vector2(0, 5),
+                                            },
+                                        }
+                                    }
                                 },
                             }
                         },
@@ -240,8 +270,7 @@ namespace osu.Game.Rulesets.Edit
             TernaryStates = CreateTernaryButtons().ToArray();
             togglesCollection.AddRange(TernaryStates.Select(b => new DrawableTernaryButton(b)));
 
-            sampleBankTogglesCollection.AddRange(BlueprintContainer.SampleBankTernaryStates.Select(b => new DrawableTernaryButton(b)));
-            sampleAdditionBankTogglesCollection.AddRange(BlueprintContainer.SampleAdditionBankTernaryStates.Select(b => new DrawableTernaryButton(b)));
+            sampleBankTogglesCollection.AddRange(BlueprintContainer.SampleBankTernaryStates.Zip(BlueprintContainer.SampleAdditionBankTernaryStates).Select(b => new DoubleDrawableTernaryButton(b.First, b.Second)));
 
             setSelectTool();
 
@@ -397,7 +426,7 @@ namespace osu.Game.Rulesets.Edit
                         attemptToggle(rightIndex, sampleBankTogglesCollection);
 
                     if (e.AltPressed)
-                        attemptToggle(rightIndex, sampleAdditionBankTogglesCollection);
+                        attemptToggle(rightIndex, sampleBankTogglesCollection, true);
                 }
                 else
                     attemptToggle(rightIndex, togglesCollection);
@@ -405,14 +434,26 @@ namespace osu.Game.Rulesets.Edit
 
             return handled || base.OnKeyDown(e);
 
-            void attemptToggle(int index, FillFlowContainer collection)
+            void attemptToggle(int index, FillFlowContainer collection, bool second = false)
             {
                 var item = collection.ElementAtOrDefault(index);
 
-                if (item is DrawableTernaryButton button)
+                switch (item)
                 {
-                    button.Button.Toggle();
-                    handled = true;
+                    case DrawableTernaryButton button:
+                        button.Button.Toggle();
+                        handled = true;
+                        break;
+
+                    case DoubleDrawableTernaryButton doubleButton:
+                    {
+                        if (second)
+                            doubleButton.Button2.Toggle();
+                        else
+                            doubleButton.Button1.Toggle();
+                        handled = true;
+                        break;
+                    }
                 }
             }
         }

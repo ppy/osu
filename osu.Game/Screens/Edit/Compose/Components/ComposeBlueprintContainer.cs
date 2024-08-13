@@ -259,28 +259,13 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         private Drawable getIconForBank(string sampleName)
         {
-            return new Container
+            return new OsuSpriteText
             {
-                Size = new Vector2(30, 20),
-                Children = new Drawable[]
-                {
-                    new SpriteIcon
-                    {
-                        Size = new Vector2(8),
-                        Anchor = Anchor.CentreLeft,
-                        Origin = Anchor.CentreLeft,
-                        Icon = FontAwesome.Solid.VolumeOff
-                    },
-                    new OsuSpriteText
-                    {
-                        Anchor = Anchor.CentreLeft,
-                        Origin = Anchor.CentreLeft,
-                        X = 10,
-                        Y = -1,
-                        Font = OsuFont.Default.With(weight: FontWeight.Bold, size: 20),
-                        Text = $"{char.ToUpperInvariant(sampleName.First())}"
-                    }
-                }
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                Y = -1,
+                Font = OsuFont.Default.With(weight: FontWeight.Bold, size: 20),
+                Text = $"{char.ToUpperInvariant(sampleName.First())}"
             };
         }
 
