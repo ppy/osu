@@ -28,6 +28,23 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         [BackgroundDependencyLoader]
         private void load()
         {
+            base.Content.Child = resizeContainer = new Container
+            {
+                RelativeSizeAxes = Axes.X,
+                AutoSizeAxes = Axes.Y,
+                Padding = new MarginPadding(10),
+                Width = relativeWidth,
+                Children = new Drawable[]
+                {
+                    new Box
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Colour = ColourProvider.Background5,
+                    },
+                    Content
+                }
+            };
+
             AddSliderStep("change relative width", 0, 1f, 0.5f, v =>
             {
                 if (resizeContainer != null)
@@ -44,26 +61,6 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             {
                 Beatmap.SetDefault();
                 SelectedMods.SetDefault();
-            });
-
-            AddStep("setup content", () =>
-            {
-                base.Content.Add(resizeContainer = new Container
-                {
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
-                    Padding = new MarginPadding(10),
-                    Width = relativeWidth,
-                    Children = new Drawable[]
-                    {
-                        new Box
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Colour = ColourProvider.Background5,
-                        },
-                        Content
-                    }
-                });
             });
         }
     }
