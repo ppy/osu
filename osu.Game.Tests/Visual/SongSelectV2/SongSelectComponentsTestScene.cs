@@ -3,6 +3,9 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Overlays;
@@ -11,6 +14,11 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 {
     public abstract partial class SongSelectComponentsTestScene : OsuTestScene
     {
+        protected Container ComponentContainer = null!;
+
+        private Container? resizeContainer;
+        private float relativeWidth;
+
         [Cached]
         protected readonly OverlayColourProvider ColourProvider = new OverlayColourProvider(OverlayColourScheme.Aquamarine);
 
@@ -19,6 +27,18 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         /// </summary>
         [Cached(typeof(IBindable<IBeatmapInfo?>))]
         protected readonly Bindable<IBeatmapInfo?> BeatmapInfo = new Bindable<IBeatmapInfo?>();
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            AddSliderStep("change relative width", 0, 1f, 0.5f, v =>
+            {
+                if (resizeContainer != null)
+                    resizeContainer.Width = v;
+
+                relativeWidth = v;
+            });
+        }
 
         protected override void LoadComplete()
         {
@@ -39,6 +59,31 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                 Beatmap.SetDefault();
                 SelectedMods.SetDefault();
                 BeatmapInfo.Value = null;
+            });
+
+            AddStep("set content", () =>
+            {
+                Child = resizeContainer = new Container
+                {
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    Padding = new MarginPadding(10),
+                    Width = relativeWidth,
+                    Children = new Drawable[]
+                    {
+                        new Box
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Colour = ColourProvider.Background5,
+                        },
+                        ComponentContainer = new Container
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
+                            Padding = new MarginPadding(10),
+                        }
+                    }
+                };
             });
         }
     }

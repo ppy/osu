@@ -3,10 +3,6 @@
 
 using System.Linq;
 using NUnit.Framework;
-using osu.Framework.Allocation;
-using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
 using osu.Framework.Localisation;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
@@ -18,56 +14,13 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 {
     public partial class TestSceneDifficultyNameContent : SongSelectComponentsTestScene
     {
-        private Container? content;
         private DifficultyNameContent? difficultyNameContent;
-        private float relativeWidth;
-
-        [BackgroundDependencyLoader]
-        private void load()
-        {
-            AddSliderStep("change relative width", 0, 1f, 0.5f, v =>
-            {
-                if (content != null)
-                    content.Width = v;
-
-                relativeWidth = v;
-            });
-        }
-
-        public override void SetUpSteps()
-        {
-            base.SetUpSteps();
-
-            AddStep("set content", () =>
-            {
-                Child = content = new Container
-                {
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
-                    Padding = new MarginPadding(10),
-                    Width = relativeWidth,
-                    Children = new Drawable[]
-                    {
-                        new Box
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Colour = ColourProvider.Background5,
-                        },
-                        new Container
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
-                            Padding = new MarginPadding(10),
-                            Child = difficultyNameContent = new DifficultyNameContent(),
-                        }
-                    }
-                };
-            });
-        }
 
         [Test]
         public void TestLocalBeatmap()
         {
+            AddStep("set component", () => ComponentContainer.Child = difficultyNameContent = new DifficultyNameContent());
+
             AddAssert("difficulty name is not set", () => LocalisableString.IsNullOrEmpty(difficultyNameContent.ChildrenOfType<TruncatingSpriteText>().Single().Text));
             AddAssert("author is not set", () => LocalisableString.IsNullOrEmpty(difficultyNameContent.ChildrenOfType<OsuHoverContainer>().Single().ChildrenOfType<OsuSpriteText>().Single().Text));
 
