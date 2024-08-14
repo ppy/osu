@@ -2,12 +2,10 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Testing;
-using osu.Game.Beatmaps;
 using osu.Game.Overlays;
 
 namespace osu.Game.Tests.Visual.SongSelectV2
@@ -22,12 +20,6 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         [Cached]
         protected readonly OverlayColourProvider ColourProvider = new OverlayColourProvider(OverlayColourScheme.Aquamarine);
 
-        /// <summary>
-        /// The beatmap. Can be local/online depending on the context.
-        /// </summary>
-        [Cached(typeof(IBindable<IBeatmapInfo?>))]
-        protected readonly Bindable<IBeatmapInfo?> BeatmapInfo = new Bindable<IBeatmapInfo?>();
-
         [BackgroundDependencyLoader]
         private void load()
         {
@@ -40,17 +32,6 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             });
         }
 
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            // mimics song select's `WorkingBeatmap` binding
-            Beatmap.BindValueChanged(b =>
-            {
-                BeatmapInfo.Value = b.NewValue.BeatmapInfo;
-            });
-        }
-
         [SetUpSteps]
         public virtual void SetUpSteps()
         {
@@ -58,7 +39,6 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             {
                 Beatmap.SetDefault();
                 SelectedMods.SetDefault();
-                BeatmapInfo.Value = null;
             });
 
             AddStep("set content", () =>

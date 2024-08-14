@@ -3,34 +3,24 @@
 
 using System;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Localisation;
-using osu.Game.Online;
-using osu.Game.Online.Chat;
 using osu.Game.Overlays;
 
 namespace osu.Game.Screens.SelectV2.Wedge
 {
-    public partial class DifficultyNameContent : CompositeDrawable
+    public abstract partial class DifficultyNameContent : CompositeDrawable
     {
-        private OsuSpriteText difficultyName = null!;
+        protected OsuSpriteText DifficultyName = null!;
         private OsuSpriteText mappedByLabel = null!;
-        private OsuHoverContainer mapperLink = null!;
-        private OsuSpriteText mapperName = null!;
+        protected OsuHoverContainer MapperLink = null!;
+        protected OsuSpriteText MapperName = null!;
 
-        [Resolved]
-        private IBindable<IBeatmapInfo?> beatmapInfo { get; set; } = null!;
-
-        [Resolved]
-        private ILinkHandler? linkHandler { get; set; }
-
-        public DifficultyNameContent()
+        protected DifficultyNameContent()
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
@@ -46,7 +36,7 @@ namespace osu.Game.Screens.SelectV2.Wedge
                 Direction = FillDirection.Horizontal,
                 Children = new Drawable[]
                 {
-                    difficultyName = new TruncatingSpriteText
+                    DifficultyName = new TruncatingSpriteText
                     {
                         Anchor = Anchor.BottomLeft,
                         Origin = Anchor.BottomLeft,
@@ -60,12 +50,12 @@ namespace osu.Game.Screens.SelectV2.Wedge
                         Text = " mapped by ",
                         Font = OsuFont.GetFont(size: 14),
                     },
-                    mapperLink = new MapperLink
+                    MapperLink = new MapperLinkContainer
                     {
                         Anchor = Anchor.BottomLeft,
                         Origin = Anchor.BottomLeft,
                         AutoSizeAxes = Axes.Both,
-                        Child = mapperName = new OsuSpriteText
+                        Child = MapperName = new OsuSpriteText
                         {
                             Font = OsuFont.GetFont(weight: FontWeight.SemiBold, size: 14),
                         }
@@ -74,45 +64,20 @@ namespace osu.Game.Screens.SelectV2.Wedge
             };
         }
 
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            beatmapInfo.BindValueChanged(b =>
-            {
-                difficultyName.Text = b.NewValue?.DifficultyName ?? string.Empty;
-                updateMapper();
-            }, true);
-        }
-
-        private void updateMapper()
-        {
-            mapperName.Text = string.Empty;
-
-            switch (beatmapInfo.Value)
-            {
-                case BeatmapInfo localBeatmap:
-                    // TODO: should be the mapper of the guest difficulty, but that isn't stored correctly yet (see https://github.com/ppy/osu/issues/12965)
-                    mapperName.Text = localBeatmap.Metadata.Author.Username;
-                    mapperLink.Action = () => linkHandler?.HandleLink(new LinkDetails(LinkAction.OpenUserProfile, localBeatmap.Metadata.Author));
-                    break;
-            }
-        }
-
         protected override void Update()
         {
             base.Update();
 
             // truncate difficulty name when width exceeds bounds, prioritizing mapper name display
-            difficultyName.MaxWidth = Math.Max(DrawWidth - mappedByLabel.DrawWidth
-                                                         - mapperName.DrawWidth, 0);
+            DifficultyName.MaxWidth = Math.Max(DrawWidth - mappedByLabel.DrawWidth
+                                                         - MapperName.DrawWidth, 0);
         }
 
         /// <summary>
         /// This class is a workaround for the single-frame layout issues with `{Link|Text|Fill}FlowContainer`s.
         /// See https://github.com/ppy/osu-framework/issues/3369.
         /// </summary>
-        private partial class MapperLink : OsuHoverContainer
+        private partial class MapperLinkContainer : OsuHoverContainer
         {
             [BackgroundDependencyLoader]
             private void load(OverlayColourProvider? overlayColourProvider, OsuColour colours)
