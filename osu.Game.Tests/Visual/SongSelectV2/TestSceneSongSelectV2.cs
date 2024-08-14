@@ -20,7 +20,7 @@ using osu.Game.Screens.Menu;
 using osu.Game.Screens.SelectV2.Footer;
 using osuTK.Input;
 
-namespace osu.Game.Tests.Visual.SongSelect
+namespace osu.Game.Tests.Visual.SongSelectV2
 {
     public partial class TestSceneSongSelectV2 : ScreenTestScene
     {
