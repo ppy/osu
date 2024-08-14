@@ -90,6 +90,7 @@ namespace osu.Game.Screens.Ranking.Expanded
                 RelativeSizeAxes = Axes.Both,
                 Direction = FillDirection.Vertical,
                 Spacing = new Vector2(20),
+                AlwaysPresent = withFlair,
                 Children = new Drawable[]
                 {
                     new FillFlowContainer
@@ -99,6 +100,7 @@ namespace osu.Game.Screens.Ranking.Expanded
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
                         Direction = FillDirection.Vertical,
+                        AlwaysPresent = withFlair,
                         Children = new Drawable[]
                         {
                             new TruncatingSpriteText
@@ -124,12 +126,14 @@ namespace osu.Game.Screens.Ranking.Expanded
                                 Margin = new MarginPadding { Top = 40 },
                                 RelativeSizeAxes = Axes.X,
                                 Height = 230,
+                                AlwaysPresent = withFlair,
                                 Child = new AccuracyCircle(score, withFlair)
                                 {
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
                                     RelativeSizeAxes = Axes.Both,
                                     FillMode = FillMode.Fit,
+                                    AlwaysPresent = withFlair,
                                 }
                             },
                             scoreCounter = new TotalScoreCounter(!withFlair)

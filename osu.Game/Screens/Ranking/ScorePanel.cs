@@ -137,6 +137,7 @@ namespace osu.Game.Screens.Ranking
                 Origin = Anchor.Centre,
                 Size = new Vector2(40),
                 Y = vertical_fudge,
+                AlwaysPresent = displayWithFlair,
                 Children = new Drawable[]
                 {
                     topLayerContainer = new Container
@@ -162,6 +163,7 @@ namespace osu.Game.Screens.Ranking
                     {
                         Name = "Middle layer",
                         RelativeSizeAxes = Axes.Both,
+                        AlwaysPresent = displayWithFlair,
                         Children = new Drawable[]
                         {
                             new Container
@@ -181,7 +183,7 @@ namespace osu.Game.Screens.Ranking
                                     }
                                 }
                             },
-                            middleLayerContentContainer = new Container { RelativeSizeAxes = Axes.Both }
+                            middleLayerContentContainer = new Container { RelativeSizeAxes = Axes.Both, AlwaysPresent = displayWithFlair }
                         }
                     },
                     samplePanelFocus = new DrawableSample(audio.Samples.Get(@"Results/score-panel-focus"))

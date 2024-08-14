@@ -129,6 +129,7 @@ namespace osu.Game.Tests.Visual.Ranking
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
+                AlwaysPresent = true,
                 State = state
             };
         });

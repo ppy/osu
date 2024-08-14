@@ -112,6 +112,7 @@ namespace osu.Game.Screens.Ranking
             {
                 Anchor = Anchor.CentreLeft,
                 Origin = Anchor.CentreLeft,
+                AlwaysPresent = isNewLocalScore,
                 PostExpandAction = () => PostExpandAction?.Invoke()
             }.With(p =>
             {
@@ -126,6 +127,7 @@ namespace osu.Game.Screens.Ranking
             {
                 d.Anchor = Anchor.Centre;
                 d.Origin = Anchor.Centre;
+                d.AlwaysPresent = isNewLocalScore;
                 d.Hide();
             });
 
