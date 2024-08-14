@@ -21,7 +21,6 @@ namespace osu.Game.Screens.OnlinePlay.Components
         private PlaylistItemBackground? background;
 
         protected OnlinePlayBackgroundScreen()
-            : base(false)
         {
             AddInternal(new Box
             {
