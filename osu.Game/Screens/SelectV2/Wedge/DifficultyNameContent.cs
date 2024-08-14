@@ -50,6 +50,8 @@ namespace osu.Game.Screens.SelectV2.Wedge
                         Text = " mapped by ",
                         Font = OsuFont.GetFont(size: 14),
                     },
+                    // This is not a `LinkFlowContainer` as there are single-frame layout issues when Update()
+                    // is being used for layout, see https://github.com/ppy/osu-framework/issues/3369.
                     MapperLink = new MapperLinkContainer
                     {
                         Anchor = Anchor.BottomLeft,
@@ -73,10 +75,6 @@ namespace osu.Game.Screens.SelectV2.Wedge
                                                          - MapperName.DrawWidth, 0);
         }
 
-        /// <summary>
-        /// This class is a workaround for the single-frame layout issues with `{Link|Text|Fill}FlowContainer`s.
-        /// See https://github.com/ppy/osu-framework/issues/3369.
-        /// </summary>
         private partial class MapperLinkContainer : OsuHoverContainer
         {
             [BackgroundDependencyLoader]
