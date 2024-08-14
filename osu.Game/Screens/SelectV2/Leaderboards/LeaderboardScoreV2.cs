@@ -15,7 +15,6 @@ using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
-using osu.Framework.Layout;
 using osu.Framework.Localisation;
 using osu.Game.Configuration;
 using osu.Game.Extensions;
@@ -38,6 +37,7 @@ using osu.Game.Users.Drawables;
 using osu.Game.Utils;
 using osuTK;
 using osuTK.Graphics;
+using CommonStrings = osu.Game.Localisation.CommonStrings;
 
 namespace osu.Game.Screens.SelectV2.Leaderboards
 {
@@ -61,7 +61,6 @@ namespace osu.Game.Screens.SelectV2.Leaderboards
         private const float statistics_regular_min_width = 175;
         private const float statistics_compact_min_width = 100;
         private const float rank_label_width = 65;
-        private const float rank_label_visibility_width_cutoff = rank_label_width + height + username_min_width + statistics_regular_min_width + expanded_right_content_width;
 
         private readonly ScoreInfo score;
         private readonly bool sheared;
@@ -560,33 +559,34 @@ namespace osu.Game.Screens.SelectV2.Leaderboards
             background.FadeColour(IsHovered ? backgroundColour.Lighten(0.2f) : backgroundColour, transition_duration, Easing.OutQuint);
             totalScoreBackground.FadeColour(IsHovered ? lightenedGradient : totalScoreBackgroundGradient, transition_duration, Easing.OutQuint);
 
-            if (DrawWidth < rank_label_visibility_width_cutoff && IsHovered)
+            if (IsHovered && currentMode != DisplayMode.Full)
                 rankLabelOverlay.FadeIn(transition_duration, Easing.OutQuint);
             else
                 rankLabelOverlay.FadeOut(transition_duration, Easing.OutQuint);
         }
 
-        protected override bool OnInvalidate(Invalidation invalidation, InvalidationSource source)
-        {
-            Scheduler.AddOnce(() =>
-            {
-                // when width decreases
-                // - hide rank and show rank overlay on avatar when hovered, then
-                // - compact statistics, then
-                // - hide statistics
+        private DisplayMode? currentMode;
 
-                if (DrawWidth >= rank_label_visibility_width_cutoff)
+        protected override void Update()
+        {
+            base.Update();
+
+            DisplayMode mode = getCurrentDisplayMode();
+
+            if (currentMode != mode)
+            {
+                if (mode >= DisplayMode.Full)
                     rankLabel.FadeIn(transition_duration, Easing.OutQuint).MoveToX(0, transition_duration, Easing.OutQuint);
                 else
                     rankLabel.FadeOut(transition_duration, Easing.OutQuint).MoveToX(-rankLabel.DrawWidth, transition_duration, Easing.OutQuint);
 
-                if (DrawWidth >= height + username_min_width + statistics_regular_min_width + expanded_right_content_width)
+                if (mode >= DisplayMode.Regular)
                 {
                     statisticsContainer.FadeIn(transition_duration, Easing.OutQuint).MoveToX(0, transition_duration, Easing.OutQuint);
                     statisticsContainer.Direction = FillDirection.Horizontal;
                     statisticsContainer.ScaleTo(1, transition_duration, Easing.OutQuint);
                 }
-                else if (DrawWidth >= height + username_min_width + statistics_compact_min_width + expanded_right_content_width)
+                else if (mode >= DisplayMode.Compact)
                 {
                     statisticsContainer.FadeIn(transition_duration, Easing.OutQuint).MoveToX(0, transition_duration, Easing.OutQuint);
                     statisticsContainer.Direction = FillDirection.Vertical;
@@ -594,12 +594,34 @@ namespace osu.Game.Screens.SelectV2.Leaderboards
                 }
                 else
                     statisticsContainer.FadeOut(transition_duration, Easing.OutQuint).MoveToX(statisticsContainer.DrawWidth, transition_duration, Easing.OutQuint);
-            });
 
-            return base.OnInvalidate(invalidation, source);
+                currentMode = mode;
+            }
+        }
+
+        private DisplayMode getCurrentDisplayMode()
+        {
+            if (DrawWidth >= height + username_min_width + statistics_regular_min_width + expanded_right_content_width + rank_label_width)
+                return DisplayMode.Full;
+
+            if (DrawWidth >= height + username_min_width + statistics_regular_min_width + expanded_right_content_width)
+                return DisplayMode.Regular;
+
+            if (DrawWidth >= height + username_min_width + statistics_compact_min_width + expanded_right_content_width)
+                return DisplayMode.Compact;
+
+            return DisplayMode.Minimal;
         }
 
         #region Subclasses
+
+        private enum DisplayMode
+        {
+            Minimal,
+            Compact,
+            Regular,
+            Full
+        }
 
         private partial class DateLabel : DrawableDate
         {
@@ -749,8 +771,8 @@ namespace osu.Game.Screens.SelectV2.Leaderboards
 
                 if (score.Files.Count <= 0) return items.ToArray();
 
-                items.Add(new OsuMenuItem(Localisation.CommonStrings.Export, MenuItemType.Standard, () => scoreManager.Export(score)));
-                items.Add(new OsuMenuItem(CommonStrings.ButtonsDelete, MenuItemType.Destructive, () => dialogOverlay?.Push(new LocalScoreDeleteDialog(score))));
+                items.Add(new OsuMenuItem(CommonStrings.Export, MenuItemType.Standard, () => scoreManager.Export(score)));
+                items.Add(new OsuMenuItem(Resources.Localisation.Web.CommonStrings.ButtonsDelete, MenuItemType.Destructive, () => dialogOverlay?.Push(new LocalScoreDeleteDialog(score))));
 
                 return items.ToArray();
             }

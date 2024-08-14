@@ -52,10 +52,7 @@ namespace osu.Game.Tests.Editing
         [SetUp]
         public void Setup() => Schedule(() =>
         {
-            Children = new Drawable[]
-            {
-                composer = new TestHitObjectComposer()
-            };
+            Child = composer = new TestHitObjectComposer();
 
             BeatDivisor.Value = 1;
 

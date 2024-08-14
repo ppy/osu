@@ -642,10 +642,10 @@ namespace osu.Game
             Live<BeatmapSetInfo> databasedSet = null;
 
             if (beatmap.OnlineID > 0)
-                databasedSet = BeatmapManager.QueryBeatmapSet(s => s.OnlineID == beatmap.OnlineID);
+                databasedSet = BeatmapManager.QueryBeatmapSet(s => s.OnlineID == beatmap.OnlineID && !s.DeletePending);
 
             if (beatmap is BeatmapSetInfo localBeatmap)
-                databasedSet ??= BeatmapManager.QueryBeatmapSet(s => s.Hash == localBeatmap.Hash);
+                databasedSet ??= BeatmapManager.QueryBeatmapSet(s => s.Hash == localBeatmap.Hash && !s.DeletePending);
 
             if (databasedSet == null)
             {
