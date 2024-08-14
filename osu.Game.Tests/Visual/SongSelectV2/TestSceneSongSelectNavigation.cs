@@ -9,7 +9,7 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.SongSelectV2
 {
-    public partial class TestSceneSongSelectV2Navigation : OsuGameTestScene
+    public partial class TestSceneSongSelectNavigation : OsuGameTestScene
     {
         public override void SetUpSteps()
         {

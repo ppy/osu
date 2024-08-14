@@ -22,7 +22,7 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.SongSelectV2
 {
-    public partial class TestSceneSongSelectV2 : ScreenTestScene
+    public partial class TestSceneSongSelect : ScreenTestScene
     {
         [Cached]
         private readonly ScreenFooter screenScreenFooter;
@@ -30,7 +30,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         [Cached]
         private readonly OsuLogo logo;
 
-        public TestSceneSongSelectV2()
+        public TestSceneSongSelect()
         {
             Children = new Drawable[]
             {

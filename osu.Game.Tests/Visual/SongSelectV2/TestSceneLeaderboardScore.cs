@@ -7,7 +7,6 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Configuration;
 using osu.Game.Graphics.Sprites;
@@ -26,7 +25,7 @@ using osuTK;
 
 namespace osu.Game.Tests.Visual.SongSelectV2
 {
-    public partial class TestSceneLeaderboardScoreV2 : OsuTestScene
+    public partial class TestSceneLeaderboardScore : SongSelectComponentsTestScene
     {
         [Cached]
         private OverlayColourProvider colourProvider { get; set; } = new OverlayColourProvider(OverlayColourScheme.Aquamarine);
@@ -36,19 +35,6 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
         private FillFlowContainer? fillFlow;
         private OsuSpriteText? drawWidthText;
-        private float relativeWidth;
-
-        [BackgroundDependencyLoader]
-        private void load()
-        {
-            // TODO: invalidation seems to be one-off when clicking slider to a certain value, so drag for now
-            // doesn't seem to happen in-game (when toggling window mode)
-            AddSliderStep("change relative width", 0, 1f, 0.6f, v =>
-            {
-                relativeWidth = v;
-                if (fillFlow != null) fillFlow.Width = v;
-            });
-        }
 
         [Test]
         public void TestSheared()
@@ -59,7 +45,6 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                 {
                     fillFlow = new FillFlowContainer
                     {
-                        Width = relativeWidth,
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         RelativeSizeAxes = Axes.X,
@@ -94,7 +79,6 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                 {
                     fillFlow = new FillFlowContainer
                     {
-                        Width = relativeWidth,
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         RelativeSizeAxes = Axes.X,
@@ -118,8 +102,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             });
         }
 
-        [SetUpSteps]
-        public void SetUpSteps()
+        public override void SetUpSteps()
         {
             AddToggleStep("toggle scoring mode", v => config.SetValue(OsuSetting.ScoreDisplayMode, v ? ScoringMode.Classic : ScoringMode.Standardised));
         }
