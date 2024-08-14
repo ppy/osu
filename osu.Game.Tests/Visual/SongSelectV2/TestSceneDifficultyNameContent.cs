@@ -19,7 +19,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         [Test]
         public void TestLocalBeatmap()
         {
-            AddStep("set component", () => ComponentContainer.Child = difficultyNameContent = new DifficultyNameContent());
+            AddStep("set component", () => ComponentContainer.Child = difficultyNameContent = new LocalDifficultyNameContent());
 
             AddAssert("difficulty name is not set", () => LocalisableString.IsNullOrEmpty(difficultyNameContent.ChildrenOfType<TruncatingSpriteText>().Single().Text));
             AddAssert("author is not set", () => LocalisableString.IsNullOrEmpty(difficultyNameContent.ChildrenOfType<OsuHoverContainer>().Single().ChildrenOfType<OsuSpriteText>().Single().Text));
@@ -39,12 +39,6 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
             AddAssert("difficulty name is set", () => !LocalisableString.IsNullOrEmpty(difficultyNameContent.ChildrenOfType<TruncatingSpriteText>().Single().Text));
             AddAssert("author is set", () => !LocalisableString.IsNullOrEmpty(difficultyNameContent.ChildrenOfType<OsuHoverContainer>().Single().ChildrenOfType<OsuSpriteText>().Single().Text));
-        }
-
-        [Test]
-        public void TestNullBeatmap()
-        {
-            AddStep("set beatmap", () => BeatmapInfo.Value = null);
         }
     }
 }
