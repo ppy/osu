@@ -788,7 +788,7 @@ namespace osu.Game.Online.Multiplayer
 
                     try
                     {
-                        indexOf = Room.Playlist.IndexOf(Room.Playlist.Single(existing => existing.ID == item.ID));
+                        indexOf = APIRoom!.Playlist.IndexOf(APIRoom.Playlist.Single(existing => existing.ID == item.ID));
                         Room.Playlist[indexOf] = item;
                     }
                     catch
