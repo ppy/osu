@@ -12,13 +12,18 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 {
     public abstract partial class SongSelectComponentsTestScene : OsuTestScene
     {
-        protected Container ComponentContainer = null!;
+        [Cached]
+        protected readonly OverlayColourProvider ColourProvider = new OverlayColourProvider(OverlayColourScheme.Aquamarine);
+
+        protected override Container<Drawable> Content { get; } = new Container
+        {
+            RelativeSizeAxes = Axes.X,
+            AutoSizeAxes = Axes.Y,
+            Padding = new MarginPadding(10),
+        };
 
         private Container? resizeContainer;
         private float relativeWidth;
-
-        [Cached]
-        protected readonly OverlayColourProvider ColourProvider = new OverlayColourProvider(OverlayColourScheme.Aquamarine);
 
         [BackgroundDependencyLoader]
         private void load()
@@ -41,9 +46,9 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                 SelectedMods.SetDefault();
             });
 
-            AddStep("set content", () =>
+            AddStep("setup content", () =>
             {
-                Child = resizeContainer = new Container
+                base.Content.Add(resizeContainer = new Container
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
@@ -56,14 +61,9 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                             RelativeSizeAxes = Axes.Both,
                             Colour = ColourProvider.Background5,
                         },
-                        ComponentContainer = new Container
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
-                            Padding = new MarginPadding(10),
-                        }
+                        Content
                     }
-                };
+                });
             });
         }
     }

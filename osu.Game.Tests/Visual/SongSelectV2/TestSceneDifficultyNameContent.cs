@@ -19,7 +19,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         [Test]
         public void TestLocalBeatmap()
         {
-            AddStep("set component", () => ComponentContainer.Child = difficultyNameContent = new LocalDifficultyNameContent());
+            AddStep("set component", () => Child = difficultyNameContent = new LocalDifficultyNameContent());
 
             AddAssert("difficulty name is not set", () => LocalisableString.IsNullOrEmpty(difficultyNameContent.ChildrenOfType<TruncatingSpriteText>().Single().Text));
             AddAssert("author is not set", () => LocalisableString.IsNullOrEmpty(difficultyNameContent.ChildrenOfType<OsuHoverContainer>().Single().ChildrenOfType<OsuSpriteText>().Single().Text));
