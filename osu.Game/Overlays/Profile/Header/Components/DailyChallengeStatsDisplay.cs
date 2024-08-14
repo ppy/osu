@@ -12,8 +12,8 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.API.Requests.Responses;
-using osu.Game.Resources.Localisation.Web;
 using osu.Game.Scoring;
+using osu.Game.Localisation;
 
 namespace osu.Game.Overlays.Profile.Header.Components
 {
@@ -106,7 +106,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
 
             APIUserDailyChallengeStatistics stats = User.Value.User.DailyChallengeStatistics;
 
-            dailyPlayCount.Text = UsersStrings.ShowDailyChallengeUnitDay(stats.PlayCount.ToLocalisableString("N0"));
+            dailyPlayCount.Text = DailyChallengeStatsDisplayStrings.UnitDay(stats.PlayCount.ToLocalisableString("N0"));
             dailyPlayCount.Colour = colours.ForRankingTier(tierForPlayCount(stats.PlayCount));
 
             TooltipContent = new DailyChallengeTooltipData(colourProvider, stats);
