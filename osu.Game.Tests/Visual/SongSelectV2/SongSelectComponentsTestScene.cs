@@ -45,7 +45,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                 }
             };
 
-            AddSliderStep("change relative width", 0, 1f, 0.5f, v =>
+            AddSliderStep("change relative width", 0, 1f, 1f, v =>
             {
                 if (resizeContainer != null)
                     resizeContainer.Width = v;
