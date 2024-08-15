@@ -230,32 +230,12 @@ namespace osu.Game.Beatmaps.ControlPoints
         {
             ArgumentNullException.ThrowIfNull(list);
 
-            if (list.Count == 0)
-                return null;
+            int index = BinarySearchUtils.BinarySearch(list, time, c => c.Time, EqualitySelection.Rightmost);
 
-            if (time < list[0].Time)
-                return null;
+            if (index < 0)
+                index = ~index - 1;
 
-            if (time >= list[^1].Time)
-                return list[^1];
-
-            int l = 0;
-            int r = list.Count - 2;
-
-            while (l <= r)
-            {
-                int pivot = l + ((r - l) >> 1);
-
-                if (list[pivot].Time < time)
-                    l = pivot + 1;
-                else if (list[pivot].Time > time)
-                    r = pivot - 1;
-                else
-                    return list[pivot];
-            }
-
-            // l will be the first control point with Time > time, but we want the one before it
-            return list[l - 1];
+            return index >= 0 ? list[index] : null;
         }
 
         /// <summary>
