@@ -443,7 +443,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddAssert("no combo in global target", () => !globalHUDTarget.Components.OfType<LegacyComboCounter>().Any());
             AddAssert("combo placed in ruleset target", () => rulesetHUDTarget.Components.OfType<LegacyComboCounter>().Count() == 1);
 
-            AddStep("add combo to global target", () => globalHUDTarget.Add(new LegacyComboCounter
+            AddStep("add combo to global target", () => globalHUDTarget.Add(new LegacyDefaultComboCounter
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
