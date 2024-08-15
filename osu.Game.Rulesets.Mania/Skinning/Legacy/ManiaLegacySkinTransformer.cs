@@ -81,9 +81,6 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
             switch (lookup)
             {
                 case SkinComponentsContainerLookup containerLookup:
-                    if (containerLookup.Target != SkinComponentsContainerLookup.TargetArea.MainHUDComponents)
-                        return base.GetDrawableComponent(lookup);
-
                     // Modifications for global components.
                     if (containerLookup.Ruleset == null)
                         return base.GetDrawableComponent(lookup);
@@ -96,20 +93,26 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
                     if (!IsProvidingLegacyResources)
                         return null;
 
-                    return new DefaultSkinComponentsContainer(container =>
+                    switch (containerLookup.Target)
                     {
-                        var combo = container.ChildrenOfType<LegacyManiaComboCounter>().FirstOrDefault();
+                        case SkinComponentsContainerLookup.TargetArea.MainHUDComponents:
+                            return new DefaultSkinComponentsContainer(container =>
+                            {
+                                var combo = container.ChildrenOfType<LegacyManiaComboCounter>().FirstOrDefault();
 
-                        if (combo != null)
-                        {
-                            combo.Anchor = Anchor.TopCentre;
-                            combo.Origin = Anchor.Centre;
-                            combo.Y = this.GetManiaSkinConfig<float>(LegacyManiaSkinConfigurationLookups.ComboPosition)?.Value ?? 0;
-                        }
-                    })
-                    {
-                        new LegacyManiaComboCounter(),
-                    };
+                                if (combo != null)
+                                {
+                                    combo.Anchor = Anchor.TopCentre;
+                                    combo.Origin = Anchor.Centre;
+                                    combo.Y = this.GetManiaSkinConfig<float>(LegacyManiaSkinConfigurationLookups.ComboPosition)?.Value ?? 0;
+                                }
+                            })
+                            {
+                                new LegacyManiaComboCounter(),
+                            };
+                    }
+
+                    return null;
 
                 case GameplaySkinComponentLookup<HitResult> resultComponent:
                     return getResult(resultComponent.Component);
