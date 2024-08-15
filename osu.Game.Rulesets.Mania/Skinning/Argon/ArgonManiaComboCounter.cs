@@ -7,6 +7,6 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
 {
     public partial class ArgonManiaComboCounter : ArgonComboCounter
     {
-
+        protected override bool DisplayXSymbol => false;
     }
 }
