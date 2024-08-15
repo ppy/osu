@@ -23,6 +23,8 @@ namespace osu.Game.Screens.Play.HUD
 
         protected override double RollingDuration => 250;
 
+        protected virtual bool DisplayXSymbol => true;
+
         [SettingSource("Wireframe opacity", "Controls the opacity of the wireframes behind the digits.")]
         public BindableFloat WireframeOpacity { get; } = new BindableFloat(0.25f)
         {
@@ -76,15 +78,15 @@ namespace osu.Game.Screens.Play.HUD
 
         private int getDigitsRequiredForDisplayCount()
         {
-            // one for the single presumed starting digit, one for the "x" at the end.
-            int digitsRequired = 2;
+            // one for the single presumed starting digit, one for the "x" at the end (unless disabled).
+            int digitsRequired = DisplayXSymbol ? 2 : 1;
             long c = DisplayedCount;
             while ((c /= 10) > 0)
                 digitsRequired++;
             return digitsRequired;
         }
 
-        protected override LocalisableString FormatCount(int count) => $@"{count}x";
+        protected override LocalisableString FormatCount(int count) => DisplayXSymbol ? $@"{count}x" : count.ToString();
 
         protected override IHasText CreateText() => Text = new ArgonCounterTextComponent(Anchor.TopLeft, MatchesStrings.MatchScoreStatsCombo.ToUpper())
         {
