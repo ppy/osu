@@ -75,6 +75,19 @@ namespace osu.Game.Beatmaps.ControlPoints
         public TimingControlPoint TimingPointAt(double time) => BinarySearchWithFallback(TimingPoints, time, TimingPoints.Count > 0 ? TimingPoints[0] : TimingControlPoint.DEFAULT);
 
         /// <summary>
+        /// Finds the first timing point that is active strictly after <paramref name="time"/>, or null if no such point exists.
+        /// </summary>
+        /// <param name="time">The time after which to find the timing control point.</param>
+        /// <returns>The timing control point.</returns>
+        [CanBeNull]
+        public TimingControlPoint TimingPointAfter(double time)
+        {
+            int index = BinarySearchUtils.BinarySearch(TimingPoints, time, c => c.Time, EqualitySelection.Rightmost);
+            index = index < 0 ? ~index : index + 1;
+            return index < TimingPoints.Count ? TimingPoints[index] : null;
+        }
+
+        /// <summary>
         /// Finds the maximum BPM represented by any timing control point.
         /// </summary>
         [JsonIgnore]
@@ -156,7 +169,14 @@ namespace osu.Game.Beatmaps.ControlPoints
         public double GetClosestSnappedTime(double time, int beatDivisor, double? referenceTime = null)
         {
             var timingPoint = TimingPointAt(referenceTime ?? time);
-            return getClosestSnappedTime(timingPoint, time, beatDivisor);
+            double snappedTime = getClosestSnappedTime(timingPoint, time, beatDivisor);
+
+            if (referenceTime.HasValue)
+                return snappedTime;
+
+            // If there is a timing point right after the given time, we should check if it is closer than the snapped time and snap to it.
+            var timingPointAfter = TimingPointAfter(time);
+            return timingPointAfter is null || Math.Abs(time - snappedTime) < Math.Abs(time - timingPointAfter.Time) ? snappedTime : timingPointAfter.Time;
         }
 
         /// <summary>
