@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -43,10 +44,9 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
                 Anchor |= direction.Value == ScrollingDirection.Up ? Anchor.y2 : Anchor.y0;
             }
 
-            // since we flip the vertical anchor when changing scroll direction,
-            // we can use the sign of the Y value as an indicator to make the combo counter displayed correctly.
-            if ((Y < 0 && direction.Value == ScrollingDirection.Down) || (Y > 0 && direction.Value == ScrollingDirection.Up))
-                Y = -Y;
+            // change the sign of the Y coordinate in line with the scrolling direction.
+            // i.e. if the user changes direction from down to up, the anchor is changed from top to bottom, and the Y is flipped from positive to negative here.
+            Y = Math.Abs(Y) * (direction.Value == ScrollingDirection.Up ? -1 : 1);
         }
     }
 }
