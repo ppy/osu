@@ -53,6 +53,10 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                     if (base.GetDrawableComponent(lookup) is UserConfiguredLayoutContainer d)
                         return d;
 
+                    // we don't have enough assets to display these components (this is especially the case on a "beatmap" skin).
+                    if (!IsProvidingLegacyResources)
+                        return null;
+
                     // Our own ruleset components default.
                     switch (containerLookup.Target)
                     {

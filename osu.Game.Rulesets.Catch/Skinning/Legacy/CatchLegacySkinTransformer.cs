@@ -43,6 +43,10 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
                     if (base.GetDrawableComponent(lookup) is UserConfiguredLayoutContainer d)
                         return d;
 
+                    // we don't have enough assets to display these components (this is especially the case on a "beatmap" skin).
+                    if (!IsProvidingLegacyResources)
+                        return null;
+
                     // Our own ruleset components default.
                     // todo: remove CatchSkinComponents.CatchComboCounter and refactor LegacyCatchComboCounter to be added here instead.
                     return new DefaultSkinComponentsContainer(container =>
