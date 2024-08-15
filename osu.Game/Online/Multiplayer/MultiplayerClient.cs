@@ -787,7 +787,7 @@ namespace osu.Game.Online.Multiplayer
                     StringBuilder exceptionText = new StringBuilder();
 
                     exceptionText.AppendLine("MultiplayerClient test failure investigation");
-                    exceptionText.AppendLine($"Exception                : {exceptionText}");
+                    exceptionText.AppendLine($"Exception                : {ex.ToString()}");
                     exceptionText.AppendLine($"Lookup                   : {item.ID}");
                     exceptionText.AppendLine($"Items in Room.Playlist   : {string.Join(',', Room.Playlist.Select(i => i.ID))}");
                     exceptionText.AppendLine($"Items in APIRoom.Playlist: {string.Join(',', APIRoom!.Playlist.Select(i => i.ID))}");
