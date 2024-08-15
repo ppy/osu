@@ -82,11 +82,10 @@ namespace osu.Game.Utils
                 case EqualitySelection.Leftmost:
                     return min;
 
+                default:
                 case EqualitySelection.Rightmost:
                     return min - 1;
             }
-
-            return ~min;
         }
     }
 
