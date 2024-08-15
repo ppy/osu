@@ -92,6 +92,10 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
                     if (base.GetDrawableComponent(lookup) is UserConfiguredLayoutContainer d)
                         return d;
 
+                    // we don't have enough assets to display these components (this is especially the case on a "beatmap" skin).
+                    if (!IsProvidingLegacyResources)
+                        return null;
+
                     return new DefaultSkinComponentsContainer(container =>
                     {
                         var combo = container.ChildrenOfType<LegacyManiaComboCounter>().FirstOrDefault();
