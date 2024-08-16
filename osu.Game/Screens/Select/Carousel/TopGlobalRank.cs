@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -14,6 +12,7 @@ using osu.Game.Database;
 using osu.Game.Models;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Leaderboards;
 using osu.Game.Rulesets;
 using osu.Game.Scoring;
@@ -37,9 +36,9 @@ namespace osu.Game.Screens.Select.Carousel
 
         private readonly UpdateableRank updateable;
 
-        private GetScoresRequest getScoresRequest;
+        private GetScoresRequest? getScoresRequest;
 
-        private IDisposable scoreSubscription;
+        private IDisposable? scoreSubscription;
 
         public ScoreRank? DisplayedRank => updateable.Rank;
 
@@ -73,42 +72,31 @@ namespace osu.Game.Screens.Select.Carousel
                     localScoresChanged);
             }, true);
 
-            void localScoresChanged(IRealmCollection<ScoreInfo> sender, ChangeSet changes)
+            void localScoresChanged(IRealmCollection<ScoreInfo> sender, ChangeSet? changes)
             {
                 // This subscription may fire from changes to linked beatmaps, which we don't care about.
                 // It's currently not possible for a score to be modified after insertion, so we can safely ignore callbacks with only modifications.
                 if (changes?.HasCollectionChanges() == false)
                     return;
 
-                updateRank(sender);
+                ScoreInfo? topScore = sender?.MaxBy(info => (info.TotalScore, -info.Date.UtcDateTime.Ticks));
+                updateable.Rank = topScore?.Rank;
+                updateable.Alpha = topScore != null ? 1 : 0;
             }
 
-            updateRank();
+            getScoresRequest?.Cancel();
+            getScoresRequest = null;
 
-            void updateRank(IRealmCollection<ScoreInfo> sender = null)
+            getScoresRequest = new GetScoresRequest(beatmapInfo, beatmapInfo.Ruleset);
+            getScoresRequest.Success += scores =>
             {
-                getScoresRequest?.Cancel();
-                getScoresRequest = null;
+                if (scores.Scores.Count == 0)
+                    return;
 
-                getScoresRequest = new GetScoresRequest(beatmapInfo, beatmapInfo.Ruleset);
-                getScoresRequest.Success += scores =>
-                {
-                    if (scores.Scores.Count == 0)
-                        return;
-
-                    updateable.Rank = scores.UserScore?.Score.Rank;
-                    updateable.Alpha = scores.UserScore != null ? 1 : 0;
-                };
-                getScoresRequest.Failure += _ => Schedule(() =>
-                {
-                    // Back to try get local rank.
-                    ScoreInfo topScore = sender?.MaxBy(info => (info.TotalScore, -info.Date.UtcDateTime.Ticks));
-                    updateable.Rank = topScore?.Rank;
-                    updateable.Alpha = topScore != null ? 1 : 0;
-                });
-
-                api.Queue(getScoresRequest);
-            }
+                SoloScoreInfo? topScore = scores.UserScore?.Score;
+                updateable.Rank = topScore?.Rank;
+                updateable.Alpha = topScore != null ? 1 : 0;
+            };
         }
 
         protected override void Dispose(bool isDisposing)
