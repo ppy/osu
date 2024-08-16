@@ -231,7 +231,8 @@ namespace osu.Game.Tournament.Screens.MapPool
             {
                 Team = pickColour,
                 Type = pickType,
-                BeatmapID = beatmapId
+                BeatmapID = beatmapId,
+                Token = true,
             });
 
             setNextMode();

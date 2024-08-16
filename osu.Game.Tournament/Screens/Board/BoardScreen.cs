@@ -311,8 +311,8 @@ namespace osu.Game.Tournament.Screens.Board
                 return;
 
             // if bans have already been placed, beatmap changes result in a selection being made automatically
-            if (beatmap.NewValue?.OnlineID > 0)
-                addForBeatmap(beatmap.NewValue.OnlineID);
+            // if (beatmap.NewValue?.OnlineID > 0)
+            //     addForBeatmap(beatmap.NewValue.OnlineID);
         }
 
         private void setMode(TeamColour colour, ChoiceType choiceType)
@@ -491,7 +491,8 @@ namespace osu.Game.Tournament.Screens.Board
                 {
                     Team = pickType == ChoiceType.RedWin ? TeamColour.Red : TeamColour.Blue,
                     Type = pickType,
-                    BeatmapID = beatmapId
+                    BeatmapID = beatmapId,
+                    Token = true,
                 });
             }
             // setNextMode(); // Uncomment if you still want to automatically set the next mode
@@ -579,6 +580,7 @@ namespace osu.Game.Tournament.Screens.Board
                             BeatmapID = beatmapId,
                             Team = matchTrap.Team == TeamColour.Red ? TeamColour.Red : TeamColour.Blue,
                             Type = matchTrap.Team == TeamColour.Red ? ChoiceType.RedWin : ChoiceType.BlueWin,
+                            Token = true,
                         });
                     }
                     // matchTrap.IsTriggered = true;
@@ -650,7 +652,8 @@ namespace osu.Game.Tournament.Screens.Board
                 {
                     Team = pickColour,
                     Type = pickType,
-                    BeatmapID = beatmapId
+                    BeatmapID = beatmapId,
+                    Token = true,
                 });
             }
 

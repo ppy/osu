@@ -266,8 +266,8 @@ namespace osu.Game.Tournament.Screens.Board
                 return;
 
             // if bans have already been placed, beatmap changes result in a selection being made automatically
-            if (beatmap.NewValue?.OnlineID > 0)
-                addForBeatmap(beatmap.NewValue.OnlineID);
+            // if (beatmap.NewValue?.OnlineID > 0)
+            //     addForBeatmap(beatmap.NewValue.OnlineID);
         }
 
         private void setMode(TeamColour colour, ChoiceType choiceType)
@@ -337,7 +337,8 @@ namespace osu.Game.Tournament.Screens.Board
             {
                 Team = pickColour,
                 Type = pickType,
-                BeatmapID = beatmapId
+                BeatmapID = beatmapId,
+                Token = true,
             });
 
             if (LadderInfo.AutoProgressScreens.Value)

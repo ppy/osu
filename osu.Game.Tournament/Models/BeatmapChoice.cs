@@ -20,6 +20,9 @@ namespace osu.Game.Tournament.Models
         public ChoiceType Type;
 
         public int BeatmapID;
+
+        // For auto selecting check.
+        public bool Token = false;
     }
 
     [JsonConverter(typeof(StringEnumConverter))]

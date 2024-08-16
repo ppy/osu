@@ -293,6 +293,13 @@ namespace osu.Game.Tournament.Components
 
             if (newChoice != null)
             {
+                // Auto selecting is bothering us! Fight back!
+                if (!newChoice.Token)
+                {
+                    currentMatch.Value.PicksBans.Remove(newChoice);
+                    return;
+                }
+
                 if (shouldFlash)
                 {
                     flash.FadeOutFromOne(duration: 900, easing: Easing.OutSine).Loop(0, 3);
