@@ -2,11 +2,14 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Models;
@@ -39,6 +42,7 @@ namespace osu.Game.Screens.Select.Carousel
         private GetScoresRequest? getScoresRequest;
 
         private IDisposable? scoreSubscription;
+        private Task? realmWriteTask;
 
         public ScoreRank? DisplayedRank => updateable.Rank;
 
@@ -70,6 +74,41 @@ namespace osu.Game.Screens.Select.Carousel
                                  + $" && {nameof(ScoreInfo.Ruleset)}.{nameof(RulesetInfo.ShortName)} == $2"
                                  + $" && {nameof(ScoreInfo.DeletePending)} == false", api.LocalUser.Value.Id, beatmapInfo.ID, ruleset.Value.ShortName),
                     localScoresChanged);
+                if (beatmapInfo.UserRank.Rank >= (int)ScoreRank.F)
+                {
+                    updateRank();
+                }
+                else if (beatmapInfo.UserRank.Exists)
+                {
+                    getScoresRequest = new GetScoresRequest(beatmapInfo, beatmapInfo.Ruleset);
+                    getScoresRequest.Success += scores =>
+                    {
+                        if (scores.Scores.Count > 0)
+                        {
+                            SoloScoreInfo? topScore = scores.UserScore?.Score;
+                            if (topScore != null)
+                            {
+                                rankChanged(topScore.Rank);
+                            }
+                            else if (beatmapInfo.UserRank.Exists)
+                            {
+                                // Makes ignore search before getting first ranked score.
+                                // It's broken updating ranks between devices.
+                                realmWriteTask = realm.WriteAsync(r =>
+                                {
+                                    BeatmapInfo? beatmapInfo = r.Find<BeatmapInfo>(this.beatmapInfo.ID);
+
+                                    if (beatmapInfo == null)
+                                        return;
+
+                                    beatmapInfo.UserRank.Exists = false;
+                                });
+                            }
+                        }
+                    };
+
+                    api.Queue(getScoresRequest);
+                }
             }, true);
 
             void localScoresChanged(IRealmCollection<ScoreInfo> sender, ChangeSet? changes)
@@ -80,23 +119,67 @@ namespace osu.Game.Screens.Select.Carousel
                     return;
 
                 ScoreInfo? topScore = sender?.MaxBy(info => (info.TotalScore, -info.Date.UtcDateTime.Ticks));
-                updateable.Rank = topScore?.Rank;
-                updateable.Alpha = topScore != null ? 1 : 0;
+                if (topScore != null && topScore.Ranked && beatmapInfo.UserRank.Rank < (int)topScore.Rank)
+                {
+                    rankChanged(topScore.Rank);
+                }
+
+                updateRank(sender);
             }
 
-            getScoresRequest?.Cancel();
-            getScoresRequest = null;
+            updateRank();
 
-            getScoresRequest = new GetScoresRequest(beatmapInfo, beatmapInfo.Ruleset);
-            getScoresRequest.Success += scores =>
+            void updateRank(IRealmCollection<ScoreInfo>? sender = null)
             {
-                if (scores.Scores.Count == 0)
-                    return;
+                if (beatmapInfo.UserRank.Rank >= (int)ScoreRank.F)
+                {
+                    // Try show global rank
+                    updateable.Rank = (ScoreRank?)beatmapInfo.UserRank.Rank;
+                    updateable.Alpha = 1;
+                }
+                else if (sender != null)
+                {
+                    // Try show local rank
+                    ScoreInfo? topScore = sender.MaxBy(info => (info.TotalScore, -info.Date.UtcDateTime.Ticks));
+                    updateable.Rank = topScore?.Rank;
+                    updateable.Alpha = topScore != null ? 1 : 0;
+                }
+                else
+                {
+                    updateable.Alpha = 0;
+                }
+            }
 
-                SoloScoreInfo? topScore = scores.UserScore?.Score;
-                updateable.Rank = topScore?.Rank;
-                updateable.Alpha = topScore != null ? 1 : 0;
-            };
+            void rankChanged(ScoreRank newRank)
+            {
+                Scheduler.AddOnce(writeNewRank);
+
+                void writeNewRank()
+                {
+                    if (realmWriteTask?.IsCompleted == false)
+                    {
+                        Scheduler.AddOnce(writeNewRank);
+                        return;
+                    }
+
+                    realmWriteTask = realm.WriteAsync(r =>
+                    {
+                        BeatmapInfo? beatmapInfo = r.Find<BeatmapInfo>(this.beatmapInfo.ID);
+
+                        if (beatmapInfo == null)
+                            return;
+
+                        var userRank = beatmapInfo.UserRank;
+                        if (userRank.Rank != (int)newRank)
+                        {
+                            userRank.Exists = true;
+                            userRank.Rank = (int)newRank;
+                        }
+
+                        updateRank();
+                    });
+                }
+            }
         }
 
         protected override void Dispose(bool isDisposing)
@@ -106,7 +189,6 @@ namespace osu.Game.Screens.Select.Carousel
             Schedule(() =>
             {
                 getScoresRequest?.Cancel();
-                getScoresRequest = null;
             });
         }
     }

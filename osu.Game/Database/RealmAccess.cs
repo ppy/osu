@@ -93,8 +93,9 @@ namespace osu.Game.Database
         /// 40   2023-12-21    Add ScoreInfo.Version to keep track of which build scores were set on.
         /// 41   2024-04-17    Add ScoreInfo.TotalScoreWithoutMods for future mod multiplier rebalances.
         /// 42   2024-08-07    Update mania key bindings to reflect changes to ManiaAction
+        /// 43   2022-03-01    Added BeatmapUserRank to BeatmapInfo.
         /// </summary>
-        private const int schema_version = 42;
+        private const int schema_version = 43;
 
         /// <summary>
         /// Lock object which is held during <see cref="BlockAllOperations"/> sections, blocking realm retrieval during blocking periods.
@@ -1190,6 +1191,11 @@ namespace osu.Game.Database
                                 migration.NewRealm.Add(new RealmKeyBinding(newAction, oldKeyBinding.KeyCombination, @"mania", variant));
                         }
                     }
+
+                    break;
+                case 43:
+                    foreach (var beatmap in migration.NewRealm.All<BeatmapInfo>())
+                        beatmap.UserRank = new BeatmapUserRank();
 
                     break;
             }

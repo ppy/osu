@@ -47,6 +47,8 @@ namespace osu.Game.Beatmaps
 
         public BeatmapUserSettings UserSettings { get; set; } = null!;
 
+        public BeatmapUserRank UserRank { get; set; } = null!;
+
         public BeatmapInfo(RulesetInfo? ruleset = null, BeatmapDifficulty? difficulty = null, BeatmapMetadata? metadata = null)
         {
             ID = Guid.NewGuid();
@@ -59,6 +61,7 @@ namespace osu.Game.Beatmaps
             Difficulty = difficulty ?? new BeatmapDifficulty();
             Metadata = metadata ?? new BeatmapMetadata();
             UserSettings = new BeatmapUserSettings();
+            UserRank = new BeatmapUserRank();
         }
 
         [UsedImplicitly]
