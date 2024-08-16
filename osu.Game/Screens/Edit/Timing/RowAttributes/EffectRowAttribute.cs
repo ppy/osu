@@ -5,6 +5,8 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Configuration;
+using osu.Game.Rulesets.UI.Scrolling;
 
 namespace osu.Game.Screens.Edit.Timing.RowAttributes
 {
@@ -15,6 +17,10 @@ namespace osu.Game.Screens.Edit.Timing.RowAttributes
 
         private AttributeText kiaiModeBubble = null!;
         private AttributeText text = null!;
+        private AttributeProgressBar progressBar = null!;
+
+        [Resolved]
+        protected EditorBeatmap Beatmap { get; private set; } = null!;
 
         public EffectRowAttribute(EffectControlPoint effect)
             : base(effect, "effect")
@@ -28,13 +34,21 @@ namespace osu.Game.Screens.Edit.Timing.RowAttributes
         {
             Content.AddRange(new Drawable[]
             {
-                new AttributeProgressBar(Point)
+                progressBar = new AttributeProgressBar(Point)
                 {
                     Current = scrollSpeed,
                 },
                 text = new AttributeText(Point) { Width = 45 },
                 kiaiModeBubble = new AttributeText(Point) { Text = "kiai" },
             });
+
+            var drawableRuleset = Beatmap.BeatmapInfo.Ruleset.CreateInstance().CreateDrawableRulesetWith(Beatmap.PlayableBeatmap);
+
+            if (drawableRuleset is not IDrawableScrollingRuleset scrollingRuleset || scrollingRuleset.VisualisationMethod == ScrollVisualisationMethod.Constant)
+            {
+                text.Hide();
+                progressBar.Hide();
+            }
 
             kiaiMode.BindValueChanged(enabled => kiaiModeBubble.FadeTo(enabled.NewValue ? 1 : 0), true);
             scrollSpeed.BindValueChanged(_ => updateText(), true);
