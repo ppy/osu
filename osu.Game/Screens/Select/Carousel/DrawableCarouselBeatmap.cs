@@ -173,7 +173,7 @@ namespace osu.Game.Screens.Select.Carousel
                                     AutoSizeAxes = Axes.Both,
                                     Children = new Drawable[]
                                     {
-                                        new TopLocalRank(beatmapInfo),
+                                        new TopGlobalRank(beatmapInfo),
                                         starCounter = new StarCounter()
                                     }
                                 }
