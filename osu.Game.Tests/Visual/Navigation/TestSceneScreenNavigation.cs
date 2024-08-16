@@ -276,8 +276,11 @@ namespace osu.Game.Tests.Visual.Navigation
 
             AddStep("delete beatmap files", () =>
             {
-                foreach (var file in Game.Beatmap.Value.BeatmapSetInfo.Files.Where(f => Path.GetExtension(f.Filename) == ".osu"))
-                    Game.Storage.Delete(Path.Combine("files", file.File.GetStoragePath()));
+                FileUtils.AttemptOperation(() =>
+                {
+                    foreach (var file in Game.Beatmap.Value.BeatmapSetInfo.Files.Where(f => Path.GetExtension(f.Filename) == ".osu"))
+                        Game.Storage.Delete(Path.Combine("files", file.File.GetStoragePath()));
+                });
             });
 
             AddStep("invalidate cache", () =>
