@@ -33,6 +33,7 @@ namespace osu.Game.Tests.Utils
             Assert.That(BinarySearchUtils.BinarySearch(values, search, x => x, EqualitySelection.Rightmost), Is.EqualTo(expectedIndex));
         }
 
+        [TestCase(new[] { 1, 1 }, 1, 0)]
         [TestCase(new[] { 1, 2, 2 }, 2, 1)]
         [TestCase(new[] { 1, 2, 2, 2 }, 2, 1)]
         [TestCase(new[] { 1, 2, 2, 2, 3 }, 2, 2)]
@@ -42,6 +43,7 @@ namespace osu.Game.Tests.Utils
             Assert.That(BinarySearchUtils.BinarySearch(values, search, x => x), Is.EqualTo(expectedIndex));
         }
 
+        [TestCase(new[] { 1, 1 }, 1, 0)]
         [TestCase(new[] { 1, 2, 2 }, 2, 1)]
         [TestCase(new[] { 1, 2, 2, 2 }, 2, 1)]
         [TestCase(new[] { 1, 2, 2, 2, 3 }, 2, 1)]
@@ -51,6 +53,7 @@ namespace osu.Game.Tests.Utils
             Assert.That(BinarySearchUtils.BinarySearch(values, search, x => x, EqualitySelection.Leftmost), Is.EqualTo(expectedIndex));
         }
 
+        [TestCase(new[] { 1, 1 }, 1, 1)]
         [TestCase(new[] { 1, 2, 2 }, 2, 2)]
         [TestCase(new[] { 1, 2, 2, 2 }, 2, 3)]
         [TestCase(new[] { 1, 2, 2, 2, 3 }, 2, 3)]
