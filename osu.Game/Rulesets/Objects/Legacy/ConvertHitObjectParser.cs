@@ -347,7 +347,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
                 vertices[i] = new PathControlPoint { Position = points[i] };
 
             // Edge-case rules (to match stable).
-            if (type == PathType.PERFECT_CURVE)
+            if (type == PathType.PERFECT_CURVE && FormatVersion < LegacyBeatmapEncoder.FIRST_LAZER_VERSION)
             {
                 int endPointLength = endPoint == null ? 0 : 1;
 
