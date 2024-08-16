@@ -125,10 +125,6 @@ namespace osu.Game.Rulesets.Edit
 
             switch (e.Action)
             {
-                case GlobalAction.Select:
-                    EndPlacement(true);
-                    return true;
-
                 case GlobalAction.Back:
                     EndPlacement(false);
                     return true;
