@@ -2,14 +2,12 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Models;
@@ -74,11 +72,7 @@ namespace osu.Game.Screens.Select.Carousel
                                  + $" && {nameof(ScoreInfo.Ruleset)}.{nameof(RulesetInfo.ShortName)} == $2"
                                  + $" && {nameof(ScoreInfo.DeletePending)} == false", api.LocalUser.Value.Id, beatmapInfo.ID, ruleset.Value.ShortName),
                     localScoresChanged);
-                if (beatmapInfo.UserRank.Rank >= (int)ScoreRank.F)
-                {
-                    updateRank();
-                }
-                else if (beatmapInfo.UserRank.Exists)
+                if (beatmapInfo.UserRank.Updated == false)
                 {
                     getScoresRequest = new GetScoresRequest(beatmapInfo, beatmapInfo.Ruleset);
                     getScoresRequest.Success += scores =>
@@ -90,24 +84,25 @@ namespace osu.Game.Screens.Select.Carousel
                             {
                                 rankChanged(topScore.Rank);
                             }
-                            else if (beatmapInfo.UserRank.Exists)
+
+                            // Makes ignore search before getting first ranked score.
+                            realmWriteTask = realm.WriteAsync(r =>
                             {
-                                // Makes ignore search before getting first ranked score.
-                                // It's broken updating ranks between devices.
-                                realmWriteTask = realm.WriteAsync(r =>
-                                {
-                                    BeatmapInfo? beatmapInfo = r.Find<BeatmapInfo>(this.beatmapInfo.ID);
+                                BeatmapInfo? beatmapInfo = r.Find<BeatmapInfo>(this.beatmapInfo.ID);
 
-                                    if (beatmapInfo == null)
-                                        return;
+                                if (beatmapInfo == null)
+                                    return;
 
-                                    beatmapInfo.UserRank.Exists = false;
-                                });
-                            }
+                                beatmapInfo.UserRank.Updated = true;
+                            });
                         }
                     };
 
                     api.Queue(getScoresRequest);
+                }
+                if (beatmapInfo.UserRank.Rank >= (int)ScoreRank.F)
+                {
+                    updateRank();
                 }
             }, true);
 
@@ -172,7 +167,7 @@ namespace osu.Game.Screens.Select.Carousel
                         var userRank = beatmapInfo.UserRank;
                         if (userRank.Rank != (int)newRank)
                         {
-                            userRank.Exists = true;
+                            userRank.Updated = true;
                             userRank.Rank = (int)newRank;
                         }
 

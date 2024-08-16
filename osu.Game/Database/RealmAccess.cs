@@ -93,7 +93,7 @@ namespace osu.Game.Database
         /// 40   2023-12-21    Add ScoreInfo.Version to keep track of which build scores were set on.
         /// 41   2024-04-17    Add ScoreInfo.TotalScoreWithoutMods for future mod multiplier rebalances.
         /// 42   2024-08-07    Update mania key bindings to reflect changes to ManiaAction
-        /// 43   2022-03-01    Added BeatmapUserRank to BeatmapInfo.
+        /// 43   2024-08-17    Added BeatmapUserRank to BeatmapInfo.
         /// </summary>
         private const int schema_version = 43;
 

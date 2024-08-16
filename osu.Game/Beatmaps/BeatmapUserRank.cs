@@ -9,6 +9,8 @@ namespace osu.Game.Beatmaps
     public class BeatmapUserRank : EmbeddedObject
     {
         public int Rank { get; set; } = (int)ScoreRank.F - 1;
-        public bool Exists { get; set; } = true;
+
+        [Ignored]
+        public bool Updated { get; set; }
     }
 }
