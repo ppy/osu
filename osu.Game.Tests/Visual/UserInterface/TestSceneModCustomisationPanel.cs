@@ -130,19 +130,21 @@ namespace osu.Game.Tests.Visual.UserInterface
             checkExpanded(true);
 
             AddStep("click", () => InputManager.Click(MouseButton.Left));
-            checkExpanded(false);
-            AddStep("click", () => InputManager.Click(MouseButton.Left));
             checkExpanded(true);
 
             AddStep("move away", () => InputManager.MoveMouseTo(Vector2.One));
             checkExpanded(true);
 
+            AddStep("hover header", () => InputManager.MoveMouseTo(header));
             AddStep("click", () => InputManager.Click(MouseButton.Left));
+            checkExpanded(false);
+
+            AddStep("move away", () => InputManager.MoveMouseTo(Vector2.One));
             checkExpanded(false);
         }
 
         [Test]
-        public void TestHoverExpandsAndCollapsesWhenHeaderClicked()
+        public void TestHoverExpandsAndKeepExpandWhenHeaderClicked()
         {
             AddStep("add customisable mod", () =>
             {
@@ -154,7 +156,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             checkExpanded(true);
 
             AddStep("click", () => InputManager.Click(MouseButton.Left));
-            checkExpanded(false);
+            checkExpanded(true);
         }
 
         private void checkExpanded(bool expanded)
