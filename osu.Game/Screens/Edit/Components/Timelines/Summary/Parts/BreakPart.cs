@@ -70,7 +70,8 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
                 RelativeSizeAxes = Axes.Both;
 
                 InternalChild = new Circle { RelativeSizeAxes = Axes.Both };
-                Colour = colours.Gray6;
+                Colour = colours.Gray7;
+                Alpha = 0.8f;
             }
 
             public LocalisableString TooltipText => $"{breakPeriod.StartTime.ToEditorFormattedString()} - {breakPeriod.EndTime.ToEditorFormattedString()} break time";
