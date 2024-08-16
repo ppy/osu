@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using osu.Game.Beatmaps;
@@ -59,5 +60,22 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             StarRating = values[ATTRIB_ID_DIFFICULTY];
             GreatHitWindow = values[ATTRIB_ID_GREAT_HIT_WINDOW];
         }
+
+        public override SkillValue[] GetSkillValues()
+        {
+            //double aimPerformanceWithoutSliders = OsuStrainSkill.DifficultyToPerformance(AimDifficulty * SliderFactor);
+            //double speedPerformance = OsuStrainSkill.DifficultyToPerformance(SpeedDifficulty);
+            //double flashlightPerformance = Flashlight.DifficultyToPerformance(FlashlightDifficulty);
+
+
+
+            return [
+                new SkillValue { Value = difficultyRescale(ColourDifficulty), SkillName = "Colour" },
+                new SkillValue { Value = difficultyRescale(RhythmDifficulty), SkillName = "Rhythm" },
+                new SkillValue { Value = difficultyRescale(StaminaDifficulty), SkillName = "Stamina" },
+            ];
+        }
+
+        private static double difficultyRescale(double difficulty) => 10.43 * Math.Log(difficulty * 1.4 / 8 + 1);
     }
 }
