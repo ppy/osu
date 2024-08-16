@@ -97,32 +97,6 @@ namespace osu.Game.Tests.Visual.Editing
         }
 
         [Test]
-        public void TestCommitPlacementViaGlobalAction()
-        {
-            Playfield playfield = null!;
-
-            AddStep("select slider placement tool", () => InputManager.Key(Key.Number3));
-            AddStep("move mouse to top left of playfield", () =>
-            {
-                playfield = this.ChildrenOfType<Playfield>().Single();
-                var location = (3 * playfield.ScreenSpaceDrawQuad.TopLeft + playfield.ScreenSpaceDrawQuad.BottomRight) / 4;
-                InputManager.MoveMouseTo(location);
-            });
-            AddStep("begin placement", () => InputManager.Click(MouseButton.Left));
-            AddStep("move mouse to bottom right of playfield", () =>
-            {
-                var location = (playfield.ScreenSpaceDrawQuad.TopLeft + 3 * playfield.ScreenSpaceDrawQuad.BottomRight) / 4;
-                InputManager.MoveMouseTo(location);
-            });
-            AddStep("confirm via global action", () =>
-            {
-                globalActionContainer.TriggerPressed(GlobalAction.Select);
-                globalActionContainer.TriggerReleased(GlobalAction.Select);
-            });
-            AddAssert("slider placed", () => EditorBeatmap.HitObjects.Count, () => Is.EqualTo(1));
-        }
-
-        [Test]
         public void TestAbortPlacementViaGlobalAction()
         {
             Playfield playfield = null!;
@@ -272,11 +246,7 @@ namespace osu.Game.Tests.Visual.Editing
                 var location = (playfield.ScreenSpaceDrawQuad.TopLeft + 3 * playfield.ScreenSpaceDrawQuad.BottomRight) / 4;
                 InputManager.MoveMouseTo(location);
             });
-            AddStep("confirm via global action", () =>
-            {
-                globalActionContainer.TriggerPressed(GlobalAction.Select);
-                globalActionContainer.TriggerReleased(GlobalAction.Select);
-            });
+            AddStep("confirm via right click", () => InputManager.Click(MouseButton.Right));
             AddAssert("slider placed", () => EditorBeatmap.HitObjects.Count, () => Is.EqualTo(1));
 
             AddAssert("slider samples have drum bank", () => EditorBeatmap.HitObjects[0].Samples.All(s => s.Bank == HitSampleInfo.BANK_DRUM));
