@@ -118,8 +118,8 @@ namespace osu.Game.Overlays.Mods
             {
                 ExpandedState.Value = ExpandedState.Value switch
                 {
-                    ModCustomisationPanelState.Collapsed => ModCustomisationPanelState.Expanded,
-                    _ => ModCustomisationPanelState.Collapsed
+                    ModCustomisationPanelState.Expanded => ModCustomisationPanelState.Collapsed,
+                    _ => ModCustomisationPanelState.Expanded
                 };
             }
 
