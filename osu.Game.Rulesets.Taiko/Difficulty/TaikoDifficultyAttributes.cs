@@ -63,15 +63,9 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
 
         public override SkillValue[] GetSkillValues()
         {
-            //double aimPerformanceWithoutSliders = OsuStrainSkill.DifficultyToPerformance(AimDifficulty * SliderFactor);
-            //double speedPerformance = OsuStrainSkill.DifficultyToPerformance(SpeedDifficulty);
-            //double flashlightPerformance = Flashlight.DifficultyToPerformance(FlashlightDifficulty);
-
-
-
             return [
-                new SkillValue { Value = difficultyRescale(ColourDifficulty), SkillName = "Colour" },
                 new SkillValue { Value = difficultyRescale(RhythmDifficulty), SkillName = "Rhythm" },
+                new SkillValue { Value = difficultyRescale(ColourDifficulty), SkillName = "Colour" },
                 new SkillValue { Value = difficultyRescale(StaminaDifficulty), SkillName = "Stamina" },
             ];
         }
