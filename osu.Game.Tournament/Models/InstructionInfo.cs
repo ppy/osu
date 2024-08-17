@@ -100,8 +100,8 @@ namespace osu.Game.Tournament.Models
                     break;
 
                 default:
-                    name = @"欢迎来到 OFFC";
-                    description = @"祝游玩愉快·by OFFC staff";
+                    name = @"Welcome to the Fumo era!";
+                    description = @"(ᗜˬᗜ)";
                     break;
             };
         }

@@ -73,7 +73,7 @@ namespace osu.Game.Tournament.Components
                                 Anchor = Anchor.CentreLeft,
                                 Origin = Anchor.CentreLeft,
                                 Text = thisStep.Name,
-                                Font = OsuFont.GetFont(typeface: Typeface.HarmonyOSSans, size: 49, weight: FontWeight.Bold),
+                                Font = OsuFont.GetFont(typeface: Typeface.HarmonyOSSans, size: 42, weight: FontWeight.Bold),
                             },
                             new TournamentSpriteText
                             {
