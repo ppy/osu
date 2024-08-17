@@ -51,7 +51,8 @@ namespace osu.Game.Tournament.Components
 
         private SpriteIcon icon = null!;
         private SpriteIcon swapIcon = null!;
-        private SpriteIcon statusIcon = null!;
+        private SpriteIcon protectIcon = null!;
+        private SpriteIcon trapIcon = null!;
 
         private bool justSwapped = false;
 
@@ -196,10 +197,21 @@ namespace osu.Game.Tournament.Components
                     Icon = FontAwesome.Solid.ExchangeAlt,
                     Alpha = 0,
                 },
-                statusIcon = new SpriteIcon
+                protectIcon = new SpriteIcon
                 {
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.BottomLeft,
+                    Icon = FontAwesome.Solid.Lock,
+                    Colour = Color4.White,
+                    Size = new osuTK.Vector2(24),
+                    Position = new osuTK.Vector2(5, -5),
+                    Alpha = 0,
+                },
+                trapIcon = new SpriteIcon
+                {
+                    Anchor = Anchor.BottomLeft,
+                    Origin = Anchor.BottomLeft,
+                    Icon = FontAwesome.Solid.ExclamationCircle,
                     Colour = Color4.White,
                     Size = new osuTK.Vector2(24),
                     Position = new osuTK.Vector2(5, -5),
@@ -307,6 +319,15 @@ namespace osu.Game.Tournament.Components
                     flash.FadeOutFromOne(duration: 900, easing: Easing.OutSine).Loop(0, 3);
                 }
 
+                if (isProtected && isTrapped)
+                {
+                    trapIcon.MoveTo(newPosition: new osuTK.Vector2(30, -5), duration: 200, easing: Easing.OutCubic);
+                }
+                else
+                {
+                    trapIcon.MoveTo(newPosition: new osuTK.Vector2(5, -5), duration: 150, easing: Easing.OutCubic);
+                }
+
                 BorderThickness = 4;
 
                 BorderColour = TournamentGame.GetTeamColour(newChoice.Team);
@@ -349,9 +370,8 @@ namespace osu.Game.Tournament.Components
                     case ChoiceType.Protect:
                         Alpha = 1f;
                         backgroundAddition.FadeTo(newAlpha: 0, duration: 150, easing: Easing.InCubic);
-                        statusIcon.FadeIn(duration: 150, easing: Easing.InCubic);
-                        statusIcon.Icon = FontAwesome.Solid.Lock;
-                        statusIcon.Colour = newChoice.Team == TeamColour.Red ? new OsuColour().TeamColourRed : new OsuColour().Sky;
+                        protectIcon.FadeIn(duration: 150, easing: Easing.InCubic);
+                        protectIcon.Colour = newChoice.Team == TeamColour.Red ? new OsuColour().TeamColourRed : new OsuColour().Sky;
                         BorderColour = Color4.White;
                         BorderThickness = 0;
                         break;
@@ -382,9 +402,8 @@ namespace osu.Game.Tournament.Components
                     case ChoiceType.Trap:
                         Alpha = 1f;
                         backgroundAddition.FadeTo(newAlpha: 0, duration: 150, easing: Easing.InCubic);
-                        statusIcon.FadeIn(duration: 150, easing: Easing.InCubic);
-                        statusIcon.Icon = FontAwesome.Solid.ExclamationCircle;
-                        statusIcon.Colour = isBothTrapped ? Color4.White : (newChoice.Team == TeamColour.Red ? new OsuColour().TeamColourRed : new OsuColour().Sky);
+                        trapIcon.FadeIn(duration: 150, easing: Easing.InCubic);
+                        trapIcon.Colour = isBothTrapped ? Color4.White : (newChoice.Team == TeamColour.Red ? new OsuColour().TeamColourRed : new OsuColour().Sky);
                         BorderColour = Color4.White;
                         BorderThickness = 0;
                         break;
@@ -394,7 +413,8 @@ namespace osu.Game.Tournament.Components
             {
                 // Stop all transforms first, to make relative properties adjustable.
                 icon.ClearTransforms();
-                statusIcon.ClearTransforms();
+                protectIcon.ClearTransforms();
+                trapIcon.ClearTransforms();
                 flash.ClearTransforms();
                 textArea.ClearTransforms();
 
@@ -404,7 +424,8 @@ namespace osu.Game.Tournament.Components
                 this.FadeIn(duration: 100, easing: Easing.InCubic);
                 backgroundAddition.FadeOut(duration: 100, easing: Easing.OutCubic);
                 icon.FadeOut(duration: 100, easing: Easing.OutCubic);
-                statusIcon.FadeOut(duration: 100, easing: Easing.OutCubic);
+                protectIcon.FadeOut(duration: 100, easing: Easing.OutCubic);
+                trapIcon.FadeOut(duration: 100, easing: Easing.OutCubic);
                 textArea.FadeTo(newAlpha: 1f, duration: 200, easing: Easing.OutCubic);
                 Colour = Color4.White;
                 icon.Colour = Color4.White;
