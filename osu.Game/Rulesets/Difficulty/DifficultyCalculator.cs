@@ -18,6 +18,7 @@ using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Utils;
 
 namespace osu.Game.Rulesets.Difficulty
@@ -114,7 +115,7 @@ namespace osu.Game.Rulesets.Difficulty
 
             foreach (var obj in Beatmap.HitObjects)
             {
-                progressiveBeatmap.HitObjects.Add(obj);
+                progressiveBeatmap.AddHitObject(obj);
 
                 while (currentIndex < difficultyObjects.Length && difficultyObjects[currentIndex].BaseObject.GetEndTime() <= obj.GetEndTime())
                 {
@@ -293,7 +294,7 @@ namespace osu.Game.Rulesets.Difficulty
         /// <summary>
         /// Used to calculate timed difficulty attributes, where only a subset of hitobjects should be visible at any point in time.
         /// </summary>
-        private class ProgressiveCalculationBeatmap : IBeatmap
+        protected class ProgressiveCalculationBeatmap : IBeatmap
         {
             private readonly IBeatmap baseBeatmap;
 
@@ -302,9 +303,40 @@ namespace osu.Game.Rulesets.Difficulty
                 this.baseBeatmap = baseBeatmap;
             }
 
-            public readonly List<HitObject> HitObjects = new List<HitObject>();
+            public void AddHitObject(HitObject hitObject)
+            {
+                hitObjects.Add(hitObject);
 
-            IReadOnlyList<HitObject> IBeatmap.HitObjects => HitObjects;
+                var objectType = hitObject.GetType();
+                if (!hitObjectsCounts.ContainsKey(objectType))
+                    hitObjectsCounts[objectType] = 0; // Initialize to 0 if not present
+                hitObjectsCounts[objectType]++;
+            }
+
+            private readonly List<HitObject> hitObjects = new List<HitObject>();
+
+            private Dictionary<Type, int> hitObjectsCounts = new Dictionary<Type, int>();
+
+            public int GetHitObjectCountOf(Type type) => hitObjectsCounts.GetValueOrDefault(type);
+
+            IReadOnlyList<HitObject> IBeatmap.HitObjects => hitObjects;
+
+            private int comboObjectIndex = 0, combo = 0;
+            public int GetMaxCombo()
+            {
+                for (; comboObjectIndex < hitObjects.Count; comboObjectIndex++)
+                    addCombo(hitObjects[comboObjectIndex], ref combo);
+                return combo;
+
+                static void addCombo(HitObject hitObject, ref int combo)
+                {
+                    if (hitObject.Judgement.MaxResult.AffectsCombo())
+                        combo++;
+
+                    foreach (var nested in hitObject.NestedHitObjects)
+                        addCombo(nested, ref combo);
+                }
+            }
 
             #region Delegated IBeatmap implementation
 
