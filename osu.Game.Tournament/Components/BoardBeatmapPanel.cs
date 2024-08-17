@@ -353,6 +353,7 @@ namespace osu.Game.Tournament.Components
                         statusIcon.Icon = FontAwesome.Solid.Lock;
                         statusIcon.Colour = newChoice.Team == TeamColour.Red ? new OsuColour().TeamColourRed : new OsuColour().Sky;
                         BorderColour = Color4.White;
+                        BorderThickness = 0;
                         break;
 
                     // Win: Background colour
@@ -385,6 +386,7 @@ namespace osu.Game.Tournament.Components
                         statusIcon.Icon = FontAwesome.Solid.ExclamationCircle;
                         statusIcon.Colour = isBothTrapped ? Color4.White : (newChoice.Team == TeamColour.Red ? new OsuColour().TeamColourRed : new OsuColour().Sky);
                         BorderColour = Color4.White;
+                        BorderThickness = 0;
                         break;
                 }
             }
