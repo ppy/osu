@@ -356,12 +356,12 @@ namespace osu.Game.Skinning
 
         public override Drawable? GetDrawableComponent(ISkinComponentLookup lookup)
         {
-            if (base.GetDrawableComponent(lookup) is UserConfiguredLayoutContainer c)
-                return c;
-
             switch (lookup)
             {
                 case SkinComponentsContainerLookup containerLookup:
+                    if (base.GetDrawableComponent(lookup) is UserConfiguredLayoutContainer c)
+                        return c;
+
                     switch (containerLookup.Target)
                     {
                         case SkinComponentsContainerLookup.TargetArea.MainHUDComponents:
@@ -445,7 +445,7 @@ namespace osu.Game.Skinning
                     return null;
             }
 
-            return null;
+            return base.GetDrawableComponent(lookup);
         }
 
         private Texture? getParticleTexture(HitResult result)
