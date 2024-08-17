@@ -76,20 +76,7 @@ namespace osu.Game.Screens.Select.Carousel
                 getScoresRequest?.Cancel();
                 if (beatmapInfo.UserRank.GetRankByRulesetInfo(rulesetInfo.NewValue) == null)
                 {
-                    getScoresRequest = new GetScoresRequest(beatmapInfo, rulesetInfo.NewValue);
-                    getScoresRequest.Success += scores =>
-                    {
-                        if (scores.Scores.Count > 0)
-                        {
-                            SoloScoreInfo? topScore = scores.UserScore?.Score;
-                            if (topScore != null)
-                            {
-                                rankChanged(rulesetInfo.NewValue, topScore.Rank);
-                            }
-                        }
-                    };
-
-                    api.Queue(getScoresRequest);
+                    updateRankFromOnlineScore(rulesetInfo.NewValue);
                 }
             }, true);
 
@@ -102,21 +89,41 @@ namespace osu.Game.Screens.Select.Carousel
 
                 ScoreInfo? topScore = sender?.MaxBy(info => (info.TotalScore, -info.Date.UtcDateTime.Ticks));
                 ScoreRank? oldRank = beatmapInfo.UserRank.GetRankByRulesetInfo(rulesetInfo);
-                if (topScore != null && (oldRank == null || (int)oldRank < (int)topScore.Rank))
+                if (topScore != null && (oldRank == null || beatmapInfo.UserRank.HasNewRecord(rulesetInfo, topScore.TotalScore)))
                 {
-                    // Update global rank, if a new local replay it's ranked.
-                    // Update global rank, if a new local replay it will be a new record for an unranked beatmap.
-                    // Update global rank, if a new local replay ruleset doesn't equals original beatmap ruleset.
-                    if (topScore.Ranked || beatmapInfo.Status.GrantsPerformancePoints() == false || topScore.Ruleset.ShortName != beatmapInfo.Ruleset.ShortName)
+                    if (beatmapInfo.OnlineID <= 0 || beatmapInfo.Status <= BeatmapOnlineStatus.Pending || beatmapInfo.Ruleset.ShortName != rulesetInfo.ShortName)
                     {
-                        rankChanged(rulesetInfo, topScore.Rank);
+                        rankChanged(rulesetInfo, topScore.Rank, topScore.TotalScore);
+                    }
+                    else
+                    {
+                        updateRankFromOnlineScore(rulesetInfo);
                     }
                 }
 
                 updateRank(rulesetInfo, beatmapInfo);
             }
 
-            void rankChanged(RulesetInfo rulesetInfo, ScoreRank newRank)
+            void updateRankFromOnlineScore(RulesetInfo rulesetInfo)
+            {
+                getScoresRequest?.Cancel();
+                getScoresRequest = new GetScoresRequest(beatmapInfo, rulesetInfo);
+                getScoresRequest.Success += scores =>
+                {
+                    if (scores.Scores.Count > 0)
+                    {
+                        SoloScoreInfo? topScore = scores.UserScore?.Score;
+                        if (topScore != null)
+                        {
+                            rankChanged(rulesetInfo, topScore.Rank, topScore.TotalScore);
+                        }
+                    }
+                };
+
+                api.Queue(getScoresRequest);
+            }
+
+            void rankChanged(RulesetInfo rulesetInfo, ScoreRank newRank, long score)
             {
                 Scheduler.AddOnce(setNewRank);
 
@@ -136,9 +143,18 @@ namespace osu.Game.Screens.Select.Carousel
                             return;
 
                         var userRank = beatmapInfo.UserRank;
-                        if ((int?)userRank.GetRankByRulesetInfo(rulesetInfo) != (int)newRank)
+                        if (userRank.HasNewRecord(rulesetInfo, score))
                         {
-                            userRank.SetRankByRulesetInfo(rulesetInfo, newRank);
+                            userRank.SetRankByRulesetInfo(rulesetInfo, newRank, score);
+                            // Load new datas
+                            beatmapInfo.UserRank.OsuRank = userRank.OsuRank;
+                            beatmapInfo.UserRank.ManiaRank = userRank.ManiaRank;
+                            beatmapInfo.UserRank.FruitsRank = userRank.FruitsRank;
+                            beatmapInfo.UserRank.TaikoRank = userRank.TaikoRank;
+                            beatmapInfo.UserRank.OsuScore = userRank.OsuScore;
+                            beatmapInfo.UserRank.ManiaScore = userRank.ManiaScore;
+                            beatmapInfo.UserRank.FruitsScore = userRank.FruitsScore;
+                            beatmapInfo.UserRank.TaikoScore = userRank.TaikoScore;
                         }
 
                         updateRank(rulesetInfo, beatmapInfo);

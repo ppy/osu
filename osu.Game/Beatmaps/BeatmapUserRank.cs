@@ -14,29 +14,47 @@ namespace osu.Game.Beatmaps
         public int TaikoRank { get; set; } = (int)ScoreRank.F - 1;
         public int FruitsRank { get; set; } = (int)ScoreRank.F - 1;
 
+        public long OsuScore { get; set; }
+        public long ManiaScore { get; set; }
+        public long TaikoScore { get; set; }
+        public long FruitsScore { get; set; }
+
         public void ResetRanks()
         {
             OsuRank = (int)ScoreRank.F - 1;
             ManiaRank = (int)ScoreRank.F - 1;
             TaikoRank = (int)ScoreRank.F - 1;
             FruitsRank = (int)ScoreRank.F - 1;
+            OsuScore = 0;
+            ManiaScore = 0;
+            TaikoScore = 0;
+            FruitsScore = 0;
         }
 
-        public void SetRankByRulesetInfo(IRulesetInfo rulesetInfo, ScoreRank rank)
+        public bool HasNewRecord(IRulesetInfo rulesetInfo, long score)
+        {
+            return GetScoreByRulesetInfo(rulesetInfo) < score;
+        }
+
+        public void SetRankByRulesetInfo(IRulesetInfo rulesetInfo, ScoreRank rank, long score)
         {
             switch (rulesetInfo.ShortName)
             {
                 case @"osu":
                     OsuRank = (int)rank;
+                    OsuScore = score;
                     break;
                 case @"taiko":
                     TaikoRank = (int)rank;
+                    TaikoScore = score;
                     break;
                 case @"fruits":
                     FruitsRank = (int)rank;
+                    FruitsScore = score;
                     break;
                 case @"mania":
                     ManiaRank = (int)rank;
+                    ManiaScore = score;
                     break;
             }
         }
@@ -55,6 +73,23 @@ namespace osu.Game.Beatmaps
                     return ManiaRank >= (int)ScoreRank.F ? (ScoreRank)ManiaRank : null;
                 default:
                     return null;
+            }
+        }
+
+        public long GetScoreByRulesetInfo(IRulesetInfo rulesetInfo)
+        {
+            switch (rulesetInfo.ShortName)
+            {
+                case @"osu":
+                    return OsuScore;
+                case @"taiko":
+                    return TaikoScore;
+                case @"fruits":
+                    return FruitsScore;
+                case @"mania":
+                    return ManiaScore;
+                default:
+                    return 0;
             }
         }
     }

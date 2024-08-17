@@ -143,6 +143,37 @@ namespace osu.Game.Tests.Visual.SongSelect
         }
 
         [Test]
+        public void TestHigherScoreSet2()
+        {
+            AddStep("Add score for current user with \"No Fail\" mod", () =>
+            {
+                var testScoreInfo = TestResources.CreateTestScoreInfo(importedBeatmap);
+
+                testScoreInfo.User = API.LocalUser.Value;
+                testScoreInfo.Rank = ScoreRank.S;
+                testScoreInfo.TotalScore = 1000000;
+
+                scoreManager.Import(testScoreInfo);
+            });
+
+            AddUntilStep("S rank displayed", () => topGlobalRank.DisplayedRank == ScoreRank.S);
+
+            AddStep("Add higher score for current user", () =>
+            {
+                var testScoreInfo2 = TestResources.CreateTestScoreInfo(importedBeatmap);
+
+                testScoreInfo2.User = API.LocalUser.Value;
+                testScoreInfo2.Rank = ScoreRank.A;
+                testScoreInfo2.TotalScore = 1500000;
+                testScoreInfo2.Statistics = testScoreInfo2.MaximumStatistics;
+
+                scoreManager.Import(testScoreInfo2);
+            });
+
+            AddUntilStep("A rank displayed", () => topGlobalRank.DisplayedRank == ScoreRank.A);
+        }
+
+        [Test]
         public void TestLegacyScore()
         {
             ScoreInfo testScoreInfo = null!;
