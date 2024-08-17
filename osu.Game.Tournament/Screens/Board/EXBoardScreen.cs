@@ -180,7 +180,7 @@ namespace osu.Game.Tournament.Screens.Board
                                 {
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.CentreLeft,
-                                    Text = @"欢迎进入 EX 阶段",
+                                    Text = @"Welcome to the EX Fumo era!",
                                     Font = OsuFont.HarmonyOSSans.With(size: 32, weight: FontWeight.Bold),
                                 },
                                 new TournamentSpriteText
