@@ -53,7 +53,8 @@ namespace osu.Game.Beatmaps
                     return FruitsRank >= (int)ScoreRank.F ? (ScoreRank)FruitsRank : null;
                 case @"mania":
                     return ManiaRank >= (int)ScoreRank.F ? (ScoreRank)ManiaRank : null;
-                default: return null;
+                default:
+                    return null;
             }
         }
     }

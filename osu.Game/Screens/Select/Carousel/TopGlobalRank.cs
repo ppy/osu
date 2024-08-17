@@ -93,7 +93,6 @@ namespace osu.Game.Screens.Select.Carousel
                 }
 
                 updateRank(rulesetInfo.NewValue);
-
             }, true);
 
             void localScoresChanged(IRealmCollection<ScoreInfo> sender, ChangeSet? changes, RulesetInfo rulesetInfo)
@@ -105,11 +104,15 @@ namespace osu.Game.Screens.Select.Carousel
 
                 ScoreInfo? topScore = sender?.MaxBy(info => (info.TotalScore, -info.Date.UtcDateTime.Ticks));
                 ScoreRank? oldRank = beatmapInfo.UserRank.GetRankByRulesetInfo(rulesetInfo);
-                // Update global rank if new local replay it's rating.
-                // Update the global rank, if a new local replay it will be a new record for an unranked beatmap.
-                if (topScore != null && (topScore.Ranked || beatmapInfo.Status.GrantsPerformancePoints() == false) && (oldRank == null || (int)oldRank < (int)topScore.Rank))
+                if (topScore != null && (oldRank == null || (int)oldRank < (int)topScore.Rank))
                 {
-                    rankChanged(rulesetInfo, topScore.Rank);
+                    // Update global rank, if a new local replay it's ranked.
+                    // Update global rank, if a new local replay it will be a new record for an unranked beatmap.
+                    // Update global rank, if a new local replay ruleset doesn't equals original beatmap ruleset.
+                    if (topScore.Ranked || beatmapInfo.Status.GrantsPerformancePoints() == false || topScore.Ruleset.ShortName != beatmapInfo.Ruleset.ShortName)
+                    {
+                        rankChanged(rulesetInfo, topScore.Rank);
+                    }
                 }
             }
 
