@@ -44,6 +44,8 @@ namespace osu.Game.Tournament.Components
 
         private readonly Bindable<TournamentMatch?> currentMatch = new Bindable<TournamentMatch?>();
 
+        private FillFlowContainer textArea = null!;
+
         private Box backgroundAddition = null!;
         private Box flash = null!;
 
@@ -96,7 +98,7 @@ namespace osu.Game.Tournament.Components
                     Colour = Color4.Black,
                     Alpha = 0.1f
                 },
-                new FillFlowContainer
+                textArea = new FillFlowContainer
                 {
                     AutoSizeAxes = Axes.Both,
                     Anchor = Anchor.TopLeft,
@@ -315,6 +317,15 @@ namespace osu.Game.Tournament.Components
                     swapIcon.FadeInFromZero(duration: 800, easing: Easing.InCubic);
                 }
 
+                if (newChoice.Type == ChoiceType.Ban)
+                {
+                    textArea.FadeTo(newAlpha: 0.5f, duration: 200, easing: Easing.OutCubic);
+                }
+                else
+                {
+                    textArea.FadeTo(newAlpha: 1f, duration: 200, easing: Easing.OutCubic);
+                }
+
                 switch (newChoice.Type)
                 {
                     case ChoiceType.Pick:
@@ -382,6 +393,7 @@ namespace osu.Game.Tournament.Components
                 icon.ClearTransforms();
                 statusIcon.ClearTransforms();
                 flash.ClearTransforms();
+                textArea.ClearTransforms();
 
                 // Then we can change them to the default state.
                 BorderThickness = 0;
@@ -390,6 +402,7 @@ namespace osu.Game.Tournament.Components
                 backgroundAddition.FadeOut(duration: 100, easing: Easing.OutCubic);
                 icon.FadeOut(duration: 100, easing: Easing.OutCubic);
                 statusIcon.FadeOut(duration: 100, easing: Easing.OutCubic);
+                textArea.FadeTo(newAlpha: 1f, duration: 200, easing: Easing.OutCubic);
                 Colour = Color4.White;
                 icon.Colour = Color4.White;
                 backgroundAddition.Colour = Color4.White;
