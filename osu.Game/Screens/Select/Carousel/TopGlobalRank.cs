@@ -61,7 +61,7 @@ namespace osu.Game.Screens.Select.Carousel
         {
             base.LoadComplete();
 
-            ruleset.BindValueChanged(_ =>
+            ruleset.BindValueChanged(rulesetInfo =>
             {
                 scoreSubscription?.Dispose();
                 scoreSubscription = realm.RegisterForNotifications(r =>
@@ -71,10 +71,12 @@ namespace osu.Game.Screens.Select.Carousel
                                  + $" && {nameof(ScoreInfo.BeatmapInfo)}.{nameof(BeatmapInfo.Hash)} == {nameof(ScoreInfo.BeatmapHash)}"
                                  + $" && {nameof(ScoreInfo.Ruleset)}.{nameof(RulesetInfo.ShortName)} == $2"
                                  + $" && {nameof(ScoreInfo.DeletePending)} == false", api.LocalUser.Value.Id, beatmapInfo.ID, ruleset.Value.ShortName),
-                    localScoresChanged);
-                if (beatmapInfo.UserRank.Updated == false)
+                    (sender, changes) => localScoresChanged(sender, changes, rulesetInfo.NewValue));
+
+                getScoresRequest?.Cancel();
+                if (beatmapInfo.UserRank.GetRankByRulesetInfo(rulesetInfo.NewValue) == null)
                 {
-                    getScoresRequest = new GetScoresRequest(beatmapInfo, beatmapInfo.Ruleset);
+                    getScoresRequest = new GetScoresRequest(beatmapInfo, rulesetInfo.NewValue);
                     getScoresRequest.Success += scores =>
                     {
                         if (scores.Scores.Count > 0)
@@ -82,31 +84,19 @@ namespace osu.Game.Screens.Select.Carousel
                             SoloScoreInfo? topScore = scores.UserScore?.Score;
                             if (topScore != null)
                             {
-                                rankChanged(topScore.Rank);
+                                rankChanged(rulesetInfo.NewValue, topScore.Rank);
                             }
-
-                            // Makes ignore search before getting first ranked score.
-                            realmWriteTask = realm.WriteAsync(r =>
-                            {
-                                BeatmapInfo? beatmapInfo = r.Find<BeatmapInfo>(this.beatmapInfo.ID);
-
-                                if (beatmapInfo == null)
-                                    return;
-
-                                beatmapInfo.UserRank.Updated = true;
-                            });
                         }
                     };
 
                     api.Queue(getScoresRequest);
                 }
-                if (beatmapInfo.UserRank.Rank >= (int)ScoreRank.F)
-                {
-                    updateRank();
-                }
+
+                updateRank(rulesetInfo.NewValue);
+
             }, true);
 
-            void localScoresChanged(IRealmCollection<ScoreInfo> sender, ChangeSet? changes)
+            void localScoresChanged(IRealmCollection<ScoreInfo> sender, ChangeSet? changes, RulesetInfo rulesetInfo)
             {
                 // This subscription may fire from changes to linked beatmaps, which we don't care about.
                 // It's currently not possible for a score to be modified after insertion, so we can safely ignore callbacks with only modifications.
@@ -114,22 +104,21 @@ namespace osu.Game.Screens.Select.Carousel
                     return;
 
                 ScoreInfo? topScore = sender?.MaxBy(info => (info.TotalScore, -info.Date.UtcDateTime.Ticks));
-                if (topScore != null && topScore.Ranked && beatmapInfo.UserRank.Rank < (int)topScore.Rank)
+                ScoreRank? oldRank = beatmapInfo.UserRank.GetRankByRulesetInfo(rulesetInfo);
+                // Update global rank if new local replay it's rating.
+                // Update the global rank, if a new local replay it will be a new record for an unranked beatmap.
+                if (topScore != null && (topScore.Ranked || beatmapInfo.Status.GrantsPerformancePoints() == false) && (oldRank == null || (int)oldRank < (int)topScore.Rank))
                 {
-                    rankChanged(topScore.Rank);
+                    rankChanged(rulesetInfo, topScore.Rank);
                 }
-
-                updateRank(sender);
             }
 
-            updateRank();
-
-            void updateRank(IRealmCollection<ScoreInfo>? sender = null)
+            void updateRank(RulesetInfo rulesetInfo, IRealmCollection<ScoreInfo>? sender = null)
             {
-                if (beatmapInfo.UserRank.Rank >= (int)ScoreRank.F)
+                if (beatmapInfo.UserRank.GetRankByRulesetInfo(rulesetInfo) != null)
                 {
                     // Try show global rank
-                    updateable.Rank = (ScoreRank?)beatmapInfo.UserRank.Rank;
+                    updateable.Rank = beatmapInfo.UserRank.GetRankByRulesetInfo(rulesetInfo);
                     updateable.Alpha = 1;
                 }
                 else if (sender != null)
@@ -145,15 +134,15 @@ namespace osu.Game.Screens.Select.Carousel
                 }
             }
 
-            void rankChanged(ScoreRank newRank)
+            void rankChanged(RulesetInfo rulesetInfo, ScoreRank newRank)
             {
-                Scheduler.AddOnce(writeNewRank);
+                Scheduler.AddOnce(setNewRank);
 
-                void writeNewRank()
+                void setNewRank()
                 {
                     if (realmWriteTask?.IsCompleted == false)
                     {
-                        Scheduler.AddOnce(writeNewRank);
+                        Scheduler.AddOnce(setNewRank);
                         return;
                     }
 
@@ -165,13 +154,12 @@ namespace osu.Game.Screens.Select.Carousel
                             return;
 
                         var userRank = beatmapInfo.UserRank;
-                        if (userRank.Rank != (int)newRank)
+                        if ((int?)userRank.GetRankByRulesetInfo(rulesetInfo) != (int)newRank)
                         {
-                            userRank.Updated = true;
-                            userRank.Rank = (int)newRank;
+                            userRank.SetRankByRulesetInfo(rulesetInfo, newRank);
                         }
 
-                        updateRank();
+                        updateRank(rulesetInfo);
                     });
                 }
             }

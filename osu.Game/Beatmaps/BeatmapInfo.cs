@@ -137,6 +137,7 @@ namespace osu.Game.Beatmaps
             OnlineMD5Hash = string.Empty;
             if (Status != BeatmapOnlineStatus.LocallyModified)
                 Status = BeatmapOnlineStatus.None;
+            UserRank.ResetRanks();
         }
 
         #region Properties we may not want persisted (but also maybe no harm?)
