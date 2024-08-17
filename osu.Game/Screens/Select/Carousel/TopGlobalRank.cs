@@ -70,7 +70,7 @@ namespace osu.Game.Screens.Select.Carousel
                                  + $" && {nameof(ScoreInfo.BeatmapInfo)}.{nameof(BeatmapInfo.ID)} == $1"
                                  + $" && {nameof(ScoreInfo.BeatmapInfo)}.{nameof(BeatmapInfo.Hash)} == {nameof(ScoreInfo.BeatmapHash)}"
                                  + $" && {nameof(ScoreInfo.Ruleset)}.{nameof(RulesetInfo.ShortName)} == $2"
-                                 + $" && {nameof(ScoreInfo.DeletePending)} == false", api.LocalUser.Value.Id, beatmapInfo.ID, ruleset.Value.ShortName),
+                                 + $" && {nameof(ScoreInfo.DeletePending)} == false", api.LocalUser.Value.Id, beatmapInfo.ID, rulesetInfo.NewValue.ShortName),
                     (sender, changes) => localScoresChanged(sender, changes, rulesetInfo.NewValue));
 
                 getScoresRequest?.Cancel();
@@ -91,8 +91,6 @@ namespace osu.Game.Screens.Select.Carousel
 
                     api.Queue(getScoresRequest);
                 }
-
-                updateRank(rulesetInfo.NewValue);
             }, true);
 
             void localScoresChanged(IRealmCollection<ScoreInfo> sender, ChangeSet? changes, RulesetInfo rulesetInfo)
@@ -114,27 +112,8 @@ namespace osu.Game.Screens.Select.Carousel
                         rankChanged(rulesetInfo, topScore.Rank);
                     }
                 }
-            }
 
-            void updateRank(RulesetInfo rulesetInfo, IRealmCollection<ScoreInfo>? sender = null)
-            {
-                if (beatmapInfo.UserRank.GetRankByRulesetInfo(rulesetInfo) != null)
-                {
-                    // Try show global rank
-                    updateable.Rank = beatmapInfo.UserRank.GetRankByRulesetInfo(rulesetInfo);
-                    updateable.Alpha = 1;
-                }
-                else if (sender != null)
-                {
-                    // Try show local rank
-                    ScoreInfo? topScore = sender.MaxBy(info => (info.TotalScore, -info.Date.UtcDateTime.Ticks));
-                    updateable.Rank = topScore?.Rank;
-                    updateable.Alpha = topScore != null ? 1 : 0;
-                }
-                else
-                {
-                    updateable.Alpha = 0;
-                }
+                updateRank(rulesetInfo, beatmapInfo);
             }
 
             void rankChanged(RulesetInfo rulesetInfo, ScoreRank newRank)
@@ -162,9 +141,31 @@ namespace osu.Game.Screens.Select.Carousel
                             userRank.SetRankByRulesetInfo(rulesetInfo, newRank);
                         }
 
-                        updateRank(rulesetInfo);
+                        updateRank(rulesetInfo, beatmapInfo);
                     });
                 }
+            }
+        }
+
+        private void updateRank(RulesetInfo rulesetInfo, BeatmapInfo beatmapInfo, IRealmCollection<ScoreInfo>? sender = null)
+        {
+            if (beatmapInfo.UserRank.GetRankByRulesetInfo(rulesetInfo) != null)
+            {
+                // Try show global rank
+                updateable.Rank = beatmapInfo.UserRank.GetRankByRulesetInfo(rulesetInfo);
+                updateable.Alpha = 1;
+            }
+            else if (sender != null)
+            {
+                // Try show local rank
+                ScoreInfo? topScore = sender.MaxBy(info => (info.TotalScore, -info.Date.UtcDateTime.Ticks));
+                updateable.Rank = topScore?.Rank;
+                updateable.Alpha = topScore != null ? 1 : 0;
+            }
+            else
+            {
+                updateable.Rank = null;
+                updateable.Alpha = 0;
             }
         }
 

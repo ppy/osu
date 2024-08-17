@@ -43,6 +43,18 @@ namespace osu.Game.Tests.Visual.SongSelect
         {
             AddStep("Delete all scores", () => scoreManager.Delete());
 
+            AddStep("Delete all cached user ranks", () =>
+            {
+                Realm.Write(r =>
+                {
+                    var beatmap = r.Find<BeatmapInfo>(importedBeatmap.ID);
+                    if (beatmap == null)
+                        return;
+
+                    beatmap.UserRank.ResetRanks();
+                });
+            });
+
             AddStep("Create global rank", () =>
             {
                 Child = topGlobalRank = new TopGlobalRank(importedBeatmap)
