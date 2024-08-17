@@ -133,7 +133,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
 
                 savedSortedStrains = new List<double>(strains);
                 amountOfStrainsAddedSinceSave = 0;
-                savedCurrentStrain = currentSectionPeak > 0 ? currentSectionPeak : -1;
+                savedCurrentStrain = currentSectionPeak;
                 isSavedCurrentStrainRelevant = true;
             }
             // If several sections were added since last save - insert them into saved strains list
@@ -146,11 +146,11 @@ namespace osu.Game.Rulesets.Difficulty.Skills
                 strains = new List<double>(savedSortedStrains);
 
                 amountOfStrainsAddedSinceSave = 0;
-                savedCurrentStrain = currentSectionPeak > 0 ? currentSectionPeak : -1;
+                savedCurrentStrain = currentSectionPeak;
                 isSavedCurrentStrainRelevant = true;
             }
             // If no section was added, but last one was changed - find it and replace it with new one
-            else if (!isSavedCurrentStrainRelevant && savedCurrentStrain != -1)
+            else if (!isSavedCurrentStrainRelevant && savedCurrentStrain > 0)
             {
                 int invalidStrainIndex = savedSortedStrains.BinarySearch(savedCurrentStrain, new ReverseComparer());
                 savedSortedStrains.RemoveAt(invalidStrainIndex);
@@ -158,7 +158,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
 
                 strains = new List<double>(savedSortedStrains);
 
-                savedCurrentStrain = currentSectionPeak > 0 ? currentSectionPeak : -1;
+                savedCurrentStrain = currentSectionPeak;
                 isSavedCurrentStrainRelevant = true;
             }
             // Otherwise - just use saved strains
@@ -171,7 +171,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         }
 
         private List<double>? savedSortedStrains;
-        private double savedCurrentStrain = -1;
+        private double savedCurrentStrain = 0;
         private bool isSavedCurrentStrainRelevant = false;
         private int amountOfStrainsAddedSinceSave = 0;
 
