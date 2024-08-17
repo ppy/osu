@@ -60,6 +60,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
             }
 
             double currentStrain = StrainValueAt(current);
+
             if (currentSectionPeak < currentStrain)
             {
                 currentSectionPeak = currentStrain;
@@ -171,9 +172,9 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         }
 
         private List<double>? savedSortedStrains;
-        private double savedCurrentStrain = 0;
-        private bool isSavedCurrentStrainRelevant = false;
-        private int amountOfStrainsAddedSinceSave = 0;
+        private double savedCurrentStrain;
+        private bool isSavedCurrentStrainRelevant;
+        private int amountOfStrainsAddedSinceSave;
 
         protected static void InsertElementInReverseSortedList(List<double> list, double element)
         {

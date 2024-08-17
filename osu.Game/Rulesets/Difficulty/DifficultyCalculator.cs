@@ -315,13 +315,14 @@ namespace osu.Game.Rulesets.Difficulty
 
             private readonly List<HitObject> hitObjects = new List<HitObject>();
 
-            private Dictionary<Type, int> hitObjectsCounts = new Dictionary<Type, int>();
+            private readonly Dictionary<Type, int> hitObjectsCounts = new Dictionary<Type, int>();
 
             public int GetHitObjectCountOf(Type type) => hitObjectsCounts.GetValueOrDefault(type);
 
             IReadOnlyList<HitObject> IBeatmap.HitObjects => hitObjects;
 
-            private int comboObjectIndex = 0, combo = 0;
+            private int comboObjectIndex, combo;
+
             public int GetMaxCombo()
             {
                 for (; comboObjectIndex < hitObjects.Count; comboObjectIndex++)
