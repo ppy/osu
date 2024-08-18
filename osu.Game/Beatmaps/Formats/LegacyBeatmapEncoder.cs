@@ -223,7 +223,7 @@ namespace osu.Game.Beatmaps.Formats
                 // if samplePoint isn't already legacy,create LegacyHitSampleInfo with customSampleBank 1
                 HitSampleInfo tempHitSample;
 
-                if (samplePoint?.GetType() == typeof(SampleControlPoint))
+                if (samplePoint.GetType() == typeof(SampleControlPoint))
                 {
                     tempHitSample = samplePoint.ApplyTo(new ConvertHitObjectParser.LegacyHitSampleInfo(string.Empty, customSampleBank: 1));
                 }
