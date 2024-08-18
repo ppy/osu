@@ -220,8 +220,20 @@ namespace osu.Game.Beatmaps.Formats
                 var samplePoint = legacyControlPoints.SamplePointAt(group.Time);
                 var effectPoint = legacyControlPoints.EffectPointAt(group.Time);
 
+                // if samplePoint isn't already legacy, create legacy with customSampleBank 1
+                HitSampleInfo tempHitSample;
+                if (samplePoint.GetType() == typeof(SampleControlPoint))
+                {
+                    tempHitSample = samplePoint.ApplyTo(new ConvertHitObjectParser.LegacyHitSampleInfo(string.Empty, customSampleBank: 1));
+
+                }
+                // else create LegacyHitSampleInfo with existing customSampleBank
+                else
+                {
+                    tempHitSample = samplePoint.ApplyTo(new ConvertHitObjectParser.LegacyHitSampleInfo(string.Empty));
+
+                }
                 // Apply the control point to a hit sample to uncover legacy properties (e.g. suffix)
-                HitSampleInfo tempHitSample = samplePoint.ApplyTo(new ConvertHitObjectParser.LegacyHitSampleInfo(string.Empty));
                 int customSampleBank = toLegacyCustomSampleBank(tempHitSample);
 
                 // Convert effect flags to the legacy format
@@ -617,7 +629,7 @@ namespace osu.Game.Beatmaps.Formats
             if (hitSampleInfo is ConvertHitObjectParser.LegacyHitSampleInfo legacy)
                 return legacy.CustomSampleBank;
 
-            return 1;
+            return 0;
         }
 
         private struct LegacyControlPointProperties
