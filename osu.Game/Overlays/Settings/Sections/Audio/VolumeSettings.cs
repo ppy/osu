@@ -36,16 +36,22 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
                 },
                 new VolumeAdjustSlider
                 {
+                    LabelText = AudioSettingsStrings.MusicVolume,
+                    Current = audio.VolumeTrack,
+                    KeyboardStep = 0.01f,
+                    DisplayAsPercentage = true
+                },
+                new VolumeAdjustSlider
+                {
                     LabelText = AudioSettingsStrings.EffectVolume,
                     Current = audio.VolumeSample,
                     KeyboardStep = 0.01f,
                     DisplayAsPercentage = true
                 },
-
-                new VolumeAdjustSlider
+                new SettingsSlider<double>
                 {
-                    LabelText = AudioSettingsStrings.MusicVolume,
-                    Current = audio.VolumeTrack,
+                    LabelText = AudioSettingsStrings.GameplayVolume,
+                    Current = config.GetBindable<double>(OsuSetting.GameplayVolume),
                     KeyboardStep = 0.01f,
                     DisplayAsPercentage = true
                 },
