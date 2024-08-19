@@ -78,7 +78,7 @@ namespace osu.Game.Screens.Ranking
             {
                 Logger.Error(e, $"Failed to fetch beatmap info: {e.Message}");
 
-                loading.Hide();
+                Schedule(() => loading.Hide());
                 Enabled.Value = false;
             };
             api.Queue(beatmapSetRequest);
