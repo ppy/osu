@@ -37,6 +37,7 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
             DisplayedCountText.Origin = DisplayedCountText.Anchor = Anchor.Centre;
 
             Content.ChangeChildDepth(PopOutCountText, float.MinValue);
+            UsesFixedAnchor = true;
         }
 
         protected override void LoadComplete()
@@ -68,6 +69,10 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
                 var catcher = ((CatchPlayfield)drawableRuleset.Playfield).Catcher;
                 X = Parent!.ToLocalSpace(catcher.ScreenSpaceDrawQuad.Centre).X;
             }
+
+            // These are required in order for the combo to follow the catcher in a sane way.
+            Anchor = (Anchor & ~(Anchor.x1 | Anchor.x2)) | Anchor.x0;
+            Origin = (Origin & ~(Anchor.x0 | Anchor.x2)) | Anchor.x1;
         }
 
         private ScheduledDelegate? scheduledPopOut;
