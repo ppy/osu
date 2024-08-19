@@ -157,8 +157,9 @@ namespace osu.Game.Tests.Database
             AddAssert("Score not marked as failed", () => Realm.Run(r => r.Find<ScoreInfo>(scoreInfo.ID)!.BackgroundReprocessingFailed), () => Is.False);
         }
 
-        [Test]
-        public void TestScoreUpgradeFailed()
+        [TestCase(30000002)]
+        [TestCase(30000013)]
+        public void TestScoreUpgradeFailed(int scoreVersion)
         {
             ScoreInfo scoreInfo = null!;
 
@@ -172,16 +173,18 @@ namespace osu.Game.Tests.Database
                         Ruleset = r.All<RulesetInfo>().First(),
                     })
                     {
-                        TotalScoreVersion = 30000002,
+                        TotalScoreVersion = scoreVersion,
                         IsLegacyScore = true,
                     });
                 });
             });
 
-            AddStep("Run background processor", () => Add(new TestBackgroundDataStoreProcessor()));
+            TestBackgroundDataStoreProcessor processor = null!;
+            AddStep("Run background processor", () => Add(processor = new TestBackgroundDataStoreProcessor()));
+            AddUntilStep("Wait for completion", () => processor.Completed);
 
             AddUntilStep("Score marked as failed", () => Realm.Run(r => r.Find<ScoreInfo>(scoreInfo.ID)!.BackgroundReprocessingFailed), () => Is.True);
-            AddAssert("Score version not upgraded", () => Realm.Run(r => r.Find<ScoreInfo>(scoreInfo.ID)!.TotalScoreVersion), () => Is.EqualTo(30000002));
+            AddAssert("Score version not upgraded", () => Realm.Run(r => r.Find<ScoreInfo>(scoreInfo.ID)!.TotalScoreVersion), () => Is.EqualTo(scoreVersion));
         }
 
         [Test]

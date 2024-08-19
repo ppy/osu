@@ -2,8 +2,10 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Scoring;
@@ -26,6 +28,37 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
         {
             switch (lookup)
             {
+                case SkinComponentsContainerLookup containerLookup:
+                    // Only handle per ruleset defaults here.
+                    if (containerLookup.Ruleset == null)
+                        return base.GetDrawableComponent(lookup);
+
+                    // Skin has configuration.
+                    if (base.GetDrawableComponent(lookup) is UserConfiguredLayoutContainer d)
+                        return d;
+
+                    switch (containerLookup.Target)
+                    {
+                        case SkinComponentsContainerLookup.TargetArea.MainHUDComponents:
+                            return new DefaultSkinComponentsContainer(container =>
+                            {
+                                var combo = container.ChildrenOfType<ArgonManiaComboCounter>().FirstOrDefault();
+
+                                if (combo != null)
+                                {
+                                    combo.ShowLabel.Value = false;
+                                    combo.Anchor = Anchor.TopCentre;
+                                    combo.Origin = Anchor.Centre;
+                                    combo.Y = 200;
+                                }
+                            })
+                            {
+                                new ArgonManiaComboCounter(),
+                            };
+                    }
+
+                    return null;
+
                 case GameplaySkinComponentLookup<HitResult> resultComponent:
                     // This should eventually be moved to a skin setting, when supported.
                     if (Skin is ArgonProSkin && resultComponent.Component >= HitResult.Great)

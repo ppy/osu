@@ -26,6 +26,7 @@ using osu.Game.Collections;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
 using osu.Game.Overlays;
@@ -61,19 +62,19 @@ namespace osu.Game.Screens.Select
         /// </summary>
         protected virtual bool ControlGlobalMusic => true;
 
-        protected virtual bool ShowFooter => true;
+        protected virtual bool ShowSongSelectFooter => true;
 
         public override bool? ApplyModTrackAdjustments => true;
 
         /// <summary>
-        /// Can be null if <see cref="ShowFooter"/> is false.
+        /// Can be null if <see cref="ShowSongSelectFooter"/> is false.
         /// </summary>
         protected BeatmapOptionsOverlay BeatmapOptions { get; private set; } = null!;
 
         /// <summary>
-        /// Can be null if <see cref="ShowFooter"/> is false.
+        /// Can be null if <see cref="ShowSongSelectFooter"/> is false.
         /// </summary>
-        protected Footer? Footer { get; private set; }
+        protected Footer? SongSelectFooter { get; private set; }
 
         /// <summary>
         /// Contains any panel which is triggered by a footer button.
@@ -168,7 +169,7 @@ namespace osu.Game.Screens.Select
                 Origin = Anchor.CentreRight,
                 RelativeSizeAxes = Axes.Both,
                 BleedTop = FilterControl.HEIGHT,
-                BleedBottom = Footer.HEIGHT,
+                BleedBottom = Select.Footer.HEIGHT,
                 SelectionChanged = updateSelectedBeatmap,
                 BeatmapSetsChanged = carouselBeatmapsLoaded,
                 FilterApplied = () => Scheduler.AddOnce(updateVisibleBeatmapCount),
@@ -215,7 +216,7 @@ namespace osu.Game.Screens.Select
                                         Padding = new MarginPadding
                                         {
                                             Top = FilterControl.HEIGHT,
-                                            Bottom = Footer.HEIGHT
+                                            Bottom = Select.Footer.HEIGHT
                                         },
                                         Child = new LoadingSpinner(true) { State = { Value = Visibility.Visible } }
                                     }
@@ -302,7 +303,7 @@ namespace osu.Game.Screens.Select
                                                 RelativeSizeAxes = Axes.Both,
                                                 Padding = new MarginPadding
                                                 {
-                                                    Bottom = Footer.HEIGHT,
+                                                    Bottom = Select.Footer.HEIGHT,
                                                     Top = WEDGE_HEIGHT + 70,
                                                     Left = left_area_padding,
                                                     Right = left_area_padding * 2,
@@ -327,7 +328,7 @@ namespace osu.Game.Screens.Select
                 modSpeedHotkeyHandler = new ModSpeedHotkeyHandler(),
             });
 
-            if (ShowFooter)
+            if (ShowSongSelectFooter)
             {
                 AddRangeInternal(new Drawable[]
                 {
@@ -336,13 +337,13 @@ namespace osu.Game.Screens.Select
                         Anchor = Anchor.BottomLeft,
                         Origin = Anchor.BottomLeft,
                         RelativeSizeAxes = Axes.Both,
-                        Padding = new MarginPadding { Bottom = Footer.HEIGHT },
+                        Padding = new MarginPadding { Bottom = Select.Footer.HEIGHT },
                         Children = new Drawable[]
                         {
                             BeatmapOptions = new BeatmapOptionsOverlay(),
                         }
                     },
-                    Footer = new Footer()
+                    SongSelectFooter = new Footer()
                 });
             }
 
@@ -350,10 +351,10 @@ namespace osu.Game.Screens.Select
             // therein it will be registered at the `OsuGame` level to properly function as a blocking overlay.
             LoadComponent(ModSelect = CreateModSelectOverlay());
 
-            if (Footer != null)
+            if (SongSelectFooter != null)
             {
-                foreach (var (button, overlay) in CreateFooterButtons())
-                    Footer.AddButton(button, overlay);
+                foreach (var (button, overlay) in CreateSongSelectFooterButtons())
+                    SongSelectFooter.AddButton(button, overlay);
 
                 BeatmapOptions.AddButton(@"Manage", @"collections", FontAwesome.Solid.Book, colours.Green, () => manageCollectionsDialog?.Show());
                 BeatmapOptions.AddButton(@"Delete", @"all difficulties", FontAwesome.Solid.Trash, colours.Pink, () => DeleteBeatmap(Beatmap.Value.BeatmapSetInfo));
@@ -387,7 +388,7 @@ namespace osu.Game.Screens.Select
         /// Creates the buttons to be displayed in the footer.
         /// </summary>
         /// <returns>A set of <see cref="FooterButton"/> and an optional <see cref="OverlayContainer"/> which the button opens when pressed.</returns>
-        protected virtual IEnumerable<(FooterButton, OverlayContainer?)> CreateFooterButtons() => new (FooterButton, OverlayContainer?)[]
+        protected virtual IEnumerable<(FooterButton, OverlayContainer?)> CreateSongSelectFooterButtons() => new (FooterButton, OverlayContainer?)[]
         {
             (new FooterButtonMods { Current = Mods }, ModSelect),
             (new FooterButtonRandom
@@ -505,6 +506,13 @@ namespace osu.Game.Screens.Select
             var beatmap = e?.NewValue ?? Beatmap.Value;
             if (beatmap is DummyWorkingBeatmap || !this.IsCurrentScreen()) return;
 
+            if (beatmap.BeatmapSetInfo.Protected && e != null)
+            {
+                Logger.Log($"Denying working beatmap switch to protected beatmap {beatmap}");
+                Beatmap.Value = e.OldValue;
+                return;
+            }
+
             Logger.Log($"Song select working beatmap updated to {beatmap}");
 
             if (!Carousel.SelectBeatmap(beatmap.BeatmapInfo, false))
@@ -602,7 +610,7 @@ namespace osu.Game.Screens.Select
                 // clear pending task immediately to track any potential nested debounce operation.
                 selectionChangedDebounce = null;
 
-                Logger.Log($"Song select updating selection with beatmap:{beatmap?.ID.ToString() ?? "null"} ruleset:{ruleset?.ShortName ?? "null"}");
+                Logger.Log($"Song select updating selection with beatmap: {beatmap} {beatmap?.ID.ToString() ?? "null"} ruleset:{ruleset?.ShortName ?? "null"}");
 
                 if (transferRulesetValue())
                 {
@@ -851,7 +859,7 @@ namespace osu.Game.Screens.Select
 
             BeatmapDetails.Beatmap = beatmap;
 
-            ModSelect.Beatmap = beatmap;
+            ModSelect.Beatmap.Value = beatmap;
 
             advancedStats.BeatmapInfo = beatmap.BeatmapInfo;
 
@@ -1074,7 +1082,7 @@ namespace osu.Game.Screens.Select
                 Anchor = Anchor.Centre;
                 Origin = Anchor.Centre;
                 Width = panel_overflow; // avoid horizontal masking so the panels don't clip when screen stack is pushed.
-                InternalChild = Content = new Container
+                InternalChild = Content = new OsuContextMenuContainer
                 {
                     RelativeSizeAxes = Axes.Both,
                     Anchor = Anchor.Centre,

@@ -128,6 +128,9 @@ namespace osu.Game.Online.Chat
 
         public partial class ChatTextBox : HistoryTextBox
         {
+            public Action Focus;
+            public Action FocusLost;
+
             protected override bool OnKeyDown(KeyDownEvent e)
             {
                 // Chat text boxes are generally used in places where they retain focus, but shouldn't block interaction with other
@@ -153,13 +156,17 @@ namespace osu.Game.Online.Chat
                 BackgroundFocused = new Color4(10, 10, 10, 255);
             }
 
+            protected override void OnFocus(FocusEvent e)
+            {
+                base.OnFocus(e);
+                Focus?.Invoke();
+            }
+
             protected override void OnFocusLost(FocusLostEvent e)
             {
                 base.OnFocusLost(e);
                 FocusLost?.Invoke();
             }
-
-            public Action FocusLost;
         }
 
         public partial class StandAloneDrawableChannel : DrawableChannel
@@ -178,7 +185,7 @@ namespace osu.Game.Online.Chat
 
         protected partial class StandAloneDaySeparator : DaySeparator
         {
-            protected override float TextSize => 14;
+            protected override float TextSize => 13;
             protected override float LineHeight => 1;
             protected override float Spacing => 5;
             protected override float DateAlign => 125;
@@ -198,9 +205,9 @@ namespace osu.Game.Online.Chat
 
         protected partial class StandAloneMessage : ChatLine
         {
-            protected override float FontSize => 15;
+            protected override float FontSize => 13;
             protected override float Spacing => 5;
-            protected override float UsernameWidth => 75;
+            protected override float UsernameWidth => 90;
 
             public StandAloneMessage(Message message)
                 : base(message)

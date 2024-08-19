@@ -32,6 +32,7 @@ using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
+using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Scoring;
 using osu.Game.Scoring.Legacy;
 using osu.Game.Screens.Play.HUD;
@@ -236,6 +237,9 @@ namespace osu.Game.Screens.Play
             DrawableRuleset = ruleset.CreateDrawableRulesetWith(playableBeatmap, gameplayMods);
             dependencies.CacheAs(DrawableRuleset);
 
+            if (DrawableRuleset is IDrawableScrollingRuleset scrollingRuleset)
+                dependencies.CacheAs(scrollingRuleset.ScrollingInfo);
+
             ScoreProcessor = ruleset.CreateScoreProcessor();
             ScoreProcessor.Mods.Value = gameplayMods;
             ScoreProcessor.ApplyBeatmap(playableBeatmap);
@@ -260,7 +264,7 @@ namespace osu.Game.Screens.Play
             Score.ScoreInfo.Ruleset = ruleset.RulesetInfo;
             Score.ScoreInfo.Mods = gameplayMods;
 
-            dependencies.CacheAs(GameplayState = new GameplayState(playableBeatmap, ruleset, gameplayMods, Score, ScoreProcessor, Beatmap.Value.Storyboard));
+            dependencies.CacheAs(GameplayState = new GameplayState(playableBeatmap, ruleset, gameplayMods, Score, ScoreProcessor, HealthProcessor, Beatmap.Value.Storyboard));
 
             var rulesetSkinProvider = new RulesetSkinProvidingContainer(ruleset, playableBeatmap, Beatmap.Value.Skin);
 
@@ -987,14 +991,14 @@ namespace osu.Game.Screens.Play
         /// <summary>
         /// The amount of gameplay time after which a second pause is allowed.
         /// </summary>
-        private const double pause_cooldown = 1000;
+        protected virtual double PauseCooldownDuration => 1000;
 
         protected PauseOverlay PauseOverlay { get; private set; }
 
         private double? lastPauseActionTime;
 
         protected bool PauseCooldownActive =>
-            lastPauseActionTime.HasValue && GameplayClockContainer.CurrentTime < lastPauseActionTime + pause_cooldown;
+            lastPauseActionTime.HasValue && GameplayClockContainer.CurrentTime < lastPauseActionTime + PauseCooldownDuration;
 
         /// <summary>
         /// A set of conditionals which defines whether the current game state and configuration allows for
