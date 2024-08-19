@@ -50,8 +50,12 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                         return base.GetDrawableComponent(lookup);
 
                     // Skin has configuration.
-                    if (base.GetDrawableComponent(lookup) is Drawable d)
+                    if (base.GetDrawableComponent(lookup) is UserConfiguredLayoutContainer d)
                         return d;
+
+                    // we don't have enough assets to display these components (this is especially the case on a "beatmap" skin).
+                    if (!IsProvidingLegacyResources)
+                        return null;
 
                     // Our own ruleset components default.
                     switch (containerLookup.Target)
@@ -70,10 +74,20 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                                     // 340px is the default height inherit from stable
                                     keyCounter.Y = container.ToLocalSpace(new Vector2(0, container.ScreenSpaceDrawQuad.Centre.Y - 340f)).Y;
                                 }
+
+                                var combo = container.OfType<LegacyDefaultComboCounter>().FirstOrDefault();
+
+                                if (combo != null)
+                                {
+                                    combo.Anchor = Anchor.BottomLeft;
+                                    combo.Origin = Anchor.BottomLeft;
+                                    combo.Scale = new Vector2(1.28f);
+                                }
                             })
                             {
                                 Children = new Drawable[]
                                 {
+                                    new LegacyDefaultComboCounter(),
                                     new LegacyKeyCounterDisplay(),
                                 }
                             };
@@ -85,7 +99,8 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                     switch (osuComponent.Component)
                     {
                         case OsuSkinComponents.FollowPoint:
-                            return this.GetAnimation("followpoint", true, true, true, startAtCurrentTime: false, maxSize: new Vector2(OsuHitObject.OBJECT_RADIUS * 2, OsuHitObject.OBJECT_RADIUS));
+                            return this.GetAnimation("followpoint", true, true, true, startAtCurrentTime: false,
+                                maxSize: new Vector2(OsuHitObject.OBJECT_RADIUS * 2, OsuHitObject.OBJECT_RADIUS));
 
                         case OsuSkinComponents.SliderScorePoint:
                             return this.GetAnimation("sliderscorepoint", false, false, maxSize: OsuHitObject.OBJECT_DIMENSIONS);

@@ -9,15 +9,16 @@ using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Effects;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Localisation;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Resources.Localisation.Web;
 using osu.Game.Scoring;
 using osuTK;
-using Box = osu.Framework.Graphics.Shapes.Box;
-using Color4 = osuTK.Graphics.Color4;
+using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Profile.Header.Components
 {
@@ -112,16 +113,16 @@ namespace osu.Game.Overlays.Profile.Header.Components
             background.Colour = colourProvider.Background4;
             topBackground.Colour = colourProvider.Background5;
 
-            currentDaily.Value = UsersStrings.ShowDailyChallengeUnitDay(content.Statistics.DailyStreakCurrent.ToLocalisableString(@"N0"));
+            currentDaily.Value = DailyChallengeStatsDisplayStrings.UnitDay(content.Statistics.DailyStreakCurrent.ToLocalisableString(@"N0"));
             currentDaily.ValueColour = colours.ForRankingTier(TierForDaily(statistics.DailyStreakCurrent));
 
-            currentWeekly.Value = UsersStrings.ShowDailyChallengeUnitWeek(statistics.WeeklyStreakCurrent.ToLocalisableString(@"N0"));
+            currentWeekly.Value = DailyChallengeStatsDisplayStrings.UnitWeek(statistics.WeeklyStreakCurrent.ToLocalisableString(@"N0"));
             currentWeekly.ValueColour = colours.ForRankingTier(TierForWeekly(statistics.WeeklyStreakCurrent));
 
-            bestDaily.Value = UsersStrings.ShowDailyChallengeUnitDay(statistics.DailyStreakBest.ToLocalisableString(@"N0"));
+            bestDaily.Value = DailyChallengeStatsDisplayStrings.UnitDay(statistics.DailyStreakBest.ToLocalisableString(@"N0"));
             bestDaily.ValueColour = colours.ForRankingTier(TierForDaily(statistics.DailyStreakBest));
 
-            bestWeekly.Value = UsersStrings.ShowDailyChallengeUnitWeek(statistics.WeeklyStreakBest.ToLocalisableString(@"N0"));
+            bestWeekly.Value = DailyChallengeStatsDisplayStrings.UnitWeek(statistics.WeeklyStreakBest.ToLocalisableString(@"N0"));
             bestWeekly.ValueColour = colours.ForRankingTier(TierForWeekly(statistics.WeeklyStreakBest));
 
             topTen.Value = statistics.Top10PercentPlacements.ToLocalisableString(@"N0");

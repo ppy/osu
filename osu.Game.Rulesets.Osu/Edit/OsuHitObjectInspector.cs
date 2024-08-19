@@ -11,14 +11,14 @@ namespace osu.Game.Rulesets.Osu.Edit
 {
     public partial class OsuHitObjectInspector : HitObjectInspector
     {
-        protected override void AddInspectorValues()
+        protected override void AddInspectorValues(HitObject[] objects)
         {
-            base.AddInspectorValues();
+            base.AddInspectorValues(objects);
 
-            if (EditorBeatmap.SelectedHitObjects.Count > 0)
+            if (objects.Length > 0)
             {
-                var firstInSelection = (OsuHitObject)EditorBeatmap.SelectedHitObjects.MinBy(ho => ho.StartTime)!;
-                var lastInSelection = (OsuHitObject)EditorBeatmap.SelectedHitObjects.MaxBy(ho => ho.GetEndTime())!;
+                var firstInSelection = (OsuHitObject)objects.MinBy(ho => ho.StartTime)!;
+                var lastInSelection = (OsuHitObject)objects.MaxBy(ho => ho.GetEndTime())!;
 
                 Debug.Assert(firstInSelection != null && lastInSelection != null);
 

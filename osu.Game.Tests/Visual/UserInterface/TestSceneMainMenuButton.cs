@@ -58,6 +58,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                             {
                                 new PlaylistItem(beatmap)
                             },
+                            StartDate = { Value = DateTimeOffset.Now.AddMinutes(-5) },
                             EndDate = { Value = DateTimeOffset.Now.AddSeconds(30) }
                         });
                         return true;
@@ -95,8 +96,13 @@ namespace osu.Game.Tests.Visual.UserInterface
                     },
                 };
             });
-            AddAssert("no notification posted", () => notificationOverlay.AllNotifications.Count(), () => Is.Zero);
+            AddAssert("notification posted", () => notificationOverlay.AllNotifications.Count(), () => Is.EqualTo(1));
 
+            AddStep("clear notifications", () =>
+            {
+                foreach (var notification in notificationOverlay.AllNotifications)
+                    notification.Close(runFlingAnimation: false);
+            });
             AddStep("beatmap of the day not active", () => metadataClient.DailyChallengeUpdated(null));
             AddAssert("no notification posted", () => notificationOverlay.AllNotifications.Count(), () => Is.Zero);
 
@@ -105,7 +111,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             {
                 RoomID = 1234,
             }));
-            AddAssert("notification posted", () => notificationOverlay.AllNotifications.Count(), () => Is.EqualTo(1));
+            AddAssert("no notification posted", () => notificationOverlay.AllNotifications.Count(), () => Is.Zero);
         }
     }
 }
