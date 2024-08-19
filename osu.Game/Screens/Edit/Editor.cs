@@ -6,6 +6,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using osu.Framework;
@@ -159,7 +160,7 @@ namespace osu.Game.Screens.Edit
 
         private string lastSavedHash;
 
-        private Container<EditorScreen> screenContainer;
+        private ScreenContainer screenContainer;
 
         [CanBeNull]
         private readonly EditorLoader loader;
@@ -329,7 +330,7 @@ namespace osu.Game.Screens.Edit
                         Name = "Screen container",
                         RelativeSizeAxes = Axes.Both,
                         Padding = new MarginPadding { Top = 40, Bottom = 50 },
-                        Child = screenContainer = new Container<EditorScreen>
+                        Child = screenContainer = new ScreenContainer
                         {
                             RelativeSizeAxes = Axes.Both,
                         }
@@ -422,6 +423,7 @@ namespace osu.Game.Screens.Edit
                     MutationTracker,
                 }
             });
+
             changeHandler?.CanUndo.BindValueChanged(v => undoMenuItem.Action.Disabled = !v.NewValue, true);
             changeHandler?.CanRedo.BindValueChanged(v => redoMenuItem.Action.Disabled = !v.NewValue, true);
 
@@ -1007,7 +1009,7 @@ namespace osu.Game.Screens.Edit
                         throw new InvalidOperationException("Editor menu bar switched to an unsupported mode");
                 }
 
-                LoadComponentAsync(currentScreen, newScreen =>
+                screenContainer.LoadComponentAsync(currentScreen, newScreen =>
                 {
                     if (newScreen == currentScreen)
                     {
@@ -1284,9 +1286,22 @@ namespace osu.Game.Screens.Edit
                 foreach (var beatmap in rulesetBeatmaps)
                 {
                     bool isCurrentDifficulty = playableBeatmap.BeatmapInfo.Equals(beatmap);
-                    difficultyItems.Add(new DifficultyMenuItem(beatmap, isCurrentDifficulty, SwitchToDifficulty));
+                    var difficultyMenuItem = new DifficultyMenuItem(beatmap, isCurrentDifficulty, SwitchToDifficulty);
+                    difficultyItems.Add(difficultyMenuItem);
                 }
             }
+
+            // Ensure difficulty names are updated when modified in the editor.
+            // Maybe we could trigger less often but this seems to work well enough.
+            editorBeatmap.SaveStateTriggered += () =>
+            {
+                foreach (var beatmapInfo in Beatmap.Value.BeatmapSetInfo.Beatmaps)
+                {
+                    var menuItem = difficultyItems.OfType<DifficultyMenuItem>().FirstOrDefault(i => i.BeatmapInfo.Equals(beatmapInfo));
+                    if (menuItem != null)
+                        menuItem.Text.Value = string.IsNullOrEmpty(beatmapInfo.DifficultyName) ? "(unnamed)" : beatmapInfo.DifficultyName;
+                }
+            };
 
             return new EditorMenuItem(EditorStrings.ChangeDifficulty) { Items = difficultyItems };
         }
@@ -1384,6 +1399,13 @@ namespace osu.Game.Screens.Edit
                 : base(InputSettingsStrings.EditorSection, value, beatmapDisplayName)
             {
             }
+        }
+
+        private partial class ScreenContainer : Container<EditorScreen>
+        {
+            public new Task LoadComponentAsync<TLoadable>([NotNull] TLoadable component, Action<TLoadable> onLoaded = null, CancellationToken cancellation = default, Scheduler scheduler = null)
+                where TLoadable : Drawable
+                => base.LoadComponentAsync(component, onLoaded, cancellation, scheduler);
         }
     }
 }

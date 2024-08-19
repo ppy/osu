@@ -421,6 +421,9 @@ namespace osu.Game.Overlays.SkinEditor
             if (targetContainer != null)
                 changeHandler = new SkinEditorChangeHandler(targetContainer);
             hasBegunMutating = true;
+
+            // Reload sidebar components.
+            selectedTarget.TriggerChange();
         }
 
         /// <summary>

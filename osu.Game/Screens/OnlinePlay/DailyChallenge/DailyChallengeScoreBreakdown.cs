@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -67,34 +68,61 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
             });
         }
 
+        private readonly Queue<NewScoreEvent> newScores = new Queue<NewScoreEvent>();
+
         public void AddNewScore(NewScoreEvent newScoreEvent)
         {
-            int targetBin = (int)Math.Clamp(Math.Floor((float)newScoreEvent.TotalScore / 100000), 0, bin_count - 1);
-            bins[targetBin] += 1;
-            updateCounts();
+            newScores.Enqueue(newScoreEvent);
 
-            var text = new OsuSpriteText
+            // ensure things don't get too out-of-hand.
+            if (newScores.Count > 25)
             {
-                Text = newScoreEvent.TotalScore.ToString(@"N0"),
-                Anchor = Anchor.TopCentre,
-                Origin = Anchor.BottomCentre,
-                Font = OsuFont.Default.With(size: 30),
-                RelativePositionAxes = Axes.X,
-                X = (targetBin + 0.5f) / bin_count - 0.5f,
-                Alpha = 0,
-            };
-            AddInternal(text);
+                bins[getTargetBin(newScores.Dequeue())] += 1;
+                Scheduler.AddOnce(updateCounts);
+            }
+        }
 
-            Scheduler.AddDelayed(() =>
+        private double lastScoreDisplay;
+
+        protected override void Update()
+        {
+            base.Update();
+
+            if (Time.Current - lastScoreDisplay > 150 && newScores.TryDequeue(out var newScore))
             {
-                float startY = ToLocalSpace(barsContainer[targetBin].CircularBar.ScreenSpaceDrawQuad.TopLeft).Y;
-                text.FadeInFromZero()
-                    .ScaleTo(new Vector2(0.8f), 500, Easing.OutElasticHalf)
-                    .MoveToY(startY)
-                    .MoveToOffset(new Vector2(0, -50), 2500, Easing.OutQuint)
-                    .FadeOut(2500, Easing.OutQuint)
-                    .Expire();
-            }, 150);
+                if (lastScoreDisplay < Time.Current)
+                    lastScoreDisplay = Time.Current;
+
+                int targetBin = getTargetBin(newScore);
+                bins[targetBin] += 1;
+
+                updateCounts();
+
+                var text = new OsuSpriteText
+                {
+                    Text = newScore.TotalScore.ToString(@"N0"),
+                    Anchor = Anchor.TopCentre,
+                    Origin = Anchor.BottomCentre,
+                    Font = OsuFont.Default.With(size: 30),
+                    RelativePositionAxes = Axes.X,
+                    X = (targetBin + 0.5f) / bin_count - 0.5f,
+                    Alpha = 0,
+                };
+                AddInternal(text);
+
+                Scheduler.AddDelayed(() =>
+                {
+                    float startY = ToLocalSpace(barsContainer[targetBin].CircularBar.ScreenSpaceDrawQuad.TopLeft).Y;
+                    text.FadeInFromZero()
+                        .ScaleTo(new Vector2(0.8f), 500, Easing.OutElasticHalf)
+                        .MoveToY(startY)
+                        .MoveToOffset(new Vector2(0, -50), 2500, Easing.OutQuint)
+                        .FadeOut(2500, Easing.OutQuint)
+                        .Expire();
+                }, 150);
+
+                lastScoreDisplay = Time.Current;
+            }
         }
 
         public void SetInitialCounts(long[] counts)
@@ -105,6 +133,9 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
             bins = counts;
             updateCounts();
         }
+
+        private static int getTargetBin(NewScoreEvent score) =>
+            (int)Math.Clamp(Math.Floor((float)score.TotalScore / 100000), 0, bin_count - 1);
 
         private void updateCounts()
         {
