@@ -293,10 +293,16 @@ namespace osu.Game.Skinning
 
                         Type newCatchComboCounter = SerialisedDrawableInfo.GetAllAvailableDrawables(ruleset).Single(t => t.IsAssignableTo(typeof(LegacyComboCounter)));
 
+                        var serialisedComponent = new SerialisedDrawableInfo((Drawable)Activator.CreateInstance(newCatchComboCounter)!)
+                        {
+                            Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.Centre
+                        };
+
                         // add catch-specific combo counter.
                         catchHUDComponents =
                             catchHUDComponents
-                                .Append(new SerialisedDrawableInfo((Drawable)Activator.CreateInstance(newCatchComboCounter)!))
+                                .Append(serialisedComponent)
                                 .ToArray();
 
                         layout.Update(ruleset, catchHUDComponents);

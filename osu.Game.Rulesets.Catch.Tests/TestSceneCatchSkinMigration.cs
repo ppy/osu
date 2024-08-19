@@ -66,6 +66,11 @@ namespace osu.Game.Rulesets.Catch.Tests
             AddUntilStep("wait for load", () => rulesetHUDTarget.ComponentsLoaded);
 
             AddAssert("catch specific combo counter in ruleset target", () => rulesetHUDTarget.Components.OfType<LegacyCatchComboCounter>(), () => Has.One.Items);
+            AddAssert("correct anchor/origin", () =>
+            {
+                var catchComboCounter = rulesetHUDTarget.Components.OfType<LegacyCatchComboCounter>().Single();
+                return catchComboCounter.Anchor == Anchor.CentreLeft && catchComboCounter.Origin == Anchor.Centre;
+            });
         }
 
         private Skin importSkinFromArchives(string filename)
