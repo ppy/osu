@@ -209,9 +209,7 @@ namespace osu.Game.Rulesets.Edit
 
                 case MouseButtonEvent mouse:
                     // placement blueprints should generally block mouse from reaching underlying components (ie. performing clicks on interface buttons).
-                    // for now, the one exception we want to allow is when using a non-main mouse button when shift is pressed, which is used to trigger object deletion
-                    // while in placement mode.
-                    return mouse.Button == MouseButton.Left || !mouse.ShiftPressed;
+                    return mouse.Button == MouseButton.Left || PlacementActive == PlacementState.Active;
 
                 default:
                     return false;
