@@ -13,6 +13,7 @@ using osu.Game.Rulesets.Osu.UI.Cursor;
 using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Play;
 using osuTK.Graphics;
+using TagLib.Flac;
 
 namespace osu.Game.Rulesets.Osu.UI
 {
@@ -172,12 +173,13 @@ namespace osu.Game.Rulesets.Osu.UI
                 Depth = float.MinValue;
             }
 
-            public bool OnPressed(KeyBindingPressEvent<OsuAction> e)
+            protected override void Update()
             {
-                bool block = BlockNextPress;
+                base.Update();
                 BlockNextPress = false;
-                return block;
             }
+
+            public bool OnPressed(KeyBindingPressEvent<OsuAction> e) => BlockNextPress;
 
             public void OnReleased(KeyBindingReleaseEvent<OsuAction> e)
             {
