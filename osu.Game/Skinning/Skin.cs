@@ -288,7 +288,7 @@ namespace osu.Game.Skinning
 
                         if (layout.TryGetDrawableInfo(ruleset, out var rulesetHUDComponents))
                         {
-                            Type newCatchComboCounter = SerialisedDrawableInfo.GetAllAvailableDrawables(ruleset).Single(t => t.IsAssignableFrom(typeof(LegacyComboCounter)));
+                            Type newCatchComboCounter = SerialisedDrawableInfo.GetAllAvailableDrawables(ruleset).Single(t => t.IsAssignableTo(typeof(LegacyComboCounter)));
 
                             // add catch-specific combo counter.
                             rulesetHUDComponents =
