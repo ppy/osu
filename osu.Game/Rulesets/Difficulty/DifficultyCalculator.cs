@@ -294,7 +294,7 @@ namespace osu.Game.Rulesets.Difficulty
         /// <summary>
         /// Used to calculate timed difficulty attributes, where only a subset of hitobjects should be visible at any point in time.
         /// </summary>
-        protected class ProgressiveCalculationBeatmap : IBeatmap
+        private class ProgressiveCalculationBeatmap : IBeatmap
         {
             private readonly IBeatmap baseBeatmap;
 
@@ -317,15 +317,15 @@ namespace osu.Game.Rulesets.Difficulty
                 hitObjectsCounts[objectType]++;
 
                 addCombo(hitObject);
+            }
 
-                void addCombo(HitObject hitObject)
-                {
-                    if (hitObject.Judgement.MaxResult.AffectsCombo())
-                        maxCombo++;
+            private void addCombo(HitObject hitObject)
+            {
+                if (hitObject.Judgement.MaxResult.AffectsCombo())
+                    maxCombo++;
 
-                    foreach (var nested in hitObject.NestedHitObjects)
-                        addCombo(nested);
-                };
+                foreach (var nested in hitObject.NestedHitObjects)
+                    addCombo(nested);
             }
 
             private readonly List<HitObject> hitObjects = new List<HitObject>();
