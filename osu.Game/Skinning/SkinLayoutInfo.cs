@@ -26,6 +26,7 @@ namespace osu.Game.Skinning
         /// <list type="bullet">
         /// <item><description>0: Initial version of all skin layouts.</description></item>
         /// <item><description>1: Moves existing combo counters from global to per-ruleset HUD targets.</description></item>
+        /// <item><description>2: Adds catch combo counter to catch-specific HUD target for skins with existing layout configuration.</description></item>
         /// </list>
         /// </remarks>
         public const int LATEST_VERSION = 2;
