@@ -12,8 +12,10 @@ using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Users;
 using osu.Game.Users.Drawables;
+using osu.Framework.Graphics.Sprites;
 using osuTK;
 using osuTK.Graphics;
+using osu.Framework.Graphics.Textures;
 
 namespace osu.Game.Tournament.Components
 {
@@ -35,11 +37,16 @@ namespace osu.Game.Tournament.Components
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(TextureStore textures)
         {
+            AltBackground.Texture = textures.Get("Icons/usercard-default");
+            AltBackground.Colour = ColourInfo.GradientHorizontal(Color4Extensions.FromHex("#43C7DE").Opacity(0.5f), Color4.White.Opacity(0.5f));
+            AltBackground.FillMode = FillMode.Fill;
+            AltBackground.Origin = Anchor.CentreRight;
+            AltBackground.Anchor = Anchor.CentreRight;
             Background.Origin = Anchor.CentreRight;
             Background.Anchor = Anchor.CentreRight;
-            Background.Colour = ColourInfo.GradientHorizontal(Color4.White.Opacity(1), Color4.White.Opacity(0.8f));
+            Background.Colour = Color4.Gray;
 
             var request = new GetUserRequest(User.Id);
 
@@ -96,12 +103,22 @@ namespace osu.Game.Tournament.Components
                                 Masking = true,
                                 CornerRadius = 6,
                                 Margin = new MarginPadding { Left = 10 },
-                                Child = new UpdateableAvatar(user: teamPlayer)
+                                Children = new Drawable[]
                                 {
-                                    Anchor = Anchor.CentreLeft,
-                                    Origin = Anchor.CentreLeft,
-                                    Size = new Vector2(40),
-                                },
+                                    new SpriteIcon
+                                    {
+                                        Anchor = Anchor.CentreLeft,
+                                        Origin = Anchor.CentreLeft,
+                                        Size = new Vector2(25),
+                                        Icon = FontAwesome.Solid.UserAlt,
+                                    },
+                                    new UpdateableAvatar(user: teamPlayer)
+                                    {
+                                        Anchor = Anchor.CentreLeft,
+                                        Origin = Anchor.CentreLeft,
+                                        Size = new Vector2(40),
+                                    },
+                                }
                             },
                             CreateUsername().With(username =>
                             {

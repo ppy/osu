@@ -25,10 +25,11 @@ using osu.Game.Screens;
 using osu.Game.Screens.Play;
 using osu.Game.Users.Drawables;
 using osuTK;
-using osu.Game.Overlays.Profile.Header.Components;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Localisation;
+using osu.Framework.Graphics.Textures;
+using osu.Framework.Graphics.Sprites;
 
 namespace osu.Game.Users
 {
@@ -45,6 +46,8 @@ namespace osu.Game.Users
         protected Action ViewProfile { get; private set; } = null!;
 
         private readonly IBindable<UserStatistics?> statistics = new Bindable<UserStatistics?>();
+
+        protected Sprite AltBackground { get; private set; } = null!;
 
         protected Drawable Background { get; private set; } = null!;
 
@@ -86,7 +89,7 @@ namespace osu.Game.Users
         private MultiplayerClient? multiplayerClient { get; set; }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(TextureStore textures)
         {
             // Initialize globalRankDisplay
             globalRankDisplay = new OsuSpriteText
@@ -112,12 +115,21 @@ namespace osu.Game.Users
             Add(new Box
             {
                 RelativeSizeAxes = Axes.Both,
-                Colour = ColourProvider?.Background5 ?? Colours.Gray1
+                Colour = ColourProvider?.Background5 ?? Colours.Gray1,
+                Alpha = 0.6f,
             });
+
+            var altBackground = CreateAltBackground();
+            if (altBackground != null)
+            {
+                Add(altBackground);
+            }
 
             var background = CreateBackground();
             if (background != null)
+            {
                 Add(background);
+            }
 
             Add(CreateLayout());
 
@@ -141,6 +153,13 @@ namespace osu.Game.Users
             Anchor = Anchor.Centre,
             Origin = Anchor.Centre,
             User = User
+        };
+
+        protected virtual Sprite? CreateAltBackground() => AltBackground = new Sprite
+        {
+            RelativeSizeAxes = Axes.Both,
+            Anchor = Anchor.Centre,
+            Origin = Anchor.Centre,
         };
 
         protected OsuSpriteText CreateUsername() => new OsuSpriteText
