@@ -28,7 +28,7 @@ namespace osu.Game.Skinning
         /// <item><description>1: Moves existing combo counters from global to per-ruleset HUD targets.</description></item>
         /// </list>
         /// </remarks>
-        public const int LATEST_VERSION = 1;
+        public const int LATEST_VERSION = 2;
 
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.Populate)]
         public int Version = LATEST_VERSION;

@@ -393,6 +393,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddAssert("no combo in global target", () => !globalHUDTarget.Components.OfType<ArgonComboCounter>().Any());
             AddAssert("combo placed in ruleset target", () => rulesetHUDTarget.Components.OfType<ArgonComboCounter>().Count() == 1);
 
+            // Add back migrated component and reload skin to check that the migration is only applied once.
             AddStep("add combo to global target", () => globalHUDTarget.Add(new ArgonComboCounter
             {
                 Anchor = Anchor.Centre,
@@ -418,6 +419,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddAssert("no combo in global target", () => !globalHUDTarget.Components.OfType<DefaultComboCounter>().Any());
             AddAssert("combo placed in ruleset target", () => rulesetHUDTarget.Components.OfType<DefaultComboCounter>().Count() == 1);
 
+            // Add back migrated component and reload skin to check that the migration is only applied once.
             AddStep("add combo to global target", () => globalHUDTarget.Add(new DefaultComboCounter
             {
                 Anchor = Anchor.Centre,
@@ -443,6 +445,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddAssert("no combo in global target", () => !globalHUDTarget.Components.OfType<LegacyComboCounter>().Any());
             AddAssert("combo placed in ruleset target", () => rulesetHUDTarget.Components.OfType<LegacyComboCounter>().Count() == 1);
 
+            // Add back migrated component and reload skin to check that the migration is only applied once.
             AddStep("add combo to global target", () => globalHUDTarget.Add(new LegacyDefaultComboCounter
             {
                 Anchor = Anchor.Centre,

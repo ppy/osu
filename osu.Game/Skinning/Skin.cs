@@ -277,6 +277,29 @@ namespace osu.Game.Skinning
 
                     break;
                 }
+
+                case 2:
+                {
+                    resources?.RealmAccess.Run(r =>
+                    {
+                        var ruleset = r.Find<RulesetInfo>("fruits");
+
+                        if (layout.TryGetDrawableInfo(ruleset, out var rulesetHUDComponents))
+                        {
+                            Type newCatchComboCounter = SerialisedDrawableInfo.GetAllAvailableDrawables(ruleset).Single(t => t.IsAssignableFrom(typeof(LegacyComboCounter)));
+
+                            // replace with catch-specific combo counter.
+                            rulesetHUDComponents =
+                                rulesetHUDComponents
+                                    .Append(new SerialisedDrawableInfo((Drawable)Activator.CreateInstance(newCatchComboCounter)!))
+                                    .ToArray();
+
+                            layout.Update(ruleset, rulesetHUDComponents);
+                        }
+                    });
+
+                    break;
+                }
             }
         }
 
