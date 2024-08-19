@@ -32,7 +32,6 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
 
         private int lastDisplayedCombo;
 
-        bool ISerialisableDrawable.SupportsClosestAnchor => false;
 
         public LegacyCatchComboCounter()
         {
