@@ -25,7 +25,7 @@ namespace osu.Game.Rulesets.Catch.Tests
         [Cached(typeof(ScoreProcessor))]
         private ScoreProcessor scoreProcessor;
 
-        private Color4 judgedObjectColour = Color4.White;
+        private Color4? judgedObjectColour;
 
         public TestSceneComboCounter()
         {
@@ -61,23 +61,27 @@ namespace osu.Game.Rulesets.Catch.Tests
         [Test]
         public void TestCatchComboCounter()
         {
-            AddRepeatStep("perform hit", () => performJudgement(HitResult.Great), 20);
-            AddStep("perform miss", () => performJudgement(HitResult.Miss));
-
-            AddStep("randomize judged object colour", () =>
+            AddRepeatStep("perform hit", () =>
             {
-                judgedObjectColour = new Color4(
-                    RNG.NextSingle(1f),
-                    RNG.NextSingle(1f),
-                    RNG.NextSingle(1f),
-                    1f
-                );
-            });
+                if (judgedObjectColour == null || RNG.NextDouble() > 0.8)
+                {
+                    judgedObjectColour = new Color4(
+                        RNG.NextSingle(1f),
+                        RNG.NextSingle(1f),
+                        RNG.NextSingle(1f),
+                        1f
+                    );
+                }
+
+                performJudgement(HitResult.Great);
+            }, 20);
+
+            AddStep("perform miss", () => performJudgement(HitResult.Miss));
         }
 
         private void performJudgement(HitResult type, Judgement? judgement = null)
         {
-            var judgedObject = new DrawableFruit(new ColourfulFruit(judgedObjectColour));
+            var judgedObject = new DrawableFruit(new ColourfulFruit(judgedObjectColour!.Value));
 
             var result = new JudgementResult(judgedObject.HitObject, judgement ?? new Judgement()) { Type = type };
             scoreProcessor.ApplyResult(result);
