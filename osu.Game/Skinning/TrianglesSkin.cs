@@ -64,12 +64,12 @@ namespace osu.Game.Skinning
             // Temporary until default skin has a valid hit lighting.
             if ((lookup as SkinnableSprite.SpriteComponentLookup)?.LookupName == @"lighting") return Drawable.Empty();
 
-            if (base.GetDrawableComponent(lookup) is Drawable c)
-                return c;
-
             switch (lookup)
             {
                 case SkinComponentsContainerLookup containerLookup:
+                    if (base.GetDrawableComponent(lookup) is UserConfiguredLayoutContainer c)
+                        return c;
+
                     // Only handle global level defaults for now.
                     if (containerLookup.Ruleset != null)
                         return null;
@@ -178,7 +178,7 @@ namespace osu.Game.Skinning
                     return null;
             }
 
-            return null;
+            return base.GetDrawableComponent(lookup);
         }
 
         public override IBindable<TValue>? GetConfig<TLookup, TValue>(TLookup lookup)

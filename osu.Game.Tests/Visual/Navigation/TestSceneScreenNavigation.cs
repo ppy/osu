@@ -47,6 +47,7 @@ using osu.Game.Screens.Select.Carousel;
 using osu.Game.Screens.Select.Leaderboards;
 using osu.Game.Screens.Select.Options;
 using osu.Game.Tests.Beatmaps.IO;
+using osu.Game.Utils;
 using osuTK;
 using osuTK.Input;
 using SharpCompress;
@@ -240,11 +241,14 @@ namespace osu.Game.Tests.Visual.Navigation
 
             AddStep("change beatmap files", () =>
             {
-                foreach (var file in Game.Beatmap.Value.BeatmapSetInfo.Files.Where(f => Path.GetExtension(f.Filename) == ".osu"))
+                FileUtils.AttemptOperation(() =>
                 {
-                    using (var stream = Game.Storage.GetStream(Path.Combine("files", file.File.GetStoragePath()), FileAccess.ReadWrite))
-                        stream.WriteByte(0);
-                }
+                    foreach (var file in Game.Beatmap.Value.BeatmapSetInfo.Files.Where(f => Path.GetExtension(f.Filename) == ".osu"))
+                    {
+                        using (var stream = Game.Storage.GetStream(Path.Combine("files", file.File.GetStoragePath()), FileAccess.ReadWrite))
+                            stream.WriteByte(0);
+                    }
+                });
             });
 
             AddStep("invalidate cache", () =>
@@ -272,8 +276,11 @@ namespace osu.Game.Tests.Visual.Navigation
 
             AddStep("delete beatmap files", () =>
             {
-                foreach (var file in Game.Beatmap.Value.BeatmapSetInfo.Files.Where(f => Path.GetExtension(f.Filename) == ".osu"))
-                    Game.Storage.Delete(Path.Combine("files", file.File.GetStoragePath()));
+                FileUtils.AttemptOperation(() =>
+                {
+                    foreach (var file in Game.Beatmap.Value.BeatmapSetInfo.Files.Where(f => Path.GetExtension(f.Filename) == ".osu"))
+                        Game.Storage.Delete(Path.Combine("files", file.File.GetStoragePath()));
+                });
             });
 
             AddStep("invalidate cache", () =>
@@ -952,6 +959,8 @@ namespace osu.Game.Tests.Visual.Navigation
         [Test]
         public void TestTouchScreenDetectionAtSongSelect()
         {
+            AddUntilStep("wait for settings", () => Game.Settings.IsLoaded);
+
             AddStep("touch logo", () =>
             {
                 var button = Game.ChildrenOfType<OsuLogo>().Single();

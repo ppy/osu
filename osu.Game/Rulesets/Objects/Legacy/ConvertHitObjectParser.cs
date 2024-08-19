@@ -32,7 +32,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
         protected readonly double Offset;
 
         /// <summary>
-        /// The beatmap version.
+        /// The .osu format (beatmap) version.
         /// </summary>
         protected readonly int FormatVersion;
 
@@ -48,7 +48,10 @@ namespace osu.Game.Rulesets.Objects.Legacy
         {
             string[] split = text.Split(',');
 
-            Vector2 pos = new Vector2((int)Parsing.ParseFloat(split[0], Parsing.MAX_COORDINATE_VALUE), (int)Parsing.ParseFloat(split[1], Parsing.MAX_COORDINATE_VALUE));
+            Vector2 pos =
+                FormatVersion >= LegacyBeatmapEncoder.FIRST_LAZER_VERSION
+                    ? new Vector2(Parsing.ParseFloat(split[0], Parsing.MAX_COORDINATE_VALUE), Parsing.ParseFloat(split[1], Parsing.MAX_COORDINATE_VALUE))
+                    : new Vector2((int)Parsing.ParseFloat(split[0], Parsing.MAX_COORDINATE_VALUE), (int)Parsing.ParseFloat(split[1], Parsing.MAX_COORDINATE_VALUE));
 
             double startTime = Parsing.ParseDouble(split[2]) + Offset;
 
