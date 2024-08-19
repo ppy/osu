@@ -260,14 +260,8 @@ namespace osu.Game.Tournament.Screens.Board
             if (CurrentMatch.Value?.Round.Value == null)
                 return;
 
-            int totalBansRequired = CurrentMatch.Value.Round.Value.BanCount.Value * 2;
-
-            if (CurrentMatch.Value.PicksBans.Count(p => p.Type == ChoiceType.Ban) < totalBansRequired)
-                return;
-
-            // if bans have already been placed, beatmap changes result in a selection being made automatically
-            // if (beatmap.NewValue?.OnlineID > 0)
-            //     addForBeatmap(beatmap.NewValue.OnlineID);
+            if (beatmap.NewValue?.OnlineID > 0)
+                addForBeatmap(beatmap.NewValue.OnlineID);
         }
 
         private void setMode(TeamColour colour, ChoiceType choiceType)
@@ -293,14 +287,13 @@ namespace osu.Game.Tournament.Screens.Board
                     addForBeatmap(map.Beatmap.OnlineID);
                 else
                 {
-                    var existing = CurrentMatch.Value?.PicksBans.FirstOrDefault(p => p.BeatmapID == map.Beatmap?.OnlineID);
+                    var existing = CurrentMatch.Value?.EXPicks.FirstOrDefault(p => p.BeatmapID == map.Beatmap?.OnlineID);
 
                     if (existing != null)
                     {
-                        CurrentMatch.Value?.PicksBans.Remove(existing);
+                        CurrentMatch.Value?.EXPicks.Remove(existing);
                     }
                 }
-
                 return true;
             }
 
@@ -309,7 +302,7 @@ namespace osu.Game.Tournament.Screens.Board
 
         private void reset()
         {
-            CurrentMatch.Value?.PicksBans.Clear();
+            CurrentMatch.Value?.EXPicks.Clear();
 
             // Reset buttons
             buttonPick.Colour = Color4.White;
@@ -327,23 +320,22 @@ namespace osu.Game.Tournament.Screens.Board
                 return;
 
             // In EX stage, just remove any existing marks before adding a new one.
-            if (CurrentMatch.Value.PicksBans.Any(p => p.BeatmapID == beatmapId))
+            if (CurrentMatch.Value.EXPicks.Any(p => p.BeatmapID == beatmapId))
             {
-                var existing = CurrentMatch.Value.PicksBans.FirstOrDefault(p => p.BeatmapID == beatmapId);
-                if (existing != null) CurrentMatch.Value.PicksBans.Remove(existing);
+                var existing = CurrentMatch.Value.EXPicks.FirstOrDefault(p => p.BeatmapID == beatmapId);
+                if (existing != null) CurrentMatch.Value.EXPicks.Remove(existing);
             }
 
-            CurrentMatch.Value.PicksBans.Add(new BeatmapChoice
+            CurrentMatch.Value.EXPicks.Add(new BeatmapChoice
             {
                 Team = pickColour,
                 Type = pickType,
                 BeatmapID = beatmapId,
-                Token = true,
             });
 
             if (LadderInfo.AutoProgressScreens.Value)
             {
-                if (pickType == ChoiceType.Pick && CurrentMatch.Value.PicksBans.Any(i => i.Type == ChoiceType.Pick))
+                if (pickType == ChoiceType.Pick && CurrentMatch.Value.EXPicks.Any(i => i.Type == ChoiceType.Pick))
                 {
                     scheduledScreenChange?.Cancel();
                     scheduledScreenChange = Scheduler.AddDelayed(() => { sceneManager?.SetScreen(typeof(GameplayScreen)); }, 10000);

@@ -158,9 +158,9 @@ namespace osu.Game.Tournament.Components
         private void matchChanged(ValueChangedEvent<TournamentMatch?> match)
         {
             if (match.OldValue != null)
-                match.OldValue.PicksBans.CollectionChanged -= picksBansOnCollectionChanged;
+                match.OldValue.EXPicks.CollectionChanged -= picksBansOnCollectionChanged;
             if (match.NewValue != null)
-                match.NewValue.PicksBans.CollectionChanged += picksBansOnCollectionChanged;
+                match.NewValue.EXPicks.CollectionChanged += picksBansOnCollectionChanged;
 
             Scheduler.AddOnce(updateState);
         }
@@ -177,19 +177,12 @@ namespace osu.Game.Tournament.Components
                 return;
             }
 
-            var newChoice = currentMatch.Value.PicksBans.FirstOrDefault(p => p.BeatmapID == Beatmap?.OnlineID);
+            var newChoice = currentMatch.Value.EXPicks.FirstOrDefault(p => p.BeatmapID == Beatmap?.OnlineID);
 
             bool shouldFlash = newChoice != choice;
 
             if (newChoice != null)
             {
-                // Auto selecting is bothering us! Fight back!
-                if (!newChoice.Token)
-                {
-                    currentMatch.Value.PicksBans.Remove(newChoice);
-                    return;
-                }
-
                 if (shouldFlash)
                     flash.FadeOutFromOne(duration: 900, easing: Easing.OutSine).Loop(0, 3);
 
@@ -202,37 +195,20 @@ namespace osu.Game.Tournament.Components
                     case ChoiceType.Pick:
                         backgroundAddition.Colour = Color4.White;
                         backgroundAddition.FadeTo(newAlpha: 0, duration: 150, easing: Easing.InCubic);
-                        Alpha = 1;
-                        break;
-
-                    case ChoiceType.Ban:
-                        backgroundAddition.Colour = Color4.Gray;
-                        backgroundAddition.FadeTo(newAlpha: 0.5f, duration: 150, easing: Easing.InCubic);
-                        Alpha = 0.5f;
-                        break;
-
-                    case ChoiceType.Protect:
-                        backgroundAddition.Colour = new OsuColour().Cyan;
-                        backgroundAddition.FadeTo(newAlpha: 0.3f, duration: 150, easing: Easing.InCubic);
-                        Alpha = 0.9f;
                         break;
 
                     case ChoiceType.RedWin:
                         backgroundAddition.Colour = new OsuColour().Red;
                         backgroundAddition.FadeTo(newAlpha: 0.35f, duration: 100, easing: Easing.InCubic);
-                        Alpha = 1;
                         break;
 
                     case ChoiceType.BlueWin:
                         backgroundAddition.Colour = new OsuColour().Sky;
                         backgroundAddition.FadeTo(newAlpha: 0.4f, duration: 100, easing: Easing.InCubic);
-                        Alpha = 1;
                         break;
 
-                    case ChoiceType.Trap:
-                        backgroundAddition.Colour = new OsuColour().PurpleLight;
-                        backgroundAddition.FadeTo(newAlpha: 0.2f, duration: 150, easing: Easing.InCubic);
-                        Alpha = 1;
+                    default:
+                        backgroundAddition.Colour = Color4.White;
                         break;
                 }
             }
