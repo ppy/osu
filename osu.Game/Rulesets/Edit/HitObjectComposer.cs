@@ -270,7 +270,7 @@ namespace osu.Game.Rulesets.Edit
             TernaryStates = CreateTernaryButtons().ToArray();
             togglesCollection.AddRange(TernaryStates.Select(b => new DrawableTernaryButton(b)));
 
-            sampleBankTogglesCollection.AddRange(BlueprintContainer.SampleBankTernaryStates.Zip(BlueprintContainer.SampleAdditionBankTernaryStates).Select(b => new DoubleDrawableTernaryButton(b.First, b.Second)));
+            sampleBankTogglesCollection.AddRange(BlueprintContainer.SampleBankTernaryStates.Zip(BlueprintContainer.SampleAdditionBankTernaryStates).Select(b => new SampleBankTernaryButton(b.First, b.Second)));
 
             setSelectTool();
 
@@ -422,40 +422,28 @@ namespace osu.Game.Rulesets.Edit
             {
                 if (e.ShiftPressed || e.AltPressed)
                 {
-                    if (e.ShiftPressed)
-                        attemptToggle(rightIndex, sampleBankTogglesCollection);
+                    if (sampleBankTogglesCollection.ElementAtOrDefault(rightIndex) is SampleBankTernaryButton sampleBankTernaryButton)
+                    {
+                        if (e.ShiftPressed)
+                            sampleBankTernaryButton.NormalButton.Toggle();
 
-                    if (e.AltPressed)
-                        attemptToggle(rightIndex, sampleBankTogglesCollection, true);
+                        if (e.AltPressed)
+                            sampleBankTernaryButton.AdditionsButton.Toggle();
+
+                        return true;
+                    }
                 }
                 else
-                    attemptToggle(rightIndex, togglesCollection);
-            }
-
-            return handled || base.OnKeyDown(e);
-
-            void attemptToggle(int index, FillFlowContainer collection, bool second = false)
-            {
-                var item = collection.ElementAtOrDefault(index);
-
-                switch (item)
                 {
-                    case DrawableTernaryButton button:
-                        button.Button.Toggle();
-                        handled = true;
-                        break;
-
-                    case DoubleDrawableTernaryButton doubleButton:
+                    if (togglesCollection.ElementAtOrDefault(rightIndex) is DrawableTernaryButton button)
                     {
-                        if (second)
-                            doubleButton.Button2.Toggle();
-                        else
-                            doubleButton.Button1.Toggle();
-                        handled = true;
-                        break;
+                        button.Button.Toggle();
+                        return true;
                     }
                 }
             }
+
+            return base.OnKeyDown(e);
         }
 
         private bool checkLeftToggleFromKey(Key key, out int index)
