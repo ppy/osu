@@ -101,7 +101,7 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
             PopOutCountText.FadeTo(0.7f)
                            .FadeOut(pop_out_duration);
 
-            this.Delay(main_duration - 140).Schedule(() =>
+            this.Delay(pop_out_duration - 140).Schedule(() =>
             {
                 base.OnCountIncrement();
             }, out scheduledPopOut);
