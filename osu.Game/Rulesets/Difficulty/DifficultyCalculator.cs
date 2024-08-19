@@ -303,6 +303,10 @@ namespace osu.Game.Rulesets.Difficulty
                 this.baseBeatmap = baseBeatmap;
             }
 
+            private int maxCombo;
+
+            public int GetMaxCombo() => maxCombo;
+
             public void AddHitObject(HitObject hitObject)
             {
                 hitObjects.Add(hitObject);
@@ -311,6 +315,17 @@ namespace osu.Game.Rulesets.Difficulty
                 if (!hitObjectsCounts.ContainsKey(objectType))
                     hitObjectsCounts[objectType] = 0; // Initialize to 0 if not present
                 hitObjectsCounts[objectType]++;
+
+                addCombo(hitObject);
+
+                void addCombo(HitObject hitObject)
+                {
+                    if (hitObject.Judgement.MaxResult.AffectsCombo())
+                        maxCombo++;
+
+                    foreach (var nested in hitObject.NestedHitObjects)
+                        addCombo(nested);
+                };
             }
 
             private readonly List<HitObject> hitObjects = new List<HitObject>();
@@ -320,24 +335,6 @@ namespace osu.Game.Rulesets.Difficulty
             public int GetHitObjectCountOf(Type type) => hitObjectsCounts.GetValueOrDefault(type);
 
             IReadOnlyList<HitObject> IBeatmap.HitObjects => hitObjects;
-
-            private int comboObjectIndex, combo;
-
-            public int GetMaxCombo()
-            {
-                for (; comboObjectIndex < hitObjects.Count; comboObjectIndex++)
-                    addCombo(hitObjects[comboObjectIndex], ref combo);
-                return combo;
-
-                static void addCombo(HitObject hitObject, ref int combo)
-                {
-                    if (hitObject.Judgement.MaxResult.AffectsCombo())
-                        combo++;
-
-                    foreach (var nested in hitObject.NestedHitObjects)
-                        addCombo(nested, ref combo);
-                }
-            }
 
             #region Delegated IBeatmap implementation
 

@@ -198,6 +198,10 @@ namespace osu.Game.Screens.Edit
 
         public double GetMostCommonBeatLength() => PlayableBeatmap.GetMostCommonBeatLength();
 
+        public int GetMaxCombo() => PlayableBeatmap.GetMaxCombo();
+
+        public int GetHitObjectCountOf(Type type) => PlayableBeatmap.GetHitObjectCountOf(type);
+
         public IBeatmap Clone() => (EditorBeatmap)MemberwiseClone();
 
         private IList mutableHitObjects => (IList)PlayableBeatmap.HitObjects;
