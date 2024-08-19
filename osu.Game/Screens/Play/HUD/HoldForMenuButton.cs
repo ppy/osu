@@ -30,6 +30,8 @@ namespace osu.Game.Screens.Play.HUD
     {
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
 
+        public override bool PropagatePositionalInputSubTree => alwaysShow.Value || touchActive.Value;
+
         public readonly Bindable<bool> IsPaused = new Bindable<bool>();
 
         public readonly Bindable<bool> ReplayLoaded = new Bindable<bool>();
@@ -41,8 +43,6 @@ namespace osu.Game.Screens.Play.HUD
         private OsuSpriteText text;
 
         private Bindable<bool> alwaysShow;
-
-        public override bool PropagatePositionalInputSubTree => alwaysShow.Value || touchActive.Value;
 
         public HoldForMenuButton()
         {
@@ -123,10 +123,13 @@ namespace osu.Game.Screens.Play.HUD
         {
             base.Update();
 
+            // While the button is hovered or still animating, keep fully visible.
             if (text.Alpha > 0 || button.Progress.Value > 0 || button.IsHovered)
                 Alpha = 1;
+            // When touch input is detected, keep visible at a constant opacity.
             else if (touchActive.Value)
-                Alpha = 0.08f;
+                Alpha = 0.5f;
+            // Otherwise, if the user chooses, show it when the mouse is nearby.
             else if (alwaysShow.Value)
             {
                 float minAlpha = touchActive.Value ? .08f : 0;
@@ -136,9 +139,7 @@ namespace osu.Game.Screens.Play.HUD
                     Alpha, Math.Clamp(1 - positionalAdjust, minAlpha, 1), 0, 200, Easing.OutQuint);
             }
             else
-            {
                 Alpha = 0;
-            }
         }
 
         private partial class HoldButton : HoldToConfirmContainer, IKeyBindingHandler<GlobalAction>
