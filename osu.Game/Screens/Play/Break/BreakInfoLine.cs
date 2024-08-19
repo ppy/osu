@@ -11,13 +11,14 @@ using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Utils;
+using osuTK;
 
 namespace osu.Game.Screens.Play.Break
 {
     public partial class BreakInfoLine<T> : Container
         where T : struct
     {
-        private const int margin = 2;
+        private const int spacing = 4;
 
         public Bindable<T> Current = new Bindable<T>();
 
@@ -35,25 +36,27 @@ namespace osu.Game.Screens.Play.Break
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            Children = new Drawable[]
+            Child = new FillFlowContainer
             {
-                new OsuSpriteText
+                AutoSizeAxes = Axes.Both,
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                Direction = FillDirection.Horizontal,
+                Spacing = new Vector2(spacing, 0),
+                Children = new Drawable[]
                 {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.CentreRight,
-                    Text = name,
-                    Font = OsuFont.GetFont(size: 17),
-                    Margin = new MarginPadding { Right = margin },
-                    Colour = colours.Yellow,
-                },
-                valueText = new OsuSpriteText
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.CentreLeft,
-                    Text = @"-",
-                    Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 17),
-                    Margin = new MarginPadding { Left = margin },
-                    Colour = colours.YellowLight,
+                    new OsuSpriteText
+                    {
+                        Text = name,
+                        Font = OsuFont.GetFont(size: 17),
+                        Colour = colours.Yellow,
+                    },
+                    valueText = new OsuSpriteText
+                    {
+                        Text = @"-",
+                        Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 17),
+                        Colour = colours.YellowLight,
+                    }
                 }
             };
 
