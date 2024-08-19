@@ -142,7 +142,7 @@ namespace osu.Game.Tests.Visual.Menus
                     new UserStatistics
                     {
                         GlobalRank = 111_111,
-                        PP = 1357
+                        PP = 1357.1m
                     });
             });
             AddStep("Was null", () =>
