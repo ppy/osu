@@ -122,27 +122,26 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
                 counter.Current.Value = 0;
                 explosion.Current.Value = 0;
 
-                this.FadeOut(400, Easing.Out);
+                this.FadeOut(100);
             }
             else
             {
                 this.FadeInFromZero().Then().Delay(1000).FadeOut(300);
 
-                counter.ScaleTo(1.5f)
-                       .ScaleTo(0.8f, 250, Easing.Out)
-                       .OnComplete(c => c.SetCountWithoutRolling(combo.Value));
-
-                counter.Delay(250)
-                       .ScaleTo(1f)
-                       .ScaleTo(1.1f, 60).Then().ScaleTo(1f, 30);
+                counter.ScaleTo(2)
+                       .ScaleTo(1, 300, Easing.Out);
 
                 var catchObject = (CatchHitObject)judgement.NewValue.HitObject;
+
                 explosion.Colour = ((IHasComboInformation)catchObject).GetComboColour(skin);
 
                 explosion.SetCountWithoutRolling(combo.Value);
-                explosion.ScaleTo(1.5f)
-                         .ScaleTo(1.9f, 400, Easing.Out)
-                         .FadeOutFromOne(400);
+                explosion.ScaleTo(2)
+                         .ScaleTo(2.4f, 400, Easing.Out)
+                         .FadeTo(0.7f)
+                         .FadeOut(400);
+
+                Scheduler.AddDelayed(() => counter.SetCountWithoutRolling(combo.Value), 260);
             }
         }
     }

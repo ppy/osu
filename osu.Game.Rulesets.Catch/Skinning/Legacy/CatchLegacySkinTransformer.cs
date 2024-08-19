@@ -67,7 +67,6 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
                                 {
                                     combo.Anchor = Anchor.CentreLeft;
                                     combo.Origin = Anchor.Centre;
-                                    combo.Scale = new Vector2(0.8f);
                                 }
                             })
                             {
