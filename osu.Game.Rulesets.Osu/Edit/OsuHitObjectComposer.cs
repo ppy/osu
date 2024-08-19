@@ -65,7 +65,7 @@ namespace osu.Game.Rulesets.Osu.Edit
         private Bindable<HitObject> placementObject;
 
         [Cached(typeof(IDistanceSnapProvider))]
-        protected readonly OsuDistanceSnapProvider DistanceSnapProvider = new OsuDistanceSnapProvider();
+        public readonly OsuDistanceSnapProvider DistanceSnapProvider = new OsuDistanceSnapProvider();
 
         [Cached]
         protected readonly OsuGridToolboxGroup OsuGridToolboxGroup = new OsuGridToolboxGroup();
@@ -110,6 +110,7 @@ namespace osu.Game.Rulesets.Osu.Edit
                         RotationHandler = BlueprintContainer.SelectionHandler.RotationHandler,
                         ScaleHandler = (OsuSelectionScaleHandler)BlueprintContainer.SelectionHandler.ScaleHandler,
                     },
+                    new GenerateToolboxGroup(),
                     FreehandSliderToolboxGroup
                 }
             );
