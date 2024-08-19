@@ -265,6 +265,8 @@ __pycache__/
 .idea/**/usage.statistics.xml
 .idea/**/dictionaries
 .idea/**/shelf
+.idea/*/.idea/projectSettingsUpdater.xml
+.idea/*/.idea/encodings.xml
 
 # Generated files
 .idea/**/contentModel.xml

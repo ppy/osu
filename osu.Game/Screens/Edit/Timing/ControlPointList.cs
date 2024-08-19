@@ -7,10 +7,8 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Game.Beatmaps.ControlPoints;
-using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Overlays;
@@ -21,11 +19,7 @@ namespace osu.Game.Screens.Edit.Timing
     public partial class ControlPointList : CompositeDrawable
     {
         private OsuButton deleteButton = null!;
-        private ControlPointTable table = null!;
-        private OsuScrollContainer scroll = null!;
         private RoundedButton addButton = null!;
-
-        private readonly IBindableList<ControlPointGroup> controlPointGroups = new BindableList<ControlPointGroup>();
 
         [Resolved]
         private EditorClock clock { get; set; } = null!;
@@ -36,9 +30,6 @@ namespace osu.Game.Screens.Edit.Timing
         [Resolved]
         private Bindable<ControlPointGroup?> selectedGroup { get; set; } = null!;
 
-        [Resolved]
-        private IEditorChangeHandler? changeHandler { get; set; }
-
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colours)
         {
@@ -47,21 +38,10 @@ namespace osu.Game.Screens.Edit.Timing
             const float margins = 10;
             InternalChildren = new Drawable[]
             {
-                new Box
-                {
-                    Colour = colours.Background4,
-                    RelativeSizeAxes = Axes.Both,
-                },
-                new Box
-                {
-                    Colour = colours.Background3,
-                    RelativeSizeAxes = Axes.Y,
-                    Width = ControlPointTable.TIMING_COLUMN_WIDTH + margins,
-                },
-                scroll = new OsuScrollContainer
+                new ControlPointTable
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Child = table = new ControlPointTable(),
+                    Groups = { BindTarget = Beatmap.ControlPointInfo.Groups, },
                 },
                 new FillFlowContainer
                 {
@@ -105,20 +85,6 @@ namespace osu.Game.Screens.Edit.Timing
                     ? "+ Clone to current time"
                     : "+ Add at current time";
             }, true);
-
-            controlPointGroups.BindTo(Beatmap.ControlPointInfo.Groups);
-            controlPointGroups.BindCollectionChanged((_, _) =>
-            {
-                // This callback can happen many times in a change operation. It gets expensive.
-                // We really should be handling the `CollectionChanged` event properly.
-                Scheduler.AddOnce(() =>
-                {
-                    table.ControlGroups = controlPointGroups;
-                    changeHandler?.SaveState();
-                });
-            }, true);
-
-            table.OnRowSelected += drawable => scroll.ScrollIntoView(drawable);
         }
 
         protected override bool OnClick(ClickEvent e)

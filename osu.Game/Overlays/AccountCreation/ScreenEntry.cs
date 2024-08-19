@@ -243,7 +243,7 @@ namespace osu.Game.Overlays.AccountCreation
 
             if (nextTextBox != null)
             {
-                Schedule(() => GetContainingFocusManager().ChangeFocus(nextTextBox));
+                Schedule(() => GetContainingFocusManager()!.ChangeFocus(nextTextBox));
                 return true;
             }
 

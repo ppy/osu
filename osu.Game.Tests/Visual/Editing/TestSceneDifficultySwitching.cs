@@ -12,7 +12,9 @@ using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Overlays.Dialog;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Catch;
 using osu.Game.Rulesets.Osu;
+using osu.Game.Rulesets.Taiko;
 using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Edit;
 using osu.Game.Storyboards;
@@ -163,6 +165,24 @@ namespace osu.Game.Tests.Visual.Editing
             });
 
             confirmEditingBeatmap(() => targetDifficulty);
+
+            AddStep("exit editor forcefully", () => Stack.Exit());
+            // ensure editor loader didn't resume.
+            AddAssert("stack empty", () => Stack.CurrentScreen == null);
+        }
+
+        [Test]
+        public void TestSwitchToDifficultyOfAnotherRuleset()
+        {
+            BeatmapInfo targetDifficulty = null;
+
+            AddAssert("ruleset is catch", () => Ruleset.Value.CreateInstance() is CatchRuleset);
+
+            AddStep("set taiko difficulty", () => targetDifficulty = importedBeatmapSet.Beatmaps.First(b => b.Ruleset.OnlineID == 1));
+            switchToDifficulty(() => targetDifficulty);
+            confirmEditingBeatmap(() => targetDifficulty);
+
+            AddAssert("ruleset switched to taiko", () => Ruleset.Value.CreateInstance() is TaikoRuleset);
 
             AddStep("exit editor forcefully", () => Stack.Exit());
             // ensure editor loader didn't resume.

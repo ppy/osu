@@ -39,6 +39,8 @@ namespace osu.Game.Online.API
 
         public string AccessToken => "token";
 
+        public Guid SessionIdentifier { get; } = Guid.NewGuid();
+
         /// <seealso cref="APIAccess.IsLoggedIn"/>
         public bool IsLoggedIn => State.Value > APIState.Offline;
 
