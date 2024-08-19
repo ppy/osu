@@ -18,10 +18,9 @@ using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Screens.Select;
 using osuTK;
 
-namespace osu.Game.Tests.Visual.SongSelect
+namespace osu.Game.Tests.Visual.SongSelectV2
 {
-    [TestFixture]
-    public partial class TestSceneBeatmapInfoWedgeV2 : OsuTestScene
+    public partial class TestSceneBeatmapInfoWedge : SongSelectComponentsTestScene
     {
         private RulesetStore rulesets = null!;
         private TestBeatmapInfoWedgeV2 infoWedge = null!;
@@ -31,6 +30,13 @@ namespace osu.Game.Tests.Visual.SongSelect
         private void load(RulesetStore rulesets)
         {
             this.rulesets = rulesets;
+        }
+
+        public override void SetUpSteps()
+        {
+            base.SetUpSteps();
+
+            AddStep("reset mods", () => SelectedMods.SetDefault());
         }
 
         protected override void LoadComplete()
@@ -105,12 +111,6 @@ namespace osu.Game.Tests.Visual.SongSelect
         {
             AddAssert("check title", () => infoWedge.Info!.TitleLabel.Current.Value == $"{ruleset.ShortName}Title");
             AddAssert("check artist", () => infoWedge.Info!.ArtistLabel.Current.Value == $"{ruleset.ShortName}Artist");
-        }
-
-        [SetUpSteps]
-        public void SetUpSteps()
-        {
-            AddStep("reset mods", () => SelectedMods.SetDefault());
         }
 
         [Test]

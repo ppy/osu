@@ -115,6 +115,7 @@ namespace osu.Game.Tests.Visual.OnlinePlay
                                 MaxCombo = 1000,
                                 TotalScore = 1000000,
                                 User = new APIUser { Username = "best user" },
+                                Mods = [new APIMod { Acronym = @"DT" }],
                                 Statistics = new Dictionary<HitResult, int>()
                             },
                             new MultiplayerScore

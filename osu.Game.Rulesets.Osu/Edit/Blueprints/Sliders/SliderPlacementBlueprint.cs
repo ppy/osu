@@ -359,8 +359,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                 }
 
                 // Update the cursor position.
-                var result = positionSnapProvider?.FindSnappedPositionAndTime(inputManager.CurrentState.Mouse.Position, state == SliderPlacementState.ControlPoints ? SnapType.GlobalGrids : SnapType.All);
-                cursor.Position = ToLocalSpace(result?.ScreenSpacePosition ?? inputManager.CurrentState.Mouse.Position) - HitObject.Position;
+                cursor.Position = getCursorPosition();
             }
             else if (cursor != null)
             {
@@ -372,6 +371,12 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                 currentSegmentLength--;
                 updatePathType();
             }
+        }
+
+        private Vector2 getCursorPosition()
+        {
+            var result = positionSnapProvider?.FindSnappedPositionAndTime(inputManager.CurrentState.Mouse.Position, state == SliderPlacementState.ControlPoints ? SnapType.GlobalGrids : SnapType.All);
+            return ToLocalSpace(result?.ScreenSpacePosition ?? inputManager.CurrentState.Mouse.Position) - HitObject.Position;
         }
 
         /// <summary>
@@ -386,7 +391,9 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             var lastPiece = controlPointVisualiser.Pieces.Single(p => p.ControlPoint == last);
 
             lastPoint = last;
-            return lastPiece.IsHovered != true;
+            // We may only place a new control point if the cursor is not overlapping with the last control point.
+            // If snapping is enabled, the cursor may not hover the last piece while still placing the control point at the same position.
+            return !lastPiece.IsHovered && (last is null || Vector2.DistanceSquared(last.Position, getCursorPosition()) > 1f);
         }
 
         private void placeNewControlPoint()

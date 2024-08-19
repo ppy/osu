@@ -166,6 +166,8 @@ namespace osu.Game.Screens.Select.Carousel
             return true;
         }
 
+        protected override bool OnHover(HoverEvent e) => true;
+
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
