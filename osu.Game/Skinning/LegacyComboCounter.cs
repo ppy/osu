@@ -32,7 +32,7 @@ namespace osu.Game.Skinning
 
         private bool isRolling;
 
-        private readonly Container counterContainer;
+        protected readonly Container Content;
 
         public bool UsesFixedAnchor { get; set; }
 
@@ -42,7 +42,7 @@ namespace osu.Game.Skinning
 
             InternalChildren = new[]
             {
-                counterContainer = new Container
+                Content = new Container
                 {
                     AlwaysPresent = true,
                     Children = new[]
@@ -101,7 +101,7 @@ namespace osu.Game.Skinning
 
             Current.BindValueChanged(combo => updateCount(combo.NewValue == 0), true);
 
-            counterContainer.Size = DisplayedCountText.Size;
+            Content.Size = DisplayedCountText.Size;
         }
 
         private void updateCount(bool rolling)
@@ -171,7 +171,7 @@ namespace osu.Game.Skinning
                 DisplayedCountText.FadeOut(fade_out_duration);
 
             DisplayedCountText.Text = FormatCount(newValue);
-            counterContainer.Size = DisplayedCountText.Size;
+            Content.Size = DisplayedCountText.Size;
         }
 
         private void onDisplayedCountChange(int newValue)
@@ -179,14 +179,14 @@ namespace osu.Game.Skinning
             DisplayedCountText.FadeTo(newValue == 0 ? 0 : 1);
             DisplayedCountText.Text = FormatCount(newValue);
 
-            counterContainer.Size = DisplayedCountText.Size;
+            Content.Size = DisplayedCountText.Size;
         }
 
         private void onDisplayedCountIncrement(int newValue)
         {
             DisplayedCountText.Text = FormatCount(newValue);
 
-            counterContainer.Size = DisplayedCountText.Size;
+            Content.Size = DisplayedCountText.Size;
         }
 
         private void transformRoll(int currentValue, int newValue) =>

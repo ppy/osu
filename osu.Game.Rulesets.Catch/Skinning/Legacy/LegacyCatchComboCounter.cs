@@ -5,24 +5,21 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
-using osu.Game.Graphics.Containers;
-using osu.Game.Rulesets.Catch.Objects;
+using osu.Framework.Threading;
 using osu.Game.Rulesets.Catch.UI;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects.Types;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Play;
 using osu.Game.Skinning;
-using osuTK;
 
 namespace osu.Game.Rulesets.Catch.Skinning.Legacy
 {
     /// <summary>
     /// A combo counter implementation that visually behaves almost similar to stable's osu!catch combo counter.
     /// </summary>
-    // todo: maybe make this inherit LegacyComboCounter at some point
-    public partial class LegacyCatchComboCounter : CompositeDrawable, ISerialisableDrawable
+    public partial class LegacyCatchComboCounter : LegacyComboCounter
     {
         [Resolved]
         private GameplayState gameplayState { get; set; } = null!;
@@ -33,51 +30,32 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
         [Resolved]
         private ISkinSource skin { get; set; } = null!;
 
-        private readonly LegacyRollingCounter counter;
-
-        private readonly LegacyRollingCounter explosion;
-
-        public bool UsesFixedAnchor { get; set; }
-
-        private int lastDisplayedCombo;
-
         private IBindable<JudgementResult> lastJudgementResult = null!;
-        private IBindable<int> combo = null!;
 
         public LegacyCatchComboCounter()
         {
-            AutoSizeAxes = Axes.Both;
-            Alpha = 0f;
+            PopOutCountText.Origin = PopOutCountText.Anchor = Anchor.Centre;
+            DisplayedCountText.Origin = DisplayedCountText.Anchor = Anchor.Centre;
 
-            InternalChild = new UprightAspectMaintainingContainer
-            {
-                AutoSizeAxes = Axes.Both,
-                Children = new[]
-                {
-                    explosion = new LegacyRollingCounter(LegacyFont.Combo)
-                    {
-                        Alpha = 0.65f,
-                        Blending = BlendingParameters.Additive,
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        Scale = new Vector2(1.5f),
-                    },
-                    counter = new LegacyRollingCounter(LegacyFont.Combo)
-                    {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                    },
-                }
-            };
+            Content.ChangeChildDepth(PopOutCountText, float.MinValue);
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            combo = gameplayState.ScoreProcessor.Combo.GetBoundCopy();
             lastJudgementResult = gameplayState.LastJudgementResult.GetBoundCopy();
-            lastJudgementResult.BindValueChanged(onNewJudgement, true);
+            lastJudgementResult.BindValueChanged(result =>
+            {
+                if (!result.NewValue.Type.AffectsCombo() || !result.NewValue.HasResult)
+                    return;
+
+                if (!result.NewValue.IsHit)
+                    return;
+
+                if (result.NewValue?.HitObject is IHasComboInformation catchObject)
+                    PopOutCountText.Colour = catchObject.GetComboColour(skin);
+            });
 
             FinishTransforms(true);
         }
@@ -93,52 +71,58 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
             }
         }
 
-        private void onNewJudgement(ValueChangedEvent<JudgementResult> judgement)
+        private ScheduledDelegate? scheduledPopOut;
+
+        protected override void OnCountIncrement()
         {
-            if (combo.Value == lastDisplayedCombo)
-                return;
+            const double main_duration = 300;
+            const double pop_out_duration = 400;
 
-            // There may still be existing transforms to the counter (including value change after 250ms),
-            // finish them immediately before new transforms.
-            counter.SetCountWithoutRolling(lastDisplayedCombo);
+            scheduledPopOut?.Cancel();
+            scheduledPopOut = null;
 
-            lastDisplayedCombo = combo.Value;
+            DisplayedCountText.ScaleTo(2)
+                              .ScaleTo(1, main_duration, Easing.Out);
 
-            if ((Clock as IGameplayClock)?.IsRewinding == true)
+            DisplayedCountText.FadeInFromZero()
+                              .Then()
+                              .Delay(1000)
+                              .FadeOut(main_duration);
+
+            PopOutCountText.Text = FormatCount(Current.Value);
+
+            PopOutCountText.ScaleTo(2)
+                           .ScaleTo(2.4f, pop_out_duration, Easing.Out);
+
+            PopOutCountText.FadeTo(0.7f)
+                           .FadeOut(pop_out_duration);
+
+            this.Delay(main_duration - 140).Schedule(() =>
             {
-                // needs more work to make rewind somehow look good.
-                // basically we want the previous increment to play... or turning off RemoveCompletedTransforms (not feasible from a performance angle).
-                Hide();
-                return;
-            }
+                base.OnCountIncrement();
+            }, out scheduledPopOut);
+        }
 
-            // Combo fell to zero, roll down and fade out the counter.
-            if (combo.Value == 0)
+        protected override void OnCountRolling()
+        {
+            base.OnCountRolling();
+
+            scheduledPopOut?.Cancel();
+            scheduledPopOut = null;
+
+            if (Current.Value == 0)
             {
-                counter.Current.Value = 0;
-                explosion.Current.Value = 0;
-
-                this.FadeOut(100);
+                PopOutCountText.FadeOut(100);
+                DisplayedCountText.FadeOut(100);
             }
-            else
-            {
-                this.FadeInFromZero().Then().Delay(1000).FadeOut(300);
+        }
 
-                counter.ScaleTo(2)
-                       .ScaleTo(1, 300, Easing.Out);
+        protected override void OnCountChange()
+        {
+            base.OnCountChange();
 
-                var catchObject = (CatchHitObject)judgement.NewValue.HitObject;
-
-                explosion.Colour = ((IHasComboInformation)catchObject).GetComboColour(skin);
-
-                explosion.SetCountWithoutRolling(combo.Value);
-                explosion.ScaleTo(2)
-                         .ScaleTo(2.4f, 400, Easing.Out)
-                         .FadeTo(0.7f)
-                         .FadeOut(400);
-
-                Scheduler.AddDelayed(() => counter.SetCountWithoutRolling(combo.Value), 260);
-            }
+            scheduledPopOut?.Cancel();
+            scheduledPopOut = null;
         }
     }
 }

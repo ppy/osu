@@ -20,18 +20,21 @@ namespace osu.Game.Rulesets.Catch.Tests
 {
     public partial class TestSceneComboCounter : CatchSkinnableTestScene
     {
-        private ScoreProcessor scoreProcessor = null!;
+        private readonly GameplayState gameplayState = TestGameplayState.Create(new CatchRuleset());
 
-        private GameplayState gameplayState = null!;
+        [Cached(typeof(ScoreProcessor))]
+        private ScoreProcessor scoreProcessor;
 
         private Color4 judgedObjectColour = Color4.White;
+
+        public TestSceneComboCounter()
+        {
+            scoreProcessor = gameplayState.ScoreProcessor;
+        }
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            gameplayState = TestGameplayState.Create(Ruleset.Value.CreateInstance());
-            scoreProcessor = gameplayState.ScoreProcessor;
-
             scoreProcessor.NewJudgement += result => gameplayState.ApplyResult(result);
 
             Dependencies.CacheAs(gameplayState);
