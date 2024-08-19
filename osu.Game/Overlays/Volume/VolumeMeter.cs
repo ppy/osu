@@ -35,8 +35,12 @@ namespace osu.Game.Overlays.Volume
         private CircularProgress volumeCircle;
         private CircularProgress volumeCircleGlow;
 
+        protected static readonly Vector2 LABEL_SIZE = new Vector2(120, 20);
+
         public BindableDouble Bindable { get; } = new BindableDouble { MinValue = 0, MaxValue = 1, Precision = 0.01 };
-        private readonly float circleSize;
+
+        protected readonly float CircleSize;
+
         private readonly Color4 meterColour;
         private readonly string name;
 
@@ -73,7 +77,7 @@ namespace osu.Game.Overlays.Volume
 
         public VolumeMeter(string name, float circleSize, Color4 meterColour)
         {
-            this.circleSize = circleSize;
+            CircleSize = circleSize;
             this.meterColour = meterColour;
             this.name = name;
 
@@ -101,7 +105,7 @@ namespace osu.Game.Overlays.Volume
             {
                 new Container
                 {
-                    Size = new Vector2(circleSize),
+                    Size = new Vector2(CircleSize),
                     Children = new Drawable[]
                     {
                         new BufferedContainer
@@ -199,7 +203,7 @@ namespace osu.Game.Overlays.Volume
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
-                            Font = OsuFont.Numeric.With(size: 0.16f * circleSize)
+                            Font = OsuFont.Numeric.With(size: 0.16f * CircleSize)
                         }).WithEffect(new GlowEffect
                         {
                             Colour = Color4.Transparent,
@@ -209,10 +213,10 @@ namespace osu.Game.Overlays.Volume
                 },
                 new Container
                 {
-                    Size = new Vector2(120, 20),
+                    Size = LABEL_SIZE,
                     CornerRadius = 10,
                     Masking = true,
-                    Margin = new MarginPadding { Left = circleSize + 10 },
+                    Margin = new MarginPadding { Left = CircleSize + 10 },
                     Origin = Anchor.CentreLeft,
                     Anchor = Anchor.CentreLeft,
                     Children = new Drawable[]
