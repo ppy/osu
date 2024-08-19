@@ -40,6 +40,10 @@ namespace osu.Game.Screens.Play.HUD
 
         private OsuSpriteText text;
 
+        private Bindable<bool> alwaysShow;
+
+        public override bool PropagatePositionalInputSubTree => alwaysShow.Value || touchActive.Value;
+
         public HoldForMenuButton()
         {
             Direction = FillDirection.Horizontal;
@@ -50,7 +54,7 @@ namespace osu.Game.Screens.Play.HUD
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(Player player)
+        private void load(Player player, OsuConfigManager config)
         {
             Children = new Drawable[]
             {
@@ -71,6 +75,8 @@ namespace osu.Game.Screens.Play.HUD
             };
 
             AutoSizeAxes = Axes.Both;
+
+            alwaysShow = config.GetBindable<bool>(OsuSetting.AlwaysShowHoldForMenuButton);
         }
 
         [Resolved]
@@ -119,13 +125,19 @@ namespace osu.Game.Screens.Play.HUD
 
             if (text.Alpha > 0 || button.Progress.Value > 0 || button.IsHovered)
                 Alpha = 1;
-            else
+            else if (touchActive.Value)
+                Alpha = 0.08f;
+            else if (alwaysShow.Value)
             {
                 float minAlpha = touchActive.Value ? .08f : 0;
 
                 Alpha = Interpolation.ValueAt(
                     Math.Clamp(Clock.ElapsedFrameTime, 0, 200),
                     Alpha, Math.Clamp(1 - positionalAdjust, minAlpha, 1), 0, 200, Easing.OutQuint);
+            }
+            else
+            {
+                Alpha = 0;
             }
         }
 
