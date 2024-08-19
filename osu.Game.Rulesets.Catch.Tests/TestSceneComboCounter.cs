@@ -13,7 +13,7 @@ using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Play;
 using osu.Game.Skinning;
-using osuTK;
+using osu.Game.Tests.Gameplay;
 using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Catch.Tests
@@ -29,8 +29,8 @@ namespace osu.Game.Rulesets.Catch.Tests
         [BackgroundDependencyLoader]
         private void load()
         {
-            scoreProcessor = new ScoreProcessor(new CatchRuleset());
-            gameplayState = new GameplayState(Beatmap.Value.Beatmap, Ruleset.Value.CreateInstance(), scoreProcessor: scoreProcessor);
+            gameplayState = TestGameplayState.Create(Ruleset.Value.CreateInstance());
+            scoreProcessor = gameplayState.ScoreProcessor;
 
             scoreProcessor.NewJudgement += result => gameplayState.ApplyResult(result);
 
@@ -48,7 +48,6 @@ namespace osu.Game.Rulesets.Catch.Tests
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
-                        Scale = new Vector2(2.5f),
                     };
                 }
 

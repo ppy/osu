@@ -24,6 +24,15 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
     // todo: maybe make this inherit LegacyComboCounter at some point
     public partial class LegacyCatchComboCounter : CompositeDrawable, ISerialisableDrawable
     {
+        [Resolved]
+        private GameplayState gameplayState { get; set; } = null!;
+
+        [Resolved]
+        private DrawableRuleset? drawableRuleset { get; set; }
+
+        [Resolved]
+        private ISkinSource skin { get; set; } = null!;
+
         private readonly LegacyRollingCounter counter;
 
         private readonly LegacyRollingCounter explosion;
@@ -32,12 +41,12 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
 
         private int lastDisplayedCombo;
 
+        private IBindable<JudgementResult> lastJudgementResult = null!;
+        private IBindable<int> combo = null!;
 
         public LegacyCatchComboCounter()
         {
             AutoSizeAxes = Axes.Both;
-
-            AlwaysPresent = true;
             Alpha = 0f;
 
             InternalChild = new UprightAspectMaintainingContainer
@@ -60,21 +69,7 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
                     },
                 }
             };
-
-            UsesFixedAnchor = true;
         }
-
-        [Resolved]
-        private GameplayState gameplayState { get; set; } = null!;
-
-        [Resolved]
-        private DrawableRuleset? drawableRuleset { get; set; }
-
-        [Resolved]
-        private ISkinSource skin { get; set; } = null!;
-
-        private IBindable<JudgementResult> lastJudgementResult = null!;
-        private IBindable<int> combo = null!;
 
         protected override void LoadComplete()
         {
@@ -83,6 +78,8 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
             combo = gameplayState.ScoreProcessor.Combo.GetBoundCopy();
             lastJudgementResult = gameplayState.LastJudgementResult.GetBoundCopy();
             lastJudgementResult.BindValueChanged(onNewJudgement, true);
+
+            FinishTransforms(true);
         }
 
         protected override void Update()
