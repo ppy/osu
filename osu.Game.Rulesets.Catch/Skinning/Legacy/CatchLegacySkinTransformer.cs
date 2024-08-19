@@ -4,7 +4,6 @@
 using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Game.Skinning;
 using osuTK;
 using osuTK.Graphics;
@@ -32,50 +31,46 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
             switch (lookup)
             {
                 case SkinComponentsContainerLookup containerLookup:
-                    if (containerLookup.Target != SkinComponentsContainerLookup.TargetArea.MainHUDComponents)
+                    // Only handle per ruleset defaults here.
+                    if (containerLookup.Ruleset == null)
                         return base.GetDrawableComponent(lookup);
 
-                    // Modifications for global components.
-                    if (containerLookup.Ruleset == null)
-                    {
-                        var components = base.GetDrawableComponent(lookup) as Container;
-
-                        if (providesComboCounter && components != null)
-                        {
-                            // catch may provide its own combo counter; hide the default.
-                            // todo: this should be done in an elegant way per ruleset, defining which HUD skin components should be displayed.
-                            foreach (var legacyComboCounter in components.OfType<LegacyComboCounter>())
-                                legacyComboCounter.HiddenByRulesetImplementation = false;
-                        }
-
-                        return components;
-                    }
-
                     // Skin has configuration.
-                    if (base.GetDrawableComponent(lookup) is Drawable d)
+                    if (base.GetDrawableComponent(lookup) is UserConfiguredLayoutContainer d)
                         return d;
 
-                    // Our own ruleset components default.
-                    return new DefaultSkinComponentsContainer(container =>
-                    {
-                        var keyCounter = container.OfType<LegacyKeyCounterDisplay>().FirstOrDefault();
+                    // we don't have enough assets to display these components (this is especially the case on a "beatmap" skin).
+                    if (!IsProvidingLegacyResources)
+                        return null;
 
-                        if (keyCounter != null)
-                        {
-                            // set the anchor to top right so that it won't squash to the return button to the top
-                            keyCounter.Anchor = Anchor.CentreRight;
-                            keyCounter.Origin = Anchor.CentreRight;
-                            keyCounter.X = 0;
-                            // 340px is the default height inherit from stable
-                            keyCounter.Y = container.ToLocalSpace(new Vector2(0, container.ScreenSpaceDrawQuad.Centre.Y - 340f)).Y;
-                        }
-                    })
+                    // Our own ruleset components default.
+                    switch (containerLookup.Target)
                     {
-                        Children = new Drawable[]
-                        {
-                            new LegacyKeyCounterDisplay(),
-                        }
-                    };
+                        case SkinComponentsContainerLookup.TargetArea.MainHUDComponents:
+                            // todo: remove CatchSkinComponents.CatchComboCounter and refactor LegacyCatchComboCounter to be added here instead.
+                            return new DefaultSkinComponentsContainer(container =>
+                            {
+                                var keyCounter = container.OfType<LegacyKeyCounterDisplay>().FirstOrDefault();
+
+                                if (keyCounter != null)
+                                {
+                                    // set the anchor to top right so that it won't squash to the return button to the top
+                                    keyCounter.Anchor = Anchor.CentreRight;
+                                    keyCounter.Origin = Anchor.CentreRight;
+                                    keyCounter.X = 0;
+                                    // 340px is the default height inherit from stable
+                                    keyCounter.Y = container.ToLocalSpace(new Vector2(0, container.ScreenSpaceDrawQuad.Centre.Y - 340f)).Y;
+                                }
+                            })
+                            {
+                                Children = new Drawable[]
+                                {
+                                    new LegacyKeyCounterDisplay(),
+                                }
+                            };
+                    }
+
+                    return null;
 
                 case CatchSkinComponentLookup catchSkinComponent:
                     switch (catchSkinComponent.Component)

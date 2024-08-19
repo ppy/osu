@@ -9,12 +9,10 @@ using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Threading;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps.Drawables;
-using osu.Game.Beatmaps.Drawables.Cards;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Localisation;
@@ -30,7 +28,7 @@ using osuTK.Input;
 
 namespace osu.Game.Screens.Menu
 {
-    public partial class DailyChallengeButton : MainMenuButton, IHasCustomTooltip<APIBeatmapSet?>
+    public partial class DailyChallengeButton : MainMenuButton
     {
         public Room? Room { get; private set; }
 
@@ -104,8 +102,7 @@ namespace osu.Game.Screens.Menu
         {
             base.LoadComplete();
 
-            info.BindValueChanged(_ => dailyChallengeChanged(postNotification: true));
-            dailyChallengeChanged(postNotification: false);
+            info.BindValueChanged(dailyChallengeChanged, true);
         }
 
         protected override void Update()
@@ -131,7 +128,9 @@ namespace osu.Game.Screens.Menu
             }
         }
 
-        private void dailyChallengeChanged(bool postNotification)
+        private long? lastNotifiedDailyChallengeRoomId;
+
+        private void dailyChallengeChanged(ValueChangedEvent<DailyChallengeInfo?> _)
         {
             UpdateState();
 
@@ -152,8 +151,14 @@ namespace osu.Game.Screens.Menu
                     Room = room;
                     cover.OnlineInfo = TooltipContent = room.Playlist.FirstOrDefault()?.Beatmap.BeatmapSet as APIBeatmapSet;
 
-                    if (postNotification)
+                    // We only want to notify the user if a new challenge recently went live.
+                    if (room.StartDate.Value != null
+                        && Math.Abs((DateTimeOffset.Now - room.StartDate.Value!.Value).TotalSeconds) < 1800
+                        && room.RoomID.Value != lastNotifiedDailyChallengeRoomId)
+                    {
+                        lastNotifiedDailyChallengeRoomId = room.RoomID.Value;
                         notificationOverlay?.Post(new NewDailyChallengeNotification(room));
+                    }
 
                     updateCountdown();
                     Scheduler.AddDelayed(updateCountdown, 1000, true);
@@ -194,36 +199,6 @@ namespace osu.Game.Screens.Menu
             base.UpdateState();
         }
 
-        public ITooltip<APIBeatmapSet?> GetCustomTooltip() => new DailyChallengeTooltip();
-
         public APIBeatmapSet? TooltipContent { get; private set; }
-
-        internal partial class DailyChallengeTooltip : CompositeDrawable, ITooltip<APIBeatmapSet?>
-        {
-            [Cached]
-            private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Purple);
-
-            private APIBeatmapSet? lastContent;
-
-            [BackgroundDependencyLoader]
-            private void load()
-            {
-                AutoSizeAxes = Axes.Both;
-            }
-
-            public void Move(Vector2 pos) => Position = pos;
-
-            public void SetContent(APIBeatmapSet? content)
-            {
-                if (content == lastContent)
-                    return;
-
-                lastContent = content;
-
-                ClearInternal();
-                if (content != null)
-                    AddInternal(new BeatmapCardNano(content));
-            }
-        }
     }
 }
