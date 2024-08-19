@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Linq;
 using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.Threading;
@@ -16,6 +17,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             base.LoadComplete();
 
             EditorBeatmap.SelectedHitObjects.CollectionChanged += (_, _) => updateInspectorText();
+            EditorBeatmap.PlacementObject.BindValueChanged(_ => updateInspectorText());
             EditorBeatmap.TransactionBegan += updateInspectorText;
             EditorBeatmap.TransactionEnded += updateInspectorText;
             updateInspectorText();
@@ -29,24 +31,33 @@ namespace osu.Game.Screens.Edit.Compose.Components
             rollingTextUpdate?.Cancel();
             rollingTextUpdate = null;
 
-            AddInspectorValues();
+            HitObject[] objects;
+
+            if (EditorBeatmap.SelectedHitObjects.Count > 0)
+                objects = EditorBeatmap.SelectedHitObjects.ToArray();
+            else if (EditorBeatmap.PlacementObject.Value != null)
+                objects = new[] { EditorBeatmap.PlacementObject.Value };
+            else
+                objects = Array.Empty<HitObject>();
+
+            AddInspectorValues(objects);
 
             // I'd hope there's a better way to do this, but I don't want to bind to each and every property above to watch for changes.
             // This is a good middle-ground for the time being.
-            if (EditorBeatmap.SelectedHitObjects.Count > 0)
+            if (objects.Length > 0)
                 rollingTextUpdate ??= Scheduler.AddDelayed(updateInspectorText, 250);
         }
 
-        protected virtual void AddInspectorValues()
+        protected virtual void AddInspectorValues(HitObject[] objects)
         {
-            switch (EditorBeatmap.SelectedHitObjects.Count)
+            switch (objects.Length)
             {
                 case 0:
                     AddValue("No selection");
                     break;
 
                 case 1:
-                    var selected = EditorBeatmap.SelectedHitObjects.Single();
+                    var selected = objects.Single();
 
                     AddHeader("Type");
                     AddValue($"{selected.GetType().ReadableName()}");
@@ -58,7 +69,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
                     {
                         case IHasPosition pos:
                             AddHeader("Position");
-                            AddValue($"x:{pos.X:#,0.##} y:{pos.Y:#,0.##}");
+                            AddValue($"x:{pos.X:#,0.##}");
+                            AddValue($"y:{pos.Y:#,0.##}");
                             break;
 
                         case IHasXPosition x:
@@ -104,13 +116,13 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
                 default:
                     AddHeader("Selected Objects");
-                    AddValue($"{EditorBeatmap.SelectedHitObjects.Count:#,0.##}");
+                    AddValue($"{objects.Length:#,0.##}");
 
                     AddHeader("Start Time");
-                    AddValue($"{EditorBeatmap.SelectedHitObjects.Min(o => o.StartTime):#,0.##}ms");
+                    AddValue($"{objects.Min(o => o.StartTime):#,0.##}ms");
 
                     AddHeader("End Time");
-                    AddValue($"{EditorBeatmap.SelectedHitObjects.Max(o => o.GetEndTime()):#,0.##}ms");
+                    AddValue($"{objects.Max(o => o.GetEndTime()):#,0.##}ms");
                     break;
             }
         }

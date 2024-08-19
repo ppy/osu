@@ -219,7 +219,7 @@ namespace osu.Game.Screens.Footer
 
             var targetPosition = targetButton?.ToSpaceOfOtherDrawable(targetButton.LayoutRectangle.TopRight, this) ?? fallbackPosition;
 
-            updateColourScheme(overlay.ColourProvider.ColourScheme);
+            updateColourScheme(overlay.ColourProvider.Hue);
 
             footerContent = overlay.CreateFooterContent();
 
@@ -256,16 +256,16 @@ namespace osu.Game.Screens.Footer
 
             temporarilyHiddenButtons.Clear();
 
-            updateColourScheme(OverlayColourScheme.Aquamarine);
+            updateColourScheme(OverlayColourScheme.Aquamarine.GetHue());
 
             contentContainer.Delay(timeUntilRun).Expire();
             contentContainer = null;
             activeOverlay = null;
         }
 
-        private void updateColourScheme(OverlayColourScheme colourScheme)
+        private void updateColourScheme(int hue)
         {
-            colourProvider.ChangeColourScheme(colourScheme);
+            colourProvider.ChangeColourScheme(hue);
 
             background.FadeColour(colourProvider.Background5, 150, Easing.OutQuint);
 

@@ -43,6 +43,9 @@ namespace osu.Game.Collections
             //
             // if we want to support user sorting (but changes will need to be made to realm to persist).
             ShowDragHandle.Value = false;
+
+            Masking = true;
+            CornerRadius = item_height / 2;
         }
 
         protected override Drawable CreateContent() => new ItemContent(Model);
@@ -50,7 +53,7 @@ namespace osu.Game.Collections
         /// <summary>
         /// The main content of the <see cref="DrawableCollectionListItem"/>.
         /// </summary>
-        private partial class ItemContent : CircularContainer
+        private partial class ItemContent : CompositeDrawable
         {
             private readonly Live<BeatmapCollection> collection;
 
@@ -65,13 +68,12 @@ namespace osu.Game.Collections
 
                 RelativeSizeAxes = Axes.X;
                 Height = item_height;
-                Masking = true;
             }
 
             [BackgroundDependencyLoader]
             private void load()
             {
-                Children = new[]
+                InternalChildren = new[]
                 {
                     collection.IsManaged
                         ? new DeleteButton(collection)
@@ -132,7 +134,7 @@ namespace osu.Game.Collections
             }
         }
 
-        public partial class DeleteButton : CompositeDrawable
+        public partial class DeleteButton : OsuClickableContainer
         {
             public Func<Vector2, bool> IsTextBoxHovered = null!;
 
@@ -155,7 +157,7 @@ namespace osu.Game.Collections
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)
             {
-                InternalChild = fadeContainer = new Container
+                Child = fadeContainer = new Container
                 {
                     RelativeSizeAxes = Axes.Both,
                     Alpha = 0.1f,
@@ -176,6 +178,14 @@ namespace osu.Game.Collections
                         }
                     }
                 };
+
+                Action = () =>
+                {
+                    if (collection.PerformRead(c => c.BeatmapMD5Hashes.Count) == 0)
+                        deleteCollection();
+                    else
+                        dialogOverlay?.Push(new DeleteCollectionDialog(collection, deleteCollection));
+                };
             }
 
             public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => base.ReceivePositionalInputAt(screenSpacePos) && !IsTextBoxHovered(screenSpacePos);
@@ -195,12 +205,7 @@ namespace osu.Game.Collections
             {
                 background.FlashColour(Color4.White, 150);
 
-                if (collection.PerformRead(c => c.BeatmapMD5Hashes.Count) == 0)
-                    deleteCollection();
-                else
-                    dialogOverlay?.Push(new DeleteCollectionDialog(collection, deleteCollection));
-
-                return true;
+                return base.OnClick(e);
             }
 
             private void deleteCollection() => collection.PerformWrite(c => c.Realm!.Remove(c));

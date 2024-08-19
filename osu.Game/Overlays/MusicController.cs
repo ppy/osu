@@ -316,7 +316,7 @@ namespace osu.Game.Overlays
 
             queuedDirection = TrackChangeDirection.Next;
 
-            var playableSet = getBeatmapSets().AsEnumerable().SkipWhile(i => !i.Equals(current?.BeatmapSetInfo) && (!i.Protected || allowProtectedTracks)).ElementAtOrDefault(1)
+            var playableSet = getBeatmapSets().AsEnumerable().SkipWhile(i => !i.Equals(current?.BeatmapSetInfo) || (i.Protected && !allowProtectedTracks)).ElementAtOrDefault(1)
                               ?? getBeatmapSets().AsEnumerable().FirstOrDefault(i => !i.Protected || allowProtectedTracks);
 
             var playableBeatmap = playableSet?.Beatmaps.FirstOrDefault();

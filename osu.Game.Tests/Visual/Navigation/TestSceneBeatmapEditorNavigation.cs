@@ -1,12 +1,16 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using NUnit.Framework;
+using osu.Framework.Allocation;
 using osu.Framework.Extensions;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Extensions.ObjectExtensions;
+using osu.Framework.Graphics;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input;
 using osu.Framework.Screens;
@@ -204,12 +208,16 @@ namespace osu.Game.Tests.Visual.Navigation
 
             AddStep("Set current beatmap to default", () => Game.Beatmap.SetDefault());
 
-            AddStep("Push editor loader", () => Game.ScreenStack.Push(new EditorLoader()));
+            DelayedLoadEditorLoader loader = null!;
+            AddStep("Push editor loader", () => Game.ScreenStack.Push(loader = new DelayedLoadEditorLoader()));
             AddUntilStep("Wait for loader current", () => Game.ScreenStack.CurrentScreen is EditorLoader);
+            AddUntilStep("wait for editor load start", () => loader.Editor != null);
             AddStep("Close editor while loading", () => Game.ScreenStack.CurrentScreen.Exit());
+            AddStep("allow editor load", () => loader.AllowLoad.Set());
+            AddUntilStep("wait for editor ready", () => loader.Editor!.LoadState >= LoadState.Ready);
 
             AddUntilStep("Wait for menu", () => Game.ScreenStack.CurrentScreen is MainMenu);
-            AddAssert("Check no new beatmaps were made", () => allBeatmapSets().SequenceEqual(beatmapSets));
+            AddAssert("Check no new beatmaps were made", allBeatmapSets, () => Is.EquivalentTo(beatmapSets));
 
             BeatmapSetInfo[] allBeatmapSets() => Game.Realm.Run(realm => realm.All<BeatmapSetInfo>().Where(x => !x.DeletePending).ToArray());
         }
@@ -356,5 +364,33 @@ namespace osu.Game.Tests.Visual.Navigation
         private EditorBeatmap getEditorBeatmap() => getEditor().ChildrenOfType<EditorBeatmap>().Single();
 
         private Editor getEditor() => (Editor)Game.ScreenStack.CurrentScreen;
+
+        private partial class DelayedLoadEditorLoader : EditorLoader
+        {
+            public readonly ManualResetEventSlim AllowLoad = new ManualResetEventSlim();
+            public Editor? Editor { get; private set; }
+
+            protected override Editor CreateEditor() => Editor = new DelayedLoadEditor(this);
+        }
+
+        private partial class DelayedLoadEditor : Editor
+        {
+            private readonly DelayedLoadEditorLoader loader;
+
+            public DelayedLoadEditor(DelayedLoadEditorLoader loader)
+                : base(loader)
+            {
+                this.loader = loader;
+            }
+
+            protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
+            {
+                // Importantly, this occurs before base.load().
+                if (!loader.AllowLoad.Wait(TimeSpan.FromSeconds(10)))
+                    throw new TimeoutException();
+
+                return base.CreateChildDependencies(parent);
+            }
+        }
     }
 }

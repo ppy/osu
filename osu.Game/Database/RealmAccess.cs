@@ -92,8 +92,9 @@ namespace osu.Game.Database
         /// 39   2023-12-19    Migrate any EndTimeObjectCount and TotalObjectCount values of 0 to -1 to better identify non-calculated values.
         /// 40   2023-12-21    Add ScoreInfo.Version to keep track of which build scores were set on.
         /// 41   2024-04-17    Add ScoreInfo.TotalScoreWithoutMods for future mod multiplier rebalances.
+        /// 42   2024-08-07    Update mania key bindings to reflect changes to ManiaAction
         /// </summary>
-        private const int schema_version = 41;
+        private const int schema_version = 42;
 
         /// <summary>
         /// Lock object which is held during <see cref="BlockAllOperations"/> sections, blocking realm retrieval during blocking periods.
@@ -1142,6 +1143,51 @@ namespace osu.Game.Database
                         catch (Exception ex)
                         {
                             Logger.Log($@"Failed to populate total score without mods for score {score.ID}: {ex}", LoggingTarget.Database);
+                        }
+                    }
+
+                    break;
+
+                case 42:
+                    for (int columns = 1; columns <= 10; columns++)
+                    {
+                        remapKeyBindingsForVariant(columns, false);
+                        remapKeyBindingsForVariant(columns, true);
+                    }
+
+                    // Replace existing key bindings with new ones reflecting changes to ManiaAction:
+                    // - "Special#" actions are removed and "Key#" actions are inserted in their place.
+                    // - All actions are renumbered to remove the old offsets.
+                    void remapKeyBindingsForVariant(int columns, bool dual)
+                    {
+                        // https://github.com/ppy/osu/blob/8773c2f7ebc226942d6124eb95c07a83934272ea/osu.Game.Rulesets.Mania/ManiaRuleset.cs#L327-L336
+                        int variant = dual ? 1000 + (columns * 2) : columns;
+
+                        var oldKeyBindingsQuery = migration.NewRealm
+                                                           .All<RealmKeyBinding>()
+                                                           .Where(kb => kb.RulesetName == @"mania" && kb.Variant == variant);
+                        var oldKeyBindings = oldKeyBindingsQuery.Detach();
+
+                        migration.NewRealm.RemoveRange(oldKeyBindingsQuery);
+
+                        // https://github.com/ppy/osu/blob/8773c2f7ebc226942d6124eb95c07a83934272ea/osu.Game.Rulesets.Mania/ManiaInputManager.cs#L22-L31
+                        int oldNormalAction = 10; // Old Key1 offset
+                        int oldSpecialAction = 1; // Old Special1 offset
+
+                        for (int column = 0; column < columns * (dual ? 2 : 1); column++)
+                        {
+                            if (columns % 2 == 1 && column % columns == columns / 2)
+                                remapKeyBinding(oldSpecialAction++, column);
+                            else
+                                remapKeyBinding(oldNormalAction++, column);
+                        }
+
+                        void remapKeyBinding(int oldAction, int newAction)
+                        {
+                            var oldKeyBinding = oldKeyBindings.Find(kb => kb.ActionInt == oldAction);
+
+                            if (oldKeyBinding != null)
+                                migration.NewRealm.Add(new RealmKeyBinding(newAction, oldKeyBinding.KeyCombination, @"mania", variant));
                         }
                     }
 
