@@ -404,8 +404,6 @@ namespace osu.Game.Rulesets.Edit
             if (e.ControlPressed || e.SuperPressed)
                 return false;
 
-            bool handled = false;
-
             if (checkLeftToggleFromKey(e.Key, out int leftIndex))
             {
                 var item = toolboxCollection.Items.ElementAtOrDefault(leftIndex);
