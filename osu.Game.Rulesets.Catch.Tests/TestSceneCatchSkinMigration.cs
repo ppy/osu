@@ -37,9 +37,6 @@ namespace osu.Game.Rulesets.Catch.Tests
 
         private SkinComponentsContainer targetContainer => Player.ChildrenOfType<SkinComponentsContainer>().First();
 
-        private SkinComponentsContainer globalHUDTarget => Player.ChildrenOfType<SkinComponentsContainer>()
-                                                                 .Single(c => c.Lookup.Target == SkinComponentsContainerLookup.TargetArea.MainHUDComponents && c.Lookup.Ruleset == null);
-
         private SkinComponentsContainer rulesetHUDTarget => Player.ChildrenOfType<SkinComponentsContainer>()
                                                                   .Single(c => c.Lookup.Target == SkinComponentsContainerLookup.TargetArea.MainHUDComponents && c.Lookup.Ruleset != null);
 
@@ -65,7 +62,7 @@ namespace osu.Game.Rulesets.Catch.Tests
         public void TestMigrationLegacyCatch()
         {
             AddStep("import old classic skin", () => skins.CurrentSkinInfo.Value = importSkinFromArchives(@"classic-layout-version-0.osk").SkinInfo);
-            AddUntilStep("wait for load", () => globalHUDTarget.ComponentsLoaded && rulesetHUDTarget.ComponentsLoaded);
+            AddUntilStep("wait for load", () => rulesetHUDTarget.ComponentsLoaded);
 
             AddAssert("catch specific combo counter in ruleset target", () => rulesetHUDTarget.Components.OfType<LegacyCatchComboCounter>(), () => Has.One.Items);
         }
