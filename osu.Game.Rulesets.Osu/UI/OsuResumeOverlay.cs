@@ -14,7 +14,6 @@ using osu.Game.Rulesets.Osu.UI.Cursor;
 using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Play;
 using osuTK.Graphics;
-using TagLib.Flac;
 
 namespace osu.Game.Rulesets.Osu.UI
 {
