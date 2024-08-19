@@ -119,9 +119,14 @@ namespace osu.Game.Graphics.UserInterface
             Expanded.BindValueChanged(v =>
             {
                 label.Text = v.NewValue ? expandedLabelText : contractedLabelText;
-                slider.FadeTo(v.NewValue ? 1f : 0f, 500, Easing.OutQuint);
+                slider.FadeTo(v.NewValue ? Current.Disabled ? 0.3f : 1f : 0f, 500, Easing.OutQuint);
                 slider.BypassAutoSizeAxes = !v.NewValue ? Axes.Y : Axes.None;
             }, true);
+
+            Current.BindDisabledChanged(disabled =>
+            {
+                slider.Alpha = Expanded.Value ? disabled ? 0.3f : 1 : 0f;
+            });
         }
     }
 

@@ -9,6 +9,7 @@ using Humanizer;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
@@ -404,6 +405,14 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 // As per stable editor, when changing tools, we should forcefully commit any pending placement.
                 CommitIfPlacementActive();
             }
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (Beatmap.IsNotNull())
+                Beatmap.HitObjectAdded -= hitObjectAdded;
         }
     }
 }

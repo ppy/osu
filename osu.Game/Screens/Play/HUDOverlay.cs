@@ -8,7 +8,6 @@ using System.Collections.Generic;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
@@ -295,7 +294,7 @@ namespace osu.Game.Screens.Play
                 Drawable drawable = (Drawable)element;
 
                 // for now align some top components with the bottom-edge of the lowest top-anchored hud element.
-                if (drawable.Anchor.HasFlagFast(Anchor.y0))
+                if (drawable.Anchor.HasFlag(Anchor.y0))
                 {
                     // health bars are excluded for the sake of hacky legacy skins which extend the health bar to take up the full screen area.
                     if (element is LegacyHealthDisplay)
@@ -305,20 +304,20 @@ namespace osu.Game.Screens.Play
 
                     bool isRelativeX = drawable.RelativeSizeAxes == Axes.X;
 
-                    if (drawable.Anchor.HasFlagFast(Anchor.TopRight) || isRelativeX)
+                    if (drawable.Anchor.HasFlag(Anchor.TopRight) || isRelativeX)
                     {
                         if (lowestTopScreenSpaceRight == null || bottom > lowestTopScreenSpaceRight.Value)
                             lowestTopScreenSpaceRight = bottom;
                     }
 
-                    if (drawable.Anchor.HasFlagFast(Anchor.TopLeft) || isRelativeX)
+                    if (drawable.Anchor.HasFlag(Anchor.TopLeft) || isRelativeX)
                     {
                         if (lowestTopScreenSpaceLeft == null || bottom > lowestTopScreenSpaceLeft.Value)
                             lowestTopScreenSpaceLeft = bottom;
                     }
                 }
                 // and align bottom-right components with the top-edge of the highest bottom-anchored hud element.
-                else if (drawable.Anchor.HasFlagFast(Anchor.BottomRight) || (drawable.Anchor.HasFlagFast(Anchor.y2) && drawable.RelativeSizeAxes == Axes.X))
+                else if (drawable.Anchor.HasFlag(Anchor.BottomRight) || (drawable.Anchor.HasFlag(Anchor.y2) && drawable.RelativeSizeAxes == Axes.X))
                 {
                     var topLeft = element.ScreenSpaceDrawQuad.TopLeft;
                     if (highestBottomScreenSpace == null || topLeft.Y < highestBottomScreenSpace.Value.Y)

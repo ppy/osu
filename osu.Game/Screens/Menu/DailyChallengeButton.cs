@@ -9,12 +9,10 @@ using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Threading;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps.Drawables;
-using osu.Game.Beatmaps.Drawables.Cards;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Localisation;
@@ -23,13 +21,14 @@ using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Metadata;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
+using osu.Game.Screens.OnlinePlay.DailyChallenge;
 using osuTK;
 using osuTK.Graphics;
 using osuTK.Input;
 
 namespace osu.Game.Screens.Menu
 {
-    public partial class DailyChallengeButton : MainMenuButton, IHasCustomTooltip<APIBeatmapSet?>
+    public partial class DailyChallengeButton : MainMenuButton
     {
         public Room? Room { get; private set; }
 
@@ -43,6 +42,9 @@ namespace osu.Game.Screens.Menu
 
         [Resolved]
         private IAPIProvider api { get; set; } = null!;
+
+        [Resolved]
+        private INotificationOverlay? notificationOverlay { get; set; }
 
         public DailyChallengeButton(string sampleName, Color4 colour, Action<MainMenuButton>? clickAction = null, params Key[] triggerKeys)
             : base(ButtonSystemStrings.DailyChallenge, sampleName, OsuIcon.DailyChallenge, colour, clickAction, triggerKeys)
@@ -100,7 +102,7 @@ namespace osu.Game.Screens.Menu
         {
             base.LoadComplete();
 
-            info.BindValueChanged(updateDisplay, true);
+            info.BindValueChanged(dailyChallengeChanged, true);
         }
 
         protected override void Update()
@@ -126,26 +128,37 @@ namespace osu.Game.Screens.Menu
             }
         }
 
-        private void updateDisplay(ValueChangedEvent<DailyChallengeInfo?> info)
+        private long? lastNotifiedDailyChallengeRoomId;
+
+        private void dailyChallengeChanged(ValueChangedEvent<DailyChallengeInfo?> _)
         {
             UpdateState();
 
             scheduledCountdownUpdate?.Cancel();
             scheduledCountdownUpdate = null;
 
-            if (info.NewValue == null)
+            if (info.Value == null)
             {
                 Room = null;
                 cover.OnlineInfo = TooltipContent = null;
             }
             else
             {
-                var roomRequest = new GetRoomRequest(info.NewValue.Value.RoomID);
+                var roomRequest = new GetRoomRequest(info.Value.Value.RoomID);
 
                 roomRequest.Success += room =>
                 {
                     Room = room;
                     cover.OnlineInfo = TooltipContent = room.Playlist.FirstOrDefault()?.Beatmap.BeatmapSet as APIBeatmapSet;
+
+                    // We only want to notify the user if a new challenge recently went live.
+                    if (room.StartDate.Value != null
+                        && Math.Abs((DateTimeOffset.Now - room.StartDate.Value!.Value).TotalSeconds) < 1800
+                        && room.RoomID.Value != lastNotifiedDailyChallengeRoomId)
+                    {
+                        lastNotifiedDailyChallengeRoomId = room.RoomID.Value;
+                        notificationOverlay?.Post(new NewDailyChallengeNotification(room));
+                    }
 
                     updateCountdown();
                     Scheduler.AddDelayed(updateCountdown, 1000, true);
@@ -186,36 +199,6 @@ namespace osu.Game.Screens.Menu
             base.UpdateState();
         }
 
-        public ITooltip<APIBeatmapSet?> GetCustomTooltip() => new DailyChallengeTooltip();
-
         public APIBeatmapSet? TooltipContent { get; private set; }
-
-        internal partial class DailyChallengeTooltip : CompositeDrawable, ITooltip<APIBeatmapSet?>
-        {
-            [Cached]
-            private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Purple);
-
-            private APIBeatmapSet? lastContent;
-
-            [BackgroundDependencyLoader]
-            private void load()
-            {
-                AutoSizeAxes = Axes.Both;
-            }
-
-            public void Move(Vector2 pos) => Position = pos;
-
-            public void SetContent(APIBeatmapSet? content)
-            {
-                if (content == lastContent)
-                    return;
-
-                lastContent = content;
-
-                ClearInternal();
-                if (content != null)
-                    AddInternal(new BeatmapCardNano(content));
-            }
-        }
     }
 }

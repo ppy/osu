@@ -17,13 +17,10 @@ namespace osu.Game.Screens.Footer
 {
     public partial class ScreenBackButton : ShearedButton
     {
-        // todo: see https://github.com/ppy/osu-framework/issues/3271
-        private const float torus_scale_factor = 1.2f;
-
         public const float BUTTON_WIDTH = 240;
 
         public ScreenBackButton()
-            : base(BUTTON_WIDTH, 70)
+            : base(BUTTON_WIDTH)
         {
         }
 
@@ -42,14 +39,14 @@ namespace osu.Game.Screens.Footer
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
-                        Size = new Vector2(20f),
+                        Size = new Vector2(17f),
                         Icon = FontAwesome.Solid.ChevronLeft,
                     },
                     new OsuSpriteText
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
-                        Font = OsuFont.TorusAlternate.With(size: 20 * torus_scale_factor),
+                        Font = OsuFont.TorusAlternate.With(size: 17),
                         Text = CommonStrings.Back,
                         UseFullGlyphHeight = false,
                     }

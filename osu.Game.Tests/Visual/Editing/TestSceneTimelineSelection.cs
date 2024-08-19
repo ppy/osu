@@ -403,6 +403,28 @@ namespace osu.Game.Tests.Visual.Editing
             AddAssert("placement committed", () => EditorBeatmap.HitObjects, () => Has.Count.EqualTo(2));
         }
 
+        [Test]
+        public void TestBreakRemoval()
+        {
+            var addedObjects = new[]
+            {
+                new HitCircle { StartTime = 0 },
+                new HitCircle { StartTime = 5000 },
+            };
+
+            AddStep("add hitobjects", () => EditorBeatmap.AddRange(addedObjects));
+            AddAssert("beatmap has one break", () => EditorBeatmap.Breaks, () => Has.Count.EqualTo(1));
+
+            AddStep("move mouse to break", () => InputManager.MoveMouseTo(this.ChildrenOfType<TimelineBreak>().Single()));
+            AddStep("right click", () => InputManager.Click(MouseButton.Right));
+
+            AddStep("move mouse to delete menu item", () => InputManager.MoveMouseTo(this.ChildrenOfType<OsuContextMenu>().First().ChildrenOfType<DrawableOsuMenuItem>().First()));
+            AddStep("click", () => InputManager.Click(MouseButton.Left));
+
+            AddAssert("beatmap has no breaks", () => EditorBeatmap.Breaks, () => Is.Empty);
+            AddAssert("break piece went away", () => this.ChildrenOfType<TimelineBreak>().Count(), () => Is.Zero);
+        }
+
         private void assertSelectionIs(IEnumerable<HitObject> hitObjects)
             => AddAssert("correct hitobjects selected", () => EditorBeatmap.SelectedHitObjects.OrderBy(h => h.StartTime).SequenceEqual(hitObjects));
     }

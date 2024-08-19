@@ -7,7 +7,7 @@ using osu.Game.Screens.OnlinePlay.Playlists;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer
 {
-    public partial class MultiplayerResultsScreen : PlaylistsResultsScreen
+    public partial class MultiplayerResultsScreen : PlaylistItemUserResultsScreen
     {
         public MultiplayerResultsScreen(ScoreInfo score, long roomId, PlaylistItem playlistItem)
             : base(score, roomId, playlistItem)

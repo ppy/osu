@@ -31,8 +31,6 @@ namespace osu.Game.Tests.Visual.SongSelect
         [SetUpSteps]
         public override void SetUpSteps()
         {
-            base.SetUpSteps();
-
             AddStep("populate ruleset statistics", () =>
             {
                 Dictionary<string, UserStatistics> rulesetStatistics = new Dictionary<string, UserStatistics>();
@@ -68,6 +66,8 @@ namespace osu.Game.Tests.Visual.SongSelect
                         return 0;
                 }
             }
+
+            base.SetUpSteps();
         }
 
         [Test]

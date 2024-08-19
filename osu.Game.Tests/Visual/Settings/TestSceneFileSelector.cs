@@ -21,7 +21,7 @@ namespace osu.Game.Tests.Visual.Settings
         {
             AddStep("create", () =>
             {
-                Cell(0, 0).Children = new Drawable[]
+                ContentContainer.Children = new Drawable[]
                 {
                     new Box
                     {
