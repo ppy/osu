@@ -3,7 +3,6 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Threading;
 using osu.Game.Rulesets.Catch.UI;
@@ -66,8 +65,8 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
 
             if (drawableRuleset != null)
             {
-                var catchPlayfield = (CatchPlayfield)drawableRuleset.Playfield;
-                X = Parent.AsNonNull().ToLocalSpace(catchPlayfield.Catcher.ScreenSpaceDrawQuad.Centre).X;
+                var catcher = ((CatchPlayfield)drawableRuleset.Playfield).Catcher;
+                X = Parent!.ToLocalSpace(catcher.ScreenSpaceDrawQuad.Centre).X;
             }
         }
 
