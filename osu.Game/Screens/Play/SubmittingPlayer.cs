@@ -8,11 +8,13 @@ using System.Linq;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
+using osu.Framework.Graphics;
 using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Database;
+using osu.Game.Online;
 using osu.Game.Online.API;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
@@ -41,6 +43,11 @@ namespace osu.Game.Screens.Play
         [Resolved]
         private SessionStatics statics { get; set; }
 
+        [Resolved(canBeNull: true)]
+        [CanBeNull]
+        private UserStatisticsWatcher userStatisticsWatcher { get; set; }
+
+        private readonly object scoreSubmissionLock = new object();
         private TaskCompletionSource<bool> scoreSubmissionSource;
 
         protected SubmittingPlayer(PlayerConfiguration configuration = null)
@@ -58,7 +65,21 @@ namespace osu.Game.Screens.Play
             }
 
             AddInternal(new PlayerTouchInputDetector());
+
+            // We probably want to move this display to something more global.
+            // Probably using the OSD somehow.
+            AddInternal(new GameplayOffsetControl
+            {
+                Margin = new MarginPadding(20),
+                Anchor = Anchor.CentreRight,
+                Origin = Anchor.CentreRight,
+            });
         }
+
+        protected override GameplayClockContainer CreateGameplayClockContainer(WorkingBeatmap beatmap, double gameplayStart) => new MasterGameplayClockContainer(beatmap, gameplayStart)
+        {
+            ShouldValidatePlaybackRate = true,
+        };
 
         protected override void LoadAsyncComplete()
         {
@@ -97,7 +118,7 @@ namespace osu.Game.Screens.Play
                 token = r.ID;
                 tcs.SetResult(true);
             };
-            req.Failure += handleTokenFailure;
+            req.Failure += ex => handleTokenFailure(ex, displayNotification: true);
 
             api.Queue(req);
 
@@ -107,28 +128,52 @@ namespace osu.Game.Screens.Play
 
             return true;
 
-            void handleTokenFailure(Exception exception)
+            void handleTokenFailure(Exception exception, bool displayNotification = false)
             {
                 tcs.SetResult(false);
 
-                if (HandleTokenRetrievalFailure(exception))
-                {
-                    if (string.IsNullOrEmpty(exception.Message))
-                        Logger.Error(exception, "Failed to retrieve a score submission token.");
-                    else
-                        Logger.Log($"You are not able to submit a score: {exception.Message}", level: LogLevel.Important);
+                bool shouldExit = ShouldExitOnTokenRetrievalFailure(exception);
 
+                if (displayNotification || shouldExit)
+                {
+                    string whatWillHappen = shouldExit
+                        ? "Play in this state is not permitted."
+                        : "Your score will not be submitted.";
+
+                    if (string.IsNullOrEmpty(exception.Message))
+                        Logger.Error(exception, $"Failed to retrieve a score submission token.\n\n{whatWillHappen}");
+                    else
+                    {
+                        switch (exception.Message)
+                        {
+                            case @"missing token header":
+                            case @"invalid client hash":
+                            case @"invalid verification hash":
+                                Logger.Log($"Please ensure that you are using the latest version of the official game releases.\n\n{whatWillHappen}", level: LogLevel.Important);
+                                break;
+
+                            case @"invalid beatmap_hash":
+                                Logger.Log($"This beatmap does not match the online version. Please update or redownload it.\n\n{whatWillHappen}", level: LogLevel.Important);
+                                break;
+
+                            case @"expired token":
+                                Logger.Log($"Your system clock is set incorrectly. Please check your system time, date and timezone.\n\n{whatWillHappen}", level: LogLevel.Important);
+                                break;
+
+                            default:
+                                Logger.Log($"{whatWillHappen} {exception.Message}", level: LogLevel.Important);
+                                break;
+                        }
+                    }
+                }
+
+                if (shouldExit)
+                {
                     Schedule(() =>
                     {
                         ValidForResume = false;
                         this.Exit();
                     });
-                }
-                else
-                {
-                    // Gameplay is allowed to continue, but we still should keep track of the error.
-                    // In the future, this should be visible to the user in some way.
-                    Logger.Log($"Score submission token retrieval failed ({exception.Message})");
                 }
             }
         }
@@ -138,7 +183,7 @@ namespace osu.Game.Screens.Play
         /// </summary>
         /// <param name="exception">The error causing the failure.</param>
         /// <returns>Whether gameplay should be immediately exited as a result. Returning false allows the gameplay session to continue. Defaults to true.</returns>
-        protected virtual bool HandleTokenRetrievalFailure(Exception exception) => true;
+        protected virtual bool ShouldExitOnTokenRetrievalFailure(Exception exception) => true;
 
         protected override async Task PrepareScoreForResultsAsync(Score score)
         {
@@ -148,6 +193,7 @@ namespace osu.Game.Screens.Play
 
             await submitScore(score).ConfigureAwait(false);
             spectatorClient.EndPlaying(GameplayState);
+            userStatisticsWatcher?.RegisterForStatisticsUpdateAfter(score.ScoreInfo);
         }
 
         [Resolved]
@@ -198,7 +244,7 @@ namespace osu.Game.Screens.Play
 
         /// <summary>
         /// Construct a request to be used for retrieval of the score token.
-        /// Can return null, at which point <see cref="HandleTokenRetrievalFailure"/> will be fired.
+        /// Can return null, at which point <see cref="ShouldExitOnTokenRetrievalFailure"/> will be fired.
         /// </summary>
         [CanBeNull]
         protected abstract APIRequest<APIScoreToken> CreateTokenRequest();
@@ -228,16 +274,19 @@ namespace osu.Game.Screens.Play
                 return Task.CompletedTask;
             }
 
-            if (scoreSubmissionSource != null)
-                return scoreSubmissionSource.Task;
+            lock (scoreSubmissionLock)
+            {
+                if (scoreSubmissionSource != null)
+                    return scoreSubmissionSource.Task;
+
+                scoreSubmissionSource = new TaskCompletionSource<bool>();
+            }
 
             // if the user never hit anything, this score should not be counted in any way.
             if (!score.ScoreInfo.Statistics.Any(s => s.Key.IsHit() && s.Value > 0))
                 return Task.CompletedTask;
 
             Logger.Log($"Beginning score submission (token:{token.Value})...");
-
-            scoreSubmissionSource = new TaskCompletionSource<bool>();
             var request = CreateSubmissionRequest(score, token.Value);
 
             request.Success += s =>

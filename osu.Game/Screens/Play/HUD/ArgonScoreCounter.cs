@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
@@ -15,10 +16,11 @@ namespace osu.Game.Screens.Play.HUD
 {
     public partial class ArgonScoreCounter : GameplayScoreCounter, ISerialisableDrawable
     {
-        protected override double RollingDuration => 500;
-        protected override Easing RollingEasing => Easing.OutQuint;
+        private ArgonScoreTextComponent scoreText = null!;
 
-        [SettingSource("Wireframe opacity", "Controls the opacity of the wire frames behind the digits.")]
+        protected override double RollingDuration => 250;
+
+        [SettingSource("Wireframe opacity", "Controls the opacity of the wireframes behind the digits.")]
         public BindableFloat WireframeOpacity { get; } = new BindableFloat(0.25f)
         {
             Precision = 0.01f,
@@ -31,14 +33,45 @@ namespace osu.Game.Screens.Play.HUD
 
         public bool UsesFixedAnchor { get; set; }
 
-        protected override LocalisableString FormatCount(long count) => count.ToLocalisableString();
+        protected override LocalisableString FormatCount(long count) => count.ToString();
 
-        protected override IHasText CreateText() => new ArgonScoreTextComponent(Anchor.TopRight, BeatmapsetsStrings.ShowScoreboardHeadersScore.ToUpper())
+        protected override IHasText CreateText() => scoreText = new ArgonScoreTextComponent(Anchor.TopRight, BeatmapsetsStrings.ShowScoreboardHeadersScore.ToUpper())
         {
-            RequiredDisplayDigits = { BindTarget = RequiredDisplayDigits },
             WireframeOpacity = { BindTarget = WireframeOpacity },
             ShowLabel = { BindTarget = ShowLabel },
         };
+
+        public ArgonScoreCounter()
+        {
+            RequiredDisplayDigits.BindValueChanged(_ => updateWireframe());
+        }
+
+        public override long DisplayedCount
+        {
+            get => base.DisplayedCount;
+            set
+            {
+                base.DisplayedCount = value;
+                updateWireframe();
+            }
+        }
+
+        private void updateWireframe()
+        {
+            int digitsRequiredForDisplayCount = Math.Max(RequiredDisplayDigits.Value, getDigitsRequiredForDisplayCount());
+
+            if (digitsRequiredForDisplayCount != scoreText.WireframeTemplate.Length)
+                scoreText.WireframeTemplate = new string('#', digitsRequiredForDisplayCount);
+        }
+
+        private int getDigitsRequiredForDisplayCount()
+        {
+            int digitsRequired = 1;
+            long c = DisplayedCount;
+            while ((c /= 10) > 0)
+                digitsRequired++;
+            return digitsRequired;
+        }
 
         private partial class ArgonScoreTextComponent : ArgonCounterTextComponent
         {

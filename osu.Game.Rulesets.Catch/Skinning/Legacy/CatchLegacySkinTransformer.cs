@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -32,15 +31,36 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
             switch (lookup)
             {
                 case SkinComponentsContainerLookup containerLookup:
+                    // Only handle per ruleset defaults here.
+                    if (containerLookup.Ruleset == null)
+                        return base.GetDrawableComponent(lookup);
+
+                    // Skin has configuration.
+                    if (base.GetDrawableComponent(lookup) is UserConfiguredLayoutContainer d)
+                        return d;
+
+                    // we don't have enough assets to display these components (this is especially the case on a "beatmap" skin).
+                    if (!IsProvidingLegacyResources)
+                        return null;
+
+                    // Our own ruleset components default.
                     switch (containerLookup.Target)
                     {
-                        case SkinComponentsContainerLookup.TargetArea.MainHUDComponents when containerLookup.Ruleset != null:
-                            Debug.Assert(containerLookup.Ruleset.ShortName == CatchRuleset.SHORT_NAME);
-
-                            var rulesetHUDComponents = Skin.GetDrawableComponent(lookup);
-
-                            rulesetHUDComponents ??= new DefaultSkinComponentsContainer(container =>
+                        case SkinComponentsContainerLookup.TargetArea.MainHUDComponents:
+                            return new DefaultSkinComponentsContainer(container =>
                             {
+                                var keyCounter = container.OfType<LegacyKeyCounterDisplay>().FirstOrDefault();
+
+                                if (keyCounter != null)
+                                {
+                                    // set the anchor to top right so that it won't squash to the return button to the top
+                                    keyCounter.Anchor = Anchor.CentreRight;
+                                    keyCounter.Origin = Anchor.CentreRight;
+                                    keyCounter.X = 0;
+                                    // 340px is the default height inherit from stable
+                                    keyCounter.Y = container.ToLocalSpace(new Vector2(0, container.ScreenSpaceDrawQuad.Centre.Y - 340f)).Y;
+                                }
+
                                 var combo = container.OfType<LegacyCatchComboCounter>().FirstOrDefault();
 
                                 if (combo != null)
@@ -51,13 +71,15 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
                                 }
                             })
                             {
-                                new LegacyCatchComboCounter(),
+                                Children = new Drawable[]
+                                {
+                                    new LegacyKeyCounterDisplay(),
+                                    new LegacyCatchComboCounter(),
+                                }
                             };
-
-                            return rulesetHUDComponents;
                     }
 
-                    break;
+                    return null;
 
                 case CatchSkinComponentLookup catchSkinComponent:
                     switch (catchSkinComponent.Component)
@@ -133,19 +155,6 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
 
                     result.Value = LegacyColourCompatibility.DisallowZeroAlpha(result.Value);
                     return (IBindable<TValue>)result;
-
-                case CatchSkinConfiguration config:
-                    switch (config)
-                    {
-                        case CatchSkinConfiguration.FlipCatcherPlate:
-                            // Don't flip catcher plate contents if the catcher is provided by this legacy skin.
-                            if (GetDrawableComponent(new CatchSkinComponentLookup(CatchSkinComponents.Catcher)) != null)
-                                return (IBindable<TValue>)new Bindable<bool>();
-
-                            break;
-                    }
-
-                    break;
             }
 
             return base.GetConfig<TLookup, TValue>(lookup);

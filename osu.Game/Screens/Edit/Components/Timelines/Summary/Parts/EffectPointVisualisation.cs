@@ -1,15 +1,16 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
+using osu.Framework.Graphics.Shapes;
+using osu.Framework.Localisation;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Extensions;
 using osu.Game.Graphics;
-using osu.Game.Screens.Edit.Components.Timelines.Summary.Visualisations;
 
 namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
 {
@@ -53,7 +54,18 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
             // for changes. ControlPointInfo needs a refactor to make this flow better, but it should do for now.
             Scheduler.AddDelayed(() =>
             {
-                var next = beatmap.ControlPointInfo.EffectPoints.FirstOrDefault(c => c.Time > effect.Time);
+                EffectControlPoint? next = null;
+
+                for (int i = 0; i < beatmap.ControlPointInfo.EffectPoints.Count; i++)
+                {
+                    var point = beatmap.ControlPointInfo.EffectPoints[i];
+
+                    if (point.Time > effect.Time)
+                    {
+                        next = point;
+                        break;
+                    }
+                }
 
                 if (!ReferenceEquals(nextControlPoint, next))
                 {
@@ -81,16 +93,30 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
 
                 Width = (float)(nextControlPoint.Time - effect.Time);
 
-                AddInternal(new PointVisualisation
+                AddInternal(new KiaiVisualisation(effect.Time, nextControlPoint.Time)
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Origin = Anchor.TopLeft,
-                    Width = 1,
-                    Height = 0.25f,
+                    Anchor = Anchor.BottomLeft,
+                    Origin = Anchor.CentreLeft,
+                    Height = 0.4f,
                     Depth = float.MaxValue,
-                    Colour = effect.GetRepresentingColour(colours).Darken(0.5f),
+                    Colour = colours.Purple1,
                 });
             }
+        }
+
+        private partial class KiaiVisualisation : Circle, IHasTooltip
+        {
+            private readonly double startTime;
+            private readonly double endTime;
+
+            public KiaiVisualisation(double startTime, double endTime)
+            {
+                this.startTime = startTime;
+                this.endTime = endTime;
+            }
+
+            public LocalisableString TooltipText => $"{startTime.ToEditorFormattedString()} - {endTime.ToEditorFormattedString()} kiai time";
         }
 
         // kiai sections display duration, so are required to be visualised.

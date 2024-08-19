@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -8,6 +9,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
+using osu.Game.Database;
 using osu.Game.Rulesets;
 using osu.Game.Scoring;
 using osu.Game.Scoring.Legacy;
@@ -155,8 +157,9 @@ namespace osu.Game.Tests.Database
             AddAssert("Score not marked as failed", () => Realm.Run(r => r.Find<ScoreInfo>(scoreInfo.ID)!.BackgroundReprocessingFailed), () => Is.False);
         }
 
-        [Test]
-        public void TestScoreUpgradeFailed()
+        [TestCase(30000002)]
+        [TestCase(30000013)]
+        public void TestScoreUpgradeFailed(int scoreVersion)
         {
             ScoreInfo scoreInfo = null!;
 
@@ -170,21 +173,52 @@ namespace osu.Game.Tests.Database
                         Ruleset = r.All<RulesetInfo>().First(),
                     })
                     {
-                        TotalScoreVersion = 30000002,
+                        TotalScoreVersion = scoreVersion,
                         IsLegacyScore = true,
                     });
                 });
             });
 
-            AddStep("Run background processor", () => Add(new TestBackgroundDataStoreProcessor()));
+            TestBackgroundDataStoreProcessor processor = null!;
+            AddStep("Run background processor", () => Add(processor = new TestBackgroundDataStoreProcessor()));
+            AddUntilStep("Wait for completion", () => processor.Completed);
 
             AddUntilStep("Score marked as failed", () => Realm.Run(r => r.Find<ScoreInfo>(scoreInfo.ID)!.BackgroundReprocessingFailed), () => Is.True);
-            AddAssert("Score version not upgraded", () => Realm.Run(r => r.Find<ScoreInfo>(scoreInfo.ID)!.TotalScoreVersion), () => Is.EqualTo(30000002));
+            AddAssert("Score version not upgraded", () => Realm.Run(r => r.Find<ScoreInfo>(scoreInfo.ID)!.TotalScoreVersion), () => Is.EqualTo(scoreVersion));
+        }
+
+        [Test]
+        public void TestCustomRulesetScoreNotSubjectToUpgrades([Values] bool available)
+        {
+            RulesetInfo rulesetInfo = null!;
+            ScoreInfo scoreInfo = null!;
+            TestBackgroundDataStoreProcessor processor = null!;
+
+            AddStep("Add unavailable ruleset", () => Realm.Write(r => r.Add(rulesetInfo = new RulesetInfo
+            {
+                ShortName = Guid.NewGuid().ToString(),
+                Available = available
+            })));
+
+            AddStep("Add score for unavailable ruleset", () => Realm.Write(r => r.Add(scoreInfo = new ScoreInfo(
+                ruleset: rulesetInfo,
+                beatmap: r.All<BeatmapInfo>().First())
+            {
+                TotalScoreVersion = 30000001
+            })));
+
+            AddStep("Run background processor", () => Add(processor = new TestBackgroundDataStoreProcessor()));
+            AddUntilStep("Wait for completion", () => processor.Completed);
+
+            AddAssert("Score not marked as failed", () => Realm.Run(r => r.Find<ScoreInfo>(scoreInfo.ID)!.BackgroundReprocessingFailed), () => Is.False);
+            AddAssert("Score version not upgraded", () => Realm.Run(r => r.Find<ScoreInfo>(scoreInfo.ID)!.TotalScoreVersion), () => Is.EqualTo(30000001));
         }
 
         public partial class TestBackgroundDataStoreProcessor : BackgroundDataStoreProcessor
         {
             protected override int TimeToSleepDuringGameplay => 10;
+
+            public bool Completed => ProcessingTask.IsCompleted;
         }
     }
 }

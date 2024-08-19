@@ -42,7 +42,7 @@ body:
   - type: input
     attributes:
       label: Version
-      description: The version you encountered this bug on. This is shown at the bottom of the main menu and also at the end of the settings screen.
+      description: The version you encountered this bug on. This is shown at the end of the settings overlay.
     validations:
       required: true
   - type: markdown

@@ -244,10 +244,19 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             playerArea.LoadScore(spectatorGameplayState.Score);
         });
 
-        protected override void FailGameplay(int userId)
+        protected override void FailGameplay(int userId) => Schedule(() =>
         {
             // We probably want to visualise this in the future.
-        }
+
+            var instance = instances.Single(i => i.UserId == userId);
+            syncManager.RemoveManagedClock(instance.SpectatorPlayerClock);
+        });
+
+        protected override void PassGameplay(int userId) => Schedule(() =>
+        {
+            var instance = instances.Single(i => i.UserId == userId);
+            syncManager.RemoveManagedClock(instance.SpectatorPlayerClock);
+        });
 
         protected override void QuitGameplay(int userId) => Schedule(() =>
         {

@@ -7,6 +7,7 @@ using JetBrains.Annotations;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Audio;
 using osu.Game.Beatmaps.Formats;
@@ -77,7 +78,10 @@ namespace osu.Game.Skinning
         {
             foreach (string lookup in sampleInfo.LookupNames)
             {
-                var sample = Samples?.Get(lookup) ?? Resources.AudioManager?.Samples.Get(lookup);
+                var sample = Samples?.Get(lookup)
+                             ?? Resources.AudioManager?.Samples.Get(lookup.Replace(@"Gameplay/", @"Gameplay/Argon/"))
+                             ?? Resources.AudioManager?.Samples.Get(lookup);
+
                 if (sample != null)
                     return sample;
             }
@@ -90,15 +94,12 @@ namespace osu.Game.Skinning
             // Temporary until default skin has a valid hit lighting.
             if ((lookup as SkinnableSprite.SpriteComponentLookup)?.LookupName == @"lighting") return Drawable.Empty();
 
-            if (base.GetDrawableComponent(lookup) is Drawable c)
-                return c;
-
             switch (lookup)
             {
                 case SkinComponentsContainerLookup containerLookup:
-                    // Only handle global level defaults for now.
-                    if (containerLookup.Ruleset != null)
-                        return null;
+
+                    if (base.GetDrawableComponent(lookup) is UserConfiguredLayoutContainer c)
+                        return c;
 
                     switch (containerLookup.Target)
                     {
@@ -111,6 +112,21 @@ namespace osu.Game.Skinning
                             return songSelectComponents;
 
                         case SkinComponentsContainerLookup.TargetArea.MainHUDComponents:
+                            if (containerLookup.Ruleset != null)
+                            {
+                                return new Container
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    Child = new ArgonComboCounter
+                                    {
+                                        Anchor = Anchor.BottomLeft,
+                                        Origin = Anchor.BottomLeft,
+                                        Position = new Vector2(36, -66),
+                                        Scale = new Vector2(1.3f),
+                                    },
+                                };
+                            }
+
                             var mainHUDComponents = new DefaultSkinComponentsContainer(container =>
                             {
                                 var health = container.OfType<ArgonHealthDisplay>().FirstOrDefault();
@@ -118,6 +134,7 @@ namespace osu.Game.Skinning
                                 var wedgePieces = container.OfType<ArgonWedgePiece>().ToArray();
                                 var score = container.OfType<ArgonScoreCounter>().FirstOrDefault();
                                 var accuracy = container.OfType<ArgonAccuracyCounter>().FirstOrDefault();
+                                var performancePoints = container.OfType<ArgonPerformancePointsCounter>().FirstOrDefault();
                                 var songProgress = container.OfType<ArgonSongProgress>().FirstOrDefault();
                                 var keyCounter = container.OfType<ArgonKeyCounterDisplay>().FirstOrDefault();
 
@@ -156,6 +173,13 @@ namespace osu.Game.Skinning
                                         accuracy.Position = new Vector2(-20, 20);
                                         accuracy.Anchor = Anchor.TopRight;
                                         accuracy.Origin = Anchor.TopRight;
+                                    }
+
+                                    if (performancePoints != null && accuracy != null)
+                                    {
+                                        performancePoints.Position = new Vector2(accuracy.X, accuracy.Y + accuracy.DrawHeight + 10);
+                                        performancePoints.Anchor = Anchor.TopRight;
+                                        performancePoints.Origin = Anchor.TopRight;
                                     }
 
                                     var hitError = container.OfType<HitErrorMeter>().FirstOrDefault();
@@ -216,6 +240,10 @@ namespace osu.Game.Skinning
                                         CornerRadius = { Value = 0.5f }
                                     },
                                     new ArgonAccuracyCounter(),
+                                    new ArgonPerformancePointsCounter
+                                    {
+                                        Scale = new Vector2(0.8f),
+                                    },
                                     new BarHitErrorMeter(),
                                     new BarHitErrorMeter(),
                                     new ArgonSongProgress(),
@@ -229,7 +257,7 @@ namespace osu.Game.Skinning
                     return null;
             }
 
-            return null;
+            return base.GetDrawableComponent(lookup);
         }
 
         public override IBindable<TValue>? GetConfig<TLookup, TValue>(TLookup lookup)

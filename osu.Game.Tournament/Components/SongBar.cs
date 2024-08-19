@@ -12,6 +12,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Legacy;
 using osu.Game.Extensions;
 using osu.Game.Graphics;
+using osu.Game.Models;
 using osu.Game.Rulesets;
 using osu.Game.Screens.Menu;
 using osuTK;
@@ -101,11 +102,25 @@ namespace osu.Game.Tournament.Components
 
         private void refreshContent()
         {
-            if (beatmap == null)
+            beatmap ??= new BeatmapInfo
             {
-                flow.Clear();
-                return;
-            }
+                Metadata = new BeatmapMetadata
+                {
+                    Artist = "unknown",
+                    Title = "no beatmap selected",
+                    Author = new RealmUser { Username = "unknown" },
+                },
+                DifficultyName = "unknown",
+                BeatmapSet = new BeatmapSetInfo(),
+                StarRating = 0,
+                Difficulty = new BeatmapDifficulty
+                {
+                    CircleSize = 0,
+                    DrainRate = 0,
+                    OverallDifficulty = 0,
+                    ApproachRate = 0,
+                },
+            };
 
             double bpm = beatmap.BPM;
             double length = beatmap.Length;

@@ -18,7 +18,7 @@ namespace osu.Game.Screens.Play.Break
 
         private const int blurred_icon_blur_sigma = 20;
         private const int blurred_icon_size = 130;
-        private const float blurred_icon_final_offset = 0.35f;
+        private const float blurred_icon_final_offset = 0.38f;
         private const float blurred_icon_offscreen_offset = 0.7f;
 
         private readonly GlowIcon leftGlowIcon;

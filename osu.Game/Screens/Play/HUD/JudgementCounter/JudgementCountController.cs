@@ -6,6 +6,7 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Localisation;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Scoring;
@@ -21,18 +22,30 @@ namespace osu.Game.Screens.Play.HUD.JudgementCounter
         [Resolved]
         private ScoreProcessor scoreProcessor { get; set; } = null!;
 
-        public List<JudgementCount> Results = new List<JudgementCount>();
+        private readonly Dictionary<HitResult, JudgementCount> results = new Dictionary<HitResult, JudgementCount>();
+
+        public IEnumerable<JudgementCount> Counters => counters;
+
+        private readonly List<JudgementCount> counters = new List<JudgementCount>();
 
         [BackgroundDependencyLoader]
         private void load(IBindable<RulesetInfo> ruleset)
         {
-            foreach (var result in ruleset.Value.CreateInstance().GetHitResults())
+            // Due to weirdness in judgements, some results have the same name and should be aggregated for display purposes.
+            // There's only one case of this right now ("slider end").
+            foreach (var group in ruleset.Value.CreateInstance().GetHitResults().GroupBy(r => r.displayName))
             {
-                Results.Add(new JudgementCount
+                var judgementCount = new JudgementCount
                 {
-                    Type = result.result,
+                    DisplayName = group.Key,
+                    Types = group.Select(r => r.result).ToArray(),
                     ResultCount = new BindableInt()
-                });
+                };
+
+                counters.Add(judgementCount);
+
+                foreach (var r in group)
+                    results[r.result] = judgementCount;
             }
         }
 
@@ -46,13 +59,20 @@ namespace osu.Game.Screens.Play.HUD.JudgementCounter
 
         private void updateCount(JudgementResult judgement, bool revert)
         {
-            foreach (JudgementCount result in Results.Where(result => result.Type == judgement.Type))
-                result.ResultCount.Value = revert ? result.ResultCount.Value - 1 : result.ResultCount.Value + 1;
+            if (!results.TryGetValue(judgement.Type, out var count))
+                return;
+
+            if (revert)
+                count.ResultCount.Value--;
+            else
+                count.ResultCount.Value++;
         }
 
         public struct JudgementCount
         {
-            public HitResult Type { get; set; }
+            public LocalisableString DisplayName { get; set; }
+
+            public HitResult[] Types { get; set; }
 
             public BindableInt ResultCount { get; set; }
         }

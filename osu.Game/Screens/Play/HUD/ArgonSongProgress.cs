@@ -26,6 +26,9 @@ namespace osu.Game.Screens.Play.HUD
         [SettingSource(typeof(SongProgressStrings), nameof(SongProgressStrings.ShowGraph), nameof(SongProgressStrings.ShowGraphDescription))]
         public Bindable<bool> ShowGraph { get; } = new BindableBool(true);
 
+        [SettingSource(typeof(SongProgressStrings), nameof(SongProgressStrings.ShowTime), nameof(SongProgressStrings.ShowTimeDescription))]
+        public Bindable<bool> ShowTime { get; } = new BindableBool(true);
+
         [Resolved]
         private Player? player { get; set; }
 
@@ -90,6 +93,7 @@ namespace osu.Game.Screens.Play.HUD
 
             Interactive.BindValueChanged(_ => bar.Interactive = Interactive.Value, true);
             ShowGraph.BindValueChanged(_ => updateGraphVisibility(), true);
+            ShowTime.BindValueChanged(_ => info.FadeTo(ShowTime.Value ? 1 : 0, 200, Easing.In), true);
         }
 
         protected override void UpdateObjects(IEnumerable<HitObject> objects)
@@ -114,12 +118,7 @@ namespace osu.Game.Screens.Play.HUD
 
         protected override void UpdateProgress(double progress, bool isIntro)
         {
-            bar.TrackTime = GameplayClock.CurrentTime;
-
-            if (isIntro)
-                bar.CurrentTime = 0;
-            else
-                bar.CurrentTime = FrameStableClock.CurrentTime;
+            bar.Progress = isIntro ? 0 : progress;
         }
     }
 }
