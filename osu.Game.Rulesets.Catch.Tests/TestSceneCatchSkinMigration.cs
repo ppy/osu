@@ -62,6 +62,7 @@ namespace osu.Game.Rulesets.Catch.Tests
         public void TestMigrationLegacyCatch()
         {
             AddStep("import old classic skin", () => skins.CurrentSkinInfo.Value = importSkinFromArchives(@"classic-layout-version-0.osk").SkinInfo);
+            AddAssert("layout loaded", () => skins.CurrentSkin.Value.LayoutInfos, () => NUnit.Framework.Contains.Key(SkinComponentsContainerLookup.TargetArea.MainHUDComponents));
             AddUntilStep("wait for load", () => rulesetHUDTarget.ComponentsLoaded);
 
             AddAssert("catch specific combo counter in ruleset target", () => rulesetHUDTarget.Components.OfType<LegacyCatchComboCounter>(), () => Has.One.Items);
