@@ -416,8 +416,8 @@ namespace osu.Game.Tournament.Screens.Board
                     // Handle updating status to Red/Blue Win
                     if (isPickWin)
                     {
-                        var existing = CurrentMatch.Value?.PicksBans.FirstOrDefault(p => p.BeatmapID == map.Beatmap?.OnlineID);
-                        if (existing != null) CurrentMatch.Value?.PicksBans.Remove(existing);
+                        // var existing = CurrentMatch.Value?.PicksBans.FirstOrDefault(p => p.BeatmapID == map.Beatmap?.OnlineID);
+                        // if (existing != null) CurrentMatch.Value?.PicksBans.Remove(existing);
                         updateWinStatusForBeatmap(map.Beatmap.OnlineID);
                     }
                     else
@@ -477,24 +477,20 @@ namespace osu.Game.Tournament.Screens.Board
 
         private void updateWinStatusForBeatmap(int beatmapId)
         {
-            var existing = CurrentMatch.Value?.PicksBans.FirstOrDefault(p => p.BeatmapID == beatmapId);
+            var existing = CurrentMatch.Value?.PicksBans.FirstOrDefault(p => p.BeatmapID == beatmapId && (p.Type == ChoiceType.RedWin || p.Type == ChoiceType.BlueWin));
 
             if (existing != null)
             {
-                existing.Type = pickType;
-                // Ensure the pickColour is set correctly for the win types.
-                existing.Team = pickType == ChoiceType.RedWin ? TeamColour.Red : TeamColour.Blue;
+                CurrentMatch.Value?.PicksBans.Remove(existing);
             }
-            else
+
+            CurrentMatch.Value?.PicksBans.Add(new BeatmapChoice
             {
-                CurrentMatch.Value?.PicksBans.Add(new BeatmapChoice
-                {
-                    Team = pickType == ChoiceType.RedWin ? TeamColour.Red : TeamColour.Blue,
-                    Type = pickType,
-                    BeatmapID = beatmapId,
-                    Token = true,
-                });
-            }
+                Team = pickType == ChoiceType.RedWin ? TeamColour.Red : TeamColour.Blue,
+                Type = pickType,
+                BeatmapID = beatmapId,
+                Token = true,
+            });
             // setNextMode(); // Uncomment if you still want to automatically set the next mode
         }
 
@@ -558,19 +554,33 @@ namespace osu.Game.Tournament.Screens.Board
             }
 
             // Show the trap description
-            if (CurrentMatch.Value.Traps.Any(p => p.BeatmapID == beatmapId && !p.IsTriggered))
+            if (CurrentMatch.Value.Traps.Any(p => p.BeatmapID == beatmapId))
             {
-                var matchTrap = CurrentMatch.Value.Traps.FirstOrDefault(p => p.BeatmapID == beatmapId && !p.IsTriggered);
+                // One and another for both teams
+                var matchTrap = CurrentMatch.Value.Traps.FirstOrDefault(p => p.BeatmapID == beatmapId);
+                var anotherTrap = CurrentMatch.Value.Traps.LastOrDefault(p => p.BeatmapID == beatmapId);
                 var PBTrap = CurrentMatch.Value.PicksBans.FirstOrDefault(p => p.BeatmapID == beatmapId && p.Type == ChoiceType.Trap);
 
-                if (pickType == ChoiceType.Pick && matchTrap != null)
+                if (pickType == ChoiceType.Pick && matchTrap != null && anotherTrap != null)
                 {
-                    informationDisplayContainer.Child = matchTrap.Team != pickColour
+                    bool isSameTeam = matchTrap.Team == anotherTrap.Team;
+                    var triggeredTrap = matchTrap.Team != pickColour ? matchTrap : anotherTrap;
+                    if (!isSameTeam)
+                    {
+                        informationDisplayContainer.Child = new TrapInfoDisplay(
+                            trap: triggeredTrap.Mode, team: triggeredTrap.Team, mapID: triggeredTrap.BeatmapID);
+                        CurrentMatch.Value.Traps.Remove(matchTrap);
+                        CurrentMatch.Value.Traps.Remove(anotherTrap);
+                    }
+                    else
+                    {
+                        informationDisplayContainer.Child = matchTrap.Team != pickColour
                         ? new TrapInfoDisplay(trap: matchTrap.Mode, team: matchTrap.Team, mapID: matchTrap.BeatmapID)
                         : new TrapInfoDisplay(trap: TrapType.Unused, team: matchTrap.Team, mapID: matchTrap.BeatmapID);
+                        CurrentMatch.Value.Traps.Remove(matchTrap);
+                        if (PBTrap != null) CurrentMatch.Value.PicksBans.Remove(PBTrap);
+                    }
 
-                    CurrentMatch.Value.Traps.Remove(matchTrap);
-                    if (PBTrap != null) CurrentMatch.Value.PicksBans.Remove(PBTrap);
                     if (matchTrap.Mode == TrapType.Reverse)
                     {
                         // Add Win status first
@@ -583,7 +593,6 @@ namespace osu.Game.Tournament.Screens.Board
                             Token = true,
                         });
                     }
-                    // matchTrap.IsTriggered = true;
                     hasTrap = true;
                 }
                 else
@@ -600,14 +609,12 @@ namespace osu.Game.Tournament.Screens.Board
 
                 if (source != null)
                 {
-                    // "Trigger" the trap upon final swap, after marking colors
-                    var targetTrap = CurrentMatch.Value.Traps.FirstOrDefault(p => (p.BeatmapID == source.BeatmapID && !p.IsTriggered));
-                    if (targetTrap != null) targetTrap.IsTriggered = true;
                     CurrentMatch.Value.PendingSwaps.Add(new BeatmapChoice
                     {
                         Team = TeamColour.Neutral,
                         Type = ChoiceType.Neutral,
                         BeatmapID = beatmapId,
+                        Token = true,
                     });
                     SwapMap(source.BeatmapID, beatmapId);
                 }
@@ -619,6 +626,7 @@ namespace osu.Game.Tournament.Screens.Board
                         Team = TeamColour.Neutral,
                         Type = ChoiceType.Neutral,
                         BeatmapID = beatmapId,
+                        Token = true,
                     });
                 }
             }
@@ -631,7 +639,6 @@ namespace osu.Game.Tournament.Screens.Board
                     Team = pickColour,
                     Mode = new TrapInfo().GetReversedType(trapTypeDropdown.Current.Value),
                     BeatmapID = beatmapId,
-                    IsTriggered = false,
                 });
             }
 
@@ -642,7 +649,8 @@ namespace osu.Game.Tournament.Screens.Board
                 {
                     Team = pickColour,
                     Type = pickType,
-                    BeatmapID = beatmapId
+                    BeatmapID = beatmapId,
+                    Token = true,
                 });
             }
 

@@ -117,64 +117,17 @@ namespace osu.Game.Tournament.Components
                             Font = OsuFont.Torus.With(weight: FontWeight.Bold, size: 18),
                             Margin = new MarginPadding { Left = -9, Top = -7 },
                         },
-                        /* Disable text display
-                        new TextFlowContainer
-                        {
-                            AutoSizeAxes = Axes.Y,
-                            RelativeSizeAxes = Axes.X,
-                            TextAnchor = Anchor.TopLeft,
-                            Width = 1f, // Ensure the container takes up the full width
-                            Margin = new MarginPadding { Left = -8 }, // Adjust padding as needed
-                        }.With(t => t.AddParagraph(Beatmap?.GetDisplayTitleRomanisable(false, false) ?? (LocalisableString)@"unknown", s =>
-                        {
-                            s.Font = OsuFont.Torus.With(weight: FontWeight.Bold);
-                        })),*/
-                        new FillFlowContainer
-                        {
-                            AutoSizeAxes = Axes.Both,
-                            Direction = FillDirection.Horizontal,
-                            Margin = new MarginPadding { Left = -7 }, // Adjust this value to change the distance
-                            Children = new Drawable[]
-                            {
-                                /* Disable text display
-                                new TournamentSpriteText
-                                {
-                                    Text = "mapper",
-                                    Padding = new MarginPadding { Right = 5 },
-                                    Font = OsuFont.Torus.With(weight: FontWeight.Regular, size: 14),
-                                    Margin = new MarginPadding { Right = 10 }, // Adjusts the space to the right of the mapper label
-                                },
-                                new TournamentSpriteText
-                                {
-                                    Text = Beatmap?.Metadata.Author.Username ?? "unknown",
-                                    Font = OsuFont.Torus.With(weight: FontWeight.Bold, size: 14),
-                                    MaxWidth = 79,
-                                    Margin = new MarginPadding { Right = 20 }, // Adjusts the space to the right of the mapper name
-                                },*/
-                            }
-                        },
                         new FillFlowContainer
                         {
                             AutoSizeAxes = Axes.Both,
                             Direction = FillDirection.Horizontal,
                             Margin = new MarginPadding { Left = -9, Top = 5 }, // Adjust this value to change the distance
-                            Children = new Drawable[]
+                            Child = new TournamentSpriteText
                             {
-                                /* Disable "difficulty" display
-                                new TournamentSpriteText
-                                {
-                                    Text = "difficulty",
-                                    Padding = new MarginPadding { Right = 5 },
-                                    Font = OsuFont.Torus.With(weight: FontWeight.Regular, size: 14),
-                                    Margin = new MarginPadding { Right = 10 }, // Adjusts the space to the right of the difficulty label
-                                },*/
-                                new TournamentSpriteText
-                                {
-                                    Text = truncatedDifficultyName,
-                                    MaxWidth = 120,
-                                    Font = OsuFont.Torus.With(weight: FontWeight.Medium, size: 14),
-                                },
-                            }
+                                Text = truncatedDifficultyName,
+                                MaxWidth = 120,
+                                Font = OsuFont.Torus.With(weight: FontWeight.Medium, size: 14),
+                            },
                         }
                     },
                 },
@@ -242,9 +195,6 @@ namespace osu.Game.Tournament.Components
 
             if (justSwapped)
             {
-                // icon.Icon = FontAwesome.Solid.ExchangeAlt;
-                // icon.Alpha = 1;
-                // icon.Colour = Color4.Yellow;
                 flash.Colour = Color4.White;
                 swapIcon.FadeOutFromOne(duration: 3000, easing: Easing.OutSine);
                 flash.FadeOutFromOne(duration: 1000, easing: Easing.OutCubic);
@@ -286,20 +236,14 @@ namespace osu.Game.Tournament.Components
 
             bool isProtected = currentMatch.Value.Protects.Any(p => p.BeatmapID == Beatmap?.OnlineID);
 
-            bool isTrapped = currentMatch.Value.Traps.Any(p => p.BeatmapID == Beatmap?.OnlineID && !p.IsTriggered);
+            bool isTrapped = currentMatch.Value.Traps.Any(p => p.BeatmapID == Beatmap?.OnlineID);
 
-            bool isBothTrapped = currentMatch.Value.Traps.Any(p => (p.BeatmapID == Beatmap?.OnlineID && p.Team == TeamColour.Red && !p.IsTriggered))
-                && currentMatch.Value.Traps.Any(p => (p.BeatmapID == Beatmap?.OnlineID && p.Team == TeamColour.Blue && !p.IsTriggered));
+            bool isBothTrapped = currentMatch.Value.Traps.Any(p => p.BeatmapID == Beatmap?.OnlineID && p.Team == TeamColour.Red)
+                && currentMatch.Value.Traps.Any(p => p.BeatmapID == Beatmap?.OnlineID && p.Team == TeamColour.Blue);
 
             var newChoice = currentMatch.Value.PicksBans.LastOrDefault(p => p.BeatmapID == Beatmap?.OnlineID);
 
-            var nextPureChoice = newChoice;
-
-            // Check: We need this?
-            if (isProtected) nextPureChoice = currentMatch.Value.PicksBans.LastOrDefault(p => (p.BeatmapID == Beatmap?.OnlineID && p.Type != ChoiceType.Protect));
-            else if (isTrapped) nextPureChoice = currentMatch.Value.PicksBans.LastOrDefault(p => (p.BeatmapID == Beatmap?.OnlineID && p.Type != ChoiceType.Trap));
-
-            // newChoice = nextPureChoice ?? newChoice;
+            var pickerChoice = currentMatch.Value.PicksBans.LastOrDefault(p => p.BeatmapID == Beatmap?.OnlineID && p.Type == ChoiceType.Pick);
 
             bool isSwapping = currentMatch.Value.PendingSwaps.Any(p => p.BeatmapID == Beatmap?.OnlineID);
             if (isSwapping) newChoice = currentMatch.Value.PendingSwaps.FirstOrDefault(p => p.BeatmapID == Beatmap?.OnlineID);
@@ -328,13 +272,22 @@ namespace osu.Game.Tournament.Components
                     trapIcon.MoveTo(newPosition: new osuTK.Vector2(5, -5), duration: 150, easing: Easing.OutCubic);
                 }
 
+                protectIcon.FadeTo(newAlpha: isProtected ? 1 : 0, duration: 200, easing: Easing.OutCubic);
+                trapIcon.FadeTo(newAlpha: isTrapped ? 1 : 0, duration: 200, easing: Easing.OutCubic);
+
                 BorderThickness = 4;
 
-                BorderColour = TournamentGame.GetTeamColour(newChoice.Team);
+                if (pickerChoice != null)
+                {
+                    BorderColour = TournamentGame.GetTeamColour(pickerChoice.Team);
+                }
+                else
+                {
+                    BorderColour = Color4.White;
+                }
 
                 if (isSwapping)
                 {
-                    // icon.Icon = FontAwesome.Solid.ExchangeAlt;
                     swapIcon.FadeInFromZero(duration: 800, easing: Easing.InCubic);
                 }
 
@@ -354,6 +307,7 @@ namespace osu.Game.Tournament.Components
                         Alpha = 1f;
                         backgroundAddition.FadeTo(newAlpha: 0, duration: 150, easing: Easing.InCubic);
                         icon.FadeOut(duration: 100, easing: Easing.OutCubic);
+                        BorderColour = TournamentGame.GetTeamColour(newChoice.Team);
                         break;
 
                     // Ban: All darker
@@ -363,7 +317,6 @@ namespace osu.Game.Tournament.Components
                         icon.Icon = FontAwesome.Solid.Ban;
                         icon.Colour = newChoice.Team == TeamColour.Red ? new OsuColour().TeamColourRed : new OsuColour().Sky;
                         icon.FadeTo(newAlpha: 0.6f, duration: 200, easing: Easing.InCubic);
-                        BorderColour = Color4.White;
                         BorderThickness = 0;
                         break;
 
@@ -372,7 +325,6 @@ namespace osu.Game.Tournament.Components
                         backgroundAddition.FadeTo(newAlpha: 0, duration: 150, easing: Easing.InCubic);
                         protectIcon.FadeIn(duration: 150, easing: Easing.InCubic);
                         protectIcon.Colour = newChoice.Team == TeamColour.Red ? new OsuColour().TeamColourRed : new OsuColour().Sky;
-                        BorderColour = Color4.White;
                         BorderThickness = 0;
                         break;
 
@@ -383,9 +335,6 @@ namespace osu.Game.Tournament.Components
                         icon.FadeIn(duration: 150, easing: Easing.InCubic);
                         icon.Icon = FontAwesome.Solid.Trophy;
                         icon.Colour = new OsuColour().Red;
-                        // icon.Colour = isProtected ? new OsuColour().Pink : Color4.Red;
-                        /* Commented out this line, as it will cause some degree of visual distraction.
-                        icon.Alpha = 0.73f; // Added this line to distinguish last win from other wins */
                         break;
 
                     case ChoiceType.BlueWin:
@@ -394,9 +343,6 @@ namespace osu.Game.Tournament.Components
                         icon.FadeIn(duration: 150, easing: Easing.InCubic);
                         icon.Icon = FontAwesome.Solid.Trophy;
                         icon.Colour = new OsuColour().Blue;
-                        // icon.Colour = isProtected ? new OsuColour().Sky : Color4.Blue;
-                        /* Commented out this line, as it will cause some degree of visual distraction.
-                        icon.Alpha = 0.73f; // Added this line to distinguish last win from other wins */
                         break;
 
                     case ChoiceType.Trap:
@@ -404,7 +350,6 @@ namespace osu.Game.Tournament.Components
                         backgroundAddition.FadeTo(newAlpha: 0, duration: 150, easing: Easing.InCubic);
                         trapIcon.FadeIn(duration: 150, easing: Easing.InCubic);
                         trapIcon.Colour = isBothTrapped ? Color4.White : (newChoice.Team == TeamColour.Red ? new OsuColour().TeamColourRed : new OsuColour().Sky);
-                        BorderColour = Color4.White;
                         BorderThickness = 0;
                         break;
                 }
