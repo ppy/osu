@@ -286,18 +286,20 @@ namespace osu.Game.Skinning
                     {
                         var ruleset = r.Find<RulesetInfo>("fruits");
 
-                        if (layout.TryGetDrawableInfo(ruleset, out var rulesetHUDComponents))
-                        {
-                            Type newCatchComboCounter = SerialisedDrawableInfo.GetAllAvailableDrawables(ruleset).Single(t => t.IsAssignableTo(typeof(LegacyComboCounter)));
+                        if (target != SkinComponentsContainerLookup.TargetArea.MainHUDComponents
+                            || !layout.TryGetDrawableInfo(ruleset, out var catchHUDComponents)
+                            || resources == null)
+                            return;
 
-                            // add catch-specific combo counter.
-                            rulesetHUDComponents =
-                                rulesetHUDComponents
-                                    .Append(new SerialisedDrawableInfo((Drawable)Activator.CreateInstance(newCatchComboCounter)!))
-                                    .ToArray();
+                        Type newCatchComboCounter = SerialisedDrawableInfo.GetAllAvailableDrawables(ruleset).Single(t => t.IsAssignableTo(typeof(LegacyComboCounter)));
 
-                            layout.Update(ruleset, rulesetHUDComponents);
-                        }
+                        // add catch-specific combo counter.
+                        catchHUDComponents =
+                            catchHUDComponents
+                                .Append(new SerialisedDrawableInfo((Drawable)Activator.CreateInstance(newCatchComboCounter)!))
+                                .ToArray();
+
+                        layout.Update(ruleset, catchHUDComponents);
                     });
 
                     break;
