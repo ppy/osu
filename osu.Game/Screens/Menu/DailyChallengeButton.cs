@@ -13,6 +13,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Threading;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps.Drawables;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Localisation;
@@ -45,6 +46,9 @@ namespace osu.Game.Screens.Menu
 
         [Resolved]
         private INotificationOverlay? notificationOverlay { get; set; }
+
+        [Resolved]
+        private SessionStatics statics { get; set; } = null!;
 
         public DailyChallengeButton(string sampleName, Color4 colour, Action<MainMenuButton>? clickAction = null, params Key[] triggerKeys)
             : base(ButtonSystemStrings.DailyChallenge, sampleName, OsuIcon.DailyChallenge, colour, clickAction, triggerKeys)
@@ -148,6 +152,9 @@ namespace osu.Game.Screens.Menu
 
                 roomRequest.Success += room =>
                 {
+                    // force showing intro on the first time when a new daily challenge is up.
+                    statics.SetValue(Static.DailyChallengeIntroPlayed, false);
+
                     Room = room;
                     cover.OnlineInfo = TooltipContent = room.Playlist.FirstOrDefault()?.Beatmap.BeatmapSet as APIBeatmapSet;
 
