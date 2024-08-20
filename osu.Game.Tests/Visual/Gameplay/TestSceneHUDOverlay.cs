@@ -174,6 +174,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 holdForMenu.Action += () => activated = true;
             });
 
+            AddStep("set hold button always visible", () => localConfig.SetValue(OsuSetting.AlwaysShowHoldForMenuButton, true));
             AddStep("set showhud false", () => hudOverlay.ShowHud.Value = false);
             AddUntilStep("hidetarget is hidden", () => hideTarget.Alpha, () => Is.LessThanOrEqualTo(0));
 
@@ -214,6 +215,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 progress.ChildrenOfType<ArgonSongProgressBar>().Single().OnSeek += _ => seeked = true;
             });
 
+            AddStep("set hold button always visible", () => localConfig.SetValue(OsuSetting.AlwaysShowHoldForMenuButton, true));
             AddStep("set showhud false", () => hudOverlay.ShowHud.Value = false);
             AddUntilStep("hidetarget is hidden", () => hideTarget.Alpha, () => Is.LessThanOrEqualTo(0));
 
