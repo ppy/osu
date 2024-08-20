@@ -82,7 +82,7 @@ namespace osu.Game.Beatmaps.ControlPoints
         [CanBeNull]
         public TimingControlPoint TimingPointAfter(double time)
         {
-            int index = BinarySearchUtils.BinarySearch(TimingPoints, time, c => c.Time, EqualitySelection.Rightmost);
+            int index = BinarySearch(TimingPoints, time, EqualitySelection.Rightmost);
             index = index < 0 ? ~index : index + 1;
             return index < TimingPoints.Count ? TimingPoints[index] : null;
         }
@@ -250,12 +250,81 @@ namespace osu.Game.Beatmaps.ControlPoints
         {
             ArgumentNullException.ThrowIfNull(list);
 
-            int index = BinarySearchUtils.BinarySearch(list, time, c => c.Time, EqualitySelection.Rightmost);
+            int index = BinarySearch(list, time, EqualitySelection.Rightmost);
 
             if (index < 0)
                 index = ~index - 1;
 
             return index >= 0 ? list[index] : null;
+        }
+
+        /// <summary>
+        /// Binary searches one of the control point lists to find the active control point at <paramref name="time"/>.
+        /// </summary>
+        /// <param name="list">The list to search.</param>
+        /// <param name="time">The time to find the control point at.</param>
+        /// <param name="equalitySelection">Determines which index to return if there are multiple exact matches.</param>
+        /// <returns>The index of the control point at <paramref name="time"/>. Will return the complement of the index of the control point after <paramref name="time"/> if no exact match is found.</returns>
+        public static int BinarySearch<T>(IReadOnlyList<T> list, double time, EqualitySelection equalitySelection)
+            where T : class, IControlPoint
+        {
+            ArgumentNullException.ThrowIfNull(list);
+
+            int n = list.Count;
+
+            if (n == 0)
+                return -1;
+
+            if (time < list[0].Time)
+                return -1;
+
+            if (time > list[^1].Time)
+                return ~n;
+
+            int l = 0;
+            int r = n - 1;
+            bool equalityFound = false;
+
+            while (l <= r)
+            {
+                int pivot = l + ((r - l) >> 1);
+
+                if (list[pivot].Time < time)
+                    l = pivot + 1;
+                else if (list[pivot].Time > time)
+                    r = pivot - 1;
+                else
+                {
+                    equalityFound = true;
+
+                    switch (equalitySelection)
+                    {
+                        case EqualitySelection.Leftmost:
+                            r = pivot - 1;
+                            break;
+
+                        case EqualitySelection.Rightmost:
+                            l = pivot + 1;
+                            break;
+
+                        default:
+                        case EqualitySelection.FirstFound:
+                            return pivot;
+                    }
+                }
+            }
+
+            if (!equalityFound) return ~l;
+
+            switch (equalitySelection)
+            {
+                case EqualitySelection.Leftmost:
+                    return l;
+
+                default:
+                case EqualitySelection.Rightmost:
+                    return l - 1;
+            }
         }
 
         /// <summary>
@@ -327,5 +396,12 @@ namespace osu.Game.Beatmaps.ControlPoints
 
             return controlPointInfo;
         }
+    }
+
+    public enum EqualitySelection
+    {
+        FirstFound,
+        Leftmost,
+        Rightmost
     }
 }
