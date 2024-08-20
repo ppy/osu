@@ -12,7 +12,6 @@ using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Screens.Edit.Components.Timelines.Summary.Parts;
-using osu.Game.Screens.Edit.Components.Timelines.Summary.Visualisations;
 using osuTK.Graphics;
 
 namespace osu.Game.Screens.Edit.Compose.Components.Timeline
@@ -122,8 +121,6 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)
             {
-                const float corner_radius = PointVisualisation.MAX_WIDTH / 2;
-
                 InternalChildren = new Drawable[]
                 {
                     new Container
@@ -131,7 +128,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                         RelativeSizeAxes = Axes.Both,
                         Colour = Point.GetRepresentingColour(colours),
                         Masking = true,
-                        CornerRadius = corner_radius,
+                        CornerRadius = TimelineTickDisplay.TICK_WIDTH / 2,
                         Child = new Box
                         {
                             Colour = Color4.White,

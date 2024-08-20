@@ -526,7 +526,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                     AlwaysDisplayed = alwaysDisplayed;
                     Divisor = divisor;
 
-                    Size = new Vector2(6f, 18) * BindableBeatDivisor.GetSize(divisor);
+                    Size = new Vector2(4, 18) * BindableBeatDivisor.GetSize(divisor);
                     Alpha = alwaysDisplayed ? 1 : 0;
 
                     InternalChild = new Box { RelativeSizeAxes = Axes.Both };
