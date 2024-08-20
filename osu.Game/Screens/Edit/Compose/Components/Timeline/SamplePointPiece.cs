@@ -12,6 +12,7 @@ using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Game.Audio;
@@ -164,6 +165,13 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
             [Resolved(canBeNull: true)]
             private EditorBeatmap beatmap { get; set; } = null!;
+
+            protected override Drawable CreateArrow() => new Triangle
+            {
+                Size = new Vector2(20),
+                Anchor = Anchor.Centre,
+                Origin = Anchor.TopCentre,
+            };
 
             public SampleEditPopover(HitObject hitObject)
             {
