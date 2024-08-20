@@ -11,6 +11,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Game.Configuration;
@@ -214,15 +215,23 @@ namespace osu.Game.Overlays.Mods
                 this.panel = panel;
             }
 
-            protected override void OnHoverLost(HoverLostEvent e)
-            {
-                if (ExpandedState.Value is ModCustomisationPanelState.ExpandedByHover
-                    && !ReceivePositionalInputAt(e.ScreenSpaceMousePosition))
-                {
-                    ExpandedState.Value = ModCustomisationPanelState.Collapsed;
-                }
+            private InputManager? inputManager;
 
-                base.OnHoverLost(e);
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+                inputManager = GetContainingInputManager();
+            }
+
+            protected override void Update()
+            {
+                base.Update();
+
+                if (ExpandedState.Value == ModCustomisationPanelState.ExpandedByHover)
+                {
+                    if (!ReceivePositionalInputAt(inputManager!.CurrentState.Mouse.Position) && inputManager.DraggedDrawable == null)
+                        ExpandedState.Value = ModCustomisationPanelState.Collapsed;
+                }
             }
         }
 
