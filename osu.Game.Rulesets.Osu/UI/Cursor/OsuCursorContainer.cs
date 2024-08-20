@@ -82,8 +82,8 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
         {
             base.Update();
 
-            // We can direct cast here because the cursor trail is always a derived class of CursorTrail.
-            ((CursorTrail)cursorTrail.Drawable).NewPartScale = ActiveCursor.CurrentExpandedScale;
+            if (cursorTrail.Drawable is CursorTrail trail)
+                trail.NewPartScale = ActiveCursor.CurrentExpandedScale;
         }
 
         public bool OnPressed(KeyBindingPressEvent<OsuAction> e)
