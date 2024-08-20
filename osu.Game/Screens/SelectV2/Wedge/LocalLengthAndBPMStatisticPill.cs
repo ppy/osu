@@ -82,17 +82,13 @@ namespace osu.Game.Screens.SelectV2.Wedge
 
         private Colour4 getColourByRate(double rate)
         {
-            switch (rate)
-            {
-                case < 1:
-                    return colours.ForModType(ModType.DifficultyReduction);
+            if (rate < 1)
+                return colours.ForModType(ModType.DifficultyReduction);
 
-                case > 1:
-                    return colours.ForModType(ModType.DifficultyIncrease);
+            if (rate > 1)
+                return colours.ForModType(ModType.DifficultyIncrease);
 
-                default:
-                    return colourProvider.Content2;
-            }
+            return colourProvider.Content2;
         }
 
         protected override void Dispose(bool isDisposing)
