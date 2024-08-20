@@ -323,14 +323,8 @@ namespace osu.Game.Screens.Edit.Timing
                     case TimingControlPoint timing:
                         return new TimingRowAttribute(timing);
 
-                    case DifficultyControlPoint difficulty:
-                        return new DifficultyRowAttribute(difficulty);
-
                     case EffectControlPoint effect:
                         return new EffectRowAttribute(effect);
-
-                    case SampleControlPoint sample:
-                        return new SampleRowAttribute(sample);
                 }
 
                 throw new ArgumentOutOfRangeException(nameof(controlPoint), $"Control point type {controlPoint.GetType()} is not supported");
