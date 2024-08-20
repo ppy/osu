@@ -78,7 +78,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         private TimelineTickDisplay ticks = null!;
 
-        private TimelineControlPointDisplay controlPoints = null!;
+        private TimelineTimingChangeDisplay controlPoints = null!;
 
         private Container mainContent = null!;
 
@@ -117,10 +117,11 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
             AddRange(new Drawable[]
             {
-                controlPoints = new TimelineControlPointDisplay
+                ticks = new TimelineTickDisplay(),
+                controlPoints = new TimelineTimingChangeDisplay
                 {
                     RelativeSizeAxes = Axes.X,
-                    Height = timeline_expanded_height,
+                    Height = timeline_expanded_height - timeline_height,
                 },
                 ticks,
                 mainContent = new Container
