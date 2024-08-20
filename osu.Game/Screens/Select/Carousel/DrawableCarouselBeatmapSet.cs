@@ -8,18 +8,22 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Platform;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Collections;
 using osu.Game.Database;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Online.API;
 using osu.Game.Overlays;
+using osu.Game.Rulesets;
 
 namespace osu.Game.Screens.Select.Carousel
 {
@@ -29,6 +33,7 @@ namespace osu.Game.Screens.Select.Carousel
 
         private Action<BeatmapSetInfo> restoreHiddenRequested = null!;
         private Action<int>? viewDetails;
+        private Action? copyBeatmapSetUrl;
 
         [Resolved]
         private IDialogOverlay? dialogOverlay { get; set; }
@@ -65,7 +70,7 @@ namespace osu.Game.Screens.Select.Carousel
         }
 
         [BackgroundDependencyLoader]
-        private void load(BeatmapSetOverlay? beatmapOverlay, SongSelect? songSelect)
+        private void load(BeatmapSetOverlay? beatmapOverlay, SongSelect? songSelect, Clipboard clipboard, IBindable<RulesetInfo> ruleset, IAPIProvider api)
         {
             if (songSelect != null)
                 mainMenuItems = songSelect.CreateForwardNavigationMenuItemsForBeatmap(() => (((CarouselBeatmapSet)Item!).GetNextToSelect() as CarouselBeatmap)!.BeatmapInfo);
@@ -78,6 +83,8 @@ namespace osu.Game.Screens.Select.Carousel
 
             if (beatmapOverlay != null)
                 viewDetails = beatmapOverlay.FetchAndShowBeatmapSet;
+
+            copyBeatmapSetUrl += () => clipboard.SetText($@"{api.WebsiteRootUrl}/beatmapsets/{beatmapSet.OnlineID}#{ruleset.Value.ShortName}");
         }
 
         protected override void Update()
@@ -286,6 +293,8 @@ namespace osu.Game.Screens.Select.Carousel
 
                 if (beatmapSet.Beatmaps.Any(b => b.Hidden))
                     items.Add(new OsuMenuItem("Restore all hidden", MenuItemType.Standard, () => restoreHiddenRequested(beatmapSet)));
+
+                items.Add(new OsuMenuItem("Copy URL", MenuItemType.Standard, () => copyBeatmapSetUrl?.Invoke()));
 
                 if (dialogOverlay != null)
                     items.Add(new OsuMenuItem("Delete...", MenuItemType.Destructive, () => dialogOverlay.Push(new BeatmapDeleteDialog(beatmapSet))));

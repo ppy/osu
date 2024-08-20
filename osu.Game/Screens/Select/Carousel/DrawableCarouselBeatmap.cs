@@ -17,6 +17,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
+using osu.Framework.Platform;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Collections;
@@ -25,6 +26,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Online.API;
 using osu.Game.Overlays;
 using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets;
@@ -53,6 +55,7 @@ namespace osu.Game.Screens.Select.Carousel
 
         private Action<BeatmapInfo>? selectRequested;
         private Action<BeatmapInfo>? hideRequested;
+        private Action? copyBeatmapSetUrl;
 
         private Triangles triangles = null!;
 
@@ -89,7 +92,7 @@ namespace osu.Game.Screens.Select.Carousel
         }
 
         [BackgroundDependencyLoader]
-        private void load(BeatmapManager? manager, SongSelect? songSelect)
+        private void load(BeatmapManager? manager, SongSelect? songSelect, Clipboard clipboard, IAPIProvider api)
         {
             Header.Height = height;
 
@@ -101,6 +104,8 @@ namespace osu.Game.Screens.Select.Carousel
 
             if (manager != null)
                 hideRequested = manager.Hide;
+
+            copyBeatmapSetUrl += () => clipboard.SetText($@"{api.WebsiteRootUrl}/beatmapsets/{beatmapInfo.BeatmapSet.OnlineID}#{beatmapInfo.Ruleset.ShortName}/{beatmapInfo.OnlineID}");
 
             Header.Children = new Drawable[]
             {
@@ -287,6 +292,8 @@ namespace osu.Game.Screens.Select.Carousel
                     collectionItems.Add(new OsuMenuItem("Manage...", MenuItemType.Standard, manageCollectionsDialog.Show));
 
                 items.Add(new OsuMenuItem("Collections") { Items = collectionItems });
+
+                items.Add(new OsuMenuItem("Copy URL", MenuItemType.Standard, () => copyBeatmapSetUrl?.Invoke()));
 
                 if (hideRequested != null)
                     items.Add(new OsuMenuItem(CommonStrings.ButtonsHide.ToSentence(), MenuItemType.Destructive, () => hideRequested(beatmapInfo)));
