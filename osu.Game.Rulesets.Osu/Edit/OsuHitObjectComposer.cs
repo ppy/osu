@@ -54,11 +54,8 @@ namespace osu.Game.Rulesets.Osu.Edit
 
         protected override IEnumerable<TernaryButton> CreateTernaryButtons()
             => base.CreateTernaryButtons()
-                   .Concat(DistanceSnapProvider.CreateTernaryButtons())
-                   .Concat(new[]
-                   {
-                       new TernaryButton(rectangularGridSnapToggle, "Grid Snap", () => new SpriteIcon { Icon = OsuIcon.EditorGridSnap })
-                   });
+                   .Append(new TernaryButton(rectangularGridSnapToggle, "Grid Snap", () => new SpriteIcon { Icon = OsuIcon.EditorGridSnap }))
+                   .Concat(DistanceSnapProvider.CreateTernaryButtons());
 
         private BindableList<HitObject> selectedHitObjects;
 
