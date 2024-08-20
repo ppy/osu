@@ -220,18 +220,13 @@ namespace osu.Game.Beatmaps.Formats
                 var samplePoint = legacyControlPoints.SamplePointAt(group.Time);
                 var effectPoint = legacyControlPoints.EffectPointAt(group.Time);
 
-                // if samplePoint isn't already legacy,create LegacyHitSampleInfo with customSampleBank 1
-                HitSampleInfo tempHitSample;
-
-                if (samplePoint.GetType() == typeof(SampleControlPoint))
-                {
-                    tempHitSample = samplePoint.ApplyTo(new ConvertHitObjectParser.LegacyHitSampleInfo(string.Empty, customSampleBank: 1));
-                }
+                // if samplePoint isn't already legacy, create LegacyHitSampleInfo with customSampleBank 1
                 // else create LegacyHitSampleInfo with existing customSampleBank
-                else
-                {
-                    tempHitSample = samplePoint.ApplyTo(new ConvertHitObjectParser.LegacyHitSampleInfo(string.Empty));
-                }
+                HitSampleInfo tempHitSample = samplePoint.ApplyTo(
+                    samplePoint.GetType() == typeof(SampleControlPoint)
+                    ? new ConvertHitObjectParser.LegacyHitSampleInfo(string.Empty, customSampleBank: 1)
+                    : new ConvertHitObjectParser.LegacyHitSampleInfo(string.Empty)
+                    );
 
                 // Apply the control point to a hit sample to uncover legacy properties (e.g. suffix)
                 int customSampleBank = toLegacyCustomSampleBank(tempHitSample);
