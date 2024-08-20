@@ -11,7 +11,6 @@ using osu.Framework.Input.Events;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
-using osu.Game.Overlays;
 using osuTK;
 
 namespace osu.Game.Screens.Edit.Timing
@@ -31,7 +30,7 @@ namespace osu.Game.Screens.Edit.Timing
         private Bindable<ControlPointGroup?> selectedGroup { get; set; } = null!;
 
         [BackgroundDependencyLoader]
-        private void load(OverlayColourProvider colours)
+        private void load()
         {
             RelativeSizeAxes = Axes.Both;
 
@@ -68,6 +67,14 @@ namespace osu.Game.Screens.Edit.Timing
                             Anchor = Anchor.BottomRight,
                             Origin = Anchor.BottomRight,
                         },
+                        new RoundedButton
+                        {
+                            Text = "Go to current time",
+                            Action = goToCurrentGroup,
+                            Size = new Vector2(140, 30),
+                            Anchor = Anchor.BottomRight,
+                            Origin = Anchor.BottomRight,
+                        },
                     }
                 },
             };
@@ -97,78 +104,18 @@ namespace osu.Game.Screens.Edit.Timing
         {
             base.Update();
 
-            trackActivePoint();
-
             addButton.Enabled.Value = clock.CurrentTimeAccurate != selectedGroup.Value?.Time;
         }
 
-        private Type? trackedType;
-
-        /// <summary>
-        /// Given the user has selected a control point group, we want to track any group which is
-        /// active at the current point in time which matches the type the user has selected.
-        ///
-        /// So if the user is currently looking at a timing point and seeks into the future, a
-        /// future timing point would be automatically selected if it is now the new "current" point.
-        /// </summary>
-        private void trackActivePoint()
+        private void goToCurrentGroup()
         {
-            // For simplicity only match on the first type of the active control point.
-            if (selectedGroup.Value == null)
-                trackedType = null;
-            else
-            {
-                switch (selectedGroup.Value.ControlPoints.Count)
-                {
-                    // If the selected group has no control points, clear the tracked type.
-                    // Otherwise the user will be unable to select a group with no control points.
-                    case 0:
-                        trackedType = null;
-                        break;
+            double accurateTime = clock.CurrentTimeAccurate;
 
-                    // If the selected group only has one control point, update the tracking type.
-                    case 1:
-                        trackedType = selectedGroup.Value?.ControlPoints[0].GetType();
-                        break;
+            var activeTimingPoint = Beatmap.ControlPointInfo.TimingPointAt(accurateTime);
+            var activeEffectPoint = Beatmap.ControlPointInfo.EffectPointAt(accurateTime);
 
-                    // If the selected group has more than one control point, choose the first as the tracking type
-                    // if we don't already have a singular tracked type.
-                    default:
-                        trackedType ??= selectedGroup.Value?.ControlPoints[0].GetType();
-                        break;
-                }
-            }
-
-            if (trackedType != null)
-            {
-                double accurateTime = clock.CurrentTimeAccurate;
-
-                // We don't have an efficient way of looking up groups currently, only individual point types.
-                // To improve the efficiency of this in the future, we should reconsider the overall structure of ControlPointInfo.
-
-                // Find the next group which has the same type as the selected one.
-                ControlPointGroup? found = null;
-
-                for (int i = 0; i < Beatmap.ControlPointInfo.Groups.Count; i++)
-                {
-                    var g = Beatmap.ControlPointInfo.Groups[i];
-
-                    if (g.Time > accurateTime)
-                        continue;
-
-                    for (int j = 0; j < g.ControlPoints.Count; j++)
-                    {
-                        if (g.ControlPoints[j].GetType() == trackedType)
-                        {
-                            found = g;
-                            break;
-                        }
-                    }
-                }
-
-                if (found != null)
-                    selectedGroup.Value = found;
-            }
+            double latestActiveTime = Math.Max(activeTimingPoint.Time, activeEffectPoint.Time);
+            selectedGroup.Value = Beatmap.ControlPointInfo.GroupAt(latestActiveTime);
         }
 
         private void delete()
