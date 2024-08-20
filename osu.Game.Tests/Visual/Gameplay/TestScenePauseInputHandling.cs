@@ -52,6 +52,11 @@ namespace osu.Game.Tests.Visual.Gameplay
                 {
                     Position = OsuPlayfield.BASE_SIZE / 2,
                     StartTime = 10000,
+                },
+                new HitCircle
+                {
+                    Position = OsuPlayfield.BASE_SIZE / 2,
+                    StartTime = 15000,
                 }
             }
         };
@@ -261,7 +266,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         [Test]
-        public void TestOsuRegisterInputFromPressingOrangeCursorButPressIsBlocked()
+        public void TestOsuHitCircleNotReceivingInputOnResume()
         {
             KeyCounter counter = null!;
 
@@ -287,7 +292,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         [Test]
-        public void TestOsuRegisterInputFromPressingOrangeCursorButPressIsBlocked_PauseWhileHolding()
+        public void TestOsuHitCircleNotReceivingInputOnResume_PauseWhileHoldingSameKey()
         {
             KeyCounter counter = null!;
 
@@ -316,6 +321,32 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddStep("release Z", () => InputManager.ReleaseKey(Key.Z));
             checkKey(() => counter, 2, false);
+        }
+
+        [Test]
+        public void TestOsuHitCircleNotReceivingInputOnResume_PauseWhileHoldingOtherKey()
+        {
+            loadPlayer(() => new OsuRuleset());
+
+            AddStep("press X", () => InputManager.PressKey(Key.X));
+            AddAssert("circle hit", () => Player.ScoreProcessor.HighestCombo.Value, () => Is.EqualTo(1));
+
+            seekTo(5000);
+
+            AddStep("pause", () => Player.Pause());
+            AddStep("release X", () => InputManager.ReleaseKey(Key.X));
+
+            AddStep("resume", () => Player.Resume());
+            AddStep("go to resume cursor", () => InputManager.MoveMouseTo(this.ChildrenOfType<OsuResumeOverlay.OsuClickToResumeCursor>().Single()));
+            AddStep("press Z to resume", () => InputManager.PressKey(Key.Z));
+            AddStep("release Z", () => InputManager.ReleaseKey(Key.Z));
+
+            AddAssert("circle not hit", () => Player.ScoreProcessor.HighestCombo.Value, () => Is.EqualTo(1));
+
+            AddStep("press X", () => InputManager.PressKey(Key.X));
+            AddStep("release X", () => InputManager.ReleaseKey(Key.X));
+
+            AddAssert("circle hit", () => Player.ScoreProcessor.HighestCombo.Value, () => Is.EqualTo(2));
         }
 
         private void loadPlayer(Func<Ruleset> createRuleset)
