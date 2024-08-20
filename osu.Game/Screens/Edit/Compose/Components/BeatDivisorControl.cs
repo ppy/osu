@@ -330,13 +330,13 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
             private void setPresetsFromTextBoxEntry()
             {
-                if (!int.TryParse(divisorTextBox.Text, out int divisor) || divisor < 1 || divisor > 64)
+                if (!int.TryParse(divisorTextBox.Text, out int divisor) || !BeatDivisor.SetArbitraryDivisor(divisor))
                 {
+                    // the text either didn't parse as a divisor, or the divisor was not set due to being out of range.
+                    // force a state update to reset the text box's value to the last sane value.
                     updateState();
                     return;
                 }
-
-                BeatDivisor.SetArbitraryDivisor(divisor);
 
                 this.HidePopover();
             }
