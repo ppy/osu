@@ -538,8 +538,8 @@ namespace osu.Game.Tournament.Screens.Board
                 // don't attempt to add if the beatmap isn't in our pool
                 return;
 
-            if (CurrentMatch.Value.PicksBans.Any(p => p.BeatmapID == beatmapId && (p.Type == ChoiceType.Ban && !isPickWin)))
-                // don't attempt to add if already banned and it's not a win type.
+            if (CurrentMatch.Value.PicksBans.Any(p => p.BeatmapID == beatmapId && ((p.Type == ChoiceType.Ban || p.Type == ChoiceType.RedWin || p.Type == ChoiceType.BlueWin) && !isPickWin)))
+                // don't attempt to add if already banned / winned and it's not a win type.
                 return;
 
             if (CurrentMatch.Value.Protects.Any(p => p.BeatmapID == beatmapId && pickType == ChoiceType.Ban))
