@@ -114,6 +114,6 @@ namespace osu.Game.Rulesets.Osu.Objects
             };
         }
 
-        public float HitsoundTiming => 1;
+        public double HitsoundTiming => EndTime;
     }
 }
