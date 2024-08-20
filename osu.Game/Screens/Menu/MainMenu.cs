@@ -150,7 +150,10 @@ namespace osu.Game.Screens.Menu
                             OnPlaylists = () => this.Push(new Playlists()),
                             OnDailyChallenge = room =>
                             {
-                                this.Push(new DailyChallengeIntro(room));
+                                if (statics.Get<bool>(Static.DailyChallengeIntroPlayed))
+                                    this.Push(new DailyChallenge(room));
+                                else
+                                    this.Push(new DailyChallengeIntro(room));
                             },
                             OnExit = () =>
                             {
