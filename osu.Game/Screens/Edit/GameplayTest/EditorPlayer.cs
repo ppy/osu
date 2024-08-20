@@ -72,7 +72,11 @@ namespace osu.Game.Screens.Edit.GameplayTest
             foreach (var hitObject in enumerateHitObjects(DrawableRuleset.Objects, editorState.Time))
             {
                 var judgement = hitObject.Judgement;
-                var result = new JudgementResult(hitObject, judgement) { Type = judgement.MaxResult };
+                var result = new JudgementResult(hitObject, judgement)
+                {
+                    Type = judgement.MaxResult,
+                    GameplayRate = GameplayClockContainer.GetTrueGameplayRate(),
+                };
 
                 HealthProcessor.ApplyResult(result);
                 ScoreProcessor.ApplyResult(result);

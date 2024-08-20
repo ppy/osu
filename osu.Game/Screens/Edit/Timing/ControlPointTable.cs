@@ -104,10 +104,11 @@ namespace osu.Game.Screens.Edit.Timing
                     // child items valid coordinates from the start, so ballpark something similar
                     // using estimated row height.
                     var row = Items.FlowingChildren.SingleOrDefault(item => item.Row.Equals(val.NewValue));
+
                     if (row == null)
                         return;
 
-                    float minPos = Items.GetLayoutPosition(row) * row_height;
+                    float minPos = row.Y;
                     float maxPos = minPos + row_height;
 
                     if (minPos < Scroll.Current)
@@ -322,14 +323,8 @@ namespace osu.Game.Screens.Edit.Timing
                     case TimingControlPoint timing:
                         return new TimingRowAttribute(timing);
 
-                    case DifficultyControlPoint difficulty:
-                        return new DifficultyRowAttribute(difficulty);
-
                     case EffectControlPoint effect:
                         return new EffectRowAttribute(effect);
-
-                    case SampleControlPoint sample:
-                        return new SampleRowAttribute(sample);
                 }
 
                 throw new ArgumentOutOfRangeException(nameof(controlPoint), $"Control point type {controlPoint.GetType()} is not supported");
