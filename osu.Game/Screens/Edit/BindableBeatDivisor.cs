@@ -16,6 +16,9 @@ namespace osu.Game.Screens.Edit
     {
         public static readonly int[] PREDEFINED_DIVISORS = { 1, 2, 3, 4, 6, 8, 12, 16 };
 
+        public const int MINIMUM_DIVISOR = 1;
+        public const int MAXIMUM_DIVISOR = 64;
+
         public Bindable<BeatDivisorPresetCollection> ValidDivisors { get; } = new Bindable<BeatDivisorPresetCollection>(BeatDivisorPresetCollection.COMMON);
 
         public BindableBeatDivisor(int value = 1)
@@ -30,8 +33,12 @@ namespace osu.Game.Screens.Edit
         /// </summary>
         /// <param name="divisor">The intended divisor.</param>
         /// <param name="preferKnownPresets">Forces changing the valid divisors to a known preset.</param>
-        public void SetArbitraryDivisor(int divisor, bool preferKnownPresets = false)
+        /// <returns>Whether the divisor was successfully set.</returns>
+        public bool SetArbitraryDivisor(int divisor, bool preferKnownPresets = false)
         {
+            if (divisor < MINIMUM_DIVISOR || divisor > MAXIMUM_DIVISOR)
+                return false;
+
             // If the current valid divisor range doesn't contain the proposed value, attempt to find one which does.
             if (preferKnownPresets || !ValidDivisors.Value.Presets.Contains(divisor))
             {
@@ -44,6 +51,7 @@ namespace osu.Game.Screens.Edit
             }
 
             Value = divisor;
+            return true;
         }
 
         private void updateBindableProperties()
