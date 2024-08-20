@@ -59,6 +59,12 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary
                     RelativeSizeAxes = Axes.Both,
                     Height = 0.4f,
                 },
+                new BreakPart
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    RelativeSizeAxes = Axes.Both,
+                },
                 new ControlPointPart
                 {
                     Anchor = Anchor.Centre,
@@ -72,13 +78,6 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary
                     Origin = Anchor.TopCentre,
                     RelativeSizeAxes = Axes.Both,
                     Height = 0.4f
-                },
-                new BreakPart
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    RelativeSizeAxes = Axes.Both,
-                    Height = 0.15f
                 },
                 new MarkerPart { RelativeSizeAxes = Axes.Both },
             };
