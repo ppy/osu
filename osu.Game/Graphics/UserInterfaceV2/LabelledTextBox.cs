@@ -28,6 +28,12 @@ namespace osu.Game.Graphics.UserInterfaceV2
             set => Component.ReadOnly = value;
         }
 
+        public bool SelectAllOnFocus
+        {
+            get => Component.SelectAllOnFocus;
+            set => Component.SelectAllOnFocus = value;
+        }
+
         public LocalisableString PlaceholderText
         {
             set => Component.PlaceholderText = value;

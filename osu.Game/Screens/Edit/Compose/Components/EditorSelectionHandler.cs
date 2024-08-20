@@ -186,7 +186,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
             foreach ((string bankName, var bindable) in SelectionBankStates)
             {
-                bindable.Value = GetStateFromSelection(samplesInSelection, h => h.Any(s => s.Bank == bankName));
+                bindable.Value = GetStateFromSelection(samplesInSelection.SelectMany(s => s), h => h.Bank == bankName);
             }
 
             IEnumerable<IList<HitSampleInfo>> enumerateAllSamples(HitObject hitObject)

@@ -90,10 +90,9 @@ namespace osu.Game.Beatmaps.Drawables.Cards
         protected override void Update()
         {
             base.Update();
-            progress.Progress = playButton.Progress.Value;
 
-            playButton.Scale = new Vector2(DrawWidth / 100);
-            progress.Size = new Vector2(50 * DrawWidth / 100);
+            progress.Progress = playButton.Progress.Value;
+            progress.Size = new Vector2(50 * playButton.DrawWidth / (BeatmapCardNormal.HEIGHT - BeatmapCard.CORNER_RADIUS));
         }
 
         private void updateState()
@@ -101,7 +100,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
             bool shouldDim = Dimmed.Value || playButton.Playing.Value;
 
             playButton.FadeTo(shouldDim ? 1 : 0, BeatmapCard.TRANSITION_DURATION, Easing.OutQuint);
-            background.FadeColour(colourProvider.Background6.Opacity(shouldDim ? 0.8f : 0f), BeatmapCard.TRANSITION_DURATION, Easing.OutQuint);
+            background.FadeColour(colourProvider.Background6.Opacity(shouldDim ? 0.6f : 0f), BeatmapCard.TRANSITION_DURATION, Easing.OutQuint);
         }
     }
 }

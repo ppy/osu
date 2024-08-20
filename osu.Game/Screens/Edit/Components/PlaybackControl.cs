@@ -46,8 +46,8 @@ namespace osu.Game.Screens.Edit.Components
                 {
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft,
-                    Scale = new Vector2(1.4f),
-                    IconScale = new Vector2(1.4f),
+                    Scale = new Vector2(1.2f),
+                    IconScale = new Vector2(1.2f),
                     Icon = FontAwesome.Regular.PlayCircle,
                     Action = togglePause,
                 },
@@ -105,7 +105,7 @@ namespace osu.Game.Screens.Edit.Components
 
         protected override void Dispose(bool isDisposing)
         {
-            Track.Value?.RemoveAdjustment(AdjustableProperty.Frequency, tempoAdjustment);
+            Track.Value?.RemoveAdjustment(AdjustableProperty.Tempo, tempoAdjustment);
 
             base.Dispose(isDisposing);
         }

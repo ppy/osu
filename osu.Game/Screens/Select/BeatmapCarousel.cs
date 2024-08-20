@@ -22,7 +22,6 @@ using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Database;
 using osu.Game.Graphics.Containers;
-using osu.Game.Graphics.Cursor;
 using osu.Game.Input.Bindings;
 using osu.Game.Screens.Select.Carousel;
 using osuTK;
@@ -197,9 +196,7 @@ namespace osu.Game.Screens.Select
         private CarouselRoot root;
 
         private IDisposable? subscriptionSets;
-        private IDisposable? subscriptionDeletedSets;
         private IDisposable? subscriptionBeatmaps;
-        private IDisposable? subscriptionHiddenBeatmaps;
 
         private readonly DrawablePool<DrawableCarouselBeatmapSet> setPool = new DrawablePool<DrawableCarouselBeatmapSet>(100);
 
@@ -211,7 +208,7 @@ namespace osu.Game.Screens.Select
         public BeatmapCarousel()
         {
             root = new CarouselRoot(this);
-            InternalChild = new OsuContextMenuContainer
+            InternalChild = new Container
             {
                 RelativeSizeAxes = Axes.Both,
                 Padding = new MarginPadding
@@ -246,6 +243,9 @@ namespace osu.Game.Screens.Select
 
             if (!loadedTestBeatmaps)
             {
+                // This is performing an unnecessary second lookup on realm (in addition to the subscription), but for performance reasons
+                // we require it to be separate: the subscription's initial callback (with `ChangeSet` of `null`) will run on the update
+                // thread. If we attempt to detach beatmaps in this callback the game will fall over (it takes time).
                 realm.Run(r => loadBeatmapSets(getBeatmapSets(r)));
             }
         }
@@ -253,53 +253,21 @@ namespace osu.Game.Screens.Select
         [Resolved]
         private RealmAccess realm { get; set; } = null!;
 
+        /// <summary>
+        /// Track GUIDs of all sets in realm to allow handling deletions.
+        /// </summary>
+        private readonly List<Guid> realmBeatmapSets = new List<Guid>();
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
             subscriptionSets = realm.RegisterForNotifications(getBeatmapSets, beatmapSetsChanged);
             subscriptionBeatmaps = realm.RegisterForNotifications(r => r.All<BeatmapInfo>().Where(b => !b.Hidden), beatmapsChanged);
-
-            // Can't use main subscriptions because we can't lookup deleted indices.
-            // https://github.com/realm/realm-dotnet/discussions/2634#discussioncomment-1605595.
-            subscriptionDeletedSets = realm.RegisterForNotifications(r => r.All<BeatmapSetInfo>().Where(s => s.DeletePending && !s.Protected), deletedBeatmapSetsChanged);
-            subscriptionHiddenBeatmaps = realm.RegisterForNotifications(r => r.All<BeatmapInfo>().Where(b => b.Hidden), beatmapsChanged);
         }
 
-        private void deletedBeatmapSetsChanged(IRealmCollection<BeatmapSetInfo> sender, ChangeSet? changes)
-        {
-            // If loading test beatmaps, avoid overwriting with realm subscription callbacks.
-            if (loadedTestBeatmaps)
-                return;
-
-            if (changes == null)
-                return;
-
-            var removeableSets = changes.InsertedIndices.Select(i => sender[i].ID).ToHashSet();
-
-            // This schedule is required to retain selection of beatmaps over an ImportAsUpdate operation.
-            // This is covered by TestPlaySongSelect.TestSelectionRetainedOnBeatmapUpdate.
-            //
-            // In short, we have specialised logic in `beatmapSetsChanged` (directly below) to infer that an
-            // update operation has occurred. For this to work, we need to confirm the `DeletePending` flag
-            // of the current selection.
-            //
-            // If we don't schedule the following code, it is possible for the `deleteBeatmapSetsChanged` handler
-            // to be invoked before the `beatmapSetsChanged` handler (realm call order seems non-deterministic)
-            // which will lead to the currently selected beatmap changing via `CarouselGroupEagerSelect`.
-            //
-            // We need a better path forward here. A few ideas:
-            // - Avoid the necessity of having realm subscriptions on deleted/hidden items, maybe by storing all guids in realm
-            //   to a local list so we can better look them up on receiving `DeletedIndices`.
-            // - Add a new property on `BeatmapSetInfo` to link to the pre-update set, and use that to handle the update case.
-            Schedule(() =>
-            {
-                foreach (var set in removeableSets)
-                    removeBeatmapSet(set);
-
-                invalidateAfterChange();
-            });
-        }
+        private readonly HashSet<Guid> setsRequiringUpdate = new HashSet<Guid>();
+        private readonly HashSet<Guid> setsRequiringRemoval = new HashSet<Guid>();
 
         private void beatmapSetsChanged(IRealmCollection<BeatmapSetInfo> sender, ChangeSet? changes)
         {
@@ -307,96 +275,125 @@ namespace osu.Game.Screens.Select
             if (loadedTestBeatmaps)
                 return;
 
-            var setsRequiringUpdate = new HashSet<BeatmapSetInfo>();
-            var setsRequiringRemoval = new HashSet<Guid>();
-
             if (changes == null)
             {
-                // During initial population, we must manually account for the fact that our original query was done on an async thread.
-                // Since then, there may have been imports or deletions.
-                // Here we manually catch up on any changes.
-                var realmSets = new HashSet<Guid>();
+                realmBeatmapSets.Clear();
+                realmBeatmapSets.AddRange(sender.Select(r => r.ID));
 
-                for (int i = 0; i < sender.Count; i++)
-                    realmSets.Add(sender[i].ID);
-
-                foreach (var id in realmSets)
+                if (originalBeatmapSetsDetached.Count > 0 && sender.Count == 0)
                 {
-                    if (!root.BeatmapSetsByID.ContainsKey(id))
-                        setsRequiringUpdate.Add(realm.Realm.Find<BeatmapSetInfo>(id)!.Detach());
+                    // Usually we'd reset stuff here, but doing so triggers a silly flow which ends up deadlocking realm.
+                    // Additionally, user should not be at song select when realm is blocking all operations in the first place.
+                    //
+                    // Note that due to the catch-up logic below, once operations are restored we will still be in a roughly
+                    // correct state. The only things that this return will change is the carousel will not empty *during* the blocking
+                    // operation.
+                    return;
                 }
 
-                foreach (var id in root.BeatmapSetsByID.Keys)
+                // Do a full two-way check for missing (or incorrectly present) beatmaps.
+                // Let's assume that the worst that can happen is deletions or additions.
+                setsRequiringRemoval.Clear();
+                setsRequiringUpdate.Clear();
+
+                foreach (Guid id in realmBeatmapSets)
                 {
-                    if (!realmSets.Contains(id))
+                    if (!root.BeatmapSetsByID.ContainsKey(id))
+                        setsRequiringUpdate.Add(id);
+                }
+
+                foreach (Guid id in root.BeatmapSetsByID.Keys)
+                {
+                    if (!realmBeatmapSets.Contains(id))
                         setsRequiringRemoval.Add(id);
                 }
             }
             else
             {
-                foreach (int i in changes.NewModifiedIndices)
-                    setsRequiringUpdate.Add(sender[i].Detach());
+                foreach (int i in changes.DeletedIndices.OrderDescending())
+                {
+                    Guid id = realmBeatmapSets[i];
+
+                    setsRequiringRemoval.Add(id);
+                    setsRequiringUpdate.Remove(id);
+
+                    realmBeatmapSets.RemoveAt(i);
+                }
 
                 foreach (int i in changes.InsertedIndices)
-                    setsRequiringUpdate.Add(sender[i].Detach());
+                {
+                    Guid id = sender[i].ID;
+
+                    setsRequiringRemoval.Remove(id);
+                    setsRequiringUpdate.Add(id);
+
+                    realmBeatmapSets.Insert(i, id);
+                }
+
+                foreach (int i in changes.NewModifiedIndices)
+                    setsRequiringUpdate.Add(sender[i].ID);
             }
 
-            // All local operations must be scheduled.
-            //
-            // If we don't schedule, beatmaps getting changed while song select is suspended (ie. last played being updated)
-            // will cause unexpected sounds and operations to occur in the background.
-            Schedule(() =>
+            Scheduler.AddOnce(processBeatmapChanges);
+        }
+
+        // All local operations must be scheduled.
+        //
+        // If we don't schedule, beatmaps getting changed while song select is suspended (ie. last played being updated)
+        // will cause unexpected sounds and operations to occur in the background.
+        private void processBeatmapChanges()
+        {
+            try
             {
-                try
+                foreach (var set in setsRequiringRemoval) removeBeatmapSet(set);
+
+                foreach (var set in setsRequiringUpdate) updateBeatmapSet(fetchFromID(set)!);
+
+                if (setsRequiringRemoval.Count > 0 && SelectedBeatmapInfo != null)
                 {
-                    foreach (var set in setsRequiringRemoval)
-                        removeBeatmapSet(set);
+                    // If SelectedBeatmapInfo is non-null, the set should also be non-null.
+                    Debug.Assert(SelectedBeatmapSet != null);
 
-                    foreach (var set in setsRequiringUpdate)
-                        updateBeatmapSet(set);
+                    // To handle the beatmap update flow, attempt to track selection changes across delete-insert transactions.
+                    // When an update occurs, the previous beatmap set is either soft or hard deleted.
+                    // Check if the current selection was potentially deleted by re-querying its validity.
+                    bool selectedSetMarkedDeleted = fetchFromID(SelectedBeatmapSet.ID)?.DeletePending != false;
 
-                    if (changes?.DeletedIndices.Length > 0 && SelectedBeatmapInfo != null)
+                    if (selectedSetMarkedDeleted && setsRequiringUpdate.Any())
                     {
-                        // If SelectedBeatmapInfo is non-null, the set should also be non-null.
-                        Debug.Assert(SelectedBeatmapSet != null);
-
-                        // To handle the beatmap update flow, attempt to track selection changes across delete-insert transactions.
-                        // When an update occurs, the previous beatmap set is either soft or hard deleted.
-                        // Check if the current selection was potentially deleted by re-querying its validity.
-                        bool selectedSetMarkedDeleted = realm.Run(r => r.Find<BeatmapSetInfo>(SelectedBeatmapSet.ID)?.DeletePending != false);
-
-                        if (selectedSetMarkedDeleted && setsRequiringUpdate.Any())
+                        // If it is no longer valid, make the bold assumption that an updated version will be available in the modified/inserted indices.
+                        // This relies on the full update operation being in a single transaction, so please don't change that.
+                        foreach (var set in setsRequiringUpdate)
                         {
-                            // If it is no longer valid, make the bold assumption that an updated version will be available in the modified/inserted indices.
-                            // This relies on the full update operation being in a single transaction, so please don't change that.
-                            foreach (var set in setsRequiringUpdate)
+                            foreach (var beatmapInfo in fetchFromID(set)!.Beatmaps)
                             {
-                                foreach (var beatmapInfo in set.Beatmaps)
-                                {
-                                    if (!((IBeatmapMetadataInfo)beatmapInfo.Metadata).Equals(SelectedBeatmapInfo.Metadata))
-                                        continue;
+                                if (!((IBeatmapMetadataInfo)beatmapInfo.Metadata).Equals(SelectedBeatmapInfo.Metadata)) continue;
 
-                                    // Best effort matching. We can't use ID because in the update flow a new version will get its own GUID.
-                                    if (beatmapInfo.DifficultyName == SelectedBeatmapInfo.DifficultyName)
-                                    {
-                                        SelectBeatmap(beatmapInfo);
-                                        return;
-                                    }
+                                // Best effort matching. We can't use ID because in the update flow a new version will get its own GUID.
+                                if (beatmapInfo.DifficultyName == SelectedBeatmapInfo.DifficultyName)
+                                {
+                                    SelectBeatmap(beatmapInfo);
+                                    return;
                                 }
                             }
-
-                            // If a direct selection couldn't be made, it's feasible that the difficulty name (or beatmap metadata) changed.
-                            // Let's attempt to follow set-level selection anyway.
-                            SelectBeatmap(setsRequiringUpdate.First().Beatmaps.First());
                         }
+
+                        // If a direct selection couldn't be made, it's feasible that the difficulty name (or beatmap metadata) changed.
+                        // Let's attempt to follow set-level selection anyway.
+                        SelectBeatmap(fetchFromID(setsRequiringUpdate.First())!.Beatmaps.First());
                     }
                 }
-                finally
-                {
-                    BeatmapSetsLoaded = true;
-                    invalidateAfterChange();
-                }
-            });
+            }
+            finally
+            {
+                BeatmapSetsLoaded = true;
+                invalidateAfterChange();
+            }
+
+            setsRequiringRemoval.Clear();
+            setsRequiringUpdate.Clear();
+
+            BeatmapSetInfo? fetchFromID(Guid id) => realm.Realm.Find<BeatmapSetInfo>(id);
         }
 
         private void beatmapsChanged(IRealmCollection<BeatmapInfo> sender, ChangeSet? changes)
@@ -453,16 +450,23 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        public void UpdateBeatmapSet(BeatmapSetInfo beatmapSet) => Schedule(() =>
+        public void UpdateBeatmapSet(BeatmapSetInfo beatmapSet)
         {
-            updateBeatmapSet(beatmapSet);
-            invalidateAfterChange();
-        });
+            beatmapSet = beatmapSet.Detach();
+
+            Schedule(() =>
+            {
+                updateBeatmapSet(beatmapSet);
+                invalidateAfterChange();
+            });
+        }
 
         private void updateBeatmapSet(BeatmapSetInfo beatmapSet)
         {
+            beatmapSet = beatmapSet.Detach();
+
             originalBeatmapSetsDetached.RemoveAll(set => set.ID == beatmapSet.ID);
-            originalBeatmapSetsDetached.Add(beatmapSet.Detach());
+            originalBeatmapSetsDetached.Add(beatmapSet);
 
             var newSets = new List<CarouselBeatmapSet>();
 
@@ -1312,9 +1316,7 @@ namespace osu.Game.Screens.Select
             base.Dispose(isDisposing);
 
             subscriptionSets?.Dispose();
-            subscriptionDeletedSets?.Dispose();
             subscriptionBeatmaps?.Dispose();
-            subscriptionHiddenBeatmaps?.Dispose();
         }
     }
 }

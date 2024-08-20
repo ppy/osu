@@ -32,9 +32,7 @@ namespace osu.Game.Screens.SelectV2.Footer
 {
     public partial class ScreenFooterButtonMods : ScreenFooterButton, IHasCurrentValue<IReadOnlyList<Mod>>
     {
-        // todo: see https://github.com/ppy/osu-framework/issues/3271
-        private const float torus_scale_factor = 1.2f;
-        private const float bar_height = 37f;
+        private const float bar_height = 30f;
         private const float mod_display_portion = 0.65f;
 
         private readonly BindableWithCurrent<IReadOnlyList<Mod>> current = new BindableWithCurrent<IReadOnlyList<Mod>>(Array.Empty<Mod>());
@@ -112,7 +110,7 @@ namespace osu.Game.Screens.SelectV2.Footer
                                 Origin = Anchor.Centre,
                                 Shear = -BUTTON_SHEAR,
                                 UseFullGlyphHeight = false,
-                                Font = OsuFont.Torus.With(size: 14 * torus_scale_factor, weight: FontWeight.Bold)
+                                Font = OsuFont.Torus.With(size: 14f, weight: FontWeight.Bold)
                             }
                         },
                         new Container
@@ -133,7 +131,7 @@ namespace osu.Game.Screens.SelectV2.Footer
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
                                     Shear = -BUTTON_SHEAR,
-                                    Scale = new Vector2(0.6f),
+                                    Scale = new Vector2(0.5f),
                                     Current = { BindTarget = Current },
                                     ExpansionMode = ExpansionMode.AlwaysContracted,
                                 },
@@ -142,7 +140,7 @@ namespace osu.Game.Screens.SelectV2.Footer
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
                                     Shear = -BUTTON_SHEAR,
-                                    Font = OsuFont.Torus.With(size: 14 * torus_scale_factor, weight: FontWeight.Bold),
+                                    Font = OsuFont.Torus.With(size: 14f, weight: FontWeight.Bold),
                                     Mods = { BindTarget = Current },
                                 }
                             }
@@ -335,7 +333,7 @@ namespace osu.Game.Screens.SelectV2.Footer
                         Text = ModSelectOverlayStrings.Unranked.ToUpper(),
                         Margin = new MarginPadding { Horizontal = 15 },
                         UseFullGlyphHeight = false,
-                        Font = OsuFont.Torus.With(size: 14 * torus_scale_factor, weight: FontWeight.Bold),
+                        Font = OsuFont.Torus.With(size: 14f, weight: FontWeight.Bold),
                         Colour = Color4.Black,
                     }
                 };

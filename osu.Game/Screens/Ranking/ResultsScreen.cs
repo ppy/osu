@@ -179,11 +179,11 @@ namespace osu.Game.Screens.Ranking
                 Scheduler.AddDelayed(() => OverlayActivationMode.Value = OverlayActivation.All, shouldFlair ? AccuracyCircle.TOTAL_DURATION + 1000 : 0);
             }
 
-            if (SelectedScore.Value != null && AllowWatchingReplay)
+            if (AllowWatchingReplay)
             {
                 buttons.Add(new ReplayDownloadButton(SelectedScore.Value)
                 {
-                    Score = { BindTarget = SelectedScore! },
+                    Score = { BindTarget = SelectedScore },
                     Width = 300
                 });
             }
@@ -267,7 +267,8 @@ namespace osu.Game.Screens.Ranking
             foreach (var s in scores)
                 addScore(s);
 
-            lastFetchCompleted = true;
+            // allow a frame for scroll container to adjust its dimensions with the added scores before fetching again.
+            Schedule(() => lastFetchCompleted = true);
 
             if (ScorePanelList.IsEmpty)
             {
@@ -398,7 +399,8 @@ namespace osu.Game.Screens.Ranking
                     break;
 
                 case GlobalAction.Select:
-                    StatisticsPanel.ToggleVisibility();
+                    if (SelectedScore.Value != null)
+                        StatisticsPanel.ToggleVisibility();
                     return true;
             }
 

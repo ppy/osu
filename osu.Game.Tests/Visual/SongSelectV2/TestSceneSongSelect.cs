@@ -17,13 +17,12 @@ using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Screens;
 using osu.Game.Screens.Footer;
 using osu.Game.Screens.Menu;
-using osu.Game.Screens.SelectV2;
 using osu.Game.Screens.SelectV2.Footer;
 using osuTK.Input;
 
-namespace osu.Game.Tests.Visual.SongSelect
+namespace osu.Game.Tests.Visual.SongSelectV2
 {
-    public partial class TestSceneSongSelectV2 : ScreenTestScene
+    public partial class TestSceneSongSelect : ScreenTestScene
     {
         [Cached]
         private readonly ScreenFooter screenScreenFooter;
@@ -31,7 +30,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         [Cached]
         private readonly OsuLogo logo;
 
-        public TestSceneSongSelectV2()
+        public TestSceneSongSelect()
         {
             Children = new Drawable[]
             {
@@ -63,8 +62,8 @@ namespace osu.Game.Tests.Visual.SongSelect
         {
             base.SetUpSteps();
 
-            AddStep("load screen", () => Stack.Push(new SongSelectV2()));
-            AddUntilStep("wait for load", () => Stack.CurrentScreen is SongSelectV2 songSelect && songSelect.IsLoaded);
+            AddStep("load screen", () => Stack.Push(new Screens.SelectV2.SongSelectV2()));
+            AddUntilStep("wait for load", () => Stack.CurrentScreen is Screens.SelectV2.SongSelectV2 songSelect && songSelect.IsLoaded);
         }
 
         #region Footer
@@ -180,12 +179,6 @@ namespace osu.Game.Tests.Visual.SongSelect
         }
 
         #endregion
-
-        protected override void Update()
-        {
-            base.Update();
-            Stack.Padding = new MarginPadding { Bottom = screenScreenFooter.DrawHeight - screenScreenFooter.Y };
-        }
 
         private void updateFooter(IScreen? _, IScreen? newScreen)
         {
