@@ -154,33 +154,38 @@ namespace osu.Game.Utils
         {
             List<Vector2> p = points.ToList();
 
-            if (p.Count <= 1)
+            if (p.Count < 3)
                 return p;
-
-            int n = p.Count, k = 0;
-            List<Vector2> hull = new List<Vector2>(new Vector2[2 * n]);
 
             p.Sort((a, b) => a.X == b.X ? a.Y.CompareTo(b.Y) : a.X.CompareTo(b.X));
 
-            // Build lower hull
-            for (int i = 0; i < n; ++i)
+            List<Vector2> upper = new List<Vector2>();
+            List<Vector2> lower = new List<Vector2>();
+
+            // Build the lower hull
+            for (int i = 0; i < p.Count; i++)
             {
-                while (k >= 2 && cross(hull[k - 2], hull[k - 1], p[i]) <= 0)
-                    k--;
-                hull[k] = p[i];
-                k++;
+                while (lower.Count >= 2 && cross(lower[^2], lower[^1], p[i]) <= 0)
+                    lower.RemoveAt(lower.Count - 1);
+
+                lower.Add(p[i]);
             }
 
-            // Build upper hull
-            for (int i = n - 2, t = k + 1; i >= 0; i--)
+            // Build the upper hull
+            for (int i = p.Count - 1; i >= 0; i--)
             {
-                while (k >= t && cross(hull[k - 2], hull[k - 1], p[i]) <= 0)
-                    k--;
-                hull[k] = p[i];
-                k++;
+                while (upper.Count >= 2 && cross(upper[^2], upper[^1], p[i]) <= 0)
+                    upper.RemoveAt(upper.Count - 1);
+
+                upper.Add(p[i]);
             }
 
-            return hull.Take(k - 1).ToList();
+            // Remove the last point of each half because it's a duplicate of the first point of the other half
+            lower.RemoveAt(lower.Count - 1);
+            upper.RemoveAt(upper.Count - 1);
+
+            lower.AddRange(upper);
+            return lower;
 
             float cross(Vector2 o, Vector2 a, Vector2 b) => (a.X - o.X) * (b.Y - o.Y) - (a.Y - o.Y) * (b.X - o.X);
         }
