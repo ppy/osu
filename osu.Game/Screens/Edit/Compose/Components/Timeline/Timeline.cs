@@ -16,7 +16,6 @@ using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Overlays;
 using osu.Game.Rulesets.Edit;
-using osu.Game.Screens.Edit.Components.Timelines.Summary.Visualisations;
 using osuTK;
 using osuTK.Input;
 
@@ -26,24 +25,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
     public partial class Timeline : ZoomableScrollContainer, IPositionSnapProvider
     {
         private const float timeline_height = 80;
-        private const float timeline_expanded_height = 80;
 
         private readonly Drawable userContent;
-
-        private bool alwaysShowControlPoints;
-
-        public bool AlwaysShowControlPoints
-        {
-            get => alwaysShowControlPoints;
-            set
-            {
-                if (value == alwaysShowControlPoints)
-                    return;
-
-                alwaysShowControlPoints = value;
-                controlPointsVisible.TriggerChange();
-            }
-        }
 
         [Resolved]
         private EditorClock editorClock { get; set; } = null!;
@@ -80,12 +63,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         private TimelineTickDisplay ticks = null!;
 
-        private TimelineTimingChangeDisplay controlPoints = null!;
-
-        private Container mainContent = null!;
-
         private Bindable<float> waveformOpacity = null!;
-        private Bindable<bool> controlPointsVisible = null!;
         private Bindable<bool> ticksVisible = null!;
 
         private double trackLengthForZoom;
@@ -112,18 +90,16 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             // We don't want the centre marker to scroll
             AddInternal(centreMarker = new CentreMarker());
 
-            ticks = new TimelineTickDisplay();
-
             AddRange(new Drawable[]
             {
-                ticks,
-                controlPoints = new TimelineTimingChangeDisplay
+                ticks = new TimelineTickDisplay(),
+                new TimelineTimingChangeDisplay
                 {
                     RelativeSizeAxes = Axes.Both,
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft,
                 },
-                mainContent = new Container
+                new Container
                 {
                     RelativeSizeAxes = Axes.X,
                     Height = timeline_height,
@@ -153,7 +129,6 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             });
 
             waveformOpacity = config.GetBindable<float>(OsuSetting.EditorWaveformOpacity);
-            controlPointsVisible = config.GetBindable<bool>(OsuSetting.EditorTimelineShowTimingChanges);
             ticksVisible = config.GetBindable<bool>(OsuSetting.EditorTimelineShowTicks);
 
             track.BindTo(editorClock.Track);
@@ -187,26 +162,6 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             waveformOpacity.BindValueChanged(_ => updateWaveformOpacity(), true);
 
             ticksVisible.BindValueChanged(visible => ticks.FadeTo(visible.NewValue ? 1 : 0, 200, Easing.OutQuint), true);
-
-            controlPointsVisible.BindValueChanged(visible =>
-            {
-                if (visible.NewValue || alwaysShowControlPoints)
-                {
-                    this.ResizeHeightTo(timeline_expanded_height, 200, Easing.OutQuint);
-                    mainContent.MoveToY(0, 200, Easing.OutQuint);
-
-                    // delay the fade in else masking looks weird.
-                    controlPoints.Delay(180).FadeIn(400, Easing.OutQuint);
-                }
-                else
-                {
-                    controlPoints.FadeOut(200, Easing.OutQuint);
-
-                    // likewise, delay the resize until the fade is complete.
-                    this.Delay(180).ResizeHeightTo(timeline_height, 200, Easing.OutQuint);
-                    mainContent.Delay(180).MoveToY(0, 200, Easing.OutQuint);
-                }
-            }, true);
         }
 
         private void updateWaveformOpacity() =>
