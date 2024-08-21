@@ -315,6 +315,10 @@ namespace osu.Game.Tournament.Screens.Board
             if (CurrentMatch.Value?.Round.Value == null)
                 return;
 
+            // Block illegal choice type actions.
+            if (pickType != ChoiceType.Pick && pickType != ChoiceType.RedWin && pickType != ChoiceType.BlueWin)
+                return;
+
             if (CurrentMatch.Value.Round.Value.Beatmaps.All(b => b.Beatmap?.OnlineID != beatmapId))
                 // don't attempt to add if the beatmap isn't in our pool
                 return;

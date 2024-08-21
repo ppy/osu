@@ -209,6 +209,7 @@ namespace osu.Game.Tournament.Components
 
                     default:
                         backgroundAddition.Colour = Color4.White;
+                        backgroundAddition.FadeTo(newAlpha: 0, duration: 150, easing: Easing.InCubic);
                         break;
                 }
             }
