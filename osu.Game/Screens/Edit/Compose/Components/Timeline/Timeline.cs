@@ -111,6 +111,14 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             AddRange(new Drawable[]
             {
                 ticks = new TimelineTickDisplay(),
+                new Box
+                {
+                    Name = "zero marker",
+                    RelativeSizeAxes = Axes.Y,
+                    Width = TimelineTickDisplay.TICK_WIDTH / 2,
+                    Origin = Anchor.TopCentre,
+                    Colour = colourProvider.Background1,
+                },
                 controlPoints = new TimelineTimingChangeDisplay
                 {
                     RelativeSizeAxes = Axes.Both,
@@ -135,14 +143,6 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                         ticks.CreateProxy(),
                         userContent,
                     }
-                },
-                new Box
-                {
-                    Name = "zero marker",
-                    RelativeSizeAxes = Axes.Y,
-                    Width = TimelineTickDisplay.TICK_WIDTH / 2,
-                    Origin = Anchor.TopCentre,
-                    Colour = colourProvider.Background1,
                 },
             });
 
