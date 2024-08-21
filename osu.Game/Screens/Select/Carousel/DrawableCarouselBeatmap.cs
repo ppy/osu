@@ -294,7 +294,7 @@ namespace osu.Game.Screens.Select.Carousel
 
                 items.Add(new OsuMenuItem("Collections") { Items = collectionItems });
 
-                items.Add(new OsuMenuItem("Copy URL", MenuItemType.Standard, () => copyBeatmapSetUrl?.Invoke()));
+                items.Add(new OsuMenuItem("Copy link", MenuItemType.Standard, () => copyBeatmapSetUrl?.Invoke()));
 
                 if (hideRequested != null)
                     items.Add(new OsuMenuItem(CommonStrings.ButtonsHide.ToSentence(), MenuItemType.Destructive, () => hideRequested(beatmapInfo)));

@@ -86,7 +86,7 @@ namespace osu.Game.Graphics.UserInterface
                 if (Link != null)
                 {
                     items.Add(new OsuMenuItem("Open", MenuItemType.Highlighted, () => host.OpenUrlExternally(Link)));
-                    items.Add(new OsuMenuItem("Copy URL", MenuItemType.Standard, copyUrl));
+                    items.Add(new OsuMenuItem("Copy link", MenuItemType.Standard, copyUrl));
                 }
 
                 return items.ToArray();
