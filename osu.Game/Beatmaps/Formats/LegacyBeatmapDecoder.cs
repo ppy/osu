@@ -43,6 +43,8 @@ namespace osu.Game.Beatmaps.Formats
         private LegacySampleBank defaultSampleBank;
         private int defaultSampleVolume = 100;
 
+        public static List<string> AvailableSampleBanks = ["none", "normal", "soft", "drum"];
+
         public static void Register()
         {
             AddDecoder<Beatmap>(@"osu file format v", m => new LegacyBeatmapDecoder(Parsing.ParseInt(m.Split('v').Last())));
@@ -218,6 +220,10 @@ namespace osu.Game.Beatmaps.Formats
 
                 case Section.TimingPoints:
                     handleTimingPoint(line);
+                    return;
+
+                case Section.CustomSoundBanks:
+                    handleCustomSoundBanks(line);
                     return;
 
                 case Section.HitObjects:
@@ -612,6 +618,14 @@ namespace osu.Game.Beatmaps.Formats
 
             pendingControlPoints.Clear();
             pendingControlPointTypes.Clear();
+        }
+
+        private void handleCustomSoundBanks(string line)
+        {
+            if (!AvailableSampleBanks.Contains(line))
+            {
+                AvailableSampleBanks.Add(line);
+            }
         }
 
         private void handleHitObject(string line)
