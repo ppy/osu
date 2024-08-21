@@ -30,8 +30,8 @@ namespace osu.Game.Tournament.Screens.Board
         [Resolved]
         private TournamentSceneManager? sceneManager { get; set; }
 
-        private TeamColour pickColour;
-        private ChoiceType pickType;
+        private TeamColour pickColour = TeamColour.Neutral;
+        private ChoiceType pickType = ChoiceType.Pick;
 
         private OsuButton buttonPick = null!;
         private OsuButton buttonRedWin = null!;
@@ -328,7 +328,7 @@ namespace osu.Game.Tournament.Screens.Board
 
             CurrentMatch.Value.EXPicks.Add(new BeatmapChoice
             {
-                Team = pickColour,
+                Team = TeamColour.Neutral,
                 Type = pickType,
                 BeatmapID = beatmapId,
             });
