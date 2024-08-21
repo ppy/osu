@@ -78,8 +78,11 @@ namespace osu.Game.Screens.Ranking
             {
                 Logger.Error(e, $"Failed to fetch beatmap info: {e.Message}");
 
-                Schedule(() => loading.Hide());
-                Enabled.Value = false;
+                Schedule(() =>
+                {
+                    loading.Hide();
+                    Enabled.Value = false;
+                });
             };
             api.Queue(beatmapSetRequest);
         }
@@ -109,8 +112,12 @@ namespace osu.Game.Screens.Ranking
             favouriteRequest.Failure += e =>
             {
                 Logger.Error(e, $"Failed to {actionType.ToString().ToLowerInvariant()} beatmap: {e.Message}");
-                Enabled.Value = true;
-                loading.Hide();
+
+                Schedule(() =>
+                {
+                    Enabled.Value = true;
+                    loading.Hide();
+                });
             };
 
             api.Queue(favouriteRequest);
