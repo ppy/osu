@@ -77,7 +77,6 @@ namespace osu.Game.Beatmaps.Formats
 
             writer.WriteLine();
             handleHitObjects(writer);
-
         }
 
         private void handleGeneral(TextWriter writer)
@@ -367,7 +366,6 @@ namespace osu.Game.Beatmaps.Formats
 
             foreach (var h in beatmap.HitObjects)
                 handleHitObject(writer, h);
-
         }
 
         private void handleCustomSoundBanks(TextWriter writer)
@@ -642,7 +640,6 @@ namespace osu.Game.Beatmaps.Formats
 
                 default:
                     return customSoundBanks.IndexOf(sampleBankLower) + 4;
-
             }
         }
 
