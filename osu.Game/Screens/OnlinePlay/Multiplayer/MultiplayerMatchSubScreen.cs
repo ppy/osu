@@ -6,6 +6,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -51,12 +52,35 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         private OsuGame game { get; set; }
 
         private AddItemButton addItemButton;
+        private MultiplayerMatchSongSelect songSelect;
 
         public MultiplayerMatchSubScreen(Room room)
             : base(room)
         {
             Title = room.RoomID.Value == null ? "New room" : room.Name.Value;
             Activity.Value = new UserActivity.InLobby(room);
+        }
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            preloadSongSelect();
+        }
+
+        private void preloadSongSelect()
+        {
+            LoadComponentAsync(songSelect = new MultiplayerMatchSongSelect(Room));
+        }
+
+        private MultiplayerMatchSongSelect consumeSongSelect([CanBeNull] PlaylistItem initialItem = null)
+        {
+            var s = songSelect;
+            Debug.Assert(s != null);
+
+            songSelect = null;
+
+            s.PlaylistItem = initialItem;
+            return s;
         }
 
         protected override void LoadComplete()
@@ -225,7 +249,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             if (!this.IsCurrentScreen())
                 return;
 
-            this.Push(new MultiplayerMatchSongSelect(Room, itemToEdit));
+            this.Push(consumeSongSelect(itemToEdit));
         }
 
         protected override Drawable CreateFooter() => new MultiplayerMatchFooter();
@@ -242,6 +266,12 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             var rulesetInstance = Rulesets.GetRuleset(SelectedItem.Value.RulesetID)?.CreateInstance();
             Debug.Assert(rulesetInstance != null);
             Mods.Value = client.LocalUser.Mods.Select(m => m.ToMod(rulesetInstance)).Concat(SelectedItem.Value.RequiredMods.Select(m => m.ToMod(rulesetInstance))).ToList();
+        }
+
+        public override void OnResuming(ScreenTransitionEvent e)
+        {
+            base.OnResuming(e);
+            preloadSongSelect();
         }
 
         [Resolved(canBeNull: true)]

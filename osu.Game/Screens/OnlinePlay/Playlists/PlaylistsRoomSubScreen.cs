@@ -35,6 +35,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 
         private MatchLeaderboard leaderboard;
         private SelectionPollingComponent selectionPollingComponent;
+        private PlaylistsSongSelect songSelect;
 
         private FillFlowContainer progressSection;
 
@@ -52,6 +53,22 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                 isIdle.BindTo(idleTracker.IsIdle);
 
             AddInternal(selectionPollingComponent = new SelectionPollingComponent(Room));
+            preloadSongSelect();
+        }
+
+        private void preloadSongSelect()
+        {
+            if (songSelect == null)
+                LoadComponentAsync(songSelect = new PlaylistsSongSelect(Room));
+        }
+
+        private PlaylistsSongSelect consumeSongSelect()
+        {
+            var s = songSelect;
+            Debug.Assert(s != null);
+
+            songSelect = null;
+            return s;
         }
 
         protected override void LoadComplete()
@@ -234,7 +251,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             EditPlaylist = () =>
             {
                 if (this.IsCurrentScreen())
-                    this.Push(new PlaylistsSongSelect(Room));
+                    this.Push(consumeSongSelect());
             },
         };
 
@@ -248,5 +265,12 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         {
             Exited = () => leaderboard.RefetchScores()
         });
+
+        public override void OnResuming(ScreenTransitionEvent e)
+        {
+            base.OnResuming(e);
+
+            preloadSongSelect();
+        }
     }
 }

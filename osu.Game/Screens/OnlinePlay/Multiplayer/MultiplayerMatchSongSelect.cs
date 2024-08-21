@@ -25,7 +25,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         private OngoingOperationTracker operationTracker { get; set; } = null!;
 
         private readonly IBindable<bool> operationInProgress = new Bindable<bool>();
-        private readonly PlaylistItem? itemToEdit;
 
         private LoadingLayer loadingLayer = null!;
         private IDisposable? selectionOperation;
@@ -34,11 +33,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         /// Construct a new instance of multiplayer song select.
         /// </summary>
         /// <param name="room">The room.</param>
-        /// <param name="itemToEdit">The item to be edited. May be null, in which case a new item will be added to the playlist.</param>
-        public MultiplayerMatchSongSelect(Room room, PlaylistItem? itemToEdit = null)
-            : base(room, itemToEdit)
+        public MultiplayerMatchSongSelect(Room room)
+            : base(room)
         {
-            this.itemToEdit = itemToEdit;
         }
 
         [BackgroundDependencyLoader]
@@ -79,7 +76,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
                 var multiplayerItem = new MultiplayerPlaylistItem
                 {
-                    ID = itemToEdit?.ID ?? 0,
+                    ID = PlaylistItem?.ID ?? 0,
                     BeatmapID = item.Beatmap.OnlineID,
                     BeatmapChecksum = item.Beatmap.MD5Hash,
                     RulesetID = item.RulesetID,
@@ -87,7 +84,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                     AllowedMods = item.AllowedMods.ToArray()
                 };
 
-                Task task = itemToEdit != null ? client.EditPlaylistItem(multiplayerItem) : client.AddPlaylistItem(multiplayerItem);
+                Task task = PlaylistItem != null ? client.EditPlaylistItem(multiplayerItem) : client.AddPlaylistItem(multiplayerItem);
 
                 task.FireAndForget(onSuccess: () =>
                 {

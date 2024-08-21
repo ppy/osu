@@ -35,6 +35,12 @@ namespace osu.Game.Screens.OnlinePlay
         [Resolved(typeof(Room), nameof(Room.Playlist))]
         protected BindableList<PlaylistItem> Playlist { get; private set; } = null!;
 
+        /// <summary>
+        /// An optional initial <see cref="PlaylistItem"/> to use for the initial beatmap/ruleset/mods.
+        /// If <see langword="null"/>, the last <see cref="PlaylistItem"/> in the room will be used.
+        /// </summary>
+        public PlaylistItem? PlaylistItem { get; set; }
+
         [Resolved]
         private RulesetStore rulesets { get; set; } = null!;
 
@@ -46,8 +52,9 @@ namespace osu.Game.Screens.OnlinePlay
         protected readonly Bindable<IReadOnlyList<Mod>> FreeMods = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
 
         private readonly Room room;
-        private readonly PlaylistItem? initialItem;
         private readonly FreeModSelectOverlay freeModSelectOverlay;
+
+        private PlaylistItem? initialItem => PlaylistItem ?? room.Playlist.LastOrDefault();
 
         private IDisposable? freeModSelectOverlayRegistration;
 
@@ -55,12 +62,9 @@ namespace osu.Game.Screens.OnlinePlay
         /// Creates a new <see cref="OnlinePlaySongSelect"/>.
         /// </summary>
         /// <param name="room">The room.</param>
-        /// <param name="initialItem">An optional initial <see cref="PlaylistItem"/> to use for the initial beatmap/ruleset/mods.
-        /// If <c>null</c>, the last <see cref="PlaylistItem"/> in the room will be used.</param>
-        protected OnlinePlaySongSelect(Room room, PlaylistItem? initialItem = null)
+        protected OnlinePlaySongSelect(Room room)
         {
             this.room = room;
-            this.initialItem = initialItem ?? room.Playlist.LastOrDefault();
 
             Padding = new MarginPadding { Horizontal = HORIZONTAL_OVERFLOW_PADDING };
 
@@ -81,6 +85,13 @@ namespace osu.Game.Screens.OnlinePlay
         protected override void LoadComplete()
         {
             base.LoadComplete();
+
+            freeModSelectOverlayRegistration = OverlayManager?.RegisterBlockingOverlay(freeModSelectOverlay);
+        }
+
+        public override void OnEntering(ScreenTransitionEvent e)
+        {
+            base.OnEntering(e);
 
             if (initialItem != null)
             {
@@ -115,8 +126,6 @@ namespace osu.Game.Screens.OnlinePlay
 
             Mods.BindValueChanged(onModsChanged);
             Ruleset.BindValueChanged(onRulesetChanged);
-
-            freeModSelectOverlayRegistration = OverlayManager?.RegisterBlockingOverlay(freeModSelectOverlay);
         }
 
         private void onModsChanged(ValueChangedEvent<IReadOnlyList<Mod>> mods)
