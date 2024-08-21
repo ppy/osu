@@ -97,7 +97,7 @@ namespace osu.Game.Screens.Select.Carousel
         }
 
         [BackgroundDependencyLoader]
-        private void load(BeatmapManager? manager, SongSelect? songSelect, IAPIProvider api)
+        private void load(BeatmapManager? manager, SongSelect? songSelect)
         {
             Header.Height = height;
 
