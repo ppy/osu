@@ -215,12 +215,12 @@ namespace osu.Game.Overlays.Mods
                 this.panel = panel;
             }
 
-            private InputManager? inputManager;
+            private InputManager inputManager = null!;
 
             protected override void LoadComplete()
             {
                 base.LoadComplete();
-                inputManager = GetContainingInputManager();
+                inputManager = GetContainingInputManager()!;
             }
 
             protected override void Update()
@@ -229,7 +229,7 @@ namespace osu.Game.Overlays.Mods
 
                 if (ExpandedState.Value == ModCustomisationPanelState.ExpandedByHover)
                 {
-                    if (!ReceivePositionalInputAt(inputManager!.CurrentState.Mouse.Position) && inputManager.DraggedDrawable == null)
+                    if (!ReceivePositionalInputAt(inputManager.CurrentState.Mouse.Position) && inputManager.DraggedDrawable == null)
                         ExpandedState.Value = ModCustomisationPanelState.Collapsed;
                 }
             }
