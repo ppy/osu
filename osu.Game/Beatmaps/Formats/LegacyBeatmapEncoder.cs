@@ -29,6 +29,8 @@ namespace osu.Game.Beatmaps.Formats
 
         private readonly int onlineRulesetID;
 
+        private List<string> customSoundBanks = new List<string>();
+
         /// <summary>
         /// Creates a new <see cref="LegacyBeatmapEncoder"/>.
         /// </summary>
@@ -72,6 +74,9 @@ namespace osu.Game.Beatmaps.Formats
 
             writer.WriteLine();
             handleHitObjects(writer);
+
+            writer.WriteLine();
+            handleCustomSoundBanks(writer, customSoundBanks);
         }
 
         private void handleGeneral(TextWriter writer)
@@ -361,6 +366,17 @@ namespace osu.Game.Beatmaps.Formats
 
             foreach (var h in beatmap.HitObjects)
                 handleHitObject(writer, h);
+
+        }
+
+        private void handleCustomSoundBanks(TextWriter writer, List<string> banks)
+        {
+            writer.WriteLine("[CustomSoundBanks]");
+
+            foreach (string s in banks)
+            {
+                writer.WriteLine(s);
+            }
         }
 
         private void handleHitObject(TextWriter writer, HitObject hitObject)
@@ -538,13 +554,13 @@ namespace osu.Game.Beatmaps.Formats
 
         private string getSampleBank(IList<HitSampleInfo> samples, bool banksOnly = false)
         {
-            LegacySampleBank normalBank = toLegacySampleBank(samples.SingleOrDefault(s => s.Name == HitSampleInfo.HIT_NORMAL)?.Bank);
-            LegacySampleBank addBank = toLegacySampleBank(samples.FirstOrDefault(s => !string.IsNullOrEmpty(s.Name) && s.Name != HitSampleInfo.HIT_NORMAL)?.Bank);
+            int normalBank = toLegacySampleBank(samples.SingleOrDefault(s => s.Name == HitSampleInfo.HIT_NORMAL)?.Bank);
+            int addBank = toLegacySampleBank(samples.FirstOrDefault(s => !string.IsNullOrEmpty(s.Name) && s.Name != HitSampleInfo.HIT_NORMAL)?.Bank);
 
             StringBuilder sb = new StringBuilder();
 
-            sb.Append(FormattableString.Invariant($"{(int)normalBank}:"));
-            sb.Append(FormattableString.Invariant($"{(int)addBank}"));
+            sb.Append(FormattableString.Invariant($"{normalBank}:"));
+            sb.Append(FormattableString.Invariant($"{addBank}"));
 
             if (!banksOnly)
             {
@@ -594,21 +610,28 @@ namespace osu.Game.Beatmaps.Formats
             return type;
         }
 
-        private LegacySampleBank toLegacySampleBank(string? sampleBank)
+        private int toLegacySampleBank(string? sampleBank)
         {
-            switch (sampleBank?.ToLowerInvariant())
+
+            string? sampleBankLower = sampleBank?.ToLowerInvariant();
+            switch (sampleBankLower)
             {
                 case HitSampleInfo.BANK_NORMAL:
-                    return LegacySampleBank.Normal;
+                    return (int)LegacySampleBank.Normal;
 
                 case HitSampleInfo.BANK_SOFT:
-                    return LegacySampleBank.Soft;
+                    return (int)LegacySampleBank.Soft;
 
                 case HitSampleInfo.BANK_DRUM:
-                    return LegacySampleBank.Drum;
+                    return (int)LegacySampleBank.Drum;
 
                 default:
-                    return LegacySampleBank.None;
+                    if (!customSoundBanks.Contains(sampleBankLower))
+                    {
+                        customSoundBanks.Add(sampleBankLower);
+                    }
+                    return customSoundBanks.IndexOf(sampleBankLower) + 4;
+
             }
         }
 
