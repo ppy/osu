@@ -105,7 +105,8 @@ namespace osu.Game.Screens.Select.Carousel
             if (manager != null)
                 hideRequested = manager.Hide;
 
-            copyBeatmapSetUrl += () => clipboard.SetText($@"{api.WebsiteRootUrl}/beatmapsets/{beatmapInfo.BeatmapSet.OnlineID}#{beatmapInfo.Ruleset.ShortName}/{beatmapInfo.OnlineID}");
+            if (beatmapInfo.BeatmapSet != null)
+                copyBeatmapSetUrl += () => clipboard.SetText($@"{api.WebsiteRootUrl}/beatmapsets/{beatmapInfo.BeatmapSet.OnlineID}#{beatmapInfo.Ruleset.ShortName}/{beatmapInfo.OnlineID}");
 
             Header.Children = new Drawable[]
             {
