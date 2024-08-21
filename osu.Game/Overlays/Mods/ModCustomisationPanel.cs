@@ -227,10 +227,11 @@ namespace osu.Game.Overlays.Mods
             {
                 base.Update();
 
-                if (ExpandedState.Value == ModCustomisationPanelState.ExpandedByHover)
+                if (ExpandedState.Value == ModCustomisationPanelState.ExpandedByHover
+                    && !ReceivePositionalInputAt(inputManager.CurrentState.Mouse.Position)
+                    && inputManager.DraggedDrawable == null)
                 {
-                    if (!ReceivePositionalInputAt(inputManager.CurrentState.Mouse.Position) && inputManager.DraggedDrawable == null)
-                        ExpandedState.Value = ModCustomisationPanelState.Collapsed;
+                    ExpandedState.Value = ModCustomisationPanelState.Collapsed;
                 }
             }
         }
