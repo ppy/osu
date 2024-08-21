@@ -6,7 +6,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps.ControlPoints;
-using osu.Game.Screens.Edit.Compose.Components.Timeline;
 
 namespace osu.Game.Screens.Edit.Timing
 {
@@ -53,13 +52,6 @@ namespace osu.Game.Screens.Edit.Timing
                 var nearestTimingPoint = EditorBeatmap.ControlPointInfo.TimingPointAt(editorClock.CurrentTime);
                 SelectedGroup.Value = EditorBeatmap.ControlPointInfo.GroupAt(nearestTimingPoint.Time);
             }
-        }
-
-        protected override void ConfigureTimeline(TimelineArea timelineArea)
-        {
-            base.ConfigureTimeline(timelineArea);
-
-            timelineArea.Timeline.AlwaysShowControlPoints = true;
         }
     }
 }

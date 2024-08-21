@@ -106,16 +106,8 @@ namespace osu.Game.Screens.Edit
                 MainContent.Add(content);
                 content.FadeInFromZero(300, Easing.OutQuint);
 
-                LoadComponentAsync(TimelineArea = new TimelineArea(CreateTimelineContent()), timeline =>
-                {
-                    ConfigureTimeline(timeline);
-                    timelineContent.Add(timeline);
-                });
+                LoadComponentAsync(TimelineArea = new TimelineArea(CreateTimelineContent()), timelineContent.Add);
             });
-        }
-
-        protected virtual void ConfigureTimeline(TimelineArea timelineArea)
-        {
         }
 
         protected abstract Drawable CreateMainContent();
