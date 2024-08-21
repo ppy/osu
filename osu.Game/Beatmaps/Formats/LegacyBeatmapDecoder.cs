@@ -43,7 +43,7 @@ namespace osu.Game.Beatmaps.Formats
         private LegacySampleBank defaultSampleBank;
         private int defaultSampleVolume = 100;
 
-        public static List<string> AvailableSampleBanks = ["none", "normal", "soft", "drum"];
+        public static List<string> AvailableSampleBanks = ["normal", "soft", "drum"];
 
         public static void Register()
         {

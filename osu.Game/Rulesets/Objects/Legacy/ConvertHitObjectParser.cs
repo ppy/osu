@@ -194,8 +194,8 @@ namespace osu.Game.Rulesets.Objects.Legacy
 
             List<string> availableSampleBanks = LegacyBeatmapDecoder.AvailableSampleBanks;
 
-            string bank = availableSampleBanks[Parsing.ParseInt(split[0])];
-            string addBank = availableSampleBanks[Parsing.ParseInt(split[1])];
+            string bank = availableSampleBanks[Parsing.ParseInt(split[0]) - 1];
+            string addBank = availableSampleBanks[Parsing.ParseInt(split[1]) - 1];
 
             bankInfo.BankForNormal = bank;
             bankInfo.BankForAdditions = string.IsNullOrEmpty(addBank) ? bank : addBank;
