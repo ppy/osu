@@ -6,6 +6,7 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Localisation;
 using osu.Game.Online.API;
@@ -71,6 +72,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             NotificationOverlay notificationOverlay = null!;
             DependencyProvidingContainer buttonContainer = null!;
 
+            AddStep("set intro played flag", () => Dependencies.Get<SessionStatics>().SetValue(Static.DailyChallengeIntroPlayed, true));
             AddStep("beatmap of the day active", () => metadataClient.DailyChallengeUpdated(new DailyChallengeInfo
             {
                 RoomID = 1234,
@@ -96,6 +98,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                     },
                 };
             });
+            AddAssert("intro played flag reset", () => !Dependencies.Get<SessionStatics>().Get<bool>(Static.DailyChallengeIntroPlayed));
             AddAssert("notification posted", () => notificationOverlay.AllNotifications.Count(), () => Is.EqualTo(1));
 
             AddStep("clear notifications", () =>
@@ -103,15 +106,85 @@ namespace osu.Game.Tests.Visual.UserInterface
                 foreach (var notification in notificationOverlay.AllNotifications)
                     notification.Close(runFlingAnimation: false);
             });
+
+            AddStep("set intro played flag", () => Dependencies.Get<SessionStatics>().SetValue(Static.DailyChallengeIntroPlayed, true));
+
             AddStep("beatmap of the day not active", () => metadataClient.DailyChallengeUpdated(null));
             AddAssert("no notification posted", () => notificationOverlay.AllNotifications.Count(), () => Is.Zero);
+            AddAssert("intro played flag still set", () => Dependencies.Get<SessionStatics>().Get<bool>(Static.DailyChallengeIntroPlayed));
 
             AddStep("hide button's parent", () => buttonContainer.Hide());
+
             AddStep("beatmap of the day active", () => metadataClient.DailyChallengeUpdated(new DailyChallengeInfo
             {
                 RoomID = 1234,
             }));
             AddAssert("no notification posted", () => notificationOverlay.AllNotifications.Count(), () => Is.Zero);
+            AddAssert("intro played flag still set", () => Dependencies.Get<SessionStatics>().Get<bool>(Static.DailyChallengeIntroPlayed));
+        }
+
+        [Test]
+        public void TestDailyChallengeButtonOldChallenge()
+        {
+            AddStep("set up API", () => dummyAPI.HandleRequest = req =>
+            {
+                switch (req)
+                {
+                    case GetRoomRequest getRoomRequest:
+                        if (getRoomRequest.RoomId != 1234)
+                            return false;
+
+                        var beatmap = CreateAPIBeatmap();
+                        beatmap.OnlineID = 1001;
+                        getRoomRequest.TriggerSuccess(new Room
+                        {
+                            RoomID = { Value = 1234 },
+                            Playlist =
+                            {
+                                new PlaylistItem(beatmap)
+                            },
+                            StartDate = { Value = DateTimeOffset.Now.AddMinutes(-50) },
+                            EndDate = { Value = DateTimeOffset.Now.AddSeconds(30) }
+                        });
+                        return true;
+
+                    default:
+                        return false;
+                }
+            });
+
+            NotificationOverlay notificationOverlay = null!;
+
+            AddStep("beatmap of the day not active", () => metadataClient.DailyChallengeUpdated(null));
+            AddStep("add content", () =>
+            {
+                notificationOverlay = new NotificationOverlay();
+                Children = new Drawable[]
+                {
+                    notificationOverlay,
+                    new DependencyProvidingContainer
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        AutoSizeAxes = Axes.Both,
+                        CachedDependencies = [(typeof(INotificationOverlay), notificationOverlay)],
+                        Child = new DailyChallengeButton(@"button-default-select", new Color4(102, 68, 204, 255), _ => { }, 0, Key.D)
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            ButtonSystemState = ButtonSystemState.TopLevel,
+                        },
+                    },
+                };
+            });
+
+            AddStep("set intro played flag", () => Dependencies.Get<SessionStatics>().SetValue(Static.DailyChallengeIntroPlayed, true));
+            AddStep("beatmap of the day active", () => metadataClient.DailyChallengeUpdated(new DailyChallengeInfo
+            {
+                RoomID = 1234
+            }));
+            AddAssert("no notification posted", () => notificationOverlay.AllNotifications.Count(), () => Is.Zero);
+            AddAssert("intro played flag reset", () => !Dependencies.Get<SessionStatics>().Get<bool>(Static.DailyChallengeIntroPlayed));
         }
     }
 }
