@@ -28,6 +28,21 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         private readonly Drawable userContent;
 
+        private bool alwaysShowControlPoints;
+
+        public bool AlwaysShowControlPoints
+        {
+            get => alwaysShowControlPoints;
+            set
+            {
+                if (value == alwaysShowControlPoints)
+                    return;
+
+                alwaysShowControlPoints = value;
+                controlPointsVisible.TriggerChange();
+            }
+        }
+
         [Resolved]
         private EditorClock editorClock { get; set; } = null!;
 
@@ -63,7 +78,10 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         private TimelineTickDisplay ticks = null!;
 
+        private TimelineTimingChangeDisplay controlPoints = null!;
+
         private Bindable<float> waveformOpacity = null!;
+        private Bindable<bool> controlPointsVisible = null!;
         private Bindable<bool> ticksVisible = null!;
 
         private double trackLengthForZoom;
@@ -93,7 +111,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             AddRange(new Drawable[]
             {
                 ticks = new TimelineTickDisplay(),
-                new TimelineTimingChangeDisplay
+                controlPoints = new TimelineTimingChangeDisplay
                 {
                     RelativeSizeAxes = Axes.Both,
                     Anchor = Anchor.CentreLeft,
@@ -129,6 +147,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             });
 
             waveformOpacity = config.GetBindable<float>(OsuSetting.EditorWaveformOpacity);
+            controlPointsVisible = config.GetBindable<bool>(OsuSetting.EditorTimelineShowTimingChanges);
             ticksVisible = config.GetBindable<bool>(OsuSetting.EditorTimelineShowTicks);
 
             track.BindTo(editorClock.Track);
@@ -162,6 +181,14 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             waveformOpacity.BindValueChanged(_ => updateWaveformOpacity(), true);
 
             ticksVisible.BindValueChanged(visible => ticks.FadeTo(visible.NewValue ? 1 : 0, 200, Easing.OutQuint), true);
+
+            controlPointsVisible.BindValueChanged(visible =>
+            {
+                if (visible.NewValue || alwaysShowControlPoints)
+                    controlPoints.FadeIn(400, Easing.OutQuint);
+                else
+                    controlPoints.FadeOut(200, Easing.OutQuint);
+            }, true);
         }
 
         private void updateWaveformOpacity() =>
