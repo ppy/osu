@@ -73,10 +73,11 @@ namespace osu.Game.Beatmaps.Formats
             handleColours(writer);
 
             writer.WriteLine();
-            handleHitObjects(writer);
+            handleCustomSoundBanks(writer);
 
             writer.WriteLine();
-            handleCustomSoundBanks(writer, customSoundBanks);
+            handleHitObjects(writer);
+
         }
 
         private void handleGeneral(TextWriter writer)
@@ -369,13 +370,27 @@ namespace osu.Game.Beatmaps.Formats
 
         }
 
-        private void handleCustomSoundBanks(TextWriter writer, List<string> banks)
+        private void handleCustomSoundBanks(TextWriter writer)
         {
             writer.WriteLine("[CustomSoundBanks]");
 
-            foreach (string s in banks)
+            if (beatmap.HitObjects.Count == 0)
+                return;
+
+            foreach (var h in beatmap.HitObjects)
+                checkCustomSoundBank(h);
+
+            foreach (string s in customSoundBanks)
             {
                 writer.WriteLine(s);
+            }
+        }
+
+        private void checkCustomSoundBank(HitObject h)
+        {
+            if (!customSoundBanks.Contains(h.Samples.SingleOrDefault(s => s.Name == HitSampleInfo.HIT_NORMAL)?.Bank))
+            {
+                customSoundBanks.Add(h.Samples.SingleOrDefault(s => s.Name == HitSampleInfo.HIT_NORMAL)?.Bank);
             }
         }
 
@@ -626,10 +641,6 @@ namespace osu.Game.Beatmaps.Formats
                     return (int)LegacySampleBank.Drum;
 
                 default:
-                    if (!customSoundBanks.Contains(sampleBankLower))
-                    {
-                        customSoundBanks.Add(sampleBankLower);
-                    }
                     return customSoundBanks.IndexOf(sampleBankLower) + 4;
 
             }
