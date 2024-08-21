@@ -200,7 +200,8 @@ namespace osu.Game.Overlays.BeatmapSet
 
         private void updateExternalLink()
         {
-            if (externalLink != null) externalLink.Link = $@"{api.WebsiteRootUrl}/beatmapsets/{BeatmapSet.Value?.OnlineID}#{Picker.Beatmap.Value?.Ruleset.ShortName}/{Picker.Beatmap.Value?.OnlineID}";
+            if (externalLink != null)
+                externalLink.Link = Picker.Beatmap.Value?.GetOnlineURL(api) ?? BeatmapSet.Value?.GetOnlineURL(api);
         }
 
         [BackgroundDependencyLoader]
