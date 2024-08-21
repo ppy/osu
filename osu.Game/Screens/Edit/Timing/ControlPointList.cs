@@ -9,6 +9,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
 using osuTK;
@@ -30,7 +31,7 @@ namespace osu.Game.Screens.Edit.Timing
         private Bindable<ControlPointGroup?> selectedGroup { get; set; } = null!;
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OsuColour colours)
         {
             RelativeSizeAxes = Axes.Both;
 
@@ -59,6 +60,7 @@ namespace osu.Game.Screens.Edit.Timing
                             Action = delete,
                             Anchor = Anchor.BottomRight,
                             Origin = Anchor.BottomRight,
+                            BackgroundColour = colours.Red3,
                         },
                         addButton = new RoundedButton
                         {
@@ -66,6 +68,7 @@ namespace osu.Game.Screens.Edit.Timing
                             Size = new Vector2(160, 30),
                             Anchor = Anchor.BottomRight,
                             Origin = Anchor.BottomRight,
+                            BackgroundColour = colours.Green3,
                         },
                         new RoundedButton
                         {
