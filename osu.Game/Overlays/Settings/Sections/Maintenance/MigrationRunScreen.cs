@@ -28,9 +28,6 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
         private OsuGame game { get; set; }
 
         [Resolved]
-        private INotificationOverlay notifications { get; set; }
-
-        [Resolved]
         private Storage storage { get; set; }
 
         [Resolved]
@@ -96,8 +93,6 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
             };
 
             Beatmap.Value = Beatmap.Default;
-
-            var originalStorage = new NativeStorage(storage.GetFullPath(string.Empty), host);
 
             migrationTask = Task.Run(PerformMigration)
                                 .ContinueWith(task =>
