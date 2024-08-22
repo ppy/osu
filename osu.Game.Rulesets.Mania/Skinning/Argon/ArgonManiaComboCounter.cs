@@ -38,11 +38,11 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
         private void updateAnchor()
         {
             // if the anchor isn't a vertical center, set top or bottom anchor based on scroll direction
-            if (!Anchor.HasFlag(Anchor.y1))
-            {
-                Anchor &= ~(Anchor.y0 | Anchor.y2);
-                Anchor |= direction.Value == ScrollingDirection.Up ? Anchor.y2 : Anchor.y0;
-            }
+            if (Anchor.HasFlag(Anchor.y1))
+                return;
+
+            Anchor &= ~(Anchor.y0 | Anchor.y2);
+            Anchor |= direction.Value == ScrollingDirection.Up ? Anchor.y2 : Anchor.y0;
 
             // change the sign of the Y coordinate in line with the scrolling direction.
             // i.e. if the user changes direction from down to up, the anchor is changed from top to bottom, and the Y is flipped from positive to negative here.
