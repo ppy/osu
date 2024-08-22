@@ -83,7 +83,7 @@ namespace osu.Game.Overlays.Toolbar
                 }
 
                 if (update.After.PP != null)
-                    pp.Display((int)(update.Before.PP ?? update.After.PP.Value), (int)Math.Abs((update.After.PP - update.Before.PP) ?? 0M), (int)update.After.PP.Value);
+                    pp.Display((int)(update.Before.PP ?? update.After.PP.Value), (int)Math.Abs(((int?)update.After.PP - (int?)update.Before.PP) ?? 0M), (int)update.After.PP.Value);
 
                 this.Delay(5000).FadeOut(500, Easing.OutQuint);
             });
