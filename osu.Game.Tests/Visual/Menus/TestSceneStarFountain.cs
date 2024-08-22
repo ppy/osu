@@ -67,11 +67,11 @@ namespace osu.Game.Tests.Visual.Menus
                 };
             });
 
-            AddRepeatStep("activate fountains", () =>
+            AddStep("activate fountains", () =>
             {
                 ((StarFountain)Children[0]).Shoot(1);
                 ((StarFountain)Children[1]).Shoot(-1);
-            }, 150);
+            });
         }
     }
 }
