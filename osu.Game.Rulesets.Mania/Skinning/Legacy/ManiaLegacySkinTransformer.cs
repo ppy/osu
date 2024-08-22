@@ -80,7 +80,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
         {
             switch (lookup)
             {
-                case SkinComponentsContainerLookup containerLookup:
+                case GlobalSkinnableContainerLookup containerLookup:
                     // Modifications for global components.
                     if (containerLookup.Ruleset == null)
                         return base.GetDrawableComponent(lookup);
@@ -95,7 +95,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
 
                     switch (containerLookup.Target)
                     {
-                        case SkinComponentsContainerLookup.TargetArea.MainHUDComponents:
+                        case GlobalSkinnableContainerLookup.GlobalSkinnableContainers.MainHUDComponents:
                             return new DefaultSkinComponentsContainer(container =>
                             {
                                 var combo = container.ChildrenOfType<LegacyManiaComboCounter>().FirstOrDefault();

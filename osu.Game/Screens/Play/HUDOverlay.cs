@@ -109,7 +109,7 @@ namespace osu.Game.Screens.Play
         private readonly List<Drawable> hideTargets;
 
         /// <summary>
-        /// The container for skin components attached to <see cref="SkinComponentsContainerLookup.TargetArea.Playfield"/>
+        /// The container for skin components attached to <see cref="GlobalSkinnableContainerLookup.GlobalSkinnableContainers.Playfield"/>
         /// </summary>
         internal readonly Drawable PlayfieldSkinLayer;
 
@@ -132,7 +132,7 @@ namespace osu.Game.Screens.Play
                     ? (rulesetComponents = new HUDComponentsContainer(drawableRuleset.Ruleset.RulesetInfo) { AlwaysPresent = true, })
                     : Empty(),
                 PlayfieldSkinLayer = drawableRuleset != null
-                    ? new SkinnableContainer(new SkinComponentsContainerLookup(SkinComponentsContainerLookup.TargetArea.Playfield, drawableRuleset.Ruleset.RulesetInfo)) { AlwaysPresent = true, }
+                    ? new SkinnableContainer(new GlobalSkinnableContainerLookup(GlobalSkinnableContainerLookup.GlobalSkinnableContainers.Playfield, drawableRuleset.Ruleset.RulesetInfo)) { AlwaysPresent = true, }
                     : Empty(),
                 topRightElements = new FillFlowContainer
                 {
@@ -448,7 +448,7 @@ namespace osu.Game.Screens.Play
             private OsuConfigManager config { get; set; }
 
             public HUDComponentsContainer([CanBeNull] RulesetInfo ruleset = null)
-                : base(new SkinComponentsContainerLookup(SkinComponentsContainerLookup.TargetArea.MainHUDComponents, ruleset))
+                : base(new GlobalSkinnableContainerLookup(GlobalSkinnableContainerLookup.GlobalSkinnableContainers.MainHUDComponents, ruleset))
             {
                 RelativeSizeAxes = Axes.Both;
             }
