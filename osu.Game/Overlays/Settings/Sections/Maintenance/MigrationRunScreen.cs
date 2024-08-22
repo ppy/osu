@@ -9,7 +9,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Logging;
-using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
@@ -26,12 +25,6 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
 
         [Resolved(canBeNull: true)]
         private OsuGame game { get; set; }
-
-        [Resolved]
-        private Storage storage { get; set; }
-
-        [Resolved]
-        private GameHost host { get; set; }
 
         public override bool AllowBackButton => false;
 
