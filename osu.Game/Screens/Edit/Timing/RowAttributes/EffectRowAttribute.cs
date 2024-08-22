@@ -5,8 +5,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps.ControlPoints;
-using osu.Game.Configuration;
-using osu.Game.Rulesets.UI.Scrolling;
 
 namespace osu.Game.Screens.Edit.Timing.RowAttributes
 {
@@ -42,9 +40,7 @@ namespace osu.Game.Screens.Edit.Timing.RowAttributes
                 kiaiModeBubble = new AttributeText(Point) { Text = "kiai" },
             });
 
-            var drawableRuleset = Beatmap.BeatmapInfo.Ruleset.CreateInstance().CreateDrawableRulesetWith(Beatmap.PlayableBeatmap);
-
-            if (drawableRuleset is not IDrawableScrollingRuleset scrollingRuleset || scrollingRuleset.VisualisationMethod == ScrollVisualisationMethod.Constant)
+            if (!Beatmap.BeatmapInfo.Ruleset.CreateInstance().EditorShowScrollSpeed)
             {
                 text.Hide();
                 progressBar.Hide();
