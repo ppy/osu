@@ -17,7 +17,6 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
-using osu.Framework.Platform;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Collections;
@@ -82,10 +81,10 @@ namespace osu.Game.Screens.Select.Carousel
         private IBindable<IReadOnlyList<Mod>> mods { get; set; } = null!;
 
         [Resolved]
-        private Clipboard clipboard { get; set; } = null!;
+        private IAPIProvider api { get; set; } = null!;
 
         [Resolved]
-        private IAPIProvider api { get; set; } = null!;
+        private OsuGame? game { get; set; }
 
         private IBindable<StarDifficulty?> starDifficultyBindable = null!;
         private CancellationTokenSource? starDifficultyCancellationSource;
@@ -297,7 +296,7 @@ namespace osu.Game.Screens.Select.Carousel
                 items.Add(new OsuMenuItem("Collections") { Items = collectionItems });
 
                 if (beatmapInfo.GetOnlineURL(api) is string url)
-                    items.Add(new OsuMenuItem("Copy link", MenuItemType.Standard, () => clipboard.SetText(url)));
+                    items.Add(new OsuMenuItem("Copy link", MenuItemType.Standard, () => game?.CopyUrlToClipboard(url)));
 
                 if (hideRequested != null)
                     items.Add(new OsuMenuItem(CommonStrings.ButtonsHide.ToSentence(), MenuItemType.Destructive, () => hideRequested(beatmapInfo)));
