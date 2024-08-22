@@ -60,7 +60,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                     // Our own ruleset components default.
                     switch (containerLookup.Target)
                     {
-                        case GlobalSkinnableContainerLookup.GlobalSkinnableContainers.MainHUDComponents:
+                        case GlobalSkinnableContainers.MainHUDComponents:
                             return new DefaultSkinComponentsContainer(container =>
                             {
                                 var keyCounter = container.OfType<LegacyKeyCounterDisplay>().FirstOrDefault();

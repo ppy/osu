@@ -364,7 +364,7 @@ namespace osu.Game.Skinning
 
                     switch (containerLookup.Target)
                     {
-                        case GlobalSkinnableContainerLookup.GlobalSkinnableContainers.MainHUDComponents:
+                        case GlobalSkinnableContainers.MainHUDComponents:
                             if (containerLookup.Ruleset != null)
                             {
                                 return new DefaultSkinComponentsContainer(container =>

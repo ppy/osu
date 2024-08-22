@@ -38,7 +38,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             CreateSkinTest(TrianglesSkin.CreateInfo(), () => new LegacyBeatmapSkin(new BeatmapInfo(), null));
             AddUntilStep("wait for hud load", () => Player.ChildrenOfType<SkinnableContainer>().All(c => c.ComponentsLoaded));
-            AddAssert("hud from default skin", () => AssertComponentsFromExpectedSource(GlobalSkinnableContainerLookup.GlobalSkinnableContainers.MainHUDComponents, skinManager.CurrentSkin.Value));
+            AddAssert("hud from default skin", () => AssertComponentsFromExpectedSource(GlobalSkinnableContainers.MainHUDComponents, skinManager.CurrentSkin.Value));
         }
 
         protected void CreateSkinTest(SkinInfo gameCurrentSkin, Func<ISkin> getBeatmapSkin)
@@ -53,7 +53,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             });
         }
 
-        protected bool AssertComponentsFromExpectedSource(GlobalSkinnableContainerLookup.GlobalSkinnableContainers target, ISkin expectedSource)
+        protected bool AssertComponentsFromExpectedSource(GlobalSkinnableContainers target, ISkin expectedSource)
         {
             var targetContainer = Player.ChildrenOfType<SkinnableContainer>().First(s => s.Lookup.Target == target);
             var actualComponentsContainer = targetContainer.ChildrenOfType<Container>().SingleOrDefault(c => c.Parent == targetContainer);

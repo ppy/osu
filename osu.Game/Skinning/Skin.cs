@@ -43,10 +43,10 @@ namespace osu.Game.Skinning
 
         public SkinConfiguration Configuration { get; set; }
 
-        public IDictionary<GlobalSkinnableContainerLookup.GlobalSkinnableContainers, SkinLayoutInfo> LayoutInfos => layoutInfos;
+        public IDictionary<GlobalSkinnableContainers, SkinLayoutInfo> LayoutInfos => layoutInfos;
 
-        private readonly Dictionary<GlobalSkinnableContainerLookup.GlobalSkinnableContainers, SkinLayoutInfo> layoutInfos =
-            new Dictionary<GlobalSkinnableContainerLookup.GlobalSkinnableContainers, SkinLayoutInfo>();
+        private readonly Dictionary<GlobalSkinnableContainers, SkinLayoutInfo> layoutInfos =
+            new Dictionary<GlobalSkinnableContainers, SkinLayoutInfo>();
 
         public abstract ISample? GetSample(ISampleInfo sampleInfo);
 
@@ -123,7 +123,7 @@ namespace osu.Game.Skinning
             }
 
             // skininfo files may be null for default skin.
-            foreach (GlobalSkinnableContainerLookup.GlobalSkinnableContainers skinnableTarget in Enum.GetValues<GlobalSkinnableContainerLookup.GlobalSkinnableContainers>())
+            foreach (GlobalSkinnableContainers skinnableTarget in Enum.GetValues<GlobalSkinnableContainers>())
             {
                 string filename = $"{skinnableTarget}.json";
 
@@ -206,7 +206,7 @@ namespace osu.Game.Skinning
 
         #region Deserialisation & Migration
 
-        private SkinLayoutInfo? parseLayoutInfo(string jsonContent, GlobalSkinnableContainerLookup.GlobalSkinnableContainers target)
+        private SkinLayoutInfo? parseLayoutInfo(string jsonContent, GlobalSkinnableContainers target)
         {
             SkinLayoutInfo? layout = null;
 
@@ -245,7 +245,7 @@ namespace osu.Game.Skinning
             return layout;
         }
 
-        private void applyMigration(SkinLayoutInfo layout, GlobalSkinnableContainerLookup.GlobalSkinnableContainers target, int version)
+        private void applyMigration(SkinLayoutInfo layout, GlobalSkinnableContainers target, int version)
         {
             switch (version)
             {
@@ -253,7 +253,7 @@ namespace osu.Game.Skinning
                 {
                     // Combo counters were moved out of the global HUD components into per-ruleset.
                     // This is to allow some rulesets to customise further (ie. mania and catch moving the combo to within their play area).
-                    if (target != GlobalSkinnableContainerLookup.GlobalSkinnableContainers.MainHUDComponents ||
+                    if (target != GlobalSkinnableContainers.MainHUDComponents ||
                         !layout.TryGetDrawableInfo(null, out var globalHUDComponents) ||
                         resources == null)
                         break;
