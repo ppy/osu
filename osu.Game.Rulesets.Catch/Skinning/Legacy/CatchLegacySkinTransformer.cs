@@ -35,10 +35,6 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
                     if (containerLookup.Ruleset == null)
                         return base.GetDrawableComponent(lookup);
 
-                    // Skin has configuration.
-                    if (base.GetDrawableComponent(lookup) is UserConfiguredLayoutContainer d)
-                        return d;
-
                     // we don't have enough assets to display these components (this is especially the case on a "beatmap" skin).
                     if (!IsProvidingLegacyResources)
                         return null;
