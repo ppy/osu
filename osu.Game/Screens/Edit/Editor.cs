@@ -714,6 +714,26 @@ namespace osu.Game.Screens.Edit
 
         public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
+            // Repeatable actions
+            switch (e.Action)
+            {
+                case GlobalAction.EditorSeekToPreviousHitObject:
+                    seekHitObject(-1);
+                    return true;
+
+                case GlobalAction.EditorSeekToNextHitObject:
+                    seekHitObject(1);
+                    return true;
+
+                case GlobalAction.EditorSeekToPreviousSamplePoint:
+                    seekSamplePoint(-1);
+                    return true;
+
+                case GlobalAction.EditorSeekToNextSamplePoint:
+                    seekSamplePoint(1);
+                    return true;
+            }
+
             if (e.Repeat)
                 return false;
 
@@ -751,26 +771,9 @@ namespace osu.Game.Screens.Edit
                 case GlobalAction.EditorTestGameplay:
                     bottomBar.TestGameplayButton.TriggerClick();
                     return true;
-
-                case GlobalAction.EditorSeekToPreviousHitObject:
-                    seekHitObject(-1);
-                    return true;
-
-                case GlobalAction.EditorSeekToNextHitObject:
-                    seekHitObject(1);
-                    return true;
-
-                case GlobalAction.EditorSeekToPreviousSamplePoint:
-                    seekSamplePoint(-1);
-                    return true;
-
-                case GlobalAction.EditorSeekToNextSamplePoint:
-                    seekSamplePoint(1);
-                    return true;
-
-                default:
-                    return false;
             }
+
+            return false;
         }
 
         public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
