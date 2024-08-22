@@ -16,10 +16,10 @@ namespace osu.Game.Skinning
     /// </summary>
     /// <remarks>
     /// This is currently used as a means of serialising skin layouts to files.
-    /// Currently, one json file in a skin will represent one <see cref="SkinComponentsContainer"/>, containing
+    /// Currently, one json file in a skin will represent one <see cref="SkinnableContainer"/>, containing
     /// the output of <see cref="ISerialisableDrawableContainer.CreateSerialisedInfo"/>.
     /// </remarks>
-    public partial class SkinComponentsContainer : SkinReloadableDrawable, ISerialisableDrawableContainer
+    public partial class SkinnableContainer : SkinReloadableDrawable, ISerialisableDrawableContainer
     {
         private Container? content;
 
@@ -38,7 +38,7 @@ namespace osu.Game.Skinning
 
         private CancellationTokenSource? cancellationSource;
 
-        public SkinComponentsContainer(SkinComponentsContainerLookup lookup)
+        public SkinnableContainer(SkinComponentsContainerLookup lookup)
         {
             Lookup = lookup;
         }

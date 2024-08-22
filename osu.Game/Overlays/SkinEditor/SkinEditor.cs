@@ -472,18 +472,18 @@ namespace osu.Game.Overlays.SkinEditor
                 settingsSidebar.Add(new SkinSettingsToolbox(component));
         }
 
-        private IEnumerable<SkinComponentsContainer> availableTargets => targetScreen.ChildrenOfType<SkinComponentsContainer>();
+        private IEnumerable<SkinnableContainer> availableTargets => targetScreen.ChildrenOfType<SkinnableContainer>();
 
-        private SkinComponentsContainer? getFirstTarget() => availableTargets.FirstOrDefault();
+        private SkinnableContainer? getFirstTarget() => availableTargets.FirstOrDefault();
 
-        private SkinComponentsContainer? getTarget(SkinComponentsContainerLookup? target)
+        private SkinnableContainer? getTarget(SkinComponentsContainerLookup? target)
         {
             return availableTargets.FirstOrDefault(c => c.Lookup.Equals(target));
         }
 
         private void revert()
         {
-            SkinComponentsContainer[] targetContainers = availableTargets.ToArray();
+            SkinnableContainer[] targetContainers = availableTargets.ToArray();
 
             foreach (var t in targetContainers)
             {
@@ -555,7 +555,7 @@ namespace osu.Game.Overlays.SkinEditor
             if (targetScreen?.IsLoaded != true)
                 return;
 
-            SkinComponentsContainer[] targetContainers = availableTargets.ToArray();
+            SkinnableContainer[] targetContainers = availableTargets.ToArray();
 
             if (!targetContainers.All(c => c.ComponentsLoaded))
                 return;
@@ -600,7 +600,7 @@ namespace osu.Game.Overlays.SkinEditor
 
         public void BringSelectionToFront()
         {
-            if (getTarget(selectedTarget.Value) is not SkinComponentsContainer target)
+            if (getTarget(selectedTarget.Value) is not SkinnableContainer target)
                 return;
 
             changeHandler?.BeginChange();
@@ -624,7 +624,7 @@ namespace osu.Game.Overlays.SkinEditor
 
         public void SendSelectionToBack()
         {
-            if (getTarget(selectedTarget.Value) is not SkinComponentsContainer target)
+            if (getTarget(selectedTarget.Value) is not SkinnableContainer target)
                 return;
 
             changeHandler?.BeginChange();
