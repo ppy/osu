@@ -15,7 +15,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.UserInterface;
-using osu.Framework.Platform;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Collections;
@@ -44,10 +43,10 @@ namespace osu.Game.Screens.Select.Carousel
         private RealmAccess realm { get; set; } = null!;
 
         [Resolved]
-        private Clipboard clipboard { get; set; } = null!;
+        private IAPIProvider api { get; set; } = null!;
 
         [Resolved]
-        private IAPIProvider api { get; set; } = null!;
+        private OsuGame? game { get; set; }
 
         [Resolved]
         private IBindable<RulesetInfo> ruleset { get; set; } = null!;
@@ -301,7 +300,7 @@ namespace osu.Game.Screens.Select.Carousel
                     items.Add(new OsuMenuItem("Restore all hidden", MenuItemType.Standard, () => restoreHiddenRequested(beatmapSet)));
 
                 if (beatmapSet.GetOnlineURL(api, ruleset.Value) is string url)
-                    items.Add(new OsuMenuItem("Copy link", MenuItemType.Standard, () => clipboard.SetText(url)));
+                    items.Add(new OsuMenuItem("Copy link", MenuItemType.Standard, () => game?.CopyUrlToClipboard(url)));
 
                 if (dialogOverlay != null)
                     items.Add(new OsuMenuItem("Delete...", MenuItemType.Destructive, () => dialogOverlay.Push(new BeatmapDeleteDialog(beatmapSet))));
