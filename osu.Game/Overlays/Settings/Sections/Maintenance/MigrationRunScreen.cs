@@ -108,18 +108,6 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                                     {
                                         Logger.Error(task.Exception, $"Error during migration: {task.Exception?.Message}");
                                     }
-                                    else if (!task.GetResultSafely())
-                                    {
-                                        notifications.Post(new SimpleNotification
-                                        {
-                                            Text = MaintenanceSettingsStrings.FailedCleanupNotification,
-                                            Activated = () =>
-                                            {
-                                                originalStorage.PresentExternally();
-                                                return true;
-                                            }
-                                        });
-                                    }
 
                                     Schedule(this.Exit);
                                 });
