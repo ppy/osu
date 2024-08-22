@@ -426,7 +426,7 @@ namespace osu.Game.Skinning
 
                     return null;
 
-                case GameplaySkinComponentLookup<HitResult> resultComponent:
+                case SkinComponentLookup<HitResult> resultComponent:
 
                     // kind of wasteful that we throw this away, but should do for now.
                     if (getJudgementAnimation(resultComponent.Component) != null)
