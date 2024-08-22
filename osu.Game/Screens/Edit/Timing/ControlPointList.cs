@@ -46,6 +46,26 @@ namespace osu.Game.Screens.Edit.Timing
                 new FillFlowContainer
                 {
                     AutoSizeAxes = Axes.Both,
+                    Anchor = Anchor.BottomLeft,
+                    Origin = Anchor.BottomLeft,
+                    Direction = FillDirection.Horizontal,
+                    Margin = new MarginPadding(margins),
+                    Spacing = new Vector2(5),
+                    Children = new Drawable[]
+                    {
+                        new RoundedButton
+                        {
+                            Text = "Select closest to current time",
+                            Action = goToCurrentGroup,
+                            Size = new Vector2(220, 30),
+                            Anchor = Anchor.BottomRight,
+                            Origin = Anchor.BottomRight,
+                        },
+                    }
+                },
+                new FillFlowContainer
+                {
+                    AutoSizeAxes = Axes.Both,
                     Anchor = Anchor.BottomRight,
                     Origin = Anchor.BottomRight,
                     Direction = FillDirection.Horizontal,
@@ -66,15 +86,6 @@ namespace osu.Game.Screens.Edit.Timing
                         {
                             Action = addNew,
                             Size = new Vector2(160, 30),
-                            Anchor = Anchor.BottomRight,
-                            Origin = Anchor.BottomRight,
-                            BackgroundColour = colours.Green3,
-                        },
-                        new RoundedButton
-                        {
-                            Text = "Go to current time",
-                            Action = goToCurrentGroup,
-                            Size = new Vector2(140, 30),
                             Anchor = Anchor.BottomRight,
                             Origin = Anchor.BottomRight,
                         },
