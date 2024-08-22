@@ -60,8 +60,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         }
 
         private const int history_time_max = 5 * 1000; // 5 seconds of calculatingRhythmBonus max.
-        private const double rhythm_multiplier = 1.1;
-        private const int max_island_size = 7;
+        private const double rhythm_multiplier = 1.05;
 
         /// <summary>
         /// Calculates a rhythm multiplier for the difficulty of the tap associated with historic data of the current <see cref="OsuDifficultyHitObject"/>.
@@ -103,7 +102,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 double prevDelta = prevObj.StrainTime;
                 double lastDelta = lastObj.StrainTime;
 
-                double currRatio = 1.0 + 8.4 * Math.Min(0.5, Math.Pow(Math.Sin(Math.PI / (Math.Min(prevDelta, currDelta) / Math.Max(prevDelta, currDelta))), 2)); // fancy function to calculate rhythmbonuses.
+                double currRatio = 1.0 + 8.8 * Math.Min(0.5, Math.Pow(Math.Sin(Math.PI / (Math.Min(prevDelta, currDelta) / Math.Max(prevDelta, currDelta))), 2)); // fancy function to calculate rhythmbonuses.
 
                 double windowPenalty = Math.Min(1, Math.Max(0, Math.Abs(prevDelta - currDelta) - currObj.HitWindowGreat * 0.3) / (currObj.HitWindowGreat * 0.3));
 
@@ -117,11 +116,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 {
                     if (!(Math.Abs(prevDelta - currDelta) > deltaDifferenceEpsilon))
                     {
-                        if (island.Deltas.Count < max_island_size)
-                        {
-                            // island is still progressing
-                            island.AddDelta((int)currDelta, deltaDifferenceEpsilon);
-                        }
+                        // island is still progressing
+                        island.AddDelta((int)currDelta, deltaDifferenceEpsilon);
                     }
                     else
                     {
@@ -143,7 +139,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
                             // repeated island (ex: triplet -> triplet)
                             double power = logistic(island.AverageDelta(), 4, 0.165, 10);
-                            effectiveRatio *= Math.Min(1.0 / islandCounts[island], Math.Pow(1.0 / islandCounts[island], power));
+                            effectiveRatio *= Math.Min(2.0 / islandCounts[island], Math.Pow(1.0 / islandCounts[island], power));
                         }
 
                         rhythmComplexitySum += Math.Sqrt(effectiveRatio * startRatio) * currHistoricalDecay;
