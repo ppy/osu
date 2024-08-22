@@ -44,7 +44,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
         {
             switch (lookup)
             {
-                case SkinComponentsContainerLookup containerLookup:
+                case GlobalSkinnableContainerLookup containerLookup:
                     // Only handle per ruleset defaults here.
                     if (containerLookup.Ruleset == null)
                         return base.GetDrawableComponent(lookup);
@@ -60,7 +60,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                     // Our own ruleset components default.
                     switch (containerLookup.Target)
                     {
-                        case SkinComponentsContainerLookup.TargetArea.MainHUDComponents:
+                        case GlobalSkinnableContainerLookup.GlobalSkinnableContainers.MainHUDComponents:
                             return new DefaultSkinComponentsContainer(container =>
                             {
                                 var keyCounter = container.OfType<LegacyKeyCounterDisplay>().FirstOrDefault();

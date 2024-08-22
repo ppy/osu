@@ -30,7 +30,7 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
         {
             switch (lookup)
             {
-                case SkinComponentsContainerLookup containerLookup:
+                case GlobalSkinnableContainerLookup containerLookup:
                     // Only handle per ruleset defaults here.
                     if (containerLookup.Ruleset == null)
                         return base.GetDrawableComponent(lookup);
@@ -46,7 +46,7 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
                     // Our own ruleset components default.
                     switch (containerLookup.Target)
                     {
-                        case SkinComponentsContainerLookup.TargetArea.MainHUDComponents:
+                        case GlobalSkinnableContainerLookup.GlobalSkinnableContainers.MainHUDComponents:
                             // todo: remove CatchSkinComponents.CatchComboCounter and refactor LegacyCatchComboCounter to be added here instead.
                             return new DefaultSkinComponentsContainer(container =>
                             {
