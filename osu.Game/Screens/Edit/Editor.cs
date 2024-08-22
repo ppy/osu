@@ -225,6 +225,9 @@ namespace osu.Game.Screens.Edit
         /// </remarks>
         public Bindable<bool> ComposerFocusMode { get; } = new Bindable<bool>();
 
+        [CanBeNull]
+        public event Action<double> ShowSampleEditPopoverRequested;
+
         public Editor(EditorLoader loader = null)
         {
             this.loader = loader;
@@ -1106,9 +1109,6 @@ namespace osu.Game.Screens.Edit
             if (found != null)
                 clock.SeekSmoothlyTo(found.StartTime);
         }
-
-        [CanBeNull]
-        public event Action<double> ShowSampleEditPopoverRequested;
 
         private void seekSamplePoint(int direction)
         {
