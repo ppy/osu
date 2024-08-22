@@ -67,9 +67,6 @@ namespace osu.Game.Skinning
             switch (lookup)
             {
                 case GlobalSkinnableContainerLookup containerLookup:
-                    if (base.GetDrawableComponent(lookup) is UserConfiguredLayoutContainer c)
-                        return c;
-
                     // Only handle global level defaults for now.
                     if (containerLookup.Ruleset != null)
                         return null;

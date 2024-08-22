@@ -14,6 +14,7 @@ using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
 using osu.Framework.Logging;
@@ -196,7 +197,7 @@ namespace osu.Game.Skinning
                             if (!LayoutInfos.TryGetValue(containerLookup.Component, out var layoutInfo)) return null;
                             if (!layoutInfo.TryGetDrawableInfo(containerLookup.Ruleset, out var drawableInfos)) return null;
 
-                            return new UserConfiguredLayoutContainer
+                            return new Container
                             {
                                 RelativeSizeAxes = Axes.Both,
                                 ChildrenEnumerable = drawableInfos.Select(i => i.CreateInstance())
