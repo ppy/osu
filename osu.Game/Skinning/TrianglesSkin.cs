@@ -74,7 +74,7 @@ namespace osu.Game.Skinning
                     if (containerLookup.Ruleset != null)
                         return null;
 
-                    switch (containerLookup.Target)
+                    switch (containerLookup.Component)
                     {
                         case GlobalSkinnableContainers.SongSelect:
                             var songSelectComponents = new DefaultSkinComponentsContainer(_ =>

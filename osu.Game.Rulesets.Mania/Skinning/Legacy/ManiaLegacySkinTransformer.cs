@@ -93,7 +93,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
                     if (!IsProvidingLegacyResources)
                         return null;
 
-                    switch (containerLookup.Target)
+                    switch (containerLookup.Component)
                     {
                         case GlobalSkinnableContainers.MainHUDComponents:
                             return new DefaultSkinComponentsContainer(container =>

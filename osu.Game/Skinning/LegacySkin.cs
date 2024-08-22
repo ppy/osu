@@ -362,7 +362,7 @@ namespace osu.Game.Skinning
                     if (base.GetDrawableComponent(lookup) is UserConfiguredLayoutContainer c)
                         return c;
 
-                    switch (containerLookup.Target)
+                    switch (containerLookup.Component)
                     {
                         case GlobalSkinnableContainers.MainHUDComponents:
                             if (containerLookup.Ruleset != null)

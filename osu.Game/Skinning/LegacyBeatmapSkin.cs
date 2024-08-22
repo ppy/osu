@@ -52,7 +52,7 @@ namespace osu.Game.Skinning
         {
             if (lookup is GlobalSkinnableContainerLookup containerLookup)
             {
-                switch (containerLookup.Target)
+                switch (containerLookup.Component)
                 {
                     case GlobalSkinnableContainers.MainHUDComponents:
                         // this should exist in LegacySkin instead, but there isn't a fallback skin for LegacySkins yet.

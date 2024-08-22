@@ -164,7 +164,7 @@ namespace osu.Game.Skinning
         /// <param name="targetContainer">The target container to reset.</param>
         public void ResetDrawableTarget(SkinnableContainer targetContainer)
         {
-            LayoutInfos.Remove(targetContainer.Lookup.Target);
+            LayoutInfos.Remove(targetContainer.Lookup.Component);
         }
 
         /// <summary>
@@ -173,8 +173,8 @@ namespace osu.Game.Skinning
         /// <param name="targetContainer">The target container to serialise to this skin.</param>
         public void UpdateDrawableTarget(SkinnableContainer targetContainer)
         {
-            if (!LayoutInfos.TryGetValue(targetContainer.Lookup.Target, out var layoutInfo))
-                layoutInfos[targetContainer.Lookup.Target] = layoutInfo = new SkinLayoutInfo();
+            if (!LayoutInfos.TryGetValue(targetContainer.Lookup.Component, out var layoutInfo))
+                layoutInfos[targetContainer.Lookup.Component] = layoutInfo = new SkinLayoutInfo();
 
             layoutInfo.Update(targetContainer.Lookup.Ruleset, ((ISerialisableDrawableContainer)targetContainer).CreateSerialisedInfo().ToArray());
         }
@@ -191,7 +191,7 @@ namespace osu.Game.Skinning
 
                     // It is important to return null if the user has not configured this yet.
                     // This allows skin transformers the opportunity to provide default components.
-                    if (!LayoutInfos.TryGetValue(containerLookup.Target, out var layoutInfo)) return null;
+                    if (!LayoutInfos.TryGetValue(containerLookup.Component, out var layoutInfo)) return null;
                     if (!layoutInfo.TryGetDrawableInfo(containerLookup.Ruleset, out var drawableInfos)) return null;
 
                     return new UserConfiguredLayoutContainer
