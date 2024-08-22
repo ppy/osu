@@ -195,8 +195,8 @@ namespace osu.Game.Rulesets.Objects.Legacy
             string[] split = str.Split(':');
 
 
-            string bank = (Parsing.ParseInt(split[0]) > AvailableSampleBanks.Count) ? "normal" : AvailableSampleBanks[Parsing.ParseInt(split[0])];
-            string addBank = (Parsing.ParseInt(split[1]) > AvailableSampleBanks.Count) ? "normal" : AvailableSampleBanks[Parsing.ParseInt(split[1])];
+            string bank = (Parsing.ParseInt(split[0]) > AvailableSampleBanks.Count - 1) ? "normal" : AvailableSampleBanks[Parsing.ParseInt(split[0])];
+            string addBank = (Parsing.ParseInt(split[1]) > AvailableSampleBanks.Count - 1) ? "normal" : AvailableSampleBanks[Parsing.ParseInt(split[1])];
 
             if (bank == @"none") { bank = null; };
             if (addBank == @"none") { addBank = null; }
