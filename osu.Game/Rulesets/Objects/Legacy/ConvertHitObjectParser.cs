@@ -38,6 +38,8 @@ namespace osu.Game.Rulesets.Objects.Legacy
 
         protected bool FirstObject { get; private set; } = true;
 
+        public List<string> AvailableSampleBanks = ["normal", "soft", "drum"];
+
         protected ConvertHitObjectParser(double offset, int formatVersion)
         {
             Offset = offset;
@@ -192,10 +194,8 @@ namespace osu.Game.Rulesets.Objects.Legacy
 
             string[] split = str.Split(':');
 
-            List<string> availableSampleBanks = LegacyBeatmapDecoder.AvailableSampleBanks;
-
-            string bank = availableSampleBanks[Parsing.ParseInt(split[0]) - 1];
-            string addBank = availableSampleBanks[Parsing.ParseInt(split[1]) - 1];
+            string bank = AvailableSampleBanks[Parsing.ParseInt(split[0]) - 1];
+            string addBank = AvailableSampleBanks[Parsing.ParseInt(split[1]) - 1];
 
             bankInfo.BankForNormal = bank;
             bankInfo.BankForAdditions = string.IsNullOrEmpty(addBank) ? bank : addBank;

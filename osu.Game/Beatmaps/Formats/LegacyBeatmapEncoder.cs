@@ -88,7 +88,7 @@ namespace osu.Game.Beatmaps.Formats
             writer.WriteLine(FormattableString.Invariant($"PreviewTime: {beatmap.Metadata.PreviewTime}"));
             writer.WriteLine(FormattableString.Invariant($"Countdown: {(int)beatmap.BeatmapInfo.Countdown}"));
             writer.WriteLine(FormattableString.Invariant(
-                $"SampleSet: {toLegacySampleBank(((beatmap.ControlPointInfo as LegacyControlPointInfo)?.SamplePoints.FirstOrDefault() ?? SampleControlPoint.DEFAULT).SampleBank)}"));
+                $"SampleSet: {(LegacySampleBank)toLegacySampleBank(((beatmap.ControlPointInfo as LegacyControlPointInfo)?.SamplePoints.FirstOrDefault() ?? SampleControlPoint.DEFAULT).SampleBank)}"));
             writer.WriteLine(FormattableString.Invariant($"StackLeniency: {beatmap.BeatmapInfo.StackLeniency}"));
             writer.WriteLine(FormattableString.Invariant($"Mode: {onlineRulesetID}"));
             writer.WriteLine(FormattableString.Invariant($"LetterboxInBreaks: {(beatmap.BeatmapInfo.LetterboxInBreaks ? '1' : '0')}"));
@@ -240,7 +240,7 @@ namespace osu.Game.Beatmaps.Formats
                 {
                     SliderVelocity = difficultyPoint.SliderVelocity,
                     TimingSignature = timingPoint.TimeSignature.Numerator,
-                    SampleBank = updateSampleBank ? (int)toLegacySampleBank(tempHitSample.Bank) : lastControlPointProperties.SampleBank,
+                    SampleBank = updateSampleBank ? toLegacySampleBank(tempHitSample.Bank) : lastControlPointProperties.SampleBank,
                     // Inherit the previous custom sample bank if the current custom sample bank is not set
                     CustomSampleBank = customSampleBank >= 0 ? customSampleBank : lastControlPointProperties.CustomSampleBank,
                     SampleVolume = tempHitSample.Volume,

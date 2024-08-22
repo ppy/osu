@@ -43,8 +43,6 @@ namespace osu.Game.Beatmaps.Formats
         private LegacySampleBank defaultSampleBank;
         private int defaultSampleVolume = 100;
 
-        public static List<string> AvailableSampleBanks = ["normal", "soft", "drum"];
-
         public static void Register()
         {
             AddDecoder<Beatmap>(@"osu file format v", m => new LegacyBeatmapDecoder(Parsing.ParseInt(m.Split('v').Last())));
@@ -622,9 +620,9 @@ namespace osu.Game.Beatmaps.Formats
 
         private void handleCustomSoundBanks(string line)
         {
-            if (!AvailableSampleBanks.Contains(line))
+            if (!parser.AvailableSampleBanks.Contains(line))
             {
-                AvailableSampleBanks.Add(line);
+                parser.AvailableSampleBanks.Add(line);
             }
         }
 
