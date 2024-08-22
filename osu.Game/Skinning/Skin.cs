@@ -187,18 +187,23 @@ namespace osu.Game.Skinning
                 case SkinnableSprite.SpriteComponentLookup sprite:
                     return this.GetAnimation(sprite.LookupName, false, false, maxSize: sprite.MaxSize);
 
-                case GlobalSkinnableContainerLookup containerLookup:
-
-                    // It is important to return null if the user has not configured this yet.
-                    // This allows skin transformers the opportunity to provide default components.
-                    if (!LayoutInfos.TryGetValue(containerLookup.Component, out var layoutInfo)) return null;
-                    if (!layoutInfo.TryGetDrawableInfo(containerLookup.Ruleset, out var drawableInfos)) return null;
-
-                    return new UserConfiguredLayoutContainer
+                case UserSkinComponentLookup userLookup:
+                    switch (userLookup.Component)
                     {
-                        RelativeSizeAxes = Axes.Both,
-                        ChildrenEnumerable = drawableInfos.Select(i => i.CreateInstance())
-                    };
+                        case GlobalSkinnableContainerLookup containerLookup:
+                            // It is important to return null if the user has not configured this yet.
+                            // This allows skin transformers the opportunity to provide default components.
+                            if (!LayoutInfos.TryGetValue(containerLookup.Component, out var layoutInfo)) return null;
+                            if (!layoutInfo.TryGetDrawableInfo(containerLookup.Ruleset, out var drawableInfos)) return null;
+
+                            return new UserConfiguredLayoutContainer
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                ChildrenEnumerable = drawableInfos.Select(i => i.CreateInstance())
+                            };
+                    }
+
+                    break;
             }
 
             return null;

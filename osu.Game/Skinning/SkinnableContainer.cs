@@ -43,7 +43,10 @@ namespace osu.Game.Skinning
             Lookup = lookup;
         }
 
-        public void Reload() => Reload(CurrentSkin.GetDrawableComponent(Lookup) as Container);
+        public void Reload() => Reload((
+                CurrentSkin.GetDrawableComponent(new UserSkinComponentLookup(Lookup))
+                ?? CurrentSkin.GetDrawableComponent(Lookup))
+            as Container);
 
         public void Reload(Container? componentsContainer)
         {
