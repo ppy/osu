@@ -13,8 +13,8 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Game.Beatmaps;
@@ -22,7 +22,7 @@ using osu.Game.Beatmaps.Drawables;
 using osu.Game.Collections;
 using osu.Game.Database;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Backgrounds;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
@@ -30,7 +30,6 @@ using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Screens.Select.Carousel
 {
@@ -43,21 +42,29 @@ namespace osu.Game.Screens.Select.Carousel
         /// </summary>
         public const float HEIGHT = height + CAROUSEL_BEATMAP_SPACING;
 
-        private const float height = MAX_HEIGHT * 0.6f;
+        private const float height = MAX_HEIGHT * 0.625f;
+        private const float colour_box_width = 30;
+        private const float corner_radius = 10;
 
         private readonly BeatmapInfo beatmapInfo;
-
-        private Sprite background = null!;
 
         private MenuItem[]? mainMenuItems;
 
         private Action<BeatmapInfo>? selectRequested;
         private Action<BeatmapInfo>? hideRequested;
 
-        private Triangles triangles = null!;
-
         private StarCounter starCounter = null!;
-        private DifficultyIcon difficultyIcon = null!;
+        private ConstrainedIconContainer iconContainer = null!;
+
+        private Box colourBox = null!;
+
+        private StarRatingDisplay starRatingDisplay = null!;
+
+        [Resolved]
+        private OverlayColourProvider colourProvider { get; set; } = null!;
+
+        [Resolved]
+        private OsuColour colours { get; set; } = null!;
 
         private OsuSpriteText keyCountText = null!;
 
@@ -81,6 +88,8 @@ namespace osu.Game.Screens.Select.Carousel
 
         private IBindable<StarDifficulty?> starDifficultyBindable = null!;
         private CancellationTokenSource? starDifficultyCancellationSource;
+        private Container rightContainer = null!;
+        private Box starRatingGradient = null!;
 
         public DrawableCarouselBeatmap(CarouselBeatmap panel)
         {
@@ -104,78 +113,109 @@ namespace osu.Game.Screens.Select.Carousel
 
             Header.Children = new Drawable[]
             {
-                background = new Box
+                new BufferedContainer
                 {
                     RelativeSizeAxes = Axes.Both,
+                    Children = new Drawable[]
+                    {
+                        colourBox = new Box
+                        {
+                            Width = colour_box_width + corner_radius,
+                            RelativeSizeAxes = Axes.Y,
+                            Colour = colours.ForStarDifficulty(0),
+                            EdgeSmoothness = new Vector2(2, 0),
+                        },
+                        rightContainer = new Container
+                        {
+                            Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.CentreLeft,
+                            Masking = true,
+                            CornerRadius = corner_radius,
+                            RelativeSizeAxes = Axes.X,
+                            // We don't want to match the header's size when its selected, hence no relative sizing.
+                            Height = height,
+                            X = colour_box_width,
+                            Children = new Drawable[]
+                            {
+                                new Box
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    Colour = ColourInfo.GradientHorizontal(colourProvider.Background3, colourProvider.Background4),
+                                },
+                                starRatingGradient = new Box
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    Alpha = 0,
+                                },
+                            },
+                        },
+                    }
                 },
-                triangles = new Triangles
+                iconContainer = new ConstrainedIconContainer
                 {
-                    TriangleScale = 2,
-                    RelativeSizeAxes = Axes.Both,
-                    ColourLight = Color4Extensions.FromHex(@"3a7285"),
-                    ColourDark = Color4Extensions.FromHex(@"123744")
+                    X = colour_box_width / 2,
+                    Origin = Anchor.Centre,
+                    Anchor = Anchor.CentreLeft,
+                    Icon = beatmapInfo.Ruleset.CreateInstance().CreateIcon(),
+                    Size = new Vector2(20),
+                    Colour = colourProvider.Background5,
+                    Shear = -CarouselHeader.SHEAR,
                 },
                 new FillFlowContainer
                 {
-                    Padding = new MarginPadding(5),
-                    Direction = FillDirection.Horizontal,
+                    Padding = new MarginPadding { Top = 8, Left = colour_box_width + corner_radius },
+                    Direction = FillDirection.Vertical,
                     AutoSizeAxes = Axes.Both,
-                    Anchor = Anchor.CentreLeft,
-                    Origin = Anchor.CentreLeft,
                     Children = new Drawable[]
                     {
-                        difficultyIcon = new DifficultyIcon(beatmapInfo)
+                        new FillFlowContainer
                         {
-                            TooltipType = DifficultyIconTooltipType.None,
-                            Scale = new Vector2(1.8f),
+                            Direction = FillDirection.Horizontal,
+                            Spacing = new Vector2(3, 0),
+                            AutoSizeAxes = Axes.Both,
+                            Shear = -CarouselHeader.SHEAR,
+                            Children = new Drawable[]
+                            {
+                                starRatingDisplay = new StarRatingDisplay(default, StarRatingDisplaySize.Small),
+
+                                //Scaling is applied to size match components of row
+                                new TopLocalRank(beatmapInfo) { Scale = new Vector2(8f / 11) },
+                                starCounter = new StarCounter
+                                {
+                                    Margin = new MarginPadding { Top = 8 }, // Better aligns the stars with the star rating display
+                                    Scale = new Vector2(8 / 20f)
+                                }
+                            }
                         },
                         new FillFlowContainer
                         {
-                            Padding = new MarginPadding { Left = 5 },
-                            Direction = FillDirection.Vertical,
+                            Direction = FillDirection.Horizontal,
+                            Spacing = new Vector2(11, 0),
                             AutoSizeAxes = Axes.Both,
-                            Children = new Drawable[]
+                            Shear = -CarouselHeader.SHEAR,
+                            Children = new[]
                             {
-                                new FillFlowContainer
+                                keyCountText = new OsuSpriteText
                                 {
-                                    Direction = FillDirection.Horizontal,
-                                    Spacing = new Vector2(4, 0),
-                                    AutoSizeAxes = Axes.Both,
-                                    Children = new[]
-                                    {
-                                        keyCountText = new OsuSpriteText
-                                        {
-                                            Font = OsuFont.GetFont(size: 20),
-                                            Anchor = Anchor.BottomLeft,
-                                            Origin = Anchor.BottomLeft,
-                                            Alpha = 0,
-                                        },
-                                        new OsuSpriteText
-                                        {
-                                            Text = beatmapInfo.DifficultyName,
-                                            Font = OsuFont.GetFont(size: 20),
-                                            Anchor = Anchor.BottomLeft,
-                                            Origin = Anchor.BottomLeft
-                                        },
-                                        new OsuSpriteText
-                                        {
-                                            Text = BeatmapsetsStrings.ShowDetailsMappedBy(beatmapInfo.Metadata.Author.Username),
-                                            Anchor = Anchor.BottomLeft,
-                                            Origin = Anchor.BottomLeft
-                                        },
-                                    }
+                                    Font = OsuFont.GetFont(size: 18, weight: FontWeight.SemiBold),
+                                    Anchor = Anchor.BottomLeft,
+                                    Origin = Anchor.BottomLeft,
+                                    Alpha = 0,
                                 },
-                                new FillFlowContainer
+                                new OsuSpriteText
                                 {
-                                    Direction = FillDirection.Horizontal,
-                                    Spacing = new Vector2(4, 0),
-                                    Scale = new Vector2(0.8f),
-                                    AutoSizeAxes = Axes.Both,
-                                    Children = new Drawable[]
-                                    {
-                                        new TopLocalRank(beatmapInfo),
-                                        starCounter = new StarCounter()
-                                    }
+                                    Text = beatmapInfo.DifficultyName,
+                                    Font = OsuFont.GetFont(size: 18, weight: FontWeight.SemiBold),
+                                    Anchor = Anchor.BottomLeft,
+                                    Origin = Anchor.BottomLeft
+                                },
+                                new OsuSpriteText
+                                {
+                                    Colour = colourProvider.Content2,
+                                    Font = OsuFont.GetFont(weight: FontWeight.SemiBold),
+                                    Text = BeatmapsetsStrings.ShowDetailsMappedBy(beatmapInfo.Metadata.Author.Username),
+                                    Anchor = Anchor.BottomLeft,
+                                    Origin = Anchor.BottomLeft
                                 }
                             }
                         }
@@ -198,11 +238,10 @@ namespace osu.Game.Screens.Select.Carousel
 
             MovementContainer.MoveToX(-50, 500, Easing.OutExpo);
 
-            background.Colour = ColourInfo.GradientVertical(
-                new Color4(20, 43, 51, 255),
-                new Color4(40, 86, 102, 255));
+            rightContainer.Height = height - 4;
 
-            triangles.Colour = Color4.White;
+            colourBox.RelativeSizeAxes = Axes.Both;
+            colourBox.Width = 1;
         }
 
         protected override void Deselected()
@@ -211,8 +250,18 @@ namespace osu.Game.Screens.Select.Carousel
 
             MovementContainer.MoveToX(0, 500, Easing.OutExpo);
 
-            background.Colour = new Color4(20, 43, 51, 255);
-            triangles.Colour = OsuColour.Gray(0.5f);
+            rightContainer.Height = height;
+
+            Header.EffectContainer.EdgeEffect = new EdgeEffectParameters
+            {
+                Type = EdgeEffectType.Shadow,
+                Offset = new Vector2(1),
+                Radius = 10,
+                Colour = Colour4.Black.Opacity(100),
+            };
+
+            colourBox.RelativeSizeAxes = Axes.Y;
+            colourBox.Width = colour_box_width + corner_radius;
         }
 
         protected override bool OnClick(ClickEvent e)
@@ -237,10 +286,32 @@ namespace osu.Game.Screens.Select.Carousel
                 starDifficultyBindable = difficultyCache.GetBindableDifficulty(beatmapInfo, (starDifficultyCancellationSource = new CancellationTokenSource()).Token);
                 starDifficultyBindable.BindValueChanged(d =>
                 {
-                    starCounter.Current = (float)(d.NewValue?.Stars ?? 0);
-                    if (d.NewValue != null)
-                        difficultyIcon.Current.Value = d.NewValue.Value;
+                    starRatingDisplay.Current.Value = d.NewValue ?? default;
                 }, true);
+
+                starRatingDisplay.Current.BindValueChanged(s =>
+                {
+                    starCounter.Current = (float)s.NewValue.Stars;
+
+                    // Every other element in song select that uses this cut off uses yellow for the upper range but the designs use white here for whatever reason.
+                    iconContainer.Colour = s.NewValue.Stars > 6.5f ? Colour4.White : colourProvider.Background5;
+
+                    var starRatingColour = colours.ForStarDifficulty(s.NewValue.Stars);
+
+                    starCounter.Colour = colourBox.Colour = starRatingColour;
+                    starRatingGradient.Colour = ColourInfo.GradientHorizontal(starRatingColour.Opacity(0.25f), starRatingColour.Opacity(0));
+                    starRatingGradient.Show();
+
+                    if (Item!.State.Value == CarouselItemState.NotSelected) return;
+
+                    // We want to update the EdgeEffect here instead of in selected() to make sure the colours are correct
+                    Header.EffectContainer.EdgeEffect = new EdgeEffectParameters
+                    {
+                        Type = EdgeEffectType.Shadow,
+                        Colour = starCounter.Colour.MultiplyAlpha(0.5f),
+                        Radius = 10,
+                    };
+                });
 
                 updateKeyCount();
             }

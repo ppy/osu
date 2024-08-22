@@ -25,6 +25,9 @@ namespace osu.Game.Tests.Visual.SongSelect
     [TestFixture]
     public partial class TestSceneUpdateBeatmapSetButton : OsuManualInputManagerTestScene
     {
+        [Cached]
+        private readonly OverlayColourProvider overlayColour = new OverlayColourProvider(OverlayColourScheme.Aquamarine);
+
         private BeatmapCarousel carousel = null!;
 
         private TestSceneOnlinePlayBeatmapAvailabilityTracker.TestBeatmapModelDownloader beatmapDownloader = null!;
