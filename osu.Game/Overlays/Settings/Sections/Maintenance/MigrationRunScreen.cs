@@ -6,7 +6,6 @@
 using System.IO;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
-using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Logging;
@@ -16,7 +15,6 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation;
-using osu.Game.Overlays.Notifications;
 using osu.Game.Screens;
 using osuTK;
 
