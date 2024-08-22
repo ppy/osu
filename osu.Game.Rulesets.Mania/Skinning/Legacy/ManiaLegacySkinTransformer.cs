@@ -95,7 +95,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
 
                     switch (containerLookup.Target)
                     {
-                        case GlobalSkinnableContainerLookup.GlobalSkinnableContainers.MainHUDComponents:
+                        case GlobalSkinnableContainers.MainHUDComponents:
                             return new DefaultSkinComponentsContainer(container =>
                             {
                                 var combo = container.ChildrenOfType<LegacyManiaComboCounter>().FirstOrDefault();

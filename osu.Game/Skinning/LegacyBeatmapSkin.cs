@@ -54,7 +54,7 @@ namespace osu.Game.Skinning
             {
                 switch (containerLookup.Target)
                 {
-                    case GlobalSkinnableContainerLookup.GlobalSkinnableContainers.MainHUDComponents:
+                    case GlobalSkinnableContainers.MainHUDComponents:
                         // this should exist in LegacySkin instead, but there isn't a fallback skin for LegacySkins yet.
                         // therefore keep the check here until fallback default legacy skin is supported.
                         if (!this.HasFont(LegacyFont.Score))

@@ -46,7 +46,7 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
                     // Our own ruleset components default.
                     switch (containerLookup.Target)
                     {
-                        case GlobalSkinnableContainerLookup.GlobalSkinnableContainers.MainHUDComponents:
+                        case GlobalSkinnableContainers.MainHUDComponents:
                             // todo: remove CatchSkinComponents.CatchComboCounter and refactor LegacyCatchComboCounter to be added here instead.
                             return new DefaultSkinComponentsContainer(container =>
                             {
