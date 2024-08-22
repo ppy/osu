@@ -37,7 +37,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         public void TestEmptyLegacyBeatmapSkinFallsBack()
         {
             CreateSkinTest(TrianglesSkin.CreateInfo(), () => new LegacyBeatmapSkin(new BeatmapInfo(), null));
-            AddUntilStep("wait for hud load", () => Player.ChildrenOfType<SkinComponentsContainer>().All(c => c.ComponentsLoaded));
+            AddUntilStep("wait for hud load", () => Player.ChildrenOfType<SkinnableContainer>().All(c => c.ComponentsLoaded));
             AddAssert("hud from default skin", () => AssertComponentsFromExpectedSource(SkinComponentsContainerLookup.TargetArea.MainHUDComponents, skinManager.CurrentSkin.Value));
         }
 
@@ -55,7 +55,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         protected bool AssertComponentsFromExpectedSource(SkinComponentsContainerLookup.TargetArea target, ISkin expectedSource)
         {
-            var targetContainer = Player.ChildrenOfType<SkinComponentsContainer>().First(s => s.Lookup.Target == target);
+            var targetContainer = Player.ChildrenOfType<SkinnableContainer>().First(s => s.Lookup.Target == target);
             var actualComponentsContainer = targetContainer.ChildrenOfType<Container>().SingleOrDefault(c => c.Parent == targetContainer);
 
             if (actualComponentsContainer == null)
