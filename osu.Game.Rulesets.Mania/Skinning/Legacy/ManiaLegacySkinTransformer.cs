@@ -114,7 +114,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
 
                     return null;
 
-                case GameplaySkinComponentLookup<HitResult> resultComponent:
+                case SkinComponentLookup<HitResult> resultComponent:
                     return getResult(resultComponent.Component);
 
                 case ManiaSkinComponentLookup maniaComponent:
