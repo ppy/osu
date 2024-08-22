@@ -9,10 +9,8 @@ using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps.ControlPoints;
-using osu.Game.Configuration;
 using osu.Game.Extensions;
 using osu.Game.Graphics;
-using osu.Game.Rulesets.UI.Scrolling;
 
 namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
 {
@@ -81,9 +79,7 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
         {
             ClearInternal();
 
-            var drawableRuleset = beatmap.BeatmapInfo.Ruleset.CreateInstance().CreateDrawableRulesetWith(beatmap.PlayableBeatmap);
-
-            if (drawableRuleset is IDrawableScrollingRuleset scrollingRuleset && scrollingRuleset.VisualisationMethod != ScrollVisualisationMethod.Constant)
+            if (beatmap.BeatmapInfo.Ruleset.CreateInstance().EditorShowScrollSpeed)
                 AddInternal(new ControlPointVisualisation(effect));
 
             if (!kiai.Value)
