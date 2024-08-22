@@ -5,6 +5,7 @@ using System;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Game.Configuration;
 using osu.Game.Online.API;
 using osu.Game.Online.Metadata;
 using osu.Game.Online.Rooms;
@@ -40,6 +41,19 @@ namespace osu.Game.Tests.Visual.DailyChallenge
         {
             startChallenge();
             AddStep("push screen", () => LoadScreen(new DailyChallengeIntro(room)));
+        }
+
+        [Test]
+        public void TestPlayIntroOnceFlag()
+        {
+            AddStep("set intro played flag", () => Dependencies.Get<SessionStatics>().SetValue(Static.DailyChallengeIntroPlayed, true));
+
+            startChallenge();
+
+            AddAssert("intro played flag reset", () => Dependencies.Get<SessionStatics>().Get<bool>(Static.DailyChallengeIntroPlayed), () => Is.False);
+
+            AddStep("push screen", () => LoadScreen(new DailyChallengeIntro(room)));
+            AddUntilStep("intro played flag set", () => Dependencies.Get<SessionStatics>().Get<bool>(Static.DailyChallengeIntroPlayed), () => Is.True);
         }
 
         private void startChallenge()
