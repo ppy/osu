@@ -55,7 +55,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         protected bool AssertComponentsFromExpectedSource(GlobalSkinnableContainers target, ISkin expectedSource)
         {
-            var targetContainer = Player.ChildrenOfType<SkinnableContainer>().First(s => s.Lookup.Target == target);
+            var targetContainer = Player.ChildrenOfType<SkinnableContainer>().First(s => s.Lookup.Component == target);
             var actualComponentsContainer = targetContainer.ChildrenOfType<Container>().SingleOrDefault(c => c.Parent == targetContainer);
 
             if (actualComponentsContainer == null)

@@ -58,7 +58,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                         return null;
 
                     // Our own ruleset components default.
-                    switch (containerLookup.Target)
+                    switch (containerLookup.Component)
                     {
                         case GlobalSkinnableContainers.MainHUDComponents:
                             return new DefaultSkinComponentsContainer(container =>

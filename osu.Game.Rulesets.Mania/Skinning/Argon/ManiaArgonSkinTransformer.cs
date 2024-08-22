@@ -37,7 +37,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
                     if (base.GetDrawableComponent(lookup) is UserConfiguredLayoutContainer d)
                         return d;
 
-                    switch (containerLookup.Target)
+                    switch (containerLookup.Component)
                     {
                         case GlobalSkinnableContainers.MainHUDComponents:
                             return new DefaultSkinComponentsContainer(container =>

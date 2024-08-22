@@ -101,7 +101,7 @@ namespace osu.Game.Skinning
                     if (base.GetDrawableComponent(lookup) is UserConfiguredLayoutContainer c)
                         return c;
 
-                    switch (containerLookup.Target)
+                    switch (containerLookup.Component)
                     {
                         case GlobalSkinnableContainers.SongSelect:
                             var songSelectComponents = new DefaultSkinComponentsContainer(_ =>
