@@ -145,18 +145,18 @@ namespace osu.Game.Screens.Edit
             {
                 case 1:
                 case 2:
-                    return new Vector2(0.6f, 0.9f);
+                    return new Vector2(1, 0.9f);
 
                 case 3:
                 case 4:
-                    return new Vector2(0.5f, 0.8f);
+                    return new Vector2(0.8f, 0.8f);
 
                 case 6:
                 case 8:
-                    return new Vector2(0.4f, 0.7f);
+                    return new Vector2(0.8f, 0.7f);
 
                 default:
-                    return new Vector2(0.3f, 0.6f);
+                    return new Vector2(0.8f, 0.6f);
             }
         }
 
