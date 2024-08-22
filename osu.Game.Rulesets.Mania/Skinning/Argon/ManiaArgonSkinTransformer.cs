@@ -33,10 +33,6 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
                     if (containerLookup.Ruleset == null)
                         return base.GetDrawableComponent(lookup);
 
-                    // Skin has configuration.
-                    if (base.GetDrawableComponent(lookup) is UserConfiguredLayoutContainer d)
-                        return d;
-
                     switch (containerLookup.Component)
                     {
                         case GlobalSkinnableContainers.MainHUDComponents:
