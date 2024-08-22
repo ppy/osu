@@ -38,7 +38,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
 
         protected bool FirstObject { get; private set; } = true;
 
-        public List<string> AvailableSampleBanks = ["normal", "soft", "drum"];
+        public List<string> AvailableSampleBanks = ["none", "normal", "soft", "drum"];
 
         protected ConvertHitObjectParser(double offset, int formatVersion)
         {
@@ -194,8 +194,12 @@ namespace osu.Game.Rulesets.Objects.Legacy
 
             string[] split = str.Split(':');
 
-            string bank = AvailableSampleBanks[Parsing.ParseInt(split[0]) - 1];
-            string addBank = AvailableSampleBanks[Parsing.ParseInt(split[1]) - 1];
+
+            string bank = (Parsing.ParseInt(split[0]) > AvailableSampleBanks.Count) ? "normal" : AvailableSampleBanks[Parsing.ParseInt(split[0])];
+            string addBank = (Parsing.ParseInt(split[1]) > AvailableSampleBanks.Count) ? "normal" : AvailableSampleBanks[Parsing.ParseInt(split[1])];
+
+            if (bank == @"none") { bank = null; };
+            if (addBank == @"none") { addBank = null; }
 
             bankInfo.BankForNormal = bank;
             bankInfo.BankForAdditions = string.IsNullOrEmpty(addBank) ? bank : addBank;
