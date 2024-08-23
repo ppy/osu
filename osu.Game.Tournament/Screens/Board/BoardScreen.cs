@@ -38,6 +38,7 @@ namespace osu.Game.Tournament.Screens.Board
         private TeamColour pickColour;
         private ChoiceType pickType;
 
+        private bool havePendingSwap = false;
         private bool refEX = false;
         private bool refWin = false;
         private TeamColour refWinner = TeamColour.Neutral;
@@ -539,20 +540,20 @@ namespace osu.Game.Tournament.Screens.Board
                 if (CurrentMatch.Value != null)
                 {
                     buttonIndicator.Colour = DetectWin() ? Color4.Orange : (DetectEX() ? Color4.White : Color4.Gray);
-                    bool havePendingSwap = CurrentMatch.Value.PendingSwaps.Any();
+                    havePendingSwap = CurrentMatch.Value.PendingSwaps.Any();
 
                     if (teamWinner != TeamColour.Neutral && !havePendingSwap)
                     {
-                        informationDisplayContainer.Child = new InstructionDisplay(team: teamWinner, step: Steps.FinalWin);
+                        informationDisplayContainer.Child = new InstructionDisplay(team: teamWinner, step: (refWin && teamWinner == refWinner) ? Steps.FinalWin : Steps.Halt);
                     }
                     else if (useEX && !havePendingSwap)
                     {
-                        informationDisplayContainer.Child = new InstructionDisplay(step: Steps.EX);
+                        informationDisplayContainer.Child = new InstructionDisplay(step: refEX ? Steps.EX : Steps.Halt);
                     }
                     else if (!hasTrap)
                     {
                         // Restore to the last state
-                        setMode(pickColour, pickType);
+                        updateBottomDisplay();
                     }
                 }
 
