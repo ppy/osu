@@ -6,7 +6,6 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Localisation;
 using osu.Game.Online.API;
@@ -72,7 +71,6 @@ namespace osu.Game.Tests.Visual.UserInterface
             NotificationOverlay notificationOverlay = null!;
             DependencyProvidingContainer buttonContainer = null!;
 
-            AddStep("set intro played flag", () => Dependencies.Get<SessionStatics>().SetValue(Static.DailyChallengeIntroPlayed, true));
             AddStep("beatmap of the day active", () => metadataClient.DailyChallengeUpdated(new DailyChallengeInfo
             {
                 RoomID = 1234,
@@ -98,7 +96,6 @@ namespace osu.Game.Tests.Visual.UserInterface
                     },
                 };
             });
-            AddAssert("intro played flag reset", () => !Dependencies.Get<SessionStatics>().Get<bool>(Static.DailyChallengeIntroPlayed));
             AddAssert("notification posted", () => notificationOverlay.AllNotifications.Count(), () => Is.EqualTo(1));
 
             AddStep("clear notifications", () =>
@@ -107,11 +104,8 @@ namespace osu.Game.Tests.Visual.UserInterface
                     notification.Close(runFlingAnimation: false);
             });
 
-            AddStep("set intro played flag", () => Dependencies.Get<SessionStatics>().SetValue(Static.DailyChallengeIntroPlayed, true));
-
             AddStep("beatmap of the day not active", () => metadataClient.DailyChallengeUpdated(null));
             AddAssert("no notification posted", () => notificationOverlay.AllNotifications.Count(), () => Is.Zero);
-            AddAssert("intro played flag still set", () => Dependencies.Get<SessionStatics>().Get<bool>(Static.DailyChallengeIntroPlayed));
 
             AddStep("hide button's parent", () => buttonContainer.Hide());
 
@@ -120,7 +114,6 @@ namespace osu.Game.Tests.Visual.UserInterface
                 RoomID = 1234,
             }));
             AddAssert("no notification posted", () => notificationOverlay.AllNotifications.Count(), () => Is.Zero);
-            AddAssert("intro played flag still set", () => Dependencies.Get<SessionStatics>().Get<bool>(Static.DailyChallengeIntroPlayed));
         }
 
         [Test]
@@ -178,13 +171,11 @@ namespace osu.Game.Tests.Visual.UserInterface
                 };
             });
 
-            AddStep("set intro played flag", () => Dependencies.Get<SessionStatics>().SetValue(Static.DailyChallengeIntroPlayed, true));
             AddStep("beatmap of the day active", () => metadataClient.DailyChallengeUpdated(new DailyChallengeInfo
             {
                 RoomID = 1234
             }));
             AddAssert("no notification posted", () => notificationOverlay.AllNotifications.Count(), () => Is.Zero);
-            AddAssert("intro played flag reset", () => !Dependencies.Get<SessionStatics>().Get<bool>(Static.DailyChallengeIntroPlayed));
         }
     }
 }
