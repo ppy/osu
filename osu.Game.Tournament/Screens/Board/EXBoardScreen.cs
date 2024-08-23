@@ -308,9 +308,8 @@ namespace osu.Game.Tournament.Screens.Board
                     default:
                         break;
                 }
-                if (command.Command == Commands.PickEX || command.Command == Commands.MarkEXWin)
-                    msg.Remove(item);
             }
+            msg.Clear();
         }
 
         private void setMode(TeamColour colour, ChoiceType choiceType)
