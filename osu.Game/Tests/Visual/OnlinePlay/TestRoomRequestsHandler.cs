@@ -18,6 +18,7 @@ using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Screens.OnlinePlay.Components;
 using osu.Game.Tests.Beatmaps;
+using osu.Game.Utils;
 
 namespace osu.Game.Tests.Visual.OnlinePlay
 {
@@ -277,11 +278,18 @@ namespace osu.Game.Tests.Visual.OnlinePlay
             var result = JsonConvert.DeserializeObject<Room>(JsonConvert.SerializeObject(source));
             Debug.Assert(result != null);
 
-            // Playlist item IDs aren't serialised.
+            // Playlist item IDs and beatmaps aren't serialised.
             if (source.CurrentPlaylistItem.Value != null)
+            {
+                result.CurrentPlaylistItem.Value = result.CurrentPlaylistItem.Value.With(new Optional<IBeatmapInfo>(source.CurrentPlaylistItem.Value.Beatmap));
                 result.CurrentPlaylistItem.Value.ID = source.CurrentPlaylistItem.Value.ID;
+            }
+
             for (int i = 0; i < source.Playlist.Count; i++)
+            {
+                result.Playlist[i] = result.Playlist[i].With(new Optional<IBeatmapInfo>(source.Playlist[i].Beatmap));
                 result.Playlist[i].ID = source.Playlist[i].ID;
+            }
 
             return result;
         }
