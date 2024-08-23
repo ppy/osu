@@ -378,10 +378,10 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         private SkinnableContainer globalHUDTarget => Player.ChildrenOfType<SkinnableContainer>()
-                                                            .Single(c => c.Lookup.Component == GlobalSkinnableContainers.MainHUDComponents && c.Lookup.Ruleset == null);
+                                                            .Single(c => c.Lookup.Lookup == GlobalSkinnableContainers.MainHUDComponents && c.Lookup.Ruleset == null);
 
         private SkinnableContainer rulesetHUDTarget => Player.ChildrenOfType<SkinnableContainer>()
-                                                             .Single(c => c.Lookup.Component == GlobalSkinnableContainers.MainHUDComponents && c.Lookup.Ruleset != null);
+                                                             .Single(c => c.Lookup.Lookup == GlobalSkinnableContainers.MainHUDComponents && c.Lookup.Ruleset != null);
 
         [Test]
         public void TestMigrationArgon()
