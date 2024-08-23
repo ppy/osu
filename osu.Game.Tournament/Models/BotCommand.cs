@@ -35,17 +35,17 @@ namespace osu.Game.Tournament.Models
             if (finalRegex.Match(line).Success)
             {
                 obj = finalRegex.Match(line).Groups;
-                return new BotCommand(Commands.SetWin, TranslateFromTeamName(obj[0].Value));
+                return new BotCommand(Commands.SetWin, TranslateFromTeamName(obj[1].Value));
             }
             if (pickEXRegex.Match(line).Success)
             {
                 obj = pickEXRegex.Match(line).Groups;
-                return new BotCommand(Commands.PickEX, map: "EX" + obj[0].Value);
+                return new BotCommand(Commands.PickEX, map: "EX" + obj[1].Value);
             }
             if (stateRegex.Match(line).Success)
             {
                 obj = stateRegex.Match(line).Groups;
-                if (obj[0].Value == "EX图池")
+                if (obj[1].Value == "EX图池")
                 {
                     return new BotCommand(Commands.EnterEX);
                 }
@@ -53,7 +53,7 @@ namespace osu.Game.Tournament.Models
             if (winRegex.Match(line).Success)
             {
                 obj = winRegex.Match(line).Groups;
-                return new BotCommand(Commands.MarkWin, team: TranslateFromTeamName(obj[1].Value), map: obj[0].Value);
+                return new BotCommand(Commands.MarkWin, team: TranslateFromTeamName(obj[2].Value), map: obj[1].Value);
             }
             return new BotCommand(Commands.Unknown);
         }
