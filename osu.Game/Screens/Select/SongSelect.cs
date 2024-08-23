@@ -321,7 +321,7 @@ namespace osu.Game.Screens.Select
                         }
                     }
                 },
-                new SkinComponentsContainer(new SkinComponentsContainerLookup(SkinComponentsContainerLookup.TargetArea.SongSelect))
+                new SkinnableContainer(new GlobalSkinnableContainerLookup(GlobalSkinnableContainers.SongSelect))
                 {
                     RelativeSizeAxes = Axes.Both,
                 },

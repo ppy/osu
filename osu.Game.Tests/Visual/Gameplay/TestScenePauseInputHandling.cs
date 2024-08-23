@@ -286,7 +286,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("set ruleset", () => currentRuleset = createRuleset());
             AddStep("load player", LoadPlayer);
             AddUntilStep("player loaded", () => Player.IsLoaded && Player.Alpha == 1);
-            AddUntilStep("wait for hud", () => Player.HUDOverlay.ChildrenOfType<SkinComponentsContainer>().All(s => s.ComponentsLoaded));
+            AddUntilStep("wait for hud", () => Player.HUDOverlay.ChildrenOfType<SkinnableContainer>().All(s => s.ComponentsLoaded));
 
             AddStep("seek to gameplay", () => Player.GameplayClockContainer.Seek(0));
             AddUntilStep("wait for seek to finish", () => Player.DrawableRuleset.FrameStableClock.CurrentTime, () => Is.EqualTo(0).Within(500));
