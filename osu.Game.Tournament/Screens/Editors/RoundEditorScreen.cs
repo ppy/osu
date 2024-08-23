@@ -100,6 +100,18 @@ namespace osu.Game.Tournament.Screens.Editors
                                 Width = 0.33f,
                                 Current = Model.UseBoard,
                             },
+                            new SettingsNumberBox
+                            {
+                                LabelText = "Referee Bot ID",
+                                Width = 0.33f,
+                                Current = Model.RefereeId,
+                            },
+                            new OsuCheckbox
+                            {
+                                LabelText = "Trust All Special Commands",
+                                Width = 0.33f,
+                                Current = Model.TrustAll,
+                            },
                             new SettingsButton
                             {
                                 Width = 0.2f,
