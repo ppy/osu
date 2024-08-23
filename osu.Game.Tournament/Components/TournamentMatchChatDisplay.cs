@@ -57,15 +57,22 @@ namespace osu.Game.Tournament.Components
                     }
 
                     foreach (var ch in manager.JoinedChannels.ToList())
-                        manager.LeaveChannel(ch);
-
-                    var channel = new Channel
                     {
-                        Id = id,
-                        Type = ChannelType.Public
-                    };
+                        if (ch.Id != id) manager.LeaveChannel(ch);
+                    }
 
-                    manager.JoinChannel(channel);
+                    Channel? channel = manager.JoinedChannels.FirstOrDefault(p => p.Id == id);
+
+                    if (channel == null)
+                    {
+                        channel = new Channel
+                        {
+                            Id = id,
+                            Type = ChannelType.Public,
+                        };
+                        manager.JoinChannel(channel);
+                    }
+
                     manager.CurrentChannel.Value = channel;
                 }, true);
             }
@@ -79,7 +86,7 @@ namespace osu.Game.Tournament.Components
         {
             var currentMatch = ladderInfo.CurrentMatch;
             // Try to recognize and verify bot commmands
-            bool isCommand = message.DisplayContent[0] == '[' && message.DisplayContent[1] == '*' && message.DisplayContent[2] == ']';
+            bool isCommand = message.Content[0] == '[' && message.Content[1] == '*' && message.Content[2] == ']';
             // TODO: What if CurrentMatch is null?
             // Automatically block duplicate messages, since we have multiple chat displays available.
             if (currentMatch.Value != null && currentMatch.Value.Round.Value != null
@@ -87,11 +94,10 @@ namespace osu.Game.Tournament.Components
                 && currentMatch.Value.Round.Value.RefereeId.Value != 0
                 && message.SenderId == currentMatch.Value.Round.Value.RefereeId.Value)
                 || !currentMatch.Value.Round.Value.TrustAll.Value)
-                && isCommand && !currentMatch.Value.PendingMsgs.Any(p => p == message.DisplayContent))
+                && isCommand && !currentMatch.Value.PendingMsgs.Any(p => p == message.Content))
             {
-                currentMatch.Value.PendingMsgs.Add(message.DisplayContent);
+                currentMatch.Value.PendingMsgs.Add(message.Content);
             }
-
             return new MatchMessage(message, ladderInfo);
         }
 
