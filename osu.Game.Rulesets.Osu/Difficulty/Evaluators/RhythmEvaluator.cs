@@ -60,7 +60,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         }
 
         private const int history_time_max = 5 * 1000; // 5 seconds of calculatingRhythmBonus max.
-        private const double rhythm_multiplier = 1.05;
+        private const double rhythm_multiplier = 0.95;
 
         /// <summary>
         /// Calculates a rhythm multiplier for the difficulty of the tap associated with historic data of the current <see cref="OsuDifficultyHitObject"/>.
@@ -102,7 +102,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 double prevDelta = prevObj.StrainTime;
                 double lastDelta = lastObj.StrainTime;
 
-                double currRatio = 1.0 + 8.8 * Math.Min(0.5, Math.Pow(Math.Sin(Math.PI / (Math.Min(prevDelta, currDelta) / Math.Max(prevDelta, currDelta))), 2)); // fancy function to calculate rhythmbonuses.
+                double currRatio = 1.0 + 9.8 * Math.Min(0.5, Math.Pow(Math.Sin(Math.PI / (Math.Min(prevDelta, currDelta) / Math.Max(prevDelta, currDelta))), 2)); // fancy function to calculate rhythmbonuses.
 
                 double windowPenalty = Math.Min(1, Math.Max(0, Math.Abs(prevDelta - currDelta) - currObj.HitWindowGreat * 0.3) / (currObj.HitWindowGreat * 0.3));
 
@@ -121,16 +121,22 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                     }
                     else
                     {
-                        if (currObj.BaseObject is Slider) // bpm change is into slider, this is easy acc window
+                        // bpm change is into slider, this is easy acc window
+                        if (currObj.BaseObject is Slider)
                             effectiveRatio *= 0.125;
 
-                        if (prevObj.BaseObject is Slider) // bpm change was from a slider, this is easier typically than circle -> circle
-                            effectiveRatio *= 0.25;
+                        // bpm change was from a slider, this is easier typically than circle -> circle
+                        // unintentional side effect is that bursts with kicksliders at the ends might have lower difficulty than bursts without sliders
+                        // therefore we're checking for quick sliders and don't lower the difficulty for them since they don't really make tapping easier (no time to adjust)
+                        if (prevObj.BaseObject is Slider && prevObj.TravelTime > prevDelta * 1.5)
+                            effectiveRatio *= 0.15;
 
-                        if (island.IsSimilarPolarity(previousIsland, deltaDifferenceEpsilon)) // repeated island polartiy (2 -> 4, 3 -> 5)
-                            effectiveRatio *= 0.35;
+                        // repeated island polartiy (2 -> 4, 3 -> 5)
+                        if (island.IsSimilarPolarity(previousIsland, deltaDifferenceEpsilon))
+                            effectiveRatio *= 0.3;
 
-                        if (lastDelta > prevDelta + deltaDifferenceEpsilon && prevDelta > currDelta + deltaDifferenceEpsilon) // previous increase happened a note ago, 1/1->1/2-1/4, dont want to buff this.
+                        // previous increase happened a note ago, 1/1->1/2-1/4, dont want to buff this.
+                        if (lastDelta > prevDelta + deltaDifferenceEpsilon && prevDelta > currDelta + deltaDifferenceEpsilon)
                             effectiveRatio *= 0.125;
 
                         if (!islandCounts.TryAdd(island, 1))
@@ -141,6 +147,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                             double power = logistic(island.AverageDelta(), 4, 0.165, 10);
                             effectiveRatio *= Math.Min(2.0 / islandCounts[island], Math.Pow(1.0 / islandCounts[island], power));
                         }
+
+                        // scale down the difficulty if the object is doubletappable
+                        double doubletapness = prevObj.GetDoubletapness((OsuDifficultyHitObject?)prevObj.Next(0));
+                        effectiveRatio *= 1 - doubletapness * 0.75;
 
                         rhythmComplexitySum += Math.Sqrt(effectiveRatio * startRatio) * currHistoricalDecay;
 
@@ -167,7 +177,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 prevObj = currObj;
             }
 
-            return Math.Sqrt(4 + rhythmComplexitySum * rhythm_multiplier) / 2; //produces multiplier that can be applied to strain. range [1, infinity) (not really though)
+            return Math.Sqrt(4 + rhythmComplexitySum * rhythm_multiplier) / 2.0; //produces multiplier that can be applied to strain. range [1, infinity) (not really though)
         }
 
         private static double logistic(double x, double maxValue, double multiplier, double offset) => (maxValue / (1 + Math.Pow(Math.E, offset - (multiplier * x))));
