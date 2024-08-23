@@ -248,7 +248,31 @@ namespace osu.Game.Skinning
                 applyMigration(layout, target, i);
 
             layout.Version = SkinLayoutInfo.LATEST_VERSION;
+
+            foreach (var kvp in layout.DrawableInfo.ToArray())
+            {
+                foreach (var di in kvp.Value)
+                {
+                    if (!isValidDrawable(di))
+                        layout.DrawableInfo[kvp.Key] = kvp.Value.Where(i => i.Type != di.Type).ToArray();
+                }
+            }
+
             return layout;
+        }
+
+        private bool isValidDrawable(SerialisedDrawableInfo di)
+        {
+            if (!typeof(ISerialisableDrawable).IsAssignableFrom(di.Type))
+                return false;
+
+            foreach (var child in di.Children)
+            {
+                if (!isValidDrawable(child))
+                    return false;
+            }
+
+            return true;
         }
 
         private void applyMigration(SkinLayoutInfo layout, GlobalSkinnableContainers target, int version)
