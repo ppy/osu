@@ -4,10 +4,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
@@ -335,38 +333,51 @@ namespace osu.Game.Tournament.Screens.Board
             buttonTrapSwap.Text = CurrentMatch.Value?.PendingSwaps.Any() ?? false ? @$"Free Swap (Target)" : @$"Free Swap";
 
             static Color4 setColour(bool active) => active ? Color4.White : Color4.Gray;
+            updateBottomDisplay();
+        }
 
-            switch (choiceType)
+        private void updateBottomDisplay()
+        {
+            // TODO: Detect changes properly
+            Drawable oldDisplay = informationDisplayContainer.Child;
+            Drawable newDisplay;
+
+            switch (pickType)
             {
                 case ChoiceType.Protect:
-                    informationDisplayContainer.Child = new InstructionDisplay(team: pickColour, step: Steps.Protect);
+                    newDisplay = new InstructionDisplay(team: pickColour, step: Steps.Protect);
                     break;
 
                 case ChoiceType.Pick:
-                    informationDisplayContainer.Child = new InstructionDisplay(team: pickColour, step: Steps.Pick);
+                    newDisplay = new InstructionDisplay(team: pickColour, step: Steps.Pick);
                     break;
 
                 case ChoiceType.Trap:
-                    informationDisplayContainer.Child = new InstructionDisplay(team: pickColour, step: Steps.Trap);
+                    newDisplay = new InstructionDisplay(team: pickColour, step: Steps.Trap);
                     break;
 
                 case ChoiceType.Ban:
-                    informationDisplayContainer.Child = new InstructionDisplay(team: pickColour, step: Steps.Ban);
+                    newDisplay = new InstructionDisplay(team: pickColour, step: Steps.Ban);
                     break;
 
                 case ChoiceType.RedWin or ChoiceType.BlueWin:
-                    informationDisplayContainer.Child = new InstructionDisplay(team: pickColour, step: Steps.Win);
+                    newDisplay = new InstructionDisplay(team: pickColour, step: Steps.Win);
                     break;
 
                 case ChoiceType.Swap:
-                    informationDisplayContainer.Child = new TrapInfoDisplay(trap: TrapType.Swap);
+                    newDisplay = new TrapInfoDisplay(trap: TrapType.Swap);
                     break;
 
                 default:
-                    informationDisplayContainer.Child = new InstructionDisplay(team: teamWinner, step: DetectWin() ? Steps.FinalWin : (useEX ? Steps.EX : Steps.Default));
+                    newDisplay = new InstructionDisplay(step: Steps.Halt);
+                    // newDisplay = new InstructionDisplay(team: teamWinner, step: DetectWin() ? Steps.FinalWin : (useEX ? Steps.EX : Steps.Default));
                     break;
             }
-            informationDisplayContainer.FadeInFromZero(duration: 200, easing: Easing.InCubic);
+            if (oldDisplay != newDisplay)
+            {
+                informationDisplayContainer.Child = newDisplay;
+                informationDisplayContainer.FadeInFromZero(duration: 200, easing: Easing.InCubic);
+            }
         }
 
         /*
