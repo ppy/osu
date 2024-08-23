@@ -3,6 +3,8 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
+using System.Data;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -31,8 +33,14 @@ namespace osu.Game.Tournament.Screens.Board
         [Resolved]
         private TournamentSceneManager? sceneManager { get; set; }
 
+        private readonly Bindable<TournamentMatch?> currentMatch = new Bindable<TournamentMatch?>();
+
         private TeamColour pickColour;
         private ChoiceType pickType;
+
+        private bool refEX = false;
+        private bool refWin = false;
+        private TeamColour refWinner = TeamColour.Neutral;
 
         private TeamColour teamWinner = TeamColour.Neutral;
 
@@ -69,6 +77,9 @@ namespace osu.Game.Tournament.Screens.Board
         [BackgroundDependencyLoader]
         private void load(TextureStore textures)
         {
+            currentMatch.BindValueChanged(matchChanged);
+            currentMatch.BindTo(LadderInfo.CurrentMatch);
+
             InternalChildren = new Drawable[]
             {
                 new TourneyVideo("mappool")
@@ -313,6 +324,58 @@ namespace osu.Game.Tournament.Screens.Board
             //     addForBeatmap(beatmap.NewValue.OnlineID);
         }
 
+        private void matchChanged(ValueChangedEvent<TournamentMatch?> match)
+        {
+            if (match.OldValue != null)
+            {
+                match.OldValue.PendingMsgs.CollectionChanged -= msgOnCollectionChanged;
+            }
+            if (match.NewValue != null)
+            {
+                match.NewValue.PendingMsgs.CollectionChanged += msgOnCollectionChanged;
+            }
+
+            Scheduler.AddOnce(parseCommands);
+        }
+
+        private void msgOnCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+            => Scheduler.AddOnce(parseCommands);
+
+        private void parseCommands()
+        {
+            if (CurrentMatch.Value == null)
+                return;
+
+            var msg = CurrentMatch.Value.PendingMsgs;
+
+            foreach (string item in msg)
+            {
+                BotCommand command = new BotCommand().ParseFromText(item);
+                switch (command.Command)
+                {
+                    case Commands.EnterEX:
+                        refEX = true;
+                        break;
+
+                    case Commands.SetWin:
+                        refWin = true;
+                        refWinner = command.Team;
+                        break;
+
+                    case Commands.MarkWin:
+                        pickColour = command.Team;
+                        pickType = command.Team == TeamColour.Red ? ChoiceType.RedWin : ChoiceType.BlueWin;
+                        addForBeatmap(command.MapMod);
+                        break;
+
+                    default:
+                        break;
+                }
+                if (command.Command == Commands.EnterEX || command.Command == Commands.SetWin || command.Command == Commands.MarkWin)
+                    msg.Remove(item);
+            }
+        }
+
         private void setMode(TeamColour colour, ChoiceType choiceType)
         {
             pickColour = colour;
@@ -369,8 +432,21 @@ namespace osu.Game.Tournament.Screens.Board
                     break;
 
                 default:
-                    newDisplay = new InstructionDisplay(step: Steps.Halt);
-                    // newDisplay = new InstructionDisplay(team: teamWinner, step: DetectWin() ? Steps.FinalWin : (useEX ? Steps.EX : Steps.Default));
+                    Steps state = Steps.Halt;
+                    if (useEX && refEX)
+                    {
+                        state = Steps.EX;
+                    }
+                    else if (DetectWin() && refWin)
+                    {
+                        if (teamWinner == refWinner)
+                            state = Steps.FinalWin;
+                    }
+                    else if (!useEX && teamWinner == TeamColour.Neutral)
+                    {
+                        state = Steps.Default;
+                    }
+                    newDisplay = new InstructionDisplay(team: teamWinner, step: state);
                     break;
             }
             if (oldDisplay != newDisplay)
@@ -534,6 +610,17 @@ namespace osu.Game.Tournament.Screens.Board
         }
 
         private bool isPickWin => pickType == ChoiceType.RedWin || pickType == ChoiceType.BlueWin;
+
+        private void addForBeatmap(string modId)
+        {
+            if (CurrentMatch.Value?.Round.Value == null)
+                return;
+
+            var map = CurrentMatch.Value.Round.Value.Beatmaps.FirstOrDefault(b => b.Mods + b.ModIndex == modId);
+
+            if (map != null)
+                addForBeatmap(map.ID);
+        }
 
         private void addForBeatmap(int beatmapId)
         {

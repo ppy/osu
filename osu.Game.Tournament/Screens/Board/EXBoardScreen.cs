@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Specialized;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -254,7 +255,6 @@ namespace osu.Game.Tournament.Screens.Board
             ipc.Beatmap.BindValueChanged(beatmapChanged);
         }
 
-
         private void beatmapChanged(ValueChangedEvent<TournamentBeatmap?> beatmap)
         {
             if (CurrentMatch.Value?.Round.Value == null)
@@ -262,6 +262,55 @@ namespace osu.Game.Tournament.Screens.Board
 
             if (beatmap.NewValue?.OnlineID > 0)
                 addForBeatmap(beatmap.NewValue.OnlineID);
+        }
+
+        private void matchChanged(ValueChangedEvent<TournamentMatch?> match)
+        {
+            if (match.OldValue != null)
+            {
+                match.OldValue.PendingMsgs.CollectionChanged -= msgOnCollectionChanged;
+            }
+            if (match.NewValue != null)
+            {
+                match.NewValue.PendingMsgs.CollectionChanged += msgOnCollectionChanged;
+            }
+
+            Scheduler.AddOnce(parseCommands);
+        }
+
+        private void msgOnCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+            => Scheduler.AddOnce(parseCommands);
+
+        private void parseCommands()
+        {
+            if (CurrentMatch.Value == null)
+                return;
+
+            var msg = CurrentMatch.Value.PendingMsgs;
+
+            foreach (string item in msg)
+            {
+                BotCommand command = new BotCommand().ParseFromText(item);
+                switch (command.Command)
+                {
+                    case Commands.PickEX:
+                        pickColour = TeamColour.Neutral;
+                        pickType = ChoiceType.Pick;
+                        addForBeatmap(command.MapMod);
+                        break;
+
+                    case Commands.MarkEXWin:
+                        pickColour = command.Team;
+                        pickType = command.Team == TeamColour.Red ? ChoiceType.RedWin : ChoiceType.BlueWin;
+                        addForBeatmap(command.MapMod);
+                        break;
+
+                    default:
+                        break;
+                }
+                if (command.Command == Commands.PickEX || command.Command == Commands.MarkEXWin)
+                    msg.Remove(item);
+            }
         }
 
         private void setMode(TeamColour colour, ChoiceType choiceType)
@@ -308,6 +357,17 @@ namespace osu.Game.Tournament.Screens.Board
             buttonPick.Colour = Color4.White;
             buttonBlueWin.Colour = Color4.White;
             buttonRedWin.Colour = Color4.White;
+        }
+
+        private void addForBeatmap(string modId)
+        {
+            if (CurrentMatch.Value?.Round.Value == null)
+                return;
+
+            var map = CurrentMatch.Value.Round.Value.Beatmaps.FirstOrDefault(b => b.Mods + b.ModIndex == modId);
+
+            if (map != null)
+                addForBeatmap(map.ID);
         }
 
         private void addForBeatmap(int beatmapId)

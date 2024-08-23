@@ -20,7 +20,7 @@ namespace osu.Game.Tournament.Models
         public TeamColour Team;
         public string MapMod;
 
-        public BotCommand(Commands command, TeamColour team = TeamColour.Neutral,
+        public BotCommand(Commands command = Commands.Unknown, TeamColour team = TeamColour.Neutral,
             string map = "")
         {
             Command = command;
