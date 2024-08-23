@@ -99,6 +99,13 @@ namespace osu.Game.Tournament.Models
                     icon.Colour = team == TeamColour.Red ? new OsuColour().Pink : (team == TeamColour.Blue ? new OsuColour().Sky : new OsuColour().Yellow);
                     break;
 
+                case Steps.Halt:
+                    name = @"请稍候...";
+                    description = @"等待JuroeBot响应...";
+                    icon.Icon = FontAwesome.Solid.ExclamationCircle;
+                    icon.Colour = Color4.Orange;
+                    break;
+
                 default:
                     name = @"Welcome to the Fumo era!";
                     description = @"(ᗜˬᗜ)";
@@ -138,6 +145,9 @@ namespace osu.Game.Tournament.Models
 
                 case @"即将进入 EX 模式":
                     return Steps.EX;
+
+                case @"请稍候...":
+                    return Steps.Halt;
 
                 default:
                     return Steps.Default;
@@ -179,6 +189,10 @@ namespace osu.Game.Tournament.Models
         /// The winner is decided.
         /// </summary>
         FinalWin,
+        /// <summary>
+        /// Something went wrong.
+        /// </summary>
+        Halt,
         /// <summary>
         /// Placeholder for default conditions.
         /// </summary>
