@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Linq;
+using System.Text.RegularExpressions;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -75,7 +76,20 @@ namespace osu.Game.Tournament.Components
 
         public void Contract() => this.FadeOut(200);
 
-        protected override ChatLine CreateMessage(Message message) => new MatchMessage(message, ladderInfo);
+        protected override ChatLine CreateMessage(Message message)
+        {
+            var currentMatch = ladderInfo.CurrentMatch;
+            // Try to recognize bot commmands (TODO: verify?)
+            bool isCommand = message.Content[0] == '[' && message.Content[1] == '*' && message.Content[2] == ']';
+            // TODO: What if CurrentMatch is null?
+            // Automatically block duplicate messages, since we have multiple chat displays available.
+            if (currentMatch.Value != null && isCommand && !currentMatch.Value.PendingMsgs.Any(p => p == message.Content))
+            {
+                currentMatch.Value.PendingMsgs.Add(message.Content);
+            }
+
+            return new MatchMessage(message, ladderInfo);
+        }
 
         protected override StandAloneDrawableChannel CreateDrawableChannel(Channel channel) => new MatchChannel(channel);
 
