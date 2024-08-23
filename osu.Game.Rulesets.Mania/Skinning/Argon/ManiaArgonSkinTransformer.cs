@@ -33,7 +33,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
                     if (containerLookup.Ruleset == null)
                         return base.GetDrawableComponent(lookup);
 
-                    switch (containerLookup.Component)
+                    switch (containerLookup.Lookup)
                     {
                         case GlobalSkinnableContainers.MainHUDComponents:
                             return new DefaultSkinComponentsContainer(container =>

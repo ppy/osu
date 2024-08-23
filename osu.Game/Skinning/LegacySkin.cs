@@ -359,7 +359,7 @@ namespace osu.Game.Skinning
             switch (lookup)
             {
                 case GlobalSkinnableContainerLookup containerLookup:
-                    switch (containerLookup.Component)
+                    switch (containerLookup.Lookup)
                     {
                         case GlobalSkinnableContainers.MainHUDComponents:
                             if (containerLookup.Ruleset != null)

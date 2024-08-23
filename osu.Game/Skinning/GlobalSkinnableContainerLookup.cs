@@ -15,7 +15,7 @@ namespace osu.Game.Skinning
         /// <summary>
         /// The target area / layer of the game for which skin components will be returned.
         /// </summary>
-        public readonly GlobalSkinnableContainers Component;
+        public readonly GlobalSkinnableContainers Lookup;
 
         /// <summary>
         /// The ruleset for which skin components should be returned.
@@ -23,17 +23,17 @@ namespace osu.Game.Skinning
         /// </summary>
         public readonly RulesetInfo? Ruleset;
 
-        public GlobalSkinnableContainerLookup(GlobalSkinnableContainers component, RulesetInfo? ruleset = null)
+        public GlobalSkinnableContainerLookup(GlobalSkinnableContainers lookup, RulesetInfo? ruleset = null)
         {
-            Component = component;
+            Lookup = lookup;
             Ruleset = ruleset;
         }
 
         public override string ToString()
         {
-            if (Ruleset == null) return Component.GetDescription();
+            if (Ruleset == null) return Lookup.GetDescription();
 
-            return $"{Component.GetDescription()} (\"{Ruleset.Name}\" only)";
+            return $"{Lookup.GetDescription()} (\"{Ruleset.Name}\" only)";
         }
 
         public bool Equals(GlobalSkinnableContainerLookup? other)
@@ -41,7 +41,7 @@ namespace osu.Game.Skinning
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
 
-            return Component == other.Component && (ReferenceEquals(Ruleset, other.Ruleset) || Ruleset?.Equals(other.Ruleset) == true);
+            return Lookup == other.Lookup && (ReferenceEquals(Ruleset, other.Ruleset) || Ruleset?.Equals(other.Ruleset) == true);
         }
 
         public override bool Equals(object? obj)
@@ -55,7 +55,7 @@ namespace osu.Game.Skinning
 
         public override int GetHashCode()
         {
-            return HashCode.Combine((int)Component, Ruleset);
+            return HashCode.Combine((int)Lookup, Ruleset);
         }
     }
 }
