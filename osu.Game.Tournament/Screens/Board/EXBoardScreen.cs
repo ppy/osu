@@ -27,6 +27,7 @@ namespace osu.Game.Tournament.Screens.Board
     public partial class EXBoardScreen : TournamentMatchScreen
     {
         private FillFlowContainer<FillFlowContainer<EXBoardBeatmapPanel>> mapFlows = null!;
+        private readonly Bindable<TournamentMatch?> currentMatch = new Bindable<TournamentMatch?>();
 
         [Resolved]
         private TournamentSceneManager? sceneManager { get; set; }
@@ -50,6 +51,8 @@ namespace osu.Game.Tournament.Screens.Board
         [BackgroundDependencyLoader]
         private void load(TextureStore textures, MatchIPCInfo ipc)
         {
+            currentMatch.BindValueChanged(matchChanged);
+            currentMatch.BindTo(LadderInfo.CurrentMatch);
             InternalChildren = new Drawable[]
             {
                 new TourneyVideo("mappool")
