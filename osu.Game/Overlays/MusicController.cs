@@ -115,7 +115,7 @@ namespace osu.Game.Overlays
             seekDelegate?.Cancel();
             seekDelegate = Schedule(() =>
             {
-                if (beatmap.Disabled || !AllowTrackControl.Value)
+                if (!AllowTrackControl.Value)
                     return;
 
                 CurrentTrack.Seek(position);
