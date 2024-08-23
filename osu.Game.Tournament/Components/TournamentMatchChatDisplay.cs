@@ -79,7 +79,7 @@ namespace osu.Game.Tournament.Components
         {
             var currentMatch = ladderInfo.CurrentMatch;
             // Try to recognize and verify bot commmands
-            bool isCommand = message.Content[0] == '[' && message.Content[1] == '*' && message.Content[2] == ']';
+            bool isCommand = message.DisplayContent[0] == '[' && message.DisplayContent[1] == '*' && message.DisplayContent[2] == ']';
             // TODO: What if CurrentMatch is null?
             // Automatically block duplicate messages, since we have multiple chat displays available.
             if (currentMatch.Value != null && currentMatch.Value.Round.Value != null
@@ -87,9 +87,9 @@ namespace osu.Game.Tournament.Components
                 && currentMatch.Value.Round.Value.RefereeId.Value != 0
                 && message.SenderId == currentMatch.Value.Round.Value.RefereeId.Value)
                 || !currentMatch.Value.Round.Value.TrustAll.Value)
-                && isCommand && !currentMatch.Value.PendingMsgs.Any(p => p == message.Content))
+                && isCommand && !currentMatch.Value.PendingMsgs.Any(p => p == message.DisplayContent))
             {
-                currentMatch.Value.PendingMsgs.Add(message.Content);
+                currentMatch.Value.PendingMsgs.Add(message.DisplayContent);
             }
 
             return new MatchMessage(message, ladderInfo);
