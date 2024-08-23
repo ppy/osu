@@ -44,23 +44,19 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
         {
             switch (lookup)
             {
-                case SkinComponentsContainerLookup containerLookup:
+                case GlobalSkinnableContainerLookup containerLookup:
                     // Only handle per ruleset defaults here.
                     if (containerLookup.Ruleset == null)
                         return base.GetDrawableComponent(lookup);
-
-                    // Skin has configuration.
-                    if (base.GetDrawableComponent(lookup) is UserConfiguredLayoutContainer d)
-                        return d;
 
                     // we don't have enough assets to display these components (this is especially the case on a "beatmap" skin).
                     if (!IsProvidingLegacyResources)
                         return null;
 
                     // Our own ruleset components default.
-                    switch (containerLookup.Target)
+                    switch (containerLookup.Lookup)
                     {
-                        case SkinComponentsContainerLookup.TargetArea.MainHUDComponents:
+                        case GlobalSkinnableContainers.MainHUDComponents:
                             return new DefaultSkinComponentsContainer(container =>
                             {
                                 var keyCounter = container.OfType<LegacyKeyCounterDisplay>().FirstOrDefault();

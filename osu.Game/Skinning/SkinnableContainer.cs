@@ -16,17 +16,17 @@ namespace osu.Game.Skinning
     /// </summary>
     /// <remarks>
     /// This is currently used as a means of serialising skin layouts to files.
-    /// Currently, one json file in a skin will represent one <see cref="SkinComponentsContainer"/>, containing
+    /// Currently, one json file in a skin will represent one <see cref="SkinnableContainer"/>, containing
     /// the output of <see cref="ISerialisableDrawableContainer.CreateSerialisedInfo"/>.
     /// </remarks>
-    public partial class SkinComponentsContainer : SkinReloadableDrawable, ISerialisableDrawableContainer
+    public partial class SkinnableContainer : SkinReloadableDrawable, ISerialisableDrawableContainer
     {
         private Container? content;
 
         /// <summary>
         /// The lookup criteria which will be used to retrieve components from the active skin.
         /// </summary>
-        public SkinComponentsContainerLookup Lookup { get; }
+        public GlobalSkinnableContainerLookup Lookup { get; }
 
         public IBindableList<ISerialisableDrawable> Components => components;
 
@@ -38,12 +38,15 @@ namespace osu.Game.Skinning
 
         private CancellationTokenSource? cancellationSource;
 
-        public SkinComponentsContainer(SkinComponentsContainerLookup lookup)
+        public SkinnableContainer(GlobalSkinnableContainerLookup lookup)
         {
             Lookup = lookup;
         }
 
-        public void Reload() => Reload(CurrentSkin.GetDrawableComponent(Lookup) as Container);
+        public void Reload() => Reload((
+                CurrentSkin.GetDrawableComponent(new UserSkinComponentLookup(Lookup))
+                ?? CurrentSkin.GetDrawableComponent(Lookup))
+            as Container);
 
         public void Reload(Container? componentsContainer)
         {
