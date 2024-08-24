@@ -1,4 +1,4 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Linq;
@@ -18,12 +18,12 @@ using osuTK;
 
 namespace osu.Game.Tests.Visual.SongSelect
 {
-    public partial class TestSceneTopLocalRank : OsuTestScene
+    public partial class TestSceneTopGlobalRank : OsuTestScene
     {
         private RulesetStore rulesets = null!;
         private BeatmapManager beatmapManager = null!;
         private ScoreManager scoreManager = null!;
-        private TopLocalRank topLocalRank = null!;
+        private TopGlobalRank topGlobalRank = null!;
 
         [BackgroundDependencyLoader]
         private void load(GameHost host, AudioManager audio)
@@ -43,9 +43,21 @@ namespace osu.Game.Tests.Visual.SongSelect
         {
             AddStep("Delete all scores", () => scoreManager.Delete());
 
-            AddStep("Create local rank", () =>
+            AddStep("Delete all cached user ranks", () =>
             {
-                Child = topLocalRank = new TopLocalRank(importedBeatmap)
+                Realm.Write(r =>
+                {
+                    var beatmap = r.Find<BeatmapInfo>(importedBeatmap.ID);
+                    if (beatmap == null)
+                        return;
+
+                    beatmap.UserRank.ResetRanks();
+                });
+            });
+
+            AddStep("Create global rank", () =>
+            {
+                Child = topGlobalRank = new TopGlobalRank(importedBeatmap)
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
@@ -53,7 +65,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 };
             });
 
-            AddAssert("No rank displayed initially", () => topLocalRank.DisplayedRank == null);
+            AddAssert("No rank displayed initially", () => topGlobalRank.DisplayedRank == null);
         }
 
         [Test]
@@ -71,11 +83,11 @@ namespace osu.Game.Tests.Visual.SongSelect
                 scoreManager.Import(testScoreInfo);
             });
 
-            AddUntilStep("B rank displayed", () => topLocalRank.DisplayedRank == ScoreRank.B);
+            AddUntilStep("B rank displayed", () => topGlobalRank.DisplayedRank == ScoreRank.B);
 
             AddStep("Delete score", () => scoreManager.Delete(testScoreInfo));
 
-            AddUntilStep("No rank displayed", () => topLocalRank.DisplayedRank == null);
+            AddUntilStep("No rank displayed", () => topGlobalRank.DisplayedRank == null);
         }
 
         [Test]
@@ -91,13 +103,13 @@ namespace osu.Game.Tests.Visual.SongSelect
                 scoreManager.Import(testScoreInfo);
             });
 
-            AddUntilStep("Wait for initial display", () => topLocalRank.DisplayedRank == ScoreRank.B);
+            AddUntilStep("Wait for initial display", () => topGlobalRank.DisplayedRank == ScoreRank.B);
 
             AddStep("Change ruleset", () => Ruleset.Value = rulesets.GetRuleset("fruits"));
-            AddUntilStep("No rank displayed", () => topLocalRank.DisplayedRank == null);
+            AddUntilStep("No rank displayed", () => topGlobalRank.DisplayedRank == null);
 
             AddStep("Change ruleset back", () => Ruleset.Value = rulesets.GetRuleset("osu"));
-            AddUntilStep("B rank displayed", () => topLocalRank.DisplayedRank == ScoreRank.B);
+            AddUntilStep("B rank displayed", () => topGlobalRank.DisplayedRank == ScoreRank.B);
         }
 
         [Test]
@@ -113,7 +125,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 scoreManager.Import(testScoreInfo);
             });
 
-            AddUntilStep("B rank displayed", () => topLocalRank.DisplayedRank == ScoreRank.B);
+            AddUntilStep("B rank displayed", () => topGlobalRank.DisplayedRank == ScoreRank.B);
 
             AddStep("Add higher score for current user", () =>
             {
@@ -127,7 +139,38 @@ namespace osu.Game.Tests.Visual.SongSelect
                 scoreManager.Import(testScoreInfo2);
             });
 
-            AddUntilStep("SS rank displayed", () => topLocalRank.DisplayedRank == ScoreRank.X);
+            AddUntilStep("SS rank displayed", () => topGlobalRank.DisplayedRank == ScoreRank.X);
+        }
+
+        [Test]
+        public void TestHigherScoreSet2()
+        {
+            AddStep("Add score for current user with \"No Fail\" mod", () =>
+            {
+                var testScoreInfo = TestResources.CreateTestScoreInfo(importedBeatmap);
+
+                testScoreInfo.User = API.LocalUser.Value;
+                testScoreInfo.Rank = ScoreRank.S;
+                testScoreInfo.TotalScore = 1000000;
+
+                scoreManager.Import(testScoreInfo);
+            });
+
+            AddUntilStep("S rank displayed", () => topGlobalRank.DisplayedRank == ScoreRank.S);
+
+            AddStep("Add higher score for current user", () =>
+            {
+                var testScoreInfo2 = TestResources.CreateTestScoreInfo(importedBeatmap);
+
+                testScoreInfo2.User = API.LocalUser.Value;
+                testScoreInfo2.Rank = ScoreRank.A;
+                testScoreInfo2.TotalScore = 1500000;
+                testScoreInfo2.Statistics = testScoreInfo2.MaximumStatistics;
+
+                scoreManager.Import(testScoreInfo2);
+            });
+
+            AddUntilStep("A rank displayed", () => topGlobalRank.DisplayedRank == ScoreRank.A);
         }
 
         [Test]
@@ -145,7 +188,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 scoreManager.Import(testScoreInfo);
             });
 
-            AddUntilStep("B rank displayed", () => topLocalRank.DisplayedRank == ScoreRank.B);
+            AddUntilStep("B rank displayed", () => topGlobalRank.DisplayedRank == ScoreRank.B);
 
             AddStep("Add higher-graded score for current user", () =>
             {
@@ -159,7 +202,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 scoreManager.Import(testScoreInfo2);
             });
 
-            AddUntilStep("SS rank displayed", () => topLocalRank.DisplayedRank == ScoreRank.X);
+            AddUntilStep("SS rank displayed", () => topGlobalRank.DisplayedRank == ScoreRank.X);
         }
     }
 }
