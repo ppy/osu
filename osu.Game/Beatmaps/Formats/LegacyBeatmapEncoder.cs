@@ -70,10 +70,10 @@ namespace osu.Game.Beatmaps.Formats
             handleControlPoints(writer);
 
             writer.WriteLine();
-            handleColours(writer);
+            handleCustomSoundBanks(writer);
 
             writer.WriteLine();
-            handleCustomSoundBanks(writer);
+            handleColours(writer);
 
             writer.WriteLine();
             handleHitObjects(writer);
