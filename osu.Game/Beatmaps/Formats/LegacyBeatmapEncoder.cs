@@ -386,8 +386,9 @@ namespace osu.Game.Beatmaps.Formats
 
         private void checkCustomSoundBank(HitObject h)
         {
-            string bank = h.Samples.SingleOrDefault(s => s.Name == HitSampleInfo.HIT_NORMAL)?.Bank;
-            if (!customSoundBanks.Contains(bank)
+            string? bank = h.Samples.SingleOrDefault(s => s.Name == HitSampleInfo.HIT_NORMAL)?.Bank;
+            if (bank != null
+                && !customSoundBanks.Contains(bank)
                 && bank != "none" && bank != "normal" && bank != "soft" && bank != "drum")
             {
                 customSoundBanks.Add(bank);
@@ -653,7 +654,8 @@ namespace osu.Game.Beatmaps.Formats
                     return (int)LegacySampleBank.Drum;
 
                 default:
-                    return customSoundBanks.IndexOf(sampleBankLower) + 4;
+                    if (sampleBankLower != null) return customSoundBanks.IndexOf(sampleBankLower) + 4;
+                    return 0;
             }
         }
 

@@ -620,6 +620,9 @@ namespace osu.Game.Beatmaps.Formats
 
         private void handleCustomSoundBanks(string line)
         {
+            // If the ruleset wasn't specified, assume the osu!standard ruleset.
+            parser ??= new Rulesets.Objects.Legacy.Osu.ConvertHitObjectParser(getOffsetTime(), FormatVersion);
+
             if (!parser.AvailableSampleBanks.Contains(line))
             {
                 parser.AvailableSampleBanks.Add(line);
