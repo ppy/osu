@@ -157,6 +157,7 @@ namespace osu.Game.Tests.Visual.Online
         {
             setUpCommentsResponse(getExampleComments());
             AddStep("show comments", () => commentsContainer.ShowComments(CommentableType.Beatmapset, 123));
+            AddUntilStep("comments shown", () => commentsContainer.ChildrenOfType<DrawableComment>().Any());
 
             setUpPostResponse();
             AddStep("enter text", () => editorTextBox.Current.Value = "comm");
@@ -175,6 +176,7 @@ namespace osu.Game.Tests.Visual.Online
         {
             setUpCommentsResponse(getExampleComments());
             AddStep("show comments", () => commentsContainer.ShowComments(CommentableType.Beatmapset, 123));
+            AddUntilStep("comments shown", () => commentsContainer.ChildrenOfType<DrawableComment>().Any());
 
             setUpPostResponse(true);
             AddStep("enter text", () => editorTextBox.Current.Value = "comm");

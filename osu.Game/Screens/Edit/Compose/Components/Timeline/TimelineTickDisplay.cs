@@ -2,12 +2,10 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Caching;
 using osu.Framework.Graphics;
-using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
@@ -19,6 +17,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 {
     public partial class TimelineTickDisplay : TimelinePart<PointVisualisation>
     {
+        public const float TICK_WIDTH = 3;
+
         // With current implementation every tick in the sub-tree should be visible, no need to check whether they are masked away.
         public override bool UpdateSubTreeMasking() => false;
 
@@ -140,39 +140,20 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
                         // even though "bar lines" take up the full vertical space, we render them in two pieces because it allows for less anchor/origin churn.
 
-                        Vector2 size = Vector2.One;
-
-                        if (indexInBar != 0)
-                            size = BindableBeatDivisor.GetSize(divisor);
+                        var size = indexInBar == 0
+                            ? new Vector2(1.3f, 1)
+                            : BindableBeatDivisor.GetSize(divisor);
 
                         var line = getNextUsableLine();
                         line.X = xPos;
 
-                        line.Anchor = Anchor.CentreLeft;
-                        line.Origin = Anchor.Centre;
-
-                        line.Height = 0.6f + size.Y * 0.4f;
-                        line.Width = PointVisualisation.MAX_WIDTH * (0.6f + 0.4f * size.X);
-
+                        line.Width = TICK_WIDTH * size.X;
+                        line.Height = size.Y;
                         line.Colour = colour;
                     }
 
                     beat++;
                 }
-            }
-
-            if (Children.Count > 512)
-            {
-                // There should always be a sanely small number of ticks rendered.
-                // If this assertion triggers, either the zoom logic is broken or a beatmap is
-                // probably doing weird things...
-                //
-                // Let's hope the latter never happens.
-                // If it does, we can choose to either fix it or ignore it as an outlier.
-                string message = $"Timeline is rendering many ticks ({Children.Count})";
-
-                Logger.Log(message);
-                Debug.Fail(message);
             }
 
             int usedDrawables = drawableIndex;
@@ -190,8 +171,15 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             Drawable getNextUsableLine()
             {
                 PointVisualisation point;
+
                 if (drawableIndex >= Count)
-                    Add(point = new PointVisualisation(0));
+                {
+                    Add(point = new PointVisualisation(0)
+                    {
+                        Anchor = Anchor.CentreLeft,
+                        Origin = Anchor.Centre,
+                    });
+                }
                 else
                     point = Children[drawableIndex];
 
