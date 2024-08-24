@@ -14,6 +14,7 @@ using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Compose;
+using osu.Game.Screens.Edit.Compose.Components;
 
 namespace osu.Game.Tests.Visual
 {
@@ -95,7 +96,14 @@ namespace osu.Game.Tests.Visual
                 this.contentContainer = contentContainer;
 
                 RelativeSizeAxes = Axes.Both;
-                InternalChild = contentContainer;
+                InternalChildren = new Drawable[]
+                {
+                    contentContainer,
+                    new ComposeBlueprintContainer.PlacementBlueprintPositionUpdater
+                    {
+                        UpdatePosition = updatePlacementTimeAndPosition
+                    }
+                };
             }
 
             public void BeginPlacement(HitObject hitObject)
@@ -120,7 +128,7 @@ namespace osu.Game.Tests.Visual
             protected override void Update()
             {
                 base.Update();
-                CurrentBlueprint.UpdateTimeAndPosition(SnapForBlueprint(CurrentBlueprint));
+                updatePlacementTimeAndPosition();
             }
 
             public void Delete(HitObject hitObject)
@@ -137,6 +145,8 @@ namespace osu.Game.Tests.Visual
                     blueprint.UpdateTimeAndPosition(SnapForBlueprint(blueprint));
                 }
             }
+
+            private void updatePlacementTimeAndPosition() => CurrentBlueprint.UpdateTimeAndPosition(SnapForBlueprint(CurrentBlueprint));
         }
     }
 }

@@ -72,7 +72,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
             AddInternal(new PlacementBlueprintPositionUpdater
             {
-                UpdatePosition = updatePlacementPosition,
+                UpdatePosition = updatePlacementTimeAndPosition,
             });
         }
 
@@ -298,7 +298,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             ensurePlacementCreated();
         }
 
-        private void updatePlacementPosition()
+        private void updatePlacementTimeAndPosition()
         {
             if (CurrentPlacement == null)
                 return;
@@ -336,7 +336,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 ensurePlacementCreated();
 
             if (CurrentPlacement != null)
-                updatePlacementPosition();
+                updatePlacementTimeAndPosition();
         }
 
         protected sealed override SelectionBlueprint<HitObject> CreateBlueprintFor(HitObject item)
@@ -373,7 +373,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 placementBlueprintContainer.Child = CurrentPlacement = blueprint;
 
                 // Fixes a 1-frame position discrepancy due to the first mouse move event happening in the next frame
-                updatePlacementPosition();
+                updatePlacementTimeAndPosition();
 
                 updatePlacementSamples();
 
@@ -422,7 +422,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// This is necessary for touch input to work with editor, as tapping on the compose area issues both a mouse-move and mouse-down event in a single frame,
         /// therefore requiring <see cref="SnapResult"/> to be updated before the blueprint handles the mouse-down event to finalise a placement (or begin a placement in the slider case).
         /// </remarks>
-        private partial class PlacementBlueprintPositionUpdater : Drawable
+        public partial class PlacementBlueprintPositionUpdater : Drawable
         {
             public Action UpdatePosition;
 
