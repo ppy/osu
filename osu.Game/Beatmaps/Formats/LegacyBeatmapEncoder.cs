@@ -398,7 +398,7 @@ namespace osu.Game.Beatmaps.Formats
             {
                 foreach (List<HitSampleInfo> node in hr.NodeSamples)
                 {
-                    if (!customSoundBanks.Contains(node[0].Bank)
+                    if (node.Count > 0 && !customSoundBanks.Contains(node[0].Bank)
                         && node[0].Bank != "none" && node[0].Bank != "normal" && node[0].Bank != "soft" && node[0].Bank != "drum")
                     {
                         customSoundBanks.Add(node[0].Bank);
