@@ -16,7 +16,6 @@ using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Skinning;
 using osuTK;
 using osuTK.Graphics;
-using osuTK.Platform.MacOS;
 
 namespace osu.Game.Beatmaps.Formats
 {
