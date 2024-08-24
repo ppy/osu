@@ -29,7 +29,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         {
             var scoreInfos = base.PerformSuccessCallback(callback, scores, pivot);
 
-            Schedule(() => SelectedScore.Value = scoreInfos.SingleOrDefault(score => score.OnlineID == scoreId));
+            Schedule(() => SelectedScore.Value ??= scoreInfos.SingleOrDefault(score => score.OnlineID == scoreId));
 
             return scoreInfos;
         }

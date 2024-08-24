@@ -26,6 +26,7 @@ using osu.Game.Collections;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
 using osu.Game.Overlays;
@@ -320,7 +321,7 @@ namespace osu.Game.Screens.Select
                         }
                     }
                 },
-                new SkinComponentsContainer(new SkinComponentsContainerLookup(SkinComponentsContainerLookup.TargetArea.SongSelect))
+                new SkinnableContainer(new GlobalSkinnableContainerLookup(GlobalSkinnableContainers.SongSelect))
                 {
                     RelativeSizeAxes = Axes.Both,
                 },
@@ -505,6 +506,13 @@ namespace osu.Game.Screens.Select
             var beatmap = e?.NewValue ?? Beatmap.Value;
             if (beatmap is DummyWorkingBeatmap || !this.IsCurrentScreen()) return;
 
+            if (beatmap.BeatmapSetInfo.Protected && e != null)
+            {
+                Logger.Log($"Denying working beatmap switch to protected beatmap {beatmap}");
+                Beatmap.Value = e.OldValue;
+                return;
+            }
+
             Logger.Log($"Song select working beatmap updated to {beatmap}");
 
             if (!Carousel.SelectBeatmap(beatmap.BeatmapInfo, false))
@@ -602,7 +610,7 @@ namespace osu.Game.Screens.Select
                 // clear pending task immediately to track any potential nested debounce operation.
                 selectionChangedDebounce = null;
 
-                Logger.Log($"Song select updating selection with beatmap:{beatmap?.ID.ToString() ?? "null"} ruleset:{ruleset?.ShortName ?? "null"}");
+                Logger.Log($"Song select updating selection with beatmap: {beatmap} {beatmap?.ID.ToString() ?? "null"} ruleset:{ruleset?.ShortName ?? "null"}");
 
                 if (transferRulesetValue())
                 {
@@ -1074,7 +1082,7 @@ namespace osu.Game.Screens.Select
                 Anchor = Anchor.Centre;
                 Origin = Anchor.Centre;
                 Width = panel_overflow; // avoid horizontal masking so the panels don't clip when screen stack is pushed.
-                InternalChild = Content = new Container
+                InternalChild = Content = new OsuContextMenuContainer
                 {
                     RelativeSizeAxes = Axes.Both,
                     Anchor = Anchor.Centre,
