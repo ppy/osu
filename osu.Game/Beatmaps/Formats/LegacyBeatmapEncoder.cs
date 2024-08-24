@@ -16,6 +16,7 @@ using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Skinning;
 using osuTK;
 using osuTK.Graphics;
+using osuTK.Platform.MacOS;
 
 namespace osu.Game.Beatmaps.Formats
 {
@@ -391,6 +392,18 @@ namespace osu.Game.Beatmaps.Formats
                 && bank != "none" && bank != "normal" && bank != "soft" && bank != "drum")
             {
                 customSoundBanks.Add(bank);
+            }
+
+            if (h is IHasRepeats hr)
+            {
+                foreach (List<HitSampleInfo> node in hr.NodeSamples)
+                {
+                    if (!customSoundBanks.Contains(node[0].Bank)
+                        && node[0].Bank != "none" && node[0].Bank != "normal" && node[0].Bank != "soft" && node[0].Bank != "drum")
+                    {
+                        customSoundBanks.Add(node[0].Bank);
+                    }
+                }
             }
         }
 
