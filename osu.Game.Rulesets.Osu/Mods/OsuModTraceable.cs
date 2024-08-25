@@ -2,9 +2,11 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
+using osu.Game.Configuration;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -16,6 +18,9 @@ namespace osu.Game.Rulesets.Osu.Mods
 {
     public class OsuModTraceable : ModWithVisibilityAdjustment, IRequiresApproachCircles
     {
+        [SettingSource("Default Slider Body Display", "Body of the slider will have the same looks as without Traceable.")]
+        public Bindable<bool> DefaultSliderBodyDisplay { get; } = new BindableBool();
+
         public override string Name => "Traceable";
         public override string Acronym => "TC";
         public override ModType Type => ModType.Fun;
@@ -72,6 +77,9 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         private void applySliderState(DrawableSlider slider)
         {
+            if (DefaultSliderBodyDisplay.Value)
+                return;
+
             ((PlaySliderBody)slider.Body.Drawable).AccentColour = slider.AccentColour.Value.Opacity(0);
             ((PlaySliderBody)slider.Body.Drawable).BorderColour = slider.AccentColour.Value;
         }
