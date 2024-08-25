@@ -6,6 +6,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Online.API;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Chat;
 using osu.Game.Overlays.Chat;
 using osu.Game.Tournament.IPC;
@@ -56,19 +57,16 @@ namespace osu.Game.Tournament.Components
                         Channel.BindTo(manager.CurrentChannel);
                     }
 
-                    foreach (var ch in manager.JoinedChannels.ToList())
-                    {
-                        if (ch.Id != id) manager.LeaveChannel(ch);
-                    }
-
                     Channel? channel = manager.JoinedChannels.FirstOrDefault(p => p.Id == id);
 
                     if (channel == null)
                     {
+                        // channel = new Channel(new APIUser { Id = 3 })
                         channel = new Channel
                         {
                             Id = id,
                             Type = ChannelType.Public,
+                            // Type = ChannelType.PM,
                         };
                         manager.JoinChannel(channel);
                     }
