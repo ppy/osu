@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public override LocalisableString Description => @"Removes sliderbodies, transforming sliders into circles.";
 
-        public override Type[] IncompatibleMods => new[] { typeof(OsuModStrictTracking) };
+        public override Type[] IncompatibleMods => new[] { typeof(OsuModStrictTracking), typeof(OsuModTargetPractice) };
 
         public void ApplyToBeatmap(IBeatmap beatmap)
         {
