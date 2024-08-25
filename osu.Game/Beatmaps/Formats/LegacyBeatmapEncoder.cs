@@ -29,7 +29,7 @@ namespace osu.Game.Beatmaps.Formats
 
         private readonly int onlineRulesetID;
 
-        private List<string> customSoundBanks = new List<string>();
+        private readonly List<string> customSoundBanks = new List<string>();
 
         /// <summary>
         /// Creates a new <see cref="LegacyBeatmapEncoder"/>.
@@ -387,6 +387,7 @@ namespace osu.Game.Beatmaps.Formats
         private void checkCustomSoundBank(HitObject h)
         {
             string? bank = h.Samples.SingleOrDefault(s => s.Name == HitSampleInfo.HIT_NORMAL)?.Bank;
+
             if (bank != null
                 && !customSoundBanks.Contains(bank)
                 && bank != "none" && bank != "normal" && bank != "soft" && bank != "drum")
@@ -396,10 +397,10 @@ namespace osu.Game.Beatmaps.Formats
 
             if (h is IHasRepeats hr)
             {
-                foreach (List<HitSampleInfo> node in hr.NodeSamples)
+                foreach (IList<HitSampleInfo> node in hr.NodeSamples)
                 {
-                    if (node.Count > 0 && !customSoundBanks.Contains(node[0].Bank)
-                        && node[0].Bank != "none" && node[0].Bank != "normal" && node[0].Bank != "soft" && node[0].Bank != "drum")
+                    if (node.Count > 0 && !customSoundBanks.Contains(node[0].Bank) &&
+                        node[0].Bank != "none" && node[0].Bank != "normal" && node[0].Bank != "soft" && node[0].Bank != "drum")
                     {
                         customSoundBanks.Add(node[0].Bank);
                     }
@@ -640,8 +641,8 @@ namespace osu.Game.Beatmaps.Formats
 
         private int toLegacySampleBank(string? sampleBank)
         {
-
             string? sampleBankLower = sampleBank?.ToLowerInvariant();
+
             switch (sampleBankLower)
             {
                 case HitSampleInfo.BANK_NORMAL:
@@ -655,6 +656,7 @@ namespace osu.Game.Beatmaps.Formats
 
                 default:
                     if (sampleBankLower != null) return customSoundBanks.IndexOf(sampleBankLower) + 4;
+
                     return 0;
             }
         }
