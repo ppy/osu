@@ -17,7 +17,7 @@ namespace osu.Game.Rulesets.Osu.Mods
     {
         public override double ScoreMultiplier => 0.7;
 
-        public override LocalisableString Description => @"Replaces all sliders with circles.";
+        public override LocalisableString Description => @"Removes sliderbodies, transforming sliders into circles.";
 
         public override Type[] IncompatibleMods => new[] { typeof(OsuModStrictTracking) };
 
