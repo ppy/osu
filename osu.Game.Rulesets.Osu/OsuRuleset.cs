@@ -182,6 +182,7 @@ namespace osu.Game.Rulesets.Osu
                         new OsuModClassic(),
                         new OsuModRandom(),
                         new OsuModMirror(),
+                        new OsuModHoldOff(),
                         new MultiMod(new OsuModAlternate(), new OsuModSingleTap())
                     };
 
