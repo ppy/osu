@@ -91,7 +91,7 @@ namespace osu.Game.Tournament.Components
                 && ((currentMatch.Value.Round.Value.RefereeId.Value != null
                 && currentMatch.Value.Round.Value.RefereeId.Value != 0
                 && message.SenderId == currentMatch.Value.Round.Value.RefereeId.Value)
-                || !currentMatch.Value.Round.Value.TrustAll.Value)
+                || currentMatch.Value.Round.Value.TrustAll.Value)
                 && isCommand && !currentMatch.Value.PendingMsgs.Any(p => p == message.Content))
             {
                 currentMatch.Value.PendingMsgs.Add(message.Content);
