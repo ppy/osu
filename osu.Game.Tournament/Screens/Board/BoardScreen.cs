@@ -354,19 +354,48 @@ namespace osu.Game.Tournament.Screens.Board
                 BotCommand command = new BotCommand().ParseFromText(item);
                 switch (command.Command)
                 {
+                    case Commands.Panic:
+                        informationDisplayContainer.Child = new InstructionDisplay(step: Steps.Halt);
+                        informationDisplayContainer.FadeInFromZero(duration: 200, easing: Easing.OutCubic);
+                        break;
+
                     case Commands.EnterEX:
                         refEX = true;
+                        updateBottomDisplay();
                         break;
 
                     case Commands.SetWin:
                         refWin = true;
                         refWinner = command.Team;
+                        updateBottomDisplay();
                         break;
 
                     case Commands.MarkWin:
                         pickColour = command.Team;
                         pickType = command.Team == TeamColour.Red ? ChoiceType.RedWin : ChoiceType.BlueWin;
                         addForBeatmap(command.MapMod);
+                        updateBottomDisplay();
+                        break;
+
+                    case Commands.Ban:
+                        pickColour = command.Team;
+                        pickType = ChoiceType.Ban;
+                        addForBeatmap(command.MapMod);
+                        updateBottomDisplay();
+                        break;
+
+                    case Commands.Protect:
+                        pickColour = command.Team;
+                        pickType = ChoiceType.Protect;
+                        addForBeatmap(command.MapMod);
+                        updateBottomDisplay();
+                        break;
+
+                    case Commands.Pick:
+                        pickColour = command.Team;
+                        pickType = ChoiceType.Pick;
+                        addForBeatmap(command.MapMod);
+                        updateBottomDisplay();
                         break;
 
                     default:
@@ -405,6 +434,22 @@ namespace osu.Game.Tournament.Screens.Board
             Drawable oldDisplay = informationDisplayContainer.Child;
             Drawable newDisplay;
 
+            Steps state = Steps.Halt;
+            if (useEX && refEX)
+            {
+                state = Steps.EX;
+            }
+            else if (DetectWin() && refWin)
+            {
+                if (teamWinner == refWinner)
+                    state = Steps.FinalWin;
+            }
+            else if (!useEX && teamWinner == TeamColour.Neutral)
+            {
+                state = Steps.Default;
+            }
+            newDisplay = new InstructionDisplay(team: teamWinner, step: state);
+
             switch (pickType)
             {
                 case ChoiceType.Protect:
@@ -429,24 +474,6 @@ namespace osu.Game.Tournament.Screens.Board
 
                 case ChoiceType.Swap:
                     newDisplay = new TrapInfoDisplay(trap: TrapType.Swap);
-                    break;
-
-                default:
-                    Steps state = Steps.Halt;
-                    if (useEX && refEX)
-                    {
-                        state = Steps.EX;
-                    }
-                    else if (DetectWin() && refWin)
-                    {
-                        if (teamWinner == refWinner)
-                            state = Steps.FinalWin;
-                    }
-                    else if (!useEX && teamWinner == TeamColour.Neutral)
-                    {
-                        state = Steps.Default;
-                    }
-                    newDisplay = new InstructionDisplay(team: teamWinner, step: state);
                     break;
             }
             if (oldDisplay != newDisplay)
