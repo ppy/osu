@@ -434,48 +434,46 @@ namespace osu.Game.Tournament.Screens.Board
             Drawable oldDisplay = informationDisplayContainer.Child;
             Drawable newDisplay;
 
-            Steps state = Steps.Halt;
-            if (useEX && refEX)
+            var color = pickColour;
+            Steps state = Steps.Default;
+
+            if (useEX)
             {
-                state = Steps.EX;
+                state = refEX ? Steps.EX : Steps.Halt;
             }
-            else if (DetectWin() && refWin)
+            else if (DetectWin())
             {
-                if (teamWinner == refWinner)
-                    state = Steps.FinalWin;
+                state = refWin && teamWinner == refWinner ? Steps.FinalWin : Steps.Halt;
+                color = refWin && teamWinner == refWinner ? teamWinner : pickColour;
             }
-            else if (!useEX && teamWinner == TeamColour.Neutral)
+            else
             {
-                state = Steps.Default;
+                switch (pickType)
+                {
+                    case ChoiceType.Protect:
+                        state = Steps.Protect;
+                        break;
+
+                    case ChoiceType.Pick:
+                        state = Steps.Pick;
+                        break;
+
+                    case ChoiceType.Trap:
+                        state = Steps.Trap;
+                        break;
+
+                    case ChoiceType.Ban:
+                        state = Steps.Ban;
+                        break;
+
+                    case ChoiceType.RedWin or ChoiceType.BlueWin:
+                        state = Steps.Win;
+                        break;
+                }
             }
-            newDisplay = new InstructionDisplay(team: teamWinner, step: state);
 
-            switch (pickType)
-            {
-                case ChoiceType.Protect:
-                    newDisplay = new InstructionDisplay(team: pickColour, step: Steps.Protect);
-                    break;
+            newDisplay = pickType == ChoiceType.Swap ? new TrapInfoDisplay(trap: TrapType.Swap) : new InstructionDisplay(team: color, step: state);
 
-                case ChoiceType.Pick:
-                    newDisplay = new InstructionDisplay(team: pickColour, step: Steps.Pick);
-                    break;
-
-                case ChoiceType.Trap:
-                    newDisplay = new InstructionDisplay(team: pickColour, step: Steps.Trap);
-                    break;
-
-                case ChoiceType.Ban:
-                    newDisplay = new InstructionDisplay(team: pickColour, step: Steps.Ban);
-                    break;
-
-                case ChoiceType.RedWin or ChoiceType.BlueWin:
-                    newDisplay = new InstructionDisplay(team: pickColour, step: Steps.Win);
-                    break;
-
-                case ChoiceType.Swap:
-                    newDisplay = new TrapInfoDisplay(trap: TrapType.Swap);
-                    break;
-            }
             if (oldDisplay != newDisplay)
             {
                 informationDisplayContainer.Child = newDisplay;
