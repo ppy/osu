@@ -100,7 +100,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
             StarRatingDisplay starRatingDisplay;
 
             IBeatmapInfo beatmap = item.Beatmap;
-            Ruleset ruleset = rulesets.GetRuleset(item.Beatmap.Ruleset.ShortName)?.CreateInstance() ?? Ruleset.Value.CreateInstance();
+            Ruleset ruleset = rulesets.GetRuleset(item.Beatmap.Ruleset.ShortName)!.CreateInstance();
 
             InternalChildren = new Drawable[]
             {
