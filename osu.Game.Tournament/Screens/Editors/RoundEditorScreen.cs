@@ -246,14 +246,14 @@ namespace osu.Game.Tournament.Screens.Editors
                                         LabelText = "Board Row",
                                         RelativeSizeAxes = Axes.None,
                                         Width = 100,
-                                        Current = boardX,
+                                        Current = boardY,
                                     },
                                     new SettingsNumberBox
                                     {
                                         LabelText = "Board Column",
                                         RelativeSizeAxes = Axes.None,
                                         Width = 100,
-                                        Current = boardY,
+                                        Current = boardX,
                                     },
                                     drawableContainer = new Container
                                     {
