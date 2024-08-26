@@ -107,11 +107,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
                         var hitSprite = this.GetAnimation(hitName, true, false);
 
                         if (hitSprite != null)
-                        {
-                            var strongHitSprite = this.GetAnimation($"{hitName}k", true, false);
-
-                            return new LegacyHitExplosion(hitSprite, strongHitSprite);
-                        }
+                            return new LegacyHitExplosion(hitSprite, this.GetAnimation($"{hitName}k", true, false));
 
                         break;
 
