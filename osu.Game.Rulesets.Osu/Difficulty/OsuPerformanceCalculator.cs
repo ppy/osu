@@ -198,9 +198,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double speedAntiRakeMultiplier = calculateSpeedRakeNerf(attributes);
             speedValue *= speedAntiRakeMultiplier;
 
-            // Scale the speed value with adjusted speed deviation
+            // Scale the speed value with speed deviation.
+            // Use additional bad UR penalty for high speed difficulty
+            // (WARNING: potentially unstable, but instability detected in playable difficulty range).
             double adjustedSpeedDeviation = speedDeviation * calculateDeviationArAdjust(attributes.ApproachRate);
-            speedValue *= SpecialFunctions.Erf(20 / (Math.Sqrt(2) * adjustedSpeedDeviation));
+            speedValue *= SpecialFunctions.Erf(20 / (Math.Sqrt(2) * adjustedSpeedDeviation * Math.Max(1, Math.Pow(attributes.SpeedDifficulty / 4.5, 1.2))));
             speedValue *= 0.95 + Math.Pow(100.0 / 9, 2) / 750; // OD 11 SS stays the same.
 
             return speedValue;
@@ -211,7 +213,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (score.Mods.Any(h => h is OsuModRelax) || deviation == double.PositiveInfinity)
                 return 0.0;
 
-            int amountHitObjectsWithAccuracy = attributes.HitCircleCount;
+            double amountHitObjectsWithAccuracy = attributes.HitCircleCount;
+
+            // If amount of circles is too small - also add sliders, because UR is calculated accounting to sliders too
+            double circlesRatio = (double)attributes.HitCircleCount / (attributes.HitCircleCount + attributes.SliderCount);
+            if (circlesRatio < 0.25)
+                amountHitObjectsWithAccuracy += attributes.SliderCount * (1 - circlesRatio / 0.25);
 
             double liveLengthBonus = Math.Min(1.15, Math.Pow(amountHitObjectsWithAccuracy / 1000.0, 0.3));
             double threshold = 1000 * Math.Pow(1.15, 1 / 0.3); // Number of objects until length bonus caps.
