@@ -44,62 +44,62 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
                         if (GetTexture("taiko-roll-middle") != null)
                             return new LegacyDrumRoll();
 
-                        return null;
+                        break;
 
                     case TaikoSkinComponents.InputDrum:
                         if (hasBarLeft)
                             return new LegacyInputDrum();
 
-                        return null;
+                        break;
 
                     case TaikoSkinComponents.DrumSamplePlayer:
-                        return null;
+                        break;
 
                     case TaikoSkinComponents.CentreHit:
                     case TaikoSkinComponents.RimHit:
                         if (hasHitCircle)
                             return new LegacyHit(taikoComponent.Component);
 
-                        return null;
+                        break;
 
                     case TaikoSkinComponents.DrumRollTick:
                         return this.GetAnimation("sliderscorepoint", false, false);
 
                     case TaikoSkinComponents.Swell:
                         // todo: support taiko legacy swell (https://github.com/ppy/osu/issues/13601).
-                        return null;
+                        break;
 
                     case TaikoSkinComponents.HitTarget:
                         if (GetTexture("taikobigcircle") != null)
                             return new TaikoLegacyHitTarget();
 
-                        return null;
+                        break;
 
                     case TaikoSkinComponents.PlayfieldBackgroundRight:
                         if (GetTexture("taiko-bar-right") != null)
                             return new TaikoLegacyPlayfieldBackgroundRight();
 
-                        return null;
+                        break;
 
                     case TaikoSkinComponents.PlayfieldBackgroundLeft:
                         // This is displayed inside LegacyInputDrum. It is required to be there for layout purposes (can be seen on legacy skins).
                         if (GetTexture("taiko-bar-right") != null)
                             return Drawable.Empty();
 
-                        return null;
+                        break;
 
                     case TaikoSkinComponents.BarLine:
                         if (GetTexture("taiko-barline") != null)
                             return new LegacyBarLine();
 
-                        return null;
+                        break;
 
                     case TaikoSkinComponents.TaikoExplosionMiss:
                         var missSprite = this.GetAnimation(getHitName(taikoComponent.Component), true, false);
                         if (missSprite != null)
                             return new LegacyHitExplosion(missSprite);
 
-                        return null;
+                        break;
 
                     case TaikoSkinComponents.TaikoExplosionOk:
                     case TaikoSkinComponents.TaikoExplosionGreat:
@@ -113,7 +113,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
                             return new LegacyHitExplosion(hitSprite, strongHitSprite);
                         }
 
-                        return null;
+                        break;
 
                     case TaikoSkinComponents.TaikoExplosionKiai:
                         // suppress the default kiai explosion if the skin brings its own sprites.
@@ -121,13 +121,13 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
                         if (hasExplosion.Value)
                             return Drawable.Empty().With(d => d.Expire());
 
-                        return null;
+                        break;
 
                     case TaikoSkinComponents.Scroller:
                         if (GetTexture("taiko-slider") != null)
                             return new LegacyTaikoScroller();
 
-                        return null;
+                        break;
 
                     case TaikoSkinComponents.Mascot:
                         return new DrawableTaikoMascot();
@@ -136,7 +136,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
                         if (GetTexture("taiko-glow") != null)
                             return new LegacyKiaiGlow();
 
-                        return null;
+                        break;
 
                     default:
                         throw new UnsupportedSkinComponentException(lookup);

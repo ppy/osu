@@ -250,7 +250,7 @@ namespace osu.Game.Skinning
                             return mainHUDComponents;
                     }
 
-                    return null;
+                    break;
             }
 
             return base.GetDrawableComponent(lookup);

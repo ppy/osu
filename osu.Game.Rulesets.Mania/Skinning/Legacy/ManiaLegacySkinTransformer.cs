@@ -83,11 +83,11 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
                 case GlobalSkinnableContainerLookup containerLookup:
                     // Modifications for global components.
                     if (containerLookup.Ruleset == null)
-                        return base.GetDrawableComponent(lookup);
+                        break;
 
                     // we don't have enough assets to display these components (this is especially the case on a "beatmap" skin).
                     if (!IsProvidingLegacyResources)
-                        return null;
+                        break;
 
                     switch (containerLookup.Lookup)
                     {
@@ -108,14 +108,14 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
                             };
                     }
 
-                    return null;
+                    break;
 
                 case SkinComponentLookup<HitResult> resultComponent:
                     return getResult(resultComponent.Component);
 
                 case ManiaSkinComponentLookup maniaComponent:
                     if (!isLegacySkin.Value || !hasKeyTexture.Value)
-                        return null;
+                        break;
 
                     switch (maniaComponent.Component)
                     {
@@ -152,11 +152,13 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
                             return new LegacyStageForeground();
 
                         case ManiaSkinComponents.BarLine:
-                            return null; // Not yet implemented.
+                            break; // Not yet implemented.
 
                         default:
                             throw new UnsupportedSkinComponentException(lookup);
                     }
+
+                    break;
             }
 
             return base.GetDrawableComponent(lookup);

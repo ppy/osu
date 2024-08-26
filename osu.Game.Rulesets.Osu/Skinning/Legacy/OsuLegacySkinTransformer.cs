@@ -47,11 +47,11 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                 case GlobalSkinnableContainerLookup containerLookup:
                     // Only handle per ruleset defaults here.
                     if (containerLookup.Ruleset == null)
-                        return base.GetDrawableComponent(lookup);
+                        break;
 
                     // we don't have enough assets to display these components (this is especially the case on a "beatmap" skin).
                     if (!IsProvidingLegacyResources)
-                        return null;
+                        break;
 
                     // Our own ruleset components default.
                     switch (containerLookup.Lookup)
@@ -87,7 +87,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                             };
                     }
 
-                    return null;
+                    break;
 
                 case OsuSkinComponentLookup osuComponent:
                     switch (osuComponent.Component)
@@ -104,55 +104,55 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                             if (followCircleContent != null)
                                 return new LegacyFollowCircle(followCircleContent);
 
-                            return null;
+                            break;
 
                         case OsuSkinComponents.SliderBall:
                             if (GetTexture("sliderb") != null || GetTexture("sliderb0") != null)
                                 return new LegacySliderBall(this);
 
-                            return null;
+                            break;
 
                         case OsuSkinComponents.SliderBody:
                             if (hasHitCircle.Value)
                                 return new LegacySliderBody();
 
-                            return null;
+                            break;
 
                         case OsuSkinComponents.SliderTailHitCircle:
                             if (hasHitCircle.Value)
                                 return new LegacyMainCirclePiece("sliderendcircle", false);
 
-                            return null;
+                            break;
 
                         case OsuSkinComponents.SliderHeadHitCircle:
                             if (hasHitCircle.Value)
                                 return new LegacySliderHeadHitCircle();
 
-                            return null;
+                            break;
 
                         case OsuSkinComponents.ReverseArrow:
                             if (hasHitCircle.Value)
                                 return new LegacyReverseArrow();
 
-                            return null;
+                            break;
 
                         case OsuSkinComponents.HitCircle:
                             if (hasHitCircle.Value)
                                 return new LegacyMainCirclePiece();
 
-                            return null;
+                            break;
 
                         case OsuSkinComponents.Cursor:
                             if (GetTexture("cursor") != null)
                                 return new LegacyCursor(this);
 
-                            return null;
+                            break;
 
                         case OsuSkinComponents.CursorTrail:
                             if (GetTexture("cursortrail") != null)
                                 return new LegacyCursorTrail(this);
 
-                            return null;
+                            break;
 
                         case OsuSkinComponents.CursorRipple:
                             if (GetTexture("cursor-ripple") != null)
@@ -174,23 +174,23 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                                 return ripple;
                             }
 
-                            return null;
+                            break;
 
                         case OsuSkinComponents.CursorParticles:
                             if (GetTexture("star2") != null)
                                 return new LegacyCursorParticles();
 
-                            return null;
+                            break;
 
                         case OsuSkinComponents.CursorSmoke:
                             if (GetTexture("cursor-smoke") != null)
                                 return new LegacySmokeSegment();
 
-                            return null;
+                            break;
 
                         case OsuSkinComponents.HitCircleText:
                             if (!this.HasFont(LegacyFont.HitCircle))
-                                return null;
+                                break;
 
                             const float hitcircle_text_scale = 0.8f;
                             return new LegacySpriteText(LegacyFont.HitCircle)
@@ -208,21 +208,22 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                             else if (hasBackground)
                                 return new LegacyOldStyleSpinner();
 
-                            return null;
+                            break;
 
                         case OsuSkinComponents.ApproachCircle:
                             if (GetTexture(@"approachcircle") != null)
                                 return new LegacyApproachCircle();
 
-                            return null;
+                            break;
 
                         default:
                             throw new UnsupportedSkinComponentException(lookup);
                     }
 
-                default:
-                    return base.GetDrawableComponent(lookup);
+                    break;
             }
+
+            return base.GetDrawableComponent(lookup);
         }
 
         public override IBindable<TValue>? GetConfig<TLookup, TValue>(TLookup lookup)

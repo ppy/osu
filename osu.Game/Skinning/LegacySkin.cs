@@ -421,7 +421,7 @@ namespace osu.Game.Skinning
                             };
                     }
 
-                    return null;
+                    break;
 
                 case SkinComponentLookup<HitResult> resultComponent:
 
@@ -439,7 +439,7 @@ namespace osu.Game.Skinning
                         return new LegacyJudgementPieceOld(resultComponent.Component, createDrawable);
                     }
 
-                    return null;
+                    break;
             }
 
             return base.GetDrawableComponent(lookup);

@@ -33,11 +33,11 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
                 case GlobalSkinnableContainerLookup containerLookup:
                     // Only handle per ruleset defaults here.
                     if (containerLookup.Ruleset == null)
-                        return base.GetDrawableComponent(lookup);
+                        break;
 
                     // we don't have enough assets to display these components (this is especially the case on a "beatmap" skin).
                     if (!IsProvidingLegacyResources)
-                        return null;
+                        break;
 
                     // Our own ruleset components default.
                     switch (containerLookup.Lookup)
@@ -64,7 +64,7 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
                             };
                     }
 
-                    return null;
+                    break;
 
                 case CatchSkinComponentLookup catchSkinComponent:
                     switch (catchSkinComponent.Component)
@@ -73,19 +73,19 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
                             if (hasPear)
                                 return new LegacyFruitPiece();
 
-                            return null;
+                            break;
 
                         case CatchSkinComponents.Banana:
                             if (GetTexture("fruit-bananas") != null)
                                 return new LegacyBananaPiece();
 
-                            return null;
+                            break;
 
                         case CatchSkinComponents.Droplet:
                             if (GetTexture("fruit-drop") != null)
                                 return new LegacyDropletPiece();
 
-                            return null;
+                            break;
 
                         case CatchSkinComponents.Catcher:
                             decimal version = GetConfig<SkinConfiguration.LegacySetting, decimal>(SkinConfiguration.LegacySetting.Version)?.Value ?? 1;
@@ -99,23 +99,25 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
                             if (hasNewStyleCatcherSprite())
                                 return new LegacyCatcherNew();
 
-                            return null;
+                            break;
 
                         case CatchSkinComponents.CatchComboCounter:
                             if (providesComboCounter)
                                 return new LegacyCatchComboCounter();
 
-                            return null;
+                            break;
 
                         case CatchSkinComponents.HitExplosion:
                             if (hasOldStyleCatcherSprite() || hasNewStyleCatcherSprite())
                                 return new LegacyHitExplosion();
 
-                            return null;
+                            break;
 
                         default:
                             throw new UnsupportedSkinComponentException(lookup);
                     }
+
+                    break;
             }
 
             return base.GetDrawableComponent(lookup);

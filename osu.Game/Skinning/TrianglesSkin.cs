@@ -69,7 +69,7 @@ namespace osu.Game.Skinning
                 case GlobalSkinnableContainerLookup containerLookup:
                     // Only handle global level defaults for now.
                     if (containerLookup.Ruleset != null)
-                        return null;
+                        break;
 
                     switch (containerLookup.Lookup)
                     {
@@ -172,7 +172,7 @@ namespace osu.Game.Skinning
                             return skinnableTargetWrapper;
                     }
 
-                    return null;
+                    break;
             }
 
             return base.GetDrawableComponent(lookup);

@@ -53,7 +53,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
                             };
                     }
 
-                    return null;
+                    break;
 
                 case SkinComponentLookup<HitResult> resultComponent:
                     // This should eventually be moved to a skin setting, when supported.
