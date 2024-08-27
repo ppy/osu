@@ -1162,7 +1162,7 @@ namespace osu.Game.Screens.Select
 
         private float getParallaxAt(float position)
         {
-            float parallaxCenter = Scroll.Current + DrawHeight / 2f;
+            float parallaxCenter = Scroll.Current + (DrawHeight / 2f);
 
             return parallaxEnabled.Value ? (parallaxCenter - position) / visibleHalfHeight : 0f;
         }
