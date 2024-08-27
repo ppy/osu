@@ -18,7 +18,7 @@ namespace osu.Game.Beatmaps
     public class BeatmapPanelBackgroundTextureLoaderStore : IResourceStore<TextureUpload>
     {
         // The aspect ratio of SetPanelBackground at its maximum size (very tall window).
-        private const float minimum_display_ratio = 512 / 80f;
+        private const float minimum_display_ratio = 512 / 120f;
 
         private readonly IResourceStore<TextureUpload>? textureStore;
 
