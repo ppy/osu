@@ -2,7 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
+using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -10,15 +10,18 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
+using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play.Break;
+using osu.Game.Utils;
 
 namespace osu.Game.Screens.Play
 {
-    public partial class BreakOverlay : Container
+    public partial class BreakOverlay : BeatSyncedContainer
     {
         /// <summary>
         /// The duration of the break overlay fading.
@@ -26,25 +29,13 @@ namespace osu.Game.Screens.Play
         public const double BREAK_FADE_DURATION = BreakPeriod.MIN_BREAK_DURATION / 2;
 
         private const float remaining_time_container_max_size = 0.3f;
-        private const int vertical_margin = 25;
+        private const int vertical_margin = 15;
 
         private readonly Container fadeContainer;
 
-        private IReadOnlyList<BreakPeriod> breaks = Array.Empty<BreakPeriod>();
-
-        public IReadOnlyList<BreakPeriod> Breaks
-        {
-            get => breaks;
-            set
-            {
-                breaks = value;
-
-                if (IsLoaded)
-                    initializeBreaks();
-            }
-        }
-
         public override bool RemoveCompletedTransforms => false;
+
+        public BreakTracker BreakTracker { get; init; } = null!;
 
         private readonly Container remainingTimeAdjustmentBox;
         private readonly Container remainingTimeBox;
@@ -53,10 +44,14 @@ namespace osu.Game.Screens.Play
         private readonly ScoreProcessor scoreProcessor;
         private readonly BreakInfo info;
 
+        private readonly IBindable<Period?> currentPeriod = new Bindable<Period?>();
+
         public BreakOverlay(bool letterboxing, ScoreProcessor scoreProcessor)
         {
             this.scoreProcessor = scoreProcessor;
             RelativeSizeAxes = Axes.Both;
+
+            MinimumBeatLength = 200;
 
             Child = fadeContainer = new Container
             {
@@ -114,13 +109,13 @@ namespace osu.Game.Screens.Play
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.BottomCentre,
-                        Margin = new MarginPadding { Bottom = vertical_margin },
+                        Y = -vertical_margin,
                     },
                     info = new BreakInfo
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.TopCentre,
-                        Margin = new MarginPadding { Top = vertical_margin },
+                        Y = vertical_margin,
                     },
                     breakArrows = new BreakArrows
                     {
@@ -134,51 +129,68 @@ namespace osu.Game.Screens.Play
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            initializeBreaks();
 
             info.AccuracyDisplay.Current.BindTo(scoreProcessor.Accuracy);
             ((IBindable<ScoreRank>)info.GradeDisplay.Current).BindTo(scoreProcessor.Rank);
+
+            currentPeriod.BindTo(BreakTracker.CurrentPeriod);
+            currentPeriod.BindValueChanged(updateDisplay, true);
         }
+
+        private float remainingTimeForCurrentPeriod =>
+            currentPeriod.Value == null ? 0 : (float)Math.Max(0, (currentPeriod.Value.Value.End - Time.Current - BREAK_FADE_DURATION) / currentPeriod.Value.Value.Duration);
 
         protected override void Update()
         {
             base.Update();
 
-            remainingTimeBox.Height = Math.Min(8, remainingTimeBox.DrawWidth);
+            if (currentPeriod.Value != null)
+            {
+                remainingTimeBox.Height = Math.Min(8, remainingTimeBox.DrawWidth);
+                remainingTimeCounter.X = -(remainingTimeForCurrentPeriod - 0.5f) * 30;
+                info.X = (remainingTimeForCurrentPeriod - 0.5f) * 30;
+            }
         }
 
-        private void initializeBreaks()
+        protected override void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, ChannelAmplitudes amplitudes)
+        {
+            base.OnNewBeat(beatIndex, timingPoint, effectPoint, amplitudes);
+
+            if (currentPeriod.Value == null)
+                return;
+
+            float timeBoxTargetWidth = (float)Math.Max(0, (remainingTimeForCurrentPeriod - timingPoint.BeatLength / currentPeriod.Value.Value.Duration));
+            remainingTimeBox.ResizeWidthTo(timeBoxTargetWidth, timingPoint.BeatLength * 2, Easing.OutQuint);
+        }
+
+        private void updateDisplay(ValueChangedEvent<Period?> period)
         {
             FinishTransforms(true);
             Scheduler.CancelDelayedTasks();
 
-            foreach (var b in breaks)
+            if (period.NewValue == null)
+                return;
+
+            var b = period.NewValue.Value;
+
+            using (BeginAbsoluteSequence(b.Start))
             {
-                if (!b.HasEffect)
-                    continue;
+                fadeContainer.FadeIn(BREAK_FADE_DURATION);
+                breakArrows.Show(BREAK_FADE_DURATION);
 
-                using (BeginAbsoluteSequence(b.StartTime))
+                remainingTimeAdjustmentBox
+                    .ResizeWidthTo(remaining_time_container_max_size, BREAK_FADE_DURATION, Easing.OutQuint)
+                    .Delay(b.Duration - BREAK_FADE_DURATION)
+                    .ResizeWidthTo(0);
+
+                remainingTimeBox.ResizeWidthTo(remainingTimeForCurrentPeriod);
+
+                remainingTimeCounter.CountTo(b.Duration).CountTo(0, b.Duration);
+
+                using (BeginDelayedSequence(b.Duration - BREAK_FADE_DURATION))
                 {
-                    fadeContainer.FadeIn(BREAK_FADE_DURATION);
-                    breakArrows.Show(BREAK_FADE_DURATION);
-
-                    remainingTimeAdjustmentBox
-                        .ResizeWidthTo(remaining_time_container_max_size, BREAK_FADE_DURATION, Easing.OutQuint)
-                        .Delay(b.Duration - BREAK_FADE_DURATION)
-                        .ResizeWidthTo(0);
-
-                    remainingTimeBox
-                        .ResizeWidthTo(0, b.Duration - BREAK_FADE_DURATION)
-                        .Then()
-                        .ResizeWidthTo(1);
-
-                    remainingTimeCounter.CountTo(b.Duration).CountTo(0, b.Duration);
-
-                    using (BeginDelayedSequence(b.Duration - BREAK_FADE_DURATION))
-                    {
-                        fadeContainer.FadeOut(BREAK_FADE_DURATION);
-                        breakArrows.Hide(BREAK_FADE_DURATION);
-                    }
+                    fadeContainer.FadeOut(BREAK_FADE_DURATION);
+                    breakArrows.Hide(BREAK_FADE_DURATION);
                 }
             }
         }
