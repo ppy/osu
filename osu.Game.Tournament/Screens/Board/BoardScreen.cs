@@ -1102,7 +1102,7 @@ namespace osu.Game.Tournament.Screens.Board
 
                         for (int j = 1; j <= 4; j++)
                         {
-                            var nextMap = CurrentMatch.Value.Round.Value.Beatmaps.FirstOrDefault(p => (p.Mods != "EX" && p.BoardX == i && p.BoardY == j));
+                            var nextMap = CurrentMatch.Value.Round.Value.Beatmaps.FirstOrDefault(p => (p.Mods != "EX" && p.BoardX == j && p.BoardY == i));
 
                             if (nextMap != null)
                             {
