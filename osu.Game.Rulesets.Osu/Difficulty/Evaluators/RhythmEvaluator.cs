@@ -60,12 +60,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         }
 
         private const int history_time_max = 5 * 1000; // 5 seconds of calculatingRhythmBonus max.
-        private const double rhythm_multiplier = 0.95;
+        private const int history_objects_max = 32;
+        private const double rhythm_multiplier = 1.25;
 
         /// <summary>
         /// Calculates a rhythm multiplier for the difficulty of the tap associated with historic data of the current <see cref="OsuDifficultyHitObject"/>.
         /// </summary>
-        public static double EvaluateDifficultyOf(DifficultyHitObject current)
+        public static double EvaluateDifficultyOf(DifficultyHitObject current, double clockRate)
         {
             if (current.BaseObject is Spinner)
                 return 0;
@@ -76,15 +77,18 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             var previousIsland = new Island();
             Dictionary<Island, int> islandCounts = new Dictionary<Island, int>();
 
+            int historyTimeMaxAdjusted = (int)Math.Ceiling(history_time_max / clockRate);
+            int historyObjectsMaxAdjusted = (int)Math.Ceiling(history_objects_max / clockRate);
+
             double startRatio = 0; // store the ratio of the current start of an island to buff for tighter rhythms
 
             bool firstDeltaSwitch = false;
 
-            int historicalNoteCount = Math.Min(current.Index, 32);
+            int historicalNoteCount = Math.Min(current.Index, historyObjectsMaxAdjusted);
 
             int rhythmStart = 0;
 
-            while (rhythmStart < historicalNoteCount - 2 && current.StartTime - current.Previous(rhythmStart).StartTime < history_time_max)
+            while (rhythmStart < historicalNoteCount - 2 && current.StartTime - current.Previous(rhythmStart).StartTime < historyTimeMaxAdjusted)
                 rhythmStart++;
 
             OsuDifficultyHitObject prevObj = (OsuDifficultyHitObject)current.Previous(rhythmStart);
@@ -94,7 +98,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             {
                 OsuDifficultyHitObject currObj = (OsuDifficultyHitObject)current.Previous(i - 1);
 
-                double currHistoricalDecay = (history_time_max - (current.StartTime - currObj.StartTime)) / history_time_max; // scales note 0 to 1 from history to now
+                double currHistoricalDecay = (historyTimeMaxAdjusted - (current.StartTime - currObj.StartTime)) / historyTimeMaxAdjusted; // scales note 0 to 1 from history to now
 
                 currHistoricalDecay = Math.Min((double)(historicalNoteCount - i) / historicalNoteCount, currHistoricalDecay); // either we're limited by time or limited by object count.
 
@@ -102,15 +106,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 double prevDelta = prevObj.StrainTime;
                 double lastDelta = lastObj.StrainTime;
 
-                double currRatio = 1.0 + 9.8 * Math.Min(0.5, Math.Pow(Math.Sin(Math.PI / (Math.Min(prevDelta, currDelta) / Math.Max(prevDelta, currDelta))), 2)); // fancy function to calculate rhythmbonuses.
-
-                double windowPenalty = Math.Min(1, Math.Max(0, Math.Abs(prevDelta - currDelta) - currObj.HitWindowGreat * 0.3) / (currObj.HitWindowGreat * 0.3));
-
-                windowPenalty = Math.Min(1, windowPenalty);
-
-                double effectiveRatio = windowPenalty * currRatio;
+                double currRatio = 1.0 + 7.27 * Math.Min(0.5, Math.Pow(Math.Sin(Math.PI / (Math.Min(prevDelta, currDelta) / Math.Max(prevDelta, currDelta))), 2)); // fancy function to calculate rhythmbonuses.
 
                 double deltaDifferenceEpsilon = currObj.HitWindowGreat * 0.3;
+
+                double windowPenalty = Math.Min(1, Math.Max(0, Math.Abs(prevDelta - currDelta) - deltaDifferenceEpsilon) / deltaDifferenceEpsilon);
+
+                double effectiveRatio = windowPenalty * currRatio;
 
                 if (firstDeltaSwitch)
                 {
@@ -145,7 +147,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
                             // repeated island (ex: triplet -> triplet)
                             double power = logistic(island.AverageDelta(), 4, 0.165, 10);
-                            effectiveRatio *= Math.Min(2.0 / islandCounts[island], Math.Pow(1.0 / islandCounts[island], power));
+                            effectiveRatio *= Math.Min(3.0 / islandCounts[island], Math.Pow(1.0 / islandCounts[island], power));
                         }
 
                         // scale down the difficulty if the object is doubletappable
