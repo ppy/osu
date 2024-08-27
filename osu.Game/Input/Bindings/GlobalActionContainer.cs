@@ -147,10 +147,10 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(new[] { InputKey.Control, InputKey.Shift, InputKey.MouseWheelLeft }, GlobalAction.EditorCycleNextBeatSnapDivisor),
             new KeyBinding(new[] { InputKey.Control, InputKey.R }, GlobalAction.EditorToggleRotateControl),
             new KeyBinding(new[] { InputKey.Control, InputKey.E }, GlobalAction.EditorToggleScaleControl),
-            new KeyBinding(new[] { InputKey.Alt, InputKey.Left }, GlobalAction.EditorSeekToPreviousHitObject),
-            new KeyBinding(new[] { InputKey.Alt, InputKey.Right }, GlobalAction.EditorSeekToNextHitObject),
-            new KeyBinding(new[] { InputKey.Alt, InputKey.Shift, InputKey.Left }, GlobalAction.EditorSeekToPreviousSamplePoint),
-            new KeyBinding(new[] { InputKey.Alt, InputKey.Shift, InputKey.Right }, GlobalAction.EditorSeekToNextSamplePoint),
+            new KeyBinding(new[] { InputKey.Control, InputKey.Left }, GlobalAction.EditorSeekToPreviousHitObject),
+            new KeyBinding(new[] { InputKey.Control, InputKey.Right }, GlobalAction.EditorSeekToNextHitObject),
+            new KeyBinding(new[] { InputKey.Alt, InputKey.Left }, GlobalAction.EditorSeekToPreviousSamplePoint),
+            new KeyBinding(new[] { InputKey.Alt, InputKey.Right }, GlobalAction.EditorSeekToNextSamplePoint),
         };
 
         private static IEnumerable<KeyBinding> editorTestPlayKeyBindings => new[]
