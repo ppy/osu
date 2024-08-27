@@ -14,19 +14,24 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
     {
         private readonly struct Island : IEquatable<Island>
         {
-            public Island()
+            private readonly double deltaDifferenceEpsilon;
+
+            public Island(double epsilon)
             {
+                deltaDifferenceEpsilon = epsilon;
             }
 
             public Island(int firstDelta, double epsilon)
             {
-                AddDelta(firstDelta, epsilon);
+                deltaDifferenceEpsilon = epsilon;
+                AddDelta(firstDelta);
             }
 
             public List<int> Deltas { get; } = new List<int>();
 
-            public void AddDelta(int delta, double epsilon)
+            public void AddDelta(int delta)
             {
+                double epsilon = deltaDifferenceEpsilon;
                 int existingDelta = Deltas.FirstOrDefault(x => Math.Abs(x - delta) >= epsilon);
 
                 Deltas.Add(existingDelta == default ? delta : existingDelta);
@@ -34,10 +39,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             public double AverageDelta() => Deltas.Count > 0 ? Math.Max(Deltas.Average(), OsuDifficultyHitObject.MIN_DELTA_TIME) : 0;
 
-            public bool IsSimilarPolarity(Island other, double epsilon)
+            public bool IsSimilarPolarity(Island other)
             {
                 // consider islands to be of similar polarity only if they're having the same average delta (we don't want to consider 3 singletaps similar to a triple)
-                return Math.Abs(AverageDelta() - other.AverageDelta()) < epsilon &&
+                return Math.Abs(AverageDelta() - other.AverageDelta()) < deltaDifferenceEpsilon &&
                        Deltas.Count % 2 == other.Deltas.Count % 2;
             }
 
@@ -61,7 +66,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
         private const int history_time_max = 5 * 1000; // 5 seconds of calculatingRhythmBonus max.
         private const int history_objects_max = 32;
-        private const double rhythm_multiplier = 1.25;
+        private const double rhythm_multiplier = 1.2;
 
         /// <summary>
         /// Calculates a rhythm multiplier for the difficulty of the tap associated with historic data of the current <see cref="OsuDifficultyHitObject"/>.
@@ -73,8 +78,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             double rhythmComplexitySum = 0;
 
-            var island = new Island();
-            var previousIsland = new Island();
+            double deltaDifferenceEpsilon = ((OsuDifficultyHitObject)current).HitWindowGreat * 0.3;
+
+            var island = new Island(deltaDifferenceEpsilon);
+            var previousIsland = new Island(deltaDifferenceEpsilon);
             Dictionary<Island, int> islandCounts = new Dictionary<Island, int>();
 
             int historyTimeMaxAdjusted = (int)Math.Ceiling(history_time_max / clockRate);
@@ -106,9 +113,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 double prevDelta = prevObj.StrainTime;
                 double lastDelta = lastObj.StrainTime;
 
-                double currRatio = 1.0 + 7.27 * Math.Min(0.5, Math.Pow(Math.Sin(Math.PI / (Math.Min(prevDelta, currDelta) / Math.Max(prevDelta, currDelta))), 2)); // fancy function to calculate rhythmbonuses.
-
-                double deltaDifferenceEpsilon = currObj.HitWindowGreat * 0.3;
+                double currRatio = 1.0 + 5.8 * Math.Min(0.5, Math.Pow(Math.Sin(Math.PI / (Math.Min(prevDelta, currDelta) / Math.Max(prevDelta, currDelta))), 2)); // fancy function to calculate rhythmbonuses.
 
                 double windowPenalty = Math.Min(1, Math.Max(0, Math.Abs(prevDelta - currDelta) - deltaDifferenceEpsilon) / deltaDifferenceEpsilon);
 
@@ -119,7 +124,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                     if (!(Math.Abs(prevDelta - currDelta) > deltaDifferenceEpsilon))
                     {
                         // island is still progressing
-                        island.AddDelta((int)currDelta, deltaDifferenceEpsilon);
+                        island.AddDelta((int)currDelta);
                     }
                     else
                     {
@@ -131,10 +136,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                         // unintentional side effect is that bursts with kicksliders at the ends might have lower difficulty than bursts without sliders
                         // therefore we're checking for quick sliders and don't lower the difficulty for them since they don't really make tapping easier (no time to adjust)
                         if (prevObj.BaseObject is Slider && prevObj.TravelTime > prevDelta * 1.5)
-                            effectiveRatio *= 0.15;
+                            effectiveRatio *= 0.2;
 
                         // repeated island polartiy (2 -> 4, 3 -> 5)
-                        if (island.IsSimilarPolarity(previousIsland, deltaDifferenceEpsilon))
+                        if (island.IsSimilarPolarity(previousIsland))
                             effectiveRatio *= 0.3;
 
                         // previous increase happened a note ago, 1/1->1/2-1/4, dont want to buff this.
@@ -143,7 +148,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
                         if (!islandCounts.TryAdd(island, 1))
                         {
-                            islandCounts[island]++;
+                            // only add island to island counts if they're going one after another
+                            if (previousIsland.Equals(island))
+                                islandCounts[island]++;
 
                             // repeated island (ex: triplet -> triplet)
                             double power = logistic(island.AverageDelta(), 4, 0.165, 10);
