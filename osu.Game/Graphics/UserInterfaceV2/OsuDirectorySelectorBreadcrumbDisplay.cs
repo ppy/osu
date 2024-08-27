@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.IO;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -31,7 +29,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
         protected override DirectorySelectorDirectory CreateRootDirectoryItem() => new OsuBreadcrumbDisplayComputer();
 
-        protected override DirectorySelectorDirectory CreateDirectoryItem(DirectoryInfo directory, string displayName = null) => new OsuBreadcrumbDisplayDirectory(directory, displayName);
+        protected override DirectorySelectorDirectory CreateDirectoryItem(DirectoryInfo directory, string? displayName = null) => new OsuBreadcrumbDisplayDirectory(directory, displayName);
 
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider)
@@ -62,13 +60,13 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
         private partial class OsuBreadcrumbDisplayDirectory : DirectorySelectorDirectory
         {
-            public OsuBreadcrumbDisplayDirectory(DirectoryInfo directory, string displayName = null)
+            public OsuBreadcrumbDisplayDirectory(DirectoryInfo? directory, string? displayName = null)
                 : base(directory, displayName)
             {
             }
 
             [Resolved]
-            private OverlayColourProvider colourProvider { get; set; }
+            private OverlayColourProvider colourProvider { get; set; } = null!;
 
             [BackgroundDependencyLoader]
             private void load()
