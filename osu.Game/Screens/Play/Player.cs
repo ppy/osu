@@ -446,14 +446,6 @@ namespace osu.Game.Screens.Play
                 Children = new[]
                 {
                     DimmableStoryboard.OverlayLayerContainer.CreateProxy(),
-                    BreakOverlay = new BreakOverlay(working.Beatmap.BeatmapInfo.LetterboxInBreaks, ScoreProcessor)
-                    {
-                        Clock = DrawableRuleset.FrameStableClock,
-                        ProcessCustomClock = false,
-                        Breaks = working.Beatmap.Breaks
-                    },
-                    // display the cursor above some HUD elements.
-                    DrawableRuleset.Cursor?.CreateProxy() ?? new Container(),
                     HUDOverlay = new HUDOverlay(DrawableRuleset, GameplayState.Mods, Configuration.AlwaysShowLeaderboard)
                     {
                         HoldToQuit =
@@ -472,6 +464,14 @@ namespace osu.Game.Screens.Play
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre
                     },
+                    BreakOverlay = new BreakOverlay(working.Beatmap.BeatmapInfo.LetterboxInBreaks, ScoreProcessor)
+                    {
+                        Clock = DrawableRuleset.FrameStableClock,
+                        ProcessCustomClock = false,
+                        Breaks = working.Beatmap.Breaks
+                    },
+                    // display the cursor above some HUD elements.
+                    DrawableRuleset.Cursor?.CreateProxy() ?? new Container(),
                     skipIntroOverlay = new SkipOverlay(DrawableRuleset.GameplayStartTime)
                     {
                         RequestSkip = performUserRequestedSkip
