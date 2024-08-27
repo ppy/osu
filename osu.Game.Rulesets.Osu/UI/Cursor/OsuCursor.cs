@@ -31,6 +31,11 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
 
         private SkinnableCursor skinnableCursor => (SkinnableCursor)cursorSprite.Drawable;
 
+        /// <summary>
+        /// The current expanded scale of the cursor.
+        /// </summary>
+        public Vector2 CurrentExpandedScale => skinnableCursor.ExpandTarget?.Scale ?? Vector2.One;
+
         public IBindable<float> CursorScale => cursorScale;
 
         private readonly Bindable<float> cursorScale = new BindableFloat(1);
