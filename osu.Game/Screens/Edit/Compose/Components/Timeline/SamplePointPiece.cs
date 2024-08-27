@@ -14,6 +14,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
+using osu.Framework.Utils;
 using osu.Game.Audio;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
@@ -71,7 +72,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         private void onShowSampleEditPopoverRequested(double time)
         {
-            if (time == GetTime())
+            if (Precision.AlmostEquals(time, GetTime()))
                 this.ShowPopover();
         }
 
