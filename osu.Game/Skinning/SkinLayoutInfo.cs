@@ -11,8 +11,8 @@ using osu.Game.Rulesets;
 namespace osu.Game.Skinning
 {
     /// <summary>
-    /// A serialisable model describing layout of a <see cref="SkinComponentsContainer"/>.
-    /// May contain multiple configurations for different rulesets, each of which should manifest their own <see cref="SkinComponentsContainer"/> as required.
+    /// A serialisable model describing layout of a <see cref="SkinnableContainer"/>.
+    /// May contain multiple configurations for different rulesets, each of which should manifest their own <see cref="SkinnableContainer"/> as required.
     /// </summary>
     [Serializable]
     public class SkinLayoutInfo

@@ -80,22 +80,18 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
         {
             switch (lookup)
             {
-                case SkinComponentsContainerLookup containerLookup:
+                case GlobalSkinnableContainerLookup containerLookup:
                     // Modifications for global components.
                     if (containerLookup.Ruleset == null)
                         return base.GetDrawableComponent(lookup);
-
-                    // Skin has configuration.
-                    if (base.GetDrawableComponent(lookup) is UserConfiguredLayoutContainer d)
-                        return d;
 
                     // we don't have enough assets to display these components (this is especially the case on a "beatmap" skin).
                     if (!IsProvidingLegacyResources)
                         return null;
 
-                    switch (containerLookup.Target)
+                    switch (containerLookup.Lookup)
                     {
-                        case SkinComponentsContainerLookup.TargetArea.MainHUDComponents:
+                        case GlobalSkinnableContainers.MainHUDComponents:
                             return new DefaultSkinComponentsContainer(container =>
                             {
                                 var combo = container.ChildrenOfType<LegacyManiaComboCounter>().FirstOrDefault();
@@ -114,7 +110,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
 
                     return null;
 
-                case GameplaySkinComponentLookup<HitResult> resultComponent:
+                case SkinComponentLookup<HitResult> resultComponent:
                     return getResult(resultComponent.Component);
 
                 case ManiaSkinComponentLookup maniaComponent:

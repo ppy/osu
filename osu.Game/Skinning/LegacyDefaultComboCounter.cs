@@ -41,9 +41,6 @@ namespace osu.Game.Skinning
 
         protected override void OnCountIncrement()
         {
-            scheduledPopOut?.Cancel();
-            scheduledPopOut = null;
-
             DisplayedCountText.Show();
 
             PopOutCountText.Text = FormatCount(Current.Value);

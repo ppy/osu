@@ -95,10 +95,10 @@ namespace osu.Game.Screens.Play
 
         private readonly BindableBool holdingForHUD = new BindableBool();
 
-        private readonly SkinComponentsContainer mainComponents;
+        private readonly SkinnableContainer mainComponents;
 
         [CanBeNull]
-        private readonly SkinComponentsContainer rulesetComponents;
+        private readonly SkinnableContainer rulesetComponents;
 
         /// <summary>
         /// A flow which sits at the left side of the screen to house leaderboard (and related) components.
@@ -109,7 +109,7 @@ namespace osu.Game.Screens.Play
         private readonly List<Drawable> hideTargets;
 
         /// <summary>
-        /// The container for skin components attached to <see cref="SkinComponentsContainerLookup.TargetArea.Playfield"/>
+        /// The container for skin components attached to <see cref="GlobalSkinnableContainers.Playfield"/>
         /// </summary>
         internal readonly Drawable PlayfieldSkinLayer;
 
@@ -132,7 +132,7 @@ namespace osu.Game.Screens.Play
                     ? (rulesetComponents = new HUDComponentsContainer(drawableRuleset.Ruleset.RulesetInfo) { AlwaysPresent = true, })
                     : Empty(),
                 PlayfieldSkinLayer = drawableRuleset != null
-                    ? new SkinComponentsContainer(new SkinComponentsContainerLookup(SkinComponentsContainerLookup.TargetArea.Playfield, drawableRuleset.Ruleset.RulesetInfo)) { AlwaysPresent = true, }
+                    ? new SkinnableContainer(new GlobalSkinnableContainerLookup(GlobalSkinnableContainers.Playfield, drawableRuleset.Ruleset.RulesetInfo)) { AlwaysPresent = true, }
                     : Empty(),
                 topRightElements = new FillFlowContainer
                 {
@@ -280,7 +280,7 @@ namespace osu.Game.Screens.Play
             else
                 bottomRightElements.Y = 0;
 
-            void processDrawables(SkinComponentsContainer components)
+            void processDrawables(SkinnableContainer components)
             {
                 // Avoid using foreach due to missing GetEnumerator implementation.
                 // See https://github.com/ppy/osu-framework/blob/e10051e6643731e393b09de40a3a3d209a545031/osu.Framework/Bindables/IBindableList.cs#L41-L44.
@@ -440,7 +440,7 @@ namespace osu.Game.Screens.Play
             }
         }
 
-        private partial class HUDComponentsContainer : SkinComponentsContainer
+        private partial class HUDComponentsContainer : SkinnableContainer
         {
             private Bindable<ScoringMode> scoringMode;
 
@@ -448,7 +448,7 @@ namespace osu.Game.Screens.Play
             private OsuConfigManager config { get; set; }
 
             public HUDComponentsContainer([CanBeNull] RulesetInfo ruleset = null)
-                : base(new SkinComponentsContainerLookup(SkinComponentsContainerLookup.TargetArea.MainHUDComponents, ruleset))
+                : base(new GlobalSkinnableContainerLookup(GlobalSkinnableContainers.MainHUDComponents, ruleset))
             {
                 RelativeSizeAxes = Axes.Both;
             }
