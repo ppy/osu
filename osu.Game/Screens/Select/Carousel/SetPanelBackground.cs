@@ -17,13 +17,12 @@ namespace osu.Game.Screens.Select.Carousel
     public partial class SetPanelBackground : BufferedContainer
     {
         public SetPanelBackground(IWorkingBeatmap working)
-            : base(cachedFrameBuffer: true)
         {
             RedrawOnScale = false;
 
             Children = new Drawable[]
             {
-                new PanelBeatmapBackground(working)
+                background = new PanelBeatmapBackground(working)
                 {
                     RelativeSizeAxes = Axes.Both,
                     Anchor = Anchor.Centre,
@@ -69,6 +68,25 @@ namespace osu.Game.Screens.Select.Carousel
                     }
                 },
             };
+        }
+
+        [Resolved(canBeNull: true)]
+        private DrawableCarouselBeatmapSet? carouselBeatmapSet { get; set; }
+
+        private readonly PanelBeatmapBackground background;
+
+        private const float parallax_strength = 35;
+
+        protected override void Update()
+        {
+            base.Update();
+
+            if (carouselBeatmapSet != null)
+            {
+                float maxParallax = (background.DrawHeight - DrawHeight) / 2f;
+
+                background.Y = Math.Clamp(carouselBeatmapSet.Parallax, -1f, 1f) * Math.Min(maxParallax, parallax_strength);
+            }
         }
 
         public partial class PanelBeatmapBackground : Sprite

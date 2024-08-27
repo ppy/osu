@@ -23,6 +23,7 @@ using osu.Game.Overlays;
 
 namespace osu.Game.Screens.Select.Carousel
 {
+    [Cached]
     public partial class DrawableCarouselBeatmapSet : DrawableCarouselItem, IHasContextMenu
     {
         public const float HEIGHT = MAX_HEIGHT;
@@ -182,6 +183,11 @@ namespace osu.Game.Screens.Select.Carousel
 
         [Resolved]
         private BeatmapCarousel.CarouselScrollContainer scrollContainer { get; set; } = null!;
+
+        /**
+         * Parallax to apply to the header's beatmap cover, ranging from -1 to 1.
+         */
+        public float Parallax = 0f;
 
         private void loadContentIfRequired()
         {

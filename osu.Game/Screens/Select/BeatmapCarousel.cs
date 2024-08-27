@@ -191,6 +191,8 @@ namespace osu.Game.Screens.Select
 
         public Bindable<bool> RightClickScrollingEnabled = new Bindable<bool>();
 
+        private readonly BindableBool parallaxEnabled = new BindableBool();
+
         public Bindable<RandomSelectAlgorithm> RandomAlgorithm = new Bindable<RandomSelectAlgorithm>();
         private readonly List<CarouselBeatmapSet> previouslyVisitedRandomSets = new List<CarouselBeatmapSet>();
         private readonly List<CarouselBeatmap> randomSelectedBeatmaps = new List<CarouselBeatmap>();
@@ -241,6 +243,7 @@ namespace osu.Game.Screens.Select
 
             config.BindWith(OsuSetting.RandomSelectAlgorithm, RandomAlgorithm);
             config.BindWith(OsuSetting.SongSelectRightMouseScroll, RightClickScrollingEnabled);
+            config.BindWith(OsuSetting.MenuParallax, parallaxEnabled);
 
             RightClickScrollingEnabled.ValueChanged += enabled => Scroll.RightMouseScrollbar = enabled.NewValue;
             RightClickScrollingEnabled.TriggerChange();
@@ -897,6 +900,7 @@ namespace osu.Game.Screens.Select
 
                         panel.Depth = item.CarouselYPosition;
                         panel.Y = item.CarouselYPosition;
+                        panel.Parallax = getParallaxAt(item.CarouselYPosition);
 
                         Scroll.Add(panel);
                     }
@@ -908,6 +912,13 @@ namespace osu.Game.Screens.Select
             foreach (DrawableCarouselItem item in Scroll)
             {
                 updateItem(item);
+
+                if (item is DrawableCarouselBeatmapSet carouselBeatmapSet)
+                {
+                    float parallax = getParallaxAt(carouselBeatmapSet.Y);
+
+                    carouselBeatmapSet.Parallax = (float)Interpolation.Lerp(parallax, carouselBeatmapSet.Parallax, Math.Exp(-0.01f * Time.Elapsed));
+                }
 
                 Debug.Assert(item.Item != null);
 
@@ -1147,6 +1158,13 @@ namespace osu.Game.Screens.Select
             // additional container and setting that container's alpha) such that we can
             // layer alpha transformations on top.
             item.SetMultiplicativeAlpha(Math.Clamp(1.75f - 1.5f * dist, 0, 1));
+        }
+
+        private float getParallaxAt(float position)
+        {
+            float parallaxCenter = Scroll.Current + DrawHeight / 2f;
+
+            return parallaxEnabled.Value ? (parallaxCenter - position) / visibleHalfHeight : 0f;
         }
 
         private enum PendingScrollOperation
