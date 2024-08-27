@@ -105,7 +105,7 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
             }
         }
 
-        private partial class KiaiVisualisation : Circle, IHasTooltip
+        private partial class KiaiVisualisation : FastCircle, IHasTooltip
         {
             private readonly double startTime;
             private readonly double endTime;
