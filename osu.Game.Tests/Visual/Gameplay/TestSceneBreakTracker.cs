@@ -10,6 +10,8 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps.Timing;
+using osu.Game.Rulesets.Osu;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Play;
 using osuTK.Graphics;
 
@@ -38,7 +40,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                     RelativeSizeAxes = Axes.Both,
                 },
                 breakTracker = new TestBreakTracker(),
-                breakOverlay = new BreakOverlay(true, null)
+                breakOverlay = new BreakOverlay(true, new ScoreProcessor(new OsuRuleset()))
                 {
                     ProcessCustomClock = false,
                 }
