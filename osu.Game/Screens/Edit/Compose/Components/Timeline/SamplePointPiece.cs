@@ -78,9 +78,16 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         protected override bool OnClick(ClickEvent e)
         {
-            editorClock?.SeekSmoothlyTo(GetTime());
             this.ShowPopover();
             return true;
+        }
+
+        protected override void OnMouseUp(MouseUpEvent e)
+        {
+            if (e.Button != MouseButton.Right) return;
+
+            editorClock?.SeekSmoothlyTo(GetTime());
+            this.ShowPopover();
         }
 
         private void updateText()
