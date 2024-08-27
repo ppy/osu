@@ -7,9 +7,11 @@ using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Screens.Play;
+using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
@@ -28,14 +30,19 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         public TestSceneBreakTracker()
         {
-            AddRange(new Drawable[]
+            Children = new Drawable[]
             {
+                new Box
+                {
+                    Colour = Color4.White,
+                    RelativeSizeAxes = Axes.Both,
+                },
                 breakTracker = new TestBreakTracker(),
                 breakOverlay = new BreakOverlay(true, null)
                 {
                     ProcessCustomClock = false,
                 }
-            });
+            };
         }
 
         protected override void Update()
