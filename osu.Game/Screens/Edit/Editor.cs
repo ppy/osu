@@ -1131,7 +1131,7 @@ namespace osu.Game.Screens.Edit
 
                 for (int i = 0; i < r.SpanCount(); i++)
                 {
-                    nodeSamplePointTimes[i + 2] = current.StartTime + r.Duration / r.SpanCount() * (i + 1);
+                    nodeSamplePointTimes[i + 2] = current.StartTime + r.Duration * (i + 1) / r.SpanCount();
                 }
 
                 double found = direction < 1
