@@ -6,11 +6,14 @@
 using System;
 using System.Collections.Generic;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Beatmaps.Timing;
+using osu.Game.Graphics;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play.Break;
@@ -68,6 +71,30 @@ namespace osu.Game.Screens.Play
                         Alpha = letterboxing ? 1 : 0,
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
+                    },
+                    new CircularContainer
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Width = 80,
+                        Height = 4,
+                        Masking = true,
+                        EdgeEffect = new EdgeEffectParameters
+                        {
+                            Type = EdgeEffectType.Shadow,
+                            Radius = 260,
+                            Colour = OsuColour.Gray(0.2f).Opacity(0.8f),
+                            Roundness = 12
+                        },
+                        Children = new Drawable[]
+                        {
+                            new Box
+                            {
+                                Alpha = 0,
+                                AlwaysPresent = true,
+                                RelativeSizeAxes = Axes.Both,
+                            },
+                        }
                     },
                     remainingTimeAdjustmentBox = new Container
                     {
