@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
 using osu.Framework.Bindables;
@@ -32,7 +30,7 @@ namespace osu.Game.Screens.Play
 
         private readonly Container fadeContainer;
 
-        private IReadOnlyList<BreakPeriod> breaks;
+        private IReadOnlyList<BreakPeriod> breaks = Array.Empty<BreakPeriod>();
 
         public IReadOnlyList<BreakPeriod> Breaks
         {
@@ -138,11 +136,8 @@ namespace osu.Game.Screens.Play
             base.LoadComplete();
             initializeBreaks();
 
-            if (scoreProcessor != null)
-            {
-                info.AccuracyDisplay.Current.BindTo(scoreProcessor.Accuracy);
-                ((IBindable<ScoreRank>)info.GradeDisplay.Current).BindTo(scoreProcessor.Rank);
-            }
+            info.AccuracyDisplay.Current.BindTo(scoreProcessor.Accuracy);
+            ((IBindable<ScoreRank>)info.GradeDisplay.Current).BindTo(scoreProcessor.Rank);
         }
 
         protected override void Update()
@@ -156,8 +151,6 @@ namespace osu.Game.Screens.Play
         {
             FinishTransforms(true);
             Scheduler.CancelDelayedTasks();
-
-            if (breaks == null) return; // we need breaks.
 
             foreach (var b in breaks)
             {
