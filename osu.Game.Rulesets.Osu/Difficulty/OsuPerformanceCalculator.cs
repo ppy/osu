@@ -154,7 +154,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             // Scale the aim value with adjusted deviation
             double adjustedDeviation = deviation * calculateDeviationArAdjust(attributes.ApproachRate);
-            aimValue *= SpecialFunctions.Erf(30 / (Math.Sqrt(2) * adjustedDeviation));
+            aimValue *= SpecialFunctions.Erf(33 / (Math.Sqrt(2) * adjustedDeviation));
             aimValue *= 0.98 + Math.Pow(100.0 / 9, 2) / 2500; // OD 11 SS stays the same.
 
             return aimValue;
@@ -202,7 +202,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             // Use additional bad UR penalty for high speed difficulty
             // (WARNING: potentially unstable, but instability detected in playable difficulty range).
             double adjustedSpeedDeviation = speedDeviation * calculateDeviationArAdjust(attributes.ApproachRate);
-            speedValue *= SpecialFunctions.Erf(20 / (Math.Sqrt(2) * adjustedSpeedDeviation * Math.Max(1, Math.Pow(attributes.SpeedDifficulty / 4.5, 1.2))));
+            speedValue *= SpecialFunctions.Erf(22 / (Math.Sqrt(2) * adjustedSpeedDeviation * Math.Max(1, Math.Pow(attributes.SpeedDifficulty / 4.5, 1.2))));
             speedValue *= 0.95 + Math.Pow(100.0 / 9, 2) / 750; // OD 11 SS stays the same.
 
             return speedValue;
@@ -227,7 +227,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double adjustedDeviation = deviation * calculateDeviationArAdjust(attributes.ApproachRate);
 
             // Some fancy stuff to make curve similar to live
-            double scaling = Math.Sqrt(2) * Math.Log(1.52163) * SpecialFunctions.ErfInv(1 / (1 + 1 / Math.Min(amountHitObjectsWithAccuracy, threshold))) / 6;
+            double scaling = 0.9 * Math.Sqrt(2) * Math.Log(1.52163) * SpecialFunctions.ErfInv(1 / (1 + 1 / Math.Min(amountHitObjectsWithAccuracy, threshold))) / 6;
 
             // Accuracy pp formula that's roughly the same as live.
             double accuracyValue = 2.83 * Math.Pow(1.52163, 40.0 / 3) * liveLengthBonus * Math.Exp(-scaling * adjustedDeviation);
@@ -272,7 +272,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             // Scale the flashlight value with adjusted deviation
             double adjustedDeviation = deviation * calculateDeviationArAdjust(attributes.ApproachRate);
-            flashlightValue *= SpecialFunctions.Erf(50 / (Math.Sqrt(2) * adjustedDeviation));
+            flashlightValue *= SpecialFunctions.Erf(55 / (Math.Sqrt(2) * adjustedDeviation));
             flashlightValue *= 0.98 + Math.Pow(100.0 / 9, 2) / 2500;  // OD 11 SS stays the same.
 
             return flashlightValue;
@@ -400,8 +400,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             // Find the total deviation.
             deviation = Math.Sqrt(((relevantCountGreat + relevantCountOk) * Math.Pow(deviation, 2) + relevantCountMeh * mehVariance) / (relevantCountGreat + relevantCountOk + relevantCountMeh));
 
-            // Adjust by 0.9 to account for the fact that it's higher bound UR value
-            return deviation * 0.9;
+            return deviation;
         }
 
         // Calculates multiplier for speed accounting for rake based on the deviation and speed difficulty
@@ -412,7 +411,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double speedValue = 4 * Math.Pow(attributes.SpeedDifficulty, 3);
 
             // Starting from this pp amount - penalty will be applied
-            double abusePoint = 100 + 260 * Math.Pow(20 / speedDeviation, 5.8);
+            double abusePoint = 100 + 260 * Math.Pow(22 / speedDeviation, 5.8);
 
             if (speedValue <= abusePoint)
                 return 1.0;
@@ -438,7 +437,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double totalValue = Math.Pow(Math.Pow(aimNoSlidersValue, 1.1) + Math.Pow(speedValue, 1.1), 1 / 1.1);
 
             // Starting from this pp amount - penalty will be applied
-            double abusePoint = 200 + 600 * Math.Pow(20 / adjustedDeviation, 4.2);
+            double abusePoint = 200 + 600 * Math.Pow(22 / adjustedDeviation, 4.2);
 
             if (totalValue <= abusePoint)
                 return 1.0;
@@ -455,6 +454,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             score.Mods.OfType<IApplicableToTrack>().ForEach(m => m.ApplyToTrack(track));
             return track.Rate;
         }
+
         private double getComboScalingFactor(OsuDifficultyAttributes attributes) => attributes.MaxCombo <= 0 ? 1.0 : Math.Min(Math.Pow(scoreMaxCombo, 0.8) / Math.Pow(attributes.MaxCombo, 0.8), 1.0);
 
         // Bonus for low AR to account for the fact that it's more difficult to get low UR on low AR
