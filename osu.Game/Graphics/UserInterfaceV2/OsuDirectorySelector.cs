@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.IO;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -20,7 +18,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
         private Box hiddenToggleBackground = null!;
 
-        public OsuDirectorySelector(string initialPath = null)
+        public OsuDirectorySelector(string? initialPath = null)
             : base(initialPath)
         {
         }
@@ -68,7 +66,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
         protected override DirectorySelectorDirectory CreateParentDirectoryItem(DirectoryInfo directory) => new OsuDirectorySelectorParentDirectory(directory);
 
-        protected override DirectorySelectorDirectory CreateDirectoryItem(DirectoryInfo directory, string displayName = null) => new OsuDirectorySelectorDirectory(directory, displayName);
+        protected override DirectorySelectorDirectory CreateDirectoryItem(DirectoryInfo directory, string? displayName = null) => new OsuDirectorySelectorDirectory(directory, displayName);
 
         protected override void NotifySelectionError() => this.FlashColour(Colour4.Red, 300);
     }
