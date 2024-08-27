@@ -5,6 +5,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
@@ -57,6 +58,9 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         [Resolved(CanBeNull = true)]
         private BindableBeatDivisor beatDivisor { get; set; }
 
+        [CanBeNull]
+        private PathControlPoint placementControlPoint;
+
         public override Quad SelectionQuad
         {
             get
@@ -84,6 +88,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         // Cached slider path which ignored the expected distance value.
         private readonly Cached<SliderPath> fullPathCache = new Cached<SliderPath>();
 
+        private Vector2 lastRightClickPosition;
+
         public SliderSelectionBlueprint(Slider slider)
             : base(slider)
         {
@@ -99,7 +105,10 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                 TailOverlay = CreateCircleOverlay(HitObject, SliderPosition.End),
             };
 
-            TailOverlay.EndDragMarker!.StartDrag += startAdjustingLength;
+            // tail will always have a non-null end drag marker.
+            Debug.Assert(TailOverlay.EndDragMarker != null);
+
+            TailOverlay.EndDragMarker.StartDrag += startAdjustingLength;
             TailOverlay.EndDragMarker.Drag += adjustLength;
             TailOverlay.EndDragMarker.EndDrag += endAdjustLength;
 
@@ -154,7 +163,6 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         protected override bool OnHover(HoverEvent e)
         {
             updateVisualDefinition();
-
             return base.OnHover(e);
         }
 
@@ -199,14 +207,12 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             }
         }
 
-        private Vector2 rightClickPosition;
-
         protected override bool OnMouseDown(MouseDownEvent e)
         {
             switch (e.Button)
             {
                 case MouseButton.Right:
-                    rightClickPosition = e.MouseDownPosition;
+                    lastRightClickPosition = e.MouseDownPosition;
                     return false; // Allow right click to be handled by context menu
 
                 case MouseButton.Left:
@@ -225,6 +231,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
             return false;
         }
+
+        #region Length Adjustment (independent of path nodes)
 
         private Vector2 lengthAdjustMouseOffset;
         private double oldDuration;
@@ -351,8 +359,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             return bestValue;
         }
 
-        [CanBeNull]
-        private PathControlPoint placementControlPoint;
+        #endregion
 
         protected override bool OnDragStart(DragStartEvent e)
         {
@@ -586,7 +593,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             new OsuMenuItem("Add control point", MenuItemType.Standard, () =>
             {
                 changeHandler?.BeginChange();
-                addControlPoint(rightClickPosition);
+                addControlPoint(lastRightClickPosition);
                 changeHandler?.EndChange();
             }),
             new OsuMenuItem("Convert to stream", MenuItemType.Destructive, convertToStream),
