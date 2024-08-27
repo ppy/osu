@@ -1,13 +1,10 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Caching;
@@ -36,30 +33,28 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
     {
         protected new DrawableSlider DrawableObject => (DrawableSlider)base.DrawableObject;
 
-        protected SliderBodyPiece BodyPiece { get; private set; }
-        protected SliderCircleOverlay HeadOverlay { get; private set; }
-        protected SliderCircleOverlay TailOverlay { get; private set; }
+        protected SliderBodyPiece BodyPiece { get; private set; } = null!;
+        protected SliderCircleOverlay HeadOverlay { get; private set; } = null!;
+        protected SliderCircleOverlay TailOverlay { get; private set; } = null!;
 
-        [CanBeNull]
-        protected PathControlPointVisualiser<Slider> ControlPointVisualiser { get; private set; }
+        protected PathControlPointVisualiser<Slider>? ControlPointVisualiser { get; private set; }
 
-        [Resolved(CanBeNull = true)]
-        private IDistanceSnapProvider distanceSnapProvider { get; set; }
+        [Resolved]
+        private IDistanceSnapProvider? distanceSnapProvider { get; set; }
 
-        [Resolved(CanBeNull = true)]
-        private IPlacementHandler placementHandler { get; set; }
+        [Resolved]
+        private IPlacementHandler? placementHandler { get; set; }
 
-        [Resolved(CanBeNull = true)]
-        private EditorBeatmap editorBeatmap { get; set; }
+        [Resolved]
+        private EditorBeatmap? editorBeatmap { get; set; }
 
-        [Resolved(CanBeNull = true)]
-        private IEditorChangeHandler changeHandler { get; set; }
+        [Resolved]
+        private IEditorChangeHandler? changeHandler { get; set; }
 
-        [Resolved(CanBeNull = true)]
-        private BindableBeatDivisor beatDivisor { get; set; }
+        [Resolved]
+        private BindableBeatDivisor? beatDivisor { get; set; }
 
-        [CanBeNull]
-        private PathControlPoint placementControlPoint;
+        private PathControlPoint? placementControlPoint;
 
         public override Quad SelectionQuad
         {
@@ -145,7 +140,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                 return false;
 
             hoveredControlPoint.IsSelected.Value = true;
-            ControlPointVisualiser.DeleteSelected();
+            ControlPointVisualiser?.DeleteSelected();
             return true;
         }
 
@@ -487,6 +482,9 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
         private void splitControlPoints(List<PathControlPoint> controlPointsToSplitAt)
         {
+            if (editorBeatmap == null)
+                return;
+
             // Arbitrary gap in milliseconds to put between split slider pieces
             const double split_gap = 100;
 
