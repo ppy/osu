@@ -212,7 +212,7 @@ namespace osu.Game.Tests.Visual.Editing
         private void assertRomanisedArtist(string expected, bool editable)
         {
             AddAssert($"romanised artist is {expected}", () => metadataSection.RomanisedArtistTextBox.Current.Value, () => Is.EqualTo(expected));
-            AddAssert($"romanised artist is {(editable ? "" : "not ")}editable", () => metadataSection.RomanisedArtistTextBox.ReadOnly == !editable);
+            AddAssert($"romanised artist is {(editable ? "" : "not ")}editable", () => metadataSection.RomanisedArtistTextBox.Current.Disabled == !editable);
         }
 
         private void assertTitle(string expected)
@@ -221,16 +221,16 @@ namespace osu.Game.Tests.Visual.Editing
         private void assertRomanisedTitle(string expected, bool editable)
         {
             AddAssert($"romanised title is {expected}", () => metadataSection.RomanisedTitleTextBox.Current.Value, () => Is.EqualTo(expected));
-            AddAssert($"romanised title is {(editable ? "" : "not ")}editable", () => metadataSection.RomanisedTitleTextBox.ReadOnly == !editable);
+            AddAssert($"romanised title is {(editable ? "" : "not ")}editable", () => metadataSection.RomanisedTitleTextBox.Current.Disabled == !editable);
         }
 
         private partial class TestMetadataSection : MetadataSection
         {
-            public new LabelledTextBox ArtistTextBox => base.ArtistTextBox;
-            public new LabelledTextBox RomanisedArtistTextBox => base.RomanisedArtistTextBox;
+            public new FormTextBox ArtistTextBox => base.ArtistTextBox;
+            public new FormTextBox RomanisedArtistTextBox => base.RomanisedArtistTextBox;
 
-            public new LabelledTextBox TitleTextBox => base.TitleTextBox;
-            public new LabelledTextBox RomanisedTitleTextBox => base.RomanisedTitleTextBox;
+            public new FormTextBox TitleTextBox => base.TitleTextBox;
+            public new FormTextBox RomanisedTitleTextBox => base.RomanisedTitleTextBox;
         }
     }
 }

@@ -99,11 +99,11 @@ namespace osu.Game.Tests.Visual.Editing
 
         private partial class TestDesignSection : DesignSection
         {
-            public new LabelledSwitchButton EnableCountdown => base.EnableCountdown;
+            public new FormCheckBox EnableCountdown => base.EnableCountdown;
 
             public new FillFlowContainer CountdownSettings => base.CountdownSettings;
-            public new LabelledEnumDropdown<CountdownType> CountdownSpeed => base.CountdownSpeed;
-            public new LabelledNumberBox CountdownOffset => base.CountdownOffset;
+            public new FormEnumDropdown<CountdownType> CountdownSpeed => base.CountdownSpeed;
+            public new FormTextBox CountdownOffset => base.CountdownOffset;
         }
     }
 }

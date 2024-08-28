@@ -133,7 +133,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
                 int colourIndex = i;
                 var colourButton = new ColourButton { Current = { Value = Colours[colourIndex] } };
                 colourButton.Current.BindValueChanged(colour => Colours[colourIndex] = colour.NewValue);
-                colourButton.DeleteRequested = () => Colours.RemoveAt(flow.IndexOf(colourButton));
+                colourButton.DeleteRequested = () => Colours.RemoveAt(colourIndex);
                 flow.Add(colourButton);
             }
         }
