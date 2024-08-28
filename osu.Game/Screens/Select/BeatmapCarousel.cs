@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
@@ -235,7 +236,7 @@ namespace osu.Game.Screens.Select
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config, AudioManager audio, DetachedBeatmapStore beatmapStore)
+        private void load(OsuConfigManager config, AudioManager audio, CancellationToken cancellationToken)
         {
             spinSample = audio.Samples.Get("SongSelect/random-spin");
             randomSelectSample = audio.Samples.Get(@"SongSelect/select-random");
@@ -251,7 +252,7 @@ namespace osu.Game.Screens.Select
                 // This is performing an unnecessary second lookup on realm (in addition to the subscription), but for performance reasons
                 // we require it to be separate: the subscription's initial callback (with `ChangeSet` of `null`) will run on the update
                 // thread. If we attempt to detach beatmaps in this callback the game will fall over (it takes time).
-                detachedBeatmapSets = detachedBeatmapStore!.GetDetachedBeatmaps();
+                detachedBeatmapSets = detachedBeatmapStore!.GetDetachedBeatmaps(cancellationToken);
                 detachedBeatmapSets.BindCollectionChanged(beatmapSetsChanged);
                 loadBeatmapSets(detachedBeatmapSets);
             }
