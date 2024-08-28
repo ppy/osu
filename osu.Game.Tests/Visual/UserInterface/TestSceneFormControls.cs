@@ -100,6 +100,11 @@ namespace osu.Game.Tests.Visual.UserInterface
                             Caption = EditorSetupStrings.EnableCountdown,
                             HintText = EditorSetupStrings.CountdownDescription,
                         },
+                        new FormFileSelector
+                        {
+                            Caption = "Audio file",
+                            PlaceholderText = "Select an audio file",
+                        },
                     },
                 },
             }
