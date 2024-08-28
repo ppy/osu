@@ -130,18 +130,22 @@ namespace osu.Game.Screens.Select
             get => beatmapSets.Select(g => g.BeatmapSet);
             set
             {
+                if (LoadState != LoadState.NotLoaded)
+                    throw new InvalidOperationException("If not using a realm source, beatmap sets must be set before load.");
+
                 loadedTestBeatmaps = true;
-                Schedule(() => loadBeatmapSets(value));
+                detachedBeatmapSets = new BindableList<BeatmapSetInfo>(value);
+                Schedule(loadNewRoot);
             }
         }
 
-        private void loadBeatmapSets(IEnumerable<BeatmapSetInfo> beatmapSets)
+        private void loadNewRoot()
         {
             // Ensure no changes are made to the list while we are initialising items.
             // We'll catch up on changes via subscriptions anyway.
-            beatmapSets = beatmapSets.ToArray();
+            BeatmapSetInfo[] loadableSets = detachedBeatmapSets.ToArray();
 
-            if (selectedBeatmapSet != null && !beatmapSets.Contains(selectedBeatmapSet.BeatmapSet))
+            if (selectedBeatmapSet != null && !loadableSets.Contains(selectedBeatmapSet.BeatmapSet))
                 selectedBeatmapSet = null;
 
             var selectedBeatmapBefore = selectedBeatmap?.BeatmapInfo;
@@ -150,7 +154,7 @@ namespace osu.Game.Screens.Select
 
             if (beatmapsSplitOut)
             {
-                var carouselBeatmapSets = beatmapSets.SelectMany(s => s.Beatmaps).Select(b =>
+                var carouselBeatmapSets = loadableSets.SelectMany(s => s.Beatmaps).Select(b =>
                 {
                     return createCarouselSet(new BeatmapSetInfo(new[] { b })
                     {
@@ -164,7 +168,7 @@ namespace osu.Game.Screens.Select
             }
             else
             {
-                var carouselBeatmapSets = beatmapSets.Select(createCarouselSet).OfType<CarouselBeatmapSet>();
+                var carouselBeatmapSets = loadableSets.Select(createCarouselSet).OfType<CarouselBeatmapSet>();
 
                 newRoot.AddItems(carouselBeatmapSets);
             }
@@ -259,7 +263,7 @@ namespace osu.Game.Screens.Select
                 // thread. If we attempt to detach beatmaps in this callback the game will fall over (it takes time).
                 detachedBeatmapSets = detachedBeatmapStore.GetDetachedBeatmaps(cancellationToken);
                 detachedBeatmapSets.BindCollectionChanged(beatmapSetsChanged);
-                loadBeatmapSets(detachedBeatmapSets);
+                loadNewRoot();
             }
         }
 
@@ -309,8 +313,7 @@ namespace osu.Game.Screens.Select
                 case NotifyCollectionChangedAction.Reset:
                     setsRequiringRemoval.Clear();
                     setsRequiringUpdate.Clear();
-
-                    loadBeatmapSets(detachedBeatmapSets);
+                    loadNewRoot();
                     break;
             }
 
@@ -733,7 +736,7 @@ namespace osu.Game.Screens.Select
                 if (activeCriteria.SplitOutDifficulties != beatmapsSplitOut)
                 {
                     beatmapsSplitOut = activeCriteria.SplitOutDifficulties;
-                    loadBeatmapSets(detachedBeatmapSets);
+                    loadNewRoot();
                     return;
                 }
 
