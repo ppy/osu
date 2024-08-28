@@ -148,12 +148,12 @@ namespace osu.Game.Graphics.UserInterfaceV2
             base.LoadComplete();
 
             popoverState.BindValueChanged(_ => updateState());
+            current.BindDisabledChanged(_ => updateState());
             current.BindValueChanged(_ =>
             {
                 updateState();
                 onFileSelected();
-            });
-            current.BindDisabledChanged(_ => updateState(), true);
+            }, true);
             game.RegisterImportHandler(this);
         }
 
@@ -189,7 +189,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
         private void updateState()
         {
             caption.Colour = Current.Disabled ? colourProvider.Foreground1 : colourProvider.Content2;
-            filenameText.Colour = Current.Disabled ? colourProvider.Foreground1 : colourProvider.Content1;
+            filenameText.Colour = Current.Disabled || Current.Value == null ? colourProvider.Foreground1 : colourProvider.Content1;
 
             if (!Current.Disabled)
             {
