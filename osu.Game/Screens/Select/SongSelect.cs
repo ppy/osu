@@ -428,7 +428,8 @@ namespace osu.Game.Screens.Select
 
             // Forced refetch is important here to guarantee correct invalidation across all difficulties.
             Beatmap.Value = beatmaps.GetWorkingBeatmap(beatmapInfo ?? beatmapInfoNoDebounce, true);
-            this.Push(new EditorLoader());
+
+            FinaliseSelection(customStartAction: () => this.Push(new EditorLoader()));
         }
 
         /// <summary>
