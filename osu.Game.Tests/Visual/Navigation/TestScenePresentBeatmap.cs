@@ -176,6 +176,12 @@ namespace osu.Game.Tests.Visual.Navigation
 
         private void confirmBeatmapInSongSelect(Func<BeatmapSetInfo> getImport)
         {
+            AddUntilStep("wait for carousel loaded", () =>
+            {
+                var songSelect = (Screens.Select.SongSelect)Game.ScreenStack.CurrentScreen;
+                return songSelect.ChildrenOfType<BeatmapCarousel>().SingleOrDefault()?.IsLoaded == true;
+            });
+
             AddUntilStep("beatmap in song select", () =>
             {
                 var songSelect = (Screens.Select.SongSelect)Game.ScreenStack.CurrentScreen;

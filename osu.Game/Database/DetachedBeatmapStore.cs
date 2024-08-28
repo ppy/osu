@@ -24,17 +24,16 @@ namespace osu.Game.Database
         [Resolved]
         private RealmAccess realm { get; set; } = null!;
 
-        public IBindableList<BeatmapSetInfo> GetDetachedBeatmaps(CancellationToken cancellationToken)
+        public IBindableList<BeatmapSetInfo> GetDetachedBeatmaps(CancellationToken? cancellationToken)
         {
-            loaded.Wait(cancellationToken);
+            loaded.Wait(cancellationToken ?? CancellationToken.None);
             return detachedBeatmapSets.GetBoundCopy();
         }
 
         [BackgroundDependencyLoader]
-        private void load(CancellationToken cancellationToken)
+        private void load()
         {
             realmSubscription = realm.RegisterForNotifications(r => r.All<BeatmapSetInfo>().Where(s => !s.DeletePending && !s.Protected), beatmapSetsChanged);
-            loaded.Wait(cancellationToken);
         }
 
         private void beatmapSetsChanged(IRealmCollection<BeatmapSetInfo> sender, ChangeSet? changes)
