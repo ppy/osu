@@ -4,6 +4,7 @@
 using System;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -30,9 +31,10 @@ namespace osu.Game.Database
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(CancellationToken cancellationToken)
         {
-            realmSubscription = realm.RegisterForNotifications(getBeatmapSets, beatmapSetsChanged);
+            realmSubscription = realm.RegisterForNotifications(r => r.All<BeatmapSetInfo>().Where(s => !s.DeletePending && !s.Protected), beatmapSetsChanged);
+            loaded.Wait(cancellationToken);
         }
 
         private void beatmapSetsChanged(IRealmCollection<BeatmapSetInfo> sender, ChangeSet? changes)
@@ -50,23 +52,56 @@ namespace osu.Game.Database
                     return;
                 }
 
-                detachedBeatmapSets.Clear();
-                detachedBeatmapSets.AddRange(sender.Detach());
+                // Detaching beatmaps takes some time, so let's make sure it doesn't run on the update thread.
+                var frozenSets = sender.Freeze();
 
-                loaded.Set();
+                Task.Factory.StartNew(() =>
+                {
+                    realm.Run(_ =>
+                    {
+                        var detached = frozenSets.Detach();
+
+                        detachedBeatmapSets.Clear();
+                        detachedBeatmapSets.AddRange(detached);
+                        loaded.Set();
+                    });
+                }, TaskCreationOptions.LongRunning);
+
                 return;
             }
 
             foreach (int i in changes.DeletedIndices.OrderDescending())
-                detachedBeatmapSets.RemoveAt(i);
+                removeAt(i);
 
             foreach (int i in changes.InsertedIndices)
-            {
-                detachedBeatmapSets.Insert(i, sender[i].Detach());
-            }
+                insert(sender[i].Detach(), i);
 
             foreach (int i in changes.NewModifiedIndices)
-                detachedBeatmapSets.ReplaceRange(i, 1, new[] { sender[i].Detach() });
+                replaceRange(sender[i].Detach(), i);
+        }
+
+        private void replaceRange(BeatmapSetInfo set, int i)
+        {
+            if (loaded.IsSet)
+                detachedBeatmapSets.ReplaceRange(i, 1, new[] { set });
+            else
+                Schedule(() => { detachedBeatmapSets.ReplaceRange(i, 1, new[] { set }); });
+        }
+
+        private void insert(BeatmapSetInfo set, int i)
+        {
+            if (loaded.IsSet)
+                detachedBeatmapSets.Insert(i, set);
+            else
+                Schedule(() => { detachedBeatmapSets.Insert(i, set); });
+        }
+
+        private void removeAt(int i)
+        {
+            if (loaded.IsSet)
+                detachedBeatmapSets.RemoveAt(i);
+            else
+                Schedule(() => { detachedBeatmapSets.RemoveAt(i); });
         }
 
         protected override void Dispose(bool isDisposing)
@@ -75,7 +110,5 @@ namespace osu.Game.Database
             loaded.Set();
             realmSubscription?.Dispose();
         }
-
-        private IQueryable<BeatmapSetInfo> getBeatmapSets(Realm realm) => realm.All<BeatmapSetInfo>().Where(s => !s.DeletePending && !s.Protected);
     }
 }
