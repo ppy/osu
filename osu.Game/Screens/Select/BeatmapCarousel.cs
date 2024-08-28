@@ -137,6 +137,10 @@ namespace osu.Game.Screens.Select
 
         private void loadBeatmapSets(IEnumerable<BeatmapSetInfo> beatmapSets)
         {
+            // Ensure no changes are made to the list while we are initialising items.
+            // We'll catch up on changes via subscriptions anyway.
+            beatmapSets = beatmapSets.ToArray();
+
             if (selectedBeatmapSet != null && !beatmapSets.Contains(selectedBeatmapSet.BeatmapSet))
                 selectedBeatmapSet = null;
 
