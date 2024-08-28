@@ -1389,6 +1389,11 @@ namespace osu.Game.Tests.Visual.SongSelect
 
         private partial class TestBeatmapCarousel : BeatmapCarousel
         {
+            public TestBeatmapCarousel()
+                : base(new FilterCriteria())
+            {
+            }
+
             public bool PendingFilterTask => PendingFilter != null;
 
             public IEnumerable<DrawableCarouselItem> Items

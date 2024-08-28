@@ -162,20 +162,6 @@ namespace osu.Game.Screens.Select
                 ApplyToBackground(applyBlurToBackground);
             });
 
-            LoadComponentAsync(Carousel = new BeatmapCarousel
-            {
-                AllowSelection = false, // delay any selection until our bindables are ready to make a good choice.
-                Anchor = Anchor.CentreRight,
-                Origin = Anchor.CentreRight,
-                RelativeSizeAxes = Axes.Both,
-                BleedTop = FilterControl.HEIGHT,
-                BleedBottom = Select.Footer.HEIGHT,
-                SelectionChanged = updateSelectedBeatmap,
-                BeatmapSetsChanged = carouselBeatmapsLoaded,
-                FilterApplied = () => Scheduler.AddOnce(updateVisibleBeatmapCount),
-                GetRecommendedBeatmap = s => recommender?.GetRecommendedBeatmap(s),
-            }, c => carouselContainer.Child = c);
-
             // initial value transfer is required for FilterControl (it uses our re-cached bindables in its async load for the initial filter).
             transferRulesetValue();
 
@@ -227,7 +213,6 @@ namespace osu.Game.Screens.Select
                         {
                             RelativeSizeAxes = Axes.X,
                             Height = FilterControl.HEIGHT,
-                            FilterChanged = ApplyFilterToCarousel,
                         },
                         new GridContainer // used for max width implementation
                         {
@@ -327,6 +312,23 @@ namespace osu.Game.Screens.Select
                 },
                 modSpeedHotkeyHandler = new ModSpeedHotkeyHandler(),
             });
+
+            // Important to load this after the filter control is loaded (so we have initial filter criteria prepared).
+            LoadComponentAsync(Carousel = new BeatmapCarousel(FilterControl.CreateCriteria())
+            {
+                AllowSelection = false, // delay any selection until our bindables are ready to make a good choice.
+                Anchor = Anchor.CentreRight,
+                Origin = Anchor.CentreRight,
+                RelativeSizeAxes = Axes.Both,
+                BleedTop = FilterControl.HEIGHT,
+                BleedBottom = Select.Footer.HEIGHT,
+                SelectionChanged = updateSelectedBeatmap,
+                BeatmapSetsChanged = carouselBeatmapsLoaded,
+                FilterApplied = () => Scheduler.AddOnce(updateVisibleBeatmapCount),
+                GetRecommendedBeatmap = s => recommender?.GetRecommendedBeatmap(s),
+            }, c => carouselContainer.Child = c);
+
+            FilterControl.FilterChanged = ApplyFilterToCarousel;
 
             if (ShowSongSelectFooter)
             {
@@ -992,7 +994,8 @@ namespace osu.Game.Screens.Select
 
             // if we have a pending filter operation, we want to run it now.
             // it could change selection (ie. if the ruleset has been changed).
-            Carousel.FlushPendingFilterOperations();
+            if (IsLoaded)
+                Carousel.FlushPendingFilterOperations();
 
             return true;
         }

@@ -170,12 +170,11 @@ namespace osu.Game.Screens.Select
             }
 
             root = newRoot;
+            root.Filter(activeCriteria);
 
             Scroll.Clear(false);
             itemsCache.Invalidate();
             ScrollToSelected();
-
-            applyActiveCriteria(false);
 
             // Restore selection
             if (selectedBeatmapBefore != null && newRoot.BeatmapSetsByID.TryGetValue(selectedBeatmapBefore.BeatmapSet!.ID, out var newSelectionCandidates))
@@ -215,7 +214,7 @@ namespace osu.Game.Screens.Select
 
         private int visibleSetsCount;
 
-        public BeatmapCarousel()
+        public BeatmapCarousel(FilterCriteria initialCriterial)
         {
             root = new CarouselRoot(this);
             InternalChild = new Container
@@ -237,6 +236,8 @@ namespace osu.Game.Screens.Select
                     noResultsPlaceholder = new NoResultsPlaceholder()
                 }
             };
+
+            activeCriteria = initialCriterial;
         }
 
         [BackgroundDependencyLoader]
@@ -662,7 +663,7 @@ namespace osu.Game.Screens.Select
             item.State.Value = CarouselItemState.Selected;
         }
 
-        private FilterCriteria activeCriteria = new FilterCriteria();
+        private FilterCriteria activeCriteria;
 
         protected ScheduledDelegate? PendingFilter;
 
