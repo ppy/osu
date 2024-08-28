@@ -6,6 +6,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using JetBrains.Annotations;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.IEnumerableExtensions;
@@ -1268,26 +1269,23 @@ namespace osu.Game.Tests.Visual.SongSelect
                 }
             }
 
-            createCarousel(beatmapSets, c =>
+            createCarousel(beatmapSets, initialCriteria, c =>
             {
-                carouselAdjust?.Invoke(c);
-
-                carousel.Filter(initialCriteria?.Invoke() ?? new FilterCriteria());
                 carousel.BeatmapSetsChanged = () => changed = true;
-                carousel.BeatmapSets = beatmapSets;
+                carouselAdjust?.Invoke(c);
             });
 
             AddUntilStep("Wait for load", () => changed);
         }
 
-        private void createCarousel(List<BeatmapSetInfo> beatmapSets, Action<BeatmapCarousel> carouselAdjust = null, Container target = null)
+        private void createCarousel(List<BeatmapSetInfo> beatmapSets, [CanBeNull] Func<FilterCriteria> initialCriteria = null, Action<BeatmapCarousel> carouselAdjust = null, Container target = null)
         {
             AddStep("Create carousel", () =>
             {
                 selectedSets.Clear();
                 eagerSelectedIDs.Clear();
 
-                carousel = new TestBeatmapCarousel
+                carousel = new TestBeatmapCarousel(initialCriteria?.Invoke() ?? new FilterCriteria())
                 {
                     RelativeSizeAxes = Axes.Both,
                 };
@@ -1389,8 +1387,8 @@ namespace osu.Game.Tests.Visual.SongSelect
 
         private partial class TestBeatmapCarousel : BeatmapCarousel
         {
-            public TestBeatmapCarousel()
-                : base(new FilterCriteria())
+            public TestBeatmapCarousel(FilterCriteria criteria)
+                : base(criteria)
             {
             }
 
