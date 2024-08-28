@@ -648,6 +648,49 @@ namespace osu.Game.Tests.Visual.Online
             AddUntilStep("Info message displayed", () => channelManager.CurrentChannel.Value.Messages.Last(), () => Is.InstanceOf(typeof(InfoMessage)));
         }
 
+        [Test]
+        public void TestAlternatingBackgroundDoesNotChange()
+        {
+            AddStep("show overlay with channel", () =>
+            {
+                for (int i = 0; i < Channel.MAX_HISTORY; i++)
+                {
+                    testChannel1.AddNewMessages(new Message
+                    {
+                        ChannelId = testChannel1.Id,
+                        Content = $"Message {i}",
+                        Timestamp = DateTimeOffset.Now,
+                        Sender = testUser,
+                    });
+                }
+
+                chatOverlay.Show();
+                channelManager.CurrentChannel.Value = channelManager.JoinChannel(testChannel1);
+            });
+
+            AddAssert("Overlay is visible", () => chatOverlay.State.Value == Visibility.Visible);
+            waitForChannel1Visible();
+
+            ChatLine lastLine = null;
+            bool lastLineAlternatingBackground = false;
+
+            AddStep("grab last line", () =>
+            {
+                lastLine = currentDrawableChannel.ChildrenOfType<ChatLine>().Last();
+                lastLineAlternatingBackground = lastLine.AlternatingBackground;
+            });
+
+            AddStep("add another message", () => testChannel1.AddNewMessages(new Message
+            {
+                ChannelId = testChannel1.Id,
+                Content = $"One final message",
+                Timestamp = DateTimeOffset.Now,
+                Sender = testUser,
+            }));
+
+            AddAssert("second-last message has same background", () => lastLine.AlternatingBackground, () => Is.EqualTo(lastLineAlternatingBackground));
+        }
+
         private void joinTestChannel(int i)
         {
             AddStep($"Join test channel {i}", () => channelManager.JoinChannel(testChannels[i]));
