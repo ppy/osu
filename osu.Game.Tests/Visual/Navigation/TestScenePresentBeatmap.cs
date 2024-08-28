@@ -193,7 +193,7 @@ namespace osu.Game.Tests.Visual.Navigation
         {
             AddStep("present beatmap", () => Game.PresentBeatmap(getImport()));
 
-            AddUntilStep("wait for song select", () => Game.ScreenStack.CurrentScreen is Screens.Select.SongSelect songSelect && songSelect.IsLoaded);
+            AddUntilStep("wait for song select", () => Game.ScreenStack.CurrentScreen is Screens.Select.SongSelect songSelect && songSelect.BeatmapSetsLoaded);
             AddUntilStep("correct beatmap displayed", () => Game.Beatmap.Value.BeatmapSetInfo.OnlineID, () => Is.EqualTo(getImport().OnlineID));
             AddAssert("correct ruleset selected", () => Game.Ruleset.Value, () => Is.EqualTo(getImport().Beatmaps.First().Ruleset));
         }
@@ -203,7 +203,7 @@ namespace osu.Game.Tests.Visual.Navigation
             Predicate<BeatmapInfo> pred = b => b.OnlineID == importedID * 1024 + 2;
             AddStep("present difficulty", () => Game.PresentBeatmap(getImport(), pred));
 
-            AddUntilStep("wait for song select", () => Game.ScreenStack.CurrentScreen is Screens.Select.SongSelect songSelect && songSelect.IsLoaded);
+            AddUntilStep("wait for song select", () => Game.ScreenStack.CurrentScreen is Screens.Select.SongSelect songSelect && songSelect.BeatmapSetsLoaded);
             AddUntilStep("correct beatmap displayed", () => Game.Beatmap.Value.BeatmapInfo.OnlineID, () => Is.EqualTo(importedID * 1024 + 2));
             AddAssert("correct ruleset selected", () => Game.Ruleset.Value.OnlineID, () => Is.EqualTo(expectedRulesetOnlineID ?? getImport().Beatmaps.First().Ruleset.OnlineID));
         }
