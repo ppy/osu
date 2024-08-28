@@ -116,14 +116,11 @@ namespace osu.Game.Screens.Select
         [Resolved]
         private DetachedBeatmapStore? detachedBeatmapStore { get; set; }
 
-        private IBindableList<BeatmapSetInfo> detachedBeatmapSets = null!;
+        private IBindableList<BeatmapSetInfo>? detachedBeatmapSets;
 
         private readonly NoResultsPlaceholder noResultsPlaceholder;
 
         private IEnumerable<CarouselBeatmapSet> beatmapSets => root.Items.OfType<CarouselBeatmapSet>();
-
-        // todo: only used for testing, maybe remove.
-        private bool loadedTestBeatmaps;
 
         public IEnumerable<BeatmapSetInfo> BeatmapSets
         {
@@ -133,7 +130,6 @@ namespace osu.Game.Screens.Select
                 if (LoadState != LoadState.NotLoaded)
                     throw new InvalidOperationException("If not using a realm source, beatmap sets must be set before load.");
 
-                loadedTestBeatmaps = true;
                 detachedBeatmapSets = new BindableList<BeatmapSetInfo>(value);
                 Schedule(loadNewRoot);
             }
@@ -143,7 +139,7 @@ namespace osu.Game.Screens.Select
         {
             // Ensure no changes are made to the list while we are initialising items.
             // We'll catch up on changes via subscriptions anyway.
-            BeatmapSetInfo[] loadableSets = detachedBeatmapSets.ToArray();
+            BeatmapSetInfo[] loadableSets = detachedBeatmapSets!.ToArray();
 
             if (selectedBeatmapSet != null && !loadableSets.Contains(selectedBeatmapSet.BeatmapSet))
                 selectedBeatmapSet = null;
@@ -256,7 +252,7 @@ namespace osu.Game.Screens.Select
             RightClickScrollingEnabled.ValueChanged += enabled => Scroll.RightMouseScrollbar = enabled.NewValue;
             RightClickScrollingEnabled.TriggerChange();
 
-            if (!loadedTestBeatmaps && detachedBeatmapStore != null)
+            if (detachedBeatmapStore != null && detachedBeatmapSets == null)
             {
                 // This is performing an unnecessary second lookup on realm (in addition to the subscription), but for performance reasons
                 // we require it to be separate: the subscription's initial callback (with `ChangeSet` of `null`) will run on the update
@@ -279,10 +275,6 @@ namespace osu.Game.Screens.Select
 
         private void beatmapSetsChanged(object? beatmaps, NotifyCollectionChangedEventArgs changed)
         {
-            // If loading test beatmaps, avoid overwriting with realm subscription callbacks.
-            if (loadedTestBeatmaps)
-                return;
-
             IEnumerable<BeatmapSetInfo>? newBeatmapSets = changed.NewItems?.Cast<BeatmapSetInfo>();
 
             switch (changed.Action)
