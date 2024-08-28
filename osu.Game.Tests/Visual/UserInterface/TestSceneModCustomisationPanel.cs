@@ -58,19 +58,19 @@ namespace osu.Game.Tests.Visual.UserInterface
             {
                 SelectedMods.Value = new[] { new OsuModDoubleTime() };
                 panel.Enabled.Value = true;
-                panel.ExpandedState.Value = ModCustomisationPanel.ModCustomisationPanelState.Expanded;
+                panel.ExpandedState.Value = ModCustomisationPanel.ModCustomisationPanelState.ExpandedByMod;
             });
             AddStep("set DA", () =>
             {
                 SelectedMods.Value = new Mod[] { new OsuModDifficultyAdjust() };
                 panel.Enabled.Value = true;
-                panel.ExpandedState.Value = ModCustomisationPanel.ModCustomisationPanelState.Expanded;
+                panel.ExpandedState.Value = ModCustomisationPanel.ModCustomisationPanelState.ExpandedByMod;
             });
             AddStep("set FL+WU+DA+AD", () =>
             {
                 SelectedMods.Value = new Mod[] { new OsuModFlashlight(), new ModWindUp(), new OsuModDifficultyAdjust(), new OsuModApproachDifferent() };
                 panel.Enabled.Value = true;
-                panel.ExpandedState.Value = ModCustomisationPanel.ModCustomisationPanelState.Expanded;
+                panel.ExpandedState.Value = ModCustomisationPanel.ModCustomisationPanelState.ExpandedByMod;
             });
             AddStep("set empty", () =>
             {

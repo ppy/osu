@@ -130,7 +130,7 @@ namespace osu.Game.Overlays.Mods
             if (Enabled.Value)
             {
                 if (!touchedThisFrame && panel.ExpandedState.Value == ModCustomisationPanelState.Collapsed)
-                    panel.ExpandedState.Value = ModCustomisationPanelState.ExpandedByHover;
+                    panel.ExpandedState.Value = ModCustomisationPanelState.Expanded;
             }
 
             return base.OnHover(e);
