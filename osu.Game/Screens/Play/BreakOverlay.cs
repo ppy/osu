@@ -144,12 +144,7 @@ namespace osu.Game.Screens.Play
         {
             base.Update();
 
-            if (currentPeriod.Value != null)
-            {
-                remainingTimeBox.Height = Math.Min(8, remainingTimeBox.DrawWidth);
-                remainingTimeCounter.X = -(remainingTimeForCurrentPeriod - 0.5f) * 30;
-                info.X = (remainingTimeForCurrentPeriod - 0.5f) * 30;
-            }
+            remainingTimeBox.Height = Math.Min(8, remainingTimeBox.DrawWidth);
         }
 
         protected override void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, ChannelAmplitudes amplitudes)
@@ -186,6 +181,12 @@ namespace osu.Game.Screens.Play
                 remainingTimeBox.ResizeWidthTo(remainingTimeForCurrentPeriod);
 
                 remainingTimeCounter.CountTo(b.Duration).CountTo(0, b.Duration);
+
+                remainingTimeCounter.MoveToX(-50)
+                                    .MoveToX(0, BREAK_FADE_DURATION, Easing.OutQuint);
+
+                info.MoveToX(50)
+                    .MoveToX(0, BREAK_FADE_DURATION, Easing.OutQuint);
 
                 using (BeginDelayedSequence(b.Duration - BREAK_FADE_DURATION))
                 {
