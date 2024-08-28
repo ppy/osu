@@ -84,25 +84,6 @@ namespace osu.Game.Overlays.Chat
             highlightedMessage.BindValueChanged(_ => processMessageHighlighting(), true);
         }
 
-        protected override void Update()
-        {
-            base.Update();
-
-            long? lastMinutes = null;
-
-            for (int i = 0; i < ChatLineFlow.Count; i++)
-            {
-                if (ChatLineFlow[i] is ChatLine chatline)
-                {
-                    long minutes = chatline.Message.Timestamp.ToUnixTimeSeconds() / 60;
-
-                    chatline.AlternatingBackground = i % 2 == 0;
-                    chatline.RequiresTimestamp = minutes != lastMinutes;
-                    lastMinutes = minutes;
-                }
-            }
-        }
-
         /// <summary>
         /// Processes any pending message in <see cref="highlightedMessage"/>.
         /// </summary>
@@ -149,13 +130,24 @@ namespace osu.Game.Overlays.Chat
             // Add up to last Channel.MAX_HISTORY messages
             var displayMessages = newMessages.Skip(Math.Max(0, newMessages.Count() - Channel.MAX_HISTORY));
 
-            Message lastMessage = chatLines.LastOrDefault()?.Message;
+            ChatLine lastLine = chatLines.LastOrDefault();
+            Message lastMessage = lastLine?.Message;
 
             foreach (var message in displayMessages)
             {
                 addDaySeparatorIfRequired(lastMessage, message);
 
-                ChatLineFlow.Add(CreateChatLine(message));
+                ChatLine line = CreateChatLine(message);
+
+                long minutes = line.Message.Timestamp.ToUnixTimeSeconds() / 60;
+                long? lastMinutes = lastLine?.Message.Timestamp.ToUnixTimeSeconds() / 60;
+
+                line.AlternatingBackground = !lastLine?.AlternatingBackground ?? false;
+                line.RequiresTimestamp = minutes != lastMinutes;
+
+                ChatLineFlow.Add(line);
+
+                lastLine = line;
                 lastMessage = message;
             }
 
