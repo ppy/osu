@@ -56,16 +56,20 @@ namespace osu.Game.Tests.Visual.SongSelect
         [BackgroundDependencyLoader]
         private void load(GameHost host, AudioManager audio)
         {
+            DetachedBeatmapStore detachedBeatmapStore;
+
             // These DI caches are required to ensure for interactive runs this test scene doesn't nuke all user beatmaps in the local install.
             // At a point we have isolated interactive test runs enough, this can likely be removed.
             Dependencies.Cache(rulesets = new RealmRulesetStore(Realm));
             Dependencies.Cache(Realm);
             Dependencies.Cache(manager = new BeatmapManager(LocalStorage, Realm, null, audio, Resources, host, defaultBeatmap = Beatmap.Default));
+            Dependencies.Cache(detachedBeatmapStore = new DetachedBeatmapStore());
 
             Dependencies.Cache(music = new MusicController());
 
             // required to get bindables attached
             Add(music);
+            Add(detachedBeatmapStore);
 
             Dependencies.Cache(config = new OsuConfigManager(LocalStorage));
         }

@@ -241,7 +241,7 @@ namespace osu.Game.Screens.Select
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config, AudioManager audio, CancellationToken cancellationToken)
+        private void load(OsuConfigManager config, AudioManager audio, CancellationToken? cancellationToken)
         {
             spinSample = audio.Samples.Get("SongSelect/random-spin");
             randomSelectSample = audio.Samples.Get(@"SongSelect/select-random");
@@ -252,12 +252,12 @@ namespace osu.Game.Screens.Select
             RightClickScrollingEnabled.ValueChanged += enabled => Scroll.RightMouseScrollbar = enabled.NewValue;
             RightClickScrollingEnabled.TriggerChange();
 
-            if (!loadedTestBeatmaps)
+            if (!loadedTestBeatmaps && detachedBeatmapStore != null)
             {
                 // This is performing an unnecessary second lookup on realm (in addition to the subscription), but for performance reasons
                 // we require it to be separate: the subscription's initial callback (with `ChangeSet` of `null`) will run on the update
                 // thread. If we attempt to detach beatmaps in this callback the game will fall over (it takes time).
-                detachedBeatmapSets = detachedBeatmapStore!.GetDetachedBeatmaps(cancellationToken);
+                detachedBeatmapSets = detachedBeatmapStore.GetDetachedBeatmaps(cancellationToken);
                 detachedBeatmapSets.BindCollectionChanged(beatmapSetsChanged);
                 loadBeatmapSets(detachedBeatmapSets);
             }
