@@ -89,41 +89,33 @@ namespace osu.Game.Screens.Play
                             },
                         }
                     },
-                    new ParallaxContainer
+                    remainingTimeAdjustmentBox = new Container
                     {
-                        RelativeSizeAxes = Axes.Both,
-                        ParallaxAmount = -0.008f,
-                        Children = new Drawable[]
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        AutoSizeAxes = Axes.Y,
+                        RelativeSizeAxes = Axes.X,
+                        Width = 0,
+                        Child = remainingTimeBox = new Circle
                         {
-                            remainingTimeAdjustmentBox = new Container
-                            {
-                                Anchor = Anchor.Centre,
-                                Origin = Anchor.Centre,
-                                AutoSizeAxes = Axes.Y,
-                                RelativeSizeAxes = Axes.X,
-                                Width = 0,
-                                Child = remainingTimeBox = new Circle
-                                {
-                                    Anchor = Anchor.Centre,
-                                    Origin = Anchor.Centre,
-                                    RelativeSizeAxes = Axes.X,
-                                    Height = 8,
-                                    Masking = true,
-                                }
-                            },
-                            remainingTimeCounter = new RemainingTimeCounter
-                            {
-                                Anchor = Anchor.Centre,
-                                Origin = Anchor.BottomCentre,
-                                Y = -vertical_margin,
-                            },
-                            info = new BreakInfo
-                            {
-                                Anchor = Anchor.Centre,
-                                Origin = Anchor.TopCentre,
-                                Y = vertical_margin,
-                            },
-                        },
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            RelativeSizeAxes = Axes.X,
+                            Height = 8,
+                            Masking = true,
+                        }
+                    },
+                    remainingTimeCounter = new RemainingTimeCounter
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.BottomCentre,
+                        Y = -vertical_margin,
+                    },
+                    info = new BreakInfo
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.TopCentre,
+                        Y = vertical_margin,
                     },
                     breakArrows = new BreakArrows
                     {
