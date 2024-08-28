@@ -246,7 +246,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             createSongSelect();
 
-            AddAssert("filter count is 1", () => songSelect?.FilterCount == 1);
+            AddAssert("filter count is 0", () => songSelect?.FilterCount, () => Is.EqualTo(0));
         }
 
         [Test]
@@ -366,7 +366,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             AddStep("return", () => songSelect!.MakeCurrent());
             AddUntilStep("wait for current", () => songSelect!.IsCurrentScreen());
-            AddAssert("filter count is 1", () => songSelect!.FilterCount == 1);
+            AddAssert("filter count is 0", () => songSelect!.FilterCount, () => Is.EqualTo(0));
         }
 
         [Test]
@@ -386,7 +386,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             AddStep("return", () => songSelect!.MakeCurrent());
             AddUntilStep("wait for current", () => songSelect!.IsCurrentScreen());
-            AddAssert("filter count is 2", () => songSelect!.FilterCount == 2);
+            AddAssert("filter count is 1", () => songSelect!.FilterCount, () => Is.EqualTo(1));
         }
 
         [Test]
@@ -1274,11 +1274,11 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             // Mod that is guaranteed to never re-filter.
             AddStep("add non-filterable mod", () => SelectedMods.Value = new Mod[] { new OsuModCinema() });
-            AddAssert("filter count is 1", () => songSelect!.FilterCount, () => Is.EqualTo(1));
+            AddAssert("filter count is 0", () => songSelect!.FilterCount, () => Is.EqualTo(0));
 
             // Removing the mod should still not re-filter.
             AddStep("remove non-filterable mod", () => SelectedMods.Value = Array.Empty<Mod>());
-            AddAssert("filter count is 1", () => songSelect!.FilterCount, () => Is.EqualTo(1));
+            AddAssert("filter count is 0", () => songSelect!.FilterCount, () => Is.EqualTo(0));
         }
 
         [Test]
@@ -1290,35 +1290,35 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             // Change to mania ruleset.
             AddStep("filter to mania ruleset", () => Ruleset.Value = rulesets.AvailableRulesets.First(r => r.OnlineID == 3));
-            AddAssert("filter count is 2", () => songSelect!.FilterCount, () => Is.EqualTo(2));
+            AddAssert("filter count is 2", () => songSelect!.FilterCount, () => Is.EqualTo(1));
 
             // Apply a mod, but this should NOT re-filter because there's no search text.
             AddStep("add filterable mod", () => SelectedMods.Value = new Mod[] { new ManiaModKey3() });
-            AddAssert("filter count is 2", () => songSelect!.FilterCount, () => Is.EqualTo(2));
+            AddAssert("filter count is 1", () => songSelect!.FilterCount, () => Is.EqualTo(1));
 
             // Set search text. Should re-filter.
             AddStep("set search text to match mods", () => songSelect!.FilterControl.CurrentTextSearch.Value = "keys=3");
-            AddAssert("filter count is 3", () => songSelect!.FilterCount, () => Is.EqualTo(3));
+            AddAssert("filter count is 2", () => songSelect!.FilterCount, () => Is.EqualTo(2));
 
             // Change filterable mod. Should re-filter.
             AddStep("change new filterable mod", () => SelectedMods.Value = new Mod[] { new ManiaModKey5() });
-            AddAssert("filter count is 4", () => songSelect!.FilterCount, () => Is.EqualTo(4));
+            AddAssert("filter count is 3", () => songSelect!.FilterCount, () => Is.EqualTo(3));
 
             // Add non-filterable mod. Should NOT re-filter.
             AddStep("apply non-filterable mod", () => SelectedMods.Value = new Mod[] { new ManiaModNoFail(), new ManiaModKey5() });
-            AddAssert("filter count is 4", () => songSelect!.FilterCount, () => Is.EqualTo(4));
+            AddAssert("filter count is 3", () => songSelect!.FilterCount, () => Is.EqualTo(3));
 
             // Remove filterable mod. Should re-filter.
             AddStep("remove filterable mod", () => SelectedMods.Value = new Mod[] { new ManiaModNoFail() });
-            AddAssert("filter count is 5", () => songSelect!.FilterCount, () => Is.EqualTo(5));
+            AddAssert("filter count is 4", () => songSelect!.FilterCount, () => Is.EqualTo(4));
 
             // Remove non-filterable mod. Should NOT re-filter.
             AddStep("remove filterable mod", () => SelectedMods.Value = Array.Empty<Mod>());
-            AddAssert("filter count is 5", () => songSelect!.FilterCount, () => Is.EqualTo(5));
+            AddAssert("filter count is 4", () => songSelect!.FilterCount, () => Is.EqualTo(4));
 
             // Add filterable mod. Should re-filter.
             AddStep("add filterable mod", () => SelectedMods.Value = new Mod[] { new ManiaModKey3() });
-            AddAssert("filter count is 6", () => songSelect!.FilterCount, () => Is.EqualTo(6));
+            AddAssert("filter count is 5", () => songSelect!.FilterCount, () => Is.EqualTo(5));
         }
 
         private void waitForInitialSelection()
