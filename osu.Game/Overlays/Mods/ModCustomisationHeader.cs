@@ -112,20 +112,6 @@ namespace osu.Game.Overlays.Mods
             }, true);
         }
 
-        protected override bool OnClick(ClickEvent e)
-        {
-            if (Enabled.Value)
-            {
-                ExpandedState.Value = ExpandedState.Value switch
-                {
-                    ModCustomisationPanelState.Collapsed => ModCustomisationPanelState.Expanded,
-                    _ => ModCustomisationPanelState.Collapsed
-                };
-            }
-
-            return base.OnClick(e);
-        }
-
         private bool touchedThisFrame;
 
         protected override bool OnTouchDown(TouchDownEvent e)
