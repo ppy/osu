@@ -700,12 +700,12 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        public void Filter(FilterCriteria? newCriteria, bool debounce = true)
+        public void Filter(FilterCriteria? newCriteria)
         {
             if (newCriteria != null)
                 activeCriteria = newCriteria;
 
-            applyActiveCriteria(debounce);
+            applyActiveCriteria(true);
         }
 
         private bool beatmapsSplitOut;

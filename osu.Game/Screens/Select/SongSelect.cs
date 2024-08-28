@@ -328,7 +328,7 @@ namespace osu.Game.Screens.Select
                 GetRecommendedBeatmap = s => recommender?.GetRecommendedBeatmap(s),
             }, c => carouselContainer.Child = c);
 
-            FilterControl.FilterChanged = ApplyFilterToCarousel;
+            FilterControl.FilterChanged = Carousel.Filter;
 
             if (ShowSongSelectFooter)
             {
@@ -402,14 +402,6 @@ namespace osu.Game.Screens.Select
         };
 
         protected virtual ModSelectOverlay CreateModSelectOverlay() => new SoloModSelectOverlay();
-
-        protected virtual void ApplyFilterToCarousel(FilterCriteria criteria)
-        {
-            // if not the current screen, we want to get carousel in a good presentation state before displaying (resume or enter).
-            bool shouldDebounce = this.IsCurrentScreen();
-
-            Carousel.Filter(criteria, shouldDebounce);
-        }
 
         private DependencyContainer dependencies = null!;
 

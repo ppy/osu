@@ -1397,8 +1397,6 @@ namespace osu.Game.Tests.Visual.SongSelect
         {
             public Action? StartRequested;
 
-            public new Bindable<RulesetInfo> Ruleset => base.Ruleset;
-
             public new FilterControl FilterControl => base.FilterControl;
 
             public WorkingBeatmap CurrentBeatmap => Beatmap.Value;
@@ -1408,18 +1406,18 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             public new void PresentScore(ScoreInfo score) => base.PresentScore(score);
 
+            public int FilterCount;
+
             protected override bool OnStart()
             {
                 StartRequested?.Invoke();
                 return base.OnStart();
             }
 
-            public int FilterCount;
-
-            protected override void ApplyFilterToCarousel(FilterCriteria criteria)
+            [BackgroundDependencyLoader]
+            private void load()
             {
-                FilterCount++;
-                base.ApplyFilterToCarousel(criteria);
+                FilterControl.FilterChanged += _ => FilterCount++;
             }
         }
     }
