@@ -7,7 +7,6 @@ using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using Realms;
 
@@ -24,11 +23,9 @@ namespace osu.Game.Database
         [Resolved]
         private RealmAccess realm { get; set; } = null!;
 
-        public IBindableList<BeatmapSetInfo> GetDetachedBeatmaps()
+        public IBindableList<BeatmapSetInfo> GetDetachedBeatmaps(CancellationToken cancellationToken)
         {
-            if (!loaded.Wait(60000))
-                Logger.Error(new TimeoutException("Beatmaps did not load in an acceptable time"), $"{nameof(DetachedBeatmapStore)} fell over");
-
+            loaded.Wait(cancellationToken);
             return detachedBeatmapSets.GetBoundCopy();
         }
 
@@ -75,6 +72,7 @@ namespace osu.Game.Database
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
+            loaded.Set();
             realmSubscription?.Dispose();
         }
 
