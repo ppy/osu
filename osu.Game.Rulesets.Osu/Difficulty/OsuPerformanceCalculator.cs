@@ -101,8 +101,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 + cognitionValue) * multiplier;
 
             // Fancy stuff for better visual display of FL pp
-            double flashlightPortion = Math.Pow(flashlightValue, flPower) / Math.Pow(flashlightARValue, flPower);
-            double flashlightARPortion = flashlightARValue / (flashlightARValue + readingHDValue);
+            double flashlightPortion = flashlightARValue > 0 ? Math.Pow(flashlightValue, flPower) / Math.Pow(flashlightARValue, flPower) : 0;
+            double flashlightARPortion = flashlightARValue > 0 ? flashlightARValue / (flashlightARValue + readingHDValue) : 0;
 
             // Filter reading difficulty out of FL
             double visualFlashlightValue = cognitionValue * flashlightARPortion * flashlightPortion;
