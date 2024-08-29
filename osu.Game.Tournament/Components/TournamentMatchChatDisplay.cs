@@ -83,20 +83,24 @@ namespace osu.Game.Tournament.Components
         protected override ChatLine CreateMessage(Message message)
         {
             var currentMatch = ladderInfo.CurrentMatch;
+            bool isCommand = false;
+
             // Try to recognize and verify bot commmands
-            bool isCommand = message.Content[0] == '[' && message.Content[1] == '*' && message.Content[2] == ']';
-            // TODO: What if CurrentMatch is null?
-            // Automatically block duplicate messages, since we have multiple chat displays available.
-            if (currentMatch.Value != null && currentMatch.Value.Round.Value != null
-                && ((currentMatch.Value.Round.Value.RefereeId.Value != null
-                && currentMatch.Value.Round.Value.RefereeId.Value != 0
-                && message.SenderId == currentMatch.Value.Round.Value.RefereeId.Value)
-                || currentMatch.Value.Round.Value.TrustAll.Value)
-                && isCommand && !currentMatch.Value.PendingMsgs.Any(p => p == message.Content))
+            if (currentMatch.Value != null && currentMatch.Value.Round.Value != null)
             {
-                currentMatch.Value.PendingMsgs.Add(message.Content);
+                isCommand = message.Content[0] == '[' && message.Content[1] == '*' && message.Content[2] == ']';
+                bool isRef = currentMatch.Value.Round.Value.RefereeId.Value != null
+                    && currentMatch.Value.Round.Value.RefereeId.Value != 0
+                    && message.SenderId == currentMatch.Value.Round.Value.RefereeId.Value;
+                // Automatically block duplicate messages, since we have multiple chat displays available.
+                if ((isRef || currentMatch.Value.Round.Value.TrustAll.Value)
+                    && isCommand && !currentMatch.Value.PendingMsgs.Any(p => p == message.Content))
+                {
+                    currentMatch.Value.PendingMsgs.Add(message.Content);
+                }
             }
-            return new MatchMessage(message, ladderInfo);
+
+            return new MatchMessage(message, ladderInfo, isCommand);
         }
 
         protected override StandAloneDrawableChannel CreateDrawableChannel(Channel channel) => new MatchChannel(channel);
@@ -112,11 +116,12 @@ namespace osu.Game.Tournament.Components
 
         protected partial class MatchMessage : StandAloneMessage
         {
-            public MatchMessage(Message message, LadderInfo info)
+            public MatchMessage(Message message, LadderInfo info, bool isCommand)
                 : base(message)
             {
                 // Disable line background alternating, see https://github.com/ppy/osu/pull/29137
                 AlternatingBackground = false;
+                IsStrong = isCommand;
 
                 if (info.CurrentMatch.Value is TournamentMatch match)
                 {
