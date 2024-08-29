@@ -84,34 +84,45 @@ namespace osu.Game.Input.Bindings
 
         public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e) => handler?.OnReleased(e);
 
-        private static IEnumerable<KeyBinding> globalKeyBindings => new[]
+        private static IEnumerable<KeyBinding> globalKeyBindings
         {
-            new KeyBinding(InputKey.Up, GlobalAction.SelectPrevious),
-            new KeyBinding(InputKey.Down, GlobalAction.SelectNext),
+            get
+            {
+                KeyBinding[] bindings = new[]
+                {
+                    new KeyBinding(InputKey.Up, GlobalAction.SelectPrevious),
+                    new KeyBinding(InputKey.Down, GlobalAction.SelectNext),
 
-            new KeyBinding(InputKey.Left, GlobalAction.SelectPreviousGroup),
-            new KeyBinding(InputKey.Right, GlobalAction.SelectNextGroup),
+                    new KeyBinding(InputKey.Left, GlobalAction.SelectPreviousGroup),
+                    new KeyBinding(InputKey.Right, GlobalAction.SelectNextGroup),
 
-            new KeyBinding(InputKey.Space, GlobalAction.Select),
-            new KeyBinding(InputKey.Enter, GlobalAction.Select),
-            new KeyBinding(InputKey.KeypadEnter, GlobalAction.Select),
+                    new KeyBinding(InputKey.Space, GlobalAction.Select),
+                    new KeyBinding(InputKey.Enter, GlobalAction.Select),
+                    new KeyBinding(InputKey.KeypadEnter, GlobalAction.Select),
 
-            new KeyBinding(InputKey.Escape, GlobalAction.Back),
-            new KeyBinding(InputKey.ExtraMouseButton1, GlobalAction.Back),
+                    new KeyBinding(InputKey.Escape, GlobalAction.Back),
+                    new KeyBinding(InputKey.ExtraMouseButton1, GlobalAction.Back),
 
-            new KeyBinding(new[] { InputKey.Alt, InputKey.Home }, GlobalAction.Home),
+                    new KeyBinding(new[] { InputKey.Alt, InputKey.Home }, GlobalAction.Home),
 
-            new KeyBinding(new[] { InputKey.Control, InputKey.Shift, InputKey.F }, GlobalAction.ToggleFPSDisplay),
-            new KeyBinding(new[] { InputKey.Control, InputKey.T }, GlobalAction.ToggleToolbar),
-            new KeyBinding(new[] { InputKey.Control, InputKey.Shift, InputKey.S }, GlobalAction.ToggleSkinEditor),
+                    new KeyBinding(new[] { InputKey.Control, InputKey.Shift, InputKey.F }, GlobalAction.ToggleFPSDisplay),
+                    new KeyBinding(new[] { InputKey.Control, InputKey.T }, GlobalAction.ToggleToolbar),
+                    new KeyBinding(new[] { InputKey.Control, InputKey.Shift, InputKey.S }, GlobalAction.ToggleSkinEditor),
 
-            new KeyBinding(new[] { InputKey.Control, InputKey.Alt, InputKey.R }, GlobalAction.ResetInputSettings),
+                    new KeyBinding(new[] { InputKey.Control, InputKey.Alt, InputKey.R }, GlobalAction.ResetInputSettings),
 
-            new KeyBinding(new[] { InputKey.Control, InputKey.Shift, InputKey.R }, GlobalAction.RandomSkin),
+                    new KeyBinding(new[] { InputKey.Control, InputKey.Shift, InputKey.R }, GlobalAction.RandomSkin),
 
-            new KeyBinding(InputKey.F10, GlobalAction.ToggleGameplayMouseButtons),
-            new KeyBinding(InputKey.F12, GlobalAction.TakeScreenshot),
-        };
+                    new KeyBinding(InputKey.F10, GlobalAction.ToggleGameplayMouseButtons),
+                    new KeyBinding(InputKey.F12, GlobalAction.TakeScreenshot),
+                };
+
+                if (OperatingSystem.IsWindows())
+                    return bindings.Append(new KeyBinding(InputKey.Insert, GlobalAction.BossKey));
+
+                return bindings;
+            }
+        }
 
         private static IEnumerable<KeyBinding> overlayKeyBindings => new[]
         {
@@ -456,6 +467,9 @@ namespace osu.Game.Input.Bindings
 
         [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.EditorTestPlayQuickExitToCurrentTime))]
         EditorTestPlayQuickExitToCurrentTime,
+
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.BossKey))]
+        BossKey,
     }
 
     public enum GlobalActionCategory
