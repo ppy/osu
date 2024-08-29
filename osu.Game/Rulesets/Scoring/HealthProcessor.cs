@@ -4,6 +4,7 @@
 using osu.Framework.Bindables;
 using osu.Framework.Utils;
 using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Rulesets.Scoring
 {
@@ -22,6 +23,24 @@ namespace osu.Game.Rulesets.Scoring
                 return;
 
             Health.Value += GetHealthIncreaseFor(result);
+
+            if (CheckDefaultFailCondition(result))
+            {
+                bool allowFail = false;
+
+                for (int i = 0; i < Mods.Value.Count; i++)
+                {
+                    if (Mods.Value[i] is IBlockFail blockMod)
+                    {
+                        // Intentionally does not early return so that all mods have a chance to update internal states (e.g. ModEasyWithExtraLives).
+                        allowFail |= blockMod.AllowFail();
+                        break;
+                    }
+                }
+
+                if (allowFail)
+                    TriggerFailure(false);
+            }
         }
 
         protected override void RevertResultInternal(JudgementResult result)
@@ -36,7 +55,7 @@ namespace osu.Game.Rulesets.Scoring
         /// <returns>The health increase.</returns>
         protected virtual double GetHealthIncreaseFor(JudgementResult result) => result.HealthIncrease;
 
-        protected override bool CheckDefaultFailCondition(JudgementResult result) => Precision.AlmostBigger(Health.MinValue, Health.Value);
+        protected virtual bool CheckDefaultFailCondition(JudgementResult result) => Precision.AlmostBigger(Health.MinValue, Health.Value);
 
         protected override void Reset(bool storeResults)
         {

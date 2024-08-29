@@ -254,6 +254,21 @@ namespace osu.Game.Rulesets.Scoring
 
                 updateScore();
             }
+
+            bool hasForcedFail = false;
+            bool forcedRestartOnFail = false;
+
+            for (int i = 0; i < Mods.Value.Count; i++)
+            {
+                if (Mods.Value[i] is IForceFail failMod && failMod.ShouldFail(result))
+                {
+                    hasForcedFail = true;
+                    forcedRestartOnFail = failMod.RestartOnFail;
+                }
+            }
+
+            if (hasForcedFail)
+                TriggerFailure(forcedRestartOnFail);
         }
 
         /// <summary>

@@ -94,7 +94,6 @@ namespace osu.Game.Rulesets.Scoring
             lastAppliedResult = result;
 
             ApplyResultInternal(result);
-            checkFailConditions(result);
 
             NewJudgement?.Invoke(result);
         }
@@ -126,54 +125,13 @@ namespace osu.Game.Rulesets.Scoring
         /// <param name="result">The judgement scoring result.</param>
         protected abstract void RevertResultInternal(JudgementResult result);
 
-        private void checkFailConditions(JudgementResult result)
+        protected void TriggerFailure(bool restart)
         {
             if (HasFailed)
                 return;
 
-            if (!meetsAnyFailCondition(result, out bool restart))
-                return;
-
             if (Failed?.Invoke(restart) != false)
                 HasFailed = true;
-        }
-
-        /// <summary>
-        /// Whether the current state of <see cref="HealthProcessor"/> or the provided <paramref name="result"/> meets any fail condition.
-        /// </summary>
-        /// <param name="result">The judgement result.</param>
-        /// <param name="restart">Whether a restart should be triggered as a result of the fail.</param>
-        private bool meetsAnyFailCondition(JudgementResult result, out bool restart)
-        {
-            bool hasDefaultFail = CheckDefaultFailCondition(result);
-            bool allowDefaultFail = false;
-
-            bool hasForcedFail = false;
-            bool forcedRestartOnFail = false;
-
-            for (int i = 0; i < Mods.Value.Count; i++)
-            {
-                switch (Mods.Value[i])
-                {
-                    case IBlockFail blockFailMod:
-                        // This is intentionally not de-duping so that all mods have a chance to update internal states (e.g. ModEasyWithExtraLives).
-                        if (hasDefaultFail)
-                            allowDefaultFail |= blockFailMod.AllowFail();
-                        break;
-
-                    case IForceFail failMod:
-                        if (failMod.ShouldFail(result))
-                        {
-                            hasForcedFail = true;
-                            forcedRestartOnFail = failMod.RestartOnFail;
-                        }
-
-                        break;
-                }
-            }
-
-            restart = forcedRestartOnFail;
-            return hasForcedFail || (hasDefaultFail && allowDefaultFail);
         }
 
         /// <summary>
@@ -278,12 +236,6 @@ namespace osu.Game.Rulesets.Scoring
                     // Last applied result is guaranteed to be non-null when JudgedHits > 0.
                     || lastAppliedResult.AsNonNull().TimeAbsolute < Clock.CurrentTime);
         }
-
-        /// <summary>
-        /// Checks whether the default conditions for failing are met.
-        /// </summary>
-        /// <returns><see langword="true"/> if failure should be invoked.</returns>
-        protected virtual bool CheckDefaultFailCondition(JudgementResult result) => false;
     }
 
     /// <summary>
