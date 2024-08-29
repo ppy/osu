@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -20,6 +21,8 @@ namespace osu.Game.Database
         private readonly BindableList<BeatmapSetInfo> detachedBeatmapSets = new BindableList<BeatmapSetInfo>();
 
         private IDisposable? realmSubscription;
+
+        private readonly Queue<OperationArgs> pendingOperations = new Queue<OperationArgs>();
 
         [Resolved]
         private RealmAccess realm { get; set; } = null!;
@@ -70,37 +73,61 @@ namespace osu.Game.Database
             }
 
             foreach (int i in changes.DeletedIndices.OrderDescending())
-                removeAt(i);
+            {
+                pendingOperations.Enqueue(new OperationArgs
+                {
+                    Type = OperationType.Remove,
+                    Index = i,
+                });
+            }
 
             foreach (int i in changes.InsertedIndices)
-                insert(sender[i].Detach(), i);
+            {
+                pendingOperations.Enqueue(new OperationArgs
+                {
+                    Type = OperationType.Insert,
+                    BeatmapSet = sender[i].Detach(),
+                    Index = i,
+                });
+            }
 
             foreach (int i in changes.NewModifiedIndices)
-                replaceRange(sender[i].Detach(), i);
+            {
+                pendingOperations.Enqueue(new OperationArgs
+                {
+                    Type = OperationType.Update,
+                    BeatmapSet = sender[i].Detach(),
+                    Index = i,
+                });
+            }
         }
 
-        private void replaceRange(BeatmapSetInfo set, int i)
+        protected override void Update()
         {
-            if (loaded.IsSet)
-                detachedBeatmapSets.ReplaceRange(i, 1, new[] { set });
-            else
-                Schedule(() => { detachedBeatmapSets.ReplaceRange(i, 1, new[] { set }); });
-        }
+            base.Update();
 
-        private void insert(BeatmapSetInfo set, int i)
-        {
-            if (loaded.IsSet)
-                detachedBeatmapSets.Insert(i, set);
-            else
-                Schedule(() => { detachedBeatmapSets.Insert(i, set); });
-        }
+            // We can't start processing operations until we have finished detaching the initial list.
+            if (!loaded.IsSet)
+                return;
 
-        private void removeAt(int i)
-        {
-            if (loaded.IsSet)
-                detachedBeatmapSets.RemoveAt(i);
-            else
-                Schedule(() => { detachedBeatmapSets.RemoveAt(i); });
+            // If this ever leads to performance issues, we could dequeue a limited number of operations per update frame.
+            while (pendingOperations.TryDequeue(out var op))
+            {
+                switch (op.Type)
+                {
+                    case OperationType.Insert:
+                        detachedBeatmapSets.Insert(op.Index, op.BeatmapSet!);
+                        break;
+
+                    case OperationType.Update:
+                        detachedBeatmapSets.ReplaceRange(op.Index, 1, new[] { op.BeatmapSet! });
+                        break;
+
+                    case OperationType.Remove:
+                        detachedBeatmapSets.RemoveAt(op.Index);
+                        break;
+                }
+            }
         }
 
         protected override void Dispose(bool isDisposing)
@@ -108,6 +135,20 @@ namespace osu.Game.Database
             base.Dispose(isDisposing);
             loaded.Set();
             realmSubscription?.Dispose();
+        }
+
+        private record OperationArgs
+        {
+            public OperationType Type;
+            public BeatmapSetInfo? BeatmapSet;
+            public int Index;
+        }
+
+        private enum OperationType
+        {
+            Insert,
+            Update,
+            Remove
         }
     }
 }
