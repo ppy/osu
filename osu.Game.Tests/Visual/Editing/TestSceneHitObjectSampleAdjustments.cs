@@ -332,15 +332,6 @@ namespace osu.Game.Tests.Visual.Editing
                 });
             });
 
-            clickNodeSamplePiece(0, 0);
-            editorTimeIs(0);
-            clickNodeSamplePiece(0, 1);
-            editorTimeIs(813);
-            clickNodeSamplePiece(0, 2);
-            editorTimeIs(1627);
-            clickSamplePiece(0);
-            editorTimeIs(406);
-
             seekSamplePiece(-1);
             editorTimeIs(0);
             samplePopoverIsOpen();
@@ -692,11 +683,11 @@ namespace osu.Game.Tests.Visual.Editing
 
         private void seekSamplePiece(int direction) => AddStep($"seek sample piece {direction}", () =>
         {
+            InputManager.PressKey(Key.ControlLeft);
             InputManager.PressKey(Key.ShiftLeft);
-            InputManager.PressKey(Key.AltLeft);
             InputManager.Key(direction < 1 ? Key.Left : Key.Right);
-            InputManager.ReleaseKey(Key.AltLeft);
             InputManager.ReleaseKey(Key.ShiftLeft);
+            InputManager.ReleaseKey(Key.ControlLeft);
         });
 
         private void samplePopoverIsOpen() => AddUntilStep("sample popover is open", () =>
