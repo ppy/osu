@@ -254,5 +254,7 @@ namespace osu.Game.Rulesets.Catch
 
             return adjustedDifficulty;
         }
+
+        public override bool EditorShowScrollSpeed => false;
     }
 }
