@@ -8,7 +8,7 @@ namespace osu.Game.Rulesets.Mods
     /// <summary>
     /// Interface for mods that block the player from failing.
     /// </summary>
-    public interface IBlockFail
+    public interface IBlockFail : IApplicableMod
     {
         /// <summary>
         /// Check if a fail should be allowed.

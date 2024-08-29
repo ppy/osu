@@ -8,7 +8,7 @@ namespace osu.Game.Rulesets.Mods
     /// <summary>
     /// Interface for mods that force the player to fail.
     /// </summary>
-    public interface IForceFail
+    public interface IForceFail : IApplicableMod
     {
         /// <summary>
         /// Whether to restart on fail.
