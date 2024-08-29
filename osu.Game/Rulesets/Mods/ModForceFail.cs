@@ -8,7 +8,7 @@ using osu.Game.Rulesets.Judgements;
 
 namespace osu.Game.Rulesets.Mods
 {
-    public abstract class ModFailCondition : Mod, IApplicableFailOverride
+    public abstract class ModForceFail : Mod, IForceFail
     {
         public override Type[] IncompatibleMods => new[] { typeof(ModNoFail), typeof(ModCinema) };
 
@@ -17,6 +17,6 @@ namespace osu.Game.Rulesets.Mods
 
         public virtual bool RestartOnFail => Restart.Value;
 
-        public abstract FailState CheckFail(JudgementResult result);
+        public abstract bool ShouldFail(JudgementResult result);
     }
 }

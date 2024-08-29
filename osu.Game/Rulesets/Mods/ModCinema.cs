@@ -6,7 +6,6 @@ using System.Linq;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Graphics;
-using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Play;
@@ -24,14 +23,14 @@ namespace osu.Game.Rulesets.Mods
         }
     }
 
-    public class ModCinema : ModAutoplay, IApplicableToHUD, IApplicableToPlayer, IApplicableFailOverride
+    public class ModCinema : ModAutoplay, IApplicableToHUD, IApplicableToPlayer, IBlockFail
     {
         public override string Name => "Cinema";
         public override string Acronym => "CN";
         public override IconUsage? Icon => OsuIcon.ModCinema;
         public override LocalisableString Description => "Watch the video without visual distractions.";
 
-        public override Type[] IncompatibleMods => base.IncompatibleMods.Concat(new[] { typeof(ModAutoplay), typeof(ModNoFail), typeof(ModFailCondition) }).ToArray();
+        public override Type[] IncompatibleMods => base.IncompatibleMods.Concat(new[] { typeof(ModAutoplay), typeof(ModNoFail), typeof(ModForceFail) }).ToArray();
 
         public void ApplyToHUD(HUDOverlay overlay)
         {
@@ -49,8 +48,6 @@ namespace osu.Game.Rulesets.Mods
             player.BreakOverlay.Hide();
         }
 
-        public bool RestartOnFail => false;
-
-        public FailState CheckFail(JudgementResult result) => FailState.Block;
+        public bool AllowFail() => false;
     }
 }

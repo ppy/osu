@@ -426,7 +426,7 @@ namespace osu.Game.Tests.Gameplay
             }
         }
 
-        private class ModFailOnResult : ModFailCondition
+        private class ModFailOnResult : ModForceFail
         {
             public override string Name => "";
             public override LocalisableString Description => "";
@@ -440,7 +440,7 @@ namespace osu.Game.Tests.Gameplay
                 this.type = type;
             }
 
-            public override FailState CheckFail(JudgementResult result) => result.Type == type ? FailState.Force : FailState.Allow;
+            public override bool ShouldFail(JudgementResult result) => result.Type == type;
         }
     }
 }

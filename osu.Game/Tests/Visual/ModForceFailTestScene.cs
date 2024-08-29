@@ -8,11 +8,11 @@ using osu.Game.Rulesets.Objects;
 
 namespace osu.Game.Tests.Visual
 {
-    public abstract partial class ModFailConditionTestScene : ModTestScene
+    public abstract partial class ModForceFailTestScene : ModTestScene
     {
-        private readonly ModFailCondition mod;
+        private readonly ModForceFail mod;
 
-        protected ModFailConditionTestScene(ModFailCondition mod)
+        protected ModForceFailTestScene(ModForceFail mod)
         {
             this.mod = mod;
         }

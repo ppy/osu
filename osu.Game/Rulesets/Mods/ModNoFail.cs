@@ -7,12 +7,11 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
-using osu.Game.Rulesets.Judgements;
 using osu.Game.Screens.Play;
 
 namespace osu.Game.Rulesets.Mods
 {
-    public abstract class ModNoFail : Mod, IApplicableFailOverride, IApplicableToHUD, IReadFromConfig
+    public abstract class ModNoFail : Mod, IBlockFail, IApplicableToHUD, IReadFromConfig
     {
         public override string Name => "No Fail";
         public override string Acronym => "NF";
@@ -20,17 +19,10 @@ namespace osu.Game.Rulesets.Mods
         public override ModType Type => ModType.DifficultyReduction;
         public override LocalisableString Description => "You can't fail, no matter what.";
         public override double ScoreMultiplier => 0.5;
-        public override Type[] IncompatibleMods => new[] { typeof(ModFailCondition), typeof(ModCinema) };
+        public override Type[] IncompatibleMods => new[] { typeof(ModForceFail), typeof(ModCinema) };
         public override bool Ranked => UsesDefaultConfiguration;
 
         private readonly Bindable<bool> showHealthBar = new Bindable<bool>();
-
-        public bool RestartOnFail => false;
-
-        /// <summary>
-        /// We never fail, 'yo.
-        /// </summary>
-        public FailState CheckFail(JudgementResult result) => FailState.Block;
 
         public void ReadFromConfig(OsuConfigManager config)
         {
@@ -41,5 +33,7 @@ namespace osu.Game.Rulesets.Mods
         {
             overlay.ShowHealthBar.BindTo(showHealthBar);
         }
+
+        public bool AllowFail() => false;
     }
 }

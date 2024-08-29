@@ -54,14 +54,14 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             // this test ensures that the game fails at exactly the first judgement, ModSuddenDeath does not ensure that as it doesn't take into account IgnoreMiss judgements.
             // to make the test work as desired, create a custom mod that fails on any applied judgement.
-            private class ModFailOnFirstJudgement : ModFailCondition
+            private class ModFailOnFirstJudgement : ModForceFail
             {
                 public override string Name => "";
                 public override LocalisableString Description => "";
                 public override double ScoreMultiplier => 1.0;
                 public override string Acronym => "";
 
-                public override FailState CheckFail(JudgementResult result) => FailState.Force;
+                public override bool ShouldFail(JudgementResult result) => true;
             }
         }
     }

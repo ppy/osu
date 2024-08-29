@@ -145,56 +145,35 @@ namespace osu.Game.Rulesets.Scoring
         /// <param name="restart">Whether a restart should be triggered as a result of the fail.</param>
         private bool meetsAnyFailCondition(JudgementResult result, out bool restart)
         {
-            bool hasFailed = CheckDefaultFailCondition(result);
+            bool hasDefaultFail = CheckDefaultFailCondition(result);
+            bool allowDefaultFail = false;
 
-            // Whether any mod has blocked the fail.
-            bool failBlocked = false;
-
-            // Whether any mod is forcing a fail.
-            bool failForced = false;
-
-            // Whether any mod allowing a fail wants to restart.
-            bool restartOnFail = false;
-
-            // Whether any mod forcing a fail wants to restart.
+            bool hasForcedFail = false;
             bool forcedRestartOnFail = false;
 
             for (int i = 0; i < Mods.Value.Count; i++)
             {
-                if (Mods.Value[i] is not IApplicableFailOverride failMod)
-                    continue;
-
-                switch (failMod.CheckFail(result))
+                switch (Mods.Value[i])
                 {
-                    case FailState.Block:
-                        failBlocked = true;
+                    case IBlockFail blockFailMod:
+                        // This is intentionally not de-duping so that all mods have a chance to update internal states (e.g. ModEasyWithExtraLives).
+                        if (hasDefaultFail)
+                            allowDefaultFail |= blockFailMod.AllowFail();
                         break;
 
-                    case FailState.Allow:
-                        restartOnFail |= failMod.RestartOnFail;
-                        break;
+                    case IForceFail failMod:
+                        if (failMod.ShouldFail(result))
+                        {
+                            hasForcedFail = true;
+                            forcedRestartOnFail = failMod.RestartOnFail;
+                        }
 
-                    case FailState.Force:
-                        forcedRestartOnFail |= failMod.RestartOnFail;
-                        failForced = true;
                         break;
                 }
             }
 
-            if (failForced)
-            {
-                restart = forcedRestartOnFail;
-                return true;
-            }
-
-            if (failBlocked)
-            {
-                restart = false;
-                return false;
-            }
-
-            restart = restartOnFail;
-            return hasFailed;
+            restart = forcedRestartOnFail;
+            return hasForcedFail || (hasDefaultFail && allowDefaultFail);
         }
 
         /// <summary>

@@ -7,12 +7,11 @@ using Humanizer;
 using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
-using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Mods
 {
-    public abstract class ModEasyWithExtraLives : ModEasy, IApplicableFailOverride, IApplicableToHealthProcessor
+    public abstract class ModEasyWithExtraLives : ModEasy, IBlockFail, IApplicableToHealthProcessor
     {
         [SettingSource("Extra Lives", "Number of extra lives")]
         public Bindable<int> Retries { get; } = new BindableInt(2)
@@ -34,22 +33,18 @@ namespace osu.Game.Rulesets.Mods
             retries = Retries.Value;
         }
 
-        public bool RestartOnFail => false;
-
-        public FailState CheckFail(JudgementResult result)
-        {
-            if (retries == 0)
-                return FailState.Allow;
-
-            health.Value = health.MaxValue;
-            retries--;
-
-            return FailState.Block;
-        }
-
         public void ApplyToHealthProcessor(HealthProcessor healthProcessor)
         {
             health.BindTo(healthProcessor.Health);
+        }
+
+        public bool AllowFail()
+        {
+            if (retries == 0)
+                return true;
+
+            retries--;
+            return false;
         }
     }
 }
