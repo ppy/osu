@@ -168,15 +168,18 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         }
         public override double DifficultyValue()
         {
+            // Coefs for curve similar to difficulty to performance curve
+            const double power = 3.0369, multiplier = 3.69656;
+
             // Simulating summing to get the most correct value possible
             double aimValue = Math.Sqrt(aimComponent.DifficultyValue()) * OsuDifficultyCalculator.DIFFICULTY_MULTIPLIER;
             double speedValue = Math.Sqrt(speedComponent.DifficultyValue()) * OsuDifficultyCalculator.DIFFICULTY_MULTIPLIER;
 
-            double aimPerformance = OsuStrainSkill.DifficultyToPerformance(aimValue);
-            double speedPerformance = OsuStrainSkill.DifficultyToPerformance(speedValue);
+            double aimPerformance = Math.Pow(aimValue, power) * multiplier;
+            double speedPerformance = Math.Pow(speedValue, power) * multiplier;
 
-            double power = OsuDifficultyCalculator.SUM_POWER;
-            double totalPerformance = Math.Pow(Math.Pow(aimPerformance, power) + Math.Pow(speedPerformance, power), 1.0 / power);
+            double sumPower = OsuDifficultyCalculator.SUM_POWER;
+            double totalPerformance = Math.Pow(Math.Pow(aimPerformance, sumPower) + Math.Pow(speedPerformance, sumPower), 1.0 / sumPower);
 
             // Length bonus is in SR to not inflate Star Rating of short AR11 maps
             double lengthBonus = OsuPerformanceCalculator.CalculateDefaultLengthBonus(objectsCount);
@@ -194,13 +197,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             totalPerformance *= Math.Pow(lengthBonus, lengthBonusPower);
 
-            double adjustedDifficulty = OsuStrainSkill.PerformanceToDifficulty(totalPerformance);
+            double adjustedDifficulty = Math.Pow(totalPerformance / multiplier, 1.0 / power);
             double difficultyValue = Math.Pow(adjustedDifficulty / OsuDifficultyCalculator.DIFFICULTY_MULTIPLIER, 2.0);
 
             // Sqrt value to make difficulty depend less on mechanical difficulty
             return skill_multiplier * Math.Pow(difficultyValue, MECHANICAL_PP_POWER);
         }
-
         public class HighARAimComponent : Aim
         {
             public HighARAimComponent(Mod[] mods)
