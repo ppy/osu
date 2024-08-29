@@ -43,7 +43,9 @@ namespace osu.Game.Rulesets.Mods
             if (retries == 0)
                 return true;
 
+            health.Value = health.MaxValue;
             retries--;
+
             return false;
         }
     }
