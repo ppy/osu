@@ -66,6 +66,10 @@ namespace osu.Game.Screens.Select
                 case "lastplayed":
                     return tryUpdateDateAgoRange(ref criteria.LastPlayed, op, value);
 
+                case "unplayed":
+                    criteria.LastPlayed.Max = DateTimeOffset.MinValue.AddDays(1);
+                    return true;
+
                 case "divisor":
                     return TryUpdateCriteriaRange(ref criteria.BeatDivisor, op, value, tryParseInt);
 
