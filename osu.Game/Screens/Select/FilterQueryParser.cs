@@ -67,7 +67,11 @@ namespace osu.Game.Screens.Select
                     return tryUpdateDateAgoRange(ref criteria.LastPlayed, op, value);
 
                 case "unplayed":
-                    criteria.LastPlayed.Max = DateTimeOffset.MinValue.AddDays(1);
+                    // Unplayed beatmaps are filtered on DateTimeOffset.MinValue.
+                    criteria.LastPlayed.Min = DateTimeOffset.MinValue;
+                    criteria.LastPlayed.Max = DateTimeOffset.MinValue;
+                    criteria.LastPlayed.IsLowerInclusive = true;
+                    criteria.LastPlayed.IsUpperInclusive = true;
                     return true;
 
                 case "divisor":
