@@ -100,12 +100,23 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 (Math.Pow(Math.Pow(mechanicalValue, power) + Math.Pow(accuracyValue, power), 1.0 / power)
                 + cognitionValue) * multiplier;
 
+            // Fancy stuff for better visual display of FL pp
+            double flashlightPortion = Math.Pow(flashlightValue, flPower) / Math.Pow(flashlightARValue, flPower);
+            double flashlightARPortion = flashlightARValue / (flashlightARValue + readingHDValue);
+
+            // Filter reading difficulty out of FL
+            double visualFlashlightValue = cognitionValue * flashlightARPortion * flashlightPortion;
+
+            // Calculate reading difficulty as there was no FL in the first place
+            double visualCognitionValue = AdjustCognitionPerformance(readingARValue + readingHDValue, mechanicalValue, potentialHiddenFlashlightValue);
+
             return new OsuPerformanceAttributes
             {
                 Aim = aimValue,
                 Speed = speedValue,
                 Accuracy = accuracyValue,
-                Cognition = cognitionValue,
+                Flashlight = visualFlashlightValue,
+                Cognition = visualCognitionValue,
                 EffectiveMissCount = effectiveMissCount,
                 Total = totalValue
             };

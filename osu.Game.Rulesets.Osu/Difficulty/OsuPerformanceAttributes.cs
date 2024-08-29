@@ -18,6 +18,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         [JsonProperty("accuracy")]
         public double Accuracy { get; set; }
 
+        [JsonProperty("flashlight")]
+        public double Flashlight { get; set; }
+
         [JsonProperty("cognition")]
         public double Cognition { get; set; }
 
