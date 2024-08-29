@@ -177,7 +177,6 @@ namespace osu.Game.Tests.Gameplay
             AddAssert("not failed", () => !processor.HasFailed);
             AddStep("apply miss hit result", () => processor.ApplyResult(new JudgementResult(beatmap.HitObjects[0], new Judgement()) { Type = HitResult.Miss }));
             AddAssert("failed", () => processor.HasFailed);
-            AddAssert("triggering mod is sudden death", () => processor.ModTriggeringFailure is OsuModSuddenDeath);
         }
 
         [TestCase(HitResult.Miss)]
@@ -202,10 +201,6 @@ namespace osu.Game.Tests.Gameplay
             AddStep($"apply {resultApplied.ToString().ToLowerInvariant()} hit result",
                 () => processor.ApplyResult(new JudgementResult(beatmap.HitObjects[0], new Judgement()) { Type = resultApplied }));
             AddAssert("failed", () => processor.HasFailed);
-
-            AddAssert("triggering mod is correct", () => resultApplied == HitResult.Meh
-                ? processor.ModTriggeringFailure is ModFailOnResult
-                : processor.ModTriggeringFailure is OsuModSuddenDeath);
         }
 
         [Test]
@@ -228,9 +223,6 @@ namespace osu.Game.Tests.Gameplay
 
             AddStep("apply miss hit result", () => processor.ApplyResult(new JudgementResult(beatmap.HitObjects[0], new Judgement()) { Type = HitResult.Miss }));
             AddAssert("failed", () => processor.HasFailed);
-
-            // ensure that the processor always favours the mod with RestartOnFail = true when deciding which mod triggered the failure.
-            AddAssert("triggering mod has restart", () => processor.ModTriggeringFailure is IApplicableFailOverride fail && fail.RestartOnFail);
         }
 
         [Test]
