@@ -626,5 +626,16 @@ namespace osu.Game.Tests.NonVisual.Filtering
             Assert.AreEqual(true, filterCriteria.LastPlayed.HasFilter);
             Assert.AreEqual(DateTimeOffset.MinValue.AddMilliseconds(1), filterCriteria.LastPlayed.Min);
         }
+
+        [Test]
+        public void TestUnplayedQuery()
+        {
+            const string query = "unplayed=";
+            var filterCriteria = new FilterCriteria();
+            FilterQueryParser.ApplyQueries(filterCriteria, query);
+            Assert.AreEqual(true, filterCriteria.LastPlayed.HasFilter);
+            Assert.AreEqual(true, filterCriteria.LastPlayed.IsInRange(DateTimeOffset.MinValue));
+            Assert.AreEqual(false, filterCriteria.LastPlayed.IsInRange(DateTimeOffset.Now));
+        }
     }
 }
