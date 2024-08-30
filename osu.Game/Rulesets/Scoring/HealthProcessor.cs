@@ -26,14 +26,14 @@ namespace osu.Game.Rulesets.Scoring
 
             if (CheckDefaultFailCondition(result))
             {
-                bool allowFail = false;
+                bool allowFail = true;
 
                 for (int i = 0; i < Mods.Value.Count; i++)
                 {
                     if (Mods.Value[i] is IBlockFail blockMod)
                     {
                         // Intentionally does not early return so that all mods have a chance to update internal states (e.g. ModEasyWithExtraLives).
-                        allowFail |= blockMod.AllowFail();
+                        allowFail &= blockMod.AllowFail();
                         break;
                     }
                 }

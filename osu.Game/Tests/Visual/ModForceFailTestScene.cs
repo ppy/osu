@@ -40,12 +40,12 @@ namespace osu.Game.Tests.Visual
 
             protected override bool CheckModsAllowFailure() => true;
 
-            public bool CheckFailed(bool failed)
+            public bool CheckFailed(bool shouldHaveFailed)
             {
-                if (!failed)
+                if (!shouldHaveFailed)
                     return ScoreProcessor.HasCompleted.Value && !HealthProcessor.HasFailed;
 
-                return HealthProcessor.HasFailed;
+                return HealthProcessor.HasFailed || ScoreProcessor.HasFailed;
             }
         }
 
