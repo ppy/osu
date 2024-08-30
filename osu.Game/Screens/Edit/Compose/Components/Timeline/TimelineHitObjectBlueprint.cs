@@ -110,7 +110,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.TopCentre,
                     RelativePositionAxes = Axes.X,
-                    X = Item is IHasHitsoundTiming timed && !Precision.AlmostEquals(0, timed.Duration) ? (float)((timed.HitsoundTiming - Item.StartTime) / timed.Duration) : 0,
+                    X = Item is IHasHitsoundTiming timed ? (float)((timed.HitsoundTiming - Item.StartTime) / timed.Duration) : 0,
                     AlternativeColor = Item is IHasRepeats
                 },
                 sampleComponents = new Container
