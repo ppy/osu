@@ -683,7 +683,7 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("add another message", () => testChannel1.AddNewMessages(new Message
             {
                 ChannelId = testChannel1.Id,
-                Content = $"One final message",
+                Content = "One final message",
                 Timestamp = DateTimeOffset.Now,
                 Sender = testUser,
             }));
