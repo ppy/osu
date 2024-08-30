@@ -1,12 +1,9 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Diagnostics;
 using System.Globalization;
-using JetBrains.Annotations;
 using Newtonsoft.Json;
 using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.IO.Network;
@@ -27,18 +24,17 @@ namespace osu.Game.Online.API
         /// <summary>
         /// The deserialised response object. May be null if the request or deserialisation failed.
         /// </summary>
-        [CanBeNull]
-        public T Response { get; private set; }
+        public T? Response { get; private set; }
 
         /// <summary>
         /// Invoked on successful completion of an API request.
         /// This will be scheduled to the API's internal scheduler (run on update thread automatically).
         /// </summary>
-        public new event APISuccessHandler<T> Success;
+        public new event APISuccessHandler<T>? Success;
 
         protected APIRequest()
         {
-            base.Success += () => Success?.Invoke(Response);
+            base.Success += () => Success?.Invoke(Response!);
         }
 
         protected override void PostProcess()
@@ -72,28 +68,28 @@ namespace osu.Game.Online.API
 
         protected virtual WebRequest CreateWebRequest() => new OsuWebRequest(Uri);
 
-        protected virtual string Uri => $@"{API.APIEndpointUrl}/api/v2/{Target}";
+        protected virtual string Uri => $@"{API!.APIEndpointUrl}/api/v2/{Target}";
 
-        protected IAPIProvider API;
+        protected IAPIProvider? API;
 
-        protected WebRequest WebRequest;
+        protected WebRequest? WebRequest;
 
         /// <summary>
         /// The currently logged in user. Note that this will only be populated during <see cref="Perform"/>.
         /// </summary>
-        protected APIUser User { get; private set; }
+        protected APIUser? User { get; private set; }
 
         /// <summary>
         /// Invoked on successful completion of an API request.
         /// This will be scheduled to the API's internal scheduler (run on update thread automatically).
         /// </summary>
-        public event APISuccessHandler Success;
+        public event APISuccessHandler? Success;
 
         /// <summary>
         /// Invoked on failure to complete an API request.
         /// This will be scheduled to the API's internal scheduler (run on update thread automatically).
         /// </summary>
-        public event APIFailureHandler Failure;
+        public event APIFailureHandler? Failure;
 
         private readonly object completionStateLock = new object();
 
@@ -210,7 +206,7 @@ namespace osu.Game.Online.API
                 // in the case of a cancellation we don't care about whether there's an error in the response.
                 if (!(e is OperationCanceledException))
                 {
-                    string responseString = WebRequest?.GetResponseString();
+                    string? responseString = WebRequest?.GetResponseString();
 
                     // naive check whether there's an error in the response to avoid unnecessary JSON deserialisation.
                     if (!string.IsNullOrEmpty(responseString) && responseString.Contains(@"""error"""))
@@ -248,7 +244,7 @@ namespace osu.Game.Online.API
         private class DisplayableError
         {
             [JsonProperty("error")]
-            public string ErrorMessage { get; set; }
+            public string ErrorMessage { get; set; } = string.Empty;
         }
     }
 
