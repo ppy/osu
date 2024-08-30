@@ -5,6 +5,7 @@ using System;
 using System.Runtime.Versioning;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Logging;
 using osu.Game;
 using osu.Game.Overlays;
@@ -35,7 +36,7 @@ namespace osu.Desktop.Updater
         private readonly SquirrelLogger squirrelLogger = new SquirrelLogger();
 
         [Resolved]
-        private OsuGameBase game { get; set; } = null!;
+        private OsuGame game { get; set; } = null!;
 
         [Resolved]
         private ILocalUserPlayInfo? localUserInfo { get; set; }
@@ -50,6 +51,10 @@ namespace osu.Desktop.Updater
 
         protected override async Task<bool> PerformUpdateCheck() => await checkForUpdateAsync().ConfigureAwait(false);
 
+        // We really don't want to do update stuff during gameplay. Including when the user is in break time / paused.
+        // Checking the toolbar visibility is a nice hacky way of avoiding this for now.
+        private bool isInGameplay => localUserInfo?.IsPlaying.Value == true || game.Toolbar?.State.Value == Visibility.Hidden;
+
         private async Task<bool> checkForUpdateAsync(bool useDeltaPatching = true, UpdateProgressNotification? notification = null)
         {
             // should we schedule a retry on completion of this check?
@@ -60,7 +65,7 @@ namespace osu.Desktop.Updater
             try
             {
                 // Avoid any kind of update checking while gameplay is running.
-                if (localUserInfo?.IsPlaying.Value == true)
+                if (isInGameplay)
                     return false;
 
                 updateManager ??= new Squirrel.UpdateManager(new GithubSource(@"https://github.com/ppy/osu", github_token, false), @"osulazer");
@@ -71,15 +76,19 @@ namespace osu.Desktop.Updater
                 {
                     if (updatePending)
                     {
-                        // the user may have dismissed the completion notice, so show it again.
-                        notificationOverlay.Post(new UpdateApplicationCompleteNotification
+                        runOutsideOfGameplay(() =>
                         {
-                            Activated = () =>
+                            // the user may have dismissed the completion notice, so show it again.
+                            notificationOverlay.Post(new UpdateApplicationCompleteNotification
                             {
-                                restartToApplyUpdate();
-                                return true;
-                            },
+                                Activated = () =>
+                                {
+                                    restartToApplyUpdate();
+                                    return true;
+                                },
+                            });
                         });
+
                         return true;
                     }
 
@@ -109,7 +118,8 @@ namespace osu.Desktop.Updater
 
                     await updateManager.ApplyReleases(info, p => notification.Progress = p / 100f).ConfigureAwait(false);
 
-                    notification.State = ProgressNotificationState.Completed;
+                    runOutsideOfGameplay(() => notification.State = ProgressNotificationState.Completed);
+
                     updatePending = true;
                 }
                 catch (Exception e)
@@ -145,6 +155,17 @@ namespace osu.Desktop.Updater
             }
 
             return true;
+        }
+
+        private void runOutsideOfGameplay(Action action)
+        {
+            if (isInGameplay)
+            {
+                Scheduler.AddDelayed(() => runOutsideOfGameplay(action), 1000);
+                return;
+            }
+
+            action();
         }
 
         private bool restartToApplyUpdate()
