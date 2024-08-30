@@ -110,7 +110,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.TopCentre,
                     RelativePositionAxes = Axes.X,
-                    X = (Item as IHasHitsoundTiming)?.HitsoundTiming ?? 0,
+                    X = (Item as IHasEditorSamplePosition)?.EditorSamplePosition ?? 0,
                     AlternativeColor = Item is IHasRepeats
                 },
                 sampleComponents = new Container

@@ -16,7 +16,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Objects
 {
-    public class Spinner : OsuHitObject, IHasDuration, IHasHitsoundTiming
+    public class Spinner : OsuHitObject, IHasDuration, IHasEditorSamplePosition
     {
         /// <summary>
         /// The RPM required to clear the spinner at ODs [ 0, 5, 10 ].
@@ -114,6 +114,6 @@ namespace osu.Game.Rulesets.Osu.Objects
             };
         }
 
-        public float HitsoundTiming => 1;
+        public float EditorSamplePosition => 1;
     }
 }
