@@ -391,7 +391,7 @@ namespace osu.Game.Screens.Select
                 if (root.BeatmapSetsByID.TryGetValue(beatmapSet.ID, out var existingSets)
                     && existingSets.SelectMany(s => s.Beatmaps).All(b => b.BeatmapInfo.ID != beatmapInfo.ID))
                 {
-                    updateBeatmapSet(beatmapSet);
+                    updateBeatmapSet(beatmapSet.Detach());
                     changed = true;
                 }
             }
