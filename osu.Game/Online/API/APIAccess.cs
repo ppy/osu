@@ -385,7 +385,8 @@ namespace osu.Game.Online.API
         {
             try
             {
-                request.Perform(this);
+                request.AttachAPI(this);
+                request.Perform();
             }
             catch (Exception e)
             {
@@ -483,7 +484,8 @@ namespace osu.Game.Online.API
         {
             try
             {
-                req.Perform(this);
+                req.AttachAPI(this);
+                req.Perform();
 
                 if (req.CompletionState != APIRequestCompletionState.Completed)
                     return false;
@@ -568,6 +570,8 @@ namespace osu.Game.Online.API
         {
             lock (queue)
             {
+                request.AttachAPI(this);
+
                 if (state.Value == APIState.Offline)
                 {
                     request.Fail(new WebException(@"User not logged in"));

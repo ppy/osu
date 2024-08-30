@@ -4,6 +4,7 @@
 #nullable disable
 
 using System;
+using System.Diagnostics;
 using System.Globalization;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
@@ -74,6 +75,7 @@ namespace osu.Game.Online.API
         protected virtual string Uri => $@"{API.APIEndpointUrl}/api/v2/{Target}";
 
         protected APIAccess API;
+
         protected WebRequest WebRequest;
 
         /// <summary>
@@ -101,16 +103,29 @@ namespace osu.Game.Online.API
         /// </summary>
         public APIRequestCompletionState CompletionState { get; private set; }
 
-        public void Perform(IAPIProvider api)
+        /// <summary>
+        /// Should be called before <see cref="Perform"/> to give API context.
+        /// </summary>
+        /// <remarks>
+        /// This allows scheduling of operations back to the correct thread (which may be required before <see cref="Perform"/> is called).
+        /// </remarks>
+        public void AttachAPI(APIAccess apiAccess)
         {
-            if (!(api is APIAccess apiAccess))
+            if (API != null && API != apiAccess)
+                throw new InvalidOperationException("Attached API cannot be changed after initial set.");
+
+            API = apiAccess;
+        }
+
+        public void Perform()
+        {
+            if (API == null)
             {
                 Fail(new NotSupportedException($"A {nameof(APIAccess)} is required to perform requests."));
                 return;
             }
 
-            API = apiAccess;
-            User = apiAccess.LocalUser.Value;
+            User = API.LocalUser.Value;
 
             if (isFailing) return;
 
@@ -153,6 +168,8 @@ namespace osu.Game.Online.API
 
         internal void TriggerSuccess()
         {
+            Debug.Assert(API != null);
+
             lock (completionStateLock)
             {
                 if (CompletionState != APIRequestCompletionState.Waiting)
@@ -161,14 +178,13 @@ namespace osu.Game.Online.API
                 CompletionState = APIRequestCompletionState.Completed;
             }
 
-            if (API == null)
-                Success?.Invoke();
-            else
-                API.Schedule(() => Success?.Invoke());
+            API.Schedule(() => Success?.Invoke());
         }
 
         internal void TriggerFailure(Exception e)
         {
+            Debug.Assert(API != null);
+
             lock (completionStateLock)
             {
                 if (CompletionState != APIRequestCompletionState.Waiting)
@@ -177,10 +193,7 @@ namespace osu.Game.Online.API
                 CompletionState = APIRequestCompletionState.Failed;
             }
 
-            if (API == null)
-                Failure?.Invoke(e);
-            else
-                API.Schedule(() => Failure?.Invoke(e));
+            API.Schedule(() => Failure?.Invoke(e));
         }
 
         public void Cancel() => Fail(new OperationCanceledException(@"Request cancelled"));
