@@ -74,7 +74,7 @@ namespace osu.Game.Online.API
 
         protected virtual string Uri => $@"{API.APIEndpointUrl}/api/v2/{Target}";
 
-        protected APIAccess API;
+        protected IAPIProvider API;
 
         protected WebRequest WebRequest;
 
@@ -109,7 +109,7 @@ namespace osu.Game.Online.API
         /// <remarks>
         /// This allows scheduling of operations back to the correct thread (which may be required before <see cref="Perform"/> is called).
         /// </remarks>
-        public void AttachAPI(APIAccess apiAccess)
+        public void AttachAPI(IAPIProvider apiAccess)
         {
             if (API != null && API != apiAccess)
                 throw new InvalidOperationException("Attached API cannot be changed after initial set.");
