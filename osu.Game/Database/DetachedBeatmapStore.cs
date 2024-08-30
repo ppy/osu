@@ -10,6 +10,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
+using osu.Game.Online.Multiplayer;
 using Realms;
 
 namespace osu.Game.Database
@@ -59,15 +60,21 @@ namespace osu.Game.Database
 
                 Task.Factory.StartNew(() =>
                 {
-                    realm.Run(_ =>
+                    try
                     {
-                        var detached = frozenSets.Detach();
+                        realm.Run(_ =>
+                        {
+                            var detached = frozenSets.Detach();
 
-                        detachedBeatmapSets.Clear();
-                        detachedBeatmapSets.AddRange(detached);
+                            detachedBeatmapSets.Clear();
+                            detachedBeatmapSets.AddRange(detached);
+                        });
+                    }
+                    finally
+                    {
                         loaded.Set();
-                    });
-                }, TaskCreationOptions.LongRunning);
+                    }
+                }, TaskCreationOptions.LongRunning).FireAndForget();
 
                 return;
             }
