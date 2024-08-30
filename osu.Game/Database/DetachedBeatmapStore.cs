@@ -133,7 +133,9 @@ namespace osu.Game.Database
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
+
             loaded.Set();
+            loaded.Dispose();
             realmSubscription?.Dispose();
         }
 
