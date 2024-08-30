@@ -122,7 +122,7 @@ namespace osu.Game.Screens.Select
 
         private IEnumerable<CarouselBeatmapSet> beatmapSets => root.Items.OfType<CarouselBeatmapSet>();
 
-        public IEnumerable<BeatmapSetInfo> BeatmapSets
+        internal IEnumerable<BeatmapSetInfo> BeatmapSets
         {
             get => beatmapSets.Select(g => g.BeatmapSet);
             set
