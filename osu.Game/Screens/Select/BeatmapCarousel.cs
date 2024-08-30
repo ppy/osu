@@ -320,7 +320,6 @@ namespace osu.Game.Screens.Select
         {
             try
             {
-                // TODO: chekc whether we still need beatmap sets by ID
                 foreach (var set in setsRequiringRemoval) removeBeatmapSet(set.ID);
 
                 foreach (var set in setsRequiringUpdate) updateBeatmapSet(set);
