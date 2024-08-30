@@ -9,8 +9,8 @@ namespace osu.Game.Rulesets.Objects.Types
     public interface IHasHitsoundTiming : IHasDuration
     {
         /// <summary>
-        /// The absolute time of when the hitsound occurs.
-        /// Used for placement of the sample point in the editor timeline.
+        /// The current hitsound timing of this hit object.
+        /// 0 means at the start of the object, 1 means at the end of the object.
         /// </summary>
         double HitsoundTiming { get; }
     }
