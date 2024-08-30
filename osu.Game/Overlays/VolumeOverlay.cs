@@ -110,14 +110,18 @@ namespace osu.Game.Overlays
                     return true;
 
                 case GlobalAction.NextVolumeMeter:
-                    if (State.Value == Visibility.Visible)
-                        volumeMeters.SelectNext();
+                    if (State.Value != Visibility.Visible)
+                        return false;
+
+                    volumeMeters.SelectNext();
                     Show();
                     return true;
 
                 case GlobalAction.PreviousVolumeMeter:
-                    if (State.Value == Visibility.Visible)
-                        volumeMeters.SelectPrevious();
+                    if (State.Value != Visibility.Visible)
+                        return false;
+
+                    volumeMeters.SelectPrevious();
                     Show();
                     return true;
 
