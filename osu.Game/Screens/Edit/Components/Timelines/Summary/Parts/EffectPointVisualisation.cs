@@ -79,7 +79,14 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
         {
             ClearInternal();
 
-            AddInternal(new ControlPointVisualisation(effect));
+            if (beatmap.BeatmapInfo.Ruleset.CreateInstance().EditorShowScrollSpeed)
+            {
+                AddInternal(new ControlPointVisualisation(effect)
+                {
+                    // importantly, override the x position being set since we do that in the GroupVisualisation parent drawable.
+                    X = 0,
+                });
+            }
 
             if (!kiai.Value)
                 return;
