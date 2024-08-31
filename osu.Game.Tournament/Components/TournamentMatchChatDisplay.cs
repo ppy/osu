@@ -94,9 +94,9 @@ namespace osu.Game.Tournament.Components
                     && message.SenderId == currentMatch.Value.Round.Value.RefereeId.Value;
                 // Automatically block duplicate messages, since we have multiple chat displays available.
                 if ((isRef || currentMatch.Value.Round.Value.TrustAll.Value)
-                    && isCommand && !currentMatch.Value.PendingMsgs.Any(p => p == message.Content))
+                    && isCommand && !currentMatch.Value.PendingMsgs.Any(p => p.Id == message.Id))
                 {
-                    currentMatch.Value.PendingMsgs.Add(message.Content);
+                    currentMatch.Value.PendingMsgs.Add(message);
                 }
             }
 

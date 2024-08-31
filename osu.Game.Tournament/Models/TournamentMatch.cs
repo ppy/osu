@@ -7,6 +7,7 @@ using System.Collections.ObjectModel;
 using System.Drawing;
 using Newtonsoft.Json;
 using osu.Framework.Bindables;
+using osu.Game.Online.Chat;
 using osu.Game.Tournament.Screens.Ladder.Components;
 
 namespace osu.Game.Tournament.Models
@@ -59,7 +60,10 @@ namespace osu.Game.Tournament.Models
         public readonly ObservableCollection<BeatmapChoice> EXPicks = new ObservableCollection<BeatmapChoice>();
 
         [JsonIgnore]
-        public readonly ObservableCollection<string> PendingMsgs = new ObservableCollection<string>();
+        public readonly ObservableCollection<Message> PendingMsgs = new ObservableCollection<Message>();
+
+        [JsonIgnore]
+        public readonly ObservableCollection<Message> ChatMsgs = new ObservableCollection<Message>();
 
         [JsonIgnore]
         public readonly Bindable<TournamentRound?> Round = new Bindable<TournamentRound?>();
@@ -139,6 +143,8 @@ namespace osu.Game.Tournament.Models
             Protects.Clear();
             Traps.Clear();
             PendingSwaps.Clear();
+            PendingMsgs.Clear();
+            ChatMsgs.Clear();
         }
     }
 }

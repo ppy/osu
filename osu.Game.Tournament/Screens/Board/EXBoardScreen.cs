@@ -291,9 +291,9 @@ namespace osu.Game.Tournament.Screens.Board
 
             var msg = CurrentMatch.Value.PendingMsgs;
 
-            foreach (string item in msg)
+            foreach (var item in msg)
             {
-                BotCommand command = new BotCommand().ParseFromText(item);
+                BotCommand command = new BotCommand().ParseFromText(item.Content);
                 switch (command.Command)
                 {
                     case Commands.PickEX:
