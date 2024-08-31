@@ -103,7 +103,7 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
                 Anchor = Anchor.CentreLeft;
                 Origin = Anchor.CentreLeft;
                 Height = 0.2f;
-                AddInternal(new Circle
+                AddInternal(new FastCircle
                 {
                     RelativeSizeAxes = Axes.Both,
                     Colour = colours.Purple1
