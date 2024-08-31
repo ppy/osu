@@ -4,15 +4,20 @@
 #nullable disable
 
 using System.Linq;
+using System.Collections.Generic;
 using NUnit.Framework;
+using osu.Framework.Allocation;
 using osu.Framework.Testing;
+using osu.Framework.Platform;
 using osu.Game.Beatmaps;
+using osu.Game.IO.Serialization;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Objects;
+using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Compose.Components;
 using osu.Game.Screens.Edit.Compose.Components.Timeline;
 using osu.Game.Tests.Beatmaps;
@@ -25,6 +30,17 @@ namespace osu.Game.Tests.Visual.Editing
         protected override Ruleset CreateEditorRuleset() => new OsuRuleset();
 
         protected override IBeatmap CreateBeatmap(RulesetInfo ruleset) => new TestBeatmap(ruleset, false);
+
+        [Resolved]
+        private Clipboard hostClipboard { get; set; } = null!;
+
+        public override void SetUpSteps()
+        {
+            base.SetUpSteps();
+
+            // writing arbitrary value to the clipboard to make sure the clipboard contains no hitobects before each test
+            AddStep("clear clipboard", () => hostClipboard.SetText("dummy text"));
+        }
 
         [Test]
         public void TestCutRemovesObjects()
@@ -165,10 +181,33 @@ namespace osu.Game.Tests.Visual.Editing
         }
 
         [Test]
+        public void TestCopyCreatesClipboardEntry()
+        {
+            var addedObject = new HitCircle { StartTime = 1000 };
+            AddStep("add hitobject", () => EditorBeatmap.Add(addedObject));
+            AddStep("select added object", () => EditorBeatmap.SelectedHitObjects.Add(addedObject));
+            AddStep("copy hitobject", () => Editor.Copy());
+
+            AddAssert("clipboard contains entry for hitobjects", () => hostClipboard.GetCustom(ClipboardContent.CLIPBOARD_FORMAT) != null);
+        }
+
+        [Test]
+        public void TestCutCreatesClipboardEntry()
+        {
+            var addedObject = new HitCircle { StartTime = 1000 };
+            AddStep("add hitobject", () => EditorBeatmap.Add(addedObject));
+            AddStep("select added object", () => EditorBeatmap.SelectedHitObjects.Add(addedObject));
+            AddStep("cut hitobject", () => Editor.Cut());
+
+            AddAssert("clipboard contains entry for hitobjects", () => hostClipboard.GetCustom(ClipboardContent.CLIPBOARD_FORMAT) != null);
+        }
+
+        [Test]
         public void TestCutNothing()
         {
             AddStep("cut hitobject", () => Editor.Cut());
             AddAssert("are no objects", () => EditorBeatmap.HitObjects.Count == 0);
+            AddAssert("clipboard contains no objects", () => hostClipboard.GetCustom(ClipboardContent.CLIPBOARD_FORMAT) == null);
         }
 
         [Test]
@@ -176,6 +215,7 @@ namespace osu.Game.Tests.Visual.Editing
         {
             AddStep("copy hitobject", () => Editor.Copy());
             AddAssert("are no objects", () => EditorBeatmap.HitObjects.Count == 0);
+            AddAssert("clipboard contains no objects", () => hostClipboard.GetCustom(ClipboardContent.CLIPBOARD_FORMAT) == null);
         }
 
         [Test]
@@ -200,6 +240,31 @@ namespace osu.Game.Tests.Visual.Editing
             AddAssert("is one object", () => EditorBeatmap.HitObjects.Count == 1);
             AddStep("clone", () => Editor.Clone());
             AddAssert("still one object", () => EditorBeatmap.HitObjects.Count == 1);
+        }
+
+        [Test]
+        public void TestPasteRawClipboardCootent()
+        {
+            var hitObjects = new List<HitObject>
+            {
+                new HitCircle { StartTime = 1000 }
+            };
+
+            AddStep("store json content in clipboard", () => hostClipboard.SetCustom(ClipboardContent.CLIPBOARD_FORMAT, new ClipboardContent(hitObjects).Serialize()));
+
+            AddStep("paste hitobject", () => Editor.Paste());
+
+            AddAssert("one object", () => EditorBeatmap.HitObjects.Count == 1);
+        }
+
+        [Test]
+        public void TestPasteUnparseableClipboardContent()
+        {
+            AddStep("store invalid content in clipboard", () => hostClipboard.SetCustom(ClipboardContent.CLIPBOARD_FORMAT, "invalid json content"));
+
+            AddStep("paste hitobject", () => Editor.Paste());
+
+            AddAssert("zero objects", () => EditorBeatmap.HitObjects.Count == 0);
         }
     }
 }

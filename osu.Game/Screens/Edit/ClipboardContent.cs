@@ -16,6 +16,8 @@ namespace osu.Game.Screens.Edit
         [JsonConverter(typeof(TypedListConverter<HitObject>))]
         public IList<HitObject> HitObjects;
 
+        public const string CLIPBOARD_FORMAT = "application/x-osu-hitobjects";
+
         public ClipboardContent()
         {
         }
@@ -23,6 +25,11 @@ namespace osu.Game.Screens.Edit
         public ClipboardContent(EditorBeatmap editorBeatmap)
         {
             HitObjects = editorBeatmap.SelectedHitObjects.ToList();
+        }
+
+        public ClipboardContent(IList<HitObject> hitObjects)
+        {
+            HitObjects = hitObjects;
         }
     }
 }
