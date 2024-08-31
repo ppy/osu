@@ -18,6 +18,7 @@ using osu.Framework.Screens;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
+using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -48,12 +49,17 @@ namespace osu.Game.Tests.Visual.Background
         [BackgroundDependencyLoader]
         private void load(GameHost host, AudioManager audio)
         {
+            DetachedBeatmapStore detachedBeatmapStore;
+
             Dependencies.Cache(rulesets = new RealmRulesetStore(Realm));
             Dependencies.Cache(manager = new BeatmapManager(LocalStorage, Realm, null, audio, Resources, host, Beatmap.Default));
             Dependencies.Cache(new OsuConfigManager(LocalStorage));
+            Dependencies.Cache(detachedBeatmapStore = new DetachedBeatmapStore());
             Dependencies.Cache(Realm);
 
             manager.Import(TestResources.GetQuickTestBeatmapForImport()).WaitSafely();
+
+            Add(detachedBeatmapStore);
 
             Beatmap.SetDefault();
         }
