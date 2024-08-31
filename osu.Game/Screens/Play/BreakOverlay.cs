@@ -1,15 +1,17 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
+using System;
 using System.Collections.Generic;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Beatmaps.Timing;
+using osu.Game.Graphics;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play.Break;
@@ -28,7 +30,7 @@ namespace osu.Game.Screens.Play
 
         private readonly Container fadeContainer;
 
-        private IReadOnlyList<BreakPeriod> breaks;
+        private IReadOnlyList<BreakPeriod> breaks = Array.Empty<BreakPeriod>();
 
         public IReadOnlyList<BreakPeriod> Breaks
         {
@@ -68,6 +70,30 @@ namespace osu.Game.Screens.Play
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                     },
+                    new CircularContainer
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Width = 80,
+                        Height = 4,
+                        Masking = true,
+                        EdgeEffect = new EdgeEffectParameters
+                        {
+                            Type = EdgeEffectType.Shadow,
+                            Radius = 260,
+                            Colour = OsuColour.Gray(0.2f).Opacity(0.8f),
+                            Roundness = 12
+                        },
+                        Children = new Drawable[]
+                        {
+                            new Box
+                            {
+                                Alpha = 0,
+                                AlwaysPresent = true,
+                                RelativeSizeAxes = Axes.Both,
+                            },
+                        }
+                    },
                     remainingTimeAdjustmentBox = new Container
                     {
                         Anchor = Anchor.Centre,
@@ -75,15 +101,13 @@ namespace osu.Game.Screens.Play
                         AutoSizeAxes = Axes.Y,
                         RelativeSizeAxes = Axes.X,
                         Width = 0,
-                        Child = remainingTimeBox = new Container
+                        Child = remainingTimeBox = new Circle
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             RelativeSizeAxes = Axes.X,
                             Height = 8,
-                            CornerRadius = 4,
                             Masking = true,
-                            Child = new Box { RelativeSizeAxes = Axes.Both }
                         }
                     },
                     remainingTimeCounter = new RemainingTimeCounter
@@ -112,19 +136,21 @@ namespace osu.Game.Screens.Play
             base.LoadComplete();
             initializeBreaks();
 
-            if (scoreProcessor != null)
-            {
-                info.AccuracyDisplay.Current.BindTo(scoreProcessor.Accuracy);
-                ((IBindable<ScoreRank>)info.GradeDisplay.Current).BindTo(scoreProcessor.Rank);
-            }
+            info.AccuracyDisplay.Current.BindTo(scoreProcessor.Accuracy);
+            ((IBindable<ScoreRank>)info.GradeDisplay.Current).BindTo(scoreProcessor.Rank);
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            remainingTimeBox.Height = Math.Min(8, remainingTimeBox.DrawWidth);
         }
 
         private void initializeBreaks()
         {
             FinishTransforms(true);
             Scheduler.CancelDelayedTasks();
-
-            if (breaks == null) return; // we need breaks.
 
             foreach (var b in breaks)
             {

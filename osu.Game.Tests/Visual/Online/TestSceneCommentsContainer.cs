@@ -17,6 +17,7 @@ using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.Comments;
+using osu.Game.Overlays.Comments.Buttons;
 
 namespace osu.Game.Tests.Visual.Online
 {
@@ -58,6 +59,11 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("show comments", () => commentsContainer.ShowComments(CommentableType.Beatmapset, 123));
             AddUntilStep("show more button hidden",
                 () => commentsContainer.ChildrenOfType<CommentsShowMoreButton>().Single().Alpha == 0);
+
+            if (withPinned)
+                AddAssert("pinned comment replies collapsed", () => commentsContainer.ChildrenOfType<ShowRepliesButton>().First().Expanded.Value, () => Is.False);
+            else
+                AddAssert("first comment replies expanded", () => commentsContainer.ChildrenOfType<ShowRepliesButton>().First().Expanded.Value, () => Is.True);
         }
 
         [TestCase(false)]
@@ -157,6 +163,7 @@ namespace osu.Game.Tests.Visual.Online
         {
             setUpCommentsResponse(getExampleComments());
             AddStep("show comments", () => commentsContainer.ShowComments(CommentableType.Beatmapset, 123));
+            AddUntilStep("comments shown", () => commentsContainer.ChildrenOfType<DrawableComment>().Any());
 
             setUpPostResponse();
             AddStep("enter text", () => editorTextBox.Current.Value = "comm");
@@ -175,6 +182,7 @@ namespace osu.Game.Tests.Visual.Online
         {
             setUpCommentsResponse(getExampleComments());
             AddStep("show comments", () => commentsContainer.ShowComments(CommentableType.Beatmapset, 123));
+            AddUntilStep("comments shown", () => commentsContainer.ChildrenOfType<DrawableComment>().Any());
 
             setUpPostResponse(true);
             AddStep("enter text", () => editorTextBox.Current.Value = "comm");
@@ -300,7 +308,7 @@ namespace osu.Game.Tests.Visual.Online
                 bundle.Comments.Add(new Comment
                 {
                     Id = 20,
-                    Message = "Reply to pinned comment",
+                    Message = "Reply to pinned comment initially hidden",
                     LegacyName = "AbandonedUser",
                     CreatedAt = DateTimeOffset.Now,
                     VotesCount = 0,

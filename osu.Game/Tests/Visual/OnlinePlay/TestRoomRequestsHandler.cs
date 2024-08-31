@@ -9,6 +9,7 @@ using System.Diagnostics;
 using System.Linq;
 using Newtonsoft.Json;
 using osu.Game.Beatmaps;
+using osu.Game.Database;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
@@ -99,6 +100,55 @@ namespace osu.Game.Tests.Visual.OnlinePlay
                     });
                     return true;
 
+                case IndexPlaylistScoresRequest roomLeaderboardRequest:
+                    roomLeaderboardRequest.TriggerSuccess(new IndexedMultiplayerScores
+                    {
+                        Scores =
+                        {
+                            new MultiplayerScore
+                            {
+                                ID = currentScoreId++,
+                                Accuracy = 1,
+                                Position = 1,
+                                EndedAt = DateTimeOffset.Now,
+                                Passed = true,
+                                Rank = ScoreRank.S,
+                                MaxCombo = 1000,
+                                TotalScore = 1000000,
+                                User = new APIUser { Username = "best user" },
+                                Mods = [new APIMod { Acronym = @"DT" }],
+                                Statistics = new Dictionary<HitResult, int>()
+                            },
+                            new MultiplayerScore
+                            {
+                                ID = currentScoreId++,
+                                Accuracy = 0.7,
+                                Position = 2,
+                                EndedAt = DateTimeOffset.Now,
+                                Passed = true,
+                                Rank = ScoreRank.B,
+                                MaxCombo = 100,
+                                TotalScore = 200000,
+                                User = new APIUser { Username = "worst user" },
+                                Statistics = new Dictionary<HitResult, int>()
+                            },
+                        },
+                        UserScore = new MultiplayerScore
+                        {
+                            ID = currentScoreId++,
+                            Accuracy = 0.91,
+                            Position = 4,
+                            EndedAt = DateTimeOffset.Now,
+                            Passed = true,
+                            Rank = ScoreRank.A,
+                            MaxCombo = 100,
+                            TotalScore = 800000,
+                            User = localUser,
+                            Statistics = new Dictionary<HitResult, int>()
+                        },
+                    });
+                    return true;
+
                 case PartRoomRequest partRoomRequest:
                     partRoomRequest.TriggerSuccess();
                     return true;
@@ -151,7 +201,7 @@ namespace osu.Game.Tests.Visual.OnlinePlay
                 {
                     var baseBeatmap = getBeatmapSetRequest.Type == BeatmapSetLookupType.BeatmapId
                         ? beatmapManager.QueryBeatmap(b => b.OnlineID == getBeatmapSetRequest.ID)
-                        : beatmapManager.QueryBeatmap(b => b.BeatmapSet.OnlineID == getBeatmapSetRequest.ID);
+                        : beatmapManager.QueryBeatmapSet(s => s.OnlineID == getBeatmapSetRequest.ID)?.PerformRead(s => s.Beatmaps.First().Detach());
 
                     if (baseBeatmap == null)
                     {
