@@ -103,10 +103,6 @@ namespace osu.Game.Tournament.Components
                 {
                     currentMatch.Value.PendingMsgs.Add(message);
                 }
-                if (!currentMatch.Value.ChatMsgs.Any(p => p.Equals(message)))
-                {
-                    currentMatch.Value.ChatMsgs.Add(message);
-                }
             }
 
             return new MatchMessage(message, ladderInfo, isCommand);

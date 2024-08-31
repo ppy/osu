@@ -63,9 +63,6 @@ namespace osu.Game.Tournament.Models
         public readonly ObservableCollection<Message> PendingMsgs = new ObservableCollection<Message>();
 
         [JsonIgnore]
-        public readonly ObservableCollection<Message> ChatMsgs = new ObservableCollection<Message>();
-
-        [JsonIgnore]
         public readonly Bindable<TournamentRound?> Round = new Bindable<TournamentRound?>();
 
         [JsonIgnore]
@@ -144,7 +141,6 @@ namespace osu.Game.Tournament.Models
             Traps.Clear();
             PendingSwaps.Clear();
             PendingMsgs.Clear();
-            ChatMsgs.Clear();
         }
     }
 }
