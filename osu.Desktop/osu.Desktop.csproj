@@ -25,7 +25,7 @@
   <ItemGroup Label="Package References">
     <PackageReference Include="System.IO.Packaging" Version="8.0.0" />
     <PackageReference Include="DiscordRichPresence" Version="1.2.1.24" />
-    <PackageReference Include="Velopack" Version="0.0.583" />
+    <PackageReference Include="Velopack" Version="0.0.598-g933b2ab" />
   </ItemGroup>
   <ItemGroup Label="Resources">
     <EmbeddedResource Include="lazer.ico" />
