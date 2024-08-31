@@ -9,19 +9,25 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.UserInterface;
+using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets.Objects;
 using osuTK;
 
 namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 {
-    public partial class TimelineBreak : CompositeDrawable
+    public partial class TimelineBreak : CompositeDrawable, IHasContextMenu
     {
         public Bindable<BreakPeriod> Break { get; } = new Bindable<BreakPeriod>();
+
+        public Action<BreakPeriod>? OnDeleted { get; init; }
 
         public TimelineBreak(BreakPeriod b)
         {
@@ -46,7 +52,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                     {
                         RelativeSizeAxes = Axes.Both,
                         Colour = colours.Gray5,
-                        Alpha = 0.7f,
+                        Alpha = 0.9f,
                     },
                 },
                 new DragHandle(isStartHandle: true)
@@ -76,6 +82,11 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 Width = (float)Break.Value.Duration;
             }, true);
         }
+
+        public MenuItem[] ContextMenuItems => new MenuItem[]
+        {
+            new OsuMenuItem(CommonStrings.ButtonsDelete, MenuItemType.Destructive, () => OnDeleted?.Invoke(Break.Value)),
+        };
 
         private partial class DragHandle : FillFlowContainer
         {
@@ -126,7 +137,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                         Anchor = Anchor,
                         Origin = Anchor,
                         RelativeSizeAxes = Axes.Y,
-                        CornerRadius = 5,
+                        CornerRadius = 4,
                         Masking = true,
                         Child = new Box
                         {
@@ -216,8 +227,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 if (active)
                     colour = colour.Lighten(0.3f);
 
-                this.FadeColour(colour, 400, Easing.OutQuint);
-                handle.ResizeWidthTo(active ? 20 : 10, 400, Easing.OutElasticHalf);
+                handle.FadeColour(colour, 400, Easing.OutQuint);
+                handle.ResizeWidthTo(active ? 10 : 8, 400, Easing.OutElasticHalf);
             }
         }
     }

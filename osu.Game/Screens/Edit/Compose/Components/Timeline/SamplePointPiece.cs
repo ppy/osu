@@ -14,6 +14,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
+using osu.Framework.Utils;
 using osu.Game.Audio;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
@@ -21,6 +22,7 @@ using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Screens.Edit.Components.TernaryButtons;
 using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Screens.Edit.Timing;
 using osuTK;
 using osuTK.Graphics;
@@ -32,20 +34,48 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
     {
         public readonly HitObject HitObject;
 
+        [Resolved]
+        private EditorClock? editorClock { get; set; }
+
+        [Resolved]
+        private Editor? editor { get; set; }
+
         public SamplePointPiece(HitObject hitObject)
         {
             HitObject = hitObject;
+            Y = 2.5f;
         }
 
         public bool AlternativeColor { get; init; }
 
         protected override Color4 GetRepresentingColour(OsuColour colours) => AlternativeColor ? colours.Pink2 : colours.Pink1;
 
+        protected virtual double GetTime() => HitObject is IHasRepeats r ? HitObject.StartTime + r.Duration / r.SpanCount() / 2 : HitObject.StartTime;
+
         [BackgroundDependencyLoader]
         private void load()
         {
             HitObject.DefaultsApplied += _ => updateText();
             updateText();
+
+            if (editor != null)
+                editor.ShowSampleEditPopoverRequested += onShowSampleEditPopoverRequested;
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (editor != null)
+                editor.ShowSampleEditPopoverRequested -= onShowSampleEditPopoverRequested;
+        }
+
+        private void onShowSampleEditPopoverRequested(double time)
+        {
+            if (!Precision.AlmostEquals(time, GetTime())) return;
+
+            editorClock?.SeekSmoothlyTo(GetTime());
+            this.ShowPopover();
         }
 
         protected override bool OnClick(ClickEvent e)
@@ -105,15 +135,34 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             private FillFlowContainer togglesCollection = null!;
 
             private HitObject[] relevantObjects = null!;
-            private IList<HitSampleInfo>[] allRelevantSamples = null!;
+            private (HitObject hitObject, IList<HitSampleInfo> samples)[] allRelevantSamples = null!;
 
             /// <summary>
             /// Gets the sub-set of samples relevant to this sample point piece.
             /// For example, to edit node samples this should return the samples at the index of the node.
             /// </summary>
-            /// <param name="ho">The hit object to get the relevant samples from.</param>
+            /// <param name="hitObjects">The hit objects to get the relevant samples from.</param>
             /// <returns>The relevant list of samples.</returns>
-            protected virtual IList<HitSampleInfo> GetRelevantSamples(HitObject ho) => ho.Samples;
+            protected virtual IEnumerable<(HitObject hitObject, IList<HitSampleInfo> samples)> GetRelevantSamples(HitObject[] hitObjects)
+            {
+                if (hitObjects.Length == 1)
+                {
+                    yield return (hitObjects[0], hitObjects[0].Samples);
+
+                    yield break;
+                }
+
+                foreach (var ho in hitObjects)
+                {
+                    yield return (ho, ho.Samples);
+
+                    if (ho is IHasRepeats hasRepeats)
+                    {
+                        foreach (var node in hasRepeats.NodeSamples)
+                            yield return (ho, node);
+                    }
+                }
+            }
 
             [Resolved(canBeNull: true)]
             private EditorBeatmap beatmap { get; set; } = null!;
@@ -148,10 +197,12 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                             bank = new LabelledTextBox
                             {
                                 Label = "Bank Name",
+                                SelectAllOnFocus = true,
                             },
                             additionBank = new LabelledTextBox
                             {
                                 Label = "Addition Bank",
+                                SelectAllOnFocus = true,
                             },
                             volume = new IndeterminateSliderWithTextBoxInput<int>("Volume", new BindableInt(100)
                             {
@@ -169,7 +220,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 // if the piece belongs to a currently selected object, assume that the user wants to change all selected objects.
                 // if the piece belongs to an unselected object, operate on that object alone, independently of the selection.
                 relevantObjects = (beatmap.SelectedHitObjects.Contains(hitObject) ? beatmap.SelectedHitObjects : hitObject.Yield()).ToArray();
-                allRelevantSamples = relevantObjects.Select(GetRelevantSamples).ToArray();
+                allRelevantSamples = GetRelevantSamples(relevantObjects).ToArray();
 
                 // even if there are multiple objects selected, we can still display sample volume or bank if they all have the same value.
                 int? commonVolume = getCommonVolume();
@@ -211,9 +262,19 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 togglesCollection.AddRange(createTernaryButtons().Select(b => new DrawableTernaryButton(b) { RelativeSizeAxes = Axes.None, Size = new Vector2(40, 40) }));
             }
 
-            private string? getCommonBank() => allRelevantSamples.Select(GetBankValue).Distinct().Count() == 1 ? GetBankValue(allRelevantSamples.First()) : null;
-            private string? getCommonAdditionBank() => allRelevantSamples.Select(GetAdditionBankValue).Where(o => o is not null).Distinct().Count() == 1 ? GetAdditionBankValue(allRelevantSamples.First()) : null;
-            private int? getCommonVolume() => allRelevantSamples.Select(GetVolumeValue).Distinct().Count() == 1 ? GetVolumeValue(allRelevantSamples.First()) : null;
+            private string? getCommonBank() => allRelevantSamples.Select(h => GetBankValue(h.samples)).Distinct().Count() == 1
+                ? GetBankValue(allRelevantSamples.First().samples)
+                : null;
+
+            private string? getCommonAdditionBank()
+            {
+                string[] additionBanks = allRelevantSamples.Select(h => GetAdditionBankValue(h.samples)).Where(o => o is not null).Cast<string>().Distinct().ToArray();
+                return additionBanks.Length == 1 ? additionBanks[0] : null;
+            }
+
+            private int? getCommonVolume() => allRelevantSamples.Select(h => GetVolumeValue(h.samples)).Distinct().Count() == 1
+                ? GetVolumeValue(allRelevantSamples.First().samples)
+                : null;
 
             private void updatePrimaryBankState()
             {
@@ -228,7 +289,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 additionBank.PlaceholderText = string.IsNullOrEmpty(commonAdditionBank) ? "(multiple)" : string.Empty;
                 additionBank.Current.Value = commonAdditionBank;
 
-                bool anyAdditions = allRelevantSamples.Any(o => o.Any(s => s.Name != HitSampleInfo.HIT_NORMAL));
+                bool anyAdditions = allRelevantSamples.Any(o => o.samples.Any(s => s.Name != HitSampleInfo.HIT_NORMAL));
                 if (anyAdditions)
                     additionBank.Show();
                 else
@@ -244,9 +305,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             {
                 beatmap.BeginChange();
 
-                foreach (var relevantHitObject in relevantObjects)
+                foreach (var (relevantHitObject, relevantSamples) in GetRelevantSamples(relevantObjects))
                 {
-                    var relevantSamples = GetRelevantSamples(relevantHitObject);
                     updateAction(relevantHitObject, relevantSamples);
                     beatmap.Update(relevantHitObject);
                 }
@@ -330,7 +390,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             {
                 foreach ((string sampleName, var bindable) in selectionSampleStates)
                 {
-                    bindable.Value = SelectionHandler<HitObject>.GetStateFromSelection(relevantObjects, h => GetRelevantSamples(h).Any(s => s.Name == sampleName));
+                    bindable.Value = SelectionHandler<HitObject>.GetStateFromSelection(GetRelevantSamples(relevantObjects), h => h.samples.Any(s => s.Name == sampleName));
                 }
             }
 

@@ -280,8 +280,11 @@ namespace osu.Game.Scoring.Legacy
                     continue;
                 }
 
+                // In mania, mouseX encodes the pressed keys in the lower 20 bits
+                int mouseXParseLimit = currentRuleset.RulesetInfo.OnlineID == 3 ? (1 << 20) - 1 : Parsing.MAX_COORDINATE_VALUE;
+
                 float diff = Parsing.ParseFloat(split[0]);
-                float mouseX = Parsing.ParseFloat(split[1], Parsing.MAX_COORDINATE_VALUE);
+                float mouseX = Parsing.ParseFloat(split[1], mouseXParseLimit);
                 float mouseY = Parsing.ParseFloat(split[2], Parsing.MAX_COORDINATE_VALUE);
 
                 lastTime += diff;

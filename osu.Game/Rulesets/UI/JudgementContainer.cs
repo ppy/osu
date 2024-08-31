@@ -16,7 +16,7 @@ namespace osu.Game.Rulesets.UI
 
             // remove any existing judgements for the judged object.
             // this can be the case when rewinding.
-            RemoveAll(c => c.JudgedObject == judgement.JudgedObject, false);
+            RemoveAll(c => c.JudgedHitObject == judgement.JudgedHitObject, false);
 
             base.Add(judgement);
         }

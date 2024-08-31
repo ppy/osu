@@ -42,6 +42,11 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                 },
                 new SettingsCheckbox
                 {
+                    LabelText = GameplaySettingsStrings.AlwaysShowHoldForMenuButton,
+                    Current = config.GetBindable<bool>(OsuSetting.AlwaysShowHoldForMenuButton),
+                },
+                new SettingsCheckbox
+                {
                     ClassicDefault = false,
                     LabelText = GameplaySettingsStrings.ShowHealthDisplayWhenCantFail,
                     Current = config.GetBindable<bool>(OsuSetting.ShowHealthDisplayWhenCantFail),

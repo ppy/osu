@@ -62,6 +62,7 @@ namespace osu.Game.Online.Metadata
                     connection.On<BeatmapUpdates>(nameof(IMetadataClient.BeatmapSetsUpdated), ((IMetadataClient)this).BeatmapSetsUpdated);
                     connection.On<int, UserPresence?>(nameof(IMetadataClient.UserPresenceUpdated), ((IMetadataClient)this).UserPresenceUpdated);
                     connection.On<DailyChallengeInfo?>(nameof(IMetadataClient.DailyChallengeUpdated), ((IMetadataClient)this).DailyChallengeUpdated);
+                    connection.On<MultiplayerRoomScoreSetEvent>(nameof(IMetadataClient.MultiplayerRoomScoreSet), ((IMetadataClient)this).MultiplayerRoomScoreSet);
                     connection.On(nameof(IStatefulUserHubClient.DisconnectRequested), ((IMetadataClient)this).DisconnectRequested);
                 };
 
@@ -214,6 +215,7 @@ namespace osu.Game.Online.Metadata
             Debug.Assert(connection != null);
             await connection.InvokeAsync(nameof(IMetadataServer.BeginWatchingUserPresence)).ConfigureAwait(false);
             Schedule(() => isWatchingUserPresence.Value = true);
+            Logger.Log($@"{nameof(OnlineMetadataClient)} began watching user presence", LoggingTarget.Network);
         }
 
         public override async Task EndWatchingUserPresence()
@@ -227,6 +229,7 @@ namespace osu.Game.Online.Metadata
                 Schedule(() => userStates.Clear());
                 Debug.Assert(connection != null);
                 await connection.InvokeAsync(nameof(IMetadataServer.EndWatchingUserPresence)).ConfigureAwait(false);
+                Logger.Log($@"{nameof(OnlineMetadataClient)} stopped watching user presence", LoggingTarget.Network);
             }
             finally
             {
@@ -238,6 +241,27 @@ namespace osu.Game.Online.Metadata
         {
             Schedule(() => dailyChallengeInfo.Value = info);
             return Task.CompletedTask;
+        }
+
+        public override async Task<MultiplayerPlaylistItemStats[]> BeginWatchingMultiplayerRoom(long id)
+        {
+            if (connector?.IsConnected.Value != true)
+                throw new OperationCanceledException();
+
+            Debug.Assert(connection != null);
+            var result = await connection.InvokeAsync<MultiplayerPlaylistItemStats[]>(nameof(IMetadataServer.BeginWatchingMultiplayerRoom), id).ConfigureAwait(false);
+            Logger.Log($@"{nameof(OnlineMetadataClient)} began watching multiplayer room with ID {id}", LoggingTarget.Network);
+            return result;
+        }
+
+        public override async Task EndWatchingMultiplayerRoom(long id)
+        {
+            if (connector?.IsConnected.Value != true)
+                throw new OperationCanceledException();
+
+            Debug.Assert(connection != null);
+            await connection.InvokeAsync(nameof(IMetadataServer.EndWatchingMultiplayerRoom), id).ConfigureAwait(false);
+            Logger.Log($@"{nameof(OnlineMetadataClient)} stopped watching multiplayer room with ID {id}", LoggingTarget.Network);
         }
 
         public override async Task DisconnectRequested()
