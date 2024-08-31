@@ -359,5 +359,7 @@ namespace osu.Game.Rulesets.Osu
 
             return adjustedDifficulty;
         }
+
+        public override bool EditorShowScrollSpeed => false;
     }
 }
