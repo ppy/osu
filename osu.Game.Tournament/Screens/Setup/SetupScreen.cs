@@ -93,10 +93,11 @@ namespace osu.Game.Tournament.Screens.Setup
                 new ActionableInfo
                 {
                     Label = "Current user",
-                    ButtonText = "Change sign-in",
+                    ButtonText = "Show profile",
                     Action = () =>
                     {
-                        api.Logout();
+                        // We already have an entry to log out the account.
+                        // api.Logout();
 
                         if (loginOverlay == null)
                         {
