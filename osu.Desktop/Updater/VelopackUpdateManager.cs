@@ -11,11 +11,10 @@ using osu.Game.Overlays.Notifications;
 using osu.Game.Screens.Play;
 using Velopack;
 using Velopack.Sources;
-using UpdateManager = Velopack.UpdateManager;
 
 namespace osu.Desktop.Updater
 {
-    public partial class VeloUpdateManager : Game.Updater.UpdateManager
+    public partial class VelopackUpdateManager : Game.Updater.UpdateManager
     {
         private readonly UpdateManager updateManager;
         private INotificationOverlay notificationOverlay = null!;
@@ -26,7 +25,7 @@ namespace osu.Desktop.Updater
         [Resolved]
         private ILocalUserPlayInfo? localUserInfo { get; set; }
 
-        public VeloUpdateManager()
+        public VelopackUpdateManager()
         {
             const string? github_token = null; // TODO: populate.
             updateManager = new UpdateManager(new GithubSource(@"https://github.com/ppy/osu", github_token, false), new UpdateOptions

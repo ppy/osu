@@ -100,7 +100,7 @@ namespace osu.Desktop
             if (!string.IsNullOrEmpty(packageManaged))
                 return new NoActionUpdateManager();
 
-            return new VeloUpdateManager();
+            return new VelopackUpdateManager();
         }
 
         public override bool RestartAppWhenExited()
