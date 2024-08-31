@@ -83,15 +83,6 @@ namespace osu.Game.Tournament.Screens.Board
                             Anchor = Anchor.TopLeft,
                             Origin = Anchor.TopLeft,
                         },
-                        new TournamentMatchChatDisplay(cornerRadius: 10)
-                        {
-                            RelativeSizeAxes = Axes.None,
-                            Height = sideListHeight - team1List.GetHeight() - 5,
-                            Width = 300,
-                            Anchor = Anchor.TopLeft,
-                            Origin = Anchor.TopLeft,
-                            Margin = new MarginPadding { Top = 10 },
-                        },
                     },
                 },
                 new FillFlowContainer

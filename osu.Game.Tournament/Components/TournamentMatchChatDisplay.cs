@@ -23,15 +23,15 @@ namespace osu.Game.Tournament.Components
         [Resolved]
         private LadderInfo ladderInfo { get; set; } = null!;
 
-        public TournamentMatchChatDisplay(float cornerRadius = 0, bool AutoSizeY = false)
+        public TournamentMatchChatDisplay(float cornerRadius = 0, bool AutoSizeY = false, bool RelativeSizeY = false, float bkgAlpha = 0.7f)
         {
             AutoSizeAxes = AutoSizeY ? Axes.Y : Axes.None;
-            RelativeSizeAxes = Axes.X;
-            if (!AutoSizeY) Height = 144;
+            RelativeSizeAxes = RelativeSizeY ? Axes.Both : Axes.X;
+            if (!AutoSizeY) Height = RelativeSizeY ? 1f : 144;
             Anchor = Anchor.BottomLeft;
             Origin = Anchor.BottomLeft;
 
-            Background.Alpha = 0.7f;
+            Background.Alpha = bkgAlpha;
 
             CornerRadius = cornerRadius;
         }
@@ -76,6 +76,11 @@ namespace osu.Game.Tournament.Components
             }
         }
 
+        public void ChangeRadius(int radius)
+        {
+            CornerRadius = radius;
+        }
+
         public void Expand() => this.FadeIn(300);
 
         public void Contract() => this.FadeOut(200);
@@ -94,9 +99,13 @@ namespace osu.Game.Tournament.Components
                     && message.SenderId == currentMatch.Value.Round.Value.RefereeId.Value;
                 // Automatically block duplicate messages, since we have multiple chat displays available.
                 if ((isRef || currentMatch.Value.Round.Value.TrustAll.Value)
-                    && isCommand && !currentMatch.Value.PendingMsgs.Any(p => p.Id == message.Id))
+                    && isCommand && !currentMatch.Value.PendingMsgs.Any(p => p.Equals(message)))
                 {
                     currentMatch.Value.PendingMsgs.Add(message);
+                }
+                if (!currentMatch.Value.ChatMsgs.Any(p => p.Equals(message)))
+                {
+                    currentMatch.Value.ChatMsgs.Add(message);
                 }
             }
 

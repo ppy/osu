@@ -47,10 +47,12 @@ namespace osu.Game.Tournament
         public const int REQUIRED_WIDTH = CONTROL_AREA_WIDTH * 2 + STREAM_AREA_WIDTH;
 
         [Cached]
-        private TournamentMatchChatDisplay chat = new TournamentMatchChatDisplay();
+        private TournamentMatchChatDisplay chat = new TournamentMatchChatDisplay(RelativeSizeY: true);
 
         private Container chatContainer = null!;
         private FillFlowContainer buttons = null!;
+
+        private TournamentScreen middle = null!;
 
         public TournamentSceneManager()
         {
@@ -104,13 +106,17 @@ namespace osu.Game.Tournament
                                 new DrawingsScreen(),
                                 new GameplayScreen(),
                                 new TeamWinScreen(),
-                                new BoardScreen(),
+                                middle = new BoardScreen(),
                                 new EXBoardScreen()
                             }
                         },
                         chatContainer = new Container
                         {
-                            RelativeSizeAxes = Axes.Both,
+                            Anchor = Anchor.BottomLeft,
+                            Origin = Anchor.BottomLeft,
+                            RelativeSizeAxes = Axes.None,
+                            Width = STREAM_AREA_WIDTH,
+                            Height = 480,
                             Child = chat
                         },
                     }
@@ -217,16 +223,32 @@ namespace osu.Game.Tournament
             screens.ChangeChildDepth(currentScreen, depth--);
             currentScreen.Show();
 
+            var team1List = new DrawableTeamPlayerList(middle.LadderInfo.CurrentMatch.Value?.Team1.Value);
+
             switch (currentScreen)
             {
                 case MapPoolScreen:
                     chatContainer.FadeIn(TournamentScreen.FADE_DELAY);
-                    chatContainer.ResizeWidthTo(1, 500, Easing.OutQuint);
+                    chatContainer.ResizeWidthTo(STREAM_AREA_WIDTH, 500, Easing.OutQuint);
+                    chatContainer.ResizeHeightTo(144, 500, Easing.OutQuint);
+                    chatContainer.MoveTo(new Vector2(0, 0), 500, Easing.OutQuint);
+                    chat.ChangeRadius(0);
                     break;
 
                 case GameplayScreen:
                     chatContainer.FadeIn(TournamentScreen.FADE_DELAY);
-                    chatContainer.ResizeWidthTo(0.5f, 500, Easing.OutQuint);
+                    chatContainer.ResizeWidthTo(STREAM_AREA_WIDTH / 2, 500, Easing.OutQuint);
+                    chatContainer.ResizeHeightTo(144, 500, Easing.OutQuint);
+                    chatContainer.MoveTo(new Vector2(0, 0), 500, Easing.OutQuint);
+                    chat.ChangeRadius(0);
+                    break;
+
+                case BoardScreen or EXBoardScreen:
+                    chatContainer.FadeIn(TournamentScreen.FADE_DELAY);
+                    chatContainer.MoveTo(new Vector2(30, -(270 - team1List.GetHeight() - 5)), 500, Easing.OutQuint);
+                    chatContainer.ResizeWidthTo(300, 500, Easing.OutQuint);
+                    chatContainer.ResizeHeightTo(660 - team1List.GetHeight() - 5, 500, Easing.OutQuint);
+                    chat.ChangeRadius(10);
                     break;
 
                 default:

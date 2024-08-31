@@ -13,7 +13,7 @@ namespace osu.Game.Tournament.Screens
         public const double FADE_DELAY = 200;
 
         [Resolved]
-        protected LadderInfo LadderInfo { get; private set; } = null!;
+        public LadderInfo LadderInfo { get; private set; } = null!;
 
         protected TournamentScreen()
         {
