@@ -29,11 +29,7 @@ namespace osu.Game.Tournament.Screens.Setup
 
             reloadTournamentsButton.Action = () => dropdown.Items = storage.ListTournaments();
 
-            Action = () =>
-            {
-                game.RestartAppWhenExited();
-                game.AttemptExit();
-            };
+            Action = () => game.Restart();
             folderButton.Action = () => storage.PresentExternally();
 
             ButtonText = "Close osu!";

@@ -35,7 +35,7 @@ namespace osu.Desktop.Updater
         private readonly SquirrelLogger squirrelLogger = new SquirrelLogger();
 
         [Resolved]
-        private OsuGameBase game { get; set; } = null!;
+        private OsuGame game { get; set; } = null!;
 
         [Resolved]
         private ILocalUserPlayInfo? localUserInfo { get; set; }
@@ -150,7 +150,7 @@ namespace osu.Desktop.Updater
         private bool restartToApplyUpdate()
         {
             PrepareUpdateAsync()
-                .ContinueWith(_ => Schedule(() => game.AttemptExit()));
+                .ContinueWith(_ => Schedule(() => game.Restart()));
             return true;
         }
 
