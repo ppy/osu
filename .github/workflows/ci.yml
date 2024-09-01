@@ -13,10 +13,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Install .NET 8.0.x
-        uses: actions/setup-dotnet@v3
+        uses: actions/setup-dotnet@v4
         with:
           dotnet-version: "8.0.x"
 
@@ -27,7 +27,7 @@ jobs:
         run: dotnet restore osu.Desktop.slnf
 
       - name: Restore inspectcode cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ${{ github.workspace }}/inspectcode
           key: inspectcode-${{ hashFiles('.config/dotnet-tools.json', '.github/workflows/ci.yml', 'osu.sln*', 'osu*.slnf', '.editorconfig', '.globalconfig', 'CodeAnalysis/*', '**/*.csproj', '**/*.props') }}
@@ -64,16 +64,17 @@ jobs:
        matrix:
           os:
             - { prettyname: Windows, fullname: windows-latest }
-            - { prettyname: macOS, fullname: macos-latest }
+            # macOS runner performance has gotten unbearably slow so let's turn them off temporarily.
+            # - { prettyname: macOS, fullname: macos-latest }
             - { prettyname: Linux, fullname: ubuntu-latest }
           threadingMode: ['SingleThread', 'MultiThreaded']
-    timeout-minutes: 60
+    timeout-minutes: 120
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Install .NET 8.0.x
-        uses: actions/setup-dotnet@v3
+        uses: actions/setup-dotnet@v4
         with:
           dotnet-version: "8.0.x"
 
@@ -99,16 +100,16 @@ jobs:
     timeout-minutes: 60
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup JDK 11
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           distribution: microsoft
           java-version: 11
 
       - name: Install .NET 8.0.x
-        uses: actions/setup-dotnet@v3
+        uses: actions/setup-dotnet@v4
         with:
           dotnet-version: "8.0.x"
 
@@ -120,24 +121,19 @@ jobs:
 
   build-only-ios:
     name: Build only (iOS)
-    # `macos-13` is required, because the newest Microsoft.iOS.Sdk versions require Xcode 14.3.
-    # TODO: can be changed to `macos-latest` once `macos-13` becomes latest (currently in beta: https://github.com/actions/runner-images/tree/main#available-images)
-    runs-on: macos-13
+    runs-on: macos-latest
     timeout-minutes: 60
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Install .NET 8.0.x
-        uses: actions/setup-dotnet@v3
+        uses: actions/setup-dotnet@v4
         with:
           dotnet-version: "8.0.x"
 
       - name: Install .NET Workloads
         run: dotnet workload install maui-ios
-
-      - name: Select Xcode 15.2
-        run: sudo xcode-select -s /Applications/Xcode_15.2.app/Contents/Developer
 
       - name: Build
         run: dotnet build -c Debug osu.iOS

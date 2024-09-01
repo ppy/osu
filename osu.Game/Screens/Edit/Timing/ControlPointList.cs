@@ -7,13 +7,11 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Game.Beatmaps.ControlPoints;
-using osu.Game.Graphics.Containers;
+using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
-using osu.Game.Overlays;
 using osuTK;
 
 namespace osu.Game.Screens.Edit.Timing
@@ -21,11 +19,7 @@ namespace osu.Game.Screens.Edit.Timing
     public partial class ControlPointList : CompositeDrawable
     {
         private OsuButton deleteButton = null!;
-        private ControlPointTable table = null!;
-        private OsuScrollContainer scroll = null!;
         private RoundedButton addButton = null!;
-
-        private readonly IBindableList<ControlPointGroup> controlPointGroups = new BindableList<ControlPointGroup>();
 
         [Resolved]
         private EditorClock clock { get; set; } = null!;
@@ -36,32 +30,38 @@ namespace osu.Game.Screens.Edit.Timing
         [Resolved]
         private Bindable<ControlPointGroup?> selectedGroup { get; set; } = null!;
 
-        [Resolved]
-        private IEditorChangeHandler? changeHandler { get; set; }
-
         [BackgroundDependencyLoader]
-        private void load(OverlayColourProvider colours)
+        private void load(OsuColour colours)
         {
             RelativeSizeAxes = Axes.Both;
 
             const float margins = 10;
             InternalChildren = new Drawable[]
             {
-                new Box
-                {
-                    Colour = colours.Background4,
-                    RelativeSizeAxes = Axes.Both,
-                },
-                new Box
-                {
-                    Colour = colours.Background3,
-                    RelativeSizeAxes = Axes.Y,
-                    Width = ControlPointTable.TIMING_COLUMN_WIDTH + margins,
-                },
-                scroll = new OsuScrollContainer
+                new ControlPointTable
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Child = table = new ControlPointTable(),
+                    Groups = { BindTarget = Beatmap.ControlPointInfo.Groups, },
+                },
+                new FillFlowContainer
+                {
+                    AutoSizeAxes = Axes.Both,
+                    Anchor = Anchor.BottomLeft,
+                    Origin = Anchor.BottomLeft,
+                    Direction = FillDirection.Horizontal,
+                    Margin = new MarginPadding(margins),
+                    Spacing = new Vector2(5),
+                    Children = new Drawable[]
+                    {
+                        new RoundedButton
+                        {
+                            Text = "Select closest to current time",
+                            Action = goToCurrentGroup,
+                            Size = new Vector2(220, 30),
+                            Anchor = Anchor.BottomRight,
+                            Origin = Anchor.BottomRight,
+                        },
+                    }
                 },
                 new FillFlowContainer
                 {
@@ -80,6 +80,7 @@ namespace osu.Game.Screens.Edit.Timing
                             Action = delete,
                             Anchor = Anchor.BottomRight,
                             Origin = Anchor.BottomRight,
+                            BackgroundColour = colours.Red3,
                         },
                         addButton = new RoundedButton
                         {
@@ -105,20 +106,6 @@ namespace osu.Game.Screens.Edit.Timing
                     ? "+ Clone to current time"
                     : "+ Add at current time";
             }, true);
-
-            controlPointGroups.BindTo(Beatmap.ControlPointInfo.Groups);
-            controlPointGroups.BindCollectionChanged((_, _) =>
-            {
-                // This callback can happen many times in a change operation. It gets expensive.
-                // We really should be handling the `CollectionChanged` event properly.
-                Scheduler.AddOnce(() =>
-                {
-                    table.ControlGroups = controlPointGroups;
-                    changeHandler?.SaveState();
-                });
-            }, true);
-
-            table.OnRowSelected += drawable => scroll.ScrollIntoView(drawable);
         }
 
         protected override bool OnClick(ClickEvent e)
@@ -131,61 +118,18 @@ namespace osu.Game.Screens.Edit.Timing
         {
             base.Update();
 
-            trackActivePoint();
-
             addButton.Enabled.Value = clock.CurrentTimeAccurate != selectedGroup.Value?.Time;
         }
 
-        private Type? trackedType;
-
-        /// <summary>
-        /// Given the user has selected a control point group, we want to track any group which is
-        /// active at the current point in time which matches the type the user has selected.
-        ///
-        /// So if the user is currently looking at a timing point and seeks into the future, a
-        /// future timing point would be automatically selected if it is now the new "current" point.
-        /// </summary>
-        private void trackActivePoint()
+        private void goToCurrentGroup()
         {
-            // For simplicity only match on the first type of the active control point.
-            if (selectedGroup.Value == null)
-                trackedType = null;
-            else
-            {
-                switch (selectedGroup.Value.ControlPoints.Count)
-                {
-                    // If the selected group has no control points, clear the tracked type.
-                    // Otherwise the user will be unable to select a group with no control points.
-                    case 0:
-                        trackedType = null;
-                        break;
+            double accurateTime = clock.CurrentTimeAccurate;
 
-                    // If the selected group only has one control point, update the tracking type.
-                    case 1:
-                        trackedType = selectedGroup.Value?.ControlPoints.Single().GetType();
-                        break;
+            var activeTimingPoint = Beatmap.ControlPointInfo.TimingPointAt(accurateTime);
+            var activeEffectPoint = Beatmap.ControlPointInfo.EffectPointAt(accurateTime);
 
-                    // If the selected group has more than one control point, choose the first as the tracking type
-                    // if we don't already have a singular tracked type.
-                    default:
-                        trackedType ??= selectedGroup.Value?.ControlPoints.FirstOrDefault()?.GetType();
-                        break;
-                }
-            }
-
-            if (trackedType != null)
-            {
-                // We don't have an efficient way of looking up groups currently, only individual point types.
-                // To improve the efficiency of this in the future, we should reconsider the overall structure of ControlPointInfo.
-
-                // Find the next group which has the same type as the selected one.
-                var found = Beatmap.ControlPointInfo.Groups
-                                   .Where(g => g.ControlPoints.Any(cp => cp.GetType() == trackedType))
-                                   .LastOrDefault(g => g.Time <= clock.CurrentTimeAccurate);
-
-                if (found != null)
-                    selectedGroup.Value = found;
-            }
+            double latestActiveTime = Math.Max(activeTimingPoint.Time, activeEffectPoint.Time);
+            selectedGroup.Value = Beatmap.ControlPointInfo.GroupAt(latestActiveTime);
         }
 
         private void delete()

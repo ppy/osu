@@ -112,7 +112,7 @@ namespace osu.Game.Tests.Rulesets.Scoring
 
             for (int i = 0; i < 4; i++)
             {
-                var judgementResult = new JudgementResult(fourObjectBeatmap.HitObjects[i], fourObjectBeatmap.HitObjects[i].CreateJudgement())
+                var judgementResult = new JudgementResult(fourObjectBeatmap.HitObjects[i], fourObjectBeatmap.HitObjects[i].Judgement)
                 {
                     Type = i == 2 ? minResult : hitResult
                 };
@@ -141,7 +141,7 @@ namespace osu.Game.Tests.Rulesets.Scoring
 
             for (int i = 0; i < object_count; ++i)
             {
-                var judgementResult = new JudgementResult(largeBeatmap.HitObjects[i], largeBeatmap.HitObjects[i].CreateJudgement())
+                var judgementResult = new JudgementResult(largeBeatmap.HitObjects[i], largeBeatmap.HitObjects[i].Judgement)
                 {
                     Type = HitResult.Great
                 };
@@ -325,11 +325,11 @@ namespace osu.Game.Tests.Rulesets.Scoring
             scoreProcessor = new TestScoreProcessor();
             scoreProcessor.ApplyBeatmap(beatmap);
 
-            scoreProcessor.ApplyResult(new JudgementResult(beatmap.HitObjects[0], beatmap.HitObjects[0].CreateJudgement()) { Type = HitResult.Great });
+            scoreProcessor.ApplyResult(new JudgementResult(beatmap.HitObjects[0], beatmap.HitObjects[0].Judgement) { Type = HitResult.Great });
             Assert.That(scoreProcessor.Combo.Value, Is.EqualTo(1));
             Assert.That(scoreProcessor.Accuracy.Value, Is.EqualTo(1));
 
-            scoreProcessor.ApplyResult(new JudgementResult(beatmap.HitObjects[1], beatmap.HitObjects[1].CreateJudgement()) { Type = HitResult.ComboBreak });
+            scoreProcessor.ApplyResult(new JudgementResult(beatmap.HitObjects[1], beatmap.HitObjects[1].Judgement) { Type = HitResult.ComboBreak });
             Assert.That(scoreProcessor.Combo.Value, Is.EqualTo(0));
             Assert.That(scoreProcessor.Accuracy.Value, Is.EqualTo(1));
         }
@@ -350,7 +350,7 @@ namespace osu.Game.Tests.Rulesets.Scoring
 
             for (int i = 0; i < beatmap.HitObjects.Count; i++)
             {
-                scoreProcessor.ApplyResult(new JudgementResult(beatmap.HitObjects[i], beatmap.HitObjects[i].CreateJudgement())
+                scoreProcessor.ApplyResult(new JudgementResult(beatmap.HitObjects[i], beatmap.HitObjects[i].Judgement)
                 {
                     Type = i == 0 ? HitResult.Miss : HitResult.Great
                 });
@@ -441,10 +441,7 @@ namespace osu.Game.Tests.Rulesets.Scoring
             private readonly HitResult maxResult;
             private readonly HitResult? minResult;
 
-            public override Judgement CreateJudgement()
-            {
-                return new TestJudgement(maxResult, minResult);
-            }
+            public override Judgement CreateJudgement() => new TestJudgement(maxResult, minResult);
 
             public TestHitObject(HitResult maxResult, HitResult? minResult = null)
             {

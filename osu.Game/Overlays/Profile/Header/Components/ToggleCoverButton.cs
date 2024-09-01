@@ -50,12 +50,13 @@ namespace osu.Game.Overlays.Profile.Header.Components
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
-                Size = new Vector2(10.5f, 12)
+                Size = new Vector2(10.5f, 12),
+                Icon = FontAwesome.Solid.ChevronDown,
             };
 
             CoverExpanded.BindValueChanged(visible => updateState(visible.NewValue), true);
         }
 
-        private void updateState(bool detailsVisible) => icon.Icon = detailsVisible ? FontAwesome.Solid.ChevronUp : FontAwesome.Solid.ChevronDown;
+        private void updateState(bool detailsVisible) => icon.ScaleTo(detailsVisible ? new Vector2(1f, -1f) : Vector2.One, 300, Easing.OutQuint);
     }
 }
