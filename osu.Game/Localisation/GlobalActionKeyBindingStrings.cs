@@ -369,6 +369,61 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString EditorToggleRotateControl => new TranslatableString(getKey(@"editor_toggle_rotate_control"), @"Toggle rotate control");
 
+        /// <summary>
+        /// "Toggle scale control"
+        /// </summary>
+        public static LocalisableString EditorToggleScaleControl => new TranslatableString(getKey(@"editor_toggle_scale_control"), @"Toggle scale control");
+
+        /// <summary>
+        /// "Toggle autoplay"
+        /// </summary>
+        public static LocalisableString EditorTestPlayToggleAutoplay => new TranslatableString(getKey(@"editor_test_play_toggle_autoplay"), @"Toggle autoplay");
+
+        /// <summary>
+        /// "Toggle quick pause"
+        /// </summary>
+        public static LocalisableString EditorTestPlayToggleQuickPause => new TranslatableString(getKey(@"editor_test_play_toggle_quick_pause"), @"Toggle quick pause");
+
+        /// <summary>
+        /// "Quick exit to initial time"
+        /// </summary>
+        public static LocalisableString EditorTestPlayQuickExitToInitialTime => new TranslatableString(getKey(@"editor_test_play_quick_exit_to_initial_time"), @"Quick exit to initial time");
+
+        /// <summary>
+        /// "Quick exit to current time"
+        /// </summary>
+        public static LocalisableString EditorTestPlayQuickExitToCurrentTime => new TranslatableString(getKey(@"editor_test_play_quick_exit_to_current_time"), @"Quick exit to current time");
+
+        /// <summary>
+        /// "Increase mod speed"
+        /// </summary>
+        public static LocalisableString IncreaseModSpeed => new TranslatableString(getKey(@"increase_mod_speed"), @"Increase mod speed");
+
+        /// <summary>
+        /// "Decrease mod speed"
+        /// </summary>
+        public static LocalisableString DecreaseModSpeed => new TranslatableString(getKey(@"decrease_mod_speed"), @"Decrease mod speed");
+
+        /// <summary>
+        /// "Seek to previous hit object"
+        /// </summary>
+        public static LocalisableString EditorSeekToPreviousHitObject => new TranslatableString(getKey(@"editor_seek_to_previous_hit_object"), @"Seek to previous hit object");
+
+        /// <summary>
+        /// "Seek to next hit object"
+        /// </summary>
+        public static LocalisableString EditorSeekToNextHitObject => new TranslatableString(getKey(@"editor_seek_to_next_hit_object"), @"Seek to next hit object");
+
+        /// <summary>
+        /// "Seek to previous sample point"
+        /// </summary>
+        public static LocalisableString EditorSeekToPreviousSamplePoint => new TranslatableString(getKey(@"editor_seek_to_previous_sample_point"), @"Seek to previous sample point");
+
+        /// <summary>
+        /// "Seek to next sample point"
+        /// </summary>
+        public static LocalisableString EditorSeekToNextSamplePoint => new TranslatableString(getKey(@"editor_seek_to_next_sample_point"), @"Seek to next sample point");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }

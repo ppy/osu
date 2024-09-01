@@ -11,6 +11,7 @@ using osu.Framework.Testing;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
 using osuTK;
+using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
@@ -59,6 +60,40 @@ namespace osu.Game.Tests.Visual.UserInterface
             expectedValue(numberBoxes, "123");
 
             clearTextboxes(numberBoxes);
+        }
+
+        [Test]
+        public void TestSelectAllOnFocus()
+        {
+            AddStep("create themed content", () => CreateThemedContent(OverlayColourScheme.Red));
+
+            AddStep("enter numbers", () => numberBoxes.ForEach(numberBox => numberBox.Text = "987654321"));
+
+            AddAssert("nothing selected", () => string.IsNullOrEmpty(numberBoxes.First().SelectedText));
+            AddStep("click on a number box", () =>
+            {
+                InputManager.MoveMouseTo(numberBoxes.First());
+                InputManager.Click(MouseButton.Left);
+            });
+            AddAssert("text selected", () => numberBoxes.First().SelectedText == "987654321");
+
+            AddStep("click away", () =>
+            {
+                InputManager.MoveMouseTo(Vector2.Zero);
+                InputManager.Click(MouseButton.Left);
+            });
+
+            Drawable textContainer = null!;
+
+            AddStep("move mouse to end of text", () =>
+            {
+                textContainer = numberBoxes.First().ChildrenOfType<Container>().ElementAt(1);
+                InputManager.MoveMouseTo(textContainer.ScreenSpaceDrawQuad.TopRight);
+            });
+            AddStep("hold mouse", () => InputManager.PressButton(MouseButton.Left));
+            AddStep("drag to half", () => InputManager.MoveMouseTo(textContainer.ScreenSpaceDrawQuad.BottomRight - new Vector2(textContainer.ScreenSpaceDrawQuad.Width / 2 + 1f, 0)));
+            AddStep("release mouse", () => InputManager.ReleaseButton(MouseButton.Left));
+            AddAssert("half text selected", () => numberBoxes.First().SelectedText == "54321");
         }
 
         private void clearTextboxes(IEnumerable<OsuTextBox> textBoxes) => AddStep("clear textbox", () => textBoxes.ForEach(textBox => textBox.Text = null));

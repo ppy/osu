@@ -152,6 +152,17 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             newPreview.IsChosen.Value = applyNewButton.IsHovered;
         }
 
+        public override bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
+        {
+            if (e.Action == GlobalAction.Select && !e.Repeat)
+            {
+                applyNew();
+                return true;
+            }
+
+            return base.OnPressed(e);
+        }
+
         private partial class ConflictingKeyBindingPreview : CompositeDrawable
         {
             private readonly object action;

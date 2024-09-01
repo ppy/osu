@@ -91,7 +91,16 @@ namespace osu.Game.Graphics.Containers
 
             if (IsBeatSyncedWithTrack)
             {
-                currentTrackTime = BeatSyncSource.Clock.CurrentTime + EarlyActivationMilliseconds;
+                double early = EarlyActivationMilliseconds;
+
+                // In the case of gameplay, we are usually within a hierarchy with the correct rate applied to our `Drawable.Clock`.
+                // This means that the amount of early adjustment is adjusted in line with audio track rate changes.
+                // But other cases like the osu! logo at the main menu won't correctly have this rate information.
+                // We can adjust here to ensure the applied early activation always matches expectations.
+                if (Clock.Rate > 0)
+                    early *= BeatSyncSource.Clock.Rate / Clock.Rate;
+
+                currentTrackTime = BeatSyncSource.Clock.CurrentTime + early;
 
                 timingPoint = BeatSyncSource.ControlPoints?.TimingPointAt(currentTrackTime) ?? TimingControlPoint.DEFAULT;
                 effectPoint = BeatSyncSource.ControlPoints?.EffectPointAt(currentTrackTime) ?? EffectControlPoint.DEFAULT;

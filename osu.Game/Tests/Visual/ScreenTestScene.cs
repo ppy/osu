@@ -12,6 +12,7 @@ using osu.Framework.Testing;
 using osu.Game.Graphics;
 using osu.Game.Overlays;
 using osu.Game.Screens;
+using osu.Game.Screens.Footer;
 
 namespace osu.Game.Tests.Visual
 {
@@ -30,6 +31,9 @@ namespace osu.Game.Tests.Visual
         [Cached(typeof(IDialogOverlay))]
         protected DialogOverlay DialogOverlay { get; private set; }
 
+        [Cached]
+        private ScreenFooter footer;
+
         protected ScreenTestScene()
         {
             base.Content.AddRange(new Drawable[]
@@ -44,7 +48,8 @@ namespace osu.Game.Tests.Visual
                 {
                     RelativeSizeAxes = Axes.Both,
                     Child = DialogOverlay = new DialogOverlay()
-                }
+                },
+                footer = new ScreenFooter(),
             });
 
             Stack.ScreenPushed += (_, newScreen) => Logger.Log($"{nameof(ScreenTestScene)} screen changed → {newScreen}");

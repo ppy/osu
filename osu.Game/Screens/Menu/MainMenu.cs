@@ -31,6 +31,7 @@ using osu.Game.Overlays.SkinEditor;
 using osu.Game.Rulesets;
 using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Edit;
+using osu.Game.Screens.OnlinePlay.DailyChallenge;
 using osu.Game.Screens.OnlinePlay.Multiplayer;
 using osu.Game.Screens.OnlinePlay.Playlists;
 using osu.Game.Screens.Select;
@@ -52,8 +53,6 @@ namespace osu.Game.Screens.Menu
         public override bool AllowExternalScreenChange => true;
 
         public override bool? AllowGlobalTrackControl => true;
-
-        private Screen songSelect;
 
         private MenuSideFlashes sideFlashes;
 
@@ -98,7 +97,7 @@ namespace osu.Game.Screens.Menu
         private ParallaxContainer buttonsContainer;
         private SongTicker songTicker;
         private Container logoTarget;
-        private SystemTitle systemTitle;
+        private OnlineMenuBanner onlineMenuBanner;
         private MenuTip menuTip;
         private FillFlowContainer bottomElementsFlow;
         private SupporterDisplay supporterDisplay;
@@ -147,6 +146,13 @@ namespace osu.Game.Screens.Menu
                             OnSolo = loadSoloSongSelect,
                             OnMultiplayer = () => this.Push(new Multiplayer()),
                             OnPlaylists = () => this.Push(new Playlists()),
+                            OnDailyChallenge = room =>
+                            {
+                                if (statics.Get<bool>(Static.DailyChallengeIntroPlayed))
+                                    this.Push(new DailyChallenge(room));
+                                else
+                                    this.Push(new DailyChallengeIntro(room));
+                            },
                             OnExit = () =>
                             {
                                 exitConfirmedViaHoldOrClick = true;
@@ -178,7 +184,7 @@ namespace osu.Game.Screens.Menu
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
                         },
-                        systemTitle = new SystemTitle
+                        onlineMenuBanner = new OnlineMenuBanner
                         {
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
@@ -201,12 +207,12 @@ namespace osu.Game.Screens.Menu
                     case ButtonSystemState.Initial:
                     case ButtonSystemState.Exit:
                         ApplyToBackground(b => b.FadeColour(Color4.White, 500, Easing.OutSine));
-                        systemTitle.State.Value = Visibility.Hidden;
+                        onlineMenuBanner.State.Value = Visibility.Hidden;
                         break;
 
                     default:
                         ApplyToBackground(b => b.FadeColour(OsuColour.Gray(0.8f), 500, Easing.OutSine));
-                        systemTitle.State.Value = Visibility.Visible;
+                        onlineMenuBanner.State.Value = Visibility.Visible;
                         break;
                 }
             };
@@ -215,26 +221,11 @@ namespace osu.Game.Screens.Menu
             Buttons.OnBeatmapListing = () => beatmapListing?.ToggleVisibility();
 
             reappearSampleSwoosh = audio.Samples.Get(@"Menu/reappear-swoosh");
-
-            preloadSongSelect();
         }
 
         public void ReturnToOsuLogo() => Buttons.State = ButtonSystemState.Initial;
 
-        private void preloadSongSelect()
-        {
-            if (songSelect == null)
-                LoadComponentAsync(songSelect = new PlaySongSelect());
-        }
-
-        private void loadSoloSongSelect() => this.Push(consumeSongSelect());
-
-        private Screen consumeSongSelect()
-        {
-            var s = songSelect;
-            songSelect = null;
-            return s;
-        }
+        private void loadSoloSongSelect() => this.Push(new PlaySongSelect());
 
         public override void OnEntering(ScreenTransitionEvent e)
         {
@@ -367,9 +358,6 @@ namespace osu.Game.Screens.Menu
             reappearSampleSwoosh?.Play();
 
             ApplyToBackground(b => (b as BackgroundScreenDefault)?.Next());
-
-            // we may have consumed our preloaded instance, so let's make another.
-            preloadSongSelect();
 
             musicController.EnsurePlayingSomething();
 

@@ -228,7 +228,8 @@ namespace osu.Game.Screens.Play.PlayerSettings
                 useAverageButton = new SettingsButton
                 {
                     Text = BeatmapOffsetControlStrings.CalibrateUsingLastPlay,
-                    Action = () => Current.Value = lastPlayBeatmapOffset - lastPlayAverage
+                    Action = () => Current.Value = lastPlayBeatmapOffset - lastPlayAverage,
+                    Enabled = { Value = !Precision.AlmostEquals(lastPlayAverage, 0, Current.Precision / 2) }
                 },
                 globalOffsetText = new LinkFlowContainer
                 {

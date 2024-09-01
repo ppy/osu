@@ -173,6 +173,16 @@ namespace osu.Game.Tests.Skins.IO
             assertCorrectMetadata(import1, "name 1 [my custom skin 1]", "author 1", 1.0m, osu);
         });
 
+        [Test]
+        public Task TestImportWithSubfolder() => runSkinTest(async osu =>
+        {
+            const string filename = "Archives/skin-with-subfolder-zip-entries.osk";
+            var import = await loadSkinIntoOsu(osu, new ImportTask(TestResources.OpenResource(filename), filename));
+
+            assertCorrectMetadata(import, $"Totally fully features skin [Real Skin with Real Features] [{filename[..^4]}]", "Unknown", 2.7m, osu);
+            Assert.That(import.PerformRead(r => r.Files.Count), Is.EqualTo(3));
+        });
+
         #endregion
 
         #region Cases where imports should be uniquely imported

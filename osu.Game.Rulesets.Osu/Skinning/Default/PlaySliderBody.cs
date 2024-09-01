@@ -44,7 +44,6 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
 
             SnakingOut.BindTo(configSnakingOut);
 
-            BorderSize = skin.GetConfig<OsuSkinConfiguration, float>(OsuSkinConfiguration.SliderBorderSize)?.Value ?? 1;
             BorderColour = skin.GetConfig<OsuSkinColour, Color4>(OsuSkinColour.SliderBorder)?.Value ?? Color4.White;
         }
 

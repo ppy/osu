@@ -14,7 +14,7 @@ namespace osu.Game.Overlays.Chat
 {
     public partial class DaySeparator : Container
     {
-        protected virtual float TextSize => 15;
+        protected virtual float TextSize => 13;
 
         protected virtual float LineHeight => 2;
 

@@ -122,8 +122,17 @@ namespace osu.Game.Screens.Play
             StopGameplayClock();
         }
 
-        protected virtual void StartGameplayClock() => GameplayClock.Start();
-        protected virtual void StopGameplayClock() => GameplayClock.Stop();
+        protected virtual void StartGameplayClock()
+        {
+            Logger.Log($"{nameof(GameplayClockContainer)} started via call to {nameof(StartGameplayClock)}");
+            GameplayClock.Start();
+        }
+
+        protected virtual void StopGameplayClock()
+        {
+            Logger.Log($"{nameof(GameplayClockContainer)} stopped via call to {nameof(StopGameplayClock)}");
+            GameplayClock.Stop();
+        }
 
         /// <summary>
         /// Resets this <see cref="GameplayClockContainer"/> and the source to an initial state ready for gameplay.

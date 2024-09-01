@@ -95,6 +95,8 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
                 case SwellTick:
                     scoreIncrease = 300;
                     increaseCombo = false;
+                    isBonus = true;
+                    bonusResult = HitResult.IgnoreHit;
                     break;
 
                 case DrumRollTick:

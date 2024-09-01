@@ -7,7 +7,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Primitives;
 using osu.Game.Rulesets.Mania.Beatmaps;
@@ -67,13 +66,12 @@ namespace osu.Game.Rulesets.Mania.UI
                 Content = new[] { new Drawable[stageDefinitions.Count] }
             });
 
-            var normalColumnAction = ManiaAction.Key1;
-            var specialColumnAction = ManiaAction.Special1;
+            var columnAction = ManiaAction.Key1;
             int firstColumnIndex = 0;
 
             for (int i = 0; i < stageDefinitions.Count; i++)
             {
-                var newStage = new Stage(firstColumnIndex, stageDefinitions[i], ref normalColumnAction, ref specialColumnAction);
+                var newStage = new Stage(firstColumnIndex, stageDefinitions[i], ref columnAction);
 
                 playfieldGrid.Content[0][i] = newStage;
 
@@ -149,7 +147,18 @@ namespace osu.Game.Rulesets.Mania.UI
         /// <summary>
         /// Retrieves the total amount of columns across all stages in this playfield.
         /// </summary>
-        public int TotalColumns => stages.Sum(s => s.Columns.Length);
+        public int TotalColumns
+        {
+            get
+            {
+                int sum = 0;
+
+                foreach (var stage in stages)
+                    sum += stage.Columns.Length;
+
+                return sum;
+            }
+        }
 
         private Stage getStageByColumn(int column)
         {

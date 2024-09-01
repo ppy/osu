@@ -50,7 +50,6 @@ using osu.Game.Online.API;
 using osu.Game.Online.Chat;
 using osu.Game.Online.Metadata;
 using osu.Game.Online.Multiplayer;
-using osu.Game.Online.Solo;
 using osu.Game.Online.Spectator;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Settings;
@@ -76,6 +75,12 @@ namespace osu.Game
     {
         public static readonly string[] VIDEO_EXTENSIONS = { ".mp4", ".mov", ".avi", ".flv", ".mpg", ".wmv", ".m4v" };
 
+#if DEBUG
+        public const string GAME_NAME = "osu! (development)";
+#else
+        public const string GAME_NAME = "osu!";
+#endif
+
         public const string OSU_PROTOCOL = "osu://";
 
         public const string CLIENT_STREAM_NAME = @"lazer";
@@ -95,7 +100,7 @@ namespace osu.Game
         public const int SAMPLE_DEBOUNCE_TIME = 20;
 
         /// <summary>
-        /// The maximum volume at which audio tracks should playback. This can be set lower than 1 to create some head-room for sound effects.
+        /// The maximum volume at which audio tracks should play back at. This can be set lower than 1 to create some head-room for sound effects.
         /// </summary>
         private const double global_track_volume_adjust = 0.8;
 
@@ -207,7 +212,6 @@ namespace osu.Game
         protected MultiplayerClient MultiplayerClient { get; private set; }
 
         private MetadataClient metadataClient;
-        private SoloStatisticsWatcher soloStatisticsWatcher;
 
         private RealmAccess realm;
 
@@ -243,11 +247,7 @@ namespace osu.Game
 
         public OsuGameBase()
         {
-            Name = @"osu!";
-
-#if DEBUG
-            Name += " (development)";
-#endif
+            Name = GAME_NAME;
 
             allowableExceptions = UnhandledExceptionsBeforeCrash;
         }
@@ -328,7 +328,6 @@ namespace osu.Game
             dependencies.CacheAs(SpectatorClient = new OnlineSpectatorClient(endpoints));
             dependencies.CacheAs(MultiplayerClient = new OnlineMultiplayerClient(endpoints));
             dependencies.CacheAs(metadataClient = new OnlineMetadataClient(endpoints));
-            dependencies.CacheAs(soloStatisticsWatcher = new SoloStatisticsWatcher());
 
             base.Content.Add(new BeatmapOnlineChangeIngest(beatmapUpdater, realm, metadataClient));
 
@@ -371,7 +370,6 @@ namespace osu.Game
             base.Content.Add(SpectatorClient);
             base.Content.Add(MultiplayerClient);
             base.Content.Add(metadataClient);
-            base.Content.Add(soloStatisticsWatcher);
 
             base.Content.Add(rulesetConfigCache);
 
@@ -517,6 +515,12 @@ namespace osu.Game
         /// <returns>Whether a restart operation was queued.</returns>
         public virtual bool RestartAppWhenExited() => false;
 
+        /// <summary>
+        /// Perform migration of user data to a specified path.
+        /// </summary>
+        /// <param name="path">The path to migrate to.</param>
+        /// <returns>Whether migration succeeded to completion. If <c>false</c>, some files were left behind.</returns>
+        /// <exception cref="TimeoutException"></exception>
         public bool Migrate(string path)
         {
             Logger.Log($@"Migrating osu! data from ""{Storage.GetFullPath(string.Empty)}"" to ""{path}""...");
@@ -544,10 +548,10 @@ namespace osu.Game
                 if (!readyToRun.Wait(30000) || !success)
                     throw new TimeoutException("Attempting to block for migration took too long.");
 
-                bool? cleanupSucceded = (Storage as OsuStorage)?.Migrate(Host.GetStorage(path));
+                bool? cleanupSucceeded = (Storage as OsuStorage)?.Migrate(Host.GetStorage(path));
 
                 Logger.Log(@"Migration complete!");
-                return cleanupSucceded != false;
+                return cleanupSucceeded != false;
             }
             finally
             {
@@ -580,17 +584,17 @@ namespace osu.Game
                 {
                     case ITabletHandler th:
                         return new TabletSettings(th);
-
-                    case MouseHandler mh:
-                        return new MouseSettings(mh);
-
-                    case JoystickHandler jh:
-                        return new JoystickSettings(jh);
                 }
             }
 
             switch (handler)
             {
+                case MouseHandler mh:
+                    return new MouseSettings(mh);
+
+                case JoystickHandler jh:
+                    return new JoystickSettings(jh);
+
                 case TouchHandler th:
                     return new TouchSettings(th);
 
@@ -682,16 +686,21 @@ namespace osu.Game
         /// <summary>
         /// Allows a maximum of one unhandled exception, per second of execution.
         /// </summary>
-        private bool onExceptionThrown(Exception _)
+        /// <returns>Whether to ignore the exception and continue running.</returns>
+        private bool onExceptionThrown(Exception ex)
         {
-            bool continueExecution = Interlocked.Decrement(ref allowableExceptions) >= 0;
+            if (Interlocked.Decrement(ref allowableExceptions) < 0)
+            {
+                Logger.Log("Too many unhandled exceptions, crashing out.");
+                RulesetStore?.TryDisableCustomRulesetsCausing(ex);
+                return false;
+            }
 
-            Logger.Log($"Unhandled exception has been {(continueExecution ? $"allowed with {allowableExceptions} more allowable exceptions" : "denied")} .");
-
+            Logger.Log($"Unhandled exception has been allowed with {allowableExceptions} more allowable exceptions.");
             // restore the stock of allowable exceptions after a short delay.
             Task.Delay(1000).ContinueWith(_ => Interlocked.Increment(ref allowableExceptions));
 
-            return continueExecution;
+            return true;
         }
 
         protected override void Dispose(bool isDisposing)

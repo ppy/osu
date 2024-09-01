@@ -11,10 +11,11 @@ using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.ListExtensions;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Primitives;
+using osu.Framework.Lists;
 using osu.Framework.Threading;
 using osu.Framework.Utils;
 using osu.Game.Audio;
@@ -65,7 +66,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         public virtual IEnumerable<HitSampleInfo> GetSamples() => HitObject.Samples;
 
         private readonly List<DrawableHitObject> nestedHitObjects = new List<DrawableHitObject>();
-        public IReadOnlyList<DrawableHitObject> NestedHitObjects => nestedHitObjects;
+        public SlimReadOnlyListWrapper<DrawableHitObject> NestedHitObjects => nestedHitObjects.AsSlimReadOnly();
 
         /// <summary>
         /// Whether this object should handle any user input events.
@@ -313,11 +314,11 @@ namespace osu.Game.Rulesets.Objects.Drawables
         private void updateStateFromResult()
         {
             if (Result.IsHit)
-                updateState(ArmedState.Hit, true);
+                UpdateState(ArmedState.Hit, true);
             else if (Result.HasResult)
-                updateState(ArmedState.Miss, true);
+                UpdateState(ArmedState.Miss, true);
             else
-                updateState(ArmedState.Idle, true);
+                UpdateState(ArmedState.Idle, true);
         }
 
         protected sealed override void OnFree(HitObjectLifetimeEntry entry)
@@ -401,7 +402,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
         private void onRevertResult()
         {
-            updateState(ArmedState.Idle);
+            UpdateState(ArmedState.Idle);
             OnRevertResult?.Invoke(this, Result);
         }
 
@@ -420,7 +421,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
             if (Result is not null)
             {
                 Result.TimeOffset = 0;
-                updateState(State.Value, true);
+                UpdateState(State.Value, true);
             }
 
             DefaultsApplied?.Invoke(this);
@@ -460,7 +461,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
             throw new InvalidOperationException(
                 $"Should never clear a {nameof(DrawableHitObject)} as the base implementation adds components. If attempting to use {nameof(InternalChild)} or {nameof(InternalChildren)}, using {nameof(AddInternal)} or {nameof(AddRangeInternal)} instead.");
 
-        private void updateState(ArmedState newState, bool force = false)
+        protected void UpdateState(ArmedState newState, bool force = false)
         {
             if (State.Value == newState && !force)
                 return;
@@ -505,7 +506,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// <summary>
         /// Reapplies the current <see cref="ArmedState"/>.
         /// </summary>
-        public void RefreshStateTransforms() => updateState(State.Value, true);
+        public void RefreshStateTransforms() => UpdateState(State.Value, true);
 
         /// <summary>
         /// Apply (generally fade-in) transforms leading into the <see cref="HitObject"/> start time.
@@ -564,7 +565,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
             ApplySkin(CurrentSkin, true);
 
             if (IsLoaded)
-                updateState(State.Value, true);
+                UpdateState(State.Value, true);
         }
 
         protected void UpdateComboColour()
@@ -630,7 +631,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
         #endregion
 
-        public override bool UpdateSubTreeMasking(Drawable source, RectangleF maskingBounds) => false;
+        public override bool UpdateSubTreeMasking() => false;
 
         protected override void UpdateAfterChildren()
         {
@@ -683,17 +684,31 @@ namespace osu.Game.Rulesets.Objects.Drawables
             UpdateResult(false);
         }
 
+        protected void ApplyMaxResult() => ApplyResult((r, _) => r.Type = r.Judgement.MaxResult);
+        protected void ApplyMinResult() => ApplyResult((r, _) => r.Type = r.Judgement.MinResult);
+
+        protected void ApplyResult(HitResult type) => ApplyResult(static (result, state) => result.Type = state, type);
+
+        [Obsolete("Use overload with state, preferrably with static delegates to avoid allocation overhead.")] // Can be removed 2024-07-26
+        protected void ApplyResult(Action<JudgementResult> application) => ApplyResult((r, _) => application(r), this);
+
+        protected void ApplyResult(Action<JudgementResult, DrawableHitObject> application) => ApplyResult(application, this);
+
         /// <summary>
         /// Applies the <see cref="Result"/> of this <see cref="DrawableHitObject"/>, notifying responders such as
         /// the <see cref="ScoreProcessor"/> of the <see cref="JudgementResult"/>.
         /// </summary>
-        /// <param name="application">The callback that applies changes to the <see cref="JudgementResult"/>.</param>
-        protected void ApplyResult(Action<JudgementResult> application)
+        /// <param name="application">The callback that applies changes to the <see cref="JudgementResult"/>. Using a `static` delegate is recommended to avoid allocation overhead.</param>
+        /// <param name="state">
+        /// Use this parameter to pass any data that <paramref name="application"/> requires
+        /// to apply a result, so that it can remain a `static` delegate and thus not allocate.
+        /// </param>
+        protected void ApplyResult<T>(Action<JudgementResult, T> application, T state)
         {
             if (Result.HasResult)
                 throw new InvalidOperationException("Cannot apply result on a hitobject that already has a result.");
 
-            application?.Invoke(Result);
+            application?.Invoke(Result, state);
 
             if (!Result.HasResult)
                 throw new InvalidOperationException($"{GetType().ReadableName()} applied a {nameof(JudgementResult)} but did not update {nameof(JudgementResult.Type)}.");
@@ -710,7 +725,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
             Result.GameplayRate = (Clock as IGameplayClock)?.GetTrueGameplayRate() ?? Clock.Rate;
 
             if (Result.HasResult)
-                updateState(Result.IsHit ? ArmedState.Hit : ArmedState.Miss);
+                UpdateState(Result.IsHit ? ArmedState.Hit : ArmedState.Miss);
 
             OnNewResult?.Invoke(this, Result);
         }
@@ -738,7 +753,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// Checks if a scoring result has occurred for this <see cref="DrawableHitObject"/>.
         /// </summary>
         /// <remarks>
-        /// If a scoring result has occurred, this method must invoke <see cref="ApplyResult"/> to update the result and notify responders.
+        /// If a scoring result has occurred, this method must invoke <see cref="ApplyResult{T}"/> to update the result and notify responders.
         /// </remarks>
         /// <param name="userTriggered">Whether the user triggered this check.</param>
         /// <param name="timeOffset">The offset from the end time of the <see cref="HitObject"/> at which this check occurred.
@@ -756,7 +771,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         private void ensureEntryHasResult()
         {
             Debug.Assert(Entry != null);
-            Entry.Result ??= CreateResult(HitObject.CreateJudgement())
+            Entry.Result ??= CreateResult(HitObject.Judgement)
                              ?? throw new InvalidOperationException($"{GetType().ReadableName()} must provide a {nameof(JudgementResult)} through {nameof(CreateResult)}.");
         }
 

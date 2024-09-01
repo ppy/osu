@@ -276,5 +276,20 @@ namespace osu.Game.Utils
 
             return scoreMultiplier.ToLocalisableString("0.00x");
         }
+
+        /// <summary>
+        /// Calculate the rate for the song with the selected mods.
+        /// </summary>
+        /// <param name="mods">The list of selected mods.</param>
+        /// <returns>The rate with mods.</returns>
+        public static double CalculateRateWithMods(IEnumerable<Mod> mods)
+        {
+            double rate = 1;
+
+            foreach (var mod in mods.OfType<IApplicableToRate>())
+                rate = mod.ApplyToRate(0, rate);
+
+            return rate;
+        }
     }
 }
