@@ -70,6 +70,9 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
         [Resolved]
         private MusicController musicController { get; set; } = null!;
 
+        [Resolved]
+        private SessionStatics statics { get; set; } = null!;
+
         private Sample? dateWindupSample;
         private Sample? dateImpactSample;
         private Sample? beatmapWindupSample;
@@ -462,6 +465,8 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
                         {
                             Schedule(() =>
                             {
+                                statics.SetValue(Static.DailyChallengeIntroPlayed, true);
+
                                 if (this.IsCurrentScreen())
                                     this.Push(new DailyChallenge(room));
                             });
