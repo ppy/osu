@@ -27,8 +27,7 @@ namespace osu.Desktop.Updater
 
         public VelopackUpdateManager()
         {
-            const string? github_token = null; // TODO: populate.
-            updateManager = new UpdateManager(new GithubSource(@"https://github.com/ppy/osu", github_token, false), new UpdateOptions
+            updateManager = new UpdateManager(new GithubSource(@"https://github.com/ppy/osu", null, false), new UpdateOptions
             {
                 AllowVersionDowngrade = true
             });
