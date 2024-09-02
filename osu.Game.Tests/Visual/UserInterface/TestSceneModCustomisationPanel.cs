@@ -7,6 +7,7 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Input;
 using osu.Framework.Testing;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
@@ -120,7 +121,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         }
 
         [Test]
-        public void TestExpandedStatePersistsWhenClicked()
+        public void TestHoverExpandsAndCollapsesWhenHeaderTouched()
         {
             AddStep("add customisable mod", () =>
             {
@@ -128,34 +129,20 @@ namespace osu.Game.Tests.Visual.UserInterface
                 panel.Enabled.Value = true;
             });
 
-            AddStep("hover header", () => InputManager.MoveMouseTo(header));
-            checkExpanded(true);
-
-            AddStep("click", () => InputManager.Click(MouseButton.Left));
-            checkExpanded(false);
-            AddStep("click", () => InputManager.Click(MouseButton.Left));
-            checkExpanded(true);
-
-            AddStep("move away", () => InputManager.MoveMouseTo(Vector2.One));
-            checkExpanded(true);
-
-            AddStep("click", () => InputManager.Click(MouseButton.Left));
-            checkExpanded(false);
-        }
-
-        [Test]
-        public void TestHoverExpandsAndCollapsesWhenHeaderClicked()
-        {
-            AddStep("add customisable mod", () =>
+            AddStep("touch header", () =>
             {
-                SelectedMods.Value = new[] { new OsuModDoubleTime() };
-                panel.Enabled.Value = true;
+                var touch = new Touch(TouchSource.Touch1, header.ScreenSpaceDrawQuad.Centre);
+                InputManager.BeginTouch(touch);
+                Schedule(() => InputManager.EndTouch(touch));
             });
-
-            AddStep("hover header", () => InputManager.MoveMouseTo(header));
             checkExpanded(true);
 
-            AddStep("click", () => InputManager.Click(MouseButton.Left));
+            AddStep("touch away from header", () =>
+            {
+                var touch = new Touch(TouchSource.Touch1, header.ScreenSpaceDrawQuad.TopLeft - new Vector2(10));
+                InputManager.BeginTouch(touch);
+                Schedule(() => InputManager.EndTouch(touch));
+            });
             checkExpanded(false);
         }
 
