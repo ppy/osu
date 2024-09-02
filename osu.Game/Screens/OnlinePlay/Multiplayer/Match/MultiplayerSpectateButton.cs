@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Linq;
 using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -58,6 +57,13 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             automaticallyDownload = config.GetBindable<bool>(OsuSetting.AutomaticallyDownloadMissingBeatmaps);
         }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            CurrentPlaylistItem.BindValueChanged(_ => Scheduler.AddOnce(checkForAutomaticDownload), true);
+        }
+
         protected override void OnRoomUpdated()
         {
             base.OnRoomUpdated();
@@ -102,19 +108,13 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 
         private CancellationTokenSource? downloadCheckCancellation;
 
-        protected override void PlaylistItemChanged(MultiplayerPlaylistItem item)
-        {
-            base.PlaylistItemChanged(item);
-            Scheduler.AddOnce(checkForAutomaticDownload);
-        }
-
         private void checkForAutomaticDownload()
         {
-            MultiplayerPlaylistItem? item = Client.Room?.Playlist.FirstOrDefault(i => !i.Expired);
+            PlaylistItem? currentItem = CurrentPlaylistItem.Value;
 
             downloadCheckCancellation?.Cancel();
 
-            if (item == null)
+            if (currentItem == null)
                 return;
 
             if (!automaticallyDownload.Value)
@@ -132,7 +132,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             // In a perfect world we'd use BeatmapAvailability, but there's no event-driven flow for when a selection changes.
             // ie. if selection changes from "not downloaded" to another "not downloaded" we wouldn't get a value changed raised.
             beatmapLookupCache
-                .GetBeatmapAsync(item.BeatmapID, (downloadCheckCancellation = new CancellationTokenSource()).Token)
+                .GetBeatmapAsync(currentItem.Beatmap.OnlineID, (downloadCheckCancellation = new CancellationTokenSource()).Token)
                 .ContinueWith(resolved => Schedule(() =>
                 {
                     var beatmapSet = resolved.GetResultSafely()?.BeatmapSet;
