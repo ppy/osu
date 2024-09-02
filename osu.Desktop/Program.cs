@@ -31,7 +31,7 @@ namespace osu.Desktop
         public static void Main(string[] args)
         {
             // Velopack needs to run before anything else
-            setupVelo();
+            setupVelopack();
 
             if (OperatingSystem.IsWindows())
             {
@@ -164,7 +164,7 @@ namespace osu.Desktop
             return false;
         }
 
-        private static void setupVelo()
+        private static void setupVelopack()
         {
             VelopackApp
                 .Build()
