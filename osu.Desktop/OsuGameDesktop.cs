@@ -5,6 +5,7 @@ using System;
 using System.IO;
 using System.Reflection;
 using System.Runtime.Versioning;
+using System.Threading.Tasks;
 using Microsoft.Win32;
 using osu.Desktop.Performance;
 using osu.Desktop.Security;
@@ -18,6 +19,7 @@ using osu.Desktop.Windows;
 using osu.Framework.Allocation;
 using osu.Game.IO;
 using osu.Game.IPC;
+using osu.Game.Online.Multiplayer;
 using osu.Game.Performance;
 using osu.Game.Utils;
 
@@ -105,16 +107,8 @@ namespace osu.Desktop
 
         public override bool RestartAppWhenExited()
         {
-            try
-            {
-                Velopack.UpdateExe.Start();
-                return true;
-            }
-            catch (Exception e)
-            {
-                Logger.Error(e, "Failed to restart application");
-                return base.RestartAppWhenExited();
-            }
+            Task.Run(() => Velopack.UpdateExe.Start()).FireAndForget();
+            return true;
         }
 
         protected override void LoadComplete()
