@@ -202,6 +202,7 @@ namespace osu.Game.Screens.Edit.Timing
             // VERY TEMPORARY
             var currentGroupItems = selectedGroup.Value.ControlPoints.ToArray();
 
+            beatmap.BeginChange();
             beatmap.ControlPointInfo.RemoveGroup(selectedGroup.Value);
 
             double newOffset = selectedGroup.Value.Time + adjust;
@@ -209,17 +210,20 @@ namespace osu.Game.Screens.Edit.Timing
             foreach (var cp in currentGroupItems)
             {
                 if (beatmap.AdjustNotesOnOffsetBPMChange.Value && cp is TimingControlPoint tp)
+                {
                     TimingSectionAdjustments.AdjustHitObjectOffset(beatmap, tp, adjust);
+                    beatmap.UpdateAllHitObjects();
+                }
+
                 beatmap.ControlPointInfo.Add(newOffset, cp);
             }
 
             // the control point might not necessarily exist yet, if currentGroupItems was empty.
             selectedGroup.Value = beatmap.ControlPointInfo.GroupAt(newOffset, true);
+            beatmap.EndChange();
 
             if (!editorClock.IsRunning && wasAtStart)
                 editorClock.Seek(newOffset);
-
-            beatmap.UpdateAllHitObjects();
         }
 
         private void adjustBpm(double adjust)
@@ -229,9 +233,16 @@ namespace osu.Game.Screens.Edit.Timing
             if (timing == null)
                 return;
 
+            double oldBeatLength = timing.BeatLength;
             timing.BeatLength = 60000 / (timing.BPM + adjust);
 
-            beatmap.UpdateAllHitObjects();
+            if (beatmap.AdjustNotesOnOffsetBPMChange.Value)
+            {
+                beatmap.BeginChange();
+                TimingSectionAdjustments.SetHitObjectBPM(beatmap, timing, oldBeatLength);
+                beatmap.UpdateAllHitObjects();
+                beatmap.EndChange();
+            }
         }
 
         private partial class InlineButton : OsuButton
