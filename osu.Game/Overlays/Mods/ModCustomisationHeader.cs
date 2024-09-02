@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
@@ -20,7 +19,7 @@ using static osu.Game.Overlays.Mods.ModCustomisationPanel;
 
 namespace osu.Game.Overlays.Mods
 {
-    public partial class ModCustomisationHeader : OsuHoverContainer
+    public partial class ModCustomisationHeader : OsuClickableContainer
     {
         private Box background = null!;
         private Box backgroundFlash = null!;
@@ -28,8 +27,6 @@ namespace osu.Game.Overlays.Mods
 
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; } = null!;
-
-        protected override IEnumerable<Drawable> EffectTargets => new[] { background };
 
         public readonly Bindable<ModCustomisationPanelState> ExpandedState = new Bindable<ModCustomisationPanelState>(ModCustomisationPanelState.Collapsed);
 
@@ -52,6 +49,7 @@ namespace osu.Game.Overlays.Mods
                 background = new Box
                 {
                     RelativeSizeAxes = Axes.Both,
+                    Colour = colourProvider.Dark3,
                 },
                 backgroundFlash = new Box
                 {
@@ -84,9 +82,6 @@ namespace osu.Game.Overlays.Mods
                     }
                 }
             };
-
-            IdleColour = colourProvider.Dark3;
-            HoverColour = colourProvider.Light4;
         }
 
         protected override void LoadComplete()
@@ -110,6 +105,20 @@ namespace osu.Game.Overlays.Mods
             {
                 icon.ScaleTo(v.NewValue > ModCustomisationPanelState.Collapsed ? new Vector2(1, -1) : Vector2.One, 300, Easing.OutQuint);
             }, true);
+
+            panel.ExpandedState.BindValueChanged(v =>
+            {
+                switch (v.NewValue)
+                {
+                    case ModCustomisationPanelState.Expanded:
+                    case ModCustomisationPanelState.ExpandedByMod:
+                        fadeBackgroundColor(colourProvider.Light4);
+                        break;
+                    default:
+                        fadeBackgroundColor(colourProvider.Dark3);
+                        break;
+                };
+            }, false);
         }
 
         protected override bool OnHover(HoverEvent e)
@@ -118,6 +127,11 @@ namespace osu.Game.Overlays.Mods
                 panel.ExpandedState.Value = ModCustomisationPanelState.Expanded;
 
             return base.OnHover(e);
+        }
+
+        private void fadeBackgroundColor(Color4 color)
+        {
+            background.FadeColour(color, 500, Easing.OutQuint);
         }
     }
 }
