@@ -52,7 +52,7 @@ namespace osu.Desktop.Updater
                 if (localUserInfo?.IsPlaying.Value == true)
                     return false;
 
-                var info = await updateManager.CheckForUpdatesAsync().ConfigureAwait(false);
+                UpdateInfo? info = await updateManager.CheckForUpdatesAsync().ConfigureAwait(false);
 
                 // Handle no updates available.
                 if (info == null)
@@ -65,7 +65,7 @@ namespace osu.Desktop.Updater
                     {
                         Activated = () =>
                         {
-                            restartToApplyUpdate();
+                            restartToApplyUpdate(null);
                             return true;
                         }
                     });
@@ -78,7 +78,7 @@ namespace osu.Desktop.Updater
                 {
                     notification = new UpdateProgressNotification
                     {
-                        CompletionClickAction = restartToApplyUpdate,
+                        CompletionClickAction = () => restartToApplyUpdate(info),
                     };
 
                     Schedule(() => notificationOverlay.Post(notification));
@@ -117,9 +117,9 @@ namespace osu.Desktop.Updater
             return true;
         }
 
-        private bool restartToApplyUpdate()
+        private bool restartToApplyUpdate(UpdateInfo? info)
         {
-            updateManager.WaitExitThenApplyUpdates(null);
+            updateManager.WaitExitThenApplyUpdates(info?.TargetFullRelease);
             Schedule(() => game.AttemptExit());
             return true;
         }
