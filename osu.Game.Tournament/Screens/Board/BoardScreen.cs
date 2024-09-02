@@ -949,7 +949,7 @@ namespace osu.Game.Tournament.Screens.Board
         /// <param name="endX">The end point of the line, X value.</param>
         /// <param name="endY">The end point of the line, Y value.</param>
         /// <returns>the winner team's colour, or <see cref="TeamColour.Neutral"/> if there isn't one</returns>
-        private TeamColour isWin(int startX, int startY, int endX, int endY)
+        private TeamColour isWin(int startY, int startX, int endY, int endX)
         {
             List<RoundBeatmap> mapLine = new List<RoundBeatmap>();
             const TeamColour colourfalse = TeamColour.Neutral;
@@ -1014,7 +1014,7 @@ namespace osu.Game.Tournament.Screens.Board
         /// <param name="endX">The end point of the line, X value.</param>
         /// <param name="endY">The end point of the line, Y value.</param>
         /// <returns>true if can, otherwise false</returns>
-        private bool canWin(int startX, int startY, int endX, int endY)
+        private bool canWin(int startY, int startX, int endY, int endX)
         {
             List<RoundBeatmap> mapLine = new List<RoundBeatmap>();
             TeamColour thisColour = TeamColour.Neutral;
@@ -1061,7 +1061,7 @@ namespace osu.Game.Tournament.Screens.Board
         /// <param name="Y">The Y coordinate value of the beatmap.</param>
         /// <returns>A <see cref="RoundBeatmap"/>, pointing to the corresponding beatmap.</returns>
         private RoundBeatmap? getBoardMap(int X, int Y)
-            => CurrentMatch.Value?.Round.Value?.Beatmaps.FirstOrDefault(p => (p.BoardX == X && p.BoardY == Y)) ?? null;
+            => CurrentMatch.Value?.Round.Value?.Beatmaps.FirstOrDefault(p => (p.BoardX == X && p.BoardY == Y && p.Mods != "EX")) ?? null;
 
         private void updateDisplay()
         {
