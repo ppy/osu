@@ -54,7 +54,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
         {
             operationInProgress = ongoingOperationTracker.InProgress.GetBoundCopy();
             operationInProgress.BindValueChanged(_ => updateState());
+
             automaticallyDownload = config.GetBindable<bool>(OsuSetting.AutomaticallyDownloadMissingBeatmaps);
+            automaticallyDownload.BindValueChanged(_ => Scheduler.AddOnce(checkForAutomaticDownload));
         }
 
         protected override void LoadComplete()
