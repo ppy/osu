@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -43,16 +44,16 @@ namespace osu.Game.Screens.Edit.Timing
                 if (!isRebinding) ChangeHandler?.SaveState();
             }
 
-            bpmTextEntry.Bindable.BindValueChanged(val =>
+            bpmTextEntry.OnCommit = (oldBeatLength, _) =>
             {
                 if (!Beatmap.AdjustNotesOnOffsetBPMChange.Value || ControlPoint.Value == null)
                     return;
 
                 Beatmap.BeginChange();
-                TimingSectionAdjustments.SetHitObjectBPM(Beatmap, ControlPoint.Value, val.OldValue);
+                TimingSectionAdjustments.SetHitObjectBPM(Beatmap, ControlPoint.Value, oldBeatLength);
                 Beatmap.UpdateAllHitObjects();
                 Beatmap.EndChange();
-            });
+            };
         }
 
         private bool isRebinding;
@@ -85,6 +86,8 @@ namespace osu.Game.Screens.Edit.Timing
 
         private partial class BPMTextBox : LabelledTextBox
         {
+            public new Action<double, double>? OnCommit { get; set; }
+
             private readonly BindableNumber<double> beatLengthBindable = new TimingControlPoint().BeatLengthBindable;
 
             public BPMTextBox()
@@ -92,9 +95,11 @@ namespace osu.Game.Screens.Edit.Timing
                 Label = "BPM";
                 SelectAllOnFocus = true;
 
-                OnCommit += (_, isNew) =>
+                base.OnCommit += (_, isNew) =>
                 {
                     if (!isNew) return;
+
+                    double oldBeatLength = beatLengthBindable.Value;
 
                     try
                     {
@@ -109,6 +114,7 @@ namespace osu.Game.Screens.Edit.Timing
                     // This is run regardless of parsing success as the parsed number may not actually trigger a change
                     // due to bindable clamping. Even in such a case we want to update the textbox to a sane visual state.
                     beatLengthBindable.TriggerChange();
+                    OnCommit?.Invoke(oldBeatLength, beatLengthBindable.Value);
                 };
 
                 beatLengthBindable.BindValueChanged(val =>
