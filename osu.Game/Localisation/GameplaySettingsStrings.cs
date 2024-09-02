@@ -85,6 +85,11 @@ namespace osu.Game.Localisation
         public static LocalisableString AlwaysShowGameplayLeaderboard => new TranslatableString(getKey(@"gameplay_leaderboard"), @"Always show gameplay leaderboard");
 
         /// <summary>
+        /// "Always show hold for menu button"
+        /// </summary>
+        public static LocalisableString AlwaysShowHoldForMenuButton => new TranslatableString(getKey(@"always_show_hold_for_menu_button"), @"Always show hold for menu button");
+
+        /// <summary>
         /// "Always play first combo break sound"
         /// </summary>
         public static LocalisableString AlwaysPlayFirstComboBreak => new TranslatableString(getKey(@"always_play_first_combo_break"), @"Always play first combo break sound");

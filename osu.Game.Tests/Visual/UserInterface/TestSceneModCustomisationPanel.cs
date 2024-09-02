@@ -7,6 +7,8 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Testing;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Mods;
 using osu.Game.Rulesets.Mods;
@@ -154,6 +156,27 @@ namespace osu.Game.Tests.Visual.UserInterface
             checkExpanded(true);
 
             AddStep("click", () => InputManager.Click(MouseButton.Left));
+            checkExpanded(false);
+        }
+
+        [Test]
+        public void TestDraggingKeepsPanelExpanded()
+        {
+            AddStep("add customisable mod", () =>
+            {
+                SelectedMods.Value = new[] { new OsuModDoubleTime() };
+                panel.Enabled.Value = true;
+            });
+
+            AddStep("hover header", () => InputManager.MoveMouseTo(header));
+            checkExpanded(true);
+
+            AddStep("hover slider bar nub", () => InputManager.MoveMouseTo(panel.ChildrenOfType<OsuSliderBar<double>>().First().ChildrenOfType<Nub>().Single()));
+            AddStep("hold", () => InputManager.PressButton(MouseButton.Left));
+            AddStep("drag outside", () => InputManager.MoveMouseTo(Vector2.Zero));
+            checkExpanded(true);
+
+            AddStep("release", () => InputManager.ReleaseButton(MouseButton.Left));
             checkExpanded(false);
         }
 

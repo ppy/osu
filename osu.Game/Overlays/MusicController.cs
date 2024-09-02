@@ -60,6 +60,8 @@ namespace osu.Game.Overlays
         [Resolved]
         private RealmAccess realm { get; set; } = null!;
 
+        private BindableNumber<double> sampleVolume = null!;
+
         private readonly BindableDouble audioDuckVolume = new BindableDouble(1);
 
         private AudioFilter audioDuckFilter = null!;
@@ -69,6 +71,7 @@ namespace osu.Game.Overlays
         {
             AddInternal(audioDuckFilter = new AudioFilter(audio.TrackMixer));
             audio.Tracks.AddAdjustment(AdjustableProperty.Volume, audioDuckVolume);
+            sampleVolume = audio.VolumeSample.GetBoundCopy();
         }
 
         protected override void LoadComplete()
@@ -112,7 +115,7 @@ namespace osu.Game.Overlays
             seekDelegate?.Cancel();
             seekDelegate = Schedule(() =>
             {
-                if (beatmap.Disabled || !AllowTrackControl.Value)
+                if (!AllowTrackControl.Value)
                     return;
 
                 CurrentTrack.Seek(position);
@@ -269,6 +272,10 @@ namespace osu.Game.Overlays
         /// <returns>A <see cref="IDisposable"/> which will restore the duck operation when disposed.</returns>
         public IDisposable Duck(DuckParameters? parameters = null)
         {
+            // Don't duck if samples have no volume, it sounds weird.
+            if (sampleVolume.Value == 0)
+                return new InvokeOnDisposal(() => { });
+
             parameters ??= new DuckParameters();
 
             duckOperations.Add(parameters);
@@ -302,6 +309,10 @@ namespace osu.Game.Overlays
         /// <param name="parameters">Parameters defining the ducking operation.</param>
         public void DuckMomentarily(double delayUntilRestore, DuckParameters? parameters = null)
         {
+            // Don't duck if samples have no volume, it sounds weird.
+            if (sampleVolume.Value == 0)
+                return;
+
             parameters ??= new DuckParameters();
 
             IDisposable duckOperation = Duck(parameters);

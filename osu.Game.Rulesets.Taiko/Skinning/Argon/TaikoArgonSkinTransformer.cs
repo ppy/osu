@@ -18,7 +18,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Argon
         {
             switch (lookup)
             {
-                case GameplaySkinComponentLookup<HitResult> resultComponent:
+                case SkinComponentLookup<HitResult> resultComponent:
                     // This should eventually be moved to a skin setting, when supported.
                     if (Skin is ArgonProSkin && resultComponent.Component >= HitResult.Great)
                         return Drawable.Empty();
