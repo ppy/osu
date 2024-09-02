@@ -112,26 +112,10 @@ namespace osu.Game.Overlays.Mods
             }, true);
         }
 
-        private bool touchedThisFrame;
-
-        protected override bool OnTouchDown(TouchDownEvent e)
-        {
-            if (Enabled.Value)
-            {
-                touchedThisFrame = true;
-                Schedule(() => touchedThisFrame = false);
-            }
-
-            return base.OnTouchDown(e);
-        }
-
         protected override bool OnHover(HoverEvent e)
         {
-            if (Enabled.Value)
-            {
-                if (!touchedThisFrame && panel.ExpandedState.Value == ModCustomisationPanelState.Collapsed)
-                    panel.ExpandedState.Value = ModCustomisationPanelState.Expanded;
-            }
+            if (Enabled.Value && panel.ExpandedState.Value == ModCustomisationPanelState.Collapsed)
+                panel.ExpandedState.Value = ModCustomisationPanelState.Expanded;
 
             return base.OnHover(e);
         }
