@@ -1035,9 +1035,11 @@ namespace osu.Game.Tests.Visual.Navigation
         [Test]
         public void TestTouchScreenDetectionInGame()
         {
+            BeatmapSetInfo beatmapSet = null;
+
             PushAndConfirm(() => new TestPlaySongSelect());
-            AddStep("import beatmap", () => BeatmapImportHelper.LoadQuickOszIntoOsu(Game).WaitSafely());
-            AddUntilStep("wait for selected", () => !Game.Beatmap.IsDefault);
+            AddStep("import beatmap", () => beatmapSet = BeatmapImportHelper.LoadQuickOszIntoOsu(Game).GetResultSafely());
+            AddUntilStep("wait for selected", () => Game.Beatmap.Value.BeatmapSetInfo.Equals(beatmapSet));
             AddStep("select", () => InputManager.Key(Key.Enter));
 
             Player player = null;

@@ -65,6 +65,12 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary
                     Origin = Anchor.Centre,
                     RelativeSizeAxes = Axes.Both,
                 },
+                new KiaiPart
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    RelativeSizeAxes = Axes.Both,
+                },
                 new ControlPointPart
                 {
                     Anchor = Anchor.Centre,

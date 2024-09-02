@@ -692,7 +692,7 @@ namespace osu.Game
             if (Interlocked.Decrement(ref allowableExceptions) < 0)
             {
                 Logger.Log("Too many unhandled exceptions, crashing out.");
-                RulesetStore.TryDisableCustomRulesetsCausing(ex);
+                RulesetStore?.TryDisableCustomRulesetsCausing(ex);
                 return false;
             }
 
