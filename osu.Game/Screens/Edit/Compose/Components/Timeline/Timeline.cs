@@ -14,6 +14,7 @@ using osu.Framework.Input.Events;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
+using osu.Game.Overlays;
 using osu.Game.Rulesets.Edit;
 using osuTK;
 using osuTK.Input;
@@ -24,7 +25,6 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
     public partial class Timeline : ZoomableScrollContainer, IPositionSnapProvider
     {
         private const float timeline_height = 80;
-        private const float timeline_expanded_height = 94;
 
         private readonly Drawable userContent;
 
@@ -78,9 +78,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         private TimelineTickDisplay ticks = null!;
 
-        private TimelineControlPointDisplay controlPoints = null!;
-
-        private Container mainContent = null!;
+        private TimelineTimingChangeDisplay controlPoints = null!;
 
         private Bindable<float> waveformOpacity = null!;
         private Bindable<bool> controlPointsVisible = null!;
@@ -103,31 +101,34 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         }
 
         [BackgroundDependencyLoader]
-        private void load(IBindable<WorkingBeatmap> beatmap, OsuColour colours, OsuConfigManager config)
+        private void load(IBindable<WorkingBeatmap> beatmap, OsuColour colours, OverlayColourProvider colourProvider, OsuConfigManager config)
         {
             CentreMarker centreMarker;
 
             // We don't want the centre marker to scroll
             AddInternal(centreMarker = new CentreMarker());
 
-            ticks = new TimelineTickDisplay
-            {
-                Padding = new MarginPadding { Vertical = 2, },
-            };
-
             AddRange(new Drawable[]
             {
-                controlPoints = new TimelineControlPointDisplay
+                ticks = new TimelineTickDisplay(),
+                new Box
                 {
-                    RelativeSizeAxes = Axes.X,
-                    Height = timeline_expanded_height,
+                    Name = "zero marker",
+                    RelativeSizeAxes = Axes.Y,
+                    Width = TimelineTickDisplay.TICK_WIDTH / 2,
+                    Origin = Anchor.TopCentre,
+                    Colour = colourProvider.Background1,
                 },
-                ticks,
-                mainContent = new Container
+                controlPoints = new TimelineTimingChangeDisplay
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Anchor = Anchor.CentreLeft,
+                    Origin = Anchor.CentreLeft,
+                },
+                new Container
                 {
                     RelativeSizeAxes = Axes.X,
                     Height = timeline_height,
-                    Depth = float.MaxValue,
                     Children = new[]
                     {
                         waveform = new WaveformGraph
@@ -138,16 +139,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                             MidColour = colours.BlueDark,
                             HighColour = colours.BlueDarker,
                         },
-                        ticks.CreateProxy(),
                         centreMarker.CreateProxy(),
-                        new Box
-                        {
-                            Name = "zero marker",
-                            RelativeSizeAxes = Axes.Y,
-                            Width = 2,
-                            Origin = Anchor.TopCentre,
-                            Colour = colours.YellowDarker,
-                        },
+                        ticks.CreateProxy(),
                         userContent,
                     }
                 },
@@ -192,21 +185,9 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             controlPointsVisible.BindValueChanged(visible =>
             {
                 if (visible.NewValue || alwaysShowControlPoints)
-                {
-                    this.ResizeHeightTo(timeline_expanded_height, 200, Easing.OutQuint);
-                    mainContent.MoveToY(15, 200, Easing.OutQuint);
-
-                    // delay the fade in else masking looks weird.
-                    controlPoints.Delay(180).FadeIn(400, Easing.OutQuint);
-                }
+                    controlPoints.FadeIn(400, Easing.OutQuint);
                 else
-                {
                     controlPoints.FadeOut(200, Easing.OutQuint);
-
-                    // likewise, delay the resize until the fade is complete.
-                    this.Delay(180).ResizeHeightTo(timeline_height, 200, Easing.OutQuint);
-                    mainContent.Delay(180).MoveToY(0, 200, Easing.OutQuint);
-                }
             }, true);
         }
 

@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -44,16 +45,15 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
         private void updateAnchor()
         {
             // if the anchor isn't a vertical center, set top or bottom anchor based on scroll direction
-            if (!Anchor.HasFlag(Anchor.y1))
-            {
-                Anchor &= ~(Anchor.y0 | Anchor.y2);
-                Anchor |= direction.Value == ScrollingDirection.Up ? Anchor.y2 : Anchor.y0;
-            }
+            if (Anchor.HasFlag(Anchor.y1))
+                return;
 
-            // since we flip the vertical anchor when changing scroll direction,
-            // we can use the sign of the Y value as an indicator to make the combo counter displayed correctly.
-            if ((Y < 0 && direction.Value == ScrollingDirection.Down) || (Y > 0 && direction.Value == ScrollingDirection.Up))
-                Y = -Y;
+            Anchor &= ~(Anchor.y0 | Anchor.y2);
+            Anchor |= direction.Value == ScrollingDirection.Up ? Anchor.y2 : Anchor.y0;
+
+            // change the sign of the Y coordinate in line with the scrolling direction.
+            // i.e. if the user changes direction from down to up, the anchor is changed from top to bottom, and the Y is flipped from positive to negative here.
+            Y = Math.Abs(Y) * (direction.Value == ScrollingDirection.Up ? -1 : 1);
         }
 
         protected override void OnCountIncrement()

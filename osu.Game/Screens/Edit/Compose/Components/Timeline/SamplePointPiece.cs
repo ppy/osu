@@ -14,6 +14,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
+using osu.Framework.Utils;
 using osu.Game.Audio;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
@@ -33,6 +34,12 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
     {
         public readonly HitObject HitObject;
 
+        [Resolved]
+        private EditorClock? editorClock { get; set; }
+
+        [Resolved]
+        private Editor? editor { get; set; }
+
         public SamplePointPiece(HitObject hitObject)
         {
             HitObject = hitObject;
@@ -43,11 +50,32 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         protected override Color4 GetRepresentingColour(OsuColour colours) => AlternativeColor ? colours.Pink2 : colours.Pink1;
 
+        protected virtual double GetTime() => HitObject is IHasRepeats r ? HitObject.StartTime + r.Duration / r.SpanCount() / 2 : HitObject.StartTime;
+
         [BackgroundDependencyLoader]
         private void load()
         {
             HitObject.DefaultsApplied += _ => updateText();
             updateText();
+
+            if (editor != null)
+                editor.ShowSampleEditPopoverRequested += onShowSampleEditPopoverRequested;
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (editor != null)
+                editor.ShowSampleEditPopoverRequested -= onShowSampleEditPopoverRequested;
+        }
+
+        private void onShowSampleEditPopoverRequested(double time)
+        {
+            if (!Precision.AlmostEquals(time, GetTime())) return;
+
+            editorClock?.SeekSmoothlyTo(GetTime());
+            this.ShowPopover();
         }
 
         protected override bool OnClick(ClickEvent e)
