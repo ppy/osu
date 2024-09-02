@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Linq;
 using System.Threading;
 using osu.Framework.Allocation;
@@ -23,12 +21,12 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
     public partial class MultiplayerSpectateButton : MultiplayerRoomComposite
     {
         [Resolved]
-        private OngoingOperationTracker ongoingOperationTracker { get; set; }
+        private OngoingOperationTracker ongoingOperationTracker { get; set; } = null!;
 
         [Resolved]
-        private OsuColour colours { get; set; }
+        private OsuColour colours { get; set; } = null!;
 
-        private IBindable<bool> operationInProgress;
+        private IBindable<bool> operationInProgress = null!;
 
         private readonly RoundedButton button;
 
@@ -92,17 +90,17 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
         #region Automatic download handling
 
         [Resolved]
-        private BeatmapLookupCache beatmapLookupCache { get; set; }
+        private BeatmapLookupCache beatmapLookupCache { get; set; } = null!;
 
         [Resolved]
         private BeatmapModelDownloader beatmapDownloader { get; set; } = null!;
 
         [Resolved]
-        private BeatmapManager beatmaps { get; set; }
+        private BeatmapManager beatmaps { get; set; } = null!;
 
-        private CancellationTokenSource downloadCheckCancellation;
+        private Bindable<bool> automaticallyDownload = null!;
 
-        private Bindable<bool> automaticallyDownload;
+        private CancellationTokenSource? downloadCheckCancellation;
 
         protected override void PlaylistItemChanged(MultiplayerPlaylistItem item)
         {
@@ -112,7 +110,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 
         private void checkForAutomaticDownload()
         {
-            MultiplayerPlaylistItem item = Client.Room?.Playlist.FirstOrDefault(i => !i.Expired);
+            MultiplayerPlaylistItem? item = Client.Room?.Playlist.FirstOrDefault(i => !i.Expired);
 
             downloadCheckCancellation?.Cancel();
 
