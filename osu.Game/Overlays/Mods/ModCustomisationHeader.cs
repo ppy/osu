@@ -117,7 +117,7 @@ namespace osu.Game.Overlays.Mods
                     default:
                         fadeBackgroundColor(colourProvider.Dark3);
                         break;
-                };
+                }
             }, false);
         }
 
