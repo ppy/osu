@@ -1141,6 +1141,7 @@ namespace osu.Game
             loadComponentSingleFile(new MedalOverlay(), topMostOverlayContent.Add);
 
             loadComponentSingleFile(new BackgroundDataStoreProcessor(), Add);
+            loadComponentSingleFile(new DetachedBeatmapStore(), Add, true);
 
             Add(difficultyRecommender);
             Add(externalLinkOpener = new ExternalLinkOpener());

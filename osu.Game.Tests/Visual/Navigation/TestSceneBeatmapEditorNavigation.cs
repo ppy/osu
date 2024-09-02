@@ -165,16 +165,19 @@ namespace osu.Game.Tests.Visual.Navigation
         }
 
         [Test]
+        [Solo]
         public void TestEditorGameplayTestAlwaysUsesOriginalRuleset()
         {
             prepareBeatmap();
 
-            AddStep("switch ruleset", () => Game.Ruleset.Value = new ManiaRuleset().RulesetInfo);
+            AddStep("switch ruleset at song select", () => Game.Ruleset.Value = new ManiaRuleset().RulesetInfo);
 
             AddStep("open editor", () => ((PlaySongSelect)Game.ScreenStack.CurrentScreen).Edit(beatmapSet.Beatmaps.First(beatmap => beatmap.Ruleset.OnlineID == 0)));
-            AddUntilStep("wait for editor open", () => Game.ScreenStack.CurrentScreen is Editor editor && editor.ReadyForUse);
-            AddStep("test gameplay", () => getEditor().TestGameplay());
 
+            AddUntilStep("wait for editor open", () => Game.ScreenStack.CurrentScreen is Editor editor && editor.ReadyForUse);
+            AddAssert("editor ruleset is osu!", () => Game.Ruleset.Value, () => Is.EqualTo(new OsuRuleset().RulesetInfo));
+
+            AddStep("test gameplay", () => getEditor().TestGameplay());
             AddUntilStep("wait for player", () =>
             {
                 // notifications may fire at almost any inopportune time and cause annoying test failures.
@@ -183,8 +186,7 @@ namespace osu.Game.Tests.Visual.Navigation
                 Game.CloseAllOverlays();
                 return Game.ScreenStack.CurrentScreen is EditorPlayer editorPlayer && editorPlayer.IsLoaded;
             });
-
-            AddAssert("current ruleset is osu!", () => Game.Ruleset.Value.Equals(new OsuRuleset().RulesetInfo));
+            AddAssert("gameplay ruleset is osu!", () => Game.Ruleset.Value, () => Is.EqualTo(new OsuRuleset().RulesetInfo));
 
             AddStep("exit to song select", () => Game.PerformFromScreen(_ => { }, typeof(PlaySongSelect).Yield()));
             AddUntilStep("wait for song select", () => Game.ScreenStack.CurrentScreen is PlaySongSelect);
@@ -352,7 +354,7 @@ namespace osu.Game.Tests.Visual.Navigation
             AddUntilStep("wait for song select",
                 () => Game.Beatmap.Value.BeatmapSetInfo.Equals(beatmapSet)
                       && Game.ScreenStack.CurrentScreen is PlaySongSelect songSelect
-                      && songSelect.IsLoaded);
+                      && songSelect.BeatmapSetsLoaded);
         }
 
         private void openEditor()

@@ -446,7 +446,7 @@ namespace osu.Game.Tests.Visual.Online
         {
             AddStep("Show overlay with channel 1", () =>
             {
-                channelManager.JoinChannel(testChannel1);
+                channelManager.CurrentChannel.Value = channelManager.JoinChannel(testChannel1);
                 chatOverlay.Show();
             });
             waitForChannel1Visible();
@@ -462,7 +462,7 @@ namespace osu.Game.Tests.Visual.Online
         {
             AddStep("Show overlay with channel 1", () =>
             {
-                channelManager.JoinChannel(testChannel1);
+                channelManager.CurrentChannel.Value = channelManager.JoinChannel(testChannel1);
                 chatOverlay.Show();
             });
             waitForChannel1Visible();
