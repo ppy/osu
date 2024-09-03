@@ -105,7 +105,7 @@ namespace osu.Desktop.Updater
             {
                 // we'll ignore this and retry later. can be triggered by no internet connection or thread abortion.
                 scheduleRecheck = true;
-                Logger.Error(e, @"update check failed!");
+                Logger.Log($@"update check failed ({e.Message})");
             }
             finally
             {
