@@ -428,7 +428,7 @@ namespace osu.Game.Tournament.Screens.Board
             var color = pickColour;
             Steps state = Steps.Default;
 
-            if (useEX)
+            if (DetectEX())
             {
                 state = refEX ? Steps.EX : Steps.Halt;
             }
