@@ -142,6 +142,8 @@ namespace osu.Game.Rulesets.Osu.UI
 
             public void Add(AimPointEntry entry) => lifetimeManager.AddEntry(entry);
 
+            public void Clear() => lifetimeManager.ClearEntries();
+
             private void entryBecameAlive(LifetimeEntry entry)
             {
                 aliveEntries.Add((AimPointEntry)entry);
