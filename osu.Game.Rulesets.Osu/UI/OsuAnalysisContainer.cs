@@ -1,5 +1,4 @@
-﻿
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
@@ -38,27 +37,37 @@ namespace osu.Game.Rulesets.Osu.UI
                 HitMarkers = new HitMarkersContainer(),
                 AimMarkers = new AimMarkersContainer { Depth = float.MinValue }
             };
+
         }
 
         protected override OsuAnalysisSettings CreateAnalysisSettings()
         {
             var settings = new OsuAnalysisSettings();
-            settings.HitMarkersEnabled.ValueChanged += e => HitMarkers.FadeTo(e.NewValue ? 1 : 0);
-            settings.AimMarkersEnabled.ValueChanged += e => AimMarkers.FadeTo(e.NewValue ? 1 : 0);
-            settings.AimLinesEnabled.ValueChanged += e => AimLines.FadeTo(e.NewValue ? 1 : 0);
-            settings.CursorHideEnabled.ValueChanged += e => Playfield.Cursor.FadeTo(e.NewValue ? 0 : 1);
+            settings.HitMarkersEnabled.ValueChanged += e => toggleHitMarkers(e.NewValue);
+            settings.AimMarkersEnabled.ValueChanged += e => toggleAimMarkers(e.NewValue);
+            settings.AimLinesEnabled.ValueChanged += e => toggleAimLines(e.NewValue);
+            settings.CursorHideEnabled.ValueChanged += e => toggleCursorHidden(e.NewValue);
             return settings;
         }
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            HitMarkers.Hide();
-            AimMarkers.Hide();
-            AimLines.Hide();
+            toggleHitMarkers(AnalysisSettings.HitMarkersEnabled.Value);
+            toggleAimMarkers(AnalysisSettings.AimMarkersEnabled.Value);
+            toggleAimLines(AnalysisSettings.AimLinesEnabled.Value);
+            toggleCursorHidden(AnalysisSettings.CursorHideEnabled.Value);
 
             LoadReplay();
         }
+
+        private void toggleHitMarkers(bool value) => HitMarkers.FadeTo(value ? 1 : 0);
+
+        private void toggleAimMarkers(bool value) => AimMarkers.FadeTo(value ? 1 : 0);
+
+        private void toggleAimLines(bool value) => AimLines.FadeTo(value ? 1 : 0);
+
+        private void toggleCursorHidden(bool value) => Playfield.Cursor.FadeTo(value ? 0 : 1);
 
         protected void LoadReplay()
         {
