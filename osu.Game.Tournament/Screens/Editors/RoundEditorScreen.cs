@@ -44,7 +44,7 @@ namespace osu.Game.Tournament.Screens.Editors
 
                 RoundBeatmapEditor beatmapEditor = new RoundBeatmapEditor(round)
                 {
-                    Width = 0.95f
+                    Width = 0.98f
                 };
 
                 InternalChildren = new Drawable[]
@@ -57,7 +57,7 @@ namespace osu.Game.Tournament.Screens.Editors
                     new FillFlowContainer
                     {
                         Margin = new MarginPadding(5),
-                        Padding = new MarginPadding { Right = 160 },
+                        // Padding = new MarginPadding { Right = 160 },
                         Spacing = new Vector2(5),
                         Direction = FillDirection.Full,
                         RelativeSizeAxes = Axes.X,
@@ -97,44 +97,40 @@ namespace osu.Game.Tournament.Screens.Editors
                             new OsuCheckbox
                             {
                                 LabelText = "Board Mode",
-                                Width = 0.33f,
+                                Width = 0.2f,
                                 Current = Model.UseBoard,
                             },
                             new SettingsNumberBox
                             {
                                 LabelText = "Referee Bot ID",
-                                Width = 0.33f,
+                                Width = 0.25f,
                                 Current = Model.RefereeId,
                             },
                             new OsuCheckbox
                             {
                                 LabelText = "Trust All Special Commands",
-                                Width = 0.33f,
+                                Width = 0.25f,
                                 Current = Model.TrustAll,
                             },
-                            new SettingsButton
+                            new DangerousSettingsButton
                             {
                                 Width = 0.2f,
-                                Margin = new MarginPadding(10),
+                                Text = "Delete Round",
+                                Action = () => dialogOverlay?.Push(new DeleteRoundDialog(Model, () =>
+                                {
+                                    Expire();
+                                    ladderInfo.Rounds.Remove(Model);
+                                }))
+                            },
+                            beatmapEditor,
+                            new SettingsButton
+                            {
                                 Text = "Add beatmap",
+                                Margin = new MarginPadding { Top = 10, Bottom = 10 },
                                 Action = () => beatmapEditor.CreateNew()
                             },
-                            beatmapEditor
                         }
                     },
-                    new DangerousSettingsButton
-                    {
-                        Anchor = Anchor.CentreRight,
-                        Origin = Anchor.CentreRight,
-                        RelativeSizeAxes = Axes.None,
-                        Width = 150,
-                        Text = "Delete Round",
-                        Action = () => dialogOverlay?.Push(new DeleteRoundDialog(Model, () =>
-                        {
-                            Expire();
-                            ladderInfo.Rounds.Remove(Model);
-                        }))
-                    }
                 };
 
                 RelativeSizeAxes = Axes.X;
@@ -214,7 +210,7 @@ namespace osu.Game.Tournament.Screens.Editors
                             new FillFlowContainer
                             {
                                 Margin = new MarginPadding(5),
-                                Padding = new MarginPadding { Right = 160 },
+                                Padding = new MarginPadding { Right = 10 },
                                 Spacing = new Vector2(5),
                                 Direction = FillDirection.Horizontal,
                                 AutoSizeAxes = Axes.Both,
@@ -243,14 +239,14 @@ namespace osu.Game.Tournament.Screens.Editors
                                     },
                                     new SettingsNumberBox
                                     {
-                                        LabelText = "Board Row",
+                                        LabelText = "Row",
                                         RelativeSizeAxes = Axes.None,
                                         Width = 100,
                                         Current = boardY,
                                     },
                                     new SettingsNumberBox
                                     {
-                                        LabelText = "Board Column",
+                                        LabelText = "Column",
                                         RelativeSizeAxes = Axes.None,
                                         Width = 100,
                                         Current = boardX,
