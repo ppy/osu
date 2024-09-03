@@ -3,16 +3,25 @@
 
 using osu.Framework.Graphics.Containers;
 using osu.Game.Replays;
+using osu.Game.Screens.Play.PlayerSettings;
 
 namespace osu.Game.Rulesets.UI
 {
-    public partial class AnalysisContainer : Container
+    public abstract partial class AnalysisContainer : Container
     {
         protected Replay Replay;
+        protected Playfield Playfield;
 
-        public AnalysisContainer(Replay replay)
+        public AnalysisSettings AnalysisSettings;
+
+        public AnalysisContainer(Replay replay, Playfield playfield)
         {
             Replay = replay;
+            Playfield = playfield;
+
+            AnalysisSettings = CreateAnalysisSettings();
         }
+
+        protected abstract AnalysisSettings CreateAnalysisSettings();
     }
 }

@@ -72,12 +72,12 @@ namespace osu.Game.Screens.Play
 
             HUDOverlay.PlayerSettingsOverlay.AddAtStart(playbackSettings);
 
-            var analysisSettings = DrawableRuleset.Ruleset.CreateAnalysisSettings(DrawableRuleset);
+            var analysisContainer = DrawableRuleset.Ruleset.CreateAnalysisContainer(GameplayState.Score.Replay, DrawableRuleset.Playfield);
 
-            if (analysisSettings != null)
+            if (analysisContainer != null)
             {
-                HUDOverlay.PlayerSettingsOverlay.AddAtStart(analysisSettings);
-                DrawableRuleset.Playfield.AddAnalysisContainer(analysisSettings.CreateAnalysisContainer(GameplayState.Score.Replay));
+                HUDOverlay.PlayerSettingsOverlay.AddAtStart(analysisContainer.AnalysisSettings);
+                DrawableRuleset.Playfield.AddAnalysisContainer(analysisContainer);
             }
         }
 

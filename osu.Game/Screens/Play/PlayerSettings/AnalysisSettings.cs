@@ -1,21 +1,16 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Game.Replays;
-using osu.Game.Rulesets.UI;
+using osu.Game.Configuration;
 
 namespace osu.Game.Screens.Play.PlayerSettings
 {
-    public abstract partial class AnalysisSettings : PlayerSettingsGroup
+    public partial class AnalysisSettings : PlayerSettingsGroup
     {
-        protected DrawableRuleset DrawableRuleset;
-
-        protected AnalysisSettings(DrawableRuleset drawableRuleset)
+        public AnalysisSettings()
             : base("Analysis Settings")
         {
-            DrawableRuleset = drawableRuleset;
+            AddRange(this.CreateSettingsControls());
         }
-
-        public abstract AnalysisContainer CreateAnalysisContainer(Replay replay);
     }
 }

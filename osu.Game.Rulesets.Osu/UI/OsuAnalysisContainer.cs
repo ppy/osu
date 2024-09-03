@@ -1,10 +1,10 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Lines;
 using osu.Framework.Graphics.Performance;
@@ -21,27 +21,33 @@ namespace osu.Game.Rulesets.Osu.UI
 {
     public partial class OsuAnalysisContainer : AnalysisContainer
     {
-        public Bindable<bool> HitMarkerEnabled = new BindableBool();
-        public Bindable<bool> AimMarkersEnabled = new BindableBool();
-        public Bindable<bool> AimLinesEnabled = new BindableBool();
+        public new OsuAnalysisSettings AnalysisSettings => (OsuAnalysisSettings)base.AnalysisSettings;
+
+        protected new OsuPlayfield Playfield => (OsuPlayfield)base.Playfield;
 
         protected HitMarkersContainer HitMarkers;
         protected AimMarkersContainer AimMarkers;
         protected AimLinesContainer AimLines;
 
-        public OsuAnalysisContainer(Replay replay)
-            : base(replay)
+        public OsuAnalysisContainer(Replay replay, Playfield playfield)
+            : base(replay, playfield)
         {
             InternalChildren = new Drawable[]
             {
+                AimLines = new AimLinesContainer { Depth = float.MaxValue },
                 HitMarkers = new HitMarkersContainer(),
-                AimMarkers = new AimMarkersContainer { Depth = float.MinValue },
-                AimLines = new AimLinesContainer { Depth = float.MaxValue }
+                AimMarkers = new AimMarkersContainer { Depth = float.MinValue }
             };
+        }
 
-            HitMarkerEnabled.ValueChanged += e => HitMarkers.FadeTo(e.NewValue ? 1 : 0);
-            AimMarkersEnabled.ValueChanged += e => AimMarkers.FadeTo(e.NewValue ? 1 : 0);
-            AimLinesEnabled.ValueChanged += e => AimLines.FadeTo(e.NewValue ? 1 : 0);
+        protected override OsuAnalysisSettings CreateAnalysisSettings()
+        {
+            var settings = new OsuAnalysisSettings();
+            settings.HitMarkersEnabled.ValueChanged += e => HitMarkers.FadeTo(e.NewValue ? 1 : 0);
+            settings.AimMarkersEnabled.ValueChanged += e => AimMarkers.FadeTo(e.NewValue ? 1 : 0);
+            settings.AimLinesEnabled.ValueChanged += e => AimLines.FadeTo(e.NewValue ? 1 : 0);
+            settings.CursorHideEnabled.ValueChanged += e => Playfield.Cursor.FadeTo(e.NewValue ? 0 : 1);
+            return settings;
         }
 
         [BackgroundDependencyLoader]
@@ -51,6 +57,11 @@ namespace osu.Game.Rulesets.Osu.UI
             AimMarkers.Hide();
             AimLines.Hide();
 
+            LoadReplay();
+        }
+
+        protected void LoadReplay()
+        {
             bool leftHeld = false;
             bool rightHeld = false;
 
