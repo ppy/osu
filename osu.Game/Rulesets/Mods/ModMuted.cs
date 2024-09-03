@@ -40,7 +40,7 @@ namespace osu.Game.Rulesets.Mods
         public BindableBool InverseMuting { get; } = new BindableBool();
 
         [SettingSource("Enable metronome", "Add a metronome beat to help you keep track of the rhythm.")]
-        public BindableBool EnableMetronome { get; } = new BindableBool(true);
+        public BindableBool EnableMetronome { get; } = new BindableBool();
 
         [SettingSource("Final volume at combo", "The combo count at which point the track reaches its final volume.", SettingControlType = typeof(SettingsSlider<int, MuteComboSlider>))]
         public BindableInt MuteComboCount { get; } = new BindableInt(100)
