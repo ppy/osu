@@ -13,6 +13,7 @@ using osu.Game.Beatmaps.Legacy;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Overlays.Settings;
+using osu.Game.Replays;
 using osu.Game.Rulesets.Configuration;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Edit;
@@ -37,7 +38,6 @@ using osu.Game.Rulesets.Scoring.Legacy;
 using osu.Game.Rulesets.UI;
 using osu.Game.Scoring;
 using osu.Game.Screens.Edit.Setup;
-using osu.Game.Screens.Play.PlayerSettings;
 using osu.Game.Screens.Ranking.Statistics;
 using osu.Game.Skinning;
 
@@ -361,7 +361,7 @@ namespace osu.Game.Rulesets.Osu
             return adjustedDifficulty;
         }
 
-        public override AnalysisSettings CreateAnalysisSettings(DrawableRuleset drawableRuleset) => new OsuAnalysisSettings(drawableRuleset);
+        public override OsuAnalysisContainer CreateAnalysisContainer(Replay replay, Playfield playfield) => new OsuAnalysisContainer(replay, playfield);
 
         public override bool EditorShowScrollSpeed => false;
     }
