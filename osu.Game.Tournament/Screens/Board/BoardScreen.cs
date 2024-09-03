@@ -198,80 +198,135 @@ namespace osu.Game.Tournament.Screens.Board
                         {
                             Text = "Current Mode"
                         },
-                        buttonRedProtect = new TourneyButton
+                        new GridContainer
                         {
                             RelativeSizeAxes = Axes.X,
-                            Text = "Red Protect",
-                            BackgroundColour = TournamentGame.COLOUR_RED,
-                            Action = () => setMode(TeamColour.Red, ChoiceType.Protect)
+                            Height = 40,
+                            Content = new[]
+                            {
+                                new Drawable[]
+                                {
+                                    buttonRedProtect = new TourneyButton
+                                    {
+                                        RelativeSizeAxes = Axes.X,
+                                        Text = "Red Protect",
+                                        BackgroundColour = TournamentGame.COLOUR_RED,
+                                        Action = () => setMode(TeamColour.Red, ChoiceType.Protect)
+                                    },
+                                    buttonBlueProtect = new TourneyButton
+                                    {
+                                        RelativeSizeAxes = Axes.X,
+                                        Text = "Blue Protect",
+                                        BackgroundColour = TournamentGame.COLOUR_BLUE,
+                                        Action = () => setMode(TeamColour.Blue, ChoiceType.Protect)
+                                    },
+                                }
+                            },
                         },
-                        buttonBlueProtect = new TourneyButton
+                        new GridContainer
                         {
                             RelativeSizeAxes = Axes.X,
-                            Text = "Blue Protect",
-                            BackgroundColour = TournamentGame.COLOUR_BLUE,
-                            Action = () => setMode(TeamColour.Blue, ChoiceType.Protect)
+                            Height = 40,
+                            Content = new[]
+                            {
+                                new Drawable[]
+                                {
+                                    buttonRedBan = new TourneyButton
+                                    {
+                                        RelativeSizeAxes = Axes.X,
+                                        Text = "Red Ban",
+                                        BackgroundColour = TournamentGame.COLOUR_RED,
+                                        Action = () => setMode(TeamColour.Red, ChoiceType.Ban)
+                                    },
+                                    buttonBlueBan = new TourneyButton
+                                    {
+                                        RelativeSizeAxes = Axes.X,
+                                        Text = "Blue Ban",
+                                        BackgroundColour = TournamentGame.COLOUR_BLUE,
+                                        Action = () => setMode(TeamColour.Blue, ChoiceType.Ban)
+                                    },
+                                }
+                            },
                         },
-                        buttonRedBan = new TourneyButton
+                        new GridContainer
                         {
                             RelativeSizeAxes = Axes.X,
-                            Text = "Red Ban",
-                            BackgroundColour = TournamentGame.COLOUR_RED,
-                            Action = () => setMode(TeamColour.Red, ChoiceType.Ban)
+                            Height = 40,
+                            Content = new[]
+                            {
+                                new Drawable[]
+                                {
+                                    buttonRedPick = new TourneyButton
+                                    {
+                                        RelativeSizeAxes = Axes.X,
+                                        Text = "Red Pick",
+                                        BackgroundColour = TournamentGame.COLOUR_RED,
+                                        Action = () => setMode(TeamColour.Red, ChoiceType.Pick)
+                                    },
+                                    buttonBluePick = new TourneyButton
+                                    {
+                                        RelativeSizeAxes = Axes.X,
+                                        Text = "Blue Pick",
+                                        BackgroundColour = TournamentGame.COLOUR_BLUE,
+                                        Action = () => setMode(TeamColour.Blue, ChoiceType.Pick)
+                                    },
+                                }
+                            },
                         },
-                        buttonBlueBan = new TourneyButton
+                        new GridContainer
                         {
                             RelativeSizeAxes = Axes.X,
-                            Text = "Blue Ban",
-                            BackgroundColour = TournamentGame.COLOUR_BLUE,
-                            Action = () => setMode(TeamColour.Blue, ChoiceType.Ban)
-                        },
-                        buttonRedPick = new TourneyButton
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            Text = "Red Pick",
-                            BackgroundColour = TournamentGame.COLOUR_RED,
-                            Action = () => setMode(TeamColour.Red, ChoiceType.Pick)
-                        },
-                        buttonBluePick = new TourneyButton
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            Text = "Blue Pick",
-                            BackgroundColour = TournamentGame.COLOUR_BLUE,
-                            Action = () => setMode(TeamColour.Blue, ChoiceType.Pick)
-                        },
-                        buttonRedWin = new TourneyButton
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            Text = "Red Win",
-                            BackgroundColour = TournamentGame.COLOUR_RED,
-                            Action = () => setMode(TeamColour.Red, ChoiceType.RedWin)
-                        },
-                        buttonBlueWin = new TourneyButton
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            Text = "Blue Win",
-                            BackgroundColour = TournamentGame.COLOUR_BLUE,
-                            Action = () => setMode(TeamColour.Blue, ChoiceType.BlueWin)
+                            Height = 40,
+                            Content = new[]
+                            {
+                                new Drawable[]
+                                {
+                                    buttonRedWin = new TourneyButton
+                                    {
+                                        RelativeSizeAxes = Axes.X,
+                                        Text = "Red Win",
+                                        BackgroundColour = TournamentGame.COLOUR_RED,
+                                        Action = () => setMode(TeamColour.Red, ChoiceType.RedWin)
+                                    },
+                                    buttonBlueWin = new TourneyButton
+                                    {
+                                        RelativeSizeAxes = Axes.X,
+                                        Text = "Blue Win",
+                                        BackgroundColour = TournamentGame.COLOUR_BLUE,
+                                        Action = () => setMode(TeamColour.Blue, ChoiceType.BlueWin)
+                                    },
+                                }
+                            },
                         },
                         new ControlPanel.Spacer(),
                         trapTypeDropdown = new TrapTypeDropdown
                         {
                             LabelText = "Trap type"
                         },
-                        buttonRedTrap = new TourneyButton
+                        new GridContainer
                         {
                             RelativeSizeAxes = Axes.X,
-                            Text = "Red Trap",
-                            BackgroundColour = TournamentGame.COLOUR_RED,
-                            Action = () => setMode(TeamColour.Red, ChoiceType.Trap)
-                        },
-                        buttonBlueTrap = new TourneyButton
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            Text = "Blue Trap",
-                            BackgroundColour = TournamentGame.COLOUR_BLUE,
-                            Action = () => setMode(TeamColour.Blue, ChoiceType.Trap)
+                            Height = 40,
+                            Content = new[]
+                            {
+                                new Drawable[]
+                                {
+                                    buttonRedTrap = new TourneyButton
+                                    {
+                                        RelativeSizeAxes = Axes.X,
+                                        Text = "Red Trap",
+                                        BackgroundColour = TournamentGame.COLOUR_RED,
+                                        Action = () => setMode(TeamColour.Red, ChoiceType.Trap)
+                                    },
+                                    buttonBlueTrap = new TourneyButton
+                                    {
+                                        RelativeSizeAxes = Axes.X,
+                                        Text = "Blue Trap",
+                                        BackgroundColour = TournamentGame.COLOUR_BLUE,
+                                        Action = () => setMode(TeamColour.Blue, ChoiceType.Trap)
+                                    },
+                                }
+                            },
                         },
                         buttonTrapSwap = new TourneyButton
                         {
