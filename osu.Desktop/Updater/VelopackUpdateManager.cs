@@ -25,11 +25,13 @@ namespace osu.Desktop.Updater
         [Resolved]
         private ILocalUserPlayInfo? localUserInfo { get; set; }
 
+        private UpdateInfo? pendingUpdate;
+
         public VelopackUpdateManager()
         {
             updateManager = new UpdateManager(new GithubSource(@"https://github.com/ppy/osu", null, false), new UpdateOptions
             {
-                AllowVersionDowngrade = true
+                AllowVersionDowngrade = true,
             });
         }
 
@@ -52,25 +54,25 @@ namespace osu.Desktop.Updater
                 if (localUserInfo?.IsPlaying.Value == true)
                     return false;
 
-                UpdateInfo? info = await updateManager.CheckForUpdatesAsync().ConfigureAwait(false);
-
-                // Handle no updates available.
-                if (info == null)
+                if (pendingUpdate != null)
                 {
-                    // If there's no updates pending restart, bail and retry later.
-                    if (!updateManager.IsUpdatePendingRestart) return false;
-
                     // If there is an update pending restart, show the notification to restart again.
                     notificationOverlay.Post(new UpdateApplicationCompleteNotification
                     {
                         Activated = () =>
                         {
-                            restartToApplyUpdate(null);
+                            restartToApplyUpdate();
                             return true;
                         }
                     });
                     return true;
                 }
+
+                pendingUpdate = await updateManager.CheckForUpdatesAsync().ConfigureAwait(false);
+
+                // Handle no updates available.
+                if (pendingUpdate == null)
+                    return false;
 
                 scheduleRecheck = false;
 
@@ -78,7 +80,7 @@ namespace osu.Desktop.Updater
                 {
                     notification = new UpdateProgressNotification
                     {
-                        CompletionClickAction = () => restartToApplyUpdate(info),
+                        CompletionClickAction = restartToApplyUpdate,
                     };
 
                     Schedule(() => notificationOverlay.Post(notification));
@@ -88,7 +90,7 @@ namespace osu.Desktop.Updater
 
                 try
                 {
-                    await updateManager.DownloadUpdatesAsync(info, p => notification.Progress = p / 100f).ConfigureAwait(false);
+                    await updateManager.DownloadUpdatesAsync(pendingUpdate, p => notification.Progress = p / 100f).ConfigureAwait(false);
 
                     notification.State = ProgressNotificationState.Completed;
                 }
@@ -117,9 +119,9 @@ namespace osu.Desktop.Updater
             return true;
         }
 
-        private bool restartToApplyUpdate(UpdateInfo? info)
+        private bool restartToApplyUpdate()
         {
-            updateManager.WaitExitThenApplyUpdates(info?.TargetFullRelease);
+            updateManager.WaitExitThenApplyUpdates(pendingUpdate?.TargetFullRelease);
             Schedule(() => game.AttemptExit());
             return true;
         }
