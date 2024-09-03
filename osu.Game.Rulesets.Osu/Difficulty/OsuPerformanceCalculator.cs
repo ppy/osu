@@ -116,7 +116,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 Speed = speedValue,
                 Accuracy = accuracyValue,
                 Flashlight = visualFlashlightValue,
-                Cognition = visualCognitionValue,
+                Reading = visualCognitionValue,
                 EffectiveMissCount = effectiveMissCount,
                 Total = totalValue
             };
