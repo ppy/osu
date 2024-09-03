@@ -145,6 +145,13 @@ namespace osu.Game.Screens.Play
             base.Update();
 
             remainingTimeBox.Height = Math.Min(8, remainingTimeBox.DrawWidth);
+
+            // Keep things simple by resetting beat synced transforms on a rewind.
+            if (Clock.ElapsedFrameTime < 0)
+            {
+                remainingTimeBox.ClearTransforms(targetMember: nameof(Width));
+                remainingTimeBox.Width = remainingTimeForCurrentPeriod;
+            }
         }
 
         protected override void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, ChannelAmplitudes amplitudes)
