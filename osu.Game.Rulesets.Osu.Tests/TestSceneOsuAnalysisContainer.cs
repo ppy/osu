@@ -8,11 +8,12 @@ using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
-using osu.Framework.Threading;
 using osu.Game.Replays;
+using osu.Game.Rulesets.Osu.Beatmaps;
 using osu.Game.Rulesets.Osu.Replays;
 using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Rulesets.Replays;
+using osu.Game.Rulesets.UI;
 using osu.Game.Tests.Visual;
 using osuTK;
 
@@ -31,7 +32,6 @@ namespace osu.Game.Rulesets.Osu.Tests
         [Test]
         public void TestHitMarkers()
         {
-            var loop = createAnalysisContainer();
             AddStep("enable hit markers", () => analysisContainer.AnalysisSettings.HitMarkersEnabled.Value = true);
             AddAssert("hit markers visible", () => analysisContainer.HitMarkersVisible);
             AddStep("disable hit markers", () => analysisContainer.AnalysisSettings.HitMarkersEnabled.Value = false);
@@ -41,7 +41,6 @@ namespace osu.Game.Rulesets.Osu.Tests
         [Test]
         public void TestAimMarker()
         {
-            var loop = createAnalysisContainer();
             AddStep("enable aim markers", () => analysisContainer.AnalysisSettings.AimMarkersEnabled.Value = true);
             AddAssert("aim markers visible", () => analysisContainer.AimMarkersVisible);
             AddStep("disable aim markers", () => analysisContainer.AnalysisSettings.AimMarkersEnabled.Value = false);
@@ -51,19 +50,28 @@ namespace osu.Game.Rulesets.Osu.Tests
         [Test]
         public void TestAimLines()
         {
-            var loop = createAnalysisContainer();
             AddStep("enable aim lines", () => analysisContainer.AnalysisSettings.AimLinesEnabled.Value = true);
             AddAssert("aim lines visible", () => analysisContainer.AimLinesVisible);
             AddStep("disable aim lines", () => analysisContainer.AnalysisSettings.AimLinesEnabled.Value = false);
             AddAssert("aim lines not visible", () => !analysisContainer.AimLinesVisible);
         }
 
-        private TestOsuAnalysisContainer createAnalysisContainer() => new TestOsuAnalysisContainer();
+        private TestOsuAnalysisContainer createAnalysisContainer()
+        {
+            var replay = new Replay();
+            var ruleset = new OsuRuleset();
+            var beatmap = new OsuBeatmap();
+            var drawableRuleset = new DrawableOsuRuleset(ruleset, beatmap);
+            // Load playfield cursor to avoid errors
+            Add(drawableRuleset);
+
+            return new TestOsuAnalysisContainer(replay, drawableRuleset);
+        }
 
         private partial class TestOsuAnalysisContainer : OsuAnalysisContainer
         {
-            public TestOsuAnalysisContainer()
-                : base(new Replay(), new OsuPlayfield())
+            public TestOsuAnalysisContainer(Replay replay, DrawableRuleset drawableRuleset)
+                : base(replay, drawableRuleset)
             {
             }
 
