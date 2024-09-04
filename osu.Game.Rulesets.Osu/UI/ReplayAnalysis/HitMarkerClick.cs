@@ -1,17 +1,18 @@
+using System;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
+using osu.Game.Graphics;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.UI.ReplayAnalysis
 {
-    public partial class HitMarkerRightClick : HitMarker
+    public partial class HitMarkerClick : HitMarker
     {
-        public HitMarkerRightClick()
+        public HitMarkerClick()
         {
             const float length = 20;
-
-            Colour = Color4.GreenYellow;
+            const float border_size = 3;
 
             InternalChildren = new Drawable[]
             {
@@ -19,14 +20,14 @@ namespace osu.Game.Rulesets.Osu.UI.ReplayAnalysis
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Size = new Vector2(3, length),
+                    Size = new Vector2(border_size, length + border_size),
                     Colour = Colour4.Black.Opacity(0.5F)
                 },
                 new Box
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Size = new Vector2(3, length),
+                    Size = new Vector2(border_size, length + border_size),
                     Rotation = 90,
                     Colour = Colour4.Black.Opacity(0.5F)
                 },
@@ -44,6 +45,28 @@ namespace osu.Game.Rulesets.Osu.UI.ReplayAnalysis
                     Rotation = 90,
                 }
             };
+        }
+
+        [Resolved]
+        private OsuColour colours { get; set; } = null!;
+
+        protected override void OnApply(AnalysisFrameEntry entry)
+        {
+            base.OnApply(entry);
+
+            switch (entry.Action)
+            {
+                case OsuAction.LeftButton:
+                    Colour = colours.BlueLight;
+                    break;
+
+                case OsuAction.RightButton:
+                    Colour = colours.YellowLight;
+                    break;
+
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
         }
     }
 }

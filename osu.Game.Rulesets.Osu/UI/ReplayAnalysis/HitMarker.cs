@@ -6,14 +6,14 @@ using osu.Game.Rulesets.Objects.Pooling;
 
 namespace osu.Game.Rulesets.Osu.UI.ReplayAnalysis
 {
-    public partial class HitMarker : PoolableDrawableWithLifetime<AimPointEntry>
+    public partial class HitMarker : PoolableDrawableWithLifetime<AnalysisFrameEntry>
     {
         public HitMarker()
         {
             Origin = Anchor.Centre;
         }
 
-        protected override void OnApply(AimPointEntry entry)
+        protected override void OnApply(AnalysisFrameEntry entry)
         {
             Position = entry.Position;
 
