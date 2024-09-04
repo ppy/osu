@@ -103,6 +103,8 @@ namespace osu.Game.Rulesets.Osu.Tests
             {
             }
 
+            public new ReplayAnalysisSettings Settings => base.Settings;
+
             public bool HitMarkersVisible => HitMarkers.Alpha > 0 && HitMarkers.Entries.Any();
             public bool AimMarkersVisible => AimMarkers.Alpha > 0 && AimMarkers.Entries.Any();
             public bool AimLinesVisible => AimLines.Alpha > 0 && AimLines.Vertices.Count > 1;

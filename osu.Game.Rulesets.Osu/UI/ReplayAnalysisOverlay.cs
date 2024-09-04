@@ -26,7 +26,7 @@ namespace osu.Game.Rulesets.Osu.UI
         protected readonly AimMarkersContainer AimMarkers;
         protected readonly AimLinesContainer AimLines;
 
-        public ReplayAnalysisSettings Settings = null!;
+        protected ReplayAnalysisSettings Settings = null!;
 
         private readonly Replay replay;
         private readonly DrawableRuleset drawableRuleset;
@@ -45,32 +45,30 @@ namespace osu.Game.Rulesets.Osu.UI
         }
 
         [BackgroundDependencyLoader]
-        private void load(ReplayPlayer replayPlayer)
+        private void load(ReplayPlayer? replayPlayer)
         {
-            replayPlayer.AddSettings(Settings = new ReplayAnalysisSettings());
+            Settings = new ReplayAnalysisSettings();
 
-            LoadReplay();
+            if (replayPlayer != null)
+                replayPlayer.AddSettings(Settings);
+            else
+                // only in test
+                AddInternal(Settings);
+
+            loadReplay();
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            Settings.HitMarkersEnabled.BindValueChanged(e => toggleHitMarkers(e.NewValue), true);
-            Settings.AimMarkersEnabled.BindValueChanged(e => toggleAimMarkers(e.NewValue), true);
-            Settings.AimLinesEnabled.BindValueChanged(e => toggleAimLines(e.NewValue), true);
-            Settings.CursorHideEnabled.BindValueChanged(e => toggleCursorHidden(e.NewValue), true);
+            Settings.HitMarkersEnabled.BindValueChanged(enabled => HitMarkers.FadeTo(enabled.NewValue ? 1 : 0), true);
+            Settings.AimMarkersEnabled.BindValueChanged(enabled => AimMarkers.FadeTo(enabled.NewValue ? 1 : 0), true);
+            Settings.AimLinesEnabled.BindValueChanged(enabled => AimLines.FadeTo(enabled.NewValue ? 1 : 0), true);
+            Settings.CursorHideEnabled.BindValueChanged(enabled => drawableRuleset.Playfield.Cursor.FadeTo(enabled.NewValue ? 0 : 1), true);
         }
 
-        private void toggleHitMarkers(bool value) => HitMarkers.FadeTo(value ? 1 : 0);
-
-        private void toggleAimMarkers(bool value) => AimMarkers.FadeTo(value ? 1 : 0);
-
-        private void toggleAimLines(bool value) => AimLines.FadeTo(value ? 1 : 0);
-
-        private void toggleCursorHidden(bool value) => drawableRuleset.Playfield.Cursor.FadeTo(value ? 0 : 1);
-
-        protected void LoadReplay()
+        private void loadReplay()
         {
             bool leftHeld = false;
             bool rightHeld = false;
