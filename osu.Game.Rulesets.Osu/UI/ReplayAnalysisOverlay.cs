@@ -19,18 +19,18 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.UI
 {
-    public partial class OsuAnalysisContainer : CompositeDrawable
+    public partial class ReplayAnalysisOverlay : CompositeDrawable
     {
         protected readonly HitMarkersContainer HitMarkers;
         protected readonly AimMarkersContainer AimMarkers;
         protected readonly AimLinesContainer AimLines;
 
-        public OsuAnalysisSettings Settings = null!;
+        public ReplayAnalysisSettings Settings = null!;
 
         private readonly Replay replay;
         private readonly DrawableRuleset drawableRuleset;
 
-        public OsuAnalysisContainer(Replay replay, DrawableRuleset drawableRuleset)
+        public ReplayAnalysisOverlay(Replay replay, DrawableRuleset drawableRuleset)
         {
             this.replay = replay;
             this.drawableRuleset = drawableRuleset;
@@ -46,7 +46,7 @@ namespace osu.Game.Rulesets.Osu.UI
         [BackgroundDependencyLoader]
         private void load()
         {
-            AddInternal(Settings = new OsuAnalysisSettings());
+            AddInternal(Settings = new ReplayAnalysisSettings());
 
             LoadReplay();
         }

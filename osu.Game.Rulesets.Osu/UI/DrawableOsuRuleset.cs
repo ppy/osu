@@ -39,7 +39,7 @@ namespace osu.Game.Rulesets.Osu.UI
         protected override void LoadComplete()
         {
             if (HasReplayLoaded.Value)
-                LoadComponentAsync(new OsuAnalysisContainer(ReplayScore.Replay, this), PlayfieldAdjustmentContainer.Add);
+                LoadComponentAsync(new ReplayAnalysisOverlay(ReplayScore.Replay, this), PlayfieldAdjustmentContainer.Add);
 
             base.LoadComplete();
         }

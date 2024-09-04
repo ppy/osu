@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 {
     public partial class TestSceneOsuAnalysisContainer : OsuTestScene
     {
-        private TestOsuAnalysisContainer analysisContainer = null!;
+        private TestReplayAnalysisOverlay analysisContainer = null!;
 
         [SetUpSteps]
         public void SetUpSteps()
@@ -32,7 +32,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 Children = new Drawable[]
                 {
                     drawableRuleset,
-                    analysisContainer = new TestOsuAnalysisContainer(fabricateReplay(), drawableRuleset),
+                    analysisContainer = new TestReplayAnalysisOverlay(fabricateReplay(), drawableRuleset),
                 };
             });
         }
@@ -96,9 +96,9 @@ namespace osu.Game.Rulesets.Osu.Tests
             return new Replay { Frames = frames };
         }
 
-        private partial class TestOsuAnalysisContainer : OsuAnalysisContainer
+        private partial class TestReplayAnalysisOverlay : ReplayAnalysisOverlay
         {
-            public TestOsuAnalysisContainer(Replay replay, DrawableRuleset drawableRuleset)
+            public TestReplayAnalysisOverlay(Replay replay, DrawableRuleset drawableRuleset)
                 : base(replay, drawableRuleset)
             {
             }
