@@ -62,12 +62,11 @@ namespace osu.Game.Rulesets.Osu.UI
             bool leftHeld = false;
             bool rightHeld = false;
 
+            OsuAction? lastAction = null;
+
             foreach (var frame in replay.Frames)
             {
                 var osuFrame = (OsuReplayFrame)frame;
-
-                MovementMarkers.Add(new AnalysisFrameEntry(osuFrame.Time, osuFrame.Position));
-                MovementPath.Add(new AnalysisFrameEntry(osuFrame.Time, osuFrame.Position));
 
                 bool leftButton = osuFrame.Actions.Contains(OsuAction.LeftButton);
                 bool rightButton = osuFrame.Actions.Contains(OsuAction.RightButton);
@@ -76,17 +75,25 @@ namespace osu.Game.Rulesets.Osu.UI
                     leftHeld = false;
                 else if (!leftHeld && leftButton)
                 {
-                    ClickMarkers.Add(new AnalysisFrameEntry(osuFrame.Time, osuFrame.Position, OsuAction.LeftButton));
                     leftHeld = true;
+                    lastAction = OsuAction.LeftButton;
+                    ClickMarkers.Add(new AnalysisFrameEntry(osuFrame.Time, osuFrame.Position, OsuAction.LeftButton));
                 }
 
                 if (rightHeld && !rightButton)
                     rightHeld = false;
                 else if (!rightHeld && rightButton)
                 {
-                    ClickMarkers.Add(new AnalysisFrameEntry(osuFrame.Time, osuFrame.Position, OsuAction.RightButton));
                     rightHeld = true;
+                    lastAction = OsuAction.RightButton;
+                    ClickMarkers.Add(new AnalysisFrameEntry(osuFrame.Time, osuFrame.Position, OsuAction.RightButton));
                 }
+
+                if (!leftButton && !rightButton)
+                    lastAction = null;
+
+                MovementMarkers.Add(new AnalysisFrameEntry(osuFrame.Time, osuFrame.Position, lastAction));
+                MovementPath.Add(new AnalysisFrameEntry(osuFrame.Time, osuFrame.Position));
             }
         }
     }
