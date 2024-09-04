@@ -54,6 +54,8 @@ namespace osu.Desktop.Updater
                 if (localUserInfo?.IsPlaying.Value == true)
                     return false;
 
+                // TODO: we should probably be checking if there's a more recent update, rather than shortcutting here.
+                // Velopack does support this scenario (see https://github.com/ppy/osu/pull/28743#discussion_r1743495975).
                 if (pendingUpdate != null)
                 {
                     // If there is an update pending restart, show the notification to restart again.
