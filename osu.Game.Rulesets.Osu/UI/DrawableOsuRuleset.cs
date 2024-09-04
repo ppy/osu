@@ -32,6 +32,8 @@ namespace osu.Game.Rulesets.Osu.UI
 
         public new OsuPlayfield Playfield => (OsuPlayfield)base.Playfield;
 
+        protected new OsuRulesetConfigManager Config => (OsuRulesetConfigManager)base.Config;
+
         public DrawableOsuRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod>? mods = null)
             : base(ruleset, beatmap, mods)
         {
@@ -43,9 +45,9 @@ namespace osu.Game.Rulesets.Osu.UI
             if (replayPlayer != null)
             {
                 PlayfieldAdjustmentContainer.Add(new ReplayAnalysisOverlay(replayPlayer.Score.Replay));
-                replayPlayer.AddSettings(new ReplayAnalysisSettings((OsuRulesetConfigManager)Config));
+                replayPlayer.AddSettings(new ReplayAnalysisSettings(Config));
 
-                cursorHideEnabled = ((OsuRulesetConfigManager)Config).GetBindable<bool>(OsuRulesetSetting.ReplayCursorHideEnabled);
+                cursorHideEnabled = Config.GetBindable<bool>(OsuRulesetSetting.ReplayCursorHideEnabled);
                 cursorHideEnabled.BindValueChanged(enabled => Playfield.Cursor.FadeTo(enabled.NewValue ? 0 : 1), true);
             }
         }
