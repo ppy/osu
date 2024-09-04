@@ -66,8 +66,8 @@ namespace osu.Game.Rulesets.Osu.UI
             {
                 var osuFrame = (OsuReplayFrame)frame;
 
-                MovementMarkers.Add(new AimPointEntry(osuFrame.Time, osuFrame.Position));
-                MovementPath.Add(new AimPointEntry(osuFrame.Time, osuFrame.Position));
+                MovementMarkers.Add(new AnalysisFrameEntry(osuFrame.Time, osuFrame.Position));
+                MovementPath.Add(new AnalysisFrameEntry(osuFrame.Time, osuFrame.Position));
 
                 bool leftButton = osuFrame.Actions.Contains(OsuAction.LeftButton);
                 bool rightButton = osuFrame.Actions.Contains(OsuAction.RightButton);
@@ -76,7 +76,7 @@ namespace osu.Game.Rulesets.Osu.UI
                     leftHeld = false;
                 else if (!leftHeld && leftButton)
                 {
-                    ClickMarkers.Add(new HitMarkerEntry(osuFrame.Time, osuFrame.Position, true));
+                    ClickMarkers.Add(new AnalysisFrameEntry(osuFrame.Time, osuFrame.Position, OsuAction.LeftButton));
                     leftHeld = true;
                 }
 
@@ -84,7 +84,7 @@ namespace osu.Game.Rulesets.Osu.UI
                     rightHeld = false;
                 else if (!rightHeld && rightButton)
                 {
-                    ClickMarkers.Add(new HitMarkerEntry(osuFrame.Time, osuFrame.Position, false));
+                    ClickMarkers.Add(new AnalysisFrameEntry(osuFrame.Time, osuFrame.Position, OsuAction.RightButton));
                     rightHeld = true;
                 }
             }

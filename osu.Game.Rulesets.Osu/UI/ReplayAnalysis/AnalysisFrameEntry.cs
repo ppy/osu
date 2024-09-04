@@ -6,15 +6,18 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.UI.ReplayAnalysis
 {
-    public partial class AimPointEntry : LifetimeEntry
+    public partial class AnalysisFrameEntry : LifetimeEntry
     {
+        public OsuAction? Action { get; }
+
         public Vector2 Position { get; }
 
-        public AimPointEntry(double time, Vector2 position)
+        public AnalysisFrameEntry(double time, Vector2 position, OsuAction? action = null)
         {
             LifetimeStart = time;
             LifetimeEnd = time + 1_000;
             Position = position;
+            Action = action;
         }
     }
 }

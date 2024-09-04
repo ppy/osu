@@ -3,16 +3,17 @@
 
 using System;
 using System.Collections.Generic;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics.Lines;
 using osu.Framework.Graphics.Performance;
-using osuTK.Graphics;
+using osu.Game.Graphics;
 
 namespace osu.Game.Rulesets.Osu.UI.ReplayAnalysis
 {
     public partial class MovementPathContainer : Path
     {
         private readonly LifetimeEntryManager lifetimeManager = new LifetimeEntryManager();
-        private readonly SortedSet<AimPointEntry> aliveEntries = new SortedSet<AimPointEntry>(new AimLinePointComparator());
+        private readonly SortedSet<AnalysisFrameEntry> aliveEntries = new SortedSet<AnalysisFrameEntry>(new AimLinePointComparator());
 
         public MovementPathContainer()
         {
@@ -20,7 +21,12 @@ namespace osu.Game.Rulesets.Osu.UI.ReplayAnalysis
             lifetimeManager.EntryBecameDead += entryBecameDead;
 
             PathRadius = 1f;
-            Colour = new Color4(255, 255, 255, 127);
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
+        {
+            Colour = colours.Pink2;
         }
 
         protected override void Update()
@@ -30,17 +36,17 @@ namespace osu.Game.Rulesets.Osu.UI.ReplayAnalysis
             lifetimeManager.Update(Time.Current);
         }
 
-        public void Add(AimPointEntry entry) => lifetimeManager.AddEntry(entry);
+        public void Add(AnalysisFrameEntry entry) => lifetimeManager.AddEntry(entry);
 
         private void entryBecameAlive(LifetimeEntry entry)
         {
-            aliveEntries.Add((AimPointEntry)entry);
+            aliveEntries.Add((AnalysisFrameEntry)entry);
             updateVertices();
         }
 
         private void entryBecameDead(LifetimeEntry entry)
         {
-            aliveEntries.Remove((AimPointEntry)entry);
+            aliveEntries.Remove((AnalysisFrameEntry)entry);
             updateVertices();
         }
 
@@ -54,9 +60,9 @@ namespace osu.Game.Rulesets.Osu.UI.ReplayAnalysis
             }
         }
 
-        private sealed class AimLinePointComparator : IComparer<AimPointEntry>
+        private sealed class AimLinePointComparator : IComparer<AnalysisFrameEntry>
         {
-            public int Compare(AimPointEntry? x, AimPointEntry? y)
+            public int Compare(AnalysisFrameEntry? x, AnalysisFrameEntry? y)
             {
                 ArgumentNullException.ThrowIfNull(x);
                 ArgumentNullException.ThrowIfNull(y);

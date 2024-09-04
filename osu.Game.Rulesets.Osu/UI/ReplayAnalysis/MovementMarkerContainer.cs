@@ -6,7 +6,7 @@ using osu.Game.Rulesets.Objects.Pooling;
 
 namespace osu.Game.Rulesets.Osu.UI.ReplayAnalysis
 {
-    public partial class MovementMarkerContainer : PooledDrawableWithLifetimeContainer<AimPointEntry, HitMarker>
+    public partial class MovementMarkerContainer : PooledDrawableWithLifetimeContainer<AnalysisFrameEntry, HitMarker>
     {
         private readonly DrawablePool<HitMarkerMovement> pool;
 
@@ -15,6 +15,6 @@ namespace osu.Game.Rulesets.Osu.UI.ReplayAnalysis
             AddInternal(pool = new DrawablePool<HitMarkerMovement>(80));
         }
 
-        protected override HitMarker GetDrawable(AimPointEntry entry) => pool.Get(d => d.Apply(entry));
+        protected override HitMarker GetDrawable(AnalysisFrameEntry entry) => pool.Get(d => d.Apply(entry));
     }
 }
