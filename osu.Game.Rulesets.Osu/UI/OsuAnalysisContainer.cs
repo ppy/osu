@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Lines;
 using osu.Framework.Graphics.Performance;
 using osu.Framework.Graphics.Pooling;
@@ -18,46 +19,46 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.UI
 {
-    public partial class OsuAnalysisContainer : AnalysisContainer
+    public partial class OsuAnalysisContainer : CompositeDrawable
     {
-        public new OsuAnalysisSettings AnalysisSettings => (OsuAnalysisSettings)base.AnalysisSettings;
+        protected readonly HitMarkersContainer HitMarkers;
+        protected readonly AimMarkersContainer AimMarkers;
+        protected readonly AimLinesContainer AimLines;
 
-        protected new DrawableOsuRuleset DrawableRuleset => (DrawableOsuRuleset)base.DrawableRuleset;
+        public OsuAnalysisSettings Settings = null!;
 
-        protected HitMarkersContainer HitMarkers;
-        protected AimMarkersContainer AimMarkers;
-        protected AimLinesContainer AimLines;
+        private readonly Replay replay;
+        private readonly DrawableRuleset drawableRuleset;
 
         public OsuAnalysisContainer(Replay replay, DrawableRuleset drawableRuleset)
-            : base(replay, drawableRuleset)
         {
+            this.replay = replay;
+            this.drawableRuleset = drawableRuleset;
+
             InternalChildren = new Drawable[]
             {
-                AimLines = new AimLinesContainer { Depth = float.MaxValue },
                 HitMarkers = new HitMarkersContainer(),
-                AimMarkers = new AimMarkersContainer { Depth = float.MinValue }
+                AimLines = new AimLinesContainer(),
+                AimMarkers = new AimMarkersContainer(),
             };
-        }
-
-        protected override OsuAnalysisSettings CreateAnalysisSettings(Ruleset ruleset)
-        {
-            var settings = new OsuAnalysisSettings((OsuRuleset)ruleset);
-            settings.HitMarkersEnabled.ValueChanged += e => toggleHitMarkers(e.NewValue);
-            settings.AimMarkersEnabled.ValueChanged += e => toggleAimMarkers(e.NewValue);
-            settings.AimLinesEnabled.ValueChanged += e => toggleAimLines(e.NewValue);
-            settings.CursorHideEnabled.ValueChanged += e => toggleCursorHidden(e.NewValue);
-            return settings;
         }
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            toggleHitMarkers(AnalysisSettings.HitMarkersEnabled.Value);
-            toggleAimMarkers(AnalysisSettings.AimMarkersEnabled.Value);
-            toggleAimLines(AnalysisSettings.AimLinesEnabled.Value);
-            toggleCursorHidden(AnalysisSettings.CursorHideEnabled.Value);
+            AddInternal(Settings = new OsuAnalysisSettings());
 
             LoadReplay();
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            Settings.HitMarkersEnabled.BindValueChanged(e => toggleHitMarkers(e.NewValue), true);
+            Settings.AimMarkersEnabled.BindValueChanged(e => toggleAimMarkers(e.NewValue), true);
+            Settings.AimLinesEnabled.BindValueChanged(e => toggleAimLines(e.NewValue), true);
+            Settings.CursorHideEnabled.BindValueChanged(e => toggleCursorHidden(e.NewValue), true);
         }
 
         private void toggleHitMarkers(bool value) => HitMarkers.FadeTo(value ? 1 : 0);
@@ -66,14 +67,14 @@ namespace osu.Game.Rulesets.Osu.UI
 
         private void toggleAimLines(bool value) => AimLines.FadeTo(value ? 1 : 0);
 
-        private void toggleCursorHidden(bool value) => DrawableRuleset.Playfield.Cursor.FadeTo(value ? 0 : 1);
+        private void toggleCursorHidden(bool value) => drawableRuleset.Playfield.Cursor.FadeTo(value ? 0 : 1);
 
         protected void LoadReplay()
         {
             bool leftHeld = false;
             bool rightHeld = false;
 
-            foreach (var frame in Replay.Frames)
+            foreach (var frame in replay.Frames)
             {
                 var osuFrame = (OsuReplayFrame)frame;
 

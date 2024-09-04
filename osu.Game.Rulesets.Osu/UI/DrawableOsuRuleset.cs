@@ -36,6 +36,14 @@ namespace osu.Game.Rulesets.Osu.UI
         {
         }
 
+        protected override void LoadComplete()
+        {
+            if (HasReplayLoaded.Value)
+                LoadComponentAsync(new OsuAnalysisContainer(ReplayScore.Replay, this), PlayfieldAdjustmentContainer.Add);
+
+            base.LoadComplete();
+        }
+
         public override DrawableHitObject<OsuHitObject> CreateDrawableRepresentation(OsuHitObject h) => null;
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true; // always show the gameplay cursor
@@ -68,7 +76,5 @@ namespace osu.Game.Rulesets.Osu.UI
                 return 0;
             }
         }
-
-        public override AnalysisContainer CreateAnalysisContainer(Replay replay) => new OsuAnalysisContainer(replay, this);
     }
 }
