@@ -6,11 +6,11 @@ using osu.Game.Rulesets.Objects.Pooling;
 
 namespace osu.Game.Rulesets.Osu.UI.ReplayAnalysis
 {
-    public partial class AimMarkersContainer : PooledDrawableWithLifetimeContainer<AimPointEntry, HitMarker>
+    public partial class MovementMarkerContainer : PooledDrawableWithLifetimeContainer<AimPointEntry, HitMarker>
     {
         private readonly DrawablePool<HitMarkerMovement> pool;
 
-        public AimMarkersContainer()
+        public MovementMarkerContainer()
         {
             AddInternal(pool = new DrawablePool<HitMarkerMovement>(80));
         }

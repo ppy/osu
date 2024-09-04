@@ -9,12 +9,12 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.UI.ReplayAnalysis
 {
-    public partial class AimLinesContainer : Path
+    public partial class MovementPathContainer : Path
     {
         private readonly LifetimeEntryManager lifetimeManager = new LifetimeEntryManager();
         private readonly SortedSet<AimPointEntry> aliveEntries = new SortedSet<AimPointEntry>(new AimLinePointComparator());
 
-        public AimLinesContainer()
+        public MovementPathContainer()
         {
             lifetimeManager.EntryBecameAlive += entryBecameAlive;
             lifetimeManager.EntryBecameDead += entryBecameDead;
@@ -31,8 +31,6 @@ namespace osu.Game.Rulesets.Osu.UI.ReplayAnalysis
         }
 
         public void Add(AimPointEntry entry) => lifetimeManager.AddEntry(entry);
-
-        public void Clear() => lifetimeManager.ClearEntries();
 
         private void entryBecameAlive(LifetimeEntry entry)
         {

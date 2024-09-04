@@ -18,9 +18,9 @@ namespace osu.Game.Rulesets.Osu.UI
         private BindableBool aimMarkersEnabled { get; } = new BindableBool();
         private BindableBool aimLinesEnabled { get; } = new BindableBool();
 
-        protected readonly HitMarkersContainer HitMarkers;
-        protected readonly AimMarkersContainer AimMarkers;
-        protected readonly AimLinesContainer AimLines;
+        protected readonly ClickMarkerContainer ClickMarkers;
+        protected readonly MovementMarkerContainer MovementMarkers;
+        protected readonly MovementPathContainer MovementPath;
 
         private readonly Replay replay;
 
@@ -32,9 +32,9 @@ namespace osu.Game.Rulesets.Osu.UI
 
             InternalChildren = new Drawable[]
             {
-                HitMarkers = new HitMarkersContainer(),
-                AimLines = new AimLinesContainer(),
-                AimMarkers = new AimMarkersContainer(),
+                ClickMarkers = new ClickMarkerContainer(),
+                MovementPath = new MovementPathContainer(),
+                MovementMarkers = new MovementMarkerContainer(),
             };
         }
 
@@ -52,9 +52,9 @@ namespace osu.Game.Rulesets.Osu.UI
         {
             base.LoadComplete();
 
-            hitMarkersEnabled.BindValueChanged(enabled => HitMarkers.FadeTo(enabled.NewValue ? 1 : 0), true);
-            aimMarkersEnabled.BindValueChanged(enabled => AimMarkers.FadeTo(enabled.NewValue ? 1 : 0), true);
-            aimLinesEnabled.BindValueChanged(enabled => AimLines.FadeTo(enabled.NewValue ? 1 : 0), true);
+            hitMarkersEnabled.BindValueChanged(enabled => ClickMarkers.FadeTo(enabled.NewValue ? 1 : 0), true);
+            aimMarkersEnabled.BindValueChanged(enabled => MovementMarkers.FadeTo(enabled.NewValue ? 1 : 0), true);
+            aimLinesEnabled.BindValueChanged(enabled => MovementPath.FadeTo(enabled.NewValue ? 1 : 0), true);
         }
 
         private void loadReplay()
@@ -66,8 +66,8 @@ namespace osu.Game.Rulesets.Osu.UI
             {
                 var osuFrame = (OsuReplayFrame)frame;
 
-                AimMarkers.Add(new AimPointEntry(osuFrame.Time, osuFrame.Position));
-                AimLines.Add(new AimPointEntry(osuFrame.Time, osuFrame.Position));
+                MovementMarkers.Add(new AimPointEntry(osuFrame.Time, osuFrame.Position));
+                MovementPath.Add(new AimPointEntry(osuFrame.Time, osuFrame.Position));
 
                 bool leftButton = osuFrame.Actions.Contains(OsuAction.LeftButton);
                 bool rightButton = osuFrame.Actions.Contains(OsuAction.RightButton);
@@ -76,7 +76,7 @@ namespace osu.Game.Rulesets.Osu.UI
                     leftHeld = false;
                 else if (!leftHeld && leftButton)
                 {
-                    HitMarkers.Add(new HitMarkerEntry(osuFrame.Time, osuFrame.Position, true));
+                    ClickMarkers.Add(new HitMarkerEntry(osuFrame.Time, osuFrame.Position, true));
                     leftHeld = true;
                 }
 
@@ -84,7 +84,7 @@ namespace osu.Game.Rulesets.Osu.UI
                     rightHeld = false;
                 else if (!rightHeld && rightButton)
                 {
-                    HitMarkers.Add(new HitMarkerEntry(osuFrame.Time, osuFrame.Position, false));
+                    ClickMarkers.Add(new HitMarkerEntry(osuFrame.Time, osuFrame.Position, false));
                     rightHeld = true;
                 }
             }
