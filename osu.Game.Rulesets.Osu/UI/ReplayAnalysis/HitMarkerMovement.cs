@@ -1,8 +1,7 @@
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
+using osu.Game.Graphics;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.UI.ReplayAnalysis
 {
@@ -10,41 +9,30 @@ namespace osu.Game.Rulesets.Osu.UI.ReplayAnalysis
     {
         public HitMarkerMovement()
         {
-            const float length = 5;
-
-            Colour = Color4.Gray.Opacity(0.4f);
-
             InternalChildren = new Drawable[]
             {
-                new Box
+                new Circle
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Size = new Vector2(3, length),
-                    Colour = Colour4.Black.Opacity(0.5F)
+                    Colour = OsuColour.Gray(0.2f),
+                    RelativeSizeAxes = Axes.Both,
+                    Size = new Vector2(1.2f)
                 },
-                new Box
+                new Circle
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Size = new Vector2(3, length),
-                    Rotation = 90,
-                    Colour = Colour4.Black.Opacity(0.5F)
+                    RelativeSizeAxes = Axes.Both,
                 },
-                new Box
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Size = new Vector2(1, length),
-                },
-                new Box
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Size = new Vector2(1, length),
-                    Rotation = 90,
-                }
             };
+        }
+
+        protected override void OnApply(AnalysisFrameEntry entry)
+        {
+            base.OnApply(entry);
+
+            Size = new Vector2(entry.Action != null ? 4 : 3);
         }
     }
 }
