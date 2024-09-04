@@ -22,14 +22,14 @@ namespace osu.Game.Rulesets.Osu.UI
     {
         public new OsuAnalysisSettings AnalysisSettings => (OsuAnalysisSettings)base.AnalysisSettings;
 
-        protected new OsuPlayfield Playfield => (OsuPlayfield)base.Playfield;
+        protected new DrawableOsuRuleset DrawableRuleset => (DrawableOsuRuleset)base.DrawableRuleset;
 
         protected HitMarkersContainer HitMarkers;
         protected AimMarkersContainer AimMarkers;
         protected AimLinesContainer AimLines;
 
-        public OsuAnalysisContainer(Replay replay, Playfield playfield)
-            : base(replay, playfield)
+        public OsuAnalysisContainer(Replay replay, DrawableRuleset drawableRuleset)
+            : base(replay, drawableRuleset)
         {
             InternalChildren = new Drawable[]
             {
@@ -37,12 +37,11 @@ namespace osu.Game.Rulesets.Osu.UI
                 HitMarkers = new HitMarkersContainer(),
                 AimMarkers = new AimMarkersContainer { Depth = float.MinValue }
             };
-
         }
 
-        protected override OsuAnalysisSettings CreateAnalysisSettings()
+        protected override OsuAnalysisSettings CreateAnalysisSettings(Ruleset ruleset)
         {
-            var settings = new OsuAnalysisSettings();
+            var settings = new OsuAnalysisSettings((OsuRuleset)ruleset);
             settings.HitMarkersEnabled.ValueChanged += e => toggleHitMarkers(e.NewValue);
             settings.AimMarkersEnabled.ValueChanged += e => toggleAimMarkers(e.NewValue);
             settings.AimLinesEnabled.ValueChanged += e => toggleAimLines(e.NewValue);
@@ -67,7 +66,7 @@ namespace osu.Game.Rulesets.Osu.UI
 
         private void toggleAimLines(bool value) => AimLines.FadeTo(value ? 1 : 0);
 
-        private void toggleCursorHidden(bool value) => Playfield.Cursor.FadeTo(value ? 0 : 1);
+        private void toggleCursorHidden(bool value) => DrawableRuleset.Playfield.Cursor.FadeTo(value ? 0 : 1);
 
         protected void LoadReplay()
         {
