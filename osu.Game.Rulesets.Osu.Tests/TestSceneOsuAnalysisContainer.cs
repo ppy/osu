@@ -33,9 +33,27 @@ namespace osu.Game.Rulesets.Osu.Tests
             {
                 Children = new Drawable[]
                 {
-                    analysisContainer = new TestReplayAnalysisOverlay(fabricateReplay()),
+                    new OsuPlayfieldAdjustmentContainer
+                    {
+                        Child = analysisContainer = new TestReplayAnalysisOverlay(fabricateReplay()),
+                    },
                     settings = new ReplayAnalysisSettings(config),
                 };
+
+                settings.HitMarkersEnabled.Value = false;
+                settings.AimMarkersEnabled.Value = false;
+                settings.AimLinesEnabled.Value = false;
+            });
+        }
+
+        [Test]
+        public void TestEverythingOn()
+        {
+            AddStep("enable everything", () =>
+            {
+                settings.HitMarkersEnabled.Value = true;
+                settings.AimMarkersEnabled.Value = true;
+                settings.AimLinesEnabled.Value = true;
             });
         }
 
@@ -76,8 +94,8 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             for (int i = 0; i < 1000; i++)
             {
-                posX = Math.Clamp(posX + random.Next(-10, 11), 0, 500);
-                posY = Math.Clamp(posY + random.Next(-10, 11), 0, 500);
+                posX = Math.Clamp(posX + random.Next(-20, 21), 0, 500);
+                posY = Math.Clamp(posY + random.Next(-20, 21), 0, 500);
 
                 var actions = new List<OsuAction>();
 
