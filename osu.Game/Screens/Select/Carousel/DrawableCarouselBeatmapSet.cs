@@ -51,7 +51,9 @@ namespace osu.Game.Screens.Select.Carousel
         [Resolved]
         private IBindable<RulesetInfo> ruleset { get; set; } = null!;
 
-        public Container<DrawableCarouselItem>? Beatmaps;
+        public IReadOnlyList<DrawableCarouselItem> DrawableBeatmaps => beatmapContainer?.IsLoaded != true ? Array.Empty<DrawableCarouselItem>() : beatmapContainer;
+
+        private Container<DrawableCarouselItem>? beatmapContainer;
 
         private BeatmapSetInfo beatmapSet = null!;
 
@@ -124,7 +126,7 @@ namespace osu.Game.Screens.Select.Carousel
             Content.Clear();
             Header.Clear();
 
-            Beatmaps = null;
+            beatmapContainer = null;
             beatmapsLoadTask = null;
 
             if (Item == null)
@@ -162,7 +164,7 @@ namespace osu.Game.Screens.Select.Carousel
             // if we are already displaying all the correct beatmaps, only run animation updates.
             // note that the displayed beatmaps may change due to the applied filter.
             // a future optimisation could add/remove only changed difficulties rather than reinitialise.
-            if (Beatmaps != null && visibleBeatmaps.Length == Beatmaps.Count && visibleBeatmaps.All(b => Beatmaps.Any(c => c.Item == b)))
+            if (beatmapContainer != null && visibleBeatmaps.Length == beatmapContainer.Count && visibleBeatmaps.All(b => beatmapContainer.Any(c => c.Item == b)))
             {
                 updateBeatmapYPositions();
             }
@@ -171,17 +173,17 @@ namespace osu.Game.Screens.Select.Carousel
                 // on selection we show our child beatmaps.
                 // for now this is a simple drawable construction each selection.
                 // can be improved in the future.
-                Beatmaps = new Container<DrawableCarouselItem>
+                beatmapContainer = new Container<DrawableCarouselItem>
                 {
                     X = 100,
                     RelativeSizeAxes = Axes.Both,
                     ChildrenEnumerable = visibleBeatmaps.Select(c => c.CreateDrawableRepresentation()!)
                 };
 
-                beatmapsLoadTask = LoadComponentAsync(Beatmaps, loaded =>
+                beatmapsLoadTask = LoadComponentAsync(beatmapContainer, loaded =>
                 {
                     // make sure the pooled target hasn't changed.
-                    if (Beatmaps != loaded)
+                    if (beatmapContainer != loaded)
                         return;
 
                     Content.Child = loaded;
@@ -242,7 +244,7 @@ namespace osu.Game.Screens.Select.Carousel
 
         private void updateBeatmapYPositions()
         {
-            if (Beatmaps == null)
+            if (beatmapContainer == null)
                 return;
 
             if (beatmapsLoadTask == null || !beatmapsLoadTask.IsCompleted)
@@ -252,7 +254,7 @@ namespace osu.Game.Screens.Select.Carousel
 
             bool isSelected = Item?.State.Value == CarouselItemState.Selected;
 
-            foreach (var panel in Beatmaps)
+            foreach (var panel in beatmapContainer)
             {
                 Debug.Assert(panel.Item != null);
 

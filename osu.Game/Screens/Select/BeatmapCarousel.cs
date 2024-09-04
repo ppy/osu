@@ -899,12 +899,10 @@ namespace osu.Game.Screens.Select
                     Scroll.ChangeChildDepth(item, hasPassedSelection ? -item.Item.CarouselYPosition : item.Item.CarouselYPosition);
                 }
 
-                if (item is DrawableCarouselBeatmapSet set && set.Beatmaps?.IsLoaded == true)
+                if (item is DrawableCarouselBeatmapSet set)
                 {
-                    foreach (var diff in set.Beatmaps)
-                    {
-                        updateItem(diff, item);
-                    }
+                    for (int i = 0; i < set.DrawableBeatmaps.Count; i++)
+                        updateItem(set.DrawableBeatmaps[i], item);
                 }
             }
         }
