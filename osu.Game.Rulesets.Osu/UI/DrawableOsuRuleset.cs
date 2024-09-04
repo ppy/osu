@@ -5,6 +5,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
+using osu.Framework.Graphics;
 using osu.Framework.Input;
 using osu.Game.Beatmaps;
 using osu.Game.Input.Handlers;
@@ -24,7 +26,7 @@ namespace osu.Game.Rulesets.Osu.UI
 {
     public partial class DrawableOsuRuleset : DrawableRuleset<OsuHitObject>
     {
-        protected new OsuRulesetConfigManager Config => (OsuRulesetConfigManager)base.Config;
+        private Bindable<bool>? cursorHideEnabled;
 
         public new OsuInputManager KeyBindingInputManager => (OsuInputManager)base.KeyBindingInputManager;
 
@@ -39,7 +41,13 @@ namespace osu.Game.Rulesets.Osu.UI
         private void load(ReplayPlayer? replayPlayer)
         {
             if (replayPlayer != null)
-                PlayfieldAdjustmentContainer.Add(new ReplayAnalysisOverlay(replayPlayer.Score.Replay, this));
+            {
+                PlayfieldAdjustmentContainer.Add(new ReplayAnalysisOverlay(replayPlayer.Score.Replay));
+                replayPlayer.AddSettings(new ReplayAnalysisSettings((OsuRulesetConfigManager)Config));
+
+                cursorHideEnabled = ((OsuRulesetConfigManager)Config).GetBindable<bool>(OsuRulesetSetting.ReplayCursorHideEnabled);
+                cursorHideEnabled.BindValueChanged(enabled => Playfield.Cursor.FadeTo(enabled.NewValue ? 0 : 1), true);
+            }
         }
 
         public override DrawableHitObject<OsuHitObject>? CreateDrawableRepresentation(OsuHitObject h) => null;

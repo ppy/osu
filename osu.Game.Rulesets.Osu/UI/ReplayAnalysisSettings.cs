@@ -11,6 +11,8 @@ namespace osu.Game.Rulesets.Osu.UI
 {
     public partial class ReplayAnalysisSettings : PlayerSettingsGroup
     {
+        private readonly OsuRulesetConfigManager config;
+
         [SettingSource("Hit markers", SettingControlType = typeof(PlayerCheckbox))]
         public BindableBool HitMarkersEnabled { get; } = new BindableBool();
 
@@ -23,17 +25,16 @@ namespace osu.Game.Rulesets.Osu.UI
         [SettingSource("Hide cursor", SettingControlType = typeof(PlayerCheckbox))]
         public BindableBool CursorHideEnabled { get; } = new BindableBool();
 
-        public ReplayAnalysisSettings()
+        public ReplayAnalysisSettings(OsuRulesetConfigManager config)
             : base("Analysis Settings")
         {
+            this.config = config;
         }
 
         [BackgroundDependencyLoader]
-        private void load(IRulesetConfigCache cache)
+        private void load()
         {
             AddRange(this.CreateSettingsControls());
-
-            var config = (OsuRulesetConfigManager)cache.GetConfigFor(new OsuRuleset())!;
 
             config.BindWith(OsuRulesetSetting.ReplayHitMarkersEnabled, HitMarkersEnabled);
             config.BindWith(OsuRulesetSetting.ReplayAimMarkersEnabled, AimMarkersEnabled);
