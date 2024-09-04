@@ -5,14 +5,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Testing;
 using osu.Game.Replays;
-using osu.Game.Rulesets.Osu.Beatmaps;
+using osu.Game.Rulesets.Osu.Configuration;
 using osu.Game.Rulesets.Osu.Replays;
 using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Rulesets.Replays;
-using osu.Game.Rulesets.UI;
 using osu.Game.Tests.Visual;
 using osuTK;
 
@@ -21,18 +21,20 @@ namespace osu.Game.Rulesets.Osu.Tests
     public partial class TestSceneOsuAnalysisContainer : OsuTestScene
     {
         private TestReplayAnalysisOverlay analysisContainer = null!;
+        private ReplayAnalysisSettings settings = null!;
+
+        [Cached]
+        private OsuRulesetConfigManager config = new OsuRulesetConfigManager(null, new OsuRuleset().RulesetInfo);
 
         [SetUpSteps]
         public void SetUpSteps()
         {
             AddStep("create analysis container", () =>
             {
-                DrawableOsuRuleset drawableRuleset = new DrawableOsuRuleset(new OsuRuleset(), new OsuBeatmap());
-
                 Children = new Drawable[]
                 {
-                    drawableRuleset,
-                    analysisContainer = new TestReplayAnalysisOverlay(fabricateReplay(), drawableRuleset),
+                    analysisContainer = new TestReplayAnalysisOverlay(fabricateReplay()),
+                    settings = new ReplayAnalysisSettings(config),
                 };
             });
         }
@@ -40,27 +42,27 @@ namespace osu.Game.Rulesets.Osu.Tests
         [Test]
         public void TestHitMarkers()
         {
-            AddStep("enable hit markers", () => analysisContainer.Settings.HitMarkersEnabled.Value = true);
+            AddStep("enable hit markers", () => settings.HitMarkersEnabled.Value = true);
             AddAssert("hit markers visible", () => analysisContainer.HitMarkersVisible);
-            AddStep("disable hit markers", () => analysisContainer.Settings.HitMarkersEnabled.Value = false);
+            AddStep("disable hit markers", () => settings.HitMarkersEnabled.Value = false);
             AddAssert("hit markers not visible", () => !analysisContainer.HitMarkersVisible);
         }
 
         [Test]
         public void TestAimMarker()
         {
-            AddStep("enable aim markers", () => analysisContainer.Settings.AimMarkersEnabled.Value = true);
+            AddStep("enable aim markers", () => settings.AimMarkersEnabled.Value = true);
             AddAssert("aim markers visible", () => analysisContainer.AimMarkersVisible);
-            AddStep("disable aim markers", () => analysisContainer.Settings.AimMarkersEnabled.Value = false);
+            AddStep("disable aim markers", () => settings.AimMarkersEnabled.Value = false);
             AddAssert("aim markers not visible", () => !analysisContainer.AimMarkersVisible);
         }
 
         [Test]
         public void TestAimLines()
         {
-            AddStep("enable aim lines", () => analysisContainer.Settings.AimLinesEnabled.Value = true);
+            AddStep("enable aim lines", () => settings.AimLinesEnabled.Value = true);
             AddAssert("aim lines visible", () => analysisContainer.AimLinesVisible);
-            AddStep("disable aim lines", () => analysisContainer.Settings.AimLinesEnabled.Value = false);
+            AddStep("disable aim lines", () => settings.AimLinesEnabled.Value = false);
             AddAssert("aim lines not visible", () => !analysisContainer.AimLinesVisible);
         }
 
@@ -98,12 +100,10 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         private partial class TestReplayAnalysisOverlay : ReplayAnalysisOverlay
         {
-            public TestReplayAnalysisOverlay(Replay replay, DrawableRuleset drawableRuleset)
-                : base(replay, drawableRuleset)
+            public TestReplayAnalysisOverlay(Replay replay)
+                : base(replay)
             {
             }
-
-            public new ReplayAnalysisSettings Settings => base.Settings;
 
             public bool HitMarkersVisible => HitMarkers.Alpha > 0 && HitMarkers.Entries.Any();
             public bool AimMarkersVisible => AimMarkers.Alpha > 0 && AimMarkers.Entries.Any();

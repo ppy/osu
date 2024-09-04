@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Lines;
@@ -11,10 +12,9 @@ using osu.Framework.Graphics.Performance;
 using osu.Framework.Graphics.Pooling;
 using osu.Game.Replays;
 using osu.Game.Rulesets.Objects.Pooling;
+using osu.Game.Rulesets.Osu.Configuration;
 using osu.Game.Rulesets.Osu.Replays;
 using osu.Game.Rulesets.Osu.Skinning.Default;
-using osu.Game.Rulesets.UI;
-using osu.Game.Screens.Play;
 using osuTK;
 using osuTK.Graphics;
 
@@ -22,19 +22,19 @@ namespace osu.Game.Rulesets.Osu.UI
 {
     public partial class ReplayAnalysisOverlay : CompositeDrawable
     {
+        private BindableBool hitMarkersEnabled { get; } = new BindableBool();
+        private BindableBool aimMarkersEnabled { get; } = new BindableBool();
+        private BindableBool aimLinesEnabled { get; } = new BindableBool();
+
         protected readonly HitMarkersContainer HitMarkers;
         protected readonly AimMarkersContainer AimMarkers;
         protected readonly AimLinesContainer AimLines;
 
-        protected ReplayAnalysisSettings Settings = null!;
-
         private readonly Replay replay;
-        private readonly DrawableRuleset drawableRuleset;
 
-        public ReplayAnalysisOverlay(Replay replay, DrawableRuleset drawableRuleset)
+        public ReplayAnalysisOverlay(Replay replay)
         {
             this.replay = replay;
-            this.drawableRuleset = drawableRuleset;
 
             InternalChildren = new Drawable[]
             {
@@ -45,27 +45,22 @@ namespace osu.Game.Rulesets.Osu.UI
         }
 
         [BackgroundDependencyLoader]
-        private void load(ReplayPlayer? replayPlayer)
+        private void load(OsuRulesetConfigManager config)
         {
-            Settings = new ReplayAnalysisSettings();
-
-            if (replayPlayer != null)
-                replayPlayer.AddSettings(Settings);
-            else
-                // only in test
-                AddInternal(Settings);
-
             loadReplay();
+
+            config.BindWith(OsuRulesetSetting.ReplayHitMarkersEnabled, hitMarkersEnabled);
+            config.BindWith(OsuRulesetSetting.ReplayAimMarkersEnabled, aimMarkersEnabled);
+            config.BindWith(OsuRulesetSetting.ReplayAimLinesEnabled, aimLinesEnabled);
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            Settings.HitMarkersEnabled.BindValueChanged(enabled => HitMarkers.FadeTo(enabled.NewValue ? 1 : 0), true);
-            Settings.AimMarkersEnabled.BindValueChanged(enabled => AimMarkers.FadeTo(enabled.NewValue ? 1 : 0), true);
-            Settings.AimLinesEnabled.BindValueChanged(enabled => AimLines.FadeTo(enabled.NewValue ? 1 : 0), true);
-            Settings.CursorHideEnabled.BindValueChanged(enabled => drawableRuleset.Playfield.Cursor.FadeTo(enabled.NewValue ? 0 : 1), true);
+            hitMarkersEnabled.BindValueChanged(enabled => HitMarkers.FadeTo(enabled.NewValue ? 1 : 0), true);
+            aimMarkersEnabled.BindValueChanged(enabled => AimMarkers.FadeTo(enabled.NewValue ? 1 : 0), true);
+            aimLinesEnabled.BindValueChanged(enabled => AimLines.FadeTo(enabled.NewValue ? 1 : 0), true);
         }
 
         private void loadReplay()
