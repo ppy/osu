@@ -45,6 +45,7 @@ namespace osu.Game.Tournament.Screens.Board
 
         private DrawableTeamPlayerList team1List = null!;
         private DrawableTeamPlayerList team2List = null!;
+        private EmptyBox danmakuBox = null!;
 
         private readonly int sideListHeight = 660;
 
@@ -72,7 +73,7 @@ namespace osu.Game.Tournament.Screens.Board
                     Anchor = Anchor.TopLeft,
                     Origin = Anchor.TopLeft,
                     RelativeSizeAxes = Axes.None,
-                    Position = new Vector2(30, 110),
+                    Position = new Vector2(30, 100),
                     Width = 320,
                     Height = sideListHeight,
                     Direction = FillDirection.Vertical,
@@ -92,7 +93,7 @@ namespace osu.Game.Tournament.Screens.Board
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight,
                     RelativeSizeAxes = Axes.None,
-                    Position = new Vector2(-30, 110),
+                    Position = new Vector2(-30, 100),
                     Width = 320,
                     Height = sideListHeight,
                     Direction = FillDirection.Vertical,
@@ -107,14 +108,13 @@ namespace osu.Game.Tournament.Screens.Board
                         },
                         // A single Box for livestream danmakus.
                         // Wrapped in a container for round corners.
-                        new EmptyBox(cornerRadius: 10)
+                        danmakuBox = new EmptyBox(cornerRadius: 10)
                         {
                             Anchor = Anchor.TopRight,
                             Origin = Anchor.TopRight,
                             RelativeSizeAxes = Axes.None,
                             Width = 300,
                             Height = sideListHeight - team2List.GetHeight() - 5,
-                            Margin = new MarginPadding { Top = 10 },
                             Colour = Color4.Black,
                             Alpha = 0.7f,
                         },
@@ -269,6 +269,13 @@ namespace osu.Game.Tournament.Screens.Board
             if (match.NewValue != null)
             {
                 match.NewValue.PendingMsgs.CollectionChanged += msgOnCollectionChanged;
+
+                if (match.NewValue.Team1 != null) team1List?.ReloadWithTeam(match.NewValue.Team1.Value);
+                if (match.NewValue.Team2 != null && team2List != null)
+                {
+                    team2List.ReloadWithTeam(match.NewValue.Team2.Value);
+                    danmakuBox.ResizeHeightTo(Height = sideListHeight - team2List.GetHeight() - 5, 500, Easing.OutCubic);
+                }
             }
 
             Scheduler.AddOnce(parseCommands);

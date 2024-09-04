@@ -19,12 +19,12 @@ namespace osu.Game.Tournament.Components
         {
             var players = team?.Players ?? new BindableList<TournamentUser>();
 
-            AutoSizeAxes = Axes.Y;
+            // AutoSizeAxes = Axes.Y;
             RelativeSizeAxes = Axes.None;
             Width = 300;
             Direction = FillDirection.Vertical;
-            Spacing = new Vector2(spacing);
             totalHeight = players.Count * (entryheight + spacing) + spacing;
+            Height = totalHeight;
             // We need to provide all children upon definition of a widget,
             // Since it's impossible to change its height after that.
             ChildrenEnumerable = players.Select(createCard);
@@ -36,10 +36,19 @@ namespace osu.Game.Tournament.Components
             Origin = Anchor.BottomLeft,
             Width = 300,
             Height = entryheight,
+            Margin = new MarginPadding { Bottom = spacing },
             Scale = new Vector2(1f),
             // BackgroundColour = ColourInfo.GradientHorizontal(Color4.White.Opacity(1), Color4.White.Opacity(0.7f)),
         };
 
         public int GetHeight() => totalHeight;
+
+        public void ReloadWithTeam(TournamentTeam? team)
+        {
+            var players = team?.Players ?? new BindableList<TournamentUser>();
+            totalHeight = players.Count * (entryheight + spacing) + spacing;
+            ChildrenEnumerable = players.Select(createCard);
+            this.ResizeHeightTo(totalHeight, 500, Easing.OutCubic);
+        }
     }
 }
