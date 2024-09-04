@@ -121,6 +121,8 @@ namespace osu.Desktop.Updater
 
         private bool restartToApplyUpdate()
         {
+            // TODO: Migrate this to async flow whenever available (see https://github.com/ppy/osu/pull/28743#discussion_r1740505665).
+            // Currently there's an internal Thread.Sleep(300) which will cause a stutter when the user clicks to restart.
             updateManager.WaitExitThenApplyUpdates(pendingUpdate?.TargetFullRelease);
             Schedule(() => game.AttemptExit());
             return true;
