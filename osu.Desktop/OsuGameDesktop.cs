@@ -2,10 +2,10 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Runtime.Versioning;
+using System.Threading.Tasks;
 using Microsoft.Win32;
 using osu.Desktop.Performance;
 using osu.Desktop.Security;
@@ -102,35 +102,13 @@ namespace osu.Desktop
             if (!string.IsNullOrEmpty(packageManaged))
                 return new NoActionUpdateManager();
 
-            switch (RuntimeInfo.OS)
-            {
-                case RuntimeInfo.Platform.Windows:
-                    Debug.Assert(OperatingSystem.IsWindows());
-
-                    return new SquirrelUpdateManager();
-
-                default:
-                    return new SimpleUpdateManager();
-            }
+            return new VelopackUpdateManager();
         }
 
         public override bool RestartAppWhenExited()
         {
-            switch (RuntimeInfo.OS)
-            {
-                case RuntimeInfo.Platform.Windows:
-                    Debug.Assert(OperatingSystem.IsWindows());
-
-                    // Of note, this is an async method in squirrel that adds an arbitrary delay before returning
-                    // likely to ensure the external process is in a good state.
-                    //
-                    // We're not waiting on that here, but the outro playing before the actual exit should be enough
-                    // to cover this.
-                    Squirrel.UpdateManager.RestartAppWhenExited().FireAndForget();
-                    return true;
-            }
-
-            return base.RestartAppWhenExited();
+            Task.Run(() => Velopack.UpdateExe.Start()).FireAndForget();
+            return true;
         }
 
         protected override void LoadComplete()
