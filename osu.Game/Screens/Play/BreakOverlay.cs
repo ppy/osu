@@ -53,6 +53,10 @@ namespace osu.Game.Screens.Play
 
             MinimumBeatLength = 200;
 
+            // Doesn't play well with pause/unpause.
+            // This might mean that some beats don't animate if the user is running <60fps, but we'll deal with that if anyone notices.
+            AllowMistimedEventFiring = false;
+
             Child = fadeContainer = new Container
             {
                 Alpha = 0,
