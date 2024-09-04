@@ -71,14 +71,6 @@ namespace osu.Game.Screens.Play
                 playbackSettings.UserPlaybackRate.BindTo(master.UserPlaybackRate);
 
             HUDOverlay.PlayerSettingsOverlay.AddAtStart(playbackSettings);
-
-            var analysisContainer = DrawableRuleset.CreateAnalysisContainer(GameplayState.Score.Replay);
-
-            if (analysisContainer != null)
-            {
-                HUDOverlay.PlayerSettingsOverlay.AddAtStart(analysisContainer.AnalysisSettings);
-                DrawableRuleset.Playfield.AddAnalysisContainer(analysisContainer);
-            }
         }
 
         protected override void PrepareReplay()

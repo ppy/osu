@@ -9,13 +9,8 @@ using osu.Game.Screens.Play.PlayerSettings;
 
 namespace osu.Game.Rulesets.Osu.UI
 {
-    public partial class OsuAnalysisSettings : AnalysisSettings
+    public partial class OsuAnalysisSettings : PlayerSettingsGroup
     {
-        public OsuAnalysisSettings(Ruleset ruleset)
-            : base(ruleset)
-        {
-        }
-
         [SettingSource("Hit markers", SettingControlType = typeof(PlayerCheckbox))]
         public BindableBool HitMarkersEnabled { get; } = new BindableBool();
 
@@ -28,10 +23,18 @@ namespace osu.Game.Rulesets.Osu.UI
         [SettingSource("Hide cursor", SettingControlType = typeof(PlayerCheckbox))]
         public BindableBool CursorHideEnabled { get; } = new BindableBool();
 
+        public OsuAnalysisSettings()
+            : base("Analysis Settings")
+        {
+        }
+
         [BackgroundDependencyLoader]
         private void load(IRulesetConfigCache cache)
         {
-            var config = (OsuRulesetConfigManager)cache.GetConfigFor(Ruleset)!;
+            AddRange(this.CreateSettingsControls());
+
+            var config = (OsuRulesetConfigManager)cache.GetConfigFor(new OsuRuleset())!;
+
             config.BindWith(OsuRulesetSetting.ReplayHitMarkersEnabled, HitMarkersEnabled);
             config.BindWith(OsuRulesetSetting.ReplayAimMarkersEnabled, AimMarkersEnabled);
             config.BindWith(OsuRulesetSetting.ReplayAimLinesEnabled, AimLinesEnabled);

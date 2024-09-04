@@ -406,7 +406,5 @@ namespace osu.Game.Rulesets
         /// Can be overridden to avoid showing scroll speed changes in the editor.
         /// </summary>
         public virtual bool EditorShowScrollSpeed => true;
-
-        public virtual DifficultySection? CreateEditorDifficultySection() => null;
     }
 }
