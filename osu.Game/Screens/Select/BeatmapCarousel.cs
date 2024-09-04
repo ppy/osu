@@ -857,8 +857,9 @@ namespace osu.Game.Screens.Select
                     // Add those items within the previously found index range that should be displayed.
                     foreach (var item in toDisplay)
                     {
-                        var panel = setPool.Get(p => p.Item = item);
+                        var panel = setPool.Get();
 
+                        panel.Item = item;
                         panel.Y = item.CarouselYPosition;
 
                         Scroll.Add(panel);
@@ -898,10 +899,12 @@ namespace osu.Game.Screens.Select
                     Scroll.ChangeChildDepth(item, hasPassedSelection ? -item.Item.CarouselYPosition : item.Item.CarouselYPosition);
                 }
 
-                if (item is DrawableCarouselBeatmapSet set)
+                if (item is DrawableCarouselBeatmapSet set && set.Beatmaps?.IsLoaded == true)
                 {
-                    foreach (var diff in set.DrawableBeatmaps)
+                    foreach (var diff in set.Beatmaps)
+                    {
                         updateItem(diff, item);
+                    }
                 }
             }
         }
@@ -1101,7 +1104,7 @@ namespace osu.Game.Screens.Select
         }
 
         /// <summary>
-        /// Update a item's x position and multiplicative alpha based on its y position and
+        /// Update an item's x position and multiplicative alpha based on its y position and
         /// the current scroll position.
         /// </summary>
         /// <param name="item">The item to be updated.</param>
