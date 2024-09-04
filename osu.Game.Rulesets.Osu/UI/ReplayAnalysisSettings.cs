@@ -9,7 +9,7 @@ using osu.Game.Screens.Play.PlayerSettings;
 
 namespace osu.Game.Rulesets.Osu.UI
 {
-    public partial class OsuAnalysisSettings : PlayerSettingsGroup
+    public partial class ReplayAnalysisSettings : PlayerSettingsGroup
     {
         [SettingSource("Hit markers", SettingControlType = typeof(PlayerCheckbox))]
         public BindableBool HitMarkersEnabled { get; } = new BindableBool();
@@ -23,7 +23,7 @@ namespace osu.Game.Rulesets.Osu.UI
         [SettingSource("Hide cursor", SettingControlType = typeof(PlayerCheckbox))]
         public BindableBool CursorHideEnabled { get; } = new BindableBool();
 
-        public OsuAnalysisSettings()
+        public ReplayAnalysisSettings()
             : base("Analysis Settings")
         {
         }
