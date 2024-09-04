@@ -24,6 +24,11 @@ namespace osu.Game.Rulesets.Osu.Configuration
             SetDefault(OsuRulesetSetting.ShowCursorTrail, true);
             SetDefault(OsuRulesetSetting.ShowCursorRipples, false);
             SetDefault(OsuRulesetSetting.PlayfieldBorderStyle, PlayfieldBorderStyle.None);
+
+            SetDefault(OsuRulesetSetting.ReplayHitMarkersEnabled, false);
+            SetDefault(OsuRulesetSetting.ReplayAimMarkersEnabled, false);
+            SetDefault(OsuRulesetSetting.ReplayAimLinesEnabled, false);
+            SetDefault(OsuRulesetSetting.ReplayCursorHideEnabled, false);
         }
     }
 
@@ -34,5 +39,11 @@ namespace osu.Game.Rulesets.Osu.Configuration
         ShowCursorTrail,
         ShowCursorRipples,
         PlayfieldBorderStyle,
+
+        // Replay
+        ReplayHitMarkersEnabled,
+        ReplayAimMarkersEnabled,
+        ReplayAimLinesEnabled,
+        ReplayCursorHideEnabled,
     }
 }

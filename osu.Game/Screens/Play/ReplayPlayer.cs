@@ -72,7 +72,7 @@ namespace osu.Game.Screens.Play
 
             HUDOverlay.PlayerSettingsOverlay.AddAtStart(playbackSettings);
 
-            var analysisContainer = DrawableRuleset.Ruleset.CreateAnalysisContainer(GameplayState.Score.Replay, DrawableRuleset.Playfield);
+            var analysisContainer = DrawableRuleset.CreateAnalysisContainer(GameplayState.Score.Replay);
 
             if (analysisContainer != null)
             {

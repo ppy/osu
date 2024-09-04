@@ -17,7 +17,6 @@ using osu.Game.Beatmaps.Legacy;
 using osu.Game.Configuration;
 using osu.Game.Extensions;
 using osu.Game.Overlays.Settings;
-using osu.Game.Replays;
 using osu.Game.Rulesets.Configuration;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Edit;
@@ -409,7 +408,5 @@ namespace osu.Game.Rulesets
         public virtual bool EditorShowScrollSpeed => true;
 
         public virtual DifficultySection? CreateEditorDifficultySection() => null;
-
-        public virtual AnalysisContainer? CreateAnalysisContainer(Replay replay, Playfield playfield) => null;
     }
 }

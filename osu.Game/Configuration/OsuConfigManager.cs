@@ -154,12 +154,6 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.IncreaseFirstObjectVisibility, true);
             SetDefault(OsuSetting.GameplayDisableWinKey, true);
 
-            // Replay
-            SetDefault(OsuSetting.ReplayHitMarkersEnabled, false);
-            SetDefault(OsuSetting.ReplayAimMarkersEnabled, false);
-            SetDefault(OsuSetting.ReplayAimLinesEnabled, false);
-            SetDefault(OsuSetting.ReplayCursorHideEnabled, false);
-
             // Update
             SetDefault(OsuSetting.ReleaseStream, ReleaseStream.Lazer);
 
@@ -419,10 +413,6 @@ namespace osu.Game.Configuration
         EditorShowHitMarkers,
         EditorAutoSeekOnPlacement,
         DiscordRichPresence,
-        ReplayHitMarkersEnabled,
-        ReplayAimMarkersEnabled,
-        ReplayAimLinesEnabled,
-        ReplayCursorHideEnabled,
 
         ShowOnlineExplicitContent,
         LastProcessedMetadataId,

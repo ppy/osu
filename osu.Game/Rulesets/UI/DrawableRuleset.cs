@@ -596,6 +596,8 @@ namespace osu.Game.Rulesets.UI
         /// Invoked when the user requests to pause while the resume overlay is active.
         /// </summary>
         public abstract void CancelResume();
+
+        public virtual AnalysisContainer CreateAnalysisContainer(Replay replay) => null;
     }
 
     public class BeatmapInvalidForRulesetException : ArgumentException

@@ -4,12 +4,18 @@
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Game.Configuration;
+using osu.Game.Rulesets.Osu.Configuration;
 using osu.Game.Screens.Play.PlayerSettings;
 
 namespace osu.Game.Rulesets.Osu.UI
 {
     public partial class OsuAnalysisSettings : AnalysisSettings
     {
+        public OsuAnalysisSettings(Ruleset ruleset)
+            : base(ruleset)
+        {
+        }
+
         [SettingSource("Hit markers", SettingControlType = typeof(PlayerCheckbox))]
         public BindableBool HitMarkersEnabled { get; } = new BindableBool();
 
@@ -23,12 +29,13 @@ namespace osu.Game.Rulesets.Osu.UI
         public BindableBool CursorHideEnabled { get; } = new BindableBool();
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
+        private void load(IRulesetConfigCache cache)
         {
-            config.BindWith(OsuSetting.ReplayHitMarkersEnabled, HitMarkersEnabled);
-            config.BindWith(OsuSetting.ReplayAimMarkersEnabled, AimMarkersEnabled);
-            config.BindWith(OsuSetting.ReplayAimLinesEnabled, AimLinesEnabled);
-            config.BindWith(OsuSetting.ReplayCursorHideEnabled, CursorHideEnabled);
+            var config = (OsuRulesetConfigManager)cache.GetConfigFor(Ruleset)!;
+            config.BindWith(OsuRulesetSetting.ReplayHitMarkersEnabled, HitMarkersEnabled);
+            config.BindWith(OsuRulesetSetting.ReplayAimMarkersEnabled, AimMarkersEnabled);
+            config.BindWith(OsuRulesetSetting.ReplayAimLinesEnabled, AimLinesEnabled);
+            config.BindWith(OsuRulesetSetting.ReplayCursorHideEnabled, CursorHideEnabled);
         }
     }
 }

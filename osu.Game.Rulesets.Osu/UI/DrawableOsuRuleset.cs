@@ -68,5 +68,7 @@ namespace osu.Game.Rulesets.Osu.UI
                 return 0;
             }
         }
+
+        public override AnalysisContainer CreateAnalysisContainer(Replay replay) => new OsuAnalysisContainer(replay, this);
     }
 }

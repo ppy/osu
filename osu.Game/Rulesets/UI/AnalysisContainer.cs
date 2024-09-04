@@ -10,18 +10,18 @@ namespace osu.Game.Rulesets.UI
     public abstract partial class AnalysisContainer : Container
     {
         protected Replay Replay;
-        protected Playfield Playfield;
+        protected DrawableRuleset DrawableRuleset;
 
         public AnalysisSettings AnalysisSettings;
 
-        public AnalysisContainer(Replay replay, Playfield playfield)
+        protected AnalysisContainer(Replay replay, DrawableRuleset drawableRuleset)
         {
             Replay = replay;
-            Playfield = playfield;
+            DrawableRuleset = drawableRuleset;
 
-            AnalysisSettings = CreateAnalysisSettings();
+            AnalysisSettings = CreateAnalysisSettings(drawableRuleset.Ruleset);
         }
 
-        protected abstract AnalysisSettings CreateAnalysisSettings();
+        protected abstract AnalysisSettings CreateAnalysisSettings(Ruleset ruleset);
     }
 }

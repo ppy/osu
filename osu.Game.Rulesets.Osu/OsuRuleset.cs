@@ -13,7 +13,6 @@ using osu.Game.Beatmaps.Legacy;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Overlays.Settings;
-using osu.Game.Replays;
 using osu.Game.Rulesets.Configuration;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Edit;
@@ -360,8 +359,6 @@ namespace osu.Game.Rulesets.Osu
 
             return adjustedDifficulty;
         }
-
-        public override OsuAnalysisContainer CreateAnalysisContainer(Replay replay, Playfield playfield) => new OsuAnalysisContainer(replay, playfield);
 
         public override bool EditorShowScrollSpeed => false;
     }
