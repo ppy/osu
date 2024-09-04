@@ -450,7 +450,8 @@ namespace osu.Game.Tournament.Screens.Board
                         pickColour = command.Team;
                         pickType = ChoiceType.Pick;
                         addForBeatmap(command.MapMod);
-                        updateBottomDisplay();
+                        var map = CurrentMatch.Value.Round.Value.Beatmaps.FirstOrDefault(b => b.Mods + b.ModIndex == command.MapMod);
+                        if (CurrentMatch.Value.Traps.All(p => p.BeatmapID != map.Beatmap.OnlineID)) updateBottomDisplay();
                         break;
 
                     default:
