@@ -1405,9 +1405,9 @@ namespace osu.Game.Tests.Visual.SongSelect
 
                         yield return item;
 
-                        if (item is DrawableCarouselBeatmapSet set && set.Beatmaps?.IsLoaded == true)
+                        if (item is DrawableCarouselBeatmapSet set)
                         {
-                            foreach (var difficulty in set.Beatmaps)
+                            foreach (var difficulty in set.DrawableBeatmaps)
                                 yield return difficulty;
                         }
                     }
