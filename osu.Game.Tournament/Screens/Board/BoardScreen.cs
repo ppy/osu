@@ -33,6 +33,8 @@ namespace osu.Game.Tournament.Screens.Board
         [Resolved]
         private TournamentSceneManager? sceneManager { get; set; }
 
+        private WarningBox warning = null!;
+
         private readonly Bindable<TournamentMatch?> currentMatch = new Bindable<TournamentMatch?>();
 
         private TeamColour pickColour;
@@ -1123,19 +1125,20 @@ namespace osu.Game.Tournament.Screens.Board
             mapFlows.Clear();
 
             if (CurrentMatch.Value == null)
+            {
+                AddInternal(warning = new WarningBox("Cannot access current match, sorry ;w;"));
                 return;
-
-            // const int maxRows = 4;
-            int totalRows = 0;
+            }
 
             if (CurrentMatch.Value.Round.Value != null)
             {
                 FillFlowContainer<BoardBeatmapPanel>? currentFlow = null;
-                int flowCount = 0;
 
                 // Use predefined Board coodinate
                 if (CurrentMatch.Value.Round.Value.UseBoard.Value)
                 {
+                    warning?.FadeOut(duration: 200, easing: Easing.OutCubic);
+
                     for (int i = 1; i <= 4; i++)
                     {
                         mapFlows.Add(currentFlow = new FillFlowContainer<BoardBeatmapPanel>
@@ -1164,50 +1167,13 @@ namespace osu.Game.Tournament.Screens.Board
                         }
                     }
                 }
-                // Normal placement
                 else
                 {
-                    foreach (var b in CurrentMatch.Value.Round.Value.Beatmaps)
-                    {
-                        // Exclude EX beatmaps from the list
-                        if (b.Mods == "EX") continue;
-
-                        if (currentFlow == null)
-                        {
-                            mapFlows.Add(currentFlow = new FillFlowContainer<BoardBeatmapPanel>
-                            {
-                                Spacing = new Vector2(10, 10),
-                                Direction = FillDirection.Full,
-                                RelativeSizeAxes = Axes.X,
-                                AutoSizeAxes = Axes.Y
-                            });
-
-                            totalRows++;
-                            flowCount = 0;
-                        }
-
-                        // One flow per row
-                        if (++flowCount > 2)
-                        {
-                            totalRows++;
-                            flowCount = 1;
-                        }
-
-                        currentFlow.Add(new BoardBeatmapPanel(b.Beatmap, b.Mods, b.ModIndex)
-                        {
-                            Anchor = Anchor.TopCentre,
-                            Origin = Anchor.TopCentre,
-                            Height = 150,
-                        });
-                    }
+                    AddInternal(warning = new WarningBox("This round isn't set up for board view..."));
+                    return;
                 }
+                mapFlows.Padding = new MarginPadding(5);
             }
-
-            mapFlows.Padding = new MarginPadding(5)
-            {
-                // remove horizontal padding to increase flow width to 3 panels
-                Horizontal = totalRows > 9 ? 0 : 100
-            };
         }
     }
 }

@@ -32,6 +32,8 @@ namespace osu.Game.Tournament.Screens.Board
         [Resolved]
         private TournamentSceneManager? sceneManager { get; set; }
 
+        private WarningBox warning = null!;
+
         private TeamColour pickColour = TeamColour.Neutral;
         private ChoiceType pickType = ChoiceType.Pick;
 
@@ -417,7 +419,10 @@ namespace osu.Game.Tournament.Screens.Board
             mapFlows.Clear();
 
             if (CurrentMatch.Value == null)
+            {
+                AddInternal(warning = new WarningBox("Cannot access current match, sorry ;w;"));
                 return;
+            }
 
             int totalRows = 0;
 
@@ -426,6 +431,16 @@ namespace osu.Game.Tournament.Screens.Board
                 FillFlowContainer<EXBoardBeatmapPanel>? currentFlow = null;
                 string? currentMods;
                 int flowCount = 0;
+
+                int exCount = CurrentMatch.Value.Round.Value.Beatmaps.Count(p => p.Mods == "EX");
+
+                if (exCount == 0)
+                {
+                    AddInternal(warning = new WarningBox("Seemingly you don't have any EX map set up..."));
+                    return;
+                }
+
+                warning?.FadeOut(duration: 200, easing: Easing.OutCubic);
 
                 foreach (var b in CurrentMatch.Value.Round.Value.Beatmaps)
                 {
@@ -460,12 +475,12 @@ namespace osu.Game.Tournament.Screens.Board
                     });
                 }
             }
-
-            mapFlows.Padding = new MarginPadding(5)
+            else
             {
-                // remove horizontal padding to increase flow width to 3 panels
-                Horizontal = totalRows > 9 ? 0 : 100
-            };
+                AddInternal(warning = new WarningBox("Cannot access current match, sorry ;w;"));
+                return;
+            }
+
         }
     }
 }
