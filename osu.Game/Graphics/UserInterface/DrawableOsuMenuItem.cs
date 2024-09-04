@@ -23,10 +23,10 @@ namespace osu.Game.Graphics.UserInterface
     {
         public const int MARGIN_HORIZONTAL = 10;
         public const int MARGIN_VERTICAL = 4;
-        private const int text_size = 17;
-        private const int transition_length = 80;
+        public const int TEXT_SIZE = 17;
+        public const int TRANSITION_LENGTH = 80;
 
-        protected TextContainer Text { get; private set; }
+        private TextContainer text;
         private HotkeyDisplay hotkey;
         private HoverClickSounds hoverClickSounds;
 
@@ -84,15 +84,15 @@ namespace osu.Game.Graphics.UserInterface
             {
                 default:
                 case MenuItemType.Standard:
-                    Text.Colour = Color4.White;
+                    text.Colour = Color4.White;
                     break;
 
                 case MenuItemType.Destructive:
-                    Text.Colour = Color4.Red;
+                    text.Colour = Color4.Red;
                     break;
 
                 case MenuItemType.Highlighted:
-                    Text.Colour = Color4Extensions.FromHex(@"ffcc22");
+                    text.Colour = Color4Extensions.FromHex(@"ffcc22");
                     break;
             }
 
@@ -108,7 +108,7 @@ namespace osu.Game.Graphics.UserInterface
             // the gist of it is that while the hotkey display is not in the text / "content" that determines sizing
             // (because it cannot be, because we want the hotkey display to align to the *right* and not the left),
             // enough padding to fit the hotkey with _its_ spacing is added as padding of the text to compensate.
-            Text.Padding = new MarginPadding { Right = hotkey.Alpha > 0 || showChevron ? hotkey.DrawWidth + 15 : 0 };
+            text.Padding = new MarginPadding { Right = hotkey.Alpha > 0 || showChevron ? hotkey.DrawWidth + 15 : 0 };
         }
 
         protected override bool OnHover(HoverEvent e)
@@ -130,17 +130,17 @@ namespace osu.Game.Graphics.UserInterface
 
             if (IsHovered && IsActionable)
             {
-                Text.BoldText.FadeIn(transition_length, Easing.OutQuint);
-                Text.NormalText.FadeOut(transition_length, Easing.OutQuint);
+                text.BoldText.FadeIn(TRANSITION_LENGTH, Easing.OutQuint);
+                text.NormalText.FadeOut(TRANSITION_LENGTH, Easing.OutQuint);
             }
             else
             {
-                Text.BoldText.FadeOut(transition_length, Easing.OutQuint);
-                Text.NormalText.FadeIn(transition_length, Easing.OutQuint);
+                text.BoldText.FadeOut(TRANSITION_LENGTH, Easing.OutQuint);
+                text.NormalText.FadeIn(TRANSITION_LENGTH, Easing.OutQuint);
             }
         }
 
-        protected sealed override Drawable CreateContent() => Text = CreateTextContainer();
+        protected sealed override Drawable CreateContent() => text = CreateTextContainer();
         protected virtual TextContainer CreateTextContainer() => new TextContainer();
 
         protected partial class TextContainer : Container, IHasText
@@ -192,7 +192,7 @@ namespace osu.Game.Graphics.UserInterface
                                     AlwaysPresent = true, // ensures that the menu item does not change width when switching between normal and bold text.
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.CentreLeft,
-                                    Font = OsuFont.GetFont(size: text_size),
+                                    Font = OsuFont.GetFont(size: TEXT_SIZE),
                                 },
                                 BoldText = new OsuSpriteText
                                 {
@@ -200,7 +200,7 @@ namespace osu.Game.Graphics.UserInterface
                                     Alpha = 0,
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.CentreLeft,
-                                    Font = OsuFont.GetFont(size: text_size, weight: FontWeight.Bold),
+                                    Font = OsuFont.GetFont(size: TEXT_SIZE, weight: FontWeight.Bold),
                                 }
                             }
                         },
