@@ -109,8 +109,8 @@ namespace osu.Game.Tournament.Components
                                 {
                                     new SpriteIcon
                                     {
-                                        Anchor = Anchor.CentreLeft,
-                                        Origin = Anchor.CentreLeft,
+                                        Anchor = Anchor.Centre,
+                                        Origin = Anchor.Centre,
                                         Size = new Vector2(25),
                                         Icon = FontAwesome.Solid.UserAlt,
                                     },
