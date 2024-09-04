@@ -24,13 +24,13 @@ namespace osu.Game.Rulesets.Mods
         public override IconUsage? Icon => FontAwesome.Solid.VolumeMute;
         public override LocalisableString Description => "Can you still feel the rhythm without music?";
         public override ModType Type => ModType.Fun;
-        public override double ScoreMultiplier => 1;
-        public override bool Ranked => true;
     }
 
     public abstract class ModMuted<TObject> : ModMuted, IApplicableToDrawableRuleset<TObject>, IApplicableToTrack, IApplicableToScoreProcessor
         where TObject : HitObject
     {
+        public override double ScoreMultiplier => EnableMetronome.Value ? 0.8 : 1;
+        public override bool Ranked => !EnableMetronome.Value;
         private readonly BindableNumber<double> mainVolumeAdjust = new BindableDouble(0.5);
         private readonly BindableNumber<double> metronomeVolumeAdjust = new BindableDouble(0.5);
 
