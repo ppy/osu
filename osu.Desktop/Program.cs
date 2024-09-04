@@ -3,7 +3,6 @@
 
 using System;
 using System.IO;
-using System.Runtime.Versioning;
 using osu.Desktop.LegacyIpc;
 using osu.Desktop.Windows;
 using osu.Framework;
@@ -14,7 +13,7 @@ using osu.Game;
 using osu.Game.IPC;
 using osu.Game.Tournament;
 using SDL;
-using Squirrel;
+using Velopack;
 
 namespace osu.Desktop
 {
@@ -31,19 +30,11 @@ namespace osu.Desktop
         [STAThread]
         public static void Main(string[] args)
         {
-            /*
-             * WARNING: DO NOT PLACE **ANY** CODE ABOVE THE FOLLOWING BLOCK!
-             *
-             * Logic handling Squirrel MUST run before EVERYTHING if you do not want to break it.
-             * To be more precise: Squirrel is internally using a rather... crude method to determine whether it is running under NUnit,
-             * namely by checking loaded assemblies:
-             * https://github.com/clowd/Clowd.Squirrel/blob/24427217482deeeb9f2cacac555525edfc7bd9ac/src/Squirrel/SimpleSplat/PlatformModeDetector.cs#L17-L32
-             *
-             * If it finds ANY assembly from the ones listed above - REGARDLESS of the reason why it is loaded -
-             * the app will then do completely broken things like:
-             * - not creating system shortcuts (as the logic is if'd out if "running tests")
-             * - not exiting after the install / first-update / uninstall hooks are ran (as the `Environment.Exit()` calls are if'd out if "running tests")
-             */
+            // IMPORTANT DON'T IGNORE: For general sanity, velopack's setup needs to run before anything else.
+            // This has bitten us in the rear before (bricked updater), and although the underlying issue from
+            // last time has been fixed, let's not tempt fate.
+            setupVelopack();
+
             if (OperatingSystem.IsWindows())
             {
                 var windowsVersion = Environment.OSVersion.Version;
@@ -66,8 +57,6 @@ namespace osu.Desktop
                         return;
                     }
                 }
-
-                setupSquirrel();
             }
 
             // NVIDIA profiles are based on the executable name of a process.
@@ -177,32 +166,14 @@ namespace osu.Desktop
             return false;
         }
 
-        [SupportedOSPlatform("windows")]
-        private static void setupSquirrel()
+        private static void setupVelopack()
         {
-            SquirrelAwareApp.HandleEvents(onInitialInstall: (_, tools) =>
-            {
-                tools.CreateShortcutForThisExe();
-                tools.CreateUninstallerRegistryEntry();
-                WindowsAssociationManager.InstallAssociations();
-            }, onAppUpdate: (_, tools) =>
-            {
-                tools.CreateUninstallerRegistryEntry();
-                WindowsAssociationManager.UpdateAssociations();
-            }, onAppUninstall: (_, tools) =>
-            {
-                tools.RemoveShortcutForThisExe();
-                tools.RemoveUninstallerRegistryEntry();
-                WindowsAssociationManager.UninstallAssociations();
-            }, onEveryRun: (_, _, _) =>
-            {
-                // While setting the `ProcessAppUserModelId` fixes duplicate icons/shortcuts on the taskbar, it currently
-                // causes the right-click context menu to function incorrectly.
-                //
-                // This may turn out to be non-required after an alternative solution is implemented.
-                // see https://github.com/clowd/Clowd.Squirrel/issues/24
-                // tools.SetProcessAppUserModelId();
-            });
+            VelopackApp
+                .Build()
+                .WithFirstRun(v =>
+                {
+                    if (OperatingSystem.IsWindows()) WindowsAssociationManager.InstallAssociations();
+                }).Run();
         }
     }
 }
