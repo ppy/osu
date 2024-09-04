@@ -1,11 +1,10 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Allocation;
 using osu.Framework.Input;
 using osu.Game.Beatmaps;
 using osu.Game.Input.Handlers;
@@ -31,20 +30,19 @@ namespace osu.Game.Rulesets.Osu.UI
 
         public new OsuPlayfield Playfield => (OsuPlayfield)base.Playfield;
 
-        public DrawableOsuRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod> mods = null)
+        public DrawableOsuRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod>? mods = null)
             : base(ruleset, beatmap, mods)
         {
         }
 
-        protected override void LoadComplete()
+        [BackgroundDependencyLoader]
+        private void load(ReplayPlayer? replayPlayer)
         {
-            if (HasReplayLoaded.Value)
-                LoadComponentAsync(new ReplayAnalysisOverlay(ReplayScore.Replay, this), PlayfieldAdjustmentContainer.Add);
-
-            base.LoadComplete();
+            if (replayPlayer != null)
+                PlayfieldAdjustmentContainer.Add(new ReplayAnalysisOverlay(replayPlayer.Score.Replay, this));
         }
 
-        public override DrawableHitObject<OsuHitObject> CreateDrawableRepresentation(OsuHitObject h) => null;
+        public override DrawableHitObject<OsuHitObject>? CreateDrawableRepresentation(OsuHitObject h) => null;
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true; // always show the gameplay cursor
 

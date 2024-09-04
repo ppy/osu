@@ -14,6 +14,7 @@ using osu.Game.Rulesets.Objects.Pooling;
 using osu.Game.Rulesets.Osu.Replays;
 using osu.Game.Rulesets.Osu.Skinning.Default;
 using osu.Game.Rulesets.UI;
+using osu.Game.Screens.Play;
 using osuTK;
 using osuTK.Graphics;
 
@@ -44,9 +45,9 @@ namespace osu.Game.Rulesets.Osu.UI
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(ReplayPlayer replayPlayer)
         {
-            AddInternal(Settings = new ReplayAnalysisSettings());
+            replayPlayer.AddSettings(Settings = new ReplayAnalysisSettings());
 
             LoadReplay();
         }
