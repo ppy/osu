@@ -80,6 +80,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
             Masking = true;
             CornerRadius = 5;
+            CornerExponent = 2.5f;
 
             InternalChildren = new Drawable[]
             {
@@ -178,7 +179,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
             if (!disabled)
             {
-                BorderThickness = IsHovered || textBox.Focused.Value ? 3 : 0;
+                BorderThickness = IsHovered || textBox.Focused.Value ? 2 : 0;
                 BorderColour = textBox.Focused.Value ? colourProvider.Highlight1 : colourProvider.Light4;
 
                 if (textBox.Focused.Value)
