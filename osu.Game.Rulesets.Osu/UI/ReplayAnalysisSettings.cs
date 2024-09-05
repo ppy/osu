@@ -25,6 +25,15 @@ namespace osu.Game.Rulesets.Osu.UI
         [SettingSource("Hide gameplay cursor", SettingControlType = typeof(PlayerCheckbox))]
         public BindableBool HideSkinCursor { get; } = new BindableBool();
 
+        [SettingSource("Display length", SettingControlType = typeof(PlayerSliderBar<int>))]
+        public BindableInt DisplayLength { get; } = new BindableInt
+        {
+            MinValue = 100,
+            Default = 800,
+            MaxValue = 2000,
+            Precision = 100,
+        };
+
         public ReplayAnalysisSettings(OsuRulesetConfigManager config)
             : base("Analysis Settings")
         {
@@ -40,6 +49,7 @@ namespace osu.Game.Rulesets.Osu.UI
             config.BindWith(OsuRulesetSetting.ReplayFrameMarkersEnabled, ShowAimMarkers);
             config.BindWith(OsuRulesetSetting.ReplayCursorPathEnabled, ShowCursorPath);
             config.BindWith(OsuRulesetSetting.ReplayCursorHideEnabled, HideSkinCursor);
+            config.BindWith(OsuRulesetSetting.ReplayAnalysisDisplayLength, DisplayLength);
         }
     }
 }

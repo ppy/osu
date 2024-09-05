@@ -27,6 +27,7 @@ namespace osu.Game.Rulesets.Osu.Configuration
             SetDefault(OsuRulesetSetting.ReplayFrameMarkersEnabled, false);
             SetDefault(OsuRulesetSetting.ReplayCursorPathEnabled, false);
             SetDefault(OsuRulesetSetting.ReplayCursorHideEnabled, false);
+            SetDefault(OsuRulesetSetting.ReplayAnalysisDisplayLength, 750);
         }
     }
 
@@ -43,5 +44,6 @@ namespace osu.Game.Rulesets.Osu.Configuration
         ReplayFrameMarkersEnabled,
         ReplayCursorPathEnabled,
         ReplayCursorHideEnabled,
+        ReplayAnalysisDisplayLength,
     }
 }
