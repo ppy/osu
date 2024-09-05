@@ -48,6 +48,9 @@ namespace osu.Game.Rulesets.Osu.UI
                 replayPlayer.AddSettings(new ReplayAnalysisSettings(Config));
 
                 cursorHideEnabled = Config.GetBindable<bool>(OsuRulesetSetting.ReplayCursorHideEnabled);
+
+                // I have little faith in this working (other things touch cursor visibility) but haven't broken it yet.
+                // Let's wait for someone to report an issue before spending too much time on it.
                 cursorHideEnabled.BindValueChanged(enabled => Playfield.Cursor.FadeTo(enabled.NewValue ? 0 : 1), true);
             }
         }
