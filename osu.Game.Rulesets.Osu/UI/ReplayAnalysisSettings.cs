@@ -28,10 +28,10 @@ namespace osu.Game.Rulesets.Osu.UI
         [SettingSource("Display length", SettingControlType = typeof(PlayerSliderBar<int>))]
         public BindableInt DisplayLength { get; } = new BindableInt
         {
-            MinValue = 100,
-            Default = 800,
+            MinValue = 200,
             MaxValue = 2000,
-            Precision = 100,
+            Default = 800,
+            Precision = 200,
         };
 
         public ReplayAnalysisSettings(OsuRulesetConfigManager config)

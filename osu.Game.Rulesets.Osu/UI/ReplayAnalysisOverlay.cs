@@ -1,8 +1,10 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Caching;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Replays;
@@ -19,9 +21,9 @@ namespace osu.Game.Rulesets.Osu.UI
         private BindableBool showCursorPath { get; } = new BindableBool();
         private BindableInt displayLength { get; } = new BindableInt();
 
-        protected ClickMarkerContainer ClickMarkers = null!;
-        protected FrameMarkerContainer FrameMarkers = null!;
-        protected CursorPathContainer CursorPath = null!;
+        protected ClickMarkerContainer? ClickMarkers;
+        protected FrameMarkerContainer? FrameMarkers;
+        protected CursorPathContainer? CursorPath;
 
         private readonly Replay replay;
 
@@ -47,42 +49,43 @@ namespace osu.Game.Rulesets.Osu.UI
         {
             base.LoadComplete();
 
-            showClickMarkers.BindValueChanged(enabled =>
-            {
-                initialise();
-                ClickMarkers.FadeTo(enabled.NewValue ? 1 : 0);
-            }, true);
-            showFrameMarkers.BindValueChanged(enabled =>
-            {
-                initialise();
-                FrameMarkers.FadeTo(enabled.NewValue ? 1 : 0);
-            }, true);
-            showCursorPath.BindValueChanged(enabled =>
-            {
-                initialise();
-                CursorPath.FadeTo(enabled.NewValue ? 1 : 0);
-            }, true);
             displayLength.BindValueChanged(_ =>
             {
-                isLoaded = false;
-                initialise();
+                // Need to fully reload to make this work.
+                loaded.Invalidate();
             }, true);
         }
 
-        private bool isLoaded;
+        private readonly Cached loaded = new Cached();
+
+        private CancellationTokenSource? generationCancellationSource;
+
+        protected override void Update()
+        {
+            base.Update();
+
+            if (requireDisplay)
+            {
+                initialise();
+
+                if (ClickMarkers != null) ClickMarkers.Alpha = showClickMarkers.Value ? 1 : 0;
+                if (FrameMarkers != null) FrameMarkers.Alpha = showFrameMarkers.Value ? 1 : 0;
+                if (CursorPath != null) CursorPath.Alpha = showCursorPath.Value ? 1 : 0;
+            }
+        }
 
         private void initialise()
         {
-            if (!requireDisplay)
+            if (loaded.IsValid)
                 return;
 
-            if (isLoaded)
-                return;
+            loaded.Validate();
 
-            isLoaded = true;
+            generationCancellationSource?.Cancel();
+            generationCancellationSource = new CancellationTokenSource();
 
             // It's faster to reinitialise the whole drawable stack than use `Clear` on `PooledDrawableWithLifetimeContainer`
-            InternalChildren = new Drawable[]
+            var newDrawables = new Drawable[]
             {
                 CursorPath = new CursorPathContainer(),
                 ClickMarkers = new ClickMarkerContainer(),
@@ -92,6 +95,8 @@ namespace osu.Game.Rulesets.Osu.UI
             bool leftHeld = false;
             bool rightHeld = false;
 
+            // This should probably be async as well, but it's a bit of a pain to debounce and everything.
+            // Let's address concerns when they are raised.
             foreach (var frame in replay.Frames)
             {
                 var osuFrame = (OsuReplayFrame)frame;
@@ -118,6 +123,8 @@ namespace osu.Game.Rulesets.Osu.UI
                 FrameMarkers.Add(new AnalysisFrameEntry(osuFrame.Time, displayLength.Value, osuFrame.Position, osuFrame.Actions.ToArray()));
                 CursorPath.Add(new AnalysisFrameEntry(osuFrame.Time, displayLength.Value, osuFrame.Position));
             }
+
+            LoadComponentsAsync(newDrawables, drawables => InternalChildrenEnumerable = drawables, generationCancellationSource.Token);
         }
     }
 }
