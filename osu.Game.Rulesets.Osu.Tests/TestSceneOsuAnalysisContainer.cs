@@ -90,26 +90,28 @@ namespace osu.Game.Rulesets.Osu.Tests
             var random = new Random();
             int posX = 250;
             int posY = 250;
-            bool leftOrRight = false;
+
+            var actions = new HashSet<OsuAction>();
 
             for (int i = 0; i < 1000; i++)
             {
                 posX = Math.Clamp(posX + random.Next(-20, 21), -100, 600);
                 posY = Math.Clamp(posY + random.Next(-20, 21), -100, 600);
 
-                var actions = new List<OsuAction>();
-
-                if (i % 20 == 0)
+                if (random.NextDouble() > (actions.Count == 0 ? 0.9 : 0.95))
                 {
-                    actions.Add(leftOrRight ? OsuAction.LeftButton : OsuAction.RightButton);
-                    leftOrRight = !leftOrRight;
+                    actions.Add(random.NextDouble() > 0.5 ? OsuAction.LeftButton : OsuAction.RightButton);
+                }
+                else if (random.NextDouble() > 0.7)
+                {
+                    actions.Remove(random.NextDouble() > 0.5 ? OsuAction.LeftButton : OsuAction.RightButton);
                 }
 
                 frames.Add(new OsuReplayFrame
                 {
                     Time = Time.Current + i * 15,
                     Position = new Vector2(posX, posY),
-                    Actions = actions
+                    Actions = actions.ToList(),
                 });
             }
 
