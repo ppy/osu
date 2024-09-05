@@ -46,6 +46,9 @@ namespace osu.Game.Online.API
                 Response = ((OsuJsonWebRequest<T>)WebRequest).ResponseObject;
                 Logger.Log($"{GetType().ReadableName()} finished with response size of {WebRequest.ResponseStream.Length:#,0} bytes", LoggingTarget.Network);
             }
+
+            if (Response == null)
+                TriggerFailure(new ArgumentNullException(nameof(Response)));
         }
 
         internal void TriggerSuccess(T result)
@@ -151,6 +154,8 @@ namespace osu.Game.Online.API
             if (isFailing) return;
 
             PostProcess();
+
+            if (isFailing) return;
 
             TriggerSuccess();
         }
