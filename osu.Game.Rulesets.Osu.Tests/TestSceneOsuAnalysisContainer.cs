@@ -40,9 +40,9 @@ namespace osu.Game.Rulesets.Osu.Tests
                     settings = new ReplayAnalysisSettings(config),
                 };
 
-                settings.HitMarkersEnabled.Value = false;
-                settings.AimMarkersEnabled.Value = false;
-                settings.AimLinesEnabled.Value = false;
+                settings.ShowClickMarkers.Value = false;
+                settings.ShowAimMarkers.Value = false;
+                settings.ShowCursorPath.Value = false;
             });
         }
 
@@ -51,36 +51,36 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             AddStep("enable everything", () =>
             {
-                settings.HitMarkersEnabled.Value = true;
-                settings.AimMarkersEnabled.Value = true;
-                settings.AimLinesEnabled.Value = true;
+                settings.ShowClickMarkers.Value = true;
+                settings.ShowAimMarkers.Value = true;
+                settings.ShowCursorPath.Value = true;
             });
         }
 
         [Test]
         public void TestHitMarkers()
         {
-            AddStep("enable hit markers", () => settings.HitMarkersEnabled.Value = true);
+            AddStep("enable hit markers", () => settings.ShowClickMarkers.Value = true);
             AddAssert("hit markers visible", () => analysisContainer.HitMarkersVisible);
-            AddStep("disable hit markers", () => settings.HitMarkersEnabled.Value = false);
+            AddStep("disable hit markers", () => settings.ShowClickMarkers.Value = false);
             AddAssert("hit markers not visible", () => !analysisContainer.HitMarkersVisible);
         }
 
         [Test]
         public void TestAimMarker()
         {
-            AddStep("enable aim markers", () => settings.AimMarkersEnabled.Value = true);
+            AddStep("enable aim markers", () => settings.ShowAimMarkers.Value = true);
             AddAssert("aim markers visible", () => analysisContainer.AimMarkersVisible);
-            AddStep("disable aim markers", () => settings.AimMarkersEnabled.Value = false);
+            AddStep("disable aim markers", () => settings.ShowAimMarkers.Value = false);
             AddAssert("aim markers not visible", () => !analysisContainer.AimMarkersVisible);
         }
 
         [Test]
         public void TestAimLines()
         {
-            AddStep("enable aim lines", () => settings.AimLinesEnabled.Value = true);
+            AddStep("enable aim lines", () => settings.ShowCursorPath.Value = true);
             AddAssert("aim lines visible", () => analysisContainer.AimLinesVisible);
-            AddStep("disable aim lines", () => settings.AimLinesEnabled.Value = false);
+            AddStep("disable aim lines", () => settings.ShowCursorPath.Value = false);
             AddAssert("aim lines not visible", () => !analysisContainer.AimLinesVisible);
         }
 

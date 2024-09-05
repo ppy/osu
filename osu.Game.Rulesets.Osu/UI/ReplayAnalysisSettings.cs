@@ -13,17 +13,17 @@ namespace osu.Game.Rulesets.Osu.UI
     {
         private readonly OsuRulesetConfigManager config;
 
-        [SettingSource("Hit markers", SettingControlType = typeof(PlayerCheckbox))]
-        public BindableBool HitMarkersEnabled { get; } = new BindableBool();
+        [SettingSource("Show click markers", SettingControlType = typeof(PlayerCheckbox))]
+        public BindableBool ShowClickMarkers { get; } = new BindableBool();
 
-        [SettingSource("Aim markers", SettingControlType = typeof(PlayerCheckbox))]
-        public BindableBool AimMarkersEnabled { get; } = new BindableBool();
+        [SettingSource("Show frame markers", SettingControlType = typeof(PlayerCheckbox))]
+        public BindableBool ShowAimMarkers { get; } = new BindableBool();
 
-        [SettingSource("Aim lines", SettingControlType = typeof(PlayerCheckbox))]
-        public BindableBool AimLinesEnabled { get; } = new BindableBool();
+        [SettingSource("Show cursor path", SettingControlType = typeof(PlayerCheckbox))]
+        public BindableBool ShowCursorPath { get; } = new BindableBool();
 
-        [SettingSource("Hide cursor", SettingControlType = typeof(PlayerCheckbox))]
-        public BindableBool CursorHideEnabled { get; } = new BindableBool();
+        [SettingSource("Hide gameplay cursor", SettingControlType = typeof(PlayerCheckbox))]
+        public BindableBool HideSkinCursor { get; } = new BindableBool();
 
         public ReplayAnalysisSettings(OsuRulesetConfigManager config)
             : base("Analysis Settings")
@@ -36,10 +36,10 @@ namespace osu.Game.Rulesets.Osu.UI
         {
             AddRange(this.CreateSettingsControls());
 
-            config.BindWith(OsuRulesetSetting.ReplayHitMarkersEnabled, HitMarkersEnabled);
-            config.BindWith(OsuRulesetSetting.ReplayAimMarkersEnabled, AimMarkersEnabled);
-            config.BindWith(OsuRulesetSetting.ReplayAimLinesEnabled, AimLinesEnabled);
-            config.BindWith(OsuRulesetSetting.ReplayCursorHideEnabled, CursorHideEnabled);
+            config.BindWith(OsuRulesetSetting.ReplayClickMarkersEnabled, ShowClickMarkers);
+            config.BindWith(OsuRulesetSetting.ReplayFrameMarkersEnabled, ShowAimMarkers);
+            config.BindWith(OsuRulesetSetting.ReplayCursorPathEnabled, ShowCursorPath);
+            config.BindWith(OsuRulesetSetting.ReplayCursorHideEnabled, HideSkinCursor);
         }
     }
 }
