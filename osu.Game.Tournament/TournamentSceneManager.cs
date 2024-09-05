@@ -46,12 +46,24 @@ namespace osu.Game.Tournament
 
         public const int REQUIRED_WIDTH = CONTROL_AREA_WIDTH * 2 + STREAM_AREA_WIDTH;
 
+        public bool isChatShown = true;
+
         [Cached]
         private TournamentMatchChatDisplay chat = new TournamentMatchChatDisplay(RelativeSizeY: true);
 
         private TournamentIntro intro = null!;
 
-        private Container chatContainer = null!;
+        [Cached]
+        private Container chatContainer = new Container
+        {
+            Anchor = Anchor.TopLeft,
+            Origin = Anchor.TopLeft,
+            RelativeSizeAxes = Axes.None,
+            Width = STREAM_AREA_WIDTH,
+            Height = 480,
+            // Child = chat
+        };
+
         private FillFlowContainer buttons = null!;
 
         private TournamentScreen middle = null!;
@@ -241,7 +253,7 @@ namespace osu.Game.Tournament
                     chatContainer.FadeIn(TournamentScreen.FADE_DELAY);
                     chatContainer.ResizeWidthTo(STREAM_AREA_WIDTH / 2, 500, Easing.OutQuint);
                     chatContainer.ResizeHeightTo(144, 500, Easing.OutQuint);
-                    chatContainer.MoveTo(new Vector2(0, STREAM_AREA_HEIGHT - 144), 500, Easing.OutQuint);
+                    chatContainer.MoveTo(new Vector2(0, isChatShown ? STREAM_AREA_HEIGHT - 144 : -500), 500, Easing.OutQuint);
                     chat.ChangeRadius(0);
                     break;
 

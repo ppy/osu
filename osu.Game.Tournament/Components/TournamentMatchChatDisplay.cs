@@ -81,10 +81,6 @@ namespace osu.Game.Tournament.Components
             CornerRadius = radius;
         }
 
-        public void Expand() => this.FadeIn(300);
-
-        public void Contract() => this.FadeOut(200);
-
         protected override ChatLine CreateMessage(Message message)
         {
             var currentMatch = ladderInfo.CurrentMatch;
