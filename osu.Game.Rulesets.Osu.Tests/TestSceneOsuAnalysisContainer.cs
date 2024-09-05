@@ -125,9 +125,9 @@ namespace osu.Game.Rulesets.Osu.Tests
             {
             }
 
-            public bool HitMarkersVisible => ClickMarkers.Alpha > 0 && ClickMarkers.Entries.Any();
-            public bool AimMarkersVisible => FrameMarkers.Alpha > 0 && FrameMarkers.Entries.Any();
-            public bool AimLinesVisible => CursorPath.Alpha > 0 && CursorPath.Vertices.Count > 1;
+            public bool HitMarkersVisible => ClickMarkers?.Alpha > 0 && ClickMarkers.Entries.Any();
+            public bool AimMarkersVisible => FrameMarkers?.Alpha > 0 && FrameMarkers.Entries.Any();
+            public bool AimLinesVisible => CursorPath?.Alpha > 0 && CursorPath.Vertices.Count > 1;
         }
     }
 }
