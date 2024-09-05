@@ -61,27 +61,27 @@ namespace osu.Game.Rulesets.Osu.Tests
         public void TestHitMarkers()
         {
             AddStep("enable hit markers", () => settings.ShowClickMarkers.Value = true);
-            AddAssert("hit markers visible", () => analysisContainer.HitMarkersVisible);
+            AddUntilStep("hit markers visible", () => analysisContainer.HitMarkersVisible);
             AddStep("disable hit markers", () => settings.ShowClickMarkers.Value = false);
-            AddAssert("hit markers not visible", () => !analysisContainer.HitMarkersVisible);
+            AddUntilStep("hit markers not visible", () => !analysisContainer.HitMarkersVisible);
         }
 
         [Test]
         public void TestAimMarker()
         {
             AddStep("enable aim markers", () => settings.ShowAimMarkers.Value = true);
-            AddAssert("aim markers visible", () => analysisContainer.AimMarkersVisible);
+            AddUntilStep("aim markers visible", () => analysisContainer.AimMarkersVisible);
             AddStep("disable aim markers", () => settings.ShowAimMarkers.Value = false);
-            AddAssert("aim markers not visible", () => !analysisContainer.AimMarkersVisible);
+            AddUntilStep("aim markers not visible", () => !analysisContainer.AimMarkersVisible);
         }
 
         [Test]
         public void TestAimLines()
         {
             AddStep("enable aim lines", () => settings.ShowCursorPath.Value = true);
-            AddAssert("aim lines visible", () => analysisContainer.AimLinesVisible);
+            AddUntilStep("aim lines visible", () => analysisContainer.AimLinesVisible);
             AddStep("disable aim lines", () => settings.ShowCursorPath.Value = false);
-            AddAssert("aim lines not visible", () => !analysisContainer.AimLinesVisible);
+            AddUntilStep("aim lines not visible", () => !analysisContainer.AimLinesVisible);
         }
 
         private Replay fabricateReplay()
