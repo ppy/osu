@@ -14,9 +14,9 @@ namespace osu.Game.Rulesets.Osu.UI
 {
     public partial class ReplayAnalysisOverlay : CompositeDrawable
     {
-        private BindableBool hitMarkersEnabled { get; } = new BindableBool();
-        private BindableBool aimMarkersEnabled { get; } = new BindableBool();
-        private BindableBool aimLinesEnabled { get; } = new BindableBool();
+        private BindableBool showClickMarkers { get; } = new BindableBool();
+        private BindableBool showFrameMarkers { get; } = new BindableBool();
+        private BindableBool showCursorPath { get; } = new BindableBool();
 
         protected readonly ClickMarkerContainer ClickMarkers;
         protected readonly FrameMarkerContainer FrameMarkers;
@@ -43,18 +43,18 @@ namespace osu.Game.Rulesets.Osu.UI
         {
             loadReplay();
 
-            config.BindWith(OsuRulesetSetting.ReplayHitMarkersEnabled, hitMarkersEnabled);
-            config.BindWith(OsuRulesetSetting.ReplayAimMarkersEnabled, aimMarkersEnabled);
-            config.BindWith(OsuRulesetSetting.ReplayAimLinesEnabled, aimLinesEnabled);
+            config.BindWith(OsuRulesetSetting.ReplayClickMarkersEnabled, showClickMarkers);
+            config.BindWith(OsuRulesetSetting.ReplayFrameMarkersEnabled, showFrameMarkers);
+            config.BindWith(OsuRulesetSetting.ReplayCursorPathEnabled, showCursorPath);
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            hitMarkersEnabled.BindValueChanged(enabled => ClickMarkers.FadeTo(enabled.NewValue ? 1 : 0), true);
-            aimMarkersEnabled.BindValueChanged(enabled => FrameMarkers.FadeTo(enabled.NewValue ? 1 : 0), true);
-            aimLinesEnabled.BindValueChanged(enabled => CursorPath.FadeTo(enabled.NewValue ? 1 : 0), true);
+            showClickMarkers.BindValueChanged(enabled => ClickMarkers.FadeTo(enabled.NewValue ? 1 : 0), true);
+            showFrameMarkers.BindValueChanged(enabled => FrameMarkers.FadeTo(enabled.NewValue ? 1 : 0), true);
+            showCursorPath.BindValueChanged(enabled => CursorPath.FadeTo(enabled.NewValue ? 1 : 0), true);
         }
 
         private void loadReplay()
