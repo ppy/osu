@@ -12,12 +12,12 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.UI.ReplayAnalysis
 {
-    public partial class MovementPathContainer : Path
+    public partial class CursorPathContainer : Path
     {
         private readonly LifetimeEntryManager lifetimeManager = new LifetimeEntryManager();
         private readonly SortedSet<AnalysisFrameEntry> aliveEntries = new SortedSet<AnalysisFrameEntry>(new AimLinePointComparator());
 
-        public MovementPathContainer()
+        public CursorPathContainer()
         {
             lifetimeManager.EntryBecameAlive += entryBecameAlive;
             lifetimeManager.EntryBecameDead += entryBecameDead;

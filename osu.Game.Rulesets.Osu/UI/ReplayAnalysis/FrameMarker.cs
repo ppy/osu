@@ -7,7 +7,10 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.UI.ReplayAnalysis
 {
-    public partial class HitMarkerMovement : HitMarker
+    /// <summary>
+    /// A marker which shows one movement frame, include any buttons which are pressed.
+    /// </summary>
+    public partial class FrameMarker : AnalysisMarker
     {
         private Container clickDisplay = null!;
         private Circle mainCircle = null!;
