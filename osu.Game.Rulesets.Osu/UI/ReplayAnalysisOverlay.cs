@@ -32,8 +32,8 @@ namespace osu.Game.Rulesets.Osu.UI
 
             InternalChildren = new Drawable[]
             {
-                ClickMarkers = new ClickMarkerContainer(),
                 MovementPath = new MovementPathContainer(),
+                ClickMarkers = new ClickMarkerContainer(),
                 MovementMarkers = new MovementMarkerContainer(),
             };
         }

@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics.Lines;
 using osu.Framework.Graphics.Performance;
 using osu.Game.Graphics;
@@ -28,6 +29,7 @@ namespace osu.Game.Rulesets.Osu.UI.ReplayAnalysis
         private void load(OsuColour colours)
         {
             Colour = colours.Pink2;
+            BackgroundColour = colours.Pink2.Opacity(0);
         }
 
         protected override void Update()
