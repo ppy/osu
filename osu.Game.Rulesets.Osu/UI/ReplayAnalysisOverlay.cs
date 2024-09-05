@@ -62,8 +62,6 @@ namespace osu.Game.Rulesets.Osu.UI
             bool leftHeld = false;
             bool rightHeld = false;
 
-            OsuAction? lastAction = null;
-
             foreach (var frame in replay.Frames)
             {
                 var osuFrame = (OsuReplayFrame)frame;
@@ -76,7 +74,6 @@ namespace osu.Game.Rulesets.Osu.UI
                 else if (!leftHeld && leftButton)
                 {
                     leftHeld = true;
-                    lastAction = OsuAction.LeftButton;
                     ClickMarkers.Add(new AnalysisFrameEntry(osuFrame.Time, osuFrame.Position, OsuAction.LeftButton));
                 }
 
@@ -85,14 +82,10 @@ namespace osu.Game.Rulesets.Osu.UI
                 else if (!rightHeld && rightButton)
                 {
                     rightHeld = true;
-                    lastAction = OsuAction.RightButton;
                     ClickMarkers.Add(new AnalysisFrameEntry(osuFrame.Time, osuFrame.Position, OsuAction.RightButton));
                 }
 
-                if (!leftButton && !rightButton)
-                    lastAction = null;
-
-                FrameMarkers.Add(new AnalysisFrameEntry(osuFrame.Time, osuFrame.Position, lastAction));
+                FrameMarkers.Add(new AnalysisFrameEntry(osuFrame.Time, osuFrame.Position, osuFrame.Actions.ToArray()));
                 CursorPath.Add(new AnalysisFrameEntry(osuFrame.Time, osuFrame.Position));
             }
         }
