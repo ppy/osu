@@ -19,6 +19,7 @@ namespace osu.Game.Tournament.Components
         private readonly InstructionInfo thisStep = null!;
 
         private Container iconHolder = null!;
+        private Container descHolder = null!;
 
         public InstructionDisplay(TeamColour team = TeamColour.Neutral, Steps step = Steps.Default)
         {
@@ -65,6 +66,7 @@ namespace osu.Game.Tournament.Components
                         Anchor = Anchor.CentreLeft,
                         Origin = Anchor.CentreLeft,
                         Direction = FillDirection.Vertical,
+                        Spacing = new Vector2(15),
 
                         Children = new Drawable[]
                         {
@@ -75,12 +77,10 @@ namespace osu.Game.Tournament.Components
                                 Text = thisStep.Name,
                                 Font = OsuFont.GetFont(typeface: Typeface.HarmonyOSSans, size: 42, weight: FontWeight.Bold),
                             },
-                            new TournamentSpriteText
+                            descHolder = new Container
                             {
                                 Anchor = Anchor.CentreLeft,
                                 Origin = Anchor.CentreLeft,
-                                Text = thisStep.Description,
-                                Font = OsuFont.GetFont(typeface: Typeface.HarmonyOSSans, size: 30, weight: FontWeight.Regular),
                             },
                         }
                     }
@@ -93,18 +93,20 @@ namespace osu.Game.Tournament.Components
         {
             // Put one under the tournament match directory
             Texture welcomeTexture = textures.Get("Icons/welcome-img");
+            Texture mainDescTexture = textures.Get("Icons/main-descimg");
 
             if (thisStep.Step == Steps.Default && welcomeTexture != null)
             {
+
                 iconHolder.Child = new Sprite
                 {
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft,
-                    // Feel free to changed based on the texture's size
+                    // Feel free to change based on the texture's size
                     Size = new Vector2(100),
                     X = -20,
                     Alpha = 1,
-                    Texture = textures.Get("Icons/welcome-img")
+                    Texture = welcomeTexture,
                 };
             }
             else
@@ -117,6 +119,28 @@ namespace osu.Game.Tournament.Components
                     Size = new Vector2(56),
                     Colour = thisStep.IconColor,
                     Alpha = 1,
+                };
+            }
+
+            if (thisStep.Step == Steps.Default && mainDescTexture != null)
+            {
+                descHolder.Child = new Sprite
+                {
+                    Anchor = Anchor.CentreLeft,
+                    Origin = Anchor.CentreLeft,
+                    // Feel free to change based on the texture's size
+                    Size = new Vector2(60, mainDescTexture.Height * (60f / mainDescTexture.Width)),
+                    Texture = mainDescTexture,
+                };
+            }
+            else
+            {
+                descHolder.Child = new TournamentSpriteText
+                {
+                    Anchor = Anchor.CentreLeft,
+                    Origin = Anchor.CentreLeft,
+                    Text = thisStep.Description,
+                    Font = OsuFont.GetFont(typeface: Typeface.HarmonyOSSans, size: 30, weight: FontWeight.Regular),
                 };
             }
         }
