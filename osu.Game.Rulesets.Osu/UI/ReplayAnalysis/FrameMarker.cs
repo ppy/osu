@@ -1,9 +1,12 @@
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
+
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.UserInterface;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.UI.ReplayAnalysis
 {
@@ -12,7 +15,8 @@ namespace osu.Game.Rulesets.Osu.UI.ReplayAnalysis
     /// </summary>
     public partial class FrameMarker : AnalysisMarker
     {
-        private Container clickDisplay = null!;
+        private CircularProgress leftClickDisplay = null!;
+        private CircularProgress rightClickDisplay = null!;
         private Circle mainCircle = null!;
 
         [BackgroundDependencyLoader]
@@ -27,24 +31,26 @@ namespace osu.Game.Rulesets.Osu.UI.ReplayAnalysis
                     RelativeSizeAxes = Axes.Both,
                     Colour = Colours.Pink2,
                 },
-                clickDisplay = new Container
+                leftClickDisplay = new CircularProgress
                 {
                     Colour = Colours.Yellow,
-                    Scale = new Vector2(0.8f),
-                    Anchor = Anchor.Centre,
+                    Size = new Vector2(0.8f),
+                    Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreRight,
+                    Rotation = 180,
+                    Progress = 0.5f,
+                    InnerRadius = 0.5f,
                     RelativeSizeAxes = Axes.Both,
-                    Width = 0.5f,
-                    Masking = true,
-                    Children = new Drawable[]
-                    {
-                        new Circle
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Width = 2,
-                            Colour = Color4.White,
-                        },
-                    },
+                },
+                rightClickDisplay = new CircularProgress
+                {
+                    Colour = Colours.Yellow,
+                    Size = new Vector2(0.8f),
+                    Anchor = Anchor.CentreRight,
+                    Origin = Anchor.CentreRight,
+                    Progress = 0.5f,
+                    InnerRadius = 0.5f,
+                    RelativeSizeAxes = Axes.Both,
                 },
             };
         }
@@ -52,12 +58,12 @@ namespace osu.Game.Rulesets.Osu.UI.ReplayAnalysis
         protected override void OnApply(AnalysisFrameEntry entry)
         {
             base.OnApply(entry);
-            Size = new Vector2(entry.Action != null ? 4 : 2.5f);
+            Size = new Vector2(entry.Action.Any() ? 4 : 2.5f);
 
-            mainCircle.Colour = entry.Action != null ? Colours.Gray4 : Colours.Pink2;
+            mainCircle.Colour = entry.Action.Any() ? Colours.Gray4 : Colours.Pink2;
 
-            clickDisplay.Alpha = entry.Action != null ? 1 : 0;
-            clickDisplay.Rotation = entry.Action == OsuAction.LeftButton ? 0 : 180;
+            leftClickDisplay.Alpha = entry.Action.Contains(OsuAction.LeftButton) ? 1 : 0;
+            rightClickDisplay.Alpha = entry.Action.Contains(OsuAction.RightButton) ? 1 : 0;
         }
     }
 }
