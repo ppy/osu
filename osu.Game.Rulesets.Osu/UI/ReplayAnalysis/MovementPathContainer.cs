@@ -7,6 +7,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics.Lines;
 using osu.Framework.Graphics.Performance;
 using osu.Game.Graphics;
+using osuTK;
 
 namespace osu.Game.Rulesets.Osu.UI.ReplayAnalysis
 {
@@ -54,10 +55,19 @@ namespace osu.Game.Rulesets.Osu.UI.ReplayAnalysis
         {
             ClearVertices();
 
+            Vector2 min = Vector2.Zero;
+
             foreach (var entry in aliveEntries)
             {
                 AddVertex(entry.Position);
+                if (entry.Position.X < min.X)
+                    min.X = entry.Position.X;
+
+                if (entry.Position.Y < min.Y)
+                    min.Y = entry.Position.Y;
             }
+
+            Position = min;
         }
 
         private sealed class AimLinePointComparator : IComparer<AnalysisFrameEntry>
