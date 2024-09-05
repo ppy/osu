@@ -94,8 +94,8 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             for (int i = 0; i < 1000; i++)
             {
-                posX = Math.Clamp(posX + random.Next(-20, 21), 0, 500);
-                posY = Math.Clamp(posY + random.Next(-20, 21), 0, 500);
+                posX = Math.Clamp(posX + random.Next(-20, 21), -100, 600);
+                posY = Math.Clamp(posY + random.Next(-20, 21), -100, 600);
 
                 var actions = new List<OsuAction>();
 
