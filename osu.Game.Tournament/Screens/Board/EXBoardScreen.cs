@@ -399,6 +399,11 @@ namespace osu.Game.Tournament.Screens.Board
                 BeatmapID = beatmapId,
             });
 
+            if (pickType == ChoiceType.Pick)
+            {
+                AddInternal(new TournamentIntro(CurrentMatch.Value.Round.Value.Beatmaps.FirstOrDefault(b => b.Beatmap?.OnlineID == beatmapId)));
+            }
+
             if (LadderInfo.AutoProgressScreens.Value)
             {
                 if (pickType == ChoiceType.Pick && CurrentMatch.Value.EXPicks.Any(i => i.Type == ChoiceType.Pick))

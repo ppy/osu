@@ -49,6 +49,8 @@ namespace osu.Game.Tournament
         [Cached]
         private TournamentMatchChatDisplay chat = new TournamentMatchChatDisplay(RelativeSizeY: true);
 
+        private TournamentIntro intro = null!;
+
         private Container chatContainer = null!;
         private FillFlowContainer buttons = null!;
 

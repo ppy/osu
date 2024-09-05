@@ -844,6 +844,12 @@ namespace osu.Game.Tournament.Screens.Board
                 });
             }
 
+            AddInternal(new TournamentIntro(CurrentMatch.Value.Round.Value.Beatmaps.FirstOrDefault(b => b.Beatmap?.OnlineID == beatmapId))
+            {
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+            });
+
             // setNextMode(); // Uncomment if you still want to automatically set the next mode
 
             if (LadderInfo.AutoProgressScreens.Value)
