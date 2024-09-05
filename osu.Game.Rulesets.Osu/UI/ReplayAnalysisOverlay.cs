@@ -19,8 +19,8 @@ namespace osu.Game.Rulesets.Osu.UI
         private BindableBool aimLinesEnabled { get; } = new BindableBool();
 
         protected readonly ClickMarkerContainer ClickMarkers;
-        protected readonly MovementMarkerContainer MovementMarkers;
-        protected readonly MovementPathContainer MovementPath;
+        protected readonly FrameMarkerContainer FrameMarkers;
+        protected readonly CursorPathContainer CursorPath;
 
         private readonly Replay replay;
 
@@ -32,9 +32,9 @@ namespace osu.Game.Rulesets.Osu.UI
 
             InternalChildren = new Drawable[]
             {
-                MovementPath = new MovementPathContainer(),
+                CursorPath = new CursorPathContainer(),
                 ClickMarkers = new ClickMarkerContainer(),
-                MovementMarkers = new MovementMarkerContainer(),
+                FrameMarkers = new FrameMarkerContainer(),
             };
         }
 
@@ -53,8 +53,8 @@ namespace osu.Game.Rulesets.Osu.UI
             base.LoadComplete();
 
             hitMarkersEnabled.BindValueChanged(enabled => ClickMarkers.FadeTo(enabled.NewValue ? 1 : 0), true);
-            aimMarkersEnabled.BindValueChanged(enabled => MovementMarkers.FadeTo(enabled.NewValue ? 1 : 0), true);
-            aimLinesEnabled.BindValueChanged(enabled => MovementPath.FadeTo(enabled.NewValue ? 1 : 0), true);
+            aimMarkersEnabled.BindValueChanged(enabled => FrameMarkers.FadeTo(enabled.NewValue ? 1 : 0), true);
+            aimLinesEnabled.BindValueChanged(enabled => CursorPath.FadeTo(enabled.NewValue ? 1 : 0), true);
         }
 
         private void loadReplay()
@@ -92,8 +92,8 @@ namespace osu.Game.Rulesets.Osu.UI
                 if (!leftButton && !rightButton)
                     lastAction = null;
 
-                MovementMarkers.Add(new AnalysisFrameEntry(osuFrame.Time, osuFrame.Position, lastAction));
-                MovementPath.Add(new AnalysisFrameEntry(osuFrame.Time, osuFrame.Position));
+                FrameMarkers.Add(new AnalysisFrameEntry(osuFrame.Time, osuFrame.Position, lastAction));
+                CursorPath.Add(new AnalysisFrameEntry(osuFrame.Time, osuFrame.Position));
             }
         }
     }

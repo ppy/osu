@@ -8,7 +8,7 @@ using osu.Game.Rulesets.Objects.Pooling;
 
 namespace osu.Game.Rulesets.Osu.UI.ReplayAnalysis
 {
-    public abstract partial class HitMarker : PoolableDrawableWithLifetime<AnalysisFrameEntry>
+    public abstract partial class AnalysisMarker : PoolableDrawableWithLifetime<AnalysisFrameEntry>
     {
         [Resolved]
         protected OsuColour Colours { get; private set; } = null!;

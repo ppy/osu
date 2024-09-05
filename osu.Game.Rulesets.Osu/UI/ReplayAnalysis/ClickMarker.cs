@@ -7,7 +7,10 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.UI.ReplayAnalysis
 {
-    public partial class HitMarkerClick : HitMarker
+    /// <summary>
+    /// A marker which shows one click, with visuals focusing on the button which was clicked and the precise location of the click.
+    /// </summary>
+    public partial class ClickMarker : AnalysisMarker
     {
         private Container clickDisplay = null!;
 
