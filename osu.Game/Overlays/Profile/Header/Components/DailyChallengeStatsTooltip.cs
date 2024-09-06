@@ -116,7 +116,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
             topBackground.Colour = colourProvider.Background5;
 
             totalParticipation.Value = DailyChallengeStatsDisplayStrings.UnitDay(statistics.PlayCount.ToLocalisableString(@"N0"));
-            totalParticipation.ValueColour = colourProvider.Content2;
+            totalParticipation.ValueColour = colours.ForRankingTier(TierForDaily(statistics.PlayCount));
 
             currentDaily.Value = DailyChallengeStatsDisplayStrings.UnitDay(content.Statistics.DailyStreakCurrent.ToLocalisableString(@"N0"));
             currentDaily.ValueColour = colours.ForRankingTier(TierForDaily(statistics.DailyStreakCurrent));
