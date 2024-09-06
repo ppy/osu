@@ -19,6 +19,7 @@ using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Replays;
 using osu.Game.Rulesets.UI;
 using osu.Game.Scoring;
+using osu.Game.Screens.OnlinePlay.Multiplayer.Spectate;
 using osu.Game.Screens.Play;
 using osuTK;
 
@@ -34,18 +35,23 @@ namespace osu.Game.Rulesets.Osu.UI
 
         protected new OsuRulesetConfigManager Config => (OsuRulesetConfigManager)base.Config;
 
+        [Resolved]
+        private MultiSpectatorScreen? multiSpectatorScreen { get; set; }
+
         public DrawableOsuRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod>? mods = null)
             : base(ruleset, beatmap, mods)
         {
         }
 
         [BackgroundDependencyLoader]
-        private void load(ReplayPlayer? replayPlayer)
+        private void load(Player? player)
         {
-            if (replayPlayer != null)
+            if (player is ReplayPlayer || player is SpectatorPlayer)
             {
-                PlayfieldAdjustmentContainer.Add(new ReplayAnalysisOverlay(replayPlayer.Score.Replay));
-                replayPlayer.AddSettings(new ReplayAnalysisSettings(Config));
+                PlayfieldAdjustmentContainer.Add(new ReplayAnalysisOverlay(player.Score.Replay));
+
+                if (multiSpectatorScreen == null)
+                    player.AddSettings(new ReplayAnalysisSettings(Config));
 
                 cursorHideEnabled = Config.GetBindable<bool>(OsuRulesetSetting.ReplayCursorHideEnabled);
 
@@ -53,6 +59,14 @@ namespace osu.Game.Rulesets.Osu.UI
                 // Let's wait for someone to report an issue before spending too much time on it.
                 cursorHideEnabled.BindValueChanged(enabled => Playfield.Cursor.FadeTo(enabled.NewValue ? 0 : 1), true);
             }
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            if (multiSpectatorScreen != null && !multiSpectatorScreen.SettingsAdded)
+                multiSpectatorScreen.AddSettingsAsync(new ReplayAnalysisSettings(Config));
         }
 
         public override DrawableHitObject<OsuHitObject>? CreateDrawableRepresentation(OsuHitObject h) => null;
