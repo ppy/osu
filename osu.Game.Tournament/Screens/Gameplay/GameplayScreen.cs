@@ -8,6 +8,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Threading;
 using osu.Game.Graphics.UserInterfaceV2;
+using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.Settings;
 using osu.Game.Tournament.Components;
 using osu.Game.Tournament.IPC;
@@ -33,6 +34,7 @@ namespace osu.Game.Tournament.Screens.Gameplay
         // private SettingsSlider<float> blueMultiplier = null!;
 
         private MatchIPCInfo ipc = null!;
+        private bool chatEnforcing = false;
 
         [Resolved]
         private TournamentSceneManager? sceneManager { get; set; }
@@ -110,6 +112,7 @@ namespace osu.Game.Tournament.Screens.Gameplay
                             RelativeSizeAxes = Axes.X,
                             Text = "Toggle chat",
                             Action = () => {
+                                chatEnforcing = true;
                                 if (isChatShown)
                                 {
                                     isChatShown = false;
@@ -176,7 +179,7 @@ namespace osu.Game.Tournament.Screens.Gameplay
             warmupToggle.Current.BindValueChanged(_ => updateWarmup(), true);
 
             State.BindTo(ipc.State);
-            State.BindValueChanged(_ => updateState(), true);
+            State.BindValueChanged(e => updateState(e), true);
         }
 
         protected override void CurrentMatchChanged(ValueChangedEvent<TournamentMatch?> match)
@@ -226,8 +229,10 @@ namespace osu.Game.Tournament.Screens.Gameplay
             }
         }
 
-        private void updateState()
+        private void updateState(ValueChangedEvent<TourneyState>? e = null)
         {
+            var newState = e != null ? e.NewValue : State.Value;
+
             try
             {
                 scheduledScreenChange?.Cancel();
@@ -245,8 +250,12 @@ namespace osu.Game.Tournament.Screens.Gameplay
                 switch (State.Value)
                 {
                     case TourneyState.Idle:
-                        isChatShown = false;
-                        contract();
+                        if (!chatEnforcing || lastState == TourneyState.Ranking)
+                        {
+                            chatEnforcing = false;
+                            isChatShown = true;
+                            contract();
+                        }
 
                         if (LadderInfo.AutoProgressScreens.Value)
                         {
@@ -270,14 +279,17 @@ namespace osu.Game.Tournament.Screens.Gameplay
                         break;
 
                     default:
-                        isChatShown = true;
-                        expand();
+                        if (e == null || !chatEnforcing)
+                        {
+                            isChatShown = false;
+                            expand();
+                        }
                         break;
                 }
             }
             finally
             {
-                lastState = State.Value;
+                lastState = e != null ? e.NewValue : State.Value;
             }
         }
 
