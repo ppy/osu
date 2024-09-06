@@ -168,12 +168,30 @@ namespace osu.Desktop
 
         private static void setupVelopack()
         {
-            VelopackApp
-                .Build()
-                .WithFirstRun(v =>
+            var app = VelopackApp.Build();
+
+            app.WithFirstRun(_ =>
+            {
+                if (OperatingSystem.IsWindows())
+                    WindowsAssociationManager.InstallAssociations();
+            });
+
+            if (OperatingSystem.IsWindows())
+            {
+                app.WithAfterUpdateFastCallback(_ =>
                 {
-                    if (OperatingSystem.IsWindows()) WindowsAssociationManager.InstallAssociations();
-                }).Run();
+                    if (OperatingSystem.IsWindows())
+                        WindowsAssociationManager.UpdateAssociations();
+                });
+
+                app.WithBeforeUninstallFastCallback(_ =>
+                {
+                    if (OperatingSystem.IsWindows())
+                        WindowsAssociationManager.UninstallAssociations();
+                });
+            }
+
+            app.Run();
         }
     }
 }
