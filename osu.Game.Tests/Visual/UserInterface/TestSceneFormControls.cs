@@ -6,6 +6,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.UserInterfaceV2;
+using osu.Game.Localisation;
 using osuTK;
 
 namespace osu.Game.Tests.Visual.UserInterface
@@ -53,9 +54,22 @@ namespace osu.Game.Tests.Visual.UserInterface
                             PlaceholderText = "Mine is 42!",
                             TabbableContentContainer = this,
                         },
+                        new FormCheckBox
+                        {
+                            Caption = EditorSetupStrings.LetterboxDuringBreaks,
+                            HintText = EditorSetupStrings.LetterboxDuringBreaksDescription,
+                            OnText = "Letterbox",
+                            OffText = "Do not letterbox",
+                        },
+                        new FormCheckBox
+                        {
+                            Caption = EditorSetupStrings.LetterboxDuringBreaks,
+                            HintText = EditorSetupStrings.LetterboxDuringBreaksDescription,
+                            Current = { Disabled = true },
+                        },
                     },
                 },
-            },
+            }
         };
     }
 }
