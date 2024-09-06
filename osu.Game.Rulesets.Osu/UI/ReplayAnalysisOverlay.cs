@@ -98,7 +98,6 @@ namespace osu.Game.Rulesets.Osu.UI
 
             generationCancellationSource?.Cancel();
             generationCancellationSource = new CancellationTokenSource();
-            generationCancellationSource.Token.Register(invalidateLoaded);
 
             // It's faster to reinitialise the whole drawable stack than use `Clear` on `PooledDrawableWithLifetimeContainer`
             var newDrawables = new Drawable[]
