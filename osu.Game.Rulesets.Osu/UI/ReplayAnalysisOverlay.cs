@@ -34,8 +34,6 @@ namespace osu.Game.Rulesets.Osu.UI
             RelativeSizeAxes = Axes.Both;
 
             this.replay = replay;
-
-            invalidateLoaded();
         }
 
         private bool requireDisplay => showClickMarkers.Value || showFrameMarkers.Value || showCursorPath.Value;
