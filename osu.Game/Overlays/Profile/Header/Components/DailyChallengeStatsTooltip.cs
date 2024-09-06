@@ -71,7 +71,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
                             {
                                 topBackground = new Box
                                 {
-                                    RelativeSizeAxes = Axes.None,
+                                    RelativeSizeAxes = Axes.Both,
                                 },
                                 new FillFlowContainer
                                 {
