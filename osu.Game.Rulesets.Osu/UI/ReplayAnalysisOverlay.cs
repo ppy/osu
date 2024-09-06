@@ -27,13 +27,15 @@ namespace osu.Game.Rulesets.Osu.UI
 
         private readonly Replay replay;
 
-        private int replayFrameIndex = 0;
+        private int replayFrameIndex;
 
         public ReplayAnalysisOverlay(Replay replay)
         {
             RelativeSizeAxes = Axes.Both;
 
             this.replay = replay;
+
+            invalidateLoaded();
         }
 
         private bool requireDisplay => showClickMarkers.Value || showFrameMarkers.Value || showCursorPath.Value;
@@ -58,13 +60,16 @@ namespace osu.Game.Rulesets.Osu.UI
             }, true);
         }
 
-        private readonly Cached loaded = new Cached();
+        /// <summary>
+        /// false for loading, true for loaded
+        /// </summary>
+        private readonly Cached<bool> loadState = new Cached<bool>();
 
         private CancellationTokenSource? generationCancellationSource;
 
         private void invalidateLoaded()
         {
-            loaded.Invalidate();
+            loadState.Invalidate();
             replayFrameIndex = 0;
         }
 
@@ -73,7 +78,13 @@ namespace osu.Game.Rulesets.Osu.UI
             base.Update();
 
             if (requireDisplay)
+            {
                 initialise();
+                // adding entries while the component is asynchronously loading
+                // can collide with enumeration operations and cause an error
+                if (loadState.IsValid && loadState.Value)
+                    addEntries();
+            }
 
             if (ClickMarkers != null) ClickMarkers.Alpha = showClickMarkers.Value ? 1 : 0;
             if (FrameMarkers != null) FrameMarkers.Alpha = showFrameMarkers.Value ? 1 : 0;
@@ -82,18 +93,14 @@ namespace osu.Game.Rulesets.Osu.UI
 
         private void initialise()
         {
-            if (loaded.IsValid)
-            {
-                if (CursorPath != null)
-                    addEntries();
-
+            if (loadState.IsValid)
                 return;
-            }
 
-            loaded.Validate();
+            loadState.Value = false;
 
             generationCancellationSource?.Cancel();
             generationCancellationSource = new CancellationTokenSource();
+            generationCancellationSource.Token.Register(invalidateLoaded);
 
             // It's faster to reinitialise the whole drawable stack than use `Clear` on `PooledDrawableWithLifetimeContainer`
             var newDrawables = new Drawable[]
@@ -103,9 +110,11 @@ namespace osu.Game.Rulesets.Osu.UI
                 FrameMarkers = new FrameMarkerContainer(),
             };
 
-            addEntries();
-
-            LoadComponentsAsync(newDrawables, drawables => InternalChildrenEnumerable = drawables, generationCancellationSource.Token);
+            LoadComponentsAsync(newDrawables, drawables =>
+            {
+                InternalChildrenEnumerable = drawables;
+                loadState.Value = true;
+            }, generationCancellationSource.Token);
         }
 
         private void addEntries()
