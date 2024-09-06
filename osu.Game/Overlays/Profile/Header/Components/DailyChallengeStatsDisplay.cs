@@ -107,6 +107,12 @@ namespace osu.Game.Overlays.Profile.Header.Components
 
             APIUserDailyChallengeStatistics stats = User.Value.User.DailyChallengeStatistics;
 
+            if (stats.PlayCount == 0)
+            {
+                Hide();
+                return;
+            }
+
             dailyPlayCount.Text = DailyChallengeStatsDisplayStrings.UnitDay(stats.PlayCount.ToLocalisableString("N0"));
             dailyPlayCount.Colour = colours.ForRankingTier(TierForPlayCount(stats.PlayCount));
 
