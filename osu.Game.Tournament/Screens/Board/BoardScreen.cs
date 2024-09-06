@@ -489,15 +489,16 @@ namespace osu.Game.Tournament.Screens.Board
             // TODO: Detect changes properly
             Drawable oldDisplay = informationDisplayContainer.Child;
             Drawable newDisplay;
+            havePendingSwap = CurrentMatch.Value.PendingSwaps.Any();
 
             var color = pickColour;
             Steps state = Steps.Default;
 
-            if (DetectEX())
+            if (DetectEX() && !havePendingSwap)
             {
                 state = refEX ? Steps.EX : Steps.Halt;
             }
-            else if (DetectWin())
+            else if (DetectWin() && !havePendingSwap)
             {
                 state = refWin && teamWinner == refWinner ? Steps.FinalWin : Steps.Halt;
                 color = refWin && teamWinner == refWinner ? teamWinner : pickColour;
@@ -534,6 +535,11 @@ namespace osu.Game.Tournament.Screens.Board
             {
                 informationDisplayContainer.Child = newDisplay;
                 informationDisplayContainer.FadeInFromZero(duration: 200, easing: Easing.InCubic);
+            }
+
+            if (state == Steps.FinalWin)
+            {
+                AddInternal(new RoundAnimation(teamWinner == TeamColour.Red ? CurrentMatch.Value.Team1.Value : CurrentMatch.Value.Team2.Value, teamWinner));
             }
         }
 
@@ -622,15 +628,7 @@ namespace osu.Game.Tournament.Screens.Board
                     buttonIndicator.Colour = DetectWin() ? Color4.Orange : (DetectEX() ? Color4.White : Color4.Gray);
                     havePendingSwap = CurrentMatch.Value.PendingSwaps.Any();
 
-                    if (teamWinner != TeamColour.Neutral && !havePendingSwap)
-                    {
-                        informationDisplayContainer.Child = new InstructionDisplay(team: teamWinner, step: (refWin && teamWinner == refWinner) ? Steps.FinalWin : Steps.Halt);
-                    }
-                    else if (useEX && !havePendingSwap)
-                    {
-                        informationDisplayContainer.Child = new InstructionDisplay(step: refEX ? Steps.EX : Steps.Halt);
-                    }
-                    else if (!hasTrap)
+                    if (!hasTrap)
                     {
                         // Restore to the last state
                         updateBottomDisplay();
@@ -844,11 +842,11 @@ namespace osu.Game.Tournament.Screens.Board
                 });
             }
 
-            AddInternal(new TournamentIntro(CurrentMatch.Value.Round.Value.Beatmaps.FirstOrDefault(b => b.Beatmap?.OnlineID == beatmapId))
+            /*AddInternal(new TournamentIntro(CurrentMatch.Value.Round.Value.Beatmaps.FirstOrDefault(b => b.Beatmap?.OnlineID == beatmapId))
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
-            });
+            });*/
 
             // setNextMode(); // Uncomment if you still want to automatically set the next mode
 
