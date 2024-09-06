@@ -28,7 +28,6 @@ namespace osu.Game.Tournament.Components
 
         private const float border_width = 5;
 
-        // private readonly Medal medal;
         private readonly Box background;
         private readonly Container backgroundStrip, particleContainer;
         private readonly BackgroundStrip leftStrip, rightStrip;
@@ -280,19 +279,6 @@ namespace osu.Game.Tournament.Components
                     trophy.Delay(2500).FadeIn(500)
                         .MoveToOffset(new Vector2(0, 100), step_duration, Easing.OutQuint);
 
-                    /*this.Animate().Schedule(() =>
-                    {
-                        if (drawableMedal.State != DisplayState.Full)
-                            drawableMedal.State = DisplayState.Icon;
-                    }).Delay(step_duration).Schedule(() =>
-                    {
-                        if (drawableMedal.State != DisplayState.Full)
-                            drawableMedal.State = DisplayState.MedalUnlocked;
-                    }).Delay(step_duration).Schedule(() =>
-                    {
-                        if (drawableMedal.State != DisplayState.Full)
-                            drawableMedal.State = DisplayState.Full;
-                    });*/
                     this.FadeIn(200).Then().Delay(10000).FadeOut(1000);
                 }
             }
@@ -310,10 +296,8 @@ namespace osu.Game.Tournament.Components
 
         public void Dismiss()
         {
-            if (drawableMedal != null)//&& drawableMedal.State != DisplayState.Full)
+            if (drawableMedal != null)
             {
-                // if we haven't yet, play out the animation fully
-                //drawableMedal.State = DisplayState.Full;
                 FinishTransforms(true);
                 return;
             }
