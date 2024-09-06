@@ -26,6 +26,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
     {
         private StreakPiece currentDaily = null!;
         private StreakPiece currentWeekly = null!;
+        private StreakPiece totalParticipation = null!;
         private StatisticsPiece bestDaily = null!;
         private StatisticsPiece bestWeekly = null!;
         private StatisticsPiece topTen = null!;
@@ -70,7 +71,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
                             {
                                 topBackground = new Box
                                 {
-                                    RelativeSizeAxes = Axes.Both,
+                                    RelativeSizeAxes = Axes.None,
                                 },
                                 new FillFlowContainer
                                 {
@@ -78,8 +79,9 @@ namespace osu.Game.Overlays.Profile.Header.Components
                                     Direction = FillDirection.Horizontal,
                                     Padding = new MarginPadding(15f),
                                     Spacing = new Vector2(30f),
-                                    Children = new[]
+                                    Children = new Drawable[]
                                     {
+                                        totalParticipation = new StreakPiece(UsersStrings.ShowDailyChallengePlaycount),
                                         currentDaily = new StreakPiece(UsersStrings.ShowDailyChallengeDailyStreakCurrent),
                                         currentWeekly = new StreakPiece(UsersStrings.ShowDailyChallengeWeeklyStreakCurrent),
                                     }
@@ -112,6 +114,9 @@ namespace osu.Game.Overlays.Profile.Header.Components
 
             background.Colour = colourProvider.Background4;
             topBackground.Colour = colourProvider.Background5;
+
+            totalParticipation.Value = DailyChallengeStatsDisplayStrings.UnitDay(statistics.PlayCount.ToLocalisableString(@"N0"));
+            totalParticipation.ValueColour = colourProvider.Content2;
 
             currentDaily.Value = DailyChallengeStatsDisplayStrings.UnitDay(content.Statistics.DailyStreakCurrent.ToLocalisableString(@"N0"));
             currentDaily.ValueColour = colours.ForRankingTier(TierForDaily(statistics.DailyStreakCurrent));
