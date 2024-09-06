@@ -41,7 +41,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         /// </summary>
         public bool AllPlayersLoaded => instances.All(p => p.PlayerLoaded);
 
-        public bool SettingsAdded { get; private set; } = false;
+        public bool SettingsAdded { get; private set; }
+        private readonly object settingsAddedLock = new object();
 
         protected override UserActivity InitialActivity => new UserActivity.SpectatingMultiplayerGame(Beatmap.Value.BeatmapInfo, Ruleset.Value);
 
@@ -81,15 +82,24 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         /// <summary>
         /// Add a settings group to the bottom of the side container. Intended to be used by rulesets to add spectate-specific settings.
         /// </summary>
-        /// <param name="settings">The settings group to be shown.</param>
-        public void AddSettingsAsync(PlayerSettingsGroup settings)
+        /// <param name="createSettings">A function that returns the settings group to be shown.</param>
+        public void AddSettings(Func<PlayerSettingsGroup> createSettings)
         {
-            SettingsAdded = true;
-
-            LoadComponentAsync(settings, (loadedSettings) =>
+            // This function may be called by multiple drawable rulesets loading at the same time
+            // Without the lock, duplicate setting containers may be added
+            lock (settingsAddedLock)
             {
-                loadedSettings.Expanded.Value = false;
-                leaderboardFlow.Insert(2, loadedSettings);
+                if (SettingsAdded)
+                    return;
+
+                SettingsAdded = true;
+            }
+
+            Schedule(() =>
+            {
+                var settings = createSettings();
+                settings.Expanded.Value = false;
+                leaderboardFlow.Insert(2, settings);
             });
         }
 

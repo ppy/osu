@@ -52,6 +52,8 @@ namespace osu.Game.Rulesets.Osu.UI
 
                 if (multiSpectatorScreen == null)
                     player.AddSettings(new ReplayAnalysisSettings(Config));
+                else if (!multiSpectatorScreen.SettingsAdded)
+                    multiSpectatorScreen.AddSettings(() => new ReplayAnalysisSettings(Config));
 
                 cursorHideEnabled = Config.GetBindable<bool>(OsuRulesetSetting.ReplayCursorHideEnabled);
 
@@ -59,14 +61,6 @@ namespace osu.Game.Rulesets.Osu.UI
                 // Let's wait for someone to report an issue before spending too much time on it.
                 cursorHideEnabled.BindValueChanged(enabled => Playfield.Cursor.FadeTo(enabled.NewValue ? 0 : 1), true);
             }
-        }
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            if (multiSpectatorScreen != null && !multiSpectatorScreen.SettingsAdded)
-                multiSpectatorScreen.AddSettingsAsync(new ReplayAnalysisSettings(Config));
         }
 
         public override DrawableHitObject<OsuHitObject>? CreateDrawableRepresentation(OsuHitObject h) => null;
