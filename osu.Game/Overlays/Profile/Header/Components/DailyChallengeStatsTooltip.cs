@@ -79,7 +79,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
                                     Direction = FillDirection.Horizontal,
                                     Padding = new MarginPadding(15f),
                                     Spacing = new Vector2(30f),
-                                    Children = new Drawable[]
+                                    Children = new[]
                                     {
                                         totalParticipation = new StreakPiece(UsersStrings.ShowDailyChallengePlaycount),
                                         currentDaily = new StreakPiece(UsersStrings.ShowDailyChallengeDailyStreakCurrent),
