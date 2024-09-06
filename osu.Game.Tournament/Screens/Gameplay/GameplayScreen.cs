@@ -26,6 +26,8 @@ namespace osu.Game.Tournament.Screens.Gameplay
         public readonly Bindable<TourneyState> State = new Bindable<TourneyState>();
         private LabelledSwitchButton warmupToggle = null!;
 
+        private bool isChatShown = false;
+
         private TourneyButton chatToggle = null!;
         // private SettingsSlider<float> redMultiplier = null!;
         // private SettingsSlider<float> blueMultiplier = null!;
@@ -34,12 +36,6 @@ namespace osu.Game.Tournament.Screens.Gameplay
 
         [Resolved]
         private TournamentSceneManager? sceneManager { get; set; }
-
-        //[Resolved]
-        //private TournamentMatchChatDisplay chat { get; set; } = null!;
-
-        [Resolved]
-        private Container chatContainer { get; set; } = null!;
 
         private Drawable chroma = null!;
 
@@ -113,7 +109,18 @@ namespace osu.Game.Tournament.Screens.Gameplay
                         {
                             RelativeSizeAxes = Axes.X,
                             Text = "Toggle chat",
-                            Action = () => { if (sceneManager.isChatShown) contract(); else expand();  }// State.Value = State.Value == TourneyState.Idle ? TourneyState.Playing : TourneyState.Idle; }
+                            Action = () => {
+                                if (isChatShown)
+                                {
+                                    isChatShown = false;
+                                    expand();
+                                }
+                                else
+                                {
+                                    isChatShown = true;
+                                    contract();
+                                }
+                            }
                         },
                         new SettingsSlider<int>
                         {
@@ -199,10 +206,8 @@ namespace osu.Game.Tournament.Screens.Gameplay
             scheduledContract?.Cancel();
 
             SongBar.Expanded = false;
-            sceneManager.isChatShown = false;
             scoreDisplay.FadeOut(100);
-            using (chatContainer.BeginDelayedSequence(500))
-                chatContainer.MoveToY(500, 200, Easing.OutQuint);
+            sceneManager.UpdateChatState(true);
         }
 
         private void expand()
@@ -211,9 +216,8 @@ namespace osu.Game.Tournament.Screens.Gameplay
                 return;
 
             scheduledContract?.Cancel();
-            sceneManager.isChatShown = true;
 
-            chatContainer.MoveToY(0, 200, Easing.OutQuint);//(int)(1366 * 9f / 16f) - 144);
+            sceneManager.UpdateChatState(false);
 
             using (BeginDelayedSequence(300))
             {
@@ -241,6 +245,7 @@ namespace osu.Game.Tournament.Screens.Gameplay
                 switch (State.Value)
                 {
                     case TourneyState.Idle:
+                        isChatShown = false;
                         contract();
 
                         if (LadderInfo.AutoProgressScreens.Value)
@@ -265,6 +270,7 @@ namespace osu.Game.Tournament.Screens.Gameplay
                         break;
 
                     default:
+                        isChatShown = true;
                         expand();
                         break;
                 }

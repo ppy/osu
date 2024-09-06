@@ -54,7 +54,7 @@ namespace osu.Game.Tournament
         private TournamentIntro intro = null!;
 
         [Cached]
-        private Container chatContainer = new Container
+        public Container chatContainer = new Container
         {
             Anchor = Anchor.TopLeft,
             Origin = Anchor.TopLeft,
@@ -253,7 +253,7 @@ namespace osu.Game.Tournament
                     chatContainer.FadeIn(TournamentScreen.FADE_DELAY);
                     chatContainer.ResizeWidthTo(STREAM_AREA_WIDTH / 2, 500, Easing.OutQuint);
                     chatContainer.ResizeHeightTo(144, 500, Easing.OutQuint);
-                    chatContainer.MoveTo(new Vector2(0, isChatShown ? STREAM_AREA_HEIGHT - 144 : -500), 500, Easing.OutQuint);
+                    chatContainer.MoveTo(new Vector2(0, isChatShown ? STREAM_AREA_HEIGHT - 144 : STREAM_AREA_HEIGHT + 200), 500, Easing.OutQuint);
                     chat.ChangeRadius(0);
                     break;
 
@@ -358,6 +358,19 @@ namespace osu.Game.Tournament
                     BackgroundColour = isSelected ? Color4.SkyBlue : OsuColour.Gray(0.2f);
                     SpriteText.Colour = isSelected ? Color4.Black : Color4.White;
                 }
+            }
+        }
+
+        public void UpdateChatState(bool isShown)
+        {
+            switch (currentScreen)
+            {
+                case GameplayScreen:
+                    chatContainer.MoveToY(isShown ? STREAM_AREA_HEIGHT - 144 : STREAM_AREA_HEIGHT + 200, 500, Easing.OutQuint);
+                    break;
+
+                default:
+                    return;
             }
         }
     }
