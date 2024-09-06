@@ -99,7 +99,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
 
         private void updateDisplay()
         {
-            if (User.Value == null || User.Value.Ruleset.OnlineID != 0)
+            if (User.Value == null)
             {
                 Hide();
                 return;
