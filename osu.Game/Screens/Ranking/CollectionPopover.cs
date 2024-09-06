@@ -38,6 +38,7 @@ namespace osu.Game.Screens.Ranking
             {
                 new OsuMenu(Direction.Vertical, true)
                 {
+                    MaxHeight = 500,
                     Items = items,
                 },
             };
