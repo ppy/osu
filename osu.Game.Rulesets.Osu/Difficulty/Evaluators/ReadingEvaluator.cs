@@ -18,7 +18,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
         private const double overlap_multiplier = 1;
 
-        public static double EvaluateDensityOf(DifficultyHitObject current, bool applyDistanceNerf = true)
+        public static double EvaluateDensityOf(DifficultyHitObject current, bool applyDistanceNerf = true, bool applySliderbodyDensity = true)
         {
             var currObj = (OsuDifficultyHitObject)current;
 
@@ -40,6 +40,17 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
                 // Small distances means objects may be cheesed, so it doesn't matter whether they are arranged confusingly.
                 if (applyDistanceNerf) loopDifficulty *= (logistic((loopObj.MinimumJumpDistance - 80) / 10) + 0.2) / 1.2;
+
+                // Additional buff for long sliderbodies. OVERBUFFED ON PURPOSE
+                if (applySliderbodyDensity && loopObj.BaseObject is Slider slider)
+                {
+                    // In radiuses, with minimal of 1
+                    double sliderBodyLength = Math.Max(1, slider.Velocity * slider.SpanDuration / slider.Radius);
+
+                    // The maximum is 3x buff
+                    double sliderBodyBuff = Math.Log10(sliderBodyLength);
+                    loopDifficulty *= 1 + 1.5 * Math.Min(sliderBodyBuff, 2);
+                }
 
                 // Reduce density bonus for this object if they're too apart in time
                 // Nerf starts on 1500ms and reaches maximum (*=0) on 3000ms
@@ -153,7 +164,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             if (current.BaseObject is Spinner || current.Index == 0)
                 return 0;
 
-            double difficulty = Math.Pow(4 * Math.Log(Math.Max(1, ((OsuDifficultyHitObject)current).Density)), 2.5);
+            double difficulty = Math.Pow(4 * Math.Log(Math.Max(1, EvaluateDensityOf(current, true, true))), 2.5);
 
             double overlapBonus = EvaluateOverlapDifficultyOf(current) * difficulty;
             difficulty += overlapBonus;
@@ -163,7 +174,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
         public static double EvaluateAimingDensityFactorOf(DifficultyHitObject current)
         {
-            double difficulty = ((OsuDifficultyHitObject)current).Density;
+            double difficulty = EvaluateDensityOf(current, true, false);
 
             return Math.Max(0, Math.Pow(difficulty, 1.5) - 1);
         }
@@ -292,7 +303,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         {
             var currObj = (OsuDifficultyHitObject)current;
 
-            double density = ReadingEvaluator.EvaluateDensityOf(current, false);
+            double density = ReadingEvaluator.EvaluateDensityOf(current, false, false);
             double preempt = currObj.Preempt / 1000;
 
             double densityFactor = Math.Pow(density / 6.2, 1.5);

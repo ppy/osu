@@ -104,11 +104,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         public double RhythmDifficulty { get; private set; }
 
         /// <summary>
-        /// Density of the object for given preempt. Saved for optimization, density calculation is expensive.
-        /// </summary>
-        public double Density { get; private set; }
-
-        /// <summary>
         /// Predictabiliy of the angle. Gives high values only in exceptionally repetitive patterns.
         /// </summary>
         public double AnglePredictability { get; private set; }
@@ -175,7 +170,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             (ReadingObjects, OverlapValues) = getReadingObjects();
 
             RhythmDifficulty = RhythmEvaluator.EvaluateDifficultyOf(this);
-            Density = ReadingEvaluator.EvaluateDensityOf(this);
         }
 
         private (IList<ReadingObject>, IDictionary<int, double>) getReadingObjects()
