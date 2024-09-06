@@ -633,11 +633,15 @@ namespace osu.Game.Tests.NonVisual.Filtering
             new object[] { "0", DateTimeOffset.Now, false },
             new object[] { "false", DateTimeOffset.MinValue, true },
             new object[] { "false", DateTimeOffset.Now, false },
+            new object[] { "no", DateTimeOffset.MinValue, true },
+            new object[] { "no", DateTimeOffset.Now, false },
 
             new object[] { "1", DateTimeOffset.MinValue, false },
             new object[] { "1", DateTimeOffset.Now, true },
             new object[] { "true", DateTimeOffset.MinValue, false },
             new object[] { "true", DateTimeOffset.Now, true },
+            new object[] { "yes", DateTimeOffset.MinValue, false },
+            new object[] { "yes", DateTimeOffset.Now, true },
         };
 
         [Test]
