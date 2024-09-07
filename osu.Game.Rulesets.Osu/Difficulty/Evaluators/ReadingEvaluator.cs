@@ -47,9 +47,19 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                     // In radiuses, with minimal of 1
                     double sliderBodyLength = Math.Max(1, slider.Velocity * slider.SpanDuration / slider.Radius);
 
+                    // Bandaid to fix abuze
+                    sliderBodyLength = Math.Min(sliderBodyLength, 1 + slider.LazyTravelDistance / 8);
+
                     // The maximum is 3x buff
                     double sliderBodyBuff = Math.Log10(sliderBodyLength);
-                    loopDifficulty *= 1 + 1.5 * Math.Min(sliderBodyBuff, 2);
+
+                    // Limit the max buff to prevent abuse with very long sliders.
+                    // With explicit coverage of cases like one very long slider on the map, or just very few objects visible before/after.
+                    double maxBuff = 0.5;
+                    if (i > 0) maxBuff += 1;
+                    if (i < readingObjects.Count - 1) maxBuff += 1;
+
+                    loopDifficulty *= 1 + 1.5 * Math.Min(sliderBodyBuff, maxBuff);
                 }
 
                 // Reduce density bonus for this object if they're too apart in time

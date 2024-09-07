@@ -246,6 +246,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             // This one is goes from 0.0 on delta=0 to 1.0 somewhere around delta=3.4
             double deltaBonus = (1 - Math.Pow(0.95, Math.Pow(ARODDelta, 4)));
 
+            // Nerf delta bonus on OD lower than 10 and 9
+            if (attributes.OverallDifficulty < 10)
+                deltaBonus *= Math.Pow(attributes.OverallDifficulty / 10, 2);
+            if (attributes.OverallDifficulty < 9)
+                deltaBonus *= Math.Pow(attributes.OverallDifficulty / 9, 4);
+
             accuracyValue *= 1 + visualBonus * (1 + 2 * deltaBonus);
             if (score.Mods.Any(h => h is OsuModHidden || h is OsuModTraceable))
                 accuracyValue *= 1 + visualBonus * (1 + deltaBonus);

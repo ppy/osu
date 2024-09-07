@@ -410,6 +410,31 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
             angleDifference -= prevAngleAdjust;
 
+            // Explicit nerf for same pattern repeating
+            OsuDifficultyHitObject? prevObj3 = (OsuDifficultyHitObject?)Previous(3);
+            OsuDifficultyHitObject? prevObj4 = (OsuDifficultyHitObject?)Previous(4);
+            OsuDifficultyHitObject? prevObj5 = (OsuDifficultyHitObject?)Previous(5);
+
+            // 3-3 repeat
+            double similarity3_1 = getGeneralSimilarity(this, prevObj2);
+            double similarity3_2 = getGeneralSimilarity(prevObj0, prevObj3);
+            double similarity3_3 = getGeneralSimilarity(prevObj1, prevObj4);
+
+            double similarity3_max = Math.Max(Math.Max(similarity3_1, similarity3_2), similarity3_3);
+            double similarity3_total = similarity3_1 * similarity3_2 * similarity3_3;
+
+            double similarity3 = Math.Max(Math.Pow(similarity3_max, 3) * 0.5, similarity3_total);
+
+            // 4-4 repeat
+            double similarity4_1 = getGeneralSimilarity(this, prevObj3);
+            double similarity4_2 = getGeneralSimilarity(prevObj0, prevObj4);
+            double similarity4_3 = getGeneralSimilarity(prevObj1, prevObj5);
+
+            double similarity4_max = Math.Pow(Math.Max(Math.Max(similarity4_1, similarity4_2), similarity4_3), 2);
+            double similarity4_total = similarity4_1 * similarity4_2 * similarity4_3;
+
+            double similarity4 = Math.Max(Math.Pow(similarity4_max, 3) * 0.5, similarity4_total);
+
             // Bandaid to fix Rubik's Cube +EZ
             double wideness = 0;
             if (Angle!.Value > Math.PI * 0.5)
@@ -426,7 +451,31 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
             // Angle difference more than 15 degrees gets no penalty
             double adjustedAngleDifference = Math.Min(Math.PI / 12, angleDifference);
-            return rhythmFactor * Math.Cos(Math.Min(Math.PI / 2, 6 * adjustedAngleDifference));
+            double predictability = Math.Cos(Math.Min(Math.PI / 2, 6 * adjustedAngleDifference)) * rhythmFactor;
+
+            // Punish for big pattern similarity
+            return 1 - (1 - predictability) * (1 - Math.Max(similarity3_total, similarity4_total));
+        }
+
+        private double getGeneralSimilarity(OsuDifficultyHitObject? o1, OsuDifficultyHitObject? o2)
+        {
+            if (o1 == null || o2 == null)
+                return 1;
+
+            if (o1.AngleSigned == null || o2.AngleSigned == null)
+                return o1.AngleSigned == o2.AngleSigned ? 1 : 0;
+
+
+            double timeSimilarity = 1 - getTimeDifference(o1.StrainTime, o2.StrainTime);
+
+            double angleDelta = Math.Abs((double)o1.AngleSigned - (double)o2.AngleSigned);
+            angleDelta = Math.Clamp(angleDelta - 0.1, 0, 0.15);
+            double angleSimilarity = 1 - angleDelta / 0.15;
+
+            double distanceDelta = Math.Abs(o1.LazyJumpDistance - o2.LazyJumpDistance) / NORMALISED_RADIUS;
+            double distanceSimilarity = 1 / Math.Max(1, distanceDelta);
+
+            return timeSimilarity * angleSimilarity * distanceSimilarity;
         }
 
         public double OpacityAt(double time, bool hidden)
