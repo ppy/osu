@@ -778,6 +778,15 @@ namespace osu.Game.Tournament.Screens.Board
                 }
             }
 
+            if (pickType == ChoiceType.Pick)
+            {
+                AddInternal(new TournamentIntro(CurrentMatch.Value.Round.Value.Beatmaps.FirstOrDefault(b => b.Beatmap?.OnlineID == beatmapId))
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                });
+            }
+
             // Perform a Swap with the latest untriggered Swap
             if (pickType == ChoiceType.Swap)
             {
@@ -841,12 +850,6 @@ namespace osu.Game.Tournament.Screens.Board
                     Token = true,
                 });
             }
-
-            /*AddInternal(new TournamentIntro(CurrentMatch.Value.Round.Value.Beatmaps.FirstOrDefault(b => b.Beatmap?.OnlineID == beatmapId))
-            {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-            });*/
 
             // setNextMode(); // Uncomment if you still want to automatically set the next mode
 
