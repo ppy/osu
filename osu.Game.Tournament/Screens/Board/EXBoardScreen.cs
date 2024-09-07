@@ -32,6 +32,8 @@ namespace osu.Game.Tournament.Screens.Board
         [Resolved]
         private TournamentSceneManager? sceneManager { get; set; }
 
+        private WarningBox warning = null!;
+
         private TeamColour pickColour = TeamColour.Neutral;
         private ChoiceType pickType = ChoiceType.Pick;
 
@@ -43,6 +45,7 @@ namespace osu.Game.Tournament.Screens.Board
 
         private DrawableTeamPlayerList team1List = null!;
         private DrawableTeamPlayerList team2List = null!;
+        private EmptyBox danmakuBox = null!;
 
         private readonly int sideListHeight = 660;
 
@@ -70,7 +73,7 @@ namespace osu.Game.Tournament.Screens.Board
                     Anchor = Anchor.TopLeft,
                     Origin = Anchor.TopLeft,
                     RelativeSizeAxes = Axes.None,
-                    Position = new Vector2(30, 110),
+                    Position = new Vector2(30, 100),
                     Width = 320,
                     Height = sideListHeight,
                     Direction = FillDirection.Vertical,
@@ -90,7 +93,7 @@ namespace osu.Game.Tournament.Screens.Board
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight,
                     RelativeSizeAxes = Axes.None,
-                    Position = new Vector2(-30, 110),
+                    Position = new Vector2(-30, 100),
                     Width = 320,
                     Height = sideListHeight,
                     Direction = FillDirection.Vertical,
@@ -105,14 +108,13 @@ namespace osu.Game.Tournament.Screens.Board
                         },
                         // A single Box for livestream danmakus.
                         // Wrapped in a container for round corners.
-                        new EmptyBox(cornerRadius: 10)
+                        danmakuBox = new EmptyBox(cornerRadius: 10)
                         {
                             Anchor = Anchor.TopRight,
                             Origin = Anchor.TopRight,
                             RelativeSizeAxes = Axes.None,
                             Width = 300,
                             Height = sideListHeight - team2List.GetHeight() - 5,
-                            Margin = new MarginPadding { Top = 10 },
                             Colour = Color4.Black,
                             Alpha = 0.7f,
                         },
@@ -267,6 +269,13 @@ namespace osu.Game.Tournament.Screens.Board
             if (match.NewValue != null)
             {
                 match.NewValue.PendingMsgs.CollectionChanged += msgOnCollectionChanged;
+
+                if (match.NewValue.Team1 != null) team1List?.ReloadWithTeam(match.NewValue.Team1.Value);
+                if (match.NewValue.Team2 != null && team2List != null)
+                {
+                    team2List.ReloadWithTeam(match.NewValue.Team2.Value);
+                    danmakuBox.ResizeHeightTo(Height = sideListHeight - team2List.GetHeight() - 5, 500, Easing.OutCubic);
+                }
             }
 
             Scheduler.AddOnce(parseCommands);
@@ -417,7 +426,10 @@ namespace osu.Game.Tournament.Screens.Board
             mapFlows.Clear();
 
             if (CurrentMatch.Value == null)
+            {
+                AddInternal(warning = new WarningBox("Cannot access current match, sorry ;w;"));
                 return;
+            }
 
             int totalRows = 0;
 
@@ -426,6 +438,16 @@ namespace osu.Game.Tournament.Screens.Board
                 FillFlowContainer<EXBoardBeatmapPanel>? currentFlow = null;
                 string? currentMods;
                 int flowCount = 0;
+
+                int exCount = CurrentMatch.Value.Round.Value.Beatmaps.Count(p => p.Mods == "EX");
+
+                if (exCount == 0)
+                {
+                    AddInternal(warning = new WarningBox("Seemingly you don't have any EX map set up..."));
+                    return;
+                }
+
+                warning?.FadeOut(duration: 200, easing: Easing.OutCubic);
 
                 foreach (var b in CurrentMatch.Value.Round.Value.Beatmaps)
                 {
@@ -460,12 +482,12 @@ namespace osu.Game.Tournament.Screens.Board
                     });
                 }
             }
-
-            mapFlows.Padding = new MarginPadding(5)
+            else
             {
-                // remove horizontal padding to increase flow width to 3 panels
-                Horizontal = totalRows > 9 ? 0 : 100
-            };
+                AddInternal(warning = new WarningBox("Cannot access current match, sorry ;w;"));
+                return;
+            }
+
         }
     }
 }

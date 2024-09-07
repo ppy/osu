@@ -137,6 +137,16 @@ namespace osu.Game.Tournament.Screens.Editors
                                 Width = 0.2f,
                                 Current = Model.Seed
                             },
+                            new DangerousSettingsButton
+                            {
+                                Width = 0.2f,
+                                Text = "Delete Team",
+                                Action = () => dialogOverlay?.Push(new DeleteTeamDialog(Model, () =>
+                                {
+                                    Expire();
+                                    ladderInfo.Teams.Remove(Model);
+                                })),
+                            },
                             new SettingsSlider<int, LastYearPlacementSlider>
                             {
                                 LabelText = "Last Year Placement",
@@ -146,7 +156,7 @@ namespace osu.Game.Tournament.Screens.Editors
                             new SettingsButton
                             {
                                 Width = 0.2f,
-                                Margin = new MarginPadding(10),
+                                Margin = new MarginPadding { Left = 10 },
                                 Text = "Edit seeding results",
                                 Action = () =>
                                 {
@@ -157,27 +167,8 @@ namespace osu.Game.Tournament.Screens.Editors
                             new SettingsButton
                             {
                                 Text = "Add player",
+                                Margin = new MarginPadding { Top = 10, Bottom = 10 },
                                 Action = () => playerEditor.CreateNew()
-                            },
-                            new Container
-                            {
-                                RelativeSizeAxes = Axes.X,
-                                AutoSizeAxes = Axes.Y,
-                                Children = new Drawable[]
-                                {
-                                    new DangerousSettingsButton
-                                    {
-                                        Width = 0.2f,
-                                        Text = "Delete Team",
-                                        Anchor = Anchor.TopRight,
-                                        Origin = Anchor.TopRight,
-                                        Action = () => dialogOverlay?.Push(new DeleteTeamDialog(Model, () =>
-                                        {
-                                            Expire();
-                                            ladderInfo.Teams.Remove(Model);
-                                        })),
-                                    },
-                                }
                             },
                         }
                     },

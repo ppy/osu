@@ -33,6 +33,8 @@ namespace osu.Game.Tournament.Screens.Board
         [Resolved]
         private TournamentSceneManager? sceneManager { get; set; }
 
+        private WarningBox warning = null!;
+
         private readonly Bindable<TournamentMatch?> currentMatch = new Bindable<TournamentMatch?>();
 
         private TeamColour pickColour;
@@ -70,6 +72,7 @@ namespace osu.Game.Tournament.Screens.Board
 
         private DrawableTeamPlayerList team1List = null!;
         private DrawableTeamPlayerList team2List = null!;
+        private EmptyBox danmakuBox = null!;
 
         private readonly int sideListHeight = 660;
 
@@ -112,7 +115,7 @@ namespace osu.Game.Tournament.Screens.Board
                     Anchor = Anchor.TopLeft,
                     Origin = Anchor.TopLeft,
                     RelativeSizeAxes = Axes.None,
-                    Position = new Vector2(30, 110),
+                    Position = new Vector2(30, 100),
                     Width = 320,
                     Height = sideListHeight,
                     Direction = FillDirection.Vertical,
@@ -132,7 +135,7 @@ namespace osu.Game.Tournament.Screens.Board
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight,
                     RelativeSizeAxes = Axes.None,
-                    Position = new Vector2(-30, 110),
+                    Position = new Vector2(-30, 100),
                     Width = 320,
                     Height = sideListHeight,
                     Direction = FillDirection.Vertical,
@@ -147,14 +150,13 @@ namespace osu.Game.Tournament.Screens.Board
                         },
                         // A single Box for livestream danmakus.
                         // Wrapped in a container for round corners.
-                        new EmptyBox(cornerRadius: 10)
+                        danmakuBox = new EmptyBox(cornerRadius: 10)
                         {
                             Anchor = Anchor.TopRight,
                             Origin = Anchor.TopRight,
                             RelativeSizeAxes = Axes.None,
                             Width = 300,
                             Height = sideListHeight - team2List.GetHeight() - 5,
-                            Margin = new MarginPadding { Top = 10 },
                             Colour = Color4.Black,
                             Alpha = 0.7f,
                         },
@@ -198,80 +200,135 @@ namespace osu.Game.Tournament.Screens.Board
                         {
                             Text = "Current Mode"
                         },
-                        buttonRedProtect = new TourneyButton
+                        new GridContainer
                         {
                             RelativeSizeAxes = Axes.X,
-                            Text = "Red Protect",
-                            BackgroundColour = TournamentGame.COLOUR_RED,
-                            Action = () => setMode(TeamColour.Red, ChoiceType.Protect)
+                            Height = 40,
+                            Content = new[]
+                            {
+                                new Drawable[]
+                                {
+                                    buttonRedProtect = new TourneyButton
+                                    {
+                                        RelativeSizeAxes = Axes.X,
+                                        Text = "Red Protect",
+                                        BackgroundColour = TournamentGame.COLOUR_RED,
+                                        Action = () => setMode(TeamColour.Red, ChoiceType.Protect)
+                                    },
+                                    buttonBlueProtect = new TourneyButton
+                                    {
+                                        RelativeSizeAxes = Axes.X,
+                                        Text = "Blue Protect",
+                                        BackgroundColour = TournamentGame.COLOUR_BLUE,
+                                        Action = () => setMode(TeamColour.Blue, ChoiceType.Protect)
+                                    },
+                                }
+                            },
                         },
-                        buttonBlueProtect = new TourneyButton
+                        new GridContainer
                         {
                             RelativeSizeAxes = Axes.X,
-                            Text = "Blue Protect",
-                            BackgroundColour = TournamentGame.COLOUR_BLUE,
-                            Action = () => setMode(TeamColour.Blue, ChoiceType.Protect)
+                            Height = 40,
+                            Content = new[]
+                            {
+                                new Drawable[]
+                                {
+                                    buttonRedBan = new TourneyButton
+                                    {
+                                        RelativeSizeAxes = Axes.X,
+                                        Text = "Red Ban",
+                                        BackgroundColour = TournamentGame.COLOUR_RED,
+                                        Action = () => setMode(TeamColour.Red, ChoiceType.Ban)
+                                    },
+                                    buttonBlueBan = new TourneyButton
+                                    {
+                                        RelativeSizeAxes = Axes.X,
+                                        Text = "Blue Ban",
+                                        BackgroundColour = TournamentGame.COLOUR_BLUE,
+                                        Action = () => setMode(TeamColour.Blue, ChoiceType.Ban)
+                                    },
+                                }
+                            },
                         },
-                        buttonRedBan = new TourneyButton
+                        new GridContainer
                         {
                             RelativeSizeAxes = Axes.X,
-                            Text = "Red Ban",
-                            BackgroundColour = TournamentGame.COLOUR_RED,
-                            Action = () => setMode(TeamColour.Red, ChoiceType.Ban)
+                            Height = 40,
+                            Content = new[]
+                            {
+                                new Drawable[]
+                                {
+                                    buttonRedPick = new TourneyButton
+                                    {
+                                        RelativeSizeAxes = Axes.X,
+                                        Text = "Red Pick",
+                                        BackgroundColour = TournamentGame.COLOUR_RED,
+                                        Action = () => setMode(TeamColour.Red, ChoiceType.Pick)
+                                    },
+                                    buttonBluePick = new TourneyButton
+                                    {
+                                        RelativeSizeAxes = Axes.X,
+                                        Text = "Blue Pick",
+                                        BackgroundColour = TournamentGame.COLOUR_BLUE,
+                                        Action = () => setMode(TeamColour.Blue, ChoiceType.Pick)
+                                    },
+                                }
+                            },
                         },
-                        buttonBlueBan = new TourneyButton
+                        new GridContainer
                         {
                             RelativeSizeAxes = Axes.X,
-                            Text = "Blue Ban",
-                            BackgroundColour = TournamentGame.COLOUR_BLUE,
-                            Action = () => setMode(TeamColour.Blue, ChoiceType.Ban)
-                        },
-                        buttonRedPick = new TourneyButton
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            Text = "Red Pick",
-                            BackgroundColour = TournamentGame.COLOUR_RED,
-                            Action = () => setMode(TeamColour.Red, ChoiceType.Pick)
-                        },
-                        buttonBluePick = new TourneyButton
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            Text = "Blue Pick",
-                            BackgroundColour = TournamentGame.COLOUR_BLUE,
-                            Action = () => setMode(TeamColour.Blue, ChoiceType.Pick)
-                        },
-                        buttonRedWin = new TourneyButton
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            Text = "Red Win",
-                            BackgroundColour = TournamentGame.COLOUR_RED,
-                            Action = () => setMode(TeamColour.Red, ChoiceType.RedWin)
-                        },
-                        buttonBlueWin = new TourneyButton
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            Text = "Blue Win",
-                            BackgroundColour = TournamentGame.COLOUR_BLUE,
-                            Action = () => setMode(TeamColour.Blue, ChoiceType.BlueWin)
+                            Height = 40,
+                            Content = new[]
+                            {
+                                new Drawable[]
+                                {
+                                    buttonRedWin = new TourneyButton
+                                    {
+                                        RelativeSizeAxes = Axes.X,
+                                        Text = "Red Win",
+                                        BackgroundColour = TournamentGame.COLOUR_RED,
+                                        Action = () => setMode(TeamColour.Red, ChoiceType.RedWin)
+                                    },
+                                    buttonBlueWin = new TourneyButton
+                                    {
+                                        RelativeSizeAxes = Axes.X,
+                                        Text = "Blue Win",
+                                        BackgroundColour = TournamentGame.COLOUR_BLUE,
+                                        Action = () => setMode(TeamColour.Blue, ChoiceType.BlueWin)
+                                    },
+                                }
+                            },
                         },
                         new ControlPanel.Spacer(),
                         trapTypeDropdown = new TrapTypeDropdown
                         {
                             LabelText = "Trap type"
                         },
-                        buttonRedTrap = new TourneyButton
+                        new GridContainer
                         {
                             RelativeSizeAxes = Axes.X,
-                            Text = "Red Trap",
-                            BackgroundColour = TournamentGame.COLOUR_RED,
-                            Action = () => setMode(TeamColour.Red, ChoiceType.Trap)
-                        },
-                        buttonBlueTrap = new TourneyButton
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            Text = "Blue Trap",
-                            BackgroundColour = TournamentGame.COLOUR_BLUE,
-                            Action = () => setMode(TeamColour.Blue, ChoiceType.Trap)
+                            Height = 40,
+                            Content = new[]
+                            {
+                                new Drawable[]
+                                {
+                                    buttonRedTrap = new TourneyButton
+                                    {
+                                        RelativeSizeAxes = Axes.X,
+                                        Text = "Red Trap",
+                                        BackgroundColour = TournamentGame.COLOUR_RED,
+                                        Action = () => setMode(TeamColour.Red, ChoiceType.Trap)
+                                    },
+                                    buttonBlueTrap = new TourneyButton
+                                    {
+                                        RelativeSizeAxes = Axes.X,
+                                        Text = "Blue Trap",
+                                        BackgroundColour = TournamentGame.COLOUR_BLUE,
+                                        Action = () => setMode(TeamColour.Blue, ChoiceType.Trap)
+                                    },
+                                }
+                            },
                         },
                         buttonTrapSwap = new TourneyButton
                         {
@@ -325,6 +382,13 @@ namespace osu.Game.Tournament.Screens.Board
             if (match.NewValue != null)
             {
                 match.NewValue.PendingMsgs.CollectionChanged += msgOnCollectionChanged;
+
+                if (match.NewValue.Team1 != null) team1List?.ReloadWithTeam(match.NewValue.Team1.Value);
+                if (match.NewValue.Team2 != null && team2List != null)
+                {
+                    team2List.ReloadWithTeam(match.NewValue.Team2.Value);
+                    danmakuBox.ResizeHeightTo(Height = sideListHeight - team2List.GetHeight() - 5, 500, Easing.OutCubic);
+                }
             }
 
             Scheduler.AddOnce(parseCommands);
@@ -386,7 +450,8 @@ namespace osu.Game.Tournament.Screens.Board
                         pickColour = command.Team;
                         pickType = ChoiceType.Pick;
                         addForBeatmap(command.MapMod);
-                        updateBottomDisplay();
+                        var map = CurrentMatch.Value.Round.Value.Beatmaps.FirstOrDefault(b => b.Mods + b.ModIndex == command.MapMod);
+                        if (CurrentMatch.Value.Traps.All(p => p.BeatmapID != map.Beatmap.OnlineID)) updateBottomDisplay();
                         break;
 
                     default:
@@ -428,7 +493,7 @@ namespace osu.Game.Tournament.Screens.Board
             var color = pickColour;
             Steps state = Steps.Default;
 
-            if (useEX)
+            if (DetectEX())
             {
                 state = refEX ? Steps.EX : Steps.Halt;
             }
@@ -652,7 +717,7 @@ namespace osu.Game.Tournament.Screens.Board
                 // don't attempt to add if the beatmap isn't in our pool
                 return;
 
-            if (CurrentMatch.Value.PicksBans.Any(p => p.BeatmapID == beatmapId && ((p.Type == ChoiceType.Ban || p.Type == ChoiceType.RedWin || p.Type == ChoiceType.BlueWin) && !isPickWin)))
+            if (CurrentMatch.Value.PicksBans.Any(p => p.BeatmapID == beatmapId && ((p.Type == ChoiceType.Ban || p.Type == ChoiceType.RedWin || p.Type == ChoiceType.BlueWin) && !isPickWin && pickType != ChoiceType.Swap)))
                 // don't attempt to add if already banned / winned and it's not a win type.
                 return;
 
@@ -949,7 +1014,7 @@ namespace osu.Game.Tournament.Screens.Board
         /// <param name="endX">The end point of the line, X value.</param>
         /// <param name="endY">The end point of the line, Y value.</param>
         /// <returns>the winner team's colour, or <see cref="TeamColour.Neutral"/> if there isn't one</returns>
-        private TeamColour isWin(int startX, int startY, int endX, int endY)
+        private TeamColour isWin(int startY, int startX, int endY, int endX)
         {
             List<RoundBeatmap> mapLine = new List<RoundBeatmap>();
             const TeamColour colourfalse = TeamColour.Neutral;
@@ -1014,7 +1079,7 @@ namespace osu.Game.Tournament.Screens.Board
         /// <param name="endX">The end point of the line, X value.</param>
         /// <param name="endY">The end point of the line, Y value.</param>
         /// <returns>true if can, otherwise false</returns>
-        private bool canWin(int startX, int startY, int endX, int endY)
+        private bool canWin(int startY, int startX, int endY, int endX)
         {
             List<RoundBeatmap> mapLine = new List<RoundBeatmap>();
             TeamColour thisColour = TeamColour.Neutral;
@@ -1061,26 +1126,27 @@ namespace osu.Game.Tournament.Screens.Board
         /// <param name="Y">The Y coordinate value of the beatmap.</param>
         /// <returns>A <see cref="RoundBeatmap"/>, pointing to the corresponding beatmap.</returns>
         private RoundBeatmap? getBoardMap(int X, int Y)
-            => CurrentMatch.Value?.Round.Value?.Beatmaps.FirstOrDefault(p => (p.BoardX == X && p.BoardY == Y)) ?? null;
+            => CurrentMatch.Value?.Round.Value?.Beatmaps.FirstOrDefault(p => (p.BoardX == X && p.BoardY == Y && p.Mods != "EX")) ?? null;
 
         private void updateDisplay()
         {
             mapFlows.Clear();
 
             if (CurrentMatch.Value == null)
+            {
+                AddInternal(warning = new WarningBox("Cannot access current match, sorry ;w;"));
                 return;
-
-            // const int maxRows = 4;
-            int totalRows = 0;
+            }
 
             if (CurrentMatch.Value.Round.Value != null)
             {
                 FillFlowContainer<BoardBeatmapPanel>? currentFlow = null;
-                int flowCount = 0;
 
                 // Use predefined Board coodinate
                 if (CurrentMatch.Value.Round.Value.UseBoard.Value)
                 {
+                    warning?.FadeOut(duration: 200, easing: Easing.OutCubic);
+
                     for (int i = 1; i <= 4; i++)
                     {
                         mapFlows.Add(currentFlow = new FillFlowContainer<BoardBeatmapPanel>
@@ -1109,50 +1175,13 @@ namespace osu.Game.Tournament.Screens.Board
                         }
                     }
                 }
-                // Normal placement
                 else
                 {
-                    foreach (var b in CurrentMatch.Value.Round.Value.Beatmaps)
-                    {
-                        // Exclude EX beatmaps from the list
-                        if (b.Mods == "EX") continue;
-
-                        if (currentFlow == null)
-                        {
-                            mapFlows.Add(currentFlow = new FillFlowContainer<BoardBeatmapPanel>
-                            {
-                                Spacing = new Vector2(10, 10),
-                                Direction = FillDirection.Full,
-                                RelativeSizeAxes = Axes.X,
-                                AutoSizeAxes = Axes.Y
-                            });
-
-                            totalRows++;
-                            flowCount = 0;
-                        }
-
-                        // One flow per row
-                        if (++flowCount > 2)
-                        {
-                            totalRows++;
-                            flowCount = 1;
-                        }
-
-                        currentFlow.Add(new BoardBeatmapPanel(b.Beatmap, b.Mods, b.ModIndex)
-                        {
-                            Anchor = Anchor.TopCentre,
-                            Origin = Anchor.TopCentre,
-                            Height = 150,
-                        });
-                    }
+                    AddInternal(warning = new WarningBox("This round isn't set up for board view..."));
+                    return;
                 }
+                mapFlows.Padding = new MarginPadding(5);
             }
-
-            mapFlows.Padding = new MarginPadding(5)
-            {
-                // remove horizontal padding to increase flow width to 3 panels
-                Horizontal = totalRows > 9 ? 0 : 100
-            };
         }
     }
 }

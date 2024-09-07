@@ -74,14 +74,37 @@ namespace osu.Game.Tournament.Components
             currentMatch.BindValueChanged(matchChanged);
             currentMatch.BindTo(ladder.CurrentMatch);
 
-
             var displayTitle = Beatmap?.GetDisplayTitleRomanisable(false, false) ?? (LocalisableString)@"unknown";
-            string songName = displayTitle.ToString().Split('-').Last().Trim();
-            string truncatedSongName = songName.TruncateWithEllipsis(17);
+
+            string[] songNameList = displayTitle.ToString().Split(' ');
+
+            int firstHyphenIndex = 0;
+
+            // Find the first " - " (Hopefully it isn't in the Artists field)
+            for (int i = 0; i < songNameList.Count(); i++)
+            {
+                string obj = songNameList.ElementAt(i);
+                if (obj == "-")
+                {
+                    firstHyphenIndex = i;
+                    break;
+                }
+            }
+
+            var TitleList = songNameList.Skip(firstHyphenIndex + 1);
+
+            // Re-construct
+            string songName = string.Empty;
+            for (int i = 0; i < TitleList.Count(); i++)
+            {
+                songName += TitleList.ElementAt(i).Trim();
+                if (i != TitleList.Count() - 1) songName += ' ';
+            }
+
+            string truncatedSongName = songName.Trim().TruncateWithEllipsis(17);
 
             string displayDifficulty = Beatmap?.DifficultyName ?? "unknown";
-            string difficultyName = displayDifficulty.ToString().Split('-').Last().Trim();
-            string truncatedDifficultyName = difficultyName.TruncateWithEllipsis(19);
+            string truncatedDifficultyName = displayDifficulty.TruncateWithEllipsis(19);
 
             Masking = true;
 

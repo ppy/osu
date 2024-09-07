@@ -112,8 +112,8 @@ namespace osu.Game.Tournament
                         },
                         chatContainer = new Container
                         {
-                            Anchor = Anchor.BottomLeft,
-                            Origin = Anchor.BottomLeft,
+                            Anchor = Anchor.TopLeft,
+                            Origin = Anchor.TopLeft,
                             RelativeSizeAxes = Axes.None,
                             Width = STREAM_AREA_WIDTH,
                             Height = 480,
@@ -231,7 +231,7 @@ namespace osu.Game.Tournament
                     chatContainer.FadeIn(TournamentScreen.FADE_DELAY);
                     chatContainer.ResizeWidthTo(STREAM_AREA_WIDTH, 500, Easing.OutQuint);
                     chatContainer.ResizeHeightTo(144, 500, Easing.OutQuint);
-                    chatContainer.MoveTo(new Vector2(0, 0), 500, Easing.OutQuint);
+                    chatContainer.MoveTo(new Vector2(0, STREAM_AREA_HEIGHT - 144), 500, Easing.OutQuint);
                     chat.ChangeRadius(0);
                     break;
 
@@ -239,13 +239,13 @@ namespace osu.Game.Tournament
                     chatContainer.FadeIn(TournamentScreen.FADE_DELAY);
                     chatContainer.ResizeWidthTo(STREAM_AREA_WIDTH / 2, 500, Easing.OutQuint);
                     chatContainer.ResizeHeightTo(144, 500, Easing.OutQuint);
-                    chatContainer.MoveTo(new Vector2(0, 0), 500, Easing.OutQuint);
+                    chatContainer.MoveTo(new Vector2(0, STREAM_AREA_HEIGHT - 144), 500, Easing.OutQuint);
                     chat.ChangeRadius(0);
                     break;
 
                 case BoardScreen or EXBoardScreen:
                     chatContainer.FadeIn(TournamentScreen.FADE_DELAY);
-                    chatContainer.MoveTo(new Vector2(30, -(270 - team1List.GetHeight() - 5)), 500, Easing.OutQuint);
+                    chatContainer.MoveTo(new Vector2(30, team1List.GetHeight() + 100), 500, Easing.OutQuint);
                     chatContainer.ResizeWidthTo(300, 500, Easing.OutQuint);
                     chatContainer.ResizeHeightTo(660 - team1List.GetHeight() - 5, 500, Easing.OutQuint);
                     chat.ChangeRadius(10);
