@@ -75,7 +75,7 @@ namespace osu.Game.Tournament.Components
                     break;
 
                 case "EX":
-                    color = Color4Extensions.FromHex("#7b74ec");
+                    color = Color4Extensions.FromHex("#ffa500");
                     break;
 
                 case "TB":

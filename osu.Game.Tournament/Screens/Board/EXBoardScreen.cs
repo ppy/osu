@@ -401,7 +401,15 @@ namespace osu.Game.Tournament.Screens.Board
 
             if (pickType == ChoiceType.Pick)
             {
-                AddInternal(new TournamentIntro(CurrentMatch.Value.Round.Value.Beatmaps.FirstOrDefault(b => b.Beatmap?.OnlineID == beatmapId)));
+                var map = CurrentMatch.Value.Round.Value.Beatmaps.FirstOrDefault(b => b.Beatmap?.OnlineID == beatmapId);
+                if (map != null)
+                {
+                    AddInternal(new TournamentIntro(map)
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                    });
+                }
             }
 
             if (LadderInfo.AutoProgressScreens.Value)
