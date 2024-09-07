@@ -12,7 +12,6 @@ using osu.Game.Overlays.Notifications;
 using osu.Game.Screens.Menu;
 using osu.Game.Localisation;
 
-
 namespace osu.Game.Screens.OnlinePlay.DailyChallenge
 {
     public partial class NewDailyChallengeNotification : SimpleNotification
@@ -38,6 +37,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
                     game?.PerformFromScreen(s => s.Push(new DailyChallenge(room)), [typeof(MainMenu)]);
                 else
                     game?.PerformFromScreen(s => s.Push(new DailyChallengeIntro(room)), [typeof(MainMenu)]);
+
                 return true;
             };
         }
