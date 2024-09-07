@@ -520,6 +520,18 @@ namespace osu.Game.Tests.Visual.SongSelect
             waitForSelection(set_count);
         }
 
+        [Solo]
+        [Test]
+        public void TestDifficultiesSplitOutOnLoad()
+        {
+            loadBeatmaps(new List<BeatmapSetInfo> { TestResources.CreateTestBeatmapSetInfo(diff_count) }, () => new FilterCriteria
+            {
+                Sort = SortMode.Difficulty,
+            });
+
+            checkVisibleItemCount(false, 3);
+        }
+
         [Test]
         public void TestAddRemoveDifficultySort()
         {
