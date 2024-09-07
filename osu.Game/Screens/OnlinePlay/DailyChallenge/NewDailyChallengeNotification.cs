@@ -32,7 +32,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
             Content.Add(card = new BeatmapCardNano((APIBeatmapSet)room.Playlist.Single().Beatmap.BeatmapSet!));
             Activated = () =>
             {
-                if(statics.Get<bool>(Static.DailyChallengeIntroPlayed))
+                if (statics.Get<bool>(Static.DailyChallengeIntroPlayed))
                     game?.PerformFromScreen(s => s.Push(new DailyChallenge(room)), [typeof(MainMenu)]);
                 else
                     game?.PerformFromScreen(s => s.Push(new DailyChallengeIntro(room)), [typeof(MainMenu)]);
