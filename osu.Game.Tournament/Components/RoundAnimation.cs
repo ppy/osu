@@ -266,8 +266,10 @@ namespace osu.Game.Tournament.Components
                     textContainer.FadeIn(step_duration);
 
                     flag.Delay(2500)
-                        .FadeIn(500).MoveToOffset(new Vector2(0, -50), 900, Easing.OutQuint)
-                        .Then().ScaleTo(2f, 1800, Easing.OutSine);
+                        .FadeIn(500)
+                        .MoveToOffset(new Vector2(0, -50), 900, Easing.OutQuint)
+                        .Then()
+                        .ScaleTo(2f, 1800, Easing.OutExpo);
 
                     ggText.FadeIn(1000)
                           .Then().Delay(step_duration)
