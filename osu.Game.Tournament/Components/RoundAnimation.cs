@@ -266,18 +266,18 @@ namespace osu.Game.Tournament.Components
                     textContainer.FadeIn(step_duration);
 
                     flag.Delay(2500)
-                        .FadeIn(500).MoveToOffset(new Vector2(0, -50), 400, Easing.InQuint)
-                        .Then().ScaleTo(2f, 3000, Easing.OutSine);
+                        .FadeIn(500).MoveToOffset(new Vector2(0, -50), 900, Easing.OutQuint)
+                        .Then().ScaleTo(2f, 1800, Easing.OutSine);
 
                     ggText.FadeIn(1000)
-                        .Then().Delay(step_duration)
-                        .Then().MoveToOffset(new Vector2(0, 50), step_duration, Easing.OutQuint).FadeOut(500, Easing.OutQuint);
+                          .Then().Delay(step_duration)
+                          .Then().MoveToOffset(new Vector2(0, 50), step_duration, Easing.OutQuint).FadeOut(500, Easing.OutQuint);
 
                     cText.Delay(2500).FadeIn(500)
-                        .MoveToOffset(new Vector2(0, 50), step_duration, Easing.OutQuint);
+                         .MoveToOffset(new Vector2(0, 50), step_duration, Easing.OutQuint);
 
                     trophy.Delay(2500).FadeIn(500)
-                        .MoveToOffset(new Vector2(0, 100), step_duration, Easing.OutQuint);
+                          .MoveToOffset(new Vector2(0, 100), step_duration, Easing.OutQuint);
 
                     this.FadeIn(200).Then().Delay(10000).FadeOut(1000);
                 }
