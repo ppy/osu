@@ -53,7 +53,7 @@ namespace osu.Game.Screens.Edit.Timing
         private void load(OverlayColourProvider colours)
         {
             RelativeSizeAxes = Axes.Both;
-            Padding = new() { Bottom = 50 };
+            Padding = new MarginPadding { Bottom = 50 };
 
             InternalChildren = new Drawable[]
             {
