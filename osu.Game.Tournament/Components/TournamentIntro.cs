@@ -208,13 +208,13 @@ namespace osu.Game.Tournament.Components
                                                     Origin = Anchor.TopCentre,
                                                     Shear = new Vector2(-OsuGame.SHEAR, 0f),
                                                     MaxWidth = horizontal_info_size,
-                                                    Text = map.Beatmap.Metadata.GetDisplayTitleRomanisable(false),
+                                                    Text = map.Beatmap != null ? map.Beatmap.Metadata.GetDisplayTitleRomanisable(false) : "This beatmap!",
                                                     Padding = new MarginPadding { Horizontal = 5f },
                                                     Font = OsuFont.GetFont(size: 26),
                                                 },
                                                 new TruncatingSpriteText
                                                 {
-                                                    Text = $"Difficulty: {map.Beatmap.DifficultyName}",
+                                                    Text = $"Difficulty: {(map.Beatmap != null ? map.Beatmap.DifficultyName : "A Random Difficulty")}",
                                                     Font = OsuFont.GetFont(size: 20, italics: true),
                                                     MaxWidth = horizontal_info_size,
                                                     Shear = new Vector2(-OsuGame.SHEAR, 0f),
@@ -223,7 +223,7 @@ namespace osu.Game.Tournament.Components
                                                 },
                                                 new TruncatingSpriteText
                                                 {
-                                                    Text = $"by {map.Beatmap.Metadata.Author.Username}",
+                                                    Text = $"by {(map.Beatmap != null ? map.Beatmap.Metadata.Author.Username : "A Random Mapper")}",
                                                     Font = OsuFont.GetFont(size: 16, italics: true),
                                                     MaxWidth = horizontal_info_size,
                                                     Shear = new Vector2(-OsuGame.SHEAR, 0f),
@@ -275,7 +275,7 @@ namespace osu.Game.Tournament.Components
 
         private void updateAnimationState()
         {
-            if (!beatmapBackgroundLoaded) // || !this.IsCurrentScreen())
+            if (!beatmapBackgroundLoaded)
                 return;
 
             if (animationBegan)
@@ -328,9 +328,6 @@ namespace osu.Game.Tournament.Components
                     using (BeginDelayedSequence(240))
                     {
                         beatmapContent.FadeInFromZero(280, Easing.InQuad);
-
-                        // using (BeginDelayedSequence(300))
-                            // Schedule(() => ApplyToBackground(bs => ((RoomBackgroundScreen)bs).SelectedItem.Value = item));
 
                         using (BeginDelayedSequence(400))
                             flash.FadeOutFromOne(5000, Easing.OutQuint);

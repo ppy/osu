@@ -450,8 +450,13 @@ namespace osu.Game.Tournament.Screens.Board
                         pickColour = command.Team;
                         pickType = ChoiceType.Pick;
                         addForBeatmap(command.MapMod);
-                        var map = CurrentMatch.Value.Round.Value.Beatmaps.FirstOrDefault(b => b.Mods + b.ModIndex == command.MapMod);
-                        if (CurrentMatch.Value.Traps.All(p => p.BeatmapID != map.Beatmap.OnlineID)) updateBottomDisplay();
+
+                        if (CurrentMatch.Value.Round.Value != null)
+                        {
+                            var map = CurrentMatch.Value.Round.Value.Beatmaps.FirstOrDefault(b => b.Mods + b.ModIndex == command.MapMod);
+                            if (map != null && map.Beatmap != null && CurrentMatch.Value.Traps.All(p => p.BeatmapID != map.Beatmap.OnlineID)) updateBottomDisplay();
+                        }
+
                         break;
 
                     default:
@@ -486,9 +491,11 @@ namespace osu.Game.Tournament.Screens.Board
 
         private void updateBottomDisplay()
         {
-            // TODO: Detect changes properly
             Drawable oldDisplay = informationDisplayContainer.Child;
             Drawable newDisplay;
+
+            if (CurrentMatch.Value == null) return;
+
             havePendingSwap = CurrentMatch.Value.PendingSwaps.Any();
 
             var color = pickColour;
@@ -780,11 +787,15 @@ namespace osu.Game.Tournament.Screens.Board
 
             if (pickType == ChoiceType.Pick)
             {
-                AddInternal(new TournamentIntro(CurrentMatch.Value.Round.Value.Beatmaps.FirstOrDefault(b => b.Beatmap?.OnlineID == beatmapId))
+                var introMap = CurrentMatch.Value.Round.Value.Beatmaps.FirstOrDefault(b => b.Beatmap?.OnlineID == beatmapId);
+                if (introMap != null)
                 {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                });
+                    AddInternal(new TournamentIntro(introMap)
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                    });
+                }
             }
 
             // Perform a Swap with the latest untriggered Swap
@@ -1177,7 +1188,7 @@ namespace osu.Game.Tournament.Screens.Board
                                     Origin = Anchor.TopCentre,
                                     Height = 150,
                                 });
-                                CurrentMatch.Value.PendingSwaps.Remove(hasSwappedMap);
+                                if (hasSwappedMap != null) CurrentMatch.Value.PendingSwaps.Remove(hasSwappedMap);
                             }
                         }
                     }

@@ -8,7 +8,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Threading;
 using osu.Game.Graphics.UserInterfaceV2;
-using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.Settings;
 using osu.Game.Tournament.Components;
 using osu.Game.Tournament.IPC;
@@ -30,6 +29,7 @@ namespace osu.Game.Tournament.Screens.Gameplay
         private bool isChatShown = false;
 
         private TourneyButton chatToggle = null!;
+
         // private SettingsSlider<float> redMultiplier = null!;
         // private SettingsSlider<float> blueMultiplier = null!;
 
@@ -210,7 +210,7 @@ namespace osu.Game.Tournament.Screens.Gameplay
 
             SongBar.Expanded = false;
             scoreDisplay.FadeOut(100);
-            sceneManager.UpdateChatState(true);
+            sceneManager?.UpdateChatState(true);
         }
 
         private void expand()
@@ -220,7 +220,7 @@ namespace osu.Game.Tournament.Screens.Gameplay
 
             scheduledContract?.Cancel();
 
-            sceneManager.UpdateChatState(false);
+            sceneManager?.UpdateChatState(false);
 
             using (BeginDelayedSequence(300))
             {
