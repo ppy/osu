@@ -275,7 +275,7 @@ namespace osu.Game.Tournament.Components
 
         private void updateAnimationState()
         {
-            if (!beatmapBackgroundLoaded)// || !this.IsCurrentScreen())
+            if (!beatmapBackgroundLoaded) // || !this.IsCurrentScreen())
                 return;
 
             if (animationBegan)
@@ -287,7 +287,7 @@ namespace osu.Game.Tournament.Components
 
         private void beginAnimation()
         {
-            using (BeginDelayedSequence(200))
+            using (BeginDelayedSequence(1500))
             {
                 introContent.Show();
 
@@ -314,9 +314,9 @@ namespace osu.Game.Tournament.Components
                 {
                     beatmapContent
                         .ScaleTo(3)
-                        .ScaleTo(1f, 500, Easing.In)
+                        .ScaleTo(1.15f, 500, Easing.In)
                         .Then()
-                        .ScaleTo(1.3f, 4000, Easing.OutCubic);
+                        .ScaleTo(1.3f, 2000, Easing.OutCubic);
 
                     using (BeginDelayedSequence(100))
                     {
@@ -336,9 +336,10 @@ namespace osu.Game.Tournament.Components
                             flash.FadeOutFromOne(5000, Easing.OutQuint);
                     }
                 }
-                using (BeginDelayedSequence(10000))
+
+                using (BeginDelayedSequence(6000))
                 {
-                    this.FadeOutFromOne(3000, Easing.OutQuint);
+                    this.FadeOutFromOne(3000, Easing.OutExpo);
                 }
             }
         }
