@@ -5,6 +5,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps;
@@ -21,8 +22,9 @@ namespace osu.Game.Tournament.Components
 {
     public partial class TournamentIntro : CompositeDrawable
     {
-        // private readonly Room room;
         private RoundBeatmap map = null!;
+        private string mod = null!;
+        private ColourInfo color;
 
         private Container introContent = null!;
         private Container topTitleDisplay = null!;
@@ -30,6 +32,7 @@ namespace osu.Game.Tournament.Components
         private Container beatmapBackground = null!;
         private Box flash = null!;
         private EmptyBox dummyBackground = null!;
+        private OsuSpriteText modText = null!;
 
         private FillFlowContainer beatmapContent = null!;
 
@@ -47,6 +50,42 @@ namespace osu.Game.Tournament.Components
         public TournamentIntro(RoundBeatmap map)
         {
             this.map = map;
+            mod = map.Mods + map.ModIndex;
+
+            switch (map.Mods)
+            {
+                case "HR":
+                    color = Color4Extensions.FromHex("#f76363");
+                    break;
+
+                case "FM":
+                    color = Color4Extensions.FromHex("#24eecb");
+                    break;
+
+                case "NM":
+                    color = Color4Extensions.FromHex("#ffdb75");
+                    break;
+
+                case "DT":
+                    color = Color4Extensions.FromHex("#66ccff");
+                    break;
+
+                case "HD":
+                    color = Color4Extensions.FromHex("#fdc300");
+                    break;
+
+                case "EX":
+                    color = Color4Extensions.FromHex("#7b74ec");
+                    break;
+
+                case "TB":
+                    color = Color4.Yellow;
+                    break;
+
+                default:
+                    color = Color4.White;
+                    break;
+            }
         }
 
         // protected override BackgroundScreen CreateBackground() => new DailyChallengeIntroBackgroundScreen(colourProvider);
@@ -105,7 +144,7 @@ namespace osu.Game.Tournament.Components
                                         {
                                             Anchor = Anchor.Centre,
                                             Origin = Anchor.Centre,
-                                            Text = "You picked...",
+                                            Text = "You've picked...",
                                             Margin = new MarginPadding { Horizontal = 10f, Vertical = 5f },
                                             Shear = new Vector2(-OsuGame.SHEAR, 0f),
                                             Font = OsuFont.GetFont(size: 32, weight: FontWeight.Light, typeface: Typeface.TorusAlternate),
@@ -127,14 +166,15 @@ namespace osu.Game.Tournament.Components
                                             Colour = colourProvider.Background3,
                                             RelativeSizeAxes = Axes.Both,
                                         },
-                                        new OsuSpriteText
+                                        modText = new OsuSpriteText
                                         {
                                             Anchor = Anchor.Centre,
                                             Origin = Anchor.Centre,
-                                            Text = "...the map:",
+                                            Text = $"...{mod}:",
                                             Margin = new MarginPadding { Horizontal = 10f, Vertical = 5f },
                                             Shear = new Vector2(-OsuGame.SHEAR, 0f),
-                                            Font = OsuFont.GetFont(size: 32, weight: FontWeight.Light, typeface: Typeface.TorusAlternate),
+                                            Font = OsuFont.GetFont(size: 45, weight: FontWeight.SemiBold, typeface: Typeface.TorusAlternate),
+                                            Colour = colourProvider.Background3,
                                         },
                                     }
                                 },
@@ -304,6 +344,9 @@ namespace osu.Game.Tournament.Components
                                .MoveToY(-y_offset_end, 300, Easing.OutQuint)
                                .Then()
                                .MoveToY(0, 4000);
+
+                modText.Delay(200)
+                    .Then().FadeColour(color, 500, Easing.OutQuint);
 
                 bottomDateDisplay.MoveToY(y_offset_start)
                                  .MoveToY(y_offset_end, 300, Easing.OutQuint)
