@@ -76,10 +76,5 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         /// Converts difficulty value from <see cref="OsuDifficultyAttributes"/> to base performance.
         /// </summary>
         public static double DifficultyToPerformance(double difficulty) => Math.Pow(5.0 * Math.Max(1.0, difficulty / 0.0675) - 4.0, 3.0) / 100000.0;
-
-        /// <summary>
-        /// Converts base performance to <see cref="OsuDifficultyAttributes"/> difficulty value.s
-        /// </summary>
-        public static double PerformanceToDifficulty(double performance) => (Math.Pow(100000.0 * performance, 1.0 / 3.0) + 4.0) / 5.0 * 0.0675;
     }
 }

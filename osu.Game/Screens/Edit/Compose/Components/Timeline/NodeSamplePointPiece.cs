@@ -22,6 +22,12 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             NodeIndex = nodeIndex;
         }
 
+        protected override double GetTime()
+        {
+            var hasRepeats = (IHasRepeats)HitObject;
+            return HitObject.StartTime + hasRepeats.Duration * NodeIndex / hasRepeats.SpanCount();
+        }
+
         protected override IList<HitSampleInfo> GetSamples()
         {
             var hasRepeats = (IHasRepeats)HitObject;
@@ -34,12 +40,12 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         {
             private readonly int nodeIndex;
 
-            protected override IList<HitSampleInfo> GetRelevantSamples(HitObject ho)
+            protected override IEnumerable<(HitObject hitObject, IList<HitSampleInfo> samples)> GetRelevantSamples(HitObject[] hitObjects)
             {
-                if (ho is not IHasRepeats hasRepeats)
-                    return ho.Samples;
+                if (hitObjects.Length > 1 || hitObjects[0] is not IHasRepeats hasRepeats)
+                    return base.GetRelevantSamples(hitObjects);
 
-                return nodeIndex < hasRepeats.NodeSamples.Count ? hasRepeats.NodeSamples[nodeIndex] : ho.Samples;
+                return [(hitObjects[0], nodeIndex < hasRepeats.NodeSamples.Count ? hasRepeats.NodeSamples[nodeIndex] : hitObjects[0].Samples)];
             }
 
             public NodeSampleEditPopover(HitObject hitObject, int nodeIndex)
