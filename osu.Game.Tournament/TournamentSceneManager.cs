@@ -369,5 +369,10 @@ namespace osu.Game.Tournament
                     return;
             }
         }
+
+        public void HideShowChat(int duration) =>
+            chatContainer.Delay(1500).FadeTo(0.6f, duration, Easing.OutQuint)
+                .Then().Delay(7500).FadeIn(duration, Easing.OutQuint);
+        public void ShowChat(int duration) => chatContainer.FadeIn(duration, Easing.OutQuint);
     }
 }

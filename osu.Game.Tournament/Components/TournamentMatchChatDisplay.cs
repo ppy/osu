@@ -61,12 +61,12 @@ namespace osu.Game.Tournament.Components
 
                     if (channel == null)
                     {
-                        channel = new Channel(new APIUser { Id = 3 })
-                        // channel = new Channel
+                        // channel = new Channel(new APIUser { Id = 3 })
+                        channel = new Channel
                         {
-                            Id = 51163657,
-                            // Type = ChannelType.Public,
-                            Type = ChannelType.PM,
+                            Id = id,
+                            Type = ChannelType.Public,
+                            // Type = ChannelType.PM,
                         };
                         manager.JoinChannel(channel);
                     }

@@ -22,6 +22,9 @@ namespace osu.Game.Tournament.Components
 {
     public partial class TournamentIntro : CompositeDrawable
     {
+        [Resolved]
+        private TournamentSceneManager? sceneManager { get; set; }
+
         private RoundBeatmap map = null!;
         private string mod = null!;
         private ColourInfo color;
@@ -87,8 +90,6 @@ namespace osu.Game.Tournament.Components
                     break;
             }
         }
-
-        // protected override BackgroundScreen CreateBackground() => new DailyChallengeIntroBackgroundScreen(colourProvider);
 
         [BackgroundDependencyLoader]
         private void load(BeatmapDifficultyCache difficultyCache)
@@ -308,6 +309,7 @@ namespace osu.Game.Tournament.Components
 
                 beatmapBackgroundLoaded = true;
                 updateAnimationState();
+                sceneManager?.HideShowChat(400);
             });
             this.FadeInFromZero(400, Easing.OutQuint);
             updateAnimationState();
