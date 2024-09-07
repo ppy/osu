@@ -137,6 +137,8 @@ namespace osu.Game.Screens.Select
 
         private void loadNewRoot()
         {
+            beatmapsSplitOut = activeCriteria.SplitOutDifficulties;
+
             // Ensure no changes are made to the list while we are initialising items.
             // We'll catch up on changes via subscriptions anyway.
             BeatmapSetInfo[] loadableSets = detachedBeatmapSets!.ToArray();
@@ -726,7 +728,6 @@ namespace osu.Game.Screens.Select
 
                 if (activeCriteria.SplitOutDifficulties != beatmapsSplitOut)
                 {
-                    beatmapsSplitOut = activeCriteria.SplitOutDifficulties;
                     loadNewRoot();
                     return;
                 }
