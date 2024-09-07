@@ -25,7 +25,6 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
             this.room = room;
         }
 
-
         [BackgroundDependencyLoader]
         private void load(OsuGame? game, SessionStatics statics)
         {
