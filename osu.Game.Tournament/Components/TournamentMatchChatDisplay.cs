@@ -90,9 +90,8 @@ namespace osu.Game.Tournament.Components
             if (currentMatch.Value != null && currentMatch.Value.Round.Value != null)
             {
                 isCommand = message.Content[0] == '[' && message.Content[1] == '*' && message.Content[2] == ']';
-                bool isRef = currentMatch.Value.Round.Value.RefereeId.Value != null
-                    && currentMatch.Value.Round.Value.RefereeId.Value != 0
-                    && message.SenderId == currentMatch.Value.Round.Value.RefereeId.Value;
+                bool isRef = currentMatch.Value.Round.Value.Referees.Count != 0
+                    && currentMatch.Value.Round.Value.Referees.Any(p => p.OnlineID == message.SenderId);
                 // Automatically block duplicate messages, since we have multiple chat displays available.
                 if ((isRef || currentMatch.Value.Round.Value.TrustAll.Value)
                     && isCommand && !currentMatch.Value.PendingMsgs.Any(p => p.Equals(message)))
