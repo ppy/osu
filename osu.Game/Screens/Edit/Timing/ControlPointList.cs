@@ -7,11 +7,13 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
+using osu.Game.Overlays;
 using osuTK;
 
 namespace osu.Game.Screens.Edit.Timing
@@ -30,6 +32,9 @@ namespace osu.Game.Screens.Edit.Timing
         [Resolved]
         private Bindable<ControlPointGroup?> selectedGroup { get; set; } = null!;
 
+        [Cached]
+        private OverlayColourProvider overlayColourProvider = new OverlayColourProvider(OverlayColourScheme.Green);
+
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
@@ -43,51 +48,62 @@ namespace osu.Game.Screens.Edit.Timing
                     RelativeSizeAxes = Axes.Both,
                     Groups = { BindTarget = Beatmap.ControlPointInfo.Groups, },
                 },
-                new FillFlowContainer
+                new Container
                 {
-                    AutoSizeAxes = Axes.Both,
-                    Anchor = Anchor.BottomLeft,
-                    Origin = Anchor.BottomLeft,
-                    Direction = FillDirection.Horizontal,
-                    Margin = new MarginPadding(margins),
-                    Spacing = new Vector2(5),
+                    AutoSizeAxes = Axes.Y,
+                    RelativeSizeAxes = Axes.X,
+                    Anchor = Anchor.BottomCentre,
+                    Origin = Anchor.BottomCentre,
                     Children = new Drawable[]
                     {
-                        new RoundedButton
+                        new Box
                         {
-                            Text = "Select closest to current time",
-                            Action = goToCurrentGroup,
-                            Size = new Vector2(220, 30),
-                            Anchor = Anchor.BottomRight,
-                            Origin = Anchor.BottomRight,
+                            Height = 50,
+                            RelativeSizeAxes = Axes.X,
+                            Anchor = Anchor.CentreLeft,
+                            Colour = overlayColourProvider.Background2,
                         },
-                    }
-                },
-                new FillFlowContainer
-                {
-                    AutoSizeAxes = Axes.Both,
-                    Anchor = Anchor.BottomRight,
-                    Origin = Anchor.BottomRight,
-                    Direction = FillDirection.Horizontal,
-                    Margin = new MarginPadding(margins),
-                    Spacing = new Vector2(5),
-                    Children = new Drawable[]
-                    {
-                        deleteButton = new RoundedButton
+                        new FillFlowContainer
                         {
-                            Text = "-",
-                            Size = new Vector2(30, 30),
-                            Action = delete,
-                            Anchor = Anchor.BottomRight,
-                            Origin = Anchor.BottomRight,
-                            BackgroundColour = colours.Red3,
+                            Anchor = Anchor.BottomLeft,
+                            Padding = new MarginPadding { Left = margins, Bottom = margins },
+                            Children = new Drawable[]
+                            {
+                                new RoundedButton
+                                {
+                                    Text = "Select closest to current time",
+                                    Action = goToCurrentGroup,
+                                    Size = new Vector2(220, 30),
+                                    Anchor = Anchor.BottomLeft,
+                                    Origin = Anchor.BottomLeft,
+                                },
+                            }
                         },
-                        addButton = new RoundedButton
+                        new FillFlowContainer
                         {
-                            Action = addNew,
-                            Size = new Vector2(160, 30),
+                            Direction = FillDirection.Horizontal,
                             Anchor = Anchor.BottomRight,
-                            Origin = Anchor.BottomRight,
+                            Spacing = new Vector2(5),
+                            Padding = new MarginPadding { Right = margins, Bottom = margins },
+                            Children = new Drawable[]
+                            {
+                                deleteButton = new RoundedButton
+                                {
+                                    Text = "-",
+                                    Size = new Vector2(30, 30),
+                                    Action = delete,
+                                    Anchor = Anchor.BottomRight,
+                                    Origin = Anchor.BottomRight,
+                                    BackgroundColour = colours.Red3,
+                                },
+                                addButton = new RoundedButton
+                                {
+                                    Action = addNew,
+                                    Size = new Vector2(160, 30),
+                                    Anchor = Anchor.BottomRight,
+                                    Origin = Anchor.BottomRight,
+                                },
+                            }
                         },
                     }
                 },
