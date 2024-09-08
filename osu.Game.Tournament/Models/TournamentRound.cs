@@ -30,6 +30,8 @@ namespace osu.Game.Tournament.Models
         public readonly Bindable<int?> RefereeId = new Bindable<int?>(0);
         public readonly BindableBool TrustAll = new BindableBool(false);
 
+        public readonly BindableList<TournamentUser> Referees = new BindableList<TournamentUser>();
+
         // only used for serialisation
         public List<int> Matches = new List<int>();
 
