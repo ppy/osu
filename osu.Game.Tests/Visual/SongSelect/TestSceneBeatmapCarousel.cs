@@ -520,7 +520,6 @@ namespace osu.Game.Tests.Visual.SongSelect
             waitForSelection(set_count);
         }
 
-        [Solo]
         [Test]
         public void TestDifficultiesSplitOutOnLoad()
         {
@@ -1130,6 +1129,32 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             // always returns to same selection as long as it's available.
             AddAssert("Selection was remembered", () => eagerSelectedIDs.Count == 1);
+        }
+
+        [Test]
+        public void TestCarouselRetainsSelectionFromDifficultySort()
+        {
+            List<BeatmapSetInfo> manySets = new List<BeatmapSetInfo>();
+
+            AddStep("Populate beatmap sets", () =>
+            {
+                manySets.Clear();
+
+                for (int i = 1; i <= 50; i++)
+                    manySets.Add(TestResources.CreateTestBeatmapSetInfo(diff_count));
+            });
+
+            loadBeatmaps(manySets);
+
+            BeatmapInfo chosenBeatmap = null!;
+            AddStep("select given beatmap", () => carousel.SelectBeatmap(chosenBeatmap = manySets[20].Beatmaps[0]));
+            AddUntilStep("selection changed", () => carousel.SelectedBeatmapInfo, () => Is.EqualTo(chosenBeatmap));
+
+            AddStep("sort by difficulty", () => carousel.FilterImmediately(new FilterCriteria { Sort = SortMode.Difficulty }));
+            AddAssert("selection retained", () => carousel.SelectedBeatmapInfo, () => Is.EqualTo(chosenBeatmap));
+
+            AddStep("sort by title", () => carousel.FilterImmediately(new FilterCriteria { Sort = SortMode.Title }));
+            AddAssert("selection retained", () => carousel.SelectedBeatmapInfo, () => Is.EqualTo(chosenBeatmap));
         }
 
         [Test]
