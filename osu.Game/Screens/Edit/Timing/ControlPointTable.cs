@@ -28,6 +28,12 @@ namespace osu.Game.Screens.Edit.Timing
     {
         public BindableList<ControlPointGroup> Groups { get; } = new BindableList<ControlPointGroup>();
 
+        public new MarginPadding Padding
+        {
+            get => base.Padding;
+            set => base.Padding = value;
+        }
+
         [Cached]
         private Bindable<TimingControlPoint?> activeTimingPoint { get; } = new Bindable<TimingControlPoint?>();
 
@@ -53,7 +59,6 @@ namespace osu.Game.Screens.Edit.Timing
         private void load(OverlayColourProvider colours)
         {
             RelativeSizeAxes = Axes.Both;
-            Padding = new MarginPadding { Bottom = 50 };
 
             InternalChildren = new Drawable[]
             {

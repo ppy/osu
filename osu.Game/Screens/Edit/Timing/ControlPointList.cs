@@ -20,6 +20,8 @@ namespace osu.Game.Screens.Edit.Timing
 {
     public partial class ControlPointList : CompositeDrawable
     {
+        private ControlPointTable table = null!;
+        private Container controls = null!;
         private OsuButton deleteButton = null!;
         private RoundedButton addButton = null!;
 
@@ -40,12 +42,12 @@ namespace osu.Game.Screens.Edit.Timing
             const float margins = 10;
             InternalChildren = new Drawable[]
             {
-                new ControlPointTable
+                table = new ControlPointTable
                 {
                     RelativeSizeAxes = Axes.Both,
                     Groups = { BindTarget = Beatmap.ControlPointInfo.Groups, },
                 },
-                new Container
+                controls = new Container
                 {
                     AutoSizeAxes = Axes.Y,
                     RelativeSizeAxes = Axes.X,
@@ -55,15 +57,16 @@ namespace osu.Game.Screens.Edit.Timing
                     {
                         new Box
                         {
-                            Height = 50,
-                            RelativeSizeAxes = Axes.X,
-                            Anchor = Anchor.CentreLeft,
-                            Colour = overlayColourProvider.Background2,
+                            RelativeSizeAxes = Axes.Both,
+                            Colour = colourProvider.Background2,
                         },
                         new FillFlowContainer
                         {
-                            Anchor = Anchor.BottomLeft,
-                            Padding = new MarginPadding { Left = margins, Bottom = margins },
+                            AutoSizeAxes = Axes.Both,
+                            Direction = FillDirection.Horizontal,
+                            Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.CentreLeft,
+                            Padding = new MarginPadding { Left = margins, Vertical = margins, },
                             Children = new Drawable[]
                             {
                                 new RoundedButton
@@ -71,17 +74,19 @@ namespace osu.Game.Screens.Edit.Timing
                                     Text = "Select closest to current time",
                                     Action = goToCurrentGroup,
                                     Size = new Vector2(220, 30),
-                                    Anchor = Anchor.BottomLeft,
-                                    Origin = Anchor.BottomLeft,
+                                    Anchor = Anchor.CentreLeft,
+                                    Origin = Anchor.CentreLeft,
                                 },
                             }
                         },
                         new FillFlowContainer
                         {
+                            AutoSizeAxes = Axes.Both,
                             Direction = FillDirection.Horizontal,
-                            Anchor = Anchor.BottomRight,
+                            Anchor = Anchor.CentreRight,
+                            Origin = Anchor.CentreRight,
                             Spacing = new Vector2(5),
-                            Padding = new MarginPadding { Right = margins, Bottom = margins },
+                            Padding = new MarginPadding { Right = margins, Vertical = margins, },
                             Children = new Drawable[]
                             {
                                 deleteButton = new RoundedButton
@@ -89,16 +94,16 @@ namespace osu.Game.Screens.Edit.Timing
                                     Text = "-",
                                     Size = new Vector2(30, 30),
                                     Action = delete,
-                                    Anchor = Anchor.BottomRight,
-                                    Origin = Anchor.BottomRight,
+                                    Anchor = Anchor.CentreRight,
+                                    Origin = Anchor.CentreRight,
                                     BackgroundColour = colours.Red3,
                                 },
                                 addButton = new RoundedButton
                                 {
                                     Action = addNew,
                                     Size = new Vector2(160, 30),
-                                    Anchor = Anchor.BottomRight,
-                                    Origin = Anchor.BottomRight,
+                                    Anchor = Anchor.CentreRight,
+                                    Origin = Anchor.CentreRight,
                                 },
                             }
                         },
@@ -132,6 +137,7 @@ namespace osu.Game.Screens.Edit.Timing
             base.Update();
 
             addButton.Enabled.Value = clock.CurrentTimeAccurate != selectedGroup.Value?.Time;
+            table.Padding = new MarginPadding { Bottom = controls.DrawHeight };
         }
 
         private void goToCurrentGroup()
