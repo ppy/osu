@@ -15,6 +15,7 @@ using osu.Framework.Graphics.Textures;
 using osu.Framework.Input.Events;
 using osu.Framework.Threading;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Tournament.Components;
 using osu.Game.Tournament.Models;
 using osu.Game.Tournament.Screens.Board.Components;
@@ -83,6 +84,9 @@ namespace osu.Game.Tournament.Screens.Board
         {
             currentMatch.BindValueChanged(matchChanged);
             currentMatch.BindTo(LadderInfo.CurrentMatch);
+
+            LadderInfo.UseRefereeCommands.BindValueChanged(refereeChanged);
+            LadderInfo.NeedRefereeResponse.BindValueChanged(updateBottomDisplay);
 
             InternalChildren = new Drawable[]
             {
@@ -199,6 +203,18 @@ namespace osu.Game.Tournament.Screens.Board
                         new TournamentSpriteText
                         {
                             Text = "Current Mode"
+                        },
+                        new LabelledSwitchButton
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            Label = "Ref Commands",
+                            Current = LadderInfo.UseRefereeCommands,
+                        },
+                        new LabelledSwitchButton
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            Label = "Enforce Response",
+                            Current = LadderInfo.NeedRefereeResponse,
                         },
                         new GridContainer
                         {
@@ -397,6 +413,11 @@ namespace osu.Game.Tournament.Screens.Board
         private void msgOnCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
             => Scheduler.AddOnce(parseCommands);
 
+        private void refereeChanged(ValueChangedEvent<bool> enableEvent)
+        {
+            parseCommands();
+        }
+
         private void parseCommands()
         {
             if (CurrentMatch.Value == null)
@@ -489,7 +510,7 @@ namespace osu.Game.Tournament.Screens.Board
             updateBottomDisplay();
         }
 
-        private void updateBottomDisplay()
+        private void updateBottomDisplay(ValueChangedEvent<bool>? _ = null)
         {
             Drawable oldDisplay = informationDisplayContainer.Child;
             Drawable newDisplay;
@@ -503,12 +524,27 @@ namespace osu.Game.Tournament.Screens.Board
 
             if (DetectEX() && !havePendingSwap)
             {
-                state = refEX ? Steps.EX : Steps.Halt;
+                if (LadderInfo.UseRefereeCommands.Value && LadderInfo.NeedRefereeResponse.Value)
+                {
+                    state = refEX ? Steps.EX : Steps.Halt;
+                }
+                else
+                {
+                    state = Steps.EX;
+                }
             }
             else if (DetectWin() && !havePendingSwap)
             {
-                state = refWin && teamWinner == refWinner ? Steps.FinalWin : Steps.Halt;
-                color = refWin && teamWinner == refWinner ? teamWinner : pickColour;
+                if (LadderInfo.UseRefereeCommands.Value && LadderInfo.NeedRefereeResponse.Value)
+                {
+                    state = refWin && teamWinner == refWinner ? Steps.FinalWin : Steps.Halt;
+                    color = refWin && teamWinner == refWinner ? teamWinner : pickColour;
+                }
+                else
+                {
+                    state = Steps.FinalWin;
+                    color = teamWinner;
+                }
             }
             else
             {

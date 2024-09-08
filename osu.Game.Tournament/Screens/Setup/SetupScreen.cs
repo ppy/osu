@@ -96,9 +96,6 @@ namespace osu.Game.Tournament.Screens.Setup
                     ButtonText = "Show profile",
                     Action = () =>
                     {
-                        // We already have an entry to log out the account.
-                        // api.Logout();
-
                         if (loginOverlay == null)
                         {
                             AddInternal(loginOverlay = new LoginOverlay
@@ -134,6 +131,18 @@ namespace osu.Game.Tournament.Screens.Setup
                     {
                         windowSize.Value = new Size((int)(height * aspect_ratio / TournamentSceneManager.STREAM_AREA_WIDTH * TournamentSceneManager.REQUIRED_WIDTH), height);
                     }
+                },
+                new LabelledSwitchButton
+                {
+                    Label = "Use referee commands",
+                    Description = "Referees can use pre-defined commands to control the tournament client in the multiplayer room.",
+                    Current = LadderInfo.UseRefereeCommands,
+                },
+                new LabelledSwitchButton
+                {
+                    Label = "Need referee response for critical steps",
+                    Description = "The tournament client will wait for referee\'s correct command to progress.",
+                    Current = LadderInfo.NeedRefereeResponse,
                 },
                 new LabelledSwitchButton
                 {

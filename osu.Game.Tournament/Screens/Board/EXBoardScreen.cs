@@ -13,6 +13,7 @@ using osu.Framework.Input.Events;
 using osu.Framework.Threading;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Tournament.Components;
 using osu.Game.Tournament.IPC;
 using osu.Game.Tournament.Models;
@@ -56,6 +57,9 @@ namespace osu.Game.Tournament.Screens.Board
         {
             currentMatch.BindValueChanged(matchChanged);
             currentMatch.BindTo(LadderInfo.CurrentMatch);
+
+            LadderInfo.UseRefereeCommands.BindValueChanged(refereeChanged);
+
             InternalChildren = new Drawable[]
             {
                 new TourneyVideo("mappool")
@@ -215,6 +219,18 @@ namespace osu.Game.Tournament.Screens.Board
                         {
                             Text = "Current Mode"
                         },
+                        new LabelledSwitchButton
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            Label = "Ref Commands",
+                            Current = LadderInfo.UseRefereeCommands,
+                        },
+                        new LabelledSwitchButton
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            Label = "Enforce Response",
+                            Current = LadderInfo.NeedRefereeResponse,
+                        },
                         buttonPick = new TourneyButton
                         {
                             RelativeSizeAxes = Axes.X,
@@ -283,6 +299,11 @@ namespace osu.Game.Tournament.Screens.Board
 
         private void msgOnCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
             => Scheduler.AddOnce(parseCommands);
+
+        private void refereeChanged(ValueChangedEvent<bool> enabledEvent)
+        {
+            parseCommands();
+        }
 
         private void parseCommands()
         {
