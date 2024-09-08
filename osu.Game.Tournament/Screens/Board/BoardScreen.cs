@@ -1041,7 +1041,7 @@ namespace osu.Game.Tournament.Screens.Board
             {
                 for (int i = startX; i <= endX; i++)
                 {
-                    var map = getBoardMap(startY, i);
+                    var map = getBoardMap(i, startY);
                     if (map != null) mapLine.Add(map);
                 }
             }
@@ -1080,7 +1080,7 @@ namespace osu.Game.Tournament.Screens.Board
             // Reject null matches
             if (CurrentMatch.Value == null) return colourfalse;
 
-            mapLine = getMapLine(startX, startY, endX, endY);
+            mapLine = getMapLine(startY, startX, endY, endX);
 
             foreach (RoundBeatmap b in mapLine)
             {
