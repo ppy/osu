@@ -143,7 +143,7 @@ namespace osu.Game.Screens.Select
             // We'll catch up on changes via subscriptions anyway.
             BeatmapSetInfo[] loadableSets = detachedBeatmapSets!.ToArray();
 
-            if (selectedBeatmapSet != null && !loadableSets.Contains(selectedBeatmapSet.BeatmapSet))
+            if (selectedBeatmapSet != null && !loadableSets.Contains(selectedBeatmapSet.BeatmapSet, EqualityComparer<BeatmapSetInfo>.Default))
                 selectedBeatmapSet = null;
 
             var selectedBeatmapBefore = selectedBeatmap?.BeatmapInfo;
