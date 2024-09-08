@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.LocalisationExtensions;
@@ -14,7 +13,6 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Localisation;
 using osu.Game.Online.API.Requests.Responses;
-using osu.Game.Scoring;
 
 namespace osu.Game.Overlays.Profile.Header.Components
 {
@@ -114,17 +112,12 @@ namespace osu.Game.Overlays.Profile.Header.Components
             }
 
             dailyPlayCount.Text = DailyChallengeStatsDisplayStrings.UnitDay(stats.PlayCount.ToLocalisableString("N0"));
-            dailyPlayCount.Colour = colours.ForRankingTier(TierForPlayCount(stats.PlayCount));
+            dailyPlayCount.Colour = colours.ForRankingTier(DailyChallengeStatsTooltip.TierForPlayCount(stats.PlayCount));
 
             TooltipContent = new DailyChallengeTooltipData(colourProvider, stats);
 
             Show();
         }
-
-        // Rounding up is needed here to ensure the overlay shows the same colour as osu-web for the play count.
-        // This is because, for example, 31 / 3 > 10 in JavaScript because floats are used, while here it would
-        // get truncated to 10 with an integer division and show a lower tier.
-        public static RankingTier TierForPlayCount(int playCount) => DailyChallengeStatsTooltip.TierForDaily((int)Math.Ceiling(playCount / 3.0d));
 
         public ITooltip<DailyChallengeTooltipData> GetCustomTooltip() => new DailyChallengeStatsTooltip();
     }
