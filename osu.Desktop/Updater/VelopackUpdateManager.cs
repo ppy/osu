@@ -105,6 +105,7 @@ namespace osu.Desktop.Updater
                 catch (Exception e)
                 {
                     // In the case of an error, a separate notification will be displayed.
+                    scheduleRecheck = true;
                     notification.FailDownload();
                     Logger.Error(e, @"update failed!");
                 }
