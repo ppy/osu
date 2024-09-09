@@ -86,7 +86,7 @@ namespace osu.Game.Tournament.Screens.Board
             currentMatch.BindTo(LadderInfo.CurrentMatch);
 
             LadderInfo.UseRefereeCommands.BindValueChanged(refereeChanged);
-            LadderInfo.NeedRefereeResponse.BindValueChanged(updateBottomDisplay);
+            LadderInfo.NeedRefereeResponse.BindValueChanged(refereeNeedChanged);
 
             InternalChildren = new Drawable[]
             {
@@ -443,14 +443,14 @@ namespace osu.Game.Tournament.Screens.Board
                     case Commands.SetWin:
                         refWin = true;
                         refWinner = command.Team;
-                        updateBottomDisplay();
+                        updateBottomDisplay(bottomOnly: false);
                         break;
 
                     case Commands.MarkWin:
                         pickColour = command.Team;
                         pickType = command.Team == TeamColour.Red ? ChoiceType.RedWin : ChoiceType.BlueWin;
                         addForBeatmap(command.MapMod);
-                        updateBottomDisplay();
+                        updateBottomDisplay(bottomOnly: false);
                         break;
 
                     case Commands.Ban:
@@ -510,7 +510,10 @@ namespace osu.Game.Tournament.Screens.Board
             updateBottomDisplay();
         }
 
-        private void updateBottomDisplay(ValueChangedEvent<bool>? _ = null)
+        private void refereeNeedChanged(ValueChangedEvent<bool>? _ = null)
+            => updateBottomDisplay(bottomOnly: false);
+
+        private void updateBottomDisplay(ValueChangedEvent<bool>? _ = null, bool bottomOnly = true)
         {
             Drawable oldDisplay = informationDisplayContainer.Child;
             Drawable newDisplay;
@@ -585,11 +588,14 @@ namespace osu.Game.Tournament.Screens.Board
                 if (CurrentMatch.Value.Round.Value != null)
                     CurrentMatch.Value.Round.Value.IsFinalStage.Value =
                         color == TeamColour.Neutral ? true : false;
-                AddInternal(new RoundAnimation(teamWinner == TeamColour.Red
-                    ? CurrentMatch.Value.Team1.Value
-                    : teamWinner == TeamColour.Blue
-                        ? CurrentMatch.Value.Team2.Value
-                        : null, teamWinner));
+                if (!bottomOnly)
+                {
+                    AddInternal(new RoundAnimation(teamWinner == TeamColour.Red
+                        ? CurrentMatch.Value.Team1.Value
+                        : teamWinner == TeamColour.Blue
+                            ? CurrentMatch.Value.Team2.Value
+                            : null, teamWinner));
+                }
             }
         }
 
@@ -681,7 +687,7 @@ namespace osu.Game.Tournament.Screens.Board
                     if (!hasTrap)
                     {
                         // Restore to the last state
-                        updateBottomDisplay();
+                        updateBottomDisplay(bottomOnly: false);
                     }
                 }
 
