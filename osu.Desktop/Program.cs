@@ -171,7 +171,7 @@ namespace osu.Desktop
         {
             if (OsuGameDesktop.IsPackageManaged)
             {
-                Logger.Log("Updates are being managed by an external provider. Skipping Velopack setup");
+                Logger.Log("Updates are being managed by an external provider. Skipping Velopack setup.");
                 return;
             }
 
