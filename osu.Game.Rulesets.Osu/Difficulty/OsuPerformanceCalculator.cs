@@ -29,7 +29,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         private double effectiveMissCount;
 
         private double hitWindow300, hitWindow100, hitWindow50;
-        private double deviation, speedDeviation;
+        private double speedDeviation;
 
         public OsuPerformanceCalculator()
             : base(new OsuRuleset())
@@ -73,7 +73,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             hitWindow100 = (140 - 8 * ((80 - hitWindow300 * clockRate) / 6)) / clockRate;
             hitWindow50 = (200 - 10 * ((80 - hitWindow300 * clockRate) / 6)) / clockRate;
 
-            deviation = calculateTotalDeviation(score, osuAttributes);
             speedDeviation = calculateSpeedDeviation(score, osuAttributes);
 
             double aimValue = computeAimValue(score, osuAttributes);
@@ -96,7 +95,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 Accuracy = accuracyValue,
                 Flashlight = flashlightValue,
                 EffectiveMissCount = effectiveMissCount,
-                Deviation = deviation,
                 SpeedDeviation = speedDeviation,
                 Total = totalValue
             };
@@ -104,9 +102,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         private double computeAimValue(ScoreInfo score, OsuDifficultyAttributes attributes)
         {
-            if (deviation == double.PositiveInfinity)
-                return 0.0;
-
             double aimValue = Math.Pow(5.0 * Math.Max(1.0, attributes.AimDifficulty / 0.0675) - 4.0, 3.0) / 100000.0;
 
             double lengthBonus = 0.95 + 0.4 * Math.Min(1.0, totalHits / 2000.0) +
@@ -147,10 +142,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 double sliderNerfFactor = (1 - attributes.SliderFactor) * Math.Pow(1 - estimateSliderEndsDropped / estimateDifficultSliders, 3) + attributes.SliderFactor;
                 aimValue *= sliderNerfFactor;
             }
-
-            // Apply antirake nerf
-            double totalAntiRakeMultiplier = calculateTotalRakeNerf(attributes);
-            aimValue *= totalAntiRakeMultiplier;
 
             aimValue *= accuracy;
             // It is important to consider accuracy difficulty when scaling with accuracy.
@@ -252,7 +243,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         private double computeFlashlightValue(ScoreInfo score, OsuDifficultyAttributes attributes)
         {
-            if (!score.Mods.Any(h => h is OsuModFlashlight) || deviation == double.PositiveInfinity)
+            if (!score.Mods.Any(h => h is OsuModFlashlight))
                 return 0.0;
 
             double flashlightValue = Math.Pow(attributes.FlashlightDifficulty, 2.0) * 25.0;
@@ -266,10 +257,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             // Account for shorter maps having a higher ratio of 0 combo/100 combo flashlight radius.
             flashlightValue *= 0.7 + 0.1 * Math.Min(1.0, totalHits / 200.0) +
                                (totalHits > 200 ? 0.2 * Math.Min(1.0, (totalHits - 200) / 200.0) : 0.0);
-
-            // Apply antirake nerf
-            double totalAntiRakeMultiplier = calculateTotalRakeNerf(attributes);
-            flashlightValue *= totalAntiRakeMultiplier;
 
             // Scale the flashlight value with accuracy _slightly_.
             flashlightValue *= 0.5 + accuracy / 2.0;
@@ -298,40 +285,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         }
 
         /// <summary>
-        /// Using <see cref="calculateDeviation"/> estimates player's deviation on accuracy objects.
-        /// Returns deviation for circles and sliders if score was set with slideracc.
-        /// Returns the min between deviation of circles and deviation on circles and sliders (assuming slider hits are 50s), if score was set without slideracc.
-        /// </summary>
-        private double calculateTotalDeviation(ScoreInfo score, OsuDifficultyAttributes attributes)
-        {
-            if (totalSuccessfulHits == 0)
-                return double.PositiveInfinity;
-
-            int accuracyObjectCount = attributes.HitCircleCount;
-
-            // Assume worst case: all mistakes was on accuracy objects
-            int relevantCountMiss = Math.Min(countMiss, accuracyObjectCount);
-            int relevantCountMeh = Math.Min(countMeh, accuracyObjectCount - relevantCountMiss);
-            int relevantCountOk = Math.Min(countOk, accuracyObjectCount - relevantCountMiss - relevantCountMeh);
-            int relevantCountGreat = Math.Max(0, accuracyObjectCount - relevantCountMiss - relevantCountMeh - relevantCountOk);
-
-            // Calculate deviation on accuracy objects
-            double deviation = calculateDeviation(relevantCountGreat, relevantCountOk, relevantCountMeh, relevantCountMiss);
-
-            // If score was set without slider accuracy - also compute deviation with sliders
-            // Assume that all hits was 50s
-            int totalCountWithSliders = attributes.HitCircleCount + attributes.SliderCount;
-            int missCountWithSliders = Math.Min(totalCountWithSliders, countMiss);
-            int hitCountWithSliders = totalCountWithSliders - missCountWithSliders;
-
-            double hitProbabilityWithSliders = hitCountWithSliders / (totalCountWithSliders + 1.0);
-            double deviationWithSliders = hitWindow50 / (Math.Sqrt(2) * SpecialFunctions.ErfInv(hitProbabilityWithSliders));
-
-            // Min is needed for edgecase maps with 1 circle and 999 sliders, as deviation on sliders can be lower in this case
-            return Math.Min(deviation, deviationWithSliders);
-        }
-
-        /// <summary>
         /// Using <see cref="calculateDeviation"/> estimates player's deviation on speed notes, assuming worst-case.
         /// Treats all speed notes as hit circles. This is not good way to do this, but fixing this is impossible under the limitation of current speed pp.
         /// If score was set with slideracc - tries to remove mistaps on sliders from total mistaps.
@@ -343,6 +296,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             // Calculate accuracy assuming the worst case scenario
             double speedNoteCount = attributes.SpeedNoteCount;
+
+            speedNoteCount += (totalHits - attributes.SpeedNoteCount) * 0.1;
 
             // Assume worst case: all mistakes was on speed notes
             double relevantCountMiss = Math.Min(countMiss, speedNoteCount);
@@ -423,30 +378,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double speedRakeNerf = adjustedSpeedValue / speedValue;
 
-            return Math.Min(speedRakeNerf, calculateTotalRakeNerf(attributes));
-        }
-
-        // Calculates multiplier for total pp accounting for rake based on the deviation and sliderless aim and speed difficulty
-        private double calculateTotalRakeNerf(OsuDifficultyAttributes attributes)
-        {
-            // Use adjusted deviation to not nerf EZHT aim maps
-            double adjustedDeviation = deviation * calculateDeviationArAdjust(attributes.ApproachRate);
-
-            // Base values
-            double aimNoSlidersValue = 4 * Math.Pow(attributes.AimDifficulty * attributes.SliderFactor, 3);
-            double speedValue = 4 * Math.Pow(attributes.SpeedDifficulty, 3);
-            double totalValue = Math.Pow(Math.Pow(aimNoSlidersValue, 1.1) + Math.Pow(speedValue, 1.1), 1 / 1.1);
-
-            // Starting from this pp amount - penalty will be applied
-            double abusePoint = 200 + 600 * Math.Pow(22 / adjustedDeviation, 4.2);
-
-            if (totalValue <= abusePoint)
-                return 1.0;
-
-            // Use relax penalty after the point to make values grow slower but still noticeably
-            double adjustedTotalValue = abusePoint + Math.Pow(0.9, 3) * (totalValue - abusePoint);
-
-            return adjustedTotalValue / totalValue;
+            return speedRakeNerf;
         }
 
         private static double getClockRate(ScoreInfo score)
@@ -457,9 +389,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         }
 
         private double getComboScalingFactor(OsuDifficultyAttributes attributes) => attributes.MaxCombo <= 0 ? 1.0 : Math.Min(Math.Pow(scoreMaxCombo, 0.8) / Math.Pow(attributes.MaxCombo, 0.8), 1.0);
-
-        // Bonus for low AR to account for the fact that it's more difficult to get low UR on low AR
-        private static double calculateDeviationArAdjust(double AR) => 0.475 + 0.7 / (1.0 + Math.Pow(1.73, 7.9 - AR));
 
         private int totalHits => countGreat + countOk + countMeh + countMiss;
 
