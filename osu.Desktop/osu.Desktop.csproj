@@ -5,7 +5,7 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <Description>A free-to-win rhythm game. Rhythm is just a *click* away!</Description>
     <AssemblyName>osu!</AssemblyName>
-    <AssemblyTitle>osu!lazer</AssemblyTitle>
+    <AssemblyTitle>osu!(lazer)</AssemblyTitle>
     <Title>osu!</Title>
     <Product>osu!(lazer)</Product>
     <ApplicationIcon>lazer.ico</ApplicationIcon>
