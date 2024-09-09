@@ -152,10 +152,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double totalAntiRakeMultiplier = calculateTotalRakeNerf(attributes);
             aimValue *= totalAntiRakeMultiplier;
 
-            // Scale the aim value with adjusted deviation
-            double adjustedDeviation = deviation * calculateDeviationArAdjust(attributes.ApproachRate);
-            aimValue *= SpecialFunctions.Erf(33 / (Math.Sqrt(2) * adjustedDeviation));
-            aimValue *= 0.98 + Math.Pow(100.0 / 9, 2) / 2500; // OD 11 SS stays the same.
+            aimValue *= accuracy;
+            // It is important to consider accuracy difficulty when scaling with accuracy.
+            aimValue *= 0.98 + Math.Pow(attributes.OverallDifficulty, 2) / 2500;
 
             return aimValue;
         }
@@ -198,44 +197,46 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double speedAntiRakeMultiplier = calculateSpeedRakeNerf(attributes);
             speedValue *= speedAntiRakeMultiplier;
 
-            // Scale the speed value with speed deviation.
-            // Use additional bad UR penalty for high speed difficulty
-            // (WARNING: potentially unstable, but instability detected in playable difficulty range).
-            double adjustedSpeedDeviation = speedDeviation * calculateDeviationArAdjust(attributes.ApproachRate);
-            speedValue *= SpecialFunctions.Erf(22 / (Math.Sqrt(2) * adjustedSpeedDeviation * Math.Max(1, Math.Pow(attributes.SpeedDifficulty / 4.5, 1.2))));
-            speedValue *= 0.95 + Math.Pow(100.0 / 9, 2) / 750; // OD 11 SS stays the same.
+            // Calculate accuracy assuming the worst case scenario
+            double relevantTotalDiff = totalHits - attributes.SpeedNoteCount;
+            double relevantCountGreat = Math.Max(0, countGreat - relevantTotalDiff);
+            double relevantCountOk = Math.Max(0, countOk - Math.Max(0, relevantTotalDiff - countGreat));
+            double relevantCountMeh = Math.Max(0, countMeh - Math.Max(0, relevantTotalDiff - countGreat - countOk));
+            double relevantAccuracy = attributes.SpeedNoteCount == 0 ? 0 : (relevantCountGreat * 6.0 + relevantCountOk * 2.0 + relevantCountMeh) / (attributes.SpeedNoteCount * 6.0);
+
+            // Scale the speed value with accuracy and OD.
+            speedValue *= (0.95 + Math.Pow(attributes.OverallDifficulty, 2) / 750) * Math.Pow((accuracy + relevantAccuracy) / 2.0, (14.5 - Math.Max(attributes.OverallDifficulty, 8)) / 2);
+
+            // Scale the speed value with # of 50s to punish doubletapping.
+            speedValue *= Math.Pow(0.99, countMeh < totalHits / 500.0 ? 0 : countMeh - totalHits / 500.0);
 
             return speedValue;
         }
 
         private double computeAccuracyValue(ScoreInfo score, OsuDifficultyAttributes attributes)
         {
-            if (score.Mods.Any(h => h is OsuModRelax) || deviation == double.PositiveInfinity)
+            if (score.Mods.Any(h => h is OsuModRelax))
                 return 0.0;
 
-            double amountHitObjectsWithAccuracy = attributes.HitCircleCount;
+            // This percentage only considers HitCircles of any value - in this part of the calculation we focus on hitting the timing hit window.
+            double betterAccuracyPercentage;
+            int amountHitObjectsWithAccuracy = attributes.HitCircleCount;
 
-            // If amount of circles is too small - also add sliders, because UR is calculated accounting to sliders too
-            double circlesRatio = (double)attributes.HitCircleCount / (attributes.HitCircleCount + attributes.SliderCount);
-            if (circlesRatio < 0.25)
-                amountHitObjectsWithAccuracy += attributes.SliderCount * (1 - circlesRatio / 0.25);
+            if (amountHitObjectsWithAccuracy > 0)
+                betterAccuracyPercentage = ((countGreat - (totalHits - amountHitObjectsWithAccuracy)) * 6 + countOk * 2 + countMeh) / (double)(amountHitObjectsWithAccuracy * 6);
+            else
+                betterAccuracyPercentage = 0;
 
-            double liveLengthBonus = Math.Min(1.15, Math.Pow(amountHitObjectsWithAccuracy / 1000.0, 0.3));
-            double threshold = 1000 * Math.Pow(1.15, 1 / 0.3); // Number of objects until length bonus caps.
+            // It is possible to reach a negative accuracy with this formula. Cap it at zero - zero points.
+            if (betterAccuracyPercentage < 0)
+                betterAccuracyPercentage = 0;
 
-            // Adjust deviation as it's harder to get good acc on lower AR
-            double adjustedDeviation = deviation * calculateDeviationArAdjust(attributes.ApproachRate);
+            // Lots of arbitrary values from testing.
+            // Considering to use derivation from perfect accuracy in a probabilistic manner - assume normal distribution.
+            double accuracyValue = Math.Pow(1.52163, attributes.OverallDifficulty) * Math.Pow(betterAccuracyPercentage, 24) * 2.83;
 
-            // Some fancy stuff to make curve similar to live
-            double scaling = 0.9 * Math.Sqrt(2) * Math.Log(1.52163) * SpecialFunctions.ErfInv(1 / (1 + 1 / Math.Min(amountHitObjectsWithAccuracy, threshold))) / 6;
-
-            // Accuracy pp formula that's roughly the same as live.
-            double accuracyValue = 2.83 * Math.Pow(1.52163, 40.0 / 3) * liveLengthBonus * Math.Exp(-scaling * adjustedDeviation);
-
-            // Punish very low amount of hits additionally to prevent big pp values right at the start of the map
-            double amountOfHits = Math.Clamp(totalSuccessfulHits - attributes.SpinnerCount, 0, amountHitObjectsWithAccuracy);
-            if (amountOfHits < 30)
-                accuracyValue *= Math.Sqrt(amountOfHits / 30);
+            // Bonus for many hitcircles - it's harder to keep good accuracy up for longer.
+            accuracyValue *= Math.Min(1.15, Math.Pow(amountHitObjectsWithAccuracy / 1000.0, 0.3));
 
             // Increasing the accuracy value by object count for Blinds isn't ideal, so the minimum buff is given.
             if (score.Mods.Any(m => m is OsuModBlinds))
@@ -270,10 +271,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double totalAntiRakeMultiplier = calculateTotalRakeNerf(attributes);
             flashlightValue *= totalAntiRakeMultiplier;
 
-            // Scale the flashlight value with adjusted deviation
-            double adjustedDeviation = deviation * calculateDeviationArAdjust(attributes.ApproachRate);
-            flashlightValue *= SpecialFunctions.Erf(55 / (Math.Sqrt(2) * adjustedDeviation));
-            flashlightValue *= 0.98 + Math.Pow(100.0 / 9, 2) / 2500;  // OD 11 SS stays the same.
+            // Scale the flashlight value with accuracy _slightly_.
+            flashlightValue *= 0.5 + accuracy / 2.0;
+            // It is important to also consider accuracy difficulty when doing that.
+            flashlightValue *= 0.98 + Math.Pow(attributes.OverallDifficulty, 2) / 2500;
 
             return flashlightValue;
         }
