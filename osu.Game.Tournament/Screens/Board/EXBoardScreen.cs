@@ -375,6 +375,7 @@ namespace osu.Game.Tournament.Screens.Board
         private void reset()
         {
             CurrentMatch.Value?.EXPicks.Clear();
+            CurrentMatch.Value?.Round.Value?.IsFinalStage.BindTo(new BindableBool(false));
 
             // Reset buttons
             buttonPick.Colour = Color4.White;

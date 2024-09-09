@@ -540,8 +540,15 @@ namespace osu.Game.Tournament.Screens.Board
             {
                 if (LadderInfo.UseRefereeCommands.Value && LadderInfo.NeedRefereeResponse.Value)
                 {
-                    state = refWin && teamWinner == refWinner ? Steps.FinalWin : Steps.Halt;
+                    state = refWin && teamWinner == refWinner && teamWinner != TeamColour.None ? Steps.FinalWin : Steps.Halt;
                     color = refWin && teamWinner == refWinner ? teamWinner : pickColour;
+
+                    // Special cases for a draw
+                    if (teamWinner == TeamColour.Neutral && refEX)
+                    {
+                        state = Steps.FinalWin;
+                        color = teamWinner;
+                    }
                 }
                 else
                 {
@@ -585,9 +592,8 @@ namespace osu.Game.Tournament.Screens.Board
 
             if (state == Steps.FinalWin)
             {
-                if (CurrentMatch.Value.Round.Value != null)
-                    CurrentMatch.Value.Round.Value.IsFinalStage.Value =
-                        color == TeamColour.Neutral ? true : false;
+                CurrentMatch.Value.Round.Value?.IsFinalStage.BindTo(new BindableBool(color == TeamColour.Neutral));
+
                 if (!bottomOnly)
                 {
                     AddInternal(new RoundAnimation(teamWinner == TeamColour.Red
@@ -596,6 +602,10 @@ namespace osu.Game.Tournament.Screens.Board
                             ? CurrentMatch.Value.Team2.Value
                             : null, teamWinner));
                 }
+            }
+            else
+            {
+                CurrentMatch.Value.Round.Value?.IsFinalStage.BindTo(new BindableBool(false));
             }
         }
 
@@ -646,8 +656,6 @@ namespace osu.Game.Tournament.Screens.Board
                     // Handle updating status to Red/Blue Win
                     if (isPickWin)
                     {
-                        // var existing = CurrentMatch.Value?.PicksBans.FirstOrDefault(p => p.BeatmapID == map.Beatmap?.OnlineID);
-                        // if (existing != null) CurrentMatch.Value?.PicksBans.Remove(existing);
                         updateWinStatusForBeatmap(map.Beatmap.OnlineID);
                     }
                     else
@@ -723,6 +731,7 @@ namespace osu.Game.Tournament.Screens.Board
             CurrentMatch.Value?.Protects.Clear();
             CurrentMatch.Value?.Traps.Clear();
             CurrentMatch.Value?.PendingSwaps.Clear();
+            CurrentMatch.Value?.Round.Value?.IsFinalStage.BindTo(new BindableBool(false));
 
             // Reset bottom display
             informationDisplayContainer.Child = new InstructionDisplay();
