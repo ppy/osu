@@ -136,10 +136,9 @@ namespace osu.Game.Skinning
         /// </summary>
         protected virtual void OnCountIncrement()
         {
-            if (DisplayedCount < Current.Value - 1)
-                DisplayedCount++;
-
-            DisplayedCount++;
+            // Do not assume every OnCountIncrement event is actually an increment because
+            // for some reason this event may be fired multiple times on the same value.
+            DisplayedCount = Current.Value;
         }
 
         /// <summary>
