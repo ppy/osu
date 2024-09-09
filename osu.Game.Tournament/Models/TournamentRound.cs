@@ -29,6 +29,8 @@ namespace osu.Game.Tournament.Models
 
         public readonly BindableBool TrustAll = new BindableBool(false);
 
+        public readonly BindableBool IsFinalStage = new BindableBool(false);
+
         public readonly BindableList<TournamentUser> Referees = new BindableList<TournamentUser>();
 
         // only used for serialisation

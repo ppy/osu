@@ -44,9 +44,9 @@ namespace osu.Game.Tournament.Screens.Board
         private bool havePendingSwap = false;
         private bool refEX = false;
         private bool refWin = false;
-        private TeamColour refWinner = TeamColour.Neutral;
+        private TeamColour refWinner = TeamColour.None;
 
-        private TeamColour teamWinner = TeamColour.Neutral;
+        private TeamColour teamWinner = TeamColour.None;
 
         private OsuButton buttonRedBan = null!;
         private OsuButton buttonBlueBan = null!;
@@ -582,6 +582,9 @@ namespace osu.Game.Tournament.Screens.Board
 
             if (state == Steps.FinalWin)
             {
+                if (CurrentMatch.Value.Round.Value != null)
+                    CurrentMatch.Value.Round.Value.IsFinalStage.Value =
+                        color == TeamColour.Neutral ? true : false;
                 AddInternal(new RoundAnimation(teamWinner == TeamColour.Red
                     ? CurrentMatch.Value.Team1.Value
                     : teamWinner == TeamColour.Blue

@@ -433,6 +433,18 @@ namespace osu.Game.Tournament.Screens.Board
                 }
             }
 
+            if (pickType == ChoiceType.RedWin || pickType == ChoiceType.BlueWin)
+            {
+                if (CurrentMatch.Value.Round.Value.IsFinalStage.Value)
+                {
+                    AddInternal(new RoundAnimation(pickType == ChoiceType.RedWin ? CurrentMatch.Value.Team1.Value : CurrentMatch.Value.Team2.Value,
+                        pickType == ChoiceType.RedWin ? TeamColour.Red : TeamColour.Blue));
+
+                    CurrentMatch.Value.Team1Score.Value = pickType == ChoiceType.RedWin ? 6 : 0;
+                    CurrentMatch.Value.Team2Score.Value = pickType == ChoiceType.BlueWin ? 6 : 0;
+                }
+            }
+
             if (LadderInfo.AutoProgressScreens.Value)
             {
                 if (pickType == ChoiceType.Pick && CurrentMatch.Value.EXPicks.Any(i => i.Type == ChoiceType.Pick))
