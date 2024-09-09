@@ -582,7 +582,11 @@ namespace osu.Game.Tournament.Screens.Board
 
             if (state == Steps.FinalWin)
             {
-                AddInternal(new RoundAnimation(teamWinner == TeamColour.Red ? CurrentMatch.Value.Team1.Value : CurrentMatch.Value.Team2.Value, teamWinner));
+                AddInternal(new RoundAnimation(teamWinner == TeamColour.Red
+                    ? CurrentMatch.Value.Team1.Value
+                    : teamWinner == TeamColour.Blue
+                        ? CurrentMatch.Value.Team2.Value
+                        : null, teamWinner));
             }
         }
 
@@ -966,49 +970,43 @@ namespace osu.Game.Tournament.Screens.Board
             if (!CurrentMatch.Value.Round.Value.UseBoard.Value) return false;
             if (CurrentMatch.Value.PendingSwaps.Any()) return false;
 
-            var winner = TeamColour.Neutral;
-            int i = 0;
+            List<TeamColour> winColours = new List<TeamColour>();
 
-            while (i == 0)
+            TeamColour winner;
+
+            winColours.Add(isWin(1, 1, 1, 4));
+            winColours.Add(isWin(2, 1, 2, 4));
+            winColours.Add(isWin(3, 1, 3, 4));
+            winColours.Add(isWin(4, 1, 4, 4));
+            winColours.Add(isWin(1, 1, 4, 1));
+            winColours.Add(isWin(1, 2, 4, 2));
+            winColours.Add(isWin(1, 3, 4, 3));
+            winColours.Add(isWin(1, 4, 4, 4));
+            winColours.Add(isWin(1, 1, 4, 4));
+            winColours.Add(isWin(1, 4, 4, 1));
+
+            winner = winColours.Contains(TeamColour.Red)
+                ? winColours.Contains(TeamColour.Blue)
+                    ? TeamColour.Neutral
+                    : TeamColour.Red
+                : winColours.Contains(TeamColour.Blue)
+                    ? TeamColour.Blue
+                    : TeamColour.None;
+
+            teamWinner = winner;
+
+            if (winner == TeamColour.Neutral || winner == TeamColour.None)
             {
-                if ((winner = isWin(1, 1, 1, 4)) != TeamColour.Neutral) break;
-                if ((winner = isWin(2, 1, 2, 4)) != TeamColour.Neutral) break;
-                if ((winner = isWin(3, 1, 3, 4)) != TeamColour.Neutral) break;
-                if ((winner = isWin(4, 1, 4, 4)) != TeamColour.Neutral) break;
-                if ((winner = isWin(1, 1, 4, 1)) != TeamColour.Neutral) break;
-                if ((winner = isWin(1, 2, 4, 2)) != TeamColour.Neutral) break;
-                if ((winner = isWin(1, 3, 4, 3)) != TeamColour.Neutral) break;
-                if ((winner = isWin(1, 4, 4, 4)) != TeamColour.Neutral) break;
-                if ((winner = isWin(1, 1, 4, 4)) != TeamColour.Neutral) break;
-                if ((winner = isWin(1, 4, 4, 1)) != TeamColour.Neutral) break;
-
-                i++;
-            }
-
-            if (winner == TeamColour.Neutral)
-            {
-                // Reset the round winner to Neutral
-                teamWinner = TeamColour.Neutral;
                 // Reset team scores
                 CurrentMatch.Value.Team1Score.Value = 0;
                 CurrentMatch.Value.Team2Score.Value = 0;
-                return false;
+
+                return winner == TeamColour.Neutral;
             }
             else
             {
-                // 6 is just enough to fill the score bar, subject to change
-                teamWinner = winner;
-
-                if (winner == TeamColour.Red)
-                {
-                    CurrentMatch.Value.Team1Score.Value = 6;
-                    CurrentMatch.Value.Team2Score.Value = 0;
-                }
-                else
-                {
-                    CurrentMatch.Value.Team2Score.Value = 6;
-                    CurrentMatch.Value.Team1Score.Value = 0;
-                }
+                CurrentMatch.Value.Team1Score.Value = winner == TeamColour.Red ? 6 : 0;
+                CurrentMatch.Value.Team2Score.Value = winner == TeamColour.Blue ? 6 : 0;
 
                 return true;
             }

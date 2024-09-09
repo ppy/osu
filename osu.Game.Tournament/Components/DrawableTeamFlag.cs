@@ -30,7 +30,7 @@ namespace osu.Game.Tournament.Components
         [BackgroundDependencyLoader]
         private void load(TextureStore textures)
         {
-            if (team == null) return;
+            //if (team == null) return;
 
             Size = new Vector2(75, 54);
             Masking = true;
@@ -43,7 +43,14 @@ namespace osu.Game.Tournament.Components
                 FillMode = FillMode.Fill
             };
 
-            (flag = team.FlagName.GetBoundCopy()).BindValueChanged(_ => flagSprite.Texture = textures.Get($@"Flags/{team.FlagName}"), true);
+            if (team != null)
+            {
+                (flag = team.FlagName.GetBoundCopy()).BindValueChanged(_ => flagSprite.Texture = textures.Get($@"Flags/{team.FlagName}"), true);
+            }
+            else
+            {
+                flagSprite.Texture = textures.Get(@"Flags/alt");
+            }
         }
     }
 }

@@ -176,7 +176,7 @@ namespace osu.Game.Tournament.Components
                             {
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
-                                Text = @$"{(colour == TeamColour.Red ? "ºì¶Ó" : colour == TeamColour.Blue ? "À¶¶Ó" : "Ë«·½")}»ñÊ¤!",
+                                Text = colour == TeamColour.Red ? "çº¢é˜Ÿè·èƒœ!" : colour == TeamColour.Blue ? "è“é˜Ÿè·èƒœ!" : "æœ€åä¸€æ: EX!",
                                 Font = OsuFont.HarmonyOSSans.With(weight: FontWeight.Bold, size: 55),
                                 Colour = Color4.White,
                                 Alpha = 0,
