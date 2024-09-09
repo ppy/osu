@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Extensions.LocalisationExtensions;
@@ -26,6 +27,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
     {
         private StreakPiece currentDaily = null!;
         private StreakPiece currentWeekly = null!;
+        private StreakPiece totalParticipation = null!;
         private StatisticsPiece bestDaily = null!;
         private StatisticsPiece bestWeekly = null!;
         private StatisticsPiece topTen = null!;
@@ -80,6 +82,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
                                     Spacing = new Vector2(30f),
                                     Children = new[]
                                     {
+                                        totalParticipation = new StreakPiece(UsersStrings.ShowDailyChallengePlaycount),
                                         currentDaily = new StreakPiece(UsersStrings.ShowDailyChallengeDailyStreakCurrent),
                                         currentWeekly = new StreakPiece(UsersStrings.ShowDailyChallengeWeeklyStreakCurrent),
                                     }
@@ -113,6 +116,9 @@ namespace osu.Game.Overlays.Profile.Header.Components
             background.Colour = colourProvider.Background4;
             topBackground.Colour = colourProvider.Background5;
 
+            totalParticipation.Value = DailyChallengeStatsDisplayStrings.UnitDay(statistics.PlayCount.ToLocalisableString(@"N0"));
+            totalParticipation.ValueColour = colours.ForRankingTier(TierForPlayCount(statistics.PlayCount));
+
             currentDaily.Value = DailyChallengeStatsDisplayStrings.UnitDay(content.Statistics.DailyStreakCurrent.ToLocalisableString(@"N0"));
             currentDaily.ValueColour = colours.ForRankingTier(TierForDaily(statistics.DailyStreakCurrent));
 
@@ -132,7 +138,13 @@ namespace osu.Game.Overlays.Profile.Header.Components
             topFifty.ValueColour = colourProvider.Content2;
         }
 
-        // reference: https://github.com/ppy/osu-web/blob/8206e0e91eeea80ccf92f0586561346dd40e085e/resources/js/profile-page/daily-challenge.tsx#L13-L43
+        // reference: https://github.com/ppy/osu-web/blob/adf1e94754ba9625b85eba795f4a310caf169eec/resources/js/profile-page/daily-challenge.tsx#L13-L47
+
+        // Rounding up is needed here to ensure the overlay shows the same colour as osu-web for the play count.
+        // This is because, for example, 31 / 3 > 10 in JavaScript because floats are used, while here it would
+        // get truncated to 10 with an integer division and show a lower tier.
+        public static RankingTier TierForPlayCount(int playCount) => TierForDaily((int)Math.Ceiling(playCount / 3.0d));
+
         public static RankingTier TierForDaily(int daily)
         {
             if (daily > 360)
