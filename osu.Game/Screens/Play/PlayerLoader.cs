@@ -529,7 +529,13 @@ namespace osu.Game.Screens.Play
             scheduledPushPlayer = Scheduler.AddDelayed(() =>
             {
                 // ensure that once we have reached this "point of no return", readyForPush will be false for all future checks (until a new player instance is prepared).
-                var consumedPlayer = consumePlayer();
+                Player consumedPlayer = consumePlayer();
+
+                consumedPlayer.OnShowingResults += () =>
+                {
+                    highPerformanceSession?.Dispose();
+                    highPerformanceSession = null;
+                };
 
                 ContentOut();
 

@@ -57,6 +57,11 @@ namespace osu.Game.Screens.Play
         /// </summary>
         public event Action OnGameplayStarted;
 
+        /// <summary>
+        /// Raised after all gameplay has finished.
+        /// </summary>
+        public event Action OnShowingResults;
+
         public override bool AllowBackButton => false; // handled by HoldForMenuButton
 
         protected override bool PlayExitSound => !isRestarting;
@@ -820,6 +825,7 @@ namespace osu.Game.Screens.Play
                     // This player instance may already be in the process of exiting.
                     return;
 
+                OnShowingResults?.Invoke();
                 this.Push(CreateResults(prepareScoreForDisplayTask.GetResultSafely()));
             }, Time.Current + delay, 50);
 
