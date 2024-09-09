@@ -59,8 +59,12 @@ namespace osu.Game.Rulesets.Osu.UI
         }
 
         /// <summary>
-        /// false for loading, true for loaded
+        /// Invalidated when containers are not loaded nor loading, false if loading, and true if loaded
         /// </summary>
+        /// <remarks>
+        /// Knowing the loading/loaded state is for avoiding an enumeration error when adding
+        /// new entries and not starting a new load while loading
+        /// </remarks>
         private readonly Cached<bool> loadState = new Cached<bool>();
 
         private CancellationTokenSource? generationCancellationSource;

@@ -35,21 +35,19 @@ namespace osu.Game.Rulesets.Osu.UI
 
         protected new OsuRulesetConfigManager Config => (OsuRulesetConfigManager)base.Config;
 
-        [Resolved]
-        private MultiSpectatorScreen? multiSpectatorScreen { get; set; }
-
         public DrawableOsuRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod>? mods = null)
             : base(ruleset, beatmap, mods)
         {
         }
 
         [BackgroundDependencyLoader]
-        private void load(Player? player)
+        private void load(Player? player, MultiSpectatorScreen? multiSpectatorScreen)
         {
             if (player is ReplayPlayer || player is SpectatorPlayer)
             {
                 PlayfieldAdjustmentContainer.Add(new ReplayAnalysisOverlay(player.Score.Replay));
 
+                // if in multiplayer spectator mode, place the settings elsewhere
                 if (multiSpectatorScreen == null)
                     player.AddSettings(new ReplayAnalysisSettings(Config));
                 else if (!multiSpectatorScreen.SettingsAdded)
