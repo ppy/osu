@@ -51,13 +51,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double sliderFactor = aimRating > 0 ? aimRatingNoSliders / aimRating : 1;
 
-            double baseReadingHiddenPerformance = 0;
+            double baseReadingHiddenPerformance = 0.0;
             if (mods.Any(h => h is OsuModHidden))
             {
                 hiddenRating = Math.Sqrt(skills[6].DifficultyValue()) * DIFFICULTY_MULTIPLIER;
                 baseReadingHiddenPerformance = ReadingHidden.DifficultyToPerformance(hiddenRating);
             }
 
+            double baseFlashlightPerformance = 0.0;
             if (mods.Any(h => h is OsuModFlashlight))
             {
                 baseFlashlightPerformance = Flashlight.DifficultyToPerformance(flashlightRating);
