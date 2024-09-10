@@ -69,18 +69,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             // Cognition
 
-            // Get HDFL value for capping reading performance
-            // In the future consider separating "all notes all invisible" and "full-memory but notes are visible" case
-            double potentialHiddenFlashlightValue = computeFlashlightValue(score, osuAttributes, true);
-
             double lowARValue = computeReadingLowARValue(score, osuAttributes);
             double highARValue = computeReadingHighARValue(score, osuAttributes);
 
             double readingARValue = Math.Pow(Math.Pow(lowARValue, power) + Math.Pow(highARValue, power), 1.0 / power);
 
-            double flashlightValue = 0;
-            if (score.Mods.Any(h => h is OsuModFlashlight))
-                flashlightValue = computeFlashlightValue(score, osuAttributes);
+            double flashlightValue = computeFlashlightValue(score, osuAttributes);
 
             double readingHDValue = 0;
             if (score.Mods.Any(h => h is OsuModHidden))
@@ -91,7 +85,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double flashlightARValue = Math.Pow(Math.Pow(flashlightValue, flPower) + Math.Pow(readingARValue, flPower), 1.0 / flPower);
 
             double cognitionValue = flashlightARValue + readingHDValue;
-            cognitionValue = AdjustCognitionPerformance(cognitionValue, mechanicalValue, potentialHiddenFlashlightValue);
+            cognitionValue = AdjustCognitionPerformance(cognitionValue, mechanicalValue, flashlightValue);
 
             double accuracyValue = computeAccuracyValue(score, osuAttributes);
 
@@ -108,7 +102,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double visualFlashlightValue = cognitionValue * flashlightARPortion * flashlightPortion;
 
             // Calculate reading difficulty as there was no FL in the first place
-            double visualCognitionValue = AdjustCognitionPerformance(readingARValue + readingHDValue, mechanicalValue, potentialHiddenFlashlightValue);
+            double visualCognitionValue = AdjustCognitionPerformance(readingARValue + readingHDValue, mechanicalValue, flashlightValue);
 
             return new OsuPerformanceAttributes
             {
@@ -259,9 +253,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             return accuracyValue;
         }
 
-        private double computeFlashlightValue(ScoreInfo score, OsuDifficultyAttributes attributes, bool alwaysUseHD = false)
+        private double computeFlashlightValue(ScoreInfo score, OsuDifficultyAttributes attributes)
         {
-            double flashlightValue = Flashlight.DifficultyToPerformance(alwaysUseHD ? attributes.HiddenFlashlightDifficulty : attributes.FlashlightDifficulty);
+            double flashlightValue = Flashlight.DifficultyToPerformance(attributes.FlashlightDifficulty);
 
             // Penalize misses by assessing # of misses relative to the total # of objects. Default a 3% reduction for any # of misses.
             if (effectiveMissCount > 0)
