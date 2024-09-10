@@ -11,6 +11,7 @@ using Newtonsoft.Json;
 using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
@@ -18,6 +19,8 @@ using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
+using osu.Framework.Logging;
+using osu.Framework.Platform;
 using Web = osu.Game.Resources.Localisation.Web;
 using osu.Framework.Testing;
 using osu.Game.Database;
@@ -59,6 +62,9 @@ namespace osu.Game.Overlays.SkinEditor
         private OsuGame? game { get; set; }
 
         [Resolved]
+        private GameHost host { get; set; } = null!;
+
+        [Resolved]
         private SkinManager skins { get; set; } = null!;
 
         [Resolved]
@@ -84,6 +90,7 @@ namespace osu.Game.Overlays.SkinEditor
 
         private SkinEditorChangeHandler? changeHandler;
 
+        private EditorMenuItem mountMenuItem = null!;
         private EditorMenuItem undoMenuItem = null!;
         private EditorMenuItem redoMenuItem = null!;
 
@@ -157,6 +164,7 @@ namespace osu.Game.Overlays.SkinEditor
                                                     {
                                                         new EditorMenuItem(Web.CommonStrings.ButtonsSave, MenuItemType.Standard, () => Save()),
                                                         new EditorMenuItem(CommonStrings.Export, MenuItemType.Standard, () => skins.ExportCurrentSkin()) { Action = { Disabled = !RuntimeInfo.IsDesktop } },
+                                                        mountMenuItem = new EditorMenuItem("Edit externally", MenuItemType.Standard, () => _ = editExternally()) { Action = { Disabled = !RuntimeInfo.IsDesktop } },
                                                         new OsuMenuItemSpacer(),
                                                         new EditorMenuItem(CommonStrings.RevertToDefault, MenuItemType.Destructive, () => dialogOverlay?.Push(new RevertConfirmDialog(revert))),
                                                         new OsuMenuItemSpacer(),
@@ -272,6 +280,86 @@ namespace osu.Game.Overlays.SkinEditor
             SelectedComponents.BindCollectionChanged((_, _) => Scheduler.AddOnce(populateSettings), true);
 
             selectedTarget.BindValueChanged(targetChanged, true);
+        }
+
+        private ExternalEditOperation<SkinInfo>? externalEditOperation;
+
+        private async Task editExternally()
+        {
+            var skin = currentSkin.Value.SkinInfo.PerformRead(s => s.Detach());
+
+            try
+            {
+                externalEditOperation = await skins.BeginExternalEditing(skin).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                Logger.Log($"Failed to initialize external edit operation: {ex}", LoggingTarget.Database, LogLevel.Error);
+            }
+
+            if (externalEditOperation == null)
+                return;
+
+            host.OpenFileExternally(externalEditOperation.MountedPath.TrimDirectorySeparator() + Path.DirectorySeparatorChar);
+
+            mountMenuItem.Text.Value = "Finish external edit";
+            mountMenuItem.Action.Value = () => _ = finishExternalEdit();
+        }
+
+        private async Task finishExternalEdit()
+        {
+            if (externalEditOperation == null || !externalEditOperation.IsMounted)
+                return;
+
+            // TODO: The cache is not being invalidated, resulting in there being no visual change after the skin is updated. I don't know how to work with the cache, so I'm leaving it like this for now.
+            await Task.Run(() =>
+            {
+                currentSkin.Value.SkinInfo.PerformWrite(skinInfo =>
+                {
+                    var filesInSkin = skinInfo.Files.Select(f => f.Filename).ToHashSet();
+                    var filesInMounted = Directory.EnumerateFiles(externalEditOperation.MountedPath, "*.*", SearchOption.AllDirectories).Select(f => Path.GetRelativePath(externalEditOperation.MountedPath, f)).ToHashSet();
+
+                    // Enumerate over every file in the skin. If it's not in the mounted directory, it was deleted and should be removed from the skin.
+                    var filesToDelete = filesInSkin.Except(filesInMounted).ToList();
+
+                    foreach (string file in filesToDelete)
+                    {
+                        var fileToDelete = skinInfo.Files.First(f => f.Filename == file);
+                        skins.DeleteFile(skinInfo, fileToDelete);
+                    }
+
+                    // Enumerate over every file in the mounted directory. If the file is not in the skin, it should be added. If it is, the hashes should be compared, and the file should be updated if necessary.
+                    var filesToAddOrUpdate = filesInMounted.Except(filesInSkin).ToList();
+                    var filesToUpdate = filesInMounted.Intersect(filesInSkin).ToList();
+
+                    foreach (string file in filesToAddOrUpdate)
+                    {
+                        using var stream = File.OpenRead(Path.Combine(externalEditOperation.MountedPath, file));
+                        skins.AddFile(skinInfo, stream, file);
+                    }
+
+                    foreach (string newFile in filesToUpdate)
+                    {
+                        var existingFile = skinInfo.Files.First(f => f.Filename == newFile);
+                        string newFileAbsolutePath = Path.Combine(externalEditOperation.MountedPath, newFile);
+                        string? hash = File.ReadAllText(newFileAbsolutePath).ComputeSHA2Hash();
+
+                        if (hash == existingFile.File.Hash) continue;
+
+                        using var stream = File.OpenRead(newFileAbsolutePath);
+                        skins.AddFile(skinInfo, stream, existingFile.Filename);
+                    }
+                });
+            }).ConfigureAwait(false);
+
+            try
+            {
+                Directory.Delete(externalEditOperation.MountedPath, true);
+            }
+            catch { }
+
+            mountMenuItem.Text.Value = "Edit externally";
+            mountMenuItem.Action.Value = () => _ = editExternally();
         }
 
         public bool OnPressed(KeyBindingPressEvent<PlatformAction> e)

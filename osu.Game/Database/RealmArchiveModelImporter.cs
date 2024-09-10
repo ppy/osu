@@ -188,7 +188,9 @@ namespace osu.Game.Database
 
             Directory.CreateDirectory(mountedPath);
 
-            foreach (var realmFile in model.Files)
+            // Detach files from the model to avoid realm contention when copying to the external location.
+            // This is safe as we are not modifying the model in any way.
+            foreach (var realmFile in model.Files.Detach())
             {
                 string sourcePath = Files.Storage.GetFullPath(realmFile.File.GetStoragePath());
                 string destinationPath = Path.Join(mountedPath, realmFile.Filename);
