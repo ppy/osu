@@ -29,7 +29,8 @@ namespace osu.Game.Tournament.Screens.Board
 {
     public partial class BoardScreen : TournamentMatchScreen
     {
-        private FillFlowContainer<FillFlowContainer<BoardBeatmapPanel>> mapFlows = null!;
+        private Container boardContainer = null!;
+        private List<BoardBeatmapPanel> boardMapList = new List<BoardBeatmapPanel>();
 
         [Resolved]
         private TournamentSceneManager? sceneManager { get; set; }
@@ -169,18 +170,11 @@ namespace osu.Game.Tournament.Screens.Board
                         },
                     },
                 },
-                mapFlows = new FillFlowContainer<FillFlowContainer<BoardBeatmapPanel>>
+                boardContainer = new Container
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    RelativeSizeAxes = Axes.Y,
-                    Direction = FillDirection.Vertical,
-                    // X = 0,
-                    Y = 15,
-                    Height = 1f,
-                    Width = 900,
-                    Padding = new MarginPadding{ Left = 50 },
-                    Spacing = new Vector2(10, 10),
+                    CornerRadius = 10,
                 },
                 informationDisplayContainer = new Container
                 {
@@ -669,8 +663,7 @@ namespace osu.Game.Tournament.Screens.Board
 
         protected override bool OnMouseDown(MouseDownEvent e)
         {
-            var maps = mapFlows.Select(f => f.FirstOrDefault(m => m.ReceivePositionalInputAt(e.ScreenSpaceMousePosition)));
-            var map = maps.FirstOrDefault(m => m != null);
+            var map = boardMapList.FirstOrDefault(m => m.ReceivePositionalInputAt(e.ScreenSpaceMousePosition));
 
             if (map != null)
             {
@@ -972,6 +965,9 @@ namespace osu.Game.Tournament.Screens.Board
             var source = CurrentMatch.Value?.Round.Value?.Beatmaps.FirstOrDefault(p => p.Beatmap?.OnlineID == sourceMapID && p.Mods != "EX");
             var target = CurrentMatch.Value?.Round.Value?.Beatmaps.FirstOrDefault(p => p.Beatmap?.OnlineID == targetMapID && p.Mods != "EX");
 
+            var sourceDrawable = boardMapList.FirstOrDefault(p => p.Beatmap?.OnlineID == sourceMapID);
+            var targetDrawable = boardMapList.FirstOrDefault(p => p.Beatmap?.OnlineID == targetMapID);
+
             // Already detected null here, no need to do again
             if (source != null && target != null)
             {
@@ -986,11 +982,20 @@ namespace osu.Game.Tournament.Screens.Board
                 target.BoardX = middleX;
                 target.BoardY = middleY;
 
-                // TODO: A better way to reload maps
+
+                if (sourceDrawable != null && targetDrawable != null)
+                {
+                    float middleDX = sourceDrawable.X;
+                    float middleDY = sourceDrawable.Y;
+
+                    sourceDrawable.MoveTo(new Vector2(targetDrawable.X, targetDrawable.Y), 500, Easing.OutCubic);
+                    targetDrawable.MoveTo(new Vector2(middleDX, middleDY), 500, Easing.OutCubic);
+                }
+
                 DetectWin();
                 DetectEX();
-                updateDisplay();
-                // CurrentMatch.Value?.PendingSwaps.Clear();
+                // updateDisplay();
+                CurrentMatch.Value?.PendingSwaps.Clear();
             }
             else
             {
@@ -1217,7 +1222,8 @@ namespace osu.Game.Tournament.Screens.Board
 
         private void updateDisplay()
         {
-            mapFlows.Clear();
+            boardContainer.Clear();
+            boardMapList.Clear();
 
             if (CurrentMatch.Value == null)
             {
@@ -1227,8 +1233,6 @@ namespace osu.Game.Tournament.Screens.Board
 
             if (CurrentMatch.Value.Round.Value != null)
             {
-                FillFlowContainer<BoardBeatmapPanel>? currentFlow = null;
-
                 // Use predefined Board coodinate
                 if (CurrentMatch.Value.Round.Value.UseBoard.Value)
                 {
@@ -1236,28 +1240,26 @@ namespace osu.Game.Tournament.Screens.Board
 
                     for (int i = 1; i <= 4; i++)
                     {
-                        mapFlows.Add(currentFlow = new FillFlowContainer<BoardBeatmapPanel>
-                        {
-                            Spacing = new Vector2(10, 10),
-                            Direction = FillDirection.Full,
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y
-                        });
-
                         for (int j = 1; j <= 4; j++)
                         {
                             var nextMap = CurrentMatch.Value.Round.Value.Beatmaps.FirstOrDefault(p => (p.Mods != "EX" && p.BoardX == j && p.BoardY == i));
-
                             if (nextMap != null)
                             {
                                 var hasSwappedMap = CurrentMatch.Value.PendingSwaps.FirstOrDefault(p => p.BeatmapID == nextMap.Beatmap?.OnlineID);
-                                currentFlow.Add(new BoardBeatmapPanel(nextMap.Beatmap, nextMap.Mods, nextMap.ModIndex, hasSwappedMap != null)
+                                var mapDrawable = new BoardBeatmapPanel(nextMap.Beatmap, nextMap.Mods, nextMap.ModIndex)
                                 {
-                                    Anchor = Anchor.TopCentre,
-                                    Origin = Anchor.TopCentre,
-                                    Height = 150,
-                                });
+                                    Anchor = Anchor.Centre,
+                                    Origin = Anchor.Centre,
+                                    X = -400 + j * 160,
+                                    Y = -450 + i * 160,
+                                };
+                                boardContainer.Add(mapDrawable);
+                                boardMapList.Add(mapDrawable);
                                 if (hasSwappedMap != null) CurrentMatch.Value.PendingSwaps.Remove(hasSwappedMap);
+                            }
+                            else
+                            {
+                                // TODO: Do we need to add a placeholder here?
                             }
                         }
                     }
@@ -1267,7 +1269,6 @@ namespace osu.Game.Tournament.Screens.Board
                     AddInternal(warning = new WarningBox("This round isn't set up for board view..."));
                     return;
                 }
-                mapFlows.Padding = new MarginPadding(5);
             }
         }
     }
