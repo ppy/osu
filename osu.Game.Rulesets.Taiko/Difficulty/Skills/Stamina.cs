@@ -11,9 +11,9 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
     /// <summary>
     /// Calculates the stamina coefficient of taiko difficulty.
     /// </summary>
-    public class Stamina : StrainDecaySkill
+    public class Stamina : StrainSkill
     {
-        protected override double SkillMultiplier => 1.1;
+        public override double SkillMultiplier => 1.1;
         protected override double StrainDecayBase => 0.4;
 
         /// <summary>
@@ -25,9 +25,6 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
         {
         }
 
-        protected override double StrainValueOf(DifficultyHitObject current)
-        {
-            return StaminaEvaluator.EvaluateDifficultyOf(current);
-        }
+        protected override double StrainValueOf(DifficultyHitObject current) => StaminaEvaluator.EvaluateDifficultyOf(current);
     }
 }
