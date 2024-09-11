@@ -46,6 +46,7 @@ namespace osu.Game.Rulesets.Osu.UI
             {
                 ReplayAnalysisOverlay analysisOverlay;
                 PlayfieldAdjustmentContainer.Add(analysisOverlay = new ReplayAnalysisOverlay(replayPlayer.Score.Replay));
+                Overlays.Add(analysisOverlay.CreateProxy().With(p => p.Depth = float.NegativeInfinity));
                 replayPlayer.AddSettings(new ReplayAnalysisSettings(Config));
 
                 cursorHideEnabled = Config.GetBindable<bool>(OsuRulesetSetting.ReplayCursorHideEnabled);
