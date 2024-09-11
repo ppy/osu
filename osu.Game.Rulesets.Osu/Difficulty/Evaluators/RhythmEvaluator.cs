@@ -134,8 +134,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
                         // bpm change was from a slider, this is easier typically than circle -> circle
                         // unintentional side effect is that bursts with kicksliders at the ends might have lower difficulty than bursts without sliders
-                        // therefore we're checking for quick sliders and don't lower the difficulty for them since they don't really make tapping easier (no time to adjust)
-                        if (prevObj.BaseObject is Slider && prevObj.TravelTime > prevDelta * 1.5)
+                        if (prevObj.BaseObject is Slider)
                             effectiveRatio *= 0.2;
 
                         // repeated island polartiy (2 -> 4, 3 -> 5)
