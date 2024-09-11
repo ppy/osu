@@ -169,6 +169,12 @@ namespace osu.Desktop
 
         private static void setupVelopack()
         {
+            if (OsuGameDesktop.IsPackageManaged)
+            {
+                Logger.Log("Updates are being managed by an external provider. Skipping Velopack setup.");
+                return;
+            }
+
             var app = VelopackApp.Build();
 
             if (OperatingSystem.IsWindows())
