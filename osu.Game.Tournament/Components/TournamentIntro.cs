@@ -42,6 +42,7 @@ namespace osu.Game.Tournament.Components
         private Container titleContainer = null!;
 
         private bool beatmapBackgroundLoaded;
+        private static bool isAnimationRunning = false;
 
         private bool animationBegan;
 

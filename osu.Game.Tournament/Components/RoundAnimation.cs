@@ -27,6 +27,7 @@ namespace osu.Game.Tournament.Components
         public const float DISC_SIZE = 400;
 
         private const float border_width = 5;
+        private static bool isAnimationRunning = false;
 
         private readonly Box background;
         private readonly Container backgroundStrip, particleContainer;
@@ -48,6 +49,11 @@ namespace osu.Game.Tournament.Components
 
         public RoundAnimation(TournamentTeam? team, TeamColour colour = TeamColour.Neutral)
         {
+            if (isAnimationRunning)
+                return;
+
+            isAnimationRunning = true;
+
             winColour = colour;
             RelativeSizeAxes = Axes.Both;
 
@@ -282,7 +288,7 @@ namespace osu.Game.Tournament.Components
                     trophy.Delay(2500).FadeIn(500)
                           .MoveToOffset(new Vector2(0, 100), step_duration, Easing.OutQuint);
 
-                    this.FadeIn(200).Then().Delay(10000).FadeOut(1000);
+                    this.FadeIn(200).Then().Delay(10000).FadeOut(1000).OnComplete(_ => isAnimationRunning = false);
                 }
             }
         }
