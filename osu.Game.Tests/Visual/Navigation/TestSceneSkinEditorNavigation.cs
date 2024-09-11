@@ -336,13 +336,13 @@ namespace osu.Game.Tests.Visual.Navigation
             });
 
             AddStep("change to triangles skin", () => Game.Dependencies.Get<SkinManager>().SetSkinFromConfiguration(SkinInfo.TRIANGLES_SKIN.ToString()));
-            AddUntilStep("components loaded", () => Game.ChildrenOfType<SkinComponentsContainer>().All(c => c.ComponentsLoaded));
+            AddUntilStep("components loaded", () => Game.ChildrenOfType<SkinnableContainer>().All(c => c.ComponentsLoaded));
             // sort of implicitly relies on song select not being skinnable.
             // TODO: revisit if the above ever changes
             AddUntilStep("skin changed", () => !skinEditor.ChildrenOfType<SkinBlueprint>().Any());
 
             AddStep("change back to modified skin", () => Game.Dependencies.Get<SkinManager>().SetSkinFromConfiguration(editedSkinId.ToString()));
-            AddUntilStep("components loaded", () => Game.ChildrenOfType<SkinComponentsContainer>().All(c => c.ComponentsLoaded));
+            AddUntilStep("components loaded", () => Game.ChildrenOfType<SkinnableContainer>().All(c => c.ComponentsLoaded));
             AddUntilStep("changes saved", () => skinEditor.ChildrenOfType<SkinBlueprint>().Any());
         }
 

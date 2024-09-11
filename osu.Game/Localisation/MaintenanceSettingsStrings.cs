@@ -35,11 +35,6 @@ namespace osu.Game.Localisation
         public static LocalisableString ProhibitedInteractDuringMigration => new TranslatableString(getKey(@"prohibited_interact_during_migration"), @"Please avoid interacting with the game!");
 
         /// <summary>
-        /// "Some files couldn't be cleaned up during migration. Clicking this notification will open the folder so you can manually clean things up."
-        /// </summary>
-        public static LocalisableString FailedCleanupNotification => new TranslatableString(getKey(@"failed_cleanup_notification"), @"Some files couldn't be cleaned up during migration. Clicking this notification will open the folder so you can manually clean things up.");
-
-        /// <summary>
         /// "Please select a new location"
         /// </summary>
         public static LocalisableString SelectNewLocation => new TranslatableString(getKey(@"select_new_location"), @"Please select a new location");
