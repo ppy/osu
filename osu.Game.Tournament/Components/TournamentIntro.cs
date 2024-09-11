@@ -311,7 +311,7 @@ namespace osu.Game.Tournament.Components
                 updateAnimationState();
                 sceneManager?.HideShowChat(400);
             });
-            this.FadeInFromZero(400, Easing.OutQuint);
+            this.FadeInFromZero(500, Easing.OutExpo);
             updateAnimationState();
         }
 
