@@ -5,9 +5,11 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Testing;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mania.Beatmaps;
@@ -78,7 +80,37 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
         {
             switch (lookup)
             {
-                case GameplaySkinComponentLookup<HitResult> resultComponent:
+                case GlobalSkinnableContainerLookup containerLookup:
+                    // Modifications for global components.
+                    if (containerLookup.Ruleset == null)
+                        return base.GetDrawableComponent(lookup);
+
+                    // we don't have enough assets to display these components (this is especially the case on a "beatmap" skin).
+                    if (!IsProvidingLegacyResources)
+                        return null;
+
+                    switch (containerLookup.Lookup)
+                    {
+                        case GlobalSkinnableContainers.MainHUDComponents:
+                            return new DefaultSkinComponentsContainer(container =>
+                            {
+                                var combo = container.ChildrenOfType<LegacyManiaComboCounter>().FirstOrDefault();
+
+                                if (combo != null)
+                                {
+                                    combo.Anchor = Anchor.TopCentre;
+                                    combo.Origin = Anchor.Centre;
+                                    combo.Y = this.GetManiaSkinConfig<float>(LegacyManiaSkinConfigurationLookups.ComboPosition)?.Value ?? 0;
+                                }
+                            })
+                            {
+                                new LegacyManiaComboCounter(),
+                            };
+                    }
+
+                    return null;
+
+                case SkinComponentLookup<HitResult> resultComponent:
                     return getResult(resultComponent.Component);
 
                 case ManiaSkinComponentLookup maniaComponent:

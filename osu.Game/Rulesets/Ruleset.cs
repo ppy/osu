@@ -401,5 +401,10 @@ namespace osu.Game.Rulesets
             new DifficultySection(),
             new ColoursSection(),
         ];
+
+        /// <summary>
+        /// Can be overridden to avoid showing scroll speed changes in the editor.
+        /// </summary>
+        public virtual bool EditorShowScrollSpeed => true;
     }
 }
