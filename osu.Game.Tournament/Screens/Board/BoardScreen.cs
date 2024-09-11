@@ -365,6 +365,13 @@ namespace osu.Game.Tournament.Screens.Board
                         new TourneyButton
                         {
                             RelativeSizeAxes = Axes.X,
+                            Text = "Refresh",
+                            BackgroundColour = Color4.Orange,
+                            Action = updateDisplay
+                        },
+                        new TourneyButton
+                        {
+                            RelativeSizeAxes = Axes.X,
                             Text = "Reset",
                             BackgroundColour = Color4.Orange,
                             Action = reset
