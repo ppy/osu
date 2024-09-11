@@ -240,7 +240,8 @@ namespace osu.Game.Tournament.Components
 
         private void startAnimation()
         {
-            content.Show();
+            using (BeginDelayedSequence(700))
+                content.Show();
 
             background.FlashColour(Color4.White.Opacity(0.25f), 400);
 
