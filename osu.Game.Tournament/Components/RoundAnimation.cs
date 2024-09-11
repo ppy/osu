@@ -49,11 +49,6 @@ namespace osu.Game.Tournament.Components
 
         public RoundAnimation(TournamentTeam? team, TeamColour colour = TeamColour.Neutral)
         {
-            if (isAnimationRunning)
-                return;
-
-            isAnimationRunning = true;
-
             winColour = colour;
             RelativeSizeAxes = Axes.Both;
 
@@ -207,6 +202,10 @@ namespace osu.Game.Tournament.Components
         [BackgroundDependencyLoader]
         private void load(OsuColour colours, TextureStore textures, AudioManager audio)
         {
+            // Don't load if an active animation instance exists.
+            if (isAnimationRunning)
+                return;
+
             getSample = audio.Samples.Get(@"MedalSplash/medal-get");
             innerSpin.Texture = outerSpin.Texture = textures.Get(@"MedalSplash/disc-spin");
 
@@ -221,6 +220,9 @@ namespace osu.Game.Tournament.Components
         protected override void LoadComplete()
         {
             base.LoadComplete();
+
+            if (isAnimationRunning)
+                return;
 
             LoadComponentAsync(drawableMedal = new SpriteIcon
             {
@@ -246,6 +248,8 @@ namespace osu.Game.Tournament.Components
 
         private void startAnimation()
         {
+            isAnimationRunning = true;
+
             using (BeginDelayedSequence(700))
                 content.Show();
 
