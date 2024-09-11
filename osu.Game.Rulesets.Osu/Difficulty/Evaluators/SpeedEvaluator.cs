@@ -10,9 +10,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 {
     public static class SpeedEvaluator
     {
-        private const double single_spacing_threshold = 125;
+        public const double single_spacing_threshold = 125;
         private const double min_speed_bonus = 75; // ~200BPM
         private const double speed_balancing_factor = 40;
+        private const double distance_multiplier = 1.1;
 
         /// <summary>
         /// Evaluates the difficulty of tapping the current object, based on:
@@ -54,12 +55,26 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             double speedBonus = 1.0;
 
             if (strainTime < min_speed_bonus)
-                speedBonus = 1 + 0.75 * Math.Pow((min_speed_bonus - strainTime) / speed_balancing_factor, 2);
+                speedBonus = 1 + 0.70 * Math.Pow((min_speed_bonus - strainTime) / speed_balancing_factor, 2);
 
             double travelDistance = osuPrevObj?.TravelDistance ?? 0;
-            double distance = Math.Min(single_spacing_threshold, travelDistance + osuCurrObj.MinimumJumpDistance);
+            double distance = travelDistance + osuCurrObj.MinimumJumpDistance;
+            double distanceBonus = distance_multiplier * Math.Min(1, Math.Pow(distance / single_spacing_threshold, 3));
 
-            return (speedBonus + speedBonus * Math.Pow(distance / single_spacing_threshold, 3.5)) * doubletapness / strainTime;
+            double adjustedDistanceScale = 1.0;
+
+            if (osuCurrObj.Angle.HasValue &&
+                osuPrevObj?.Angle != null &&
+                Math.Abs(osuCurrObj.DeltaTime - osuPrevObj.DeltaTime) < 10)
+            {
+                double angleDifference = Math.Abs(osuCurrObj.Angle.Value - osuPrevObj.Angle.Value);
+                double angleDifferenceAdjusted = Math.Sin((angleDifference) / 2) * 180.0;
+                double angularVelocity = angleDifferenceAdjusted / (0.1 * strainTime);
+                double angularVelocityBonus = Math.Max(0.0, Math.Pow(angularVelocity, 0.4) - 1.0);
+                adjustedDistanceScale = 0.65 + angularVelocityBonus * 0.45;
+            }
+
+            return (speedBonus + distanceBonus * adjustedDistanceScale) * doubletapness / strainTime;
         }
     }
 }
