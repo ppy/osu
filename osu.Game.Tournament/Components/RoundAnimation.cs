@@ -39,11 +39,11 @@ namespace osu.Game.Tournament.Components
 
         private SpriteIcon? drawableMedal;
         private Sample? getSample;
-        private Container? textContainer;
-        private DrawableTeamFlag? flag;
-        private TournamentSpriteText? ggText;
-        private TournamentSpriteText? cText;
-        private SpriteIcon? trophy;
+        private Container textContainer;
+        private DrawableTeamFlag flag;
+        private TournamentSpriteText ggText;
+        private TournamentSpriteText cText;
+        private SpriteIcon trophy;
 
         private readonly Container content;
 
@@ -182,7 +182,7 @@ namespace osu.Game.Tournament.Components
                             {
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
-                                Text = @$"{(colour == TeamColour.Red ? "红队" : colour == TeamColour.Blue ? "蓝队" : "双方")}获胜!",
+                                Text = @$"{(colour == TeamColour.Red ? "绾㈤槦" : colour == TeamColour.Blue ? "钃濋槦" : "鍙屾柟")}鑾疯儨!",
                                 Font = OsuFont.HarmonyOSSans.With(weight: FontWeight.Bold, size: 55),
                                 Colour = Color4.White,
                                 Alpha = 0,
