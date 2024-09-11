@@ -207,13 +207,13 @@ namespace osu.Game.Tournament.Screens.Board
                         new LabelledSwitchButton
                         {
                             RelativeSizeAxes = Axes.X,
-                            Label = "Ref Commands",
+                            Label = "Board autoControl",
                             Current = LadderInfo.UseRefereeCommands,
                         },
                         new LabelledSwitchButton
                         {
                             RelativeSizeAxes = Axes.X,
-                            Label = "Enforce Response",
+                            Label = "Await Response",
                             Current = LadderInfo.NeedRefereeResponse,
                         },
                         new GridContainer
