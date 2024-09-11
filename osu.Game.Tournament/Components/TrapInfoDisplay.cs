@@ -17,6 +17,72 @@ namespace osu.Game.Tournament.Components
     {
         private readonly TrapInfo thisTrap = null!;
 
+        public TrapInfoDisplay(TrapInfo thisTrap)
+        {
+            this.thisTrap = thisTrap;
+            Anchor = Anchor.CentreLeft;
+            Origin = Anchor.CentreLeft;
+            Height = 100;
+            Width = 500;
+            AlwaysPresent = true;
+
+            InternalChild = new FillFlowContainer
+            {
+                Anchor = Anchor.CentreLeft,
+                Origin = Anchor.CentreLeft,
+                Y = -15,
+                Direction = FillDirection.Horizontal,
+                AutoSizeAxes = Axes.Both,
+                Spacing = new Vector2(20, 0),
+                Children = new Drawable[]
+                {
+                    new SpriteIcon
+                    {
+                        Anchor = Anchor.CentreLeft,
+                        Origin = Anchor.CentreLeft,
+                        Icon = thisTrap.Icon,
+                        Size = new Vector2(56),
+                        Colour = thisTrap.IconColor,
+                        Alpha = 1,
+                    },
+                    new Box
+                    {
+                        Anchor = Anchor.CentreLeft,
+                        Origin = Anchor.CentreLeft,
+                        Colour = Color4.White,
+                        RelativeSizeAxes = Axes.Y,
+                        Height = 0.75f,
+                        Width = 3,
+                    },
+                    new FillFlowContainer
+                    {
+                        AutoSizeAxes = Axes.Both,
+                        Anchor = Anchor.CentreLeft,
+                        Origin = Anchor.CentreLeft,
+                        Direction = FillDirection.Vertical,
+
+                        Children = new Drawable[]
+                        {
+                            new TournamentSpriteText
+                            {
+                                Anchor = Anchor.CentreLeft,
+                                Origin = Anchor.CentreLeft,
+                                Text = thisTrap.Name,
+                                Font = OsuFont.GetFont(typeface: Typeface.HarmonyOSSans, size: 49, weight: FontWeight.Bold),
+                            },
+                            new TournamentSpriteText
+                            {
+                                Anchor = Anchor.CentreLeft,
+                                Origin = Anchor.CentreLeft,
+                                Text = thisTrap.Description,
+                                Font = OsuFont.GetFont(typeface: Typeface.HarmonyOSSans, size: 30, weight: FontWeight.Regular),
+                            },
+                        }
+                    }
+                }
+            };
+        }
+
         public TrapInfoDisplay(TrapType trap = TrapType.Unknown, TeamColour team = TeamColour.Neutral, int mapID = 0)
         {
             thisTrap = new TrapInfo

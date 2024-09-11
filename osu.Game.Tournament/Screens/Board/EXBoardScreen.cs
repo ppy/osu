@@ -33,7 +33,7 @@ namespace osu.Game.Tournament.Screens.Board
         [Resolved]
         private TournamentSceneManager? sceneManager { get; set; }
 
-        private WarningBox warning = null!;
+        private WarningBox? warning;
 
         private TeamColour pickColour = TeamColour.Neutral;
         private ChoiceType pickType = ChoiceType.Pick;
@@ -48,7 +48,7 @@ namespace osu.Game.Tournament.Screens.Board
         private DrawableTeamPlayerList team2List = null!;
         private EmptyBox danmakuBox = null!;
 
-        private readonly int sideListHeight = 660;
+        private const int sideListHeight = 660;
 
         private ScheduledDelegate? scheduledScreenChange;
 
@@ -289,12 +289,17 @@ namespace osu.Game.Tournament.Screens.Board
             {
                 match.OldValue.PendingMsgs.CollectionChanged -= msgOnCollectionChanged;
             }
+
             if (match.NewValue != null)
             {
                 match.NewValue.PendingMsgs.CollectionChanged += msgOnCollectionChanged;
 
-                if (match.NewValue.Team1 != null) team1List?.ReloadWithTeam(match.NewValue.Team1.Value);
-                if (match.NewValue.Team2 != null && team2List != null)
+                if (!IsLoaded)
+                    return;
+
+                if (match.NewValue.Team1.Value != null) team1List.ReloadWithTeam(match.NewValue.Team1.Value);
+
+                if (match.NewValue.Team2.Value != null)
                 {
                     team2List.ReloadWithTeam(match.NewValue.Team2.Value);
                     danmakuBox.ResizeHeightTo(Height = sideListHeight - team2List.GetHeight() - 5, 500, Easing.OutCubic);
@@ -322,6 +327,7 @@ namespace osu.Game.Tournament.Screens.Board
             foreach (var item in msg)
             {
                 BotCommand command = new BotCommand().ParseFromText(item.Content);
+
                 switch (command.Command)
                 {
                     case Commands.PickEX:
@@ -340,6 +346,7 @@ namespace osu.Game.Tournament.Screens.Board
                         break;
                 }
             }
+
             msg.Clear();
         }
 
@@ -373,6 +380,7 @@ namespace osu.Game.Tournament.Screens.Board
                         CurrentMatch.Value?.EXPicks.Remove(existing);
                     }
                 }
+
                 return true;
             }
 
@@ -392,10 +400,7 @@ namespace osu.Game.Tournament.Screens.Board
 
         private void addForBeatmap(string modId)
         {
-            if (CurrentMatch.Value?.Round.Value == null)
-                return;
-
-            var map = CurrentMatch.Value.Round.Value.Beatmaps.FirstOrDefault(b => b.Mods + b.ModIndex == modId);
+            var map = CurrentMatch.Value?.Round.Value?.Beatmaps.FirstOrDefault(b => b.Mods + b.ModIndex == modId);
 
             if (map != null)
                 addForBeatmap(map.ID);
@@ -431,6 +436,7 @@ namespace osu.Game.Tournament.Screens.Board
             if (pickType == ChoiceType.Pick)
             {
                 var map = CurrentMatch.Value.Round.Value.Beatmaps.FirstOrDefault(b => b.Beatmap?.OnlineID == beatmapId);
+
                 if (map != null)
                 {
                     AddInternal(new TournamentIntro(map)
@@ -481,7 +487,7 @@ namespace osu.Game.Tournament.Screens.Board
 
             if (CurrentMatch.Value == null)
             {
-                AddInternal(warning = new WarningBox("Cannot access current match, sorry ;w;"));
+                AddInternal(warning = new WarningBox("Select a match from bracket screen first"));
                 return;
             }
 
@@ -506,6 +512,7 @@ namespace osu.Game.Tournament.Screens.Board
                 foreach (var b in CurrentMatch.Value.Round.Value.Beatmaps)
                 {
                     if (b.Mods != "EX") continue;
+
                     if (currentFlow == null)
                     {
                         mapFlows.Add(currentFlow = new FillFlowContainer<EXBoardBeatmapPanel>
@@ -539,9 +546,7 @@ namespace osu.Game.Tournament.Screens.Board
             else
             {
                 AddInternal(warning = new WarningBox("Cannot access current match, sorry ;w;"));
-                return;
             }
-
         }
     }
 }

@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -86,12 +87,13 @@ namespace osu.Game.Tournament.Components
             var currentMatch = ladderInfo.CurrentMatch;
             bool isCommand = false;
 
-            // Try to recognize and verify bot commmands
-            if (currentMatch.Value != null && currentMatch.Value.Round.Value != null)
+            // Try to recognize and verify bot commands
+            if (currentMatch.Value?.Round.Value != null)
             {
-                isCommand = message.Content[0] == '[' && message.Content[1] == '*' && message.Content[2] == ']';
-                bool isRef = currentMatch.Value.Round.Value.Referees.Count != 0
-                    && currentMatch.Value.Round.Value.Referees.Any(p => p.OnlineID == message.SenderId);
+                isCommand = message.Content.StartsWith("[*]", StringComparison.Ordinal);
+
+                bool isRef = currentMatch.Value.Round.Value.Referees.Any(p => p.OnlineID == message.SenderId);
+
                 // Automatically block duplicate messages, since we have multiple chat displays available.
                 if ((isRef || currentMatch.Value.Round.Value.TrustAll.Value)
                     && isCommand && !currentMatch.Value.PendingMsgs.Any(p => p.Equals(message)))
