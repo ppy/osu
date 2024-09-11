@@ -88,6 +88,9 @@ namespace osu.Game.Tournament.Screens.Board
             LadderInfo.UseRefereeCommands.BindValueChanged(refereeChanged);
             LadderInfo.NeedRefereeResponse.BindValueChanged(refereeNeedChanged);
 
+            // Bind the ValueChanged event of the "Await response" switch
+            LadderInfo.NeedRefereeResponse.BindValueChanged(onAwaitResponseChanged);
+
             InternalChildren = new Drawable[]
             {
                 new TourneyVideo("mappool")
@@ -415,6 +418,14 @@ namespace osu.Game.Tournament.Screens.Board
             }
 
             Scheduler.AddOnce(parseCommands);
+        }
+
+        private void onAwaitResponseChanged(ValueChangedEvent<bool> e)
+        {
+            if (e.NewValue)
+            {
+                LadderInfo.UseRefereeCommands.Value = true;
+            }
         }
 
         private void msgOnCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
