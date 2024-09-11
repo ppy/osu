@@ -953,8 +953,8 @@ namespace osu.Game.Tournament.Screens.Board
 
         protected void SwapMap(int sourceMapID, int targetMapID)
         {
-            var source = CurrentMatch.Value?.Round.Value?.Beatmaps.FirstOrDefault(p => p.Beatmap?.OnlineID == sourceMapID);
-            var target = CurrentMatch.Value?.Round.Value?.Beatmaps.FirstOrDefault(p => p.Beatmap?.OnlineID == targetMapID);
+            var source = CurrentMatch.Value?.Round.Value?.Beatmaps.FirstOrDefault(p => p.Beatmap?.OnlineID == sourceMapID && p.Mods != "EX");
+            var target = CurrentMatch.Value?.Round.Value?.Beatmaps.FirstOrDefault(p => p.Beatmap?.OnlineID == targetMapID && p.Mods != "EX");
 
             // Already detected null here, no need to do again
             if (source != null && target != null)
