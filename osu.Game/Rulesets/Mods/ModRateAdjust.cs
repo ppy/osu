@@ -7,7 +7,7 @@ using osu.Framework.Bindables;
 
 namespace osu.Game.Rulesets.Mods
 {
-    public abstract class ModRateAdjust : Mod, IApplicableToRate
+    public abstract class ModRateAdjust : Mod, IApplicableToRate, ICanBeToggledDuringReplay
     {
         public sealed override bool ValidForMultiplayerAsFreeMod => false;
 
@@ -19,6 +19,8 @@ namespace osu.Game.Rulesets.Mods
         {
             sample.AddAdjustment(AdjustableProperty.Frequency, SpeedChange);
         }
+
+        public BindableBool IsDisabled { get; } = new BindableBool();
 
         public double ApplyToRate(double time, double rate) => rate * SpeedChange.Value;
 

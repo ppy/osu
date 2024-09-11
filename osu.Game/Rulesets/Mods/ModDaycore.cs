@@ -39,8 +39,12 @@ namespace osu.Game.Rulesets.Mods
             // as the expected result of operation is not the same (daycore should preserve constant pitch).
             SpeedChange.BindValueChanged(val =>
             {
-                freqAdjust.Value = SpeedChange.Default;
-                tempoAdjust.Value = val.NewValue / SpeedChange.Default;
+                tempoAdjust.Value = IsDisabled.Value ? val.NewValue : val.NewValue / SpeedChange.Default;
+            }, true);
+
+            IsDisabled.BindValueChanged(_ =>
+            {
+                freqAdjust.Value = IsDisabled.Value ? 1 : SpeedChange.Value;
             }, true);
         }
 

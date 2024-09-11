@@ -29,7 +29,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Mods
 {
-    public abstract class ModFlashlight : Mod
+    public abstract class ModFlashlight : Mod, ICanBeToggledDuringReplay
     {
         public override string Name => "Flashlight";
         public override string Acronym => "FL";
@@ -49,6 +49,8 @@ namespace osu.Game.Rulesets.Mods
         /// <see cref="SizeMultiplier"/> and <see cref="ComboBasedSize"/> will apply their adjustments on top of this size.
         /// </summary>
         public abstract float DefaultFlashlightSize { get; }
+
+        public BindableBool IsDisabled { get; } = new BindableBool();
     }
 
     public abstract partial class ModFlashlight<T> : ModFlashlight, IApplicableToDrawableRuleset<T>, IApplicableToScoreProcessor
@@ -116,11 +118,21 @@ namespace osu.Game.Rulesets.Mods
             private readonly float sizeMultiplier;
             private readonly bool comboBasedSize;
 
+            protected readonly BindableBool IsDisabled = new BindableBool();
+
             protected Flashlight(ModFlashlight modFlashlight)
             {
                 defaultFlashlightSize = modFlashlight.DefaultFlashlightSize;
                 sizeMultiplier = modFlashlight.SizeMultiplier.Value;
                 comboBasedSize = modFlashlight.ComboBasedSize.Value;
+                IsDisabled.BindTo(modFlashlight.IsDisabled);
+
+                IsDisabled.BindValueChanged(disable =>
+                {
+                    if (disable.NewValue) this.TransformTo(nameof(FlashlightDim), 0.0f, 50);
+
+                    Alpha = disable.NewValue ? 0.3f : 1.0f;
+                }, true);
             }
 
             [BackgroundDependencyLoader]

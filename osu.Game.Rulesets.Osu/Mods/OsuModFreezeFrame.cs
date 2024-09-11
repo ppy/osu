@@ -3,6 +3,7 @@
 
 using System;
 using System.Linq;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
@@ -13,7 +14,7 @@ using osu.Game.Rulesets.Osu.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
-    public class OsuModFreezeFrame : Mod, IApplicableToDrawableHitObject, IApplicableToBeatmap
+    public class OsuModFreezeFrame : Mod, IApplicableToDrawableHitObject, IApplicableToBeatmap, ICanBeToggledDuringReplay
     {
         public override string Name => "Freeze Frame";
 
@@ -31,26 +32,38 @@ namespace osu.Game.Rulesets.Osu.Mods
         //mod breaks normal approach circle preempt
         private double originalPreempt;
 
+        public BindableBool IsDisabled { get; } = new BindableBool();
+
         public void ApplyToBeatmap(IBeatmap beatmap)
         {
             var firstHitObject = beatmap.HitObjects.OfType<OsuHitObject>().FirstOrDefault();
             if (firstHitObject == null)
                 return;
 
-            double lastNewComboTime = 0;
-
             originalPreempt = firstHitObject.TimePreempt;
 
-            foreach (var obj in beatmap.HitObjects.OfType<OsuHitObject>())
+            IsDisabled.BindValueChanged(s =>
             {
-                if (obj.NewCombo) { lastNewComboTime = obj.StartTime; }
+                double lastNewComboTime = 0;
 
-                applyFadeInAdjustment(obj);
-            }
+                foreach (var obj in beatmap.HitObjects.OfType<OsuHitObject>())
+                {
+                    if (obj.NewCombo) { lastNewComboTime = obj.StartTime; }
 
-            void applyFadeInAdjustment(OsuHitObject osuObject)
+                    applyFadeInAdjustment(obj, lastNewComboTime);
+                }
+            }, true);
+
+            void applyFadeInAdjustment(OsuHitObject osuObject, double lastNewComboTime)
             {
-                osuObject.TimePreempt += osuObject.StartTime - lastNewComboTime;
+                if (!IsDisabled.Value)
+                {
+                    osuObject.TimePreempt += osuObject.StartTime - lastNewComboTime;
+                }
+                else
+                {
+                    osuObject.TimePreempt -= osuObject.StartTime - lastNewComboTime;
+                }
 
                 foreach (var nested in osuObject.NestedHitObjects.OfType<OsuHitObject>())
                 {
@@ -63,7 +76,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                             break;
 
                         default:
-                            applyFadeInAdjustment(nested);
+                            applyFadeInAdjustment(nested, lastNewComboTime);
                             break;
                     }
                 }
@@ -74,6 +87,8 @@ namespace osu.Game.Rulesets.Osu.Mods
         {
             drawableObject.ApplyCustomUpdateState += (drawableHitObject, _) =>
             {
+                if (IsDisabled.Value) return;
+
                 if (drawableHitObject is not DrawableHitCircle drawableHitCircle) return;
 
                 var hitCircle = drawableHitCircle.HitObject;

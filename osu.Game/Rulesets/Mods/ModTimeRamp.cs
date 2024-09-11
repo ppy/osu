@@ -12,7 +12,7 @@ using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Mods
 {
-    public abstract class ModTimeRamp : Mod, IUpdatableByPlayfield, IApplicableToBeatmap, IApplicableToRate
+    public abstract class ModTimeRamp : Mod, IUpdatableByPlayfield, IApplicableToBeatmap, IApplicableToRate, ICanBeToggledDuringReplay
     {
         /// <summary>
         /// The point in the beatmap at which the final ramping rate should be reached.
@@ -44,12 +44,15 @@ namespace osu.Game.Rulesets.Mods
             Precision = 0.01,
         };
 
+        public BindableBool IsDisabled { get; } = new BindableBool();
+
         private readonly RateAdjustModHelper rateAdjustHelper;
 
         protected ModTimeRamp()
         {
             rateAdjustHelper = new RateAdjustModHelper(SpeedChange);
             rateAdjustHelper.HandleAudioAdjustments(AdjustPitch);
+            rateAdjustHelper.DisableSpeedChange.BindTo(IsDisabled);
 
             // for preview purpose at song select. eventually we'll want to be able to update every frame.
             FinalRate.BindValueChanged(_ => applyRateAdjustment(double.PositiveInfinity), true);
@@ -94,6 +97,6 @@ namespace osu.Game.Rulesets.Mods
         /// <summary>
         /// Adjust the rate along the specified ramp.
         /// </summary>
-        private void applyRateAdjustment(double time) => SpeedChange.Value = ApplyToRate(time);
+        private void applyRateAdjustment(double time) => SpeedChange.Value = !IsDisabled.Value ? ApplyToRate(time) : InitialRate.Value;
     }
 }

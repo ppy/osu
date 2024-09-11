@@ -3,6 +3,7 @@
 
 using System;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -35,9 +36,11 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         private DrawableOsuBlinds blinds = null!;
 
+        public BindableBool IsDisabled { get; } = new BindableBool();
+
         public void ApplyToDrawableRuleset(DrawableRuleset<OsuHitObject> drawableRuleset)
         {
-            drawableRuleset.Overlays.Add(blinds = new DrawableOsuBlinds(drawableRuleset.Playfield, drawableRuleset.Beatmap));
+            drawableRuleset.Overlays.Add(blinds = new DrawableOsuBlinds(drawableRuleset.Playfield, drawableRuleset.Beatmap, IsDisabled));
         }
 
         public void ApplyToHealthProcessor(HealthProcessor healthProcessor)
@@ -75,6 +78,8 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             private readonly CompositeDrawable restrictTo;
 
+            private readonly BindableBool disabled = new BindableBool();
+
             /// <summary>
             /// <para>
             /// Percentage of playfield to extend blinds over. Basically moves the origin points where the blinds start.
@@ -88,13 +93,16 @@ namespace osu.Game.Rulesets.Osu.Mods
             /// </summary>
             private const float leniency = 0.1f;
 
-            public DrawableOsuBlinds(CompositeDrawable restrictTo, Beatmap<OsuHitObject> beatmap)
+            public DrawableOsuBlinds(CompositeDrawable restrictTo, Beatmap<OsuHitObject> beatmap, BindableBool disabledBind)
             {
                 this.restrictTo = restrictTo;
                 this.beatmap = beatmap;
+                disabled.BindTo(disabledBind);
 
                 targetBreakMultiplier = 0;
                 easing = 1;
+
+                disabled.BindValueChanged(disable => Alpha = disable.NewValue ? 0.3f : 1.0f);
             }
 
             [BackgroundDependencyLoader]

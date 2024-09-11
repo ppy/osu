@@ -51,8 +51,12 @@ namespace osu.Game.Rulesets.Mods
             // as the expected result of operation is not the same (nightcore should preserve constant pitch).
             SpeedChange.BindValueChanged(val =>
             {
-                freqAdjust.Value = SpeedChange.Default;
-                tempoAdjust.Value = val.NewValue / SpeedChange.Default;
+                tempoAdjust.Value = IsDisabled.Value ? tempoAdjust.Value = val.NewValue : tempoAdjust.Value = val.NewValue / SpeedChange.Default;
+            }, true);
+
+            IsDisabled.BindValueChanged(_ =>
+            {
+                freqAdjust.Value = IsDisabled.Value ? 1 : SpeedChange.Value;
             }, true);
         }
 

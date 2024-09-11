@@ -13,7 +13,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Mods
 {
-    public abstract class ModBarrelRoll<TObject> : Mod, IUpdatableByPlayfield, IApplicableToDrawableRuleset<TObject>
+    public abstract class ModBarrelRoll<TObject> : Mod, IUpdatableByPlayfield, IApplicableToDrawableRuleset<TObject>, ICanBeToggledDuringReplay
         where TObject : HitObject
     {
         /// <summary>
@@ -21,6 +21,8 @@ namespace osu.Game.Rulesets.Mods
         /// Generally should be used to apply inverse rotation to elements which should not be rotated.
         /// </summary>
         protected float CurrentRotation { get; private set; }
+
+        public BindableBool IsDisabled { get; } = new BindableBool();
 
         [SettingSource("Roll speed", "Rotations per minute")]
         public BindableNumber<double> SpinSpeed { get; } = new BindableDouble(0.5)
@@ -42,7 +44,7 @@ namespace osu.Game.Rulesets.Mods
 
         public void Update(Playfield playfield)
         {
-            playfield.Rotation = CurrentRotation = (Direction.Value == RotationDirection.Counterclockwise ? -1 : 1) * 360 * (float)(playfield.Time.Current / 60000 * SpinSpeed.Value);
+            playfield.Rotation = CurrentRotation = IsDisabled.Value ? 0 : (Direction.Value == RotationDirection.Counterclockwise ? -1 : 1) * 360 * (float)(playfield.Time.Current / 60000 * SpinSpeed.Value);
         }
 
         public void ApplyToDrawableRuleset(DrawableRuleset<TObject> drawableRuleset)
