@@ -43,6 +43,8 @@ namespace osu.Game.Beatmaps
 
         public override async Task<Live<BeatmapSetInfo>?> ImportAsUpdate(ProgressNotification notification, ImportTask importTask, BeatmapSetInfo original)
         {
+            var originalDateAdded = original.DateAdded;
+
             Guid originalId = original.ID;
 
             var imported = await Import(notification, new[] { importTask }).ConfigureAwait(false);
@@ -57,8 +59,11 @@ namespace osu.Game.Beatmaps
             // If there were no changes, ensure we don't accidentally nuke ourselves.
             if (first.ID == originalId)
             {
-                first.PerformRead(s =>
+                first.PerformWrite(s =>
                 {
+                    // Transfer local values which should be persisted across a beatmap update.
+                    s.DateAdded = originalDateAdded;
+
                     // Re-run processing even in this case. We might have outdated metadata.
                     ProcessBeatmap?.Invoke(s, MetadataLookupScope.OnlineFirst);
                 });
@@ -79,7 +84,7 @@ namespace osu.Game.Beatmaps
                 original.DeletePending = true;
 
                 // Transfer local values which should be persisted across a beatmap update.
-                updated.DateAdded = original.DateAdded;
+                updated.DateAdded = originalDateAdded;
 
                 transferCollectionReferences(realm, original, updated);
 
@@ -278,6 +283,9 @@ namespace osu.Game.Beatmaps
 
         protected override void UndeleteForReuse(BeatmapSetInfo existing)
         {
+            if (!existing.DeletePending)
+                return;
+
             base.UndeleteForReuse(existing);
             existing.DateAdded = DateTimeOffset.UtcNow;
         }

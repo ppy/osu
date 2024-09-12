@@ -21,7 +21,7 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
             : base(point.Time)
         {
             Point = point;
-            Alpha = 0.3f;
+            Alpha = 0.5f;
             Blending = BlendingParameters.Additive;
         }
 

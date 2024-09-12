@@ -7,6 +7,8 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Pooling;
+using osu.Framework.Logging;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Skinning;
@@ -23,7 +25,7 @@ namespace osu.Game.Rulesets.Judgements
 
         public JudgementResult? Result { get; private set; }
 
-        public DrawableHitObject? JudgedObject { get; private set; }
+        public HitObject? JudgedHitObject { get; private set; }
 
         public override bool RemoveCompletedTransforms => false;
 
@@ -33,17 +35,6 @@ namespace osu.Game.Rulesets.Judgements
 
         private readonly Lazy<Drawable> proxiedAboveHitObjectsContent;
         public Drawable ProxiedAboveHitObjectsContent => proxiedAboveHitObjectsContent.Value;
-
-        /// <summary>
-        /// Creates a drawable which visualises a <see cref="Judgements.Judgement"/>.
-        /// </summary>
-        /// <param name="result">The judgement to visualise.</param>
-        /// <param name="judgedObject">The object which was judged.</param>
-        public DrawableJudgement(JudgementResult result, DrawableHitObject judgedObject)
-            : this()
-        {
-            Apply(result, judgedObject);
-        }
 
         public DrawableJudgement()
         {
@@ -94,22 +85,25 @@ namespace osu.Game.Rulesets.Judgements
         /// </summary>
         /// <param name="result">The applicable judgement.</param>
         /// <param name="judgedObject">The drawable object.</param>
-        public void Apply(JudgementResult result, DrawableHitObject? judgedObject)
+        public virtual void Apply(JudgementResult result, DrawableHitObject? judgedObject)
         {
             Result = result;
-            JudgedObject = judgedObject;
+            JudgedHitObject = judgedObject?.HitObject;
         }
 
         protected override void FreeAfterUse()
         {
             base.FreeAfterUse();
 
-            JudgedObject = null;
+            JudgedHitObject = null;
         }
 
         protected override void PrepareForUse()
         {
             base.PrepareForUse();
+
+            if (!IsInPool)
+                Logger.Log($"{nameof(DrawableJudgement)} for judgement type {Result} was not retrieved from a pool. Consider adding to a JudgementPooler.");
 
             Debug.Assert(Result != null);
 
@@ -118,9 +112,6 @@ namespace osu.Game.Rulesets.Judgements
 
         private void runAnimation()
         {
-            // is a no-op if the drawables are already in a correct state.
-            prepareDrawables();
-
             // undo any transforms applies in ApplyMissAnimations/ApplyHitAnimations to get a sane initial state.
             ApplyTransformsAt(double.MinValue, true);
             ClearTransforms(true);
@@ -172,7 +163,7 @@ namespace osu.Game.Rulesets.Judgements
             if (JudgementBody != null)
                 RemoveInternal(JudgementBody, true);
 
-            AddInternal(JudgementBody = new SkinnableDrawable(new GameplaySkinComponentLookup<HitResult>(type), _ =>
+            AddInternal(JudgementBody = new SkinnableDrawable(new SkinComponentLookup<HitResult>(type), _ =>
                 CreateDefaultJudgement(type), confineMode: ConfineMode.NoScaling));
 
             JudgementBody.OnSkinChanged += () =>

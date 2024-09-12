@@ -573,6 +573,9 @@ namespace osu.Game.Screens.Play
                 // if the player never got pushed, we should explicitly dispose it.
                 DisposalTask = LoadTask?.ContinueWith(_ => CurrentPlayer?.Dispose());
             }
+
+            highPerformanceSession?.Dispose();
+            highPerformanceSession = null;
         }
 
         #endregion

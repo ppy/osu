@@ -99,6 +99,7 @@ namespace osu.Game.Screens.OnlinePlay
             Logger.Log($"{this} forcefully exiting due to loss of API connection");
 
             // This is temporary since we don't currently have a way to force screens to be exited
+            // See also: `DailyChallenge.forcefullyExit()`
             if (this.IsCurrentScreen())
             {
                 while (this.IsCurrentScreen())

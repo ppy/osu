@@ -305,7 +305,9 @@ namespace osu.Game.Rulesets.Edit
                 PlayfieldContentContainer.X = TOOLBOX_CONTRACTED_SIZE_LEFT;
             }
 
-            composerFocusMode.Value = PlayfieldContentContainer.Contains(InputManager.CurrentState.Mouse.Position);
+            composerFocusMode.Value = PlayfieldContentContainer.Contains(InputManager.CurrentState.Mouse.Position)
+                                      && !LeftToolbox.Contains(InputManager.CurrentState.Mouse.Position)
+                                      && !RightToolbox.Contains(InputManager.CurrentState.Mouse.Position);
         }
 
         public override Playfield Playfield => drawableRulesetWrapper.Playfield;

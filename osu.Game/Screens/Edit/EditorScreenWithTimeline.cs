@@ -5,7 +5,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Overlays;
 using osu.Game.Screens.Edit.Compose.Components.Timeline;
 
 namespace osu.Game.Screens.Edit
@@ -26,7 +25,7 @@ namespace osu.Game.Screens.Edit
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(OverlayColourProvider colourProvider)
+        private void load()
         {
             // Grid with only two rows.
             // First is the timeline area, which should be allowed to expand as required.
@@ -107,8 +106,16 @@ namespace osu.Game.Screens.Edit
                 MainContent.Add(content);
                 content.FadeInFromZero(300, Easing.OutQuint);
 
-                LoadComponentAsync(TimelineArea = new TimelineArea(CreateTimelineContent()), timelineContent.Add);
+                LoadComponentAsync(TimelineArea = new TimelineArea(CreateTimelineContent()), timeline =>
+                {
+                    ConfigureTimeline(timeline);
+                    timelineContent.Add(timeline);
+                });
             });
+        }
+
+        protected virtual void ConfigureTimeline(TimelineArea timelineArea)
+        {
         }
 
         protected abstract Drawable CreateMainContent();
