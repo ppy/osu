@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Bindables;
@@ -18,7 +16,7 @@ namespace osu.Game.Screens.Play
         private readonly ScoreProcessor scoreProcessor;
         private readonly double gameplayStartTime;
 
-        private PeriodTracker breaks;
+        private PeriodTracker breaks = new PeriodTracker(Enumerable.Empty<Period>());
 
         /// <summary>
         /// Whether the gameplay is currently in a break.
@@ -26,6 +24,8 @@ namespace osu.Game.Screens.Play
         public IBindable<bool> IsBreakTime => isBreakTime;
 
         private readonly BindableBool isBreakTime = new BindableBool(true);
+
+        public readonly Bindable<Period?> CurrentPeriod = new Bindable<Period?>();
 
         public IReadOnlyList<BreakPeriod> Breaks
         {
@@ -39,7 +39,7 @@ namespace osu.Game.Screens.Play
             }
         }
 
-        public BreakTracker(double gameplayStartTime = 0, ScoreProcessor scoreProcessor = null)
+        public BreakTracker(double gameplayStartTime, ScoreProcessor scoreProcessor)
         {
             this.gameplayStartTime = gameplayStartTime;
             this.scoreProcessor = scoreProcessor;
@@ -55,9 +55,16 @@ namespace osu.Game.Screens.Play
         {
             double time = Clock.CurrentTime;
 
-            isBreakTime.Value = breaks?.IsInAny(time) == true
-                                || time < gameplayStartTime
-                                || scoreProcessor?.HasCompleted.Value == true;
+            if (breaks.IsInAny(time, out var currentBreak))
+            {
+                CurrentPeriod.Value = currentBreak;
+                isBreakTime.Value = true;
+            }
+            else
+            {
+                CurrentPeriod.Value = null;
+                isBreakTime.Value = time < gameplayStartTime || scoreProcessor.HasCompleted.Value;
+            }
         }
     }
 }

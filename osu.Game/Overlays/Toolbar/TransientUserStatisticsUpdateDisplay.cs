@@ -24,7 +24,7 @@ namespace osu.Game.Overlays.Toolbar
         public Bindable<UserStatisticsUpdate?> LatestUpdate { get; } = new Bindable<UserStatisticsUpdate?>();
 
         private Statistic<int> globalRank = null!;
-        private Statistic<decimal> pp = null!;
+        private Statistic<int> pp = null!;
 
         [BackgroundDependencyLoader]
         private void load(UserStatisticsWatcher? userStatisticsWatcher)
@@ -43,7 +43,7 @@ namespace osu.Game.Overlays.Toolbar
                 Children = new Drawable[]
                 {
                     globalRank = new Statistic<int>(UsersStrings.ShowRankGlobalSimple, @"#", Comparer<int>.Create((before, after) => before - after)),
-                    pp = new Statistic<decimal>(RankingsStrings.StatPerformance, string.Empty, Comparer<decimal>.Create((before, after) => Math.Sign(after - before))),
+                    pp = new Statistic<int>(RankingsStrings.StatPerformance, string.Empty, Comparer<int>.Create((before, after) => Math.Sign(after - before))),
                 }
             };
 
@@ -83,7 +83,7 @@ namespace osu.Game.Overlays.Toolbar
                 }
 
                 if (update.After.PP != null)
-                    pp.Display(update.Before.PP ?? update.After.PP.Value, Math.Abs((update.After.PP - update.Before.PP) ?? 0M), update.After.PP.Value);
+                    pp.Display((int)(update.Before.PP ?? update.After.PP.Value), (int)Math.Abs(((int?)update.After.PP - (int?)update.Before.PP) ?? 0M), (int)update.After.PP.Value);
 
                 this.Delay(5000).FadeOut(500, Easing.OutQuint);
             });

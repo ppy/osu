@@ -18,6 +18,7 @@ using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Chat;
 using osuTK;
@@ -103,6 +104,8 @@ namespace osu.Game.Overlays.Chat
                 updateBackground();
             }
         }
+
+        private bool isMention;
 
         /// <summary>
         /// The colour used to paint the author's username.
@@ -255,11 +258,20 @@ namespace osu.Game.Overlays.Chat
         private void styleMessageContent(SpriteText text)
         {
             text.Shadow = false;
-            text.Font = text.Font.With(size: FontSize, italics: Message.IsAction);
+            text.Font = text.Font.With(size: FontSize, italics: Message.IsAction, weight: isMention ? FontWeight.SemiBold : FontWeight.Medium);
 
-            bool messageHasColour = Message.IsAction && !string.IsNullOrEmpty(message.Sender.Colour);
-            text.Colour = messageHasColour ? Color4Extensions.FromHex(message.Sender.Colour) : colourProvider?.Content1 ?? Colour4.White;
+            Color4 messageColour = colourProvider?.Content1 ?? Colour4.White;
+
+            if (isMention)
+                messageColour = colourProvider?.Highlight1 ?? Color4.Orange;
+            else if (Message.IsAction && !string.IsNullOrEmpty(message.Sender.Colour))
+                messageColour = Color4Extensions.FromHex(message.Sender.Colour);
+
+            text.Colour = messageColour;
         }
+
+        [Resolved]
+        private IAPIProvider api { get; set; } = null!;
 
         private void updateMessageContent()
         {
@@ -279,6 +291,8 @@ namespace osu.Game.Overlays.Chat
 
             // remove non-existent channels from the link list
             message.Links.RemoveAll(link => link.Action == LinkAction.OpenChannel && chatManager?.AvailableChannels.Any(c => c.Name == link.Argument.ToString()) != true);
+
+            isMention = MessageNotifier.CheckContainsUsername(message.DisplayContent, api.LocalUser.Value.Username);
 
             drawableContentFlow.Clear();
             drawableContentFlow.AddLinks(message.DisplayContent, message.Links);

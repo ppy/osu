@@ -54,6 +54,7 @@ using osu.Game.Overlays.BeatmapListing;
 using osu.Game.Overlays.Mods;
 using osu.Game.Overlays.Music;
 using osu.Game.Overlays.Notifications;
+using osu.Game.Overlays.OSD;
 using osu.Game.Overlays.SkinEditor;
 using osu.Game.Overlays.Toolbar;
 using osu.Game.Overlays.Volume;
@@ -141,6 +142,8 @@ namespace osu.Game
         protected Container ScreenOffsetContainer { get; private set; }
 
         private Container overlayOffsetContainer;
+
+        private OnScreenDisplay onScreenDisplay;
 
         [Resolved]
         private FrameworkConfigManager frameworkConfig { get; set; }
@@ -497,6 +500,12 @@ namespace osu.Game
             }
         });
 
+        public void CopyUrlToClipboard(string url) => waitForReady(() => onScreenDisplay, _ =>
+        {
+            dependencies.Get<Clipboard>().SetText(url);
+            onScreenDisplay.Display(new CopyUrlToast());
+        });
+
         public void OpenUrlExternally(string url, bool forceBypassExternalUrlWarning = false) => waitForReady(() => externalLinkOpener, _ =>
         {
             bool isTrustedDomain;
@@ -642,10 +651,10 @@ namespace osu.Game
             Live<BeatmapSetInfo> databasedSet = null;
 
             if (beatmap.OnlineID > 0)
-                databasedSet = BeatmapManager.QueryBeatmapSet(s => s.OnlineID == beatmap.OnlineID);
+                databasedSet = BeatmapManager.QueryBeatmapSet(s => s.OnlineID == beatmap.OnlineID && !s.DeletePending);
 
             if (beatmap is BeatmapSetInfo localBeatmap)
-                databasedSet ??= BeatmapManager.QueryBeatmapSet(s => s.Hash == localBeatmap.Hash);
+                databasedSet ??= BeatmapManager.QueryBeatmapSet(s => s.Hash == localBeatmap.Hash && !s.DeletePending);
 
             if (databasedSet == null)
             {
@@ -1078,7 +1087,7 @@ namespace osu.Game
 
             loadComponentSingleFile(volume = new VolumeOverlay(), leftFloatingOverlayContent.Add, true);
 
-            var onScreenDisplay = new OnScreenDisplay();
+            onScreenDisplay = new OnScreenDisplay();
 
             onScreenDisplay.BeginTracking(this, frameworkConfig);
             onScreenDisplay.BeginTracking(this, LocalConfig);
@@ -1132,6 +1141,7 @@ namespace osu.Game
             loadComponentSingleFile(new MedalOverlay(), topMostOverlayContent.Add);
 
             loadComponentSingleFile(new BackgroundDataStoreProcessor(), Add);
+            loadComponentSingleFile(new DetachedBeatmapStore(), Add, true);
 
             Add(difficultyRecommender);
             Add(externalLinkOpener = new ExternalLinkOpener());

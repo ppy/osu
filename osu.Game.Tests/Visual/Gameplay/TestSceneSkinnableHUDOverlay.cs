@@ -16,12 +16,13 @@ using osu.Framework.Testing;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
+using osu.Game.Rulesets.Osu.Beatmaps;
+using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Skinning;
 using osu.Game.Tests.Gameplay;
-using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
@@ -44,7 +45,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         private IEnumerable<HUDOverlay> hudOverlays => CreatedDrawables.OfType<HUDOverlay>();
 
         // best way to check without exposing.
-        private Drawable hideTarget => hudOverlay.ChildrenOfType<SkinComponentsContainer>().First();
+        private Drawable hideTarget => hudOverlay.ChildrenOfType<SkinnableContainer>().First();
         private Drawable keyCounterFlow => hudOverlay.ChildrenOfType<KeyCounterDisplay>().First().ChildrenOfType<FillFlowContainer<KeyCounter>>().Single();
 
         public TestSceneSkinnableHUDOverlay()
@@ -91,10 +92,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             {
                 SetContents(_ =>
                 {
-                    hudOverlay = new HUDOverlay(null, Array.Empty<Mod>());
-
-                    // Add any key just to display the key counter visually.
-                    hudOverlay.InputCountController.Add(new KeyCounterKeyboardTrigger(Key.Space));
+                    hudOverlay = new HUDOverlay(new DrawableOsuRuleset(new OsuRuleset(), new OsuBeatmap()), Array.Empty<Mod>());
 
                     action?.Invoke(hudOverlay);
 
@@ -103,7 +101,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             });
             AddUntilStep("HUD overlay loaded", () => hudOverlay.IsAlive);
             AddUntilStep("components container loaded",
-                () => hudOverlay.ChildrenOfType<SkinComponentsContainer>().Any(scc => scc.ComponentsLoaded));
+                () => hudOverlay.ChildrenOfType<SkinnableContainer>().Any(scc => scc.ComponentsLoaded));
         }
 
         protected override Ruleset CreateRulesetForSkinProvider() => new OsuRuleset();
