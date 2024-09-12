@@ -47,7 +47,7 @@ namespace osu.Game.Overlays.Comments
 
         public readonly BindableList<DrawableComment> Replies = new BindableList<DrawableComment>();
 
-        private readonly BindableBool childrenExpanded = new BindableBool(true);
+        private readonly BindableBool childrenExpanded;
 
         private int currentPage;
 
@@ -92,6 +92,8 @@ namespace osu.Game.Overlays.Comments
         {
             Comment = comment;
             Meta = meta;
+
+            childrenExpanded = new BindableBool(!comment.Pinned);
         }
 
         [BackgroundDependencyLoader]
