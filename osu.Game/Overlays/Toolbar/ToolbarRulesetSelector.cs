@@ -3,8 +3,12 @@
 
 #nullable disable
 
+using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -21,6 +25,13 @@ namespace osu.Game.Overlays.Toolbar
     {
         protected Drawable ModeButtonLine { get; private set; }
 
+        [Resolved]
+        private MusicController musicController { get; set; }
+
+        private readonly Dictionary<RulesetInfo, Sample> rulesetSelectionSample = new Dictionary<RulesetInfo, Sample>();
+        private readonly Dictionary<RulesetInfo, SampleChannel> rulesetSelectionChannel = new Dictionary<RulesetInfo, SampleChannel>();
+        private Sample defaultSelectSample;
+
         public ToolbarRulesetSelector()
         {
             RelativeSizeAxes = Axes.Y;
@@ -28,7 +39,7 @@ namespace osu.Game.Overlays.Toolbar
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(AudioManager audio)
         {
             AddRangeInternal(new[]
             {
@@ -54,6 +65,13 @@ namespace osu.Game.Overlays.Toolbar
                     }
                 },
             });
+
+            foreach (var r in Rulesets.AvailableRulesets)
+                rulesetSelectionSample[r] = audio.Samples.Get($@"UI/ruleset-select-{r.ShortName}");
+
+            defaultSelectSample = audio.Samples.Get(@"UI/default-select");
+
+            Current.ValueChanged += playRulesetSelectionSample;
         }
 
         protected override void LoadComplete()
@@ -82,6 +100,29 @@ namespace osu.Game.Overlays.Toolbar
                 ModeButtonLine.MoveToX(SelectedTab.DrawPosition.X, !hasInitialPosition ? 0 : 500, Easing.OutElasticQuarter);
                 hasInitialPosition = true;
             }
+        }
+
+        private void playRulesetSelectionSample(ValueChangedEvent<RulesetInfo> r)
+        {
+            // Don't play sample on first setting of value
+            if (r.OldValue == null)
+                return;
+
+            var channel = rulesetSelectionSample[r.NewValue]?.GetChannel();
+
+            // Skip sample choking and ducking for the default/fallback sample
+            if (channel == null)
+            {
+                defaultSelectSample.Play();
+                return;
+            }
+
+            foreach (var pair in rulesetSelectionChannel)
+                pair.Value?.Stop();
+
+            rulesetSelectionChannel[r.NewValue] = channel;
+            channel.Play();
+            musicController?.DuckMomentarily(500, new DuckParameters { DuckDuration = 0 });
         }
 
         public override bool HandleNonPositionalInput => !Current.Disabled && base.HandleNonPositionalInput;

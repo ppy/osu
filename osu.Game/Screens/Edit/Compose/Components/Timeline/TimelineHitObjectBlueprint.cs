@@ -30,7 +30,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 {
     public partial class TimelineHitObjectBlueprint : SelectionBlueprint<HitObject>
     {
-        private const float circle_size = 38;
+        private const float circle_size = 32;
 
         private Container? repeatsContainer;
 
@@ -519,7 +519,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                     {
                         Type = EdgeEffectType.Shadow,
                         Radius = 5,
-                        Colour = Color4.Black.Opacity(0.4f)
+                        Colour = Color4.Black.Opacity(0.05f)
                     }
                 };
             }

@@ -79,6 +79,7 @@ namespace osu.Game.Screens.Edit.Timing
             public BPMTextBox()
             {
                 Label = "BPM";
+                SelectAllOnFocus = true;
 
                 OnCommit += (_, isNew) =>
                 {

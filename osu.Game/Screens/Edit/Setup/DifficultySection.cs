@@ -15,12 +15,12 @@ namespace osu.Game.Screens.Edit.Setup
 {
     public partial class DifficultySection : SetupSection
     {
-        protected LabelledSliderBar<float> CircleSizeSlider { get; private set; } = null!;
-        protected LabelledSliderBar<float> HealthDrainSlider { get; private set; } = null!;
-        protected LabelledSliderBar<float> ApproachRateSlider { get; private set; } = null!;
-        protected LabelledSliderBar<float> OverallDifficultySlider { get; private set; } = null!;
-        protected LabelledSliderBar<double> BaseVelocitySlider { get; private set; } = null!;
-        protected LabelledSliderBar<double> TickRateSlider { get; private set; } = null!;
+        private LabelledSliderBar<float> circleSizeSlider { get; set; } = null!;
+        private LabelledSliderBar<float> healthDrainSlider { get; set; } = null!;
+        private LabelledSliderBar<float> approachRateSlider { get; set; } = null!;
+        private LabelledSliderBar<float> overallDifficultySlider { get; set; } = null!;
+        private LabelledSliderBar<double> baseVelocitySlider { get; set; } = null!;
+        private LabelledSliderBar<double> tickRateSlider { get; set; } = null!;
 
         public override LocalisableString Title => EditorSetupStrings.DifficultyHeader;
 
@@ -29,7 +29,7 @@ namespace osu.Game.Screens.Edit.Setup
         {
             Children = new Drawable[]
             {
-                CircleSizeSlider = new LabelledSliderBar<float>
+                circleSizeSlider = new LabelledSliderBar<float>
                 {
                     Label = BeatmapsetsStrings.ShowStatsCs,
                     FixedLabelWidth = LABEL_WIDTH,
@@ -42,7 +42,7 @@ namespace osu.Game.Screens.Edit.Setup
                         Precision = 0.1f,
                     }
                 },
-                HealthDrainSlider = new LabelledSliderBar<float>
+                healthDrainSlider = new LabelledSliderBar<float>
                 {
                     Label = BeatmapsetsStrings.ShowStatsDrain,
                     FixedLabelWidth = LABEL_WIDTH,
@@ -55,7 +55,7 @@ namespace osu.Game.Screens.Edit.Setup
                         Precision = 0.1f,
                     }
                 },
-                ApproachRateSlider = new LabelledSliderBar<float>
+                approachRateSlider = new LabelledSliderBar<float>
                 {
                     Label = BeatmapsetsStrings.ShowStatsAr,
                     FixedLabelWidth = LABEL_WIDTH,
@@ -68,7 +68,7 @@ namespace osu.Game.Screens.Edit.Setup
                         Precision = 0.1f,
                     }
                 },
-                OverallDifficultySlider = new LabelledSliderBar<float>
+                overallDifficultySlider = new LabelledSliderBar<float>
                 {
                     Label = BeatmapsetsStrings.ShowStatsAccuracy,
                     FixedLabelWidth = LABEL_WIDTH,
@@ -81,7 +81,7 @@ namespace osu.Game.Screens.Edit.Setup
                         Precision = 0.1f,
                     }
                 },
-                BaseVelocitySlider = new LabelledSliderBar<double>
+                baseVelocitySlider = new LabelledSliderBar<double>
                 {
                     Label = EditorSetupStrings.BaseVelocity,
                     FixedLabelWidth = LABEL_WIDTH,
@@ -94,7 +94,7 @@ namespace osu.Game.Screens.Edit.Setup
                         Precision = 0.01f,
                     }
                 },
-                TickRateSlider = new LabelledSliderBar<double>
+                tickRateSlider = new LabelledSliderBar<double>
                 {
                     Label = EditorSetupStrings.TickRate,
                     FixedLabelWidth = LABEL_WIDTH,
@@ -120,12 +120,12 @@ namespace osu.Game.Screens.Edit.Setup
         {
             // for now, update these on commit rather than making BeatmapMetadata bindables.
             // after switching database engines we can reconsider if switching to bindables is a good direction.
-            Beatmap.Difficulty.CircleSize = CircleSizeSlider.Current.Value;
-            Beatmap.Difficulty.DrainRate = HealthDrainSlider.Current.Value;
-            Beatmap.Difficulty.ApproachRate = ApproachRateSlider.Current.Value;
-            Beatmap.Difficulty.OverallDifficulty = OverallDifficultySlider.Current.Value;
-            Beatmap.Difficulty.SliderMultiplier = BaseVelocitySlider.Current.Value;
-            Beatmap.Difficulty.SliderTickRate = TickRateSlider.Current.Value;
+            Beatmap.Difficulty.CircleSize = circleSizeSlider.Current.Value;
+            Beatmap.Difficulty.DrainRate = healthDrainSlider.Current.Value;
+            Beatmap.Difficulty.ApproachRate = approachRateSlider.Current.Value;
+            Beatmap.Difficulty.OverallDifficulty = overallDifficultySlider.Current.Value;
+            Beatmap.Difficulty.SliderMultiplier = baseVelocitySlider.Current.Value;
+            Beatmap.Difficulty.SliderTickRate = tickRateSlider.Current.Value;
 
             Beatmap.UpdateAllHitObjects();
             Beatmap.SaveState();

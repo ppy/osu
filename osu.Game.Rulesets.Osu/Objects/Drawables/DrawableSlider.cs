@@ -382,7 +382,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         internal void RestoreHitAnimations()
         {
-            UpdateState(ArmedState.Hit, force: true);
+            UpdateState(ArmedState.Hit);
             HeadCircle.RestoreHitAnimations();
             TailCircle.RestoreHitAnimations();
         }
