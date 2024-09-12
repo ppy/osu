@@ -10,7 +10,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 {
     public static class SpeedEvaluator
     {
-        private const double single_spacing_threshold = 125;
+        private const double single_spacing_threshold = 125; // 1.25 circles distance between centers
         private const double min_speed_bonus = 75; // ~200BPM
         private const double speed_balancing_factor = 40;
 
@@ -50,16 +50,27 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             // 0.93 is derived from making sure 260bpm OD8 streams aren't nerfed harshly, whilst 0.92 limits the effect of the cap.
             strainTime /= Math.Clamp((strainTime / osuCurrObj.HitWindowGreat) / 0.93, 0.92, 1);
 
-            // derive speedBonus for calculation
+            // speedBonus will be 1.0 for BPM < 200
             double speedBonus = 1.0;
 
+            // Add additional scaling bonus for streams/bursts higher than 200bpm
             if (strainTime < min_speed_bonus)
                 speedBonus = 1 + 0.75 * Math.Pow((min_speed_bonus - strainTime) / speed_balancing_factor, 2);
 
             double travelDistance = osuPrevObj?.TravelDistance ?? 0;
-            double distance = Math.Min(single_spacing_threshold, travelDistance + osuCurrObj.MinimumJumpDistance);
+            double distance = travelDistance + osuCurrObj.MinimumJumpDistance;
 
-            return (speedBonus + speedBonus * Math.Pow(distance / single_spacing_threshold, 3.5)) * doubletapness / strainTime;
+            // Cap distance at single_spacing_threshold
+            distance = Math.Min(distance, single_spacing_threshold);
+
+            // Max distance bonus is 2 at single_spacing_threshold
+            double distanceBonus = 1 + Math.Pow(distance / single_spacing_threshold, 3.5);
+
+            // Base difficulty with all bonuses
+            double difficulty = speedBonus * distanceBonus * 1000 / strainTime;
+
+            // Apply penalty if there's doubletappable doubles
+            return difficulty * doubletapness;
         }
     }
 }

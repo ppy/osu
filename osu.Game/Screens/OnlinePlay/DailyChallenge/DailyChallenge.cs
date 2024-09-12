@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
@@ -44,7 +45,7 @@ using osuTK;
 namespace osu.Game.Screens.OnlinePlay.DailyChallenge
 {
     [Cached(typeof(IPreviewTrackOwner))]
-    public partial class DailyChallenge : OsuScreen, IPreviewTrackOwner
+    public partial class DailyChallenge : OsuScreen, IPreviewTrackOwner, IHandlePresentBeatmap
     {
         private readonly Room room;
         private readonly PlaylistItem playlistItem;
@@ -75,6 +76,9 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
 
         [Cached]
         private readonly OnlinePlayBeatmapAvailabilityTracker beatmapAvailabilityTracker = new OnlinePlayBeatmapAvailabilityTracker();
+
+        [Resolved]
+        private OsuGame? game { get; set; }
 
         [Resolved]
         private BeatmapManager beatmapManager { get; set; } = null!;
@@ -386,7 +390,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
             base.LoadComplete();
 
             beatmapAvailabilityTracker.SelectedItem.Value = playlistItem;
-            beatmapAvailabilityTracker.Availability.BindValueChanged(_ => trySetDailyChallengeBeatmap(), true);
+            beatmapAvailabilityTracker.Availability.BindValueChanged(_ => TrySetDailyChallengeBeatmap(this, beatmapManager, rulesets, musicController, playlistItem), true);
 
             userModsSelectOverlayRegistration = overlayManager?.RegisterBlockingOverlay(userModsSelectOverlay);
             userModsSelectOverlay.SelectedItem.Value = playlistItem;
@@ -396,15 +400,6 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
             apiState.BindValueChanged(onlineStateChanged, true);
 
             dailyChallengeInfo.BindValueChanged(dailyChallengeChanged);
-        }
-
-        private void trySetDailyChallengeBeatmap()
-        {
-            var beatmap = beatmapManager.QueryBeatmap(b => b.OnlineID == playlistItem.Beatmap.OnlineID);
-            Beatmap.Value = beatmapManager.GetWorkingBeatmap(beatmap); // this will gracefully fall back to dummy beatmap if missing locally.
-            Ruleset.Value = rulesets.GetRuleset(playlistItem.RulesetID);
-
-            applyLoopingToTrack();
         }
 
         private void onlineStateChanged(ValueChangedEvent<APIState> state) => Schedule(() =>
@@ -440,7 +435,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
 
             waves.Show();
             roomManager.JoinRoom(room);
-            applyLoopingToTrack();
+            startLoopingTrack(this, musicController);
 
             metadataClient.BeginWatchingMultiplayerRoom(room.RoomID.Value!.Value).ContinueWith(t =>
             {
@@ -452,6 +447,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
 
                 MultiplayerPlaylistItemStats[] stats = t.GetResultSafely();
                 var itemStats = stats.SingleOrDefault(item => item.PlaylistItemID == playlistItem.ID);
+
                 if (itemStats == null) return;
 
                 Schedule(() =>
@@ -459,17 +455,17 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
                     breakdown.SetInitialCounts(itemStats.TotalScoreDistribution);
                     totals.SetInitialCounts(itemStats.TotalScoreDistribution.Sum(c => c), itemStats.CumulativeScore);
                 });
-            });
+            }, TaskContinuationOptions.OnlyOnRanToCompletion);
 
-            beatmapAvailabilityTracker.SelectedItem.Value = playlistItem;
-            beatmapAvailabilityTracker.Availability.BindValueChanged(_ => trySetDailyChallengeBeatmap(), true);
             userModsSelectOverlay.SelectedItem.Value = playlistItem;
+
+            TrySetDailyChallengeBeatmap(this, beatmapManager, rulesets, musicController, playlistItem);
         }
 
         public override void OnResuming(ScreenTransitionEvent e)
         {
             base.OnResuming(e);
-            applyLoopingToTrack();
+            startLoopingTrack(this, musicController);
             // re-apply mods as they may have been changed by a child screen
             // (one known instance of this is showing a replay).
             updateMods();
@@ -498,17 +494,30 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
             return base.OnExiting(e);
         }
 
-        private void applyLoopingToTrack()
+        public static void TrySetDailyChallengeBeatmap(OsuScreen screen, BeatmapManager beatmaps, RulesetStore rulesets, MusicController music, PlaylistItem item)
         {
-            if (!this.IsCurrentScreen())
+            if (!screen.IsCurrentScreen())
                 return;
 
-            var track = Beatmap.Value?.Track;
+            var beatmap = beatmaps.QueryBeatmap(b => b.OnlineID == item.Beatmap.OnlineID);
+
+            screen.Beatmap.Value = beatmaps.GetWorkingBeatmap(beatmap); // this will gracefully fall back to dummy beatmap if missing locally.
+            screen.Ruleset.Value = rulesets.GetRuleset(item.RulesetID);
+
+            startLoopingTrack(screen, music);
+        }
+
+        private static void startLoopingTrack(OsuScreen screen, MusicController music)
+        {
+            if (!screen.IsCurrentScreen())
+                return;
+
+            var track = screen.Beatmap.Value?.Track;
 
             if (track != null)
             {
-                Beatmap.Value?.PrepareTrackForPreview(true);
-                musicController.EnsurePlayingSomething();
+                screen.Beatmap.Value?.PrepareTrackForPreview(true);
+                music.EnsurePlayingSomething();
             }
         }
 
@@ -545,6 +554,22 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
 
             if (metadataClient.IsNotNull())
                 metadataClient.MultiplayerRoomScoreSet -= onRoomScoreSet;
+        }
+
+        public void PresentBeatmap(WorkingBeatmap beatmap, RulesetInfo ruleset)
+        {
+            if (!this.IsCurrentScreen())
+                return;
+
+            // We can only handle the current daily challenge beatmap.
+            // If the import was for a different beatmap, pass the duty off to global handling.
+            if (beatmap.BeatmapSetInfo.OnlineID != playlistItem.Beatmap.BeatmapSet!.OnlineID)
+            {
+                this.Exit();
+                game?.PresentBeatmap(beatmap.BeatmapSetInfo, b => b.ID == beatmap.BeatmapInfo.ID);
+            }
+
+            // And if we're handling, we don't really have much to do here.
         }
     }
 }
