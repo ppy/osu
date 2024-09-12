@@ -34,6 +34,34 @@ namespace osu.Game.Tests.Visual.Online
         }
 
         [Test]
+        public void TestMention()
+        {
+            AddStep("add normal message", () => channel.AddNewMessages(
+                new Message(1)
+                {
+                    Sender = new APIUser
+                    {
+                        Id = 2,
+                        Username = "TestUser2"
+                    },
+                    Content = "Hello how are you today?",
+                    Timestamp = new DateTimeOffset(2021, 12, 11, 13, 33, 24, TimeSpan.Zero)
+                }));
+
+            AddStep("add mention", () => channel.AddNewMessages(
+                new Message(2)
+                {
+                    Sender = new APIUser
+                    {
+                        Id = 2,
+                        Username = "TestUser2"
+                    },
+                    Content = $"Hello {API.LocalUser.Value.Username} how are you today?",
+                    Timestamp = new DateTimeOffset(2021, 12, 11, 13, 33, 25, TimeSpan.Zero)
+                }));
+        }
+
+        [Test]
         public void TestDaySeparators()
         {
             var localUser = new APIUser

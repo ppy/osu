@@ -11,6 +11,7 @@ using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
+using osu.Game.Rulesets.Taiko;
 using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual.Online
@@ -192,13 +193,26 @@ namespace osu.Game.Tests.Visual.Online
             int hue2 = 0;
 
             AddSliderStep("hue 2", 0, 360, 50, h => hue2 = h);
-            AddStep("show user", () => profile.ShowUser(new APIUser { Id = 1 }));
+            AddStep("show user", () => profile.ShowUser(new APIUser { Id = 2 }));
             AddWaitStep("wait some", 3);
 
             AddStep("complete request", () => pendingRequest.TriggerSuccess(new APIUser
             {
                 Username = $"Colorful #{hue2}",
-                Id = 1,
+                Id = 2,
+                CountryCode = CountryCode.JP,
+                CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c2.jpg",
+                ProfileHue = hue2,
+                PlayMode = "osu",
+            }));
+
+            AddStep("show user different ruleset", () => profile.ShowUser(new APIUser { Id = 2 }, new TaikoRuleset().RulesetInfo));
+            AddWaitStep("wait some", 3);
+
+            AddStep("complete request", () => pendingRequest.TriggerSuccess(new APIUser
+            {
+                Username = $"Colorful #{hue2}",
+                Id = 2,
                 CountryCode = CountryCode.JP,
                 CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c2.jpg",
                 ProfileHue = hue2,
