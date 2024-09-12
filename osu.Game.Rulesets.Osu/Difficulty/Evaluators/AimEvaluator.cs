@@ -77,20 +77,20 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                     wideAngleBonus = calcWideAngleBonus(currAngle);
                     acuteAngleBonus = calcAcuteAngleBonus(currAngle);
 
-                    if (osuCurrObj.StrainTime > 100) // Only buff deltaTime exceeding 300 bpm 1/2.
+                    if (osuCurrObj.StrainTime > 100) // Only buff deltaTime exceeding 300 bpm 1/2
                         acuteAngleBonus = 0;
                     else
                     {
                         acuteAngleBonus *= calcAcuteAngleBonus(lastAngle) // Multiply by previous angle, we don't want to buff unless this is a wiggle type pattern.
                                            * Math.Min(angleBonus, 125 / osuCurrObj.StrainTime) // The maximum velocity we buff is equal to 125 / strainTime
-                                           * Math.Pow(Math.Sin(Math.PI / 2 * Math.Min(1, (100 - osuCurrObj.StrainTime) / 25)), 2) // scale buff from 150 bpm 1/4 to 200 bpm 1/4
+                                           * (osuCurrObj.StrainTime / 75 * Math.Pow((100 - osuCurrObj.StrainTime) / 25, 2)) // Scale with bpm
                                            * Math.Pow(Math.Sin(Math.PI / 2 * (Math.Clamp(osuCurrObj.LazyJumpDistance, 50, 100) - 50) / 50), 2); // Buff distance exceeding 50 (radius) up to 100 (diameter).
                     }
 
                     // Penalize wide angles if they're repeated, reducing the penalty as the lastAngle gets more acute.
                     wideAngleBonus *= angleBonus * (1 - Math.Min(wideAngleBonus, Math.Pow(calcWideAngleBonus(lastAngle), 3)));
                     // Penalize acute angles if they're repeated, reducing the penalty as the lastLastAngle gets more obtuse.
-                    acuteAngleBonus *= 0.5 + 0.5 * (1 - Math.Min(acuteAngleBonus, Math.Pow(calcAcuteAngleBonus(lastLastAngle), 3)));
+                    acuteAngleBonus *= 0.4 + 0.6 * (1 - Math.Min(acuteAngleBonus, Math.Pow(calcAcuteAngleBonus(lastLastAngle), 3)));
                 }
             }
 
