@@ -54,14 +54,11 @@ namespace osu.Game.Tournament.Components
         private SpriteIcon protectIcon = null!;
         private SpriteIcon trapIcon = null!;
 
-        private bool justSwapped = false;
-
-        public BoardBeatmapPanel(IBeatmapInfo? beatmap, string mod = "", string index = "", bool showSwap = false)
+        public BoardBeatmapPanel(IBeatmapInfo? beatmap, string mod = "", string index = "")
         {
             Beatmap = beatmap;
             this.index = index;
             this.mod = mod;
-            justSwapped = showSwap;
 
             Width = HEIGHT;
             Height = HEIGHT;
@@ -215,14 +212,6 @@ namespace osu.Game.Tournament.Components
                     Position = new osuTK.Vector2(34, -18) // (x, y). Increment of x = Move right; Decrement of y = Move upwards. 
                 });
             }
-
-            if (justSwapped)
-            {
-                flash.Colour = Color4.White;
-                swapIcon.FadeOutFromOne(duration: 3000, easing: Easing.OutSine);
-                flash.FadeOutFromOne(duration: 1000, easing: Easing.OutCubic);
-                justSwapped = false;
-            }
         }
 
         private void matchChanged(ValueChangedEvent<TournamentMatch?> match)
@@ -248,11 +237,12 @@ namespace osu.Game.Tournament.Components
         private void picksBansOnCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
             => Scheduler.AddOnce(updateState);
 
-        private BeatmapChoice? choice;
+        private BeatmapChoice? bpChoice, pChoice;
+        private TrapInfo? tChoice;
 
         private void updateState()
         {
-            if (currentMatch.Value == null || justSwapped)
+            if (currentMatch.Value == null)
             {
                 return;
             }
@@ -266,17 +256,18 @@ namespace osu.Game.Tournament.Components
 
             var trapChoice = currentMatch.Value.Traps.LastOrDefault(p => p.BeatmapID == Beatmap?.OnlineID);
 
+            var swapChoice = currentMatch.Value.PendingSwaps.LastOrDefault(p => p.BeatmapID == Beatmap?.OnlineID);
+
             var pickerChoice = currentMatch.Value.PicksBans.LastOrDefault(p => p.BeatmapID == Beatmap?.OnlineID && p.Type == ChoiceType.Pick);
 
             TeamColour borderColor = newBPChoice != null ? newBPChoice.Team : TeamColour.Neutral;
             TeamColour protectColor = protectChoice != null ? protectChoice.Team : TeamColour.Neutral;
             TeamColour trapColor = trapChoice != null ? trapChoice.Team : TeamColour.Neutral;
 
-            bool isSwapping = currentMatch.Value.PendingSwaps.Any(p => p.BeatmapID == Beatmap?.OnlineID);
-            if (isSwapping) newBPChoice = currentMatch.Value.PendingSwaps.FirstOrDefault(p => p.BeatmapID == Beatmap?.OnlineID);
-            bool shouldFlash = newBPChoice != null || protectChoice != null || trapChoice != null || isSwapping;
+            // Flash when new changes are made.
+            bool shouldFlash = newBPChoice != bpChoice || protectChoice != pChoice || trapChoice != tChoice || swapChoice != null;
 
-            if (newBPChoice != null || protectChoice != null || trapChoice != null)
+            if (newBPChoice != null || protectChoice != null || trapChoice != null || swapChoice != null)
             {
                 // Auto selecting is bothering us! Fight back!
                 if (newBPChoice != null && !newBPChoice.Token)
@@ -331,7 +322,7 @@ namespace osu.Game.Tournament.Components
                     BorderColour = Color4.White;
                 }
 
-                if (isSwapping)
+                if (swapChoice != null)
                 {
                     swapIcon.FadeInFromZero(duration: 800, easing: Easing.InCubic);
                 }
@@ -395,7 +386,7 @@ namespace osu.Game.Tournament.Components
                     }
                 }
             }
-            else if (!justSwapped)
+            else
             {
                 // Stop all transforms first, to make relative properties adjustable.
                 icon.ClearTransforms();
@@ -406,7 +397,7 @@ namespace osu.Game.Tournament.Components
 
                 // Then we can change them to the default state.
                 BorderThickness = 0;
-                flash.Alpha = 0;
+                flash.FadeOut(duration: 200, easing: Easing.OutCubic);
                 this.FadeIn(duration: 100, easing: Easing.InCubic);
                 backgroundAddition.FadeOut(duration: 100, easing: Easing.OutCubic);
                 icon.FadeOut(duration: 100, easing: Easing.OutCubic);
@@ -417,7 +408,18 @@ namespace osu.Game.Tournament.Components
                 icon.Colour = Color4.White;
                 backgroundAddition.Colour = Color4.White;
             }
-            choice = newBPChoice;
+            bpChoice = newBPChoice;
+            pChoice = protectChoice;
+            tChoice = trapChoice;
+        }
+
+        public void Flash(int count = 1)
+        {
+            if (count <= 0) return;
+            if (count == 1) flash.FadeOutFromOne(duration: 900, easing: Easing.OutSine);
+            else flash.FadeOutFromOne(duration: 900, easing: Easing.OutSine).Loop(0, count);
+
+            swapIcon.FadeOutFromOne(1000, Easing.InCubic);
         }
 
         private partial class NoUnloadBeatmapSetCover : UpdateableOnlineBeatmapSetCover

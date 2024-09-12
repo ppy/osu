@@ -988,8 +988,11 @@ namespace osu.Game.Tournament.Screens.Board
                     float middleDX = sourceDrawable.X;
                     float middleDY = sourceDrawable.Y;
 
-                    sourceDrawable.MoveTo(new Vector2(targetDrawable.X, targetDrawable.Y), 500, Easing.OutCubic);
-                    targetDrawable.MoveTo(new Vector2(middleDX, middleDY), 500, Easing.OutCubic);
+                    sourceDrawable.Flash();
+                    targetDrawable.Flash();
+
+                    sourceDrawable.Delay(200).Then().MoveTo(new Vector2(targetDrawable.X, targetDrawable.Y), 500, Easing.OutCubic);
+                    targetDrawable.Delay(200).Then().MoveTo(new Vector2(middleDX, middleDY), 500, Easing.OutCubic);
                 }
 
                 DetectWin();
