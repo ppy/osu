@@ -16,6 +16,7 @@ using osu.Framework.Input.Events;
 using osu.Framework.Threading;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
+using osu.Game.Overlays.Toolbar;
 using osu.Game.Tournament.Components;
 using osu.Game.Tournament.Models;
 using osu.Game.Tournament.Screens.Board.Components;
@@ -192,6 +193,14 @@ namespace osu.Game.Tournament.Screens.Board
                     Position = new Vector2(300, -20),
                     Size = new Vector2(85),
                     Texture = textures.Get("Icons/additional-icon"),
+                },
+                new ToolbarClock
+                {
+                    Anchor = Anchor.BottomRight,
+                    Origin = Anchor.BottomRight,
+                    RelativeSizeAxes = Axes.None,
+                    Height = 50,
+                    Position = new Vector2(-30, -10),
                 },
                 new ControlPanel
                 {
