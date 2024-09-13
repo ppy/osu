@@ -26,7 +26,10 @@ namespace osu.Game.Tests.Visual.UserInterface
                 RelativeSizeAxes = Axes.Both,
                 Child = new FillFlowContainer
                 {
-                    RelativeSizeAxes = Axes.Both,
+                    RelativeSizeAxes = Axes.Y,
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Width = 400,
                     Direction = FillDirection.Vertical,
                     Spacing = new Vector2(5),
                     Padding = new MarginPadding(10),
