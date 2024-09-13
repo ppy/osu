@@ -14,7 +14,9 @@ using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Localisation;
 using osu.Game.Overlays;
+using osuTK;
 
 namespace osu.Game.Graphics.UserInterfaceV2
 {
@@ -30,8 +32,6 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
         public LocalisableString Caption { get; init; }
         public LocalisableString HintText { get; init; }
-        public LocalisableString OnText { get; init; } = "On";
-        public LocalisableString OffText { get; init; } = "Off";
 
         private Box background = null!;
         private FormFieldCaption caption = null!;
@@ -74,17 +74,30 @@ namespace osu.Game.Graphics.UserInterfaceV2
                             Anchor = Anchor.TopLeft,
                             Origin = Anchor.TopLeft,
                         },
-                        text = new OsuSpriteText
+                        new FillFlowContainer
                         {
                             RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
                             Anchor = Anchor.BottomLeft,
                             Origin = Anchor.BottomLeft,
-                        },
-                        checkbox = new Nub
-                        {
-                            Anchor = Anchor.CentreRight,
-                            Origin = Anchor.CentreRight,
-                            Current = Current,
+                            Direction = FillDirection.Horizontal,
+                            Spacing = new Vector2(7),
+                            Children = new Drawable[]
+                            {
+                                checkbox = new Nub
+                                {
+                                    Anchor = Anchor.CentreLeft,
+                                    Origin = Anchor.CentreLeft,
+                                    Current = Current,
+                                    Margin = new MarginPadding { Top = 2, },
+                                },
+                                text = new OsuSpriteText
+                                {
+                                    RelativeSizeAxes = Axes.X,
+                                    Anchor = Anchor.CentreLeft,
+                                    Origin = Anchor.CentreLeft,
+                                },
+                            }
                         }
                     },
                 },
@@ -141,7 +154,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
             checkbox.Colour = Current.Disabled ? colourProvider.Foreground1 : colourProvider.Content1;
             text.Colour = Current.Disabled ? colourProvider.Foreground1 : colourProvider.Content1;
 
-            text.Text = Current.Value ? OnText : OffText;
+            text.Text = Current.Value ? CommonStrings.Enabled : CommonStrings.Disabled;
 
             if (!Current.Disabled)
             {
