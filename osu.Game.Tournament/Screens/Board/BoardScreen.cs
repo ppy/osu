@@ -451,12 +451,8 @@ namespace osu.Game.Tournament.Screens.Board
                         pickType = ChoiceType.Pick;
                         addForBeatmap(command.MapMod);
 
-                        if (CurrentMatch.Value.Round.Value != null)
-                        {
-                            var map = CurrentMatch.Value.Round.Value.Beatmaps.FirstOrDefault(b => b.Mods + b.ModIndex == command.MapMod);
-                            if (map != null && map.Beatmap != null && CurrentMatch.Value.Traps.All(p => p.BeatmapID != map.Beatmap.OnlineID)) updateBottomDisplay();
-                        }
-
+                        var map = CurrentMatch.Value.Round.Value?.Beatmaps.FirstOrDefault(b => b.Mods + b.ModIndex == command.MapMod);
+                        if (map?.Beatmap != null && CurrentMatch.Value.Traps.All(p => p.BeatmapID != map.Beatmap.OnlineID)) updateBottomDisplay();
                         break;
 
                     default:
@@ -491,10 +487,10 @@ namespace osu.Game.Tournament.Screens.Board
 
         private void updateBottomDisplay()
         {
+            if (CurrentMatch.Value == null) return;
+
             Drawable oldDisplay = informationDisplayContainer.Child;
             Drawable newDisplay;
-
-            if (CurrentMatch.Value == null) return;
 
             havePendingSwap = CurrentMatch.Value.PendingSwaps.Any();
 
