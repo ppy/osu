@@ -16,7 +16,6 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation;
 using osu.Game.Overlays;
-using osuTK;
 
 namespace osu.Game.Graphics.UserInterfaceV2
 {
@@ -74,31 +73,18 @@ namespace osu.Game.Graphics.UserInterfaceV2
                             Anchor = Anchor.TopLeft,
                             Origin = Anchor.TopLeft,
                         },
-                        new FillFlowContainer
+                        text = new OsuSpriteText
                         {
                             RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
                             Anchor = Anchor.BottomLeft,
                             Origin = Anchor.BottomLeft,
-                            Direction = FillDirection.Horizontal,
-                            Spacing = new Vector2(7),
-                            Children = new Drawable[]
-                            {
-                                checkbox = new Nub
-                                {
-                                    Anchor = Anchor.CentreLeft,
-                                    Origin = Anchor.CentreLeft,
-                                    Current = Current,
-                                    Margin = new MarginPadding { Top = 2, },
-                                },
-                                text = new OsuSpriteText
-                                {
-                                    RelativeSizeAxes = Axes.X,
-                                    Anchor = Anchor.CentreLeft,
-                                    Origin = Anchor.CentreLeft,
-                                },
-                            }
-                        }
+                        },
+                        checkbox = new Nub
+                        {
+                            Anchor = Anchor.CentreRight,
+                            Origin = Anchor.CentreRight,
+                            Current = Current,
+                        },
                     },
                 },
             };
