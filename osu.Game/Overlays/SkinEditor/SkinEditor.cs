@@ -286,6 +286,7 @@ namespace osu.Game.Overlays.SkinEditor
 
         private async Task editExternally()
         {
+            mountMenuItem.Action.Disabled = true;
             var skin = currentSkin.Value.SkinInfo.PerformRead(s => s.Detach());
 
             try
@@ -302,8 +303,12 @@ namespace osu.Game.Overlays.SkinEditor
 
             host.OpenFileExternally(externalEditOperation.MountedPath.TrimDirectorySeparator() + Path.DirectorySeparatorChar);
 
-            mountMenuItem.Text.Value = "Finish external edit";
-            mountMenuItem.Action.Value = () => _ = finishExternalEdit();
+            Schedule(() =>
+            {
+                mountMenuItem.Action.Disabled = false;
+                mountMenuItem.Text.Value = "Finish external edit";
+                mountMenuItem.Action.Value = () => _ = finishExternalEdit();
+            });
         }
 
         private async Task finishExternalEdit()
@@ -311,55 +316,51 @@ namespace osu.Game.Overlays.SkinEditor
             if (externalEditOperation == null || !externalEditOperation.IsMounted)
                 return;
 
-            // TODO: The cache is not being invalidated, resulting in there being no visual change after the skin is updated. I don't know how to work with the cache, so I'm leaving it like this for now.
+            mountMenuItem.Action.Disabled = true;
+
             await Task.Run(() =>
             {
                 currentSkin.Value.SkinInfo.PerformWrite(skinInfo =>
                 {
-                    var filesInSkin = skinInfo.Files.Select(f => f.Filename).ToHashSet();
-                    var filesInMounted = Directory.EnumerateFiles(externalEditOperation.MountedPath, "*.*", SearchOption.AllDirectories).Select(f => Path.GetRelativePath(externalEditOperation.MountedPath, f)).ToHashSet();
+                    // Clear files in the skin
+                    skinInfo.Files.Clear();
 
-                    // Enumerate over every file in the skin. If it's not in the mounted directory, it was deleted and should be removed from the skin.
-                    var filesToDelete = filesInSkin.Except(filesInMounted).ToList();
+                    // Get all the files in the mounted directory and add them to the skin
+                    string[] filesInMounted = Directory.EnumerateFiles(externalEditOperation.MountedPath, "*.*", SearchOption.AllDirectories).Select(f => Path.GetRelativePath(externalEditOperation.MountedPath, f)).ToArray();
 
-                    foreach (string file in filesToDelete)
-                    {
-                        var fileToDelete = skinInfo.Files.First(f => f.Filename == file);
-                        skins.DeleteFile(skinInfo, fileToDelete);
-                    }
-
-                    // Enumerate over every file in the mounted directory. If the file is not in the skin, it should be added. If it is, the hashes should be compared, and the file should be updated if necessary.
-                    var filesToAddOrUpdate = filesInMounted.Except(filesInSkin).ToList();
-                    var filesToUpdate = filesInMounted.Intersect(filesInSkin).ToList();
-
-                    foreach (string file in filesToAddOrUpdate)
+                    foreach (string file in filesInMounted)
                     {
                         using var stream = File.OpenRead(Path.Combine(externalEditOperation.MountedPath, file));
+
+                        // The GetFile call in this method is really expensive, and we are certain that the file does not exist in the skin yet.
+                        // Consider adding a method to add a file without checking if it exists. Or add the file directly to the skin.
                         skins.AddFile(skinInfo, stream, file);
                     }
-
-                    foreach (string newFile in filesToUpdate)
-                    {
-                        var existingFile = skinInfo.Files.First(f => f.Filename == newFile);
-                        string newFileAbsolutePath = Path.Combine(externalEditOperation.MountedPath, newFile);
-                        string? hash = File.ReadAllText(newFileAbsolutePath).ComputeSHA2Hash();
-
-                        if (hash == existingFile.File.Hash) continue;
-
-                        using var stream = File.OpenRead(newFileAbsolutePath);
-                        skins.AddFile(skinInfo, stream, existingFile.Filename);
-                    }
                 });
+
+                try
+                {
+                    Directory.Delete(externalEditOperation.MountedPath, true);
+                }
+                catch { }
             }).ConfigureAwait(false);
 
-            try
+            Schedule(() =>
             {
-                Directory.Delete(externalEditOperation.MountedPath, true);
-            }
-            catch { }
+                var oldskin = currentSkin.Value;
+                var newSkinInfo = oldskin.SkinInfo.PerformRead(s => s);
 
-            mountMenuItem.Text.Value = "Edit externally";
-            mountMenuItem.Action.Value = () => _ = editExternally();
+                // Create a new skin instance to ensure the skin is reloaded
+                // If there's a better way to reload the skin, this should be replaced with it.
+                currentSkin.Value = newSkinInfo.CreateInstance(skins);
+
+                // Dispose the old skin to ensure it's no longer used
+                oldskin.Dispose();
+
+                mountMenuItem.Action.Disabled = false;
+                mountMenuItem.Text.Value = "Edit externally";
+                mountMenuItem.Action.Value = () => _ = editExternally();
+            });
         }
 
         public bool OnPressed(KeyBindingPressEvent<PlatformAction> e)
