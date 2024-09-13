@@ -481,10 +481,10 @@ namespace osu.Game.Database
                  .AsEnumerable()
                  .Select(b => b.ID)));
 
-            Logger.Log($"Found {beatmapSetIds.Count} beatmap sets with missing submission/rank date.");
-
             if (beatmapSetIds.Count == 0)
                 return;
+
+            Logger.Log($"Found {beatmapSetIds.Count} beatmap sets with missing submission/rank date.");
 
             var notification = showProgressNotification(beatmapSetIds.Count, "Populating missing submission and rank dates", "beatmap sets now have correct submission and rank dates.");
 
