@@ -3,6 +3,7 @@
 
 using System;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Threading.Tasks;
 using Microsoft.Data.Sqlite;
@@ -78,7 +79,7 @@ namespace osu.Game.Beatmaps
             // cached database exists on disk.
             && storage.Exists(cache_database_name);
 
-        public bool TryLookup(BeatmapInfo beatmapInfo, out OnlineBeatmapMetadata? onlineMetadata)
+        public bool TryLookup(BeatmapInfo beatmapInfo, [NotNullWhen(true)] out OnlineBeatmapMetadata? onlineMetadata)
         {
             Debug.Assert(beatmapInfo.BeatmapSet != null);
 
@@ -98,7 +99,7 @@ namespace osu.Game.Beatmaps
 
             try
             {
-                using (var db = new SqliteConnection(string.Concat(@"Data Source=", storage.GetFullPath(@"online.db", true))))
+                using (var db = getConnection())
                 {
                     db.Open();
 
@@ -124,6 +125,9 @@ namespace osu.Game.Beatmaps
             onlineMetadata = null;
             return false;
         }
+
+        private SqliteConnection getConnection() =>
+            new SqliteConnection(string.Concat(@"Data Source=", storage.GetFullPath(@"online.db", true)));
 
         private void prepareLocalCache()
         {
@@ -189,6 +193,15 @@ namespace osu.Game.Beatmaps
                     // Prevent throwing unobserved exceptions, as they will be logged from the network request to the log file anyway.
                 }
             });
+        }
+
+        public int GetCacheVersion()
+        {
+            using (var connection = getConnection())
+            {
+                connection.Open();
+                return getCacheVersion(connection);
+            }
         }
 
         private int getCacheVersion(SqliteConnection connection)
