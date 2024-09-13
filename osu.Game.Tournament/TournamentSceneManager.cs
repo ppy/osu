@@ -28,6 +28,7 @@ using osu.Game.Tournament.Screens.Board;
 using osuTK;
 using osuTK.Graphics;
 using osuTK.Input;
+using osu.Game.Tournament.Models;
 
 namespace osu.Game.Tournament
 {
@@ -374,5 +375,12 @@ namespace osu.Game.Tournament
             chatContainer.Delay(1500).FadeTo(0.6f, duration, Easing.OutQuint)
                 .Then().Delay(5700).FadeIn(duration, Easing.OutQuint);
         public void ShowChat(int duration) => chatContainer.FadeIn(duration, Easing.OutQuint);
+
+        public void ShowMapIntro(RoundBeatmap map) => AddInternal(new TournamentIntro(map)
+        {
+            Anchor = Anchor.CentreLeft,
+            Origin = Anchor.CentreLeft,
+            X = CONTROL_AREA_WIDTH + STREAM_AREA_WIDTH / 2,
+        });
     }
 }

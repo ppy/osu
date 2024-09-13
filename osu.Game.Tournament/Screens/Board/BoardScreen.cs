@@ -786,11 +786,7 @@ namespace osu.Game.Tournament.Screens.Board
                 var introMap = CurrentMatch.Value.Round.Value.Beatmaps.FirstOrDefault(b => b.Beatmap?.OnlineID == beatmapId);
                 if (introMap != null)
                 {
-                    AddInternal(new TournamentIntro(introMap)
-                    {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                    });
+                    sceneManager?.ShowMapIntro(introMap);
                 }
             }
 

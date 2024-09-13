@@ -301,7 +301,6 @@ namespace osu.Game.Tournament.Components
 
                 beatmapBackgroundLoaded = true;
                 updateAnimationState();
-                sceneManager?.HideShowChat(400);
             });
             this.FadeInFromZero(500, Easing.OutExpo);
             updateAnimationState();

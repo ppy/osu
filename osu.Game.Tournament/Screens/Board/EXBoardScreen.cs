@@ -404,11 +404,7 @@ namespace osu.Game.Tournament.Screens.Board
                 var map = CurrentMatch.Value.Round.Value.Beatmaps.FirstOrDefault(b => b.Beatmap?.OnlineID == beatmapId);
                 if (map != null)
                 {
-                    AddInternal(new TournamentIntro(map)
-                    {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                    });
+                    sceneManager?.ShowMapIntro(map);
                 }
             }
 
