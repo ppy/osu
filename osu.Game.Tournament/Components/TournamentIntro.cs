@@ -46,8 +46,6 @@ namespace osu.Game.Tournament.Components
 
         private bool animationBegan;
 
-        private IBindable<StarDifficulty?> starDifficulty = null!;
-
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Plum);
 
@@ -272,7 +270,7 @@ namespace osu.Game.Tournament.Components
                                                     Anchor = Anchor.TopCentre,
                                                     Origin = Anchor.TopCentre,
                                                 },
-                                                starRatingDisplay = new StarRatingDisplay(default)
+                                                starRatingDisplay = new StarRatingDisplay(new StarDifficulty(map.Beatmap?.StarRating ?? 0, 0))
                                                 {
                                                     Shear = new Vector2(-OsuGame.SHEAR, 0f),
                                                     Margin = new MarginPadding(5),
@@ -288,13 +286,6 @@ namespace osu.Game.Tournament.Components
                     }
                 }
             };
-
-            starDifficulty = difficultyCache.GetBindableDifficulty(map.Beatmap);
-            starDifficulty.BindValueChanged(star =>
-            {
-                if (star.NewValue != null)
-                    starRatingDisplay.Current.Value = star.NewValue.Value;
-            }, true);
 
             LoadComponentAsync(new OnlineBeatmapSetCover(map.Beatmap)
             {
