@@ -42,9 +42,8 @@ namespace osu.Game.Tournament.Components
         private Container titleContainer = null!;
 
         private bool beatmapBackgroundLoaded;
-        private static bool isAnimationRunning = false;
 
-        private bool animationBegan;
+        private static bool animationBegan;
 
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Plum);
@@ -308,6 +307,12 @@ namespace osu.Game.Tournament.Components
 
         private void updateAnimationState()
         {
+            if (sceneManager == null)
+                return;
+
+            if (!sceneManager.IsAnimationRunning)
+                return;
+
             if (!beatmapBackgroundLoaded)
                 return;
 
@@ -316,6 +321,7 @@ namespace osu.Game.Tournament.Components
 
             beginAnimation();
             animationBegan = true;
+            sceneManager.IsAnimationRunning = true;
         }
 
         private void beginAnimation()
@@ -372,7 +378,7 @@ namespace osu.Game.Tournament.Components
 
                 using (BeginDelayedSequence(6000))
                 {
-                    this.FadeOutFromOne(3000, Easing.OutExpo);
+                    this.FadeOutFromOne(3000, Easing.OutExpo).OnComplete(_ => animationBegan = false);
                 }
             }
         }

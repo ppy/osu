@@ -48,6 +48,7 @@ namespace osu.Game.Tournament
         public const int REQUIRED_WIDTH = CONTROL_AREA_WIDTH * 2 + STREAM_AREA_WIDTH;
 
         public bool IsChatShown = true;
+        public bool IsAnimationRunning = false;
 
         [Cached]
         private TournamentMatchChatDisplay chat = new TournamentMatchChatDisplay(RelativeSizeY: true);
@@ -377,6 +378,13 @@ namespace osu.Game.Tournament
         public void ShowChat(int duration) => chatContainer.FadeIn(duration, Easing.OutQuint);
 
         public void ShowMapIntro(RoundBeatmap map) => AddInternal(new TournamentIntro(map)
+        {
+            Anchor = Anchor.CentreLeft,
+            Origin = Anchor.CentreLeft,
+            X = CONTROL_AREA_WIDTH + STREAM_AREA_WIDTH / 2,
+        });
+
+        public void ShowWinAnimation(TournamentTeam? team, TeamColour colour = TeamColour.Neutral) => AddInternal(new RoundAnimation(team, colour)
         {
             Anchor = Anchor.CentreLeft,
             Origin = Anchor.CentreLeft,

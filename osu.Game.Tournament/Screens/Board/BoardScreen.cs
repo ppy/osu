@@ -542,7 +542,7 @@ namespace osu.Game.Tournament.Screens.Board
 
             if (state == Steps.FinalWin)
             {
-                AddInternal(new RoundAnimation(teamWinner == TeamColour.Red ? CurrentMatch.Value.Team1.Value : CurrentMatch.Value.Team2.Value, teamWinner));
+                sceneManager?.ShowWinAnimation(teamWinner == TeamColour.Red ? CurrentMatch.Value.Team1.Value : CurrentMatch.Value.Team2.Value, teamWinner);
             }
         }
 
