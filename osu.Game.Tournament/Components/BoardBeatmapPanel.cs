@@ -54,14 +54,14 @@ namespace osu.Game.Tournament.Components
         private SpriteIcon protectIcon = null!;
         private SpriteIcon trapIcon = null!;
 
-        public BoardBeatmapPanel(IBeatmapInfo? beatmap, string mod = "", string index = "")
+        public BoardBeatmapPanel(IBeatmapInfo? beatmap, string mod = "", string index = "", float scale = 1.0f)
         {
             Beatmap = beatmap;
             this.index = index;
             this.mod = mod;
 
-            Width = HEIGHT;
-            Height = HEIGHT;
+            Width = HEIGHT * scale;
+            Height = HEIGHT * scale;
         }
 
 
