@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -9,7 +10,6 @@ using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Localisation;
-using System.Linq;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Containers;
@@ -189,7 +189,7 @@ namespace osu.Game.Overlays.Mods
             part.DrawablePartsRecreated += applySemiBoldToFirstWord;
             applySemiBoldToFirstWord(part.Drawables);
 
-            void applySemiBoldToFirstWord(IEnumerable<Drawable> d)
+            static void applySemiBoldToFirstWord(IEnumerable<Drawable> d)
             {
                 if (d.FirstOrDefault() is OsuSpriteText firstWord)
                     firstWord.Font = firstWord.Font.With(weight: FontWeight.SemiBold);

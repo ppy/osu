@@ -9,8 +9,8 @@ using osu.Framework.Localisation;
 using osu.Game.Configuration;
 using osu.Game.Localisation.HUD;
 using osu.Game.Overlays.Settings;
-using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 
 namespace osu.Game.Rulesets.Mods

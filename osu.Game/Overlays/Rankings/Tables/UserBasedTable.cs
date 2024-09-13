@@ -8,12 +8,12 @@ using System.Linq;
 using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
-using osu.Game.Users;
-using osu.Game.Scoring;
-using osu.Framework.Localisation;
 using osu.Game.Resources.Localisation.Web;
+using osu.Game.Scoring;
+using osu.Game.Users;
 
 namespace osu.Game.Overlays.Rankings.Tables
 {

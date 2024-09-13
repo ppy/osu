@@ -2,8 +2,8 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Localisation;
-using osu.Game.Rulesets;
 using osu.Game.Localisation;
+using osu.Game.Rulesets;
 
 namespace osu.Game.Screens.Edit.Setup
 {

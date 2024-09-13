@@ -2,9 +2,9 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using osu.Game.Rulesets.Mods;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Catch.Beatmaps;
+using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Rulesets.Catch.Mods
 {

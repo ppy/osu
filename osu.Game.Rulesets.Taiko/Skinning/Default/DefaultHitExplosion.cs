@@ -61,7 +61,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Default
             if (body == null)
                 return;
 
-            bool isRim = (judgedObject?.HitObject as Hit)?.Type == HitType.Rim;
+            bool isRim = judgedObject?.HitObject is Hit { Type: HitType.Rim };
             body.Colour = isRim ? colours.BlueDarker : colours.PinkDarker;
         }
 

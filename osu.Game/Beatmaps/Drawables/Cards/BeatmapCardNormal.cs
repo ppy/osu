@@ -13,8 +13,8 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
 using osu.Game.Overlays.BeatmapSet;
-using osuTK;
 using osu.Game.Resources.Localisation.Web;
+using osuTK;
 
 namespace osu.Game.Beatmaps.Drawables.Cards
 {

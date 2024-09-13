@@ -47,7 +47,7 @@ namespace osu.Game.Overlays.Rankings
                 rulesetSelector.FadeTo(showRulesetSelector(scope.NewValue) ? 1 : 0, 200, Easing.OutQuint);
             }, true);
 
-            bool showRulesetSelector(RankingsScope scope)
+            static bool showRulesetSelector(RankingsScope scope)
             {
                 switch (scope)
                 {

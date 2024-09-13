@@ -3,20 +3,20 @@
 
 #nullable disable
 
-using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics;
-using osu.Game.Rulesets.Mods;
-using osu.Framework.Bindables;
-using osu.Game.Rulesets;
-using osuTK;
-using osu.Game.Rulesets.UI;
-using osu.Framework.Input.Events;
-using osu.Game.Graphics.UserInterface;
-using osuTK.Graphics;
 using System;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.IEnumerableExtensions;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Input.Events;
+using osu.Game.Graphics.UserInterface;
+using osu.Game.Rulesets;
+using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.UI;
+using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Overlays.BeatmapSet
 {

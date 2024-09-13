@@ -4,9 +4,9 @@
 using System.Linq;
 using NUnit.Framework;
 using osu.Game.Beatmaps;
-using osu.Game.Rulesets.Mania.Edit.Checks;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Checks;
+using osu.Game.Rulesets.Mania.Edit.Checks;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Tests.Beatmaps;
 

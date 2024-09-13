@@ -7,9 +7,9 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.UserInterface;
 using osu.Game.Beatmaps.Drawables.Cards.Buttons;
 using osu.Game.Overlays;
-using osu.Framework.Graphics.UserInterface;
 using osuTK;
 
 namespace osu.Game.Beatmaps.Drawables.Cards

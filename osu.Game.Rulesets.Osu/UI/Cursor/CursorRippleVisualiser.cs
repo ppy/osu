@@ -40,7 +40,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
 
         public bool OnPressed(KeyBindingPressEvent<OsuAction> e)
         {
-            if ((Clock as IGameplayClock)?.IsRewinding == true)
+            if (Clock is IGameplayClock { IsRewinding: true })
                 return false;
 
             if (showRipples.Value)

@@ -2,8 +2,8 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Game.Skinning;
 using osu.Game.Overlays.Dialog;
+using osu.Game.Skinning;
 
 namespace osu.Game.Screens.Select
 {

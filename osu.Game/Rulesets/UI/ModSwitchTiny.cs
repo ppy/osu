@@ -124,8 +124,10 @@ namespace osu.Game.Rulesets.UI
 
             if (Mod is Mod actualMod)
             {
-                modSettingsChangeTracker = new ModSettingChangeTracker(new[] { actualMod });
-                modSettingsChangeTracker.SettingChanged = _ => updateExtendedInformation();
+                modSettingsChangeTracker = new ModSettingChangeTracker(new[] { actualMod })
+                {
+                    SettingChanged = _ => updateExtendedInformation()
+                };
             }
 
             updateExtendedInformation();

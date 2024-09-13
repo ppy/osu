@@ -53,7 +53,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Argon
         {
             this.FadeOut();
 
-            bool isRim = (drawableHitObject.HitObject as Hit)?.Type == HitType.Rim;
+            bool isRim = drawableHitObject.HitObject is Hit { Type: HitType.Rim };
 
             outer.Colour = isRim ? ArgonInputDrum.RIM_HIT_GRADIENT : ArgonInputDrum.CENTRE_HIT_GRADIENT;
             inner.EdgeEffect = new EdgeEffectParameters

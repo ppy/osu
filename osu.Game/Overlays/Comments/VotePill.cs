@@ -3,24 +3,24 @@
 
 #nullable disable
 
-using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics;
-using osu.Game.Graphics;
-using osu.Framework.Graphics.Sprites;
-using osu.Game.Online.API.Requests.Responses;
-using osu.Framework.Graphics.Shapes;
-using osu.Framework.Allocation;
-using osu.Game.Graphics.Sprites;
-using osuTK.Graphics;
-using osu.Framework.Extensions.Color4Extensions;
-using osu.Framework.Input.Events;
-using osu.Game.Graphics.UserInterface;
 using System.Collections.Generic;
-using osuTK;
+using System.Linq;
+using osu.Framework.Allocation;
+using osu.Framework.Bindables;
+using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
+using osu.Framework.Input.Events;
+using osu.Game.Graphics;
+using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
-using osu.Framework.Bindables;
-using System.Linq;
+using osu.Game.Online.API.Requests.Responses;
+using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Comments
 {

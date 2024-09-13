@@ -3,8 +3,8 @@
 
 using System;
 using osu.Framework.Graphics.Sprites;
-using osu.Game.Overlays.Dialog;
 using osu.Game.Localisation;
+using osu.Game.Overlays.Dialog;
 
 namespace osu.Game.Screens.Select.Carousel
 {

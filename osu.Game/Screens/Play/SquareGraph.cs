@@ -9,15 +9,15 @@ using System.Linq;
 using System.Threading;
 using JetBrains.Annotations;
 using osu.Framework;
+using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osuTK;
-using osuTK.Graphics;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Allocation;
 using osu.Framework.Layout;
 using osu.Framework.Threading;
+using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Screens.Play
 {

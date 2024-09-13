@@ -31,9 +31,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Argon
 
         public override void Play(HitType hitType, bool strong)
         {
-            TaikoHitObject? hitObject = GetMostValidObject() as TaikoHitObject;
-
-            if (hitObject == null)
+            if (GetMostValidObject() is not TaikoHitObject hitObject)
                 return;
 
             var originalSample = hitObject.CreateHitSampleInfo(hitType == HitType.Rim ? HitSampleInfo.HIT_CLAP : HitSampleInfo.HIT_NORMAL);

@@ -9,11 +9,11 @@ using Markdig.Syntax;
 namespace osu.Game.Graphics.Containers.Markdown.Extensions
 {
     /// <summary>
-    /// A variant of <see cref="Markdig.Extensions.GenericAttributes.GenericAttributesExtension"/>
+    /// A variant of <see cref="GenericAttributesExtension"/>
     /// which only handles generic attributes in the current markdown <see cref="Block"/> and ignores inline generic attributes.
     /// </summary>
     /// <remarks>
-    /// For rationale, see implementation of <see cref="Setup(Markdig.MarkdownPipelineBuilder)"/>.
+    /// For rationale, see implementation of <see cref="Setup(MarkdownPipelineBuilder)"/>.
     /// </remarks>
     public class BlockAttributeExtension : IMarkdownExtension
     {

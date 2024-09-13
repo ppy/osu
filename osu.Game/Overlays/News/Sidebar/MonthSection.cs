@@ -4,23 +4,23 @@
 #nullable disable
 
 using System;
-using osu.Framework.Bindables;
-using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics;
-using osu.Game.Online.API.Requests.Responses;
-using osu.Game.Graphics.Containers;
-using osuTK;
-using osu.Game.Graphics.Sprites;
-using osu.Game.Graphics;
-using System.Linq;
 using System.Collections.Generic;
-using osu.Framework.Allocation;
-using osu.Framework.Graphics.Sprites;
 using System.Diagnostics;
+using System.Linq;
+using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.LocalisationExtensions;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Sprites;
+using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.Sprites;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Chat;
+using osuTK;
 
 namespace osu.Game.Overlays.News.Sidebar
 {

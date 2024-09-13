@@ -189,7 +189,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 bindable.Value = GetStateFromSelection(samplesInSelection.SelectMany(s => s), h => h.Bank == bankName);
             }
 
-            IEnumerable<IList<HitSampleInfo>> enumerateAllSamples(HitObject hitObject)
+            static IEnumerable<IList<HitSampleInfo>> enumerateAllSamples(HitObject hitObject)
             {
                 yield return hitObject.Samples;
 
@@ -328,9 +328,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
             EditorBeatmap.PerformOnSelection(h =>
             {
-                var comboInfo = h as IHasComboInformation;
-
-                if (comboInfo == null || comboInfo.NewCombo == state) return;
+                if (h is not IHasComboInformation comboInfo || comboInfo.NewCombo == state) return;
 
                 comboInfo.NewCombo = state;
                 EditorBeatmap.Update(h);

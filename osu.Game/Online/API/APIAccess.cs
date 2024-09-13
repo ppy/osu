@@ -159,7 +159,7 @@ namespace osu.Game.Online.API
 
         private void onTokenChanged(ValueChangedEvent<OAuthToken> e) => config.SetValue(OsuSetting.Token, config.Get<bool>(OsuSetting.SavePassword) ? authentication.TokenString : string.Empty);
 
-        void IAPIProvider.Schedule(Action action) => base.Schedule(action);
+        void IAPIProvider.Schedule(Action action) => Schedule(action);
 
         public string AccessToken => authentication.RequestAccessToken();
 

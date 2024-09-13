@@ -11,19 +11,19 @@ using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.IEnumerableExtensions;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Pooling;
+using osu.Framework.Graphics.Primitives;
 using osu.Game.Audio;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.Objects.Pooling;
 using osu.Game.Skinning;
 using osuTK;
-using osu.Game.Rulesets.Objects.Pooling;
-using osu.Framework.Extensions.ObjectExtensions;
-using osu.Framework.Graphics.Primitives;
 
 namespace osu.Game.Rulesets.UI
 {
@@ -432,10 +432,9 @@ namespace osu.Game.Rulesets.UI
         {
             var lookupType = hitObject.GetType();
 
-            IDrawablePool pool;
 
             // Tests may add derived hitobject instances for which pools don't exist. Try to find any applicable pool and dynamically assign the type if the pool exists.
-            if (!pools.TryGetValue(lookupType, out pool))
+            if (!pools.TryGetValue(lookupType, out var pool))
             {
                 foreach (var (t, p) in pools)
                 {

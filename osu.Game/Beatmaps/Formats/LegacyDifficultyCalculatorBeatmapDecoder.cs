@@ -8,7 +8,7 @@ namespace osu.Game.Beatmaps.Formats
     /// <summary>
     /// A <see cref="LegacyBeatmapDecoder"/> built for difficulty calculation of legacy <see cref="Beatmap"/>s
     /// <remarks>
-    /// To use this, the decoder must be registered by the application through <see cref="LegacyDifficultyCalculatorBeatmapDecoder.Register"/>.
+    /// To use this, the decoder must be registered by the application through <see cref="Register"/>.
     /// Doing so will override any existing <see cref="Beatmap"/> decoders.
     /// </remarks>
     /// </summary>

@@ -289,7 +289,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             }
 
             public Drawable GetDrawableComponent(ISkinComponentLookup componentLookupName) =>
-                (componentLookupName as TestSkinComponentLookup)?.LookupName == "available"
+                componentLookupName is TestSkinComponentLookup { LookupName: "available" }
                     ? new DrawWidthBox
                     {
                         Colour = Color4.Yellow,

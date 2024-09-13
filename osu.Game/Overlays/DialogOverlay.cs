@@ -4,15 +4,15 @@
 #nullable disable
 
 using System;
-using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
-using osu.Game.Overlays.Dialog;
-using osu.Game.Graphics.Containers;
-using osu.Game.Input.Bindings;
 using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
+using osu.Game.Graphics.Containers;
+using osu.Game.Input.Bindings;
+using osu.Game.Overlays.Dialog;
 
 namespace osu.Game.Overlays
 {

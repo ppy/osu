@@ -171,8 +171,10 @@ namespace osu.Game.Rulesets.UI
 
             if (value is Mod actualMod)
             {
-                modSettingsChangeTracker = new ModSettingChangeTracker(new[] { actualMod });
-                modSettingsChangeTracker.SettingChanged = _ => updateExtendedInformation();
+                modSettingsChangeTracker = new ModSettingChangeTracker(new[] { actualMod })
+                {
+                    SettingChanged = _ => updateExtendedInformation()
+                };
             }
 
             modAcronym.Text = value.Acronym;

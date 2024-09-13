@@ -236,7 +236,7 @@ namespace osu.Game.Configuration
             if (!int.TryParse(pieces[1], out int monthDay)) return;
 
             // ReSharper disable once UnusedVariable
-            int combined = (year * 10000) + monthDay;
+            _ = (year * 10000) + monthDay;
 
             // migrations can be added here using a condition like:
             // if (combined < 20220103) { performMigration() }

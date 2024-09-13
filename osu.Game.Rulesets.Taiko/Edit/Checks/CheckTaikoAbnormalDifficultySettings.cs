@@ -15,9 +15,8 @@ namespace osu.Game.Rulesets.Taiko.Edit.Checks
         public override IEnumerable<Issue> Run(BeatmapVerifierContext context)
         {
             var diff = context.Beatmap.Difficulty;
-            Issue? issue;
 
-            if (HasMoreThanOneDecimalPlace("Overall difficulty", diff.OverallDifficulty, out issue))
+            if (HasMoreThanOneDecimalPlace("Overall difficulty", diff.OverallDifficulty, out var issue))
                 yield return issue;
 
             if (OutOfRange("Overall difficulty", diff.OverallDifficulty, out issue))

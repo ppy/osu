@@ -22,17 +22,17 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Overlays;
-using osu.Game.Rulesets.UI;
-using osu.Game.Screens.Select;
-using osu.Game.Scoring;
-using osu.Game.Users.Drawables;
-using osuTK;
-using osuTK.Graphics;
 using osu.Game.Online.API;
+using osu.Game.Overlays;
 using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.UI;
+using osu.Game.Scoring;
+using osu.Game.Screens.Select;
+using osu.Game.Users.Drawables;
 using osu.Game.Utils;
+using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Online.Leaderboards
 {

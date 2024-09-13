@@ -38,7 +38,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             RelativeSizeAxes = Axes.X;
             Height = height;
 
-            IEnumerable<Dimension> createColumns(int count)
+            static IEnumerable<Dimension> createColumns(int count)
             {
                 for (int i = 0; i < count; ++i)
                 {

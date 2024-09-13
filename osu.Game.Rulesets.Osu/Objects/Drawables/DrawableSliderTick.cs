@@ -5,12 +5,12 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
 using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Skinning;
 using osuTK;
 using osuTK.Graphics;
-using osu.Framework.Graphics.Shapes;
-using osu.Game.Skinning;
-using osu.Framework.Graphics.Containers;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {

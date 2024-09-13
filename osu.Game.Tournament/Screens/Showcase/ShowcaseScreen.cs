@@ -5,8 +5,8 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Tournament.Components;
 using osu.Framework.Graphics.Shapes;
+using osu.Game.Tournament.Components;
 using osu.Game.Tournament.Models;
 using osuTK.Graphics;
 

@@ -283,10 +283,7 @@ namespace osu.Game.Graphics.UserInterface
 
             public void EndSegment(int tier, float end)
             {
-                SegmentInfo? pendingSegment = pendingSegments[tier];
-                if (pendingSegment == null)
-                    throw new InvalidOperationException($"Cannot end {nameof(SegmentInfo)} of tier {tier.ToString()} that has not been started.");
-
+                SegmentInfo? pendingSegment = pendingSegments[tier] ?? throw new InvalidOperationException($"Cannot end {nameof(SegmentInfo)} of tier {tier.ToString()} that has not been started.");
                 SegmentInfo segment = pendingSegment.Value;
                 segment.End = Math.Clamp(end, 0, 1);
                 segments.Add(segment);

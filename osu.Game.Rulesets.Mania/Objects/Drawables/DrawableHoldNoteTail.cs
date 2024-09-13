@@ -30,7 +30,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             Origin = Anchor.TopCentre;
         }
 
-        public void UpdateResult() => base.UpdateResult(true);
+        public void UpdateResult() => UpdateResult(true);
 
         protected override void CheckForResult(bool userTriggered, double timeOffset) =>
             // Factor in the release lenience

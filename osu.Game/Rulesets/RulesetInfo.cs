@@ -99,14 +99,8 @@ namespace osu.Game.Rulesets
             if (!Available)
                 throw new RulesetLoadException(@"Ruleset not available");
 
-            var type = Type.GetType(InstantiationInfo);
-
-            if (type == null)
-                throw new RulesetLoadException(@"Type lookup failure");
-
-            var ruleset = Activator.CreateInstance(type) as Ruleset;
-
-            if (ruleset == null)
+            var type = Type.GetType(InstantiationInfo) ?? throw new RulesetLoadException(@"Type lookup failure");
+            if (Activator.CreateInstance(type) is not Ruleset ruleset)
                 throw new RulesetLoadException(@"Instantiation failure");
 
             // overwrite the pre-populated RulesetInfo with a potentially database attached copy.

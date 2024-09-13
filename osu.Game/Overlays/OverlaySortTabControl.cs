@@ -3,24 +3,24 @@
 
 #nullable disable
 
-using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics;
-using osu.Framework.Graphics.UserInterface;
-using osu.Framework.Graphics.Sprites;
-using osu.Game.Graphics;
-using osuTK;
-using osu.Game.Graphics.UserInterface;
-using osu.Framework.Input.Events;
-using osu.Framework.Bindables;
-using osu.Framework.Allocation;
-using osu.Game.Graphics.Sprites;
-using osuTK.Graphics;
-using osu.Game.Overlays.Comments;
-using JetBrains.Annotations;
 using System;
+using JetBrains.Annotations;
+using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
+using osu.Game.Graphics;
+using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.UserInterface;
+using osu.Game.Overlays.Comments;
 using osu.Game.Resources.Localisation.Web;
+using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Overlays
 {

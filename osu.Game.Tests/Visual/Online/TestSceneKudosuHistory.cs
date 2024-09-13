@@ -1,16 +1,16 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Game.Overlays.Profile.Sections.Kudosu;
-using System.Collections.Generic;
 using System;
-using osu.Framework.Graphics.Containers;
+using System.Collections.Generic;
 using osu.Framework.Allocation;
-using osu.Framework.Graphics.Shapes;
-using osu.Framework.Graphics;
-using osu.Game.Online.API.Requests.Responses;
 using osu.Framework.Extensions.IEnumerableExtensions;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
+using osu.Game.Overlays.Profile.Sections.Kudosu;
 
 namespace osu.Game.Tests.Visual.Online
 {

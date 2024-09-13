@@ -38,7 +38,7 @@ namespace osu.Game.Rulesets.Judgements
         internal double? RawTime { get; set; }
 
         /// <summary>
-        /// The offset of <see cref="TimeAbsolute"/> from the end time of <see cref="HitObject"/>, clamped by <see cref="osu.Game.Rulesets.Objects.HitObject.MaximumJudgementOffset"/>.
+        /// The offset of <see cref="TimeAbsolute"/> from the end time of <see cref="HitObject"/>, clamped by <see cref="HitObject.MaximumJudgementOffset"/>.
         /// </summary>
         public double TimeOffset
         {
@@ -47,7 +47,7 @@ namespace osu.Game.Rulesets.Judgements
         }
 
         /// <summary>
-        /// The absolute time at which this <see cref="JudgementResult"/> occurred, clamped by the end time of <see cref="HitObject"/> plus <see cref="osu.Game.Rulesets.Objects.HitObject.MaximumJudgementOffset"/>.
+        /// The absolute time at which this <see cref="JudgementResult"/> occurred, clamped by the end time of <see cref="HitObject"/> plus <see cref="HitObject.MaximumJudgementOffset"/>.
         /// </summary>
         /// <remarks>
         /// The end time of <see cref="HitObject"/> is returned if this result is not populated yet.

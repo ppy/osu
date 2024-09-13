@@ -4,9 +4,9 @@
 using System;
 using System.ComponentModel;
 using osu.Framework.Localisation;
-using osuTK.Graphics;
 using osu.Game.Graphics;
 using osu.Game.Resources.Localisation.Web;
+using osuTK.Graphics;
 
 namespace osu.Game.Users
 {

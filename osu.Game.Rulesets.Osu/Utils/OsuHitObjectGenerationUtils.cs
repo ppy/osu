@@ -4,10 +4,10 @@
 using System;
 using System.Linq;
 using osu.Framework.Extensions.IEnumerableExtensions;
-using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Beatmaps;
 using osu.Game.Rulesets.Osu.Objects;
+using osu.Game.Rulesets.Osu.UI;
 using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Utils
@@ -117,7 +117,7 @@ namespace osu.Game.Rulesets.Osu.Utils
             if (osuObject is not Slider slider)
                 return;
 
-            void reflectNestedObject(OsuHitObject nested) => nested.Position = new Vector2(OsuPlayfield.BASE_SIZE.X - nested.Position.X, nested.Position.Y);
+            static void reflectNestedObject(OsuHitObject nested) => nested.Position = new Vector2(OsuPlayfield.BASE_SIZE.X - nested.Position.X, nested.Position.Y);
             static void reflectControlPoint(PathControlPoint point) => point.Position = new Vector2(-point.Position.X, point.Position.Y);
 
             modifySlider(slider, reflectNestedObject, reflectControlPoint);
@@ -134,7 +134,7 @@ namespace osu.Game.Rulesets.Osu.Utils
             if (osuObject is not Slider slider)
                 return;
 
-            void reflectNestedObject(OsuHitObject nested) => nested.Position = new Vector2(nested.Position.X, OsuPlayfield.BASE_SIZE.Y - nested.Position.Y);
+            static void reflectNestedObject(OsuHitObject nested) => nested.Position = new Vector2(nested.Position.X, OsuPlayfield.BASE_SIZE.Y - nested.Position.Y);
             static void reflectControlPoint(PathControlPoint point) => point.Position = new Vector2(point.Position.X, -point.Position.Y);
 
             modifySlider(slider, reflectNestedObject, reflectControlPoint);

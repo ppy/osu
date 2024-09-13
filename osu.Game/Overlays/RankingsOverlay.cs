@@ -6,12 +6,12 @@
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Game.Overlays.Rankings;
-using osu.Game.Users;
-using osu.Game.Rulesets;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
+using osu.Game.Overlays.Rankings;
 using osu.Game.Overlays.Rankings.Tables;
+using osu.Game.Rulesets;
+using osu.Game.Users;
 
 namespace osu.Game.Overlays
 {

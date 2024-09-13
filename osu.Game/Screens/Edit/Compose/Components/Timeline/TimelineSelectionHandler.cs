@@ -112,7 +112,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             EditorBeatmap.SelectedHitObjects.Clear();
             EditorBeatmap.SelectedHitObjects.AddRange(newSelection);
 
-            bool isInRange(HitObject hitObject, double start, double end)
+            static bool isInRange(HitObject hitObject, double start, double end)
                 => hitObject.StartTime >= start && hitObject.GetEndTime() <= end;
         }
     }
