@@ -58,8 +58,6 @@ namespace osu.Game.Tests.Visual.UserInterface
                         {
                             Caption = EditorSetupStrings.LetterboxDuringBreaks,
                             HintText = EditorSetupStrings.LetterboxDuringBreaksDescription,
-                            OnText = "Letterbox",
-                            OffText = "Do not letterbox",
                         },
                         new FormCheckBox
                         {
