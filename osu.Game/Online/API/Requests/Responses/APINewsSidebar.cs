@@ -3,8 +3,8 @@
 
 #nullable disable
 
-using System.Collections.Generic;
 using Newtonsoft.Json;
+using System.Collections.Generic;
 
 namespace osu.Game.Online.API.Requests.Responses
 {

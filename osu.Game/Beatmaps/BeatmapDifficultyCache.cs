@@ -83,7 +83,7 @@ namespace osu.Game.Beatmaps
 
         public void Invalidate(IBeatmapInfo beatmap)
         {
-            Invalidate(lookup => lookup.BeatmapInfo.Equals(beatmap));
+            base.Invalidate(lookup => lookup.BeatmapInfo.Equals(beatmap));
         }
 
         /// <summary>
@@ -122,8 +122,11 @@ namespace osu.Game.Beatmaps
             // In the case that the user hasn't given us a ruleset, use the beatmap's default ruleset.
             rulesetInfo ??= beatmapInfo.Ruleset;
 
+            var localBeatmapInfo = beatmapInfo as BeatmapInfo;
+            var localRulesetInfo = rulesetInfo as RulesetInfo;
+
             // Difficulty can only be computed if the beatmap and ruleset are locally available.
-            if (beatmapInfo is not BeatmapInfo localBeatmapInfo || rulesetInfo is not RulesetInfo localRulesetInfo)
+            if (localBeatmapInfo == null || localRulesetInfo == null)
             {
                 // If not, fall back to the existing star difficulty (e.g. from an online source).
                 return Task.FromResult<StarDifficulty?>(new StarDifficulty(beatmapInfo.StarRating, (beatmapInfo as IBeatmapOnlineInfo)?.MaxCombo ?? 0));

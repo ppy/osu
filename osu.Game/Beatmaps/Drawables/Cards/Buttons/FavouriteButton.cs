@@ -7,10 +7,10 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Framework.Logging;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
-using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Beatmaps.Drawables.Cards.Buttons

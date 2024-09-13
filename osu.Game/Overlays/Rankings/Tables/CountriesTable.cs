@@ -1,17 +1,17 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using System;
+using osu.Game.Users;
+using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions;
 using osu.Framework.Extensions.LocalisationExtensions;
-using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
-using osu.Game.Graphics;
-using osu.Game.Graphics.Containers;
 using osu.Game.Resources.Localisation.Web;
-using osu.Game.Users;
 
 namespace osu.Game.Overlays.Rankings.Tables
 {

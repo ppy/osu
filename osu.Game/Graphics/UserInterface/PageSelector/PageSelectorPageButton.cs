@@ -3,9 +3,9 @@
 
 #nullable disable
 
-using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Bindables;
+using osu.Framework.Allocation;
 using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Graphics.UserInterface.PageSelector

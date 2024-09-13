@@ -3,10 +3,8 @@
 
 #nullable disable
 
-using System;
+using osuTK.Graphics;
 using osu.Framework.Allocation;
-using osu.Framework.Audio.Track;
-using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
@@ -15,10 +13,12 @@ using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
-using osu.Game.Online.API;
-using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Skinning;
-using osuTK.Graphics;
+using osu.Game.Online.API;
+using System;
+using osu.Framework.Audio.Track;
+using osu.Framework.Bindables;
+using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Screens.Menu
 {

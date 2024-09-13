@@ -73,10 +73,8 @@ namespace osu.Game.Overlays.Mods
         private void selectedModsChanged()
         {
             settingChangeTracker?.Dispose();
-            settingChangeTracker = new ModSettingChangeTracker(selectedMods.Value)
-            {
-                SettingChanged = _ => updateActiveState()
-            };
+            settingChangeTracker = new ModSettingChangeTracker(selectedMods.Value);
+            settingChangeTracker.SettingChanged = _ => updateActiveState();
             updateActiveState();
         }
 

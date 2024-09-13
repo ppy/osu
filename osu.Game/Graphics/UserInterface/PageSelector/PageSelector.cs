@@ -2,9 +2,9 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using osu.Framework.Bindables;
-using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics;
+using osu.Framework.Bindables;
 using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Graphics.UserInterface.PageSelector

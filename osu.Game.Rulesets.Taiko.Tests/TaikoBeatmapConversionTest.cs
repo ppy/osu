@@ -32,11 +32,11 @@ namespace osu.Game.Rulesets.Taiko.Tests
             {
                 StartTime = hitObject.StartTime,
                 EndTime = hitObject.GetEndTime(),
-                IsRim = hitObject is Hit { Type: HitType.Rim },
-                IsCentre = hitObject is Hit { Type: HitType.Centre },
+                IsRim = (hitObject as Hit)?.Type == HitType.Rim,
+                IsCentre = (hitObject as Hit)?.Type == HitType.Centre,
                 IsDrumRoll = hitObject is DrumRoll,
                 IsSwell = hitObject is Swell,
-                IsStrong = hitObject is TaikoStrongableHitObject { IsStrong: true }
+                IsStrong = (hitObject as TaikoStrongableHitObject)?.IsStrong == true
             };
         }
 

@@ -23,7 +23,7 @@ namespace osu.Game.Beatmaps
     /// - Access the storyboard via <see cref="Storyboard"/>.
     /// - Access a local skin via <see cref="Skin"/>.
     /// - Access the track via <see cref="LoadTrack"/> (and then <see cref="Track"/> for subsequent accesses).
-    /// - Create a playable <see cref="Beatmap"/> via <see cref="GetPlayableBeatmap(IRulesetInfo,IReadOnlyList{Mod})"/>.
+    /// - Create a playable <see cref="Beatmap"/> via <see cref="GetPlayableBeatmap(osu.Game.Rulesets.IRulesetInfo,System.Collections.Generic.IReadOnlyList{osu.Game.Rulesets.Mods.Mod})"/>.
     /// </summary>
     public interface IWorkingBeatmap
     {
@@ -84,7 +84,7 @@ namespace osu.Game.Beatmaps
         /// <remarks>
         /// By default, the beatmap load process will be interrupted after 10 seconds.
         /// For finer-grained control over the load process, use the
-        /// <see cref="GetPlayableBeatmap(IRulesetInfo,IReadOnlyList{Mod},CancellationToken)"/>
+        /// <see cref="GetPlayableBeatmap(osu.Game.Rulesets.IRulesetInfo,System.Collections.Generic.IReadOnlyList{osu.Game.Rulesets.Mods.Mod},System.Threading.CancellationToken)"/>
         /// overload instead.
         /// </remarks>
         /// <param name="ruleset">The <see cref="RulesetInfo"/> to create a playable <see cref="IBeatmap"/> for.</param>

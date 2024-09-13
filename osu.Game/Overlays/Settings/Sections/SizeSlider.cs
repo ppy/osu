@@ -2,8 +2,8 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Globalization;
 using System.Numerics;
+using System.Globalization;
 using osu.Framework.Localisation;
 using osu.Game.Graphics.UserInterface;
 

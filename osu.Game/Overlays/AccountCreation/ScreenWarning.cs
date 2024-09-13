@@ -10,12 +10,12 @@ using osu.Framework.Screens;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Localisation;
 using osu.Game.Online.API;
 using osu.Game.Overlays.Settings;
 using osu.Game.Screens.Menu;
 using osuTK;
 using osuTK.Graphics;
+using osu.Game.Localisation;
 
 namespace osu.Game.Overlays.AccountCreation
 {

@@ -11,8 +11,8 @@ using osu.Framework.Utils;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Overlays;
 using osu.Game.Overlays.Settings;
+using osu.Game.Overlays;
 
 namespace osu.Game.Tests.Visual.Settings
 {

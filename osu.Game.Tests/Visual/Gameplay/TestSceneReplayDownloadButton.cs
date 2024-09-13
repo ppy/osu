@@ -5,15 +5,15 @@
 
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Graphics;
+using osu.Game.Online;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
-using osu.Framework.Graphics;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Online;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Scoring;
 using osu.Game.Screens.Ranking;

@@ -15,8 +15,9 @@ namespace osu.Game.Rulesets.Osu.Edit.Checks
         public override IEnumerable<Issue> Run(BeatmapVerifierContext context)
         {
             var diff = context.Beatmap.Difficulty;
+            Issue? issue;
 
-            if (HasMoreThanOneDecimalPlace("Approach rate", diff.ApproachRate, out var issue))
+            if (HasMoreThanOneDecimalPlace("Approach rate", diff.ApproachRate, out issue))
                 yield return issue;
 
             if (OutOfRange("Approach rate", diff.ApproachRate, out issue))

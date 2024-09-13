@@ -92,7 +92,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddAssert("DHO reused", () => this.ChildrenOfType<DrawableTestHitObject>().Single() == firstObject);
             AddAssert("object in new position", () => firstObject.Position != position);
 
-            static void onStateUpdate(DrawableHitObject hitObject, ArmedState state)
+            void onStateUpdate(DrawableHitObject hitObject, ArmedState state)
             {
                 using (hitObject.BeginAbsoluteSequence(hitObject.StateUpdateTime))
                     hitObject.MoveToOffset(new Vector2(-100, 0));

@@ -10,11 +10,11 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Graphics.UserInterface;
 using osuTK;
 using osuTK.Graphics;
+using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Screens.Select.Options
 {

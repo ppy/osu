@@ -6,9 +6,9 @@
 using System.Threading;
 using NUnit.Framework;
 using osu.Framework.Graphics;
+using osu.Framework.Utils;
 using osu.Framework.Testing;
 using osu.Framework.Timing;
-using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Beatmaps.Timing;

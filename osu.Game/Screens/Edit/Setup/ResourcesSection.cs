@@ -7,8 +7,8 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
-using osu.Game.Localisation;
 using osu.Game.Overlays;
+using osu.Game.Localisation;
 
 namespace osu.Game.Screens.Edit.Setup
 {

@@ -62,7 +62,7 @@ namespace osu.Game.Rulesets.Mods
                 track?.RemoveAdjustment(adjustmentForPitchSetting(adjustPitchSetting.OldValue), SpeedChange);
                 track?.AddAdjustment(adjustmentForPitchSetting(adjustPitchSetting.NewValue), SpeedChange);
 
-                static AdjustableProperty adjustmentForPitchSetting(bool adjustPitchSettingValue)
+                AdjustableProperty adjustmentForPitchSetting(bool adjustPitchSettingValue)
                     => adjustPitchSettingValue ? AdjustableProperty.Frequency : AdjustableProperty.Tempo;
             });
         }

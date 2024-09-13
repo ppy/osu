@@ -6,11 +6,11 @@ using osu.Framework.Allocation;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps.Drawables.Cards;
 using osu.Game.Configuration;
-using osu.Game.Localisation;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Screens.Menu;
+using osu.Game.Localisation;
 
 namespace osu.Game.Screens.OnlinePlay.DailyChallenge
 {

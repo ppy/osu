@@ -254,7 +254,11 @@ namespace osu.Game.Beatmaps
 
         public virtual IBeatmap GetPlayableBeatmap(IRulesetInfo ruleset, IReadOnlyList<Mod> mods, CancellationToken token)
         {
-            var rulesetInstance = ruleset.CreateInstance() ?? throw new RulesetLoadException("Creating ruleset instance failed when attempting to create playable beatmap.");
+            var rulesetInstance = ruleset.CreateInstance();
+
+            if (rulesetInstance == null)
+                throw new RulesetLoadException("Creating ruleset instance failed when attempting to create playable beatmap.");
+
             IBeatmapConverter converter = CreateBeatmapConverter(Beatmap, rulesetInstance);
 
             // Check if the beatmap can be converted

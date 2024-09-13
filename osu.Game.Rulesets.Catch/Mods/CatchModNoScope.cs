@@ -4,9 +4,9 @@
 using System;
 using osu.Framework.Bindables;
 using osu.Framework.Localisation;
+using osu.Game.Rulesets.Mods;
 using osu.Framework.Utils;
 using osu.Game.Rulesets.Catch.UI;
-using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Catch.Mods

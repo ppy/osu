@@ -10,10 +10,10 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Localisation;
 using osu.Game.Online;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
+using osu.Game.Localisation;
 
 namespace osu.Game.Beatmaps.Drawables.Cards
 {

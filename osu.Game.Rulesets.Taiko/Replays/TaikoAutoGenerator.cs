@@ -5,10 +5,10 @@ using System;
 using System.Linq;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Game.Beatmaps;
-using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Taiko.Objects;
 using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.Taiko.Beatmaps;
-using osu.Game.Rulesets.Taiko.Objects;
+using osu.Game.Rulesets.Objects;
 
 namespace osu.Game.Rulesets.Taiko.Replays
 {

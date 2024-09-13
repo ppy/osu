@@ -3,12 +3,12 @@
 
 #nullable disable
 
+using osuTK.Graphics;
+using osu.Game.Skinning;
+using osu.Game.Online.API;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
-using osu.Game.Skinning;
-using osuTK.Graphics;
 
 namespace osu.Game.Screens.Menu
 {

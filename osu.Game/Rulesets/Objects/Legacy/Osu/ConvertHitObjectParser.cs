@@ -3,9 +3,9 @@
 
 #nullable disable
 
+using osuTK;
 using System.Collections.Generic;
 using osu.Game.Audio;
-using osuTK;
 
 namespace osu.Game.Rulesets.Objects.Legacy.Osu
 {

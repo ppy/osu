@@ -17,7 +17,7 @@ using osuTK;
 namespace osu.Game.Rulesets.Judgements
 {
     /// <summary>
-    /// A drawable object which visualises the hit result of a <see cref="Judgement"/>.
+    /// A drawable object which visualises the hit result of a <see cref="Judgements.Judgement"/>.
     /// </summary>
     public partial class DrawableJudgement : PoolableDrawable
     {

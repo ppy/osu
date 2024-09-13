@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using osuTK;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Pooling;
@@ -11,7 +12,6 @@ using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko.Objects;
 using osu.Game.Rulesets.Taiko.Skinning.Default;
 using osu.Game.Skinning;
-using osuTK;
 
 namespace osu.Game.Rulesets.Taiko.UI
 {

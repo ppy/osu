@@ -3,11 +3,11 @@
 
 #nullable disable
 
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using System;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
-using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Objects;

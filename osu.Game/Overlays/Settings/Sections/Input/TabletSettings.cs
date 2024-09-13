@@ -17,9 +17,9 @@ using osu.Framework.Threading;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
+using osuTK;
 using osu.Game.Localisation;
 using osu.Game.Online.Chat;
-using osuTK;
 
 namespace osu.Game.Overlays.Settings.Sections.Input
 {

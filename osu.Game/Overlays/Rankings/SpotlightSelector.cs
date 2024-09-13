@@ -3,24 +3,24 @@
 
 #nullable disable
 
-using System;
-using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.Color4Extensions;
-using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Graphics.UserInterface;
-using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
-using osu.Game.Resources.Localisation.Web;
 using osuTK;
+using System;
+using System.Collections.Generic;
+using osu.Framework.Graphics.UserInterface;
+using osu.Game.Online.API.Requests;
+using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Extensions.LocalisationExtensions;
+using osu.Framework.Localisation;
+using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Overlays.Rankings
 {

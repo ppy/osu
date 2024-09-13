@@ -4,6 +4,8 @@
 #nullable disable
 
 using System;
+using osuTK;
+using osuTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
@@ -15,8 +17,6 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Game.Graphics.Sprites;
-using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Graphics.UserInterface
 {

@@ -42,7 +42,7 @@ namespace osu.Game.Rulesets.Filter
         /// </para>
         /// <para>
         /// For adding numerical-type range criteria, <see cref="FilterCriteria.OptionalRange{T}"/> can be used for matching,
-        /// along with <see cref="FilterQueryParser.TryUpdateCriteriaRange{T}(ref FilterCriteria.OptionalRange{T},Operator,string,FilterQueryParser.TryParseFunction{T})"/>
+        /// along with <see cref="FilterQueryParser.TryUpdateCriteriaRange{T}(ref osu.Game.Screens.Select.FilterCriteria.OptionalRange{T},osu.Game.Screens.Select.Filter.Operator,string,FilterQueryParser.TryParseFunction{T})"/>
         /// and <see cref="float"/>- and <see cref="double"/>-typed overloads for parsing.
         /// </para>
         /// </remarks>

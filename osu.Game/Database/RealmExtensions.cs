@@ -9,7 +9,7 @@ namespace osu.Game.Database
     public static class RealmExtensions
     {
         /// <summary>
-        /// Performs a <see cref="Realm.Find{T}(long?)"/>.
+        /// Performs a <see cref="Realm.Find{T}(System.Nullable{long})"/>.
         /// If a match was not found, a <see cref="Realm.Refresh"/> is performed before trying a second time.
         /// This ensures that an instance is found even if the realm requested against was not in a consistent state.
         /// </summary>

@@ -6,8 +6,8 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Screens;
-using osu.Game.Beatmaps;
 using osu.Game.Database;
+using osu.Game.Beatmaps;
 using osu.Game.Online.API;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Screens;

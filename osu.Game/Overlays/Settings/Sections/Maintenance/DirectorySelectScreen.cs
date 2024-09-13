@@ -3,19 +3,19 @@
 
 #nullable disable
 
+using osu.Framework.Graphics;
 using System.IO;
 using osu.Framework.Allocation;
-using osu.Framework.Graphics;
+using osu.Game.Graphics;
+using osu.Game.Graphics.UserInterfaceV2;
+using osu.Game.Screens;
+using osuTK;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Localisation;
 using osu.Framework.Screens;
-using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
-using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Localisation;
-using osu.Game.Screens;
-using osuTK;
 
 namespace osu.Game.Overlays.Settings.Sections.Maintenance
 {

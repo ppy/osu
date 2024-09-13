@@ -9,12 +9,12 @@ using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
-using osu.Framework.Input.Events;
-using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Users.Drawables;
+using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
+using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Users
 {

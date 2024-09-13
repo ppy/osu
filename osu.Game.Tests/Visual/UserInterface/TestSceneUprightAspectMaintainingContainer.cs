@@ -5,15 +5,15 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
-using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics;
 using osu.Framework.Utils;
-using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
-using osuTK;
+using osu.Game.Graphics;
 using osuTK.Graphics;
+using osuTK;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {

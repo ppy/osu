@@ -3,8 +3,8 @@
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Screens.Play.PlayerSettings;
 using osuTK;
+using osu.Game.Screens.Play.PlayerSettings;
 
 namespace osu.Game.Screens.Play.HUD
 {

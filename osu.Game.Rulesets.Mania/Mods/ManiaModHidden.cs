@@ -4,12 +4,12 @@
 using System;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Localisation;
+using osu.Game.Rulesets.Mania.UI;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
-using osu.Framework.Localisation;
 using osu.Game.Rulesets.Mania.Skinning;
-using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;

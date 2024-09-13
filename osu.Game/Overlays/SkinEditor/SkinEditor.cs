@@ -18,6 +18,7 @@ using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
+using Web = osu.Game.Resources.Localisation.Web;
 using osu.Framework.Testing;
 using osu.Game.Database;
 using osu.Game.Graphics;
@@ -32,7 +33,6 @@ using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Components;
 using osu.Game.Screens.Edit.Components.Menus;
 using osu.Game.Skinning;
-using Web = osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Overlays.SkinEditor
 {

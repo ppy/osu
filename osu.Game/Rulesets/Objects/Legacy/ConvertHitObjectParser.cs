@@ -3,21 +3,21 @@
 
 #nullable disable
 
+using osuTK;
+using osu.Game.Rulesets.Objects.Types;
 using System;
-using System.Buffers;
 using System.Collections.Generic;
 using System.IO;
+using osu.Game.Beatmaps.Formats;
+using osu.Game.Audio;
 using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Utils;
-using osu.Game.Audio;
 using osu.Game.Beatmaps.ControlPoints;
-using osu.Game.Beatmaps.Formats;
 using osu.Game.Beatmaps.Legacy;
-using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Skinning;
 using osu.Game.Utils;
-using osuTK;
+using System.Buffers;
 
 namespace osu.Game.Rulesets.Objects.Legacy
 {

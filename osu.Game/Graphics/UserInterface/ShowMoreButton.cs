@@ -3,19 +3,19 @@
 
 #nullable disable
 
-using System.Collections.Generic;
 using osu.Framework.Allocation;
-using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
-using osu.Framework.Localisation;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays;
-using osu.Game.Resources.Localisation.Web;
 using osuTK;
+using System.Collections.Generic;
+using osu.Framework.Extensions.LocalisationExtensions;
+using osu.Framework.Localisation;
+using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Graphics.UserInterface
 {

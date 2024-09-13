@@ -15,8 +15,9 @@ namespace osu.Game.Rulesets.Mania.Edit.Checks
         public override IEnumerable<Issue> Run(BeatmapVerifierContext context)
         {
             var diff = context.Beatmap.Difficulty;
+            Issue? issue;
 
-            if (HasMoreThanOneDecimalPlace("Overall difficulty", diff.OverallDifficulty, out var issue))
+            if (HasMoreThanOneDecimalPlace("Overall difficulty", diff.OverallDifficulty, out issue))
                 yield return issue;
 
             if (OutOfRange("Overall difficulty", diff.OverallDifficulty, out issue))

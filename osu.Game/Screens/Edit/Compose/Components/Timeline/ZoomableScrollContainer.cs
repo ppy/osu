@@ -208,7 +208,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             private readonly float scrollOffset;
 
             /// <summary>
-            /// Transforms <see cref="CurrentZoom"/> to a new value.
+            /// Transforms <see cref="ZoomableScrollContainer.CurrentZoom"/> to a new value.
             /// </summary>
             /// <param name="focusPoint">The focus point in absolute coordinates local to the content.</param>
             /// <param name="contentSize">The size of the content.</param>

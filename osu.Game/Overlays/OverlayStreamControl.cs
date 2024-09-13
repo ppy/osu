@@ -3,12 +3,12 @@
 
 #nullable disable
 
+using osu.Framework.Graphics;
+using osu.Framework.Input.Events;
 using System.Collections.Generic;
 using System.Linq;
-using JetBrains.Annotations;
-using osu.Framework.Graphics;
 using osu.Framework.Graphics.UserInterface;
-using osu.Framework.Input.Events;
+using JetBrains.Annotations;
 
 namespace osu.Game.Overlays
 {

@@ -317,7 +317,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
             return true;
 
-            static bool isModifier(Key k) => k < Key.F1;
+            bool isModifier(Key k) => k < Key.F1;
         }
 
         protected override void OnKeyUp(KeyUpEvent e)

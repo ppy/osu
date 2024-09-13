@@ -8,8 +8,8 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Screens.Play.HUD
 {

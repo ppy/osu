@@ -335,7 +335,7 @@ namespace osu.Game.Beatmaps
                     + (metadata.Author.Username.Length > 0 ? @" (" + metadata.Author.Username + @")" : string.Empty)
                     + @".osb");
 
-                static string windowsFilenameStrip(string entry)
+                string windowsFilenameStrip(string entry)
                 {
                     // Inlined from Path.GetInvalidFilenameChars() to ensure the windows characters are used (to match stable).
                     char[] invalidCharacters =

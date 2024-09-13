@@ -2,14 +2,14 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Graphics;
-using osu.Framework.Graphics.Rendering;
 using osu.Framework.Graphics.Shaders;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Graphics.Sprites;
-using osu.Game.Graphics.Backgrounds;
+using osu.Framework.Graphics;
 using osuTK;
 using osuTK.Graphics;
+using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Rendering;
+using osu.Game.Graphics.Backgrounds;
 
 namespace osu.Game.Tests.Visual.Background
 {

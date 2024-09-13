@@ -3,29 +3,29 @@
 
 #nullable disable
 
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions;
 using osu.Framework.Extensions.EnumExtensions;
-using osu.Framework.Extensions.LocalisationExtensions;
-using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Cursor;
-using osu.Framework.Graphics.Sprites;
-using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.Leaderboards;
-using osu.Game.Resources.Localisation.Web;
-using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Scoring;
 using osu.Game.Users.Drawables;
 using osuTK;
 using osuTK.Graphics;
+using osu.Framework.Localisation;
+using osu.Framework.Extensions.LocalisationExtensions;
+using osu.Framework.Graphics.Cursor;
+using osu.Framework.Graphics.Sprites;
+using osu.Game.Resources.Localisation.Web;
+using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Overlays.BeatmapSet.Scores
 {

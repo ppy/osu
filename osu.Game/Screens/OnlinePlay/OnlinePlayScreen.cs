@@ -136,7 +136,7 @@ namespace osu.Game.Screens.OnlinePlay
             // if a subscreen was pushed to the nested stack while the stack was not present, this path will proxy `OnResuming()`
             // to the subscreen before `OnEntering()` can even be called for the subscreen, breaking ordering expectations.
             // to work around this, do not proxy resume to screens that haven't loaded yet.
-            if (screenStack.CurrentScreen is Drawable { IsLoaded: true })
+            if ((screenStack.CurrentScreen as Drawable)?.IsLoaded == true)
                 screenStack.CurrentScreen.OnResuming(e);
 
             base.OnResuming(e);
@@ -152,7 +152,7 @@ namespace osu.Game.Screens.OnlinePlay
             // if a subscreen was pushed to the nested stack while the stack was not present, this path will proxy `OnSuspending()`
             // to the subscreen before `OnEntering()` can even be called for the subscreen, breaking ordering expectations.
             // to work around this, do not proxy suspend to screens that haven't loaded yet.
-            if (screenStack.CurrentScreen is Drawable { IsLoaded: true })
+            if ((screenStack.CurrentScreen as Drawable)?.IsLoaded == true)
                 screenStack.CurrentScreen.OnSuspending(e);
         }
 

@@ -19,9 +19,9 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
-using osu.Game.Localisation;
 using osuTK;
 using osuTK.Graphics;
+using osu.Game.Localisation;
 
 namespace osu.Game.Screens.Play
 {

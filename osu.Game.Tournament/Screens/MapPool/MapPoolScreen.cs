@@ -179,7 +179,7 @@ namespace osu.Game.Tournament.Screens.MapPool
 
             setMode(nextColour, hasAllBans ? ChoiceType.Pick : ChoiceType.Ban);
 
-            static TeamColour getOppositeTeamColour(TeamColour colour) => colour == TeamColour.Red ? TeamColour.Blue : TeamColour.Red;
+            TeamColour getOppositeTeamColour(TeamColour colour) => colour == TeamColour.Red ? TeamColour.Blue : TeamColour.Red;
         }
 
         protected override bool OnMouseDown(MouseDownEvent e)

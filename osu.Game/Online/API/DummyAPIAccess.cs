@@ -100,7 +100,7 @@ namespace osu.Game.Online.API
             });
         }
 
-        void IAPIProvider.Schedule(Action action) => Schedule(action);
+        void IAPIProvider.Schedule(Action action) => base.Schedule(action);
 
         public void Perform(APIRequest request)
         {

@@ -2,9 +2,9 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Graphics.Sprites;
 using osu.Game.Overlays.Dialog;
 using osu.Game.Scoring;
+using osu.Framework.Graphics.Sprites;
 
 namespace osu.Game.Screens.Select
 {

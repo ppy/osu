@@ -2,8 +2,8 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using NUnit.Framework;
-using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Taiko.Skinning.Legacy;
 
 namespace osu.Game.Rulesets.Taiko.Tests.Skinning

@@ -71,7 +71,7 @@ namespace osu.Game.Tests.Database
 
         protected static BeatmapSetInfo CreateBeatmapSet(RulesetInfo ruleset)
         {
-            static RealmFile createRealmFile() => new RealmFile { Hash = Guid.NewGuid().ToString().ComputeSHA2Hash() };
+            RealmFile createRealmFile() => new RealmFile { Hash = Guid.NewGuid().ToString().ComputeSHA2Hash() };
 
             var metadata = new BeatmapMetadata
             {

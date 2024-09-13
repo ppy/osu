@@ -19,7 +19,7 @@ using Container = osu.Framework.Graphics.Containers.Container;
 namespace osu.Game.Rulesets.Mania.UI
 {
     /// <summary>
-    /// A <see cref="Container"/> that has its contents partially hidden by an adjustable "cover". This is intended to be used in a playfield.
+    /// A <see cref="Framework.Graphics.Containers.Container"/> that has its contents partially hidden by an adjustable "cover". This is intended to be used in a playfield.
     /// </summary>
     public partial class PlayfieldCoveringWrapper : CompositeDrawable
     {

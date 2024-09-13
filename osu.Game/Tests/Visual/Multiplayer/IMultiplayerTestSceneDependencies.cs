@@ -23,7 +23,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         new TestMultiplayerRoomManager RoomManager { get; }
 
         /// <summary>
-        /// The cached <see cref="Online.Spectator.SpectatorClient"/>.
+        /// The cached <see cref="osu.Game.Online.Spectator.SpectatorClient"/>.
         /// </summary>
         TestSpectatorClient SpectatorClient { get; }
     }

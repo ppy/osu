@@ -3,13 +3,13 @@
 
 #nullable disable
 
-using JetBrains.Annotations;
-using osu.Framework.Allocation;
-using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Input.Events;
 using osu.Game.Graphics.Containers;
+using osu.Framework.Input.Events;
+using JetBrains.Annotations;
 using osu.Game.Overlays;
 
 namespace osu.Game.Graphics.UserInterface.PageSelector

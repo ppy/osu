@@ -4,14 +4,14 @@
 #nullable disable
 
 using System;
-using System.Linq;
-using JetBrains.Annotations;
+using osuTK;
 using osu.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
-using osuTK;
+using System.Linq;
+using JetBrains.Annotations;
+using osu.Framework.Graphics.Sprites;
 
 namespace osu.Game.Graphics.UserInterface
 {

@@ -9,7 +9,6 @@ using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
-using osu.Framework.Audio.Track;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -17,7 +16,6 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Utils;
-using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -28,7 +26,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.Play
 {
-    public partial class SkipOverlay : BeatSyncedContainer, IKeyBindingHandler<GlobalAction>
+    public partial class SkipOverlay : CompositeDrawable, IKeyBindingHandler<GlobalAction>
     {
         /// <summary>
         /// The total number of successful skips performed by this overlay.
@@ -38,9 +36,10 @@ namespace osu.Game.Screens.Play
         private readonly double startTime;
 
         public Action RequestSkip;
+
         private Button button;
         private ButtonContainer buttonContainer;
-        private Circle remainingTimeBox;
+        private Box remainingTimeBox;
 
         private FadeContainer fadeContainer;
         private double displayTime;
@@ -88,14 +87,13 @@ namespace osu.Game.Screens.Play
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                         },
-                        remainingTimeBox = new Circle
+                        remainingTimeBox = new Box
                         {
                             Height = 5,
+                            RelativeSizeAxes = Axes.X,
+                            Colour = colours.Yellow,
                             Anchor = Anchor.BottomCentre,
                             Origin = Anchor.BottomCentre,
-                            Colour = colours.Yellow,
-                            RelativeSizeAxes = Axes.X,
-                            Masking = true,
                         }
                     }
                 }
@@ -210,17 +208,6 @@ namespace osu.Game.Screens.Play
 
         public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
         {
-        }
-
-        protected override void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, ChannelAmplitudes amplitudes)
-        {
-            base.OnNewBeat(beatIndex, timingPoint, effectPoint, amplitudes);
-
-            if (fadeOutBeginTime <= gameplayClock.CurrentTime)
-                return;
-
-            float progress = (float)(gameplayClock.CurrentTime - displayTime) / (float)(fadeOutBeginTime - displayTime);
-            remainingTimeBox.ResizeWidthTo(Math.Max(0, (float)(1 - progress)), timingPoint.BeatLength * 2, Easing.OutQuint);
         }
 
         public partial class FadeContainer : Container, IStateful<Visibility>

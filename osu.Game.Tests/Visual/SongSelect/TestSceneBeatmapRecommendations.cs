@@ -46,7 +46,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 API.LocalUser.Value.RulesetsStatistics = rulesetStatistics;
             });
 
-            static decimal getNecessaryPP(int? rulesetID)
+            decimal getNecessaryPP(int? rulesetID)
             {
                 switch (rulesetID)
                 {

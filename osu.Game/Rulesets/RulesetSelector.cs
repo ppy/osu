@@ -3,8 +3,8 @@
 
 #nullable disable
 
-using osu.Framework.Allocation;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Allocation;
 using osu.Framework.Logging;
 using osu.Game.Extensions;
 

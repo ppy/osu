@@ -4,8 +4,8 @@
 using System.Collections.Generic;
 using System.Threading;
 using osu.Game.Beatmaps;
-using osu.Game.Rulesets.EmptyScrolling.Objects;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.EmptyScrolling.Objects;
 
 namespace osu.Game.Rulesets.EmptyScrolling.Beatmaps
 {

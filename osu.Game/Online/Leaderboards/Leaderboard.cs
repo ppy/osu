@@ -17,11 +17,11 @@ using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Localisation;
 using osu.Game.Online.API;
 using osu.Game.Online.Placeholders;
 using osuTK;
 using osuTK.Graphics;
+using osu.Game.Localisation;
 
 namespace osu.Game.Online.Leaderboards
 {
