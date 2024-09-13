@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using Newtonsoft.Json;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps;
@@ -13,6 +14,7 @@ using osu.Game.Database;
 using osu.Game.Extensions;
 using osu.Game.IO;
 using osu.Game.IO.Archives;
+using osu.Game.Overlays.Notifications;
 using Realms;
 
 namespace osu.Game.Skinning
@@ -42,6 +44,11 @@ namespace osu.Game.Skinning
         protected override SkinInfo CreateModel(ArchiveReader archive, ImportParameters parameters) => new SkinInfo { Name = archive.Name ?? @"No name" };
 
         private const string unknown_creator_string = @"Unknown";
+
+        public override async Task<Live<SkinInfo>?> ImportAsUpdate(ProgressNotification notification, ImportTask task, SkinInfo original)
+        {
+            throw new NotImplementedException();
+        }
 
         protected override void Populate(SkinInfo model, ArchiveReader? archive, Realm realm, CancellationToken cancellationToken = default)
         {
