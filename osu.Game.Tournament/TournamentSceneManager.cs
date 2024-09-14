@@ -29,6 +29,7 @@ using osuTK;
 using osuTK.Graphics;
 using osuTK.Input;
 using osu.Game.Tournament.Models;
+using osu.Framework.Bindables;
 
 namespace osu.Game.Tournament
 {
@@ -37,6 +38,7 @@ namespace osu.Game.Tournament
     {
         private Container screens = null!;
         private TourneyVideo video = null!;
+        private BindableList<Drawable> animationQueue = new BindableList<Drawable>();
 
         public const int CONTROL_AREA_WIDTH = 200;
 
@@ -48,7 +50,7 @@ namespace osu.Game.Tournament
         public const int REQUIRED_WIDTH = CONTROL_AREA_WIDTH * 2 + STREAM_AREA_WIDTH;
 
         public bool IsChatShown = true;
-        public bool IsAnimationRunning = false;
+        public BindableBool IsAnimationRunning = new BindableBool(false);
 
         [Cached]
         private TournamentMatchChatDisplay chat = new TournamentMatchChatDisplay(RelativeSizeY: true);
@@ -74,6 +76,7 @@ namespace osu.Game.Tournament
         [BackgroundDependencyLoader]
         private void load()
         {
+            IsAnimationRunning.BindValueChanged(animationStatusChanged);
             InternalChildren = new Drawable[]
             {
                 new Container
@@ -377,18 +380,61 @@ namespace osu.Game.Tournament
                 .Then().Delay(5700).FadeIn(duration, Easing.OutQuint);
         public void ShowChat(int duration) => chatContainer.FadeIn(duration, Easing.OutQuint);
 
-        public void ShowMapIntro(RoundBeatmap map) => AddInternal(new TournamentIntro(map)
+        public void ShowMapIntro(RoundBeatmap map) => queueAnimation(new TournamentIntro(map)
         {
             Anchor = Anchor.CentreLeft,
             Origin = Anchor.CentreLeft,
             X = CONTROL_AREA_WIDTH + STREAM_AREA_WIDTH / 2,
         });
 
-        public void ShowWinAnimation(TournamentTeam? team, TeamColour colour = TeamColour.Neutral) => AddInternal(new RoundAnimation(team, colour)
+        public void ShowWinAnimation(TournamentTeam? team, TeamColour colour = TeamColour.Neutral) => queueAnimation(new RoundAnimation(team, colour)
         {
             Anchor = Anchor.CentreLeft,
             Origin = Anchor.CentreLeft,
             X = CONTROL_AREA_WIDTH + STREAM_AREA_WIDTH / 2,
         });
+
+        private void startAnimation(Drawable d)
+        {
+            IsAnimationRunning.Value = true;
+            AddInternal(d);
+
+            if (d.GetType() == typeof(RoundAnimation))
+            {
+                var roundAnimation = (RoundAnimation)d;
+                roundAnimation.Fire();
+            }
+
+            if (d.GetType() == typeof(TournamentIntro))
+            {
+                var tournamentIntro = (TournamentIntro)d;
+                tournamentIntro.Fire();
+            }
+        }
+
+        private void queueAnimation(Drawable d)
+        {
+            if (animationQueue.Count == 0 && !IsAnimationRunning.Value)
+            {
+                IsAnimationRunning.Value = true;
+                startAnimation(d);
+            }
+            else
+                animationQueue.Add(d);
+        }
+
+        private void animationStatusChanged(ValueChangedEvent<bool> e)
+        {
+            if (!e.NewValue)
+            {
+                // If just stopped, try to push and add the next animation
+                if (animationQueue.Count > 0)
+                {
+                    var animation = animationQueue.FirstOrDefault();
+                    startAnimation(animation);
+                    animationQueue.Remove(animation);
+                }
+            }
+        }
     }
 }

@@ -24,6 +24,9 @@ namespace osu.Game.Tournament.Components
 {
     public partial class RoundAnimation : VisibilityContainer
     {
+        [Resolved]
+        private TournamentSceneManager sceneManager { get; set; } = null!;
+
         public const float DISC_SIZE = 400;
 
         private const float border_width = 5;
@@ -232,7 +235,6 @@ namespace osu.Game.Tournament.Components
             }, loaded =>
             {
                 disc.Add(loaded);
-                startAnimation();
             });
         }
 
@@ -245,6 +247,8 @@ namespace osu.Game.Tournament.Components
 
         private const double initial_duration = 400;
         private const double step_duration = 900;
+
+        public void Fire() => startAnimation();
 
         private void startAnimation()
         {
@@ -292,7 +296,7 @@ namespace osu.Game.Tournament.Components
                     trophy.Delay(2500).FadeIn(500)
                           .MoveToOffset(new Vector2(0, 100), step_duration, Easing.OutQuint);
 
-                    this.FadeIn(200).Then().Delay(10000).FadeOut(1000).OnComplete(_ => isAnimationRunning = false);
+                    this.FadeIn(200).Then().Delay(10000).FadeOut(1000).OnComplete(_ => { isAnimationRunning = false; sceneManager.IsAnimationRunning.Value = false; });
                 }
             }
         }

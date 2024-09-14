@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
@@ -23,7 +22,7 @@ namespace osu.Game.Tournament.Components
     public partial class TournamentIntro : CompositeDrawable
     {
         [Resolved]
-        private TournamentSceneManager? sceneManager { get; set; }
+        private TournamentSceneManager? sceneManager { get; set; } = null!;
 
         private RoundBeatmap map = null!;
         private string mod = null!;
@@ -42,8 +41,6 @@ namespace osu.Game.Tournament.Components
         private Container titleContainer = null!;
 
         private bool beatmapBackgroundLoaded;
-
-        private static bool animationBegan;
 
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Plum);
@@ -93,8 +90,6 @@ namespace osu.Game.Tournament.Components
         private void load(BeatmapDifficultyCache difficultyCache)
         {
             const float horizontal_info_size = 500f;
-
-            StarRatingDisplay starRatingDisplay;
 
             InternalChildren = new Drawable[]
             {
@@ -269,7 +264,7 @@ namespace osu.Game.Tournament.Components
                                                     Anchor = Anchor.TopCentre,
                                                     Origin = Anchor.TopCentre,
                                                 },
-                                                starRatingDisplay = new StarRatingDisplay(new StarDifficulty(map.Beatmap?.StarRating ?? 0, 0))
+                                                new StarRatingDisplay(new StarDifficulty(map.Beatmap?.StarRating ?? 0, 0))
                                                 {
                                                     Shear = new Vector2(-OsuGame.SHEAR, 0f),
                                                     Margin = new MarginPadding(5),
@@ -285,7 +280,10 @@ namespace osu.Game.Tournament.Components
                     }
                 }
             };
+        }
 
+        public void Fire()
+        {
             LoadComponentAsync(new OnlineBeatmapSetCover(map.Beatmap)
             {
                 RelativeSizeAxes = Axes.Both,
@@ -301,8 +299,6 @@ namespace osu.Game.Tournament.Components
                 beatmapBackgroundLoaded = true;
                 updateAnimationState();
             });
-            this.FadeInFromZero(500, Easing.OutExpo);
-            updateAnimationState();
         }
 
         private void updateAnimationState()
@@ -310,22 +306,18 @@ namespace osu.Game.Tournament.Components
             if (sceneManager == null)
                 return;
 
-            if (!sceneManager.IsAnimationRunning)
-                return;
-
             if (!beatmapBackgroundLoaded)
+            {
+                sceneManager.IsAnimationRunning.Value = false;
                 return;
-
-            if (animationBegan)
-                return;
+            }
 
             beginAnimation();
-            animationBegan = true;
-            sceneManager.IsAnimationRunning = true;
         }
 
         private void beginAnimation()
         {
+            this.FadeInFromZero(500, Easing.OutExpo);
             using (BeginDelayedSequence(1500))
             {
                 introContent.Show();
@@ -378,7 +370,7 @@ namespace osu.Game.Tournament.Components
 
                 using (BeginDelayedSequence(6000))
                 {
-                    this.FadeOutFromOne(3000, Easing.OutExpo).OnComplete(_ => animationBegan = false);
+                    this.FadeOutFromOne(3000, Easing.OutExpo).Then().Finally(_ => { sceneManager.IsAnimationRunning.Value = false; Expire(); });
                 }
             }
         }
