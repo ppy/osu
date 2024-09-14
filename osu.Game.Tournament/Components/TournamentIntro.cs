@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -19,17 +20,17 @@ using osuTK.Graphics;
 
 namespace osu.Game.Tournament.Components
 {
-    public partial class TournamentIntro : CompositeDrawable
+    public partial class TournamentIntro : CompositeDrawable, IAnimation
     {
         [Resolved]
-        private TournamentSceneManager? sceneManager { get; set; } = null!;
+        private TournamentSceneManager? sceneManager { get; set; }
 
-        private RoundBeatmap map = null!;
-        private string mod = null!;
-        private TeamColour colour;
-        private ColourInfo themeColour;
-        private TrapInfo? mapTrap = null!;
-        private ColourInfo modColour;
+        private readonly RoundBeatmap map;
+        private readonly string mod;
+        private readonly TeamColour colour;
+        private readonly ColourInfo themeColour;
+        private readonly TrapInfo? mapTrap;
+        private readonly ColourInfo modColour;
 
         private Container introContent = null!;
         private Container topTitleDisplay = null!;
@@ -47,7 +48,10 @@ namespace osu.Game.Tournament.Components
 
         private bool beatmapBackgroundLoaded;
 
-        private OverlayColourProvider colourProvider;// = new OverlayColourProvider(OverlayColourScheme.Plum);
+        private readonly OverlayColourProvider colourProvider;
+
+        public event Action? OnAnimationComplete;
+        public AnimationStatus Status { get; private set; } = AnimationStatus.Loading;
 
         public TournamentIntro(RoundBeatmap map, TeamColour colour = TeamColour.Neutral, TrapInfo? trap = null)
         {
@@ -95,7 +99,7 @@ namespace osu.Game.Tournament.Components
         }
 
         [BackgroundDependencyLoader]
-        private void load(BeatmapDifficultyCache difficultyCache)
+        private void load()
         {
             const float horizontal_info_size = 500f;
 
@@ -399,8 +403,10 @@ namespace osu.Game.Tournament.Components
             }
         }
 
-        public void Fire()
+        protected override void LoadComplete()
         {
+            base.LoadComplete();
+
             LoadComponentAsync(new OnlineBeatmapSetCover(map.Beatmap)
             {
                 RelativeSizeAxes = Axes.Both,
@@ -414,27 +420,18 @@ namespace osu.Game.Tournament.Components
                 beatmapBackground.Add(c);
 
                 beatmapBackgroundLoaded = true;
-                updateAnimationState();
             });
         }
 
-        private void updateAnimationState()
+        public void Fire()
         {
-            if (sceneManager == null)
-                return;
-
-            if (!beatmapBackgroundLoaded)
-            {
-                sceneManager.IsAnimationRunning.Value = false;
-                return;
-            }
-
             beginAnimation();
         }
 
         private void beginAnimation()
         {
             this.FadeInFromZero(500, Easing.OutExpo);
+
             using (BeginDelayedSequence(1500))
             {
                 introContent.Show();
@@ -501,7 +498,12 @@ namespace osu.Game.Tournament.Components
 
                 using (BeginDelayedSequence(6000))
                 {
-                    this.FadeOutFromOne(3000, Easing.OutExpo).Then().Finally(_ => { sceneManager.IsAnimationRunning.Value = false; Expire(); });
+                    this.FadeOutFromOne(3000, Easing.OutExpo).Then().Finally(_ =>
+                    {
+                        Status = AnimationStatus.Complete;
+                        OnAnimationComplete?.Invoke();
+                        Expire();
+                    });
                 }
             }
         }

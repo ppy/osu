@@ -38,7 +38,9 @@ namespace osu.Game.Tournament
     {
         private Container screens = null!;
         private TourneyVideo video = null!;
-        private BindableList<Drawable> animationQueue = new BindableList<Drawable>();
+        private BindableList<IAnimation> animationQueue = new BindableList<IAnimation>();
+
+        private IAnimation? currentAnimation;
 
         public const int CONTROL_AREA_WIDTH = 200;
 
@@ -50,7 +52,6 @@ namespace osu.Game.Tournament
         public const int REQUIRED_WIDTH = CONTROL_AREA_WIDTH * 2 + STREAM_AREA_WIDTH;
 
         public bool IsChatShown = true;
-        public BindableBool IsAnimationRunning = new BindableBool(false);
 
         [Cached]
         private TournamentMatchChatDisplay chat = new TournamentMatchChatDisplay(RelativeSizeY: true);
@@ -71,12 +72,23 @@ namespace osu.Game.Tournament
         public TournamentSceneManager()
         {
             RelativeSizeAxes = Axes.Both;
+
+            animationQueue.BindCollectionChanged((_, arg) =>
+            {
+                if (!animationQueue.Any())
+                    return;
+
+                if (currentAnimation == null || currentAnimation.Status == AnimationStatus.Complete)
+                {
+                    var animation = animationQueue.First();
+                    startAnimation(animation);
+                }
+            });
         }
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            IsAnimationRunning.BindValueChanged(animationStatusChanged);
             InternalChildren = new Drawable[]
             {
                 new Container
@@ -378,6 +390,7 @@ namespace osu.Game.Tournament
         public void HideShowChat(int duration) =>
             chatContainer.Delay(1500).FadeTo(0.6f, duration, Easing.OutQuint)
                 .Then().Delay(5700).FadeIn(duration, Easing.OutQuint);
+
         public void ShowChat(int duration) => chatContainer.FadeIn(duration, Easing.OutQuint);
 
         public void ShowMapIntro(RoundBeatmap map, TeamColour colour = TeamColour.Neutral, TrapInfo? trap = null) => queueAnimation(new TournamentIntro(map, colour, trap)
@@ -394,47 +407,20 @@ namespace osu.Game.Tournament
             X = CONTROL_AREA_WIDTH + STREAM_AREA_WIDTH / 2,
         });
 
-        private void startAnimation(Drawable d)
+        private void startAnimation(IAnimation animation)
         {
-            IsAnimationRunning.Value = true;
-            AddInternal(d);
+            AddInternal((Drawable)(currentAnimation = animation));
 
-            if (d.GetType() == typeof(RoundAnimation))
+            animation.Fire();
+            animation.OnAnimationComplete += () =>
             {
-                var roundAnimation = (RoundAnimation)d;
-                roundAnimation.Fire();
-            }
-
-            if (d.GetType() == typeof(TournamentIntro))
-            {
-                var tournamentIntro = (TournamentIntro)d;
-                tournamentIntro.Fire();
-            }
+                animationQueue.Remove(animation);
+            };
         }
 
-        private void queueAnimation(Drawable d)
+        private void queueAnimation(IAnimation d)
         {
-            if (animationQueue.Count == 0 && !IsAnimationRunning.Value)
-            {
-                IsAnimationRunning.Value = true;
-                startAnimation(d);
-            }
-            else
-                animationQueue.Add(d);
-        }
-
-        private void animationStatusChanged(ValueChangedEvent<bool> e)
-        {
-            if (!e.NewValue)
-            {
-                // If just stopped, try to push and add the next animation
-                if (animationQueue.Count > 0)
-                {
-                    var animation = animationQueue.FirstOrDefault();
-                    startAnimation(animation);
-                    animationQueue.Remove(animation);
-                }
-            }
+            animationQueue.Add(d);
         }
     }
 }

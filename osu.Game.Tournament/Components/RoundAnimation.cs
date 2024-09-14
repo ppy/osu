@@ -22,7 +22,7 @@ using osu.Game.Tournament.Models;
 
 namespace osu.Game.Tournament.Components
 {
-    public partial class RoundAnimation : VisibilityContainer
+    public partial class RoundAnimation : VisibilityContainer, IAnimation
     {
         [Resolved]
         private TournamentSceneManager sceneManager { get; set; } = null!;
@@ -30,7 +30,6 @@ namespace osu.Game.Tournament.Components
         public const float DISC_SIZE = 400;
 
         private const float border_width = 5;
-        private static bool isAnimationRunning = false;
 
         private readonly Box background;
         private readonly Container backgroundStrip, particleContainer;
@@ -38,15 +37,18 @@ namespace osu.Game.Tournament.Components
         private readonly CircularContainer disc;
         private readonly Sprite innerSpin, outerSpin;
 
-        private TeamColour winColour;
+        public event Action? OnAnimationComplete;
+        public AnimationStatus Status { get; private set; } = AnimationStatus.Loading;
+
+        private readonly TeamColour winColour;
 
         private SpriteIcon? drawableMedal;
         private Sample? getSample;
-        private Container textContainer;
-        private DrawableTeamFlag flag;
-        private TournamentSpriteText ggText;
-        private TournamentSpriteText cText;
-        private SpriteIcon trophy;
+        private readonly Container textContainer;
+        private readonly DrawableTeamFlag flag;
+        private readonly TournamentSpriteText ggText;
+        private readonly TournamentSpriteText cText;
+        private readonly SpriteIcon trophy;
 
         private readonly Container content;
 
@@ -205,10 +207,6 @@ namespace osu.Game.Tournament.Components
         [BackgroundDependencyLoader]
         private void load(OsuColour colours, TextureStore textures, AudioManager audio)
         {
-            // Don't load if an active animation instance exists.
-            if (isAnimationRunning)
-                return;
-
             getSample = audio.Samples.Get(@"MedalSplash/medal-get");
             innerSpin.Texture = outerSpin.Texture = textures.Get(@"MedalSplash/disc-spin");
 
@@ -223,9 +221,6 @@ namespace osu.Game.Tournament.Components
         protected override void LoadComplete()
         {
             base.LoadComplete();
-
-            if (isAnimationRunning)
-                return;
 
             LoadComponentAsync(drawableMedal = new SpriteIcon
             {
@@ -252,7 +247,7 @@ namespace osu.Game.Tournament.Components
 
         private void startAnimation()
         {
-            isAnimationRunning = true;
+            Status = AnimationStatus.Running;
 
             using (BeginDelayedSequence(700))
                 content.Show();
@@ -296,7 +291,11 @@ namespace osu.Game.Tournament.Components
                     trophy.Delay(2500).FadeIn(500)
                           .MoveToOffset(new Vector2(0, 100), step_duration, Easing.OutQuint);
 
-                    this.FadeIn(200).Then().Delay(10000).FadeOut(1000).OnComplete(_ => { isAnimationRunning = false; sceneManager.IsAnimationRunning.Value = false; });
+                    this.FadeIn(200).Then().Delay(10000).FadeOut(1000).OnComplete(_ =>
+                    {
+                        Status = AnimationStatus.Complete;
+                        OnAnimationComplete?.Invoke();
+                    });
                 }
             }
         }
