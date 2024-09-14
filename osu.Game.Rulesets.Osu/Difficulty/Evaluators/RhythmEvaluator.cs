@@ -98,6 +98,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             OsuDifficultyHitObject prevObj = (OsuDifficultyHitObject)current.Previous(rhythmStart);
             OsuDifficultyHitObject lastObj = (OsuDifficultyHitObject)current.Previous(rhythmStart + 1);
 
+            // we go from the furthest object back to the current one
             for (int i = rhythmStart; i > 0; i--)
             {
                 OsuDifficultyHitObject currObj = (OsuDifficultyHitObject)current.Previous(i - 1);
@@ -171,15 +172,20 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                         previousIsland = island;
 
                         if (prevDelta + deltaDifferenceEpsilon < currDelta) // we're slowing down, stop counting
-                            firstDeltaSwitch = false; // if we're speeding up, this stays true and  we keep counting island size.
+                            firstDeltaSwitch = false; // if we're speeding up, this stays true and we keep counting island size.
 
                         island = new Island((int)currDelta, deltaDifferenceEpsilon);
                     }
                 }
-                else if (prevDelta > currDelta + deltaDifferenceEpsilon) // we want to be speeding up.
+                else if (prevDelta > currDelta + deltaDifferenceEpsilon) // we're speeding up
                 {
                     // Begin counting island until we change speed again.
                     firstDeltaSwitch = true;
+
+                    // reduce ratio if we're starting after a slider
+                    if (prevObj.BaseObject is Slider)
+                        effectiveRatio *= 0.3;
+
                     startRatio = effectiveRatio;
 
                     island = new Island((int)currDelta, deltaDifferenceEpsilon);
