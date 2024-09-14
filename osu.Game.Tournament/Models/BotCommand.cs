@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
-using NUnit.Framework;
 
 namespace osu.Game.Tournament.Models
 {
@@ -26,7 +25,7 @@ namespace osu.Game.Tournament.Models
         private Regex panicRegex = new Regex("\\[\\*\\] 收到异常信号, 启动通知进程");
         // 1, 3, 5, 7 MapID
         // 2, 4, 6, 8 Status
-        private Regex boardLineRegex = new Regex("\\[\\*\\] 当前棋盘: (.+) \\((.+)\\) (.+) \\((.+)\\) (.+) \\((.+)\\) (.+) \\((.+)\\) ");
+        private Regex boardLineRegex = new Regex("\\[\\*\\] 当前棋盘: (.+) \\((.+)\\) (.+) \\((.+)\\) (.+) \\((.+)\\) (.+) \\((.+)\\)");
 
         public Commands Command;
         public TeamColour Team;

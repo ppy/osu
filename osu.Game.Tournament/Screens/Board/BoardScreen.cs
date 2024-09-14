@@ -16,12 +16,14 @@ using osu.Framework.Input.Events;
 using osu.Framework.Threading;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
+using osu.Game.Overlays;
 using osu.Game.Overlays.Toolbar;
 using osu.Game.Tournament.Components;
 using osu.Game.Tournament.Models;
 using osu.Game.Tournament.Screens.Board.Components;
 using osu.Game.Tournament.Screens.Gameplay;
 using osu.Game.Tournament.Screens.Gameplay.Components;
+using osu.Game.Tournament.Screens.Setup;
 using osuTK;
 using osuTK.Graphics;
 using osuTK.Input;
@@ -374,6 +376,26 @@ namespace osu.Game.Tournament.Screens.Board
                             Text = "Refresh",
                             BackgroundColour = Color4.Orange,
                             Action = updateDisplay
+                        },
+                        new TourneyButton
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            Text = "Sync",
+                            BackgroundColour = Color4.Orange,
+                            Action = () => {
+                                if (!CurrentMatch.Value.Round.Value.UseBoard.Value)
+                                {
+                                    var overlay = new DialogOverlay();
+                                    overlay.Push(new IPCErrorDialog("Unsupported", "This round isn't set for board layout. Check this in round editor."));
+                                    AddInternal(overlay);
+                                }
+                                else
+                                {
+                                    sceneManager?.SetScreen(new BoardImportScreen());
+                                    sceneManager?.MoveChatTo(new Vector2(175, 150), 500, Easing.OutQuint);
+                                    sceneManager?.ResizeChatTo(new Vector2(350, 450), 500, Easing.OutQuint);
+                                }
+                            },
                         },
                         new TourneyButton
                         {

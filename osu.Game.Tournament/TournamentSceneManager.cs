@@ -374,5 +374,11 @@ namespace osu.Game.Tournament
             chatContainer.Delay(1500).FadeTo(0.6f, duration, Easing.OutQuint)
                 .Then().Delay(7500).FadeIn(duration, Easing.OutQuint);
         public void ShowChat(int duration) => chatContainer.FadeIn(duration, Easing.OutQuint);
+
+        public void MoveChatTo(Vector2 pos, int duration, Easing easing) =>
+            chatContainer.MoveTo(pos, duration, easing);
+
+        public void ResizeChatTo(Vector2 size, int duration, Easing easing) =>
+            chatContainer.ResizeTo(size, duration, easing);
     }
 }
