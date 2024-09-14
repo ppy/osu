@@ -19,7 +19,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
 using osu.Framework.Logging;
 using osu.Framework.Testing;
-using osu.Framework.Utils;
 using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
@@ -33,6 +32,7 @@ using osu.Game.Overlays.Chat.ChannelList;
 using osuTK;
 using osuTK.Input;
 using osu.Game.Graphics.UserInterfaceV2;
+using osu.Game.Tests.Resources;
 
 namespace osu.Game.Tests.Visual.Online
 {
@@ -122,7 +122,7 @@ namespace osu.Game.Tests.Visual.Online
                             return true;
 
                         case PostMessageRequest postMessage:
-                            postMessage.TriggerSuccess(new Message(RNG.Next(0, 10000000))
+                            postMessage.TriggerSuccess(new Message(TestResources.GetNextTestID())
                             {
                                 Content = postMessage.Message.Content,
                                 ChannelId = postMessage.Message.ChannelId,
@@ -446,7 +446,7 @@ namespace osu.Game.Tests.Visual.Online
         {
             AddStep("Show overlay with channel 1", () =>
             {
-                channelManager.JoinChannel(testChannel1);
+                channelManager.CurrentChannel.Value = channelManager.JoinChannel(testChannel1);
                 chatOverlay.Show();
             });
             waitForChannel1Visible();
@@ -462,7 +462,7 @@ namespace osu.Game.Tests.Visual.Online
         {
             AddStep("Show overlay with channel 1", () =>
             {
-                channelManager.JoinChannel(testChannel1);
+                channelManager.CurrentChannel.Value = channelManager.JoinChannel(testChannel1);
                 chatOverlay.Show();
             });
             waitForChannel1Visible();
@@ -719,7 +719,8 @@ namespace osu.Game.Tests.Visual.Online
 
         private Channel createPrivateChannel()
         {
-            int id = RNG.Next(0, DummyAPIAccess.DUMMY_USER_ID - 1);
+            int id = TestResources.GetNextTestID();
+
             return new Channel(new APIUser
             {
                 Id = id,

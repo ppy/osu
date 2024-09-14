@@ -6,7 +6,6 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using System.Threading;
-using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
@@ -271,7 +270,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
                         Duration = endTimeData.Duration,
                         Column = column,
                         Samples = HitObject.Samples,
-                        NodeSamples = (HitObject as IHasRepeats)?.NodeSamples ?? defaultNodeSamples
+                        NodeSamples = (HitObject as IHasRepeats)?.NodeSamples ?? HoldNote.CreateDefaultNodeSamples(HitObject)
                     });
                 }
                 else if (HitObject is IHasXPosition)
@@ -286,16 +285,6 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
 
                 return pattern;
             }
-
-            /// <remarks>
-            /// osu!mania-specific beatmaps in stable only play samples at the start of the hold note.
-            /// </remarks>
-            private List<IList<HitSampleInfo>> defaultNodeSamples
-                => new List<IList<HitSampleInfo>>
-                {
-                    HitObject.Samples,
-                    new List<HitSampleInfo>()
-                };
         }
     }
 }

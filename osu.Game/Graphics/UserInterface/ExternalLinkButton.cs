@@ -10,9 +10,6 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
-using osu.Framework.Platform;
-using osu.Game.Overlays;
-using osu.Game.Overlays.OSD;
 using osuTK;
 using osuTK.Graphics;
 
@@ -25,13 +22,7 @@ namespace osu.Game.Graphics.UserInterface
         private Color4 hoverColour;
 
         [Resolved]
-        private GameHost host { get; set; } = null!;
-
-        [Resolved]
-        private Clipboard clipboard { get; set; } = null!;
-
-        [Resolved]
-        private OnScreenDisplay? onScreenDisplay { get; set; }
+        private OsuGame? game { get; set; }
 
         private readonly SpriteIcon linkIcon;
 
@@ -71,7 +62,7 @@ namespace osu.Game.Graphics.UserInterface
         protected override bool OnClick(ClickEvent e)
         {
             if (Link != null)
-                host.OpenUrlExternally(Link);
+                game?.OpenUrlExternally(Link);
             return true;
         }
 
@@ -85,8 +76,8 @@ namespace osu.Game.Graphics.UserInterface
 
                 if (Link != null)
                 {
-                    items.Add(new OsuMenuItem("Open", MenuItemType.Highlighted, () => host.OpenUrlExternally(Link)));
-                    items.Add(new OsuMenuItem("Copy URL", MenuItemType.Standard, copyUrl));
+                    items.Add(new OsuMenuItem("Open", MenuItemType.Highlighted, () => game?.OpenUrlExternally(Link)));
+                    items.Add(new OsuMenuItem("Copy link", MenuItemType.Standard, copyUrl));
                 }
 
                 return items.ToArray();
@@ -95,11 +86,9 @@ namespace osu.Game.Graphics.UserInterface
 
         private void copyUrl()
         {
-            if (Link != null)
-            {
-                clipboard.SetText(Link);
-                onScreenDisplay?.Display(new CopyUrlToast());
-            }
+            if (Link == null) return;
+
+            game?.CopyUrlToClipboard(Link);
         }
     }
 }
