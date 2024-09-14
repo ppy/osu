@@ -212,6 +212,9 @@ namespace osu.Game.Tournament.Screens.Setup
 
         private void updateBoard()
         {
+            if (!useChat.Value)
+                return;
+
             // No enough commands.
             if (defCommandList.Count < 4)
                 return;
