@@ -26,6 +26,7 @@ using osu.Game.Collections;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
 using osu.Game.Overlays;
@@ -161,20 +162,6 @@ namespace osu.Game.Screens.Select
                 ApplyToBackground(applyBlurToBackground);
             });
 
-            LoadComponentAsync(Carousel = new BeatmapCarousel
-            {
-                AllowSelection = false, // delay any selection until our bindables are ready to make a good choice.
-                Anchor = Anchor.CentreRight,
-                Origin = Anchor.CentreRight,
-                RelativeSizeAxes = Axes.Both,
-                BleedTop = FilterControl.HEIGHT,
-                BleedBottom = Select.Footer.HEIGHT,
-                SelectionChanged = updateSelectedBeatmap,
-                BeatmapSetsChanged = carouselBeatmapsLoaded,
-                FilterApplied = () => Scheduler.AddOnce(updateVisibleBeatmapCount),
-                GetRecommendedBeatmap = s => recommender?.GetRecommendedBeatmap(s),
-            }, c => carouselContainer.Child = c);
-
             // initial value transfer is required for FilterControl (it uses our re-cached bindables in its async load for the initial filter).
             transferRulesetValue();
 
@@ -226,7 +213,6 @@ namespace osu.Game.Screens.Select
                         {
                             RelativeSizeAxes = Axes.X,
                             Height = FilterControl.HEIGHT,
-                            FilterChanged = ApplyFilterToCarousel,
                         },
                         new GridContainer // used for max width implementation
                         {
@@ -320,12 +306,29 @@ namespace osu.Game.Screens.Select
                         }
                     }
                 },
-                new SkinComponentsContainer(new SkinComponentsContainerLookup(SkinComponentsContainerLookup.TargetArea.SongSelect))
+                new SkinnableContainer(new GlobalSkinnableContainerLookup(GlobalSkinnableContainers.SongSelect))
                 {
                     RelativeSizeAxes = Axes.Both,
                 },
                 modSpeedHotkeyHandler = new ModSpeedHotkeyHandler(),
             });
+
+            // Important to load this after the filter control is loaded (so we have initial filter criteria prepared).
+            LoadComponentAsync(Carousel = new BeatmapCarousel(FilterControl.CreateCriteria())
+            {
+                AllowSelection = false, // delay any selection until our bindables are ready to make a good choice.
+                Anchor = Anchor.CentreRight,
+                Origin = Anchor.CentreRight,
+                RelativeSizeAxes = Axes.Both,
+                BleedTop = FilterControl.HEIGHT,
+                BleedBottom = Select.Footer.HEIGHT,
+                SelectionChanged = updateSelectedBeatmap,
+                BeatmapSetsChanged = carouselBeatmapsLoaded,
+                FilterApplied = () => Scheduler.AddOnce(updateVisibleBeatmapCount),
+                GetRecommendedBeatmap = s => recommender?.GetRecommendedBeatmap(s),
+            }, c => carouselContainer.Child = c);
+
+            FilterControl.FilterChanged = Carousel.Filter;
 
             if (ShowSongSelectFooter)
             {
@@ -400,14 +403,6 @@ namespace osu.Game.Screens.Select
 
         protected virtual ModSelectOverlay CreateModSelectOverlay() => new SoloModSelectOverlay();
 
-        protected virtual void ApplyFilterToCarousel(FilterCriteria criteria)
-        {
-            // if not the current screen, we want to get carousel in a good presentation state before displaying (resume or enter).
-            bool shouldDebounce = this.IsCurrentScreen();
-
-            Carousel.Filter(criteria, shouldDebounce);
-        }
-
         private DependencyContainer dependencies = null!;
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
@@ -433,7 +428,8 @@ namespace osu.Game.Screens.Select
 
             // Forced refetch is important here to guarantee correct invalidation across all difficulties.
             Beatmap.Value = beatmaps.GetWorkingBeatmap(beatmapInfo ?? beatmapInfoNoDebounce, true);
-            this.Push(new EditorLoader());
+
+            FinaliseSelection(customStartAction: () => this.Push(new EditorLoader()));
         }
 
         /// <summary>
@@ -991,7 +987,8 @@ namespace osu.Game.Screens.Select
 
             // if we have a pending filter operation, we want to run it now.
             // it could change selection (ie. if the ruleset has been changed).
-            Carousel.FlushPendingFilterOperations();
+            if (IsLoaded)
+                Carousel.FlushPendingFilterOperations();
 
             return true;
         }
@@ -1081,7 +1078,7 @@ namespace osu.Game.Screens.Select
                 Anchor = Anchor.Centre;
                 Origin = Anchor.Centre;
                 Width = panel_overflow; // avoid horizontal masking so the panels don't clip when screen stack is pushed.
-                InternalChild = Content = new Container
+                InternalChild = Content = new OsuContextMenuContainer
                 {
                     RelativeSizeAxes = Axes.Both,
                     Anchor = Anchor.Centre,

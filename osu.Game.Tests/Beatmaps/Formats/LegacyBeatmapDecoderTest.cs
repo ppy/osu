@@ -469,6 +469,40 @@ namespace osu.Game.Tests.Beatmaps.Formats
         }
 
         [Test]
+        public void TestDecodeBeatmapHitObjectCoordinatesLegacy()
+        {
+            var decoder = new LegacyBeatmapDecoder();
+
+            using (var resStream = TestResources.OpenResource("hitobject-coordinates-legacy.osu"))
+            using (var stream = new LineBufferedReader(resStream))
+            {
+                var hitObjects = decoder.Decode(stream).HitObjects;
+
+                var positionData = hitObjects[0] as IHasPosition;
+
+                Assert.IsNotNull(positionData);
+                Assert.AreEqual(new Vector2(256, 256), positionData!.Position);
+            }
+        }
+
+        [Test]
+        public void TestDecodeBeatmapHitObjectCoordinatesLazer()
+        {
+            var decoder = new LegacyBeatmapDecoder(LegacyBeatmapEncoder.FIRST_LAZER_VERSION);
+
+            using (var resStream = TestResources.OpenResource("hitobject-coordinates-lazer.osu"))
+            using (var stream = new LineBufferedReader(resStream))
+            {
+                var hitObjects = decoder.Decode(stream).HitObjects;
+
+                var positionData = hitObjects[0] as IHasPosition;
+
+                Assert.IsNotNull(positionData);
+                Assert.AreEqual(new Vector2(256.99853f, 256.001f), positionData!.Position);
+            }
+        }
+
+        [Test]
         public void TestDecodeBeatmapHitObjects()
         {
             var decoder = new LegacyBeatmapDecoder { ApplyOffsets = false };
