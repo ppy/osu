@@ -380,7 +380,7 @@ namespace osu.Game.Tournament
                 .Then().Delay(5700).FadeIn(duration, Easing.OutQuint);
         public void ShowChat(int duration) => chatContainer.FadeIn(duration, Easing.OutQuint);
 
-        public void ShowMapIntro(RoundBeatmap map) => queueAnimation(new TournamentIntro(map)
+        public void ShowMapIntro(RoundBeatmap map, TeamColour colour = TeamColour.Neutral, TrapInfo? trap = null) => queueAnimation(new TournamentIntro(map, colour, trap)
         {
             Anchor = Anchor.CentreLeft,
             Origin = Anchor.CentreLeft,

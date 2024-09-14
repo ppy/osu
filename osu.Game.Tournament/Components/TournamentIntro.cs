@@ -7,12 +7,12 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays;
-using osu.Game.Screens.OnlinePlay.Match;
 using osu.Game.Tournament.Models;
 using osuTK;
 using osuTK.Graphics;
@@ -26,12 +26,17 @@ namespace osu.Game.Tournament.Components
 
         private RoundBeatmap map = null!;
         private string mod = null!;
-        private ColourInfo color;
+        private TeamColour colour;
+        private ColourInfo themeColour;
+        private TrapInfo? mapTrap = null!;
+        private ColourInfo modColour;
 
         private Container introContent = null!;
         private Container topTitleDisplay = null!;
-        private Container bottomDateDisplay = null!;
+        private Container secondDisplay = null!;
         private Container beatmapBackground = null!;
+        private FillFlowContainer authorDisplay = null!;
+        private Container trapDisplay = null!;
         private Box flash = null!;
         private EmptyBox dummyBackground = null!;
         private OsuSpriteText modText = null!;
@@ -42,46 +47,49 @@ namespace osu.Game.Tournament.Components
 
         private bool beatmapBackgroundLoaded;
 
-        [Cached]
-        private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Plum);
+        private OverlayColourProvider colourProvider;// = new OverlayColourProvider(OverlayColourScheme.Plum);
 
-        public TournamentIntro(RoundBeatmap map)
+        public TournamentIntro(RoundBeatmap map, TeamColour colour = TeamColour.Neutral, TrapInfo? trap = null)
         {
             this.map = map;
+            this.colour = colour;
+            colourProvider = new OverlayColourProvider(colour == TeamColour.Red ? OverlayColourScheme.Pink : colour == TeamColour.Blue ? OverlayColourScheme.Blue : OverlayColourScheme.Plum);
+            themeColour = colour == TeamColour.Red ? new OsuColour().Pink1 : colour == TeamColour.Blue ? new OsuColour().Sky : Color4.White;
+            mapTrap = trap;
             mod = map.Mods + map.ModIndex;
 
             switch (map.Mods)
             {
                 case "HR":
-                    color = Color4Extensions.FromHex("#f76363");
+                    modColour = Color4Extensions.FromHex("#f76363");
                     break;
 
                 case "FM":
-                    color = Color4Extensions.FromHex("#24eecb");
+                    modColour = Color4Extensions.FromHex("#24eecb");
                     break;
 
                 case "NM":
-                    color = Color4Extensions.FromHex("#ffdb75");
+                    modColour = Color4Extensions.FromHex("#ffdb75");
                     break;
 
                 case "DT":
-                    color = Color4Extensions.FromHex("#66ccff");
+                    modColour = Color4Extensions.FromHex("#66ccff");
                     break;
 
                 case "HD":
-                    color = Color4Extensions.FromHex("#fdc300");
+                    modColour = Color4Extensions.FromHex("#fdc300");
                     break;
 
                 case "EX":
-                    color = Color4Extensions.FromHex("#ffa500");
+                    modColour = Color4Extensions.FromHex("#ffa500");
                     break;
 
                 case "TB":
-                    color = Color4.Yellow;
+                    modColour = Color4.Yellow;
                     break;
 
                 default:
-                    color = Color4.White;
+                    modColour = Color4.White;
                     break;
             }
         }
@@ -145,7 +153,7 @@ namespace osu.Game.Tournament.Components
                                         },
                                     }
                                 },
-                                bottomDateDisplay = new Container
+                                secondDisplay = new Container
                                 {
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.CentreLeft,
@@ -273,6 +281,38 @@ namespace osu.Game.Tournament.Components
                                                 }
                                             }
                                         },
+                                        authorDisplay = new FillFlowContainer
+                                        {
+                                            RelativeSizeAxes = Axes.X,
+                                            AutoSizeAxes = Axes.Y,
+                                            Anchor = Anchor.BottomRight,
+                                            Origin = Anchor.BottomRight,
+                                            Direction = FillDirection.Horizontal,
+                                            Padding = new MarginPadding(5f),
+                                            Alpha = 0,
+                                            Children = new Drawable[]
+                                            {
+                                                new SpriteIcon
+                                                {
+                                                    Anchor = Anchor.BottomRight,
+                                                    Origin = Anchor.BottomRight,
+                                                    Icon = FontAwesome.Solid.Check,
+                                                    Size = new Vector2(20),
+                                                    Shear = new Vector2(-OsuGame.SHEAR, 0f),
+                                                    Colour = themeColour,
+                                                },
+                                                new TruncatingSpriteText
+                                                {
+                                                    Text = $"{(colour == TeamColour.Red ? "Red" : colour == TeamColour.Blue ? "Blue" : "Smoke")} Team Picked",
+                                                    Font = OsuFont.GetFont(size: 16, italics: true),
+                                                    MaxWidth = horizontal_info_size,
+                                                    Colour = themeColour,
+                                                    Shear = new Vector2(-OsuGame.SHEAR, 0f),
+                                                    Anchor = Anchor.BottomRight,
+                                                    Origin = Anchor.BottomRight,
+                                                }
+                                            }
+                                        },
                                     }
                                 },
                             }
@@ -280,6 +320,83 @@ namespace osu.Game.Tournament.Components
                     }
                 }
             };
+
+            if (mapTrap != null)
+            {
+                AddInternal(trapDisplay = new Container
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Width = horizontal_info_size,
+                    AutoSizeAxes = Axes.Y,
+                    CornerRadius = 10f,
+                    Masking = true,
+                    Shear = new Vector2(OsuGame.SHEAR, 0f),
+                    Alpha = 0,
+                    Children = new Drawable[]
+                    {
+                        new Box
+                        {
+                            Colour = colourProvider.Background3,
+                            RelativeSizeAxes = Axes.Both,
+                        },
+                        new TruncatingSpriteText
+                        {
+                            Anchor = Anchor.TopLeft,
+                            Origin = Anchor.TopLeft,
+                            Shear = new Vector2(-OsuGame.SHEAR, 0f),
+                            MaxWidth = horizontal_info_size,
+                            Text = "Also triggered the trap:",
+                            Padding = new MarginPadding { Horizontal = 5f },
+                            Font = OsuFont.GetFont(typeface: Typeface.TorusAlternate, size: 26, weight: FontWeight.SemiBold),
+                        },
+                        new SpriteIcon
+                        {
+                            Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.CentreLeft,
+                            X = 20,
+                            Y = 15,
+                            Shear = new Vector2(-OsuGame.SHEAR, 0f),
+                            Icon = mapTrap.Icon,
+                            Colour = mapTrap.IconColor,
+                            Size = new Vector2(32),
+                        },
+                        new FillFlowContainer
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
+                            X = 55,
+                            Width = 0.9f,
+                            Y = 15,
+                            Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.CentreLeft,
+                            Direction = FillDirection.Vertical,
+                            Padding = new MarginPadding(5f),
+                            Children = new Drawable[]
+                            {
+                                new TruncatingSpriteText
+                                {
+                                    Text = mapTrap.Name,
+                                    Font = OsuFont.GetFont(typeface: Typeface.HarmonyOSSans, size: 30, weight: FontWeight.Bold),
+                                    MaxWidth = horizontal_info_size,
+                                    Shear = new Vector2(-OsuGame.SHEAR, 0f),
+                                    Anchor = Anchor.CentreLeft,
+                                    Origin = Anchor.CentreLeft,
+                                },
+                                new TruncatingSpriteText
+                                {
+                                    Text = mapTrap.Description,
+                                    Font = OsuFont.GetFont(typeface: Typeface.HarmonyOSSans, size: 20, weight: FontWeight.Regular),
+                                    MaxWidth = horizontal_info_size,
+                                    Shear = new Vector2(-OsuGame.SHEAR, 0f),
+                                    Anchor = Anchor.CentreLeft,
+                                    Origin = Anchor.CentreLeft,
+                                },
+                            }
+                        },
+                    }
+                });
+            }
         }
 
         public void Fire()
@@ -337,9 +454,9 @@ namespace osu.Game.Tournament.Components
                                .MoveToY(0, 4000);
 
                 modText.Delay(200)
-                    .Then().FadeColour(color, 500, Easing.OutQuint);
+                    .Then().FadeColour(modColour, 500, Easing.OutQuint);
 
-                bottomDateDisplay.MoveToY(y_offset_start)
+                secondDisplay.MoveToY(y_offset_start)
                                  .MoveToY(y_offset_end, 300, Easing.OutQuint)
                                  .Then()
                                  .MoveToY(0, 4000);
@@ -363,8 +480,22 @@ namespace osu.Game.Tournament.Components
                     {
                         beatmapContent.FadeInFromZero(280, Easing.InQuad);
 
+                        using (BeginDelayedSequence(200))
+                            authorDisplay.FadeInFromZero(200, Easing.InQuad);
+
                         using (BeginDelayedSequence(400))
                             flash.FadeOutFromOne(5000, Easing.OutQuint);
+                    }
+
+                    if (mapTrap != null)
+                    {
+                        using (BeginDelayedSequence(1000))
+                        {
+                            trapDisplay.FadeInFromZero(800, Easing.InQuad);
+                            trapDisplay.MoveToOffset(new Vector2(0, 175), 600, Easing.OutQuint);
+                            beatmapContent.MoveToOffset(new Vector2(0, -75), 600, Easing.OutQuint);
+                            trapDisplay.Delay(100).ScaleTo(1.3f, 1500, Easing.OutQuint);
+                        }
                     }
                 }
 
@@ -372,28 +503,6 @@ namespace osu.Game.Tournament.Components
                 {
                     this.FadeOutFromOne(3000, Easing.OutExpo).Then().Finally(_ => { sceneManager.IsAnimationRunning.Value = false; Expire(); });
                 }
-            }
-        }
-
-        private partial class DailyChallengeIntroBackgroundScreen : RoomBackgroundScreen
-        {
-            private readonly OverlayColourProvider colourProvider;
-
-            public DailyChallengeIntroBackgroundScreen(OverlayColourProvider colourProvider)
-                : base(null)
-            {
-                this.colourProvider = colourProvider;
-            }
-
-            [BackgroundDependencyLoader]
-            private void load()
-            {
-                AddInternal(new Box
-                {
-                    Depth = float.MinValue,
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = colourProvider.Background5.Opacity(0.6f),
-                });
             }
         }
     }

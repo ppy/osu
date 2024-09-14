@@ -733,6 +733,49 @@ namespace osu.Game.Tournament.Screens.Board
                 if (latestWin != null) CurrentMatch.Value.PicksBans.Remove(latestWin);
             }
 
+            // Perform a Swap with the latest untriggered Swap
+            if (pickType == ChoiceType.Swap)
+            {
+                // Already have one: perform a Swap
+                var source = CurrentMatch.Value.PendingSwaps.FirstOrDefault();
+
+                if (source != null)
+                {
+                    CurrentMatch.Value.PendingSwaps.Add(new BeatmapChoice
+                    {
+                        Team = TeamColour.Neutral,
+                        Type = ChoiceType.Neutral,
+                        BeatmapID = beatmapId,
+                        Token = true,
+                    });
+                    SwapMap(source.BeatmapID, beatmapId);
+                }
+                else
+                {
+                    // Add as a pending Swap operation
+                    CurrentMatch.Value.PendingSwaps.Add(new BeatmapChoice
+                    {
+                        Team = TeamColour.Neutral,
+                        Type = ChoiceType.Neutral,
+                        BeatmapID = beatmapId,
+                        Token = true,
+                    });
+                }
+            }
+
+            // Trap action specific
+            if (pickType == ChoiceType.Trap)
+            {
+                CurrentMatch.Value.Traps.Add(new TrapInfo
+                {
+                    Team = pickColour,
+                    Mode = new TrapInfo().GetReversedType(trapTypeDropdown.Current.Value),
+                    BeatmapID = beatmapId,
+                });
+            }
+
+            var introTrap = CurrentMatch.Value.Traps.LastOrDefault(p => p.BeatmapID == beatmapId && p.Team != pickColour);
+
             // Show the trap description
             if (CurrentMatch.Value.Traps.Any(p => p.BeatmapID == beatmapId))
             {
@@ -786,49 +829,8 @@ namespace osu.Game.Tournament.Screens.Board
                 var introMap = CurrentMatch.Value.Round.Value.Beatmaps.FirstOrDefault(b => b.Beatmap?.OnlineID == beatmapId);
                 if (introMap != null)
                 {
-                    sceneManager?.ShowMapIntro(introMap);
+                    sceneManager?.ShowMapIntro(introMap, pickColour, introTrap);
                 }
-            }
-
-            // Perform a Swap with the latest untriggered Swap
-            if (pickType == ChoiceType.Swap)
-            {
-                // Already have one: perform a Swap
-                var source = CurrentMatch.Value.PendingSwaps.FirstOrDefault();
-
-                if (source != null)
-                {
-                    CurrentMatch.Value.PendingSwaps.Add(new BeatmapChoice
-                    {
-                        Team = TeamColour.Neutral,
-                        Type = ChoiceType.Neutral,
-                        BeatmapID = beatmapId,
-                        Token = true,
-                    });
-                    SwapMap(source.BeatmapID, beatmapId);
-                }
-                else
-                {
-                    // Add as a pending Swap operation
-                    CurrentMatch.Value.PendingSwaps.Add(new BeatmapChoice
-                    {
-                        Team = TeamColour.Neutral,
-                        Type = ChoiceType.Neutral,
-                        BeatmapID = beatmapId,
-                        Token = true,
-                    });
-                }
-            }
-
-            // Trap action specific
-            if (pickType == ChoiceType.Trap)
-            {
-                CurrentMatch.Value.Traps.Add(new TrapInfo
-                {
-                    Team = pickColour,
-                    Mode = new TrapInfo().GetReversedType(trapTypeDropdown.Current.Value),
-                    BeatmapID = beatmapId,
-                });
             }
 
             // Not to add a same map reference of the same type twice!
