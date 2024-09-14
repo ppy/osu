@@ -46,8 +46,6 @@ namespace osu.Game.Tournament.Components
 
         private Container titleContainer = null!;
 
-        private bool beatmapBackgroundLoaded;
-
         private readonly OverlayColourProvider colourProvider;
 
         public event Action? OnAnimationComplete;
@@ -418,8 +416,6 @@ namespace osu.Game.Tournament.Components
             }, c =>
             {
                 beatmapBackground.Add(c);
-
-                beatmapBackgroundLoaded = true;
             });
         }
 
