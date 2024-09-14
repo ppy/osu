@@ -66,7 +66,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
         private const int history_time_max = 5 * 1000; // 5 seconds of calculatingRhythmBonus max.
         private const int history_objects_max = 32;
-        private const double rhythm_multiplier = 1.2;
+        private const double rhythm_multiplier = 1.3;
 
         /// <summary>
         /// Calculates a rhythm multiplier for the difficulty of the tap associated with historic data of the current <see cref="OsuDifficultyHitObject"/>.
@@ -113,7 +113,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 double prevDelta = prevObj.StrainTime;
                 double lastDelta = lastObj.StrainTime;
 
-                double currRatio = 1.0 + 5.8 * Math.Min(0.5, Math.Pow(Math.Sin(Math.PI / (Math.Min(prevDelta, currDelta) / Math.Max(prevDelta, currDelta))), 2)); // fancy function to calculate rhythmbonuses.
+                double currRatio = 1.0 + 6.0 * Math.Min(0.5, Math.Pow(Math.Sin(Math.PI / (Math.Min(prevDelta, currDelta) / Math.Max(prevDelta, currDelta))), 2)); // fancy function to calculate rhythmbonuses.
 
                 double windowPenalty = Math.Min(1, Math.Max(0, Math.Abs(prevDelta - currDelta) - deltaDifferenceEpsilon) / deltaDifferenceEpsilon);
 
@@ -137,13 +137,17 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                         if (prevObj.BaseObject is Slider)
                             effectiveRatio *= 0.2;
 
-                        // repeated island polartiy (2 -> 4, 3 -> 5)
+                        // repeated island polarity (2 -> 4, 3 -> 5)
                         if (island.IsSimilarPolarity(previousIsland))
                             effectiveRatio *= 0.3;
 
                         // previous increase happened a note ago, 1/1->1/2-1/4, dont want to buff this.
                         if (lastDelta > prevDelta + deltaDifferenceEpsilon && prevDelta > currDelta + deltaDifferenceEpsilon)
                             effectiveRatio *= 0.125;
+
+                        // singletaps are easier to control
+                        if (island.Deltas.Count == 1)
+                            effectiveRatio *= 0.7;
 
                         if (!islandCounts.TryAdd(island, 1))
                         {
