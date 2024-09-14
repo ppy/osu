@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Objects;
@@ -12,7 +11,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 {
     public static class RhythmEvaluator
     {
-        private readonly struct Island : IEquatable<Island>
+        private struct Island : IEquatable<Island>
         {
             private readonly double deltaDifferenceEpsilon;
 
@@ -21,41 +20,39 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 deltaDifferenceEpsilon = epsilon;
             }
 
-            public Island(int firstDelta, double epsilon)
+            public Island(int delta, double epsilon)
             {
                 deltaDifferenceEpsilon = epsilon;
-                AddDelta(firstDelta);
+                Delta = Math.Max(delta, OsuDifficultyHitObject.MIN_DELTA_TIME);
             }
 
-            public List<int> Deltas { get; } = new List<int>();
+            public int Delta { get; private set; }
+            public int DeltaCount { get; private set; }
 
             public void AddDelta(int delta)
             {
-                double epsilon = deltaDifferenceEpsilon;
-                int existingDelta = Deltas.FirstOrDefault(x => Math.Abs(x - delta) >= epsilon);
+                if (Delta == default)
+                    Delta = Math.Max(delta, OsuDifficultyHitObject.MIN_DELTA_TIME);
 
-                Deltas.Add(existingDelta == default ? delta : existingDelta);
+                DeltaCount++;
             }
-
-            public double AverageDelta() => Deltas.Count > 0 ? Math.Max(Deltas.Average(), OsuDifficultyHitObject.MIN_DELTA_TIME) : 0;
 
             public bool IsSimilarPolarity(Island other)
             {
                 // consider islands to be of similar polarity only if they're having the same average delta (we don't want to consider 3 singletaps similar to a triple)
-                return Math.Abs(AverageDelta() - other.AverageDelta()) < deltaDifferenceEpsilon &&
-                       Deltas.Count % 2 == other.Deltas.Count % 2;
+                return DeltaCount % 2 == other.DeltaCount % 2 &&
+                       Math.Abs(Delta - other.Delta) < deltaDifferenceEpsilon;
             }
 
             public override int GetHashCode()
             {
-                // we need to compare all deltas and they must be in the exact same order we added them
-                string joinedDeltas = string.Join(string.Empty, Deltas);
-                return joinedDeltas.GetHashCode();
+                return HashCode.Combine(Delta, DeltaCount);
             }
 
             public bool Equals(Island other)
             {
-                return other.GetHashCode() == GetHashCode();
+                return Math.Abs(Delta - other.Delta) < deltaDifferenceEpsilon &&
+                       DeltaCount == other.DeltaCount;
             }
 
             public override bool Equals(object? obj)
@@ -113,7 +110,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 double prevDelta = prevObj.StrainTime;
                 double lastDelta = lastObj.StrainTime;
 
-                double currRatio = 1.0 + 6.0 * Math.Min(0.5, Math.Pow(Math.Sin(Math.PI / (Math.Min(prevDelta, currDelta) / Math.Max(prevDelta, currDelta))), 2)); // fancy function to calculate rhythmbonuses.
+                // calculate how much current delta difference deserves a rhythm bonus
+                // this function is meant to reduce rhythm bonus for deltas that are multiples of each other (i.e 100 and 200)
+                double deltaDifferenceRatio = Math.Min(prevDelta, currDelta) / Math.Max(prevDelta, currDelta);
+                double currRatio = 1.0 + 6.0 * Math.Min(0.5, Math.Pow(Math.Sin(Math.PI / deltaDifferenceRatio), 2));
 
                 double windowPenalty = Math.Min(1, Math.Max(0, Math.Abs(prevDelta - currDelta) - deltaDifferenceEpsilon) / deltaDifferenceEpsilon);
 
@@ -121,7 +121,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
                 if (firstDeltaSwitch)
                 {
-                    if (!(Math.Abs(prevDelta - currDelta) > deltaDifferenceEpsilon))
+                    if (Math.Abs(prevDelta - currDelta) < deltaDifferenceEpsilon)
                     {
                         // island is still progressing
                         island.AddDelta((int)currDelta);
@@ -146,7 +146,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                             effectiveRatio *= 0.125;
 
                         // singletaps are easier to control
-                        if (island.Deltas.Count == 1)
+                        if (island.DeltaCount == 1)
                             effectiveRatio *= 0.7;
 
                         if (!islandCounts.TryAdd(island, 1))
@@ -156,7 +156,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                                 islandCounts[island]++;
 
                             // repeated island (ex: triplet -> triplet)
-                            double power = logistic(island.AverageDelta(), 4, 0.165, 10);
+                            double power = logistic(island.Delta, 4, 0.165, 10);
                             effectiveRatio *= Math.Min(3.0 / islandCounts[island], Math.Pow(1.0 / islandCounts[island], power));
                         }
 
