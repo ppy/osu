@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Data;
 using System.Linq;
+using System.Xml.Schema;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -16,6 +17,7 @@ using osu.Framework.Input.Events;
 using osu.Framework.Threading;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
+using osu.Game.Overlays;
 using osu.Game.Overlays.Toolbar;
 using osu.Game.Tournament.Components;
 using osu.Game.Tournament.Models;
@@ -77,6 +79,8 @@ namespace osu.Game.Tournament.Screens.Board
         private DrawableTeamPlayerList team2List = null!;
         private EmptyBox danmakuBox = null!;
 
+        private DialogOverlay dialogOverlay = null!;
+
         private readonly int sideListHeight = 660;
 
         private ScheduledDelegate? scheduledScreenChange;
@@ -92,6 +96,8 @@ namespace osu.Game.Tournament.Screens.Board
 
             // Bind the ValueChanged event of the "Await response" switch
             LadderInfo.NeedRefereeResponse.BindValueChanged(onAwaitResponseChanged);
+
+            dialogOverlay = new DialogOverlay();
 
             InternalChildren = new Drawable[]
             {
@@ -375,13 +381,42 @@ namespace osu.Game.Tournament.Screens.Board
                             BackgroundColour = Color4.Orange,
                             Action = updateDisplay
                         },
-                        new TourneyButton
+                        new GridContainer
                         {
                             RelativeSizeAxes = Axes.X,
-                            Text = "Reset",
-                            BackgroundColour = Color4.Orange,
-                            Action = reset
+                            Height = 40,
+                            Content = new[]
+                            {
+                                new Drawable[]
+                                {
+                                    new TourneyButton
+                                    {
+                                        RelativeSizeAxes = Axes.X,
+                                        Text = "Reset",
+                                        BackgroundColour = Color4.Orange,
+                                        Action = reset
+                                    },
+                                    new TourneyButton
+                                    {
+                                        RelativeSizeAxes = Axes.X,
+                                        Text = "Revert",
+                                        BackgroundColour = Color4.DeepPink,
+                                        Action = () => {
+                                            dialogOverlay?.Push(new RevertBoardDialog(() =>
+                                                {
+                                                    // This will manba all elements on this view out of the screen. Don't use this!
+                                                    // Expire();
+                                                    reset();
+                                                    revertSwaps();
+                                                    // TODO: Add other helpful actions if possible
+                                                }));
+                                            AddInternal(dialogOverlay);
+                                        },
+                                    },
+                                }
+                            },
                         },
+
                     },
                 }
             };
@@ -777,6 +812,26 @@ namespace osu.Game.Tournament.Screens.Board
             // setNextMode();
         }
 
+        private void revertSwaps()
+        {
+            if (CurrentMatch.Value == null)
+                return;
+
+            var swaps = CurrentMatch.Value.SwapRecords;
+
+            if (swaps.Count == 0)
+                return;
+
+            // Revert in Reversed order 0.0
+            foreach (var rec in swaps.Reverse())
+            {
+                // TODO: Use a queue for swap animations
+                if (rec.Key.Beatmap != null && rec.Value.Beatmap != null)
+                    SwapMap(rec.Key.Beatmap.OnlineID, rec.Value.Beatmap.OnlineID);
+                swaps.Remove(rec);
+            }
+        }
+
         private bool isPickWin => pickType == ChoiceType.RedWin || pickType == ChoiceType.BlueWin;
 
         private void addForBeatmap(string modId)
@@ -896,6 +951,15 @@ namespace osu.Game.Tournament.Screens.Board
                         BeatmapID = beatmapId,
                         Token = true,
                     });
+
+                    var sourceMap = CurrentMatch.Value.Round.Value.Beatmaps.FirstOrDefault(b => b.Beatmap?.OnlineID == source.BeatmapID);
+                    var targetMap = CurrentMatch.Value.Round.Value.Beatmaps.FirstOrDefault(b => b.Beatmap?.OnlineID == beatmapId);
+
+                    if (sourceMap != null && targetMap != null)
+                    {
+                        CurrentMatch.Value.SwapRecords.Add(new KeyValuePair<RoundBeatmap, RoundBeatmap>(sourceMap, targetMap));
+                    }
+
                     SwapMap(source.BeatmapID, beatmapId);
                 }
                 else

@@ -59,6 +59,8 @@ namespace osu.Game.Tournament.Models
 
         public readonly ObservableCollection<BeatmapChoice> EXPicks = new ObservableCollection<BeatmapChoice>();
 
+        public readonly BindableList<KeyValuePair<RoundBeatmap, RoundBeatmap>> SwapRecords = new BindableList<KeyValuePair<RoundBeatmap, RoundBeatmap>>();
+
         [JsonIgnore]
         public readonly ObservableCollection<Message> PendingMsgs = new ObservableCollection<Message>();
 
