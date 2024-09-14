@@ -152,72 +152,52 @@ namespace osu.Game.Utils
         /// <param name="points">The points to calculate a convex hull.</param>
         public static List<Vector2> GetConvexHull(IEnumerable<Vector2> points)
         {
-            // Naming convention implies positive y upwards.
-
-            bool isCCW(Vector2 a, Vector2 b, Vector2 c) => crossProduct(b - a, c - a) > 0;
-
-            float crossProduct(Vector2 v1, Vector2 v2) => v1.X * v2.Y - v1.Y * v2.X;
-
-            var pointsList = points.ToList();
-
-            pointsList.Sort(delegate (Vector2 point1, Vector2 point2)
-            {
-                if (point1.X == point2.X)
-                    return point1.Y.CompareTo(point2.Y);
-                return point1.X.CompareTo(point2.X);
-            });
+            var pointsList = points.OrderBy(p => p.X).ThenBy(p => p.Y).ToList();
 
             if (pointsList.Count < 3)
                 return pointsList;
 
-            var convexHullUpper = new List<Vector2>
+            var convexHullLower = new List<Vector2>
             {
                 pointsList[0],
                 pointsList[1]
             };
-            var convexHullLower = new List<Vector2>
+            var convexHullUpper = new List<Vector2>
             {
-                pointsList[pointsList.Count - 1],
-                pointsList[pointsList.Count - 2]
+                pointsList[^1],
+                pointsList[^2]
             };
 
-            for (int i_points = 2; i_points < pointsList.Count; i_points++)
+            // Build the lower hull.
+            for (int i = 2; i < pointsList.Count; i++)
             {
-                Vector2 c = pointsList[i_points];
-                for (int i_hull = convexHullUpper.Count - 1; i_hull > 0; i_hull--)
-                {
-                    Vector2 a = convexHullUpper[^2];
-                    Vector2 b = convexHullUpper[^1];
-                    if (isCCW(a, b, c))
-                        convexHullUpper.Remove(b);
-                    else
-                        break;
-                }
-                convexHullUpper.Add(c);
-            }
+                Vector2 c = pointsList[i];
+                while (convexHullLower.Count > 1 && isClockwise(convexHullLower[^2], convexHullLower[^1], c))
+                    convexHullLower.RemoveAt(convexHullLower.Count - 1);
 
-            for (int i_points = pointsList.Count - 3; i_points >= 0; i_points--)
-            {
-                Vector2 c = pointsList[i_points];
-                for (int i_hull = convexHullLower.Count - 1; i_hull > 0; i_hull--)
-                {
-                    Vector2 a = convexHullLower[^2];
-                    Vector2 b = convexHullLower[^1];
-                    if (isCCW(a, b, c))
-                        convexHullLower.Remove(b);
-                    else
-                        break;
-                }
                 convexHullLower.Add(c);
             }
 
-            convexHullUpper.RemoveAt(convexHullUpper.Count - 1);
+            // Build the upper hull.
+            for (int i = pointsList.Count - 3; i >= 0; i--)
+            {
+                Vector2 c = pointsList[i];
+                while (convexHullUpper.Count > 1 && isClockwise(convexHullUpper[^2], convexHullUpper[^1], c))
+                    convexHullUpper.RemoveAt(convexHullUpper.Count - 1);
+
+                convexHullUpper.Add(c);
+            }
+
             convexHullLower.RemoveAt(convexHullLower.Count - 1);
+            convexHullUpper.RemoveAt(convexHullUpper.Count - 1);
 
-            convexHullUpper.AddRange(convexHullLower);
-            var convexHull = convexHullUpper;
+            convexHullLower.AddRange(convexHullUpper);
 
-            return convexHull;
+            return convexHullLower;
+
+            float crossProduct(Vector2 v1, Vector2 v2) => v1.X * v2.Y - v1.Y * v2.X;
+
+            bool isClockwise(Vector2 a, Vector2 b, Vector2 c) => crossProduct(b - a, c - a) >= 0;
         }
 
         public static List<Vector2> GetConvexHull(IEnumerable<IHasPosition> hitObjects) =>
