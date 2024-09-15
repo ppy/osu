@@ -2,9 +2,22 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.ComponentModel;
+using osu.Framework.Bindables;
 using osu.Framework.Localisation;
+using osu.Game.Configuration;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Osu.Mods.CipherTransformers;
 using osuTK;
+
+public enum Transformers
+{
+    [Description("None")]
+    None,
+
+    [Description("Circle dance")]
+    CircleDance
+}
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
@@ -13,21 +26,42 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override LocalisableString Description => "Cipher for Osu";
         public override Type[] IncompatibleMods => [];
 
+        [SettingSource("Transformer", "Transformer used to encode text into play data")]
+        public Bindable<Transformers> Transformer { get; } = new Bindable<Transformers>();
+
         public override Func<Vector2, Vector2>? TransformMouseInput
         {
-            get => circleDanceTransform;
+            get
+            {
+                setUpCipherTransformer();
+
+                if (cipherTransformer != null)
+                {
+                    return cipherTransformer.Transform;
+                }
+
+                return null;
+            }
             set => base.TransformMouseInput = value;
         }
 
-        private float arcCounter;
+        private CipherTransformer? cipherTransformer;
 
-        private Vector2 circleDanceTransform(Vector2 center)
+        /// <summary>
+        /// Here CipherTransformers are initialized with values from mod's Customize menu
+        /// </summary>
+        private void setUpCipherTransformer()
         {
-            const float radius = 100f;
-            float x = (float)(radius * Math.Cos(arcCounter));
-            float y = (float)(radius * Math.Sin(arcCounter));
-            arcCounter += 2f;
-            return center + new Vector2(x, y);
+            switch (Transformer.Value)
+            {
+                case Transformers.CircleDance:
+                    cipherTransformer = new CircleDanceTransformer(100f, 2f);
+                    break;
+
+                default:
+                case Transformers.None:
+                    break;
+            }
         }
     }
 }
