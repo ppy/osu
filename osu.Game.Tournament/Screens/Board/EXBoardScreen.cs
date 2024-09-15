@@ -280,8 +280,6 @@ namespace osu.Game.Tournament.Screens.Board
                     },
                 }
             };
-
-            ipc.Beatmap.BindValueChanged(beatmapChanged);
         }
 
         private void beatmapChanged(ValueChangedEvent<TournamentBeatmap?> beatmap)

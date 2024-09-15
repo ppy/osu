@@ -114,8 +114,6 @@ namespace osu.Game.Tournament.Screens.MapPool
                     },
                 }
             };
-
-            ipc.Beatmap.BindValueChanged(beatmapChanged);
         }
 
         private Bindable<bool>? splitMapPoolByMods;
