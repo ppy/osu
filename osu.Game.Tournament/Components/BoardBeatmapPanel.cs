@@ -36,9 +36,9 @@ namespace osu.Game.Tournament.Components
     {
         public readonly IBeatmapInfo? Beatmap;
 
-        private readonly string index;
+        public readonly string Index;
 
-        private readonly string mod;
+        public readonly string Mod;
 
         public const float HEIGHT = 150;
 
@@ -54,11 +54,17 @@ namespace osu.Game.Tournament.Components
         private SpriteIcon protectIcon = null!;
         private SpriteIcon trapIcon = null!;
 
-        public BoardBeatmapPanel(IBeatmapInfo? beatmap, string mod = "", string index = "")
+        // Real X and Y positions on the board, distinct from RoundBeatmap.BoardX and BoardY.
+        public int RealX;
+        public int RealY;
+
+        public BoardBeatmapPanel(IBeatmapInfo? beatmap, string mod = "", string index = "", int initX = 1, int initY = 1)
         {
             Beatmap = beatmap;
-            this.index = index;
-            this.mod = mod;
+            Index = index;
+            Mod = mod;
+            RealX = initX;
+            RealY = initY;
 
             Width = HEIGHT;
             Height = HEIGHT;
@@ -199,9 +205,9 @@ namespace osu.Game.Tournament.Components
                 },
             });
 
-            if (!string.IsNullOrEmpty(mod))
+            if (!string.IsNullOrEmpty(Mod))
             {
-                AddInternal(new TournamentModIcon(index.IsNull() ? mod : mod + index)
+                AddInternal(new TournamentModIcon(Index.IsNull() ? Mod : Mod + Index)
                 {
                     Anchor = Anchor.BottomCentre,
                     Origin = Anchor.Centre,

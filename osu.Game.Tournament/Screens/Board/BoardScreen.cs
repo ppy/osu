@@ -1035,38 +1035,30 @@ namespace osu.Game.Tournament.Screens.Board
 
         protected void SwapMap(int sourceMapID, int targetMapID)
         {
-            var source = CurrentMatch.Value?.Round.Value?.Beatmaps.FirstOrDefault(p => p.Beatmap?.OnlineID == sourceMapID && p.Mods != "EX");
-            var target = CurrentMatch.Value?.Round.Value?.Beatmaps.FirstOrDefault(p => p.Beatmap?.OnlineID == targetMapID && p.Mods != "EX");
-
             var sourceDrawable = boardMapList.FirstOrDefault(p => p.Beatmap?.OnlineID == sourceMapID);
             var targetDrawable = boardMapList.FirstOrDefault(p => p.Beatmap?.OnlineID == targetMapID);
 
             // Already detected null here, no need to do again
-            if (source != null && target != null)
+            if (sourceDrawable != null && targetDrawable != null)
             {
                 if (CurrentMatch.Value?.Round.Value?.UseBoard.Value == false) return;
 
-                int middleX = source.BoardX;
-                int middleY = source.BoardY;
+                int middleX = sourceDrawable.RealX;
+                int middleY = sourceDrawable.RealY;
+                float middleDX = sourceDrawable.X;
+                float middleDY = sourceDrawable.Y;
 
-                source.BoardX = target.BoardX;
-                source.BoardY = target.BoardY;
+                sourceDrawable.RealX = targetDrawable.RealX;
+                sourceDrawable.RealY = targetDrawable.RealY;
 
-                target.BoardX = middleX;
-                target.BoardY = middleY;
+                targetDrawable.RealX = middleX;
+                targetDrawable.RealY = middleY;
 
+                sourceDrawable.Flash();
+                targetDrawable.Flash();
 
-                if (sourceDrawable != null && targetDrawable != null)
-                {
-                    float middleDX = sourceDrawable.X;
-                    float middleDY = sourceDrawable.Y;
-
-                    sourceDrawable.Flash();
-                    targetDrawable.Flash();
-
-                    sourceDrawable.Delay(200).Then().MoveTo(new Vector2(targetDrawable.X, targetDrawable.Y), 500, Easing.OutCubic);
-                    targetDrawable.Delay(200).Then().MoveTo(new Vector2(middleDX, middleDY), 500, Easing.OutCubic);
-                }
+                sourceDrawable.Delay(200).Then().MoveTo(new Vector2(targetDrawable.X, targetDrawable.Y), 500, Easing.OutCubic);
+                targetDrawable.Delay(200).Then().MoveTo(new Vector2(middleDX, middleDY), 500, Easing.OutCubic);
 
                 DetectWin();
                 DetectEX();
@@ -1294,7 +1286,10 @@ namespace osu.Game.Tournament.Screens.Board
         /// <param name="Y">The Y coordinate value of the beatmap.</param>
         /// <returns>A <see cref="RoundBeatmap"/>, pointing to the corresponding beatmap.</returns>
         private RoundBeatmap? getBoardMap(int X, int Y)
-            => CurrentMatch.Value?.Round.Value?.Beatmaps.FirstOrDefault(p => (p.BoardX == X && p.BoardY == Y && p.Mods != "EX")) ?? null;
+        {
+            BoardBeatmapPanel? dMap = boardMapList.FirstOrDefault(p => p.RealX == X && p.RealY == Y && p.Mod != "EX");
+            return CurrentMatch.Value?.Round.Value?.Beatmaps.FirstOrDefault(p => p.Beatmap?.OnlineID == dMap?.Beatmap?.OnlineID && p.Mods != "EX");
+        }
 
         private void updateDisplay()
         {
@@ -1322,7 +1317,7 @@ namespace osu.Game.Tournament.Screens.Board
                             if (nextMap != null)
                             {
                                 var hasSwappedMap = CurrentMatch.Value.PendingSwaps.FirstOrDefault(p => p.BeatmapID == nextMap.Beatmap?.OnlineID);
-                                var mapDrawable = new BoardBeatmapPanel(nextMap.Beatmap, nextMap.Mods, nextMap.ModIndex)
+                                var mapDrawable = new BoardBeatmapPanel(nextMap.Beatmap, nextMap.Mods, nextMap.ModIndex, j, i)
                                 {
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
@@ -1337,6 +1332,15 @@ namespace osu.Game.Tournament.Screens.Board
                             {
                                 // TODO: Do we need to add a placeholder here?
                             }
+                        }
+                    }
+
+                    if (CurrentMatch.Value.SwapRecords.Count > 0)
+                    {
+                        foreach (var i in CurrentMatch.Value.SwapRecords)
+                        {
+                            if (i.Key.Beatmap != null && i.Value.Beatmap != null)
+                                SwapMap(i.Key.Beatmap.OnlineID, i.Value.Beatmap.OnlineID);
                         }
                     }
                 }
