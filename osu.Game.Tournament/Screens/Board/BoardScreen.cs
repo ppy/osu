@@ -937,7 +937,6 @@ namespace osu.Game.Tournament.Screens.Board
             {
                 if (pickType == ChoiceType.Pick)
                 {
-                    hasTrap = true;
                     bool trapActive = true;
                     var triggeredTrap = matchTrap.FirstOrDefault(t => t.Team != pickTeam);
 
@@ -945,6 +944,10 @@ namespace osu.Game.Tournament.Screens.Board
                     {
                         triggeredTrap = matchTrap.First();
                         trapActive = false;
+                    }
+                    else
+                    {
+                        hasTrap = true;
                     }
 
                     informationDisplayContainer.Child = triggeredTrap.Team != pickTeam
@@ -1202,7 +1205,7 @@ namespace osu.Game.Tournament.Screens.Board
 
             var mapLine = getMapLine(startY, startX, endY, endX);
 
-            var result = mapLine.Select(m => CurrentMatch.Value.PicksBans.FirstOrDefault(p => p.BeatmapID == m.Beatmap?.OnlineID))
+            var result = mapLine.Select(m => CurrentMatch.Value.PicksBans.FirstOrDefault(p => p.BeatmapID == m.Beatmap?.OnlineID && p.Type != ChoiceType.Pick))
                                 .GroupBy(p => p?.Type);
 
             if (result.FirstOrDefault(g => g.Key == ChoiceType.BlueWin)?.Count() == mapLine.Count)
