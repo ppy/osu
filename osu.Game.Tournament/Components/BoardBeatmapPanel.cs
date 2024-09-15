@@ -58,7 +58,7 @@ namespace osu.Game.Tournament.Components
         public int RealX;
         public int RealY;
 
-        public BoardBeatmapPanel(IBeatmapInfo? beatmap, string mod = "", string index = "", int initX = 1, int initY = 1)
+        public BoardBeatmapPanel(IBeatmapInfo? beatmap, string mod = "", string index = "", int initX = 1, int initY = 1, float scale = 1.0f)
         {
             Beatmap = beatmap;
             Index = index;
@@ -66,8 +66,8 @@ namespace osu.Game.Tournament.Components
             RealX = initX;
             RealY = initY;
 
-            Width = HEIGHT;
-            Height = HEIGHT;
+            Width = HEIGHT * scale;
+            Height = HEIGHT * scale;
         }
 
 
