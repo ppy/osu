@@ -154,6 +154,12 @@ namespace osu.Game.Rulesets.Osu
         {
             switch (type)
             {
+                case ModType.Ciphers:
+                    return new Mod[]
+                    {
+                        new CircleDanceTransformerMod()
+                    };
+
                 case ModType.DifficultyReduction:
                     return new Mod[]
                     {
@@ -213,7 +219,6 @@ namespace osu.Game.Rulesets.Osu
                         new OsuModBubbles(),
                         new OsuModSynesthesia(),
                         new OsuModDepth(),
-                        new OsuModCipher()
                     };
 
                 case ModType.System:

@@ -3,11 +3,8 @@
 
 using System;
 using System.ComponentModel;
-using osu.Framework.Bindables;
-using osu.Framework.Localisation;
-using osu.Game.Configuration;
+using osu.Framework.Graphics.Sprites;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Rulesets.Osu.Mods.CipherTransformers;
 using osuTK;
 
 public enum Transformers
@@ -21,47 +18,23 @@ public enum Transformers
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
-    public class OsuModCipher : ModCipher
+    public abstract class OsuModCipher : ModCipher
     {
-        public override LocalisableString Description => "Cipher for Osu";
-        public override Type[] IncompatibleMods => [];
+        public override IconUsage? Icon => null;
 
-        [SettingSource("Transformer", "Transformer used to encode text into play data")]
-        public Bindable<Transformers> Transformer { get; } = new Bindable<Transformers>();
+        public override ModType Type => ModType.Ciphers;
+
+        public override Type[] IncompatibleMods => [];
 
         public override Func<Vector2, Vector2>? TransformMouseInput
         {
-            get
-            {
-                setUpCipherTransformer();
-
-                if (cipherTransformer != null)
-                {
-                    return cipherTransformer.Transform;
-                }
-
-                return null;
-            }
+            get => Transform;
             set => base.TransformMouseInput = value;
         }
 
-        private CipherTransformer? cipherTransformer;
-
         /// <summary>
-        /// Here CipherTransformers are initialized with values from mod's Customize menu
+        /// Runs every replay frame used by ReplayRecorder
         /// </summary>
-        private void setUpCipherTransformer()
-        {
-            switch (Transformer.Value)
-            {
-                case Transformers.CircleDance:
-                    cipherTransformer = new CircleDanceTransformer(100f, 2f);
-                    break;
-
-                default:
-                case Transformers.None:
-                    break;
-            }
-        }
+        public abstract Vector2 Transform(Vector2 mousePosition);
     }
 }
