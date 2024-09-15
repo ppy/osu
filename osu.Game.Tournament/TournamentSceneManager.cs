@@ -422,5 +422,11 @@ namespace osu.Game.Tournament
         {
             animationQueue.Add(d);
         }
+
+        public void MoveChatTo(Vector2 pos, int duration, Easing easing) =>
+            chatContainer.MoveTo(pos, duration, easing);
+
+        public void ResizeChatTo(Vector2 size, int duration, Easing easing) =>
+            chatContainer.ResizeTo(size, duration, easing);
     }
 }
