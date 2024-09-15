@@ -4,6 +4,7 @@
 using System;
 using osu.Framework.Localisation;
 using osu.Game.Rulesets.Mods;
+using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
@@ -11,5 +12,14 @@ namespace osu.Game.Rulesets.Osu.Mods
     {
         public override LocalisableString Description => "Cipher for Osu";
         public override Type[] IncompatibleMods => [];
+
+        public override Func<Vector2, Vector2> TransformMouseInput
+        {
+            get => vector2 =>
+            {
+                return vector2;
+            };
+            set => base.TransformMouseInput = value;
+        }
     }
 }

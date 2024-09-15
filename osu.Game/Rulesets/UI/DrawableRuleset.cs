@@ -312,6 +312,11 @@ namespace osu.Game.Rulesets.UI
 
             recorder.ScreenSpaceToGamefield = Playfield.ScreenSpaceToGamefield;
 
+            foreach (var mod in Mods.OfType<ITransformsReplayRecorder>())
+            {
+                recorder.TransformMouseInput = mod.TransformMouseInput;
+            }
+
             recordingInputManager.Recorder = recorder;
         }
 
