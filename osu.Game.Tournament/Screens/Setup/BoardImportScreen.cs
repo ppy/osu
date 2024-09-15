@@ -30,9 +30,6 @@ namespace osu.Game.Tournament.Screens.Setup
         [Resolved]
         private TournamentSceneManager? sceneManager { get; set; }
 
-        [Resolved]
-        private MatchIPCInfo ipc { get; set; } = null!;
-
         private TournamentRound? round = null!;
 
         private Container boardContainer = null!;
@@ -47,6 +44,7 @@ namespace osu.Game.Tournament.Screens.Setup
         [BackgroundDependencyLoader(true)]
         private void load(Storage storage, OsuColour colours)
         {
+            isUpdateDone = false;
             round = LadderInfo.CurrentMatch.Value?.Round.Value;
             defCommandList = new List<List<RoundBeatmap>>();
             LadderInfo.CurrentMatch.Value.PendingMsgs.CollectionChanged += msgOnCollectionChanged;
@@ -202,6 +200,12 @@ namespace osu.Game.Tournament.Screens.Setup
 
         private void fetchAndUpdate()
         {
+            if (!useChat.Value)
+                return;
+
+            if (isUpdateDone)
+                return;
+
             if (parseCommands())
             {
                 updateBoard();

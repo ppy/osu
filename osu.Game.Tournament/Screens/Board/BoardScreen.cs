@@ -518,7 +518,7 @@ namespace osu.Game.Tournament.Screens.Board
 
                     case Commands.EnterEX:
                         refEX = true;
-                        updateBottomDisplay();
+                        updateBottomDisplay(bottomOnly: false);
                         break;
 
                     case Commands.SetWin:
