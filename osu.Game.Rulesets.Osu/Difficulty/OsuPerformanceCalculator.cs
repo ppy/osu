@@ -285,12 +285,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         private double computeReadingLowARValue(ScoreInfo score, OsuDifficultyAttributes attributes)
         {
-            double rawReading = attributes.ReadingDifficultyLowAR;
-
-            if (score.Mods.Any(m => m is OsuModTouchDevice))
-                rawReading = Math.Pow(rawReading, 0.8);
-
-            double readingValue = ReadingLowAR.DifficultyToPerformance(rawReading);
+            double readingValue = ReadingLowAR.DifficultyToPerformance(attributes.ReadingDifficultyLowAR);
 
             // Penalize misses by assessing # of misses relative to the total # of objects. Default a 3% reduction for any # of misses.
             if (effectiveMissCount > 0)
@@ -365,7 +360,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (!score.Mods.Any(h => h is OsuModHidden))
                 return 0.0;
 
-            double rawReading = attributes.HiddenDifficulty;
             double hiddenValue = ReadingHidden.DifficultyToPerformance(attributes.HiddenDifficulty);
 
             double lengthBonus = CalculateDefaultLengthBonus(totalHits);

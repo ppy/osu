@@ -67,9 +67,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (mods.Any(m => m is OsuModTouchDevice))
             {
                 aimRating = Math.Pow(aimRating, 0.8);
-                readingLowARRating = Math.Pow(readingLowARRating, 0.9);
+                readingLowARRating = Math.Pow(readingLowARRating, 0.8);
                 readingHighARRating = Math.Pow(readingHighARRating, 0.9);
-                hiddenRating = Math.Pow(hiddenRating, 0.9);
+                hiddenRating = Math.Pow(hiddenRating, 0.8);
                 flashlightRating = Math.Pow(flashlightRating, 0.8);
             }
 
