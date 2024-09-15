@@ -2,19 +2,9 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.ComponentModel;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Rulesets.Mods;
 using osuTK;
-
-public enum Transformers
-{
-    [Description("None")]
-    None,
-
-    [Description("Circle dance")]
-    CircleDance
-}
 
 namespace osu.Game.Rulesets.Osu.Mods
 {

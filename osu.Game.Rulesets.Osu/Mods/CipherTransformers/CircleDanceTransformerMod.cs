@@ -19,7 +19,6 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public override IconUsage? Icon => FontAwesome.Solid.CompressArrowsAlt;
 
-
         [SettingSource("Circle radius", "The radius the cursor goes around", SettingControlType = typeof(MultiplierSettingsSlider))]
         public BindableNumber<double> CircleRadius { get; } = new BindableDouble(100)
         {
