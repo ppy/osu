@@ -16,14 +16,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
     /// </summary>
     public class Speed : OsuStrainSkill
     {
-        protected double SkillMultiplier => 1375;
+        protected double SkillMultiplier => 1.430;
         protected override double StrainDecayBase => 0.3;
 
         protected double CurrentStrain;
         protected double CurrentRhythm;
 
         protected override int ReducedSectionCount => 5;
-        protected override double DifficultyMultiplier => 1.04;
 
         private readonly List<double> objectStrains = new List<double>();
 
