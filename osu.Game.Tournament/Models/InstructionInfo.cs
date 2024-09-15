@@ -46,6 +46,8 @@ namespace osu.Game.Tournament.Models
         {
             Step = step;
 
+            bool notDraw = team == TeamColour.Red || team == TeamColour.Blue;
+
             teamPrompt = team == TeamColour.Red ? @"红队" : (team == TeamColour.Blue ? @"蓝队" : string.Empty);
 
             switch (Step)
@@ -93,9 +95,9 @@ namespace osu.Game.Tournament.Models
                     break;
 
                 case Steps.FinalWin:
-                    name = @$"{teamPrompt}获胜！";
-                    description = @$"恭喜{teamPrompt}获得最终胜利！";
-                    icon.Icon = FontAwesome.Solid.Medal;
+                    name = notDraw ? @$"{teamPrompt}获胜！" : team == TeamColour.Neutral ? @"EX: 决胜局" : @"Do you want smoke?";
+                    description = notDraw ? @$"恭喜{teamPrompt}获得最终胜利！" : team == TeamColour.Neutral ? @"我只是个笨蛋，也没有你聪明。" : @"来看看礼堂顶针？";
+                    icon.Icon = notDraw ? FontAwesome.Solid.Medal : FontAwesome.Solid.Asterisk;
                     icon.Colour = team == TeamColour.Red ? new OsuColour().Pink : (team == TeamColour.Blue ? new OsuColour().Sky : new OsuColour().Yellow);
                     break;
 

@@ -13,6 +13,8 @@ using osu.Framework.Input.Events;
 using osu.Framework.Threading;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Graphics.UserInterfaceV2;
+using osu.Game.Overlays.Toolbar;
 using osu.Game.Tournament.Components;
 using osu.Game.Tournament.IPC;
 using osu.Game.Tournament.Models;
@@ -32,7 +34,7 @@ namespace osu.Game.Tournament.Screens.Board
         [Resolved]
         private TournamentSceneManager? sceneManager { get; set; }
 
-        private WarningBox warning = null!;
+        private WarningBox? warning;
 
         private TeamColour pickColour = TeamColour.Neutral;
         private ChoiceType pickType = ChoiceType.Pick;
@@ -47,7 +49,7 @@ namespace osu.Game.Tournament.Screens.Board
         private DrawableTeamPlayerList team2List = null!;
         private EmptyBox danmakuBox = null!;
 
-        private readonly int sideListHeight = 660;
+        private const int sideListHeight = 660;
 
         private ScheduledDelegate? scheduledScreenChange;
 
@@ -56,6 +58,9 @@ namespace osu.Game.Tournament.Screens.Board
         {
             currentMatch.BindValueChanged(matchChanged);
             currentMatch.BindTo(LadderInfo.CurrentMatch);
+
+            LadderInfo.UseRefereeCommands.BindValueChanged(refereeChanged);
+
             InternalChildren = new Drawable[]
             {
                 new TourneyVideo("mappool")
@@ -207,6 +212,14 @@ namespace osu.Game.Tournament.Screens.Board
                     Size = new Vector2(64),
                     Texture = textures.Get("Icons/additional-icon"),
                 },
+                new ToolbarClock
+                {
+                    Anchor = Anchor.BottomRight,
+                    Origin = Anchor.BottomRight,
+                    RelativeSizeAxes = Axes.None,
+                    Height = 50,
+                    Position = new Vector2(-30, -10),
+                },
                 new ControlPanel
                 {
                     Children = new Drawable[]
@@ -214,6 +227,18 @@ namespace osu.Game.Tournament.Screens.Board
                         new TournamentSpriteText
                         {
                             Text = "Current Mode"
+                        },
+                        new LabelledSwitchButton
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            Label = "Board autoControl",
+                            Current = LadderInfo.UseRefereeCommands,
+                        },
+                        new LabelledSwitchButton
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            Label = "Await Response",
+                            Current = LadderInfo.NeedRefereeResponse,
                         },
                         buttonPick = new TourneyButton
                         {
@@ -237,6 +262,13 @@ namespace osu.Game.Tournament.Screens.Board
                             Action = () => setMode(TeamColour.Blue, ChoiceType.BlueWin)
                         },
                         new ControlPanel.Spacer(),
+                        new TourneyButton
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            Text = "Refresh",
+                            BackgroundColour = Color4.Orange,
+                            Action = updateDisplay
+                        },
                         new TourneyButton
                         {
                             RelativeSizeAxes = Axes.X,
@@ -266,12 +298,17 @@ namespace osu.Game.Tournament.Screens.Board
             {
                 match.OldValue.PendingMsgs.CollectionChanged -= msgOnCollectionChanged;
             }
+
             if (match.NewValue != null)
             {
                 match.NewValue.PendingMsgs.CollectionChanged += msgOnCollectionChanged;
 
-                if (match.NewValue.Team1 != null) team1List?.ReloadWithTeam(match.NewValue.Team1.Value);
-                if (match.NewValue.Team2 != null && team2List != null)
+                if (!IsLoaded)
+                    return;
+
+                if (match.NewValue.Team1.Value != null) team1List.ReloadWithTeam(match.NewValue.Team1.Value);
+
+                if (match.NewValue.Team2.Value != null)
                 {
                     team2List.ReloadWithTeam(match.NewValue.Team2.Value);
                     danmakuBox.ResizeHeightTo(Height = sideListHeight - team2List.GetHeight() - 5, 500, Easing.OutCubic);
@@ -284,6 +321,11 @@ namespace osu.Game.Tournament.Screens.Board
         private void msgOnCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
             => Scheduler.AddOnce(parseCommands);
 
+        private void refereeChanged(ValueChangedEvent<bool> enabledEvent)
+        {
+            parseCommands();
+        }
+
         private void parseCommands()
         {
             if (CurrentMatch.Value == null)
@@ -294,6 +336,7 @@ namespace osu.Game.Tournament.Screens.Board
             foreach (var item in msg)
             {
                 BotCommand command = new BotCommand().ParseFromText(item.Content);
+
                 switch (command.Command)
                 {
                     case Commands.PickEX:
@@ -312,6 +355,7 @@ namespace osu.Game.Tournament.Screens.Board
                         break;
                 }
             }
+
             msg.Clear();
         }
 
@@ -345,6 +389,7 @@ namespace osu.Game.Tournament.Screens.Board
                         CurrentMatch.Value?.EXPicks.Remove(existing);
                     }
                 }
+
                 return true;
             }
 
@@ -354,6 +399,7 @@ namespace osu.Game.Tournament.Screens.Board
         private void reset()
         {
             CurrentMatch.Value?.EXPicks.Clear();
+            CurrentMatch.Value?.Round.Value?.IsFinalStage.BindTo(new BindableBool(false));
 
             // Reset buttons
             buttonPick.Colour = Color4.White;
@@ -363,10 +409,7 @@ namespace osu.Game.Tournament.Screens.Board
 
         private void addForBeatmap(string modId)
         {
-            if (CurrentMatch.Value?.Round.Value == null)
-                return;
-
-            var map = CurrentMatch.Value.Round.Value.Beatmaps.FirstOrDefault(b => b.Mods + b.ModIndex == modId);
+            var map = CurrentMatch.Value?.Round.Value?.Beatmaps.FirstOrDefault(b => b.Mods + b.ModIndex == modId);
 
             if (map != null)
                 addForBeatmap(map.ID);
@@ -399,6 +442,32 @@ namespace osu.Game.Tournament.Screens.Board
                 BeatmapID = beatmapId,
             });
 
+            if (pickType == ChoiceType.Pick)
+            {
+                var map = CurrentMatch.Value.Round.Value.Beatmaps.FirstOrDefault(b => b.Beatmap?.OnlineID == beatmapId);
+
+                if (map != null)
+                {
+                    AddInternal(new TournamentIntro(map)
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                    });
+                }
+            }
+
+            if (pickType == ChoiceType.RedWin || pickType == ChoiceType.BlueWin)
+            {
+                if (CurrentMatch.Value.Round.Value.IsFinalStage.Value)
+                {
+                    AddInternal(new RoundAnimation(pickType == ChoiceType.RedWin ? CurrentMatch.Value.Team1.Value : CurrentMatch.Value.Team2.Value,
+                        pickType == ChoiceType.RedWin ? TeamColour.Red : TeamColour.Blue));
+
+                    CurrentMatch.Value.Team1Score.Value = pickType == ChoiceType.RedWin ? 6 : 0;
+                    CurrentMatch.Value.Team2Score.Value = pickType == ChoiceType.BlueWin ? 6 : 0;
+                }
+            }
+
             if (LadderInfo.AutoProgressScreens.Value)
             {
                 if (pickType == ChoiceType.Pick && CurrentMatch.Value.EXPicks.Any(i => i.Type == ChoiceType.Pick))
@@ -427,7 +496,7 @@ namespace osu.Game.Tournament.Screens.Board
 
             if (CurrentMatch.Value == null)
             {
-                AddInternal(warning = new WarningBox("Cannot access current match, sorry ;w;"));
+                AddInternal(warning = new WarningBox("Select a match from bracket screen first"));
                 return;
             }
 
@@ -452,6 +521,7 @@ namespace osu.Game.Tournament.Screens.Board
                 foreach (var b in CurrentMatch.Value.Round.Value.Beatmaps)
                 {
                     if (b.Mods != "EX") continue;
+
                     if (currentFlow == null)
                     {
                         mapFlows.Add(currentFlow = new FillFlowContainer<EXBoardBeatmapPanel>
@@ -485,9 +555,7 @@ namespace osu.Game.Tournament.Screens.Board
             else
             {
                 AddInternal(warning = new WarningBox("Cannot access current match, sorry ;w;"));
-                return;
             }
-
         }
     }
 }

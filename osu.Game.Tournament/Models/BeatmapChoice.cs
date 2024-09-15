@@ -30,7 +30,14 @@ namespace osu.Game.Tournament.Models
     {
         Red,
         Blue,
-        Neutral
+        /// <summary>
+        /// Should only be used by actions.
+        /// </summary>
+        Neutral,
+        /// <summary>
+        /// Used for winner and EX detection.
+        /// </summary>
+        None
     }
 
     [JsonConverter(typeof(StringEnumConverter))]

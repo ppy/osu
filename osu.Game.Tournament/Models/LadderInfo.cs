@@ -39,10 +39,14 @@ namespace osu.Game.Tournament.Models
             MaxValue = 4,
         };
 
+        public Bindable<bool> UseRefereeCommands = new BindableBool(false);
+
+        public Bindable<bool> NeedRefereeResponse = new BindableBool(false);
+
         public Bindable<bool> AutoProgressScreens = new BindableBool(true);
 
         public Bindable<bool> SplitMapPoolByMods = new BindableBool(true);
 
-        public Bindable<bool> DisplayTeamSeeds = new BindableBool();
+        public Bindable<bool> DisplayTeamSeeds = new BindableBool(false);
     }
 }

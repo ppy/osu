@@ -95,6 +95,13 @@ namespace osu.Game.Tournament.Screens.MapPool
                         new TourneyButton
                         {
                             RelativeSizeAxes = Axes.X,
+                            Text = "Refresh",
+                            BackgroundColour = Color4.Orange,
+                            Action = updateDisplay
+                        },
+                        new TourneyButton
+                        {
+                            RelativeSizeAxes = Axes.X,
                             Text = "Reset",
                             Action = reset
                         },

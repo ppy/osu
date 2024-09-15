@@ -25,17 +25,19 @@ namespace osu.Game.Tournament.Screens.Gameplay
 
         public readonly Bindable<TourneyState> State = new Bindable<TourneyState>();
         private LabelledSwitchButton warmupToggle = null!;
+
+        private bool isChatShown = false;
+
         private TourneyButton chatToggle = null!;
+
         // private SettingsSlider<float> redMultiplier = null!;
         // private SettingsSlider<float> blueMultiplier = null!;
 
         private MatchIPCInfo ipc = null!;
+        private bool chatEnforcing = false;
 
         [Resolved]
         private TournamentSceneManager? sceneManager { get; set; }
-
-        [Resolved]
-        private TournamentMatchChatDisplay chat { get; set; } = null!;
 
         private Drawable chroma = null!;
 
@@ -109,7 +111,19 @@ namespace osu.Game.Tournament.Screens.Gameplay
                         {
                             RelativeSizeAxes = Axes.X,
                             Text = "Toggle chat",
-                            Action = () => { State.Value = State.Value == TourneyState.Idle ? TourneyState.Playing : TourneyState.Idle; }
+                            Action = () => {
+                                chatEnforcing = true;
+                                if (isChatShown)
+                                {
+                                    isChatShown = false;
+                                    expand();
+                                }
+                                else
+                                {
+                                    isChatShown = true;
+                                    contract();
+                                }
+                            }
                         },
                         new SettingsSlider<int>
                         {
@@ -165,7 +179,7 @@ namespace osu.Game.Tournament.Screens.Gameplay
             warmupToggle.Current.BindValueChanged(_ => updateWarmup(), true);
 
             State.BindTo(ipc.State);
-            State.BindValueChanged(_ => updateState(), true);
+            State.BindValueChanged(e => updateState(e), true);
         }
 
         protected override void CurrentMatchChanged(ValueChangedEvent<TournamentMatch?> match)
@@ -196,8 +210,7 @@ namespace osu.Game.Tournament.Screens.Gameplay
 
             SongBar.Expanded = false;
             scoreDisplay.FadeOut(100);
-            using (chat.BeginDelayedSequence(500))
-                chat.Expand();
+            sceneManager?.UpdateChatState(true);
         }
 
         private void expand()
@@ -207,7 +220,7 @@ namespace osu.Game.Tournament.Screens.Gameplay
 
             scheduledContract?.Cancel();
 
-            chat.Contract();
+            sceneManager?.UpdateChatState(false);
 
             using (BeginDelayedSequence(300))
             {
@@ -216,8 +229,10 @@ namespace osu.Game.Tournament.Screens.Gameplay
             }
         }
 
-        private void updateState()
+        private void updateState(ValueChangedEvent<TourneyState>? e = null)
         {
+            var newState = e != null ? e.NewValue : State.Value;
+
             try
             {
                 scheduledScreenChange?.Cancel();
@@ -235,7 +250,12 @@ namespace osu.Game.Tournament.Screens.Gameplay
                 switch (State.Value)
                 {
                     case TourneyState.Idle:
-                        contract();
+                        if (!chatEnforcing || lastState == TourneyState.Ranking)
+                        {
+                            chatEnforcing = false;
+                            isChatShown = true;
+                            contract();
+                        }
 
                         if (LadderInfo.AutoProgressScreens.Value)
                         {
@@ -259,13 +279,17 @@ namespace osu.Game.Tournament.Screens.Gameplay
                         break;
 
                     default:
-                        expand();
+                        if (e == null || !chatEnforcing)
+                        {
+                            isChatShown = false;
+                            expand();
+                        }
                         break;
                 }
             }
             finally
             {
-                lastState = State.Value;
+                lastState = e != null ? e.NewValue : State.Value;
             }
         }
 
