@@ -61,14 +61,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             }
         }
 
-        private const int history_time_max = 5 * 1000; // 5 seconds of calculatingRhythmBonus max.
-        private const int history_objects_max = 32;
+        private const int history_time_max = 4 * 1000; // 5 seconds of calculatingRhythmBonus max.
+        private const int history_objects_max = 24;
         private const double rhythm_multiplier = 1.32;
 
         /// <summary>
         /// Calculates a rhythm multiplier for the difficulty of the tap associated with historic data of the current <see cref="OsuDifficultyHitObject"/>.
         /// </summary>
-        public static double EvaluateDifficultyOf(DifficultyHitObject current, double clockRate)
+        public static double EvaluateDifficultyOf(DifficultyHitObject current)
         {
             if (current.BaseObject is Spinner)
                 return 0;
@@ -81,18 +81,15 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             var previousIsland = new Island(deltaDifferenceEpsilon);
             Dictionary<Island, int> islandCounts = new Dictionary<Island, int>();
 
-            int historyTimeMaxAdjusted = (int)Math.Ceiling(history_time_max / clockRate);
-            int historyObjectsMaxAdjusted = (int)Math.Ceiling(history_objects_max / clockRate);
-
             double startRatio = 0; // store the ratio of the current start of an island to buff for tighter rhythms
 
             bool firstDeltaSwitch = false;
 
-            int historicalNoteCount = Math.Min(current.Index, historyObjectsMaxAdjusted);
+            int historicalNoteCount = Math.Min(current.Index, history_objects_max);
 
             int rhythmStart = 0;
 
-            while (rhythmStart < historicalNoteCount - 2 && current.StartTime - current.Previous(rhythmStart).StartTime < historyTimeMaxAdjusted)
+            while (rhythmStart < historicalNoteCount - 2 && current.StartTime - current.Previous(rhythmStart).StartTime < history_time_max)
                 rhythmStart++;
 
             OsuDifficultyHitObject prevObj = (OsuDifficultyHitObject)current.Previous(rhythmStart);
@@ -103,7 +100,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             {
                 OsuDifficultyHitObject currObj = (OsuDifficultyHitObject)current.Previous(i - 1);
 
-                double currHistoricalDecay = (historyTimeMaxAdjusted - (current.StartTime - currObj.StartTime)) / historyTimeMaxAdjusted; // scales note 0 to 1 from history to now
+                double currHistoricalDecay = (history_time_max - (current.StartTime - currObj.StartTime)) / history_time_max; // scales note 0 to 1 from history to now
 
                 currHistoricalDecay = Math.Min((double)(historicalNoteCount - i) / historicalNoteCount, currHistoricalDecay); // either we're limited by time or limited by object count.
 

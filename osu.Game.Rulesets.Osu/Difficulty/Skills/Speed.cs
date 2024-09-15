@@ -17,7 +17,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
     public class Speed : OsuStrainSkill
     {
         private double skillMultiplier => 1.375;
-        private readonly double clockRate;
         private double strainDecayBase => 0.3;
 
         private double currentStrain;
@@ -28,10 +27,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         private readonly List<double> objectStrains = new List<double>();
 
-        public Speed(Mod[] mods, double clockRate)
+        public Speed(Mod[] mods)
             : base(mods)
         {
-            this.clockRate = clockRate;
         }
 
         private double strainDecay(double ms) => Math.Pow(strainDecayBase, ms / 1000);
@@ -43,7 +41,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             currentStrain *= strainDecay(((OsuDifficultyHitObject)current).StrainTime);
             currentStrain += SpeedEvaluator.EvaluateDifficultyOf(current) * skillMultiplier;
 
-            currentRhythm = RhythmEvaluator.EvaluateDifficultyOf(current, clockRate);
+            currentRhythm = RhythmEvaluator.EvaluateDifficultyOf(current);
 
             double totalStrain = currentStrain * currentRhythm;
 
