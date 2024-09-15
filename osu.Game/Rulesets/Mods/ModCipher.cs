@@ -22,8 +22,7 @@ namespace osu.Game.Rulesets.Mods
         [SettingSource("Plaintext", "Enter text to encode", SettingControlType = typeof(SettingsTextBox))]
         public Bindable<string> Plaintext { get; } = new Bindable<string>("Test String");
 
-        public Func<Vector2, Vector2> TransformMouseInputDelegate;
-
-        public virtual Func<Vector2, Vector2> TransformMouseInput { get; set; }
+        public Func<Vector2, Vector2>? TransformMouseInputDelegate;
+        public virtual Func<Vector2, Vector2>? TransformMouseInput { get; set; }
     }
 }

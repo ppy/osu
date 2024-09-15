@@ -8,6 +8,6 @@ namespace osu.Game.Rulesets.Mods
 {
     public interface ITransformsReplayRecorder : IApplicableMod
     {
-        Func<Vector2, Vector2> TransformMouseInput { get; set; }
+        Func<Vector2, Vector2>? TransformMouseInput { get; set; }
     }
 }
