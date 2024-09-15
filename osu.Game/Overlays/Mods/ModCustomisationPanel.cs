@@ -227,7 +227,7 @@ namespace osu.Game.Overlays.Mods
             {
                 base.Update();
 
-                if (ExpandedState.Value == ModCustomisationPanelState.ExpandedByHover
+                if (ExpandedState.Value == ModCustomisationPanelState.Expanded
                     && !ReceivePositionalInputAt(inputManager.CurrentState.Mouse.Position)
                     && inputManager.DraggedDrawable == null)
                 {
@@ -239,8 +239,8 @@ namespace osu.Game.Overlays.Mods
         public enum ModCustomisationPanelState
         {
             Collapsed = 0,
-            ExpandedByHover = 1,
-            Expanded = 2,
+            Expanded = 1,
+            ExpandedByMod = 2,
         }
     }
 }
