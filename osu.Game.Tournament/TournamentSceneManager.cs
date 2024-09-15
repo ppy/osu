@@ -28,6 +28,8 @@ using osu.Game.Tournament.Screens.Board;
 using osuTK;
 using osuTK.Graphics;
 using osuTK.Input;
+using osu.Game.Tournament.Models;
+using osu.Framework.Bindables;
 
 namespace osu.Game.Tournament
 {
@@ -36,6 +38,9 @@ namespace osu.Game.Tournament
     {
         private Container screens = null!;
         private TourneyVideo video = null!;
+        private BindableList<IAnimation> animationQueue = new BindableList<IAnimation>();
+
+        private IAnimation? currentAnimation;
 
         public const int CONTROL_AREA_WIDTH = 200;
 
@@ -67,6 +72,18 @@ namespace osu.Game.Tournament
         public TournamentSceneManager()
         {
             RelativeSizeAxes = Axes.Both;
+
+            animationQueue.BindCollectionChanged((_, arg) =>
+            {
+                if (!animationQueue.Any())
+                    return;
+
+                if (currentAnimation == null || currentAnimation.Status == AnimationStatus.Complete)
+                {
+                    var animation = animationQueue.First();
+                    startAnimation(animation);
+                }
+            });
         }
 
         [BackgroundDependencyLoader]
@@ -372,7 +389,38 @@ namespace osu.Game.Tournament
 
         public void HideShowChat(int duration) =>
             chatContainer.Delay(1500).FadeTo(0.6f, duration, Easing.OutQuint)
-                .Then().Delay(7500).FadeIn(duration, Easing.OutQuint);
+                .Then().Delay(5700).FadeIn(duration, Easing.OutQuint);
+
         public void ShowChat(int duration) => chatContainer.FadeIn(duration, Easing.OutQuint);
+
+        public void ShowMapIntro(RoundBeatmap map, TeamColour colour = TeamColour.Neutral, TrapInfo? trap = null) => queueAnimation(new TournamentIntro(map, colour, trap)
+        {
+            Anchor = Anchor.CentreLeft,
+            Origin = Anchor.CentreLeft,
+            X = CONTROL_AREA_WIDTH + STREAM_AREA_WIDTH / 2,
+        });
+
+        public void ShowWinAnimation(TournamentTeam? team, TeamColour colour = TeamColour.Neutral) => queueAnimation(new RoundAnimation(team, colour)
+        {
+            Anchor = Anchor.CentreLeft,
+            Origin = Anchor.CentreLeft,
+            // X = CONTROL_AREA_WIDTH + STREAM_AREA_WIDTH / 2,
+        });
+
+        private void startAnimation(IAnimation animation)
+        {
+            AddInternal((Drawable)(currentAnimation = animation));
+
+            animation.Fire();
+            animation.OnAnimationComplete += () =>
+            {
+                animationQueue.Remove(animation);
+            };
+        }
+
+        private void queueAnimation(IAnimation d)
+        {
+            animationQueue.Add(d);
+        }
     }
 }

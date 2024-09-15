@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Data;
 using System.Linq;
-using System.Xml.Schema;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -416,7 +415,6 @@ namespace osu.Game.Tournament.Screens.Board
                                 }
                             },
                         },
-
                     },
                 }
             };
@@ -537,14 +535,12 @@ namespace osu.Game.Tournament.Screens.Board
                         var map = CurrentMatch.Value.Round.Value?.Beatmaps.FirstOrDefault(b => b.Mods + b.ModIndex == command.MapMod);
                         if (map?.Beatmap != null && CurrentMatch.Value.Traps.All(p => p.BeatmapID != map.Beatmap.OnlineID))
                             updateBottomDisplay();
-
                         break;
 
                     default:
                         break;
                 }
             }
-
             msg.Clear();
         }
 
@@ -576,10 +572,10 @@ namespace osu.Game.Tournament.Screens.Board
 
         private void updateBottomDisplay(ValueChangedEvent<bool>? _ = null, bool bottomOnly = true, bool refresh = true)
         {
+            if (CurrentMatch.Value == null) return;
+
             Drawable oldDisplay = informationDisplayContainer.Child;
             Drawable newDisplay;
-
-            if (CurrentMatch.Value == null) return;
 
             havePendingSwap = CurrentMatch.Value.PendingSwaps.Any();
 
@@ -649,19 +645,13 @@ namespace osu.Game.Tournament.Screens.Board
             {
                 informationDisplayContainer.Child = newDisplay;
                 informationDisplayContainer.FadeInFromZero(duration: 200, easing: Easing.InCubic);
-            }
-
-            if (state == Steps.FinalWin)
-            {
                 CurrentMatch.Value.Round.Value?.IsFinalStage.BindTo(new BindableBool(color == TeamColour.Neutral));
 
-                if (!bottomOnly)
+                if (state == Steps.FinalWin && !bottomOnly)
                 {
-                    AddInternal(new RoundAnimation(teamWinner == TeamColour.Red
-                        ? CurrentMatch.Value.Team1.Value
-                        : teamWinner == TeamColour.Blue
-                            ? CurrentMatch.Value.Team2.Value
-                            : null, teamWinner));
+                    sceneManager?.ShowWinAnimation(teamWinner == TeamColour.Red ? CurrentMatch.Value.Team1.Value
+                        : teamWinner == TeamColour.Blue ? CurrentMatch.Value.Team2.Value
+                        : null, teamWinner);
                 }
             }
             else
@@ -754,7 +744,7 @@ namespace osu.Game.Tournament.Screens.Board
                     if (!hasTrap)
                     {
                         // Restore to the last state
-                        updateBottomDisplay(bottomOnly: false);
+                        updateBottomDisplay(bottomOnly: e.Button != MouseButton.Left);
                     }
                 }
 
@@ -859,8 +849,8 @@ namespace osu.Game.Tournament.Screens.Board
                 return;
 
             if (!isPickWin && CurrentMatch.Value.PicksBans.Any(p => p.BeatmapID == beatmapId
-                                                                    && (p.Type == ChoiceType.Ban || p.Type == ChoiceType.RedWin || p.Type == ChoiceType.BlueWin)
-                                                                    && pickType != ChoiceType.Swap))
+                && (p.Type == ChoiceType.Ban || p.Type == ChoiceType.RedWin || p.Type == ChoiceType.BlueWin)
+                && pickType != ChoiceType.Swap))
                 // don't attempt to add if already banned / winned and it's not a win type.
                 return;
 
@@ -868,15 +858,58 @@ namespace osu.Game.Tournament.Screens.Board
                 // don't attempt to ban a protected map
                 return;
 
+            // Perform a Swap with the latest untriggered Swap
+            if (pickType == ChoiceType.Swap)
+            {
+                // Already have one: perform a Swap
+                var source = CurrentMatch.Value.PendingSwaps.FirstOrDefault();
+
+                if (source != null)
+                {
+                    CurrentMatch.Value.PendingSwaps.Add(new BeatmapChoice
+                    {
+                        Team = TeamColour.Neutral,
+                        Type = ChoiceType.Neutral,
+                        BeatmapID = beatmapId,
+                        Token = true,
+                    });
+                    SwapMap(source.BeatmapID, beatmapId);
+                }
+                else
+                {
+                    // Add as a pending Swap operation
+                    CurrentMatch.Value.PendingSwaps.Add(new BeatmapChoice
+                    {
+                        Team = TeamColour.Neutral,
+                        Type = ChoiceType.Neutral,
+                        BeatmapID = beatmapId,
+                        Token = true,
+                    });
+                }
+            }
+
+            // Trap action specific
+            if (pickType == ChoiceType.Trap)
+            {
+                CurrentMatch.Value.Traps.Add(new TrapInfo
+                (
+                    colour: pickTeam,
+                    type: new TrapInfo().GetReversedType(trapTypeDropdown.Current.Value),
+                    mapID: beatmapId
+                ));
+            }
+
+            var introTrap = CurrentMatch.Value.Traps.LastOrDefault(p => p.BeatmapID == beatmapId && p.Team != pickTeam);
+
+            var matchTrap = CurrentMatch.Value.Traps.Where(p => p.BeatmapID == beatmapId);
+
             // Remove the latest win state for Reverse Trap
             if (pickType == ChoiceType.Pick && CurrentMatch.Value.PicksBans.Any(p => p.BeatmapID == beatmapId
-                                                                                     && (p.Type == ChoiceType.RedWin || p.Type == ChoiceType.BlueWin)))
+                && (p.Type == ChoiceType.RedWin || p.Type == ChoiceType.BlueWin)))
             {
                 var latestWin = CurrentMatch.Value.PicksBans.LastOrDefault(p => p.BeatmapID == beatmapId && (p.Type == ChoiceType.RedWin || p.Type == ChoiceType.BlueWin));
                 if (latestWin != null) CurrentMatch.Value.PicksBans.Remove(latestWin);
             }
-
-            var matchTrap = CurrentMatch.Value.Traps.Where(p => p.BeatmapID == beatmapId);
 
             // Show the trap description
             if (matchTrap.Any())
@@ -926,53 +959,7 @@ namespace osu.Game.Tournament.Screens.Board
             {
                 var introMap = CurrentMatch.Value.Round.Value.Beatmaps.FirstOrDefault(b => b.Beatmap?.OnlineID == beatmapId);
 
-                if (introMap != null && !hasTrap)
-                {
-                    AddInternal(new TournamentIntro(introMap)
-                    {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                    });
-                }
-            }
-
-            // Perform a Swap with the latest untriggered Swap
-            if (pickType == ChoiceType.Swap)
-            {
-                // Already have one: perform a Swap
-                var source = CurrentMatch.Value.PendingSwaps.FirstOrDefault();
-
-                if (source != null)
-                {
-                    CurrentMatch.Value.PendingSwaps.Add(new BeatmapChoice
-                    {
-                        Team = TeamColour.Neutral,
-                        Type = ChoiceType.Neutral,
-                        BeatmapID = beatmapId,
-                        Token = true,
-                    });
-
-                    var sourceMap = CurrentMatch.Value.Round.Value.Beatmaps.FirstOrDefault(b => b.Beatmap?.OnlineID == source.BeatmapID);
-                    var targetMap = CurrentMatch.Value.Round.Value.Beatmaps.FirstOrDefault(b => b.Beatmap?.OnlineID == beatmapId);
-
-                    if (sourceMap != null && targetMap != null)
-                    {
-                        CurrentMatch.Value.SwapRecords.Add(new KeyValuePair<RoundBeatmap, RoundBeatmap>(sourceMap, targetMap));
-                    }
-
-                    SwapMap(source.BeatmapID, beatmapId);
-                }
-                else
-                {
-                    // Add as a pending Swap operation
-                    CurrentMatch.Value.PendingSwaps.Add(new BeatmapChoice
-                    {
-                        Team = TeamColour.Neutral,
-                        Type = ChoiceType.Neutral,
-                        BeatmapID = beatmapId,
-                        Token = true,
-                    });
-                }
+                sceneManager?.ShowMapIntro(introMap, pickTeam, introTrap);
             }
 
             // Trap action specific

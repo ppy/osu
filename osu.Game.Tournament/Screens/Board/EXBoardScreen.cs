@@ -20,6 +20,7 @@ using osu.Game.Tournament.IPC;
 using osu.Game.Tournament.Models;
 using osu.Game.Tournament.Screens.Gameplay;
 using osu.Game.Tournament.Screens.Gameplay.Components;
+using osu.Game.Tournament.Screens.TeamWin;
 using osuTK;
 using osuTK.Graphics;
 using osuTK.Input;
@@ -448,11 +449,7 @@ namespace osu.Game.Tournament.Screens.Board
 
                 if (map != null)
                 {
-                    AddInternal(new TournamentIntro(map)
-                    {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                    });
+                    sceneManager?.ShowMapIntro(map);
                 }
             }
 
@@ -460,8 +457,8 @@ namespace osu.Game.Tournament.Screens.Board
             {
                 if (CurrentMatch.Value.Round.Value.IsFinalStage.Value)
                 {
-                    AddInternal(new RoundAnimation(pickType == ChoiceType.RedWin ? CurrentMatch.Value.Team1.Value : CurrentMatch.Value.Team2.Value,
-                        pickType == ChoiceType.RedWin ? TeamColour.Red : TeamColour.Blue));
+                    sceneManager?.ShowWinAnimation(team: pickType == ChoiceType.RedWin ? CurrentMatch.Value.Team1.Value : CurrentMatch.Value.Team2.Value,
+                        colour: pickType == ChoiceType.RedWin ? TeamColour.Red : TeamColour.Blue);
 
                     CurrentMatch.Value.Team1Score.Value = pickType == ChoiceType.RedWin ? 6 : 0;
                     CurrentMatch.Value.Team2Score.Value = pickType == ChoiceType.BlueWin ? 6 : 0;
@@ -474,6 +471,12 @@ namespace osu.Game.Tournament.Screens.Board
                 {
                     scheduledScreenChange?.Cancel();
                     scheduledScreenChange = Scheduler.AddDelayed(() => { sceneManager?.SetScreen(typeof(GameplayScreen)); }, 10000);
+                }
+
+                if (pickType == ChoiceType.RedWin || pickType == ChoiceType.BlueWin)
+                {
+                    scheduledScreenChange?.Cancel();
+                    scheduledScreenChange = Scheduler.AddDelayed(() => { sceneManager?.SetScreen(typeof(TeamWinScreen)); }, 10000);
                 }
             }
         }

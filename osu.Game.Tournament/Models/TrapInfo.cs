@@ -32,8 +32,8 @@ namespace osu.Game.Tournament.Models
             Colour = Color4.White,
         };
 
-        private LocalisableString name = string.Empty;
-        private LocalisableString description = string.Empty;
+        public string Name { get; private set; } = string.Empty;
+        public string Description { get; private set; } = string.Empty;
 
         /// <summary>
         /// A constructor to set up an instance of <see cref="TrapInfo"/>.
@@ -50,35 +50,33 @@ namespace osu.Game.Tournament.Models
             switch (type)
             {
                 case TrapType.Swap:
-                    name = @"大陆漂移";
-                    description = @"游玩结束后，此格子将与另一个交换";
+                    Name = @"大陆漂移";
+                    Description = @"游玩结束后，此格子将与另一个交换";
                     icon.Icon = FontAwesome.Solid.ExchangeAlt;
                     icon.Colour = Color4.Orange;
                     break;
 
                 case TrapType.Reverse:
-                    name = @"时空之门";
-                    description = @"以对方胜利进行结算，此后回到原状态";
+                    Name = @"时空之门";
+                    Description = @"以对方胜利进行结算，此后回到原状态";
                     icon.Icon = FontAwesome.Solid.Clock;
                     icon.Colour = Color4.SkyBlue;
                     break;
 
                 case TrapType.Unused:
-                    name = @"陷阱无效";
-                    description = @"布置方触发了陷阱，将不会生效";
+                    Name = @"陷阱无效";
+                    Description = @"布置方触发了陷阱，将不会生效";
                     icon.Icon = FontAwesome.Solid.Check;
                     icon.Colour = Color4.White;
                     break;
 
                 default:
-                    name = @"Unknown Trap";
-                    description = @"We don't know this one.";
+                    Name = @"Unknown Trap";
+                    Description = @"We don't know this one.";
                     break;
             };
         }
 
-        public LocalisableString Name => name;
-        public LocalisableString Description => description;
         public IconUsage Icon => icon.Icon;
         public ColourInfo IconColor => icon.Colour;
 

@@ -22,8 +22,11 @@ using osu.Game.Tournament.Models;
 
 namespace osu.Game.Tournament.Components
 {
-    public partial class RoundAnimation : VisibilityContainer
+    public partial class RoundAnimation : VisibilityContainer, IAnimation
     {
+        [Resolved]
+        private TournamentSceneManager sceneManager { get; set; } = null!;
+
         public const float DISC_SIZE = 400;
 
         private const float border_width = 5;
@@ -34,15 +37,18 @@ namespace osu.Game.Tournament.Components
         private readonly CircularContainer disc;
         private readonly Sprite innerSpin, outerSpin;
 
-        private TeamColour winColour;
+        public event Action? OnAnimationComplete;
+        public AnimationStatus Status { get; private set; } = AnimationStatus.Loading;
+
+        private readonly TeamColour winColour;
 
         private SpriteIcon? drawableMedal;
         private Sample? getSample;
-        private Container? textContainer;
-        private DrawableTeamFlag? flag;
-        private TournamentSpriteText? ggText;
-        private TournamentSpriteText? cText;
-        private SpriteIcon? trophy;
+        private readonly Container textContainer;
+        private readonly DrawableTeamFlag flag;
+        private readonly TournamentSpriteText ggText;
+        private readonly TournamentSpriteText cText;
+        private readonly SpriteIcon trophy;
 
         private readonly Container content;
 
@@ -224,7 +230,6 @@ namespace osu.Game.Tournament.Components
             }, loaded =>
             {
                 disc.Add(loaded);
-                startAnimation();
             });
         }
 
@@ -238,9 +243,14 @@ namespace osu.Game.Tournament.Components
         private const double initial_duration = 400;
         private const double step_duration = 900;
 
+        public void Fire() => startAnimation();
+
         private void startAnimation()
         {
-            content.Show();
+            Status = AnimationStatus.Running;
+
+            using (BeginDelayedSequence(700))
+                content.Show();
 
             background.FlashColour(Color4.White.Opacity(0.25f), 400);
 
@@ -281,7 +291,11 @@ namespace osu.Game.Tournament.Components
                     trophy.Delay(2500).FadeIn(500)
                           .MoveToOffset(new Vector2(0, 100), step_duration, Easing.OutQuint);
 
-                    this.FadeIn(200).Then().Delay(10000).FadeOut(1000);
+                    content.FadeIn(200).Then().Delay(10000).Then().FadeOut(1000).OnComplete(_ =>
+                    {
+                        Status = AnimationStatus.Complete;
+                        OnAnimationComplete?.Invoke();
+                    });
                 }
             }
         }
