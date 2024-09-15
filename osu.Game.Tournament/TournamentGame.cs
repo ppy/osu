@@ -51,6 +51,8 @@ namespace osu.Game.Tournament
         [Cached(typeof(IDialogOverlay))]
         private readonly DialogOverlay dialogOverlay = new DialogOverlay();
 
+        private OsuContextMenuContainer mainContainer = null!;
+
         [BackgroundDependencyLoader]
         private void load(FrameworkConfigManager frameworkConfig, GameHost host)
         {
@@ -99,17 +101,23 @@ namespace osu.Game.Tournament
                         Origin = Anchor.BottomCentre,
                         Margin = new MarginPadding(20),
                     },
-                    new OsuContextMenuContainer
+                    mainContainer = new OsuContextMenuContainer
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Child = new TournamentSceneManager()
+                        Child = new TournamentSceneManager(),
+                        Alpha = 0,
                     },
                     dialogOverlay
                 }, drawables =>
                 {
-                    loadingSpinner.Hide();
+                    loadingSpinner.FadeOut(200, Easing.InQuint);
                     loadingSpinner.Expire();
-                    AddRange(drawables);
+
+                    using (BeginDelayedSequence(1000))
+                    {
+                        AddRange(drawables);
+                        mainContainer.Delay(500).FadeIn(500, Easing.InCubic);
+                    }
 
                     windowSize.BindValueChanged(size => ScheduleAfterChildren(() =>
                     {
