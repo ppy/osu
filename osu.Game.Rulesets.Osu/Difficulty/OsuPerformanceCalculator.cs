@@ -365,7 +365,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         private double calculateSpeedRakeNerf(OsuDifficultyAttributes attributes)
         {
             // Base speed value
-            double speedValue = 4 * Math.Pow(attributes.SpeedDifficulty, 3);
+            double speedValue = OsuStrainSkill.DifficultyToPerformance(attributes.SpeedDifficulty);
 
             // Starting from this pp amount - penalty will be applied
             double abusePoint = 100 + 260 * Math.Pow(22 / speedDeviation, 5.8);
