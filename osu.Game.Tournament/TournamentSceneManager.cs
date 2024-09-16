@@ -404,7 +404,6 @@ namespace osu.Game.Tournament
         {
             Anchor = Anchor.CentreLeft,
             Origin = Anchor.CentreLeft,
-            // X = CONTROL_AREA_WIDTH + STREAM_AREA_WIDTH / 2,
         });
 
         private void startAnimation(IAnimation animation)

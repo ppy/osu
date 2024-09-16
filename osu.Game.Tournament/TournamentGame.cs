@@ -15,6 +15,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
+using osu.Game.Tournament.Components;
 using osu.Game.Tournament.Models;
 using osuTK.Graphics;
 
@@ -52,6 +53,7 @@ namespace osu.Game.Tournament
         private readonly DialogOverlay dialogOverlay = new DialogOverlay();
 
         private OsuContextMenuContainer mainContainer = null!;
+        private WindowSizeIndicator windowSizeIndicator = null!;
 
         [BackgroundDependencyLoader]
         private void load(FrameworkConfigManager frameworkConfig, GameHost host)
@@ -95,6 +97,11 @@ namespace osu.Game.Tournament
                     {
                         Depth = float.MinValue,
                     },
+                    windowSizeIndicator = new WindowSizeIndicator(windowSize)
+                    {
+                        Depth = float.MinValue,
+                        AlwaysPresent = true,
+                    },
                     heightWarning = new WarningBox($"Please reduce the aspect ratio.\nThe minimum window width is {TournamentSceneManager.REQUIRED_WIDTH}.")
                     {
                         Anchor = Anchor.BottomCentre,
@@ -123,6 +130,7 @@ namespace osu.Game.Tournament
                     {
                         int minWidth = (int)(size.NewValue.Height / 768f * TournamentSceneManager.REQUIRED_WIDTH) - 1;
                         heightWarning.Alpha = size.NewValue.Width < minWidth ? 1 : 0;
+                        Scheduler.Add(() => windowSizeIndicator.FadeIn(100, Easing.InQuint).Delay(1500).FadeOut(1000, Easing.InQuint));
                     }), true);
 
                     windowMode.BindValueChanged(_ => ScheduleAfterChildren(() =>
