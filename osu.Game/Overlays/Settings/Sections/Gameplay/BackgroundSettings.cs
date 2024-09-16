@@ -32,6 +32,13 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                     KeyboardStep = 0.01f,
                     DisplayAsPercentage = true
                 },
+                new SettingsSlider<double>
+                {
+                    LabelText = GameplaySettingsStrings.BackgroundColour,
+                    Current = config.GetBindable<double>(OsuSetting.DimColour),
+                    KeyboardStep = 0.01f,
+                    DisplayAsPercentage = true
+                },
                 new SettingsCheckbox
                 {
                     LabelText = GameplaySettingsStrings.LightenDuringBreaks,

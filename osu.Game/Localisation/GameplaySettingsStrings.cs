@@ -50,6 +50,11 @@ namespace osu.Game.Localisation
         public static LocalisableString BackgroundBlur => new TranslatableString(getKey(@"blur"), @"Background blur");
 
         /// <summary>
+        /// "Background colour"
+        /// </summary>
+        public static LocalisableString BackgroundColour => new TranslatableString(getKey(@"bg_colour"), @"Background colour");
+
+        /// <summary>
         /// "Lighten playfield during breaks"
         /// </summary>
         public static LocalisableString LightenDuringBreaks => new TranslatableString(getKey(@"lighten_during_breaks"), @"Lighten playfield during breaks");
