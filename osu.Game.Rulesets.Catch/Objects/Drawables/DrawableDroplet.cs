@@ -30,11 +30,11 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
 
         private float startRotation;
 
-        protected override void OnApply()
+        protected override void UpdateInitialTransforms()
         {
-            base.OnApply();
+            base.UpdateInitialTransforms();
 
-            // roughly matches osu-stable
+            // Important to have this in UpdateInitialTransforms() to it is re-triggered by RefreshStateTransforms().
             startRotation = RandomSingle(1) * 20;
         }
 

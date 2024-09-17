@@ -44,10 +44,11 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
         private float startAngle;
         private float endAngle;
 
-        protected override void OnApply()
+        protected override void UpdateInitialTransforms()
         {
-            base.OnApply();
+            base.UpdateInitialTransforms();
 
+            // Important to have this in UpdateInitialTransforms() to it is re-triggered by RefreshStateTransforms().
             const float end_scale = 0.6f;
             const float random_scale_range = 1.6f;
 

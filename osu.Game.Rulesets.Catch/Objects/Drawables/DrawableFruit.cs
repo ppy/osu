@@ -27,9 +27,11 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
                 _ => new FruitPiece());
         }
 
-        protected override void OnApply()
+        protected override void UpdateInitialTransforms()
         {
-            base.OnApply();
+            base.UpdateInitialTransforms();
+
+            // Important to have this in UpdateInitialTransforms() to it is re-triggered by RefreshStateTransforms().
             ScalingContainer.Rotation = (RandomSingle(1) - 0.5f) * 40;
         }
     }
