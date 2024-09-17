@@ -2,7 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Graphics;
+using osu.Framework.Utils;
 using osu.Game.Rulesets.Catch.Skinning.Default;
 using osu.Game.Skinning;
 
@@ -28,15 +28,22 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
                 _ => new DropletPiece());
         }
 
-        protected override void UpdateInitialTransforms()
+        private float startRotation;
+
+        protected override void OnApply()
         {
-            base.UpdateInitialTransforms();
+            base.OnApply();
 
             // roughly matches osu-stable
-            float startRotation = RandomSingle(1) * 20;
-            double duration = HitObject.TimePreempt + 2000;
+            startRotation = RandomSingle(1) * 20;
+        }
 
-            ScalingContainer.RotateTo(startRotation).RotateTo(startRotation + 720, duration);
+        protected override void Update()
+        {
+            base.Update();
+
+            double preemptProgress = (Time.Current - (HitObject.StartTime - InitialLifetimeOffset)) / (HitObject.TimePreempt + 2000);
+            ScalingContainer.Rotation = (float)Interpolation.Lerp(startRotation, startRotation + 720, preemptProgress);
         }
     }
 }
