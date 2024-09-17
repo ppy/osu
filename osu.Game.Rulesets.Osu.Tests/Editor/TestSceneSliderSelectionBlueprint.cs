@@ -218,6 +218,9 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
 
             AddAssert("tail positioned correctly",
                 () => Precision.AlmostEquals(blueprint.TailOverlay.CirclePiece.ScreenSpaceDrawQuad.Centre, drawableObject.TailCircle.ScreenSpaceDrawQuad.Centre));
+
+            AddAssert("end drag marker positioned correctly",
+                () => Precision.AlmostEquals(blueprint.TailOverlay.EndDragMarker!.ToScreenSpace(blueprint.TailOverlay.EndDragMarker.OriginPosition), drawableObject.TailCircle.ScreenSpaceDrawQuad.Centre, 2));
         }
 
         private void moveMouseToControlPoint(int index)
