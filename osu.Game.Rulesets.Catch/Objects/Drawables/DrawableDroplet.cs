@@ -42,6 +42,8 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
         {
             base.Update();
 
+            // No clamping for droplets. They should be considered indefinitely spinning regardless of time.
+            // They also never end up on the plate, so they shouldn't stop spinning when caught.
             double preemptProgress = (Time.Current - (HitObject.StartTime - InitialLifetimeOffset)) / (HitObject.TimePreempt + 2000);
             ScalingContainer.Rotation = (float)Interpolation.Lerp(startRotation, startRotation + 720, preemptProgress);
         }
