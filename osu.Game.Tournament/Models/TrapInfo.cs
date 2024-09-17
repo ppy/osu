@@ -4,10 +4,8 @@
 using System;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
-using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
-using osu.Game.Graphics;
 using osuTK.Graphics;
 
 namespace osu.Game.Tournament.Models
@@ -26,13 +24,16 @@ namespace osu.Game.Tournament.Models
 
         public int BeatmapID;
 
-        private SpriteIcon icon = new SpriteIcon
+        [JsonIgnore]
+        public SpriteIcon Icon { get; private set; } = new SpriteIcon
         {
             Icon = FontAwesome.Solid.QuestionCircle,
             Colour = Color4.White,
         };
 
+        [JsonIgnore]
         public string Name { get; private set; } = string.Empty;
+        [JsonIgnore]
         public string Description { get; private set; } = string.Empty;
 
         /// <summary>
@@ -52,22 +53,22 @@ namespace osu.Game.Tournament.Models
                 case TrapType.Swap:
                     Name = @"大陆漂移";
                     Description = @"游玩结束后，此格子将与另一个交换";
-                    icon.Icon = FontAwesome.Solid.ExchangeAlt;
-                    icon.Colour = Color4.Orange;
+                    Icon.Icon = FontAwesome.Solid.ExchangeAlt;
+                    Icon.Colour = Color4.Orange;
                     break;
 
                 case TrapType.Reverse:
                     Name = @"时空之门";
                     Description = @"以对方胜利进行结算，此后回到原状态";
-                    icon.Icon = FontAwesome.Solid.Clock;
-                    icon.Colour = Color4.SkyBlue;
+                    Icon.Icon = FontAwesome.Solid.Clock;
+                    Icon.Colour = Color4.SkyBlue;
                     break;
 
                 case TrapType.Unused:
                     Name = @"陷阱无效";
                     Description = @"布置方触发了陷阱，将不会生效";
-                    icon.Icon = FontAwesome.Solid.Check;
-                    icon.Colour = Color4.White;
+                    Icon.Icon = FontAwesome.Solid.Check;
+                    Icon.Colour = Color4.White;
                     break;
 
                 default:
@@ -76,9 +77,6 @@ namespace osu.Game.Tournament.Models
                     break;
             };
         }
-
-        public IconUsage Icon => icon.Icon;
-        public ColourInfo IconColor => icon.Colour;
 
         /// <summary>
         /// Get the original trap type based on a string.

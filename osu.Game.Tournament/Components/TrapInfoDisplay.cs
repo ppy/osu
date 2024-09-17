@@ -39,9 +39,9 @@ namespace osu.Game.Tournament.Components
                     {
                         Anchor = Anchor.CentreLeft,
                         Origin = Anchor.CentreLeft,
-                        Icon = thisTrap.Icon,
+                        Icon = thisTrap.Icon.Icon,
                         Size = new Vector2(56),
-                        Colour = thisTrap.IconColor,
+                        Colour = thisTrap.Icon.Colour,
                         Alpha = 1,
                     },
                     new Box
@@ -110,9 +110,9 @@ namespace osu.Game.Tournament.Components
                     {
                         Anchor = Anchor.CentreLeft,
                         Origin = Anchor.CentreLeft,
-                        Icon = thisTrap.Icon,
+                        Icon = thisTrap.Icon.Icon,
                         Size = new Vector2(56),
-                        Colour = thisTrap.IconColor,
+                        Colour = thisTrap.Icon.Colour,
                         Alpha = 1,
                     },
                     new Box

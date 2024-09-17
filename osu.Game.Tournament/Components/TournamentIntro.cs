@@ -359,8 +359,8 @@ namespace osu.Game.Tournament.Components
                             X = 20,
                             Y = 15,
                             Shear = new Vector2(-OsuGame.SHEAR, 0f),
-                            Icon = mapTrap.Icon,
-                            Colour = mapTrap.IconColor,
+                            Icon = mapTrap.Icon.Icon,
+                            Colour = mapTrap.Icon.Colour,
                             Size = new Vector2(32),
                         },
                         new FillFlowContainer
