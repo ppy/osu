@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Graphics;
 using osu.Game.Rulesets.Catch.Skinning.Default;
 using osu.Game.Skinning;
 
@@ -28,11 +27,10 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
                 _ => new FruitPiece());
         }
 
-        protected override void UpdateInitialTransforms()
+        protected override void OnApply()
         {
-            base.UpdateInitialTransforms();
-
-            ScalingContainer.RotateTo((RandomSingle(1) - 0.5f) * 40);
+            base.OnApply();
+            ScalingContainer.Rotation = (RandomSingle(1) - 0.5f) * 40;
         }
     }
 }
