@@ -26,6 +26,7 @@ using osu.Game.Rulesets.Replays.Types;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Scoring;
+using osu.Game.Screens.Edit.Compose.Components.Timeline;
 using osu.Game.Screens.Edit.Setup;
 using osu.Game.Screens.Ranking.Statistics;
 using osu.Game.Skinning;
@@ -269,6 +270,8 @@ namespace osu.Game.Rulesets
         public virtual PerformanceCalculator? CreatePerformanceCalculator() => null;
 
         public virtual HitObjectComposer? CreateHitObjectComposer() => null;
+
+        public virtual TimelineBlueprintContainer CreateTimelineBlueprintContainer(HitObjectComposer composer) => new TimelineBlueprintContainer(composer);
 
         public virtual IBeatmapVerifier? CreateBeatmapVerifier() => null;
 
