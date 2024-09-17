@@ -52,7 +52,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         private readonly Container colouredComponents;
         private readonly Container sampleComponents;
         private readonly OsuSpriteText comboIndexText;
-        private readonly SamplePointPiece samplePointPiece;
+        protected readonly SamplePointPiece SamplePointPiece;
         private readonly DifficultyPointPiece? difficultyPointPiece;
 
         [Resolved]
@@ -105,7 +105,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                         },
                     }
                 },
-                samplePointPiece = new SamplePointPiece(Item)
+                SamplePointPiece = new SamplePointPiece(Item)
                 {
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.TopCentre,
@@ -258,7 +258,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 });
             }
 
-            samplePointPiece.X = 1f / (repeats.RepeatCount + 1) / 2;
+            SamplePointPiece.X = 1f / (repeats.RepeatCount + 1) / 2;
         }
 
         protected override bool ShouldBeConsideredForInput(Drawable child) => true;
@@ -281,7 +281,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             // If the component is considered masked away, we'll use children to create an extended quad that encapsulates all parts of this blueprint
             // to ensure it doesn't pop in and out of existence abruptly when scrolling the timeline.
             var rect = RectangleF.Union(ScreenSpaceDrawQuad.AABBFloat, circle.ScreenSpaceDrawQuad.AABBFloat);
-            rect = RectangleF.Union(rect, samplePointPiece.ScreenSpaceDrawQuad.AABBFloat);
+            rect = RectangleF.Union(rect, SamplePointPiece.ScreenSpaceDrawQuad.AABBFloat);
 
             if (difficultyPointPiece != null)
                 rect = RectangleF.Union(rect, difficultyPointPiece.ScreenSpaceDrawQuad.AABBFloat);
