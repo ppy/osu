@@ -122,7 +122,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
                                 if (!current.Disabled && !ReadOnly)
                                 {
-                                    flashLayer.Colour = ColourInfo.GradientVertical(colourProvider.Dark1.Opacity(0), colourProvider.Dark2);
+                                    flashLayer.Colour = ColourInfo.GradientVertical(colourProvider.Dark2.Opacity(0), colourProvider.Dark2);
                                     flashLayer.FadeOutFromOne(800, Easing.OutQuint);
                                 }
                             };
