@@ -16,6 +16,7 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Framework.Utils;
 using osu.Game.Audio;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
@@ -40,6 +41,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         [Resolved]
         private Editor? editor { get; set; }
 
+        private Bindable<bool> samplesVisible = null!;
+
         public SamplePointPiece(HitObject hitObject)
         {
             HitObject = hitObject;
@@ -53,13 +56,23 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         protected virtual double GetTime() => HitObject is IHasRepeats r ? HitObject.StartTime + r.Duration / r.SpanCount() / 2 : HitObject.StartTime;
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OsuConfigManager config)
         {
             HitObject.DefaultsApplied += _ => updateText();
             updateText();
 
             if (editor != null)
                 editor.ShowSampleEditPopoverRequested += onShowSampleEditPopoverRequested;
+
+            samplesVisible = config.GetBindable<bool>(OsuSetting.EditorTimelineShowSamples);
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            samplesVisible.BindValueChanged(visible => this.FadeTo(visible.NewValue ? 1 : 0, 200, Easing.OutQuint));
+            this.FadeTo(samplesVisible.Value ? 1 : 0);
         }
 
         protected override void Dispose(bool isDisposing)

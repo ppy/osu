@@ -139,6 +139,11 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString TimelineShowTicks => new TranslatableString(getKey(@"timeline_show_ticks"), @"Show ticks");
 
+        /// <summary>
+        /// "Show samples"
+        /// </summary>
+        public static LocalisableString TimelineShowSamples => new TranslatableString(getKey(@"timeline_show_samples"), @"Show samples");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }
