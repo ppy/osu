@@ -789,7 +789,6 @@ namespace osu.Game.Tournament.Screens.Board
                 Team = pickType == ChoiceType.RedWin ? TeamColour.Red : TeamColour.Blue,
                 Type = pickType,
                 BeatmapID = beatmapId,
-                Token = true,
             });
             // setNextMode(); // Uncomment if you still want to automatically set the next mode
         }
@@ -892,7 +891,6 @@ namespace osu.Game.Tournament.Screens.Board
                         Team = TeamColour.Neutral,
                         Type = ChoiceType.Neutral,
                         BeatmapID = beatmapId,
-                        Token = true,
                     });
                     SwapMap(source.BeatmapID, beatmapId);
                 }
@@ -904,7 +902,6 @@ namespace osu.Game.Tournament.Screens.Board
                         Team = TeamColour.Neutral,
                         Type = ChoiceType.Neutral,
                         BeatmapID = beatmapId,
-                        Token = true,
                     });
                 }
             }
@@ -964,7 +961,6 @@ namespace osu.Game.Tournament.Screens.Board
                             BeatmapID = beatmapId,
                             Team = triggeredTrap.Team == TeamColour.Red ? TeamColour.Red : TeamColour.Blue,
                             Type = triggeredTrap.Team == TeamColour.Red ? ChoiceType.RedWin : ChoiceType.BlueWin,
-                            Token = true,
                         });
                         updateBottomDisplay(bottomOnly: false, refresh: false);
                     }
@@ -1005,7 +1001,6 @@ namespace osu.Game.Tournament.Screens.Board
                     Team = pickTeam,
                     Type = pickType,
                     BeatmapID = beatmapId,
-                    Token = true,
                 });
             }
 
@@ -1016,7 +1011,6 @@ namespace osu.Game.Tournament.Screens.Board
                     Team = pickTeam,
                     Type = pickType,
                     BeatmapID = beatmapId,
-                    Token = true,
                 });
             }
 

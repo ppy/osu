@@ -275,13 +275,6 @@ namespace osu.Game.Tournament.Components
 
             if (newBPChoice != null || protectChoice != null || trapChoice != null || swapChoice != null)
             {
-                // Auto selecting is bothering us! Fight back!
-                if (newBPChoice != null && !newBPChoice.Token)
-                {
-                    currentMatch.Value.PicksBans.Remove(newBPChoice);
-                    return;
-                }
-
                 if (shouldFlash)
                 {
                     flash.FadeOutFromOne(duration: 900, easing: Easing.OutSine).Loop(0, 3);
