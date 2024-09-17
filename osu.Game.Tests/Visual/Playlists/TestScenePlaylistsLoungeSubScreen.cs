@@ -9,6 +9,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Rooms;
 using osu.Game.Screens.OnlinePlay.Lounge.Components;
 using osu.Game.Screens.OnlinePlay.Playlists;
@@ -89,6 +90,20 @@ namespace osu.Game.Tests.Visual.Playlists
 
             AddAssert("selected room is non-null", () => loungeScreen.SelectedRoom.Value != null);
             AddAssert("selected room is disabled", () => loungeScreen.SelectedRoom.Disabled);
+        }
+
+        [Test]
+        public void TestFilterTextCount()
+        {
+            AddAssert("filter text is 0 matches", () => this.ChildrenOfType<ShearedFilterTextBox>().Single().FilterText.ToString(), () => Is.EqualTo("0 matches"));
+
+            AddStep("add 10 rooms", () => RoomManager.AddRooms(10));
+
+            AddAssert("filter text is 10 matches", () => this.ChildrenOfType<ShearedFilterTextBox>().Single().FilterText.ToString(), () => Is.EqualTo("10 matches"));
+
+            AddStep("search for room 1", () => this.ChildrenOfType<ShearedFilterTextBox>().Single().Current.Value = "room 1");
+
+            AddUntilStep("filter text is 1 match", () => this.ChildrenOfType<ShearedFilterTextBox>().Single().FilterText.ToString(), () => Is.EqualTo("1 match"));
         }
 
         private bool checkRoomVisible(DrawableRoom room) =>
