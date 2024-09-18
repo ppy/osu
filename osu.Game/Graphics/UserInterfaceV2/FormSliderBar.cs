@@ -7,6 +7,7 @@ using System.Numerics;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
@@ -29,7 +30,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
             set => current.Current = value;
         }
 
-        private bool instantaneous;
+        private bool instantaneous = true;
 
         /// <summary>
         /// Whether changes to the slider should instantaneously transfer to the text box (and vice versa).
@@ -41,7 +42,9 @@ namespace osu.Game.Graphics.UserInterfaceV2
             set
             {
                 instantaneous = value;
-                slider.TransferValueOnCommit = !instantaneous;
+
+                if (slider.IsNotNull())
+                    slider.TransferValueOnCommit = !instantaneous;
             }
         }
 
@@ -116,6 +119,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
                             RelativeSizeAxes = Axes.X,
                             Width = 0.5f,
                             Current = Current,
+                            TransferValueOnCommit = !instantaneous,
                         }
                     },
                 },
