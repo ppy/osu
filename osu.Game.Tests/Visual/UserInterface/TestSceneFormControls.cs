@@ -78,7 +78,8 @@ namespace osu.Game.Tests.Visual.UserInterface
                                 MaxValue = 10,
                                 Value = 5,
                                 Precision = 0.1f,
-                            }
+                            },
+                            TabbableContentContainer = this,
                         },
                         new FormSliderBar<float>
                         {
@@ -91,6 +92,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                                 Precision = 0.1f,
                             },
                             Instantaneous = false,
+                            TabbableContentContainer = this,
                         },
                     },
                 },

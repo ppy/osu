@@ -48,6 +48,19 @@ namespace osu.Game.Graphics.UserInterfaceV2
             }
         }
 
+        private CompositeDrawable? tabbableContentContainer;
+
+        public CompositeDrawable? TabbableContentContainer
+        {
+            set
+            {
+                tabbableContentContainer = value;
+
+                if (textBox.IsNotNull())
+                    textBox.TabbableContentContainer = tabbableContentContainer;
+            }
+        }
+
         private readonly BindableNumberWithCurrent<T> current = new BindableNumberWithCurrent<T>();
 
         /// <summary>
@@ -117,7 +130,8 @@ namespace osu.Game.Graphics.UserInterfaceV2
                             {
                                 flashLayer.Colour = ColourInfo.GradientVertical(colours.Red3.Opacity(0), colours.Red3);
                                 flashLayer.FadeOutFromOne(200, Easing.OutQuint);
-                            }
+                            },
+                            TabbableContentContainer = tabbableContentContainer,
                         },
                         slider = new Slider
                         {
