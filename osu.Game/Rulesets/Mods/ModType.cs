@@ -5,6 +5,7 @@ namespace osu.Game.Rulesets.Mods
 {
     public enum ModType
     {
+        Ciphers,
         DifficultyReduction,
         DifficultyIncrease,
         Conversion,

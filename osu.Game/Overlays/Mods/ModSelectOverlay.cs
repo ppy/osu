@@ -301,6 +301,7 @@ namespace osu.Game.Overlays.Mods
                 });
             }
 
+            yield return createModColumnContent(ModType.Ciphers);
             yield return createModColumnContent(ModType.DifficultyReduction);
             yield return createModColumnContent(ModType.DifficultyIncrease);
             yield return createModColumnContent(ModType.Automation);

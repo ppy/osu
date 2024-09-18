@@ -81,6 +81,8 @@ namespace osu.Game.Rulesets.UI
 
             var position = ScreenSpaceToGamefield?.Invoke(inputManager.CurrentState.Mouse.Position) ?? inputManager.CurrentState.Mouse.Position;
 
+            if (TransformMouseInput != null) position = TransformMouseInput.Invoke(position);
+
             var frame = HandleFrame(position, pressedActions, last);
 
             if (frame != null)
@@ -97,5 +99,6 @@ namespace osu.Game.Rulesets.UI
     public abstract partial class ReplayRecorder : Component
     {
         public Func<Vector2, Vector2> ScreenSpaceToGamefield;
+        public Func<Vector2, Vector2> TransformMouseInput;
     }
 }

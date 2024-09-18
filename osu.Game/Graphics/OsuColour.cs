@@ -154,6 +154,9 @@ namespace osu.Game.Graphics
         {
             switch (modType)
             {
+                case ModType.Ciphers:
+                    return Pink1;
+
                 case ModType.Automation:
                     return Blue1;
 
