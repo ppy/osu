@@ -706,7 +706,7 @@ namespace osu.Game.Screens.Select
 
         private bool beatmapsSplitOut;
 
-        private void applyActiveCriteria(bool debounce, bool alwaysResetScrollPosition = true)
+        private void applyActiveCriteria(bool debounce)
         {
             PendingFilter?.Cancel();
             PendingFilter = null;
@@ -735,8 +735,7 @@ namespace osu.Game.Screens.Select
                 root.Filter(activeCriteria);
                 itemsCache.Invalidate();
 
-                if (alwaysResetScrollPosition || !Scroll.UserScrolling)
-                    ScrollToSelected(true);
+                ScrollToSelected(true);
 
                 FilterApplied?.Invoke();
             }
