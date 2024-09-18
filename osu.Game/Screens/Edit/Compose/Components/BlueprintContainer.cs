@@ -196,6 +196,11 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
             DragBox.HandleDrag(e);
             DragBox.Show();
+
+            selectionBeforeDrag.Clear();
+            if (e.ControlPressed)
+                selectionBeforeDrag.UnionWith(SelectedItems);
+
             return true;
         }
 
@@ -217,6 +222,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             }
 
             DragBox.Hide();
+            selectionBeforeDrag.Clear();
         }
 
         protected override void Update()
@@ -227,7 +233,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             {
                 lastDragEvent.Target = this;
                 DragBox.HandleDrag(lastDragEvent);
-                UpdateSelectionFromDragBox();
+                UpdateSelectionFromDragBox(selectionBeforeDrag);
             }
         }
 
@@ -472,7 +478,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <summary>
         /// Select all blueprints in a selection area specified by <see cref="DragBox"/>.
         /// </summary>
-        protected virtual void UpdateSelectionFromDragBox()
+        protected virtual void UpdateSelectionFromDragBox(HashSet<T> selectionBeforeDrag)
         {
             var quad = DragBox.Box.ScreenSpaceDrawQuad;
 
@@ -482,7 +488,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 {
                     case SelectionState.Selected:
                         // Selection is preserved even after blueprint becomes dead.
-                        if (!quad.Contains(blueprint.ScreenSpaceSelectionPoint))
+                        if (!quad.Contains(blueprint.ScreenSpaceSelectionPoint) && !selectionBeforeDrag.Contains(blueprint.Item))
                             blueprint.Deselect();
                         break;
 
@@ -534,6 +540,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// Whether a drag operation was started at all.
         /// </summary>
         private bool wasDragStarted;
+
+        private readonly HashSet<T> selectionBeforeDrag = new HashSet<T>();
 
         /// <summary>
         /// Attempts to begin the movement of any selected blueprints.
