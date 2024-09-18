@@ -802,6 +802,13 @@ namespace osu.Game.Tournament.Screens.Board
             CurrentMatch.Value?.PendingSwaps.Clear();
             CurrentMatch.Value?.Round.Value?.IsFinalStage.BindTo(new BindableBool(false));
 
+            if (CurrentMatch.Value != null)
+            {
+                CurrentMatch.Value.Completed.Value = false;
+                CurrentMatch.Value.Team1Score.Value = 0;
+                CurrentMatch.Value.Team2Score.Value = 0;
+            }
+
             // Reset bottom display
             informationDisplayContainer.Child = new InstructionDisplay();
 
