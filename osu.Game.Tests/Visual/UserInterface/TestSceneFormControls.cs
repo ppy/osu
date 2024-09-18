@@ -8,7 +8,6 @@ using osu.Framework.Graphics.Cursor;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Localisation;
-using osu.Game.Resources.Localisation.Web;
 using osuTK;
 
 namespace osu.Game.Tests.Visual.UserInterface
@@ -72,8 +71,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                         },
                         new FormSliderBar<float>
                         {
-                            Caption = BeatmapsetsStrings.ShowStatsDrain,
-                            HintText = EditorSetupStrings.DrainRateDescription,
+                            Caption = "Instantaneous slider",
                             Current = new BindableFloat
                             {
                                 MinValue = 0,
@@ -81,6 +79,18 @@ namespace osu.Game.Tests.Visual.UserInterface
                                 Value = 5,
                                 Precision = 0.1f,
                             }
+                        },
+                        new FormSliderBar<float>
+                        {
+                            Caption = "Non-instantaneous slider",
+                            Current = new BindableFloat
+                            {
+                                MinValue = 0,
+                                MaxValue = 10,
+                                Value = 5,
+                                Precision = 0.1f,
+                            },
+                            Instantaneous = false,
                         },
                     },
                 },
