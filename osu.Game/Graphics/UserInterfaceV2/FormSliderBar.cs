@@ -143,6 +143,8 @@ namespace osu.Game.Graphics.UserInterfaceV2
             textBox.OnCommit += textCommitted;
             textBox.Current.BindValueChanged(textChanged);
 
+            slider.IsDragging.BindValueChanged(_ => updateState());
+
             current.BindValueChanged(_ =>
             {
                 updateState();
@@ -226,12 +228,12 @@ namespace osu.Game.Graphics.UserInterfaceV2
             caption.Colour = Current.Disabled ? colourProvider.Foreground1 : colourProvider.Content2;
             textBox.Colour = Current.Disabled ? colourProvider.Foreground1 : colourProvider.Content1;
 
-            BorderThickness = IsHovered || textBox.Focused.Value ? 2 : 0;
+            BorderThickness = IsHovered || textBox.Focused.Value || slider.IsDragging.Value ? 2 : 0;
             BorderColour = textBox.Focused.Value ? colourProvider.Highlight1 : colourProvider.Light4;
 
             if (textBox.Focused.Value)
                 background.Colour = ColourInfo.GradientVertical(colourProvider.Background5, colourProvider.Dark3);
-            else if (IsHovered)
+            else if (IsHovered || slider.IsDragging.Value)
                 background.Colour = ColourInfo.GradientVertical(colourProvider.Background5, colourProvider.Dark4);
             else
                 background.Colour = colourProvider.Background5;
@@ -246,6 +248,8 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
         private partial class Slider : OsuSliderBar<T>
         {
+            public BindableBool IsDragging { get; set; } = new BindableBool();
+
             private Box leftBox = null!;
             private Box rightBox = null!;
             private Circle nub = null!;
@@ -313,6 +317,21 @@ namespace osu.Game.Graphics.UserInterfaceV2
                 rightBox.Width = Math.Clamp(DrawWidth - nub.DrawPosition.X - RangePadding, 0, Math.Max(0, DrawWidth)) / DrawWidth;
             }
 
+            protected override bool OnDragStart(DragStartEvent e)
+            {
+                bool dragging = base.OnDragStart(e);
+                IsDragging.Value = dragging;
+                updateState();
+                return dragging;
+            }
+
+            protected override void OnDragEnd(DragEndEvent e)
+            {
+                base.OnDragEnd(e);
+                IsDragging.Value = false;
+                updateState();
+            }
+
             protected override bool OnHover(HoverEvent e)
             {
                 updateState();
@@ -328,8 +347,8 @@ namespace osu.Game.Graphics.UserInterfaceV2
             private void updateState()
             {
                 rightBox.Colour = colourProvider.Background6;
-                leftBox.Colour = IsHovered ? colourProvider.Highlight1.Opacity(0.5f) : colourProvider.Dark2;
-                nub.Colour = IsHovered ? colourProvider.Highlight1 : colourProvider.Light4;
+                leftBox.Colour = IsHovered || IsDragged ? colourProvider.Highlight1.Opacity(0.5f) : colourProvider.Dark2;
+                nub.Colour = IsHovered || IsDragged ? colourProvider.Highlight1 : colourProvider.Light4;
             }
 
             protected override void UpdateValue(float value)
