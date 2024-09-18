@@ -26,7 +26,19 @@ namespace osu.Game.Graphics.UserInterfaceV2
             set => slider.KeyboardStep = value;
         }
 
+        private readonly BindableNumberWithCurrent<T> current = new BindableNumberWithCurrent<T>();
+
         public Bindable<T> Current
+        {
+            get => current;
+            set
+            {
+                current.Current = value;
+                SliderCurrent = value;
+            }
+        }
+
+        public Bindable<T> SliderCurrent
         {
             get => slider.Current;
             set => slider.Current = value;
@@ -82,37 +94,38 @@ namespace osu.Game.Graphics.UserInterfaceV2
             textBox.OnCommit += textCommitted;
             textBox.Current.BindValueChanged(textChanged);
 
-            Current.BindValueChanged(updateTextBoxFromSlider, true);
+            SliderCurrent.BindValueChanged(updateCurrentFromSlider);
+            Current.BindValueChanged(updateTextBoxAndSliderFromCurrent, true);
         }
 
         public bool TakeFocus() => GetContainingFocusManager()?.ChangeFocus(textBox) == true;
 
         public bool SelectAll() => textBox.SelectAll();
 
-        private bool updatingFromTextBox;
+        private bool updatingFromCurrent;
 
         private void textChanged(ValueChangedEvent<string> change)
         {
             if (!instantaneous) return;
 
-            tryUpdateSliderFromTextBox();
+            tryUpdateCurrentFromTextBox();
         }
 
         private void textCommitted(TextBox t, bool isNew)
         {
-            tryUpdateSliderFromTextBox();
+            tryUpdateCurrentFromTextBox();
 
             // If the attempted update above failed, restore text box to match the slider.
             Current.TriggerChange();
         }
 
-        private void tryUpdateSliderFromTextBox()
+        private void tryUpdateCurrentFromTextBox()
         {
-            updatingFromTextBox = true;
+            if (updatingFromCurrent) return;
 
             try
             {
-                switch (slider.Current)
+                switch (Current)
                 {
                     case Bindable<int> bindableInt:
                         bindableInt.Value = int.Parse(textBox.Current.Value);
@@ -123,7 +136,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
                         break;
 
                     default:
-                        slider.Current.Parse(textBox.Current.Value, CultureInfo.CurrentCulture);
+                        Current.Parse(textBox.Current.Value, CultureInfo.CurrentCulture);
                         break;
                 }
             }
@@ -132,16 +145,25 @@ namespace osu.Game.Graphics.UserInterfaceV2
                 // ignore parsing failures.
                 // sane state will eventually be restored by a commit (either explicit, or implicit via focus loss).
             }
-
-            updatingFromTextBox = false;
         }
 
-        private void updateTextBoxFromSlider(ValueChangedEvent<T> _)
+        private void updateCurrentFromSlider(ValueChangedEvent<T> _)
         {
-            if (updatingFromTextBox) return;
+            if (updatingFromCurrent) return;
 
-            decimal decimalValue = decimal.CreateTruncating(slider.Current.Value);
+            Current.Value = SliderCurrent.Value;
+        }
+
+        private void updateTextBoxAndSliderFromCurrent(ValueChangedEvent<T> _)
+        {
+            updatingFromCurrent = true;
+
+            SliderCurrent.Value = Current.Value;
+
+            decimal decimalValue = decimal.CreateTruncating(Current.Value);
             textBox.Text = decimalValue.ToString($@"N{FormatUtils.FindPrecision(decimalValue)}");
+
+            updatingFromCurrent = false;
         }
     }
 }
