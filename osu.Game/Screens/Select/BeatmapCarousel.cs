@@ -1036,7 +1036,7 @@ namespace osu.Game.Screens.Select
             itemsCache.Validate();
 
             // update and let external consumers know about selection loss.
-            if (BeatmapSetsLoaded)
+            if (BeatmapSetsLoaded && AllowSelection)
             {
                 bool selectionLost = selectedBeatmapSet != null && selectedBeatmapSet.State.Value != CarouselItemState.Selected;
 
