@@ -67,14 +67,5 @@ namespace osu.Game.Screens.Play.HUD.JudgementCounter
             else
                 count.ResultCount.Value++;
         }
-
-        public struct JudgementCount
-        {
-            public LocalisableString DisplayName { get; set; }
-
-            public HitResult[] Types { get; set; }
-
-            public BindableInt ResultCount { get; set; }
-        }
     }
 }
