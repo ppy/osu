@@ -145,13 +145,13 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             AddStep("commit text", () => InputManager.Key(Key.Enter));
             AddAssert("slider moved", () => slider.Current.Value, () => Is.EqualTo(3));
-            AddAssert("current changed", () => sliderWithTextBoxInput.Current.Value, () => Is.EqualTo(3.4));
+            AddAssert("current changed", () => sliderWithTextBoxInput.Current.Value, () => Is.EqualTo(3.4).Within(0.01));
 
             AddStep("move mouse to nub", () => InputManager.MoveMouseTo(nub));
             AddStep("hold left mouse", () => InputManager.PressButton(MouseButton.Left));
             AddStep("move mouse to minimum", () => InputManager.MoveMouseTo(sliderWithTextBoxInput.ScreenSpaceDrawQuad.BottomLeft));
-            AddAssert("textbox not changed", () => textBox.Current.Value, () => Is.EqualTo("3"));
-            AddAssert("current not changed", () => sliderWithTextBoxInput.Current.Value, () => Is.EqualTo(3));
+            AddAssert("textbox not changed", () => textBox.Current.Value, () => Is.EqualTo("3.4"));
+            AddAssert("current not changed", () => sliderWithTextBoxInput.Current.Value, () => Is.EqualTo(3.4).Within(0.01));
 
             AddStep("release left mouse", () => InputManager.ReleaseButton(MouseButton.Left));
             AddAssert("textbox changed", () => textBox.Current.Value, () => Is.EqualTo("-5"));
