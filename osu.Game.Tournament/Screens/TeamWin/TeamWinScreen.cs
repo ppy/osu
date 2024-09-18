@@ -3,7 +3,6 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
@@ -85,26 +84,26 @@ namespace osu.Game.Tournament.Screens.TeamWin
                     RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]
                     {
-                                            winMainText = new TournamentSpriteText
-                    {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        Text = "胜负已定...",
-                        X = -250,
-                        Y = -50,
-                        Font = OsuFont.HarmonyOSSans.With(size: 64, weight: FontWeight.Bold),
-                        Alpha = 0,
-                    },
-                    winSubText = new TournamentSpriteText
-                    {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        Text = "...他们来了...",
-                        X = 250,
-                        Y = 50,
-                        Font = OsuFont.HarmonyOSSans.With(size: 64, weight: FontWeight.Bold),
-                        Alpha = 0,
-                    }
+                        winMainText = new TournamentSpriteText
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            Text = "胜负已定...",
+                            X = -250,
+                            Y = -50,
+                            Font = OsuFont.HarmonyOSSans.With(size: 64, weight: FontWeight.Bold),
+                            Alpha = 0,
+                        },
+                        winSubText = new TournamentSpriteText
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            Text = "...他们来了...",
+                            X = 250,
+                            Y = 50,
+                            Font = OsuFont.HarmonyOSSans.With(size: 64, weight: FontWeight.Bold),
+                            Alpha = 0,
+                        }
                     }
                 },
                 altContainer = new Container
