@@ -70,7 +70,7 @@ namespace osu.Game.Overlays
         private OsuColour colours { get; set; } = null!;
 
         private Bindable<bool> allowTrackControl = null!;
-        private BindableBool shuffle = new BindableBool(true);
+        private readonly BindableBool shuffle = new BindableBool(true);
 
         public NowPlayingOverlay()
         {
