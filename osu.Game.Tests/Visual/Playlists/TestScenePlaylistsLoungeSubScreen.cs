@@ -3,6 +3,7 @@
 
 #nullable disable
 
+using System;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Bindables;
@@ -23,6 +24,7 @@ namespace osu.Game.Tests.Visual.Playlists
         protected new TestRoomManager RoomManager => (TestRoomManager)base.RoomManager;
 
         private TestLoungeSubScreen loungeScreen;
+        private IDisposable loadingOperation;
 
         public override void SetUpSteps()
         {
@@ -104,6 +106,16 @@ namespace osu.Game.Tests.Visual.Playlists
             AddStep("search for room 1", () => this.ChildrenOfType<ShearedFilterTextBox>().Single().Current.Value = "room 1");
 
             AddUntilStep("filter text is 1 match", () => this.ChildrenOfType<ShearedFilterTextBox>().Single().FilterText.ToString(), () => Is.EqualTo("1 match"));
+
+            AddStep("begin loading operation", () => loadingOperation = OngoingOperationTracker.BeginOperation());
+
+            AddAssert("filter text is loading...", () => this.ChildrenOfType<ShearedFilterTextBox>().Single().FilterText.ToString(), () => Is.EqualTo("loading..."));
+
+            AddStep("finish loading operation", () =>
+            {
+                loadingOperation?.Dispose();
+                loadingOperation = null;
+            });
         }
 
         private bool checkRoomVisible(DrawableRoom room) =>
