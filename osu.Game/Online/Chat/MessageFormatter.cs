@@ -340,8 +340,6 @@ namespace osu.Game.Online.Chat
         Spectate,
         OpenUserProfile,
         SearchBeatmapSet,
-        SearchBeatmapTitle,
-        SearchBeatmapArtist,
         OpenWiki,
         Custom,
         OpenChangelog,

@@ -445,17 +445,15 @@ namespace osu.Game
                     break;
 
                 case LinkAction.SearchBeatmapSet:
-                    SearchBeatmapSet(argString);
-                    break;
+                    if (link.Argument is LocalisableString localisable)
+                    {
+                        var localised = Localisation.GetLocalisedBindableString(localisable);
+                        SearchBeatmapSet(localised.Value);
+                        localised.UnbindAll();
+                    }
+                    else
+                        SearchBeatmapSet(argString);
 
-                case LinkAction.SearchBeatmapTitle:
-                    string title = ((RomanisableString)link.Argument).GetPreferred(Localisation.CurrentParameters.Value.PreferOriginalScript);
-                    SearchBeatmapSet($@"title=""""{title}""""");
-                    break;
-
-                case LinkAction.SearchBeatmapArtist:
-                    string artist = ((RomanisableString)link.Argument).GetPreferred(Localisation.CurrentParameters.Value.PreferOriginalScript);
-                    SearchBeatmapSet($@"artist=""""{artist}""""");
                     break;
 
                 case LinkAction.FilterBeatmapSetGenre:
