@@ -45,7 +45,7 @@ namespace osu.Game.Rulesets.Osu.Edit
                 {
                     angleInput = new SliderWithTextBoxInput<float>("Angle (degrees):")
                     {
-                        Current = new BindableNumber<float>
+                        SliderCurrent = new BindableNumber<float>
                         {
                             MinValue = -360,
                             MaxValue = 360,
