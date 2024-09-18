@@ -50,7 +50,14 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
         private readonly BindableNumberWithCurrent<T> current = new BindableNumberWithCurrent<T>();
 
+        /// <summary>
+        /// Caption describing this slider bar, displayed on top of the controls.
+        /// </summary>
         public LocalisableString Caption { get; init; }
+
+        /// <summary>
+        /// Hint text containing an extended description of this slider bar, displayed in a tooltip when hovering the caption.
+        /// </summary>
         public LocalisableString HintText { get; init; }
 
         private Box background = null!;
