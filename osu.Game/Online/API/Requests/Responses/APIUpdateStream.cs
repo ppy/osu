@@ -28,6 +28,9 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty("latest_build")]
         public APIChangelogBuild LatestBuild { get; set; }
 
+        [JsonProperty("user_count")]
+        public int UserCount { get; set; }
+
         public bool Equals(APIUpdateStream other) => Id == other?.Id;
 
         internal static readonly Dictionary<string, Color4> KNOWN_STREAMS = new Dictionary<string, Color4>

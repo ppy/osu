@@ -72,14 +72,14 @@ namespace osu.Game.Skinning
                 circularProgress.Scale = new Vector2(-1, 1);
                 circularProgress.Anchor = Anchor.TopRight;
                 circularProgress.Colour = new Colour4(199, 255, 47, 153);
-                circularProgress.Current.Value = 1 - progress;
+                circularProgress.Progress = 1 - progress;
             }
             else
             {
                 circularProgress.Scale = new Vector2(1);
                 circularProgress.Anchor = Anchor.TopLeft;
                 circularProgress.Colour = new Colour4(255, 255, 255, 153);
-                circularProgress.Current.Value = progress;
+                circularProgress.Progress = progress;
             }
         }
     }

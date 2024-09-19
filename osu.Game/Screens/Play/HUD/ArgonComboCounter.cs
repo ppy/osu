@@ -19,12 +19,13 @@ namespace osu.Game.Screens.Play.HUD
 {
     public partial class ArgonComboCounter : ComboCounter
     {
-        private ArgonCounterTextComponent text = null!;
+        protected ArgonCounterTextComponent Text = null!;
 
-        protected override double RollingDuration => 500;
-        protected override Easing RollingEasing => Easing.OutQuint;
+        protected override double RollingDuration => 250;
 
-        [SettingSource("Wireframe opacity", "Controls the opacity of the wire frames behind the digits.")]
+        protected virtual bool DisplayXSymbol => true;
+
+        [SettingSource("Wireframe opacity", "Controls the opacity of the wireframes behind the digits.")]
         public BindableFloat WireframeOpacity { get; } = new BindableFloat(0.25f)
         {
             Precision = 0.01f,
@@ -44,22 +45,50 @@ namespace osu.Game.Screens.Play.HUD
                 bool wasIncrease = combo.NewValue > combo.OldValue;
                 bool wasMiss = combo.OldValue > 1 && combo.NewValue == 0;
 
-                float newScale = Math.Clamp(text.NumberContainer.Scale.X * (wasIncrease ? 1.1f : 0.8f), 0.6f, 1.4f);
+                float newScale = Math.Clamp(Text.NumberContainer.Scale.X * (wasIncrease ? 1.1f : 0.8f), 0.6f, 1.4f);
 
                 float duration = wasMiss ? 2000 : 500;
 
-                text.NumberContainer
+                Text.NumberContainer
                     .ScaleTo(new Vector2(newScale))
                     .ScaleTo(Vector2.One, duration, Easing.OutQuint);
 
                 if (wasMiss)
-                    text.FlashColour(Color4.Red, duration, Easing.OutQuint);
+                    Text.FlashColour(Color4.Red, duration, Easing.OutQuint);
             });
         }
 
-        protected override LocalisableString FormatCount(int count) => $@"{count}x";
+        public override int DisplayedCount
+        {
+            get => base.DisplayedCount;
+            set
+            {
+                base.DisplayedCount = value;
+                updateWireframe();
+            }
+        }
 
-        protected override IHasText CreateText() => text = new ArgonCounterTextComponent(Anchor.TopLeft, MatchesStrings.MatchScoreStatsCombo.ToUpper())
+        private void updateWireframe()
+        {
+            int digitsRequiredForDisplayCount = getDigitsRequiredForDisplayCount();
+
+            if (digitsRequiredForDisplayCount != Text.WireframeTemplate.Length)
+                Text.WireframeTemplate = new string('#', digitsRequiredForDisplayCount);
+        }
+
+        private int getDigitsRequiredForDisplayCount()
+        {
+            // one for the single presumed starting digit, one for the "x" at the end (unless disabled).
+            int digitsRequired = DisplayXSymbol ? 2 : 1;
+            long c = DisplayedCount;
+            while ((c /= 10) > 0)
+                digitsRequired++;
+            return digitsRequired;
+        }
+
+        protected override LocalisableString FormatCount(int count) => DisplayXSymbol ? $@"{count}x" : count.ToString();
+
+        protected override IHasText CreateText() => Text = new ArgonCounterTextComponent(Anchor.TopLeft, MatchesStrings.MatchScoreStatsCombo.ToUpper())
         {
             WireframeOpacity = { BindTarget = WireframeOpacity },
             ShowLabel = { BindTarget = ShowLabel },

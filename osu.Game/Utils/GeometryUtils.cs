@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Primitives;
-using osu.Framework.Utils;
 using osu.Game.Rulesets.Objects.Types;
 using osuTK;
 
@@ -43,8 +42,8 @@ namespace osu.Game.Utils
         public static Vector2 RotateVector(Vector2 vector, float angle)
         {
             return new Vector2(
-                vector.X * MathF.Cos(MathUtils.DegreesToRadians(angle)) + vector.Y * MathF.Sin(MathUtils.DegreesToRadians(angle)),
-                vector.X * -MathF.Sin(MathUtils.DegreesToRadians(angle)) + vector.Y * MathF.Cos(MathUtils.DegreesToRadians(angle))
+                vector.X * MathF.Cos(float.DegreesToRadians(angle)) + vector.Y * MathF.Sin(float.DegreesToRadians(angle)),
+                vector.X * -MathF.Sin(float.DegreesToRadians(angle)) + vector.Y * MathF.Cos(float.DegreesToRadians(angle))
             );
         }
 
@@ -52,6 +51,9 @@ namespace osu.Game.Utils
         /// Given a flip direction, a surrounding quad for all selected objects, and a position,
         /// will return the flipped position in screen space coordinates.
         /// </summary>
+        /// <param name="direction">The direction to flip towards.</param>
+        /// <param name="quad">The quad surrounding all selected objects. The center of this determines the position of the axis.</param>
+        /// <param name="position">The position to flip.</param>
         public static Vector2 GetFlippedPosition(Direction direction, Quad quad, Vector2 position)
         {
             var centre = quad.Centre;
@@ -74,6 +76,9 @@ namespace osu.Game.Utils
         /// Given a flip axis vector, a surrounding quad for all selected objects, and a position,
         /// will return the flipped position in screen space coordinates.
         /// </summary>
+        /// <param name="axis">The vector indicating the direction to flip towards. This is perpendicular to the mirroring axis.</param>
+        /// <param name="quad">The quad surrounding all selected objects. The center of this determines the position of the axis.</param>
+        /// <param name="position">The position to flip.</param>
         public static Vector2 GetFlippedPosition(Vector2 axis, Quad quad, Vector2 position)
         {
             var centre = quad.Centre;
@@ -99,6 +104,15 @@ namespace osu.Game.Utils
                 position.Y = selectionQuad.TopLeft.Y + yOffset + (position.Y - selectionQuad.TopLeft.Y) / selectionQuad.Height * (selectionQuad.Height + scale.Y);
 
             return position;
+        }
+
+        /// <summary>
+        /// Given a scale multiplier, an origin, and a position,
+        /// will return the scaled position in screen space coordinates.
+        /// </summary>
+        public static Vector2 GetScaledPosition(Vector2 scale, Vector2 origin, Vector2 position, float axisRotation = 0)
+        {
+            return origin + RotateVector(RotateVector(position - origin, axisRotation) * scale, -axisRotation);
         }
 
         /// <summary>
@@ -130,7 +144,67 @@ namespace osu.Game.Utils
         /// </summary>
         /// <param name="hitObjects">The hit objects to calculate a quad for.</param>
         public static Quad GetSurroundingQuad(IEnumerable<IHasPosition> hitObjects) =>
-            GetSurroundingQuad(hitObjects.SelectMany(h =>
+            GetSurroundingQuad(enumerateStartAndEndPositions(hitObjects));
+
+        /// <summary>
+        /// Returns the points that make up the convex hull of the provided points.
+        /// </summary>
+        /// <param name="points">The points to calculate a convex hull.</param>
+        public static List<Vector2> GetConvexHull(IEnumerable<Vector2> points)
+        {
+            var pointsList = points.OrderBy(p => p.X).ThenBy(p => p.Y).ToList();
+
+            if (pointsList.Count < 3)
+                return pointsList;
+
+            var convexHullLower = new List<Vector2>
+            {
+                pointsList[0],
+                pointsList[1]
+            };
+            var convexHullUpper = new List<Vector2>
+            {
+                pointsList[^1],
+                pointsList[^2]
+            };
+
+            // Build the lower hull.
+            for (int i = 2; i < pointsList.Count; i++)
+            {
+                Vector2 c = pointsList[i];
+                while (convexHullLower.Count > 1 && isClockwise(convexHullLower[^2], convexHullLower[^1], c))
+                    convexHullLower.RemoveAt(convexHullLower.Count - 1);
+
+                convexHullLower.Add(c);
+            }
+
+            // Build the upper hull.
+            for (int i = pointsList.Count - 3; i >= 0; i--)
+            {
+                Vector2 c = pointsList[i];
+                while (convexHullUpper.Count > 1 && isClockwise(convexHullUpper[^2], convexHullUpper[^1], c))
+                    convexHullUpper.RemoveAt(convexHullUpper.Count - 1);
+
+                convexHullUpper.Add(c);
+            }
+
+            convexHullLower.RemoveAt(convexHullLower.Count - 1);
+            convexHullUpper.RemoveAt(convexHullUpper.Count - 1);
+
+            convexHullLower.AddRange(convexHullUpper);
+
+            return convexHullLower;
+
+            float crossProduct(Vector2 v1, Vector2 v2) => v1.X * v2.Y - v1.Y * v2.X;
+
+            bool isClockwise(Vector2 a, Vector2 b, Vector2 c) => crossProduct(b - a, c - a) >= 0;
+        }
+
+        public static List<Vector2> GetConvexHull(IEnumerable<IHasPosition> hitObjects) =>
+            GetConvexHull(enumerateStartAndEndPositions(hitObjects));
+
+        private static IEnumerable<Vector2> enumerateStartAndEndPositions(IEnumerable<IHasPosition> hitObjects) =>
+            hitObjects.SelectMany(h =>
             {
                 if (h is IHasPath path)
                 {
@@ -143,6 +217,6 @@ namespace osu.Game.Utils
                 }
 
                 return new[] { h.Position };
-            }));
+            });
     }
 }

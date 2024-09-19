@@ -5,25 +5,19 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Cursor;
-using osu.Framework.Localisation;
 using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Overlays.Profile.Header.Components
 {
-    public partial class TotalPlayTime : CompositeDrawable, IHasTooltip
+    public partial class TotalPlayTime : CompositeDrawable
     {
         public readonly Bindable<UserProfileData?> User = new Bindable<UserProfileData?>();
-
-        public LocalisableString TooltipText { get; set; }
 
         private ProfileValueDisplay info = null!;
 
         public TotalPlayTime()
         {
             AutoSizeAxes = Axes.Both;
-
-            TooltipText = "0 hours";
         }
 
         [BackgroundDependencyLoader]
@@ -32,6 +26,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
             InternalChild = info = new ProfileValueDisplay(minimumWidth: 140)
             {
                 Title = UsersStrings.ShowStatsPlayTime,
+                ContentTooltipText = "0 hours",
             };
 
             User.BindValueChanged(updateTime, true);
@@ -40,7 +35,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
         private void updateTime(ValueChangedEvent<UserProfileData?> user)
         {
             int? playTime = user.NewValue?.User.Statistics?.PlayTime;
-            TooltipText = (playTime ?? 0) / 3600 + " hours";
+            info.ContentTooltipText = (playTime ?? 0) / 3600 + " hours";
             info.Content = formatTime(playTime);
         }
 

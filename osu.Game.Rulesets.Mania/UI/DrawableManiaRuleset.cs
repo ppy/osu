@@ -1,16 +1,17 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.IEnumerableExtensions;
-using osu.Framework.Graphics;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Input;
+using osu.Framework.Platform;
+using osu.Framework.Threading;
+using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Input.Handlers;
@@ -26,10 +27,12 @@ using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Scoring;
+using osu.Game.Screens.Play;
 using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
+    [Cached]
     public partial class DrawableManiaRuleset : DrawableScrollingRuleset<ManiaHitObject>
     {
         /// <summary>
@@ -42,7 +45,7 @@ namespace osu.Game.Rulesets.Mania.UI
         /// </summary>
         public const double MAX_TIME_RANGE = 11485;
 
-        protected new ManiaPlayfield Playfield => (ManiaPlayfield)base.Playfield;
+        public new ManiaPlayfield Playfield => (ManiaPlayfield)base.Playfield;
 
         public new ManiaBeatmap Beatmap => (ManiaBeatmap)base.Beatmap;
 
@@ -54,15 +57,19 @@ namespace osu.Game.Rulesets.Mania.UI
 
         private readonly Bindable<ManiaScrollingDirection> configDirection = new Bindable<ManiaScrollingDirection>();
         private readonly BindableInt configScrollSpeed = new BindableInt();
-        private double smoothTimeRange;
+
+        private double currentTimeRange;
+        protected double TargetTimeRange;
 
         // Stores the current speed adjustment active in gameplay.
         private readonly Track speedAdjustmentTrack = new TrackVirtual(0);
 
-        [Resolved]
-        private ISkinSource skin { get; set; }
+        private ISkinSource currentSkin = null!;
 
-        public DrawableManiaRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod> mods = null)
+        [Resolved]
+        private GameHost gameHost { get; set; } = null!;
+
+        public DrawableManiaRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod>? mods = null)
             : base(ruleset, beatmap, mods)
         {
             BarLines = new BarLineGenerator<BarLine>(Beatmap).BarLines;
@@ -72,8 +79,12 @@ namespace osu.Game.Rulesets.Mania.UI
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(ISkinSource source)
         {
+            currentSkin = source;
+            currentSkin.SourceChanged += onSkinChange;
+            skinChanged();
+
             foreach (var mod in Mods.OfType<IApplicableToTrack>())
                 mod.ApplyToTrack(speedAdjustmentTrack);
 
@@ -96,9 +107,11 @@ namespace osu.Game.Rulesets.Mania.UI
             configDirection.BindValueChanged(direction => Direction.Value = (ScrollingDirection)direction.NewValue, true);
 
             Config.BindWith(ManiaRulesetSetting.ScrollSpeed, configScrollSpeed);
-            configScrollSpeed.BindValueChanged(speed => this.TransformTo(nameof(smoothTimeRange), ComputeScrollTime(speed.NewValue), 200, Easing.OutQuint));
+            configScrollSpeed.BindValueChanged(speed => TargetTimeRange = ComputeScrollTime(speed.NewValue));
 
-            TimeRange.Value = smoothTimeRange = ComputeScrollTime(configScrollSpeed.Value);
+            TimeRange.Value = TargetTimeRange = currentTimeRange = ComputeScrollTime(configScrollSpeed.Value);
+
+            KeyBindingInputManager.Add(new ManiaTouchInputArea());
         }
 
         protected override void AdjustScrollSpeed(int amount) => configScrollSpeed.Value += amount;
@@ -109,19 +122,37 @@ namespace osu.Game.Rulesets.Mania.UI
             updateTimeRange();
         }
 
+        private ScheduledDelegate? pendingSkinChange;
+        private float hitPosition;
+
+        private void onSkinChange()
+        {
+            // schedule required to avoid calls after disposed.
+            // note that this has the side-effect of components only performing a skin change when they are alive.
+            pendingSkinChange?.Cancel();
+            pendingSkinChange = Scheduler.Add(skinChanged);
+        }
+
+        private void skinChanged()
+        {
+            hitPosition = currentSkin.GetConfig<ManiaSkinConfigurationLookup, float>(
+                              new ManiaSkinConfigurationLookup(LegacyManiaSkinConfigurationLookups.HitPosition))?.Value
+                          ?? Stage.HIT_TARGET_POSITION;
+
+            pendingSkinChange = null;
+        }
+
         private void updateTimeRange()
         {
-            float hitPosition = skin.GetConfig<ManiaSkinConfigurationLookup, float>(
-                                    new ManiaSkinConfigurationLookup(LegacyManiaSkinConfigurationLookups.HitPosition))?.Value
-                                ?? Stage.HIT_TARGET_POSITION;
-
             const float length_to_default_hit_position = 768 - LegacyManiaSkinConfiguration.DEFAULT_HIT_POSITION;
             float lengthToHitPosition = 768 - hitPosition;
 
             // This scaling factor preserves the scroll speed as the scroll length varies from changes to the hit position.
             float scale = lengthToHitPosition / length_to_default_hit_position;
 
-            TimeRange.Value = smoothTimeRange * speedAdjustmentTrack.AggregateTempo.Value * speedAdjustmentTrack.AggregateFrequency.Value * scale;
+            // we're intentionally using the game host's update clock here to decouple the time range tween from the gameplay clock (which can be arbitrarily paused, or even rewinding)
+            currentTimeRange = Interpolation.DampContinuously(currentTimeRange, TargetTimeRange, 50, gameHost.UpdateThread.Clock.ElapsedFrameTime);
+            TimeRange.Value = currentTimeRange * speedAdjustmentTrack.AggregateTempo.Value * speedAdjustmentTrack.AggregateFrequency.Value * scale;
         }
 
         /// <summary>
@@ -139,10 +170,20 @@ namespace osu.Game.Rulesets.Mania.UI
 
         protected override PassThroughInputManager CreateInputManager() => new ManiaInputManager(Ruleset.RulesetInfo, Variant);
 
-        public override DrawableHitObject<ManiaHitObject> CreateDrawableRepresentation(ManiaHitObject h) => null;
+        public override DrawableHitObject<ManiaHitObject>? CreateDrawableRepresentation(ManiaHitObject h) => null;
 
         protected override ReplayInputHandler CreateReplayInputHandler(Replay replay) => new ManiaFramedReplayInputHandler(replay);
 
         protected override ReplayRecorder CreateReplayRecorder(Score score) => new ManiaReplayRecorder(score);
+
+        protected override ResumeOverlay CreateResumeOverlay() => new DelayedResumeOverlay();
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (currentSkin.IsNotNull())
+                currentSkin.SourceChanged -= onSkinChange;
+        }
     }
 }

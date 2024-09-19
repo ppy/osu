@@ -84,7 +84,7 @@ namespace osu.Game.Rulesets.Catch.UI
         {
             base.Update();
 
-            var replayState = (GetContainingInputManager().CurrentState as RulesetInputManagerInputState<CatchAction>)?.LastReplayState as CatchFramedReplayInputHandler.CatchReplayState;
+            var replayState = (GetContainingInputManager()!.CurrentState as RulesetInputManagerInputState<CatchAction>)?.LastReplayState as CatchFramedReplayInputHandler.CatchReplayState;
 
             SetCatcherPosition(
                 replayState?.CatcherX ??
@@ -110,9 +110,9 @@ namespace osu.Game.Rulesets.Catch.UI
 
             if (Catcher.Dashing || Catcher.HyperDashing)
             {
-                double generationInterval = Catcher.HyperDashing ? 25 : 50;
+                const double trail_generation_interval = 16;
 
-                if (Time.Current - catcherTrails.LastDashTrailTime >= generationInterval)
+                if (Time.Current - catcherTrails.LastDashTrailTime >= trail_generation_interval)
                     displayCatcherTrail(Catcher.HyperDashing ? CatcherTrailAnimation.HyperDashing : CatcherTrailAnimation.Dashing);
             }
 

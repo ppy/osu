@@ -30,7 +30,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
         private SessionStatics statics { get; set; } = null!;
 
         private ScoreAccessibleSoloPlayer currentPlayer = null!;
-        private readonly ManualClock manualClock = new ManualClock { Rate = 0 };
+        private readonly ManualClock manualClock = new ManualClock { Rate = 1 };
 
         protected override WorkingBeatmap CreateWorkingBeatmap(IBeatmap beatmap, Storyboard? storyboard = null)
             => new ClockBackedTestWorkingBeatmap(beatmap, storyboard, new FramedClock(manualClock), Audio);
@@ -51,7 +51,6 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
         public void TestUserAlreadyHasTouchDeviceActive()
         {
             loadPlayer();
-            // it is presumed that a previous screen (i.e. song select) will set this up
             AddStep("set up touchscreen user", () =>
             {
                 currentPlayer.Score.ScoreInfo.Mods = currentPlayer.Score.ScoreInfo.Mods.Append(new OsuModTouchDevice()).ToArray();
@@ -67,6 +66,14 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
                 InputManager.EndTouch(touch);
             });
             AddAssert("touch device mod activated", () => currentPlayer.Score.ScoreInfo.Mods, () => Has.One.InstanceOf<OsuModTouchDevice>());
+        }
+
+        [Test]
+        public void TestTouchActivePriorToPlayerLoad()
+        {
+            AddStep("set touch input active", () => statics.SetValue(Static.TouchInputActive, true));
+            loadPlayer();
+            AddUntilStep("touch device mod activated", () => currentPlayer.Score.ScoreInfo.Mods, () => Has.One.InstanceOf<OsuModTouchDevice>());
         }
 
         [Test]
