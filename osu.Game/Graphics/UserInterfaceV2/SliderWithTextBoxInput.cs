@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Numerics;
 using System.Globalization;
 using osu.Framework.Bindables;
@@ -34,14 +35,75 @@ namespace osu.Game.Graphics.UserInterfaceV2
             set
             {
                 current.Current = value;
-                SliderCurrent = value;
+                slider.Current = value;
             }
         }
 
-        public Bindable<T> SliderCurrent
+        private T? sliderPrecision;
+
+        public T? SliderPrecision
         {
-            get => slider.Current;
-            set => slider.Current = value;
+            get => sliderPrecision;
+            set
+            {
+                if (value.HasValue)
+                {
+                    T multiple = value.Value / current.Precision;
+                    if (!T.IsNaN(multiple) && !T.IsInfinity(multiple) && !T.IsZero(multiple % T.One))
+                        throw new ArgumentException(@"Precision override must be a multiple of the current precision.");
+                }
+
+                sliderPrecision = value;
+                slider.Current = new BindableNumber<T>
+                {
+                    MinValue = sliderMinValue ?? current.MinValue,
+                    MaxValue = sliderMaxValue ?? current.MaxValue,
+                    Default = current.Default,
+                    Precision = value ?? current.Precision,
+                };
+            }
+        }
+
+        private T? sliderMinValue;
+
+        public T? SliderMinValue
+        {
+            get => sliderMinValue;
+            set
+            {
+                if (value.HasValue && value.Value < current.MinValue)
+                    throw new ArgumentException(@"Minimum value override must be greater than or equal to the current minimum value.");
+
+                sliderMinValue = value;
+                slider.Current = new BindableNumber<T>
+                {
+                    MinValue = value ?? current.MinValue,
+                    MaxValue = sliderMaxValue ?? current.MaxValue,
+                    Default = current.Default,
+                    Precision = sliderPrecision ?? current.Precision,
+                };
+            }
+        }
+
+        private T? sliderMaxValue;
+
+        public T? SliderMaxValue
+        {
+            get => sliderMaxValue;
+            set
+            {
+                if (value.HasValue && value.Value > current.MaxValue)
+                    throw new ArgumentException(@"Maximum value override must be less than or equal to the current maximum value.");
+
+                sliderMaxValue = value;
+                slider.Current = new BindableNumber<T>
+                {
+                    MinValue = sliderMinValue ?? current.MinValue,
+                    MaxValue = value ?? current.MaxValue,
+                    Default = current.Default,
+                    Precision = sliderPrecision ?? current.Precision,
+                };
+            }
         }
 
         private bool instantaneous;
@@ -94,7 +156,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
             textBox.OnCommit += textCommitted;
             textBox.Current.BindValueChanged(textChanged);
 
-            SliderCurrent.BindValueChanged(updateCurrentFromSlider);
+            slider.Current.BindValueChanged(updateCurrentFromSlider);
             Current.BindValueChanged(updateTextBoxAndSliderFromCurrent, true);
         }
 
@@ -151,14 +213,14 @@ namespace osu.Game.Graphics.UserInterfaceV2
         {
             if (updatingFromCurrent) return;
 
-            Current.Value = SliderCurrent.Value;
+            Current.Value = slider.Current.Value;
         }
 
         private void updateTextBoxAndSliderFromCurrent(ValueChangedEvent<T> _)
         {
             updatingFromCurrent = true;
 
-            SliderCurrent.Value = Current.Value;
+            slider.Current.Value = Current.Value;
 
             decimal decimalValue = decimal.CreateTruncating(Current.Value);
             textBox.Text = decimalValue.ToString($@"N{FormatUtils.FindPrecision(decimalValue)}");

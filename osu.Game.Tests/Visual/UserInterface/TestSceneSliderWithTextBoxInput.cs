@@ -131,12 +131,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         [Test]
         public void TestMultiPrecision()
         {
-            AddStep("set slider precision to 1", () => sliderWithTextBoxInput.SliderCurrent = new BindableNumber<float>
-            {
-                MinValue = -5,
-                MaxValue = 5,
-                Precision = 1f
-            });
+            AddStep("set slider precision to 1", () => sliderWithTextBoxInput.SliderPrecision = 1f);
 
             AddStep("focus textbox", () => ((IFocusManager)InputManager).ChangeFocus(textBox));
             AddStep("change text", () => textBox.Text = "3.4");
