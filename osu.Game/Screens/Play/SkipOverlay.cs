@@ -218,7 +218,7 @@ namespace osu.Game.Screens.Play
                 return;
 
             float progress = (float)(gameplayClock.CurrentTime - displayTime) / (float)(fadeOutBeginTime - displayTime);
-            float newWidth = Math.Max(0, 1 - Math.Clamp(progress, 0, 1));
+            float newWidth = 1 - Math.Clamp(progress, 0, 1);
             remainingTimeBox.ResizeWidthTo(newWidth, timingPoint.BeatLength * 2, Easing.OutQuint);
         }
 
