@@ -79,7 +79,7 @@ namespace osu.Game.Tournament.Screens.Board
                     Anchor = Anchor.TopLeft,
                     Origin = Anchor.TopLeft,
                     RelativeSizeAxes = Axes.None,
-                    Position = new Vector2(30, 100),
+                    Position = new Vector2(40, 100),
                     Width = 320,
                     Height = sideListHeight,
                     Direction = FillDirection.Vertical,
@@ -99,7 +99,7 @@ namespace osu.Game.Tournament.Screens.Board
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight,
                     RelativeSizeAxes = Axes.None,
-                    Position = new Vector2(-30, 100),
+                    Position = new Vector2(-40, 100),
                     Width = 320,
                     Height = sideListHeight,
                     Direction = FillDirection.Vertical,
@@ -219,7 +219,7 @@ namespace osu.Game.Tournament.Screens.Board
                     Origin = Anchor.BottomRight,
                     RelativeSizeAxes = Axes.None,
                     Height = 50,
-                    Position = new Vector2(-30, -10),
+                    Position = new Vector2(-40, -10),
                 },
                 new ControlPanel
                 {
