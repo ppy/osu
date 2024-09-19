@@ -367,7 +367,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
             protected override void UpdateValue(float value)
             {
-                nub.MoveToX(value, 250, Easing.OutQuint);
+                nub.MoveToX(value, 200, Easing.OutPow10);
             }
         }
     }
