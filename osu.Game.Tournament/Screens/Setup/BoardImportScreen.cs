@@ -16,8 +16,8 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Overlays;
 using osu.Game.Tournament.Components;
-using osu.Game.Tournament.IPC;
 using osu.Game.Tournament.Models;
+using osu.Game.Tournament.Screens.Board;
 using osuTK;
 
 namespace osu.Game.Tournament.Screens.Setup
@@ -38,7 +38,7 @@ namespace osu.Game.Tournament.Screens.Setup
 
         private bool isUpdateDone = false;
 
-        private List<List<RoundBeatmap>> defCommandList;
+        private List<List<RoundBeatmap>> defCommandList = new List<List<RoundBeatmap>>();
         private BindableBool useChat = new BindableBool(false);
 
         [BackgroundDependencyLoader(true)]
@@ -46,7 +46,7 @@ namespace osu.Game.Tournament.Screens.Setup
         {
             isUpdateDone = false;
             round = LadderInfo.CurrentMatch.Value?.Round.Value;
-            defCommandList = new List<List<RoundBeatmap>>();
+            defCommandList.Clear();
             LadderInfo.CurrentMatch.Value.PendingMsgs.CollectionChanged += msgOnCollectionChanged;
             useChat.BindValueChanged(_ => fetchAndUpdate());
 
@@ -154,7 +154,7 @@ namespace osu.Game.Tournament.Screens.Setup
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.BottomLeft,
                     State = { Value = Visibility.Visible },
-                    Action = () => sceneManager?.SetScreen(typeof(SetupScreen))
+                    Action = () => sceneManager?.SetScreen(typeof(BoardScreen))
                 }
             });
 
