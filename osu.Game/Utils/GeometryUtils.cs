@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Primitives;
+using osu.Framework.Utils;
 using osu.Game.Rulesets.Objects.Types;
 using osuTK;
 
@@ -218,5 +219,137 @@ namespace osu.Game.Utils
 
                 return new[] { h.Position };
             });
+
+        #region welzl_helpers
+
+        // Function to check whether a point lies inside or on the boundaries of the circle
+        private static bool isInside((Vector2, float) c, Vector2 p)
+        {
+            return Precision.AlmostBigger(c.Item2, Vector2.Distance(c.Item1, p));
+        }
+
+        // Function to return a unique circle that intersects three points
+        private static (Vector2, float) circleFrom(Vector2 a, Vector2 b, Vector2 c)
+        {
+            if (Precision.AlmostEquals(0, (b.Y - a.Y) * (c.X - a.X) - (b.X - a.X) * (c.Y - a.Y)))
+                return circleFrom(a, b);
+
+            // See: https://en.wikipedia.org/wiki/Circumscribed_circle#Cartesian_coordinates_2
+            float d = 2 * (a.X * (b - c).Y + b.X * (c - a).Y + c.X * (a - b).Y);
+            float aSq = a.LengthSquared;
+            float bSq = b.LengthSquared;
+            float cSq = c.LengthSquared;
+
+            var centre = new Vector2(
+                aSq * (b - c).Y + bSq * (c - a).Y + cSq * (a - b).Y,
+                aSq * (c - b).X + bSq * (a - c).X + cSq * (b - a).X) / d;
+
+            return (centre, Vector2.Distance(a, centre));
+        }
+
+        // Function to return the smallest circle that intersects 2 points
+        private static (Vector2, float) circleFrom(Vector2 a, Vector2 b)
+        {
+            var centre = (a + b) / 2.0f;
+            return (centre, Vector2.Distance(a, b) / 2.0f);
+        }
+
+        // Function to check whether a circle encloses the given points
+        private static bool isValidCircle((Vector2, float) c, ReadOnlySpan<Vector2> points)
+        {
+            // Iterating through all the points to check whether the points lie inside the circle or not
+            foreach (Vector2 p in points)
+            {
+                if (!isInside(c, p)) return false;
+            }
+
+            return true;
+        }
+
+        // Function to return the minimum enclosing circle for N <= 3
+        private static (Vector2, float) minCircleTrivial(ReadOnlySpan<Vector2> points)
+        {
+            switch (points.Length)
+            {
+                case 0:
+                    return (new Vector2(0, 0), 0);
+
+                case 1:
+                    return (points[0], 0);
+
+                case 2:
+                    return circleFrom(points[0], points[1]);
+            }
+
+            // To check if MEC can be determined by 2 points only
+            for (int i = 0; i < 3; i++)
+            {
+                for (int j = i + 1; j < 3; j++)
+                {
+                    var c = circleFrom(points[i], points[j]);
+
+                    if (isValidCircle(c, points))
+                        return c;
+                }
+            }
+
+            return circleFrom(points[0], points[1], points[2]);
+        }
+
+        // Returns the MEC using Welzl's algorithm
+        // Takes a set of input points P and a set R
+        // points on the circle boundary.
+        // n represents the number of points in P that are not yet processed.
+        private static (Vector2, float) welzlHelper(List<Vector2> points, ReadOnlySpan<Vector2> r, int n, Random random)
+        {
+            // Base case when all points processed or |R| = 3
+            if (n == 0 || r.Length == 3)
+                return minCircleTrivial(r);
+
+            // Pick a random point randomly
+            int idx = random.Next(n);
+            Vector2 p = points[idx];
+
+            // Put the picked point at the end of P since it's more efficient than
+            // deleting from the middle of the list
+            (points[idx], points[n - 1]) = (points[n - 1], points[idx]);
+
+            // Get the MEC circle d from the set of points P - {p}
+            var d = welzlHelper(points, r, n - 1, random);
+
+            // If d contains p, return d
+            if (isInside(d, p))
+                return d;
+
+            // Otherwise, must be on the boundary of the MEC
+            // Stackalloc to avoid allocations. It's safe to assume that the length of r will be at most 3
+            Span<Vector2> r2 = stackalloc Vector2[r.Length + 1];
+            r.CopyTo(r2);
+            r2[r.Length] = p;
+
+            // Return the MEC for P - {p} and R U {p}
+            return welzlHelper(points, r2, n - 1, random);
+        }
+
+        #endregion
+
+        /// <summary>
+        /// Function to find the minimum enclosing circle for a collection of points.
+        /// </summary>
+        /// <returns>A tuple containing the circle center and radius.</returns>
+        public static (Vector2, float) MinimumEnclosingCircle(IEnumerable<Vector2> points)
+        {
+            // Using Welzl's algorithm to find the minimum enclosing circle
+            // https://www.geeksforgeeks.org/minimum-enclosing-circle-using-welzls-algorithm/
+            List<Vector2> pCopy = points.ToList();
+            return welzlHelper(pCopy, Array.Empty<Vector2>(), pCopy.Count, new Random());
+        }
+
+        /// <summary>
+        /// Function to find the minimum enclosing circle for a collection of hit objects.
+        /// </summary>
+        /// <returns>A tuple containing the circle center and radius.</returns>
+        public static (Vector2, float) MinimumEnclosingCircle(IEnumerable<IHasPosition> hitObjects) =>
+            MinimumEnclosingCircle(enumerateStartAndEndPositions(hitObjects));
     }
 }
