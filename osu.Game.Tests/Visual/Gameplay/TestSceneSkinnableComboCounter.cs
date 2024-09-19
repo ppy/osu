@@ -18,7 +18,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         protected override Drawable CreateArgonImplementation() => new ArgonComboCounter();
         protected override Drawable CreateDefaultImplementation() => new DefaultComboCounter();
-        protected override Drawable CreateLegacyImplementation() => new LegacyComboCounter();
+        protected override Drawable CreateLegacyImplementation() => new LegacyDefaultComboCounter();
 
         [Test]
         public void TestComboCounterIncrementing()

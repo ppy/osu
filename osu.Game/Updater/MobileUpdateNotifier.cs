@@ -4,7 +4,6 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using osu.Framework;
 using osu.Framework.Allocation;
@@ -16,10 +15,10 @@ using osu.Game.Overlays.Notifications;
 namespace osu.Game.Updater
 {
     /// <summary>
-    /// An update manager that shows notifications if a newer release is detected.
+    /// An update manager that shows notifications if a newer release is detected for mobile platforms.
     /// Installation is left up to the user.
     /// </summary>
-    public partial class SimpleUpdateManager : UpdateManager
+    public partial class MobileUpdateNotifier : UpdateManager
     {
         private string version = null!;
 
@@ -80,19 +79,6 @@ namespace osu.Game.Updater
 
             switch (RuntimeInfo.OS)
             {
-                case RuntimeInfo.Platform.Windows:
-                    bestAsset = release.Assets?.Find(f => f.Name.EndsWith(".exe", StringComparison.Ordinal));
-                    break;
-
-                case RuntimeInfo.Platform.macOS:
-                    string arch = RuntimeInformation.OSArchitecture == Architecture.Arm64 ? "Apple.Silicon" : "Intel";
-                    bestAsset = release.Assets?.Find(f => f.Name.EndsWith($".app.{arch}.zip", StringComparison.Ordinal));
-                    break;
-
-                case RuntimeInfo.Platform.Linux:
-                    bestAsset = release.Assets?.Find(f => f.Name.EndsWith(".AppImage", StringComparison.Ordinal));
-                    break;
-
                 case RuntimeInfo.Platform.iOS:
                     if (release.Assets?.Exists(f => f.Name.EndsWith(".ipa", StringComparison.Ordinal)) == true)
                         // iOS releases are available via testflight. this link seems to work well enough for now.

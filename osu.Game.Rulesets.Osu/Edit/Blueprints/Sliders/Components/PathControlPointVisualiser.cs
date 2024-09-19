@@ -309,8 +309,13 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
                     if (!e.AltPressed)
                         return false;
 
+                    // If no pieces are selected, we can't change the path type.
+                    if (Pieces.All(p => !p.IsSelected.Value))
+                        return false;
+
                     var type = path_types[e.Key - Key.Number1];
 
+                    // The first control point can never be inherit type
                     if (Pieces[0].IsSelected.Value && type == null)
                         return false;
 

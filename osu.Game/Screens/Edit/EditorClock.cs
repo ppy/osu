@@ -132,7 +132,7 @@ namespace osu.Game.Screens.Edit
             seekTime = timingPoint.Time + closestBeat * seekAmount;
 
             // limit forward seeking to only up to the next timing point's start time.
-            var nextTimingPoint = ControlPointInfo.TimingPoints.FirstOrDefault(t => t.Time > timingPoint.Time);
+            var nextTimingPoint = ControlPointInfo.TimingPointAfter(timingPoint.Time);
             if (seekTime > nextTimingPoint?.Time)
                 seekTime = nextTimingPoint.Time;
 

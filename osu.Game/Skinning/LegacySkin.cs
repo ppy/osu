@@ -13,7 +13,6 @@ using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
 using osu.Game.Audio;
@@ -24,6 +23,7 @@ using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Screens.Play.HUD.HitErrorMeters;
+using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Skinning
@@ -155,6 +155,9 @@ namespace osu.Game.Skinning
                 case LegacyManiaSkinConfigurationLookups.HitPosition:
                     return SkinUtils.As<TValue>(new Bindable<float>(existing.HitPosition));
 
+                case LegacyManiaSkinConfigurationLookups.ComboPosition:
+                    return SkinUtils.As<TValue>(new Bindable<float>(existing.ComboPosition));
+
                 case LegacyManiaSkinConfigurationLookups.ScorePosition:
                     return SkinUtils.As<TValue>(new Bindable<float>(existing.ScorePosition));
 
@@ -191,6 +194,9 @@ namespace osu.Game.Skinning
                 case LegacyManiaSkinConfigurationLookups.ColumnLightColour:
                     Debug.Assert(maniaLookup.ColumnIndex != null);
                     return SkinUtils.As<TValue>(getCustomColour(existing, $"ColourLight{maniaLookup.ColumnIndex + 1}"));
+
+                case LegacyManiaSkinConfigurationLookups.ComboBreakColour:
+                    return SkinUtils.As<TValue>(getCustomColour(existing, "ColourBreak"));
 
                 case LegacyManiaSkinConfigurationLookups.MinimumColumnWidth:
                     return SkinUtils.As<TValue>(new Bindable<float>(existing.MinimumColumnWidth));
@@ -350,21 +356,27 @@ namespace osu.Game.Skinning
 
         public override Drawable? GetDrawableComponent(ISkinComponentLookup lookup)
         {
-            if (base.GetDrawableComponent(lookup) is UserConfiguredLayoutContainer c)
-                return c;
-
             switch (lookup)
             {
-                case SkinComponentsContainerLookup containerLookup:
-                    switch (containerLookup.Target)
+                case GlobalSkinnableContainerLookup containerLookup:
+                    switch (containerLookup.Lookup)
                     {
-                        case SkinComponentsContainerLookup.TargetArea.MainHUDComponents:
+                        case GlobalSkinnableContainers.MainHUDComponents:
                             if (containerLookup.Ruleset != null)
                             {
-                                return new Container
+                                return new DefaultSkinComponentsContainer(container =>
                                 {
-                                    RelativeSizeAxes = Axes.Both,
-                                    Child = new LegacyComboCounter(),
+                                    var combo = container.OfType<LegacyDefaultComboCounter>().FirstOrDefault();
+
+                                    if (combo != null)
+                                    {
+                                        combo.Anchor = Anchor.BottomLeft;
+                                        combo.Origin = Anchor.BottomLeft;
+                                        combo.Scale = new Vector2(1.28f);
+                                    }
+                                })
+                                {
+                                    new LegacyDefaultComboCounter()
                                 };
                             }
 
@@ -411,7 +423,7 @@ namespace osu.Game.Skinning
 
                     return null;
 
-                case GameplaySkinComponentLookup<HitResult> resultComponent:
+                case SkinComponentLookup<HitResult> resultComponent:
 
                     // kind of wasteful that we throw this away, but should do for now.
                     if (getJudgementAnimation(resultComponent.Component) != null)
@@ -430,7 +442,7 @@ namespace osu.Game.Skinning
                     return null;
             }
 
-            return null;
+            return base.GetDrawableComponent(lookup);
         }
 
         private Texture? getParticleTexture(HitResult result)

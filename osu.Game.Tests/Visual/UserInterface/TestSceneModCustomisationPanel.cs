@@ -7,6 +7,9 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Input;
+using osu.Framework.Testing;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Mods;
 using osu.Game.Rulesets.Mods;
@@ -56,19 +59,19 @@ namespace osu.Game.Tests.Visual.UserInterface
             {
                 SelectedMods.Value = new[] { new OsuModDoubleTime() };
                 panel.Enabled.Value = true;
-                panel.ExpandedState.Value = ModCustomisationPanel.ModCustomisationPanelState.Expanded;
+                panel.ExpandedState.Value = ModCustomisationPanel.ModCustomisationPanelState.ExpandedByMod;
             });
             AddStep("set DA", () =>
             {
                 SelectedMods.Value = new Mod[] { new OsuModDifficultyAdjust() };
                 panel.Enabled.Value = true;
-                panel.ExpandedState.Value = ModCustomisationPanel.ModCustomisationPanelState.Expanded;
+                panel.ExpandedState.Value = ModCustomisationPanel.ModCustomisationPanelState.ExpandedByMod;
             });
             AddStep("set FL+WU+DA+AD", () =>
             {
                 SelectedMods.Value = new Mod[] { new OsuModFlashlight(), new ModWindUp(), new OsuModDifficultyAdjust(), new OsuModApproachDifferent() };
                 panel.Enabled.Value = true;
-                panel.ExpandedState.Value = ModCustomisationPanel.ModCustomisationPanelState.Expanded;
+                panel.ExpandedState.Value = ModCustomisationPanel.ModCustomisationPanelState.ExpandedByMod;
             });
             AddStep("set empty", () =>
             {
@@ -118,7 +121,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         }
 
         [Test]
-        public void TestExpandedStatePersistsWhenClicked()
+        public void TestHoverExpandsAndCollapsesWhenHeaderTouched()
         {
             AddStep("add customisable mod", () =>
             {
@@ -126,23 +129,25 @@ namespace osu.Game.Tests.Visual.UserInterface
                 panel.Enabled.Value = true;
             });
 
-            AddStep("hover header", () => InputManager.MoveMouseTo(header));
+            AddStep("touch header", () =>
+            {
+                var touch = new Touch(TouchSource.Touch1, header.ScreenSpaceDrawQuad.Centre);
+                InputManager.BeginTouch(touch);
+                Schedule(() => InputManager.EndTouch(touch));
+            });
             checkExpanded(true);
 
-            AddStep("click", () => InputManager.Click(MouseButton.Left));
-            checkExpanded(false);
-            AddStep("click", () => InputManager.Click(MouseButton.Left));
-            checkExpanded(true);
-
-            AddStep("move away", () => InputManager.MoveMouseTo(Vector2.One));
-            checkExpanded(true);
-
-            AddStep("click", () => InputManager.Click(MouseButton.Left));
+            AddStep("touch away from header", () =>
+            {
+                var touch = new Touch(TouchSource.Touch1, header.ScreenSpaceDrawQuad.TopLeft - new Vector2(10));
+                InputManager.BeginTouch(touch);
+                Schedule(() => InputManager.EndTouch(touch));
+            });
             checkExpanded(false);
         }
 
         [Test]
-        public void TestHoverExpandsAndCollapsesWhenHeaderClicked()
+        public void TestDraggingKeepsPanelExpanded()
         {
             AddStep("add customisable mod", () =>
             {
@@ -153,7 +158,12 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddStep("hover header", () => InputManager.MoveMouseTo(header));
             checkExpanded(true);
 
-            AddStep("click", () => InputManager.Click(MouseButton.Left));
+            AddStep("hover slider bar nub", () => InputManager.MoveMouseTo(panel.ChildrenOfType<OsuSliderBar<double>>().First().ChildrenOfType<Nub>().Single()));
+            AddStep("hold", () => InputManager.PressButton(MouseButton.Left));
+            AddStep("drag outside", () => InputManager.MoveMouseTo(Vector2.Zero));
+            checkExpanded(true);
+
+            AddStep("release", () => InputManager.ReleaseButton(MouseButton.Left));
             checkExpanded(false);
         }
 
