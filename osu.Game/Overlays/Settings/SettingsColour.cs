@@ -19,7 +19,7 @@ namespace osu.Game.Overlays.Settings
 
         public partial class ColourControl : OsuClickableContainer, IHasPopover, IHasCurrentValue<Colour4>
         {
-            private readonly BindableWithCurrent<Colour4> current = new BindableWithCurrent<Colour4>();
+            private readonly BindableWithCurrent<Colour4> current = new BindableWithCurrent<Colour4>(Colour4.White);
 
             public Bindable<Colour4> Current
             {
