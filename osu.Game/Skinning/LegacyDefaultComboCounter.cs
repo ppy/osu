@@ -14,7 +14,7 @@ namespace osu.Game.Skinning
     /// <summary>
     /// Uses the 'x' symbol and has a pop-out effect while rolling over.
     /// </summary>
-    public partial class LegacyComboCounter : CompositeDrawable, ISerialisableDrawable
+    public partial class LegacyDefaultComboCounter : CompositeDrawable, ISerialisableDrawable
     {
         public Bindable<int> Current { get; } = new BindableInt { MinValue = 0 };
 
@@ -45,7 +45,7 @@ namespace osu.Game.Skinning
 
         public bool UsesFixedAnchor { get; set; }
 
-        public LegacyComboCounter()
+        public LegacyDefaultComboCounter()
         {
             AutoSizeAxes = Axes.Both;
 
