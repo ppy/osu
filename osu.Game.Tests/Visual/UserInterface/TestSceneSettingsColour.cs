@@ -3,7 +3,6 @@
 
 #nullable disable
 
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Graphics;
