@@ -104,9 +104,11 @@ namespace osu.Game.Rulesets.Osu.Edit
             StartPositionY.Value = point1.Y;
 
             // Get the angle between the two points and normalize to the valid range.
-            const float period = 180;
-            GridLinesRotation.Value = (MathHelper.RadiansToDegrees(MathF.Atan2(point2.Y - point1.Y, point2.X - point1.X))
-                                       + period * 1.5f) % period - period * 0.5f;
+            if (!GridLinesRotation.Disabled)
+            {
+                float period = GridLinesRotation.MaxValue - GridLinesRotation.MinValue;
+                GridLinesRotation.Value = normalizeRotation(MathHelper.RadiansToDegrees(MathF.Atan2(point2.Y - point1.Y, point2.X - point1.X)), period);
+            }
 
             // Divide the distance so that there is a good density of grid lines.
             float dist = Vector2.Distance(point1, point2);
@@ -231,18 +233,23 @@ namespace osu.Game.Rulesets.Osu.Edit
                 switch (v.NewValue)
                 {
                     case PositionSnapGridType.Square:
-                        GridLinesRotation.Value = ((GridLinesRotation.Value + 405) % 90) - 45;
+                        GridLinesRotation.Value = normalizeRotation(GridLinesRotation.Value, 90);
                         GridLinesRotation.MinValue = -45;
                         GridLinesRotation.MaxValue = 45;
                         break;
 
                     case PositionSnapGridType.Triangle:
-                        GridLinesRotation.Value = ((GridLinesRotation.Value + 390) % 60) - 30;
+                        GridLinesRotation.Value = normalizeRotation(GridLinesRotation.Value, 60);
                         GridLinesRotation.MinValue = -30;
                         GridLinesRotation.MaxValue = 30;
                         break;
                 }
             }, true);
+        }
+
+        private float normalizeRotation(float rotation, float period)
+        {
+            return ((rotation + 360 + period * 0.5f) % period) - period * 0.5f;
         }
 
         private void nextGridSize()
