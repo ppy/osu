@@ -45,24 +45,27 @@ namespace osu.Game.Tests.Visual.UserInterface
 
         private void createContent()
         {
-            Child = new PopoverContainer
+            AddStep("create component", () =>
             {
-                RelativeSizeAxes = Axes.Both,
-                Child = new FillFlowContainer
+                Child = new PopoverContainer
                 {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Width = 500,
-                    AutoSizeAxes = Axes.Y,
-                    Children = new Drawable[]
+                    RelativeSizeAxes = Axes.Both,
+                    Child = new FillFlowContainer
                     {
-                        component = new SettingsColour
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Width = 500,
+                        AutoSizeAxes = Axes.Y,
+                        Children = new Drawable[]
                         {
-                            LabelText = "a sample component",
+                            component = new SettingsColour
+                            {
+                                LabelText = "a sample component",
+                            },
                         },
                     },
-                },
-            };
+                };
+            });
         }
 
         private Colour4 randomColour() => new Color4(
