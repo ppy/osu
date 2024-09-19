@@ -73,7 +73,7 @@ namespace osu.Game.Overlays.SkinEditor
             isFlippedY = false;
         }
 
-        public override void Update(Vector2 scale, Vector2? origin = null, Axes adjustAxis = Axes.Both)
+        public override void Update(Vector2 scale, Vector2? origin = null, Axes adjustAxis = Axes.Both, float axisRotation = 0)
         {
             if (objectsInScale == null)
                 throw new InvalidOperationException($"Cannot {nameof(Update)} a scale operation without calling {nameof(Begin)} first!");
