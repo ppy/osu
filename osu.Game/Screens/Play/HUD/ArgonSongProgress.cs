@@ -29,6 +29,7 @@ namespace osu.Game.Screens.Play.HUD
 
         [SettingSource(typeof(SongProgressStrings), nameof(SongProgressStrings.ShowTime), nameof(SongProgressStrings.ShowTimeDescription))]
         public Bindable<bool> ShowTime { get; } = new BindableBool(true);
+
         [SettingSource(typeof(SkinnableComponentStrings), nameof(SkinnableComponentStrings.Colour), nameof(SkinnableComponentStrings.ColourDescription))]
         public new BindableColour4 Colour { get; } = new BindableColour4(Colour4.White);
 
