@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using osu.Framework.Lists;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Objects;
@@ -113,6 +112,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
                         if (islandCount != default)
                         {
+                            int countIndex = islandCounts.IndexOf(islandCount);
+
                             // only add island to island counts if they're going one after another
                             if (previousIsland.Equals(island))
                                 islandCount.Count++;
@@ -120,6 +121,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                             // repeated island (ex: triplet -> triplet)
                             double power = logistic(island.Delta, 4, 0.165, 10);
                             effectiveRatio *= Math.Min(3.0 / islandCount.Count, Math.Pow(1.0 / islandCount.Count, power));
+
+                            islandCounts[countIndex] = (islandCount.Island, islandCount.Count);
                         }
                         else
                         {
