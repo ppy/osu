@@ -381,26 +381,6 @@ namespace osu.Game.Tournament.Screens.Board
                             BackgroundColour = Color4.Orange,
                             Action = updateDisplay
                         },
-                        new TourneyButton
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            Text = "Sync",
-                            BackgroundColour = Color4.Orange,
-                            Action = () => {
-                                if (!CurrentMatch.Value.Round.Value.UseBoard.Value)
-                                {
-                                    var overlay = new DialogOverlay();
-                                    overlay.Push(new IPCErrorDialog("Unsupported", "This round isn't set for board layout. Check this in round editor."));
-                                    AddInternal(overlay);
-                                }
-                                else
-                                {
-                                    sceneManager?.SetScreen(new BoardImportScreen());
-                                    sceneManager?.MoveChatTo(new Vector2(175, 150), 500, Easing.OutQuint);
-                                    sceneManager?.ResizeChatTo(new Vector2(350, 450), 500, Easing.OutQuint);
-                                }
-                            },
-                        },
                         new GridContainer
                         {
                             RelativeSizeAxes = Axes.X,
@@ -412,9 +392,22 @@ namespace osu.Game.Tournament.Screens.Board
                                     new TourneyButton
                                     {
                                         RelativeSizeAxes = Axes.X,
-                                        Text = "Reset",
+                                        Text = "Sync",
                                         BackgroundColour = Color4.Orange,
-                                        Action = reset
+                                        Action = () => {
+                                            if (!CurrentMatch.Value.Round.Value.UseBoard.Value)
+                                            {
+                                                var overlay = new DialogOverlay();
+                                                overlay.Push(new IPCErrorDialog("Unsupported", "This round isn't set for board layout. Check this in round editor."));
+                                                AddInternal(overlay);
+                                            }
+                                            else
+                                            {
+                                                sceneManager?.SetScreen(new BoardImportScreen());
+                                                sceneManager?.MoveChatTo(new Vector2(175, 150), 500, Easing.OutQuint);
+                                                sceneManager?.ResizeChatTo(new Vector2(350, 450), 500, Easing.OutQuint);
+                                            }
+                                        },
                                     },
                                     new TourneyButton
                                     {
@@ -422,13 +415,18 @@ namespace osu.Game.Tournament.Screens.Board
                                         Text = "Revert",
                                         BackgroundColour = Color4.DeepPink,
                                         Action = () => {
-                                            dialogOverlay?.Push(new RevertBoardDialog(() =>
+                                            dialogOverlay?.Push(new ResetBoardDialog(
+                                                revertAction: () =>
                                                 {
                                                     // This will manba all elements on this view out of the screen. Don't use this!
                                                     // Expire();
                                                     reset();
                                                     revertSwaps();
                                                     // TODO: Add other helpful actions if possible
+                                                },
+                                                resetAction: () =>
+                                                {
+                                                    reset();
                                                 }));
                                             AddInternal(dialogOverlay);
                                         },

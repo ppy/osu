@@ -18,7 +18,6 @@ namespace osu.Game.Tournament.Components
                 new PopupDialogOkButton
                 {
                     Text = @"Yep, I'll wait.",
-                    Action = () => Expire()
                 }
             };
         }
