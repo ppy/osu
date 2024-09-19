@@ -20,7 +20,7 @@ namespace osu.Game.Tests.Visual.Settings
         {
             Children = new Drawable[]
             {
-                new PopoverContainer()
+                new PopoverContainer
                 {
                     RelativeSizeAxes = Axes.Both,
                     Child = new FillFlowContainer
@@ -73,7 +73,7 @@ namespace osu.Game.Tests.Visual.Settings
             public Bindable<int?> IntTextBoxBindable { get; } = new Bindable<int?>();
 
             [SettingSource("Sample colour", "Change the colour", SettingControlType = typeof(SettingsColour))]
-            public BindableColour4 ColourBindable { get; } = new BindableColour4()
+            public BindableColour4 ColourBindable { get; } = new BindableColour4
             {
                 Default = Colour4.White,
                 Value = Colour4.Red
