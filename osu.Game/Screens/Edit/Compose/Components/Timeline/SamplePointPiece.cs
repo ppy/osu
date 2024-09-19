@@ -41,6 +41,9 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         [Resolved]
         private Editor? editor { get; set; }
 
+        [Resolved]
+        private Timeline? timeline { get; set; }
+
         private Bindable<bool> samplesVisible = null!;
 
         public SamplePointPiece(HitObject hitObject)
@@ -59,6 +62,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         private void load(OsuConfigManager config)
         {
             HitObject.DefaultsApplied += _ => updateText();
+            Label.AllowMultiline = false;
+            LabelContainer.AutoSizeAxes = Axes.None;
             updateText();
 
             if (editor != null)
@@ -73,6 +78,30 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
             samplesVisible.BindValueChanged(visible => this.FadeTo(visible.NewValue ? 1 : 0, 200, Easing.OutQuint));
             this.FadeTo(samplesVisible.Value ? 1 : 0);
+        }
+
+        private float lastZoom;
+        private const float zoom_threshold = 40f;
+
+        protected override void Update()
+        {
+            base.Update();
+
+            // Retract visual state if the timeline is zoomed out too far.
+            if (timeline is null || timeline.Zoom == lastZoom) return;
+
+            lastZoom = timeline.Zoom;
+
+            if (timeline.Zoom < zoom_threshold)
+            {
+                Label.FadeOut(200, Easing.OutQuint);
+                LabelContainer.ResizeWidthTo(16, 200, Easing.OutQuint);
+            }
+            else
+            {
+                Label.FadeIn(200, Easing.OutQuint);
+                LabelContainer.ResizeWidthTo(Label.Width, 200, Easing.OutQuint);
+            }
         }
 
         protected override void Dispose(bool isDisposing)
@@ -100,6 +129,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         private void updateText()
         {
             Label.Text = $"{abbreviateBank(GetBankValue(GetSamples()))} {GetVolumeValue(GetSamples())}";
+            LabelContainer.ResizeWidthTo(Label.Width, 200, Easing.OutQuint);
         }
 
         private static string? abbreviateBank(string? bank)
