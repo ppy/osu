@@ -11,57 +11,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 {
     public static class RhythmEvaluator
     {
-        private struct Island : IEquatable<Island>
-        {
-            private readonly double deltaDifferenceEpsilon;
-
-            public Island(double epsilon)
-            {
-                deltaDifferenceEpsilon = epsilon;
-            }
-
-            public Island(int delta, double epsilon)
-            {
-                deltaDifferenceEpsilon = epsilon;
-                Delta = Math.Max(delta, OsuDifficultyHitObject.MIN_DELTA_TIME);
-            }
-
-            public int Delta { get; private set; }
-            public int DeltaCount { get; private set; }
-
-            public void AddDelta(int delta)
-            {
-                if (Delta == default)
-                    Delta = Math.Max(delta, OsuDifficultyHitObject.MIN_DELTA_TIME);
-
-                DeltaCount++;
-            }
-
-            public bool IsSimilarPolarity(Island other)
-            {
-                // consider islands to be of similar polarity only if they're having the same average delta (we don't want to consider 3 singletaps similar to a triple)
-                return DeltaCount % 2 == other.DeltaCount % 2 &&
-                       Math.Abs(Delta - other.Delta) < deltaDifferenceEpsilon;
-            }
-
-            public override int GetHashCode()
-            {
-                return HashCode.Combine(Delta, DeltaCount);
-            }
-
-            public bool Equals(Island other)
-            {
-                return Math.Abs(Delta - other.Delta) < deltaDifferenceEpsilon &&
-                       DeltaCount == other.DeltaCount;
-            }
-
-            public override bool Equals(object? obj)
-            {
-                return obj?.GetHashCode() == GetHashCode();
-            }
-        }
-
-        private const int history_time_max = 4 * 1000; // 5 seconds of calculatingRhythmBonus max.
+        private const int history_time_max = 4 * 1000; // 4 seconds
         private const int history_objects_max = 24;
         private const double rhythm_overall_multiplier = 1.25;
         private const double rhythm_ratio_multiplier = 11.0;
@@ -101,9 +51,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             {
                 OsuDifficultyHitObject currObj = (OsuDifficultyHitObject)current.Previous(i - 1);
 
-                double currHistoricalDecay = (history_time_max - (current.StartTime - currObj.StartTime)) / history_time_max; // scales note 0 to 1 from history to now
+                // scales note 0 to 1 from history to now
+                double timeDecay = (history_time_max - (current.StartTime - currObj.StartTime)) / history_time_max;
+                double noteDecay = (double)(historicalNoteCount - i) / historicalNoteCount;
 
-                currHistoricalDecay = Math.Min((double)(historicalNoteCount - i) / historicalNoteCount, currHistoricalDecay); // either we're limited by time or limited by object count.
+                double currHistoricalDecay = Math.Min(noteDecay, timeDecay); // either we're limited by time or limited by object count.
 
                 double currDelta = currObj.StrainTime;
                 double prevDelta = prevObj.StrainTime;
@@ -197,5 +149,55 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         }
 
         private static double logistic(double x, double maxValue, double multiplier, double offset) => (maxValue / (1 + Math.Pow(Math.E, offset - (multiplier * x))));
+
+        private struct Island : IEquatable<Island>
+        {
+            private readonly double deltaDifferenceEpsilon;
+
+            public Island(double epsilon)
+            {
+                deltaDifferenceEpsilon = epsilon;
+            }
+
+            public Island(int delta, double epsilon)
+            {
+                deltaDifferenceEpsilon = epsilon;
+                Delta = Math.Max(delta, OsuDifficultyHitObject.MIN_DELTA_TIME);
+            }
+
+            public int Delta { get; private set; }
+            public int DeltaCount { get; private set; }
+
+            public void AddDelta(int delta)
+            {
+                if (Delta == default)
+                    Delta = Math.Max(delta, OsuDifficultyHitObject.MIN_DELTA_TIME);
+
+                DeltaCount++;
+            }
+
+            public bool IsSimilarPolarity(Island other)
+            {
+                // consider islands to be of similar polarity only if they're having the same average delta (we don't want to consider 3 singletaps similar to a triple)
+                return DeltaCount % 2 == other.DeltaCount % 2 &&
+                       Math.Abs(Delta - other.Delta) < deltaDifferenceEpsilon;
+            }
+
+            public override int GetHashCode()
+            {
+                return HashCode.Combine(Delta, DeltaCount);
+            }
+
+            public bool Equals(Island other)
+            {
+                return Math.Abs(Delta - other.Delta) < deltaDifferenceEpsilon &&
+                       DeltaCount == other.DeltaCount;
+            }
+
+            public override bool Equals(object? obj)
+            {
+                return obj?.GetHashCode() == GetHashCode();
+            }
+        }
     }
 }
