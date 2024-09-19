@@ -55,28 +55,13 @@ namespace osu.Game.Screens.Play.HUD.JudgementCounter
             scoreProcessor.OnResetFromReplayFrame += updateAllCounts;
             scoreProcessor.NewJudgement += judgement => updateCount(judgement, false);
             scoreProcessor.JudgementReverted += judgement => updateCount(judgement, true);
-
-            updateAllCounts();
         }
+
+        private bool hasUpdatedCounts;
 
         private void updateAllCounts()
         {
-            // This flow is made to handle cases of watching from the middle of a replay / spectating session.
-            //
-            // Once we get an initial state, we can rely on `NewJudgement` and `JudgementReverted`, so
-            // as a preemptive optimisation, only do a full re-sync if we have all-zero counts.
-            bool hasCounts = false;
-
-            foreach (var r in results)
-            {
-                if (r.Value.ResultCount.Value > 0)
-                {
-                    hasCounts = true;
-                    break;
-                }
-            }
-
-            if (hasCounts)
+            if (hasUpdatedCounts)
                 return;
 
             foreach (var kvp in scoreProcessor.Statistics)
@@ -86,6 +71,8 @@ namespace osu.Game.Screens.Play.HUD.JudgementCounter
 
                 count.ResultCount.Value = kvp.Value;
             }
+
+            hasUpdatedCounts = true;
         }
 
         private void updateCount(JudgementResult judgement, bool revert)
