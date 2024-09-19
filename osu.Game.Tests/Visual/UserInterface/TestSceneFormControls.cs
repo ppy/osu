@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
@@ -67,6 +68,31 @@ namespace osu.Game.Tests.Visual.UserInterface
                             Caption = EditorSetupStrings.LetterboxDuringBreaks,
                             HintText = EditorSetupStrings.LetterboxDuringBreaksDescription,
                             Current = { Disabled = true },
+                        },
+                        new FormSliderBar<float>
+                        {
+                            Caption = "Instantaneous slider",
+                            Current = new BindableFloat
+                            {
+                                MinValue = 0,
+                                MaxValue = 10,
+                                Value = 5,
+                                Precision = 0.1f,
+                            },
+                            TabbableContentContainer = this,
+                        },
+                        new FormSliderBar<float>
+                        {
+                            Caption = "Non-instantaneous slider",
+                            Current = new BindableFloat
+                            {
+                                MinValue = 0,
+                                MaxValue = 10,
+                                Value = 5,
+                                Precision = 0.1f,
+                            },
+                            Instantaneous = false,
+                            TabbableContentContainer = this,
                         },
                     },
                 },
