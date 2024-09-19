@@ -112,7 +112,7 @@ namespace osu.Game.Online.Rooms
         public readonly Bindable<PlaylistAggregateScore> UserScore = new Bindable<PlaylistAggregateScore>();
 
         [JsonProperty("has_password")]
-        public readonly BindableBool HasPassword = new BindableBool();
+        public readonly Bindable<bool> HasPassword = new Bindable<bool>();
 
         [Cached]
         [JsonProperty("recent_participants")]
@@ -145,6 +145,11 @@ namespace osu.Game.Online.Rooms
         }
 
         #endregion
+
+        // Only supports retrieval for now
+        [Cached]
+        [JsonProperty("starts_at")]
+        public readonly Bindable<DateTimeOffset?> StartDate = new Bindable<DateTimeOffset?>();
 
         // Only supports retrieval for now
         [Cached]
@@ -200,9 +205,6 @@ namespace osu.Game.Online.Rooms
             PlaylistItemStats.Value = other.PlaylistItemStats.Value;
             CurrentPlaylistItem.Value = other.CurrentPlaylistItem.Value;
             AutoSkip.Value = other.AutoSkip.Value;
-
-            if (EndDate.Value != null && DateTimeOffset.Now >= EndDate.Value)
-                Status.Value = new RoomStatusEnded();
 
             other.RemoveExpiredPlaylistItems();
 

@@ -56,10 +56,10 @@ namespace osu.Game.Tests.Visual.OnlinePlay
             CacheAs(BeatmapLookupCache);
         }
 
-        public object Get(Type type)
+        public object? Get(Type type)
             => dependencies.Get(type);
 
-        public object Get(Type type, CacheInfo info)
+        public object? Get(Type type, CacheInfo info)
             => dependencies.Get(type, info);
 
         public void Inject<T>(T instance)

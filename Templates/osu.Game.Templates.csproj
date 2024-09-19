@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <PackageType>Template</PackageType>
     <PackageId>ppy.osu.Game.Templates</PackageId>
@@ -8,7 +8,7 @@
     <PackageProjectUrl>https://github.com/ppy/osu/blob/master/Templates</PackageProjectUrl>
     <RepositoryUrl>https://github.com/ppy/osu</RepositoryUrl>
     <PackageReleaseNotes>Automated release.</PackageReleaseNotes>
-    <copyright>Copyright (c) 2022 ppy Pty Ltd</copyright>
+    <copyright>Copyright (c) 2024 ppy Pty Ltd</copyright>
     <Description>Templates to use when creating a ruleset for consumption in osu!.</Description>
     <PackageTags>dotnet-new;templates;osu</PackageTags>
     <TargetFramework>netstandard2.1</TargetFramework>

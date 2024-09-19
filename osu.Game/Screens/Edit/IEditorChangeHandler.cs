@@ -43,5 +43,11 @@ namespace osu.Game.Screens.Edit
         /// Note that this will be a no-op if there is a change in progress via <see cref="BeginChange"/>.
         /// </summary>
         void SaveState();
+
+        /// <summary>
+        /// Restores an older or newer state.
+        /// </summary>
+        /// <param name="direction">The direction to restore in. If less than 0, an older state will be used. If greater than 0, a newer state will be used.</param>
+        void RestoreState(int direction);
     }
 }

@@ -10,7 +10,6 @@ using System.Text.RegularExpressions;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Caching;
-using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
@@ -51,13 +50,12 @@ namespace osu.Game.Rulesets.Osu.Edit
 
         private readonly Bindable<TernaryState> rectangularGridSnapToggle = new Bindable<TernaryState>();
 
+        protected override Drawable CreateHitObjectInspector() => new OsuHitObjectInspector();
+
         protected override IEnumerable<TernaryButton> CreateTernaryButtons()
             => base.CreateTernaryButtons()
-                   .Concat(DistanceSnapProvider.CreateTernaryButtons())
-                   .Concat(new[]
-                   {
-                       new TernaryButton(rectangularGridSnapToggle, "Grid Snap", () => new SpriteIcon { Icon = OsuIcon.EditorGridSnap })
-                   });
+                   .Append(new TernaryButton(rectangularGridSnapToggle, "Grid Snap", () => new SpriteIcon { Icon = OsuIcon.EditorGridSnap }))
+                   .Concat(DistanceSnapProvider.CreateTernaryButtons());
 
         private BindableList<HitObject> selectedHitObjects;
 
@@ -66,13 +64,13 @@ namespace osu.Game.Rulesets.Osu.Edit
         private GridFromPointsTool gridFromPointsTool;
 
         [Cached(typeof(IDistanceSnapProvider))]
-        protected readonly OsuDistanceSnapProvider DistanceSnapProvider = new OsuDistanceSnapProvider();
+        public readonly OsuDistanceSnapProvider DistanceSnapProvider = new OsuDistanceSnapProvider();
 
         [Cached]
         protected readonly OsuGridToolboxGroup OsuGridToolboxGroup = new OsuGridToolboxGroup();
 
         [Cached]
-        protected readonly FreehandSliderToolboxGroup FreehandlSliderToolboxGroup = new FreehandSliderToolboxGroup();
+        protected readonly FreehandSliderToolboxGroup FreehandSliderToolboxGroup = new FreehandSliderToolboxGroup();
 
         [BackgroundDependencyLoader]
         private void load()
@@ -110,11 +108,17 @@ namespace osu.Game.Rulesets.Osu.Edit
                 }
             );
 
-            RightToolbox.AddRange(new EditorToolboxGroup[]
+            RightToolbox.AddRange(new Drawable[]
                 {
                     OsuGridToolboxGroup,
-                    new TransformToolboxGroup { RotationHandler = BlueprintContainer.SelectionHandler.RotationHandler, GridToolbox = OsuGridToolboxGroup },
-                    FreehandlSliderToolboxGroup
+                    new TransformToolboxGroup
+                    {
+                        RotationHandler = BlueprintContainer.SelectionHandler.RotationHandler,
+                        ScaleHandler = (OsuSelectionScaleHandler)BlueprintContainer.SelectionHandler.ScaleHandler,
+                        GridToolbox = OsuGridToolboxGroup,
+                    },
+                    new GenerateToolboxGroup(),
+                    FreehandSliderToolboxGroup
                 }
             );
         }
@@ -153,7 +157,7 @@ namespace osu.Game.Rulesets.Osu.Edit
                     break;
 
                 default:
-                    throw new NotImplementedException($"{OsuGridToolboxGroup.GridType} has an incorrect value.");
+                    throw new ArgumentOutOfRangeException(nameof(OsuGridToolboxGroup.GridType), OsuGridToolboxGroup.GridType, "Unsupported grid type.");
             }
 
             // Bind the start position to the toolbox sliders.
@@ -224,7 +228,7 @@ namespace osu.Game.Rulesets.Osu.Edit
 
         public override SnapResult FindSnappedPositionAndTime(Vector2 screenSpacePosition, SnapType snapType = SnapType.All)
         {
-            if (snapType.HasFlagFast(SnapType.NearbyObjects) && snapToVisibleBlueprints(screenSpacePosition, out var snapResult))
+            if (snapType.HasFlag(SnapType.NearbyObjects) && snapToVisibleBlueprints(screenSpacePosition, out var snapResult))
             {
                 // In the case of snapping to nearby objects, a time value is not provided.
                 // This matches the stable editor (which also uses current time), but with the introduction of time-snapping distance snap
@@ -234,7 +238,7 @@ namespace osu.Game.Rulesets.Osu.Edit
                 // We want to ensure that in this particular case, the time-snapping component of distance snap is still applied.
                 // The easiest way to ensure this is to attempt application of distance snap after a nearby object is found, and copy over
                 // the time value if the proposed positions are roughly the same.
-                if (snapType.HasFlagFast(SnapType.RelativeGrids) && DistanceSnapProvider.DistanceSnapToggle.Value == TernaryState.True && distanceSnapGrid != null)
+                if (snapType.HasFlag(SnapType.RelativeGrids) && DistanceSnapProvider.DistanceSnapToggle.Value == TernaryState.True && distanceSnapGrid != null)
                 {
                     (Vector2 distanceSnappedPosition, double distanceSnappedTime) = distanceSnapGrid.GetSnappedPosition(distanceSnapGrid.ToLocalSpace(snapResult.ScreenSpacePosition));
                     if (Precision.AlmostEquals(distanceSnapGrid.ToScreenSpace(distanceSnappedPosition), snapResult.ScreenSpacePosition, 1))
@@ -246,7 +250,7 @@ namespace osu.Game.Rulesets.Osu.Edit
 
             SnapResult result = base.FindSnappedPositionAndTime(screenSpacePosition, snapType);
 
-            if (snapType.HasFlagFast(SnapType.RelativeGrids))
+            if (snapType.HasFlag(SnapType.RelativeGrids))
             {
                 if (DistanceSnapProvider.DistanceSnapToggle.Value == TernaryState.True && distanceSnapGrid != null)
                 {
@@ -257,7 +261,7 @@ namespace osu.Game.Rulesets.Osu.Edit
                 }
             }
 
-            if (snapType.HasFlagFast(SnapType.GlobalGrids))
+            if (snapType.HasFlag(SnapType.GlobalGrids))
             {
                 if (rectangularGridSnapToggle.Value == TernaryState.True)
                 {
@@ -299,6 +303,12 @@ namespace osu.Game.Rulesets.Osu.Edit
 
                 if (Vector2.Distance(closestSnapPosition, screenSpacePosition) < snapRadius)
                 {
+                    // if the snap target is a stacked object, snap to its unstacked position rather than its stacked position.
+                    // this is intended to make working with stacks easier (because thanks to this, you can drag an object to any
+                    // of the items on the stack to add an object to it, rather than having to drag to the position of the *first* object on it at all times).
+                    if (b.Item is OsuHitObject osuObject && osuObject.StackOffset != Vector2.Zero)
+                        closestSnapPosition = b.ToScreenSpace(b.ToLocalSpace(closestSnapPosition) - osuObject.StackOffset);
+
                     // only return distance portion, since time is not really valid
                     snapResult = new SnapResult(closestSnapPosition, null, playfield);
                     return true;
@@ -394,7 +404,7 @@ namespace osu.Game.Rulesets.Osu.Edit
         /// <returns>The <see cref="OsuDistanceSnapGrid"/> from a selected <see cref="HitObject"/> to a target <see cref="HitObject"/>.</returns>
         private OsuDistanceSnapGrid createGrid(Func<HitObject, bool> sourceSelector, int targetOffset = 1)
         {
-            if (targetOffset < 1) throw new ArgumentOutOfRangeException(nameof(targetOffset));
+            ArgumentOutOfRangeException.ThrowIfNegativeOrZero(targetOffset);
 
             int sourceIndex = -1;
 

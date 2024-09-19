@@ -7,7 +7,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Primitives;
 using osu.Game.Rulesets.Mania.Beatmaps;
@@ -42,7 +41,16 @@ namespace osu.Game.Rulesets.Mania.UI
             }
         }
 
-        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => stages.Any(s => s.ReceivePositionalInputAt(screenSpacePos));
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos)
+        {
+            foreach (var s in stages)
+            {
+                if (s.ReceivePositionalInputAt(screenSpacePos))
+                    return true;
+            }
+
+            return false;
+        }
 
         public ManiaPlayfield(List<StageDefinition> stageDefinitions)
         {
@@ -58,20 +66,19 @@ namespace osu.Game.Rulesets.Mania.UI
                 Content = new[] { new Drawable[stageDefinitions.Count] }
             });
 
-            var normalColumnAction = ManiaAction.Key1;
-            var specialColumnAction = ManiaAction.Special1;
+            var columnAction = ManiaAction.Key1;
             int firstColumnIndex = 0;
 
             for (int i = 0; i < stageDefinitions.Count; i++)
             {
-                var newStage = new Stage(firstColumnIndex, stageDefinitions[i], ref normalColumnAction, ref specialColumnAction);
+                var newStage = new Stage(firstColumnIndex, stageDefinitions[i], ref columnAction);
 
                 playfieldGrid.Content[0][i] = newStage;
 
                 stages.Add(newStage);
                 AddNested(newStage);
 
-                firstColumnIndex += newStage.Columns.Count;
+                firstColumnIndex += newStage.Columns.Length;
             }
         }
 
@@ -125,9 +132,9 @@ namespace osu.Game.Rulesets.Mania.UI
 
             foreach (var stage in stages)
             {
-                if (index >= stage.Columns.Count)
+                if (index >= stage.Columns.Length)
                 {
-                    index -= stage.Columns.Count;
+                    index -= stage.Columns.Length;
                     continue;
                 }
 
@@ -140,7 +147,18 @@ namespace osu.Game.Rulesets.Mania.UI
         /// <summary>
         /// Retrieves the total amount of columns across all stages in this playfield.
         /// </summary>
-        public int TotalColumns => stages.Sum(s => s.Columns.Count);
+        public int TotalColumns
+        {
+            get
+            {
+                int sum = 0;
+
+                foreach (var stage in stages)
+                    sum += stage.Columns.Length;
+
+                return sum;
+            }
+        }
 
         private Stage getStageByColumn(int column)
         {
@@ -148,7 +166,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
             foreach (var stage in stages)
             {
-                sum += stage.Columns.Count;
+                sum += stage.Columns.Length;
                 if (sum > column)
                     return stage;
             }

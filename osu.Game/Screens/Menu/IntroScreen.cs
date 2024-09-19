@@ -90,10 +90,12 @@ namespace osu.Game.Screens.Menu
         /// </summary>
         protected bool UsingThemedIntro { get; private set; }
 
-        protected override BackgroundScreen CreateBackground() => new BackgroundScreenDefault(false)
+        protected override BackgroundScreen CreateBackground() => new BackgroundScreenDefault
         {
             Colour = Color4.Black
         };
+
+        public override bool? AllowGlobalTrackControl => false;
 
         protected IntroScreen([CanBeNull] Func<MainMenu> createNextScreen = null)
         {

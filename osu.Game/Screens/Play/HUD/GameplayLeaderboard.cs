@@ -128,7 +128,7 @@ namespace osu.Game.Screens.Play.HUD
             if (!scroll.IsScrolledToEnd()) fadeBottom -= panel_height;
 
             // logic is mostly shared with Leaderboard, copied here for simplicity.
-            foreach (var c in Flow.Children)
+            foreach (var c in Flow)
             {
                 float topY = c.ToSpaceOfOtherDrawable(Vector2.Zero, Flow).Y;
                 float bottomY = topY + panel_height;

@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Game.Beatmaps;
@@ -29,7 +28,7 @@ namespace osu.Game.Tests.Editing.Checks
         {
             var beatmap = new Beatmap<HitObject>
             {
-                Breaks = new List<BreakPeriod>
+                Breaks =
                 {
                     new BreakPeriod(0, 649)
                 }
@@ -52,7 +51,7 @@ namespace osu.Game.Tests.Editing.Checks
                     new HitCircle { StartTime = 0 },
                     new HitCircle { StartTime = 1_200 }
                 },
-                Breaks = new List<BreakPeriod>
+                Breaks =
                 {
                     new BreakPeriod(100, 751)
                 }
@@ -75,7 +74,7 @@ namespace osu.Game.Tests.Editing.Checks
                     new HitCircle { StartTime = 0 },
                     new HitCircle { StartTime = 1_298 }
                 },
-                Breaks = new List<BreakPeriod>
+                Breaks =
                 {
                     new BreakPeriod(200, 850)
                 }
@@ -98,7 +97,7 @@ namespace osu.Game.Tests.Editing.Checks
                     new HitCircle { StartTime = 0 },
                     new HitCircle { StartTime = 1200 }
                 },
-                Breaks = new List<BreakPeriod>
+                Breaks =
                 {
                     new BreakPeriod(1398, 2300)
                 }
@@ -121,7 +120,7 @@ namespace osu.Game.Tests.Editing.Checks
                     new HitCircle { StartTime = 1100 },
                     new HitCircle { StartTime = 1500 }
                 },
-                Breaks = new List<BreakPeriod>
+                Breaks =
                 {
                     new BreakPeriod(0, 652)
                 }
@@ -145,7 +144,7 @@ namespace osu.Game.Tests.Editing.Checks
                     new HitCircle { StartTime = 1_297 },
                     new HitCircle { StartTime = 1_298 }
                 },
-                Breaks = new List<BreakPeriod>
+                Breaks =
                 {
                     new BreakPeriod(200, 850)
                 }
@@ -168,7 +167,7 @@ namespace osu.Game.Tests.Editing.Checks
                     new HitCircle { StartTime = 0 },
                     new HitCircle { StartTime = 1_300 }
                 },
-                Breaks = new List<BreakPeriod>
+                Breaks =
                 {
                     new BreakPeriod(200, 850)
                 }

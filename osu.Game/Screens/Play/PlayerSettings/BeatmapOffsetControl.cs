@@ -86,7 +86,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
                     new OffsetSliderBar
                     {
                         KeyboardStep = 5,
-                        LabelText = BeatmapOffsetControlStrings.BeatmapOffset,
+                        LabelText = BeatmapOffsetControlStrings.AudioOffsetThisBeatmap,
                         Current = Current,
                     },
                     referenceScoreContainer = new FillFlowContainer
@@ -103,8 +103,6 @@ namespace osu.Game.Screens.Play.PlayerSettings
         protected override void LoadComplete()
         {
             base.LoadComplete();
-
-            ReferenceScore.BindValueChanged(scoreChanged, true);
 
             beatmapOffsetSubscription = realm.SubscribeToPropertyChanged(
                 r => r.Find<BeatmapInfo>(beatmap.Value.BeatmapInfo.ID)?.UserSettings,
@@ -124,6 +122,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
                 });
 
             Current.BindValueChanged(currentChanged);
+            ReferenceScore.BindValueChanged(scoreChanged, true);
         }
 
         private void currentChanged(ValueChangedEvent<double> offset)
@@ -228,7 +227,8 @@ namespace osu.Game.Screens.Play.PlayerSettings
                 useAverageButton = new SettingsButton
                 {
                     Text = BeatmapOffsetControlStrings.CalibrateUsingLastPlay,
-                    Action = () => Current.Value = lastPlayBeatmapOffset - lastPlayAverage
+                    Action = () => Current.Value = lastPlayBeatmapOffset - lastPlayAverage,
+                    Enabled = { Value = !Precision.AlmostEquals(lastPlayAverage, 0, Current.Precision / 2) }
                 },
                 globalOffsetText = new LinkFlowContainer
                 {
@@ -307,7 +307,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
             }
         }
 
-        public partial class OffsetSliderBar : PlayerSliderBar<double>
+        private partial class OffsetSliderBar : PlayerSliderBar<double>
         {
             protected override Drawable CreateControl() => new CustomSliderBar();
 

@@ -4,7 +4,6 @@
 using System;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Effects;
 using osuTK;
 
 namespace osu.Game.Graphics.Containers
@@ -17,19 +16,7 @@ namespace osu.Game.Graphics.Containers
         public Drawable Icon
         {
             get => InternalChild;
-
             set => InternalChild = value;
-        }
-
-        /// <summary>
-        /// Determines an edge effect of this <see cref="Container"/>.
-        /// Edge effects are e.g. glow or a shadow.
-        /// Only has an effect when <see cref="CompositeDrawable.Masking"/> is true.
-        /// </summary>
-        public new EdgeEffectParameters EdgeEffect
-        {
-            get => base.EdgeEffect;
-            set => base.EdgeEffect = value;
         }
 
         protected override void Update()
@@ -48,11 +35,6 @@ namespace osu.Game.Graphics.Containers
                 InternalChild.Anchor = Anchor.Centre;
                 InternalChild.Origin = Anchor.Centre;
             }
-        }
-
-        public ConstrainedIconContainer()
-        {
-            Masking = true;
         }
     }
 }

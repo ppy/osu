@@ -44,22 +44,41 @@ namespace osu.Game.Overlays.Profile.Header.Components
                 Spacing = new Vector2(0, 15),
                 Children = new Drawable[]
                 {
-                    new FillFlowContainer
+                    new GridContainer
                     {
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
-                        Direction = FillDirection.Horizontal,
-                        Spacing = new Vector2(20),
-                        Children = new Drawable[]
+                        ColumnDimensions = new[]
                         {
-                            detailGlobalRank = new ProfileValueDisplay(true)
+                            new Dimension(GridSizeMode.AutoSize),
+                            new Dimension(GridSizeMode.Absolute, 20),
+                            new Dimension(),
+                            new Dimension(GridSizeMode.AutoSize),
+                        },
+                        RowDimensions = new[]
+                        {
+                            new Dimension(GridSizeMode.AutoSize),
+                        },
+                        Content = new[]
+                        {
+                            new[]
                             {
-                                Title = UsersStrings.ShowRankGlobalSimple,
-                            },
-                            detailCountryRank = new ProfileValueDisplay(true)
-                            {
-                                Title = UsersStrings.ShowRankCountrySimple,
-                            },
+                                detailGlobalRank = new ProfileValueDisplay(true)
+                                {
+                                    Title = UsersStrings.ShowRankGlobalSimple,
+                                },
+                                Empty(),
+                                detailCountryRank = new ProfileValueDisplay(true)
+                                {
+                                    Title = UsersStrings.ShowRankCountrySimple,
+                                },
+                                new DailyChallengeStatsDisplay
+                                {
+                                    Anchor = Anchor.TopRight,
+                                    Origin = Anchor.TopRight,
+                                    User = { BindTarget = User },
+                                }
+                            }
                         }
                     },
                     new Container
@@ -143,6 +162,13 @@ namespace osu.Game.Overlays.Profile.Header.Components
                 scoreRankInfo.Value.RankCount = user?.Statistics?.GradesCount[scoreRankInfo.Key] ?? 0;
 
             detailGlobalRank.Content = user?.Statistics?.GlobalRank?.ToLocalisableString("\\##,##0") ?? (LocalisableString)"-";
+
+            var rankHighest = user?.RankHighest;
+
+            detailGlobalRank.ContentTooltipText = rankHighest != null
+                ? UsersStrings.ShowRankHighest(rankHighest.Rank.ToLocalisableString("\\##,##0"), rankHighest.UpdatedAt.ToLocalisableString(@"d MMM yyyy"))
+                : string.Empty;
+
             detailCountryRank.Content = user?.Statistics?.CountryRank?.ToLocalisableString("\\##,##0") ?? (LocalisableString)"-";
 
             rankGraph.Statistics.Value = user?.Statistics;

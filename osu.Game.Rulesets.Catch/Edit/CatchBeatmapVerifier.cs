@@ -13,7 +13,8 @@ namespace osu.Game.Rulesets.Catch.Edit
     {
         private readonly List<ICheck> checks = new List<ICheck>
         {
-            new CheckBananaShowerGap()
+            new CheckBananaShowerGap(),
+            new CheckCatchAbnormalDifficultySettings(),
         };
 
         public IEnumerable<Issue> Run(BeatmapVerifierContext context)

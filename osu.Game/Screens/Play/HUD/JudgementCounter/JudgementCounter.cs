@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -44,14 +45,14 @@ namespace osu.Game.Screens.Play.HUD.JudgementCounter
                     {
                         Alpha = 0,
                         Font = OsuFont.Numeric.With(size: 8),
-                        Text = ruleset.Value.CreateInstance().GetDisplayNameForHitResult(Result.Type)
+                        Text = Result.DisplayName,
                     }
                 }
             };
 
-            var result = Result.Type;
+            var result = Result.Types.First();
 
-            Colour = result.IsBasic() ? colours.ForHitResult(Result.Type) : !result.IsBonus() ? colours.PurpleLight : colours.PurpleLighter;
+            Colour = result.IsBasic() ? colours.ForHitResult(result) : !result.IsBonus() ? colours.PurpleLight : colours.PurpleLighter;
         }
 
         protected override void LoadComplete()

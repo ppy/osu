@@ -394,13 +394,17 @@ namespace osu.Game.Rulesets
         public virtual IRulesetFilterCriteria? CreateRulesetFilterCriteria() => null;
 
         /// <summary>
-        /// Can be overridden to add a ruleset-specific section to the editor beatmap setup screen.
+        /// Can be overridden to add ruleset-specific sections to the editor beatmap setup screen.
         /// </summary>
-        public virtual RulesetSetupSection? CreateEditorSetupSection() => null;
+        public virtual IEnumerable<SetupSection> CreateEditorSetupSections() =>
+        [
+            new DifficultySection(),
+            new ColoursSection(),
+        ];
 
         /// <summary>
-        /// Can be overridden to alter the difficulty section to the editor beatmap setup screen.
+        /// Can be overridden to avoid showing scroll speed changes in the editor.
         /// </summary>
-        public virtual DifficultySection? CreateEditorDifficultySection() => null;
+        public virtual bool EditorShowScrollSpeed => true;
     }
 }

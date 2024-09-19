@@ -61,7 +61,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                     RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]
                     {
-                        thumbnail = new BeatmapCardThumbnail(BeatmapSet)
+                        thumbnail = new BeatmapCardThumbnail(BeatmapSet, BeatmapSet)
                         {
                             Name = @"Left (icon) area",
                             Size = new Vector2(height),
