@@ -3,6 +3,8 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using osu.Framework.Lists;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Objects;
@@ -13,8 +15,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
     {
         private const int history_time_max = 4 * 1000; // 4 seconds
         private const int history_objects_max = 24;
-        private const double rhythm_overall_multiplier = 1.25;
-        private const double rhythm_ratio_multiplier = 11.0;
+        private const double rhythm_overall_multiplier = 1.0;
+        private const double rhythm_ratio_multiplier = 14.0;
 
         /// <summary>
         /// Calculates a rhythm multiplier for the difficulty of the tap associated with historic data of the current <see cref="OsuDifficultyHitObject"/>.
@@ -30,7 +32,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             var island = new Island(deltaDifferenceEpsilon);
             var previousIsland = new Island(deltaDifferenceEpsilon);
-            Dictionary<Island, int> islandCounts = new Dictionary<Island, int>();
+
+            // we can't use dictionary here because we need to compare island with a tolerance
+            // which is impossible to pass into the hash comparer
+            var islandCounts = new List<(Island Island, int Count)>();
 
             double startRatio = 0; // store the ratio of the current start of an island to buff for tighter rhythms
 
@@ -104,15 +109,21 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                         if (island.DeltaCount == 1)
                             effectiveRatio *= 0.7;
 
-                        if (!islandCounts.TryAdd(island, 1))
+                        var islandCount = islandCounts.FirstOrDefault(x => x.Island.Equals(island));
+
+                        if (islandCount != default)
                         {
                             // only add island to island counts if they're going one after another
                             if (previousIsland.Equals(island))
-                                islandCounts[island]++;
+                                islandCount.Count++;
 
                             // repeated island (ex: triplet -> triplet)
                             double power = logistic(island.Delta, 4, 0.165, 10);
-                            effectiveRatio *= Math.Min(3.0 / islandCounts[island], Math.Pow(1.0 / islandCounts[island], power));
+                            effectiveRatio *= Math.Min(3.0 / islandCount.Count, Math.Pow(1.0 / islandCount.Count, power));
+                        }
+                        else
+                        {
+                            islandCounts.Add((island, 1));
                         }
 
                         // scale down the difficulty if the object is doubletappable
@@ -150,7 +161,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
         private static double logistic(double x, double maxValue, double multiplier, double offset) => (maxValue / (1 + Math.Pow(Math.E, offset - (multiplier * x))));
 
-        private struct Island : IEquatable<Island>
+        private class Island : IEquatable<Island>
         {
             private readonly double deltaDifferenceEpsilon;
 
@@ -163,6 +174,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             {
                 deltaDifferenceEpsilon = epsilon;
                 Delta = Math.Max(delta, OsuDifficultyHitObject.MIN_DELTA_TIME);
+                DeltaCount++;
             }
 
             public int Delta { get; private set; }
@@ -188,15 +200,18 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 return HashCode.Combine(Delta, DeltaCount);
             }
 
-            public bool Equals(Island other)
+            public bool Equals(Island? other)
             {
+                if (other == null)
+                    return false;
+
                 return Math.Abs(Delta - other.Delta) < deltaDifferenceEpsilon &&
                        DeltaCount == other.DeltaCount;
             }
 
-            public override bool Equals(object? obj)
+            public override string ToString()
             {
-                return obj?.GetHashCode() == GetHashCode();
+                return $"{Delta}x{DeltaCount}";
             }
         }
     }
