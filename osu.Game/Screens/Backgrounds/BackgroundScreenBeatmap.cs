@@ -8,6 +8,7 @@ using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Sprites;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Graphics.Backgrounds;
@@ -148,6 +149,30 @@ namespace osu.Game.Screens.Backgrounds
 
             public readonly Bindable<bool> StoryboardReplacesBackground = new Bindable<bool>();
 
+            public partial class BeatmapBackgroundSprite : Sprite { }
+
+            public partial class BeatmapBackground : Background {
+                private Background Background;
+
+                public BeatmapBackground(Background background) {
+                    Background = background;
+
+                    Sprite = new BeatmapBackgroundSprite {
+                        RelativeSizeAxes = Axes.Both,
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        FillMode = FillMode.Fill,
+                    };
+                }
+
+                [BackgroundDependencyLoader]
+                private void load()
+                {
+                    if (Background != null)
+                        Sprite.Texture = Background.Sprite.Texture;
+                }
+            }
+
             public Background Background
             {
                 get => background;
@@ -155,14 +180,14 @@ namespace osu.Game.Screens.Backgrounds
                 {
                     background?.Expire();
 
-                    base.Add(background = value);
+                    base.Add(background = new BeatmapBackground(value));
                     background.BlurTo(blurTarget, 0, Easing.OutQuint);
                 }
             }
 
             private Bindable<double> userBlurLevel { get; set; }
 
-            private Background background;
+            private BeatmapBackground background;
 
             public override void Add(Drawable drawable)
             {
