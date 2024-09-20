@@ -70,14 +70,14 @@ namespace osu.Game.Localisation.SkinComponents
         public static LocalisableString ColourDescription => new TranslatableString(getKey(@"colour_description"), @"The colour of the component.");
 
         /// <summary>
-        /// "Font colour"
+        /// "Text colour"
         /// </summary>
-        public static LocalisableString FontColour => new TranslatableString(getKey(@"font_colour"), @"Font colour");
+        public static LocalisableString TextColour => new TranslatableString(getKey(@"text_colour"), @"Text colour");
 
         /// <summary>
-        /// "The colour of the font."
+        /// "The colour of the text."
         /// </summary>
-        public static LocalisableString FontColourDescription => new TranslatableString(getKey(@"font_colour_description"), @"The colour of the font.");
+        public static LocalisableString TextColourDescription => new TranslatableString(getKey(@"text_colour_description"), @"The colour of the text.");
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
