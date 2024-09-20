@@ -20,7 +20,22 @@ namespace osu.Game.Graphics.Backgrounds
     /// </summary>
     public partial class Background : CompositeDrawable, IEquatable<Background>
     {
-        public readonly Sprite Sprite;
+        private Sprite sprite;
+
+        public Sprite Sprite
+        {
+            get => sprite;
+            protected set
+            {
+                if (bufferedContainer == null) {
+                    if (sprite != null)
+                        RemoveInternal(sprite, true);
+                    AddInternal(sprite = value);
+                } else {
+                    bufferedContainer.Child = sprite = value;
+                }
+            }
+        }
 
         private readonly string textureName;
 
@@ -31,13 +46,13 @@ namespace osu.Game.Graphics.Backgrounds
             this.textureName = textureName;
             RelativeSizeAxes = Axes.Both;
 
-            AddInternal(Sprite = new Sprite
+            Sprite = new Sprite
             {
                 RelativeSizeAxes = Axes.Both,
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 FillMode = FillMode.Fill,
-            });
+            };
         }
 
         [BackgroundDependencyLoader]
