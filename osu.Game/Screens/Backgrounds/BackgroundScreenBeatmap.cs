@@ -5,10 +5,13 @@
 
 using System;
 using System.Threading;
+using System.Runtime.InteropServices;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Rendering;
 using osu.Framework.Graphics.Shaders;
+using osu.Framework.Graphics.Shaders.Types;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
@@ -165,6 +168,62 @@ namespace osu.Game.Screens.Backgrounds
                     public BeatmapBackgroundSpriteDrawNode(BeatmapBackgroundSprite source)
                         : base(source)
                     {
+                    }
+
+                    private float DimLevel;
+                    private float DimColour;
+
+                    private IShader textureShader;
+
+                    public override void ApplyState()
+                    {
+                        base.ApplyState();
+
+                        DimLevel = 0.5f;
+                        DimColour = 1.0f;
+
+                        textureShader = Source.TextureShader;
+                    }
+
+                    private IUniformBuffer<BeatmapBackgroundParameters> beatmapBackgroundParametersBuffer;
+
+                    private void BindParametersBuffer(IRenderer renderer)
+                    {
+                        beatmapBackgroundParametersBuffer ??= renderer.CreateUniformBuffer<BeatmapBackgroundParameters>();
+
+                        beatmapBackgroundParametersBuffer.Data = beatmapBackgroundParametersBuffer.Data with
+                        {
+                            DimLevel = DimLevel,
+                            DimColour = DimColour,
+                        };
+
+                        textureShader.BindUniformBlock("m_BeatmapBackgroundParameters", beatmapBackgroundParametersBuffer);
+                    }
+
+                    protected override void Draw(IRenderer renderer)
+                    {
+                        BindParametersBuffer(renderer);
+                        base.Draw(renderer);
+                    }
+
+                    protected override void DrawOpaqueInterior(IRenderer renderer)
+                    {
+                        BindParametersBuffer(renderer);
+                        base.DrawOpaqueInterior(renderer);
+                    }
+
+                    protected override void Dispose(bool isDisposing)
+                    {
+                        base.Dispose(isDisposing);
+                        beatmapBackgroundParametersBuffer?.Dispose();
+                    }
+
+                    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+                    private record struct BeatmapBackgroundParameters
+                    {
+                        public UniformFloat DimLevel;
+                        public UniformFloat DimColour;
+                        private readonly UniformPadding8 pad1;
                     }
                 }
             }
