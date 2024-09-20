@@ -8,6 +8,7 @@ using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Shaders;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
@@ -149,7 +150,13 @@ namespace osu.Game.Screens.Backgrounds
 
             public readonly Bindable<bool> StoryboardReplacesBackground = new Bindable<bool>();
 
-            public partial class BeatmapBackgroundSprite : Sprite { }
+            public partial class BeatmapBackgroundSprite : Sprite {
+                [BackgroundDependencyLoader]
+                private void load(ShaderManager shaders)
+                {
+                    TextureShader = shaders.Load(VertexShaderDescriptor.TEXTURE_2, "BeatmapBackground");
+                }
+            }
 
             public partial class BeatmapBackground : Background {
                 private Background Background;
