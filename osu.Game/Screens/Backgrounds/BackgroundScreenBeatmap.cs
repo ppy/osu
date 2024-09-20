@@ -156,6 +156,17 @@ namespace osu.Game.Screens.Backgrounds
                 {
                     TextureShader = shaders.Load(VertexShaderDescriptor.TEXTURE_2, "BeatmapBackground");
                 }
+
+                protected override DrawNode CreateDrawNode() => new BeatmapBackgroundSpriteDrawNode(this);
+
+                public class BeatmapBackgroundSpriteDrawNode : SpriteDrawNode {
+                    public new BeatmapBackgroundSprite Source => (BeatmapBackgroundSprite)base.Source;
+
+                    public BeatmapBackgroundSpriteDrawNode(BeatmapBackgroundSprite source)
+                        : base(source)
+                    {
+                    }
+                }
             }
 
             public partial class BeatmapBackground : Background {
