@@ -49,6 +49,11 @@ namespace osu.Game.Rulesets.Osu.UI
                 Overlays.Add(analysisOverlay.CreateProxy().With(p => p.Depth = float.NegativeInfinity));
                 replayPlayer.AddSettings(new ReplayAnalysisSettings(Config));
 
+                ReplayReadCoords readCoords;
+                PlayfieldAdjustmentContainer.Add(readCoords = new ReplayReadCoords(replayPlayer.Score.Replay));
+                Overlays.Add(readCoords.CreateProxy().With(p => p.Depth = float.NegativeInfinity));
+                replayPlayer.AddSettings(new ReplayShowCoords(Config));
+
                 cursorHideEnabled = Config.GetBindable<bool>(OsuRulesetSetting.ReplayCursorHideEnabled);
 
                 // I have little faith in this working (other things touch cursor visibility) but haven't broken it yet.
