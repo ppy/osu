@@ -154,6 +154,9 @@ namespace osu.Game.Screens.Backgrounds
             public readonly Bindable<bool> StoryboardReplacesBackground = new Bindable<bool>();
 
             public partial class BeatmapBackgroundSprite : Sprite {
+                public float DimLevel;
+                public float DimColour;
+
                 [BackgroundDependencyLoader]
                 private void load(ShaderManager shaders)
                 {
@@ -179,8 +182,8 @@ namespace osu.Game.Screens.Backgrounds
                     {
                         base.ApplyState();
 
-                        DimLevel = 0.5f;
-                        DimColour = 1.0f;
+                        DimLevel = Source.DimLevel;
+                        DimColour = Source.DimColour;
 
                         textureShader = Source.TextureShader;
                     }
@@ -230,6 +233,31 @@ namespace osu.Game.Screens.Backgrounds
 
             public partial class BeatmapBackground : Background {
                 private Background Background;
+
+                private float dimLevel;
+                private float dimColour;
+
+                public float DimLevel {
+                    get => dimLevel;
+                    set {
+                        dimLevel = value;
+                        BeatmapBackgroundSprite sprite = (BeatmapBackgroundSprite)Sprite;
+                        sprite.DimLevel = dimLevel;
+
+                        bufferedContainer?.ForceRedraw();
+                    }
+                }
+
+                public float DimColour {
+                    get => dimColour;
+                    set {
+                        dimColour = value;
+                        BeatmapBackgroundSprite sprite = (BeatmapBackgroundSprite)Sprite;
+                        sprite.DimColour = dimColour;
+
+                        bufferedContainer?.ForceRedraw();
+                    }
+                }
 
                 public BeatmapBackground(Background background) {
                     Background = background;
@@ -296,6 +324,11 @@ namespace osu.Game.Screens.Backgrounds
                 userBlurLevel.ValueChanged += _ => UpdateVisuals();
                 BlurAmount.ValueChanged += _ => UpdateVisuals();
                 StoryboardReplacesBackground.ValueChanged += _ => UpdateVisuals();
+
+                if (background != null) {
+                    background.DimLevel = DimLevel;
+                    background.DimColour = 0.0f;
+                }
             }
 
             protected override float DimLevel
@@ -311,7 +344,10 @@ namespace osu.Game.Screens.Backgrounds
 
             protected override void UpdateVisuals()
             {
-                base.UpdateVisuals();
+                ContentDisplayed = ShowDimContent;
+
+                Content.FadeTo(ContentDisplayed ? 1 : 0, BACKGROUND_FADE_DURATION, Easing.OutQuint);
+                background?.TransformTo(nameof(BeatmapBackground.DimLevel), DimLevel, BACKGROUND_FADE_DURATION, Easing.OutQuint);
 
                 Background?.BlurTo(blurTarget, BACKGROUND_FADE_DURATION, Easing.OutQuint);
             }
