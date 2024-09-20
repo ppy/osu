@@ -21,15 +21,15 @@ namespace osu.Game.Skinning
         [SettingSource(typeof(SkinnableComponentStrings), nameof(SkinnableComponentStrings.Font), nameof(SkinnableComponentStrings.FontDescription))]
         public Bindable<Typeface> Font { get; } = new Bindable<Typeface>(Typeface.Torus);
 
-        [SettingSource(typeof(SkinnableComponentStrings), nameof(SkinnableComponentStrings.FontColour), nameof(SkinnableComponentStrings.FontColourDescription))]
-        public BindableColour4 FontColour { get; } = new BindableColour4(Colour4.White);
+        [SettingSource(typeof(SkinnableComponentStrings), nameof(SkinnableComponentStrings.TextColour), nameof(SkinnableComponentStrings.TextColourDescription))]
+        public BindableColour4 TextColour { get; } = new BindableColour4(Colour4.White);
 
         /// <summary>
         /// Implement to apply the user font selection to one or more components.
         /// </summary>
         protected abstract void SetFont(FontUsage font);
 
-        protected abstract void SetFontColour(Colour4 fontColour);
+        protected abstract void SetTextColour(Colour4 textColour);
 
         protected override void LoadComplete()
         {
@@ -44,7 +44,7 @@ namespace osu.Game.Skinning
                 SetFont(f);
             }, true);
 
-            FontColour.BindValueChanged(e => SetFontColour(e.NewValue), true);
+            TextColour.BindValueChanged(e => SetTextColour(e.NewValue), true);
         }
     }
 }
