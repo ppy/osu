@@ -291,6 +291,7 @@ namespace osu.Game.Screens.Backgrounds
             }
 
             private Bindable<double> userBlurLevel { get; set; }
+            private Bindable<double> userDimColour { get; set; }
 
             private BeatmapBackground background;
 
@@ -315,6 +316,7 @@ namespace osu.Game.Screens.Backgrounds
             private void load(OsuConfigManager config)
             {
                 userBlurLevel = config.GetBindable<double>(OsuSetting.BlurLevel);
+                userDimColour = config.GetBindable<double>(OsuSetting.DimColour);
             }
 
             protected override void LoadComplete()
@@ -322,12 +324,13 @@ namespace osu.Game.Screens.Backgrounds
                 base.LoadComplete();
 
                 userBlurLevel.ValueChanged += _ => UpdateVisuals();
+                userDimColour.ValueChanged += _ => UpdateVisuals();
                 BlurAmount.ValueChanged += _ => UpdateVisuals();
                 StoryboardReplacesBackground.ValueChanged += _ => UpdateVisuals();
 
                 if (background != null) {
                     background.DimLevel = DimLevel;
-                    background.DimColour = 0.0f;
+                    background.DimColour = DimColour;
                 }
             }
 
@@ -342,12 +345,16 @@ namespace osu.Game.Screens.Backgrounds
                 }
             }
 
+            protected virtual float DimColour => (float)userDimColour.Value;
+
             protected override void UpdateVisuals()
             {
                 ContentDisplayed = ShowDimContent;
 
                 Content.FadeTo(ContentDisplayed ? 1 : 0, BACKGROUND_FADE_DURATION, Easing.OutQuint);
                 background?.TransformTo(nameof(BeatmapBackground.DimLevel), DimLevel, BACKGROUND_FADE_DURATION, Easing.OutQuint);
+
+                background?.TransformTo(nameof(BeatmapBackground.DimColour), DimColour, BACKGROUND_FADE_DURATION, Easing.OutQuint);
 
                 Background?.BlurTo(blurTarget, BACKGROUND_FADE_DURATION, Easing.OutQuint);
             }
