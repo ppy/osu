@@ -31,7 +31,7 @@ namespace osu.Game.Screens.Play.HUD
         public Bindable<bool> ShowTime { get; } = new BindableBool(true);
 
         [SettingSource(typeof(SkinnableComponentStrings), nameof(SkinnableComponentStrings.Colour), nameof(SkinnableComponentStrings.ColourDescription))]
-        public new BindableColour4 Colour { get; } = new BindableColour4(Colour4.White);
+        public BindableColour4 AccentColour { get; } = new BindableColour4(Colour4.White);
 
         [Resolved]
         private Player? player { get; set; }
@@ -118,7 +118,7 @@ namespace osu.Game.Screens.Play.HUD
             base.Update();
             content.Height = bar.Height + bar_height + info.Height;
             graphContainer.Height = bar.Height;
-            base.Colour = Colour.Value;
+            Colour = AccentColour.Value;
         }
 
         protected override void UpdateProgress(double progress, bool isIntro)

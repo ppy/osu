@@ -28,7 +28,7 @@ namespace osu.Game.Skinning.Components
         };
 
         [SettingSource(typeof(SkinnableComponentStrings), nameof(SkinnableComponentStrings.Colour), nameof(SkinnableComponentStrings.ColourDescription))]
-        public new BindableColour4 Colour { get; } = new BindableColour4(Colour4.White);
+        public BindableColour4 AccentColour { get; } = new BindableColour4(Colour4.White);
 
         public BoxElement()
         {
@@ -51,7 +51,7 @@ namespace osu.Game.Skinning.Components
             base.Update();
 
             base.CornerRadius = CornerRadius.Value * Math.Min(DrawWidth, DrawHeight);
-            base.Colour = Colour.Value;
+            Colour = AccentColour.Value;
         }
     }
 }

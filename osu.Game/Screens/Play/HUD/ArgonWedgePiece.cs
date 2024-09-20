@@ -23,7 +23,7 @@ namespace osu.Game.Screens.Play.HUD
         public BindableBool InvertShear { get; } = new BindableBool();
 
         [SettingSource(typeof(SkinnableComponentStrings), nameof(SkinnableComponentStrings.Colour), nameof(SkinnableComponentStrings.ColourDescription))]
-        public new BindableColour4 Colour { get; } = new BindableColour4(Color4Extensions.FromHex("#66CCFF"));
+        public BindableColour4 AccentColour { get; } = new BindableColour4(Color4Extensions.FromHex("#66CCFF"));
 
         public ArgonWedgePiece()
         {
@@ -41,7 +41,7 @@ namespace osu.Game.Screens.Play.HUD
             InternalChild = new Box
             {
                 RelativeSizeAxes = Axes.Both,
-                Colour = ColourInfo.GradientVertical(Colour.Value.Opacity(0.0f), Colour.Value.Opacity(0.25f)),
+                Colour = ColourInfo.GradientVertical(AccentColour.Value.Opacity(0.0f), AccentColour.Value.Opacity(0.25f)),
             };
         }
 
@@ -50,7 +50,7 @@ namespace osu.Game.Screens.Play.HUD
             base.LoadComplete();
 
             InvertShear.BindValueChanged(v => Shear = new Vector2(0.8f, 0f) * (v.NewValue ? -1 : 1), true);
-            Colour.BindValueChanged(c => InternalChild.Colour = ColourInfo.GradientVertical(Colour.Value.Opacity(0.0f), Colour.Value.Opacity(0.25f)));
+            AccentColour.BindValueChanged(c => InternalChild.Colour = ColourInfo.GradientVertical(AccentColour.Value.Opacity(0.0f), AccentColour.Value.Opacity(0.25f)));
         }
     }
 }
