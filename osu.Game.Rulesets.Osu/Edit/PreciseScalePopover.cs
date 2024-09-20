@@ -10,7 +10,10 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
+using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.UI;
+using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Components.RadioButtons;
 using osuTK;
 
@@ -35,6 +38,8 @@ namespace osu.Game.Rulesets.Osu.Edit
         private OsuCheckbox xCheckBox = null!;
         private OsuCheckbox yCheckBox = null!;
 
+        private BindableList<HitObject> selectedItems { get; } = new BindableList<HitObject>();
+
         public PreciseScalePopover(OsuSelectionScaleHandler scaleHandler, OsuGridToolboxGroup gridToolbox)
         {
             this.scaleHandler = scaleHandler;
@@ -44,8 +49,10 @@ namespace osu.Game.Rulesets.Osu.Edit
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(EditorBeatmap editorBeatmap)
         {
+            selectedItems.BindTo(editorBeatmap.SelectedHitObjects);
+
             Child = new FillFlowContainer
             {
                 Width = 220,
@@ -196,6 +203,7 @@ namespace osu.Game.Rulesets.Osu.Edit
             {
                 ScaleOrigin.GridCentre => gridToolbox.StartPosition.Value,
                 ScaleOrigin.PlayfieldCentre => OsuPlayfield.BASE_SIZE / 2,
+                ScaleOrigin.SelectionCentre when selectedItems.Count == 1 && selectedItems.First() is Slider slider => slider.Position,
                 ScaleOrigin.SelectionCentre => null,
                 _ => throw new ArgumentOutOfRangeException(nameof(scale))
             };
