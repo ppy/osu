@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Graphics;
@@ -19,14 +17,14 @@ namespace osu.Game.Tests.Visual.UserInterface
 {
     public partial class TestSceneSettingsColour : OsuManualInputManagerTestScene
     {
-        private SettingsColour component;
+        private SettingsColour? component;
 
         [Test]
         public void TestColour()
         {
             createContent();
 
-            AddRepeatStep("set random colour", () => component.Current.Value = randomColour(), 4);
+            AddRepeatStep("set random colour", () => component!.Current.Value = randomColour(), 4);
         }
 
         [Test]
@@ -36,7 +34,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             AddStep("click colour", () =>
             {
-                InputManager.MoveMouseTo(component);
+                InputManager.MoveMouseTo(component!);
                 InputManager.Click(MouseButton.Left);
             });
 
