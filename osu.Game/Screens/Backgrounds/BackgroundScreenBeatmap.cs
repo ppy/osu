@@ -196,8 +196,8 @@ namespace osu.Game.Screens.Backgrounds
 
                         beatmapBackgroundParametersBuffer.Data = beatmapBackgroundParametersBuffer.Data with
                         {
+                            DimColour = new Vector4(DimColour, DimColour, DimColour, 1.0f),
                             DimLevel = DimLevel,
-                            DimColour = DimColour,
                         };
 
                         textureShader.BindUniformBlock("m_BeatmapBackgroundParameters", beatmapBackgroundParametersBuffer);
@@ -224,9 +224,9 @@ namespace osu.Game.Screens.Backgrounds
                     [StructLayout(LayoutKind.Sequential, Pack = 1)]
                     private record struct BeatmapBackgroundParameters
                     {
+                        public UniformVector4 DimColour;
                         public UniformFloat DimLevel;
-                        public UniformFloat DimColour;
-                        private readonly UniformPadding8 pad1;
+                        private readonly UniformPadding12 pad1;
                     }
                 }
             }
