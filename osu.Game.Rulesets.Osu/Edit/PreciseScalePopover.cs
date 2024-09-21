@@ -189,6 +189,16 @@ namespace osu.Game.Rulesets.Osu.Edit
                 scale.Y = max_scale;
 
             scaleInputBindable.MaxValue = MathF.Max(1, MathF.Min(scale.X, scale.Y));
+
+            const float min_scale = -10;
+            scale = scaleHandler.ClampScaleToPlayfieldBounds(new Vector2(min_scale), getOriginPosition(scaleInfo.Value), getAdjustAxis(scaleInfo.Value), getRotation(scaleInfo.Value));
+
+            if (!scaleInfo.Value.XAxis)
+                scale.X = max_scale;
+            if (!scaleInfo.Value.YAxis)
+                scale.Y = max_scale;
+
+            scaleInputBindable.MinValue = MathF.Min(-1, MathF.Max(scale.X, scale.Y));
         }
 
         private void setOrigin(ScaleOrigin origin)
