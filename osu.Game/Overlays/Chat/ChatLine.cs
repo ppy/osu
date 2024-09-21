@@ -105,6 +105,8 @@ namespace osu.Game.Overlays.Chat
             }
         }
 
+        public bool IsBackgroundInverted;
+
         public bool IsStrong;
 
         private bool isMention;
@@ -197,7 +199,7 @@ namespace osu.Game.Overlays.Chat
                                 Anchor = Anchor.TopRight,
                                 Margin = new MarginPadding { Horizontal = Spacing },
                                 AccentColour = UsernameColour,
-                                Inverted = !string.IsNullOrEmpty(message.Sender.Colour),
+                                Inverted = IsBackgroundInverted || !string.IsNullOrEmpty(message.Sender.Colour),
                             },
                             drawableContentFlow = new LinkFlowContainer(styleMessageContent)
                             {

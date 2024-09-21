@@ -86,13 +86,14 @@ namespace osu.Game.Tournament.Components
         {
             var currentMatch = ladderInfo.CurrentMatch;
             bool isCommand = false;
+            bool isRef = false;
 
             // Try to recognize and verify bot commands
             if (currentMatch.Value?.Round.Value != null)
             {
                 isCommand = message.Content.StartsWith("[*]", StringComparison.Ordinal);
 
-                bool isRef = currentMatch.Value.Round.Value.Referees.Any(p => p.OnlineID == message.SenderId);
+                isRef = currentMatch.Value.Round.Value.Referees.Any(p => p.OnlineID == message.SenderId);
 
                 // Automatically block duplicate messages, since we have multiple chat displays available.
                 if ((isRef || currentMatch.Value.Round.Value.TrustAll.Value)
@@ -102,7 +103,10 @@ namespace osu.Game.Tournament.Components
                 }
             }
 
-            return new MatchMessage(message, ladderInfo, isCommand);
+            return new MatchMessage(message, ladderInfo, isCommand)
+            {
+                IsBackgroundInverted = isRef,
+            };
         }
 
         protected override StandAloneDrawableChannel CreateDrawableChannel(Channel channel) => new MatchChannel(channel);
