@@ -36,7 +36,6 @@ using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Scoring;
 using osu.Game.Scoring.Legacy;
 using osu.Game.Screens.Play.HUD;
-using osu.Game.Screens.Play.PlayerSettings;
 using osu.Game.Screens.Ranking;
 using osu.Game.Skinning;
 using osu.Game.Users;
@@ -171,16 +170,6 @@ namespace osu.Game.Screens.Play
         {
             Configuration = configuration ?? new PlayerConfiguration();
         }
-
-        /// <summary>
-        /// Add a settings group to the HUD overlay. Intended to be used by rulesets to add replay/spectate-specific settings.
-        /// </summary>
-        /// <param name="settings">The settings group to be shown.</param>
-        public void AddSettings(PlayerSettingsGroup settings) => Schedule(() =>
-        {
-            settings.Expanded.Value = false;
-            HUDOverlay.PlayerSettingsOverlay.Add(settings);
-        });
 
         private ScreenSuspensionHandler screenSuspension;
 
@@ -1291,5 +1280,15 @@ namespace osu.Game.Screens.Play
         IBindable<bool> ISamplePlaybackDisabler.SamplePlaybackDisabled => samplePlaybackDisabled;
 
         IBindable<bool> ILocalUserPlayInfo.IsPlaying => LocalUserPlaying;
+
+        /// <summary>
+        /// Create and add <see cref="ReplayAnalysisSettings"/> to settings overlay.
+        /// </summary>
+        protected void AddReplayAnalysisSettings()
+        {
+            var replayAnalysisSettings = DrawableRuleset.Ruleset.CreateReplayAnalysisSettings();
+            if (replayAnalysisSettings is not null)
+                HUDOverlay.PlayerSettingsOverlay.Add(replayAnalysisSettings);
+        }
     }
 }

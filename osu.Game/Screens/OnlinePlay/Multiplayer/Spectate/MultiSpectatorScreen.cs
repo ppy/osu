@@ -15,7 +15,6 @@ using osu.Game.Online.Rooms;
 using osu.Game.Online.Spectator;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Play.HUD;
-using osu.Game.Screens.Play.PlayerSettings;
 using osu.Game.Screens.Spectate;
 using osu.Game.Users;
 using osuTK;
@@ -25,7 +24,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
     /// <summary>
     /// A <see cref="SpectatorScreen"/> that spectates multiple users in a match.
     /// </summary>
-    [Cached]
     public partial class MultiSpectatorScreen : SpectatorScreen
     {
         // Isolates beatmap/ruleset to this screen.
@@ -40,9 +38,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         /// Whether all spectating players have finished loading.
         /// </summary>
         public bool AllPlayersLoaded => instances.All(p => p.PlayerLoaded);
-
-        public bool SettingsAdded { get; private set; }
-        private readonly object settingsAddedLock = new object();
 
         protected override UserActivity InitialActivity => new UserActivity.SpectatingMultiplayerGame(Beatmap.Value.BeatmapInfo, Ruleset.Value);
 
@@ -77,30 +72,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             this.users = users;
 
             instances = new PlayerArea[Users.Count];
-        }
-
-        /// <summary>
-        /// Add a settings group to the bottom of the side container. Intended to be used by rulesets to add spectate-specific settings.
-        /// </summary>
-        /// <param name="createSettings">A function that returns the settings group to be shown.</param>
-        public void AddSettings(Func<PlayerSettingsGroup> createSettings)
-        {
-            // This function may be called by multiple drawable rulesets loading at the same time
-            // Without the lock, duplicate setting containers may be added
-            lock (settingsAddedLock)
-            {
-                if (SettingsAdded)
-                    return;
-
-                SettingsAdded = true;
-            }
-
-            Schedule(() =>
-            {
-                var settings = createSettings();
-                settings.Expanded.Value = false;
-                leaderboardFlow.Insert(2, settings);
-            });
         }
 
         [BackgroundDependencyLoader]
@@ -185,6 +156,10 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             {
                 Expanded = { Value = true },
             }, chat => leaderboardFlow.Insert(1, chat));
+
+            var replayAnalysisSettings = Ruleset.Value.CreateInstance().CreateReplayAnalysisSettings();
+            if (replayAnalysisSettings is not null)
+                leaderboardFlow.Insert(2, replayAnalysisSettings);
         }
 
         protected override void LoadComplete()

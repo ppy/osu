@@ -361,5 +361,12 @@ namespace osu.Game.Rulesets.Osu
         }
 
         public override bool EditorShowScrollSpeed => false;
+
+        public override ReplayAnalysisSettings CreateReplayAnalysisSettings()
+        {
+            var settings = new OsuReplayAnalysisSettings(this);
+            settings.Expanded.Value = false;
+            return settings;
+        }
     }
 }
