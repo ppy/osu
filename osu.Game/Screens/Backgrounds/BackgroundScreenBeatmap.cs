@@ -202,7 +202,8 @@ namespace osu.Game.Screens.Backgrounds
                 BlurAmount.ValueChanged += _ => UpdateVisuals();
                 StoryboardReplacesBackground.ValueChanged += _ => UpdateVisuals();
 
-                if (background != null) {
+                if (background != null)
+                {
                     background.DimLevel = DimLevel;
                     background.DimColour = DimColour;
                 }

@@ -3,18 +3,13 @@
 
 #nullable disable
 
-using System;
-using System.Diagnostics;
 using System.Runtime.InteropServices;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Rendering;
 using osu.Framework.Graphics.Shaders;
 using osu.Framework.Graphics.Shaders.Types;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Textures;
-using osu.Framework.Graphics.Transforms;
 using osu.Game.Beatmaps;
 using osuTK;
 using osuTK.Graphics;
@@ -24,34 +19,41 @@ namespace osu.Game.Graphics.Backgrounds
     /// <summary>
     /// A background which offers dimming using a custom shader with ability to change dim colour.
     /// </summary>
-    public partial class DimmableBeatmapBackground : BeatmapBackground {
+    public partial class DimmableBeatmapBackground : BeatmapBackground
+    {
         private float dimLevel;
         private Color4 dimColour;
 
-        public float DimLevel {
+        public float DimLevel
+        {
             get => dimLevel;
-            set {
+            set
+            {
                 dimLevel = value;
                 DimmableBeatmapBackgroundSprite sprite = (DimmableBeatmapBackgroundSprite)Sprite;
                 sprite.DimLevel = dimLevel;
 
-                bufferedContainer?.ForceRedraw();
+                BufferedContainer?.ForceRedraw();
             }
         }
 
-        public Color4 DimColour {
+        public Color4 DimColour
+        {
             get => dimColour;
-            set {
+            set
+            {
                 dimColour = value;
                 DimmableBeatmapBackgroundSprite sprite = (DimmableBeatmapBackgroundSprite)Sprite;
                 sprite.DimColour = dimColour;
 
-                bufferedContainer?.ForceRedraw();
+                BufferedContainer?.ForceRedraw();
             }
         }
 
-        public DimmableBeatmapBackground(WorkingBeatmap beatmap, string fallbackTextureName = @"Backgrounds/bg1") : base(beatmap, fallbackTextureName) {
-            Sprite = new DimmableBeatmapBackgroundSprite {
+        public DimmableBeatmapBackground(WorkingBeatmap beatmap, string fallbackTextureName = @"Backgrounds/bg1") : base(beatmap, fallbackTextureName)
+        {
+            Sprite = new DimmableBeatmapBackgroundSprite
+            {
                 RelativeSizeAxes = Axes.Both,
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
@@ -59,21 +61,26 @@ namespace osu.Game.Graphics.Backgrounds
             };
         }
 
-        public partial class DimmableBeatmapBackgroundSprite : Sprite {
+        public partial class DimmableBeatmapBackgroundSprite : Sprite
+        {
             private float dimLevel;
             private Color4 dimColour;
 
-            public float DimLevel {
+            public float DimLevel
+            {
                 get => dimLevel;
-                set {
+                set
+                {
                     dimLevel = value;
                     Invalidate(Invalidation.DrawNode);
                 }
             }
 
-            public Color4 DimColour {
+            public Color4 DimColour
+            {
                 get => dimColour;
-                set {
+                set
+                {
                     dimColour = value;
                     Invalidate(Invalidation.DrawNode);
                 }
@@ -87,7 +94,8 @@ namespace osu.Game.Graphics.Backgrounds
 
             protected override DrawNode CreateDrawNode() => new DimmableBeatmapBackgroundSpriteDrawNode(this);
 
-            public class DimmableBeatmapBackgroundSpriteDrawNode : SpriteDrawNode {
+            public class DimmableBeatmapBackgroundSpriteDrawNode : SpriteDrawNode
+            {
                 public new DimmableBeatmapBackgroundSprite Source => (DimmableBeatmapBackgroundSprite)base.Source;
 
                 public DimmableBeatmapBackgroundSpriteDrawNode(DimmableBeatmapBackgroundSprite source)
@@ -95,8 +103,8 @@ namespace osu.Game.Graphics.Backgrounds
                 {
                 }
 
-                private float DimLevel;
-                private Color4 DimColour;
+                private float dimLevel;
+                private Color4 dimColour;
 
                 private IShader textureShader;
 
@@ -104,22 +112,22 @@ namespace osu.Game.Graphics.Backgrounds
                 {
                     base.ApplyState();
 
-                    DimLevel = Source.DimLevel;
-                    DimColour = Source.DimColour;
+                    dimLevel = Source.DimLevel;
+                    dimColour = Source.DimColour;
 
                     textureShader = Source.TextureShader;
                 }
 
                 private IUniformBuffer<DimmableBeatmapBackgroundParameters> dimmableBeatmapBackgroundParametersBuffer;
 
-                private void BindParametersBuffer(IRenderer renderer)
+                private void bindParametersBuffer(IRenderer renderer)
                 {
                     dimmableBeatmapBackgroundParametersBuffer ??= renderer.CreateUniformBuffer<DimmableBeatmapBackgroundParameters>();
 
                     dimmableBeatmapBackgroundParametersBuffer.Data = dimmableBeatmapBackgroundParametersBuffer.Data with
                     {
-                        DimColour = new Vector4(DimColour.R, DimColour.G, DimColour.B, DimColour.A),
-                        DimLevel = DimLevel,
+                        DimColour = new Vector4(dimColour.R, dimColour.G, dimColour.B, dimColour.A),
+                        DimLevel = dimLevel,
                     };
 
                     textureShader.BindUniformBlock("m_DimmableBeatmapBackgroundParameters", dimmableBeatmapBackgroundParametersBuffer);
@@ -127,13 +135,13 @@ namespace osu.Game.Graphics.Backgrounds
 
                 protected override void Draw(IRenderer renderer)
                 {
-                    BindParametersBuffer(renderer);
+                    bindParametersBuffer(renderer);
                     base.Draw(renderer);
                 }
 
                 protected override void DrawOpaqueInterior(IRenderer renderer)
                 {
-                    BindParametersBuffer(renderer);
+                    bindParametersBuffer(renderer);
                     base.DrawOpaqueInterior(renderer);
                 }
 
