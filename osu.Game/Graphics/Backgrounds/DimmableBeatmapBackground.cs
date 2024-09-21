@@ -60,8 +60,24 @@ namespace osu.Game.Graphics.Backgrounds
         }
 
         public partial class DimmableBeatmapBackgroundSprite : Sprite {
-            public float DimLevel;
-            public Color4 DimColour;
+            private float dimLevel;
+            private Color4 dimColour;
+
+            public float DimLevel {
+                get => dimLevel;
+                set {
+                    dimLevel = value;
+                    Invalidate(Invalidation.DrawNode);
+                }
+            }
+
+            public Color4 DimColour {
+                get => dimColour;
+                set {
+                    dimColour = value;
+                    Invalidate(Invalidation.DrawNode);
+                }
+            }
 
             [BackgroundDependencyLoader]
             private void load(ShaderManager shaders)
