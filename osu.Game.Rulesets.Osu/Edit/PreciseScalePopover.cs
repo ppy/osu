@@ -180,7 +180,9 @@ namespace osu.Game.Rulesets.Osu.Edit
             if (!scaleHandler.OriginalSurroundingQuad.HasValue)
                 return;
 
+            const float min_scale = -10;
             const float max_scale = 10;
+
             var scale = scaleHandler.ClampScaleToPlayfieldBounds(new Vector2(max_scale), getOriginPosition(scaleInfo.Value), getAdjustAxis(scaleInfo.Value), getRotation(scaleInfo.Value));
 
             if (!scaleInfo.Value.XAxis)
@@ -190,15 +192,14 @@ namespace osu.Game.Rulesets.Osu.Edit
 
             scaleInputBindable.MaxValue = MathF.Max(1, MathF.Min(scale.X, scale.Y));
 
-            const float min_scale = -10;
             scale = scaleHandler.ClampScaleToPlayfieldBounds(new Vector2(min_scale), getOriginPosition(scaleInfo.Value), getAdjustAxis(scaleInfo.Value), getRotation(scaleInfo.Value));
 
             if (!scaleInfo.Value.XAxis)
-                scale.X = max_scale;
+                scale.X = min_scale;
             if (!scaleInfo.Value.YAxis)
-                scale.Y = max_scale;
+                scale.Y = min_scale;
 
-            scaleInputBindable.MinValue = MathF.Min(-1, MathF.Max(scale.X, scale.Y));
+            scaleInputBindable.MinValue = MathF.Min(1, MathF.Max(scale.X, scale.Y));
         }
 
         private void setOrigin(ScaleOrigin origin)
