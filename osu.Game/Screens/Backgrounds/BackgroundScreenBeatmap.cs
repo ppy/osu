@@ -220,7 +220,16 @@ namespace osu.Game.Screens.Backgrounds
                 }
             }
 
-            protected virtual Color4 DimColour => OsuColour.Gray((float)userDimColour.Value);
+            protected virtual Color4 DimColour
+            {
+                get
+                {
+                    if ((IgnoreUserSettings.Value || ShowStoryboard.Value) && StoryboardReplacesBackground.Value)
+                        return Color4.Black;
+
+                    return OsuColour.Gray((float)userDimColour.Value);
+                }
+            }
 
             protected override void UpdateVisuals()
             {
