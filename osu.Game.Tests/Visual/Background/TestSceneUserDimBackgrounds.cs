@@ -101,10 +101,10 @@ namespace osu.Game.Tests.Visual.Background
                 return songSelect.IsBackgroundCurrent();
             });
 
-            AddUntilStep("Screen is dimmed and blur applied", () =>
+            AddUntilStep("Screen is dimmed, blur applied and dim colour adjusted", () =>
             {
                 InputManager.MoveMouseTo(playerLoader.VisualSettingsPos);
-                return songSelect.IsBackgroundDimmed() && songSelect.IsUserBlurApplied();
+                return songSelect.IsBackgroundDimmed() && songSelect.IsUserBlurApplied() && songSelect.IsBackgroundColourOffset();
             });
 
             AddStep("Stop background preview", () => InputManager.MoveMouseTo(playerLoader.ScreenPos));
@@ -122,7 +122,7 @@ namespace osu.Game.Tests.Visual.Background
             performFullSetup();
             AddStep("Trigger hover event", () => playerLoader.TriggerOnHover());
             AddAssert("Background retained from song select", () => songSelect.IsBackgroundCurrent());
-            AddUntilStep("Screen is dimmed and blur applied", () => songSelect.IsBackgroundDimmed() && songSelect.IsUserBlurApplied());
+            AddUntilStep("Screen is dimmed, blur applied and dim colour adjusted", () => songSelect.IsBackgroundDimmed() && songSelect.IsUserBlurApplied() && songSelect.IsBackgroundColourOffset());
         }
 
         /// <summary>
@@ -167,11 +167,11 @@ namespace osu.Game.Tests.Visual.Background
         public void TestDisableUserDimBackground()
         {
             performFullSetup();
-            AddUntilStep("Screen is dimmed and blur applied", () => songSelect.IsBackgroundDimmed() && songSelect.IsUserBlurApplied());
+            AddUntilStep("Screen is dimmed, blur applied and dim colour adjusted", () => songSelect.IsBackgroundDimmed() && songSelect.IsUserBlurApplied() && songSelect.IsBackgroundColourOffset());
             AddStep("Disable user dim", () => songSelect.IgnoreUserSettings.Value = true);
             AddUntilStep("Screen is undimmed and user blur removed", () => songSelect.IsBackgroundUndimmed() && songSelect.IsUserBlurDisabled());
             AddStep("Enable user dim", () => songSelect.IgnoreUserSettings.Value = false);
-            AddUntilStep("Screen is dimmed and blur applied", () => songSelect.IsBackgroundDimmed() && songSelect.IsUserBlurApplied());
+            AddUntilStep("Screen is dimmed, blur applied and dim colour adjusted", () => songSelect.IsBackgroundDimmed() && songSelect.IsUserBlurApplied() && songSelect.IsBackgroundColourOffset());
         }
 
         /// <summary>
@@ -225,9 +225,9 @@ namespace osu.Game.Tests.Visual.Background
         {
             performFullSetup(true);
             AddStep("Pause", () => player.Pause());
-            AddUntilStep("Screen is dimmed and blur applied", () => songSelect.IsBackgroundDimmed() && songSelect.IsUserBlurApplied());
+            AddUntilStep("Screen is dimmed, blur applied and dim colour adjusted", () => songSelect.IsBackgroundDimmed() && songSelect.IsUserBlurApplied() && songSelect.IsBackgroundColourOffset());
             AddStep("Unpause", () => player.Resume());
-            AddUntilStep("Screen is dimmed and blur applied", () => songSelect.IsBackgroundDimmed() && songSelect.IsUserBlurApplied());
+            AddUntilStep("Screen is dimmed, blur applied and dim colour adjusted", () => songSelect.IsBackgroundDimmed() && songSelect.IsUserBlurApplied() && songSelect.IsBackgroundColourOffset());
         }
 
         /// <summary>
@@ -260,7 +260,7 @@ namespace osu.Game.Tests.Visual.Background
                                                                                                  playerLoader.VisualSettingsPos.ScreenSpaceDrawQuad.Height / 2
                                                                                              )));
             AddStep("Resume PlayerLoader", () => player.Restart());
-            AddUntilStep("Screen is dimmed and blur applied", () => songSelect.IsBackgroundDimmed() && songSelect.IsUserBlurApplied());
+            AddUntilStep("Screen is dimmed, blur applied and dim colour adjusted", () => songSelect.IsBackgroundDimmed() && songSelect.IsUserBlurApplied() && songSelect.IsBackgroundColourOffset());
             AddStep("Move mouse to center of screen", () => InputManager.MoveMouseTo(playerLoader.ScreenPos));
             AddUntilStep("Screen is undimmed and user blur removed", () => songSelect.IsBackgroundUndimmed() && songSelect.CheckBackgroundBlur(playerLoader.ExpectedBackgroundBlur));
         }
@@ -342,6 +342,19 @@ namespace osu.Game.Tests.Visual.Background
             public bool IsBackgroundDimmed() => background.CurrentColour == OsuColour.Gray(1f - background.CurrentDim);
 
             public bool IsBackgroundUndimmed() => background.CurrentColour == Color4.White;
+
+            public bool IsBackgroundColourOffset()
+            {
+                Color4 CurrentDimColour = background.CurrentDimColour;
+                Color4 TargetColourOffset = new Color4(
+                    CurrentDimColour.R * background.CurrentDim,
+                    CurrentDimColour.G * background.CurrentDim,
+                    CurrentDimColour.B * background.CurrentDim,
+                    1
+                );
+
+                return background.CurrentColourOffset == TargetColourOffset;
+            }
 
             public bool IsUserBlurApplied() => Precision.AlmostEquals(background.CurrentBlur, new Vector2((float)BlurLevel.Value * BackgroundScreenBeatmap.USER_BLUR_FACTOR), 0.1f);
 
@@ -440,9 +453,13 @@ namespace osu.Game.Tests.Visual.Background
 
             public Color4 CurrentColour => dimmable.CurrentColour;
 
+            public Color4 CurrentColourOffset => dimmable.CurrentColourOffset;
+
             public float CurrentAlpha => dimmable.CurrentAlpha;
 
             public float CurrentDim => dimmable.DimLevel;
+
+            public Color4 CurrentDimColour => dimmable.DimColour;
 
             public Vector2 CurrentBlur => Background?.BlurSigma ?? Vector2.Zero;
 
@@ -462,19 +479,35 @@ namespace osu.Game.Tests.Visual.Background
                 {
                     Color4 ContentColour = Content.Colour;
                     float DimLevel = DimmableBeatmapBackground.DimLevel;
+
+                    return new Color4(
+                        ContentColour.R * (1 - DimLevel),
+                        ContentColour.G * (1 - DimLevel),
+                        ContentColour.B * (1 - DimLevel),
+                        ContentColour.A
+                    );
+                }
+            }
+            public Color4 CurrentColourOffset
+            {
+                get
+                {
+                    float DimLevel = DimmableBeatmapBackground.DimLevel;
                     Color4 DimColour = DimmableBeatmapBackground.DimColour;
 
                     return new Color4(
-                        ContentColour.R * (1 - DimLevel) + DimColour.R * DimLevel,
-                        ContentColour.G * (1 - DimLevel) + DimColour.G * DimLevel,
-                        ContentColour.B * (1 - DimLevel) + DimColour.B * DimLevel,
-                        ContentColour.A
+                        DimColour.R * DimLevel,
+                        DimColour.G * DimLevel,
+                        DimColour.B * DimLevel,
+                        1
                     );
                 }
             }
             public float CurrentAlpha => Content.Alpha;
 
             public new float DimLevel => base.DimLevel;
+
+            public new Color4 DimColour => base.DimColour;
         }
     }
 }
