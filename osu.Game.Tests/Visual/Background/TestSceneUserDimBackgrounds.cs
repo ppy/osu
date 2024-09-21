@@ -301,6 +301,7 @@ namespace osu.Game.Tests.Visual.Background
                 SelectedMods.Value = new[] { new OsuModNoFail() };
                 songSelect.DimLevel.Value = 0.7f;
                 songSelect.BlurLevel.Value = 0.4f;
+                songSelect.DimColour.Value = 0.5f;
             });
         }
 
@@ -324,6 +325,7 @@ namespace osu.Game.Tests.Visual.Background
             public readonly Bindable<bool> IgnoreUserSettings = new Bindable<bool>();
             public readonly Bindable<double> DimLevel = new BindableDouble();
             public readonly Bindable<double> BlurLevel = new BindableDouble();
+            public readonly Bindable<double> DimColour = new BindableDouble();
 
             public new BeatmapCarousel Carousel => base.Carousel;
 
@@ -332,6 +334,7 @@ namespace osu.Game.Tests.Visual.Background
             {
                 config.BindWith(OsuSetting.DimLevel, DimLevel);
                 config.BindWith(OsuSetting.BlurLevel, BlurLevel);
+                config.BindWith(OsuSetting.DimColour, DimColour);
             }
 
             public bool IsBackgroundBlack() => background.CurrentColour == OsuColour.Gray(0);
