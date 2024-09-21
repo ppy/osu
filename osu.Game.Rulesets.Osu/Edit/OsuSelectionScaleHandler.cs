@@ -241,33 +241,42 @@ namespace osu.Game.Rulesets.Osu.Edit
 
             foreach (var point in points)
             {
-                scale = clampToBound(scale, point, Vector2.Zero);
-                scale = clampToBound(scale, point, OsuPlayfield.BASE_SIZE);
+                scale = clampToBound(scale, point, Vector2.Zero, OsuPlayfield.BASE_SIZE);
             }
 
             return Vector2.ComponentMax(scale, new Vector2(Precision.FLOAT_EPSILON));
 
-            float minPositiveComponent(Vector2 v) => MathF.Min(v.X < 0 ? float.PositiveInfinity : v.X, v.Y < 0 ? float.PositiveInfinity : v.Y);
+            float minComponent(Vector2 v) => MathF.Min(v.X, v.Y);
+            float maxComponent(Vector2 v) => MathF.Max(v.X, v.Y);
 
-            Vector2 clampToBound(Vector2 s, Vector2 p, Vector2 bound)
+            Vector2 clampToBound(Vector2 s, Vector2 p, Vector2 lowerBound, Vector2 upperBound)
             {
                 p -= actualOrigin;
-                bound -= actualOrigin;
+                lowerBound -= actualOrigin;
+                upperBound -= actualOrigin;
                 var a = new Vector2(cos * cos * p.X - sin * cos * p.Y, -sin * cos * p.X + sin * sin * p.Y);
                 var b = new Vector2(sin * sin * p.X + sin * cos * p.Y, sin * cos * p.X + cos * cos * p.Y);
 
                 switch (adjustAxis)
                 {
                     case Axes.X:
-                        s.X = MathF.Min(scale.X, minPositiveComponent(Vector2.Divide(bound - b, a)));
+                        var lowerBounds = Vector2.Divide(lowerBound - b, a);
+                        var upperBounds = Vector2.Divide(upperBound - b, a);
+                        if (a.X < 0)
+                            (lowerBounds, upperBounds) = (upperBounds, lowerBounds);
+                        s.X = MathHelper.Clamp(s.X, maxComponent(lowerBounds), minComponent(upperBounds));
                         break;
 
                     case Axes.Y:
-                        s.Y = MathF.Min(scale.Y, minPositiveComponent(Vector2.Divide(bound - a, b)));
+                        var lowerBoundsY = Vector2.Divide(lowerBound - a, b);
+                        var upperBoundsY = Vector2.Divide(upperBound - a, b);
+                        if (b.Y < 0)
+                            (lowerBoundsY, upperBoundsY) = (upperBoundsY, lowerBoundsY);
+                        s.Y = MathHelper.Clamp(s.Y, maxComponent(lowerBoundsY), minComponent(upperBoundsY));
                         break;
 
                     case Axes.Both:
-                        s = Vector2.ComponentMin(s, s * minPositiveComponent(Vector2.Divide(bound, a * s.X + b * s.Y)));
+                        // s = Vector2.ComponentMin(s, s * minPositiveComponent(Vector2.Divide(bound, a * s.X + b * s.Y)));
                         break;
                 }
 
