@@ -337,7 +337,7 @@ namespace osu.Game.Tests.Visual.Background
                 config.BindWith(OsuSetting.DimColour, DimColour);
             }
 
-            public bool IsBackgroundBlack() => background.CurrentColour == OsuColour.Gray(0);
+            public bool IsBackgroundBlack() => background.CurrentColour == OsuColour.Gray(0) && background.CurrentColourOffset == OsuColour.Gray(0);
 
             public bool IsBackgroundDimmed() => background.CurrentColour == OsuColour.Gray(1f - background.CurrentDim);
 
