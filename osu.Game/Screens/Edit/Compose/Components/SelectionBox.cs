@@ -6,6 +6,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
@@ -284,8 +285,12 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 Action = action
             };
 
+            button.OperationStarted += freezeButtonPosition;
+            button.HoverLost += unfreezeButtonPosition;
+
             button.OperationStarted += operationStarted;
             button.OperationEnded += operationEnded;
+
             buttons.Add(button);
 
             return button;
@@ -357,8 +362,29 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 OperationStarted?.Invoke();
         }
 
+        private Quad? frozenButtonsDrawQuad;
+
+        private void freezeButtonPosition()
+        {
+            frozenButtonsDrawQuad = buttons.ScreenSpaceDrawQuad;
+        }
+
+        private void unfreezeButtonPosition()
+        {
+            frozenButtonsDrawQuad = null;
+        }
+
         private void ensureButtonsOnScreen()
         {
+            if (frozenButtonsDrawQuad != null)
+            {
+                buttons.Anchor = Anchor.TopLeft;
+                buttons.Origin = Anchor.TopLeft;
+
+                buttons.Position = ToLocalSpace(frozenButtonsDrawQuad.Value.TopLeft) - new Vector2(button_padding);
+                return;
+            }
+
             buttons.Position = Vector2.Zero;
 
             var thisQuad = ScreenSpaceDrawQuad;
