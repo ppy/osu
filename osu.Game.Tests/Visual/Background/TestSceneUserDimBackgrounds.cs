@@ -453,7 +453,22 @@ namespace osu.Game.Tests.Visual.Background
 
         private partial class TestDimmableBackground : BackgroundScreenBeatmap.DimmableBackground
         {
-            public Color4 CurrentColour => Content.Colour;
+            public Color4 CurrentColour
+            {
+                get
+                {
+                    Color4 ContentColour = Content.Colour;
+                    float DimLevel = DimmableBeatmapBackground.DimLevel;
+                    Color4 DimColour = DimmableBeatmapBackground.DimColour;
+
+                    return new Color4(
+                        ContentColour.R * (1 - DimLevel) + DimColour.R * DimLevel,
+                        ContentColour.G * (1 - DimLevel) + DimColour.G * DimLevel,
+                        ContentColour.B * (1 - DimLevel) + DimColour.B * DimLevel,
+                        ContentColour.A
+                    );
+                }
+            }
             public float CurrentAlpha => Content.Alpha;
 
             public new float DimLevel => base.DimLevel;
