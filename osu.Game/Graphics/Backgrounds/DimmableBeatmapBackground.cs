@@ -17,6 +17,7 @@ using osu.Framework.Graphics.Textures;
 using osu.Framework.Graphics.Transforms;
 using osu.Game.Beatmaps;
 using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Graphics.Backgrounds
 {
@@ -25,7 +26,7 @@ namespace osu.Game.Graphics.Backgrounds
     /// </summary>
     public partial class DimmableBeatmapBackground : BeatmapBackground {
         private float dimLevel;
-        private float dimColour;
+        private Color4 dimColour;
 
         public float DimLevel {
             get => dimLevel;
@@ -38,7 +39,7 @@ namespace osu.Game.Graphics.Backgrounds
             }
         }
 
-        public float DimColour {
+        public Color4 DimColour {
             get => dimColour;
             set {
                 dimColour = value;
@@ -60,7 +61,7 @@ namespace osu.Game.Graphics.Backgrounds
 
         public partial class DimmableBeatmapBackgroundSprite : Sprite {
             public float DimLevel;
-            public float DimColour;
+            public Color4 DimColour;
 
             [BackgroundDependencyLoader]
             private void load(ShaderManager shaders)
@@ -79,7 +80,7 @@ namespace osu.Game.Graphics.Backgrounds
                 }
 
                 private float DimLevel;
-                private float DimColour;
+                private Color4 DimColour;
 
                 private IShader textureShader;
 
@@ -101,7 +102,7 @@ namespace osu.Game.Graphics.Backgrounds
 
                     dimmableBeatmapBackgroundParametersBuffer.Data = dimmableBeatmapBackgroundParametersBuffer.Data with
                     {
-                        DimColour = new Vector4(DimColour, DimColour, DimColour, 1.0f),
+                        DimColour = new Vector4(DimColour.R, DimColour.G, DimColour.B, DimColour.A),
                         DimLevel = DimLevel,
                     };
 
