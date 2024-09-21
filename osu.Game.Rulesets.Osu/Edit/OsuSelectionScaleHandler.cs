@@ -240,47 +240,65 @@ namespace osu.Game.Rulesets.Osu.Edit
                 points = originalConvexHull!;
 
             foreach (var point in points)
-            {
                 scale = clampToBound(scale, point, Vector2.Zero, OsuPlayfield.BASE_SIZE);
-            }
 
-            return Vector2.ComponentMax(scale, new Vector2(Precision.FLOAT_EPSILON));
+            return scale;
 
-            float minComponent(Vector2 v) => MathF.Min(v.X, v.Y);
-            float maxComponent(Vector2 v) => MathF.Max(v.X, v.Y);
-
-            Vector2 clampToBound(Vector2 s, Vector2 p, Vector2 lowerBound, Vector2 upperBound)
+            Vector2 clampToBound(Vector2 s, Vector2 p, Vector2 lowerBounds, Vector2 upperBounds)
             {
                 p -= actualOrigin;
-                lowerBound -= actualOrigin;
-                upperBound -= actualOrigin;
+                lowerBounds -= actualOrigin;
+                upperBounds -= actualOrigin;
+                // a.X is the rotated X component of p with respect to the X bounds
+                // a.Y is the rotated X component of p with respect to the Y bounds
+                // b.X is the rotated Y component of p with respect to the X bounds
+                // b.Y is the rotated Y component of p with respect to the Y bounds
                 var a = new Vector2(cos * cos * p.X - sin * cos * p.Y, -sin * cos * p.X + sin * sin * p.Y);
                 var b = new Vector2(sin * sin * p.X + sin * cos * p.Y, sin * cos * p.X + cos * cos * p.Y);
+
+                float sLowerBound, sUpperBound;
 
                 switch (adjustAxis)
                 {
                     case Axes.X:
-                        var lowerBounds = Vector2.Divide(lowerBound - b, a);
-                        var upperBounds = Vector2.Divide(upperBound - b, a);
-                        if (a.X < 0)
-                            (lowerBounds, upperBounds) = (upperBounds, lowerBounds);
-                        s.X = MathHelper.Clamp(s.X, maxComponent(lowerBounds), minComponent(upperBounds));
+                        (sLowerBound, sUpperBound) = computeBounds(lowerBounds - b, upperBounds - b, a);
+                        s.X = MathHelper.Clamp(s.X, sLowerBound, sUpperBound);
                         break;
 
                     case Axes.Y:
-                        var lowerBoundsY = Vector2.Divide(lowerBound - a, b);
-                        var upperBoundsY = Vector2.Divide(upperBound - a, b);
-                        if (b.Y < 0)
-                            (lowerBoundsY, upperBoundsY) = (upperBoundsY, lowerBoundsY);
-                        s.Y = MathHelper.Clamp(s.Y, maxComponent(lowerBoundsY), minComponent(upperBoundsY));
+                        (sLowerBound, sUpperBound) = computeBounds(lowerBounds - a, upperBounds - a, b);
+                        s.Y = MathHelper.Clamp(s.Y, sLowerBound, sUpperBound);
                         break;
 
                     case Axes.Both:
-                        // s = Vector2.ComponentMin(s, s * minPositiveComponent(Vector2.Divide(bound, a * s.X + b * s.Y)));
+                        // Here we compute the bounds for the magnitude multiplier of the scale vector
+                        // Therefore the ratio s.X / s.Y will be maintained
+                        (sLowerBound, sUpperBound) = computeBounds(lowerBounds, upperBounds, a * s.X + b * s.Y);
+                        s.X = s.X < 0
+                            ? MathHelper.Clamp(s.X, s.X * sUpperBound, s.X * sLowerBound)
+                            : MathHelper.Clamp(s.X, s.X * sLowerBound, s.X * sUpperBound);
+                        s.Y = s.Y < 0
+                            ? MathHelper.Clamp(s.Y, s.Y * sUpperBound, s.Y * sLowerBound)
+                            : MathHelper.Clamp(s.Y, s.Y * sLowerBound, s.Y * sUpperBound);
                         break;
                 }
 
                 return s;
+            }
+
+            (float, float) computeBounds(Vector2 lowerBounds, Vector2 upperBounds, Vector2 p)
+            {
+                var sLowerBounds = Vector2.Divide(lowerBounds, p);
+                var sUpperBounds = Vector2.Divide(upperBounds, p);
+                if (p.X < 0)
+                    (sLowerBounds.X, sUpperBounds.X) = (sUpperBounds.X, sLowerBounds.X);
+                if (p.Y < 0)
+                    (sLowerBounds.Y, sUpperBounds.Y) = (sUpperBounds.Y, sLowerBounds.Y);
+                if (Precision.AlmostEquals(p.X, 0))
+                    (sLowerBounds.X, sUpperBounds.X) = (float.NegativeInfinity, float.PositiveInfinity);
+                if (Precision.AlmostEquals(p.Y, 0))
+                    (sLowerBounds.Y, sUpperBounds.Y) = (float.NegativeInfinity, float.PositiveInfinity);
+                return (MathF.Max(sLowerBounds.X, sLowerBounds.Y), MathF.Min(sUpperBounds.X, sUpperBounds.Y));
             }
         }
 
