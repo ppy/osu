@@ -15,6 +15,7 @@ using osu.Framework.Graphics.Shaders.Types;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Graphics.Transforms;
+using osu.Game.Beatmaps;
 using osuTK;
 
 namespace osu.Game.Graphics.Backgrounds
@@ -22,9 +23,7 @@ namespace osu.Game.Graphics.Backgrounds
     /// <summary>
     /// A background which offers dimming using a custom shader with ability to change dim colour.
     /// </summary>
-    public partial class DimmableBeatmapBackground : Background {
-        private Background Background;
-
+    public partial class DimmableBeatmapBackground : BeatmapBackground {
         private float dimLevel;
         private float dimColour;
 
@@ -50,22 +49,13 @@ namespace osu.Game.Graphics.Backgrounds
             }
         }
 
-        public DimmableBeatmapBackground(Background background) {
-            Background = background;
-
+        public DimmableBeatmapBackground(WorkingBeatmap beatmap, string fallbackTextureName = @"Backgrounds/bg1") : base(beatmap, fallbackTextureName) {
             Sprite = new DimmableBeatmapBackgroundSprite {
                 RelativeSizeAxes = Axes.Both,
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 FillMode = FillMode.Fill,
             };
-        }
-
-        [BackgroundDependencyLoader]
-        private void load()
-        {
-            if (Background != null)
-                Sprite.Texture = Background.Sprite.Texture;
         }
 
         public partial class DimmableBeatmapBackgroundSprite : Sprite {
