@@ -153,22 +153,22 @@ namespace osu.Game.Screens.Backgrounds
 
             public readonly Bindable<bool> StoryboardReplacesBackground = new Bindable<bool>();
 
-            public partial class BeatmapBackgroundSprite : Sprite {
+            public partial class DimmableBeatmapBackgroundSprite : Sprite {
                 public float DimLevel;
                 public float DimColour;
 
                 [BackgroundDependencyLoader]
                 private void load(ShaderManager shaders)
                 {
-                    TextureShader = shaders.Load(VertexShaderDescriptor.TEXTURE_2, "BeatmapBackground");
+                    TextureShader = shaders.Load(VertexShaderDescriptor.TEXTURE_2, "DimmableBeatmapBackground");
                 }
 
-                protected override DrawNode CreateDrawNode() => new BeatmapBackgroundSpriteDrawNode(this);
+                protected override DrawNode CreateDrawNode() => new DimmableBeatmapBackgroundSpriteDrawNode(this);
 
-                public class BeatmapBackgroundSpriteDrawNode : SpriteDrawNode {
-                    public new BeatmapBackgroundSprite Source => (BeatmapBackgroundSprite)base.Source;
+                public class DimmableBeatmapBackgroundSpriteDrawNode : SpriteDrawNode {
+                    public new DimmableBeatmapBackgroundSprite Source => (DimmableBeatmapBackgroundSprite)base.Source;
 
-                    public BeatmapBackgroundSpriteDrawNode(BeatmapBackgroundSprite source)
+                    public DimmableBeatmapBackgroundSpriteDrawNode(DimmableBeatmapBackgroundSprite source)
                         : base(source)
                     {
                     }
@@ -188,19 +188,19 @@ namespace osu.Game.Screens.Backgrounds
                         textureShader = Source.TextureShader;
                     }
 
-                    private IUniformBuffer<BeatmapBackgroundParameters> beatmapBackgroundParametersBuffer;
+                    private IUniformBuffer<DimmableBeatmapBackgroundParameters> dimmableBeatmapBackgroundParametersBuffer;
 
                     private void BindParametersBuffer(IRenderer renderer)
                     {
-                        beatmapBackgroundParametersBuffer ??= renderer.CreateUniformBuffer<BeatmapBackgroundParameters>();
+                        dimmableBeatmapBackgroundParametersBuffer ??= renderer.CreateUniformBuffer<DimmableBeatmapBackgroundParameters>();
 
-                        beatmapBackgroundParametersBuffer.Data = beatmapBackgroundParametersBuffer.Data with
+                        dimmableBeatmapBackgroundParametersBuffer.Data = dimmableBeatmapBackgroundParametersBuffer.Data with
                         {
                             DimColour = new Vector4(DimColour, DimColour, DimColour, 1.0f),
                             DimLevel = DimLevel,
                         };
 
-                        textureShader.BindUniformBlock("m_BeatmapBackgroundParameters", beatmapBackgroundParametersBuffer);
+                        textureShader.BindUniformBlock("m_DimmableBeatmapBackgroundParameters", dimmableBeatmapBackgroundParametersBuffer);
                     }
 
                     protected override void Draw(IRenderer renderer)
@@ -218,11 +218,11 @@ namespace osu.Game.Screens.Backgrounds
                     protected override void Dispose(bool isDisposing)
                     {
                         base.Dispose(isDisposing);
-                        beatmapBackgroundParametersBuffer?.Dispose();
+                        dimmableBeatmapBackgroundParametersBuffer?.Dispose();
                     }
 
                     [StructLayout(LayoutKind.Sequential, Pack = 1)]
-                    private record struct BeatmapBackgroundParameters
+                    private record struct DimmableBeatmapBackgroundParameters
                     {
                         public UniformVector4 DimColour;
                         public UniformFloat DimLevel;
@@ -231,7 +231,7 @@ namespace osu.Game.Screens.Backgrounds
                 }
             }
 
-            public partial class BeatmapBackground : Background {
+            public partial class DimmableBeatmapBackground : Background {
                 private Background Background;
 
                 private float dimLevel;
@@ -241,7 +241,7 @@ namespace osu.Game.Screens.Backgrounds
                     get => dimLevel;
                     set {
                         dimLevel = value;
-                        BeatmapBackgroundSprite sprite = (BeatmapBackgroundSprite)Sprite;
+                        DimmableBeatmapBackgroundSprite sprite = (DimmableBeatmapBackgroundSprite)Sprite;
                         sprite.DimLevel = dimLevel;
 
                         bufferedContainer?.ForceRedraw();
@@ -252,17 +252,17 @@ namespace osu.Game.Screens.Backgrounds
                     get => dimColour;
                     set {
                         dimColour = value;
-                        BeatmapBackgroundSprite sprite = (BeatmapBackgroundSprite)Sprite;
+                        DimmableBeatmapBackgroundSprite sprite = (DimmableBeatmapBackgroundSprite)Sprite;
                         sprite.DimColour = dimColour;
 
                         bufferedContainer?.ForceRedraw();
                     }
                 }
 
-                public BeatmapBackground(Background background) {
+                public DimmableBeatmapBackground(Background background) {
                     Background = background;
 
-                    Sprite = new BeatmapBackgroundSprite {
+                    Sprite = new DimmableBeatmapBackgroundSprite {
                         RelativeSizeAxes = Axes.Both,
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
@@ -285,7 +285,7 @@ namespace osu.Game.Screens.Backgrounds
                 {
                     background?.Expire();
 
-                    base.Add(background = new BeatmapBackground(value));
+                    base.Add(background = new DimmableBeatmapBackground(value));
                     background.BlurTo(blurTarget, 0, Easing.OutQuint);
                 }
             }
@@ -293,7 +293,7 @@ namespace osu.Game.Screens.Backgrounds
             private Bindable<double> userBlurLevel { get; set; }
             private Bindable<double> userDimColour { get; set; }
 
-            private BeatmapBackground background;
+            private DimmableBeatmapBackground background;
 
             public override void Add(Drawable drawable)
             {
@@ -352,9 +352,9 @@ namespace osu.Game.Screens.Backgrounds
                 ContentDisplayed = ShowDimContent;
 
                 Content.FadeTo(ContentDisplayed ? 1 : 0, BACKGROUND_FADE_DURATION, Easing.OutQuint);
-                background?.TransformTo(nameof(BeatmapBackground.DimLevel), DimLevel, BACKGROUND_FADE_DURATION, Easing.OutQuint);
+                background?.TransformTo(nameof(DimmableBeatmapBackground.DimLevel), DimLevel, BACKGROUND_FADE_DURATION, Easing.OutQuint);
 
-                background?.TransformTo(nameof(BeatmapBackground.DimColour), DimColour, BACKGROUND_FADE_DURATION, Easing.OutQuint);
+                background?.TransformTo(nameof(DimmableBeatmapBackground.DimColour), DimColour, BACKGROUND_FADE_DURATION, Easing.OutQuint);
 
                 Background?.BlurTo(blurTarget, BACKGROUND_FADE_DURATION, Easing.OutQuint);
             }
