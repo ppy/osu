@@ -33,7 +33,7 @@ namespace osu.Game.Tournament.Screens.Setup
         private TournamentRound? round = null!;
 
         private Container boardContainer = null!;
-        private DialogOverlay? overlay;
+        private DialogOverlay overlay = null!;
         private RoundedButton saveButton = null!;
 
         private bool isUpdateDone = false;
@@ -155,14 +155,13 @@ namespace osu.Game.Tournament.Screens.Setup
                     Origin = Anchor.BottomLeft,
                     State = { Value = Visibility.Visible },
                     Action = () => sceneManager?.SetScreen(typeof(BoardScreen))
-                }
+                },
+                overlay = new DialogOverlay(),
             });
 
             if (round == null)
             {
-                overlay = new DialogOverlay();
                 overlay.Push(new IPCErrorDialog("Failed to auto detect", "An osu! stable cutting-edge installation could not be auto detected.\nPlease try and manually point to the directory."));
-                AddInternal(overlay);
                 return;
             }
             updateBoardDisplay();
@@ -244,21 +243,17 @@ namespace osu.Game.Tournament.Screens.Setup
 
         protected virtual void PromptSave()
         {
-            overlay = new DialogOverlay();
-
             if (!isUpdateDone)
             {
                 if (defCommandList.Count == 0)
                     overlay.Push(new BoardNoUpdateDialog("No need to update", "Your board is unchanged, still up to date!"));
                 else
                     overlay.Push(new BoardUpdateWaitingDialog("Some messages are missing", $"We're still waiting for the remaining {4 - defCommandList.Count} messages!"));
-                AddInternal(overlay);
             }
             else
             {
                 tournamentGame.SaveChanges();
                 overlay.Push(new BoardUpdateSuccessDialog("Done!", "Your board is updated successfully. Remember to refresh your board view!"));
-                AddInternal(overlay);
             }
         }
 
