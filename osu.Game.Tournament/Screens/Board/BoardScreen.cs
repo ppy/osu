@@ -97,8 +97,6 @@ namespace osu.Game.Tournament.Screens.Board
             // Bind the ValueChanged event of the "Await response" switch
             LadderInfo.NeedRefereeResponse.BindValueChanged(onAwaitResponseChanged);
 
-            dialogOverlay = new DialogOverlay();
-
             InternalChildren = new Drawable[]
             {
                 new TourneyVideo("mappool")
@@ -397,9 +395,7 @@ namespace osu.Game.Tournament.Screens.Board
                                         Action = () => {
                                             if (!CurrentMatch.Value.Round.Value.UseBoard.Value)
                                             {
-                                                var overlay = new DialogOverlay();
-                                                overlay.Push(new IPCErrorDialog("Unsupported", "This round isn't set for board layout. Check this in round editor."));
-                                                AddInternal(overlay);
+                                                dialogOverlay.Push(new IPCErrorDialog("Unsupported", "This round isn't set for board layout. Check this in round editor."));
                                             }
                                             else
                                             {
@@ -427,15 +423,16 @@ namespace osu.Game.Tournament.Screens.Board
                                                 resetAction: () =>
                                                 {
                                                     reset();
-                                                }));
-                                            AddInternal(dialogOverlay);
+                                                }
+                                            ));
                                         },
                                     },
                                 },
                             },
                         }
                     },
-                }
+                },
+                dialogOverlay = new DialogOverlay(),
             };
         }
 
