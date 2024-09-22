@@ -100,7 +100,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
                 ColourDifficulty = colourRating,
                 PeakDifficulty = combinedRating,
                 GreatHitWindow = hitWindows.WindowFor(HitResult.Great) / clockRate,
-                MaxCombo = beatmap.HitObjects.Count(h => h is Hit),
+                MaxCombo = beatmap.GetMaxCombo(),
             };
 
             return attributes;

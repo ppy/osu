@@ -18,6 +18,7 @@ using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Utils;
 
 namespace osu.Game.Rulesets.Difficulty
@@ -114,7 +115,7 @@ namespace osu.Game.Rulesets.Difficulty
 
             foreach (var obj in Beatmap.HitObjects)
             {
-                progressiveBeatmap.HitObjects.Add(obj);
+                progressiveBeatmap.AddHitObject(obj);
 
                 while (currentIndex < difficultyObjects.Length && difficultyObjects[currentIndex].BaseObject.GetEndTime() <= obj.GetEndTime())
                 {
@@ -302,9 +303,36 @@ namespace osu.Game.Rulesets.Difficulty
                 this.baseBeatmap = baseBeatmap;
             }
 
-            public readonly List<HitObject> HitObjects = new List<HitObject>();
+            private readonly List<HitObject> hitObjects = new List<HitObject>();
 
-            IReadOnlyList<HitObject> IBeatmap.HitObjects => HitObjects;
+            IReadOnlyList<HitObject> IBeatmap.HitObjects => hitObjects;
+
+            private int maxCombo;
+
+            public int GetMaxCombo() => maxCombo;
+
+            private readonly Dictionary<Type, int> hitObjectsCounts = new Dictionary<Type, int>();
+
+            public int GetHitObjectCountOf(Type type) => hitObjectsCounts.GetValueOrDefault(type);
+
+            public void AddHitObject(HitObject hitObject)
+            {
+                hitObjects.Add(hitObject);
+
+                var objectType = hitObject.GetType();
+                hitObjectsCounts[objectType] = hitObjectsCounts.GetValueOrDefault(objectType, 0) + 1;
+
+                addCombo(hitObject);
+            }
+
+            private void addCombo(HitObject hitObject)
+            {
+                if (hitObject.Judgement.MaxResult.AffectsCombo())
+                    maxCombo++;
+
+                foreach (var nested in hitObject.NestedHitObjects)
+                    addCombo(nested);
+            }
 
             #region Delegated IBeatmap implementation
 

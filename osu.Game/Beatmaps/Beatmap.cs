@@ -10,6 +10,7 @@ using osu.Game.Beatmaps.ControlPoints;
 using Newtonsoft.Json;
 using osu.Framework.Lists;
 using osu.Game.IO.Serialization.Converters;
+using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Beatmaps
 {
@@ -118,6 +119,25 @@ namespace osu.Game.Beatmaps
         IBeatmap IBeatmap.Clone() => Clone();
 
         public Beatmap<T> Clone() => (Beatmap<T>)MemberwiseClone();
+
+        public int GetMaxCombo()
+        {
+            int combo = 0;
+            foreach (var h in HitObjects)
+                addCombo(h, ref combo);
+            return combo;
+
+            static void addCombo(HitObject hitObject, ref int combo)
+            {
+                if (hitObject.Judgement.MaxResult.AffectsCombo())
+                    combo++;
+
+                foreach (var nested in hitObject.NestedHitObjects)
+                    addCombo(nested, ref combo);
+            }
+        }
+
+        public int GetHitObjectCountOf(Type type) => HitObjects.Count(h => h.GetType() == type);
 
         public override string ToString() => BeatmapInfo.ToString();
     }
