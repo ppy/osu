@@ -66,8 +66,8 @@ namespace osu.Game.Tests.Visual.Online
         [Test]
         public void TestPlayCountRankingTier()
         {
-            AddAssert("1 before silver", () => DailyChallengeStatsTooltip.TierForPlayCount(30) == RankingTier.Bronze);
-            AddAssert("first silver", () => DailyChallengeStatsTooltip.TierForPlayCount(31) == RankingTier.Silver);
+            AddAssert("1 before silver", () => DailyChallengeStatsDisplay.TierForPlayCount(30) == RankingTier.Bronze);
+            AddAssert("first silver", () => DailyChallengeStatsDisplay.TierForPlayCount(31) == RankingTier.Silver);
         }
     }
 }

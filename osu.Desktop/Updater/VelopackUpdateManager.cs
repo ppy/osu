@@ -45,17 +45,14 @@ namespace osu.Desktop.Updater
 
         private async Task<bool> checkForUpdateAsync(UpdateProgressNotification? notification = null)
         {
-            // whether to check again in 30 minutes. generally only if there's an error or no update was found (yet).
-            bool scheduleRecheck = false;
+            // should we schedule a retry on completion of this check?
+            bool scheduleRecheck = true;
 
             try
             {
                 // Avoid any kind of update checking while gameplay is running.
                 if (localUserInfo?.IsPlaying.Value == true)
-                {
-                    scheduleRecheck = true;
                     return false;
-                }
 
                 // TODO: we should probably be checking if there's a more recent update, rather than shortcutting here.
                 // Velopack does support this scenario (see https://github.com/ppy/osu/pull/28743#discussion_r1743495975).
@@ -70,20 +67,17 @@ namespace osu.Desktop.Updater
                             return true;
                         }
                     });
-
                     return true;
                 }
 
                 pendingUpdate = await updateManager.CheckForUpdatesAsync().ConfigureAwait(false);
 
-                // No update is available. We'll check again later.
+                // Handle no updates available.
                 if (pendingUpdate == null)
-                {
-                    scheduleRecheck = true;
                     return false;
-                }
 
-                // An update is found, let's notify the user and start downloading it.
+                scheduleRecheck = false;
+
                 if (notification == null)
                 {
                     notification = new UpdateProgressNotification
@@ -105,7 +99,6 @@ namespace osu.Desktop.Updater
                 catch (Exception e)
                 {
                     // In the case of an error, a separate notification will be displayed.
-                    scheduleRecheck = true;
                     notification.FailDownload();
                     Logger.Error(e, @"update failed!");
                 }
@@ -120,6 +113,7 @@ namespace osu.Desktop.Updater
             {
                 if (scheduleRecheck)
                 {
+                    // check again in 30 minutes.
                     Scheduler.AddDelayed(() => Task.Run(async () => await checkForUpdateAsync().ConfigureAwait(false)), 60000 * 30);
                 }
             }

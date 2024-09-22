@@ -20,25 +20,21 @@ namespace osu.Game.Rulesets.Osu.Edit
     {
         private readonly OsuSelectionScaleHandler scaleHandler;
 
-        private readonly OsuGridToolboxGroup gridToolbox;
-
-        private readonly Bindable<PreciseScaleInfo> scaleInfo = new Bindable<PreciseScaleInfo>(new PreciseScaleInfo(1, ScaleOrigin.GridCentre, true, true));
+        private readonly Bindable<PreciseScaleInfo> scaleInfo = new Bindable<PreciseScaleInfo>(new PreciseScaleInfo(1, ScaleOrigin.PlayfieldCentre, true, true));
 
         private SliderWithTextBoxInput<float> scaleInput = null!;
         private BindableNumber<float> scaleInputBindable = null!;
         private EditorRadioButtonCollection scaleOrigin = null!;
 
-        private RadioButton gridCentreButton = null!;
         private RadioButton playfieldCentreButton = null!;
         private RadioButton selectionCentreButton = null!;
 
         private OsuCheckbox xCheckBox = null!;
         private OsuCheckbox yCheckBox = null!;
 
-        public PreciseScalePopover(OsuSelectionScaleHandler scaleHandler, OsuGridToolboxGroup gridToolbox)
+        public PreciseScalePopover(OsuSelectionScaleHandler scaleHandler)
         {
             this.scaleHandler = scaleHandler;
-            this.gridToolbox = gridToolbox;
 
             AllowableAnchors = new[] { Anchor.CentreLeft, Anchor.CentreRight };
         }
@@ -70,9 +66,6 @@ namespace osu.Game.Rulesets.Osu.Edit
                         RelativeSizeAxes = Axes.X,
                         Items = new[]
                         {
-                            gridCentreButton = new RadioButton("Grid centre",
-                                () => setOrigin(ScaleOrigin.GridCentre),
-                                () => new SpriteIcon { Icon = FontAwesome.Regular.PlusSquare }),
                             playfieldCentreButton = new RadioButton("Playfield centre",
                                 () => setOrigin(ScaleOrigin.PlayfieldCentre),
                                 () => new SpriteIcon { Icon = FontAwesome.Regular.Square }),
@@ -104,10 +97,6 @@ namespace osu.Game.Rulesets.Osu.Edit
                     },
                 }
             };
-            gridCentreButton.Selected.DisabledChanged += isDisabled =>
-            {
-                gridCentreButton.TooltipText = isDisabled ? "The current selection cannot be scaled relative to grid centre." : string.Empty;
-            };
             playfieldCentreButton.Selected.DisabledChanged += isDisabled =>
             {
                 playfieldCentreButton.TooltipText = isDisabled ? "The current selection cannot be scaled relative to playfield centre." : string.Empty;
@@ -134,20 +123,19 @@ namespace osu.Game.Rulesets.Osu.Edit
 
             selectionCentreButton.Selected.Disabled = !(scaleHandler.CanScaleX.Value || scaleHandler.CanScaleY.Value);
             playfieldCentreButton.Selected.Disabled = scaleHandler.IsScalingSlider.Value && !selectionCentreButton.Selected.Disabled;
-            gridCentreButton.Selected.Disabled = playfieldCentreButton.Selected.Disabled;
 
             scaleOrigin.Items.First(b => !b.Selected.Disabled).Select();
 
             scaleInfo.BindValueChanged(scale =>
             {
-                var newScale = new Vector2(scale.NewValue.Scale, scale.NewValue.Scale);
-                scaleHandler.Update(newScale, getOriginPosition(scale.NewValue), getAdjustAxis(scale.NewValue), getRotation(scale.NewValue));
+                var newScale = new Vector2(scale.NewValue.XAxis ? scale.NewValue.Scale : 1, scale.NewValue.YAxis ? scale.NewValue.Scale : 1);
+                scaleHandler.Update(newScale, getOriginPosition(scale.NewValue));
             });
         }
 
         private void updateAxisCheckBoxesEnabled()
         {
-            if (scaleInfo.Value.Origin != ScaleOrigin.SelectionCentre)
+            if (scaleInfo.Value.Origin == ScaleOrigin.PlayfieldCentre)
             {
                 toggleAxisAvailable(xCheckBox.Current, true);
                 toggleAxisAvailable(yCheckBox.Current, true);
@@ -174,7 +162,7 @@ namespace osu.Game.Rulesets.Osu.Edit
                 return;
 
             const float max_scale = 10;
-            var scale = scaleHandler.ClampScaleToPlayfieldBounds(new Vector2(max_scale), getOriginPosition(scaleInfo.Value), getAdjustAxis(scaleInfo.Value), getRotation(scaleInfo.Value));
+            var scale = scaleHandler.ClampScaleToPlayfieldBounds(new Vector2(max_scale), getOriginPosition(scaleInfo.Value));
 
             if (!scaleInfo.Value.XAxis)
                 scale.X = max_scale;
@@ -191,18 +179,7 @@ namespace osu.Game.Rulesets.Osu.Edit
             updateAxisCheckBoxesEnabled();
         }
 
-        private Vector2? getOriginPosition(PreciseScaleInfo scale) =>
-            scale.Origin switch
-            {
-                ScaleOrigin.GridCentre => gridToolbox.StartPosition.Value,
-                ScaleOrigin.PlayfieldCentre => OsuPlayfield.BASE_SIZE / 2,
-                ScaleOrigin.SelectionCentre => null,
-                _ => throw new ArgumentOutOfRangeException(nameof(scale))
-            };
-
-        private Axes getAdjustAxis(PreciseScaleInfo scale) => scale.XAxis ? scale.YAxis ? Axes.Both : Axes.X : Axes.Y;
-
-        private float getRotation(PreciseScaleInfo scale) => scale.Origin == ScaleOrigin.GridCentre ? gridToolbox.GridLinesRotation.Value : 0;
+        private Vector2? getOriginPosition(PreciseScaleInfo scale) => scale.Origin == ScaleOrigin.PlayfieldCentre ? OsuPlayfield.BASE_SIZE / 2 : null;
 
         private void setAxis(bool x, bool y)
         {
@@ -227,7 +204,6 @@ namespace osu.Game.Rulesets.Osu.Edit
 
     public enum ScaleOrigin
     {
-        GridCentre,
         PlayfieldCentre,
         SelectionCentre
     }

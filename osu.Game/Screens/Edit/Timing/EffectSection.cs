@@ -56,7 +56,7 @@ namespace osu.Game.Screens.Edit.Timing
                 isRebinding = true;
 
                 kiai.Current = newEffectPoint.KiaiModeBindable;
-                scrollSpeedSlider.Current = new BindableDouble(1)
+                scrollSpeedSlider.Current = new BindableDouble
                 {
                     MinValue = 0.01,
                     MaxValue = 10,

@@ -76,13 +76,12 @@ namespace osu.Game.Screens.Ranking
             };
             beatmapSetRequest.Failure += e =>
             {
-                Logger.Log($"Favourite button failed to fetch beatmap info: {e}", LoggingTarget.Network);
+                Logger.Error(e, $"Failed to fetch beatmap info: {e.Message}");
 
                 Schedule(() =>
                 {
                     loading.Hide();
                     Enabled.Value = false;
-                    TooltipText = "this beatmap cannot be favourited";
                 });
             };
             api.Queue(beatmapSetRequest);

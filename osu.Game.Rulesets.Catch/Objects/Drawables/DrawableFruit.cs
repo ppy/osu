@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Graphics;
 using osu.Game.Rulesets.Catch.Skinning.Default;
 using osu.Game.Skinning;
 
@@ -31,8 +32,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
         {
             base.UpdateInitialTransforms();
 
-            // Important to have this in UpdateInitialTransforms() to it is re-triggered by RefreshStateTransforms().
-            ScalingContainer.Rotation = (RandomSingle(1) - 0.5f) * 40;
+            ScalingContainer.RotateTo((RandomSingle(1) - 0.5f) * 40);
         }
     }
 }

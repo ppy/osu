@@ -137,13 +137,11 @@ namespace osu.Game.Screens.Select
 
         private void loadNewRoot()
         {
-            beatmapsSplitOut = activeCriteria.SplitOutDifficulties;
-
             // Ensure no changes are made to the list while we are initialising items.
             // We'll catch up on changes via subscriptions anyway.
             BeatmapSetInfo[] loadableSets = detachedBeatmapSets!.ToArray();
 
-            if (selectedBeatmapSet != null && !loadableSets.Contains(selectedBeatmapSet.BeatmapSet, EqualityComparer<BeatmapSetInfo>.Default))
+            if (selectedBeatmapSet != null && !loadableSets.Contains(selectedBeatmapSet.BeatmapSet))
                 selectedBeatmapSet = null;
 
             var selectedBeatmapBefore = selectedBeatmap?.BeatmapInfo;
@@ -706,7 +704,7 @@ namespace osu.Game.Screens.Select
 
         private bool beatmapsSplitOut;
 
-        private void applyActiveCriteria(bool debounce)
+        private void applyActiveCriteria(bool debounce, bool alwaysResetScrollPosition = true)
         {
             PendingFilter?.Cancel();
             PendingFilter = null;
@@ -728,6 +726,7 @@ namespace osu.Game.Screens.Select
 
                 if (activeCriteria.SplitOutDifficulties != beatmapsSplitOut)
                 {
+                    beatmapsSplitOut = activeCriteria.SplitOutDifficulties;
                     loadNewRoot();
                     return;
                 }
@@ -735,7 +734,8 @@ namespace osu.Game.Screens.Select
                 root.Filter(activeCriteria);
                 itemsCache.Invalidate();
 
-                ScrollToSelected(true);
+                if (alwaysResetScrollPosition || !Scroll.UserScrolling)
+                    ScrollToSelected(true);
 
                 FilterApplied?.Invoke();
             }
@@ -1035,7 +1035,7 @@ namespace osu.Game.Screens.Select
             itemsCache.Validate();
 
             // update and let external consumers know about selection loss.
-            if (BeatmapSetsLoaded && AllowSelection)
+            if (BeatmapSetsLoaded)
             {
                 bool selectionLost = selectedBeatmapSet != null && selectedBeatmapSet.State.Value != CarouselItemState.Selected;
 

@@ -159,12 +159,10 @@ namespace osu.Game.Screens.Select
             switch (value)
             {
                 case "1":
-                case "yes":
                     result = true;
                     return true;
 
                 case "0":
-                case "no":
                     result = false;
                     return true;
 

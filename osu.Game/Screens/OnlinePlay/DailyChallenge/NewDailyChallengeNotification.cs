@@ -5,7 +5,6 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps.Drawables.Cards;
-using osu.Game.Configuration;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays.Notifications;
@@ -26,17 +25,13 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuGame? game, SessionStatics statics)
+        private void load(OsuGame? game)
         {
             Text = DailyChallengeStrings.ChallengeLiveNotification;
             Content.Add(card = new BeatmapCardNano((APIBeatmapSet)room.Playlist.Single().Beatmap.BeatmapSet!));
             Activated = () =>
             {
-                if (statics.Get<bool>(Static.DailyChallengeIntroPlayed))
-                    game?.PerformFromScreen(s => s.Push(new DailyChallenge(room)), [typeof(MainMenu)]);
-                else
-                    game?.PerformFromScreen(s => s.Push(new DailyChallengeIntro(room)), [typeof(MainMenu)]);
-
+                game?.PerformFromScreen(s => s.Push(new DailyChallenge(room)), [typeof(MainMenu)]);
                 return true;
             };
         }

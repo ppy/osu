@@ -39,23 +39,14 @@ namespace osu.Game.Screens.Play.HUD
 
         private IBindable<APIUser>? apiUser;
 
-        private readonly Container cornerContainer;
-
         public PlayerAvatar()
         {
             Size = new Vector2(default_size);
 
-            InternalChild = cornerContainer = new Container
+            InternalChild = avatar = new UpdateableAvatar(isInteractive: false)
             {
-                Masking = true,
                 RelativeSizeAxes = Axes.Both,
-                Child = avatar = new UpdateableAvatar(isInteractive: false)
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    RelativeSizeAxes = Axes.Both,
-                    FillMode = FillMode.Fill,
-                }
+                Masking = true
             };
         }
 
@@ -75,7 +66,7 @@ namespace osu.Game.Screens.Play.HUD
         {
             base.LoadComplete();
 
-            CornerRadius.BindValueChanged(e => cornerContainer.CornerRadius = e.NewValue * default_size, true);
+            CornerRadius.BindValueChanged(e => avatar.CornerRadius = e.NewValue * default_size, true);
         }
 
         public bool UsesFixedAnchor { get; set; }
