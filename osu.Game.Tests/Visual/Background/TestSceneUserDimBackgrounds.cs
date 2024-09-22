@@ -478,7 +478,7 @@ namespace osu.Game.Tests.Visual.Background
                 get
                 {
                     Color4 ContentColour = Content.Colour;
-                    float DimLevel = DimmableBeatmapBackground.DimLevel;
+                    float DimLevel = BeatmapBackground.DimLevel;
 
                     return new Color4(
                         ContentColour.R * (1 - DimLevel),
@@ -492,8 +492,8 @@ namespace osu.Game.Tests.Visual.Background
             {
                 get
                 {
-                    float DimLevel = DimmableBeatmapBackground.DimLevel;
-                    Color4 DimColour = DimmableBeatmapBackground.DimColour;
+                    float DimLevel = BeatmapBackground.DimLevel;
+                    Color4 DimColour = BeatmapBackground.DimColour;
 
                     return new Color4(
                         DimColour.R * DimLevel,

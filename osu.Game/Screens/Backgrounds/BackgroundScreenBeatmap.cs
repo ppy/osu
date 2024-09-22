@@ -75,7 +75,7 @@ namespace osu.Game.Screens.Backgrounds
         [BackgroundDependencyLoader]
         private void load()
         {
-            var background = new DimmableBeatmapBackground(beatmap);
+            var background = new BeatmapBackground(beatmap);
             LoadComponent(background);
             switchBackground(background);
         }
@@ -94,11 +94,11 @@ namespace osu.Game.Screens.Backgrounds
 
                 Schedule(() =>
                 {
-                    if ((Background as DimmableBeatmapBackground)?.Beatmap.BeatmapInfo.BackgroundEquals(beatmap?.BeatmapInfo) ?? false)
+                    if ((Background as BeatmapBackground)?.Beatmap.BeatmapInfo.BackgroundEquals(beatmap?.BeatmapInfo) ?? false)
                         return;
 
                     cancellationSource?.Cancel();
-                    LoadComponentAsync(new DimmableBeatmapBackground(beatmap), switchBackground, (cancellationSource = new CancellationTokenSource()).Token);
+                    LoadComponentAsync(new BeatmapBackground(beatmap), switchBackground, (cancellationSource = new CancellationTokenSource()).Token);
                 });
             }
         }
@@ -111,11 +111,11 @@ namespace osu.Game.Screens.Backgrounds
             Schedule(() =>
             {
                 cancellationSource?.Cancel();
-                LoadComponentAsync(new DimmableBeatmapBackground(beatmap), switchBackground, (cancellationSource = new CancellationTokenSource()).Token);
+                LoadComponentAsync(new BeatmapBackground(beatmap), switchBackground, (cancellationSource = new CancellationTokenSource()).Token);
             });
         }
 
-        private void switchBackground(DimmableBeatmapBackground b)
+        private void switchBackground(BeatmapBackground b)
         {
             float newDepth = 0;
 
@@ -128,7 +128,7 @@ namespace osu.Game.Screens.Backgrounds
             }
 
             b.Depth = newDepth;
-            Background = dimmable.DimmableBeatmapBackground = b;
+            Background = dimmable.BeatmapBackground = b;
         }
 
         public override bool Equals(BackgroundScreen other)
@@ -152,7 +152,7 @@ namespace osu.Game.Screens.Backgrounds
 
             public Background Background => background;
 
-            public DimmableBeatmapBackground DimmableBeatmapBackground
+            public BeatmapBackground BeatmapBackground
             {
                 get => background;
                 set
@@ -167,7 +167,7 @@ namespace osu.Game.Screens.Backgrounds
             private Bindable<double> userBlurLevel { get; set; }
             private Bindable<double> userDimColour { get; set; }
 
-            private DimmableBeatmapBackground background;
+            private BeatmapBackground background;
 
             public override void Add(Drawable drawable)
             {
@@ -236,9 +236,9 @@ namespace osu.Game.Screens.Backgrounds
                 ContentDisplayed = ShowDimContent;
 
                 Content.FadeTo(ContentDisplayed ? 1 : 0, BACKGROUND_FADE_DURATION, Easing.OutQuint);
-                background?.TransformTo(nameof(DimmableBeatmapBackground.DimLevel), DimLevel, BACKGROUND_FADE_DURATION, Easing.OutQuint);
+                background?.TransformTo(nameof(BeatmapBackground.DimLevel), DimLevel, BACKGROUND_FADE_DURATION, Easing.OutQuint);
 
-                background?.TransformTo(nameof(DimmableBeatmapBackground.DimColour), DimColour, BACKGROUND_FADE_DURATION, Easing.OutQuint);
+                background?.TransformTo(nameof(BeatmapBackground.DimColour), DimColour, BACKGROUND_FADE_DURATION, Easing.OutQuint);
 
                 Background?.BlurTo(blurTarget, BACKGROUND_FADE_DURATION, Easing.OutQuint);
             }
