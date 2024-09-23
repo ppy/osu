@@ -129,6 +129,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
         public bool SelectAll() => textBox.SelectAll();
 
         private bool updatingFromCurrent;
+        private bool updatingFromTextBox;
 
         private void textChanged(ValueChangedEvent<string> change)
         {
@@ -148,6 +149,8 @@ namespace osu.Game.Graphics.UserInterfaceV2
         private void tryUpdateCurrentFromTextBox()
         {
             if (updatingFromCurrent) return;
+
+            updatingFromTextBox = true;
 
             try
             {
@@ -171,6 +174,8 @@ namespace osu.Game.Graphics.UserInterfaceV2
                 // ignore parsing failures.
                 // sane state will eventually be restored by a commit (either explicit, or implicit via focus loss).
             }
+
+            updatingFromTextBox = false;
         }
 
         private void updateCurrentFromSlider(ValueChangedEvent<T> _)
@@ -186,8 +191,11 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
             slider.Current.Value = Current.Value;
 
-            decimal decimalValue = decimal.CreateTruncating(Current.Value);
-            textBox.Text = decimalValue.ToString($@"N{FormatUtils.FindPrecision(decimalValue)}");
+            if (!updatingFromTextBox)
+            {
+                decimal decimalValue = decimal.CreateTruncating(Current.Value);
+                textBox.Text = decimalValue.ToString($@"N{FormatUtils.FindPrecision(decimalValue)}");
+            }
 
             updatingFromCurrent = false;
         }
