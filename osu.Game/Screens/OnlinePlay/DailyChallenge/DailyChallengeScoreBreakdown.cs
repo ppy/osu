@@ -47,14 +47,6 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
                     Origin = Anchor.BottomCentre,
                 }
             };
-
-            for (int i = 0; i < bin_count; ++i)
-            {
-                barsContainer.Add(new Bar(100_000 * i, 100_000 * (i + 1) - 1)
-                {
-                    Width = 1f / bin_count,
-                });
-            }
         }
 
         protected override void LoadComplete()
@@ -139,8 +131,28 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
 
         private void updateCounts()
         {
+            int displayCutoff = Array.FindLastIndex(bins, x => x > 0) + 1;
+
+            if (displayCutoff > barsContainer.Count)
+            {
+                for (int i = 0; i < displayCutoff; i++)
+                {
+                    if (i < barsContainer.Count)
+                    {
+                        barsContainer[i].Width = 1f / displayCutoff;
+                    }
+                    else
+                    {
+                        barsContainer.Add(new Bar(100_000 * i, 100_000 * (i + 1) - 1)
+                        {
+                            Width = 1f / displayCutoff,
+                        });
+                    }
+                }
+            }
+
             long max = Math.Max(bins.Max(), 1);
-            for (int i = 0; i < bin_count; ++i)
+            for (int i = 0; i < displayCutoff; ++i)
                 barsContainer[i].UpdateCounts(bins[i], max);
         }
 
