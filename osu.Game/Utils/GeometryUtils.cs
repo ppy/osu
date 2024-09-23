@@ -223,9 +223,9 @@ namespace osu.Game.Utils
         #region Welzl helpers
 
         // Function to check whether a point lies inside or on the boundaries of the circle
-        private static bool isInside((Vector2, float) c, Vector2 p)
+        private static bool isInside((Vector2 Centre, float Radius) c, Vector2 p)
         {
-            return Precision.AlmostBigger(c.Item2, Vector2.Distance(c.Item1, p));
+            return Precision.AlmostBigger(c.Radius, Vector2.Distance(c.Centre, p));
         }
 
         // Function to return a unique circle that intersects three points
@@ -336,7 +336,7 @@ namespace osu.Game.Utils
         /// <summary>
         /// Function to find the minimum enclosing circle for a collection of points.
         /// </summary>
-        /// <returns>A tuple containing the circle center and radius.</returns>
+        /// <returns>A tuple containing the circle centre and radius.</returns>
         public static (Vector2, float) MinimumEnclosingCircle(IEnumerable<Vector2> points)
         {
             // Using Welzl's algorithm to find the minimum enclosing circle
@@ -348,7 +348,7 @@ namespace osu.Game.Utils
         /// <summary>
         /// Function to find the minimum enclosing circle for a collection of hit objects.
         /// </summary>
-        /// <returns>A tuple containing the circle center and radius.</returns>
+        /// <returns>A tuple containing the circle centre and radius.</returns>
         public static (Vector2, float) MinimumEnclosingCircle(IEnumerable<IHasPosition> hitObjects) =>
             MinimumEnclosingCircle(enumerateStartAndEndPositions(hitObjects));
     }
