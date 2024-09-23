@@ -303,14 +303,14 @@ namespace osu.Game.Utils
         // Takes a set of input points P and a set R
         // points on the circle boundary.
         // n represents the number of points in P that are not yet processed.
-        private static (Vector2, float) welzlHelper(List<Vector2> points, ReadOnlySpan<Vector2> r, int n, Random random)
+        private static (Vector2, float) welzlHelper(List<Vector2> points, ReadOnlySpan<Vector2> r, int n)
         {
             // Base case when all points processed or |R| = 3
             if (n == 0 || r.Length == 3)
                 return minCircleTrivial(r);
 
             // Pick a random point randomly
-            int idx = random.Next(n);
+            int idx = RNG.Next(n);
             Vector2 p = points[idx];
 
             // Put the picked point at the end of P since it's more efficient than
@@ -318,7 +318,7 @@ namespace osu.Game.Utils
             (points[idx], points[n - 1]) = (points[n - 1], points[idx]);
 
             // Get the MEC circle d from the set of points P - {p}
-            var d = welzlHelper(points, r, n - 1, random);
+            var d = welzlHelper(points, r, n - 1);
 
             // If d contains p, return d
             if (isInside(d, p))
@@ -331,7 +331,7 @@ namespace osu.Game.Utils
             r2[r.Length] = p;
 
             // Return the MEC for P - {p} and R U {p}
-            return welzlHelper(points, r2, n - 1, random);
+            return welzlHelper(points, r2, n - 1);
         }
 
         #endregion
@@ -345,7 +345,7 @@ namespace osu.Game.Utils
             // Using Welzl's algorithm to find the minimum enclosing circle
             // https://www.geeksforgeeks.org/minimum-enclosing-circle-using-welzls-algorithm/
             List<Vector2> pCopy = points.ToList();
-            return welzlHelper(pCopy, Array.Empty<Vector2>(), pCopy.Count, new Random());
+            return welzlHelper(pCopy, Array.Empty<Vector2>(), pCopy.Count);
         }
 
         /// <summary>
