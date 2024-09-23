@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -45,9 +46,34 @@ namespace osu.Game.Skinning
 
         private const string unknown_creator_string = @"Unknown";
 
-        public override async Task<Live<SkinInfo>?> ImportAsUpdate(ProgressNotification notification, ImportTask task, SkinInfo original)
+        /// <summary>
+        /// Update an existing skin with the contents of a path
+        /// </summary>
+        /// <param name="notification">The progress notification</param>
+        /// <param name="task">The <see cref="ImportTask"/> to update the <paramref name="original"/> with</param>
+        /// <param name="original">The <see cref="SkinInfo"/> to update</param>
+        /// <returns></returns>
+        public override Task<Live<SkinInfo>?> ImportAsUpdate(ProgressNotification notification, ImportTask task, SkinInfo original)
         {
-            throw new NotImplementedException();
+            var skinInfoLive = original.ToLive(Realm);
+
+            skinInfoLive.PerformWrite(skinInfo =>
+            {
+                skinInfo.Files.Clear();
+
+                string[] filesInMountedDirectory = Directory.EnumerateFiles(task.Path, "*.*", SearchOption.AllDirectories).Select(f => Path.GetRelativePath(task.Path, f)).ToArray();
+
+                foreach (string file in filesInMountedDirectory)
+                {
+                    using var stream = File.OpenRead(Path.Combine(task.Path, file));
+
+                    // The GetFile call in this method is *really* expensive, and we are certain that the file does not exist in the skin yet.
+                    // Consider adding a method to add a file without checking if it already exists. Or add the file directly to the skin.
+                    modelManager.AddFile(original, stream, file);
+                }
+            });
+
+            return Task.FromResult(skinInfoLive)!;
         }
 
         protected override void Populate(SkinInfo model, ArchiveReader? archive, Realm realm, CancellationToken cancellationToken = default)
