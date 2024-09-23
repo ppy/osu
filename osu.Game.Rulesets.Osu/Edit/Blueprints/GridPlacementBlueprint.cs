@@ -70,6 +70,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints
             return base.OnMouseDown(e);
         }
 
+        public override SnapType SnapType => ~SnapType.GlobalGrids;
+
         public override void UpdateTimeAndPosition(SnapResult result)
         {
             var pos = ToLocalSpace(result.ScreenSpacePosition);

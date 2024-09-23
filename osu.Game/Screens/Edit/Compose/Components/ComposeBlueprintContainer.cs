@@ -297,7 +297,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         private void updatePlacementPosition()
         {
-            var snapResult = Composer.FindSnappedPositionAndTime(InputManager.CurrentState.Mouse.Position);
+            var snapResult = Composer.FindSnappedPositionAndTime(InputManager.CurrentState.Mouse.Position, CurrentPlacement.SnapType);
 
             // if no time was found from positional snapping, we should still quantize to the beat.
             snapResult.Time ??= Beatmap.SnapTime(EditorClock.CurrentTime, null);
