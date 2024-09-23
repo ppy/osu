@@ -305,8 +305,11 @@ namespace osu.Game.Utils
         // n represents the number of points in P that are not yet processed.
         private static (Vector2, float) welzlHelper(List<Vector2> points, ReadOnlySpan<Vector2> r, int n)
         {
+            const int max_depth = 4000;
+
             // Base case when all points processed or |R| = 3
-            if (n == 0 || r.Length == 3)
+            // To prevent stack overflow, we stop at a certain depth and give an approximate answer
+            if (n == 0 || r.Length == 3 || points.Count - n >= max_depth)
                 return minCircleTrivial(r);
 
             // Pick a random point randomly
