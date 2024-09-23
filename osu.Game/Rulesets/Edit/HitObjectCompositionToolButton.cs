@@ -9,9 +9,9 @@ namespace osu.Game.Rulesets.Edit
 {
     public class HitObjectCompositionToolButton : RadioButton
     {
-        public HitObjectCompositionTool Tool { get; }
+        public CompositionTool Tool { get; }
 
-        public HitObjectCompositionToolButton(HitObjectCompositionTool tool, Action? action)
+        public HitObjectCompositionToolButton(CompositionTool tool, Action? action)
             : base(tool.Name, action, tool.CreateIcon)
         {
             Tool = tool;

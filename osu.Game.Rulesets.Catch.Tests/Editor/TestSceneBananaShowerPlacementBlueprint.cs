@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Catch.Tests.Editor
     {
         protected override DrawableHitObject CreateHitObject(HitObject hitObject) => new DrawableBananaShower((BananaShower)hitObject);
 
-        protected override PlacementBlueprint CreateBlueprint() => new BananaShowerPlacementBlueprint();
+        protected override HitObjectPlacementBlueprint CreateBlueprint() => new BananaShowerPlacementBlueprint();
 
         protected override void AddHitObject(DrawableHitObject hitObject)
         {
@@ -71,7 +71,7 @@ namespace osu.Game.Rulesets.Catch.Tests.Editor
             AddClickStep(MouseButton.Left);
             AddClickStep(MouseButton.Right);
             AddAssert("banana shower is not placed", () => LastObject == null);
-            AddAssert("state is waiting", () => CurrentBlueprint?.PlacementActive == PlacementBlueprint.PlacementState.Waiting);
+            AddAssert("state is waiting", () => CurrentBlueprint?.PlacementActive == HitObjectPlacementBlueprint.PlacementState.Waiting);
         }
 
         [Test]
