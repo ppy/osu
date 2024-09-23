@@ -77,6 +77,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
         {
             base.OnDrag(e);
 
+            if (rotationHandler == null || !rotationHandler.OperationInProgress.Value) return;
+
             rawCumulativeRotation += convertDragEventToAngleOfRotation(e);
 
             applyRotation(shouldSnap: e.ShiftPressed);
@@ -114,9 +116,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         private float convertDragEventToAngleOfRotation(DragEvent e)
         {
             // Adjust coordinate system to the center of the selection
-            Vector2 center = rotationHandler?.DefaultOrigin is not null
-                ? selectionBox.ToLocalSpace(rotationHandler.ToScreenSpace(rotationHandler.DefaultOrigin.Value))
-                : selectionBox.DrawSize / 2;
+            Vector2 center = selectionBox.ToLocalSpace(rotationHandler!.ToScreenSpace(rotationHandler!.DefaultOrigin!.Value));
 
             float startAngle = MathF.Atan2(e.LastMousePosition.Y - center.Y, e.LastMousePosition.X - center.X);
             float endAngle = MathF.Atan2(e.MousePosition.Y - center.Y, e.MousePosition.X - center.X);
