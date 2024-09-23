@@ -37,8 +37,8 @@ namespace osu.Game.Graphics.UserInterfaceV2
                 current.Current = value;
                 slider.Current = new BindableNumber<T>
                 {
-                    MinValue = current.MinValue,
-                    MaxValue = current.MaxValue,
+                    MinValue = sliderMinValue ?? current.MinValue,
+                    MaxValue = sliderMaxValue ?? current.MaxValue,
                     Default = current.Default,
                     Precision = sliderPrecision ?? current.Precision,
                 };
