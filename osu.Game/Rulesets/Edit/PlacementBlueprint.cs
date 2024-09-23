@@ -71,6 +71,8 @@ namespace osu.Game.Rulesets.Edit
             PlacementActive = PlacementState.Finished;
         }
 
+        public virtual SnapType SnapType => SnapType.All;
+
         /// <summary>
         /// Updates the time and position of this <see cref="PlacementBlueprint"/> based on the provided snap information.
         /// </summary>
