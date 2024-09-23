@@ -56,52 +56,10 @@ namespace osu.Game.Graphics.UserInterfaceV2
                 sliderPrecision = value;
                 slider.Current = new BindableNumber<T>
                 {
-                    MinValue = sliderMinValue ?? current.MinValue,
-                    MaxValue = sliderMaxValue ?? current.MaxValue,
+                    MinValue = current.MinValue,
+                    MaxValue = current.MaxValue,
                     Default = current.Default,
                     Precision = value ?? current.Precision,
-                };
-            }
-        }
-
-        private T? sliderMinValue;
-
-        public T? SliderMinValue
-        {
-            get => sliderMinValue;
-            set
-            {
-                if (value.HasValue && value.Value < current.MinValue)
-                    throw new ArgumentException(@"Minimum value override must be greater than or equal to the current minimum value.");
-
-                sliderMinValue = value;
-                slider.Current = new BindableNumber<T>
-                {
-                    MinValue = value ?? current.MinValue,
-                    MaxValue = sliderMaxValue ?? current.MaxValue,
-                    Default = current.Default,
-                    Precision = sliderPrecision ?? current.Precision,
-                };
-            }
-        }
-
-        private T? sliderMaxValue;
-
-        public T? SliderMaxValue
-        {
-            get => sliderMaxValue;
-            set
-            {
-                if (value.HasValue && value.Value > current.MaxValue)
-                    throw new ArgumentException(@"Maximum value override must be less than or equal to the current maximum value.");
-
-                sliderMaxValue = value;
-                slider.Current = new BindableNumber<T>
-                {
-                    MinValue = sliderMinValue ?? current.MinValue,
-                    MaxValue = value ?? current.MaxValue,
-                    Default = current.Default,
-                    Precision = sliderPrecision ?? current.Precision,
                 };
             }
         }
