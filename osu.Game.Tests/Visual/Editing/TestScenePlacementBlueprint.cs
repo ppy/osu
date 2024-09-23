@@ -122,7 +122,7 @@ namespace osu.Game.Tests.Visual.Editing
             AddAssert("editor is still current", () => Editor.IsCurrentScreen());
             AddAssert("slider not placed", () => EditorBeatmap.HitObjects.Count, () => Is.EqualTo(0));
             AddAssert("no active placement", () => this.ChildrenOfType<ComposeBlueprintContainer>().Single().CurrentPlacement.PlacementActive,
-                () => Is.EqualTo(HitObjectPlacementBlueprint.PlacementState.Waiting));
+                () => Is.EqualTo(PlacementBlueprint.PlacementState.Waiting));
         }
 
         [Test]
