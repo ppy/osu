@@ -77,8 +77,6 @@ namespace osu.Game.Rulesets.Edit
 
         protected readonly Container LayerBelowRuleset = new Container { RelativeSizeAxes = Axes.Both };
 
-        protected readonly Container LayerAboveRuleset = new Container { RelativeSizeAxes = Axes.Both };
-
         protected InputManager InputManager { get; private set; }
 
         private Box leftToolboxBackground;
@@ -145,8 +143,7 @@ namespace osu.Game.Rulesets.Edit
                         drawableRulesetWrapper,
                         // layers above playfield
                         drawableRulesetWrapper.CreatePlayfieldAdjustmentContainer()
-                                              .WithChild(blueprintContainer = CreateBlueprintContainer()),
-                        drawableRulesetWrapper.CreatePlayfieldAdjustmentContainer().WithChild(LayerAboveRuleset),
+                                              .WithChild(blueprintContainer = CreateBlueprintContainer())
                     }
                 },
                 new Container
@@ -234,7 +231,7 @@ namespace osu.Game.Rulesets.Edit
 
             sampleBankTogglesCollection.AddRange(BlueprintContainer.SampleBankTernaryStates.Select(b => new DrawableTernaryButton(b)));
 
-            setSelectTool();
+            SetSelectTool();
 
             EditorBeatmap.SelectedHitObjects.CollectionChanged += selectionChanged;
         }
@@ -259,7 +256,7 @@ namespace osu.Game.Rulesets.Edit
             {
                 // it's important this is performed before the similar code in EditorRadioButton disables the button.
                 if (!timing.NewValue)
-                    setSelectTool();
+                    SetSelectTool();
             });
 
             EditorBeatmap.HasTiming.BindValueChanged(hasTiming =>
@@ -463,11 +460,11 @@ namespace osu.Game.Rulesets.Edit
             if (EditorBeatmap.SelectedHitObjects.Any())
             {
                 // ensure in selection mode if a selection is made.
-                setSelectTool();
+                SetSelectTool();
             }
         }
 
-        private void setSelectTool() => toolboxCollection.Items.First().Select();
+        public void SetSelectTool() => toolboxCollection.Items.First().Select();
 
         private void toolSelected(CompositionTool tool)
         {
