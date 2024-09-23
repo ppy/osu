@@ -80,7 +80,14 @@ namespace osu.Game.Rulesets.Osu.Edit
                 angleInput.TakeFocus();
                 angleInput.SelectAll();
             });
-            angleInput.Current.BindValueChanged(angle => rotationInfo.Value = rotationInfo.Value with { Degrees = angle.NewValue });
+            angleInput.Current.BindValueChanged(angle =>
+            {
+                float normalizedAngle = angle.NewValue < -360 || angle.NewValue > 360
+                    ? ((((angle.NewValue + 360) % 720) + 720) % 720) - 360
+                    : angle.NewValue;
+                rotationInfo.Value = rotationInfo.Value with { Degrees = normalizedAngle };
+                angleInput.Current.Value = normalizedAngle;
+            });
             rotationOrigin.Items.First().Select();
 
             rotationHandler.CanRotateAroundSelectionOrigin.BindValueChanged(e =>
