@@ -107,6 +107,7 @@ namespace osu.Game.Rulesets.Osu.Edit
             }
 
             // Divide the distance so that there is a good density of grid lines.
+            // This matches the maximum grid size of the grid size cycling hotkey.
             float dist = Vector2.Distance(point1, point2);
             while (dist >= max_automatic_spacing)
                 dist /= 2;
