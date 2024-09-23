@@ -45,7 +45,8 @@ namespace osu.Game.Rulesets.Osu.Edit
         {
             new HitCircleCompositionTool(),
             new SliderCompositionTool(),
-            new SpinnerCompositionTool()
+            new SpinnerCompositionTool(),
+            new GridFromPointsTool(),
         };
 
         private readonly Bindable<TernaryState> rectangularGridSnapToggle = new Bindable<TernaryState>();
@@ -60,8 +61,6 @@ namespace osu.Game.Rulesets.Osu.Edit
         private BindableList<HitObject> selectedHitObjects;
 
         private Bindable<HitObject> placementObject;
-
-        private GridFromPointsTool gridFromPointsTool;
 
         [Cached(typeof(IDistanceSnapProvider))]
         public readonly OsuDistanceSnapProvider DistanceSnapProvider = new OsuDistanceSnapProvider();
@@ -99,14 +98,6 @@ namespace osu.Game.Rulesets.Osu.Edit
             updateDistanceSnapGrid();
 
             OsuGridToolboxGroup.GridType.BindValueChanged(updatePositionSnapGrid, true);
-
-            LayerAboveRuleset.Add(
-                // Place it above the playfield and blueprints, so it takes priority when handling input.
-                gridFromPointsTool = new GridFromPointsTool
-                {
-                    RelativeSizeAxes = Axes.Both,
-                }
-            );
 
             RightToolbox.AddRange(new Drawable[]
                 {
@@ -291,7 +282,7 @@ namespace osu.Game.Rulesets.Osu.Edit
 
             foreach (var b in blueprints)
             {
-                if (b.IsSelected && !gridFromPointsTool.IsPlacing)
+                if (b.IsSelected)
                     continue;
 
                 var snapPositions = b.ScreenSpaceSnapPoints;
