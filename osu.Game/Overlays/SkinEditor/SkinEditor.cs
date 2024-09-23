@@ -318,32 +318,7 @@ namespace osu.Game.Overlays.SkinEditor
 
             mountMenuItem.Action.Disabled = true;
 
-            await Task.Run(() =>
-            {
-                currentSkin.Value.SkinInfo.PerformWrite(skinInfo =>
-                {
-                    // Clear files in the skin
-                    skinInfo.Files.Clear();
-
-                    // Get all the files in the mounted directory and add them to the skin
-                    string[] filesInMounted = Directory.EnumerateFiles(externalEditOperation.MountedPath, "*.*", SearchOption.AllDirectories).Select(f => Path.GetRelativePath(externalEditOperation.MountedPath, f)).ToArray();
-
-                    foreach (string file in filesInMounted)
-                    {
-                        using var stream = File.OpenRead(Path.Combine(externalEditOperation.MountedPath, file));
-
-                        // The GetFile call in this method is really expensive, and we are certain that the file does not exist in the skin yet.
-                        // Consider adding a method to add a file without checking if it exists. Or add the file directly to the skin.
-                        skins.AddFile(skinInfo, stream, file);
-                    }
-                });
-
-                try
-                {
-                    Directory.Delete(externalEditOperation.MountedPath, true);
-                }
-                catch { }
-            }).ConfigureAwait(false);
+            await externalEditOperation.Finish().ConfigureAwait(false);
 
             Schedule(() =>
             {
@@ -354,7 +329,6 @@ namespace osu.Game.Overlays.SkinEditor
                 // If there's a better way to reload the skin, this should be replaced with it.
                 currentSkin.Value = newSkinInfo.CreateInstance(skins);
 
-                // Dispose the old skin to ensure it's no longer used
                 oldskin.Dispose();
 
                 mountMenuItem.Action.Disabled = false;
