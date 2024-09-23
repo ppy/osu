@@ -13,7 +13,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
     public partial class SelectionRotationHandler : Component
     {
         /// <summary>
-        /// Whether there is any ongoing scale operation right now.
+        /// Whether there is any ongoing rotation operation right now.
         /// </summary>
         public Bindable<bool> OperationInProgress { get; private set; } = new BindableBool();
 
