@@ -234,7 +234,7 @@ namespace osu.Game.Utils
             if (Precision.AlmostEquals(0, (b.Y - a.Y) * (c.X - a.X) - (b.X - a.X) * (c.Y - a.Y)))
                 return circleFrom(a, b);
 
-            // See: https://en.wikipedia.org/wiki/Circumscribed_circle#Cartesian_coordinates_2
+            // See: https://en.wikipedia.org/wiki/Circumcircle#Cartesian_coordinates
             float d = 2 * (a.X * (b - c).Y + b.X * (c - a).Y + c.X * (a - b).Y);
             float aSq = a.LengthSquared;
             float bSq = b.LengthSquared;
