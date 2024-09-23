@@ -220,7 +220,7 @@ namespace osu.Game.Utils
                 return new[] { h.Position };
             });
 
-        #region welzl_helpers
+        #region Welzl helpers
 
         // Function to check whether a point lies inside or on the boundaries of the circle
         private static bool isInside((Vector2, float) c, Vector2 p)
