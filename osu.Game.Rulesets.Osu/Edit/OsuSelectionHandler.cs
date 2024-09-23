@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.UserInterface;
@@ -25,6 +26,9 @@ namespace osu.Game.Rulesets.Osu.Edit
 {
     public partial class OsuSelectionHandler : EditorSelectionHandler
     {
+        [Resolved]
+        private OsuGridToolboxGroup gridToolbox { get; set; } = null!;
+
         protected override void OnSelectionChanged()
         {
             base.OnSelectionChanged();
@@ -123,13 +127,43 @@ namespace osu.Game.Rulesets.Osu.Edit
         {
             var hitObjects = selectedMovableObjects;
 
-            var flipQuad = flipOverOrigin ? new Quad(0, 0, OsuPlayfield.BASE_SIZE.X, OsuPlayfield.BASE_SIZE.Y) : GeometryUtils.GetSurroundingQuad(hitObjects);
+            // If we're flipping over the origin, we take the grid origin position from the grid toolbox.
+            var flipQuad = flipOverOrigin ? new Quad(gridToolbox.StartPositionX.Value, gridToolbox.StartPositionY.Value, 0, 0) : GeometryUtils.GetSurroundingQuad(hitObjects);
+            Vector2 flipAxis = direction == Direction.Vertical ? Vector2.UnitY : Vector2.UnitX;
+
+            if (flipOverOrigin)
+            {
+                // If we're flipping over the origin, we take one of the axes of the grid.
+                // Take the axis closest to the direction we want to flip over.
+                switch (gridToolbox.GridType.Value)
+                {
+                    case PositionSnapGridType.Square:
+                        flipAxis = GeometryUtils.RotateVector(Vector2.UnitX, -((gridToolbox.GridLinesRotation.Value + 360 + 45) % 90 - 45));
+                        flipAxis = direction == Direction.Vertical ? flipAxis.PerpendicularLeft : flipAxis;
+                        break;
+
+                    case PositionSnapGridType.Triangle:
+                        // Hex grid has 3 axes, so you can not directly flip over one of the axes,
+                        // however it's still possible to achieve that flip by combining multiple flips over the other axes.
+                        // Angle degree range for vertical = (-120, -60]
+                        // Angle degree range for horizontal = [-30, 30)
+                        flipAxis = direction == Direction.Vertical
+                            ? GeometryUtils.RotateVector(Vector2.UnitX, -((gridToolbox.GridLinesRotation.Value + 360 + 30) % 60 + 60))
+                            : GeometryUtils.RotateVector(Vector2.UnitX, -((gridToolbox.GridLinesRotation.Value + 360) % 60 - 30));
+                        break;
+                }
+            }
+
+            var controlPointFlipQuad = new Quad();
 
             bool didFlip = false;
 
             foreach (var h in hitObjects)
             {
-                var flippedPosition = GeometryUtils.GetFlippedPosition(direction, flipQuad, h.Position);
+                var flippedPosition = GeometryUtils.GetFlippedPosition(flipAxis, flipQuad, h.Position);
+
+                // Clamp the flipped position inside the playfield bounds, because the flipped position might be outside the playfield bounds if the origin is not centered.
+                flippedPosition = Vector2.Clamp(flippedPosition, Vector2.Zero, OsuPlayfield.BASE_SIZE);
 
                 if (!Precision.AlmostEquals(flippedPosition, h.Position))
                 {
@@ -142,12 +176,7 @@ namespace osu.Game.Rulesets.Osu.Edit
                     didFlip = true;
 
                     foreach (var cp in slider.Path.ControlPoints)
-                    {
-                        cp.Position = new Vector2(
-                            (direction == Direction.Horizontal ? -1 : 1) * cp.Position.X,
-                            (direction == Direction.Vertical ? -1 : 1) * cp.Position.Y
-                        );
-                    }
+                        cp.Position = GeometryUtils.GetFlippedPosition(flipAxis, controlPointFlipQuad, cp.Position);
                 }
             }
 

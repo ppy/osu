@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using NUnit.Framework;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
@@ -22,9 +20,9 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
 {
     public partial class TestSceneSliderSelectionBlueprint : SelectionBlueprintTestScene
     {
-        private Slider slider;
-        private DrawableSlider drawableObject;
-        private TestSliderBlueprint blueprint;
+        private Slider slider = null!;
+        private DrawableSlider drawableObject = null!;
+        private TestSliderBlueprint blueprint = null!;
 
         [SetUp]
         public void Setup() => Schedule(() =>
@@ -218,6 +216,9 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
 
             AddAssert("tail positioned correctly",
                 () => Precision.AlmostEquals(blueprint.TailOverlay.CirclePiece.ScreenSpaceDrawQuad.Centre, drawableObject.TailCircle.ScreenSpaceDrawQuad.Centre));
+
+            AddAssert("end drag marker positioned correctly",
+                () => Precision.AlmostEquals(blueprint.TailOverlay.EndDragMarker!.ToScreenSpace(blueprint.TailOverlay.EndDragMarker.OriginPosition), drawableObject.TailCircle.ScreenSpaceDrawQuad.Centre, 2));
         }
 
         private void moveMouseToControlPoint(int index)
@@ -230,14 +231,14 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
         }
 
         private void checkControlPointSelected(int index, bool selected)
-            => AddAssert($"control point {index} {(selected ? "selected" : "not selected")}", () => blueprint.ControlPointVisualiser.Pieces[index].IsSelected.Value == selected);
+            => AddAssert($"control point {index} {(selected ? "selected" : "not selected")}", () => blueprint.ControlPointVisualiser!.Pieces[index].IsSelected.Value == selected);
 
         private partial class TestSliderBlueprint : SliderSelectionBlueprint
         {
             public new SliderBodyPiece BodyPiece => base.BodyPiece;
             public new TestSliderCircleOverlay HeadOverlay => (TestSliderCircleOverlay)base.HeadOverlay;
             public new TestSliderCircleOverlay TailOverlay => (TestSliderCircleOverlay)base.TailOverlay;
-            public new PathControlPointVisualiser<Slider> ControlPointVisualiser => base.ControlPointVisualiser;
+            public new PathControlPointVisualiser<Slider>? ControlPointVisualiser => base.ControlPointVisualiser;
 
             public TestSliderBlueprint(Slider slider)
                 : base(slider)
