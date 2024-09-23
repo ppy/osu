@@ -66,13 +66,12 @@ namespace osu.Game.Rulesets.Mania.UI
                 Content = new[] { new Drawable[stageDefinitions.Count] }
             });
 
-            var normalColumnAction = ManiaAction.Key1;
-            var specialColumnAction = ManiaAction.Special1;
+            var columnAction = ManiaAction.Key1;
             int firstColumnIndex = 0;
 
             for (int i = 0; i < stageDefinitions.Count; i++)
             {
-                var newStage = new Stage(firstColumnIndex, stageDefinitions[i], ref normalColumnAction, ref specialColumnAction);
+                var newStage = new Stage(firstColumnIndex, stageDefinitions[i], ref columnAction);
 
                 playfieldGrid.Content[0][i] = newStage;
 

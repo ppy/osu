@@ -390,7 +390,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
             base.LoadComplete();
 
             beatmapAvailabilityTracker.SelectedItem.Value = playlistItem;
-            beatmapAvailabilityTracker.Availability.BindValueChanged(_ => trySetDailyChallengeBeatmap(), true);
+            beatmapAvailabilityTracker.Availability.BindValueChanged(_ => TrySetDailyChallengeBeatmap(this, beatmapManager, rulesets, musicController, playlistItem), true);
 
             userModsSelectOverlayRegistration = overlayManager?.RegisterBlockingOverlay(userModsSelectOverlay);
             userModsSelectOverlay.SelectedItem.Value = playlistItem;
@@ -400,15 +400,6 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
             apiState.BindValueChanged(onlineStateChanged, true);
 
             dailyChallengeInfo.BindValueChanged(dailyChallengeChanged);
-        }
-
-        private void trySetDailyChallengeBeatmap()
-        {
-            var beatmap = beatmapManager.QueryBeatmap(b => b.OnlineID == playlistItem.Beatmap.OnlineID);
-            Beatmap.Value = beatmapManager.GetWorkingBeatmap(beatmap); // this will gracefully fall back to dummy beatmap if missing locally.
-            Ruleset.Value = rulesets.GetRuleset(playlistItem.RulesetID);
-
-            applyLoopingToTrack();
         }
 
         private void onlineStateChanged(ValueChangedEvent<APIState> state) => Schedule(() =>
@@ -444,7 +435,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
 
             waves.Show();
             roomManager.JoinRoom(room);
-            applyLoopingToTrack();
+            startLoopingTrack(this, musicController);
 
             metadataClient.BeginWatchingMultiplayerRoom(room.RoomID.Value!.Value).ContinueWith(t =>
             {
@@ -466,15 +457,15 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
                 });
             }, TaskContinuationOptions.OnlyOnRanToCompletion);
 
-            beatmapAvailabilityTracker.SelectedItem.Value = playlistItem;
-            beatmapAvailabilityTracker.Availability.BindValueChanged(_ => trySetDailyChallengeBeatmap(), true);
             userModsSelectOverlay.SelectedItem.Value = playlistItem;
+
+            TrySetDailyChallengeBeatmap(this, beatmapManager, rulesets, musicController, playlistItem);
         }
 
         public override void OnResuming(ScreenTransitionEvent e)
         {
             base.OnResuming(e);
-            applyLoopingToTrack();
+            startLoopingTrack(this, musicController);
             // re-apply mods as they may have been changed by a child screen
             // (one known instance of this is showing a replay).
             updateMods();
@@ -503,17 +494,30 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
             return base.OnExiting(e);
         }
 
-        private void applyLoopingToTrack()
+        public static void TrySetDailyChallengeBeatmap(OsuScreen screen, BeatmapManager beatmaps, RulesetStore rulesets, MusicController music, PlaylistItem item)
         {
-            if (!this.IsCurrentScreen())
+            if (!screen.IsCurrentScreen())
                 return;
 
-            var track = Beatmap.Value?.Track;
+            var beatmap = beatmaps.QueryBeatmap(b => b.OnlineID == item.Beatmap.OnlineID);
+
+            screen.Beatmap.Value = beatmaps.GetWorkingBeatmap(beatmap); // this will gracefully fall back to dummy beatmap if missing locally.
+            screen.Ruleset.Value = rulesets.GetRuleset(item.RulesetID);
+
+            startLoopingTrack(screen, music);
+        }
+
+        private static void startLoopingTrack(OsuScreen screen, MusicController music)
+        {
+            if (!screen.IsCurrentScreen())
+                return;
+
+            var track = screen.Beatmap.Value?.Track;
 
             if (track != null)
             {
-                Beatmap.Value?.PrepareTrackForPreview(true);
-                musicController.EnsurePlayingSomething();
+                screen.Beatmap.Value?.PrepareTrackForPreview(true);
+                music.EnsurePlayingSomething();
             }
         }
 
