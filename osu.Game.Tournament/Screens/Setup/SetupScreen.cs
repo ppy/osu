@@ -132,6 +132,12 @@ namespace osu.Game.Tournament.Screens.Setup
                         windowSize.Value = new Size((int)(height * aspect_ratio / TournamentSceneManager.STREAM_AREA_WIDTH * TournamentSceneManager.REQUIRED_WIDTH), height);
                     }
                 },
+                new ActionableInfo
+                {
+                    Label = "Background video settings",
+                    ButtonText = "Change videos",
+                    Description = "Set paths and behaviour of background video display.",
+                },
                 new LabelledSwitchButton
                 {
                     Label = "Use referee commands",
