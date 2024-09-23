@@ -269,6 +269,9 @@ namespace osu.Game.Utils
         // Function to return the minimum enclosing circle for N <= 3
         private static (Vector2, float) minCircleTrivial(ReadOnlySpan<Vector2> points)
         {
+            if (points.Length > 3)
+                throw new ArgumentException("Number of points must be at most 3", nameof(points));
+
             switch (points.Length)
             {
                 case 0:
