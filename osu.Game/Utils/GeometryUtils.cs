@@ -325,8 +325,13 @@ namespace osu.Game.Utils
                 return d;
 
             // Otherwise, must be on the boundary of the MEC
+            // Stackalloc to avoid allocations. It's safe to assume that the length of r will be at most 3
+            Span<Vector2> r2 = stackalloc Vector2[r.Length + 1];
+            r.CopyTo(r2);
+            r2[r.Length] = p;
+
             // Return the MEC for P - {p} and R U {p}
-            return welzlHelper(points, [..r, p], n - 1);
+            return welzlHelper(points, r2, n - 1);
         }
 
         #endregion
