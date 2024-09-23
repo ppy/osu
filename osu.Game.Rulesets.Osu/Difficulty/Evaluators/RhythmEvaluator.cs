@@ -198,11 +198,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                        Math.Abs(Delta - other.Delta) < deltaDifferenceEpsilon;
             }
 
-            public override int GetHashCode()
-            {
-                return HashCode.Combine(Delta, DeltaCount);
-            }
-
             public bool Equals(Island? other)
             {
                 if (other == null)
