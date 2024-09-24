@@ -198,15 +198,26 @@ namespace osu.Game.Rulesets.Osu.Edit
             updateAxisCheckBoxesEnabled();
         }
 
-        private Vector2? getOriginPosition(PreciseScaleInfo scale) =>
-            scale.Origin switch
+        private Vector2? getOriginPosition(PreciseScaleInfo scale)
+        {
+            switch (scale.Origin)
             {
-                ScaleOrigin.GridCentre => gridToolbox.StartPosition.Value,
-                ScaleOrigin.PlayfieldCentre => OsuPlayfield.BASE_SIZE / 2,
-                ScaleOrigin.SelectionCentre when selectedItems.Count == 1 && selectedItems.First() is Slider slider => slider.Position,
-                ScaleOrigin.SelectionCentre => null,
-                _ => throw new ArgumentOutOfRangeException(nameof(scale))
-            };
+                case ScaleOrigin.GridCentre:
+                    return gridToolbox.StartPosition.Value;
+
+                case ScaleOrigin.PlayfieldCentre:
+                    return OsuPlayfield.BASE_SIZE / 2;
+
+                case ScaleOrigin.SelectionCentre:
+                    if (selectedItems.Count == 1 && selectedItems.First() is Slider slider)
+                        return slider.Position;
+
+                    return null;
+
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(scale));
+            }
+        }
 
         private Axes getAdjustAxis(PreciseScaleInfo scale) => scale.XAxis ? scale.YAxis ? Axes.Both : Axes.X : Axes.Y;
 
