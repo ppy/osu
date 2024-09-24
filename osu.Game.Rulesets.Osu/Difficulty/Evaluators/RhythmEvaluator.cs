@@ -13,9 +13,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
     public static class RhythmEvaluator
     {
         private const int history_time_max = 4 * 1000; // 4 seconds
-        private const int history_objects_max = 24;
-        private const double rhythm_overall_multiplier = 0.95;
-        private const double rhythm_ratio_multiplier = 14.0;
+        private const int history_objects_max = 32;
+        private const double rhythm_overall_multiplier = 0.9;
+        private const double rhythm_ratio_multiplier = 11.5;
 
         /// <summary>
         /// Calculates a rhythm multiplier for the difficulty of the tap associated with historic data of the current <see cref="OsuDifficultyHitObject"/>.
@@ -78,15 +78,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
                 double effectiveRatio = windowPenalty * currRatio * fractionMultiplier;
 
-                // bpm change is into slider, this is easy acc window
-                if (currObj.BaseObject is Slider)
-                    effectiveRatio *= 0.125;
-
-                // bpm change was from a slider, this is easier typically than circle -> circle
-                // unintentional side effect is that bursts with kicksliders at the ends might have lower difficulty than bursts without sliders
-                if (prevObj.BaseObject is Slider)
-                    effectiveRatio *= 0.2;
-
                 if (firstDeltaSwitch)
                 {
                     if (Math.Abs(prevDelta - currDelta) < deltaDifferenceEpsilon)
@@ -96,6 +87,15 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                     }
                     else
                     {
+                        // bpm change is into slider, this is easy acc window
+                        if (currObj.BaseObject is Slider)
+                            effectiveRatio *= 0.125;
+
+                        // bpm change was from a slider, this is easier typically than circle -> circle
+                        // unintentional side effect is that bursts with kicksliders at the ends might have lower difficulty than bursts without sliders
+                        if (prevObj.BaseObject is Slider)
+                            effectiveRatio *= 0.15;
+
                         // repeated island polarity (2 -> 4, 3 -> 5)
                         if (island.IsSimilarPolarity(previousIsland))
                             effectiveRatio *= 0.3;
@@ -119,7 +119,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                                 islandCount.Count++;
 
                             // repeated island (ex: triplet -> triplet)
-                            double power = logistic(island.Delta, 4, 0.165, 10);
+                            double power = logistic(island.Delta, 2, 0.165, 10);
                             effectiveRatio *= Math.Min(3.0 / islandCount.Count, Math.Pow(1.0 / islandCount.Count, power));
 
                             islandCounts[countIndex] = (islandCount.Island, islandCount.Count);
