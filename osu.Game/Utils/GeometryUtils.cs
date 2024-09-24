@@ -305,33 +305,37 @@ namespace osu.Game.Utils
         // n represents the number of points in P that are not yet processed.
         private static (Vector2, float) welzlHelper(List<Vector2> points, ReadOnlySpan<Vector2> r, int n)
         {
-            // Base case when all points processed or |R| = 3
-            if (n == 0 || r.Length == 3)
-                return minCircleTrivial(r);
-
-            // Pick a random point randomly
-            int idx = RNG.Next(n);
-            Vector2 p = points[idx];
-
-            // Put the picked point at the end of P since it's more efficient than
-            // deleting from the middle of the list
-            (points[idx], points[n - 1]) = (points[n - 1], points[idx]);
-
-            // Get the MEC circle d from the set of points P - {p}
-            var d = welzlHelper(points, r, n - 1);
-
-            // If d contains p, return d
-            if (isInside(d, p))
-                return d;
-
-            // Otherwise, must be on the boundary of the MEC
-            // Stackalloc to avoid allocations. It's safe to assume that the length of r will be at most 3
-            Span<Vector2> r2 = stackalloc Vector2[r.Length + 1];
+            Span<Vector2> r2 = stackalloc Vector2[3];
+            int rLength = r.Length;
             r.CopyTo(r2);
-            r2[r.Length] = p;
 
-            // Return the MEC for P - {p} and R U {p}
-            return welzlHelper(points, r2, n - 1);
+            while (true)
+            {
+                // Base case when all points processed or |R| = 3
+                if (n == 0 || rLength == 3) return minCircleTrivial(r2[..rLength]);
+
+                // Pick a random point randomly
+                int idx = RNG.Next(n);
+                Vector2 p = points[idx];
+
+                // Put the picked point at the end of P since it's more efficient than
+                // deleting from the middle of the list
+                (points[idx], points[n - 1]) = (points[n - 1], points[idx]);
+
+                // Get the MEC circle d from the set of points P - {p}
+                var d = welzlHelper(points, r2[..rLength], n - 1);
+
+                // If d contains p, return d
+                if (isInside(d, p)) return d;
+
+                // Otherwise, must be on the boundary of the MEC
+                // Stackalloc to avoid allocations. It's safe to assume that the length of r will be at most 3
+                r2[rLength] = p;
+                rLength++;
+
+                // Return the MEC for P - {p} and R U {p}
+                n--;
+            }
         }
 
         #endregion
