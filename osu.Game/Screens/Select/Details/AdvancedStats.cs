@@ -27,6 +27,7 @@ using osu.Game.Configuration;
 using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets;
 using osu.Game.Overlays.Mods;
+using osu.Game.Utils;
 
 namespace osu.Game.Screens.Select.Details
 {
@@ -179,9 +180,7 @@ namespace osu.Game.Screens.Select.Details
 
                 if (Ruleset.Value != null)
                 {
-                    double rate = 1;
-                    foreach (var mod in mods.Value.OfType<IApplicableToRate>())
-                        rate = mod.ApplyToRate(0, rate);
+                    double rate = ModUtils.CalculateRateWithMods(mods.Value);
 
                     adjustedDifficulty = Ruleset.Value.CreateInstance().GetRateAdjustedDisplayDifficulty(originalDifficulty, rate);
 
@@ -199,7 +198,7 @@ namespace osu.Game.Screens.Select.Details
                     // For the time being, the key count is static no matter what, because:
                     // a) The method doesn't have knowledge of the active keymods. Doing so may require considerations for filtering.
                     // b) Using the difficulty adjustment mod to adjust OD doesn't have an effect on conversion.
-                    int keyCount = baseDifficulty == null ? 0 : legacyRuleset.GetKeyCount(BeatmapInfo);
+                    int keyCount = baseDifficulty == null ? 0 : legacyRuleset.GetKeyCount(BeatmapInfo, mods.Value);
 
                     FirstValue.Title = BeatmapsetsStrings.ShowStatsCsMania;
                     FirstValue.Value = (keyCount, keyCount);

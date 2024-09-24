@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -19,14 +20,19 @@ namespace osu.Game.Rulesets.Osu.Edit
     {
         private readonly SelectionRotationHandler rotationHandler;
 
-        private readonly Bindable<PreciseRotationInfo> rotationInfo = new Bindable<PreciseRotationInfo>(new PreciseRotationInfo(0, RotationOrigin.PlayfieldCentre));
+        private readonly OsuGridToolboxGroup gridToolbox;
+
+        private readonly Bindable<PreciseRotationInfo> rotationInfo = new Bindable<PreciseRotationInfo>(new PreciseRotationInfo(0, RotationOrigin.GridCentre));
 
         private SliderWithTextBoxInput<float> angleInput = null!;
         private EditorRadioButtonCollection rotationOrigin = null!;
 
-        public PreciseRotationPopover(SelectionRotationHandler rotationHandler)
+        private RadioButton selectionCentreButton = null!;
+
+        public PreciseRotationPopover(SelectionRotationHandler rotationHandler, OsuGridToolboxGroup gridToolbox)
         {
             this.rotationHandler = rotationHandler;
+            this.gridToolbox = gridToolbox;
 
             AllowableAnchors = new[] { Anchor.CentreLeft, Anchor.CentreRight };
         }
@@ -56,15 +62,22 @@ namespace osu.Game.Rulesets.Osu.Edit
                         RelativeSizeAxes = Axes.X,
                         Items = new[]
                         {
+                            new RadioButton("Grid centre",
+                                () => rotationInfo.Value = rotationInfo.Value with { Origin = RotationOrigin.GridCentre },
+                                () => new SpriteIcon { Icon = FontAwesome.Regular.PlusSquare }),
                             new RadioButton("Playfield centre",
                                 () => rotationInfo.Value = rotationInfo.Value with { Origin = RotationOrigin.PlayfieldCentre },
                                 () => new SpriteIcon { Icon = FontAwesome.Regular.Square }),
-                            new RadioButton("Selection centre",
+                            selectionCentreButton = new RadioButton("Selection centre",
                                 () => rotationInfo.Value = rotationInfo.Value with { Origin = RotationOrigin.SelectionCentre },
                                 () => new SpriteIcon { Icon = FontAwesome.Solid.VectorSquare })
                         }
                     }
                 }
+            };
+            selectionCentreButton.Selected.DisabledChanged += isDisabled =>
+            {
+                selectionCentreButton.TooltipText = isDisabled ? "Select more than one object to perform selection-based rotation." : string.Empty;
             };
         }
 
@@ -72,15 +85,33 @@ namespace osu.Game.Rulesets.Osu.Edit
         {
             base.LoadComplete();
 
-            ScheduleAfterChildren(() => angleInput.TakeFocus());
+            ScheduleAfterChildren(() =>
+            {
+                angleInput.TakeFocus();
+                angleInput.SelectAll();
+            });
             angleInput.Current.BindValueChanged(angle => rotationInfo.Value = rotationInfo.Value with { Degrees = angle.NewValue });
             rotationOrigin.Items.First().Select();
 
+            rotationHandler.CanRotateAroundSelectionOrigin.BindValueChanged(e =>
+            {
+                selectionCentreButton.Selected.Disabled = !e.NewValue;
+            }, true);
+
             rotationInfo.BindValueChanged(rotation =>
             {
-                rotationHandler.Update(rotation.NewValue.Degrees, rotation.NewValue.Origin == RotationOrigin.PlayfieldCentre ? OsuPlayfield.BASE_SIZE / 2 : null);
+                rotationHandler.Update(rotation.NewValue.Degrees, getOriginPosition(rotation.NewValue));
             });
         }
+
+        private Vector2? getOriginPosition(PreciseRotationInfo rotation) =>
+            rotation.Origin switch
+            {
+                RotationOrigin.GridCentre => gridToolbox.StartPosition.Value,
+                RotationOrigin.PlayfieldCentre => OsuPlayfield.BASE_SIZE / 2,
+                RotationOrigin.SelectionCentre => null,
+                _ => throw new ArgumentOutOfRangeException(nameof(rotation))
+            };
 
         protected override void PopIn()
         {
@@ -99,6 +130,7 @@ namespace osu.Game.Rulesets.Osu.Edit
 
     public enum RotationOrigin
     {
+        GridCentre,
         PlayfieldCentre,
         SelectionCentre
     }

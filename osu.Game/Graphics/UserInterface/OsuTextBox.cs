@@ -63,6 +63,11 @@ namespace osu.Game.Graphics.UserInterface
 
         private Dictionary<FeedbackSampleType, Sample?[]> sampleMap = new Dictionary<FeedbackSampleType, Sample?[]>();
 
+        /// <summary>
+        /// Whether all text should be selected when the <see cref="OsuTextBox"/> gains focus.
+        /// </summary>
+        public bool SelectAllOnFocus { get; set; }
+
         public OsuTextBox()
         {
             Height = 40;
@@ -255,6 +260,10 @@ namespace osu.Game.Graphics.UserInterface
                 BorderThickness = 3;
 
             base.OnFocus(e);
+
+            // we may become focused from an ongoing drag operation, we don't want to overwrite selection in that case.
+            if (SelectAllOnFocus && string.IsNullOrEmpty(SelectedText))
+                SelectAll();
         }
 
         protected override void OnFocusLost(FocusLostEvent e)

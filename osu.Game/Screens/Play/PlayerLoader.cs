@@ -110,10 +110,10 @@ namespace osu.Game.Screens.Play
             && ReadyForGameplay;
 
         protected virtual bool ReadyForGameplay =>
-            // not ready if the user is hovering one of the panes, unless they are idle.
-            (IsHovered || idleTracker.IsIdle.Value)
+            // not ready if the user is hovering one of the panes (logo is excluded), unless they are idle.
+            (IsHovered || osuLogo?.IsHovered == true || idleTracker.IsIdle.Value)
             // not ready if the user is dragging a slider or otherwise.
-            && inputManager.DraggedDrawable == null
+            && (inputManager.DraggedDrawable == null || inputManager.DraggedDrawable is OsuLogo)
             // not ready if a focused overlay is visible, like settings.
             && inputManager.FocusedDrawable == null;
 
@@ -249,7 +249,7 @@ namespace osu.Game.Screens.Play
         {
             base.LoadComplete();
 
-            inputManager = GetContainingInputManager();
+            inputManager = GetContainingInputManager()!;
 
             showStoryboards.BindValueChanged(val => epilepsyWarning?.FadeTo(val.NewValue ? 1 : 0, 250, Easing.OutQuint), true);
             epilepsyWarning?.FinishTransforms(true);
@@ -335,9 +335,13 @@ namespace osu.Game.Screens.Play
             return base.OnExiting(e);
         }
 
+        private OsuLogo? osuLogo;
+
         protected override void LogoArriving(OsuLogo logo, bool resuming)
         {
             base.LogoArriving(logo, resuming);
+
+            osuLogo = logo;
 
             const double duration = 300;
 
@@ -357,6 +361,7 @@ namespace osu.Game.Screens.Play
         {
             base.LogoExiting(logo);
             content.StopTracking();
+            osuLogo = null;
         }
 
         protected override void LogoSuspending(OsuLogo logo)
@@ -367,6 +372,8 @@ namespace osu.Game.Screens.Play
             logo
                 .FadeOut(CONTENT_OUT_DURATION / 2, Easing.OutQuint)
                 .ScaleTo(logo.Scale * 0.8f, CONTENT_OUT_DURATION * 2, Easing.OutQuint);
+
+            osuLogo = null;
         }
 
         #endregion
@@ -566,6 +573,9 @@ namespace osu.Game.Screens.Play
                 // if the player never got pushed, we should explicitly dispose it.
                 DisposalTask = LoadTask?.ContinueWith(_ => CurrentPlayer?.Dispose());
             }
+
+            highPerformanceSession?.Dispose();
+            highPerformanceSession = null;
         }
 
         #endregion

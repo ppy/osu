@@ -27,7 +27,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                     {
                         deleteScoresButton.Enabled.Value = false;
                         Task.Run(() => scores.Delete()).ContinueWith(_ => Schedule(() => deleteScoresButton.Enabled.Value = true));
-                    }));
+                    }, DeleteConfirmationContentStrings.Scores));
                 }
             });
         }
