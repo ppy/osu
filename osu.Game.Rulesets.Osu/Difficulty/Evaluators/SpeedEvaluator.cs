@@ -57,35 +57,29 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             if (strainTime < min_speed_bonus)
                 speedBonus = 1 + 0.75 * Math.Pow((min_speed_bonus - strainTime) / speed_balancing_factor, 2);
 
-
-            double distance = Math.Min(single_spacing_threshold, osuCurrObj.JumpDistance);
-
-            // Cap distance at single_spacing_threshold
-            distance = Math.Min(distance, single_spacing_threshold);
-
-            // Max distance bonus is 2 at single_spacing_threshold
-            double distanceBonus = 1 + Math.Pow(distance / single_spacing_threshold, 3.5);
-
-            double sliderStreamMultiplier = 1;
+            double sliderStreamBonus = 1;
 
             if (osuCurrObj.BaseObject is Slider slider && osuPrevObj?.BaseObject is Slider)
             {
-                double sliderStreamBonus = 0.25;
+                double sliderStreamFactor = 0.25;
 
                 // If slider was slower than notes before - punish it
                 if (osuCurrObj.StrainTime > osuPrevObj.StrainTime)
-                    sliderStreamBonus *= AimEvaluator.CalcRhythmDifferenceMultiplier(osuCurrObj.StrainTime, osuPrevObj.StrainTime);
+                    sliderStreamFactor *= AimEvaluator.CalcRhythmDifferenceMultiplier(osuCurrObj.StrainTime, osuPrevObj.StrainTime);
 
                 // Punish too short sliders to prevent cheesing (cheesing is still possible, but it's very rare)
                 double sliderLength = slider.Velocity * slider.SpanDuration;
                 if (sliderLength < slider.Radius)
-                    sliderStreamBonus *= sliderLength / slider.Radius;
+                    sliderStreamFactor *= sliderLength / slider.Radius;
 
-                sliderStreamMultiplier += sliderStreamBonus;
+                sliderStreamBonus += sliderStreamFactor;
             }
 
+            // Max distance bonus is 2 at single_spacing_threshold //
+            double distanceBonus = Math.Min(2, 1 + Math.Pow(osuCurrObj.JumpDistance / single_spacing_threshold, 3.5));
+
             // Base difficulty with all bonuses
-            double difficulty = speedBonus * distanceBonus * sliderStreamMultiplier * 1000 / strainTime;
+            double difficulty = speedBonus * distanceBonus * sliderStreamBonus * 1000 / strainTime;
 
             // Apply penalty if there's doubletappable doubles
             return difficulty * doubletapness;
