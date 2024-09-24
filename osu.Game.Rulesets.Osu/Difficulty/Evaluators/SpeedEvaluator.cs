@@ -13,7 +13,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         private const double single_spacing_threshold = 125; // 1.25 circles distance between centers
         private const double min_speed_bonus = 75; // ~200BPM
         private const double speed_balancing_factor = 40;
-        private const double distance_multiplier = 0.95;
+        private const double distance_multiplier = 0.94;
 
         /// <summary>
         /// Evaluates the difficulty of tapping the current object, based on:
@@ -65,7 +65,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             distance = Math.Min(distance, single_spacing_threshold);
 
             // Max distance bonus is 1 * `distance_multiplier` at single_spacing_threshold
-            double distanceBonus = Math.Pow(distance / single_spacing_threshold, 3.75) * distance_multiplier;
+            double distanceBonus = Math.Pow(distance / single_spacing_threshold, 3.95) * distance_multiplier;
 
             // Base difficulty with all bonuses
             double difficulty = (1 + speedBonus + distanceBonus) * 1000 / strainTime;
