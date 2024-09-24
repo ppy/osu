@@ -550,7 +550,7 @@ namespace osu.Game.Tests.Visual.Editing
 
             AddStep("begin drag", () => InputManager.PressButton(MouseButton.Left));
 
-            AddStep("move mouse", () => InputManager.MoveMouseTo(InputManager.CurrentState.Mouse.Position + new Vector2(50)));
+            AddStep("move mouse", () => InputManager.MoveMouseTo(InputManager.CurrentState.Mouse.Position + new Vector2(50, 0)));
 
             AddStep("aspect ratio does not equal", () => Assert.AreNotEqual(aspectRatioBeforeDrag, getAspectRatio()));
 
@@ -589,7 +589,7 @@ namespace osu.Game.Tests.Visual.Editing
 
             AddStep("begin drag", () => InputManager.PressButton(MouseButton.Left));
 
-            AddStep("move mouse", () => InputManager.MoveMouseTo(InputManager.CurrentState.Mouse.Position + new Vector2(50)));
+            AddStep("move mouse", () => InputManager.MoveMouseTo(InputManager.CurrentState.Mouse.Position + new Vector2(50, 0)));
 
             AddStep("center does not equal", () => Assert.AreNotEqual(centerBeforeDrag, getCenter()));
 
@@ -633,7 +633,7 @@ namespace osu.Game.Tests.Visual.Editing
 
             AddStep("begin drag", () => InputManager.PressButton(MouseButton.Left));
 
-            AddStep("move mouse", () => InputManager.MoveMouseTo(InputManager.CurrentState.Mouse.Position + new Vector2(50)));
+            AddStep("move mouse", () => InputManager.MoveMouseTo(InputManager.CurrentState.Mouse.Position + new Vector2(50, 0)));
 
             AddStep("aspect ratio does not equal", () => Assert.AreNotEqual(aspectRatioBeforeDrag, getAspectRatio()));
 
