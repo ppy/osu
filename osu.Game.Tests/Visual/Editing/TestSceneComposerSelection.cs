@@ -4,6 +4,7 @@
 using System;
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Graphics;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Testing;
@@ -35,6 +36,9 @@ namespace osu.Game.Tests.Visual.Editing
 
         private ContextMenuContainer contextMenuContainer
             => Editor.ChildrenOfType<ContextMenuContainer>().First();
+
+        private SelectionBoxScaleHandle getScaleHandle(Anchor anchor)
+            => Editor.ChildrenOfType<SelectionBoxScaleHandle>().First(it => it.Anchor == anchor);
 
         private void moveMouseToObject(Func<HitObject> targetFunc)
         {
@@ -518,6 +522,138 @@ namespace osu.Game.Tests.Visual.Editing
             AddAssert("no hitobjects in beatmap", () => EditorBeatmap.HitObjects.Count == 0);
 
             AddStep("release shift", () => InputManager.ReleaseKey(Key.ShiftLeft));
+        }
+
+        [Test]
+        public void TestShiftModifierMaintainsAspectRatio()
+        {
+            HitCircle[] addedObjects = null!;
+
+            float aspectRatioBeforeDrag = 0;
+
+            float getAspectRatio() => (addedObjects[1].X - addedObjects[0].X) / (addedObjects[1].Y - addedObjects[0].Y);
+
+            AddStep("add hitobjects", () =>
+            {
+                EditorBeatmap.AddRange(addedObjects = new[]
+                {
+                    new HitCircle { StartTime = 100, Position = new Vector2(150, 150) },
+                    new HitCircle { StartTime = 200, Position = new Vector2(250, 200) },
+                });
+
+                aspectRatioBeforeDrag = getAspectRatio();
+            });
+
+            AddStep("select objects", () => EditorBeatmap.SelectedHitObjects.AddRange(addedObjects));
+
+            AddStep("move mouse to handle", () => InputManager.MoveMouseTo(getScaleHandle(Anchor.BottomRight).ScreenSpaceDrawQuad.Centre));
+
+            AddStep("begin drag", () => InputManager.PressButton(MouseButton.Left));
+
+            AddStep("move mouse", () => InputManager.MoveMouseTo(InputManager.CurrentState.Mouse.Position + new Vector2(50)));
+
+            AddStep("aspect ratio does not equal", () => Assert.AreNotEqual(aspectRatioBeforeDrag, getAspectRatio()));
+
+            AddStep("press shift", () => InputManager.PressKey(Key.ShiftLeft));
+
+            AddStep("aspect ratio does equal", () => Assert.AreEqual(aspectRatioBeforeDrag, getAspectRatio()));
+
+            AddStep("end drag", () => InputManager.ReleaseButton(MouseButton.Left));
+
+            AddStep("release shift", () => InputManager.ReleaseKey(Key.ShiftLeft));
+        }
+
+        [Test]
+        public void TestAltModifierScalesAroundCenter()
+        {
+            HitCircle[] addedObjects = null!;
+
+            Vector2 centerBeforeDrag = Vector2.Zero;
+
+            Vector2 getCenter() => (addedObjects[0].Position + addedObjects[1].Position) / 2;
+
+            AddStep("add hitobjects", () =>
+            {
+                EditorBeatmap.AddRange(addedObjects = new[]
+                {
+                    new HitCircle { StartTime = 100, Position = new Vector2(150, 150) },
+                    new HitCircle { StartTime = 200, Position = new Vector2(250, 200) },
+                });
+
+                centerBeforeDrag = getCenter();
+            });
+
+            AddStep("select objects", () => EditorBeatmap.SelectedHitObjects.AddRange(addedObjects));
+
+            AddStep("move mouse to handle", () => InputManager.MoveMouseTo(getScaleHandle(Anchor.BottomRight).ScreenSpaceDrawQuad.Centre));
+
+            AddStep("begin drag", () => InputManager.PressButton(MouseButton.Left));
+
+            AddStep("move mouse", () => InputManager.MoveMouseTo(InputManager.CurrentState.Mouse.Position + new Vector2(50)));
+
+            AddStep("center does not equal", () => Assert.AreNotEqual(centerBeforeDrag, getCenter()));
+
+            AddStep("press alt", () => InputManager.PressKey(Key.AltLeft));
+
+            AddStep("center does equal", () => Assert.AreEqual(centerBeforeDrag, getCenter()));
+
+            AddStep("end drag", () => InputManager.ReleaseButton(MouseButton.Left));
+
+            AddStep("release alt", () => InputManager.ReleaseKey(Key.AltLeft));
+        }
+
+        [Test]
+        public void TestShiftAndAltModifierKeys()
+        {
+            HitCircle[] addedObjects = null!;
+
+            float aspectRatioBeforeDrag = 0;
+
+            Vector2 centerBeforeDrag = Vector2.Zero;
+
+            float getAspectRatio() => (addedObjects[1].X - addedObjects[0].X) / (addedObjects[1].Y - addedObjects[0].Y);
+
+            Vector2 getCenter() => (addedObjects[0].Position + addedObjects[1].Position) / 2;
+
+            AddStep("add hitobjects", () =>
+            {
+                EditorBeatmap.AddRange(addedObjects = new[]
+                {
+                    new HitCircle { StartTime = 100, Position = new Vector2(150, 150) },
+                    new HitCircle { StartTime = 200, Position = new Vector2(250, 200) },
+                });
+
+                aspectRatioBeforeDrag = getAspectRatio();
+                centerBeforeDrag = getCenter();
+            });
+
+            AddStep("select objects", () => EditorBeatmap.SelectedHitObjects.AddRange(addedObjects));
+
+            AddStep("move mouse to handle", () => InputManager.MoveMouseTo(getScaleHandle(Anchor.BottomRight).ScreenSpaceDrawQuad.Centre));
+
+            AddStep("begin drag", () => InputManager.PressButton(MouseButton.Left));
+
+            AddStep("move mouse", () => InputManager.MoveMouseTo(InputManager.CurrentState.Mouse.Position + new Vector2(50)));
+
+            AddStep("aspect ratio does not equal", () => Assert.AreNotEqual(aspectRatioBeforeDrag, getAspectRatio()));
+
+            AddStep("center does not equal", () => Assert.AreNotEqual(centerBeforeDrag, getCenter()));
+
+            AddStep("press shift", () => InputManager.PressKey(Key.ShiftLeft));
+
+            AddStep("aspect ratio does equal", () => Assert.AreEqual(aspectRatioBeforeDrag, getAspectRatio()));
+
+            AddStep("center does not equal", () => Assert.AreNotEqual(centerBeforeDrag, getCenter()));
+
+            AddStep("press alt", () => InputManager.PressKey(Key.AltLeft));
+
+            AddStep("center does equal", () => Assert.AreEqual(centerBeforeDrag, getCenter()));
+
+            AddStep("end drag", () => InputManager.ReleaseButton(MouseButton.Left));
+
+            AddStep("release shift", () => InputManager.ReleaseKey(Key.ShiftLeft));
+
+            AddStep("release alt", () => InputManager.ReleaseKey(Key.AltLeft));
         }
     }
 }
