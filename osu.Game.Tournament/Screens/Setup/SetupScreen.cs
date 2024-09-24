@@ -137,6 +137,7 @@ namespace osu.Game.Tournament.Screens.Setup
                     Label = "Background video settings",
                     ButtonText = "Change videos",
                     Description = "Set paths and behaviour of background video display.",
+                    Action = () => sceneManager?.SetScreen(new BackgroundVideoSelectScreen()),
                 },
                 new LabelledSwitchButton
                 {
