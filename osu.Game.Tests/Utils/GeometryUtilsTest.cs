@@ -29,5 +29,23 @@ namespace osu.Game.Tests.Utils
 
             Assert.That(hull, Is.EquivalentTo(expectedPoints));
         }
+
+        [TestCase(new int[] { }, 0, 0, 0)]
+        [TestCase(new[] { 0, 0 }, 0, 0, 0)]
+        [TestCase(new[] { 0, 0, 1, 1, 1, -1, 2, 0 }, 1, 0, 1)]
+        [TestCase(new[] { 0, 0, 1, 1, 1, -1, 2, 0, 1, 0 }, 1, 0, 1)]
+        [TestCase(new[] { 0, 0, 1, 1, 2, -1, 2, 0, 1, 0, 4, 10 }, 3, 4.5f, 5.5901699f)]
+        public void TestMinimumEnclosingCircle(int[] values, float x, float y, float r)
+        {
+            var points = new Vector2[values.Length / 2];
+            for (int i = 0; i < values.Length; i += 2)
+                points[i / 2] = new Vector2(values[i], values[i + 1]);
+
+            (var centre, float radius) = GeometryUtils.MinimumEnclosingCircle(points);
+
+            Assert.That(centre.X, Is.EqualTo(x).Within(0.0001));
+            Assert.That(centre.Y, Is.EqualTo(y).Within(0.0001));
+            Assert.That(radius, Is.EqualTo(r).Within(0.0001));
+        }
     }
 }
