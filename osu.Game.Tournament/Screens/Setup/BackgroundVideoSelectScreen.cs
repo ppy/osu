@@ -3,31 +3,31 @@
 
 using System.IO;
 using System.Linq;
-using MessagePack.Formatters;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Logging;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Platform;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Overlays;
-using osu.Game.Overlays.Settings;
 using osu.Game.Tournament.Components;
-using osu.Game.Tournament.IO;
 using osu.Game.Tournament.IPC;
 using osu.Game.Tournament.Models;
 using osu.Game.Tournament.Screens.Board.Components;
 using osuTK;
+using osuTK.Graphics;
+using Vortice.DXGI;
 
 namespace osu.Game.Tournament.Screens.Setup
 {
     public partial class BackgroundVideoSelectScreen : TournamentScreen
     {
         private VideoTypeDropdown videoDropdown = null!;
+        private TournamentSpriteText videoInfo = null!;
 
         private TourneyVideo videoPreview = null!;
 
@@ -138,15 +138,44 @@ namespace osu.Game.Tournament.Screens.Setup
                                         Origin = Anchor.TopCentre,
                                         RelativeSizeAxes = Axes.Both,
                                         Direction = FillDirection.Vertical,
+                                        Spacing = new Vector2(10),
                                         Children = new Drawable[]
                                         {
+                                            new FillFlowContainer
+                                            {
+                                                Anchor = Anchor.TopCentre,
+                                                Origin = Anchor.TopCentre,
+                                                Direction = FillDirection.Horizontal,
+                                                Spacing = new Vector2(10),
+                                                AutoSizeAxes = Axes.Both,
+                                                Margin = new MarginPadding { Top = 10 },
+                                                Children = new Drawable[]
+                                                {
+                                                    new SpriteIcon
+                                                    {
+                                                        Anchor = Anchor.TopCentre,
+                                                        Origin = Anchor.TopCentre,
+                                                        Icon = FontAwesome.Solid.InfoCircle,
+                                                        Size = new Vector2(24),
+                                                        Colour = Color4.White,
+                                                    },
+                                                    videoInfo = new TournamentSpriteText
+                                                    {
+                                                        Anchor = Anchor.TopCentre,
+                                                        Origin = Anchor.TopCentre,
+                                                        Text = "Unknown",
+                                                        Font = OsuFont.Default.With(size: 24),
+                                                    },
+                                                },
+                                            },
                                             videoDropdown = new VideoTypeDropdown
                                             {
                                                 Anchor = Anchor.TopCentre,
                                                 Origin = Anchor.TopCentre,
                                                 LabelText = "Select background video for",
-                                                Margin = new MarginPadding(10),
+                                                Margin = new MarginPadding { Top = 10 },
                                             },
+
                                             videoContainer = new Container
                                             {
                                                 Anchor = Anchor.TopCentre,
@@ -187,7 +216,7 @@ namespace osu.Game.Tournament.Screens.Setup
                                                 Anchor = Anchor.Centre,
                                                 Origin = Anchor.Centre,
                                                 Width = 200,
-                                                Text = "Reset",
+                                                Text = "Reset...",
                                                 // Action = ?
                                             },
                                         }
@@ -206,6 +235,9 @@ namespace osu.Game.Tournament.Screens.Setup
                 }
             });
 
+            videoInfo.Text = LadderInfo.BackgroundVideoFiles.First(v => v.Key == BackgroundVideoProps.GetVideoFromName(videoDropdown.Current.Value)).Value;
+            videoInfo.Colour = videoPreview.VideoAvailable ? Color4.SkyBlue : Color4.Orange;
+
             videoDropdown.Current.BindValueChanged(e =>
             {
                 videoContainer.Child = videoPreview = new TourneyVideo(LadderInfo.BackgroundVideoFiles.First(v => v.Key == BackgroundVideoProps.GetVideoFromName(e.NewValue)).Value)
@@ -213,6 +245,9 @@ namespace osu.Game.Tournament.Screens.Setup
                     Loop = true,
                     RelativeSizeAxes = Axes.Both,
                 };
+
+                videoInfo.Text = $"Use video: {LadderInfo.BackgroundVideoFiles.First(v => v.Key == BackgroundVideoProps.GetVideoFromName(e.NewValue)).Value}";
+                videoInfo.Colour = videoPreview.VideoAvailable ? Color4.SkyBlue : Color4.Orange;
             }, true);
         }
     }
