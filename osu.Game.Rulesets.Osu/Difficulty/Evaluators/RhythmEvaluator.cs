@@ -14,7 +14,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
     {
         private const int history_time_max = 4 * 1000; // 4 seconds
         private const int history_objects_max = 32;
-        private const double rhythm_overall_multiplier = 0.9;
+        private const double rhythm_overall_multiplier = 0.92;
         private const double rhythm_ratio_multiplier = 11.5;
 
         /// <summary>
@@ -119,7 +119,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                                 islandCount.Count++;
 
                             // repeated island (ex: triplet -> triplet)
-                            double power = logistic(island.Delta, 2, 0.165, 10);
+                            double power = logistic(island.Delta, 2.75, 0.24, 14);
                             effectiveRatio *= Math.Min(3.0 / islandCount.Count, Math.Pow(1.0 / islandCount.Count, power));
 
                             islandCounts[countIndex] = (islandCount.Island, islandCount.Count);
