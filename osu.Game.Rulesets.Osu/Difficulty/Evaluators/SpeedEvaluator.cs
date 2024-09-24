@@ -51,7 +51,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             // 0.93 is derived from making sure 260bpm OD8 streams aren't nerfed harshly, whilst 0.92 limits the effect of the cap.
             strainTime /= Math.Clamp((strainTime / osuCurrObj.HitWindowGreat) / 0.93, 0.92, 1);
 
-            // speedBonus will be 1.0 for BPM < 200
+            // speedBonus will be 0.0 for BPM < 200
             double speedBonus = 0.0;
 
             // Add additional scaling bonus for streams/bursts higher than 200bpm
