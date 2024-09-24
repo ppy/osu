@@ -98,6 +98,7 @@ namespace osu.Game.Screens.Play.HUD
             Interactive.BindValueChanged(_ => bar.Interactive = Interactive.Value, true);
             ShowGraph.BindValueChanged(_ => updateGraphVisibility(), true);
             ShowTime.BindValueChanged(_ => info.FadeTo(ShowTime.Value ? 1 : 0, 200, Easing.In), true);
+            AccentColour.BindValueChanged(_ => Colour = AccentColour.Value, true);
         }
 
         protected override void UpdateObjects(IEnumerable<HitObject> objects)
@@ -118,7 +119,6 @@ namespace osu.Game.Screens.Play.HUD
             base.Update();
             content.Height = bar.Height + bar_height + info.Height;
             graphContainer.Height = bar.Height;
-            Colour = AccentColour.Value;
         }
 
         protected override void UpdateProgress(double progress, bool isIntro)

@@ -90,6 +90,7 @@ namespace osu.Game.Screens.Play.HUD
             Interactive.BindValueChanged(_ => updateBarVisibility(), true);
             ShowGraph.BindValueChanged(_ => updateGraphVisibility(), true);
             ShowTime.BindValueChanged(_ => updateTimeVisibility(), true);
+            AccentColour.BindValueChanged(_ => Colour = AccentColour.Value, true);
 
             base.LoadComplete();
         }
@@ -118,8 +119,6 @@ namespace osu.Game.Screens.Play.HUD
 
             if (!Precision.AlmostEquals(Height, newHeight, 5f))
                 content.Height = newHeight;
-
-            Colour = AccentColour.Value;
         }
 
         private void updateBarVisibility()
