@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using osu.Game.Screens.OnlinePlay.Components;
 
 namespace osu.Game.Tournament.Models
 {
@@ -13,6 +14,7 @@ namespace osu.Game.Tournament.Models
         Drawings,
         Showcase,
         Seeding,
+        TeamIntro,
         Gameplay,
         Mappool,
         RedWin,
@@ -33,6 +35,7 @@ namespace osu.Game.Tournament.Models
             KeyValuePair.Create(BackgroundVideo.Drawings, "Drawings Video"),
             KeyValuePair.Create(BackgroundVideo.Showcase, "Showcase Video"),
             KeyValuePair.Create(BackgroundVideo.Seeding, "Seeding Video"),
+            KeyValuePair.Create(BackgroundVideo.TeamIntro, "Team Intro Video"),
             KeyValuePair.Create(BackgroundVideo.Gameplay, "Gameplay Video"),
             KeyValuePair.Create(BackgroundVideo.Mappool, "Mappool Video"),
             KeyValuePair.Create(BackgroundVideo.RedWin, "Red Win Video"),

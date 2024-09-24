@@ -42,7 +42,7 @@ namespace osu.Game.Tournament.Screens.Ladder
                 Masking = true,
                 Children = new Drawable[]
                 {
-                    new TourneyVideo("ladder")
+                    new TourneyVideo(BackgroundVideo.Ladder, LadderInfo)
                     {
                         RelativeSizeAxes = Axes.Both,
                         Loop = true,

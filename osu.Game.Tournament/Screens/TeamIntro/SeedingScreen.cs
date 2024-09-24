@@ -34,7 +34,7 @@ namespace osu.Game.Tournament.Screens.TeamIntro
 
             InternalChildren = new Drawable[]
             {
-                new TourneyVideo("seeding")
+                new TourneyVideo(BackgroundVideo.Seeding, LadderInfo)
                 {
                     RelativeSizeAxes = Axes.Both,
                     Loop = true,

@@ -48,7 +48,7 @@ namespace osu.Game.Tournament.Screens.Gameplay
 
             AddRangeInternal(new Drawable[]
             {
-                new TourneyVideo("gameplay")
+                new TourneyVideo(BackgroundVideo.Gameplay, LadderInfo)
                 {
                     Loop = true,
                     RelativeSizeAxes = Axes.Both,

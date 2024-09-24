@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
@@ -10,6 +11,7 @@ using osu.Framework.Graphics.Video;
 using osu.Framework.Timing;
 using osu.Game.Graphics;
 using osu.Game.Tournament.IO;
+using osu.Game.Tournament.Models;
 
 namespace osu.Game.Tournament.Components
 {
@@ -21,6 +23,12 @@ namespace osu.Game.Tournament.Components
         private ManualClock? manualClock;
 
         public bool VideoAvailable => video != null;
+
+        public TourneyVideo(BackgroundVideo videoType, LadderInfo ladder, bool drawFallbackGradient = false)
+        {
+            filename = ladder.BackgroundVideoFiles.First(v => v.Key == videoType).Value;
+            this.drawFallbackGradient = drawFallbackGradient;
+        }
 
         public TourneyVideo(string filename, bool drawFallbackGradient = false)
         {

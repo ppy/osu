@@ -56,19 +56,19 @@ namespace osu.Game.Tournament.Screens.TeamWin
 
             InternalChildren = new Drawable[]
             {
-                blueWinVideo = new TourneyVideo("teamwin-blue")
+                blueWinVideo = new TourneyVideo(BackgroundVideo.BlueWin, LadderInfo)
                 {
                     Alpha = 0,
                     RelativeSizeAxes = Axes.Both,
                     Loop = true,
                 },
-                redWinVideo = new TourneyVideo("teamwin-red")
+                redWinVideo = new TourneyVideo(BackgroundVideo.RedWin, LadderInfo)
                 {
                     Alpha = 0,
                     RelativeSizeAxes = Axes.Both,
                     Loop = true,
                 },
-                mainVideo = new TourneyVideo("gameplay")
+                mainVideo = new TourneyVideo(BackgroundVideo.Draw, LadderInfo)
                 {
                     Alpha = 1,
                     RelativeSizeAxes = Axes.Both,

@@ -59,6 +59,7 @@ namespace osu.Game.Tournament.Models
             KeyValuePair.Create(BackgroundVideo.Drawings, "drawings"),
             KeyValuePair.Create(BackgroundVideo.Showcase, "showcase"),
             KeyValuePair.Create(BackgroundVideo.Seeding, "seeding"),
+            KeyValuePair.Create(BackgroundVideo.TeamIntro, "teamintro"),
             KeyValuePair.Create(BackgroundVideo.RedWin, "teamwin-red"),
             KeyValuePair.Create(BackgroundVideo.BlueWin, "teamwin-blue"),
             KeyValuePair.Create(BackgroundVideo.Draw, "mappool"),
