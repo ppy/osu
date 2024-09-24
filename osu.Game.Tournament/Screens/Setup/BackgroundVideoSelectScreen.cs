@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -16,6 +17,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Overlays;
 using osu.Game.Tournament.Components;
+using osu.Game.Tournament.Components.Dialogs;
 using osu.Game.Tournament.IO;
 using osu.Game.Tournament.IPC;
 using osu.Game.Tournament.Models;
@@ -46,9 +48,6 @@ namespace osu.Game.Tournament.Screens.Setup
 
         [Resolved]
         private TournamentSceneManager? sceneManager { get; set; }
-
-        [Resolved]
-        private MatchIPCInfo ipc { get; set; } = null!;
 
         private OsuFileSelector fileSelector = null!;
         private DialogOverlay? overlay;
@@ -198,7 +197,7 @@ namespace osu.Game.Tournament.Screens.Setup
                                                 Anchor = Anchor.TopCentre,
                                                 Origin = Anchor.TopCentre,
                                                 RelativeSizeAxes = Axes.Both,
-                                                Child = videoPreview = new TourneyVideo(LadderInfo.BackgroundVideoFiles.First(v => v.Key == BackgroundVideoProps.GetVideoFromName(videoDropdown.Current.Value)).Value)
+                                                Child = videoPreview = new TourneyVideo(LadderInfo.BackgroundVideoFiles.Last(v => v.Key == BackgroundVideoProps.GetVideoFromName(videoDropdown.Current.Value)).Value)
                                                 {
                                                     Anchor = Anchor.TopCentre,
                                                     Origin = Anchor.TopCentre,
@@ -234,7 +233,24 @@ namespace osu.Game.Tournament.Screens.Setup
                                                 Origin = Anchor.Centre,
                                                 Width = 200,
                                                 Text = "Reset...",
-                                                // Action = ?
+                                                Colour = Color4.Orange,
+                                                Action = () => overlay?.Push(new ResetVideoDialog
+                                                (
+                                                    resetOneAction: () =>
+                                                    {
+                                                        string defaultVideo = BackgroundVideoProps.VIDEO_PATHS.First(v => v.Key == BackgroundVideoProps.GetVideoFromName(videoDropdown.Current.Value)).Value;
+                                                        LadderInfo.BackgroundVideoFiles.RemoveAll(v => v.Key == BackgroundVideoProps.GetVideoFromName(videoDropdown.Current.Value));
+                                                        LadderInfo.BackgroundVideoFiles.Add(new KeyValuePair<BackgroundVideo, string>(BackgroundVideoProps.GetVideoFromName(videoDropdown.Current.Value), defaultVideo));
+                                                    },
+                                                    resetAllAction: () =>
+                                                    {
+                                                        LadderInfo.BackgroundVideoFiles.Clear();
+                                                        foreach (var v in BackgroundVideoProps.VIDEO_PATHS)
+                                                        {
+                                                            LadderInfo.BackgroundVideoFiles.Add(new KeyValuePair<BackgroundVideo, string>(v.Key, v.Value));
+                                                        }
+                                                    }
+                                                )),
                                             },
                                         }
                                     }
@@ -249,23 +265,24 @@ namespace osu.Game.Tournament.Screens.Setup
                     Origin = Anchor.BottomLeft,
                     State = { Value = Visibility.Visible },
                     Action = () => sceneManager?.SetScreen(typeof(SetupScreen))
-                }
+                },
+                overlay = new DialogOverlay(),
             });
 
             saveButton.Enabled.Value = false;
 
-            videoInfo.Text = LadderInfo.BackgroundVideoFiles.First(v => v.Key == BackgroundVideoProps.GetVideoFromName(videoDropdown.Current.Value)).Value;
+            videoInfo.Text = LadderInfo.BackgroundVideoFiles.Last(v => v.Key == BackgroundVideoProps.GetVideoFromName(videoDropdown.Current.Value)).Value;
             videoInfo.Colour = videoPreview.VideoAvailable ? Color4.SkyBlue : Color4.Orange;
 
             videoDropdown.Current.BindValueChanged(e =>
             {
-                videoContainer.Child = videoPreview = new TourneyVideo(LadderInfo.BackgroundVideoFiles.First(v => v.Key == BackgroundVideoProps.GetVideoFromName(e.NewValue)).Value)
+                videoContainer.Child = videoPreview = new TourneyVideo(LadderInfo.BackgroundVideoFiles.Last(v => v.Key == BackgroundVideoProps.GetVideoFromName(e.NewValue)).Value)
                 {
                     Loop = true,
                     RelativeSizeAxes = Axes.Both,
                 };
 
-                videoInfo.Text = $"Use video: {LadderInfo.BackgroundVideoFiles.First(v => v.Key == BackgroundVideoProps.GetVideoFromName(e.NewValue)).Value}";
+                videoInfo.Text = $"Use video: {LadderInfo.BackgroundVideoFiles.Last(v => v.Key == BackgroundVideoProps.GetVideoFromName(e.NewValue)).Value}";
                 videoInfo.Colour = videoPreview.VideoAvailable ? Color4.SkyBlue : Color4.Orange;
             }, true);
 
@@ -335,9 +352,8 @@ namespace osu.Game.Tournament.Screens.Setup
         private void saveSetting()
         {
             BackgroundVideo currentType = BackgroundVideoProps.GetVideoFromName(videoDropdown.Current.Value);
-            var target = LadderInfo.BackgroundVideoFiles.First(v => v.Key == currentType);
+            LadderInfo.BackgroundVideoFiles.RemoveAll(v => v.Key == currentType);
 
-            LadderInfo.BackgroundVideoFiles.Remove(target);
             LadderInfo.BackgroundVideoFiles.Add(
                 new KeyValuePair<BackgroundVideo, string>(currentType, fileSelector.CurrentFile.Value.Name.Split('.')[0]));
 

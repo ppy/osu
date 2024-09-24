@@ -26,7 +26,7 @@ namespace osu.Game.Tournament.Components
 
         public TourneyVideo(BackgroundVideo videoType, LadderInfo ladder, bool drawFallbackGradient = false)
         {
-            filename = ladder.BackgroundVideoFiles.First(v => v.Key == videoType).Value;
+            filename = ladder.BackgroundVideoFiles.Last(v => v.Key == videoType).Value;
             this.drawFallbackGradient = drawFallbackGradient;
         }
 
