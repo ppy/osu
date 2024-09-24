@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -370,10 +371,14 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         private void unfreezeButtonPosition()
         {
-            frozenButtonsPosition = null;
+            if (frozenButtonsPosition != null)
+            {
+                frozenButtonsPosition = null;
+                ensureButtonsOnScreen(true);
+            }
         }
 
-        private void ensureButtonsOnScreen()
+        private void ensureButtonsOnScreen(bool animated = false)
         {
             if (frozenButtonsPosition != null)
             {
@@ -384,7 +389,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 return;
             }
 
-            buttons.Position = Vector2.Zero;
+            if (!animated && buttons.Transforms.Any())
+                return;
 
             var thisQuad = ScreenSpaceDrawQuad;
 
@@ -399,24 +405,51 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
             float minHeight = buttons.ScreenSpaceDrawQuad.Height;
 
+            Anchor targetAnchor;
+            Anchor targetOrigin;
+            Vector2 targetPosition = Vector2.Zero;
+
             if (topExcess < minHeight && bottomExcess < minHeight)
             {
-                buttons.Anchor = Anchor.BottomCentre;
-                buttons.Origin = Anchor.BottomCentre;
-                buttons.Y = Math.Min(0, ToLocalSpace(Parent!.ScreenSpaceDrawQuad.BottomLeft).Y - DrawHeight);
+                targetAnchor = Anchor.BottomCentre;
+                targetOrigin = Anchor.BottomCentre;
+                targetPosition.Y = Math.Min(0, ToLocalSpace(Parent!.ScreenSpaceDrawQuad.BottomLeft).Y - DrawHeight);
             }
             else if (topExcess > bottomExcess)
             {
-                buttons.Anchor = Anchor.TopCentre;
-                buttons.Origin = Anchor.BottomCentre;
+                targetAnchor = Anchor.TopCentre;
+                targetOrigin = Anchor.BottomCentre;
             }
             else
             {
-                buttons.Anchor = Anchor.BottomCentre;
-                buttons.Origin = Anchor.TopCentre;
+                targetAnchor = Anchor.BottomCentre;
+                targetOrigin = Anchor.TopCentre;
             }
 
-            buttons.X += ToLocalSpace(thisQuad.TopLeft - new Vector2(Math.Min(0, leftExcess)) + new Vector2(Math.Min(0, rightExcess))).X;
+            targetPosition.X += ToLocalSpace(thisQuad.TopLeft - new Vector2(Math.Min(0, leftExcess)) + new Vector2(Math.Min(0, rightExcess))).X;
+
+            if (animated)
+            {
+                var originalPosition = ToLocalSpace(buttons.ScreenSpaceDrawQuad.TopLeft);
+
+                buttons.Origin = targetOrigin;
+                buttons.Anchor = targetAnchor;
+                buttons.Position = targetPosition;
+
+                var newPosition = ToLocalSpace(buttons.ScreenSpaceDrawQuad.TopLeft);
+
+                var delta = newPosition - originalPosition;
+
+                buttons.Position -= delta;
+
+                buttons.MoveTo(targetPosition, 300, Easing.OutQuint);
+            }
+            else
+            {
+                buttons.Anchor = targetAnchor;
+                buttons.Origin = targetOrigin;
+                buttons.Position = targetPosition;
+            }
         }
     }
 }
