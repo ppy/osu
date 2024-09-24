@@ -46,12 +46,18 @@ namespace osu.Game.Skinning.Components
             Masking = true;
         }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            AccentColour.BindValueChanged(_ => Colour = AccentColour.Value, true);
+        }
+
         protected override void Update()
         {
             base.Update();
 
             base.CornerRadius = CornerRadius.Value * Math.Min(DrawWidth, DrawHeight);
-            Colour = AccentColour.Value;
         }
     }
 }
