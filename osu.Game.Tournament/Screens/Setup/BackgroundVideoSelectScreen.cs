@@ -1,26 +1,27 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Platform;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Overlays;
 using osu.Game.Tournament.Components;
+using osu.Game.Tournament.IO;
 using osu.Game.Tournament.IPC;
 using osu.Game.Tournament.Models;
 using osu.Game.Tournament.Screens.Board.Components;
 using osuTK;
 using osuTK.Graphics;
-using Vortice.DXGI;
 
 namespace osu.Game.Tournament.Screens.Setup
 {
@@ -33,6 +34,16 @@ namespace osu.Game.Tournament.Screens.Setup
 
         private Container videoContainer = null!;
 
+        private SpriteIcon currentFileIcon = null!;
+        private OsuSpriteText currentFileText = null!;
+
+        private RoundedButton saveButton = null!;
+        private RoundedButton resetButton = null!;
+
+        private string initialPath = null!;
+        private string videoPath = null!;
+        private bool pathValid = false;
+
         [Resolved]
         private TournamentSceneManager? sceneManager { get; set; }
 
@@ -43,10 +54,10 @@ namespace osu.Game.Tournament.Screens.Setup
         private DialogOverlay? overlay;
 
         [BackgroundDependencyLoader(true)]
-        private void load(Storage storage, OsuColour colours)
+        private void load(TournamentStorage storage, OsuColour colours)
         {
-            var initialStorage = (ipc as FileBasedIPC)?.IPCStorage ?? storage;
-            string? initialPath = new DirectoryInfo(initialStorage.GetFullPath(string.Empty)).Parent?.FullName;
+            initialPath = new DirectoryInfo(storage.GetFullPath(string.Empty)).FullName;
+            videoPath = new DirectoryInfo(storage.GetFullPath("./Videos")).FullName;
 
             AddRangeInternal(new Drawable[]
             {
@@ -101,20 +112,26 @@ namespace osu.Game.Tournament.Screens.Setup
                                         Anchor = Anchor.Centre,
                                         Origin = Anchor.Centre,
                                         Direction = FillDirection.Horizontal,
-                                        Spacing = new Vector2(20),
+                                        Spacing = new Vector2(10),
                                         Children = new Drawable[]
                                         {
-                                            new RoundedButton
+                                            currentFileIcon = new SpriteIcon
                                             {
                                                 Anchor = Anchor.Centre,
                                                 Origin = Anchor.Centre,
-                                                Width = 300,
-                                                Text = "Refresh...",
-                                                // Action = ?
+                                                Icon = FontAwesome.Solid.Edit,
+                                                Size = new Vector2(16),
+                                            },
+                                            currentFileText = new OsuSpriteText
+                                            {
+                                                Anchor = Anchor.Centre,
+                                                Origin = Anchor.Centre,
+                                                Text = "Select a file!",
+                                                Font = OsuFont.Default.With(size: 16),
                                             },
                                         }
                                     }
-                                }
+                                },
                             }
                         },
                         new GridContainer
@@ -203,15 +220,15 @@ namespace osu.Game.Tournament.Screens.Setup
                                         Spacing = new Vector2(20),
                                         Children = new Drawable[]
                                         {
-                                            new RoundedButton
+                                            saveButton = new RoundedButton
                                             {
                                                 Anchor = Anchor.Centre,
                                                 Origin = Anchor.Centre,
                                                 Width = 200,
                                                 Text = "Set and save",
-                                                // Action = ?
+                                                Action = saveSetting
                                             },
-                                            new RoundedButton
+                                            resetButton = new RoundedButton
                                             {
                                                 Anchor = Anchor.Centre,
                                                 Origin = Anchor.Centre,
@@ -235,6 +252,8 @@ namespace osu.Game.Tournament.Screens.Setup
                 }
             });
 
+            saveButton.Enabled.Value = false;
+
             videoInfo.Text = LadderInfo.BackgroundVideoFiles.First(v => v.Key == BackgroundVideoProps.GetVideoFromName(videoDropdown.Current.Value)).Value;
             videoInfo.Colour = videoPreview.VideoAvailable ? Color4.SkyBlue : Color4.Orange;
 
@@ -249,6 +268,81 @@ namespace osu.Game.Tournament.Screens.Setup
                 videoInfo.Text = $"Use video: {LadderInfo.BackgroundVideoFiles.First(v => v.Key == BackgroundVideoProps.GetVideoFromName(e.NewValue)).Value}";
                 videoInfo.Colour = videoPreview.VideoAvailable ? Color4.SkyBlue : Color4.Orange;
             }, true);
+
+            fileSelector.CurrentPath.BindValueChanged(pathChanged, true);
+            fileSelector.CurrentFile.BindValueChanged(fileChanged, true);
+        }
+
+        private void pathChanged(ValueChangedEvent<DirectoryInfo> e)
+        {
+            if (e.NewValue == null)
+            {
+                pathValid = false;
+                return;
+            }
+
+            pathValid = e.NewValue.FullName == videoPath;
+        }
+
+        private void fileChanged(ValueChangedEvent<FileInfo> selectedFile)
+        {
+            if (selectedFile.NewValue == null)
+            {
+                currentFileText.Text = "Select a file!";
+                currentFileIcon.Icon = FontAwesome.Solid.Edit;
+                return;
+            }
+
+            string lowerFileName = selectedFile.NewValue.Name.ToLowerInvariant();
+
+            bool valid = lowerFileName.EndsWith(".mp4") || lowerFileName.EndsWith(".avi") || lowerFileName.EndsWith(".m4v");
+
+            if (!valid)
+            {
+                currentFileText.Text = $"{selectedFile.NewValue.Name}: Invalid file type.";
+                currentFileText.Colour = Color4.Orange;
+                currentFileIcon.Icon = FontAwesome.Solid.ExclamationCircle;
+                currentFileIcon.Colour = Color4.Orange;
+                saveButton.Enabled.Value = false;
+            }
+            else
+            {
+                if (pathValid)
+                {
+                    currentFileText.Text = $"{selectedFile.NewValue.Name}: Preview on the right!";
+                    currentFileText.Colour = Color4.SkyBlue;
+                    currentFileIcon.Icon = FontAwesome.Solid.CheckCircle;
+                    currentFileIcon.Colour = Color4.SkyBlue;
+                    videoContainer.Child = new TourneyVideo(selectedFile.NewValue.Name.Split('.')[0])
+                    {
+                        Loop = true,
+                        RelativeSizeAxes = Axes.Both,
+                    };
+
+                    saveButton.Enabled.Value = true;
+                }
+                else
+                {
+                    currentFileText.Text = $"Must select a file from current tournament's Video path.";
+                    currentFileText.Colour = Color4.Orange;
+                    currentFileIcon.Icon = FontAwesome.Solid.ExclamationCircle;
+                    currentFileIcon.Colour = Color4.Orange;
+                    saveButton.Enabled.Value = false;
+                }
+            }
+        }
+
+        private void saveSetting()
+        {
+            BackgroundVideo currentType = BackgroundVideoProps.GetVideoFromName(videoDropdown.Current.Value);
+            var target = LadderInfo.BackgroundVideoFiles.First(v => v.Key == currentType);
+
+            LadderInfo.BackgroundVideoFiles.Remove(target);
+            LadderInfo.BackgroundVideoFiles.Add(
+                new KeyValuePair<BackgroundVideo, string>(currentType, fileSelector.CurrentFile.Value.Name.Split('.')[0]));
+
+            saveButton.FlashColour(Color4.White, 500);
+            saveButton.Enabled.Value = false;
         }
     }
 }
