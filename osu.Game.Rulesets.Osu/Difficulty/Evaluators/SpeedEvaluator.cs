@@ -64,7 +64,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             // Cap distance at single_spacing_threshold
             distance = Math.Min(distance, single_spacing_threshold);
 
-            // Max distance bonus is 2 at single_spacing_threshold
+            // Max distance bonus is 1 * `distance_multiplier` at single_spacing_threshold
             double distanceBonus = Math.Pow(distance / single_spacing_threshold, 3.75) * distance_multiplier;
 
             // Base difficulty with all bonuses
