@@ -255,7 +255,7 @@ namespace osu.Game.Utils
         }
 
         // Function to check whether a circle encloses the given points
-        private static bool isValidCircle((Vector2, float) c, ReadOnlySpan<Vector2> points)
+        private static bool isValidCircle((Vector2, float) c, List<Vector2> points)
         {
             // Iterating through all the points to check whether the points lie inside the circle or not
             foreach (Vector2 p in points)
@@ -267,12 +267,12 @@ namespace osu.Game.Utils
         }
 
         // Function to return the minimum enclosing circle for N <= 3
-        private static (Vector2, float) minCircleTrivial(ReadOnlySpan<Vector2> points)
+        private static (Vector2, float) minCircleTrivial(List<Vector2> points)
         {
-            if (points.Length > 3)
+            if (points.Count > 3)
                 throw new ArgumentException("Number of points must be at most 3", nameof(points));
 
-            switch (points.Length)
+            switch (points.Count)
             {
                 case 0:
                     return (new Vector2(0, 0), 0);
@@ -299,45 +299,6 @@ namespace osu.Game.Utils
             return circleFrom(points[0], points[1], points[2]);
         }
 
-        // Returns the MEC using Welzl's algorithm
-        // Takes a set of input points P and a set R
-        // points on the circle boundary.
-        // n represents the number of points in P that are not yet processed.
-        private static (Vector2, float) welzlHelper(List<Vector2> points, ReadOnlySpan<Vector2> r, int n)
-        {
-            Span<Vector2> r2 = stackalloc Vector2[3];
-            int rLength = r.Length;
-            r.CopyTo(r2);
-
-            while (true)
-            {
-                // Base case when all points processed or |R| = 3
-                if (n == 0 || rLength == 3) return minCircleTrivial(r2[..rLength]);
-
-                // Pick a random point randomly
-                int idx = RNG.Next(n);
-                Vector2 p = points[idx];
-
-                // Put the picked point at the end of P since it's more efficient than
-                // deleting from the middle of the list
-                (points[idx], points[n - 1]) = (points[n - 1], points[idx]);
-
-                // Get the MEC circle d from the set of points P - {p}
-                var d = welzlHelper(points, r2[..rLength], n - 1);
-
-                // If d contains p, return d
-                if (isInside(d, p)) return d;
-
-                // Otherwise, must be on the boundary of the MEC
-                // Stackalloc to avoid allocations. It's safe to assume that the length of r will be at most 3
-                r2[rLength] = p;
-                rLength++;
-
-                // Return the MEC for P - {p} and R U {p}
-                n--;
-            }
-        }
-
         #endregion
 
         /// <summary>
@@ -348,8 +309,61 @@ namespace osu.Game.Utils
         {
             // Using Welzl's algorithm to find the minimum enclosing circle
             // https://www.geeksforgeeks.org/minimum-enclosing-circle-using-welzls-algorithm/
-            List<Vector2> pCopy = points.ToList();
-            return welzlHelper(pCopy, Array.Empty<Vector2>(), pCopy.Count);
+            List<Vector2> P = points.ToList();
+
+            var stack = new Stack<(Vector2?, int)>();
+            var r = new List<Vector2>(3);
+            (Vector2, float) d = (Vector2.Zero, 0);
+
+            stack.Push((null, P.Count));
+
+            while (stack.Count > 0)
+            {
+                // n represents the number of points in P that are not yet processed.
+                // p represents the point that was randomly picked to process.
+                (Vector2? p, int n) = stack.Pop();
+
+                if (!p.HasValue)
+                {
+                    // Base case when all points processed or |R| = 3
+                    if (n == 0 || r.Count == 3)
+                    {
+                        d = minCircleTrivial(r);
+                        continue;
+                    }
+
+                    // Pick a random point randomly
+                    int idx = RNG.Next(n);
+                    p = P[idx];
+
+                    // Put the picked point at the end of P since it's more efficient than
+                    // deleting from the middle of the list
+                    (P[idx], P[n - 1]) = (P[n - 1], P[idx]);
+
+                    // Schedule processing of p after we get the MEC circle d from the set of points P - {p}
+                    stack.Push((p, n));
+                    // Get the MEC circle d from the set of points P - {p}
+                    stack.Push((null, n - 1));
+                }
+                else
+                {
+                    // If d contains p, return d
+                    if (isInside(d, p.Value))
+                        continue;
+
+                    // Remove points from R that were added in a deeper recursion
+                    // |R| = |P| - |stack| - n
+                    int removeCount = r.Count - (P.Count - stack.Count - n);
+                    r.RemoveRange(r.Count - removeCount, removeCount);
+
+                    // Otherwise, must be on the boundary of the MEC
+                    r.Add(p.Value);
+                    // Return the MEC for P - {p} and R U {p}
+                    stack.Push((null, n - 1));
+                }
+            }
+
+            return d;
         }
 
         /// <summary>
