@@ -13,6 +13,7 @@ using osu.Game.Tests.Visual;
 using osu.Game.Tournament.Components;
 using osu.Game.Tournament.IPC;
 using osu.Game.Tournament.Models;
+using osuTK;
 
 namespace osu.Game.Tournament.Tests.Components
 {
@@ -25,7 +26,19 @@ namespace osu.Game.Tournament.Tests.Components
         {
             Username = "HappyStick",
             Id = 2,
-            Colour = "f2ca34"
+            Colour = "f2ca34",
+        };
+
+        private readonly TournamentUser carbonReferee = new TournamentUser
+        {
+            Username = "Sh0rtD011y",
+            OnlineID = 114514,
+        };
+
+        private readonly TournamentUser cyberReferee = new TournamentUser
+        {
+            Username = "Juroe",
+            OnlineID = 1919810,
         };
 
         private readonly TournamentUser redUser = new TournamentUser
@@ -44,6 +57,12 @@ namespace osu.Game.Tournament.Tests.Components
         {
             Username = "nekodex",
             OnlineID = 5,
+        };
+
+        private readonly TournamentUser redUserWithLongName = new TournamentUser
+        {
+            Username = "YouKnowWhatImGoingToDo",
+            OnlineID = 6,
         };
 
         [Cached]
@@ -79,11 +98,18 @@ namespace osu.Game.Tournament.Tests.Components
             {
                 Team1 =
                 {
-                    Value = new TournamentTeam { Players = { redUser } }
+                    Value = new TournamentTeam { Players = { redUser, redUserWithLongName } }
                 },
                 Team2 =
                 {
                     Value = new TournamentTeam { Players = { blueUser, blueUserWithCustomColour } }
+                },
+                Round =
+                {
+                    Value = new TournamentRound
+                    {
+                        Referees = { carbonReferee, cyberReferee }
+                    }
                 }
             });
 
@@ -126,6 +152,18 @@ namespace osu.Game.Tournament.Tests.Components
             AddUntilStep("message from user with custom colour is inverted", () =>
                 this.ChildrenOfType<DrawableChatUsername>().Last().Inverted, () => Is.EqualTo(true));
 
+            AddStep("message with a long username", () => testChannel.AddNewMessages(new Message(nextMessageId())
+            {
+                Sender = redUserWithLongName.ToAPIUser(),
+                Content = "I have said this before that Genshin Impact is an action game, and I forgot the remaining part ;w;",
+            }));
+
+            AddStep("really long message", () => testChannel.AddNewMessages(new Message(nextMessageId())
+            {
+                Sender = admin,
+                Content = "你说的对，但是《原神》是由米哈游自主研发的一款全新开放世界冒险游戏。游戏发生在一个被称作「提瓦特」的幻想世界，在这里，被神选中的人将被授予「神之眼」，导引元素之力。你将扮演一位名为「旅行者」的神秘角色在自由的旅行中邂逅性格各异、能力独特的同伴们，和他们一起击败强敌，找回失散的亲人——同时，逐步发掘「原神」的真相。我现在每天玩原神都能赚150原石，每个月差不多5000原石的收入，也就是现实生活中每个月5000美元的收入水平，换算过来最少也30000人民币，虽然我只有14岁，但是已经超越了绝大多数人的水平，这便是原神给我的骄傲的资本。毫不夸张地说，《原神》是miHoYo迄今为止规模最为宏大，也是最具野心的一部作品。即便在经历了8700个小时的艰苦战斗后，游戏还有许多尚未发现的秘密，错过的武器与装备，以及从未使用过的法术和技能。\n尽管游戏中的战斗体验和我们之前在烧机系列游戏所见到的没有多大差别，但游戏中各类精心设计的敌人以及Boss战已然将战斗抬高到了一个全新的水平。就和几年前的《塞尔达传说》一样，《原神》也是一款能够推动同类游戏向前发展的优秀作品。",
+            }));
+
             AddStep("message from admin", () => testChannel.AddNewMessages(new Message(nextMessageId())
             {
                 Sender = admin,
@@ -151,7 +189,34 @@ namespace osu.Game.Tournament.Tests.Components
 
             AddStep("change channel to 2", () => chatDisplay.Channel.Value = testChannel2);
 
+            AddStep("referee messages", () => testChannel2.AddNewMessages(new Message(nextMessageId())
+            {
+                Sender = cyberReferee.ToAPIUser(),
+                Content = "大家好啊，我是说的道理",
+            }));
+
+            AddStep("referee commands", () => testChannel2.AddNewMessages(new Message(nextMessageId())
+            {
+                Sender = carbonReferee.ToAPIUser(),
+                Content = "[*] 比赛时间已到，请各位选手启动原神",
+            }));
+
+            AddStep("non-referee commands", () => testChannel2.AddNewMessages(new Message(nextMessageId())
+            {
+                Sender = blueUser.ToAPIUser(),
+                Content = "[*] 大家好啊，我是说的老鲤",
+            }));
+
             AddStep("change channel to 1", () => chatDisplay.Channel.Value = testChannel);
+
+            AddStep("resize container to 500x500 with animation", () =>
+            {
+                chatDisplay.RelativeSizeAxes = Axes.None;
+                chatDisplay.ResizeTo(new Vector2(500, 500), 1000, Easing.InOutQuint);
+            });
+
+            AddUntilStep("chat display don't use relative size", () =>
+                chatDisplay.RelativeSizeAxes == Axes.None, () => Is.EqualTo(true));
         }
 
         private int messageId;
