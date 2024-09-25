@@ -124,6 +124,7 @@ namespace osu.Game.Tournament.Components
                             },
                             CreateUsername().With(username =>
                             {
+                                username.Text = username.Text.ToString().TruncateWithEllipsis(20);
                                 username.Anchor = Anchor.CentreLeft;
                                 username.Origin = Anchor.CentreLeft;
                                 username.UseFullGlyphHeight = false;
