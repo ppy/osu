@@ -80,7 +80,7 @@ namespace osu.Game.Beatmaps
         int GetMaxCombo();
 
         /// <summary>
-        /// Finds amount of <see cref="HitObject"/>s that have given type.
+        /// Finds amount of <see cref="HitObject"/>s that have given type. This doesn't include nested hit objects.
         /// </summary>
         int GetHitObjectCountOf(Type type);
     }
