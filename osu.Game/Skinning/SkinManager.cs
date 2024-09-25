@@ -131,9 +131,11 @@ namespace osu.Game.Skinning
         {
             Realm.Run(r =>
             {
+                Guid currentSkinId = CurrentSkinInfo.Value.ID;
+
                 // choose from only user skins, removing the current selection to ensure a new one is chosen.
                 var randomChoices = r.All<SkinInfo>()
-                                     .Where(s => !s.DeletePending && s.ID != CurrentSkinInfo.Value.ID)
+                                     .Where(s => !s.DeletePending && s.ID != currentSkinId)
                                      .ToArray();
 
                 if (randomChoices.Length == 0)

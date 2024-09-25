@@ -29,7 +29,9 @@ namespace osu.Game.Skinning
             invalidateCache();
             Debug.Assert(fileToStoragePathMapping != null);
 
-            realmSubscription = realm?.RegisterForNotifications(r => r.All<T>().Where(s => s.ID == source.ID), skinChanged);
+            Guid id = source.ID;
+
+            realmSubscription = realm?.RegisterForNotifications(r => r.All<T>().Where(s => s.ID == id), skinChanged);
         }
 
         protected override void Dispose(bool disposing)
