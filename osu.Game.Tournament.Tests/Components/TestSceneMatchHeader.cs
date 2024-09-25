@@ -3,6 +3,7 @@
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Testing;
 using osu.Game.Graphics;
 using osu.Game.Tournament.Screens.Gameplay.Components;
 using osuTK;
@@ -28,6 +29,14 @@ namespace osu.Game.Tournament.Tests.Components
                     new MatchHeader { ShowScores = false },
                 }
             };
+        }
+
+        [SetUpSteps]
+        public override void SetUpSteps()
+        {
+            base.SetUpSteps();
+
+            AddStep("set unknown flags", () => Ladder.CurrentMatch.Value.Team2.Value.FlagName.Value = "__");
         }
     }
 }
