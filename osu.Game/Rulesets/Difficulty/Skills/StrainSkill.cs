@@ -55,9 +55,17 @@ namespace osu.Game.Rulesets.Difficulty.Skills
                 saveCurrentPeak();
                 startNewSectionFrom(currentSectionEnd, current);
                 currentSectionEnd += SectionLength;
+
+                amountOfStrainsAddedSinceSave++;
             }
 
-            currentSectionPeak = Math.Max(StrainValueAt(current), currentSectionPeak);
+            double currentStrain = StrainValueAt(current);
+
+            if (currentSectionPeak < currentStrain)
+            {
+                currentSectionPeak = currentStrain;
+                isSavedCurrentStrainRelevant = false;
+            }
         }
 
         /// <summary>
@@ -102,19 +110,84 @@ namespace osu.Game.Rulesets.Difficulty.Skills
             double difficulty = 0;
             double weight = 1;
 
-            // Sections with 0 strain are excluded to avoid worst-case time complexity of the following sort (e.g. /b/2351871).
-            // These sections will not contribute to the difficulty.
-            var peaks = GetCurrentStrainPeaks().Where(p => p > 0);
-
             // Difficulty is the weighted sum of the highest strains from every section.
             // We're sorting from highest to lowest strain.
-            foreach (double strain in peaks.OrderDescending())
+            foreach (double strain in GetCurrentStrainsSorted())
             {
                 difficulty += strain * weight;
                 weight *= DecayWeight;
             }
 
             return difficulty;
+        }
+
+        protected List<double> GetCurrentStrainsSorted()
+        {
+            List<double> strains;
+
+            // If no saved strains - calculate them from 0, and save them after that
+            if (savedSortedStrains == null || savedSortedStrains.Count == 0)
+            {
+                var peaks = GetCurrentStrainPeaks().Where(p => p > 0);
+
+                strains = peaks.OrderDescending().ToList();
+
+                savedSortedStrains = new List<double>(strains);
+                amountOfStrainsAddedSinceSave = 0;
+                savedCurrentStrain = currentSectionPeak;
+                isSavedCurrentStrainRelevant = true;
+            }
+            // If several sections were added since last save - insert them into saved strains list
+            else if (amountOfStrainsAddedSinceSave > 0)
+            {
+                var newPeaks = GetCurrentStrainPeaks().TakeLast(amountOfStrainsAddedSinceSave).Where(p => p > 0);
+                foreach (double newPeak in newPeaks)
+                    InsertElementInReverseSortedList(savedSortedStrains, newPeak);
+
+                strains = new List<double>(savedSortedStrains);
+
+                amountOfStrainsAddedSinceSave = 0;
+                savedCurrentStrain = currentSectionPeak;
+                isSavedCurrentStrainRelevant = true;
+            }
+            // If no section was added, but last one was changed - find it and replace it with new one
+            else if (!isSavedCurrentStrainRelevant && savedCurrentStrain > 0)
+            {
+                int invalidStrainIndex = savedSortedStrains.BinarySearch(savedCurrentStrain, new ReverseComparer());
+                savedSortedStrains.RemoveAt(invalidStrainIndex);
+                InsertElementInReverseSortedList(savedSortedStrains, currentSectionPeak);
+
+                strains = new List<double>(savedSortedStrains);
+
+                savedCurrentStrain = currentSectionPeak;
+                isSavedCurrentStrainRelevant = true;
+            }
+            // Otherwise - just use saved strains
+            else
+            {
+                strains = new List<double>(savedSortedStrains);
+            }
+
+            return strains;
+        }
+
+        private List<double>? savedSortedStrains;
+        private double savedCurrentStrain;
+        private bool isSavedCurrentStrainRelevant;
+        private int amountOfStrainsAddedSinceSave;
+
+        protected static void InsertElementInReverseSortedList(List<double> list, double element)
+        {
+            int indexToInsert = list.BinarySearch(element, new ReverseComparer());
+            if (indexToInsert < 0)
+                indexToInsert = ~indexToInsert;
+
+            list.Insert(indexToInsert, element);
+        }
+
+        private class ReverseComparer : IComparer<double>
+        {
+            public int Compare(double x, double y) => Comparer<double>.Default.Compare(y, x);
         }
     }
 }
