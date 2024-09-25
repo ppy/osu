@@ -12,10 +12,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 {
     public static class RhythmEvaluator
     {
-        private const int history_time_max = 4 * 1000; // 4 seconds
+        private const int history_time_max = 5 * 1000; // 5 seconds
         private const int history_objects_max = 32;
-        private const double rhythm_overall_multiplier = 0.92;
-        private const double rhythm_ratio_multiplier = 11.5;
+        private const double rhythm_overall_multiplier = 0.95;
+        private const double rhythm_ratio_multiplier = 12.0;
 
         /// <summary>
         /// Calculates a rhythm multiplier for the difficulty of the tap associated with historic data of the current <see cref="OsuDifficultyHitObject"/>.
@@ -94,19 +94,20 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                         // bpm change was from a slider, this is easier typically than circle -> circle
                         // unintentional side effect is that bursts with kicksliders at the ends might have lower difficulty than bursts without sliders
                         if (prevObj.BaseObject is Slider)
-                            effectiveRatio *= 0.15;
+                            effectiveRatio *= 0.3;
 
                         // repeated island polarity (2 -> 4, 3 -> 5)
                         if (island.IsSimilarPolarity(previousIsland))
-                            effectiveRatio *= 0.3;
+                            effectiveRatio *= 0.5;
 
                         // previous increase happened a note ago, 1/1->1/2-1/4, dont want to buff this.
                         if (lastDelta > prevDelta + deltaDifferenceEpsilon && prevDelta > currDelta + deltaDifferenceEpsilon)
                             effectiveRatio *= 0.125;
 
-                        // singletaps are easier to control
-                        if (island.DeltaCount == 1)
-                            effectiveRatio *= 0.7;
+                        // repeated island size (ex: triplet -> triplet)
+                        // TODO: remove this nerf since its staying here only for balancing purposes because of the flawed ratio calculation
+                        if (previousIsland.DeltaCount == island.DeltaCount)
+                            effectiveRatio *= 0.5;
 
                         var islandCount = islandCounts.FirstOrDefault(x => x.Island.Equals(island));
 
@@ -150,6 +151,15 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                     // Begin counting island until we change speed again.
                     firstDeltaSwitch = true;
 
+                    // bpm change is into slider, this is easy acc window
+                    if (currObj.BaseObject is Slider)
+                        effectiveRatio *= 0.6;
+
+                    // bpm change was from a slider, this is easier typically than circle -> circle
+                    // unintentional side effect is that bursts with kicksliders at the ends might have lower difficulty than bursts without sliders
+                    if (prevObj.BaseObject is Slider)
+                        effectiveRatio *= 0.6;
+
                     startRatio = effectiveRatio;
 
                     island = new Island((int)currDelta, deltaDifferenceEpsilon);
@@ -180,12 +190,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 DeltaCount++;
             }
 
-            public int Delta { get; private set; }
+            public int Delta { get; private set; } = int.MaxValue;
             public int DeltaCount { get; private set; }
 
             public void AddDelta(int delta)
             {
-                if (Delta == default)
+                if (Delta == int.MaxValue)
                     Delta = Math.Max(delta, OsuDifficultyHitObject.MIN_DELTA_TIME);
 
                 DeltaCount++;
@@ -193,9 +203,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             public bool IsSimilarPolarity(Island other)
             {
-                // consider islands to be of similar polarity only if they're having the same average delta (we don't want to consider 3 singletaps similar to a triple)
-                return DeltaCount % 2 == other.DeltaCount % 2 &&
-                       Math.Abs(Delta - other.Delta) < deltaDifferenceEpsilon;
+                // TODO: consider islands to be of similar polarity only if they're having the same average delta (we don't want to consider 3 singletaps similar to a triple)
+                //       naively adding delta check here breaks _a lot_ of maps because of the flawed ratio calculation
+                return DeltaCount % 2 == other.DeltaCount % 2;
             }
 
             public bool Equals(Island? other)
