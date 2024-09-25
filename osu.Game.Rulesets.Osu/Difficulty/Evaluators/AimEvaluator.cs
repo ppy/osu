@@ -47,7 +47,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             }
 
             // As above, do the same for the previous hitobject.
-            double prevDistance = withSliderTravelDistance ? Math.Max(osuLastObj.JumpDistance, osuLastObj.LazyJumpFromEndDistance) : osuLastObj.JumpDistance;
+            double prevDistance = withSliderTravelDistance ? osuLastObj.LazyJumpFromEndDistance : osuLastObj.JumpDistance;
             double prevVelocity = prevDistance / osuLastObj.StrainTime;
 
             if (osuLastLastObj.BaseObject is Slider && withSliderTravelDistance)
