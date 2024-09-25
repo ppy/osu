@@ -58,7 +58,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 speedBonus = 1 + 0.75 * Math.Pow((min_speed_bonus - strainTime) / speed_balancing_factor, 2);
 
             double travelDistance = osuPrevObj?.TravelDistance ?? 0;
-            double distance = travelDistance + osuCurrObj.MinimumJumpDistance;
+            double distance = Math.Max(osuCurrObj.JumpDistance, travelDistance + osuCurrObj.MinimumJumpDistance);
 
             // Cap distance at single_spacing_threshold
             distance = Math.Min(distance, single_spacing_threshold);
