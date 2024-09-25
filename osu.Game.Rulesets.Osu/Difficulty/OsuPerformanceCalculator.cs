@@ -123,8 +123,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             if (attributes.SliderCount > 0)
             {
-                // Meh and Miss are more severe on sliders than normal Ok, so punish them 2 times more
-                double estimateSliderEndsDropped = Math.Clamp(Math.Min(countOk + countMeh * 2 + countMiss * 2, attributes.MaxCombo - scoreMaxCombo), 0, estimateDifficultSliders);
+                double estimateSliderEndsDropped = Math.Clamp(Math.Min(countOk + countMeh + countMiss, attributes.MaxCombo - scoreMaxCombo), 0, estimateDifficultSliders);
                 double sliderNerfFactor = (1 - attributes.SliderFactor) * (1 - estimateSliderEndsDropped / estimateDifficultSliders) + attributes.SliderFactor;
                 aimValue *= Math.Pow(sliderNerfFactor, 3);
             }
