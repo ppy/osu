@@ -57,6 +57,15 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             if (strainTime < min_speed_bonus)
                 speedBonus = 1 + 0.75 * Math.Pow((min_speed_bonus - strainTime) / speed_balancing_factor, 2);
 
+            double travelDistance = osuPrevObj?.TravelDistance ?? 0;
+            double distance = Math.Max(osuCurrObj.JumpDistance, travelDistance + osuCurrObj.MinimumJumpDistance);
+
+            // Cap distance at single_spacing_threshold
+            distance = Math.Min(distance, single_spacing_threshold);
+
+            // Max distance bonus is 2 at single_spacing_threshold
+            double distanceBonus = 1 + Math.Pow(distance / single_spacing_threshold, 3.5);
+
             double sliderStreamBonus = 1;
 
             if (osuCurrObj.BaseObject is Slider slider && osuPrevObj?.BaseObject is Slider)
@@ -74,9 +83,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
                 sliderStreamBonus += sliderStreamFactor;
             }
-
-            // Max distance bonus is 2 at single_spacing_threshold //
-            double distanceBonus = Math.Min(2, 1 + Math.Pow(osuCurrObj.JumpDistance / single_spacing_threshold, 3.5));
 
             // Base difficulty with all bonuses
             double difficulty = speedBonus * distanceBonus * sliderStreamBonus * 1000 / strainTime;

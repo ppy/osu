@@ -36,7 +36,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             var osuLastLastObj = (OsuDifficultyHitObject)current.Previous(1);
 
             // Calculate the velocity to the current hitobject, which starts with a base distance / time assuming the last object is a hitcircle.
-            double currVelocity = osuCurrObj.JumpDistance / osuCurrObj.StrainTime;
+            double currDistance = withSliderTravelDistance ? osuCurrObj.LazyJumpFromEndDistance : osuCurrObj.JumpDistance;
+            double currVelocity = currDistance / osuCurrObj.StrainTime;
 
             // This multiplier exists to prevent slideraim having sliderjumps bonus
             double sliderJumpNerfFactor = 1.0;
@@ -56,7 +57,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             }
 
             // As above, do the same for the previous hitobject.
-            double prevVelocity = osuLastObj.JumpDistance / osuLastObj.StrainTime;
+            double prevDistance = withSliderTravelDistance ? Math.Max(osuLastObj.JumpDistance, osuLastObj.LazyJumpFromEndDistance) : osuLastObj.JumpDistance;
+            double prevVelocity = prevDistance / osuLastObj.StrainTime;
 
             if (osuLastLastObj.BaseObject is Slider && withSliderTravelDistance)
             {
@@ -93,7 +95,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                         acuteAngleBonus *= calcAcuteAngleBonus(lastAngle) // Multiply by previous angle, we don't want to buff unless this is a wiggle type pattern.
                                            * Math.Min(angleBonus, 125 / osuCurrObj.StrainTime) // The maximum velocity we buff is equal to 125 / strainTime
                                            * Math.Pow(Math.Sin(Math.PI / 2 * Math.Min(1, (100 - osuCurrObj.StrainTime) / 25)), 2) // scale buff from 150 bpm 1/4 to 200 bpm 1/4
-                                           * Math.Pow(Math.Sin(Math.PI / 2 * (Math.Clamp(osuCurrObj.LazyJumpFromEndDistance, 50, 100) - 50) / 50), 2); // Buff distance exceeding 50 (radius) up to 100 (diameter).
+                                           * Math.Pow(Math.Sin(Math.PI / 2 * (Math.Clamp(currDistance, 50, 100) - 50) / 50), 2); // Buff distance exceeding 50 (radius) up to 100 (diameter).
                     }
 
                     // Penalize wide angles if they're repeated, reducing the penalty as the lastAngle gets more acute.
@@ -103,48 +105,25 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 }
             }
 
-            double sliderlessVelocityChangeBonus = 0;
-
             if (Math.Max(prevVelocity, currVelocity) != 0)
             {
-                double normalVelocityChangeBonus = 0;
-
-                {
-                    // We want to use the average velocity over the whole object when awarding differences, not the individual jump and slider path velocities.
-                    prevVelocity = osuLastObj.JumpDistance / osuLastObj.StrainTime;
-                    currVelocity = osuCurrObj.JumpDistance / osuCurrObj.StrainTime;
-
-                    // Scale with ratio of difference compared to 0.5 * max dist.
-                    double distRatio = Math.Pow(Math.Sin(Math.PI / 2 * Math.Abs(prevVelocity - currVelocity) / Math.Max(prevVelocity, currVelocity)), 2);
-
-                    // Reward for % distance up to 125 / strainTime for overlaps where velocity is still changing.
-                    double overlapVelocityBuff = Math.Min(125 / Math.Min(osuCurrObj.StrainTime, osuLastObj.StrainTime), Math.Abs(prevVelocity - currVelocity));
-
-                    sliderlessVelocityChangeBonus = overlapVelocityBuff * distRatio;
-
-                    // Penalize for rhythm changes.
-                    sliderlessVelocityChangeBonus *= Math.Pow(Math.Min(osuCurrObj.StrainTime, osuLastObj.StrainTime) / Math.Max(osuCurrObj.StrainTime, osuLastObj.StrainTime), 2);
-                }
-
                 if (withSliderTravelDistance)
                 {
                     // We want to use the average velocity over the whole object when awarding differences, not the individual jump and slider path velocities.
                     prevVelocity = (osuLastObj.LazyJumpFromEndDistance + osuLastLastObj.TravelDistance) / osuLastObj.StrainTime;
                     currVelocity = (osuCurrObj.LazyJumpFromEndDistance + osuLastObj.TravelDistance) / osuCurrObj.StrainTime;
-
-                    // Scale with ratio of difference compared to 0.5 * max dist.
-                    double distRatio = Math.Pow(Math.Sin(Math.PI / 2 * Math.Abs(prevVelocity - currVelocity) / Math.Max(prevVelocity, currVelocity)), 2);
-
-                    // Reward for % distance up to 125 / strainTime for overlaps where velocity is still changing.
-                    double overlapVelocityBuff = Math.Min(125 / Math.Min(osuCurrObj.StrainTime, osuLastObj.StrainTime), Math.Abs(prevVelocity - currVelocity));
-
-                    normalVelocityChangeBonus = overlapVelocityBuff * distRatio;
-
-                    // Penalize for rhythm changes.
-                    normalVelocityChangeBonus *= Math.Pow(Math.Min(osuCurrObj.StrainTime, osuLastObj.StrainTime) / Math.Max(osuCurrObj.StrainTime, osuLastObj.StrainTime), 2);
                 }
 
-                velocityChangeBonus = Math.Max(sliderlessVelocityChangeBonus, normalVelocityChangeBonus);
+                // Scale with ratio of difference compared to 0.5 * max dist.
+                double distRatio = Math.Pow(Math.Sin(Math.PI / 2 * Math.Abs(prevVelocity - currVelocity) / Math.Max(prevVelocity, currVelocity)), 2);
+
+                // Reward for % distance up to 125 / strainTime for overlaps where velocity is still changing.
+                double overlapVelocityBuff = Math.Min(125 / Math.Min(osuCurrObj.StrainTime, osuLastObj.StrainTime), Math.Abs(prevVelocity - currVelocity));
+
+                velocityChangeBonus = overlapVelocityBuff * distRatio;
+
+                // Penalize for rhythm changes.
+                velocityChangeBonus *= Math.Pow(Math.Min(osuCurrObj.StrainTime, osuLastObj.StrainTime) / Math.Max(osuCurrObj.StrainTime, osuLastObj.StrainTime), 2);
             }
 
             // Add in acute angle bonus or wide angle bonus + velocity change bonus, whichever is larger.
@@ -154,12 +133,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             if (osuLastObj.BaseObject is Slider slider)
             {
                 // Take the sliderless difficulty as a base
-                sliderJumpBonus = slider_jump_multiplier * aimStrain * sliderJumpNerfFactor;
+                sliderJumpBonus = aimStrain * sliderJumpNerfFactor;
 
                 // Reward more if sliders and circles are alternating (actually it's still lower than several sliders in a row)
                 if (osuLastLastObj.BaseObject is HitCircle)
                 {
-                    double alternatingBonus = slider_jump_multiplier * osuLastObj.JumpDistance / osuLastObj.StrainTime;
+                    double alternatingBonus = osuLastObj.JumpDistance / osuLastObj.StrainTime;
 
                     if (osuLastObj.StrainTime > osuLastLastObj.StrainTime)
                         alternatingBonus *= CalcRhythmDifferenceMultiplier(osuCurrObj.StrainTime, osuLastObj.StrainTime);
@@ -177,7 +156,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                     sliderJumpBonus *= sliderLength / slider.Radius;
             }
 
-            aimStrain += sliderJumpBonus;
+            aimStrain += sliderJumpBonus * slider_jump_multiplier;
 
             // Add in additional slider velocity bonus.
             double sliderBodyBonus = 0;
