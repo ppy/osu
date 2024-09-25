@@ -6,7 +6,7 @@ using osu.Game.Tournament.Screens.Board;
 
 namespace osu.Game.Tournament.Tests.Screens
 {
-    public partial class TestSceneBoardScreen : TournamentTestScene
+    public partial class TestSceneBoardScreen : TournamentScreenTestScene
     {
         [BackgroundDependencyLoader]
         private void load()
