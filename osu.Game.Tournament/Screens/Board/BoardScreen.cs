@@ -39,6 +39,7 @@ namespace osu.Game.Tournament.Screens.Board
         private TournamentSceneManager? sceneManager { get; set; }
 
         private WarningBox warning = null!;
+        private Container warningContainer = null!;
 
         private readonly Bindable<TournamentMatch?> currentMatch = new Bindable<TournamentMatch?>();
 
@@ -205,6 +206,12 @@ namespace osu.Game.Tournament.Screens.Board
                     RelativeSizeAxes = Axes.None,
                     Height = 50,
                     Position = new Vector2(-40, -10),
+                },
+                warningContainer = new Container
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    AutoSizeAxes = Axes.Both,
                 },
                 new ControlPanel
                 {
@@ -1305,7 +1312,7 @@ namespace osu.Game.Tournament.Screens.Board
 
             if (CurrentMatch.Value == null)
             {
-                AddInternal(warning = new WarningBox("Cannot access current match, sorry ;w;"));
+                warningContainer.Child = warning = new WarningBox("Cannot access current match, sorry ;w;");
                 return;
             }
 
@@ -1353,7 +1360,7 @@ namespace osu.Game.Tournament.Screens.Board
                 }
                 else
                 {
-                    AddInternal(warning = new WarningBox("This round isn't set up for board view..."));
+                    warningContainer.Child = warning = new WarningBox("This round isn't set up for board view...");
                     return;
                 }
             }

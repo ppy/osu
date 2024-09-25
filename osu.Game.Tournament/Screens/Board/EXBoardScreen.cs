@@ -36,6 +36,7 @@ namespace osu.Game.Tournament.Screens.Board
         private TournamentSceneManager? sceneManager { get; set; }
 
         private WarningBox? warning;
+        private Container warningContainer = null!;
 
         private TeamColour pickColour = TeamColour.Neutral;
         private ChoiceType pickType = ChoiceType.Pick;
@@ -220,6 +221,12 @@ namespace osu.Game.Tournament.Screens.Board
                     RelativeSizeAxes = Axes.None,
                     Height = 50,
                     Position = new Vector2(-40, -10),
+                },
+                warningContainer = new Container
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    AutoSizeAxes = Axes.Both,
                 },
                 new ControlPanel
                 {
@@ -497,7 +504,7 @@ namespace osu.Game.Tournament.Screens.Board
 
             if (CurrentMatch.Value == null)
             {
-                AddInternal(warning = new WarningBox("Select a match from bracket screen first"));
+                warningContainer.Child = warning = new WarningBox("Select a match from bracket screen first");
                 return;
             }
 
@@ -513,7 +520,7 @@ namespace osu.Game.Tournament.Screens.Board
 
                 if (exCount == 0)
                 {
-                    AddInternal(warning = new WarningBox("Seemingly you don't have any EX map set up..."));
+                    warningContainer.Child = warning = new WarningBox("Seemingly you don't have any EX map set up...");
                     return;
                 }
 
@@ -555,7 +562,7 @@ namespace osu.Game.Tournament.Screens.Board
             }
             else
             {
-                AddInternal(warning = new WarningBox("Cannot access current match, sorry ;w;"));
+                warningContainer.Child = warning = new WarningBox("Cannot access current match, sorry ;w;");
             }
         }
     }
