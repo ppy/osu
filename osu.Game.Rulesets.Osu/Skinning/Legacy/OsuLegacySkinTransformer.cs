@@ -236,6 +236,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                     switch (osuLookup)
                     {
                         case OsuSkinConfiguration.SliderPathRadius:
+                        case OsuSkinConfiguration.EditorBlueprintRadius:
                             if (hasHitCircle.Value)
                                 return SkinUtils.As<TValue>(new BindableFloat(LEGACY_CIRCLE_RADIUS));
 

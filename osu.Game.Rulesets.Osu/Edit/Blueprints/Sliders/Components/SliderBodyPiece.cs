@@ -3,10 +3,13 @@
 
 using System.Collections.Generic;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Osu.Objects;
+using osu.Game.Rulesets.Osu.Skinning;
 using osu.Game.Rulesets.Osu.Skinning.Default;
+using osu.Game.Skinning;
 using osuTK;
 using osuTK.Graphics;
 
@@ -40,19 +43,35 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             };
         }
 
+        private readonly Bindable<float> sliderPathRadius = new BindableFloat(OsuHitObject.OBJECT_RADIUS);
+
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
             body.BorderColour = colours.Yellow;
+
+            if (skin != null)
+            {
+                skin.SourceChanged += skinChanged;
+                skinChanged();
+            }
+        }
+
+        private void skinChanged()
+        {
+            sliderPathRadius.Value = skin?.GetConfig<OsuSkinConfiguration, float>(OsuSkinConfiguration.EditorBlueprintRadius)?.Value ?? OsuHitObject.OBJECT_RADIUS;
         }
 
         private int? lastVersion;
+
+        [Resolved(canBeNull: true)]
+        private ISkinSource? skin { get; set; }
 
         public override void UpdateFrom(Slider hitObject)
         {
             base.UpdateFrom(hitObject);
 
-            body.PathRadius = hitObject.Scale * OsuHitObject.OBJECT_RADIUS;
+            body.PathRadius = hitObject.Scale * sliderPathRadius.Value;
 
             if (lastVersion != hitObject.Path.Version.Value)
             {
@@ -70,5 +89,13 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         public void RecyclePath() => body.RecyclePath();
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => body.ReceivePositionalInputAt(screenSpacePos);
+
+        protected override void Dispose(bool isDisposing)
+        {
+            if (skin != null)
+                skin.SourceChanged -= skinChanged;
+
+            base.Dispose(isDisposing);
+        }
     }
 }

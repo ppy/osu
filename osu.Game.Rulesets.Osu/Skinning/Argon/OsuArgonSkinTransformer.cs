@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Skinning;
@@ -77,6 +78,17 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
             }
 
             return base.GetDrawableComponent(lookup);
+        }
+
+        public override IBindable<TValue>? GetConfig<TLookup, TValue>(TLookup lookup)
+        {
+            switch (lookup)
+            {
+                case OsuSkinConfiguration.EditorBlueprintRadius:
+                    return SkinUtils.As<TValue>(new BindableFloat(ArgonMainCirclePiece.OUTER_GRADIENT_SIZE * 0.5f));
+            }
+
+            return base.GetConfig<TLookup, TValue>(lookup);
         }
     }
 }
