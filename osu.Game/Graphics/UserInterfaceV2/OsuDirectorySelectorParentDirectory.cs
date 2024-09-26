@@ -2,7 +2,9 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.IO;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics.Sprites;
+using osu.Game.Overlays;
 
 namespace osu.Game.Graphics.UserInterfaceV2
 {
@@ -13,6 +15,12 @@ namespace osu.Game.Graphics.UserInterfaceV2
         public OsuDirectorySelectorParentDirectory(DirectoryInfo directory)
             : base(directory, "..")
         {
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(OverlayColourProvider colourProvider)
+        {
+            Colour = colourProvider.Content1;
         }
     }
 }
