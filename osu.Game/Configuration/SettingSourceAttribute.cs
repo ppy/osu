@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using JetBrains.Annotations;
@@ -15,6 +14,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Localisation;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Settings;
+using osu.Game.Utils;
 
 namespace osu.Game.Configuration
 {
@@ -228,10 +228,7 @@ namespace osu.Game.Configuration
                     return b.Value;
 
                 case IBindable u:
-                    // An unknown (e.g. enum) generic type.
-                    var valueMethod = u.GetType().GetProperty(nameof(IBindable<int>.Value));
-                    Debug.Assert(valueMethod != null);
-                    return valueMethod.GetValue(u)!;
+                    return BindableValueAccessor.GetValue(u);
 
                 default:
                     // fall back for non-bindable cases.
