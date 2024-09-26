@@ -10,7 +10,10 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
+using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.UI;
+using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Components.RadioButtons;
 using osuTK;
 
@@ -35,6 +38,8 @@ namespace osu.Game.Rulesets.Osu.Edit
         private OsuCheckbox xCheckBox = null!;
         private OsuCheckbox yCheckBox = null!;
 
+        private BindableList<HitObject> selectedItems { get; } = new BindableList<HitObject>();
+
         public PreciseScalePopover(OsuSelectionScaleHandler scaleHandler, OsuGridToolboxGroup gridToolbox)
         {
             this.scaleHandler = scaleHandler;
@@ -44,8 +49,10 @@ namespace osu.Game.Rulesets.Osu.Edit
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(EditorBeatmap editorBeatmap)
         {
+            selectedItems.BindTo(editorBeatmap.SelectedHitObjects);
+
             Child = new FillFlowContainer
             {
                 Width = 220,
@@ -191,14 +198,26 @@ namespace osu.Game.Rulesets.Osu.Edit
             updateAxisCheckBoxesEnabled();
         }
 
-        private Vector2? getOriginPosition(PreciseScaleInfo scale) =>
-            scale.Origin switch
+        private Vector2? getOriginPosition(PreciseScaleInfo scale)
+        {
+            switch (scale.Origin)
             {
-                ScaleOrigin.GridCentre => gridToolbox.StartPosition.Value,
-                ScaleOrigin.PlayfieldCentre => OsuPlayfield.BASE_SIZE / 2,
-                ScaleOrigin.SelectionCentre => null,
-                _ => throw new ArgumentOutOfRangeException(nameof(scale))
-            };
+                case ScaleOrigin.GridCentre:
+                    return gridToolbox.StartPosition.Value;
+
+                case ScaleOrigin.PlayfieldCentre:
+                    return OsuPlayfield.BASE_SIZE / 2;
+
+                case ScaleOrigin.SelectionCentre:
+                    if (selectedItems.Count == 1 && selectedItems.First() is Slider slider)
+                        return slider.Position;
+
+                    return null;
+
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(scale));
+            }
+        }
 
         private Axes getAdjustAxis(PreciseScaleInfo scale) => scale.XAxis ? scale.YAxis ? Axes.Both : Axes.X : Axes.Y;
 
