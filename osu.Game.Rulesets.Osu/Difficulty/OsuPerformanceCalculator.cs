@@ -67,6 +67,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double speedValue = computeSpeedValue(score, osuAttributes);
             double mechanicalValue = Math.Pow(Math.Pow(aimValue, power) + Math.Pow(speedValue, power), 1.0 / power);
 
+            mechanicalValue *= calculateMechanicalBalancingMultiplier(osuAttributes);
+
             // Cognition
 
             double lowARValue = computeReadingLowARValue(score, osuAttributes);
@@ -396,6 +398,26 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             return Math.Max(countMiss, comboBasedMissCount);
         }
+
+        private double calculateMechanicalBalancingMultiplier(OsuDifficultyAttributes attributes)
+        {
+            double aimValue = OsuStrainSkill.DifficultyToPerformance(attributes.AimDifficulty);
+            double speedValue = OsuStrainSkill.DifficultyToPerformance(attributes.SpeedDifficulty);
+
+            double lengthBonus = CalculateDefaultLengthBonus(totalHits);
+            aimValue *= lengthBonus;
+            speedValue *= lengthBonus;
+
+            double power = OsuDifficultyCalculator.SUM_POWER;
+            double summedValue = Math.Pow(Math.Pow(aimValue, power) + Math.Pow(speedValue, power), 1.0 / power);
+
+            const double threshold = 800;
+            if (summedValue < threshold)
+                return 1;
+
+            return (threshold + (summedValue - threshold) * 1.4) / summedValue;
+        }
+
         private double getComboScalingFactor(OsuDifficultyAttributes attributes) => attributes.MaxCombo <= 0 ? 1.0 : Math.Min(Math.Pow(scoreMaxCombo, 0.8) / Math.Pow(attributes.MaxCombo, 0.8), 1.0);
         private int totalHits => countGreat + countOk + countMeh + countMiss;
 
