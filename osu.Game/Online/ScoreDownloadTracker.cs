@@ -46,6 +46,7 @@ namespace osu.Game.Online
             Downloader.DownloadBegan += downloadBegan;
             Downloader.DownloadFailed += downloadFailed;
 
+            // Required local for iOS. Will cause runtime crash if inlined.
             long onlineId = TrackedItem.OnlineID;
             long legacyOnlineId = TrackedItem.LegacyOnlineID;
             string hash = TrackedItem.Hash;
