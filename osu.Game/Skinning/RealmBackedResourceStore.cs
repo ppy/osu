@@ -29,6 +29,7 @@ namespace osu.Game.Skinning
             invalidateCache();
             Debug.Assert(fileToStoragePathMapping != null);
 
+            // Required local for iOS. Will cause runtime crash if inlined.
             Guid id = source.ID;
 
             realmSubscription = realm?.RegisterForNotifications(r => r.All<T>().Where(s => s.ID == id), skinChanged);

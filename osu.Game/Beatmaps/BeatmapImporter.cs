@@ -198,6 +198,7 @@ namespace osu.Game.Beatmaps
 
             if (beatmapSet.OnlineID > 0)
             {
+                // Required local for iOS. Will cause runtime crash if inlined.
                 int onlineId = beatmapSet.OnlineID;
 
                 // OnlineID should really be unique, but to avoid catastrophic failure let's iterate just to be sure.

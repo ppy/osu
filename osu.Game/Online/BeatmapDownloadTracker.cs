@@ -40,6 +40,7 @@ namespace osu.Game.Online
             // Used to interact with manager classes that don't support interface types. Will eventually be replaced.
             var beatmapSetInfo = new BeatmapSetInfo { OnlineID = TrackedItem.OnlineID };
 
+            // Required local for iOS. Will cause runtime crash if inlined.
             int onlineId = TrackedItem.OnlineID;
 
             realmSubscription = realm.RegisterForNotifications(r => r.All<BeatmapSetInfo>().Where(s => s.OnlineID == onlineId && !s.DeletePending), (items, _) =>
