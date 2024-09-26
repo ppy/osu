@@ -400,7 +400,7 @@ namespace osu.Game.Tournament.Screens.Board
                                         Text = "Sync",
                                         BackgroundColour = Color4.Orange,
                                         Action = () => {
-                                            if (!CurrentMatch.Value.Round.Value.UseBoard.Value)
+                                            if (CurrentMatch.Value?.Round.Value?.UseBoard.Value != true)
                                             {
                                                 dialogOverlay.Push(new IPCErrorDialog("Unsupported", "This round isn't set for board layout. Check this in round editor."));
                                             }
