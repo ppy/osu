@@ -432,7 +432,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         private bool endClickSelection(MouseButtonEvent e)
         {
             // If already handled a selection, double-click, or drag, we don't want to perform a mouse up / click action.
-            if (clickSelectionHandled || doubleClickHandled || isDraggingBlueprint) return true;
+            if (clickSelectionHandled || doubleClickHandled || isDraggingBlueprint || wasDragStarted) return true;
 
             if (e.Button != MouseButton.Left) return false;
 
@@ -448,7 +448,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 return false;
             }
 
-            if (!wasDragStarted && selectedBlueprintAlreadySelectedOnMouseDown && SelectedItems.Count == 1)
+            if (selectedBlueprintAlreadySelectedOnMouseDown && SelectedItems.Count == 1)
             {
                 // If a click occurred and was handled by the currently selected blueprint but didn't result in a drag,
                 // cycle between other blueprints which are also under the cursor.
