@@ -72,36 +72,31 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             samplesVisible = config.GetBindable<bool>(OsuSetting.EditorTimelineShowSamples);
         }
 
+        private BindableNumber<float>? timelineZoom;
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
             samplesVisible.BindValueChanged(visible => this.FadeTo(visible.NewValue ? 1 : 0, 200, Easing.OutQuint));
             this.FadeTo(samplesVisible.Value ? 1 : 0);
-        }
 
-        private float lastZoom;
-        private const float zoom_threshold = 40f;
-
-        protected override void Update()
-        {
-            base.Update();
-
-            // Retract visual state if the timeline is zoomed out too far.
-            if (timeline is null || timeline.Zoom == lastZoom) return;
-
-            lastZoom = timeline.Zoom;
-
-            if (timeline.Zoom < zoom_threshold)
+            timelineZoom = timeline?.CurrentZoom.GetBoundCopy();
+            timelineZoom?.BindValueChanged(zoom =>
             {
-                Label.FadeOut(200, Easing.OutQuint);
-                LabelContainer.ResizeWidthTo(16, 200, Easing.OutQuint);
-            }
-            else
-            {
-                Label.FadeIn(200, Easing.OutQuint);
-                LabelContainer.ResizeWidthTo(Label.Width, 200, Easing.OutQuint);
-            }
+                const float zoom_threshold = 40f;
+
+                if (zoom.NewValue < zoom_threshold)
+                {
+                    Label.FadeOut(200, Easing.OutQuint);
+                    LabelContainer.ResizeWidthTo(16, 200, Easing.OutQuint);
+                }
+                else
+                {
+                    Label.FadeIn(200, Easing.OutQuint);
+                    LabelContainer.ResizeWidthTo(Label.Width, 200, Easing.OutQuint);
+                }
+            }, true);
         }
 
         protected override void Dispose(bool isDisposing)
