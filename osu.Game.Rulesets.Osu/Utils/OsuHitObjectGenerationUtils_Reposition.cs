@@ -232,8 +232,6 @@ namespace osu.Game.Rulesets.Osu.Utils
             slider.Position = workingObject.PositionModified = new Vector2(newX, newY);
             workingObject.EndPositionModified = slider.EndPosition;
 
-            shiftNestedObjects(slider, workingObject.PositionModified - workingObject.PositionOriginal);
-
             return workingObject.PositionModified - previousPosition;
         }
 
@@ -305,22 +303,6 @@ namespace osu.Game.Rulesets.Osu.Utils
             float bottom = OsuPlayfield.BASE_SIZE.Y - maxY;
 
             return new RectangleF(left, top, right - left, bottom - top);
-        }
-
-        /// <summary>
-        /// Shifts all nested <see cref="SliderTick"/>s and <see cref="SliderRepeat"/>s by the specified shift.
-        /// </summary>
-        /// <param name="slider"><see cref="Slider"/> whose nested <see cref="SliderTick"/>s and <see cref="SliderRepeat"/>s should be shifted</param>
-        /// <param name="shift">The <see cref="Vector2"/> the <see cref="Slider"/>'s nested <see cref="SliderTick"/>s and <see cref="SliderRepeat"/>s should be shifted by</param>
-        private static void shiftNestedObjects(Slider slider, Vector2 shift)
-        {
-            foreach (var hitObject in slider.NestedHitObjects.Where(o => o is SliderTick || o is SliderRepeat))
-            {
-                if (!(hitObject is OsuHitObject osuHitObject))
-                    continue;
-
-                osuHitObject.Position += shift;
-            }
         }
 
         /// <summary>
