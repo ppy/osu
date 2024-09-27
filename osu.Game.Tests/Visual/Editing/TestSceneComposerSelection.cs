@@ -244,11 +244,8 @@ namespace osu.Game.Tests.Visual.Editing
                 InputManager.PressKey(Key.ControlLeft);
             });
             AddStep("drag to left corner", () => InputManager.MoveMouseTo(blueprintContainer.ScreenSpaceDrawQuad.TopRight + new Vector2(5, -5)));
-            AddStep("end dragging", () =>
-            {
-                InputManager.ReleaseButton(MouseButton.Left);
-                InputManager.ReleaseKey(Key.ControlLeft);
-            });
+            AddStep("end dragging", () => InputManager.ReleaseButton(MouseButton.Left));
+            AddStep("release control", () => InputManager.ReleaseKey(Key.ControlLeft));
 
             AddAssert("4 hitobjects selected", () => EditorBeatmap.SelectedHitObjects, () => Has.Count.EqualTo(4));
 
