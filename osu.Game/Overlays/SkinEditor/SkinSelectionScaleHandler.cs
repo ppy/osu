@@ -67,7 +67,7 @@ namespace osu.Game.Overlays.SkinEditor
 
             objectsInScale = selectedItems.Cast<Drawable>().ToDictionary(d => d, d => new OriginalDrawableState(d));
             OriginalSurroundingQuad = ToLocalSpace(GeometryUtils.GetSurroundingQuad(objectsInScale.SelectMany(d => d.Key.ScreenSpaceDrawQuad.GetVertices().ToArray())));
-            defaultOrigin = OriginalSurroundingQuad.Value.Centre;
+            defaultOrigin = ToLocalSpace(GeometryUtils.MinimumEnclosingCircle(objectsInScale.SelectMany(d => d.Key.ScreenSpaceDrawQuad.GetVertices().ToArray())).Item1);
 
             isFlippedX = false;
             isFlippedY = false;
