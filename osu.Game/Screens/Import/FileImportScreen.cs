@@ -15,6 +15,7 @@ using osu.Framework.Screens;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterfaceV2;
+using osu.Game.Overlays;
 using osuTK;
 
 namespace osu.Game.Screens.Import
@@ -36,8 +37,8 @@ namespace osu.Game.Screens.Import
         [Resolved]
         private OsuGameBase game { get; set; }
 
-        [Resolved]
-        private OsuColour colours { get; set; }
+        [Cached]
+        private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Purple);
 
         [BackgroundDependencyLoader(true)]
         private void load()
@@ -52,11 +53,6 @@ namespace osu.Game.Screens.Import
                 Size = new Vector2(0.9f, 0.8f),
                 Children = new Drawable[]
                 {
-                    new Box
-                    {
-                        Colour = colours.GreySeaFoamDark,
-                        RelativeSizeAxes = Axes.Both,
-                    },
                     fileSelector = new OsuFileSelector(validFileExtensions: game.HandledExtensions.ToArray())
                     {
                         RelativeSizeAxes = Axes.Both,
@@ -72,7 +68,7 @@ namespace osu.Game.Screens.Import
                         {
                             new Box
                             {
-                                Colour = colours.GreySeaFoamDarker,
+                                Colour = colourProvider.Background4,
                                 RelativeSizeAxes = Axes.Both
                             },
                             new Container
