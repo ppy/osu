@@ -74,6 +74,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         private BindableNumber<float>? timelineZoom;
 
+        private bool contracted;
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
@@ -88,13 +90,17 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
                 if (zoom.NewValue < zoom_threshold)
                 {
+                    contracted = true;
                     Label.FadeOut(200, Easing.OutQuint);
-                    LabelContainer.ResizeWidthTo(16, 200, Easing.OutQuint);
+                    LabelContainer.ResizeTo(new Vector2(12), 200, Easing.OutQuint);
+                    LabelContainer.CornerRadius = 6;
                 }
                 else
                 {
+                    contracted = false;
                     Label.FadeIn(200, Easing.OutQuint);
-                    LabelContainer.ResizeWidthTo(Label.Width, 200, Easing.OutQuint);
+                    LabelContainer.ResizeTo(new Vector2(Label.Width, 16), 200, Easing.OutQuint);
+                    LabelContainer.CornerRadius = 8;
                 }
             }, true);
         }
@@ -124,7 +130,9 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         private void updateText()
         {
             Label.Text = $"{abbreviateBank(GetBankValue(GetSamples()))} {GetVolumeValue(GetSamples())}";
-            LabelContainer.ResizeWidthTo(Label.Width, 200, Easing.OutQuint);
+
+            if (!contracted)
+                LabelContainer.ResizeWidthTo(Label.Width, 200, Easing.OutQuint);
         }
 
         private static string? abbreviateBank(string? bank)
