@@ -7,7 +7,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
 using osu.Framework.Utils;
 using osu.Game.Configuration;
 using osu.Game.Rulesets.Objects.Types;
@@ -16,7 +15,6 @@ using osu.Game.Rulesets.Osu.Skinning.Default;
 using osu.Game.Screens.Edit;
 using osu.Game.Skinning;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Edit.Blueprints.HitCircles.Components
 {
@@ -48,13 +46,6 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.HitCircles.Components
                 RelativeSizeAxes = Axes.Both,
                 Children = new Drawable[]
                 {
-                    new Circle
-                    {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        RelativeSizeAxes = Axes.Both,
-                        Colour = Color4.White,
-                    },
                     ring = new RingPiece
                     {
                         BorderThickness = 4,

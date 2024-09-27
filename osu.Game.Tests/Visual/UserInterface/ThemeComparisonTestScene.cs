@@ -6,18 +6,21 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Overlays;
+using osuTK;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public abstract partial class ThemeComparisonTestScene : OsuGridTestScene
+    public abstract partial class ThemeComparisonTestScene : OsuManualInputManagerTestScene
     {
         private readonly bool showWithoutColourProvider;
 
+        public Container ContentContainer { get; private set; } = null!;
+
         protected ThemeComparisonTestScene(bool showWithoutColourProvider = true)
-            : base(1, showWithoutColourProvider ? 2 : 1)
         {
             this.showWithoutColourProvider = showWithoutColourProvider;
         }
@@ -25,16 +28,32 @@ namespace osu.Game.Tests.Visual.UserInterface
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
+            Child = ContentContainer = new Container
+            {
+                Anchor = Anchor.TopRight,
+                Origin = Anchor.TopRight,
+                RelativeSizeAxes = Axes.Both,
+            };
+
             if (showWithoutColourProvider)
             {
-                Cell(0, 0).AddRange(new[]
+                ContentContainer.Size = new Vector2(0.5f, 1f);
+
+                Add(new Container
                 {
-                    new Box
+                    Anchor = Anchor.TopLeft,
+                    Origin = Anchor.TopLeft,
+                    RelativeSizeAxes = Axes.Both,
+                    Size = new Vector2(0.5f, 1f),
+                    Children = new[]
                     {
-                        RelativeSizeAxes = Axes.Both,
-                        Colour = colours.GreySeaFoam
-                    },
-                    CreateContent()
+                        new Box
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Colour = colours.GreySeaFoam
+                        },
+                        CreateContent()
+                    }
                 });
             }
         }
@@ -43,10 +62,8 @@ namespace osu.Game.Tests.Visual.UserInterface
         {
             var colourProvider = new OverlayColourProvider(colourScheme);
 
-            int col = showWithoutColourProvider ? 1 : 0;
-
-            Cell(0, col).Clear();
-            Cell(0, col).Add(new DependencyProvidingContainer
+            ContentContainer.Clear();
+            ContentContainer.Add(new DependencyProvidingContainer
             {
                 RelativeSizeAxes = Axes.Both,
                 CachedDependencies = new (Type, object)[]
@@ -58,7 +75,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                     new Box
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Colour = colourProvider.Background4
+                        Colour = colourProvider.Background3
                     },
                     CreateContent()
                 }
