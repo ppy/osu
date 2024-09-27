@@ -29,7 +29,7 @@ namespace osu.Game.Overlays.Mods
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; } = null!;
 
-        public readonly Bindable<ModCustomisationPanelState> ExpandedState = new Bindable<ModCustomisationPanelState>(ModCustomisationPanelState.Collapsed);
+        public readonly Bindable<ModCustomisationPanelState> ExpandedState = new Bindable<ModCustomisationPanelState>();
 
         private readonly ModCustomisationPanel panel;
 
@@ -54,7 +54,7 @@ namespace osu.Game.Overlays.Mods
                 hoverBackground = new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = OsuColour.Gray(80).Opacity(180),
+                    Colour = OsuColour.Gray(50),
                     Blending = BlendingParameters.Additive,
                     Alpha = 0,
                 },
@@ -134,16 +134,13 @@ namespace osu.Game.Overlays.Mods
             if (panel.ExpandedState.Value == ModCustomisationPanelState.Collapsed)
                 panel.ExpandedState.Value = ModCustomisationPanelState.Expanded;
 
-            hoverBackground.FadeIn(200);
-
+            hoverBackground.FadeTo(0.4f, 200, Easing.OutQuint);
             return base.OnHover(e);
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
-            if (Enabled.Value)
-                hoverBackground.FadeOut(200);
-
+            hoverBackground.FadeOut(200, Easing.OutQuint);
             base.OnHoverLost(e);
         }
     }
