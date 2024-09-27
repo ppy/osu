@@ -13,7 +13,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
 using osuTK;
 
-namespace osu.Game.Graphics.UserInterfaceV2
+namespace osu.Game.Graphics.UserInterfaceV2.FileSelection
 {
     internal partial class OsuDirectorySelectorBreadcrumbDisplay : DirectorySelectorBreadcrumbDisplay
     {
@@ -80,7 +80,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
                 AddRangeInternal(new Drawable[]
                 {
-                    new OsuFileSelectorBackgroundLayer(0.5f)
+                    new BackgroundLayer(0.5f)
                     {
                         Depth = 1
                     },
