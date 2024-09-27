@@ -186,6 +186,16 @@ namespace osu.Game.Configuration
 
                         break;
 
+                    case BindableColour4 bColour:
+                        yield return new SettingsColour
+                        {
+                            LabelText = attr.Label,
+                            TooltipText = attr.Description,
+                            Current = bColour
+                        };
+
+                        break;
+
                     case IBindable bindable:
                         var dropdownType = typeof(ModSettingsEnumDropdown<>).MakeGenericType(bindable.GetType().GetGenericArguments()[0]);
                         var dropdown = (Drawable)Activator.CreateInstance(dropdownType)!;
@@ -226,6 +236,9 @@ namespace osu.Game.Configuration
 
                 case Bindable<bool> b:
                     return b.Value;
+
+                case BindableColour4 c:
+                    return c.Value.ToHex();
 
                 case IBindable u:
                     return BindableValueAccessor.GetValue(u);
