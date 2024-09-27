@@ -309,21 +309,21 @@ namespace osu.Game.Utils
         {
             // Using Welzl's algorithm to find the minimum enclosing circle
             // https://www.geeksforgeeks.org/minimum-enclosing-circle-using-welzls-algorithm/
-            List<Vector2> P = points.ToList();
+            List<Vector2> p = points.ToList();
 
             var stack = new Stack<(Vector2?, int)>();
             var r = new List<Vector2>(3);
             (Vector2, float) d = (Vector2.Zero, 0);
 
-            stack.Push((null, P.Count));
+            stack.Push((null, p.Count));
 
             while (stack.Count > 0)
             {
-                // n represents the number of points in P that are not yet processed.
-                // p represents the point that was randomly picked to process.
-                (Vector2? p, int n) = stack.Pop();
+                // `n` represents the number of points in P that are not yet processed.
+                // `point` represents the point that was randomly picked to process.
+                (Vector2? point, int n) = stack.Pop();
 
-                if (!p.HasValue)
+                if (!point.HasValue)
                 {
                     // Base case when all points processed or |R| = 3
                     if (n == 0 || r.Count == 3)
@@ -334,30 +334,30 @@ namespace osu.Game.Utils
 
                     // Pick a random point randomly
                     int idx = RNG.Next(n);
-                    p = P[idx];
+                    point = p[idx];
 
                     // Put the picked point at the end of P since it's more efficient than
                     // deleting from the middle of the list
-                    (P[idx], P[n - 1]) = (P[n - 1], P[idx]);
+                    (p[idx], p[n - 1]) = (p[n - 1], p[idx]);
 
                     // Schedule processing of p after we get the MEC circle d from the set of points P - {p}
-                    stack.Push((p, n));
+                    stack.Push((point, n));
                     // Get the MEC circle d from the set of points P - {p}
                     stack.Push((null, n - 1));
                 }
                 else
                 {
                     // If d contains p, return d
-                    if (isInside(d, p.Value))
+                    if (isInside(d, point.Value))
                         continue;
 
                     // Remove points from R that were added in a deeper recursion
                     // |R| = |P| - |stack| - n
-                    int removeCount = r.Count - (P.Count - stack.Count - n);
+                    int removeCount = r.Count - (p.Count - stack.Count - n);
                     r.RemoveRange(r.Count - removeCount, removeCount);
 
                     // Otherwise, must be on the boundary of the MEC
-                    r.Add(p.Value);
+                    r.Add(point.Value);
                     // Return the MEC for P - {p} and R U {p}
                     stack.Push((null, n - 1));
                 }
