@@ -21,7 +21,7 @@ using osuTK.Input;
 
 namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 {
-    public partial class SliderPlacementBlueprint : PlacementBlueprint
+    public partial class SliderPlacementBlueprint : HitObjectPlacementBlueprint
     {
         public new Slider HitObject => (Slider)base.HitObject;
 

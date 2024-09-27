@@ -47,7 +47,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
             });
         }
 
-        protected override SnapResult SnapForBlueprint(PlacementBlueprint blueprint)
+        protected override SnapResult SnapForBlueprint(HitObjectPlacementBlueprint blueprint)
         {
             double time = column.TimeAtScreenSpacePosition(InputManager.CurrentState.Mouse.Position);
             var pos = column.ScreenSpacePositionAtTime(time);
