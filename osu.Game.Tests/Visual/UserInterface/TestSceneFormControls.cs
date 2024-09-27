@@ -5,6 +5,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
+using osu.Game.Beatmaps;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Localisation;
@@ -93,6 +94,16 @@ namespace osu.Game.Tests.Visual.UserInterface
                             },
                             Instantaneous = false,
                             TabbableContentContainer = this,
+                        },
+                        new FormEnumDropdown<CountdownType>
+                        {
+                            Caption = EditorSetupStrings.EnableCountdown,
+                            HintText = EditorSetupStrings.CountdownDescription,
+                        },
+                        new FormFileSelector
+                        {
+                            Caption = "Audio file",
+                            PlaceholderText = "Select an audio file",
                         },
                     },
                 },

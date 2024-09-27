@@ -41,6 +41,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         public PlacementBlueprint CurrentPlacement { get; private set; }
 
+        public HitObjectPlacementBlueprint CurrentHitObjectPlacement => CurrentPlacement as HitObjectPlacementBlueprint;
+
         [Resolved(canBeNull: true)]
         private EditorScreenWithTimeline editorScreen { get; set; }
 
@@ -164,13 +166,13 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         private void updatePlacementNewCombo()
         {
-            if (CurrentPlacement?.HitObject is IHasComboInformation c)
+            if (CurrentHitObjectPlacement?.HitObject is IHasComboInformation c)
                 c.NewCombo = NewCombo.Value == TernaryState.True;
         }
 
         private void updatePlacementSamples()
         {
-            if (CurrentPlacement == null) return;
+            if (CurrentHitObjectPlacement == null) return;
 
             foreach (var kvp in SelectionHandler.SelectionSampleStates)
                 sampleChanged(kvp.Key, kvp.Value.Value);
@@ -181,9 +183,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         private void sampleChanged(string sampleName, TernaryState state)
         {
-            if (CurrentPlacement == null) return;
+            if (CurrentHitObjectPlacement == null) return;
 
-            var samples = CurrentPlacement.HitObject.Samples;
+            var samples = CurrentHitObjectPlacement.HitObject.Samples;
 
             var existingSample = samples.FirstOrDefault(s => s.Name == sampleName);
 
@@ -196,19 +198,19 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
                 case TernaryState.True:
                     if (existingSample == null)
-                        samples.Add(CurrentPlacement.HitObject.CreateHitSampleInfo(sampleName));
+                        samples.Add(CurrentHitObjectPlacement.HitObject.CreateHitSampleInfo(sampleName));
                     break;
             }
         }
 
         private void bankChanged(string bankName, TernaryState state)
         {
-            if (CurrentPlacement == null) return;
+            if (CurrentHitObjectPlacement == null) return;
 
             if (bankName == EditorSelectionHandler.HIT_BANK_AUTO)
-                CurrentPlacement.AutomaticBankAssignment = state == TernaryState.True;
+                CurrentHitObjectPlacement.AutomaticBankAssignment = state == TernaryState.True;
             else if (state == TernaryState.True)
-                CurrentPlacement.HitObject.Samples = CurrentPlacement.HitObject.Samples.Select(s => s.With(newBank: bankName)).ToList();
+                CurrentHitObjectPlacement.HitObject.Samples = CurrentHitObjectPlacement.HitObject.Samples.Select(s => s.With(newBank: bankName)).ToList();
         }
 
         public readonly Bindable<TernaryState> NewCombo = new Bindable<TernaryState> { Description = "New Combo" };
@@ -386,12 +388,12 @@ namespace osu.Game.Screens.Edit.Compose.Components
             CurrentPlacement = null;
         }
 
-        private HitObjectCompositionTool currentTool;
+        private CompositionTool currentTool;
 
         /// <summary>
         /// The current placement tool.
         /// </summary>
-        public HitObjectCompositionTool CurrentTool
+        public CompositionTool CurrentTool
         {
             get => currentTool;
 
