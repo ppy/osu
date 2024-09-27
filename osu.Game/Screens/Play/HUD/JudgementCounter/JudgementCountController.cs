@@ -52,16 +52,16 @@ namespace osu.Game.Screens.Play.HUD.JudgementCounter
         {
             base.LoadComplete();
 
-            scoreProcessor.OnResetFromReplayFrame += updateAllCounts;
+            scoreProcessor.OnResetFromReplayFrame += updateAllCountsFromReplayFrame;
             scoreProcessor.NewJudgement += judgement => updateCount(judgement, false);
             scoreProcessor.JudgementReverted += judgement => updateCount(judgement, true);
         }
 
-        private bool hasUpdatedCounts;
+        private bool hasUpdatedCountsFromReplayFrame;
 
-        private void updateAllCounts()
+        private void updateAllCountsFromReplayFrame()
         {
-            if (hasUpdatedCounts)
+            if (hasUpdatedCountsFromReplayFrame)
                 return;
 
             foreach (var kvp in scoreProcessor.Statistics)
@@ -72,7 +72,7 @@ namespace osu.Game.Screens.Play.HUD.JudgementCounter
                 count.ResultCount.Value = kvp.Value;
             }
 
-            hasUpdatedCounts = true;
+            hasUpdatedCountsFromReplayFrame = true;
         }
 
         private void updateCount(JudgementResult judgement, bool revert)
