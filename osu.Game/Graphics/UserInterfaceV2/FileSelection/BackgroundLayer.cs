@@ -9,15 +9,15 @@ using osu.Framework.Input.Events;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
 
-namespace osu.Game.Graphics.UserInterfaceV2
+namespace osu.Game.Graphics.UserInterfaceV2.FileSelection
 {
-    internal partial class OsuFileSelectorBackgroundLayer : CompositeDrawable
+    internal partial class BackgroundLayer : CompositeDrawable
     {
         private Box background = null!;
 
         private readonly float defaultAlpha;
 
-        public OsuFileSelectorBackgroundLayer(float defaultAlpha = 0f)
+        public BackgroundLayer(float defaultAlpha = 0f)
         {
             Depth = float.MaxValue;
 

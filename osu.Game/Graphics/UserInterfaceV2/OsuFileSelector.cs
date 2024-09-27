@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.UserInterfaceV2.FileSelection;
 using osu.Game.Overlays;
 
 namespace osu.Game.Graphics.UserInterfaceV2
@@ -58,7 +59,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
                 {
                     RelativeSizeAxes = Axes.Both,
                 },
-                new OsuDirectorySelectorHiddenToggle
+                new HiddenFilesToggleCheckbox
                 {
                     Current = { BindTarget = ShowHiddenItems },
                 },
@@ -86,7 +87,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
                 Flow.AutoSizeAxes = Axes.X;
                 Flow.Height = OsuDirectorySelector.ITEM_HEIGHT;
 
-                AddInternal(new OsuFileSelectorBackgroundLayer());
+                AddInternal(new BackgroundLayer());
 
                 Colour = colourProvider.Light3;
             }
