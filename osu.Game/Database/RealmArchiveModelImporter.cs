@@ -195,6 +195,7 @@ namespace osu.Game.Database
 
                 Directory.CreateDirectory(Path.GetDirectoryName(destinationPath)!);
 
+                // Consider using hard links here to make this instant.
                 using (var inStream = Files.Storage.GetStream(sourcePath))
                 using (var outStream = File.Create(destinationPath))
                     await inStream.CopyToAsync(outStream).ConfigureAwait(false);

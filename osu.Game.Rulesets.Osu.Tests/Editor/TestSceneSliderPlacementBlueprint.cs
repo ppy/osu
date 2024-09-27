@@ -514,6 +514,6 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
         private Slider? getSlider() => HitObjectContainer.Count > 0 ? ((DrawableSlider)HitObjectContainer[0]).HitObject : null;
 
         protected override DrawableHitObject CreateHitObject(HitObject hitObject) => new DrawableSlider((Slider)hitObject);
-        protected override PlacementBlueprint CreateBlueprint() => new SliderPlacementBlueprint();
+        protected override HitObjectPlacementBlueprint CreateBlueprint() => new SliderPlacementBlueprint();
     }
 }

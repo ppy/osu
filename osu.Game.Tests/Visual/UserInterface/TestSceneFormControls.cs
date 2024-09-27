@@ -1,11 +1,14 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
+using osu.Game.Beatmaps;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.UserInterfaceV2;
+using osu.Game.Localisation;
 using osuTK;
 
 namespace osu.Game.Tests.Visual.UserInterface
@@ -25,7 +28,10 @@ namespace osu.Game.Tests.Visual.UserInterface
                 RelativeSizeAxes = Axes.Both,
                 Child = new FillFlowContainer
                 {
-                    RelativeSizeAxes = Axes.Both,
+                    RelativeSizeAxes = Axes.Y,
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Width = 400,
                     Direction = FillDirection.Vertical,
                     Spacing = new Vector2(5),
                     Padding = new MarginPadding(10),
@@ -53,9 +59,55 @@ namespace osu.Game.Tests.Visual.UserInterface
                             PlaceholderText = "Mine is 42!",
                             TabbableContentContainer = this,
                         },
+                        new FormCheckBox
+                        {
+                            Caption = EditorSetupStrings.LetterboxDuringBreaks,
+                            HintText = EditorSetupStrings.LetterboxDuringBreaksDescription,
+                        },
+                        new FormCheckBox
+                        {
+                            Caption = EditorSetupStrings.LetterboxDuringBreaks,
+                            HintText = EditorSetupStrings.LetterboxDuringBreaksDescription,
+                            Current = { Disabled = true },
+                        },
+                        new FormSliderBar<float>
+                        {
+                            Caption = "Instantaneous slider",
+                            Current = new BindableFloat
+                            {
+                                MinValue = 0,
+                                MaxValue = 10,
+                                Value = 5,
+                                Precision = 0.1f,
+                            },
+                            TabbableContentContainer = this,
+                        },
+                        new FormSliderBar<float>
+                        {
+                            Caption = "Non-instantaneous slider",
+                            Current = new BindableFloat
+                            {
+                                MinValue = 0,
+                                MaxValue = 10,
+                                Value = 5,
+                                Precision = 0.1f,
+                            },
+                            Instantaneous = false,
+                            TabbableContentContainer = this,
+                        },
+                        new FormEnumDropdown<CountdownType>
+                        {
+                            Caption = EditorSetupStrings.EnableCountdown,
+                            HintText = EditorSetupStrings.CountdownDescription,
+                        },
+                        new FormFileSelector
+                        {
+                            Caption = "Audio file",
+                            PlaceholderText = "Select an audio file",
+                        },
                     },
                 },
-            },
+            }
         };
     }
 }
