@@ -13,7 +13,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
 using osuTK;
 
-namespace osu.Game.Graphics.UserInterfaceV2
+namespace osu.Game.Graphics.UserInterfaceV2.FileSelection
 {
     internal partial class OsuDirectorySelectorBreadcrumbDisplay : DirectorySelectorBreadcrumbDisplay
     {
@@ -80,7 +80,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
                 AddRangeInternal(new Drawable[]
                 {
-                    new Background
+                    new BackgroundLayer(0.5f)
                     {
                         Depth = 1
                     },
@@ -101,24 +101,6 @@ namespace osu.Game.Graphics.UserInterfaceV2
             protected override SpriteText CreateSpriteText() => new OsuSpriteText().With(t => t.Font = OsuFont.Default.With(weight: FontWeight.SemiBold));
 
             protected override IconUsage? Icon => Directory.Name.Contains(Path.DirectorySeparatorChar) ? FontAwesome.Solid.Database : null;
-
-            internal partial class Background : CompositeDrawable
-            {
-                [BackgroundDependencyLoader]
-                private void load(OverlayColourProvider overlayColourProvider)
-                {
-                    RelativeSizeAxes = Axes.Both;
-
-                    Masking = true;
-                    CornerRadius = 5;
-
-                    InternalChild = new Box
-                    {
-                        Colour = overlayColourProvider.Background3,
-                        RelativeSizeAxes = Axes.Both,
-                    };
-                }
-            }
         }
     }
 }

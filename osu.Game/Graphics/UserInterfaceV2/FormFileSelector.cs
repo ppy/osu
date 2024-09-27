@@ -24,6 +24,7 @@ using osu.Game.Database;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays;
 using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Graphics.UserInterfaceV2
 {
@@ -254,8 +255,22 @@ namespace osu.Game.Graphics.UserInterfaceV2
             [BackgroundDependencyLoader]
             private void load(OverlayColourProvider colourProvider)
             {
-                Body.BorderThickness = 2;
-                Body.BorderColour = colourProvider.Highlight1;
+                Add(new Container
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Masking = true,
+                    BorderThickness = 2,
+                    CornerRadius = 10,
+                    BorderColour = colourProvider.Highlight1,
+                    Children = new Drawable[]
+                    {
+                        new Box
+                        {
+                            Colour = Color4.Transparent,
+                            RelativeSizeAxes = Axes.Both,
+                        },
+                    }
+                });
             }
         }
     }
