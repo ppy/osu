@@ -22,6 +22,7 @@ namespace osu.Game.Rulesets.Osu.UI.ReplayAnalysis
         protected override void OnApply(AnalysisFrameEntry entry)
         {
             Position = entry.Position;
+            Depth = -(float)entry.LifetimeEnd;
         }
     }
 }

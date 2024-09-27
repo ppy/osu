@@ -9,7 +9,7 @@ using osu.Game.Rulesets.UI.Scrolling;
 
 namespace osu.Game.Rulesets.Catch.Edit.Blueprints
 {
-    public partial class CatchPlacementBlueprint<THitObject> : PlacementBlueprint
+    public partial class CatchPlacementBlueprint<THitObject> : HitObjectPlacementBlueprint
         where THitObject : CatchHitObject, new()
     {
         protected new THitObject HitObject => (THitObject)base.HitObject;

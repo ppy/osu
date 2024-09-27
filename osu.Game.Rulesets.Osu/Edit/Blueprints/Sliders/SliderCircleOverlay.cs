@@ -70,7 +70,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
             if (endDragMarkerContainer != null)
             {
-                endDragMarkerContainer.Position = circle.Position;
+                endDragMarkerContainer.Position = circle.Position + slider.StackOffset;
                 endDragMarkerContainer.Scale = CirclePiece.Scale * 1.2f;
                 var diff = slider.Path.PositionAt(1) - slider.Path.PositionAt(0.99f);
                 endDragMarkerContainer.Rotation = float.RadiansToDegrees(MathF.Atan2(diff.Y, diff.X));
