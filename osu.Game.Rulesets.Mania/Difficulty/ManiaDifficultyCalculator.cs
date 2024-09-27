@@ -19,6 +19,7 @@ using osu.Game.Rulesets.Mania.Scoring;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Rulesets.Scoring.Legacy;
 
 namespace osu.Game.Rulesets.Mania.Difficulty
 {
@@ -84,10 +85,16 @@ namespace osu.Game.Rulesets.Mania.Difficulty
         // Sorting is done in CreateDifficultyHitObjects, since the full list of hitobjects is required.
         protected override IEnumerable<DifficultyHitObject> SortObjects(IEnumerable<DifficultyHitObject> input) => input;
 
-        protected override Skill[] CreateSkills(IBeatmap beatmap, Mod[] mods, double clockRate) => new Skill[]
+        protected override Skill[] CreateSkills(IBeatmap beatmap, Mod[] mods, double clockRate)
         {
-            new Strain(mods, ((ManiaBeatmap)Beatmap).TotalColumns)
-        };
+            var difficultyInfo = LegacyBeatmapConversionDifficultyInfo.FromBeatmapInfo(beatmap.BeatmapInfo);
+            int columnCount = ManiaBeatmapConverter.GetColumnCount(difficultyInfo, mods);
+
+            return new Skill[]
+            {
+                new Strain(mods, columnCount)
+            };
+        }
 
         protected override Mod[] DifficultyAdjustmentMods
         {
