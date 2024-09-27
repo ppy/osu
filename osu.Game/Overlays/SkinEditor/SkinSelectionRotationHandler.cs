@@ -41,7 +41,7 @@ namespace osu.Game.Overlays.SkinEditor
 
         private void updateState()
         {
-            CanRotateSelectionOrigin.Value = selectedItems.Count > 0;
+            CanRotateAroundSelectionOrigin.Value = selectedItems.Count > 0;
         }
 
         private Drawable[]? objectsInRotation;
@@ -61,6 +61,8 @@ namespace osu.Game.Overlays.SkinEditor
             originalRotations = objectsInRotation.ToDictionary(d => d, d => d.Rotation);
             originalPositions = objectsInRotation.ToDictionary(d => d, d => d.ToScreenSpace(d.OriginPosition));
             defaultOrigin = GeometryUtils.GetSurroundingQuad(objectsInRotation.SelectMany(d => d.ScreenSpaceDrawQuad.GetVertices().ToArray())).Centre;
+
+            base.Begin();
         }
 
         public override void Update(float rotation, Vector2? origin = null)
@@ -99,6 +101,8 @@ namespace osu.Game.Overlays.SkinEditor
             originalPositions = null;
             originalRotations = null;
             defaultOrigin = null;
+
+            base.Commit();
         }
     }
 }

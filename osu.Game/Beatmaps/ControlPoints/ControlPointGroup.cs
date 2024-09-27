@@ -10,7 +10,10 @@ namespace osu.Game.Beatmaps.ControlPoints
     public class ControlPointGroup : IComparable<ControlPointGroup>, IEquatable<ControlPointGroup>
     {
         public event Action<ControlPoint>? ItemAdded;
+        public event Action<ControlPoint>? ItemChanged;
         public event Action<ControlPoint>? ItemRemoved;
+
+        private void raiseItemChanged(ControlPoint controlPoint) => ItemChanged?.Invoke(controlPoint);
 
         /// <summary>
         /// The time at which the control point takes effect.
@@ -39,12 +42,14 @@ namespace osu.Game.Beatmaps.ControlPoints
 
             controlPoints.Add(point);
             ItemAdded?.Invoke(point);
+            point.Changed += raiseItemChanged;
         }
 
         public void Remove(ControlPoint point)
         {
             controlPoints.Remove(point);
             ItemRemoved?.Invoke(point);
+            point.Changed -= raiseItemChanged;
         }
 
         public sealed override bool Equals(object? obj)

@@ -71,7 +71,10 @@ namespace osu.Game.Screens.Edit.Components.Menus
             });
         }
 
-        protected override Framework.Graphics.UserInterface.Menu CreateSubMenu() => new SubMenu();
+        protected override Framework.Graphics.UserInterface.Menu CreateSubMenu() => new SubMenu
+        {
+            MaxHeight = MaxHeight,
+        };
 
         protected override DrawableMenuItem CreateDrawableMenuItem(MenuItem item) => new DrawableEditorBarMenuItem(item);
 
@@ -143,7 +146,10 @@ namespace osu.Game.Screens.Edit.Components.Menus
                 BackgroundColour = colourProvider.Background2;
             }
 
-            protected override Framework.Graphics.UserInterface.Menu CreateSubMenu() => new SubMenu();
+            protected override Framework.Graphics.UserInterface.Menu CreateSubMenu() => new SubMenu
+            {
+                MaxHeight = MaxHeight,
+            };
 
             protected override DrawableMenuItem CreateDrawableMenuItem(MenuItem item)
             {

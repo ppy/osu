@@ -83,10 +83,6 @@ namespace osu.Game.Screens.Edit
             }
         }
 
-        /// <summary>
-        /// Restores an older or newer state.
-        /// </summary>
-        /// <param name="direction">The direction to restore in. If less than 0, an older state will be used. If greater than 0, a newer state will be used.</param>
         public void RestoreState(int direction)
         {
             if (TransactionActive)

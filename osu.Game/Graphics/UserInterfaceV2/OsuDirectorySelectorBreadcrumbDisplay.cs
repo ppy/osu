@@ -1,33 +1,51 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.IO;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.UserInterface;
+using osu.Game.Overlays;
 using osuTK;
 
 namespace osu.Game.Graphics.UserInterfaceV2
 {
     internal partial class OsuDirectorySelectorBreadcrumbDisplay : DirectorySelectorBreadcrumbDisplay
     {
-        protected override Drawable CreateCaption() => new OsuSpriteText
+        public const float HEIGHT = 45;
+        public const float HORIZONTAL_PADDING = 20;
+
+        protected override Drawable CreateCaption() => Empty().With(d =>
         {
-            Text = "Current Directory: ",
-            Font = OsuFont.Default.With(size: OsuDirectorySelector.ITEM_HEIGHT),
-        };
+            d.Origin = Anchor.CentreLeft;
+            d.Anchor = Anchor.CentreLeft;
+            d.Alpha = 0;
+        });
 
         protected override DirectorySelectorDirectory CreateRootDirectoryItem() => new OsuBreadcrumbDisplayComputer();
 
-        protected override DirectorySelectorDirectory CreateDirectoryItem(DirectoryInfo directory, string displayName = null) => new OsuBreadcrumbDisplayDirectory(directory, displayName);
+        protected override DirectorySelectorDirectory CreateDirectoryItem(DirectoryInfo directory, string? displayName = null) => new OsuBreadcrumbDisplayDirectory(directory, displayName);
 
-        public OsuDirectorySelectorBreadcrumbDisplay()
+        [BackgroundDependencyLoader]
+        private void load(OverlayColourProvider colourProvider)
         {
-            Padding = new MarginPadding(15);
+            ((FillFlowContainer)InternalChild).Padding = new MarginPadding
+            {
+                Horizontal = HORIZONTAL_PADDING,
+                Vertical = 10,
+            };
+
+            AddInternal(new Box
+            {
+                RelativeSizeAxes = Axes.Both,
+                Colour = colourProvider.Background4,
+                Depth = 1,
+            });
         }
 
         private partial class OsuBreadcrumbDisplayComputer : OsuBreadcrumbDisplayDirectory
@@ -40,26 +58,67 @@ namespace osu.Game.Graphics.UserInterfaceV2
             }
         }
 
-        private partial class OsuBreadcrumbDisplayDirectory : OsuDirectorySelectorDirectory
+        private partial class OsuBreadcrumbDisplayDirectory : DirectorySelectorDirectory
         {
-            public OsuBreadcrumbDisplayDirectory(DirectoryInfo directory, string displayName = null)
+            public OsuBreadcrumbDisplayDirectory(DirectoryInfo? directory, string? displayName = null)
                 : base(directory, displayName)
             {
             }
 
+            [Resolved]
+            private OverlayColourProvider colourProvider { get; set; } = null!;
+
             [BackgroundDependencyLoader]
             private void load()
             {
+                Anchor = Anchor.CentreLeft;
+                Origin = Anchor.CentreLeft;
+
+                Flow.AutoSizeAxes = Axes.X;
+                Flow.Height = 25;
+                Flow.Margin = new MarginPadding { Horizontal = 10, };
+
+                AddRangeInternal(new Drawable[]
+                {
+                    new Background
+                    {
+                        Depth = 1
+                    },
+                    new HoverClickSounds(),
+                });
+
                 Flow.Add(new SpriteIcon
                 {
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft,
                     Icon = FontAwesome.Solid.ChevronRight,
-                    Size = new Vector2(FONT_SIZE / 2)
+                    Size = new Vector2(FONT_SIZE / 2),
+                    Margin = new MarginPadding { Left = 5, },
                 });
+                Flow.Colour = colourProvider.Light3;
             }
 
-            protected override IconUsage? Icon => Directory.Name.Contains(Path.DirectorySeparatorChar) ? base.Icon : null;
+            protected override SpriteText CreateSpriteText() => new OsuSpriteText().With(t => t.Font = OsuFont.Default.With(weight: FontWeight.SemiBold));
+
+            protected override IconUsage? Icon => Directory.Name.Contains(Path.DirectorySeparatorChar) ? FontAwesome.Solid.Database : null;
+
+            internal partial class Background : CompositeDrawable
+            {
+                [BackgroundDependencyLoader]
+                private void load(OverlayColourProvider overlayColourProvider)
+                {
+                    RelativeSizeAxes = Axes.Both;
+
+                    Masking = true;
+                    CornerRadius = 5;
+
+                    InternalChild = new Box
+                    {
+                        Colour = overlayColourProvider.Background3,
+                        RelativeSizeAxes = Axes.Both,
+                    };
+                }
+            }
         }
     }
 }

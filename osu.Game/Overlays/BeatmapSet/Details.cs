@@ -68,6 +68,7 @@ namespace osu.Game.Overlays.BeatmapSet
                 preview = new PreviewButton
                 {
                     RelativeSizeAxes = Axes.X,
+                    Height = 42,
                 },
                 new DetailBox
                 {

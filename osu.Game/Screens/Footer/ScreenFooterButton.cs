@@ -25,23 +25,22 @@ namespace osu.Game.Screens.Footer
 {
     public partial class ScreenFooterButton : OsuClickableContainer, IKeyBindingHandler<GlobalAction>
     {
-        // This should be 12 by design, but an extra allowance is added due to the corner radius specification.
-        private const float shear_width = 13.5f;
+        private const float shear = OsuGame.SHEAR;
 
         protected const int CORNER_RADIUS = 10;
-        protected const int BUTTON_HEIGHT = 90;
-        protected const int BUTTON_WIDTH = 140;
+        protected const int BUTTON_HEIGHT = 75;
+        protected const int BUTTON_WIDTH = 116;
 
         public Bindable<Visibility> OverlayState = new Bindable<Visibility>();
 
-        protected static readonly Vector2 BUTTON_SHEAR = new Vector2(shear_width / BUTTON_HEIGHT, 0);
+        protected static readonly Vector2 BUTTON_SHEAR = new Vector2(shear, 0);
 
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; } = null!;
 
         private Colour4 buttonAccentColour;
 
-        protected Colour4 AccentColour
+        public Colour4 AccentColour
         {
             set
             {
@@ -51,12 +50,12 @@ namespace osu.Game.Screens.Footer
             }
         }
 
-        protected IconUsage Icon
+        public IconUsage Icon
         {
             set => icon.Icon = value;
         }
 
-        protected LocalisableString Text
+        public LocalisableString Text
         {
             set => text.Text = value;
         }
@@ -70,87 +69,93 @@ namespace osu.Game.Screens.Footer
         private readonly Box glowBox;
         private readonly Box flashLayer;
 
-        public ScreenFooterButton()
+        public readonly OverlayContainer? Overlay;
+
+        public ScreenFooterButton(OverlayContainer? overlay = null)
         {
+            Overlay = overlay;
+
             Size = new Vector2(BUTTON_WIDTH, BUTTON_HEIGHT);
 
-            Child = new Container
+            Children = new Drawable[]
             {
-                EdgeEffect = new EdgeEffectParameters
+                new Container
                 {
-                    Type = EdgeEffectType.Shadow,
-                    Radius = 4,
-                    // Figma says 50% opacity, but it does not match up visually if taken at face value, and looks bad.
-                    Colour = Colour4.Black.Opacity(0.25f),
-                    Offset = new Vector2(0, 2),
-                },
-                Shear = BUTTON_SHEAR,
-                Masking = true,
-                CornerRadius = CORNER_RADIUS,
-                RelativeSizeAxes = Axes.Both,
-                Children = new Drawable[]
-                {
-                    backgroundBox = new Box
+                    EdgeEffect = new EdgeEffectParameters
                     {
-                        RelativeSizeAxes = Axes.Both
+                        Type = EdgeEffectType.Shadow,
+                        Radius = 4,
+                        // Figma says 50% opacity, but it does not match up visually if taken at face value, and looks bad.
+                        Colour = Colour4.Black.Opacity(0.25f),
+                        Offset = new Vector2(0, 2),
                     },
-                    glowBox = new Box
+                    Shear = BUTTON_SHEAR,
+                    Masking = true,
+                    CornerRadius = CORNER_RADIUS,
+                    RelativeSizeAxes = Axes.Both,
+                    Children = new Drawable[]
                     {
-                        RelativeSizeAxes = Axes.Both
-                    },
-                    // For elements that should not be sheared.
-                    new Container
-                    {
-                        Anchor = Anchor.CentreLeft,
-                        Origin = Anchor.CentreLeft,
-                        Shear = -BUTTON_SHEAR,
-                        RelativeSizeAxes = Axes.Both,
-                        Children = new Drawable[]
+                        backgroundBox = new Box
                         {
-                            TextContainer = new Container
+                            RelativeSizeAxes = Axes.Both
+                        },
+                        glowBox = new Box
+                        {
+                            RelativeSizeAxes = Axes.Both
+                        },
+                        // For elements that should not be sheared.
+                        new Container
+                        {
+                            Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.CentreLeft,
+                            Shear = -BUTTON_SHEAR,
+                            RelativeSizeAxes = Axes.Both,
+                            Children = new Drawable[]
                             {
-                                Anchor = Anchor.TopCentre,
-                                Origin = Anchor.TopCentre,
-                                Y = 42,
-                                AutoSizeAxes = Axes.Both,
-                                Child = text = new OsuSpriteText
+                                TextContainer = new Container
                                 {
-                                    // figma design says the size is 16, but due to the issues with font sizes 19 matches better
-                                    Font = OsuFont.TorusAlternate.With(size: 19),
-                                    AlwaysPresent = true
-                                }
-                            },
-                            icon = new SpriteIcon
+                                    Anchor = Anchor.TopCentre,
+                                    Origin = Anchor.TopCentre,
+                                    Y = 35,
+                                    AutoSizeAxes = Axes.Both,
+                                    Child = text = new OsuSpriteText
+                                    {
+                                        Font = OsuFont.TorusAlternate.With(size: 16),
+                                        AlwaysPresent = true
+                                    }
+                                },
+                                icon = new SpriteIcon
+                                {
+                                    Y = 10,
+                                    Size = new Vector2(16),
+                                    Anchor = Anchor.TopCentre,
+                                    Origin = Anchor.TopCentre
+                                },
+                            }
+                        },
+                        new Container
+                        {
+                            Shear = -BUTTON_SHEAR,
+                            Anchor = Anchor.BottomCentre,
+                            Origin = Anchor.Centre,
+                            Y = -CORNER_RADIUS,
+                            Size = new Vector2(100, 5),
+                            Masking = true,
+                            CornerRadius = 3,
+                            Child = bar = new Box
                             {
-                                Y = 12,
-                                Size = new Vector2(20),
-                                Anchor = Anchor.TopCentre,
-                                Origin = Anchor.TopCentre
-                            },
-                        }
-                    },
-                    new Container
-                    {
-                        Shear = -BUTTON_SHEAR,
-                        Anchor = Anchor.BottomCentre,
-                        Origin = Anchor.Centre,
-                        Y = -CORNER_RADIUS,
-                        Size = new Vector2(120, 6),
-                        Masking = true,
-                        CornerRadius = 3,
-                        Child = bar = new Box
+                                RelativeSizeAxes = Axes.Both,
+                            }
+                        },
+                        flashLayer = new Box
                         {
                             RelativeSizeAxes = Axes.Both,
-                        }
+                            Colour = Colour4.White.Opacity(0.9f),
+                            Blending = BlendingParameters.Additive,
+                            Alpha = 0,
+                        },
                     },
-                    flashLayer = new Box
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Colour = Colour4.White.Opacity(0.9f),
-                        Blending = BlendingParameters.Additive,
-                        Alpha = 0,
-                    },
-                },
+                }
             };
         }
 
@@ -158,11 +163,17 @@ namespace osu.Game.Screens.Footer
         {
             base.LoadComplete();
 
-            OverlayState.BindValueChanged(_ => updateDisplay());
-            Enabled.BindValueChanged(_ => updateDisplay(), true);
+            if (Overlay != null)
+                OverlayState.BindTo(Overlay.State);
+
+            OverlayState.BindValueChanged(_ => UpdateDisplay());
+            Enabled.BindValueChanged(_ => UpdateDisplay(), true);
 
             FinishTransforms(true);
         }
+
+        // use Content for tracking input as some buttons might be temporarily hidden with DisappearToBottom, and they become hidden by moving Content away from screen.
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => Content.ReceivePositionalInputAt(screenSpacePos);
 
         public GlobalAction? Hotkey;
 
@@ -178,11 +189,11 @@ namespace osu.Game.Screens.Footer
 
         protected override bool OnHover(HoverEvent e)
         {
-            updateDisplay();
+            UpdateDisplay();
             return true;
         }
 
-        protected override void OnHoverLost(HoverLostEvent e) => updateDisplay();
+        protected override void OnHoverLost(HoverLostEvent e) => UpdateDisplay();
 
         public virtual bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
@@ -194,7 +205,7 @@ namespace osu.Game.Screens.Footer
 
         public virtual void OnReleased(KeyBindingReleaseEvent<GlobalAction> e) { }
 
-        private void updateDisplay()
+        public void UpdateDisplay()
         {
             Color4 backgroundColour = OverlayState.Value == Visibility.Visible ? buttonAccentColour : colourProvider.Background3;
             Color4 textColour = OverlayState.Value == Visibility.Visible ? colourProvider.Background6 : colourProvider.Content1;
@@ -215,6 +226,48 @@ namespace osu.Game.Screens.Footer
             bar.FadeColour(accentColour, 150, Easing.OutQuint);
 
             glowBox.FadeColour(ColourInfo.GradientVertical(buttonAccentColour.Opacity(0f), buttonAccentColour.Opacity(0.2f)), 150, Easing.OutQuint);
+        }
+
+        public void AppearFromLeft(double delay)
+        {
+            Content.FinishTransforms();
+            Content.MoveToX(-300f)
+                   .FadeOut()
+                   .Delay(delay)
+                   .MoveToX(0f, 240, Easing.OutCubic)
+                   .FadeIn(240, Easing.OutCubic);
+        }
+
+        public void AppearFromBottom(double delay)
+        {
+            Content.FinishTransforms();
+            Content.MoveToY(100f)
+                   .FadeOut()
+                   .Delay(delay)
+                   .MoveToY(0f, 240, Easing.OutCubic)
+                   .FadeIn(240, Easing.OutCubic);
+        }
+
+        public void DisappearToRight(double delay, bool expire)
+        {
+            Content.FinishTransforms();
+            Content.Delay(delay)
+                   .FadeOut(240, Easing.InOutCubic)
+                   .MoveToX(300f, 360, Easing.InOutCubic);
+
+            if (expire)
+                this.Delay(Content.LatestTransformEndTime - Time.Current).Expire();
+        }
+
+        public void DisappearToBottom(double delay, bool expire)
+        {
+            Content.FinishTransforms();
+            Content.Delay(delay)
+                   .FadeOut(240, Easing.InOutCubic)
+                   .MoveToY(100f, 240, Easing.InOutCubic);
+
+            if (expire)
+                this.Delay(Content.LatestTransformEndTime - Time.Current).Expire();
         }
     }
 }

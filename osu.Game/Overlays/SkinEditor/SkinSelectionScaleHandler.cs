@@ -7,7 +7,6 @@ using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Utils;
@@ -51,7 +50,7 @@ namespace osu.Game.Overlays.SkinEditor
             CanScaleDiagonally.Value = true;
         }
 
-        private bool allSelectedSupportManualSizing(Axes axis) => selectedItems.All(b => (b as CompositeDrawable)?.AutoSizeAxes.HasFlagFast(axis) == false);
+        private bool allSelectedSupportManualSizing(Axes axis) => selectedItems.All(b => (b as CompositeDrawable)?.AutoSizeAxes.HasFlag(axis) == false);
 
         private Dictionary<Drawable, OriginalDrawableState>? objectsInScale;
         private Vector2? defaultOrigin;
@@ -74,7 +73,7 @@ namespace osu.Game.Overlays.SkinEditor
             isFlippedY = false;
         }
 
-        public override void Update(Vector2 scale, Vector2? origin = null, Axes adjustAxis = Axes.Both)
+        public override void Update(Vector2 scale, Vector2? origin = null, Axes adjustAxis = Axes.Both, float axisRotation = 0)
         {
             if (objectsInScale == null)
                 throw new InvalidOperationException($"Cannot {nameof(Update)} a scale operation without calling {nameof(Begin)} first!");

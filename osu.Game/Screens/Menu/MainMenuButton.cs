@@ -115,7 +115,6 @@ namespace osu.Game.Screens.Menu
                         backgroundContent = CreateBackground(colour).With(bg =>
                         {
                             bg.RelativeSizeAxes = Axes.Y;
-                            bg.X = -ButtonSystem.WEDGE_WIDTH;
                             bg.Anchor = Anchor.Centre;
                             bg.Origin = Anchor.Centre;
                         }),

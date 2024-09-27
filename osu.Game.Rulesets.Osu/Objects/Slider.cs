@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using osu.Game.Rulesets.Objects;
 using System.Linq;
 using System.Threading;
+using JetBrains.Annotations;
 using Newtonsoft.Json;
 using osu.Framework.Bindables;
 using osu.Framework.Caching;
@@ -162,6 +163,10 @@ namespace osu.Game.Rulesets.Osu.Objects
         [JsonIgnore]
         public SliderTailCircle TailCircle { get; protected set; }
 
+        [JsonIgnore]
+        [CanBeNull]
+        public SliderRepeat LastRepeat { get; protected set; }
+
         public Slider()
         {
             SamplesBindable.CollectionChanged += (_, _) => UpdateNestedSamples();
@@ -225,7 +230,7 @@ namespace osu.Game.Rulesets.Osu.Objects
                         break;
 
                     case SliderEventType.Repeat:
-                        AddNested(new SliderRepeat(this)
+                        AddNested(LastRepeat = new SliderRepeat(this)
                         {
                             RepeatIndex = e.SpanIndex,
                             StartTime = StartTime + (e.SpanIndex + 1) * SpanDuration,
@@ -248,10 +253,15 @@ namespace osu.Game.Rulesets.Osu.Objects
 
             if (TailCircle != null)
                 TailCircle.Position = EndPosition;
+
+            if (LastRepeat != null)
+                LastRepeat.Position = RepeatCount % 2 == 0 ? Position : Position + Path.PositionAt(1);
         }
 
         protected void UpdateNestedSamples()
         {
+            this.PopulateNodeSamples();
+
             // TODO: remove this when guaranteed sort is present for samples (https://github.com/ppy/osu/issues/1933)
             HitSampleInfo tickSample = (Samples.FirstOrDefault(s => s.Name == HitSampleInfo.HIT_NORMAL) ?? Samples.FirstOrDefault())?.With("slidertick");
 

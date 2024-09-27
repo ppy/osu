@@ -29,18 +29,14 @@ namespace osu.Game.Screens.Edit.Setup
         {
             var ruleset = beatmap.BeatmapInfo.Ruleset.CreateInstance();
 
-            var sectionsEnumerable = new List<SetupSection>
-            {
+            List<SetupSection> sectionsEnumerable =
+            [
                 new ResourcesSection(),
-                new MetadataSection(),
-                ruleset.CreateEditorDifficultySection() ?? new DifficultySection(),
-                new ColoursSection(),
-                new DesignSection(),
-            };
+                new MetadataSection()
+            ];
 
-            var rulesetSpecificSection = ruleset.CreateEditorSetupSection();
-            if (rulesetSpecificSection != null)
-                sectionsEnumerable.Add(rulesetSpecificSection);
+            sectionsEnumerable.AddRange(ruleset.CreateEditorSetupSections());
+            sectionsEnumerable.Add(new DesignSection());
 
             Add(new Box
             {
