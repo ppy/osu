@@ -446,11 +446,7 @@ namespace osu.Game
 
                 case LinkAction.SearchBeatmapSet:
                     if (link.Argument is LocalisableString localisable)
-                    {
-                        var localised = Localisation.GetLocalisedBindableString(localisable);
-                        SearchBeatmapSet(localised.Value);
-                        localised.UnbindAll();
-                    }
+                        SearchBeatmapSet(Localisation.GetLocalisedString(localisable));
                     else
                         SearchBeatmapSet(argString);
 
