@@ -73,16 +73,6 @@ namespace osu.Game.Beatmaps
         /// </summary>
         /// <returns>The shallow-cloned beatmap.</returns>
         IBeatmap Clone();
-
-        /// <summary>
-        /// Finds the maximum achievable combo by hitting all <see cref="HitObject"/>s in a beatmap.
-        /// </summary>
-        int GetMaxCombo();
-
-        /// <summary>
-        /// Finds amount of <see cref="HitObject"/>s that have given type. This doesn't include nested hit objects.
-        /// </summary>
-        int GetHitObjectCountOf(Type type);
     }
 
     /// <summary>

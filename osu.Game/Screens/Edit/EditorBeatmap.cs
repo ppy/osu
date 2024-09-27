@@ -200,10 +200,6 @@ namespace osu.Game.Screens.Edit
 
         public IBeatmap Clone() => (EditorBeatmap)MemberwiseClone();
 
-        public int GetMaxCombo() => PlayableBeatmap.GetMaxCombo();
-
-        public int GetHitObjectCountOf(Type type) => PlayableBeatmap.GetHitObjectCountOf(type);
-
         private IList mutableHitObjects => (IList)PlayableBeatmap.HitObjects;
 
         private readonly List<HitObject> batchPendingInserts = new List<HitObject>();
