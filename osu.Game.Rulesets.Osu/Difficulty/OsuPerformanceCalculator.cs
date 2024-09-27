@@ -35,7 +35,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         {
             var osuAttributes = (OsuDifficultyAttributes)attributes;
 
-            usingClassicSliderAccuracy = score.Mods.OfType<OsuModClassic>().All(m => m.NoSliderHeadAccuracy.Value);
+            usingClassicSliderAccuracy = !(score.Mods.OfType<OsuModClassic>().All(m => !m.NoSliderHeadAccuracy.Value));
 
             accuracy = score.Accuracy;
             scoreMaxCombo = score.MaxCombo;
