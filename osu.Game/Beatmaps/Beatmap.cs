@@ -10,7 +10,6 @@ using osu.Game.Beatmaps.ControlPoints;
 using Newtonsoft.Json;
 using osu.Framework.Lists;
 using osu.Game.IO.Serialization.Converters;
-using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Beatmaps
 {
