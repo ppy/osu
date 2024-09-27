@@ -16,6 +16,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
     {
         public const double PERFORMANCE_BASE_MULTIPLIER = 1.14; // This is being adjusted to keep the final pp value scaled around what it used to be when changing things.
 
+	private bool usingClassicSliderAccuracy;
+	
         private double accuracy;
         private int scoreMaxCombo;
         private int countGreat;
@@ -34,6 +36,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         {
             var osuAttributes = (OsuDifficultyAttributes)attributes;
 
+	    usingClassicSliderAccuracy = score.Mods.OfType<OsuModClassic>().All(m => m.NoSliderHeadAccuracy.Value);
+	    
             accuracy = score.Accuracy;
             scoreMaxCombo = score.MaxCombo;
             countGreat = score.Statistics.GetValueOrDefault(HitResult.Great);
