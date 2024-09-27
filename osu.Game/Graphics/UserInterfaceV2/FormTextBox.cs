@@ -59,8 +59,19 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
         private readonly BindableWithCurrent<string> current = new BindableWithCurrent<string>();
 
+        /// <summary>
+        /// Caption describing this slider bar, displayed on top of the controls.
+        /// </summary>
         public LocalisableString Caption { get; init; }
+
+        /// <summary>
+        /// Hint text containing an extended description of this slider bar, displayed in a tooltip when hovering the caption.
+        /// </summary>
         public LocalisableString HintText { get; init; }
+
+        /// <summary>
+        /// Text displayed in the text box when its contents are empty.
+        /// </summary>
         public LocalisableString PlaceholderText { get; init; }
 
         private Box background = null!;
@@ -122,7 +133,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
                                 if (!current.Disabled && !ReadOnly)
                                 {
-                                    flashLayer.Colour = ColourInfo.GradientVertical(colourProvider.Dark1.Opacity(0), colourProvider.Dark2);
+                                    flashLayer.Colour = ColourInfo.GradientVertical(colourProvider.Dark2.Opacity(0), colourProvider.Dark2);
                                     flashLayer.FadeOutFromOne(800, Easing.OutQuint);
                                 }
                             };
