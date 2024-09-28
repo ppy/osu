@@ -155,10 +155,6 @@ namespace osu.Game.Rulesets.Osu.Edit
                             Action = () => GridFromPointsClicked?.Invoke(),
                             RelativeSizeAxes = Axes.X,
                             Text = "Grid from points",
-                            TooltipText = """
-                                           Left click to set the origin.
-                                           Click and drag to set the origin, rotation and spacing.
-                                           """
                         },
                         gridTypeButtons = new EditorRadioButtonCollection
                         {
