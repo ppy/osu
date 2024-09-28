@@ -48,11 +48,30 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints
         {
             if (e.Button == MouseButton.Left)
             {
+                switch (PlacementActive)
+                {
+                    case PlacementState.Waiting:
+                        BeginPlacement(true);
+                        return true;
+
+                    case PlacementState.Active:
+                        EndPlacement(true);
+                        return true;
+                }
+            }
+
+            return base.OnClick(e);
+        }
+
+        protected override bool OnMouseDown(MouseDownEvent e)
+        {
+            if (e.Button == MouseButton.Right)
+            {
                 EndPlacement(true);
                 return true;
             }
 
-            return base.OnClick(e);
+            return base.OnMouseDown(e);
         }
 
         protected override bool OnDragStart(DragStartEvent e)
@@ -83,7 +102,18 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints
             if (PlacementActive != PlacementState.Active)
                 gridToolboxGroup.StartPosition.Value = pos;
             else
-                gridToolboxGroup.SetGridFromPoints(gridToolboxGroup.StartPosition.Value, pos);
+            {
+                // Default to the original spacing and rotation if the distance is too small.
+                if (Vector2.Distance(gridToolboxGroup.StartPosition.Value, pos) < 2)
+                {
+                    gridToolboxGroup.Spacing.Value = originalSpacing;
+                    gridToolboxGroup.GridLinesRotation.Value = originalRotation;
+                }
+                else
+                {
+                    gridToolboxGroup.SetGridFromPoints(gridToolboxGroup.StartPosition.Value, pos);
+                }
+            }
         }
     }
 }
