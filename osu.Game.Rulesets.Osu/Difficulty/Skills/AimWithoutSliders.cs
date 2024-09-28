@@ -6,7 +6,7 @@ using osu.Game.Rulesets.Mods;
 namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 {
     /// <summary>
-    /// Represents the Aim skill that includes sliders in it's calculation
+    /// Represents the Aim skill that does not include sliders length in it's calculation
     /// </summary>
     public class AimWithoutSliders : Aim
     {
