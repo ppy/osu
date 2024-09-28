@@ -46,8 +46,9 @@ namespace osu.Game.Rulesets.Osu.Edit
             new HitCircleCompositionTool(),
             new SliderCompositionTool(),
             new SpinnerCompositionTool(),
-            new GridFromPointsTool(),
         };
+
+        private readonly GridFromPointsTool gridFromPointsTool = new GridFromPointsTool();
 
         private readonly Bindable<TernaryState> rectangularGridSnapToggle = new Bindable<TernaryState>();
 
@@ -98,6 +99,7 @@ namespace osu.Game.Rulesets.Osu.Edit
             updateDistanceSnapGrid();
 
             OsuGridToolboxGroup.GridType.BindValueChanged(updatePositionSnapGrid, true);
+            OsuGridToolboxGroup.GridFromPointsClicked += () => SetCustomTool(gridFromPointsTool);
 
             RightToolbox.AddRange(new Drawable[]
                 {
