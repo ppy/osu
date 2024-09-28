@@ -44,30 +44,34 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints
                 osuHitObjectComposer.SetSelectTool();
         }
 
-        protected override bool OnMouseDown(MouseDownEvent e)
+        protected override bool OnClick(ClickEvent e)
         {
-            switch (e.Button)
+            if (e.Button == MouseButton.Left)
             {
-                case MouseButton.Right:
-                    EndPlacement(true);
-                    return true;
-
-                case MouseButton.Left:
-                    switch (PlacementActive)
-                    {
-                        case PlacementState.Waiting:
-                            BeginPlacement(true);
-                            return true;
-
-                        case PlacementState.Active:
-                            EndPlacement(true);
-                            return true;
-                    }
-
-                    break;
+                EndPlacement(true);
+                return true;
             }
 
-            return base.OnMouseDown(e);
+            return base.OnClick(e);
+        }
+
+        protected override bool OnDragStart(DragStartEvent e)
+        {
+            if (e.Button == MouseButton.Left)
+            {
+                BeginPlacement(true);
+                return true;
+            }
+
+            return base.OnDragStart(e);
+        }
+
+        protected override void OnDragEnd(DragEndEvent e)
+        {
+            if (PlacementActive == PlacementState.Active)
+                EndPlacement(true);
+
+            base.OnDragEnd(e);
         }
 
         public override SnapType SnapType => ~SnapType.GlobalGrids;
