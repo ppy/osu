@@ -215,19 +215,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             if (slider.LazyEndPosition != null)
                 return;
 
-            // TODO: This commented version is actually correct by the new lazer implementation, but intentionally held back from
-            // difficulty calculator to preserve known behaviour.
-            // double trackingEndTime = Math.Max(
-            //     // SliderTailCircle always occurs at the final end time of the slider, but the player only needs to hold until within a lenience before it.
-            //     slider.Duration + SliderEventGenerator.TAIL_LENIENCY,
-            //     // There's an edge case where one or more ticks/repeats fall within that leniency range.
-            //     // In such a case, the player needs to track until the final tick or repeat.
-            //     slider.NestedHitObjects.LastOrDefault(n => n is not SliderTailCircle)?.StartTime ?? double.MinValue
-            // );
-
             double trackingEndTime = Math.Max(
+                // SliderTailCircle always occurs at the final end time of the slider, but the player only needs to hold until within a lenience before it.
                 slider.StartTime + slider.Duration + SliderEventGenerator.TAIL_LENIENCY,
-                slider.StartTime + slider.Duration / 2
+                // There's an edge case where one or more ticks/repeats fall within that leniency range.
+                // In such a case, the player needs to track until the final tick or repeat.
+                slider.NestedHitObjects.LastOrDefault(n => n is not SliderTailCircle)?.StartTime ?? double.MinValue
             );
 
             IList<HitObject> nestedObjects = slider.NestedHitObjects;
