@@ -369,6 +369,8 @@ namespace osu.Game.Rulesets.Osu.Edit
                 gridSnapMomentary = shiftPressed;
                 rectangularGridSnapToggle.Value = rectangularGridSnapToggle.Value == TernaryState.False ? TernaryState.True : TernaryState.False;
             }
+
+            DistanceSnapProvider.HandleToggleViaKey(key);
         }
 
         private DistanceSnapGrid createDistanceSnapGrid(IEnumerable<HitObject> selectedHitObjects)
