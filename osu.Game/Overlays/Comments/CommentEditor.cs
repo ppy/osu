@@ -68,7 +68,7 @@ namespace osu.Game.Overlays.Comments
                 else
                     loadingSpinner.Hide();
 
-                updateCommitButtonState();
+                updateState();
             }
         }
 
@@ -170,17 +170,15 @@ namespace osu.Game.Overlays.Comments
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            Current.BindValueChanged(_ => updateCommitButtonState(), true);
-            apiState.BindValueChanged(_ => updateEnabledState());
-            CommentableMeta.BindValueChanged(_ => updateEnabledState(), true);
+            Current.BindValueChanged(_ => updateState());
+            apiState.BindValueChanged(_ => Scheduler.AddOnce(updateState));
+            CommentableMeta.BindValueChanged(_ => Scheduler.AddOnce(updateState));
+            updateState();
         }
 
         protected abstract void OnCommit(string text);
 
-        private void updateCommitButtonState() =>
-            commitButton.Enabled.Value = loadingSpinner.State.Value == Visibility.Hidden && !string.IsNullOrEmpty(Current.Value);
-
-        private void updateEnabledState() => Schedule(() =>
+        private void updateState()
         {
             bool isOnline = apiState.Value > APIState.Offline;
             var canNewCommentReason = CommentEditor.canNewCommentReason(CommentableMeta.Value);
@@ -198,7 +196,7 @@ namespace osu.Game.Overlays.Comments
             if (isOnline)
             {
                 commitButton.Show();
-                commitButton.Enabled.Value = !commentsDisabled;
+                commitButton.Enabled.Value = !commentsDisabled && loadingSpinner.State.Value == Visibility.Hidden && !string.IsNullOrEmpty(Current.Value);
                 logInButton.Hide();
             }
             else
@@ -206,7 +204,7 @@ namespace osu.Game.Overlays.Comments
                 commitButton.Hide();
                 logInButton.Show();
             }
-        });
+        }
 
         // https://github.com/ppy/osu-web/blob/83816dbe24ad2927273cba968f2fcd2694a121a9/resources/js/components/comment-editor.tsx#L54-L60
         // careful here, logic is VERY finicky.
