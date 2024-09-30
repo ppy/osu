@@ -48,7 +48,7 @@ namespace osu.Game.Tests
 
             fetchReq.Success += updates =>
             {
-                if (updates?.Presence != null)
+                if (updates.Presence != null)
                 {
                     foreach (var channel in updates.Presence)
                         handleChannelJoined(channel);

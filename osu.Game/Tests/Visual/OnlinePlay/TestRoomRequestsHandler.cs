@@ -9,6 +9,7 @@ using System.Diagnostics;
 using System.Linq;
 using Newtonsoft.Json;
 using osu.Game.Beatmaps;
+using osu.Game.Database;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
@@ -18,6 +19,7 @@ using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Screens.OnlinePlay.Components;
 using osu.Game.Tests.Beatmaps;
+using osu.Game.Utils;
 
 namespace osu.Game.Tests.Visual.OnlinePlay
 {
@@ -200,7 +202,7 @@ namespace osu.Game.Tests.Visual.OnlinePlay
                 {
                     var baseBeatmap = getBeatmapSetRequest.Type == BeatmapSetLookupType.BeatmapId
                         ? beatmapManager.QueryBeatmap(b => b.OnlineID == getBeatmapSetRequest.ID)
-                        : beatmapManager.QueryBeatmap(b => b.BeatmapSet.OnlineID == getBeatmapSetRequest.ID);
+                        : beatmapManager.QueryBeatmapSet(s => s.OnlineID == getBeatmapSetRequest.ID)?.PerformRead(s => s.Beatmaps.First().Detach());
 
                     if (baseBeatmap == null)
                     {
@@ -277,11 +279,18 @@ namespace osu.Game.Tests.Visual.OnlinePlay
             var result = JsonConvert.DeserializeObject<Room>(JsonConvert.SerializeObject(source));
             Debug.Assert(result != null);
 
-            // Playlist item IDs aren't serialised.
+            // Playlist item IDs and beatmaps aren't serialised.
             if (source.CurrentPlaylistItem.Value != null)
+            {
+                result.CurrentPlaylistItem.Value = result.CurrentPlaylistItem.Value.With(new Optional<IBeatmapInfo>(source.CurrentPlaylistItem.Value.Beatmap));
                 result.CurrentPlaylistItem.Value.ID = source.CurrentPlaylistItem.Value.ID;
+            }
+
             for (int i = 0; i < source.Playlist.Count; i++)
+            {
+                result.Playlist[i] = result.Playlist[i].With(new Optional<IBeatmapInfo>(source.Playlist[i].Beatmap));
                 result.Playlist[i].ID = source.Playlist[i].ID;
+            }
 
             return result;
         }

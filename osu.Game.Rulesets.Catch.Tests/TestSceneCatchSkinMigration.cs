@@ -35,10 +35,10 @@ namespace osu.Game.Rulesets.Catch.Tests
         [Resolved]
         private SkinManager skins { get; set; } = null!;
 
-        private SkinComponentsContainer targetContainer => Player.ChildrenOfType<SkinComponentsContainer>().First();
+        private SkinnableContainer targetContainer => Player.ChildrenOfType<SkinnableContainer>().First();
 
-        private SkinComponentsContainer rulesetHUDTarget => Player.ChildrenOfType<SkinComponentsContainer>()
-                                                                  .Single(c => c.Lookup.Target == SkinComponentsContainerLookup.TargetArea.MainHUDComponents && c.Lookup.Ruleset != null);
+        private SkinnableContainer rulesetHUDTarget => Player.ChildrenOfType<SkinnableContainer>()
+                                                             .Single(c => c.Lookup.Lookup == GlobalSkinnableContainers.MainHUDComponents && c.Lookup.Ruleset != null);
 
         [SetUpSteps]
         public override void SetUpSteps()
@@ -62,7 +62,7 @@ namespace osu.Game.Rulesets.Catch.Tests
         public void TestMigrationLegacyCatch()
         {
             AddStep("import old classic skin", () => skins.CurrentSkinInfo.Value = importSkinFromArchives(@"classic-layout-version-0.osk").SkinInfo);
-            AddAssert("layout loaded", () => skins.CurrentSkin.Value.LayoutInfos, () => NUnit.Framework.Contains.Key(SkinComponentsContainerLookup.TargetArea.MainHUDComponents));
+            AddAssert("layout loaded", () => skins.CurrentSkin.Value.LayoutInfos, () => NUnit.Framework.Contains.Key(GlobalSkinnableContainers.MainHUDComponents));
             AddUntilStep("wait for load", () => rulesetHUDTarget.ComponentsLoaded);
 
             AddAssert("catch specific combo counter in ruleset target", () => rulesetHUDTarget.Components.OfType<LegacyCatchComboCounter>(), () => Has.One.Items);

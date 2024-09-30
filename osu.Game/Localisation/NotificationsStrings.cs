@@ -135,11 +135,6 @@ Click to see what's new!", version);
         /// </summary>
         public static LocalisableString DownloadingUpdate => new TranslatableString(getKey(@"downloading_update"), @"Downloading update...");
 
-        /// <summary>
-        /// "Installing update..."
-        /// </summary>
-        public static LocalisableString InstallingUpdate => new TranslatableString(getKey(@"installing_update"), @"Installing update...");
-
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }

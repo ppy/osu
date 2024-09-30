@@ -1,13 +1,9 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Input;
@@ -25,34 +21,33 @@ using osuTK.Input;
 
 namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 {
-    public partial class SliderPlacementBlueprint : PlacementBlueprint
+    public partial class SliderPlacementBlueprint : HitObjectPlacementBlueprint
     {
         public new Slider HitObject => (Slider)base.HitObject;
 
-        private SliderBodyPiece bodyPiece;
-        private HitCirclePiece headCirclePiece;
-        private HitCirclePiece tailCirclePiece;
-        private PathControlPointVisualiser<Slider> controlPointVisualiser;
+        private SliderBodyPiece bodyPiece = null!;
+        private HitCirclePiece headCirclePiece = null!;
+        private HitCirclePiece tailCirclePiece = null!;
+        private PathControlPointVisualiser<Slider> controlPointVisualiser = null!;
 
-        private InputManager inputManager;
+        private InputManager inputManager = null!;
+
+        private PathControlPoint? cursor;
 
         private SliderPlacementState state;
         private PathControlPoint segmentStart;
-        private PathControlPoint cursor;
+
         private int currentSegmentLength;
         private bool usingCustomSegmentType;
 
-        [Resolved(CanBeNull = true)]
-        [CanBeNull]
-        private IPositionSnapProvider positionSnapProvider { get; set; }
+        [Resolved]
+        private IPositionSnapProvider? positionSnapProvider { get; set; }
 
-        [Resolved(CanBeNull = true)]
-        [CanBeNull]
-        private IDistanceSnapProvider distanceSnapProvider { get; set; }
+        [Resolved]
+        private IDistanceSnapProvider? distanceSnapProvider { get; set; }
 
-        [Resolved(CanBeNull = true)]
-        [CanBeNull]
-        private FreehandSliderToolboxGroup freehandToolboxGroup { get; set; }
+        [Resolved]
+        private FreehandSliderToolboxGroup? freehandToolboxGroup { get; set; }
 
         private readonly IncrementalBSplineBuilder bSplineBuilder = new IncrementalBSplineBuilder { Degree = 4 };
 
@@ -84,7 +79,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            inputManager = GetContainingInputManager();
+
+            inputManager = GetContainingInputManager()!;
 
             if (freehandToolboxGroup != null)
             {
@@ -108,7 +104,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         }
 
         [Resolved]
-        private EditorBeatmap editorBeatmap { get; set; }
+        private EditorBeatmap editorBeatmap { get; set; } = null!;
 
         public override void UpdateTimeAndPosition(SnapResult result)
         {
@@ -151,7 +147,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                 case SliderPlacementState.ControlPoints:
                     if (canPlaceNewControlPoint(out var lastPoint))
                         placeNewControlPoint();
-                    else
+                    else if (lastPoint != null)
                         beginNewSegment(lastPoint);
 
                     break;
@@ -162,9 +158,6 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
         private void beginNewSegment(PathControlPoint lastPoint)
         {
-            // Transform the last point into a new segment.
-            Debug.Assert(lastPoint != null);
-
             segmentStart = lastPoint;
             segmentStart.Type = PathType.LINEAR;
 
@@ -384,7 +377,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         /// </summary>
         /// <param name="lastPoint">The last-placed control point. May be null, but is not null if <c>false</c> is returned.</param>
         /// <returns>Whether a new control point can be placed at the current position.</returns>
-        private bool canPlaceNewControlPoint([CanBeNull] out PathControlPoint lastPoint)
+        private bool canPlaceNewControlPoint(out PathControlPoint? lastPoint)
         {
             // We cannot rely on the ordering of drawable pieces, so find the respective drawable piece by searching for the last non-cursor control point.
             var last = HitObject.Path.ControlPoints.LastOrDefault(p => p != cursor);
@@ -436,7 +429,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                 // Replace this segment with a circular arc if it is a reasonable substitute.
                 var circleArcSegment = tryCircleArc(segment);
 
-                if (circleArcSegment is not null)
+                if (circleArcSegment != null)
                 {
                     HitObject.Path.ControlPoints.Add(new PathControlPoint(circleArcSegment[0], PathType.PERFECT_CURVE));
                     HitObject.Path.ControlPoints.Add(new PathControlPoint(circleArcSegment[1]));
@@ -453,7 +446,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             }
         }
 
-        private Vector2[] tryCircleArc(List<Vector2> segment)
+        private Vector2[]? tryCircleArc(List<Vector2> segment)
         {
             if (segment.Count < 3 || freehandToolboxGroup?.CircleThreshold.Value == 0) return null;
 

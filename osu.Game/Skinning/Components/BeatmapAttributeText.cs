@@ -123,6 +123,8 @@ namespace osu.Game.Skinning.Components
         }
 
         protected override void SetFont(FontUsage font) => text.Font = font.With(size: 40);
+
+        protected override void SetTextColour(Colour4 textColour) => text.Colour = textColour;
     }
 
     // WARNING: DO NOT ADD ANY VALUES TO THIS ENUM ANYWHERE ELSE THAN AT THE END.
