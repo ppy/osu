@@ -413,7 +413,6 @@ namespace osu.Game.Rulesets.Osu.Utils
         private class WorkingObject
         {
             public float RotationOriginal { get; }
-            public Vector2 PositionOriginal { get; }
             public Vector2 PositionModified { get; set; }
             public Vector2 EndPositionModified { get; set; }
 
@@ -424,7 +423,7 @@ namespace osu.Game.Rulesets.Osu.Utils
             {
                 PositionInfo = positionInfo;
                 RotationOriginal = HitObject is Slider slider ? getSliderRotation(slider) : 0;
-                PositionModified = PositionOriginal = HitObject.Position;
+                PositionModified = HitObject.Position;
                 EndPositionModified = HitObject.EndPosition;
             }
         }
