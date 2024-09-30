@@ -422,17 +422,24 @@ namespace osu.Game.Overlays.SkinEditor
             });
 
             changeHandler?.Dispose();
+            changeHandler = null;
 
-            skins.EnsureMutableSkin();
+            // Schedule is required to ensure that all layout in `LoadComplete` methods has been completed
+            // before storing an undo state.
+            //
+            // See https://github.com/ppy/osu/blob/8e6a4559e3ae8c9892866cf9cf8d4e8d1b72afd0/osu.Game/Skinning/SkinReloadableDrawable.cs#L76.
+            Schedule(() =>
+            {
+                var targetContainer = getTarget(selectedTarget.Value);
 
-            var targetContainer = getTarget(selectedTarget.Value);
+                if (targetContainer != null)
+                    changeHandler = new SkinEditorChangeHandler(targetContainer);
 
-            if (targetContainer != null)
-                changeHandler = new SkinEditorChangeHandler(targetContainer);
-            hasBegunMutating = true;
+                hasBegunMutating = true;
 
-            // Reload sidebar components.
-            selectedTarget.TriggerChange();
+                // Reload sidebar components.
+                selectedTarget.TriggerChange();
+            });
         }
 
         /// <summary>
