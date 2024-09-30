@@ -29,9 +29,10 @@ namespace osu.Game.Tests.Visual.UserInterface
         private TestCancellableCommentEditor cancellableCommentEditor = null!;
         private DummyAPIAccess dummyAPI => (DummyAPIAccess)API;
 
-        [SetUp]
-        public void SetUp() => Schedule(() =>
-            Add(new FillFlowContainer
+        [SetUpSteps]
+        public void SetUpSteps()
+        {
+            AddStep("create content", () => Child = new FillFlowContainer
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
@@ -44,7 +45,8 @@ namespace osu.Game.Tests.Visual.UserInterface
                     commentEditor = new TestCommentEditor(),
                     cancellableCommentEditor = new TestCancellableCommentEditor()
                 }
-            }));
+            });
+        }
 
         [Test]
         public void TestCommitViaKeyboard()
