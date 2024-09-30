@@ -269,7 +269,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             {
                 double minDistance = distanceSnapProvider?.GetBeatSnapDistanceAt(HitObject, false) * oldVelocityMultiplier ?? 1;
                 // Add a small amount to the proposed distance to make it easier to snap to the full length of the slider.
-                proposedDistance = distanceSnapProvider?.FindSnappedDistance(HitObject, (float)proposedDistance + 1) ?? proposedDistance;
+                proposedDistance = distanceSnapProvider?.FindSnappedDistance(HitObject, (float)proposedDistance + 1, DistanceSnapTarget.Start) ?? proposedDistance;
                 proposedDistance = MathHelper.Clamp(proposedDistance, minDistance, HitObject.Path.CalculatedDistance);
             }
 
