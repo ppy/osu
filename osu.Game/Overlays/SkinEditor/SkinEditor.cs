@@ -401,6 +401,10 @@ namespace osu.Game.Overlays.SkinEditor
 
         private void skinChanged()
         {
+            if (skins.EnsureMutableSkin())
+                // Another skin changed event will arrive which will complete the process.
+                return;
+
             headerText.Clear();
 
             headerText.AddParagraph(SkinEditorStrings.SkinEditor, cp => cp.Font = OsuFont.Default.With(size: 16));
