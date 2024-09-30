@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Objects;
@@ -130,30 +131,31 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             aimStrain += Math.Max(acuteAngleBonus * acute_angle_multiplier, wideAngleBonus * wide_angle_multiplier + velocityChangeBonus * velocity_change_multiplier);
 
             double sliderJumpBonus = 0;
-            if (osuLastObj.BaseObject is Slider slider)
+
+            Slider? slider = osuLastObj.BaseObject as Slider;
+            Slider? sliderLast = osuLastLastObj.BaseObject as Slider;
+
+            if (slider.IsNotNull() || sliderLast.IsNotNull())
             {
                 // Take the sliderless difficulty as a base
                 sliderJumpBonus = aimStrain * sliderJumpNerfFactor;
-
-                // Reward more if sliders and circles are alternating (actually it's still lower than several sliders in a row)
-                if (osuLastLastObj.BaseObject is HitCircle)
-                {
-                    double alternatingBonus = osuLastObj.JumpDistance / osuLastObj.StrainTime;
-
-                    if (osuLastObj.StrainTime > osuLastLastObj.StrainTime)
-                        alternatingBonus *= CalcRhythmDifferenceMultiplier(osuCurrObj.StrainTime, osuLastObj.StrainTime);
-
-                    sliderJumpBonus += alternatingBonus;
-                }
 
                 // If slider was slower than notes before - punish it
                 if (osuCurrObj.StrainTime > osuLastObj.StrainTime)
                     sliderJumpBonus *= CalcRhythmDifferenceMultiplier(osuCurrObj.StrainTime, osuLastObj.StrainTime);
 
+                // Punish lastLast only if it's slider and slower than both curr and last
+                double maxStrainTime = Math.Max(osuCurrObj.StrainTime, osuLastObj.StrainTime);
+                if (slider.IsNull() && maxStrainTime > osuLastLastObj.StrainTime)
+                    sliderJumpBonus *= CalcRhythmDifferenceMultiplier(maxStrainTime, osuLastLastObj.StrainTime);
+
                 // Punish too short sliders to prevent cheesing (cheesing is still possible, but it's very rare)
-                double sliderLength = slider.Velocity * slider.SpanDuration;
-                if (sliderLength < slider.Radius)
-                    sliderJumpBonus *= sliderLength / slider.Radius;
+                static double length(Slider? slider) => slider.IsNotNull() ? slider.Velocity * slider.SpanDuration : 0;
+                double sliderLength = Math.Max(length(slider), length(sliderLast));
+
+                Slider sliderAny = slider.IsNotNull() ? slider : sliderLast!;
+                if (sliderLength < sliderAny.Radius)
+                    sliderJumpBonus *= sliderLength / sliderAny.Radius;
             }
 
             aimStrain += sliderJumpBonus * slider_jump_multiplier;
