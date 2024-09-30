@@ -244,6 +244,9 @@ namespace osu.Game.Graphics.UserInterfaceV2
                 Child = new Container
                 {
                     Size = new Vector2(600, 400),
+                    // simplest solution to avoid underlying text to bleed through the bottom border
+                    // https://github.com/ppy/osu/pull/30005#issuecomment-2378884430
+                    Padding = new MarginPadding { Bottom = 1 },
                     Child = new OsuFileSelector(chooserPath, handledExtensions)
                     {
                         RelativeSizeAxes = Axes.Both,
