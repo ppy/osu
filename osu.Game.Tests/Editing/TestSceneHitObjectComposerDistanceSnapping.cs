@@ -228,6 +228,42 @@ namespace osu.Game.Tests.Editing
         }
 
         [Test]
+        public void TestUnsnappedObject()
+        {
+            var slider = new Slider
+            {
+                StartTime = 0,
+                Path = new SliderPath
+                {
+                    ControlPoints =
+                    {
+                        new PathControlPoint(),
+                        // simulate object snapped to 1/3rds
+                        // this object's end time will be 2000 / 3 = 666.66... ms
+                        new PathControlPoint(new Vector2(200 / 3f, 0)),
+                    }
+                }
+            };
+
+            AddStep("add slider", () => composer.EditorBeatmap.Add(slider));
+            AddStep("set snap to 1/4", () => BeatDivisor.Value = 4);
+
+            // with default beat length of 1000ms and snap at 1/4, the valid snap times are 500ms, 750ms, and 1000ms
+            // with default settings, the snapped distance will be a tenth of the difference of the time delta
+
+            // (500 - 666.66...) / 10 = -16.66... = -100 / 6
+            assertSnappedDistance(0, -100 / 6f, slider);
+            assertSnappedDistance(7, -100 / 6f, slider);
+
+            // (750 - 666.66...) / 10 = 8.33... = 100 / 12
+            assertSnappedDistance(9, 100 / 12f, slider);
+            assertSnappedDistance(33, 100 / 12f, slider);
+
+            // (1000 - 666.66...) / 10 = 33.33... = 100 / 3
+            assertSnappedDistance(34, 100 / 3f, slider);
+        }
+
+        [Test]
         public void TestUseCurrentSnap()
         {
             AddStep("add objects to beatmap", () =>
