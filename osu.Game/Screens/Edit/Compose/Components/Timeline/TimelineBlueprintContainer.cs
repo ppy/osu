@@ -173,7 +173,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         protected sealed override DragBox CreateDragBox() => new TimelineDragBox();
 
-        protected override void UpdateSelectionFromDragBox()
+        protected override void UpdateSelectionFromDragBox(HashSet<HitObject> selectionBeforeDrag)
         {
             Composer.BlueprintContainer.CommitIfPlacementActive();
 
@@ -191,6 +191,9 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
             bool shouldBeSelected(HitObject hitObject)
             {
+                if (selectionBeforeDrag.Contains(hitObject))
+                    return true;
+
                 double midTime = (hitObject.StartTime + hitObject.GetEndTime()) / 2;
                 return minTime <= midTime && midTime <= maxTime;
             }

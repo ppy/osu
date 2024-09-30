@@ -220,6 +220,51 @@ namespace osu.Game.Tests.Visual.Editing
         }
 
         [Test]
+        public void TestMultiSelectWithDragBox()
+        {
+            var addedObjects = new[]
+            {
+                new HitCircle { StartTime = 100 },
+                new HitCircle { StartTime = 200, Position = new Vector2(100) },
+                new HitCircle { StartTime = 300, Position = new Vector2(512, 0) },
+                new HitCircle { StartTime = 400, Position = new Vector2(412, 100) },
+            };
+            AddStep("add hitobjects", () => EditorBeatmap.AddRange(addedObjects));
+
+            AddStep("start dragging", () =>
+            {
+                InputManager.MoveMouseTo(blueprintContainer.ScreenSpaceDrawQuad.Centre);
+                InputManager.PressButton(MouseButton.Left);
+            });
+            AddStep("drag to left corner", () => InputManager.MoveMouseTo(blueprintContainer.ScreenSpaceDrawQuad.TopLeft - new Vector2(5)));
+            AddStep("end dragging", () => InputManager.ReleaseButton(MouseButton.Left));
+
+            AddAssert("2 hitobjects selected", () => EditorBeatmap.SelectedHitObjects, () => Has.Count.EqualTo(2));
+
+            AddStep("start dragging with control", () =>
+            {
+                InputManager.MoveMouseTo(blueprintContainer.ScreenSpaceDrawQuad.Centre);
+                InputManager.PressButton(MouseButton.Left);
+                InputManager.PressKey(Key.ControlLeft);
+            });
+            AddStep("drag to left corner", () => InputManager.MoveMouseTo(blueprintContainer.ScreenSpaceDrawQuad.TopRight + new Vector2(5, -5)));
+            AddStep("end dragging", () => InputManager.ReleaseButton(MouseButton.Left));
+            AddStep("release control", () => InputManager.ReleaseKey(Key.ControlLeft));
+
+            AddAssert("4 hitobjects selected", () => EditorBeatmap.SelectedHitObjects, () => Has.Count.EqualTo(4));
+
+            AddStep("start dragging without control", () =>
+            {
+                InputManager.MoveMouseTo(blueprintContainer.ScreenSpaceDrawQuad.Centre);
+                InputManager.PressButton(MouseButton.Left);
+            });
+            AddStep("drag to left corner", () => InputManager.MoveMouseTo(blueprintContainer.ScreenSpaceDrawQuad.TopRight + new Vector2(5, -5)));
+            AddStep("end dragging", () => InputManager.ReleaseButton(MouseButton.Left));
+
+            AddAssert("2 hitobjects selected", () => EditorBeatmap.SelectedHitObjects, () => Has.Count.EqualTo(2));
+        }
+
+        [Test]
         public void TestNearestSelection()
         {
             var firstObject = new HitCircle { Position = new Vector2(256, 192), StartTime = 0 };
