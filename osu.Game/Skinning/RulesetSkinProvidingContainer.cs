@@ -76,10 +76,6 @@ namespace osu.Game.Skinning
                     case Skin skin:
                         sources.Add(GetRulesetTransformedSkin(skin));
                         break;
-
-                    default:
-                        sources.Add(source);
-                        break;
                 }
             }
 
