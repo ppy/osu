@@ -112,6 +112,7 @@ namespace osu.Game.Tests.Editing
             {
                 SliderVelocityMultiplier = slider_velocity
             };
+            AddStep("add to beatmap", () => composer.EditorBeatmap.Add(referenceObject));
 
             assertSnapDistance(base_distance * slider_velocity, referenceObject, true);
             assertSnappedDistance(base_distance * slider_velocity + 10, base_distance * slider_velocity, referenceObject);
