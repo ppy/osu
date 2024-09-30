@@ -31,12 +31,6 @@ namespace osu.Game.Skinning
         [CanBeNull]
         private readonly ISkin beatmapSkin;
 
-        /// <remarks>
-        /// This container already re-exposes all parent <see cref="ISkinSource"/> sources in a ruleset-usable form.
-        /// Therefore disallow falling back to any parent <see cref="ISkinSource"/> any further.
-        /// </remarks>
-        protected override bool AllowFallingBackToParent => false;
-
         protected override Container<Drawable> Content { get; } = new Container
         {
             RelativeSizeAxes = Axes.Both,
