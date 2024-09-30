@@ -256,7 +256,7 @@ namespace osu.Game.Skinning
                 // This handles cases where a user skin doesn't have the required resources for complete display of
                 // certain elements.
 
-                if (CurrentSkin.Value is LegacySkin && CurrentSkin.Value != DefaultClassicSkin)
+                if (CurrentSkin.Value != DefaultClassicSkin)
                     yield return DefaultClassicSkin;
 
                 if (CurrentSkin.Value != trianglesSkin)
