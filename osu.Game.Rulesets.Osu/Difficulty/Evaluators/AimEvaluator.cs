@@ -140,14 +140,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 // Take the sliderless difficulty as a base
                 sliderJumpBonus = aimStrain * sliderJumpNerfFactor;
 
-                // If slider was slower than notes before - punish it
+                // Punish the cases where 1/2 slider going into 1/2 note
                 if (osuCurrObj.StrainTime > osuLastObj.StrainTime)
                     sliderJumpBonus *= CalcRhythmDifferenceMultiplier(osuCurrObj.StrainTime, osuLastObj.StrainTime);
 
-                // Punish lastLast only if it's slider and slower than both curr and last
-                double maxStrainTime = Math.Max(osuCurrObj.StrainTime, osuLastObj.StrainTime);
-                if (slider.IsNull() && maxStrainTime > osuLastLastObj.StrainTime)
-                    sliderJumpBonus *= CalcRhythmDifferenceMultiplier(maxStrainTime, osuLastLastObj.StrainTime);
+                // Punish the cases where 1/2 slider going into two 1/2 notes
+                if (slider.IsNull() && osuLastObj.StrainTime > osuCurrObj.StrainTime)
+                    sliderJumpBonus *= CalcRhythmDifferenceMultiplier(osuCurrObj.StrainTime, osuLastObj.StrainTime);
 
                 // Punish too short sliders to prevent cheesing (cheesing is still possible, but it's very rare)
                 static double length(Slider? slider) => slider.IsNotNull() ? slider.Velocity * slider.SpanDuration : 0;
