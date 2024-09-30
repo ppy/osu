@@ -99,10 +99,7 @@ namespace osu.Game.Skinning
                     yield return i.skin;
 
                 if (ParentSource != null)
-                {
-                    foreach (var skin in ParentSource.AllSources)
-                        yield return skin;
-                }
+                    yield return ParentSource;
             }
         }
 

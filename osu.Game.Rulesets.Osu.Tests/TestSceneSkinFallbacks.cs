@@ -172,7 +172,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             public ISkin FindProvider(Func<ISkin, bool> lookupFunction) => lookupFunction(this) ? this : null;
 
-            public IEnumerable<ISkin> AllSources => new[] { this };
+            public IEnumerable<ISkin> AllSources => Array.Empty<ISkin>();
 
             [CanBeNull]
             public event Action SourceChanged;
