@@ -3,13 +3,13 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 using Humanizer;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Audio;
-using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
@@ -36,7 +36,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             // bring in updates from selection changes
             EditorBeatmap.HitObjectUpdated += _ => Scheduler.AddOnce(UpdateTernaryStates);
 
-            SelectedItems.CollectionChanged += (_, _) => Scheduler.AddOnce(UpdateTernaryStates);
+            SelectedItems.CollectionChanged += onSelectedItemsChanged;
         }
 
         protected override void DeleteItems(IEnumerable<HitObject> items) => EditorBeatmap.RemoveRange(items);
@@ -208,9 +208,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 SelectionAdditionBankStates[bankName] = bindable;
             }
 
-            // start with normal selected.
-            SelectionBankStates[SampleControlPoint.DEFAULT_BANK].Value = TernaryState.True;
-            SelectionAdditionBankStates[HIT_BANK_AUTO].Value = TernaryState.True;
+            resetTernaryStates();
 
             foreach (string sampleName in HitSampleInfo.AllAdditions)
             {
@@ -252,6 +250,12 @@ namespace osu.Game.Screens.Edit.Compose.Components
             };
         }
 
+        private void resetTernaryStates()
+        {
+            SelectionBankStates[HIT_BANK_AUTO].Value = TernaryState.True;
+            SelectionAdditionBankStates[HIT_BANK_AUTO].Value = TernaryState.True;
+        }
+
         /// <summary>
         /// Called when context menu ternary states may need to be recalculated (selection changed or hitobject updated).
         /// </summary>
@@ -277,6 +281,15 @@ namespace osu.Game.Screens.Edit.Compose.Components
             {
                 bindable.Value = GetStateFromSelection(samplesInSelection.SelectMany(s => s).Where(o => o.Name != HitSampleInfo.HIT_NORMAL), h => (bankName != HIT_BANK_AUTO && h.Bank == bankName && !h.EditorAutoBank) || (bankName == HIT_BANK_AUTO && h.EditorAutoBank));
             }
+        }
+
+        private void onSelectedItemsChanged(object? sender, NotifyCollectionChangedEventArgs e)
+        {
+            // Reset the ternary states when the selection is cleared.
+            if (e.OldStartingIndex >= 0 && e.NewStartingIndex < 0)
+                Scheduler.AddOnce(resetTernaryStates);
+            else
+                Scheduler.AddOnce(UpdateTernaryStates);
         }
 
         private IEnumerable<IList<HitSampleInfo>> enumerateAllSamples(HitObject hitObject)
