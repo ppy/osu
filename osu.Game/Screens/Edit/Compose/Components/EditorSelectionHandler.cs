@@ -64,6 +64,11 @@ namespace osu.Game.Screens.Edit.Compose.Components
         public readonly Dictionary<string, Bindable<TernaryState>> SelectionAdditionBankStates = new Dictionary<string, Bindable<TernaryState>>();
 
         /// <summary>
+        /// Whether the selection contains any addition samples and the <see cref="SelectionAdditionBankStates"/> can be used.
+        /// </summary>
+        public readonly Bindable<bool> SelectionAdditionBanksEnabled = new Bindable<bool>();
+
+        /// <summary>
         /// Set up ternary state bindables and bind them to selection/hitobject changes (in both directions)
         /// </summary>
         private void createStateBindables()
@@ -265,6 +270,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
             {
                 bindable.Value = GetStateFromSelection(samplesInSelection.SelectMany(s => s).Where(o => o.Name == HitSampleInfo.HIT_NORMAL), h => h.Bank == bankName);
             }
+
+            SelectionAdditionBanksEnabled.Value = samplesInSelection.SelectMany(s => s).Any(o => o.Name != HitSampleInfo.HIT_NORMAL);
 
             foreach ((string bankName, var bindable) in SelectionAdditionBankStates)
             {
