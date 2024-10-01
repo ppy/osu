@@ -10,9 +10,9 @@ namespace osu.Game.Input
 {
     public partial class OsuUserInputManager : UserInputManager
     {
-        protected override bool AllowRightClickFromLongTouch => PlayingState.Value == LocalUserPlayingStates.NotPlaying;
+        protected override bool AllowRightClickFromLongTouch => PlayingState.Value == LocalUserPlayingState.NotPlaying;
 
-        public readonly Bindable<LocalUserPlayingStates> PlayingState = new Bindable<LocalUserPlayingStates>();
+        public readonly Bindable<LocalUserPlayingState> PlayingState = new Bindable<LocalUserPlayingState>();
 
         internal OsuUserInputManager()
         {

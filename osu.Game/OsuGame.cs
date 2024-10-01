@@ -175,9 +175,9 @@ namespace osu.Game
         /// </summary>
         public readonly IBindable<OverlayActivation> OverlayActivationMode = new Bindable<OverlayActivation>();
 
-        IBindable<LocalUserPlayingStates> ILocalUserPlayInfo.PlayingState => playingState;
+        IBindable<LocalUserPlayingState> ILocalUserPlayInfo.PlayingState => playingState;
 
-        private readonly Bindable<LocalUserPlayingStates> playingState = new Bindable<LocalUserPlayingStates>();
+        private readonly Bindable<LocalUserPlayingState> playingState = new Bindable<LocalUserPlayingState>();
 
         protected OsuScreenStack ScreenStack;
 
@@ -388,9 +388,9 @@ namespace osu.Game
 
             playingState.BindValueChanged(p =>
             {
-                BeatmapManager.PauseImports = p.NewValue != LocalUserPlayingStates.NotPlaying;
-                SkinManager.PauseImports = p.NewValue != LocalUserPlayingStates.NotPlaying;
-                ScoreManager.PauseImports = p.NewValue != LocalUserPlayingStates.NotPlaying;
+                BeatmapManager.PauseImports = p.NewValue != LocalUserPlayingState.NotPlaying;
+                SkinManager.PauseImports = p.NewValue != LocalUserPlayingState.NotPlaying;
+                ScoreManager.PauseImports = p.NewValue != LocalUserPlayingState.NotPlaying;
             }, true);
 
             IsActive.BindValueChanged(active => updateActiveState(active.NewValue), true);
@@ -1549,7 +1549,7 @@ namespace osu.Game
             });
 
             // reset on screen change for sanity.
-            playingState.Value = LocalUserPlayingStates.NotPlaying;
+            playingState.Value = LocalUserPlayingState.NotPlaying;
 
             if (current is Player oldPlayer)
                 oldPlayer.PlayingState.UnbindFrom(playingState);

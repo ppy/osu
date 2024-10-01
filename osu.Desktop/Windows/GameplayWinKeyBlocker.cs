@@ -13,7 +13,7 @@ namespace osu.Desktop.Windows
     public partial class GameplayWinKeyBlocker : Component
     {
         private Bindable<bool> disableWinKey = null!;
-        private IBindable<LocalUserPlayingStates> localUserPlaying = null!;
+        private IBindable<LocalUserPlayingState> localUserPlaying = null!;
         private IBindable<bool> isActive = null!;
 
         [Resolved]
@@ -34,7 +34,7 @@ namespace osu.Desktop.Windows
 
         private void updateBlocking()
         {
-            bool shouldDisable = isActive.Value && disableWinKey.Value && localUserPlaying.Value == LocalUserPlayingStates.Playing;
+            bool shouldDisable = isActive.Value && disableWinKey.Value && localUserPlaying.Value == LocalUserPlayingState.Playing;
 
             if (shouldDisable)
                 host.InputThread.Scheduler.Add(WindowsKey.Disable);

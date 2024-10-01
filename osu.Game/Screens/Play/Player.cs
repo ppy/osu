@@ -94,7 +94,7 @@ namespace osu.Game.Screens.Play
         public IBindable<bool> LocalUserPlaying => localUserPlaying;
 
         private readonly Bindable<bool> localUserPlaying = new Bindable<bool>();
-        private readonly Bindable<LocalUserPlayingStates> playingState = new Bindable<LocalUserPlayingStates>();
+        private readonly Bindable<LocalUserPlayingState> playingState = new Bindable<LocalUserPlayingState>();
 
         public int RestartCount;
 
@@ -512,12 +512,12 @@ namespace osu.Game.Screens.Play
             bool inBreak = breakTracker.IsBreakTime.Value || DrawableRuleset.IsPaused.Value || GameplayState.HasFailed;
 
             if (inGameplay)
-                playingState.Value = inBreak ? LocalUserPlayingStates.Break : LocalUserPlayingStates.Playing;
+                playingState.Value = inBreak ? LocalUserPlayingState.Break : LocalUserPlayingState.Playing;
             else
-                playingState.Value = LocalUserPlayingStates.NotPlaying;
+                playingState.Value = LocalUserPlayingState.NotPlaying;
 
-            localUserPlaying.Value = playingState.Value == LocalUserPlayingStates.Playing;
-            OverlayActivationMode.Value = playingState.Value == LocalUserPlayingStates.Playing ? OverlayActivation.Disabled : OverlayActivation.UserTriggered;
+            localUserPlaying.Value = playingState.Value == LocalUserPlayingState.Playing;
+            OverlayActivationMode.Value = playingState.Value == LocalUserPlayingState.Playing ? OverlayActivation.Disabled : OverlayActivation.UserTriggered;
         }
 
         private void updateSampleDisabledState()
@@ -1284,6 +1284,6 @@ namespace osu.Game.Screens.Play
 
         IBindable<bool> ISamplePlaybackDisabler.SamplePlaybackDisabled => samplePlaybackDisabled;
 
-        public IBindable<LocalUserPlayingStates> PlayingState => playingState;
+        public IBindable<LocalUserPlayingState> PlayingState => playingState;
     }
 }
