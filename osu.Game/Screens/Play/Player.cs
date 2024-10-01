@@ -508,16 +508,16 @@ namespace osu.Game.Screens.Play
 
         private void updateGameplayState()
         {
-            bool inGameplay = !DrawableRuleset.HasReplayLoaded.Value && !GameplayState.HasFailed;
-            bool inBreak = breakTracker.IsBreakTime.Value || DrawableRuleset.IsPaused.Value;
+            bool inGameplay = !DrawableRuleset.HasReplayLoaded.Value;
+            bool inBreak = breakTracker.IsBreakTime.Value || DrawableRuleset.IsPaused.Value || GameplayState.HasFailed;
 
             if (inGameplay)
                 playingState.Value = inBreak ? LocalUserPlayingStates.Break : LocalUserPlayingStates.Playing;
             else
                 playingState.Value = LocalUserPlayingStates.NotPlaying;
 
-            localUserPlaying.Value = playingState.Value != LocalUserPlayingStates.NotPlaying;
-            OverlayActivationMode.Value = playingState.Value != LocalUserPlayingStates.NotPlaying ? OverlayActivation.Disabled : OverlayActivation.UserTriggered;
+            localUserPlaying.Value = playingState.Value == LocalUserPlayingStates.Playing;
+            OverlayActivationMode.Value = playingState.Value == LocalUserPlayingStates.Playing ? OverlayActivation.Disabled : OverlayActivation.UserTriggered;
         }
 
         private void updateSampleDisabledState()
