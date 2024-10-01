@@ -543,7 +543,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
             /// <summary>
             /// Whether the bank for additions should be inherited from the normal sample in edit.
             /// </summary>
-            public bool EditorAutoBank;
+            public bool EditorAutoBank = true;
 
             public SampleBankInfo Clone() => (SampleBankInfo)MemberwiseClone();
         }
