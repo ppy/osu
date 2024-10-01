@@ -183,7 +183,14 @@ namespace osu.Game.Beatmaps
 
         #region Beatmap
 
-        public virtual bool BeatmapLoaded => beatmapLoadTask?.IsCompleted ?? false;
+        public virtual bool BeatmapLoaded
+        {
+            get
+            {
+                lock (beatmapFetchLock)
+                    return beatmapLoadTask?.IsCompleted ?? false;
+            }
+        }
 
         public IBeatmap Beatmap
         {
