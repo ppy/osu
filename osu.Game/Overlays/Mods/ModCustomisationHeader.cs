@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
@@ -20,18 +19,17 @@ using static osu.Game.Overlays.Mods.ModCustomisationPanel;
 
 namespace osu.Game.Overlays.Mods
 {
-    public partial class ModCustomisationHeader : OsuHoverContainer
+    public partial class ModCustomisationHeader : OsuClickableContainer
     {
         private Box background = null!;
+        private Box hoverBackground = null!;
         private Box backgroundFlash = null!;
         private SpriteIcon icon = null!;
 
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; } = null!;
 
-        protected override IEnumerable<Drawable> EffectTargets => new[] { background };
-
-        public readonly Bindable<ModCustomisationPanelState> ExpandedState = new Bindable<ModCustomisationPanelState>(ModCustomisationPanelState.Collapsed);
+        public readonly Bindable<ModCustomisationPanelState> ExpandedState = new Bindable<ModCustomisationPanelState>();
 
         private readonly ModCustomisationPanel panel;
 
@@ -52,6 +50,13 @@ namespace osu.Game.Overlays.Mods
                 background = new Box
                 {
                     RelativeSizeAxes = Axes.Both,
+                },
+                hoverBackground = new Box
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = OsuColour.Gray(50),
+                    Blending = BlendingParameters.Additive,
+                    Alpha = 0,
                 },
                 backgroundFlash = new Box
                 {
@@ -84,9 +89,6 @@ namespace osu.Game.Overlays.Mods
                     }
                 }
             };
-
-            IdleColour = colourProvider.Dark3;
-            HoverColour = colourProvider.Light4;
         }
 
         protected override void LoadComplete()
@@ -109,45 +111,37 @@ namespace osu.Game.Overlays.Mods
             ExpandedState.BindValueChanged(v =>
             {
                 icon.ScaleTo(v.NewValue > ModCustomisationPanelState.Collapsed ? new Vector2(1, -1) : Vector2.One, 300, Easing.OutQuint);
-            }, true);
-        }
 
-        protected override bool OnClick(ClickEvent e)
-        {
-            if (Enabled.Value)
-            {
-                ExpandedState.Value = ExpandedState.Value switch
+                switch (v.NewValue)
                 {
-                    ModCustomisationPanelState.Collapsed => ModCustomisationPanelState.Expanded,
-                    _ => ModCustomisationPanelState.Collapsed
-                };
-            }
+                    case ModCustomisationPanelState.Collapsed:
+                        background.FadeColour(colourProvider.Dark3, 500, Easing.OutQuint);
+                        break;
 
-            return base.OnClick(e);
-        }
-
-        private bool touchedThisFrame;
-
-        protected override bool OnTouchDown(TouchDownEvent e)
-        {
-            if (Enabled.Value)
-            {
-                touchedThisFrame = true;
-                Schedule(() => touchedThisFrame = false);
-            }
-
-            return base.OnTouchDown(e);
+                    case ModCustomisationPanelState.Expanded:
+                    case ModCustomisationPanelState.ExpandedByMod:
+                        background.FadeColour(colourProvider.Light4, 500, Easing.OutQuint);
+                        break;
+                }
+            }, true);
         }
 
         protected override bool OnHover(HoverEvent e)
         {
-            if (Enabled.Value)
-            {
-                if (!touchedThisFrame && panel.ExpandedState.Value == ModCustomisationPanelState.Collapsed)
-                    panel.ExpandedState.Value = ModCustomisationPanelState.ExpandedByHover;
-            }
+            if (!Enabled.Value)
+                return base.OnHover(e);
 
+            if (panel.ExpandedState.Value == ModCustomisationPanelState.Collapsed)
+                panel.ExpandedState.Value = ModCustomisationPanelState.Expanded;
+
+            hoverBackground.FadeTo(0.4f, 200, Easing.OutQuint);
             return base.OnHover(e);
+        }
+
+        protected override void OnHoverLost(HoverLostEvent e)
+        {
+            hoverBackground.FadeOut(200, Easing.OutQuint);
+            base.OnHoverLost(e);
         }
     }
 }

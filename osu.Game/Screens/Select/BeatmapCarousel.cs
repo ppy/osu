@@ -137,11 +137,13 @@ namespace osu.Game.Screens.Select
 
         private void loadNewRoot()
         {
+            beatmapsSplitOut = activeCriteria.SplitOutDifficulties;
+
             // Ensure no changes are made to the list while we are initialising items.
             // We'll catch up on changes via subscriptions anyway.
             BeatmapSetInfo[] loadableSets = detachedBeatmapSets!.ToArray();
 
-            if (selectedBeatmapSet != null && !loadableSets.Contains(selectedBeatmapSet.BeatmapSet))
+            if (selectedBeatmapSet != null && !loadableSets.Contains(selectedBeatmapSet.BeatmapSet, EqualityComparer<BeatmapSetInfo>.Default))
                 selectedBeatmapSet = null;
 
             var selectedBeatmapBefore = selectedBeatmap?.BeatmapInfo;
@@ -704,7 +706,7 @@ namespace osu.Game.Screens.Select
 
         private bool beatmapsSplitOut;
 
-        private void applyActiveCriteria(bool debounce, bool alwaysResetScrollPosition = true)
+        private void applyActiveCriteria(bool debounce)
         {
             PendingFilter?.Cancel();
             PendingFilter = null;
@@ -726,7 +728,6 @@ namespace osu.Game.Screens.Select
 
                 if (activeCriteria.SplitOutDifficulties != beatmapsSplitOut)
                 {
-                    beatmapsSplitOut = activeCriteria.SplitOutDifficulties;
                     loadNewRoot();
                     return;
                 }
@@ -734,8 +735,7 @@ namespace osu.Game.Screens.Select
                 root.Filter(activeCriteria);
                 itemsCache.Invalidate();
 
-                if (alwaysResetScrollPosition || !Scroll.UserScrolling)
-                    ScrollToSelected(true);
+                ScrollToSelected(true);
 
                 FilterApplied?.Invoke();
             }
@@ -857,8 +857,9 @@ namespace osu.Game.Screens.Select
                     // Add those items within the previously found index range that should be displayed.
                     foreach (var item in toDisplay)
                     {
-                        var panel = setPool.Get(p => p.Item = item);
+                        var panel = setPool.Get();
 
+                        panel.Item = item;
                         panel.Y = item.CarouselYPosition;
 
                         Scroll.Add(panel);
@@ -900,8 +901,8 @@ namespace osu.Game.Screens.Select
 
                 if (item is DrawableCarouselBeatmapSet set)
                 {
-                    foreach (var diff in set.DrawableBeatmaps)
-                        updateItem(diff, item);
+                    for (int i = 0; i < set.DrawableBeatmaps.Count; i++)
+                        updateItem(set.DrawableBeatmaps[i], item);
                 }
             }
         }
@@ -1034,7 +1035,7 @@ namespace osu.Game.Screens.Select
             itemsCache.Validate();
 
             // update and let external consumers know about selection loss.
-            if (BeatmapSetsLoaded)
+            if (BeatmapSetsLoaded && AllowSelection)
             {
                 bool selectionLost = selectedBeatmapSet != null && selectedBeatmapSet.State.Value != CarouselItemState.Selected;
 
@@ -1101,7 +1102,7 @@ namespace osu.Game.Screens.Select
         }
 
         /// <summary>
-        /// Update a item's x position and multiplicative alpha based on its y position and
+        /// Update an item's x position and multiplicative alpha based on its y position and
         /// the current scroll position.
         /// </summary>
         /// <param name="item">The item to be updated.</param>

@@ -351,13 +351,19 @@ namespace osu.Game.Rulesets.Objects.Legacy
             {
                 int endPointLength = endPoint == null ? 0 : 1;
 
-                if (vertices.Length + endPointLength != 3)
-                    type = PathType.BEZIER;
-                else if (isLinear(points[0], points[1], endPoint ?? points[2]))
+                if (FormatVersion < LegacyBeatmapEncoder.FIRST_LAZER_VERSION)
                 {
-                    // osu-stable special-cased colinear perfect curves to a linear path
-                    type = PathType.LINEAR;
+                    if (vertices.Length + endPointLength != 3)
+                        type = PathType.BEZIER;
+                    else if (isLinear(points[0], points[1], endPoint ?? points[2]))
+                    {
+                        // osu-stable special-cased colinear perfect curves to a linear path
+                        type = PathType.LINEAR;
+                    }
                 }
+                else if (vertices.Length + endPointLength > 3)
+                    // Lazer supports perfect curves with less than 3 points and colinear points
+                    type = PathType.BEZIER;
             }
 
             // The first control point must have a definite type.

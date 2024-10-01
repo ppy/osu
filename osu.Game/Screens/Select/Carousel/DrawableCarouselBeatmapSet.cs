@@ -51,7 +51,7 @@ namespace osu.Game.Screens.Select.Carousel
         [Resolved]
         private IBindable<RulesetInfo> ruleset { get; set; } = null!;
 
-        public IEnumerable<DrawableCarouselItem> DrawableBeatmaps => beatmapContainer?.IsLoaded != true ? Enumerable.Empty<DrawableCarouselItem>() : beatmapContainer.AliveChildren;
+        public IReadOnlyList<DrawableCarouselItem> DrawableBeatmaps => beatmapContainer?.IsLoaded != true ? Array.Empty<DrawableCarouselItem>() : beatmapContainer;
 
         private Container<DrawableCarouselItem>? beatmapContainer;
 
