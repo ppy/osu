@@ -181,7 +181,7 @@ namespace osu.Game.Overlays.Comments
         private void updateState()
         {
             bool isOnline = apiState.Value > APIState.Offline;
-            var canNewCommentReason = CommentEditor.canNewCommentReason(CommentableMeta.Value);
+            LocalisableString? canNewCommentReason = CommentEditor.canNewCommentReason(CommentableMeta.Value);
             bool commentsDisabled = canNewCommentReason != null;
             bool canComment = isOnline && !commentsDisabled;
 
