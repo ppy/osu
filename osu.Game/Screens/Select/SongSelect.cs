@@ -127,6 +127,8 @@ namespace osu.Game.Screens.Select
         private Sample sampleChangeDifficulty = null!;
         private Sample sampleChangeBeatmap = null!;
 
+        private bool pendingFilterApplication;
+
         private Container carouselContainer = null!;
 
         protected BeatmapDetailArea BeatmapDetails { get; private set; } = null!;
@@ -161,20 +163,6 @@ namespace osu.Game.Screens.Select
 
                 ApplyToBackground(applyBlurToBackground);
             });
-
-            LoadComponentAsync(Carousel = new BeatmapCarousel
-            {
-                AllowSelection = false, // delay any selection until our bindables are ready to make a good choice.
-                Anchor = Anchor.CentreRight,
-                Origin = Anchor.CentreRight,
-                RelativeSizeAxes = Axes.Both,
-                BleedTop = FilterControl.HEIGHT,
-                BleedBottom = Select.Footer.HEIGHT,
-                SelectionChanged = updateSelectedBeatmap,
-                BeatmapSetsChanged = carouselBeatmapsLoaded,
-                FilterApplied = () => Scheduler.AddOnce(updateVisibleBeatmapCount),
-                GetRecommendedBeatmap = s => recommender?.GetRecommendedBeatmap(s),
-            }, c => carouselContainer.Child = c);
 
             // initial value transfer is required for FilterControl (it uses our re-cached bindables in its async load for the initial filter).
             transferRulesetValue();
@@ -227,7 +215,6 @@ namespace osu.Game.Screens.Select
                         {
                             RelativeSizeAxes = Axes.X,
                             Height = FilterControl.HEIGHT,
-                            FilterChanged = ApplyFilterToCarousel,
                         },
                         new GridContainer // used for max width implementation
                         {
@@ -321,12 +308,42 @@ namespace osu.Game.Screens.Select
                         }
                     }
                 },
-                new SkinComponentsContainer(new SkinComponentsContainerLookup(SkinComponentsContainerLookup.TargetArea.SongSelect))
+                new SkinnableContainer(new GlobalSkinnableContainerLookup(GlobalSkinnableContainers.SongSelect))
                 {
                     RelativeSizeAxes = Axes.Both,
                 },
                 modSpeedHotkeyHandler = new ModSpeedHotkeyHandler(),
             });
+
+            // Important to load this after the filter control is loaded (so we have initial filter criteria prepared).
+            LoadComponentAsync(Carousel = new BeatmapCarousel(FilterControl.CreateCriteria())
+            {
+                AllowSelection = false, // delay any selection until our bindables are ready to make a good choice.
+                Anchor = Anchor.CentreRight,
+                Origin = Anchor.CentreRight,
+                RelativeSizeAxes = Axes.Both,
+                BleedTop = FilterControl.HEIGHT,
+                BleedBottom = Select.Footer.HEIGHT,
+                SelectionChanged = updateSelectedBeatmap,
+                BeatmapSetsChanged = carouselBeatmapsLoaded,
+                FilterApplied = () => Scheduler.AddOnce(updateVisibleBeatmapCount),
+                GetRecommendedBeatmap = s => recommender?.GetRecommendedBeatmap(s),
+            }, c => carouselContainer.Child = c);
+
+            FilterControl.FilterChanged = criteria =>
+            {
+                // If a filter operation is applied when we're in a state that doesn't allow selection,
+                // we might end up in an unexpected state. This is because currently carousel panels are in charge
+                // of updating the global selection (which is very hard to deal with).
+                //
+                // For now let's just avoid filtering when selection isn't allowed locally.
+                // This should be nuked from existence when we get around to fixing the complexity of song select <-> beatmap carousel.
+                // The debounce part of BeatmapCarousel's filtering should probably also be removed and handled locally.
+                if (Carousel.AllowSelection)
+                    Carousel.Filter(criteria);
+                else
+                    pendingFilterApplication = true;
+            };
 
             if (ShowSongSelectFooter)
             {
@@ -401,14 +418,6 @@ namespace osu.Game.Screens.Select
 
         protected virtual ModSelectOverlay CreateModSelectOverlay() => new SoloModSelectOverlay();
 
-        protected virtual void ApplyFilterToCarousel(FilterCriteria criteria)
-        {
-            // if not the current screen, we want to get carousel in a good presentation state before displaying (resume or enter).
-            bool shouldDebounce = this.IsCurrentScreen();
-
-            Carousel.Filter(criteria, shouldDebounce);
-        }
-
         private DependencyContainer dependencies = null!;
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
@@ -434,7 +443,8 @@ namespace osu.Game.Screens.Select
 
             // Forced refetch is important here to guarantee correct invalidation across all difficulties.
             Beatmap.Value = beatmaps.GetWorkingBeatmap(beatmapInfo ?? beatmapInfoNoDebounce, true);
-            this.Push(new EditorLoader());
+
+            FinaliseSelection(customStartAction: () => this.Push(new EditorLoader()));
         }
 
         /// <summary>
@@ -705,6 +715,12 @@ namespace osu.Game.Screens.Select
             ModSelect.SelectedMods.BindTo(selectedMods);
 
             Carousel.AllowSelection = true;
+
+            if (pendingFilterApplication)
+            {
+                Carousel.Filter(FilterControl.CreateCriteria());
+                pendingFilterApplication = false;
+            }
 
             BeatmapDetails.Refresh();
 
@@ -992,7 +1008,8 @@ namespace osu.Game.Screens.Select
 
             // if we have a pending filter operation, we want to run it now.
             // it could change selection (ie. if the ruleset has been changed).
-            Carousel.FlushPendingFilterOperations();
+            if (IsLoaded)
+                Carousel.FlushPendingFilterOperations();
 
             return true;
         }

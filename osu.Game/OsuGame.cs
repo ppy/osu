@@ -54,6 +54,7 @@ using osu.Game.Overlays.BeatmapListing;
 using osu.Game.Overlays.Mods;
 using osu.Game.Overlays.Music;
 using osu.Game.Overlays.Notifications;
+using osu.Game.Overlays.OSD;
 using osu.Game.Overlays.SkinEditor;
 using osu.Game.Overlays.Toolbar;
 using osu.Game.Overlays.Volume;
@@ -141,6 +142,8 @@ namespace osu.Game
         protected Container ScreenOffsetContainer { get; private set; }
 
         private Container overlayOffsetContainer;
+
+        private OnScreenDisplay onScreenDisplay;
 
         [Resolved]
         private FrameworkConfigManager frameworkConfig { get; set; }
@@ -442,10 +445,11 @@ namespace osu.Game
                     break;
 
                 case LinkAction.SearchBeatmapSet:
-                    if (link.Argument is RomanisableString romanisable)
-                        SearchBeatmapSet(romanisable.GetPreferred(Localisation.CurrentParameters.Value.PreferOriginalScript));
+                    if (link.Argument is LocalisableString localisable)
+                        SearchBeatmapSet(Localisation.GetLocalisedString(localisable));
                     else
                         SearchBeatmapSet(argString);
+
                     break;
 
                 case LinkAction.FilterBeatmapSetGenre:
@@ -495,6 +499,12 @@ namespace osu.Game
                 default:
                     throw new NotImplementedException($"This {nameof(LinkAction)} ({link.Action.ToString()}) is missing an associated action.");
             }
+        });
+
+        public void CopyUrlToClipboard(string url) => waitForReady(() => onScreenDisplay, _ =>
+        {
+            dependencies.Get<Clipboard>().SetText(url);
+            onScreenDisplay.Display(new CopyUrlToast());
         });
 
         public void OpenUrlExternally(string url, bool forceBypassExternalUrlWarning = false) => waitForReady(() => externalLinkOpener, _ =>
@@ -1078,7 +1088,7 @@ namespace osu.Game
 
             loadComponentSingleFile(volume = new VolumeOverlay(), leftFloatingOverlayContent.Add, true);
 
-            var onScreenDisplay = new OnScreenDisplay();
+            onScreenDisplay = new OnScreenDisplay();
 
             onScreenDisplay.BeginTracking(this, frameworkConfig);
             onScreenDisplay.BeginTracking(this, LocalConfig);
@@ -1132,6 +1142,7 @@ namespace osu.Game
             loadComponentSingleFile(new MedalOverlay(), topMostOverlayContent.Add);
 
             loadComponentSingleFile(new BackgroundDataStoreProcessor(), Add);
+            loadComponentSingleFile(new DetachedBeatmapStore(), Add, true);
 
             Add(difficultyRecommender);
             Add(externalLinkOpener = new ExternalLinkOpener());

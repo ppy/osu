@@ -315,7 +315,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
             EditorBeatmap.PerformOnSelection(h =>
             {
-                if (h.Samples.Where(o => o.Name == HitSampleInfo.HIT_NORMAL).All(s => s.Bank == bankName))
+                if (hasRelevantBank(h))
                     return;
 
                 h.Samples = h.Samples.Select(s => s.Name == HitSampleInfo.HIT_NORMAL ? s.With(newBank: bankName) : s).ToList();
@@ -394,10 +394,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
             EditorBeatmap.PerformOnSelection(h =>
             {
                 // Make sure there isn't already an existing sample
-                if (h.Samples.Any(s => s.Name == sampleName))
-                    return;
-
-                h.Samples.Add(h.CreateHitSampleInfo(sampleName));
+                if (h.Samples.All(s => s.Name != sampleName))
+                    h.Samples.Add(h.CreateHitSampleInfo(sampleName));
 
                 if (h is IHasRepeats hasRepeats)
                 {

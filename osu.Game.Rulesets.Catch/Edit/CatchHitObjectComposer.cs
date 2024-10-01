@@ -84,7 +84,7 @@ namespace osu.Game.Rulesets.Catch.Edit
 
         protected override BeatSnapGrid CreateBeatSnapGrid() => new CatchBeatSnapGrid();
 
-        protected override IReadOnlyList<HitObjectCompositionTool> CompositionTools => new HitObjectCompositionTool[]
+        protected override IReadOnlyList<CompositionTool> CompositionTools => new CompositionTool[]
         {
             new FruitCompositionTool(),
             new JuiceStreamCompositionTool(),
@@ -112,6 +112,26 @@ namespace osu.Game.Rulesets.Catch.Edit
 
         public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
         {
+        }
+
+        protected override bool OnKeyDown(KeyDownEvent e)
+        {
+            if (e.Repeat)
+                return false;
+
+            handleToggleViaKey(e);
+            return base.OnKeyDown(e);
+        }
+
+        protected override void OnKeyUp(KeyUpEvent e)
+        {
+            handleToggleViaKey(e);
+            base.OnKeyUp(e);
+        }
+
+        private void handleToggleViaKey(KeyboardEvent key)
+        {
+            DistanceSnapProvider.HandleToggleViaKey(key);
         }
 
         public override SnapResult FindSnappedPositionAndTime(Vector2 screenSpacePosition, SnapType snapType = SnapType.All)

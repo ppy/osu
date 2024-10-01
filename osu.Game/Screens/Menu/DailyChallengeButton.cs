@@ -13,6 +13,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Threading;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps.Drawables;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Localisation;
@@ -45,6 +46,9 @@ namespace osu.Game.Screens.Menu
 
         [Resolved]
         private INotificationOverlay? notificationOverlay { get; set; }
+
+        [Resolved]
+        private SessionStatics statics { get; set; } = null!;
 
         public DailyChallengeButton(string sampleName, Color4 colour, Action<MainMenuButton>? clickAction = null, params Key[] triggerKeys)
             : base(ButtonSystemStrings.DailyChallenge, sampleName, OsuIcon.DailyChallenge, colour, clickAction, triggerKeys)
@@ -128,7 +132,7 @@ namespace osu.Game.Screens.Menu
             }
         }
 
-        private long? lastNotifiedDailyChallengeRoomId;
+        private long? lastDailyChallengeRoomID;
 
         private void dailyChallengeChanged(ValueChangedEvent<DailyChallengeInfo?> _)
         {
@@ -151,13 +155,16 @@ namespace osu.Game.Screens.Menu
                     Room = room;
                     cover.OnlineInfo = TooltipContent = room.Playlist.FirstOrDefault()?.Beatmap.BeatmapSet as APIBeatmapSet;
 
-                    // We only want to notify the user if a new challenge recently went live.
-                    if (room.StartDate.Value != null
-                        && Math.Abs((DateTimeOffset.Now - room.StartDate.Value!.Value).TotalSeconds) < 1800
-                        && room.RoomID.Value != lastNotifiedDailyChallengeRoomId)
+                    if (room.StartDate.Value != null && room.RoomID.Value != lastDailyChallengeRoomID)
                     {
-                        lastNotifiedDailyChallengeRoomId = room.RoomID.Value;
-                        notificationOverlay?.Post(new NewDailyChallengeNotification(room));
+                        lastDailyChallengeRoomID = room.RoomID.Value;
+
+                        // new challenge is live, reset intro played static.
+                        statics.SetValue(Static.DailyChallengeIntroPlayed, false);
+
+                        // we only want to notify the user if the new challenge just went live.
+                        if (Math.Abs((DateTimeOffset.Now - room.StartDate.Value!.Value).TotalSeconds) < 1800)
+                            notificationOverlay?.Post(new NewDailyChallengeNotification(room));
                     }
 
                     updateCountdown();
