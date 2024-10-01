@@ -22,9 +22,9 @@ namespace osu.Game.Tests.Database
     [HeadlessTest]
     public partial class BackgroundDataStoreProcessorTests : OsuTestScene, ILocalUserPlayInfo
     {
-        public IBindable<bool> IsPlaying => isPlaying;
+        public IBindable<LocalUserPlayingStates> PlayingState => isPlaying;
 
-        private readonly Bindable<bool> isPlaying = new Bindable<bool>();
+        private readonly Bindable<LocalUserPlayingStates> isPlaying = new Bindable<LocalUserPlayingStates>();
 
         private BeatmapSetInfo importedSet = null!;
 
@@ -37,7 +37,7 @@ namespace osu.Game.Tests.Database
         [SetUpSteps]
         public void SetUpSteps()
         {
-            AddStep("Set not playing", () => isPlaying.Value = false);
+            AddStep("Set not playing", () => isPlaying.Value = LocalUserPlayingStates.NotPlaying);
         }
 
         [Test]
@@ -89,7 +89,7 @@ namespace osu.Game.Tests.Database
                 });
             });
 
-            AddStep("Set playing", () => isPlaying.Value = true);
+            AddStep("Set playing", () => isPlaying.Value = LocalUserPlayingStates.Playing);
 
             AddStep("Reset difficulty", () =>
             {
@@ -117,7 +117,7 @@ namespace osu.Game.Tests.Database
                 });
             });
 
-            AddStep("Set not playing", () => isPlaying.Value = false);
+            AddStep("Set not playing", () => isPlaying.Value = LocalUserPlayingStates.NotPlaying);
 
             AddUntilStep("wait for difficulties repopulated", () =>
             {
