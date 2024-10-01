@@ -157,7 +157,9 @@ namespace osu.Game.Rulesets.Osu.Edit
                             Text = "Grid from points",
                             TooltipText = """
                                            Left click to set the origin.
-                                           Click and drag to set the origin, rotation and spacing.
+                                           Left click again to set the spacing and rotation.
+                                           Right click to only set the origin.
+                                           Click and drag to set the origin, spacing and rotation.
                                            """
                         },
                         gridTypeButtons = new EditorRadioButtonCollection
