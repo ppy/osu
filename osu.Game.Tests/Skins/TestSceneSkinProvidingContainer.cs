@@ -32,7 +32,7 @@ namespace osu.Game.Tests.Skins
         [Resolved]
         private IRenderer renderer { get; set; }
 
-        private static Type[] testSkinTypes = new[]
+        private static Type[] testSkinTypes =
         {
             null,
             typeof(DefaultLegacySkin),
