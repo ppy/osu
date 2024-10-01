@@ -109,7 +109,7 @@ namespace osu.Game.Graphics.UserInterface
                     Colour = BackgroundColourHover,
                     RelativeSizeAxes = Axes.X,
                     Height = 2f,
-                    Width = 0.8f,
+                    Width = 0.9f,
                 });
             }
 
