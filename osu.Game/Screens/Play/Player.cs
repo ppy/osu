@@ -94,6 +94,7 @@ namespace osu.Game.Screens.Play
         public IBindable<bool> LocalUserPlaying => localUserPlaying;
 
         private readonly Bindable<bool> localUserPlaying = new Bindable<bool>();
+        private readonly Bindable<LocalUserPlayingStates> playingState = new Bindable<LocalUserPlayingStates>();
 
         public int RestartCount;
 
@@ -230,9 +231,6 @@ namespace osu.Game.Screens.Play
 
             if (game != null)
                 gameActive.BindTo(game.IsActive);
-
-            if (game is OsuGame osuGame)
-                LocalUserPlaying.BindTo(osuGame.LocalUserPlaying);
 
             DrawableRuleset = ruleset.CreateDrawableRulesetWith(playableBeatmap, gameplayMods);
             dependencies.CacheAs(DrawableRuleset);
@@ -510,9 +508,16 @@ namespace osu.Game.Screens.Play
 
         private void updateGameplayState()
         {
-            bool inGameplay = !DrawableRuleset.HasReplayLoaded.Value && !DrawableRuleset.IsPaused.Value && !breakTracker.IsBreakTime.Value && !GameplayState.HasFailed;
-            OverlayActivationMode.Value = inGameplay ? OverlayActivation.Disabled : OverlayActivation.UserTriggered;
-            localUserPlaying.Value = inGameplay;
+            bool inGameplay = !DrawableRuleset.HasReplayLoaded.Value && !GameplayState.HasFailed;
+            bool inBreak = breakTracker.IsBreakTime.Value || DrawableRuleset.IsPaused.Value;
+
+            if (inGameplay)
+                playingState.Value = inBreak ? LocalUserPlayingStates.Break : LocalUserPlayingStates.Playing;
+            else
+                playingState.Value = LocalUserPlayingStates.NotPlaying;
+
+            localUserPlaying.Value = playingState.Value != LocalUserPlayingStates.NotPlaying;
+            OverlayActivationMode.Value = playingState.Value != LocalUserPlayingStates.NotPlaying ? OverlayActivation.Disabled : OverlayActivation.UserTriggered;
         }
 
         private void updateSampleDisabledState()
@@ -1279,6 +1284,6 @@ namespace osu.Game.Screens.Play
 
         IBindable<bool> ISamplePlaybackDisabler.SamplePlaybackDisabled => samplePlaybackDisabled;
 
-        IBindable<bool> ILocalUserPlayInfo.IsPlaying => LocalUserPlaying;
+        public IBindable<LocalUserPlayingStates> PlayingState => playingState;
     }
 }
