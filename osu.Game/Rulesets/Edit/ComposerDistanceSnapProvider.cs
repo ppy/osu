@@ -74,6 +74,7 @@ namespace osu.Game.Rulesets.Edit
 
             toolboxContainer.Add(toolboxGroup = new EditorToolboxGroup("snapping")
             {
+                Name = "snapping",
                 Alpha = DistanceSpacingMultiplier.Disabled ? 0 : 1,
                 Children = new Drawable[]
                 {
