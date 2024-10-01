@@ -323,7 +323,7 @@ namespace osu.Game.Rulesets.Edit
         /// <remarks>
         /// A "select" tool is automatically added as the first tool.
         /// </remarks>
-        protected abstract IReadOnlyList<HitObjectCompositionTool> CompositionTools { get; }
+        protected abstract IReadOnlyList<CompositionTool> CompositionTools { get; }
 
         /// <summary>
         /// A collection of states which will be displayed to the user in the toolbox.
@@ -466,7 +466,7 @@ namespace osu.Game.Rulesets.Edit
 
         private void setSelectTool() => toolboxCollection.Items.First().Select();
 
-        private void toolSelected(HitObjectCompositionTool tool)
+        private void toolSelected(CompositionTool tool)
         {
             BlueprintContainer.CurrentTool = tool;
 

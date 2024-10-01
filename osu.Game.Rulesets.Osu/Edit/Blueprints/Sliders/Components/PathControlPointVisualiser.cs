@@ -353,6 +353,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         {
             changeHandler?.BeginChange();
 
+            double originalDistance = hitObject.Path.Distance;
+
             foreach (var p in Pieces.Where(p => p.IsSelected.Value))
             {
                 var pointsInSegment = hitObject.Path.PointsInSegment(p.ControlPoint);
@@ -374,6 +376,11 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             }
 
             EnsureValidPathTypes();
+
+            if (hitObject.Path.Distance < originalDistance)
+                hitObject.SnapTo(distanceSnapProvider);
+            else
+                hitObject.Path.ExpectedDistance.Value = originalDistance;
 
             changeHandler?.EndChange();
         }
