@@ -363,7 +363,7 @@ namespace osu.Game.Rulesets.Edit
             if (e.ControlPressed || e.AltPressed || e.SuperPressed)
                 return false;
 
-            if (checkLeftToggleFromKey(e.Key, out int leftIndex))
+            if (checkToolboxMappingFromKey(e.Key, out int leftIndex))
             {
                 var item = toolboxCollection.Items.ElementAtOrDefault(leftIndex);
 
@@ -375,7 +375,7 @@ namespace osu.Game.Rulesets.Edit
                 }
             }
 
-            if (checkRightToggleFromKey(e.Key, out int rightIndex))
+            if (checkToggleMappingFromKey(e.Key, out int rightIndex))
             {
                 var item = e.ShiftPressed
                     ? sampleBankTogglesCollection.ElementAtOrDefault(rightIndex)
@@ -391,7 +391,7 @@ namespace osu.Game.Rulesets.Edit
             return base.OnKeyDown(e);
         }
 
-        private bool checkLeftToggleFromKey(Key key, out int index)
+        private bool checkToolboxMappingFromKey(Key key, out int index)
         {
             if (key < Key.Number1 || key > Key.Number9)
             {
@@ -403,7 +403,7 @@ namespace osu.Game.Rulesets.Edit
             return true;
         }
 
-        private bool checkRightToggleFromKey(Key key, out int index)
+        private bool checkToggleMappingFromKey(Key key, out int index)
         {
             switch (key)
             {
