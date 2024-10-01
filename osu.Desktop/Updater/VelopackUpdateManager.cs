@@ -25,7 +25,7 @@ namespace osu.Desktop.Updater
         [Resolved]
         private ILocalUserPlayInfo? localUserInfo { get; set; }
 
-        private bool isInGameplay => localUserInfo?.PlayingState.Value != LocalUserPlayingStates.NotPlaying;
+        private bool isInGameplay => localUserInfo?.PlayingState.Value != LocalUserPlayingState.NotPlaying;
 
         private UpdateInfo? pendingUpdate;
 

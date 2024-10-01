@@ -17,7 +17,7 @@ namespace osu.Game.Tests.Input
     [HeadlessTest]
     public partial class ConfineMouseTrackerTest : OsuGameTestScene
     {
-        private readonly Bindable<LocalUserPlayingStates> playingState = new Bindable<LocalUserPlayingStates>();
+        private readonly Bindable<LocalUserPlayingState> playingState = new Bindable<LocalUserPlayingState>();
 
         [Resolved]
         private FrameworkConfigManager frameworkConfigManager { get; set; } = null!;
@@ -28,7 +28,7 @@ namespace osu.Game.Tests.Input
             base.SetUpSteps();
 
             // a bit dodgy.
-            AddStep("bind playing state", () => ((IBindable<LocalUserPlayingStates>)playingState).BindTo(((ILocalUserPlayInfo)Game).PlayingState));
+            AddStep("bind playing state", () => ((IBindable<LocalUserPlayingState>)playingState).BindTo(((ILocalUserPlayInfo)Game).PlayingState));
         }
 
         [TestCase(WindowMode.Windowed)]
@@ -101,7 +101,7 @@ namespace osu.Game.Tests.Input
             => AddStep($"set {mode} game-side", () => Game.LocalConfig.SetValue(OsuSetting.ConfineMouseMode, mode));
 
         private void setLocalUserPlayingTo(bool playing)
-            => AddStep($"local user {(playing ? "playing" : "not playing")}", () => playingState.Value = playing ? LocalUserPlayingStates.Playing : LocalUserPlayingStates.NotPlaying);
+            => AddStep($"local user {(playing ? "playing" : "not playing")}", () => playingState.Value = playing ? LocalUserPlayingState.Playing : LocalUserPlayingState.NotPlaying);
 
         private void gameSideModeIs(OsuConfineMouseMode mode)
             => AddAssert($"mode is {mode} game-side", () => Game.LocalConfig.Get<OsuConfineMouseMode>(OsuSetting.ConfineMouseMode) == mode);

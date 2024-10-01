@@ -25,7 +25,7 @@ namespace osu.Game.Input
         private Bindable<bool> frameworkMinimiseOnFocusLossInFullscreen;
 
         private Bindable<OsuConfineMouseMode> osuConfineMode;
-        private IBindable<LocalUserPlayingStates> localUserPlaying;
+        private IBindable<LocalUserPlayingState> localUserPlaying;
 
         [BackgroundDependencyLoader]
         private void load(ILocalUserPlayInfo localUserInfo, FrameworkConfigManager frameworkConfigManager, OsuConfigManager osuConfigManager)
@@ -63,7 +63,7 @@ namespace osu.Game.Input
                     break;
 
                 case OsuConfineMouseMode.DuringGameplay:
-                    frameworkConfineMode.Value = localUserPlaying.Value == LocalUserPlayingStates.Playing ? ConfineMouseMode.Always : ConfineMouseMode.Never;
+                    frameworkConfineMode.Value = localUserPlaying.Value == LocalUserPlayingState.Playing ? ConfineMouseMode.Always : ConfineMouseMode.Never;
                     break;
 
                 case OsuConfineMouseMode.Always:

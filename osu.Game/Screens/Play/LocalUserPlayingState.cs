@@ -3,7 +3,7 @@
 
 namespace osu.Game.Screens.Play
 {
-    public enum LocalUserPlayingStates
+    public enum LocalUserPlayingState
     {
         /// <summary>
         /// The local player is not current in gameplay. If watching a replay, gameplay always remains in this state.

@@ -12,6 +12,6 @@ namespace osu.Game.Screens.Play
         /// <summary>
         /// Whether the local user is currently interacting (playing) with the game in a way that should not be interrupted.
         /// </summary>
-        IBindable<LocalUserPlayingStates> PlayingState { get; }
+        IBindable<LocalUserPlayingState> PlayingState { get; }
     }
 }

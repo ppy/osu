@@ -23,9 +23,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         [CanBeNull]
         private ILocalUserPlayInfo localUserInfo { get; set; }
 
-        private readonly IBindable<LocalUserPlayingStates> localUserPlaying = new Bindable<LocalUserPlayingStates>();
+        private readonly IBindable<LocalUserPlayingState> localUserPlaying = new Bindable<LocalUserPlayingState>();
 
-        public override bool PropagatePositionalInputSubTree => localUserPlaying.Value != LocalUserPlayingStates.Playing;
+        public override bool PropagatePositionalInputSubTree => localUserPlaying.Value != LocalUserPlayingState.Playing;
 
         public Bindable<bool> Expanded = new Bindable<bool>();
 
@@ -67,7 +67,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                 TextBox.HoldFocus = false;
 
                 // only hold focus (after sending a message) during breaks
-                TextBox.ReleaseFocusOnCommit = playing.NewValue == LocalUserPlayingStates.Playing;
+                TextBox.ReleaseFocusOnCommit = playing.NewValue == LocalUserPlayingState.Playing;
             }, true);
 
             Expanded.BindValueChanged(_ => updateExpandedState(), true);
