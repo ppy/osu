@@ -127,6 +127,8 @@ namespace osu.Game.Screens.Select
         private Sample sampleChangeDifficulty = null!;
         private Sample sampleChangeBeatmap = null!;
 
+        private bool pendingFilterApplication;
+
         private Container carouselContainer = null!;
 
         protected BeatmapDetailArea BeatmapDetails { get; private set; } = null!;
@@ -328,7 +330,20 @@ namespace osu.Game.Screens.Select
                 GetRecommendedBeatmap = s => recommender?.GetRecommendedBeatmap(s),
             }, c => carouselContainer.Child = c);
 
-            FilterControl.FilterChanged = Carousel.Filter;
+            FilterControl.FilterChanged = criteria =>
+            {
+                // If a filter operation is applied when we're in a state that doesn't allow selection,
+                // we might end up in an unexpected state. This is because currently carousel panels are in charge
+                // of updating the global selection (which is very hard to deal with).
+                //
+                // For now let's just avoid filtering when selection isn't allowed locally.
+                // This should be nuked from existence when we get around to fixing the complexity of song select <-> beatmap carousel.
+                // The debounce part of BeatmapCarousel's filtering should probably also be removed and handled locally.
+                if (Carousel.AllowSelection)
+                    Carousel.Filter(criteria);
+                else
+                    pendingFilterApplication = true;
+            };
 
             if (ShowSongSelectFooter)
             {
@@ -700,6 +715,12 @@ namespace osu.Game.Screens.Select
             ModSelect.SelectedMods.BindTo(selectedMods);
 
             Carousel.AllowSelection = true;
+
+            if (pendingFilterApplication)
+            {
+                Carousel.Filter(FilterControl.CreateCriteria());
+                pendingFilterApplication = false;
+            }
 
             BeatmapDetails.Refresh();
 

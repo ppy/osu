@@ -45,15 +45,20 @@ namespace osu.Desktop.Updater
 
         private async Task<bool> checkForUpdateAsync(UpdateProgressNotification? notification = null)
         {
-            // should we schedule a retry on completion of this check?
-            bool scheduleRecheck = true;
+            // whether to check again in 30 minutes. generally only if there's an error or no update was found (yet).
+            bool scheduleRecheck = false;
 
             try
             {
                 // Avoid any kind of update checking while gameplay is running.
                 if (localUserInfo?.IsPlaying.Value == true)
+                {
+                    scheduleRecheck = true;
                     return false;
+                }
 
+                // TODO: we should probably be checking if there's a more recent update, rather than shortcutting here.
+                // Velopack does support this scenario (see https://github.com/ppy/osu/pull/28743#discussion_r1743495975).
                 if (pendingUpdate != null)
                 {
                     // If there is an update pending restart, show the notification to restart again.
@@ -61,26 +66,33 @@ namespace osu.Desktop.Updater
                     {
                         Activated = () =>
                         {
-                            restartToApplyUpdate();
+                            Task.Run(restartToApplyUpdate);
                             return true;
                         }
                     });
+
                     return true;
                 }
 
                 pendingUpdate = await updateManager.CheckForUpdatesAsync().ConfigureAwait(false);
 
-                // Handle no updates available.
+                // No update is available. We'll check again later.
                 if (pendingUpdate == null)
+                {
+                    scheduleRecheck = true;
                     return false;
+                }
 
-                scheduleRecheck = false;
-
+                // An update is found, let's notify the user and start downloading it.
                 if (notification == null)
                 {
                     notification = new UpdateProgressNotification
                     {
-                        CompletionClickAction = restartToApplyUpdate,
+                        CompletionClickAction = () =>
+                        {
+                            Task.Run(restartToApplyUpdate);
+                            return true;
+                        },
                     };
 
                     Schedule(() => notificationOverlay.Post(notification));
@@ -97,6 +109,7 @@ namespace osu.Desktop.Updater
                 catch (Exception e)
                 {
                     // In the case of an error, a separate notification will be displayed.
+                    scheduleRecheck = true;
                     notification.FailDownload();
                     Logger.Error(e, @"update failed!");
                 }
@@ -111,7 +124,6 @@ namespace osu.Desktop.Updater
             {
                 if (scheduleRecheck)
                 {
-                    // check again in 30 minutes.
                     Scheduler.AddDelayed(() => Task.Run(async () => await checkForUpdateAsync().ConfigureAwait(false)), 60000 * 30);
                 }
             }
@@ -119,13 +131,10 @@ namespace osu.Desktop.Updater
             return true;
         }
 
-        private bool restartToApplyUpdate()
+        private async Task restartToApplyUpdate()
         {
-            // TODO: Migrate this to async flow whenever available (see https://github.com/ppy/osu/pull/28743#discussion_r1740505665).
-            // Currently there's an internal Thread.Sleep(300) which will cause a stutter when the user clicks to restart.
-            updateManager.WaitExitThenApplyUpdates(pendingUpdate?.TargetFullRelease);
+            await updateManager.WaitExitThenApplyUpdatesAsync(pendingUpdate?.TargetFullRelease).ConfigureAwait(false);
             Schedule(() => game.AttemptExit());
-            return true;
         }
     }
 }

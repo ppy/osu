@@ -195,22 +195,7 @@ namespace osu.Game.Rulesets.Edit
             new TernaryButton(DistanceSnapToggle, "Distance Snap", () => new SpriteIcon { Icon = OsuIcon.EditorDistanceSnap })
         };
 
-        protected override bool OnKeyDown(KeyDownEvent e)
-        {
-            if (e.Repeat)
-                return false;
-
-            handleToggleViaKey(e);
-            return base.OnKeyDown(e);
-        }
-
-        protected override void OnKeyUp(KeyUpEvent e)
-        {
-            handleToggleViaKey(e);
-            base.OnKeyUp(e);
-        }
-
-        private void handleToggleViaKey(KeyboardEvent key)
+        public void HandleToggleViaKey(KeyboardEvent key)
         {
             bool altPressed = key.AltPressed;
 
