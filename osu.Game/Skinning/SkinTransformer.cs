@@ -4,6 +4,7 @@
 using System;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Audio;
@@ -47,6 +48,6 @@ namespace osu.Game.Skinning
             }
         }
 
-        public override string ToString() => $"{nameof(SkinTransformer)} {{ Skin: {Skin} }}";
+        public override string ToString() => $"{GetType().ReadableName()} {{ Skin: {Skin} }}";
     }
 }
