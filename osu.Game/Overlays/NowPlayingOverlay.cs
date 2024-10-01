@@ -164,14 +164,15 @@ namespace osu.Game.Overlays
                                                     Action = () => musicController.NextTrack(),
                                                     Icon = FontAwesome.Solid.StepForward,
                                                 },
-                                                shuffleButton = new MusicIconButton
-                                                {
-                                                    Anchor = Anchor.Centre,
-                                                    Origin = Anchor.Centre,
-                                                    Action = shuffle.Toggle,
-                                                    Icon = FontAwesome.Solid.Random,
-                                                }
                                             }
+                                        },
+                                        shuffleButton = new MusicIconButton
+                                        {
+                                            Anchor = Anchor.CentreLeft,
+                                            Origin = Anchor.Centre,
+                                            Position = new Vector2(bottom_black_area_height / 2, 0),
+                                            Action = shuffle.Toggle,
+                                            Icon = FontAwesome.Solid.Random,
                                         },
                                         playlistButton = new MusicIconButton
                                         {
