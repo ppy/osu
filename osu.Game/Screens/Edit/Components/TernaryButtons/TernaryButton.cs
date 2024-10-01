@@ -19,6 +19,8 @@ namespace osu.Game.Screens.Edit.Components.TernaryButtons
         /// </summary>
         public readonly Func<Drawable>? CreateIcon;
 
+        public string Tooltip { get; set; } = string.Empty;
+
         public TernaryButton(Bindable<TernaryState> bindable, string description, Func<Drawable>? createIcon = null)
         {
             Bindable = bindable;

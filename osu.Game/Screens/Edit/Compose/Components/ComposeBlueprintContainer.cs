@@ -68,6 +68,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
             SampleBankTernaryStates = createSampleBankTernaryButtons(SelectionHandler.SelectionBankStates).ToArray();
             SampleAdditionBankTernaryStates = createSampleBankTernaryButtons(SelectionHandler.SelectionAdditionBankStates).ToArray();
 
+            SelectionHandler.SelectionAdditionBanksEnabled.BindValueChanged(_ => updateTernaryButtonTooltips());
+
             AddInternal(new DrawableRulesetDependenciesProvidingContainer(Composer.Ruleset)
             {
                 Child = placementBlueprintContainer
@@ -286,6 +288,12 @@ namespace osu.Game.Screens.Edit.Compose.Components
             }
 
             return null;
+        }
+
+        private void updateTernaryButtonTooltips()
+        {
+            foreach (var ternaryButton in SampleAdditionBankTernaryStates)
+                ternaryButton.Tooltip = !SelectionHandler.SelectionAdditionBanksEnabled.Value ? "Add an addition sample first to be able to set a bank" : string.Empty;
         }
 
         #region Placement
