@@ -42,7 +42,7 @@ namespace osu.Game.Screens.Play.HUD
 
         private InputManager? inputManager;
 
-        public LocalisableString TooltipText => $"{(relativePositionX > 0 ? Math.Round(EndTime * relativePositionX / DrawWidth, 2) : relativePositionX > DrawWidth ? EndTime : 0).ToEditorFormattedString()}"
+        public LocalisableString TooltipText => $"{(relativePositionX > 0 ? (EndTime - StartTime) * relativePositionX / DrawWidth : relativePositionX > DrawWidth ? EndTime : 0).ToEditorFormattedString()}"
                                                 + $" - {(relativePositionX > 0 ? Math.Round(relativePositionX / DrawWidth * 100, 2) : relativePositionX > DrawWidth ? 100 : 0)}%";
 
         public ArgonSongProgressBar(float barHeight)
