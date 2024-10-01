@@ -11,7 +11,7 @@ using osu.Game.Input.Bindings;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public readonly struct Hotkey
+    public readonly record struct Hotkey
     {
         public KeyCombination[]? KeyCombinations { get; init; }
         public GlobalAction? GlobalAction { get; init; }
