@@ -368,7 +368,7 @@ namespace osu.Game.Overlays.Mods
                 customisationPanel.Enabled.Value = true;
 
                 if (anyModPendingConfiguration)
-                    customisationPanel.ExpandedState.Value = ModCustomisationPanel.ModCustomisationPanelState.Expanded;
+                    customisationPanel.ExpandedState.Value = ModCustomisationPanel.ModCustomisationPanelState.ExpandedByMod;
             }
             else
             {

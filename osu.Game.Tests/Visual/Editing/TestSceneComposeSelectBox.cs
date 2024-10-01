@@ -84,6 +84,7 @@ namespace osu.Game.Tests.Visual.Editing
 
                 targetContainer = getTargetContainer();
                 initialRotation = targetContainer!.Rotation;
+                DefaultOrigin = ToLocalSpace(targetContainer.ToScreenSpace(Vector2.Zero));
 
                 base.Begin();
             }
@@ -134,7 +135,7 @@ namespace osu.Game.Tests.Visual.Editing
                 OriginalSurroundingQuad = new Quad(targetContainer!.X, targetContainer.Y, targetContainer.Width, targetContainer.Height);
             }
 
-            public override void Update(Vector2 scale, Vector2? origin = null, Axes adjustAxis = Axes.Both)
+            public override void Update(Vector2 scale, Vector2? origin = null, Axes adjustAxis = Axes.Both, float axisRotation = 0)
             {
                 if (targetContainer == null)
                     throw new InvalidOperationException($"Cannot {nameof(Update)} a scale operation without calling {nameof(Begin)} first!");

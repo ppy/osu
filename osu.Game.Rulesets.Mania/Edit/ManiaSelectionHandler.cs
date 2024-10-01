@@ -104,8 +104,10 @@ namespace osu.Game.Rulesets.Mania.Edit
             int minColumn = int.MaxValue;
             int maxColumn = int.MinValue;
 
+            var selectedObjects = EditorBeatmap.SelectedHitObjects.OfType<ManiaHitObject>().ToArray();
+
             // find min/max in an initial pass before actually performing the movement.
-            foreach (var obj in EditorBeatmap.SelectedHitObjects.OfType<ManiaHitObject>())
+            foreach (var obj in selectedObjects)
             {
                 if (obj.Column < minColumn)
                     minColumn = obj.Column;
@@ -121,6 +123,13 @@ namespace osu.Game.Rulesets.Mania.Edit
                 ((ManiaHitObject)h).Column += columnDelta;
                 maniaPlayfield.Add(h);
             });
+
+            // `HitObjectUsageEventBuffer`'s usage transferal flows and the playfield's `SetKeepAlive()` functionality do not combine well with this operation's usage pattern,
+            // leading to selections being sometimes partially dropped if some of the objects being moved are off screen
+            // (check blame for detailed explanation).
+            // thus, ensure that selection is preserved manually.
+            EditorBeatmap.SelectedHitObjects.Clear();
+            EditorBeatmap.SelectedHitObjects.AddRange(selectedObjects);
         }
     }
 }

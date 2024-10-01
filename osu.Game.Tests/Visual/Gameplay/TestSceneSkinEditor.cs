@@ -440,8 +440,8 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddStep("import old classic skin", () => skins.CurrentSkinInfo.Value = importedSkin = importSkinFromArchives(@"classic-layout-version-0.osk").SkinInfo);
             AddUntilStep("wait for load", () => globalHUDTarget.ComponentsLoaded && rulesetHUDTarget.ComponentsLoaded);
-            AddAssert("no combo in global target", () => !globalHUDTarget.Components.OfType<LegacyComboCounter>().Any());
-            AddAssert("combo placed in ruleset target", () => rulesetHUDTarget.Components.OfType<LegacyComboCounter>().Count() == 1);
+            AddAssert("no combo in global target", () => !globalHUDTarget.Components.OfType<LegacyDefaultComboCounter>().Any());
+            AddAssert("combo placed in ruleset target", () => rulesetHUDTarget.Components.OfType<LegacyDefaultComboCounter>().Count() == 1);
 
             AddStep("add combo to global target", () => globalHUDTarget.Add(new LegacyDefaultComboCounter
             {
@@ -454,8 +454,8 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("select another skin", () => skins.CurrentSkinInfo.SetDefault());
             AddStep("select skin again", () => skins.CurrentSkinInfo.Value = importedSkin);
             AddUntilStep("wait for load", () => globalHUDTarget.ComponentsLoaded && rulesetHUDTarget.ComponentsLoaded);
-            AddAssert("combo placed in global target", () => globalHUDTarget.Components.OfType<LegacyComboCounter>().Count() == 1);
-            AddAssert("combo placed in ruleset target", () => rulesetHUDTarget.Components.OfType<LegacyComboCounter>().Count() == 1);
+            AddAssert("combo placed in global target", () => globalHUDTarget.Components.OfType<LegacyDefaultComboCounter>().Count() == 1);
+            AddAssert("combo placed in ruleset target", () => rulesetHUDTarget.Components.OfType<LegacyDefaultComboCounter>().Count() == 1);
         }
 
         private Skin importSkinFromArchives(string filename)
