@@ -55,6 +55,16 @@ namespace osu.Game.Screens.Play
             this.createScore = createScore;
         }
 
+        /// <summary>
+        /// Add a settings group to the HUD overlay. Intended to be used by rulesets to add replay-specific settings.
+        /// </summary>
+        /// <param name="settings">The settings group to be shown.</param>
+        public void AddSettings(PlayerSettingsGroup settings) => Schedule(() =>
+        {
+            settings.Expanded.Value = false;
+            HUDOverlay.PlayerSettingsOverlay.Add(settings);
+        });
+
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {

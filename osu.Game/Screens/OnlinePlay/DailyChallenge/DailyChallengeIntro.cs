@@ -70,6 +70,9 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
         [Resolved]
         private MusicController musicController { get; set; } = null!;
 
+        [Resolved]
+        private SessionStatics statics { get; set; } = null!;
+
         private Sample? dateWindupSample;
         private Sample? dateImpactSample;
         private Sample? beatmapWindupSample;
@@ -93,13 +96,14 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
         protected override BackgroundScreen CreateBackground() => new DailyChallengeIntroBackgroundScreen(colourProvider);
 
         [BackgroundDependencyLoader]
-        private void load(BeatmapDifficultyCache difficultyCache, BeatmapModelDownloader beatmapDownloader, OsuConfigManager config, AudioManager audio)
+        private void load(RulesetStore rulesets, BeatmapDifficultyCache difficultyCache, BeatmapModelDownloader beatmapDownloader, OsuConfigManager config, AudioManager audio)
         {
             const float horizontal_info_size = 500f;
 
-            Ruleset ruleset = Ruleset.Value.CreateInstance();
-
             StarRatingDisplay starRatingDisplay;
+
+            IBeatmapInfo beatmap = item.Beatmap;
+            Ruleset ruleset = rulesets.GetRuleset(item.Beatmap.Ruleset.ShortName)!.CreateInstance();
 
             InternalChildren = new Drawable[]
             {
@@ -242,13 +246,13 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
                                                     Origin = Anchor.TopCentre,
                                                     Shear = new Vector2(-OsuGame.SHEAR, 0f),
                                                     MaxWidth = horizontal_info_size,
-                                                    Text = item.Beatmap.BeatmapSet!.Metadata.GetDisplayTitleRomanisable(false),
+                                                    Text = beatmap.BeatmapSet!.Metadata.GetDisplayTitleRomanisable(false),
                                                     Padding = new MarginPadding { Horizontal = 5f },
                                                     Font = OsuFont.GetFont(size: 26),
                                                 },
                                                 new TruncatingSpriteText
                                                 {
-                                                    Text = $"Difficulty: {item.Beatmap.DifficultyName}",
+                                                    Text = $"Difficulty: {beatmap.DifficultyName}",
                                                     Font = OsuFont.GetFont(size: 20, italics: true),
                                                     MaxWidth = horizontal_info_size,
                                                     Shear = new Vector2(-OsuGame.SHEAR, 0f),
@@ -257,7 +261,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
                                                 },
                                                 new TruncatingSpriteText
                                                 {
-                                                    Text = $"by {item.Beatmap.Metadata.Author.Username}",
+                                                    Text = $"by {beatmap.Metadata.Author.Username}",
                                                     Font = OsuFont.GetFont(size: 16, italics: true),
                                                     MaxWidth = horizontal_info_size,
                                                     Shear = new Vector2(-OsuGame.SHEAR, 0f),
@@ -309,14 +313,14 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
                 }
             };
 
-            starDifficulty = difficultyCache.GetBindableDifficulty(item.Beatmap);
+            starDifficulty = difficultyCache.GetBindableDifficulty(beatmap);
             starDifficulty.BindValueChanged(star =>
             {
                 if (star.NewValue != null)
                     starRatingDisplay.Current.Value = star.NewValue.Value;
             }, true);
 
-            LoadComponentAsync(new OnlineBeatmapSetCover(item.Beatmap.BeatmapSet as IBeatmapSetOnlineInfo)
+            LoadComponentAsync(new OnlineBeatmapSetCover(beatmap.BeatmapSet as IBeatmapSetOnlineInfo)
             {
                 RelativeSizeAxes = Axes.Both,
                 Anchor = Anchor.Centre,
@@ -334,8 +338,8 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
 
             if (config.Get<bool>(OsuSetting.AutomaticallyDownloadMissingBeatmaps))
             {
-                if (!beatmapManager.IsAvailableLocally(new BeatmapSetInfo { OnlineID = item.Beatmap.BeatmapSet!.OnlineID }))
-                    beatmapDownloader.Download(item.Beatmap.BeatmapSet!, config.Get<bool>(OsuSetting.PreferNoVideo));
+                if (!beatmapManager.IsAvailableLocally(new BeatmapSetInfo { OnlineID = beatmap.BeatmapSet!.OnlineID }))
+                    beatmapDownloader.Download(beatmap.BeatmapSet!, config.Get<bool>(OsuSetting.PreferNoVideo));
             }
 
             dateWindupSample = audio.Samples.Get(@"DailyChallenge/date-windup");
@@ -461,6 +465,8 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
                         {
                             Schedule(() =>
                             {
+                                statics.SetValue(Static.DailyChallengeIntroPlayed, true);
+
                                 if (this.IsCurrentScreen())
                                     this.Push(new DailyChallenge(room));
                             });

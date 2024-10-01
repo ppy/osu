@@ -135,5 +135,8 @@ jobs:
       - name: Install .NET Workloads
         run: dotnet workload install maui-ios
 
+      - name: Select Xcode 16
+        run: sudo xcode-select -s /Applications/Xcode_16.app/Contents/Developer
+
       - name: Build
         run: dotnet build -c Debug osu.iOS

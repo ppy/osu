@@ -82,6 +82,8 @@ namespace osu.Game.Online.API
 
         public virtual void Queue(APIRequest request)
         {
+            request.AttachAPI(this);
+
             Schedule(() =>
             {
                 if (HandleRequest?.Invoke(request) != true)
@@ -98,10 +100,17 @@ namespace osu.Game.Online.API
             });
         }
 
-        public void Perform(APIRequest request) => HandleRequest?.Invoke(request);
+        void IAPIProvider.Schedule(Action action) => base.Schedule(action);
+
+        public void Perform(APIRequest request)
+        {
+            request.AttachAPI(this);
+            HandleRequest?.Invoke(request);
+        }
 
         public Task PerformAsync(APIRequest request)
         {
+            request.AttachAPI(this);
             HandleRequest?.Invoke(request);
             return Task.CompletedTask;
         }
@@ -154,6 +163,8 @@ namespace osu.Game.Online.API
 
             state.Value = APIState.Connecting;
             LastLoginError = null;
+
+            request.AttachAPI(this);
 
             // if no handler installed / handler can't handle verification, just assume that the server would verify for simplicity.
             if (HandleRequest?.Invoke(request) != true)

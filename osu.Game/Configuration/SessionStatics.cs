@@ -80,5 +80,11 @@ namespace osu.Game.Configuration
         /// Stores the local user's last score (can be completed or aborted).
         /// </summary>
         LastLocalUserScore,
+
+        /// <summary>
+        /// Whether the intro animation for the daily challenge screen has been played once.
+        /// This is reset when a new challenge is up.
+        /// </summary>
+        DailyChallengeIntroPlayed,
     }
 }

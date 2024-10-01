@@ -135,6 +135,11 @@ namespace osu.Game.Online.API
         void UpdateStatistics(UserStatistics newStatistics);
 
         /// <summary>
+        /// Schedule a callback to run on the update thread.
+        /// </summary>
+        internal void Schedule(Action action);
+
+        /// <summary>
         /// Constructs a new <see cref="IHubClientConnector"/>. May be null if not supported.
         /// </summary>
         /// <param name="clientName">The name of the client this connector connects for, used for logging.</param>

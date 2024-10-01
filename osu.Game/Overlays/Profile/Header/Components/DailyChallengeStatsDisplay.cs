@@ -11,9 +11,8 @@ using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Online.API.Requests.Responses;
-using osu.Game.Scoring;
 using osu.Game.Localisation;
+using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Overlays.Profile.Header.Components
 {
@@ -98,7 +97,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
 
         private void updateDisplay()
         {
-            if (User.Value == null || User.Value.Ruleset.OnlineID != 0)
+            if (User.Value == null)
             {
                 Hide();
                 return;
@@ -106,14 +105,18 @@ namespace osu.Game.Overlays.Profile.Header.Components
 
             APIUserDailyChallengeStatistics stats = User.Value.User.DailyChallengeStatistics;
 
+            if (stats.PlayCount == 0)
+            {
+                Hide();
+                return;
+            }
+
             dailyPlayCount.Text = DailyChallengeStatsDisplayStrings.UnitDay(stats.PlayCount.ToLocalisableString("N0"));
-            dailyPlayCount.Colour = colours.ForRankingTier(tierForPlayCount(stats.PlayCount));
+            dailyPlayCount.Colour = colours.ForRankingTier(DailyChallengeStatsTooltip.TierForPlayCount(stats.PlayCount));
 
             TooltipContent = new DailyChallengeTooltipData(colourProvider, stats);
 
             Show();
-
-            static RankingTier tierForPlayCount(int playCount) => DailyChallengeStatsTooltip.TierForDaily(playCount / 3);
         }
 
         public ITooltip<DailyChallengeTooltipData> GetCustomTooltip() => new DailyChallengeStatsTooltip();
