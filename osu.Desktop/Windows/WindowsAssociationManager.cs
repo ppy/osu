@@ -40,10 +40,10 @@ namespace osu.Desktop.Windows
 
         private static readonly FileAssociation[] file_associations =
         {
-            new FileAssociation(@".osz", WindowsAssociationManagerStrings.OsuBeatmap, Icons.Lazer),
-            new FileAssociation(@".olz", WindowsAssociationManagerStrings.OsuBeatmap, Icons.Lazer),
-            new FileAssociation(@".osr", WindowsAssociationManagerStrings.OsuReplay, Icons.Lazer),
-            new FileAssociation(@".osk", WindowsAssociationManagerStrings.OsuSkin, Icons.Lazer),
+            new FileAssociation(@".osz", WindowsAssociationManagerStrings.OsuBeatmap, Icons.Beatmap),
+            new FileAssociation(@".olz", WindowsAssociationManagerStrings.OsuBeatmap, Icons.Beatmap),
+            new FileAssociation(@".osr", WindowsAssociationManagerStrings.OsuReplay, Icons.Beatmap),
+            new FileAssociation(@".osk", WindowsAssociationManagerStrings.OsuSkin, Icons.Beatmap),
         };
 
         private static readonly UriAssociation[] uri_associations =

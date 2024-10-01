@@ -13,7 +13,7 @@ using osuTK.Input;
 
 namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Spinners
 {
-    public partial class SpinnerPlacementBlueprint : PlacementBlueprint
+    public partial class SpinnerPlacementBlueprint : HitObjectPlacementBlueprint
     {
         public new Spinner HitObject => (Spinner)base.HitObject;
 

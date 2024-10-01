@@ -3,6 +3,7 @@
 
 using System;
 using System.IO;
+using System.Runtime.Versioning;
 using osu.Desktop.LegacyIpc;
 using osu.Desktop.Windows;
 using osu.Framework;
@@ -168,12 +169,26 @@ namespace osu.Desktop
 
         private static void setupVelopack()
         {
-            VelopackApp
-                .Build()
-                .WithFirstRun(v =>
-                {
-                    if (OperatingSystem.IsWindows()) WindowsAssociationManager.InstallAssociations();
-                }).Run();
+            if (OsuGameDesktop.IsPackageManaged)
+            {
+                Logger.Log("Updates are being managed by an external provider. Skipping Velopack setup.");
+                return;
+            }
+
+            var app = VelopackApp.Build();
+
+            if (OperatingSystem.IsWindows())
+                configureWindows(app);
+
+            app.Run();
+        }
+
+        [SupportedOSPlatform("windows")]
+        private static void configureWindows(VelopackApp app)
+        {
+            app.WithFirstRun(_ => WindowsAssociationManager.InstallAssociations());
+            app.WithAfterUpdateFastCallback(_ => WindowsAssociationManager.UpdateAssociations());
+            app.WithBeforeUninstallFastCallback(_ => WindowsAssociationManager.UninstallAssociations());
         }
     }
 }

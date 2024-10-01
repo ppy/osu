@@ -181,6 +181,8 @@ namespace osu.Game.Rulesets.Scoring
             }
         }
 
+        public IReadOnlyDictionary<HitResult, int> Statistics => ScoreResultCounts;
+
         private bool beatmapApplied;
 
         protected readonly Dictionary<HitResult, int> ScoreResultCounts = new Dictionary<HitResult, int>();
