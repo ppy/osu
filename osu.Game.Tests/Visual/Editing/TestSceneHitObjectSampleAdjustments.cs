@@ -739,20 +739,37 @@ namespace osu.Game.Tests.Visual.Editing
                 InputManager.ReleaseKey(Key.LShift);
             });
 
-            hitObjectHasSampleBank(0, HitSampleInfo.BANK_SOFT);
+            hitObjectHasSampleNormalBank(0, HitSampleInfo.BANK_SOFT);
             hitObjectHasSamples(0, HitSampleInfo.HIT_NORMAL, HitSampleInfo.HIT_WHISTLE);
-            hitObjectNodeHasSampleBank(0, 0, HitSampleInfo.BANK_SOFT);
+            hitObjectNodeHasSampleNormalBank(0, 0, HitSampleInfo.BANK_SOFT);
             hitObjectNodeHasSamples(0, 0, HitSampleInfo.HIT_NORMAL, HitSampleInfo.HIT_CLAP);
-            hitObjectNodeHasSampleBank(0, 1, HitSampleInfo.BANK_SOFT);
+            hitObjectNodeHasSampleNormalBank(0, 1, HitSampleInfo.BANK_SOFT);
             hitObjectNodeHasSamples(0, 1, HitSampleInfo.HIT_NORMAL, HitSampleInfo.HIT_WHISTLE);
 
             AddStep("unify whistle addition", () => InputManager.Key(Key.W));
 
-            hitObjectHasSampleBank(0, HitSampleInfo.BANK_SOFT);
+            hitObjectHasSampleNormalBank(0, HitSampleInfo.BANK_SOFT);
             hitObjectHasSamples(0, HitSampleInfo.HIT_NORMAL, HitSampleInfo.HIT_WHISTLE);
-            hitObjectNodeHasSampleBank(0, 0, HitSampleInfo.BANK_SOFT);
+            hitObjectNodeHasSampleNormalBank(0, 0, HitSampleInfo.BANK_SOFT);
             hitObjectNodeHasSamples(0, 0, HitSampleInfo.HIT_NORMAL, HitSampleInfo.HIT_CLAP, HitSampleInfo.HIT_WHISTLE);
-            hitObjectNodeHasSampleBank(0, 1, HitSampleInfo.BANK_SOFT);
+            hitObjectNodeHasSampleNormalBank(0, 1, HitSampleInfo.BANK_SOFT);
+            hitObjectNodeHasSamples(0, 1, HitSampleInfo.HIT_NORMAL, HitSampleInfo.HIT_WHISTLE);
+
+            AddStep("set drum addition bank", () =>
+            {
+                InputManager.PressKey(Key.LAlt);
+                InputManager.Key(Key.R);
+                InputManager.ReleaseKey(Key.LAlt);
+            });
+
+            hitObjectHasSampleNormalBank(0, HitSampleInfo.BANK_SOFT);
+            hitObjectHasSampleAdditionBank(0, HitSampleInfo.BANK_DRUM);
+            hitObjectHasSamples(0, HitSampleInfo.HIT_NORMAL, HitSampleInfo.HIT_WHISTLE);
+            hitObjectNodeHasSampleNormalBank(0, 0, HitSampleInfo.BANK_SOFT);
+            hitObjectNodeHasSampleAdditionBank(0, 0, HitSampleInfo.BANK_DRUM);
+            hitObjectNodeHasSamples(0, 0, HitSampleInfo.HIT_NORMAL, HitSampleInfo.HIT_CLAP, HitSampleInfo.HIT_WHISTLE);
+            hitObjectNodeHasSampleNormalBank(0, 1, HitSampleInfo.BANK_SOFT);
+            hitObjectNodeHasSampleAdditionBank(0, 1, HitSampleInfo.BANK_DRUM);
             hitObjectNodeHasSamples(0, 1, HitSampleInfo.HIT_NORMAL, HitSampleInfo.HIT_WHISTLE);
         }
 
