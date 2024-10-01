@@ -6,13 +6,13 @@ using osu.Framework.Localisation;
 
 namespace osu.Game.Rulesets.Edit.Tools
 {
-    public abstract class HitObjectCompositionTool
+    public abstract class CompositionTool
     {
         public readonly string Name;
 
         public LocalisableString TooltipText { get; init; }
 
-        protected HitObjectCompositionTool(string name)
+        protected CompositionTool(string name)
         {
             Name = name;
         }
