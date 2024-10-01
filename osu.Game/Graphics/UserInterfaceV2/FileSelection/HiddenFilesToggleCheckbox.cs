@@ -8,11 +8,11 @@ using osu.Game.Overlays;
 using osuTK;
 using osuTK.Graphics;
 
-namespace osu.Game.Graphics.UserInterfaceV2
+namespace osu.Game.Graphics.UserInterfaceV2.FileSelection
 {
-    internal partial class OsuDirectorySelectorHiddenToggle : OsuCheckbox
+    internal partial class HiddenFilesToggleCheckbox : OsuCheckbox
     {
-        public OsuDirectorySelectorHiddenToggle()
+        public HiddenFilesToggleCheckbox()
         {
             RelativeSizeAxes = Axes.None;
             AutoSizeAxes = Axes.None;

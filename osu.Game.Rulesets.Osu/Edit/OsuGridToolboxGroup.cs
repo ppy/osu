@@ -16,6 +16,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Input.Bindings;
 using osu.Game.Rulesets.Edit;
+using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Components.RadioButtons;
@@ -87,6 +88,7 @@ namespace osu.Game.Rulesets.Osu.Edit
         private ExpandableSlider<float> spacingSlider = null!;
         private ExpandableSlider<float> gridLinesRotationSlider = null!;
         private RoundedButton gridFromPointsButton = null!;
+        private ExpandableButton useSelectedObjectPositionButton = null!;
         private EditorRadioButtonCollection gridTypeButtons = null!;
 
         public event Action? GridFromPointsClicked;
@@ -132,6 +134,19 @@ namespace osu.Game.Rulesets.Osu.Edit
                 {
                     Current = StartPositionY,
                     KeyboardStep = 1,
+                },
+                useSelectedObjectPositionButton = new ExpandableButton
+                {
+                    ExpandedLabelText = "Centre on selected object",
+                    Action = () =>
+                    {
+                        if (editorBeatmap.SelectedHitObjects.Count != 1)
+                            return;
+
+                        StartPosition.Value = ((IHasPosition)editorBeatmap.SelectedHitObjects.Single()).Position;
+                        updateEnabledStates();
+                    },
+                    RelativeSizeAxes = Axes.X,
                 },
                 spacingSlider = new ExpandableSlider<float>
                 {
@@ -225,14 +240,6 @@ namespace osu.Game.Rulesets.Osu.Edit
                 gridLinesRotationSlider.ExpandedLabelText = $"Rotation: {rotation.NewValue:#,0.##}";
             }, true);
 
-            expandingContainer?.Expanded.BindValueChanged(v =>
-            {
-                gridFromPointsButton.FadeTo(v.NewValue ? 1f : 0f, 500, Easing.OutQuint);
-                gridFromPointsButton.BypassAutoSizeAxes = !v.NewValue ? Axes.Y : Axes.None;
-                gridTypeButtons.FadeTo(v.NewValue ? 1f : 0f, 500, Easing.OutQuint);
-                gridTypeButtons.BypassAutoSizeAxes = !v.NewValue ? Axes.Y : Axes.None;
-            }, true);
-
             GridType.BindValueChanged(v =>
             {
                 GridLinesRotation.Disabled = v.NewValue == PositionSnapGridType.Circle;
@@ -252,6 +259,24 @@ namespace osu.Game.Rulesets.Osu.Edit
                         break;
                 }
             }, true);
+
+            editorBeatmap.BeatmapReprocessed += updateEnabledStates;
+            editorBeatmap.SelectedHitObjects.BindCollectionChanged((_, _) => updateEnabledStates());
+            expandingContainer?.Expanded.BindValueChanged(v =>
+            {
+                gridFromPointsButton.FadeTo(v.NewValue ? 1f : 0f, 500, Easing.OutQuint);
+                gridFromPointsButton.BypassAutoSizeAxes = !v.NewValue ? Axes.Y : Axes.None;
+                gridTypeButtons.FadeTo(v.NewValue ? 1f : 0f, 500, Easing.OutQuint);
+                gridTypeButtons.BypassAutoSizeAxes = !v.NewValue ? Axes.Y : Axes.None;
+                updateEnabledStates();
+            }, true);
+        }
+
+        private void updateEnabledStates()
+        {
+            useSelectedObjectPositionButton.Enabled.Value = expandingContainer?.Expanded.Value == true
+                                                            && editorBeatmap.SelectedHitObjects.Count == 1
+                                                            && StartPosition.Value != ((IHasPosition)editorBeatmap.SelectedHitObjects.Single()).Position;
         }
 
         private float normalizeRotation(float rotation, float period)
