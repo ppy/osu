@@ -351,7 +351,9 @@ namespace osu.Game.Overlays
                 playableSet = getNextRandom(1, allowProtectedTracks);
             else
             {
-                playableSet = getBeatmapSets().AsEnumerable().SkipWhile(i => !i.Equals(current?.BeatmapSetInfo) || (i.Protected && !allowProtectedTracks)).ElementAtOrDefault(1)
+                playableSet = getBeatmapSets().AsEnumerable().SkipWhile(i => !i.Equals(current?.BeatmapSetInfo))
+                                              .Where(i => !i.Protected || allowProtectedTracks)
+                                              .ElementAtOrDefault(1)
                               ?? getBeatmapSets().AsEnumerable().FirstOrDefault(i => !i.Protected || allowProtectedTracks);
             }
 
