@@ -390,7 +390,8 @@ namespace osu.Game
             {
                 BeatmapManager.PauseImports = p.NewValue != LocalUserPlayingStates.NotPlaying;
                 SkinManager.PauseImports = p.NewValue != LocalUserPlayingStates.NotPlaying;
-                ScoreManager.PauseImports = p.NewValue != LocalUserPlayingStates.NotPlaying;
+                // For scores, we need to allow imports during "Break" state else local user's scores will never be imported.
+                ScoreManager.PauseImports = p.NewValue == LocalUserPlayingStates.Playing;
             }, true);
 
             IsActive.BindValueChanged(active => updateActiveState(active.NewValue), true);
