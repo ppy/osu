@@ -6,16 +6,21 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Input;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 using osu.Framework.Utils;
+using osu.Game.Extensions;
 using osu.Game.Graphics;
 using osuTK;
 
 namespace osu.Game.Screens.Play.HUD
 {
-    public partial class ArgonSongProgressBar : SongProgressBar
+    public partial class ArgonSongProgressBar : SongProgressBar, IHasTooltip
     {
+
         // Parent will handle restricting the area of valid input.
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
 
@@ -32,6 +37,13 @@ namespace osu.Game.Screens.Play.HUD
         public double Progress { get; set; }
 
         private double trackTime => (EndTime - StartTime) * Progress;
+
+        private float relativePositionX;
+
+        private InputManager? inputManager;
+
+        public LocalisableString TooltipText => $"{(relativePositionX > 0 ? Math.Round(EndTime * relativePositionX / DrawWidth, 2) : relativePositionX > DrawWidth ? EndTime : 0).ToEditorFormattedString()}"
+                                                + $" - {(relativePositionX > 0 ? Math.Round(relativePositionX / DrawWidth * 100, 2) : relativePositionX > DrawWidth ? 100 : 0)}%";
 
         public ArgonSongProgressBar(float barHeight)
         {
@@ -74,6 +86,7 @@ namespace osu.Game.Screens.Play.HUD
         private void load(OsuColour colours)
         {
             catchUpColour = colours.BlueDark;
+            inputManager = GetContainingInputManager();
         }
 
         protected override void LoadComplete()
@@ -101,6 +114,18 @@ namespace osu.Game.Screens.Play.HUD
         protected override void Update()
         {
             base.Update();
+
+            if (inputManager != null)
+            {
+                // Update the cursor position in time
+                var cursorPosition = inputManager.CurrentState.Mouse.Position;
+                relativePositionX = ToLocalSpace(cursorPosition).X;
+            }
+            else
+            {
+                // If null (e.g. before the game starts), try getting the input manager again
+                inputManager = GetContainingInputManager();
+            }
 
             playfieldBar.Length = (float)Interpolation.Lerp(playfieldBar.Length, Progress, Math.Clamp(Time.Elapsed / 40, 0, 1));
             audioBar.Length = (float)Interpolation.Lerp(audioBar.Length, AudioProgress, Math.Clamp(Time.Elapsed / 40, 0, 1));
