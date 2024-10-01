@@ -202,12 +202,6 @@ namespace osu.Game.Rulesets.Osu.Edit
                 gridLinesRotationSlider.ExpandedLabelText = $"Rotation: {rotation.NewValue:#,0.##}";
             }, true);
 
-            expandingContainer?.Expanded.BindValueChanged(v =>
-            {
-                gridTypeButtons.FadeTo(v.NewValue ? 1f : 0f, 500, Easing.OutQuint);
-                gridTypeButtons.BypassAutoSizeAxes = !v.NewValue ? Axes.Y : Axes.None;
-            }, true);
-
             GridType.BindValueChanged(v =>
             {
                 GridLinesRotation.Disabled = v.NewValue == PositionSnapGridType.Circle;
@@ -229,12 +223,20 @@ namespace osu.Game.Rulesets.Osu.Edit
             }, true);
 
             editorBeatmap.BeatmapReprocessed += updateEnabledStates;
-            editorBeatmap.SelectedHitObjects.BindCollectionChanged((_, _) => updateEnabledStates(), true);
+            editorBeatmap.SelectedHitObjects.BindCollectionChanged((_, _) => updateEnabledStates());
+            expandingContainer?.Expanded.BindValueChanged(v =>
+            {
+                gridTypeButtons.FadeTo(v.NewValue ? 1f : 0f, 500, Easing.OutQuint);
+                gridTypeButtons.BypassAutoSizeAxes = !v.NewValue ? Axes.Y : Axes.None;
+                updateEnabledStates();
+            }, true);
         }
 
         private void updateEnabledStates()
         {
-            useSelectedObjectPositionButton.Enabled.Value = editorBeatmap.SelectedHitObjects.Count == 1 && StartPosition.Value != ((IHasPosition)editorBeatmap.SelectedHitObjects.Single()).Position;
+            useSelectedObjectPositionButton.Enabled.Value = expandingContainer?.Expanded.Value == true
+                                                            && editorBeatmap.SelectedHitObjects.Count == 1
+                                                            && StartPosition.Value != ((IHasPosition)editorBeatmap.SelectedHitObjects.Single()).Position;
         }
 
         private void nextGridSize()
