@@ -108,6 +108,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
         }
 
         public bool FilteringActive { get; set; }
-        public LocalisableString TooltipText { get; set; }
+
+        public virtual LocalisableString TooltipText { get; set; }
     }
 }

@@ -12,15 +12,13 @@ using osu.Game.Graphics.UserInterfaceV2;
 
 namespace osu.Game.Overlays.Settings
 {
-    public partial class SettingsButton : RoundedButton, IHasTooltip, IConditionalFilterable
+    public partial class SettingsButton : RoundedButton, IConditionalFilterable
     {
         public SettingsButton()
         {
             RelativeSizeAxes = Axes.X;
             Padding = new MarginPadding { Left = SettingsPanel.CONTENT_MARGINS, Right = SettingsPanel.CONTENT_MARGINS };
         }
-
-        public LocalisableString TooltipText { get; set; }
 
         public IEnumerable<string> Keywords { get; set; } = Array.Empty<string>();
 
