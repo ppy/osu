@@ -25,6 +25,8 @@ namespace osu.Desktop.Updater
         [Resolved]
         private ILocalUserPlayInfo? localUserInfo { get; set; }
 
+        private bool isInGameplay => localUserInfo?.PlayingState.Value != LocalUserPlayingStates.NotPlaying;
+
         private UpdateInfo? pendingUpdate;
 
         public VelopackUpdateManager()
@@ -51,7 +53,7 @@ namespace osu.Desktop.Updater
             try
             {
                 // Avoid any kind of update checking while gameplay is running.
-                if (localUserInfo?.IsPlaying.Value == true)
+                if (isInGameplay)
                 {
                     scheduleRecheck = true;
                     return false;
@@ -61,14 +63,17 @@ namespace osu.Desktop.Updater
                 // Velopack does support this scenario (see https://github.com/ppy/osu/pull/28743#discussion_r1743495975).
                 if (pendingUpdate != null)
                 {
-                    // If there is an update pending restart, show the notification to restart again.
-                    notificationOverlay.Post(new UpdateApplicationCompleteNotification
+                    runOutsideOfGameplay(() =>
                     {
-                        Activated = () =>
+                        // If there is an update pending restart, show the notification to restart again.
+                        notificationOverlay.Post(new UpdateApplicationCompleteNotification
                         {
-                            Task.Run(restartToApplyUpdate);
-                            return true;
-                        }
+                            Activated = () =>
+                            {
+                                Task.Run(restartToApplyUpdate);
+                                return true;
+                            }
+                        });
                     });
 
                     return true;
@@ -104,7 +109,7 @@ namespace osu.Desktop.Updater
                 {
                     await updateManager.DownloadUpdatesAsync(pendingUpdate, p => notification.Progress = p / 100f).ConfigureAwait(false);
 
-                    notification.State = ProgressNotificationState.Completed;
+                    runOutsideOfGameplay(() => notification.State = ProgressNotificationState.Completed);
                 }
                 catch (Exception e)
                 {
@@ -129,6 +134,17 @@ namespace osu.Desktop.Updater
             }
 
             return true;
+        }
+
+        private void runOutsideOfGameplay(Action action)
+        {
+            if (isInGameplay)
+            {
+                Scheduler.AddDelayed(() => runOutsideOfGameplay(action), 1000);
+                return;
+            }
+
+            action();
         }
 
         private async Task restartToApplyUpdate()
