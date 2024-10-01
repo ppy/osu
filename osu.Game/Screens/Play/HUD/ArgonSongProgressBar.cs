@@ -20,7 +20,6 @@ namespace osu.Game.Screens.Play.HUD
 {
     public partial class ArgonSongProgressBar : SongProgressBar, IHasTooltip
     {
-
         // Parent will handle restricting the area of valid input.
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
 
