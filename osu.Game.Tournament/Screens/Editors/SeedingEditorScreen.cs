@@ -221,7 +221,7 @@ namespace osu.Game.Tournament.Screens.Editors
                     [BackgroundDependencyLoader]
                     private void load()
                     {
-                        beatmapId.Value = Model.ID;
+                        beatmapId.Default = beatmapId.Value = Model.ID;
                         beatmapId.BindValueChanged(id =>
                         {
                             Model.ID = id.NewValue ?? 0;
