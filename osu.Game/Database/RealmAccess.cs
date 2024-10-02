@@ -93,8 +93,9 @@ namespace osu.Game.Database
         /// 40   2023-12-21    Add ScoreInfo.Version to keep track of which build scores were set on.
         /// 41   2024-04-17    Add ScoreInfo.TotalScoreWithoutMods for future mod multiplier rebalances.
         /// 42   2024-08-07    Update mania key bindings to reflect changes to ManiaAction
+        /// 43   2024-09-15    Removed several properties from ScoreInfo which did not need to be persisted to realm.
         /// </summary>
-        private const int schema_version = 42;
+        private const int schema_version = 43;
 
         /// <summary>
         /// Lock object which is held during <see cref="BlockAllOperations"/> sections, blocking realm retrieval during blocking periods.

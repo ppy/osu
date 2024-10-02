@@ -27,6 +27,17 @@ namespace osu.Game.Tests.Beatmaps
             BeatmapInfo = baseBeatmap.BeatmapInfo;
             ControlPointInfo = baseBeatmap.ControlPointInfo;
             UnhandledEventLines = baseBeatmap.UnhandledEventLines;
+            AudioLeadIn = baseBeatmap.AudioLeadIn;
+            StackLeniency = baseBeatmap.StackLeniency;
+            SpecialStyle = baseBeatmap.SpecialStyle;
+            LetterboxInBreaks = baseBeatmap.LetterboxInBreaks;
+            WidescreenStoryboard = baseBeatmap.WidescreenStoryboard;
+            EpilepsyWarning = baseBeatmap.EpilepsyWarning;
+            SamplesMatchPlaybackRate = baseBeatmap.SamplesMatchPlaybackRate;
+            DistanceSpacing = baseBeatmap.DistanceSpacing;
+            GridSize = baseBeatmap.GridSize;
+            TimelineZoom = baseBeatmap.TimelineZoom;
+            CountdownOffset = baseBeatmap.CountdownOffset;
 
             if (withHitObjects)
             {

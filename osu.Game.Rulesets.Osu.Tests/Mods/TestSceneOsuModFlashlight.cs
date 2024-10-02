@@ -83,10 +83,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
                             })
                         }
                     },
-                    BeatmapInfo =
-                    {
-                        StackLeniency = 0,
-                    }
+                    StackLeniency = 0,
                 },
                 ReplayFrames = new List<ReplayFrame>
                 {
