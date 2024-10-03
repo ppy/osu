@@ -31,7 +31,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
 
         private readonly IBindable<APIUser> localUser = new Bindable<APIUser>();
 
-        public override LocalisableString TooltipText
+        public new LocalisableString TooltipText
         {
             get
             {
