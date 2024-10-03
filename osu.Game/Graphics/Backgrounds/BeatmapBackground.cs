@@ -133,21 +133,17 @@ namespace osu.Game.Graphics.Backgrounds
                 private float dimLevel;
                 private Color4 dimColour;
 
-                private IShader textureShader;
-
                 public override void ApplyState()
                 {
                     base.ApplyState();
 
                     dimLevel = Source.DimLevel;
                     dimColour = Source.DimColour;
-
-                    textureShader = Source.TextureShader;
                 }
 
                 private IUniformBuffer<BeatmapBackgroundParameters> beatmapBackgroundParametersBuffer;
 
-                private void bindParametersBuffer(IRenderer renderer)
+                protected override void BindUniformResources(IShader shader, IRenderer renderer)
                 {
                     beatmapBackgroundParametersBuffer ??= renderer.CreateUniformBuffer<BeatmapBackgroundParameters>();
 
@@ -157,25 +153,7 @@ namespace osu.Game.Graphics.Backgrounds
                         DimLevel = dimLevel,
                     };
 
-                    textureShader.BindUniformBlock("m_BeatmapBackgroundParameters", beatmapBackgroundParametersBuffer);
-                }
-
-                protected override void Draw(IRenderer renderer)
-                {
-                    bindParametersBuffer(renderer);
-                    base.Draw(renderer);
-                }
-
-                protected override void DrawOpaqueInterior(IRenderer renderer)
-                {
-                    bindParametersBuffer(renderer);
-                    base.DrawOpaqueInterior(renderer);
-                }
-
-                protected override void Dispose(bool isDisposing)
-                {
-                    base.Dispose(isDisposing);
-                    beatmapBackgroundParametersBuffer?.Dispose();
+                    shader.BindUniformBlock("m_BeatmapBackgroundParameters", beatmapBackgroundParametersBuffer);
                 }
 
                 [StructLayout(LayoutKind.Sequential, Pack = 1)]
