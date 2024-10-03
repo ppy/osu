@@ -435,7 +435,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 (Math.Pow(Math.Pow(mechanicalValue, power) + Math.Pow(accuracyValue, power), 1.0 / power)
                 + cognitionValue) * multiplier;
 
-            double result = totalValue > 1000 ? 1 + 0.15625 * (totalValue - 1000) / 1000 : 1;
+            if (totalValue < 1000)
+                return 1;
+
+            double rescaledValue = totalValue / 1000 - 1;
+            double result = 1 + Math.Min(0.14 * Math.Pow(rescaledValue, 0.6), 0.115 * Math.Pow(rescaledValue, 0.3));
             return result;
         }
 
