@@ -77,7 +77,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
                             Child = button = new RoundedButton
                             {
                                 Action = () => Colours.Add(Colour4.White),
-                                Size = new Vector2(70, 25),
+                                Size = new Vector2(70),
                                 Text = "+",
                             }
                         }
@@ -149,10 +149,10 @@ namespace osu.Game.Graphics.UserInterfaceV2
             [BackgroundDependencyLoader]
             private void load()
             {
-                Size = new Vector2(70, 25);
+                Size = new Vector2(70);
 
                 Masking = true;
-                CornerRadius = 12.5f;
+                CornerRadius = 35;
                 Action = this.ShowPopover;
 
                 Children = new Drawable[]
