@@ -43,7 +43,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             effectiveMissCount = calculateEffectiveMissCount(osuAttributes);
 
             double multiplier = PERFORMANCE_BASE_MULTIPLIER;
-            double power = OsuDifficultyCalculator.SUM_POWER;
 
             if (score.Mods.Any(m => m is OsuModNoFail))
                 multiplier *= Math.Max(0.90, 1.0 - 0.02 * effectiveMissCount);
@@ -63,11 +62,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 effectiveMissCount = Math.Min(effectiveMissCount + countOk * okMultiplier + countMeh * mehMultiplier, totalHits);
             }
 
+            double power = OsuDifficultyCalculator.SUM_POWER;
+
             double aimValue = computeAimValue(score, osuAttributes);
             double speedValue = computeSpeedValue(score, osuAttributes);
             double mechanicalValue = Math.Pow(Math.Pow(aimValue, power) + Math.Pow(speedValue, power), 1.0 / power);
-
-            //mechanicalValue *= calculateMechanicalBalancingMultiplier(osuAttributes);
 
             // Cognition
 
@@ -96,6 +95,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double totalValue =
                 (Math.Pow(Math.Pow(mechanicalValue, power) + Math.Pow(accuracyValue, power), 1.0 / power)
                 + cognitionValue) * multiplier;
+
+            double savedEffectiveMissCount = effectiveMissCount;
+            effectiveMissCount = 0;
+            countMiss = 0;
+
+            double balanceAdjustingMultiplier = calculateMechanicalBalancingMultiplier(score, osuAttributes);
+            totalValue *= balanceAdjustingMultiplier;
 
             // Fancy stuff for better visual display of FL pp
 
@@ -389,43 +395,48 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             return Math.Max(countMiss, comboBasedMissCount);
         }
 
-        private double calculateMechanicalBalancingMultiplier(OsuDifficultyAttributes attributes)
+        private double calculateMechanicalBalancingMultiplier(ScoreInfo originalScore, OsuDifficultyAttributes osuAttributes)
         {
-            // Mechanics
-            double aimValue = OsuStrainSkill.DifficultyToPerformance(attributes.AimDifficulty);
-            double speedValue = OsuStrainSkill.DifficultyToPerformance(attributes.SpeedDifficulty);
+            ScoreInfo score = originalScore.DeepClone();
+            score.MaxCombo = scoreMaxCombo;
 
-            double lengthBonus = CalculateDefaultLengthBonus(totalHits);
-            aimValue *= lengthBonus;
-            speedValue *= lengthBonus;
-
+            double multiplier = PERFORMANCE_BASE_MULTIPLIER;
             double power = OsuDifficultyCalculator.SUM_POWER;
+
+            double aimValue = computeAimValue(score, osuAttributes);
+            double speedValue = computeSpeedValue(score, osuAttributes);
             double mechanicalValue = Math.Pow(Math.Pow(aimValue, power) + Math.Pow(speedValue, power), 1.0 / power);
 
-            // Reading
-            double lowARValue = ReadingLowAR.DifficultyToPerformance(attributes.ReadingDifficultyLowAR);
-            double highARValue = OsuStrainSkill.DifficultyToPerformance(attributes.ReadingDifficultyHighAR);
+            // Cognition
+
+            double lowARValue = computeReadingLowARValue(score, osuAttributes);
+            double highARValue = computeReadingHighARValue(score, osuAttributes);
 
             double readingARValue = Math.Pow(Math.Pow(lowARValue, power) + Math.Pow(highARValue, power), 1.0 / power);
 
-            double readingHDValue = ReadingHidden.DifficultyToPerformance(attributes.HiddenDifficulty);
-            readingHDValue *= lengthBonus;
+            double flashlightValue = computeFlashlightValue(score, osuAttributes);
 
-            double cognitionValue = readingARValue + readingHDValue;
+            double readingHDValue = 0;
+            if (score.Mods.Any(h => h is OsuModHidden))
+                readingHDValue = computeReadingHiddenValue(score, osuAttributes);
 
-            // Adjusting
-            double flashlightValue = Flashlight.DifficultyToPerformance(attributes.FlashlightDifficulty);;
-            flashlightValue *= 0.7 + 0.1 * Math.Min(1.0, totalHits / 200.0) +
-                               (totalHits > 200 ? 0.2 * Math.Min(1.0, (totalHits - 200) / 200.0) : 0.0);
+            // Reduce AR reading bonus if FL is present
+            double flPower = OsuDifficultyCalculator.FL_SUM_POWER;
+            double flashlightARValue = score.Mods.Any(h => h is OsuModFlashlight) ?
+                Math.Pow(Math.Pow(flashlightValue, flPower) + Math.Pow(readingARValue, flPower), 1.0 / flPower) : readingARValue;
 
+            double cognitionValue = flashlightARValue + readingHDValue;
             cognitionValue = AdjustCognitionPerformance(cognitionValue, mechanicalValue, flashlightValue);
-            double summedValue = mechanicalValue + cognitionValue;
 
-            const double threshold = 1000;
-            if (summedValue < threshold)
-                return 1;
+            double accuracyValue = computeAccuracyValue(score, osuAttributes);
 
-            return (threshold + (summedValue - threshold) * 1.4) / summedValue;
+            // Add cognition value without LP-sum cuz otherwise it makes balancing harder
+            double totalValue =
+                (Math.Pow(Math.Pow(mechanicalValue, power) + Math.Pow(accuracyValue, power), 1.0 / power)
+                + cognitionValue) * multiplier;
+
+            double result = totalValue > 1000 ? 1 + 0.15625 * (totalValue - 1000) / 1000 : 1;
+            return result;
         }
 
         private double getComboScalingFactor(OsuDifficultyAttributes attributes) => attributes.MaxCombo <= 0 ? 1.0 : Math.Min(Math.Pow(scoreMaxCombo, 0.8) / Math.Pow(attributes.MaxCombo, 0.8), 1.0);

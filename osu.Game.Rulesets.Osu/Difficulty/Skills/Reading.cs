@@ -14,7 +14,6 @@ using osu.Game.Rulesets.Osu.Objects;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 {
-
     public class ReadingLowAR : GraphSkill
     {
         private readonly List<double> difficulties = new List<double>();
