@@ -197,7 +197,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
                 float distanceBetweenStartPositions = (BaseObject.StackedPosition * scalingFactor - lastObject.StackedPosition * scalingFactor).Length;
 
-                if (MinimumJumpDistance < distanceBetweenStartPositions)
+                if (MinimumJumpDistance < distanceBetweenStartPositions && LazyJumpDistance >= distanceBetweenStartPositions)
                 {
                     // MinimumJumpDistance can be sometimes calculated to be ~0 in cases where the player wouldn't move the cursor anywhere and treat the slider as just a normal circle.
                     //
