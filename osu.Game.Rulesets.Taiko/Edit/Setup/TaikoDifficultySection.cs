@@ -67,7 +67,7 @@ namespace osu.Game.Rulesets.Taiko.Edit.Setup
                     },
                     TabbableContentContainer = this,
                 },
-                tickRateSlider = new FormSliderBar<double>()
+                tickRateSlider = new FormSliderBar<double>
                 {
                     Caption = EditorSetupStrings.TickRate,
                     HintText = EditorSetupStrings.TickRateDescription,
