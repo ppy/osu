@@ -395,10 +395,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             return Math.Max(countMiss, comboBasedMissCount);
         }
 
-        private double calculateMechanicalBalancingMultiplier(ScoreInfo originalScore, OsuDifficultyAttributes osuAttributes)
+        private double calculateMechanicalBalancingMultiplier(ScoreInfo score, OsuDifficultyAttributes osuAttributes)
         {
-            ScoreInfo score = originalScore.DeepClone();
-            score.MaxCombo = scoreMaxCombo;
+            scoreMaxCombo = osuAttributes.MaxCombo;
 
             double multiplier = PERFORMANCE_BASE_MULTIPLIER;
             double power = OsuDifficultyCalculator.SUM_POWER;
