@@ -11,6 +11,7 @@ using osu.Framework.Input;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.UserInterfaceV2;
+using osu.Game.Overlays;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Setup;
@@ -20,6 +21,9 @@ namespace osu.Game.Tests.Visual.Editing
 {
     public partial class TestSceneMetadataSection : OsuManualInputManagerTestScene
     {
+        [Cached]
+        private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Aquamarine);
+
         [Cached]
         private EditorBeatmap editorBeatmap = new EditorBeatmap(new Beatmap
         {
@@ -212,7 +216,7 @@ namespace osu.Game.Tests.Visual.Editing
         private void assertRomanisedArtist(string expected, bool editable)
         {
             AddAssert($"romanised artist is {expected}", () => metadataSection.RomanisedArtistTextBox.Current.Value, () => Is.EqualTo(expected));
-            AddAssert($"romanised artist is {(editable ? "" : "not ")}editable", () => metadataSection.RomanisedArtistTextBox.Current.Disabled == !editable);
+            AddAssert($"romanised artist is {(editable ? "" : "not ")}editable", () => metadataSection.RomanisedArtistTextBox.ReadOnly == !editable);
         }
 
         private void assertTitle(string expected)
@@ -221,7 +225,7 @@ namespace osu.Game.Tests.Visual.Editing
         private void assertRomanisedTitle(string expected, bool editable)
         {
             AddAssert($"romanised title is {expected}", () => metadataSection.RomanisedTitleTextBox.Current.Value, () => Is.EqualTo(expected));
-            AddAssert($"romanised title is {(editable ? "" : "not ")}editable", () => metadataSection.RomanisedTitleTextBox.Current.Disabled == !editable);
+            AddAssert($"romanised title is {(editable ? "" : "not ")}editable", () => metadataSection.RomanisedTitleTextBox.ReadOnly == !editable);
         }
 
         private partial class TestMetadataSection : MetadataSection
