@@ -105,6 +105,17 @@ namespace osu.Game.Tests.Visual.UserInterface
                             Caption = "Audio file",
                             PlaceholderText = "Select an audio file",
                         },
+                        new FormColourPalette
+                        {
+                            Caption = "Combo colours",
+                            Colours =
+                            {
+                                Colour4.Red,
+                                Colour4.Green,
+                                Colour4.Blue,
+                                Colour4.Yellow,
+                            }
+                        },
                     },
                 },
             }
