@@ -15,6 +15,10 @@ namespace osu.Game.Screens.Edit.Setup
 {
     public partial class SetupScreen : EditorScreen
     {
+        public const float COLUMN_WIDTH = 450;
+        public const float SPACING = 28;
+        public const float MAX_WIDTH = 2 * COLUMN_WIDTH + SPACING;
+
         public SetupScreen()
             : base(EditorScreenMode.SongSetup)
         {
@@ -22,6 +26,9 @@ namespace osu.Game.Screens.Edit.Setup
 
         [Cached]
         private SetupScreenHeaderBackground background = new SetupScreenHeaderBackground { RelativeSizeAxes = Axes.Both, };
+
+        private OsuScrollContainer scroll = null!;
+        private FillFlowContainer flow = null!;
 
         [BackgroundDependencyLoader]
         private void load(EditorBeatmap beatmap, OverlayColourProvider colourProvider)
@@ -51,37 +58,46 @@ namespace osu.Game.Screens.Edit.Setup
                         },
                         new Drawable[]
                         {
-                            new OsuScrollContainer
+                            scroll = new OsuScrollContainer
                             {
                                 RelativeSizeAxes = Axes.Both,
                                 Padding = new MarginPadding(15),
-                                Child = new FillFlowContainer
+                                Child = flow = new FillFlowContainer
                                 {
                                     RelativeSizeAxes = Axes.X,
                                     AutoSizeAxes = Axes.Y,
                                     Direction = FillDirection.Full,
-                                    Spacing = new Vector2(28),
-                                    Children = new Drawable[]
+                                    Anchor = Anchor.TopCentre,
+                                    Origin = Anchor.TopCentre,
+                                    Spacing = new Vector2(25),
+                                    ChildrenEnumerable = ruleset.CreateEditorSetupSections().Select(section => section.With(s =>
                                     {
-                                        new FillFlowContainer
-                                        {
-                                            Width = 925,
-                                            AutoSizeAxes = Axes.Y,
-                                            Anchor = Anchor.TopCentre,
-                                            Origin = Anchor.TopCentre,
-                                            Spacing = new Vector2(25),
-                                            ChildrenEnumerable = ruleset.CreateEditorSetupSections().Select(section => section.With(s =>
-                                            {
-                                                s.Width = 450;
-                                            })),
-                                        },
-                                    }
+                                        s.Width = 450;
+                                        s.Anchor = Anchor.TopCentre;
+                                        s.Origin = Anchor.TopCentre;
+                                    })),
                                 }
                             }
                         }
                     }
                 }
             };
+        }
+
+        protected override void UpdateAfterChildren()
+        {
+            base.UpdateAfterChildren();
+
+            if (scroll.DrawWidth > MAX_WIDTH)
+            {
+                flow.RelativeSizeAxes = Axes.None;
+                flow.Width = MAX_WIDTH;
+            }
+            else
+            {
+                flow.RelativeSizeAxes = Axes.X;
+                flow.Width = 1;
+            }
         }
 
         public override void OnExiting(ScreenExitEvent e)
