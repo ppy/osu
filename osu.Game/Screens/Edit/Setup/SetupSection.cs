@@ -34,7 +34,6 @@ namespace osu.Game.Screens.Edit.Setup
         [BackgroundDependencyLoader]
         private void load()
         {
-            RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
 
             InternalChild = new FillFlowContainer

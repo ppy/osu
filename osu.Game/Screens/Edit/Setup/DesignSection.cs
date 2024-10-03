@@ -15,7 +15,7 @@ using osu.Game.Localisation;
 
 namespace osu.Game.Screens.Edit.Setup
 {
-    internal partial class DesignSection : SetupSection
+    public partial class DesignSection : SetupSection
     {
         protected FormCheckBox EnableCountdown = null!;
 

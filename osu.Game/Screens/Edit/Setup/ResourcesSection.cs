@@ -13,7 +13,7 @@ using osu.Game.Localisation;
 
 namespace osu.Game.Screens.Edit.Setup
 {
-    internal partial class ResourcesSection : SetupSection
+    public partial class ResourcesSection : SetupSection
     {
         private FormFileSelector audioTrackChooser = null!;
         private FormFileSelector backgroundChooser = null!;

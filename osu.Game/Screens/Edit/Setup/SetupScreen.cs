@@ -65,25 +65,15 @@ namespace osu.Game.Screens.Edit.Setup
                                     {
                                         new FillFlowContainer
                                         {
-                                            Width = 450,
+                                            Width = 925,
                                             AutoSizeAxes = Axes.Y,
                                             Anchor = Anchor.TopCentre,
                                             Origin = Anchor.TopCentre,
                                             Spacing = new Vector2(25),
-                                            Children = new Drawable[]
+                                            ChildrenEnumerable = ruleset.CreateEditorSetupSections().Select(section => section.With(s =>
                                             {
-                                                new ResourcesSection(),
-                                                new MetadataSection(),
-                                            }
-                                        },
-                                        new FillFlowContainer
-                                        {
-                                            Width = 450,
-                                            AutoSizeAxes = Axes.Y,
-                                            Anchor = Anchor.TopCentre,
-                                            Origin = Anchor.TopCentre,
-                                            Spacing = new Vector2(25),
-                                            ChildrenEnumerable = ruleset.CreateEditorSetupSections().Append(new DesignSection()),
+                                                s.Width = 450;
+                                            })),
                                         },
                                     }
                                 }
