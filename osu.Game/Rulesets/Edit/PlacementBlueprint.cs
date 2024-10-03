@@ -71,6 +71,9 @@ namespace osu.Game.Rulesets.Edit
             PlacementActive = PlacementState.Finished;
         }
 
+        /// <summary>
+        /// Determines which objects to snap to for the snap result in <see cref="UpdateTimeAndPosition"/>.
+        /// </summary>
         public virtual SnapType SnapType => SnapType.All;
 
         /// <summary>
