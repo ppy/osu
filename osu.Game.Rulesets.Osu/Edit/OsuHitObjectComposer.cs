@@ -41,7 +41,7 @@ namespace osu.Game.Rulesets.Osu.Edit
         protected override DrawableRuleset<OsuHitObject> CreateDrawableRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod> mods)
             => new DrawableOsuEditorRuleset(ruleset, beatmap, mods);
 
-        protected override IReadOnlyList<HitObjectCompositionTool> CompositionTools => new HitObjectCompositionTool[]
+        protected override IReadOnlyList<CompositionTool> CompositionTools => new CompositionTool[]
         {
             new HitCircleCompositionTool(),
             new SliderCompositionTool(),
@@ -54,24 +54,21 @@ namespace osu.Game.Rulesets.Osu.Edit
 
         protected override IEnumerable<TernaryButton> CreateTernaryButtons()
             => base.CreateTernaryButtons()
-                   .Concat(DistanceSnapProvider.CreateTernaryButtons())
-                   .Concat(new[]
-                   {
-                       new TernaryButton(rectangularGridSnapToggle, "Grid Snap", () => new SpriteIcon { Icon = OsuIcon.EditorGridSnap })
-                   });
+                   .Append(new TernaryButton(rectangularGridSnapToggle, "Grid Snap", () => new SpriteIcon { Icon = OsuIcon.EditorGridSnap }))
+                   .Concat(DistanceSnapProvider.CreateTernaryButtons());
 
         private BindableList<HitObject> selectedHitObjects;
 
         private Bindable<HitObject> placementObject;
 
         [Cached(typeof(IDistanceSnapProvider))]
-        protected readonly OsuDistanceSnapProvider DistanceSnapProvider = new OsuDistanceSnapProvider();
+        public readonly OsuDistanceSnapProvider DistanceSnapProvider = new OsuDistanceSnapProvider();
 
         [Cached]
         protected readonly OsuGridToolboxGroup OsuGridToolboxGroup = new OsuGridToolboxGroup();
 
         [Cached]
-        protected readonly FreehandSliderToolboxGroup FreehandlSliderToolboxGroup = new FreehandSliderToolboxGroup();
+        protected readonly FreehandSliderToolboxGroup FreehandSliderToolboxGroup = new FreehandSliderToolboxGroup();
 
         [BackgroundDependencyLoader]
         private void load()
@@ -109,8 +106,10 @@ namespace osu.Game.Rulesets.Osu.Edit
                     {
                         RotationHandler = BlueprintContainer.SelectionHandler.RotationHandler,
                         ScaleHandler = (OsuSelectionScaleHandler)BlueprintContainer.SelectionHandler.ScaleHandler,
+                        GridToolbox = OsuGridToolboxGroup,
                     },
-                    FreehandlSliderToolboxGroup
+                    new GenerateToolboxGroup(),
+                    FreehandSliderToolboxGroup
                 }
             );
         }
@@ -295,6 +294,12 @@ namespace osu.Game.Rulesets.Osu.Edit
 
                 if (Vector2.Distance(closestSnapPosition, screenSpacePosition) < snapRadius)
                 {
+                    // if the snap target is a stacked object, snap to its unstacked position rather than its stacked position.
+                    // this is intended to make working with stacks easier (because thanks to this, you can drag an object to any
+                    // of the items on the stack to add an object to it, rather than having to drag to the position of the *first* object on it at all times).
+                    if (b.Item is OsuHitObject osuObject && osuObject.StackOffset != Vector2.Zero)
+                        closestSnapPosition = b.ToScreenSpace(b.ToLocalSpace(closestSnapPosition) - osuObject.StackOffset);
+
                     // only return distance portion, since time is not really valid
                     snapResult = new SnapResult(closestSnapPosition, null, playfield);
                     return true;
@@ -364,6 +369,8 @@ namespace osu.Game.Rulesets.Osu.Edit
                 gridSnapMomentary = shiftPressed;
                 rectangularGridSnapToggle.Value = rectangularGridSnapToggle.Value == TernaryState.False ? TernaryState.True : TernaryState.False;
             }
+
+            DistanceSnapProvider.HandleToggleViaKey(key);
         }
 
         private DistanceSnapGrid createDistanceSnapGrid(IEnumerable<HitObject> selectedHitObjects)

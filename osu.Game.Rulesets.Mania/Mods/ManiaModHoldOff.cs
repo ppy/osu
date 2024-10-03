@@ -27,7 +27,7 @@ namespace osu.Game.Rulesets.Mania.Mods
 
         public override ModType Type => ModType.Conversion;
 
-        public override Type[] IncompatibleMods => new[] { typeof(ManiaModInvert) };
+        public override Type[] IncompatibleMods => new[] { typeof(ManiaModInvert), typeof(ManiaModNoRelease) };
 
         public void ApplyToBeatmap(IBeatmap beatmap)
         {

@@ -299,6 +299,14 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             });
             assertControlPointTypeDuringPlacement(0, PathType.BSpline(4));
 
+            AddStep("press alt-2", () =>
+            {
+                InputManager.PressKey(Key.AltLeft);
+                InputManager.Key(Key.Number2);
+                InputManager.ReleaseKey(Key.AltLeft);
+            });
+            assertControlPointTypeDuringPlacement(0, PathType.BEZIER);
+
             AddStep("start new segment via S", () => InputManager.Key(Key.S));
             assertControlPointTypeDuringPlacement(2, PathType.LINEAR);
 
@@ -309,7 +317,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             addClickStep(MouseButton.Right);
 
             assertPlaced(true);
-            assertFinalControlPointType(0, PathType.BSpline(4));
+            assertFinalControlPointType(0, PathType.BEZIER);
             assertFinalControlPointType(2, PathType.PERFECT_CURVE);
         }
 
@@ -506,6 +514,6 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
         private Slider? getSlider() => HitObjectContainer.Count > 0 ? ((DrawableSlider)HitObjectContainer[0]).HitObject : null;
 
         protected override DrawableHitObject CreateHitObject(HitObject hitObject) => new DrawableSlider((Slider)hitObject);
-        protected override PlacementBlueprint CreateBlueprint() => new SliderPlacementBlueprint();
+        protected override HitObjectPlacementBlueprint CreateBlueprint() => new SliderPlacementBlueprint();
     }
 }

@@ -60,7 +60,7 @@ namespace osu.Game.Online.Chat
                     },
                     new PopupDialogCancelButton
                     {
-                        Text = @"Copy URL to the clipboard",
+                        Text = @"Copy link",
                         Action = copyExternalLinkAction
                     },
                     new PopupDialogCancelButton
