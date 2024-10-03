@@ -439,8 +439,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 return 1;
 
             double rescaledValue = totalValue / 1000 - 1;
-            double result = 1 + Math.Min(0.14 * Math.Pow(rescaledValue, 0.6), 0.115 * Math.Pow(rescaledValue, 0.3));
-            return result;
+            double result = Math.Min(0.1 * Math.Pow(rescaledValue, 0.6), 0.11 * Math.Pow(rescaledValue, 0.3));
+            result *= Math.Min(rescaledValue, 0.2) / 0.2; // Smoother curve
+            return 1 + result;
         }
 
         private double getComboScalingFactor(OsuDifficultyAttributes attributes) => attributes.MaxCombo <= 0 ? 1.0 : Math.Min(Math.Pow(scoreMaxCombo, 0.8) / Math.Pow(attributes.MaxCombo, 0.8), 1.0);
