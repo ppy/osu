@@ -28,7 +28,7 @@ namespace osu.Game.Screens.OnlinePlay.Components
         private void updateState() =>
             base.Enabled.Value = availability.Value.State == DownloadState.LocallyAvailable && Enabled.Value;
 
-        public override LocalisableString TooltipText
+        public new virtual LocalisableString TooltipText
         {
             get
             {
