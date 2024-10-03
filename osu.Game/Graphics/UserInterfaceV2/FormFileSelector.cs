@@ -154,6 +154,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
                 updateState();
                 onFileSelected();
             }, true);
+            FinishTransforms(true);
             game.RegisterImportHandler(this);
         }
 
