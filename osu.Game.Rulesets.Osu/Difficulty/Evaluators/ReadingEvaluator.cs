@@ -18,7 +18,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
         private const double overlap_multiplier = 1;
 
-        public static double EvaluateDensityOf(DifficultyHitObject current, bool applyDistanceNerf = true, bool applySliderbodyDensity = true)
+        public static double EvaluateDensityOf(DifficultyHitObject current, bool applyDistanceNerf = true, bool applySliderbodyDensity = true, double angleNerfMultiplier = 1.0)
         {
             var currObj = (OsuDifficultyHitObject)current;
 
@@ -85,12 +85,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 density += loopDifficulty;
 
                 // Angles nerf
-                double currAngleNerf = (loopObj.AnglePredictability / 2) + 0.5;
+                double angleNerf = (loopObj.AnglePredictability / 2) + 0.5;
 
-                // Apply the nerf only when it's repeated
-                double angleNerf = currAngleNerf;
-
-                densityAnglesNerf += angleNerf * loopDifficulty;
+                densityAnglesNerf += angleNerf * loopDifficulty * angleNerfMultiplier;
 
                 prevObj0 = loopObj;
             }
@@ -184,9 +181,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
         public static double EvaluateAimingDensityFactorOf(DifficultyHitObject current)
         {
-            double difficulty = EvaluateDensityOf(current, true, false);
+            double difficulty = EvaluateDensityOf(current, true, false, 0.5);
 
-            return Math.Max(0, Math.Pow(difficulty, 1.5) - 1);
+            return Math.Max(0, Math.Pow(difficulty, 1.37) - 1);
         }
 
         // Returns value from 0 to 1, where 0 is very predictable and 1 is very unpredictable
