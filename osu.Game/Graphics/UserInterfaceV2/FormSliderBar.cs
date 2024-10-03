@@ -107,7 +107,12 @@ namespace osu.Game.Graphics.UserInterfaceV2
                 new Container
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Padding = new MarginPadding(9),
+                    Padding = new MarginPadding
+                    {
+                        Vertical = 9,
+                        Left = 9,
+                        Right = 5,
+                    },
                     Children = new Drawable[]
                     {
                         caption = new FormFieldCaption

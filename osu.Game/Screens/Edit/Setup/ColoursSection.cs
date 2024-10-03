@@ -13,18 +13,16 @@ namespace osu.Game.Screens.Edit.Setup
     {
         public override LocalisableString Title => EditorSetupStrings.ColoursHeader;
 
-        private LabelledColourPalette comboColours = null!;
+        private FormColourPalette comboColours = null!;
 
         [BackgroundDependencyLoader]
         private void load()
         {
             Children = new Drawable[]
             {
-                comboColours = new LabelledColourPalette
+                comboColours = new FormColourPalette
                 {
-                    Label = EditorSetupStrings.HitCircleSliderCombos,
-                    FixedLabelWidth = LABEL_WIDTH,
-                    ColourNamePrefix = EditorSetupStrings.ComboColourPrefix
+                    Caption = EditorSetupStrings.HitCircleSliderCombos,
                 }
             };
 
