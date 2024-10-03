@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Catch.Beatmaps;
 using osu.Game.Rulesets.Catch.Difficulty.Preprocessing;
@@ -20,7 +19,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 {
     public class CatchDifficultyCalculator : DifficultyCalculator
     {
-        private const double star_scaling_factor = 0.153;
+        private const double difficulty_multiplier = 4.59;
 
         private float halfCatcherWidth;
 
@@ -41,10 +40,10 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 
             CatchDifficultyAttributes attributes = new CatchDifficultyAttributes
             {
-                StarRating = Math.Sqrt(skills[0].DifficultyValue()) * star_scaling_factor,
+                StarRating = Math.Sqrt(skills[0].DifficultyValue()) * difficulty_multiplier,
                 Mods = mods,
                 ApproachRate = preempt > 1200.0 ? -(preempt - 1800.0) / 120.0 : -(preempt - 1200.0) / 150.0 + 5.0,
-                MaxCombo = beatmap.HitObjects.Count(h => h is Fruit) + beatmap.HitObjects.OfType<JuiceStream>().SelectMany(j => j.NestedHitObjects).Count(h => !(h is TinyDroplet)),
+                MaxCombo = beatmap.GetMaxCombo(),
             };
 
             return attributes;

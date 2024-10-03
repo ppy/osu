@@ -40,6 +40,7 @@ namespace osu.Game.Screens.Select
             {
                 case "star":
                 case "stars":
+                case "sr":
                     return TryUpdateCriteriaRange(ref criteria.StarDifficulty, op, value, 0.01d / 2);
 
                 case "ar":
@@ -61,9 +62,30 @@ namespace osu.Game.Screens.Select
                 case "length":
                     return tryUpdateLengthRange(criteria, op, value);
 
-                case "played":
                 case "lastplayed":
                     return tryUpdateDateAgoRange(ref criteria.LastPlayed, op, value);
+
+                case "played":
+                    if (!tryParseBool(value, out bool played))
+                        return false;
+
+                    // Unplayed beatmaps are filtered on DateTimeOffset.MinValue.
+
+                    if (played)
+                    {
+                        criteria.LastPlayed.Min = DateTimeOffset.MinValue;
+                        criteria.LastPlayed.Max = DateTimeOffset.MaxValue;
+                        criteria.LastPlayed.IsLowerInclusive = false;
+                    }
+                    else
+                    {
+                        criteria.LastPlayed.Min = DateTimeOffset.MinValue;
+                        criteria.LastPlayed.Max = DateTimeOffset.MinValue;
+                        criteria.LastPlayed.IsLowerInclusive = true;
+                        criteria.LastPlayed.IsUpperInclusive = true;
+                    }
+
+                    return true;
 
                 case "divisor":
                     return TryUpdateCriteriaRange(ref criteria.BeatDivisor, op, value, tryParseInt);
@@ -131,6 +153,25 @@ namespace osu.Game.Screens.Select
 
         private static bool tryParseInt(string value, out int result) =>
             int.TryParse(value, NumberStyles.None, CultureInfo.InvariantCulture, out result);
+
+        private static bool tryParseBool(string value, out bool result)
+        {
+            switch (value)
+            {
+                case "1":
+                case "yes":
+                    result = true;
+                    return true;
+
+                case "0":
+                case "no":
+                    result = false;
+                    return true;
+
+                default:
+                    return bool.TryParse(value, out result);
+            }
+        }
 
         private static bool tryParseEnum<TEnum>(string value, out TEnum result) where TEnum : struct
         {

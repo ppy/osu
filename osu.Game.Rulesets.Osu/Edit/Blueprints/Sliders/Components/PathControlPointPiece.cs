@@ -8,9 +8,9 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Game.Graphics;
@@ -40,7 +40,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         public readonly PathControlPoint ControlPoint;
 
         private readonly T hitObject;
-        private readonly Container marker;
+        private readonly FastCircle circle;
         private readonly Drawable markerRing;
 
         [Resolved]
@@ -60,38 +60,22 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             Origin = Anchor.Centre;
             AutoSizeAxes = Axes.Both;
 
-            InternalChildren = new Drawable[]
+            InternalChildren = new[]
             {
-                marker = new Container
+                circle = new FastCircle
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    AutoSizeAxes = Axes.Both,
-                    Children = new[]
-                    {
-                        new Circle
-                        {
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                            Size = new Vector2(20),
-                        },
-                        markerRing = new CircularContainer
-                        {
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                            Size = new Vector2(28),
-                            Masking = true,
-                            BorderThickness = 2,
-                            BorderColour = Color4.White,
-                            Alpha = 0,
-                            Child = new Box
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                Alpha = 0,
-                                AlwaysPresent = true
-                            }
-                        }
-                    }
+                    Size = new Vector2(20),
+                },
+                markerRing = new CircularProgress
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Size = new Vector2(28),
+                    Alpha = 0,
+                    InnerRadius = 0.1f,
+                    Progress = 1
                 }
             };
         }
@@ -115,7 +99,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         }
 
         // The connecting path is excluded from positional input
-        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => marker.ReceivePositionalInputAt(screenSpacePos);
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => circle.ReceivePositionalInputAt(screenSpacePos);
 
         protected override bool OnHover(HoverEvent e)
         {
@@ -209,8 +193,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             if (IsHovered || IsSelected.Value)
                 colour = colour.Lighten(1);
 
-            marker.Colour = colour;
-            marker.Scale = new Vector2(hitObject.Scale);
+            Colour = colour;
+            Scale = new Vector2(hitObject.Scale);
         }
 
         private Color4 getColourFromNodeType()

@@ -13,14 +13,25 @@ namespace osu.Game.Screens.Edit.Compose.Components
     public partial class SelectionRotationHandler : Component
     {
         /// <summary>
+        /// Whether there is any ongoing rotation operation right now.
+        /// </summary>
+        public Bindable<bool> OperationInProgress { get; private set; } = new BindableBool();
+
+        /// <summary>
         /// Whether rotation anchored by the selection origin can currently be performed.
         /// </summary>
-        public Bindable<bool> CanRotateSelectionOrigin { get; private set; } = new BindableBool();
+        public Bindable<bool> CanRotateAroundSelectionOrigin { get; private set; } = new BindableBool();
 
         /// <summary>
         /// Whether rotation anchored by the center of the playfield can currently be performed.
         /// </summary>
-        public Bindable<bool> CanRotatePlayfieldOrigin { get; private set; } = new BindableBool();
+        public Bindable<bool> CanRotateAroundPlayfieldOrigin { get; private set; } = new BindableBool();
+
+        /// <summary>
+        /// Implementation-defined origin point to rotate around when no explicit origin is provided.
+        /// This field is only assigned during a rotation operation.
+        /// </summary>
+        public Vector2? DefaultOrigin { get; protected set; }
 
         /// <summary>
         /// Performs a single, instant, atomic rotation operation.
@@ -50,6 +61,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// </remarks>
         public virtual void Begin()
         {
+            OperationInProgress.Value = true;
         }
 
         /// <summary>
@@ -85,6 +97,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// </remarks>
         public virtual void Commit()
         {
+            OperationInProgress.Value = false;
         }
     }
 }

@@ -39,6 +39,8 @@ namespace osu.Game.Online.API
 
         public string AccessToken => "token";
 
+        public Guid SessionIdentifier { get; } = Guid.NewGuid();
+
         /// <seealso cref="APIAccess.IsLoggedIn"/>
         public bool IsLoggedIn => State.Value > APIState.Offline;
 
@@ -80,19 +82,35 @@ namespace osu.Game.Online.API
 
         public virtual void Queue(APIRequest request)
         {
+            request.AttachAPI(this);
+
             Schedule(() =>
             {
                 if (HandleRequest?.Invoke(request) != true)
                 {
+                    // Noisy so let's silently allow these to succeed.
+                    if (request is ChatAckRequest ack)
+                    {
+                        ack.TriggerSuccess(new ChatAckResponse());
+                        return;
+                    }
+
                     request.Fail(new InvalidOperationException($@"{nameof(DummyAPIAccess)} cannot process this request."));
                 }
             });
         }
 
-        public void Perform(APIRequest request) => HandleRequest?.Invoke(request);
+        void IAPIProvider.Schedule(Action action) => base.Schedule(action);
+
+        public void Perform(APIRequest request)
+        {
+            request.AttachAPI(this);
+            HandleRequest?.Invoke(request);
+        }
 
         public Task PerformAsync(APIRequest request)
         {
+            request.AttachAPI(this);
             HandleRequest?.Invoke(request);
             return Task.CompletedTask;
         }
@@ -145,6 +163,8 @@ namespace osu.Game.Online.API
 
             state.Value = APIState.Connecting;
             LastLoginError = null;
+
+            request.AttachAPI(this);
 
             // if no handler installed / handler can't handle verification, just assume that the server would verify for simplicity.
             if (HandleRequest?.Invoke(request) != true)

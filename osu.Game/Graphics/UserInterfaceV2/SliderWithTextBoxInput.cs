@@ -85,7 +85,9 @@ namespace osu.Game.Graphics.UserInterfaceV2
             Current.BindValueChanged(updateTextBoxFromSlider, true);
         }
 
-        public bool TakeFocus() => GetContainingInputManager().ChangeFocus(textBox);
+        public bool TakeFocus() => GetContainingFocusManager()?.ChangeFocus(textBox) == true;
+
+        public bool SelectAll() => textBox.SelectAll();
 
         private bool updatingFromTextBox;
 

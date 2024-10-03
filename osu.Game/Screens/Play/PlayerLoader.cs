@@ -113,7 +113,7 @@ namespace osu.Game.Screens.Play
             // not ready if the user is hovering one of the panes (logo is excluded), unless they are idle.
             (IsHovered || osuLogo?.IsHovered == true || idleTracker.IsIdle.Value)
             // not ready if the user is dragging a slider or otherwise.
-            && inputManager.DraggedDrawable == null
+            && (inputManager.DraggedDrawable == null || inputManager.DraggedDrawable is OsuLogo)
             // not ready if a focused overlay is visible, like settings.
             && inputManager.FocusedDrawable == null;
 
@@ -249,7 +249,7 @@ namespace osu.Game.Screens.Play
         {
             base.LoadComplete();
 
-            inputManager = GetContainingInputManager();
+            inputManager = GetContainingInputManager()!;
 
             showStoryboards.BindValueChanged(val => epilepsyWarning?.FadeTo(val.NewValue ? 1 : 0, 250, Easing.OutQuint), true);
             epilepsyWarning?.FinishTransforms(true);
@@ -573,6 +573,9 @@ namespace osu.Game.Screens.Play
                 // if the player never got pushed, we should explicitly dispose it.
                 DisposalTask = LoadTask?.ContinueWith(_ => CurrentPlayer?.Dispose());
             }
+
+            highPerformanceSession?.Dispose();
+            highPerformanceSession = null;
         }
 
         #endregion

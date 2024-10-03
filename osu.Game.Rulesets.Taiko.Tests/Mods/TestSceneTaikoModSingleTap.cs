@@ -177,7 +177,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Mods
             Autoplay = false,
             Beatmap = new Beatmap
             {
-                Breaks = new List<BreakPeriod>
+                Breaks =
                 {
                     new BreakPeriod(100, 1600),
                 },

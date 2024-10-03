@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Localisation;
@@ -26,12 +27,12 @@ namespace osu.Game.Overlays.Comments
         protected override LocalisableString GetButtonText(bool isLoggedIn) =>
             isLoggedIn ? CommonStrings.ButtonsReply : CommentsStrings.GuestButtonReply;
 
-        protected override LocalisableString GetPlaceholderText(bool isLoggedIn) =>
-            isLoggedIn ? CommentsStrings.PlaceholderReply : AuthorizationStrings.RequireLogin;
+        protected override LocalisableString GetPlaceholderText() => CommentsStrings.PlaceholderReply;
 
-        public ReplyCommentEditor(Comment parent)
+        public ReplyCommentEditor(Comment parent, IEnumerable<CommentableMeta> meta)
         {
             parentComment = parent;
+            CommentableMeta.Value = meta.SingleOrDefault(m => m.Id == parent.CommentableId && m.Type == parent.CommentableType);
         }
 
         protected override void LoadComplete()
@@ -39,7 +40,7 @@ namespace osu.Game.Overlays.Comments
             base.LoadComplete();
 
             if (!TextBox.ReadOnly)
-                GetContainingInputManager().ChangeFocus(TextBox);
+                GetContainingFocusManager()!.ChangeFocus(TextBox);
         }
 
         protected override void OnCommit(string text)

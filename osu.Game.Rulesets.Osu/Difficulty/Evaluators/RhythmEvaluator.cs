@@ -36,11 +36,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             while (rhythmStart < historicalNoteCount - 2 && current.StartTime - current.Previous(rhythmStart).StartTime < history_time_max)
                 rhythmStart++;
 
+            OsuDifficultyHitObject prevObj = (OsuDifficultyHitObject)current.Previous(rhythmStart);
+            OsuDifficultyHitObject lastObj = (OsuDifficultyHitObject)current.Previous(rhythmStart + 1);
+
             for (int i = rhythmStart; i > 0; i--)
             {
                 OsuDifficultyHitObject currObj = (OsuDifficultyHitObject)current.Previous(i - 1);
-                OsuDifficultyHitObject prevObj = (OsuDifficultyHitObject)current.Previous(i);
-                OsuDifficultyHitObject lastObj = (OsuDifficultyHitObject)current.Previous(i + 1);
 
                 double currHistoricalDecay = (history_time_max - (current.StartTime - currObj.StartTime)) / history_time_max; // scales note 0 to 1 from history to now
 
@@ -66,10 +67,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                     }
                     else
                     {
-                        if (current.Previous(i - 1).BaseObject is Slider) // bpm change is into slider, this is easy acc window
+                        if (currObj.BaseObject is Slider) // bpm change is into slider, this is easy acc window
                             effectiveRatio *= 0.125;
 
-                        if (current.Previous(i).BaseObject is Slider) // bpm change was from a slider, this is easier typically than circle -> circle
+                        if (prevObj.BaseObject is Slider) // bpm change was from a slider, this is easier typically than circle -> circle
                             effectiveRatio *= 0.25;
 
                         if (previousIslandSize == islandSize) // repeated island size (ex: triplet -> triplet)
@@ -100,6 +101,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                     startRatio = effectiveRatio;
                     islandSize = 1;
                 }
+
+                lastObj = prevObj;
+                prevObj = currObj;
             }
 
             return Math.Sqrt(4 + rhythmComplexitySum * rhythm_multiplier) / 2; //produces multiplier that can be applied to strain. range [1, infinity) (not really though)
