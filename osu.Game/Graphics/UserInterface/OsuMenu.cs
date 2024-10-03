@@ -3,6 +3,7 @@
 
 #nullable disable
 
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
@@ -40,6 +41,16 @@ namespace osu.Game.Graphics.UserInterface
         {
             sampleOpen = audio.Samples.Get(@"UI/dropdown-open");
             sampleClose = audio.Samples.Get(@"UI/dropdown-close");
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            bool showCheckboxes = Items.Any(i => i is StatefulMenuItem);
+
+            foreach (var drawableItem in ItemsContainer.OfType<DrawableOsuMenuItem>())
+                drawableItem.ShowCheckbox.Value = showCheckboxes;
         }
 
         protected override void AnimateOpen()
