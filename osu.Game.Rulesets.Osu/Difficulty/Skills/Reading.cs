@@ -166,17 +166,22 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             CurrentSectionPeak = Math.Max(mergedDifficulty, CurrentSectionPeak);
         }
+
+        // Coefs for curve similar to difficulty to performance curve
+        private static double power => 3.0369;
+        private static double multiplier => 3.69656;
+
+        public static double DifficultyToPerformance(double difficulty) => Math.Pow(difficulty, power) * multiplier;
+        private static double performanceToDifficulty(double performance) => Math.Pow(performance / multiplier, 1.0 / power);
+
         public override double DifficultyValue()
         {
-            // Coefs for curve similar to difficulty to performance curve
-            const double power = 3.0369, multiplier = 3.69656;
-
             // Simulating summing to get the most correct value possible
             double aimValue = Math.Sqrt(aimComponent.DifficultyValue()) * OsuDifficultyCalculator.DIFFICULTY_MULTIPLIER;
             double speedValue = Math.Sqrt(speedComponent.DifficultyValue()) * OsuDifficultyCalculator.DIFFICULTY_MULTIPLIER;
 
-            double aimPerformance = Math.Pow(aimValue, power) * multiplier;
-            double speedPerformance = Math.Pow(speedValue, power) * multiplier;
+            double aimPerformance = DifficultyToPerformance(aimValue);
+            double speedPerformance = DifficultyToPerformance(speedValue);
 
             double sumPower = OsuDifficultyCalculator.SUM_POWER;
             double totalPerformance = Math.Pow(Math.Pow(aimPerformance, sumPower) + Math.Pow(speedPerformance, sumPower), 1.0 / sumPower);
@@ -197,7 +202,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             totalPerformance *= Math.Pow(lengthBonus, lengthBonusPower);
 
-            double adjustedDifficulty = Math.Pow(totalPerformance / multiplier, 1.0 / power);
+            double adjustedDifficulty = performanceToDifficulty(totalPerformance);
             double difficultyValue = Math.Pow(adjustedDifficulty / OsuDifficultyCalculator.DIFFICULTY_MULTIPLIER, 2.0);
 
             // Sqrt value to make difficulty depend less on mechanical difficulty

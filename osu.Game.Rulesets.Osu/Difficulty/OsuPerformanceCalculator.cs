@@ -67,7 +67,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double speedValue = computeSpeedValue(score, osuAttributes);
             double mechanicalValue = Math.Pow(Math.Pow(aimValue, power) + Math.Pow(speedValue, power), 1.0 / power);
 
-            mechanicalValue *= calculateMechanicalBalancingMultiplier(osuAttributes);
+            //mechanicalValue *= calculateMechanicalBalancingMultiplier(osuAttributes);
 
             // Cognition
 
@@ -275,16 +275,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             return flashlightValue;
         }
 
-        public static double ComputePerfectFlashlightValue(double flashlightDifficulty, int objectsCount)
-        {
-            double flashlightValue = Flashlight.DifficultyToPerformance(flashlightDifficulty);
-
-            flashlightValue *= 0.7 + 0.1 * Math.Min(1.0, objectsCount / 200.0) +
-                               (objectsCount > 200 ? 0.2 * Math.Min(1.0, (objectsCount - 200) / 200.0) : 0.0);
-
-            return flashlightValue;
-        }
-
         private double computeReadingLowARValue(ScoreInfo score, OsuDifficultyAttributes attributes)
         {
             double readingValue = ReadingLowAR.DifficultyToPerformance(attributes.ReadingDifficultyLowAR);
@@ -401,6 +391,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         private double calculateMechanicalBalancingMultiplier(OsuDifficultyAttributes attributes)
         {
+            // Mechanics
             double aimValue = OsuStrainSkill.DifficultyToPerformance(attributes.AimDifficulty);
             double speedValue = OsuStrainSkill.DifficultyToPerformance(attributes.SpeedDifficulty);
 
@@ -409,9 +400,28 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             speedValue *= lengthBonus;
 
             double power = OsuDifficultyCalculator.SUM_POWER;
-            double summedValue = Math.Pow(Math.Pow(aimValue, power) + Math.Pow(speedValue, power), 1.0 / power);
+            double mechanicalValue = Math.Pow(Math.Pow(aimValue, power) + Math.Pow(speedValue, power), 1.0 / power);
 
-            const double threshold = 800;
+            // Reading
+            double lowARValue = ReadingLowAR.DifficultyToPerformance(attributes.ReadingDifficultyLowAR);
+            double highARValue = OsuStrainSkill.DifficultyToPerformance(attributes.ReadingDifficultyHighAR);
+
+            double readingARValue = Math.Pow(Math.Pow(lowARValue, power) + Math.Pow(highARValue, power), 1.0 / power);
+
+            double readingHDValue = ReadingHidden.DifficultyToPerformance(attributes.HiddenDifficulty);
+            readingHDValue *= lengthBonus;
+
+            double cognitionValue = readingARValue + readingHDValue;
+
+            // Adjusting
+            double flashlightValue = Flashlight.DifficultyToPerformance(attributes.FlashlightDifficulty);;
+            flashlightValue *= 0.7 + 0.1 * Math.Min(1.0, totalHits / 200.0) +
+                               (totalHits > 200 ? 0.2 * Math.Min(1.0, (totalHits - 200) / 200.0) : 0.0);
+
+            cognitionValue = AdjustCognitionPerformance(cognitionValue, mechanicalValue, flashlightValue);
+            double summedValue = mechanicalValue + cognitionValue;
+
+            const double threshold = 1000;
             if (summedValue < threshold)
                 return 1;
 

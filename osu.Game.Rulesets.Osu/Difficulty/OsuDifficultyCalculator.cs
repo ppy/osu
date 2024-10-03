@@ -106,7 +106,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double mechanicalPerformance = Math.Pow(Math.Pow(baseAimPerformance, SUM_POWER) + Math.Pow(baseSpeedPerformance, SUM_POWER), 1.0 / SUM_POWER);
 
             // Limit cognition by full memorisation difficulty, what is assumed to be mechanicalPerformance + flashlightPerformance
-            double perfectFlashlightPerformance = OsuPerformanceCalculator.ComputePerfectFlashlightValue(flashlightRating, hitCirclesCount + sliderCount);
+            double perfectFlashlightPerformance = Flashlight.DifficultyToPerformance(flashlightRating);
             cognitionPerformance = OsuPerformanceCalculator.AdjustCognitionPerformance(cognitionPerformance, mechanicalPerformance, perfectFlashlightPerformance);
 
             double basePerformance = mechanicalPerformance + cognitionPerformance;
