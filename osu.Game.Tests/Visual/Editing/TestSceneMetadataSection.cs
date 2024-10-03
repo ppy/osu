@@ -6,6 +6,7 @@
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Graphics;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input;
 using osu.Framework.Testing;
@@ -205,7 +206,7 @@ namespace osu.Game.Tests.Visual.Editing
         }
 
         private void createSection()
-            => AddStep("create metadata section", () => Child = metadataSection = new TestMetadataSection());
+            => AddStep("create metadata section", () => Child = metadataSection = new TestMetadataSection { RelativeSizeAxes = Axes.X });
 
         private void assertArtistMetadata(string expected)
             => AddAssert($"artist metadata is {expected}", () => editorBeatmap.Metadata.Artist, () => Is.EqualTo(expected));
