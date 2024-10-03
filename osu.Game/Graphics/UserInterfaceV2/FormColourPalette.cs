@@ -152,7 +152,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
                 Size = new Vector2(70, 25);
 
                 Masking = true;
-                CornerRadius = 3;
+                CornerRadius = 12.5f;
                 Action = this.ShowPopover;
 
                 Children = new Drawable[]
