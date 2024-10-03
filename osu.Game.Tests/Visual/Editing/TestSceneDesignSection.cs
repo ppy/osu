@@ -47,7 +47,7 @@ namespace osu.Game.Tests.Visual.Editing
                 {
                     (typeof(EditorBeatmap), editorBeatmap)
                 },
-                Child = designSection = new TestDesignSection()
+                Child = designSection = new TestDesignSection { RelativeSizeAxes = Axes.X }
             });
         }
 
