@@ -508,8 +508,8 @@ namespace osu.Game.Screens.Play
 
         private void updateGameplayState()
         {
-            bool inGameplay = !DrawableRuleset.HasReplayLoaded.Value && !GameplayState.HasPassed;
-            bool inBreak = breakTracker.IsBreakTime.Value || DrawableRuleset.IsPaused.Value || GameplayState.HasFailed;
+            bool inGameplay = !DrawableRuleset.HasReplayLoaded.Value && !GameplayState.HasPassed && !GameplayState.HasFailed;
+            bool inBreak = breakTracker.IsBreakTime.Value || DrawableRuleset.IsPaused.Value;
 
             if (inGameplay)
                 playingState.Value = inBreak ? LocalUserPlayingState.Break : LocalUserPlayingState.Playing;
