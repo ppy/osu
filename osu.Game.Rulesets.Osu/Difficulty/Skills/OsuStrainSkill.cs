@@ -13,12 +13,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
     public abstract class OsuStrainSkill : StrainSkill
     {
         /// <summary>
-        /// The default multiplier applied by <see cref="OsuStrainSkill"/> to the final difficulty value after all other calculations.
-        /// May be overridden via <see cref="DifficultyMultiplier"/>.
-        /// </summary>
-        public const double DEFAULT_DIFFICULTY_MULTIPLIER = 1.06;
-
-        /// <summary>
         /// The number of sections with the highest strains, which the peak strain reductions will apply to.
         /// This is done in order to decrease their impact on the overall difficulty of the map for this skill.
         /// </summary>
@@ -28,11 +22,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         /// The baseline multiplier applied to the section with the biggest strain.
         /// </summary>
         protected virtual double ReducedStrainBaseline => 0.75;
-
-        /// <summary>
-        /// The final multiplier to be applied to <see cref="DifficultyValue"/> after all other calculations.
-        /// </summary>
-        protected virtual double DifficultyMultiplier => DEFAULT_DIFFICULTY_MULTIPLIER;
 
         protected List<double> ObjectStrains = new List<double>();
         protected double Difficulty;
@@ -68,7 +57,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 weight *= DecayWeight;
             }
 
-            return Difficulty * DifficultyMultiplier;
+            return Difficulty;
         }
 
         /// <summary>
@@ -84,5 +73,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             // Use a weighted sum of all strains. Constants are arbitrary and give nice values
             return ObjectStrains.Sum(s => 1.1 / (1 + Math.Exp(-10 * (s / consistentTopStrain - 0.88))));
         }
+
+        public static double DifficultyToPerformance(double difficulty) => Math.Pow(5.0 * Math.Max(1.0, difficulty / 0.0675) - 4.0, 3.0) / 100000.0;
     }
 }

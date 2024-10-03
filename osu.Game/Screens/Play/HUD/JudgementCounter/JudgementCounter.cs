@@ -9,7 +9,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Rulesets;
 using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Screens.Play.HUD.JudgementCounter
@@ -19,16 +18,16 @@ namespace osu.Game.Screens.Play.HUD.JudgementCounter
         public BindableBool ShowName = new BindableBool();
         public Bindable<FillDirection> Direction = new Bindable<FillDirection>();
 
-        public readonly JudgementCountController.JudgementCount Result;
+        public readonly JudgementCount Result;
 
-        public JudgementCounter(JudgementCountController.JudgementCount result) => Result = result;
+        public JudgementCounter(JudgementCount result) => Result = result;
 
         public OsuSpriteText ResultName = null!;
         private FillFlowContainer flowContainer = null!;
         private JudgementRollingCounter counter = null!;
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, IBindable<RulesetInfo> ruleset)
+        private void load(OsuColour colours)
         {
             AutoSizeAxes = Axes.Both;
 

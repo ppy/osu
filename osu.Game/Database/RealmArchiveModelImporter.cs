@@ -179,6 +179,31 @@ namespace osu.Game.Database
 
         public virtual Task<Live<TModel>?> ImportAsUpdate(ProgressNotification notification, ImportTask task, TModel original) => throw new NotImplementedException();
 
+        public async Task<ExternalEditOperation<TModel>> BeginExternalEditing(TModel model)
+        {
+            string mountedPath = Path.Join(Path.GetTempPath(), model.Hash);
+
+            if (Directory.Exists(mountedPath))
+                Directory.Delete(mountedPath, true);
+
+            Directory.CreateDirectory(mountedPath);
+
+            foreach (var realmFile in model.Files)
+            {
+                string sourcePath = Files.Storage.GetFullPath(realmFile.File.GetStoragePath());
+                string destinationPath = Path.Join(mountedPath, realmFile.Filename);
+
+                Directory.CreateDirectory(Path.GetDirectoryName(destinationPath)!);
+
+                // Consider using hard links here to make this instant.
+                using (var inStream = Files.Storage.GetStream(sourcePath))
+                using (var outStream = File.Create(destinationPath))
+                    await inStream.CopyToAsync(outStream).ConfigureAwait(false);
+            }
+
+            return new ExternalEditOperation<TModel>(this, model, mountedPath);
+        }
+
         /// <summary>
         /// Import one <typeparamref name="TModel"/> from the filesystem and delete the file on success.
         /// Note that this bypasses the UI flow and should only be used for special cases or testing.

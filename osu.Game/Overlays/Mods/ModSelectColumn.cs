@@ -70,7 +70,7 @@ namespace osu.Game.Overlays.Mods
         {
             Width = WIDTH;
             RelativeSizeAxes = Axes.Y;
-            Shear = new Vector2(ShearedOverlayContainer.SHEAR, 0);
+            Shear = new Vector2(OsuGame.SHEAR, 0);
 
             InternalChildren = new Drawable[]
             {
@@ -96,7 +96,7 @@ namespace osu.Game.Overlays.Mods
                                 {
                                     RelativeSizeAxes = Axes.X,
                                     Height = header_height,
-                                    Shear = new Vector2(-ShearedOverlayContainer.SHEAR, 0),
+                                    Shear = new Vector2(-OsuGame.SHEAR, 0),
                                     Velocity = 0.7f,
                                     ClampAxes = Axes.Y
                                 },
@@ -111,7 +111,7 @@ namespace osu.Game.Overlays.Mods
                                     AutoSizeAxes = Axes.Y,
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.CentreLeft,
-                                    Shear = new Vector2(-ShearedOverlayContainer.SHEAR, 0),
+                                    Shear = new Vector2(-OsuGame.SHEAR, 0),
                                     Padding = new MarginPadding
                                     {
                                         Horizontal = 17,
@@ -138,6 +138,7 @@ namespace osu.Game.Overlays.Mods
                                     },
                                     new GridContainer
                                     {
+                                        Padding = new MarginPadding { Top = 1, Bottom = 3 },
                                         RelativeSizeAxes = Axes.Both,
                                         RowDimensions = new[]
                                         {

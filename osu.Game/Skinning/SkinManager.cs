@@ -131,9 +131,12 @@ namespace osu.Game.Skinning
         {
             Realm.Run(r =>
             {
+                // Required local for iOS. Will cause runtime crash if inlined.
+                Guid currentSkinId = CurrentSkinInfo.Value.ID;
+
                 // choose from only user skins, removing the current selection to ensure a new one is chosen.
                 var randomChoices = r.All<SkinInfo>()
-                                     .Where(s => !s.DeletePending && s.ID != CurrentSkinInfo.Value.ID)
+                                     .Where(s => !s.DeletePending && s.ID != currentSkinId)
                                      .ToArray();
 
                 if (randomChoices.Length == 0)
@@ -311,6 +314,8 @@ namespace osu.Game.Skinning
 
         public Task<Live<SkinInfo>> ImportAsUpdate(ProgressNotification notification, ImportTask task, SkinInfo original) =>
             skinImporter.ImportAsUpdate(notification, task, original);
+
+        public Task<ExternalEditOperation<SkinInfo>> BeginExternalEditing(SkinInfo model) => skinImporter.BeginExternalEditing(model);
 
         public Task<Live<SkinInfo>> Import(ImportTask task, ImportParameters parameters = default, CancellationToken cancellationToken = default) =>
             skinImporter.Import(task, parameters, cancellationToken);
