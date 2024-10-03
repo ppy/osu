@@ -77,7 +77,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
                             Child = button = new RoundedButton
                             {
                                 Action = () => Colours.Add(Colour4.White),
-                                Size = new Vector2(70, 25),
+                                Size = new Vector2(70),
                                 Text = "+",
                             }
                         }
@@ -133,7 +133,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
                 int colourIndex = i;
                 var colourButton = new ColourButton { Current = { Value = Colours[colourIndex] } };
                 colourButton.Current.BindValueChanged(colour => Colours[colourIndex] = colour.NewValue);
-                colourButton.DeleteRequested = () => Colours.RemoveAt(flow.IndexOf(colourButton));
+                colourButton.DeleteRequested = () => Colours.RemoveAt(colourIndex);
                 flow.Add(colourButton);
             }
         }
@@ -149,10 +149,10 @@ namespace osu.Game.Graphics.UserInterfaceV2
             [BackgroundDependencyLoader]
             private void load()
             {
-                Size = new Vector2(70, 25);
+                Size = new Vector2(70);
 
                 Masking = true;
-                CornerRadius = 12.5f;
+                CornerRadius = 35;
                 Action = this.ShowPopover;
 
                 Children = new Drawable[]
