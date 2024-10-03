@@ -10,6 +10,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
         internal override InnerTextBox CreateTextBox() => new InnerNumberBox
         {
             AllowDecimals = AllowDecimals,
+            SelectAllOnFocus = true,
         };
 
         internal partial class InnerNumberBox : InnerTextBox
