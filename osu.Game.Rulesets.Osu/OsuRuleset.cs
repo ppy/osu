@@ -346,7 +346,7 @@ namespace osu.Game.Rulesets.Osu
             {
                 AutoSizeAxes = Axes.Y,
                 Direction = FillDirection.Vertical,
-                Spacing = new Vector2(25),
+                Spacing = new Vector2(SetupScreen.SPACING),
                 Children = new Drawable[]
                 {
                     new ResourcesSection
