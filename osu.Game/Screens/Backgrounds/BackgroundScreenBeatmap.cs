@@ -160,6 +160,9 @@ namespace osu.Game.Screens.Backgrounds
                     background?.Expire();
 
                     base.Add(background = value);
+
+                    background.DimLevel = DimLevel;
+                    background.DimColour = DimColour;
                     background.BlurTo(blurTarget, 0, Easing.OutQuint);
                 }
             }
