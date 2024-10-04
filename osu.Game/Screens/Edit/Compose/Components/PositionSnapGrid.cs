@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -51,12 +50,21 @@ namespace osu.Game.Screens.Edit.Compose.Components
         protected abstract void CreateContent();
 
         /// <summary>
-        /// Computes the line thickness of this <see cref="PositionSnapGrid"/> independent of display resolution.
+        /// Computes the line thickness of this <see cref="PositionSnapGrid"/> which will result in 1px screen-space thickness independent of display resolution.
         /// </summary>
         /// <remarks>
-        /// Unless resolution is high enough, in which case thickness will remain the same.
+        /// Unless resolution is high enough, in which case thickness will be 2px.
         /// </remarks>
-        protected float GetLineWidth() => Math.Max(DrawWidth / ScreenSpaceDrawQuad.Width, 0.4f);
+        protected float GetLineWidth()
+        {
+            float fixedWidth = DrawWidth / ScreenSpaceDrawQuad.Width; // the width at which screen-space thickness will be 1px
+
+            // Resolution is low enough
+            if (fixedWidth > 0.4f)
+                return fixedWidth;
+
+            return fixedWidth * 2f;
+        }
 
         protected void GenerateOutline(Vector2 drawSize)
         {
