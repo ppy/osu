@@ -3,7 +3,6 @@
 
 #nullable disable
 
-using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
@@ -47,10 +46,19 @@ namespace osu.Game.Graphics.UserInterface
         {
             base.Update();
 
-            bool showCheckboxes = Items.Any(i => i is StatefulMenuItem);
+            bool showCheckboxes = false;
 
-            foreach (var drawableItem in ItemsContainer.OfType<DrawableOsuMenuItem>())
-                drawableItem.ShowCheckbox.Value = showCheckboxes;
+            foreach (var drawableItem in ItemsContainer)
+            {
+                if (drawableItem.Item is StatefulMenuItem)
+                    showCheckboxes = true;
+            }
+
+            foreach (var drawableItem in ItemsContainer)
+            {
+                if (drawableItem is DrawableOsuMenuItem osuItem)
+                    osuItem.ShowCheckbox.Value = showCheckboxes;
+            }
         }
 
         protected override void AnimateOpen()
