@@ -11,7 +11,6 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Framework.Utils;
-using osu.Game.Extensions;
 using osu.Game.Graphics;
 using osuTK;
 
@@ -38,8 +37,9 @@ namespace osu.Game.Screens.Play.HUD
 
         private float relativePositionX;
 
-        public LocalisableString TooltipText => $"{(relativePositionX > 0 ? (EndTime - StartTime) * relativePositionX / DrawWidth : relativePositionX > DrawWidth ? EndTime : 0).ToEditorFormattedString()}"
-                                                + $" - {(relativePositionX > 0 ? Math.Round(relativePositionX / DrawWidth * 100, 2) : relativePositionX > DrawWidth ? 100 : 0)}%";
+        public LocalisableString TooltipText => $"{formatTime(TimeSpan.FromSeconds(relativePositionX > 0 ? Math.Round((EndTime - StartTime) * relativePositionX / DrawWidth / 1000)
+            : relativePositionX > DrawWidth ? Math.Round(EndTime / 1000) : 0))}"
+                                                + $" - {(relativePositionX > 0 ? Math.Round(relativePositionX / DrawWidth * 100, 1) : relativePositionX > DrawWidth ? 100 : 0)}%";
 
         public ArgonSongProgressBar(float barHeight)
         {
@@ -191,5 +191,7 @@ namespace osu.Game.Screens.Play.HUD
                 set => fill.Colour = value;
             }
         }
+
+        private string formatTime(TimeSpan timeSpan) => $"{(timeSpan < TimeSpan.Zero ? "-" : "")}{Math.Floor(timeSpan.Duration().TotalMinutes)}:{timeSpan.Duration().Seconds:D2}";
     }
 }
