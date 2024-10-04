@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -49,10 +50,17 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         protected abstract void CreateContent();
 
+        /// <summary>
+        /// Computes the line thickness of this <see cref="PositionSnapGrid"/> independent of display resolution.
+        /// </summary>
+        /// <remarks>
+        /// Unless resolution is high enough, in which case thickness will remain the same.
+        /// </remarks>
+        protected float GetLineWidth() => Math.Max(DrawWidth / ScreenSpaceDrawQuad.Width, 0.4f);
+
         protected void GenerateOutline(Vector2 drawSize)
         {
-            // Make lines the same width independent of display resolution.
-            float lineWidth = DrawWidth / ScreenSpaceDrawQuad.Width;
+            float lineWidth = GetLineWidth();
 
             AddRangeInternal(new[]
             {

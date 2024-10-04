@@ -45,8 +45,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         private void generateCircles(int count)
         {
-            // Make lines the same width independent of display resolution.
-            float lineWidth = 2 * DrawWidth / ScreenSpaceDrawQuad.Width;
+            float lineWidth = 2f * GetLineWidth();
 
             List<CircularProgress> generatedCircles = new List<CircularProgress>();
 
