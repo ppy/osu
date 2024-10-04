@@ -97,8 +97,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 + cognitionValue) * multiplier;
 
             double savedEffectiveMissCount = effectiveMissCount;
+
             effectiveMissCount = 0;
             countMiss = 0;
+            scoreMaxCombo = osuAttributes.MaxCombo;
 
             double balanceAdjustingMultiplier = calculateBalancerAdjustingMultiplier(score, osuAttributes);
             totalValue *= balanceAdjustingMultiplier;
@@ -397,8 +399,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         private double calculateBalancerAdjustingMultiplier(ScoreInfo score, OsuDifficultyAttributes osuAttributes)
         {
-            scoreMaxCombo = osuAttributes.MaxCombo;
-
             double multiplier = PERFORMANCE_BASE_MULTIPLIER;
             double power = OsuDifficultyCalculator.SUM_POWER;
 
