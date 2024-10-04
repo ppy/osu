@@ -35,12 +35,17 @@ namespace osu.Game.Screens.Edit.Setup
         [Resolved]
         private Editor? editor { get; set; }
 
-        [Resolved]
-        private SetupScreenHeaderBackground headerBackground { get; set; } = null!;
+        private SetupScreenHeaderBackground headerBackground = null!;
 
         [BackgroundDependencyLoader]
         private void load()
         {
+            headerBackground = new SetupScreenHeaderBackground
+            {
+                RelativeSizeAxes = Axes.X,
+                Height = 110,
+            };
+
             Children = new Drawable[]
             {
                 backgroundChooser = new FormFileSelector(".jpg", ".jpeg", ".png")
@@ -54,6 +59,8 @@ namespace osu.Game.Screens.Edit.Setup
                     PlaceholderText = EditorSetupStrings.ClickToSelectTrack,
                 },
             };
+
+            backgroundChooser.PreviewContainer.Add(headerBackground);
 
             if (!string.IsNullOrEmpty(working.Value.Metadata.BackgroundFile))
                 backgroundChooser.Current.Value = new FileInfo(working.Value.Metadata.BackgroundFile);
