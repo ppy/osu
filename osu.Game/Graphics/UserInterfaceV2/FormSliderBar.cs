@@ -17,6 +17,7 @@ using osu.Framework.Input;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Localisation;
 using osu.Game.Overlays;
 
 namespace osu.Game.Graphics.UserInterfaceV2
@@ -83,8 +84,10 @@ namespace osu.Game.Graphics.UserInterfaceV2
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; } = null!;
 
+        private readonly Bindable<Language> currentLanguage = new Bindable<Language>();
+
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load(OsuColour colours, OsuGame? game)
         {
             RelativeSizeAxes = Axes.X;
             Height = 50;
@@ -150,6 +153,9 @@ namespace osu.Game.Graphics.UserInterfaceV2
                     },
                 },
             };
+
+            if (game != null)
+                currentLanguage.BindTo(game.CurrentLanguage);
         }
 
         protected override void LoadComplete()
@@ -164,10 +170,11 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
             slider.IsDragging.BindValueChanged(_ => updateState());
 
+            currentLanguage.BindValueChanged(_ => Schedule(updateValueDisplay));
             current.BindValueChanged(_ =>
             {
                 updateState();
-                updateTextBoxFromSlider();
+                updateValueDisplay();
             }, true);
         }
 
@@ -258,7 +265,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
                 background.Colour = colourProvider.Background5;
         }
 
-        private void updateTextBoxFromSlider()
+        private void updateValueDisplay()
         {
             if (updatingFromTextBox) return;
 
