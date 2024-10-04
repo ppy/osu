@@ -24,9 +24,6 @@ namespace osu.Game.Screens.Edit.Setup
         {
         }
 
-        [Cached]
-        private SetupScreenHeaderBackground background = new SetupScreenHeaderBackground { RelativeSizeAxes = Axes.Both, };
-
         private OsuScrollContainer scroll = null!;
         private FillFlowContainer flow = null!;
 
@@ -42,43 +39,24 @@ namespace osu.Game.Screens.Edit.Setup
                     RelativeSizeAxes = Axes.Both,
                     Colour = colourProvider.Background3,
                 },
-                new GridContainer
+                scroll = new OsuScrollContainer
                 {
                     RelativeSizeAxes = Axes.Both,
-                    RowDimensions =
-                    [
-                        new Dimension(GridSizeMode.Absolute, 110),
-                        new Dimension()
-                    ],
-                    Content = new[]
+                    Padding = new MarginPadding(15),
+                    Child = flow = new FillFlowContainer
                     {
-                        new Drawable[]
+                        RelativeSizeAxes = Axes.X,
+                        AutoSizeAxes = Axes.Y,
+                        Direction = FillDirection.Full,
+                        Anchor = Anchor.TopCentre,
+                        Origin = Anchor.TopCentre,
+                        Spacing = new Vector2(25),
+                        ChildrenEnumerable = ruleset.CreateEditorSetupSections().Select(section => section.With(s =>
                         {
-                            background,
-                        },
-                        new Drawable[]
-                        {
-                            scroll = new OsuScrollContainer
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                Padding = new MarginPadding(15),
-                                Child = flow = new FillFlowContainer
-                                {
-                                    RelativeSizeAxes = Axes.X,
-                                    AutoSizeAxes = Axes.Y,
-                                    Direction = FillDirection.Full,
-                                    Anchor = Anchor.TopCentre,
-                                    Origin = Anchor.TopCentre,
-                                    Spacing = new Vector2(25),
-                                    ChildrenEnumerable = ruleset.CreateEditorSetupSections().Select(section => section.With(s =>
-                                    {
-                                        s.Width = 450;
-                                        s.Anchor = Anchor.TopCentre;
-                                        s.Origin = Anchor.TopCentre;
-                                    })),
-                                }
-                            }
-                        }
+                            s.Width = 450;
+                            s.Anchor = Anchor.TopCentre;
+                            s.Origin = Anchor.TopCentre;
+                        })),
                     }
                 }
             };
