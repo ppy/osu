@@ -28,7 +28,7 @@ namespace osu.Game.Screens.Edit.Setup
             };
         }
 
-        private bool syncingColours = false;
+        private bool syncingColours;
 
         protected override void LoadComplete()
         {
