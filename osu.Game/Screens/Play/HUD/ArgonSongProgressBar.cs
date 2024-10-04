@@ -37,9 +37,7 @@ namespace osu.Game.Screens.Play.HUD
 
         private float relativePositionX;
 
-        public LocalisableString TooltipText => $"{formatTime(TimeSpan.FromSeconds(relativePositionX > 0 ? Math.Round((EndTime - StartTime) * relativePositionX / DrawWidth / 1000)
-            : relativePositionX > DrawWidth ? Math.Round(EndTime / 1000) : 0))}"
-                                                + $" - {(relativePositionX > 0 ? Math.Round(relativePositionX / DrawWidth * 100, 1) : relativePositionX > DrawWidth ? 100 : 0)}%";
+        public LocalisableString TooltipText => updateTooltip();
 
         public ArgonSongProgressBar(float barHeight)
         {
@@ -82,6 +80,19 @@ namespace osu.Game.Screens.Play.HUD
         private void load(OsuColour colours)
         {
             catchUpColour = colours.BlueDark;
+        }
+
+        private LocalisableString updateTooltip()
+        {
+            // clamping in case the cursor lays out of the progress bar horizontally
+            double progress = Math.Clamp(relativePositionX, 0, DrawWidth) / DrawWidth;
+
+            TimeSpan currentSpan = TimeSpan.FromMilliseconds(Math.Round((EndTime - StartTime) * progress));
+            int currentSeconds = currentSpan.Duration().Seconds;
+            // merging hours and minutes, e.g. 1:15:55 -> 75:55
+            int currentMinutes = (int)Math.Floor(currentSpan.Duration().TotalMinutes);
+
+            return $"{currentMinutes}:{currentSeconds:D2} - {progress:P1}";
         }
 
         protected override void LoadComplete()
@@ -191,7 +202,5 @@ namespace osu.Game.Screens.Play.HUD
                 set => fill.Colour = value;
             }
         }
-
-        private string formatTime(TimeSpan timeSpan) => $"{(timeSpan < TimeSpan.Zero ? "-" : "")}{Math.Floor(timeSpan.Duration().TotalMinutes)}:{timeSpan.Duration().Seconds:D2}";
     }
 }
