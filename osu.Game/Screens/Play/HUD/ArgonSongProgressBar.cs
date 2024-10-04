@@ -8,7 +8,6 @@ using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Input;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Framework.Utils;
@@ -38,8 +37,6 @@ namespace osu.Game.Screens.Play.HUD
         private double trackTime => (EndTime - StartTime) * Progress;
 
         private float relativePositionX;
-
-        private InputManager? inputManager;
 
         public LocalisableString TooltipText => $"{(relativePositionX > 0 ? (EndTime - StartTime) * relativePositionX / DrawWidth : relativePositionX > DrawWidth ? EndTime : 0).ToEditorFormattedString()}"
                                                 + $" - {(relativePositionX > 0 ? Math.Round(relativePositionX / DrawWidth * 100, 2) : relativePositionX > DrawWidth ? 100 : 0)}%";
@@ -85,7 +82,6 @@ namespace osu.Game.Screens.Play.HUD
         private void load(OsuColour colours)
         {
             catchUpColour = colours.BlueDark;
-            inputManager = GetContainingInputManager();
         }
 
         protected override void LoadComplete()
@@ -94,6 +90,16 @@ namespace osu.Game.Screens.Play.HUD
 
             background.FadeTo(0.3f, 200, Easing.In);
             playfieldBar.TransformTo(nameof(playfieldBar.AccentColour), mainColour, 200, Easing.In);
+        }
+
+        protected override bool OnMouseMove(MouseMoveEvent e)
+        {
+            base.OnMouseMove(e);
+
+            var cursorPosition = e.ScreenSpaceMousePosition;
+            relativePositionX = ToLocalSpace(cursorPosition).X;
+
+            return true;
         }
 
         protected override bool OnHover(HoverEvent e)
@@ -113,18 +119,6 @@ namespace osu.Game.Screens.Play.HUD
         protected override void Update()
         {
             base.Update();
-
-            if (inputManager != null)
-            {
-                // Update the cursor position in time
-                var cursorPosition = inputManager.CurrentState.Mouse.Position;
-                relativePositionX = ToLocalSpace(cursorPosition).X;
-            }
-            else
-            {
-                // If null (e.g. before the game starts), try getting the input manager again
-                inputManager = GetContainingInputManager();
-            }
 
             playfieldBar.Length = (float)Interpolation.Lerp(playfieldBar.Length, Progress, Math.Clamp(Time.Elapsed / 40, 0, 1));
             audioBar.Length = (float)Interpolation.Lerp(audioBar.Length, AudioProgress, Math.Clamp(Time.Elapsed / 40, 0, 1));
