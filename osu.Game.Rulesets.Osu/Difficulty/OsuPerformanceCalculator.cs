@@ -100,7 +100,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             effectiveMissCount = 0;
             countMiss = 0;
 
-            double balanceAdjustingMultiplier = calculateMechanicalBalancingMultiplier(score, osuAttributes);
+            double balanceAdjustingMultiplier = calculateBalancerAdjustingMultiplier(score, osuAttributes);
             totalValue *= balanceAdjustingMultiplier;
 
             // Fancy stuff for better visual display of FL pp
@@ -395,7 +395,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             return Math.Max(countMiss, comboBasedMissCount);
         }
 
-        private double calculateMechanicalBalancingMultiplier(ScoreInfo score, OsuDifficultyAttributes osuAttributes)
+        private double calculateBalancerAdjustingMultiplier(ScoreInfo score, OsuDifficultyAttributes osuAttributes)
         {
             scoreMaxCombo = osuAttributes.MaxCombo;
 
@@ -434,12 +434,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 (Math.Pow(Math.Pow(mechanicalValue, power) + Math.Pow(accuracyValue, power), 1.0 / power)
                 + cognitionValue) * multiplier;
 
-            if (totalValue < 1000)
+            if (totalValue < 600)
                 return 1;
 
-            double rescaledValue = totalValue / 1000 - 1;
-            double result = Math.Min(0.1 * Math.Pow(rescaledValue, 0.6), 0.11 * Math.Pow(rescaledValue, 0.3));
-            result *= Math.Min(rescaledValue, 0.2) / 0.2; // Smoother curve
+            double rescaledValue = (totalValue - 600) / 1000;
+            double result = Math.Min(0.06 * rescaledValue, 0.088 * Math.Pow(rescaledValue, 0.4));
             return 1 + result;
         }
 
