@@ -65,7 +65,7 @@ namespace osu.Game.Rulesets.Difficulty
             cancellationToken.ThrowIfCancellationRequested();
             preProcess(mods, cancellationToken);
 
-            var skills = CreateSkills(Beatmap, playableMods, clockRate);
+            var skills = CreateSkills(beatmap.Beatmap, playableMods, clockRate);
 
             if (!Beatmap.HitObjects.Any())
                 return CreateDifficultyAttributes(Beatmap, playableMods, skills, clockRate);
@@ -106,7 +106,7 @@ namespace osu.Game.Rulesets.Difficulty
             if (!Beatmap.HitObjects.Any())
                 return attribs;
 
-            var skills = CreateSkills(Beatmap, playableMods, clockRate);
+            var skills = CreateSkills(beatmap.Beatmap, playableMods, clockRate);
             var progressiveBeatmap = new ProgressiveCalculationBeatmap(Beatmap);
             var difficultyObjects = getDifficultyHitObjects().ToArray();
 

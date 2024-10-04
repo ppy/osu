@@ -87,7 +87,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
 
         protected override Skill[] CreateSkills(IBeatmap beatmap, Mod[] mods, double clockRate)
         {
-            var difficultyInfo = LegacyBeatmapConversionDifficultyInfo.FromBeatmapInfo(beatmap.BeatmapInfo);
+            var difficultyInfo = LegacyBeatmapConversionDifficultyInfo.FromBeatmap(beatmap);
             int columnCount = ManiaBeatmapConverter.GetColumnCount(difficultyInfo, mods);
 
             return new Skill[]
