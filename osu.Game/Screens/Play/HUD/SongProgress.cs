@@ -50,8 +50,7 @@ namespace osu.Game.Screens.Play.HUD
         /// <summary>
         /// Type of the difficulty info used in graph.
         /// </summary>
-        [SettingSource(typeof(SongProgressStrings), nameof(SongProgressStrings.GraphType), nameof(SongProgressStrings.GraphTypeDescription))]
-        public Bindable<DifficultyGraphType> GraphType { get; } = new Bindable<DifficultyGraphType>(DifficultyGraphType.None);
+        protected readonly Bindable<DifficultyGraphType> GraphTypeInternal = new Bindable<DifficultyGraphType>(DifficultyGraphType.None);
 
         public bool UsesFixedAnchor { get; set; }
 
@@ -92,12 +91,12 @@ namespace osu.Game.Screens.Play.HUD
                 Objects = drawableRuleset.Objects;
             }
 
-            GraphType.BindValueChanged(_ => updateBasedOnGraphType(), true);
+            GraphTypeInternal.BindValueChanged(_ => updateBasedOnGraphType(), true);
         }
 
         private void updateBasedOnGraphType()
         {
-            switch (GraphType.Value)
+            switch (GraphTypeInternal.Value)
             {
                 case DifficultyGraphType.None:
                     UpdateFromObjects(Enumerable.Empty<HitObject>());

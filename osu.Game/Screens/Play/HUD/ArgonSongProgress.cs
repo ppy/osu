@@ -24,6 +24,9 @@ namespace osu.Game.Screens.Play.HUD
 
         private const float bar_height = 10;
 
+        [SettingSource(typeof(SongProgressStrings), nameof(SongProgressStrings.GraphType), nameof(SongProgressStrings.GraphTypeDescription))]
+        public Bindable<DifficultyGraphType> GraphType { get; } = new Bindable<DifficultyGraphType>(DifficultyGraphType.TotalStrain);
+
         [SettingSource(typeof(SongProgressStrings), nameof(SongProgressStrings.ShowTime), nameof(SongProgressStrings.ShowTimeDescription))]
         public Bindable<bool> ShowTime { get; } = new BindableBool(true);
 
@@ -92,7 +95,9 @@ namespace osu.Game.Screens.Play.HUD
         {
             base.LoadComplete();
 
-            GraphType.ValueChanged += _ => updateGraphVisibility();
+            GraphTypeInternal.ValueChanged += _ => updateGraphVisibility();
+            GraphTypeInternal.Value = GraphType.Value;
+            GraphTypeInternal.BindTo(GraphType);
 
             Interactive.BindValueChanged(_ => bar.Interactive = Interactive.Value, true);
             ShowTime.BindValueChanged(_ => info.FadeTo(ShowTime.Value ? 1 : 0, 200, Easing.In), true);
@@ -111,7 +116,7 @@ namespace osu.Game.Screens.Play.HUD
 
         private void updateGraphVisibility()
         {
-            graph.FadeTo(GraphType.Value != DifficultyGraphType.None ? 1 : 0, 200, Easing.In);
+            graph.FadeTo(GraphTypeInternal.Value != DifficultyGraphType.None ? 1 : 0, 200, Easing.In);
         }
 
         protected override void Update()

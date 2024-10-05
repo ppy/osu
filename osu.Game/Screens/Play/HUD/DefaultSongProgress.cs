@@ -31,8 +31,8 @@ namespace osu.Game.Screens.Play.HUD
         private readonly SongProgressInfo info;
         private readonly Container content;
 
-        //[SettingSource(typeof(SongProgressStrings), nameof(SongProgressStrings.GraphType), nameof(SongProgressStrings.GraphTypeDescription))]
-        //public Bindable<DifficultyGraphType> GraphType { get; } = new Bindable<DifficultyGraphType>(DifficultyGraphType.TotalStrain);
+        [SettingSource(typeof(SongProgressStrings), nameof(SongProgressStrings.GraphType), nameof(SongProgressStrings.GraphTypeDescription))]
+        public Bindable<DifficultyGraphType> GraphType { get; } = new Bindable<DifficultyGraphType>(DifficultyGraphType.TotalStrain);
 
         [SettingSource(typeof(SongProgressStrings), nameof(SongProgressStrings.ShowTime), nameof(SongProgressStrings.ShowTimeDescription))]
         public Bindable<bool> ShowTime { get; } = new BindableBool(true);
@@ -87,13 +87,15 @@ namespace osu.Game.Screens.Play.HUD
 
         protected override void LoadComplete()
         {
-            GraphType.ValueChanged += _ => updateGraphType();
+            GraphTypeInternal.ValueChanged += _ => updateGraphVisibility();
+            GraphTypeInternal.Value = GraphType.Value;
+            GraphTypeInternal.BindTo(GraphType);
 
             Interactive.BindValueChanged(_ => updateBarVisibility(), true);
             ShowTime.BindValueChanged(_ => updateTimeVisibility(), true);
             AccentColour.BindValueChanged(_ => Colour = AccentColour.Value, true);
 
-            updateGraphType();
+            updateGraphVisibility();
 
             base.LoadComplete();
         }
@@ -133,12 +135,12 @@ namespace osu.Game.Screens.Play.HUD
             updateInfoMargin();
         }
 
-        private void updateGraphType()
+        private void updateGraphVisibility()
         {
             float barHeight = bottom_bar_height + handle_size.Y;
 
-            bar.ResizeHeightTo(GraphType.Value != DifficultyGraphType.None ? barHeight + graph_height : barHeight, transition_duration, Easing.In);
-            graph.FadeTo(GraphType.Value != DifficultyGraphType.None ? 1 : 0, transition_duration, Easing.In);
+            bar.ResizeHeightTo(GraphTypeInternal.Value != DifficultyGraphType.None ? barHeight + graph_height : barHeight, transition_duration, Easing.In);
+            graph.FadeTo(GraphTypeInternal.Value != DifficultyGraphType.None ? 1 : 0, transition_duration, Easing.In);
 
             updateInfoMargin();
         }
@@ -152,7 +154,7 @@ namespace osu.Game.Screens.Play.HUD
 
         private void updateInfoMargin()
         {
-            float finalMargin = bottom_bar_height + (Interactive.Value ? handle_size.Y : 0) + (GraphType.Value != DifficultyGraphType.None ? graph_height : 0);
+            float finalMargin = bottom_bar_height + (Interactive.Value ? handle_size.Y : 0) + (GraphTypeInternal.Value != DifficultyGraphType.None ? graph_height : 0);
             info.TransformTo(nameof(info.Margin), new MarginPadding { Bottom = finalMargin }, transition_duration, Easing.In);
         }
     }
