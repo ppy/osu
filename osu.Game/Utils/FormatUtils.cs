@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Linq;
 using Humanizer;
 using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Localisation;
@@ -59,5 +60,156 @@ namespace osu.Game.Utils
         /// <param name="baseBpm">The base BPM to round.</param>
         /// <param name="rate">Rate adjustment, if applicable.</param>
         public static int RoundBPM(double baseBpm, double rate = 1) => (int)Math.Round(Math.Round(baseBpm) * rate);
+
+        /// <summary>
+        /// Resampling strain values to certain bin size.
+        /// </summary>
+        /// <remarks>
+        /// The main feature of this resampling is that peak strains will be always preserved.
+        /// This means that the highest strain can't be decreased by averaging or interpolation.
+        /// </remarks>
+        public static double[] ResampleStrains(double[] values, int targetSize)
+        {
+            if (targetSize > values.Length)
+                return resamplingUpscale(values, targetSize);
+
+            else if (targetSize < values.Length)
+                return resamplingDownscale(values, targetSize);
+
+            return (double[])values.Clone();
+        }
+
+        private static double[] resamplingUpscale(double[] values, int targetSize)
+        {
+            // Create array filled with -inf
+            double[] result = Enumerable.Repeat(double.NegativeInfinity, targetSize).ToArray();
+
+            // First and last peaks are constant
+            result[0] = values[0];
+            result[^1] = values[^1];
+
+            // On the first pass we place peaks
+
+            int sourceIndex = 1;
+            int targetIndex = 1;
+
+            // Adjust sizes accounting for the fact that first and last elements already set-up
+            int sourceSize = values.Length - 1;
+            targetSize -= 1;
+
+            for (; targetIndex < targetSize - 1; targetIndex++)
+            {
+                double sourceProgress = (double)sourceIndex / sourceSize;
+
+                double targetProgressNext = (targetIndex + 1.0) / targetSize;
+
+                // If we reached the point where source is between current and next - then peak is either current or next
+                if (sourceProgress <= targetProgressNext)
+                {
+                    double targetProgressCurrent = (double)targetIndex / targetSize;
+
+                    double distanceToCurrent = sourceProgress - targetProgressCurrent;
+                    double distanceToNext = targetProgressNext - sourceProgress;
+
+                    // If it's next what is closer - abbadon current and move to next immediatly
+                    if (distanceToNext < distanceToCurrent)
+                    {
+                        result[targetIndex] = double.NegativeInfinity;
+                        targetIndex++;
+                    }
+
+                    result[targetIndex] = values[sourceIndex];
+                    sourceIndex++;
+                }
+            }
+
+            // On second pass we interpolate between peaks
+
+            sourceIndex = 0;
+            targetIndex = 1;
+
+            for (; targetIndex < targetSize; targetIndex++)
+            {
+                // If we're on peak - skip iteration
+                if (result[targetIndex] != double.NegativeInfinity)
+                {
+                    sourceIndex++;
+                    continue;
+                }
+
+                double targetProgress = (double)targetIndex / targetSize;
+
+                double previousPeakProgress = (double)sourceIndex / sourceSize;
+                double nextPeakProgress = (sourceIndex + 1.0) / sourceSize;
+
+                double distanceToPreviousPeak = targetProgress - previousPeakProgress;
+                double distanceToNextPeak = nextPeakProgress - targetProgress;
+
+                double lerpCoef = distanceToPreviousPeak / (distanceToPreviousPeak + distanceToNextPeak);
+                result[targetIndex] = double.Lerp(values[sourceIndex], values[sourceIndex + 1], lerpCoef);
+            }
+
+            return result;
+        }
+
+        private static double[] resamplingDownscale(double[] values, int targetSize)
+        {
+            double[] result = new double[targetSize];
+
+            int sourceIndex = 0;
+            int targetIndex = 0;
+
+            double currentSampleMax = double.NegativeInfinity;
+
+            for (; sourceIndex < values.Length; sourceIndex++)
+            {
+                double currentValue = values[sourceIndex];
+
+                double sourceProgress = (sourceIndex + 0.5) / values.Length;
+                double targetProgressBorder = (targetIndex + 1.0) / targetSize;
+
+                double distanceToBorder = targetProgressBorder - sourceProgress;
+
+                // Handle transition to next sample
+                if (distanceToBorder < 0)
+                {
+                    double targetProgressCurrent = (targetIndex + 0.5) / targetSize;
+                    double targetProgressNext = (targetIndex + 1.5) / targetSize;
+
+                    // Try fit weighted current into still current sample
+                    // It would always be closer to Next than to Current
+                    double weight = (targetProgressNext - sourceProgress) / (sourceProgress - targetProgressCurrent);
+                    double weightedValue = currentValue * weight;
+
+                    if (currentSampleMax < weightedValue) currentSampleMax = weightedValue;
+
+                    // Flush current max
+                    result[targetIndex] = currentSampleMax;
+                    targetIndex++;
+                    currentSampleMax = double.NegativeInfinity;
+
+                    // Try to fit weighted previous into future sample
+                    if (sourceIndex > 0)
+                    {
+                        double prevValue = values[sourceIndex - 1];
+                        double sourceProgressPrev = (sourceIndex - 0.5) / values.Length;
+
+                        // It would always be closer to Current than to Current
+                        weight = (sourceProgressPrev - targetProgressCurrent) / (targetProgressNext - sourceProgressPrev);
+                        weightedValue = prevValue * weight;
+
+                        currentSampleMax = weightedValue;
+                    }
+                }
+
+                // Replace with maximum of the sample
+                if (currentSampleMax < currentValue) currentSampleMax = currentValue;
+            }
+
+            // Flush last value
+            result[targetIndex] = currentSampleMax;
+
+            return result;
+        }
     }
 }

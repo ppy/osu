@@ -222,7 +222,7 @@ namespace osu.Game.Screens.Play.HUD
                 .GroupBy(x => x.index)
                 .Select(g => g.Max(x => x.value));
 
-            return convertStrains(result);
+            return result.ToArray();
         }
 
         private double[] getTotalStrains(List<double[]> allStrains)
@@ -232,13 +232,7 @@ namespace osu.Game.Screens.Play.HUD
                 .GroupBy(x => x.index)
                 .Select(g => Math.Sqrt(g.Sum(x => x.value * x.value)));
 
-            return convertStrains(result);
-        }
-
-        // Strains are ending with StartTime of last object, so we need to add
-        private double[] convertStrains(IEnumerable<double> strains)
-        {
-            return strains.ToArray();
+            return result.ToArray();
         }
 
         protected virtual void UpdateFromStrains(double[] sectionStrains) { }

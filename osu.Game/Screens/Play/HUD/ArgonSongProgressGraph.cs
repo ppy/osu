@@ -10,49 +10,48 @@ using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Utils;
 
 namespace osu.Game.Screens.Play.HUD
 {
-    public partial class ArgonSongProgressGraph : SegmentedGraph<int>
+    public partial class ArgonSongProgressGraph : SegmentedGraph<float>
     {
         private const int tier_count = 5;
 
         private const int display_granularity = 200;
 
-        private IEnumerable<HitObject>? objects;
-
-        public IEnumerable<HitObject> Objects
+        public void SetFromObjects(IEnumerable<HitObject> objects)
         {
-            set
+            float[] values = new float[display_granularity];
+
+            if (!objects.Any())
+                return;
+
+            (double firstHit, double lastHit) = BeatmapExtensions.CalculatePlayableBounds(objects);
+
+            if (lastHit == 0)
+                lastHit = objects.Last().StartTime;
+
+            double interval = (lastHit - firstHit + 1) / display_granularity;
+
+            foreach (var h in objects)
             {
-                objects = value;
+                double endTime = h.GetEndTime();
 
-                int[] values = new int[display_granularity];
+                Debug.Assert(endTime >= h.StartTime);
 
-                if (!objects.Any())
-                    return;
-
-                (double firstHit, double lastHit) = BeatmapExtensions.CalculatePlayableBounds(objects);
-
-                if (lastHit == 0)
-                    lastHit = objects.Last().StartTime;
-
-                double interval = (lastHit - firstHit + 1) / display_granularity;
-
-                foreach (var h in objects)
-                {
-                    double endTime = h.GetEndTime();
-
-                    Debug.Assert(endTime >= h.StartTime);
-
-                    int startRange = (int)((h.StartTime - firstHit) / interval);
-                    int endRange = (int)((endTime - firstHit) / interval);
-                    for (int i = startRange; i <= endRange; i++)
-                        values[i]++;
-                }
-
-                Values = values;
+                int startRange = (int)((h.StartTime - firstHit) / interval);
+                int endRange = (int)((endTime - firstHit) / interval);
+                for (int i = startRange; i <= endRange; i++)
+                    values[i]++;
             }
+
+            Values = values;
+    }
+
+        public void SetFromStrains(double[] strains)
+        {
+            Values = FormatUtils.ResampleStrains(strains, display_granularity).Select(value => (float)value).ToArray();
         }
 
         public ArgonSongProgressGraph()

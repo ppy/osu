@@ -24,9 +24,6 @@ namespace osu.Game.Screens.Play.HUD
 
         private const float bar_height = 10;
 
-        [SettingSource(typeof(SongProgressStrings), nameof(SongProgressStrings.GraphType), nameof(SongProgressStrings.GraphTypeDescription))]
-        public Bindable<bool> ShowGraph { get; } = new BindableBool(true);
-
         [SettingSource(typeof(SongProgressStrings), nameof(SongProgressStrings.ShowTime), nameof(SongProgressStrings.ShowTimeDescription))]
         public Bindable<bool> ShowTime { get; } = new BindableBool(true);
 
@@ -95,23 +92,26 @@ namespace osu.Game.Screens.Play.HUD
         {
             base.LoadComplete();
 
+            GraphType.ValueChanged += _ => updateGraphVisibility();
+
             Interactive.BindValueChanged(_ => bar.Interactive = Interactive.Value, true);
-            ShowGraph.BindValueChanged(_ => updateGraphVisibility(), true);
             ShowTime.BindValueChanged(_ => info.FadeTo(ShowTime.Value ? 1 : 0, 200, Easing.In), true);
             AccentColour.BindValueChanged(_ => Colour = AccentColour.Value, true);
         }
 
-        protected override void UpdateFromObjects(IEnumerable<HitObject> objects)
+        protected override void UpdateTimeBounds()
         {
-            graph.Objects = objects;
-
             info.StartTime = bar.StartTime = FirstHitTime;
             info.EndTime = bar.EndTime = LastHitTime;
         }
 
+        protected override void UpdateFromObjects(IEnumerable<HitObject> objects) => graph.SetFromObjects(objects);
+
+        protected override void UpdateFromStrains(double[] sectionStrains) => graph.SetFromStrains(sectionStrains);
+
         private void updateGraphVisibility()
         {
-            graph.FadeTo(ShowGraph.Value ? 1 : 0, 200, Easing.In);
+            graph.FadeTo(GraphType.Value != DifficultyGraphType.None ? 1 : 0, 200, Easing.In);
         }
 
         protected override void Update()
