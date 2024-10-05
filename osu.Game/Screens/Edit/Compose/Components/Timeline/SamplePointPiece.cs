@@ -42,7 +42,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         private Editor? editor { get; set; }
 
         [Resolved]
-        private Timeline? timeline { get; set; }
+        private TimelineBlueprintContainer? timelineBlueprintContainer { get; set; }
 
         private Bindable<bool> samplesVisible = null!;
 
@@ -72,9 +72,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             samplesVisible = config.GetBindable<bool>(OsuSetting.EditorTimelineShowSamples);
         }
 
-        private BindableNumber<float>? timelineZoom;
-
-        private bool contracted;
+        private readonly Bindable<bool> contracted = new Bindable<bool>();
 
         protected override void LoadComplete()
         {
@@ -83,21 +81,19 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             samplesVisible.BindValueChanged(visible => this.FadeTo(visible.NewValue ? 1 : 0, 200, Easing.OutQuint));
             this.FadeTo(samplesVisible.Value ? 1 : 0);
 
-            timelineZoom = timeline?.CurrentZoom.GetBoundCopy();
-            timelineZoom?.BindValueChanged(zoom =>
-            {
-                const float zoom_threshold = 40f;
+            if (timelineBlueprintContainer != null)
+                contracted.BindTo(timelineBlueprintContainer.SamplePointContracted);
 
-                if (zoom.NewValue < zoom_threshold)
+            contracted.BindValueChanged(v =>
+            {
+                if (v.NewValue)
                 {
-                    contracted = true;
                     Label.FadeOut(200, Easing.OutQuint);
                     LabelContainer.ResizeTo(new Vector2(12), 200, Easing.OutQuint);
                     LabelContainer.CornerRadius = 6;
                 }
                 else
                 {
-                    contracted = false;
                     Label.FadeIn(200, Easing.OutQuint);
                     LabelContainer.ResizeTo(new Vector2(Label.Width, 16), 200, Easing.OutQuint);
                     LabelContainer.CornerRadius = 8;
@@ -131,7 +127,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         {
             Label.Text = $"{abbreviateBank(GetBankValue(GetSamples()))} {GetVolumeValue(GetSamples())}";
 
-            if (!contracted)
+            if (!contracted.Value)
                 LabelContainer.ResizeWidthTo(Label.Width, 200, Easing.OutQuint);
         }
 

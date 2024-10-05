@@ -15,16 +15,19 @@ using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
+using osu.Framework.Layout;
 using osu.Framework.Utils;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Screens.Edit.Components.Timelines.Summary.Parts;
 using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 {
+    [Cached]
     internal partial class TimelineBlueprintContainer : EditorBlueprintContainer
     {
         [Resolved(CanBeNull = true)]
@@ -34,6 +37,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         private SelectionBlueprint<HitObject> placementBlueprint;
 
         private bool hitObjectDragged;
+
+        private readonly LayoutValue samplePointContractedStateCache = new LayoutValue(Invalidation.DrawSize);
 
         /// <remarks>
         /// Positional input must be received outside the container's bounds,
@@ -49,6 +54,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             Origin = Anchor.Centre;
 
             Height = 0.6f;
+
+            AddLayout(samplePointContractedStateCache);
         }
 
         [BackgroundDependencyLoader]
@@ -116,9 +123,41 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 Composer.Playfield.FutureLifetimeExtension = timeline.VisibleRange / 2;
             }
 
+            updateSamplePointContractedState();
+
             base.Update();
 
             updateStacking();
+        }
+
+        public Bindable<bool> SamplePointContracted = new Bindable<bool>();
+
+        private void updateSamplePointContractedState()
+        {
+            if (samplePointContractedStateCache.IsValid)
+                return;
+
+            const double minimum_gap = 28;
+
+            // Find the smallest time gap between any two sample point pieces
+            double smallestTimeGap = double.PositiveInfinity;
+            double lastTime = double.PositiveInfinity;
+
+            // The blueprints are ordered in reverse chronological order
+            foreach (var selectionBlueprint in SelectionBlueprints)
+            {
+                var hitObject = selectionBlueprint.Item;
+
+                if (hitObject is IHasRepeats hasRepeats)
+                    smallestTimeGap = Math.Min(smallestTimeGap, hasRepeats.Duration / hasRepeats.SpanCount() / 2);
+
+                smallestTimeGap = Math.Min(smallestTimeGap, lastTime - hitObject.GetEndTime());
+                lastTime = hitObject.StartTime;
+            }
+
+            double smallestAbsoluteGap = ((TimelineSelectionBlueprintContainer)SelectionBlueprints).ContentRelativeToAbsoluteFactor.X * smallestTimeGap;
+            SamplePointContracted.Value = smallestAbsoluteGap < minimum_gap;
+            samplePointContractedStateCache.Validate();
         }
 
         private readonly Stack<HitObject> currentConcurrentObjects = new Stack<HitObject>();
@@ -287,6 +326,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         protected partial class TimelineSelectionBlueprintContainer : Container<SelectionBlueprint<HitObject>>
         {
             protected override Container<SelectionBlueprint<HitObject>> Content { get; }
+
+            public Vector2 ContentRelativeToAbsoluteFactor => Content.RelativeToAbsoluteFactor;
 
             public TimelineSelectionBlueprintContainer()
             {
