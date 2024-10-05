@@ -7,6 +7,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Textures;
@@ -35,6 +36,8 @@ namespace osu.Game.Tournament
         private DependencyContainer dependencies = null!;
         private FileBasedIPC ipc = null!;
         private BeatmapLookupCache beatmapCache = null!;
+
+        public BindableBool IsSaveTriggered = new BindableBool(false);
 
         protected Task BracketLoadTask => bracketLoadTaskCompletionSource.Task;
 
@@ -329,7 +332,9 @@ namespace osu.Game.Tournament
                 return;
             }
 
+            IsSaveTriggered.Value = true;
             saveChanges();
+            IsSaveTriggered.Value = false;
         }
 
         private void saveChanges()

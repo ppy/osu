@@ -71,9 +71,18 @@ namespace osu.Game.Tournament.Screens.Editors
             [Resolved]
             private LadderInfo ladderInfo { get; set; } = null!;
 
+            [Resolved]
+            private TournamentGameBase? game { get; set; }
+
             public TeamRow(TournamentTeam team, TournamentScreen parent)
             {
                 Model = team;
+
+                Model.FullName.Default = Model.FullName.Value;
+                Model.Acronym.Default = Model.Acronym.Value;
+                Model.FlagName.Default = Model.FlagName.Value;
+                Model.LastYearPlacing.Default = Model.LastYearPlacing.Value;
+                Model.Seed.Default = Model.Seed.Value;
 
                 Masking = true;
                 CornerRadius = 10;
@@ -175,6 +184,22 @@ namespace osu.Game.Tournament.Screens.Editors
                         }
                     },
                 };
+            }
+
+            [BackgroundDependencyLoader]
+            private void load()
+            {
+                // TournamentGameBase won't be loaded so early, probably binding the event here
+                game?.IsSaveTriggered.BindValueChanged(state =>
+                {
+                    if (!state.NewValue) return;
+
+                    Model.FullName.Default = Model.FullName.Value;
+                    Model.Acronym.Default = Model.Acronym.Value;
+                    Model.FlagName.Default = Model.FlagName.Value;
+                    Model.LastYearPlacing.Default = Model.LastYearPlacing.Value;
+                    Model.Seed.Default = Model.Seed.Value;
+                });
             }
 
             private partial class LastYearPlacementSlider : RoundedSliderBar<int>
@@ -299,6 +324,13 @@ namespace osu.Game.Tournament.Screens.Editors
 
                             game.PopulatePlayer(user, updatePanel, updatePanel);
                         }, true);
+
+                        game.IsSaveTriggered.BindValueChanged(state =>
+                        {
+                            if (!state.NewValue) return;
+
+                            playerId.Default = playerId.Value;
+                        });
                     }
 
                     private void updatePanel() => Scheduler.AddOnce(() =>
