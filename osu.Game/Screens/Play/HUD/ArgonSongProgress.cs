@@ -24,7 +24,7 @@ namespace osu.Game.Screens.Play.HUD
 
         private const float bar_height = 10;
 
-        [SettingSource(typeof(SongProgressStrings), nameof(SongProgressStrings.ShowGraph), nameof(SongProgressStrings.ShowGraphDescription))]
+        [SettingSource(typeof(SongProgressStrings), nameof(SongProgressStrings.GraphType), nameof(SongProgressStrings.GraphTypeDescription))]
         public Bindable<bool> ShowGraph { get; } = new BindableBool(true);
 
         [SettingSource(typeof(SongProgressStrings), nameof(SongProgressStrings.ShowTime), nameof(SongProgressStrings.ShowTimeDescription))]
@@ -101,7 +101,7 @@ namespace osu.Game.Screens.Play.HUD
             AccentColour.BindValueChanged(_ => Colour = AccentColour.Value, true);
         }
 
-        protected override void UpdateObjects(IEnumerable<HitObject> objects)
+        protected override void UpdateFromObjects(IEnumerable<HitObject> objects)
         {
             graph.Objects = objects;
 

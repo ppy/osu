@@ -134,6 +134,64 @@ namespace osu.Game.Rulesets.Difficulty
         }
 
         /// <summary>
+        /// Calculates the difficulty of section of the beatmap with no mods applied.
+        /// </summary>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>Per-skill array where each value represents difficulty of this section in certain skill.</returns>
+        public IEnumerable<double[]> CalculateSectionDifficulties(CancellationToken cancellationToken = default)
+            => CalculateSectionDifficulties(Array.Empty<Mod>(), cancellationToken);
+
+        /// <summary>
+        /// Calculates the difficulty of section of the beatmap using a specific mod combination.
+        /// </summary>
+        /// <param name="mods">The mods that should be applied to the beatmap.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>Per-skill array where each value represents difficulty of this section in certain skill.</returns>
+        public IEnumerable<double[]> CalculateSectionDifficulties([NotNull] IEnumerable<Mod> mods, CancellationToken cancellationToken = default)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            preProcess(mods, cancellationToken);
+
+            var skills = CreateSkills(Beatmap, playableMods, clockRate);
+            StrainSkill[] relevantSkills = GetRelevantSkills(skills);
+            var hitObjects = getDifficultyHitObjects();
+
+            if (!hitObjects.Any())
+                return Enumerable.Empty<double[]>();
+
+            // Add sections before first object to preserve correct bounds
+            foreach (var skill in relevantSkills)
+                skill.AddEmptySections(hitObjects.First().StartTime, Beatmap.HitObjects.First().StartTime / clockRate);
+
+            foreach (var hitObject in hitObjects)
+            {
+                foreach (var skill in relevantSkills)
+                {
+                    cancellationToken.ThrowIfCancellationRequested();
+                    skill.Process(hitObject);
+                }
+            }
+
+            // Add sections up to the end time of last object to preserve correct bounds
+            foreach (var skill in relevantSkills)
+                skill.AddEmptySections(Beatmap.HitObjects.Last().GetEndTime() / clockRate);
+
+            var strainsForSkills = relevantSkills
+                .Select(skill => skill.GetCurrentStrainPeaks().ToArray());
+
+            return strainsForSkills;
+        }
+
+        /// <summary>
+        /// Filters relevant skills that would be used to represent difficulty of the section.
+        /// </summary>
+        /// <remarks>
+        /// IMPORTANT NOTE: for now it's using <see cref="StrainSkill"/> to receive section values, consider changing it in the future.
+        /// Also, this function should also be changed if filtering skills is no longer enough to get desired values.
+        /// </remarks>
+        public virtual StrainSkill[] GetRelevantSkills(Skill[] skills) => skills.OfType<StrainSkill>().ToArray();
+
+        /// <summary>
         /// Calculates the difficulty of the beatmap using all mod combinations applicable to the beatmap.
         /// </summary>
         /// <remarks>

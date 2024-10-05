@@ -31,8 +31,8 @@ namespace osu.Game.Screens.Play.HUD
         private readonly SongProgressInfo info;
         private readonly Container content;
 
-        [SettingSource(typeof(SongProgressStrings), nameof(SongProgressStrings.ShowGraph), nameof(SongProgressStrings.ShowGraphDescription))]
-        public Bindable<bool> ShowGraph { get; } = new BindableBool(true);
+        //[SettingSource(typeof(SongProgressStrings), nameof(SongProgressStrings.GraphType), nameof(SongProgressStrings.GraphTypeDescription))]
+        //public Bindable<DifficultyGraphType> GraphType { get; } = new Bindable<DifficultyGraphType>(DifficultyGraphType.TotalStrain);
 
         [SettingSource(typeof(SongProgressStrings), nameof(SongProgressStrings.ShowTime), nameof(SongProgressStrings.ShowTimeDescription))]
         public Bindable<bool> ShowTime { get; } = new BindableBool(true);
@@ -87,23 +87,28 @@ namespace osu.Game.Screens.Play.HUD
 
         protected override void LoadComplete()
         {
+            GraphType.ValueChanged += _ => updateGraphType();
+
             Interactive.BindValueChanged(_ => updateBarVisibility(), true);
-            ShowGraph.BindValueChanged(_ => updateGraphVisibility(), true);
             ShowTime.BindValueChanged(_ => updateTimeVisibility(), true);
             AccentColour.BindValueChanged(_ => Colour = AccentColour.Value, true);
+
+            updateGraphType();
 
             base.LoadComplete();
         }
 
-        protected override void UpdateObjects(IEnumerable<HitObject> objects)
+        protected override void UpdateTimeBounds()
         {
-            graph.Objects = objects;
-
             info.StartTime = FirstHitTime;
             info.EndTime = LastHitTime;
             bar.StartTime = FirstHitTime;
             bar.EndTime = LastHitTime;
         }
+
+        protected override void UpdateFromObjects(IEnumerable<HitObject> objects) => graph.SetFromObjects(objects);
+
+        protected override void UpdateFromStrains(double[] sectionStrains) => graph.SetFromStrains(sectionStrains);
 
         protected override void UpdateProgress(double progress, bool isIntro)
         {
@@ -128,12 +133,12 @@ namespace osu.Game.Screens.Play.HUD
             updateInfoMargin();
         }
 
-        private void updateGraphVisibility()
+        private void updateGraphType()
         {
             float barHeight = bottom_bar_height + handle_size.Y;
 
-            bar.ResizeHeightTo(ShowGraph.Value ? barHeight + graph_height : barHeight, transition_duration, Easing.In);
-            graph.FadeTo(ShowGraph.Value ? 1 : 0, transition_duration, Easing.In);
+            bar.ResizeHeightTo(GraphType.Value != DifficultyGraphType.None ? barHeight + graph_height : barHeight, transition_duration, Easing.In);
+            graph.FadeTo(GraphType.Value != DifficultyGraphType.None ? 1 : 0, transition_duration, Easing.In);
 
             updateInfoMargin();
         }
@@ -147,7 +152,7 @@ namespace osu.Game.Screens.Play.HUD
 
         private void updateInfoMargin()
         {
-            float finalMargin = bottom_bar_height + (Interactive.Value ? handle_size.Y : 0) + (ShowGraph.Value ? graph_height : 0);
+            float finalMargin = bottom_bar_height + (Interactive.Value ? handle_size.Y : 0) + (GraphType.Value != DifficultyGraphType.None ? graph_height : 0);
             info.TransformTo(nameof(info.Margin), new MarginPadding { Bottom = finalMargin }, transition_duration, Easing.In);
         }
     }

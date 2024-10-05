@@ -142,6 +142,17 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             return skills.ToArray();
         }
 
+        public override StrainSkill[] GetRelevantSkills(Skill[] skills)
+        {
+            var strainSkills = skills.OfType<StrainSkill>().ToList();
+
+            // Remove the second skill (SliderlessAim) from the list
+            if (strainSkills.Count > 1)
+                strainSkills.RemoveAt(1);
+
+            return strainSkills.ToArray();
+        }
+
         protected override Mod[] DifficultyAdjustmentMods => new Mod[]
         {
             new OsuModTouchDevice(),

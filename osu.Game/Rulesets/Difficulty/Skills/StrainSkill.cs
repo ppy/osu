@@ -61,6 +61,22 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         }
 
         /// <summary>
+        /// Adds empty strain sections
+        /// </summary>
+        public void AddEmptySections(double time, double? currentSectionOverride = null)
+        {
+            if (currentSectionOverride.HasValue)
+                currentSectionEnd = Math.Ceiling(currentSectionOverride.Value / SectionLength) * SectionLength;
+
+            while (time > currentSectionEnd)
+            {
+                saveCurrentPeak();
+                currentSectionPeak = 0; // This is wrong, but there's no way get decay from this class
+                currentSectionEnd += SectionLength;
+            }
+        }
+
+        /// <summary>
         /// Saves the current peak strain level to the list of strain peaks, which will be used to calculate an overall difficulty.
         /// </summary>
         private void saveCurrentPeak()
