@@ -34,9 +34,15 @@ namespace osu.Game.Tournament.Screens.Editors
         {
             public SeedingResult Model { get; }
 
+            [Resolved]
+            private TournamentGameBase? game { get; set; }
+
             public SeedingResultRow(TournamentTeam team, SeedingResult round)
             {
                 Model = round;
+
+                Model.Mod.Default = Model.Mod.Value;
+                Model.Seed.Default = Model.Seed.Value;
 
                 Masking = true;
                 CornerRadius = 10;
@@ -104,6 +110,18 @@ namespace osu.Game.Tournament.Screens.Editors
                 AutoSizeAxes = Axes.Y;
             }
 
+            [BackgroundDependencyLoader]
+            private void load()
+            {
+                game?.IsSaveTriggered.BindValueChanged(state =>
+                {
+                    if (!state.NewValue) return;
+
+                    Model.Mod.Default = Model.Mod.Value;
+                    Model.Seed.Default = Model.Seed.Value;
+                });
+            }
+
             public partial class SeedingBeatmapEditor : CompositeDrawable
             {
                 private readonly SeedingResult round;
@@ -136,6 +154,9 @@ namespace osu.Game.Tournament.Screens.Editors
                 {
                     private readonly SeedingResult result;
                     public SeedingBeatmap Model { get; }
+
+                    [Resolved]
+                    private TournamentGameBase? game { get; set; }
 
                     [Resolved]
                     protected IAPIProvider API { get; private set; } = null!;
@@ -252,8 +273,19 @@ namespace osu.Game.Tournament.Screens.Editors
                             API.Queue(req);
                         }, true);
 
-                        score.Value = Model.Score.ToString();
+                        Model.Seed.Default = Model.Seed.Value;
+
+                        score.Default = score.Value = Model.Score.ToString();
                         score.BindValueChanged(str => long.TryParse(str.NewValue, out Model.Score));
+
+                        game?.IsSaveTriggered.BindValueChanged(state =>
+                        {
+                            if (!state.NewValue) return;
+
+                            beatmapId.Default = beatmapId.Value;
+                            Model.Seed.Default = Model.Seed.Value;
+                            score.Default = score.Value;
+                        });
                     }
 
                     private void updatePanel()
