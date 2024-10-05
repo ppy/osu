@@ -32,7 +32,7 @@ namespace osu.Game.Screens.Play.HUD
         private readonly Container content;
 
         [SettingSource(typeof(SongProgressStrings), nameof(SongProgressStrings.GraphType), nameof(SongProgressStrings.GraphTypeDescription))]
-        public Bindable<DifficultyGraphType> GraphType { get; } = new Bindable<DifficultyGraphType>(DifficultyGraphType.TotalStrain);
+        public Bindable<DifficultyGraphType> GraphType { get; } = new Bindable<DifficultyGraphType>(DifficultyGraphType.Difficulty);
 
         [SettingSource(typeof(SongProgressStrings), nameof(SongProgressStrings.ShowTime), nameof(SongProgressStrings.ShowTimeDescription))]
         public Bindable<bool> ShowTime { get; } = new BindableBool(true);

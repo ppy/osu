@@ -24,8 +24,7 @@ namespace osu.Game.Screens.Play.HUD
     {
         None,
         ObjectDensity,
-        MaxStrain,
-        TotalStrain
+        Difficulty
     }
 
     public abstract partial class SongProgress : OverlayContainer, ISerialisableDrawable
@@ -104,12 +103,7 @@ namespace osu.Game.Screens.Play.HUD
                     if (objects != null) UpdateFromObjects(objects);
                     break;
 
-                case DifficultyGraphType.MaxStrain:
-                    if (sectionStrains != null) UpdateFromStrains(getMaxStrains(sectionStrains));
-                    else calculateStrains();
-                    break;
-
-                case DifficultyGraphType.TotalStrain:
+                case DifficultyGraphType.Difficulty:
                     if (sectionStrains != null) UpdateFromStrains(getTotalStrains(sectionStrains));
                     else calculateStrains();
                     break;
