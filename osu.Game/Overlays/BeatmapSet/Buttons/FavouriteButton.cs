@@ -7,6 +7,7 @@ using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Graphics.UserInterface;
@@ -20,7 +21,7 @@ using APIUser = osu.Game.Online.API.Requests.Responses.APIUser;
 
 namespace osu.Game.Overlays.BeatmapSet.Buttons
 {
-    public partial class FavouriteButton : HeaderButton
+    public partial class FavouriteButton : HeaderButton, IHasTooltip
     {
         public readonly Bindable<APIBeatmapSet> BeatmapSet = new Bindable<APIBeatmapSet>();
 
@@ -31,7 +32,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
 
         private readonly IBindable<APIUser> localUser = new Bindable<APIUser>();
 
-        public override LocalisableString TooltipText
+        public LocalisableString TooltipText
         {
             get
             {
