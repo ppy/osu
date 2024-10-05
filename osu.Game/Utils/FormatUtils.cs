@@ -76,7 +76,6 @@ namespace osu.Game.Utils
 
             if (targetSize > values.Length)
                 return resamplingUpscale(values, targetSize);
-
             else if (targetSize < values.Length)
                 return resamplingDownscale(values, targetSize);
 

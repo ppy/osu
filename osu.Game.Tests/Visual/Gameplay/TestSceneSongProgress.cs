@@ -91,8 +91,8 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddToggleStep("toggle graph", b =>
             {
-                applyToDefaultProgress(s => s.ShowGraph.Value = b);
-                applyToArgonProgress(s => s.ShowGraph.Value = b);
+                applyToDefaultProgress(s => s.GraphType.Value = b ? DifficultyGraphType.ObjectDensity : DifficultyGraphType.None);
+                applyToArgonProgress(s => s.GraphType.Value = b ? DifficultyGraphType.ObjectDensity : DifficultyGraphType.None);
             });
 
             AddStep("set white background", () => background.FadeColour(Color4.White, 200, Easing.OutQuint));

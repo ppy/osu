@@ -12,8 +12,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
-using osu.Game.Configuration;
-using osu.Game.Localisation.HUD;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;

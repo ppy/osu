@@ -47,7 +47,7 @@ namespace osu.Game.Screens.Play.HUD
             }
 
             Values = values;
-    }
+        }
 
         public void SetFromStrains(double[] strains)
         {
