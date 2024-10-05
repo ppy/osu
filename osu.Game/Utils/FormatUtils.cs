@@ -70,6 +70,10 @@ namespace osu.Game.Utils
         /// </remarks>
         public static double[] ResampleStrains(double[] values, int targetSize)
         {
+            // Set to at least one value, what will be 0 in this case
+            if (values.Length == 0)
+                values = new double[1];
+
             if (targetSize > values.Length)
                 return resamplingUpscale(values, targetSize);
 
@@ -94,7 +98,7 @@ namespace osu.Game.Utils
             int targetIndex = 1;
 
             // Adjust sizes accounting for the fact that first and last elements already set-up
-            int sourceSize = values.Length - 1;
+            int sourceSize = Math.Max(1, values.Length - 1);
             targetSize -= 1;
 
             for (; targetIndex < targetSize - 1; targetIndex++)
@@ -146,7 +150,8 @@ namespace osu.Game.Utils
                 double distanceToNextPeak = nextPeakProgress - targetProgress;
 
                 double lerpCoef = distanceToPreviousPeak / (distanceToPreviousPeak + distanceToNextPeak);
-                result[targetIndex] = double.Lerp(values[sourceIndex], values[sourceIndex + 1], lerpCoef);
+                double nextValue = sourceIndex + 1 < values.Length ? values[sourceIndex + 1] : values[sourceIndex];
+                result[targetIndex] = double.Lerp(values[sourceIndex], nextValue, lerpCoef);
             }
 
             return result;
