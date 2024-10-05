@@ -7,10 +7,12 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
@@ -150,7 +152,7 @@ namespace osu.Game.Rulesets.Osu.Edit
                     Spacing = new Vector2(0f, 10f),
                     Children = new Drawable[]
                     {
-                        gridFromPointsButton = new RoundedButton
+                        gridFromPointsButton = new TooltipRoundedButton
                         {
                             Action = () => GridFromPointsClicked?.Invoke(),
                             RelativeSizeAxes = Axes.X,
@@ -309,6 +311,11 @@ namespace osu.Game.Rulesets.Osu.Edit
                 Blending = BlendingParameters.Additive;
             }
         }
+    }
+
+    public partial class TooltipRoundedButton : RoundedButton, IHasTooltip
+    {
+        public virtual LocalisableString TooltipText { get; set; }
     }
 
     public enum PositionSnapGridType
