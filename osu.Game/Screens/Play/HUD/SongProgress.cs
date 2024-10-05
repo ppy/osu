@@ -179,10 +179,9 @@ namespace osu.Game.Screens.Play.HUD
 
         #endregion
 
-
         #region diffcalc
 
-        private bool strainsCalculationWasStarted = false;
+        private bool strainsCalculationWasStarted;
 
         private List<double[]>? sectionStrains;
 
@@ -205,29 +204,19 @@ namespace osu.Game.Screens.Play.HUD
 
             strainsCalculationWasStarted = true;
             difficultyCache.GetSectionDifficultiesAsync(beatmap.Value, ruleset.Value.CreateInstance(), mods.Value.ToArray())
-                .ContinueWith(task => Schedule(() =>
-                {
-                    sectionStrains = task.GetResultSafely();
-                    updateBasedOnGraphType();
-                }), TaskContinuationOptions.OnlyOnRanToCompletion);
-        }
-
-        private double[] getMaxStrains(List<double[]> allStrains)
-        {
-            var result = allStrains
-                .SelectMany(arr => arr.Select((value, index) => (value, index)))
-                .GroupBy(x => x.index)
-                .Select(g => g.Max(x => x.value));
-
-            return result.ToArray();
+                           .ContinueWith(task => Schedule(() =>
+                           {
+                               sectionStrains = task.GetResultSafely();
+                               updateBasedOnGraphType();
+                           }), TaskContinuationOptions.OnlyOnRanToCompletion);
         }
 
         private double[] getTotalStrains(List<double[]> allStrains)
         {
             var result = allStrains
-                .SelectMany(arr => arr.Select((value, index) => (value, index)))
-                .GroupBy(x => x.index)
-                .Select(g => Math.Sqrt(g.Sum(x => x.value * x.value)));
+                         .SelectMany(arr => arr.Select((value, index) => (value, index)))
+                         .GroupBy(x => x.index)
+                         .Select(g => Math.Sqrt(g.Sum(x => x.value * x.value)));
 
             return result.ToArray();
         }
