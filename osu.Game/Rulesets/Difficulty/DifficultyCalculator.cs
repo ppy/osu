@@ -153,7 +153,7 @@ namespace osu.Game.Rulesets.Difficulty
             preProcess(mods, cancellationToken);
 
             var skills = CreateSkills(Beatmap, playableMods, clockRate);
-            StrainSkill[] relevantSkills = GetRelevantSkills(skills);
+            StrainSkill[] relevantSkills = skills.OfType<StrainSkill>().Where(s => s.IsRelevant).ToArray();
             var hitObjects = getDifficultyHitObjects();
 
             if (!hitObjects.Any())
@@ -181,15 +181,6 @@ namespace osu.Game.Rulesets.Difficulty
 
             return strainsForSkills;
         }
-
-        /// <summary>
-        /// Filters relevant skills that would be used to represent difficulty of the section.
-        /// </summary>
-        /// <remarks>
-        /// IMPORTANT NOTE: for now it's using <see cref="StrainSkill"/> to receive section values, consider changing it in the future.
-        /// Also, this function should also be changed if filtering skills is no longer enough to get desired values.
-        /// </remarks>
-        public virtual StrainSkill[] GetRelevantSkills(Skill[] skills) => skills.OfType<StrainSkill>().ToArray();
 
         /// <summary>
         /// Calculates the difficulty of the beatmap using all mod combinations applicable to the beatmap.
