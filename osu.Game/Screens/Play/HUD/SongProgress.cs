@@ -212,7 +212,8 @@ namespace osu.Game.Screens.Play.HUD
                          .GroupBy(x => x.index)
                          .Select(g => Math.Sqrt(g.Sum(x => x.value * x.value)));
 
-            return result.ToArray();
+            // Skip one to account for delay in strains
+            return result.Skip(1).ToArray();
         }
 
         protected virtual void UpdateFromStrains(double[] sectionStrains) { }
