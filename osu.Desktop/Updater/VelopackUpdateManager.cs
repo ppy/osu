@@ -56,7 +56,7 @@ namespace osu.Desktop.Updater
                 if (isInGameplay)
                 {
                     scheduleRecheck = true;
-                    return false;
+                    return true;
                 }
 
                 // TODO: we should probably be checking if there's a more recent update, rather than shortcutting here.
