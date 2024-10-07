@@ -40,6 +40,7 @@ namespace osu.Game.Screens.Edit.Setup
                         MaxValue = 10,
                         Precision = 0.1f,
                     },
+                    TransferValueOnCommit = true,
                     TabbableContentContainer = this,
                 },
                 healthDrainSlider = new FormSliderBar<float>
@@ -53,6 +54,7 @@ namespace osu.Game.Screens.Edit.Setup
                         MaxValue = 10,
                         Precision = 0.1f,
                     },
+                    TransferValueOnCommit = true,
                     TabbableContentContainer = this,
                 },
                 approachRateSlider = new FormSliderBar<float>
@@ -66,6 +68,7 @@ namespace osu.Game.Screens.Edit.Setup
                         MaxValue = 10,
                         Precision = 0.1f,
                     },
+                    TransferValueOnCommit = true,
                     TabbableContentContainer = this,
                 },
                 overallDifficultySlider = new FormSliderBar<float>
@@ -79,6 +82,7 @@ namespace osu.Game.Screens.Edit.Setup
                         MaxValue = 10,
                         Precision = 0.1f,
                     },
+                    TransferValueOnCommit = true,
                     TabbableContentContainer = this,
                 },
                 baseVelocitySlider = new FormSliderBar<double>
@@ -92,6 +96,7 @@ namespace osu.Game.Screens.Edit.Setup
                         MaxValue = 3.6,
                         Precision = 0.01f,
                     },
+                    TransferValueOnCommit = true,
                     TabbableContentContainer = this,
                 },
                 tickRateSlider = new FormSliderBar<double>
@@ -105,6 +110,7 @@ namespace osu.Game.Screens.Edit.Setup
                         MaxValue = 4,
                         Precision = 1,
                     },
+                    TransferValueOnCommit = true,
                     TabbableContentContainer = this,
                 },
             };
