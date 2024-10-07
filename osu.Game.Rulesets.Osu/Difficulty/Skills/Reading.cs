@@ -16,7 +16,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 {
     public class ReadingLowAR : GraphSkill
     {
-        private readonly List<double> difficulties = new List<double>();
         private double skillMultiplier => 1.23;
         private double aimComponentMultiplier => 0.4;
 
@@ -40,7 +39,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             double totalDensityDifficulty = (currentDensityAimStrain + densityReadingDifficulty) * skillMultiplier;
 
-            difficulties.Add(totalDensityDifficulty);
+            ObjectStrains.Add(totalDensityDifficulty);
 
             if (current.Index == 0)
                 CurrentSectionEnd = Math.Ceiling(current.StartTime / SectionLength) * SectionLength;
@@ -59,11 +58,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private double reducedNoteBaseline => 0.7;
         public override double DifficultyValue()
         {
-            double difficulty = 0;
-
             // Sections with 0 difficulty are excluded to avoid worst-case time complexity of the following sort (e.g. /b/2351871).
             // These sections will not contribute to the difficulty.
-            var peaks = difficulties.Where(p => p > 0);
+            var peaks = ObjectStrains.Where(p => p > 0);
 
             List<double> values = peaks.OrderByDescending(d => d).ToList();
 
@@ -75,14 +72,16 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             values = values.OrderByDescending(d => d).ToList();
 
+            Difficulty = 0;
+
             // Difficulty is the weighted sum of the highest strains from every section.
             // We're sorting from highest to lowest strain.
             for (int i = 0; i < values.Count; i++)
             {
-                difficulty += values[i] / (i + 1);
+                Difficulty += values[i] / (i + 1);
             }
 
-            return difficulty;
+            return Difficulty;
         }
         public static double DifficultyToPerformance(double difficulty) => Math.Max(
             Math.Max(Math.Pow(difficulty, 1.5) * 20, Math.Pow(difficulty, 2) * 17.0),
@@ -95,7 +94,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             : base(mods, false)
         {
         }
-        protected new double SkillMultiplier => 7.2;
+        protected new double SkillMultiplier => 7.632;
 
         protected override double StrainValueAt(DifficultyHitObject current)
         {
@@ -107,6 +106,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             hiddenDifficulty *= SkillMultiplier;
 
             CurrentStrain += hiddenDifficulty;
+            ObjectStrains.Add(CurrentStrain);
 
             return CurrentStrain;
         }
@@ -204,8 +204,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             double adjustedDifficulty = performanceToDifficulty(totalPerformance);
             double difficultyValue = Math.Pow(adjustedDifficulty / OsuDifficultyCalculator.DIFFICULTY_MULTIPLIER, 2.0);
 
+            Difficulty = skill_multiplier * Math.Pow(difficultyValue, MECHANICAL_PP_POWER);
+
             // Sqrt value to make difficulty depend less on mechanical difficulty
-            return skill_multiplier * Math.Pow(difficultyValue, MECHANICAL_PP_POWER);
+            return Difficulty;
         }
         public class HighARAimComponent : Aim
         {

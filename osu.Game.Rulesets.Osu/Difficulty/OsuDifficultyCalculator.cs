@@ -51,11 +51,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double sliderFactor = aimRating > 0 ? aimRatingNoSliders / aimRating : 1;
 
+            double hiddenDifficultyStrainCount = 0;
             double baseReadingHiddenPerformance = 0.0;
             if (mods.Any(h => h is OsuModHidden))
             {
                 hiddenRating = Math.Sqrt(skills[6].DifficultyValue()) * DIFFICULTY_MULTIPLIER;
                 baseReadingHiddenPerformance = ReadingHidden.DifficultyToPerformance(hiddenRating);
+                hiddenDifficultyStrainCount = skills[5].CountDifficultStrains();
             }
 
             double baseFlashlightPerformance = 0.0;
@@ -63,8 +65,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             {
                 baseFlashlightPerformance = Flashlight.DifficultyToPerformance(flashlightRating);
             }
-            double aimDifficultyStrainCount = ((OsuStrainSkill)skills[0]).CountDifficultStrains();
-            double speedDifficultyStrainCount = ((OsuStrainSkill)skills[2]).CountDifficultStrains();
+
+            double aimDifficultyStrainCount = skills[0].CountDifficultStrains();
+            double speedDifficultyStrainCount = skills[2].CountDifficultStrains();
+            double lowArDifficultyStrainCount = skills[4].CountDifficultStrains();
 
             if (mods.Any(m => m is OsuModTouchDevice))
             {
@@ -135,13 +139,15 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 SliderFactor = sliderFactor,
                 AimDifficultStrainCount = aimDifficultyStrainCount,
                 SpeedDifficultStrainCount = speedDifficultyStrainCount,
+                LowArDifficultStrainCount = lowArDifficultyStrainCount,
+                HiddenDifficultStrainCount = hiddenDifficultyStrainCount,
                 ApproachRate = IBeatmapDifficultyInfo.InverseDifficultyRange(preempt, 1800, 1200, 450),
                 OverallDifficulty = (80 - hitWindowGreat) / 6,
                 DrainRate = drainRate,
                 MaxCombo = beatmap.GetMaxCombo(),
                 HitCircleCount = hitCirclesCount,
                 SliderCount = sliderCount,
-                SpinnerCount = spinnerCount,
+                SpinnerCount = spinnerCount
             };
 
             return attributes;

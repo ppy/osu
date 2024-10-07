@@ -30,7 +30,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         {
             CurrentStrain *= StrainDecay(current.DeltaTime);
             CurrentStrain += AimEvaluator.EvaluateDifficultyOf(current, withSliders) * SkillMultiplier;
-            ObjectStrains.Add(currentStrain);
+            ObjectStrains.Add(CurrentStrain);
 
             return CurrentStrain;
         }
