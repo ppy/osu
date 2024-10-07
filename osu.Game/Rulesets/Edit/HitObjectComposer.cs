@@ -466,14 +466,6 @@ namespace osu.Game.Rulesets.Edit
 
         public void SetSelectTool() => toolboxCollection.Items.First().Select();
 
-        protected void SetCustomTool(CompositionTool tool)
-        {
-            foreach (var toolBoxRadioButton in toolboxCollection.Items)
-                toolBoxRadioButton.Deselect();
-
-            toolSelected(tool);
-        }
-
         private void toolSelected(CompositionTool tool)
         {
             BlueprintContainer.CurrentTool = tool;
