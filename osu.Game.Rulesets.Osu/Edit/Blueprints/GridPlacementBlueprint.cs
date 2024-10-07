@@ -34,7 +34,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints
             {
                 gridToolboxGroup.StartPosition.Value = originalOrigin;
                 gridToolboxGroup.Spacing.Value = originalSpacing;
-                gridToolboxGroup.GridLinesRotation.Value = originalRotation;
+                if (!gridToolboxGroup.GridLinesRotation.Disabled)
+                    gridToolboxGroup.GridLinesRotation.Value = originalRotation;
             }
 
             base.EndPlacement(commit);
@@ -107,7 +108,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints
                 if (Vector2.Distance(gridToolboxGroup.StartPosition.Value, pos) < 2)
                 {
                     gridToolboxGroup.Spacing.Value = originalSpacing;
-                    gridToolboxGroup.GridLinesRotation.Value = originalRotation;
+                    if (!gridToolboxGroup.GridLinesRotation.Disabled)
+                        gridToolboxGroup.GridLinesRotation.Value = originalRotation;
                 }
                 else
                 {
