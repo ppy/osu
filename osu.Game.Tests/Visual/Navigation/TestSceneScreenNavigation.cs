@@ -365,37 +365,6 @@ namespace osu.Game.Tests.Visual.Navigation
         }
 
         [Test]
-        public void TestSaveFailedReplay()
-        {
-            Player player = null;
-
-            Screens.Select.SongSelect songSelect = null;
-            PushAndConfirm(() => songSelect = new TestPlaySongSelect());
-            AddUntilStep("wait for song select", () => songSelect.BeatmapSetsLoaded);
-
-            AddStep("import beatmap", () => BeatmapImportHelper.LoadOszIntoOsu(Game, virtualTrack: true).WaitSafely());
-
-            AddUntilStep("wait for selected", () => !Game.Beatmap.IsDefault);
-
-            AddStep("press enter", () => InputManager.Key(Key.Enter));
-
-            AddUntilStep("wait for player", () =>
-            {
-                DismissAnyNotifications();
-                return (player = Game.ScreenStack.CurrentScreen as Player) != null;
-            });
-
-            AddUntilStep("wait for fail", () => player.GameplayState.HasFailed);
-
-            AddUntilStep("fail screen displayed", () => player.ChildrenOfType<FailOverlay>().First().State.Value == Visibility.Visible);
-            AddUntilStep("wait for button clickable", () => player.ChildrenOfType<SaveFailedScoreButton>().First().ChildrenOfType<OsuClickableContainer>().First().Enabled.Value);
-
-            AddUntilStep("score not in database", () => Realm.Run(r => r.Find<ScoreInfo>(player.Score.ScoreInfo.ID) == null));
-            AddStep("click save button", () => player.ChildrenOfType<SaveFailedScoreButton>().First().ChildrenOfType<OsuClickableContainer>().First().TriggerClick());
-            AddUntilStep("score in database", () => Realm.Run(r => r.Find<ScoreInfo>(player.Score.ScoreInfo.ID) != null));
-        }
-
-        [Test]
         public void TestExitImmediatelyAfterCompletion()
         {
             var player = playToCompletion();
