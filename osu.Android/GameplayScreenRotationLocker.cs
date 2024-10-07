@@ -12,7 +12,7 @@ namespace osu.Android
 {
     public partial class GameplayScreenRotationLocker : Component
     {
-        private IBindable<LocalUserPlayingStates> localUserPlaying = null!;
+        private IBindable<LocalUserPlayingState> localUserPlaying = null!;
 
         [Resolved]
         private OsuGameActivity gameActivity { get; set; } = null!;
@@ -24,11 +24,11 @@ namespace osu.Android
             localUserPlaying.BindValueChanged(updateLock, true);
         }
 
-        private void updateLock(ValueChangedEvent<LocalUserPlayingStates> userPlaying)
+        private void updateLock(ValueChangedEvent<LocalUserPlayingState> userPlaying)
         {
             gameActivity.RunOnUiThread(() =>
             {
-                gameActivity.RequestedOrientation = userPlaying.NewValue != LocalUserPlayingStates.NotPlaying ? ScreenOrientation.Locked : gameActivity.DefaultOrientation;
+                gameActivity.RequestedOrientation = userPlaying.NewValue != LocalUserPlayingState.NotPlaying ? ScreenOrientation.Locked : gameActivity.DefaultOrientation;
             });
         }
     }
