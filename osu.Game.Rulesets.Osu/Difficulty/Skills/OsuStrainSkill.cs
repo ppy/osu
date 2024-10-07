@@ -26,6 +26,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         protected virtual double StrainDecayBase => 0.15;
 
         protected double StrainDecay(double ms) => Math.Pow(StrainDecayBase, ms / 1000);
+        protected List<double> ObjectStrains = new List<double>();
+        protected double Difficulty;
 
         protected OsuStrainSkill(Mod[] mods)
             : base(mods)
@@ -34,7 +36,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         public override double DifficultyValue()
         {
-            double difficulty = 0;
+            Difficulty = 0;
             double weight = 1;
 
             // Sections with 0 strain are excluded to avoid worst-case time complexity of the following sort (e.g. /b/2351871).
@@ -54,11 +56,25 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             // We're sorting from highest to lowest strain.
             foreach (double strain in strains.OrderDescending())
             {
-                difficulty += strain * weight;
+                Difficulty += strain * weight;
                 weight *= DecayWeight;
             }
 
-            return difficulty;
+            return Difficulty;
+        }
+
+        /// <summary>
+        /// Returns the number of strains weighted against the top strain.
+        /// The result is scaled by clock rate as it affects the total number of strains.
+        /// </summary>
+        public double CountDifficultStrains()
+        {
+            if (Difficulty == 0)
+                return 0.0;
+
+            double consistentTopStrain = Difficulty / 10; // What would the top strain be if all strain values were identical
+            // Use a weighted sum of all strains. Constants are arbitrary and give nice values
+            return ObjectStrains.Sum(s => 1.1 / (1 + Math.Exp(-10 * (s / consistentTopStrain - 0.88))));
         }
 
         /// <summary>

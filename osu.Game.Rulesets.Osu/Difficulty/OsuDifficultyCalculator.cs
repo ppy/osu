@@ -63,6 +63,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             {
                 baseFlashlightPerformance = Flashlight.DifficultyToPerformance(flashlightRating);
             }
+            double aimDifficultyStrainCount = ((OsuStrainSkill)skills[0]).CountDifficultStrains();
+            double speedDifficultyStrainCount = ((OsuStrainSkill)skills[2]).CountDifficultStrains();
 
             if (mods.Any(m => m is OsuModTouchDevice))
             {
@@ -96,7 +98,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double preempt = IBeatmapDifficultyInfo.DifficultyRange(beatmap.Difficulty.ApproachRate, 1800, 1200, 450) / clockRate;
 
             double drainRate = beatmap.Difficulty.DrainRate;
-            int maxCombo = beatmap.GetMaxCombo();
 
             int hitCirclesCount = beatmap.HitObjects.Count(h => h is HitCircle);
             int sliderCount = beatmap.HitObjects.Count(h => h is Slider);
@@ -132,10 +133,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 HiddenDifficulty = hiddenRating,
                 FlashlightDifficulty = flashlightRating,
                 SliderFactor = sliderFactor,
+                AimDifficultStrainCount = aimDifficultyStrainCount,
+                SpeedDifficultStrainCount = speedDifficultyStrainCount,
                 ApproachRate = IBeatmapDifficultyInfo.InverseDifficultyRange(preempt, 1800, 1200, 450),
                 OverallDifficulty = (80 - hitWindowGreat) / 6,
                 DrainRate = drainRate,
-                MaxCombo = maxCombo,
+                MaxCombo = beatmap.GetMaxCombo(),
                 HitCircleCount = hitCirclesCount,
                 SliderCount = sliderCount,
                 SpinnerCount = spinnerCount,

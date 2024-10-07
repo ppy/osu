@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private readonly bool withSliders;
 
         protected double CurrentStrain;
-        protected double SkillMultiplier => 25.15; // WARNING - INCREASED FROM 24.963 FOR BALANCING
+        protected double SkillMultiplier => 25.18; // WARNING - INCREASED FROM 24.963 FOR BALANCING
 
         protected override double CalculateInitialStrain(double time, DifficultyHitObject current) => CurrentStrain * StrainDecay(time - current.Previous(0).StartTime);
 
@@ -30,6 +30,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         {
             CurrentStrain *= StrainDecay(current.DeltaTime);
             CurrentStrain += AimEvaluator.EvaluateDifficultyOf(current, withSliders) * SkillMultiplier;
+            ObjectStrains.Add(currentStrain);
 
             return CurrentStrain;
         }
