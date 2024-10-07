@@ -7,12 +7,14 @@ using System;
 using System.Globalization;
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.UserInterfaceV2;
+using osu.Game.Overlays;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Setup;
@@ -24,6 +26,9 @@ namespace osu.Game.Tests.Visual.Editing
     {
         private TestDesignSection designSection;
         private EditorBeatmap editorBeatmap { get; set; }
+
+        [Cached]
+        private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Aquamarine);
 
         [SetUpSteps]
         public void SetUp()
@@ -42,7 +47,7 @@ namespace osu.Game.Tests.Visual.Editing
                 {
                     (typeof(EditorBeatmap), editorBeatmap)
                 },
-                Child = designSection = new TestDesignSection()
+                Child = designSection = new TestDesignSection { RelativeSizeAxes = Axes.X }
             });
         }
 
@@ -99,11 +104,11 @@ namespace osu.Game.Tests.Visual.Editing
 
         private partial class TestDesignSection : DesignSection
         {
-            public new LabelledSwitchButton EnableCountdown => base.EnableCountdown;
+            public new FormCheckBox EnableCountdown => base.EnableCountdown;
 
             public new FillFlowContainer CountdownSettings => base.CountdownSettings;
-            public new LabelledEnumDropdown<CountdownType> CountdownSpeed => base.CountdownSpeed;
-            public new LabelledNumberBox CountdownOffset => base.CountdownOffset;
+            public new FormEnumDropdown<CountdownType> CountdownSpeed => base.CountdownSpeed;
+            public new FormTextBox CountdownOffset => base.CountdownOffset;
         }
     }
 }

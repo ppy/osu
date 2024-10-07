@@ -6,6 +6,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -25,6 +26,8 @@ namespace osu.Game.Graphics.UserInterface
         public const int MARGIN_VERTICAL = 4;
         public const int TEXT_SIZE = 17;
         public const int TRANSITION_LENGTH = 80;
+
+        public BindableBool ShowCheckbox { get; } = new BindableBool();
 
         private TextContainer text;
         private HotkeyDisplay hotkey;
@@ -72,6 +75,7 @@ namespace osu.Game.Graphics.UserInterface
         {
             base.LoadComplete();
 
+            ShowCheckbox.BindValueChanged(_ => updateState());
             Item.Action.BindDisabledChanged(_ => updateState(), true);
             FinishTransforms();
         }
@@ -138,6 +142,8 @@ namespace osu.Game.Graphics.UserInterface
                 text.BoldText.FadeOut(TRANSITION_LENGTH, Easing.OutQuint);
                 text.NormalText.FadeIn(TRANSITION_LENGTH, Easing.OutQuint);
             }
+
+            text.CheckboxContainer.Alpha = ShowCheckbox.Value ? 1 : 0;
         }
 
         protected sealed override Drawable CreateContent() => text = CreateTextContainer();

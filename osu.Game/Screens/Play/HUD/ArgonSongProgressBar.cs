@@ -6,15 +6,17 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 using osu.Framework.Utils;
 using osu.Game.Graphics;
 using osuTK;
 
 namespace osu.Game.Screens.Play.HUD
 {
-    public partial class ArgonSongProgressBar : SongProgressBar
+    public partial class ArgonSongProgressBar : SongProgressBar, IHasTooltip
     {
         // Parent will handle restricting the area of valid input.
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
@@ -32,6 +34,23 @@ namespace osu.Game.Screens.Play.HUD
         public double Progress { get; set; }
 
         private double trackTime => (EndTime - StartTime) * Progress;
+
+        private float lastMouseX;
+
+        public LocalisableString TooltipText
+        {
+            get
+            {
+                double progress = Math.Clamp(lastMouseX, 0, DrawWidth) / DrawWidth;
+
+                TimeSpan currentSpan = TimeSpan.FromMilliseconds(Math.Round((EndTime - StartTime) * progress));
+
+                int seconds = currentSpan.Duration().Seconds;
+                int minutes = (int)Math.Floor(currentSpan.Duration().TotalMinutes);
+
+                return $"{minutes}:{seconds:D2} ({progress:P0})";
+            }
+        }
 
         public ArgonSongProgressBar(float barHeight)
         {
@@ -82,6 +101,14 @@ namespace osu.Game.Screens.Play.HUD
 
             background.FadeTo(0.3f, 200, Easing.In);
             playfieldBar.TransformTo(nameof(playfieldBar.AccentColour), mainColour, 200, Easing.In);
+        }
+
+        protected override bool OnMouseMove(MouseMoveEvent e)
+        {
+            base.OnMouseMove(e);
+
+            lastMouseX = e.MousePosition.X;
+            return false;
         }
 
         protected override bool OnHover(HoverEvent e)

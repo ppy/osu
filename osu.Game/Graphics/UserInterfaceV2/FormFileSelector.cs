@@ -68,6 +68,8 @@ namespace osu.Game.Graphics.UserInterfaceV2
         /// </summary>
         public LocalisableString PlaceholderText { get; init; }
 
+        public Container PreviewContainer { get; private set; } = null!;
+
         private Box background = null!;
 
         private FormFieldCaption caption = null!;
@@ -89,7 +91,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
         private void load()
         {
             RelativeSizeAxes = Axes.X;
-            Height = 50;
+            AutoSizeAxes = Axes.Y;
 
             Masking = true;
             CornerRadius = 5;
@@ -101,9 +103,23 @@ namespace osu.Game.Graphics.UserInterfaceV2
                     RelativeSizeAxes = Axes.Both,
                     Colour = colourProvider.Background5,
                 },
+                PreviewContainer = new Container
+                {
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    Padding = new MarginPadding
+                    {
+                        Horizontal = 1.5f,
+                        Top = 1.5f,
+                        Bottom = 50
+                    },
+                },
                 new Container
                 {
-                    RelativeSizeAxes = Axes.Both,
+                    RelativeSizeAxes = Axes.X,
+                    Height = 50,
+                    Anchor = Anchor.BottomLeft,
+                    Origin = Anchor.BottomLeft,
                     Padding = new MarginPadding(9),
                     Children = new Drawable[]
                     {
@@ -148,12 +164,13 @@ namespace osu.Game.Graphics.UserInterfaceV2
             base.LoadComplete();
 
             popoverState.BindValueChanged(_ => updateState());
+            current.BindDisabledChanged(_ => updateState());
             current.BindValueChanged(_ =>
             {
                 updateState();
                 onFileSelected();
-            });
-            current.BindDisabledChanged(_ => updateState(), true);
+            }, true);
+            FinishTransforms(true);
             game.RegisterImportHandler(this);
         }
 
@@ -189,7 +206,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
         private void updateState()
         {
             caption.Colour = Current.Disabled ? colourProvider.Foreground1 : colourProvider.Content2;
-            filenameText.Colour = Current.Disabled ? colourProvider.Foreground1 : colourProvider.Content1;
+            filenameText.Colour = Current.Disabled || Current.Value == null ? colourProvider.Foreground1 : colourProvider.Content1;
 
             if (!Current.Disabled)
             {
