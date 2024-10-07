@@ -1,17 +1,27 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Framework.Utils;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
 using osu.Game.Rulesets.Edit;
+using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Screens.Edit;
+using osu.Game.Screens.Edit.Components.RadioButtons;
 using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Edit
 {
@@ -19,6 +29,9 @@ namespace osu.Game.Rulesets.Osu.Edit
     {
         [Resolved]
         private EditorBeatmap editorBeatmap { get; set; } = null!;
+
+        [Resolved]
+        private IExpandingContainer? expandingContainer { get; set; }
 
         /// <summary>
         /// X position of the grid's origin.
@@ -55,8 +68,8 @@ namespace osu.Game.Rulesets.Osu.Edit
         /// </summary>
         public BindableFloat GridLinesRotation { get; } = new BindableFloat(0f)
         {
-            MinValue = -45f,
-            MaxValue = 45f,
+            MinValue = -180f,
+            MaxValue = 180f,
             Precision = 1f
         };
 
@@ -72,10 +85,15 @@ namespace osu.Game.Rulesets.Osu.Edit
         /// </summary>
         public Bindable<Vector2> SpacingVector { get; } = new Bindable<Vector2>();
 
+        public Bindable<PositionSnapGridType> GridType { get; } = new Bindable<PositionSnapGridType>();
+
         private ExpandableSlider<float> startPositionXSlider = null!;
         private ExpandableSlider<float> startPositionYSlider = null!;
         private ExpandableSlider<float> spacingSlider = null!;
         private ExpandableSlider<float> gridLinesRotationSlider = null!;
+        private EditorRadioButtonCollection gridTypeButtons = null!;
+
+        private ExpandableButton useSelectedObjectPositionButton = null!;
 
         public OsuGridToolboxGroup()
             : base("grid")
@@ -99,6 +117,20 @@ namespace osu.Game.Rulesets.Osu.Edit
                     Current = StartPositionY,
                     KeyboardStep = 1,
                 },
+                useSelectedObjectPositionButton = new ExpandableButton
+                {
+                    ExpandedLabelText = "Centre on selected object",
+                    Action = () =>
+                    {
+                        if (editorBeatmap.SelectedHitObjects.Count != 1)
+                            return;
+
+                        var position = ((IHasPosition)editorBeatmap.SelectedHitObjects.Single()).Position;
+                        StartPosition.Value = new Vector2(MathF.Round(position.X), MathF.Round(position.Y));
+                        updateEnabledStates();
+                    },
+                    RelativeSizeAxes = Axes.X,
+                },
                 spacingSlider = new ExpandableSlider<float>
                 {
                     Current = Spacing,
@@ -109,6 +141,31 @@ namespace osu.Game.Rulesets.Osu.Edit
                     Current = GridLinesRotation,
                     KeyboardStep = 1,
                 },
+                new FillFlowContainer
+                {
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    Spacing = new Vector2(0f, 10f),
+                    Children = new Drawable[]
+                    {
+                        gridTypeButtons = new EditorRadioButtonCollection
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            Items = new[]
+                            {
+                                new RadioButton("Square",
+                                    () => GridType.Value = PositionSnapGridType.Square,
+                                    () => new SpriteIcon { Icon = FontAwesome.Regular.Square }),
+                                new RadioButton("Triangle",
+                                    () => GridType.Value = PositionSnapGridType.Triangle,
+                                    () => new OutlineTriangle(true, 20)),
+                                new RadioButton("Circle",
+                                    () => GridType.Value = PositionSnapGridType.Circle,
+                                    () => new SpriteIcon { Icon = FontAwesome.Regular.Circle }),
+                            }
+                        },
+                    }
+                },
             };
 
             Spacing.Value = editorBeatmap.BeatmapInfo.GridSize;
@@ -117,6 +174,8 @@ namespace osu.Game.Rulesets.Osu.Edit
         protected override void LoadComplete()
         {
             base.LoadComplete();
+
+            gridTypeButtons.Items.First().Select();
 
             StartPositionX.BindValueChanged(x =>
             {
@@ -132,6 +191,13 @@ namespace osu.Game.Rulesets.Osu.Edit
                 StartPosition.Value = new Vector2(StartPosition.Value.X, y.NewValue);
             }, true);
 
+            StartPosition.BindValueChanged(pos =>
+            {
+                StartPositionX.Value = pos.NewValue.X;
+                StartPositionY.Value = pos.NewValue.Y;
+                updateEnabledStates();
+            });
+
             Spacing.BindValueChanged(spacing =>
             {
                 spacingSlider.ContractedLabelText = $"S: {spacing.NewValue:N0}";
@@ -145,6 +211,42 @@ namespace osu.Game.Rulesets.Osu.Edit
                 gridLinesRotationSlider.ContractedLabelText = $"R: {rotation.NewValue:#,0.##}";
                 gridLinesRotationSlider.ExpandedLabelText = $"Rotation: {rotation.NewValue:#,0.##}";
             }, true);
+
+            GridType.BindValueChanged(v =>
+            {
+                GridLinesRotation.Disabled = v.NewValue == PositionSnapGridType.Circle;
+
+                switch (v.NewValue)
+                {
+                    case PositionSnapGridType.Square:
+                        GridLinesRotation.Value = ((GridLinesRotation.Value + 405) % 90) - 45;
+                        GridLinesRotation.MinValue = -45;
+                        GridLinesRotation.MaxValue = 45;
+                        break;
+
+                    case PositionSnapGridType.Triangle:
+                        GridLinesRotation.Value = ((GridLinesRotation.Value + 390) % 60) - 30;
+                        GridLinesRotation.MinValue = -30;
+                        GridLinesRotation.MaxValue = 30;
+                        break;
+                }
+            }, true);
+
+            editorBeatmap.BeatmapReprocessed += updateEnabledStates;
+            editorBeatmap.SelectedHitObjects.BindCollectionChanged((_, _) => updateEnabledStates());
+            expandingContainer?.Expanded.BindValueChanged(v =>
+            {
+                gridTypeButtons.FadeTo(v.NewValue ? 1f : 0f, 500, Easing.OutQuint);
+                gridTypeButtons.BypassAutoSizeAxes = !v.NewValue ? Axes.Y : Axes.None;
+                updateEnabledStates();
+            }, true);
+        }
+
+        private void updateEnabledStates()
+        {
+            useSelectedObjectPositionButton.Enabled.Value = expandingContainer?.Expanded.Value == true
+                                                            && editorBeatmap.SelectedHitObjects.Count == 1
+                                                            && !Precision.AlmostEquals(StartPosition.Value, ((IHasPosition)editorBeatmap.SelectedHitObjects.Single()).Position, 0.5f);
         }
 
         private void nextGridSize()
@@ -167,5 +269,42 @@ namespace osu.Game.Rulesets.Osu.Edit
         public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
         {
         }
+
+        public partial class OutlineTriangle : BufferedContainer
+        {
+            public OutlineTriangle(bool outlineOnly, float size)
+                : base(cachedFrameBuffer: true)
+            {
+                Size = new Vector2(size);
+
+                InternalChildren = new Drawable[]
+                {
+                    new EquilateralTriangle { RelativeSizeAxes = Axes.Both },
+                };
+
+                if (outlineOnly)
+                {
+                    AddInternal(new EquilateralTriangle
+                    {
+                        Anchor = Anchor.TopCentre,
+                        Origin = Anchor.Centre,
+                        RelativePositionAxes = Axes.Y,
+                        Y = 0.48f,
+                        Colour = Color4.Black,
+                        Size = new Vector2(size - 7),
+                        Blending = BlendingParameters.None,
+                    });
+                }
+
+                Blending = BlendingParameters.Additive;
+            }
+        }
+    }
+
+    public enum PositionSnapGridType
+    {
+        Square,
+        Triangle,
+        Circle,
     }
 }

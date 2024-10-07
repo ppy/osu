@@ -1,10 +1,13 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Testing;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Components;
@@ -19,9 +22,10 @@ namespace osu.Game.Tests.Visual.Editing
         [Cached]
         private EditorBeatmap editorBeatmap = new EditorBeatmap(new TestBeatmap(new OsuRuleset().RulesetInfo));
 
-        public TestSceneEditorClock()
+        [SetUpSteps]
+        public void SetUpSteps()
         {
-            Add(new FillFlowContainer
+            AddStep("create content", () => Add(new FillFlowContainer
             {
                 RelativeSizeAxes = Axes.Both,
                 Children = new Drawable[]
@@ -39,17 +43,15 @@ namespace osu.Game.Tests.Visual.Editing
                         Size = new Vector2(200, 100)
                     }
                 }
+            }));
+            AddStep("set working beatmap", () =>
+            {
+                Beatmap.Disabled = false;
+                Beatmap.Value = CreateWorkingBeatmap(new OsuRuleset().RulesetInfo);
+                // ensure that music controller does not change this beatmap due to it
+                // completing naturally as part of the test.
+                Beatmap.Disabled = true;
             });
-        }
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            Beatmap.Value = CreateWorkingBeatmap(new OsuRuleset().RulesetInfo);
-            // ensure that music controller does not change this beatmap due to it
-            // completing naturally as part of the test.
-            Beatmap.Disabled = true;
         }
 
         [Test]
@@ -100,6 +102,29 @@ namespace osu.Game.Tests.Visual.Editing
 
             AddStep("seek smoothly beyond track length", () => EditorClock.SeekSmoothlyTo(EditorClock.TrackLength + 1000));
             AddUntilStep("time is clamped to track length", () => EditorClock.CurrentTime, () => Is.EqualTo(EditorClock.TrackLength));
+        }
+
+        [Test]
+        public void TestCurrentTimeDoubleTransform()
+        {
+            AddAssert("seek smoothly twice and current time is accurate", () =>
+            {
+                EditorClock.SeekSmoothlyTo(1000);
+                EditorClock.SeekSmoothlyTo(2000);
+                return 2000 == EditorClock.CurrentTimeAccurate;
+            });
+        }
+
+        [Test]
+        public void TestAdjustmentsRemovedOnDisposal()
+        {
+            AddStep("reset clock", () => EditorClock.Seek(0));
+
+            AddStep("set 0.25x speed", () => this.ChildrenOfType<OsuTabControl<double>>().First().Current.Value = 0.25);
+            AddAssert("track has 0.25x tempo", () => Beatmap.Value.Track.AggregateTempo.Value, () => Is.EqualTo(0.25));
+
+            AddStep("dispose playback control", () => Clear(disposeChildren: true));
+            AddAssert("track has 1x tempo", () => Beatmap.Value.Track.AggregateTempo.Value, () => Is.EqualTo(1));
         }
 
         protected override void Dispose(bool isDisposing)

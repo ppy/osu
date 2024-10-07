@@ -30,7 +30,8 @@ namespace osu.Game.Overlays
 
         private const float border_width = 5;
 
-        private readonly Medal medal;
+        public readonly Medal Medal;
+
         private readonly Box background;
         private readonly Container backgroundStrip, particleContainer;
         private readonly BackgroundStrip leftStrip, rightStrip;
@@ -44,7 +45,7 @@ namespace osu.Game.Overlays
 
         public MedalAnimation(Medal medal)
         {
-            this.medal = medal;
+            Medal = medal;
             RelativeSizeAxes = Axes.Both;
 
             Child = content = new Container
@@ -168,7 +169,7 @@ namespace osu.Game.Overlays
         {
             base.LoadComplete();
 
-            LoadComponentAsync(drawableMedal = new DrawableMedal(medal)
+            LoadComponentAsync(drawableMedal = new DrawableMedal(Medal)
             {
                 Anchor = Anchor.TopCentre,
                 Origin = Anchor.TopCentre,

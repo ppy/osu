@@ -48,7 +48,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 return true;
             });
 
-            AddAssert("sample playback disabled", () => sampleDisabler.SamplePlaybackDisabled.Value);
+            AddUntilStep("sample playback disabled", () => sampleDisabler.SamplePlaybackDisabled.Value);
 
             // because we are in frame stable context, it's quite likely that not all samples are "played" at this point.
             // the important thing is that at least one started, and that sample has since stopped.

@@ -5,14 +5,15 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Development;
 using osu.Framework.Graphics;
 using osu.Game.Database;
+using osu.Game.Localisation;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Multiplayer.Countdown;
@@ -22,7 +23,6 @@ using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Utils;
-using osu.Game.Localisation;
 
 namespace osu.Game.Online.Multiplayer
 {
@@ -777,12 +777,22 @@ namespace osu.Game.Online.Multiplayer
                     Room.Playlist[Room.Playlist.IndexOf(Room.Playlist.Single(existing => existing.ID == item.ID))] = item;
 
                     int existingIndex = APIRoom.Playlist.IndexOf(APIRoom.Playlist.Single(existing => existing.ID == item.ID));
+
                     APIRoom.Playlist.RemoveAt(existingIndex);
                     APIRoom.Playlist.Insert(existingIndex, createPlaylistItem(item));
                 }
                 catch (Exception ex)
                 {
-                    throw new AggregateException($"Item: {JsonConvert.SerializeObject(createPlaylistItem(item))}\n\nRoom:{JsonConvert.SerializeObject(APIRoom)}", ex);
+                    // Temporary code to attempt to figure out long-term failing tests.
+                    StringBuilder exceptionText = new StringBuilder();
+
+                    exceptionText.AppendLine("MultiplayerClient test failure investigation");
+                    exceptionText.AppendLine($"Exception                : {ex.ToString()}");
+                    exceptionText.AppendLine($"Lookup                   : {item.ID}");
+                    exceptionText.AppendLine($"Items in Room.Playlist   : {string.Join(',', Room.Playlist.Select(i => i.ID))}");
+                    exceptionText.AppendLine($"Items in APIRoom.Playlist: {string.Join(',', APIRoom!.Playlist.Select(i => i.ID))}");
+
+                    throw new AggregateException(exceptionText.ToString());
                 }
 
                 ItemChanged?.Invoke(item);

@@ -10,7 +10,6 @@ using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -133,7 +132,7 @@ namespace osu.Game.Rulesets.Edit
 
             InternalChildren = new[]
             {
-                PlayfieldContentContainer = new ContentContainer
+                PlayfieldContentContainer = new Container
                 {
                     Name = "Playfield content",
                     RelativeSizeAxes = Axes.Y,
@@ -207,7 +206,7 @@ namespace osu.Game.Rulesets.Edit
                         {
                             Child = new EditorToolboxGroup("inspector")
                             {
-                                Child = new HitObjectInspector()
+                                Child = CreateHitObjectInspector()
                             },
                         }
                     }
@@ -216,14 +215,14 @@ namespace osu.Game.Rulesets.Edit
 
             toolboxCollection.Items = CompositionTools
                                       .Prepend(new SelectTool())
-                                      .Select(t => new RadioButton(t.Name, () => toolSelected(t), t.CreateIcon))
+                                      .Select(t => new HitObjectCompositionToolButton(t, () => toolSelected(t)))
                                       .ToList();
 
             foreach (var item in toolboxCollection.Items)
             {
                 item.Selected.DisabledChanged += isDisabled =>
                 {
-                    item.TooltipText = isDisabled ? "Add at least one timing point first!" : string.Empty;
+                    item.TooltipText = isDisabled ? "Add at least one timing point first!" : ((HitObjectCompositionToolButton)item).TooltipText;
                 };
             }
 
@@ -270,9 +269,17 @@ namespace osu.Game.Rulesets.Edit
 
             composerFocusMode.BindValueChanged(_ =>
             {
-                float targetAlpha = composerFocusMode.Value ? 0.5f : 1;
-                leftToolboxBackground.FadeTo(targetAlpha, 400, Easing.OutQuint);
-                rightToolboxBackground.FadeTo(targetAlpha, 400, Easing.OutQuint);
+                // Transforms should be kept in sync with other usages of composer focus mode.
+                if (!composerFocusMode.Value)
+                {
+                    leftToolboxBackground.FadeIn(750, Easing.OutQuint);
+                    rightToolboxBackground.FadeIn(750, Easing.OutQuint);
+                }
+                else
+                {
+                    leftToolboxBackground.Delay(600).FadeTo(0.5f, 4000, Easing.OutQuint);
+                    rightToolboxBackground.Delay(600).FadeTo(0.5f, 4000, Easing.OutQuint);
+                }
             }, true);
         }
 
@@ -297,6 +304,10 @@ namespace osu.Game.Rulesets.Edit
                 PlayfieldContentContainer.Width = Math.Max(1024, DrawWidth) - (TOOLBOX_CONTRACTED_SIZE_LEFT + TOOLBOX_CONTRACTED_SIZE_RIGHT);
                 PlayfieldContentContainer.X = TOOLBOX_CONTRACTED_SIZE_LEFT;
             }
+
+            composerFocusMode.Value = PlayfieldContentContainer.Contains(InputManager.CurrentState.Mouse.Position)
+                                      && !LeftToolbox.Contains(InputManager.CurrentState.Mouse.Position)
+                                      && !RightToolbox.Contains(InputManager.CurrentState.Mouse.Position);
         }
 
         public override Playfield Playfield => drawableRulesetWrapper.Playfield;
@@ -312,7 +323,7 @@ namespace osu.Game.Rulesets.Edit
         /// <remarks>
         /// A "select" tool is automatically added as the first tool.
         /// </remarks>
-        protected abstract IReadOnlyList<HitObjectCompositionTool> CompositionTools { get; }
+        protected abstract IReadOnlyList<CompositionTool> CompositionTools { get; }
 
         /// <summary>
         /// A collection of states which will be displayed to the user in the toolbox.
@@ -328,6 +339,8 @@ namespace osu.Game.Rulesets.Edit
         /// Construct a relevant blueprint container. This will manage hitobject selection/placement input handling and display logic.
         /// </summary>
         protected virtual ComposeBlueprintContainer CreateBlueprintContainer() => new ComposeBlueprintContainer(this);
+
+        protected virtual Drawable CreateHitObjectInspector() => new HitObjectInspector();
 
         /// <summary>
         /// Construct a drawable ruleset for the provided ruleset.
@@ -350,7 +363,7 @@ namespace osu.Game.Rulesets.Edit
             if (e.ControlPressed || e.AltPressed || e.SuperPressed)
                 return false;
 
-            if (checkLeftToggleFromKey(e.Key, out int leftIndex))
+            if (checkToolboxMappingFromKey(e.Key, out int leftIndex))
             {
                 var item = toolboxCollection.Items.ElementAtOrDefault(leftIndex);
 
@@ -362,7 +375,7 @@ namespace osu.Game.Rulesets.Edit
                 }
             }
 
-            if (checkRightToggleFromKey(e.Key, out int rightIndex))
+            if (checkToggleMappingFromKey(e.Key, out int rightIndex))
             {
                 var item = e.ShiftPressed
                     ? sampleBankTogglesCollection.ElementAtOrDefault(rightIndex)
@@ -378,7 +391,7 @@ namespace osu.Game.Rulesets.Edit
             return base.OnKeyDown(e);
         }
 
-        private bool checkLeftToggleFromKey(Key key, out int index)
+        private bool checkToolboxMappingFromKey(Key key, out int index)
         {
             if (key < Key.Number1 || key > Key.Number9)
             {
@@ -390,7 +403,7 @@ namespace osu.Game.Rulesets.Edit
             return true;
         }
 
-        private bool checkRightToggleFromKey(Key key, out int index)
+        private bool checkToggleMappingFromKey(Key key, out int index)
         {
             switch (key)
             {
@@ -453,7 +466,7 @@ namespace osu.Game.Rulesets.Edit
 
         private void setSelectTool() => toolboxCollection.Items.First().Select();
 
-        private void toolSelected(HitObjectCompositionTool tool)
+        private void toolSelected(CompositionTool tool)
         {
             BlueprintContainer.CurrentTool = tool;
 
@@ -503,7 +516,7 @@ namespace osu.Game.Rulesets.Edit
             var playfield = PlayfieldAtScreenSpacePosition(screenSpacePosition);
             double? targetTime = null;
 
-            if (snapType.HasFlagFast(SnapType.GlobalGrids))
+            if (snapType.HasFlag(SnapType.GlobalGrids))
             {
                 if (playfield is ScrollingPlayfield scrollingPlayfield)
                 {
@@ -521,31 +534,6 @@ namespace osu.Game.Rulesets.Edit
         }
 
         #endregion
-
-        private partial class ContentContainer : Container
-        {
-            public override bool HandlePositionalInput => true;
-
-            private readonly Bindable<bool> composerFocusMode = new Bindable<bool>();
-
-            [BackgroundDependencyLoader(true)]
-            private void load([CanBeNull] Editor editor)
-            {
-                if (editor != null)
-                    composerFocusMode.BindTo(editor.ComposerFocusMode);
-            }
-
-            protected override bool OnHover(HoverEvent e)
-            {
-                composerFocusMode.Value = true;
-                return false;
-            }
-
-            protected override void OnHoverLost(HoverLostEvent e)
-            {
-                composerFocusMode.Value = false;
-            }
-        }
     }
 
     /// <summary>

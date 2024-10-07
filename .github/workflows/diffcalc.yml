@@ -104,6 +104,25 @@ env:
   EXECUTION_ID: execution-${{ github.run_id }}-${{ github.run_number }}-${{ github.run_attempt }}
 
 jobs:
+  master-environment:
+    name: Save master environment
+    runs-on: ubuntu-latest
+    outputs:
+      HEAD: ${{ steps.get-head.outputs.HEAD }}
+    steps:
+      - name: Checkout osu
+        uses: actions/checkout@v4
+        with:
+          ref: master
+          sparse-checkout: |
+            README.md
+
+      - name: Get HEAD ref
+        id: get-head
+        run: |
+          ref=$(git log -1 --format='%H')
+          echo "HEAD=https://github.com/${{ github.repository }}/commit/${ref}" >> "${GITHUB_OUTPUT}"
+
   check-permissions:
     name: Check permissions
     runs-on: ubuntu-latest
@@ -111,7 +130,7 @@ jobs:
     steps:
       - name: Check permissions
         run: |
-          ALLOWED_USERS=(smoogipoo peppy bdach)
+          ALLOWED_USERS=(smoogipoo peppy bdach frenzibyte)
           for i in "${ALLOWED_USERS[@]}"; do
               if [[ "${{ github.actor }}" == "$i" ]]; then
                   exit 0
@@ -121,7 +140,7 @@ jobs:
 
   create-comment:
     name: Create PR comment
-    needs: check-permissions
+    needs: [ master-environment, check-permissions ]
     runs-on: ubuntu-latest
     if: ${{ github.event_name == 'issue_comment' && github.event.issue.pull_request }}
     steps:
@@ -158,7 +177,7 @@ jobs:
 
   environment:
     name: Setup environment
-    needs: directory
+    needs: [ master-environment, directory ]
     runs-on: self-hosted
     env:
       VARS_JSON: ${{ toJSON(vars) }}
@@ -181,6 +200,10 @@ jobs:
                 sed -i "s;^${optNoPrefix}=.*$;${optNoPrefix}=${val};" "${{ needs.directory.outputs.GENERATOR_ENV }}"
               fi
           done
+
+      - name: Add master environment
+        run: |
+          sed -i "s;^OSU_A=.*$;OSU_A=${{ needs.master-environment.outputs.HEAD }};" "${{ needs.directory.outputs.GENERATOR_ENV }}"
 
       - name: Add pull-request environment
         if: ${{ github.event_name == 'issue_comment' && github.event.issue.pull_request }}
@@ -361,8 +384,7 @@ jobs:
         uses: thollander/actions-comment-pull-request@fabd468d3a1a0b97feee5f6b9e499eab0dd903f6 # v2.5.0
         with:
           comment_tag: ${{ env.EXECUTION_ID }}
-          mode: upsert
-          create_if_not_exists: false
+          mode: recreate
           message: |
             Target: ${{ needs.generator.outputs.TARGET }}
             Spreadsheet: ${{ needs.generator.outputs.SPREADSHEET_LINK }}
@@ -372,8 +394,7 @@ jobs:
         uses: thollander/actions-comment-pull-request@fabd468d3a1a0b97feee5f6b9e499eab0dd903f6 # v2.5.0
         with:
           comment_tag: ${{ env.EXECUTION_ID }}
-          mode: upsert
-          create_if_not_exists: false
+          mode: recreate
           message: |
             Difficulty calculation failed: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
 
