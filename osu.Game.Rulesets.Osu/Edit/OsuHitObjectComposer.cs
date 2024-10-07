@@ -41,7 +41,7 @@ namespace osu.Game.Rulesets.Osu.Edit
         protected override DrawableRuleset<OsuHitObject> CreateDrawableRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod> mods)
             => new DrawableOsuEditorRuleset(ruleset, beatmap, mods);
 
-        protected override IReadOnlyList<HitObjectCompositionTool> CompositionTools => new HitObjectCompositionTool[]
+        protected override IReadOnlyList<CompositionTool> CompositionTools => new CompositionTool[]
         {
             new HitCircleCompositionTool(),
             new SliderCompositionTool(),
@@ -369,6 +369,8 @@ namespace osu.Game.Rulesets.Osu.Edit
                 gridSnapMomentary = shiftPressed;
                 rectangularGridSnapToggle.Value = rectangularGridSnapToggle.Value == TernaryState.False ? TernaryState.True : TernaryState.False;
             }
+
+            DistanceSnapProvider.HandleToggleViaKey(key);
         }
 
         private DistanceSnapGrid createDistanceSnapGrid(IEnumerable<HitObject> selectedHitObjects)
