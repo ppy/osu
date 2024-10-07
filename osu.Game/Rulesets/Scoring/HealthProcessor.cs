@@ -36,6 +36,9 @@ namespace osu.Game.Rulesets.Scoring
         /// </summary>
         public void TriggerFailure()
         {
+            if (HasFailed)
+                return;
+
             if (Failed?.Invoke() != false)
                 HasFailed = true;
         }

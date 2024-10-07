@@ -320,6 +320,8 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestExitViaHoldToExit()
         {
+            AddStep("set hold button always visible", () => LocalConfig.SetValue(OsuSetting.AlwaysShowHoldForMenuButton, true));
+
             AddStep("exit", () =>
             {
                 InputManager.MoveMouseTo(Player.HUDOverlay.HoldToQuit.First(c => c is HoldToConfirmContainer));

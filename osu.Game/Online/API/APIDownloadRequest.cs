@@ -4,6 +4,7 @@
 #nullable disable
 
 using System;
+using System.Diagnostics;
 using System.IO;
 using osu.Framework.IO.Network;
 
@@ -34,7 +35,11 @@ namespace osu.Game.Online.API
             return request;
         }
 
-        private void request_Progress(long current, long total) => API.Schedule(() => Progressed?.Invoke(current, total));
+        private void request_Progress(long current, long total)
+        {
+            Debug.Assert(API != null);
+            API.Schedule(() => Progressed?.Invoke(current, total));
+        }
 
         protected void TriggerSuccess(string filename)
         {
