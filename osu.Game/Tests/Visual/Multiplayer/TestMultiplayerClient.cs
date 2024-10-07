@@ -208,6 +208,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         protected override async Task<MultiplayerRoom> JoinRoom(long roomId, string? password = null)
         {
+            if (RoomJoined || ServerAPIRoom != null)
+                throw new InvalidOperationException("Already joined a room");
+
             roomId = clone(roomId);
             password = clone(password);
 
@@ -260,6 +263,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
         protected override Task LeaveRoomInternal()
         {
             RoomJoined = false;
+            ServerAPIRoom = null;
+            ServerRoom = null;
             return Task.CompletedTask;
         }
 

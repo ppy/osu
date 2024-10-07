@@ -4,6 +4,8 @@
 #nullable disable
 
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -78,14 +80,17 @@ namespace osu.Game.Screens.OnlinePlay.Match.Components
                             },
                         },
                     },
-                    new HoverClickSounds(),
+                    new HoverSounds(HoverSampleSet.TabSelect),
                 };
             }
 
+            private Sample selectSample;
+
             [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
+            private void load(OsuColour colours, AudioManager audio)
             {
                 selection.Colour = colours.Yellow;
+                selectSample = audio.Samples.Get(@"UI/tabselect-select");
             }
 
             protected override bool OnHover(HoverEvent e)
@@ -109,6 +114,8 @@ namespace osu.Game.Screens.OnlinePlay.Match.Components
             {
                 selection.FadeOut(transition_duration, Easing.OutQuint);
             }
+
+            protected override void OnActivatedByUser() => selectSample.Play();
         }
     }
 }

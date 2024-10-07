@@ -40,6 +40,7 @@ namespace osu.Game.Screens.Select
             {
                 case "star":
                 case "stars":
+                case "sr":
                     return TryUpdateCriteriaRange(ref criteria.StarDifficulty, op, value, 0.01d / 2);
 
                 case "ar":
@@ -61,15 +62,36 @@ namespace osu.Game.Screens.Select
                 case "length":
                     return tryUpdateLengthRange(criteria, op, value);
 
-                case "played":
                 case "lastplayed":
                     return tryUpdateDateAgoRange(ref criteria.LastPlayed, op, value);
+
+                case "played":
+                    if (!tryParseBool(value, out bool played))
+                        return false;
+
+                    // Unplayed beatmaps are filtered on DateTimeOffset.MinValue.
+
+                    if (played)
+                    {
+                        criteria.LastPlayed.Min = DateTimeOffset.MinValue;
+                        criteria.LastPlayed.Max = DateTimeOffset.MaxValue;
+                        criteria.LastPlayed.IsLowerInclusive = false;
+                    }
+                    else
+                    {
+                        criteria.LastPlayed.Min = DateTimeOffset.MinValue;
+                        criteria.LastPlayed.Max = DateTimeOffset.MinValue;
+                        criteria.LastPlayed.IsLowerInclusive = true;
+                        criteria.LastPlayed.IsUpperInclusive = true;
+                    }
+
+                    return true;
 
                 case "divisor":
                     return TryUpdateCriteriaRange(ref criteria.BeatDivisor, op, value, tryParseInt);
 
                 case "status":
-                    return TryUpdateCriteriaRange(ref criteria.OnlineStatus, op, value, tryParseEnum);
+                    return TryUpdateCriteriaSet(ref criteria.OnlineStatus, op, value);
 
                 case "creator":
                 case "author":
@@ -131,6 +153,25 @@ namespace osu.Game.Screens.Select
 
         private static bool tryParseInt(string value, out int result) =>
             int.TryParse(value, NumberStyles.None, CultureInfo.InvariantCulture, out result);
+
+        private static bool tryParseBool(string value, out bool result)
+        {
+            switch (value)
+            {
+                case "1":
+                case "yes":
+                    result = true;
+                    return true;
+
+                case "0":
+                case "no":
+                    result = false;
+                    return true;
+
+                default:
+                    return bool.TryParse(value, out result);
+            }
+        }
 
         private static bool tryParseEnum<TEnum>(string value, out TEnum result) where TEnum : struct
         {
@@ -299,6 +340,75 @@ namespace osu.Game.Screens.Select
         public static bool TryUpdateCriteriaRange<T>(ref FilterCriteria.OptionalRange<T> range, Operator op, string val, TryParseFunction<T> parseFunction)
             where T : struct
             => parseFunction.Invoke(val, out var converted) && tryUpdateCriteriaRange(ref range, op, converted);
+
+        /// <summary>
+        /// Attempts to parse a keyword filter of type <typeparamref name="T"/>,
+        /// from the specified <paramref name="op"/> and <paramref name="filterValue"/>.
+        /// If <paramref name="filterValue"/> can be parsed successfully, the function returns <c>true</c>
+        /// and the resulting range constraint is stored into the <paramref name="range"/>'s expected values.
+        /// </summary>
+        /// <param name="range">The <see cref="FilterCriteria.OptionalSet{T}"/> to store the parsed data into, if successful.</param>
+        /// <param name="op">The operator for the keyword filter.</param>
+        /// <param name="filterValue">The value of the keyword filter.</param>
+        public static bool TryUpdateCriteriaSet<T>(ref FilterCriteria.OptionalSet<T> range, Operator op, string filterValue)
+            where T : struct, Enum
+        {
+            var matchingValues = new HashSet<T>();
+
+            if (op == Operator.Equal && filterValue.Contains(','))
+            {
+                string[] splitValues = filterValue.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+
+                foreach (string splitValue in splitValues)
+                {
+                    if (!tryParseEnum<T>(splitValue, out var parsedValue))
+                        return false;
+
+                    matchingValues.Add(parsedValue);
+                }
+            }
+            else
+            {
+                if (!tryParseEnum<T>(filterValue, out var pivotValue))
+                    return false;
+
+                var allDefinedValues = Enum.GetValues<T>();
+
+                foreach (var val in allDefinedValues)
+                {
+                    int compareResult = Comparer<T>.Default.Compare(val, pivotValue);
+
+                    switch (op)
+                    {
+                        case Operator.Less:
+                            if (compareResult < 0) matchingValues.Add(val);
+                            break;
+
+                        case Operator.LessOrEqual:
+                            if (compareResult <= 0) matchingValues.Add(val);
+                            break;
+
+                        case Operator.Equal:
+                            if (compareResult == 0) matchingValues.Add(val);
+                            break;
+
+                        case Operator.GreaterOrEqual:
+                            if (compareResult >= 0) matchingValues.Add(val);
+                            break;
+
+                        case Operator.Greater:
+                            if (compareResult > 0) matchingValues.Add(val);
+                            break;
+
+                        default:
+                            return false;
+                    }
+                }
+            }
+
+            range.Values.IntersectWith(matchingValues);
+            return true;
+        }
 
         private static bool tryUpdateCriteriaRange<T>(ref FilterCriteria.OptionalRange<T> range, Operator op, T value)
             where T : struct

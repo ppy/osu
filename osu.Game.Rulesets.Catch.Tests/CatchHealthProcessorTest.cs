@@ -19,6 +19,7 @@ namespace osu.Game.Rulesets.Catch.Tests
             [new Droplet(), 0.01, true],
             [new TinyDroplet(), 0, false],
             [new Banana(), 0, false],
+            [new BananaShower(), 0, false]
         ];
 
         [TestCaseSource(nameof(test_cases))]

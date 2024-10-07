@@ -15,7 +15,6 @@ using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Development;
 using osu.Framework.Extensions;
-using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
@@ -35,6 +34,7 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osu.Game.Scoring.Legacy;
 using osu.Game.Skinning;
+using osu.Game.Utils;
 using osuTK.Input;
 using Realms;
 using Realms.Exceptions;
@@ -91,8 +91,10 @@ namespace osu.Game.Database
         /// 38   2023-12-10    Add EndTimeObjectCount and TotalObjectCount to BeatmapInfo.
         /// 39   2023-12-19    Migrate any EndTimeObjectCount and TotalObjectCount values of 0 to -1 to better identify non-calculated values.
         /// 40   2023-12-21    Add ScoreInfo.Version to keep track of which build scores were set on.
+        /// 41   2024-04-17    Add ScoreInfo.TotalScoreWithoutMods for future mod multiplier rebalances.
+        /// 42   2024-08-07    Update mania key bindings to reflect changes to ManiaAction
         /// </summary>
-        private const int schema_version = 40;
+        private const int schema_version = 42;
 
         /// <summary>
         /// Lock object which is held during <see cref="BlockAllOperations"/> sections, blocking realm retrieval during blocking periods.
@@ -321,12 +323,32 @@ namespace osu.Game.Database
                 {
                     Logger.Error(e, "Your local database is too new to work with this version of osu!. Please close osu! and install the latest release to recover your data.");
 
-                    // If a newer version database already exists, don't backup again. We can presume that the first backup is the one we care about.
+                    // If a newer version database already exists, don't create another backup. We can presume that the first backup is the one we care about.
                     if (!storage.Exists(newerVersionFilename))
                         createBackup(newerVersionFilename);
                 }
                 else
                 {
+                    // This error can occur due to file handles still being open by a previous instance.
+                    // If this is the case, rather than assuming the realm file is corrupt, block game startup.
+                    if (e.Message.StartsWith("SetEndOfFile() failed", StringComparison.Ordinal))
+                    {
+                        // This will throw if the realm file is not available for write access after 5 seconds.
+                        FileUtils.AttemptOperation(() =>
+                        {
+                            if (storage.Exists(Filename))
+                            {
+                                using (var _ = storage.GetStream(Filename, FileAccess.ReadWrite))
+                                {
+                                }
+                            }
+                        }, 20);
+
+                        // If the above eventually succeeds, try and continue startup as per normal.
+                        // This may throw again but let's allow it to, and block startup.
+                        return getRealmInstance();
+                    }
+
                     Logger.Error(e, "Realm startup failed with unrecoverable error; starting with a fresh database. A backup of your database has been made.");
                     createBackup($"{Filename.Replace(realm_extension, string.Empty)}_{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}_corrupt{realm_extension}");
                 }
@@ -1013,7 +1035,7 @@ namespace osu.Game.Database
 
                             var legacyMods = (LegacyMods)sr.ReadInt32();
 
-                            if (!legacyMods.HasFlagFast(LegacyMods.ScoreV2) || score.APIMods.Any(mod => mod.Acronym == @"SV2"))
+                            if (!legacyMods.HasFlag(LegacyMods.ScoreV2) || score.APIMods.Any(mod => mod.Acronym == @"SV2"))
                                 return;
 
                             score.APIMods = score.APIMods.Append(new APIMod(new ModScoreV2())).ToArray();
@@ -1109,6 +1131,67 @@ namespace osu.Game.Database
                     }
 
                     break;
+
+                case 41:
+                    foreach (var score in migration.NewRealm.All<ScoreInfo>())
+                    {
+                        try
+                        {
+                            // this can fail e.g. if a user has a score set on a ruleset that can no longer be loaded.
+                            LegacyScoreDecoder.PopulateTotalScoreWithoutMods(score);
+                        }
+                        catch (Exception ex)
+                        {
+                            Logger.Log($@"Failed to populate total score without mods for score {score.ID}: {ex}", LoggingTarget.Database);
+                        }
+                    }
+
+                    break;
+
+                case 42:
+                    for (int columns = 1; columns <= 10; columns++)
+                    {
+                        remapKeyBindingsForVariant(columns, false);
+                        remapKeyBindingsForVariant(columns, true);
+                    }
+
+                    // Replace existing key bindings with new ones reflecting changes to ManiaAction:
+                    // - "Special#" actions are removed and "Key#" actions are inserted in their place.
+                    // - All actions are renumbered to remove the old offsets.
+                    void remapKeyBindingsForVariant(int columns, bool dual)
+                    {
+                        // https://github.com/ppy/osu/blob/8773c2f7ebc226942d6124eb95c07a83934272ea/osu.Game.Rulesets.Mania/ManiaRuleset.cs#L327-L336
+                        int variant = dual ? 1000 + (columns * 2) : columns;
+
+                        var oldKeyBindingsQuery = migration.NewRealm
+                                                           .All<RealmKeyBinding>()
+                                                           .Where(kb => kb.RulesetName == @"mania" && kb.Variant == variant);
+                        var oldKeyBindings = oldKeyBindingsQuery.Detach();
+
+                        migration.NewRealm.RemoveRange(oldKeyBindingsQuery);
+
+                        // https://github.com/ppy/osu/blob/8773c2f7ebc226942d6124eb95c07a83934272ea/osu.Game.Rulesets.Mania/ManiaInputManager.cs#L22-L31
+                        int oldNormalAction = 10; // Old Key1 offset
+                        int oldSpecialAction = 1; // Old Special1 offset
+
+                        for (int column = 0; column < columns * (dual ? 2 : 1); column++)
+                        {
+                            if (columns % 2 == 1 && column % columns == columns / 2)
+                                remapKeyBinding(oldSpecialAction++, column);
+                            else
+                                remapKeyBinding(oldNormalAction++, column);
+                        }
+
+                        void remapKeyBinding(int oldAction, int newAction)
+                        {
+                            var oldKeyBinding = oldKeyBindings.Find(kb => kb.ActionInt == oldAction);
+
+                            if (oldKeyBinding != null)
+                                migration.NewRealm.Add(new RealmKeyBinding(newAction, oldKeyBinding.KeyCombination, @"mania", variant));
+                        }
+                    }
+
+                    break;
             }
 
             Logger.Log($"Migration completed in {stopwatch.ElapsedMilliseconds}ms");
@@ -1142,33 +1225,18 @@ namespace osu.Game.Database
         {
             Logger.Log($"Creating full realm database backup at {backupFilename}", LoggingTarget.Database);
 
-            int attempts = 10;
-
-            while (true)
+            FileUtils.AttemptOperation(() =>
             {
-                try
+                using (var source = storage.GetStream(Filename, mode: FileMode.Open))
                 {
-                    using (var source = storage.GetStream(Filename, mode: FileMode.Open))
-                    {
-                        // source may not exist.
-                        if (source == null)
-                            return;
+                    // source may not exist.
+                    if (source == null)
+                        return;
 
-                        using (var destination = storage.GetStream(backupFilename, FileAccess.Write, FileMode.CreateNew))
-                            source.CopyTo(destination);
-                    }
-
-                    return;
+                    using (var destination = storage.GetStream(backupFilename, FileAccess.Write, FileMode.CreateNew))
+                        source.CopyTo(destination);
                 }
-                catch (IOException)
-                {
-                    if (attempts-- <= 0)
-                        throw;
-
-                    // file may be locked during use.
-                    Thread.Sleep(500);
-                }
-            }
+            }, 20);
         }
 
         /// <summary>

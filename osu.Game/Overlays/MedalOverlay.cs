@@ -8,6 +8,7 @@ using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
+using osu.Framework.Logging;
 using osu.Game.Graphics.Containers;
 using osu.Game.Input.Bindings;
 using osu.Game.Online.API;
@@ -81,7 +82,10 @@ namespace osu.Game.Overlays
             };
 
             var medalAnimation = new MedalAnimation(medal);
+
             queuedMedals.Enqueue(medalAnimation);
+            Logger.Log($"Queueing medal unlock for \"{medal.Name}\" ({queuedMedals.Count} to display)");
+
             if (OverlayActivationMode.Value == OverlayActivation.All)
                 Scheduler.AddOnce(Show);
         }
@@ -95,10 +99,12 @@ namespace osu.Game.Overlays
 
             if (!queuedMedals.TryDequeue(out lastAnimation))
             {
+                Logger.Log("All queued medals have been displayed!");
                 Hide();
                 return;
             }
 
+            Logger.Log($"Preparing to display \"{lastAnimation.Medal.Name}\"");
             LoadComponentAsync(lastAnimation, medalContainer.Add);
         }
 

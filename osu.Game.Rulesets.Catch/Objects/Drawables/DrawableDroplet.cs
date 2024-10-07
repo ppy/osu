@@ -2,7 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Graphics;
+using osu.Framework.Utils;
 using osu.Game.Rulesets.Catch.Skinning.Default;
 using osu.Game.Skinning;
 
@@ -28,15 +28,24 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
                 _ => new DropletPiece());
         }
 
+        private float startRotation;
+
         protected override void UpdateInitialTransforms()
         {
             base.UpdateInitialTransforms();
 
-            // roughly matches osu-stable
-            float startRotation = RandomSingle(1) * 20;
-            double duration = HitObject.TimePreempt + 2000;
+            // Important to have this in UpdateInitialTransforms() to it is re-triggered by RefreshStateTransforms().
+            startRotation = RandomSingle(1) * 20;
+        }
 
-            ScalingContainer.RotateTo(startRotation).RotateTo(startRotation + 720, duration);
+        protected override void Update()
+        {
+            base.Update();
+
+            // No clamping for droplets. They should be considered indefinitely spinning regardless of time.
+            // They also never end up on the plate, so they shouldn't stop spinning when caught.
+            double preemptProgress = (Time.Current - (HitObject.StartTime - InitialLifetimeOffset)) / (HitObject.TimePreempt + 2000);
+            ScalingContainer.Rotation = (float)Interpolation.Lerp(startRotation, startRotation + 720, preemptProgress);
         }
     }
 }

@@ -123,6 +123,43 @@ namespace osu.Game.Tests.Visual.UserInterface
             assertSelectedModsEquivalentTo(new Mod[] { new OsuModTouchDevice(), new OsuModHardRock(), new OsuModDoubleTime { SpeedChange = { Value = 1.5 } } });
         }
 
+        [Test]
+        public void TestSystemModsNotPreservedIfIncompatibleWithPresetMods()
+        {
+            ModPresetPanel? panel = null;
+
+            AddStep("create panel", () => Child = panel = new ModPresetPanel(new ModPreset
+            {
+                Name = "Autopilot included",
+                Description = "no way",
+                Mods = new Mod[]
+                {
+                    new OsuModAutopilot()
+                },
+                Ruleset = new OsuRuleset().RulesetInfo
+            }.ToLiveUnmanaged())
+            {
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                Width = 0.5f
+            });
+
+            AddStep("Add touch device to selected mods", () => SelectedMods.Value = new Mod[] { new OsuModTouchDevice() });
+            AddStep("activate panel", () => panel.AsNonNull().TriggerClick());
+
+            // touch device should be removed due to incompatibility with autopilot.
+            assertSelectedModsEquivalentTo(new Mod[] { new OsuModAutopilot() });
+
+            AddStep("deactivate panel", () => panel.AsNonNull().TriggerClick());
+            assertSelectedModsEquivalentTo(Array.Empty<Mod>());
+
+            // just for test purposes, can't/shouldn't happen in reality
+            AddStep("Add score v2 to selected mod", () => SelectedMods.Value = new Mod[] { new ModScoreV2() });
+            AddStep("activate panel", () => panel.AsNonNull().TriggerClick());
+
+            assertSelectedModsEquivalentTo(new Mod[] { new OsuModAutopilot(), new ModScoreV2() });
+        }
+
         private void assertSelectedModsEquivalentTo(IEnumerable<Mod> mods)
             => AddAssert("selected mods changed correctly", () => new HashSet<Mod>(SelectedMods.Value).SetEquals(mods));
 

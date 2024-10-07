@@ -99,7 +99,6 @@ namespace osu.Game.Overlays.Rankings.Tables
                 new UpdateableFlag(GetCountryCode(item))
                 {
                     Size = new Vector2(28, 20),
-                    ShowPlaceholderOnUnknown = false,
                 },
                 CreateFlagContent(item)
             }

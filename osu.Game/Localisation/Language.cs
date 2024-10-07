@@ -2,10 +2,12 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using JetBrains.Annotations;
 
 namespace osu.Game.Localisation
 {
+    [SuppressMessage("ReSharper", "InconsistentNaming")]
     [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
     public enum Language
     {

@@ -1,13 +1,9 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Input;
@@ -25,33 +21,33 @@ using osuTK.Input;
 
 namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 {
-    public partial class SliderPlacementBlueprint : PlacementBlueprint
+    public partial class SliderPlacementBlueprint : HitObjectPlacementBlueprint
     {
         public new Slider HitObject => (Slider)base.HitObject;
 
-        private SliderBodyPiece bodyPiece;
-        private HitCirclePiece headCirclePiece;
-        private HitCirclePiece tailCirclePiece;
-        private PathControlPointVisualiser<Slider> controlPointVisualiser;
+        private SliderBodyPiece bodyPiece = null!;
+        private HitCirclePiece headCirclePiece = null!;
+        private HitCirclePiece tailCirclePiece = null!;
+        private PathControlPointVisualiser<Slider> controlPointVisualiser = null!;
 
-        private InputManager inputManager;
+        private InputManager inputManager = null!;
+
+        private PathControlPoint? cursor;
 
         private SliderPlacementState state;
         private PathControlPoint segmentStart;
-        private PathControlPoint cursor;
+
         private int currentSegmentLength;
+        private bool usingCustomSegmentType;
 
-        [Resolved(CanBeNull = true)]
-        [CanBeNull]
-        private IPositionSnapProvider positionSnapProvider { get; set; }
+        [Resolved]
+        private IPositionSnapProvider? positionSnapProvider { get; set; }
 
-        [Resolved(CanBeNull = true)]
-        [CanBeNull]
-        private IDistanceSnapProvider distanceSnapProvider { get; set; }
+        [Resolved]
+        private IDistanceSnapProvider? distanceSnapProvider { get; set; }
 
-        [Resolved(CanBeNull = true)]
-        [CanBeNull]
-        private FreehandSliderToolboxGroup freehandToolboxGroup { get; set; }
+        [Resolved]
+        private FreehandSliderToolboxGroup? freehandToolboxGroup { get; set; }
 
         private readonly IncrementalBSplineBuilder bSplineBuilder = new IncrementalBSplineBuilder { Degree = 4 };
 
@@ -83,7 +79,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            inputManager = GetContainingInputManager();
+
+            inputManager = GetContainingInputManager()!;
 
             if (freehandToolboxGroup != null)
             {
@@ -107,7 +104,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         }
 
         [Resolved]
-        private EditorBeatmap editorBeatmap { get; set; }
+        private EditorBeatmap editorBeatmap { get; set; } = null!;
 
         public override void UpdateTimeAndPosition(SnapResult result)
         {
@@ -149,26 +146,23 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
                 case SliderPlacementState.ControlPoints:
                     if (canPlaceNewControlPoint(out var lastPoint))
-                    {
-                        // Place a new point by detatching the current cursor.
-                        updateCursor();
-                        cursor = null;
-                    }
-                    else
-                    {
-                        // Transform the last point into a new segment.
-                        Debug.Assert(lastPoint != null);
-
-                        segmentStart = lastPoint;
-                        segmentStart.Type = PathType.LINEAR;
-
-                        currentSegmentLength = 1;
-                    }
+                        placeNewControlPoint();
+                    else if (lastPoint != null)
+                        beginNewSegment(lastPoint);
 
                     break;
             }
 
             return true;
+        }
+
+        private void beginNewSegment(PathControlPoint lastPoint)
+        {
+            segmentStart = lastPoint;
+            segmentStart.Type = PathType.LINEAR;
+
+            currentSegmentLength = 1;
+            usingCustomSegmentType = false;
         }
 
         protected override bool OnDragStart(DragStartEvent e)
@@ -223,6 +217,72 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             base.OnMouseUp(e);
         }
 
+        private static readonly PathType[] path_types =
+        [
+            PathType.LINEAR,
+            PathType.BEZIER,
+            PathType.PERFECT_CURVE,
+            PathType.BSpline(4),
+        ];
+
+        protected override bool OnKeyDown(KeyDownEvent e)
+        {
+            if (e.Repeat)
+                return false;
+
+            if (state != SliderPlacementState.ControlPoints)
+                return false;
+
+            switch (e.Key)
+            {
+                case Key.S:
+                {
+                    if (!canPlaceNewControlPoint(out _))
+                        return false;
+
+                    placeNewControlPoint();
+                    var last = HitObject.Path.ControlPoints.Last(p => p != cursor);
+                    beginNewSegment(last);
+                    return true;
+                }
+
+                case Key.Number1:
+                case Key.Number2:
+                case Key.Number3:
+                case Key.Number4:
+                {
+                    if (!e.AltPressed)
+                        return false;
+
+                    usingCustomSegmentType = true;
+                    segmentStart.Type = path_types[e.Key - Key.Number1];
+                    controlPointVisualiser.EnsureValidPathTypes();
+                    return true;
+                }
+
+                case Key.Tab:
+                {
+                    usingCustomSegmentType = true;
+
+                    int currentTypeIndex = segmentStart.Type.HasValue ? Array.IndexOf(path_types, segmentStart.Type.Value) : -1;
+
+                    if (currentTypeIndex < 0 && e.ShiftPressed)
+                        currentTypeIndex = 0;
+
+                    do
+                    {
+                        currentTypeIndex = (path_types.Length + currentTypeIndex + (e.ShiftPressed ? -1 : 1)) % path_types.Length;
+                        segmentStart.Type = path_types[currentTypeIndex];
+                        controlPointVisualiser.EnsureValidPathTypes();
+                    } while (segmentStart.Type != path_types[currentTypeIndex]);
+
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         protected override void Update()
         {
             base.Update();
@@ -246,6 +306,12 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
         private void updatePathType()
         {
+            if (usingCustomSegmentType)
+            {
+                controlPointVisualiser.EnsureValidPathTypes();
+                return;
+            }
+
             if (state == SliderPlacementState.Drawing)
             {
                 segmentStart.Type = PathType.BSpline(4);
@@ -286,8 +352,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                 }
 
                 // Update the cursor position.
-                var result = positionSnapProvider?.FindSnappedPositionAndTime(inputManager.CurrentState.Mouse.Position, state == SliderPlacementState.ControlPoints ? SnapType.GlobalGrids : SnapType.All);
-                cursor.Position = ToLocalSpace(result?.ScreenSpacePosition ?? inputManager.CurrentState.Mouse.Position) - HitObject.Position;
+                cursor.Position = getCursorPosition();
             }
             else if (cursor != null)
             {
@@ -301,19 +366,34 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             }
         }
 
+        private Vector2 getCursorPosition()
+        {
+            var result = positionSnapProvider?.FindSnappedPositionAndTime(inputManager.CurrentState.Mouse.Position, state == SliderPlacementState.ControlPoints ? SnapType.GlobalGrids : SnapType.All);
+            return ToLocalSpace(result?.ScreenSpacePosition ?? inputManager.CurrentState.Mouse.Position) - HitObject.Position;
+        }
+
         /// <summary>
         /// Whether a new control point can be placed at the current mouse position.
         /// </summary>
         /// <param name="lastPoint">The last-placed control point. May be null, but is not null if <c>false</c> is returned.</param>
         /// <returns>Whether a new control point can be placed at the current position.</returns>
-        private bool canPlaceNewControlPoint([CanBeNull] out PathControlPoint lastPoint)
+        private bool canPlaceNewControlPoint(out PathControlPoint? lastPoint)
         {
             // We cannot rely on the ordering of drawable pieces, so find the respective drawable piece by searching for the last non-cursor control point.
             var last = HitObject.Path.ControlPoints.LastOrDefault(p => p != cursor);
             var lastPiece = controlPointVisualiser.Pieces.Single(p => p.ControlPoint == last);
 
             lastPoint = last;
-            return lastPiece.IsHovered != true;
+            // We may only place a new control point if the cursor is not overlapping with the last control point.
+            // If snapping is enabled, the cursor may not hover the last piece while still placing the control point at the same position.
+            return !lastPiece.IsHovered && (last is null || Vector2.DistanceSquared(last.Position, getCursorPosition()) > 1f);
+        }
+
+        private void placeNewControlPoint()
+        {
+            // Place a new point by detatching the current cursor.
+            updateCursor();
+            cursor = null;
         }
 
         private void updateSlider()
@@ -321,7 +401,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             if (state == SliderPlacementState.Drawing)
                 HitObject.Path.ExpectedDistance.Value = (float)HitObject.Path.CalculatedDistance;
             else
-                HitObject.Path.ExpectedDistance.Value = distanceSnapProvider?.FindSnappedDistance(HitObject, (float)HitObject.Path.CalculatedDistance) ?? (float)HitObject.Path.CalculatedDistance;
+                HitObject.Path.ExpectedDistance.Value = distanceSnapProvider?.FindSnappedDistance(HitObject, (float)HitObject.Path.CalculatedDistance, DistanceSnapTarget.Start) ?? (float)HitObject.Path.CalculatedDistance;
 
             bodyPiece.UpdateFrom(HitObject);
             headCirclePiece.UpdateFrom(HitObject.HeadCircle);
@@ -349,7 +429,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                 // Replace this segment with a circular arc if it is a reasonable substitute.
                 var circleArcSegment = tryCircleArc(segment);
 
-                if (circleArcSegment is not null)
+                if (circleArcSegment != null)
                 {
                     HitObject.Path.ControlPoints.Add(new PathControlPoint(circleArcSegment[0], PathType.PERFECT_CURVE));
                     HitObject.Path.ControlPoints.Add(new PathControlPoint(circleArcSegment[1]));
@@ -366,7 +446,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             }
         }
 
-        private Vector2[] tryCircleArc(List<Vector2> segment)
+        private Vector2[]? tryCircleArc(List<Vector2> segment)
         {
             if (segment.Count < 3 || freehandToolboxGroup?.CircleThreshold.Value == 0) return null;
 

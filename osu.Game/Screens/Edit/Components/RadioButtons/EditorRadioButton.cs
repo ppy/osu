@@ -33,9 +33,6 @@ namespace osu.Game.Screens.Edit.Components.RadioButtons
 
         private Drawable icon = null!;
 
-        [Resolved]
-        private EditorBeatmap? editorBeatmap { get; set; }
-
         public EditorRadioButton(RadioButton button)
         {
             Button = button;
@@ -76,8 +73,6 @@ namespace osu.Game.Screens.Edit.Components.RadioButtons
                     Selected?.Invoke(Button);
             };
 
-            editorBeatmap?.HasTiming.BindValueChanged(hasTiming => Button.Selected.Disabled = !hasTiming.NewValue, true);
-
             Button.Selected.BindDisabledChanged(disabled => Enabled.Value = !disabled, true);
             updateSelectionState();
         }
@@ -99,6 +94,6 @@ namespace osu.Game.Screens.Edit.Components.RadioButtons
             X = 40f
         };
 
-        public LocalisableString TooltipText => Enabled.Value ? string.Empty : "Add at least one timing point first!";
+        public LocalisableString TooltipText => Button.TooltipText;
     }
 }

@@ -424,7 +424,7 @@ namespace osu.Game.Tests.Visual.Ranking
                     scores.Add(score);
                 }
 
-                scoresCallback?.Invoke(scores);
+                scoresCallback.Invoke(scores);
 
                 return null;
             }

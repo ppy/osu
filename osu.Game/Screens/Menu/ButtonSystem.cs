@@ -24,6 +24,7 @@ using osu.Game.Input;
 using osu.Game.Input.Bindings;
 using osu.Game.Localisation;
 using osu.Game.Online.API;
+using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
 using osuTK;
 using osuTK.Graphics;
@@ -46,6 +47,7 @@ namespace osu.Game.Screens.Menu
         public Action? OnSettings;
         public Action? OnMultiplayer;
         public Action? OnPlaylists;
+        public Action<Room>? OnDailyChallenge;
 
         private readonly IBindable<bool> isIdle = new BindableBool();
 
@@ -102,10 +104,13 @@ namespace osu.Game.Screens.Menu
 
             buttonArea.AddRange(new Drawable[]
             {
-                new MainMenuButton(ButtonSystemStrings.Settings, string.Empty, OsuIcon.Settings, new Color4(85, 85, 85, 255), () => OnSettings?.Invoke(), -WEDGE_WIDTH, Key.O, Key.S),
-                backButton = new MainMenuButton(ButtonSystemStrings.Back, @"back-to-top", OsuIcon.PrevCircle, new Color4(51, 58, 94, 255), () => State = ButtonSystemState.TopLevel,
-                    -WEDGE_WIDTH)
+                new MainMenuButton(ButtonSystemStrings.Settings, string.Empty, OsuIcon.Settings, new Color4(85, 85, 85, 255), _ => OnSettings?.Invoke(), Key.O, Key.S)
                 {
+                    Padding = new MarginPadding { Right = WEDGE_WIDTH },
+                },
+                backButton = new MainMenuButton(ButtonSystemStrings.Back, @"back-to-top", OsuIcon.PrevCircle, new Color4(51, 58, 94, 255), _ => State = ButtonSystemState.TopLevel)
+                {
+                    Padding = new MarginPadding { Right = WEDGE_WIDTH },
                     VisibleStateMin = ButtonSystemState.Play,
                     VisibleStateMax = ButtonSystemState.Edit,
                 },
@@ -127,21 +132,31 @@ namespace osu.Game.Screens.Menu
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, IdleTracker? idleTracker, GameHost host)
         {
-            buttonsPlay.Add(new MainMenuButton(ButtonSystemStrings.Solo, @"button-default-select", OsuIcon.Player, new Color4(102, 68, 204, 255), () => OnSolo?.Invoke(), WEDGE_WIDTH, Key.P));
-            buttonsPlay.Add(new MainMenuButton(ButtonSystemStrings.Multi, @"button-default-select", OsuIcon.Online, new Color4(94, 63, 186, 255), onMultiplayer, 0, Key.M));
-            buttonsPlay.Add(new MainMenuButton(ButtonSystemStrings.Playlists, @"button-default-select", OsuIcon.Tournament, new Color4(94, 63, 186, 255), onPlaylists, 0, Key.L));
+            buttonsPlay.Add(new MainMenuButton(ButtonSystemStrings.Solo, @"button-default-select", OsuIcon.Player, new Color4(102, 68, 204, 255), _ => OnSolo?.Invoke(), Key.P)
+            {
+                Padding = new MarginPadding { Left = WEDGE_WIDTH },
+            });
+            buttonsPlay.Add(new MainMenuButton(ButtonSystemStrings.Multi, @"button-default-select", OsuIcon.Online, new Color4(94, 63, 186, 255), onMultiplayer, Key.M));
+            buttonsPlay.Add(new MainMenuButton(ButtonSystemStrings.Playlists, @"button-default-select", OsuIcon.Tournament, new Color4(94, 63, 186, 255), onPlaylists, Key.L));
+            buttonsPlay.Add(new DailyChallengeButton(@"button-daily-select", new Color4(94, 63, 186, 255), onDailyChallenge, Key.D));
             buttonsPlay.ForEach(b => b.VisibleState = ButtonSystemState.Play);
 
-            buttonsEdit.Add(new MainMenuButton(EditorStrings.BeatmapEditor.ToLower(), @"button-default-select", OsuIcon.Beatmap, new Color4(238, 170, 0, 255), () => OnEditBeatmap?.Invoke(), WEDGE_WIDTH, Key.B, Key.E));
-            buttonsEdit.Add(new MainMenuButton(SkinEditorStrings.SkinEditor.ToLower(), @"button-default-select", OsuIcon.SkinB, new Color4(220, 160, 0, 255), () => OnEditSkin?.Invoke(), 0, Key.S));
+            buttonsEdit.Add(new MainMenuButton(EditorStrings.BeatmapEditor.ToLower(), @"button-default-select", OsuIcon.Beatmap, new Color4(238, 170, 0, 255), _ => OnEditBeatmap?.Invoke(), Key.B, Key.E)
+            {
+                Padding = new MarginPadding { Left = WEDGE_WIDTH },
+            });
+            buttonsEdit.Add(new MainMenuButton(SkinEditorStrings.SkinEditor.ToLower(), @"button-default-select", OsuIcon.SkinB, new Color4(220, 160, 0, 255), _ => OnEditSkin?.Invoke(), Key.S));
             buttonsEdit.ForEach(b => b.VisibleState = ButtonSystemState.Edit);
 
-            buttonsTopLevel.Add(new MainMenuButton(ButtonSystemStrings.Play, @"button-play-select", OsuIcon.Logo, new Color4(102, 68, 204, 255), () => State = ButtonSystemState.Play, WEDGE_WIDTH, Key.P, Key.M, Key.L));
-            buttonsTopLevel.Add(new MainMenuButton(ButtonSystemStrings.Edit, @"button-play-select", OsuIcon.EditCircle, new Color4(238, 170, 0, 255), () => State = ButtonSystemState.Edit, 0, Key.E));
-            buttonsTopLevel.Add(new MainMenuButton(ButtonSystemStrings.Browse, @"button-default-select", OsuIcon.Beatmap, new Color4(165, 204, 0, 255), () => OnBeatmapListing?.Invoke(), 0, Key.B, Key.D));
+            buttonsTopLevel.Add(new MainMenuButton(ButtonSystemStrings.Play, @"button-play-select", OsuIcon.Logo, new Color4(102, 68, 204, 255), _ => State = ButtonSystemState.Play, Key.P, Key.M, Key.L)
+            {
+                Padding = new MarginPadding { Left = WEDGE_WIDTH },
+            });
+            buttonsTopLevel.Add(new MainMenuButton(ButtonSystemStrings.Edit, @"button-play-select", OsuIcon.EditCircle, new Color4(238, 170, 0, 255), _ => State = ButtonSystemState.Edit, Key.E));
+            buttonsTopLevel.Add(new MainMenuButton(ButtonSystemStrings.Browse, @"button-default-select", OsuIcon.Beatmap, new Color4(165, 204, 0, 255), _ => OnBeatmapListing?.Invoke(), Key.B, Key.D));
 
             if (host.CanExit)
-                buttonsTopLevel.Add(new MainMenuButton(ButtonSystemStrings.Exit, string.Empty, OsuIcon.CrossCircle, new Color4(238, 51, 153, 255), () => OnExit?.Invoke(), 0, Key.Q));
+                buttonsTopLevel.Add(new MainMenuButton(ButtonSystemStrings.Exit, string.Empty, OsuIcon.CrossCircle, new Color4(238, 51, 153, 255), _ => OnExit?.Invoke(), Key.Q));
 
             buttonArea.AddRange(buttonsPlay);
             buttonArea.AddRange(buttonsEdit);
@@ -164,7 +179,7 @@ namespace osu.Game.Screens.Menu
             sampleLogoSwoosh = audio.Samples.Get(@"Menu/osu-logo-swoosh");
         }
 
-        private void onMultiplayer()
+        private void onMultiplayer(MainMenuButton _)
         {
             if (api.State.Value != APIState.Online)
             {
@@ -175,7 +190,7 @@ namespace osu.Game.Screens.Menu
             OnMultiplayer?.Invoke();
         }
 
-        private void onPlaylists()
+        private void onPlaylists(MainMenuButton _)
         {
             if (api.State.Value != APIState.Online)
             {
@@ -184,6 +199,20 @@ namespace osu.Game.Screens.Menu
             }
 
             OnPlaylists?.Invoke();
+        }
+
+        private void onDailyChallenge(MainMenuButton button)
+        {
+            if (api.State.Value != APIState.Online)
+            {
+                loginOverlay?.Show();
+                return;
+            }
+
+            var dailyChallengeButton = (DailyChallengeButton)button;
+
+            if (dailyChallengeButton.Room != null)
+                OnDailyChallenge?.Invoke(dailyChallengeButton.Room);
         }
 
         private void updateIdleState(bool isIdle)

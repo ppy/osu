@@ -20,7 +20,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         /// </summary>
         public const int NORMALISED_RADIUS = 50; // Change radius to 50 to make 100 the diameter. Easier for mental maths.
 
-        private const int min_delta_time = 25;
+        public const int MIN_DELTA_TIME = 25;
+
         private const float maximum_slider_radius = NORMALISED_RADIUS * 2.4f;
         private const float assumed_slider_radius = NORMALISED_RADIUS * 1.8f;
 
@@ -93,7 +94,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             this.lastObject = (OsuHitObject)lastObject;
 
             // Capped to 25ms to prevent difficulty calculation breaking from simultaneous objects.
-            StrainTime = Math.Max(DeltaTime, min_delta_time);
+            StrainTime = Math.Max(DeltaTime, MIN_DELTA_TIME);
 
             if (BaseObject is Slider sliderObject)
             {
@@ -136,6 +137,24 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             return Math.Clamp((time - fadeInStartTime) / fadeInDuration, 0.0, 1.0);
         }
 
+        /// <summary>
+        /// Returns how possible is it to doubletap this object together with the next one and get perfect judgement in range from 0 to 1
+        /// </summary>
+        public double GetDoubletapness(OsuDifficultyHitObject? osuNextObj)
+        {
+            if (osuNextObj != null)
+            {
+                double currDeltaTime = Math.Max(1, DeltaTime);
+                double nextDeltaTime = Math.Max(1, osuNextObj.DeltaTime);
+                double deltaDifference = Math.Abs(nextDeltaTime - currDeltaTime);
+                double speedRatio = currDeltaTime / Math.Max(currDeltaTime, deltaDifference);
+                double windowRatio = Math.Pow(Math.Min(1, currDeltaTime / HitWindowGreat), 2);
+                return 1.0 - Math.Pow(speedRatio, 1 - windowRatio);
+            }
+
+            return 0;
+        }
+
         private void setDistances(double clockRate)
         {
             if (BaseObject is Slider currentSlider)
@@ -143,7 +162,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 computeSliderCursorPosition(currentSlider);
                 // Bonus for repeat sliders until a better per nested object strain system can be achieved.
                 TravelDistance = currentSlider.LazyTravelDistance * (float)Math.Pow(1 + currentSlider.RepeatCount / 2.5, 1.0 / 2.5);
-                TravelTime = Math.Max(currentSlider.LazyTravelTime / clockRate, min_delta_time);
+                TravelTime = Math.Max(currentSlider.LazyTravelTime / clockRate, MIN_DELTA_TIME);
             }
 
             // We don't need to calculate either angle or distance when one of the last->curr objects is a spinner
@@ -167,8 +186,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
             if (lastObject is Slider lastSlider)
             {
-                double lastTravelTime = Math.Max(lastSlider.LazyTravelTime / clockRate, min_delta_time);
-                MinimumJumpTime = Math.Max(StrainTime - lastTravelTime, min_delta_time);
+                double lastTravelTime = Math.Max(lastSlider.LazyTravelTime / clockRate, MIN_DELTA_TIME);
+                MinimumJumpTime = Math.Max(StrainTime - lastTravelTime, MIN_DELTA_TIME);
 
                 //
                 // There are two types of slider-to-object patterns to consider in order to better approximate the real movement a player will take to jump between the hitobjects.

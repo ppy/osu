@@ -47,7 +47,7 @@ namespace osu.Game.Localisation
         public static LocalisableString Calculating => new TranslatableString(getKey(@"calculating"), @"calculating...");
 
         /// <summary>
-        /// "{0} items"
+        /// "{0} item(s)"
         /// </summary>
         public static LocalisableString Items(int arg0) => new TranslatableString(getKey(@"items"), @"{0} item(s)", arg0);
 

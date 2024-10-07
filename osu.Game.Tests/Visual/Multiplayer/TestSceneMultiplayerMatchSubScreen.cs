@@ -197,7 +197,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddUntilStep("wait for join", () => RoomJoined);
 
-            ClickButtonWhenEnabled<RoomSubScreen.UserModSelectButton>();
+            ClickButtonWhenEnabled<UserModSelectButton>();
 
             AddUntilStep("mod select contents loaded",
                 () => this.ChildrenOfType<ModColumn>().Any() && this.ChildrenOfType<ModColumn>().All(col => col.IsLoaded && col.ItemsLoaded));
@@ -311,15 +311,15 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddUntilStep("wait for join", () => RoomJoined);
 
-            ClickButtonWhenEnabled<RoomSubScreen.UserModSelectButton>();
-            AddAssert("mod select shows unranked", () => screen.UserModsSelectOverlay.ChildrenOfType<RankingInformationDisplay>().Single().Ranked.Value == false);
-            AddAssert("score multiplier = 1.20", () => screen.UserModsSelectOverlay.ChildrenOfType<RankingInformationDisplay>().Single().ModMultiplier.Value, () => Is.EqualTo(1.2).Within(0.01));
+            ClickButtonWhenEnabled<UserModSelectButton>();
+            AddAssert("mod select shows unranked", () => this.ChildrenOfType<RankingInformationDisplay>().Single().Ranked.Value == false);
+            AddAssert("score multiplier = 1.20", () => this.ChildrenOfType<RankingInformationDisplay>().Single().ModMultiplier.Value, () => Is.EqualTo(1.2).Within(0.01));
 
             AddStep("select flashlight", () => screen.UserModsSelectOverlay.ChildrenOfType<ModPanel>().Single(m => m.Mod is ModFlashlight).TriggerClick());
-            AddAssert("score multiplier = 1.35", () => screen.UserModsSelectOverlay.ChildrenOfType<RankingInformationDisplay>().Single().ModMultiplier.Value, () => Is.EqualTo(1.35).Within(0.01));
+            AddAssert("score multiplier = 1.35", () => this.ChildrenOfType<RankingInformationDisplay>().Single().ModMultiplier.Value, () => Is.EqualTo(1.35).Within(0.01));
 
             AddStep("change flashlight setting", () => ((OsuModFlashlight)screen.UserModsSelectOverlay.SelectedMods.Value.Single()).FollowDelay.Value = 1200);
-            AddAssert("score multiplier = 1.20", () => screen.UserModsSelectOverlay.ChildrenOfType<RankingInformationDisplay>().Single().ModMultiplier.Value, () => Is.EqualTo(1.2).Within(0.01));
+            AddAssert("score multiplier = 1.20", () => this.ChildrenOfType<RankingInformationDisplay>().Single().ModMultiplier.Value, () => Is.EqualTo(1.2).Within(0.01));
         }
 
         private partial class TestMultiplayerMatchSubScreen : MultiplayerMatchSubScreen

@@ -85,7 +85,7 @@ namespace osu.Game.Screens.Select.Carousel
 
             match &= criteria.CollectionBeatmapMD5Hashes?.Contains(BeatmapInfo.MD5Hash) ?? true;
             if (match && criteria.RulesetCriteria != null)
-                match &= criteria.RulesetCriteria.Matches(BeatmapInfo);
+                match &= criteria.RulesetCriteria.Matches(BeatmapInfo, criteria);
 
             return match;
         }
