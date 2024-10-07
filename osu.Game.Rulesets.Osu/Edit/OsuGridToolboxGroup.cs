@@ -192,6 +192,7 @@ namespace osu.Game.Rulesets.Osu.Edit
             {
                 StartPositionX.Value = pos.NewValue.X;
                 StartPositionY.Value = pos.NewValue.Y;
+                updateEnabledStates();
             });
 
             Spacing.BindValueChanged(spacing =>
