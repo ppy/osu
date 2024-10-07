@@ -6,6 +6,7 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Pooling;
 using osu.Framework.Graphics.Shapes;
@@ -27,9 +28,32 @@ namespace osu.Game.Screens.Edit.Timing
     {
         public BindableList<ControlPointGroup> Groups { get; } = new BindableList<ControlPointGroup>();
 
+        public new MarginPadding Padding
+        {
+            get => base.Padding;
+            set => base.Padding = value;
+        }
+
+        [Cached]
+        private Bindable<TimingControlPoint?> activeTimingPoint { get; } = new Bindable<TimingControlPoint?>();
+
+        [Cached]
+        private Bindable<EffectControlPoint?> activeEffectPoint { get; } = new Bindable<EffectControlPoint?>();
+
+        [Resolved]
+        private EditorBeatmap beatmap { get; set; } = null!;
+
+        [Resolved]
+        private Bindable<ControlPointGroup?> selectedGroup { get; set; } = null!;
+
+        [Resolved]
+        private EditorClock editorClock { get; set; } = null!;
+
         private const float timing_column_width = 300;
         private const float row_height = 25;
         private const float row_horizontal_padding = 20;
+
+        private ControlPointRowList list = null!;
 
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colours)
@@ -65,7 +89,7 @@ namespace osu.Game.Screens.Edit.Timing
                         {
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
-                            Margin = new MarginPadding { Left = ControlPointTable.timing_column_width }
+                            Margin = new MarginPadding { Left = timing_column_width }
                         },
                     }
                 },
@@ -73,7 +97,7 @@ namespace osu.Game.Screens.Edit.Timing
                 {
                     RelativeSizeAxes = Axes.Both,
                     Padding = new MarginPadding { Top = row_height },
-                    Child = new ControlPointRowList
+                    Child = list = new ControlPointRowList
                     {
                         RelativeSizeAxes = Axes.Both,
                         RowData = { BindTarget = Groups, },
@@ -82,40 +106,63 @@ namespace osu.Game.Screens.Edit.Timing
             };
         }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            selectedGroup.BindValueChanged(_ => scrollToMostRelevantRow(force: true), true);
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            scrollToMostRelevantRow(force: false);
+        }
+
+        private void scrollToMostRelevantRow(bool force)
+        {
+            double accurateTime = editorClock.CurrentTimeAccurate;
+
+            activeTimingPoint.Value = beatmap.ControlPointInfo.TimingPointAt(accurateTime);
+            activeEffectPoint.Value = beatmap.ControlPointInfo.EffectPointAt(accurateTime);
+
+            double latestActiveTime = Math.Max(activeTimingPoint.Value?.Time ?? double.NegativeInfinity, activeEffectPoint.Value?.Time ?? double.NegativeInfinity);
+            var groupToShow = selectedGroup.Value ?? beatmap.ControlPointInfo.GroupAt(latestActiveTime);
+            list.ScrollTo(groupToShow, force);
+        }
+
         private partial class ControlPointRowList : VirtualisedListContainer<ControlPointGroup, DrawableControlGroup>
         {
-            [Resolved]
-            private Bindable<ControlPointGroup?> selectedGroup { get; set; } = null!;
-
             public ControlPointRowList()
                 : base(row_height, 50)
             {
             }
 
-            protected override ScrollContainer<Drawable> CreateScrollContainer() => new OsuScrollContainer();
+            protected override ScrollContainer<Drawable> CreateScrollContainer() => new UserTrackingScrollContainer();
 
-            protected override void LoadComplete()
+            protected new UserTrackingScrollContainer Scroll => (UserTrackingScrollContainer)base.Scroll;
+
+            public void ScrollTo(ControlPointGroup group, bool force)
             {
-                base.LoadComplete();
+                if (Scroll.UserScrolling && !force)
+                    return;
 
-                selectedGroup.BindValueChanged(val =>
-                {
-                    // can't use `.ScrollIntoView()` here because of the list virtualisation not giving
-                    // child items valid coordinates from the start, so ballpark something similar
-                    // using estimated row height.
-                    var row = Items.FlowingChildren.SingleOrDefault(item => item.Row.Equals(val.NewValue));
+                // can't use `.ScrollIntoView()` here because of the list virtualisation not giving
+                // child items valid coordinates from the start, so ballpark something similar
+                // using estimated row height.
+                var row = Items.FlowingChildren.SingleOrDefault(item => item.Row.Equals(group));
 
-                    if (row == null)
-                        return;
+                if (row == null)
+                    return;
 
-                    float minPos = row.Y;
-                    float maxPos = minPos + row_height;
+                float minPos = row.Y;
+                float maxPos = minPos + row_height;
 
-                    if (minPos < Scroll.Current)
-                        Scroll.ScrollTo(minPos);
-                    else if (maxPos > Scroll.Current + Scroll.DisplayableContent)
-                        Scroll.ScrollTo(maxPos - Scroll.DisplayableContent);
-                });
+                if (minPos < Scroll.Current)
+                    Scroll.ScrollTo(minPos);
+                else if (maxPos > Scroll.Current + Scroll.DisplayableContent)
+                    Scroll.ScrollTo(maxPos - Scroll.DisplayableContent);
             }
         }
 
@@ -130,12 +177,22 @@ namespace osu.Game.Screens.Edit.Timing
             private readonly BindableWithCurrent<ControlPointGroup> current = new BindableWithCurrent<ControlPointGroup>();
 
             private Box background = null!;
+            private Box currentIndicator = null!;
 
             [Resolved]
             private OverlayColourProvider colourProvider { get; set; } = null!;
 
             [Resolved]
+            private OsuColour colours { get; set; } = null!;
+
+            [Resolved]
             private Bindable<ControlPointGroup?> selectedGroup { get; set; } = null!;
+
+            [Resolved]
+            private Bindable<TimingControlPoint?> activeTimingPoint { get; set; } = null!;
+
+            [Resolved]
+            private Bindable<EffectControlPoint?> activeEffectPoint { get; set; } = null!;
 
             [Resolved]
             private EditorClock editorClock { get; set; } = null!;
@@ -151,6 +208,12 @@ namespace osu.Game.Screens.Edit.Timing
                     {
                         RelativeSizeAxes = Axes.Both,
                         Colour = colourProvider.Background1,
+                        Alpha = 0,
+                    },
+                    currentIndicator = new Box
+                    {
+                        RelativeSizeAxes = Axes.Y,
+                        Width = 5,
                         Alpha = 0,
                     },
                     new Container
@@ -174,7 +237,9 @@ namespace osu.Game.Screens.Edit.Timing
             {
                 base.LoadComplete();
 
-                selectedGroup.BindValueChanged(_ => updateState(), true);
+                selectedGroup.BindValueChanged(_ => updateState());
+                activeEffectPoint.BindValueChanged(_ => updateState());
+                activeTimingPoint.BindValueChanged(_ => updateState(), true);
                 FinishTransforms(true);
             }
 
@@ -213,12 +278,31 @@ namespace osu.Game.Screens.Edit.Timing
             {
                 bool isSelected = selectedGroup.Value?.Equals(current.Value) == true;
 
+                bool hasCurrentTimingPoint = activeTimingPoint.Value != null && current.Value.ControlPoints.Contains(activeTimingPoint.Value);
+                bool hasCurrentEffectPoint = activeEffectPoint.Value != null && current.Value.ControlPoints.Contains(activeEffectPoint.Value);
+
                 if (IsHovered || isSelected)
                     background.FadeIn(100, Easing.OutQuint);
+                else if (hasCurrentTimingPoint || hasCurrentEffectPoint)
+                    background.FadeTo(0.2f, 100, Easing.OutQuint);
                 else
                     background.FadeOut(100, Easing.OutQuint);
 
                 background.Colour = isSelected ? colourProvider.Colour3 : colourProvider.Background1;
+
+                if (hasCurrentTimingPoint || hasCurrentEffectPoint)
+                {
+                    currentIndicator.FadeIn(100, Easing.OutQuint);
+
+                    if (hasCurrentTimingPoint && hasCurrentEffectPoint)
+                        currentIndicator.Colour = ColourInfo.GradientVertical(activeTimingPoint.Value!.GetRepresentingColour(colours), activeEffectPoint.Value!.GetRepresentingColour(colours));
+                    else if (hasCurrentTimingPoint)
+                        currentIndicator.Colour = activeTimingPoint.Value!.GetRepresentingColour(colours);
+                    else
+                        currentIndicator.Colour = activeEffectPoint.Value!.GetRepresentingColour(colours);
+                }
+                else
+                    currentIndicator.FadeOut(100, Easing.OutQuint);
             }
         }
 
@@ -323,14 +407,8 @@ namespace osu.Game.Screens.Edit.Timing
                     case TimingControlPoint timing:
                         return new TimingRowAttribute(timing);
 
-                    case DifficultyControlPoint difficulty:
-                        return new DifficultyRowAttribute(difficulty);
-
                     case EffectControlPoint effect:
                         return new EffectRowAttribute(effect);
-
-                    case SampleControlPoint sample:
-                        return new SampleRowAttribute(sample);
                 }
 
                 throw new ArgumentOutOfRangeException(nameof(controlPoint), $"Control point type {controlPoint.GetType()} is not supported");

@@ -5,6 +5,7 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Testing;
+using osu.Game.Beatmaps;
 using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Mods;
@@ -134,6 +135,59 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddUntilStep("Button is disabled", () => !offsetControl.ChildrenOfType<SettingsButton>().Single().Enabled.Value);
             AddStep("Remove reference score", () => offsetControl.ReferenceScore.Value = null);
             AddAssert("No calibration button", () => !offsetControl.ChildrenOfType<SettingsButton>().Any());
+        }
+
+        [Test]
+        public void TestCalibrationFromNonZeroWithImmediateReferenceScore()
+        {
+            const double average_error = -4.5;
+            const double initial_offset = -2;
+
+            AddStep("Set beatmap offset non-neutral", () => Realm.Write(r =>
+            {
+                r.Add(new BeatmapInfo
+                {
+                    ID = Beatmap.Value.BeatmapInfo.ID,
+                    Ruleset = Beatmap.Value.BeatmapInfo.Ruleset,
+                    UserSettings =
+                    {
+                        Offset = initial_offset,
+                    }
+                });
+            }));
+
+            AddStep("Create control with preloaded reference score", () =>
+            {
+                Child = new PlayerSettingsGroup("Some settings")
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Children = new Drawable[]
+                    {
+                        offsetControl = new BeatmapOffsetControl
+                        {
+                            ReferenceScore =
+                            {
+                                Value = new ScoreInfo
+                                {
+                                    HitEvents = TestSceneHitEventTimingDistributionGraph.CreateDistributedHitEvents(average_error),
+                                    BeatmapInfo = Beatmap.Value.BeatmapInfo,
+                                }
+                            }
+                        }
+                    }
+                };
+            });
+
+            AddUntilStep("Has calibration button", () => offsetControl.ChildrenOfType<SettingsButton>().Any());
+            AddStep("Press button", () => offsetControl.ChildrenOfType<SettingsButton>().Single().TriggerClick());
+            AddAssert("Offset is adjusted", () => offsetControl.Current.Value, () => Is.EqualTo(initial_offset - average_error));
+
+            AddUntilStep("Button is disabled", () => !offsetControl.ChildrenOfType<SettingsButton>().Single().Enabled.Value);
+            AddStep("Remove reference score", () => offsetControl.ReferenceScore.Value = null);
+            AddAssert("No calibration button", () => !offsetControl.ChildrenOfType<SettingsButton>().Any());
+
+            AddStep("Clean up beatmap", () => Realm.Write(r => r.RemoveAll<BeatmapInfo>()));
         }
 
         [Test]

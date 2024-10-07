@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -10,10 +11,12 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Framework.Utils;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
 using osu.Game.Rulesets.Edit;
+using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Components.RadioButtons;
@@ -90,6 +93,8 @@ namespace osu.Game.Rulesets.Osu.Edit
         private ExpandableSlider<float> gridLinesRotationSlider = null!;
         private EditorRadioButtonCollection gridTypeButtons = null!;
 
+        private ExpandableButton useSelectedObjectPositionButton = null!;
+
         public OsuGridToolboxGroup()
             : base("grid")
         {
@@ -111,6 +116,20 @@ namespace osu.Game.Rulesets.Osu.Edit
                 {
                     Current = StartPositionY,
                     KeyboardStep = 1,
+                },
+                useSelectedObjectPositionButton = new ExpandableButton
+                {
+                    ExpandedLabelText = "Centre on selected object",
+                    Action = () =>
+                    {
+                        if (editorBeatmap.SelectedHitObjects.Count != 1)
+                            return;
+
+                        var position = ((IHasPosition)editorBeatmap.SelectedHitObjects.Single()).Position;
+                        StartPosition.Value = new Vector2(MathF.Round(position.X), MathF.Round(position.Y));
+                        updateEnabledStates();
+                    },
+                    RelativeSizeAxes = Axes.X,
                 },
                 spacingSlider = new ExpandableSlider<float>
                 {
@@ -172,6 +191,13 @@ namespace osu.Game.Rulesets.Osu.Edit
                 StartPosition.Value = new Vector2(StartPosition.Value.X, y.NewValue);
             }, true);
 
+            StartPosition.BindValueChanged(pos =>
+            {
+                StartPositionX.Value = pos.NewValue.X;
+                StartPositionY.Value = pos.NewValue.Y;
+                updateEnabledStates();
+            });
+
             Spacing.BindValueChanged(spacing =>
             {
                 spacingSlider.ContractedLabelText = $"S: {spacing.NewValue:N0}";
@@ -184,12 +210,6 @@ namespace osu.Game.Rulesets.Osu.Edit
             {
                 gridLinesRotationSlider.ContractedLabelText = $"R: {rotation.NewValue:#,0.##}";
                 gridLinesRotationSlider.ExpandedLabelText = $"Rotation: {rotation.NewValue:#,0.##}";
-            }, true);
-
-            expandingContainer?.Expanded.BindValueChanged(v =>
-            {
-                gridTypeButtons.FadeTo(v.NewValue ? 1f : 0f, 500, Easing.OutQuint);
-                gridTypeButtons.BypassAutoSizeAxes = !v.NewValue ? Axes.Y : Axes.None;
             }, true);
 
             GridType.BindValueChanged(v =>
@@ -211,6 +231,22 @@ namespace osu.Game.Rulesets.Osu.Edit
                         break;
                 }
             }, true);
+
+            editorBeatmap.BeatmapReprocessed += updateEnabledStates;
+            editorBeatmap.SelectedHitObjects.BindCollectionChanged((_, _) => updateEnabledStates());
+            expandingContainer?.Expanded.BindValueChanged(v =>
+            {
+                gridTypeButtons.FadeTo(v.NewValue ? 1f : 0f, 500, Easing.OutQuint);
+                gridTypeButtons.BypassAutoSizeAxes = !v.NewValue ? Axes.Y : Axes.None;
+                updateEnabledStates();
+            }, true);
+        }
+
+        private void updateEnabledStates()
+        {
+            useSelectedObjectPositionButton.Enabled.Value = expandingContainer?.Expanded.Value == true
+                                                            && editorBeatmap.SelectedHitObjects.Count == 1
+                                                            && !Precision.AlmostEquals(StartPosition.Value, ((IHasPosition)editorBeatmap.SelectedHitObjects.Single()).Position, 0.5f);
         }
 
         private void nextGridSize()
