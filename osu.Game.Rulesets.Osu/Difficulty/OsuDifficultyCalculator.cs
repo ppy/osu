@@ -39,13 +39,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double aimRating = Math.Sqrt(skills[0].DifficultyValue()) * DIFFICULTY_MULTIPLIER;
             double aimRatingNoSliders = Math.Sqrt(skills[1].DifficultyValue()) * DIFFICULTY_MULTIPLIER;
-            double speedRating = Math.Sqrt(skills[2].DifficultyValue()) * DIFFICULTY_MULTIPLIER;
-            double speedNotes = ((Speed)skills[2]).RelevantNoteCount();
+            double speedRating = Math.Sqrt(skills.OfType<Speed>().First().DifficultyValue()) * DIFFICULTY_MULTIPLIER;
+            double speedNotes = skills.OfType<Speed>().First().RelevantNoteCount();
 
-            double flashlightRating = Math.Sqrt(skills[3].DifficultyValue()) * DIFFICULTY_MULTIPLIER;
+            double flashlightRating = Math.Sqrt(skills.OfType<Flashlight>().First().DifficultyValue()) * DIFFICULTY_MULTIPLIER;
 
-            double readingLowARRating = Math.Sqrt(skills[4].DifficultyValue()) * DIFFICULTY_MULTIPLIER;
-            double readingHighARRating = Math.Sqrt(skills[5].DifficultyValue()) * DIFFICULTY_MULTIPLIER;
+            double readingLowARRating = Math.Sqrt(skills.OfType<ReadingLowAR>().First().DifficultyValue()) * DIFFICULTY_MULTIPLIER;
+            double readingHighARRating = Math.Sqrt(skills.OfType<ReadingHighAR>().First().DifficultyValue()) * DIFFICULTY_MULTIPLIER;
 
             double hiddenRating = 0;
 
@@ -57,7 +57,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             {
                 hiddenRating = Math.Sqrt(skills[6].DifficultyValue()) * DIFFICULTY_MULTIPLIER;
                 baseReadingHiddenPerformance = ReadingHidden.DifficultyToPerformance(hiddenRating);
-                hiddenDifficultyStrainCount = skills[5].CountDifficultStrains();
+                hiddenDifficultyStrainCount = skills.OfType<ReadingHidden>().First().CountDifficultStrains();
             }
 
             double baseFlashlightPerformance = 0.0;
@@ -67,8 +67,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             }
 
             double aimDifficultyStrainCount = skills[0].CountDifficultStrains();
-            double speedDifficultyStrainCount = skills[2].CountDifficultStrains();
-            double lowArDifficultyStrainCount = skills[4].CountDifficultStrains();
+            double speedDifficultyStrainCount = skills.OfType<Speed>().First().CountDifficultStrains();
+            double lowArDifficultyStrainCount = skills.OfType<ReadingLowAR>().First().CountDifficultStrains();
 
             if (mods.Any(m => m is OsuModTouchDevice))
             {
