@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Specialized;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
@@ -19,6 +20,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
 using osu.Game.Resources.Localisation.Web;
 using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Graphics.UserInterfaceV2
 {
@@ -76,7 +78,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
                             Spacing = new Vector2(5),
                             Child = button = new RoundedButton
                             {
-                                Action = () => Colours.Add(Colour4.White),
+                                Action = addNewColour,
                                 Size = new Vector2(70),
                                 Text = "+",
                             }
@@ -110,6 +112,16 @@ namespace osu.Game.Graphics.UserInterfaceV2
         {
             base.OnHoverLost(e);
             updateState();
+        }
+
+        private void addNewColour()
+        {
+            Color4 startingColour = Colours.Count > 0
+                ? Colours.Last()
+                : Colour4.White;
+
+            Colours.Add(startingColour);
+            flow.OfType<ColourButton>().Last().TriggerClick();
         }
 
         private void updateState()
