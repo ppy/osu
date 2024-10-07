@@ -7,15 +7,12 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
-using osu.Framework.Localisation;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Input.Bindings;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Osu.UI;
@@ -88,10 +85,7 @@ namespace osu.Game.Rulesets.Osu.Edit
         private ExpandableSlider<float> startPositionYSlider = null!;
         private ExpandableSlider<float> spacingSlider = null!;
         private ExpandableSlider<float> gridLinesRotationSlider = null!;
-        private RoundedButton gridFromPointsButton = null!;
         private EditorRadioButtonCollection gridTypeButtons = null!;
-
-        public event Action? GridFromPointsClicked;
 
         public OsuGridToolboxGroup()
             : base("grid")
@@ -152,18 +146,6 @@ namespace osu.Game.Rulesets.Osu.Edit
                     Spacing = new Vector2(0f, 10f),
                     Children = new Drawable[]
                     {
-                        gridFromPointsButton = new TooltipRoundedButton
-                        {
-                            Action = () => GridFromPointsClicked?.Invoke(),
-                            RelativeSizeAxes = Axes.X,
-                            Text = "Grid from points",
-                            TooltipText = """
-                                           Left click to set the origin.
-                                           Left click again to set the spacing and rotation.
-                                           Right click to only set the origin.
-                                           Click and drag to set the origin, spacing and rotation.
-                                           """
-                        },
                         gridTypeButtons = new EditorRadioButtonCollection
                         {
                             RelativeSizeAxes = Axes.X,
@@ -249,8 +231,6 @@ namespace osu.Game.Rulesets.Osu.Edit
 
             expandingContainer?.Expanded.BindValueChanged(v =>
             {
-                gridFromPointsButton.FadeTo(v.NewValue ? 1f : 0f, 500, Easing.OutQuint);
-                gridFromPointsButton.BypassAutoSizeAxes = !v.NewValue ? Axes.Y : Axes.None;
                 gridTypeButtons.FadeTo(v.NewValue ? 1f : 0f, 500, Easing.OutQuint);
                 gridTypeButtons.BypassAutoSizeAxes = !v.NewValue ? Axes.Y : Axes.None;
             }, true);
@@ -311,11 +291,6 @@ namespace osu.Game.Rulesets.Osu.Edit
                 Blending = BlendingParameters.Additive;
             }
         }
-    }
-
-    public partial class TooltipRoundedButton : RoundedButton, IHasTooltip
-    {
-        public virtual LocalisableString TooltipText { get; set; }
     }
 
     public enum PositionSnapGridType
