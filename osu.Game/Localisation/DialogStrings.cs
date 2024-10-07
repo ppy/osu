@@ -12,7 +12,12 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "Caution"
         /// </summary>
-        public static LocalisableString Caution => new TranslatableString(getKey(@"header_text"), @"Caution");
+        public static LocalisableString CautionHeaderText => new TranslatableString(getKey(@"header_text"), @"Caution");
+
+        /// <summary>
+        /// "Are you sure you want to delete the following:"
+        /// </summary>
+        public static LocalisableString DeletionHeaderText => new TranslatableString(getKey(@"deletion_header_text"), @"Are you sure you want to delete the following:");
 
         /// <summary>
         /// "Yes. Go for it."
