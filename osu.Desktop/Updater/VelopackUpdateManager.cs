@@ -66,7 +66,7 @@ namespace osu.Desktop.Updater
                     {
                         Activated = () =>
                         {
-                            restartToApplyUpdate();
+                            Task.Run(restartToApplyUpdate);
                             return true;
                         }
                     });
@@ -88,7 +88,11 @@ namespace osu.Desktop.Updater
                 {
                     notification = new UpdateProgressNotification
                     {
-                        CompletionClickAction = restartToApplyUpdate,
+                        CompletionClickAction = () =>
+                        {
+                            Task.Run(restartToApplyUpdate);
+                            return true;
+                        },
                     };
 
                     Schedule(() => notificationOverlay.Post(notification));
@@ -127,13 +131,10 @@ namespace osu.Desktop.Updater
             return true;
         }
 
-        private bool restartToApplyUpdate()
+        private async Task restartToApplyUpdate()
         {
-            // TODO: Migrate this to async flow whenever available (see https://github.com/ppy/osu/pull/28743#discussion_r1740505665).
-            // Currently there's an internal Thread.Sleep(300) which will cause a stutter when the user clicks to restart.
-            updateManager.WaitExitThenApplyUpdates(pendingUpdate?.TargetFullRelease);
+            await updateManager.WaitExitThenApplyUpdatesAsync(pendingUpdate?.TargetFullRelease).ConfigureAwait(false);
             Schedule(() => game.AttemptExit());
-            return true;
         }
     }
 }

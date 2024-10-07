@@ -84,10 +84,10 @@ namespace osu.Game.Rulesets.Osu.Edit
             OriginalSurroundingQuad = objectsInScale.Count == 1 && objectsInScale.First().Key is Slider slider
                 ? GeometryUtils.GetSurroundingQuad(slider.Path.ControlPoints.Select(p => slider.Position + p.Position))
                 : GeometryUtils.GetSurroundingQuad(objectsInScale.Keys);
-            defaultOrigin = OriginalSurroundingQuad.Value.Centre;
             originalConvexHull = objectsInScale.Count == 1 && objectsInScale.First().Key is Slider slider2
                 ? GeometryUtils.GetConvexHull(slider2.Path.ControlPoints.Select(p => slider2.Position + p.Position))
                 : GeometryUtils.GetConvexHull(objectsInScale.Keys);
+            defaultOrigin = GeometryUtils.MinimumEnclosingCircle(originalConvexHull).Item1;
         }
 
         public override void Update(Vector2 scale, Vector2? origin = null, Axes adjustAxis = Axes.Both, float axisRotation = 0)
