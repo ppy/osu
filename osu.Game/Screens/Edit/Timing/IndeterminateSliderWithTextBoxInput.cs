@@ -75,6 +75,7 @@ namespace osu.Game.Screens.Edit.Timing
                         textBox = new LabelledTextBox
                         {
                             Label = labelText,
+                            SelectAllOnFocus = true,
                         },
                         slider = new SettingsSlider<T>
                         {
@@ -126,7 +127,7 @@ namespace osu.Game.Screens.Edit.Timing
         protected override void OnFocus(FocusEvent e)
         {
             base.OnFocus(e);
-            GetContainingFocusManager().ChangeFocus(textBox);
+            GetContainingFocusManager()!.ChangeFocus(textBox);
         }
 
         private void updateState()

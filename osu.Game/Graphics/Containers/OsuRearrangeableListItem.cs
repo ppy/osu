@@ -64,6 +64,7 @@ namespace osu.Game.Graphics.Containers
         {
             InternalChildren = new Drawable[]
             {
+                new HoverClickSounds(),
                 new GridContainer
                 {
                     RelativeSizeAxes = Axes.X,
@@ -92,7 +93,6 @@ namespace osu.Game.Graphics.Containers
                     ColumnDimensions = new[] { new Dimension(GridSizeMode.AutoSize) },
                     RowDimensions = new[] { new Dimension(GridSizeMode.AutoSize) }
                 },
-                new HoverClickSounds()
             };
         }
 

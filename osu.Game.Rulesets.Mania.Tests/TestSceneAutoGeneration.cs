@@ -36,8 +36,8 @@ namespace osu.Game.Rulesets.Mania.Tests
             Assert.AreEqual(generated.Frames.Count, frame_offset + 2, "Incorrect number of frames");
             Assert.AreEqual(1000, generated.Frames[frame_offset].Time, "Incorrect hit time");
             Assert.AreEqual(1000 + ManiaAutoGenerator.RELEASE_DELAY, generated.Frames[frame_offset + 1].Time, "Incorrect release time");
-            Assert.IsTrue(checkContains(generated.Frames[frame_offset], ManiaAction.Special1), "Special1 has not been pressed");
-            Assert.IsFalse(checkContains(generated.Frames[frame_offset + 1], ManiaAction.Special1), "Special1 has not been released");
+            Assert.IsTrue(checkContains(generated.Frames[frame_offset], ManiaAction.Key1), "Key1 has not been pressed");
+            Assert.IsFalse(checkContains(generated.Frames[frame_offset + 1], ManiaAction.Key1), "Key1 has not been released");
         }
 
         [Test]
@@ -57,8 +57,8 @@ namespace osu.Game.Rulesets.Mania.Tests
             Assert.AreEqual(generated.Frames.Count, frame_offset + 2, "Incorrect number of frames");
             Assert.AreEqual(1000, generated.Frames[frame_offset].Time, "Incorrect hit time");
             Assert.AreEqual(3000, generated.Frames[frame_offset + 1].Time, "Incorrect release time");
-            Assert.IsTrue(checkContains(generated.Frames[frame_offset], ManiaAction.Special1), "Special1 has not been pressed");
-            Assert.IsFalse(checkContains(generated.Frames[frame_offset + 1], ManiaAction.Special1), "Special1 has not been released");
+            Assert.IsTrue(checkContains(generated.Frames[frame_offset], ManiaAction.Key1), "Key1 has not been pressed");
+            Assert.IsFalse(checkContains(generated.Frames[frame_offset + 1], ManiaAction.Key1), "Key1 has not been released");
         }
 
         [Test]

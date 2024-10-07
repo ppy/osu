@@ -49,7 +49,7 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints
         {
             base.LoadComplete();
 
-            inputManager = GetContainingInputManager();
+            inputManager = GetContainingInputManager()!;
 
             BeginPlacement();
         }

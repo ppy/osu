@@ -23,29 +23,6 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary
 
             Children = new Drawable[]
             {
-                new MarkerPart { RelativeSizeAxes = Axes.Both },
-                new ControlPointPart
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.BottomCentre,
-                    RelativeSizeAxes = Axes.Both,
-                    Y = -10,
-                    Height = 0.35f
-                },
-                new BookmarkPart
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.TopCentre,
-                    RelativeSizeAxes = Axes.Both,
-                    Height = 0.35f
-                },
-                new PreviewTimePart
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.TopCentre,
-                    RelativeSizeAxes = Axes.Both,
-                    Height = 0.35f
-                },
                 new Container
                 {
                     Name = "centre line",
@@ -75,13 +52,40 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary
                         },
                     }
                 },
+                new PreviewTimePart
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.TopCentre,
+                    RelativeSizeAxes = Axes.Both,
+                    Height = 0.4f,
+                },
                 new BreakPart
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     RelativeSizeAxes = Axes.Both,
-                    Height = 0.10f
-                }
+                },
+                new KiaiPart
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    RelativeSizeAxes = Axes.Both,
+                },
+                new ControlPointPart
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.BottomCentre,
+                    RelativeSizeAxes = Axes.Both,
+                    Height = 0.4f
+                },
+                new BookmarkPart
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.TopCentre,
+                    RelativeSizeAxes = Axes.Both,
+                    Height = 0.4f
+                },
+                new MarkerPart { RelativeSizeAxes = Axes.Both },
             };
         }
     }

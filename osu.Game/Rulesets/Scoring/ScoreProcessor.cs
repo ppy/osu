@@ -181,6 +181,8 @@ namespace osu.Game.Rulesets.Scoring
             }
         }
 
+        public IReadOnlyDictionary<HitResult, int> Statistics => ScoreResultCounts;
+
         private bool beatmapApplied;
 
         protected readonly Dictionary<HitResult, int> ScoreResultCounts = new Dictionary<HitResult, int>();
@@ -369,9 +371,9 @@ namespace osu.Game.Rulesets.Scoring
             MaximumAccuracy.Value = maximumBaseScore > 0 ? (currentBaseScore + (maximumBaseScore - currentMaximumBaseScore)) / maximumBaseScore : 1;
 
             double comboProgress = maximumComboPortion > 0 ? currentComboPortion / maximumComboPortion : 1;
-            double accuracyProcess = maximumAccuracyJudgementCount > 0 ? (double)currentAccuracyJudgementCount / maximumAccuracyJudgementCount : 1;
+            double accuracyProgress = maximumAccuracyJudgementCount > 0 ? (double)currentAccuracyJudgementCount / maximumAccuracyJudgementCount : 1;
 
-            TotalScoreWithoutMods.Value = (long)Math.Round(ComputeTotalScore(comboProgress, accuracyProcess, currentBonusPortion));
+            TotalScoreWithoutMods.Value = (long)Math.Round(ComputeTotalScore(comboProgress, accuracyProgress, currentBonusPortion));
             TotalScore.Value = (long)Math.Round(TotalScoreWithoutMods.Value * scoreMultiplier);
         }
 
@@ -381,9 +383,12 @@ namespace osu.Game.Rulesets.Scoring
             if (rank.Value == ScoreRank.F)
                 return;
 
-            rank.Value = RankFromScore(Accuracy.Value, ScoreResultCounts);
+            ScoreRank newRank = RankFromScore(Accuracy.Value, ScoreResultCounts);
+
             foreach (var mod in Mods.Value.OfType<IApplicableToScoreProcessor>())
-                rank.Value = mod.AdjustRank(Rank.Value, Accuracy.Value);
+                newRank = mod.AdjustRank(newRank, Accuracy.Value);
+
+            rank.Value = newRank;
         }
 
         protected virtual double ComputeTotalScore(double comboProgress, double accuracyProgress, double bonusPortion)
