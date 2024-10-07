@@ -409,6 +409,7 @@ namespace osu.Game
 
             KeyBindingStore = new RealmKeyBindingStore(realm, keyCombinationProvider);
             KeyBindingStore.Register(globalBindings, RulesetStore.AvailableRulesets);
+            dependencies.Cache(KeyBindingStore);
 
             dependencies.Cache(globalBindings);
 
