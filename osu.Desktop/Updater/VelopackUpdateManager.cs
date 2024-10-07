@@ -45,7 +45,7 @@ namespace osu.Desktop.Updater
 
         protected override async Task<bool> PerformUpdateCheck() => await checkForUpdateAsync().ConfigureAwait(false);
 
-        private async Task<bool> checkForUpdateAsync(UpdateProgressNotification? notification = null)
+        private async Task<bool> checkForUpdateAsync()
         {
             // whether to check again in 30 minutes. generally only if there's an error or no update was found (yet).
             bool scheduleRecheck = false;
@@ -86,26 +86,21 @@ namespace osu.Desktop.Updater
                 }
 
                 // An update is found, let's notify the user and start downloading it.
-                if (notification == null)
+                UpdateProgressNotification notification = new UpdateProgressNotification
                 {
-                    notification = new UpdateProgressNotification
+                    CompletionClickAction = () =>
                     {
-                        CompletionClickAction = () =>
-                        {
-                            Task.Run(restartToApplyUpdate);
-                            return true;
-                        },
-                    };
+                        Task.Run(restartToApplyUpdate);
+                        return true;
+                    },
+                };
 
-                    runOutsideOfGameplay(() => notificationOverlay.Post(notification));
-                }
-
+                runOutsideOfGameplay(() => notificationOverlay.Post(notification));
                 notification.StartDownload();
 
                 try
                 {
                     await updateManager.DownloadUpdatesAsync(pendingUpdate, p => notification.Progress = p / 100f).ConfigureAwait(false);
-
                     runOutsideOfGameplay(() => notification.State = ProgressNotificationState.Completed);
                 }
                 catch (Exception e)
