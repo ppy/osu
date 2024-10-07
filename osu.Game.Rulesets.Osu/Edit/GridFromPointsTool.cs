@@ -23,7 +23,7 @@ namespace osu.Game.Rulesets.Osu.Edit
                           """;
         }
 
-        public override Drawable? CreateIcon() => new SpriteIcon { Icon = OsuIcon.EditorGridSnap };
+        public override Drawable CreateIcon() => new SpriteIcon { Icon = OsuIcon.EditorGridSnap };
 
         public override PlacementBlueprint CreatePlacementBlueprint() => new GridPlacementBlueprint();
     }
