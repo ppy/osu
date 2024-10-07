@@ -178,7 +178,6 @@ namespace osu.Game.Graphics
         public static IconUsage EditorWhistle => get(OsuIconMapping.EditorWhistle);
         public static IconUsage Tortoise => get(OsuIconMapping.Tortoise);
         public static IconUsage Hare => get(OsuIconMapping.Hare);
-        public static IconUsage EditorPlaceGrid => get(OsuIconMapping.EditorPlaceGrid);
 
         private static IconUsage get(OsuIconMapping glyph) => new IconUsage((char)glyph, FONT_NAME);
 
@@ -393,9 +392,6 @@ namespace osu.Game.Graphics
 
             [Description(@"hare")]
             Hare,
-
-            [Description(@"Editor/place-grid")]
-            EditorPlaceGrid,
         }
 
         public class OsuIconStore : ITextureStore, ITexturedGlyphLookupStore
