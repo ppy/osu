@@ -13,7 +13,7 @@ namespace osu.Game.Rulesets.Osu.Edit
     public partial class GridFromPointsTool : CompositionTool
     {
         public GridFromPointsTool()
-            : base("Change grid")
+            : base("Grid")
         {
             TooltipText = """
                           Left click to set the origin.
