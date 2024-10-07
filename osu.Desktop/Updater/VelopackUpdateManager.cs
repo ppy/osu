@@ -63,17 +63,14 @@ namespace osu.Desktop.Updater
                 // Velopack does support this scenario (see https://github.com/ppy/osu/pull/28743#discussion_r1743495975).
                 if (pendingUpdate != null)
                 {
-                    runOutsideOfGameplay(() =>
+                    // If there is an update pending restart, show the notification to restart again.
+                    notificationOverlay.Post(new UpdateApplicationCompleteNotification
                     {
-                        // If there is an update pending restart, show the notification to restart again.
-                        notificationOverlay.Post(new UpdateApplicationCompleteNotification
+                        Activated = () =>
                         {
-                            Activated = () =>
-                            {
-                                Task.Run(restartToApplyUpdate);
-                                return true;
-                            }
-                        });
+                            Task.Run(restartToApplyUpdate);
+                            return true;
+                        }
                     });
 
                     return true;
