@@ -32,6 +32,7 @@ using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
+using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Scoring;
 using osu.Game.Scoring.Legacy;
 using osu.Game.Screens.Play.HUD;
@@ -100,6 +101,11 @@ namespace osu.Game.Screens.Play
         /// Whether the <see cref="HUDOverlay"/> is currently visible.
         /// </summary>
         public IBindable<bool> ShowingOverlayComponents = new Bindable<bool>();
+
+        // Should match PlayerLoader for consistency. Cached here for the rare case we push a Player
+        // without the loading screen (one such usage is the skin editor's scene library).
+        [Cached]
+        private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Purple);
 
         [Resolved]
         private ScoreManager scoreManager { get; set; }
@@ -231,6 +237,9 @@ namespace osu.Game.Screens.Play
             DrawableRuleset = ruleset.CreateDrawableRulesetWith(playableBeatmap, gameplayMods);
             dependencies.CacheAs(DrawableRuleset);
 
+            if (DrawableRuleset is IDrawableScrollingRuleset scrollingRuleset)
+                dependencies.CacheAs(scrollingRuleset.ScrollingInfo);
+
             ScoreProcessor = ruleset.CreateScoreProcessor();
             ScoreProcessor.Mods.Value = gameplayMods;
             ScoreProcessor.ApplyBeatmap(playableBeatmap);
@@ -255,7 +264,7 @@ namespace osu.Game.Screens.Play
             Score.ScoreInfo.Ruleset = ruleset.RulesetInfo;
             Score.ScoreInfo.Mods = gameplayMods;
 
-            dependencies.CacheAs(GameplayState = new GameplayState(playableBeatmap, ruleset, gameplayMods, Score, ScoreProcessor, Beatmap.Value.Storyboard));
+            dependencies.CacheAs(GameplayState = new GameplayState(playableBeatmap, ruleset, gameplayMods, Score, ScoreProcessor, HealthProcessor, Beatmap.Value.Storyboard));
 
             var rulesetSkinProvider = new RulesetSkinProvidingContainer(ruleset, playableBeatmap, Beatmap.Value.Skin);
 
@@ -396,8 +405,20 @@ namespace osu.Game.Screens.Play
 
         protected virtual GameplayClockContainer CreateGameplayClockContainer(WorkingBeatmap beatmap, double gameplayStart) => new MasterGameplayClockContainer(beatmap, gameplayStart);
 
-        private Drawable createUnderlayComponents() =>
-            DimmableStoryboard = new DimmableStoryboard(GameplayState.Storyboard, GameplayState.Mods) { RelativeSizeAxes = Axes.Both };
+        private Drawable createUnderlayComponents()
+        {
+            var container = new Container
+            {
+                RelativeSizeAxes = Axes.Both,
+                Children = new Drawable[]
+                {
+                    DimmableStoryboard = new DimmableStoryboard(GameplayState.Storyboard, GameplayState.Mods) { RelativeSizeAxes = Axes.Both },
+                    new KiaiGameplayFountains(),
+                },
+            };
+
+            return container;
+        }
 
         private Drawable createGameplayComponents(IWorkingBeatmap working) => new ScalingContainer(ScalingMode.Gameplay)
         {
@@ -425,15 +446,6 @@ namespace osu.Game.Screens.Play
                 Children = new[]
                 {
                     DimmableStoryboard.OverlayLayerContainer.CreateProxy(),
-                    BreakOverlay = new BreakOverlay(working.Beatmap.BeatmapInfo.LetterboxInBreaks, ScoreProcessor)
-                    {
-                        Clock = DrawableRuleset.FrameStableClock,
-                        ProcessCustomClock = false,
-                        Breaks = working.Beatmap.Breaks
-                    },
-                    // display the cursor above some HUD elements.
-                    DrawableRuleset.Cursor?.CreateProxy() ?? new Container(),
-                    DrawableRuleset.ResumeOverlay?.CreateProxy() ?? new Container(),
                     HUDOverlay = new HUDOverlay(DrawableRuleset, GameplayState.Mods, Configuration.AlwaysShowLeaderboard)
                     {
                         HoldToQuit =
@@ -452,6 +464,14 @@ namespace osu.Game.Screens.Play
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre
                     },
+                    BreakOverlay = new BreakOverlay(working.Beatmap.BeatmapInfo.LetterboxInBreaks, ScoreProcessor)
+                    {
+                        Clock = DrawableRuleset.FrameStableClock,
+                        ProcessCustomClock = false,
+                        BreakTracker = breakTracker,
+                    },
+                    // display the cursor above some HUD elements.
+                    DrawableRuleset.Cursor?.CreateProxy() ?? new Container(),
                     skipIntroOverlay = new SkipOverlay(DrawableRuleset.GameplayStartTime)
                     {
                         RequestSkip = performUserRequestedSkip
@@ -461,6 +481,7 @@ namespace osu.Game.Screens.Play
                         RequestSkip = () => progressToResults(false),
                         Alpha = 0
                     },
+                    DrawableRuleset.ResumeOverlay?.CreateProxy() ?? new Container(),
                     PauseOverlay = new PauseOverlay
                     {
                         OnResume = Resume,
@@ -982,14 +1003,14 @@ namespace osu.Game.Screens.Play
         /// <summary>
         /// The amount of gameplay time after which a second pause is allowed.
         /// </summary>
-        private const double pause_cooldown = 1000;
+        protected virtual double PauseCooldownDuration => 1000;
 
         protected PauseOverlay PauseOverlay { get; private set; }
 
         private double? lastPauseActionTime;
 
         protected bool PauseCooldownActive =>
-            lastPauseActionTime.HasValue && GameplayClockContainer.CurrentTime < lastPauseActionTime + pause_cooldown;
+            lastPauseActionTime.HasValue && GameplayClockContainer.CurrentTime < lastPauseActionTime + PauseCooldownDuration;
 
         /// <summary>
         /// A set of conditionals which defines whether the current game state and configuration allows for
@@ -1200,6 +1221,7 @@ namespace osu.Game.Screens.Play
             var importableScore = score.ScoreInfo.DeepClone();
 
             var imported = scoreManager.Import(importableScore, replayReader);
+            Debug.Assert(imported != null);
 
             imported.PerformRead(s =>
             {

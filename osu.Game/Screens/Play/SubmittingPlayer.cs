@@ -152,6 +152,10 @@ namespace osu.Game.Screens.Play
                                 Logger.Log($"Please ensure that you are using the latest version of the official game releases.\n\n{whatWillHappen}", level: LogLevel.Important);
                                 break;
 
+                            case @"invalid beatmap_hash":
+                                Logger.Log($"This beatmap does not match the online version. Please update or redownload it.\n\n{whatWillHappen}", level: LogLevel.Important);
+                                break;
+
                             case @"expired token":
                                 Logger.Log($"Your system clock is set incorrectly. Please check your system time, date and timezone.\n\n{whatWillHappen}", level: LogLevel.Important);
                                 break;
@@ -230,9 +234,12 @@ namespace osu.Game.Screens.Play
         {
             if (LoadedBeatmapSuccessfully)
             {
+                // compare: https://github.com/ppy/osu/blob/ccf1acce56798497edfaf92d3ece933469edcf0a/osu.Game/Screens/Play/Player.cs#L848-L851
+                var scoreCopy = Score.DeepClone();
+
                 Task.Run(async () =>
                 {
-                    await submitScore(Score.DeepClone()).ConfigureAwait(false);
+                    await submitScore(scoreCopy).ConfigureAwait(false);
                     spectatorClient.EndPlaying(GameplayState);
                 }).FireAndForget();
             }
@@ -270,6 +277,16 @@ namespace osu.Game.Screens.Play
                 return Task.CompletedTask;
             }
 
+            // if the user never hit anything, this score should not be counted in any way.
+            if (!score.ScoreInfo.Statistics.Any(s => s.Key.IsHit() && s.Value > 0))
+            {
+                Logger.Log("No hits registered, skipping score submission");
+                return Task.CompletedTask;
+            }
+
+            // mind the timing of this.
+            // once `scoreSubmissionSource` is created, it is presumed that submission is taking place in the background,
+            // so all exceptional circumstances that would disallow submission must be handled above.
             lock (scoreSubmissionLock)
             {
                 if (scoreSubmissionSource != null)
@@ -277,10 +294,6 @@ namespace osu.Game.Screens.Play
 
                 scoreSubmissionSource = new TaskCompletionSource<bool>();
             }
-
-            // if the user never hit anything, this score should not be counted in any way.
-            if (!score.ScoreInfo.Statistics.Any(s => s.Key.IsHit() && s.Value > 0))
-                return Task.CompletedTask;
 
             Logger.Log($"Beginning score submission (token:{token.Value})...");
             var request = CreateSubmissionRequest(score, token.Value);

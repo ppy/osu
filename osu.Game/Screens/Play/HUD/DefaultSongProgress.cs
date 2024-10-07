@@ -10,6 +10,7 @@ using osu.Framework.Utils;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Localisation.HUD;
+using osu.Game.Localisation.SkinComponents;
 using osu.Game.Rulesets.Objects;
 using osuTK;
 
@@ -32,6 +33,12 @@ namespace osu.Game.Screens.Play.HUD
 
         [SettingSource(typeof(SongProgressStrings), nameof(SongProgressStrings.ShowGraph), nameof(SongProgressStrings.ShowGraphDescription))]
         public Bindable<bool> ShowGraph { get; } = new BindableBool(true);
+
+        [SettingSource(typeof(SongProgressStrings), nameof(SongProgressStrings.ShowTime), nameof(SongProgressStrings.ShowTimeDescription))]
+        public Bindable<bool> ShowTime { get; } = new BindableBool(true);
+
+        [SettingSource(typeof(SkinnableComponentStrings), nameof(SkinnableComponentStrings.Colour), nameof(SkinnableComponentStrings.ColourDescription))]
+        public BindableColour4 AccentColour { get; } = new BindableColour4(Colour4.White);
 
         [Resolved]
         private Player? player { get; set; }
@@ -82,6 +89,8 @@ namespace osu.Game.Screens.Play.HUD
         {
             Interactive.BindValueChanged(_ => updateBarVisibility(), true);
             ShowGraph.BindValueChanged(_ => updateGraphVisibility(), true);
+            ShowTime.BindValueChanged(_ => updateTimeVisibility(), true);
+            AccentColour.BindValueChanged(_ => Colour = AccentColour.Value, true);
 
             base.LoadComplete();
         }
@@ -125,6 +134,13 @@ namespace osu.Game.Screens.Play.HUD
 
             bar.ResizeHeightTo(ShowGraph.Value ? barHeight + graph_height : barHeight, transition_duration, Easing.In);
             graph.FadeTo(ShowGraph.Value ? 1 : 0, transition_duration, Easing.In);
+
+            updateInfoMargin();
+        }
+
+        private void updateTimeVisibility()
+        {
+            info.FadeTo(ShowTime.Value ? 1 : 0, transition_duration, Easing.In);
 
             updateInfoMargin();
         }
