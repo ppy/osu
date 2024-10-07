@@ -13,6 +13,11 @@ namespace osu.Game.Rulesets.Difficulty
     public interface IDifficultyCalculatorBeatmap : IBeatmap
     {
         /// <summary>
+        /// Returns base <see cref="IBeatmap"/> used for construction of this <see cref="IDifficultyCalculatorBeatmap"/>.
+        /// </summary>
+        IBeatmap BaseBeatmap { get; }
+
+        /// <summary>
         /// Finds the maximum achievable combo by hitting all <see cref="HitObject"/>s in a beatmap.
         /// </summary>
         int GetMaxCombo();

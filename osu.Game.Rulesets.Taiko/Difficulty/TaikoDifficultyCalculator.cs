@@ -32,7 +32,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
         {
         }
 
-        protected override Skill[] CreateSkills(IBeatmap beatmap, Mod[] mods, double clockRate)
+        protected override Skill[] CreateSkills(IDifficultyCalculatorBeatmap beatmap, Mod[] mods, double clockRate)
         {
             return new Skill[]
             {
@@ -50,7 +50,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             new TaikoModHardRock(),
         };
 
-        protected override IEnumerable<DifficultyHitObject> CreateDifficultyHitObjects(IBeatmap beatmap, double clockRate)
+        protected override IEnumerable<DifficultyHitObject> CreateDifficultyHitObjects(IDifficultyCalculatorBeatmap beatmap, double clockRate)
         {
             List<DifficultyHitObject> difficultyHitObjects = new List<DifficultyHitObject>();
             List<TaikoDifficultyHitObject> centreObjects = new List<TaikoDifficultyHitObject>();

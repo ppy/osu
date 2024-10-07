@@ -277,7 +277,7 @@ namespace osu.Game.Rulesets.Difficulty
         /// <param name="beatmap">The <see cref="IBeatmap"/> providing the <see cref="HitObject"/>s to enumerate.</param>
         /// <param name="clockRate">The rate at which the gameplay clock is run at.</param>
         /// <returns>The enumerated <see cref="DifficultyHitObject"/>s.</returns>
-        protected abstract IEnumerable<DifficultyHitObject> CreateDifficultyHitObjects(IBeatmap beatmap, double clockRate);
+        protected abstract IEnumerable<DifficultyHitObject> CreateDifficultyHitObjects(IDifficultyCalculatorBeatmap beatmap, double clockRate);
 
         /// <summary>
         /// Creates the <see cref="Skill"/>s to calculate the difficulty of an <see cref="IBeatmap"/>.
@@ -287,6 +287,6 @@ namespace osu.Game.Rulesets.Difficulty
         /// <param name="mods">Mods to calculate difficulty with.</param>
         /// <param name="clockRate">Clockrate to calculate difficulty with.</param>
         /// <returns>The <see cref="Skill"/>s.</returns>
-        protected abstract Skill[] CreateSkills(IBeatmap beatmap, Mod[] mods, double clockRate);
+        protected abstract Skill[] CreateSkills(IDifficultyCalculatorBeatmap beatmap, Mod[] mods, double clockRate);
     }
 }

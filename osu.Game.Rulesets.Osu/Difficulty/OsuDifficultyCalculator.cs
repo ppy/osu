@@ -112,7 +112,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             return attributes;
         }
 
-        protected override IEnumerable<DifficultyHitObject> CreateDifficultyHitObjects(IBeatmap beatmap, double clockRate)
+        protected override IEnumerable<DifficultyHitObject> CreateDifficultyHitObjects(IDifficultyCalculatorBeatmap beatmap, double clockRate)
         {
             List<DifficultyHitObject> objects = new List<DifficultyHitObject>();
 
@@ -127,7 +127,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             return objects;
         }
 
-        protected override Skill[] CreateSkills(IBeatmap beatmap, Mod[] mods, double clockRate)
+        protected override Skill[] CreateSkills(IDifficultyCalculatorBeatmap beatmap, Mod[] mods, double clockRate)
         {
             var skills = new List<Skill>
             {

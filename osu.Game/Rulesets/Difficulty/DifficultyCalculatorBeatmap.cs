@@ -19,11 +19,11 @@ namespace osu.Game.Rulesets.Difficulty
     /// </summary>
     internal class DifficultyCalculatorBeatmap : IDifficultyCalculatorBeatmap
     {
-        private readonly IBeatmap baseBeatmap;
+        public IBeatmap BaseBeatmap { get; }
 
         public DifficultyCalculatorBeatmap(IBeatmap baseBeatmap)
         {
-            this.baseBeatmap = baseBeatmap;
+            BaseBeatmap = baseBeatmap;
         }
 
         public int GetMaxCombo()
@@ -47,40 +47,40 @@ namespace osu.Game.Rulesets.Difficulty
 
         #region Delegated IBeatmap implementation
 
-        public IReadOnlyList<HitObject> HitObjects => baseBeatmap.HitObjects;
+        public IReadOnlyList<HitObject> HitObjects => BaseBeatmap.HitObjects;
 
         public BeatmapInfo BeatmapInfo
         {
-            get => baseBeatmap.BeatmapInfo;
-            set => baseBeatmap.BeatmapInfo = value;
+            get => BaseBeatmap.BeatmapInfo;
+            set => BaseBeatmap.BeatmapInfo = value;
         }
 
         public ControlPointInfo ControlPointInfo
         {
-            get => baseBeatmap.ControlPointInfo;
-            set => baseBeatmap.ControlPointInfo = value;
+            get => BaseBeatmap.ControlPointInfo;
+            set => BaseBeatmap.ControlPointInfo = value;
         }
 
-        public BeatmapMetadata Metadata => baseBeatmap.Metadata;
+        public BeatmapMetadata Metadata => BaseBeatmap.Metadata;
 
         public BeatmapDifficulty Difficulty
         {
-            get => baseBeatmap.Difficulty;
-            set => baseBeatmap.Difficulty = value;
+            get => BaseBeatmap.Difficulty;
+            set => BaseBeatmap.Difficulty = value;
         }
 
         public SortedList<BreakPeriod> Breaks
         {
-            get => baseBeatmap.Breaks;
-            set => baseBeatmap.Breaks = value;
+            get => BaseBeatmap.Breaks;
+            set => BaseBeatmap.Breaks = value;
         }
 
-        public List<string> UnhandledEventLines => baseBeatmap.UnhandledEventLines;
+        public List<string> UnhandledEventLines => BaseBeatmap.UnhandledEventLines;
 
-        public double TotalBreakTime => baseBeatmap.TotalBreakTime;
-        public IEnumerable<BeatmapStatistic> GetStatistics() => baseBeatmap.GetStatistics();
-        public double GetMostCommonBeatLength() => baseBeatmap.GetMostCommonBeatLength();
-        public IBeatmap Clone() => new DifficultyCalculatorBeatmap(baseBeatmap.Clone());
+        public double TotalBreakTime => BaseBeatmap.TotalBreakTime;
+        public IEnumerable<BeatmapStatistic> GetStatistics() => BaseBeatmap.GetStatistics();
+        public double GetMostCommonBeatLength() => BaseBeatmap.GetMostCommonBeatLength();
+        public IBeatmap Clone() => new DifficultyCalculatorBeatmap(BaseBeatmap.Clone());
 
         #endregion
     }
