@@ -97,7 +97,7 @@ namespace osu.Desktop.Updater
                         },
                     };
 
-                    Schedule(() => notificationOverlay.Post(notification));
+                    runOutsideOfGameplay(() => notificationOverlay.Post(notification));
                 }
 
                 notification.StartDownload();
