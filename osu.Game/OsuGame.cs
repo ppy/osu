@@ -1548,11 +1548,15 @@ namespace osu.Game
                 scope.SetTag(@"screen", newScreen?.GetType().ReadableName() ?? @"none");
             });
 
-            // reset on screen change for sanity.
-            playingState.Value = LocalUserPlayingState.NotPlaying;
+            switch (current)
+            {
+                case Player player:
+                    player.PlayingState.UnbindFrom(playingState);
 
-            if (current is Player oldPlayer)
-                oldPlayer.PlayingState.UnbindFrom(playingState);
+                    // reset for sanity.
+                    playingState.Value = LocalUserPlayingState.NotPlaying;
+                    break;
+            }
 
             switch (newScreen)
             {
