@@ -28,6 +28,7 @@ namespace osu.Game.Rulesets.Difficulty
         protected const int ATTRIB_ID_SPEED_NOTE_COUNT = 21;
         protected const int ATTRIB_ID_SPEED_DIFFICULT_STRAIN_COUNT = 23;
         protected const int ATTRIB_ID_AIM_DIFFICULT_STRAIN_COUNT = 25;
+        protected const int ATTRIB_ID_OK_HIT_WINDOW = 27;
 
         /// <summary>
         /// The mods which were applied to the beatmap.
