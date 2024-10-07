@@ -16,13 +16,13 @@ namespace osu.Game.Rulesets.Osu.Edit.Setup
 {
     public partial class OsuDifficultySection : SetupSection
     {
-        private LabelledSliderBar<float> circleSizeSlider { get; set; } = null!;
-        private LabelledSliderBar<float> healthDrainSlider { get; set; } = null!;
-        private LabelledSliderBar<float> approachRateSlider { get; set; } = null!;
-        private LabelledSliderBar<float> overallDifficultySlider { get; set; } = null!;
-        private LabelledSliderBar<double> baseVelocitySlider { get; set; } = null!;
-        private LabelledSliderBar<double> tickRateSlider { get; set; } = null!;
-        private LabelledSliderBar<float> stackLeniency { get; set; } = null!;
+        private FormSliderBar<float> circleSizeSlider { get; set; } = null!;
+        private FormSliderBar<float> healthDrainSlider { get; set; } = null!;
+        private FormSliderBar<float> approachRateSlider { get; set; } = null!;
+        private FormSliderBar<float> overallDifficultySlider { get; set; } = null!;
+        private FormSliderBar<double> baseVelocitySlider { get; set; } = null!;
+        private FormSliderBar<double> tickRateSlider { get; set; } = null!;
+        private FormSliderBar<float> stackLeniency { get; set; } = null!;
 
         public override LocalisableString Title => EditorSetupStrings.DifficultyHeader;
 
@@ -31,103 +31,110 @@ namespace osu.Game.Rulesets.Osu.Edit.Setup
         {
             Children = new Drawable[]
             {
-                circleSizeSlider = new LabelledSliderBar<float>
+                circleSizeSlider = new FormSliderBar<float>
                 {
-                    Label = BeatmapsetsStrings.ShowStatsCs,
-                    FixedLabelWidth = LABEL_WIDTH,
-                    Description = EditorSetupStrings.CircleSizeDescription,
+                    Caption = BeatmapsetsStrings.ShowStatsCs,
+                    HintText = EditorSetupStrings.CircleSizeDescription,
                     Current = new BindableFloat(Beatmap.Difficulty.CircleSize)
                     {
                         Default = BeatmapDifficulty.DEFAULT_DIFFICULTY,
                         MinValue = 0,
                         MaxValue = 10,
                         Precision = 0.1f,
-                    }
+                    },
+                    TransferValueOnCommit = true,
+                    TabbableContentContainer = this,
                 },
-                healthDrainSlider = new LabelledSliderBar<float>
+                healthDrainSlider = new FormSliderBar<float>
                 {
-                    Label = BeatmapsetsStrings.ShowStatsDrain,
-                    FixedLabelWidth = LABEL_WIDTH,
-                    Description = EditorSetupStrings.DrainRateDescription,
+                    Caption = BeatmapsetsStrings.ShowStatsDrain,
+                    HintText = EditorSetupStrings.DrainRateDescription,
                     Current = new BindableFloat(Beatmap.Difficulty.DrainRate)
                     {
                         Default = BeatmapDifficulty.DEFAULT_DIFFICULTY,
                         MinValue = 0,
                         MaxValue = 10,
                         Precision = 0.1f,
-                    }
+                    },
+                    TransferValueOnCommit = true,
+                    TabbableContentContainer = this,
                 },
-                approachRateSlider = new LabelledSliderBar<float>
+                approachRateSlider = new FormSliderBar<float>
                 {
-                    Label = BeatmapsetsStrings.ShowStatsAr,
-                    FixedLabelWidth = LABEL_WIDTH,
-                    Description = EditorSetupStrings.ApproachRateDescription,
+                    Caption = BeatmapsetsStrings.ShowStatsAr,
+                    HintText = EditorSetupStrings.ApproachRateDescription,
                     Current = new BindableFloat(Beatmap.Difficulty.ApproachRate)
                     {
                         Default = BeatmapDifficulty.DEFAULT_DIFFICULTY,
                         MinValue = 0,
                         MaxValue = 10,
                         Precision = 0.1f,
-                    }
+                    },
+                    TransferValueOnCommit = true,
+                    TabbableContentContainer = this,
                 },
-                overallDifficultySlider = new LabelledSliderBar<float>
+                overallDifficultySlider = new FormSliderBar<float>
                 {
-                    Label = BeatmapsetsStrings.ShowStatsAccuracy,
-                    FixedLabelWidth = LABEL_WIDTH,
-                    Description = EditorSetupStrings.OverallDifficultyDescription,
+                    Caption = BeatmapsetsStrings.ShowStatsAccuracy,
+                    HintText = EditorSetupStrings.OverallDifficultyDescription,
                     Current = new BindableFloat(Beatmap.Difficulty.OverallDifficulty)
                     {
                         Default = BeatmapDifficulty.DEFAULT_DIFFICULTY,
                         MinValue = 0,
                         MaxValue = 10,
                         Precision = 0.1f,
-                    }
+                    },
+                    TransferValueOnCommit = true,
+                    TabbableContentContainer = this,
                 },
-                baseVelocitySlider = new LabelledSliderBar<double>
+                baseVelocitySlider = new FormSliderBar<double>
                 {
-                    Label = EditorSetupStrings.BaseVelocity,
-                    FixedLabelWidth = LABEL_WIDTH,
-                    Description = EditorSetupStrings.BaseVelocityDescription,
+                    Caption = EditorSetupStrings.BaseVelocity,
+                    HintText = EditorSetupStrings.BaseVelocityDescription,
                     Current = new BindableDouble(Beatmap.Difficulty.SliderMultiplier)
                     {
                         Default = 1.4,
                         MinValue = 0.4,
                         MaxValue = 3.6,
                         Precision = 0.01f,
-                    }
+                    },
+                    TransferValueOnCommit = true,
+                    TabbableContentContainer = this,
                 },
-                tickRateSlider = new LabelledSliderBar<double>
+                tickRateSlider = new FormSliderBar<double>
                 {
-                    Label = EditorSetupStrings.TickRate,
-                    FixedLabelWidth = LABEL_WIDTH,
-                    Description = EditorSetupStrings.TickRateDescription,
+                    Caption = EditorSetupStrings.TickRate,
+                    HintText = EditorSetupStrings.TickRateDescription,
                     Current = new BindableDouble(Beatmap.Difficulty.SliderTickRate)
                     {
                         Default = 1,
                         MinValue = 1,
                         MaxValue = 4,
                         Precision = 1,
-                    }
+                    },
+                    TransferValueOnCommit = true,
+                    TabbableContentContainer = this,
                 },
-                stackLeniency = new LabelledSliderBar<float>
+                stackLeniency = new FormSliderBar<float>
                 {
-                    Label = "Stack Leniency",
-                    FixedLabelWidth = LABEL_WIDTH,
-                    Description = "In play mode, osu! automatically stacks notes which occur at the same location. Increasing this value means it is more likely to snap notes of further time-distance.",
+                    Caption = "Stack Leniency",
+                    HintText = "In play mode, osu! automatically stacks notes which occur at the same location. Increasing this value means it is more likely to snap notes of further time-distance.",
                     Current = new BindableFloat(Beatmap.BeatmapInfo.StackLeniency)
                     {
                         Default = 0.7f,
                         MinValue = 0,
                         MaxValue = 1,
                         Precision = 0.1f
-                    }
+                    },
+                    TransferValueOnCommit = true,
+                    TabbableContentContainer = this,
                 },
             };
 
-            foreach (var item in Children.OfType<LabelledSliderBar<float>>())
+            foreach (var item in Children.OfType<FormSliderBar<float>>())
                 item.Current.ValueChanged += _ => updateValues();
 
-            foreach (var item in Children.OfType<LabelledSliderBar<double>>())
+            foreach (var item in Children.OfType<FormSliderBar<double>>())
                 item.Current.ValueChanged += _ => updateValues();
         }
 
