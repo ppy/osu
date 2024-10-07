@@ -35,13 +35,13 @@ namespace osu.Game.Screens.Play.HUD
 
         private double trackTime => (EndTime - StartTime) * Progress;
 
-        private float relativePositionX;
+        private float lastMouseX;
 
         public LocalisableString TooltipText
         {
             get
             {
-                double progress = Math.Clamp(relativePositionX, 0, DrawWidth) / DrawWidth;
+                double progress = Math.Clamp(lastMouseX, 0, DrawWidth) / DrawWidth;
 
                 TimeSpan currentSpan = TimeSpan.FromMilliseconds(Math.Round((EndTime - StartTime) * progress));
 
@@ -107,10 +107,8 @@ namespace osu.Game.Screens.Play.HUD
         {
             base.OnMouseMove(e);
 
-            var cursorPosition = e.ScreenSpaceMousePosition;
-            relativePositionX = ToLocalSpace(cursorPosition).X;
-
-            return true;
+            lastMouseX = e.MousePosition.X;
+            return false;
         }
 
         protected override bool OnHover(HoverEvent e)
