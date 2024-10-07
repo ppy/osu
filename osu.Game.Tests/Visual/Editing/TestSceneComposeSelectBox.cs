@@ -84,6 +84,7 @@ namespace osu.Game.Tests.Visual.Editing
 
                 targetContainer = getTargetContainer();
                 initialRotation = targetContainer!.Rotation;
+                DefaultOrigin = ToLocalSpace(targetContainer.ToScreenSpace(Vector2.Zero));
 
                 base.Begin();
             }

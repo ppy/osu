@@ -8,6 +8,7 @@ using Humanizer;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Input.Bindings;
 using osu.Game.Audio;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics.UserInterface;
@@ -350,19 +351,69 @@ namespace osu.Game.Screens.Edit.Compose.Components
         {
             if (SelectedBlueprints.All(b => b.Item is IHasComboInformation))
             {
-                yield return new TernaryStateToggleMenuItem("New combo") { State = { BindTarget = SelectionNewComboState } };
+                yield return new TernaryStateToggleMenuItem("New combo")
+                {
+                    State = { BindTarget = SelectionNewComboState },
+                    Hotkey = new Hotkey(new KeyCombination(InputKey.Q))
+                };
             }
 
-            yield return new OsuMenuItem("Sample")
+            yield return new OsuMenuItem("Sample") { Items = getSampleSubmenuItems().ToArray(), };
+            yield return new OsuMenuItem("Bank") { Items = getBankSubmenuItems().ToArray(), };
+        }
+
+        private IEnumerable<MenuItem> getSampleSubmenuItems()
+        {
+            var whistle = SelectionSampleStates[HitSampleInfo.HIT_WHISTLE];
+            yield return new TernaryStateToggleMenuItem(whistle.Description)
             {
-                Items = SelectionSampleStates.Select(kvp =>
-                    new TernaryStateToggleMenuItem(kvp.Value.Description) { State = { BindTarget = kvp.Value } }).ToArray()
+                State = { BindTarget = whistle },
+                Hotkey = new Hotkey(new KeyCombination(InputKey.W))
             };
 
-            yield return new OsuMenuItem("Bank")
+            var finish = SelectionSampleStates[HitSampleInfo.HIT_FINISH];
+            yield return new TernaryStateToggleMenuItem(finish.Description)
             {
-                Items = SelectionBankStates.Select(kvp =>
-                    new TernaryStateToggleMenuItem(kvp.Value.Description) { State = { BindTarget = kvp.Value } }).ToArray()
+                State = { BindTarget = finish },
+                Hotkey = new Hotkey(new KeyCombination(InputKey.E))
+            };
+
+            var clap = SelectionSampleStates[HitSampleInfo.HIT_CLAP];
+            yield return new TernaryStateToggleMenuItem(clap.Description)
+            {
+                State = { BindTarget = clap },
+                Hotkey = new Hotkey(new KeyCombination(InputKey.R))
+            };
+        }
+
+        private IEnumerable<MenuItem> getBankSubmenuItems()
+        {
+            var auto = SelectionBankStates[HIT_BANK_AUTO];
+            yield return new TernaryStateToggleMenuItem(auto.Description)
+            {
+                State = { BindTarget = auto },
+                Hotkey = new Hotkey(new KeyCombination(InputKey.Shift, InputKey.Q))
+            };
+
+            var normal = SelectionBankStates[HitSampleInfo.BANK_NORMAL];
+            yield return new TernaryStateToggleMenuItem(normal.Description)
+            {
+                State = { BindTarget = normal },
+                Hotkey = new Hotkey(new KeyCombination(InputKey.Shift, InputKey.W))
+            };
+
+            var soft = SelectionBankStates[HitSampleInfo.BANK_SOFT];
+            yield return new TernaryStateToggleMenuItem(soft.Description)
+            {
+                State = { BindTarget = soft },
+                Hotkey = new Hotkey(new KeyCombination(InputKey.Shift, InputKey.E))
+            };
+
+            var drum = SelectionBankStates[HitSampleInfo.BANK_DRUM];
+            yield return new TernaryStateToggleMenuItem(drum.Description)
+            {
+                State = { BindTarget = drum },
+                Hotkey = new Hotkey(new KeyCombination(InputKey.Shift, InputKey.R))
             };
         }
 

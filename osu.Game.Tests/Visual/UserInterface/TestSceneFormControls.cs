@@ -5,6 +5,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
+using osu.Game.Beatmaps;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Localisation;
@@ -71,7 +72,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                         },
                         new FormSliderBar<float>
                         {
-                            Caption = "Instantaneous slider",
+                            Caption = "Slider",
                             Current = new BindableFloat
                             {
                                 MinValue = 0,
@@ -81,18 +82,26 @@ namespace osu.Game.Tests.Visual.UserInterface
                             },
                             TabbableContentContainer = this,
                         },
-                        new FormSliderBar<float>
+                        new FormEnumDropdown<CountdownType>
                         {
-                            Caption = "Non-instantaneous slider",
-                            Current = new BindableFloat
+                            Caption = EditorSetupStrings.EnableCountdown,
+                            HintText = EditorSetupStrings.CountdownDescription,
+                        },
+                        new FormFileSelector
+                        {
+                            Caption = "Audio file",
+                            PlaceholderText = "Select an audio file",
+                        },
+                        new FormColourPalette
+                        {
+                            Caption = "Combo colours",
+                            Colours =
                             {
-                                MinValue = 0,
-                                MaxValue = 10,
-                                Value = 5,
-                                Precision = 0.1f,
-                            },
-                            Instantaneous = false,
-                            TabbableContentContainer = this,
+                                Colour4.Red,
+                                Colour4.Green,
+                                Colour4.Blue,
+                                Colour4.Yellow,
+                            }
                         },
                     },
                 },
