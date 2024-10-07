@@ -188,6 +188,12 @@ namespace osu.Game.Rulesets.Osu.Edit
                 StartPosition.Value = new Vector2(StartPosition.Value.X, y.NewValue);
             }, true);
 
+            StartPosition.BindValueChanged(pos =>
+            {
+                StartPositionX.Value = pos.NewValue.X;
+                StartPositionY.Value = pos.NewValue.Y;
+            });
+
             Spacing.BindValueChanged(spacing =>
             {
                 spacingSlider.ContractedLabelText = $"S: {spacing.NewValue:N0}";
