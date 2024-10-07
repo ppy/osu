@@ -42,6 +42,25 @@ namespace osu.Game.Graphics.UserInterface
             sampleClose = audio.Samples.Get(@"UI/dropdown-close");
         }
 
+        protected override void Update()
+        {
+            base.Update();
+
+            bool showCheckboxes = false;
+
+            foreach (var drawableItem in ItemsContainer)
+            {
+                if (drawableItem.Item is StatefulMenuItem)
+                    showCheckboxes = true;
+            }
+
+            foreach (var drawableItem in ItemsContainer)
+            {
+                if (drawableItem is DrawableOsuMenuItem osuItem)
+                    osuItem.ShowCheckbox.Value = showCheckboxes;
+            }
+        }
+
         protected override void AnimateOpen()
         {
             if (!TopLevelMenu && !wasOpened)
