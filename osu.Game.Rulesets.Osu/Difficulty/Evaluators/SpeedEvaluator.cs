@@ -31,21 +31,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             // derive strainTime for calculation
             var osuCurrObj = (OsuDifficultyHitObject)current;
             var osuPrevObj = current.Index > 0 ? (OsuDifficultyHitObject)current.Previous(0) : null;
-            var osuNextObj = (OsuDifficultyHitObject?)current.Next(0);
 
             double strainTime = osuCurrObj.StrainTime;
-            double doubletapness = 1;
-
-            // Nerf doubletappable doubles.
-            if (osuNextObj != null)
-            {
-                double currDeltaTime = Math.Max(1, osuCurrObj.DeltaTime);
-                double nextDeltaTime = Math.Max(1, osuNextObj.DeltaTime);
-                double deltaDifference = Math.Abs(nextDeltaTime - currDeltaTime);
-                double speedRatio = currDeltaTime / Math.Max(currDeltaTime, deltaDifference);
-                double windowRatio = Math.Pow(Math.Min(1, currDeltaTime / osuCurrObj.HitWindowGreat), 2);
-                doubletapness = Math.Pow(speedRatio, 1 - windowRatio);
-            }
+            double doubletapness = 1.0 - osuCurrObj.GetDoubletapness((OsuDifficultyHitObject?)osuCurrObj.Next(0));
 
             // Cap deltatime to the OD 300 hitwindow.
             // 0.93 is derived from making sure 260bpm OD8 streams aren't nerfed harshly, whilst 0.92 limits the effect of the cap.
