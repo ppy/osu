@@ -24,6 +24,8 @@ namespace osu.Game.Overlays.Settings
         public BindableBool CanBeShown { get; } = new BindableBool(true);
         IBindable<bool> IConditionalFilterable.CanBeShown => CanBeShown;
 
+        public virtual LocalisableString TooltipText { get; set; }
+
         public override IEnumerable<LocalisableString> FilterTerms
         {
             get
