@@ -8,6 +8,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Testing;
+using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets;
@@ -82,7 +83,7 @@ namespace osu.Game.Tests.Visual.Editing
         }
 
         [Test]
-        public void TestNudgeSelection()
+        public void TestNudgeSelectionTime()
         {
             HitCircle[] addedObjects = null!;
 
@@ -101,6 +102,51 @@ namespace osu.Game.Tests.Visual.Editing
 
             AddStep("nudge backwards", () => InputManager.Key(Key.J));
             AddAssert("objects reverted to original position", () => addedObjects[0].StartTime == 100);
+        }
+
+        [Test]
+        public void TestNudgeSelectionPosition()
+        {
+            HitCircle addedObject = null!;
+
+            AddStep("add hitobjects", () => EditorBeatmap.AddRange(new[]
+            {
+                addedObject = new HitCircle { StartTime = 200, Position = new Vector2(100) },
+            }));
+
+            AddStep("select object", () => EditorBeatmap.SelectedHitObjects.Add(addedObject));
+
+            AddStep("nudge up", () =>
+            {
+                InputManager.PressKey(Key.ControlLeft);
+                InputManager.Key(Key.Up);
+                InputManager.ReleaseKey(Key.ControlLeft);
+            });
+            AddAssert("object position moved up", () => addedObject.Position.Y, () => Is.EqualTo(99).Within(Precision.FLOAT_EPSILON));
+
+            AddStep("nudge down", () =>
+            {
+                InputManager.PressKey(Key.ControlLeft);
+                InputManager.Key(Key.Down);
+                InputManager.ReleaseKey(Key.ControlLeft);
+            });
+            AddAssert("object position moved down", () => addedObject.Position.Y, () => Is.EqualTo(100).Within(Precision.FLOAT_EPSILON));
+
+            AddStep("nudge left", () =>
+            {
+                InputManager.PressKey(Key.ControlLeft);
+                InputManager.Key(Key.Left);
+                InputManager.ReleaseKey(Key.ControlLeft);
+            });
+            AddAssert("object position moved left", () => addedObject.Position.X, () => Is.EqualTo(99).Within(Precision.FLOAT_EPSILON));
+
+            AddStep("nudge right", () =>
+            {
+                InputManager.PressKey(Key.ControlLeft);
+                InputManager.Key(Key.Right);
+                InputManager.ReleaseKey(Key.ControlLeft);
+            });
+            AddAssert("object position moved right", () => addedObject.Position.X, () => Is.EqualTo(100).Within(Precision.FLOAT_EPSILON));
         }
 
         [Test]
