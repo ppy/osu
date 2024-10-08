@@ -14,7 +14,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Objects
 {
-    public abstract class OsuHitObject : HitObject, IHasComboInformation, IHasPosition, IHasTimePreempt
+    public abstract class OsuHitObject : HitObject, IHasComboInformation, IHasMutablePosition, IHasTimePreempt
     {
         /// <summary>
         /// The radius of hit objects (ie. the radius of a <see cref="HitCircle"/>).
