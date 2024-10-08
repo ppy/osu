@@ -606,7 +606,7 @@ namespace osu.Game.Database
         {
             // Importantly, also sleep if high performance session is active.
             // If we don't do this, memory usage can become runaway due to GC running in a more lenient mode.
-            while (localUserPlayInfo?.IsPlaying.Value == true || highPerformanceSessionManager?.IsSessionActive == true)
+            while (localUserPlayInfo?.PlayingState.Value != LocalUserPlayingState.NotPlaying || highPerformanceSessionManager?.IsSessionActive == true)
             {
                 Logger.Log("Background processing sleeping due to active gameplay...");
                 Thread.Sleep(TimeToSleepDuringGameplay);
