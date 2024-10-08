@@ -40,7 +40,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints
 
             base.EndPlacement(commit);
 
-            // You typically only place the grid once, so we switch back to the select tool after placement.
+            // You typically only place the grid once, so we switch back to the last tool after placement.
             if (commit && hitObjectComposer is OsuHitObjectComposer osuHitObjectComposer)
                 osuHitObjectComposer.SetLastTool();
         }
