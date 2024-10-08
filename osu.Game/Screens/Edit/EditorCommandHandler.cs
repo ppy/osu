@@ -5,12 +5,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Bindables;
-using osu.Framework.Graphics;
 using osu.Game.Screens.Edit.Commands;
 
 namespace osu.Game.Screens.Edit
 {
-    public partial class EditorCommandHandler : Component
+    public partial class EditorCommandHandler
     {
         public EditorCommandHandler()
         {
