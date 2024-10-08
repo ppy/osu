@@ -633,23 +633,23 @@ namespace osu.Game.Tests.NonVisual.Filtering
         private static readonly object[] ranked_date_valid_test_cases =
         {
             new object[] { "ranked<2012",        dateTimeOffsetFromDateOnly(2012, 1, 1), (FilterCriteria x) => x.DateRanked.Max },
-            new object[] { "ranked<2012-03",     dateTimeOffsetFromDateOnly(2012, 3, 1), (FilterCriteria x) => x.DateRanked.Max },
-            new object[] { "ranked<2012-03-05",  dateTimeOffsetFromDateOnly(2012, 3, 5), (FilterCriteria x) => x.DateRanked.Max },
+            new object[] { "ranked<2012.03",     dateTimeOffsetFromDateOnly(2012, 3, 1), (FilterCriteria x) => x.DateRanked.Max },
+            new object[] { "ranked<2012/03/05",  dateTimeOffsetFromDateOnly(2012, 3, 5), (FilterCriteria x) => x.DateRanked.Max },
             new object[] { "ranked<2012-3-5",    dateTimeOffsetFromDateOnly(2012, 3, 5), (FilterCriteria x) => x.DateRanked.Max },
 
             new object[] { "ranked<=2012",       dateTimeOffsetFromDateOnly(2013, 1, 1), (FilterCriteria x) => x.DateRanked.Max },
-            new object[] { "ranked<=2012-03",    dateTimeOffsetFromDateOnly(2012, 4, 1), (FilterCriteria x) => x.DateRanked.Max },
-            new object[] { "ranked<=2012-03-05", dateTimeOffsetFromDateOnly(2012, 3, 6), (FilterCriteria x) => x.DateRanked.Max },
+            new object[] { "ranked<=2012.03",    dateTimeOffsetFromDateOnly(2012, 4, 1), (FilterCriteria x) => x.DateRanked.Max },
+            new object[] { "ranked<=2012/03/05", dateTimeOffsetFromDateOnly(2012, 3, 6), (FilterCriteria x) => x.DateRanked.Max },
             new object[] { "ranked<=2012-3-5",   dateTimeOffsetFromDateOnly(2012, 3, 6), (FilterCriteria x) => x.DateRanked.Max },
 
             new object[] { "ranked>2012",        dateTimeOffsetFromDateOnly(2013, 1, 1), (FilterCriteria x) => x.DateRanked.Min },
-            new object[] { "ranked>2012-03",     dateTimeOffsetFromDateOnly(2012, 4, 1), (FilterCriteria x) => x.DateRanked.Min },
-            new object[] { "ranked>2012-03-05",  dateTimeOffsetFromDateOnly(2012, 3, 6), (FilterCriteria x) => x.DateRanked.Min },
+            new object[] { "ranked>2012.03",     dateTimeOffsetFromDateOnly(2012, 4, 1), (FilterCriteria x) => x.DateRanked.Min },
+            new object[] { "ranked>2012/03/05",  dateTimeOffsetFromDateOnly(2012, 3, 6), (FilterCriteria x) => x.DateRanked.Min },
             new object[] { "ranked>2012-3-5",    dateTimeOffsetFromDateOnly(2012, 3, 6), (FilterCriteria x) => x.DateRanked.Min },
 
             new object[] { "ranked>=2012",       dateTimeOffsetFromDateOnly(2012, 1, 1), (FilterCriteria x) => x.DateRanked.Min },
-            new object[] { "ranked>=2012-03",    dateTimeOffsetFromDateOnly(2012, 3, 1), (FilterCriteria x) => x.DateRanked.Min },
-            new object[] { "ranked>=2012-03-05", dateTimeOffsetFromDateOnly(2012, 3, 5), (FilterCriteria x) => x.DateRanked.Min },
+            new object[] { "ranked>=2012.03",    dateTimeOffsetFromDateOnly(2012, 3, 1), (FilterCriteria x) => x.DateRanked.Min },
+            new object[] { "ranked>=2012/03/05", dateTimeOffsetFromDateOnly(2012, 3, 5), (FilterCriteria x) => x.DateRanked.Min },
             new object[] { "ranked>=2012-3-5",   dateTimeOffsetFromDateOnly(2012, 3, 5), (FilterCriteria x) => x.DateRanked.Min },
 
             new object[] { "ranked=2012",        dateTimeOffsetFromDateOnly(2012, 1, 1), (FilterCriteria x) => x.DateRanked.Min },
@@ -675,7 +675,6 @@ namespace osu.Game.Tests.NonVisual.Filtering
             new object[] { "ranked<0" },
             new object[] { "ranked=99999" },
             new object[] { "ranked>=2012-03-05-04" },
-            new object[] { "ranked>2007.5" },
         };
 
         [Test]
@@ -690,14 +689,14 @@ namespace osu.Game.Tests.NonVisual.Filtering
         private static readonly object[] submitted_date_test_cases =
         {
             new object[] { "submitted<2012",           true  },
-            new object[] { "submitted<2012-03",        true  },
-            new object[] { "submitted<2012-03-05",     true  },
+            new object[] { "submitted<2012.03",        true  },
+            new object[] { "submitted<2012/03/05",     true  },
             new object[] { "submitted<2012-3-5",       true  },
 
             new object[] { "submitted<0",              false },
             new object[] { "submitted=99999",          false },
             new object[] { "submitted>=2012-03-05-04", false },
-            new object[] { "submitted>2007.5",         false },
+            new object[] { "submitted>=2012/03.05-04", false },
         };
 
         [Test]
