@@ -1,18 +1,16 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osuTK;
-
 namespace osu.Game.Rulesets.Objects.Types
 {
     /// <summary>
-    /// A HitObject that has a starting position that can be mutated.
+    /// A HitObject that has a starting Y-position that can be mutated.
     /// </summary>
-    public interface IHasMutablePosition : IHasPosition, IHasMutableXPosition, IHasMutableYPosition
+    public interface IHasMutableYPosition : IHasYPosition
     {
         /// <summary>
-        /// The starting position of the HitObject.
+        /// The starting Y-position of this HitObject.
         /// </summary>
-        new Vector2 Position { get; set; }
+        new float Y { get; set; }
     }
 }
