@@ -545,7 +545,10 @@ namespace osu.Game
                         realmBlocker = realm.BlockAllOperations("migration");
                         success = true;
                     }
-                    catch { }
+                    catch (Exception ex)
+                    {
+                        Logger.Log($"Attempting to block all operations failed: {ex}", LoggingTarget.Database);
+                    }
 
                     readyToRun.Set();
                 }, false);
