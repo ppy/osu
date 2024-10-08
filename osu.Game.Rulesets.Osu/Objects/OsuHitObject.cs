@@ -59,8 +59,17 @@ namespace osu.Game.Rulesets.Osu.Objects
             set => position.Value = value;
         }
 
-        public float X => Position.X;
-        public float Y => Position.Y;
+        public float X
+        {
+            get => Position.X;
+            set => Position = Position with { X = value };
+        }
+
+        public float Y
+        {
+            get => Position.Y;
+            set => Position = Position with { Y = value };
+        }
 
         public Vector2 StackedPosition => Position + StackOffset;
 
