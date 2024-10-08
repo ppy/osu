@@ -68,6 +68,11 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints
         {
             if (e.Button == MouseButton.Right)
             {
+                // Reset the grid to the default values.
+                gridToolboxGroup.StartPosition.Value = gridToolboxGroup.StartPosition.Default;
+                gridToolboxGroup.Spacing.Value = gridToolboxGroup.Spacing.Default;
+                if (!gridToolboxGroup.GridLinesRotation.Disabled)
+                    gridToolboxGroup.GridLinesRotation.Value = gridToolboxGroup.GridLinesRotation.Default;
                 EndPlacement(true);
                 return true;
             }
