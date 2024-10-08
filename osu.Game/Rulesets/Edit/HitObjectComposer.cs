@@ -90,6 +90,9 @@ namespace osu.Game.Rulesets.Edit
         private Bindable<bool> autoSeekOnPlacement;
         private readonly Bindable<bool> composerFocusMode = new Bindable<bool>();
 
+        [CanBeNull]
+        private RadioButton lastTool;
+
         protected DrawableRuleset<TObject> DrawableRuleset { get; private set; }
 
         protected HitObjectComposer(Ruleset ruleset)
@@ -213,8 +216,7 @@ namespace osu.Game.Rulesets.Edit
                 },
             };
 
-            toolboxCollection.Items = CompositionTools
-                                      .Prepend(new SelectTool())
+            toolboxCollection.Items = (CompositionTools.Prepend(new SelectTool()))
                                       .Select(t => new HitObjectCompositionToolButton(t, () => toolSelected(t)))
                                       .ToList();
 
@@ -466,8 +468,12 @@ namespace osu.Game.Rulesets.Edit
 
         public void SetSelectTool() => toolboxCollection.Items.First().Select();
 
+        public void SetLastTool() => (lastTool ?? toolboxCollection.Items.First()).Select();
+
         private void toolSelected(CompositionTool tool)
         {
+            lastTool = toolboxCollection.Items.OfType<HitObjectCompositionToolButton>().FirstOrDefault(i => i.Tool == BlueprintContainer.CurrentTool);
+
             BlueprintContainer.CurrentTool = tool;
 
             if (!(tool is SelectTool))

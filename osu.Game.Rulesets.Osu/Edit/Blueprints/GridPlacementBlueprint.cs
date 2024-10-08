@@ -42,7 +42,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints
 
             // You typically only place the grid once, so we switch back to the select tool after placement.
             if (commit && hitObjectComposer is OsuHitObjectComposer osuHitObjectComposer)
-                osuHitObjectComposer.SetSelectTool();
+                osuHitObjectComposer.SetLastTool();
         }
 
         protected override bool OnClick(ClickEvent e)
