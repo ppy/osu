@@ -609,7 +609,8 @@ namespace osu.Game.Screens.Select
         /// <summary>
         /// Parses a string containing a ranked or submitted date filter.
         /// Returns a boolean depending on whether parsing was successful or not.
-        /// Accepted dates are in the formats `yyyy`, `yyyy-mm` and `yyyy-mm-dd`. Leading zeros are accepted.
+        /// Accepted dates are in the formats `yyyy`, `yyyy-mm` and `yyyy-mm-dd`.
+        /// Leading zeros are accepted. Numbers can be separated by `-`, `/`, or `.`
         /// </summary>
         /// <param name="dateRange">The <see cref="FilterCriteria.OptionalRange{DateTimeOffset}"/> to store the parsed data into, if successful.</param>
         /// <param name="op">The operator of the filtering query</param>
@@ -618,7 +619,7 @@ namespace osu.Game.Screens.Select
         {
             GroupCollection? match = null;
 
-            match ??= tryMatchRegex(val, @"^(?<year>\d+)(-(?<month>\d+)(-(?<day>\d+))?)?$");
+            match ??= tryMatchRegex(val, @"^(?<year>\d+)((-|/|\.)(?<month>\d+)((-|/|\.)(?<day>\d+))?)?$");
 
             if (match == null)
                 return false;
