@@ -34,11 +34,12 @@ using osu.Game.Screens.Edit.Components;
 using osu.Game.Screens.Edit.Components.Menus;
 using osu.Game.Skinning;
 using osu.Framework.Graphics.Cursor;
+using osu.Game.Input.Bindings;
 
 namespace osu.Game.Overlays.SkinEditor
 {
     [Cached(typeof(SkinEditor))]
-    public partial class SkinEditor : VisibilityContainer, ICanAcceptFiles, IKeyBindingHandler<PlatformAction>, IEditorChangeHandler
+    public partial class SkinEditor : VisibilityContainer, ICanAcceptFiles, IKeyBindingHandler<PlatformAction>, IKeyBindingHandler<GlobalAction>, IEditorChangeHandler
     {
         public const double TRANSITION_DURATION = 300;
 
@@ -310,6 +311,25 @@ namespace osu.Game.Overlays.SkinEditor
         }
 
         public void OnReleased(KeyBindingReleaseEvent<PlatformAction> e)
+        {
+        }
+
+        public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
+        {
+            if (e.Repeat)
+                return false;
+
+            switch (e.Action)
+            {
+                case GlobalAction.EditorCloneSelection:
+                    Clone();
+                    return true;
+            }
+
+            return false;
+        }
+
+        public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
         {
         }
 
