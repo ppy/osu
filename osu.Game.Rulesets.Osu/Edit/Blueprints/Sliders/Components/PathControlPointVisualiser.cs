@@ -26,6 +26,7 @@ using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Screens.Edit;
+using osu.Game.Screens.Edit.Commands;
 using osuTK;
 using osuTK.Input;
 
@@ -409,6 +410,9 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             changeHandler?.BeginChange();
         }
 
+        [Resolved(CanBeNull = true)]
+        private EditorCommandHandler commandHandler { get; set; }
+
         public void DragInProgress(DragEvent e)
         {
             Vector2[] oldControlPoints = hitObject.Path.ControlPoints.Select(cp => cp.Position).ToArray();
@@ -423,8 +427,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
                 Vector2 movementDelta = Parent!.ToLocalSpace(result?.ScreenSpacePosition ?? newHeadPosition) - hitObject.Position;
 
-                hitObject.Position += movementDelta;
-                hitObject.StartTime = result?.Time ?? hitObject.StartTime;
+                commandHandler.SafeSubmit(new MoveCommand(hitObject, hitObject.Position + movementDelta));
+                commandHandler.SafeSubmit(new SetStartTimeCommand(hitObject, result?.Time ?? hitObject.StartTime));
 
                 for (int i = 1; i < hitObject.Path.ControlPoints.Count; i++)
                 {
@@ -459,8 +463,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
                 for (int i = 0; i < hitObject.Path.ControlPoints.Count; i++)
                     hitObject.Path.ControlPoints[i].Position = oldControlPoints[i];
 
-                hitObject.Position = oldPosition;
-                hitObject.StartTime = oldStartTime;
+                commandHandler.SafeSubmit(new MoveCommand(hitObject, oldPosition));
+                commandHandler.SafeSubmit(new SetStartTimeCommand(hitObject, oldStartTime));
                 // Snap the path length again to undo the invalid length.
                 hitObject.SnapTo(distanceSnapProvider);
                 return;
