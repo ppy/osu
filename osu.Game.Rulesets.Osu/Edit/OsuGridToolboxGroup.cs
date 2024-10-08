@@ -71,7 +71,7 @@ namespace osu.Game.Rulesets.Osu.Edit
         /// Read-only bindable representing the grid's origin.
         /// Equivalent to <code>new Vector2(StartPositionX, StartPositionY)</code>
         /// </summary>
-        public Bindable<Vector2> StartPosition { get; } = new Bindable<Vector2>();
+        public Bindable<Vector2> StartPosition { get; } = new Bindable<Vector2>(OsuPlayfield.BASE_SIZE / 2);
 
         /// <summary>
         /// Read-only bindable representing the grid's spacing in both the X and Y dimension.

@@ -17,7 +17,7 @@ namespace osu.Game.Rulesets.Osu.Edit
             TooltipText = """
                           Left click to set the origin.
                           Left click again to set the spacing and rotation.
-                          Right click to only set the origin.
+                          Right click to reset to default.
                           Click and drag to set the origin, spacing and rotation.
                           """;
         }
