@@ -5,6 +5,8 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects.Types;
+using osu.Game.Screens.Edit;
+using osu.Game.Screens.Edit.Commands;
 using osuTK;
 
 namespace osu.Game.Rulesets.Objects
@@ -14,10 +16,12 @@ namespace osu.Game.Rulesets.Objects
         /// <summary>
         /// Snaps the provided <paramref name="hitObject"/>'s duration using the <paramref name="snapProvider"/>.
         /// </summary>
-        public static void SnapTo<THitObject>(this THitObject hitObject, IDistanceSnapProvider? snapProvider)
+        public static void SnapTo<THitObject>(this THitObject hitObject, IDistanceSnapProvider? snapProvider, EditorCommandHandler? commandHandler = null)
             where THitObject : HitObject, IHasPath
         {
-            hitObject.Path.ExpectedDistance.Value = snapProvider?.FindSnappedDistance(hitObject, (float)hitObject.Path.CalculatedDistance, DistanceSnapTarget.Start) ?? hitObject.Path.CalculatedDistance;
+            double distance = snapProvider?.FindSnappedDistance(hitObject, (float)hitObject.Path.CalculatedDistance, DistanceSnapTarget.Start) ?? hitObject.Path.CalculatedDistance;
+
+            commandHandler.SafeSubmit(new SetExpectedDistanceCommand(hitObject.Path, distance));
         }
 
         /// <summary>

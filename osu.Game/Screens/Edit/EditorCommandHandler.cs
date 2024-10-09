@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Bindables;
+using osu.Framework.Logging;
 using osu.Game.Screens.Edit.Commands;
 
 namespace osu.Game.Screens.Edit
@@ -47,10 +48,15 @@ namespace osu.Game.Screens.Edit
         public bool Commit()
         {
             if (!HasUncommittedChanges)
+            {
+                Logger.Log("Nothing to commit");
                 return false;
+            }
 
             undoStack.Push(currentTransaction);
             redoStack.Clear();
+
+            Logger.Log($"Added {currentTransaction.Entries.Count} command(s) to undo stack");
 
             currentTransaction = new Transaction();
 
