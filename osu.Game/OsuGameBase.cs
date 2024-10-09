@@ -381,7 +381,8 @@ namespace osu.Game
             base.Content.Add(detachedBeatmapStore);
             dependencies.CacheAs(detachedBeatmapStore);
 
-            base.Content.Add(MusicController = new MusicController());
+            // Needs to be async loaded as to not deadlock on DetachedBeatmapStore usage in BDL.
+            LoadComponentAsync(MusicController = new MusicController(), base.Content.Add);
             dependencies.CacheAs(MusicController);
 
             MusicController.TrackChanged += onTrackChanged;
