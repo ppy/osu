@@ -377,10 +377,6 @@ namespace osu.Game
             dependencies.Cache(previewTrackManager = new PreviewTrackManager(BeatmapManager.BeatmapTrackStore));
             base.Content.Add(previewTrackManager);
 
-            var detachedBeatmapStore = new DetachedBeatmapStore();
-            base.Content.Add(detachedBeatmapStore);
-            dependencies.CacheAs(detachedBeatmapStore);
-
             base.Content.Add(MusicController = new MusicController());
             dependencies.CacheAs(MusicController);
 
