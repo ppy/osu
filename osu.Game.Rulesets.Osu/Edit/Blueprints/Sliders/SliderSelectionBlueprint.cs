@@ -36,7 +36,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
     {
         protected new DrawableSlider DrawableObject => (DrawableSlider)base.DrawableObject;
 
-        protected SliderCommandProxy Proxy;
+        protected SliderCommandProxy Proxy = null!;
 
         protected SliderBodyPiece BodyPiece { get; private set; } = null!;
         protected SliderCircleOverlay HeadOverlay { get; private set; } = null!;
@@ -98,8 +98,6 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {
-            Proxy = new SliderCommandProxy(commandHandler, HitObject);
-
             InternalChildren = new Drawable[]
             {
                 BodyPiece = new SliderBodyPiece(),
@@ -120,6 +118,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         protected override void LoadComplete()
         {
             base.LoadComplete();
+
+            Proxy = new SliderCommandProxy(commandHandler, HitObject);
 
             controlPoints.BindTo(HitObject.Path.ControlPoints);
             controlPoints.CollectionChanged += (_, _) => fullPathCache.Invalidate();
