@@ -42,7 +42,7 @@ namespace osu.Game.Graphics.Backgrounds
 
         private readonly string textureName;
 
-        protected BufferedContainer BufferedContainer { get; private set; }
+        protected BufferedContainer BufferedContainer;
 
         public Background(string textureName = @"")
         {
@@ -71,7 +71,7 @@ namespace osu.Game.Graphics.Backgrounds
         /// Smoothly adjusts <see cref="IBufferedContainer.BlurSigma"/> over time.
         /// </summary>
         /// <returns>A <see cref="TransformSequence{T}"/> to which further transforms can be added.</returns>
-        public void BlurTo(Vector2 newBlurSigma, double duration = 0, Easing easing = Easing.None)
+        public virtual void BlurTo(Vector2 newBlurSigma, double duration = 0, Easing easing = Easing.None)
         {
             if (BufferedContainer == null && newBlurSigma != Vector2.Zero)
             {

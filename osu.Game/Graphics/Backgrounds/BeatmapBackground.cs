@@ -7,6 +7,7 @@
 using System.Runtime.InteropServices;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Rendering;
 using osu.Framework.Graphics.Shaders;
 using osu.Framework.Graphics.Shaders.Types;
@@ -36,10 +37,15 @@ namespace osu.Game.Graphics.Backgrounds
             set
             {
                 dimLevel = value;
-                BeatmapBackgroundSprite sprite = (BeatmapBackgroundSprite)Sprite;
-                sprite.DimLevel = dimLevel;
 
-                BufferedContainer?.ForceRedraw();
+                if (BufferedContainer == null)
+                {
+                    (Sprite as BeatmapBackgroundSprite).DimLevel = dimLevel;
+                }
+                else
+                {
+                    (BufferedContainer as DimmableBufferedContainer).DimLevel = dimLevel;
+                }
             }
         }
 
@@ -49,10 +55,15 @@ namespace osu.Game.Graphics.Backgrounds
             set
             {
                 dimColour = value;
-                BeatmapBackgroundSprite sprite = (BeatmapBackgroundSprite)Sprite;
-                sprite.DimColour = dimColour;
 
-                BufferedContainer?.ForceRedraw();
+                if (BufferedContainer == null)
+                {
+                    (Sprite as BeatmapBackgroundSprite).DimColour = dimColour;
+                }
+                else
+                {
+                    (BufferedContainer as DimmableBufferedContainer).DimColour = dimColour;
+                }
             }
         }
 
@@ -86,6 +97,113 @@ namespace osu.Game.Graphics.Backgrounds
 
             return other.GetType() == GetType()
                    && ((BeatmapBackground)other).Beatmap == Beatmap;
+        }
+
+        public override void BlurTo(Vector2 newBlurSigma, double duration = 0, Easing easing = Easing.None)
+        {
+            if (BufferedContainer == null && newBlurSigma != Vector2.Zero)
+            {
+                RemoveInternal(Sprite, false);
+
+                BeatmapBackgroundSprite sprite = (BeatmapBackgroundSprite)Sprite;
+                sprite.DimColour = Color4.Black;
+                sprite.DimLevel = 0.0f;
+
+                AddInternal(BufferedContainer = new DimmableBufferedContainer(cachedFrameBuffer: true)
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    RedrawOnScale = false,
+                    Child = Sprite,
+                    DimColour = DimColour,
+                    DimLevel = DimLevel
+                });
+            }
+            base.BlurTo(newBlurSigma, duration, easing);
+        }
+
+        public partial class DimmableBufferedContainer : BufferedContainer
+        {
+            private float dimLevel;
+            private Color4 dimColour;
+
+            public float DimLevel
+            {
+                get => dimLevel;
+                set
+                {
+                    dimLevel = value;
+                    Invalidate(Invalidation.DrawNode);
+                }
+            }
+
+            public Color4 DimColour
+            {
+                get => dimColour;
+                set
+                {
+                    dimColour = value;
+                    Invalidate(Invalidation.DrawNode);
+                }
+            }
+
+            public DimmableBufferedContainer(RenderBufferFormat[] formats = null, bool pixelSnapping = false, bool cachedFrameBuffer = false)
+            : base(formats, pixelSnapping, cachedFrameBuffer)
+            {
+                DimLevel = 0.0f;
+                DimColour = Color4.Black;
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(ShaderManager shaders)
+            {
+                TextureShader = shaders.Load(VertexShaderDescriptor.TEXTURE_2, "BeatmapBackground");
+            }
+
+            protected override DrawNode CreateDrawNode() => new DimmableBufferedContainerDrawNode(this, SharedData);
+
+            protected class DimmableBufferedContainerDrawNode : BufferedContainerDrawNode
+            {
+                public new DimmableBufferedContainer Source => (DimmableBufferedContainer)base.Source;
+
+                public DimmableBufferedContainerDrawNode(DimmableBufferedContainer source, BufferedContainerDrawNodeSharedData sharedData)
+                : base(source, sharedData)
+                {
+                }
+
+                private float dimLevel;
+                private Color4 dimColour;
+
+                public override void ApplyState()
+                {
+                    base.ApplyState();
+
+                    dimLevel = Source.DimLevel;
+                    dimColour = Source.DimColour;
+                }
+
+                private IUniformBuffer<BeatmapBackgroundParameters> beatmapBackgroundParametersBuffer;
+
+                protected override void BindUniformResources(IShader shader, IRenderer renderer)
+                {
+                    beatmapBackgroundParametersBuffer ??= renderer.CreateUniformBuffer<BeatmapBackgroundParameters>();
+
+                    beatmapBackgroundParametersBuffer.Data = beatmapBackgroundParametersBuffer.Data with
+                    {
+                        DimColour = new Vector4(dimColour.R, dimColour.G, dimColour.B, dimColour.A),
+                        DimLevel = dimLevel,
+                    };
+
+                    shader.BindUniformBlock("m_BeatmapBackgroundParameters", beatmapBackgroundParametersBuffer);
+                }
+
+                [StructLayout(LayoutKind.Sequential, Pack = 1)]
+                private record struct BeatmapBackgroundParameters
+                {
+                    public UniformVector4 DimColour;
+                    public UniformFloat DimLevel;
+                    private readonly UniformPadding12 pad1;
+                }
+            }
         }
 
         public partial class BeatmapBackgroundSprite : Sprite
