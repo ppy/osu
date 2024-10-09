@@ -3,6 +3,7 @@
 
 using System;
 using System.Diagnostics;
+using System.Threading;
 using System.Threading.Tasks;
 using ManagedBass.Fx;
 using osu.Framework.Allocation;
@@ -288,8 +289,7 @@ namespace osu.Game.Screens.Play
 
             Debug.Assert(CurrentPlayer != null);
 
-            highPerformanceSession?.Dispose();
-            highPerformanceSession = null;
+            endHighPerformance();
 
             // prepare for a retry.
             CurrentPlayer = null;
@@ -329,8 +329,7 @@ namespace osu.Game.Screens.Play
             BackgroundBrightnessReduction = false;
             Beatmap.Value.Track.RemoveAdjustment(AdjustableProperty.Volume, volumeAdjustment);
 
-            highPerformanceSession?.Dispose();
-            highPerformanceSession = null;
+            endHighPerformance();
 
             return base.OnExiting(e);
         }
@@ -529,7 +528,9 @@ namespace osu.Game.Screens.Play
             scheduledPushPlayer = Scheduler.AddDelayed(() =>
             {
                 // ensure that once we have reached this "point of no return", readyForPush will be false for all future checks (until a new player instance is prepared).
-                var consumedPlayer = consumePlayer();
+                Player consumedPlayer = consumePlayer();
+
+                consumedPlayer.OnShowingResults += endHighPerformance;
 
                 ContentOut();
 
@@ -562,6 +563,8 @@ namespace osu.Game.Screens.Play
             scheduledPushPlayer = null;
         }
 
+        private void endHighPerformance() => Interlocked.Exchange(ref highPerformanceSession, null)?.Dispose();
+
         #region Disposal
 
         protected override void Dispose(bool isDisposing)
@@ -574,8 +577,7 @@ namespace osu.Game.Screens.Play
                 DisposalTask = LoadTask?.ContinueWith(_ => CurrentPlayer?.Dispose());
             }
 
-            highPerformanceSession?.Dispose();
-            highPerformanceSession = null;
+            endHighPerformance();
         }
 
         #endregion
