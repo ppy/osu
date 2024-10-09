@@ -27,7 +27,6 @@ using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Edit.Commands;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Screens.Edit;
-using osu.Game.Screens.Edit.Commands;
 using osuTK;
 using osuTK.Input;
 
@@ -44,7 +43,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         private readonly T hitObject;
         private readonly bool allowSelection;
 
-        private SliderPathCommandProxy pathProxy = null;
+        private SliderPathCommandProxy pathProxy = null!;
 
         private InputManager inputManager;
 
@@ -79,6 +78,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
             controlPoints.CollectionChanged += onControlPointsChanged;
             controlPoints.BindTo(hitObject.Path.ControlPoints);
+
+            pathProxy = new SliderPathCommandProxy(commandHandler, hitObject.Path);
         }
 
         // Generally all the control points are within the visible area all the time.
@@ -409,6 +410,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
         public void DragInProgress(DragEvent e)
         {
+            var proxy = new OsuHitObjectCommandProxy(commandHandler, hitObject);
+            var controlPointsProxy = pathProxy.ControlPoints;
             Vector2[] oldControlPoints = hitObject.Path.ControlPoints.Select(cp => cp.Position).ToArray();
             Vector2 oldPosition = hitObject.Position;
             double oldStartTime = hitObject.StartTime;
@@ -421,18 +424,18 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
                 Vector2 movementDelta = Parent!.ToLocalSpace(result?.ScreenSpacePosition ?? newHeadPosition) - hitObject.Position;
 
-                commandHandler.SafeSubmit(new MoveCommand(hitObject, hitObject.Position + movementDelta));
-                commandHandler.SafeSubmit(new SetStartTimeCommand(hitObject, result?.Time ?? hitObject.StartTime));
+                proxy.Position += movementDelta;
+                proxy.StartTime = result?.Time ?? hitObject.StartTime;
 
-                for (int i = 1; i < hitObject.Path.ControlPoints.Count; i++)
+                for (int i = 1; i < controlPointsProxy.Count; i++)
                 {
-                    PathControlPoint controlPoint = hitObject.Path.ControlPoints[i];
+                    var controlPointProxy = controlPointsProxy[i];
                     // Since control points are relative to the position of the hit object, all points that are _not_ selected
                     // need to be offset _back_ by the delta corresponding to the movement of the head point.
                     // All other selected control points (if any) will move together with the head point
                     // (and so they will not move at all, relative to each other).
-                    if (!selectedControlPoints.Contains(controlPoint))
-                        commandHandler.SafeSubmit(new UpdateControlPointCommand(controlPoint) { Position = controlPoint.Position - movementDelta });
+                    if (!selectedControlPoints.Contains(controlPointProxy.ControlPoint))
+                        controlPointProxy.Position -= movementDelta;
                 }
             }
             else
@@ -441,11 +444,11 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
                 Vector2 movementDelta = Parent!.ToLocalSpace(result?.ScreenSpacePosition ?? Parent!.ToScreenSpace(e.MousePosition)) - dragStartPositions[draggedControlPointIndex] - hitObject.Position;
 
-                for (int i = 0; i < controlPoints.Count; ++i)
+                for (int i = 0; i < controlPointsProxy.Count; ++i)
                 {
-                    PathControlPoint controlPoint = controlPoints[i];
-                    if (selectedControlPoints.Contains(controlPoint))
-                        commandHandler.SafeSubmit(new UpdateControlPointCommand(controlPoint) { Position = dragStartPositions[i] + movementDelta });
+                    var controlPointProxy = controlPointsProxy[i];
+                    if (selectedControlPoints.Contains(controlPointProxy.ControlPoint))
+                        controlPointProxy.Position = dragStartPositions[i] + movementDelta;
                 }
             }
 
@@ -454,19 +457,19 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
             if (!hitObject.Path.HasValidLength)
             {
-                for (int i = 0; i < hitObject.Path.ControlPoints.Count; i++)
-                    commandHandler.SafeSubmit(new UpdateControlPointCommand(hitObject.Path.ControlPoints[i]) { Position = oldControlPoints[i] });
+                for (int i = 0; i < controlPointsProxy.Count; i++)
+                    controlPointsProxy[i].Position = oldControlPoints[i];
 
-                commandHandler.SafeSubmit(new MoveCommand(hitObject, oldPosition));
-                commandHandler.SafeSubmit(new SetStartTimeCommand(hitObject, oldStartTime));
+                proxy.Position = oldPosition;
+                proxy.StartTime = oldStartTime;
                 // Snap the path length again to undo the invalid length.
                 hitObject.SnapTo(distanceSnapProvider, commandHandler);
                 return;
             }
 
             // Maintain the path types in case they got defaulted to bezier at some point during the drag.
-            for (int i = 0; i < hitObject.Path.ControlPoints.Count; i++)
-                commandHandler.SafeSubmit(new UpdateControlPointCommand(hitObject.Path.ControlPoints[i]) { Type = dragPathTypes[i] });
+            for (int i = 0; i < controlPointsProxy.Count; i++)
+                controlPointsProxy[i].Type = dragPathTypes[i];
 
             EnsureValidPathTypes();
         }
