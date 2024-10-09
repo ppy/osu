@@ -231,6 +231,13 @@ namespace osu.Game.Graphics.Backgrounds
                 }
             }
 
+            public BeatmapBackgroundSprite()
+            : base()
+            {
+                DimLevel = 0.0f;
+                DimColour = Color4.Black;
+            }
+
             [BackgroundDependencyLoader]
             private void load(ShaderManager shaders)
             {
