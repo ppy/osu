@@ -22,13 +22,13 @@ namespace osu.Game.Rulesets.Osu.Edit.Commands
         public Vector2 Position
         {
             get => ControlPoint.Position;
-            set => Submit(new UpdateControlPointCommand(ControlPoint) { Position = Position });
+            set => Submit(new UpdateControlPointCommand(ControlPoint) { Position = value });
         }
 
         public PathType? Type
         {
             get => ControlPoint.Type;
-            set => Submit(new UpdateControlPointCommand(ControlPoint) { Type = Type });
+            set => Submit(new UpdateControlPointCommand(ControlPoint) { Type = value });
         }
     }
 }
