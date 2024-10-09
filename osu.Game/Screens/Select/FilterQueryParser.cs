@@ -642,7 +642,6 @@ namespace osu.Game.Screens.Select
 
                     switch (key)
                     {
-
                         case @"year":
                             year = (int)value;
                             break;
@@ -670,14 +669,8 @@ namespace osu.Game.Screens.Select
                 switch (op)
                 {
                     case Operator.Less:
-                        if (month == null)
-                        {
-                            month = 1;
-                            day = 1;
-                        }
-
-                        if (day == null)
-                            day = 1;
+                        month ??= 1;
+                        day ??= 1;
 
                         dateTimeOffset = dateTimeOffsetFromDateOnly(year.Value, month.Value, day.Value);
                         return tryUpdateCriteriaRange(ref dateRange, op, dateTimeOffset);
@@ -690,6 +683,7 @@ namespace osu.Game.Screens.Select
                             dateTimeOffset = dateTimeOffsetFromDateOnly(year.Value, month.Value, day.Value).AddYears(1);
                             return tryUpdateCriteriaRange(ref dateRange, Operator.Less, dateTimeOffset);
                         }
+
                         if (day == null)
                         {
                             day = 1;
@@ -701,14 +695,8 @@ namespace osu.Game.Screens.Select
                         return tryUpdateCriteriaRange(ref dateRange, Operator.Less, dateTimeOffset);
 
                     case Operator.GreaterOrEqual:
-                        if (month == null)
-                        {
-                            month = 1;
-                            day = 1;
-                        }
-
-                        if (day == null)
-                            day = 1;
+                        month ??= 1;
+                        day ??= 1;
 
                         dateTimeOffset = dateTimeOffsetFromDateOnly(year.Value, month.Value, day.Value);
                         return tryUpdateCriteriaRange(ref dateRange, op, dateTimeOffset);
@@ -721,6 +709,7 @@ namespace osu.Game.Screens.Select
                             dateTimeOffset = dateTimeOffsetFromDateOnly(year.Value, month.Value, day.Value).AddYears(1);
                             return tryUpdateCriteriaRange(ref dateRange, Operator.GreaterOrEqual, dateTimeOffset);
                         }
+
                         if (day == null)
                         {
                             day = 1;
@@ -742,11 +731,8 @@ namespace osu.Game.Screens.Select
                             day = 1;
                             minDateTimeOffset = dateTimeOffsetFromDateOnly(year.Value, month.Value, day.Value);
                             maxDateTimeOffset = dateTimeOffsetFromDateOnly(year.Value, month.Value, day.Value).AddYears(1);
-                            return (
-                                    tryUpdateCriteriaRange(ref dateRange, Operator.GreaterOrEqual, minDateTimeOffset)
-                                    &&
-                                    tryUpdateCriteriaRange(ref dateRange, Operator.Less, maxDateTimeOffset)
-                                   );
+                            return tryUpdateCriteriaRange(ref dateRange, Operator.GreaterOrEqual, minDateTimeOffset)
+                                   && tryUpdateCriteriaRange(ref dateRange, Operator.Less, maxDateTimeOffset);
                         }
 
                         if (day == null)
@@ -754,21 +740,15 @@ namespace osu.Game.Screens.Select
                             day = 1;
                             minDateTimeOffset = dateTimeOffsetFromDateOnly(year.Value, month.Value, day.Value);
                             maxDateTimeOffset = dateTimeOffsetFromDateOnly(year.Value, month.Value, day.Value).AddMonths(1);
-                            return (
-                                    tryUpdateCriteriaRange(ref dateRange, Operator.GreaterOrEqual, minDateTimeOffset)
-                                    &&
-                                    tryUpdateCriteriaRange(ref dateRange, Operator.Less, maxDateTimeOffset)
-                                   );
+                            return tryUpdateCriteriaRange(ref dateRange, Operator.GreaterOrEqual, minDateTimeOffset)
+                                   && tryUpdateCriteriaRange(ref dateRange, Operator.Less, maxDateTimeOffset);
                         }
 
                         minDateTimeOffset = dateTimeOffsetFromDateOnly(year.Value, month.Value, day.Value);
                         maxDateTimeOffset = dateTimeOffsetFromDateOnly(year.Value, month.Value, day.Value).AddDays(1);
+                        return tryUpdateCriteriaRange(ref dateRange, Operator.GreaterOrEqual, minDateTimeOffset)
+                               && tryUpdateCriteriaRange(ref dateRange, Operator.Less, maxDateTimeOffset);
 
-                        return (
-                                tryUpdateCriteriaRange(ref dateRange, Operator.GreaterOrEqual, minDateTimeOffset)
-                                &&
-                                tryUpdateCriteriaRange(ref dateRange, Operator.Less, maxDateTimeOffset)
-                               );
                     default:
                         return false;
                 }
