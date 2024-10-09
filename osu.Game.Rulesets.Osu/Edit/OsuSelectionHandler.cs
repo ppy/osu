@@ -17,6 +17,8 @@ using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Beatmaps;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.UI;
+using osu.Game.Screens.Edit;
+using osu.Game.Screens.Edit.Commands;
 using osu.Game.Screens.Edit.Compose.Components;
 using osu.Game.Utils;
 using osuTK;
@@ -51,6 +53,9 @@ namespace osu.Game.Rulesets.Osu.Edit
             return false;
         }
 
+        [Resolved(canBeNull: true)]
+        private EditorCommandHandler? commandManager { get; set; }
+
         public override bool HandleMovement(MoveSelectionEvent<HitObject> moveEvent)
         {
             var hitObjects = selectedMovableObjects;
@@ -70,12 +75,10 @@ namespace osu.Game.Rulesets.Osu.Edit
             if (hitObjects.Any(h => Precision.AlmostEquals(localDelta, -h.StackOffset)))
                 return true;
 
-            // this will potentially move the selection out of bounds...
-            foreach (var h in hitObjects)
-                h.Position += localDelta;
+            localDelta = moveSelectionInBounds(localDelta);
 
-            // but this will be corrected.
-            moveSelectionInBounds();
+            foreach (var h in hitObjects)
+                commandManager.SafeSubmit(new MoveCommand(h, h.Position + localDelta));
 
             // manually update stacking.
             // this intentionally bypasses the editor `UpdateState()` / beatmap processor flow for performance reasons,
@@ -105,7 +108,7 @@ namespace osu.Game.Rulesets.Osu.Edit
             foreach (var h in hitObjects)
             {
                 if (moreThanOneObject)
-                    h.StartTime = endTime - (h.GetEndTime() - startTime);
+                    commandManager.SafeSubmit(new SetStartTimeCommand(h, endTime - (h.GetEndTime() - startTime)));
 
                 if (h is Slider slider)
                 {
@@ -187,26 +190,23 @@ namespace osu.Game.Rulesets.Osu.Edit
 
         public override SelectionScaleHandler CreateScaleHandler() => new OsuSelectionScaleHandler();
 
-        private void moveSelectionInBounds()
+        private Vector2 moveSelectionInBounds(Vector2 delta)
         {
             var hitObjects = selectedMovableObjects;
 
             Quad quad = GeometryUtils.GetSurroundingQuad(hitObjects);
 
-            Vector2 delta = Vector2.Zero;
+            if (quad.TopLeft.X + delta.X < 0)
+                delta.X -= quad.TopLeft.X + delta.X;
+            if (quad.TopLeft.Y + delta.Y < 0)
+                delta.Y -= quad.TopLeft.Y + delta.Y;
 
-            if (quad.TopLeft.X < 0)
-                delta.X -= quad.TopLeft.X;
-            if (quad.TopLeft.Y < 0)
-                delta.Y -= quad.TopLeft.Y;
+            if (quad.BottomRight.X + delta.X > DrawWidth)
+                delta.X -= quad.BottomRight.X + delta.X - DrawWidth;
+            if (quad.BottomRight.Y + delta.Y > DrawHeight)
+                delta.Y -= quad.BottomRight.Y + delta.Y - DrawHeight;
 
-            if (quad.BottomRight.X > DrawWidth)
-                delta.X -= quad.BottomRight.X - DrawWidth;
-            if (quad.BottomRight.Y > DrawHeight)
-                delta.Y -= quad.BottomRight.Y - DrawHeight;
-
-            foreach (var h in hitObjects)
-                h.Position += delta;
+            return delta;
         }
 
         /// <summary>
@@ -307,6 +307,13 @@ namespace osu.Game.Rulesets.Osu.Edit
             SelectedItems.Add(mergedHitObject);
 
             EditorBeatmap.EndChange();
+        }
+
+        protected override void OnOperationEnded()
+        {
+            base.OnOperationEnded();
+
+            commandManager?.Commit();
         }
 
         protected override IEnumerable<MenuItem> GetContextMenuItemsForSelection(IEnumerable<SelectionBlueprint<HitObject>> selection)

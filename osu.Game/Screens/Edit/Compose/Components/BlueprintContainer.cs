@@ -42,7 +42,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         private IPositionSnapProvider snapProvider { get; set; }
 
         [Resolved(CanBeNull = true)]
-        private IEditorChangeHandler changeHandler { get; set; }
+        private EditorCommandHandler commandHandler { get; set; }
 
         protected readonly BindableList<T> SelectedItems = new BindableList<T>();
 
@@ -190,7 +190,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
             if (movementBlueprints != null)
             {
                 isDraggingBlueprint = true;
-                changeHandler?.BeginChange();
                 return true;
             }
 
@@ -218,7 +217,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             if (isDraggingBlueprint)
             {
                 DragOperationCompleted();
-                changeHandler?.EndChange();
+                commandHandler?.Commit();
             }
 
             DragBox.Hide();

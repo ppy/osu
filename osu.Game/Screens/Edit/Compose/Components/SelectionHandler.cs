@@ -52,7 +52,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         protected SelectionBox SelectionBox { get; private set; } = null!;
 
         [Resolved(CanBeNull = true)]
-        protected IEditorChangeHandler? ChangeHandler { get; private set; }
+        protected EditorCommandHandler? CommandHandler { get; private set; }
 
         public SelectionRotationHandler RotationHandler { get; private set; } = null!;
 
@@ -105,7 +105,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// </summary>
         protected virtual void OnOperationBegan()
         {
-            ChangeHandler?.BeginChange();
         }
 
         /// <summary>
@@ -113,7 +112,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// </summary>
         protected virtual void OnOperationEnded()
         {
-            ChangeHandler?.EndChange();
+            CommandHandler?.Commit();
         }
 
         #region User Input Handling
@@ -188,16 +187,14 @@ namespace osu.Game.Screens.Edit.Compose.Components
             switch (e.Action)
             {
                 case GlobalAction.EditorFlipHorizontally:
-                    ChangeHandler?.BeginChange();
                     handled = HandleFlip(Direction.Horizontal, true);
-                    ChangeHandler?.EndChange();
+                    CommandHandler?.Commit();
 
                     return handled;
 
                 case GlobalAction.EditorFlipVertically:
-                    ChangeHandler?.BeginChange();
                     handled = HandleFlip(Direction.Vertical, true);
-                    ChangeHandler?.EndChange();
+                    CommandHandler?.Commit();
 
                     return handled;
             }
