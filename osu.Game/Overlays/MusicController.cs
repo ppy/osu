@@ -63,9 +63,6 @@ namespace osu.Game.Overlays
 
         public DrawableTrack CurrentTrack { get; private set; } = new DrawableTrack(new TrackVirtual(1000));
 
-        [Resolved]
-        private RealmAccess realm { get; set; } = null!;
-
         private IBindableList<BeatmapSetInfo> detachedBeatmaps = null!;
 
         private BindableNumber<double> sampleVolume = null!;
