@@ -22,7 +22,7 @@ namespace osu.Game.Screens.Edit
 
         public readonly Bindable<bool> CanRedo = new BindableBool();
 
-        public bool HasUncommittedChanges => currentTransaction.Entries.Count != 0;
+        public bool HasUncommittedChanges => currentTransaction.Commands.Count != 0;
 
         public void Submit(IEditorCommand command, bool commitImmediately = false)
         {
@@ -56,7 +56,7 @@ namespace osu.Game.Screens.Edit
             undoStack.Push(currentTransaction);
             redoStack.Clear();
 
-            Logger.Log($"Added {currentTransaction.Entries.Count} command(s) to undo stack");
+            Logger.Log($"Added {currentTransaction.Commands.Count} command(s) to undo stack");
 
             currentTransaction = new Transaction();
 
@@ -71,10 +71,11 @@ namespace osu.Game.Screens.Edit
                 return false;
 
             var transaction = undoStack.Pop();
+            var redoTransaction = transaction.Reverse();
 
             revertTransaction(transaction);
 
-            redoStack.Push(transaction);
+            redoStack.Push(redoTransaction);
 
             historyChanged();
 
@@ -87,11 +88,12 @@ namespace osu.Game.Screens.Edit
                 return false;
 
             var transaction = redoStack.Pop();
+            var undoTransaction = transaction.Reverse();
 
-            foreach (var entry in transaction.Entries)
-                apply(entry.Command);
+            foreach (var command in transaction.Commands)
+                apply(command);
 
-            undoStack.Push(transaction);
+            undoStack.Push(undoTransaction);
 
             historyChanged();
 
@@ -112,8 +114,8 @@ namespace osu.Game.Screens.Edit
 
         private void revertTransaction(Transaction transaction)
         {
-            foreach (var entry in transaction.Entries.Reverse())
-                apply(entry.Reverse);
+            foreach (var command in transaction.Commands.Reverse())
+                apply(command);
         }
 
         private void historyChanged()
@@ -138,7 +140,7 @@ namespace osu.Game.Screens.Edit
         {
             var reverse = command.CreateUndo();
 
-            currentTransaction.Add(new HistoryEntry(command, reverse));
+            currentTransaction.Add(reverse);
         }
 
         private readonly record struct HistoryEntry(IEditorCommand Command, IEditorCommand Reverse);
@@ -149,11 +151,47 @@ namespace osu.Game.Screens.Edit
             {
             }
 
-            private readonly List<HistoryEntry> entries = new List<HistoryEntry>();
+            private readonly List<IEditorCommand> commands = new List<IEditorCommand>();
 
-            public IReadOnlyList<HistoryEntry> Entries => entries;
+            public IReadOnlyList<IEditorCommand> Commands => commands;
 
-            public void Add(HistoryEntry entry) => entries.Add(entry);
+            public void Add(IEditorCommand command)
+            {
+                if (command is IMergeableCommand mergeable)
+                {
+                    for (int i = 0; i < commands.Count; i++)
+                    {
+                        var merged = mergeable.MergeWith(commands[i]);
+
+                        if (merged == null)
+                            continue;
+
+                        command = merged;
+                        commands.RemoveAt(i--);
+
+                        if (command is IMergeableCommand newMergeable)
+                        {
+                            mergeable = newMergeable;
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+                }
+
+                commands.Add(command);
+            }
+
+            public Transaction Reverse()
+            {
+                var reversed = new Transaction();
+
+                foreach (var command in Commands.Reverse())
+                    reversed.Add(command.CreateUndo());
+
+                return reversed;
+            }
         }
     }
 }

@@ -182,7 +182,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
         private bool isSplittable(PathControlPointPiece<T> p) =>
             // A hit object can only be split on control points which connect two different path segments.
-            p.ControlPoint.Type.HasValue && p != Pieces.FirstOrDefault() && p != Pieces.LastOrDefault();
+            p.ControlPoint.Type.HasValue && p.ControlPoint != controlPoints.FirstOrDefault() && p.ControlPoint != controlPoints.LastOrDefault();
 
         private void onControlPointsChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
@@ -402,8 +402,6 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             selectedControlPoints = new HashSet<PathControlPoint>(Pieces.Where(piece => piece.IsSelected.Value).Select(piece => piece.ControlPoint));
 
             Debug.Assert(draggedControlPointIndex >= 0);
-
-            commandHandler?.Commit();
         }
 
         [Resolved(CanBeNull = true)]
