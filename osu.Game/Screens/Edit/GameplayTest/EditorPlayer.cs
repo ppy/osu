@@ -198,7 +198,7 @@ namespace osu.Game.Screens.Edit.GameplayTest
         {
             if (DrawableRuleset.ReplayScore == null)
             {
-                SetupAutoplay();
+                setupAutoplay();
             }
             else
                 DrawableRuleset.SetReplayScore(null);
@@ -214,7 +214,7 @@ namespace osu.Game.Screens.Edit.GameplayTest
                 {
                     if (GameplayClockContainer.CurrentTime < previousAutoTime)
                     {
-                        SetupAutoplay();
+                        setupAutoplay();
                     }
                 }
             }
