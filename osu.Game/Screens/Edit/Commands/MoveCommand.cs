@@ -6,7 +6,7 @@ using osuTK;
 
 namespace osu.Game.Screens.Edit.Commands
 {
-    public class MoveCommand : IEditorCommand, IMergeableCommand
+    public class MoveCommand : IMergeableCommand
     {
         public readonly IHasMutablePosition Target;
 
@@ -24,10 +24,10 @@ namespace osu.Game.Screens.Edit.Commands
 
         public bool IsRedundant => Position == Target.Position;
 
-        public IEditorCommand? MergeWith(IEditorCommand previous)
+        public IMergeableCommand? MergeWith(IEditorCommand previous)
         {
             if (previous is MoveCommand moveCommand)
-                return moveCommand.Target != Target ? null : this;
+                return moveCommand.Target != Target ? null : moveCommand;
 
             return null;
         }

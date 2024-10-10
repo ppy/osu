@@ -12,10 +12,6 @@ namespace osu.Game.Screens.Edit
 {
     public partial class EditorCommandHandler
     {
-        public EditorCommandHandler()
-        {
-        }
-
         public event Action<IEditorCommand>? CommandApplied;
 
         public readonly Bindable<bool> CanUndo = new BindableBool();
@@ -143,8 +139,6 @@ namespace osu.Game.Screens.Edit
             currentTransaction.Add(reverse);
         }
 
-        private readonly record struct HistoryEntry(IEditorCommand Command, IEditorCommand Reverse);
-
         private readonly struct Transaction
         {
             public Transaction()
@@ -159,24 +153,15 @@ namespace osu.Game.Screens.Edit
             {
                 if (command is IMergeableCommand mergeable)
                 {
-                    for (int i = 0; i < commands.Count; i++)
+                    for (int i = commands.Count - 1; i >= 0; i--)
                     {
                         var merged = mergeable.MergeWith(commands[i]);
 
                         if (merged == null)
                             continue;
 
-                        command = merged;
-                        commands.RemoveAt(i--);
-
-                        if (command is IMergeableCommand newMergeable)
-                        {
-                            mergeable = newMergeable;
-                        }
-                        else
-                        {
-                            break;
-                        }
+                        commands[i] = merged;
+                        return;
                     }
                 }
 

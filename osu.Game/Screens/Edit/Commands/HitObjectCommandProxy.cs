@@ -2,23 +2,22 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Types;
 
 namespace osu.Game.Screens.Edit.Commands
 {
-    public class HitObjectCommandProxy : CommandProxy
+    public static class HitObjectCommandProxy
     {
-        public HitObjectCommandProxy(EditorCommandHandler? commandHandler, HitObject hitObject)
-            : base(commandHandler)
-        {
-            HitObject = hitObject;
-        }
+        public static double StartTime<T>(this CommandProxy<T> proxy) where T : HitObject => proxy.Target.StartTime;
 
-        protected HitObject HitObject;
+        public static void SetStartTime<T>(this CommandProxy<T> proxy, double value) where T : HitObject => proxy.Submit(new SetStartTimeCommand(proxy.Target, value));
 
-        public double StartTime
-        {
-            get => HitObject.StartTime;
-            set => Submit(new SetStartTimeCommand(HitObject, value));
-        }
+        public static CommandProxy<SliderPath> Path<T>(this CommandProxy<T> proxy) where T : IHasPath =>
+            new CommandProxy<SliderPath>(proxy.CommandHandler, proxy.Target.Path);
+
+        public static double SliderVelocityMultiplier<T>(this CommandProxy<T> proxy) where T : IHasSliderVelocity => proxy.Target.SliderVelocityMultiplier;
+
+        public static void SetSliderVelocityMultiplier<T>(this CommandProxy<T> proxy, double value) where T : IHasSliderVelocity =>
+            proxy.Submit(new SetSliderVelocityMultiplierCommand(proxy.Target, value));
     }
 }

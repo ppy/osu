@@ -9,6 +9,6 @@ namespace osu.Game.Screens.Edit.Commands
 
         public IEditorCommand CreateUndo();
 
-        public virtual bool IsRedundant => false;
+        public bool IsRedundant => false;
     }
 }
