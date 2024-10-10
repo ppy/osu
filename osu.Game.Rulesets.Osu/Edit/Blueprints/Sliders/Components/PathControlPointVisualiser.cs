@@ -419,7 +419,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
                 Vector2 movementDelta = Parent!.ToLocalSpace(result?.ScreenSpacePosition ?? newHeadPosition) - hitObject.Position;
 
-                commandHandler.SafeSubmit(new MoveCommand(hitObject, hitObject.Position + movementDelta));
+                commandHandler.SafeSubmit(new SetPositionCommand(hitObject, hitObject.Position + movementDelta));
                 commandHandler.SafeSubmit(new SetStartTimeCommand(hitObject, result?.Time ?? hitObject.StartTime));
 
                 for (int i = 1; i < hitObject.Path.ControlPoints.Count; i++)
@@ -455,7 +455,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
                 for (int i = 0; i < hitObject.Path.ControlPoints.Count; i++)
                     commandHandler.SafeSubmit(new UpdateControlPointCommand(hitObject.Path.ControlPoints[i]) { Position = oldControlPoints[i] });
 
-                commandHandler.SafeSubmit(new MoveCommand(hitObject, oldPosition));
+                commandHandler.SafeSubmit(new SetPositionCommand(hitObject, oldPosition));
                 commandHandler.SafeSubmit(new SetStartTimeCommand(hitObject, oldStartTime));
                 // Snap the path length again to undo the invalid length.
                 hitObject.SnapTo(distanceSnapProvider, commandHandler);

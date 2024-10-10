@@ -482,7 +482,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             foreach (var c in controlPoints)
                 commandHandler.SafeSubmit(new UpdateControlPointCommand(c) { Position = c.Position - first });
 
-            commandHandler.SafeSubmit(new MoveCommand(HitObject, HitObject.Position + first));
+            commandHandler.SafeSubmit(new SetPositionCommand(HitObject, HitObject.Position + first));
         }
 
         private void splitControlPoints(List<PathControlPoint> controlPointsToSplitAt)

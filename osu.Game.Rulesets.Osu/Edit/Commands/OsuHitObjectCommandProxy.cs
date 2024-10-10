@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Commands
         public Vector2 Position
         {
             get => HitObject.Position;
-            set => Submit(new MoveCommand(HitObject, value));
+            set => Submit(new SetPositionCommand(HitObject, value));
         }
 
         public bool NewCombo

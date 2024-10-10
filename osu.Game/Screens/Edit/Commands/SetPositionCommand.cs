@@ -6,13 +6,13 @@ using osuTK;
 
 namespace osu.Game.Screens.Edit.Commands
 {
-    public class MoveCommand : IEditorCommand, IMergeableCommand
+    public class SetPositionCommand : IEditorCommand, IMergeableCommand
     {
         public readonly IHasMutablePosition Target;
 
         public readonly Vector2 Position;
 
-        public MoveCommand(IHasMutablePosition target, Vector2 position)
+        public SetPositionCommand(IHasMutablePosition target, Vector2 position)
         {
             Target = target;
             Position = position;
@@ -20,13 +20,13 @@ namespace osu.Game.Screens.Edit.Commands
 
         public void Apply() => Target.Position = Position;
 
-        public IEditorCommand CreateUndo() => new MoveCommand(Target, Target.Position);
+        public IEditorCommand CreateUndo() => new SetPositionCommand(Target, Target.Position);
 
         public bool IsRedundant => Position == Target.Position;
 
         public IEditorCommand? MergeWith(IEditorCommand previous)
         {
-            if (previous is MoveCommand moveCommand)
+            if (previous is SetPositionCommand moveCommand)
                 return moveCommand.Target != Target ? null : this;
 
             return null;

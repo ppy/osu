@@ -78,7 +78,7 @@ namespace osu.Game.Rulesets.Osu.Edit
             localDelta = moveSelectionInBounds(localDelta);
 
             foreach (var h in hitObjects)
-                commandManager.SafeSubmit(new MoveCommand(h, h.Position + localDelta));
+                commandManager.SafeSubmit(new SetPositionCommand(h, h.Position + localDelta));
 
             // manually update stacking.
             // this intentionally bypasses the editor `UpdateState()` / beatmap processor flow for performance reasons,
