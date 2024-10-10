@@ -175,7 +175,7 @@ namespace osu.Game.Screens.Edit.GameplayTest
 
         private double previousAutoTime = 0;
         
-        public void SetupAutoplay()
+        private void SetupAutoplay()
         {
             var autoplay = Ruleset.Value.CreateInstance().GetAutoplayMod();
             if (autoplay == null)
@@ -206,6 +206,7 @@ namespace osu.Game.Screens.Edit.GameplayTest
 
         protected override void Update()
         {
+            // updates if there's a replay (autoplay)
             if (DrawableRuleset.ReplayScore != null)
             {
                 // compare currentTime with previousTime
