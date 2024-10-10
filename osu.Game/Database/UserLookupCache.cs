@@ -10,7 +10,7 @@ using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Database
 {
-    public partial class UserLookupCache : OnlineLookupCache<int, APIUser, GetUsersRequest>
+    public partial class UserLookupCache : OnlineLookupCache<int, APIUser, LookupUsersRequest>
     {
         /// <summary>
         /// Perform an API lookup on the specified user, populating a <see cref="APIUser"/> model.
@@ -28,8 +28,8 @@ namespace osu.Game.Database
         /// <returns>The populated users. May include null results for failed retrievals.</returns>
         public Task<APIUser?[]> GetUsersAsync(int[] userIds, CancellationToken token = default) => LookupAsync(userIds, token);
 
-        protected override GetUsersRequest CreateRequest(IEnumerable<int> ids) => new GetUsersRequest(ids.ToArray());
+        protected override LookupUsersRequest CreateRequest(IEnumerable<int> ids) => new LookupUsersRequest(ids.ToArray());
 
-        protected override IEnumerable<APIUser>? RetrieveResults(GetUsersRequest request) => request.Response?.Users;
+        protected override IEnumerable<APIUser>? RetrieveResults(LookupUsersRequest request) => request.Response?.Users;
     }
 }
