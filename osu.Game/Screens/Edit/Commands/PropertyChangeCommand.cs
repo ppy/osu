@@ -23,7 +23,7 @@ namespace osu.Game.Screens.Edit.Commands
 
         public void Apply() => WriteValue(Target, Value);
 
-        public IEditorCommand CreateUndo() => CreateInstance(Target, Value);
+        public IEditorCommand CreateUndo() => CreateInstance(Target, ReadValue(Target));
 
         public IMergeableCommand? MergeWith(IEditorCommand previous)
         {
