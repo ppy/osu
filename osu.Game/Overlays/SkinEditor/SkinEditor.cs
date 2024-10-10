@@ -465,7 +465,9 @@ namespace osu.Game.Overlays.SkinEditor
             }
 
             SelectedComponents.Add(component);
-            SkinSelectionHandler.ApplyClosestAnchorOrigin(drawableComponent);
+
+            if (!component.UsesFixedAnchor)
+                SkinSelectionHandler.ApplyClosestAnchorOrigin(drawableComponent);
             return true;
         }
 

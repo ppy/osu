@@ -30,8 +30,6 @@ namespace osu.Game.Rulesets.Catch.UI
 
         private readonly Container<Catcher> catcherContainer;
 
-        private readonly CatchComboDisplay comboDisplay;
-
         private readonly CatcherTrailDisplay catcherTrails;
 
         private Catcher catcher = null!;
@@ -56,27 +54,16 @@ namespace osu.Game.Rulesets.Catch.UI
             {
                 catcherContainer = new Container<Catcher> { RelativeSizeAxes = Axes.Both },
                 catcherTrails = new CatcherTrailDisplay(),
-                comboDisplay = new CatchComboDisplay
-                {
-                    RelativeSizeAxes = Axes.None,
-                    AutoSizeAxes = Axes.Both,
-                    Anchor = Anchor.TopLeft,
-                    Origin = Anchor.Centre,
-                    Margin = new MarginPadding { Bottom = 350f },
-                    X = CatchPlayfield.CENTER_X
-                }
             };
         }
 
         public void OnNewResult(DrawableCatchHitObject hitObject, JudgementResult result)
         {
             Catcher.OnNewResult(hitObject, result);
-            comboDisplay.OnNewResult(hitObject, result);
         }
 
         public void OnRevertResult(JudgementResult result)
         {
-            comboDisplay.OnRevertResult(result);
             Catcher.OnRevertResult(result);
         }
 
@@ -94,8 +81,6 @@ namespace osu.Game.Rulesets.Catch.UI
         protected override void UpdateAfterChildren()
         {
             base.UpdateAfterChildren();
-
-            comboDisplay.X = Catcher.X;
 
             if ((Clock as IGameplayClock)?.IsRewinding == true)
             {

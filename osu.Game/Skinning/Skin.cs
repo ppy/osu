@@ -307,6 +307,39 @@ namespace osu.Game.Skinning
 
                     break;
                 }
+
+                case 2:
+                {
+                    // We've moved the osu!catch legacy combo counter from being a persistent ruleset component to a skinnable drawable.
+                    // For users with existing skin configuration on the ruleset-specific HUD layer, we need to manually add the combo counter because otherwise the user will not see any counter on their screen.
+                    resources?.RealmAccess.Run(r =>
+                    {
+                        var ruleset = r.Find<RulesetInfo>("fruits");
+
+                        if (target != GlobalSkinnableContainers.MainHUDComponents
+                            || !layout.TryGetDrawableInfo(ruleset, out var catchHUDComponents)
+                            || resources == null)
+                            return;
+
+                        Type newCatchComboCounter = SerialisedDrawableInfo.GetAllAvailableDrawables(ruleset).Single(t => t.IsAssignableTo(typeof(LegacyComboCounter)));
+
+                        var serialisedComponent = new SerialisedDrawableInfo((Drawable)Activator.CreateInstance(newCatchComboCounter)!)
+                        {
+                            Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.Centre
+                        };
+
+                        // add catch-specific combo counter.
+                        catchHUDComponents =
+                            catchHUDComponents
+                                .Append(serialisedComponent)
+                                .ToArray();
+
+                        layout.Update(ruleset, catchHUDComponents);
+                    });
+
+                    break;
+                }
             }
         }
 

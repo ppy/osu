@@ -43,7 +43,6 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
                     switch (containerLookup.Lookup)
                     {
                         case GlobalSkinnableContainers.MainHUDComponents:
-                            // todo: remove CatchSkinComponents.CatchComboCounter and refactor LegacyCatchComboCounter to be added here instead.
                             return new DefaultSkinComponentsContainer(container =>
                             {
                                 var keyCounter = container.OfType<LegacyKeyCounterDisplay>().FirstOrDefault();
@@ -55,11 +54,20 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
                                     keyCounter.Origin = Anchor.TopRight;
                                     keyCounter.Position = new Vector2(0, -40) * 1.6f;
                                 }
+
+                                var combo = container.OfType<LegacyCatchComboCounter>().FirstOrDefault();
+
+                                if (combo != null)
+                                {
+                                    combo.Anchor = Anchor.CentreLeft;
+                                    combo.Origin = Anchor.Centre;
+                                }
                             })
                             {
                                 Children = new Drawable[]
                                 {
                                     new LegacyKeyCounterDisplay(),
+                                    new LegacyCatchComboCounter(),
                                 }
                             };
                     }
