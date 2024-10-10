@@ -568,7 +568,7 @@ namespace osu.Game.Database
             lock (notificationsResetMap)
             {
                 // Store an action which is used when blocking to ensure consumers don't use results of a stale changeset firing.
-                notificationsResetMap.Add(action, () => callback(new EmptyRealmSet<T>(), null));
+                notificationsResetMap.Add(action, () => callback(new RealmResetEmptySet<T>(), null));
             }
 
             return RegisterCustomSubscription(action);
