@@ -174,8 +174,8 @@ namespace osu.Game.Screens.Edit.GameplayTest
         }
 
         private double previousAutoTime = 0;
-        
-        private void SetupAutoplay()
+
+        private void setupAutoplay()
         {
             var autoplay = Ruleset.Value.CreateInstance().GetAutoplayMod();
             if (autoplay == null)
@@ -188,7 +188,7 @@ namespace osu.Game.Screens.Edit.GameplayTest
 
             // remove past frames to prevent replay frame handler from seeking back to start in an attempt to play back the entirety of the replay.
             score.Replay.Frames.RemoveAll(f => f.Time <= GameplayClockContainer.CurrentTime);
-                
+
             DrawableRuleset.SetReplayScore(score);
             // Without this schedule, the `GlobalCursorDisplay.Update()` machinery will fade the gameplay cursor out, but we still want it to show.
             Schedule(() => DrawableRuleset.Cursor?.Show());
