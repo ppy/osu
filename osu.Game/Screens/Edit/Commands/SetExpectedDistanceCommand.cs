@@ -5,20 +5,17 @@ using osu.Game.Rulesets.Objects;
 
 namespace osu.Game.Screens.Edit.Commands
 {
-    public class SetExpectedDistanceCommand : IEditorCommand
+    public class SetExpectedDistanceCommand : PropertyChangeCommand<SliderPath, double?>
     {
-        public readonly SliderPath Path;
-
-        public readonly double? ExpectedDistance;
-
-        public SetExpectedDistanceCommand(SliderPath path, double? expectedDistance)
+        public SetExpectedDistanceCommand(SliderPath target, double? value)
+            : base(target, value)
         {
-            Path = path;
-            ExpectedDistance = expectedDistance;
         }
 
-        public void Apply() => Path.ExpectedDistance.Value = ExpectedDistance;
+        protected override double? ReadValue(SliderPath target) => target.ExpectedDistance.Value;
 
-        public IEditorCommand CreateUndo() => new SetExpectedDistanceCommand(Path, Path.ExpectedDistance.Value);
+        protected override void WriteValue(SliderPath target, double? value) => target.ExpectedDistance.Value = value;
+
+        protected override SetExpectedDistanceCommand CreateInstance(SliderPath target, double? value) => new SetExpectedDistanceCommand(target, value);
     }
 }
