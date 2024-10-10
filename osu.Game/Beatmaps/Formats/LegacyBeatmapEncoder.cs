@@ -29,6 +29,8 @@ namespace osu.Game.Beatmaps.Formats
 
         private readonly int onlineRulesetID;
 
+        private readonly List<string> customSoundBanks = new List<string>();
+
         /// <summary>
         /// Creates a new <see cref="LegacyBeatmapEncoder"/>.
         /// </summary>
@@ -68,6 +70,9 @@ namespace osu.Game.Beatmaps.Formats
             handleControlPoints(writer);
 
             writer.WriteLine();
+            handleCustomSoundBanks(writer);
+
+            writer.WriteLine();
             handleColours(writer);
 
             writer.WriteLine();
@@ -83,7 +88,7 @@ namespace osu.Game.Beatmaps.Formats
             writer.WriteLine(FormattableString.Invariant($"PreviewTime: {beatmap.Metadata.PreviewTime}"));
             writer.WriteLine(FormattableString.Invariant($"Countdown: {(int)beatmap.BeatmapInfo.Countdown}"));
             writer.WriteLine(FormattableString.Invariant(
-                $"SampleSet: {toLegacySampleBank(((beatmap.ControlPointInfo as LegacyControlPointInfo)?.SamplePoints.FirstOrDefault() ?? SampleControlPoint.DEFAULT).SampleBank)}"));
+                $"SampleSet: {(LegacySampleBank)toLegacySampleBank(((beatmap.ControlPointInfo as LegacyControlPointInfo)?.SamplePoints.FirstOrDefault() ?? SampleControlPoint.DEFAULT).SampleBank)}"));
             writer.WriteLine(FormattableString.Invariant($"StackLeniency: {beatmap.BeatmapInfo.StackLeniency}"));
             writer.WriteLine(FormattableString.Invariant($"Mode: {onlineRulesetID}"));
             writer.WriteLine(FormattableString.Invariant($"LetterboxInBreaks: {(beatmap.BeatmapInfo.LetterboxInBreaks ? '1' : '0')}"));
@@ -235,7 +240,7 @@ namespace osu.Game.Beatmaps.Formats
                 {
                     SliderVelocity = difficultyPoint.SliderVelocity,
                     TimingSignature = timingPoint.TimeSignature.Numerator,
-                    SampleBank = updateSampleBank ? (int)toLegacySampleBank(tempHitSample.Bank) : lastControlPointProperties.SampleBank,
+                    SampleBank = updateSampleBank ? toLegacySampleBank(tempHitSample.Bank) : lastControlPointProperties.SampleBank,
                     // Inherit the previous custom sample bank if the current custom sample bank is not set
                     CustomSampleBank = customSampleBank >= 0 ? customSampleBank : lastControlPointProperties.CustomSampleBank,
                     SampleVolume = tempHitSample.Volume,
@@ -361,6 +366,46 @@ namespace osu.Game.Beatmaps.Formats
 
             foreach (var h in beatmap.HitObjects)
                 handleHitObject(writer, h);
+        }
+
+        private void handleCustomSoundBanks(TextWriter writer)
+        {
+            writer.WriteLine("[CustomSoundBanks]");
+
+            if (beatmap.HitObjects.Count == 0)
+                return;
+
+            foreach (var h in beatmap.HitObjects)
+                checkCustomSoundBank(h);
+
+            foreach (string s in customSoundBanks)
+            {
+                writer.WriteLine(s);
+            }
+        }
+
+        private void checkCustomSoundBank(HitObject h)
+        {
+            string? bank = h.Samples.SingleOrDefault(s => s.Name == HitSampleInfo.HIT_NORMAL)?.Bank;
+
+            if (bank != null
+                && !customSoundBanks.Contains(bank)
+                && bank != "none" && bank != "normal" && bank != "soft" && bank != "drum")
+            {
+                customSoundBanks.Add(bank);
+            }
+
+            if (h is IHasRepeats hr)
+            {
+                foreach (IList<HitSampleInfo> node in hr.NodeSamples)
+                {
+                    if (node.Count > 0 && !customSoundBanks.Contains(node[0].Bank) &&
+                        node[0].Bank != "none" && node[0].Bank != "normal" && node[0].Bank != "soft" && node[0].Bank != "drum")
+                    {
+                        customSoundBanks.Add(node[0].Bank);
+                    }
+                }
+            }
         }
 
         private void handleHitObject(TextWriter writer, HitObject hitObject)
@@ -538,13 +583,13 @@ namespace osu.Game.Beatmaps.Formats
 
         private string getSampleBank(IList<HitSampleInfo> samples, bool banksOnly = false)
         {
-            LegacySampleBank normalBank = toLegacySampleBank(samples.SingleOrDefault(s => s.Name == HitSampleInfo.HIT_NORMAL)?.Bank);
-            LegacySampleBank addBank = toLegacySampleBank(samples.FirstOrDefault(s => !string.IsNullOrEmpty(s.Name) && s.Name != HitSampleInfo.HIT_NORMAL)?.Bank);
+            int normalBank = toLegacySampleBank(samples.SingleOrDefault(s => s.Name == HitSampleInfo.HIT_NORMAL)?.Bank);
+            int addBank = toLegacySampleBank(samples.FirstOrDefault(s => !string.IsNullOrEmpty(s.Name) && s.Name != HitSampleInfo.HIT_NORMAL)?.Bank);
 
             StringBuilder sb = new StringBuilder();
 
-            sb.Append(FormattableString.Invariant($"{(int)normalBank}:"));
-            sb.Append(FormattableString.Invariant($"{(int)addBank}"));
+            sb.Append(FormattableString.Invariant($"{normalBank}:"));
+            sb.Append(FormattableString.Invariant($"{addBank}"));
 
             if (!banksOnly)
             {
@@ -594,21 +639,25 @@ namespace osu.Game.Beatmaps.Formats
             return type;
         }
 
-        private LegacySampleBank toLegacySampleBank(string? sampleBank)
+        private int toLegacySampleBank(string? sampleBank)
         {
-            switch (sampleBank?.ToLowerInvariant())
+            string? sampleBankLower = sampleBank?.ToLowerInvariant();
+
+            switch (sampleBankLower)
             {
                 case HitSampleInfo.BANK_NORMAL:
-                    return LegacySampleBank.Normal;
+                    return (int)LegacySampleBank.Normal;
 
                 case HitSampleInfo.BANK_SOFT:
-                    return LegacySampleBank.Soft;
+                    return (int)LegacySampleBank.Soft;
 
                 case HitSampleInfo.BANK_DRUM:
-                    return LegacySampleBank.Drum;
+                    return (int)LegacySampleBank.Drum;
 
                 default:
-                    return LegacySampleBank.None;
+                    if (sampleBankLower != null) return customSoundBanks.IndexOf(sampleBankLower) + 4;
+
+                    return 0;
             }
         }
 

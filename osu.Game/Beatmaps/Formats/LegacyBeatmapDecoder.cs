@@ -221,6 +221,10 @@ namespace osu.Game.Beatmaps.Formats
                     handleTimingPoint(line);
                     return;
 
+                case Section.CustomSoundBanks:
+                    handleCustomSoundBanks(line);
+                    return;
+
                 case Section.HitObjects:
                     handleHitObject(line);
                     return;
@@ -613,6 +617,17 @@ namespace osu.Game.Beatmaps.Formats
 
             pendingControlPoints.Clear();
             pendingControlPointTypes.Clear();
+        }
+
+        private void handleCustomSoundBanks(string line)
+        {
+            // If the ruleset wasn't specified, assume the osu!standard ruleset.
+            parser ??= new Rulesets.Objects.Legacy.Osu.ConvertHitObjectParser(getOffsetTime(), FormatVersion);
+
+            if (!parser.AvailableSampleBanks.Contains(line))
+            {
+                parser.AvailableSampleBanks.Add(line);
+            }
         }
 
         private void handleHitObject(string line)
