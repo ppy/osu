@@ -1,27 +1,21 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Utils;
 using osu.Game.Rulesets.Objects.Types;
 
 namespace osu.Game.Screens.Edit.Commands
 {
-    public class SetXCommand : IEditorCommand
+    public class SetXCommand : PropertyChangeCommand<IHasMutableXPosition, float>
     {
-        public readonly IHasMutablePosition Target;
-
-        public readonly float X;
-
-        public SetXCommand(IHasMutablePosition target, float x)
+        public SetXCommand(IHasMutableXPosition target, float value)
+            : base(target, value)
         {
-            Target = target;
-            X = x;
         }
 
-        public void Apply() => Target.X = X;
+        protected override float ReadValue(IHasMutableXPosition target) => target.X;
 
-        public IEditorCommand CreateUndo() => new SetXCommand(Target, Target.X);
+        protected override void WriteValue(IHasMutableXPosition target, float value) => target.X = value;
 
-        public bool IsRedundant => Precision.AlmostEquals(X, Target.X);
+        protected override SetXCommand CreateInstance(IHasMutableXPosition target, float value) => new SetXCommand(target, value);
     }
 }

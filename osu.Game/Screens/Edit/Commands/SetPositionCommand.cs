@@ -6,30 +6,17 @@ using osuTK;
 
 namespace osu.Game.Screens.Edit.Commands
 {
-    public class SetPositionCommand : IEditorCommand, IMergeableCommand
+    public class SetPositionCommand : PropertyChangeCommand<IHasMutablePosition, Vector2>
     {
-        public readonly IHasMutablePosition Target;
-
-        public readonly Vector2 Position;
-
-        public SetPositionCommand(IHasMutablePosition target, Vector2 position)
+        public SetPositionCommand(IHasMutablePosition target, Vector2 value)
+            : base(target, value)
         {
-            Target = target;
-            Position = position;
         }
 
-        public void Apply() => Target.Position = Position;
+        protected override Vector2 ReadValue(IHasMutablePosition target) => target.Position;
 
-        public IEditorCommand CreateUndo() => new SetPositionCommand(Target, Target.Position);
+        protected override void WriteValue(IHasMutablePosition target, Vector2 value) => target.Position = value;
 
-        public bool IsRedundant => Position == Target.Position;
-
-        public IMergeableCommand? MergeWith(IEditorCommand previous)
-        {
-            if (previous is SetPositionCommand positionCommand && positionCommand.Target == Target)
-                return this;
-
-            return null;
-        }
+        protected override SetPositionCommand CreateInstance(IHasMutablePosition target, Vector2 value) => new SetPositionCommand(target, value);
     }
 }
