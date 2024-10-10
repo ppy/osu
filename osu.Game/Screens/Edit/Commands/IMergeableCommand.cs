@@ -5,6 +5,6 @@ namespace osu.Game.Screens.Edit.Commands
 {
     public interface IMergeableCommand : IEditorCommand
     {
-        public IEditorCommand? MergeWith(IEditorCommand previous);
+        public IMergeableCommand? MergeWith(IEditorCommand previous);
     }
 }

@@ -25,10 +25,10 @@ namespace osu.Game.Screens.Edit.Commands
 
         public IEditorCommand CreateUndo() => CreateInstance(Target, Value);
 
-        public IEditorCommand? MergeWith(IEditorCommand previous)
+        public IMergeableCommand? MergeWith(IEditorCommand previous)
         {
             if (previous is PropertyChangeCommand<TTarget, TProperty> command && command.Target == Target)
-                return this;
+                return command;
 
             return null;
         }
