@@ -27,6 +27,7 @@ using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Edit.Commands;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Screens.Edit;
+using osu.Game.Screens.Edit.Commands;
 using osuTK;
 using osuTK.Input;
 
@@ -43,7 +44,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         private readonly T hitObject;
         private readonly bool allowSelection;
 
-        private SliderPathCommandProxy pathProxy = null!;
+        private CommandProxy<T> proxy;
 
         private InputManager inputManager;
 
@@ -79,7 +80,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             controlPoints.CollectionChanged += onControlPointsChanged;
             controlPoints.BindTo(hitObject.Path.ControlPoints);
 
-            pathProxy = new SliderPathCommandProxy(commandHandler, hitObject.Path);
+            proxy = new CommandProxy<T>(commandHandler, hitObject);
         }
 
         // Generally all the control points are within the visible area all the time.
@@ -410,8 +411,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
         public void DragInProgress(DragEvent e)
         {
-            var proxy = new OsuHitObjectCommandProxy(commandHandler, hitObject);
-            var controlPointsProxy = pathProxy.ControlPoints;
+            var controlPointsProxy = proxy.Path().ControlPoints();
             Vector2[] oldControlPoints = hitObject.Path.ControlPoints.Select(cp => cp.Position).ToArray();
             Vector2 oldPosition = hitObject.Position;
             double oldStartTime = hitObject.StartTime;
@@ -424,8 +424,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
                 Vector2 movementDelta = Parent!.ToLocalSpace(result?.ScreenSpacePosition ?? newHeadPosition) - hitObject.Position;
 
-                proxy.Position += movementDelta;
-                proxy.StartTime = result?.Time ?? hitObject.StartTime;
+                proxy.SetPosition(hitObject.Position + movementDelta);
+                proxy.SetStartTime(result?.Time ?? hitObject.StartTime);
 
                 for (int i = 1; i < controlPointsProxy.Count; i++)
                 {
@@ -434,8 +434,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
                     // need to be offset _back_ by the delta corresponding to the movement of the head point.
                     // All other selected control points (if any) will move together with the head point
                     // (and so they will not move at all, relative to each other).
-                    if (!selectedControlPoints.Contains(controlPointProxy.ControlPoint))
-                        controlPointProxy.Position -= movementDelta;
+                    if (!selectedControlPoints.Contains(controlPointProxy.Target))
+                        controlPointProxy.SetPosition(controlPointProxy.Position() - movementDelta);
                 }
             }
             else
@@ -447,29 +447,29 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
                 for (int i = 0; i < controlPointsProxy.Count; ++i)
                 {
                     var controlPointProxy = controlPointsProxy[i];
-                    if (selectedControlPoints.Contains(controlPointProxy.ControlPoint))
-                        controlPointProxy.Position = dragStartPositions[i] + movementDelta;
+                    if (selectedControlPoints.Contains(controlPointProxy.Target))
+                        controlPointProxy.SetPosition(dragStartPositions[i] + movementDelta);
                 }
             }
 
             // Snap the path to the current beat divisor before checking length validity.
-            hitObject.SnapTo(distanceSnapProvider, commandHandler);
+            proxy.SnapTo(distanceSnapProvider);
 
             if (!hitObject.Path.HasValidLength)
             {
                 for (int i = 0; i < controlPointsProxy.Count; i++)
-                    controlPointsProxy[i].Position = oldControlPoints[i];
+                    controlPointsProxy[i].SetPosition(oldControlPoints[i]);
 
-                proxy.Position = oldPosition;
-                proxy.StartTime = oldStartTime;
+                proxy.SetPosition(oldPosition);
+                proxy.SetStartTime(oldStartTime);
                 // Snap the path length again to undo the invalid length.
-                hitObject.SnapTo(distanceSnapProvider, commandHandler);
+                proxy.SnapTo(distanceSnapProvider);
                 return;
             }
 
             // Maintain the path types in case they got defaulted to bezier at some point during the drag.
             for (int i = 0; i < controlPointsProxy.Count; i++)
-                controlPointsProxy[i].Type = dragPathTypes[i];
+                controlPointsProxy[i].SetType(dragPathTypes[i]);
 
             EnsureValidPathTypes();
         }

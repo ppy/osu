@@ -25,6 +25,19 @@ namespace osu.Game.Rulesets.Objects
         }
 
         /// <summary>
+        /// Snaps the provided <paramref name="proxy"/>'s duration using the <paramref name="snapProvider"/>.
+        /// </summary>
+        public static void SnapTo<THitObject>(this CommandProxy<THitObject> proxy, IDistanceSnapProvider? snapProvider)
+            where THitObject : HitObject, IHasPath
+        {
+            var hitObject = proxy.Target;
+            double distance = snapProvider?.FindSnappedDistance(hitObject, (float)hitObject.Path.CalculatedDistance, DistanceSnapTarget.Start) ?? hitObject.Path.CalculatedDistance;
+
+            proxy.Path().SetExpectedDistance(distance);
+            proxy.Path().ControlPoints();
+        }
+
+        /// <summary>
         /// Reverse the direction of this path.
         /// </summary>
         /// <param name="sliderPath">The <see cref="SliderPath"/>.</param>

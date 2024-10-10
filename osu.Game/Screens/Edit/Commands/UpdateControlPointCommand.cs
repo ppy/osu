@@ -3,10 +3,9 @@
 
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
-using osu.Game.Screens.Edit.Commands;
 using osuTK;
 
-namespace osu.Game.Rulesets.Osu.Edit.Commands
+namespace osu.Game.Screens.Edit.Commands
 {
     public class UpdateControlPointCommand : IEditorCommand
     {

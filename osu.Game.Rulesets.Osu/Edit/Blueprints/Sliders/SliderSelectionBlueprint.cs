@@ -36,7 +36,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
     {
         protected new DrawableSlider DrawableObject => (DrawableSlider)base.DrawableObject;
 
-        protected SliderCommandProxy Proxy = null!;
+        protected CommandProxy<Slider> Proxy { get; private set; }
 
         protected SliderBodyPiece BodyPiece { get; private set; } = null!;
         protected SliderCircleOverlay HeadOverlay { get; private set; } = null!;
@@ -119,7 +119,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         {
             base.LoadComplete();
 
-            Proxy = new SliderCommandProxy(commandHandler, HitObject);
+            Proxy = new CommandProxy<Slider>(commandHandler, HitObject);
 
             controlPoints.BindTo(HitObject.Path.ControlPoints);
             controlPoints.CollectionChanged += (_, _) => fullPathCache.Invalidate();
@@ -253,7 +253,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
         private void endAdjustLength()
         {
-            trimExcessControlPoints(Proxy.Path);
+            trimExcessControlPoints(Proxy.Path());
             commandHandler?.Commit();
             isAdjustingLength = false;
         }
@@ -281,8 +281,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             if (Precision.AlmostEquals(proposedDistance, HitObject.Path.Distance) && Precision.AlmostEquals(proposedVelocity, HitObject.SliderVelocityMultiplier))
                 return;
 
-            Proxy.SliderVelocityMultiplier = proposedVelocity;
-            Proxy.Path.ExpectedDistance = proposedDistance;
+            Proxy.SetSliderVelocityMultiplier(proposedVelocity);
+            Proxy.Path().SetExpectedDistance(proposedDistance);
             editorBeatmap?.Update(HitObject);
         }
 
@@ -290,22 +290,22 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         /// Trims control points from the end of the slider path which are not required to reach the expected end of the slider.
         /// </summary>
         /// <param name="sliderPath">The slider path to trim control points of.</param>
-        private void trimExcessControlPoints(SliderPathCommandProxy sliderPath)
+        private void trimExcessControlPoints(CommandProxy<SliderPath> sliderPath)
         {
-            if (!sliderPath.ExpectedDistance.HasValue)
+            if (!sliderPath.ExpectedDistance().HasValue)
                 return;
 
             double[] segmentEnds = sliderPath.GetSegmentEnds().ToArray();
             int segmentIndex = 0;
 
-            for (int i = 1; i < sliderPath.ControlPoints.Count - 1; i++)
+            for (int i = 1; i < sliderPath.ControlPoints().Count - 1; i++)
             {
-                if (!sliderPath.ControlPoints[i].Type.HasValue) continue;
+                if (!sliderPath.ControlPoints()[i].Type().HasValue) continue;
 
                 if (Precision.AlmostBigger(segmentEnds[segmentIndex], 1, 1E-3))
                 {
-                    sliderPath.ControlPoints.RemoveRange(i + 1, sliderPath.ControlPoints.Count - i - 1);
-                    sliderPath.ControlPoints[^1].Type = null;
+                    sliderPath.ControlPoints().RemoveRange(i + 1, sliderPath.ControlPoints().Count - i - 1);
+                    sliderPath.ControlPoints()[^1].SetType(null);
                     break;
                 }
 
@@ -439,7 +439,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
             var pathControlPoint = new PathControlPoint { Position = position };
 
-            Proxy.Path.ControlPoints.Insert(insertionIndex, pathControlPoint);
+            Proxy.Path().ControlPoints().Insert(insertionIndex, pathControlPoint);
 
             ControlPointVisualiser?.EnsureValidPathTypes();
 
@@ -459,9 +459,9 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                 // The first control point in the slider must have a type, so take it from the previous "first" one
                 // Todo: Should be handled within SliderPath itself
                 if (c == controlPoints[0] && controlPoints.Count > 1 && controlPoints[1].Type == null)
-                    new PathControlPointCommandProxy(commandHandler, c).Type = controlPoints[0].Type;
+                    new CommandProxy<PathControlPoint>(commandHandler, c).SetType(controlPoints[0].Type);
 
-                Proxy.Path.ControlPoints.Remove(c);
+                Proxy.Path().ControlPoints().Remove(c);
             }
 
             ControlPointVisualiser?.EnsureValidPathTypes();
@@ -499,7 +499,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
             editorBeatmap.SelectedHitObjects.Clear();
 
-            var controlPointsProxy = new PathControlPointsCommandProxy(commandHandler, controlPoints);
+            var controlPointsProxy = new ListCommandProxy<BindableList<PathControlPoint>, PathControlPoint, CommandProxy<PathControlPoint>>(commandHandler, controlPoints);
 
             foreach (var splitPoint in controlPointsToSplitAt)
             {
@@ -527,19 +527,19 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                     Path = new SliderPath(splitControlPoints.Select(o => new PathControlPoint(o.Position - splitControlPoints[0].Position, o == splitControlPoints[^1] ? null : o.Type)).ToArray())
                 };
 
-                Proxy.StartTime += split_gap;
+                Proxy.SetStartTime(Proxy.StartTime() + split_gap);
 
                 // Increase the start time of the slider before adding the new slider so the new slider is immediately inserted at the correct index and internal state remains valid.
                 commandHandler.SafeSubmit(new AddHitObjectCommand(editorBeatmap, newSlider));
 
-                Proxy.NewCombo = false;
-                Proxy.Path.ExpectedDistance -= newSlider.Path.CalculatedDistance;
-                Proxy.StartTime += newSlider.SpanDuration;
+                Proxy.SetNewCombo(false);
+                Proxy.Path().SetExpectedDistance(Proxy.Path().ExpectedDistance() - newSlider.Path.CalculatedDistance);
+                Proxy.SetStartTime(Proxy.StartTime() + newSlider.SpanDuration);
 
                 // In case the remainder of the slider has no length left over, give it length anyways so we don't get a 0 length slider.
                 if (HitObject.Path.ExpectedDistance.Value <= Precision.DOUBLE_EPSILON)
                 {
-                    Proxy.Path.ExpectedDistance = null;
+                    Proxy.Path().SetExpectedDistance(null);
                 }
             }
 
@@ -547,9 +547,9 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             // As a final step, we must reset its control points to have an origin of (0,0).
             Vector2 first = controlPoints[0].Position;
             foreach (var c in controlPointsProxy)
-                c.Position -= first;
+                c.SetPosition(c.Position() - first);
 
-            Proxy.Position += first;
+            Proxy.SetPosition(Proxy.Position() + first);
         }
 
         private void convertToStream()
