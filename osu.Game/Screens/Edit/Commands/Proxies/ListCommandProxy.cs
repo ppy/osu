@@ -61,10 +61,9 @@ namespace osu.Game.Screens.Edit.Commands.Proxies
 
         public bool IsReadOnly => Target.IsReadOnly;
 
-        public int IndexOf(TItemProxy item)
-        {
-            return Target.IndexOf(item.Target);
-        }
+        public int IndexOf(TItemProxy item) => IndexOf(item.Target);
+
+        public int IndexOf(TItem item) => Target.IndexOf(item);
 
         public void Insert(int index, TItemProxy item) => Insert(index, item.Target);
 

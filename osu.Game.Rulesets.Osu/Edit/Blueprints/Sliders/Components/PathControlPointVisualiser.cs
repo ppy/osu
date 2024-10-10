@@ -26,7 +26,6 @@ using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Screens.Edit;
-using osu.Game.Screens.Edit.Commands;
 using osu.Game.Screens.Edit.Commands.Proxies;
 using osuTK;
 using osuTK.Input;
@@ -44,7 +43,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         private readonly T hitObject;
         private readonly bool allowSelection;
 
-        private CommandProxy<T> proxy;
+        private CommandProxy<T> proxy => hitObject.AsCommandProxy(commandHandler);
 
         private InputManager inputManager;
 
@@ -79,8 +78,6 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
             controlPoints.CollectionChanged += onControlPointsChanged;
             controlPoints.BindTo(hitObject.Path.ControlPoints);
-
-            proxy = new CommandProxy<T>(commandHandler, hitObject);
         }
 
         // Generally all the control points are within the visible area all the time.
@@ -119,7 +116,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
                 return;
 
             if (segment.Count > 3)
-                commandHandler.SafeSubmit(new SetPathTypeCommand(first, PathType.BEZIER));
+                first.AsCommandProxy(commandHandler).SetType(PathType.BEZIER);
 
             if (segment.Count != 3)
                 return;
@@ -127,7 +124,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             ReadOnlySpan<Vector2> points = segment.Select(p => p.Position).ToArray();
             RectangleF boundingBox = PathApproximator.CircularArcBoundingBox(points);
             if (boundingBox.Width >= 640 || boundingBox.Height >= 480)
-                commandHandler.SafeSubmit(new SetPathTypeCommand(first, PathType.BEZIER));
+                first.AsCommandProxy(commandHandler).SetType(PathType.BEZIER);
         }
 
         /// <summary>
@@ -357,7 +354,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
             foreach (var p in Pieces.Where(p => p.IsSelected.Value))
             {
-                List<PathControlPoint> pointsInSegment = hitObject.Path.PointsInSegment(p.ControlPoint);
+                var pointsInSegment = hitObject.Path.PointsInSegment(p.ControlPoint).AsListCommandProxy(commandHandler);
                 int indexInSegment = pointsInSegment.IndexOf(p.ControlPoint);
 
                 if (type?.Type == SplineType.PerfectCurve)
@@ -368,19 +365,19 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
                     int thirdPointIndex = indexInSegment + 2;
 
                     if (pointsInSegment.Count > thirdPointIndex + 1)
-                        pointsInSegment[thirdPointIndex].Type = pointsInSegment[0].Type;
+                        pointsInSegment[thirdPointIndex].SetType(pointsInSegment[0].Type());
                 }
 
-                hitObject.Path.ExpectedDistance.Value = null;
-                p.ControlPoint.Type = type;
+                proxy.Path().SetExpectedDistance(null);
+                p.ControlPoint.AsCommandProxy(commandHandler).SetType(type);
             }
 
             EnsureValidPathTypes();
 
             if (hitObject.Path.Distance < originalDistance)
-                hitObject.SnapTo(distanceSnapProvider);
+                proxy.SnapTo(distanceSnapProvider);
             else
-                hitObject.Path.ExpectedDistance.Value = originalDistance;
+                proxy.Path().SetExpectedDistance(originalDistance);
 
             commandHandler?.Commit();
         }
