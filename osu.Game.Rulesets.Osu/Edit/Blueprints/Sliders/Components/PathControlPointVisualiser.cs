@@ -24,10 +24,10 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
-using osu.Game.Rulesets.Osu.Edit.Commands;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Commands;
+using osu.Game.Screens.Edit.Commands.Proxies;
 using osuTK;
 using osuTK.Input;
 
@@ -119,7 +119,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
                 return;
 
             if (segment.Count > 3)
-                commandHandler.SafeSubmit(new UpdateControlPointCommand(first) { Type = PathType.BEZIER });
+                commandHandler.SafeSubmit(new SetPathTypeCommand(first, PathType.BEZIER));
 
             if (segment.Count != 3)
                 return;
@@ -127,7 +127,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             ReadOnlySpan<Vector2> points = segment.Select(p => p.Position).ToArray();
             RectangleF boundingBox = PathApproximator.CircularArcBoundingBox(points);
             if (boundingBox.Width >= 640 || boundingBox.Height >= 480)
-                commandHandler.SafeSubmit(new UpdateControlPointCommand(first) { Type = PathType.BEZIER });
+                commandHandler.SafeSubmit(new SetPathTypeCommand(first, PathType.BEZIER));
         }
 
         /// <summary>

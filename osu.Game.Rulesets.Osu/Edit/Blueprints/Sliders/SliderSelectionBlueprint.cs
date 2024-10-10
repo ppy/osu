@@ -21,11 +21,11 @@ using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components;
-using osu.Game.Rulesets.Osu.Edit.Commands;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Commands;
+using osu.Game.Screens.Edit.Commands.Proxies;
 using osu.Game.Screens.Edit.Compose;
 using osuTK;
 using osuTK.Input;
@@ -480,7 +480,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             // So the slider needs to be offset by this amount instead, and all control points offset backwards such that the path is re-positioned at (0, 0)
             Vector2 first = controlPoints[0].Position;
             foreach (var c in controlPoints)
-                commandHandler.SafeSubmit(new UpdateControlPointCommand(c) { Position = c.Position - first });
+                commandHandler.SafeSubmit(new SetPositionCommand(c, c.Position - first));
 
             commandHandler.SafeSubmit(new SetPositionCommand(HitObject, HitObject.Position + first));
         }
@@ -499,7 +499,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
             editorBeatmap.SelectedHitObjects.Clear();
 
-            var controlPointsProxy = new ListCommandProxy<BindableList<PathControlPoint>, CommandProxy<PathControlPoint>, PathControlPoint>(commandHandler, controlPoints);
+            var controlPointsProxy = new ListCommandProxy<PathControlPoint, CommandProxy<PathControlPoint>>(commandHandler, controlPoints);
 
             foreach (var splitPoint in controlPointsToSplitAt)
             {
