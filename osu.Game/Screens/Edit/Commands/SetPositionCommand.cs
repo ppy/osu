@@ -24,10 +24,10 @@ namespace osu.Game.Screens.Edit.Commands
 
         public bool IsRedundant => Position == Target.Position;
 
-        public IEditorCommand? MergeWith(IEditorCommand previous)
+        public IMergeableCommand? MergeWith(IEditorCommand previous)
         {
-            if (previous is SetPositionCommand moveCommand)
-                return moveCommand.Target != Target ? null : this;
+            if (previous is SetPositionCommand positionCommand && positionCommand.Target == Target)
+                return this;
 
             return null;
         }
