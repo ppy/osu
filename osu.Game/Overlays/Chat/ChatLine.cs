@@ -18,10 +18,11 @@ using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Chat;
+using osuTK;
 using osuTK.Graphics;
-using Message = osu.Game.Online.Chat.Message;
 
 namespace osu.Game.Overlays.Chat
 {
@@ -47,11 +48,11 @@ namespace osu.Game.Overlays.Chat
 
         public IReadOnlyCollection<Drawable> DrawableContentFlow => drawableContentFlow;
 
-        protected virtual float FontSize => 14;
+        private const float font_size = 13;
 
         protected virtual float Spacing => 15;
 
-        protected virtual float UsernameWidth => 130;
+        protected virtual float UsernameWidth => 150;
 
         [Resolved]
         private ChannelManager? chatManager { get; set; }
@@ -68,6 +69,43 @@ namespace osu.Game.Overlays.Chat
         private readonly Bindable<bool> prefer24HourTime = new Bindable<bool>();
 
         private Container? highlight;
+
+        private Drawable? background;
+
+        private bool alternatingBackground;
+        private bool requiresTimestamp = true;
+
+        public bool RequiresTimestamp
+        {
+            get => requiresTimestamp;
+            set
+            {
+                if (requiresTimestamp == value)
+                    return;
+
+                requiresTimestamp = value;
+
+                if (!IsLoaded)
+                    return;
+
+                updateMessageContent();
+            }
+        }
+
+        public bool AlternatingBackground
+        {
+            get => alternatingBackground;
+            set
+            {
+                if (alternatingBackground == value)
+                    return;
+
+                alternatingBackground = value;
+                updateBackground();
+            }
+        }
+
+        private bool isMention;
 
         /// <summary>
         /// The colour used to paint the author's username.
@@ -102,48 +140,74 @@ namespace osu.Game.Overlays.Chat
             configManager.BindWith(OsuSetting.Prefer24HourTime, prefer24HourTime);
             prefer24HourTime.BindValueChanged(_ => updateTimestamp());
 
-            InternalChild = new GridContainer
+            Padding = new MarginPadding { Right = 5 };
+
+            InternalChildren = new[]
             {
-                RelativeSizeAxes = Axes.X,
-                AutoSizeAxes = Axes.Y,
-                RowDimensions = new[] { new Dimension(GridSizeMode.AutoSize) },
-                ColumnDimensions = new[]
+                background = new Container
                 {
-                    new Dimension(GridSizeMode.AutoSize),
-                    new Dimension(GridSizeMode.Absolute, Spacing + UsernameWidth + Spacing),
-                    new Dimension(),
-                },
-                Content = new[]
-                {
-                    new Drawable[]
+                    Masking = true,
+                    CornerRadius = 4,
+                    Alpha = 0,
+                    RelativeSizeAxes = Axes.Both,
+                    Blending = BlendingParameters.Additive,
+                    Child = new Box
                     {
-                        drawableTimestamp = new OsuSpriteText
-                        {
-                            Shadow = false,
-                            Anchor = Anchor.CentreLeft,
-                            Origin = Anchor.CentreLeft,
-                            Font = OsuFont.GetFont(size: FontSize * 0.75f, weight: FontWeight.SemiBold, fixedWidth: true),
-                            AlwaysPresent = true,
-                        },
-                        drawableUsername = new DrawableChatUsername(message.Sender)
-                        {
-                            Width = UsernameWidth,
-                            FontSize = FontSize,
-                            AutoSizeAxes = Axes.Y,
-                            Origin = Anchor.TopRight,
-                            Anchor = Anchor.TopRight,
-                            Margin = new MarginPadding { Horizontal = Spacing },
-                            AccentColour = UsernameColour,
-                            Inverted = !string.IsNullOrEmpty(message.Sender.Colour),
-                        },
-                        drawableContentFlow = new LinkFlowContainer(styleMessageContent)
-                        {
-                            AutoSizeAxes = Axes.Y,
-                            RelativeSizeAxes = Axes.X,
-                        }
+                        Colour = Colour4.FromHex("#3b3234"),
+                        RelativeSizeAxes = Axes.Both,
                     },
+                },
+                new GridContainer
+                {
+                    Padding = new MarginPadding
+                    {
+                        Horizontal = 2,
+                        Vertical = 2,
+                    },
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    RowDimensions = new[] { new Dimension(GridSizeMode.AutoSize) },
+                    ColumnDimensions = new[]
+                    {
+                        new Dimension(GridSizeMode.Absolute, 45),
+                        new Dimension(GridSizeMode.Absolute, Spacing + UsernameWidth + Spacing),
+                        new Dimension(),
+                    },
+                    Content = new[]
+                    {
+                        new Drawable[]
+                        {
+                            drawableTimestamp = new OsuSpriteText
+                            {
+                                Shadow = false,
+                                Anchor = Anchor.TopLeft,
+                                Origin = Anchor.TopLeft,
+                                Spacing = new Vector2(-1, 0),
+                                Font = OsuFont.GetFont(size: font_size, weight: FontWeight.SemiBold, fixedWidth: true),
+                                AlwaysPresent = true,
+                            },
+                            drawableUsername = new DrawableChatUsername(message.Sender)
+                            {
+                                Width = UsernameWidth,
+                                FontSize = font_size,
+                                AutoSizeAxes = Axes.Y,
+                                Origin = Anchor.TopRight,
+                                Anchor = Anchor.TopRight,
+                                Margin = new MarginPadding { Horizontal = Spacing },
+                                AccentColour = UsernameColour,
+                                Inverted = !string.IsNullOrEmpty(message.Sender.Colour),
+                            },
+                            drawableContentFlow = new LinkFlowContainer(styleMessageContent)
+                            {
+                                AutoSizeAxes = Axes.Y,
+                                RelativeSizeAxes = Axes.X,
+                            }
+                        },
+                    }
                 }
             };
+
+            updateBackground();
         }
 
         protected override void LoadComplete()
@@ -194,22 +258,41 @@ namespace osu.Game.Overlays.Chat
         private void styleMessageContent(SpriteText text)
         {
             text.Shadow = false;
-            text.Font = text.Font.With(size: FontSize, italics: Message.IsAction);
+            text.Font = text.Font.With(size: font_size, italics: Message.IsAction, weight: isMention ? FontWeight.SemiBold : FontWeight.Medium);
 
-            bool messageHasColour = Message.IsAction && !string.IsNullOrEmpty(message.Sender.Colour);
-            text.Colour = messageHasColour ? Color4Extensions.FromHex(message.Sender.Colour) : colourProvider?.Content1 ?? Colour4.White;
+            Color4 messageColour = colourProvider?.Content1 ?? Colour4.White;
+
+            if (isMention)
+                messageColour = colourProvider?.Highlight1 ?? Color4.Orange;
+            else if (Message.IsAction && !string.IsNullOrEmpty(message.Sender.Colour))
+                messageColour = Color4Extensions.FromHex(message.Sender.Colour);
+
+            text.Colour = messageColour;
         }
+
+        [Resolved]
+        private IAPIProvider api { get; set; } = null!;
 
         private void updateMessageContent()
         {
             this.FadeTo(message is LocalEchoMessage ? 0.4f : 1.0f, 500, Easing.OutQuint);
-            drawableTimestamp.FadeTo(message is LocalEchoMessage ? 0 : 1, 500, Easing.OutQuint);
 
-            updateTimestamp();
+            if (requiresTimestamp && !(message is LocalEchoMessage))
+            {
+                drawableTimestamp.Show();
+                updateTimestamp();
+            }
+            else
+            {
+                drawableTimestamp.Hide();
+            }
+
             drawableUsername.Text = $@"{message.Sender.Username}";
 
             // remove non-existent channels from the link list
             message.Links.RemoveAll(link => link.Action == LinkAction.OpenChannel && chatManager?.AvailableChannels.Any(c => c.Name == link.Argument.ToString()) != true);
+
+            isMention = MessageNotifier.CheckContainsUsername(message.DisplayContent, api.LocalUser.Value.Username);
 
             drawableContentFlow.Clear();
             drawableContentFlow.AddLinks(message.DisplayContent, message.Links);
@@ -217,7 +300,7 @@ namespace osu.Game.Overlays.Chat
 
         private void updateTimestamp()
         {
-            drawableTimestamp.Text = message.Timestamp.LocalDateTime.ToLocalisableString(prefer24HourTime.Value ? @"HH:mm:ss" : @"hh:mm:ss tt");
+            drawableTimestamp.Text = message.Timestamp.LocalDateTime.ToLocalisableString(prefer24HourTime.Value ? @"HH:mm" : @"hh:mm tt");
         }
 
         private static readonly Color4[] default_username_colours =
@@ -258,5 +341,11 @@ namespace osu.Game.Overlays.Chat
             Color4Extensions.FromHex("812a96"),
             Color4Extensions.FromHex("992861"),
         };
+
+        private void updateBackground()
+        {
+            if (background != null)
+                background.Alpha = alternatingBackground ? 0.2f : 0;
+        }
     }
 }

@@ -58,6 +58,7 @@ namespace osu.Game.Screens.Play.HUD
                 labelText = new OsuSpriteText
                 {
                     Alpha = 0,
+                    BypassAutoSizeAxes = Axes.X,
                     Text = label.GetValueOrDefault(),
                     Font = OsuFont.Torus.With(size: 12, weight: FontWeight.Bold),
                     Margin = new MarginPadding { Left = 2.5f },
@@ -65,6 +66,8 @@ namespace osu.Game.Screens.Play.HUD
                 NumberContainer = new Container
                 {
                     AutoSizeAxes = Axes.Both,
+                    Anchor = anchor,
+                    Origin = anchor,
                     Children = new[]
                     {
                         wireframesPart = new ArgonCounterSpriteText(wireframesLookup)

@@ -104,8 +104,6 @@ namespace osu.Game.Screens.Play.PlayerSettings
         {
             base.LoadComplete();
 
-            ReferenceScore.BindValueChanged(scoreChanged, true);
-
             beatmapOffsetSubscription = realm.SubscribeToPropertyChanged(
                 r => r.Find<BeatmapInfo>(beatmap.Value.BeatmapInfo.ID)?.UserSettings,
                 settings => settings.Offset,
@@ -124,6 +122,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
                 });
 
             Current.BindValueChanged(currentChanged);
+            ReferenceScore.BindValueChanged(scoreChanged, true);
         }
 
         private void currentChanged(ValueChangedEvent<double> offset)
@@ -228,7 +227,8 @@ namespace osu.Game.Screens.Play.PlayerSettings
                 useAverageButton = new SettingsButton
                 {
                     Text = BeatmapOffsetControlStrings.CalibrateUsingLastPlay,
-                    Action = () => Current.Value = lastPlayBeatmapOffset - lastPlayAverage
+                    Action = () => Current.Value = lastPlayBeatmapOffset - lastPlayAverage,
+                    Enabled = { Value = !Precision.AlmostEquals(lastPlayAverage, 0, Current.Precision / 2) }
                 },
                 globalOffsetText = new LinkFlowContainer
                 {

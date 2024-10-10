@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -11,6 +12,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Logging;
+using osu.Framework.Platform;
 using osu.Game.Beatmaps;
 using osu.Game.Extensions;
 using osu.Game.Online.API;
@@ -61,6 +63,9 @@ namespace osu.Game.Database
         [Resolved]
         private IAPIProvider api { get; set; } = null!;
 
+        [Resolved]
+        private Storage storage { get; set; } = null!;
+
         protected virtual int TimeToSleepDuringGameplay => 30000;
 
         protected override void LoadComplete()
@@ -78,6 +83,7 @@ namespace osu.Game.Database
                 processScoresWithMissingStatistics();
                 convertLegacyTotalScoreToStandardised();
                 upgradeScoreRanks();
+                backpopulateMissingSubmissionAndRankDates();
             }, TaskCreationOptions.LongRunning).ContinueWith(t =>
             {
                 if (t.Exception?.InnerException is ObjectDisposedException)
@@ -389,7 +395,7 @@ namespace osu.Game.Database
 
             HashSet<Guid> scoreIds = realmAccess.Run(r => new HashSet<Guid>(
                 r.All<ScoreInfo>()
-                 .Where(s => s.TotalScoreVersion < 30000013) // last total score version with a significant change to ranks
+                 .Where(s => s.TotalScoreVersion < 30000013 && !s.BackgroundReprocessingFailed) // last total score version with a significant change to ranks
                  .AsEnumerable()
                  // must be done after materialisation, as realm doesn't support
                  // filtering on nested property predicates or projection via `.Select()`
@@ -441,6 +447,104 @@ namespace osu.Game.Database
             }
 
             completeNotification(notification, processedCount, scoreIds.Count, failedCount);
+        }
+
+        private void backpopulateMissingSubmissionAndRankDates()
+        {
+            var localMetadataSource = new LocalCachedBeatmapMetadataSource(storage);
+
+            if (!localMetadataSource.Available)
+            {
+                Logger.Log("Cannot backpopulate missing submission/rank dates because the local metadata cache is missing.");
+                return;
+            }
+
+            try
+            {
+                if (localMetadataSource.GetCacheVersion() < 2)
+                {
+                    Logger.Log("Cannot backpopulate missing submission/rank dates because the local metadata cache is too old.");
+                    return;
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Log($"Error when trying to query version of local metadata cache: {ex}");
+                return;
+            }
+
+            Logger.Log("Querying for beatmap sets that contain missing submission/rank date...");
+
+            HashSet<Guid> beatmapSetIds = realmAccess.Run(r => new HashSet<Guid>(
+                r.All<BeatmapSetInfo>()
+                 .Where(b => b.StatusInt > 0 && (b.DateRanked == null || b.DateSubmitted == null))
+                 .AsEnumerable()
+                 .Select(b => b.ID)));
+
+            if (beatmapSetIds.Count == 0)
+                return;
+
+            Logger.Log($"Found {beatmapSetIds.Count} beatmap sets with missing submission/rank date.");
+
+            var notification = showProgressNotification(beatmapSetIds.Count, "Populating missing submission and rank dates", "beatmap sets now have correct submission and rank dates.");
+
+            int processedCount = 0;
+            int failedCount = 0;
+
+            foreach (var id in beatmapSetIds)
+            {
+                if (notification?.State == ProgressNotificationState.Cancelled)
+                    break;
+
+                updateNotificationProgress(notification, processedCount, beatmapSetIds.Count);
+
+                sleepIfRequired();
+
+                try
+                {
+                    // Can't use async overload because we're not on the update thread.
+                    // ReSharper disable once MethodHasAsyncOverload
+                    bool succeeded = realmAccess.Write(r =>
+                    {
+                        BeatmapSetInfo beatmapSet = r.Find<BeatmapSetInfo>(id)!;
+
+                        // we want any ranked representative of the set.
+                        // the reason for checking ranked status of the difficulty is that it can be locally modified,
+                        // at which point the lookup will fail - but there might still be another unmodified difficulty on which it will work.
+                        if (beatmapSet.Beatmaps.FirstOrDefault(b => b.Status >= BeatmapOnlineStatus.Ranked) is not BeatmapInfo beatmap)
+                            return false;
+
+                        bool lookupSucceeded = localMetadataSource.TryLookup(beatmap, out var result);
+
+                        if (lookupSucceeded)
+                        {
+                            Debug.Assert(result != null);
+                            beatmapSet.DateRanked = result.DateRanked;
+                            beatmapSet.DateSubmitted = result.DateSubmitted;
+                            return true;
+                        }
+
+                        Logger.Log($"Could not find {beatmapSet.GetDisplayString()} in local cache while backpopulating missing submission/rank date");
+                        return false;
+                    });
+
+                    if (succeeded)
+                        ++processedCount;
+                    else
+                        ++failedCount;
+                }
+                catch (ObjectDisposedException)
+                {
+                    throw;
+                }
+                catch (Exception e)
+                {
+                    Logger.Log($"Failed to update ranked/submitted dates for beatmap set {id}: {e}");
+                    ++failedCount;
+                }
+            }
+
+            completeNotification(notification, processedCount, beatmapSetIds.Count, failedCount);
         }
 
         private void updateNotificationProgress(ProgressNotification? notification, int processedCount, int totalCount)
@@ -502,7 +606,7 @@ namespace osu.Game.Database
         {
             // Importantly, also sleep if high performance session is active.
             // If we don't do this, memory usage can become runaway due to GC running in a more lenient mode.
-            while (localUserPlayInfo?.IsPlaying.Value == true || highPerformanceSessionManager?.IsSessionActive == true)
+            while (localUserPlayInfo?.PlayingState.Value != LocalUserPlayingState.NotPlaying || highPerformanceSessionManager?.IsSessionActive == true)
             {
                 Logger.Log("Background processing sleeping due to active gameplay...");
                 Thread.Sleep(TimeToSleepDuringGameplay);
