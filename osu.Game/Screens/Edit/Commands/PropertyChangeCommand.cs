@@ -27,8 +27,11 @@ namespace osu.Game.Screens.Edit.Commands
 
         public IMergeableCommand? MergeWith(IEditorCommand previous)
         {
-            if (previous is PropertyChangeCommand<TTarget, TProperty> command && command.Target == Target)
-                return command;
+            if (GetType() == previous.GetType())
+            {
+                if (ReferenceEquals(Target, ((PropertyChangeCommand<TTarget, TProperty>)previous).Target))
+                    return this;
+            }
 
             return null;
         }
