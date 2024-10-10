@@ -64,7 +64,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double aimValue = computeAimValue(score, osuAttributes);
             double speedValue = computeSpeedValue(score, osuAttributes);
-            double sliderReadingValue = computeSliderReadingValue(score, osuAttributes);
             double accuracyValue = computeAccuracyValue(score, osuAttributes);
             double flashlightValue = computeFlashlightValue(score, osuAttributes);
 
@@ -72,7 +71,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 Math.Pow(
                     Math.Pow(aimValue, 1.1) +
                     Math.Pow(speedValue, 1.1) +
-                    Math.Pow(sliderReadingValue, 1.1) +
                     Math.Pow(accuracyValue, 1.1) +
                     Math.Pow(flashlightValue, 1.1), 1.0 / 1.1
                 ) * multiplier;
@@ -81,7 +79,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             {
                 Aim = aimValue,
                 Speed = speedValue,
-                SliderReading = sliderReadingValue,
                 Accuracy = accuracyValue,
                 Flashlight = flashlightValue,
                 EffectiveMissCount = effectiveMissCount,
@@ -187,29 +184,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             speedValue *= Math.Pow(0.99, countMeh < totalHits / 500.0 ? 0 : countMeh - totalHits / 500.0);
 
             return speedValue;
-        }
-
-        private double computeSliderReadingValue(ScoreInfo score, OsuDifficultyAttributes attributes)
-        {
-            double sliderReadingValue = SliderReading.DifficultyToPerformance(attributes.SliderReadingDifficulty, attributes.AimDifficulty);
-
-            double lengthBonus = 0.95 + 0.4 * Math.Min(1.0, totalHits / 2000.0) +
-                                 (totalHits > 2000 ? Math.Log10(totalHits / 2000.0) * 0.5 : 0.0);
-            sliderReadingValue *= lengthBonus;
-
-            sliderReadingValue *= getComboScalingFactor(attributes);
-
-            if (score.Mods.Any(m => m is OsuModBlinds))
-                sliderReadingValue *= 1.3 + (totalHits * (0.0016 / (1 + 2 * effectiveMissCount)) * Math.Pow(accuracy, 16)) * (1 - 0.003 * attributes.DrainRate * attributes.DrainRate);
-
-            // We assume 15% of sliders in a map are difficult since there's no way to tell from the performance calculator.
-            double estimateDifficultSliders = Math.Max(1, attributes.SliderCount * 0.15);
-
-            double estimateSliderEndsDropped = Math.Clamp(Math.Min(countOk + countMeh + countMiss, attributes.MaxCombo - scoreMaxCombo), 0, estimateDifficultSliders);
-            double sliderNerfFactor = 1 - estimateSliderEndsDropped / estimateDifficultSliders;
-            sliderReadingValue *= sliderNerfFactor;
-
-            return sliderReadingValue;
         }
 
         private double computeAccuracyValue(ScoreInfo score, OsuDifficultyAttributes attributes)

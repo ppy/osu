@@ -2,12 +2,9 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Extensions.ObjectExtensions;
-using osu.Game.Rulesets.Difficulty.Preprocessing;
-using osu.Game.Rulesets.Objects;
-using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
+
 using osu.Game.Rulesets.Osu.Objects;
 using osuTK;
 
@@ -15,77 +12,19 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 {
     public static class SliderReadingEvaluator
     {
-        private const double slider_velocity_change_multiplier = 0.5;
         private const double slider_shape_reading_multiplier = 4;
-        private const double slider_end_distance_multiplier = 0.3;
 
         /// <summary>
         /// Evaluates the difficulty of tapping the current object, based on:
         /// </summary>
-        public static double EvaluateDifficultyOf(DifficultyHitObject current, List<OsuDifficultyHitObject> previousSliders)
+        public static double EvaluateDifficultyOf(Slider slider)
         {
-            if (current.BaseObject is not Slider)
-                return 0;
+            double complexityBonus = calculateSliderShapeComplexity(slider);
+            double pointUnpredictability = calculateSliderPointUnpredictability(slider);
 
-            // Assign prev as curr by default so it will get 0 bonuses
-            var osuCurrObj = (OsuDifficultyHitObject)current;
-            OsuDifficultyHitObject osuPrevObj = osuCurrObj;
-
-            Slider currSlider = (Slider)current.BaseObject;
-            Slider prevSlider = currSlider;
-
-            double aimCurr = osuCurrObj.TravelDistance / osuCurrObj.TravelTime;
-            double aimPrev = osuPrevObj.TravelDistance / osuPrevObj.TravelTime;
-
-            double weightedPrevVelocity = currSlider.Velocity;
-            if (previousSliders.Count > 0)
-            {
-                osuPrevObj = previousSliders[^1];
-                prevSlider = (Slider)osuPrevObj.BaseObject;
-
-                weightedPrevVelocity = 0;
-                int maxCount = Math.Min(5, previousSliders.Count);
-
-                for (int i = 1; i <= maxCount; i++)
-                {
-                    Slider loopSlider = (Slider)previousSliders[^i].BaseObject;
-                    weightedPrevVelocity += loopSlider.Velocity / Math.Pow(2, i);
-                }
-                // Adjusting accounting for gemoetric sum (1 - 0.5^n) / (1 - 0.5)
-                weightedPrevVelocity /= (1 - Math.Pow(0.5, maxCount)) * 2;
-            }
-
-            double complexityBonus = calculateSliderShapeComplexity(currSlider);
-
-            // Get velocity change bonus
-            double velocityChangeBonus = slider_velocity_change_multiplier * differenceCurve(currSlider.Velocity, weightedPrevVelocity, 0.5, 0.85);
-
-            // Punish velocity change if rhythms was different
-            velocityChangeBonus *= 1 - 0.7 * differenceCurve(currSlider.SpanDuration, prevSlider.SpanDuration, 0.5, 0.75);
-
-            double pointUnpredictability = calculateSliderPointUnpredictability(currSlider);
-
-            //complexityBonus *= 1 + velocityChangeBonus;
-
-            double difficulty = 0;
-            difficulty += aimCurr * complexityBonus * (1 + pointUnpredictability);
+            double difficulty = complexityBonus * (1 + pointUnpredictability);
 
             return difficulty;
-        }
-
-        /// <summary>
-        /// Returns curve that goes from 0 to 1 as difference increase, starting to increase on point 1 and getting max on point2
-        /// </summary>
-        /// <param name="value1"></param>
-        /// <param name="value2"></param>
-        /// <param name="point1"></param>
-        /// <param name="point2"></param>
-        /// <returns></returns>
-        private static double differenceCurve(double value1, double value2, double point1, double point2)
-        {
-            double similarity = Math.Min(value1, value2) / Math.Max(value1, value2);
-            if (Math.Max(value1, value2) <= 0) similarity = 0;
-            return 1 - sinusCurve(similarity, point1, point2);
         }
 
         /// <summary>
@@ -228,25 +167,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             lineBonus *= slider_shape_reading_multiplier / slider.SpanDuration;
             curveBonus *= slider_shape_reading_multiplier / slider.SpanDuration;
 
+            // Curve path takes more aim
             double curvedLengthBonus = (Vector2.Distance(head.Position, middlePos) + Vector2.Distance(middlePos, tail.Position))
                 / Vector2.Distance(head.Position, tail.Position) - 1;
-            curveBonus += curvedLengthBonus;
+
+            // But start to buff only from 0.2 and more
+            curveBonus += Math.Max(curvedLengthBonus - 0.2, 0);
 
             return Math.Min(lineBonus, curveBonus);
-        }
-
-        private static double calculateSliderEndDistanceDifficulty(Slider slider)
-        {
-            if (slider.LazyEndPosition is null) return 0;
-            if (slider.LazyTravelDistance == 0) return 0;
-
-            float visualDistance = Vector2.Distance(slider.StackedEndPosition, (Vector2)slider.LazyEndPosition);
-
-            var preLastObj = (OsuHitObject)slider.NestedHitObjects[^2];
-
-            double minimalMovement = Vector2.Distance((Vector2)slider.LazyEndPosition, preLastObj.Position) - slider.Radius * 4.8;
-            visualDistance *= (float)Math.Clamp(minimalMovement / slider.Radius, 0, 1); // buff only very long sliders
-            return (visualDistance / slider.LazyTravelDistance) * slider_end_distance_multiplier;
         }
 
         private static double calculateSliderPointUnpredictability(Slider slider)
@@ -267,7 +195,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 OsuHitObject currObj = (OsuHitObject)obj;
                 Vector2 currObjPos = currObj.StackedPosition;
 
-                if (prevObj0 == null)
+                if (prevObj0 == null || prevObjPos0 == null)
                 {
                     prevObj0 = currObj;
                     prevObjPos0 = currObjPos;

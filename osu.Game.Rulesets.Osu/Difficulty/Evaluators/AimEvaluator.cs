@@ -2,11 +2,9 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Linq;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Objects;
-using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 {
@@ -16,9 +14,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         private const double acute_angle_multiplier = 1.95;
         private const double slider_multiplier = 1.35;
         private const double velocity_change_multiplier = 0.75;
-
-        private const double slider_shape_reading_multiplier = 4;
-        private const double slider_end_distance_multiplier = 0.3;
 
         /// <summary>
         /// Evaluates the difficulty of aiming the current object, based on:
@@ -117,11 +112,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 velocityChangeBonus *= Math.Pow(Math.Min(osuCurrObj.StrainTime, osuLastObj.StrainTime) / Math.Max(osuCurrObj.StrainTime, osuLastObj.StrainTime), 2);
             }
 
-            if (withSliderTravelDistance && osuLastObj.BaseObject is Slider slider)
+            if (withSliderTravelDistance && osuLastObj.BaseObject is Slider)
             {
                 // Reward sliders based on velocity.
                 sliderBonus = osuLastObj.TravelDistance / osuLastObj.TravelTime;
-                sliderBonus *= calculateCurvature(slider);
             }
 
             // Add in acute angle bonus or wide angle bonus + velocity change bonus, whichever is larger.
@@ -132,34 +126,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 aimStrain += sliderBonus * slider_multiplier;
 
             return aimStrain;
-        }
-
-        private static double calculateCurvature(Slider slider)
-        {
-            if (slider.SpanDuration == 0) return 1;
-
-            //double minFollowRadius = slider.Radius;
-            //double maxFollowRadius = slider.Radius * 2.4;
-            //double deltaFollowRadius = maxFollowRadius - minFollowRadius;
-
-            //OsuHitObject head;
-            //if (slider.RepeatCount == 0)
-            //    head = (OsuHitObject)slider.NestedHitObjects[0];
-            //else
-            //    head = (OsuHitObject)slider.NestedHitObjects.Where(o => o is SliderRepeat).Last();
-
-            //var tail = (OsuHitObject)slider.NestedHitObjects[^1];
-
-            //double numberOfUpdates = Math.Ceiling(2 * slider.Path.Distance / slider.Radius);
-            //double deltaT = slider.SpanDuration / numberOfUpdates;
-
-            //double middleTime = (head.StartTime + tail.StartTime) / 2 - head.StartTime;
-            //var middlePos = positionWithRepeats(middleTime, slider);
-
-            //double curvedLengthBonus = (Vector2.Distance(head.Position, middlePos) + Vector2.Distance(middlePos, tail.Position))
-            //    / Vector2.Distance(head.Position, tail.Position) - 1;
-            //curveBonus += curvedLengthBonus;
-            return 1;
         }
 
         private static double calcWideAngleBonus(double angle) => Math.Pow(Math.Sin(3.0 / 4 * (Math.Min(5.0 / 6 * Math.PI, Math.Max(Math.PI / 6, angle)) - Math.PI / 6)), 2);

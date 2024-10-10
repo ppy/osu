@@ -20,7 +20,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         [JsonProperty("flashlight")]
         public double Flashlight { get; set; }
-        public double SliderReading { get; set; }
 
         [JsonProperty("effective_miss_count")]
         public double EffectiveMissCount { get; set; }
