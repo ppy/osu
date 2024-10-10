@@ -34,20 +34,12 @@ namespace osu.Game.Rulesets.Objects
         /// <summary>
         /// The X component of <see cref="Position"/>.
         /// </summary>
-        public float X
-        {
-            get => position.X;
-            set => Position = Position with { X = value };
-        }
+        public float X => position.X;
 
         /// <summary>
         /// The Y component of <see cref="Position"/>.
         /// </summary>
-        public float Y
-        {
-            get => position.Y;
-            set => Position = Position with { Y = value };
-        }
+        public float Y => position.Y;
 
         private PathType? type;
 
