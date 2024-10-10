@@ -6,7 +6,7 @@ using osu.Game.Screens.Edit.Commands;
 
 namespace osu.Game.Screens.Edit
 {
-    public static class EditorCommandManagerExtension
+    public static class EditorCommandHandlerExtension
     {
         public static void SafeSubmit(this EditorCommandHandler? manager, IEditorCommand command, bool commitImmediately = false)
         {
