@@ -3,8 +3,8 @@
 
 using System;
 using System.Linq;
+using HidSharp.Reports.Units;
 using osu.Framework.Extensions.ObjectExtensions;
-
 using osu.Game.Rulesets.Osu.Objects;
 using osuTK;
 
@@ -167,22 +167,15 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             lineBonus *= slider_shape_reading_multiplier / slider.SpanDuration;
             curveBonus *= slider_shape_reading_multiplier / slider.SpanDuration;
 
-            // Curve path takes more aim
-            double curvedLengthBonus = (Vector2.Distance(head.Position, middlePos) + Vector2.Distance(middlePos, tail.Position))
-                / Vector2.Distance(head.Position, tail.Position) - 1;
-
-            // But start to buff only from 0.2 and more
-            curveBonus += Math.Max(curvedLengthBonus - 0.2, 0);
-
             return Math.Min(lineBonus, curveBonus);
         }
 
         private static double calculateSliderPointUnpredictability(Slider slider)
         {
-            double currAngle = -1, prevAngle = -1;
-            double currVelocity, prevVelocity = -1;
+            double prevAngle = double.NaN;
+            double prevDeltaTime = double.NaN;
 
-            OsuHitObject? prevObj0 = null, prevObj1;
+            OsuHitObject? prevObj0 = null, prevObj1 = null;
             Vector2? prevObjPos0 = null, prevObjPos1 = null;
 
             double totalBonus = 0;
@@ -205,22 +198,47 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 double currDistance = Vector2.Distance(currObjPos, (Vector2)prevObjPos0);
                 double currDeltaTime = currObj.StartTime - prevObj0.StartTime;
 
-                currVelocity = currDistance / currDeltaTime;
-                if (prevVelocity == -1) prevVelocity = currVelocity;
+                double currVelocity = currDistance / currDeltaTime;
 
-                if (prevObjPos1.IsNotNull()) 
-                    currAngle = calculateAngleBetweenThreePoints(currObjPos, (Vector2)prevObjPos0, (Vector2)prevObjPos1);
-                if (prevAngle == -1)
-                    prevAngle = currAngle;
+                if (prevObj1 == null || prevObjPos1 == null)
+                {
+                    prevObj1 = prevObj0;
+                    prevObj0 = currObj;
 
-                // Apply bonus
+                    prevObjPos1 = prevObjPos0;
+                    prevObjPos0 = currObjPos;
 
-                double angleChangeBonus = sinusCurve(Math.Abs(currAngle - prevAngle), 0.2, 0.7);
+                    prevDeltaTime = currDeltaTime;
+                    continue;
+                }
 
-                // Punish vide angles
-                angleChangeBonus *= 1 - sinusCurve(Math.Abs(currAngle), Math.PI / 2, Math.PI * 5 / 6);
+                // Angle change bonus
 
-                double velocityChangeBonus = sinusCurve(Math.Abs(currVelocity - prevVelocity), 0.2, 0.6);
+                double currAngle = calculateAngleSigned((Vector2)prevObjPos1, (Vector2)prevObjPos0, currObjPos);
+
+                double angleChangeBonus = 0;
+                if (!double.IsNaN(prevAngle))
+                {
+                    angleChangeBonus = sinusCurve(Math.Abs(currAngle - prevAngle), 0.2, 0.7);
+
+                    // Punish wide angles
+                    angleChangeBonus *= 1 - sinusCurve(Math.Abs(currAngle), Math.PI / 2, Math.PI * 5 / 6);
+                }
+
+                // Velocity change bonus
+
+                double prevDistance = Vector2.Distance((Vector2)prevObjPos0, (Vector2)prevObjPos1);
+                double prevVelocity = prevDistance / prevDeltaTime;
+
+                (double prevCircularDistance, double currCircularDistance) = calculateCircularDistance((Vector2)prevObjPos1, (Vector2)prevObjPos0, currObjPos);
+                double prevCircularVelocity = prevCircularDistance / prevDeltaTime;
+                double currCircularVelocity = currCircularDistance / currDeltaTime;
+
+                double velocityChangeBonusLinear = sinusCurve(Math.Abs(currVelocity - prevVelocity), 0.2, 0.6);
+                double velocityChangeBonusCircular = sinusCurve(Math.Abs(currCircularVelocity - prevCircularVelocity), 0.2, 0.6);
+
+                double velocityChangeBonus = Math.Min(velocityChangeBonusLinear, velocityChangeBonusCircular);
+
                 totalBonus += (angleChangeBonus + velocityChangeBonus) * 2;
                 objectCount += 1;
 
@@ -233,24 +251,61 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 prevObjPos0 = currObjPos;
 
                 prevVelocity = currVelocity;
+                prevDeltaTime = currDeltaTime;
                 prevAngle = currAngle;
 
                 if (obj is SliderEndCircle || obj is SliderRepeat) break;
             }
 
+            if (objectCount == 0)
+                return 0;
+
             return Math.Min(1, totalBonus / objectCount);
         }
 
-        // absolute (signed!!!) angle
-        private static double calculateAngleBetweenThreePoints(Vector2 p1, Vector2 p2, Vector2 p3)
+        private static (double prev, double curr) calculateCircularDistance(Vector2 p1, Vector2 p2, Vector2 p3)
         {
-            Vector2 v1 = p2 - p1;
-            Vector2 v2 = p1 - p3;
+            static double sqr(double x) => x * x;
+            double currDist = Vector2.Distance(p2, p3);
+            double prevDist = Vector2.Distance(p1, p2);
+            double? angle = Math.Abs(calculateAngleSigned(p1, p2, p3));
+
+            double triangleArea = currDist * prevDist * Math.Sin(angle ?? 0) / 2;
+            if (triangleArea == 0)
+                return (prevDist, currDist);
+
+            double thirdSide = Math.Sqrt(sqr(currDist) + sqr(prevDist) - 2 * currDist * prevDist * Math.Cos(angle ?? Math.PI));
+            double circleRadius = currDist * prevDist * thirdSide / 4 / triangleArea;
+
+            double circularAnglePrev = Math.Abs(calculateAngleSigned(p1, p3, p2));
+            double circularAngleCurr = Math.Abs(calculateAngleSigned(p3, p1, p2));
+
+            double flowDistancePrev = circularAnglePrev / Math.PI * circleRadius;
+            double flowDistanceCurr = circularAngleCurr / Math.PI * circleRadius;
+
+            return (flowDistancePrev, flowDistanceCurr);
+        }
+
+        private static double calculateAngleSigned(Vector2 p1, Vector2 p2, Vector2 p3)
+        {
+            Vector2 v1 = p3 - p2;
+            Vector2 v2 = p1 - p2;
 
             float dot = Vector2.Dot(v1, v2);
             float det = v1.X * v2.Y - v1.Y * v2.X;
 
             return Math.Atan2(det, dot);
+        }
+
+        private static double calculateAngleAbs(Vector2 p1, Vector2 p2, Vector2 p3)
+        {
+            Vector2 v1 = p2 - p1;
+            Vector2 v2 = p2 - p3;
+
+            float dot = v1.X * v2.X + v1.Y * v2.Y;
+            float modSum = v1.Length * v2.Length;
+
+            return Math.Acos(dot / modSum);
         }
     }
 }
