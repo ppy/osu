@@ -73,7 +73,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         public LocalisableString TooltipText { get; }
 
-        internal void TriggerAction()
+        public void TriggerAction()
         {
             Circle.FlashColour(Colours.GrayF, 300);
 
