@@ -3,7 +3,7 @@
 
 namespace osu.Game.Screens.Edit.Commands
 {
-    public abstract class PropertyChangeCommand<TTarget, TProperty> : IEditorCommand, IMergeableCommand where TTarget : class
+    public abstract class PropertyChangeCommand<TTarget, TProperty> : IMergeableCommand where TTarget : class
     {
         protected abstract TProperty ReadValue(TTarget target);
 
