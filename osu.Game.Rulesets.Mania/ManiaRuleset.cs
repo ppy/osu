@@ -35,6 +35,7 @@ using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Scoring.Legacy;
 using osu.Game.Rulesets.UI;
 using osu.Game.Scoring;
+using osu.Game.Screens.Edit.Compose.Components.Timeline;
 using osu.Game.Screens.Edit.Setup;
 using osu.Game.Screens.Ranking.Statistics;
 using osu.Game.Skinning;
@@ -63,6 +64,8 @@ namespace osu.Game.Rulesets.Mania
         public override string RulesetAPIVersionSupported => CURRENT_RULESET_API_VERSION;
 
         public override HitObjectComposer CreateHitObjectComposer() => new ManiaHitObjectComposer(this);
+
+        public override TimelineBlueprintContainer CreateTimelineBlueprintContainer(HitObjectComposer composer) => new ManiaTimelineBlueprintContainer(composer);
 
         public override IBeatmapVerifier CreateBeatmapVerifier() => new ManiaBeatmapVerifier();
 
