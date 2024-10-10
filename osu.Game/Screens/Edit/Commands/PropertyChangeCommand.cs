@@ -51,6 +51,8 @@ namespace osu.Game.Screens.Edit.Commands
 
         public IEditorCommand CreateUndo() => CreateInstance(Target, ReadValue(Target));
 
+        public bool IsRedundant => EqualityComparer<TValue>.Default.Equals(Value, ReadValue(Target));
+
         public IEditorCommand? MergeWith(IEditorCommand previous)
         {
             if (GetType() == previous.GetType())
