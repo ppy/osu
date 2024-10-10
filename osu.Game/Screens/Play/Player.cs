@@ -94,6 +94,7 @@ namespace osu.Game.Screens.Play
         public IBindable<bool> LocalUserPlaying => localUserPlaying;
 
         private readonly Bindable<bool> localUserPlaying = new Bindable<bool>();
+        private readonly Bindable<LocalUserPlayingState> playingState = new Bindable<LocalUserPlayingState>();
 
         public int RestartCount;
 
@@ -230,9 +231,6 @@ namespace osu.Game.Screens.Play
 
             if (game != null)
                 gameActive.BindTo(game.IsActive);
-
-            if (game is OsuGame osuGame)
-                LocalUserPlaying.BindTo(osuGame.LocalUserPlaying);
 
             DrawableRuleset = ruleset.CreateDrawableRulesetWith(playableBeatmap, gameplayMods);
             dependencies.CacheAs(DrawableRuleset);
@@ -510,9 +508,16 @@ namespace osu.Game.Screens.Play
 
         private void updateGameplayState()
         {
-            bool inGameplay = !DrawableRuleset.HasReplayLoaded.Value && !DrawableRuleset.IsPaused.Value && !breakTracker.IsBreakTime.Value && !GameplayState.HasFailed;
-            OverlayActivationMode.Value = inGameplay ? OverlayActivation.Disabled : OverlayActivation.UserTriggered;
-            localUserPlaying.Value = inGameplay;
+            bool inGameplay = !DrawableRuleset.HasReplayLoaded.Value && !GameplayState.HasPassed && !GameplayState.HasFailed;
+            bool inBreak = breakTracker.IsBreakTime.Value || DrawableRuleset.IsPaused.Value;
+
+            if (inGameplay)
+                playingState.Value = inBreak ? LocalUserPlayingState.Break : LocalUserPlayingState.Playing;
+            else
+                playingState.Value = LocalUserPlayingState.NotPlaying;
+
+            localUserPlaying.Value = playingState.Value == LocalUserPlayingState.Playing;
+            OverlayActivationMode.Value = playingState.Value == LocalUserPlayingState.Playing ? OverlayActivation.Disabled : OverlayActivation.UserTriggered;
         }
 
         private void updateSampleDisabledState()
@@ -1275,12 +1280,6 @@ namespace osu.Game.Screens.Play
             }
         }
 
-        #endregion
-
-        IBindable<bool> ISamplePlaybackDisabler.SamplePlaybackDisabled => samplePlaybackDisabled;
-
-        IBindable<bool> ILocalUserPlayInfo.IsPlaying => LocalUserPlaying;
-
         /// <summary>
         /// Create and add <see cref="ReplayAnalysisSettings"/> to settings overlay.
         /// </summary>
@@ -1290,5 +1289,11 @@ namespace osu.Game.Screens.Play
             if (replayAnalysisSettings is not null)
                 HUDOverlay.PlayerSettingsOverlay.Add(replayAnalysisSettings);
         }
+
+        #endregion
+
+        IBindable<bool> ISamplePlaybackDisabler.SamplePlaybackDisabled => samplePlaybackDisabled;
+
+        public IBindable<LocalUserPlayingState> PlayingState => playingState;
     }
 }

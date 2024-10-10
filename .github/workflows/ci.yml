@@ -133,7 +133,7 @@ jobs:
           dotnet-version: "8.0.x"
 
       - name: Install .NET Workloads
-        run: dotnet workload install maui-ios
+        run: dotnet workload install ios --from-rollback-file https://raw.githubusercontent.com/ppy/osu-framework/refs/heads/master/workloads.json
 
       - name: Build
         run: dotnet build -c Debug osu.iOS
