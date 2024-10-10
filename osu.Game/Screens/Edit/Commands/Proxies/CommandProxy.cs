@@ -7,7 +7,6 @@ namespace osu.Game.Screens.Edit.Commands.Proxies
     {
         EditorCommandHandler? CommandHandler { get; init; }
         T Target { get; init; }
-        void Submit(IEditorCommand command);
     }
 
     public readonly struct CommandProxy<T> : ICommandProxy<T>
@@ -20,6 +19,5 @@ namespace osu.Game.Screens.Edit.Commands.Proxies
 
         public EditorCommandHandler? CommandHandler { get; init; }
         public T Target { get; init; }
-        public void Submit(IEditorCommand command) => CommandHandler.SafeSubmit(command);
     }
 }

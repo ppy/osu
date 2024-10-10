@@ -11,6 +11,7 @@ using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Screens.Edit;
+using osu.Game.Screens.Edit.Commands.Proxies;
 using osu.Game.Screens.Edit.Compose.Components;
 using osu.Game.Utils;
 using osuTK;
@@ -20,7 +21,7 @@ namespace osu.Game.Rulesets.Osu.Edit
     public partial class OsuSelectionRotationHandler : SelectionRotationHandler
     {
         [Resolved]
-        private IEditorChangeHandler? changeHandler { get; set; }
+        private EditorCommandHandler? commandHandler { get; set; }
 
         private BindableList<HitObject> selectedItems { get; } = new BindableList<HitObject>();
 
@@ -57,8 +58,6 @@ namespace osu.Game.Rulesets.Osu.Edit
 
             base.Begin();
 
-            changeHandler?.BeginChange();
-
             objectsInRotation = selectedMovableObjects.ToArray();
             DefaultOrigin = GeometryUtils.MinimumEnclosingCircle(objectsInRotation).Item1;
             originalPositions = objectsInRotation.ToDictionary(obj => obj, obj => obj.Position);
@@ -78,14 +77,18 @@ namespace osu.Game.Rulesets.Osu.Edit
 
             foreach (var ho in objectsInRotation)
             {
-                ho.Position = GeometryUtils.RotatePointAroundOrigin(originalPositions[ho], actualOrigin, rotation);
+                ho.AsCommandProxy(commandHandler).SetPosition(GeometryUtils.RotatePointAroundOrigin(originalPositions[ho], actualOrigin, rotation));
 
                 if (ho is IHasPath withPath)
                 {
                     var originalPath = originalPathControlPointPositions[withPath];
 
                     for (int i = 0; i < withPath.Path.ControlPoints.Count; ++i)
-                        withPath.Path.ControlPoints[i].Position = GeometryUtils.RotatePointAroundOrigin(originalPath[i], Vector2.Zero, rotation);
+                    {
+                        withPath.Path.ControlPoints[i]
+                                .AsCommandProxy(commandHandler)
+                                .SetPosition(GeometryUtils.RotatePointAroundOrigin(originalPath[i], Vector2.Zero, rotation));
+                    }
                 }
             }
         }
@@ -95,7 +98,7 @@ namespace osu.Game.Rulesets.Osu.Edit
             if (!OperationInProgress.Value)
                 throw new InvalidOperationException($"Cannot {nameof(Commit)} a rotate operation without calling {nameof(Begin)} first!");
 
-            changeHandler?.EndChange();
+            commandHandler?.Commit();
 
             base.Commit();
 

@@ -15,10 +15,11 @@ using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Beatmaps;
+using osu.Game.Rulesets.Osu.Edit.Commands;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Screens.Edit;
-using osu.Game.Screens.Edit.Commands;
+using osu.Game.Screens.Edit.Commands.Proxies;
 using osu.Game.Screens.Edit.Compose.Components;
 using osu.Game.Utils;
 using osuTK;
@@ -77,8 +78,8 @@ namespace osu.Game.Rulesets.Osu.Edit
 
             localDelta = moveSelectionInBounds(localDelta);
 
-            foreach (var h in hitObjects)
-                commandManager.SafeSubmit(new SetPositionCommand(h, h.Position + localDelta));
+            foreach (var h in hitObjects.AsListCommandProxy(commandManager))
+                h.SetPosition(h.Position() + localDelta);
 
             // manually update stacking.
             // this intentionally bypasses the editor `UpdateState()` / beatmap processor flow for performance reasons,
@@ -108,12 +109,12 @@ namespace osu.Game.Rulesets.Osu.Edit
             foreach (var h in hitObjects)
             {
                 if (moreThanOneObject)
-                    commandManager.SafeSubmit(new SetStartTimeCommand(h, endTime - (h.GetEndTime() - startTime)));
+                    h.AsCommandProxy(commandManager).SetStartTime(endTime - (h.GetEndTime() - startTime));
 
                 if (h is Slider slider)
                 {
-                    slider.Path.Reverse(out Vector2 offset);
-                    slider.Position += offset;
+                    slider.Path.AsCommandProxy(commandManager).Reverse(out Vector2 offset);
+                    slider.AsCommandProxy(commandManager).SetPosition(slider.Position + offset);
                 }
             }
 
@@ -121,7 +122,7 @@ namespace osu.Game.Rulesets.Osu.Edit
             hitObjects = hitObjects.OrderBy(obj => obj.StartTime).ToList();
 
             for (int i = 0; i < hitObjects.Count; ++i)
-                hitObjects[i].NewCombo = newComboOrder[i];
+                hitObjects[i].AsCommandProxy(commandManager).SetNewCombo(newComboOrder[i]);
 
             return true;
         }
@@ -161,25 +162,25 @@ namespace osu.Game.Rulesets.Osu.Edit
 
             bool didFlip = false;
 
-            foreach (var h in hitObjects)
+            foreach (var h in hitObjects.AsListCommandProxy(commandManager))
             {
-                var flippedPosition = GeometryUtils.GetFlippedPosition(flipAxis, flipQuad, h.Position);
+                var flippedPosition = GeometryUtils.GetFlippedPosition(flipAxis, flipQuad, h.Position());
 
                 // Clamp the flipped position inside the playfield bounds, because the flipped position might be outside the playfield bounds if the origin is not centered.
                 flippedPosition = Vector2.Clamp(flippedPosition, Vector2.Zero, OsuPlayfield.BASE_SIZE);
 
-                if (!Precision.AlmostEquals(flippedPosition, h.Position))
+                if (!Precision.AlmostEquals(flippedPosition, h.Position()))
                 {
-                    h.Position = flippedPosition;
+                    h.SetPosition(flippedPosition);
                     didFlip = true;
                 }
 
-                if (h is Slider slider)
+                if (h.Target is Slider slider)
                 {
                     didFlip = true;
 
-                    foreach (var cp in slider.Path.ControlPoints)
-                        cp.Position = GeometryUtils.GetFlippedPosition(flipAxis, controlPointFlipQuad, cp.Position);
+                    foreach (var cp in slider.Path.ControlPoints.AsListCommandProxy(commandManager))
+                        cp.SetPosition(GeometryUtils.GetFlippedPosition(flipAxis, controlPointFlipQuad, cp.Position()));
                 }
             }
 
@@ -231,11 +232,9 @@ namespace osu.Game.Rulesets.Osu.Edit
             if (!canMerge(mergeableObjects))
                 return;
 
-            EditorBeatmap.BeginChange();
-
             // Have an initial slider object.
             var firstHitObject = mergeableObjects[0];
-            var mergedHitObject = firstHitObject as Slider ?? new Slider
+            var mergedHitObject = new Slider
             {
                 StartTime = firstHitObject.StartTime,
                 Position = firstHitObject.Position,
@@ -285,28 +284,18 @@ namespace osu.Game.Rulesets.Osu.Edit
             }
 
             // Make sure only the merged hit object is in the beatmap.
-            if (firstHitObject is Slider)
+            foreach (var selectedMergeableObject in mergeableObjects)
             {
-                foreach (var selectedMergeableObject in mergeableObjects.Skip(1))
-                {
-                    EditorBeatmap.Remove(selectedMergeableObject);
-                }
+                EditorBeatmap.AsCommandProxy(commandManager).Remove(selectedMergeableObject);
             }
-            else
-            {
-                foreach (var selectedMergeableObject in mergeableObjects)
-                {
-                    EditorBeatmap.Remove(selectedMergeableObject);
-                }
 
-                EditorBeatmap.Add(mergedHitObject);
-            }
+            EditorBeatmap.AsCommandProxy(commandManager).Add(mergedHitObject);
 
             // Make sure the merged hitobject is selected.
             SelectedItems.Clear();
             SelectedItems.Add(mergedHitObject);
 
-            EditorBeatmap.EndChange();
+            CommandHandler?.Commit();
         }
 
         protected override void OnOperationEnded()
