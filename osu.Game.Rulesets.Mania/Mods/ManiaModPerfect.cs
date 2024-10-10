@@ -9,7 +9,7 @@ namespace osu.Game.Rulesets.Mania.Mods
 {
     public class ManiaModPerfect : ModPerfect
     {
-        protected override bool FailCondition(HealthProcessor healthProcessor, JudgementResult result)
+        public override bool ShouldFail(JudgementResult result)
         {
             if (!isRelevantResult(result.Judgement.MinResult) && !isRelevantResult(result.Judgement.MaxResult) && !isRelevantResult(result.Type))
                 return false;
