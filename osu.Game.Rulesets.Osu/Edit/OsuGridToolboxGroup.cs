@@ -259,7 +259,7 @@ namespace osu.Game.Rulesets.Osu.Edit
         {
             switch (e.Action)
             {
-                case GlobalAction.EditorCycleGridDisplayMode:
+                case GlobalAction.EditorCycleGridSpacing:
                     nextGridSize();
                     return true;
 
