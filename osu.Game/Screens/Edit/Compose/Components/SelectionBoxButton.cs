@@ -51,8 +51,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         protected override bool OnClick(ClickEvent e)
         {
-            Circle.FlashColour(Colours.GrayF, 300);
-
             Clicked?.Invoke();
 
             TriggerAction();
@@ -77,6 +75,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         internal void TriggerAction()
         {
+            Circle.FlashColour(Colours.GrayF, 300);
+
             TriggerOperationStarted();
             Action?.Invoke();
             TriggerOperationEnded();
