@@ -229,9 +229,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double flashlightValue = Flashlight.DifficultyToPerformance(attributes.FlashlightDifficulty);
 
-            // Penalize misses by assessing # of misses relative to the total # of objects. Default a 3% reduction for any # of misses.
-            if (effectiveMissCount > 0)
-                flashlightValue *= 0.97 * Math.Pow(1 - Math.Pow(effectiveMissCount / totalHits, 0.775), Math.Pow(effectiveMissCount, .875));
+            // Penalize misses by assessing # of misses relative to the total # of objects. Default a 3% reduction for at least 1 miss.
+            double missPenaltyBase = 1 - 0.03 * Math.Min(effectiveMissCount, 1);
+            flashlightValue *= missPenaltyBase * Math.Pow(1 - Math.Pow(effectiveMissCount / totalHits, 0.775), Math.Pow(effectiveMissCount, .875));
 
             flashlightValue *= getComboScalingFactor(attributes);
 
@@ -247,6 +247,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             return flashlightValue;
         }
 
+        // https://www.desmos.com/calculator/knduquaytu
         private double calculateEffectiveMissCount(OsuDifficultyAttributes attributes)
         {
             // Guess the number of misses + slider breaks from combo
@@ -254,9 +255,20 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             if (attributes.SliderCount > 0)
             {
-                double fullComboThreshold = attributes.MaxCombo - 0.1 * attributes.SliderCount;
-                if (scoreMaxCombo < fullComboThreshold)
-                    comboBasedMissCount = fullComboThreshold / Math.Max(1.0, scoreMaxCombo);
+                double fullComboThreshold = attributes.MaxCombo - 0.12 * attributes.SliderCount;
+
+                // Value for backwards compatibility with previous formula
+                double fullComboThresholdBase = attributes.MaxCombo - 0.1 * attributes.SliderCount;
+
+                // Curve for misscounts > 1
+                double mainCurve = fullComboThresholdBase / Math.Max(1.0, scoreMaxCombo);
+
+                // Curve for transition from misscount 0 to 1
+                double transitionCurve = Math.Max(0, 1 - 2 * (scoreMaxCombo - fullComboThreshold) / (attributes.MaxCombo - fullComboThreshold));
+
+                // Combine two curves with min, because main curve is always bigger than transition before fullComboThreshold
+                // While transition curve grows much faster than main curve
+                comboBasedMissCount = Math.Min(mainCurve, transitionCurve);
             }
 
             // Clamp miss count to maximum amount of possible breaks
@@ -268,7 +280,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         // Miss penalty assumes that a player will miss on the hardest parts of a map,
         // so we use the amount of relatively difficult sections to adjust miss penalty
         // to make it more punishing on maps with lower amount of hard sections.
-        private double calculateMissPenalty(double missCount, double difficultStrainCount) => 0.96 / ((missCount / (4 * Math.Pow(Math.Log(difficultStrainCount), 0.94))) + 1);
+        private double calculateMissPenalty(double missCount, double difficultStrainCount) => (1 - 0.04 * Math.Min(missCount, 1)) / ((missCount / (4 * Math.Pow(Math.Log(difficultStrainCount), 0.94))) + 1);
         private double getComboScalingFactor(OsuDifficultyAttributes attributes) => attributes.MaxCombo <= 0 ? 1.0 : Math.Min(Math.Pow(scoreMaxCombo, 0.8) / Math.Pow(attributes.MaxCombo, 0.8), 1.0);
         private int totalHits => countGreat + countOk + countMeh + countMiss;
     }
