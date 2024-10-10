@@ -59,8 +59,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
         {
             float fixedWidth = DrawWidth / ScreenSpaceDrawQuad.Width; // the width at which screen-space thickness will be 1px
 
-            // Resolution is low enough
-            if (fixedWidth > 0.4f)
+            // At 4k the grid (with 512px draw width) will be around 2167 pixels wide, let's use 2000px as a nice round value to increase thickness at.
+            if (ScreenSpaceDrawQuad.Width < 2000)
                 return fixedWidth;
 
             return fixedWidth * 2f;
