@@ -27,7 +27,7 @@ namespace osu.Game.Screens.Edit.Commands
         public void Submit(IEditorCommand command) => CommandHandler.SafeSubmit(command);
     }
 
-    public readonly struct ListCommandProxy<T, TItem, TItemProxy> : ICommandProxy<T>, IList<TItemProxy> where T : IList<TItem> where TItemProxy : ICommandProxy<TItem>, new()
+    public readonly struct ListCommandProxy<T, TItemProxy, TItem> : ICommandProxy<T>, IList<TItemProxy> where T : IList<TItem> where TItemProxy : ICommandProxy<TItem>, new()
     {
         public ListCommandProxy(EditorCommandHandler? commandHandler, T target)
         {

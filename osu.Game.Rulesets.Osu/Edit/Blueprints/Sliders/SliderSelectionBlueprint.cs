@@ -499,7 +499,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
             editorBeatmap.SelectedHitObjects.Clear();
 
-            var controlPointsProxy = new ListCommandProxy<BindableList<PathControlPoint>, PathControlPoint, CommandProxy<PathControlPoint>>(commandHandler, controlPoints);
+            var controlPointsProxy = new ListCommandProxy<BindableList<PathControlPoint>, CommandProxy<PathControlPoint>, PathControlPoint>(commandHandler, controlPoints);
 
             foreach (var splitPoint in controlPointsToSplitAt)
             {

@@ -13,8 +13,8 @@ namespace osu.Game.Screens.Edit.Commands
 
         public static void SetExpectedDistance(this CommandProxy<SliderPath> proxy, double? value) => proxy.Submit(new SetExpectedDistanceCommand(proxy.Target, value));
 
-        public static ListCommandProxy<BindableList<PathControlPoint>, PathControlPoint, CommandProxy<PathControlPoint>> ControlPoints(this CommandProxy<SliderPath> proxy) =>
-            new ListCommandProxy<BindableList<PathControlPoint>, PathControlPoint, CommandProxy<PathControlPoint>>(proxy.CommandHandler, proxy.Target.ControlPoints);
+        public static ListCommandProxy<BindableList<PathControlPoint>, CommandProxy<PathControlPoint>, PathControlPoint> ControlPoints(this CommandProxy<SliderPath> proxy) =>
+            new ListCommandProxy<BindableList<PathControlPoint>, CommandProxy<PathControlPoint>, PathControlPoint>(proxy.CommandHandler, proxy.Target.ControlPoints);
 
         public static IEnumerable<double> GetSegmentEnds(this ICommandProxy<SliderPath> proxy) => proxy.Target.GetSegmentEnds();
     }
