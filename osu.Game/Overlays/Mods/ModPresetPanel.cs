@@ -55,7 +55,12 @@ namespace osu.Game.Overlays.Mods
 
         protected override void Select()
         {
-            var selectedSystemMods = selectedMods.Value.Where(mod => mod.Type == ModType.System);
+            // this implicitly presumes that if a system mod declares incompatibility with a non-system mod,
+            // the non-system mod should take precedence.
+            // if this assumption is ever broken, this should be reconsidered.
+            var selectedSystemMods = selectedMods.Value.Where(mod => mod.Type == ModType.System &&
+                                                                     !mod.IncompatibleMods.Any(t => Preset.Value.Mods.Any(t.IsInstanceOfType)));
+
             // will also have the side effect of activating the preset (see `updateActiveState()`).
             selectedMods.Value = Preset.Value.Mods.Concat(selectedSystemMods).ToArray();
         }

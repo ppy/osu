@@ -30,7 +30,7 @@ namespace osu.Game.Overlays.Comments
 
         public Color4 AccentColour { get; set; }
 
-        protected override IEnumerable<Drawable> EffectTargets => null;
+        protected override IEnumerable<Drawable> EffectTargets => Enumerable.Empty<Drawable>();
 
         [Resolved]
         private IAPIProvider api { get; set; }

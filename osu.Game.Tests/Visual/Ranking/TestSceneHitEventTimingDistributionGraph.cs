@@ -83,6 +83,14 @@ namespace osu.Game.Tests.Visual.Ranking
         }
 
         [Test]
+        public void TestNonBasicHitResultsAreIgnored()
+        {
+            createTest(CreateDistributedHitEvents(0, 50)
+                       .Select(h => new HitEvent(h.TimeOffset, 1.0, h.TimeOffset > 0 ? HitResult.Ok : HitResult.LargeTickHit, placeholder_object, placeholder_object, null))
+                       .ToList());
+        }
+
+        [Test]
         public void TestMultipleWindowsOfHitResult()
         {
             var wide = CreateDistributedHitEvents(0, 50).Select(h =>

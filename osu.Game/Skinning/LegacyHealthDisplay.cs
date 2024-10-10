@@ -79,7 +79,14 @@ namespace osu.Game.Skinning
             marker.Position = fill.Position + new Vector2(fill.DrawWidth, isNewStyle ? fill.DrawHeight / 2 : 0);
         }
 
-        protected override void Flash() => marker.Flash();
+        protected override void HealthChanged(bool increase)
+        {
+            if (increase)
+                marker.Bulge();
+            base.HealthChanged(increase);
+        }
+
+        protected override void Flash() => marker.Flash(Current.Value >= epic_cutoff);
 
         private static Texture getTexture(ISkin skin, string name) => skin?.GetTexture($"scorebar-{name}");
 
@@ -113,19 +120,16 @@ namespace osu.Game.Skinning
                 Origin = Anchor.Centre,
             };
 
-            protected override void LoadComplete()
+            protected override void Update()
             {
-                base.LoadComplete();
+                base.Update();
 
-                Current.BindValueChanged(hp =>
-                {
-                    if (hp.NewValue < 0.2f)
-                        Main.Texture = superDangerTexture;
-                    else if (hp.NewValue < epic_cutoff)
-                        Main.Texture = dangerTexture;
-                    else
-                        Main.Texture = normalTexture;
-                });
+                if (Current.Value < 0.2f)
+                    Main.Texture = superDangerTexture;
+                else if (Current.Value < epic_cutoff)
+                    Main.Texture = dangerTexture;
+                else
+                    Main.Texture = normalTexture;
             }
         }
 
@@ -226,37 +230,30 @@ namespace osu.Game.Skinning
 
             public abstract Sprite CreateSprite();
 
-            protected override void LoadComplete()
+            public override void Flash(bool isEpic)
             {
-                base.LoadComplete();
-
-                Current.BindValueChanged(val =>
-                {
-                    if (val.NewValue > val.OldValue)
-                        bulgeMain();
-                });
-            }
-
-            public override void Flash()
-            {
-                bulgeMain();
-
-                bool isEpic = Current.Value >= epic_cutoff;
-
+                Bulge();
                 explode.Blending = isEpic ? BlendingParameters.Additive : BlendingParameters.Inherit;
                 explode.ScaleTo(1).Then().ScaleTo(isEpic ? 2 : 1.6f, 120);
                 explode.FadeOutFromOne(120);
             }
 
-            private void bulgeMain() =>
+            public override void Bulge()
+            {
+                base.Bulge();
                 Main.ScaleTo(1.4f).Then().ScaleTo(1, 200, Easing.Out);
+            }
         }
 
         public partial class LegacyHealthPiece : CompositeDrawable
         {
             public Bindable<double> Current { get; } = new Bindable<double>();
 
-            public virtual void Flash()
+            public virtual void Bulge()
+            {
+            }
+
+            public virtual void Flash(bool isEpic)
             {
             }
         }

@@ -4,9 +4,11 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using osu.Framework.Extensions.ListExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Performance;
+using osu.Framework.Lists;
 
 namespace osu.Game.Rulesets.Objects.Pooling
 {
@@ -35,7 +37,7 @@ namespace osu.Game.Rulesets.Objects.Pooling
         /// <remarks>
         /// The enumeration order is undefined.
         /// </remarks>
-        public IEnumerable<(TEntry Entry, TDrawable Drawable)> AliveEntries => aliveDrawableMap.Select(x => (x.Key, x.Value));
+        public readonly SlimReadOnlyDictionaryWrapper<TEntry, TDrawable> AliveEntries;
 
         /// <summary>
         /// Whether to remove an entry when clock goes backward and crossed its <see cref="LifetimeEntry.LifetimeStart"/>.
@@ -63,6 +65,8 @@ namespace osu.Game.Rulesets.Objects.Pooling
             lifetimeManager.EntryBecameAlive += entryBecameAlive;
             lifetimeManager.EntryBecameDead += entryBecameDead;
             lifetimeManager.EntryCrossedBoundary += entryCrossedBoundary;
+
+            AliveEntries = aliveDrawableMap.AsSlimReadOnly();
         }
 
         /// <summary>
@@ -153,6 +157,9 @@ namespace osu.Game.Rulesets.Objects.Pooling
 
         protected override bool CheckChildrenLife()
         {
+            if (!IsPresent)
+                return false;
+
             bool aliveChanged = base.CheckChildrenLife();
             aliveChanged |= lifetimeManager.Update(Time.Current - PastLifetimeExtension, Time.Current + FutureLifetimeExtension);
             return aliveChanged;

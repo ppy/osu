@@ -36,6 +36,7 @@ namespace osu.Game.Screens.Edit.Timing.RowAttributes
 
             BackgroundColour = overlayColours.Background6;
             FillColour = controlPoint.GetRepresentingColour(colours);
+            FinishTransforms(true);
         }
     }
 }

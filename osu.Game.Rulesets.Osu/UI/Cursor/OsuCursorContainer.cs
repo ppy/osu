@@ -23,14 +23,13 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
         public new OsuCursor ActiveCursor => (OsuCursor)base.ActiveCursor;
 
         protected override Drawable CreateCursor() => new OsuCursor();
-
         protected override Container<Drawable> Content => fadeContainer;
 
         private readonly Container<Drawable> fadeContainer;
 
         private readonly Bindable<bool> showTrail = new Bindable<bool>(true);
 
-        private readonly Drawable cursorTrail;
+        private readonly SkinnableDrawable cursorTrail;
 
         private readonly CursorRippleVisualiser rippleVisualiser;
 
@@ -39,7 +38,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
             InternalChild = fadeContainer = new Container
             {
                 RelativeSizeAxes = Axes.Both,
-                Children = new[]
+                Children = new CompositeDrawable[]
                 {
                     cursorTrail = new SkinnableDrawable(new OsuSkinComponentLookup(OsuSkinComponents.CursorTrail), _ => new DefaultCursorTrail(), confineMode: ConfineMode.NoScaling),
                     rippleVisualiser = new CursorRippleVisualiser(),
@@ -77,6 +76,14 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                 ActiveCursor.Expand();
             else
                 ActiveCursor.Contract();
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            if (cursorTrail.Drawable is CursorTrail trail)
+                trail.NewPartScale = ActiveCursor.CurrentExpandedScale;
         }
 
         public bool OnPressed(KeyBindingPressEvent<OsuAction> e)

@@ -28,6 +28,8 @@ namespace osu.Game.Tests.Visual.Gameplay
 {
     public partial class TestSceneGameplaySampleTriggerSource : PlayerTestScene
     {
+        protected override bool AllowBackwardsSeeks => true;
+
         private TestGameplaySampleTriggerSource sampleTriggerSource = null!;
         protected override Ruleset CreatePlayerRuleset() => new OsuRuleset();
 

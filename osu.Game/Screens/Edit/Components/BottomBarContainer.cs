@@ -20,7 +20,7 @@ namespace osu.Game.Screens.Edit.Components
 
         protected readonly IBindable<Track> Track = new Bindable<Track>();
 
-        protected readonly Drawable Background;
+        public readonly Drawable Background;
         private readonly Container content;
 
         protected override Container<Drawable> Content => content;

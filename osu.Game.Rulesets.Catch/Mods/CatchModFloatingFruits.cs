@@ -21,7 +21,6 @@ namespace osu.Game.Rulesets.Catch.Mods
         public void ApplyToDrawableRuleset(DrawableRuleset<CatchHitObject> drawableRuleset)
         {
             drawableRuleset.PlayfieldAdjustmentContainer.Scale = new Vector2(1, -1);
-            drawableRuleset.PlayfieldAdjustmentContainer.Y = 1 - drawableRuleset.PlayfieldAdjustmentContainer.Y;
         }
     }
 }

@@ -4,7 +4,6 @@
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Sprites;
@@ -46,8 +45,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 Icon = FontAwesome.Solid.Redo,
                 Scale = new Vector2
                 {
-                    X = Anchor.HasFlagFast(Anchor.x0) ? 1f : -1f,
-                    Y = Anchor.HasFlagFast(Anchor.y0) ? 1f : -1f
+                    X = Anchor.HasFlag(Anchor.x0) ? 1f : -1f,
+                    Y = Anchor.HasFlag(Anchor.y0) ? 1f : -1f
                 }
             });
         }
@@ -62,7 +61,13 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         protected override bool OnDragStart(DragStartEvent e)
         {
+            if (e.Button != MouseButton.Left)
+                return false;
+
             if (rotationHandler == null) return false;
+
+            if (rotationHandler.OperationInProgress.Value)
+                return false;
 
             rotationHandler.Begin();
             return true;
@@ -71,6 +76,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
         protected override void OnDrag(DragEvent e)
         {
             base.OnDrag(e);
+
+            if (rotationHandler == null || !rotationHandler.OperationInProgress.Value) return;
 
             rawCumulativeRotation += convertDragEventToAngleOfRotation(e);
 
@@ -108,9 +115,11 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         private float convertDragEventToAngleOfRotation(DragEvent e)
         {
-            // Adjust coordinate system to the center of SelectionBox
-            float startAngle = MathF.Atan2(e.LastMousePosition.Y - selectionBox.DrawHeight / 2, e.LastMousePosition.X - selectionBox.DrawWidth / 2);
-            float endAngle = MathF.Atan2(e.MousePosition.Y - selectionBox.DrawHeight / 2, e.MousePosition.X - selectionBox.DrawWidth / 2);
+            // Adjust coordinate system to the center of the selection
+            Vector2 center = selectionBox.ToLocalSpace(rotationHandler!.ToScreenSpace(rotationHandler!.DefaultOrigin!.Value));
+
+            float startAngle = MathF.Atan2(e.LastMousePosition.Y - center.Y, e.LastMousePosition.X - center.X);
+            float endAngle = MathF.Atan2(e.MousePosition.Y - center.Y, e.MousePosition.X - center.X);
 
             return (endAngle - startAngle) * 180 / MathF.PI;
         }

@@ -57,7 +57,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             });
 
             assertHeadJudgement(HitResult.Ok);
-            assertTailJudgement(HitResult.LargeTickHit);
+            assertTailJudgement(HitResult.SliderTailHit);
             assertSliderJudgement(HitResult.IgnoreHit);
         }
 
@@ -103,7 +103,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             assertTickJudgement(1, HitResult.LargeTickHit);
             assertTickJudgement(2, HitResult.LargeTickHit);
             assertTickJudgement(3, HitResult.LargeTickHit);
-            assertTailJudgement(HitResult.LargeTickHit);
+            assertTailJudgement(HitResult.SliderTailHit);
             assertSliderJudgement(HitResult.IgnoreHit);
         }
 
@@ -182,7 +182,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             assertHeadJudgement(HitResult.Meh);
             assertAllTickJudgements(HitResult.LargeTickHit);
             assertRepeatJudgement(HitResult.LargeTickHit);
-            assertTailJudgement(HitResult.LargeTickHit);
+            assertTailJudgement(HitResult.SliderTailHit);
             assertSliderJudgement(HitResult.IgnoreHit);
         }
 
@@ -210,7 +210,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             assertHeadJudgement(HitResult.Meh);
             assertRepeatJudgement(HitResult.LargeTickHit);
-            assertTailJudgement(HitResult.LargeTickHit);
+            assertTailJudgement(HitResult.SliderTailHit);
             assertSliderJudgement(HitResult.IgnoreHit);
         }
 
@@ -245,7 +245,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             assertAllTickJudgements(HitResult.LargeTickMiss);
 
             // This particular test actually starts tracking the slider just before the end, so the tail should be hit because of its leniency.
-            assertTailJudgement(HitResult.LargeTickHit);
+            assertTailJudgement(HitResult.SliderTailHit);
 
             assertSliderJudgement(HitResult.IgnoreHit);
         }
@@ -276,7 +276,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             assertHeadJudgement(HitResult.Meh);
             assertTickJudgement(0, HitResult.LargeTickMiss);
-            assertTailJudgement(HitResult.LargeTickHit);
+            assertTailJudgement(HitResult.SliderTailHit);
             assertSliderJudgement(HitResult.IgnoreHit);
         }
 
@@ -307,7 +307,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             assertHeadJudgement(HitResult.Meh);
             assertTickJudgement(0, HitResult.LargeTickMiss);
             assertTickJudgement(1, HitResult.LargeTickMiss);
-            assertTailJudgement(HitResult.LargeTickHit);
+            assertTailJudgement(HitResult.SliderTailHit);
             assertSliderJudgement(HitResult.IgnoreHit);
         }
 

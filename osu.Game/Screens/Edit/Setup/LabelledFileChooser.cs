@@ -18,6 +18,7 @@ using osu.Framework.Localisation;
 using osu.Framework.Platform;
 using osu.Game.Database;
 using osu.Game.Graphics.UserInterfaceV2;
+using osu.Game.Overlays;
 using osuTK;
 
 namespace osu.Game.Screens.Edit.Setup
@@ -118,6 +119,7 @@ namespace osu.Game.Screens.Edit.Setup
             protected override string PopOutSampleName => "UI/overlay-big-pop-out";
 
             public FileChooserPopover(string[] handledExtensions, Bindable<FileInfo?> currentFile, string? chooserPath)
+                : base(false)
             {
                 Child = new Container
                 {
@@ -128,6 +130,13 @@ namespace osu.Game.Screens.Edit.Setup
                         CurrentFile = { BindTarget = currentFile }
                     },
                 };
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(OverlayColourProvider colourProvider)
+            {
+                Body.BorderColour = colourProvider.Highlight1;
+                Body.BorderThickness = 2;
             }
         }
     }

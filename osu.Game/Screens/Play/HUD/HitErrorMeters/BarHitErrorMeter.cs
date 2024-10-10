@@ -303,13 +303,13 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
                     labelEarly.Child = new SpriteIcon
                     {
                         Size = new Vector2(icon_size),
-                        Icon = FontAwesome.Solid.ShippingFast,
+                        Icon = OsuIcon.Hare
                     };
 
                     labelLate.Child = new SpriteIcon
                     {
                         Size = new Vector2(icon_size),
-                        Icon = FontAwesome.Solid.Bicycle,
+                        Icon = OsuIcon.Tortoise
                     };
 
                     break;

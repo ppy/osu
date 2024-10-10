@@ -3,16 +3,28 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Allocation;
+using osu.Framework.Input.Events;
+using osu.Game.Input.Bindings;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Screens.Select;
 using osu.Game.Utils;
 
 namespace osu.Game.Overlays.Mods
 {
     public partial class UserModSelectOverlay : ModSelectOverlay
     {
+        private ModSpeedHotkeyHandler modSpeedHotkeyHandler = null!;
+
         public UserModSelectOverlay(OverlayColourScheme colourScheme = OverlayColourScheme.Green)
             : base(colourScheme)
         {
+        }
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            Add(modSpeedHotkeyHandler = new ModSpeedHotkeyHandler());
         }
 
         protected override ModColumn CreateModColumn(ModType modType) => new UserModColumn(modType, false);
@@ -36,6 +48,20 @@ namespace osu.Game.Overlays.Mods
             }
 
             return modsAfterRemoval.ToList();
+        }
+
+        public override bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
+        {
+            switch (e.Action)
+            {
+                case GlobalAction.IncreaseModSpeed:
+                    return modSpeedHotkeyHandler.ChangeSpeed(0.05, AllAvailableMods.Where(state => state.ValidForSelection.Value).Select(state => state.Mod));
+
+                case GlobalAction.DecreaseModSpeed:
+                    return modSpeedHotkeyHandler.ChangeSpeed(-0.05, AllAvailableMods.Where(state => state.ValidForSelection.Value).Select(state => state.Mod));
+            }
+
+            return base.OnPressed(e);
         }
 
         private partial class UserModColumn : ModColumn

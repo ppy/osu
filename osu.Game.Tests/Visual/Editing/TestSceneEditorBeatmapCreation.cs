@@ -25,6 +25,7 @@ using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Rulesets.Taiko;
 using osu.Game.Rulesets.Taiko.Objects;
 using osu.Game.Screens.Edit;
+using osu.Game.Screens.Edit.Compose.Components.Timeline;
 using osu.Game.Screens.Edit.Setup;
 using osu.Game.Storyboards;
 using osu.Game.Tests.Resources;
@@ -94,8 +95,11 @@ namespace osu.Game.Tests.Visual.Editing
         [Test]
         public void TestAddAudioTrack()
         {
-            AddAssert("track is virtual", () => Beatmap.Value.Track is TrackVirtual);
+            AddStep("enter compose mode", () => InputManager.Key(Key.F1));
+            AddUntilStep("wait for timeline load", () => Editor.ChildrenOfType<Timeline>().FirstOrDefault()?.IsLoaded == true);
 
+            AddStep("enter setup mode", () => InputManager.Key(Key.F4));
+            AddAssert("track is virtual", () => Beatmap.Value.Track is TrackVirtual);
             AddAssert("switch track to real track", () =>
             {
                 var setup = Editor.ChildrenOfType<SetupScreen>().First();

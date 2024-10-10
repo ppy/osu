@@ -1,0 +1,6 @@
+osu file format v128
+
+[HitObjects]
+// Coordinates should be preserves in lazer beatmaps.
+
+256.99853,256.001,1000,49,0,0:0:0:0:

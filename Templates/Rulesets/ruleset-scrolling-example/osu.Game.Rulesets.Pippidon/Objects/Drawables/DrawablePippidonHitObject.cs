@@ -10,7 +10,6 @@ using osu.Framework.Graphics.Textures;
 using osu.Game.Audio;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Pippidon.UI;
-using osu.Game.Rulesets.Scoring;
 using osuTK;
 using osuTK.Graphics;
 
@@ -49,7 +48,12 @@ namespace osu.Game.Rulesets.Pippidon.Objects.Drawables
         protected override void CheckForResult(bool userTriggered, double timeOffset)
         {
             if (timeOffset >= 0)
-                ApplyResult(r => r.Type = currentLane.Value == HitObject.Lane ? HitResult.Perfect : HitResult.Miss);
+            {
+                if (currentLane.Value == HitObject.Lane)
+                    ApplyMaxResult();
+                else
+                    ApplyMinResult();
+            }
         }
 
         protected override void UpdateHitStateTransforms(ArmedState state)

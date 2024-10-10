@@ -3,7 +3,9 @@
 
 #nullable disable
 
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Containers;
@@ -24,6 +26,21 @@ namespace osu.Game.Screens.Play
         private readonly Storyboard storyboard;
         private readonly IReadOnlyList<Mod> mods;
 
+        /// <summary>
+        /// In certain circumstances, the storyboard cannot be hidden entirely even if it is fully dimmed. Such circumstances include:
+        /// <list type="bullet">
+        /// <item>
+        /// cases where the storyboard has an overlay layer sprite, as it should continue to display fully dimmed
+        /// <i>in front of</i> the playfield (https://github.com/ppy/osu/issues/29867),
+        /// </item>
+        /// <item>
+        /// cases where the storyboard includes samples - as they are played back via drawable samples,
+        /// they must be present for the playback to occur (https://github.com/ppy/osu/issues/9315).
+        /// </item>
+        /// </list>
+        /// </summary>
+        private readonly Lazy<bool> storyboardMustAlwaysBePresent;
+
         private DrawableStoryboard drawableStoryboard;
 
         /// <summary>
@@ -38,6 +55,8 @@ namespace osu.Game.Screens.Play
         {
             this.storyboard = storyboard;
             this.mods = mods;
+
+            storyboardMustAlwaysBePresent = new Lazy<bool>(() => storyboard.GetLayer(@"Overlay").Elements.Any() || storyboard.Layers.Any(l => l.Elements.OfType<StoryboardSampleInfo>().Any()));
         }
 
         [BackgroundDependencyLoader]
@@ -54,7 +73,7 @@ namespace osu.Game.Screens.Play
             base.LoadComplete();
         }
 
-        protected override bool ShowDimContent => IgnoreUserSettings.Value || (ShowStoryboard.Value && DimLevel < 1);
+        protected override bool ShowDimContent => IgnoreUserSettings.Value || (ShowStoryboard.Value && (DimLevel < 1 || storyboardMustAlwaysBePresent.Value));
 
         private void initializeStoryboard(bool async)
         {

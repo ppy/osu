@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Cursor;
 using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Rulesets.UI;
 using osuTK;
 using osuTK.Graphics;
 
@@ -21,7 +22,7 @@ namespace osu.Game.Screens.Play
     /// </summary>
     public abstract partial class ResumeOverlay : VisibilityContainer
     {
-        public CursorContainer GameplayCursor { get; set; }
+        public GameplayCursorContainer GameplayCursor { get; set; }
 
         /// <summary>
         /// The action to be performed to complete resuming.

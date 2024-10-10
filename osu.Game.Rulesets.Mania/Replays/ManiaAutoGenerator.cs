@@ -17,28 +17,9 @@ namespace osu.Game.Rulesets.Mania.Replays
 
         public new ManiaBeatmap Beatmap => (ManiaBeatmap)base.Beatmap;
 
-        private readonly ManiaAction[] columnActions;
-
         public ManiaAutoGenerator(ManiaBeatmap beatmap)
             : base(beatmap)
         {
-            columnActions = new ManiaAction[Beatmap.TotalColumns];
-
-            var normalAction = ManiaAction.Key1;
-            var specialAction = ManiaAction.Special1;
-            int totalCounter = 0;
-
-            foreach (var stage in Beatmap.Stages)
-            {
-                for (int i = 0; i < stage.Columns; i++)
-                {
-                    if (stage.IsSpecialColumn(i))
-                        columnActions[totalCounter] = specialAction++;
-                    else
-                        columnActions[totalCounter] = normalAction++;
-                    totalCounter++;
-                }
-            }
         }
 
         protected override void GenerateFrames()
@@ -57,11 +38,11 @@ namespace osu.Game.Rulesets.Mania.Replays
                     switch (point)
                     {
                         case HitPoint:
-                            actions.Add(columnActions[point.Column]);
+                            actions.Add(ManiaAction.Key1 + point.Column);
                             break;
 
                         case ReleasePoint:
-                            actions.Remove(columnActions[point.Column]);
+                            actions.Remove(ManiaAction.Key1 + point.Column);
                             break;
                     }
                 }

@@ -58,7 +58,7 @@ namespace osu.Game.Tests.NonVisual
             var task3 = addTask();
 
             // Cancel task2, allow task3 to complete.
-            task2.cancellation.Cancel();
+            await task2.cancellation.CancelAsync();
             task2.mutex.Set();
             task3.mutex.Set();
 

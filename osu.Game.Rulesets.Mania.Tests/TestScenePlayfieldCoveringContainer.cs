@@ -39,18 +39,18 @@ namespace osu.Game.Rulesets.Mania.Tests
         public void TestScrollingDownwards()
         {
             AddStep("set down scroll", () => scrollingContainer.Direction = ScrollingDirection.Down);
-            AddStep("set coverage = 0.5", () => cover.Coverage = 0.5f);
-            AddStep("set coverage = 0.8f", () => cover.Coverage = 0.8f);
-            AddStep("set coverage = 0.2f", () => cover.Coverage = 0.2f);
+            AddStep("set coverage = 0.5", () => cover.Coverage.Value = 0.5f);
+            AddStep("set coverage = 0.8f", () => cover.Coverage.Value = 0.8f);
+            AddStep("set coverage = 0.2f", () => cover.Coverage.Value = 0.2f);
         }
 
         [Test]
         public void TestScrollingUpwards()
         {
             AddStep("set up scroll", () => scrollingContainer.Direction = ScrollingDirection.Up);
-            AddStep("set coverage = 0.5", () => cover.Coverage = 0.5f);
-            AddStep("set coverage = 0.8f", () => cover.Coverage = 0.8f);
-            AddStep("set coverage = 0.2f", () => cover.Coverage = 0.2f);
+            AddStep("set coverage = 0.5", () => cover.Coverage.Value = 0.5f);
+            AddStep("set coverage = 0.8f", () => cover.Coverage.Value = 0.8f);
+            AddStep("set coverage = 0.2f", () => cover.Coverage.Value = 0.2f);
         }
     }
 }

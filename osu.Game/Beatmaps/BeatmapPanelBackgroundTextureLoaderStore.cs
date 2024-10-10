@@ -59,12 +59,12 @@ namespace osu.Game.Beatmaps
 
         private TextureUpload limitTextureUploadSize(TextureUpload textureUpload)
         {
-            var image = Image.LoadPixelData(textureUpload.Data.ToArray(), textureUpload.Width, textureUpload.Height);
+            var image = Image.LoadPixelData(textureUpload.Data, textureUpload.Width, textureUpload.Height);
 
             // The original texture upload will no longer be returned or used.
             textureUpload.Dispose();
 
-            Size size = image.Size();
+            Size size = image.Size;
 
             // Assume that panel backgrounds are always displayed using `FillMode.Fill`.
             // Also assume that all backgrounds are wider than they are tall, so the

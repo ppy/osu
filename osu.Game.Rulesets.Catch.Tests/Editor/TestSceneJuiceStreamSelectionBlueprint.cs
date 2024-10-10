@@ -82,6 +82,7 @@ namespace osu.Game.Rulesets.Catch.Tests.Editor
 
             AddMouseMoveStep(-100, 100);
             addVertexCheckStep(3, 1, times[0], positions[0]);
+            addDragEndStep();
         }
 
         [Test]
@@ -100,6 +101,9 @@ namespace osu.Game.Rulesets.Catch.Tests.Editor
             AddMouseMoveStep(times[2] - 50, positions[2] - 50);
             addVertexCheckStep(4, 1, times[1] - 50, positions[1] - 50);
             addVertexCheckStep(4, 2, times[2] - 50, positions[2] - 50);
+
+            AddStep("release control", () => InputManager.ReleaseKey(Key.ControlLeft));
+            addDragEndStep();
         }
 
         [Test]
@@ -113,6 +117,7 @@ namespace osu.Game.Rulesets.Catch.Tests.Editor
             addDragStartStep(times[1], positions[1]);
             AddMouseMoveStep(times[1], 400);
             AddAssert("slider velocity changed", () => !hitObject.SliderVelocityMultiplierBindable.IsDefault);
+            addDragEndStep();
         }
 
         [Test]
@@ -129,6 +134,7 @@ namespace osu.Game.Rulesets.Catch.Tests.Editor
             AddStep("scroll playfield", () => manualClock.CurrentTime += 200);
             AddMouseMoveStep(times[1] + 200, positions[1] + 100);
             addVertexCheckStep(2, 1, times[1] + 200, positions[1] + 100);
+            addDragEndStep();
         }
 
         [Test]
@@ -161,18 +167,18 @@ namespace osu.Game.Rulesets.Catch.Tests.Editor
             addAddVertexSteps(500, 150);
             addVertexCheckStep(3, 1, 500, 150);
 
-            addAddVertexSteps(90, 200);
-            addVertexCheckStep(4, 1, times[0], positions[0]);
+            addAddVertexSteps(160, 200);
+            addVertexCheckStep(4, 1, 160, 200);
 
             addAddVertexSteps(750, 180);
-            addVertexCheckStep(5, 4, 750, 180);
+            addVertexCheckStep(5, 4, 800, 160);
             AddAssert("duration is changed", () => Precision.AlmostEquals(hitObject.Duration, 800 - times[0], 1e-3));
         }
 
         [Test]
         public void TestDeleteVertex()
         {
-            double[] times = { 100, 300, 500 };
+            double[] times = { 100, 300, 400 };
             float[] positions = { 100, 200, 150 };
             addBlueprintStep(times, positions);
 
@@ -265,7 +271,7 @@ namespace osu.Game.Rulesets.Catch.Tests.Editor
             AddStep("delete vertex", () =>
             {
                 InputManager.PressKey(Key.ShiftLeft);
-                InputManager.Click(MouseButton.Left);
+                InputManager.Click(MouseButton.Right);
                 InputManager.ReleaseKey(Key.ShiftLeft);
             });
         }

@@ -27,6 +27,9 @@ namespace osu.Game.Tournament.Screens.Setup
         [Resolved]
         private MatchIPCInfo ipc { get; set; } = null!;
 
+        [Cached]
+        private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
+
         private OsuDirectorySelector directorySelector = null!;
         private DialogOverlay? overlay;
 

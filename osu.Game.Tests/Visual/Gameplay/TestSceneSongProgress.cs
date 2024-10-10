@@ -3,6 +3,7 @@
 
 using System;
 using System.Linq;
+using System.Threading;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.IEnumerableExtensions;
@@ -47,13 +48,22 @@ namespace osu.Game.Tests.Visual.Gameplay
                 {
                     Child = frameStabilityContainer = new FrameStabilityContainer
                     {
-                        MaxCatchUpFrames = 1
+                        Child = new FakeLoad()
                     }
                 }
             });
 
             Dependencies.CacheAs<IGameplayClock>(gameplayClockContainer);
             Dependencies.CacheAs<IFrameStableClock>(frameStabilityContainer);
+        }
+
+        private partial class FakeLoad : Drawable
+        {
+            protected override void Update()
+            {
+                base.Update();
+                Thread.Sleep(1);
+            }
         }
 
         [SetUpSteps]

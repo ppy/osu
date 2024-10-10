@@ -193,5 +193,20 @@ namespace osu.Game.Tests.Visual.Editing
             AddUntilStep("Wait for song select", () => Game.ScreenStack.CurrentScreen is PlaySongSelect);
             AddAssert("Tags reverted correctly", () => Game.Beatmap.Value.BeatmapInfo.Metadata.Tags == tags_to_save);
         }
+
+        [Test]
+        public void TestBeatDivisor()
+        {
+            AddStep("Set custom beat divisor", () => Editor.Dependencies.Get<BindableBeatDivisor>().SetArbitraryDivisor(7));
+
+            SaveEditor();
+            AddAssert("Hash updated", () => !string.IsNullOrEmpty(EditorBeatmap.BeatmapInfo.BeatmapSet?.Hash));
+            AddAssert("Beatmap has correct beat divisor", () => EditorBeatmap.BeatmapInfo.BeatDivisor, () => Is.EqualTo(7));
+
+            ReloadEditorToSameBeatmap();
+
+            AddAssert("Beatmap still has correct beat divisor", () => EditorBeatmap.BeatmapInfo.BeatDivisor, () => Is.EqualTo(7));
+            AddAssert("Correct beat divisor actually active", () => Editor.BeatDivisor, () => Is.EqualTo(7));
+        }
     }
 }

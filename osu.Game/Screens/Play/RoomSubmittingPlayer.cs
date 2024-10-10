@@ -4,6 +4,7 @@
 #nullable disable
 
 using System.Diagnostics;
+using osu.Game.Extensions;
 using osu.Game.Online.API;
 using osu.Game.Online.Rooms;
 using osu.Game.Scoring;
@@ -30,7 +31,16 @@ namespace osu.Game.Screens.Play
             if (!(Room.RoomID.Value is long roomId))
                 return null;
 
-            return new CreateRoomScoreRequest(roomId, PlaylistItem.ID, Game.VersionHash);
+            int beatmapId = Beatmap.Value.BeatmapInfo.OnlineID;
+            int rulesetId = Ruleset.Value.OnlineID;
+
+            if (beatmapId <= 0)
+                return null;
+
+            if (!Ruleset.Value.IsLegacyRuleset())
+                return null;
+
+            return new CreateRoomScoreRequest(roomId, PlaylistItem.ID, Beatmap.Value.BeatmapInfo, rulesetId, Game.VersionHash);
         }
 
         protected override APIRequest<MultiplayerScore> CreateSubmissionRequest(Score score, long token)

@@ -67,6 +67,11 @@ namespace osu.Game.Rulesets.Mods
         bool AlwaysValidForSubmission { get; }
 
         /// <summary>
+        /// Whether scores with this mod active can give performance points.
+        /// </summary>
+        bool Ranked { get; }
+
+        /// <summary>
         /// Create a fresh <see cref="Mod"/> instance based on this mod.
         /// </summary>
         Mod CreateInstance() => (Mod)Activator.CreateInstance(GetType())!;

@@ -61,7 +61,7 @@ namespace osu.Game.Skinning
 
             if (textureUpload.Height > max_supported_texture_size || textureUpload.Width > max_supported_texture_size)
             {
-                var image = Image.LoadPixelData(textureUpload.Data.ToArray(), textureUpload.Width, textureUpload.Height);
+                var image = Image.LoadPixelData(textureUpload.Data, textureUpload.Width, textureUpload.Height);
 
                 // The original texture upload will no longer be returned or used.
                 textureUpload.Dispose();

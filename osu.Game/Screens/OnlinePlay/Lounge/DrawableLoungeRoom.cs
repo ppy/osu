@@ -248,21 +248,21 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
             {
                 base.LoadComplete();
 
-                ScheduleAfterChildren(() => GetContainingInputManager().ChangeFocus(passwordTextBox));
+                ScheduleAfterChildren(() => GetContainingFocusManager()!.ChangeFocus(passwordTextBox));
                 passwordTextBox.OnCommit += (_, _) => performJoin();
             }
 
             private void performJoin()
             {
                 lounge?.Join(room, passwordTextBox.Text, null, joinFailed);
-                GetContainingInputManager().TriggerFocusContention(passwordTextBox);
+                GetContainingFocusManager()?.TriggerFocusContention(passwordTextBox);
             }
 
             private void joinFailed(string error) => Schedule(() =>
             {
                 passwordTextBox.Text = string.Empty;
 
-                GetContainingInputManager().ChangeFocus(passwordTextBox);
+                GetContainingFocusManager()!.ChangeFocus(passwordTextBox);
 
                 errorText.Text = error;
                 errorText

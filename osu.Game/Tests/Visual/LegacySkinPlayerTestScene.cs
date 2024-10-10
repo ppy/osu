@@ -45,13 +45,13 @@ namespace osu.Game.Tests.Visual
 
         private void addResetTargetsStep()
         {
-            AddStep("reset targets", () => this.ChildrenOfType<SkinComponentsContainer>().ForEach(t =>
+            AddStep("reset targets", () => this.ChildrenOfType<SkinnableContainer>().ForEach(t =>
             {
                 LegacySkin.ResetDrawableTarget(t);
                 t.Reload();
             }));
 
-            AddUntilStep("wait for components to load", () => this.ChildrenOfType<SkinComponentsContainer>().All(t => t.ComponentsLoaded));
+            AddUntilStep("wait for components to load", () => this.ChildrenOfType<SkinnableContainer>().All(t => t.ComponentsLoaded));
         }
 
         public partial class SkinProvidingPlayer : TestPlayer

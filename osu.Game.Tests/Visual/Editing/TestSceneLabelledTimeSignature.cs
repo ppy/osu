@@ -6,6 +6,7 @@
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Graphics;
+using osu.Framework.Input;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Graphics.UserInterface;
@@ -62,12 +63,12 @@ namespace osu.Game.Tests.Visual.Editing
             createLabelledTimeSignature(TimeSignature.SimpleQuadruple);
             AddAssert("current is 4/4", () => timeSignature.Current.Value.Equals(TimeSignature.SimpleQuadruple));
 
-            AddStep("focus text box", () => InputManager.ChangeFocus(numeratorTextBox));
+            AddStep("focus text box", () => ((IFocusManager)InputManager).ChangeFocus(numeratorTextBox));
 
             AddStep("set numerator to 7", () => numeratorTextBox.Current.Value = "7");
             AddAssert("current is 4/4", () => timeSignature.Current.Value.Equals(TimeSignature.SimpleQuadruple));
 
-            AddStep("drop focus", () => InputManager.ChangeFocus(null));
+            AddStep("drop focus", () => ((IFocusManager)InputManager).ChangeFocus(null));
             AddAssert("current is 7/4", () => timeSignature.Current.Value.Equals(new TimeSignature(7)));
         }
 
@@ -77,12 +78,12 @@ namespace osu.Game.Tests.Visual.Editing
             createLabelledTimeSignature(TimeSignature.SimpleQuadruple);
             AddAssert("current is 4/4", () => timeSignature.Current.Value.Equals(TimeSignature.SimpleQuadruple));
 
-            AddStep("focus text box", () => InputManager.ChangeFocus(numeratorTextBox));
+            AddStep("focus text box", () => ((IFocusManager)InputManager).ChangeFocus(numeratorTextBox));
 
             AddStep("set numerator to 0", () => numeratorTextBox.Current.Value = "0");
             AddAssert("current is 4/4", () => timeSignature.Current.Value.Equals(TimeSignature.SimpleQuadruple));
 
-            AddStep("drop focus", () => InputManager.ChangeFocus(null));
+            AddStep("drop focus", () => ((IFocusManager)InputManager).ChangeFocus(null));
             AddAssert("current is 4/4", () => timeSignature.Current.Value.Equals(TimeSignature.SimpleQuadruple));
             AddAssert("numerator is 4", () => numeratorTextBox.Current.Value == "4");
         }

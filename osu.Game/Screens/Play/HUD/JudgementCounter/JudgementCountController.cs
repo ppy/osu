@@ -21,18 +21,30 @@ namespace osu.Game.Screens.Play.HUD.JudgementCounter
         [Resolved]
         private ScoreProcessor scoreProcessor { get; set; } = null!;
 
-        public List<JudgementCount> Results = new List<JudgementCount>();
+        private readonly Dictionary<HitResult, JudgementCount> results = new Dictionary<HitResult, JudgementCount>();
+
+        public IEnumerable<JudgementCount> Counters => counters;
+
+        private readonly List<JudgementCount> counters = new List<JudgementCount>();
 
         [BackgroundDependencyLoader]
         private void load(IBindable<RulesetInfo> ruleset)
         {
-            foreach (var result in ruleset.Value.CreateInstance().GetHitResults())
+            // Due to weirdness in judgements, some results have the same name and should be aggregated for display purposes.
+            // There's only one case of this right now ("slider end").
+            foreach (var group in ruleset.Value.CreateInstance().GetHitResults().GroupBy(r => r.displayName))
             {
-                Results.Add(new JudgementCount
+                var judgementCount = new JudgementCount
                 {
-                    Type = result.result,
+                    DisplayName = group.Key,
+                    Types = group.Select(r => r.result).ToArray(),
                     ResultCount = new BindableInt()
-                });
+                };
+
+                counters.Add(judgementCount);
+
+                foreach (var r in group)
+                    results[r.result] = judgementCount;
             }
         }
 
@@ -40,21 +52,38 @@ namespace osu.Game.Screens.Play.HUD.JudgementCounter
         {
             base.LoadComplete();
 
+            scoreProcessor.OnResetFromReplayFrame += updateAllCountsFromReplayFrame;
             scoreProcessor.NewJudgement += judgement => updateCount(judgement, false);
             scoreProcessor.JudgementReverted += judgement => updateCount(judgement, true);
         }
 
-        private void updateCount(JudgementResult judgement, bool revert)
+        private bool hasUpdatedCountsFromReplayFrame;
+
+        private void updateAllCountsFromReplayFrame()
         {
-            foreach (JudgementCount result in Results.Where(result => result.Type == judgement.Type))
-                result.ResultCount.Value = revert ? result.ResultCount.Value - 1 : result.ResultCount.Value + 1;
+            if (hasUpdatedCountsFromReplayFrame)
+                return;
+
+            foreach (var kvp in scoreProcessor.Statistics)
+            {
+                if (!results.TryGetValue(kvp.Key, out var count))
+                    continue;
+
+                count.ResultCount.Value = kvp.Value;
+            }
+
+            hasUpdatedCountsFromReplayFrame = true;
         }
 
-        public struct JudgementCount
+        private void updateCount(JudgementResult judgement, bool revert)
         {
-            public HitResult Type { get; set; }
+            if (!results.TryGetValue(judgement.Type, out var count))
+                return;
 
-            public BindableInt ResultCount { get; set; }
+            if (revert)
+                count.ResultCount.Value--;
+            else
+                count.ResultCount.Value++;
         }
     }
 }

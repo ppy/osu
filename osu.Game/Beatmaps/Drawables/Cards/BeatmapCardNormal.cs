@@ -23,7 +23,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
         protected override Drawable IdleContent => idleBottomContent;
         protected override Drawable DownloadInProgressContent => downloadProgressBar;
 
-        private const float height = 100;
+        public const float HEIGHT = 100;
 
         [Cached]
         private readonly BeatmapCardContent content;
@@ -42,14 +42,14 @@ namespace osu.Game.Beatmaps.Drawables.Cards
         public BeatmapCardNormal(APIBeatmapSet beatmapSet, bool allowExpansion = true)
             : base(beatmapSet, allowExpansion)
         {
-            content = new BeatmapCardContent(height);
+            content = new BeatmapCardContent(HEIGHT);
         }
 
         [BackgroundDependencyLoader]
         private void load()
         {
             Width = WIDTH;
-            Height = height;
+            Height = HEIGHT;
 
             FillFlowContainer leftIconArea = null!;
             FillFlowContainer titleBadgeArea = null!;
@@ -62,10 +62,10 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                     RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]
                     {
-                        thumbnail = new BeatmapCardThumbnail(BeatmapSet)
+                        thumbnail = new BeatmapCardThumbnail(BeatmapSet, BeatmapSet)
                         {
                             Name = @"Left (icon) area",
-                            Size = new Vector2(height),
+                            Size = new Vector2(HEIGHT),
                             Padding = new MarginPadding { Right = CORNER_RADIUS },
                             Child = leftIconArea = new FillFlowContainer
                             {
@@ -77,8 +77,8 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                         },
                         buttonContainer = new CollapsibleButtonContainer(BeatmapSet)
                         {
-                            X = height - CORNER_RADIUS,
-                            Width = WIDTH - height + CORNER_RADIUS,
+                            X = HEIGHT - CORNER_RADIUS,
+                            Width = WIDTH - HEIGHT + CORNER_RADIUS,
                             FavouriteState = { BindTarget = FavouriteState },
                             ButtonsCollapsedWidth = CORNER_RADIUS,
                             ButtonsExpandedWidth = 30,

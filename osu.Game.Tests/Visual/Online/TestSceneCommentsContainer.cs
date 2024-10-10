@@ -17,6 +17,7 @@ using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.Comments;
+using osu.Game.Overlays.Comments.Buttons;
 
 namespace osu.Game.Tests.Visual.Online
 {
@@ -58,6 +59,11 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("show comments", () => commentsContainer.ShowComments(CommentableType.Beatmapset, 123));
             AddUntilStep("show more button hidden",
                 () => commentsContainer.ChildrenOfType<CommentsShowMoreButton>().Single().Alpha == 0);
+
+            if (withPinned)
+                AddAssert("pinned comment replies collapsed", () => commentsContainer.ChildrenOfType<ShowRepliesButton>().First().Expanded.Value, () => Is.False);
+            else
+                AddAssert("first comment replies expanded", () => commentsContainer.ChildrenOfType<ShowRepliesButton>().First().Expanded.Value, () => Is.True);
         }
 
         [TestCase(false)]
@@ -157,6 +163,7 @@ namespace osu.Game.Tests.Visual.Online
         {
             setUpCommentsResponse(getExampleComments());
             AddStep("show comments", () => commentsContainer.ShowComments(CommentableType.Beatmapset, 123));
+            AddUntilStep("comments shown", () => commentsContainer.ChildrenOfType<DrawableComment>().Any());
 
             setUpPostResponse();
             AddStep("enter text", () => editorTextBox.Current.Value = "comm");
@@ -167,6 +174,25 @@ namespace osu.Game.Tests.Visual.Online
                 string writtenText = editorTextBox.Current.Value;
                 var comment = commentsContainer.ChildrenOfType<DrawableComment>().LastOrDefault();
                 return comment != null && comment.ChildrenOfType<SpriteText>().Any(y => y.Text == writtenText);
+            });
+        }
+
+        [Test]
+        public void TestPostAsOwner()
+        {
+            setUpCommentsResponse(getExampleComments());
+            AddStep("show comments", () => commentsContainer.ShowComments(CommentableType.Beatmapset, 123));
+            AddUntilStep("comments shown", () => commentsContainer.ChildrenOfType<DrawableComment>().Any());
+
+            setUpPostResponse(true);
+            AddStep("enter text", () => editorTextBox.Current.Value = "comm");
+            AddStep("submit", () => commentsContainer.ChildrenOfType<CommentEditor>().Single().ChildrenOfType<RoundedButton>().First().TriggerClick());
+
+            AddUntilStep("comment sent", () =>
+            {
+                string writtenText = editorTextBox.Current.Value;
+                var comment = commentsContainer.ChildrenOfType<DrawableComment>().LastOrDefault();
+                return comment != null && comment.ChildrenOfType<SpriteText>().Any(y => y.Text == writtenText) && comment.ChildrenOfType<SpriteText>().Any(y => y.Text == "MAPPER");
             });
         }
 
@@ -183,7 +209,7 @@ namespace osu.Game.Tests.Visual.Online
                 };
             });
 
-        private void setUpPostResponse()
+        private void setUpPostResponse(bool asOwner = false)
             => AddStep("set up response", () =>
             {
                 dummyAPI.HandleRequest = request =>
@@ -191,7 +217,7 @@ namespace osu.Game.Tests.Visual.Online
                     if (!(request is CommentPostRequest req))
                         return false;
 
-                    req.TriggerSuccess(new CommentBundle
+                    var bundle = new CommentBundle
                     {
                         Comments = new List<Comment>
                         {
@@ -202,9 +228,26 @@ namespace osu.Game.Tests.Visual.Online
                                 LegacyName = "FirstUser",
                                 CreatedAt = DateTimeOffset.Now,
                                 VotesCount = 98,
+                                CommentableId = 2001,
+                                CommentableType = "test",
                             }
                         }
-                    });
+                    };
+
+                    if (asOwner)
+                    {
+                        bundle.Comments[0].UserId = 1001;
+                        bundle.Comments[0].User = new APIUser { Id = 1001, Username = "FirstUser" };
+                        bundle.CommentableMeta.Add(new CommentableMeta
+                        {
+                            Id = 2001,
+                            OwnerId = 1001,
+                            OwnerTitle = "MAPPER",
+                            Type = "test",
+                        });
+                    }
+
+                    req.TriggerSuccess(bundle);
                     return true;
                 };
             });
@@ -265,7 +308,7 @@ namespace osu.Game.Tests.Visual.Online
                 bundle.Comments.Add(new Comment
                 {
                     Id = 20,
-                    Message = "Reply to pinned comment",
+                    Message = "Reply to pinned comment initially hidden",
                     LegacyName = "AbandonedUser",
                     CreatedAt = DateTimeOffset.Now,
                     VotesCount = 0,

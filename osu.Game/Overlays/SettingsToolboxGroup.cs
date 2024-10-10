@@ -4,7 +4,6 @@
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Caching;
-using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -151,14 +150,17 @@ namespace osu.Game.Overlays
             base.Update();
 
             if (!headerTextVisibilityCache.IsValid)
+            {
                 // These toolbox grouped may be contracted to only show icons.
                 // For now, let's hide the header to avoid text truncation weirdness in such cases.
                 headerText.FadeTo(headerText.DrawWidth < DrawWidth ? 1 : 0, 150, Easing.OutQuint);
+                headerTextVisibilityCache.Validate();
+            }
         }
 
         protected override bool OnInvalidate(Invalidation invalidation, InvalidationSource source)
         {
-            if (invalidation.HasFlagFast(Invalidation.DrawSize))
+            if (invalidation.HasFlag(Invalidation.DrawSize))
                 headerTextVisibilityCache.Invalidate();
 
             return base.OnInvalidate(invalidation, source);

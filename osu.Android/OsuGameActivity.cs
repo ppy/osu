@@ -72,9 +72,9 @@ namespace osu.Android
             Debug.Assert(Resources?.DisplayMetrics != null);
 
             Point displaySize = new Point();
-#pragma warning disable 618 // GetSize is deprecated
+#pragma warning disable CA1422 // GetSize is deprecated
             WindowManager.DefaultDisplay.GetSize(displaySize);
-#pragma warning restore 618
+#pragma warning restore CA1422
             float smallestWidthDp = Math.Min(displaySize.X, displaySize.Y) / Resources.DisplayMetrics.Density;
             bool isTablet = smallestWidthDp >= 600f;
 

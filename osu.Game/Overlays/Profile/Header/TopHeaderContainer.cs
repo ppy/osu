@@ -165,7 +165,6 @@ namespace osu.Game.Overlays.Profile.Header
                                                         userFlag = new UpdateableFlag
                                                         {
                                                             Size = new Vector2(28, 20),
-                                                            ShowPlaceholderOnUnknown = false,
                                                         },
                                                         userCountryContainer = new OsuHoverContainer
                                                         {

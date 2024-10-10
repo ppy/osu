@@ -22,8 +22,6 @@ namespace osu.Game.Beatmaps.Drawables.Cards
 
         public override bool IsPresent => true;
 
-        private readonly CircularContainer foreground;
-
         private readonly Box backgroundFill;
         private readonly Box foregroundFill;
 
@@ -35,22 +33,17 @@ namespace osu.Game.Beatmaps.Drawables.Cards
 
         public BeatmapCardDownloadProgressBar()
         {
-            InternalChildren = new Drawable[]
+            InternalChild = new CircularContainer
             {
-                new CircularContainer
+                RelativeSizeAxes = Axes.Both,
+                Masking = true,
+                Children = new Drawable[]
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    Masking = true,
-                    Child = backgroundFill = new Box
+                    backgroundFill = new Box
                     {
                         RelativeSizeAxes = Axes.Both,
-                    }
-                },
-                foreground = new CircularContainer
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Masking = true,
-                    Child = foregroundFill = new Box
+                    },
+                    foregroundFill = new Box
                     {
                         RelativeSizeAxes = Axes.Both,
                     }
@@ -89,7 +82,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
 
         private void progressChanged()
         {
-            foreground.ResizeWidthTo((float)progress.Value, progress.Value > 0 ? BeatmapCard.TRANSITION_DURATION : 0, Easing.OutQuint);
+            foregroundFill.ResizeWidthTo((float)progress.Value, progress.Value > 0 ? BeatmapCard.TRANSITION_DURATION : 0, Easing.OutQuint);
         }
     }
 }

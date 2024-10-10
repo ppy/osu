@@ -8,6 +8,7 @@ using System.Text;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Formats;
+using osu.Game.Beatmaps.Timing;
 using osu.Game.IO;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
@@ -59,8 +60,12 @@ namespace osu.Game.Database
 
             // Convert beatmap elements to be compatible with legacy format
             // So we truncate time and position values to integers, and convert paths with multiple segments to bezier curves
+
             foreach (var controlPoint in playableBeatmap.ControlPointInfo.AllControlPoints)
                 controlPoint.Time = Math.Floor(controlPoint.Time);
+
+            for (int i = 0; i < playableBeatmap.Breaks.Count; i++)
+                playableBeatmap.Breaks[i] = new BreakPeriod(Math.Floor(playableBeatmap.Breaks[i].StartTime), Math.Floor(playableBeatmap.Breaks[i].EndTime));
 
             foreach (var hitObject in playableBeatmap.HitObjects)
             {

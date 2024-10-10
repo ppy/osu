@@ -31,6 +31,7 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.UI;
 using osu.Game.Graphics.Containers;
 using osu.Game.Resources.Localisation.Web;
+using osu.Game.Utils;
 
 namespace osu.Game.Screens.Select
 {
@@ -401,13 +402,11 @@ namespace osu.Game.Screens.Select
                     return;
 
                 // this doesn't consider mods which apply variable rates, yet.
-                double rate = 1;
-                foreach (var mod in mods.Value.OfType<IApplicableToRate>())
-                    rate = mod.ApplyToRate(0, rate);
+                double rate = ModUtils.CalculateRateWithMods(mods.Value);
 
-                int bpmMax = (int)Math.Round(Math.Round(beatmap.ControlPointInfo.BPMMaximum) * rate);
-                int bpmMin = (int)Math.Round(Math.Round(beatmap.ControlPointInfo.BPMMinimum) * rate);
-                int mostCommonBPM = (int)Math.Round(Math.Round(60000 / beatmap.GetMostCommonBeatLength()) * rate);
+                int bpmMax = FormatUtils.RoundBPM(beatmap.ControlPointInfo.BPMMaximum, rate);
+                int bpmMin = FormatUtils.RoundBPM(beatmap.ControlPointInfo.BPMMinimum, rate);
+                int mostCommonBPM = FormatUtils.RoundBPM(60000 / beatmap.GetMostCommonBeatLength(), rate);
 
                 string labelText = bpmMin == bpmMax
                     ? $"{bpmMin}"
@@ -491,7 +490,7 @@ namespace osu.Game.Screens.Select
                                     RelativeSizeAxes = Axes.Both,
                                     Colour = Color4Extensions.FromHex(@"f7dd55"),
                                     Icon = FontAwesome.Regular.Circle,
-                                    Size = new Vector2(0.8f)
+                                    Size = new Vector2(0.7f)
                                 },
                                 statistic.CreateIcon().With(i =>
                                 {
@@ -499,7 +498,7 @@ namespace osu.Game.Screens.Select
                                     i.Origin = Anchor.Centre;
                                     i.RelativeSizeAxes = Axes.Both;
                                     i.Colour = Color4Extensions.FromHex(@"f7dd55");
-                                    i.Size = new Vector2(0.64f);
+                                    i.Size = new Vector2(0.6f);
                                 }),
                             }
                         },

@@ -246,7 +246,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
         private BeatmapCarousel createCarousel()
         {
-            return carousel = new BeatmapCarousel
+            return carousel = new BeatmapCarousel(new FilterCriteria())
             {
                 RelativeSizeAxes = Axes.Both,
                 BeatmapSets = new List<BeatmapSetInfo>

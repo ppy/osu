@@ -3,102 +3,89 @@
 
 #nullable disable
 
-using System;
-using System.Diagnostics;
+using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Testing;
-using osu.Game.Rulesets;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Judgements;
+using osu.Game.Rulesets.Osu.Scoring;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Play.HUD;
-using osuTK;
+using osu.Game.Skinning.Triangles;
+using osu.Game.Tests.Gameplay;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    public partial class TestScenePerformancePointsCounter : OsuTestScene
+    public partial class TestScenePerformancePointsCounter : SkinnableHUDComponentTestScene
     {
-        private DependencyProvidingContainer dependencyContainer;
+        [Cached(typeof(ScoreProcessor))]
+        private readonly ScoreProcessor scoreProcessor = new OsuScoreProcessor();
 
-        private GameplayState gameplayState;
-        private ScoreProcessor scoreProcessor;
+        [Cached]
+        private readonly GameplayState gameplayState = TestGameplayState.Create(new OsuRuleset());
 
         private int iteration;
-        private Bindable<JudgementResult> lastJudgementResult = new Bindable<JudgementResult>();
-        private PerformancePointsCounter counter;
 
-        [SetUpSteps]
-        public void SetUpSteps() => AddStep("create components", () =>
+        protected override Drawable CreateDefaultImplementation() => new TrianglesPerformancePointsCounter();
+        protected override Drawable CreateArgonImplementation() => new ArgonPerformancePointsCounter();
+        protected override Drawable CreateLegacyImplementation() => Empty();
+
+        private Bindable<JudgementResult> lastJudgementResult => (Bindable<JudgementResult>)gameplayState.LastJudgementResult;
+
+        public override void SetUpSteps()
         {
-            var ruleset = CreateRuleset();
-
-            Debug.Assert(ruleset != null);
-
-            var beatmap = CreateWorkingBeatmap(ruleset.RulesetInfo)
-                .GetPlayableBeatmap(ruleset.RulesetInfo);
-
-            lastJudgementResult = new Bindable<JudgementResult>();
-
-            gameplayState = new GameplayState(beatmap, ruleset);
-            gameplayState.LastJudgementResult.BindTo(lastJudgementResult);
-
-            scoreProcessor = new ScoreProcessor(ruleset);
-
-            Child = dependencyContainer = new DependencyProvidingContainer
+            AddStep("reset", () =>
             {
-                RelativeSizeAxes = Axes.Both,
-                CachedDependencies = new (Type, object)[]
-                {
-                    (typeof(GameplayState), gameplayState),
-                    (typeof(ScoreProcessor), scoreProcessor)
-                }
-            };
+                var ruleset = new OsuRuleset();
+                var beatmap = CreateWorkingBeatmap(ruleset.RulesetInfo)
+                    .GetPlayableBeatmap(ruleset.RulesetInfo);
 
-            iteration = 0;
-        });
+                iteration = 0;
+                scoreProcessor.ApplyBeatmap(beatmap);
+                lastJudgementResult.SetDefault();
+            });
 
-        protected override Ruleset CreateRuleset() => new OsuRuleset();
+            base.SetUpSteps();
+        }
 
-        private void createCounter() => AddStep("Create counter", () =>
+        [Test]
+        public void TestDisplay()
         {
-            dependencyContainer.Child = counter = new PerformancePointsCounter
-            {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                Scale = new Vector2(5),
-            };
-        });
+            AddSliderStep("pp", 0, 2000, 0, v => this.ChildrenOfType<PerformancePointsCounter>().ForEach(c => c.Current.Value = v));
+            AddToggleStep("toggle validity", v => this.ChildrenOfType<PerformancePointsCounter>().ForEach(c => c.IsValid = v));
+        }
 
         [Test]
         public void TestBasicCounting()
         {
             int previousValue = 0;
-            createCounter();
 
-            AddAssert("counter displaying zero", () => counter.Current.Value == 0);
+            AddAssert("counter displaying zero", () => this.ChildrenOfType<PerformancePointsCounter>().All(c => c.Current.Value == 0));
 
             AddRepeatStep("Add judgement", applyOneJudgement, 10);
 
-            AddUntilStep("counter non-zero", () => counter.Current.Value > 0);
-            AddUntilStep("counter opaque", () => counter.Child.Alpha == 1);
+            AddUntilStep("counter non-zero", () => this.ChildrenOfType<PerformancePointsCounter>().All(c => c.Current.Value > 0));
+            AddUntilStep("counter valid", () => this.ChildrenOfType<PerformancePointsCounter>().All(c => c.IsValid));
 
             AddStep("Revert judgement", () =>
             {
-                previousValue = counter.Current.Value;
+                previousValue = this.ChildrenOfType<PerformancePointsCounter>().First().Current.Value;
 
                 scoreProcessor.RevertResult(new JudgementResult(new HitObject(), new OsuJudgement()));
             });
 
-            AddUntilStep("counter decreased", () => counter.Current.Value < previousValue);
+            AddUntilStep("counter decreased", () => this.ChildrenOfType<PerformancePointsCounter>().All(c => c.Current.Value < previousValue));
 
             AddStep("Add judgement", applyOneJudgement);
 
-            AddUntilStep("counter non-zero", () => counter.Current.Value > 0);
+            AddUntilStep("counter non-zero", () => this.ChildrenOfType<PerformancePointsCounter>().All(c => c.Current.Value > 0));
         }
 
         [Test]
@@ -106,10 +93,10 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             AddRepeatStep("Add judgement", applyOneJudgement, 10);
 
-            createCounter();
+            AddStep("recreate counter", SetUpComponents);
 
-            AddUntilStep("counter non-zero", () => counter.Current.Value > 0);
-            AddUntilStep("counter opaque", () => counter.Child.Alpha == 1);
+            AddUntilStep("counter non-zero", () => this.ChildrenOfType<PerformancePointsCounter>().All(c => c.Current.Value > 0));
+            AddUntilStep("counter valid", () => this.ChildrenOfType<PerformancePointsCounter>().All(c => c.IsValid));
         }
 
         private void applyOneJudgement()

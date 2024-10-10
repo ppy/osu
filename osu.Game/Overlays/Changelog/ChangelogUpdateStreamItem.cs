@@ -24,7 +24,7 @@ namespace osu.Game.Overlays.Changelog
 
         protected override LocalisableString AdditionalText => Value.LatestBuild.DisplayVersion;
 
-        protected override LocalisableString InfoText => Value.LatestBuild.Users > 0 ? $"{"user".ToQuantity(Value.LatestBuild.Users, "N0")} online" : null;
+        protected override LocalisableString InfoText => Value.UserCount > 0 ? $"{"user".ToQuantity(Value.UserCount, "N0")} online" : null;
 
         protected override Color4 GetBarColour(OsuColour colours) => Value.Colour;
     }

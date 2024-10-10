@@ -35,6 +35,15 @@ namespace osu.Game.Database
         Task<Live<TModel>?> ImportAsUpdate(ProgressNotification notification, ImportTask task, TModel original);
 
         /// <summary>
+        /// Mount all files for a model to a temporary directory to allow for external editing.
+        /// </summary>
+        /// <remarks>
+        /// When editing is completed, call Finish() on the returned operation class to begin the import-and-update process.
+        /// </remarks>
+        /// <param name="model">The model to mount.</param>
+        public Task<ExternalEditOperation<TModel>> BeginExternalEditing(TModel model);
+
+        /// <summary>
         /// A user displayable name for the model type associated with this manager.
         /// </summary>
         string HumanisedModelName => $"{typeof(TModel).Name.Replace(@"Info", "").ToLowerInvariant()}";

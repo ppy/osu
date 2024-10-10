@@ -14,16 +14,16 @@ namespace osu.Game.Screens.Edit.Setup
 {
     public partial class MetadataSection : SetupSection
     {
-        protected LabelledTextBox ArtistTextBox = null!;
-        protected LabelledTextBox RomanisedArtistTextBox = null!;
+        protected FormTextBox ArtistTextBox = null!;
+        protected FormTextBox RomanisedArtistTextBox = null!;
 
-        protected LabelledTextBox TitleTextBox = null!;
-        protected LabelledTextBox RomanisedTitleTextBox = null!;
+        protected FormTextBox TitleTextBox = null!;
+        protected FormTextBox RomanisedTitleTextBox = null!;
 
-        private LabelledTextBox creatorTextBox = null!;
-        private LabelledTextBox difficultyTextBox = null!;
-        private LabelledTextBox sourceTextBox = null!;
-        private LabelledTextBox tagsTextBox = null!;
+        private FormTextBox creatorTextBox = null!;
+        private FormTextBox difficultyTextBox = null!;
+        private FormTextBox sourceTextBox = null!;
+        private FormTextBox tagsTextBox = null!;
 
         public override LocalisableString Title => EditorSetupStrings.MetadataHeader;
 
@@ -34,36 +34,26 @@ namespace osu.Game.Screens.Edit.Setup
 
             Children = new[]
             {
-                ArtistTextBox = createTextBox<LabelledTextBox>(EditorSetupStrings.Artist,
+                ArtistTextBox = createTextBox<FormTextBox>(EditorSetupStrings.Artist,
                     !string.IsNullOrEmpty(metadata.ArtistUnicode) ? metadata.ArtistUnicode : metadata.Artist),
-                RomanisedArtistTextBox = createTextBox<LabelledRomanisedTextBox>(EditorSetupStrings.RomanisedArtist,
+                RomanisedArtistTextBox = createTextBox<FormRomanisedTextBox>(EditorSetupStrings.RomanisedArtist,
                     !string.IsNullOrEmpty(metadata.Artist) ? metadata.Artist : MetadataUtils.StripNonRomanisedCharacters(metadata.ArtistUnicode)),
-
-                Empty(),
-
-                TitleTextBox = createTextBox<LabelledTextBox>(EditorSetupStrings.Title,
+                TitleTextBox = createTextBox<FormTextBox>(EditorSetupStrings.Title,
                     !string.IsNullOrEmpty(metadata.TitleUnicode) ? metadata.TitleUnicode : metadata.Title),
-                RomanisedTitleTextBox = createTextBox<LabelledRomanisedTextBox>(EditorSetupStrings.RomanisedTitle,
+                RomanisedTitleTextBox = createTextBox<FormRomanisedTextBox>(EditorSetupStrings.RomanisedTitle,
                     !string.IsNullOrEmpty(metadata.Title) ? metadata.Title : MetadataUtils.StripNonRomanisedCharacters(metadata.ArtistUnicode)),
-
-                Empty(),
-
-                creatorTextBox = createTextBox<LabelledTextBox>(EditorSetupStrings.Creator, metadata.Author.Username),
-                difficultyTextBox = createTextBox<LabelledTextBox>(EditorSetupStrings.DifficultyName, Beatmap.BeatmapInfo.DifficultyName),
-                sourceTextBox = createTextBox<LabelledTextBox>(BeatmapsetsStrings.ShowInfoSource, metadata.Source),
-                tagsTextBox = createTextBox<LabelledTextBox>(BeatmapsetsStrings.ShowInfoTags, metadata.Tags)
+                creatorTextBox = createTextBox<FormTextBox>(EditorSetupStrings.Creator, metadata.Author.Username),
+                difficultyTextBox = createTextBox<FormTextBox>(EditorSetupStrings.DifficultyName, Beatmap.BeatmapInfo.DifficultyName),
+                sourceTextBox = createTextBox<FormTextBox>(BeatmapsetsStrings.ShowInfoSource, metadata.Source),
+                tagsTextBox = createTextBox<FormTextBox>(BeatmapsetsStrings.ShowInfoTags, metadata.Tags)
             };
-
-            foreach (var item in Children.OfType<LabelledTextBox>())
-                item.OnCommit += onCommit;
         }
 
         private TTextBox createTextBox<TTextBox>(LocalisableString label, string initialValue)
-            where TTextBox : LabelledTextBox, new()
+            where TTextBox : FormTextBox, new()
             => new TTextBox
             {
-                Label = label,
-                FixedLabelWidth = LABEL_WIDTH,
+                Caption = label,
                 Current = { Value = initialValue },
                 TabbableContentContainer = this
             };
@@ -73,20 +63,23 @@ namespace osu.Game.Screens.Edit.Setup
             base.LoadComplete();
 
             if (string.IsNullOrEmpty(ArtistTextBox.Current.Value))
-                ScheduleAfterChildren(() => GetContainingInputManager().ChangeFocus(ArtistTextBox));
+                ScheduleAfterChildren(() => GetContainingFocusManager()!.ChangeFocus(ArtistTextBox));
 
             ArtistTextBox.Current.BindValueChanged(artist => transferIfRomanised(artist.NewValue, RomanisedArtistTextBox));
             TitleTextBox.Current.BindValueChanged(title => transferIfRomanised(title.NewValue, RomanisedTitleTextBox));
+
+            foreach (var item in Children.OfType<FormTextBox>())
+                item.OnCommit += onCommit;
+
             updateReadOnlyState();
         }
 
-        private void transferIfRomanised(string value, LabelledTextBox target)
+        private void transferIfRomanised(string value, FormTextBox target)
         {
             if (MetadataUtils.IsRomanised(value))
                 target.Current.Value = value;
 
             updateReadOnlyState();
-            Scheduler.AddOnce(updateMetadata);
         }
 
         private void updateReadOnlyState()
@@ -101,7 +94,7 @@ namespace osu.Game.Screens.Edit.Setup
 
             // for now, update on commit rather than making BeatmapMetadata bindables.
             // after switching database engines we can reconsider if switching to bindables is a good direction.
-            Scheduler.AddOnce(updateMetadata);
+            updateMetadata();
         }
 
         private void updateMetadata()
@@ -118,6 +111,19 @@ namespace osu.Game.Screens.Edit.Setup
             Beatmap.Metadata.Tags = tagsTextBox.Current.Value;
 
             Beatmap.SaveState();
+        }
+
+        private partial class FormRomanisedTextBox : FormTextBox
+        {
+            internal override InnerTextBox CreateTextBox() => new RomanisedTextBox();
+
+            private partial class RomanisedTextBox : InnerTextBox
+            {
+                protected override bool AllowIme => false;
+
+                protected override bool CanAddCharacter(char character)
+                    => MetadataUtils.IsRomanised(character);
+            }
         }
     }
 }

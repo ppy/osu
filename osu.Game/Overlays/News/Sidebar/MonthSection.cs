@@ -118,7 +118,7 @@ namespace osu.Game.Overlays.News.Sidebar
 
                 Expanded.BindValueChanged(open =>
                 {
-                    icon.Scale = new Vector2(1, open.NewValue ? -1 : 1);
+                    icon.ScaleTo(open.NewValue ? new Vector2(1f, -1f) : Vector2.One, 300, Easing.OutQuint);
                 }, true);
             }
         }

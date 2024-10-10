@@ -188,7 +188,7 @@ namespace osu.Game.Rulesets.Mods
         public void ApplyToBeatmap(IBeatmap beatmap)
         {
             var hitObjects = getAllApplicableHitObjects(beatmap.HitObjects).ToList();
-            var endTimes = hitObjects.Select(x => x.GetEndTime()).OrderBy(x => x).Distinct().ToList();
+            var endTimes = hitObjects.Select(x => x.GetEndTime()).Order().Distinct().ToList();
 
             foreach (HitObject hitObject in hitObjects)
             {

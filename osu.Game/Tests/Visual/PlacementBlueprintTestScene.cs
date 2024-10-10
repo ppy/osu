@@ -19,7 +19,7 @@ namespace osu.Game.Tests.Visual
     public abstract partial class PlacementBlueprintTestScene : OsuManualInputManagerTestScene, IPlacementHandler
     {
         protected readonly Container HitObjectContainer;
-        protected PlacementBlueprint CurrentBlueprint { get; private set; }
+        protected HitObjectPlacementBlueprint CurrentBlueprint { get; private set; }
 
         protected PlacementBlueprintTestScene()
         {
@@ -87,14 +87,14 @@ namespace osu.Game.Tests.Visual
             CurrentBlueprint.UpdateTimeAndPosition(SnapForBlueprint(CurrentBlueprint));
         }
 
-        protected virtual SnapResult SnapForBlueprint(PlacementBlueprint blueprint) =>
+        protected virtual SnapResult SnapForBlueprint(HitObjectPlacementBlueprint blueprint) =>
             new SnapResult(InputManager.CurrentState.Mouse.Position, null);
 
         public override void Add(Drawable drawable)
         {
             base.Add(drawable);
 
-            if (drawable is PlacementBlueprint blueprint)
+            if (drawable is HitObjectPlacementBlueprint blueprint)
             {
                 blueprint.Show();
                 blueprint.UpdateTimeAndPosition(SnapForBlueprint(blueprint));
@@ -106,6 +106,6 @@ namespace osu.Game.Tests.Visual
         protected virtual Container CreateHitObjectContainer() => new Container { RelativeSizeAxes = Axes.Both };
 
         protected abstract DrawableHitObject CreateHitObject(HitObject hitObject);
-        protected abstract PlacementBlueprint CreateBlueprint();
+        protected abstract HitObjectPlacementBlueprint CreateBlueprint();
     }
 }

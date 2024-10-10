@@ -29,8 +29,7 @@ namespace osu.Game.Rulesets.Osu.Objects
 
         public class TailJudgement : SliderEndJudgement
         {
-            public override HitResult MaxResult => HitResult.LargeTickHit;
-            public override HitResult MinResult => HitResult.IgnoreMiss;
+            public override HitResult MaxResult => HitResult.SliderTailHit;
         }
     }
 }

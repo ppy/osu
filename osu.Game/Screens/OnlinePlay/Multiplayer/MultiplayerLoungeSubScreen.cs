@@ -12,6 +12,7 @@ using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.UserInterface;
+using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Online.Multiplayer;
@@ -51,6 +52,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             roomAccessTypeDropdown = new SlimEnumDropdown<RoomPermissionsFilter>
             {
                 RelativeSizeAxes = Axes.None,
+                Current = Config.GetBindable<RoomPermissionsFilter>(OsuSetting.MultiplayerRoomFilter),
                 Width = 160,
             };
 

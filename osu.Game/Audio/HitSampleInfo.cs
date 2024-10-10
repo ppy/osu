@@ -80,6 +80,8 @@ namespace osu.Game.Audio
                     yield return $"Gameplay/{Bank}-{Name}{Suffix}";
 
                 yield return $"Gameplay/{Bank}-{Name}";
+
+                yield return $"Gameplay/{Name}";
             }
         }
 
@@ -94,7 +96,7 @@ namespace osu.Game.Audio
         public virtual HitSampleInfo With(Optional<string> newName = default, Optional<string> newBank = default, Optional<string?> newSuffix = default, Optional<int> newVolume = default)
             => new HitSampleInfo(newName.GetOr(Name), newBank.GetOr(Bank), newSuffix.GetOr(Suffix), newVolume.GetOr(Volume));
 
-        public bool Equals(HitSampleInfo? other)
+        public virtual bool Equals(HitSampleInfo? other)
             => other != null && Name == other.Name && Bank == other.Bank && Suffix == other.Suffix;
 
         public override bool Equals(object? obj)

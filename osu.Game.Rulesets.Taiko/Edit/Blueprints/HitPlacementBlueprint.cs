@@ -10,7 +10,7 @@ using osuTK.Input;
 
 namespace osu.Game.Rulesets.Taiko.Edit.Blueprints
 {
-    public partial class HitPlacementBlueprint : PlacementBlueprint
+    public partial class HitPlacementBlueprint : HitObjectPlacementBlueprint
     {
         private readonly HitPiece piece;
 
@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Taiko.Edit.Blueprints
         {
             InternalChild = piece = new HitPiece
             {
-                Size = new Vector2(TaikoHitObject.DEFAULT_SIZE * TaikoPlayfield.DEFAULT_HEIGHT)
+                Size = new Vector2(TaikoHitObject.DEFAULT_SIZE * TaikoPlayfield.BASE_HEIGHT)
             };
         }
 

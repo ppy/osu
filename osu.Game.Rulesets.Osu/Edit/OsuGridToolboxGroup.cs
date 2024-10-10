@@ -13,7 +13,6 @@ using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Input.Bindings;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Osu.UI;
@@ -66,15 +65,15 @@ namespace osu.Game.Rulesets.Osu.Edit
         /// </summary>
         public BindableFloat GridLinesRotation { get; } = new BindableFloat(0f)
         {
-            MinValue = -90f,
-            MaxValue = 90f,
+            MinValue = -180f,
+            MaxValue = 180f,
         };
 
         /// <summary>
         /// Read-only bindable representing the grid's origin.
         /// Equivalent to <code>new Vector2(StartPositionX, StartPositionY)</code>
         /// </summary>
-        public Bindable<Vector2> StartPosition { get; } = new Bindable<Vector2>();
+        public Bindable<Vector2> StartPosition { get; } = new Bindable<Vector2>(OsuPlayfield.BASE_SIZE / 2);
 
         /// <summary>
         /// Read-only bindable representing the grid's spacing in both the X and Y dimension.
@@ -88,10 +87,7 @@ namespace osu.Game.Rulesets.Osu.Edit
         private ExpandableSlider<float> startPositionYSlider = null!;
         private ExpandableSlider<float> spacingSlider = null!;
         private ExpandableSlider<float> gridLinesRotationSlider = null!;
-        private RoundedButton gridFromPointsButton = null!;
         private EditorRadioButtonCollection gridTypeButtons = null!;
-
-        public event Action? GridFromPointsClicked;
 
         public OsuGridToolboxGroup()
             : base("grid")
@@ -106,11 +102,14 @@ namespace osu.Game.Rulesets.Osu.Edit
             StartPositionY.Value = point1.Y;
 
             // Get the angle between the two points and normalize to the valid range.
-            const float period = 180;
-            GridLinesRotation.Value = (MathHelper.RadiansToDegrees(MathF.Atan2(point2.Y - point1.Y, point2.X - point1.X))
-                                       + period * 1.5f) % period - period * 0.5f;
+            if (!GridLinesRotation.Disabled)
+            {
+                float period = GridLinesRotation.MaxValue - GridLinesRotation.MinValue;
+                GridLinesRotation.Value = normalizeRotation(MathHelper.RadiansToDegrees(MathF.Atan2(point2.Y - point1.Y, point2.X - point1.X)), period);
+            }
 
             // Divide the distance so that there is a good density of grid lines.
+            // This matches the maximum grid size of the grid size cycling hotkey.
             float dist = Vector2.Distance(point1, point2);
             while (dist >= max_automatic_spacing)
                 dist /= 2;
@@ -149,12 +148,6 @@ namespace osu.Game.Rulesets.Osu.Edit
                     Spacing = new Vector2(0f, 10f),
                     Children = new Drawable[]
                     {
-                        gridFromPointsButton = new RoundedButton
-                        {
-                            Action = () => GridFromPointsClicked?.Invoke(),
-                            RelativeSizeAxes = Axes.X,
-                            Text = "Grid from points",
-                        },
                         gridTypeButtons = new EditorRadioButtonCollection
                         {
                             RelativeSizeAxes = Axes.X,
@@ -218,13 +211,36 @@ namespace osu.Game.Rulesets.Osu.Edit
                 gridLinesRotationSlider.ExpandedLabelText = $"Rotation: {rotation.NewValue:#,0.##}";
             }, true);
 
+            GridType.BindValueChanged(v =>
+            {
+                GridLinesRotation.Disabled = v.NewValue == PositionSnapGridType.Circle;
+
+                switch (v.NewValue)
+                {
+                    case PositionSnapGridType.Square:
+                        GridLinesRotation.Value = normalizeRotation(GridLinesRotation.Value, 90);
+                        GridLinesRotation.MinValue = -45;
+                        GridLinesRotation.MaxValue = 45;
+                        break;
+
+                    case PositionSnapGridType.Triangle:
+                        GridLinesRotation.Value = normalizeRotation(GridLinesRotation.Value, 60);
+                        GridLinesRotation.MinValue = -30;
+                        GridLinesRotation.MaxValue = 30;
+                        break;
+                }
+            }, true);
+
             expandingContainer?.Expanded.BindValueChanged(v =>
             {
-                gridFromPointsButton.FadeTo(v.NewValue ? 1f : 0f, 500, Easing.OutQuint);
-                gridFromPointsButton.BypassAutoSizeAxes = !v.NewValue ? Axes.Y : Axes.None;
                 gridTypeButtons.FadeTo(v.NewValue ? 1f : 0f, 500, Easing.OutQuint);
                 gridTypeButtons.BypassAutoSizeAxes = !v.NewValue ? Axes.Y : Axes.None;
             }, true);
+        }
+
+        private float normalizeRotation(float rotation, float period)
+        {
+            return ((rotation + 360 + period * 0.5f) % period) - period * 0.5f;
         }
 
         private void nextGridSize()
@@ -249,10 +265,6 @@ namespace osu.Game.Rulesets.Osu.Edit
 
                 case GlobalAction.EditorCycleGridType:
                     nextGridType();
-                    return true;
-
-                case GlobalAction.EditorGridFromPoints:
-                    GridFromPointsClicked?.Invoke();
                     return true;
             }
 

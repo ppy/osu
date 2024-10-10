@@ -79,6 +79,8 @@ namespace osu.Game.Beatmaps.Drawables.Cards.Buttons
         {
             base.Update();
 
+            icon.Scale = new Vector2(DrawWidth / (BeatmapCardNormal.HEIGHT - BeatmapCard.CORNER_RADIUS));
+
             if (Playing.Value && previewTrack != null && previewTrack.TrackLoaded)
                 progress.Value = previewTrack.CurrentTime / previewTrack.Length;
             else

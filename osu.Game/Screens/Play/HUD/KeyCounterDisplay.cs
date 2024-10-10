@@ -15,7 +15,7 @@ namespace osu.Game.Screens.Play.HUD
     /// <summary>
     /// A flowing display of all gameplay keys. Individual keys can be added using <see cref="InputTrigger"/> implementations.
     /// </summary>
-    public abstract partial class KeyCounterDisplay : CompositeDrawable, ISerialisableDrawable
+    public abstract partial class KeyCounterDisplay : Container, ISerialisableDrawable
     {
         /// <summary>
         /// Whether the key counter should be visible regardless of the configuration value.
@@ -29,24 +29,21 @@ namespace osu.Game.Screens.Play.HUD
 
         private readonly IBindableList<InputTrigger> triggers = new BindableList<InputTrigger>();
 
+        protected override Container<Drawable> Content { get; } = new Container
+        {
+            Alpha = 0,
+            AutoSizeAxes = Axes.Both,
+        };
+
         [Resolved]
         private InputCountController controller { get; set; } = null!;
 
         private const int duration = 100;
 
-        protected void UpdateVisibility()
+        protected KeyCounterDisplay()
         {
-            bool visible = AlwaysVisible.Value || ConfigVisibility.Value;
-
-            // Isolate changing visibility of the key counters from fading this component.
-            KeyFlow.FadeTo(visible ? 1 : 0, duration);
-
-            // Ensure a valid size is immediately obtained even if partially off-screen
-            // See https://github.com/ppy/osu/issues/14793.
-            KeyFlow.AlwaysPresent = visible;
+            AddInternal(Content);
         }
-
-        protected abstract KeyCounter CreateCounter(InputTrigger trigger);
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config, DrawableRuleset? drawableRuleset)
@@ -69,6 +66,20 @@ namespace osu.Game.Screens.Play.HUD
             AlwaysVisible.BindValueChanged(_ => UpdateVisibility());
             ConfigVisibility.BindValueChanged(_ => UpdateVisibility(), true);
         }
+
+        protected void UpdateVisibility()
+        {
+            bool visible = AlwaysVisible.Value || ConfigVisibility.Value;
+
+            // Isolate changing visibility of the key counters from fading this component.
+            Content.FadeTo(visible ? 1 : 0, duration);
+
+            // Ensure a valid size is immediately obtained even if partially off-screen
+            // See https://github.com/ppy/osu/issues/14793.
+            Content.AlwaysPresent = visible;
+        }
+
+        protected abstract KeyCounter CreateCounter(InputTrigger trigger);
 
         private void triggersChanged(object? sender, NotifyCollectionChangedEventArgs e)
         {

@@ -20,12 +20,16 @@ namespace osu.Game.Screens.Play
         private GameplayState gameplayState { get; set; } = null!;
 
         private IBindable<bool> touchActive = new BindableBool();
+        private IBindable<bool> isBreakTime = null!;
 
         [BackgroundDependencyLoader]
         private void load(SessionStatics statics)
         {
             touchActive = statics.GetBindable<bool>(Static.TouchInputActive);
             touchActive.BindValueChanged(_ => updateState());
+
+            isBreakTime = player.IsBreakTime.GetBoundCopy();
+            isBreakTime.BindValueChanged(_ => updateState(), true);
         }
 
         private void updateState()
@@ -39,7 +43,7 @@ namespace osu.Game.Screens.Play
             if (gameplayState.Score.ScoreInfo.Mods.OfType<ModTouchDevice>().Any())
                 return;
 
-            if (player.IsBreakTime.Value)
+            if (isBreakTime.Value)
                 return;
 
             var touchDeviceMod = gameplayState.Ruleset.GetTouchDeviceMod();

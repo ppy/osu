@@ -21,6 +21,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         public Action? Action;
 
+        public event Action? HoverLost;
+
         public SelectionBoxButton(IconUsage iconUsage, string tooltip)
         {
             this.iconUsage = iconUsage;
@@ -59,6 +61,13 @@ namespace osu.Game.Screens.Edit.Compose.Components
         {
             base.UpdateHoverState();
             icon.FadeColour(!IsHeld && IsHovered ? Color4.White : Color4.Black, TRANSFORM_DURATION, Easing.OutQuint);
+        }
+
+        protected override void OnHoverLost(HoverLostEvent e)
+        {
+            base.OnHoverLost(e);
+
+            HoverLost?.Invoke();
         }
 
         public LocalisableString TooltipText { get; }

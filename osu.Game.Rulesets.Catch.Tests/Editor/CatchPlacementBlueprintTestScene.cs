@@ -71,7 +71,7 @@ namespace osu.Game.Rulesets.Catch.Tests.Editor
             contentContainer.Playfield.HitObjectContainer.Add(hitObject);
         }
 
-        protected override SnapResult SnapForBlueprint(PlacementBlueprint blueprint)
+        protected override SnapResult SnapForBlueprint(HitObjectPlacementBlueprint blueprint)
         {
             var result = base.SnapForBlueprint(blueprint);
             result.Time = Math.Round(HitObjectContainer.TimeAtScreenSpacePosition(result.ScreenSpacePosition) / TIME_SNAP) * TIME_SNAP;

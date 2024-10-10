@@ -106,7 +106,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             {
                 var next = Children.SkipWhile(c => c != sender).Skip(1).FirstOrDefault();
                 if (next != null)
-                    GetContainingInputManager().ChangeFocus(next);
+                    GetContainingFocusManager()?.ChangeFocus(next);
             }
         }
     }

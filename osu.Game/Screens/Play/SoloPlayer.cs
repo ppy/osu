@@ -52,7 +52,7 @@ namespace osu.Game.Screens.Play
                 Scores = { BindTarget = LeaderboardScores }
             };
 
-        protected override bool HandleTokenRetrievalFailure(Exception exception) => false;
+        protected override bool ShouldExitOnTokenRetrievalFailure(Exception exception) => false;
 
         protected override Task ImportScore(Score score)
         {

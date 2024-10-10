@@ -4,7 +4,6 @@
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
-using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -26,6 +25,8 @@ namespace osu.Game.Overlays.Toolbar
 {
     public abstract partial class ToolbarButton : OsuClickableContainer, IKeyBindingHandler<GlobalAction>
     {
+        public const float PADDING = 3;
+
         protected GlobalAction? Hotkey { get; set; }
 
         public void SetIcon(Drawable icon)
@@ -63,6 +64,7 @@ namespace osu.Game.Overlays.Toolbar
 
         protected virtual Anchor TooltipAnchor => Anchor.TopLeft;
 
+        protected readonly Container ButtonContent;
         protected ConstrainedIconContainer IconContainer;
         protected SpriteText DrawableText;
         protected Box HoverBackground;
@@ -80,59 +82,66 @@ namespace osu.Game.Overlays.Toolbar
 
         protected ToolbarButton()
         {
-            Width = Toolbar.HEIGHT;
+            AutoSizeAxes = Axes.X;
             RelativeSizeAxes = Axes.Y;
-
-            Padding = new MarginPadding(3);
 
             Children = new Drawable[]
             {
-                BackgroundContent = new Container
+                ButtonContent = new Container
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    Masking = true,
-                    CornerRadius = 6,
-                    CornerExponent = 3f,
-                    Children = new Drawable[]
-                    {
-                        HoverBackground = new Box
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Colour = OsuColour.Gray(80).Opacity(180),
-                            Blending = BlendingParameters.Additive,
-                            Alpha = 0,
-                        },
-                        flashBackground = new Box
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Alpha = 0,
-                            Colour = Color4.White.Opacity(100),
-                            Blending = BlendingParameters.Additive,
-                        },
-                    }
-                },
-                Flow = new FillFlowContainer
-                {
-                    Direction = FillDirection.Horizontal,
-                    Spacing = new Vector2(5),
-                    Anchor = Anchor.TopCentre,
-                    Origin = Anchor.TopCentre,
-                    Padding = new MarginPadding { Left = Toolbar.HEIGHT / 2, Right = Toolbar.HEIGHT / 2 },
+                    Width = Toolbar.HEIGHT,
                     RelativeSizeAxes = Axes.Y,
-                    AutoSizeAxes = Axes.X,
+                    Padding = new MarginPadding(PADDING),
                     Children = new Drawable[]
                     {
-                        IconContainer = new ConstrainedIconContainer
+                        BackgroundContent = new Container
                         {
-                            Anchor = Anchor.CentreLeft,
-                            Origin = Anchor.CentreLeft,
-                            Size = new Vector2(20),
-                            Alpha = 0,
+                            RelativeSizeAxes = Axes.Both,
+                            Masking = true,
+                            CornerRadius = 6,
+                            CornerExponent = 3f,
+                            Children = new Drawable[]
+                            {
+                                HoverBackground = new Box
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    Colour = OsuColour.Gray(80).Opacity(180),
+                                    Blending = BlendingParameters.Additive,
+                                    Alpha = 0,
+                                },
+                                flashBackground = new Box
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    Alpha = 0,
+                                    Colour = Color4.White.Opacity(100),
+                                    Blending = BlendingParameters.Additive,
+                                },
+                            }
                         },
-                        DrawableText = new OsuSpriteText
+                        Flow = new FillFlowContainer
                         {
-                            Anchor = Anchor.CentreLeft,
-                            Origin = Anchor.CentreLeft,
+                            Direction = FillDirection.Horizontal,
+                            Spacing = new Vector2(5),
+                            Anchor = Anchor.TopCentre,
+                            Origin = Anchor.TopCentre,
+                            Padding = new MarginPadding { Left = Toolbar.HEIGHT / 2, Right = Toolbar.HEIGHT / 2 },
+                            RelativeSizeAxes = Axes.Y,
+                            AutoSizeAxes = Axes.X,
+                            Children = new Drawable[]
+                            {
+                                IconContainer = new ConstrainedIconContainer
+                                {
+                                    Anchor = Anchor.CentreLeft,
+                                    Origin = Anchor.CentreLeft,
+                                    Size = new Vector2(20),
+                                    Alpha = 0,
+                                },
+                                DrawableText = new OsuSpriteText
+                                {
+                                    Anchor = Anchor.CentreLeft,
+                                    Origin = Anchor.CentreLeft,
+                                },
+                            },
                         },
                     },
                 },
@@ -140,9 +149,9 @@ namespace osu.Game.Overlays.Toolbar
                 {
                     Direction = FillDirection.Vertical,
                     RelativeSizeAxes = Axes.Both, // stops us being considered in parent's autosize
-                    Anchor = TooltipAnchor.HasFlagFast(Anchor.x0) ? Anchor.BottomLeft : Anchor.BottomRight,
+                    Anchor = TooltipAnchor.HasFlag(Anchor.x0) ? Anchor.BottomLeft : Anchor.BottomRight,
                     Origin = TooltipAnchor,
-                    Position = new Vector2(TooltipAnchor.HasFlagFast(Anchor.x0) ? 5 : -5, 5),
+                    Position = new Vector2(TooltipAnchor.HasFlag(Anchor.x0) ? 5 : -5, 5),
                     Alpha = 0,
                     Children = new Drawable[]
                     {

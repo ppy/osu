@@ -123,58 +123,58 @@ namespace osu.Game.IO.Legacy
 
             switch (t)
             {
-                case ObjType.boolType:
+                case ObjType.BoolType:
                     return ReadBoolean();
 
-                case ObjType.byteType:
+                case ObjType.ByteType:
                     return ReadByte();
 
-                case ObjType.uint16Type:
+                case ObjType.UInt16Type:
                     return ReadUInt16();
 
-                case ObjType.uint32Type:
+                case ObjType.UInt32Type:
                     return ReadUInt32();
 
-                case ObjType.uint64Type:
+                case ObjType.UInt64Type:
                     return ReadUInt64();
 
-                case ObjType.sbyteType:
+                case ObjType.SByteType:
                     return ReadSByte();
 
-                case ObjType.int16Type:
+                case ObjType.Int16Type:
                     return ReadInt16();
 
-                case ObjType.int32Type:
+                case ObjType.Int32Type:
                     return ReadInt32();
 
-                case ObjType.int64Type:
+                case ObjType.Int64Type:
                     return ReadInt64();
 
-                case ObjType.charType:
+                case ObjType.CharType:
                     return ReadChar();
 
-                case ObjType.stringType:
+                case ObjType.StringType:
                     return base.ReadString();
 
-                case ObjType.singleType:
+                case ObjType.SingleType:
                     return ReadSingle();
 
-                case ObjType.doubleType:
+                case ObjType.DoubleType:
                     return ReadDouble();
 
-                case ObjType.decimalType:
+                case ObjType.DecimalType:
                     return ReadDecimal();
 
-                case ObjType.dateTimeType:
+                case ObjType.DateTimeType:
                     return ReadDateTime();
 
-                case ObjType.byteArrayType:
+                case ObjType.ByteArrayType:
                     return ReadByteArray();
 
-                case ObjType.charArrayType:
+                case ObjType.CharArrayType:
                     return ReadCharArray();
 
-                case ObjType.otherType:
+                case ObjType.OtherType:
                     throw new IOException("Deserialization of arbitrary type is not supported.");
 
                 default:
@@ -185,25 +185,25 @@ namespace osu.Game.IO.Legacy
 
     public enum ObjType : byte
     {
-        nullType,
-        boolType,
-        byteType,
-        uint16Type,
-        uint32Type,
-        uint64Type,
-        sbyteType,
-        int16Type,
-        int32Type,
-        int64Type,
-        charType,
-        stringType,
-        singleType,
-        doubleType,
-        decimalType,
-        dateTimeType,
-        byteArrayType,
-        charArrayType,
-        otherType,
-        ILegacySerializableType
+        NullType,
+        BoolType,
+        ByteType,
+        UInt16Type,
+        UInt32Type,
+        UInt64Type,
+        SByteType,
+        Int16Type,
+        Int32Type,
+        Int64Type,
+        CharType,
+        StringType,
+        SingleType,
+        DoubleType,
+        DecimalType,
+        DateTimeType,
+        ByteArrayType,
+        CharArrayType,
+        OtherType,
+        LegacySerializableType
     }
 }

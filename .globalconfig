@@ -1,5 +1,3 @@
-is_global = true
-
 # .NET Code Style
 # IDE styles reference: https://docs.microsoft.com/dotnet/fundamentals/code-analysis/style-rules/
 

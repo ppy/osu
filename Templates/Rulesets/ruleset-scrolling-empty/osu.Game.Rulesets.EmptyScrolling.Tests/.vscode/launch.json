@@ -7,7 +7,7 @@
             "request": "launch",
             "program": "dotnet",
             "args": [
-                "${workspaceRoot}/bin/Debug/net6.0/osu.Game.Rulesets.EmptyScrolling.Tests.dll"
+                "${workspaceRoot}/bin/Debug/net8.0/osu.Game.Rulesets.EmptyScrolling.Tests.dll"
             ],
             "cwd": "${workspaceRoot}",
             "preLaunchTask": "Build (Debug)",
@@ -20,7 +20,7 @@
             "request": "launch",
             "program": "dotnet",
             "args": [
-                "${workspaceRoot}/bin/Release/net6.0/osu.Game.Rulesets.EmptyScrolling.Tests.dll"
+                "${workspaceRoot}/bin/Release/net8.0/osu.Game.Rulesets.EmptyScrolling.Tests.dll"
             ],
             "cwd": "${workspaceRoot}",
             "preLaunchTask": "Build (Release)",

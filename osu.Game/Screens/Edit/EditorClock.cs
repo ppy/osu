@@ -132,7 +132,7 @@ namespace osu.Game.Screens.Edit
             seekTime = timingPoint.Time + closestBeat * seekAmount;
 
             // limit forward seeking to only up to the next timing point's start time.
-            var nextTimingPoint = ControlPointInfo.TimingPoints.FirstOrDefault(t => t.Time > timingPoint.Time);
+            var nextTimingPoint = ControlPointInfo.TimingPointAfter(timingPoint.Time);
             if (seekTime > nextTimingPoint?.Time)
                 seekTime = nextTimingPoint.Time;
 
@@ -154,7 +154,7 @@ namespace osu.Game.Screens.Edit
         /// The current time of this clock, include any active transform seeks performed via <see cref="SeekSmoothlyTo"/>.
         /// </summary>
         public double CurrentTimeAccurate =>
-            Transforms.OfType<TransformSeek>().FirstOrDefault()?.EndValue ?? CurrentTime;
+            Transforms.OfType<TransformSeek>().LastOrDefault()?.EndValue ?? CurrentTime;
 
         public double CurrentTime => underlyingClock.CurrentTime;
 

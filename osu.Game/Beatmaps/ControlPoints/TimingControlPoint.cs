@@ -26,7 +26,7 @@ namespace osu.Game.Beatmaps.ControlPoints
         /// </summary>
         private const double default_beat_length = 60000.0 / 60.0;
 
-        public override Color4 GetRepresentingColour(OsuColour colours) => colours.Orange1;
+        public override Color4 GetRepresentingColour(OsuColour colours) => colours.Red2;
 
         public static readonly TimingControlPoint DEFAULT = new TimingControlPoint
         {
@@ -81,6 +81,13 @@ namespace osu.Game.Beatmaps.ControlPoints
         /// The BPM at this control point.
         /// </summary>
         public double BPM => 60000 / BeatLength;
+
+        public TimingControlPoint()
+        {
+            TimeSignatureBindable.BindValueChanged(_ => RaiseChanged());
+            OmitFirstBarLineBindable.BindValueChanged(_ => RaiseChanged());
+            BeatLengthBindable.BindValueChanged(_ => RaiseChanged());
+        }
 
         // Timing points are never redundant as they can change the time signature.
         public override bool IsRedundant(ControlPoint? existing) => false;

@@ -18,7 +18,7 @@ namespace osu.Game.Rulesets.Edit
             RelativeSizeAxes = Axes.Y;
 
             FillFlow.Spacing = new Vector2(5);
-            Padding = new MarginPadding { Vertical = 5 };
+            FillFlow.Padding = new MarginPadding { Vertical = 5 };
         }
 
         protected override bool ReceivePositionalInputAtSubTree(Vector2 screenSpacePos) => base.ReceivePositionalInputAtSubTree(screenSpacePos) && anyToolboxHovered(screenSpacePos);

@@ -1,19 +1,25 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
-using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Overlays
 {
     public class OverlayColourProvider
     {
-        private readonly OverlayColourScheme colourScheme;
+        /// <summary>
+        /// The hue degree associated with the colour shades provided by this <see cref="OverlayColourProvider"/>.
+        /// </summary>
+        public int Hue { get; private set; }
 
         public OverlayColourProvider(OverlayColourScheme colourScheme)
+            : this(colourScheme.GetHue())
         {
-            this.colourScheme = colourScheme;
+        }
+
+        public OverlayColourProvider(int hue)
+        {
+            Hue = hue;
         }
 
         // Note that the following five colours are also defined in `OsuColour` as `{colourScheme}{0,1,2,3,4}`.
@@ -47,56 +53,20 @@ namespace osu.Game.Overlays
         public Color4 Background5 => getColour(0.1f, 0.15f);
         public Color4 Background6 => getColour(0.1f, 0.1f);
 
-        private Color4 getColour(float saturation, float lightness) => Color4.FromHsl(new Vector4(getBaseHue(colourScheme), saturation, lightness, 1));
+        /// <summary>
+        /// Changes the <see cref="Hue"/> to a different degree.
+        /// Note that this does not trigger any kind of signal to any drawable that received colours from here, all drawables need to be updated manually.
+        /// </summary>
+        /// <param name="colourScheme">The proposed colour scheme.</param>
+        public void ChangeColourScheme(OverlayColourScheme colourScheme) => ChangeColourScheme(colourScheme.GetHue());
 
-        // See https://github.com/ppy/osu-web/blob/5a536d217a21582aad999db50a981003d3ad5659/app/helpers.php#L1620-L1628
-        private static float getBaseHue(OverlayColourScheme colourScheme)
-        {
-            switch (colourScheme)
-            {
-                default:
-                    throw new ArgumentException($@"{colourScheme} colour scheme does not provide a hue value in {nameof(getBaseHue)}.");
+        /// <summary>
+        /// Changes the <see cref="Hue"/> to a different degree.
+        /// Note that this does not trigger any kind of signal to any drawable that received colours from here, all drawables need to be updated manually.
+        /// </summary>
+        /// <param name="hue">The proposed hue degree.</param>
+        public void ChangeColourScheme(int hue) => Hue = hue;
 
-                case OverlayColourScheme.Red:
-                    return 0;
-
-                case OverlayColourScheme.Pink:
-                    return 333 / 360f;
-
-                case OverlayColourScheme.Orange:
-                    return 45 / 360f;
-
-                case OverlayColourScheme.Lime:
-                    return 90 / 360f;
-
-                case OverlayColourScheme.Green:
-                    return 125 / 360f;
-
-                case OverlayColourScheme.Aquamarine:
-                    return 160 / 360f;
-
-                case OverlayColourScheme.Purple:
-                    return 255 / 360f;
-
-                case OverlayColourScheme.Blue:
-                    return 200 / 360f;
-
-                case OverlayColourScheme.Plum:
-                    return 320 / 360f;
-            }
-        }
-    }
-
-    public enum OverlayColourScheme
-    {
-        Red,
-        Pink,
-        Orange,
-        Lime,
-        Green,
-        Purple,
-        Blue,
-        Plum,
-        Aquamarine
+        private Color4 getColour(float saturation, float lightness) => Framework.Graphics.Colour4.FromHSL(Hue / 360f, saturation, lightness);
     }
 }

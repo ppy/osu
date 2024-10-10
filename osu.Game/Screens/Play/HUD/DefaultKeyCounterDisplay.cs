@@ -16,11 +16,10 @@ namespace osu.Game.Screens.Play.HUD
 
         public DefaultKeyCounterDisplay()
         {
-            InternalChild = KeyFlow = new FillFlowContainer<KeyCounter>
+            Child = KeyFlow = new FillFlowContainer<KeyCounter>
             {
                 Direction = FillDirection.Horizontal,
                 AutoSizeAxes = Axes.Both,
-                Alpha = 0,
             };
         }
 

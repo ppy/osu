@@ -11,6 +11,8 @@ namespace osu.Game.Graphics.UserInterface
     {
         public readonly MenuItemType Type;
 
+        public Hotkey Hotkey { get; init; }
+
         public OsuMenuItem(LocalisableString text, MenuItemType type = MenuItemType.Standard)
             : this(text, type, null)
         {

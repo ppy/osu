@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
@@ -21,6 +22,7 @@ namespace osu.Game.Rulesets.Mods
     /// <summary>
     /// The base class for gameplay modifiers.
     /// </summary>
+    [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)]
     public abstract class Mod : IMod, IEquatable<Mod>, IDeepCloneable<Mod>
     {
         [JsonIgnore]
@@ -168,6 +170,12 @@ namespace osu.Game.Rulesets.Mods
         public virtual bool RequiresConfiguration => false;
 
         /// <summary>
+        /// Whether scores with this mod active can give performance points.
+        /// </summary>
+        [JsonIgnore]
+        public virtual bool Ranked => false;
+
+        /// <summary>
         /// The mods this mod cannot be enabled with.
         /// </summary>
         [JsonIgnore]
@@ -195,7 +203,7 @@ namespace osu.Game.Rulesets.Mods
         /// <summary>
         /// Whether all settings in this mod are set to their default state.
         /// </summary>
-        protected virtual bool UsesDefaultConfiguration => SettingsBindables.All(s => s.IsDefault);
+        public virtual bool UsesDefaultConfiguration => SettingsBindables.All(s => s.IsDefault);
 
         /// <summary>
         /// Creates a copy of this <see cref="Mod"/> initialised to a default state.
@@ -258,8 +266,7 @@ namespace osu.Game.Rulesets.Mods
 
                 // TODO: special case for handling number types
 
-                PropertyInfo property = targetSetting.GetType().GetProperty(nameof(Bindable<bool>.Value))!;
-                property.SetValue(targetSetting, property.GetValue(sourceSetting));
+                BindableValueAccessor.SetValue(targetSetting, BindableValueAccessor.GetValue(sourceSetting));
             }
         }
 

@@ -16,14 +16,8 @@ namespace osu.Game.Graphics.UserInterface
         [Description("button-sidebar")]
         ButtonSidebar,
 
-        [Description("toolbar")]
-        Toolbar,
-
         [Description("tabselect")]
         TabSelect,
-
-        [Description("scrolltotop")]
-        ScrollToTop,
 
         [Description("dialog-cancel")]
         DialogCancel,

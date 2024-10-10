@@ -27,7 +27,7 @@ namespace osu.Game.Screens.Backgrounds
         private Background background;
 
         private int currentDisplay;
-        private const int background_count = 7;
+        private const int background_count = 8;
         private IBindable<APIUser> user;
         private Bindable<Skin> skin;
         private Bindable<BackgroundSource> source;
@@ -42,11 +42,6 @@ namespace osu.Game.Screens.Backgrounds
 
         protected virtual bool AllowStoryboardBackground => true;
 
-        public BackgroundScreenDefault(bool animateOnEnter = true)
-            : base(animateOnEnter)
-        {
-        }
-
         [BackgroundDependencyLoader]
         private void load(IAPIProvider api, SkinManager skinManager, OsuConfigManager config)
         {
@@ -56,10 +51,6 @@ namespace osu.Game.Screens.Backgrounds
             introSequence = config.GetBindable<IntroSequence>(OsuSetting.IntroSequence);
 
             AddInternal(seasonalBackgroundLoader);
-
-            // Load first background asynchronously as part of BDL load.
-            currentDisplay = RNG.Next(0, background_count);
-            Next();
         }
 
         protected override void LoadComplete()
@@ -72,6 +63,9 @@ namespace osu.Game.Screens.Backgrounds
             beatmap.ValueChanged += _ => Scheduler.AddOnce(next);
             introSequence.ValueChanged += _ => Scheduler.AddOnce(next);
             seasonalBackgroundLoader.SeasonalBackgroundChanged += () => Scheduler.AddOnce(next);
+
+            currentDisplay = RNG.Next(0, background_count);
+            Next();
 
             // helper function required for AddOnce usage.
             void next() => Next();

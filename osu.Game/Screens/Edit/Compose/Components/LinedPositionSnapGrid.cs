@@ -28,7 +28,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
             while (true)
             {
-                Vector2 currentPosition = StartPosition.Value + index++ * step;
+                Vector2 currentPosition = StartPosition.Value + index * step;
+                index++;
 
                 if (!lineDefinitelyIntersectsBox(currentPosition, step.PerpendicularLeft, drawSize, out var p1, out var p2))
                 {

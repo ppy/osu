@@ -27,8 +27,17 @@ namespace osu.Game.Beatmaps.Drawables
             set => base.Masking = value;
         }
 
-        public UpdateableOnlineBeatmapSetCover(BeatmapSetCoverType coverType = BeatmapSetCoverType.Cover)
+        protected override double LoadDelay { get; }
+
+        private readonly double timeBeforeUnload;
+
+        protected override double TransformDuration => 400;
+
+        public UpdateableOnlineBeatmapSetCover(BeatmapSetCoverType coverType = BeatmapSetCoverType.Cover, double timeBeforeLoad = 500, double timeBeforeUnload = 1000)
         {
+            LoadDelay = timeBeforeLoad;
+            this.timeBeforeUnload = timeBeforeUnload;
+
             this.coverType = coverType;
 
             InternalChild = new Box
@@ -38,12 +47,12 @@ namespace osu.Game.Beatmaps.Drawables
             };
         }
 
-        protected override double LoadDelay => 500;
-
-        protected override double TransformDuration => 400;
-
         protected override DelayedLoadWrapper CreateDelayedLoadWrapper(Func<Drawable> createContentFunc, double timeBeforeLoad)
-            => new DelayedLoadUnloadWrapper(createContentFunc, timeBeforeLoad);
+            => new DelayedLoadUnloadWrapper(createContentFunc, timeBeforeLoad, timeBeforeUnload)
+            {
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+            };
 
         protected override Drawable CreateDrawable(IBeatmapSetOnlineInfo model)
         {

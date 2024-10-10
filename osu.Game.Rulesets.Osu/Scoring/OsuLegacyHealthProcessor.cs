@@ -57,6 +57,7 @@ namespace osu.Game.Rulesets.Osu.Scoring
                     increase = 0.02;
                     break;
 
+                case HitResult.SliderTailHit:
                 case HitResult.LargeTickHit:
                     // This result comes from either a slider tick or repeat.
                     increase = hitObject is SliderTick ? 0.015 : 0.02;

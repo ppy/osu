@@ -1,7 +1,10 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
+using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Select;
 using osu.Game.Screens.Select.Filter;
 
@@ -18,11 +21,12 @@ namespace osu.Game.Rulesets.Filter
         /// in addition to the ones mandated by song select.
         /// </summary>
         /// <param name="beatmapInfo">The beatmap to test the criteria against.</param>
+        /// <param name="criteria">The filter criteria.</param>
         /// <returns>
         /// <c>true</c> if the beatmap matches the ruleset-specific custom filtering criteria,
         /// <c>false</c> otherwise.
         /// </returns>
-        bool Matches(BeatmapInfo beatmapInfo);
+        bool Matches(BeatmapInfo beatmapInfo, FilterCriteria criteria);
 
         /// <summary>
         /// Attempts to parse a single custom keyword criterion, given by the user via the song select search box.
@@ -51,5 +55,12 @@ namespace osu.Game.Rulesets.Filter
         /// while ignored criteria are included in <see cref="FilterCriteria.SearchText"/>.
         /// </returns>
         bool TryParseCustomKeywordCriteria(string key, Operator op, string value);
+
+        /// <summary>
+        /// Whether to reapply the filter as a result of the given change in applied mods.
+        /// </summary>
+        /// <param name="mods">The change in mods.</param>
+        /// <returns>Whether the filter should be re-applied.</returns>
+        bool FilterMayChangeFromMods(ValueChangedEvent<IReadOnlyList<Mod>> mods);
     }
 }

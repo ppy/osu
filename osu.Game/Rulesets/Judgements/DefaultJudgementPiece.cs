@@ -10,7 +10,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Judgements
 {
-    public partial class DefaultJudgementPiece : JudgementPiece, IAnimatableJudgement
+    public partial class DefaultJudgementPiece : TextJudgementPiece, IAnimatableJudgement
     {
         public DefaultJudgementPiece(HitResult result)
             : base(result)
@@ -38,20 +38,7 @@ namespace osu.Game.Rulesets.Judgements
         /// </remarks>
         public virtual void PlayAnimation()
         {
-            // TODO: make these better. currently they are using a text `-` and it's not centered properly.
-            // Should be an explicit drawable.
-            //
-            // When this is done, remove the [Description] attributes from HitResults which were added for this purpose.
-            if (Result == HitResult.IgnoreMiss || Result == HitResult.LargeTickMiss)
-            {
-                this.RotateTo(-45);
-                this.ScaleTo(1.8f);
-                this.ScaleTo(1.2f, 100, Easing.In);
-
-                this.MoveTo(Vector2.Zero);
-                this.MoveToOffset(new Vector2(0, 10), 800, Easing.InQuint);
-            }
-            else if (Result.IsMiss())
+            if (Result.IsMiss())
             {
                 this.ScaleTo(1.6f);
                 this.ScaleTo(1, 100, Easing.In);

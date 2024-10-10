@@ -30,6 +30,11 @@ namespace osu.Game.Localisation
         public static LocalisableString ImportFiles => new TranslatableString(getKey(@"import_files"), @"Import files");
 
         /// <summary>
+        /// "Run latency certifier"
+        /// </summary>
+        public static LocalisableString RunLatencyCertifier => new TranslatableString(getKey(@"run_latency_certifier"), @"Run latency certifier");
+
+        /// <summary>
         /// "Memory"
         /// </summary>
         public static LocalisableString MemoryHeader => new TranslatableString(getKey(@"memory_header"), @"Memory");

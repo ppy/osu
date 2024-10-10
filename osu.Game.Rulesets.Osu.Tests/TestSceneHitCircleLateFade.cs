@@ -208,7 +208,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 if (shouldHit && !userTriggered && timeOffset >= 0)
                 {
                     // force success
-                    ApplyResult(r => r.Type = HitResult.Great);
+                    ApplyResult(HitResult.Great);
                 }
                 else
                     base.CheckForResult(userTriggered, timeOffset);

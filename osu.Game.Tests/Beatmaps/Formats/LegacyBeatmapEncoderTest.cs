@@ -25,6 +25,7 @@ using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Taiko;
 using osu.Game.Skinning;
+using osu.Game.Storyboards;
 using osu.Game.Tests.Resources;
 using osuTK;
 
@@ -36,6 +37,22 @@ namespace osu.Game.Tests.Beatmaps.Formats
         private static readonly DllResourceStore beatmaps_resource_store = TestResources.GetStore();
 
         private static IEnumerable<string> allBeatmaps = beatmaps_resource_store.GetAvailableResources().Where(res => res.EndsWith(".osu", StringComparison.Ordinal));
+
+        [Test]
+        public void TestUnsupportedStoryboardEvents()
+        {
+            const string name = "Resources/storyboard_only_video.osu";
+
+            var decoded = decodeFromLegacy(beatmaps_resource_store.GetStream(name), name);
+            Assert.That(decoded.beatmap.UnhandledEventLines.Count, Is.EqualTo(1));
+            Assert.That(decoded.beatmap.UnhandledEventLines.Single(), Is.EqualTo("Video,0,\"video.avi\""));
+
+            var memoryStream = encodeToLegacy(decoded);
+
+            var storyboard = new LegacyStoryboardDecoder().Decode(new LineBufferedReader(memoryStream));
+            StoryboardLayer video = storyboard.Layers.Single(l => l.Name == "Video");
+            Assert.That(video.Elements.Count, Is.EqualTo(1));
+        }
 
         [TestCaseSource(nameof(allBeatmaps))]
         public void TestEncodeDecodeStability(string name)

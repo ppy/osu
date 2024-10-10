@@ -1,21 +1,23 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
-using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
+using osu.Game.Graphics;
 using osuTK;
+using osuTK.Graphics;
+using FontWeight = osu.Game.Graphics.FontWeight;
 
 namespace osu.Game.Overlays.BeatmapListing
 {
@@ -24,7 +26,7 @@ namespace osu.Game.Overlays.BeatmapListing
     {
         public new readonly BindableList<T> Current = new BindableList<T>();
 
-        private MultipleSelectionFilter filter;
+        private MultipleSelectionFilter filter = null!;
 
         public BeatmapSearchMultipleSelectionFilterRow(LocalisableString header)
             : base(header)
@@ -42,7 +44,6 @@ namespace osu.Game.Overlays.BeatmapListing
         /// <summary>
         /// Creates a filter control that can be used to simultaneously select multiple values of type <typeparamref name="T"/>.
         /// </summary>
-        [NotNull]
         protected virtual MultipleSelectionFilter CreateMultipleSelectionFilter() => new MultipleSelectionFilter();
 
         protected partial class MultipleSelectionFilter : FillFlowContainer<MultipleSelectionFilterTabItem>
@@ -52,11 +53,9 @@ namespace osu.Game.Overlays.BeatmapListing
             [BackgroundDependencyLoader]
             private void load()
             {
-                Anchor = Anchor.BottomLeft;
-                Origin = Anchor.BottomLeft;
                 RelativeSizeAxes = Axes.X;
-                Height = 15;
-                Spacing = new Vector2(10, 0);
+                AutoSizeAxes = Axes.Y;
+                Spacing = new Vector2(10, 5);
 
                 AddRange(GetValues().Select(CreateTabItem));
             }
@@ -71,7 +70,7 @@ namespace osu.Game.Overlays.BeatmapListing
                 Current.BindCollectionChanged(currentChanged, true);
             }
 
-            private void currentChanged(object sender, NotifyCollectionChangedEventArgs e)
+            private void currentChanged(object? sender, NotifyCollectionChangedEventArgs e)
             {
                 foreach (var c in Children)
                     c.Active.Value = Current.Contains(c.Value);
@@ -101,36 +100,101 @@ namespace osu.Game.Overlays.BeatmapListing
 
         protected partial class MultipleSelectionFilterTabItem : FilterTabItem<T>
         {
-            private readonly Box selectedUnderline;
-
-            protected override bool HighlightOnHoverWhenActive => true;
+            private Drawable activeContent = null!;
+            private Circle background = null!;
 
             public MultipleSelectionFilterTabItem(T value)
                 : base(value)
             {
+            }
+
+            [BackgroundDependencyLoader]
+            private void load()
+            {
+                AutoSizeDuration = 100;
+                AutoSizeEasing = Easing.OutQuint;
+
                 // This doesn't match any actual design, but should make it easier for the user to understand
                 // that filters are applied until we settle on a final design.
-                AddInternal(selectedUnderline = new Box
+                AddInternal(activeContent = new Container
                 {
                     Depth = float.MaxValue,
-                    RelativeSizeAxes = Axes.X,
-                    Height = 1.5f,
-                    Anchor = Anchor.BottomLeft,
-                    Origin = Anchor.CentreLeft,
+                    RelativeSizeAxes = Axes.Both,
+                    Alpha = 0,
+                    Padding = new MarginPadding
+                    {
+                        Left = -16,
+                        Right = -4,
+                        Vertical = -2
+                    },
+                    Children = new Drawable[]
+                    {
+                        background = new Circle
+                        {
+                            Colour = Color4.White,
+                            RelativeSizeAxes = Axes.Both,
+                        },
+                        new SpriteIcon
+                        {
+                            Icon = FontAwesome.Solid.TimesCircle,
+                            Size = new Vector2(10),
+                            Colour = ColourProvider.Background4,
+                            Position = new Vector2(3, 0.5f),
+                            Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.CentreLeft,
+                        }
+                    }
                 });
+            }
+
+            protected override Color4 ColourActive => ColourProvider.Light1;
+
+            public override bool ReceivePositionalInputAt(Vector2 screenSpacePos)
+            {
+                return Active.Value
+                    ? background.ReceivePositionalInputAt(screenSpacePos)
+                    : base.ReceivePositionalInputAt(screenSpacePos);
             }
 
             protected override void UpdateState()
             {
-                base.UpdateState();
-                selectedUnderline.FadeTo(Active.Value ? 1 : 0, 200, Easing.OutQuint);
-                selectedUnderline.FadeColour(IsHovered ? ColourProvider.Content2 : GetStateColour(), 200, Easing.OutQuint);
+                Color4 colour = Active.Value ? ColourActive : ColourNormal;
+
+                if (IsHovered)
+                    colour = Active.Value ? colour.Darken(0.2f) : colour.Lighten(0.2f);
+
+                if (Active.Value)
+                {
+                    // This just allows enough spacing for adjacent tab items to show the "x".
+                    Padding = new MarginPadding { Left = 12 };
+
+                    activeContent.FadeIn(200, Easing.OutQuint);
+                    background.FadeColour(colour, 200, Easing.OutQuint);
+
+                    // flipping colours
+                    Text.FadeColour(ColourProvider.Background4, 200, Easing.OutQuint);
+                    Text.Font = Text.Font.With(weight: FontWeight.SemiBold);
+                }
+                else
+                {
+                    Padding = new MarginPadding();
+
+                    activeContent.FadeOut();
+
+                    background.FadeColour(colour, 200, Easing.OutQuint);
+                    Text.FadeColour(colour, 200, Easing.OutQuint);
+                    Text.Font = Text.Font.With(weight: FontWeight.Regular);
+                }
             }
 
             protected override bool OnClick(ClickEvent e)
             {
                 base.OnClick(e);
+
+                // this tab item implementation is not managed by a TabControl,
+                // therefore we have to manually update Active state and play select sound when this tab item is clicked.
                 Active.Toggle();
+                SelectSample.Play();
                 return true;
             }
         }
