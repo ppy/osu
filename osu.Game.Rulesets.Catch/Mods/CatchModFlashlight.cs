@@ -15,14 +15,12 @@ namespace osu.Game.Rulesets.Catch.Mods
     {
         public override double ScoreMultiplier => UsesDefaultConfiguration ? 1.12 : 1;
 
-        public override BindableFloat SizeMultiplier { get; } = new BindableFloat(1)
+        public override BindableFloat StartingFlashlightSize { get; } = new BindableFloat(1)
         {
             MinValue = 0.5f,
             MaxValue = 1.5f,
             Precision = 0.1f
         };
-
-        public override BindableBool ComboBasedSize { get; } = new BindableBool(true);
 
         public override float DefaultFlashlightSize => 325;
 
@@ -32,6 +30,8 @@ namespace osu.Game.Rulesets.Catch.Mods
 
         public override void ApplyToDrawableRuleset(DrawableRuleset<CatchHitObject> drawableRuleset)
         {
+            FinalFlashlightSize.Default = 0.77f;
+
             playfield = (CatchPlayfield)drawableRuleset.Playfield;
             base.ApplyToDrawableRuleset(drawableRuleset);
         }
@@ -47,16 +47,6 @@ namespace osu.Game.Rulesets.Catch.Mods
 
                 FlashlightSize = new Vector2(0, GetSize());
                 FlashlightSmoothness = 1.4f;
-            }
-
-            protected override float GetComboScaleFor(int combo)
-            {
-                if (combo >= 200)
-                    return 0.770f;
-                if (combo >= 100)
-                    return 0.885f;
-
-                return 1.0f;
             }
 
             protected override void Update()
