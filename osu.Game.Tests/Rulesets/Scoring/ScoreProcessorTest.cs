@@ -388,37 +388,95 @@ namespace osu.Game.Tests.Rulesets.Scoring
         [Test]
         public void TestNormalGrades()
         {
-            scoreProcessor.ApplyBeatmap(new Beatmap());
+            const int count_judgements = 200;
+
+            beatmap = new TestBeatmap(new RulesetInfo())
+            {
+                HitObjects = new List<HitObject>(Enumerable.Repeat(new TestHitObject(HitResult.Great), count_judgements))
+            };
+            scoreProcessor.ApplyBeatmap(beatmap);
 
             Assert.That(scoreProcessor.Rank.Value, Is.EqualTo(ScoreRank.X));
+            Assert.That(scoreProcessor.MaximumRank.Value, Is.EqualTo(ScoreRank.X));
+            Assert.That(scoreProcessor.MinimumRank.Value, Is.EqualTo(ScoreRank.D));
 
-            scoreProcessor.Accuracy.Value = 0.99f;
+            // beatmap.HitObjects.Count -100 for simulating the situation of playing in progress
+            for (int i = 0; i < beatmap.HitObjects.Count - 100; i++)
+            {
+                scoreProcessor.ApplyResult(new JudgementResult(beatmap.HitObjects[i], beatmap.HitObjects[i].Judgement)
+                {
+                    Type = i == beatmap.HitObjects.Count - 101 ? HitResult.Ok : HitResult.Perfect
+                });
+            }
+
             Assert.That(scoreProcessor.Rank.Value, Is.EqualTo(ScoreRank.S));
+            Assert.That(scoreProcessor.MaximumRank.Value, Is.EqualTo(ScoreRank.S));
+            Assert.That(scoreProcessor.MinimumRank.Value, Is.EqualTo(ScoreRank.D));
         }
 
         [Test]
         public void TestSilverGrades()
         {
-            scoreProcessor.ApplyBeatmap(new Beatmap());
+            const int count_judgements = 200;
+
+            beatmap = new TestBeatmap(new RulesetInfo())
+            {
+                HitObjects = new List<HitObject>(Enumerable.Repeat(new TestHitObject(HitResult.Great), count_judgements))
+            };
+            scoreProcessor.ApplyBeatmap(beatmap);
+
             Assert.That(scoreProcessor.Rank.Value, Is.EqualTo(ScoreRank.X));
+            Assert.That(scoreProcessor.MaximumRank.Value, Is.EqualTo(ScoreRank.X));
+            Assert.That(scoreProcessor.MinimumRank.Value, Is.EqualTo(ScoreRank.D));
 
             scoreProcessor.Mods.Value = new[] { new OsuModHidden() };
             Assert.That(scoreProcessor.Rank.Value, Is.EqualTo(ScoreRank.XH));
+            Assert.That(scoreProcessor.MaximumRank.Value, Is.EqualTo(ScoreRank.XH));
+            Assert.That(scoreProcessor.MinimumRank.Value, Is.EqualTo(ScoreRank.D));
 
-            scoreProcessor.Accuracy.Value = 0.99f;
+            // beatmap.HitObjects.Count -100 for simulating the situation of playing in progress
+            for (int i = 0; i < beatmap.HitObjects.Count - 100; i++)
+            {
+                scoreProcessor.ApplyResult(new JudgementResult(beatmap.HitObjects[i], beatmap.HitObjects[i].Judgement)
+                {
+                    Type = i == beatmap.HitObjects.Count - 101 ? HitResult.Ok : HitResult.Perfect
+                });
+            }
+
             Assert.That(scoreProcessor.Rank.Value, Is.EqualTo(ScoreRank.SH));
+            Assert.That(scoreProcessor.MaximumRank.Value, Is.EqualTo(ScoreRank.SH));
+            Assert.That(scoreProcessor.MinimumRank.Value, Is.EqualTo(ScoreRank.D));
         }
 
         [Test]
         public void TestSilverGradesModsAppliedFirst()
         {
+            const int count_judgements = 200;
+
+            beatmap = new TestBeatmap(new RulesetInfo())
+            {
+                HitObjects = new List<HitObject>(Enumerable.Repeat(new TestHitObject(HitResult.Great), count_judgements))
+            };
+
             scoreProcessor.Mods.Value = new[] { new OsuModHidden() };
-            scoreProcessor.ApplyBeatmap(new Beatmap());
+            scoreProcessor.ApplyBeatmap(beatmap);
 
             Assert.That(scoreProcessor.Rank.Value, Is.EqualTo(ScoreRank.XH));
+            Assert.That(scoreProcessor.MaximumRank.Value, Is.EqualTo(ScoreRank.XH));
+            Assert.That(scoreProcessor.MinimumRank.Value, Is.EqualTo(ScoreRank.D));
 
-            scoreProcessor.Accuracy.Value = 0.99f;
+            // beatmap.HitObjects.Count -100 for simulating the situation of playing in progress
+            for (int i = 0; i < beatmap.HitObjects.Count - 100; i++)
+            {
+                scoreProcessor.ApplyResult(new JudgementResult(beatmap.HitObjects[i], beatmap.HitObjects[i].Judgement)
+                {
+                    Type = i == beatmap.HitObjects.Count - 101 ? HitResult.Ok : HitResult.Perfect
+                });
+            }
+
             Assert.That(scoreProcessor.Rank.Value, Is.EqualTo(ScoreRank.SH));
+            Assert.That(scoreProcessor.MaximumRank.Value, Is.EqualTo(ScoreRank.SH));
+            Assert.That(scoreProcessor.MinimumRank.Value, Is.EqualTo(ScoreRank.D));
         }
 
         private class TestJudgement : Judgement
