@@ -6,22 +6,22 @@ using osu.Game.Rulesets.Objects.Types;
 
 namespace osu.Game.Screens.Edit.Commands
 {
-    public class MoveYCommand : IEditorCommand
+    public class SetXCommand : IEditorCommand
     {
         public readonly IHasMutablePosition Target;
 
-        public readonly float Y;
+        public readonly float X;
 
-        public MoveYCommand(IHasMutablePosition target, float y)
+        public SetXCommand(IHasMutablePosition target, float x)
         {
             Target = target;
-            Y = y;
+            X = x;
         }
 
-        public void Apply() => Target.Y = Y;
+        public void Apply() => Target.X = X;
 
-        public IEditorCommand CreateUndo() => new MoveXCommand(Target, Target.Y);
+        public IEditorCommand CreateUndo() => new SetXCommand(Target, Target.X);
 
-        public bool IsRedundant => Precision.AlmostEquals(Y, Target.Y);
+        public bool IsRedundant => Precision.AlmostEquals(X, Target.X);
     }
 }
