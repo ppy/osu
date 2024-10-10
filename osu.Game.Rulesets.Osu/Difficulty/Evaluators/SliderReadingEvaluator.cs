@@ -60,6 +60,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         {
             float deltaDistance = Math.Abs(Vector2.Distance(start, middle) - Vector2.Distance(middle, end));
             float scaleDistance = Vector2.Distance(start, end) / 4;
+            if (scaleDistance == 0)
+                return 1;
+
             float result = Math.Min(deltaDistance / scaleDistance, 1);
             return 1 - (double)result;
         }
@@ -297,15 +300,5 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             return Math.Atan2(det, dot);
         }
 
-        private static double calculateAngleAbs(Vector2 p1, Vector2 p2, Vector2 p3)
-        {
-            Vector2 v1 = p2 - p1;
-            Vector2 v2 = p2 - p3;
-
-            float dot = v1.X * v2.X + v1.Y * v2.Y;
-            float modSum = v1.Length * v2.Length;
-
-            return Math.Acos(dot / modSum);
-        }
     }
 }
