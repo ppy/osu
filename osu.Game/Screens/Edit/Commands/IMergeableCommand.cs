@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Diagnostics.CodeAnalysis;
+
 namespace osu.Game.Screens.Edit.Commands
 {
     /// <summary>
@@ -14,7 +16,8 @@ namespace osu.Game.Screens.Edit.Commands
         /// The resulting command should have the same effect as applying both commands in sequence.
         /// </summary>
         /// <param name="previous">The previously applied command</param>
+        /// <param name="merged">The resulting command, or null if the commands cannot be merged.</param>
         /// <returns>The resulting command, or null if the commands cannot be merged.</returns>
-        public IEditorCommand? MergeWith(IEditorCommand previous);
+        public bool MergeWith(IEditorCommand previous, [MaybeNullWhen(false)] out IEditorCommand merged);
     }
 }

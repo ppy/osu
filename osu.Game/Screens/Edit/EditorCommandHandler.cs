@@ -18,7 +18,7 @@ namespace osu.Game.Screens.Edit
 
         public readonly Bindable<bool> CanRedo = new BindableBool();
 
-        public bool HasUncommittedChanges => currentTransaction.Commands.Count != 0;
+        public bool HasUncommittedChanges => currentTransaction.UndoCommands.Count != 0;
 
         public void Submit(IEditorCommand command, bool commitImmediately = false)
         {
@@ -52,7 +52,7 @@ namespace osu.Game.Screens.Edit
             undoStack.Push(currentTransaction);
             redoStack.Clear();
 
-            Logger.Log($"Added {currentTransaction.Commands.Count} command(s) to undo stack");
+            Logger.Log($"Added {currentTransaction.UndoCommands.Count} command(s) to undo stack");
 
             currentTransaction = new Transaction();
 
@@ -86,8 +86,7 @@ namespace osu.Game.Screens.Edit
             var transaction = redoStack.Pop();
             var undoTransaction = transaction.Reverse();
 
-            foreach (var command in transaction.Commands)
-                apply(command);
+            revertTransaction(transaction);
 
             undoStack.Push(undoTransaction);
 
@@ -110,7 +109,7 @@ namespace osu.Game.Screens.Edit
 
         private void revertTransaction(Transaction transaction)
         {
-            foreach (var command in transaction.Commands.Reverse())
+            foreach (var command in transaction.UndoCommands)
                 apply(command);
         }
 
@@ -143,39 +142,48 @@ namespace osu.Game.Screens.Edit
         {
             public Transaction()
             {
+                this.undoCommands = new List<IEditorCommand>();
             }
 
-            private readonly List<IEditorCommand> commands = new List<IEditorCommand>();
+            private Transaction(List<IEditorCommand> undoCommands)
+            {
+                this.undoCommands = undoCommands;
+            }
 
-            public IReadOnlyList<IEditorCommand> Commands => commands;
+            private readonly List<IEditorCommand> undoCommands;
+
+            /// <summary>
+            /// The commands to undo the given transaction.
+            /// Stored in reverse order of original commands to match execution order when undoing.
+            /// </summary>
+            public IReadOnlyList<IEditorCommand> UndoCommands => undoCommands;
 
             public void Add(IEditorCommand command)
             {
-                if (command is IMergeableCommand mergeable)
+                for (int i = 0; i < undoCommands.Count; i++)
                 {
-                    for (int i = commands.Count - 1; i >= 0; i--)
+                    var other = undoCommands[i];
+
+                    // Since the commands are stored in reverse order (to match execution order when undoing), the
+                    // command we're inserting is treated as the previous command relative to the current one.
+                    if (other is IMergeableCommand mergeable && mergeable.MergeWith(command, out var merged))
                     {
-                        var merged = mergeable.MergeWith(commands[i]);
+                        undoCommands[i] = merged;
 
-                        if (merged == null)
-                            continue;
-
-                        commands[i] = merged;
+                        // Since currently there's only one command that a given command can be merged with, we can
+                        // stop iterating through the list once we've found a match.
                         return;
                     }
                 }
 
-                commands.Add(command);
+                undoCommands.Insert(0, command);
             }
 
             public Transaction Reverse()
             {
-                var reversed = new Transaction();
+                var commands = UndoCommands.Reverse().Select(command => command.CreateUndo()).ToList();
 
-                foreach (var command in Commands.Reverse())
-                    reversed.Add(command.CreateUndo());
-
-                return reversed;
+                return new Transaction(commands);
             }
         }
     }
