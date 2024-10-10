@@ -617,9 +617,7 @@ namespace osu.Game.Screens.Select
         /// <param name="val">The string value to attempt parsing for.</param>
         private static bool tryUpdateRankedDateRange(ref FilterCriteria.OptionalRange<DateTimeOffset> dateRange, Operator op, string val)
         {
-            GroupCollection? match = null;
-
-            match ??= tryMatchRegex(val, @"^(?<year>\d+)((-|/|\.)(?<month>\d+)((-|/|\.)(?<day>\d+))?)?$");
+            GroupCollection? match = tryMatchRegex(val, @"^(?<year>\d+)([-/.](?<month>\d+)([-/.](?<day>\d+))?)?$");
 
             if (match == null)
                 return false;
