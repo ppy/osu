@@ -211,11 +211,11 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
         }
 
         [Test]
-        public void TestGridFromPoints()
+        public void TestGridPlacementTool()
         {
-            AddStep("enable rectangular grid", () => InputManager.Key(Key.Y));
+            AddStep("enable rectangular grid", () => InputManager.Key(Key.T));
 
-            AddStep("initiate grid from points", () => InputManager.Key(Key.B));
+            AddStep("start grid placement", () => InputManager.Key(Key.Number5));
             AddStep("move cursor to slider head + (1, 1)", () =>
             {
                 var composer = Editor.ChildrenOfType<RectangularPositionSnapGrid>().Single();
@@ -247,13 +247,17 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
                 return Precision.AlmostEquals(composer.GridLineRotation.Value, 0.09, 0.01);
             });
 
-            AddStep("initiate grid from points", () => InputManager.Key(Key.B));
+            AddStep("start grid placement", () => InputManager.Key(Key.Number5));
             AddStep("move cursor to slider tail + (1, 1)", () =>
             {
                 var composer = Editor.ChildrenOfType<RectangularPositionSnapGrid>().Single();
                 InputManager.MoveMouseTo(composer.ToScreenSpace(((Slider)EditorBeatmap.HitObjects.First()).EndPosition + new Vector2(1, 1)));
             });
-            AddStep("right click", () => InputManager.Click(MouseButton.Right));
+            AddStep("double click", () =>
+            {
+                InputManager.Click(MouseButton.Left);
+                InputManager.Click(MouseButton.Left);
+            });
             AddStep("move cursor to (0, 0)", () =>
             {
                 var composer = Editor.ChildrenOfType<RectangularPositionSnapGrid>().Single();
