@@ -173,25 +173,51 @@ namespace osu.Game.Screens.Edit.GameplayTest
         {
         }
 
+        private double previousAutoTime = 0;
+        
+        public void SetupAutoplay()
+        {
+            var autoplay = Ruleset.Value.CreateInstance().GetAutoplayMod();
+            if (autoplay == null)
+                return;
+
+            // stores time when autoplay starts
+            previousAutoTime = GameplayClockContainer.CurrentTime;
+
+            var score = autoplay.CreateScoreFromReplayData(GameplayState.Beatmap, new[] { autoplay });
+
+            // remove past frames to prevent replay frame handler from seeking back to start in an attempt to play back the entirety of the replay.
+            score.Replay.Frames.RemoveAll(f => f.Time <= GameplayClockContainer.CurrentTime);
+                
+            DrawableRuleset.SetReplayScore(score);
+
+            // Without this schedule, the `GlobalCursorDisplay.Update()` machinery will fade the gameplay cursor out, but we still want it to show.
+            Schedule(() => DrawableRuleset.Cursor?.Show());
+        }
+
         private void toggleAutoplay()
         {
             if (DrawableRuleset.ReplayScore == null)
             {
-                var autoplay = Ruleset.Value.CreateInstance().GetAutoplayMod();
-                if (autoplay == null)
-                    return;
-
-                var score = autoplay.CreateScoreFromReplayData(GameplayState.Beatmap, [autoplay]);
-
-                // remove past frames to prevent replay frame handler from seeking back to start in an attempt to play back the entirety of the replay.
-                score.Replay.Frames.RemoveAll(f => f.Time <= GameplayClockContainer.CurrentTime);
-
-                DrawableRuleset.SetReplayScore(score);
-                // Without this schedule, the `GlobalCursorDisplay.Update()` machinery will fade the gameplay cursor out, but we still want it to show.
-                Schedule(() => DrawableRuleset.Cursor?.Show());
+                SetupAutoplay();
             }
             else
                 DrawableRuleset.SetReplayScore(null);
+        }
+
+        protected override void Update()
+        {
+            if (DrawableRuleset.ReplayScore != null)
+            {
+                // compare currentTime with previousTime
+                if (GameplayClockContainer.CurrentTime != previousAutoTime)
+                {
+                    if (GameplayClockContainer.CurrentTime < previousAutoTime)
+                    {
+                        SetupAutoplay();
+                    }
+                }
+            }
         }
 
         private void toggleQuickPause()
