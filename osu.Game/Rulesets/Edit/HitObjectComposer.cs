@@ -91,6 +91,9 @@ namespace osu.Game.Rulesets.Edit
         private Bindable<bool> autoSeekOnPlacement;
         private readonly Bindable<bool> composerFocusMode = new Bindable<bool>();
 
+        [CanBeNull]
+        private RadioButton lastTool;
+
         protected DrawableRuleset<TObject> DrawableRuleset { get; private set; }
 
         protected HitObjectComposer(Ruleset ruleset)
@@ -214,8 +217,7 @@ namespace osu.Game.Rulesets.Edit
                 },
             };
 
-            toolboxCollection.Items = CompositionTools
-                                      .Prepend(new SelectTool())
+            toolboxCollection.Items = (CompositionTools.Prepend(new SelectTool()))
                                       .Select(t => new HitObjectCompositionToolButton(t, () => toolSelected(t)))
                                       .ToList();
 
@@ -232,7 +234,7 @@ namespace osu.Game.Rulesets.Edit
 
             sampleBankTogglesCollection.AddRange(BlueprintContainer.SampleBankTernaryStates.Select(b => new DrawableTernaryButton(b)));
 
-            setSelectTool();
+            SetSelectTool();
 
             EditorBeatmap.SelectedHitObjects.CollectionChanged += selectionChanged;
         }
@@ -257,7 +259,7 @@ namespace osu.Game.Rulesets.Edit
             {
                 // it's important this is performed before the similar code in EditorRadioButton disables the button.
                 if (!timing.NewValue)
-                    setSelectTool();
+                    SetSelectTool();
             });
 
             EditorBeatmap.HasTiming.BindValueChanged(hasTiming =>
@@ -461,14 +463,18 @@ namespace osu.Game.Rulesets.Edit
             if (EditorBeatmap.SelectedHitObjects.Any())
             {
                 // ensure in selection mode if a selection is made.
-                setSelectTool();
+                SetSelectTool();
             }
         }
 
-        private void setSelectTool() => toolboxCollection.Items.First().Select();
+        public void SetSelectTool() => toolboxCollection.Items.First().Select();
+
+        public void SetLastTool() => (lastTool ?? toolboxCollection.Items.First()).Select();
 
         private void toolSelected(CompositionTool tool)
         {
+            lastTool = toolboxCollection.Items.OfType<HitObjectCompositionToolButton>().FirstOrDefault(i => i.Tool == BlueprintContainer.CurrentTool);
+
             BlueprintContainer.CurrentTool = tool;
 
             if (!(tool is SelectTool))
