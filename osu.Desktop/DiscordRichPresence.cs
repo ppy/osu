@@ -279,10 +279,12 @@ namespace osu.Desktop
 
             // As above, discord decides that *non-empty* strings shorter than 2 characters cannot possibly be valid input, because... reasons?
             // And yes, that is two *characters*, or *codepoints*, not *bytes* as further down below (as determined by empirical testing).
-            // That seems very questionable, and isn't even documented anywhere. So to *make it* accept such valid input,
-            // just tack on enough of U+200B ZERO WIDTH SPACEs at the end.
-            if (str.Length < 2)
-                return str.PadRight(2, '\u200B');
+            // Also, spaces don't count. Because reasons, clearly.
+            // That all seems very questionable, and isn't even documented anywhere. So to *make it* accept such valid input,
+            // just tack on enough of U+200B ZERO WIDTH SPACEs at the end. After making sure to trim whitespace.
+            string trimmed = str.Trim();
+            if (trimmed.Length < 2)
+                return trimmed.PadRight(2, '\u200B');
 
             if (Encoding.UTF8.GetByteCount(str) <= 128)
                 return str;
