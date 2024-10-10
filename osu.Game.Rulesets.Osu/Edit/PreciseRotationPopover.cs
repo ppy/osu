@@ -53,8 +53,8 @@ namespace osu.Game.Rulesets.Osu.Edit
                         {
                             MinValue = -360,
                             MaxValue = 360,
-                            Precision = 1
                         },
+                        SliderPrecision = 1,
                         Instantaneous = true
                     },
                     rotationOrigin = new EditorRadioButtonCollection
