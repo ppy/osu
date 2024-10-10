@@ -3,8 +3,18 @@
 
 namespace osu.Game.Screens.Edit.Commands
 {
+    /// <summary>
+    /// An editor command which can be merged with a previous command. Useful for reducing the amount of
+    /// commands stored in the undo stack.
+    /// </summary>
     public interface IMergeableCommand : IEditorCommand
     {
-        public IMergeableCommand? MergeWith(IEditorCommand previous);
+        /// <summary>
+        /// Attempts to merge this command with a command that has previously been applied.
+        /// The resulting command should have the same effect as applying both commands in sequence.
+        /// </summary>
+        /// <param name="previous">The previously applied command</param>
+        /// <returns>The resulting command, or null if the commands cannot be merged.</returns>
+        public IEditorCommand? MergeWith(IEditorCommand previous);
     }
 }
