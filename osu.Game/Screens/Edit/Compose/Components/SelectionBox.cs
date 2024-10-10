@@ -142,22 +142,36 @@ namespace osu.Game.Screens.Edit.Compose.Components
             canScaleDiagonally.BindValueChanged(_ => recreate(), true);
         }
 
+        private bool dontFreezeButtonPosition;
+
         protected override bool OnKeyDown(KeyDownEvent e)
         {
             if (e.Repeat || !e.ControlPressed)
                 return false;
 
+            // We don't want to freeze the buttons when we're using the keyboard to click the buttons, because we might not be hovering them.
+            dontFreezeButtonPosition = true;
+            bool handled = false;
+
             switch (e.Key)
             {
                 case Key.G:
-                    return CanReverse && reverseButton?.TriggerClick() == true;
+                    handled = CanReverse && reverseButton?.TriggerClick() == true;
+                    break;
 
                 case Key.Comma:
-                    return canRotate.Value && rotateCounterClockwiseButton?.TriggerClick() == true;
+                    handled = canRotate.Value && rotateCounterClockwiseButton?.TriggerClick() == true;
+                    break;
 
                 case Key.Period:
-                    return canRotate.Value && rotateClockwiseButton?.TriggerClick() == true;
+                    handled = canRotate.Value && rotateClockwiseButton?.TriggerClick() == true;
+                    break;
             }
+
+            dontFreezeButtonPosition = false;
+
+            if (handled)
+                return true;
 
             return base.OnKeyDown(e);
         }
@@ -366,6 +380,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         private void freezeButtonPosition()
         {
+            if (dontFreezeButtonPosition)
+                return;
+
             frozenButtonsPosition = buttons.ScreenSpaceDrawQuad.TopLeft;
         }
 
