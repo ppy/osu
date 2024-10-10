@@ -1,27 +1,21 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Utils;
 using osu.Game.Rulesets.Objects;
 
 namespace osu.Game.Screens.Edit.Commands
 {
-    public class SetStartTimeCommand : IEditorCommand
+    public class SetStartTimeCommand : PropertyChangeCommand<HitObject, double>
     {
-        public readonly HitObject Target;
-
-        public readonly double StartTime;
-
-        public SetStartTimeCommand(HitObject target, double startTime)
+        public SetStartTimeCommand(HitObject target, double value)
+            : base(target, value)
         {
-            Target = target;
-            StartTime = startTime;
         }
 
-        public void Apply() => Target.StartTime = StartTime;
+        protected override double ReadValue(HitObject target) => target.StartTime;
 
-        public IEditorCommand CreateUndo() => new SetStartTimeCommand(Target, Target.StartTime);
+        protected override void WriteValue(HitObject target, double value) => target.StartTime = value;
 
-        public bool IsRedundant => Precision.AlmostEquals(StartTime, Target.StartTime);
+        protected override SetStartTimeCommand CreateInstance(HitObject target, double value) => new SetStartTimeCommand(target, value);
     }
 }
