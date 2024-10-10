@@ -12,10 +12,6 @@ namespace osu.Game.Screens.Edit
 {
     public partial class EditorCommandHandler
     {
-        public EditorCommandHandler()
-        {
-        }
-
         public event Action<IEditorCommand>? CommandApplied;
 
         public readonly Bindable<bool> CanUndo = new BindableBool();
@@ -142,8 +138,6 @@ namespace osu.Game.Screens.Edit
 
             currentTransaction.Add(reverse);
         }
-
-        private readonly record struct HistoryEntry(IEditorCommand Command, IEditorCommand Reverse);
 
         private readonly struct Transaction
         {

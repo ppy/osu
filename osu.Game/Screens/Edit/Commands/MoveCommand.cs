@@ -6,7 +6,7 @@ using osuTK;
 
 namespace osu.Game.Screens.Edit.Commands
 {
-    public class MoveCommand : IEditorCommand, IMergeableCommand
+    public class MoveCommand : IMergeableCommand
     {
         public readonly IHasMutablePosition Target;
 
