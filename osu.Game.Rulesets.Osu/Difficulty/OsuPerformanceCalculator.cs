@@ -18,12 +18,16 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         private bool usingClassicSliderAccuracy;
 
+        private bool useClassicSlider;
+
         private double accuracy;
         private int scoreMaxCombo;
         private int countGreat;
         private int countOk;
         private int countMeh;
         private int countMiss;
+        private int countLargeTickMiss;
+        private int countSliderEndsDropped;
 
         private double effectiveMissCount;
 
@@ -35,6 +39,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         protected override PerformanceAttributes CreatePerformanceAttributes(ScoreInfo score, DifficultyAttributes attributes)
         {
             var osuAttributes = (OsuDifficultyAttributes)attributes;
+            useClassicSlider = score.Mods.Any(h => h is OsuModClassic cl && cl.NoSliderHeadAccuracy.Value);
 
             usingClassicSliderAccuracy = score.Mods.OfType<OsuModClassic>().Any(m => m.NoSliderHeadAccuracy.Value);
 
@@ -44,7 +49,15 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             countOk = score.Statistics.GetValueOrDefault(HitResult.Ok);
             countMeh = score.Statistics.GetValueOrDefault(HitResult.Meh);
             countMiss = score.Statistics.GetValueOrDefault(HitResult.Miss);
-            effectiveMissCount = calculateEffectiveMissCount(osuAttributes);
+            countLargeTickMiss = score.Statistics.GetValueOrDefault(HitResult.LargeTickMiss);
+
+            if (!useClassicSlider)
+                countSliderEndsDropped = osuAttributes.SliderCount - score.Statistics.GetValueOrDefault(HitResult.SliderTailHit);
+
+            if (useClassicSlider)
+                effectiveMissCount = calculateEffectiveMissCount(osuAttributes);
+            else
+                effectiveMissCount = countMiss;
 
             double multiplier = PERFORMANCE_BASE_MULTIPLIER;
 
@@ -124,8 +137,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             if (attributes.SliderCount > 0)
             {
-                double estimateSliderEndsDropped = Math.Clamp(Math.Min(countOk + countMeh + countMiss, attributes.MaxCombo - scoreMaxCombo), 0, estimateDifficultSliders);
-                double sliderNerfFactor = (1 - attributes.SliderFactor) * Math.Pow(1 - estimateSliderEndsDropped / estimateDifficultSliders, 3) + attributes.SliderFactor;
+                double estimateSliderEndsDropped;
+                if (useClassicSlider)
+                    estimateSliderEndsDropped = Math.Clamp(Math.Min(countOk + countMeh + countMiss, attributes.MaxCombo - scoreMaxCombo), 0, estimateDifficultSliders);
+                else
+                    estimateSliderEndsDropped = Math.Min(countSliderEndsDropped + countLargeTickMiss, estimateDifficultSliders);
+
+                double sliderNerfFactor = 0;
+                sliderNerfFactor = (1 - attributes.SliderFactor) * Math.Pow(1 - estimateSliderEndsDropped / estimateDifficultSliders, 3) + attributes.SliderFactor;
                 aimValue *= sliderNerfFactor;
             }
 
