@@ -149,29 +149,27 @@ namespace osu.Game.Screens.Edit.Compose.Components
             if (e.Repeat || !e.ControlPressed)
                 return false;
 
-            // We don't want to freeze the buttons when we're using the keyboard to click the buttons, because we might not be hovering them.
-            dontFreezeButtonPosition = true;
-            bool handled = false;
-
-            switch (e.Key)
+            try
             {
-                case Key.G:
-                    handled = CanReverse && reverseButton?.TriggerClick() == true;
-                    break;
+                // We don't want to freeze the buttons when we're using the keyboard to click the buttons, because we might not be hovering them.
+                dontFreezeButtonPosition = true;
 
-                case Key.Comma:
-                    handled = canRotate.Value && rotateCounterClockwiseButton?.TriggerClick() == true;
-                    break;
+                switch (e.Key)
+                {
+                    case Key.G:
+                        return CanReverse && reverseButton?.TriggerClick() == true;
 
-                case Key.Period:
-                    handled = canRotate.Value && rotateClockwiseButton?.TriggerClick() == true;
-                    break;
+                    case Key.Comma:
+                        return canRotate.Value && rotateCounterClockwiseButton?.TriggerClick() == true;
+
+                    case Key.Period:
+                        return canRotate.Value && rotateClockwiseButton?.TriggerClick() == true;
+                }
             }
-
-            dontFreezeButtonPosition = false;
-
-            if (handled)
-                return true;
+            finally
+            {
+                dontFreezeButtonPosition = false;
+            }
 
             return base.OnKeyDown(e);
         }
