@@ -21,6 +21,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         public Action? Action;
 
+        public event Action? Clicked;
+
         public event Action? HoverLost;
 
         public SelectionBoxButton(IconUsage iconUsage, string tooltip)
@@ -51,9 +53,10 @@ namespace osu.Game.Screens.Edit.Compose.Components
         {
             Circle.FlashColour(Colours.GrayF, 300);
 
-            TriggerOperationStarted();
-            Action?.Invoke();
-            TriggerOperationEnded();
+            Clicked?.Invoke();
+
+            TriggerAction();
+
             return true;
         }
 
@@ -71,5 +74,12 @@ namespace osu.Game.Screens.Edit.Compose.Components
         }
 
         public LocalisableString TooltipText { get; }
+
+        internal void TriggerAction()
+        {
+            TriggerOperationStarted();
+            Action?.Invoke();
+            TriggerOperationEnded();
+        }
     }
 }
