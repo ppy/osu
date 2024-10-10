@@ -190,7 +190,6 @@ namespace osu.Game.Screens.Edit.GameplayTest
             score.Replay.Frames.RemoveAll(f => f.Time <= GameplayClockContainer.CurrentTime);
                 
             DrawableRuleset.SetReplayScore(score);
-
             // Without this schedule, the `GlobalCursorDisplay.Update()` machinery will fade the gameplay cursor out, but we still want it to show.
             Schedule(() => DrawableRuleset.Cursor?.Show());
         }
