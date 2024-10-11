@@ -164,7 +164,7 @@ namespace osu.Game.Overlays.SkinEditor
                                                     {
                                                         new EditorMenuItem(Web.CommonStrings.ButtonsSave, MenuItemType.Standard, () => Save()),
                                                         new EditorMenuItem(CommonStrings.Export, MenuItemType.Standard, () => skins.ExportCurrentSkin()) { Action = { Disabled = !RuntimeInfo.IsDesktop } },
-                                                        mountMenuItem = new EditorMenuItem("Edit externally", MenuItemType.Standard, () => _ = editExternally()) { Action = { Disabled = !RuntimeInfo.IsDesktop } },
+                                                        mountMenuItem = new EditorMenuItem(EditorStrings.EditExternally, MenuItemType.Standard, () => _ = editExternally()) { Action = { Disabled = !RuntimeInfo.IsDesktop } },
                                                         new OsuMenuItemSpacer(),
                                                         new EditorMenuItem(CommonStrings.RevertToDefault, MenuItemType.Destructive, () => dialogOverlay?.Push(new RevertConfirmDialog(revert))),
                                                         new OsuMenuItemSpacer(),
@@ -306,7 +306,7 @@ namespace osu.Game.Overlays.SkinEditor
             Schedule(() =>
             {
                 mountMenuItem.Action.Disabled = false;
-                mountMenuItem.Text.Value = "Finish external edit";
+                mountMenuItem.Text.Value = EditorStrings.FinishEditingExternally;
                 mountMenuItem.Action.Value = () => _ = finishExternalEdit();
             });
         }
@@ -332,7 +332,7 @@ namespace osu.Game.Overlays.SkinEditor
                 oldskin.Dispose();
 
                 mountMenuItem.Action.Disabled = false;
-                mountMenuItem.Text.Value = "Edit externally";
+                mountMenuItem.Text.Value = EditorStrings.EditExternally;
                 mountMenuItem.Action.Value = () => _ = editExternally();
             });
         }
