@@ -215,6 +215,8 @@ namespace osu.Game.Rulesets.Osu.Edit
             {
                 GridLinesRotation.Disabled = v.NewValue == PositionSnapGridType.Circle;
 
+                gridTypeButtons.Items[(int)v.NewValue].Select();
+
                 switch (v.NewValue)
                 {
                     case PositionSnapGridType.Square:
@@ -243,28 +245,16 @@ namespace osu.Game.Rulesets.Osu.Edit
             return ((rotation + 360 + period * 0.5f) % period) - period * 0.5f;
         }
 
-        private void nextGridSize()
-        {
-            Spacing.Value = Spacing.Value * 2 >= max_automatic_spacing ? Spacing.Value / 8 : Spacing.Value * 2;
-        }
-
-        private void nextGridType()
-        {
-            int nextGridTypeIndex = (Array.IndexOf(grid_types, GridType.Value) + 1) % grid_types.Length;
-            GridType.Value = grid_types[nextGridTypeIndex];
-            gridTypeButtons.Items[nextGridTypeIndex].Select();
-        }
-
         public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
             switch (e.Action)
             {
                 case GlobalAction.EditorCycleGridSpacing:
-                    nextGridSize();
+                    Spacing.Value = Spacing.Value * 2 >= max_automatic_spacing ? Spacing.Value / 8 : Spacing.Value * 2;
                     return true;
 
                 case GlobalAction.EditorCycleGridType:
-                    nextGridType();
+                    GridType.Value = (PositionSnapGridType)(((int)GridType.Value + 1) % Enum.GetValues<PositionSnapGridType>().Length);
                     return true;
             }
 
