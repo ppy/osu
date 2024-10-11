@@ -24,7 +24,6 @@ using osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Screens.Edit;
-using osu.Game.Screens.Edit.Commands;
 using osu.Game.Screens.Edit.Commands.Proxies;
 using osu.Game.Screens.Edit.Compose;
 using osuTK;
@@ -563,6 +562,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             int i = 0;
             double time = HitObject.StartTime;
 
+            var beatmapProxy = editorBeatmap.AsCommandProxy(commandHandler);
+
             while (!Precision.DefinitelyBigger(time, HitObject.GetEndTime(), 1))
             {
                 // positionWithRepeats is a fractional number in the range of [0, HitObject.SpanCount()]
@@ -575,19 +576,19 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
                 Vector2 position = HitObject.Position + HitObject.Path.PositionAt(pathPosition);
 
-                commandHandler.SafeSubmit(new AddHitObjectCommand(editorBeatmap, new HitCircle
+                beatmapProxy.Add(new HitCircle
                 {
                     StartTime = time,
                     Position = position,
                     NewCombo = i == 0 && HitObject.NewCombo,
                     Samples = HitObject.HeadCircle.Samples.Select(s => s.With()).ToList()
-                }));
+                });
 
                 i += 1;
                 time = HitObject.StartTime + i * streamSpacing;
             }
 
-            editorBeatmap.AsCommandProxy(commandHandler).Remove(HitObject);
+            beatmapProxy.Remove(HitObject);
 
             commandHandler?.Commit();
         }

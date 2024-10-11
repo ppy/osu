@@ -16,7 +16,6 @@ using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Screens.Edit;
-using osu.Game.Screens.Edit.Commands;
 using osu.Game.Screens.Edit.Commands.Proxies;
 using osu.Game.Screens.Edit.Compose.Components;
 using osu.Game.Utils;
@@ -113,7 +112,8 @@ namespace osu.Game.Rulesets.Osu.Edit
 
                 foreach (var (ho, originalState) in objectsInScale)
                 {
-                    commandHandler.SafeSubmit(new SetPositionCommand(ho, GeometryUtils.GetScaledPosition(scale, actualOrigin, originalState.Position, axisRotation)));
+                    ho.AsCommandProxy(commandHandler)
+                      .SetPosition(GeometryUtils.GetScaledPosition(scale, actualOrigin, originalState.Position, axisRotation));
                 }
             }
 

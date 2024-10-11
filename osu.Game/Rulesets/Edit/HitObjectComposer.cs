@@ -27,7 +27,7 @@ using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Screens.Edit;
-using osu.Game.Screens.Edit.Commands;
+using osu.Game.Screens.Edit.Commands.Proxies;
 using osu.Game.Screens.Edit.Components.RadioButtons;
 using osu.Game.Screens.Edit.Components.TernaryButtons;
 using osu.Game.Screens.Edit.Compose;
@@ -499,14 +499,14 @@ namespace osu.Game.Rulesets.Edit
 
             if (commit)
             {
-                commandHandler.SafeSubmit(new AddHitObjectCommand(EditorBeatmap, hitObject), true);
+                EditorBeatmap.AsCommandProxy(commandHandler).Add(hitObject);
 
                 if (autoSeekOnPlacement.Value && EditorClock.CurrentTime < hitObject.StartTime)
                     EditorClock.SeekSmoothlyTo(hitObject.StartTime);
             }
         }
 
-        public void Delete(HitObject hitObject) => commandHandler.SafeSubmit(new RemoveHitObjectCommand(EditorBeatmap, hitObject));
+        public void Delete(HitObject hitObject) => EditorBeatmap.AsCommandProxy(commandHandler).Remove(hitObject);
 
         #endregion
 
