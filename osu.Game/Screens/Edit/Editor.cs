@@ -721,10 +721,16 @@ namespace osu.Game.Screens.Edit
             switch (e.Action)
             {
                 case GlobalAction.EditorSeekToPreviousHitObject:
+                    if (editorBeatmap.SelectedHitObjects.Any())
+                        return false;
+
                     seekHitObject(-1);
                     return true;
 
                 case GlobalAction.EditorSeekToNextHitObject:
+                    if (editorBeatmap.SelectedHitObjects.Any())
+                        return false;
+
                     seekHitObject(1);
                     return true;
 
