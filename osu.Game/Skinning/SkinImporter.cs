@@ -59,6 +59,7 @@ namespace osu.Game.Skinning
 
             skinInfoLive.PerformWrite(skinInfo =>
             {
+                // Not sure if this deletes the files from the storage or just the database.
                 skinInfo.Files.Clear();
 
                 string[] filesInMountedDirectory = Directory.EnumerateFiles(task.Path, "*.*", SearchOption.AllDirectories).Select(f => Path.GetRelativePath(task.Path, f)).ToArray();
@@ -67,9 +68,7 @@ namespace osu.Game.Skinning
                 {
                     using var stream = File.OpenRead(Path.Combine(task.Path, file));
 
-                    // The GetFile call in this method is *really* expensive, and we are certain that the file does not exist in the skin yet.
-                    // Consider adding a method to add a file without checking if it already exists. Or add the file directly to the skin.
-                    modelManager.AddFile(original, stream, file);
+                    modelManager.AddFile(original, stream, file, Realm.Realm, false);
                 }
             });
 

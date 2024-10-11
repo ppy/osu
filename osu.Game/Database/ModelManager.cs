@@ -81,16 +81,19 @@ namespace osu.Game.Database
         }
 
         /// <summary>
-        /// Add a file from within an ongoing realm transaction. If the file already exists, it is overwritten.
+        /// Add a file from within an ongoing realm transaction. If the file already exists, it is overwritten so long as <paramref name="overwrite"/> is true.
         /// </summary>
-        public void AddFile(TModel item, Stream contents, string filename, Realm realm)
+        public void AddFile(TModel item, Stream contents, string filename, Realm realm, bool overwrite = true)
         {
-            var existing = item.GetFile(filename);
-
-            if (existing != null)
+            if (overwrite)
             {
-                ReplaceFile(existing, contents, realm);
-                return;
+                var existing = item.GetFile(filename);
+
+                if (existing != null)
+                {
+                    ReplaceFile(existing, contents, realm);
+                    return;
+                }
             }
 
             var file = realmFileStore.Add(contents, realm);
