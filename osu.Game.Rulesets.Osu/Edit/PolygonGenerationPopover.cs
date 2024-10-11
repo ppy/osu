@@ -172,6 +172,8 @@ namespace osu.Game.Rulesets.Osu.Edit
                 if (position.X < 0 || position.Y < 0 || position.X > OsuPlayfield.BASE_SIZE.X || position.Y > OsuPlayfield.BASE_SIZE.Y)
                 {
                     commitButton.Enabled.Value = false;
+                    editorBeatmap.RemoveRange(insertedCircles);
+                    insertedCircles.Clear();
                     return;
                 }
 
