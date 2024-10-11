@@ -339,10 +339,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
             if (mods.OfType<OsuModStrictTracking>().Any())
             {
-                (double path, double timeUsed) = calculateStrictSlider(slider);
+                double strictPath = calculateStrictSliderPath(slider);
 
                 double normalVelocity = slider.LazyTravelTime > 0 ? slider.LazyTravelDistance / slider.LazyTravelTime : 0;
-                double strictVelocity = timeUsed > 0 ? path / timeUsed : 0;
+                double strictVelocity = slider.LazyTravelTime > 0 ? strictPath / slider.LazyTravelTime : 0;
 
                 if (strictVelocity > normalVelocity)
                 {
@@ -353,32 +353,23 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
                     double multiplier = (normalVelocity + deltaVelocity) / strictVelocity;
 
-                    slider.LazyTravelDistance = (float)(path * multiplier);
-                    slider.LazyTravelTime = timeUsed;
+                    slider.LazyTravelDistance = (float)(strictPath * multiplier);
                 }
             }
         }
 
-        private static Vector2 positionWithRepeats(double relativeTime, Slider slider)
+        private static Vector2 positionWithRepeats(double relativeTime, Slider slider, int repeat)
         {
+            relativeTime -= slider.SpanDuration * repeat;
+
             double progress = relativeTime / slider.SpanDuration;
-            if (slider.RepeatCount % 2 == 1)
+            if (repeat % 2 == 1)
                 progress = 1 - progress; // revert if odd number of repeats
-            return slider.Position + slider.Path.PositionAt(progress);
+            return slider.Path.PositionAt(progress);
         }
 
-        private (double path, double timeUsed) calculateStrictSlider(Slider slider)
+        private double calculateStrictSliderPath(Slider slider)
         {
-            float scalingFactor = (float)(NORMALISED_RADIUS / slider.Radius);
-
-            double updateDistance = slider.Radius;
-            float followCircleRadius = assumed_slider_radius / scalingFactor;
-
-            // If slider have 0 repeates - we're calculating path from Start to LazyEnd
-
-            // If slider have repeats - we're calculating 2 paths: from Start to Repeat and from Start to LazyEnd
-            // Then total path = pathToLazyEnd + pathToRepeat * (repeats - 1)
-
             // WARNING, this is lazer-correct implementation because stable doesn't have Strict Tracking mod
             // This means that path of this function can be lower than normal path
             double lazyEndTime = Math.Max(
@@ -386,73 +377,69 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 slider.NestedHitObjects.LastOrDefault(n => n is not SliderTailCircle)?.StartTime ?? double.MinValue
             );
 
-            double endTime = slider.EndTime;
-
-            OsuHitObject head;
-
-            if (slider.RepeatCount > 0)
-                head = (OsuHitObject)slider.NestedHitObjects.Where(o => o is SliderRepeat).Last();
-            else
-                head = (OsuHitObject)slider.NestedHitObjects[0];
-
-            double lazyTrackingTime = lazyEndTime - head.StartTime;
-            double totalTrackingTime = endTime - head.StartTime;
+            double startTime = slider.HeadCircle.StartTime;
+            double totalTrackingTime = lazyEndTime - startTime;
 
             if (totalTrackingTime == 0)
-                return (0, 0);
-
-            if (slider.RepeatCount == 0 && lazyTrackingTime == 0)
-                return (0, 0);
-
-            double numberOfUpdates = Math.Ceiling(slider.Path.Distance / updateDistance);
-            double numberOfLazyUpdates = Math.Ceiling(numberOfUpdates * lazyTrackingTime / totalTrackingTime);
-
-            double deltaLazy = lazyTrackingTime / numberOfLazyUpdates;
-
-            double lazyPath = 0;
-            double relativeTime = deltaLazy;
-            Vector2 currentCursorPosition = head.StackedPosition;
-            double lastTimeWithMovement = 0;
-
-            // Adjust to be sure that there would be no floating point error
-            double adjustedTime = lazyTrackingTime + deltaLazy / 2;
-            for (; relativeTime <= adjustedTime; relativeTime += deltaLazy)
-            {
-                lazyPath += calculateNeededMovement(slider, relativeTime, ref currentCursorPosition, ref lastTimeWithMovement, followCircleRadius);
-            }
-
-            if (slider.RepeatCount == 0)
-                return (lazyPath * scalingFactor, lastTimeWithMovement);
-
-            double numberofNonLazyUpdates = Math.Max(1, numberOfUpdates - numberOfLazyUpdates);
-            double deltaNormal = (totalTrackingTime - lazyTrackingTime) / numberofNonLazyUpdates;
-            double totalPath = lazyPath;
-
-            // Adjust to be sure that there would be no floating point error
-            adjustedTime = totalTrackingTime + deltaNormal / 2;
-            for (relativeTime = lazyTrackingTime; relativeTime <= adjustedTime; relativeTime += deltaNormal)
-            {
-                totalPath += calculateNeededMovement(slider, relativeTime, ref currentCursorPosition, ref lastTimeWithMovement, followCircleRadius);
-            }
-
-            double resultPath = lazyPath + totalPath * slider.RepeatCount;
-            return (resultPath * scalingFactor, lastTimeWithMovement);
-        }
-
-        private static double calculateNeededMovement(Slider slider, double relativeTime, ref Vector2 currentCursorPosition, ref double lastTimeWithMovement, float followCircleRadius)
-        {
-            Vector2 ballPosition = positionWithRepeats(relativeTime, slider);
-            float distanceToCursor = Vector2.Distance(ballPosition, currentCursorPosition);
-
-            if (distanceToCursor <= followCircleRadius)
                 return 0;
 
-            float neededMovement = distanceToCursor - followCircleRadius;
+            double numberOfUpdates = Math.Ceiling(slider.Path.Distance * (slider.RepeatCount + 1) / NORMALISED_RADIUS);
 
-            lastTimeWithMovement = relativeTime;
-            currentCursorPosition = Vector2.Lerp(currentCursorPosition, ballPosition, neededMovement / distanceToCursor);
+            double currentTime;
+            Vector2 currentCursorPosition = new Vector2();
 
-            return neededMovement;
+            double totalPath = 0;
+
+            double deltaT = totalTrackingTime / numberOfUpdates;
+            double currentUpdateTime = deltaT;
+
+            double getNestedObjectStartTime(int index) => slider.NestedHitObjects[index].StartTime - startTime;
+            int currentNestedObjectIndex = 1;
+            double nestedObjectTime = getNestedObjectStartTime(1);
+
+            currentTime = Math.Min(currentUpdateTime, nestedObjectTime);
+
+            float scalingFactor = (float)(NORMALISED_RADIUS / slider.Radius);
+
+            // Adjust to be sure that there would be no floating point error
+            double adjustedEndTime = totalTrackingTime + deltaT / 2;
+            while (currentTime <= adjustedEndTime)
+            {
+                currentTime = Math.Min(currentUpdateTime, nestedObjectTime);
+                if (currentTime > adjustedEndTime || currentTime >= slider.TailCircle.StartTime)
+                    break;
+
+                float currentRadius = assumed_slider_radius;
+
+                // Handle the scenario where we're doing normal update
+                if (currentUpdateTime < nestedObjectTime)
+                {
+                    currentUpdateTime += deltaT;
+                }
+                // Handle the scenario where we're updating for nested object
+                else
+                {
+                    // Repeats require more accurate movement
+                    currentRadius = slider.NestedHitObjects[currentNestedObjectIndex] is SliderRepeat ? NORMALISED_RADIUS : assumed_slider_radius;
+
+                    currentNestedObjectIndex++;
+                    nestedObjectTime = currentNestedObjectIndex < slider.NestedHitObjects.Count ? getNestedObjectStartTime(currentNestedObjectIndex) : double.PositiveInfinity;
+                }
+
+                int currentRepeat = (int)(currentTime / slider.SpanDuration);
+
+                Vector2 ballPosition = positionWithRepeats(currentTime, slider, currentRepeat);
+                float distanceToCursor = Vector2.Distance(ballPosition, currentCursorPosition) * scalingFactor;
+
+                if (distanceToCursor <= currentRadius)
+                    continue;
+
+                float neededMovement = distanceToCursor - currentRadius;
+                currentCursorPosition = Vector2.Lerp(currentCursorPosition, ballPosition, neededMovement / distanceToCursor);
+                totalPath += neededMovement;
+            }
+
+            return totalPath;
         }
 
         private Vector2 getEndCursorPosition(OsuHitObject hitObject)
