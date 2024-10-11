@@ -6,10 +6,12 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Screens;
+using osu.Game.Localisation;
 using osu.Game.Online.API;
 using osu.Game.Online.Metadata;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
+using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Tests.Resources;
 using osu.Game.Tests.Visual.Metadata;
@@ -81,6 +83,7 @@ namespace osu.Game.Tests.Visual.DailyChallenge
             AddStep("push screen", () => LoadScreen(screen = new Screens.OnlinePlay.DailyChallenge.DailyChallenge(room)));
             AddUntilStep("wait for screen", () => screen.IsCurrentScreen());
             AddStep("daily challenge ended", () => metadataClient.DailyChallengeInfo.Value = null);
+            AddAssert("notification posted", () => notificationOverlay.AllNotifications.OfType<SimpleNotification>().Any(n => n.Text == DailyChallengeStrings.ChallengeEndedNotification));
         }
 
         [Test]
