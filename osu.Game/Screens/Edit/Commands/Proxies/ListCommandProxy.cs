@@ -18,7 +18,7 @@ namespace osu.Game.Screens.Edit.Commands.Proxies
         public EditorCommandHandler? CommandHandler { get; init; }
         public IList<TItem> Target { get; init; }
 
-        public void Submit(IEditorCommand command) => CommandHandler.SafeSubmit(command);
+        private void submit(IEditorCommand command) => CommandHandler.SafeSubmit(command);
 
         public IEnumerator<TItemProxy> GetEnumerator()
         {
@@ -53,7 +53,7 @@ namespace osu.Game.Screens.Edit.Commands.Proxies
             if (!Target.Contains(item))
                 return false;
 
-            Submit(new ListCommands.Remove<TItem>(Target, item));
+            submit(new ListCommands.Remove<TItem>(Target, item));
             return true;
         }
 
@@ -67,9 +67,9 @@ namespace osu.Game.Screens.Edit.Commands.Proxies
 
         public void Insert(int index, TItemProxy item) => Insert(index, item.Target);
 
-        public void Insert(int index, TItem item) => Submit(new ListCommands.Insert<TItem>(Target, index, item));
+        public void Insert(int index, TItem item) => submit(new ListCommands.Insert<TItem>(Target, index, item));
 
-        public void RemoveAt(int index) => Submit(new ListCommands.Remove<TItem>(Target, index));
+        public void RemoveAt(int index) => submit(new ListCommands.Remove<TItem>(Target, index));
 
         public void RemoveRange(int index, int count)
         {
@@ -80,7 +80,7 @@ namespace osu.Game.Screens.Edit.Commands.Proxies
         public TItemProxy this[int index]
         {
             get => new TItemProxy { CommandHandler = CommandHandler, Target = Target[index] };
-            set => Submit(new ListCommands.Update<TItem>(Target, index, value.Target));
+            set => submit(new ListCommands.Update<TItem>(Target, index, value.Target));
         }
     }
 }
