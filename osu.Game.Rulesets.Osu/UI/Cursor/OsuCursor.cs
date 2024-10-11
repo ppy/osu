@@ -39,6 +39,8 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
         public IBindable<float> CursorScale => cursorScale;
 
         private readonly Bindable<float> cursorScale = new BindableFloat(1);
+        public bool isBloom;
+        public float ComboSize;
 
         private Bindable<float> userCursorScale = null!;
         private Bindable<bool> autoCursorScale = null!;
@@ -68,12 +70,22 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
             autoCursorScale.ValueChanged += _ => cursorScale.Value = CalculateCursorScale();
 
             cursorScale.BindValueChanged(e => cursorScaleContainer.Scale = new Vector2(e.NewValue), true);
+            isBloom = false;
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
             cursorScale.Value = CalculateCursorScale();
+        }
+        protected override void Update()
+        //this should not exist will implement sane fix
+        {
+            base.Update();
+            if (isBloom)
+            {
+                cursorScale.Value = ComboSize;
+            }
         }
 
         protected virtual Drawable CreateCursorContent() => cursorScaleContainer = new Container
