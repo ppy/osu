@@ -410,7 +410,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
 
         private void dailyChallengeChanged(ValueChangedEvent<DailyChallengeInfo?> change)
         {
-            if (change.OldValue?.RoomID == room.RoomID.Value && change.NewValue == null)
+            if (change.OldValue?.RoomID == room.RoomID.Value && change.NewValue == null && metadataClient.IsConnected.Value)
             {
                 notificationOverlay?.Post(new SimpleNotification { Text = DailyChallengeStrings.ChallengeEndedNotification });
             }
