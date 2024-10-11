@@ -150,24 +150,40 @@ namespace osu.Game.Rulesets.Osu.Edit
                 insertedCircles.RemoveRange(totalPoints, insertedCircles.Count - totalPoints);
             }
 
-            bool first = true;
-
             var newlyAdded = new List<HitCircle>();
 
             for (int i = 0; i < totalPoints; ++i)
             {
                 float angle = float.DegreesToRadians(offsetAngleInput.Current.Value) + (i + 1) * (2 * float.Pi / pointInput.Current.Value);
                 var position = OsuPlayfield.BASE_SIZE / 2 + new Vector2(polygonRadius * float.Cos(angle), polygonRadius * float.Sin(angle));
+                bool newCombo = i == 0 && newComboState.Value == TernaryState.True;
 
-                bool alreadyAdded = i < insertedCircles.Count;
+                HitCircle circle;
 
-                var circle = alreadyAdded
-                    ? insertedCircles[i]
-                    : new HitCircle();
+                if (i < insertedCircles.Count)
+                {
+                    circle = insertedCircles[i];
 
-                circle.Position = position;
-                circle.StartTime = startTime;
-                circle.NewCombo = first && newComboState.Value == TernaryState.True;
+                    circle.Position = position;
+                    circle.StartTime = startTime;
+                    circle.NewCombo = newCombo;
+
+                    editorBeatmap.Update(circle);
+                }
+                else
+                {
+                    circle = new HitCircle
+                    {
+                        Position = position,
+                        StartTime = startTime,
+                        NewCombo = newCombo,
+                    };
+
+                    newlyAdded.Add(circle);
+
+                    // TODO: probably ensure samples also follow current ternary status (not trivial)
+                    circle.Samples.Add(circle.CreateHitSampleInfo());
+                }
 
                 if (position.X < 0 || position.Y < 0 || position.X > OsuPlayfield.BASE_SIZE.X || position.Y > OsuPlayfield.BASE_SIZE.Y)
                 {
@@ -177,25 +193,17 @@ namespace osu.Game.Rulesets.Osu.Edit
                     return;
                 }
 
-                if (!alreadyAdded)
-                {
-                    newlyAdded.Add(circle);
-
-                    // TODO: probably ensure samples also follow current ternary status (not trivial)
-                    circle.Samples.Add(circle.CreateHitSampleInfo());
-                }
-                else
-                {
-                    editorBeatmap.Update(circle);
-                }
-
                 startTime = beatSnapProvider.SnapTime(startTime + timeSpacing);
-
-                first = false;
             }
+
+            var previousNewComboState = newComboState.Value;
 
             insertedCircles.AddRange(newlyAdded);
             editorBeatmap.AddRange(newlyAdded);
+
+            // When adding new hitObjects, newCombo state will get reset to false  when no objects are selected.
+            // Since this is the case when this popover is showing, we need to restore the previous newCombo state
+            newComboState.Value = previousNewComboState;
 
             commitButton.Enabled.Value = true;
         }
