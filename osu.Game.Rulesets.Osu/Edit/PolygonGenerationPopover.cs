@@ -140,8 +140,8 @@ namespace osu.Game.Rulesets.Osu.Edit
 
             if (insertedCircles.Count > totalPoints)
             {
-                editorBeatmap.RemoveRange(insertedCircles.GetRange(totalPoints + 1, insertedCircles.Count - totalPoints - 1));
-                insertedCircles.RemoveRange(totalPoints + 1, insertedCircles.Count - totalPoints - 1);
+                editorBeatmap.RemoveRange(insertedCircles.GetRange(totalPoints, insertedCircles.Count - totalPoints));
+                insertedCircles.RemoveRange(totalPoints, insertedCircles.Count - totalPoints);
             }
 
             var selectionHandler = (EditorSelectionHandler)composer.BlueprintContainer.SelectionHandler;
