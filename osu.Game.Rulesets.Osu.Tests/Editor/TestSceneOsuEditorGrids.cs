@@ -206,7 +206,12 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
 
         private void nextGridTypeIs<T>() where T : PositionSnapGrid
         {
-            AddStep("toggle to next grid type", () => InputManager.Key(Key.H));
+            AddStep("toggle to next grid type", () =>
+            {
+                InputManager.PressKey(Key.ShiftLeft);
+                InputManager.Key(Key.G);
+                InputManager.ReleaseKey(Key.ShiftLeft);
+            });
             gridActive<T>(true);
         }
 
