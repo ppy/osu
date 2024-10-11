@@ -35,6 +35,16 @@ namespace osu.Game.Localisation
         public static LocalisableString Gameplay => new TranslatableString(getKey(@"gameplay"), @"Gameplay");
 
         /// <summary>
+        /// "HUD"
+        /// </summary>
+        public static LocalisableString HUD => new TranslatableString(getKey(@"hud"), @"HUD");
+
+        /// <summary>
+        /// "Playfield"
+        /// </summary>
+        public static LocalisableString Playfield => new TranslatableString(getKey(@"playfield"), @"Playfield");
+
+        /// <summary>
         /// "Settings ({0})"
         /// </summary>
         public static LocalisableString Settings(string arg0) => new TranslatableString(getKey(@"settings"), @"Settings ({0})", arg0);
