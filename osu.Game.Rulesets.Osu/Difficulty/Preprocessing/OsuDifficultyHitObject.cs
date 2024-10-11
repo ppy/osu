@@ -339,11 +339,23 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
             if (mods.OfType<OsuModStrictTracking>().Any())
             {
-                double strictVelocity = calculateStrictSliderVelocity(slider);
-                double strictDistance = strictVelocity * slider.LazyTravelTime;
+                (double path, double timeUsed) = calculateStrictSlider(slider);
 
-                Console.WriteLine($"Normal = {slider.LazyTravelDistance:0.00}, Strict = {strictDistance:0.00}");
-                slider.LazyTravelDistance = Math.Max(slider.LazyTravelDistance, (float)strictDistance);
+                double normalVelocity = slider.LazyTravelTime > 0 ? slider.LazyTravelDistance / slider.LazyTravelTime : 0;
+                double strictVelocity = timeUsed > 0 ? path / timeUsed : 0;
+
+                if (strictVelocity > normalVelocity)
+                {
+                    double deltaVelocity = strictVelocity - normalVelocity;
+
+                    // This addiional velocity would require more complex movement so buff it
+                    deltaVelocity *= 1.5;
+
+                    double multiplier = (normalVelocity + deltaVelocity) / strictVelocity;
+
+                    slider.LazyTravelDistance = (float)(path * multiplier);
+                    slider.LazyTravelTime = timeUsed;
+                }
             }
         }
 
@@ -355,67 +367,92 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             return slider.Position + slider.Path.PositionAt(progress);
         }
 
-        private double calculateStrictSliderVelocity(Slider slider)
+        private (double path, double timeUsed) calculateStrictSlider(Slider slider)
         {
-            //Console.WriteLine($"Calculating strict path for {slider.StartTime}");
-
             float scalingFactor = (float)(NORMALISED_RADIUS / slider.Radius);
 
             double updateDistance = slider.Radius;
             float followCircleRadius = assumed_slider_radius / scalingFactor;
 
+            // If slider have 0 repeates - we're calculating path from Start to LazyEnd
+
+            // If slider have repeats - we're calculating 2 paths: from Start to Repeat and from Start to LazyEnd
+            // Then total path = pathToLazyEnd + pathToRepeat * (repeats - 1)
+
             // WARNING, this is lazer-correct implementation because stable doesn't have Strict Tracking mod
             // This means that path of this function can be lower than normal path
-            double trackingEndTime = Math.Max(
+            double lazyEndTime = Math.Max(
                 slider.StartTime + slider.Duration + SliderEventGenerator.TAIL_LENIENCY,
                 slider.NestedHitObjects.LastOrDefault(n => n is not SliderTailCircle)?.StartTime ?? double.MinValue
             );
 
-            trackingEndTime = Math.Max(trackingEndTime, slider.StartTime + slider.Duration / 2);
+            double endTime = slider.EndTime;
 
             OsuHitObject head;
-            if (slider.RepeatCount == 0)
-                head = (OsuHitObject)slider.NestedHitObjects[0];
-            else
+
+            if (slider.RepeatCount > 0)
                 head = (OsuHitObject)slider.NestedHitObjects.Where(o => o is SliderRepeat).Last();
+            else
+                head = (OsuHitObject)slider.NestedHitObjects[0];
 
-            var tail = (OsuHitObject)slider.NestedHitObjects[^1];
+            double lazyTrackingTime = lazyEndTime - head.StartTime;
+            double totalTrackingTime = endTime - head.StartTime;
 
-            double totalTrackingTime = trackingEndTime - head.StartTime;
             if (totalTrackingTime == 0)
-                return 0;
+                return (0, 0);
+
+            if (slider.RepeatCount == 0 && lazyTrackingTime == 0)
+                return (0, 0);
 
             double numberOfUpdates = Math.Ceiling(slider.Path.Distance / updateDistance);
+            double numberOfLazyUpdates = Math.Ceiling(numberOfUpdates * lazyTrackingTime / totalTrackingTime);
 
-            double deltaT = totalTrackingTime / numberOfUpdates;
+            double deltaLazy = lazyTrackingTime / numberOfLazyUpdates;
 
-            double totalPath = 0;
+            double lazyPath = 0;
+            double relativeTime = deltaLazy;
             Vector2 currentCursorPosition = head.StackedPosition;
-
-            double peakVelocity = 0;
             double lastTimeWithMovement = 0;
 
-            for (double relativeTime = 0; relativeTime <= totalTrackingTime; relativeTime += deltaT)
+            // Adjust to be sure that there would be no floating point error
+            double adjustedTime = lazyTrackingTime + deltaLazy / 2;
+            for (; relativeTime <= adjustedTime; relativeTime += deltaLazy)
             {
-                // calculating position of the normal path
-                Vector2 ballPosition = positionWithRepeats(relativeTime, slider);
-
-                float distanceToCursor = Vector2.Distance(ballPosition, currentCursorPosition);
-
-                if (distanceToCursor <= followCircleRadius)
-                    continue;
-
-                float neededMovement = distanceToCursor - followCircleRadius;
-                double currentVelocity = neededMovement / (relativeTime - lastTimeWithMovement);
-                peakVelocity = Math.Max(peakVelocity, currentVelocity);
-
-                lastTimeWithMovement = relativeTime;
-
-                totalPath += neededMovement;
-                currentCursorPosition = Vector2.Lerp(currentCursorPosition, ballPosition, neededMovement / distanceToCursor);
+                lazyPath += calculateNeededMovement(slider, relativeTime, ref currentCursorPosition, ref lastTimeWithMovement, followCircleRadius);
             }
 
-            return peakVelocity * scalingFactor;
+            if (slider.RepeatCount == 0)
+                return (lazyPath * scalingFactor, lastTimeWithMovement);
+
+            double numberofNonLazyUpdates = Math.Max(1, numberOfUpdates - numberOfLazyUpdates);
+            double deltaNormal = (totalTrackingTime - lazyTrackingTime) / numberofNonLazyUpdates;
+            double totalPath = lazyPath;
+
+            // Adjust to be sure that there would be no floating point error
+            adjustedTime = totalTrackingTime + deltaNormal / 2;
+            for (relativeTime = lazyTrackingTime; relativeTime <= adjustedTime; relativeTime += deltaNormal)
+            {
+                totalPath += calculateNeededMovement(slider, relativeTime, ref currentCursorPosition, ref lastTimeWithMovement, followCircleRadius);
+            }
+
+            double resultPath = lazyPath + totalPath * slider.RepeatCount;
+            return (resultPath * scalingFactor, lastTimeWithMovement);
+        }
+
+        private static double calculateNeededMovement(Slider slider, double relativeTime, ref Vector2 currentCursorPosition, ref double lastTimeWithMovement, float followCircleRadius)
+        {
+            Vector2 ballPosition = positionWithRepeats(relativeTime, slider);
+            float distanceToCursor = Vector2.Distance(ballPosition, currentCursorPosition);
+
+            if (distanceToCursor <= followCircleRadius)
+                return 0;
+
+            float neededMovement = distanceToCursor - followCircleRadius;
+
+            lastTimeWithMovement = relativeTime;
+            currentCursorPosition = Vector2.Lerp(currentCursorPosition, ballPosition, neededMovement / distanceToCursor);
+
+            return neededMovement;
         }
 
         private Vector2 getEndCursorPosition(OsuHitObject hitObject)
