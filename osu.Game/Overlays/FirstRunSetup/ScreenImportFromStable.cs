@@ -122,10 +122,19 @@ namespace osu.Game.Overlays.FirstRunSetup
             stableLocatorTextBox.Current.Value = storage.GetFullPath(string.Empty);
             importButton.Enabled.Value = true;
 
-            bool available = legacyImportManager.CheckSongsFolderHardLinkAvailability();
-            Logger.Log($"Hard link support for beatmaps is {available}");
+            bool cowAvailable = legacyImportManager.CheckSongsFolderCoWAvailability();
+            Logger.Log($"CoW support for beatmaps is {cowAvailable}");
 
-            if (available)
+            bool hardLinkAvailable = legacyImportManager.CheckSongsFolderHardLinkAvailability();
+            Logger.Log($"Hard link support for beatmaps is {hardLinkAvailable}");
+
+            if (cowAvailable)
+            {
+                copyInformation.Text = FirstRunOverlayImportFromStableScreenStrings.DataMigrationNoExtraSpaceWithCoW;
+                copyInformation.AddText(@" "); // just to ensure correct spacing
+                copyInformation.AddLink(FirstRunOverlayImportFromStableScreenStrings.LearnMoreAboutCoW, LinkAction.OpenWiki, @"Client/Release_stream/Lazer/File_storage#via-copy-on-write");
+            }
+            else if (hardLinkAvailable)
             {
                 copyInformation.Text = FirstRunOverlayImportFromStableScreenStrings.DataMigrationNoExtraSpace;
                 copyInformation.AddText(@" "); // just to ensure correct spacing

@@ -61,7 +61,7 @@ namespace osu.Game.Database
             {
                 var tasks = GetStableImportPaths(storage).Select(p => new ImportTask(p)).ToArray();
 
-                await Importer.Import(tasks, new ImportParameters { Batch = true, PreferHardLinks = true }).ConfigureAwait(false);
+                await Importer.Import(tasks, new ImportParameters { Batch = true, PreferHardLinks = true, PreferCopyOnWrite = true }).ConfigureAwait(false);
             });
         }
 
