@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Osu.Objects;
@@ -87,7 +88,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         private readonly OsuHitObject? lastLastObject;
         private readonly OsuHitObject lastObject;
 
-        public OsuDifficultyHitObject(HitObject hitObject, HitObject lastObject, HitObject? lastLastObject, double clockRate, List<DifficultyHitObject> objects, int index)
+        public OsuDifficultyHitObject(HitObject hitObject, HitObject lastObject, HitObject? lastLastObject, double clockRate, List<DifficultyHitObject> objects, int index, Mod[] mods)
             : base(hitObject, lastObject, clockRate, objects, index)
         {
             this.lastLastObject = lastLastObject as OsuHitObject;
@@ -332,6 +333,63 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 if (i == nestedObjects.Count - 1)
                     slider.LazyEndPosition = currCursorPosition;
             }
+        }
+
+        private static Vector2 positionWithRepeats(double relativeTime, Slider slider)
+        {
+            double progress = relativeTime / slider.SpanDuration;
+            if (slider.RepeatCount % 2 == 1)
+                progress = 1 - progress; // revert if odd number of repeats
+            return slider.Position + slider.Path.PositionAt(progress);
+        }
+
+        private void calculateStrictSliderPath(Slider slider)
+        {
+            double updateDistance = slider.Radius;
+            float followCircleRadius = (float)(slider.Radius * 2.4);
+
+            // WARNING, this is lazer-correct implementation because stable doesn't have Strict Tracking mod
+            // This means that path of this function can be lower than normal path
+            double trackingEndTime = Math.Max(
+                slider.StartTime + slider.Duration + SliderEventGenerator.TAIL_LENIENCY,
+                slider.NestedHitObjects.LastOrDefault(n => n is not SliderTailCircle)?.StartTime ?? double.MinValue
+            );
+
+            OsuHitObject head;
+            if (slider.RepeatCount == 0)
+                head = (OsuHitObject)slider.NestedHitObjects[0];
+            else
+                head = (OsuHitObject)slider.NestedHitObjects.Where(o => o is SliderRepeat).Last();
+
+            var tail = (OsuHitObject)slider.NestedHitObjects[^1];
+
+            double totalTrackingTime = trackingEndTime - head.StartTime;
+            double numberOfUpdates = Math.Ceiling(slider.Path.Distance / updateDistance);
+
+            double deltaT = totalTrackingTime / numberOfUpdates;
+
+            double totalPath = 0;
+            Vector2 currentCursorPosition = head.StackedPosition;
+            double lastTimeWithMovement = 0;
+
+            for (double relativeTime = 0; relativeTime <= totalTrackingTime; relativeTime += deltaT)
+            {
+                // calculating position of the normal path
+                Vector2 ballPosition = positionWithRepeats(relativeTime, slider);
+
+                float distanceToCursor = Vector2.Distance(ballPosition, currentCursorPosition);
+
+                if (distanceToCursor <= followCircleRadius)
+                    continue;
+
+                lastTimeWithMovement = relativeTime;
+                float neededMovement = distanceToCursor - followCircleRadius;
+
+                totalPath += neededMovement;
+                currentCursorPosition = Vector2.Lerp(currentCursorPosition, ballPosition, neededMovement / distanceToCursor);
+            }
+
+
         }
 
         private Vector2 getEndCursorPosition(OsuHitObject hitObject)
