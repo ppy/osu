@@ -295,12 +295,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             for (int i = 1; i < nestedObjects.Count; i++)
             {
                 var currMovementObj = (OsuHitObject)nestedObjects[i];
-
-                Vector2 currMovement = Vector2.Subtract(currMovementObj.StackedPosition, currCursorPosition);
-                double currMovementLength = scalingFactor * currMovement.Length;
+                Vector2 currMovementObjPosition = currMovementObj.StackedPosition;
+                double currDistance = scalingFactor * Vector2.Distance(currMovementObjPosition, currCursorPosition);
 
                 // Amount of movement required so that the cursor position needs to be updated.
-                double requiredMovement = assumed_slider_radius;
+                double requiredDistance = assumed_slider_radius;
 
                 if (i == nestedObjects.Count - 1)
                 {
@@ -308,25 +307,24 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                     // There is both a lazy end position as well as the actual end slider position. We assume the player takes the simpler movement.
                     // For sliders that are circular, the lazy end position may actually be farther away than the sliders true end.
                     // This code is designed to prevent buffing situations where lazy end is actually a less efficient movement.
-                    Vector2 lazyMovement = Vector2.Subtract((Vector2)slider.LazyEndPosition, currCursorPosition);
+                    double lazyDistance = Vector2.Distance((Vector2)slider.LazyEndPosition, currCursorPosition) * scalingFactor;
 
-                    if (lazyMovement.Length < currMovement.Length)
-                        currMovement = lazyMovement;
-
-                    currMovementLength = scalingFactor * currMovement.Length;
+                    if (lazyDistance < currDistance)
+                        currDistance = lazyDistance;
                 }
                 else if (currMovementObj is SliderRepeat)
                 {
                     // For a slider repeat, assume a tighter movement threshold to better assess repeat sliders.
-                    requiredMovement = NORMALISED_RADIUS;
+                    requiredDistance = NORMALISED_RADIUS;
                 }
 
-                if (currMovementLength > requiredMovement)
+                if (currDistance > requiredDistance)
                 {
+                    double currMovement = currDistance - requiredDistance;
+                    slider.LazyTravelDistance += (float)currMovement;
+
                     // this finds the positional delta from the required radius and the current position, and updates the currCursorPosition accordingly, as well as rewarding distance.
-                    currCursorPosition = Vector2.Add(currCursorPosition, Vector2.Multiply(currMovement, (float)((currMovementLength - requiredMovement) / currMovementLength)));
-                    currMovementLength *= (currMovementLength - requiredMovement) / currMovementLength;
-                    slider.LazyTravelDistance += (float)currMovementLength;
+                    currCursorPosition = Vector2.Lerp(currCursorPosition, currMovementObjPosition, (float)(currMovement / currDistance));
                 }
 
                 if (i == nestedObjects.Count - 1)
