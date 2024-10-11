@@ -118,10 +118,10 @@ namespace osu.Game.Rulesets.Osu.Edit
             changeHandler?.BeginChange();
             began = true;
 
-            distanceSnapInput.Current.BindValueChanged(_ => tryCreatePolygon());
-            offsetAngleInput.Current.BindValueChanged(_ => tryCreatePolygon());
-            repeatCountInput.Current.BindValueChanged(_ => tryCreatePolygon());
-            pointInput.Current.BindValueChanged(_ => tryCreatePolygon());
+            distanceSnapInput.Current.BindValueChanged(_ => Scheduler.AddOnce(tryCreatePolygon));
+            offsetAngleInput.Current.BindValueChanged(_ => Scheduler.AddOnce(tryCreatePolygon));
+            repeatCountInput.Current.BindValueChanged(_ => Scheduler.AddOnce(tryCreatePolygon));
+            pointInput.Current.BindValueChanged(_ => Scheduler.AddOnce(tryCreatePolygon));
             tryCreatePolygon();
         }
 
@@ -136,23 +136,34 @@ namespace osu.Game.Rulesets.Osu.Edit
             double length = distanceSnapInput.Current.Value * velocity * timeSpacing;
             float polygonRadius = (float)(length / (2 * Math.Sin(double.Pi / pointInput.Current.Value)));
 
-            editorBeatmap.RemoveRange(insertedCircles);
-            insertedCircles.Clear();
+            int totalPoints = pointInput.Current.Value * repeatCountInput.Current.Value;
+
+            if (insertedCircles.Count > totalPoints)
+            {
+                editorBeatmap.RemoveRange(insertedCircles.GetRange(totalPoints + 1, insertedCircles.Count - totalPoints - 1));
+                insertedCircles.RemoveRange(totalPoints + 1, insertedCircles.Count - totalPoints - 1);
+            }
 
             var selectionHandler = (EditorSelectionHandler)composer.BlueprintContainer.SelectionHandler;
             bool first = true;
 
-            for (int i = 1; i <= pointInput.Current.Value * repeatCountInput.Current.Value; ++i)
+            var newlyAdded = new List<HitCircle>();
+
+            for (int i = 0; i < totalPoints; ++i)
             {
-                float angle = float.DegreesToRadians(offsetAngleInput.Current.Value) + i * (2 * float.Pi / pointInput.Current.Value);
+                float angle = float.DegreesToRadians(offsetAngleInput.Current.Value) + (i + 1) * (2 * float.Pi / pointInput.Current.Value);
                 var position = OsuPlayfield.BASE_SIZE / 2 + new Vector2(polygonRadius * float.Cos(angle), polygonRadius * float.Sin(angle));
 
-                var circle = new HitCircle
-                {
-                    Position = position,
-                    StartTime = startTime,
-                    NewCombo = first && selectionHandler.SelectionNewComboState.Value == TernaryState.True,
-                };
+                bool alreadyAdded = i < insertedCircles.Count;
+
+                var circle = alreadyAdded
+                    ? insertedCircles[i]
+                    : new HitCircle();
+
+                circle.Position = position;
+                circle.StartTime = startTime;
+                circle.NewCombo = first && selectionHandler.SelectionNewComboState.Value == TernaryState.True;
+
                 // TODO: probably ensure samples also follow current ternary status (not trivial)
                 circle.Samples.Add(circle.CreateHitSampleInfo());
 
@@ -162,13 +173,17 @@ namespace osu.Game.Rulesets.Osu.Edit
                     return;
                 }
 
-                insertedCircles.Add(circle);
+                if (!alreadyAdded)
+                    newlyAdded.Add(circle);
+
                 startTime = beatSnapProvider.SnapTime(startTime + timeSpacing);
 
                 first = false;
             }
 
-            editorBeatmap.AddRange(insertedCircles);
+            insertedCircles.AddRange(newlyAdded);
+            editorBeatmap.AddRange(newlyAdded);
+
             commitButton.Enabled.Value = true;
         }
 
