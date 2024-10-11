@@ -166,9 +166,6 @@ namespace osu.Game.Rulesets.Osu.Edit
                 circle.StartTime = startTime;
                 circle.NewCombo = first && selectionHandler.SelectionNewComboState.Value == TernaryState.True;
 
-                // TODO: probably ensure samples also follow current ternary status (not trivial)
-                circle.Samples.Add(circle.CreateHitSampleInfo());
-
                 if (position.X < 0 || position.Y < 0 || position.X > OsuPlayfield.BASE_SIZE.X || position.Y > OsuPlayfield.BASE_SIZE.Y)
                 {
                     commitButton.Enabled.Value = false;
@@ -178,7 +175,12 @@ namespace osu.Game.Rulesets.Osu.Edit
                 }
 
                 if (!alreadyAdded)
+                {
                     newlyAdded.Add(circle);
+
+                    // TODO: probably ensure samples also follow current ternary status (not trivial)
+                    circle.Samples.Add(circle.CreateHitSampleInfo());
+                }
 
                 startTime = beatSnapProvider.SnapTime(startTime + timeSpacing);
 
