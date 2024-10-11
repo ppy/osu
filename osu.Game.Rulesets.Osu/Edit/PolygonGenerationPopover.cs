@@ -118,12 +118,14 @@ namespace osu.Game.Rulesets.Osu.Edit
             changeHandler?.BeginChange();
             began = true;
 
-            distanceSnapInput.Current.BindValueChanged(_ => Scheduler.AddOnce(tryCreatePolygon));
-            offsetAngleInput.Current.BindValueChanged(_ => Scheduler.AddOnce(tryCreatePolygon));
-            repeatCountInput.Current.BindValueChanged(_ => Scheduler.AddOnce(tryCreatePolygon));
-            pointInput.Current.BindValueChanged(_ => Scheduler.AddOnce(tryCreatePolygon));
+            distanceSnapInput.Current.BindValueChanged(_ => scheduleRefresh());
+            offsetAngleInput.Current.BindValueChanged(_ => scheduleRefresh());
+            repeatCountInput.Current.BindValueChanged(_ => scheduleRefresh());
+            pointInput.Current.BindValueChanged(_ => scheduleRefresh());
             tryCreatePolygon();
         }
+
+        private void scheduleRefresh() => Scheduler.AddOnce(tryCreatePolygon);
 
         private void tryCreatePolygon()
         {
