@@ -56,9 +56,11 @@ namespace osu.Game.Screens.Edit.Commands
 
         protected virtual bool ValueEquals(TValue a, TValue b) => EqualityComparer<TValue>.Default.Equals(a, b);
 
-        public bool MergeWith(IEditorCommand previous, [MaybeNullWhen(false)] out IEditorCommand merged)
+        private bool canMergeWith(IEditorCommand command) => command.GetType() == GetType() && ((PropertyChangeCommand<TTarget, TValue>)command).Target == Target;
+
+        public bool MergeWithPrevious(IEditorCommand previousCommand, [MaybeNullWhen(false)] out IEditorCommand merged)
         {
-            if (GetType() == previous.GetType() && ReferenceEquals(Target, ((PropertyChangeCommand<TTarget, TValue>)previous).Target))
+            if (canMergeWith(previousCommand))
             {
                 merged = this;
                 return true;

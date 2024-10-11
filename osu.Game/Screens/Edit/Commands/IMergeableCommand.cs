@@ -15,9 +15,27 @@ namespace osu.Game.Screens.Edit.Commands
         /// Attempts to merge this command with a command that has previously been applied.
         /// The resulting command should have the same effect as applying both commands in sequence.
         /// </summary>
-        /// <param name="previous">The previously applied command</param>
+        /// <param name="previousCommand">The previously applied command</param>
         /// <param name="merged">The resulting command, or null if the commands cannot be merged.</param>
-        /// <returns>The resulting command, or null if the commands cannot be merged.</returns>
-        public bool MergeWith(IEditorCommand previous, [MaybeNullWhen(false)] out IEditorCommand merged);
+        public bool MergeWithPrevious(IEditorCommand previousCommand, [MaybeNullWhen(false)] out IEditorCommand merged);
+    }
+
+    public static class MergeableCommandExtensions
+    {
+        /// <summary>
+        /// Attempts to merge this command with a command that will be applied after it.
+        /// The resulting command should have the same effect as applying both commands in sequence.
+        /// </summary>
+        /// <param name="current">The command being merged</param>
+        /// <param name="nextCommand">The command applied after this one</param>
+        /// <param name="merged">The resulting command, or null if the commands cannot be merged.</param>
+        public static bool MergeWithNext(this IMergeableCommand current, IEditorCommand nextCommand, [MaybeNullWhen(false)] out IEditorCommand merged)
+        {
+            if (nextCommand is IMergeableCommand mergeable)
+                return mergeable.MergeWithPrevious(current, out merged);
+
+            merged = null;
+            return false;
+        }
     }
 }

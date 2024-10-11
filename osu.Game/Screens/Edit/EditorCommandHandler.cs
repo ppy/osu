@@ -142,7 +142,7 @@ namespace osu.Game.Screens.Edit
         {
             public Transaction()
             {
-                this.undoCommands = new List<IEditorCommand>();
+                undoCommands = new List<IEditorCommand>();
             }
 
             private Transaction(List<IEditorCommand> undoCommands)
@@ -160,19 +160,20 @@ namespace osu.Game.Screens.Edit
 
             public void Add(IEditorCommand command)
             {
-                for (int i = 0; i < undoCommands.Count; i++)
+                if (command is IMergeableCommand mergeable)
                 {
-                    var other = undoCommands[i];
-
-                    // Since the commands are stored in reverse order (to match execution order when undoing), the
-                    // command we're inserting is treated as the previous command relative to the current one.
-                    if (other is IMergeableCommand mergeable && mergeable.MergeWith(command, out var merged))
+                    for (int i = 0; i < undoCommands.Count; i++)
                     {
-                        undoCommands[i] = merged;
+                        // Since the commands are stored in reverse order (to match execution order when undoing), the
+                        // command we're inserting is treated as the previous command relative to the current one.
+                        if (mergeable.MergeWithNext(nextCommand: undoCommands[i], out var merged))
+                        {
+                            undoCommands[i] = merged;
 
-                        // Since currently there's only one command that a given command can be merged with, we can
-                        // stop iterating through the list once we've found a match.
-                        return;
+                            // Since currently there's only one command that a given command can be merged with, we can
+                            // stop iterating through the list once we've found a match.
+                            return;
+                        }
                     }
                 }
 
