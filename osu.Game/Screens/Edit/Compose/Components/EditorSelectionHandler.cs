@@ -176,7 +176,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// </summary>
         protected virtual void UpdateTernaryStates()
         {
-            SelectionNewComboState.Value = GetStateFromSelection(SelectedItems.OfType<IHasComboInformation>(), h => h.NewCombo);
+            if (SelectedItems.Any())
+                SelectionNewComboState.Value = GetStateFromSelection(SelectedItems.OfType<IHasComboInformation>(), h => h.NewCombo);
 
             var samplesInSelection = SelectedItems.SelectMany(enumerateAllSamples).ToArray();
 
