@@ -99,6 +99,19 @@ namespace osu.Game.Database
             return false;
         }
 
+        public bool CheckSongsFolderCoWAvailability()
+        {
+            var stableStorage = GetCurrentStableStorage();
+
+            if (stableStorage == null || gameHost is not DesktopGameHost desktopGameHost)
+                return false;
+
+            string testExistingPath = stableStorage.GetSongStorage().GetFullPath(string.Empty);
+            string testDestinationPath = desktopGameHost.Storage.GetFullPath(string.Empty);
+
+            return CopyOnWriteHelper.CheckAvailability(testDestinationPath, testExistingPath);
+        }
+
         public bool CheckSongsFolderHardLinkAvailability()
         {
             var stableStorage = GetCurrentStableStorage();
