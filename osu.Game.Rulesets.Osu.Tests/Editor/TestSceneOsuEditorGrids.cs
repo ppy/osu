@@ -130,6 +130,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
 
         private void gridActive<T>(bool active) where T : PositionSnapGrid
         {
+            AddAssert($"grid type is {typeof(T).Name}", () => this.ChildrenOfType<T>().Any());
             AddStep("choose placement tool", () => InputManager.Key(Key.Number2));
             AddStep("move cursor to spacing + (1, 1)", () =>
             {
