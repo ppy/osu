@@ -322,14 +322,14 @@ namespace osu.Game.Overlays.SkinEditor
 
             Schedule(() =>
             {
-                var oldskin = currentSkin.Value;
-                var newSkinInfo = oldskin.SkinInfo.PerformRead(s => s);
+                var oldSkin = currentSkin.Value;
+                var newSkinInfo = oldSkin.SkinInfo.PerformRead(s => s);
 
                 // Create a new skin instance to ensure the skin is reloaded
                 // If there's a better way to reload the skin, this should be replaced with it.
                 currentSkin.Value = newSkinInfo.CreateInstance(skins);
 
-                oldskin.Dispose();
+                oldSkin.Dispose();
 
                 mountMenuItem.Action.Disabled = false;
                 mountMenuItem.Text.Value = EditorStrings.EditExternally;
