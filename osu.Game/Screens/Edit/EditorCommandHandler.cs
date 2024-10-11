@@ -20,6 +20,11 @@ namespace osu.Game.Screens.Edit
 
         public bool HasUncommittedChanges => currentTransaction.UndoCommands.Count != 0;
 
+        /// <summary>
+        /// Submits a command to be applied and added to the history.
+        /// </summary>
+        /// <param name="command">Command to be applied.</param>
+        /// <param name="commitImmediately">Whether to commit the current transaction & push it onto the undo stack immediately.</param>
         public void Submit(IEditorCommand command, bool commitImmediately = false)
         {
             if (command.IsRedundant)
@@ -32,6 +37,11 @@ namespace osu.Game.Screens.Edit
                 Commit();
         }
 
+        /// <summary>
+        /// Submits a collection of commands to be applied and added to the history.
+        /// </summary>
+        /// <param name="commands">Commands to be applied.</param>
+        /// <param name="commitImmediately">Whether to commit the current transaction & push it onto the undo stack immediately.</param>
         public void Submit(IEnumerable<IEditorCommand> commands, bool commitImmediately = false)
         {
             foreach (var command in commands)
@@ -41,6 +51,10 @@ namespace osu.Game.Screens.Edit
                 Commit();
         }
 
+        /// <summary>
+        /// Takes the current transaction and pushes it onto the undo stack.
+        /// Returns false if there were no uncommitted changes.
+        /// </summary>
         public bool Commit()
         {
             if (!HasUncommittedChanges)
@@ -61,6 +75,10 @@ namespace osu.Game.Screens.Edit
             return true;
         }
 
+        /// <summary>
+        /// Undoes the last transaction from the undo stack.
+        /// Returns false if there are is nothing to undo.
+        /// </summary>
         public bool Undo()
         {
             if (undoStack.Count == 0)
@@ -78,6 +96,10 @@ namespace osu.Game.Screens.Edit
             return true;
         }
 
+        /// <summary>
+        /// Redoes the last transaction from the redo stack.
+        /// Returns false if there are is nothing to redo.
+        /// </summary>
         public bool Redo()
         {
             if (redoStack.Count == 0)
@@ -95,6 +117,10 @@ namespace osu.Game.Screens.Edit
             return true;
         }
 
+        /// <summary>
+        /// Reverts any changes that have been made since the last commit.
+        /// Returns false if there are no uncommitted changes.
+        /// </summary>
         public bool RevertUncommitedChanges()
         {
             if (!HasUncommittedChanges)
