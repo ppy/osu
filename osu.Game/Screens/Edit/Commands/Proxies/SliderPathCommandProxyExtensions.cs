@@ -5,12 +5,11 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
-using osu.Game.Screens.Edit.Commands.Proxies;
 using osuTK;
 
-namespace osu.Game.Rulesets.Osu.Edit.Commands
+namespace osu.Game.Screens.Edit.Commands.Proxies
 {
-    public static class SliderCommandProxyExtensions
+    public static class SliderPathCommandProxyExtensions
     {
         public static void Reverse(this CommandProxy<SliderPath> pathProxy, out Vector2 positionalOffset)
         {
