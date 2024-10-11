@@ -86,13 +86,12 @@ namespace osu.Game.IO
             switch (RuntimeInfo.OS)
             {
                 case RuntimeInfo.Platform.Windows:
-                    SafeFileHandle handle = CreateFile(filePath, FileAccess.Read, FileShare.Read, IntPtr.Zero, FileMode.Open, FileAttributes.Archive, IntPtr.Zero);
+                    using (SafeFileHandle handle = File.OpenHandle(filePath))
+                    {
+                        if (GetFileInformationByHandle(handle, out var fileInfo))
+                            result = (int)fileInfo.NumberOfLinks;
+                    }
 
-                    ByHandleFileInformation fileInfo;
-
-                    if (GetFileInformationByHandle(handle, out fileInfo))
-                        result = (int)fileInfo.NumberOfLinks;
-                    CloseHandle(handle);
                     break;
 
                 case RuntimeInfo.Platform.Linux:
@@ -111,22 +110,8 @@ namespace osu.Game.IO
         [DllImport("Kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
         public static extern bool CreateHardLink(string lpFileName, string lpExistingFileName, IntPtr lpSecurityAttributes);
 
-        [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Auto)]
-        private static extern SafeFileHandle CreateFile(
-            string lpFileName,
-            [MarshalAs(UnmanagedType.U4)] FileAccess dwDesiredAccess,
-            [MarshalAs(UnmanagedType.U4)] FileShare dwShareMode,
-            IntPtr lpSecurityAttributes,
-            [MarshalAs(UnmanagedType.U4)] FileMode dwCreationDisposition,
-            [MarshalAs(UnmanagedType.U4)] FileAttributes dwFlagsAndAttributes,
-            IntPtr hTemplateFile);
-
         [DllImport("kernel32.dll", SetLastError = true)]
         private static extern bool GetFileInformationByHandle(SafeFileHandle handle, out ByHandleFileInformation lpFileInformation);
-
-        [DllImport("kernel32.dll", SetLastError = true)]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        private static extern bool CloseHandle(SafeHandle hObject);
 
         [StructLayout(LayoutKind.Sequential)]
         private struct ByHandleFileInformation
