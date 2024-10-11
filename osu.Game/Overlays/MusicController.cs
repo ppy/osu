@@ -397,9 +397,12 @@ namespace osu.Game.Overlays
                         randomHistoryDirection += direction;
                     }
 
-                    result = previousRandomSets[^1];
-                    previousRandomSets.RemoveAt(previousRandomSets.Count - 1);
-                    return result;
+                    if (previousRandomSets.Count > 0)
+                    {
+                        result = previousRandomSets[^1];
+                        previousRandomSets.RemoveAt(previousRandomSets.Count - 1);
+                        return result;
+                    }
                 }
 
                 // if the early-return above didn't cover it, it means that we have no history to fall back on
