@@ -50,9 +50,14 @@ namespace osu.Game.Rulesets.Osu.Edit
         [Resolved]
         private HitObjectComposer composer { get; set; } = null!;
 
+        private Bindable<TernaryState> newComboState = null!;
+
         [BackgroundDependencyLoader]
         private void load()
         {
+            var selectionHandler = (EditorSelectionHandler)composer.BlueprintContainer.SelectionHandler;
+            newComboState = selectionHandler.SelectionNewComboState.GetBoundCopy();
+
             Child = new FillFlowContainer
             {
                 Width = 220,
@@ -122,6 +127,7 @@ namespace osu.Game.Rulesets.Osu.Edit
             offsetAngleInput.Current.BindValueChanged(_ => Scheduler.AddOnce(tryCreatePolygon));
             repeatCountInput.Current.BindValueChanged(_ => Scheduler.AddOnce(tryCreatePolygon));
             pointInput.Current.BindValueChanged(_ => Scheduler.AddOnce(tryCreatePolygon));
+            newComboState.BindValueChanged(_ => Scheduler.AddOnce(tryCreatePolygon));
             tryCreatePolygon();
         }
 
@@ -144,7 +150,6 @@ namespace osu.Game.Rulesets.Osu.Edit
                 insertedCircles.RemoveRange(totalPoints, insertedCircles.Count - totalPoints);
             }
 
-            var selectionHandler = (EditorSelectionHandler)composer.BlueprintContainer.SelectionHandler;
             bool first = true;
 
             var newlyAdded = new List<HitCircle>();
@@ -162,7 +167,7 @@ namespace osu.Game.Rulesets.Osu.Edit
 
                 circle.Position = position;
                 circle.StartTime = startTime;
-                circle.NewCombo = first && selectionHandler.SelectionNewComboState.Value == TernaryState.True;
+                circle.NewCombo = first && newComboState.Value == TernaryState.True;
 
                 if (position.X < 0 || position.Y < 0 || position.X > OsuPlayfield.BASE_SIZE.X || position.Y > OsuPlayfield.BASE_SIZE.Y)
                 {
@@ -178,6 +183,10 @@ namespace osu.Game.Rulesets.Osu.Edit
 
                     // TODO: probably ensure samples also follow current ternary status (not trivial)
                     circle.Samples.Add(circle.CreateHitSampleInfo());
+                }
+                else
+                {
+                    editorBeatmap.Update(circle);
                 }
 
                 startTime = beatSnapProvider.SnapTime(startTime + timeSpacing);
