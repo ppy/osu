@@ -201,7 +201,7 @@ namespace osu.Game.Rulesets.Osu.Edit
             insertedCircles.AddRange(newlyAdded);
             editorBeatmap.AddRange(newlyAdded);
 
-            // When adding new hitObjects, newCombo state will get reset to false  when no objects are selected.
+            // When adding new hitObjects, newCombo state will get reset to false when no objects are selected.
             // Since this is the case when this popover is showing, we need to restore the previous newCombo state
             newComboState.Value = previousNewComboState;
 
