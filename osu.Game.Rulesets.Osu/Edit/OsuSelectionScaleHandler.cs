@@ -240,12 +240,12 @@ namespace osu.Game.Rulesets.Osu.Edit
                 points = originalConvexHull!;
 
             foreach (var point in points)
-                scale = clampToBound(scale, point, Vector2.Zero, OsuPlayfield.BASE_SIZE);
+                scale = clampToBounds(scale, point, Vector2.Zero, OsuPlayfield.BASE_SIZE);
 
             return scale;
 
             // Clamps the scale vector s such that the point p scaled by s is within the rectangle defined by lowerBounds and upperBounds
-            Vector2 clampToBound(Vector2 s, Vector2 p, Vector2 lowerBounds, Vector2 upperBounds)
+            Vector2 clampToBounds(Vector2 s, Vector2 p, Vector2 lowerBounds, Vector2 upperBounds)
             {
                 p -= actualOrigin;
                 lowerBounds -= actualOrigin;

@@ -175,7 +175,7 @@ namespace osu.Game.Rulesets.Osu.Edit
             axisBindable.Disabled = !available;
         }
 
-        private void updateMaxScale()
+        private void updateMinMaxScale()
         {
             if (!scaleHandler.OriginalSurroundingQuad.HasValue)
                 return;
@@ -205,7 +205,7 @@ namespace osu.Game.Rulesets.Osu.Edit
         private void setOrigin(ScaleOrigin origin)
         {
             scaleInfo.Value = scaleInfo.Value with { Origin = origin };
-            updateMaxScale();
+            updateMinMaxScale();
             updateAxisCheckBoxesEnabled();
         }
 
@@ -237,14 +237,14 @@ namespace osu.Game.Rulesets.Osu.Edit
         private void setAxis(bool x, bool y)
         {
             scaleInfo.Value = scaleInfo.Value with { XAxis = x, YAxis = y };
-            updateMaxScale();
+            updateMinMaxScale();
         }
 
         protected override void PopIn()
         {
             base.PopIn();
             scaleHandler.Begin();
-            updateMaxScale();
+            updateMinMaxScale();
         }
 
         protected override void PopOut()
