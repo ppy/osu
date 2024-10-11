@@ -219,7 +219,18 @@ namespace osu.Game.Rulesets.Osu.Edit
             }
         }
 
-        private Axes getAdjustAxis(PreciseScaleInfo scale) => scale.XAxis ? scale.YAxis ? Axes.Both : Axes.X : Axes.Y;
+        private Axes getAdjustAxis(PreciseScaleInfo scale)
+        {
+            var result = Axes.None;
+
+            if (scale.XAxis)
+                result |= Axes.X;
+
+            if (scale.YAxis)
+                result |= Axes.Y;
+
+            return result;
+        }
 
         private float getRotation(PreciseScaleInfo scale) => scale.Origin == ScaleOrigin.GridCentre ? gridToolbox.GridLinesRotation.Value : 0;
 
