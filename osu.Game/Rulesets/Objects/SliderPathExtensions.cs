@@ -4,7 +4,6 @@
 using System.Linq;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects.Types;
-using osu.Game.Rulesets.Osu.Edit.Commands;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Commands;
 using osu.Game.Screens.Edit.Commands.Proxies;
