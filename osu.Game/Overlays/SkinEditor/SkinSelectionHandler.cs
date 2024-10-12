@@ -102,7 +102,7 @@ namespace osu.Game.Overlays.SkinEditor
 
         protected override IEnumerable<MenuItem> GetContextMenuItemsForSelection(IEnumerable<SelectionBlueprint<ISerialisableDrawable>> selection)
         {
-            var closestItem = new TernaryStateRadioMenuItem(SkinEditorStrings.Closest.ToString(), MenuItemType.Standard, _ => applyClosestAnchors())
+            var closestItem = new TernaryStateRadioMenuItem(SkinEditorStrings.Closest, MenuItemType.Standard, _ => applyClosestAnchors())
             {
                 State = { Value = GetStateFromSelection(selection, c => !c.Item.UsesFixedAnchor) }
             };
