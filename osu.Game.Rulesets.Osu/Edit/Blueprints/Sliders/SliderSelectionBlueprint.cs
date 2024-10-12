@@ -283,7 +283,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
             Proxy.SetSliderVelocityMultiplier(proposedVelocity);
             Proxy.Path().SetExpectedDistance(proposedDistance);
-            editorBeatmap?.Update(HitObject);
+            editorBeatmap?.AsCommandProxy(commandHandler).Update(HitObject);
         }
 
         /// <summary>

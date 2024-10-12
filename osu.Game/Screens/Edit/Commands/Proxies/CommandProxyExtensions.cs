@@ -110,6 +110,9 @@ namespace osu.Game.Screens.Edit.Commands.Proxies
         public static CommandProxy<EditorBeatmap> Remove(this CommandProxy<EditorBeatmap> proxy, HitObject hitObject) =>
             proxy.Submit(new RemoveHitObjectCommand(proxy.Target, hitObject));
 
+        public static CommandProxy<EditorBeatmap> Update(this CommandProxy<EditorBeatmap> proxy, HitObject hitObject) =>
+            proxy.Submit(new UpdateHitObjectCommand(proxy.Target, hitObject));
+
         #endregion
     }
 }
