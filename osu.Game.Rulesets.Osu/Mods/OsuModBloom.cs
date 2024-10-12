@@ -17,6 +17,7 @@ using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play;
 using osu.Game.Rulesets.Osu.UI.Cursor;
+using osu.Framework.Utils;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
@@ -84,13 +85,14 @@ namespace osu.Game.Rulesets.Osu.Mods
             Debug.Assert(osuPlayfield.Cursor != null);
             var realCursor = (OsuCursor)osuPlayfield.Cursor.ActiveCursor;
             realCursor.isBloom = true;
+            float currentCombSize = (float)Interpolation.Lerp(osuPlayfield.Cursor.Scale.X, ComboBasedSize, Math.Clamp(osuPlayfield.Time.Elapsed / TRANSITION_DURATION, 0, 1));
             if (beBaseSize)
             {
                 realCursor.ComboSize = 1;
             }
             else
             {
-                realCursor.ComboSize = ComboBasedSize;
+                realCursor.ComboSize = currentCombSize;
             }
         }
 
