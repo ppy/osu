@@ -2,10 +2,10 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Mods;
 using osu.Framework.Utils;
+using osu.Framework.Lists;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 {
@@ -32,7 +32,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             double difficulty = 0;
             double weight = 1;
 
-            List<double> strains = GetCurrentStrainsSorted();
+            SortedList<double> strains = GetCurrentStrainsSorted();
 
             int reducedSectionCount = Math.Min(strains.Count, ReducedSectionCount);
             double[] reducedStrains = new double[reducedSectionCount];
@@ -48,8 +48,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             strains.RemoveRange(0, reducedSectionCount);
 
             // Insert them back
-            foreach (double reducedStrain in reducedStrains)
-                InsertElementInReverseSortedList(strains, reducedStrain);
+            strains.AddRange(reducedStrains);
 
             // Difficulty is the weighted sum of the highest strains from every section.
             foreach (double strain in strains)

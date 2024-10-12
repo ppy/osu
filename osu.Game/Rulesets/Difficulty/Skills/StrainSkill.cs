@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Lists;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Mods;
 
@@ -55,17 +56,12 @@ namespace osu.Game.Rulesets.Difficulty.Skills
                 saveCurrentPeak();
                 startNewSectionFrom(currentSectionEnd, current);
                 currentSectionEnd += SectionLength;
-
-                amountOfStrainsAddedSinceSave++;
             }
 
             double currentStrain = StrainValueAt(current);
 
             if (currentSectionPeak < currentStrain)
-            {
                 currentSectionPeak = currentStrain;
-                isSavedCurrentStrainRelevant = false;
-            }
         }
 
         /// <summary>
@@ -121,73 +117,35 @@ namespace osu.Game.Rulesets.Difficulty.Skills
             return difficulty;
         }
 
-        protected List<double> GetCurrentStrainsSorted()
+        /// <summary>
+        /// Amount of strains that will be saved in the sorted strains list.
+        /// Use value = 0 in case you want all strains to be saved.
+        /// </summary>
+        protected virtual int MaxStrainCount => 200;
+
+        protected SortedList<double> GetCurrentStrainsSorted()
         {
-            List<double> strains;
+            int newStrainsToAdd = strainPeaks.Count - amountOfStrainsAddedSinceSave;
 
-            // If no saved strains - calculate them from 0, and save them after that
-            if (savedSortedStrains == null || savedSortedStrains.Count == 0)
+            var peaks = strainPeaks.TakeLast(newStrainsToAdd);
+            savedSortedStrains.AddRange(peaks);
+            amountOfStrainsAddedSinceSave = strainPeaks.Count;
+
+            // We're saving only the largest 200 strains
+            int excessStrainsCount = savedSortedStrains.Count - MaxStrainCount;
+            if (MaxStrainCount > 0 && excessStrainsCount > 0)
             {
-                var peaks = GetCurrentStrainPeaks().Where(p => p > 0);
-
-                strains = peaks.OrderDescending().ToList();
-
-                savedSortedStrains = new List<double>(strains);
-                amountOfStrainsAddedSinceSave = 0;
-                savedCurrentStrain = currentSectionPeak;
-                isSavedCurrentStrainRelevant = true;
-            }
-            // If several sections were added since last save - insert them into saved strains list
-            else if (amountOfStrainsAddedSinceSave > 0)
-            {
-                var newPeaks = GetCurrentStrainPeaks().TakeLast(amountOfStrainsAddedSinceSave).Where(p => p > 0);
-                foreach (double newPeak in newPeaks)
-                    InsertElementInReverseSortedList(savedSortedStrains, newPeak);
-
-                strains = new List<double>(savedSortedStrains);
-
-                amountOfStrainsAddedSinceSave = 0;
-                savedCurrentStrain = currentSectionPeak;
-                isSavedCurrentStrainRelevant = true;
-            }
-            // If no section was added, but last one was changed - find it and replace it with new one
-            else if (!isSavedCurrentStrainRelevant && savedCurrentStrain > 0)
-            {
-                int invalidStrainIndex = savedSortedStrains.BinarySearch(savedCurrentStrain, new ReverseComparer());
-                savedSortedStrains.RemoveAt(invalidStrainIndex);
-                InsertElementInReverseSortedList(savedSortedStrains, currentSectionPeak);
-
-                strains = new List<double>(savedSortedStrains);
-
-                savedCurrentStrain = currentSectionPeak;
-                isSavedCurrentStrainRelevant = true;
-            }
-            // Otherwise - just use saved strains
-            else
-            {
-                strains = new List<double>(savedSortedStrains);
+                savedSortedStrains.RemoveRange(savedSortedStrains.Count - excessStrainsCount, excessStrainsCount);
             }
 
-            return strains;
+            var strainsWithCurrent = new SortedList<double>((double a, double b) => { return a < b ? 1 : (a > b ? -1 : 0); });
+            strainsWithCurrent.AddRange(savedSortedStrains);
+            strainsWithCurrent.Add(currentSectionPeak);
+
+            return strainsWithCurrent;
         }
 
-        private List<double>? savedSortedStrains;
-        private double savedCurrentStrain;
-        private bool isSavedCurrentStrainRelevant;
-        private int amountOfStrainsAddedSinceSave;
-
-        protected static void InsertElementInReverseSortedList(List<double> list, double element)
-        {
-            int indexToInsert = list.BinarySearch(element, new ReverseComparer());
-            if (indexToInsert < 0)
-                indexToInsert = ~indexToInsert;
-
-            list.Insert(indexToInsert, element);
-        }
-
-        private class ReverseComparer : IComparer<double>
-        {
-            public int Compare(double x, double y) => Comparer<double>.Default.Compare(y, x);
-        }
+        private SortedList<double> savedSortedStrains = new SortedList<double>((double a, double b) => { return a < b ? 1 : (a > b ? -1 : 0); });
+        private int amountOfStrainsAddedSinceSave = 0;
     }
 }
