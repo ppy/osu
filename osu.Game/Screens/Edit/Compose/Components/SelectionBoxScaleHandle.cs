@@ -50,14 +50,14 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
             rawScale = convertDragEventToScaleMultiplier(e);
 
-            applyScale(shouldLockAspectRatio: isCornerAnchor(originalAnchor) && e.ShiftPressed);
+            applyScale(shouldLockAspectRatio: isCornerAnchor(originalAnchor) && e.ShiftPressed, useDefaultOrigin: e.AltPressed);
         }
 
         protected override bool OnKeyDown(KeyDownEvent e)
         {
             if (IsDragged)
             {
-                applyScale(shouldLockAspectRatio: isCornerAnchor(originalAnchor) && e.ShiftPressed);
+                applyScale(shouldLockAspectRatio: isCornerAnchor(originalAnchor) && e.ShiftPressed, useDefaultOrigin: e.AltPressed);
                 return true;
             }
 
@@ -69,7 +69,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             base.OnKeyUp(e);
 
             if (IsDragged)
-                applyScale(shouldLockAspectRatio: isCornerAnchor(originalAnchor) && e.ShiftPressed);
+                applyScale(shouldLockAspectRatio: isCornerAnchor(originalAnchor) && e.ShiftPressed, useDefaultOrigin: e.AltPressed);
         }
 
         protected override void OnDragEnd(DragEndEvent e)
@@ -100,13 +100,13 @@ namespace osu.Game.Screens.Edit.Compose.Components
             if ((originalAnchor & Anchor.y0) > 0) scale.Y = -scale.Y;
         }
 
-        private void applyScale(bool shouldLockAspectRatio)
+        private void applyScale(bool shouldLockAspectRatio, bool useDefaultOrigin = false)
         {
             var newScale = shouldLockAspectRatio
                 ? new Vector2((rawScale.X + rawScale.Y) * 0.5f)
                 : rawScale;
 
-            var scaleOrigin = originalAnchor.Opposite().PositionOnQuad(scaleHandler!.OriginalSurroundingQuad!.Value);
+            Vector2? scaleOrigin = useDefaultOrigin ? null : originalAnchor.Opposite().PositionOnQuad(scaleHandler!.OriginalSurroundingQuad!.Value);
             scaleHandler!.Update(newScale, scaleOrigin, getAdjustAxis());
         }
 
