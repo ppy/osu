@@ -12,6 +12,14 @@ namespace osu.Game.Screens.Edit
 {
     public partial class EditorCommandHandler : TransactionalCommitComponent
     {
+        private readonly EditorBeatmap editorBeatmap;
+
+        /// <summary>
+        /// This change handler will be suppressed while a transaction with this command handler is in progress.
+        /// Any save states of this change handler will be added to the undo stack.
+        /// </summary>
+        private readonly EditorChangeHandler? changeHandler;
+
         public event Action<IEditorCommand>? CommandApplied;
 
         public readonly Bindable<bool> CanUndo = new BindableBool();
@@ -19,6 +27,31 @@ namespace osu.Game.Screens.Edit
         public readonly Bindable<bool> CanRedo = new BindableBool();
 
         public bool HasUncommittedChanges => currentTransaction.UndoCommands.Count != 0;
+
+        private bool suppressStateChange;
+
+        private Transaction currentTransaction;
+
+        private readonly Stack<Transaction> undoStack = new Stack<Transaction>();
+
+        private readonly Stack<Transaction> redoStack = new Stack<Transaction>();
+
+        public EditorCommandHandler(EditorBeatmap editorBeatmap, EditorChangeHandler? changeHandler)
+        {
+            this.editorBeatmap = editorBeatmap;
+            this.changeHandler = changeHandler;
+            currentTransaction = new Transaction();
+
+            if (this.changeHandler != null)
+            {
+                // Ensure mutually exclusive state changes.
+                TransactionBegan += () => this.changeHandler.SuppressStateChange = true;
+                TransactionEnded += () => this.changeHandler.SuppressStateChange = false;
+                this.changeHandler.TransactionBegan += () => suppressStateChange = true;
+                this.changeHandler.TransactionEnded += () => suppressStateChange = false;
+                this.changeHandler.SaveStateTriggered += commitChangeHandlerTransaction;
+            }
+        }
 
         /// <summary>
         /// Submits a command to be applied and added to the history.
@@ -59,12 +92,25 @@ namespace osu.Game.Screens.Edit
                 return;
             }
 
-            undoStack.Push(currentTransaction);
-            redoStack.Clear();
+            if (!suppressStateChange)
+            {
+                undoStack.Push(currentTransaction);
+                redoStack.Clear();
 
-            Logger.Log($"Added {currentTransaction.UndoCommands.Count} command(s) to undo stack");
+                Logger.Log($"Added {currentTransaction.UndoCommands.Count} command(s) to undo stack");
+            }
 
             currentTransaction = new Transaction();
+
+            historyChanged();
+        }
+
+        private void commitChangeHandlerTransaction()
+        {
+            undoStack.Push(new Transaction(isChangeHandlerTransaction: true));
+            redoStack.Clear();
+
+            Logger.Log("Added change handler transaction to undo stack");
 
             historyChanged();
         }
@@ -81,7 +127,10 @@ namespace osu.Game.Screens.Edit
             var transaction = undoStack.Pop();
             var redoTransaction = transaction.Reverse();
 
-            revertTransaction(transaction);
+            if (transaction.IsChangeHandlerTransaction)
+                changeHandler!.RestoreState(-1);
+            else
+                revertTransaction(transaction);
 
             redoStack.Push(redoTransaction);
 
@@ -102,7 +151,10 @@ namespace osu.Game.Screens.Edit
             var transaction = redoStack.Pop();
             var undoTransaction = transaction.Reverse();
 
-            revertTransaction(transaction);
+            if (transaction.IsChangeHandlerTransaction)
+                changeHandler!.RestoreState(1);
+            else
+                revertTransaction(transaction);
 
             undoStack.Push(undoTransaction);
 
@@ -129,8 +181,18 @@ namespace osu.Game.Screens.Edit
 
         private void revertTransaction(Transaction transaction)
         {
+            if (changeHandler != null)
+                changeHandler.SuppressStateChange = true;
+
+            editorBeatmap.BeginChange();
+
             foreach (var command in transaction.UndoCommands)
                 apply(command);
+
+            editorBeatmap.EndChange();
+
+            if (changeHandler != null)
+                changeHandler.SuppressStateChange = false;
         }
 
         private void historyChanged()
@@ -138,12 +200,6 @@ namespace osu.Game.Screens.Edit
             CanUndo.Value = undoStack.Count > 0;
             CanRedo.Value = redoStack.Count > 0;
         }
-
-        private Transaction currentTransaction = new Transaction();
-
-        private readonly Stack<Transaction> undoStack = new Stack<Transaction>();
-
-        private readonly Stack<Transaction> redoStack = new Stack<Transaction>();
 
         private void apply(IEditorCommand command)
         {
@@ -160,13 +216,22 @@ namespace osu.Game.Screens.Edit
 
         private readonly struct Transaction
         {
+            public readonly bool IsChangeHandlerTransaction;
+
             public Transaction()
             {
                 undoCommands = new List<IEditorCommand>();
             }
 
-            private Transaction(List<IEditorCommand> undoCommands)
+            public Transaction(bool isChangeHandlerTransaction = false)
             {
+                IsChangeHandlerTransaction = isChangeHandlerTransaction;
+                undoCommands = new List<IEditorCommand>();
+            }
+
+            private Transaction(List<IEditorCommand> undoCommands, bool isChangeHandlerTransaction = false)
+            {
+                IsChangeHandlerTransaction = isChangeHandlerTransaction;
                 this.undoCommands = undoCommands;
             }
 
@@ -204,7 +269,7 @@ namespace osu.Game.Screens.Edit
             {
                 var commands = UndoCommands.Reverse().Select(command => command.CreateUndo()).ToList();
 
-                return new Transaction(commands);
+                return new Transaction(commands, IsChangeHandlerTransaction);
             }
         }
     }

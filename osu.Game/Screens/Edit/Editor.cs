@@ -302,7 +302,7 @@ namespace osu.Game.Screens.Edit
                 dependencies.CacheAs<IEditorChangeHandler>(changeHandler);
             }
 
-            commandHandler = new EditorCommandHandler();
+            commandHandler = new EditorCommandHandler(editorBeatmap, changeHandler);
             dependencies.CacheAs(commandHandler);
 
             beatDivisor.SetArbitraryDivisor(editorBeatmap.BeatmapInfo.BeatDivisor);
