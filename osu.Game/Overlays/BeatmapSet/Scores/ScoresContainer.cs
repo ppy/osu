@@ -34,7 +34,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         private readonly IBindable<APIUser> user = new Bindable<APIUser>();
 
         private readonly Box background;
-        private readonly ScoreTable scoreTable;
+        public readonly ScoreTable ScoreTable;
         private readonly FillFlowContainer topScoresContainer;
         private readonly LoadingLayer loading;
         private readonly LeaderboardModSelector modSelector;
@@ -59,8 +59,8 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 loadCancellationSource = new CancellationTokenSource();
 
                 topScoresContainer.Clear();
-                scoreTable.ClearScores();
-                scoreTable.Hide();
+                ScoreTable.ClearScores();
+                ScoreTable.Hide();
 
                 loading.Hide();
                 loading.FinishTransforms();
@@ -85,8 +85,8 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 var scores = value.Scores.Select(s => s.ToScoreInfo(rulesets, beatmapInfo)).OrderByTotalScore().ToArray();
                 var topScore = scores.First();
 
-                scoreTable.DisplayScores(scores, apiBeatmap.Status.GrantsPerformancePoints());
-                scoreTable.Show();
+                ScoreTable.DisplayScores(scores, apiBeatmap.Status.GrantsPerformancePoints());
+                ScoreTable.Show();
 
                 var userScore = value.UserScore;
                 var userScoreInfo = userScore?.Score.ToScoreInfo(rulesets, beatmapInfo);
@@ -175,7 +175,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                                             Direction = FillDirection.Vertical,
                                             Spacing = new Vector2(0, 5),
                                         },
-                                        scoreTable = new ScoreTable
+                                        ScoreTable = new ScoreTable
                                         {
                                             Anchor = Anchor.TopCentre,
                                             Origin = Anchor.TopCentre,

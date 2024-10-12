@@ -8,11 +8,13 @@ using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
@@ -88,6 +90,43 @@ namespace osu.Game.Tests.Visual.Online
 
             AddUntilStep("wait for scores not displayed", () => scoresContainer.ChildrenOfType<ScoreTableRowBackground>().Count() == 1);
             AddAssert("no best score displayed", () => scoresContainer.ChildrenOfType<DrawableTopScore>().Count() == 1);
+        }
+
+        [Test]
+        public void TestHitResultsWithSameNameAreGrouped()
+        {
+            AddStep("Load scores without user best", () =>
+            {
+                var allScores = createScores();
+                allScores.UserScore = null;
+                scoresContainer.Scores = allScores;
+            });
+
+            AddUntilStep("wait for scores displayed", () => scoresContainer.ChildrenOfType<ScoreTableRowBackground>().Any());
+            AddAssert("only one column for slider end", () => scoresContainer.ScoreTable.Columns.Count(c => c.Header.Equals("slider end")) == 1);
+
+            AddAssert("all rows show non-zero slider ends", () =>
+            {
+                int sliderEndColumnIndex = Array.FindIndex(scoresContainer.ScoreTable.Columns, c => c != null && c.Header.Equals("slider end"));
+                bool sliderEndFilledInEachRow = true;
+
+                for (int i = 0; i < scoresContainer.ScoreTable.Content?.GetLength(0); i++)
+                {
+                    switch (scoresContainer.ScoreTable.Content[i, sliderEndColumnIndex])
+                    {
+                        case OsuSpriteText text:
+                            if (text.Text.Equals(0.0d.ToLocalisableString(@"N0")))
+                                sliderEndFilledInEachRow = false;
+                            break;
+
+                        default:
+                            sliderEndFilledInEachRow = false;
+                            break;
+                    }
+                }
+
+                return sliderEndFilledInEachRow;
+            });
         }
 
         [Test]
@@ -287,13 +326,17 @@ namespace osu.Game.Tests.Visual.Online
 
             const int initial_great_count = 2000;
             const int initial_tick_count = 100;
+            const int initial_slider_end_count = 500;
 
             int greatCount = initial_great_count;
             int tickCount = initial_tick_count;
+            int sliderEndCount = initial_slider_end_count;
 
-            foreach (var s in scores.Scores)
+            foreach (var (score, index) in scores.Scores.Select((s, i) => (s, i)))
             {
-                s.Statistics = new Dictionary<HitResult, int>
+                HitResult sliderEndResult = index % 2 == 0 ? HitResult.SliderTailHit : HitResult.SmallTickHit;
+
+                score.Statistics = new Dictionary<HitResult, int>
                 {
                     { HitResult.Great, greatCount },
                     { HitResult.LargeTickHit, tickCount },
@@ -301,10 +344,19 @@ namespace osu.Game.Tests.Visual.Online
                     { HitResult.Meh, RNG.Next(100) },
                     { HitResult.Miss, initial_great_count - greatCount },
                     { HitResult.LargeTickMiss, initial_tick_count - tickCount },
+                    { sliderEndResult, sliderEndCount },
+                };
+
+                // Some hit results, including SliderTailHit and SmallTickHit, are only displayed
+                // when the maximum number is known
+                score.MaximumStatistics = new Dictionary<HitResult, int>
+                {
+                    { sliderEndResult, initial_slider_end_count },
                 };
 
                 greatCount -= 100;
                 tickCount -= RNG.Next(1, 5);
+                sliderEndCount -= 20;
             }
 
             return scores;
