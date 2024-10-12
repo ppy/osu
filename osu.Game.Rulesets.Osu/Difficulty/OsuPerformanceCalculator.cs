@@ -18,8 +18,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         private bool usingClassicSliderAccuracy;
 
-        private bool useClassicSlider;
-
         private double accuracy;
         private int scoreMaxCombo;
         private int countGreat;
@@ -39,7 +37,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         protected override PerformanceAttributes CreatePerformanceAttributes(ScoreInfo score, DifficultyAttributes attributes)
         {
             var osuAttributes = (OsuDifficultyAttributes)attributes;
-            useClassicSlider = score.Mods.Any(h => h is OsuModClassic cl && cl.NoSliderHeadAccuracy.Value);
 
             usingClassicSliderAccuracy = score.Mods.OfType<OsuModClassic>().Any(m => m.NoSliderHeadAccuracy.Value);
 
@@ -51,10 +48,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             countMiss = score.Statistics.GetValueOrDefault(HitResult.Miss);
             countLargeTickMiss = score.Statistics.GetValueOrDefault(HitResult.LargeTickMiss);
 
-            if (!useClassicSlider)
+            if (!usingClassicSliderAccuracy)
                 countSliderEndsDropped = osuAttributes.SliderCount - score.Statistics.GetValueOrDefault(HitResult.SliderTailHit);
 
-            if (useClassicSlider)
+            if (usingClassicSliderAccuracy)
                 effectiveMissCount = calculateEffectiveMissCount(osuAttributes);
             else
                 effectiveMissCount = countMiss;
@@ -138,7 +135,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (attributes.SliderCount > 0)
             {
                 double estimateSliderEndsDropped;
-                if (useClassicSlider)
+                if (usingClassicSliderAccuracy)
                     estimateSliderEndsDropped = Math.Clamp(Math.Min(countOk + countMeh + countMiss, attributes.MaxCombo - scoreMaxCombo), 0, estimateDifficultSliders);
                 else
                     estimateSliderEndsDropped = Math.Min(countSliderEndsDropped + countLargeTickMiss, estimateDifficultSliders);
