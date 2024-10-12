@@ -600,7 +600,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             },
             new OsuMenuItem("Convert to stream", MenuItemType.Destructive, convertToStream)
             {
-                Hotkey = new Hotkey(new KeyCombination(InputKey.Control, InputKey.Shift, InputKey.F))
+                Hotkey = new Hotkey(new KeyCombination(InputKey.Control, InputKey.Shift, InputKey.Z))
             },
         };
 
