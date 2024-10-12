@@ -27,7 +27,7 @@ namespace osu.Game.Screens.Edit
 
         private readonly List<byte[]> savedStates = new List<byte[]>();
 
-        private int currentState = -1;
+        public int CurrentState { get; set; } = -1;
 
         /// <summary>
         /// A SHA-2 hash representing the current visible editor state.
@@ -38,7 +38,7 @@ namespace osu.Game.Screens.Edit
             {
                 ensureStateSaved();
 
-                using (var stream = new MemoryStream(savedStates[currentState]))
+                using (var stream = new MemoryStream(savedStates[CurrentState]))
                     return stream.ComputeSHA2Hash();
             }
         }
@@ -71,17 +71,17 @@ namespace osu.Game.Screens.Edit
                 byte[] newState = stream.ToArray();
 
                 // if the previous state is binary equal we don't need to push a new one, unless this is the initial state.
-                if (savedStates.Count > 0 && newState.SequenceEqual(savedStates[currentState])) return;
+                if (savedStates.Count > 0 && newState.SequenceEqual(savedStates[CurrentState])) return;
 
-                if (currentState < savedStates.Count - 1)
-                    savedStates.RemoveRange(currentState + 1, savedStates.Count - currentState - 1);
+                if (CurrentState < savedStates.Count - 1)
+                    savedStates.RemoveRange(CurrentState + 1, savedStates.Count - CurrentState - 1);
 
                 if (savedStates.Count > MAX_SAVED_STATES)
                     savedStates.RemoveAt(0);
 
                 savedStates.Add(newState);
 
-                currentState = savedStates.Count - 1;
+                CurrentState = savedStates.Count - 1;
 
                 OnStateChange?.Invoke();
                 updateBindables();
@@ -96,15 +96,15 @@ namespace osu.Game.Screens.Edit
             if (savedStates.Count == 0)
                 return;
 
-            int newState = Math.Clamp(currentState + direction, 0, savedStates.Count - 1);
-            if (currentState == newState)
+            int newState = Math.Clamp(CurrentState + direction, 0, savedStates.Count - 1);
+            if (CurrentState == newState)
                 return;
 
             isRestoring = true;
 
-            ApplyStateChange(savedStates[currentState], savedStates[newState]);
+            ApplyStateChange(savedStates[CurrentState], savedStates[newState]);
 
-            currentState = newState;
+            CurrentState = newState;
 
             isRestoring = false;
 
@@ -128,8 +128,8 @@ namespace osu.Game.Screens.Edit
 
         private void updateBindables()
         {
-            CanUndo.Value = savedStates.Count > 0 && currentState > 0;
-            CanRedo.Value = currentState < savedStates.Count - 1;
+            CanUndo.Value = savedStates.Count > 0 && CurrentState > 0;
+            CanRedo.Value = CurrentState < savedStates.Count - 1;
         }
     }
 }

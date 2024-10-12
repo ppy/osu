@@ -28,7 +28,8 @@ namespace osu.Game.Screens.Edit
 
         public bool HasUncommittedChanges => currentTransaction.UndoCommands.Count != 0;
 
-        private bool suppressStateChange;
+        private bool ignoreCommandStateChange;
+        private bool ignoreChangeHandlerStateChange;
 
         private Transaction currentTransaction;
 
@@ -44,12 +45,21 @@ namespace osu.Game.Screens.Edit
 
             if (this.changeHandler != null)
             {
-                // Ensure mutually exclusive state changes.
-                TransactionBegan += () => this.changeHandler.SuppressStateChange = true;
-                TransactionEnded += () => this.changeHandler.SuppressStateChange = false;
-                this.changeHandler.TransactionBegan += () => suppressStateChange = true;
-                this.changeHandler.TransactionEnded += () => suppressStateChange = false;
-                this.changeHandler.SaveStateTriggered += commitChangeHandlerTransaction;
+                TransactionBegan += () =>
+                {
+                    ignoreChangeHandlerStateChange = !ignoreCommandStateChange;
+                    // The change handler should save states even when a change is recorded as commands,
+                    // because it needs to know the state after the commands in order to restore it.
+                    this.changeHandler.BeginChange();
+                };
+                TransactionEnded += () =>
+                {
+                    this.changeHandler.EndChange();
+                    ignoreChangeHandlerStateChange = false;
+                };
+                this.changeHandler.TransactionBegan += () => ignoreCommandStateChange = !ignoreChangeHandlerStateChange;
+                this.changeHandler.TransactionEnded += () => ignoreCommandStateChange = false;
+                this.changeHandler.OnStateChange += commitChangeHandlerStateChange;
             }
         }
 
@@ -92,7 +102,7 @@ namespace osu.Game.Screens.Edit
                 return;
             }
 
-            if (!suppressStateChange)
+            if (!ignoreCommandStateChange)
             {
                 undoStack.Push(currentTransaction);
                 redoStack.Clear();
@@ -105,8 +115,11 @@ namespace osu.Game.Screens.Edit
             historyChanged();
         }
 
-        private void commitChangeHandlerTransaction()
+        private void commitChangeHandlerStateChange()
         {
+            if (ignoreChangeHandlerStateChange || changeHandler!.CurrentState <= 0)
+                return;
+
             undoStack.Push(new Transaction(isChangeHandlerTransaction: true));
             redoStack.Clear();
 
@@ -128,9 +141,20 @@ namespace osu.Game.Screens.Edit
             var redoTransaction = transaction.Reverse();
 
             if (transaction.IsChangeHandlerTransaction)
+            {
+                ignoreChangeHandlerStateChange = true;
                 changeHandler!.RestoreState(-1);
+                ignoreChangeHandlerStateChange = false;
+                Logger.Log("Undo handled by change handler");
+            }
             else
+            {
                 revertTransaction(transaction);
+
+                if (changeHandler != null)
+                    changeHandler.CurrentState--;
+                Logger.Log("Undo handled by command handler");
+            }
 
             redoStack.Push(redoTransaction);
 
@@ -152,9 +176,20 @@ namespace osu.Game.Screens.Edit
             var undoTransaction = transaction.Reverse();
 
             if (transaction.IsChangeHandlerTransaction)
+            {
+                ignoreChangeHandlerStateChange = true;
                 changeHandler!.RestoreState(1);
+                ignoreChangeHandlerStateChange = false;
+                Logger.Log("Redo handled by change handler");
+            }
             else
+            {
                 revertTransaction(transaction);
+
+                if (changeHandler != null)
+                    changeHandler.CurrentState++;
+                Logger.Log("Redo handled by command handler");
+            }
 
             undoStack.Push(undoTransaction);
 
@@ -181,6 +216,7 @@ namespace osu.Game.Screens.Edit
 
         private void revertTransaction(Transaction transaction)
         {
+            // We are navigating history so we don't want to write a new state.
             if (changeHandler != null)
                 changeHandler.SuppressStateChange = true;
 
