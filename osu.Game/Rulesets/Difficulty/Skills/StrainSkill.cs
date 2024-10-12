@@ -124,7 +124,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         {
             int newStrainsToAdd = strainPeaks.Count - amountOfStrainsAddedSinceSave;
 
-            var peaks = strainPeaks.TakeLast(newStrainsToAdd);
+            var peaks = strainPeaks.TakeLast(newStrainsToAdd).Where(s => s > 0);
             savedSortedStrains.AddRange(peaks);
             amountOfStrainsAddedSinceSave = strainPeaks.Count;
 
