@@ -130,19 +130,20 @@ namespace osu.Game.Rulesets.Difficulty.Skills
 
             // We're saving only the largest 200 strains
             int excessStrainsCount = savedSortedStrains.Count - MaxStrainCount;
+
             if (MaxStrainCount > 0 && excessStrainsCount > 0)
             {
                 savedSortedStrains.RemoveRange(savedSortedStrains.Count - excessStrainsCount, excessStrainsCount);
             }
 
-            var strainsWithCurrent = new SortedList<double>((double a, double b) => { return a < b ? 1 : (a > b ? -1 : 0); });
+            var strainsWithCurrent = new SortedList<double>((a, b) => a < b ? 1 : (a > b ? -1 : 0));
             strainsWithCurrent.AddRange(savedSortedStrains);
             strainsWithCurrent.Add(currentSectionPeak);
 
             return strainsWithCurrent;
         }
 
-        private SortedList<double> savedSortedStrains = new SortedList<double>((double a, double b) => { return a < b ? 1 : (a > b ? -1 : 0); });
-        private int amountOfStrainsAddedSinceSave = 0;
+        private readonly SortedList<double> savedSortedStrains = new SortedList<double>((a, b) => a < b ? 1 : (a > b ? -1 : 0));
+        private int amountOfStrainsAddedSinceSave;
     }
 }
