@@ -79,6 +79,8 @@ namespace osu.Game.Rulesets.Osu.Edit
 
             base.Begin();
 
+            commandHandler?.BeginChange();
+
             objectsInScale = selectedMovableObjects.ToDictionary(ho => ho, ho => new OriginalHitObjectState(ho));
             OriginalSurroundingQuad = objectsInScale.Count == 1 && objectsInScale.First().Key is Slider slider
                 ? GeometryUtils.GetSurroundingQuad(slider.Path.ControlPoints.Select(p => slider.Position + p.Position))
@@ -125,7 +127,7 @@ namespace osu.Game.Rulesets.Osu.Edit
             if (!OperationInProgress.Value)
                 throw new InvalidOperationException($"Cannot {nameof(Commit)} a rotate operation without calling {nameof(Begin)} first!");
 
-            commandHandler?.Commit();
+            commandHandler?.EndChange();
 
             base.Commit();
 

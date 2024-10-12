@@ -22,9 +22,16 @@ namespace osu.Game.Screens.Edit.Commands.Proxies
             return proxy;
         }
 
-        public static CommandProxy<T> Commit<T>(this CommandProxy<T> proxy)
+        public static CommandProxy<T> BeginChange<T>(this CommandProxy<T> proxy)
         {
-            proxy.CommandHandler?.Commit();
+            proxy.CommandHandler?.BeginChange();
+
+            return proxy;
+        }
+
+        public static CommandProxy<T> EndChange<T>(this CommandProxy<T> proxy)
+        {
+            proxy.CommandHandler?.EndChange();
 
             return proxy;
         }

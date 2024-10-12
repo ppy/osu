@@ -58,6 +58,8 @@ namespace osu.Game.Rulesets.Osu.Edit
 
             base.Begin();
 
+            commandHandler?.BeginChange();
+
             objectsInRotation = selectedMovableObjects.ToArray();
             DefaultOrigin = GeometryUtils.MinimumEnclosingCircle(objectsInRotation).Item1;
             originalPositions = objectsInRotation.ToDictionary(obj => obj, obj => obj.Position);
@@ -98,7 +100,7 @@ namespace osu.Game.Rulesets.Osu.Edit
             if (!OperationInProgress.Value)
                 throw new InvalidOperationException($"Cannot {nameof(Commit)} a rotate operation without calling {nameof(Begin)} first!");
 
-            commandHandler?.Commit();
+            commandHandler?.EndChange();
 
             base.Commit();
 

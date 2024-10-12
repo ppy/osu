@@ -149,8 +149,9 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             if (toRemove.Count == 0)
                 return false;
 
+            commandHandler?.BeginChange();
             RemoveControlPointsRequested?.Invoke(toRemove);
-            commandHandler?.Commit();
+            commandHandler?.EndChange();
 
             // Since pieces are re-used, they will not point to the deleted control points while remaining selected
             foreach (var piece in Pieces)
@@ -167,8 +168,9 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             if (controlPointsToSplitAt.Count == 0)
                 return false;
 
+            commandHandler?.BeginChange();
             SplitControlPointsRequested?.Invoke(controlPointsToSplitAt);
-            commandHandler?.Commit();
+            commandHandler?.EndChange();
 
             // Since pieces are re-used, they will not point to the deleted control points while remaining selected
             foreach (var piece in Pieces)
@@ -287,6 +289,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
                     if (currentTypeIndex < 0 && e.ShiftPressed)
                         currentTypeIndex = 0;
 
+                    commandHandler?.BeginChange();
+
                     do
                     {
                         currentTypeIndex = (validTypes.Length + currentTypeIndex + (e.ShiftPressed ? -1 : 1)) % validTypes.Length;
@@ -294,7 +298,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
                         updatePathTypeOfSelectedPieces(validTypes[currentTypeIndex]);
                     } while (selectedPoint.Type != validTypes[currentTypeIndex]);
 
-                    commandHandler?.Commit();
+                    commandHandler?.EndChange();
 
                     return true;
                 }
@@ -350,6 +354,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         /// <param name="type">The path type we want to assign to the given control point piece.</param>
         private void updatePathTypeOfSelectedPieces(PathType? type)
         {
+            commandHandler?.BeginChange();
+
             double originalDistance = hitObject.Path.Distance;
 
             foreach (var p in Pieces.Where(p => p.IsSelected.Value))
@@ -379,7 +385,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             else
                 proxy.Path().SetExpectedDistance(originalDistance);
 
-            commandHandler?.Commit();
+            commandHandler?.EndChange();
         }
 
         #region Drag handling
@@ -399,6 +405,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             selectedControlPoints = new HashSet<PathControlPoint>(Pieces.Where(piece => piece.IsSelected.Value).Select(piece => piece.ControlPoint));
 
             Debug.Assert(draggedControlPointIndex >= 0);
+
+            commandHandler?.BeginChange();
         }
 
         [Resolved(CanBeNull = true)]
@@ -469,7 +477,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             EnsureValidPathTypes();
         }
 
-        public void DragEnded() => commandHandler?.Commit();
+        public void DragEnded() => commandHandler?.EndChange();
 
         #endregion
 

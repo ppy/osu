@@ -54,7 +54,7 @@ namespace osu.Game.Rulesets.Osu.Edit
         }
 
         [Resolved(canBeNull: true)]
-        private EditorCommandHandler? commandManager { get; set; }
+        private EditorCommandHandler? commandHandler { get; set; }
 
         public override bool HandleMovement(MoveSelectionEvent<HitObject> moveEvent)
         {
@@ -77,7 +77,7 @@ namespace osu.Game.Rulesets.Osu.Edit
 
             localDelta = moveSelectionInBounds(localDelta);
 
-            foreach (var h in hitObjects.AsListCommandProxy(commandManager))
+            foreach (var h in hitObjects.AsListCommandProxy(commandHandler))
                 h.SetPosition(h.Position() + localDelta);
 
             // manually update stacking.
@@ -108,12 +108,12 @@ namespace osu.Game.Rulesets.Osu.Edit
             foreach (var h in hitObjects)
             {
                 if (moreThanOneObject)
-                    h.AsCommandProxy(commandManager).SetStartTime(endTime - (h.GetEndTime() - startTime));
+                    h.AsCommandProxy(commandHandler).SetStartTime(endTime - (h.GetEndTime() - startTime));
 
                 if (h is Slider slider)
                 {
-                    slider.Path.AsCommandProxy(commandManager).Reverse(out Vector2 offset);
-                    slider.AsCommandProxy(commandManager).SetPosition(slider.Position + offset);
+                    slider.Path.AsCommandProxy(commandHandler).Reverse(out Vector2 offset);
+                    slider.AsCommandProxy(commandHandler).SetPosition(slider.Position + offset);
                 }
             }
 
@@ -121,7 +121,7 @@ namespace osu.Game.Rulesets.Osu.Edit
             hitObjects = hitObjects.OrderBy(obj => obj.StartTime).ToList();
 
             for (int i = 0; i < hitObjects.Count; ++i)
-                hitObjects[i].AsCommandProxy(commandManager).SetNewCombo(newComboOrder[i]);
+                hitObjects[i].AsCommandProxy(commandHandler).SetNewCombo(newComboOrder[i]);
 
             return true;
         }
@@ -161,7 +161,7 @@ namespace osu.Game.Rulesets.Osu.Edit
 
             bool didFlip = false;
 
-            foreach (var h in hitObjects.AsListCommandProxy(commandManager))
+            foreach (var h in hitObjects.AsListCommandProxy(commandHandler))
             {
                 var flippedPosition = GeometryUtils.GetFlippedPosition(flipAxis, flipQuad, h.Position());
 
@@ -178,7 +178,7 @@ namespace osu.Game.Rulesets.Osu.Edit
                 {
                     didFlip = true;
 
-                    foreach (var cp in slider.Path.ControlPoints.AsListCommandProxy(commandManager))
+                    foreach (var cp in slider.Path.ControlPoints.AsListCommandProxy(commandHandler))
                         cp.SetPosition(GeometryUtils.GetFlippedPosition(flipAxis, controlPointFlipQuad, cp.Position()));
                 }
             }
@@ -226,6 +226,8 @@ namespace osu.Game.Rulesets.Osu.Edit
 
         private void mergeSelection()
         {
+            commandHandler?.BeginChange();
+
             var mergeableObjects = selectedMergeableObjects;
 
             if (!canMerge(mergeableObjects))
@@ -285,24 +287,19 @@ namespace osu.Game.Rulesets.Osu.Edit
             // Make sure only the merged hit object is in the beatmap.
             foreach (var selectedMergeableObject in mergeableObjects)
             {
-                EditorBeatmap.AsCommandProxy(commandManager).Remove(selectedMergeableObject);
+                EditorBeatmap.AsCommandProxy(commandHandler).Remove(selectedMergeableObject);
             }
 
-            EditorBeatmap.AsCommandProxy(commandManager).Add(mergedHitObject);
+            EditorBeatmap.AsCommandProxy(commandHandler).Add(mergedHitObject);
 
             // Make sure the merged hitobject is selected.
             SelectedItems.Clear();
             SelectedItems.Add(mergedHitObject);
 
-            CommandHandler?.Commit();
+            CommandHandler?.EndChange();
         }
 
-        protected override void OnOperationEnded()
-        {
-            base.OnOperationEnded();
-
-            commandManager?.Commit();
-        }
+        protected override bool UseCommandHandler => true;
 
         protected override IEnumerable<MenuItem> GetContextMenuItemsForSelection(IEnumerable<SelectionBlueprint<HitObject>> selection)
         {

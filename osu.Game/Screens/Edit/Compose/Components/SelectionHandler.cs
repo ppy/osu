@@ -54,6 +54,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
         [Resolved(CanBeNull = true)]
         protected EditorCommandHandler? CommandHandler { get; private set; }
 
+        [Resolved(CanBeNull = true)]
+        protected IEditorChangeHandler? ChangeHandler { get; private set; }
+
         public SelectionRotationHandler RotationHandler { get; private set; } = null!;
 
         public SelectionScaleHandler ScaleHandler { get; private set; } = null!;
@@ -105,6 +108,10 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// </summary>
         protected virtual void OnOperationBegan()
         {
+            if (UseCommandHandler)
+                CommandHandler?.BeginChange();
+            else
+                ChangeHandler?.BeginChange();
         }
 
         /// <summary>
@@ -112,7 +119,10 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// </summary>
         protected virtual void OnOperationEnded()
         {
-            CommandHandler?.Commit();
+            if (UseCommandHandler)
+                CommandHandler?.EndChange();
+            else
+                ChangeHandler?.EndChange();
         }
 
         #region User Input Handling
@@ -177,6 +187,12 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <returns>Whether any items could be reversed.</returns>
         public virtual bool HandleReverse() => false;
 
+        /// <summary>
+        /// Method to determine whether the handler should use the command handler.
+        /// Temporary until all handlers are converted to use the command handler.
+        /// </summary>
+        protected virtual bool UseCommandHandler => false;
+
         public virtual bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
             if (e.Repeat)
@@ -187,14 +203,16 @@ namespace osu.Game.Screens.Edit.Compose.Components
             switch (e.Action)
             {
                 case GlobalAction.EditorFlipHorizontally:
+                    OnOperationBegan();
                     handled = HandleFlip(Direction.Horizontal, true);
-                    CommandHandler?.Commit();
+                    OnOperationEnded();
 
                     return handled;
 
                 case GlobalAction.EditorFlipVertically:
+                    OnOperationBegan();
                     handled = HandleFlip(Direction.Vertical, true);
-                    CommandHandler?.Commit();
+                    OnOperationEnded();
 
                     return handled;
             }

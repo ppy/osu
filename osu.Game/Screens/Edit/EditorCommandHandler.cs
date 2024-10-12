@@ -10,7 +10,7 @@ using osu.Game.Screens.Edit.Commands;
 
 namespace osu.Game.Screens.Edit
 {
-    public partial class EditorCommandHandler
+    public partial class EditorCommandHandler : TransactionalCommitComponent
     {
         public event Action<IEditorCommand>? CommandApplied;
 
@@ -34,7 +34,7 @@ namespace osu.Game.Screens.Edit
             apply(command);
 
             if (commitImmediately)
-                Commit();
+                UpdateState();
         }
 
         /// <summary>
@@ -48,19 +48,15 @@ namespace osu.Game.Screens.Edit
                 Submit(command);
 
             if (commitImmediately)
-                Commit();
+                UpdateState();
         }
 
-        /// <summary>
-        /// Takes the current transaction and pushes it onto the undo stack.
-        /// Returns false if there were no uncommitted changes.
-        /// </summary>
-        public bool Commit()
+        protected override void UpdateState()
         {
             if (!HasUncommittedChanges)
             {
                 Logger.Log("Nothing to commit");
-                return false;
+                return;
             }
 
             undoStack.Push(currentTransaction);
@@ -71,8 +67,6 @@ namespace osu.Game.Screens.Edit
             currentTransaction = new Transaction();
 
             historyChanged();
-
-            return true;
         }
 
         /// <summary>

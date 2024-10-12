@@ -20,6 +20,11 @@ namespace osu.Game.Screens.Edit
 
         public event Action? OnStateChange;
 
+        /// <summary>
+        /// If true, state changes will not be tracked.
+        /// </summary>
+        public bool SuppressStateChange { get; set; }
+
         private readonly List<byte[]> savedStates = new List<byte[]>();
 
         private int currentState = -1;
@@ -57,7 +62,7 @@ namespace osu.Game.Screens.Edit
 
         protected override void UpdateState()
         {
-            if (isRestoring)
+            if (isRestoring || SuppressStateChange)
                 return;
 
             using (var stream = new MemoryStream())

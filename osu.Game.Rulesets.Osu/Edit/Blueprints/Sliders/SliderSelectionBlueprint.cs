@@ -219,6 +219,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                     // If there's more than two objects selected, ctrl+click should deselect
                     if (e.ControlPressed && IsSelected && selectedObjects.Count < 2)
                     {
+                        commandHandler?.BeginChange();
                         placementControlPoint = addControlPoint(e.MousePosition);
                         ControlPointVisualiser?.SetSelectionTo(placementControlPoint);
                         return true; // Stop input from being handled and modifying the selection
@@ -246,12 +247,13 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             lengthAdjustMouseOffset = ToLocalSpace(e.ScreenSpaceMouseDownPosition) - HitObject.Position - HitObject.Path.PositionAt(1);
             oldDuration = HitObject.Path.Distance / HitObject.SliderVelocityMultiplier;
             oldVelocityMultiplier = HitObject.SliderVelocityMultiplier;
+            commandHandler?.BeginChange();
         }
 
         private void endAdjustLength()
         {
             trimExcessControlPoints(HitObject.Path);
-            commandHandler?.Commit();
+            commandHandler?.EndChange();
             isAdjustingLength = false;
         }
 
@@ -385,7 +387,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                     ControlPointVisualiser?.DragEnded();
 
                 placementControlPoint = null;
-                commandHandler?.Commit();
+                commandHandler?.EndChange();
             }
         }
 
@@ -438,6 +440,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
             var pathControlPoint = new PathControlPoint { Position = position };
 
+            // Move the control points from the insertion index onwards to make room for the insertion
             Proxy.Path().ControlPoints().Insert(insertionIndex, pathControlPoint);
 
             ControlPointVisualiser?.EnsureValidPathTypes();
@@ -526,9 +529,9 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                     Path = new SliderPath(splitControlPoints.Select(o => new PathControlPoint(o.Position - splitControlPoints[0].Position, o == splitControlPoints[^1] ? null : o.Type)).ToArray())
                 };
 
+                // Increase the start time of the slider before adding the new slider so the new slider is immediately inserted at the correct index and internal state remains valid.
                 Proxy.SetStartTime(Proxy.StartTime() + split_gap);
 
-                // Increase the start time of the slider before adding the new slider so the new slider is immediately inserted at the correct index and internal state remains valid.
                 editorBeatmap.AsCommandProxy(commandHandler).Add(newSlider);
 
                 Proxy.SetNewCombo(false);
@@ -558,6 +561,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
             var timingPoint = editorBeatmap.ControlPointInfo.TimingPointAt(HitObject.StartTime);
             double streamSpacing = timingPoint.BeatLength / beatDivisor.Value;
+
+            commandHandler?.BeginChange();
 
             int i = 0;
             double time = HitObject.StartTime;
@@ -590,15 +595,16 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
             beatmapProxy.Remove(HitObject);
 
-            commandHandler?.Commit();
+            commandHandler?.EndChange();
         }
 
         public override MenuItem[] ContextMenuItems => new MenuItem[]
         {
             new OsuMenuItem("Add control point", MenuItemType.Standard, () =>
             {
+                commandHandler?.BeginChange();
                 addControlPoint(lastRightClickPosition);
-                commandHandler?.Commit();
+                commandHandler?.EndChange();
             })
             {
                 Hotkey = new Hotkey(new KeyCombination(InputKey.Control, InputKey.MouseLeft))

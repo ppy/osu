@@ -44,6 +44,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
         [Resolved(CanBeNull = true)]
         private EditorCommandHandler commandHandler { get; set; }
 
+        [Resolved(CanBeNull = true)]
+        private IEditorChangeHandler changeHandler { get; set; }
+
         protected readonly BindableList<T> SelectedItems = new BindableList<T>();
 
         protected BlueprintContainer()
@@ -190,6 +193,10 @@ namespace osu.Game.Screens.Edit.Compose.Components
             if (movementBlueprints != null)
             {
                 isDraggingBlueprint = true;
+                if (UseCommandHandler)
+                    commandHandler?.BeginChange();
+                else
+                    changeHandler?.BeginChange();
                 return true;
             }
 
@@ -217,12 +224,21 @@ namespace osu.Game.Screens.Edit.Compose.Components
             if (isDraggingBlueprint)
             {
                 DragOperationCompleted();
-                commandHandler?.Commit();
+                if (UseCommandHandler)
+                    commandHandler?.EndChange();
+                else
+                    changeHandler?.EndChange();
             }
 
             DragBox.Hide();
             selectionBeforeDrag.Clear();
         }
+
+        /// <summary>
+        /// Method to determine whether the handler should use the command handler.
+        /// Temporary until all handlers are converted to use the command handler.
+        /// </summary>
+        protected virtual bool UseCommandHandler => false;
 
         protected override void Update()
         {
