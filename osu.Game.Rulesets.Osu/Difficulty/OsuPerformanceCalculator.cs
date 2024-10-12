@@ -135,10 +135,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (attributes.SliderCount > 0)
             {
                 double estimateSliderEndsDropped;
-                if (usingClassicSliderAccuracy)
-                    estimateSliderEndsDropped = Math.Clamp(Math.Min(countOk + countMeh + countMiss, attributes.MaxCombo - scoreMaxCombo), 0, estimateDifficultSliders);
-                else
-                    estimateSliderEndsDropped = Math.Min(countSliderEndsDropped + countLargeTickMiss, estimateDifficultSliders);
+                estimateSliderEndsDropped = usingClassicSliderAccuracy ? Math.Clamp(Math.Min(countOk + countMeh + countMiss, attributes.MaxCombo - scoreMaxCombo), 0, estimateDifficultSliders) : Math.Min(countSliderEndsDropped + countLargeTickMiss, estimateDifficultSliders);
 
                 double sliderNerfFactor = 0;
                 sliderNerfFactor = (1 - attributes.SliderFactor) * Math.Pow(1 - estimateSliderEndsDropped / estimateDifficultSliders, 3) + attributes.SliderFactor;
