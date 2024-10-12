@@ -7,7 +7,7 @@ using System.Diagnostics.CodeAnalysis;
 namespace osu.Game.Screens.Edit.Commands
 {
     /// <summary>
-    /// Represents a single property update on a given <see cref="TTarget"/>.
+    /// Represents a single property update on a given <see cref="Target"/>.
     /// </summary>
     /// <typeparam name="TTarget">Type of the object owning the property</typeparam>
     /// <typeparam name="TValue">Type of the property to update</typeparam>

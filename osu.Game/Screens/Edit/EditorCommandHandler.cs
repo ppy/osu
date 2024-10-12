@@ -67,7 +67,7 @@ namespace osu.Game.Screens.Edit
         /// Submits a command to be applied and added to the history.
         /// </summary>
         /// <param name="command">Command to be applied.</param>
-        /// <param name="commitImmediately">Whether to commit the current transaction & push it onto the undo stack immediately.</param>
+        /// <param name="commitImmediately">Whether to commit the current transaction and push it onto the undo stack immediately.</param>
         public void Submit(IEditorCommand command, bool commitImmediately = false)
         {
             if (command.IsRedundant)
@@ -84,7 +84,7 @@ namespace osu.Game.Screens.Edit
         /// Submits a collection of commands to be applied and added to the history.
         /// </summary>
         /// <param name="commands">Commands to be applied.</param>
-        /// <param name="commitImmediately">Whether to commit the current transaction & push it onto the undo stack immediately.</param>
+        /// <param name="commitImmediately">Whether to commit the current transaction and push it onto the undo stack immediately.</param>
         public void Submit(IEnumerable<IEditorCommand> commands, bool commitImmediately = false)
         {
             foreach (var command in commands)
