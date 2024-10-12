@@ -153,7 +153,7 @@ namespace osu.Game.Database
             }
         }
 
-        public async Task ImportFromStableAsync(StableContent content, bool interactiveLocateIfNotFound = true)
+        public async Task ImportFromStableAsync(StableContent content, bool interactiveLocateIfNotFound = true, bool useHardLink = true, bool useCopyOnWrite = true)
         {
             var stableStorage = GetCurrentStableStorage();
 
@@ -177,10 +177,10 @@ namespace osu.Game.Database
 
             Task beatmapImportTask = Task.CompletedTask;
             if (content.HasFlag(StableContent.Beatmaps))
-                importTasks.Add(beatmapImportTask = new LegacyBeatmapImporter(beatmaps).ImportFromStableAsync(stableStorage));
+                importTasks.Add(beatmapImportTask = new LegacyBeatmapImporter(beatmaps).ImportFromStableAsync(stableStorage, useHardLink, useCopyOnWrite));
 
             if (content.HasFlag(StableContent.Skins))
-                importTasks.Add(new LegacySkinImporter(skins).ImportFromStableAsync(stableStorage));
+                importTasks.Add(new LegacySkinImporter(skins).ImportFromStableAsync(stableStorage, useHardLink, useCopyOnWrite));
 
             if (content.HasFlag(StableContent.Collections))
             {
@@ -193,7 +193,7 @@ namespace osu.Game.Database
             }
 
             if (content.HasFlag(StableContent.Scores))
-                importTasks.Add(beatmapImportTask.ContinueWith(_ => new LegacyScoreImporter(scores).ImportFromStableAsync(stableStorage), TaskContinuationOptions.OnlyOnRanToCompletion));
+                importTasks.Add(beatmapImportTask.ContinueWith(_ => new LegacyScoreImporter(scores).ImportFromStableAsync(stableStorage, useHardLink, useCopyOnWrite), TaskContinuationOptions.OnlyOnRanToCompletion));
 
             await Task.WhenAll(importTasks.ToArray()).ConfigureAwait(false);
         }

@@ -48,6 +48,10 @@ namespace osu.Game.Overlays.FirstRunSetup
 
         private IEnumerable<ImportCheckbox> contentCheckboxes => Content.Children.OfType<ImportCheckbox>();
 
+        private bool hardLinkAvailable;
+
+        private bool cowAvailable;
+
         [BackgroundDependencyLoader(permitNulls: true)]
         private void load()
         {
@@ -122,10 +126,10 @@ namespace osu.Game.Overlays.FirstRunSetup
             stableLocatorTextBox.Current.Value = storage.GetFullPath(string.Empty);
             importButton.Enabled.Value = true;
 
-            bool cowAvailable = legacyImportManager.CheckSongsFolderCoWAvailability();
+            cowAvailable = legacyImportManager.CheckSongsFolderCoWAvailability();
             Logger.Log($"CoW support for beatmaps is {cowAvailable}");
 
-            bool hardLinkAvailable = legacyImportManager.CheckSongsFolderHardLinkAvailability();
+            hardLinkAvailable = legacyImportManager.CheckSongsFolderHardLinkAvailability();
             Logger.Log($"Hard link support for beatmaps is {hardLinkAvailable}");
 
             if (cowAvailable)
@@ -165,7 +169,7 @@ namespace osu.Game.Overlays.FirstRunSetup
             foreach (var c in contentCheckboxes.Where(c => c.Current.Value))
                 importableContent |= c.StableContent;
 
-            legacyImportManager.ImportFromStableAsync(importableContent, false).ContinueWith(t => Schedule(() =>
+            legacyImportManager.ImportFromStableAsync(importableContent, false, useCopyOnWrite: cowAvailable, useHardLink: hardLinkAvailable).ContinueWith(t => Schedule(() =>
             {
                 progressText.FadeOut(500, Easing.OutQuint);
 
