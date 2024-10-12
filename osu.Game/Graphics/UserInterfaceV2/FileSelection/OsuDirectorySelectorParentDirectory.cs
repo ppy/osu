@@ -6,7 +6,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Overlays;
 
-namespace osu.Game.Graphics.UserInterfaceV2
+namespace osu.Game.Graphics.UserInterfaceV2.FileSelection
 {
     internal partial class OsuDirectorySelectorParentDirectory : OsuDirectorySelectorDirectory
     {
