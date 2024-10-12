@@ -391,7 +391,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             if (!IsSelected)
                 return false;
 
-            if (e.Key == Key.F && e.ControlPressed && e.ShiftPressed)
+            if (e.Key == Key.X && e.ControlPressed && e.ShiftPressed)
             {
                 convertToStream();
                 return true;
@@ -600,7 +600,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             },
             new OsuMenuItem("Convert to stream", MenuItemType.Destructive, convertToStream)
             {
-                Hotkey = new Hotkey(new KeyCombination(InputKey.Control, InputKey.Shift, InputKey.Z))
+                Hotkey = new Hotkey(new KeyCombination(InputKey.Control, InputKey.Shift, InputKey.X))
             },
         };
 

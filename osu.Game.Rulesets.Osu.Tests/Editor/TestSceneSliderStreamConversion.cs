@@ -142,7 +142,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             {
                 InputManager.PressKey(Key.LControl);
                 InputManager.PressKey(Key.LShift);
-                InputManager.Key(Key.Z);
+                InputManager.Key(Key.X);
                 InputManager.ReleaseKey(Key.LShift);
                 InputManager.ReleaseKey(Key.LControl);
             });
