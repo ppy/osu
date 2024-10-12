@@ -313,6 +313,22 @@ namespace osu.Game.Beatmaps
             });
         }
 
+        public void ResetAllOffsets()
+        {
+            const string reset_complete_message = "All offsets have been reset!";
+            Realm.Write(r =>
+            {
+                var items = r.All<BeatmapInfo>();
+
+                foreach (var beatmap in items)
+                {
+                    beatmap.UserSettings.Offset = 0.0;
+                }
+
+                PostNotification?.Invoke(new ProgressCompletionNotification { Text = reset_complete_message });
+            });
+        }
+
         public void Delete(Expression<Func<BeatmapSetInfo, bool>>? filter = null, bool silent = false)
         {
             Realm.Run(r =>
