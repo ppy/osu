@@ -67,8 +67,6 @@ namespace osu.Game.Skinning
                 {
                     using var stream = File.OpenRead(Path.Combine(task.Path, file));
 
-                    // The GetFile call in this method is *really* expensive, and we are certain that the file does not exist in the skin yet.
-                    // Consider adding a method to add a file without checking if it already exists. Or add the file directly to the skin.
                     modelManager.AddFile(original, stream, file);
                 }
             });
