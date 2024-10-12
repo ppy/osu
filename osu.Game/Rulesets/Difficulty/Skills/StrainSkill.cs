@@ -58,10 +58,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
                 currentSectionEnd += SectionLength;
             }
 
-            double currentStrain = StrainValueAt(current);
-
-            if (currentSectionPeak < currentStrain)
-                currentSectionPeak = currentStrain;
+            currentSectionPeak = Math.Max(StrainValueAt(current), currentSectionPeak);
         }
 
         /// <summary>
