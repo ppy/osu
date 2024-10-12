@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osuTK;
@@ -11,6 +12,18 @@ namespace osu.Game.Screens.Edit.Commands.Proxies
 {
     public static class SliderPathCommandProxyExtensions
     {
+        /// <summary>
+        /// Snaps the provided <paramref name="proxy"/>'s duration using the <paramref name="snapProvider"/>.
+        /// </summary>
+        public static void SnapTo<THitObject>(this CommandProxy<THitObject> proxy, IDistanceSnapProvider? snapProvider)
+            where THitObject : HitObject, IHasPath
+        {
+            var hitObject = proxy.Target;
+            double distance = snapProvider?.FindSnappedDistance(hitObject, (float)hitObject.Path.CalculatedDistance, DistanceSnapTarget.Start) ?? hitObject.Path.CalculatedDistance;
+
+            proxy.Path().SetExpectedDistance(distance);
+        }
+
         public static void Reverse(this CommandProxy<SliderPath> pathProxy, out Vector2 positionalOffset)
         {
             var sliderPath = pathProxy.Target;

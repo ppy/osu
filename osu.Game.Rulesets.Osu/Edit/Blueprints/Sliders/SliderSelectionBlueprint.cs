@@ -466,7 +466,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             ControlPointVisualiser?.EnsureValidPathTypes();
 
             // Snap the slider to the current beat divisor before checking length validity.
-            HitObject.SnapTo(distanceSnapProvider, commandHandler);
+            Proxy.SnapTo(distanceSnapProvider);
 
             // If there are 0 or 1 remaining control points, or the slider has an invalid length, it is in a degenerate form and should be deleted
             if (controlPoints.Count <= 1 || !HitObject.Path.HasValidLength)
