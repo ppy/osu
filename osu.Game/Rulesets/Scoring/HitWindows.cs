@@ -87,6 +87,7 @@ namespace osu.Game.Rulesets.Scoring
             foreach (var range in GetRanges())
             {
                 double value = IBeatmapDifficultyInfo.DifficultyRange(difficulty, (range.Min, range.Average, range.Max));
+                value = Math.Round(value) - 0.5;
 
                 switch (range.Result)
                 {
