@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -173,32 +174,28 @@ namespace osu.Game.Screens.Edit.GameplayTest
         {
         }
 
-        private double previousAutoTime = 0;
-
-        private void setupAutoplay()
-        {
-            var autoplay = Ruleset.Value.CreateInstance().GetAutoplayMod();
-            if (autoplay == null)
-                return;
-
-            // stores time when autoplay starts
-            previousAutoTime = GameplayClockContainer.CurrentTime;
-
-            var score = autoplay.CreateScoreFromReplayData(GameplayState.Beatmap, new[] { autoplay });
-
-            // remove past frames to prevent replay frame handler from seeking back to start in an attempt to play back the entirety of the replay.
-            score.Replay.Frames.RemoveAll(f => f.Time <= GameplayClockContainer.CurrentTime);
-
-            DrawableRuleset.SetReplayScore(score);
-            // Without this schedule, the `GlobalCursorDisplay.Update()` machinery will fade the gameplay cursor out, but we still want it to show.
-            Schedule(() => DrawableRuleset.Cursor?.Show());
-        }
+        private double previousAutoTime;
 
         private void toggleAutoplay()
         {
             if (DrawableRuleset.ReplayScore == null)
             {
-                setupAutoplay();
+                var autoplay = Ruleset.Value.CreateInstance().GetAutoplayMod();
+                if (autoplay == null)
+                    return;
+
+                // stores time when autoplay starts
+                previousAutoTime = GameplayClockContainer.CurrentTime;
+
+                var score = autoplay.CreateScoreFromReplayData(GameplayState.Beatmap, new[] { autoplay });
+
+                DrawableRuleset.SetReplayScore(score);
+
+                // sanity check
+                if (DrawableRuleset.ReplayScore != null)
+                    DrawableRuleset.ReplayScore.Replay.Frames.RemoveAll(f => f.Time < GameplayClockContainer.CurrentTime);
+                // Without this schedule, the `GlobalCursorDisplay.Update()` machinery will fade the gameplay cursor out, but we still want it to show.
+                Schedule(() => DrawableRuleset.Cursor?.Show());
             }
             else
                 DrawableRuleset.SetReplayScore(null);
@@ -210,12 +207,25 @@ namespace osu.Game.Screens.Edit.GameplayTest
             if (DrawableRuleset.ReplayScore != null)
             {
                 // compare currentTime with previousTime
-                if (GameplayClockContainer.CurrentTime != previousAutoTime)
+                if (GameplayClockContainer.CurrentTime < previousAutoTime)
                 {
-                    if (GameplayClockContainer.CurrentTime < previousAutoTime)
-                    {
-                        setupAutoplay();
-                    }
+                    // here i am stuck on where to retrieve score, so i am just going to create it to see if it works and change it later when i figure it out
+                    var autoplay = Ruleset.Value.CreateInstance().GetAutoplayMod();
+                    if (autoplay == null)
+                        return;
+
+                    // retrieves frame (currently creating as i dont know how to retrieve)
+                    var allFrames = autoplay.CreateScoreFromReplayData(GameplayState.Beatmap, new[] { autoplay }).Replay.Frames;
+                    var drawnFrames = DrawableRuleset.ReplayScore;
+
+                    // find the frames from the original replay data that should be present based on the current time
+                    var missingFrames = allFrames.Where(f => f.Time >= GameplayClockContainer.CurrentTime && f.Time <= previousAutoTime).ToList();
+                    previousAutoTime = GameplayClockContainer.CurrentTime;
+
+                    // add the missing frames back
+                    drawnFrames.Replay.Frames.AddRange(missingFrames);
+
+                    DrawableRuleset.SetReplayScore(drawnFrames);
                 }
             }
         }
