@@ -125,6 +125,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             pathVersion.BindValueChanged(_ => editorBeatmap?.Update(HitObject));
 
             BodyPiece.UpdateFrom(HitObject);
+            HitObject.DefaultsApplied += _ => BodyPiece.UpdateFrom(HitObject);
 
             if (editorBeatmap != null)
                 selectedObjects.BindTo(editorBeatmap.SelectedHitObjects);
