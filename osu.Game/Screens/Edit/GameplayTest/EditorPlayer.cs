@@ -164,6 +164,7 @@ namespace osu.Game.Screens.Edit.GameplayTest
                 case GlobalAction.EditorTestPlayQuickExitToCurrentTime:
                     quickExit(true);
                     return true;
+                    
                 default:
                     return false;
             }
