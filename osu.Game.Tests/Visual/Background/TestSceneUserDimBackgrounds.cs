@@ -339,17 +339,29 @@ namespace osu.Game.Tests.Visual.Background
 
             public bool IsBackgroundBlack() => background.CurrentColour == OsuColour.Gray(0) && background.CurrentColourOffset == OsuColour.Gray(0);
 
-            public bool IsBackgroundDimmed() => background.CurrentColour == OsuColour.Gray(1f - background.CurrentDim);
+            public bool IsBackgroundDimmed()
+            {
+                Color4 ContentDrawColour = background.ContentDrawColour;
+                Color4 TargetColour = new Color4(
+                    ContentDrawColour.R * (1f - background.CurrentDim),
+                    ContentDrawColour.G * (1f - background.CurrentDim),
+                    ContentDrawColour.B * (1f - background.CurrentDim),
+                    ContentDrawColour.A
+                );
 
-            public bool IsBackgroundUndimmed() => background.CurrentColour == Color4.White;
+                return background.CurrentColour == TargetColour;
+            }
+
+            public bool IsBackgroundUndimmed() => background.CurrentColour == background.ParentDrawColour && background.CurrentColourOffset == Color4.Black;
 
             public bool IsBackgroundColourOffset()
             {
                 Color4 CurrentDimColour = background.CurrentDimColour;
+                Color4 ContentDrawColour = background.ContentDrawColour;
                 Color4 TargetColourOffset = new Color4(
-                    CurrentDimColour.R * background.CurrentDim,
-                    CurrentDimColour.G * background.CurrentDim,
-                    CurrentDimColour.B * background.CurrentDim,
+                    ContentDrawColour.R * CurrentDimColour.R * background.CurrentDim,
+                    ContentDrawColour.G * CurrentDimColour.G * background.CurrentDim,
+                    ContentDrawColour.B * CurrentDimColour.B * background.CurrentDim,
                     1
                 );
 
@@ -455,6 +467,10 @@ namespace osu.Game.Tests.Visual.Background
 
             public Color4 CurrentColourOffset => dimmable.CurrentColourOffset;
 
+            public Color4 ContentDrawColour => dimmable.ContentDrawColour;
+
+            public Color4 ParentDrawColour => dimmable.ParentDrawColour;
+
             public float CurrentAlpha => dimmable.CurrentAlpha;
 
             public float CurrentDim => dimmable.DimLevel;
@@ -491,32 +507,39 @@ namespace osu.Game.Tests.Visual.Background
             {
                 get
                 {
-                    Color4 ContentColour = Content.Colour;
                     float DimLevel = BeatmapBackground.DimLevel;
+                    Color4 BeatmapBackgroundDrawColour = BeatmapBackground.DrawColourInfo.Colour;
 
                     return new Color4(
-                        ContentColour.R * (1 - DimLevel),
-                        ContentColour.G * (1 - DimLevel),
-                        ContentColour.B * (1 - DimLevel),
-                        ContentColour.A
+                        BeatmapBackgroundDrawColour.R * (1 - DimLevel),
+                        BeatmapBackgroundDrawColour.G * (1 - DimLevel),
+                        BeatmapBackgroundDrawColour.B * (1 - DimLevel),
+                        BeatmapBackgroundDrawColour.A
                     );
                 }
             }
+
             public Color4 CurrentColourOffset
             {
                 get
                 {
                     float DimLevel = BeatmapBackground.DimLevel;
                     Color4 DimColour = BeatmapBackground.DimColour;
+                    Color4 BeatmapBackgroundDrawColour = BeatmapBackground.DrawColourInfo.Colour;
 
                     return new Color4(
-                        DimColour.R * DimLevel,
-                        DimColour.G * DimLevel,
-                        DimColour.B * DimLevel,
-                        1
+                        BeatmapBackgroundDrawColour.R * DimColour.R * DimLevel,
+                        BeatmapBackgroundDrawColour.G * DimColour.G * DimLevel,
+                        BeatmapBackgroundDrawColour.B * DimColour.B * DimLevel,
+                        BeatmapBackgroundDrawColour.A
                     );
                 }
             }
+
+            public Color4 ContentDrawColour => Content.DrawColourInfo.Colour;
+
+            public Color4 ParentDrawColour => Content.Parent.DrawColourInfo.Colour;
+
             public float CurrentAlpha => Content.Alpha;
 
             public new float DimLevel => base.DimLevel;
