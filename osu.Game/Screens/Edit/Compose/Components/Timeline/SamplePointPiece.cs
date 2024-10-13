@@ -405,7 +405,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 if (string.IsNullOrEmpty(sampleName))
                     return;
 
-                if (GetRelevantSamples(relevantObjects).All(s => s.samples.Any(s => s.Name == sampleName)))
+                if (GetRelevantSamples(relevantObjects).All(o => o.samples.Any(s => s.Name == sampleName)))
                     return;
 
                 updateAllRelevantSamples((h, relevantSamples) =>
