@@ -72,10 +72,12 @@ namespace osu.Game.Screens.Backgrounds
             dimmable.DimWhenUserSettingsIgnored.BindTo(DimWhenUserSettingsIgnored);
         }
 
+        protected virtual BeatmapBackground CreateBeatmapBackground(WorkingBeatmap beatmap) => new BeatmapBackground(beatmap);
+
         [BackgroundDependencyLoader]
         private void load()
         {
-            var background = new BeatmapBackground(beatmap);
+            var background = CreateBeatmapBackground(beatmap);
             LoadComponent(background);
             switchBackground(background);
         }
@@ -98,7 +100,7 @@ namespace osu.Game.Screens.Backgrounds
                         return;
 
                     cancellationSource?.Cancel();
-                    LoadComponentAsync(new BeatmapBackground(beatmap), switchBackground, (cancellationSource = new CancellationTokenSource()).Token);
+                    LoadComponentAsync(CreateBeatmapBackground(beatmap), switchBackground, (cancellationSource = new CancellationTokenSource()).Token);
                 });
             }
         }
@@ -111,7 +113,7 @@ namespace osu.Game.Screens.Backgrounds
             Schedule(() =>
             {
                 cancellationSource?.Cancel();
-                LoadComponentAsync(new BeatmapBackground(beatmap), switchBackground, (cancellationSource = new CancellationTokenSource()).Token);
+                LoadComponentAsync(CreateBeatmapBackground(beatmap), switchBackground, (cancellationSource = new CancellationTokenSource()).Token);
             });
         }
 
