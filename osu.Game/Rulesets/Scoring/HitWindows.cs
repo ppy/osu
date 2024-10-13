@@ -79,11 +79,11 @@ namespace osu.Game.Rulesets.Scoring
         public virtual bool IsHitResultAllowed(HitResult result) => true;
 
         /// <summary>
-        /// Calculates ruleset-specific HitWindow timing value for given result, using difficulty and rage.
+        /// Calculates ruleset-specific Hit Window timing value for given result, using difficulty and range.
         /// </summary>
         /// <param name="difficulty">Accuracy difficulty parameter.</param>
-        /// <param name="range">Difficulty Range for HitWindow.</param>
-        /// <returns>HitWindow timing value.</returns>
+        /// <param name="range">Difficulty Range for Hit Window.</param>
+        /// <returns>Hit Window timing value.</returns>
         public virtual double GetHitWindowForResult(double difficulty, DifficultyRange range)
         {
             double value = IBeatmapDifficultyInfo.DifficultyRange(difficulty, (range.Min, range.Average, range.Max));
