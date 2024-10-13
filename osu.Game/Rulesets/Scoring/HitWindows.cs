@@ -79,6 +79,19 @@ namespace osu.Game.Rulesets.Scoring
         public virtual bool IsHitResultAllowed(HitResult result) => true;
 
         /// <summary>
+        /// Calculates ruleset-specific HitWindow timing value for given result, using difficulty and rage.
+        /// </summary>
+        /// <param name="difficulty">Accuracy difficulty parameter<./param>
+        /// <param name="range">Difficulty Range for HitWindow.</param>
+        /// <returns>HitWindow timing value.</returns>
+        public virtual double GetHitWindowForResult(double difficulty, DifficultyRange range)
+        {
+            double value = IBeatmapDifficultyInfo.DifficultyRange(difficulty, (range.Min, range.Average, range.Max));
+            value = Math.Floor(value) - 0.5;
+            return value;
+        }
+
+        /// <summary>
         /// Sets hit windows with values that correspond to a difficulty parameter.
         /// </summary>
         /// <param name="difficulty">The parameter.</param>
@@ -86,8 +99,7 @@ namespace osu.Game.Rulesets.Scoring
         {
             foreach (var range in GetRanges())
             {
-                double value = IBeatmapDifficultyInfo.DifficultyRange(difficulty, (range.Min, range.Average, range.Max));
-                value = Math.Floor(value) - 0.5;
+                double value = GetHitWindowForResult(difficulty, range);
 
                 switch (range.Result)
                 {
@@ -129,7 +141,7 @@ namespace osu.Game.Rulesets.Scoring
 
             for (var result = HitResult.Perfect; result >= HitResult.Miss; --result)
             {
-                if (IsHitResultAllowed(result) && timeOffset < WindowFor(result))
+                if (IsHitResultAllowed(result) && timeOffset <= WindowFor(result))
                     return result;
             }
 

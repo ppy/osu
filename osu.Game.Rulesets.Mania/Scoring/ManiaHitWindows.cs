@@ -42,5 +42,7 @@ namespace osu.Game.Rulesets.Mania.Scoring
                 r.Min * multiplier,
                 r.Average * multiplier,
                 r.Max * multiplier)).ToArray();
+
+        public override double GetHitWindowForResult(double difficulty, DifficultyRange range) => base.GetHitWindowForResult(difficulty, range) + 1;
     }
 }

@@ -28,5 +28,11 @@ namespace osu.Game.Rulesets.Taiko.Scoring
         }
 
         protected override DifficultyRange[] GetRanges() => TAIKO_RANGES;
+
+        public override double GetHitWindowForResult(double difficulty, DifficultyRange range)
+        {
+            double value = base.GetHitWindowForResult(difficulty, range);
+            return range.Result == HitResult.Miss ? value + 1 : value;
+        }
     }
 }
