@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -11,6 +10,7 @@ using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Input.Bindings;
 using osu.Game.Overlays;
+using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
@@ -175,6 +175,7 @@ namespace osu.Game.Screens.Edit.GameplayTest
         }
 
         private double previousAutoTime;
+        private List<ReplayFrame> allAutoFrames = new List<ReplayFrame>();
 
         private void toggleAutoplay()
         {
@@ -188,6 +189,7 @@ namespace osu.Game.Screens.Edit.GameplayTest
                 previousAutoTime = GameplayClockContainer.CurrentTime;
 
                 var score = autoplay.CreateScoreFromReplayData(GameplayState.Beatmap, new[] { autoplay });
+                allAutoFrames = score.Replay.Frames;
 
                 DrawableRuleset.SetReplayScore(score);
 
@@ -209,17 +211,10 @@ namespace osu.Game.Screens.Edit.GameplayTest
                 // compare currentTime with previousTime
                 if (GameplayClockContainer.CurrentTime < previousAutoTime)
                 {
-                    // here i am stuck on where to retrieve score, so i am just going to create it to see if it works and change it later when i figure it out
-                    var autoplay = Ruleset.Value.CreateInstance().GetAutoplayMod();
-                    if (autoplay == null)
-                        return;
-
-                    // retrieves frame (currently creating as i dont know how to retrieve)
-                    var allFrames = autoplay.CreateScoreFromReplayData(GameplayState.Beatmap, new[] { autoplay }).Replay.Frames;
                     var drawnFrames = DrawableRuleset.ReplayScore;
 
                     // find the frames from the original replay data that should be present based on the current time
-                    var missingFrames = allFrames.Where(f => f.Time >= GameplayClockContainer.CurrentTime && f.Time <= previousAutoTime).ToList();
+                    var missingFrames = allAutoFrames.Where(f => f.Time >= GameplayClockContainer.CurrentTime && f.Time <= previousAutoTime).ToList();
                     previousAutoTime = GameplayClockContainer.CurrentTime;
 
                     // add the missing frames back
