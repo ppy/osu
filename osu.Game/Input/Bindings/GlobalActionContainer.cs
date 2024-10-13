@@ -101,7 +101,7 @@ namespace osu.Game.Input.Bindings
 
             new KeyBinding(new[] { InputKey.Alt, InputKey.Home }, GlobalAction.Home),
 
-            new KeyBinding(new[] { InputKey.Control, InputKey.Alt, InputKey.C }, GlobalAction.ToggleFPSDisplay),
+            new KeyBinding(new[] { InputKey.None }, GlobalAction.ToggleFPSDisplay),
             new KeyBinding(new[] { InputKey.Control, InputKey.T }, GlobalAction.ToggleToolbar),
             new KeyBinding(new[] { InputKey.Control, InputKey.Shift, InputKey.S }, GlobalAction.ToggleSkinEditor),
 
