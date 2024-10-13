@@ -11,7 +11,6 @@ using Newtonsoft.Json;
 using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
@@ -19,8 +18,6 @@ using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
-using osu.Framework.Logging;
-using osu.Framework.Platform;
 using Web = osu.Game.Resources.Localisation.Web;
 using osu.Framework.Testing;
 using osu.Game.Database;
@@ -62,9 +59,6 @@ namespace osu.Game.Overlays.SkinEditor
         private OsuGame? game { get; set; }
 
         [Resolved]
-        private GameHost host { get; set; } = null!;
-
-        [Resolved]
         private SkinManager skins { get; set; } = null!;
 
         [Resolved]
@@ -90,7 +84,6 @@ namespace osu.Game.Overlays.SkinEditor
 
         private SkinEditorChangeHandler? changeHandler;
 
-        private EditorMenuItem mountMenuItem = null!;
         private EditorMenuItem undoMenuItem = null!;
         private EditorMenuItem redoMenuItem = null!;
 
@@ -108,6 +101,9 @@ namespace osu.Game.Overlays.SkinEditor
 
         [Resolved]
         private IDialogOverlay? dialogOverlay { get; set; }
+
+        [Resolved]
+        private ExternalEditOverlay? externalEditOverlay { get; set; }
 
         public SkinEditor()
         {
@@ -164,7 +160,7 @@ namespace osu.Game.Overlays.SkinEditor
                                                     {
                                                         new EditorMenuItem(Web.CommonStrings.ButtonsSave, MenuItemType.Standard, () => Save()),
                                                         new EditorMenuItem(CommonStrings.Export, MenuItemType.Standard, () => skins.ExportCurrentSkin()) { Action = { Disabled = !RuntimeInfo.IsDesktop } },
-                                                        mountMenuItem = new EditorMenuItem(EditorStrings.EditExternally, MenuItemType.Standard, () => _ = editExternally()) { Action = { Disabled = !RuntimeInfo.IsDesktop } },
+                                                        new EditorMenuItem(EditorStrings.EditExternally, MenuItemType.Standard, () => _ = editExternally()) { Action = { Disabled = !RuntimeInfo.IsDesktop } },
                                                         new OsuMenuItemSpacer(),
                                                         new EditorMenuItem(CommonStrings.RevertToDefault, MenuItemType.Destructive, () => dialogOverlay?.Push(new RevertConfirmDialog(revert))),
                                                         new OsuMenuItemSpacer(),
@@ -282,59 +278,11 @@ namespace osu.Game.Overlays.SkinEditor
             selectedTarget.BindValueChanged(targetChanged, true);
         }
 
-        private ExternalEditOperation<SkinInfo>? externalEditOperation;
-
         private async Task editExternally()
         {
-            mountMenuItem.Action.Disabled = true;
             var skin = currentSkin.Value.SkinInfo.PerformRead(s => s.Detach());
 
-            try
-            {
-                externalEditOperation = await skins.BeginExternalEditing(skin).ConfigureAwait(false);
-            }
-            catch (Exception ex)
-            {
-                Logger.Log($"Failed to initialize external edit operation: {ex}", LoggingTarget.Database, LogLevel.Error);
-            }
-
-            if (externalEditOperation == null)
-                return;
-
-            host.OpenFileExternally(externalEditOperation.MountedPath.TrimDirectorySeparator() + Path.DirectorySeparatorChar);
-
-            Schedule(() =>
-            {
-                mountMenuItem.Action.Disabled = false;
-                mountMenuItem.Text.Value = EditorStrings.FinishEditingExternally;
-                mountMenuItem.Action.Value = () => _ = finishExternalEdit();
-            });
-        }
-
-        private async Task finishExternalEdit()
-        {
-            if (externalEditOperation == null || !externalEditOperation.IsMounted)
-                return;
-
-            mountMenuItem.Action.Disabled = true;
-
-            await externalEditOperation.Finish().ConfigureAwait(false);
-
-            Schedule(() =>
-            {
-                var oldSkin = currentSkin.Value;
-                var newSkinInfo = oldSkin.SkinInfo.PerformRead(s => s);
-
-                // Create a new skin instance to ensure the skin is reloaded
-                // If there's a better way to reload the skin, this should be replaced with it.
-                currentSkin.Value = newSkinInfo.CreateInstance(skins);
-
-                oldSkin.Dispose();
-
-                mountMenuItem.Action.Disabled = false;
-                mountMenuItem.Text.Value = EditorStrings.EditExternally;
-                mountMenuItem.Action.Value = () => _ = editExternally();
-            });
+            await externalEditOverlay!.Begin(skin, currentSkin, skins).ConfigureAwait(false);
         }
 
         public bool OnPressed(KeyBindingPressEvent<PlatformAction> e)
