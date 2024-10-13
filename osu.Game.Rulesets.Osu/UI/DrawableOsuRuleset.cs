@@ -1,11 +1,12 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Allocation;
+using osu.Framework.Bindables;
+using osu.Framework.Graphics;
 using osu.Framework.Input;
 using osu.Game.Beatmaps;
 using osu.Game.Input.Handlers;
@@ -25,18 +26,38 @@ namespace osu.Game.Rulesets.Osu.UI
 {
     public partial class DrawableOsuRuleset : DrawableRuleset<OsuHitObject>
     {
-        protected new OsuRulesetConfigManager Config => (OsuRulesetConfigManager)base.Config;
+        private Bindable<bool>? cursorHideEnabled;
 
         public new OsuInputManager KeyBindingInputManager => (OsuInputManager)base.KeyBindingInputManager;
 
         public new OsuPlayfield Playfield => (OsuPlayfield)base.Playfield;
 
-        public DrawableOsuRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod> mods = null)
+        protected new OsuRulesetConfigManager Config => (OsuRulesetConfigManager)base.Config;
+
+        public DrawableOsuRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod>? mods = null)
             : base(ruleset, beatmap, mods)
         {
         }
 
-        public override DrawableHitObject<OsuHitObject> CreateDrawableRepresentation(OsuHitObject h) => null;
+        [BackgroundDependencyLoader]
+        private void load(ReplayPlayer? replayPlayer)
+        {
+            if (replayPlayer != null)
+            {
+                ReplayAnalysisOverlay analysisOverlay;
+                PlayfieldAdjustmentContainer.Add(analysisOverlay = new ReplayAnalysisOverlay(replayPlayer.Score.Replay));
+                Overlays.Add(analysisOverlay.CreateProxy().With(p => p.Depth = float.NegativeInfinity));
+                replayPlayer.AddSettings(new ReplayAnalysisSettings(Config));
+
+                cursorHideEnabled = Config.GetBindable<bool>(OsuRulesetSetting.ReplayCursorHideEnabled);
+
+                // I have little faith in this working (other things touch cursor visibility) but haven't broken it yet.
+                // Let's wait for someone to report an issue before spending too much time on it.
+                cursorHideEnabled.BindValueChanged(enabled => Playfield.Cursor.FadeTo(enabled.NewValue ? 0 : 1), true);
+            }
+        }
+
+        public override DrawableHitObject<OsuHitObject>? CreateDrawableRepresentation(OsuHitObject h) => null;
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true; // always show the gameplay cursor
 

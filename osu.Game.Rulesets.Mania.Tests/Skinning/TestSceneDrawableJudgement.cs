@@ -28,14 +28,20 @@ namespace osu.Game.Rulesets.Mania.Tests.Skinning
                     AddStep("Show " + result.GetDescription(), () =>
                     {
                         SetContents(_ =>
-                            new DrawableManiaJudgement(new JudgementResult(new HitObject { StartTime = Time.Current }, new Judgement())
-                            {
-                                Type = result
-                            }, null)
+                        {
+                            var drawableManiaJudgement = new DrawableManiaJudgement
                             {
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
-                            });
+                            };
+
+                            drawableManiaJudgement.Apply(new JudgementResult(new HitObject { StartTime = Time.Current }, new Judgement())
+                            {
+                                Type = result
+                            }, null);
+
+                            return drawableManiaJudgement;
+                        });
 
                         // for test purposes, undo the Y adjustment related to the `ScorePosition` legacy positioning config value
                         // (see `LegacyManiaJudgementPiece.load()`).
