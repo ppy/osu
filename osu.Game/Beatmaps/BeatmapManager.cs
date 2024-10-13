@@ -285,7 +285,8 @@ namespace osu.Game.Beatmaps
         /// </summary>
         /// <param name="query">The query.</param>
         /// <returns>The first result for the provided query, or null if no results were found.</returns>
-        public BeatmapInfo? QueryBeatmap(Expression<Func<BeatmapInfo, bool>> query) => Realm.Run(r => r.All<BeatmapInfo>().Filter($"{nameof(BeatmapInfo.BeatmapSet)}.{nameof(BeatmapSetInfo.DeletePending)} == false").FirstOrDefault(query)?.Detach());
+        public BeatmapInfo? QueryBeatmap(Expression<Func<BeatmapInfo, bool>> query) => Realm.Run(r =>
+            r.All<BeatmapInfo>().Filter($"{nameof(BeatmapInfo.BeatmapSet)}.{nameof(BeatmapSetInfo.DeletePending)} == false").FirstOrDefault(query)?.Detach());
 
         /// <summary>
         /// A default representation of a WorkingBeatmap to use when no beatmap is available.
@@ -322,7 +323,8 @@ namespace osu.Game.Beatmaps
 
                 foreach (var beatmap in items)
                 {
-                    beatmap.UserSettings.Offset = 0.0;
+                    if (beatmap.UserSettings.Offset != 0)
+                        beatmap.UserSettings.Offset = 0;
                 }
 
                 PostNotification?.Invoke(new ProgressCompletionNotification { Text = reset_complete_message });
