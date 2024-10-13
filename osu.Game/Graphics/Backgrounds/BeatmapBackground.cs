@@ -196,6 +196,12 @@ namespace osu.Game.Graphics.Backgrounds
                     shader.BindUniformBlock("m_BeatmapBackgroundParameters", beatmapBackgroundParametersBuffer);
                 }
 
+                protected override void Dispose(bool isDisposing)
+                {
+                    base.Dispose(isDisposing);
+                    beatmapBackgroundParametersBuffer?.Dispose();
+                }
+
                 [StructLayout(LayoutKind.Sequential, Pack = 1)]
                 private record struct BeatmapBackgroundParameters
                 {
@@ -279,6 +285,12 @@ namespace osu.Game.Graphics.Backgrounds
                     };
 
                     shader.BindUniformBlock("m_BeatmapBackgroundParameters", beatmapBackgroundParametersBuffer);
+                }
+
+                protected override void Dispose(bool isDisposing)
+                {
+                    base.Dispose(isDisposing);
+                    beatmapBackgroundParametersBuffer?.Dispose();
                 }
 
                 [StructLayout(LayoutKind.Sequential, Pack = 1)]

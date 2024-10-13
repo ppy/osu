@@ -35,6 +35,7 @@ namespace osu.Game.Graphics.Backgrounds
                 }
                 else
                 {
+                    sprite?.Dispose();
                     BufferedContainer.Child = sprite = value;
                 }
             }
