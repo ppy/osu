@@ -10,10 +10,10 @@ using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Input.Bindings;
 using osu.Game.Overlays;
-using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Replays;
 using osu.Game.Screens.Play;
 using osu.Game.Users;
 
