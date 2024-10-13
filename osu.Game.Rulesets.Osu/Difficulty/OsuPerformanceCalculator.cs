@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Rulesets.Difficulty;
+using osu.Game.Rulesets.Osu.Difficulty.Aggregation;
 using osu.Game.Rulesets.Osu.Difficulty.Skills;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Scoring;
@@ -247,7 +248,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         private double calculateAimMissPenalty(double missCount, OsuDifficultyAttributes attributes)
         {
-            double penalty = attributes.AimMissCountPolynomial.SolveBetweenZeroAndOne(missCount) ?? 1;
+            double penalty = attributes.AimMissPenaltyCurve.GetPenaltyAt(missCount);
 
             double multiplier = Math.Pow(1 - penalty, 1.5);
 

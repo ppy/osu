@@ -11,80 +11,67 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Utils
     {
         private double[]? coefficients;
 
-        // The product of this matrix with 21 computed points at X values [0.0, 0.05, ..., 0.95, 1.0] returns the least squares fit polynomial coefficients.
-        private static readonly double[][] quartic_matrix =
+        private static readonly double[][] matrix =
         {
-            new[] { 0.0, -6.99428, -9.87548, -9.76922, -7.66867, -4.43461, -0.795376, 2.65313, 5.4474, 7.2564, 7.88146, 7.2564, 5.4474, 2.65313, -0.795376, -4.43461, -7.66867, -9.76922, -9.87548, -6.99428, 0.0 },
-            new[] { 0.0, 13.0907, 18.2388, 17.6639, 13.3211, 6.90022, -0.173479, -6.73969, -11.9029, -15.0326, -15.7629, -13.993, -9.88668, -3.87281, 3.35498, 10.8382, 17.3536, 21.4129, 21.2632, 14.8864, 0.0 },
-            new[] { 0.0, -7.21754, -9.85841, -9.24217, -6.5276, -2.71265, 1.36553, 5.03057, 7.76692, 9.21984, 9.19538, 7.66039, 4.74253, 0.730255, -3.92717, -8.61967, -12.5764, -14.8657, -14.395, -9.91114, 0.0 }
-        };
-
-        private static readonly double[][] cubic_matrix =
-        {
-            new[] { 0.0, -0.897868, -1.5122, -1.8745, -2.01626, -1.96901, -1.76423, -1.43344, -1.00813, -0.519818, 3.55271e-15, 0.519818, 1.00813, 1.43344, 1.76423, 1.96901, 2.01626, 1.8745, 1.5122, 0.897868, 0.0 },
-            new[] { 0.0, 1.27555, 2.1333, 2.62049, 2.78439, 2.67226, 2.33134, 1.8089, 1.1522, 0.408475, -0.375002, -1.15098, -1.8722, -2.49141, -2.96135, -3.23476, -3.2644, -3.00299, -2.4033, -1.41805, 0.0 },
+            new[] { 0.0, 3.14395, 5.18439, 6.46975, 1.4638, -9.53526, 0.0 },
+            new[] { 0.0, -4.85829, -8.09612, -10.4498, -3.84479, 12.1626, 0.0 }
         };
 
         /// <summary>
         /// Computes a quartic or cubic function that starts at 0 and ends at the highest judgement count in the array.
         /// </summary>
         /// <param name="judgementCounts">A list of judgements, with X values [0.0, 0.05, ..., 0.95, 1.0].</param>
-        /// <param name="degree">The degree of the polynomial. Only supports cubic and quintic functions.</param>
-        public void Compute(double[] judgementCounts, int degree)
+        public void Fit(double[] judgementCounts)
         {
-            if (degree != 3 && degree != 4)
-                return;
-
-            List<double> logJudgementCounts = judgementCounts.Select(x => Math.Log(x + 1)).ToList();
+            List<double> logMissCounts = judgementCounts.Select(x => Math.Log(x + 1)).ToList();
 
             // The polynomial will pass through the point (1, endPoint).
-            double endPoint = logJudgementCounts.Max();
+            double endPoint = logMissCounts.Max();
 
-            for (int i = 0; i <= 20; i++)
+            double[] penalties = { 1, 0.95, 0.9, 0.8, 0.6, 0.3, 0 };
+
+            for (int i = 0; i < logMissCounts.Count; i++)
             {
-                logJudgementCounts[i] -= endPoint * i / 20;
+                logMissCounts[i] -= endPoint * (1 - penalties[i]);
             }
 
             // The precomputed matrix assumes the misscounts go in order of greatest to least.
-            // Temporary fix.
-            logJudgementCounts.Reverse();
+            logMissCounts.Reverse();
 
-            double[][] matrix = degree == 4 ? quartic_matrix : cubic_matrix;
-            coefficients = new double[degree];
+            coefficients = new double[3];
 
-            coefficients[degree - 1] = endPoint;
+            coefficients[2] = endPoint;
 
             // Now we dot product the adjusted misscounts with the precomputed matrix.
             for (int row = 0; row < matrix.Length; row++)
             {
                 for (int column = 0; column < matrix[row].Length; column++)
                 {
-                    coefficients[row] += matrix[row][column] * logJudgementCounts[column];
+                    coefficients[row] += matrix[row][column] * logMissCounts[column];
                 }
 
-                coefficients[degree - 1] -= coefficients[row];
+                coefficients[2] -= coefficients[row];
             }
         }
 
         /// <summary>
-        /// Solve for the largest corresponding x value of a polynomial within x = 0 and x = 1 at a specified y value.
+        /// Solve for the miss penalty at a specified miss count.
         /// </summary>
-        /// <param name="y">A value between 0 and 1, inclusive, to solve the polynomial at.</param>
-        /// <returns>The x value at the specified y value, and null if no value exists.</returns>
-        public double? SolveBetweenZeroAndOne(double y)
+        /// <returns>The penalty value at the specified miss count.</returns>
+        public double GetPenaltyAt(double missCount)
         {
             if (coefficients is null)
-                return null;
+                return 1;
 
             List<double> listCoefficients = coefficients.ToList();
-            listCoefficients.Add(-Math.Log(y + 1));
+            listCoefficients.Add(-Math.Log(missCount + 1));
 
             List<double?> xVals = SpecialFunctions.SolvePolynomialRoots(listCoefficients);
 
             const double max_error = 1e-7;
             double? largestValue = xVals.Where(x => x >= 0 - max_error && x <= 1 + max_error).OrderDescending().FirstOrDefault();
 
-            return largestValue != null ? Math.Clamp(largestValue.Value, 0, 1) : null;
+            return largestValue != null ? Math.Clamp(largestValue.Value, 0, 1) : 1;
         }
     }
 }

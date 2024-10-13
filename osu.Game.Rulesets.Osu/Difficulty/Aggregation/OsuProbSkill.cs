@@ -9,7 +9,7 @@ using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Difficulty.Utils;
 
-namespace osu.Game.Rulesets.Osu.Difficulty.Skills
+namespace osu.Game.Rulesets.Osu.Difficulty.Aggregation
 {
     public abstract class OsuProbSkill : Skill
     {
@@ -95,9 +95,46 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         }
 
         /// <summary>
+        /// The coefficients of a quartic fitted to the miss counts at each skill level.
+        /// </summary>
+        /// <returns>The coefficients for ax^4+bx^3+cx^2. The 4th coefficient for dx^1 can be deduced from the first 3 in the performance calculator.</returns>
+        public ExpPolynomial GetMissPenaltyCurve()
+        {
+            double[] missCounts = new double[7];
+            double[] penalties = { 1, 0.95, 0.9, 0.8, 0.6, 0.3, 0 };
+
+            double fcSkill = DifficultyValue();
+
+            ExpPolynomial curve = new ExpPolynomial();
+
+            // If there are no notes, we just return the empty polynomial.
+            if (difficulties.Count == 0 || difficulties.Max() == 0)
+                return curve;
+
+            var bins = Bin.CreateBins(difficulties);
+
+            for (int i = 0; i < penalties.Length; i++)
+            {
+                if (i == 0)
+                {
+                    missCounts[i] = 0;
+                    continue;
+                }
+
+                double penalizedSkill = fcSkill * penalties[i];
+
+                missCounts[i] = getMissCountAtSkill(penalizedSkill, bins);
+            }
+
+            curve.Fit(missCounts);
+
+            return curve;
+        }
+
+        /// <summary>
         /// Find the lowest misscount that a player with the provided <paramref name="skill"/> would have a 2% chance of achieving.
         /// </summary>
-        public double GetMissCountAtSkill(double skill)
+        private double getMissCountAtSkill(double skill, Bin[] bins)
         {
             double maxDiff = difficulties.Max();
 
@@ -106,17 +143,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             if (skill <= 0)
                 return difficulties.Count;
 
-            PoissonBinomial poiBin;
-
-            if (difficulties.Count > 64)
-            {
-                var bins = Bin.CreateBins(difficulties);
-                poiBin = new PoissonBinomial(bins, skill, HitProbability);
-            }
-            else
-            {
-                poiBin = new PoissonBinomial(difficulties, skill, HitProbability);
-            }
+            var poiBin = difficulties.Count > 64 ? new PoissonBinomial(bins, skill, HitProbability) : new PoissonBinomial(difficulties, skill, HitProbability);
 
             return Math.Max(0, RootFinding.FindRootExpand(x => poiBin.CDF(x) - FcProbability, -50, 1000, accuracy: 1e-4));
         }

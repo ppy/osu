@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         /// The difficulty corresponding to the aim skill.
         /// </summary>
         [JsonProperty("aim_penalty_constants")]
-        public ExpPolynomial AimMissCountPolynomial { get; set; }
+        public ExpPolynomial AimMissPenaltyCurve { get; set; }
 
         /// <summary>
         /// The difficulty corresponding to the speed skill.
