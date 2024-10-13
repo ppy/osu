@@ -87,7 +87,7 @@ namespace osu.Game.Rulesets.Scoring
             foreach (var range in GetRanges())
             {
                 double value = IBeatmapDifficultyInfo.DifficultyRange(difficulty, (range.Min, range.Average, range.Max));
-                value = Math.Round(value) - 0.5;
+                value = Math.Floor(value) - 0.5;
 
                 switch (range.Result)
                 {
@@ -129,7 +129,7 @@ namespace osu.Game.Rulesets.Scoring
 
             for (var result = HitResult.Perfect; result >= HitResult.Miss; --result)
             {
-                if (IsHitResultAllowed(result) && timeOffset <= WindowFor(result))
+                if (IsHitResultAllowed(result) && timeOffset < WindowFor(result))
                     return result;
             }
 
