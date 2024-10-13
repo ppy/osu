@@ -81,7 +81,7 @@ namespace osu.Game.Rulesets.Scoring
         /// <summary>
         /// Calculates ruleset-specific HitWindow timing value for given result, using difficulty and rage.
         /// </summary>
-        /// <param name="difficulty">Accuracy difficulty parameter<./param>
+        /// <param name="difficulty">Accuracy difficulty parameter.</param>
         /// <param name="range">Difficulty Range for HitWindow.</param>
         /// <returns>HitWindow timing value.</returns>
         public virtual double GetHitWindowForResult(double difficulty, DifficultyRange range)
