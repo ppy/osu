@@ -473,6 +473,20 @@ namespace osu.Game.Tests.Visual.Background
 
         private partial class TestDimmableBackground : BackgroundScreenBeatmap.DimmableBackground
         {
+            // BeatmapBackground shader uses mix function to apply dimming with colour, which can be extended as:
+            // mix(TextureColour, DimColour, DimLevel) = TextureColour * (1 - DimLevel) + DimColour * DimLevel
+            // The result is then multiplied by vertex colour (supplied by DrawColourInfo.Colour),
+            // which can apply some external dimming that shouldn't be affected by DimColour
+            // (for example - opening settings during replay, pausing, etc.):
+            // FinalColour = DrawColourInfo.Colour * mix(TextureColour, DimColour, DimLevel)
+            // FinalColour = DrawColourInfo.Colour * TextureColour * (1 - DimLevel) + DrawColourInfo.Colour * DimColour * DimLevel
+            //
+            // These two parts can be split into separate variables:
+            // CurrentColour = DrawColourInfo.Colour * TextureColour * (1 - DimLevel)
+            // CurrentColourOffset = DrawColourInfo.Colour * DimColour * DimLevel
+            //
+            // CurrentColour can be used to track how much the texture was dimmed, and
+            // CurrentColourOffset can be used to track how much brightness was added to resulting colour.
             public Color4 CurrentColour
             {
                 get
