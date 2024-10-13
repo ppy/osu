@@ -37,7 +37,7 @@ namespace osu.Game.Overlays
         private FillFlowContainer flow = null!;
 
         [Cached]
-        private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Pink);
+        private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Purple);
 
         [Resolved]
         private GameHost gameHost { get; set; } = null!;
