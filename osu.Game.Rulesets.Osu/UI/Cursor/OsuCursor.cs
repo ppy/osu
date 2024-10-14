@@ -17,6 +17,7 @@ using osu.Game.Screens.Play;
 using osu.Game.Skinning;
 using osuTK;
 using osuTK.Graphics;
+using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Rulesets.Osu.UI.Cursor
 {
@@ -70,13 +71,13 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
             autoCursorScale.ValueChanged += _ => cursorScale.Value = CalculateCursorScale();
 
             cursorScale.BindValueChanged(e => cursorScaleContainer.Scale = new Vector2(e.NewValue), true);
-            isBloom = false;
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
             cursorScale.Value = CalculateCursorScale();
+            isBloom = false;
         }
         protected override void Update()
         //this should not exist will implement sane fix
