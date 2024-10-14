@@ -20,7 +20,7 @@ namespace osu.Game.IO
 
             if (OperatingSystem.IsWindows())
             {
-                // Attention: Windows supports mounting volume into folders. Don't detect volumn from the volume letter of path.
+                // Attention: Windows supports mounting volume into folders. Don't detect volume from the volume letter of path.
                 if (!GetVolumeInformationForDirectory(testSourcePath, out uint sourceVolume, out uint flags))
                     return false;
 
