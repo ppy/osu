@@ -1,8 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Localisation;
-using osu.Game.Localisation;
+using System.ComponentModel;
 
 namespace osu.Game.Skinning
 {
@@ -11,13 +10,13 @@ namespace osu.Game.Skinning
     /// </summary>
     public enum GlobalSkinnableContainers
     {
-        [LocalisableDescription(typeof(SkinEditorStrings), nameof(SkinEditorStrings.HUD))]
+        [Description("HUD")]
         MainHUDComponents,
 
-        [LocalisableDescription(typeof(SkinEditorStrings), nameof(SkinEditorStrings.SongSelect))]
+        [Description("Song select")]
         SongSelect,
 
-        [LocalisableDescription(typeof(SkinEditorStrings), nameof(SkinEditorStrings.Playfield))]
+        [Description("Playfield")]
         Playfield
     }
 }
