@@ -58,8 +58,8 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
 
         /// <summary>
         /// The statistics that appear in the table, grouped by their display name. If multiple HitResults have the same
-        /// DisplayName (for example, "slider end" is the name for both HitResult.SliderTailTick and HitResult.SmallTickHit
-        /// in osu!std) the name will only be listed once.
+        /// DisplayName (for example, "slider end" is the name for both <see cref="HitResult.SliderTailHit"/> and <see cref="HitResult.SmallTickHit"/>
+        /// in osu!) the name will only be listed once.
         /// </summary>
         private readonly List<(LocalisableString displayName, IEnumerable<HitResult> results)> statisticResults = new List<(LocalisableString displayName, IEnumerable<HitResult> results)>();
 
