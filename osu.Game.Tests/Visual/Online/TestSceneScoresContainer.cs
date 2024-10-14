@@ -103,16 +103,21 @@ namespace osu.Game.Tests.Visual.Online
             });
 
             AddUntilStep("wait for scores displayed", () => scoresContainer.ChildrenOfType<ScoreTableRowBackground>().Any());
-            AddAssert("only one column for slider end", () => scoresContainer.ScoreTable.Columns.Count(c => c.Header.Equals("slider end")) == 1);
+            AddAssert("only one column for slider end", () =>
+            {
+                ScoreTable scoreTable = scoresContainer.ChildrenOfType<ScoreTable>().First();
+                return scoreTable.Columns.Count(c => c.Header.Equals("slider end")) == 1;
+            });
 
             AddAssert("all rows show non-zero slider ends", () =>
             {
-                int sliderEndColumnIndex = Array.FindIndex(scoresContainer.ScoreTable.Columns, c => c != null && c.Header.Equals("slider end"));
+                ScoreTable scoreTable = scoresContainer.ChildrenOfType<ScoreTable>().First();
+                int sliderEndColumnIndex = Array.FindIndex(scoreTable.Columns, c => c != null && c.Header.Equals("slider end"));
                 bool sliderEndFilledInEachRow = true;
 
-                for (int i = 0; i < scoresContainer.ScoreTable.Content?.GetLength(0); i++)
+                for (int i = 0; i < scoreTable.Content?.GetLength(0); i++)
                 {
-                    switch (scoresContainer.ScoreTable.Content[i, sliderEndColumnIndex])
+                    switch (scoreTable.Content[i, sliderEndColumnIndex])
                     {
                         case OsuSpriteText text:
                             if (text.Text.Equals(0.0d.ToLocalisableString(@"N0")))
