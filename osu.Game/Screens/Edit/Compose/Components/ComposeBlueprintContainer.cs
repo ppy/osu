@@ -330,7 +330,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 ensurePlacementCreated();
 
             // updates the placement with the latest editor clock time.
-            updatePlacementTimeAndPosition();
+            if (CurrentPlacement != null)
+                updatePlacementTimeAndPosition();
         }
 
         protected override bool OnMouseMove(MouseMoveEvent e)
