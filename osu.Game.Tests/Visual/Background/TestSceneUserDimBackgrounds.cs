@@ -20,6 +20,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Database;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets;
@@ -463,9 +464,11 @@ namespace osu.Game.Tests.Visual.Background
         {
             protected override DimmableBackground CreateFadeContainer() => dimmable = new TestDimmableBackground { RelativeSizeAxes = Axes.Both };
 
-            public Color4 CurrentColour => dimmable.CurrentColour;
+            protected override BeatmapBackground CreateBeatmapBackground(WorkingBeatmap beatmap) => beatmapBackground = new TestBeatmapBackground(beatmap);
 
-            public Color4 CurrentColourOffset => dimmable.CurrentColourOffset;
+            public Color4 CurrentColour => beatmapBackground.CurrentColour;
+
+            public Color4 CurrentColourOffset => beatmapBackground.CurrentColourOffset;
 
             public Color4 ContentDrawColour => dimmable.ContentDrawColour;
 
@@ -481,6 +484,8 @@ namespace osu.Game.Tests.Visual.Background
 
             private TestDimmableBackground dimmable;
 
+            private TestBeatmapBackground beatmapBackground;
+
             public FadeAccessibleBackground(WorkingBeatmap beatmap)
                 : base(beatmap)
             {
@@ -489,6 +494,25 @@ namespace osu.Game.Tests.Visual.Background
 
         private partial class TestDimmableBackground : BackgroundScreenBeatmap.DimmableBackground
         {
+            public Color4 ContentDrawColour => Content.DrawColourInfo.Colour;
+
+            public Color4 ParentDrawColour => Content.Parent.DrawColourInfo.Colour;
+
+            public float CurrentAlpha => Content.Alpha;
+
+            public new float DimLevel => base.DimLevel;
+
+            public new Color4 DimColour => base.DimColour;
+        }
+
+        private partial class TestBeatmapBackground : BeatmapBackground
+        {
+            public TestBeatmapBackground(WorkingBeatmap beatmap)
+            : base(beatmap)
+            {
+
+            }
+
             // BeatmapBackground shader uses mix function to apply dimming with colour, which can be extended as:
             // mix(TextureColour, DimColour, DimLevel) = TextureColour * (1 - DimLevel) + DimColour * DimLevel
             // The result is then multiplied by vertex colour (supplied by DrawColourInfo.Colour),
@@ -502,19 +526,23 @@ namespace osu.Game.Tests.Visual.Background
             // CurrentColourOffset = DrawColourInfo.Colour * DimColour * DimLevel
             //
             // CurrentColour can be used to track how much the texture was dimmed, and
-            // CurrentColourOffset can be used to track how much brightness was added to resulting colour.
+            // CurrentColourOffset can be used to track how much colour was added as an offset.
+            //
+            // Two separate variables are needed because just one Colour variable would be ambiguous, for example:
+            // if Colour == Color4.White, that could mean either that
+            // DimLevel == 0.0, or
+            // DimLevel == 1.0 and DimColour == Color4.White.
             public Color4 CurrentColour
             {
                 get
                 {
-                    float DimLevel = BeatmapBackground.DimLevel;
-                    Color4 BeatmapBackgroundDrawColour = BeatmapBackground.DrawColourInfo.Colour;
+                    Color4 DrawColour = DrawColourInfo.Colour;
 
                     return new Color4(
-                        BeatmapBackgroundDrawColour.R * (1 - DimLevel),
-                        BeatmapBackgroundDrawColour.G * (1 - DimLevel),
-                        BeatmapBackgroundDrawColour.B * (1 - DimLevel),
-                        BeatmapBackgroundDrawColour.A
+                        DrawColour.R * (1 - DimLevel),
+                        DrawColour.G * (1 - DimLevel),
+                        DrawColour.B * (1 - DimLevel),
+                        DrawColour.A
                     );
                 }
             }
@@ -523,28 +551,16 @@ namespace osu.Game.Tests.Visual.Background
             {
                 get
                 {
-                    float DimLevel = BeatmapBackground.DimLevel;
-                    Color4 DimColour = BeatmapBackground.DimColour;
-                    Color4 BeatmapBackgroundDrawColour = BeatmapBackground.DrawColourInfo.Colour;
+                    Color4 DrawColour = DrawColourInfo.Colour;
 
                     return new Color4(
-                        BeatmapBackgroundDrawColour.R * DimColour.R * DimLevel,
-                        BeatmapBackgroundDrawColour.G * DimColour.G * DimLevel,
-                        BeatmapBackgroundDrawColour.B * DimColour.B * DimLevel,
-                        BeatmapBackgroundDrawColour.A
+                        DrawColour.R * DimColour.R * DimLevel,
+                        DrawColour.G * DimColour.G * DimLevel,
+                        DrawColour.B * DimColour.B * DimLevel,
+                        DrawColour.A
                     );
                 }
             }
-
-            public Color4 ContentDrawColour => Content.DrawColourInfo.Colour;
-
-            public Color4 ParentDrawColour => Content.Parent.DrawColourInfo.Colour;
-
-            public float CurrentAlpha => Content.Alpha;
-
-            public new float DimLevel => base.DimLevel;
-
-            public new Color4 DimColour => base.DimColour;
         }
     }
 }
