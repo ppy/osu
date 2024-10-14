@@ -28,19 +28,20 @@ namespace osu.Game.Graphics.Backgrounds
 
         private readonly string fallbackTextureName;
 
-        private float dimLevel;
         private Color4 dimColour;
 
-        public float DimLevel
-        {
-            get => dimLevel;
-            set => ColouredDimmable.DimLevel = dimLevel = value;
-        }
+        private float dimLevel;
 
         public Color4 DimColour
         {
             get => dimColour;
             set => ColouredDimmable.DimColour = dimColour = value;
+        }
+
+        public float DimLevel
+        {
+            get => dimLevel;
+            set => ColouredDimmable.DimLevel = dimLevel = value;
         }
 
         protected IColouredDimmable ColouredDimmable => BufferedContainer != null ? (BufferedContainer as DimmableBufferedContainer) : (Sprite as BeatmapBackgroundSprite);
@@ -58,8 +59,8 @@ namespace osu.Game.Graphics.Backgrounds
                 FillMode = FillMode.Fill,
             };
 
-            DimLevel = 0.0f;
             DimColour = Color4.Black;
+            DimLevel = 0.0f;
         }
 
         [BackgroundDependencyLoader]
@@ -101,25 +102,16 @@ namespace osu.Game.Graphics.Backgrounds
 
         public interface IColouredDimmable : IDrawable
         {
-            float DimLevel { get; set; }
-
             Color4 DimColour { get; set; }
+
+            float DimLevel { get; set; }
         }
 
         public partial class DimmableBufferedContainer : BufferedContainer, IColouredDimmable
         {
-            private float dimLevel;
             private Color4 dimColour;
 
-            public float DimLevel
-            {
-                get => dimLevel;
-                set
-                {
-                    dimLevel = value;
-                    Invalidate(Invalidation.DrawNode);
-                }
-            }
+            private float dimLevel;
 
             public Color4 DimColour
             {
@@ -131,11 +123,21 @@ namespace osu.Game.Graphics.Backgrounds
                 }
             }
 
+            public float DimLevel
+            {
+                get => dimLevel;
+                set
+                {
+                    dimLevel = value;
+                    Invalidate(Invalidation.DrawNode);
+                }
+            }
+
             public DimmableBufferedContainer(RenderBufferFormat[] formats = null, bool pixelSnapping = false, bool cachedFrameBuffer = false)
             : base(formats, pixelSnapping, cachedFrameBuffer)
             {
-                DimLevel = 0.0f;
                 DimColour = Color4.Black;
+                DimLevel = 0.0f;
             }
 
             [BackgroundDependencyLoader]
@@ -155,15 +157,16 @@ namespace osu.Game.Graphics.Backgrounds
                 {
                 }
 
-                private float dimLevel;
                 private Color4 dimColour;
+
+                private float dimLevel;
 
                 public override void ApplyState()
                 {
                     base.ApplyState();
 
-                    dimLevel = Source.DimLevel;
                     dimColour = Source.DimColour;
+                    dimLevel = Source.DimLevel;
                 }
 
                 private IUniformBuffer<BeatmapBackgroundParameters> beatmapBackgroundParametersBuffer;
@@ -199,18 +202,9 @@ namespace osu.Game.Graphics.Backgrounds
 
         public partial class BeatmapBackgroundSprite : Sprite, IColouredDimmable
         {
-            private float dimLevel;
             private Color4 dimColour;
 
-            public float DimLevel
-            {
-                get => dimLevel;
-                set
-                {
-                    dimLevel = value;
-                    Invalidate(Invalidation.DrawNode);
-                }
-            }
+            private float dimLevel;
 
             public Color4 DimColour
             {
@@ -222,11 +216,21 @@ namespace osu.Game.Graphics.Backgrounds
                 }
             }
 
+            public float DimLevel
+            {
+                get => dimLevel;
+                set
+                {
+                    dimLevel = value;
+                    Invalidate(Invalidation.DrawNode);
+                }
+            }
+
             public BeatmapBackgroundSprite()
             : base()
             {
-                DimLevel = 0.0f;
                 DimColour = Color4.Black;
+                DimLevel = 0.0f;
             }
 
             [BackgroundDependencyLoader]
@@ -246,15 +250,16 @@ namespace osu.Game.Graphics.Backgrounds
                 {
                 }
 
-                private float dimLevel;
                 private Color4 dimColour;
+
+                private float dimLevel;
 
                 public override void ApplyState()
                 {
                     base.ApplyState();
 
-                    dimLevel = Source.DimLevel;
                     dimColour = Source.DimColour;
+                    dimLevel = Source.DimLevel;
                 }
 
                 private IUniformBuffer<BeatmapBackgroundParameters> beatmapBackgroundParametersBuffer;
