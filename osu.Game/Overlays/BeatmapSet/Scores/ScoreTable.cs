@@ -170,15 +170,20 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
 
             foreach (var (columnName, resultTypes) in statisticResults)
             {
-                HitResultDisplayStatistic stat = new HitResultDisplayStatistic(resultTypes.First(), 0, null, columnName);
+                int count = 0;
+                int? maxCount = null;
 
                 if (availableStatistics.Contains(columnName))
                 {
+                    maxCount = 0;
                     foreach (var s in availableStatistics[columnName])
-                        stat = s;
+                    {
+                        count += s.Count;
+                        maxCount += s.MaxCount;
+                    }
                 }
 
-                content.Add(new StatisticText(stat.Count, stat.MaxCount, @"N0") { Colour = stat.Count == 0 ? Color4.Gray : Color4.White });
+                content.Add(new StatisticText(count, maxCount, @"N0") { Colour = count == 0 ? Color4.Gray : Color4.White });
             }
 
             if (showPerformancePoints)
