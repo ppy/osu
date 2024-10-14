@@ -85,7 +85,8 @@ namespace osu.Game.Rulesets.Osu.Mods
             Debug.Assert(osuPlayfield.Cursor != null);
             var realCursor = (OsuCursor)osuPlayfield.Cursor.ActiveCursor;
             realCursor.isBloom = true;
-            float currentCombSize = (float)Interpolation.Lerp(osuPlayfield.Cursor.Scale.X, ComboBasedSize, Math.Clamp(osuPlayfield.Time.Elapsed / TRANSITION_DURATION, 0, 1));
+            float currentCombSize = (float)Interpolation.Lerp(realCursor.ComboSize, ComboBasedSize, Math.Clamp(osuPlayfield.Time.Elapsed / TRANSITION_DURATION, 0, 1));
+            Console.WriteLine(ComboBasedSize + " " + currentCombSize);
             if (beBaseSize)
             {
                 realCursor.ComboSize = 1;
