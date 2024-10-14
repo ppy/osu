@@ -175,12 +175,14 @@ namespace osu.Game.Rulesets.Osu.Edit
             axisBindable.Disabled = !available;
         }
 
-        private void updateMaxScale()
+        private void updateMinMaxScale()
         {
             if (!scaleHandler.OriginalSurroundingQuad.HasValue)
                 return;
 
+            const float min_scale = 0.5f;
             const float max_scale = 10;
+
             var scale = scaleHandler.ClampScaleToPlayfieldBounds(new Vector2(max_scale), getOriginPosition(scaleInfo.Value), getAdjustAxis(scaleInfo.Value), getRotation(scaleInfo.Value));
 
             if (!scaleInfo.Value.XAxis)
@@ -189,12 +191,21 @@ namespace osu.Game.Rulesets.Osu.Edit
                 scale.Y = max_scale;
 
             scaleInputBindable.MaxValue = MathF.Max(1, MathF.Min(scale.X, scale.Y));
+
+            scale = scaleHandler.ClampScaleToPlayfieldBounds(new Vector2(min_scale), getOriginPosition(scaleInfo.Value), getAdjustAxis(scaleInfo.Value), getRotation(scaleInfo.Value));
+
+            if (!scaleInfo.Value.XAxis)
+                scale.X = min_scale;
+            if (!scaleInfo.Value.YAxis)
+                scale.Y = min_scale;
+
+            scaleInputBindable.MinValue = MathF.Min(1, MathF.Max(scale.X, scale.Y));
         }
 
         private void setOrigin(ScaleOrigin origin)
         {
             scaleInfo.Value = scaleInfo.Value with { Origin = origin };
-            updateMaxScale();
+            updateMinMaxScale();
             updateAxisCheckBoxesEnabled();
         }
 
@@ -226,14 +237,14 @@ namespace osu.Game.Rulesets.Osu.Edit
         private void setAxis(bool x, bool y)
         {
             scaleInfo.Value = scaleInfo.Value with { XAxis = x, YAxis = y };
-            updateMaxScale();
+            updateMinMaxScale();
         }
 
         protected override void PopIn()
         {
             base.PopIn();
             scaleHandler.Begin();
-            updateMaxScale();
+            updateMinMaxScale();
         }
 
         protected override void PopOut()
