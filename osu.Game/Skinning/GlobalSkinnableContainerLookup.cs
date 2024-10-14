@@ -31,9 +31,9 @@ namespace osu.Game.Skinning
 
         public override string ToString()
         {
-            if (Ruleset == null) return Lookup.GetLocalisableDescription().ToString();
+            if (Ruleset == null) return Lookup.GetDescription();
 
-            return $"{Lookup.GetLocalisableDescription().ToString()} (\"{Ruleset.Name}\" only)";
+            return $"{Lookup.GetDescription()} (\"{Ruleset.Name}\" only)";
         }
 
         public bool Equals(GlobalSkinnableContainerLookup? other)
