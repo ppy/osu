@@ -166,7 +166,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
 #pragma warning restore 618
             };
 
-            var availableStatistics = score.GetStatisticsForDisplay().ToLookup(touple => touple.DisplayName);
+            var availableStatistics = score.GetStatisticsForDisplay().ToLookup(tuple => tuple.DisplayName);
 
             foreach (var (columnName, resultTypes) in statisticResults)
             {
