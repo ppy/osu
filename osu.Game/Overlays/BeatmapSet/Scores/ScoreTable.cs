@@ -57,11 +57,11 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         }
 
         /// <summary>
-        /// The statistics that appear in the table, grouped by their display name. If multiple HitResults have the same
+        /// The names of the statistics that appear in the table. If multiple HitResults have the same
         /// DisplayName (for example, "slider end" is the name for both <see cref="HitResult.SliderTailHit"/> and <see cref="HitResult.SmallTickHit"/>
         /// in osu!) the name will only be listed once.
         /// </summary>
-        private readonly List<(LocalisableString displayName, IEnumerable<HitResult> results)> statisticResults = new List<(LocalisableString displayName, IEnumerable<HitResult> results)>();
+        private readonly List<LocalisableString> statisticResultNames = new List<LocalisableString>();
 
         private bool showPerformancePoints;
 
@@ -73,7 +73,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 return;
 
             showPerformancePoints = showPerformanceColumn;
-            statisticResults.Clear();
+            statisticResultNames.Clear();
 
             for (int i = 0; i < scores.Count; i++)
                 backgroundFlow.Add(new ScoreTableRowBackground(i, scores[i], row_height));
@@ -117,7 +117,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                     continue;
 
                 columns.Add(new TableColumn(resultGroup.Key, Anchor.CentreLeft, new Dimension(minSize: 35, maxSize: 60)));
-                statisticResults.Add((resultGroup.Key, resultGroup.Select(r => r.result)));
+                statisticResultNames.Add(resultGroup.Key);
             }
 
             if (showPerformancePoints)
@@ -168,7 +168,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
 
             var availableStatistics = score.GetStatisticsForDisplay().ToLookup(tuple => tuple.DisplayName);
 
-            foreach (var (columnName, resultTypes) in statisticResults)
+            foreach (var columnName in statisticResultNames)
             {
                 int count = 0;
                 int? maxCount = null;
@@ -176,6 +176,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 if (availableStatistics.Contains(columnName))
                 {
                     maxCount = 0;
+
                     foreach (var s in availableStatistics[columnName])
                     {
                         count += s.Count;
