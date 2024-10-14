@@ -470,7 +470,7 @@ namespace osu.Game.Tests.Visual.Background
 
             public Color4 CurrentColourOffset => beatmapBackground.CurrentColourOffset;
 
-            public Color4 ContentDrawColour => dimmable.ContentDrawColour;
+            public Color4 ContentDrawColour => beatmapBackground.ContentDrawColour;
 
             public Color4 ParentDrawColour => dimmable.ParentDrawColour;
 
@@ -494,8 +494,6 @@ namespace osu.Game.Tests.Visual.Background
 
         private partial class TestDimmableBackground : BackgroundScreenBeatmap.DimmableBackground
         {
-            public Color4 ContentDrawColour => Content.DrawColourInfo.Colour;
-
             public Color4 ParentDrawColour => Content.Parent.DrawColourInfo.Colour;
 
             public float CurrentAlpha => Content.Alpha;
@@ -561,6 +559,8 @@ namespace osu.Game.Tests.Visual.Background
                     );
                 }
             }
+
+            public Color4 ContentDrawColour => ColouredDimmable.DrawColourInfo.Colour;
         }
     }
 }
