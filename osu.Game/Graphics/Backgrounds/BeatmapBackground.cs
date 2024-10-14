@@ -34,38 +34,16 @@ namespace osu.Game.Graphics.Backgrounds
         public float DimLevel
         {
             get => dimLevel;
-            set
-            {
-                dimLevel = value;
-
-                if (BufferedContainer == null)
-                {
-                    (Sprite as BeatmapBackgroundSprite).DimLevel = dimLevel;
-                }
-                else
-                {
-                    (BufferedContainer as DimmableBufferedContainer).DimLevel = dimLevel;
-                }
-            }
+            set => ColouredDimmable.DimLevel = dimLevel = value;
         }
 
         public Color4 DimColour
         {
             get => dimColour;
-            set
-            {
-                dimColour = value;
-
-                if (BufferedContainer == null)
-                {
-                    (Sprite as BeatmapBackgroundSprite).DimColour = dimColour;
-                }
-                else
-                {
-                    (BufferedContainer as DimmableBufferedContainer).DimColour = dimColour;
-                }
-            }
+            set => ColouredDimmable.DimColour = dimColour = value;
         }
+
+        protected IColouredDimmable ColouredDimmable => BufferedContainer != null ? (BufferedContainer as DimmableBufferedContainer) : (Sprite as BeatmapBackgroundSprite);
 
         public BeatmapBackground(WorkingBeatmap beatmap, string fallbackTextureName = @"Backgrounds/bg1")
         {
@@ -121,7 +99,14 @@ namespace osu.Game.Graphics.Backgrounds
             base.BlurTo(newBlurSigma, duration, easing);
         }
 
-        public partial class DimmableBufferedContainer : BufferedContainer
+        public interface IColouredDimmable : IDrawable
+        {
+            float DimLevel { get; set; }
+
+            Color4 DimColour { get; set; }
+        }
+
+        public partial class DimmableBufferedContainer : BufferedContainer, IColouredDimmable
         {
             private float dimLevel;
             private Color4 dimColour;
@@ -212,7 +197,7 @@ namespace osu.Game.Graphics.Backgrounds
             }
         }
 
-        public partial class BeatmapBackgroundSprite : Sprite
+        public partial class BeatmapBackgroundSprite : Sprite, IColouredDimmable
         {
             private float dimLevel;
             private Color4 dimColour;
