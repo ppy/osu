@@ -88,7 +88,7 @@ namespace osu.Game.Rulesets.Scoring
         {
             double value = IBeatmapDifficultyInfo.DifficultyRange(difficulty, (range.Min, range.Average, range.Max));
             value = Math.Floor(value) - 0.5;
-            return value;
+            return Math.Max(0, value);
         }
 
         /// <summary>
