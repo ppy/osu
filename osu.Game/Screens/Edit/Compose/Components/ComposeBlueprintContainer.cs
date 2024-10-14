@@ -297,9 +297,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         private void updatePlacementTimeAndPosition()
         {
-            if (CurrentPlacement == null)
-                return;
-
             var snapResult = Composer.FindSnappedPositionAndTime(InputManager.CurrentState.Mouse.Position, CurrentPlacement.SnapType);
 
             // if no time was found from positional snapping, we should still quantize to the beat.
@@ -339,7 +336,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
         protected override bool OnMouseMove(MouseMoveEvent e)
         {
             // updates the placement with the latest mouse position.
-            updatePlacementTimeAndPosition();
+            if (CurrentPlacement != null)
+                updatePlacementTimeAndPosition();
+
             return base.OnMouseMove(e);
         }
 
