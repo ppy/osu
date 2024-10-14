@@ -20,26 +20,7 @@ namespace osu.Game.Graphics.Backgrounds
     /// </summary>
     public partial class Background : CompositeDrawable, IEquatable<Background>
     {
-        private Sprite sprite;
-
-        public Sprite Sprite
-        {
-            get => sprite;
-            protected set
-            {
-                if (BufferedContainer == null)
-                {
-                    if (sprite != null)
-                        RemoveInternal(sprite, true);
-                    AddInternal(sprite = value);
-                }
-                else
-                {
-                    sprite?.Dispose();
-                    BufferedContainer.Child = sprite = value;
-                }
-            }
-        }
+        public readonly Sprite Sprite;
 
         private readonly string textureName;
 
@@ -50,13 +31,7 @@ namespace osu.Game.Graphics.Backgrounds
             this.textureName = textureName;
             RelativeSizeAxes = Axes.Both;
 
-            Sprite = new Sprite
-            {
-                RelativeSizeAxes = Axes.Both,
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                FillMode = FillMode.Fill,
-            };
+            AddInternal(Sprite = CreateSprite());
         }
 
         [BackgroundDependencyLoader]
@@ -65,6 +40,14 @@ namespace osu.Game.Graphics.Backgrounds
             if (!string.IsNullOrEmpty(textureName))
                 Sprite.Texture = textures.Get(textureName);
         }
+
+        protected virtual Sprite CreateSprite() => new Sprite
+        {
+            RelativeSizeAxes = Axes.Both,
+            Anchor = Anchor.Centre,
+            Origin = Anchor.Centre,
+            FillMode = FillMode.Fill,
+        };
 
         public Vector2 BlurSigma => Vector2.Divide(BufferedContainer?.BlurSigma ?? Vector2.Zero, blurScale);
 

@@ -28,6 +28,8 @@ namespace osu.Game.Graphics.Backgrounds
 
         private readonly string fallbackTextureName;
 
+        protected BeatmapBackgroundSprite ColouredDimmableSprite { get; private set; }
+
         private Color4 dimColour;
 
         private float dimLevel;
@@ -44,20 +46,12 @@ namespace osu.Game.Graphics.Backgrounds
             set => ColouredDimmable.DimLevel = dimLevel = value;
         }
 
-        protected IColouredDimmable ColouredDimmable => BufferedContainer != null ? (BufferedContainer as DimmableBufferedContainer) : (Sprite as BeatmapBackgroundSprite);
+        protected IColouredDimmable ColouredDimmable => BufferedContainer != null ? (BufferedContainer as DimmableBufferedContainer) : ColouredDimmableSprite;
 
         public BeatmapBackground(WorkingBeatmap beatmap, string fallbackTextureName = @"Backgrounds/bg1")
         {
             Beatmap = beatmap;
             this.fallbackTextureName = fallbackTextureName;
-
-            Sprite = new BeatmapBackgroundSprite
-            {
-                RelativeSizeAxes = Axes.Both,
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                FillMode = FillMode.Fill,
-            };
 
             DimColour = Color4.Black;
             DimLevel = 0.0f;
@@ -68,6 +62,14 @@ namespace osu.Game.Graphics.Backgrounds
         {
             Sprite.Texture = Beatmap?.GetBackground() ?? textures.Get(fallbackTextureName);
         }
+
+        protected override Sprite CreateSprite() => ColouredDimmableSprite = new BeatmapBackgroundSprite
+        {
+            RelativeSizeAxes = Axes.Both,
+            Anchor = Anchor.Centre,
+            Origin = Anchor.Centre,
+            FillMode = FillMode.Fill,
+        };
 
         public override bool Equals(Background other)
         {
@@ -84,9 +86,8 @@ namespace osu.Game.Graphics.Backgrounds
             {
                 RemoveInternal(Sprite, false);
 
-                BeatmapBackgroundSprite sprite = (BeatmapBackgroundSprite)Sprite;
-                sprite.DimColour = Color4.Black;
-                sprite.DimLevel = 0.0f;
+                ColouredDimmableSprite.DimColour = Color4.Black;
+                ColouredDimmableSprite.DimLevel = 0.0f;
 
                 AddInternal(BufferedContainer = new DimmableBufferedContainer(cachedFrameBuffer: true)
                 {
