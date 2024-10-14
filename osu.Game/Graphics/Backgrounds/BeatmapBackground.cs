@@ -30,6 +30,8 @@ namespace osu.Game.Graphics.Backgrounds
 
         protected BeatmapBackgroundSprite ColouredDimmableSprite { get; private set; }
 
+        protected DimmableBufferedContainer ColouredDimmableBufferedContainer { get; private set; }
+
         private Color4 dimColour;
 
         private float dimLevel;
@@ -46,7 +48,7 @@ namespace osu.Game.Graphics.Backgrounds
             set => ColouredDimmable.DimLevel = dimLevel = value;
         }
 
-        protected IColouredDimmable ColouredDimmable => BufferedContainer != null ? (BufferedContainer as DimmableBufferedContainer) : ColouredDimmableSprite;
+        protected IColouredDimmable ColouredDimmable => ColouredDimmableBufferedContainer != null ? ColouredDimmableBufferedContainer : ColouredDimmableSprite;
 
         public BeatmapBackground(WorkingBeatmap beatmap, string fallbackTextureName = @"Backgrounds/bg1")
         {
@@ -71,6 +73,21 @@ namespace osu.Game.Graphics.Backgrounds
             FillMode = FillMode.Fill,
         };
 
+        protected override BufferedContainer CreateBufferedContainer()
+        {
+            ColouredDimmableSprite.DimColour = Color4.Black;
+            ColouredDimmableSprite.DimLevel = 0.0f;
+
+            return ColouredDimmableBufferedContainer = new DimmableBufferedContainer(cachedFrameBuffer: true)
+            {
+                RelativeSizeAxes = Axes.Both,
+                RedrawOnScale = false,
+                Child = Sprite,
+                DimColour = DimColour,
+                DimLevel = DimLevel
+            };
+        }
+
         public override bool Equals(Background other)
         {
             if (ReferenceEquals(null, other)) return false;
@@ -78,27 +95,6 @@ namespace osu.Game.Graphics.Backgrounds
 
             return other.GetType() == GetType()
                    && ((BeatmapBackground)other).Beatmap == Beatmap;
-        }
-
-        public override void BlurTo(Vector2 newBlurSigma, double duration = 0, Easing easing = Easing.None)
-        {
-            if (BufferedContainer == null && newBlurSigma != Vector2.Zero)
-            {
-                RemoveInternal(Sprite, false);
-
-                ColouredDimmableSprite.DimColour = Color4.Black;
-                ColouredDimmableSprite.DimLevel = 0.0f;
-
-                AddInternal(BufferedContainer = new DimmableBufferedContainer(cachedFrameBuffer: true)
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    RedrawOnScale = false,
-                    Child = Sprite,
-                    DimColour = DimColour,
-                    DimLevel = DimLevel
-                });
-            }
-            base.BlurTo(newBlurSigma, duration, easing);
         }
 
         public interface IColouredDimmable : IDrawable
