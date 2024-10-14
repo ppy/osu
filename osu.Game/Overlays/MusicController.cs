@@ -376,7 +376,7 @@ namespace osu.Game.Overlays
             {
                 Live<BeatmapSetInfo> result;
 
-                var possibleSets = getBeatmapSets().Where(s => !s.Value.Protected || allowProtectedTracks).ToArray();
+                var possibleSets = getBeatmapSets().Where(s => !s.Value.Equals(current?.BeatmapSetInfo) && (!s.Value.Protected || allowProtectedTracks)).ToArray();
 
                 if (possibleSets.Length == 0)
                     return null;
