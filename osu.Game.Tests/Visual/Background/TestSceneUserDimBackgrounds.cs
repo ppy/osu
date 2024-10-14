@@ -266,6 +266,34 @@ namespace osu.Game.Tests.Visual.Background
             AddUntilStep("Screen is undimmed and user blur removed", () => songSelect.IsBackgroundUndimmed() && songSelect.CheckBackgroundBlur(playerLoader.ExpectedBackgroundBlur));
         }
 
+        /// <summary>
+        /// Check if both the Sprite and BufferedContainer can handle dimming and don't handle it at the same time.
+        /// </summary>
+        [Test]
+        public void TestDimmingHandlers()
+        {
+            AddStep("Disallow blurring", () => TestBeatmapBackground.AllowBlur = false);
+
+            SetUpSteps();
+
+            performFullSetup();
+
+            AddUntilStep("Screen is dimmed and dim colour adjusted", () => songSelect.IsBackgroundDimmed() && songSelect.IsBackgroundColourOffset());
+            AddUntilStep("BufferedContainer is not initialized", () => songSelect.IsBufferedContainerNull());
+            AddUntilStep("Sprite is dimmed", () => songSelect.IsSpriteDimmed());
+
+            AddStep("Allow blurring", () => TestBeatmapBackground.AllowBlur = true);
+
+            SetUpSteps();
+
+            performFullSetup();
+
+            AddUntilStep("Screen is dimmed, blur applied and dim colour adjusted", () => songSelect.IsBackgroundDimmed() && songSelect.IsUserBlurApplied() && songSelect.IsBackgroundColourOffset());
+            AddUntilStep("BufferedContainer is initialized", () => !songSelect.IsBufferedContainerNull());
+            AddUntilStep("BufferedContainer is dimmed", () => songSelect.IsBufferedContainerDimmed());
+            AddUntilStep("Sprite is not dimmed", () => !songSelect.IsSpriteDimmed());
+        }
+
         private void createFakeStoryboard() => AddStep("Create storyboard", () =>
         {
             player.StoryboardEnabled.Value = false;
@@ -384,6 +412,12 @@ namespace osu.Game.Tests.Visual.Background
             /// </summary>
             /// <returns>Whether or not the original background (The one created in DummySongSelect) is still the current background</returns>
             public bool IsBackgroundCurrent() => background?.IsCurrentScreen() == true;
+
+            public bool IsSpriteDimmed() => background.IsSpriteDimmed;
+
+            public bool IsBufferedContainerDimmed() => background.IsBufferedContainerDimmed;
+
+            public bool IsBufferedContainerNull() => background.IsBufferedContainerNull;
         }
 
         private partial class FadeAccessibleResults : ResultsScreen
@@ -472,6 +506,12 @@ namespace osu.Game.Tests.Visual.Background
 
             public Color4 ContentDrawColour => beatmapBackground.ContentDrawColour;
 
+            public bool IsSpriteDimmed => beatmapBackground.IsSpriteDimmed;
+
+            public bool IsBufferedContainerDimmed => beatmapBackground.IsBufferedContainerDimmed;
+
+            public bool IsBufferedContainerNull => beatmapBackground.IsBufferedContainerNull;
+
             public Color4 ParentDrawColour => dimmable.ParentDrawColour;
 
             public float CurrentAlpha => dimmable.CurrentAlpha;
@@ -505,11 +545,7 @@ namespace osu.Game.Tests.Visual.Background
 
         private partial class TestBeatmapBackground : BeatmapBackground
         {
-            public TestBeatmapBackground(WorkingBeatmap beatmap)
-            : base(beatmap)
-            {
-
-            }
+            public static bool AllowBlur = true;
 
             // BeatmapBackground shader uses mix function to apply dimming with colour, which can be extended as:
             // mix(TextureColour, DimColour, DimLevel) = TextureColour * (1 - DimLevel) + DimColour * DimLevel
@@ -561,6 +597,25 @@ namespace osu.Game.Tests.Visual.Background
             }
 
             public Color4 ContentDrawColour => ColouredDimmable.DrawColourInfo.Colour;
+
+            public bool IsSpriteDimmed => ColouredDimmableSprite.DimLevel != 0.0f;
+
+            public bool IsBufferedContainerDimmed => ColouredDimmableBufferedContainer != null ? ColouredDimmableBufferedContainer.DimLevel != 0.0f : false;
+
+            public bool IsBufferedContainerNull => ColouredDimmableBufferedContainer == null;
+
+            public TestBeatmapBackground(WorkingBeatmap beatmap)
+            : base(beatmap)
+            {
+            }
+
+            public override void BlurTo(Vector2 newBlurSigma, double duration = 0, Easing easing = Easing.None)
+            {
+                if (AllowBlur)
+                {
+                    base.BlurTo(newBlurSigma, duration, easing);
+                }
+            }
         }
     }
 }
