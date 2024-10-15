@@ -136,8 +136,26 @@ namespace osu.Game.Rulesets.Osu.Edit
             });
             scaleInput.Current.BindValueChanged(scale => scaleInfo.Value = scaleInfo.Value with { Scale = scale.NewValue });
 
-            xCheckBox.Current.BindValueChanged(x => setAxis(x.NewValue, yCheckBox.Current.Value));
-            yCheckBox.Current.BindValueChanged(y => setAxis(xCheckBox.Current.Value, y.NewValue));
+            xCheckBox.Current.BindValueChanged(_ =>
+            {
+                if (!xCheckBox.Current.Value && !yCheckBox.Current.Value)
+                {
+                    yCheckBox.Current.Value = true;
+                    return;
+                }
+
+                updateAxes();
+            });
+            yCheckBox.Current.BindValueChanged(_ =>
+            {
+                if (!xCheckBox.Current.Value && !yCheckBox.Current.Value)
+                {
+                    xCheckBox.Current.Value = true;
+                    return;
+                }
+
+                updateAxes();
+            });
 
             selectionCentreButton.Selected.Disabled = !(scaleHandler.CanScaleX.Value || scaleHandler.CanScaleY.Value);
             playfieldCentreButton.Selected.Disabled = scaleHandler.IsScalingSlider.Value && !selectionCentreButton.Selected.Disabled;
@@ -150,6 +168,12 @@ namespace osu.Game.Rulesets.Osu.Edit
                 var newScale = new Vector2(scale.NewValue.Scale, scale.NewValue.Scale);
                 scaleHandler.Update(newScale, getOriginPosition(scale.NewValue), getAdjustAxis(scale.NewValue), getRotation(scale.NewValue));
             });
+        }
+
+        private void updateAxes()
+        {
+            scaleInfo.Value = scaleInfo.Value with { XAxis = xCheckBox.Current.Value, YAxis = yCheckBox.Current.Value };
+            updateMinMaxScale();
         }
 
         private void updateAxisCheckBoxesEnabled()
@@ -230,15 +254,20 @@ namespace osu.Game.Rulesets.Osu.Edit
             }
         }
 
-        private Axes getAdjustAxis(PreciseScaleInfo scale) => scale.XAxis ? scale.YAxis ? Axes.Both : Axes.X : Axes.Y;
+        private Axes getAdjustAxis(PreciseScaleInfo scale)
+        {
+            var result = Axes.None;
+
+            if (scale.XAxis)
+                result |= Axes.X;
+
+            if (scale.YAxis)
+                result |= Axes.Y;
+
+            return result;
+        }
 
         private float getRotation(PreciseScaleInfo scale) => scale.Origin == ScaleOrigin.GridCentre ? gridToolbox.GridLinesRotation.Value : 0;
-
-        private void setAxis(bool x, bool y)
-        {
-            scaleInfo.Value = scaleInfo.Value with { XAxis = x, YAxis = y };
-            updateMinMaxScale();
-        }
 
         protected override void PopIn()
         {
