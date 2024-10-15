@@ -361,14 +361,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         }
 
         // Calculates multiplier for speed accounting for rake based on the deviation and speed difficulty
-        // https://www.desmos.com/calculator/puc1mzdtfv
+        // https://www.desmos.com/calculator/dmogdhzofn
         private double calculateSpeedRakeNerf(OsuDifficultyAttributes attributes)
         {
             // Base speed value
             double speedValue = OsuStrainSkill.DifficultyToPerformance(attributes.SpeedDifficulty);
 
             // Starting from this pp amount - penalty will be applied
-            double abusePoint = 100 + 260 * Math.Pow(22 / speedDeviation, 5.8);
+            double abusePoint = 100 + 220 * Math.Pow(22 / speedDeviation, 6.5);
 
             if (speedValue <= abusePoint)
                 return 1.0;
@@ -377,9 +377,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             const double scale = 50;
             double adjustedSpeedValue = scale * (Math.Log((speedValue - abusePoint) / scale + 1) + abusePoint / scale);
 
-            double speedRakeNerf = adjustedSpeedValue / speedValue;
+            // 200 UR and less are considered not raked and will be punished only by normal acc scaling
+            double lerp = 1 - Math.Clamp((speedDeviation - 20) / (24 - 20), 0, 1);
+            adjustedSpeedValue = double.Lerp(adjustedSpeedValue, speedValue, lerp);
 
-            return speedRakeNerf;
+            return adjustedSpeedValue / speedValue;
         }
 
         private static double getClockRate(ScoreInfo score)
