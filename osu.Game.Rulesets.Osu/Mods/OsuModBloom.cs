@@ -89,7 +89,6 @@ namespace osu.Game.Rulesets.Osu.Mods
             {
                 realCursor.UpdateSize(1);
             }
-
             else
             {
                 realCursor.UpdateSize(currentCombSize);
