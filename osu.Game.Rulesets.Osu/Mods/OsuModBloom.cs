@@ -78,22 +78,19 @@ namespace osu.Game.Rulesets.Osu.Mods
             );
         }
         public void Update(Playfield playfield)
-        //terrible terrible handling on making sure cursor position stays accurate, will fix
         {
             bool beBaseSize = IsBreakTime.Value;
-            var osuPlayfield = (OsuPlayfield)playfield;
+            OsuPlayfield osuPlayfield = (OsuPlayfield)playfield;
             Debug.Assert(osuPlayfield.Cursor != null);
-            var realCursor = (OsuCursor)osuPlayfield.Cursor.ActiveCursor;
-            realCursor.isBloom = true;
-            float currentCombSize = (float)Interpolation.Lerp(realCursor.ComboSize, ComboBasedSize, Math.Clamp(osuPlayfield.Time.Elapsed / TRANSITION_DURATION, 0, 1));
-            Console.WriteLine(ComboBasedSize + " " + currentCombSize);
+            OsuCursor realCursor = (OsuCursor)osuPlayfield.Cursor.ActiveCursor;
+            float currentCombSize = (float)Interpolation.Lerp(realCursor.CursorScale.Value, ComboBasedSize, Math.Clamp(osuPlayfield.Time.Elapsed / TRANSITION_DURATION, 0, 1));
             if (beBaseSize)
             {
-                realCursor.ComboSize = 1;
+                realCursor.UpdateSize(1);
             }
             else
             {
-                realCursor.ComboSize = currentCombSize;
+                realCursor.UpdateSize(currentCombSize);
             }
         }
 

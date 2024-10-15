@@ -17,7 +17,6 @@ using osu.Game.Screens.Play;
 using osu.Game.Skinning;
 using osuTK;
 using osuTK.Graphics;
-using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Rulesets.Osu.UI.Cursor
 {
@@ -40,8 +39,6 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
         public IBindable<float> CursorScale => cursorScale;
 
         private readonly Bindable<float> cursorScale = new BindableFloat(1);
-        public bool isBloom;
-        public float ComboSize;
 
         private Bindable<float> userCursorScale = null!;
         private Bindable<bool> autoCursorScale = null!;
@@ -77,16 +74,6 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
         {
             base.LoadComplete();
             cursorScale.Value = CalculateCursorScale();
-            isBloom = false;
-        }
-        protected override void Update()
-        //this should not exist will implement sane fix
-        {
-            base.Update();
-            if (isBloom)
-            {
-                cursorScale.Value = ComboSize;
-            }
         }
 
         protected virtual Drawable CreateCursorContent() => cursorScaleContainer = new Container
@@ -112,6 +99,10 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
             }
 
             return scale;
+        }
+        public void UpdateSize(float size)
+        {
+            cursorScale.Value = size;
         }
 
         protected override void SkinChanged(ISkinSource skin)
