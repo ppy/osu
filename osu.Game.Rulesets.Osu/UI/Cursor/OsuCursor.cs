@@ -100,6 +100,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
 
             return scale;
         }
+
         public void UpdateSize(float size)
         {
             cursorScale.Value = size;
