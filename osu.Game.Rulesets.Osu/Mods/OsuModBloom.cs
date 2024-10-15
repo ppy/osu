@@ -41,11 +41,11 @@ namespace osu.Game.Rulesets.Osu.Mods
         [SettingSource(
             "Max Size at Combo",
             "The combo count at which the cursor reaches its maximum size",
-            SettingControlType = typeof(SettingsSlider<int, MaxSizeSlider>)
+            SettingControlType = typeof(SettingsSlider<int, RoundedSliderBar<int>>)
         )]
         public BindableInt MaxSizeComboCount { get; } = new BindableInt(50)
         {
-            MinValue = 0,
+            MinValue = 5,
             MaxValue = 100,
         };
         [SettingSource(
@@ -93,14 +93,5 @@ namespace osu.Game.Rulesets.Osu.Mods
                 realCursor.UpdateSize(currentCombSize);
             }
         }
-
-
-
-
     }
-    public partial class MaxSizeSlider : RoundedSliderBar<int>
-    {
-        public override LocalisableString TooltipText => Current.Value == 0 ? "always at max size" : base.TooltipText;
-    }
-
 }
