@@ -16,13 +16,7 @@
     <UseInterpreter>false</UseInterpreter>
     <MtouchInterpreter>-all</MtouchInterpreter>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Platform)' == 'iPhone'">
-    <RuntimeIdentifier>ios-arm64</RuntimeIdentifier>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Platform)' == 'iPhoneSimulator'">
-    <RuntimeIdentifier>iossimulator-x64</RuntimeIdentifier>
-  </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="ppy.osu.Framework.iOS" Version="2024.509.0" />
+    <PackageReference Include="ppy.osu.Framework.iOS" Version="2024.1009.0" />
   </ItemGroup>
 </Project>

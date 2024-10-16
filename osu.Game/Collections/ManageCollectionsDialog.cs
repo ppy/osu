@@ -1,17 +1,17 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Allocation;
-using osu.Framework.Audio;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
-using osu.Game.Audio.Effects;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Overlays;
 using osuTK;
 
 namespace osu.Game.Collections
@@ -21,10 +21,13 @@ namespace osu.Game.Collections
         private const double enter_duration = 500;
         private const double exit_duration = 200;
 
-        private AudioFilter lowPassFilter = null!;
-
         protected override string PopInSampleName => @"UI/overlay-big-pop-in";
         protected override string PopOutSampleName => @"UI/overlay-big-pop-out";
+
+        private IDisposable? duckOperation;
+
+        [Resolved]
+        private MusicController? musicController { get; set; }
 
         public ManageCollectionsDialog()
         {
@@ -39,7 +42,7 @@ namespace osu.Game.Collections
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, AudioManager audio)
+        private void load(OsuColour colours)
         {
             Children = new Drawable[]
             {
@@ -110,19 +113,25 @@ namespace osu.Game.Collections
                             },
                         }
                     }
-                },
-                lowPassFilter = new AudioFilter(audio.TrackMixer)
+                }
             };
         }
 
-        public override bool IsPresent => base.IsPresent
-                                          // Safety for low pass filter potentially getting stuck in applied state due to
-                                          // transforms on `this` causing children to no longer be updated.
-                                          || lowPassFilter.IsAttached;
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+            duckOperation?.Dispose();
+        }
 
         protected override void PopIn()
         {
-            lowPassFilter.CutoffTo(300, 100, Easing.OutCubic);
+            duckOperation = musicController?.Duck(new DuckParameters
+            {
+                DuckVolumeTo = 1,
+                DuckDuration = 100,
+                RestoreDuration = 100,
+            });
+
             this.FadeIn(enter_duration, Easing.OutQuint);
             this.ScaleTo(0.9f).Then().ScaleTo(1f, enter_duration, Easing.OutQuint);
         }
@@ -131,13 +140,13 @@ namespace osu.Game.Collections
         {
             base.PopOut();
 
-            lowPassFilter.CutoffTo(AudioFilter.MAX_LOWPASS_CUTOFF, 100, Easing.InCubic);
+            duckOperation?.Dispose();
 
             this.FadeOut(exit_duration, Easing.OutQuint);
             this.ScaleTo(0.9f, exit_duration);
 
             // Ensure that textboxes commit
-            GetContainingInputManager()?.TriggerFocusContention(this);
+            GetContainingFocusManager()?.TriggerFocusContention(this);
         }
     }
 }

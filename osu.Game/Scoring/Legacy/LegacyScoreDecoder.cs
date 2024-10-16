@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 #nullable disable
@@ -21,6 +21,7 @@ using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.Scoring;
+using osuTK;
 using SharpCompress.Compressors.LZMA;
 
 namespace osu.Game.Scoring.Legacy
@@ -262,7 +263,7 @@ namespace osu.Game.Scoring.Legacy
         private void readLegacyReplay(Replay replay, StreamReader reader)
         {
             float lastTime = beatmapOffset;
-            ReplayFrame currentFrame = null;
+            var legacyFrames = new List<LegacyReplayFrame>();
 
             string[] frames = reader.ReadToEnd().Split(',');
 
@@ -279,29 +280,53 @@ namespace osu.Game.Scoring.Legacy
                     continue;
                 }
 
+                // In mania, mouseX encodes the pressed keys in the lower 20 bits
+                int mouseXParseLimit = currentRuleset.RulesetInfo.OnlineID == 3 ? (1 << 20) - 1 : Parsing.MAX_COORDINATE_VALUE;
+
                 float diff = Parsing.ParseFloat(split[0]);
-                float mouseX = Parsing.ParseFloat(split[1], Parsing.MAX_COORDINATE_VALUE);
+                float mouseX = Parsing.ParseFloat(split[1], mouseXParseLimit);
                 float mouseY = Parsing.ParseFloat(split[2], Parsing.MAX_COORDINATE_VALUE);
 
                 lastTime += diff;
 
-                if (i < 2 && mouseX == 256 && mouseY == -500)
-                    // at the start of the replay, stable places two replay frames, at time 0 and SkipBoundary - 1, respectively.
-                    // both frames use a position of (256, -500).
-                    // ignore these frames as they serve no real purpose (and can even mislead ruleset-specific handlers - see mania)
-                    continue;
-
-                // Todo: At some point we probably want to rewind and play back the negative-time frames
-                // but for now we'll achieve equal playback to stable by skipping negative frames
-                if (diff < 0)
-                    continue;
-
-                currentFrame = convertFrame(new LegacyReplayFrame(lastTime,
+                legacyFrames.Add(new LegacyReplayFrame(lastTime,
                     mouseX,
                     mouseY,
-                    (ReplayButtonState)Parsing.ParseInt(split[3])), currentFrame);
+                    (ReplayButtonState)Parsing.ParseInt(split[3])));
+            }
 
-                replay.Frames.Add(currentFrame);
+            // https://github.com/peppy/osu-stable-reference/blob/e53980dd76857ee899f66ce519ba1597e7874f28/osu!/GameModes/Play/ReplayWatcher.cs#L62-L67
+            if (legacyFrames.Count >= 2 && legacyFrames[1].Time < legacyFrames[0].Time)
+            {
+                legacyFrames[1].Time = legacyFrames[0].Time;
+                legacyFrames[0].Time = 0;
+            }
+
+            // https://github.com/peppy/osu-stable-reference/blob/e53980dd76857ee899f66ce519ba1597e7874f28/osu!/GameModes/Play/ReplayWatcher.cs#L69-L71
+            if (legacyFrames.Count >= 3 && legacyFrames[0].Time > legacyFrames[2].Time)
+                legacyFrames[0].Time = legacyFrames[1].Time = legacyFrames[2].Time;
+
+            // at the start of the replay, stable places two replay frames, at time 0 and SkipBoundary - 1, respectively.
+            // both frames use a position of (256, -500).
+            // ignore these frames as they serve no real purpose (and can even mislead ruleset-specific handlers - see mania)
+            if (legacyFrames.Count >= 2 && legacyFrames[1].Position == new Vector2(256, -500))
+                legacyFrames.RemoveAt(1);
+
+            if (legacyFrames.Count >= 1 && legacyFrames[0].Position == new Vector2(256, -500))
+                legacyFrames.RemoveAt(0);
+
+            ReplayFrame currentFrame = null;
+
+            foreach (var legacyFrame in legacyFrames)
+            {
+                // never allow backwards time traversal in relation to the current frame.
+                // this handles frames with negative delta.
+                // this doesn't match stable 100% as stable will do something similar to adding an interpolated "intermediate frame"
+                // at the point wherein time flow changes from backwards to forwards, but it'll do for now.
+                if (currentFrame != null && legacyFrame.Time < currentFrame.Time)
+                    continue;
+
+                replay.Frames.Add(currentFrame = convertFrame(legacyFrame, currentFrame));
             }
         }
 
