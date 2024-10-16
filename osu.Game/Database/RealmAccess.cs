@@ -1203,7 +1203,7 @@ namespace osu.Game.Database
                     var keyBindings = migration.NewRealm.All<RealmKeyBinding>();
 
                     var toggleFpsBind = keyBindings.FirstOrDefault(bind => bind.ActionInt == (int)GlobalAction.ToggleFPSDisplay);
-                    if (toggleFpsBind != null && toggleFpsBind.KeyCombination.Keys.SequenceEqual(new[] { InputKey.Control, InputKey.Shift, InputKey.F }))
+                    if (toggleFpsBind != null && toggleFpsBind.KeyCombination.Keys.SequenceEqual(new[] { InputKey.Shift, InputKey.Control, InputKey.F }))
                         migration.NewRealm.Remove(toggleFpsBind);
 
                     break;
