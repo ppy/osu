@@ -12,6 +12,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
     {
         private readonly PlayerSliderBar<double> dimSliderBar;
         private readonly PlayerSliderBar<double> blurSliderBar;
+        private readonly PlayerSliderBar<double> dimColourSliderBar;
         private readonly PlayerSliderBar<float> comboColourNormalisationSliderBar;
         private readonly PlayerCheckbox showStoryboardToggle;
         private readonly PlayerCheckbox beatmapSkinsToggle;
@@ -32,6 +33,11 @@ namespace osu.Game.Screens.Play.PlayerSettings
                     LabelText = GameplaySettingsStrings.BackgroundBlur,
                     DisplayAsPercentage = true
                 },
+                dimColourSliderBar = new PlayerSliderBar<double>
+                {
+                    LabelText = GameplaySettingsStrings.BackgroundColour,
+                    DisplayAsPercentage = true
+                },
                 showStoryboardToggle = new PlayerCheckbox { LabelText = GraphicsSettingsStrings.StoryboardVideo },
                 beatmapSkinsToggle = new PlayerCheckbox { LabelText = SkinSettingsStrings.BeatmapSkins },
                 beatmapColorsToggle = new PlayerCheckbox { LabelText = SkinSettingsStrings.BeatmapColours },
@@ -48,6 +54,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
         {
             dimSliderBar.Current = config.GetBindable<double>(OsuSetting.DimLevel);
             blurSliderBar.Current = config.GetBindable<double>(OsuSetting.BlurLevel);
+            dimColourSliderBar.Current = config.GetBindable<double>(OsuSetting.DimColour);
             showStoryboardToggle.Current = config.GetBindable<bool>(OsuSetting.ShowStoryboard);
             beatmapSkinsToggle.Current = config.GetBindable<bool>(OsuSetting.BeatmapSkins);
             beatmapColorsToggle.Current = config.GetBindable<bool>(OsuSetting.BeatmapColours);
