@@ -34,7 +34,7 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                 },
                 new SettingsSlider<double>
                 {
-                    LabelText = GameplaySettingsStrings.BackgroundColour,
+                    LabelText = GameplaySettingsStrings.BackgroundDimColour,
                     Current = config.GetBindable<double>(OsuSetting.DimColour),
                     KeyboardStep = 0.01f,
                     DisplayAsPercentage = true

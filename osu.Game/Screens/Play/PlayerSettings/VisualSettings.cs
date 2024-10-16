@@ -35,7 +35,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
                 },
                 dimColourSliderBar = new PlayerSliderBar<double>
                 {
-                    LabelText = GameplaySettingsStrings.BackgroundColour,
+                    LabelText = GameplaySettingsStrings.BackgroundDimColour,
                     DisplayAsPercentage = true
                 },
                 showStoryboardToggle = new PlayerCheckbox { LabelText = GraphicsSettingsStrings.StoryboardVideo },
