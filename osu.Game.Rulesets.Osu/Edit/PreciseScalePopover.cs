@@ -70,6 +70,7 @@ namespace osu.Game.Rulesets.Osu.Edit
                             Value = 1,
                             Default = 1,
                         },
+                        KeyboardStep = 0.01f,
                         Instantaneous = true
                     },
                     scaleOrigin = new EditorRadioButtonCollection
