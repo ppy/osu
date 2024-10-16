@@ -87,11 +87,19 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             if (IsInverseScaling.Value)
             {
-                adjustedSize = Math.Clamp((currentComboValue / (SizeAdjustmentSpeed.Value * (maxSize - minSize))) * (maxBound - minBound) + minBound, minBound, maxBound);
+                adjustedSize = Math.Clamp(
+                    ((currentComboValue / (SizeAdjustmentSpeed.Value * (maxSize - minSize))) * (maxBound - minBound)) + minBound,
+                    minBound,
+                    maxBound
+                );
             }
             else
             {
-                adjustedSize = Math.Clamp((1 - (currentComboValue / (SizeAdjustmentSpeed.Value * (maxSize - minSize)))) * (maxBound - minBound) + minBound, minBound, maxBound);
+                adjustedSize = Math.Clamp(
+                    ((1 - (currentComboValue / (SizeAdjustmentSpeed.Value * (maxSize - minSize)))) * (maxBound - minBound)) + minBound,
+                    minBound,
+                    maxBound
+                );
             }
 
             foreach (var entry in playfield.HitObjectContainer.AliveEntries)
