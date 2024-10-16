@@ -4,11 +4,11 @@
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 
-namespace osu.Game.Screens.Edit.Commands
+namespace osu.Game.Screens.Edit.Changes
 {
-    public class SetPathTypeCommand : PropertyChangeCommand<PathControlPoint, PathType?>
+    public class PathControlPointTypeChange : PropertyChange<PathControlPoint, PathType?>
     {
-        public SetPathTypeCommand(PathControlPoint target, PathType? value)
+        public PathControlPointTypeChange(PathControlPoint target, PathType? value)
             : base(target, value)
         {
         }
@@ -16,7 +16,5 @@ namespace osu.Game.Screens.Edit.Commands
         protected override PathType? ReadValue(PathControlPoint target) => target.Type;
 
         protected override void WriteValue(PathControlPoint target, PathType? value) => target.Type = value;
-
-        protected override SetPathTypeCommand CreateInstance(PathControlPoint target, PathType? value) => new SetPathTypeCommand(target, value);
     }
 }

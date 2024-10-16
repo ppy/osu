@@ -10,7 +10,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Objects
 {
-    public class PathControlPoint : IEquatable<PathControlPoint>, IHasMutablePosition
+    public class PathControlPoint : IEquatable<PathControlPoint>
     {
         private Vector2 position;
 
@@ -30,16 +30,6 @@ namespace osu.Game.Rulesets.Objects
                 Changed?.Invoke();
             }
         }
-
-        /// <summary>
-        /// The X component of <see cref="Position"/>.
-        /// </summary>
-        public float X => position.X;
-
-        /// <summary>
-        /// The Y component of <see cref="Position"/>.
-        /// </summary>
-        public float Y => position.Y;
 
         private PathType? type;
 

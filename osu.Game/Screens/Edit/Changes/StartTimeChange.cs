@@ -3,11 +3,11 @@
 
 using osu.Game.Rulesets.Objects;
 
-namespace osu.Game.Screens.Edit.Commands
+namespace osu.Game.Screens.Edit.Changes
 {
-    public class SetStartTimeCommand : PropertyChangeCommand<HitObject, double>
+    public class StartTimeChange : PropertyChange<HitObject, double>
     {
-        public SetStartTimeCommand(HitObject target, double value)
+        public StartTimeChange(HitObject target, double value)
             : base(target, value)
         {
         }
@@ -15,7 +15,5 @@ namespace osu.Game.Screens.Edit.Commands
         protected override double ReadValue(HitObject target) => target.StartTime;
 
         protected override void WriteValue(HitObject target, double value) => target.StartTime = value;
-
-        protected override SetStartTimeCommand CreateInstance(HitObject target, double value) => new SetStartTimeCommand(target, value);
     }
 }

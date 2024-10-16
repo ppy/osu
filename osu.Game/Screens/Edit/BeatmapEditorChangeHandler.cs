@@ -3,7 +3,6 @@
 
 using System.IO;
 using System.Text;
-using osu.Framework.Logging;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Rulesets.Objects;
 
@@ -31,7 +30,6 @@ namespace osu.Game.Screens.Edit
 
         protected override void WriteCurrentStateToStream(MemoryStream stream)
         {
-            Logger.Log("Writing save state");
             using (var sw = new StreamWriter(stream, Encoding.UTF8, 1024, true))
                 new LegacyBeatmapEncoder(editorBeatmap, editorBeatmap.BeatmapSkin).Encode(sw);
         }

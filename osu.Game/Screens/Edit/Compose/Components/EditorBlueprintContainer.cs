@@ -15,7 +15,7 @@ using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
-using osu.Game.Screens.Edit.Commands.Proxies;
+using osu.Game.Screens.Edit.Changes;
 
 namespace osu.Game.Screens.Edit.Compose.Components
 {
@@ -28,7 +28,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         protected EditorBeatmap Beatmap { get; private set; }
 
         [Resolved(canBeNull: true)]
-        private EditorCommandHandler commandHandler { get; set; }
+        private NewBeatmapEditorChangeHandler changeHandler { get; set; }
 
         protected readonly HitObjectComposer Composer;
 
@@ -92,8 +92,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 {
                     Beatmap.PerformOnSelection(obj =>
                     {
-                        obj.AsCommandProxy(commandHandler).SetStartTime(obj.StartTime + offset);
-                        Beatmap.AsCommandProxy(commandHandler).Update(obj);
+                        changeHandler.SafeSubmit(new StartTimeChange(obj, obj.StartTime + offset));
+                        changeHandler.SafeSubmit(new QueueUpdateHitObject(Beatmap, obj));
                     });
                 }
             }
@@ -123,8 +123,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
             base.DragOperationCompleted();
 
             // handle positional change etc.
-            foreach (var blueprint in SelectionHandler.SelectedBlueprints)
-                Beatmap.AsCommandProxy(commandHandler).Update(blueprint.Item);
+            foreach (var blueprint in SelectionBlueprints)
+                changeHandler?.SafeSubmit(new QueueUpdateHitObject(Beatmap, blueprint.Item));
         }
 
         protected override bool OnDoubleClick(DoubleClickEvent e)

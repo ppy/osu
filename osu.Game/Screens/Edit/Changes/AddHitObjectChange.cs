@@ -3,15 +3,15 @@
 
 using osu.Game.Rulesets.Objects;
 
-namespace osu.Game.Screens.Edit.Commands
+namespace osu.Game.Screens.Edit.Changes
 {
-    public class AddHitObjectCommand : IEditorCommand
+    public class AddHitObjectChange : IRevertableChange
     {
         public EditorBeatmap Beatmap;
 
         public HitObject HitObject;
 
-        public AddHitObjectCommand(EditorBeatmap beatmap, HitObject hitObject)
+        public AddHitObjectChange(EditorBeatmap beatmap, HitObject hitObject)
         {
             Beatmap = beatmap;
             HitObject = hitObject;
@@ -19,6 +19,6 @@ namespace osu.Game.Screens.Edit.Commands
 
         public void Apply() => Beatmap.Add(HitObject);
 
-        public IEditorCommand CreateUndo() => new RemoveHitObjectCommand(Beatmap, HitObject);
+        public void Revert() => Beatmap.Remove(HitObject);
     }
 }

@@ -3,11 +3,11 @@
 
 using osu.Game.Rulesets.Objects.Types;
 
-namespace osu.Game.Screens.Edit.Commands
+namespace osu.Game.Screens.Edit.Changes
 {
-    public class SetNewComboCommand : PropertyChangeCommand<IHasComboInformation, bool>
+    public class NewComboChange : PropertyChange<IHasComboInformation, bool>
     {
-        public SetNewComboCommand(IHasComboInformation target, bool value)
+        public NewComboChange(IHasComboInformation target, bool value)
             : base(target, value)
         {
         }
@@ -15,7 +15,5 @@ namespace osu.Game.Screens.Edit.Commands
         protected override bool ReadValue(IHasComboInformation target) => target.NewCombo;
 
         protected override void WriteValue(IHasComboInformation target, bool value) => target.NewCombo = value;
-
-        protected override SetNewComboCommand CreateInstance(IHasComboInformation target, bool value) => new SetNewComboCommand(target, value);
     }
 }

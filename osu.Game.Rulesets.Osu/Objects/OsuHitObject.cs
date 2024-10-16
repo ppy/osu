@@ -14,7 +14,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Objects
 {
-    public abstract class OsuHitObject : HitObject, IHasComboInformation, IHasMutablePosition, IHasTimePreempt
+    public abstract class OsuHitObject : HitObject, IHasComboInformation, IHasPosition, IHasTimePreempt
     {
         /// <summary>
         /// The radius of hit objects (ie. the radius of a <see cref="HitCircle"/>).
@@ -60,7 +60,6 @@ namespace osu.Game.Rulesets.Osu.Objects
         }
 
         public float X => Position.X;
-
         public float Y => Position.Y;
 
         public Vector2 StackedPosition => Position + StackOffset;

@@ -2,13 +2,13 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
-using osu.Game.Screens.Edit.Commands;
+using osu.Game.Screens.Edit.Changes;
 
 namespace osu.Game.Screens.Edit
 {
-    public static class EditorCommandHandlerExtension
+    public static class NewBeatmapEditorChangeHandlerExtension
     {
-        public static void SafeSubmit(this EditorCommandHandler? manager, IEditorCommand command, bool commitImmediately = false)
+        public static void SafeSubmit(this NewBeatmapEditorChangeHandler? manager, IRevertableChange command, bool commitImmediately = false)
         {
             if (manager != null)
                 manager.Submit(command, commitImmediately);
@@ -16,7 +16,7 @@ namespace osu.Game.Screens.Edit
                 command.Apply();
         }
 
-        public static void SafeSubmit(this EditorCommandHandler? manager, IEnumerable<IEditorCommand> commands, bool commitImmediately = false)
+        public static void SafeSubmit(this NewBeatmapEditorChangeHandler? manager, IEnumerable<IRevertableChange> commands, bool commitImmediately = false)
         {
             if (manager != null)
                 manager.Submit(commands, commitImmediately);

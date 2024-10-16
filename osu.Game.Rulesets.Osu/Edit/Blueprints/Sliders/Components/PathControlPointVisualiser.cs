@@ -24,9 +24,10 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
+using osu.Game.Rulesets.Osu.Edit.Changes;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Screens.Edit;
-using osu.Game.Screens.Edit.Commands.Proxies;
+using osu.Game.Screens.Edit.Changes;
 using osuTK;
 using osuTK.Input;
 
@@ -42,8 +43,6 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         private readonly IBindableList<PathControlPoint> controlPoints = new BindableList<PathControlPoint>();
         private readonly T hitObject;
         private readonly bool allowSelection;
-
-        private CommandProxy<T> proxy => hitObject.AsCommandProxy(commandHandler);
 
         private InputManager inputManager;
 
@@ -116,7 +115,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
                 return;
 
             if (segment.Count > 3)
-                first.AsCommandProxy(commandHandler).SetType(PathType.BEZIER);
+                changeHandler.SafeSubmit(new PathControlPointTypeChange(first, PathType.BEZIER));
 
             if (segment.Count != 3)
                 return;
@@ -124,7 +123,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             ReadOnlySpan<Vector2> points = segment.Select(p => p.Position).ToArray();
             RectangleF boundingBox = PathApproximator.CircularArcBoundingBox(points);
             if (boundingBox.Width >= 640 || boundingBox.Height >= 480)
-                first.AsCommandProxy(commandHandler).SetType(PathType.BEZIER);
+                changeHandler.SafeSubmit(new PathControlPointTypeChange(first, PathType.BEZIER));
         }
 
         /// <summary>
@@ -149,9 +148,9 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             if (toRemove.Count == 0)
                 return false;
 
-            commandHandler?.BeginChange();
+            changeHandler?.BeginChange();
             RemoveControlPointsRequested?.Invoke(toRemove);
-            commandHandler?.EndChange();
+            changeHandler?.EndChange();
 
             // Since pieces are re-used, they will not point to the deleted control points while remaining selected
             foreach (var piece in Pieces)
@@ -168,9 +167,9 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             if (controlPointsToSplitAt.Count == 0)
                 return false;
 
-            commandHandler?.BeginChange();
+            changeHandler?.BeginChange();
             SplitControlPointsRequested?.Invoke(controlPointsToSplitAt);
-            commandHandler?.EndChange();
+            changeHandler?.EndChange();
 
             // Since pieces are re-used, they will not point to the deleted control points while remaining selected
             foreach (var piece in Pieces)
@@ -289,7 +288,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
                     if (currentTypeIndex < 0 && e.ShiftPressed)
                         currentTypeIndex = 0;
 
-                    commandHandler?.BeginChange();
+                    changeHandler?.BeginChange();
 
                     do
                     {
@@ -298,7 +297,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
                         updatePathTypeOfSelectedPieces(validTypes[currentTypeIndex]);
                     } while (selectedPoint.Type != validTypes[currentTypeIndex]);
 
-                    commandHandler?.EndChange();
+                    changeHandler?.EndChange();
 
                     return true;
                 }
@@ -354,13 +353,13 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         /// <param name="type">The path type we want to assign to the given control point piece.</param>
         private void updatePathTypeOfSelectedPieces(PathType? type)
         {
-            commandHandler?.BeginChange();
+            changeHandler?.BeginChange();
 
             double originalDistance = hitObject.Path.Distance;
 
             foreach (var p in Pieces.Where(p => p.IsSelected.Value))
             {
-                var pointsInSegment = hitObject.Path.PointsInSegment(p.ControlPoint).AsListCommandProxy(commandHandler);
+                List<PathControlPoint> pointsInSegment = hitObject.Path.PointsInSegment(p.ControlPoint);
                 int indexInSegment = pointsInSegment.IndexOf(p.ControlPoint);
 
                 if (type?.Type == SplineType.PerfectCurve)
@@ -371,21 +370,21 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
                     int thirdPointIndex = indexInSegment + 2;
 
                     if (pointsInSegment.Count > thirdPointIndex + 1)
-                        pointsInSegment[thirdPointIndex].SetType(pointsInSegment[0].Type());
+                        changeHandler.SafeSubmit(new PathControlPointTypeChange(pointsInSegment[thirdPointIndex], pointsInSegment[0].Type));
                 }
 
-                proxy.Path().SetExpectedDistance(null);
-                p.ControlPoint.AsCommandProxy(commandHandler).SetType(type);
+                changeHandler.SafeSubmit(new ExpectedDistanceChange(hitObject.Path, null));
+                changeHandler.SafeSubmit(new PathControlPointTypeChange(p.ControlPoint, type));
             }
 
             EnsureValidPathTypes();
 
             if (hitObject.Path.Distance < originalDistance)
-                proxy.SnapTo(distanceSnapProvider);
+                hitObject.SnapTo(distanceSnapProvider, changeHandler);
             else
-                proxy.Path().SetExpectedDistance(originalDistance);
+                changeHandler.SafeSubmit(new ExpectedDistanceChange(hitObject.Path, originalDistance));
 
-            commandHandler?.EndChange();
+            changeHandler?.EndChange();
         }
 
         #region Drag handling
@@ -406,15 +405,14 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
             Debug.Assert(draggedControlPointIndex >= 0);
 
-            commandHandler?.BeginChange();
+            changeHandler?.BeginChange();
         }
 
         [Resolved(CanBeNull = true)]
-        private EditorCommandHandler commandHandler { get; set; }
+        private NewBeatmapEditorChangeHandler changeHandler { get; set; }
 
         public void DragInProgress(DragEvent e)
         {
-            var controlPointsProxy = proxy.Path().ControlPoints();
             Vector2[] oldControlPoints = hitObject.Path.ControlPoints.Select(cp => cp.Position).ToArray();
             Vector2 oldPosition = hitObject.Position;
             double oldStartTime = hitObject.StartTime;
@@ -427,18 +425,18 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
                 Vector2 movementDelta = Parent!.ToLocalSpace(result?.ScreenSpacePosition ?? newHeadPosition) - hitObject.Position;
 
-                proxy.SetPosition(hitObject.Position + movementDelta);
-                proxy.SetStartTime(result?.Time ?? hitObject.StartTime);
+                changeHandler.SafeSubmit(new PositionChange(hitObject, hitObject.Position + movementDelta));
+                changeHandler.SafeSubmit(new StartTimeChange(hitObject, result?.Time ?? hitObject.StartTime));
 
-                for (int i = 1; i < controlPointsProxy.Count; i++)
+                for (int i = 1; i < hitObject.Path.ControlPoints.Count; i++)
                 {
-                    var controlPointProxy = controlPointsProxy[i];
+                    PathControlPoint controlPoint = hitObject.Path.ControlPoints[i];
                     // Since control points are relative to the position of the hit object, all points that are _not_ selected
                     // need to be offset _back_ by the delta corresponding to the movement of the head point.
                     // All other selected control points (if any) will move together with the head point
                     // (and so they will not move at all, relative to each other).
-                    if (!selectedControlPoints.Contains(controlPointProxy.Target))
-                        controlPointProxy.SetPosition(controlPointProxy.Position() - movementDelta);
+                    if (!selectedControlPoints.Contains(controlPoint))
+                        changeHandler.SafeSubmit(new PathControlPointPositionChange(controlPoint, controlPoint.Position - movementDelta));
                 }
             }
             else
@@ -447,37 +445,37 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
                 Vector2 movementDelta = Parent!.ToLocalSpace(result?.ScreenSpacePosition ?? Parent!.ToScreenSpace(e.MousePosition)) - dragStartPositions[draggedControlPointIndex] - hitObject.Position;
 
-                for (int i = 0; i < controlPointsProxy.Count; ++i)
+                for (int i = 0; i < controlPoints.Count; ++i)
                 {
-                    var controlPointProxy = controlPointsProxy[i];
-                    if (selectedControlPoints.Contains(controlPointProxy.Target))
-                        controlPointProxy.SetPosition(dragStartPositions[i] + movementDelta);
+                    PathControlPoint controlPoint = controlPoints[i];
+                    if (selectedControlPoints.Contains(controlPoint))
+                        changeHandler.SafeSubmit(new PathControlPointPositionChange(controlPoint, dragStartPositions[i] + movementDelta));
                 }
             }
 
             // Snap the path to the current beat divisor before checking length validity.
-            proxy.SnapTo(distanceSnapProvider);
+            hitObject.SnapTo(distanceSnapProvider, changeHandler);
 
             if (!hitObject.Path.HasValidLength)
             {
-                for (int i = 0; i < controlPointsProxy.Count; i++)
-                    controlPointsProxy[i].SetPosition(oldControlPoints[i]);
+                for (int i = 0; i < hitObject.Path.ControlPoints.Count; i++)
+                    changeHandler.SafeSubmit(new PathControlPointPositionChange(hitObject.Path.ControlPoints[i], oldControlPoints[i]));
 
-                proxy.SetPosition(oldPosition);
-                proxy.SetStartTime(oldStartTime);
+                changeHandler.SafeSubmit(new PositionChange(hitObject, oldPosition));
+                changeHandler.SafeSubmit(new StartTimeChange(hitObject, oldStartTime));
                 // Snap the path length again to undo the invalid length.
-                proxy.SnapTo(distanceSnapProvider);
+                hitObject.SnapTo(distanceSnapProvider, changeHandler);
                 return;
             }
 
             // Maintain the path types in case they got defaulted to bezier at some point during the drag.
-            for (int i = 0; i < controlPointsProxy.Count; i++)
-                controlPointsProxy[i].SetType(dragPathTypes[i]);
+            for (int i = 0; i < hitObject.Path.ControlPoints.Count; i++)
+                changeHandler.SafeSubmit(new PathControlPointTypeChange(hitObject.Path.ControlPoints[i], dragPathTypes[i]));
 
             EnsureValidPathTypes();
         }
 
-        public void DragEnded() => commandHandler?.EndChange();
+        public void DragEnded() => changeHandler?.EndChange();
 
         #endregion
 

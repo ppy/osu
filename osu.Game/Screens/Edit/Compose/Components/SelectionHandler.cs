@@ -52,10 +52,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         protected SelectionBox SelectionBox { get; private set; } = null!;
 
         [Resolved(CanBeNull = true)]
-        protected EditorCommandHandler? CommandHandler { get; private set; }
-
-        [Resolved(CanBeNull = true)]
-        protected IEditorChangeHandler? ChangeHandler { get; private set; }
+        protected NewBeatmapEditorChangeHandler? ChangeHandler { get; private set; }
 
         public SelectionRotationHandler RotationHandler { get; private set; } = null!;
 
@@ -108,10 +105,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// </summary>
         protected virtual void OnOperationBegan()
         {
-            if (UseCommandHandler)
-                CommandHandler?.BeginChange();
-            else
-                ChangeHandler?.BeginChange();
+            ChangeHandler?.BeginChange();
         }
 
         /// <summary>
@@ -119,10 +113,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// </summary>
         protected virtual void OnOperationEnded()
         {
-            if (UseCommandHandler)
-                CommandHandler?.EndChange();
-            else
-                ChangeHandler?.EndChange();
+            ChangeHandler?.EndChange();
         }
 
         #region User Input Handling
@@ -187,12 +178,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <returns>Whether any items could be reversed.</returns>
         public virtual bool HandleReverse() => false;
 
-        /// <summary>
-        /// Method to determine whether the handler should use the command handler.
-        /// Temporary until all handlers are converted to use the command handler.
-        /// </summary>
-        protected virtual bool UseCommandHandler => false;
-
         public virtual bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
             if (e.Repeat)
@@ -203,16 +188,16 @@ namespace osu.Game.Screens.Edit.Compose.Components
             switch (e.Action)
             {
                 case GlobalAction.EditorFlipHorizontally:
-                    OnOperationBegan();
+                    ChangeHandler?.BeginChange();
                     handled = HandleFlip(Direction.Horizontal, true);
-                    OnOperationEnded();
+                    ChangeHandler?.EndChange();
 
                     return handled;
 
                 case GlobalAction.EditorFlipVertically:
-                    OnOperationBegan();
+                    ChangeHandler?.BeginChange();
                     handled = HandleFlip(Direction.Vertical, true);
-                    OnOperationEnded();
+                    ChangeHandler?.EndChange();
 
                     return handled;
             }
