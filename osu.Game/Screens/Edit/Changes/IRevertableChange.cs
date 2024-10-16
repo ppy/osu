@@ -9,12 +9,12 @@ namespace osu.Game.Screens.Edit.Changes
     public interface IRevertableChange
     {
         /// <summary>
-        /// Applies this command to the current state.
+        /// Applies this change to the current state.
         /// </summary>
         void Apply();
 
         /// <summary>
-        /// Applies the inverse of this command to the current state.
+        /// Applies the inverse of this change to the current state.
         /// </summary>
         void Revert();
     }
