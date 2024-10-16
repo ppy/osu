@@ -25,8 +25,6 @@ namespace osu.Game.Rulesets.Osu.Edit
 {
     public partial class OsuGridToolboxGroup : EditorToolboxGroup, IKeyBindingHandler<GlobalAction>
     {
-        private static readonly PositionSnapGridType[] grid_types = Enum.GetValues(typeof(PositionSnapGridType)).Cast<PositionSnapGridType>().ToArray();
-
         [Resolved]
         private EditorBeatmap editorBeatmap { get; set; } = null!;
 
