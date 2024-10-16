@@ -52,7 +52,8 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
                 new SettingsCheckbox
                 {
                     LabelText = AudioSettingsStrings.AudioNormalization,
-                    Current = config.GetBindable<bool>(OsuSetting.AudioNormalization)
+                    Current = config.GetBindable<bool>(OsuSetting.AudioNormalization),
+                    Keywords = new []{ "normalization", "normalisation", "normalise" }
                 }
             };
         }
