@@ -571,6 +571,7 @@ namespace osu.Game.Tests.Visual.Background
                 get
                 {
                     Color4 DrawColour = DrawColourInfo.Colour;
+                    float DimLevel = ColouredDimmable.DimLevel;
 
                     return new Color4(
                         DrawColour.R * (1 - DimLevel),
@@ -586,6 +587,8 @@ namespace osu.Game.Tests.Visual.Background
                 get
                 {
                     Color4 DrawColour = DrawColourInfo.Colour;
+                    Color4 DimColour = ColouredDimmable.DimColour;
+                    float DimLevel = ColouredDimmable.DimLevel;
 
                     return new Color4(
                         DrawColour.R * DimColour.R * DimLevel,
