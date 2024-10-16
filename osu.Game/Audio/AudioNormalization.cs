@@ -26,6 +26,11 @@ namespace osu.Game.Audio
         /// </summary>
         public float? IntegratedLoudness { get; init; }
 
+        /// <summary>
+        /// A volume offset that can be applied upon audio to reach <see cref="TARGET_LEVEL"/> (converted from integrated loudness).
+        /// </summary>
+        public double? IntegratedLoudnessInVolumeOffset => IntegratedLoudness != null ? TrackLoudness.ConvertToVolumeOffset(TARGET_LEVEL, (float)IntegratedLoudness) : null;
+
         public AudioNormalization()
         {
         }
@@ -89,10 +94,6 @@ namespace osu.Game.Audio
             }
         }
 
-        /// <summary>
-        /// A volume offset that can be applied upon audio to reach <see cref="TARGET_LEVEL"/> (converted from integrated loudness).
-        /// </summary>
-        public double? IntegratedLoudnessInVolumeOffset => IntegratedLoudness != null ? TrackLoudness.ConvertToVolumeOffset(TARGET_LEVEL, (float)IntegratedLoudness) : null;
 
         /// <inheritdoc />
         public bool Equals(AudioNormalization? other) => other?.IntegratedLoudness != null && IntegratedLoudness != null && Math.Abs((float)(IntegratedLoudness - other.IntegratedLoudness)) < 0.0000001;
