@@ -512,7 +512,7 @@ namespace osu.Game.Tests.Visual.Background
 
             public bool IsBufferedContainerNull => beatmapBackground.IsBufferedContainerNull;
 
-            public Color4 ParentDrawColour => dimmable.ParentDrawColour;
+            public Color4 ParentDrawColour => DrawColourInfo.Colour;
 
             public float CurrentAlpha => dimmable.CurrentAlpha;
 
@@ -534,8 +534,6 @@ namespace osu.Game.Tests.Visual.Background
 
         private partial class TestDimmableBackground : BackgroundScreenBeatmap.DimmableBackground
         {
-            public Color4 ParentDrawColour => Content.Parent.DrawColourInfo.Colour;
-
             public float CurrentAlpha => Content.Alpha;
 
             public new float DimLevel => base.DimLevel;
