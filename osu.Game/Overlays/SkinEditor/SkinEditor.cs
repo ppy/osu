@@ -361,7 +361,7 @@ namespace osu.Game.Overlays.SkinEditor
 
             componentsSidebar.Children = new[]
             {
-                new EditorSidebarSection("Current working layer")
+                new EditorSidebarSection(SkinEditorStrings.CurrentWorkingLayer)
                 {
                     Children = new Drawable[]
                     {
