@@ -55,6 +55,7 @@ namespace osu.Game.Rulesets.Osu.Edit
                             MaxValue = 360,
                             Precision = 1
                         },
+                        KeyboardStep = 1f,
                         Instantaneous = true
                     },
                     rotationOrigin = new EditorRadioButtonCollection
