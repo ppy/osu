@@ -353,9 +353,10 @@ namespace osu.Game.Overlays.SkinEditor
                 return;
             }
 
-            changeHandler = new SkinEditorChangeHandler(skinComponentsContainer);
-            changeHandler.CanUndo.BindValueChanged(v => undoMenuItem.Action.Disabled = !v.NewValue, true);
-            changeHandler.CanRedo.BindValueChanged(v => redoMenuItem.Action.Disabled = !v.NewValue, true);
+            if (skinComponentsContainer.IsLoaded)
+                bindChangeHandler(skinComponentsContainer);
+            else
+                skinComponentsContainer.OnLoadComplete += d => Schedule(() => bindChangeHandler((SkinnableContainer)d));
 
             content.Child = new SkinBlueprintContainer(skinComponentsContainer);
 
@@ -396,6 +397,13 @@ namespace osu.Game.Overlays.SkinEditor
 
                 SelectedComponents.Clear();
                 placeComponent(component);
+            }
+
+            void bindChangeHandler(SkinnableContainer skinnableContainer)
+            {
+                changeHandler = new SkinEditorChangeHandler(skinnableContainer);
+                changeHandler.CanUndo.BindValueChanged(v => undoMenuItem.Action.Disabled = !v.NewValue, true);
+                changeHandler.CanRedo.BindValueChanged(v => redoMenuItem.Action.Disabled = !v.NewValue, true);
             }
         }
 
