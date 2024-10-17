@@ -21,7 +21,6 @@ using osu.Game.Localisation;
 using osu.Game.Localisation.SkinComponents;
 using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets;
-using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Utils;
 
@@ -225,9 +224,7 @@ namespace osu.Game.Skinning.Components
                     return (starDifficulty?.Stars ?? 0).ToLocalisableString(@"F2");
 
                 case BeatmapAttribute.MaxPP:
-                    return difficultyBindable?.Value?.PerformanceAttributes is PerformanceAttributes attributes
-                        ? attributes.Total.ToLocalisableString(@"F2")
-                        : @"...";
+                    return (starDifficulty?.PerformanceAttributes?.Total ?? 0).ToLocalisableString(@"F2");
 
                 default:
                     throw new ArgumentOutOfRangeException();
