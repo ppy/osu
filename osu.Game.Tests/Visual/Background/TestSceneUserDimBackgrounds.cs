@@ -370,12 +370,12 @@ namespace osu.Game.Tests.Visual.Background
 
             public bool IsBackgroundDimmed()
             {
-                Color4 ContentDrawColour = background.ContentDrawColour;
+                Color4 ParentDrawColour = background.ParentDrawColour;
                 Color4 TargetColour = new Color4(
-                    ContentDrawColour.R * (1f - background.CurrentDim),
-                    ContentDrawColour.G * (1f - background.CurrentDim),
-                    ContentDrawColour.B * (1f - background.CurrentDim),
-                    ContentDrawColour.A
+                    ParentDrawColour.R * (1f - background.CurrentDim),
+                    ParentDrawColour.G * (1f - background.CurrentDim),
+                    ParentDrawColour.B * (1f - background.CurrentDim),
+                    ParentDrawColour.A
                 );
 
                 return background.CurrentColour == TargetColour;
@@ -386,11 +386,11 @@ namespace osu.Game.Tests.Visual.Background
             public bool IsBackgroundColourOffset()
             {
                 Color4 CurrentDimColour = background.CurrentDimColour;
-                Color4 ContentDrawColour = background.ContentDrawColour;
+                Color4 ParentDrawColour = background.ParentDrawColour;
                 Color4 TargetColourOffset = new Color4(
-                    ContentDrawColour.R * CurrentDimColour.R * background.CurrentDim,
-                    ContentDrawColour.G * CurrentDimColour.G * background.CurrentDim,
-                    ContentDrawColour.B * CurrentDimColour.B * background.CurrentDim,
+                    ParentDrawColour.R * CurrentDimColour.R * background.CurrentDim,
+                    ParentDrawColour.G * CurrentDimColour.G * background.CurrentDim,
+                    ParentDrawColour.B * CurrentDimColour.B * background.CurrentDim,
                     1
                 );
 
