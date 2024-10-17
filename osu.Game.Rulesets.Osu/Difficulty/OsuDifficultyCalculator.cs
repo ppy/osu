@@ -25,7 +25,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         public const double DIFFICULTY_MULTIPLIER = 0.0668;
         public const double SUM_POWER = 1.1;
         public const double FL_SUM_POWER = 1.5;
-        public override int Version => 20220902;
+        public override int Version => 20241007;
 
         public OsuDifficultyCalculator(IRulesetInfo ruleset, IWorkingBeatmap beatmap)
             : base(ruleset, beatmap)

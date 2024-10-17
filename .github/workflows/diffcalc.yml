@@ -273,22 +273,23 @@ jobs:
 
           echo "TARGET_DIR=${{ needs.directory.outputs.GENERATOR_DIR }}/sql/${ruleset}" >> "${GITHUB_OUTPUT}"
           echo "DATA_NAME=${performance_data_name}" >> "${GITHUB_OUTPUT}"
+          echo "DATA_PKG=${performance_data_name}.tar.bz2" >> "${GITHUB_OUTPUT}"
 
       - name: Restore cache
         id: restore-cache
         uses: maxnowack/local-cache@720e69c948191660a90aa1cf6a42fc4d2dacdf30 # v2
         with:
-          path: ${{ steps.query.outputs.DATA_NAME }}.tar.bz2
+          path: ${{ steps.query.outputs.DATA_PKG }}
           key: ${{ steps.query.outputs.DATA_NAME }}
 
       - name: Download
         if: steps.restore-cache.outputs.cache-hit != 'true'
         run: |
-          wget -q -nc "https://data.ppy.sh/${{ steps.query.outputs.DATA_NAME }}.tar.bz2"
+          wget -q -O "${{ steps.query.outputs.DATA_PKG }}" "https://data.ppy.sh/${{ steps.query.outputs.DATA_PKG }}"
 
       - name: Extract
         run: |
-          tar -I lbzip2 -xf "${{ steps.query.outputs.DATA_NAME }}.tar.bz2"
+          tar -I lbzip2 -xf "${{ steps.query.outputs.DATA_PKG }}"
           rm -r "${{ steps.query.outputs.TARGET_DIR }}"
           mv "${{ steps.query.outputs.DATA_NAME }}" "${{ steps.query.outputs.TARGET_DIR }}"
 
@@ -304,22 +305,23 @@ jobs:
 
           echo "TARGET_DIR=${{ needs.directory.outputs.GENERATOR_DIR }}/beatmaps" >> "${GITHUB_OUTPUT}"
           echo "DATA_NAME=${beatmaps_data_name}" >> "${GITHUB_OUTPUT}"
+          echo "DATA_PKG=${beatmaps_data_name}.tar.bz2" >> "${GITHUB_OUTPUT}"
 
       - name: Restore cache
         id: restore-cache
         uses: maxnowack/local-cache@720e69c948191660a90aa1cf6a42fc4d2dacdf30 # v2
         with:
-          path: ${{ steps.query.outputs.DATA_NAME }}.tar.bz2
+          path: ${{ steps.query.outputs.DATA_PKG }}
           key: ${{ steps.query.outputs.DATA_NAME }}
 
       - name: Download
         if: steps.restore-cache.outputs.cache-hit != 'true'
         run: |
-          wget -q -nc "https://data.ppy.sh/${{ steps.query.outputs.DATA_NAME }}.tar.bz2"
+          wget -q -O "${{ steps.query.outputs.DATA_PKG }}" "https://data.ppy.sh/${{ steps.query.outputs.DATA_PKG }}"
 
       - name: Extract
         run: |
-          tar -I lbzip2 -xf "${{ steps.query.outputs.DATA_NAME }}.tar.bz2"
+          tar -I lbzip2 -xf "${{ steps.query.outputs.DATA_PKG }}"
           rm -r "${{ steps.query.outputs.TARGET_DIR }}"
           mv "${{ steps.query.outputs.DATA_NAME }}" "${{ steps.query.outputs.TARGET_DIR }}"
 
@@ -339,9 +341,12 @@ jobs:
           sed -i 's/^GH_TOKEN=.*$/GH_TOKEN=${{ github.token }}/' "${{ needs.directory.outputs.GENERATOR_ENV }}"
 
           cd "${{ needs.directory.outputs.GENERATOR_DIR }}"
-          docker-compose up --build generator
 
-          link=$(docker-compose logs generator -n 10 | grep 'http' | sed -E 's/^.*(http.*)$/\1/')
+          docker compose up --build --detach
+          docker compose logs --follow &
+          docker compose wait generator
+
+          link=$(docker compose logs --tail 10 generator | grep 'http' | sed -E 's/^.*(http.*)$/\1/')
           target=$(cat "${{ needs.directory.outputs.GENERATOR_ENV }}" | grep -E '^OSU_B=' | cut -d '=' -f2-)
 
           echo "TARGET=${target}" >> "${GITHUB_OUTPUT}"
@@ -351,7 +356,7 @@ jobs:
         if: ${{ always() }}
         run: |
           cd "${{ needs.directory.outputs.GENERATOR_DIR }}"
-          docker-compose down -v
+          docker compose down --volumes
 
   output-cli:
     name: Output info
