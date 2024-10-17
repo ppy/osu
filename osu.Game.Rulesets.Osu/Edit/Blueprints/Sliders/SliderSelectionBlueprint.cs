@@ -178,6 +178,9 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         {
             base.OnDeselected();
 
+            if (placementControlPoint != null)
+                endControlPointPlacement();
+
             updateVisualDefinition();
             BodyPiece.RecyclePath();
         }
@@ -377,13 +380,16 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         protected override void OnMouseUp(MouseUpEvent e)
         {
             if (placementControlPoint != null)
-            {
-                if (IsDragged)
-                    ControlPointVisualiser?.DragEnded();
+                endControlPointPlacement();
+        }
 
-                placementControlPoint = null;
-                changeHandler?.EndChange();
-            }
+        private void endControlPointPlacement()
+        {
+            if (IsDragged)
+                ControlPointVisualiser?.DragEnded();
+
+            placementControlPoint = null;
+            changeHandler?.EndChange();
         }
 
         protected override bool OnKeyDown(KeyDownEvent e)
