@@ -22,7 +22,7 @@
     <PackageReference Include="DiffPlex" Version="1.7.2" />
     <PackageReference Include="HtmlAgilityPack" Version="1.11.59" />
     <PackageReference Include="Humanizer" Version="2.14.1" />
-    <PackageReference Include="MessagePack" Version="2.5.140" />
+    <PackageReference Include="MessagePack" Version="2.5.187" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="7.0.15" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Protocols.MessagePack" Version="7.0.15" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Protocols.NewtonsoftJson" Version="7.0.15" />
