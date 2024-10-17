@@ -92,8 +92,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 {
                     Beatmap.PerformOnSelection(obj =>
                     {
-                        changeHandler.SafeSubmit(new StartTimeChange(obj, obj.StartTime + offset));
-                        changeHandler.SafeSubmit(new QueueUpdateHitObject(Beatmap, obj));
+                        new StartTimeChange(obj, obj.StartTime + offset).Submit(changeHandler);
+                        new QueueUpdateHitObject(Beatmap, obj).Submit(changeHandler);
                     });
                 }
             }
@@ -124,7 +124,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
             // handle positional change etc.
             foreach (var blueprint in SelectionBlueprints)
-                changeHandler.SafeSubmit(new QueueUpdateHitObject(Beatmap, blueprint.Item));
+                new QueueUpdateHitObject(Beatmap, blueprint.Item).Submit(changeHandler);
         }
 
         protected override bool OnDoubleClick(DoubleClickEvent e)

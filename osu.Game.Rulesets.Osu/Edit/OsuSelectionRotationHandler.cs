@@ -80,7 +80,7 @@ namespace osu.Game.Rulesets.Osu.Edit
 
             foreach (var ho in objectsInRotation)
             {
-                changeHandler.SafeSubmit(new PositionChange(ho, GeometryUtils.RotatePointAroundOrigin(originalPositions[ho], actualOrigin, rotation)));
+                new PositionChange(ho, GeometryUtils.RotatePointAroundOrigin(originalPositions[ho], actualOrigin, rotation)).Submit(changeHandler);
 
                 if (ho is IHasPath withPath)
                 {
@@ -88,9 +88,8 @@ namespace osu.Game.Rulesets.Osu.Edit
 
                     for (int i = 0; i < withPath.Path.ControlPoints.Count; ++i)
                     {
-                        changeHandler.SafeSubmit(new PathControlPointPositionChange(withPath.Path.ControlPoints[i],
-                            GeometryUtils.RotatePointAroundOrigin(originalPath[i], Vector2.Zero, rotation))
-                        );
+                        new PathControlPointPositionChange(withPath.Path.ControlPoints[i],
+                            GeometryUtils.RotatePointAroundOrigin(originalPath[i], Vector2.Zero, rotation)).Submit(changeHandler);
                     }
                 }
             }
