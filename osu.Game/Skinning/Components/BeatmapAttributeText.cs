@@ -51,6 +51,7 @@ namespace osu.Game.Skinning.Components
         private IBindable<StarDifficulty?>? difficultyBindable;
         private CancellationTokenSource? difficultyCancellationSource;
         private ModSettingChangeTracker? modSettingTracker;
+        private StarDifficulty? starDifficulty;
 
         public BeatmapAttributeText()
         {
@@ -80,7 +81,11 @@ namespace osu.Game.Skinning.Components
 
                 difficultyBindable?.UnbindAll();
                 difficultyBindable = difficultyCache.GetBindableDifficulty(b.NewValue.BeatmapInfo, difficultyCancellationSource.Token);
-                difficultyBindable.BindValueChanged(_ => updateText());
+                difficultyBindable.BindValueChanged(d =>
+                {
+                    starDifficulty = d.NewValue;
+                    updateText();
+                });
 
                 updateText();
             }, true);
@@ -213,9 +218,7 @@ namespace osu.Game.Skinning.Components
                     return computeDifficulty().ApproachRate.ToLocalisableString(@"F2");
 
                 case BeatmapAttribute.StarRating:
-                    return difficultyBindable?.Value is StarDifficulty starDifficulty
-                        ? starDifficulty.Stars.ToLocalisableString(@"F2")
-                        : @"...";
+                    return (starDifficulty?.Stars ?? 0).ToLocalisableString(@"F2");
 
                 default:
                     throw new ArgumentOutOfRangeException();
