@@ -173,7 +173,7 @@ namespace osu.Game.Rulesets.Osu.Edit
 
                 if (!Precision.AlmostEquals(flippedPosition, h.Position))
                 {
-                    changeHandler?.SafeSubmit(new PositionChange(h, flippedPosition));
+                    changeHandler.SafeSubmit(new PositionChange(h, flippedPosition));
                     didFlip = true;
                 }
 
@@ -182,7 +182,7 @@ namespace osu.Game.Rulesets.Osu.Edit
                     didFlip = true;
 
                     foreach (var cp in slider.Path.ControlPoints)
-                        changeHandler?.SafeSubmit(new PathControlPointPositionChange(cp, GeometryUtils.GetFlippedPosition(flipAxis, controlPointFlipQuad, cp.Position)));
+                        changeHandler.SafeSubmit(new PathControlPointPositionChange(cp, GeometryUtils.GetFlippedPosition(flipAxis, controlPointFlipQuad, cp.Position)));
                 }
             }
 
@@ -212,7 +212,7 @@ namespace osu.Game.Rulesets.Osu.Edit
                 delta.Y -= quad.BottomRight.Y - DrawHeight;
 
             foreach (var h in hitObjects)
-                changeHandler?.SafeSubmit(new PositionChange(h, h.Position + delta));
+                changeHandler.SafeSubmit(new PositionChange(h, h.Position + delta));
         }
 
         /// <summary>

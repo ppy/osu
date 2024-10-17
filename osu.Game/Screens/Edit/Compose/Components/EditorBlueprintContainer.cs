@@ -124,7 +124,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
             // handle positional change etc.
             foreach (var blueprint in SelectionBlueprints)
-                changeHandler?.SafeSubmit(new QueueUpdateHitObject(Beatmap, blueprint.Item));
+                changeHandler.SafeSubmit(new QueueUpdateHitObject(Beatmap, blueprint.Item));
         }
 
         protected override bool OnDoubleClick(DoubleClickEvent e)
