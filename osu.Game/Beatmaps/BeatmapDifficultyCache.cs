@@ -21,7 +21,6 @@ using osu.Game.Database;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Scoring;
@@ -245,11 +244,35 @@ namespace osu.Game.Beatmaps
                 var ruleset = rulesetInfo.CreateInstance();
                 Debug.Assert(ruleset != null);
 
-                PlayableCachedWorkingBeatmap working = new PlayableCachedWorkingBeatmap(beatmapManager.GetWorkingBeatmap(key.BeatmapInfo));
+                PlayableCachedWorkingBeatmap workingBeatmap = new PlayableCachedWorkingBeatmap(beatmapManager.GetWorkingBeatmap(key.BeatmapInfo));
+                IBeatmap playableBeatmap = workingBeatmap.GetPlayableBeatmap(ruleset.RulesetInfo, key.OrderedMods, cancellationToken);
 
-                var difficulty = ruleset.CreateDifficultyCalculator(working).Calculate(key.OrderedMods, cancellationToken);
+                var difficulty = ruleset.CreateDifficultyCalculator(workingBeatmap).Calculate(key.OrderedMods, cancellationToken);
                 cancellationToken.ThrowIfCancellationRequested();
-                var performance = computeMaxPerformance(working, key.BeatmapInfo, ruleset, key.OrderedMods, difficulty);
+
+                var performanceCalculator = ruleset.CreatePerformanceCalculator();
+                if (performanceCalculator == null)
+                    return new StarDifficulty(difficulty, new PerformanceAttributes());
+
+                ScoreProcessor scoreProcessor = ruleset.CreateScoreProcessor();
+                scoreProcessor.Mods.Value = key.OrderedMods;
+                scoreProcessor.ApplyBeatmap(playableBeatmap);
+                cancellationToken.ThrowIfCancellationRequested();
+
+                ScoreInfo perfectScore = new ScoreInfo(key.BeatmapInfo, ruleset.RulesetInfo)
+                {
+                    Passed = true,
+                    Accuracy = 1,
+                    Mods = key.OrderedMods,
+                    MaxCombo = scoreProcessor.MaximumCombo,
+                    Combo = scoreProcessor.MaximumCombo,
+                    TotalScore = scoreProcessor.MaximumTotalScore,
+                    Statistics = scoreProcessor.MaximumStatistics,
+                    MaximumStatistics = scoreProcessor.MaximumStatistics
+                };
+
+                var performance = performanceCalculator.Calculate(perfectScore, difficulty);
+                cancellationToken.ThrowIfCancellationRequested();
 
                 return new StarDifficulty(difficulty, performance);
             }
@@ -270,60 +293,6 @@ namespace osu.Game.Beatmaps
                 Logger.Error(unknownException, "Failed to calculate beatmap difficulty");
 
                 return null;
-            }
-        }
-
-        private static PerformanceAttributes computeMaxPerformance(IWorkingBeatmap working, BeatmapInfo beatmap, Ruleset ruleset, Mod[] mods, DifficultyAttributes attributes)
-        {
-            var performanceCalculator = ruleset.CreatePerformanceCalculator();
-            if (performanceCalculator == null)
-                return new PerformanceAttributes();
-
-            IBeatmap playableBeatmap = working.GetPlayableBeatmap(ruleset.RulesetInfo, mods);
-
-            // create statistics assuming all hit objects have perfect hit result
-            var statistics = playableBeatmap.HitObjects
-                                            .SelectMany(getPerfectHitResults)
-                                            .GroupBy(hr => hr, (hr, list) => (hitResult: hr, count: list.Count()))
-                                            .ToDictionary(pair => pair.hitResult, pair => pair.count);
-
-            // compute maximum total score
-            ScoreProcessor scoreProcessor = ruleset.CreateScoreProcessor();
-            scoreProcessor.Mods.Value = mods;
-            scoreProcessor.ApplyBeatmap(playableBeatmap);
-            long maxScore = scoreProcessor.MaximumTotalScore;
-
-            // todo: Get max combo from difficulty calculator instead when diffcalc properly supports lazer-first scores
-            int maxCombo = calculateMaxCombo(playableBeatmap);
-
-            // compute maximum rank - default to SS, then adjust the rank with mods
-            ScoreRank maxRank = ScoreRank.X;
-            foreach (IApplicableToScoreProcessor mod in mods.OfType<IApplicableToScoreProcessor>())
-                maxRank = mod.AdjustRank(maxRank, 1);
-
-            ScoreInfo perfectScore = new ScoreInfo(beatmap, ruleset.RulesetInfo)
-            {
-                Accuracy = 1,
-                Passed = true,
-                MaxCombo = maxCombo,
-                Combo = maxCombo,
-                Mods = mods,
-                TotalScore = maxScore,
-                Statistics = statistics,
-                MaximumStatistics = statistics
-            };
-
-            return performanceCalculator.Calculate(perfectScore, attributes);
-
-            static int calculateMaxCombo(IBeatmap beatmap)
-                => beatmap.HitObjects.SelectMany(getPerfectHitResults).Count(r => r.AffectsCombo());
-
-            static IEnumerable<HitResult> getPerfectHitResults(HitObject hitObject)
-            {
-                foreach (HitObject nested in hitObject.NestedHitObjects)
-                    yield return nested.Judgement.MaxResult;
-
-                yield return hitObject.Judgement.MaxResult;
             }
         }
 
