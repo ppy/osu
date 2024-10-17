@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
@@ -19,6 +20,9 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Localisation;
 using osu.Game.Localisation.SkinComponents;
 using osu.Game.Resources.Localisation.Web;
+using osu.Game.Rulesets;
+using osu.Game.Rulesets.Mods;
+using osu.Game.Utils;
 
 namespace osu.Game.Skinning.Components
 {
@@ -33,6 +37,12 @@ namespace osu.Game.Skinning.Components
 
         [Resolved]
         private IBindable<WorkingBeatmap> beatmap { get; set; } = null!;
+
+        [Resolved]
+        private IBindable<IReadOnlyList<Mod>> mods { get; set; } = null!;
+
+        [Resolved]
+        private IBindable<RulesetInfo> ruleset { get; set; } = null!;
 
         [Resolved]
         private BeatmapDifficultyCache difficultyCache { get; set; } = null!;
@@ -73,6 +83,9 @@ namespace osu.Game.Skinning.Components
 
                 updateText();
             }, true);
+
+            mods.BindValueChanged(_ => updateText());
+            ruleset.BindValueChanged(_ => updateText());
 
             updateText();
         }
@@ -177,16 +190,16 @@ namespace osu.Game.Skinning.Components
                     return beatmap.Value.BeatmapInfo.BPM.ToLocalisableString(@"F2");
 
                 case BeatmapAttribute.CircleSize:
-                    return ((double)beatmap.Value.BeatmapInfo.Difficulty.CircleSize).ToLocalisableString(@"F2");
+                    return computeDifficulty().CircleSize.ToLocalisableString(@"F2");
 
                 case BeatmapAttribute.HPDrain:
-                    return ((double)beatmap.Value.BeatmapInfo.Difficulty.DrainRate).ToLocalisableString(@"F2");
+                    return computeDifficulty().DrainRate.ToLocalisableString(@"F2");
 
                 case BeatmapAttribute.Accuracy:
-                    return ((double)beatmap.Value.BeatmapInfo.Difficulty.OverallDifficulty).ToLocalisableString(@"F2");
+                    return computeDifficulty().OverallDifficulty.ToLocalisableString(@"F2");
 
                 case BeatmapAttribute.ApproachRate:
-                    return ((double)beatmap.Value.BeatmapInfo.Difficulty.ApproachRate).ToLocalisableString(@"F2");
+                    return computeDifficulty().ApproachRate.ToLocalisableString(@"F2");
 
                 case BeatmapAttribute.StarRating:
                     return difficultyBindable?.Value is StarDifficulty starDifficulty
@@ -195,6 +208,22 @@ namespace osu.Game.Skinning.Components
 
                 default:
                     throw new ArgumentOutOfRangeException();
+            }
+
+            BeatmapDifficulty computeDifficulty()
+            {
+                BeatmapDifficulty difficulty = new BeatmapDifficulty(beatmap.Value.BeatmapInfo.Difficulty);
+
+                foreach (var mod in mods.Value.OfType<IApplicableToDifficulty>())
+                    mod.ApplyToDifficulty(difficulty);
+
+                if (ruleset.Value is RulesetInfo rulesetInfo)
+                {
+                    double rate = ModUtils.CalculateRateWithMods(mods.Value);
+                    difficulty = rulesetInfo.CreateInstance().GetRateAdjustedDisplayDifficulty(difficulty, rate);
+                }
+
+                return difficulty;
             }
         }
 
