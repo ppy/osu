@@ -50,6 +50,7 @@ namespace osu.Game.Skinning.Components
         private readonly OsuSpriteText text;
         private IBindable<StarDifficulty?>? difficultyBindable;
         private CancellationTokenSource? difficultyCancellationSource;
+        private ModSettingChangeTracker? modSettingTracker;
 
         public BeatmapAttributeText()
         {
@@ -84,7 +85,17 @@ namespace osu.Game.Skinning.Components
                 updateText();
             }, true);
 
-            mods.BindValueChanged(_ => updateText());
+            mods.BindValueChanged(m =>
+            {
+                modSettingTracker?.Dispose();
+                modSettingTracker = new ModSettingChangeTracker(m.NewValue)
+                {
+                    SettingChanged = _ => updateText()
+                };
+
+                updateText();
+            }, true);
+
             ruleset.BindValueChanged(_ => updateText());
 
             updateText();
