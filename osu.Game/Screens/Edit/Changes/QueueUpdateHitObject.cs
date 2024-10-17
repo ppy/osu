@@ -9,7 +9,7 @@ namespace osu.Game.Screens.Edit.Changes
     /// Queues the update of a <see cref="HitObject"/> in an <see cref="EditorBeatmap"/> for undo/redo.
     /// The order of the updates in the transaction does not matter, because the updates are aggregated and applied on the next frame.
     /// </summary>
-    public class QueueUpdateHitObject : IRevertableChange
+    public class QueueUpdateHitObject : IRevertibleChange
     {
         public EditorBeatmap? Beatmap;
 

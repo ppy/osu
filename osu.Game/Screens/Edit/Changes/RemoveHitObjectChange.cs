@@ -5,7 +5,7 @@ using osu.Game.Rulesets.Objects;
 
 namespace osu.Game.Screens.Edit.Changes
 {
-    public class RemoveHitObjectChange : IRevertableChange
+    public class RemoveHitObjectChange : IRevertibleChange
     {
         public EditorBeatmap Beatmap;
 

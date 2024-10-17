@@ -6,7 +6,7 @@ using osu.Game.Rulesets.Objects;
 
 namespace osu.Game.Screens.Edit.Changes
 {
-    public class RemovePathControlPointChange : IRevertableChange
+    public class RemovePathControlPointChange : IRevertibleChange
     {
         public readonly IList<PathControlPoint> Target;
 

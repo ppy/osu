@@ -6,7 +6,7 @@ namespace osu.Game.Screens.Edit.Changes
     /// <summary>
     /// Represents a change which can be undone.
     /// </summary>
-    public interface IRevertableChange
+    public interface IRevertibleChange
     {
         /// <summary>
         /// Applies this change to the current state.
@@ -17,5 +17,16 @@ namespace osu.Game.Screens.Edit.Changes
         /// Applies the inverse of this change to the current state.
         /// </summary>
         void Revert();
+    }
+
+    public static class IRevertibleChangeExtension
+    {
+        public static void Submit(this IRevertibleChange change, NewBeatmapEditorChangeHandler? changeHandler, bool commitImmediately = false)
+        {
+            if (changeHandler != null)
+                changeHandler.Submit(change, commitImmediately);
+            else
+                change.Apply();
+        }
     }
 }

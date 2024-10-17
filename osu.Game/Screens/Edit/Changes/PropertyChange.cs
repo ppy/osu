@@ -8,7 +8,7 @@ namespace osu.Game.Screens.Edit.Changes
     /// </summary>
     /// <typeparam name="TTarget">Type of the object owning the property</typeparam>
     /// <typeparam name="TValue">Type of the property to update</typeparam>
-    public abstract class PropertyChange<TTarget, TValue> : IRevertableChange where TTarget : class
+    public abstract class PropertyChange<TTarget, TValue> : IRevertibleChange where TTarget : class
     {
         /// <summary>
         /// Reads the current value of the property from the target.

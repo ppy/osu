@@ -7,7 +7,7 @@ namespace osu.Game.Screens.Edit
 {
     public static class NewBeatmapEditorChangeHandlerExtension
     {
-        public static void SafeSubmit(this NewBeatmapEditorChangeHandler? manager, IRevertableChange command, bool commitImmediately = false)
+        public static void SafeSubmit(this NewBeatmapEditorChangeHandler? manager, IRevertibleChange command, bool commitImmediately = false)
         {
             if (manager != null)
                 manager.Submit(command, commitImmediately);

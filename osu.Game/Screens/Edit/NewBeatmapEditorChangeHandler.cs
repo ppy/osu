@@ -42,7 +42,7 @@ namespace osu.Game.Screens.Edit
         /// </summary>
         /// <param name="change">Change to be applied.</param>
         /// <param name="commitImmediately">Whether to commit the current transaction and push it onto the undo stack immediately.</param>
-        public void Submit(IRevertableChange change, bool commitImmediately = false)
+        public void Submit(IRevertibleChange change, bool commitImmediately = false)
         {
             change.Apply();
             record(change);
@@ -56,7 +56,7 @@ namespace osu.Game.Screens.Edit
         /// </summary>
         /// <param name="changes">Changes to be applied.</param>
         /// <param name="commitImmediately">Whether to commit the current transaction and push it onto the undo stack immediately.</param>
-        public void Submit(IEnumerable<IRevertableChange> changes, bool commitImmediately = false)
+        public void Submit(IEnumerable<IRevertibleChange> changes, bool commitImmediately = false)
         {
             foreach (var change in changes)
                 Submit(change);
@@ -156,7 +156,7 @@ namespace osu.Game.Screens.Edit
             CanRedo.Value = redoStack.Count > 0;
         }
 
-        private void record(IRevertableChange change)
+        private void record(IRevertibleChange change)
         {
             currentTransaction.Add(change);
         }
@@ -165,18 +165,18 @@ namespace osu.Game.Screens.Edit
         {
             public Transaction()
             {
-                undoChanges = new List<IRevertableChange>();
+                undoChanges = new List<IRevertibleChange>();
             }
 
-            private readonly List<IRevertableChange> undoChanges;
+            private readonly List<IRevertibleChange> undoChanges;
 
             /// <summary>
             /// The changes to undo the given transaction.
             /// Stored in reverse order of original changes to match execution order when undoing.
             /// </summary>
-            public IReadOnlyList<IRevertableChange> UndoChanges => undoChanges;
+            public IReadOnlyList<IRevertibleChange> UndoChanges => undoChanges;
 
-            public void Add(IRevertableChange change)
+            public void Add(IRevertibleChange change)
             {
                 undoChanges.Add(change);
             }
