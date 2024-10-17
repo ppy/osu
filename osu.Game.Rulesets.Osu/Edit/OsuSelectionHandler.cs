@@ -15,8 +15,11 @@ using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Beatmaps;
+using osu.Game.Rulesets.Osu.Edit.Changes;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.UI;
+using osu.Game.Screens.Edit;
+using osu.Game.Screens.Edit.Changes;
 using osu.Game.Screens.Edit.Compose.Components;
 using osu.Game.Utils;
 using osuTK;
@@ -51,6 +54,9 @@ namespace osu.Game.Rulesets.Osu.Edit
             return false;
         }
 
+        [Resolved(canBeNull: true)]
+        private NewBeatmapEditorChangeHandler? changeHandler { get; set; }
+
         public override bool HandleMovement(MoveSelectionEvent<HitObject> moveEvent)
         {
             var hitObjects = selectedMovableObjects;
@@ -72,7 +78,7 @@ namespace osu.Game.Rulesets.Osu.Edit
 
             // this will potentially move the selection out of bounds...
             foreach (var h in hitObjects)
-                h.Position += localDelta;
+                new PositionChange(h, h.Position + localDelta).Submit(changeHandler);
 
             // but this will be corrected.
             moveSelectionInBounds();
@@ -105,12 +111,12 @@ namespace osu.Game.Rulesets.Osu.Edit
             foreach (var h in hitObjects)
             {
                 if (moreThanOneObject)
-                    h.StartTime = endTime - (h.GetEndTime() - startTime);
+                    new StartTimeChange(h, endTime - (h.GetEndTime() - startTime)).Submit(changeHandler);
 
                 if (h is Slider slider)
                 {
-                    slider.Path.Reverse(out Vector2 offset);
-                    slider.Position += offset;
+                    slider.Path.Reverse(out Vector2 offset, changeHandler);
+                    new PositionChange(slider, slider.Position + offset).Submit(changeHandler);
                 }
             }
 
@@ -118,7 +124,7 @@ namespace osu.Game.Rulesets.Osu.Edit
             hitObjects = hitObjects.OrderBy(obj => obj.StartTime).ToList();
 
             for (int i = 0; i < hitObjects.Count; ++i)
-                hitObjects[i].NewCombo = newComboOrder[i];
+                new NewComboChange(hitObjects[i], newComboOrder[i]).Submit(changeHandler);
 
             return true;
         }
@@ -167,7 +173,7 @@ namespace osu.Game.Rulesets.Osu.Edit
 
                 if (!Precision.AlmostEquals(flippedPosition, h.Position))
                 {
-                    h.Position = flippedPosition;
+                    new PositionChange(h, flippedPosition).Submit(changeHandler);
                     didFlip = true;
                 }
 
@@ -176,7 +182,7 @@ namespace osu.Game.Rulesets.Osu.Edit
                     didFlip = true;
 
                     foreach (var cp in slider.Path.ControlPoints)
-                        cp.Position = GeometryUtils.GetFlippedPosition(flipAxis, controlPointFlipQuad, cp.Position);
+                        new PathControlPointPositionChange(cp, GeometryUtils.GetFlippedPosition(flipAxis, controlPointFlipQuad, cp.Position)).Submit(changeHandler);
                 }
             }
 
@@ -206,7 +212,7 @@ namespace osu.Game.Rulesets.Osu.Edit
                 delta.Y -= quad.BottomRight.Y - DrawHeight;
 
             foreach (var h in hitObjects)
-                h.Position += delta;
+                new PositionChange(h, h.Position + delta).Submit(changeHandler);
         }
 
         /// <summary>
@@ -245,7 +251,7 @@ namespace osu.Game.Rulesets.Osu.Edit
 
             if (mergedHitObject.Path.ControlPoints.Count == 0)
             {
-                mergedHitObject.Path.ControlPoints.Add(new PathControlPoint(Vector2.Zero, PathType.LINEAR));
+                new InsertPathControlPointChange(mergedHitObject.Path.ControlPoints, mergedHitObject.Path.ControlPoints.Count, new PathControlPoint(Vector2.Zero, PathType.LINEAR)).Submit(changeHandler);
             }
 
             // Merge all the selected hit objects into one slider path.
@@ -259,15 +265,15 @@ namespace osu.Game.Rulesets.Osu.Edit
                     float distanceToLastControlPoint = Vector2.Distance(mergedHitObject.Path.ControlPoints[^1].Position, offset);
 
                     // Calculate the distance required to travel to the expected distance of the merging slider.
-                    mergedHitObject.Path.ExpectedDistance.Value = mergedHitObject.Path.CalculatedDistance + distanceToLastControlPoint + hasPath.Path.Distance;
+                    new ExpectedDistanceChange(mergedHitObject.Path, mergedHitObject.Path.CalculatedDistance + distanceToLastControlPoint + hasPath.Path.Distance).Submit(changeHandler);
 
                     // Remove the last control point if it sits exactly on the start of the next control point.
                     if (Precision.AlmostEquals(distanceToLastControlPoint, 0))
                     {
-                        mergedHitObject.Path.ControlPoints.RemoveAt(mergedHitObject.Path.ControlPoints.Count - 1);
+                        new RemovePathControlPointChange(mergedHitObject.Path.ControlPoints, mergedHitObject.Path.ControlPoints.Count - 1).Submit(changeHandler);
                     }
 
-                    mergedHitObject.Path.ControlPoints.AddRange(hasPath.Path.ControlPoints.Select(o => new PathControlPoint(o.Position + offset, o.Type)));
+                    mergedHitObject.Path.ControlPoints.SubmitAddRange(hasPath.Path.ControlPoints.Select(o => new PathControlPoint(o.Position + offset, o.Type)), changeHandler);
                     lastCircle = false;
                 }
                 else
@@ -275,11 +281,11 @@ namespace osu.Game.Rulesets.Osu.Edit
                     // Turn the last control point into a linear type if this is the first merging circle in a sequence, so the subsequent control points can be inherited path type.
                     if (!lastCircle)
                     {
-                        mergedHitObject.Path.ControlPoints.Last().Type = PathType.LINEAR;
+                        new PathControlPointTypeChange(mergedHitObject.Path.ControlPoints.Last(), PathType.LINEAR).Submit(changeHandler);
                     }
 
-                    mergedHitObject.Path.ControlPoints.Add(new PathControlPoint(selectedMergeableObject.Position - mergedHitObject.Position));
-                    mergedHitObject.Path.ExpectedDistance.Value = null;
+                    new InsertPathControlPointChange(mergedHitObject.Path.ControlPoints, mergedHitObject.Path.ControlPoints.Count, new PathControlPoint(selectedMergeableObject.Position - mergedHitObject.Position)).Submit(changeHandler);
+                    new ExpectedDistanceChange(mergedHitObject.Path, null).Submit(changeHandler);
                     lastCircle = true;
                 }
             }
@@ -289,17 +295,17 @@ namespace osu.Game.Rulesets.Osu.Edit
             {
                 foreach (var selectedMergeableObject in mergeableObjects.Skip(1))
                 {
-                    EditorBeatmap.Remove(selectedMergeableObject);
+                    new RemoveHitObjectChange(EditorBeatmap, selectedMergeableObject).Submit(changeHandler);
                 }
             }
             else
             {
                 foreach (var selectedMergeableObject in mergeableObjects)
                 {
-                    EditorBeatmap.Remove(selectedMergeableObject);
+                    new RemoveHitObjectChange(EditorBeatmap, selectedMergeableObject).Submit(changeHandler);
                 }
 
-                EditorBeatmap.Add(mergedHitObject);
+                new AddHitObjectChange(EditorBeatmap, mergedHitObject).Submit(changeHandler);
             }
 
             // Make sure the merged hitobject is selected.
