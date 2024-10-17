@@ -13,6 +13,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
+using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Extensions;
 using osu.Game.Online.API;
@@ -84,6 +85,7 @@ namespace osu.Game.Database
                 convertLegacyTotalScoreToStandardised();
                 upgradeScoreRanks();
                 backpopulateMissingSubmissionAndRankDates();
+                processAudioNormalization();
             }, TaskCreationOptions.LongRunning).ContinueWith(t =>
             {
                 if (t.Exception?.InnerException is ObjectDisposedException)
@@ -94,6 +96,71 @@ namespace osu.Game.Database
 
                 Logger.Log("Finished background data store processing!");
             });
+        }
+
+        /// <summary>
+        /// Go through every beatmap and calculate the audio normalization values if they are missing
+        /// </summary>
+        private void processAudioNormalization()
+        {
+            var filestorage = new RealmFileStore(realmAccess, storage);
+            int beatmapsCount = 0;
+            int beatmapsToProcess = 0;
+
+            realmAccess.Run(r =>
+            {
+                foreach (BeatmapSetInfo beatmapSetInfo in r.All<BeatmapSetInfo>().Where(b => !b.DeletePending))
+                {
+                    beatmapsCount += beatmapSetInfo.Beatmaps.Count;
+                    beatmapsToProcess += beatmapSetInfo.Beatmaps.Count(b => b.AudioNormalization == null);
+                }
+            });
+
+            if (beatmapsToProcess == 0)
+            {
+                Logger.Log("No audio normalization processing required.");
+                return;
+            }
+
+            var notification = showProgressNotification(beatmapsCount, "Verifying loudness level for beatmaps", "all loudness levels have been verified");
+            int processedCount = 0;
+
+            realmAccess.Write(r =>
+            {
+                foreach (BeatmapSetInfo beatmapSetInfo in r.All<BeatmapSetInfo>().Where(b => !b.DeletePending))
+                {
+                    foreach (BeatmapInfo beatmapInfo in beatmapSetInfo.Beatmaps)
+                    {
+                        if (notification?.State == ProgressNotificationState.Cancelled)
+                            break;
+
+                        updateNotificationProgress(notification, processedCount, beatmapsCount);
+                        processedCount++;
+
+                        if (beatmapInfo.AudioNormalization != null) continue;
+
+                        sleepIfRequired();
+
+                        AudioNormalization audioNormalization = new AudioNormalization(beatmapInfo, beatmapSetInfo, filestorage);
+
+                        if (audioNormalization.IntegratedLoudness == null)
+                        {
+                            Logger.Log($"Failed to get loudness level for {beatmapSetInfo.Metadata.Title} [{beatmapInfo.DifficultyName}]", LoggingTarget.Runtime, LogLevel.Error);
+                            continue;
+                        }
+
+                        beatmapInfo.AudioNormalization = audioNormalization;
+                        audioNormalization.PopulateSet(beatmapInfo, beatmapSetInfo);
+                        ((IWorkingBeatmapCache)beatmapManager).Invalidate(beatmapSetInfo);
+                        Logger.Log($"Processed audio normalization for {beatmapSetInfo.Metadata.Title} [{beatmapInfo.DifficultyName}]");
+                    }
+                }
+
+                r.Refresh();
+            });
+
+            Logger.Log("Finished processing audio normalization readings");
+            completeNotification(notification, processedCount, beatmapsCount);
         }
 
         /// <summary>
