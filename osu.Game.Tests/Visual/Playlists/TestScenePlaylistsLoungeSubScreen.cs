@@ -3,12 +3,14 @@
 
 #nullable disable
 
+using System;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Bindables;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Rooms;
 using osu.Game.Screens.OnlinePlay.Lounge.Components;
 using osu.Game.Screens.OnlinePlay.Playlists;
@@ -22,6 +24,7 @@ namespace osu.Game.Tests.Visual.Playlists
         protected new TestRoomManager RoomManager => (TestRoomManager)base.RoomManager;
 
         private TestLoungeSubScreen loungeScreen;
+        private IDisposable loadingOperation;
 
         public override void SetUpSteps()
         {
@@ -89,6 +92,30 @@ namespace osu.Game.Tests.Visual.Playlists
 
             AddAssert("selected room is non-null", () => loungeScreen.SelectedRoom.Value != null);
             AddAssert("selected room is disabled", () => loungeScreen.SelectedRoom.Disabled);
+        }
+
+        [Test]
+        public void TestFilterTextCount()
+        {
+            AddAssert("filter text is 0 matches", () => this.ChildrenOfType<ShearedFilterTextBox>().Single().FilterText.ToString(), () => Is.EqualTo("0 matches"));
+
+            AddStep("add 10 rooms", () => RoomManager.AddRooms(10));
+
+            AddAssert("filter text is 10 matches", () => this.ChildrenOfType<ShearedFilterTextBox>().Single().FilterText.ToString(), () => Is.EqualTo("10 matches"));
+
+            AddStep("search for room 1", () => this.ChildrenOfType<ShearedFilterTextBox>().Single().Current.Value = "room 1");
+
+            AddUntilStep("filter text is 1 match", () => this.ChildrenOfType<ShearedFilterTextBox>().Single().FilterText.ToString(), () => Is.EqualTo("1 match"));
+
+            AddStep("begin loading operation", () => loadingOperation = OngoingOperationTracker.BeginOperation());
+
+            AddAssert("filter text is loading...", () => this.ChildrenOfType<ShearedFilterTextBox>().Single().FilterText.ToString(), () => Is.EqualTo("loading..."));
+
+            AddStep("finish loading operation", () =>
+            {
+                loadingOperation?.Dispose();
+                loadingOperation = null;
+            });
         }
 
         private bool checkRoomVisible(DrawableRoom room) =>
