@@ -9,6 +9,8 @@ using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Osu.UI;
+using osu.Game.Rulesets.Osu.UI.Cursor;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Scoring;
@@ -22,16 +24,28 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override string Acronym => "CS";
         public override LocalisableString Description => "Circle size adjusts dynamically based on your combo.";
         public override ModType Type => ModType.Fun;
-        public override Type[] IncompatibleMods => base.IncompatibleMods.Concat(new[] { typeof(OsuModAutoplay), typeof(ModCinema), typeof(ModEasy), typeof(ModHardRock), typeof(OsuModMagnetised), typeof(OsuModRepel), typeof(OsuModFreezeFrame), typeof(ModWithVisibilityAdjustment) }).ToArray();
+        public override Type[] IncompatibleMods => base.IncompatibleMods.Concat(new[]
+        {
+            typeof(OsuModAutoplay),
+            typeof(ModCinema),
+            typeof(ModEasy),
+            typeof(ModHardRock),
+            typeof(OsuModMagnetised),
+            typeof(OsuModRepel),
+            typeof(OsuModFreezeFrame),
+        }).ToArray();
         public override double ScoreMultiplier => 0.85f;
         public override bool Ranked => false;
+
+        private readonly BindableNumber<int> comboCount = new BindableInt();
+        private float currentComboValue;
 
         [SettingSource("Maximum Circle Size", "The largest size when combo is low.")]
         public BindableFloat MaxCircleSize { get; } = new BindableFloat(10f)
         {
             MinValue = 0f,
             MaxValue = 10f,
-            Precision = 0.1f,
+            Precision = 0.1f
         };
 
         [SettingSource("Minimum Circle Size", "The smallest size when combo is high.")]
@@ -39,7 +53,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         {
             MinValue = 0f,
             MaxValue = 10f,
-            Precision = 0.1f,
+            Precision = 0.1f
         };
 
         [SettingSource("Size Adjustment Speed", "How fast the circle size adjusts.")]
@@ -47,31 +61,26 @@ namespace osu.Game.Rulesets.Osu.Mods
         {
             MinValue = 5f,
             MaxValue = 50f,
-            Precision = 1f,
+            Precision = 1f
         };
 
         [SettingSource("Inverse Scaling", "Reverse the scaling logic.")]
         public BindableBool IsInverseScaling { get; } = new BindableBool(false);
 
-        private readonly BindableNumber<int> comboCount = new BindableInt();
-        private float currentComboValue;
-
-        public void ApplyToDifficulty(BeatmapDifficulty difficulty) => ApplySettingsToDifficulty(difficulty);
-
-        private void ApplySettingsToDifficulty(BeatmapDifficulty difficulty)
-        {
-            difficulty.CircleSize = 0;
-        }
+        public void ApplyToDifficulty(BeatmapDifficulty difficulty) => difficulty.CircleSize = 0;
 
         public void ApplyToScoreProcessor(ScoreProcessor scoreProcessor)
         {
             if (scoreProcessor == null) return;
-
             comboCount.BindTo(scoreProcessor.Combo);
         }
 
         public void Update(Playfield playfield)
         {
+            OsuCursor gameCursor = (OsuCursor)playfield.Cursor.ActiveCursor;
+            (playfield as OsuPlayfield)?.FollowPoints.Hide();
+            playfield.DisplayJudgements.Value = false;
+
             comboCount.BindValueChanged(combo =>
             {
                 currentComboValue = combo.NewValue;
@@ -83,36 +92,25 @@ namespace osu.Game.Rulesets.Osu.Mods
             float maxBound = Math.Clamp(maxSize / 10f, 0.175f, 1f);
             float minBound = Math.Clamp(minSize / 10f, 0.175f, 1f);
 
-            float adjustedSize;
-
-            if (IsInverseScaling.Value)
-            {
-                adjustedSize = Math.Clamp(
+            float adjustedSize = IsInverseScaling.Value
+                ? Math.Clamp(
                     ((currentComboValue / (SizeAdjustmentSpeed.Value * (maxSize - minSize))) * (maxBound - minBound)) + minBound,
-                    minBound,
-                    maxBound
-                );
-            }
-            else
-            {
-                adjustedSize = Math.Clamp(
+                    minBound, maxBound)
+                : Math.Clamp(
                     ((1 - (currentComboValue / (SizeAdjustmentSpeed.Value * (maxSize - minSize)))) * (maxBound - minBound)) + minBound,
-                    minBound,
-                    maxBound
-                );
-            }
+                    minBound, maxBound);
 
             foreach (var entry in playfield.HitObjectContainer.AliveEntries)
             {
                 var drawableObject = entry.Value;
-                drawableObject.Scale = new Vector2(Math.Clamp(adjustedSize, minBound, maxBound));
-                drawableObject.ScaleTo(new Vector2(Math.Clamp(adjustedSize, minBound, maxBound)), 500, Easing.OutElasticQuarter);
+                float scale = Math.Clamp(adjustedSize, minBound, maxBound);
+
+                gameCursor.Scale = new Vector2(scale);
+                drawableObject.Scale = new Vector2(scale);
+                drawableObject.ScaleTo(new Vector2(scale), 500, Easing.OutElasticQuarter);
             }
         }
 
-        public ScoreRank AdjustRank(ScoreRank rank, double accuracy)
-        {
-            return rank;
-        }
+        public ScoreRank AdjustRank(ScoreRank rank, double accuracy) => rank;
     }
 }
