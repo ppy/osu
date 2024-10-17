@@ -66,13 +66,10 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public void ApplyToScoreProcessor(ScoreProcessor scoreProcessor)
         {
-            if (MaxSizeComboCount.Value == 0) return;
-
             CurrentCombo.BindTo(scoreProcessor.Combo);
             CurrentCombo.BindValueChanged(combo =>
             {
-                ComboBasedSize = Math.Min(MaxMulti.Value, 10 * ((float)combo.NewValue / MaxSizeComboCount.Value));
-                ComboBasedSize = Math.Max(ComboBasedSize, MIN_SIZE);
+                ComboBasedSize = Math.Clamp(MaxMulti.Value * ((float)combo.NewValue / MaxSizeComboCount.Value), MIN_SIZE, MaxMulti.Value);
             }, true);
         }
 
