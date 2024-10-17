@@ -215,7 +215,7 @@ namespace osu.Game.Rulesets.Osu
                         new OsuModBubbles(),
                         new OsuModSynesthesia(),
                         new OsuModDepth(),
-                        new OsuModDynamic()
+                        new OsuModComboScaling()
                     };
 
                 case ModType.System:

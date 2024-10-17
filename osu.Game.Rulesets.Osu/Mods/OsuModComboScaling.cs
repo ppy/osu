@@ -16,10 +16,10 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
-    public class OsuModDynamic : Mod, IApplicableToDifficulty, IApplicableToScoreProcessor, IUpdatableByPlayfield
+    public class OsuModComboScaling : Mod, IApplicableToDifficulty, IApplicableToScoreProcessor, IUpdatableByPlayfield
     {
-        public override string Name => "Dynamic Circle";
-        public override string Acronym => "DC";
+        public override string Name => "Combo Scaling";
+        public override string Acronym => "CS";
         public override LocalisableString Description => "Circle size adjusts dynamically based on your combo.";
         public override ModType Type => ModType.Fun;
         public override Type[] IncompatibleMods => base.IncompatibleMods.Concat(new[] { typeof(OsuModAutoplay), typeof(ModCinema), typeof(ModEasy), typeof(ModHardRock), typeof(OsuModMagnetised), typeof(OsuModRepel), typeof(OsuModFreezeFrame), typeof(ModWithVisibilityAdjustment) }).ToArray();
