@@ -15,9 +15,6 @@ namespace osu.Game.Rulesets.Catch.Tests.Mods
         [TestCase(0.5f)]
         [TestCase(1.25f)]
         [TestCase(1.5f)]
-        public void TestSizeMultiplier(float sizeMultiplier) => CreateModTest(new ModTestData { Mod = new CatchModFlashlight { SizeMultiplier = { Value = sizeMultiplier } }, PassCondition = () => true });
-
-        [Test]
-        public void TestComboBasedSize([Values] bool comboBasedSize) => CreateModTest(new ModTestData { Mod = new CatchModFlashlight { ComboBasedSize = { Value = comboBasedSize } }, PassCondition = () => true });
+        public void TestSizeMultiplier(float sizeMultiplier) => CreateModTest(new ModTestData { Mod = new CatchModFlashlight { StartingFlashlightSize = { Value = sizeMultiplier } }, PassCondition = () => true });
     }
 }
