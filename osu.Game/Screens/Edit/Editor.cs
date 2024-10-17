@@ -1102,11 +1102,13 @@ namespace osu.Game.Screens.Edit
             double seekMargin = 0;
             if (clock.IsRunning) 
             {
-                seekMargin = 350;
+                seekMargin = 450;
             }
             
+           IAdjustableClock adjustableClock = clock;
+
             var found = direction < 1
-                ? editorBeatmap.ControlPointInfo.AllControlPoints.LastOrDefault(p => p.Time < clock.CurrentTime - seekMargin)
+                ? editorBeatmap.ControlPointInfo.AllControlPoints.LastOrDefault(p => p.Time < clock.CurrentTime - (seekMargin * adjustableClock.Rate))
                 : editorBeatmap.ControlPointInfo.AllControlPoints.FirstOrDefault(p => p.Time > clock.CurrentTime);
 
             if (found != null)
