@@ -26,29 +26,36 @@ namespace osu.Game.Beatmaps
         /// Might not be available if the star difficulty is associated with a beatmap that's not locally available.
         /// </summary>
         [CanBeNull]
-        public readonly DifficultyAttributes Attributes;
+        public readonly DifficultyAttributes DifficultyAttributes;
 
         /// <summary>
-        /// Creates a <see cref="StarDifficulty"/> structure based on <see cref="DifficultyAttributes"/> computed
-        /// by a <see cref="DifficultyCalculator"/>.
+        /// The performance attributes computed for a perfect score on the given beatmap.
+        /// Might not be available if the star difficulty is associated with a beatmap that's not locally available.
         /// </summary>
-        public StarDifficulty([NotNull] DifficultyAttributes attributes)
+        [CanBeNull]
+        public readonly PerformanceAttributes PerformanceAttributes;
+
+        /// <summary>
+        /// Creates a <see cref="StarDifficulty"/> structure.
+        /// </summary>
+        public StarDifficulty([NotNull] DifficultyAttributes difficulty, [NotNull] PerformanceAttributes performance)
         {
-            Stars = double.IsFinite(attributes.StarRating) ? attributes.StarRating : 0;
-            MaxCombo = attributes.MaxCombo;
-            Attributes = attributes;
+            Stars = double.IsFinite(difficulty.StarRating) ? difficulty.StarRating : 0;
+            MaxCombo = difficulty.MaxCombo;
+            DifficultyAttributes = difficulty;
+            PerformanceAttributes = performance;
             // Todo: Add more members (BeatmapInfo.DifficultyRating? Attributes? Etc...)
         }
 
         /// <summary>
         /// Creates a <see cref="StarDifficulty"/> structure with a pre-populated star difficulty and max combo
-        /// in scenarios where computing <see cref="DifficultyAttributes"/> is not feasible (i.e. when working with online sources).
+        /// in scenarios where computing <see cref="Rulesets.Difficulty.DifficultyAttributes"/> is not feasible (i.e. when working with online sources).
         /// </summary>
         public StarDifficulty(double starDifficulty, int maxCombo)
         {
             Stars = double.IsFinite(starDifficulty) ? starDifficulty : 0;
             MaxCombo = maxCombo;
-            Attributes = null;
+            DifficultyAttributes = null;
         }
 
         public DifficultyRating DifficultyRating => GetDifficultyRating(Stars);
