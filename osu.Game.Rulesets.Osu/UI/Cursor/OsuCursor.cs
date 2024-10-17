@@ -101,6 +101,11 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
             return scale;
         }
 
+        public void UpdateSize(float size)
+        {
+            cursorScale.Value = size;
+        }
+
         protected override void SkinChanged(ISkinSource skin)
         {
             cursorExpand = skin.GetConfig<OsuSkinConfiguration, bool>(OsuSkinConfiguration.CursorExpand)?.Value ?? true;
