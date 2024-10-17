@@ -21,6 +21,7 @@ using osu.Game.Localisation;
 using osu.Game.Localisation.SkinComponents;
 using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Utils;
 
@@ -167,6 +168,9 @@ namespace osu.Game.Skinning.Components
                 case BeatmapAttribute.BPM:
                     return BeatmapsetsStrings.ShowStatsBpm;
 
+                case BeatmapAttribute.MaxPP:
+                    return BeatmapAttributeTextStrings.MaxPP;
+
                 default:
                     throw new ArgumentOutOfRangeException();
             }
@@ -215,6 +219,11 @@ namespace osu.Game.Skinning.Components
                 case BeatmapAttribute.StarRating:
                     return difficultyBindable?.Value is StarDifficulty starDifficulty
                         ? starDifficulty.Stars.ToLocalisableString(@"F2")
+                        : @"...";
+
+                case BeatmapAttribute.MaxPP:
+                    return difficultyBindable?.Value?.PerformanceAttributes is PerformanceAttributes attributes
+                        ? attributes.Total.ToLocalisableString(@"F2")
                         : @"...";
 
                 default:
@@ -269,5 +278,6 @@ namespace osu.Game.Skinning.Components
         RankedStatus,
         BPM,
         Source,
+        MaxPP
     }
 }
