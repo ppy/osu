@@ -295,7 +295,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             ensurePlacementCreated();
         }
 
-        private void updatePlacementPosition()
+        private void updatePlacementTimeAndPosition()
         {
             var snapResult = Composer.FindSnappedPositionAndTime(InputManager.CurrentState.Mouse.Position, CurrentPlacement.SnapType);
 
@@ -329,8 +329,18 @@ namespace osu.Game.Screens.Edit.Compose.Components
             if (Composer.CursorInPlacementArea)
                 ensurePlacementCreated();
 
+            // updates the placement with the latest editor clock time.
             if (CurrentPlacement != null)
-                updatePlacementPosition();
+                updatePlacementTimeAndPosition();
+        }
+
+        protected override bool OnMouseMove(MouseMoveEvent e)
+        {
+            // updates the placement with the latest mouse position.
+            if (CurrentPlacement != null)
+                updatePlacementTimeAndPosition();
+
+            return base.OnMouseMove(e);
         }
 
         protected sealed override SelectionBlueprint<HitObject> CreateBlueprintFor(HitObject item)
@@ -367,7 +377,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 placementBlueprintContainer.Child = CurrentPlacement = blueprint;
 
                 // Fixes a 1-frame position discrepancy due to the first mouse move event happening in the next frame
-                updatePlacementPosition();
+                updatePlacementTimeAndPosition();
 
                 updatePlacementSamples();
 

@@ -3,9 +3,11 @@
 
 #nullable disable
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Input.Events;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Edit;
@@ -24,6 +26,10 @@ namespace osu.Game.Tests.Visual
         protected PlacementBlueprintTestScene()
         {
             base.Content.Add(HitObjectContainer = CreateHitObjectContainer().With(c => c.Clock = new FramedClock(new StopwatchClock())));
+            base.Content.Add(new MouseMovementInterceptor
+            {
+                MouseMoved = updatePlacementTimeAndPosition,
+            });
         }
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
@@ -83,9 +89,10 @@ namespace osu.Game.Tests.Visual
         protected override void Update()
         {
             base.Update();
-
-            CurrentBlueprint.UpdateTimeAndPosition(SnapForBlueprint(CurrentBlueprint));
+            updatePlacementTimeAndPosition();
         }
+
+        private void updatePlacementTimeAndPosition() => CurrentBlueprint.UpdateTimeAndPosition(SnapForBlueprint(CurrentBlueprint));
 
         protected virtual SnapResult SnapForBlueprint(HitObjectPlacementBlueprint blueprint) =>
             new SnapResult(InputManager.CurrentState.Mouse.Position, null);
@@ -107,5 +114,22 @@ namespace osu.Game.Tests.Visual
 
         protected abstract DrawableHitObject CreateHitObject(HitObject hitObject);
         protected abstract HitObjectPlacementBlueprint CreateBlueprint();
+
+        private partial class MouseMovementInterceptor : Drawable
+        {
+            public Action MouseMoved;
+
+            public MouseMovementInterceptor()
+            {
+                RelativeSizeAxes = Axes.Both;
+                Depth = float.MinValue;
+            }
+
+            protected override bool OnMouseMove(MouseMoveEvent e)
+            {
+                MouseMoved?.Invoke();
+                return base.OnMouseMove(e);
+            }
+        }
     }
 }
