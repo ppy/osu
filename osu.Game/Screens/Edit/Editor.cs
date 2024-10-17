@@ -1098,6 +1098,13 @@ namespace osu.Game.Screens.Edit
 
         private void seekControlPoint(int direction)
         {
+            // Gives 350 ms margin to seek back after last control point
+            double seekMargin = 0;
+            if (clock.IsRunning) 
+            {
+                seekMargin = 350;
+            }
+            
             var found = direction < 1
                 ? editorBeatmap.ControlPointInfo.AllControlPoints.LastOrDefault(p => p.Time < clock.CurrentTime)
                 : editorBeatmap.ControlPointInfo.AllControlPoints.FirstOrDefault(p => p.Time > clock.CurrentTime);
