@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Numerics;
 using System.Globalization;
 using osu.Framework.Bindables;
@@ -26,10 +27,47 @@ namespace osu.Game.Graphics.UserInterfaceV2
             set => slider.KeyboardStep = value;
         }
 
+        private readonly BindableNumberWithCurrent<T> current = new BindableNumberWithCurrent<T>();
+
         public Bindable<T> Current
         {
-            get => slider.Current;
-            set => slider.Current = value;
+            get => current;
+            set
+            {
+                current.Current = value;
+                slider.Current = new BindableNumber<T>
+                {
+                    MinValue = current.MinValue,
+                    MaxValue = current.MaxValue,
+                    Default = current.Default,
+                    Precision = sliderPrecision ?? current.Precision,
+                };
+            }
+        }
+
+        private T? sliderPrecision;
+
+        public T? SliderPrecision
+        {
+            get => sliderPrecision;
+            set
+            {
+                if (value.HasValue)
+                {
+                    T multiple = value.Value / current.Precision;
+                    if (!T.IsNaN(multiple) && !T.IsInfinity(multiple) && !T.IsZero(multiple % T.One))
+                        throw new ArgumentException(@"Precision override must be a multiple of the current precision.");
+                }
+
+                sliderPrecision = value;
+                slider.Current = new BindableNumber<T>
+                {
+                    MinValue = current.MinValue,
+                    MaxValue = current.MaxValue,
+                    Default = current.Default,
+                    Precision = value ?? current.Precision,
+                };
+            }
         }
 
         private bool instantaneous;
@@ -82,37 +120,41 @@ namespace osu.Game.Graphics.UserInterfaceV2
             textBox.OnCommit += textCommitted;
             textBox.Current.BindValueChanged(textChanged);
 
-            Current.BindValueChanged(updateTextBoxFromSlider, true);
+            slider.Current.BindValueChanged(updateCurrentFromSlider);
+            Current.BindValueChanged(updateTextBoxAndSliderFromCurrent, true);
         }
 
         public bool TakeFocus() => GetContainingFocusManager()?.ChangeFocus(textBox) == true;
 
         public bool SelectAll() => textBox.SelectAll();
 
+        private bool updatingFromCurrent;
         private bool updatingFromTextBox;
 
         private void textChanged(ValueChangedEvent<string> change)
         {
             if (!instantaneous) return;
 
-            tryUpdateSliderFromTextBox();
+            tryUpdateCurrentFromTextBox();
         }
 
         private void textCommitted(TextBox t, bool isNew)
         {
-            tryUpdateSliderFromTextBox();
+            tryUpdateCurrentFromTextBox();
 
             // If the attempted update above failed, restore text box to match the slider.
             Current.TriggerChange();
         }
 
-        private void tryUpdateSliderFromTextBox()
+        private void tryUpdateCurrentFromTextBox()
         {
+            if (updatingFromCurrent) return;
+
             updatingFromTextBox = true;
 
             try
             {
-                switch (slider.Current)
+                switch (Current)
                 {
                     case Bindable<int> bindableInt:
                         bindableInt.Value = int.Parse(textBox.Current.Value);
@@ -123,7 +165,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
                         break;
 
                     default:
-                        slider.Current.Parse(textBox.Current.Value, CultureInfo.CurrentCulture);
+                        Current.Parse(textBox.Current.Value, CultureInfo.CurrentCulture);
                         break;
                 }
             }
@@ -136,12 +178,26 @@ namespace osu.Game.Graphics.UserInterfaceV2
             updatingFromTextBox = false;
         }
 
-        private void updateTextBoxFromSlider(ValueChangedEvent<T> _)
+        private void updateCurrentFromSlider(ValueChangedEvent<T> _)
         {
-            if (updatingFromTextBox) return;
+            if (updatingFromCurrent) return;
 
-            decimal decimalValue = decimal.CreateTruncating(slider.Current.Value);
-            textBox.Text = decimalValue.ToString($@"N{FormatUtils.FindPrecision(decimalValue)}");
+            Current.Value = slider.Current.Value;
+        }
+
+        private void updateTextBoxAndSliderFromCurrent(ValueChangedEvent<T> _)
+        {
+            updatingFromCurrent = true;
+
+            slider.Current.Value = Current.Value;
+
+            if (!updatingFromTextBox)
+            {
+                decimal decimalValue = decimal.CreateTruncating(Current.Value);
+                textBox.Text = decimalValue.ToString($@"N{FormatUtils.FindPrecision(decimalValue)}");
+            }
+
+            updatingFromCurrent = false;
         }
     }
 }
