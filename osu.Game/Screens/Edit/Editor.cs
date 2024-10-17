@@ -1106,7 +1106,7 @@ namespace osu.Game.Screens.Edit
             }
             
             var found = direction < 1
-                ? editorBeatmap.ControlPointInfo.AllControlPoints.LastOrDefault(p => p.Time < clock.CurrentTime)
+                ? editorBeatmap.ControlPointInfo.AllControlPoints.LastOrDefault(p => p.Time < clock.CurrentTime - seekMargin)
                 : editorBeatmap.ControlPointInfo.AllControlPoints.FirstOrDefault(p => p.Time > clock.CurrentTime);
 
             if (found != null)
