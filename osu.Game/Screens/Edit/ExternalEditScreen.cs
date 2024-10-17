@@ -21,6 +21,7 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
+using osu.Game.Localisation;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Overlays;
 using osu.Game.Screens.OnlinePlay.Match.Components;
@@ -156,7 +157,7 @@ namespace osu.Game.Screens.Edit
                 },
                 new DangerousRoundedButton
                 {
-                    Text = "Finish editing and import changes",
+                    Text = EditorStrings.FinishEditingExternally,
                     Width = 350,
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
