@@ -4,12 +4,15 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
+using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
+using osu.Framework.Graphics.Textures;
 using osu.Framework.Lists;
 using osu.Framework.Logging;
 using osu.Framework.Threading;
@@ -18,7 +21,12 @@ using osu.Game.Database;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
+using osu.Game.Scoring;
+using osu.Game.Skinning;
+using osu.Game.Storyboards;
 
 namespace osu.Game.Beatmaps
 {
@@ -237,10 +245,13 @@ namespace osu.Game.Beatmaps
                 var ruleset = rulesetInfo.CreateInstance();
                 Debug.Assert(ruleset != null);
 
-                var calculator = ruleset.CreateDifficultyCalculator(beatmapManager.GetWorkingBeatmap(key.BeatmapInfo));
-                var attributes = calculator.Calculate(key.OrderedMods, cancellationToken);
+                PlayableCachedWorkingBeatmap working = new PlayableCachedWorkingBeatmap(beatmapManager.GetWorkingBeatmap(key.BeatmapInfo));
 
-                return new StarDifficulty(attributes);
+                var difficulty = ruleset.CreateDifficultyCalculator(working).Calculate(key.OrderedMods, cancellationToken);
+                cancellationToken.ThrowIfCancellationRequested();
+                var performance = computeMaxPerformance(working, key.BeatmapInfo, ruleset, key.OrderedMods, difficulty);
+
+                return new StarDifficulty(difficulty, performance);
             }
             catch (OperationCanceledException)
             {
@@ -262,6 +273,60 @@ namespace osu.Game.Beatmaps
             }
         }
 
+        private static PerformanceAttributes computeMaxPerformance(IWorkingBeatmap working, BeatmapInfo beatmap, Ruleset ruleset, Mod[] mods, DifficultyAttributes attributes)
+        {
+            var performanceCalculator = ruleset.CreatePerformanceCalculator();
+            if (performanceCalculator == null)
+                return new PerformanceAttributes();
+
+            IBeatmap playableBeatmap = working.GetPlayableBeatmap(ruleset.RulesetInfo, mods);
+
+            // create statistics assuming all hit objects have perfect hit result
+            var statistics = playableBeatmap.HitObjects
+                                            .SelectMany(getPerfectHitResults)
+                                            .GroupBy(hr => hr, (hr, list) => (hitResult: hr, count: list.Count()))
+                                            .ToDictionary(pair => pair.hitResult, pair => pair.count);
+
+            // compute maximum total score
+            ScoreProcessor scoreProcessor = ruleset.CreateScoreProcessor();
+            scoreProcessor.Mods.Value = mods;
+            scoreProcessor.ApplyBeatmap(playableBeatmap);
+            long maxScore = scoreProcessor.MaximumTotalScore;
+
+            // todo: Get max combo from difficulty calculator instead when diffcalc properly supports lazer-first scores
+            int maxCombo = calculateMaxCombo(playableBeatmap);
+
+            // compute maximum rank - default to SS, then adjust the rank with mods
+            ScoreRank maxRank = ScoreRank.X;
+            foreach (IApplicableToScoreProcessor mod in mods.OfType<IApplicableToScoreProcessor>())
+                maxRank = mod.AdjustRank(maxRank, 1);
+
+            ScoreInfo perfectScore = new ScoreInfo(beatmap, ruleset.RulesetInfo)
+            {
+                Accuracy = 1,
+                Passed = true,
+                MaxCombo = maxCombo,
+                Combo = maxCombo,
+                Mods = mods,
+                TotalScore = maxScore,
+                Statistics = statistics,
+                MaximumStatistics = statistics
+            };
+
+            return performanceCalculator.Calculate(perfectScore, attributes);
+
+            static int calculateMaxCombo(IBeatmap beatmap)
+                => beatmap.HitObjects.SelectMany(getPerfectHitResults).Count(r => r.AffectsCombo());
+
+            static IEnumerable<HitResult> getPerfectHitResults(HitObject hitObject)
+            {
+                foreach (HitObject nested in hitObject.NestedHitObjects)
+                    yield return nested.Judgement.MaxResult;
+
+                yield return hitObject.Judgement.MaxResult;
+            }
+        }
+
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
@@ -276,7 +341,6 @@ namespace osu.Game.Beatmaps
         {
             public readonly BeatmapInfo BeatmapInfo;
             public readonly RulesetInfo Ruleset;
-
             public readonly Mod[] OrderedMods;
 
             public DifficultyCacheLookup(BeatmapInfo beatmapInfo, RulesetInfo? ruleset, IEnumerable<Mod>? mods)
@@ -316,6 +380,43 @@ namespace osu.Game.Beatmaps
                 BeatmapInfo = beatmapInfo;
                 CancellationToken = cancellationToken;
             }
+        }
+
+        /// <summary>
+        /// A working beatmap that caches its playable representation.
+        /// This is intended as single-use for when it is guaranteed that the playable beatmap can be reused.
+        /// </summary>
+        private class PlayableCachedWorkingBeatmap : IWorkingBeatmap
+        {
+            private readonly IWorkingBeatmap working;
+            private IBeatmap? playable;
+
+            public PlayableCachedWorkingBeatmap(IWorkingBeatmap working)
+            {
+                this.working = working;
+            }
+
+            public IBeatmap GetPlayableBeatmap(IRulesetInfo ruleset, IReadOnlyList<Mod> mods)
+                => playable ??= working.GetPlayableBeatmap(ruleset, mods);
+
+            public IBeatmap GetPlayableBeatmap(IRulesetInfo ruleset, IReadOnlyList<Mod> mods, CancellationToken cancellationToken)
+                => playable ??= working.GetPlayableBeatmap(ruleset, mods, cancellationToken);
+
+            IBeatmapInfo IWorkingBeatmap.BeatmapInfo => working.BeatmapInfo;
+            bool IWorkingBeatmap.BeatmapLoaded => working.BeatmapLoaded;
+            bool IWorkingBeatmap.TrackLoaded => working.TrackLoaded;
+            IBeatmap IWorkingBeatmap.Beatmap => working.Beatmap;
+            Texture IWorkingBeatmap.GetBackground() => working.GetBackground();
+            Texture IWorkingBeatmap.GetPanelBackground() => working.GetPanelBackground();
+            Waveform IWorkingBeatmap.Waveform => working.Waveform;
+            Storyboard IWorkingBeatmap.Storyboard => working.Storyboard;
+            ISkin IWorkingBeatmap.Skin => working.Skin;
+            Track IWorkingBeatmap.Track => working.Track;
+            Track IWorkingBeatmap.LoadTrack() => working.LoadTrack();
+            Stream IWorkingBeatmap.GetStream(string storagePath) => working.GetStream(storagePath);
+            void IWorkingBeatmap.BeginAsyncLoad() => working.BeginAsyncLoad();
+            void IWorkingBeatmap.CancelAsyncLoad() => working.CancelAsyncLoad();
+            void IWorkingBeatmap.PrepareTrackForPreview(bool looping, double offsetFromPreviewPoint) => working.PrepareTrackForPreview(looping, offsetFromPreviewPoint);
         }
     }
 }
