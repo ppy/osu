@@ -438,20 +438,27 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
             protected override bool OnKeyDown(KeyDownEvent e)
             {
-                if (e.ControlPressed || e.AltPressed || e.SuperPressed || !checkRightToggleFromKey(e.Key, out int rightIndex))
+                if (e.ControlPressed || e.SuperPressed || !checkRightToggleFromKey(e.Key, out int rightIndex))
                     return base.OnKeyDown(e);
 
-                if (e.ShiftPressed)
+                if (e.ShiftPressed || e.AltPressed)
                 {
                     string? newBank = banks.ElementAtOrDefault(rightIndex);
 
                     if (string.IsNullOrEmpty(newBank))
                         return true;
 
-                    setBank(newBank);
-                    updatePrimaryBankState();
-                    setAdditionBank(newBank);
-                    updateAdditionBankState();
+                    if (e.ShiftPressed)
+                    {
+                        setBank(newBank);
+                        updatePrimaryBankState();
+                    }
+
+                    if (e.AltPressed)
+                    {
+                        setAdditionBank(newBank);
+                        updateAdditionBankState();
+                    }
                 }
                 else
                 {
