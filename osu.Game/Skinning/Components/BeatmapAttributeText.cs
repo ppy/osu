@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -33,7 +34,12 @@ namespace osu.Game.Skinning.Components
         [Resolved]
         private IBindable<WorkingBeatmap> beatmap { get; set; } = null!;
 
+        [Resolved]
+        private BeatmapDifficultyCache difficultyCache { get; set; } = null!;
+
         private readonly OsuSpriteText text;
+        private IBindable<StarDifficulty?>? difficultyBindable;
+        private CancellationTokenSource? difficultyCancellationSource;
 
         public BeatmapAttributeText()
         {
@@ -55,7 +61,18 @@ namespace osu.Game.Skinning.Components
 
             Attribute.BindValueChanged(_ => updateText());
             Template.BindValueChanged(_ => updateText());
-            beatmap.BindValueChanged(b => updateText());
+
+            beatmap.BindValueChanged(b =>
+            {
+                difficultyCancellationSource?.Cancel();
+                difficultyCancellationSource = new CancellationTokenSource();
+
+                difficultyBindable?.UnbindAll();
+                difficultyBindable = difficultyCache.GetBindableDifficulty(b.NewValue.BeatmapInfo, difficultyCancellationSource.Token);
+                difficultyBindable.BindValueChanged(_ => updateText());
+
+                updateText();
+            }, true);
 
             updateText();
         }
@@ -172,7 +189,9 @@ namespace osu.Game.Skinning.Components
                     return ((double)beatmap.Value.BeatmapInfo.Difficulty.ApproachRate).ToLocalisableString(@"F2");
 
                 case BeatmapAttribute.StarRating:
-                    return beatmap.Value.BeatmapInfo.StarRating.ToLocalisableString(@"F2");
+                    return difficultyBindable?.Value is StarDifficulty starDifficulty
+                        ? starDifficulty.Stars.ToLocalisableString(@"F2")
+                        : @"...";
 
                 default:
                     throw new ArgumentOutOfRangeException();
@@ -182,6 +201,15 @@ namespace osu.Game.Skinning.Components
         protected override void SetFont(FontUsage font) => text.Font = font.With(size: 40);
 
         protected override void SetTextColour(Colour4 textColour) => text.Colour = textColour;
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            difficultyCancellationSource?.Cancel();
+            difficultyCancellationSource?.Dispose();
+            difficultyCancellationSource = null;
+        }
     }
 
     // WARNING: DO NOT ADD ANY VALUES TO THIS ENUM ANYWHERE ELSE THAN AT THE END.
