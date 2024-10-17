@@ -1098,7 +1098,7 @@ namespace osu.Game.Screens.Edit
 
         private void seekControlPoint(int direction)
         {
-            // Gives 350 ms margin to seek back after last control point
+            // Gives margin to seek back after last control point
             double seekMargin = 0;
             if (clock.IsRunning) 
             {
