@@ -181,13 +181,13 @@ namespace osu.Game.Skinning.Components
                     return beatmap.Value.BeatmapInfo.Metadata.Source;
 
                 case BeatmapAttribute.Length:
-                    return TimeSpan.FromMilliseconds(beatmap.Value.BeatmapInfo.Length).ToFormattedDuration();
+                    return Math.Round(beatmap.Value.BeatmapInfo.Length / ModUtils.CalculateRateWithMods(mods.Value)).ToFormattedDuration();
 
                 case BeatmapAttribute.RankedStatus:
                     return beatmap.Value.BeatmapInfo.Status.GetLocalisableDescription();
 
                 case BeatmapAttribute.BPM:
-                    return beatmap.Value.BeatmapInfo.BPM.ToLocalisableString(@"F2");
+                    return FormatUtils.RoundBPM(beatmap.Value.BeatmapInfo.BPM, ModUtils.CalculateRateWithMods(mods.Value)).ToLocalisableString(@"F2");
 
                 case BeatmapAttribute.CircleSize:
                     return computeDifficulty().CircleSize.ToLocalisableString(@"F2");
